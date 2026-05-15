@@ -80,6 +80,29 @@ jobs:
             fi
           done
 
+      - name: Pin onnxruntime-android version (avoid latest.integration XML parser bug)
+        run: |
+          # onnxruntime-react-native ships with three "latest.integration" dynamic
+          # version refs in its android/build.gradle. Resolving them forces Gradle
+          # to list all versions from Maven Central, which trips a known
+          # SAXNotRecognizedException on accessExternalSchema in the bundled
+          # Apache Ivy XML parser. Pinning a specific version skips the listing
+          # path entirely.
+          ORT_GRADLE=node_modules/onnxruntime-react-native/android/build.gradle
+          if [ ! -f "$ORT_GRADLE" ]; then
+            echo "::error::Expected $ORT_GRADLE not found"
+            exit 1
+          fi
+          echo "--- before ---"
+          grep -n "latest.integration" "$ORT_GRADLE" || true
+          sed -i 's/latest\.integration/1.20.0/g' "$ORT_GRADLE"
+          echo "--- after ---"
+          grep -n "1\.20\.0" "$ORT_GRADLE" || true
+          if grep -q "latest.integration" "$ORT_GRADLE"; then
+            echo "::error::latest.integration still present in $ORT_GRADLE"
+            exit 1
+          fi
+
       - name: Determine build profile and tag
         id: meta
         run: |
