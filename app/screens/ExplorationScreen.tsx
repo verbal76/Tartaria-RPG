@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { StatsPanel } from '../components/StatsPanel';
@@ -6,6 +6,7 @@ import { InventoryPanel } from '../components/InventoryPanel';
 import { AdventureFeed } from '../components/AdventureFeed';
 import { InputBox } from '../components/InputBox';
 import { DiceRoller } from '../components/DiceRoller';
+import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
 
 export function ExplorationScreen() {
   const player = useGameStore((s) => s.player);
@@ -14,10 +15,25 @@ export function ExplorationScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const beginScene = useGameStore((s) => s.beginScene);
   const currentScene = useGameStore((s) => s.currentScene);
+  const currentEnemyHp = useGameStore((s) => s.currentEnemyHp);
   const pendingRolls = useGameStore((s) => s.pendingRolls);
   const resolveRollStep = useGameStore((s) => s.resolveRollStep);
   const cancelPendingRolls = useGameStore((s) => s.cancelPendingRolls);
   const saveAndExitToTitle = useGameStore((s) => s.saveAndExitToTitle);
+
+  const [activeEnemyIdx, setActiveEnemyIdx] = useState(0);
+
+  // The engine is still single-enemy today, but the panel takes an array so
+  // when multi-enemy scenes get added, no UI change is needed.
+  const enemyViews: EnemyView[] = useMemo(() => {
+    if (!currentScene?.enemy) return [];
+    return [
+      {
+        enemy: currentScene.enemy,
+        currentHp: currentEnemyHp ?? currentScene.enemy.hp,
+      },
+    ];
+  }, [currentScene?.enemy, currentEnemyHp]);
 
   if (!player) {
     return (
@@ -56,6 +72,14 @@ export function ExplorationScreen() {
           </TouchableOpacity>
         </View>
       </View>
+
+      {enemyViews.length > 0 && (
+        <EnemyPanel
+          enemies={enemyViews}
+          activeIndex={Math.min(activeEnemyIdx, enemyViews.length - 1)}
+          onSelectActive={setActiveEnemyIdx}
+        />
+      )}
 
       <View style={styles.feed}>
         <AdventureFeed entries={gameLog} />
