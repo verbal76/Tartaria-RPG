@@ -10,6 +10,7 @@
 // 2026-05-15h: pin onnxruntime-android to 1.20.0 (avoid latest.integration → maven-metadata.xml SAX bug)
 // 2026-05-15i: bump onnxruntime-android pin to 1.22.0 — 1.20.0 missing Ort::Value() default ctor + zero-arg GetSymbolicDimensions used by JS bindings
 // 2026-05-15j: APK refresh — ship cumulative OTA work since last APK (lore-aware Arbiter, stamina, multi-slot saves, investigate split). OTAs not landing on device; APK update unblocks playtest while we diagnose.
+// 2026-05-15k: APK refresh #2 — bake in the combat-narration fixes (parser combat override, weapon-aware narration, Arbiter combat awareness, enemy stat block with HP bar, multi-slot save system). OTAs still unconfirmed; ship as native binary.
 
 const { getDefaultConfig } = require('expo/metro-config');
 
