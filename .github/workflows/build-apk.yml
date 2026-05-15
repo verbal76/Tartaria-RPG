@@ -76,6 +76,15 @@ jobs:
       - name: Generate native Android project
         run: npx expo prebuild --platform android --no-install
 
+      - name: Patch Kotlin to 1.9.25 (Compose compiler compat)
+        run: |
+          echo "Before:"
+          grep -n "kotlinVersion" android/build.gradle || true
+          sed -i 's/kotlinVersion = "1\.9\.24"/kotlinVersion = "1.9.25"/g' android/build.gradle
+          sed -i "s/kotlinVersion = '1\.9\.24'/kotlinVersion = '1.9.25'/g" android/build.gradle
+          echo "After:"
+          grep -n "kotlinVersion" android/build.gradle || true
+
       - name: Ensure debug keystore exists (for release signing fallback)
         run: |
           if [ ! -f android/app/debug.keystore ]; then
