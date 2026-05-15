@@ -23,7 +23,7 @@ on:
           - production
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -48,18 +48,56 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Trigger EAS build (non-interactive)
+      - name: Build APK on EAS (wait for completion)
+        id: eas_build
         env:
           EXPO_TOKEN: ${{ secrets.TARTARIA }}
         run: |
           PROFILE="${{ github.event.inputs.profile || 'apk' }}"
           echo "Building with profile: $PROFILE"
-          eas build \
+          BUILD_OUTPUT=$(eas build \
             --platform android \
             --profile "$PROFILE" \
             --non-interactive \
-            --no-wait
+            --json \
+            2>/dev/null | tail -1)
+          APK_URL=$(echo "$BUILD_OUTPUT" | node -e "
+            const chunks = [];
+            process.stdin.on('data', d => chunks.push(d));
+            process.stdin.on('end', () => {
+              try {
+                const data = JSON.parse(chunks.join(''));
+                const arr = Array.isArray(data) ? data : [data];
+                const url = arr[0]?.artifacts?.buildUrl || arr[0]?.buildUrl || '';
+                console.log(url);
+              } catch(e) { console.log(''); }
+            });
+          " <<< "$BUILD_OUTPUT")
+          echo "apk_url=$APK_URL" >> "$GITHUB_OUTPUT"
+          echo "Build URL: $APK_URL"
 
-      - name: Note
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Build queued on EAS. Visit https://expo.dev/accounts/hot-attic-games/projects/tartaria-/builds to grab the APK when it's ready."
+          TAG="apk-build-${{ github.run_number }}"
+          APK_URL="${{ steps.eas_build.outputs.apk_url }}"
+          COMMIT_MSG="${{ github.event.head_commit.message || github.event_name }}"
+          BRANCH="${GITHUB_REF_NAME}"
+
+          BODY="## Tartaria Realms — Android APK
+
+          **Branch:** \`${BRANCH}\`
+          **Trigger:** ${COMMIT_MSG}
+          **Build #:** ${{ github.run_number }}
+
+          ### Download
+          $(if [ -n "$APK_URL" ]; then echo "[⬇ Download APK]($APK_URL)"; else echo "_APK URL not captured — visit [EAS builds](https://expo.dev/accounts/hot-attic-games/projects/tartaria-/builds) to download._"; fi)
+
+          > Install on your Android device: tap the link above, download the APK, then open it to install (allow unknown sources if prompted)."
+
+          gh release create "$TAG" \
+            --repo "${{ github.repository }}" \
+            --title "Tartaria APK — Build #${{ github.run_number }}" \
+            --notes "$BODY" \
+            --prerelease
