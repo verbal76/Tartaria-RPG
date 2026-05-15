@@ -1,6 +1,10 @@
 import type { WeatherEntry, Hazard, Enemy, Location, Quest, InventoryItem, ParsedInput, Intent } from './types';
 import { pick, chance } from './rng';
 import openings from '../data/events/openings.json';
+import moodQuotes from '../data/lore/arbiter-mood-quotes.json';
+import intentQuotes from '../data/lore/arbiter-intent-quotes.json';
+import locationFlavors from '../data/lore/location-flavors.json';
+import sceneFlavors from '../data/lore/scene-flavors.json';
 
 const openingsList = openings as string[];
 
@@ -16,29 +20,14 @@ export interface SceneInput {
   quest?: Quest | null;
 }
 
-export function buildScene(input: SceneInput): string {
-  const parts: string[] = [];
-
-  parts.push(`${input.weather.description}`);
-  parts.push(`You are at ${input.location.name}. ${input.location.description}`);
-
-  if (input.hazard) {
-    parts.push(`Hazard: ${input.hazard.name}. ${input.hazard.description}`);
-  }
-
-  if (input.enemy) {
-    parts.push(`A ${input.enemy.name} (${input.enemy.type}, ${input.enemy.rarity}) emerges. Its ${input.enemy.attack} can deal ${input.enemy.damage}.`);
-  }
-
-  if (input.quest) {
-    parts.push(`Objective: ${input.quest.objective.verb} ${input.quest.objective.target} ${input.quest.complication.text}.`);
-  }
-
-  return parts.join('\n\n');
-}
+// ---------------------------------------------------------------------------
+// Lore pool wiring
+// ---------------------------------------------------------------------------
 
 // Mood pools — picked when the cognitive layer detects a dominant emotion.
-const MOOD_REMARKS: Record<string, string[]> = {
+// Hardcoded baselines stay as fallbacks; lore-curated lines from
+// `arbiter-mood-quotes.json` are concatenated so the pool grows organically.
+const BASE_MOOD_REMARKS: Record<string, string[]> = {
   FEAR: [
     `"Whatever watches has not yet decided," the Arbiter says, very quietly.`,
     `The Arbiter does not turn their head. "It knows you are here. Move as if it does."`,
@@ -83,7 +72,7 @@ const MOOD_REMARKS: Record<string, string[]> = {
 
 // Intent pools — used when no cognitive mood is available, but we know the
 // player's deterministic intent.
-const INTENT_REMARKS: Partial<Record<Intent, string[]>> = {
+const BASE_INTENT_REMARKS: Partial<Record<Intent, string[]>> = {
   attack: [
     `The Arbiter watches the blow land or fail. "Both are answers."`,
     `"Make the next strike count for two," the Arbiter says. "Tartaria taxes the first."`,
@@ -134,6 +123,111 @@ const INTENT_REMARKS: Partial<Record<Intent, string[]>> = {
   ],
 };
 
+// Wrap a raw lore quote (which tends to be a bare sentence in the
+// Arbiter's voice) in the same `"…," the Arbiter says.` shape that the
+// hardcoded pool uses, so the two read consistently when concatenated.
+function wrapLoreQuote(raw: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed) return trimmed;
+  // If the line already looks dressed (starts with a quote or contains the
+  // narrator beat), leave it alone.
+  if (trimmed.startsWith('"') || trimmed.startsWith('`') || /the Arbiter/i.test(trimmed)) {
+    return trimmed;
+  }
+  return `"${trimmed}" the Arbiter says.`;
+}
+
+function mergePools<K extends string>(
+  base: Partial<Record<K, string[]>>,
+  extra: Partial<Record<K, string[]>>,
+): Record<K, string[]> {
+  const out: Record<string, string[]> = {};
+  const keys = new Set<string>([...Object.keys(base), ...Object.keys(extra)]);
+  for (const key of keys) {
+    const baseLines = (base as Record<string, string[] | undefined>)[key] ?? [];
+    const extraLines = ((extra as Record<string, string[] | undefined>)[key] ?? []).map(wrapLoreQuote);
+    out[key] = [...baseLines, ...extraLines];
+  }
+  return out as Record<K, string[]>;
+}
+
+const MOOD_REMARKS: Record<string, string[]> = mergePools(
+  BASE_MOOD_REMARKS,
+  moodQuotes as Record<string, string[]>,
+);
+
+const INTENT_REMARKS: Partial<Record<Intent, string[]>> = mergePools<Intent>(
+  BASE_INTENT_REMARKS,
+  intentQuotes as Partial<Record<Intent, string[]>>,
+);
+
+const LOCATION_FLAVORS = locationFlavors as Record<string, string[]>;
+const SCENE_FLAVORS = sceneFlavors as Record<string, string[]>;
+
+// Pick the best-matching scene flavor category for the current scene.
+// Returns null if nothing applies. Categories are scored by tag overlap with
+// hazard / weather / location tags; `atmospheric` is the gentle default.
+function pickSceneFlavorCategory(input: SceneInput): string | null {
+  const tagBag = new Set<string>();
+  for (const t of input.weather.tags ?? []) tagBag.add(t.toLowerCase());
+  for (const t of input.location.tags ?? []) tagBag.add(t.toLowerCase());
+  if (input.hazard) {
+    for (const t of input.hazard.tags ?? []) tagBag.add(t.toLowerCase());
+  }
+
+  const has = (...needles: string[]) => needles.some((n) => {
+    for (const t of tagBag) if (t.includes(n)) return true;
+    return false;
+  });
+
+  // Danger wins when an enemy is staged or hazard severity is implied.
+  if (input.enemy || has('damage', 'trap', 'corruption', 'hazard', 'encounter')) {
+    if (SCENE_FLAVORS.danger?.length) return 'danger';
+  }
+  if (has('aetheric', 'aether', 'aetherstone', 'aetheric_core', 'aetheric_node', 'etheric_engine')) {
+    if (SCENE_FLAVORS.aether?.length) return 'aether';
+  }
+  if (has('ruin', 'buried', 'tomb', 'spire', 'tower', 'capital', 'lost_capital', 'stronghold')) {
+    if (SCENE_FLAVORS.ruins?.length) return 'ruins';
+  }
+  if (has('mystery', 'unknown', 'forgotten_order', 'objective')) {
+    if (SCENE_FLAVORS.mystery?.length) return 'mystery';
+  }
+  if (SCENE_FLAVORS.atmospheric?.length) return 'atmospheric';
+  return null;
+}
+
+export function buildScene(input: SceneInput): string {
+  const parts: string[] = [];
+
+  parts.push(`${input.weather.description}`);
+  parts.push(`You are at ${input.location.name}. ${input.location.description}`);
+
+  if (input.hazard) {
+    parts.push(`Hazard: ${input.hazard.name}. ${input.hazard.description}`);
+  }
+
+  if (input.enemy) {
+    parts.push(`A ${input.enemy.name} (${input.enemy.type}, ${input.enemy.rarity}) emerges. Its ${input.enemy.attack} can deal ${input.enemy.damage}.`);
+  }
+
+  if (input.quest) {
+    parts.push(`Objective: ${input.quest.objective.verb} ${input.quest.objective.target} ${input.quest.complication.text}.`);
+  }
+
+  // ~25% chance: append a scene flavor line drawn from the best-matching
+  // category. Falls back gracefully if no category resolves.
+  if (Math.random() < 0.25) {
+    const cat = pickSceneFlavorCategory(input);
+    const pool = cat ? SCENE_FLAVORS[cat] : undefined;
+    if (pool && pool.length > 0) {
+      parts.push(pick(pool));
+    }
+  }
+
+  return parts.join('\n\n');
+}
+
 const GENERIC_REMARKS = [
   `The Arbiter inclines their head and says nothing for a moment.`,
   `"The Aetherstone hums when you are close to the right question," the Arbiter says.`,
@@ -147,12 +241,46 @@ export interface ArbiterContext {
   hazard?: Hazard | null;
   intent?: Intent;
   mood?: string;
+  /**
+   * Most recent player actions (free-form short phrases like "drew your
+   * blade" or "stepped into the chamber"). When present, the Arbiter will
+   * occasionally reference the most recent one in passing.
+   */
+  recentActions?: string[];
+}
+
+function pickMoodPool(mood: string | undefined): string[] | undefined {
+  if (!mood) return undefined;
+  const pool = MOOD_REMARKS[mood];
+  return pool && pool.length > 0 ? pool : undefined;
 }
 
 export function buildArbiterRemark(ctx: ArbiterContext): string {
+  // ~15% chance to acknowledge the player's most recent action, wrapped in
+  // the lore-flavored mood pool when available.
+  if (
+    ctx.recentActions &&
+    ctx.recentActions.length > 0 &&
+    Math.random() < 0.15
+  ) {
+    const lastAction = ctx.recentActions[ctx.recentActions.length - 1];
+    if (lastAction && lastAction.trim().length > 0) {
+      const moodPool = pickMoodPool(ctx.mood);
+      const flavor = moodPool ? pick(moodPool).replace('this place', ctx.location.name) : null;
+      const noted = `The Arbiter notes how you ${lastAction.trim()}.`;
+      return flavor ? `${noted} ${flavor}` : noted;
+    }
+  }
+
+  // ~10% chance to drop a location-specific flavor line.
+  const locPool = LOCATION_FLAVORS[ctx.location.id];
+  if (locPool && locPool.length > 0 && Math.random() < 0.1) {
+    return `The Arbiter looks around. "${pick(locPool)}"`;
+  }
+
   // Mood (from cognitive layer) wins if available.
-  const moodPool = ctx.mood ? MOOD_REMARKS[ctx.mood] : undefined;
-  if (moodPool && moodPool.length > 0) {
+  const moodPool = pickMoodPool(ctx.mood);
+  if (moodPool) {
     return pick(moodPool).replace('this place', ctx.location.name);
   }
   // Otherwise pick by deterministic intent.
