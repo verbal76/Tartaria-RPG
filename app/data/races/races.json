@@ -1,0 +1,118 @@
+[
+  {
+    "id": "tartarian_giant",
+    "name": "Tartarian Giants",
+    "baseAC": 12,
+    "racialACBonus": "+2 AC due to size and resilience; -4 in confined spaces (low caves, pre-flood dwellings)",
+    "startingTCFormula": "4d6 x 10",
+    "startingHPBonus": 15,
+    "barehandDamage": "1d6 +2",
+    "tags": ["large", "strength", "relic_savvy"],
+    "traits": [
+      "Towering Strength: +2 Strength.",
+      "Ancient Insight: +1 Intelligence when investigating ancient structures or artifacts.",
+      "Legacy of Power: Once per day, channel Aetheric energy into a relic (repair, power-up, unexpected effect)."
+    ],
+    "description": "Towering descendants of Tartaria's first builders. Strongest hand-to-hand fighters; revered as divine by True Tartarians."
+  },
+  {
+    "id": "mud_dweller",
+    "name": "Mud Dwellers",
+    "baseAC": 10,
+    "racialACBonus": "+1 AC in underground areas",
+    "startingTCFormula": "3d6 x 10",
+    "startingHPBonus": 0,
+    "barehandDamage": "1d6 -3",
+    "tags": ["true_tartarian", "subterranean", "aethercraft"],
+    "traits": [
+      "Dark Vision: Can see in darkness.",
+      "Aethercraft Mastery: +2 Intelligence when using Aethercraft (shaping Aetherstone, tools, weapons, golems, earth).",
+      "Relic Savvy: +2 Dexterity when dealing with Aetherstone or Tartarian tech.",
+      "Aetherstone Resilience: Half damage from Aetheric or Mud-power attacks."
+    ],
+    "description": "True Tartarians who survived underground in subterranean enclaves. Nimble but lacking brute force; rely on Aethercraft."
+  },
+  {
+    "id": "reclaimer",
+    "name": "Reclaimers",
+    "baseAC": 10,
+    "racialACBonus": "+1 AC in constructed environments (cities, ruins)",
+    "startingTCFormula": "5d6 x 10",
+    "startingHPBonus": 0,
+    "barehandDamage": "1d6",
+    "tags": ["scavenger", "urban", "rogue"],
+    "traits": [
+      "Urban Explorer: +2 Acrobatics and Stealth in city ruins or underground.",
+      "Ruins Specialist: +1 Investigation, +1 Woodsman when searching for relics or navigating dangerous areas.",
+      "Rogue's Ingenuity: +1 Chicanery, reroll when picking locks or disarming traps.",
+      "Relic Hunter: Sense Aetherstone signatures within 30 feet."
+    ],
+    "description": "Treasure hunters and scavengers, equally at home in ruined cities and dangerous tunnels. Profit before ideology."
+  },
+  {
+    "id": "architectural_sentinel",
+    "name": "Architectural Sentinels",
+    "baseAC": 10,
+    "racialACBonus": "+2 AC when using or wearing runic gear",
+    "startingTCFormula": "3d6 x 10",
+    "startingHPBonus": 0,
+    "barehandDamage": "1d10 even/odd roll to land",
+    "tags": ["construct", "ageless", "runic"],
+    "traits": [
+      "Aetheric Constitution: Half damage from energy-based attacks.",
+      "Indomitable Strength: +2 Strength, +1 Intelligence.",
+      "Immunity to Time: Do not age, eat, or fatigue. Immune to hunger and exhaustion.",
+      "Defensive Protocols: Once per day, activate a shield reducing incoming damage by half for 3 rounds."
+    ],
+    "description": "Aetherstone-powered constructs left over from Tartaria's golden age. Tireless, durable, programmed with ancient duties."
+  },
+  {
+    "id": "mud_golem",
+    "name": "Mud Golems",
+    "baseAC": 8,
+    "racialACBonus": "+1 AC with relic armor or shields",
+    "startingTCFormula": "3d6 x 10",
+    "startingHPBonus": 10,
+    "barehandDamage": "1d6",
+    "tags": ["construct", "aetherstone", "regenerative"],
+    "traits": [
+      "Aetherstone Resilience: +2 Strength; half damage from non-Aetheric attacks.",
+      "Elemental Control: Manipulate Aetherstone within arm's reach/close range. 1d6 block / 1d6 attack, one of each per encounter.",
+      "Regenerative Core: Near Aetherstone, roll 1d10 daily for free HP recharge up to max."
+    ],
+    "description": "Etheric constructs born of the mud that consumed Tartaria. Unpredictable. Some serve their makers, others turn on them."
+  },
+  {
+    "id": "unknowing_mass",
+    "name": "Unknowing Masses",
+    "baseAC": 10,
+    "racialACBonus": "No inherent AC bonus",
+    "startingTCFormula": "5d6 x 10",
+    "startingHPBonus": 0,
+    "barehandDamage": "1d6",
+    "tags": ["surface", "ignorant", "adaptive"],
+    "traits": [
+      "Curious Mind: +2 Intelligence and Wisdom after first exposure to Tartaria's secrets.",
+      "Beginner's Luck: Once per day, reroll a failed difficulty roll for survival, combat, or relic interaction.",
+      "Ignorant of Aetheric Power: No initial resistance; can only use Common-level Aether/mud magic. 1d6 for damage, 1d6 for blocking/restoration."
+    ],
+    "description": "Ordinary surface-dwellers unaware of Tartaria's existence until they stumble into it. Average human stock, but adaptive."
+  },
+  {
+    "id": "aetherborn",
+    "name": "Aetherborn",
+    "baseAC": 11,
+    "racialACBonus": "+1 AC with Aetheric powers or runecasters",
+    "startingTCFormula": "6d6 x 10",
+    "startingHPBonus": 0,
+    "barehandDamage": "1d6 -2",
+    "tags": ["bloodline", "aetheric", "noble"],
+    "traits": [
+      "Aetheric Awakening: Sense nearby Aetherstone/relics; +2 Intelligence when interacting with them.",
+      "Noble Heritage: +1 Charisma, daily reroll for persuasion or intimidation.",
+      "Latent Powers: Once per day, surge of Aetheric energy enhances speed, strength, or barrier for 3 rounds.",
+      "Destiny Unfolding: Powers grow with relic exposure; Rare/Legendary Aether powers cost 1d6 self-damage."
+    ],
+    "description": "Descendants of Tartaria's noble bloodlines, born with awakened Aetheric genes. Powerful, dangerous, hunted."
+  }
+]

@@ -1,0 +1,72 @@
+[
+  {
+    "id": "mud_monarchs",
+    "name": "Mud Monarchs",
+    "subtitle": "Architects of a False World Order",
+    "alignment": "Authoritarian / Suppressive",
+    "goal": "Bury Tartaria's legacy forever to preserve their crumbling rule.",
+    "philosophy": "If the masses ever learn what lies buried beneath them, the world order they spent centuries building collapses. Better that history forget Tartaria entirely.",
+    "structure": "Descended from Tartaria's noble class. Operate through global elites, intelligence networks, assassins, and aging Aetheric machines.",
+    "rivals": ["forgotten_order", "true_tartarians", "eternal_dynasty"],
+    "allies": ["conspiracy_architects"],
+    "joinRequirements": "Bloodline ties, demonstrated loyalty to suppression, willingness to silence rediscoverers.",
+    "tags": ["suppressive", "elite", "global_reach", "fading_power"],
+    "startingStanding": -10
+  },
+  {
+    "id": "forgotten_order",
+    "name": "Forgotten Order",
+    "subtitle": "Seekers of the Lost Truth",
+    "alignment": "Idealist / Reformist",
+    "goal": "Recover Tartaria's Aetheric knowledge and rebuild the world with it.",
+    "philosophy": "Aether is humanity's birthright. Buried, it festers; revealed and mastered, it saves us.",
+    "structure": "Descendants of Tartaria's engineers and scholars. Operate from hidden enclaves like Varakush, conducting clandestine expeditions.",
+    "rivals": ["mud_monarchs", "conspiracy_architects"],
+    "allies": ["reclaimers_guild_situational"],
+    "joinRequirements": "Demonstrated scholarship, recovery of a Tartarian artifact, or referral by an existing member.",
+    "tags": ["scholarly", "exploratory", "covert", "idealistic"],
+    "startingStanding": 0
+  },
+  {
+    "id": "reclaimers_guild",
+    "name": "Reclaimers Guild",
+    "subtitle": "Opportunists of the Lost World",
+    "alignment": "Mercenary / Neutral",
+    "goal": "Profit. Whoever pays best gets the relic.",
+    "philosophy": "Tartaria is a goldmine. We don't ask what the buyer wants it for.",
+    "structure": "Loose coalition of scavengers, mercenaries, and treasure hunters. Black-market network with brokers in every major city.",
+    "rivals": ["mud_monarchs_when_unpaid"],
+    "allies": ["anyone_paying"],
+    "joinRequirements": "A relic worth selling, or a contract delivered without complaint.",
+    "tags": ["mercenary", "scavenger", "neutral", "well_connected"],
+    "startingStanding": 0
+  },
+  {
+    "id": "true_tartarians",
+    "name": "True Tartarians",
+    "subtitle": "Survivors of the Subterranean World",
+    "alignment": "Heritage / Reclamation",
+    "goal": "Reclaim the surface and restore Tartaria's empire.",
+    "philosophy": "We are the rightful heirs. The surface forgot; we remembered.",
+    "structure": "Subterranean enclaves beneath buried cities. Aethercraft adepts. Worship the Tartarian Giants as divine.",
+    "rivals": ["mud_monarchs"],
+    "allies": ["forgotten_order_partial"],
+    "joinRequirements": "Mud Dweller heritage or demonstrated devotion to the old empire.",
+    "tags": ["subterranean", "traditional", "aethercraft", "religious"],
+    "startingStanding": 0
+  },
+  {
+    "id": "eternal_dynasty",
+    "name": "Eternal Dynasty",
+    "subtitle": "The Aetherborn Cabal",
+    "alignment": "Imperial / Supremacist",
+    "goal": "Reactivate Tartaria's Aetheric cores and rule the world through the Aetherborn bloodline.",
+    "philosophy": "The fall of Tartaria was a cleansing test. Only the pure deserve to inherit.",
+    "structure": "Secretive aristocracy of Aetherborn descendants. Bred, trained, and tested in hidden estates. Some are sacrificed to power their machines.",
+    "rivals": ["forgotten_order", "true_tartarians", "mud_monarchs"],
+    "allies": [],
+    "joinRequirements": "Aetherborn blood, demonstrated power, and passing the Dynasty's tests of purity.",
+    "tags": ["bloodline", "supremacist", "secretive", "ruthless"],
+    "startingStanding": 0
+  }
+]
