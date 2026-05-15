@@ -45,7 +45,8 @@ describe('VectorSimilarityEngine', () => {
     const anchors = { close: vec(1, 0.1, 0), far: vec(0, 1, 0), partial: vec(0.9, 0.4, 0) };
     const matches = VectorSimilarityEngine.getClosestMatches(input, anchors, 0.5);
     expect(matches.map((m) => m.concept)).toEqual(['close', 'partial']);
-    expect(matches[0].score).toBeGreaterThan(matches[1].score);
+    expect(matches.length).toBe(2);
+    expect(matches[0]!.score).toBeGreaterThan(matches[1]!.score);
   });
 });
 

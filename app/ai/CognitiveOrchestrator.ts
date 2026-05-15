@@ -1,6 +1,7 @@
 import { SemanticEmbeddingService } from './embedding/SemanticEmbeddingService';
 import { EmotionInferenceEngine } from './cognition/EmotionInferenceEngine';
 import { IntentInferenceEngine } from './cognition/IntentInferenceEngine';
+import { ModelDownloader, type DownloaderOptions, type ResolvedModelFiles } from './ota/ModelDownloader';
 import type { CognitiveResponse, WorldContext, AnchorMap } from './types';
 
 const EMOTION_ANCHORS = {
@@ -23,27 +24,67 @@ const INTENT_ANCHORS = {
   TRAVEL: 'travel go walk head toward enter descend climb',
 } as const;
 
+export interface BootOptions {
+  modelUrl?: string;
+  vocabUrl?: string;
+  onProgress?: (stage: BootStage, fraction: number) => void;
+}
+
+export type BootStage = 'downloading' | 'loading' | 'precomputing' | 'ready';
+
+/**
+ * Hooks for dependency injection in tests. Production code calls boot() with
+ * no second argument.
+ */
+export interface OrchestratorDeps {
+  downloader?: { ensureFiles(opts: DownloaderOptions): Promise<ResolvedModelFiles> };
+  embeddingService?: SemanticEmbeddingService;
+  emotionEngine?: EmotionInferenceEngine;
+  intentEngine?: IntentInferenceEngine;
+}
+
 export class CognitiveOrchestrator {
+  private downloader: OrchestratorDeps['downloader'];
   private embeddingService: SemanticEmbeddingService;
   private emotionEngine: EmotionInferenceEngine;
   private intentEngine: IntentInferenceEngine;
   private ready: boolean = false;
+  private lastBootOpts: BootOptions = {};
 
-  constructor() {
-    this.embeddingService = new SemanticEmbeddingService();
-    this.emotionEngine = new EmotionInferenceEngine();
-    this.intentEngine = new IntentInferenceEngine();
+  constructor(deps: OrchestratorDeps = {}) {
+    this.downloader = deps.downloader ?? new ModelDownloader();
+    this.embeddingService = deps.embeddingService ?? new SemanticEmbeddingService();
+    this.emotionEngine = deps.emotionEngine ?? new EmotionInferenceEngine();
+    this.intentEngine = deps.intentEngine ?? new IntentInferenceEngine();
   }
 
   isReady(): boolean {
     return this.ready && this.embeddingService.isReady();
   }
 
-  async boot(modelPath: string, vocabText: string): Promise<void> {
+  async boot(opts: BootOptions = {}): Promise<void> {
+    this.lastBootOpts = opts;
+    const { onProgress } = opts;
+
+    onProgress?.('downloading', 0);
+    const { modelPath, vocabText } = await this.downloader!.ensureFiles({
+      modelUrl: opts.modelUrl,
+      vocabUrl: opts.vocabUrl,
+      onProgress: (frac) => onProgress?.('downloading', frac),
+    });
+    onProgress?.('downloading', 1);
+
+    onProgress?.('loading', 0);
     await this.embeddingService.initialize(modelPath, vocabText);
-    this.emotionEngine.setAnchors(await this.precomputeAnchors(EMOTION_ANCHORS));
-    this.intentEngine.setAnchors(await this.precomputeAnchors(INTENT_ANCHORS));
+    onProgress?.('loading', 1);
+
+    onProgress?.('precomputing', 0);
+    this.emotionEngine.setAnchors(await this.precomputeAnchors(EMOTION_ANCHORS, onProgress));
+    this.intentEngine.setAnchors(await this.precomputeAnchors(INTENT_ANCHORS, onProgress));
+    onProgress?.('precomputing', 1);
+
     this.ready = true;
+    onProgress?.('ready', 1);
   }
 
   async shutdown(): Promise<void> {
@@ -54,6 +95,12 @@ export class CognitiveOrchestrator {
   async resume(): Promise<void> {
     await this.embeddingService.reinitializeIfNeeded();
     this.ready = this.embeddingService.isReady() && this.emotionEngine.hasAnchors();
+    if (!this.ready && this.lastBootOpts) {
+      // Anchors were cleared somehow — re-derive from cache (cheap on second boot).
+      this.emotionEngine.setAnchors(await this.precomputeAnchors(EMOTION_ANCHORS));
+      this.intentEngine.setAnchors(await this.precomputeAnchors(INTENT_ANCHORS));
+      this.ready = this.embeddingService.isReady();
+    }
   }
 
   async processInput(text: string, _context: WorldContext): Promise<CognitiveResponse> {
@@ -76,12 +123,18 @@ export class CognitiveOrchestrator {
     };
   }
 
-  private async precomputeAnchors(map: Record<string, string>): Promise<AnchorMap> {
+  private async precomputeAnchors(
+    map: Record<string, string>,
+    onProgress?: (stage: BootStage, fraction: number) => void,
+  ): Promise<AnchorMap> {
+    const keys = Object.keys(map);
     const out: AnchorMap = {};
-    for (const concept of Object.keys(map)) {
+    for (let i = 0; i < keys.length; i++) {
+      const concept = keys[i]!;
       const text = map[concept];
       if (!text) continue;
       out[concept] = await this.embeddingService.embed(text);
+      onProgress?.('precomputing', (i + 1) / keys.length);
     }
     return out;
   }
