@@ -12,6 +12,7 @@
 // 2026-05-15j: APK refresh — ship cumulative OTA work since last APK (lore-aware Arbiter, stamina, multi-slot saves, investigate split). OTAs not landing on device; APK update unblocks playtest while we diagnose.
 // 2026-05-15k: APK refresh #2 — bake in the combat-narration fixes (parser combat override, weapon-aware narration, Arbiter combat awareness, enemy stat block with HP bar, multi-slot save system). OTAs still unconfirmed; ship as native binary.
 // 2026-05-15l: HOTFIX APK — multi-slot save load lost currentScene, leaving "No scene" + every action silently no-oping. hydrate / loadSlotIntoGame now beginScene() on restore; submitPlayerAction auto-recovers if scene is null.
+// 2026-05-15m: APK refresh — adds CHECK FOR OTA UPDATE button on About screen + live Updates.* diagnostics (runtimeVersion, channel, updateId, isEnabled, isEmbeddedLaunch). User can manually pull OTAs when automatic check-on-load fails.
 
 const { getDefaultConfig } = require('expo/metro-config');
 
