@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from '
 import Constants from 'expo-constants';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
+import { OTA_BUILD_ID } from '../buildInfo';
 
 export function AboutScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
@@ -31,6 +32,7 @@ export function AboutScreen() {
     const lines = [
       `Tartaria Realms`,
       `Version: ${version}`,
+      `OTA build: ${OTA_BUILD_ID}`,
       `Runtime: ${runtimeVersion}`,
       `OTA channel: ${channel}`,
       `Platform: ${Platform.OS} ${Platform.Version}`,
