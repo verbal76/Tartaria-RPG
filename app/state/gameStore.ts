@@ -224,6 +224,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           activeSlotId: activeId,
           hydrated: true,
         });
+        // SaveState doesn't persist currentScene, so we always need a fresh
+        // scene after restore. Without this the exploration screen renders
+        // "No scene" and every player action silently no-ops (bailed on the
+        // `!currentScene` guard in submitPlayerAction).
+        if (saved.currentScreen === 'exploration') {
+          get().beginScene();
+        }
         return;
       }
     }
@@ -251,6 +258,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentEnemyHp: null,
       pendingRolls: null,
     });
+    // Saves don't store the scene; generate a fresh one so the player can
+    // immediately interact with the exploration screen.
+    get().beginScene();
   },
 
   async deleteSlotById(slotId) {
@@ -352,8 +362,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const trimmed = text.trim();
     if (!trimmed || get().pendingRolls) return;
 
-    const { player, currentScene } = get();
-    if (!player || !currentScene) return;
+    const player = get().player;
+    if (!player) return;
+
+    // If the scene was lost (e.g. slot restore on an older save before this
+    // fix) auto-recover before bailing — silent no-ops on submit are the
+    // worst possible UX for a text RPG.
+    if (!get().currentScene) {
+      get().beginScene();
+    }
+    const currentScene = get().currentScene;
+    if (!currentScene) return; // give up only if beginScene itself failed
 
     const parseCtx: ParseContext = {
       inventory: player.inventory,
