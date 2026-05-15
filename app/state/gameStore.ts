@@ -300,6 +300,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!get().pendingRolls && shouldArbiterSpeak()) {
       const lastCog = get().cognitiveLastResponse;
       const mood = lastCog?.inferredEmotions[0];
+      const recentActions = get()
+        .gameLog.filter((e) => e.channel === 'player')
+        .slice(-3)
+        .map((e) => e.text);
       get().appendLog(
         'arbiter',
         buildArbiterRemark({
@@ -307,6 +311,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           hazard: currentScene.hazard,
           intent: parsed.intent,
           mood,
+          recentActions,
         }),
       );
     }
