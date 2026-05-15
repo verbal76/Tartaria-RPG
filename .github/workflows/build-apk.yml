@@ -78,12 +78,22 @@ jobs:
 
       - name: Patch Kotlin to 1.9.25 (Compose compiler compat)
         run: |
-          echo "Before:"
-          grep -n "kotlinVersion" android/build.gradle || true
-          sed -i 's/kotlinVersion = "1\.9\.24"/kotlinVersion = "1.9.25"/g' android/build.gradle
-          sed -i "s/kotlinVersion = '1\.9\.24'/kotlinVersion = '1.9.25'/g" android/build.gradle
-          echo "After:"
-          grep -n "kotlinVersion" android/build.gradle || true
+          # RN 0.76 uses a Gradle version catalog — kotlin version lives in
+          # android/gradle/libs.versions.toml, not in build.gradle ext block.
+          TOML=android/gradle/libs.versions.toml
+          if [ -f "$TOML" ]; then
+            echo "Patching $TOML:"
+            grep "kotlin" "$TOML" || true
+            sed -i 's/kotlin = "1\.9\.24"/kotlin = "1.9.25"/g' "$TOML"
+            grep "kotlin" "$TOML" || true
+          fi
+          # Fallback: older-style ext.kotlinVersion in build.gradle
+          if grep -q "1\.9\.24" android/build.gradle 2>/dev/null; then
+            sed -i 's/kotlinVersion = "1\.9\.24"/kotlinVersion = "1.9.25"/g' android/build.gradle
+            sed -i "s/kotlinVersion = '1\.9\.24'/kotlinVersion = '1.9.25'/g" android/build.gradle
+            echo "Patched build.gradle:"
+            grep kotlinVersion android/build.gradle || true
+          fi
 
       - name: Ensure debug keystore exists (for release signing fallback)
         run: |

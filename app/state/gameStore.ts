@@ -10,8 +10,10 @@ import type {
   Hazard,
   Location,
   LogChannel,
+  RollStep,
+  PendingRollState,
 } from '../engine/types';
-import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, completeQuest } from '../engine/worldMemory';
+import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat } from '../engine/worldMemory';
 import { saveGame, loadSave } from '../engine/saveSystem';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { createCharacter, type CreateCharacterInput } from '../engine/character';
@@ -19,7 +21,8 @@ import { generateQuest } from '../engine/questGenerator';
 import { pickWeather, pickHazardForLocation, pickEnemyForLocation, getLocationById } from '../engine/encounter';
 import { buildOpening, buildScene, buildArbiterRemark, shouldArbiterSpeak } from '../engine/narrativeGenerator';
 import { parseInput } from '../engine/parser';
-import { rollDie } from '../engine/rng';
+import { rollDie, rollFromNotation } from '../engine/rng';
+import { buildCombatSteps, buildSkillSteps } from '../engine/combatRules';
 import locationsData from '../data/locations/locations.json';
 
 const allLocations = locationsData as Location[];
@@ -37,6 +40,8 @@ interface GameStore {
   gameLog: GameLogEntry[];
   currentScreen: ScreenName;
   currentScene: CurrentScene | null;
+  currentEnemyHp: number | null;
+  pendingRolls: PendingRollState | null;
   hydrated: boolean;
 
   hydrate: () => Promise<void>;
@@ -49,6 +54,9 @@ interface GameStore {
 
   beginScene: () => void;
   submitPlayerAction: (text: string) => void;
+  resolveRollStep: (values: number[]) => void;
+  cancelPendingRolls: () => void;
+  concludeRolls: (steps: RollStep[], actionText: string) => void;
   travelTo: (locationId: string) => void;
   generateNewQuest: () => Quest;
   resolveEnemyDefeat: () => void;
@@ -65,6 +73,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   gameLog: [],
   currentScreen: 'title',
   currentScene: null,
+  currentEnemyHp: null,
+  pendingRolls: null,
   hydrated: false,
 
   async hydrate() {
@@ -96,6 +106,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       gameLog: [],
       currentScreen: 'exploration',
       currentScene: null,
+      currentEnemyHp: null,
+      pendingRolls: null,
     });
     get().appendLog('system', `${player.name} steps into Tartaria.`);
     get().appendLog('world', buildOpening());
@@ -109,6 +121,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       worldMemory: emptyMemory(),
       gameLog: [],
       currentScene: null,
+      currentEnemyHp: null,
+      pendingRolls: null,
       currentScreen: 'title',
     });
     await get().persist();
@@ -130,7 +144,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const hazard = pickHazardForLocation(location);
     const enemy = pickEnemyForLocation(location);
     const scene: CurrentScene = { weather, location, hazard, enemy };
-    set({ currentScene: scene });
+    set({ currentScene: scene, currentEnemyHp: enemy?.hp ?? null, pendingRolls: null });
     get().appendLog('world', buildScene({ weather, location, hazard, enemy, quest: player.activeQuests[0] }));
     if (shouldArbiterSpeak()) {
       get().appendLog('arbiter', buildArbiterRemark({ location, hazard }));
@@ -146,94 +160,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   submitPlayerAction(text) {
     const trimmed = text.trim();
-    if (!trimmed) return;
+    if (!trimmed || get().pendingRolls) return;
+
     const parsed = parseInput(trimmed);
     get().appendLog('player', trimmed, { intent: parsed.intent });
 
     const { player, currentScene } = get();
     if (!player || !currentScene) return;
 
-    const roll10 = (stat: number, statName: string, dc: number): boolean => {
-      const die = rollDie(10);
-      const total = die + stat;
-      const success = total >= dc;
-      get().appendLog(
-        'system',
-        `d10 → ${die}  +  ${statName} ${stat}  =  ${total}  vs DC ${dc}  ${success ? '✓' : '✗'}`,
-      );
-      return success;
-    };
-
     switch (parsed.intent) {
       case 'attack': {
         if (currentScene.enemy) {
-          const dc = currentScene.enemy.abilityPoint;
-          const hit = roll10(player.stats.strength, 'STR', dc);
-          if (hit) {
-            get().appendLog('combat', `You strike at the ${currentScene.enemy.name}. The blow lands true.`);
-            get().resolveEnemyDefeat();
-          } else {
-            get().appendLog('combat', `You swing at the ${currentScene.enemy.name} but the attack goes wide. It holds its ground.`);
-          }
+          const steps = buildCombatSteps(trimmed, player, currentScene.enemy);
+          set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
+          get().appendLog('world', `You face ${currentScene.enemy.name}. The Aetherstone hums with tension.`);
         } else {
           get().appendLog('world', 'Nothing in arm\'s reach answers your blade. The motion echoes off Aetherstone.');
         }
         break;
       }
-      case 'stealth': {
-        const success = roll10(player.stats.dexterity, 'DEX', 10);
-        get().appendLog('world', success
-          ? 'You move low and quiet. The dust does not rise. Whatever watches does not see you.'
-          : 'You try to slip into shadow, but your foot scrapes stone. Something stirs.');
-        break;
-      }
-      case 'diplomacy': {
-        const success = roll10(player.stats.charisma, 'CHA', 12);
-        get().appendLog('world', success
-          ? 'Your words find purchase. The dead air shifts — something in this place is listening.'
-          : 'Your words hang unanswered. The silence has heard better arguments.');
-        break;
-      }
-      case 'escape': {
-        const success = roll10(player.stats.dexterity, 'DEX', 8);
-        if (success) {
-          get().appendLog('world', 'You break for the entrance. Behind you the chamber settles back into its waiting.');
-          if (currentScene.enemy) set((s) => ({ currentScene: s.currentScene ? { ...s.currentScene, enemy: null } : null }));
-        } else {
-          get().appendLog('world', 'You bolt, but the way is longer than you remembered. You circle back to where you started, breathing hard.');
-        }
-        break;
-      }
-      case 'investigate': {
-        const success = roll10(player.stats.intelligence, 'INT', 9);
-        if (success) {
-          get().appendLog('world', `You search ${currentScene.location.name} carefully. The Aetherstone hums — there is something here.`);
-          if (Math.random() < 0.5) {
-            const quest = get().generateNewQuest();
-            get().appendLog('reward', `New lead: ${quest.objective.verb} ${quest.objective.target} at ${quest.location.name}.`);
-          }
-        } else {
-          get().appendLog('world', `You sweep ${currentScene.location.name} but find only dust and old silence.`);
-        }
+      case 'stealth':
+      case 'diplomacy':
+      case 'escape':
+      case 'investigate':
+      case 'cast':
+      case 'use_relic': {
+        const steps = buildSkillSteps(parsed.intent, player);
+        set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
         break;
       }
       case 'rest':
         get().rest();
         break;
-      case 'cast': {
-        const success = roll10(player.stats.intelligence, 'INT', 11);
-        get().appendLog('world', success
-          ? 'You shape the Aether around your hand. A pale violet glow answers, steady and true.'
-          : 'The Aether slips through your focus. The glow flickers and dies before it forms.');
-        break;
-      }
-      case 'use_relic': {
-        const success = roll10(player.stats.wisdom, 'WIS', 10);
-        get().appendLog('world', success
-          ? 'You bring a relic forward. Its hum rises in pitch — it recognises your intent.'
-          : 'You bring a relic forward. Its hum stutters. The connection does not hold.');
-        break;
-      }
       case 'travel': {
         const target = parsed.target?.toLowerCase() ?? '';
         const candidate = target
@@ -254,6 +212,149 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       default:
         get().appendLog('arbiter', '"I am not certain what you mean by that," the Arbiter says softly.');
+    }
+
+    if (!get().pendingRolls && shouldArbiterSpeak()) {
+      get().appendLog('arbiter', buildArbiterRemark({ location: currentScene.location, hazard: currentScene.hazard }));
+    }
+    void get().persist();
+  },
+
+  resolveRollStep(values: number[]) {
+    const state = get().pendingRolls;
+    if (!state) return;
+
+    const idx = state.currentStep;
+    const step = state.steps[idx];
+    if (!step) return;
+
+    const total = values.reduce((a, b) => a + b, 0) + step.bonus;
+    const success = step.target !== undefined ? total >= step.target : undefined;
+    const filled: RollStep = { ...step, values, total, success };
+    const updatedSteps = state.steps.map((s, i) => (i === idx ? filled : s));
+
+    // Skip damage roll if attack missed
+    let nextIdx = idx + 1;
+    if (nextIdx < updatedSteps.length) {
+      const nextStep = updatedSteps[nextIdx];
+      const attackStep = updatedSteps.find((s) => s.id === 'attack');
+      if (nextStep?.id === 'damage' && attackStep?.success === false) {
+        nextIdx++;
+      }
+    }
+
+    if (nextIdx < updatedSteps.length) {
+      set({ pendingRolls: { ...state, steps: updatedSteps, currentStep: nextIdx } });
+    } else {
+      set({ pendingRolls: null });
+      get().concludeRolls(updatedSteps, state.actionText);
+    }
+  },
+
+  cancelPendingRolls() {
+    set({ pendingRolls: null });
+    get().appendLog('system', 'Action cancelled.');
+  },
+
+  concludeRolls(steps: RollStep[], actionText: string) {
+    const { player, currentScene, currentEnemyHp } = get();
+    if (!player || !currentScene) return;
+
+    const initiative = steps.find((s) => s.id === 'initiative');
+    const attack = steps.find((s) => s.id === 'attack');
+    const damage = steps.find((s) => s.id === 'damage');
+    const skill = steps.find((s) => s.id === 'skill_check');
+
+    // ── SKILL CHECK ───────────────────────────────────────────────────────
+    if (skill) {
+      const { intent } = parseInput(actionText);
+      if (skill.success) {
+        switch (intent) {
+          case 'stealth':
+            get().appendLog('world', 'You move low and quiet. Whatever watches does not see you.');
+            break;
+          case 'diplomacy':
+            get().appendLog('world', 'Your words find purchase. Something in this place is listening.');
+            break;
+          case 'escape':
+            get().appendLog('world', 'You break for the entrance. Behind you the chamber settles back into silence.');
+            if (currentScene.enemy) set((s) => ({ currentScene: s.currentScene ? { ...s.currentScene, enemy: null } : null }));
+            break;
+          case 'investigate': {
+            get().appendLog('world', `You search ${currentScene.location.name} carefully. The Aetherstone hums — something is here.`);
+            if (Math.random() < 0.5) {
+              const quest = get().generateNewQuest();
+              get().appendLog('reward', `New lead: ${quest.objective.verb} ${quest.objective.target} at ${quest.location.name}.`);
+            }
+            break;
+          }
+          case 'cast':
+            get().appendLog('world', 'You shape the Aether around your hand. A pale violet glow answers, steady and true.');
+            break;
+          case 'use_relic':
+            get().appendLog('world', 'The relic hums in pitch — it recognises your intent.');
+            break;
+          default:
+            get().appendLog('world', 'The action resolves in your favour.');
+        }
+      } else {
+        switch (intent) {
+          case 'stealth':
+            get().appendLog('world', 'Your foot scrapes stone. Something stirs in the dark.');
+            break;
+          case 'diplomacy':
+            get().appendLog('world', 'Your words hang unanswered. The silence has heard better arguments.');
+            break;
+          case 'escape':
+            get().appendLog('world', 'The way is longer than you remembered. You circle back, breathing hard.');
+            break;
+          case 'investigate':
+            get().appendLog('world', `You sweep ${currentScene.location.name} but find only dust and old silence.`);
+            break;
+          case 'cast':
+            get().appendLog('world', 'The Aether slips through your focus. The glow flickers and dies.');
+            break;
+          case 'use_relic':
+            get().appendLog('world', 'The relic stutters. The connection does not hold.');
+            break;
+          default:
+            get().appendLog('world', 'The action fails.');
+        }
+      }
+      if (shouldArbiterSpeak()) {
+        get().appendLog('arbiter', buildArbiterRemark({ location: currentScene.location, hazard: currentScene.hazard }));
+      }
+      void get().persist();
+      return;
+    }
+
+    // ── COMBAT ────────────────────────────────────────────────────────────
+    if (!currentScene.enemy) { void get().persist(); return; }
+    const enemy = currentScene.enemy;
+
+    if (initiative) {
+      get().appendLog('world', initiative.success
+        ? `You seize the initiative. ${enemy.name} has no time to react.`
+        : `${enemy.name} moves first. The pressure is immediate.`);
+    }
+
+    if (attack?.success) {
+      const dmg = damage?.total ?? rollDie(6);
+      const prevHp = currentEnemyHp ?? enemy.hp;
+      const newEnemyHp = prevHp - dmg;
+
+      if (newEnemyHp <= 0) {
+        get().appendLog('combat', `Your strike finds its mark — ${dmg} damage. ${enemy.name} falls.`);
+        get().resolveEnemyDefeat();
+        set({ currentEnemyHp: null });
+      } else {
+        set({ currentEnemyHp: newEnemyHp });
+        get().appendLog('combat', `Your strike hits for ${dmg}. ${enemy.name} staggers — ${newEnemyHp} HP remaining. It fights back.`);
+        applyEnemyCounter(enemy, player, get, set);
+      }
+    } else {
+      get().appendLog('combat', `Your attack goes wide. ${enemy.name} seizes the opening.`);
+      applyEnemyCounter(enemy, player, get, set);
     }
 
     if (shouldArbiterSpeak()) {
@@ -290,7 +391,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!currentScene?.enemy || !player) return;
     const enemy = currentScene.enemy;
     const loot = enemy.loot[Math.floor(Math.random() * enemy.loot.length)] ?? 'Aether dust';
-    get().appendLog('combat', `${enemy.name} falls. You recover ${loot}.`);
+    get().appendLog('reward', `${enemy.name} defeated. You recover ${loot}.`);
     set({
       currentScene: { ...currentScene, enemy: null },
       worldMemory: recordEnemyDefeat(worldMemory, enemy.name),
@@ -308,9 +409,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   rest() {
     const player = get().player;
     if (!player) return;
-    const heal = Math.min(player.hpMax - player.hp, 2 + Math.floor(Math.random() * 11));
+    const heal = Math.min(player.hpMax - player.hp, rollDie(6) + rollDie(6));
     set({ player: { ...player, hp: player.hp + heal } });
-    get().appendLog('world', `You rest. ${heal} HP recovered.`);
+    get().appendLog('world', `You rest. 2d6 → ${heal} HP recovered.`);
     void get().persist();
   },
 
@@ -326,3 +427,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 }));
+
+// Arbiter rolls enemy counter-attack — transparent to player per rulebook
+function applyEnemyCounter(
+  enemy: Enemy,
+  player: PlayerCharacter,
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+) {
+  const atkBonus = parseInt(String(enemy.attack), 10) || 3;
+  const atkRoll = rollDie(20);
+  const atkTotal = atkRoll + atkBonus;
+  const hit = atkTotal >= player.ac;
+
+  get().appendLog(
+    'combat',
+    `${enemy.name} — d20 → ${atkRoll} + ATK ${atkBonus} = ${atkTotal} vs your AC ${player.ac} — ${hit ? '✓ HIT' : '✗ MISS'}`,
+  );
+
+  if (hit) {
+    const dmg = rollFromNotation(String(enemy.damage)) || rollDie(6);
+    set((s) => {
+      if (!s.player) return {};
+      const newHp = Math.max(0, s.player.hp - dmg);
+      const msg = newHp <= 0
+        ? `${enemy.name} deals ${dmg} damage. You fall. The Aetherstone grows dim around you.`
+        : `${enemy.name} deals ${dmg} damage. You have ${newHp} HP remaining.`;
+      // Queue the log message — we need it after the set
+      void Promise.resolve().then(() => get().appendLog('combat', msg));
+      return { player: { ...s.player, hp: newHp } };
+    });
+  }
+}

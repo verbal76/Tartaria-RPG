@@ -5,6 +5,7 @@ import { StatsPanel } from '../components/StatsPanel';
 import { InventoryPanel } from '../components/InventoryPanel';
 import { AdventureFeed } from '../components/AdventureFeed';
 import { InputBox } from '../components/InputBox';
+import { DiceRoller } from '../components/DiceRoller';
 
 export function ExplorationScreen() {
   const player = useGameStore((s) => s.player);
@@ -13,6 +14,9 @@ export function ExplorationScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const beginScene = useGameStore((s) => s.beginScene);
   const currentScene = useGameStore((s) => s.currentScene);
+  const pendingRolls = useGameStore((s) => s.pendingRolls);
+  const resolveRollStep = useGameStore((s) => s.resolveRollStep);
+  const cancelPendingRolls = useGameStore((s) => s.cancelPendingRolls);
 
   if (!player) {
     return (
@@ -52,7 +56,15 @@ export function ExplorationScreen() {
       </View>
 
       <View style={styles.controls}>
-        <InputBox onSubmit={submit} />
+        {pendingRolls ? (
+          <DiceRoller
+            state={pendingRolls}
+            onRoll={resolveRollStep}
+            onCancel={cancelPendingRolls}
+          />
+        ) : (
+          <InputBox onSubmit={submit} />
+        )}
         <View style={styles.menuRow}>
           <TouchableOpacity onPress={() => setScreen('title')}>
             <Text style={styles.menu}>title</Text>

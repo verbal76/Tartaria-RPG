@@ -195,6 +195,27 @@ export interface PlayerCharacter {
 
 export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward';
 
+export interface RollStep {
+  id: string;
+  label: string;
+  sides: number;
+  count: number;
+  bonus: number;
+  bonusLabel: string;
+  target?: number;
+  targetLabel?: string;
+  context: string;
+  values?: number[];
+  total?: number;
+  success?: boolean;
+}
+
+export interface PendingRollState {
+  actionText: string;
+  steps: RollStep[];
+  currentStep: number;
+}
+
 export interface GameLogEntry {
   id: string;
   ts: number;
