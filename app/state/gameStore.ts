@@ -24,6 +24,8 @@ import {
   newSlotId,
   migrateLegacySlotIfPresent,
   getActiveSlotId,
+  loadGlobalStash,
+  addResurrectionGems,
   type SlotSummary,
 } from '../engine/saveSystem';
 import { makeEntry, persistEntry } from '../engine/gameLog';
@@ -146,6 +148,7 @@ interface GameStore {
 
   slots: SlotSummary[];
   activeSlotId: string | null;
+  resurrectionGems: number;
 
   cognitiveStatus: CognitiveStatus;
   cognitiveFraction: number;
@@ -159,6 +162,7 @@ interface GameStore {
   refreshSlots: () => Promise<void>;
   loadSlotIntoGame: (slotId: string) => Promise<void>;
   deleteSlotById: (slotId: string) => Promise<void>;
+  resurrectSlot: (slotId: string) => Promise<boolean>;
 
   startNewGame: (input: CreateCharacterInput) => Promise<void>;
   abandonGame: () => Promise<void>;
@@ -198,6 +202,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   slots: [],
   activeSlotId: null,
+  resurrectionGems: 0,
 
   cognitiveStatus: 'idle',
   cognitiveFraction: 0,
@@ -208,35 +213,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
   async hydrate() {
     // One-shot migration from the v1 single-slot save, if present.
     await migrateLegacySlotIfPresent();
-    // Restore the last-active slot id (if the player was mid-session before
-    // backgrounding) and load its save.
     const activeId = await loadActiveSlotId();
     const slots = await listSlots();
-    if (activeId) {
-      const saved = await loadSlot(activeId);
-      if (saved && saved.player) {
-        set({
-          player: backfillPlayer(saved.player),
-          worldMemory: saved.worldMemory,
-          gameLog: saved.gameLog,
-          currentScreen: saved.currentScreen,
-          slots,
-          activeSlotId: activeId,
-          hydrated: true,
-        });
-        // SaveState doesn't persist currentScene, so we always need a fresh
-        // scene after restore. Without this the exploration screen renders
-        // "No scene" and every player action silently no-ops (bailed on the
-        // `!currentScene` guard in submitPlayerAction).
-        if (saved.currentScreen === 'exploration') {
-          get().beginScene();
-        }
-        return;
-      }
-    }
-    // No active slot or save is gone — sit on the title screen with the
-    // list of available characters.
-    set({ slots, activeSlotId: null, currentScreen: 'title', hydrated: true });
+    const stash = await loadGlobalStash();
+    // ALWAYS land on the title screen at app launch, regardless of what
+    // currentScreen the active slot was last saved at. Tapping a character
+    // in the slot list is one tap away — but the player chooses, not the
+    // last session.
+    set({
+      slots,
+      activeSlotId: activeId,
+      resurrectionGems: stash.resurrectionGems,
+      currentScreen: 'title',
+      hydrated: true,
+    });
   },
 
   async refreshSlots() {
@@ -247,6 +237,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   async loadSlotIntoGame(slotId) {
     const saved = await loadSlot(slotId);
     if (!saved || !saved.player) return;
+    if (saved.player.dead === true) return; // Dead characters need a Resurrection Gem first.
     await setActiveSlot(slotId);
     set({
       player: backfillPlayer(saved.player),
@@ -261,6 +252,43 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Saves don't store the scene; generate a fresh one so the player can
     // immediately interact with the exploration screen.
     get().beginScene();
+  },
+
+  async resurrectSlot(slotId) {
+    if (get().resurrectionGems <= 0) return false;
+    const saved = await loadSlot(slotId);
+    if (!saved || !saved.player || saved.player.dead !== true) return false;
+
+    // Consume one gem from the install-wide stash first. If the write
+    // fails, we abort before mutating the save.
+    const remainingGems = await addResurrectionGems(-1);
+
+    const revived: PlayerCharacter = {
+      ...backfillPlayer(saved.player),
+      dead: false,
+      hp: saved.player.hpMax,
+      stamina: saved.player.staminaMax ?? saved.player.stamina,
+    };
+    await saveSlot(slotId, { ...saved, player: revived });
+    await setActiveSlot(slotId);
+    set({
+      player: revived,
+      worldMemory: saved.worldMemory,
+      gameLog: saved.gameLog,
+      currentScreen: 'exploration',
+      activeSlotId: slotId,
+      resurrectionGems: remainingGems,
+      currentScene: null,
+      currentEnemyHp: null,
+      pendingRolls: null,
+    });
+    get().beginScene();
+    get().appendLog(
+      'reward',
+      `✦ Resurrection. ${revived.name} returns to Tartaria, restored. The Aetherstone hums in recognition.`,
+    );
+    await get().refreshSlots();
+    return true;
   },
 
   async deleteSlotById(slotId) {
@@ -761,6 +789,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ],
       },
     });
+    // Very rare Resurrection Gem drop. ~0.5% per kill — most playtests
+    // will never see one; long campaigns will see a handful. The gem
+    // saves to the install-wide stash, not the active character, so it
+    // survives the character's eventual death.
+    if (Math.random() < 0.005) {
+      void addResurrectionGems(1).then((total) => {
+        set({ resurrectionGems: total });
+        get().appendLog(
+          'reward',
+          `✦ A Resurrection Gem flickers from the dust — gathered to your stash. (${total} held)`,
+        );
+      });
+    }
     void get().persist();
   },
 
@@ -891,22 +932,16 @@ function applyEnemyCounter(
   }
 }
 
-// Permadeath. Triggered the moment HP hits 0 anywhere (currently only
-// enemy counter-attacks, but the helper is generic so any future HP
-// drain path can call it). Logs a flavored end-of-life narration, holds
-// the player on the exploration screen for a beat so they can read it,
-// then deletes the slot and returns to the title list.
+// Death is no longer permanent erasure. The character is marked dead and
+// remains on the title slot list (with a DEAD badge) so the player can
+// resurrect them with a Resurrection Gem.
 function handlePlayerDeath(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
 ): void {
   const state = get();
   const player = state.player;
-  if (!player) return; // already handled by a prior trigger
-
-  // Guard against double-fire: if pendingRolls is already null AND there's
-  // no active slot, we've already run this for the current death.
-  if (!state.activeSlotId && !state.pendingRolls) return;
+  if (!player || player.dead) return; // already handled
 
   const locName = state.currentScene?.location.name ?? 'Tartaria';
   const epitaph = pick([
@@ -917,29 +952,33 @@ function handlePlayerDeath(
     `${player.name} does not rise. The ruins remember another.`,
   ]);
   state.appendLog('combat', epitaph);
-  state.appendLog('system', `${player.name} has fallen. Permadeath: this character is gone from Tartaria.`);
+  state.appendLog(
+    'system',
+    `${player.name} has fallen. A Resurrection Gem from the title screen can bring them back.`,
+  );
 
-  // Cancel any in-flight rolls so the dice UI clears immediately.
-  set(() => ({ pendingRolls: null }));
+  // Mark the character dead in-place. Persist immediately so the slot
+  // summary on the title list reflects the new state.
+  set((s) => ({
+    player: s.player ? { ...s.player, dead: true, hp: 0 } : s.player,
+    pendingRolls: null,
+  }));
+  void get().persist();
 
-  const slotId = state.activeSlotId;
-  // Give the player ~3.5 seconds to read the death messages on the
-  // exploration feed before yanking them to the title screen.
+  // Hold on the exploration screen for ~3.5s so the player reads the
+  // final messages, then return to title with the refreshed slot list.
   setTimeout(() => {
-    if (slotId) {
-      void state.deleteSlotById(slotId).then(() => {
-        set(() => ({ currentScreen: 'title' }));
-      });
-    } else {
-      set(() => ({
-        player: null,
-        currentScene: null,
-        currentEnemyHp: null,
-        pendingRolls: null,
-        gameLog: [],
-        currentScreen: 'title',
-      }));
-    }
+    void get().refreshSlots();
+    set(() => ({
+      currentScreen: 'title',
+      // Clear in-memory session state — the dead character is no longer
+      // active. The slot itself is preserved on disk.
+      player: null,
+      currentScene: null,
+      currentEnemyHp: null,
+      pendingRolls: null,
+      activeSlotId: null,
+    }));
   }, 3500);
 }
 

@@ -198,6 +198,8 @@ export interface PlayerCharacter {
   factionStanding: FactionStanding[];
   currentLocationId: string;
   activeQuests: Quest[];
+  /** Set when HP hits 0; the character is barred from play until a Resurrection Gem revives them. */
+  dead?: boolean;
 }
 
 export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive';

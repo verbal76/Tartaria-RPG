@@ -19,8 +19,40 @@ export interface SlotSummary {
   locationId: string;
   hp: number;
   hpMax: number;
+  /** Mirrors player.dead — set true when the character has fallen and needs a Resurrection Gem. */
+  dead?: boolean;
   savedAt: number;
   createdAt: number;
+}
+
+// Install-wide stash (not per-character). Stores resources that persist
+// across character deaths — Resurrection Gems primarily.
+const GLOBAL_STASH_KEY = 'tartaria.global.v2';
+
+export interface GlobalStash {
+  resurrectionGems: number;
+}
+
+export async function loadGlobalStash(): Promise<GlobalStash> {
+  try {
+    const raw = await AsyncStorage.getItem(GLOBAL_STASH_KEY);
+    if (!raw) return { resurrectionGems: 0 };
+    const parsed = JSON.parse(raw) as Partial<GlobalStash>;
+    return { resurrectionGems: parsed.resurrectionGems ?? 0 };
+  } catch {
+    return { resurrectionGems: 0 };
+  }
+}
+
+export async function saveGlobalStash(stash: GlobalStash): Promise<void> {
+  await AsyncStorage.setItem(GLOBAL_STASH_KEY, JSON.stringify(stash));
+}
+
+export async function addResurrectionGems(n: number): Promise<number> {
+  const stash = await loadGlobalStash();
+  stash.resurrectionGems = Math.max(0, stash.resurrectionGems + n);
+  await saveGlobalStash(stash);
+  return stash.resurrectionGems;
 }
 
 let activeSlotId: string | null = null;
@@ -97,6 +129,7 @@ export async function saveSlot(slotId: string, state: SaveState): Promise<void> 
       locationId: state.player.currentLocationId,
       hp: state.player.hp,
       hpMax: state.player.hpMax,
+      dead: state.player.dead === true,
       savedAt: toSave.savedAt,
       createdAt: (await readCreatedAt(slotId)) ?? toSave.savedAt,
     };

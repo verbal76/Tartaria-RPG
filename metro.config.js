@@ -14,6 +14,7 @@
 // 2026-05-15l: HOTFIX APK — multi-slot save load lost currentScene, leaving "No scene" + every action silently no-oping. hydrate / loadSlotIntoGame now beginScene() on restore; submitPlayerAction auto-recovers if scene is null.
 // 2026-05-15m: APK refresh — adds CHECK FOR OTA UPDATE button on About screen + live Updates.* diagnostics (runtimeVersion, channel, updateId, isEnabled, isEmbeddedLaunch). User can manually pull OTAs when automatic check-on-load fails.
 // 2026-05-15n: APK refresh — About screen rewrite. APK build number from native versionCode (set by build-apk.yml from github.run_number), last OTA applied + published-at timestamp from Updates.* live values, cleaned up the "policy" object display. expo-application 6.0.0 added.
+// 2026-05-15o: APK refresh — always start at main menu (no auto-resume), permadeath marks character "DEAD" on slot list instead of erasing, Resurrection Gems dropped ~0.5% per kill saved install-wide, dead slots gated behind gem spend.
 
 const { getDefaultConfig } = require('expo/metro-config');
 
