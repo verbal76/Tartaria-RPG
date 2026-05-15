@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, AppState, type AppStateStatus } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useGameStore } from './app/state/gameStore';
@@ -8,15 +8,33 @@ import { CharacterCreationScreen } from './app/screens/CharacterCreationScreen';
 import { ExplorationScreen } from './app/screens/ExplorationScreen';
 import { LogScreen } from './app/screens/LogScreen';
 import { LoreScreen } from './app/screens/LoreScreen';
+import { AboutScreen } from './app/screens/AboutScreen';
 
 export default function App() {
   const screen = useGameStore((s) => s.currentScreen);
   const hydrated = useGameStore((s) => s.hydrated);
   const hydrate = useGameStore((s) => s.hydrate);
+  const bootCognitive = useGameStore((s) => s.bootCognitive);
+  const shutdownCognitive = useGameStore((s) => s.shutdownCognitive);
+  const resumeCognitive = useGameStore((s) => s.resumeCognitive);
 
   useEffect(() => {
-    void hydrate();
-  }, [hydrate]);
+    void hydrate().then(() => {
+      void bootCognitive();
+    });
+  }, [hydrate, bootCognitive]);
+
+  useEffect(() => {
+    const onChange = (status: AppStateStatus) => {
+      if (status === 'background' || status === 'inactive') {
+        void shutdownCognitive();
+      } else if (status === 'active') {
+        void resumeCognitive();
+      }
+    };
+    const sub = AppState.addEventListener('change', onChange);
+    return () => sub.remove();
+  }, [shutdownCognitive, resumeCognitive]);
 
   if (!hydrated) {
     return (
@@ -35,6 +53,7 @@ export default function App() {
         {screen === 'exploration' && <ExplorationScreen />}
         {screen === 'log' && <LogScreen />}
         {screen === 'lore' && <LoreScreen />}
+        {screen === 'about' && <AboutScreen />}
       </SafeAreaView>
     </SafeAreaProvider>
   );

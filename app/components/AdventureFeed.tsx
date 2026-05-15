@@ -11,6 +11,7 @@ const channelColors: Record<LogChannel, string> = {
   system: '#a89a7a',  // dice roll results — warm amber, readable
   combat: '#e07a5f',
   reward: '#9ec96a',
+  cognitive: '#7a705c',  // dim grey — debug-style, not story content
 };
 
 export function AdventureFeed({ entries }: Props) {
@@ -27,6 +28,7 @@ export function AdventureFeed({ entries }: Props) {
           <Text style={[styles.channel, { color: channelColors[entry.channel] }]}>
             {entry.channel === 'player' ? 'YOU'
               : entry.channel === 'system' && entry.text.startsWith('d') ? 'ROLL'
+              : entry.channel === 'cognitive' ? 'AI'
               : entry.channel.toUpperCase()}
           </Text>
           <Text style={[styles.body, { color: channelColors[entry.channel] }]}>

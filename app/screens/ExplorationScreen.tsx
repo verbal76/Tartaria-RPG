@@ -17,6 +17,7 @@ export function ExplorationScreen() {
   const pendingRolls = useGameStore((s) => s.pendingRolls);
   const resolveRollStep = useGameStore((s) => s.resolveRollStep);
   const cancelPendingRolls = useGameStore((s) => s.cancelPendingRolls);
+  const saveAndExitToTitle = useGameStore((s) => s.saveAndExitToTitle);
 
   if (!player) {
     return (
@@ -41,14 +42,19 @@ export function ExplorationScreen() {
       </View>
 
       <View style={styles.sceneBar}>
-        <Text style={styles.sceneText}>
+        <Text style={styles.sceneText} numberOfLines={1}>
           {currentScene
             ? `${currentScene.location.name}  /  ${currentScene.weather.name}${currentScene.hazard ? `  /  ${currentScene.hazard.name}` : ''}`
             : 'No scene'}
         </Text>
-        <TouchableOpacity onPress={beginScene}>
-          <Text style={styles.sceneBtn}>↻</Text>
-        </TouchableOpacity>
+        <View style={styles.sceneBarBtns}>
+          <TouchableOpacity onPress={beginScene} hitSlop={8}>
+            <Text style={styles.sceneBtn}>↻</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setScreen('about')} hitSlop={8}>
+            <Text style={styles.sceneBtn}>⚙</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.feed}>
@@ -66,11 +72,14 @@ export function ExplorationScreen() {
           <InputBox onSubmit={submit} />
         )}
         <View style={styles.menuRow}>
-          <TouchableOpacity onPress={() => setScreen('title')}>
-            <Text style={styles.menu}>title</Text>
+          <TouchableOpacity onPress={() => { void saveAndExitToTitle(); }}>
+            <Text style={styles.menu}>save & exit</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setScreen('log')}>
             <Text style={styles.menu}>full log</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setScreen('about')}>
+            <Text style={styles.menu}>about</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -88,7 +97,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8, paddingVertical: 4, backgroundColor: '#13110f',
     borderColor: '#3a342c', borderWidth: 1, borderRadius: 4,
   },
-  sceneText: { color: '#c9a86a', fontSize: 11, letterSpacing: 1 },
+  sceneText: { color: '#c9a86a', fontSize: 11, letterSpacing: 1, flex: 1 },
+  sceneBarBtns: { flexDirection: 'row', gap: 4 },
   sceneBtn: { color: '#cdbf99', fontSize: 16, paddingHorizontal: 8 },
   feed: { flex: 1 },
   controls: { gap: 6 },

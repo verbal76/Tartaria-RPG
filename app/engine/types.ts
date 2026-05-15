@@ -198,7 +198,7 @@ export interface PlayerCharacter {
   activeQuests: Quest[];
 }
 
-export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward';
+export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive';
 
 export interface RollStep {
   id: string;
@@ -241,7 +241,8 @@ export type ScreenName =
   | 'character_creation'
   | 'exploration'
   | 'log'
-  | 'lore';
+  | 'lore'
+  | 'about';
 
 export interface SaveState {
   version: 1;

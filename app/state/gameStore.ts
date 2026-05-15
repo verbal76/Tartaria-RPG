@@ -29,6 +29,8 @@ import {
 import { parseInput, type ParseContext } from '../engine/parser';
 import { rollDie, rollFromNotation } from '../engine/rng';
 import { buildCombatSteps, buildSkillSteps } from '../engine/combatRules';
+import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
+import type { CognitiveResponse, WorldContext } from '../ai/types';
 import locationsData from '../data/locations/locations.json';
 
 const allLocations = locationsData as Location[];
@@ -47,6 +49,11 @@ function collectSceneNouns(scene: CurrentScene): string[] {
   return nouns;
 }
 
+export type CognitiveStatus = 'idle' | BootStage | 'failed' | 'skipped';
+
+// Module-level singleton — class instances don't belong in zustand state.
+const cognitive = new CognitiveOrchestrator();
+
 interface GameStore {
   player: PlayerCharacter | null;
   worldMemory: WorldMemory;
@@ -57,11 +64,17 @@ interface GameStore {
   pendingRolls: PendingRollState | null;
   hydrated: boolean;
 
+  cognitiveStatus: CognitiveStatus;
+  cognitiveFraction: number;
+  cognitiveError: string | null;
+  cognitiveLastResponse: CognitiveResponse | null;
+
   hydrate: () => Promise<void>;
   setScreen: (screen: ScreenName) => void;
 
   startNewGame: (input: CreateCharacterInput) => Promise<void>;
   abandonGame: () => Promise<void>;
+  saveAndExitToTitle: () => Promise<void>;
 
   appendLog: (channel: LogChannel, text: string, meta?: Record<string, unknown>) => void;
 
@@ -74,6 +87,11 @@ interface GameStore {
   generateNewQuest: () => Quest;
   resolveEnemyDefeat: () => void;
   rest: () => void;
+
+  bootCognitive: () => Promise<void>;
+  skipCognitiveBoot: () => void;
+  shutdownCognitive: () => Promise<void>;
+  resumeCognitive: () => Promise<void>;
 
   persist: () => Promise<void>;
 }
@@ -89,6 +107,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
   currentEnemyHp: null,
   pendingRolls: null,
   hydrated: false,
+
+  cognitiveStatus: 'idle',
+  cognitiveFraction: 0,
+  cognitiveError: null,
+  cognitiveLastResponse: null,
 
   async hydrate() {
     const saved = await loadSave();
@@ -255,6 +278,39 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!get().pendingRolls && shouldArbiterSpeak()) {
       get().appendLog('arbiter', buildArbiterRemark({ location: currentScene.location, hazard: currentScene.hazard }));
     }
+
+    // Fire-and-forget cognitive enrichment — runs in parallel with the
+    // deterministic resolution above, never blocks gameplay.
+    if (get().cognitiveStatus === 'ready') {
+      const worldCtx: WorldContext = {
+        hp: player.hp,
+        maxHp: player.hpMax,
+        currentLocation: currentScene.location.name,
+        nearbyObjects: collectSceneNouns(currentScene),
+      };
+      cognitive
+        .processInput(trimmed, worldCtx)
+        .then((response) => {
+          set({ cognitiveLastResponse: response });
+          const tags: string[] = [];
+          if (response.inferredEmotions.length) tags.push(...response.inferredEmotions);
+          if (response.inferredIntentions.length) tags.push(...response.inferredIntentions);
+          if (tags.length) {
+            const summary = `${tags.join(' · ')}  (${Math.round(response.embeddingMs)}ms)`;
+            get().appendLog('cognitive', summary, {
+              emotions: response.inferredEmotions,
+              intentions: response.inferredIntentions,
+              confidence: response.semanticConfidence,
+              embeddingMs: response.embeddingMs,
+              inferenceMs: response.inferenceMs,
+            });
+          }
+        })
+        .catch(() => {
+          // swallow — cognitive failures must never affect gameplay
+        });
+    }
+
     void get().persist();
   },
 
@@ -451,6 +507,50 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ player: { ...player, hp: player.hp + heal } });
     get().appendLog('world', `You rest. 2d6 → ${heal} HP recovered.`);
     void get().persist();
+  },
+
+  async saveAndExitToTitle() {
+    await get().persist();
+    set({ currentScreen: 'title' });
+  },
+
+  async bootCognitive() {
+    const current = get().cognitiveStatus;
+    if (current !== 'idle' && current !== 'failed') return;
+    set({ cognitiveStatus: 'downloading', cognitiveFraction: 0, cognitiveError: null });
+    try {
+      await cognitive.boot({
+        onProgress: (stage, fraction) => {
+          set({ cognitiveStatus: stage, cognitiveFraction: fraction });
+        },
+      });
+      set({ cognitiveStatus: 'ready', cognitiveFraction: 1 });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      set({ cognitiveStatus: 'failed', cognitiveError: message });
+    }
+  },
+
+  skipCognitiveBoot() {
+    set({ cognitiveStatus: 'skipped' });
+  },
+
+  async shutdownCognitive() {
+    try {
+      await cognitive.shutdown();
+    } catch {
+      // ignore — best effort
+    }
+  },
+
+  async resumeCognitive() {
+    if (get().cognitiveStatus !== 'ready') return;
+    try {
+      await cognitive.resume();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      set({ cognitiveStatus: 'failed', cognitiveError: message });
+    }
   },
 
   async persist() {
