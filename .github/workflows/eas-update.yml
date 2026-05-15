@@ -1,0 +1,58 @@
+name: EAS Update (OTA)
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - '.github/**'
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'EAS channel/branch to publish to'
+        required: false
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - preview
+          - development
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    name: EAS Update
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.TARTARIA }}
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Publish update
+        env:
+          EXPO_TOKEN: ${{ secrets.TARTARIA }}
+        run: |
+          CHANNEL="${{ github.event.inputs.branch || 'production' }}"
+          MSG="${{ github.event.head_commit.message || github.event_name }}"
+          eas update \
+            --branch "$CHANNEL" \
+            --message "$MSG" \
+            --non-interactive

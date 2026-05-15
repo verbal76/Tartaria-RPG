@@ -1,0 +1,15 @@
+[
+  { "id": "tc_small", "type": "currency", "label": "30 Tartarian Coin", "amount": 30, "tags": ["currency", "small"] },
+  { "id": "tc_medium", "type": "currency", "label": "120 Tartarian Coin", "amount": 120, "tags": ["currency", "medium"] },
+  { "id": "tc_large", "type": "currency", "label": "400 Tartarian Coin", "amount": 400, "tags": ["currency", "large"] },
+  { "id": "forgotten_order_favor", "type": "standing", "label": "Forgotten Order favor (+5)", "faction": "forgotten_order", "amount": 5, "tags": ["faction"] },
+  { "id": "reclaimers_favor", "type": "standing", "label": "Reclaimers Guild favor (+5)", "faction": "reclaimers_guild", "amount": 5, "tags": ["faction"] },
+  { "id": "mud_monarch_quiet_word", "type": "standing", "label": "A quiet word from the Mud Monarchs", "faction": "mud_monarchs", "amount": 3, "tags": ["faction", "ominous"] },
+  { "id": "true_tartarian_blessing", "type": "standing", "label": "True Tartarian blessing", "faction": "true_tartarians", "amount": 5, "tags": ["faction"] },
+  { "id": "common_relic", "type": "relic", "label": "a common Tartarian relic", "tier": "common", "tags": ["relic"] },
+  { "id": "uncommon_relic", "type": "relic", "label": "an uncommon Aetheric relic", "tier": "uncommon", "tags": ["relic"] },
+  { "id": "rare_relic", "type": "relic", "label": "a rare Aetheric relic", "tier": "rare", "tags": ["relic"] },
+  { "id": "map_fragment", "type": "knowledge", "label": "a fragment of a pre-flood map", "tags": ["knowledge", "exploration"] },
+  { "id": "rumor", "type": "knowledge", "label": "a rumor about a deeper find", "tags": ["knowledge", "lead"] },
+  { "id": "patron_attention", "type": "knowledge", "label": "the attention of Dr. Lucius Kincaid", "tags": ["patron", "ambiguous"] }
+]

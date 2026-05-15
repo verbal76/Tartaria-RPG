@@ -1,40 +1,32 @@
 {
   "expo": {
     "name": "Tartaria Realms",
-    "slug": "tartaria-realms",
+    "slug": "tartaria-",
+    "owner": "hot-attic-games",
     "version": "0.1.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "scheme": "tartariarealms",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "cover",
-      "backgroundColor": "#0a0908"
-    },
+    "backgroundColor": "#0a0908",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.verbal76.tartariarealms"
     },
     "android": {
-      "package": "com.verbal76.tartariarealms",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0a0908"
-      }
+      "package": "com.verbal76.tartariarealms"
     },
     "web": {
       "bundler": "metro"
     },
-    "plugins": ["expo-splash-screen"],
+    "plugins": [],
     "extra": {
       "eas": {
-        "projectId": "REPLACE_WITH_EAS_PROJECT_ID"
+        "projectId": "af723f5e-e446-4296-aa6e-f1d4a4fbe82a"
       }
     },
     "updates": {
-      "url": "https://u.expo.dev/REPLACE_WITH_EAS_PROJECT_ID"
+      "url": "https://u.expo.dev/af723f5e-e446-4296-aa6e-f1d4a4fbe82a"
     },
     "runtimeVersion": {
       "policy": "appVersion"

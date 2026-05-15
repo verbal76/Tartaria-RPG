@@ -1,0 +1,101 @@
+[
+  {
+    "id": "temporal_loop",
+    "name": "Temporal Loop",
+    "description": "You walk the same corridor and find yourself walking it again. The Etheric field has caught the moment in a fold.",
+    "severity": 4,
+    "effect": "Lose 1d6 hours of forward progress; risk of disorientation roll.",
+    "tags": ["aetheric", "time", "psychological"],
+    "source": "manual"
+  },
+  {
+    "id": "spatial_distortion",
+    "name": "Spatial Distortion",
+    "description": "Distance unspools. A chamber thirty paces wide becomes thirty paces deep, then thirty paces tall. The geometry refuses to settle.",
+    "severity": 4,
+    "effect": "Navigation impossible while inside. Wits check or be relocated.",
+    "tags": ["aetheric", "space", "disorientation"],
+    "source": "manual"
+  },
+  {
+    "id": "etheric_storm_burst",
+    "name": "Etheric Storm Burst",
+    "description": "A localized burst of pure Aether discharge. Reality buckles for a moment.",
+    "severity": 5,
+    "effect": "1d10 Aetheric damage to all in close range; technology may be temporarily disabled.",
+    "tags": ["aetheric", "burst", "damage"],
+    "source": "manual"
+  },
+  {
+    "id": "ancient_trap",
+    "name": "Tartarian Trap",
+    "description": "A pressure plate older than recorded history triggers. Walls shift, floor opens, energy lances strike.",
+    "severity": 4,
+    "effect": "Random effect: collapsing floor, energy lance, intruder identification ping.",
+    "tags": ["trap", "tartarian"],
+    "source": "manual"
+  },
+  {
+    "id": "aetherstone_seal",
+    "name": "Aetherstone Seal",
+    "description": "Hardened Aether-mud, stronger than stone. No standard tool will pierce it.",
+    "severity": 3,
+    "effect": "Blocks access to a chamber until Mold Ether or specialized relic is used.",
+    "tags": ["barrier", "aetherstone"],
+    "source": "manual"
+  },
+  {
+    "id": "magnetic_distortion",
+    "name": "Magnetic Distortion",
+    "description": "Compasses spin. Iron-cored gear stops working. The ground tugs at every buckle and bracket.",
+    "severity": 2,
+    "effect": "All electronic / iron equipment disabled while in the zone.",
+    "tags": ["magnetic", "tech_disruption"],
+    "source": "manual"
+  },
+  {
+    "id": "flooded_tunnel",
+    "name": "Flooded Tunnel",
+    "description": "Standing water laced with Aether residue. Things move beneath the surface.",
+    "severity": 3,
+    "effect": "Swim check; risk of aquatic creature encounter.",
+    "tags": ["water", "aetheric"],
+    "source": "bible+manual"
+  },
+  {
+    "id": "corrupted_spores",
+    "name": "Corrupted Spores",
+    "description": "A cloud of pale spores released from a fungal bloom on Aetherstone.",
+    "severity": 3,
+    "effect": "Inhalation check; on fail, gain 1d6 Corruption.",
+    "tags": ["biological", "corruption"],
+    "source": "bible"
+  },
+  {
+    "id": "reality_fracture",
+    "name": "Reality Fracture",
+    "description": "A jagged seam in the air where the world simply ends. Something is visible on the other side.",
+    "severity": 5,
+    "effect": "Sanity check; on critical fail, glimpse of pre-flood Tartaria (or worse).",
+    "tags": ["aetheric", "psychic", "reality"],
+    "source": "bible+manual"
+  },
+  {
+    "id": "aether_mist",
+    "name": "Aether Mist",
+    "description": "A glowing low mist that pulses with each heartbeat — yours, or something else's.",
+    "severity": 2,
+    "effect": "Slow movement, gradual Aether exposure (build up Corruption over time).",
+    "tags": ["aetheric", "exposure"],
+    "source": "manual"
+  },
+  {
+    "id": "automated_defenses",
+    "name": "Awakening Defenses",
+    "description": "Dormant Tartarian sentinels register your heat signature. Old gears begin to grind.",
+    "severity": 4,
+    "effect": "Triggers a Sentinel / Etheric Guardian encounter.",
+    "tags": ["construct", "encounter_trigger"],
+    "source": "manual"
+  }
+]

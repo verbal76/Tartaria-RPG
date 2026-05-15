@@ -1,0 +1,64 @@
+name: EAS Build (Android APK)
+
+on:
+  push:
+    branches:
+      - main
+      - 'release/**'
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'EAS build profile'
+        required: false
+        default: 'apk'
+        type: choice
+        options:
+          - apk
+          - preview
+          - development
+          - production
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: EAS Build APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.TARTARIA }}
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Trigger EAS build (non-interactive)
+        env:
+          EXPO_TOKEN: ${{ secrets.TARTARIA }}
+        run: |
+          PROFILE="${{ github.event.inputs.profile || 'apk' }}"
+          echo "Building with profile: $PROFILE"
+          eas build \
+            --platform android \
+            --profile "$PROFILE" \
+            --non-interactive \
+            --no-wait
+
+      - name: Note
+        run: |
+          echo "Build queued on EAS. Visit https://expo.dev/accounts/hot-attic-games/projects/tartaria-/builds to grab the APK when it's ready."
