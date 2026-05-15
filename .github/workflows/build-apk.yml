@@ -78,22 +78,32 @@ jobs:
 
       - name: Patch Kotlin to 1.9.25 (Compose compiler compat)
         run: |
-          # RN 0.76 uses a Gradle version catalog — kotlin version lives in
-          # android/gradle/libs.versions.toml, not in build.gradle ext block.
-          TOML=android/gradle/libs.versions.toml
-          if [ -f "$TOML" ]; then
-            echo "Patching $TOML:"
-            grep "kotlin" "$TOML" || true
-            sed -i 's/kotlin = "1\.9\.24"/kotlin = "1.9.25"/g' "$TOML"
-            grep "kotlin" "$TOML" || true
+          echo "=== kotlin 1.9.24 refs BEFORE patch ==="
+          grep -rn "1\.9\.24" android/ 2>/dev/null | head -30 || true
+
+          # RN 0.76 version catalog
+          if [ -f android/gradle/libs.versions.toml ]; then
+            sed -i 's/kotlin = "1\.9\.24"/kotlin = "1.9.25"/g' android/gradle/libs.versions.toml
           fi
-          # Fallback: older-style ext.kotlinVersion in build.gradle
-          if grep -q "1\.9\.24" android/build.gradle 2>/dev/null; then
-            sed -i 's/kotlinVersion = "1\.9\.24"/kotlinVersion = "1.9.25"/g' android/build.gradle
-            sed -i "s/kotlinVersion = '1\.9\.24'/kotlinVersion = '1.9.25'/g" android/build.gradle
-            echo "Patched build.gradle:"
-            grep kotlinVersion android/build.gradle || true
+
+          # build.gradle — match any quote style of 1.9.24 (the real pattern is
+          # `kotlinVersion = findProperty('android.kotlinVersion') ?: '1.9.24'`,
+          # so we just replace the literal version string in either quote form)
+          if [ -f android/build.gradle ]; then
+            sed -i "s/'1\.9\.24'/'1.9.25'/g" android/build.gradle
+            sed -i 's/"1\.9\.24"/"1.9.25"/g' android/build.gradle
           fi
+
+          # gradle.properties — set Expo's expected property name as final fallback
+          if [ -f android/gradle.properties ]; then
+            echo "" >> android/gradle.properties
+            echo "android.kotlinVersion=1.9.25" >> android/gradle.properties
+          fi
+
+          echo "=== kotlin 1.9.24 refs AFTER patch ==="
+          grep -rn "1\.9\.24" android/ 2>/dev/null | head -30 || true
+          echo "=== kotlin 1.9.25 refs AFTER patch ==="
+          grep -rn "1\.9\.25" android/ 2>/dev/null | head -30 || true
 
       - name: Ensure debug keystore exists (for release signing fallback)
         run: |
@@ -111,14 +121,19 @@ jobs:
         working-directory: android
         env:
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false"
+          KOTLIN_VERSION: "1.9.25"
         run: |
           chmod +x gradlew
           if [ "${{ steps.meta.outputs.profile }}" = "production" ]; then
             echo "Building Tartaria Realms AAB (production)"
-            ./gradlew bundleRelease --no-daemon --stacktrace
+            ./gradlew bundleRelease --no-daemon --stacktrace \
+              -Pandroid.kotlinVersion=1.9.25 \
+              -PkotlinVersion=1.9.25
           else
             echo "Building Tartaria Realms APK (preview)"
-            ./gradlew assembleRelease --no-daemon --stacktrace
+            ./gradlew assembleRelease --no-daemon --stacktrace \
+              -Pandroid.kotlinVersion=1.9.25 \
+              -PkotlinVersion=1.9.25
           fi
 
       - name: Stage Tartaria Realms artifact
