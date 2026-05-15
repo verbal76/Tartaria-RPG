@@ -5,6 +5,7 @@
 // 2026-05-15c: interactive dice roller — player rolls each die, enemy counter-attacks on miss/wound
 // 2026-05-15d: Kotlin patch — sed both quote styles + gradle -Pandroid.kotlinVersion + KOTLIN_VERSION env + debug grep
 // 2026-05-15e: replace sed hacks with gradle.properties append (canonical mechanism) and strip commit message from build logs/release notes
+// 2026-05-15f: proper Kotlin fix — expo-build-properties plugin sets 1.9.25 at prebuild time; sed + suppressCheck as belt-and-suspenders
 
 const { getDefaultConfig } = require('expo/metro-config');
 

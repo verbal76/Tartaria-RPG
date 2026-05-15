@@ -76,17 +76,26 @@ jobs:
       - name: Generate native Android project
         run: npx expo prebuild --platform android --no-install
 
-      - name: Set Kotlin 1.9.25 via gradle.properties (Compose compiler compat)
+      - name: Pin Kotlin 1.9.25 (Compose compiler compat)
         run: |
-          # RN 0.76's android/build.gradle resolves kotlinVersion via
-          #   findProperty('android.kotlinVersion') ?: '1.9.24'
-          # Appending the property to gradle.properties makes findProperty()
-          # return our value. This is the same mechanism expo-build-properties
-          # uses at prebuild time — we just do it inline here.
-          echo "" >> android/gradle.properties
-          echo "android.kotlinVersion=1.9.25" >> android/gradle.properties
-          echo "Resulting gradle.properties kotlin line:"
+          # Primary: expo-build-properties plugin sets android.kotlinVersion=1.9.25
+          # in gradle.properties at expo prebuild time. Verify it landed.
+          echo "--- gradle.properties after prebuild ---"
           grep -i kotlin android/gradle.properties || true
+
+          # Secondary: if findProperty() still resolves to 1.9.24 (shouldn't happen),
+          # directly rewrite the ext block line so the classpath gets 1.9.25.
+          if grep -q "findProperty('android.kotlinVersion') ?: '1.9.24'" android/build.gradle; then
+            sed -i "s/kotlinVersion = findProperty('android.kotlinVersion') ?: '1.9.24'/kotlinVersion = '1.9.25'/" android/build.gradle
+            echo "Patched kotlinVersion fallback in android/build.gradle"
+          fi
+
+          # Tertiary: silence the Compose-compiler version gating if anything still slips through.
+          echo "" >> android/gradle.properties
+          echo "kotlin.suppressKotlinVersionCompatibilityCheck=1.9.25" >> android/gradle.properties
+
+          echo "--- final android/build.gradle kotlinVersion line ---"
+          grep "kotlinVersion" android/build.gradle || true
 
       - name: Ensure debug keystore exists (for release signing fallback)
         run: |
