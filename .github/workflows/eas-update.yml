@@ -62,13 +62,51 @@ jobs:
         env:
           EXPO_TOKEN: ${{ secrets.TARTARIA }}
         run: |
+          set -euo pipefail
+
           CHANNEL="${{ github.event.inputs.branch || 'preview' }}"
           BRANCH="${GITHUB_REF_NAME}"
           SHORT_SHA="${GITHUB_SHA::7}"
           MSG="Tartaria Realms OTA — ${BRANCH}@${SHORT_SHA} (run #${{ github.run_number }})"
-          echo "Publishing to channel: $CHANNEL"
-          echo "Message: $MSG"
+
+          echo "=== OTA publish — pre-flight ==="
+          echo "Channel:      $CHANNEL"
+          echo "Message:      $MSG"
+          echo "Project id:   $(node -p "require('./app.json').expo.extra.eas.projectId")"
+          APP_VERSION=$(node -p "require('./app.json').expo.version")
+          RT_POLICY=$(node -p "require('./app.json').expo.runtimeVersion.policy || ''")
+          echo "App version:  $APP_VERSION"
+          echo "RT policy:    $RT_POLICY"
+          # With policy 'appVersion' the runtime version resolves to app.json's
+          # version. The APK on device was built with the same value, so this
+          # is what OTAs must publish at to actually land.
+          echo "Expected runtimeVersion the APK is asking for: $APP_VERSION"
+          echo "================================="
+
+          # Force --platform android — we don't ship iOS yet, and iOS asset
+          # quirks can fail the whole update otherwise.
           eas update \
             --branch "$CHANNEL" \
             --message "$MSG" \
-            --non-interactive
+            --platform android \
+            --non-interactive \
+            --json \
+            > update-result.json
+
+          echo "=== OTA publish — result ==="
+          cat update-result.json | node -e '
+            const r = JSON.parse(require("fs").readFileSync(0, "utf8"));
+            const arr = Array.isArray(r) ? r : [r];
+            for (const u of arr) {
+              console.log("  id:              " + (u.id || u.updateId || "?"));
+              console.log("  group:           " + (u.group || "?"));
+              console.log("  platform:        " + (u.platform || "?"));
+              console.log("  runtimeVersion:  " + (u.runtimeVersion || "?"));
+              console.log("  branch:          " + (u.branch || (u.branchName) || "?"));
+              console.log("  manifestPermalink: " + (u.manifestPermalink || "?"));
+            }
+          '
+          echo "============================"
+          echo
+          echo "If runtimeVersion above != $APP_VERSION, the installed APK will"
+          echo "silently reject this update. Fix: bump APK or align app.json version."
