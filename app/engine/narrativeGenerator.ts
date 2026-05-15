@@ -1,4 +1,4 @@
-import type { WeatherEntry, Hazard, Enemy, Location, Quest } from './types';
+import type { WeatherEntry, Hazard, Enemy, Location, Quest, InventoryItem, ParsedInput } from './types';
 import { pick, chance } from './rng';
 import openings from '../data/events/openings.json';
 
@@ -53,4 +53,38 @@ export function buildArbiterRemark(context: { location: Location; hazard?: Hazar
 
 export function shouldArbiterSpeak(): boolean {
   return chance(35);
+}
+
+export interface SoftArbiterContext {
+  parsed: ParsedInput;
+  inventory: InventoryItem[];
+  enemy?: Enemy | null;
+  location: Location;
+  hazard?: Hazard | null;
+}
+
+export function buildSoftArbiterFallback(ctx: SoftArbiterContext): string {
+  const { parsed, inventory, enemy, location } = ctx;
+
+  if (parsed.resolvedNoun) {
+    return `The Arbiter follows your gaze toward the ${parsed.resolvedNoun.toLowerCase()}. "Tell me what you would do with it."`;
+  }
+
+  if (enemy) {
+    return pick([
+      `The Arbiter does not look away from the ${enemy.name.toLowerCase()}. "Decide quickly. It will not wait."`,
+      `"You can fight, hide, or speak," the Arbiter says low. "${enemy.name} is already deciding for itself."`,
+    ]);
+  }
+
+  if (inventory.length > 0) {
+    const item = pick(inventory);
+    return `The Arbiter glances at your pack. "Your ${item.name.toLowerCase()} is still there, if it suits the moment."`;
+  }
+
+  return pick([
+    `The Arbiter waits, expression unreadable. "Say it plainer — the stones are listening."`,
+    `"Search, rest, or move on," the Arbiter offers. "Even small choices echo in ${location.name}."`,
+    `The Arbiter studies you. "Phrase it as the deed you mean to do. Look. Search. Strike. Flee."`,
+  ]);
 }

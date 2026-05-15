@@ -19,8 +19,14 @@ import { makeEntry, persistEntry } from '../engine/gameLog';
 import { createCharacter, type CreateCharacterInput } from '../engine/character';
 import { generateQuest } from '../engine/questGenerator';
 import { pickWeather, pickHazardForLocation, pickEnemyForLocation, getLocationById } from '../engine/encounter';
-import { buildOpening, buildScene, buildArbiterRemark, shouldArbiterSpeak } from '../engine/narrativeGenerator';
-import { parseInput } from '../engine/parser';
+import {
+  buildOpening,
+  buildScene,
+  buildArbiterRemark,
+  shouldArbiterSpeak,
+  buildSoftArbiterFallback,
+} from '../engine/narrativeGenerator';
+import { parseInput, type ParseContext } from '../engine/parser';
 import { rollDie, rollFromNotation } from '../engine/rng';
 import { buildCombatSteps, buildSkillSteps } from '../engine/combatRules';
 import locationsData from '../data/locations/locations.json';
@@ -32,6 +38,13 @@ interface CurrentScene {
   location: Location;
   hazard: Hazard | null;
   enemy: Enemy | null;
+}
+
+function collectSceneNouns(scene: CurrentScene): string[] {
+  const nouns = [scene.location.name, scene.weather.name];
+  if (scene.hazard) nouns.push(scene.hazard.name);
+  if (scene.enemy) nouns.push(scene.enemy.name, scene.enemy.type);
+  return nouns;
 }
 
 interface GameStore {
@@ -162,11 +175,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const trimmed = text.trim();
     if (!trimmed || get().pendingRolls) return;
 
-    const parsed = parseInput(trimmed);
-    get().appendLog('player', trimmed, { intent: parsed.intent });
-
     const { player, currentScene } = get();
     if (!player || !currentScene) return;
+
+    const parseCtx: ParseContext = {
+      inventory: player.inventory,
+      recentNouns: collectSceneNouns(currentScene),
+      enemyPresent: !!currentScene.enemy,
+    };
+    const parsed = parseInput(trimmed, parseCtx);
+    get().appendLog('player', trimmed, {
+      intent: parsed.intent,
+      confidence: parsed.confidence,
+      resolvedNoun: parsed.resolvedNoun,
+    });
+
+    if (parsed.intent === 'unknown' || parsed.confidence < 0.5) {
+      get().appendLog(
+        'arbiter',
+        buildSoftArbiterFallback({
+          parsed,
+          inventory: player.inventory,
+          enemy: currentScene.enemy,
+          location: currentScene.location,
+          hazard: currentScene.hazard,
+        }),
+      );
+      if (parsed.suggestions.length) {
+        get().appendLog('system', `Try: ${parsed.suggestions.slice(0, 3).join(' · ')}`);
+      }
+      void get().persist();
+      return;
+    }
 
     switch (parsed.intent) {
       case 'attack': {
@@ -210,8 +250,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       case 'inventory':
         get().appendLog('system', 'Pack is on the right.');
         break;
-      default:
-        get().appendLog('arbiter', '"I am not certain what you mean by that," the Arbiter says softly.');
     }
 
     if (!get().pendingRolls && shouldArbiterSpeak()) {

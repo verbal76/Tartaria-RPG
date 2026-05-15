@@ -16,9 +16,14 @@ export type Intent =
 
 export interface ParsedInput {
   intent: Intent;
-  scores: Record<Intent, number>;
   raw: string;
+  normalized: string;
   target?: string;
+  resolvedItemId?: string;
+  resolvedNoun?: string;
+  matchedVerb?: string;
+  confidence: number;
+  suggestions: string[];
 }
 
 export interface Stats {
