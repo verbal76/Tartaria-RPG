@@ -1,4 +1,4 @@
-name: EAS Build (Android APK)
+name: Build Android APK
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
     inputs:
       profile:
-        description: 'EAS build profile'
+        description: 'Build profile'
         required: false
         default: 'apk'
         type: choice
@@ -27,7 +27,7 @@ permissions:
 
 jobs:
   build:
-    name: EAS Build APK
+    name: Build Android APK (local)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -39,65 +39,50 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Setup Expo and EAS
-        uses: expo/expo-github-action@v8
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
         with:
-          eas-version: latest
-          token: ${{ secrets.TARTARIA }}
+          java-version: '17'
+          distribution: 'temurin'
 
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Build APK on EAS (wait for completion)
-        id: eas_build
+      - name: Install EAS CLI
+        run: npm install -g eas-cli@latest
+
+      - name: Build APK on this runner
+        id: build
         env:
           EXPO_TOKEN: ${{ secrets.TARTARIA }}
+          ANDROID_HOME: /usr/local/lib/android/sdk
+          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
         run: |
           PROFILE="${{ github.event.inputs.profile || 'apk' }}"
-          echo "Building with profile: $PROFILE"
-          BUILD_OUTPUT=$(eas build \
+          echo "Building profile: $PROFILE"
+          eas build \
             --platform android \
             --profile "$PROFILE" \
+            --local \
             --non-interactive \
-            --json \
-            2>/dev/null | tail -1)
-          APK_URL=$(echo "$BUILD_OUTPUT" | node -e "
-            const chunks = [];
-            process.stdin.on('data', d => chunks.push(d));
-            process.stdin.on('end', () => {
-              try {
-                const data = JSON.parse(chunks.join(''));
-                const arr = Array.isArray(data) ? data : [data];
-                const url = arr[0]?.artifacts?.buildUrl || arr[0]?.buildUrl || '';
-                console.log(url);
-              } catch(e) { console.log(''); }
-            });
-          " <<< "$BUILD_OUTPUT")
-          echo "apk_url=$APK_URL" >> "$GITHUB_OUTPUT"
-          echo "Build URL: $APK_URL"
+            --output ./tartaria-${{ github.run_number }}.apk
 
-      - name: Create GitHub Release
+      - name: Create GitHub Release with APK
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="apk-build-${{ github.run_number }}"
-          APK_URL="${{ steps.eas_build.outputs.apk_url }}"
-          COMMIT_MSG="${{ github.event.head_commit.message || github.event_name }}"
           BRANCH="${GITHUB_REF_NAME}"
-
-          BODY="## Tartaria Realms — Android APK
-
-          **Branch:** \`${BRANCH}\`
-          **Trigger:** ${COMMIT_MSG}
-          **Build #:** ${{ github.run_number }}
-
-          ### Download
-          $(if [ -n "$APK_URL" ]; then echo "[⬇ Download APK]($APK_URL)"; else echo "_APK URL not captured — visit [EAS builds](https://expo.dev/accounts/hot-attic-games/projects/tartaria-/builds) to download._"; fi)
-
-          > Install on your Android device: tap the link above, download the APK, then open it to install (allow unknown sources if prompted)."
+          COMMIT_MSG="${{ github.event.head_commit.message || github.event_name }}"
+          APK=$(find . -maxdepth 1 -name "*.apk" -o -name "*.aab" | head -1)
 
           gh release create "$TAG" \
+            "$APK" \
             --repo "${{ github.repository }}" \
             --title "Tartaria APK — Build #${{ github.run_number }}" \
-            --notes "$BODY" \
+            --notes "**Branch:** \`${BRANCH}\`
+**Commit:** ${COMMIT_MSG}
+**Build #:** ${{ github.run_number }}
+
+Install the attached APK on your Android device. Enable *Install unknown apps* for your browser or file manager if prompted." \
             --prerelease
