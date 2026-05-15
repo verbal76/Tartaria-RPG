@@ -9,6 +9,7 @@
 // 2026-05-15g: REAL root cause — patch kotlin=1.9.24 → 1.9.25 in node_modules libs.versions.toml (RN + gradle-plugin) before prebuild
 // 2026-05-15h: pin onnxruntime-android to 1.20.0 (avoid latest.integration → maven-metadata.xml SAX bug)
 // 2026-05-15i: bump onnxruntime-android pin to 1.22.0 — 1.20.0 missing Ort::Value() default ctor + zero-arg GetSymbolicDimensions used by JS bindings
+// 2026-05-15j: APK refresh — ship cumulative OTA work since last APK (lore-aware Arbiter, stamina, multi-slot saves, investigate split). OTAs not landing on device; APK update unblocks playtest while we diagnose.
 
 const { getDefaultConfig } = require('expo/metro-config');
 
