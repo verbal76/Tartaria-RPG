@@ -364,6 +364,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     const player = get().player;
     if (!player) return;
+    if (player.hp <= 0) {
+      // Player is dead — the death handler is mid-flight (~3.5s timer
+      // before screen transition). Swallow input rather than letting them
+      // submit posthumous actions.
+      return;
+    }
 
     // If the scene was lost (e.g. slot restore on an older save before this
     // fix) auto-recover before bailing — silent no-ops on submit are the
@@ -868,17 +874,73 @@ function applyEnemyCounter(
 
   if (hit) {
     const dmg = rollFromNotation(String(enemy.damage)) || rollDie(6);
+    let killed = false;
     set((s) => {
       if (!s.player) return {};
       const newHp = Math.max(0, s.player.hp - dmg);
-      const msg = newHp <= 0
-        ? `${enemy.name} deals ${dmg} damage. You fall. The Aetherstone grows dim around you.`
+      killed = newHp <= 0;
+      const msg = killed
+        ? `${enemy.name} deals ${dmg} damage. You fall.`
         : `${enemy.name} deals ${dmg} damage. You have ${newHp} HP remaining.`;
-      // Queue the log message — we need it after the set
       void Promise.resolve().then(() => get().appendLog('combat', msg));
       return { player: { ...s.player, hp: newHp } };
     });
+    if (killed) {
+      void Promise.resolve().then(() => handlePlayerDeath(get, set));
+    }
   }
+}
+
+// Permadeath. Triggered the moment HP hits 0 anywhere (currently only
+// enemy counter-attacks, but the helper is generic so any future HP
+// drain path can call it). Logs a flavored end-of-life narration, holds
+// the player on the exploration screen for a beat so they can read it,
+// then deletes the slot and returns to the title list.
+function handlePlayerDeath(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const state = get();
+  const player = state.player;
+  if (!player) return; // already handled by a prior trigger
+
+  // Guard against double-fire: if pendingRolls is already null AND there's
+  // no active slot, we've already run this for the current death.
+  if (!state.activeSlotId && !state.pendingRolls) return;
+
+  const locName = state.currentScene?.location.name ?? 'Tartaria';
+  const epitaph = pick([
+    `${player.name} falls in ${locName}. The Aetherstone grows dim and does not lift.`,
+    `The buried world claims ${player.name}. Tartaria keeps the body count.`,
+    `${player.name}'s breath leaves. The dust settles back into its old patterns.`,
+    `An end at ${locName}. The Arbiter watches and says nothing.`,
+    `${player.name} does not rise. The ruins remember another.`,
+  ]);
+  state.appendLog('combat', epitaph);
+  state.appendLog('system', `${player.name} has fallen. Permadeath: this character is gone from Tartaria.`);
+
+  // Cancel any in-flight rolls so the dice UI clears immediately.
+  set(() => ({ pendingRolls: null }));
+
+  const slotId = state.activeSlotId;
+  // Give the player ~3.5 seconds to read the death messages on the
+  // exploration feed before yanking them to the title screen.
+  setTimeout(() => {
+    if (slotId) {
+      void state.deleteSlotById(slotId).then(() => {
+        set(() => ({ currentScreen: 'title' }));
+      });
+    } else {
+      set(() => ({
+        player: null,
+        currentScene: null,
+        currentEnemyHp: null,
+        pendingRolls: null,
+        gameLog: [],
+        currentScreen: 'title',
+      }));
+    }
+  }, 3500);
 }
 
 // ---------------------------------------------------------------------------

@@ -65,7 +65,10 @@ function fuzzyEqual(word: string, candidate: string): boolean {
     return Math.abs(word.length - candidate.length) <= 3;
   }
   const maxLen = Math.max(word.length, candidate.length);
-  const allowed = maxLen <= 4 ? 1 : maxLen <= 7 ? 2 : 3;
+  // Tightened for short words: 4-char words now require exact match. This
+  // stops noise like "dead" → "read" (distance 1) silently routing "am i
+  // dead?" to investigate intent. 5–7 chars still allow 1 edit, 8+ allow 2.
+  const allowed = maxLen <= 4 ? 0 : maxLen <= 7 ? 1 : 2;
   return levenshtein(word, candidate) <= allowed;
 }
 

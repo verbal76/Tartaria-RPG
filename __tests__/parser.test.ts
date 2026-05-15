@@ -85,3 +85,15 @@ describe('parseInput — combat context override', () => {
     expect(r.intent).toBe('use_relic');
   });
 });
+
+describe('parseInput — fuzzy match strictness for short words', () => {
+  it('does not fuzzy-match "dead" to "read" (investigate) — question, not action', () => {
+    // "am i dead?" was routing to investigate intent because dead and read
+    // are distance 1 and the old allowance was 1 edit at length 4.
+    const r = parseInput('am i dead', {});
+    expect(r.intent).not.toBe('investigate');
+  });
+  it('still recovers slightly-misspelled longer verbs', () => {
+    expect(parseInput('serch the ruins').intent).toBe('investigate');
+  });
+});
