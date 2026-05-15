@@ -53,6 +53,33 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
+      - name: Pin Kotlin 1.9.25 in RN/Expo version catalogs (Compose compiler compat)
+        run: |
+          # The real Kotlin version source is libs.versions.toml in two node_modules
+          # locations — NOT android/build.gradle (its classpath line has no version).
+          # @react-native/gradle-plugin compiles itself against the version in
+          # its own libs.versions.toml, and the app pulls in kotlin-gradle-plugin
+          # transitively from that artifact. So patch both catalogs before prebuild.
+
+          RN_CATALOG=node_modules/react-native/gradle/libs.versions.toml
+          GP_CATALOG=node_modules/@react-native/gradle-plugin/gradle/libs.versions.toml
+
+          for f in "$RN_CATALOG" "$GP_CATALOG"; do
+            if [ ! -f "$f" ]; then
+              echo "::error::Expected catalog $f not found"
+              exit 1
+            fi
+            echo "--- before: $f ---"
+            grep '^kotlin' "$f" || true
+            sed -i 's/^kotlin = "1\.9\.24"$/kotlin = "1.9.25"/' "$f"
+            echo "--- after: $f ---"
+            grep '^kotlin' "$f" || true
+            if ! grep -q '^kotlin = "1.9.25"$' "$f"; then
+              echo "::error::Patch did not apply to $f"
+              exit 1
+            fi
+          done
+
       - name: Determine build profile and tag
         id: meta
         run: |
@@ -76,26 +103,21 @@ jobs:
       - name: Generate native Android project
         run: npx expo prebuild --platform android --no-install
 
-      - name: Pin Kotlin 1.9.25 (Compose compiler compat)
+      - name: Verify Kotlin 1.9.25 propagated through prebuild
         run: |
-          # Primary: expo-build-properties plugin sets android.kotlinVersion=1.9.25
-          # in gradle.properties at expo prebuild time. Verify it landed.
-          echo "--- gradle.properties after prebuild ---"
+          echo "--- node_modules catalog (source of truth) ---"
+          grep '^kotlin' node_modules/react-native/gradle/libs.versions.toml
+          grep '^kotlin' node_modules/@react-native/gradle-plugin/gradle/libs.versions.toml
+
+          echo "--- android/build.gradle kotlinVersion ext ---"
+          grep -n kotlinVersion android/build.gradle || true
+
+          echo "--- android/gradle.properties kotlin lines ---"
           grep -i kotlin android/gradle.properties || true
 
-          # Secondary: if findProperty() still resolves to 1.9.24 (shouldn't happen),
-          # directly rewrite the ext block line so the classpath gets 1.9.25.
-          if grep -q "findProperty('android.kotlinVersion') ?: '1.9.24'" android/build.gradle; then
-            sed -i "s/kotlinVersion = findProperty('android.kotlinVersion') ?: '1.9.24'/kotlinVersion = '1.9.25'/" android/build.gradle
-            echo "Patched kotlinVersion fallback in android/build.gradle"
-          fi
-
-          # Tertiary: silence the Compose-compiler version gating if anything still slips through.
-          echo "" >> android/gradle.properties
+          # Final guard: a no-op when versions match, but if anything upstream
+          # still mismatches at compile time, suppress the Compose-compiler check.
           echo "kotlin.suppressKotlinVersionCompatibilityCheck=1.9.25" >> android/gradle.properties
-
-          echo "--- final android/build.gradle kotlinVersion line ---"
-          grep "kotlinVersion" android/build.gradle || true
 
       - name: Ensure debug keystore exists (for release signing fallback)
         run: |
