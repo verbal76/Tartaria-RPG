@@ -2,7 +2,9 @@ import { SemanticEmbeddingService } from './embedding/SemanticEmbeddingService';
 import { EmotionInferenceEngine } from './cognition/EmotionInferenceEngine';
 import { IntentInferenceEngine } from './cognition/IntentInferenceEngine';
 import { ModelDownloader, type DownloaderOptions, type ResolvedModelFiles } from './ota/ModelDownloader';
-import type { CognitiveResponse, WorldContext, AnchorMap } from './types';
+import type { CognitiveResponse, WorldContext, AnchorMap, ModelInfo } from './types';
+// Statically-known runtime version. Bumped when the package is bumped in package.json.
+const ORT_RUNTIME_VERSION = '1.24.3';
 
 // Natural sentences — MiniLM is a sentence embedder, not a bag-of-words model.
 // Cosine similarity is much stronger against full phrases than keyword soup.
@@ -62,6 +64,10 @@ export class CognitiveOrchestrator {
 
   isReady(): boolean {
     return this.ready && this.embeddingService.isReady();
+  }
+
+  async getModelInfo(): Promise<ModelInfo> {
+    return this.embeddingService.getModelInfo(ORT_RUNTIME_VERSION);
   }
 
   async boot(opts: BootOptions = {}): Promise<void> {

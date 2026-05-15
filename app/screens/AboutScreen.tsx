@@ -10,6 +10,7 @@ export function AboutScreen() {
   const cognitiveFraction = useGameStore((s) => s.cognitiveFraction);
   const cognitiveError = useGameStore((s) => s.cognitiveError);
   const cognitiveLastResponse = useGameStore((s) => s.cognitiveLastResponse);
+  const cognitiveModelInfo = useGameStore((s) => s.cognitiveModelInfo);
   const gameLogLength = useGameStore((s) => s.gameLog.length);
   const player = useGameStore((s) => s.player);
 
@@ -24,6 +25,9 @@ export function AboutScreen() {
         : JSON.stringify(expoConfig?.runtimeVersion ?? null);
     const channel = (expoConfig?.updates as { requestHeaders?: Record<string, string> } | undefined)
       ?.requestHeaders?.['expo-channel-name'] ?? 'unknown';
+    const mb = (bytes: number | null | undefined) =>
+      bytes != null ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : 'unknown';
+
     const lines = [
       `Tartaria Realms`,
       `Version: ${version}`,
@@ -40,12 +44,26 @@ export function AboutScreen() {
         ? `  Last response: ${cognitiveLastResponse.inferredEmotions.join(',') || '-'} / ${cognitiveLastResponse.inferredIntentions.join(',') || '-'} (${cognitiveLastResponse.embeddingMs.toFixed(1)}ms embed, ${cognitiveLastResponse.inferenceMs.toFixed(1)}ms infer)`
         : `  Last response: none yet`,
       ``,
+      `Model`,
+      cognitiveModelInfo
+        ? [
+            `  Name: ${cognitiveModelInfo.name}`,
+            `  Source: ${cognitiveModelInfo.source}`,
+            `  Embedding dim: ${cognitiveModelInfo.embeddingDim}`,
+            `  Vocab tokens: ${cognitiveModelInfo.vocabSize}`,
+            `  Max seq len: ${cognitiveModelInfo.maxSeqLen}`,
+            `  File size: ${mb(cognitiveModelInfo.modelSizeBytes)}`,
+            `  Local path: ${cognitiveModelInfo.modelPath ?? 'unknown'}`,
+            `  Runtime: ${cognitiveModelInfo.runtime}`,
+          ].join('\n')
+        : `  (not loaded yet)`,
+      ``,
       `Session`,
       `  Player: ${player?.name ?? 'none'}`,
       `  Log entries in memory: ${gameLogLength}`,
     ];
     return lines.join('\n');
-  }, [cognitiveStatus, cognitiveFraction, cognitiveError, cognitiveLastResponse, player, gameLogLength]);
+  }, [cognitiveStatus, cognitiveFraction, cognitiveError, cognitiveLastResponse, cognitiveModelInfo, player, gameLogLength]);
 
   async function handleCopy() {
     await Clipboard.setStringAsync(info);

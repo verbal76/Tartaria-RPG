@@ -1,9 +1,13 @@
 import * as ort from 'onnxruntime-react-native';
+import * as FileSystem from 'expo-file-system';
 import { WordPieceTokenizer } from './Tokenizer';
 import { EmbeddingCache } from './EmbeddingCache';
+import type { ModelInfo } from '../types';
 
 const EMBEDDING_DIM = 384;
 const MAX_SEQ_LEN = 128;
+const MODEL_NAME = 'all-MiniLM-L6-v2 (int8 quantized)';
+const MODEL_SOURCE = 'Xenova/all-MiniLM-L6-v2 @ HuggingFace';
 
 export class SemanticEmbeddingService {
   private session: ort.InferenceSession | null = null;
@@ -24,6 +28,30 @@ export class SemanticEmbeddingService {
 
   isReady(): boolean {
     return this.session !== null && this.tokenizer.isLoaded();
+  }
+
+  async getModelInfo(runtimeVersion: string): Promise<ModelInfo> {
+    let modelSizeBytes: number | null = null;
+    if (this.modelPath) {
+      try {
+        const info = await FileSystem.getInfoAsync(this.modelPath);
+        if (info.exists && 'size' in info && typeof info.size === 'number') {
+          modelSizeBytes = info.size;
+        }
+      } catch {
+        // best-effort — leave as null
+      }
+    }
+    return {
+      name: MODEL_NAME,
+      source: MODEL_SOURCE,
+      embeddingDim: EMBEDDING_DIM,
+      maxSeqLen: MAX_SEQ_LEN,
+      vocabSize: this.tokenizer.vocabSize(),
+      modelPath: this.modelPath,
+      modelSizeBytes,
+      runtime: `onnxruntime-react-native ${runtimeVersion}`,
+    };
   }
 
   async dispose(): Promise<void> {

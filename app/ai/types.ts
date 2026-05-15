@@ -37,3 +37,14 @@ export interface SimilarityMatch {
   concept: string;
   score: number;
 }
+
+export interface ModelInfo {
+  name: string;
+  source: string;
+  embeddingDim: number;
+  maxSeqLen: number;
+  vocabSize: number;
+  modelPath: string | null;
+  modelSizeBytes: number | null;
+  runtime: string;
+}

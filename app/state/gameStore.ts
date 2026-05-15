@@ -30,7 +30,7 @@ import { parseInput, type ParseContext } from '../engine/parser';
 import { rollDie, rollFromNotation } from '../engine/rng';
 import { buildCombatSteps, buildSkillSteps } from '../engine/combatRules';
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
-import type { CognitiveResponse, WorldContext } from '../ai/types';
+import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import locationsData from '../data/locations/locations.json';
 
 const allLocations = locationsData as Location[];
@@ -68,6 +68,7 @@ interface GameStore {
   cognitiveFraction: number;
   cognitiveError: string | null;
   cognitiveLastResponse: CognitiveResponse | null;
+  cognitiveModelInfo: ModelInfo | null;
 
   hydrate: () => Promise<void>;
   setScreen: (screen: ScreenName) => void;
@@ -112,6 +113,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   cognitiveFraction: 0,
   cognitiveError: null,
   cognitiveLastResponse: null,
+  cognitiveModelInfo: null,
 
   async hydrate() {
     const saved = await loadSave();
@@ -568,7 +570,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set({ cognitiveStatus: stage, cognitiveFraction: fraction });
         },
       });
-      set({ cognitiveStatus: 'ready', cognitiveFraction: 1 });
+      const info = await cognitive.getModelInfo();
+      set({ cognitiveStatus: 'ready', cognitiveFraction: 1, cognitiveModelInfo: info });
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       set({ cognitiveStatus: 'failed', cognitiveError: message });
