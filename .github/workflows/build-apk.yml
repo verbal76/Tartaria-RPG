@@ -76,34 +76,17 @@ jobs:
       - name: Generate native Android project
         run: npx expo prebuild --platform android --no-install
 
-      - name: Patch Kotlin to 1.9.25 (Compose compiler compat)
+      - name: Set Kotlin 1.9.25 via gradle.properties (Compose compiler compat)
         run: |
-          echo "=== kotlin 1.9.24 refs BEFORE patch ==="
-          grep -rn "1\.9\.24" android/ 2>/dev/null | head -30 || true
-
-          # RN 0.76 version catalog
-          if [ -f android/gradle/libs.versions.toml ]; then
-            sed -i 's/kotlin = "1\.9\.24"/kotlin = "1.9.25"/g' android/gradle/libs.versions.toml
-          fi
-
-          # build.gradle — match any quote style of 1.9.24 (the real pattern is
-          # `kotlinVersion = findProperty('android.kotlinVersion') ?: '1.9.24'`,
-          # so we just replace the literal version string in either quote form)
-          if [ -f android/build.gradle ]; then
-            sed -i "s/'1\.9\.24'/'1.9.25'/g" android/build.gradle
-            sed -i 's/"1\.9\.24"/"1.9.25"/g' android/build.gradle
-          fi
-
-          # gradle.properties — set Expo's expected property name as final fallback
-          if [ -f android/gradle.properties ]; then
-            echo "" >> android/gradle.properties
-            echo "android.kotlinVersion=1.9.25" >> android/gradle.properties
-          fi
-
-          echo "=== kotlin 1.9.24 refs AFTER patch ==="
-          grep -rn "1\.9\.24" android/ 2>/dev/null | head -30 || true
-          echo "=== kotlin 1.9.25 refs AFTER patch ==="
-          grep -rn "1\.9\.25" android/ 2>/dev/null | head -30 || true
+          # RN 0.76's android/build.gradle resolves kotlinVersion via
+          #   findProperty('android.kotlinVersion') ?: '1.9.24'
+          # Appending the property to gradle.properties makes findProperty()
+          # return our value. This is the same mechanism expo-build-properties
+          # uses at prebuild time — we just do it inline here.
+          echo "" >> android/gradle.properties
+          echo "android.kotlinVersion=1.9.25" >> android/gradle.properties
+          echo "Resulting gradle.properties kotlin line:"
+          grep -i kotlin android/gradle.properties || true
 
       - name: Ensure debug keystore exists (for release signing fallback)
         run: |
@@ -164,42 +147,38 @@ jobs:
       - name: Create Tartaria Realms GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          COMMIT_MSG: ${{ github.event.head_commit.message || github.event_name }}
         run: |
           TAG="${{ steps.meta.outputs.tag }}"
           PROFILE="${{ steps.meta.outputs.profile }}"
           VERSION="${{ steps.meta.outputs.version }}"
           BRANCH="${GITHUB_REF_NAME}"
-          COMMIT_MSG=$(echo "$COMMIT_MSG" | head -1)
           SHORT_SHA="${GITHUB_SHA::7}"
 
           if [ "$PROFILE" = "production" ]; then
             TITLE="Tartaria Realms ${TAG}"
             KIND="Production AAB (Play Store)"
-            LATEST_FLAG="--latest"
-            INSTALL_NOTE="This is a Play Store **AAB** bundle — upload it to Google Play Console. For sideloadable APKs, use a non-tagged build from the same commit."
+            INSTALL_NOTE="Play Store AAB bundle — upload to Google Play Console. For sideloadable APKs, use a non-tagged build."
           else
             TITLE="Tartaria Realms v${VERSION}-build.${{ github.run_number }}"
             KIND="Playtest APK"
-            LATEST_FLAG="--latest"
-            INSTALL_NOTE="1. Download the \`.apk\` attached below on your Android device.
-          2. Open it. If prompted, enable *Install unknown apps* for your browser/file manager.
-          3. Tap **Install**. Launch *Tartaria Realms*.
+            INSTALL_NOTE="1. Download the .apk attached below on your Android device.
+          2. Open it. If prompted, enable Install unknown apps for your browser or file manager.
+          3. Tap Install. Launch Tartaria Realms.
 
-          > Release-optimized APK, debug-signed for sideloaded playtesting. Each build uses a fresh debug key, so uninstall the previous version first if Android refuses the upgrade. OTA updates ship continuously to channel \`preview\` while this APK is installed."
+          Release-optimized APK, debug-signed for sideloaded playtesting. Each build uses a fresh debug key, so uninstall the previous version first if Android refuses the upgrade. OTA updates ship continuously to channel preview while this APK is installed."
           fi
 
           gh release create "$TAG" \
             "${{ steps.artifact.outputs.path }}" \
             --repo "${{ github.repository }}" \
             --title "$TITLE" \
-            $LATEST_FLAG \
+            --latest \
             --notes "## Tartaria Realms — $KIND
 
-          **Version:** \`${VERSION}\`
-          **Branch:** \`${BRANCH}\`
-          **Commit:** \`${SHORT_SHA}\` — ${COMMIT_MSG}
-          **Build #:** ${{ github.run_number }}
+          Version: ${VERSION}
+          Branch: ${BRANCH}
+          Commit: ${SHORT_SHA}
+          Build #: ${{ github.run_number }}
 
           ### Install
           ${INSTALL_NOTE}"

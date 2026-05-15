@@ -4,6 +4,7 @@
 // 2026-05-15b: patch Kotlin 1.9.24 -> 1.9.25 in android/build.gradle for Compose compiler compat
 // 2026-05-15c: interactive dice roller — player rolls each die, enemy counter-attacks on miss/wound
 // 2026-05-15d: Kotlin patch — sed both quote styles + gradle -Pandroid.kotlinVersion + KOTLIN_VERSION env + debug grep
+// 2026-05-15e: replace sed hacks with gradle.properties append (canonical mechanism) and strip commit message from build logs/release notes
 
 const { getDefaultConfig } = require('expo/metro-config');
 
