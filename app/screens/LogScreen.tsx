@@ -1,15 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import { readFullLog } from '../engine/saveSystem';
 
 export function LogScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const [diskLog, setDiskLog] = useState<string>('Loading…');
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     readFullLog().then((text) => setDiskLog(text || '(no log yet)'));
   }, []);
+
+  async function handleCopy() {
+    await Clipboard.setStringAsync(diskLog);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
 
   return (
     <View style={styles.container}>
@@ -21,6 +29,9 @@ export function LogScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
         <Text style={styles.body}>{diskLog}</Text>
       </ScrollView>
+      <TouchableOpacity style={styles.copyBtn} onPress={handleCopy} activeOpacity={0.7}>
+        <Text style={styles.copyText}>{copied ? 'COPIED' : 'COPY ALL'}</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -32,5 +43,13 @@ const styles = StyleSheet.create({
   title: { color: '#e6d8b3', letterSpacing: 4, fontSize: 14 },
   scroll: { flex: 1, backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, padding: 8 },
   content: { paddingBottom: 24 },
-  body: { color: '#cdbf99', fontFamily: 'monospace', fontSize: 11, lineHeight: 16 },
+  body: { color: '#cdbf99', fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', fontSize: 11, lineHeight: 16 },
+  copyBtn: {
+    backgroundColor: '#c9a86a',
+    borderRadius: 4,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  copyText: { color: '#0a0908', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
 });

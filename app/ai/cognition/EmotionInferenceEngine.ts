@@ -5,7 +5,7 @@ export class EmotionInferenceEngine {
   private anchors: AnchorMap = {};
   private threshold: number;
 
-  constructor(threshold: number = 0.45) {
+  constructor(threshold: number = 0.32) {
     this.threshold = threshold;
   }
 

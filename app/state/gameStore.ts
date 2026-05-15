@@ -252,9 +252,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
         break;
       }
-      case 'rest':
-        get().rest();
+      case 'rest': {
+        // If the player resolved a consumable inventory item (e.g. "eat ration"),
+        // consume one and heal from a 2d6 roll instead of a generic camp-rest.
+        const consumable = parsed.resolvedItemId
+          ? player.inventory.find((i) => i.id === parsed.resolvedItemId && i.kind === 'consumable')
+          : undefined;
+        if (consumable) {
+          const room = player.hpMax - player.hp;
+          const heal = Math.min(Math.max(0, room), rollDie(6) + rollDie(6));
+          const newInventory = player.inventory
+            .map((i) => (i.id === consumable.id ? { ...i, quantity: i.quantity - 1 } : i))
+            .filter((i) => i.quantity > 0);
+          set({ player: { ...player, hp: player.hp + heal, inventory: newInventory } });
+          const tail = heal > 0
+            ? `2d6 → ${heal} HP recovered.`
+            : 'You were already at full strength — the ration steadies you, nothing more.';
+          get().appendLog('world', `You consume one ${consumable.name}. ${tail}`);
+          void get().persist();
+        } else {
+          get().rest();
+        }
         break;
+      }
       case 'travel': {
         const target = parsed.target?.toLowerCase() ?? '';
         const candidate = target
@@ -276,7 +296,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     if (!get().pendingRolls && shouldArbiterSpeak()) {
-      get().appendLog('arbiter', buildArbiterRemark({ location: currentScene.location, hazard: currentScene.hazard }));
+      const lastCog = get().cognitiveLastResponse;
+      const mood = lastCog?.inferredEmotions[0];
+      get().appendLog(
+        'arbiter',
+        buildArbiterRemark({
+          location: currentScene.location,
+          hazard: currentScene.hazard,
+          intent: parsed.intent,
+          mood,
+        }),
+      );
     }
 
     // Fire-and-forget cognitive enrichment — runs in parallel with the
@@ -292,19 +322,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         .processInput(trimmed, worldCtx)
         .then((response) => {
           set({ cognitiveLastResponse: response });
-          const tags: string[] = [];
-          if (response.inferredEmotions.length) tags.push(...response.inferredEmotions);
-          if (response.inferredIntentions.length) tags.push(...response.inferredIntentions);
-          if (tags.length) {
-            const summary = `${tags.join(' · ')}  (${Math.round(response.embeddingMs)}ms)`;
-            get().appendLog('cognitive', summary, {
-              emotions: response.inferredEmotions,
-              intentions: response.inferredIntentions,
-              confidence: response.semanticConfidence,
-              embeddingMs: response.embeddingMs,
-              inferenceMs: response.inferenceMs,
-            });
-          }
+          const tags = [...response.inferredEmotions, ...response.inferredIntentions];
+          const summary = tags.length
+            ? `${tags.join(' · ')}  (${Math.round(response.embeddingMs)}ms)`
+            : `neutral  (${Math.round(response.embeddingMs)}ms)`;
+          get().appendLog('cognitive', summary, {
+            emotions: response.inferredEmotions,
+            intentions: response.inferredIntentions,
+            confidence: response.semanticConfidence,
+            embeddingMs: response.embeddingMs,
+            inferenceMs: response.inferenceMs,
+          });
         })
         .catch(() => {
           // swallow — cognitive failures must never affect gameplay
@@ -375,8 +403,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (currentScene.enemy) set((s) => ({ currentScene: s.currentScene ? { ...s.currentScene, enemy: null } : null }));
             break;
           case 'investigate': {
-            get().appendLog('world', `You search ${currentScene.location.name} carefully. The Aetherstone hums — something is here.`);
-            if (Math.random() < 0.5) {
+            // Narrate against the actual thing the player searched, not the whole location.
+            const reparsed = parseInput(actionText);
+            const focus = reparsed.resolvedNoun ?? reparsed.target ?? currentScene.location.name;
+            get().appendLog('world', `You examine ${focus}. The Aetherstone hums — something is here, but not in plain sight.`);
+            // Only drop a new lead occasionally, and only if the player isn't already
+            // juggling unfinished quests. Was 50%; "search my pockets" should not spawn
+            // a quest about brokering relic sales at Thametan's Tower.
+            const activeQuests = player.activeQuests.length;
+            if (activeQuests < 2 && Math.random() < 0.12) {
               const quest = get().generateNewQuest();
               get().appendLog('reward', `New lead: ${quest.objective.verb} ${quest.objective.target} at ${quest.location.name}.`);
             }
@@ -503,7 +538,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
   rest() {
     const player = get().player;
     if (!player) return;
-    const heal = Math.min(player.hpMax - player.hp, rollDie(6) + rollDie(6));
+    const room = player.hpMax - player.hp;
+    if (room <= 0) {
+      get().appendLog(
+        'world',
+        'You take a moment to settle yourself. The Aetherstone hums steady — you are already as whole as it allows.',
+      );
+      void get().persist();
+      return;
+    }
+    const heal = Math.min(room, rollDie(6) + rollDie(6));
     set({ player: { ...player, hp: player.hp + heal } });
     get().appendLog('world', `You rest. 2d6 → ${heal} HP recovered.`);
     void get().persist();

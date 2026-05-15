@@ -5,7 +5,7 @@ export class IntentInferenceEngine {
   private anchors: AnchorMap = {};
   private threshold: number;
 
-  constructor(threshold: number = 0.42) {
+  constructor(threshold: number = 0.30) {
     this.threshold = threshold;
   }
 

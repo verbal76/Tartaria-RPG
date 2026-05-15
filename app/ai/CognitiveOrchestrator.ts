@@ -4,24 +4,26 @@ import { IntentInferenceEngine } from './cognition/IntentInferenceEngine';
 import { ModelDownloader, type DownloaderOptions, type ResolvedModelFiles } from './ota/ModelDownloader';
 import type { CognitiveResponse, WorldContext, AnchorMap } from './types';
 
+// Natural sentences — MiniLM is a sentence embedder, not a bag-of-words model.
+// Cosine similarity is much stronger against full phrases than keyword soup.
 const EMOTION_ANCHORS = {
-  FEAR: 'danger terrifying scary run away death trap dark threat',
-  CURIOSITY: 'investigate mysterious strange ancient glowing study symbol resonance',
-  AGGRESSION: 'kill destroy attack smash fight blood strike',
-  CAUTIOUSNESS: 'hide sneak quiet observe from distance careful',
-  RESOLVE: 'press on continue forward despite the cost',
-  DESPAIR: 'tired hopeless lost cannot go on collapse',
+  FEAR: 'I am afraid and want to escape this danger before it kills me',
+  CURIOSITY: 'I want to investigate this mysterious thing and understand what it is',
+  AGGRESSION: 'I will attack and destroy my enemy with violence',
+  CAUTIOUSNESS: 'I move carefully and quietly so nothing notices me',
+  RESOLVE: 'I will keep going forward no matter the cost',
+  DESPAIR: 'I am tired and hopeless and cannot continue',
 } as const;
 
 const INTENT_ANCHORS = {
-  ATTACK: 'attack strike slash stab kill the enemy',
-  SEARCH: 'search look around examine investigate inspect',
-  HIDE: 'hide sneak crouch take cover stay quiet',
-  RETREAT: 'flee run away withdraw bolt escape',
-  TALK: 'speak ask parley persuade negotiate',
-  USE_ITEM: 'use activate wield apply consume drink eat the item',
-  REST: 'rest sleep camp recover',
-  TRAVEL: 'travel go walk head toward enter descend climb',
+  ATTACK: 'I attack the enemy with my weapon',
+  SEARCH: 'I look around carefully and search for something hidden',
+  HIDE: 'I hide and stay quiet so no one sees me',
+  RETREAT: 'I run away from this place to get to safety',
+  TALK: 'I speak to them and try to convince them',
+  USE_ITEM: 'I use an item from my pack',
+  REST: 'I sit down to rest and recover my strength',
+  TRAVEL: 'I travel to another place',
 } as const;
 
 export interface BootOptions {
