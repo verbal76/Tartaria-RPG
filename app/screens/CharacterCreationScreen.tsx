@@ -14,9 +14,12 @@ export function CharacterCreationScreen() {
   const races = getRaces();
   const factions = getFactions();
 
+  const trimmedName = name.trim();
+  const canStart = trimmedName.length >= 2;
+
   const handleStart = async () => {
-    const finalName = name.trim() || 'Stranger';
-    await startNewGame({ name: finalName, raceId, factionId });
+    if (!canStart) return;
+    await startNewGame({ name: trimmedName, raceId, factionId });
   };
 
   return (
@@ -65,8 +68,12 @@ export function CharacterCreationScreen() {
         <TouchableOpacity style={styles.back} onPress={() => setScreen('title')}>
           <Text style={styles.backText}>Back</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.start} onPress={handleStart}>
-          <Text style={styles.startText}>Begin</Text>
+        <TouchableOpacity
+          style={[styles.start, !canStart && styles.startDisabled]}
+          onPress={handleStart}
+          disabled={!canStart}
+        >
+          <Text style={styles.startText}>{canStart ? 'Begin' : 'Name required'}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -107,5 +114,6 @@ const styles = StyleSheet.create({
   start: {
     flex: 2, padding: 12, backgroundColor: '#3a342c', borderRadius: 4, alignItems: 'center',
   },
+  startDisabled: { backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1 },
   startText: { color: '#e6d8b3', fontWeight: '700', letterSpacing: 2 },
 });

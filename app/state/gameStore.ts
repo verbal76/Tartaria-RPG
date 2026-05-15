@@ -14,7 +14,18 @@ import type {
   PendingRollState,
 } from '../engine/types';
 import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat } from '../engine/worldMemory';
-import { saveGame, loadSave } from '../engine/saveSystem';
+import {
+  listSlots,
+  loadSlot,
+  saveSlot,
+  deleteSlot,
+  setActiveSlot,
+  loadActiveSlotId,
+  newSlotId,
+  migrateLegacySlotIfPresent,
+  getActiveSlotId,
+  type SlotSummary,
+} from '../engine/saveSystem';
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { createCharacter, type CreateCharacterInput } from '../engine/character';
 import { generateQuest } from '../engine/questGenerator';
@@ -133,6 +144,9 @@ interface GameStore {
   pendingRolls: PendingRollState | null;
   hydrated: boolean;
 
+  slots: SlotSummary[];
+  activeSlotId: string | null;
+
   cognitiveStatus: CognitiveStatus;
   cognitiveFraction: number;
   cognitiveError: string | null;
@@ -141,6 +155,10 @@ interface GameStore {
 
   hydrate: () => Promise<void>;
   setScreen: (screen: ScreenName) => void;
+
+  refreshSlots: () => Promise<void>;
+  loadSlotIntoGame: (slotId: string) => Promise<void>;
+  deleteSlotById: (slotId: string) => Promise<void>;
 
   startNewGame: (input: CreateCharacterInput) => Promise<void>;
   abandonGame: () => Promise<void>;
@@ -178,6 +196,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   pendingRolls: null,
   hydrated: false,
 
+  slots: [],
+  activeSlotId: null,
+
   cognitiveStatus: 'idle',
   cognitiveFraction: 0,
   cognitiveError: null,
@@ -185,20 +206,65 @@ export const useGameStore = create<GameStore>((set, get) => ({
   cognitiveModelInfo: null,
 
   async hydrate() {
-    const saved = await loadSave();
-    if (saved) {
-      // Backfill fields added after the save was written (e.g. stamina).
-      const player = saved.player ? backfillPlayer(saved.player) : null;
-      set({
-        player,
-        worldMemory: saved.worldMemory,
-        gameLog: saved.gameLog,
-        currentScreen: saved.currentScreen,
-        hydrated: true,
-      });
-    } else {
-      set({ hydrated: true });
+    // One-shot migration from the v1 single-slot save, if present.
+    await migrateLegacySlotIfPresent();
+    // Restore the last-active slot id (if the player was mid-session before
+    // backgrounding) and load its save.
+    const activeId = await loadActiveSlotId();
+    const slots = await listSlots();
+    if (activeId) {
+      const saved = await loadSlot(activeId);
+      if (saved && saved.player) {
+        set({
+          player: backfillPlayer(saved.player),
+          worldMemory: saved.worldMemory,
+          gameLog: saved.gameLog,
+          currentScreen: saved.currentScreen,
+          slots,
+          activeSlotId: activeId,
+          hydrated: true,
+        });
+        return;
+      }
     }
+    // No active slot or save is gone — sit on the title screen with the
+    // list of available characters.
+    set({ slots, activeSlotId: null, currentScreen: 'title', hydrated: true });
+  },
+
+  async refreshSlots() {
+    const slots = await listSlots();
+    set({ slots });
+  },
+
+  async loadSlotIntoGame(slotId) {
+    const saved = await loadSlot(slotId);
+    if (!saved || !saved.player) return;
+    await setActiveSlot(slotId);
+    set({
+      player: backfillPlayer(saved.player),
+      worldMemory: saved.worldMemory,
+      gameLog: saved.gameLog,
+      currentScreen: 'exploration',
+      activeSlotId: slotId,
+      currentScene: null,
+      currentEnemyHp: null,
+      pendingRolls: null,
+    });
+  },
+
+  async deleteSlotById(slotId) {
+    await deleteSlot(slotId);
+    const slots = await listSlots();
+    const activeId = getActiveSlotId();
+    set({
+      slots,
+      activeSlotId: activeId,
+      // If we just deleted the currently-loaded character, drop player state too.
+      ...(get().activeSlotId === slotId
+        ? { player: null, gameLog: [], currentScene: null, currentEnemyHp: null, pendingRolls: null }
+        : {}),
+    });
   },
 
   setScreen(screen) {
@@ -209,6 +275,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   async startNewGame(input) {
     const player = createCharacter(input);
     const memory = discoverLocation(emptyMemory(), player.currentLocationId);
+    // Each new character gets its own save slot; switch the active slot
+    // pointer so subsequent persist() writes go to it.
+    const slotId = newSlotId();
+    await setActiveSlot(slotId);
     set({
       player,
       worldMemory: memory,
@@ -217,14 +287,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentScene: null,
       currentEnemyHp: null,
       pendingRolls: null,
+      activeSlotId: slotId,
     });
     get().appendLog('system', `${player.name} steps into Tartaria.`);
     get().appendLog('world', buildOpening());
     get().beginScene();
     await get().persist();
+    const slots = await listSlots();
+    set({ slots });
   },
 
   async abandonGame() {
+    // "Abandon" deletes the active slot entirely — keeps the slot list
+    // clean. Use saveAndExitToTitle() if you want to keep the character.
+    const activeId = get().activeSlotId;
+    if (activeId) {
+      await deleteSlot(activeId);
+    }
+    const slots = await listSlots();
     set({
       player: null,
       worldMemory: emptyMemory(),
@@ -233,8 +313,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentEnemyHp: null,
       pendingRolls: null,
       currentScreen: 'title',
+      activeSlotId: null,
+      slots,
     });
-    await get().persist();
   },
 
   appendLog(channel, text, meta) {
@@ -671,7 +752,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   async saveAndExitToTitle() {
     await get().persist();
-    set({ currentScreen: 'title' });
+    // Keep the active slot pointer set so resume can pick it back up, but
+    // refresh the slot index so the title list reflects the latest summary.
+    const slots = await listSlots();
+    set({ slots, currentScreen: 'title' });
   },
 
   async bootCognitive() {
@@ -715,8 +799,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   async persist() {
-    const { player, worldMemory, gameLog, currentScreen } = get();
-    await saveGame({
+    const { player, worldMemory, gameLog, currentScreen, activeSlotId } = get();
+    if (!activeSlotId) return; // No active slot — nothing to write to.
+    await saveSlot(activeSlotId, {
       version: 1,
       savedAt: Date.now(),
       player,
