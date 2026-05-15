@@ -19,6 +19,7 @@ import { generateQuest } from '../engine/questGenerator';
 import { pickWeather, pickHazardForLocation, pickEnemyForLocation, getLocationById } from '../engine/encounter';
 import { buildOpening, buildScene, buildArbiterRemark, shouldArbiterSpeak } from '../engine/narrativeGenerator';
 import { parseInput } from '../engine/parser';
+import { rollDie } from '../engine/rng';
 import locationsData from '../data/locations/locations.json';
 
 const allLocations = locationsData as Location[];
@@ -152,41 +153,87 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { player, currentScene } = get();
     if (!player || !currentScene) return;
 
+    const roll10 = (stat: number, statName: string, dc: number): boolean => {
+      const die = rollDie(10);
+      const total = die + stat;
+      const success = total >= dc;
+      get().appendLog(
+        'system',
+        `d10 → ${die}  +  ${statName} ${stat}  =  ${total}  vs DC ${dc}  ${success ? '✓' : '✗'}`,
+      );
+      return success;
+    };
+
     switch (parsed.intent) {
-      case 'attack':
+      case 'attack': {
         if (currentScene.enemy) {
-          get().appendLog('combat', `You strike at the ${currentScene.enemy.name}.`);
-          get().resolveEnemyDefeat();
+          const dc = currentScene.enemy.abilityPoint;
+          const hit = roll10(player.stats.strength, 'STR', dc);
+          if (hit) {
+            get().appendLog('combat', `You strike at the ${currentScene.enemy.name}. The blow lands true.`);
+            get().resolveEnemyDefeat();
+          } else {
+            get().appendLog('combat', `You swing at the ${currentScene.enemy.name} but the attack goes wide. It holds its ground.`);
+          }
         } else {
           get().appendLog('world', 'Nothing in arm\'s reach answers your blade. The motion echoes off Aetherstone.');
         }
         break;
-      case 'stealth':
-        get().appendLog('world', 'You move low and quiet. The dust does not rise.');
+      }
+      case 'stealth': {
+        const success = roll10(player.stats.dexterity, 'DEX', 10);
+        get().appendLog('world', success
+          ? 'You move low and quiet. The dust does not rise. Whatever watches does not see you.'
+          : 'You try to slip into shadow, but your foot scrapes stone. Something stirs.');
         break;
-      case 'diplomacy':
-        get().appendLog('world', 'Your words hang in the dead air. Something — or no one — considers them.');
+      }
+      case 'diplomacy': {
+        const success = roll10(player.stats.charisma, 'CHA', 12);
+        get().appendLog('world', success
+          ? 'Your words find purchase. The dead air shifts — something in this place is listening.'
+          : 'Your words hang unanswered. The silence has heard better arguments.');
         break;
-      case 'escape':
-        get().appendLog('world', 'You break for the entrance. Behind you, the chamber settles back into its waiting.');
-        if (currentScene.enemy) set((s) => ({ currentScene: s.currentScene ? { ...s.currentScene, enemy: null } : null }));
-        break;
-      case 'investigate':
-        get().appendLog('world', `You search ${currentScene.location.name}. The Aetherstone reveals little, but you sense a thread to follow.`);
-        if (Math.random() < 0.3) {
-          const quest = get().generateNewQuest();
-          get().appendLog('reward', `New lead: ${quest.objective.verb} ${quest.objective.target} at ${quest.location.name}.`);
+      }
+      case 'escape': {
+        const success = roll10(player.stats.dexterity, 'DEX', 8);
+        if (success) {
+          get().appendLog('world', 'You break for the entrance. Behind you the chamber settles back into its waiting.');
+          if (currentScene.enemy) set((s) => ({ currentScene: s.currentScene ? { ...s.currentScene, enemy: null } : null }));
+        } else {
+          get().appendLog('world', 'You bolt, but the way is longer than you remembered. You circle back to where you started, breathing hard.');
         }
         break;
+      }
+      case 'investigate': {
+        const success = roll10(player.stats.intelligence, 'INT', 9);
+        if (success) {
+          get().appendLog('world', `You search ${currentScene.location.name} carefully. The Aetherstone hums — there is something here.`);
+          if (Math.random() < 0.5) {
+            const quest = get().generateNewQuest();
+            get().appendLog('reward', `New lead: ${quest.objective.verb} ${quest.objective.target} at ${quest.location.name}.`);
+          }
+        } else {
+          get().appendLog('world', `You sweep ${currentScene.location.name} but find only dust and old silence.`);
+        }
+        break;
+      }
       case 'rest':
         get().rest();
         break;
-      case 'cast':
-        get().appendLog('world', 'You shape the Aether around your hand. A pale violet glow answers.');
+      case 'cast': {
+        const success = roll10(player.stats.intelligence, 'INT', 11);
+        get().appendLog('world', success
+          ? 'You shape the Aether around your hand. A pale violet glow answers, steady and true.'
+          : 'The Aether slips through your focus. The glow flickers and dies before it forms.');
         break;
-      case 'use_relic':
-        get().appendLog('world', 'You bring a relic forward. Its hum changes pitch.');
+      }
+      case 'use_relic': {
+        const success = roll10(player.stats.wisdom, 'WIS', 10);
+        get().appendLog('world', success
+          ? 'You bring a relic forward. Its hum rises in pitch — it recognises your intent.'
+          : 'You bring a relic forward. Its hum stutters. The connection does not hold.');
         break;
+      }
       case 'travel': {
         const target = parsed.target?.toLowerCase() ?? '';
         const candidate = target

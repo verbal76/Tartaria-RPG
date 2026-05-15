@@ -8,7 +8,7 @@ const channelColors: Record<LogChannel, string> = {
   player: '#7fb8ff',
   arbiter: '#c9a86a',
   world: '#cdbf99',
-  system: '#7a705c',
+  system: '#a89a7a',  // dice roll results — warm amber, readable
   combat: '#e07a5f',
   reward: '#9ec96a',
 };
@@ -25,7 +25,9 @@ export function AdventureFeed({ entries }: Props) {
       {entries.map((entry) => (
         <View key={entry.id} style={styles.entry}>
           <Text style={[styles.channel, { color: channelColors[entry.channel] }]}>
-            {entry.channel === 'player' ? 'YOU' : entry.channel.toUpperCase()}
+            {entry.channel === 'player' ? 'YOU'
+              : entry.channel === 'system' && entry.text.startsWith('d') ? 'ROLL'
+              : entry.channel.toUpperCase()}
           </Text>
           <Text style={[styles.body, { color: channelColors[entry.channel] }]}>
             {entry.text}
