@@ -189,6 +189,8 @@ export interface PlayerCharacter {
   stats: Stats;
   hp: number;
   hpMax: number;
+  stamina: number;
+  staminaMax: number;
   ac: number;
   tc: number;
   corruption: number;

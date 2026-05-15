@@ -44,6 +44,8 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
   const faction = factions.find((f) => f.id === input.factionId) ?? factions[0]!;
   const stats = rollStats();
   const hpMax = rollStartingHP(race);
+  // Stamina scales lightly off STR (1d10 stat → +0..+5 bonus over base 8).
+  const staminaMax = 8 + Math.floor(stats.strength / 2);
 
   const factionStanding: FactionStanding[] = factions.map((f) => ({
     factionId: f.id,
@@ -57,6 +59,8 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
     stats,
     hp: hpMax,
     hpMax,
+    stamina: staminaMax,
+    staminaMax,
     ac: race.baseAC,
     tc: rollFromTCFormula(race.startingTCFormula),
     corruption: 0,

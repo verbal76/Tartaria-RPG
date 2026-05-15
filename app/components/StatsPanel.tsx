@@ -14,6 +14,7 @@ export function StatsPanel({ player }: Props) {
       <Text style={styles.subline}>{race?.name ?? player.raceId}</Text>
       <View style={styles.row}>
         <Stat label="HP" value={`${player.hp}/${player.hpMax}`} />
+        <Stat label="STA" value={`${player.stamina}/${player.staminaMax}`} />
         <Stat label="AC" value={`${player.ac}`} />
         <Stat label="TC" value={`${player.tc}`} />
         <Stat label="Corr" value={`${player.corruption}`} />

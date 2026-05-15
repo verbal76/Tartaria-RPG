@@ -27,7 +27,7 @@ import {
   buildSoftArbiterFallback,
 } from '../engine/narrativeGenerator';
 import { parseInput, type ParseContext } from '../engine/parser';
-import { rollDie, rollFromNotation } from '../engine/rng';
+import { rollDie, rollFromNotation, pick, chance } from '../engine/rng';
 import { buildCombatSteps, buildSkillSteps } from '../engine/combatRules';
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
@@ -53,6 +53,75 @@ export type CognitiveStatus = 'idle' | BootStage | 'failed' | 'skipped';
 
 // Module-level singleton — class instances don't belong in zustand state.
 const cognitive = new CognitiveOrchestrator();
+
+// Casual-look narration: the player asked to look around but didn't target
+// anything specific. We narrate the scene without a roll, and occasionally
+// surface a hook the player can follow up on with a targeted action.
+const CASUAL_LOOK_LINES = [
+  'You scan the area. The stones are quiet for now.',
+  'You take in your surroundings. Nothing the Arbiter would call a discovery.',
+  'You let your gaze drift. The dust hangs the way dust does.',
+  'Your eyes track across the ruins. Whatever was here has been here a long time.',
+  'You look around. The hazard remains exactly as it was, no more, no less.',
+];
+const CASUAL_LOOK_HOOKS = [
+  'Something dark, half-swallowed by mud, catches your eye.',
+  'A faint resonance pulses from a collapsed corner.',
+  'Fresh scrape marks across the stone where there should be none.',
+  'A glint of metal — too small to name yet — lies in the rubble.',
+  'A handprint pressed into Aetherstone dust, recent enough to still hold shape.',
+  'The Aetheric haze thickens around one specific spot. You cannot tell why.',
+  'A thread of cold air leaks from somewhere behind the rubble.',
+];
+
+// Wandering-journey narration: the player asked to walk / travel without
+// naming a destination. Move the world forward, plant something in the
+// distance the player can pursue.
+const WANDERING_LEADS = [
+  'After a while you set down on the next stretch of ground.',
+  'You walk. Tartaria walks beside you.',
+  'Your boots find the next stretch of ground.',
+  'You set out on foot. The weather closes around you.',
+];
+const FEATURE_SIGHTINGS = [
+  'A low shape resolves on the horizon — too regular to be a hill, too small to be a tower.',
+  'You spot what looks like a stone arch, half-swallowed by old mud.',
+  'A faint resonance pulses from the south. Something there is awake.',
+  'A column of smoke or steam rises in the distance, thin and straight.',
+  'A thread of footprints, not yours, crosses your path and trails off.',
+  'A wagon, abandoned and broken-axled, leans into the mud ahead.',
+  'A toppled obelisk lies on its side, runes faded but not yet silent.',
+];
+
+// Trigger phrases that switch an "investigate" intent from a generic look
+// into a request for navigational options.
+const DIRECTION_KEYWORDS = /\b(direction|way|paths?|exits?|route|where to go|which way)\b/i;
+
+// Per-action stamina costs. Casual look, wait, inventory, talk = 0.
+const STAMINA_COSTS = {
+  travel: 2,
+  wander: 2,
+  attack: 1,
+  skillCheck: 1,
+} as const;
+const TRAVEL_MIN_STAMINA = STAMINA_COSTS.travel;
+
+function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
+  const stamMax = p.staminaMax ?? 8 + Math.floor((p.stats?.strength ?? 5) / 2);
+  return {
+    ...p,
+    staminaMax: stamMax,
+    stamina: p.stamina ?? stamMax,
+  };
+}
+
+function spendStamina(player: PlayerCharacter, amount: number): PlayerCharacter {
+  return { ...player, stamina: Math.max(0, player.stamina - amount) };
+}
+
+function restoreStamina(player: PlayerCharacter, amount: number): PlayerCharacter {
+  return { ...player, stamina: Math.min(player.staminaMax, player.stamina + amount) };
+}
 
 interface GameStore {
   player: PlayerCharacter | null;
@@ -118,8 +187,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   async hydrate() {
     const saved = await loadSave();
     if (saved) {
+      // Backfill fields added after the save was written (e.g. stamina).
+      const player = saved.player ? backfillPlayer(saved.player) : null;
       set({
-        player: saved.player,
+        player,
         worldMemory: saved.worldMemory,
         gameLog: saved.gameLog,
         currentScreen: saved.currentScreen,
@@ -236,6 +307,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     switch (parsed.intent) {
       case 'attack': {
         if (currentScene.enemy) {
+          set({ player: spendStamina(player, STAMINA_COSTS.attack) });
           const steps = buildCombatSteps(trimmed, player, currentScene.enemy);
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
           get().appendLog('world', `You face ${currentScene.enemy.name}. The Aetherstone hums with tension.`);
@@ -244,12 +316,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         break;
       }
+      case 'investigate': {
+        // 1) "find a way / look for a path / which direction" — surface options, no roll.
+        if (DIRECTION_KEYWORDS.test(trimmed)) {
+          narratePossibleDirections(get, currentScene);
+          break;
+        }
+        // 2) Targeted look ("examine the locket", "dig up the rubble") — roll.
+        if (parsed.resolvedNoun || parsed.resolvedItemId) {
+          set({ player: spendStamina(player, STAMINA_COSTS.skillCheck) });
+          const steps = buildSkillSteps('investigate', player);
+          set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
+          break;
+        }
+        // 3) Generic look-around — no roll, atmospheric narration with optional hook.
+        narrateCasualLook(get, currentScene);
+        break;
+      }
       case 'stealth':
       case 'diplomacy':
       case 'escape':
-      case 'investigate':
       case 'cast':
       case 'use_relic': {
+        set({ player: spendStamina(player, STAMINA_COSTS.skillCheck) });
         const steps = buildSkillSteps(parsed.intent, player);
         set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
         break;
@@ -278,14 +367,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'travel': {
+        if (player.stamina < TRAVEL_MIN_STAMINA) {
+          get().appendLog(
+            'world',
+            'You take one step and the buried world refuses. Your legs will not. Rest first, then the road.',
+          );
+          break;
+        }
         const target = parsed.target?.toLowerCase() ?? '';
         const candidate = target
           ? allLocations.find((l) => l.name.toLowerCase().includes(target) || l.id === target)
           : undefined;
         if (candidate) {
+          set({ player: spendStamina(player, STAMINA_COSTS.travel) });
           get().travelTo(candidate.id);
         } else {
-          get().appendLog('world', 'You set off, but the path coils on itself. You return to where you started.');
+          set({ player: spendStamina(player, STAMINA_COSTS.wander) });
+          narrateWanderingJourney(get, currentScene);
         }
         break;
       }
@@ -545,8 +643,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   rest() {
     const player = get().player;
     if (!player) return;
-    const room = player.hpMax - player.hp;
-    if (room <= 0) {
+    const hpRoom = player.hpMax - player.hp;
+    const stamRoom = player.staminaMax - player.stamina;
+    if (hpRoom <= 0 && stamRoom <= 0) {
       get().appendLog(
         'world',
         'You take a moment to settle yourself. The Aetherstone hums steady — you are already as whole as it allows.',
@@ -554,9 +653,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       void get().persist();
       return;
     }
-    const heal = Math.min(room, rollDie(6) + rollDie(6));
-    set({ player: { ...player, hp: player.hp + heal } });
-    get().appendLog('world', `You rest. 2d6 → ${heal} HP recovered.`);
+    const heal = Math.min(hpRoom, rollDie(6) + rollDie(6));
+    const stamGain = Math.min(stamRoom, rollDie(6) + 2);
+    set({
+      player: {
+        ...player,
+        hp: player.hp + heal,
+        stamina: player.stamina + stamGain,
+      },
+    });
+    const parts: string[] = [];
+    if (heal > 0) parts.push(`2d6 → ${heal} HP`);
+    if (stamGain > 0) parts.push(`d6+2 → ${stamGain} stamina`);
+    get().appendLog('world', `You rest. ${parts.join(', ')} recovered.`);
     void get().persist();
   },
 
@@ -648,4 +757,39 @@ function applyEnemyCounter(
       return { player: { ...s.player, hp: newHp } };
     });
   }
+}
+
+// ---------------------------------------------------------------------------
+// Free-narration helpers — these emit log entries WITHOUT triggering a dice
+// roll. Used for "look around" / "look for a way" / "start walking" style
+// actions where the player is exploring intent, not attempting a specific
+// challenge that warrants a check.
+// ---------------------------------------------------------------------------
+
+function narrateCasualLook(get: () => GameStore, _scene: CurrentScene): void {
+  const baseLine = pick(CASUAL_LOOK_LINES);
+  const hook = chance(30) ? pick(CASUAL_LOOK_HOOKS) : null;
+  get().appendLog('world', hook ? `${baseLine}  ${hook}` : baseLine);
+}
+
+function narrateWanderingJourney(get: () => GameStore, _scene: CurrentScene): void {
+  const lead = pick(WANDERING_LEADS);
+  const sighting = pick(FEATURE_SIGHTINGS);
+  get().appendLog('world', `${lead}  ${sighting}`);
+}
+
+function narratePossibleDirections(get: () => GameStore, scene: CurrentScene): void {
+  const others = allLocations.filter((l) => l.id !== scene.location.id && l.discoverable !== false);
+  if (others.length === 0) {
+    get().appendLog('world', 'You scan for a way forward. Tartaria does not advertise its directions.');
+    return;
+  }
+  const first = pick(others);
+  const second = others.length > 1 && chance(60)
+    ? pick(others.filter((o) => o.id !== first.id))
+    : null;
+  const fragments: string[] = [];
+  fragments.push(`a ${(first.type ?? 'path').toLowerCase()} toward ${first.name}`);
+  if (second) fragments.push(`a ${(second.type ?? 'path').toLowerCase()} toward ${second.name}`);
+  get().appendLog('world', `You look for a way forward. The Arbiter notes ${fragments.join(' and ')}.`);
 }
