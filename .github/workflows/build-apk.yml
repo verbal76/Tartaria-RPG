@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Android Build (Tartaria Realms)
 
 on:
   push:
@@ -6,17 +6,33 @@ on:
       - main
       - 'release/**'
       - 'claude/**'
+    tags:
+      - 'v*'
     paths-ignore:
+      - 'app/**'
+      - 'App.tsx'
+      - 'assets/**'
       - 'docs/**'
+      - 'scripts/**'
       - '**.md'
+      - '.github/**'
   workflow_dispatch:
+    inputs:
+      profile:
+        description: 'Build profile (preview = APK, production = AAB)'
+        required: false
+        default: 'preview'
+        type: choice
+        options:
+          - preview
+          - production
 
 permissions:
   contents: write
 
 jobs:
   build:
-    name: Build & Release APK
+    name: Build & Release Tartaria Realms APK
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,17 +53,30 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Read app version
-        id: version
+      - name: Determine build profile and tag
+        id: meta
         run: |
+          # Tag pushes (v*) always produce a production AAB
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            PROFILE="production"
+            TAG="${GITHUB_REF#refs/tags/}"
+            IS_TAG="true"
+          else
+            PROFILE="${{ github.event.inputs.profile || 'preview' }}"
+            IS_TAG="false"
+            TAG="apk-build-${{ github.run_number }}"
+          fi
           VERSION=$(node -p "require('./package.json').version")
+          echo "profile=$PROFILE" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "tag=v${VERSION}-build.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+          echo "is_tag=$IS_TAG" >> "$GITHUB_OUTPUT"
+          echo "Building Tartaria Realms — profile: $PROFILE, tag: $TAG, version: $VERSION"
 
       - name: Generate native Android project
         run: npx expo prebuild --platform android --no-install
 
-      - name: Ensure debug keystore exists
+      - name: Ensure debug keystore exists (for release signing fallback)
         run: |
           if [ ! -f android/app/debug.keystore ]; then
             keytool -genkey -v \
@@ -56,53 +85,86 @@ jobs:
               -alias androiddebugkey \
               -keypass android \
               -keyalg RSA -keysize 2048 -validity 10000 \
-              -dname "CN=Android Debug,O=Android,C=US"
+              -dname "CN=Tartaria Realms Debug,O=HotAtticGames,C=US"
           fi
 
-      - name: Build release APK with Gradle
+      - name: Gradle build (Tartaria Realms)
         working-directory: android
         env:
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false"
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon --stacktrace
-
-      - name: Stage APK artifact
-        id: apk
-        run: |
-          SRC=android/app/build/outputs/apk/release/app-release.apk
-          if [ ! -f "$SRC" ]; then
-            SRC=$(find android/app/build/outputs/apk -name "*.apk" | head -1)
+          if [ "${{ steps.meta.outputs.profile }}" = "production" ]; then
+            echo "Building Tartaria Realms AAB (production)"
+            ./gradlew bundleRelease --no-daemon --stacktrace
+          else
+            echo "Building Tartaria Realms APK (preview)"
+            ./gradlew assembleRelease --no-daemon --stacktrace
           fi
+
+      - name: Stage Tartaria Realms artifact
+        id: artifact
+        run: |
           mkdir -p artifacts
-          OUT="artifacts/tartaria-${{ steps.version.outputs.tag }}.apk"
+          if [ "${{ steps.meta.outputs.profile }}" = "production" ]; then
+            SRC=android/app/build/outputs/bundle/release/app-release.aab
+            [ -f "$SRC" ] || SRC=$(find android/app/build/outputs/bundle -name "*.aab" | head -1)
+            OUT="artifacts/tartaria-realms-${{ steps.meta.outputs.tag }}.aab"
+          else
+            SRC=android/app/build/outputs/apk/release/app-release.apk
+            [ -f "$SRC" ] || SRC=$(find android/app/build/outputs/apk -name "*.apk" | head -1)
+            OUT="artifacts/tartaria-realms-${{ steps.meta.outputs.tag }}.apk"
+          fi
           cp "$SRC" "$OUT"
           echo "path=$OUT" >> "$GITHUB_OUTPUT"
+          echo "filename=$(basename "$OUT")" >> "$GITHUB_OUTPUT"
           ls -lh "$OUT"
 
-      - name: Create GitHub Release
+      - name: Upload Tartaria Realms artifact (GitHub Actions, 90d retention)
+        uses: actions/upload-artifact@v4
+        with:
+          name: tartaria-realms-${{ steps.meta.outputs.profile }}-${{ github.run_number }}
+          path: ${{ steps.artifact.outputs.path }}
+          retention-days: 90
+
+      - name: Create Tartaria Realms GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="${{ steps.version.outputs.tag }}"
+          TAG="${{ steps.meta.outputs.tag }}"
+          PROFILE="${{ steps.meta.outputs.profile }}"
+          VERSION="${{ steps.meta.outputs.version }}"
           BRANCH="${GITHUB_REF_NAME}"
           COMMIT_MSG="${{ github.event.head_commit.message || github.event_name }}"
           SHORT_SHA="${GITHUB_SHA::7}"
 
-          gh release create "$TAG" \
-            "${{ steps.apk.outputs.path }}" \
-            --repo "${{ github.repository }}" \
-            --title "Tartaria Realms ${{ steps.version.outputs.tag }}" \
-            --notes "## Tartaria Realms — Playtest APK
+          if [ "$PROFILE" = "production" ]; then
+            TITLE="Tartaria Realms ${TAG}"
+            KIND="Production AAB (Play Store)"
+            LATEST_FLAG="--latest"
+            INSTALL_NOTE="This is a Play Store **AAB** bundle — upload it to Google Play Console. For sideloadable APKs, use a non-tagged build from the same commit."
+          else
+            TITLE="Tartaria Realms v${VERSION}-build.${{ github.run_number }}"
+            KIND="Playtest APK"
+            LATEST_FLAG="--latest"
+            INSTALL_NOTE="1. Download the \`.apk\` attached below on your Android device.
+          2. Open it. If prompted, enable *Install unknown apps* for your browser/file manager.
+          3. Tap **Install**. Launch *Tartaria Realms*.
 
+          > Release-optimized APK, debug-signed for sideloaded playtesting. Each build uses a fresh debug key, so uninstall the previous version first if Android refuses the upgrade. OTA updates ship continuously to channel \`preview\` while this APK is installed."
+          fi
+
+          gh release create "$TAG" \
+            "${{ steps.artifact.outputs.path }}" \
+            --repo "${{ github.repository }}" \
+            --title "$TITLE" \
+            $LATEST_FLAG \
+            --notes "## Tartaria Realms — $KIND
+
+          **Version:** \`${VERSION}\`
           **Branch:** \`${BRANCH}\`
           **Commit:** \`${SHORT_SHA}\` — ${COMMIT_MSG}
           **Build #:** ${{ github.run_number }}
 
           ### Install
-          1. Download the \`.apk\` attached below on your Android device.
-          2. Open it. If prompted, enable *Install unknown apps* for your browser/file manager.
-          3. Tap **Install**. Launch *Tartaria Realms*.
-
-          > Release-build APK (optimized), signed with the debug keystore — fine for sideloading, not for Play Store distribution. Each build uses a fresh debug key, so uninstall the previous version before installing a new one if Android refuses the upgrade." \
-            --prerelease
+          ${INSTALL_NOTE}"
