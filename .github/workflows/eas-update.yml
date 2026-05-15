@@ -61,10 +61,11 @@ jobs:
       - name: Publish OTA update to Tartaria Realms
         env:
           EXPO_TOKEN: ${{ secrets.TARTARIA }}
+          COMMIT_MSG: ${{ github.event.head_commit.message || github.event_name }}
         run: |
           CHANNEL="${{ github.event.inputs.branch || 'preview' }}"
-          MSG="${{ github.event.head_commit.message || github.event_name }}"
-          echo "Publishing Tartaria Realms OTA to channel: $CHANNEL"
+          MSG=$(echo "$COMMIT_MSG" | head -1)
+          echo "Publishing Tartaria Realms OTA to channel: $CHANNEL — $MSG"
           eas update \
             --branch "$CHANNEL" \
             --message "$MSG" \

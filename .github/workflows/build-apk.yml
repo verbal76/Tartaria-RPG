@@ -149,12 +149,13 @@ jobs:
       - name: Create Tartaria Realms GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMIT_MSG: ${{ github.event.head_commit.message || github.event_name }}
         run: |
           TAG="${{ steps.meta.outputs.tag }}"
           PROFILE="${{ steps.meta.outputs.profile }}"
           VERSION="${{ steps.meta.outputs.version }}"
           BRANCH="${GITHUB_REF_NAME}"
-          COMMIT_MSG="${{ github.event.head_commit.message || github.event_name }}"
+          COMMIT_MSG=$(echo "$COMMIT_MSG" | head -1)
           SHORT_SHA="${GITHUB_SHA::7}"
 
           if [ "$PROFILE" = "production" ]; then
