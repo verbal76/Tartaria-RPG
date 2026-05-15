@@ -156,6 +156,19 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
     }
   }
 
+  // Combat-context override: when an enemy is present and the input contains
+  // an explicit attack verb, force attack intent. Prevents "use my torch to
+  // attack the moth" from routing to use_relic just because "use" comes first.
+  if (bestMatch && context.enemyPresent && bestMatch.intent !== 'attack') {
+    for (let i = 0; i < tokens.length; i++) {
+      const t = tokens[i];
+      if (t && VERB_SYNONYMS.attack.includes(t)) {
+        bestMatch = { intent: 'attack', verb: t, distance: 0, index: i };
+        break;
+      }
+    }
+  }
+
   if (!bestMatch) {
     // Try treating the entire input as a possible noun reference and suggest verbs
     const noun = resolveContextNoun(tokens.filter((t) => !STOPWORDS.has(t)), recentNouns);

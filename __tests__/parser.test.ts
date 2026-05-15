@@ -74,3 +74,14 @@ describe('parseInput — never hard fails', () => {
     expect(parseInput('search the ruins').confidence).toBeGreaterThan(0.5);
   });
 });
+
+describe('parseInput — combat context override', () => {
+  it('routes "use my torch to attack the moth" to attack when enemy is present', () => {
+    const r = parseInput('use my torch to attack the moth', { inventory: [torch], enemyPresent: true });
+    expect(r.intent).toBe('attack');
+  });
+  it('keeps use_relic intent when no enemy is present', () => {
+    const r = parseInput('use my torch', { inventory: [torch], enemyPresent: false });
+    expect(r.intent).toBe('use_relic');
+  });
+});

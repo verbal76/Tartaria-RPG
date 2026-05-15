@@ -391,7 +391,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set({ player: spendStamina(player, STAMINA_COSTS.attack) });
           const steps = buildCombatSteps(trimmed, player, currentScene.enemy);
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
-          get().appendLog('world', `You face ${currentScene.enemy.name}. The Aetherstone hums with tension.`);
+          get().appendLog('world', attackOpener(currentScene.enemy.name, parsed.resolvedNoun));
         } else {
           get().appendLog('world', 'Nothing in arm\'s reach answers your blade. The motion echoes off Aetherstone.');
         }
@@ -488,6 +488,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         buildArbiterRemark({
           location: currentScene.location,
           hazard: currentScene.hazard,
+          enemy: currentScene.enemy,
           intent: parsed.intent,
           mood,
           recentActions,
@@ -647,6 +648,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!currentScene.enemy) { void get().persist(); return; }
     const enemy = currentScene.enemy;
 
+    // Re-parse with full context so we can pull the resolved weapon name
+    // back out of the original action text (e.g. "use my torch to attack").
+    const combatParse = parseInput(actionText, {
+      inventory: player.inventory,
+      recentNouns: collectSceneNouns(currentScene),
+      enemyPresent: true,
+    });
+    const weaponName = combatParse.resolvedNoun ?? null;
+
     if (initiative) {
       get().appendLog('world', initiative.success
         ? `You seize the initiative. ${enemy.name} has no time to react.`
@@ -659,21 +669,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const newEnemyHp = prevHp - dmg;
 
       if (newEnemyHp <= 0) {
-        get().appendLog('combat', `Your strike finds its mark — ${dmg} damage. ${enemy.name} falls.`);
+        get().appendLog('combat', attackKill(weaponName, enemy.name, dmg));
         get().resolveEnemyDefeat();
         set({ currentEnemyHp: null });
       } else {
         set({ currentEnemyHp: newEnemyHp });
-        get().appendLog('combat', `Your strike hits for ${dmg}. ${enemy.name} staggers — ${newEnemyHp} HP remaining. It fights back.`);
+        get().appendLog('combat', attackHit(weaponName, enemy.name, dmg, newEnemyHp));
         applyEnemyCounter(enemy, player, get, set);
       }
     } else {
-      get().appendLog('combat', `Your attack goes wide. ${enemy.name} seizes the opening.`);
+      get().appendLog('combat', attackMiss(weaponName, enemy.name));
       applyEnemyCounter(enemy, player, get, set);
     }
 
     if (shouldArbiterSpeak()) {
-      get().appendLog('arbiter', buildArbiterRemark({ location: currentScene.location, hazard: currentScene.hazard }));
+      get().appendLog(
+        'arbiter',
+        buildArbiterRemark({
+          location: currentScene.location,
+          hazard: currentScene.hazard,
+          enemy: get().currentScene?.enemy ?? null,
+          intent: 'attack',
+        }),
+      );
     }
     void get().persist();
   },
@@ -877,4 +895,61 @@ function narratePossibleDirections(get: () => GameStore, scene: CurrentScene): v
   fragments.push(`a ${(first.type ?? 'path').toLowerCase()} toward ${first.name}`);
   if (second) fragments.push(`a ${(second.type ?? 'path').toLowerCase()} toward ${second.name}`);
   get().appendLog('world', `You look for a way forward. The Arbiter notes ${fragments.join(' and ')}.`);
+}
+
+// ---------------------------------------------------------------------------
+// Weapon-aware combat narration — pulls the resolved weapon name (when the
+// player explicitly named one) into the strike/hit/miss/kill messages so the
+// combat log stops feeling like a Mad Lib.
+// ---------------------------------------------------------------------------
+
+function weaponPhrase(weapon: string | null): string {
+  return weapon ? ` with the ${weapon.toLowerCase()}` : '';
+}
+
+function attackOpener(enemyName: string, weapon?: string | null): string {
+  const w = weapon ?? null;
+  if (w) {
+    return pick([
+      `You raise the ${w.toLowerCase()} toward ${enemyName}. The room narrows around the both of you.`,
+      `Your ${w.toLowerCase()} comes around in an arc; ${enemyName} reads it but does not move yet.`,
+      `You commit forward with the ${w.toLowerCase()}. ${enemyName} watches your hands.`,
+      `The ${w.toLowerCase()} is already moving when ${enemyName} sees it coming.`,
+    ]);
+  }
+  return pick([
+    `You close on ${enemyName}. The room narrows around the both of you.`,
+    `${enemyName} fixes on you. You commit to the strike.`,
+    `You drive toward ${enemyName} before it can choose first.`,
+  ]);
+}
+
+function attackHit(weapon: string | null, enemyName: string, dmg: number, remainingHp: number): string {
+  const wp = weaponPhrase(weapon);
+  return pick([
+    `Your strike${wp} lands for ${dmg}. ${enemyName} staggers — ${remainingHp} HP remaining. It answers.`,
+    `${enemyName} takes ${dmg}${wp}. It reels: ${remainingHp} left. Then it fights back.`,
+    `Clean hit${wp} for ${dmg}. ${enemyName} has ${remainingHp} left and does not back away.`,
+    `The blow${wp} finds purchase — ${dmg} damage, ${remainingHp} HP standing. ${enemyName} commits to the counter.`,
+  ]);
+}
+
+function attackMiss(weapon: string | null, enemyName: string): string {
+  const wp = weaponPhrase(weapon);
+  return pick([
+    `Your strike${wp} glances off. ${enemyName} seizes the opening.`,
+    `${enemyName} reads the motion and slips it${wp ? ` — the ${weapon!.toLowerCase()} carves only air` : ''}. The counter is already coming.`,
+    `${wp ? `The ${weapon!.toLowerCase()} cuts air` : 'Your strike cuts air'}. ${enemyName} answers immediately.`,
+    `Half a beat too slow. ${enemyName} steps inside your reach.`,
+  ]);
+}
+
+function attackKill(weapon: string | null, enemyName: string, dmg: number): string {
+  const wp = weaponPhrase(weapon);
+  return pick([
+    `Your blow${wp} lands clean — ${dmg} damage. ${enemyName} crumples in the dust. The Aetherstone settles.`,
+    `${enemyName} folds${wp ? ` under the ${weapon!.toLowerCase()}` : ''}. ${dmg} damage was enough. The room exhales.`,
+    `Final strike${wp} for ${dmg}. ${enemyName} is still. The Aetherstone hums on, indifferent.`,
+    `The killing blow${wp}: ${dmg}. ${enemyName} drops where it stood.`,
+  ]);
 }

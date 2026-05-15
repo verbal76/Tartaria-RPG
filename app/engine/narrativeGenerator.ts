@@ -239,6 +239,7 @@ const GENERIC_REMARKS = [
 export interface ArbiterContext {
   location: Location;
   hazard?: Hazard | null;
+  enemy?: Enemy | null;
   intent?: Intent;
   mood?: string;
   /**
@@ -255,7 +256,52 @@ function pickMoodPool(mood: string | undefined): string[] | undefined {
   return pool && pool.length > 0 ? pool : undefined;
 }
 
+// Combat-only Arbiter lines that reference the specific enemy. Used when the
+// scene has an active hostile; takes priority over the generic intent pool.
+const COMBAT_REMARKS = [
+  `The Arbiter watches the {enemy}. "It is not the first thing here that decided to keep its distance, then changed its mind."`,
+  `"Footwork over fury," the Arbiter says quietly. "The {enemy} is patient. Be patienter."`,
+  `The Arbiter does not look away from the {enemy}. "Decide quickly. It already has."`,
+  `"You hit what you commit to," the Arbiter says. "The {enemy} hears the difference."`,
+  `"Tartaria does not award style points," the Arbiter says, eyes on the {enemy}. "End it."`,
+  `The Arbiter's hand drifts to nothing in particular. "The {enemy} will not tire before you do. Spend wisely."`,
+  `"That one bleeds slow," the Arbiter says. "Make the hit count."`,
+  `"You can fight, hide, or speak," the Arbiter says low. "The {enemy} is already deciding for itself."`,
+];
+
+function combatRemark(enemy: Enemy): string {
+  return pick(COMBAT_REMARKS).replace('{enemy}', enemy.name.toLowerCase());
+}
+
 export function buildArbiterRemark(ctx: ArbiterContext): string {
+  const inCombat = !!ctx.enemy;
+
+  // When an enemy is present, the Arbiter stays on combat. No location
+  // tourism mid-fight ("the borderlands. Where Tartaria thins" was firing
+  // while the player was mid-swing).
+  if (inCombat) {
+    // ~20% chance to ack the player's most recent action even in combat —
+    // gives the Arbiter a beat of awareness before the combat color.
+    if (
+      ctx.recentActions &&
+      ctx.recentActions.length > 0 &&
+      Math.random() < 0.2
+    ) {
+      const lastAction = ctx.recentActions[ctx.recentActions.length - 1];
+      if (lastAction && lastAction.trim().length > 0) {
+        return `The Arbiter notes how you ${lastAction.trim()}. ${combatRemark(ctx.enemy!)}`;
+      }
+    }
+    // Mood/intent pools still get a turn so combat remarks vary in color.
+    const aggressionPool = pickMoodPool('AGGRESSION');
+    const intentAttack = INTENT_REMARKS.attack;
+    const r = Math.random();
+    if (r < 0.55) return combatRemark(ctx.enemy!);
+    if (r < 0.8 && intentAttack && intentAttack.length > 0) return pick(intentAttack);
+    if (aggressionPool) return pick(aggressionPool).replace('this place', ctx.location.name);
+    return combatRemark(ctx.enemy!);
+  }
+
   // ~15% chance to acknowledge the player's most recent action, wrapped in
   // the lore-flavored mood pool when available.
   if (
