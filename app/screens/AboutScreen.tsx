@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from '
 import Constants from 'expo-constants';
 import * as Clipboard from 'expo-clipboard';
 import * as Updates from 'expo-updates';
+import * as Application from 'expo-application';
 import { useGameStore } from '../state/gameStore';
 import { OTA_BUILD_ID } from '../buildInfo';
 
@@ -52,37 +53,49 @@ export function AboutScreen() {
   const info = useMemo(() => {
     const expoConfig = Constants.expoConfig;
     const version = expoConfig?.version ?? '0.0.0';
-    const runtimeVersion =
-      typeof expoConfig?.runtimeVersion === 'string'
-        ? expoConfig.runtimeVersion
-        : JSON.stringify(expoConfig?.runtimeVersion ?? null);
-    const channel = (expoConfig?.updates as { requestHeaders?: Record<string, string> } | undefined)
-      ?.requestHeaders?.['expo-channel-name'] ?? 'unknown';
     const mb = (bytes: number | null | undefined) =>
       bytes != null ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : 'unknown';
 
-    // Runtime values from expo-updates — what the *installed binary* thinks
-    // the OTA config is, vs what app.json declares. If these don't line up,
-    // OTAs silently no-op. This is the smoking gun for diagnosing publish
-    // vs apply mismatches.
+    // Native APK build number — versionCode baked at gradle build time by
+    // the build-apk.yml workflow. Cannot be overridden by OTA, so this
+    // always tells you which APK is actually installed.
+    const apkBuildNumber = Application.nativeBuildVersion ?? '(unknown)';
+    const apkAppVersion = Application.nativeApplicationVersion ?? version;
+
+    // Resolved runtime version from expo-updates. This is what the manifest
+    // server uses to decide whether an OTA applies. If this doesn't equal
+    // the publish-side runtimeVersion, every OTA silently no-ops.
     const updRuntimeVersion = safeUpdates(() => Updates.runtimeVersion);
     const updChannel = safeUpdates(() => Updates.channel);
     const updUpdateId = safeUpdates(() => Updates.updateId);
+    const updCreatedAt = safeUpdates(() => {
+      const d = Updates.createdAt;
+      return d instanceof Date ? d.toISOString() : d;
+    });
     const updIsEmbedded = safeUpdates(() => Updates.isEmbeddedLaunch);
     const updIsEnabled = safeUpdates(() => Updates.isEnabled);
 
+    const otaApplied =
+      updIsEmbedded === 'true'
+        ? 'No (running the APK\'s embedded bundle)'
+        : updUpdateId && updUpdateId !== '(unset)'
+          ? `Yes — ${updUpdateId}`
+          : '(unknown)';
+
     const lines = [
       `Tartaria Realms`,
-      `Version: ${version}`,
-      `OTA build: ${OTA_BUILD_ID}`,
-      `Runtime config (app.json): ${runtimeVersion}`,
-      `Runtime live (Updates): ${updRuntimeVersion}`,
-      `Channel config (app.json): ${channel}`,
-      `Channel live (Updates): ${updChannel}`,
-      `Update ID: ${updUpdateId || '(embedded)'}`,
-      `Updates enabled: ${updIsEnabled}`,
-      `Embedded launch: ${updIsEmbedded}`,
-      `Update status: ${updateStatus}${updateError ? `\n  Error: ${updateError}` : ''}`,
+      `App version: ${apkAppVersion}`,
+      `APK build: ${apkBuildNumber}`,
+      `OTA build ID: ${OTA_BUILD_ID}`,
+      ``,
+      `OTA status`,
+      `  Channel: ${updChannel}`,
+      `  Runtime version: ${updRuntimeVersion}`,
+      `  Last OTA applied: ${otaApplied}`,
+      `  OTA published at: ${updCreatedAt || '(none)'}`,
+      `  Updates enabled: ${updIsEnabled}`,
+      `  Last check: ${updateStatus}${updateError ? `\n    Error: ${updateError}` : ''}`,
+      ``,
       `Platform: ${Platform.OS} ${Platform.Version}`,
       `Hermes: ${typeof (globalThis as { HermesInternal?: unknown }).HermesInternal !== 'undefined' ? 'yes' : 'no'}`,
       ``,

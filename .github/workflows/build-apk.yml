@@ -53,6 +53,22 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
+      - name: Inject Android versionCode = GitHub run_number
+        run: |
+          # Stamp the GitHub Actions run_number into app.json's android.versionCode
+          # so it lands in the native Android manifest at prebuild time. This is
+          # what Application.nativeBuildVersion reads at runtime, and what the
+          # About screen displays as "APK build: N". Cannot be overridden by OTA.
+          node -e "
+            const fs = require('fs');
+            const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));
+            app.expo.android = app.expo.android || {};
+            app.expo.android.versionCode = ${{ github.run_number }};
+            fs.writeFileSync('app.json', JSON.stringify(app, null, 2));
+          "
+          echo "android.versionCode = ${{ github.run_number }} — baked into APK"
+          grep -A2 '"android"' app.json | head -10
+
       - name: Pin Kotlin 1.9.25 in RN/Expo version catalogs (Compose compiler compat)
         run: |
           # The real Kotlin version source is libs.versions.toml in two node_modules
