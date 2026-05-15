@@ -1,0 +1,108 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+      - 'release/**'
+      - 'claude/**'
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build & Release APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Read app version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v${VERSION}-build.${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+
+      - name: Generate native Android project
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Ensure debug keystore exists
+        run: |
+          if [ ! -f android/app/debug.keystore ]; then
+            keytool -genkey -v \
+              -keystore android/app/debug.keystore \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
+      - name: Build release APK with Gradle
+        working-directory: android
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false"
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon --stacktrace
+
+      - name: Stage APK artifact
+        id: apk
+        run: |
+          SRC=android/app/build/outputs/apk/release/app-release.apk
+          if [ ! -f "$SRC" ]; then
+            SRC=$(find android/app/build/outputs/apk -name "*.apk" | head -1)
+          fi
+          mkdir -p artifacts
+          OUT="artifacts/tartaria-${{ steps.version.outputs.tag }}.apk"
+          cp "$SRC" "$OUT"
+          echo "path=$OUT" >> "$GITHUB_OUTPUT"
+          ls -lh "$OUT"
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          BRANCH="${GITHUB_REF_NAME}"
+          COMMIT_MSG="${{ github.event.head_commit.message || github.event_name }}"
+          SHORT_SHA="${GITHUB_SHA::7}"
+
+          gh release create "$TAG" \
+            "${{ steps.apk.outputs.path }}" \
+            --repo "${{ github.repository }}" \
+            --title "Tartaria Realms ${{ steps.version.outputs.tag }}" \
+            --notes "## Tartaria Realms — Playtest APK
+
+          **Branch:** \`${BRANCH}\`
+          **Commit:** \`${SHORT_SHA}\` — ${COMMIT_MSG}
+          **Build #:** ${{ github.run_number }}
+
+          ### Install
+          1. Download the \`.apk\` attached below on your Android device.
+          2. Open it. If prompted, enable *Install unknown apps* for your browser/file manager.
+          3. Tap **Install**. Launch *Tartaria Realms*.
+
+          > Release-build APK (optimized), signed with the debug keystore — fine for sideloading, not for Play Store distribution. Each build uses a fresh debug key, so uninstall the previous version before installing a new one if Android refuses the upgrade." \
+            --prerelease
