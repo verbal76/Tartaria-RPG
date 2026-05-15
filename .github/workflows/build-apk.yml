@@ -88,6 +88,11 @@ jobs:
           # SAXNotRecognizedException on accessExternalSchema in the bundled
           # Apache Ivy XML parser. Pinning a specific version skips the listing
           # path entirely.
+          #
+          # The C++ bindings in cpp/InferenceSessionHostObject.cpp use APIs added
+          # in ORT 1.21+ (default Ort::Value() ctor, zero-arg GetSymbolicDimensions).
+          # 1.22.0 is the stable release matching the JS bindings 1.24.3 timeframe.
+          ORT_VERSION=1.22.0
           ORT_GRADLE=node_modules/onnxruntime-react-native/android/build.gradle
           if [ ! -f "$ORT_GRADLE" ]; then
             echo "::error::Expected $ORT_GRADLE not found"
@@ -95,9 +100,9 @@ jobs:
           fi
           echo "--- before ---"
           grep -n "latest.integration" "$ORT_GRADLE" || true
-          sed -i 's/latest\.integration/1.20.0/g' "$ORT_GRADLE"
+          sed -i "s/latest\.integration/${ORT_VERSION}/g" "$ORT_GRADLE"
           echo "--- after ---"
-          grep -n "1\.20\.0" "$ORT_GRADLE" || true
+          grep -n "$ORT_VERSION" "$ORT_GRADLE" || true
           if grep -q "latest.integration" "$ORT_GRADLE"; then
             echo "::error::latest.integration still present in $ORT_GRADLE"
             exit 1
