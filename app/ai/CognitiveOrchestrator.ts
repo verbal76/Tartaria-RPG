@@ -9,23 +9,23 @@ const ORT_RUNTIME_VERSION = '1.24.3';
 // Natural sentences — MiniLM is a sentence embedder, not a bag-of-words model.
 // Cosine similarity is much stronger against full phrases than keyword soup.
 const EMOTION_ANCHORS = {
-  FEAR: 'I am afraid and want to escape this danger before it kills me',
-  CURIOSITY: 'I want to investigate this mysterious thing and understand what it is',
-  AGGRESSION: 'I will attack and destroy my enemy with violence',
-  CAUTIOUSNESS: 'I move carefully and quietly so nothing notices me',
-  RESOLVE: 'I will keep going forward no matter the cost',
-  DESPAIR: 'I am tired and hopeless and cannot continue',
+  FEAR: 'I am terrified and want to flee from this Aetheric hazard before the buried ruins collapse and kill me',
+  CURIOSITY: 'I want to investigate the strange resonance from the buried Aetherstone and understand what these forgotten Tartarian ruins are hiding',
+  AGGRESSION: 'I will attack and destroy this Sentinel with my weapon, channeling my runecaster to smash the construct apart in violence',
+  CAUTIOUSNESS: 'I move slowly and quietly through the collapsed ruins so the dormant sentinels and Aetheric hazards do not notice me passing',
+  RESOLVE: 'I will push deeper into the buried Tartarian ruins no matter the cost, determined to recover the lost relic and survive',
+  DESPAIR: 'I am exhausted and hopeless, drained by the Aetheric storms and the endless ruins, and I cannot keep going any longer',
 } as const;
 
 const INTENT_ANCHORS = {
-  ATTACK: 'I attack the enemy with my weapon',
-  SEARCH: 'I look around carefully and search for something hidden',
-  HIDE: 'I hide and stay quiet so no one sees me',
-  RETREAT: 'I run away from this place to get to safety',
-  TALK: 'I speak to them and try to convince them',
-  USE_ITEM: 'I use an item from my pack',
-  REST: 'I sit down to rest and recover my strength',
-  TRAVEL: 'I travel to another place',
+  ATTACK: 'I attack the enemy with my weapon, swinging my blade or firing my runecaster to strike the sentinel down',
+  SEARCH: 'I look carefully around the ruins, scavenging for hidden Aetherstone, relics, and forgotten Tartarian artifacts buried in the rubble',
+  HIDE: 'I hide behind the rubble and stay silent so the patrolling sentinels and Aetherborn enemies cannot see or hear me',
+  RETREAT: 'I retreat and run away from this dangerous place, escaping the collapsing ruins and Aetheric storm to reach safety',
+  TALK: 'I speak to them and try to persuade or negotiate, asking the Arbiter or NPC about the lore of these ruins',
+  USE_ITEM: 'I reach into my pack and use an item, a relic, a runecaster, or an Aetherstone charge to help me',
+  REST: 'I sit down to rest and recover my strength and HP, sheltering from the Aetheric storms inside the quiet ruins',
+  TRAVEL: 'I travel onward to another place, journeying across the ruined Tartarian landscape toward the next buried city or settlement',
 } as const;
 
 export interface BootOptions {
