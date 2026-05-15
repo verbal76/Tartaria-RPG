@@ -46,7 +46,7 @@ jobs:
           token: ${{ secrets.TARTARIA }}
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Trigger EAS build (non-interactive)
         env:
