@@ -25,6 +25,8 @@ function describeTime(hours: number): string {
 export function ExplorationScreen() {
   const player = useGameStore((s) => s.player);
   const gameLog = useGameStore((s) => s.gameLog);
+  const partialArbiterText = useGameStore((s) => s.partialArbiterText);
+  const isGenerating = useGameStore((s) => s.isGenerating);
   const submit = useGameStore((s) => s.submitPlayerAction);
   const setScreen = useGameStore((s) => s.setScreen);
   const currentScene = useGameStore((s) => s.currentScene);
@@ -131,6 +133,15 @@ export function ExplorationScreen() {
 
       <TutorialTarget area="feed" style={styles.feed}>
         <AdventureFeed entries={gameLog} />
+        {isGenerating && (partialArbiterText || partialArbiterText === '') && (
+          <View style={styles.streamingTail}>
+            <Text style={styles.streamingPrefix}>The Arbiter:</Text>
+            <Text style={styles.streamingText}>
+              {partialArbiterText}
+              <Text style={styles.streamingCursor}>▍</Text>
+            </Text>
+          </View>
+        )}
       </TutorialTarget>
 
       <View style={styles.controls}>
@@ -193,6 +204,17 @@ const styles = StyleSheet.create({
   sceneBarBtns: { flexDirection: 'row', gap: 4 },
   sceneBtn: { color: '#cdbf99', fontSize: 16, paddingHorizontal: 8 },
   feed: { flex: 1 },
+  streamingTail: {
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    backgroundColor: '#0e0c0a',
+    borderLeftColor: '#c9a86a',
+    borderLeftWidth: 2,
+    marginTop: 4,
+  },
+  streamingPrefix: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginBottom: 2 },
+  streamingText: { color: '#cdbf99', fontSize: 13, lineHeight: 18 },
+  streamingCursor: { color: '#c9a86a', fontSize: 13 },
   controls: { gap: 6 },
   menuRow: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 4 },
   menu: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },

@@ -49,6 +49,7 @@ import { buildCombatSteps, buildSkillSteps, buildRestSteps } from '../engine/com
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
+import { buildLlmContext, buildSystemPrompt, type SceneSlice } from '../engine/contextInjector';
 import locationsData from '../data/locations/locations.json';
 import enemiesData from '../data/enemies/enemies.json';
 import conceptsData from '../data/lore/concepts.json';
@@ -498,6 +499,10 @@ interface GameStore {
   bootQwen: () => Promise<void>;
   skipQwenBoot: () => void;
   shutdownQwen: () => Promise<void>;
+  /** Discards the in-flight Arbiter generation buffer. The model keeps
+   *  running but its output will be dropped on the floor instead of appended
+   *  to the log. Used when a new player action arrives mid-stream. */
+  cancelGeneration: () => void;
 
   persist: () => Promise<void>;
 }
@@ -922,9 +927,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     //      rather than commenting after the fact.
     //   2) ~25% chance — a reactive remark (mood/intent/location pool).
     // Both can fire in rare cases but the intro tends to anchor first.
+    // Two-channel Arbiter spawn: a higher-rate proactive scene intro, or a
+    // lower-rate reactive remark. With Qwen ready, narrateViaArbiter replaces
+    // the template string with an LLM-generated line that respects the
+    // current location / inventory / hooks. The template string is still
+    // computed eagerly — it carries the line when the model isn't ready.
+    const unresolvedHookList = (initialHooks.length > 0 ? initialHooks : [])
+      .filter((h) => !h.resolved)
+      .map((h) => ({ kind: h.kind, nouns: h.nouns }));
     if (chance(45)) {
-      get().appendLog(
-        'arbiter',
+      void narrateViaArbiter(
+        get,
+        set,
         buildArbiterSceneIntro({
           location,
           enemy: sceneEnemy,
@@ -932,11 +946,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
           worldMemory: get().worldMemory,
         }),
       );
-    } else if (shouldArbiterSpeak()) {
-      const unresolvedHooks = (initialHooks.length > 0 ? initialHooks : [])
-        .filter((h) => !h.resolved)
-        .map((h) => ({ kind: h.kind, nouns: h.nouns }));
-      get().appendLog('arbiter', buildArbiterRemark({ location, hazard, enemy: sceneEnemy, unresolvedHooks }));
+    } else if (
+      shouldArbiterSpeak({
+        hasEnemy: !!sceneEnemy,
+        hasUnresolvedHooks: unresolvedHookList.length > 0,
+      })
+    ) {
+      void narrateViaArbiter(
+        get,
+        set,
+        buildArbiterRemark({
+          location,
+          hazard,
+          enemy: sceneEnemy,
+          unresolvedHooks: unresolvedHookList,
+        }),
+      );
     }
     set((s) => {
       const taggedMem = recordTags(
@@ -956,6 +981,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
   submitPlayerAction(text) {
     const trimmed = text.trim();
     if (!trimmed || get().pendingRolls) return;
+
+    // A new player action invalidates any in-flight Arbiter generation. The
+    // stale stream's tokens would land below the new scene, which feels
+    // disjointed. cancelGeneration bumps the epoch so the dropped text is
+    // discarded when the model finally returns.
+    if (get().isGenerating) get().cancelGeneration();
 
     const player = get().player;
     if (!player) return;
@@ -1693,7 +1724,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
-    if (!get().pendingRolls && shouldArbiterSpeak()) {
+    if (!get().pendingRolls) {
       const lastCog = get().cognitiveLastResponse;
       const mood = lastCog?.inferredEmotions[0];
       const recentActions = get()
@@ -1703,18 +1734,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const unresolvedHooks = (currentScene.hooks ?? [])
         .filter((h) => !h.resolved)
         .map((h) => ({ kind: h.kind, nouns: h.nouns }));
-      get().appendLog(
-        'arbiter',
-        buildArbiterRemark({
+      const liveEnemy = activeEnemy(currentScene);
+      if (
+        shouldArbiterSpeak({
+          hasEnemy: !!liveEnemy,
+          hasUnresolvedHooks: unresolvedHooks.length > 0,
+          hasRecentActions: recentActions.length > 0,
+          hasMood: !!mood,
+        })
+      ) {
+        const template = buildArbiterRemark({
           location: currentScene.location,
           hazard: currentScene.hazard,
-          enemy: activeEnemy(currentScene),
+          enemy: liveEnemy,
           intent: parsed.intent,
           mood,
           recentActions,
           unresolvedHooks,
-        }),
-      );
+        });
+        void narrateViaArbiter(get, set, template);
+      }
     }
 
     // Fire-and-forget cognitive enrichment — runs in parallel with the
@@ -3547,6 +3586,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ qwenStatus: 'idle', qwenFraction: 0, partialArbiterText: null, isGenerating: false });
   },
 
+  cancelGeneration() {
+    // Drops the streaming buffer + flag. The in-flight inference call keeps
+    // running on the background thread (we can't synchronously kill it
+    // through transformers.js), but bumping the epoch makes its eventual
+    // result discard cleanly — see narrateViaArbiter's epoch check.
+    if (get().isGenerating || get().partialArbiterText !== null) {
+      arbiterGenerationEpoch++;
+      set({ isGenerating: false, partialArbiterText: null });
+    }
+  },
+
   async persist() {
     const { player, worldMemory, gameLog, currentScreen, activeSlotId } = get();
     if (!activeSlotId) return; // No active slot — nothing to write to.
@@ -4234,5 +4284,88 @@ function logRepChanges(
     const name = faction?.name ?? c.factionId;
     const sign = c.delta > 0 ? '+' : '';
     get().appendLog('system', `${name} standing ${sign}${c.delta} (now ${c.newStanding})`);
+  }
+}
+
+// Async Arbiter narration helper — bridges the game engine to the Qwen LLM.
+//
+// Call this from any site that would otherwise do
+//   `get().appendLog('arbiter', someTemplateString)`
+// to give Qwen a chance to write the line instead. Fire-and-forget — the
+// action that called it returns immediately. Streaming tokens populate
+// `partialArbiterText` for tail rendering; the final assembled text gets
+// appended to the log on completion.
+//
+// Falls back to the template string in three cases:
+//   1. Qwen isn't ready yet (cold boot, model still downloading, or boot
+//      skipped).
+//   2. Another generation is already in flight — we don't queue, because the
+//      template fallback is already perfectly atmospheric.
+//   3. Generation throws for any reason (model corrupt, OOM, etc).
+//
+// The `templateFallback` param is the same string the call site would have
+// used pre-Qwen, computed eagerly so the failure path is instantaneous.
+// Monotonic counter — incremented every time a new Arbiter generation begins.
+// Each call captures the epoch at start; if the epoch has moved by the time
+// the stream completes (because cancelGeneration was called, or a fresh
+// narration started), the result is discarded. Mirrors the AudioManager
+// fade-epoch pattern.
+let arbiterGenerationEpoch = 0;
+
+async function narrateViaArbiter(
+  get: () => GameStore,
+  set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+  templateFallback: string,
+): Promise<void> {
+  const trimmed = (templateFallback ?? '').trim();
+  if (!qwen.isReady() || get().isGenerating) {
+    if (trimmed) get().appendLog('arbiter', trimmed);
+    return;
+  }
+  const state = get();
+  const player = state.player;
+  const scene = state.currentScene;
+  if (!player || !scene) {
+    if (trimmed) get().appendLog('arbiter', trimmed);
+    return;
+  }
+  const sceneSlice: SceneSlice = {
+    location: scene.location,
+    weather: scene.weather,
+    hazard: scene.hazard,
+    enemies: scene.enemies,
+    enemyHps: scene.enemyHps,
+    vendor: scene.vendor
+      ? { name: scene.vendor.name, affiliation: scene.vendor.faction ?? undefined }
+      : null,
+  };
+  const ctx = buildLlmContext({ player, scene: sceneSlice, gameLog: state.gameLog });
+  const messages = buildSystemPrompt(ctx);
+  const myEpoch = ++arbiterGenerationEpoch;
+  set({ isGenerating: true, partialArbiterText: '' });
+  try {
+    const text = await qwen.stream(
+      messages,
+      (token: string) => {
+        // Only update the buffer if we're still the active generation.
+        if (myEpoch !== arbiterGenerationEpoch) return;
+        const current = get().partialArbiterText ?? '';
+        set({ partialArbiterText: current + token });
+      },
+      { maxNewTokens: 120 },
+    );
+    if (myEpoch !== arbiterGenerationEpoch) return; // cancelled mid-flight
+    const finalText = text.trim();
+    get().appendLog('arbiter', finalText || trimmed);
+  } catch {
+    if (myEpoch === arbiterGenerationEpoch && trimmed) {
+      get().appendLog('arbiter', trimmed);
+    }
+  } finally {
+    // Only clear flags if we're still the active generation; otherwise the
+    // newer generation owns them.
+    if (myEpoch === arbiterGenerationEpoch) {
+      set({ isGenerating: false, partialArbiterText: null });
+    }
   }
 }

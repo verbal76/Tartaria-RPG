@@ -373,8 +373,29 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
   return pick(GENERIC_REMARKS);
 }
 
-export function shouldArbiterSpeak(): boolean {
-  return chance(45);
+/**
+ * Decides whether the Arbiter should speak this turn. Replaces the previous
+ * flat 45% gate (HANDOFF §5 #1: "Arbiter feels disconnected"). The baseline
+ * sits at 20% and earns context-aware boosts: combat, unresolved hooks, mood,
+ * and recent player input each nudge it up. Cap is 60% so even maximally
+ * "interesting" turns don't always trigger commentary.
+ *
+ * All flags are optional — callers from older code paths that just say
+ * `shouldArbiterSpeak()` quietly settle at the 20% baseline rather than
+ * dominating the log.
+ */
+export function shouldArbiterSpeak(ctx?: {
+  hasEnemy?: boolean;
+  hasUnresolvedHooks?: boolean;
+  hasRecentActions?: boolean;
+  hasMood?: boolean;
+}): boolean {
+  let chancePct = 20;
+  if (ctx?.hasEnemy) chancePct += 15;
+  if (ctx?.hasUnresolvedHooks) chancePct += 15;
+  if (ctx?.hasMood) chancePct += 10;
+  if (ctx?.hasRecentActions) chancePct += 5;
+  return chance(Math.min(60, chancePct));
 }
 
 export interface SoftArbiterContext {
