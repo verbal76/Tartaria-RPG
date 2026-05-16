@@ -30,10 +30,11 @@ export interface CatalogWeapon {
 }
 
 export type ArmorSlot = 'head' | 'chest' | 'legs' | 'feet';
+export type CatalogArmorSlot = ArmorSlot | 'cloak' | 'hands';
 
 export interface CatalogArmor {
   name: string;
-  slot: ArmorSlot;
+  slot: CatalogArmorSlot;
   acBonus: number;
   resistances: string[];
   statBonus?: { stat: string; amount: number };

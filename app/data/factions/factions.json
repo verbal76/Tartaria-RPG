@@ -68,5 +68,61 @@
     "joinRequirements": "Aetherborn blood, demonstrated power, and passing the Dynasty's tests of purity.",
     "tags": ["bloodline", "supremacist", "secretive", "ruthless"],
     "startingStanding": 0
+  },
+  {
+    "id": "conspiracy_architects",
+    "name": "Conspiracy Architects",
+    "subtitle": "Controllers of the False Narrative",
+    "alignment": "Suppressive / Covert",
+    "goal": "Keep the Unknowing Masses ignorant of Tartaria and Etheric technology by any means necessary.",
+    "philosophy": "Knowledge of Tartaria would destabilize global society. The lie is a kindness. The silence is a service.",
+    "structure": "A covert cabal embedded in global media, academia, and intelligence networks. Aligned with and largely funded by the Mud Monarchs.",
+    "rivals": ["forgotten_order", "reclaimers_guild", "true_tartarians", "tartarian_revivalists"],
+    "allies": ["mud_monarchs"],
+    "joinRequirements": "Demonstrated ability to suppress information and evidence. An existing member's vouchsafe.",
+    "tags": ["covert", "suppressive", "narrative_control", "global_reach"],
+    "startingStanding": -20
+  },
+  {
+    "id": "servants_of_giants",
+    "name": "Servants of the Giants",
+    "subtitle": "Devoted to the Sleeping Titans",
+    "alignment": "Religious / Reclamation",
+    "goal": "Awaken the Tartarian Giants and restore the empire through their divine power.",
+    "philosophy": "The Giants did not fall. They wait. When they rise, Tartaria rises with them.",
+    "structure": "A religious faction conducting rituals and pilgrimages at Tartarian ruins. Loosely affiliated with the True Tartarians but more fervent and less political.",
+    "rivals": ["mud_monarchs", "conspiracy_architects"],
+    "allies": ["true_tartarians", "tartarian_revivalists"],
+    "joinRequirements": "Demonstrated faith and willingness to participate in ritual expeditions to Tartarian ruins.",
+    "tags": ["religious", "ritual", "giants", "reclamation"],
+    "startingStanding": 0
+  },
+  {
+    "id": "stone_builders",
+    "name": "Stone Builders",
+    "subtitle": "Scholars of the Sacred Architecture",
+    "alignment": "Scholarly / Reconstructive",
+    "goal": "Understand and replicate Architectural Sorcery — the Tartarian fusion of engineering and Aetheric principles.",
+    "philosophy": "Tartaria's buildings were scripture in stone. Study them long enough and they will teach us to build a better world.",
+    "structure": "A hybrid religious-scientific order with lodges near major Tartarian ruins. Share scholarly findings selectively. Cooperate with the Forgotten Order on engineering questions.",
+    "rivals": ["mud_monarchs", "conspiracy_architects"],
+    "allies": ["forgotten_order"],
+    "joinRequirements": "Demonstrated knowledge of Tartarian architectural principles or Aetheric engineering. Submission of original research.",
+    "tags": ["scholarly", "architectural", "religious", "reconstructive"],
+    "startingStanding": 0
+  },
+  {
+    "id": "tartarian_revivalists",
+    "name": "Tartarian Revivalists",
+    "subtitle": "Restore Tartaria at Any Cost",
+    "alignment": "Radical / Maximalist",
+    "goal": "Reactivate Tartaria's Etheric Power systems and fully restore the empire, even at the risk of a Second Mud Flood.",
+    "philosophy": "Every other faction tinkers at the edges. We are the only ones willing to do what actually needs to be done.",
+    "structure": "Led by Sasha Ironheart. Decentralized cells that share a goal but not always methods. Regarded as extremists by most other factions.",
+    "rivals": ["mud_monarchs", "conspiracy_architects", "forgotten_order"],
+    "allies": ["servants_of_giants"],
+    "joinRequirements": "Absolute commitment to Tartaria's revival. Willingness to act where others hesitate.",
+    "tags": ["radical", "maximalist", "reckless", "driven"],
+    "startingStanding": -5
   }
 ]

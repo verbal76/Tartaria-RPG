@@ -1,101 +1,1289 @@
 [
-  { "name": "Mud Boar", "type": "Animal", "abilityPoint": "Strength 4", "attack": "Tusk Charge", "damage": "2D6", "hp": 20, "rarity": "Common", "loot": ["Boar Hide", "Aether Mud"] },
-  { "name": "Mud Wasp", "type": "Animal", "abilityPoint": "Dexterity 3", "attack": "Poison Sting", "damage": "1D6", "hp": 10, "rarity": "Common", "loot": ["Wasp Venom", "Aether Residue"] },
-  { "name": "Swamp Crab", "type": "Animal", "abilityPoint": "Strength 2", "attack": "Claw Pinch", "damage": "1D6", "hp": 15, "rarity": "Common", "loot": ["Crab Meat", "Swamp Shell"] },
-  { "name": "Gutter Rat", "type": "Animal", "abilityPoint": "Dexterity 2", "attack": "Bite", "damage": "1D6", "hp": 8, "rarity": "Common", "loot": ["Rat Fur", "Disease Sample"] },
-  { "name": "Bog Hound", "type": "Animal", "abilityPoint": "Dexterity 3", "attack": "Pack Attack", "damage": "1D6", "hp": 18, "rarity": "Common", "loot": ["Hound Fur", "Aetheric Teeth"] },
-  { "name": "Mudling", "type": "Mud Creature", "abilityPoint": "Dexterity 4", "attack": "Mud Whip", "damage": "1D6", "hp": 18, "rarity": "Common", "loot": ["Aetheric Sludge", "Minor Relic"] },
-  { "name": "Aetheric Ooze", "type": "Aetheric Mutation", "abilityPoint": "Intelligence 3", "attack": "Acidic Dissolve", "damage": "1D10", "hp": 12, "rarity": "Common", "loot": ["Ooze Residue", "Aether Crystal"] },
-  { "name": "Aetherbat", "type": "Aetheric Creature", "abilityPoint": "Dexterity 3", "attack": "Sonic Scream", "damage": "1D6", "hp": 15, "rarity": "Common", "loot": ["Aetherwing", "Crystalline Echo"] },
-  { "name": "Mud Strider", "type": "Mud Creature", "abilityPoint": "Dexterity 4", "attack": "Spear Jab", "damage": "2D6", "hp": 20, "rarity": "Common", "loot": ["Strider Leg", "Aether Residue"] },
-  { "name": "Aetheric Leech", "type": "Aetheric Mutation", "abilityPoint": "Dexterity 4", "attack": "Energy Drain", "damage": "1D10 Aetheric", "hp": 16, "rarity": "Common", "loot": ["Aetheric Blood", "Leech Mucus"] },
-  { "name": "Mud Tortoise", "type": "Mud Creature", "abilityPoint": "Strength 5", "attack": "Shell Smash", "damage": "2D6", "hp": 25, "rarity": "Common", "loot": ["Tortoise Shell", "Mud Fragment"] },
-  { "name": "Aetheric Spider", "type": "Aetheric Creature", "abilityPoint": "Dexterity 3", "attack": "Web Trap", "damage": "1D6", "hp": 12, "rarity": "Common", "loot": ["Spider Silk", "Aether Venom"] },
-  { "name": "Scrap Drone", "type": "Automation", "abilityPoint": "Dexterity 3", "attack": "Drill Arm", "damage": "2D6", "hp": 15, "rarity": "Common", "loot": ["Drone Processor", "Aetheric Cog"] },
-  { "name": "Aetheric Worm", "type": "Aetheric Mutation", "abilityPoint": "Dexterity 4", "attack": "Acid Spit", "damage": "2D6", "hp": 18, "rarity": "Common", "loot": ["Worm Mucus", "Aether Acid"] },
-  { "name": "Mud Imp", "type": "Mud Creature", "abilityPoint": "Dexterity 3", "attack": "Sneak Attack", "damage": "1D6", "hp": 14, "rarity": "Common", "loot": ["Imp Horn", "Aether Residue"] },
-  { "name": "Aetheric Slug", "type": "Aetheric Mutation", "abilityPoint": "Dexterity 3", "attack": "Acid Trail", "damage": "1D6", "hp": 12, "rarity": "Common", "loot": ["Slug Slime", "Aetheric Residue"] },
-  { "name": "Mud Spider", "type": "Mud Creature", "abilityPoint": "Dexterity 4", "attack": "Web Trap", "damage": "2D6", "hp": 18, "rarity": "Common", "loot": ["Spider Silk", "Mud Poison"] },
-  { "name": "Aetheric Raven", "type": "Aetheric Creature", "abilityPoint": "Dexterity 4", "attack": "Beak Peck", "damage": "1D6", "hp": 18, "rarity": "Common", "loot": ["Raven Feather", "Aether Wing"] },
-  { "name": "Mud Lurker", "type": "Mud Creature", "abilityPoint": "Strength 5", "attack": "Mud Smash", "damage": "2D6", "hp": 25, "rarity": "Uncommon", "loot": ["Aetheric Mud Fragment", "Relic Key"] },
-  { "name": "Silt Serpent", "type": "Mud Creature", "abilityPoint": "Dexterity 5", "attack": "Coil Crush", "damage": "2D10", "hp": 30, "rarity": "Uncommon", "loot": ["Serpent Fang", "Mud Essence"] },
-  { "name": "Aetheric Drone", "type": "Automation", "abilityPoint": "Dexterity 4", "attack": "Laser Beam", "damage": "2D6", "hp": 44, "rarity": "Uncommon", "loot": ["Drone Core", "Energy Fragment"] },
-  { "name": "Silt Stalker", "type": "Mud Creature", "abilityPoint": "Dexterity 5", "attack": "Quick Claw", "damage": "2D6", "hp": 38, "rarity": "Uncommon", "loot": ["Stalker Hide", "Silt Core"] },
-  { "name": "Mud Viper", "type": "Animal", "abilityPoint": "Dexterity 4", "attack": "Venom Strike", "damage": "2D6", "hp": 51, "rarity": "Uncommon", "loot": ["Viper Venom", "Aetheric Fang"] },
-  { "name": "Dust Fiend", "type": "Aetheric Creature", "abilityPoint": "Dexterity 5", "attack": "Wind Slash", "damage": "2D6", "hp": 47, "rarity": "Uncommon", "loot": ["Aetheric Dust", "Tornado Core"] },
-  { "name": "Rust Lurker", "type": "Automation", "abilityPoint": "Dexterity 4", "attack": "Claw Slash", "damage": "2D6", "hp": 55, "rarity": "Uncommon", "loot": ["Rusted Parts", "Scrap Metal"] },
-  { "name": "Bog Creeper", "type": "Mud Creature", "abilityPoint": "Dexterity 4", "attack": "Vine Lash", "damage": "2D6", "hp": 58, "rarity": "Uncommon", "loot": ["Creeper Vine", "Aetheric Moss"] },
-  { "name": "Mud Hound Alpha", "type": "Animal", "abilityPoint": "Strength 5", "attack": "Alpha Strike", "damage": "2D6", "hp": 60, "rarity": "Uncommon", "loot": ["Alpha Fur", "Aether Fang"] },
-  { "name": "Plague Moth", "type": "Animal", "abilityPoint": "Dexterity 3", "attack": "Dust Cloud", "damage": "1D6 Poison", "hp": 51, "rarity": "Uncommon", "loot": ["Moth Wing", "Poison Dust"] },
-  { "name": "Aetheric Salamander", "type": "Aetheric Creature", "abilityPoint": "Dexterity 5", "attack": "Fire Breath", "damage": "2D6", "hp": 66, "rarity": "Uncommon", "loot": ["Salamander Scale", "Fire Essence"] },
-  { "name": "Aetheric Scarab", "type": "Aetheric Creature", "abilityPoint": "Dexterity 4", "attack": "Energy Spike", "damage": "2D6", "hp": 58, "rarity": "Uncommon", "loot": ["Scarab Shell", "Aether Gem"] },
-  { "name": "Aetheric Shrike", "type": "Aetheric Creature", "abilityPoint": "Dexterity 5", "attack": "Talon Slash", "damage": "2D6", "hp": 47, "rarity": "Uncommon", "loot": ["Shrike Claw", "Aether Feather"] },
-  { "name": "Iron Spider", "type": "Automation", "abilityPoint": "Dexterity 5", "attack": "Metal Bite", "damage": "2D6", "hp": 39, "rarity": "Uncommon", "loot": ["Iron Fangs", "Spider Mechanism"] },
-  { "name": "Mud Spirit", "type": "Mud Creature", "abilityPoint": "Intelligence 5", "attack": "Spirit Touch", "damage": "2D6 Psychic", "hp": 61, "rarity": "Uncommon", "loot": ["Spirit Residue", "Mud Essence"] },
-  { "name": "Mud Harpy", "type": "Mud Creature", "abilityPoint": "Dexterity 5", "attack": "Claw Attack", "damage": "2D6", "hp": 76, "rarity": "Uncommon", "loot": ["Harpy Feather", "Mud Fragment"] },
-  { "name": "Shifting Shade", "type": "Aetheric Mutation", "abilityPoint": "Dexterity 6", "attack": "Shadow Strike", "damage": "2D6", "hp": 100, "rarity": "Rare", "loot": ["Aetheric Cloth", "Shadow Core"] },
-  { "name": "Mud Golem", "type": "Mud Creature", "abilityPoint": "Strength 8", "attack": "Slam", "damage": "2D10", "hp": 122, "rarity": "Rare", "loot": ["Golem Core", "Mudstone"] },
-  { "name": "Aetheric Hound", "type": "Aetheric Mutation", "abilityPoint": "Dexterity 7", "attack": "Bite", "damage": "2D10 Aetheric", "hp": 115, "rarity": "Rare", "loot": ["Aetheric Pelt", "Fragmented Aether"] },
-  { "name": "Mud Siren", "type": "Mud Creature", "abilityPoint": "Intelligence 6", "attack": "Siren Song", "damage": "2D6 Psychic", "hp": 142, "rarity": "Rare", "loot": ["Siren Scale", "Aetheric Shard"] },
-  { "name": "Aetheric Apparition", "type": "Aetheric Creature", "abilityPoint": "Dexterity 6", "attack": "Aethereal Swipe", "damage": "2D6", "hp": 131, "rarity": "Rare", "loot": ["Ghostly Remnant", "Aetheric Cloth"] },
-  { "name": "Steam Walker", "type": "Mechanism", "abilityPoint": "Strength 8", "attack": "Steam Blast", "damage": "2D10", "hp": 134, "rarity": "Rare", "loot": ["Gears", "Aether Engine"] },
-  { "name": "Rock Basilisk", "type": "Mud Creature", "abilityPoint": "Intelligence 6", "attack": "Stone Gaze", "damage": "2D10", "hp": 155, "rarity": "Rare", "loot": ["Basilisk Eye", "Stone Fragment"] },
-  { "name": "Steel Hound", "type": "Automation", "abilityPoint": "Strength 7", "attack": "Bite", "damage": "2D6", "hp": 118, "rarity": "Rare", "loot": ["Hound Processor", "Gear Box"] },
-  { "name": "Shifting Phantom", "type": "Aetheric Mutation", "abilityPoint": "Dexterity 7", "attack": "Phase Claw", "damage": "2D6", "hp": 133, "rarity": "Rare", "loot": ["Aether Veil", "Phantom Core"] },
-  { "name": "Flesh Weaver", "type": "Aetheric Mutation", "abilityPoint": "Dexterity 8", "attack": "Flesh Rip", "damage": "3D10", "hp": 139, "rarity": "Rare", "loot": ["Flesh Shard", "Aetheric Thread"] },
-  { "name": "Jade Serpent", "type": "Aetheric Mutation", "abilityPoint": "Dexterity 7", "attack": "Poison Strike", "damage": "2D10", "hp": 134, "rarity": "Rare", "loot": ["Serpent Scale", "Aether Poison"] },
-  { "name": "Mud Cyclops", "type": "Mud Creature", "abilityPoint": "Strength 8", "attack": "Eye Beam", "damage": "3D6", "hp": 140, "rarity": "Rare", "loot": ["Cyclops Eye", "Mudstone"] },
-  { "name": "Crystalline Entity", "type": "Aetheric Creature", "abilityPoint": "Intelligence 7", "attack": "Crystal Shard", "damage": "2D10", "hp": 134, "rarity": "Rare", "loot": ["Crystal Core", "Aetheric Gem"] },
-  { "name": "Aether Serpent", "type": "Aetheric Mutation", "abilityPoint": "Dexterity 6", "attack": "Electric Bite", "damage": "2D10", "hp": 130, "rarity": "Rare", "loot": ["Serpent Coil", "Aetheric Fang"] },
-  { "name": "Steam Golem", "type": "Automation", "abilityPoint": "Strength 8", "attack": "Steam Hammer", "damage": "3D6", "hp": 142, "rarity": "Rare", "loot": ["Steam Core", "Golem Fragment"] },
-  { "name": "Aetheric Harpy", "type": "Aetheric Creature", "abilityPoint": "Dexterity 6", "attack": "Shriek", "damage": "2D6 Psychic", "hp": 158, "rarity": "Rare", "loot": ["Harpy Feather", "Aether Wing"] },
-  { "name": "Clockwork Knight", "type": "Automation", "abilityPoint": "Strength 9", "attack": "Sword Slash", "damage": "3D6", "hp": 144, "rarity": "Rare", "loot": ["Knight Armor", "Clockwork Core"] },
-  { "name": "Mud Wraith", "type": "Mud Creature", "abilityPoint": "Dexterity 7", "attack": "Wraith Claw", "damage": "3D6 Aetheric", "hp": 102, "rarity": "Rare", "loot": ["Wraith Essence", "Mud Remains"] },
-  { "name": "Aetheric Ghost", "type": "Aetheric Creature", "abilityPoint": "Intelligence 5", "attack": "Possession", "damage": "2D6 Psychic", "hp": 126, "rarity": "Rare", "loot": ["Aetheric Fragment", "Spirit Cloth"] },
-  { "name": "Mud Ogre", "type": "Mud Creature", "abilityPoint": "Strength 7", "attack": "Club Smash", "damage": "3D10", "hp": 140, "rarity": "Rare", "loot": ["Ogre Club", "Mud Fragment"] },
-  { "name": "Stone Warden", "type": "Mechanism", "abilityPoint": "Strength 8", "attack": "Stone Punch", "damage": "3D6", "hp": 142, "rarity": "Rare", "loot": ["Warden Stone", "Aetheric Key"] },
-  { "name": "Golem Knight", "type": "Automation", "abilityPoint": "Strength 8", "attack": "Sword Strike", "damage": "3D6", "hp": 149, "rarity": "Rare", "loot": ["Golem Armor", "Aether Core"] },
-  { "name": "Aetheric Gargoyle", "type": "Aetheric Mutation", "abilityPoint": "Dexterity 6", "attack": "Stone Crush", "damage": "3D6", "hp": 135, "rarity": "Rare", "loot": ["Gargoyle Wing", "Aetheric Dust"] },
-  { "name": "Silt Horror", "type": "Mud Creature", "abilityPoint": "Strength 7", "attack": "Tentacle Whip", "damage": "2D10", "hp": 136, "rarity": "Rare", "loot": ["Horror Tendril", "Aetheric Slime"] },
-  { "name": "Aetheric Lion", "type": "Aetheric Creature", "abilityPoint": "Strength 7", "attack": "Roar", "damage": "3D6", "hp": 138, "rarity": "Rare", "loot": ["Lion Mane", "Aether Core"] },
-  { "name": "Mud Serpent", "type": "Mud Creature", "abilityPoint": "Dexterity 6", "attack": "Constrict", "damage": "2D10", "hp": 133, "rarity": "Rare", "loot": ["Serpent Fang", "Mud Essence"] },
-  { "name": "Aetheric Cyclops", "type": "Aetheric Mutation", "abilityPoint": "Intelligence 8", "attack": "Laser Beam", "damage": "3D10", "hp": 144, "rarity": "Rare", "loot": ["Cyclops Eye", "Aetheric Crystal"] },
-  { "name": "Steam Spider", "type": "Automation", "abilityPoint": "Strength 6", "attack": "Steam Burst", "damage": "2D6", "hp": 128, "rarity": "Rare", "loot": ["Steam Core", "Spider Legs"] },
-  { "name": "Aetheric Banshee", "type": "Aetheric Creature", "abilityPoint": "Intelligence 8", "attack": "Wail", "damage": "3D10 Psychic", "hp": 142, "rarity": "Rare", "loot": ["Banshee Wail", "Aetheric Hair"] },
-  { "name": "Mud Drake", "type": "Mud Creature", "abilityPoint": "Strength 7", "attack": "Mud Breath", "damage": "3D6", "hp": 138, "rarity": "Rare", "loot": ["Drake Scale", "Mud Fragment"] },
-  { "name": "Clockwork Serpent", "type": "Automation", "abilityPoint": "Dexterity 7", "attack": "Coil Crush", "damage": "3D6", "hp": 134, "rarity": "Rare", "loot": ["Serpent Gear", "Clockwork Core"] },
-  { "name": "Silt Guardian", "type": "Mud Creature", "abilityPoint": "Strength 6", "attack": "Earth Slam", "damage": "3D6", "hp": 132, "rarity": "Rare", "loot": ["Silt Heart", "Guardian Key"] },
-  { "name": "Aetheric Beast", "type": "Aetheric Creature", "abilityPoint": "Strength 7", "attack": "Aether Claw", "damage": "3D6", "hp": 136, "rarity": "Rare", "loot": ["Beast Fang", "Aether Fur"] },
-  { "name": "Architectural Sentinel", "type": "Automation", "abilityPoint": "Strength 9", "attack": "Laser Blast", "damage": "3D10", "hp": 245, "rarity": "Legendary", "loot": ["Sentinel Core", "Relic Shard"] },
-  { "name": "Mud Elemental", "type": "Mud Creature", "abilityPoint": "Strength 10", "attack": "Mud Quake", "damage": "4D6", "hp": 250, "rarity": "Legendary", "loot": ["Elemental Core", "Hardened Aether Mud"] },
-  { "name": "Aether Golem", "type": "Aetheric Creature", "abilityPoint": "Strength 9", "attack": "Aether Blast", "damage": "3D10", "hp": 248, "rarity": "Legendary", "loot": ["Aether Core", "Ancient Relic"] },
-  { "name": "Bog Dragon", "type": "Aetheric Creature", "abilityPoint": "Strength 10", "attack": "Breath Attack", "damage": "4D10", "hp": 255, "rarity": "Legendary", "loot": ["Dragon Scale", "Aetheric Breath"] },
-  { "name": "Metal Hydra", "type": "Automation", "abilityPoint": "Dexterity 9", "attack": "Multi-Headed Strike", "damage": "3D10", "hp": 250, "rarity": "Legendary", "loot": ["Hydra Core", "Aetheric Alloy"] },
-  { "name": "Storm Walker", "type": "Mechanism", "abilityPoint": "Strength 8", "attack": "Thunder Punch", "damage": "3D6", "hp": 240, "rarity": "Legendary", "loot": ["Thunder Core", "Aetheric Battery"] },
-  { "name": "Aetheric Wyvern", "type": "Aetheric Creature", "abilityPoint": "Strength 9", "attack": "Tail Swipe", "damage": "3D6", "hp": 245, "rarity": "Legendary", "loot": ["Wyvern Scale", "Aether Core"] },
-  { "name": "Mud Titan", "type": "Mud Creature", "abilityPoint": "Strength 10", "attack": "Ground Slam", "damage": "4D6", "hp": 260, "rarity": "Legendary", "loot": ["Titan Core", "Hardened Mudstone"] },
-  { "name": "Mech Sentinel", "type": "Automation", "abilityPoint": "Dexterity 9", "attack": "Beam Cannon", "damage": "3D10", "hp": 248, "rarity": "Legendary", "loot": ["Sentinel Gears", "Core Relic"] },
-  { "name": "Mud Elemental Spawn", "type": "Mud Creature", "abilityPoint": "Strength 9", "attack": "Mud Wave", "damage": "3D6", "hp": 244, "rarity": "Legendary", "loot": ["Aetheric Mud Heart", "Elemental Core"] },
-  { "name": "Obsidian Sentinel", "type": "Mechanism", "abilityPoint": "Strength 10", "attack": "Obsidian Strike", "damage": "4D6", "hp": 250, "rarity": "Legendary", "loot": ["Obsidian Shard", "Sentinel Core"] },
-  { "name": "Mud Monarch", "type": "Aetheric Mutation", "abilityPoint": "Intelligence 7", "attack": "Royal Slash", "damage": "3D6", "hp": 288, "rarity": "Legendary", "loot": ["Monarch Crown", "Aether Core"] },
-  { "name": "Stone Chimera", "type": "Mud Creature", "abilityPoint": "Strength 9", "attack": "Triple Attack", "damage": "4D6", "hp": 298, "rarity": "Legendary", "loot": ["Chimera Horn", "Aetheric Core"] },
-  { "name": "Iron Titan", "type": "Automation", "abilityPoint": "Strength 10", "attack": "Iron Fist", "damage": "4D10", "hp": 360, "rarity": "Legendary", "loot": ["Titan Armor", "Aether Shard"] },
-  { "name": "Mud Siren Queen", "type": "Mud Creature", "abilityPoint": "Intelligence 9", "attack": "Song of Despair", "damage": "4D6 Psychic", "hp": 352, "rarity": "Legendary", "loot": ["Aetheric Song", "Siren Crystal"] },
-  { "name": "Aetheric Guardian", "type": "Automation", "abilityPoint": "Intelligence 9", "attack": "Arcane Blast", "damage": "3D6", "hp": 345, "rarity": "Legendary", "loot": ["Guardian Core", "Aetheric Shield"] },
-  { "name": "Aetheric Phoenix", "type": "Aetheric Creature", "abilityPoint": "Dexterity 10", "attack": "Rebirth Flame", "damage": "4D10", "hp": 360, "rarity": "Legendary", "loot": ["Phoenix Feather", "Aether Core"] },
-  { "name": "Sludge Behemoth", "type": "Mud Creature", "abilityPoint": "Strength 8", "attack": "Quake Stomp", "damage": "3D10", "hp": 350, "rarity": "Legendary", "loot": ["Behemoth Horn", "Mud Gem"] },
-  { "name": "Aetheric Horror", "type": "Aetheric Mutation", "abilityPoint": "Intelligence 9", "attack": "Mind Flay", "damage": "4D6 Psychic", "hp": 346, "rarity": "Legendary", "loot": ["Horror Tendril", "Aether Core"] },
-  { "name": "Aetheric Minotaur", "type": "Aetheric Mutation", "abilityPoint": "Strength 9", "attack": "Axe Swing", "damage": "4D6", "hp": 344, "rarity": "Legendary", "loot": ["Minotaur Horn", "Aether Axe"] },
-  { "name": "Aetheric Leviathan", "type": "Aetheric Creature", "abilityPoint": "Strength 10", "attack": "Water Crush", "damage": "4D10", "hp": 358, "rarity": "Legendary", "loot": ["Leviathan Scale", "Aether Pearl"] },
-  { "name": "Mud Leviathan", "type": "Mud Creature", "abilityPoint": "Strength 9", "attack": "Wave Slam", "damage": "4D6", "hp": 354, "rarity": "Legendary", "loot": ["Leviathan Fang", "Mudstone"] },
-  { "name": "Aetheric Chimera", "type": "Aetheric Mutation", "abilityPoint": "Strength 10", "attack": "Multi-Strike", "damage": "4D6", "hp": 356, "rarity": "Legendary", "loot": ["Chimera Claw", "Aetheric Heart"] },
-  { "name": "Mud Demon", "type": "Mud Creature", "abilityPoint": "Strength 8", "attack": "Claw Slash", "damage": "3D10", "hp": 345, "rarity": "Legendary", "loot": ["Demon Core", "Mud Relic"] },
-  { "name": "Aetheric Kraken", "type": "Aetheric Mutation", "abilityPoint": "Strength 10", "attack": "Tentacle Smash", "damage": "4D10", "hp": 360, "rarity": "Legendary", "loot": ["Kraken Ink", "Aether Core"] },
-  { "name": "Mud Lich", "type": "Mud Creature", "abilityPoint": "Intelligence 9", "attack": "Dark Pulse", "damage": "3D10", "hp": 342, "rarity": "Legendary", "loot": ["Lich Robe", "Aether Skull"] },
-  { "name": "Mud Giant", "type": "Mud Creature", "abilityPoint": "Strength 10", "attack": "Stomp", "damage": "4D6", "hp": 360, "rarity": "Legendary", "loot": ["Giant's Club", "Mud Gem"] },
-  { "name": "Aetheric Necromancer", "type": "Aetheric Mutation", "abilityPoint": "Intelligence 9", "attack": "Life Drain", "damage": "3D10", "hp": 446, "rarity": "Legendary", "loot": ["Necromancer Staff", "Aetheric Scroll"] },
-  { "name": "Aetheric Behemoth", "type": "Aetheric Mutation", "abilityPoint": "Strength 10", "attack": "Aether Smash", "damage": "4D10", "hp": 458, "rarity": "Legendary", "loot": ["Behemoth Heart", "Aetheric Shard"] },
-  { "name": "Aetherkin", "type": "Etheric Undead", "abilityPoint": "Strength 7", "attack": "Etheric Burst", "damage": "3D6 Aetheric", "hp": 180, "rarity": "Rare", "loot": ["Aetherstone Fragment", "Veil of Peace"] },
-  { "name": "Reclaimer Ambusher", "type": "Human", "abilityPoint": "Dexterity 5", "attack": "Crossbow Volley", "damage": "1D6", "hp": 24, "rarity": "Uncommon", "loot": ["Bone Bolt", "Patched Cloth"] },
-  { "name": "Black Cloak Agent", "type": "Human", "abilityPoint": "Dexterity 6", "attack": "Concealed Blade", "damage": "2D6", "hp": 32, "rarity": "Rare", "loot": ["Aether Residue", "Patched Cloth"] }
+  {
+    "name": "Mud Boar",
+    "type": "Animal",
+    "abilityPoint": "Strength 4",
+    "attack": "Tusk Charge",
+    "damage": "2D6",
+    "hp": 20,
+    "rarity": "Common",
+    "loot": [
+      "Boar Hide",
+      "Aether Mud"
+    ]
+  },
+  {
+    "name": "Mud Wasp",
+    "type": "Animal",
+    "abilityPoint": "Dexterity 3",
+    "attack": "Poison Sting",
+    "damage": "1D6",
+    "hp": 10,
+    "rarity": "Common",
+    "loot": [
+      "Wasp Venom",
+      "Aether Residue"
+    ]
+  },
+  {
+    "name": "Swamp Crab",
+    "type": "Animal",
+    "abilityPoint": "Strength 2",
+    "attack": "Claw Pinch",
+    "damage": "1D6",
+    "hp": 15,
+    "rarity": "Common",
+    "loot": [
+      "Crab Meat",
+      "Swamp Shell"
+    ]
+  },
+  {
+    "name": "Gutter Rat",
+    "type": "Animal",
+    "abilityPoint": "Dexterity 2",
+    "attack": "Bite",
+    "damage": "1D6",
+    "hp": 8,
+    "rarity": "Common",
+    "loot": [
+      "Rat Fur",
+      "Disease Sample"
+    ]
+  },
+  {
+    "name": "Bog Hound",
+    "type": "Animal",
+    "abilityPoint": "Dexterity 3",
+    "attack": "Pack Attack",
+    "damage": "1D6",
+    "hp": 18,
+    "rarity": "Common",
+    "loot": [
+      "Hound Fur",
+      "Aetheric Teeth"
+    ]
+  },
+  {
+    "name": "Mudling",
+    "type": "Mud Creature",
+    "abilityPoint": "Dexterity 4",
+    "attack": "Mud Whip",
+    "damage": "1D6",
+    "hp": 18,
+    "rarity": "Common",
+    "loot": [
+      "Aetheric Sludge",
+      "Minor Relic"
+    ]
+  },
+  {
+    "name": "Aetheric Ooze",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Intelligence 3",
+    "attack": "Acidic Dissolve",
+    "damage": "1D10",
+    "hp": 12,
+    "rarity": "Common",
+    "loot": [
+      "Ooze Residue",
+      "Aether Crystal"
+    ]
+  },
+  {
+    "name": "Aetherbat",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Dexterity 3",
+    "attack": "Sonic Scream",
+    "damage": "1D6",
+    "hp": 15,
+    "rarity": "Common",
+    "loot": [
+      "Aetherwing",
+      "Crystalline Echo"
+    ]
+  },
+  {
+    "name": "Mud Strider",
+    "type": "Mud Creature",
+    "abilityPoint": "Dexterity 4",
+    "attack": "Spear Jab",
+    "damage": "2D6",
+    "hp": 20,
+    "rarity": "Common",
+    "loot": [
+      "Strider Leg",
+      "Aether Residue"
+    ]
+  },
+  {
+    "name": "Aetheric Leech",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Dexterity 4",
+    "attack": "Energy Drain",
+    "damage": "1D10 Aetheric",
+    "hp": 16,
+    "rarity": "Common",
+    "loot": [
+      "Aetheric Blood",
+      "Leech Mucus"
+    ]
+  },
+  {
+    "name": "Mud Tortoise",
+    "type": "Mud Creature",
+    "abilityPoint": "Strength 5",
+    "attack": "Shell Smash",
+    "damage": "2D6",
+    "hp": 25,
+    "rarity": "Common",
+    "loot": [
+      "Tortoise Shell",
+      "Mud Fragment"
+    ]
+  },
+  {
+    "name": "Aetheric Spider",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Dexterity 3",
+    "attack": "Web Trap",
+    "damage": "1D6",
+    "hp": 12,
+    "rarity": "Common",
+    "loot": [
+      "Spider Silk",
+      "Aether Venom"
+    ]
+  },
+  {
+    "name": "Scrap Drone",
+    "type": "Automation",
+    "abilityPoint": "Dexterity 3",
+    "attack": "Drill Arm",
+    "damage": "2D6",
+    "hp": 15,
+    "rarity": "Common",
+    "loot": [
+      "Drone Processor",
+      "Aetheric Cog"
+    ]
+  },
+  {
+    "name": "Aetheric Worm",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Dexterity 4",
+    "attack": "Acid Spit",
+    "damage": "2D6",
+    "hp": 18,
+    "rarity": "Common",
+    "loot": [
+      "Worm Mucus",
+      "Aether Acid"
+    ]
+  },
+  {
+    "name": "Mud Imp",
+    "type": "Mud Creature",
+    "abilityPoint": "Dexterity 3",
+    "attack": "Sneak Attack",
+    "damage": "1D6",
+    "hp": 14,
+    "rarity": "Common",
+    "loot": [
+      "Imp Horn",
+      "Aether Residue"
+    ]
+  },
+  {
+    "name": "Aetheric Slug",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Dexterity 3",
+    "attack": "Acid Trail",
+    "damage": "1D6",
+    "hp": 12,
+    "rarity": "Common",
+    "loot": [
+      "Slug Slime",
+      "Aetheric Residue"
+    ]
+  },
+  {
+    "name": "Mud Spider",
+    "type": "Mud Creature",
+    "abilityPoint": "Dexterity 4",
+    "attack": "Web Trap",
+    "damage": "2D6",
+    "hp": 18,
+    "rarity": "Common",
+    "loot": [
+      "Spider Silk",
+      "Mud Poison"
+    ]
+  },
+  {
+    "name": "Aetheric Raven",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Dexterity 4",
+    "attack": "Beak Peck",
+    "damage": "1D6",
+    "hp": 18,
+    "rarity": "Common",
+    "loot": [
+      "Raven Feather",
+      "Aether Wing"
+    ]
+  },
+  {
+    "name": "Mud Lurker",
+    "type": "Mud Creature",
+    "abilityPoint": "Strength 5",
+    "attack": "Mud Smash",
+    "damage": "2D6",
+    "hp": 25,
+    "rarity": "Uncommon",
+    "loot": [
+      "Aetheric Mud Fragment",
+      "Relic Key"
+    ]
+  },
+  {
+    "name": "Silt Serpent",
+    "type": "Mud Creature",
+    "abilityPoint": "Dexterity 5",
+    "attack": "Coil Crush",
+    "damage": "2D10",
+    "hp": 30,
+    "rarity": "Uncommon",
+    "loot": [
+      "Serpent Fang",
+      "Mud Essence"
+    ]
+  },
+  {
+    "name": "Aetheric Drone",
+    "type": "Automation",
+    "abilityPoint": "Dexterity 4",
+    "attack": "Laser Beam",
+    "damage": "2D6",
+    "hp": 44,
+    "rarity": "Uncommon",
+    "loot": [
+      "Drone Core",
+      "Energy Fragment"
+    ]
+  },
+  {
+    "name": "Silt Stalker",
+    "type": "Mud Creature",
+    "abilityPoint": "Dexterity 5",
+    "attack": "Quick Claw",
+    "damage": "2D6",
+    "hp": 38,
+    "rarity": "Uncommon",
+    "loot": [
+      "Stalker Hide",
+      "Silt Core"
+    ]
+  },
+  {
+    "name": "Mud Viper",
+    "type": "Animal",
+    "abilityPoint": "Dexterity 4",
+    "attack": "Venom Strike",
+    "damage": "2D6",
+    "hp": 51,
+    "rarity": "Uncommon",
+    "loot": [
+      "Viper Venom",
+      "Aetheric Fang"
+    ]
+  },
+  {
+    "name": "Dust Fiend",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Dexterity 5",
+    "attack": "Wind Slash",
+    "damage": "2D6",
+    "hp": 47,
+    "rarity": "Uncommon",
+    "loot": [
+      "Aetheric Dust",
+      "Tornado Core"
+    ]
+  },
+  {
+    "name": "Rust Lurker",
+    "type": "Automation",
+    "abilityPoint": "Dexterity 4",
+    "attack": "Claw Slash",
+    "damage": "2D6",
+    "hp": 55,
+    "rarity": "Uncommon",
+    "loot": [
+      "Rusted Parts",
+      "Scrap Metal"
+    ]
+  },
+  {
+    "name": "Bog Creeper",
+    "type": "Mud Creature",
+    "abilityPoint": "Dexterity 4",
+    "attack": "Vine Lash",
+    "damage": "2D6",
+    "hp": 58,
+    "rarity": "Uncommon",
+    "loot": [
+      "Creeper Vine",
+      "Aetheric Moss"
+    ]
+  },
+  {
+    "name": "Mud Hound Alpha",
+    "type": "Animal",
+    "abilityPoint": "Strength 5",
+    "attack": "Alpha Strike",
+    "damage": "2D6",
+    "hp": 60,
+    "rarity": "Uncommon",
+    "loot": [
+      "Alpha Fur",
+      "Aether Fang"
+    ]
+  },
+  {
+    "name": "Plague Moth",
+    "type": "Animal",
+    "abilityPoint": "Dexterity 3",
+    "attack": "Dust Cloud",
+    "damage": "1D6 Poison",
+    "hp": 51,
+    "rarity": "Uncommon",
+    "loot": [
+      "Moth Wing",
+      "Poison Dust"
+    ]
+  },
+  {
+    "name": "Aetheric Salamander",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Dexterity 5",
+    "attack": "Fire Breath",
+    "damage": "2D6",
+    "hp": 66,
+    "rarity": "Uncommon",
+    "loot": [
+      "Salamander Scale",
+      "Fire Essence"
+    ]
+  },
+  {
+    "name": "Aetheric Scarab",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Dexterity 4",
+    "attack": "Energy Spike",
+    "damage": "2D6",
+    "hp": 58,
+    "rarity": "Uncommon",
+    "loot": [
+      "Scarab Shell",
+      "Aether Gem"
+    ]
+  },
+  {
+    "name": "Aetheric Shrike",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Dexterity 5",
+    "attack": "Talon Slash",
+    "damage": "2D6",
+    "hp": 47,
+    "rarity": "Uncommon",
+    "loot": [
+      "Shrike Claw",
+      "Aether Feather"
+    ]
+  },
+  {
+    "name": "Iron Spider",
+    "type": "Automation",
+    "abilityPoint": "Dexterity 5",
+    "attack": "Metal Bite",
+    "damage": "2D6",
+    "hp": 39,
+    "rarity": "Uncommon",
+    "loot": [
+      "Iron Fangs",
+      "Spider Mechanism"
+    ]
+  },
+  {
+    "name": "Mud Spirit",
+    "type": "Mud Creature",
+    "abilityPoint": "Intelligence 5",
+    "attack": "Spirit Touch",
+    "damage": "2D6 Psychic",
+    "hp": 61,
+    "rarity": "Uncommon",
+    "loot": [
+      "Spirit Residue",
+      "Mud Essence"
+    ]
+  },
+  {
+    "name": "Mud Harpy",
+    "type": "Mud Creature",
+    "abilityPoint": "Dexterity 5",
+    "attack": "Claw Attack",
+    "damage": "2D6",
+    "hp": 76,
+    "rarity": "Uncommon",
+    "loot": [
+      "Harpy Feather",
+      "Mud Fragment"
+    ]
+  },
+  {
+    "name": "Shifting Shade",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Dexterity 6",
+    "attack": "Shadow Strike",
+    "damage": "2D6",
+    "hp": 100,
+    "rarity": "Rare",
+    "loot": [
+      "Aetheric Cloth",
+      "Shadow Core"
+    ]
+  },
+  {
+    "name": "Mud Golem",
+    "type": "Mud Creature",
+    "abilityPoint": "Strength 8",
+    "attack": "Slam",
+    "damage": "2D10",
+    "hp": 122,
+    "rarity": "Rare",
+    "loot": [
+      "Golem Core",
+      "Mudstone"
+    ]
+  },
+  {
+    "name": "Aetheric Hound",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Dexterity 7",
+    "attack": "Bite",
+    "damage": "2D10 Aetheric",
+    "hp": 115,
+    "rarity": "Rare",
+    "loot": [
+      "Aetheric Pelt",
+      "Fragmented Aether"
+    ]
+  },
+  {
+    "name": "Mud Siren",
+    "type": "Mud Creature",
+    "abilityPoint": "Intelligence 6",
+    "attack": "Siren Song",
+    "damage": "2D6 Psychic",
+    "hp": 142,
+    "rarity": "Rare",
+    "loot": [
+      "Siren Scale",
+      "Aetheric Shard"
+    ]
+  },
+  {
+    "name": "Aetheric Apparition",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Dexterity 6",
+    "attack": "Aethereal Swipe",
+    "damage": "2D6",
+    "hp": 131,
+    "rarity": "Rare",
+    "loot": [
+      "Ghostly Remnant",
+      "Aetheric Cloth"
+    ]
+  },
+  {
+    "name": "Steam Walker",
+    "type": "Mechanism",
+    "abilityPoint": "Strength 8",
+    "attack": "Steam Blast",
+    "damage": "2D10",
+    "hp": 134,
+    "rarity": "Rare",
+    "loot": [
+      "Gears",
+      "Aether Engine"
+    ]
+  },
+  {
+    "name": "Rock Basilisk",
+    "type": "Mud Creature",
+    "abilityPoint": "Intelligence 6",
+    "attack": "Stone Gaze",
+    "damage": "2D10",
+    "hp": 155,
+    "rarity": "Rare",
+    "loot": [
+      "Basilisk Eye",
+      "Stone Fragment"
+    ]
+  },
+  {
+    "name": "Steel Hound",
+    "type": "Automation",
+    "abilityPoint": "Strength 7",
+    "attack": "Bite",
+    "damage": "2D6",
+    "hp": 118,
+    "rarity": "Rare",
+    "loot": [
+      "Hound Processor",
+      "Gear Box"
+    ]
+  },
+  {
+    "name": "Shifting Phantom",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Dexterity 7",
+    "attack": "Phase Claw",
+    "damage": "2D6",
+    "hp": 133,
+    "rarity": "Rare",
+    "loot": [
+      "Aether Veil",
+      "Phantom Core"
+    ]
+  },
+  {
+    "name": "Flesh Weaver",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Dexterity 8",
+    "attack": "Flesh Rip",
+    "damage": "3D10",
+    "hp": 139,
+    "rarity": "Rare",
+    "loot": [
+      "Flesh Shard",
+      "Aetheric Thread"
+    ]
+  },
+  {
+    "name": "Jade Serpent",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Dexterity 7",
+    "attack": "Poison Strike",
+    "damage": "2D10",
+    "hp": 134,
+    "rarity": "Rare",
+    "loot": [
+      "Serpent Scale",
+      "Aether Poison"
+    ]
+  },
+  {
+    "name": "Mud Cyclops",
+    "type": "Mud Creature",
+    "abilityPoint": "Strength 8",
+    "attack": "Eye Beam",
+    "damage": "3D6",
+    "hp": 140,
+    "rarity": "Rare",
+    "loot": [
+      "Cyclops Eye",
+      "Mudstone"
+    ]
+  },
+  {
+    "name": "Crystalline Entity",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Intelligence 7",
+    "attack": "Crystal Shard",
+    "damage": "2D10",
+    "hp": 134,
+    "rarity": "Rare",
+    "loot": [
+      "Crystal Core",
+      "Aetheric Gem"
+    ]
+  },
+  {
+    "name": "Aether Serpent",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Dexterity 6",
+    "attack": "Electric Bite",
+    "damage": "2D10",
+    "hp": 130,
+    "rarity": "Rare",
+    "loot": [
+      "Serpent Coil",
+      "Aetheric Fang"
+    ]
+  },
+  {
+    "name": "Steam Golem",
+    "type": "Automation",
+    "abilityPoint": "Strength 8",
+    "attack": "Steam Hammer",
+    "damage": "3D6",
+    "hp": 142,
+    "rarity": "Rare",
+    "loot": [
+      "Steam Core",
+      "Golem Fragment"
+    ]
+  },
+  {
+    "name": "Aetheric Harpy",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Dexterity 6",
+    "attack": "Shriek",
+    "damage": "2D6 Psychic",
+    "hp": 158,
+    "rarity": "Rare",
+    "loot": [
+      "Harpy Feather",
+      "Aether Wing"
+    ]
+  },
+  {
+    "name": "Clockwork Knight",
+    "type": "Automation",
+    "abilityPoint": "Strength 9",
+    "attack": "Sword Slash",
+    "damage": "3D6",
+    "hp": 144,
+    "rarity": "Rare",
+    "loot": [
+      "Knight Armor",
+      "Clockwork Core"
+    ]
+  },
+  {
+    "name": "Mud Wraith",
+    "type": "Mud Creature",
+    "abilityPoint": "Dexterity 7",
+    "attack": "Wraith Claw",
+    "damage": "3D6 Aetheric",
+    "hp": 102,
+    "rarity": "Rare",
+    "loot": [
+      "Wraith Essence",
+      "Mud Remains"
+    ]
+  },
+  {
+    "name": "Aetheric Ghost",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Intelligence 5",
+    "attack": "Possession",
+    "damage": "2D6 Psychic",
+    "hp": 126,
+    "rarity": "Rare",
+    "loot": [
+      "Aetheric Fragment",
+      "Spirit Cloth"
+    ]
+  },
+  {
+    "name": "Mud Ogre",
+    "type": "Mud Creature",
+    "abilityPoint": "Strength 7",
+    "attack": "Club Smash",
+    "damage": "3D10",
+    "hp": 140,
+    "rarity": "Rare",
+    "loot": [
+      "Ogre Club",
+      "Mud Fragment"
+    ]
+  },
+  {
+    "name": "Stone Warden",
+    "type": "Mechanism",
+    "abilityPoint": "Strength 8",
+    "attack": "Stone Punch",
+    "damage": "3D6",
+    "hp": 142,
+    "rarity": "Rare",
+    "loot": [
+      "Warden Stone",
+      "Aetheric Key"
+    ]
+  },
+  {
+    "name": "Golem Knight",
+    "type": "Automation",
+    "abilityPoint": "Strength 8",
+    "attack": "Sword Strike",
+    "damage": "3D6",
+    "hp": 149,
+    "rarity": "Rare",
+    "loot": [
+      "Golem Armor",
+      "Aether Core"
+    ]
+  },
+  {
+    "name": "Aetheric Gargoyle",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Dexterity 6",
+    "attack": "Stone Crush",
+    "damage": "3D6",
+    "hp": 135,
+    "rarity": "Rare",
+    "loot": [
+      "Gargoyle Wing",
+      "Aetheric Dust"
+    ]
+  },
+  {
+    "name": "Silt Horror",
+    "type": "Mud Creature",
+    "abilityPoint": "Strength 7",
+    "attack": "Tentacle Whip",
+    "damage": "2D10",
+    "hp": 136,
+    "rarity": "Rare",
+    "loot": [
+      "Horror Tendril",
+      "Aetheric Slime"
+    ]
+  },
+  {
+    "name": "Aetheric Lion",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Strength 7",
+    "attack": "Roar",
+    "damage": "3D6",
+    "hp": 138,
+    "rarity": "Rare",
+    "loot": [
+      "Lion Mane",
+      "Aether Core"
+    ]
+  },
+  {
+    "name": "Mud Serpent",
+    "type": "Mud Creature",
+    "abilityPoint": "Dexterity 6",
+    "attack": "Constrict",
+    "damage": "2D10",
+    "hp": 133,
+    "rarity": "Rare",
+    "loot": [
+      "Serpent Fang",
+      "Mud Essence"
+    ]
+  },
+  {
+    "name": "Aetheric Cyclops",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Intelligence 8",
+    "attack": "Laser Beam",
+    "damage": "3D10",
+    "hp": 144,
+    "rarity": "Rare",
+    "loot": [
+      "Cyclops Eye",
+      "Aetheric Crystal"
+    ]
+  },
+  {
+    "name": "Steam Spider",
+    "type": "Automation",
+    "abilityPoint": "Strength 6",
+    "attack": "Steam Burst",
+    "damage": "2D6",
+    "hp": 128,
+    "rarity": "Rare",
+    "loot": [
+      "Steam Core",
+      "Spider Legs"
+    ]
+  },
+  {
+    "name": "Aetheric Banshee",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Intelligence 8",
+    "attack": "Wail",
+    "damage": "3D10 Psychic",
+    "hp": 142,
+    "rarity": "Rare",
+    "loot": [
+      "Banshee Wail",
+      "Aetheric Hair"
+    ]
+  },
+  {
+    "name": "Mud Drake",
+    "type": "Mud Creature",
+    "abilityPoint": "Strength 7",
+    "attack": "Mud Breath",
+    "damage": "3D6",
+    "hp": 138,
+    "rarity": "Rare",
+    "loot": [
+      "Drake Scale",
+      "Mud Fragment"
+    ]
+  },
+  {
+    "name": "Clockwork Serpent",
+    "type": "Automation",
+    "abilityPoint": "Dexterity 7",
+    "attack": "Coil Crush",
+    "damage": "3D6",
+    "hp": 134,
+    "rarity": "Rare",
+    "loot": [
+      "Serpent Gear",
+      "Clockwork Core"
+    ]
+  },
+  {
+    "name": "Silt Guardian",
+    "type": "Mud Creature",
+    "abilityPoint": "Strength 6",
+    "attack": "Earth Slam",
+    "damage": "3D6",
+    "hp": 132,
+    "rarity": "Rare",
+    "loot": [
+      "Silt Heart",
+      "Guardian Key"
+    ]
+  },
+  {
+    "name": "Aetheric Beast",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Strength 7",
+    "attack": "Aether Claw",
+    "damage": "3D6",
+    "hp": 136,
+    "rarity": "Rare",
+    "loot": [
+      "Beast Fang",
+      "Aether Fur"
+    ]
+  },
+  {
+    "name": "Architectural Sentinel",
+    "type": "Automation",
+    "abilityPoint": "Strength 9",
+    "attack": "Laser Blast",
+    "damage": "3D10",
+    "hp": 245,
+    "rarity": "Legendary",
+    "loot": [
+      "Sentinel Core",
+      "Relic Shard"
+    ]
+  },
+  {
+    "name": "Mud Elemental",
+    "type": "Mud Creature",
+    "abilityPoint": "Strength 10",
+    "attack": "Mud Quake",
+    "damage": "4D6",
+    "hp": 250,
+    "rarity": "Legendary",
+    "loot": [
+      "Elemental Core",
+      "Hardened Aether Mud"
+    ]
+  },
+  {
+    "name": "Aether Golem",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Strength 9",
+    "attack": "Aether Blast",
+    "damage": "3D10",
+    "hp": 248,
+    "rarity": "Legendary",
+    "loot": [
+      "Aether Core",
+      "Ancient Relic"
+    ]
+  },
+  {
+    "name": "Bog Dragon",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Strength 10",
+    "attack": "Breath Attack",
+    "damage": "4D10",
+    "hp": 255,
+    "rarity": "Legendary",
+    "loot": [
+      "Dragon Scale",
+      "Aetheric Breath"
+    ]
+  },
+  {
+    "name": "Metal Hydra",
+    "type": "Automation",
+    "abilityPoint": "Dexterity 9",
+    "attack": "Multi-Headed Strike",
+    "damage": "3D10",
+    "hp": 250,
+    "rarity": "Legendary",
+    "loot": [
+      "Hydra Core",
+      "Aetheric Alloy"
+    ]
+  },
+  {
+    "name": "Storm Walker",
+    "type": "Mechanism",
+    "abilityPoint": "Strength 8",
+    "attack": "Thunder Punch",
+    "damage": "3D6",
+    "hp": 240,
+    "rarity": "Legendary",
+    "loot": [
+      "Thunder Core",
+      "Aetheric Battery"
+    ]
+  },
+  {
+    "name": "Aetheric Wyvern",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Strength 9",
+    "attack": "Tail Swipe",
+    "damage": "3D6",
+    "hp": 245,
+    "rarity": "Legendary",
+    "loot": [
+      "Wyvern Scale",
+      "Aether Core"
+    ]
+  },
+  {
+    "name": "Mud Titan",
+    "type": "Mud Creature",
+    "abilityPoint": "Strength 10",
+    "attack": "Ground Slam",
+    "damage": "4D6",
+    "hp": 260,
+    "rarity": "Legendary",
+    "loot": [
+      "Titan Core",
+      "Hardened Mudstone"
+    ]
+  },
+  {
+    "name": "Mech Sentinel",
+    "type": "Automation",
+    "abilityPoint": "Dexterity 9",
+    "attack": "Beam Cannon",
+    "damage": "3D10",
+    "hp": 248,
+    "rarity": "Legendary",
+    "loot": [
+      "Sentinel Gears",
+      "Core Relic"
+    ]
+  },
+  {
+    "name": "Mud Elemental Spawn",
+    "type": "Mud Creature",
+    "abilityPoint": "Strength 9",
+    "attack": "Mud Wave",
+    "damage": "3D6",
+    "hp": 244,
+    "rarity": "Legendary",
+    "loot": [
+      "Aetheric Mud Heart",
+      "Elemental Core"
+    ]
+  },
+  {
+    "name": "Obsidian Sentinel",
+    "type": "Mechanism",
+    "abilityPoint": "Strength 10",
+    "attack": "Obsidian Strike",
+    "damage": "4D6",
+    "hp": 250,
+    "rarity": "Legendary",
+    "loot": [
+      "Obsidian Shard",
+      "Sentinel Core"
+    ]
+  },
+  {
+    "name": "Mud Monarch",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Intelligence 7",
+    "attack": "Royal Slash",
+    "damage": "3D6",
+    "hp": 288,
+    "rarity": "Legendary",
+    "loot": [
+      "Monarch Crown",
+      "Aether Core"
+    ]
+  },
+  {
+    "name": "Stone Chimera",
+    "type": "Mud Creature",
+    "abilityPoint": "Strength 9",
+    "attack": "Triple Attack",
+    "damage": "4D6",
+    "hp": 298,
+    "rarity": "Legendary",
+    "loot": [
+      "Chimera Horn",
+      "Aetheric Core"
+    ]
+  },
+  {
+    "name": "Iron Titan",
+    "type": "Automation",
+    "abilityPoint": "Strength 10",
+    "attack": "Iron Fist",
+    "damage": "4D10",
+    "hp": 360,
+    "rarity": "Legendary",
+    "loot": [
+      "Titan Armor",
+      "Aether Shard"
+    ]
+  },
+  {
+    "name": "Mud Siren Queen",
+    "type": "Mud Creature",
+    "abilityPoint": "Intelligence 9",
+    "attack": "Song of Despair",
+    "damage": "4D6 Psychic",
+    "hp": 352,
+    "rarity": "Legendary",
+    "loot": [
+      "Aetheric Song",
+      "Siren Crystal"
+    ]
+  },
+  {
+    "name": "Aetheric Guardian",
+    "type": "Automation",
+    "abilityPoint": "Intelligence 9",
+    "attack": "Arcane Blast",
+    "damage": "3D6",
+    "hp": 345,
+    "rarity": "Legendary",
+    "loot": [
+      "Guardian Core",
+      "Aetheric Shield"
+    ]
+  },
+  {
+    "name": "Aetheric Phoenix",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Dexterity 10",
+    "attack": "Rebirth Flame",
+    "damage": "4D10",
+    "hp": 360,
+    "rarity": "Legendary",
+    "loot": [
+      "Phoenix Feather",
+      "Aether Core"
+    ]
+  },
+  {
+    "name": "Sludge Behemoth",
+    "type": "Mud Creature",
+    "abilityPoint": "Strength 8",
+    "attack": "Quake Stomp",
+    "damage": "3D10",
+    "hp": 350,
+    "rarity": "Legendary",
+    "loot": [
+      "Behemoth Horn",
+      "Mud Gem"
+    ]
+  },
+  {
+    "name": "Aetheric Horror",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Intelligence 9",
+    "attack": "Mind Flay",
+    "damage": "4D6 Psychic",
+    "hp": 346,
+    "rarity": "Legendary",
+    "loot": [
+      "Horror Tendril",
+      "Aether Core"
+    ]
+  },
+  {
+    "name": "Aetheric Minotaur",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Strength 9",
+    "attack": "Axe Swing",
+    "damage": "4D6",
+    "hp": 344,
+    "rarity": "Legendary",
+    "loot": [
+      "Minotaur Horn",
+      "Aether Axe"
+    ]
+  },
+  {
+    "name": "Aetheric Leviathan",
+    "type": "Aetheric Creature",
+    "abilityPoint": "Strength 10",
+    "attack": "Water Crush",
+    "damage": "4D10",
+    "hp": 358,
+    "rarity": "Legendary",
+    "loot": [
+      "Leviathan Scale",
+      "Aether Pearl"
+    ]
+  },
+  {
+    "name": "Mud Leviathan",
+    "type": "Mud Creature",
+    "abilityPoint": "Strength 9",
+    "attack": "Wave Slam",
+    "damage": "4D6",
+    "hp": 354,
+    "rarity": "Legendary",
+    "loot": [
+      "Leviathan Fang",
+      "Mudstone"
+    ]
+  },
+  {
+    "name": "Aetheric Chimera",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Strength 10",
+    "attack": "Multi-Strike",
+    "damage": "4D6",
+    "hp": 356,
+    "rarity": "Legendary",
+    "loot": [
+      "Chimera Claw",
+      "Aetheric Heart"
+    ]
+  },
+  {
+    "name": "Mud Demon",
+    "type": "Mud Creature",
+    "abilityPoint": "Strength 8",
+    "attack": "Claw Slash",
+    "damage": "3D10",
+    "hp": 345,
+    "rarity": "Legendary",
+    "loot": [
+      "Demon Core",
+      "Mud Relic"
+    ]
+  },
+  {
+    "name": "Aetheric Kraken",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Strength 10",
+    "attack": "Tentacle Smash",
+    "damage": "4D10",
+    "hp": 360,
+    "rarity": "Legendary",
+    "loot": [
+      "Kraken Ink",
+      "Aether Core"
+    ]
+  },
+  {
+    "name": "Mud Lich",
+    "type": "Mud Creature",
+    "abilityPoint": "Intelligence 9",
+    "attack": "Dark Pulse",
+    "damage": "3D10",
+    "hp": 342,
+    "rarity": "Legendary",
+    "loot": [
+      "Lich Robe",
+      "Aether Skull"
+    ]
+  },
+  {
+    "name": "Mud Giant",
+    "type": "Mud Creature",
+    "abilityPoint": "Strength 10",
+    "attack": "Stomp",
+    "damage": "4D6",
+    "hp": 360,
+    "rarity": "Legendary",
+    "loot": [
+      "Giant's Club",
+      "Mud Gem"
+    ]
+  },
+  {
+    "name": "Aetheric Necromancer",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Intelligence 9",
+    "attack": "Life Drain",
+    "damage": "3D10",
+    "hp": 446,
+    "rarity": "Legendary",
+    "loot": [
+      "Necromancer Staff",
+      "Aetheric Scroll"
+    ]
+  },
+  {
+    "name": "Aetheric Behemoth",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Strength 10",
+    "attack": "Aether Smash",
+    "damage": "4D10",
+    "hp": 458,
+    "rarity": "Legendary",
+    "loot": [
+      "Behemoth Heart",
+      "Aetheric Shard"
+    ]
+  },
+  {
+    "name": "Aetherkin",
+    "type": "Etheric Undead",
+    "abilityPoint": "Strength 7",
+    "attack": "Etheric Burst",
+    "damage": "3D6 Aetheric",
+    "hp": 180,
+    "rarity": "Rare",
+    "loot": [
+      "Aetherstone Fragment",
+      "Veil of Peace"
+    ]
+  },
+  {
+    "name": "Reclaimer Ambusher",
+    "type": "Human",
+    "abilityPoint": "Dexterity 5",
+    "attack": "Crossbow Volley",
+    "damage": "1D6",
+    "hp": 24,
+    "rarity": "Uncommon",
+    "loot": [
+      "Bone Bolt",
+      "Patched Cloth"
+    ]
+  },
+  {
+    "name": "Black Cloak Agent",
+    "type": "Human",
+    "abilityPoint": "Dexterity 6",
+    "attack": "Concealed Blade",
+    "damage": "2D6",
+    "hp": 32,
+    "rarity": "Rare",
+    "loot": [
+      "Aether Residue",
+      "Patched Cloth"
+    ]
+  }
 ]

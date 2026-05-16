@@ -7,12 +7,30 @@
       "faction": "reclaimers_guild",
       "description": "A Reclaimer who knows the price of everything and the value of most things. Will trade you nearly anything for TC.",
       "offers": [
-        { "itemName": "Trail Rations", "price": 8 },
-        { "itemName": "Climbing Rope", "price": 12 },
-        { "itemName": "Aetheric Torch", "price": 25 },
-        { "itemName": "First Aid Kit", "price": 35 },
-        { "itemName": "Rusted Blade", "price": 30 },
-        { "itemName": "Patched Cloth", "price": 20 }
+        {
+          "itemName": "Trail Rations",
+          "price": 8
+        },
+        {
+          "itemName": "Climbing Rope",
+          "price": 12
+        },
+        {
+          "itemName": "Aetheric Torch",
+          "price": 25
+        },
+        {
+          "itemName": "First Aid Kit",
+          "price": 35
+        },
+        {
+          "itemName": "Rusted Blade",
+          "price": 30
+        },
+        {
+          "itemName": "Patched Cloth",
+          "price": 20
+        }
       ]
     },
     {
@@ -22,14 +40,38 @@
       "faction": "forgotten_order",
       "description": "A Forgotten Order scholar carrying relics and runecasters for the careful researcher. Speaks in long sentences.",
       "offers": [
-        { "itemName": "Aetheric Compass", "price": 80 },
-        { "itemName": "Aetheric Locket", "price": 45 },
-        { "itemName": "Pyric Wand", "price": 90 },
-        { "itemName": "Storm Rod", "price": 220 },
-        { "itemName": "Ceremonial Robes", "price": 110 },
-        { "itemName": "Runic Mantle", "price": 280 },
-        { "itemName": "Aetheric Diadem", "price": 130 },
-        { "itemName": "Rusted Band of Knowledge", "price": 60 }
+        {
+          "itemName": "Aetheric Compass",
+          "price": 80
+        },
+        {
+          "itemName": "Aetheric Locket",
+          "price": 45
+        },
+        {
+          "itemName": "Pyric Wand",
+          "price": 90
+        },
+        {
+          "itemName": "Storm Rod",
+          "price": 220
+        },
+        {
+          "itemName": "Ceremonial Robes",
+          "price": 110
+        },
+        {
+          "itemName": "Runic Mantle",
+          "price": 280
+        },
+        {
+          "itemName": "Aetheric Diadem",
+          "price": 130
+        },
+        {
+          "itemName": "Rusted Band of Knowledge",
+          "price": 60
+        }
       ]
     },
     {
@@ -39,12 +81,30 @@
       "faction": "true_tartarians",
       "description": "A subterranean quartermaster trading in heavier gear. Speaks little. Watches your hands.",
       "offers": [
-        { "itemName": "Tartarian Spear", "price": 150 },
-        { "itemName": "Aetheric Crystal Blade", "price": 180 },
-        { "itemName": "Bone Crossbow", "price": 160 },
-        { "itemName": "Mud-glass Scales", "price": 130 },
-        { "itemName": "Aetheric Vest", "price": 220 },
-        { "itemName": "Tartarian Stoneband", "price": 320 }
+        {
+          "itemName": "Tartarian Spear",
+          "price": 150
+        },
+        {
+          "itemName": "Aetheric Crystal Blade",
+          "price": 180
+        },
+        {
+          "itemName": "Bone Crossbow",
+          "price": 160
+        },
+        {
+          "itemName": "Mud-glass Scales",
+          "price": 130
+        },
+        {
+          "itemName": "Aetheric Vest",
+          "price": 220
+        },
+        {
+          "itemName": "Tartarian Stoneband",
+          "price": 320
+        }
       ]
     },
     {
@@ -54,11 +114,26 @@
       "faction": null,
       "description": "An unaffiliated traveller with a mixed pack. The prices are sometimes generous, sometimes not. Depends on the day.",
       "offers": [
-        { "itemName": "Trail Rations", "price": 6 },
-        { "itemName": "Aetheric Torch", "price": 22 },
-        { "itemName": "Mud-fist Wraps", "price": 18 },
-        { "itemName": "Salvaged Bow", "price": 40 },
-        { "itemName": "First Aid Kit", "price": 30 }
+        {
+          "itemName": "Trail Rations",
+          "price": 6
+        },
+        {
+          "itemName": "Aetheric Torch",
+          "price": 22
+        },
+        {
+          "itemName": "Mud-fist Wraps",
+          "price": 18
+        },
+        {
+          "itemName": "Salvaged Bow",
+          "price": 40
+        },
+        {
+          "itemName": "First Aid Kit",
+          "price": 30
+        }
       ]
     },
     {
@@ -68,11 +143,26 @@
       "faction": null,
       "description": "Friendly and talkative, Thalan walks the roadside outposts with a horse and a limited pack. Trades common weapons and tools, sometimes coin advice.",
       "offers": [
-        { "itemName": "Rusted Blade", "price": 28 },
-        { "itemName": "Mud-Stalker Leggings", "price": 55 },
-        { "itemName": "Mud-Lurker Boots", "price": 45 },
-        { "itemName": "Trail Rations", "price": 7 },
-        { "itemName": "Climbing Rope", "price": 10 }
+        {
+          "itemName": "Rusted Blade",
+          "price": 28
+        },
+        {
+          "itemName": "Mud-Stalker Leggings",
+          "price": 55
+        },
+        {
+          "itemName": "Mud-Lurker Boots",
+          "price": 45
+        },
+        {
+          "itemName": "Trail Rations",
+          "price": 7
+        },
+        {
+          "itemName": "Climbing Rope",
+          "price": 10
+        }
       ]
     },
     {
@@ -82,10 +172,22 @@
       "faction": "true_tartarians",
       "description": "A gruff, no-nonsense smith from the Tartarian Giant encampments. Specializes in durable armor for melee combatants.",
       "offers": [
-        { "itemName": "Rough-Hewn Chestplate", "price": 110 },
-        { "itemName": "Sentinel's Chestplate", "price": 280 },
-        { "itemName": "Aetheric Helm of Command", "price": 130 },
-        { "itemName": "Forgotten Leggings", "price": 95 }
+        {
+          "itemName": "Rough-Hewn Chestplate",
+          "price": 110
+        },
+        {
+          "itemName": "Sentinel's Chestplate",
+          "price": 280
+        },
+        {
+          "itemName": "Aetheric Helm of Command",
+          "price": 130
+        },
+        {
+          "itemName": "Forgotten Leggings",
+          "price": 95
+        }
       ]
     },
     {
@@ -95,10 +197,22 @@
       "faction": null,
       "description": "Secretive and suspicious, Velar deals out of the hidden Mud Dweller market. Sells light armor and rogue gear for those who prefer to be unseen.",
       "offers": [
-        { "itemName": "Echoing Steps Boots", "price": 220 },
-        { "itemName": "Mud-Stalker Leggings", "price": 60 },
-        { "itemName": "Reclaimer's Quick Band", "price": 140 },
-        { "itemName": "Reclaimer's Salvage Cap", "price": 35 }
+        {
+          "itemName": "Echoing Steps Boots",
+          "price": 220
+        },
+        {
+          "itemName": "Mud-Stalker Leggings",
+          "price": 60
+        },
+        {
+          "itemName": "Reclaimer's Quick Band",
+          "price": 140
+        },
+        {
+          "itemName": "Reclaimer's Salvage Cap",
+          "price": 35
+        }
       ]
     },
     {
@@ -108,10 +222,22 @@
       "faction": "forgotten_order",
       "description": "Kind and knowledgeable, Jorah keeps a stall at the Reclaimers' University. Focuses on wisdom-based items, scrolls, and staves.",
       "offers": [
-        { "itemName": "Minor Aetheric Amulet", "price": 50 },
-        { "itemName": "Mud-Seer's Hood", "price": 40 },
-        { "itemName": "Whisperer's Charm", "price": 35 },
-        { "itemName": "Aetheric Compass", "price": 75 }
+        {
+          "itemName": "Minor Aetheric Amulet",
+          "price": 50
+        },
+        {
+          "itemName": "Mud-Seer's Hood",
+          "price": 40
+        },
+        {
+          "itemName": "Whisperer's Charm",
+          "price": 35
+        },
+        {
+          "itemName": "Aetheric Compass",
+          "price": 75
+        }
       ]
     },
     {
@@ -121,10 +247,22 @@
       "faction": null,
       "description": "Chatty and cunning, Elara works the urban bazaars among the Unknowing Masses. Specializes in small tools and trinkets favored by the stealthy.",
       "offers": [
-        { "itemName": "Reclaimer's Quick Band", "price": 145 },
-        { "itemName": "Whisperer's Charm", "price": 40 },
-        { "itemName": "Climbing Rope", "price": 11 },
-        { "itemName": "First Aid Kit", "price": 32 }
+        {
+          "itemName": "Reclaimer's Quick Band",
+          "price": 145
+        },
+        {
+          "itemName": "Whisperer's Charm",
+          "price": 40
+        },
+        {
+          "itemName": "Climbing Rope",
+          "price": 11
+        },
+        {
+          "itemName": "First Aid Kit",
+          "price": 32
+        }
       ]
     },
     {
@@ -132,14 +270,32 @@
       "name": "Halem the Trader",
       "title": "General Goods",
       "faction": null,
-      "description": "Friendly and trustworthy, Halem runs the village trading post — basic weapons, food, potions, perfect for restocking before the road.",
+      "description": "Friendly and trustworthy, Halem runs the village trading post \u2014 basic weapons, food, potions, perfect for restocking before the road.",
       "offers": [
-        { "itemName": "Trail Rations", "price": 6 },
-        { "itemName": "Climbing Rope", "price": 10 },
-        { "itemName": "Aetheric Torch", "price": 22 },
-        { "itemName": "First Aid Kit", "price": 28 },
-        { "itemName": "Rusted Blade", "price": 26 },
-        { "itemName": "Patched Cloth", "price": 18 }
+        {
+          "itemName": "Trail Rations",
+          "price": 6
+        },
+        {
+          "itemName": "Climbing Rope",
+          "price": 10
+        },
+        {
+          "itemName": "Aetheric Torch",
+          "price": 22
+        },
+        {
+          "itemName": "First Aid Kit",
+          "price": 28
+        },
+        {
+          "itemName": "Rusted Blade",
+          "price": 26
+        },
+        {
+          "itemName": "Patched Cloth",
+          "price": 18
+        }
       ]
     },
     {
@@ -149,10 +305,22 @@
       "faction": "reclaimers_guild",
       "description": "Eccentric and energetic, Tarek runs a Reclaimer workshop full of half-finished gadgets. Carries golem parts and experimental gear.",
       "offers": [
-        { "itemName": "Golem Controller Ring", "price": 200 },
-        { "itemName": "Aetheric Compass", "price": 70 },
-        { "itemName": "Aetheric Torch", "price": 24 },
-        { "itemName": "Aether-Runner Boots", "price": 170 }
+        {
+          "itemName": "Golem Controller Ring",
+          "price": 200
+        },
+        {
+          "itemName": "Aetheric Compass",
+          "price": 70
+        },
+        {
+          "itemName": "Aetheric Torch",
+          "price": 24
+        },
+        {
+          "itemName": "Aether-Runner Boots",
+          "price": 170
+        }
       ]
     },
     {
@@ -160,13 +328,145 @@
       "name": "Felra Swiftfoot",
       "title": "Boot-Smith",
       "faction": null,
-      "description": "Friendly but sneaky, Felra peddles light armor and boots from a Mud Dweller hidden camp — anything that adds a little dexterity to a step.",
+      "description": "Friendly but sneaky, Felra peddles light armor and boots from a Mud Dweller hidden camp \u2014 anything that adds a little dexterity to a step.",
       "offers": [
-        { "itemName": "Mud-Lurker Boots", "price": 42 },
-        { "itemName": "Aether-Runner Boots", "price": 165 },
-        { "itemName": "Echoing Steps Boots", "price": 230 },
-        { "itemName": "Mud-Stalker Leggings", "price": 50 }
+        {
+          "itemName": "Mud-Lurker Boots",
+          "price": 42
+        },
+        {
+          "itemName": "Aether-Runner Boots",
+          "price": 165
+        },
+        {
+          "itemName": "Echoing Steps Boots",
+          "price": 230
+        },
+        {
+          "itemName": "Mud-Stalker Leggings",
+          "price": 50
+        }
       ]
+    },
+    {
+      "id": "korr_stonefoot",
+      "name": "Korr Stonefoot",
+      "title": "Heavy Weapons Dealer",
+      "faction": "mud_golems",
+      "location": "Mud Golem Stronghold",
+      "description": "Stoic and slow to trust. Carries large two-handed weapons and heavy armor pieces.",
+      "personality": "Stoic",
+      "offers": []
+    },
+    {
+      "id": "cassia_nightwind",
+      "name": "Cassia Nightwind",
+      "title": "Ranged Weapons Specialist",
+      "faction": "aetherborn",
+      "location": "Forest Trading Post",
+      "description": "Friendly but mysterious. Sells bows, crossbows, and projectiles, sometimes rare arrows or bolts.",
+      "personality": "Friendly",
+      "offers": []
+    },
+    {
+      "id": "odar_flameforge",
+      "name": "Odar Flameforge",
+      "title": "Fire-Weaponsmith",
+      "faction": "architectural_sentinels",
+      "location": "Forge City of the Sentinels",
+      "description": "Proud and loud. Known for crafting fire-imbued weapons and armor with fire resistance.",
+      "personality": "Proud",
+      "offers": []
+    },
+    {
+      "id": "silvan_the_quiet",
+      "name": "Silvan the Quiet",
+      "title": "Relic Dealer",
+      "faction": "aetherborn",
+      "location": "Aetherborn Temple",
+      "description": "Calm and quiet. Sells rare and unique magic-based items, often has relics or enchanted gear.",
+      "personality": "Calm",
+      "offers": []
+    },
+    {
+      "id": "bran_the_beastmaster",
+      "name": "Bran the Beastmaster",
+      "title": "Wilderness Outfitter",
+      "faction": "reclaimers_guild",
+      "location": "Wilderness Encampments",
+      "description": "Enthusiastic and passionate. Animal-handling gear, potions for mounts, unique animal accessories.",
+      "personality": "Enthusiastic",
+      "offers": []
+    },
+    {
+      "id": "vela_ironheart",
+      "name": "Vela Ironheart",
+      "title": "Melee Armorer",
+      "faction": "true_tartarians",
+      "location": "Tartarian Giant Fortress",
+      "description": "Stern and disciplined. High-quality swords, axes, and shields for melee fighters.",
+      "personality": "Stern",
+      "offers": []
+    },
+    {
+      "id": "mara_stoneskin",
+      "name": "Mara Stoneskin",
+      "title": "Earth-Gear Vendor",
+      "faction": "mud_golems",
+      "location": "Mud Golem Caves",
+      "description": "Warm but distrustful. Stone-infused weapons and armor, protection from earth-based hazards.",
+      "personality": "Warm",
+      "offers": []
+    },
+    {
+      "id": "yara_windcaller",
+      "name": "Yara the Windcaller",
+      "title": "Wind-Gear Dealer",
+      "faction": "aetherborn",
+      "location": "Aetherborn Floating City",
+      "description": "Soft-spoken and patient. Light armor and wind-imbued weapons that enhance movement and speed.",
+      "personality": "Patient",
+      "offers": []
+    },
+    {
+      "id": "zorin_nightblade",
+      "name": "Zorin Nightblade",
+      "title": "Exotic Weapons Dealer",
+      "faction": "unknowing_masses",
+      "location": "Dark Alleys",
+      "description": "Silent and mysterious. Rare and exotic weapons, including legendary and cursed items. Expensive and risky.",
+      "personality": "Mysterious",
+      "offers": []
+    },
+    {
+      "id": "kirin_spellweaver",
+      "name": "Kirin Spellweaver",
+      "title": "Arcane Gear Dealer",
+      "faction": "aetherborn",
+      "location": "Aetherborn Academy",
+      "description": "Wise and thoughtful. Magical staves, armor, and wands \u2014 often enchanted for magic users.",
+      "personality": "Wise",
+      "offers": []
+    },
+    {
+      "id": "drakos_mercenary",
+      "name": "Drakos the Mercenary",
+      "title": "Two-Handed Weapons Dealer",
+      "faction": "true_tartarians",
+      "location": "Mountain Fort",
+      "description": "Bold and aggressive. High-damage two-handed weapons, ideal for strength-based characters.",
+      "personality": "Bold",
+      "offers": []
+    },
+    {
+      "id": "nalren_frostgrip",
+      "name": "Nalren Frostgrip",
+      "title": "Frost-Gear Specialist",
+      "faction": "reclaimers_guild",
+      "location": "Frozen Outpost",
+      "description": "Cold and distant. Frost-imbued weapons and frost-resistant armor, rare but effective in cold environments.",
+      "personality": "Cold",
+      "offers": []
     }
   ]
 }

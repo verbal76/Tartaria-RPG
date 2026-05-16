@@ -12,7 +12,9 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   }
   const armor = findArmorByName(item.name);
   if (armor) {
-    return [armor.slot];
+    const equipSlots: EquipSlot[] = ['main','off','head','chest','legs','feet','amulet','ring'];
+    if (equipSlots.includes(armor.slot as EquipSlot)) return [armor.slot as EquipSlot];
+    return []; // cloak/hands slots not yet in the equip system
   }
   if (findAmuletByName(item.name)) return ['amulet'];
   if (findRingByName(item.name)) return ['ring'];

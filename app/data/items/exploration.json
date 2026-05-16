@@ -1,0 +1,898 @@
+[
+  {
+    "name": "Aetheric Torch",
+    "abilityReq": "Dexterity Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Unknowing Masses",
+    "tcBuy": 13,
+    "tags": [
+      "exploration",
+      "gear",
+      "common"
+    ],
+    "description": "Lasts 12 hours."
+  },
+  {
+    "name": "Advanced Aetheric Torch",
+    "abilityReq": "Dexterity Level 5",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "faction": "Forgotten Order",
+    "tcBuy": 18,
+    "tags": [
+      "exploration",
+      "gear",
+      "uncommon"
+    ],
+    "description": "Lasts 36 hours and resists storms."
+  },
+  {
+    "name": "Endless Aether Torch",
+    "abilityReq": "Wisdom Level 9",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Forgotten Order",
+    "tcBuy": 60,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Emits aura and repels wildlife."
+  },
+  {
+    "name": "Aetheric Beacon",
+    "abilityReq": "Intelligence Level 11",
+    "kind": "exploration",
+    "rarity": "Legendary",
+    "faction": "Aetheric Guild",
+    "tcBuy": 250,
+    "tags": [
+      "exploration",
+      "gear",
+      "legendary"
+    ],
+    "description": "Reveals hidden Aetheric fields and regenerates energy."
+  },
+  {
+    "name": "Climbing Gear",
+    "abilityReq": "Strength Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Reclaimers",
+    "tcBuy": 14,
+    "tags": [
+      "exploration",
+      "gear",
+      "common"
+    ],
+    "description": "Supports up to 200 lbs."
+  },
+  {
+    "name": "Alloy Grappler",
+    "abilityReq": "Dexterity Level 5",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "faction": "Reclaimers Guild",
+    "tcBuy": 22,
+    "tags": [
+      "exploration",
+      "gear",
+      "uncommon"
+    ],
+    "description": "Resists environmental wear."
+  },
+  {
+    "name": "Mag-Climb Kit",
+    "abilityReq": "Strength Level 9",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Forgotten Order",
+    "tcBuy": 80,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Adheres to metal surfaces."
+  },
+  {
+    "name": "Aether-Taether",
+    "abilityReq": "Dexterity Level 11",
+    "kind": "exploration",
+    "rarity": "Legendary",
+    "faction": "Aetheric Engineers",
+    "tcBuy": 300,
+    "tags": [
+      "exploration",
+      "gear",
+      "legendary"
+    ],
+    "description": "Phases through objects, unlimited range."
+  },
+  {
+    "name": "Mudwalker Boots",
+    "abilityReq": "Dexterity Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Mud Dwellers",
+    "tcBuy": 13,
+    "tags": [
+      "exploration",
+      "gear",
+      "common"
+    ],
+    "description": "Provides traction, resists slipping."
+  },
+  {
+    "name": "Mudwalker's Treads",
+    "abilityReq": "Dexterity Level 6",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "faction": "Mud Dwellers",
+    "tcBuy": 30,
+    "tags": [
+      "exploration",
+      "gear",
+      "uncommon"
+    ],
+    "description": "Reduces sinking in quicksand."
+  },
+  {
+    "name": "Aetheric Treads",
+    "abilityReq": "Dexterity Level 9",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Forgotten Order",
+    "tcBuy": 70,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Walk freely over quicksand, resist entrapment."
+  },
+  {
+    "name": "Aetheric Walkers",
+    "abilityReq": "Dexterity Level 11",
+    "kind": "exploration",
+    "rarity": "Legendary",
+    "faction": "Forgotten Order",
+    "tcBuy": 275,
+    "tags": [
+      "exploration",
+      "gear",
+      "legendary"
+    ],
+    "description": "Float over obstacles, avoid mud completely."
+  },
+  {
+    "name": "Signal Flare",
+    "abilityReq": "Dexterity Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Unknowing Masses",
+    "tcBuy": 15,
+    "tags": [
+      "exploration",
+      "gear",
+      "common"
+    ],
+    "description": "Bright, visible for 1 mile."
+  },
+  {
+    "name": "Aetheric Flare",
+    "abilityReq": "Dexterity Level 5",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "faction": "Reclaimers",
+    "tcBuy": 22,
+    "tags": [
+      "exploration",
+      "gear",
+      "uncommon"
+    ],
+    "description": "Visible up to 10 miles, lasts 30 minutes."
+  },
+  {
+    "name": "Aether Beacon",
+    "abilityReq": "Intelligence Level 10",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Forgotten Order",
+    "tcBuy": 75,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Lasts 24 hours, pierces storms and fog."
+  },
+  {
+    "name": "Dimensional Locator",
+    "abilityReq": "Wisdom Level 12",
+    "kind": "exploration",
+    "rarity": "Legendary",
+    "faction": "Aetheric Guild",
+    "tcBuy": 260,
+    "tags": [
+      "exploration",
+      "gear",
+      "legendary"
+    ],
+    "description": "Sends undetectable signals across dimensions."
+  },
+  {
+    "name": "Water Purifier",
+    "abilityReq": "Wisdom Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Unknowing Masses",
+    "tcBuy": 14,
+    "tags": [
+      "exploration",
+      "gear",
+      "common"
+    ],
+    "description": "Filters 50 gallons of water."
+  },
+  {
+    "name": "Aether-Stone Filter",
+    "abilityReq": "Wisdom Level 6",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "faction": "Mud Dwellers",
+    "tcBuy": 22,
+    "tags": [
+      "exploration",
+      "gear",
+      "uncommon"
+    ],
+    "description": "Filters 100 gallons, eliminates toxins."
+  },
+  {
+    "name": "Aetheric Purifier",
+    "abilityReq": "Intelligence Level 9",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Forgotten Order",
+    "tcBuy": 65,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Requires no maintenance, filters water indefinitely."
+  },
+  {
+    "name": "Aether Purifier",
+    "abilityReq": "Wisdom Level 11",
+    "kind": "exploration",
+    "rarity": "Legendary",
+    "faction": "Aetheric Guild",
+    "tcBuy": 230,
+    "tags": [
+      "exploration",
+      "gear",
+      "legendary"
+    ],
+    "description": "Generates clean water from moisture in the air."
+  },
+  {
+    "name": "Aether-Spark Starter",
+    "abilityReq": "Dexterity Level 5",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "faction": "Forgotten Order",
+    "tcBuy": 20,
+    "tags": [
+      "exploration",
+      "gear",
+      "uncommon"
+    ],
+    "description": "Starts fire in rain or wind."
+  },
+  {
+    "name": "Solar Firestone",
+    "abilityReq": "Intelligence Level 9",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Forgotten Order",
+    "tcBuy": 55,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Instant heat without flame."
+  },
+  {
+    "name": "Aetheric Flame Kit",
+    "abilityReq": "Wisdom Level 11",
+    "kind": "exploration",
+    "rarity": "Legendary",
+    "faction": "Aetheric Engineers",
+    "tcBuy": 190,
+    "tags": [
+      "exploration",
+      "gear",
+      "legendary"
+    ],
+    "description": "Sustained flame without fuel."
+  },
+  {
+    "name": "Basic Tent",
+    "abilityReq": "Wisdom Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Reclaimers",
+    "tcBuy": 14,
+    "tags": [
+      "exploration",
+      "gear",
+      "common"
+    ],
+    "description": "Weather-resistant, lightweight."
+  },
+  {
+    "name": "Aether-Woven Tent",
+    "abilityReq": "Wisdom Level 6",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "faction": "Mud Dwellers",
+    "tcBuy": 28,
+    "tags": [
+      "exploration",
+      "gear",
+      "uncommon"
+    ],
+    "description": "Shields from cold and moderate storms."
+  },
+  {
+    "name": "Aetheric Dome Tent",
+    "abilityReq": "Wisdom Level 9",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Forgotten Order",
+    "tcBuy": 68,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Aetheric shield, protects from storms."
+  },
+  {
+    "name": "Forcefield Shelter",
+    "abilityReq": "Intelligence Level 11",
+    "kind": "exploration",
+    "rarity": "Legendary",
+    "faction": "Aetheric Engineers",
+    "tcBuy": 210,
+    "tags": [
+      "exploration",
+      "gear",
+      "legendary"
+    ],
+    "description": "Creates a temperature-controlled force field."
+  },
+  {
+    "name": "Aether-Salve Kit",
+    "abilityReq": "Wisdom Level 5",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "faction": "Mud Dwellers",
+    "tcBuy": 26,
+    "tags": [
+      "exploration",
+      "gear",
+      "uncommon"
+    ],
+    "description": "Accelerates healing, minor wounds."
+  },
+  {
+    "name": "Regeneration Patch",
+    "abilityReq": "Wisdom Level 9",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Forgotten Order",
+    "tcBuy": 60,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Heals moderate injuries instantly."
+  },
+  {
+    "name": "Nano-Med Kit",
+    "abilityReq": "Intelligence Level 11",
+    "kind": "exploration",
+    "rarity": "Legendary",
+    "faction": "Aetheric Guild",
+    "tcBuy": 240,
+    "tags": [
+      "exploration",
+      "gear",
+      "legendary"
+    ],
+    "description": "Heals critical injuries, cures diseases overnight."
+  },
+  {
+    "name": "Mapping Device",
+    "abilityReq": "Intelligence Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Reclaimers",
+    "tcBuy": 14,
+    "tags": [
+      "exploration",
+      "gear",
+      "common"
+    ],
+    "description": "Standard paper maps, mechanical compass."
+  },
+  {
+    "name": "Aetheric Compass",
+    "abilityReq": "Intelligence Level 5",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "faction": "Forgotten Order",
+    "tcBuy": 22,
+    "tags": [
+      "exploration",
+      "gear",
+      "uncommon"
+    ],
+    "description": "Resistant to magnetic interference."
+  },
+  {
+    "name": "Auto-Mapper",
+    "abilityReq": "Intelligence Level 9",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Reclaimers Guild",
+    "tcBuy": 60,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Automatically maps surroundings while traveling."
+  },
+  {
+    "name": "Aetheric Nav-Core",
+    "abilityReq": "Intelligence Level 12",
+    "kind": "exploration",
+    "rarity": "Legendary",
+    "faction": "Aetheric Engineers",
+    "tcBuy": 270,
+    "tags": [
+      "exploration",
+      "gear",
+      "legendary"
+    ],
+    "description": "Predicts terrain, detects hidden paths."
+  },
+  {
+    "name": "Aether Goggles",
+    "abilityReq": "Dexterity Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Reclaimers",
+    "tcBuy": 13,
+    "tags": [
+      "exploration",
+      "gear",
+      "common"
+    ],
+    "description": "Light tint, enhances vision."
+  },
+  {
+    "name": "Nightvision Goggles",
+    "abilityReq": "Dexterity Level 6",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "faction": "Mud Dwellers",
+    "tcBuy": 28,
+    "tags": [
+      "exploration",
+      "gear",
+      "uncommon"
+    ],
+    "description": "Enhances vision in the dark."
+  },
+  {
+    "name": "Thermal Goggles",
+    "abilityReq": "Intelligence Level 9",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Forgotten Order",
+    "tcBuy": 60,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Detects heat signatures and Aetheric constructs."
+  },
+  {
+    "name": "Aether-Sight Goggles",
+    "abilityReq": "Intelligence Level 11",
+    "kind": "exploration",
+    "rarity": "Legendary",
+    "faction": "Aetheric Guild",
+    "tcBuy": 240,
+    "tags": [
+      "exploration",
+      "gear",
+      "legendary"
+    ],
+    "description": "Reveals Aetheric fields, hidden energies."
+  },
+  {
+    "name": "Breathing Apparatus",
+    "abilityReq": "Strength Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Reclaimers",
+    "tcBuy": 14,
+    "tags": [
+      "exploration",
+      "gear",
+      "common"
+    ],
+    "description": "Provides 1 hour of breathable air."
+  },
+  {
+    "name": "Aetheric Mask",
+    "abilityReq": "Wisdom Level 6",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "faction": "Mud Dwellers",
+    "tcBuy": 30,
+    "tags": [
+      "exploration",
+      "gear",
+      "uncommon"
+    ],
+    "description": "Provides 5 hours of air, filters toxins."
+  },
+  {
+    "name": "Aether Respirator",
+    "abilityReq": "Wisdom Level 9",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Forgotten Order",
+    "tcBuy": 65,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Functions underwater and in toxic environments."
+  },
+  {
+    "name": "Aetheric Lung",
+    "abilityReq": "Wisdom Level 12",
+    "kind": "exploration",
+    "rarity": "Legendary",
+    "faction": "Aetheric Engineers",
+    "tcBuy": 260,
+    "tags": [
+      "exploration",
+      "gear",
+      "legendary"
+    ],
+    "description": "Infinite breathable air underwater or in space."
+  },
+  {
+    "name": "Communicator",
+    "abilityReq": "Charisma Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Unknowing Masses",
+    "tcBuy": 13,
+    "tags": [
+      "exploration",
+      "gear",
+      "common"
+    ],
+    "description": "Short-range, 5 miles."
+  },
+  {
+    "name": "Aetheric Radio",
+    "abilityReq": "Charisma Level 6",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "faction": "Reclaimers Guild",
+    "tcBuy": 30,
+    "tags": [
+      "exploration",
+      "gear",
+      "uncommon"
+    ],
+    "description": "Range up to 100 miles, encrypted channels."
+  },
+  {
+    "name": "Aetheric Link",
+    "abilityReq": "Charisma Level 9",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Forgotten Order",
+    "tcBuy": 60,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Works across vast distances, immune to jamming."
+  },
+  {
+    "name": "Universal Communicator",
+    "abilityReq": "Charisma Level 12",
+    "kind": "exploration",
+    "rarity": "Legendary",
+    "faction": "Aetheric Guild",
+    "tcBuy": 290,
+    "tags": [
+      "exploration",
+      "gear",
+      "legendary"
+    ],
+    "description": "Communicates across dimensions, undetectable."
+  },
+  {
+    "name": "Surveying Tool",
+    "abilityReq": "Intelligence Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Reclaimers",
+    "tcBuy": 15,
+    "tags": [
+      "exploration",
+      "gear",
+      "common"
+    ],
+    "description": "Used for surveying terrain."
+  },
+  {
+    "name": "Aetheric Sextant",
+    "abilityReq": "Intelligence Level 6",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "faction": "Forgotten Order",
+    "tcBuy": 28,
+    "tags": [
+      "exploration",
+      "gear",
+      "uncommon"
+    ],
+    "description": "Maps local energy fields and terrain."
+  },
+  {
+    "name": "Auto-Surveyor",
+    "abilityReq": "Intelligence Level 9",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Reclaimers Guild",
+    "tcBuy": 60,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Charts terrain instantly."
+  },
+  {
+    "name": "Aetheric Analyzer",
+    "abilityReq": "Intelligence Level 11",
+    "kind": "exploration",
+    "rarity": "Legendary",
+    "faction": "Aetheric Engineers",
+    "tcBuy": 210,
+    "tags": [
+      "exploration",
+      "gear",
+      "legendary"
+    ],
+    "description": "Detects hidden rifts and Aetheric anomalies."
+  },
+  {
+    "name": "Golemstone Charm",
+    "abilityReq": "Wisdom Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Reclaimers",
+    "tcBuy": 14,
+    "tags": [
+      "exploration",
+      "gear",
+      "common"
+    ],
+    "description": "Wards off minor creatures."
+  },
+  {
+    "name": "Aetheric Charm",
+    "abilityReq": "Wisdom Level 5",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "faction": "Forgotten Order",
+    "tcBuy": 20,
+    "tags": [
+      "exploration",
+      "gear",
+      "uncommon"
+    ],
+    "description": "Generates minor protective shield."
+  },
+  {
+    "name": "Guardian Charm",
+    "abilityReq": "Wisdom Level 9",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Forgotten Order",
+    "tcBuy": 60,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Protects from Aetheric storms, lasts 1 hour."
+  },
+  {
+    "name": "Golem Guardian Charm",
+    "abilityReq": "Wisdom Level 12",
+    "kind": "exploration",
+    "rarity": "Legendary",
+    "faction": "Aetheric Engineers",
+    "tcBuy": 260,
+    "tags": [
+      "exploration",
+      "gear",
+      "legendary"
+    ],
+    "description": "Summons an Aetheric Golem for protection for 10 minutes."
+  },
+  {
+    "name": "Sky-Walker Harness",
+    "abilityReq": "Dexterity Level 5",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "faction": "Reclaimers",
+    "tcBuy": 30,
+    "tags": [
+      "exploration",
+      "gear",
+      "uncommon"
+    ],
+    "description": "Reduces fall damage by half."
+  },
+  {
+    "name": "Hover Harness",
+    "abilityReq": "Dexterity Level 9",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Forgotten Order",
+    "tcBuy": 65,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Floats 1 meter above ground, glides over terrain."
+  },
+  {
+    "name": "Aetheric Flight Harness",
+    "abilityReq": "Dexterity Level 12",
+    "kind": "exploration",
+    "rarity": "Legendary",
+    "faction": "Aetheric Engineers",
+    "tcBuy": 290,
+    "tags": [
+      "exploration",
+      "gear",
+      "legendary"
+    ],
+    "description": "Allows flight, ignores gravitational anomalies."
+  },
+  {
+    "name": "Aetheric Cloak",
+    "abilityReq": "Dexterity Level 9",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Forgotten Order",
+    "tcBuy": 68,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Provides stealth in Aetheric storms."
+  },
+  {
+    "name": "Stealth Hood",
+    "abilityReq": "Dexterity Level 6",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "faction": "Mud Dwellers",
+    "tcBuy": 28,
+    "tags": [
+      "exploration",
+      "gear",
+      "uncommon"
+    ],
+    "description": "Reduces visibility in fog and Aetheric disturbances."
+  },
+  {
+    "name": "Dimensional Pouch",
+    "abilityReq": "Intelligence Level 11",
+    "kind": "exploration",
+    "rarity": "Legendary",
+    "faction": "Aetheric Guild",
+    "tcBuy": 250,
+    "tags": [
+      "exploration",
+      "gear",
+      "legendary"
+    ],
+    "description": "Holds more than its physical size allows."
+  },
+  {
+    "name": "Anti-Aetheric Cloak",
+    "abilityReq": "Intelligence Level 9",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Forgotten Order",
+    "tcBuy": 60,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Blocks detection from Aetheric sensors."
+  },
+  {
+    "name": "Heat-Shield Gloves",
+    "abilityReq": "Dexterity Level 6",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "faction": "Mud Dwellers",
+    "tcBuy": 30,
+    "tags": [
+      "exploration",
+      "gear",
+      "uncommon"
+    ],
+    "description": "Resistant to high temperatures and Aetheric burns."
+  },
+  {
+    "name": "Aetheric Charge Packs",
+    "abilityReq": "Intelligence Level 9",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Forgotten Order",
+    "tcBuy": 65,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Restores energy to Aetheric cores."
+  },
+  {
+    "name": "Lightstone Amulet",
+    "abilityReq": "Wisdom Level 9",
+    "kind": "exploration",
+    "rarity": "Rare",
+    "faction": "Forgotten Order",
+    "tcBuy": 60,
+    "tags": [
+      "exploration",
+      "gear",
+      "rare"
+    ],
+    "description": "Emits light and repels shadow creatures."
+  }
+]

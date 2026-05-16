@@ -1,18 +1,7942 @@
 {
   "armor": [
-    { "name": "Mud-Seer's Hood", "slot": "head", "acBonus": 1, "resistances": [], "statBonus": { "stat": "wisdom", "amount": 1 }, "rarity": "Common", "baseDurability": 25, "tags": ["armor", "head", "cloth"], "description": "A cloth hood woven with Aetheric thread. Sharpens the wearer's intuition." },
-    { "name": "Aetheric Helm of Command", "slot": "head", "acBonus": 1, "resistances": ["aetheric"], "statBonus": { "stat": "intelligence", "amount": 1 }, "rarity": "Uncommon", "baseDurability": 35, "tags": ["armor", "head", "helm", "aether"], "description": "A Tartarian command helm of dark steel and Aetherstone. Steadies the channeller's hand." },
-    { "name": "Reclaimer's Salvage Cap", "slot": "head", "acBonus": 1, "resistances": [], "rarity": "Common", "baseDurability": 25, "tags": ["armor", "head", "leather"], "description": "A scuffed leather cap with extra padding around the temples." },
-    { "name": "Rough-Hewn Chestplate", "slot": "chest", "acBonus": 2, "resistances": ["slashing"], "rarity": "Common", "baseDurability": 40, "tags": ["armor", "chest", "plate"], "description": "Hammered iron plate. Crude, heavy, effective." },
-    { "name": "Sentinel's Chestplate", "slot": "chest", "acBonus": 3, "resistances": ["piercing", "slashing"], "rarity": "Rare", "baseDurability": 60, "tags": ["armor", "chest", "plate", "sentinel"], "description": "Salvaged Sentinel plating. Remembers how to stand even when the wearer doesn't." },
-    { "name": "Aetheric Vest", "slot": "chest", "acBonus": 2, "resistances": ["aetheric"], "rarity": "Uncommon", "baseDurability": 45, "tags": ["armor", "chest", "aether"], "description": "A vest panelled with Aetherstone slabs. Hums softly when Aether is near." },
-    { "name": "Ceremonial Robes", "slot": "chest", "acBonus": 1, "resistances": [], "statBonus": { "stat": "intelligence", "amount": 1 }, "rarity": "Uncommon", "baseDurability": 35, "tags": ["armor", "chest", "cloth", "runic"], "description": "Robes embroidered with old Tartarian sigils. Quickens the runecasting hand." },
-    { "name": "Mud-Stalker Leggings", "slot": "legs", "acBonus": 1, "resistances": [], "statBonus": { "stat": "dexterity", "amount": 1 }, "rarity": "Common", "baseDurability": 30, "tags": ["armor", "legs", "leather"], "description": "Tight leather leggings made for moving through silt without sucking sound." },
-    { "name": "Forgotten Leggings", "slot": "legs", "acBonus": 2, "resistances": ["degradation"], "rarity": "Uncommon", "baseDurability": 40, "tags": ["armor", "legs", "scaled"], "description": "Scaled leggings recovered from a Forgotten Order cache." },
-    { "name": "Mud-Lurker Boots", "slot": "feet", "acBonus": 1, "resistances": [], "statBonus": { "stat": "dexterity", "amount": 1 }, "rarity": "Common", "baseDurability": 25, "tags": ["armor", "feet", "leather"], "description": "Soft-soled boots, treated against mud and Aetheric runoff." },
-    { "name": "Echoing Steps Boots", "slot": "feet", "acBonus": 1, "resistances": [], "statBonus": { "stat": "dexterity", "amount": 2 }, "rarity": "Rare", "baseDurability": 40, "tags": ["armor", "feet", "stealth"], "description": "Boots for silent movement in ruins. Even Aetherstone strains to hear them." },
-    { "name": "Aether-Runner Boots", "slot": "feet", "acBonus": 1, "resistances": ["aetheric"], "statBonus": { "stat": "dexterity", "amount": 1 }, "rarity": "Uncommon", "baseDurability": 35, "tags": ["armor", "feet", "aether"], "description": "Boots threaded with Aetheric soles. The ground feels different underfoot." },
-    { "name": "Runic Mantle", "slot": "chest", "acBonus": 2, "resistances": ["aetheric"], "statBonus": { "stat": "intelligence", "amount": 2 }, "rarity": "Rare", "baseDurability": 50, "tags": ["armor", "chest", "cloth", "runic"], "description": "A Forgotten Order mantle embroidered with active runes. Channels Aetheric current along the spine." },
-    { "name": "Mud-glass Scales", "slot": "chest", "acBonus": 2, "resistances": ["slashing", "piercing"], "rarity": "Uncommon", "baseDurability": 50, "tags": ["armor", "chest", "scaled", "tartarian"], "description": "Overlapping shards of mud-glass set into a leather backing. True Tartarian field kit — heavy but quiet." }
+    {
+      "name": "Mud-Seer's Hood",
+      "slot": "head",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "mud_dwellers"
+      ],
+      "description": "Mud-Seer's Hood. Common head armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Shaman's Mud Helm",
+      "slot": "head",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "mud_dwellers"
+      ],
+      "description": "Shaman's Mud Helm. Common head armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Spirit-Caller's Helm",
+      "slot": "head",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 2
+        },
+        {
+          "stat": "stealth",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "mud_dwellers"
+      ],
+      "description": "Spirit-Caller's Helm. Uncommon head armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Aether-Seeker's Hood",
+      "slot": "head",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 3
+        },
+        {
+          "stat": "wisdom",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "mud_dwellers"
+      ],
+      "description": "Aether-Seeker's Hood. Rare head armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Crown of the Deep",
+      "slot": "head",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 4
+        },
+        {
+          "stat": "intelligence",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "mud_dwellers"
+      ],
+      "description": "Crown of the Deep. Legendary head armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Aetheric Helm of Command",
+      "slot": "head",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 7,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "tartarian_giants"
+      ],
+      "description": "Aetheric Helm of Command. Common head armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Titan's Forehead Guard",
+      "slot": "head",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "tartarian_giants"
+      ],
+      "description": "Titan's Forehead Guard. Common head armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Architect's Crown",
+      "slot": "head",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 2
+        },
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "tartarian_giants"
+      ],
+      "description": "Architect's Crown. Uncommon head armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Helm of the Great Architect",
+      "slot": "head",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 3
+        },
+        {
+          "stat": "aetheria",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "tartarian_giants"
+      ],
+      "description": "Helm of the Great Architect. Rare head armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Aetheric Crown of the Giants",
+      "slot": "head",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 4
+        },
+        {
+          "stat": "strength",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "tartarian_giants"
+      ],
+      "description": "Aetheric Crown of the Giants. Legendary head armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Reclaimer's Salvage Cap",
+      "slot": "head",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "investigation",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "investigation",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "reclaimers"
+      ],
+      "description": "Reclaimer's Salvage Cap. Common head armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Explorer's Worn Headgear",
+      "slot": "head",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "reclaimers"
+      ],
+      "description": "Explorer's Worn Headgear. Common head armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Salvager's Intuition Band",
+      "slot": "head",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "investigation",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "investigation",
+          "amount": 2
+        },
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "reclaimers"
+      ],
+      "description": "Salvager's Intuition Band. Uncommon head armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Forgotten Heir's Crown",
+      "slot": "head",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 3
+        },
+        {
+          "stat": "investigation",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "reclaimers"
+      ],
+      "description": "Forgotten Heir's Crown. Rare head armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Relic Seeker's Crown",
+      "slot": "head",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 4
+        },
+        {
+          "stat": "charisma",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "reclaimers"
+      ],
+      "description": "Relic Seeker's Crown. Legendary head armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Sentinel's Repair Cap",
+      "slot": "head",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "architectural_sentinels"
+      ],
+      "description": "Sentinel's Repair Cap. Common head armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Architect's Observer Visor",
+      "slot": "head",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "architectural_sentinels"
+      ],
+      "description": "Architect's Observer Visor. Common head armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Architect's Sight Enhancer",
+      "slot": "head",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 2
+        },
+        {
+          "stat": "aetheria",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "architectural_sentinels"
+      ],
+      "description": "Architect's Sight Enhancer. Uncommon head armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Aetheric Analyzer Helm",
+      "slot": "head",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 3
+        },
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "architectural_sentinels"
+      ],
+      "description": "Aetheric Analyzer Helm. Rare head armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Sentinel King's Visor",
+      "slot": "head",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 4
+        },
+        {
+          "stat": "dexterity",
+          "amount": 2
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "architectural_sentinels"
+      ],
+      "description": "Sentinel King's Visor. Legendary head armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Rusted Band of Knowledge",
+      "slot": "head",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 7,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "mud_golems"
+      ],
+      "description": "Rusted Band of Knowledge. Common head armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Stone Seeker's Brow Guard",
+      "slot": "head",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "mud_golems"
+      ],
+      "description": "Stone Seeker's Brow Guard. Common head armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Golem-Wielder's Helm",
+      "slot": "head",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 2
+        },
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "mud_golems"
+      ],
+      "description": "Golem-Wielder's Helm. Uncommon head armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Stone Guardian's Headpiece",
+      "slot": "head",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 3
+        },
+        {
+          "stat": "aetheria",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "mud_golems"
+      ],
+      "description": "Stone Guardian's Headpiece. Rare head armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Crown of the Golem King",
+      "slot": "head",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 4
+        },
+        {
+          "stat": "dexterity",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "mud_golems"
+      ],
+      "description": "Crown of the Golem King. Legendary head armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Aetheric Diadem",
+      "slot": "head",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 7,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "aetherborn"
+      ],
+      "description": "Aetheric Diadem. Common head armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Arcane Observer's Circlet",
+      "slot": "head",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "aetherborn"
+      ],
+      "description": "Arcane Observer's Circlet. Common head armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Aether-Seeker's Cap",
+      "slot": "head",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 2
+        },
+        {
+          "stat": "charisma",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "aetherborn"
+      ],
+      "description": "Aether-Seeker's Cap. Uncommon head armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Crown of the Aether Lords",
+      "slot": "head",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 3
+        },
+        {
+          "stat": "aetheria",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "aetherborn"
+      ],
+      "description": "Crown of the Aether Lords. Rare head armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Arcane King's Diadem",
+      "slot": "head",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 4
+        },
+        {
+          "stat": "charisma",
+          "amount": 2
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "aetherborn"
+      ],
+      "description": "Arcane King's Diadem. Legendary head armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Memory Weaver's Hood",
+      "slot": "head",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "unknowing_masses"
+      ],
+      "description": "Memory Weaver's Hood. Common head armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Thought-Crafter's Headpiece",
+      "slot": "head",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "unknowing_masses"
+      ],
+      "description": "Thought-Crafter's Headpiece. Common head armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Observer's Hat of the Past",
+      "slot": "head",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 2
+        },
+        {
+          "stat": "aetheria",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "unknowing_masses"
+      ],
+      "description": "Observer's Hat of the Past. Uncommon head armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Ancient Seeker's Crown",
+      "slot": "head",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 3
+        },
+        {
+          "stat": "dexterity",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "unknowing_masses"
+      ],
+      "description": "Ancient Seeker's Crown. Rare head armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Crown of Lost Knowledge",
+      "slot": "head",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 4
+        },
+        {
+          "stat": "strength",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "head",
+        "cloth",
+        "helmet",
+        "unknowing_masses"
+      ],
+      "description": "Crown of Lost Knowledge. Legendary head armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Mud-Walker Mask",
+      "slot": "head",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "mud_dwellers"
+      ],
+      "description": "Mud-Walker Mask. Common head armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Mask of the Mud Stalker",
+      "slot": "head",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "charisma",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "charisma",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "mud_dwellers"
+      ],
+      "description": "Mask of the Mud Stalker. Common head armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Shaman's Veil of Secrets",
+      "slot": "head",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "stealth",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "mud_dwellers"
+      ],
+      "description": "Shaman's Veil of Secrets. Uncommon head armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Face of the Ancient Walker",
+      "slot": "head",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "charisma",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "mud_dwellers"
+      ],
+      "description": "Face of the Ancient Walker. Rare head armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Crown Mask of the Mud King",
+      "slot": "head",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "charisma",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "mud_dwellers"
+      ],
+      "description": "Crown Mask of the Mud King. Legendary head armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Titan's Guard Mask",
+      "slot": "head",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "tartarian_giants"
+      ],
+      "description": "Titan's Guard Mask. Common head armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Diplomat's Mask of the Giants",
+      "slot": "head",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "charisma",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "charisma",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "tartarian_giants"
+      ],
+      "description": "Diplomat's Mask of the Giants. Common head armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Mask of the Guardian Titan",
+      "slot": "head",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "tartarian_giants"
+      ],
+      "description": "Mask of the Guardian Titan. Uncommon head armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Helm of the Titan King",
+      "slot": "head",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "constitution",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "tartarian_giants"
+      ],
+      "description": "Helm of the Titan King. Rare head armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Mask of the Aether Lords",
+      "slot": "head",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "charisma",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "charisma",
+          "amount": 4
+        },
+        {
+          "stat": "dexterity",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "tartarian_giants"
+      ],
+      "description": "Mask of the Aether Lords. Legendary head armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Reclaimer's Mask",
+      "slot": "head",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "charisma",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "charisma",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "reclaimers"
+      ],
+      "description": "Reclaimer's Mask. Common head armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Salvager's Mask of Secrets",
+      "slot": "head",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "reclaimers"
+      ],
+      "description": "Salvager's Mask of Secrets. Common head armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Relic Hunter's Veil",
+      "slot": "head",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "charisma",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "reclaimers"
+      ],
+      "description": "Relic Hunter's Veil. Uncommon head armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Forgotten Seeker's Mask",
+      "slot": "head",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "investigation",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "reclaimers"
+      ],
+      "description": "Forgotten Seeker's Mask. Rare head armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Mask of the Relic King",
+      "slot": "head",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "charisma",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "charisma",
+          "amount": 4
+        },
+        {
+          "stat": "dexterity",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "reclaimers"
+      ],
+      "description": "Mask of the Relic King. Legendary head armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Sentinel's Faceguard",
+      "slot": "head",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "architectural_sentinels"
+      ],
+      "description": "Sentinel's Faceguard. Common head armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Architect's Mask of Vision",
+      "slot": "head",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "charisma",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "charisma",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "architectural_sentinels"
+      ],
+      "description": "Architect's Mask of Vision. Common head armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Mask of the Forgotten Gaze",
+      "slot": "head",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "stealth",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "architectural_sentinels"
+      ],
+      "description": "Mask of the Forgotten Gaze. Uncommon head armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Aether Mask of the Sentinel",
+      "slot": "head",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "strength",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "architectural_sentinels"
+      ],
+      "description": "Aether Mask of the Sentinel. Rare head armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Guardian Mask of the Architects",
+      "slot": "head",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "constitution",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "architectural_sentinels"
+      ],
+      "description": "Guardian Mask of the Architects. Legendary head armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Rough Hewn Mask",
+      "slot": "head",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "mud_golems"
+      ],
+      "description": "Rough Hewn Mask. Common head armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Golem-Born Guardian Mask",
+      "slot": "head",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "charisma",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "charisma",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "mud_golems"
+      ],
+      "description": "Golem-Born Guardian Mask. Common head armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Mask of the Stoneborn",
+      "slot": "head",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "mud_golems"
+      ],
+      "description": "Mask of the Stoneborn. Uncommon head armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Aetheric Golem's Faceplate",
+      "slot": "head",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "wisdom",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "mud_golems"
+      ],
+      "description": "Aetheric Golem's Faceplate. Rare head armor from the Mud Golems tradition."
+    },
+    {
+      "name": "The face of the Golem King",
+      "slot": "head",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "strength",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "mud_golems"
+      ],
+      "description": "The face of the Golem King. Legendary head armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Aetherbound Mask",
+      "slot": "head",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "charisma",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "charisma",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 7,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "aetherborn"
+      ],
+      "description": "Aetherbound Mask. Common head armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Seer's Veil of the Aether",
+      "slot": "head",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "aetherborn"
+      ],
+      "description": "Seer's Veil of the Aether. Common head armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Mask of the Aether Seeker",
+      "slot": "head",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "charisma",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "charisma",
+          "amount": 2
+        },
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "aetherborn"
+      ],
+      "description": "Mask of the Aether Seeker. Uncommon head armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Aether-Warrior's Veil",
+      "slot": "head",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "charisma",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "aetherborn"
+      ],
+      "description": "Aether-Warrior's Veil. Rare head armor from the Aetherborn tradition."
+    },
+    {
+      "name": "King's Mask of the Aetherborn",
+      "slot": "head",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "charisma",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "aetherborn"
+      ],
+      "description": "King's Mask of the Aetherborn. Legendary head armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Forgotten Faceshroud",
+      "slot": "head",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "charisma",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "charisma",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "unknowing_masses"
+      ],
+      "description": "Forgotten Faceshroud. Common head armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Wanderer's Face of Shadows",
+      "slot": "head",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "unknowing_masses"
+      ],
+      "description": "Wanderer's Face of Shadows. Common head armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Mask of the Forgotten One",
+      "slot": "head",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "charisma",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "unknowing_masses"
+      ],
+      "description": "Mask of the Forgotten One. Uncommon head armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Mask of the Shadow Lord",
+      "slot": "head",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "stealth",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "unknowing_masses"
+      ],
+      "description": "Mask of the Shadow Lord. Rare head armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Mask of the Last Ruler",
+      "slot": "head",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "charisma",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "charisma",
+          "amount": 4
+        },
+        {
+          "stat": "dexterity",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "face",
+        "unknowing_masses"
+      ],
+      "description": "Mask of the Last Ruler. Legendary head armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Mud-Warden's Vest",
+      "slot": "chest",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "mud_dwellers"
+      ],
+      "description": "Mud-Warden's Vest. Common chest armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Mud-Encrusted Armor",
+      "slot": "chest",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "mud_dwellers"
+      ],
+      "description": "Mud-Encrusted Armor. Common chest armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Shaman's Mud Plate",
+      "slot": "chest",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 2
+        },
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 22,
+      "tcSell": 8,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "mud_dwellers"
+      ],
+      "description": "Shaman's Mud Plate. Uncommon chest armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Aether-Woven Mud Plate",
+      "slot": "chest",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 3
+        },
+        {
+          "stat": "strength",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 45,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "mud_dwellers"
+      ],
+      "description": "Aether-Woven Mud Plate. Rare chest armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Armor of the Mud King",
+      "slot": "chest",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 4
+        },
+        {
+          "stat": "strength",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 60,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "mud_dwellers"
+      ],
+      "description": "Armor of the Mud King. Legendary chest armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Aetheric Chainmail",
+      "slot": "chest",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "tartarian_giants"
+      ],
+      "description": "Aetheric Chainmail. Common chest armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Hardened Titan's Chestplate",
+      "slot": "chest",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "tartarian_giants"
+      ],
+      "description": "Hardened Titan's Chestplate. Common chest armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Architect's Warplate",
+      "slot": "chest",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 2
+        },
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 22,
+      "tcSell": 8,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "tartarian_giants"
+      ],
+      "description": "Architect's Warplate. Uncommon chest armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Aether-Fused Battle Armor",
+      "slot": "chest",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 3
+        },
+        {
+          "stat": "constitution",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 45,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "tartarian_giants"
+      ],
+      "description": "Aether-Fused Battle Armor. Rare chest armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Crown Defender's Plate",
+      "slot": "chest",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 4
+        },
+        {
+          "stat": "dexterity",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 60,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "tartarian_giants"
+      ],
+      "description": "Crown Defender's Plate. Legendary chest armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Reclaimer's Salvage Vest",
+      "slot": "chest",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 7,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "reclaimers"
+      ],
+      "description": "Reclaimer's Salvage Vest. Common chest armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Scrap-Forged Breastplate",
+      "slot": "chest",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "reclaimers"
+      ],
+      "description": "Scrap-Forged Breastplate. Common chest armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Relic Hunter's Guard Vest",
+      "slot": "chest",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 2
+        },
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 22,
+      "tcSell": 8,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "reclaimers"
+      ],
+      "description": "Relic Hunter's Guard Vest. Uncommon chest armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Salvager's Battle Armor",
+      "slot": "chest",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 3
+        },
+        {
+          "stat": "dexterity",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 45,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "reclaimers"
+      ],
+      "description": "Salvager's Battle Armor. Rare chest armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Vest of the Forgotten Hero",
+      "slot": "chest",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 4
+        },
+        {
+          "stat": "strength",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 60,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "reclaimers"
+      ],
+      "description": "Vest of the Forgotten Hero. Legendary chest armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Sentinel's Chestplate",
+      "slot": "chest",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "architectural_sentinels"
+      ],
+      "description": "Sentinel's Chestplate. Common chest armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Architect's Mantle",
+      "slot": "chest",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "architectural_sentinels"
+      ],
+      "description": "Architect's Mantle. Common chest armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Aether-Reinforced Armor",
+      "slot": "chest",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 2
+        },
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 22,
+      "tcSell": 8,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "architectural_sentinels"
+      ],
+      "description": "Aether-Reinforced Armor. Uncommon chest armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Sentinel's Warplate",
+      "slot": "chest",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 3
+        },
+        {
+          "stat": "dexterity",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 45,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "architectural_sentinels"
+      ],
+      "description": "Sentinel's Warplate. Rare chest armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Aetheric Bulwark of the Sentinel",
+      "slot": "chest",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 4
+        },
+        {
+          "stat": "strength",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 60,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "architectural_sentinels"
+      ],
+      "description": "Aetheric Bulwark of the Sentinel. Legendary chest armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Rough-Hewn Chestplate",
+      "slot": "chest",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "mud_golems"
+      ],
+      "description": "Rough-Hewn Chestplate. Common chest armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Golem-Bound Armor",
+      "slot": "chest",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "mud_golems"
+      ],
+      "description": "Golem-Bound Armor. Common chest armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Stone-Forged War Armor",
+      "slot": "chest",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 2
+        },
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 22,
+      "tcSell": 8,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "mud_golems"
+      ],
+      "description": "Stone-Forged War Armor. Uncommon chest armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Guardian of the Stone",
+      "slot": "chest",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 3
+        },
+        {
+          "stat": "strength",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 45,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "mud_golems"
+      ],
+      "description": "Guardian of the Stone. Rare chest armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Chestplate of the Golem King",
+      "slot": "chest",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 4
+        },
+        {
+          "stat": "strength",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 60,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "mud_golems"
+      ],
+      "description": "Chestplate of the Golem King. Legendary chest armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Aetheric Warplate",
+      "slot": "chest",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "aetherborn"
+      ],
+      "description": "Aetheric Warplate. Common chest armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Arcane Guardian's Chestpiece",
+      "slot": "chest",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "aetherborn"
+      ],
+      "description": "Arcane Guardian's Chestpiece. Common chest armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Aether-Woven Battlecoat",
+      "slot": "chest",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 2
+        },
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 22,
+      "tcSell": 8,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "aetherborn"
+      ],
+      "description": "Aether-Woven Battlecoat. Uncommon chest armor from the Aetherborn tradition."
+    },
+    {
+      "name": "King's Aether Warplate",
+      "slot": "chest",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 3
+        },
+        {
+          "stat": "charisma",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 45,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "aetherborn"
+      ],
+      "description": "King's Aether Warplate. Rare chest armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Warplate of the Aetherborn",
+      "slot": "chest",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 4
+        },
+        {
+          "stat": "dexterity",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 60,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "aetherborn"
+      ],
+      "description": "Warplate of the Aetherborn. Legendary chest armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Lost Scholar's Robe",
+      "slot": "chest",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 7,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "unknowing_masses"
+      ],
+      "description": "Lost Scholar's Robe. Common chest armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Wanderer's Armor of Wisdom",
+      "slot": "chest",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "unknowing_masses"
+      ],
+      "description": "Wanderer's Armor of Wisdom. Common chest armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Forgotten Protector's Plate",
+      "slot": "chest",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 2
+        },
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 22,
+      "tcSell": 8,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "unknowing_masses"
+      ],
+      "description": "Forgotten Protector's Plate. Uncommon chest armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Battlecoat of the Wanderer",
+      "slot": "chest",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 3
+        },
+        {
+          "stat": "wisdom",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 45,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "unknowing_masses"
+      ],
+      "description": "Battlecoat of the Wanderer. Rare chest armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Forgotten King's Warplate",
+      "slot": "chest",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 4
+        },
+        {
+          "stat": "dexterity",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 60,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "chest",
+        "unknowing_masses"
+      ],
+      "description": "Forgotten King's Warplate. Legendary chest armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Mud-Stalker Leggings",
+      "slot": "legs",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "mud_dwellers"
+      ],
+      "description": "Mud-Stalker Leggings. Common legs armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Mud-Treader's Greaves",
+      "slot": "legs",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "acrobatics",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "acrobatics",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "mud_dwellers"
+      ],
+      "description": "Mud-Treader's Greaves. Common legs armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Aether-Warden's Legguards",
+      "slot": "legs",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "stealth",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "mud_dwellers"
+      ],
+      "description": "Aether-Warden's Legguards. Uncommon legs armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Aether-Wrapped Mud Greaves",
+      "slot": "legs",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "constitution",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "mud_dwellers"
+      ],
+      "description": "Aether-Wrapped Mud Greaves. Rare legs armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Legplates of the Mud King",
+      "slot": "legs",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "acrobatics",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "mud_dwellers"
+      ],
+      "description": "Legplates of the Mud King. Legendary legs armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Aetheric Scout Greaves",
+      "slot": "legs",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "tartarian_giants"
+      ],
+      "description": "Aetheric Scout Greaves. Common legs armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Titan's Trail Leggings",
+      "slot": "legs",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "acrobatics",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "acrobatics",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "tartarian_giants"
+      ],
+      "description": "Titan's Trail Leggings. Common legs armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Greaves of the Lost Titan",
+      "slot": "legs",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "tartarian_giants"
+      ],
+      "description": "Greaves of the Lost Titan. Uncommon legs armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Architect's Aether Legplates",
+      "slot": "legs",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "constitution",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "tartarian_giants"
+      ],
+      "description": "Architect's Aether Legplates. Rare legs armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Legplates of the Crown Titan",
+      "slot": "legs",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "acrobatics",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "tartarian_giants"
+      ],
+      "description": "Legplates of the Crown Titan. Legendary legs armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Reclaimer's Trousers",
+      "slot": "legs",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "reclaimers"
+      ],
+      "description": "Reclaimer's Trousers. Common legs armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Salvager's Worn Greaves",
+      "slot": "legs",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "acrobatics",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "acrobatics",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "reclaimers"
+      ],
+      "description": "Salvager's Worn Greaves. Common legs armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Relic Hunter's Legplates",
+      "slot": "legs",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "reclaimers"
+      ],
+      "description": "Relic Hunter's Legplates. Uncommon legs armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Explorer's Aetheric Legplates",
+      "slot": "legs",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "investigation",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "reclaimers"
+      ],
+      "description": "Explorer's Aetheric Legplates. Rare legs armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Forgotten Wanderer's Greaves",
+      "slot": "legs",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "acrobatics",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "reclaimers"
+      ],
+      "description": "Forgotten Wanderer's Greaves. Legendary legs armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Sentinel's Mobile Greaves",
+      "slot": "legs",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "architectural_sentinels"
+      ],
+      "description": "Sentinel's Mobile Greaves. Common legs armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Architect's Leg Enhancers",
+      "slot": "legs",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "acrobatics",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "acrobatics",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "architectural_sentinels"
+      ],
+      "description": "Architect's Leg Enhancers. Common legs armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Aetheric Reinforced Greaves",
+      "slot": "legs",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "architectural_sentinels"
+      ],
+      "description": "Aetheric Reinforced Greaves. Uncommon legs armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Sentinel's Agile Legplates",
+      "slot": "legs",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "stealth",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "architectural_sentinels"
+      ],
+      "description": "Sentinel's Agile Legplates. Rare legs armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Greaves of the Sentinel King",
+      "slot": "legs",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "acrobatics",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "architectural_sentinels"
+      ],
+      "description": "Greaves of the Sentinel King. Legendary legs armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Stone-Stride Greaves",
+      "slot": "legs",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "mud_golems"
+      ],
+      "description": "Stone-Stride Greaves. Common legs armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Golem-Warden's Legplates",
+      "slot": "legs",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "acrobatics",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "acrobatics",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "mud_golems"
+      ],
+      "description": "Golem-Warden's Legplates. Common legs armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Stoneborn Legguards",
+      "slot": "legs",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "mud_golems"
+      ],
+      "description": "Stoneborn Legguards. Uncommon legs armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Golem-Sentry's Legplates",
+      "slot": "legs",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "constitution",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "mud_golems"
+      ],
+      "description": "Golem-Sentry's Legplates. Rare legs armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Legplates of the Stone King",
+      "slot": "legs",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "acrobatics",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "mud_golems"
+      ],
+      "description": "Legplates of the Stone King. Legendary legs armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Aether-Runner Greaves",
+      "slot": "legs",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "aetherborn"
+      ],
+      "description": "Aether-Runner Greaves. Common legs armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Arcane Sprinter's Legplates",
+      "slot": "legs",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "acrobatics",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "acrobatics",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "aetherborn"
+      ],
+      "description": "Arcane Sprinter's Legplates. Common legs armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Aetheric Runner's Legplates",
+      "slot": "legs",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "charisma",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "aetherborn"
+      ],
+      "description": "Aetheric Runner's Legplates. Uncommon legs armor from the Aetherborn tradition."
+    },
+    {
+      "name": "King's Legplates of Speed",
+      "slot": "legs",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "charisma",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "aetherborn"
+      ],
+      "description": "King's Legplates of Speed. Rare legs armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Greaves of the Aetherborn King",
+      "slot": "legs",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "acrobatics",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "aetherborn"
+      ],
+      "description": "Greaves of the Aetherborn King. Legendary legs armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Forgotten Leggings",
+      "slot": "legs",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "unknowing_masses"
+      ],
+      "description": "Forgotten Leggings. Common legs armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Wanderer's Swiftstride Greaves",
+      "slot": "legs",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "acrobatics",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "acrobatics",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "unknowing_masses"
+      ],
+      "description": "Wanderer's Swiftstride Greaves. Common legs armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Lost Traveler's Legplates",
+      "slot": "legs",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "unknowing_masses"
+      ],
+      "description": "Lost Traveler's Legplates. Uncommon legs armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Forgotten Hero's Greaves",
+      "slot": "legs",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "acrobatics",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "unknowing_masses"
+      ],
+      "description": "Forgotten Hero's Greaves. Rare legs armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Legplates of the Lost King",
+      "slot": "legs",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "stealth",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "legs",
+        "greaves",
+        "legs",
+        "unknowing_masses"
+      ],
+      "description": "Legplates of the Lost King. Legendary legs armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Mud-Bound Cloak",
+      "slot": "cloak",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "stealth",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "stealth",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "mud_dwellers"
+      ],
+      "description": "Mud-Bound Cloak. Common cloak armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Cloak of the Mud Shaman",
+      "slot": "cloak",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "mud_dwellers"
+      ],
+      "description": "Cloak of the Mud Shaman. Common cloak armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Aether-Warden's Cape",
+      "slot": "cloak",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "stealth",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "mud_dwellers"
+      ],
+      "description": "Aether-Warden's Cape. Uncommon cloak armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Shaman's Mantle of Secrets",
+      "slot": "cloak",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "wisdom",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "mud_dwellers"
+      ],
+      "description": "Shaman's Mantle of Secrets. Rare cloak armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Cloak of the Mud King",
+      "slot": "cloak",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "stealth",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "mud_dwellers"
+      ],
+      "description": "Cloak of the Mud King. Legendary cloak armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Titan's Vest",
+      "slot": "cloak",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "tartarian_giants"
+      ],
+      "description": "Titan's Vest. Common cloak armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Architect's Field Jacket",
+      "slot": "cloak",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "tartarian_giants"
+      ],
+      "description": "Architect's Field Jacket. Common cloak armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Aetheric Titan's Overcoat",
+      "slot": "cloak",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 2
+        },
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "tartarian_giants"
+      ],
+      "description": "Aetheric Titan's Overcoat. Uncommon cloak armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Titan King's War Vest",
+      "slot": "cloak",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 3
+        },
+        {
+          "stat": "dexterity",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "tartarian_giants"
+      ],
+      "description": "Titan King's War Vest. Rare cloak armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Mantle of the Great Architect",
+      "slot": "cloak",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 4
+        },
+        {
+          "stat": "constitution",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "tartarian_giants"
+      ],
+      "description": "Mantle of the Great Architect. Legendary cloak armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Reclaimer's Cloak",
+      "slot": "cloak",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "reclaimers"
+      ],
+      "description": "Reclaimer's Cloak. Common cloak armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Salvager's Trench Coat",
+      "slot": "cloak",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "stealth",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "stealth",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "reclaimers"
+      ],
+      "description": "Salvager's Trench Coat. Common cloak armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Explorer's Worn Vest",
+      "slot": "cloak",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "reclaimers"
+      ],
+      "description": "Explorer's Worn Vest. Uncommon cloak armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Cloak of the Forgotten Seeker",
+      "slot": "cloak",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "charisma",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "reclaimers"
+      ],
+      "description": "Cloak of the Forgotten Seeker. Rare cloak armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Relic Hunter's Mantle",
+      "slot": "cloak",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "strength",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "reclaimers"
+      ],
+      "description": "Relic Hunter's Mantle. Legendary cloak armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Sentinel's Overcoat",
+      "slot": "cloak",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "architectural_sentinels"
+      ],
+      "description": "Sentinel's Overcoat. Common cloak armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Architect's Outer Mantle",
+      "slot": "cloak",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "architectural_sentinels"
+      ],
+      "description": "Architect's Outer Mantle. Common cloak armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Aetheric Guard Cloak",
+      "slot": "cloak",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "architectural_sentinels"
+      ],
+      "description": "Aetheric Guard Cloak. Uncommon cloak armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Cloak of the Sentinel King",
+      "slot": "cloak",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 3
+        },
+        {
+          "stat": "dexterity",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "architectural_sentinels"
+      ],
+      "description": "Cloak of the Sentinel King. Rare cloak armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Aether-Reinforced Cloak",
+      "slot": "cloak",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "constitution",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "architectural_sentinels"
+      ],
+      "description": "Aether-Reinforced Cloak. Legendary cloak armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Stonebreaker's Cloak",
+      "slot": "cloak",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "mud_golems"
+      ],
+      "description": "Stonebreaker's Cloak. Common cloak armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Golem-Bound Cloak",
+      "slot": "cloak",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "mud_golems"
+      ],
+      "description": "Golem-Bound Cloak. Common cloak armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Stone-Warden's Cape",
+      "slot": "cloak",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 2
+        },
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "mud_golems"
+      ],
+      "description": "Stone-Warden's Cape. Uncommon cloak armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Guardian's Aether Mantle",
+      "slot": "cloak",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "strength",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "mud_golems"
+      ],
+      "description": "Guardian's Aether Mantle. Rare cloak armor from the Mud Golems tradition."
+    },
+    {
+      "name": "King's Mantle of the Golems",
+      "slot": "cloak",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "constitution",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "mud_golems"
+      ],
+      "description": "King's Mantle of the Golems. Legendary cloak armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Aether-Weaver's Mantle",
+      "slot": "cloak",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "charisma",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "charisma",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "aetherborn"
+      ],
+      "description": "Aether-Weaver's Mantle. Common cloak armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Aether-Walker's Cape",
+      "slot": "cloak",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "aetherborn"
+      ],
+      "description": "Aether-Walker's Cape. Common cloak armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Arcane Cloak of the Aetherborn",
+      "slot": "cloak",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "charisma",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "charisma",
+          "amount": 2
+        },
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "aetherborn"
+      ],
+      "description": "Arcane Cloak of the Aetherborn. Uncommon cloak armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Cloak of the Aether King",
+      "slot": "cloak",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "charisma",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "aetherborn"
+      ],
+      "description": "Cloak of the Aether King. Rare cloak armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Mantle of the Aether Lords",
+      "slot": "cloak",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "charisma",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "charisma",
+          "amount": 4
+        },
+        {
+          "stat": "dexterity",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "aetherborn"
+      ],
+      "description": "Mantle of the Aether Lords. Legendary cloak armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Traveler's Cloak",
+      "slot": "cloak",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "unknowing_masses"
+      ],
+      "description": "Traveler's Cloak. Common cloak armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Wanderer's Outercoat",
+      "slot": "cloak",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "stealth",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "stealth",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "unknowing_masses"
+      ],
+      "description": "Wanderer's Outercoat. Common cloak armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Cloak of the Forgotten King",
+      "slot": "cloak",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "wisdom",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "unknowing_masses"
+      ],
+      "description": "Cloak of the Forgotten King. Uncommon cloak armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Wanderer's Tattered Overcoat",
+      "slot": "cloak",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "constitution",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "unknowing_masses"
+      ],
+      "description": "Wanderer's Tattered Overcoat. Rare cloak armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Cloak of the Forgotten Heir",
+      "slot": "cloak",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "stealth",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "outer",
+        "unknowing_masses"
+      ],
+      "description": "Cloak of the Forgotten Heir. Legendary cloak armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Mud-Lurker Boots",
+      "slot": "feet",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "mud_dwellers"
+      ],
+      "description": "Mud-Lurker Boots. Common feet armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Mud-Stalker's Footwraps",
+      "slot": "feet",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "stealth",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "stealth",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "mud_dwellers"
+      ],
+      "description": "Mud-Stalker's Footwraps. Common feet armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Shaman's Mud Boots",
+      "slot": "feet",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "acrobatics",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "mud_dwellers"
+      ],
+      "description": "Shaman's Mud Boots. Uncommon feet armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Aether-Walker's Mud Boots",
+      "slot": "feet",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "constitution",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "mud_dwellers"
+      ],
+      "description": "Aether-Walker's Mud Boots. Rare feet armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Boots of the Mud King",
+      "slot": "feet",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "acrobatics",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "mud_dwellers"
+      ],
+      "description": "Boots of the Mud King. Legendary feet armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Aetheric Strider Boots",
+      "slot": "feet",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "tartarian_giants"
+      ],
+      "description": "Aetheric Strider Boots. Common feet armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Titan's Swiftstep Boots",
+      "slot": "feet",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "acrobatics",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "acrobatics",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "tartarian_giants"
+      ],
+      "description": "Titan's Swiftstep Boots. Common feet armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Aether-Walker's Boots",
+      "slot": "feet",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "tartarian_giants"
+      ],
+      "description": "Aether-Walker's Boots. Uncommon feet armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Greaves of the Titan's Path",
+      "slot": "feet",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "constitution",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "tartarian_giants"
+      ],
+      "description": "Greaves of the Titan's Path. Rare feet armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "King's Greaves of Speed",
+      "slot": "feet",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "acrobatics",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "tartarian_giants"
+      ],
+      "description": "King's Greaves of Speed. Legendary feet armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Reclaimer's Boots",
+      "slot": "feet",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "reclaimers"
+      ],
+      "description": "Reclaimer's Boots. Common feet armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Salvager's Worn Boots",
+      "slot": "feet",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "acrobatics",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "acrobatics",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "reclaimers"
+      ],
+      "description": "Salvager's Worn Boots. Common feet armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Relic Hunter's Boots",
+      "slot": "feet",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "charisma",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "reclaimers"
+      ],
+      "description": "Relic Hunter's Boots. Uncommon feet armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Explorer's Aetheric Greaves",
+      "slot": "feet",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "investigation",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "reclaimers"
+      ],
+      "description": "Explorer's Aetheric Greaves. Rare feet armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Boots of the Forgotten Seeker",
+      "slot": "feet",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "acrobatics",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "reclaimers"
+      ],
+      "description": "Boots of the Forgotten Seeker. Legendary feet armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Sentinel's Greaves",
+      "slot": "feet",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "architectural_sentinels"
+      ],
+      "description": "Sentinel's Greaves. Common feet armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Architect's Aetheric Boots",
+      "slot": "feet",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "acrobatics",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "acrobatics",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "architectural_sentinels"
+      ],
+      "description": "Architect's Aetheric Boots. Common feet armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Aetheric Swiftstep Greaves",
+      "slot": "feet",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "architectural_sentinels"
+      ],
+      "description": "Aetheric Swiftstep Greaves. Uncommon feet armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Sentinel's Reinforced Greaves",
+      "slot": "feet",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "strength",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "architectural_sentinels"
+      ],
+      "description": "Sentinel's Reinforced Greaves. Rare feet armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Boots of the Sentinel King",
+      "slot": "feet",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "acrobatics",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "architectural_sentinels"
+      ],
+      "description": "Boots of the Sentinel King. Legendary feet armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Stone-Strider Boots",
+      "slot": "feet",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "mud_golems"
+      ],
+      "description": "Stone-Strider Boots. Common feet armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Golem-Guardian's Greaves",
+      "slot": "feet",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "mud_golems"
+      ],
+      "description": "Golem-Guardian's Greaves. Common feet armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Stone-Warden's Footwraps",
+      "slot": "feet",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "mud_golems"
+      ],
+      "description": "Stone-Warden's Footwraps. Uncommon feet armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Stonebound Boots",
+      "slot": "feet",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "constitution",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "mud_golems"
+      ],
+      "description": "Stonebound Boots. Rare feet armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Greaves of the Golem King",
+      "slot": "feet",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "strength",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "mud_golems"
+      ],
+      "description": "Greaves of the Golem King. Legendary feet armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Aether-Runner Boots",
+      "slot": "feet",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "aetherborn"
+      ],
+      "description": "Aether-Runner Boots. Common feet armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Arcane Sprinter's Boots",
+      "slot": "feet",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "acrobatics",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "acrobatics",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "aetherborn"
+      ],
+      "description": "Arcane Sprinter's Boots. Common feet armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Aetheric Runner's Boots",
+      "slot": "feet",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "charisma",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "aetherborn"
+      ],
+      "description": "Aetheric Runner's Boots. Uncommon feet armor from the Aetherborn tradition."
+    },
+    {
+      "name": "King's Speed Boots",
+      "slot": "feet",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "charisma",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "aetherborn"
+      ],
+      "description": "King's Speed Boots. Rare feet armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Greaves of the Aether Lords",
+      "slot": "feet",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "acrobatics",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "aetherborn"
+      ],
+      "description": "Greaves of the Aether Lords. Legendary feet armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Lost Traveler's Boots",
+      "slot": "feet",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "unknowing_masses"
+      ],
+      "description": "Lost Traveler's Boots. Common feet armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Wanderer's Footwraps",
+      "slot": "feet",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "acrobatics",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "acrobatics",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "unknowing_masses"
+      ],
+      "description": "Wanderer's Footwraps. Common feet armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Forgotten Traveler's Greaves",
+      "slot": "feet",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "wisdom",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "unknowing_masses"
+      ],
+      "description": "Forgotten Traveler's Greaves. Uncommon feet armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Lost Hero's Greaves",
+      "slot": "feet",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "stealth",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "unknowing_masses"
+      ],
+      "description": "Lost Hero's Greaves. Rare feet armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Boots of the Forgotten King",
+      "slot": "feet",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "acrobatics",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "feet",
+        "unknowing_masses"
+      ],
+      "description": "Boots of the Forgotten King. Legendary feet armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Mud-Claw Gloves",
+      "slot": "hands",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "mud_dwellers"
+      ],
+      "description": "Mud-Claw Gloves. Common hands armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Shaman's Warden Gloves",
+      "slot": "hands",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "mud_dwellers"
+      ],
+      "description": "Shaman's Warden Gloves. Common hands armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Mud-Woven Gauntlets",
+      "slot": "hands",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "mud_dwellers"
+      ],
+      "description": "Mud-Woven Gauntlets. Uncommon hands armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Aether-Warden's Gloves",
+      "slot": "hands",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "strength",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "mud_dwellers"
+      ],
+      "description": "Aether-Warden's Gloves. Rare hands armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Gauntlets of the Mud King",
+      "slot": "hands",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 4
+        },
+        {
+          "stat": "dexterity",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "mud_dwellers"
+      ],
+      "description": "Gauntlets of the Mud King. Legendary hands armor from the Mud Dwellers tradition."
+    },
+    {
+      "name": "Titan's Gauntlets",
+      "slot": "hands",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "tartarian_giants"
+      ],
+      "description": "Titan's Gauntlets. Common hands armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Architect's Grip",
+      "slot": "hands",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "tartarian_giants"
+      ],
+      "description": "Architect's Grip. Common hands armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Architect's Guard Gauntlets",
+      "slot": "hands",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 2
+        },
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "tartarian_giants"
+      ],
+      "description": "Architect's Guard Gauntlets. Uncommon hands armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Aetheric King's Gauntlets",
+      "slot": "hands",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 3
+        },
+        {
+          "stat": "constitution",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "tartarian_giants"
+      ],
+      "description": "Aetheric King's Gauntlets. Rare hands armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Gauntlets of the Giant Lord",
+      "slot": "hands",
+      "raceAffinity": "Tartarian Giants",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 4
+        },
+        {
+          "stat": "dexterity",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "tartarian_giants"
+      ],
+      "description": "Gauntlets of the Giant Lord. Legendary hands armor from the Tartarian Giants tradition."
+    },
+    {
+      "name": "Reclaimer's Gloves",
+      "slot": "hands",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "reclaimers"
+      ],
+      "description": "Reclaimer's Gloves. Common hands armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Salvager's Worn Gloves",
+      "slot": "hands",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "reclaimers"
+      ],
+      "description": "Salvager's Worn Gloves. Common hands armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Relic Hunter's Gauntlets",
+      "slot": "hands",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "reclaimers"
+      ],
+      "description": "Relic Hunter's Gauntlets. Uncommon hands armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Explorer's Aetheric Grip",
+      "slot": "hands",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "investigation",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "reclaimers"
+      ],
+      "description": "Explorer's Aetheric Grip. Rare hands armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Gauntlets of the Relic Seeker",
+      "slot": "hands",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 4
+        },
+        {
+          "stat": "dexterity",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "reclaimers"
+      ],
+      "description": "Gauntlets of the Relic Seeker. Legendary hands armor from the Reclaimers tradition."
+    },
+    {
+      "name": "Sentinel's Gauntlets",
+      "slot": "hands",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "architectural_sentinels"
+      ],
+      "description": "Sentinel's Gauntlets. Common hands armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Architect's Aether Gloves",
+      "slot": "hands",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "architectural_sentinels"
+      ],
+      "description": "Architect's Aether Gloves. Common hands armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Aether-Grip Gauntlets",
+      "slot": "hands",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 2
+        },
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "architectural_sentinels"
+      ],
+      "description": "Aether-Grip Gauntlets. Uncommon hands armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Sentinel's Guard Gauntlets",
+      "slot": "hands",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "strength",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "architectural_sentinels"
+      ],
+      "description": "Sentinel's Guard Gauntlets. Rare hands armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Gauntlets of the Sentinel King",
+      "slot": "hands",
+      "raceAffinity": "Architectural Sentinels",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 4
+        },
+        {
+          "stat": "dexterity",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "architectural_sentinels"
+      ],
+      "description": "Gauntlets of the Sentinel King. Legendary hands armor from the Architectural Sentinels tradition."
+    },
+    {
+      "name": "Rough-Hewn Gauntlets",
+      "slot": "hands",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "mud_golems"
+      ],
+      "description": "Rough-Hewn Gauntlets. Common hands armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Stone-Grip Gloves",
+      "slot": "hands",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "mud_golems"
+      ],
+      "description": "Stone-Grip Gloves. Common hands armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Golem-Bound Gauntlets",
+      "slot": "hands",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 2
+        },
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "mud_golems"
+      ],
+      "description": "Golem-Bound Gauntlets. Uncommon hands armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Stone-Warden's Gauntlets",
+      "slot": "hands",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 3
+        },
+        {
+          "stat": "constitution",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "mud_golems"
+      ],
+      "description": "Stone-Warden's Gauntlets. Rare hands armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Gauntlets of the Stone King",
+      "slot": "hands",
+      "raceAffinity": "Mud Golems",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 4
+        },
+        {
+          "stat": "dexterity",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "mud_golems"
+      ],
+      "description": "Gauntlets of the Stone King. Legendary hands armor from the Mud Golems tradition."
+    },
+    {
+      "name": "Aetheric Gauntlets",
+      "slot": "hands",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "aetherborn"
+      ],
+      "description": "Aetheric Gauntlets. Common hands armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Arcane Weaver's Grip",
+      "slot": "hands",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "aetherborn"
+      ],
+      "description": "Arcane Weaver's Grip. Common hands armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Aetherborn Gauntlets of Grace",
+      "slot": "hands",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "charisma",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "aetherborn"
+      ],
+      "description": "Aetherborn Gauntlets of Grace. Uncommon hands armor from the Aetherborn tradition."
+    },
+    {
+      "name": "King's Aether Gauntlets",
+      "slot": "hands",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "strength",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "aetherborn"
+      ],
+      "description": "King's Aether Gauntlets. Rare hands armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Gauntlets of the Aether Lord",
+      "slot": "hands",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "charisma",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "aetherborn"
+      ],
+      "description": "Gauntlets of the Aether Lord. Legendary hands armor from the Aetherborn tradition."
+    },
+    {
+      "name": "Lost Seeker's Gloves",
+      "slot": "hands",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 1,
+      "tcBuy": 6,
+      "tcSell": 2,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "unknowing_masses"
+      ],
+      "description": "Lost Seeker's Gloves. Common hands armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Wanderer's Worn Gauntlets",
+      "slot": "hands",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "dexReq": 3,
+      "tcBuy": 8,
+      "tcSell": 3,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "unknowing_masses"
+      ],
+      "description": "Wanderer's Worn Gauntlets. Common hands armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Forgotten Hero's Grip",
+      "slot": "hands",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 2
+        },
+        {
+          "stat": "wisdom",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 5,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "unknowing_masses"
+      ],
+      "description": "Forgotten Hero's Grip. Uncommon hands armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Gauntlets of the Wanderer",
+      "slot": "hands",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 3,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "strength",
+          "amount": 2
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 9,
+      "tcBuy": 40,
+      "tcSell": 15,
+      "baseDurability": 45,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "unknowing_masses"
+      ],
+      "description": "Gauntlets of the Wanderer. Rare hands armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Gauntlets of the Lost King",
+      "slot": "hands",
+      "raceAffinity": "Unknowing Masses",
+      "acBonus": 4,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 4
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 4
+        },
+        {
+          "stat": "strength",
+          "amount": 3
+        }
+      ],
+      "rarity": "Legendary",
+      "dexReq": 12,
+      "tcBuy": 55,
+      "tcSell": 20,
+      "baseDurability": 65,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "hands",
+        "unknowing_masses"
+      ],
+      "description": "Gauntlets of the Lost King. Legendary hands armor from the Unknowing Masses tradition."
+    }
   ]
 }

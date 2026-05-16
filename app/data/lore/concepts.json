@@ -212,6 +212,215 @@
       "keywords": ["join", "joining", "enlist", "pledge"],
       "title": "Joining a faction",
       "answer": "Type 'join <faction name>'. Requires at least 20 standing with that faction. Faction standing rises through purchases (+1), gifts (+5), and certain quests; it falls through theft (-10) and aligned actions against them."
+    },
+
+    {
+      "id": "advantage",
+      "keywords": ["advantage", "advantage roll", "bonus die", "extra die"],
+      "title": "Advantage",
+      "answer": "When you have advantage on a roll, you also roll an additional 1d6 alongside your normal die. Keep the better result. Advantage can come from terrain, preparation, faction boons, or specific relics like the Tartarian Obelisk."
+    },
+    {
+      "id": "disadvantage",
+      "keywords": ["disadvantage", "disadvantage roll", "weakened roll", "penalty"],
+      "title": "Disadvantage",
+      "answer": "When you have disadvantage, you roll 1d10 and 1d6 instead of a 1d20. Your ceiling drops from 20 to 16. Disadvantage comes from injury, status effects like bleeding or poisoning, or unfavorable terrain."
+    },
+    {
+      "id": "even_odd_roll",
+      "keywords": ["even odd", "even odd roll", "coin flip", "50/50", "chance roll"],
+      "title": "Even/Odd Roll",
+      "answer": "A 1d6 used as a fate coin. Even is always the positive outcome; odd is always negative. The Arbiter calls for one when neither skill nor strategy fully applies. A coin works just as well — Tartaria likes symmetry."
+    },
+    {
+      "id": "max_roll",
+      "keywords": ["max roll", "maximum roll", "max damage", "rolled max"],
+      "title": "Max Roll",
+      "answer": "When you roll the maximum on your damage die (not your attack roll), that's a Max Roll. In Tartaria Prima there are no critical hits on attack rolls — only the damage dice can peak. A max roll is its own reward."
+    },
+    {
+      "id": "faction_points",
+      "keywords": ["faction points", "fp", "faction standing", "standing", "reputation"],
+      "title": "Faction Points (FP)",
+      "answer": "Represented in-game as faction standing. Earn FP by completing faction tasks, making purchases (+1), gifting items (+5), and turning in quests. Spend it to unlock exclusive gear, restricted areas, and faction abilities. Different factions start at different standings with you."
+    },
+    {
+      "id": "blinded",
+      "keywords": ["blinded", "blind", "cannot see", "blindness"],
+      "title": "Blinded",
+      "answer": "Blinded creatures cannot see for 2 turns — any task requiring eyesight fails outright. At the start of the third turn, roll 1d6: even, you return to normal immediately; odd, you roll at disadvantage for one more turn, then clear."
+    },
+    {
+      "id": "ignite",
+      "keywords": ["ignite", "ignited", "set fire", "engulf", "burning"],
+      "title": "Ignite",
+      "answer": "When ignited, the target is engulfed in flame and continues burning until extinguished. Ignite starts the Burn damage-over-time effect. Each round of burning deals Aetheric heat damage; putting it out requires an action."
+    },
+
+    {
+      "id": "aetherkin",
+      "keywords": ["aetherkin", "etheric undead", "undead tartarian", "buried undead"],
+      "title": "Aetherkin",
+      "answer": "Ether-infused undead buried by the Great Mud Flood, trapped in an ethereal peace. Disturb the Aetherstone encasing them and they reawaken with powerful Etheric abilities — hostile to anything that threatens their rest."
+    },
+    {
+      "id": "ancient_mud_golems",
+      "keywords": ["ancient mud golem", "mud guardian", "ancient golem"],
+      "title": "Ancient Mud Golems",
+      "answer": "Guardians formed when Aether-charged mud encased a Tartarian citizen who couldn't reach safety in the Flood. They protect the ruins and artifacts around them. They blend with the mud almost perfectly — you won't see one until it's too late."
+    },
+    {
+      "id": "architectural_sorcery",
+      "keywords": ["architectural sorcery", "aetheric engineering", "etheric architecture", "tartarian architecture"],
+      "title": "Architectural Sorcery",
+      "answer": "Tartaria's fusion of engineering and Aetheric principles. Buildings that channel Etheric Power, self-repairing walls, defense systems that project illusions or repel intruders. The Stone Builders still study it; no one has replicated it."
+    },
+    {
+      "id": "etheric_anomalies",
+      "keywords": ["etheric anomaly", "aetheric anomaly", "etheric disturbance", "anomaly"],
+      "title": "Etheric Anomalies",
+      "answer": "Residual Aether gone wrong — magnetic fluctuations, disorienting time slips, Etheric lightning, hallucinations. Common in the Mud Seas and near unstable Etheric Ruins. Some are predictable. Most are not."
+    },
+    {
+      "id": "etheric_guardians",
+      "keywords": ["etheric guardian", "aetheric guardian", "tartarian guardian", "automaton", "guardian construct"],
+      "title": "Etheric Guardians",
+      "answer": "Automated constructs ranging from shoulder-height drones to war-scale machines, all programmed with one task: defend the Tartarian sites they were built into. They have been at it since before the Flood."
+    },
+    {
+      "id": "etheric_ruins",
+      "keywords": ["etheric ruin", "aetheric ruin", "ruin", "dense aether location"],
+      "title": "Etheric Ruins",
+      "answer": "Locations where Tartarian structures left so much Aether behind that time and space distort. Ghostly apparitions, unpredictable energy phenomena, and valuable relics co-exist in them. Explore carefully."
+    },
+    {
+      "id": "etheric_titan",
+      "keywords": ["etheric titan", "aetheric titan", "titan construct", "titan guardian"],
+      "title": "Etheric Titan",
+      "answer": "A massive construct built as a final line of defense for Tartarian systems. If you're trying to activate or deactivate something important, an Etheric Titan is probably the last obstacle between you and it."
+    },
+    {
+      "id": "mold_ether",
+      "term": "Mold Ether",
+      "keywords": ["mold ether", "mold the ether", "etheric repair", "etheric manipulation"],
+      "title": "Mold Ether",
+      "answer": "A Tartarian technique — part spell, part engineering — for repairing, redirecting, or manipulating Etheric relics. Requires high Arcana. Misapplied, it can overload a device rather than restore it."
+    },
+    {
+      "id": "mud_flood",
+      "keywords": ["mud flood", "great mud flood", "the flood", "aetherstone flood"],
+      "title": "The Mud Flood",
+      "answer": "The catastrophe that ended Tartaria. Etheric Power experiments at Thametan's Tower in Samarran malfunctioned, releasing Aether-charged mud that encased cities in Aetherstone and buried the empire. The factions that survive today are all, in one way or another, its consequence."
+    },
+    {
+      "id": "mud_golems",
+      "keywords": ["mud golem", "mud construct", "golem"],
+      "title": "Mud Golems",
+      "answer": "Etheric constructs made from Aether-charged mud — born either from Mud Magic or from failed Mud Tech experiments. Immensely strong and highly unpredictable. Known to turn on their own makers without warning."
+    },
+    {
+      "id": "mud_magic",
+      "keywords": ["mud magic", "mud manipulation", "etheric mud"],
+      "title": "Mud Magic",
+      "answer": "Primitive Aether manipulation through prolonged contact with Etheric-charged mud. Practitioners can shape terrain, accelerate healing, and conjure Mud Golems. The Mud Dwellers use it extensively. The cost is physical and mental — the mud takes something back."
+    },
+    {
+      "id": "mud_tech",
+      "keywords": ["mud tech", "etheric technology", "mud technology", "crude aether"],
+      "title": "Mud Tech",
+      "answer": "Tartarian Etheric technology reverse-engineered from the mud. Crude, unreliable, and prone to catastrophic failure. The Reclaimers Guild sells a lot of it. The Mud Monarchs would rather no one had any."
+    },
+    {
+      "id": "relic_trade",
+      "keywords": ["relic trade", "black market", "relic economy", "artifact trade"],
+      "title": "Relic Trade",
+      "answer": "The black-market economy surrounding Tartarian artifacts — from minor relics with mild properties to unstable Aether-cored devices worth fortunes. The Reclaimers Guild dominates it. The Mud Monarchs and Forgotten Order both fight to control it, for opposite reasons."
+    },
+    {
+      "id": "second_mud_flood",
+      "keywords": ["second mud flood", "second flood", "another flood", "new flood"],
+      "title": "The Second Mud Flood",
+      "answer": "The feared second cataclysm. Some factions — particularly the Tartarian Revivalists — believe that reactivating Etheric Power systems could trigger it. Others theorize cosmic disturbances or environmental shifts could do it without any help."
+    },
+    {
+      "id": "tartarian_obelisk",
+      "keywords": ["tartarian obelisk", "obelisk", "etheric obelisk", "aetheric obelisk"],
+      "title": "Tartarian Obelisk",
+      "answer": "An Etheric artifact projecting an energy field within arm's reach. Grants advantage on up to three creatures once per long rest. If damaged, the stored energy releases as a destructive Etheric blast — handle with care."
+    },
+    {
+      "id": "the_entombed",
+      "keywords": ["the entombed", "entombed", "sealed tartarians", "mud-sealed dead"],
+      "title": "The Entombed",
+      "answer": "Tartarians who died sealed inside their homes when the Mud Flood struck. As the True Tartarians reclaim underground space, they uncover the Entombed and reinter them with reverence — bones shelved in thousands of miles of tunnels, their names sometimes carved nearby."
+    },
+    {
+      "id": "unknowing_masses",
+      "keywords": ["unknowing masses", "the masses", "surface people", "general population"],
+      "title": "Unknowing Masses",
+      "answer": "Everyone on the surface who has no idea Tartaria ever existed. Their ignorance is not accidental — the Mud Monarchs and Conspiracy Architects have maintained it for generations. Most players didn't start out in this category."
+    },
+
+    {
+      "id": "conspiracy_architects",
+      "keywords": ["conspiracy architects", "architects", "cabal"],
+      "title": "Conspiracy Architects",
+      "answer": "A covert cabal that suppresses all knowledge of Tartaria and Etheric technology, ostensibly to protect surface society from its dangers. In practice they serve the Mud Monarchs' interests. They work through controlled narratives, media, and the quiet removal of people who talk too much."
+    },
+    {
+      "id": "servants_of_giants",
+      "keywords": ["servants of giants", "servants", "giant worshippers", "giant cult"],
+      "title": "Servants of the Giants",
+      "answer": "A religious faction devoted to the Tartarian Giants, believed to be dormant and waiting in ruins like the Giant Vault. The Servants conduct rituals and pilgrimages hoping to awaken them and restore Tartaria's might. The True Tartarians share the reverence; few share the zeal."
+    },
+    {
+      "id": "stone_builders",
+      "keywords": ["stone builders", "stone builder", "architectural scholars"],
+      "title": "Stone Builders",
+      "answer": "A hybrid religious-scientific order that studies Tartarian architecture as both divine text and engineering manual. They want to understand Architectural Sorcery well enough to build anew. Less radical than the Revivalists, more practical than the Forgotten Order."
+    },
+    {
+      "id": "tartarian_revivalists",
+      "keywords": ["tartarian revivalists", "revivalists", "sasha ironheart", "radical faction"],
+      "title": "Tartarian Revivalists",
+      "answer": "A radical faction willing to risk another Mud Flood to restore Tartaria. Led by Sasha Ironheart. They are dedicated to reactivating Etheric Power systems, and they consider the other factions' caution a form of cowardice. Dangerous allies. Worse enemies."
+    },
+
+    {
+      "id": "elior_zalmar",
+      "keywords": ["elior zalmar", "zalmar", "etheric engine creator", "philosopher scientist"],
+      "title": "Elior Zalmar",
+      "answer": "Tartaria's most consequential engineer. His research on Etheric frequency resonance and the Etheric Engine at Thametan's Tower caused the Great Mud Flood. Whether he died in it, survived it, or stepped sideways through time depends on which account you believe."
+    },
+    {
+      "id": "harlan_moore",
+      "keywords": ["harlan moore", "professor moore", "moore", "tartarian historian"],
+      "title": "Professor Harlan Moore",
+      "answer": "A historian whose obsession with Tartaria's secrets has made him useful and dangerous in equal measure. He'll betray any alliance if it brings him closer to what he wants. Most people underestimate how serious that is until it's too late."
+    },
+    {
+      "id": "sasha_ironheart",
+      "keywords": ["sasha ironheart", "ironheart", "revivalist leader"],
+      "title": "Sasha Ironheart",
+      "answer": "Leader of the Tartarian Revivalists. Believes that awakening the Giants is the only path to humanity's survival. Formidable, certain, and occasionally terrifying. People who dismiss her as a fanatic tend to meet her twice — once dismissively, once not."
+    },
+    {
+      "id": "drake_volkov",
+      "keywords": ["drake volkov", "volkov", "mercenary"],
+      "title": "Drake Volkov",
+      "answer": "A seasoned mercenary who takes contracts on Tartarian expeditions. His past is murky and his loyalties shift with the coin. The factions all use him when they need someone reliable; none of them trust him, which is the only honest position to take."
+    },
+    {
+      "id": "ivy_solis",
+      "keywords": ["ivy solis", "solis", "treasure hunter"],
+      "title": "Ivy Solis",
+      "answer": "A treasure hunter drawn to Tartarian relics like water finds low ground. Her loyalty is proportional to the value of what's on the line. She's excellent in the field and genuinely fun to work with, right up until the moment she isn't."
+    },
+    {
+      "id": "lucius_kincaid",
+      "keywords": ["lucius kincaid", "kincaid", "dr kincaid", "expedition sponsor"],
+      "title": "Dr. Lucius Kincaid",
+      "answer": "A reclusive scholar who funds expeditions into Tartaria, supplying maps and resources that shouldn't exist. His true motives are unknown to everyone, including possibly himself. The resources are real; the help is real; the unanswered questions multiply every time you talk to him."
     }
   ]
 }
