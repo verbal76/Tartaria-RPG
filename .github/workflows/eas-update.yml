@@ -107,6 +107,25 @@ jobs:
             }
           '
           echo "============================"
-          echo
-          echo "If runtimeVersion above != $APP_VERSION, the installed APK will"
-          echo "silently reject this update. Fix: bump APK or align app.json version."
+
+          # GUARDRAIL — assert the published runtimeVersion matches app.json's
+          # local version. With eas.json appVersionSource=local this is the
+          # contract the APK relies on. If they drift, FAIL the build so we
+          # see it instead of an OTA that publishes silently to a runtime
+          # the installed APK doesn't request.
+          PUBLISHED_RT=$(node -e '
+            const r = JSON.parse(require("fs").readFileSync("update-result.json", "utf8"));
+            const arr = Array.isArray(r) ? r : [r];
+            console.log(arr[0] && arr[0].runtimeVersion || "");
+          ')
+          if [ -z "$PUBLISHED_RT" ]; then
+            echo "::error::OTA publish returned no runtimeVersion. Publish probably did not land."
+            exit 1
+          fi
+          if [ "$PUBLISHED_RT" != "$APP_VERSION" ]; then
+            echo "::error::Published runtimeVersion '$PUBLISHED_RT' does not match app.json version '$APP_VERSION'."
+            echo "::error::The installed APK requests runtimeVersion '$APP_VERSION' and will silently reject this update."
+            echo "::error::Fix: either bump app.json version + rebuild APK, or align eas.json appVersionSource."
+            exit 1
+          fi
+          echo "✓ Runtime version match: APK requests $APP_VERSION, OTA published at $PUBLISHED_RT."
