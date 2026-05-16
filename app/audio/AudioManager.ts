@@ -5,12 +5,13 @@
 //
 //   Priority:  combat (enemies present)
 //            > shop (vendor in scene / inventory screen open)
+//            > menu (title / character creation / about-settings screen)
 //            > explore (default while playing)
-//            > silence (title / between sessions)
+//            > silence (between sessions)
 //
 // Volume + on/off are read from audioSettings (persisted via AsyncStorage).
-// Transitions between tracks crossfade — old fades out while new fades in
-// over ~400ms.
+// Transitions hard-stop the previous track then fade in the new one —
+// no overlap window during rapid context changes.
 //
 // All errors are swallowed because audio failure should never break
 // gameplay.
@@ -18,7 +19,7 @@
 import { Audio } from 'expo-av';
 import { getAudioSettings, loadAudioSettings, onAudioSettingsChange } from './audioSettings';
 
-type Context = 'combat' | 'shop' | 'explore';
+type Context = 'combat' | 'shop' | 'menu' | 'explore';
 
 interface TrackEntry {
   id: string;
@@ -35,7 +36,12 @@ const POOLS: Record<Context, TrackEntry[]> = {
   shop: [
     { id: 'shop-quiet-back-alley', source: require('../../assets/audio/shop-quiet-back-alley.mp3'), baseVolume: 0.45 },
   ],
+  menu: [
+    { id: 'menu-misty-compass', source: require('../../assets/audio/menu-misty-compass.mp3'), baseVolume: 0.5 },
+  ],
   explore: [
+    // Misty Compass also sits in the explore rotation per user request.
+    { id: 'menu-misty-compass', source: require('../../assets/audio/menu-misty-compass.mp3'), baseVolume: 0.4 },
     { id: 'explore-map-of-the-wild-2', source: require('../../assets/audio/explore-map-of-the-wild-2.mp3'), baseVolume: 0.4 },
     { id: 'explore-dusty-threshold', source: require('../../assets/audio/explore-dusty-threshold.mp3'), baseVolume: 0.4 },
     { id: 'explore-map-of-ashes', source: require('../../assets/audio/explore-map-of-ashes.mp3'), baseVolume: 0.4 },
