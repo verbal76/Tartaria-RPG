@@ -86,6 +86,18 @@ describe('parseInput — combat context override', () => {
   });
 });
 
+describe('parseInput — equip intent', () => {
+  it('routes "equip the rusted blade" to equip', () => {
+    expect(parseInput('equip the rusted blade').intent).toBe('equip');
+  });
+  it('routes "wear the patched leather" to equip', () => {
+    expect(parseInput('wear the patched leather').intent).toBe('equip');
+  });
+  it('routes "unequip" to equip (handler distinguishes)', () => {
+    expect(parseInput('unequip').intent).toBe('equip');
+  });
+});
+
 describe('parseInput — ask intent for game concept questions', () => {
   it('routes "what is corruption" to ask', () => {
     expect(parseInput('what is corruption').intent).toBe('ask');

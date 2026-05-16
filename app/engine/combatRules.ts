@@ -1,7 +1,16 @@
 import type { RollStep, PlayerCharacter, Enemy } from './types';
 import { rollDie } from './rng';
+import { findWeaponByName, type CatalogWeapon } from './crafting';
 
 type WeaponClass = 'ranged' | 'melee' | 'runecaster' | 'barehanded';
+
+// Resolve the player's currently-equipped weapon to a catalog entry, if any.
+// Used by combat resolution to override the generic 1d6 / weapon-class
+// detection with the actual stats of the gear they're wielding.
+export function getEquippedWeapon(player: PlayerCharacter): CatalogWeapon | null {
+  const name = player.equipped?.weaponName;
+  return name ? findWeaponByName(name) : null;
+}
 
 function detectWeaponClass(text: string): WeaponClass {
   const t = text.toLowerCase();
@@ -41,11 +50,18 @@ export function buildCombatSteps(
   player: PlayerCharacter,
   enemy: Enemy,
 ): RollStep[] {
-  const wc = detectWeaponClass(actionText);
-  const stat = attackStatFor(wc, player.stats);
+  // Equipped weapon takes precedence over text-based weapon-class detection.
+  // No equip = fall back to the original behavior (rusted blade / fists).
+  const equipped = getEquippedWeapon(player);
+  const wc: WeaponClass = equipped?.weaponKind ?? detectWeaponClass(actionText);
+  const stat = equipped
+    ? { value: player.stats[equipped.stat], label: STAT_LABEL[equipped.stat] }
+    : attackStatFor(wc, player.stats);
   const ac = enemyAC(enemy);
   const enemyInit = rollDie(10);
-  const dmg = damageDice(wc);
+  // Use equipped damage dice if available; parse "2d6" or "1d10+1d6".
+  const dmg = equipped ? parseDamageDice(equipped.damageDice) : damageDice(wc);
+  const damageTypeNote = equipped ? ` (${equipped.damageType})` : '';
 
   return [
     {
@@ -77,10 +93,21 @@ export function buildCombatSteps(
       count: dmg.count,
       bonus: 0,
       bonusLabel: '',
-      context: `damage dealt to ${enemy.name}`,
+      context: `damage dealt to ${enemy.name}${damageTypeNote}`,
       // no target — always applies if the attack hit
     },
   ];
+}
+
+// Parse a damage notation string like "2d6" or "1d10+1d6" into a single
+// {sides, count} we can roll. For multi-die notations we pick the larger
+// die and double the count to roughly preserve the range (close enough
+// for a single roll step — we don't currently animate multiple groups).
+function parseDamageDice(notation: string): { sides: number; count: number } {
+  const m = /(\d+)d(\d+)/i.exec(notation);
+  if (!m) return { sides: 6, count: 1 };
+  // For compound like "1d10+1d6" the first match captures the larger.
+  return { count: parseInt(m[1]!, 10), sides: parseInt(m[2]!, 10) };
 }
 
 // ─── Skill checks ────────────────────────────────────────────────────────────

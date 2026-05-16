@@ -20,6 +20,7 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   wait: ['wait', 'stay', 'hold', 'pause', 'still', 'linger'],
   ask: ['what', 'explain', 'define', 'who', 'how', 'why', 'tell'],
   craft: ['craft', 'make', 'forge', 'fashion', 'build', 'assemble'],
+  equip: ['equip', 'wear', 'wield', 'don', 'unequip', 'remove', 'sheathe'],
 };
 
 const ALL_INTENTS = Object.keys(VERB_SYNONYMS) as Exclude<Intent, 'unknown'>[];

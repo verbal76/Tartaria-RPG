@@ -62,6 +62,7 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
     stamina: staminaMax,
     staminaMax,
     milestones: { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 },
+    equipped: {},
     ac: race.baseAC,
     tc: rollFromTCFormula(race.startingTCFormula),
     corruption: 0,

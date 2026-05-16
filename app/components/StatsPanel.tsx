@@ -2,12 +2,16 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import type { PlayerCharacter } from '../engine/types';
 import racesData from '../data/races/races.json';
+import { findArmorByName } from '../engine/crafting';
 
 interface Props { player: PlayerCharacter; }
 
 export function StatsPanel({ player }: Props) {
   const race = (racesData as { id: string; name: string }[]).find((r) => r.id === player.raceId);
   const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
+  const equippedArmor = player.equipped?.armorName ? findArmorByName(player.equipped.armorName) : null;
+  const effectiveAc = player.ac + (equippedArmor?.acBonus ?? 0);
+  const equippedLabel = [player.equipped?.weaponName, player.equipped?.armorName].filter(Boolean).join(' · ');
   return (
     <View style={styles.container}>
       <Text style={styles.name}>{player.name}</Text>
@@ -15,7 +19,7 @@ export function StatsPanel({ player }: Props) {
       <View style={styles.row}>
         <Stat label="HP" value={`${player.hp}/${player.hpMax}`} />
         <Stat label="STA" value={`${player.stamina}/${player.staminaMax}`} />
-        <Stat label="AC" value={`${player.ac}`} />
+        <Stat label="AC" value={`${effectiveAc}`} />
         <Stat label="TC" value={`${player.tc}`} />
         <Stat label="Corr" value={`${player.corruption}`} />
       </View>
@@ -26,6 +30,9 @@ export function StatsPanel({ player }: Props) {
         <Stat label="WIS" value={`${player.stats.wisdom}`} />
         <Stat label="CHA" value={`${player.stats.charisma}`} />
       </View>
+      <Text style={styles.equipped} numberOfLines={1}>
+        {equippedLabel ? `Equipped: ${equippedLabel}` : 'Equipped: nothing'}
+      </Text>
       <Text style={styles.subline}>Faction standing: {factionStanding}</Text>
     </View>
   );
@@ -50,6 +57,7 @@ const styles = StyleSheet.create({
   },
   name: { color: '#e6d8b3', fontSize: 16, fontWeight: '700' },
   subline: { color: '#7a705c', fontSize: 11, marginBottom: 4 },
+  equipped: { color: '#c9a86a', fontSize: 10, marginTop: 4, letterSpacing: 1 },
   row: { flexDirection: 'row', gap: 8, marginTop: 4 },
   stat: { flex: 1 },
   label: { color: '#7a705c', fontSize: 10 },

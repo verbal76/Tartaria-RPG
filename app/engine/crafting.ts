@@ -106,6 +106,83 @@ export function findRecipeByResult(target: string): Recipe | null {
   return null;
 }
 
+// Catalog lookup helpers — find an item entry by name across the four
+// catalog buckets. Used by the equip flow and combat damage resolution.
+export function findWeaponByName(name: string): CatalogWeapon | null {
+  const t = name.toLowerCase().trim();
+  if (!t) return null;
+  return WEAPONS.find((w) => w.name.toLowerCase() === t) ?? null;
+}
+
+export function findArmorByName(name: string): CatalogArmor | null {
+  const t = name.toLowerCase().trim();
+  if (!t) return null;
+  return ARMOR.find((a) => a.name.toLowerCase() === t) ?? null;
+}
+
+// Looser match — used when the player types "equip the crystal blade"
+// and we want to resolve to "Aetheric Crystal Blade".
+export function fuzzyFindWeapon(text: string): CatalogWeapon | null {
+  const t = text.toLowerCase().trim();
+  if (!t) return null;
+  const exact = WEAPONS.find((w) => w.name.toLowerCase() === t);
+  if (exact) return exact;
+  return WEAPONS.find((w) => w.name.toLowerCase().includes(t) || t.includes(w.name.toLowerCase())) ?? null;
+}
+
+export function fuzzyFindArmor(text: string): CatalogArmor | null {
+  const t = text.toLowerCase().trim();
+  if (!t) return null;
+  const exact = ARMOR.find((a) => a.name.toLowerCase() === t);
+  if (exact) return exact;
+  return ARMOR.find((a) => a.name.toLowerCase().includes(t) || t.includes(a.name.toLowerCase())) ?? null;
+}
+
+// Damage-type modifier matrix keyed by enemy `type` (the field already on
+// every Enemy row, e.g. "Mud Creature", "Aetheric Mutation"). Resistances
+// halve incoming damage; weaknesses multiply by 1.5. Centralized here so
+// both combat resolution and Arbiter narration can read the same data.
+const TYPE_RESISTANCE_MAP: Record<string, { resist: string[]; weak: string[] }> = {
+  Animal: { resist: [], weak: ['piercing'] },
+  'Mud Creature': { resist: ['slashing', 'piercing'], weak: ['burn', 'radiation'] },
+  'Aetheric Mutation': { resist: ['aetheric', 'radiation'], weak: ['bludgeoning'] },
+  'Aetheric Creature': { resist: ['aetheric', 'electrical'], weak: ['bludgeoning'] },
+  Automation: { resist: ['poison', 'aetheric'], weak: ['electrical', 'bludgeoning'] },
+  Construct: { resist: ['slashing', 'piercing'], weak: ['bludgeoning', 'electrical'] },
+};
+
+export type DamageMatch = 'normal' | 'weak' | 'resist';
+
+export function applyDamageTypeModifier(
+  rawDamage: number,
+  weaponDamageType: string | null | undefined,
+  enemyType: string | null | undefined,
+): { damage: number; match: DamageMatch } {
+  if (!weaponDamageType || !enemyType) return { damage: rawDamage, match: 'normal' };
+  const map = TYPE_RESISTANCE_MAP[enemyType];
+  if (!map) return { damage: rawDamage, match: 'normal' };
+  const wt = weaponDamageType.toLowerCase();
+  if (map.weak.includes(wt)) return { damage: Math.ceil(rawDamage * 1.5), match: 'weak' };
+  if (map.resist.includes(wt)) return { damage: Math.max(1, Math.floor(rawDamage / 2)), match: 'resist' };
+  return { damage: rawDamage, match: 'normal' };
+}
+
+// Player armor resistance — halves incoming damage when the armor lists
+// the damage type. Returns a 1-tuple of the new amount; armor resistances
+// don't scale beyond 50% in this pass.
+export function applyArmorResistance(
+  incomingDamage: number,
+  damageType: string | null | undefined,
+  armor: CatalogArmor | null | undefined,
+): { damage: number; blocked: boolean } {
+  if (!armor || !damageType) return { damage: incomingDamage, blocked: false };
+  const dt = damageType.toLowerCase();
+  if (armor.resistances?.some((r) => r.toLowerCase() === dt)) {
+    return { damage: Math.max(1, Math.floor(incomingDamage / 2)), blocked: true };
+  }
+  return { damage: incomingDamage, blocked: false };
+}
+
 // Subtract ingredients from inventory, return the new inventory. Mutates
 // quantities in-place on cloned rows; removes rows that hit 0.
 export function consumeIngredients(

@@ -54,8 +54,14 @@ import {
   consumeIngredients,
   lookupCraftedItem,
   RECIPES,
+  fuzzyFindWeapon,
+  fuzzyFindArmor,
+  findArmorByName,
+  applyDamageTypeModifier,
+  applyArmorResistance,
   type Recipe,
 } from '../engine/crafting';
+import { getEquippedWeapon } from '../engine/combatRules';
 
 interface Concept {
   id: string;
@@ -164,6 +170,7 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     staminaMax: stamMax,
     stamina: p.stamina ?? stamMax,
     milestones: p.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 },
+    equipped: p.equipped ?? {},
   };
 }
 
@@ -626,6 +633,71 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         break;
       }
+      case 'equip': {
+        const verb = parsed.matchedVerb?.toLowerCase() ?? '';
+        const isUnequip = /^un|^remove|^sheathe/.test(verb) || /^un|^remove|^sheathe|take off/.test(trimmed.toLowerCase());
+        if (isUnequip) {
+          const target = (parsed.target ?? '').toLowerCase();
+          const onlyArmor = /armou?r|plate|vest|robe|cloth|mantle|scales|harness/.test(target);
+          const onlyWeapon = /blade|sword|wand|rod|stave|bow|gauntlet|spear|cleaver|edge|crown|fist|crossbow/.test(target);
+          const newEquipped: { weaponName?: string; armorName?: string } = { ...(player.equipped ?? {}) };
+          if (onlyArmor && !onlyWeapon) {
+            newEquipped.armorName = undefined;
+            get().appendLog('world', `You shrug off your armor.`);
+          } else if (onlyWeapon && !onlyArmor) {
+            newEquipped.weaponName = undefined;
+            get().appendLog('world', `You sheathe your weapon.`);
+          } else {
+            newEquipped.weaponName = undefined;
+            newEquipped.armorName = undefined;
+            get().appendLog('world', `You set everything aside. Your hands are empty.`);
+          }
+          set((s) => ({ player: s.player ? { ...s.player, equipped: newEquipped } : s.player }));
+          break;
+        }
+        // EQUIP path
+        const lookup = parsed.resolvedNoun ?? parsed.target ?? '';
+        if (!lookup.trim()) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter raises an eyebrow. "Equip what? Say it by name — a blade, a vest, a rod."`,
+          );
+          break;
+        }
+        // Must be in inventory before they can equip it.
+        const inInventory = player.inventory.find((i) => i.name.toLowerCase() === lookup.toLowerCase());
+        if (!inInventory) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter glances at your pack. "I do not see any ${lookup.toLowerCase()} on you."`,
+          );
+          break;
+        }
+        const weapon = fuzzyFindWeapon(inInventory.name);
+        const armor = !weapon ? fuzzyFindArmor(inInventory.name) : null;
+        if (!weapon && !armor) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter frowns. "That is not a thing you can wear or wield."`,
+          );
+          break;
+        }
+        const newEquipped: { weaponName?: string; armorName?: string } = { ...(player.equipped ?? {}) };
+        if (weapon) {
+          newEquipped.weaponName = weapon.name;
+          set((s) => ({ player: s.player ? { ...s.player, equipped: newEquipped } : s.player }));
+          get().appendLog(
+            'world',
+            `You take up the ${weapon.name}. ${weapon.damageDice} ${weapon.damageType} — ${weapon.stat.toUpperCase().slice(0, 3)} to hit.`,
+          );
+        } else if (armor) {
+          newEquipped.armorName = armor.name;
+          set((s) => ({ player: s.player ? { ...s.player, equipped: newEquipped } : s.player }));
+          const resistList = armor.resistances?.length ? ` Resists ${armor.resistances.join(', ')}.` : '';
+          get().appendLog('world', `You don the ${armor.name}. +${armor.acBonus} AC.${resistList}`);
+        }
+        break;
+      }
       case 'craft': {
         // No target — list what's currently craftable from inventory.
         const target = parsed.target?.trim() ?? '';
@@ -898,9 +970,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     if (attack?.success) {
-      const dmg = damage?.total ?? rollDie(6);
+      const rawDmg = damage?.total ?? rollDie(6);
+      const equipped = getEquippedWeapon(player);
+      const weaponType = equipped?.damageType ?? null;
+      const mod = applyDamageTypeModifier(rawDmg, weaponType, enemy.type);
+      const dmg = mod.damage;
       const prevHp = currentEnemyHp ?? enemy.hp;
       const newEnemyHp = prevHp - dmg;
+
+      // Narrate the resistance/weakness modifier on its own line so the
+      // player can see WHY the damage changed.
+      if (mod.match === 'weak') {
+        get().appendLog('combat', `Weakness exposed — ${enemy.name} flinches. (${weaponType} ×1.5 → ${dmg})`);
+      } else if (mod.match === 'resist') {
+        get().appendLog('combat', `${enemy.name} shrugs off the ${weaponType}. (resisted, ×0.5 → ${dmg})`);
+      }
 
       if (newEnemyHp <= 0) {
         get().appendLog('combat', attackKill(weaponName, enemy.name, dmg));
@@ -1137,23 +1221,32 @@ function applyEnemyCounter(
   const atkBonus = parseInt(String(enemy.attack), 10) || 3;
   const atkRoll = rollDie(20);
   const atkTotal = atkRoll + atkBonus;
-  const hit = atkTotal >= player.ac;
+  // Effective AC includes any equipped armor's acBonus.
+  const armor = player.equipped?.armorName ? findArmorByName(player.equipped.armorName) : null;
+  const effectiveAc = player.ac + (armor?.acBonus ?? 0);
+  const hit = atkTotal >= effectiveAc;
 
   get().appendLog(
     'combat',
-    `${enemy.name} — d20 → ${atkRoll} + ATK ${atkBonus} = ${atkTotal} vs your AC ${player.ac} — ${hit ? '✓ HIT' : '✗ MISS'}`,
+    `${enemy.name} — d20 → ${atkRoll} + ATK ${atkBonus} = ${atkTotal} vs your AC ${effectiveAc} — ${hit ? '✓ HIT' : '✗ MISS'}`,
   );
 
   if (hit) {
-    const dmg = rollFromNotation(String(enemy.damage)) || rollDie(6);
+    let rawDmg = rollFromNotation(String(enemy.damage)) || rollDie(6);
+    // Detect damage type from the enemy.damage string (e.g. "2D6 Psychic",
+    // "1D10 Aetheric"). Falls back to a generic physical class.
+    const enemyDamageType = parseIncomingDamageType(String(enemy.damage));
+    const resisted = applyArmorResistance(rawDmg, enemyDamageType, armor);
+    const dmg = resisted.damage;
     let killed = false;
     set((s) => {
       if (!s.player) return {};
       const newHp = Math.max(0, s.player.hp - dmg);
       killed = newHp <= 0;
+      const resistTag = resisted.blocked ? ` (armor halves the ${enemyDamageType})` : '';
       const msg = killed
-        ? `${enemy.name} deals ${dmg} damage. You fall.`
-        : `${enemy.name} deals ${dmg} damage. You have ${newHp} HP remaining.`;
+        ? `${enemy.name} deals ${dmg} damage${resistTag}. You fall.`
+        : `${enemy.name} deals ${dmg} damage${resistTag}. You have ${newHp} HP remaining.`;
       void Promise.resolve().then(() => get().appendLog('combat', msg));
       return { player: { ...s.player, hp: newHp } };
     });
@@ -1161,6 +1254,28 @@ function applyEnemyCounter(
       void Promise.resolve().then(() => handlePlayerDeath(get, set));
     }
   }
+}
+
+const DAMAGE_TYPE_KEYWORDS = [
+  'degradation',
+  'bludgeoning',
+  'burn',
+  'aetheric',
+  'electrical',
+  'piercing',
+  'poison',
+  'radiation',
+  'slashing',
+  'stun',
+  'psychic', // common in enemy data — fold into aetheric for resistance purposes
+];
+
+function parseIncomingDamageType(damageString: string): string | null {
+  const lower = damageString.toLowerCase();
+  for (const t of DAMAGE_TYPE_KEYWORDS) {
+    if (lower.includes(t)) return t === 'psychic' ? 'aetheric' : t;
+  }
+  return null;
 }
 
 // Death is no longer permanent erasure. The character is marked dead and

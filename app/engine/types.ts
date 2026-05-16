@@ -14,6 +14,7 @@ export type Intent =
   | 'wait'
   | 'ask'
   | 'craft'
+  | 'equip'
   | 'unknown';
 
 export interface ParsedInput {
@@ -190,6 +191,23 @@ export interface PlayerMilestones {
   checksSucceeded: number;
 }
 
+export interface PlayerEquipped {
+  weaponName?: string;
+  armorName?: string;
+}
+
+export type DamageType =
+  | 'degradation'
+  | 'bludgeoning'
+  | 'burn'
+  | 'aetheric'
+  | 'electrical'
+  | 'piercing'
+  | 'poison'
+  | 'radiation'
+  | 'slashing'
+  | 'stun';
+
 export interface PlayerCharacter {
   name: string;
   raceId: string;
@@ -210,6 +228,8 @@ export interface PlayerCharacter {
   dead?: boolean;
   /** Lifetime counters; thresholds trigger stat growth. */
   milestones?: PlayerMilestones;
+  /** Currently-equipped weapon and armor (by catalog name). */
+  equipped?: PlayerEquipped;
 }
 
 export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive';
