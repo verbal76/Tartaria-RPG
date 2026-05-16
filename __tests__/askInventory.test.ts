@@ -1,4 +1,8 @@
-import { isInventoryQuestion, extractInventoryTarget } from '../app/engine/askInventory';
+import {
+  isInventoryQuestion,
+  extractInventoryTarget,
+  isContinueCommand,
+} from '../app/engine/askInventory';
 
 describe('isInventoryQuestion', () => {
   it.each([
@@ -49,5 +53,32 @@ describe('extractInventoryTarget', () => {
   it('is case-insensitive', () => {
     expect(extractInventoryTarget('IS THE FUNGUS IN MY PACK')).toBe('fungus');
     expect(extractInventoryTarget('Got Any Bandages')).toBe('bandages');
+  });
+});
+
+describe('isContinueCommand', () => {
+  it.each([
+    'continue',
+    'continue please',
+    'keep going',
+    'keep    going',
+    'same way',
+    'onward',
+    'press on',
+    'Continue',
+    'KEEP GOING',
+  ])('treats "%s" as a continue command', (text) => {
+    expect(isContinueCommand(text)).toBe(true);
+  });
+
+  it.each([
+    'I will not continue',
+    'before you continue',
+    'go north',
+    'rest',
+    'attack',
+    '',
+  ])('does not treat "%s" as a continue command', (text) => {
+    expect(isContinueCommand(text)).toBe(false);
   });
 });

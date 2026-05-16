@@ -1,6 +1,9 @@
+// Small text-pattern helpers used by intent handlers in the game store.
+// Pulled out as plain functions so they're unit-testable without spinning
+// up the store.
+//
 // Helpers for the "do I have X?" / "is X in my pack?" pattern surfaced by
-// the `ask` intent handler in the game store. Pulled out as plain functions
-// so they're unit-testable without spinning up the store.
+// the `ask` intent handler.
 //
 // The pattern complements the existing concept lookup: when the player asks
 // about a tangible thing (an item name, a material name), this short-circuits
@@ -48,4 +51,23 @@ export function extractInventoryTarget(text: string): string {
     .replace(/\b(any|some|the|my|a|an|on me|with me)\b/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+/**
+ * True when the player typed something like "continue" / "keep going" /
+ * "onward" — meaning "repeat my last cardinal travel step." Anchored to
+ * the start so phrases that just *contain* "continue" elsewhere don't
+ * accidentally trigger.
+ *
+ *   "continue"           → true
+ *   "keep going"         → true
+ *   "onward"             → true
+ *   "press on"           → true
+ *   "same way"           → true
+ *   "continue to the bazaar" → true (still a continue intent — the handler
+ *                                    will use the last direction regardless)
+ *   "I will not continue" → false (continue is not the first verb)
+ */
+export function isContinueCommand(text: string): boolean {
+  return /^\s*(continue|keep\s+going|same\s+way|onward|press\s+on)\b/i.test(text);
 }

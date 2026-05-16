@@ -52,7 +52,7 @@ import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
 import { buildLlmContext, buildSystemPrompt, type SceneSlice } from '../engine/contextInjector';
 import { getItemPreview } from '../components/itemPreview';
-import { isInventoryQuestion, extractInventoryTarget } from '../engine/askInventory';
+import { isInventoryQuestion, extractInventoryTarget, isContinueCommand } from '../engine/askInventory';
 import locationsData from '../data/locations/locations.json';
 import enemiesData from '../data/enemies/enemies.json';
 import conceptsData from '../data/lore/concepts.json';
@@ -1316,6 +1316,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         const target = parsed.target?.toLowerCase() ?? '';
+        // Continue / keep going / onward — repeat the player's last cardinal
+        // direction without making them retype it. If there's no last
+        // direction recorded (player just spawned, or last move was a named
+        // travelTo), prompt them to point first.
+        if (isContinueCommand(trimmed)) {
+          const last = player.lastTravelDirection;
+          if (last) {
+            set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.travel), 1) });
+            get().stepDirection(last);
+          } else {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter raises a brow. "Continue which way? You have not pointed yet."`,
+            );
+          }
+          break;
+        }
         // Directional travel: "go north" / "head east" / "walk south" /
         // "travel west" — walk one tile on the procedural map.
         const dirMatch = /\b(north|south|east|west)\b/.exec(target);
@@ -2188,6 +2205,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         stamina: newStamina,
         staminaMax: newStaminaMax,
         milestones: { ...prevMs, travelsCompleted: newTravels },
+        // Named travelTo breaks the cardinal-step flow — clear the saved
+        // direction so "continue" can't snap back to the old bearing.
+        lastTravelDirection: undefined,
       },
       worldMemory: discoverLocation(get().worldMemory, locationId),
     });
@@ -3290,7 +3310,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const fromX = player.mapX ?? 4;
     const fromY = player.mapY ?? 4;
     const step = stepInDirection(map, fromX, fromY, dir);
-    set((s) => (s.player ? { player: { ...s.player, mapX: step.x, mapY: step.y } } : s));
+    // Record both the new coordinates AND the direction so "continue" can
+    // repeat the same step without the player retyping the bearing.
+    set((s) =>
+      s.player
+        ? { player: { ...s.player, mapX: step.x, mapY: step.y, lastTravelDirection: dir } }
+        : s,
+    );
     if (step.landedOn && step.landedOn.locationId !== player.currentLocationId) {
       get().appendLog('world', `You walk ${dir}. You arrive at ${step.landedOn.locationName}.`);
       get().travelTo(step.landedOn.locationId);

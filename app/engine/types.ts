@@ -320,6 +320,12 @@ export interface PlayerCharacter {
   /** Current (x, y) on the procedural grid. Defaults to map center. */
   mapX?: number;
   mapY?: number;
+  /** Last cardinal direction the player traveled. Lets "continue" /
+   *  "keep going" / "onward" repeat the previous step without forcing the
+   *  player to retype the direction. Cleared on travelTo() to a named
+   *  destination since the player has explicitly broken the cardinal flow.
+   *  String-typed (not Direction) to avoid pulling in worldMap.ts here. */
+  lastTravelDirection?: 'north' | 'east' | 'south' | 'west';
 }
 
 export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive';
