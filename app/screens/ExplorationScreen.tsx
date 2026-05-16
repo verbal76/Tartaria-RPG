@@ -8,6 +8,7 @@ import { DiceRoller } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
 import { VendorPanel } from '../components/VendorPanel';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
+import { SearchModal } from '../components/SearchModal';
 import { findWeaponByName } from '../engine/crafting';
 
 function describeTime(hours: number): string {
@@ -37,6 +38,7 @@ export function ExplorationScreen() {
   const dismissVendor = useGameStore((s) => s.dismissVendor);
 
   const [activeEnemyIdx, setActiveEnemyIdx] = useState(0);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   // Engine still single-enemy; panel takes an array for future multi-enemy.
   const enemyViews: EnemyView[] = useMemo(() => {
@@ -146,6 +148,7 @@ export function ExplorationScreen() {
           <InputBox
             onSubmit={submit}
             onOpenInventory={() => setScreen('inventory')}
+            onOpenSearch={() => setSearchOpen(true)}
             inCombat={inCombat}
             equippedMain={equippedMain}
             equippedOff={equippedOff}
@@ -164,6 +167,16 @@ export function ExplorationScreen() {
           </TouchableOpacity>
         </View>
       </View>
+
+      <SearchModal
+        visible={searchOpen}
+        hints={currentScene?.ambientNouns}
+        onSubmit={(target) => {
+          setSearchOpen(false);
+          submit(`search the ${target}`);
+        }}
+        onCancel={() => setSearchOpen(false)}
+      />
     </KeyboardAvoidingView>
   );
 }

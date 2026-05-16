@@ -4,6 +4,7 @@ import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-nativ
 interface Props {
   onSubmit: (text: string) => void;
   onOpenInventory: () => void;
+  onOpenSearch: () => void;
   inCombat: boolean;
   equippedMain: string | null;
   equippedOff: string | null;
@@ -11,7 +12,10 @@ interface Props {
   range?: 'arm' | 'close' | 'far' | null;
 }
 
-const PEACE_QUICK = ['look', 'search', 'rest', 'dig'] as const;
+// Peace-mode quick buttons. 'look' = generic look-around (no target).
+// 'search' = opens a search prompt where the player names what to search.
+// 'rest', 'dig' = direct verbs.
+const PEACE_QUICK_DIRECT = ['look', 'rest', 'dig'] as const;
 
 // Trim a weapon name down to fit comfortably on a button. Examples:
 // "Aetheric Crystal Blade" → "Crystal Blade"
@@ -23,7 +27,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, inCombat, equippedMain, equippedOff, range }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, inCombat, equippedMain, equippedOff, range }: Props) {
   const [text, setText] = useState('');
 
   const handleSubmit = () => {
@@ -63,9 +67,10 @@ export function InputBox({ onSubmit, onOpenInventory, inCombat, equippedMain, eq
           </>
         ) : (
           <>
-            {PEACE_QUICK.map((qa) => (
+            {PEACE_QUICK_DIRECT.map((qa) => (
               <QuickBtn key={qa} label={qa} onPress={() => onSubmit(qa)} />
             ))}
+            <QuickBtn label="search" onPress={onOpenSearch} />
             <QuickBtn label="inventory" onPress={onOpenInventory} />
           </>
         )}

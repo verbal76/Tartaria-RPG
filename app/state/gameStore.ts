@@ -117,6 +117,7 @@ import {
   fuzzyFindStoryline,
 } from '../engine/factionStorylines';
 import { tickWeather, weatherBlocksRepositioning } from '../engine/weatherEffects';
+import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
 import { bestDigTool, rollDig } from '../engine/digging';
 import {
   generateWorldMap,
@@ -175,12 +176,26 @@ interface CurrentScene {
   range: CombatRange | null;
   /** Live narrative hooks the player can follow into multi-stage chains. */
   hooks: Hook[];
+  /** Notable nouns extracted from location.description — the things the
+   *  scene paragraph mentioned that the player can ask / investigate /
+   *  search against. */
+  ambientNouns: string[];
 }
 
 function collectSceneNouns(scene: CurrentScene): string[] {
   const nouns = [scene.location.name, scene.weather.name];
   if (scene.hazard) nouns.push(scene.hazard.name);
   if (scene.enemy) nouns.push(scene.enemy.name, scene.enemy.type);
+  // Ambient nouns from the location description so the parser can resolve
+  // "investigate the traps" / "ask about buried cities" against the same
+  // content the player just read in the scene paragraph.
+  if (scene.ambientNouns) nouns.push(...scene.ambientNouns);
+  // Hook nouns so a search hits an active narrative thread.
+  if (scene.hooks) {
+    for (const h of scene.hooks) {
+      if (!h.resolved) nouns.push(...h.nouns);
+    }
+  }
   return nouns;
 }
 
@@ -637,7 +652,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       initialHooks.push(h);
       consumedChainIds.push(next.chainId);
     }
-    const scene: CurrentScene = { weather, location, hazard, enemy, vendor, range, hooks: initialHooks };
+    const ambientNouns = extractAmbientNouns(location.description);
+    const scene: CurrentScene = { weather, location, hazard, enemy, vendor, range, hooks: initialHooks, ambientNouns };
     set({ currentScene: scene, currentEnemyHp: enemy?.hp ?? null, pendingRolls: null });
     if (consumedChainIds.length > 0) {
       set((s) => ({
@@ -960,14 +976,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
           narratePossibleDirections(get, currentScene);
           break;
         }
-        // 2) Targeted look ("examine the locket", "dig up the rubble") — roll.
+        // The target the player named (raw, before resolution).
+        const rawTarget = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
+
+        // 2) Ambient noun match — the player named something the scene
+        // paragraph actually mentioned ("investigate the traps" → match).
+        // Narrate a flavored find. May plant a hook.
+        if (rawTarget) {
+          const ambient = matchAmbientNoun(rawTarget, currentScene.ambientNouns ?? []);
+          if (ambient) {
+            narrateAmbientFind(get, set, currentScene, ambient);
+            break;
+          }
+        }
+        // 3) Targeted item/noun the parser DID resolve — skill check it.
         if (parsed.resolvedNoun || parsed.resolvedItemId) {
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
           const steps = buildSkillSteps('investigate', player);
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
           break;
         }
-        // 3) Generic look-around — no roll, atmospheric narration with optional hook.
+        // 4) Player aimed at something specific the engine can't recognise —
+        // re-prompt with the things they CAN search for. Better than a
+        // silent atmospheric one-liner that ignores their intent.
+        if (rawTarget) {
+          repromptUnknownTarget(get, currentScene, rawTarget);
+          break;
+        }
+        // 5) Generic look-around — no roll, atmospheric narration with optional hook.
         narrateCasualLook(get, set, currentScene);
         break;
       }
@@ -3441,6 +3477,53 @@ function handlePlayerDeath(
 // actions where the player is exploring intent, not attempting a specific
 // challenge that warrants a check.
 // ---------------------------------------------------------------------------
+
+// Narrate the player looking at a specific ambient noun mentioned in the
+// location description. Sometimes plants a hook (the player's interest in
+// "the traps" was rewarded with finding actual rigged-trap remnants);
+// usually just enriches the scene without a payoff.
+function narrateAmbientFind(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  scene: CurrentScene,
+  noun: string,
+): void {
+  const lines = [
+    `You look closer at the ${noun}. Mud-glazed, undisturbed for a long while.`,
+    `You examine the ${noun}. Tartaria has not given up its secrets here.`,
+    `You study the ${noun}. The Aetheric haze around them thickens, then settles.`,
+    `You inspect the ${noun}. Whatever was here once, this is what remains.`,
+    `You crouch beside the ${noun}. The silt has half-swallowed them.`,
+  ];
+  get().appendLog('world', pick(lines));
+  // ~25% chance the investigation turns into a real hook in this scene.
+  const activeUnresolved = (scene.hooks ?? []).some((h) => !h.resolved);
+  if (!activeUnresolved && chance(25)) {
+    const hook = plantHookByKind(pickRandomHookKind());
+    set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } } : s));
+    get().appendLog('world', hook.plantedLine);
+  }
+}
+
+// Politely re-prompt the player when they searched for something the
+// engine cannot recognise. Lists the actual nouns visible in the scene so
+// they can pick a real target instead of guessing.
+function repromptUnknownTarget(
+  get: () => GameStore,
+  scene: CurrentScene,
+  attempted: string,
+): void {
+  const ambient = scene.ambientNouns ?? [];
+  const hookNouns = (scene.hooks ?? [])
+    .filter((h) => !h.resolved)
+    .flatMap((h) => h.nouns.slice(0, 2));
+  const all = Array.from(new Set([...hookNouns, ...ambient])).slice(0, 6);
+  const list = all.length > 0 ? all.join(', ') : 'the mud, the haze, the dust';
+  get().appendLog(
+    'arbiter',
+    `The Arbiter tilts their head. "I do not see a '${attempted}' here. Choose words carefully — try: ${list}."`,
+  );
+}
 
 function narrateCasualLook(
   get: () => GameStore,
