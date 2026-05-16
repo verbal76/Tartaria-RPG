@@ -362,6 +362,85 @@ describe('buildSystemPrompt', () => {
 // integration: full pipeline
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// ladder override — when a Micro-Micro chunk is supplied, its fields win
+// ---------------------------------------------------------------------------
+
+describe('buildLlmContext with ladder override', () => {
+  it('uses the macro name as the biome and the micro-micro as the room', () => {
+    const ladder = {
+      macro: {
+        id: 'silt_wastes',
+        name: 'The Silt Wastes',
+        subtitle: 'The Endless Mud',
+        ambient: '',
+        tags: [],
+        microLocations: [],
+      },
+      micro: {
+        id: 'sunken_metropolis',
+        name: 'The Sunken Metropolis',
+        description: '',
+        microMicroLocations: [],
+      },
+      microMicro: {
+        id: 'buried_skyscraper_upper',
+        name: 'Buried Skyscraper — Upper Floors',
+        environmental_description: 'Wind moans through a glass-toothed atrium.',
+        exits: ['down the stairwell', 'out the window'],
+        possibleEncounters: ['Aetherbat'],
+        lootTable: ['Scrap Metal'],
+      },
+    };
+    const scene: SceneSlice = {
+      location: makeLocation({ name: 'Old Asgardar Outskirts' }),
+      weather: makeWeather(),
+      hazard: null,
+      enemies: [],
+      enemyHps: [],
+      vendor: null,
+    };
+    const ctx = buildLlmContext({
+      player: makePlayer(),
+      scene,
+      gameLog: [],
+      ladder,
+    });
+    expect(ctx.current_biome).toBe('The Silt Wastes');
+    expect(ctx.room_name).toBe('Buried Skyscraper — Upper Floors');
+    expect(ctx.environmental_description).toContain('Wind moans through a glass-toothed atrium');
+    expect(ctx.environmental_description).toContain('Aetheric Storm'); // weather still folded in
+    expect(ctx.available_exits).toBe('down the stairwell, out the window');
+  });
+
+  it('still folds hazard + weather into the ladder environment', () => {
+    const ladder = {
+      macro: { id: 'm', name: 'M', subtitle: '', ambient: '', tags: [], microLocations: [] },
+      micro: { id: 'mi', name: 'Mi', description: '', microMicroLocations: [] },
+      microMicro: {
+        id: 'mm',
+        name: 'MM',
+        environmental_description: 'Stone walls.',
+        exits: ['out'],
+        possibleEncounters: [],
+        lootTable: [],
+      },
+    };
+    const scene: SceneSlice = {
+      location: makeLocation(),
+      weather: makeWeather({ name: 'Glass Hail' }),
+      hazard: makeHazard({ name: 'Pulsing Mud' }),
+      enemies: [],
+      enemyHps: [],
+      vendor: null,
+    };
+    const ctx = buildLlmContext({ player: makePlayer(), scene, gameLog: [], ladder });
+    expect(ctx.environmental_description).toContain('Stone walls');
+    expect(ctx.environmental_description).toContain('Glass Hail');
+    expect(ctx.environmental_description).toContain('Pulsing Mud');
+  });
+});
+
 describe('buildLlmContext + buildSystemPrompt (integration)', () => {
   it('produces a system prompt that includes every fact from a real scene', () => {
     const player = makePlayer({

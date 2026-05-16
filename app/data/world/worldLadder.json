@@ -1,0 +1,351 @@
+{
+  "version": 1,
+  "description": "Procedural world hierarchy per TDD §2.2 (explicit) + lore-inferred branches (§2.4). Each microMicroLocation holds the environmental_description, exits, possibleEncounters, and lootTable the LLM context injector reads when the player is in a chunk. Encounter and loot IDs reference exact names from enemies.json and loot_tables.json so there is no duplicate truth.",
+  "macroLocations": [
+    {
+      "id": "silt_wastes",
+      "name": "The Silt Wastes",
+      "subtitle": "The Endless Mud",
+      "ambient": "Black silt to the horizon. Half-drowned spires lean against a low, ochre sky. Nothing in this country is dry for long.",
+      "tags": ["mud", "surface", "buried"],
+      "microLocations": [
+        {
+          "id": "sunken_metropolis",
+          "name": "The Sunken Metropolis",
+          "description": "A pre-flood city, three quarters of it locked under the mud. The exposed towers still throw light at sunset.",
+          "microMicroLocations": [
+            {
+              "id": "buried_skyscraper_upper",
+              "name": "Buried Skyscraper — Upper Floors",
+              "environmental_description": "Wind moans through a glass-toothed atrium. Office furniture sits where it was abandoned five centuries ago, drifts of mud powder on every surface. The floor tilts ten degrees off true.",
+              "exits": ["down the stairwell", "out the broken window", "across the catwalk"],
+              "possibleEncounters": ["Aetherbat", "Aetheric Raven", "Reclaimer Ambusher", "Black Cloak Agent"],
+              "lootTable": ["Worn Tartarian Coin", "Ancient Fragment", "Tarnished Ether Necklace", "Etheric Flashlight", "Scrap Metal"]
+            },
+            {
+              "id": "buried_skyscraper_lower",
+              "name": "Buried Skyscraper — Flooded Floors",
+              "environmental_description": "Mud-water laps at the ceiling fixtures. Office doors hang half-submerged, the rooms beyond preserved like specimens. Aetheric current threads the water — the lights down here still flicker on their own.",
+              "exits": ["up the stairwell", "into the elevator shaft", "through a flooded corridor"],
+              "possibleEncounters": ["Mud Lurker", "Aetheric Slug", "Aetheric Worm", "Black Cloak Agent"],
+              "lootTable": ["Etheric Battery", "Etheric Dagger", "Tartarian Map Fragment", "Ancient Tools", "Old Relic Key", "Cracked Ether Crystal"]
+            },
+            {
+              "id": "submerged_transit_hub",
+              "name": "Submerged Transit Hub",
+              "environmental_description": "An old subway terminal, the platforms two feet under brackish silt-water. Petrified train cars wait at a station that has not seen a passenger since the flood.",
+              "exits": ["up to the street", "along the tracks east", "down the maintenance hatch"],
+              "possibleEncounters": ["Aetheric Ooze", "Mud Spider", "Silt Serpent", "Reclaimer Ambusher"],
+              "lootTable": ["Bioluminescent Fungus", "Worn Tartarian Coin", "Scrap Metal", "Etheric Rope", "Dust Compass"]
+            },
+            {
+              "id": "subterranean_garage",
+              "name": "Subterranean Parking Garage",
+              "environmental_description": "Concrete ribs hold up a low ceiling. Pre-flood vehicles slump on flat tires beneath strata of mud. Something has been siphoning the fuel cells — the cuts are recent.",
+              "exits": ["up the ramp", "into the maintenance corridor", "behind the collapsed wall"],
+              "possibleEncounters": ["Bog Hound", "Scrap Drone", "Rust Lurker", "Reclaimer Ambusher"],
+              "lootTable": ["Scrap Metal", "Ancient Tools", "Etheric Scrap", "Automaton Circuit", "Cracked Ether Lens"]
+            }
+          ]
+        },
+        {
+          "id": "drowned_suburbs",
+          "name": "The Drowned Suburbs",
+          "description": "A grid of half-buried homes, fences poking through the mud at strange angles. Quiet, in the way that grief is quiet.",
+          "microMicroLocations": [
+            {
+              "id": "collapsed_residential",
+              "name": "Collapsed Residential Home",
+              "environmental_description": "A two-story house tipped onto its side. The kitchen is upside down; preserved dishes sit on what was once a ceiling. Family portraits remain on the walls.",
+              "exits": ["out through the broken window", "down into the basement", "across the yard"],
+              "possibleEncounters": ["Gutter Rat", "Mud Boar", "Bog Hound"],
+              "lootTable": ["Worn Tartarian Coin", "Leatherbound Tome", "Bioluminescent Fungus", "Glowstone Pendant", "Scrap Metal"]
+            },
+            {
+              "id": "buried_strip_mall",
+              "name": "Buried Strip Mall",
+              "environmental_description": "A row of storefronts, plate glass long since shattered, signage half-erased. The hardware shop has been picked over but not stripped — somebody comes back for these supplies.",
+              "exits": ["out to the parking lot", "behind the counter", "through the loading dock"],
+              "possibleEncounters": ["Mudling", "Rust Lurker", "Reclaimer Ambusher", "Gutter Rat"],
+              "lootTable": ["Ancient Tools", "Etheric Scrap", "Rune Caster Shell (Common)", "Etheric Rope", "Scrap Metal", "Bioluminescent Fungus"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aetherstone_deep",
+      "name": "The Aetherstone Deep",
+      "subtitle": "Giant Facilities",
+      "ambient": "The air here tastes of ozone and old metal. Light comes from no obvious source. The walls are warm, as if something below is breathing.",
+      "tags": ["aether", "underground", "tartarian"],
+      "microLocations": [
+        {
+          "id": "aetheric_power_grid",
+          "name": "Aetheric Power Grid",
+          "description": "A subterranean lattice of Aetherstone conduits — the empire's nervous system, still humming five centuries after burial.",
+          "microMicroLocations": [
+            {
+              "id": "crystal_pylon_chamber",
+              "name": "Crystal Pylon Chamber",
+              "environmental_description": "A cathedral-sized vault built around a single Aetherstone pylon as wide as a tower. Violet light pulses with a slow heartbeat. Walking pads ring the central pillar.",
+              "exits": ["out through the ring corridor", "up the maintenance gantry", "down into the well"],
+              "possibleEncounters": ["Aetheric Guardian", "Architectural Sentinel", "Aetheric Drone", "Aetheric Slug"],
+              "lootTable": ["Aetherstone Fragment", "Aetherstone Pebble", "Etheric Core", "Aether Core Crystal", "Etheric Stabilizer", "Etheric Battery"]
+            },
+            {
+              "id": "maintenance_tunnels",
+              "name": "Maintenance Tunnels",
+              "environmental_description": "Service corridors barely tall enough to stand in. Conduit bundles run along the ceiling. Old repair drones still patrol on rust-creaking wheels.",
+              "exits": ["back to the pylon chamber", "deeper into the network", "up to a service hatch"],
+              "possibleEncounters": ["Scrap Drone", "Aetheric Worm", "Aetheric Drone", "Rust Lurker"],
+              "lootTable": ["Etheric Scrap", "Automaton Circuit", "Ancient Tools", "Etheric Engineer's Toolkit", "Aetherstone Dust"]
+            }
+          ]
+        },
+        {
+          "id": "giantkin_mausoleum",
+          "name": "Giant-Kin Mausoleum",
+          "description": "A burial vault sized for a race two stories tall. The Tartarians worshipped their giants. The dead remember.",
+          "microMicroLocations": [
+            {
+              "id": "grand_hall",
+              "name": "The Grand Hall",
+              "environmental_description": "Vaulted ceiling vanishes into shadow. Twelve stone sarcophagi line the walls, each twice human height. The floor is inscribed with a geometry that hurts to look at directly.",
+              "exits": ["back through the bronze doors", "down into the offering antechamber", "behind the central sarcophagus"],
+              "possibleEncounters": ["Iron Titan", "Mud Giant", "Aetheric Behemoth", "Stone Chimera", "Aetheric Guardian"],
+              "lootTable": ["Heart of the Ether Dragon", "Wrath of the Ether Titan", "Etheric Tome of the Giants", "Tartarian Battle Horn", "True Tartarian Gauntlet", "Sovereign Ether Crown"]
+            },
+            {
+              "id": "offering_antechamber",
+              "name": "Offering Antechamber",
+              "environmental_description": "A smaller room before the Grand Hall. The mosaic floor is laid with pressure-stones; one of them is sunk a finger's-width below the others. Ceremonial daggers ring the walls.",
+              "exits": ["back to the hall entrance", "forward into the Grand Hall", "through the side passage"],
+              "possibleEncounters": ["Aetherkin", "Architectural Sentinel", "Aetheric Spider"],
+              "lootTable": ["Tartarian Pottery Shard", "Tartarian Writing Tablet", "Worn Tartarian Coin", "Ancient Fragment", "Forgotten Scroll", "Tartarian Crown Fragment"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "borderlands",
+      "name": "The Borderlands",
+      "subtitle": "The Thinning",
+      "ambient": "Surface contraband meets subterranean salvage. Lantern-light, low voices, deals struck in tongues that nobody outside this band speaks.",
+      "tags": ["liminal", "trade", "frontier"],
+      "microLocations": [
+        {
+          "id": "culvert_markets",
+          "name": "The Culvert Markets",
+          "description": "Half-legal market warrens dug into the old aqueducts. Reclaimers, scholars, and assassins all drink the same fungal beer.",
+          "microMicroLocations": [
+            {
+              "id": "black_market_bazaar",
+              "name": "Black Market Bazaar",
+              "environmental_description": "A narrow gallery lit by hanging Etheric lamps. Stalls line both walls; the prices are written in three different scripts and one of them is not human.",
+              "exits": ["out to the main culvert", "behind the curtain to the back rooms", "up the iron stairs"],
+              "possibleEncounters": ["Reclaimer Ambusher", "Black Cloak Agent"],
+              "lootTable": ["Worn Tartarian Coin", "Dust Compass", "Etheric Rope", "Bioluminescent Fungus", "Tarnished Ether Necklace", "Old Relic Key"]
+            },
+            {
+              "id": "triage_tent",
+              "name": "Triage Tent",
+              "environmental_description": "A canvas surgery strung up between two pillars. Surgical instruments laid out in a row that has not been wiped down today.",
+              "exits": ["back to the bazaar", "into the recovery cot row"],
+              "possibleEncounters": [],
+              "lootTable": ["Etheric Potion Vial", "Bioluminescent Fungus", "Etheric Thread", "Ancient Tools", "Ether Lamp"]
+            },
+            {
+              "id": "dispatch_board",
+              "name": "Reclaimer Dispatch Board",
+              "environmental_description": "A cork board the size of a barn door, layered six deep in bounty postings, sinkhole rumors, and grudge contracts. The pins are bone.",
+              "exits": ["out to the bazaar", "to the dispatcher's cubby"],
+              "possibleEncounters": [],
+              "lootTable": ["Tartarian Map Fragment", "Worn Tartarian Coin", "Forgotten Scroll", "Tartarian Navigator's Map", "Dust Compass"]
+            }
+          ]
+        },
+        {
+          "id": "monarch_excavation",
+          "name": "Monarch Excavation Sites",
+          "description": "Mud Monarch dig operations — guarded, methodical, deeply illegal to interfere with. The wagons leave under tarp.",
+          "microMicroLocations": [
+            {
+              "id": "active_dig_trench",
+              "name": "Active Dig Trench",
+              "environmental_description": "A pit twenty feet deep, walls braced with iron. Two Monarch overseers watch from a plank gantry. The mud here is the color of wet rust.",
+              "exits": ["up the ladder", "to the staging camp", "deeper into the trench"],
+              "possibleEncounters": ["Black Cloak Agent", "Reclaimer Ambusher", "Mud Lurker"],
+              "lootTable": ["Ancient Tools", "Mud Monarch Badge", "Mud Monarch Seal", "Tartarian Pottery Shard", "Aetherstone Pebble", "Old Relic Key"]
+            },
+            {
+              "id": "staging_camp",
+              "name": "Monarch Staging Camp",
+              "environmental_description": "Three canvas tents around a brazier. Crates marked with the Monarch sigil. The guards rotate every six hours. The dogs do not.",
+              "exits": ["back to the trench", "out toward the road", "through the supply tent"],
+              "possibleEncounters": ["Bog Hound", "Black Cloak Agent"],
+              "lootTable": ["Mud Monarch's Pendant", "Mud Monarch Seal", "Etheric Insignia", "Ancient Tools", "Worn Tartarian Coin", "Etheric Battery"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lost_capitals",
+      "name": "The Lost Capitals",
+      "subtitle": "Tartaria's Sealed Cities",
+      "ambient": "Sealed by hardened Etheric mud for five centuries. The dust has not settled because the dust never settled — it has been held in place by something that is still awake.",
+      "tags": ["tartarian", "sealed", "aetheric", "lore"],
+      "microLocations": [
+        {
+          "id": "asgardar",
+          "name": "Asgardar",
+          "description": "The capital city, buried with its court intact. The Grand Spire of Etheria still throws light at full power five centuries after the flood.",
+          "microMicroLocations": [
+            {
+              "id": "grand_spire_etheria",
+              "name": "Grand Spire of Etheria",
+              "environmental_description": "A tower of seamless white stone wider at the crown than the base. The interior staircase ascends past floors that no longer have boundaries — they fade into Aetheric haze.",
+              "exits": ["down the spiral", "out to the plaza", "up into the apex chamber"],
+              "possibleEncounters": ["Aetheric Guardian", "Aetheric Necromancer", "Aetheric Phoenix", "Architectural Sentinel"],
+              "lootTable": ["Aether Core Crystal", "Etheric Core", "Crown of the Last Monarch", "Tartarian Crown Fragment", "Whispering Aether Crystal", "Sovereign Ether Crown"]
+            },
+            {
+              "id": "royal_vaults",
+              "name": "Royal Vaults Beneath the Spire",
+              "environmental_description": "Stone vaults whose locks have not been touched. Cool air carries the scent of dry parchment and old gold. The pressure here suggests great depth.",
+              "exits": ["back up to the spire", "deeper into the catacomb", "through the sealed bronze door"],
+              "possibleEncounters": ["Mud Lich", "Aetheric Necromancer", "Aetheric Spider", "Aetherkin"],
+              "lootTable": ["Vaultbreaker Staff", "Whispering Vault Key", "Mask of Tartaria's Last King", "Tartarian Rune Sword", "Royal Etherblade", "Tartarian Blood Dagger"]
+            }
+          ]
+        },
+        {
+          "id": "samarran",
+          "name": "Samarran",
+          "description": "The city of engineers — home to Thametan's Tower and the Etheric Engine that triggered the flood.",
+          "microMicroLocations": [
+            {
+              "id": "thametans_tower",
+              "name": "Thametan's Tower",
+              "environmental_description": "A research tower with study rooms that defy the floor plan posted at the entrance. Walls shift by a handspan when you are not looking at them.",
+              "exits": ["down to the engine chamber", "out to the courtyard", "up to the observatory"],
+              "possibleEncounters": ["Aetheric Horror", "Aetheric Chimera", "Architectural Sentinel", "Aetheric Spider"],
+              "lootTable": ["Etheric Engineer's Toolkit", "Rune Engraving Kit", "Forgotten Scroll", "Whispering Cipher", "Cracked Etheric Mirror", "Tartarian Rune Inscription Kit"]
+            },
+            {
+              "id": "etheric_engine_chamber",
+              "name": "Etheric Engine Chamber",
+              "environmental_description": "The room where it all went wrong. A piece of machinery the size of a guild hall, suspended in a cylinder of frozen Aetheric flame. It is still running.",
+              "exits": ["back up to the tower", "behind the engine to the control gallery"],
+              "possibleEncounters": ["Aetheric Behemoth", "Aetheric Phoenix", "Mud Demon", "Aetheric Guardian"],
+              "lootTable": ["Heart of the Ether Dragon", "Primordial Ether Vial", "Magnetic Ether Sphere", "Etheric Infusion Rod", "Etheric Wand", "Aetherstorm Shard"]
+            }
+          ]
+        },
+        {
+          "id": "nimari",
+          "name": "Nimari",
+          "description": "The Red Tower city — last seat of functional Etheric technology, contested ground for centuries.",
+          "microMicroLocations": [
+            {
+              "id": "red_tower_interior",
+              "name": "Red Tower Interior",
+              "environmental_description": "A tower whose walls glow faintly red — not paint, not light, but the color of the stone itself when exposed to Aether. Climbing it makes your teeth ache.",
+              "exits": ["down to the archives", "out to the plaza", "up to the broadcaster room"],
+              "possibleEncounters": ["Aetheric Minotaur", "Aetheric Necromancer", "Aetheric Drone", "Architectural Sentinel"],
+              "lootTable": ["Fragment of the Red Tower", "Etheric Beacon", "Aetherlight Beacon", "Whispering Aether Crystal", "Etheric Talisman"]
+            },
+            {
+              "id": "tartarian_archives",
+              "name": "Tartarian Archives",
+              "environmental_description": "Stack upon stack of scroll cases, glyph tablets, and bound codices, all preserved by Aetheric stasis. The reading carrels are still set with quill and ink.",
+              "exits": ["back up to the tower", "into the restricted section", "through the side reading room"],
+              "possibleEncounters": ["Mud Lich", "Aetherkin", "Aetheric Spider"],
+              "lootTable": ["Etheric Tome of the Giants", "Forgotten Scroll", "Tartarian Writing Tablet", "Leatherbound Tome", "Whispering Cipher", "Tartarian Map Fragment"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "subterranean_empire",
+      "name": "The Subterranean Empire",
+      "subtitle": "True Tartarian Heartland",
+      "ambient": "Lamp oil and stone. The True Tartarians walk these halls and have for centuries. The catacombs go further than any map drawn above admits.",
+      "tags": ["true_tartarian", "subterranean", "aethercraft"],
+      "microLocations": [
+        {
+          "id": "true_tartarian_catacombs",
+          "name": "True Tartarian Catacombs",
+          "description": "Memorial passages of the Entombed — the honored dead, sealed in their homes during the flood. The True Tartarians tunnel through carefully, reburying every bone in the wall shelves.",
+          "microMicroLocations": [
+            {
+              "id": "memorial_passages",
+              "name": "Memorial Passages",
+              "environmental_description": "Tunnels lined floor to ceiling with skeletal remains, arranged with reverence. Lamp-niches every twenty paces. Footsteps echo a long way down here.",
+              "exits": ["forward along the passage", "back the way you came", "down the side burrow"],
+              "possibleEncounters": ["Aetherkin", "Mud Spider", "Aetheric Spider"],
+              "lootTable": ["Forgotten Scroll", "Worn Tartarian Coin", "Ancient Fragment", "Tarnished Ether Necklace", "Glowstone Pendant", "Tartarian Pottery Shard"]
+            },
+            {
+              "id": "aethercraft_workshop",
+              "name": "Aethercraft Workshop",
+              "environmental_description": "A working forge of Aethercrafters — the True Tartarian craft of shaping stone and metal with Etheric current. Half-finished sculptures stand at workbenches; the apprentices have stepped out.",
+              "exits": ["back to the catacombs", "into the apprentice hall", "out to the central plaza"],
+              "possibleEncounters": ["Architectural Sentinel", "Aetheric Drone"],
+              "lootTable": ["Rune Engraving Kit", "Etheric Engineer's Toolkit", "Tartarian Rune Inscription Kit", "Etheric Chain", "Etheric Gauntlet", "True Tartarian Gauntlet"]
+            }
+          ]
+        },
+        {
+          "id": "aetherkin_nesting",
+          "name": "Aetherkin Nesting Grounds",
+          "description": "Where the reanimated dead try to return to their Aetheric rest. Disturb the mud and they wake — and they are not patient with the living.",
+          "microMicroLocations": [
+            {
+              "id": "pulsing_mud_chamber",
+              "name": "Pulsing Mud Chamber",
+              "environmental_description": "A circular chamber whose floor pulses faintly violet. Bodies are visible just beneath the surface, half a finger deep, their faces serene.",
+              "exits": ["back to the corridor", "across the chamber (carefully)"],
+              "possibleEncounters": ["Aetherkin", "Aetheric Slug"],
+              "lootTable": ["Aetherstone Fragment", "Aether Core Crystal", "Etheric Talisman", "Whispering Aether Crystal", "Cracked Ether Crystal", "Ancient Fragment"]
+            },
+            {
+              "id": "old_burial_chamber",
+              "name": "Old Burial Chamber",
+              "environmental_description": "An older crypt that predates the flood. The bodies here were buried before the mud came — they have not joined the Aetheric field, only rotted. It feels different.",
+              "exits": ["back to the nesting tunnel", "into the sealed antechamber"],
+              "possibleEncounters": ["Mud Lich", "Aetheric Necromancer", "Aetherkin"],
+              "lootTable": ["Tartarian Blood Dagger", "Obsidian Knife", "Mud Warden Amulet", "Worn Tartarian Coin", "Etheric Talisman", "Forgotten Scroll"]
+            }
+          ]
+        },
+        {
+          "id": "underground_markets",
+          "name": "Underground Markets",
+          "description": "Hidden trade halls of the True Tartarians — Varakush Forum, smoke-thick cantinas, fences who deal in surface contraband.",
+          "microMicroLocations": [
+            {
+              "id": "varakush_forum",
+              "name": "Varakush Forum",
+              "environmental_description": "A hidden enclave of the Forgotten Order — half-meeting hall, half-archive. Maps of buried cities cover the long table. Visitors are watched.",
+              "exits": ["back to the antechamber", "into the document room", "out the back tunnel"],
+              "possibleEncounters": ["Black Cloak Agent"],
+              "lootTable": ["Tartarian Map Fragment", "Forgotten Scroll", "Tartarian Navigator's Compass", "Tartarian Navigator's Map", "Dust Compass", "Etheric Insignia"]
+            },
+            {
+              "id": "hidden_cantina",
+              "name": "Hidden Cantina",
+              "environmental_description": "Low ceilings, lamp smoke, four-rope tables. The bartender is the only honest person here. The drinks are honest too — most of them.",
+              "exits": ["out to the underground street", "into the back room"],
+              "possibleEncounters": ["Reclaimer Ambusher"],
+              "lootTable": ["Bioluminescent Fungus", "Worn Tartarian Coin", "Old Relic Key", "Etheric Potion Vial", "Ether Lamp"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

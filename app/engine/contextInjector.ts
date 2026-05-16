@@ -10,6 +10,7 @@ import type {
   StatusEffect,
 } from './types';
 import type { ChatMessage } from '../ai/generation/QwenGenerativeEngine';
+import type { MacroLocation, MicroLocation, MicroMicroLocation } from './worldLadder';
 
 /**
  * The strict, comma-light fact sheet that gets injected into the Qwen
@@ -37,6 +38,11 @@ export interface ContextInputs {
   player: PlayerCharacter | null;
   scene: SceneSlice | null;
   gameLog: readonly GameLogEntry[];
+  /** Optional world-ladder chunk the player is currently in. When supplied,
+   *  room_name / environmental_description / available_exits come from the
+   *  Micro-Micro node instead of the top-level Location. The biome name
+   *  comes from the Macro. */
+  ladder?: { macro: MacroLocation; micro: MicroLocation; microMicro: MicroMicroLocation } | null;
 }
 
 export interface SceneSlice {
@@ -57,17 +63,43 @@ const UNKNOWN_ROOM = 'an unmarked stretch of ground';
 const NO_ENTITIES = 'None.';
 
 export function buildLlmContext(input: ContextInputs): LlmContext {
-  const { player, scene, gameLog } = input;
+  const { player, scene, gameLog, ladder } = input;
+  const room_name = ladder
+    ? ladder.microMicro.name
+    : scene?.location?.name ?? UNKNOWN_ROOM;
+  const current_biome = ladder
+    ? ladder.macro.name
+    : deriveBiome(scene?.location);
+  const environmental_description = ladder
+    ? buildLadderEnvironment(ladder, scene)
+    : deriveEnvironment(scene);
+  const available_exits = ladder && ladder.microMicro.exits.length > 0
+    ? ladder.microMicro.exits.join(', ')
+    : deriveExits(scene);
   return {
-    current_biome: deriveBiome(scene?.location),
-    room_name: scene?.location?.name ?? UNKNOWN_ROOM,
-    environmental_description: deriveEnvironment(scene),
-    available_exits: deriveExits(scene),
+    current_biome,
+    room_name,
+    environmental_description,
+    available_exits,
     active_entities: formatActiveEntities(scene),
     player_stats: formatPlayerStats(player),
     full_inventory: stringifyInventory(player?.inventory ?? [], player?.equipped, player?.tc ?? 0),
     recent_history: formatRecentHistory(gameLog),
   };
+}
+
+function buildLadderEnvironment(
+  ladder: NonNullable<ContextInputs['ladder']>,
+  scene: SceneSlice | null,
+): string {
+  const parts: string[] = [ladder.microMicro.environmental_description.trim()];
+  if (scene?.weather?.name) {
+    parts.push(`Weather: ${scene.weather.name}${scene.weather.description ? ' — ' + scene.weather.description : ''}`);
+  }
+  if (scene?.hazard) {
+    parts.push(`Hazard: ${scene.hazard.name} — ${scene.hazard.description}`);
+  }
+  return parts.join(' ').trim();
 }
 
 /**
