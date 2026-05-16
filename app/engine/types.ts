@@ -313,6 +313,10 @@ export interface PlayerCharacter {
   /** Last spot key the player dug at (`locationId:x:y`). Must move away
    *  before digging again — prevents stand-still spam farming. */
   lastDugSpot?: string;
+  /** True after the player has finished (or skipped) the new-player intro
+   *  tutorial. Set once, never reset; ensures the walkthrough only runs
+   *  on the first session of a fresh character. */
+  hasSeenIntro?: boolean;
   /** Current (x, y) on the procedural grid. Defaults to map center. */
   mapX?: number;
   mapY?: number;

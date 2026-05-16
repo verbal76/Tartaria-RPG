@@ -12,6 +12,7 @@ import { AboutScreen } from './app/screens/AboutScreen';
 import { InventoryScreen } from './app/screens/InventoryScreen';
 import { CraftingScreen } from './app/screens/CraftingScreen';
 import { VendorScreen } from './app/screens/VendorScreen';
+import { TutorialOverlay } from './app/components/TutorialOverlay';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
 import { startAudioController, stopAudioController } from './app/audio/AudioController';
 
@@ -67,6 +68,7 @@ export default function App() {
         {screen === 'inventory' && <InventoryScreen />}
         {screen === 'crafting' && <CraftingScreen />}
         {screen === 'vendor' && <VendorScreen />}
+        <TutorialOverlay />
       </SafeAreaView>
     </SafeAreaProvider>
   );

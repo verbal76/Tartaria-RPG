@@ -402,6 +402,11 @@ interface GameStore {
   hydrated: boolean;
   /** Set when a slot load fails — UI surfaces this and offers recovery. */
   slotLoadError: string | null;
+  /** Current tutorial step index, or null when no tutorial is active. */
+  tutorialStep: number | null;
+  /** When set, the vendor screen displays this stub vendor for the
+   *  tutorial's trading-screen step. Cleared on tutorial end. */
+  tutorialDemoVendor: VendorInstance | null;
 
   slots: SlotSummary[];
   activeSlotId: string | null;
@@ -419,6 +424,10 @@ interface GameStore {
   refreshSlots: () => Promise<void>;
   loadSlotIntoGame: (slotId: string) => Promise<void>;
   clearSlotLoadError: () => void;
+  /** Tutorial controls — called by the overlay component. */
+  startTutorial: () => void;
+  advanceTutorial: () => void;
+  skipTutorial: () => void;
   deleteSlotById: (slotId: string) => Promise<void>;
   resurrectSlot: (slotId: string) => Promise<boolean>;
 
@@ -481,6 +490,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   pendingRolls: null,
   hydrated: false,
   slotLoadError: null,
+  tutorialStep: null,
+  tutorialDemoVendor: null,
 
   slots: [],
   activeSlotId: null,
@@ -649,6 +660,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     await get().persist();
     const slots = await listSlots();
     set({ slots });
+    // First-time tutorial — only on brand-new characters. Persists once
+    // (hasSeenIntro) so it never reruns on load.
+    if (!player.hasSeenIntro) {
+      get().startTutorial();
+    }
   },
 
   async abandonGame() {
@@ -3185,6 +3201,56 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   clearSlotLoadError() {
     set({ slotLoadError: null });
+  },
+
+  // Tutorial — runs once after first character creation. Players can skip
+  // at the welcome modal or any subsequent step. End of tutorial (skip or
+  // completion) marks player.hasSeenIntro=true so it never re-runs.
+  startTutorial() {
+    set({ tutorialStep: 0 });
+  },
+  advanceTutorial() {
+    const next = (get().tutorialStep ?? 0) + 1;
+    // 11 steps total — index 10 is the final one. Past that, end.
+    const TOTAL_STEPS = 11;
+    if (next >= TOTAL_STEPS) {
+      get().skipTutorial();
+      return;
+    }
+    // The vendor tutorial step (index 9) needs a stub vendor in the
+    // scene so the real VendorScreen has something to render. Inject one
+    // when entering, clear it when leaving.
+    if (next === 9) {
+      const vendor = pickRandomVendor();
+      set({ tutorialDemoVendor: vendor });
+      set((s) => (s.currentScene
+        ? { currentScene: { ...s.currentScene, vendor }, tutorialStep: next }
+        : { tutorialStep: next }));
+      return;
+    }
+    // If leaving the vendor step (10 follows 9), strip the demo vendor.
+    if (get().tutorialStep === 9) {
+      set((s) => (s.currentScene
+        ? { currentScene: { ...s.currentScene, vendor: null }, tutorialDemoVendor: null, tutorialStep: next }
+        : { tutorialDemoVendor: null, tutorialStep: next }));
+      return;
+    }
+    set({ tutorialStep: next });
+  },
+  skipTutorial() {
+    // Clear any tutorial-injected vendor from the scene.
+    set((s) => {
+      const patch: Partial<GameStore> = { tutorialStep: null, tutorialDemoVendor: null };
+      if (s.currentScene && s.tutorialDemoVendor && s.currentScene.vendor === s.tutorialDemoVendor) {
+        patch.currentScene = { ...s.currentScene, vendor: null };
+      }
+      // Persist hasSeenIntro=true so the tutorial never re-runs for this character.
+      if (s.player) {
+        patch.player = { ...s.player, hasSeenIntro: true };
+      }
+      return patch;
+    });
+    void get().persist();
   },
 
   setActiveEnemyIdx(idx: number) {
