@@ -198,7 +198,22 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     milestones: p.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 },
     equipped: p.equipped ?? {},
     statusEffects: p.statusEffects ?? [],
+    hoursElapsed: p.hoursElapsed ?? 0,
   };
+}
+
+// Convert a raw hours-elapsed counter into a friendly "Day N, time-of-day"
+// label. 24 hours per day, four broad slots so the day/night cycle is
+// readable but not granular enough to be annoying.
+function describeTime(hours: number): string {
+  const day = Math.floor(hours / 24) + 1;
+  const hourOfDay = Math.floor(hours % 24);
+  let part: string;
+  if (hourOfDay < 6) part = 'night';
+  else if (hourOfDay < 12) part = 'morning';
+  else if (hourOfDay < 18) part = 'afternoon';
+  else part = 'evening';
+  return `Day ${day}, ${part}`;
 }
 
 // Record a discrete memorable event on the world memory. Used for the
@@ -712,8 +727,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('world', 'You hold still. Tartaria holds still longer.');
         break;
       case 'inventory':
-        get().appendLog('system', 'Pack is on the right.');
+        get().setScreen('inventory');
         break;
+      case 'dodge': {
+        // Defensive stance: +4 AC for one round, costs nothing else.
+        // Implemented as a status effect so it ticks down like everything
+        // else and shows in the StatsPanel "Effects" line.
+        const dodging: StatusEffect = {
+          kind: 'dodging',
+          remainingRounds: 1,
+          label: 'dodging',
+        };
+        set((s) =>
+          s.player
+            ? {
+                player: {
+                  ...s.player,
+                  statusEffects: applyEffect(s.player.statusEffects ?? [], dodging),
+                },
+              }
+            : s,
+        );
+        get().appendLog(
+          'world',
+          currentScene.enemy
+            ? `You drop into a dodging stance. ${currentScene.enemy.name}'s next attack will have to find you.`
+            : `You shift your weight, ready to evade. Nothing tests it.`,
+        );
+        break;
+      }
       case 'ask': {
         // Look up the player's question in the concepts knowledge base. The
         // target text is whatever followed the question verb (the parser
@@ -1534,10 +1576,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!player) return;
     const hpRoom = player.hpMax - player.hp;
     const stamRoom = player.staminaMax - player.stamina;
+    // Rest always advances time, even at full health/stamina — you sat
+    // somewhere for a while. 4-7 hours per rest, rolled randomly.
+    const hoursSlept = rollDie(4) + 3;
+    const newHours = (player.hoursElapsed ?? 0) + hoursSlept;
     if (hpRoom <= 0 && stamRoom <= 0) {
+      set((s) => (s.player ? { player: { ...s.player, hoursElapsed: newHours } } : s));
       get().appendLog(
         'world',
-        'You take a moment to settle yourself. The Aetherstone hums steady — you are already as whole as it allows.',
+        `You sit for ${hoursSlept} hours. Whole already — the Aetherstone hums steady. (${describeTime(newHours)})`,
       );
       void get().persist();
       return;
@@ -1549,12 +1596,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ...player,
         hp: player.hp + heal,
         stamina: player.stamina + stamGain,
+        hoursElapsed: newHours,
       },
     });
     const parts: string[] = [];
     if (heal > 0) parts.push(`2d6 → ${heal} HP`);
     if (stamGain > 0) parts.push(`d6+2 → ${stamGain} stamina`);
-    get().appendLog('world', `You rest. ${parts.join(', ')} recovered.`);
+    get().appendLog(
+      'world',
+      `You rest for ${hoursSlept} hours. ${parts.join(', ')} recovered. (${describeTime(newHours)})`,
+    );
     void get().persist();
   },
 

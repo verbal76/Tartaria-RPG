@@ -1,0 +1,83 @@
+import type { InventoryItem } from '../engine/types';
+import { WEAPONS, ARMOR, MATERIALS, GEAR } from '../engine/crafting';
+
+export type InventoryCategory =
+  | 'weapon'
+  | 'armor'
+  | 'consumable'
+  | 'relic'
+  | 'material'
+  | 'loot';
+
+// Color coding used by both the inventory screen rows and the legend
+// strip at the bottom. Tuned to fit the existing dark/amber palette.
+export const CATEGORY_COLORS: Record<InventoryCategory, string> = {
+  weapon: '#e07a5f',
+  armor: '#6a9bbf',
+  consumable: '#9ec96a',
+  relic: '#b88ce0',
+  material: '#c9a86a',
+  loot: '#a89a7a',
+};
+
+export const CATEGORY_LABEL: Record<InventoryCategory, string> = {
+  weapon: 'Weapons',
+  armor: 'Armor',
+  consumable: 'Consumables',
+  relic: 'Relics',
+  material: 'Materials',
+  loot: 'Loot',
+};
+
+// Order the categories appear in. Weapons first (most actionable),
+// then armor, then consumables, then relics, then crafting stock, then
+// generic loot.
+export const CATEGORY_ORDER: InventoryCategory[] = [
+  'weapon',
+  'armor',
+  'consumable',
+  'relic',
+  'material',
+  'loot',
+];
+
+export function categorizeItem(item: InventoryItem): InventoryCategory {
+  const nameLower = item.name.toLowerCase();
+  // Catalog name matches take precedence over kind/tag heuristics — if a
+  // crafted Aetheric Torch shows up with kind='relic', it should still
+  // resolve to 'relic' via the GEAR catalog.
+  if (WEAPONS.some((w) => w.name.toLowerCase() === nameLower)) return 'weapon';
+  if (ARMOR.some((a) => a.name.toLowerCase() === nameLower)) return 'armor';
+  if (GEAR.some((g) => g.name.toLowerCase() === nameLower)) {
+    const gearKind = GEAR.find((g) => g.name.toLowerCase() === nameLower)?.kind;
+    if (gearKind === 'consumable') return 'consumable';
+    if (gearKind === 'relic') return 'relic';
+    return 'loot';
+  }
+  if (MATERIALS.some((m) => m.name.toLowerCase() === nameLower)) return 'material';
+
+  // Fallback by kind/tags.
+  if (item.kind === 'weapon') return 'weapon';
+  if (item.kind === 'armor') return 'armor';
+  if (item.kind === 'consumable' || item.tags.some((t) => /food|healing/i.test(t))) return 'consumable';
+  if (item.kind === 'relic' || item.tags.some((t) => /relic|detection|light/i.test(t))) return 'relic';
+  if (item.tags.some((t) => /aether|crystal|mud|metal|cloth|fiber|construct/i.test(t))) return 'material';
+  return 'loot';
+}
+
+export function groupInventoryByCategory(
+  inventory: InventoryItem[],
+): Record<InventoryCategory, InventoryItem[]> {
+  const groups: Record<InventoryCategory, InventoryItem[]> = {
+    weapon: [],
+    armor: [],
+    consumable: [],
+    relic: [],
+    material: [],
+    loot: [],
+  };
+  for (const item of inventory) {
+    groups[categorizeItem(item)].push(item);
+  }
+  return groups;
+}

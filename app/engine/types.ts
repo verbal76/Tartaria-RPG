@@ -18,6 +18,7 @@ export type Intent =
   | 'gift'
   | 'steal'
   | 'join'
+  | 'dodge'
   | 'unknown';
 
 export interface ParsedInput {
@@ -217,7 +218,8 @@ export type StatusEffectKind =
   | 'burn_scar'
   | 'armor_severed'
   | 'paralyzed'
-  | 'poisoned';
+  | 'poisoned'
+  | 'dodging';
 
 export interface StatusEffect {
   kind: StatusEffectKind;
@@ -252,6 +254,8 @@ export interface PlayerCharacter {
   equipped?: PlayerEquipped;
   /** Active combat status effects; tick down each player action. */
   statusEffects?: StatusEffect[];
+  /** Hours elapsed since the character entered Tartaria. Day = 24 hours. */
+  hoursElapsed?: number;
 }
 
 export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive';
@@ -314,7 +318,8 @@ export type ScreenName =
   | 'exploration'
   | 'log'
   | 'lore'
-  | 'about';
+  | 'about'
+  | 'inventory';
 
 export interface SaveState {
   version: 1;

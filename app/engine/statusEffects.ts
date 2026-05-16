@@ -133,12 +133,19 @@ export function hasEffect(
 }
 
 /**
- * Effective AC adjustment from status effects. Currently only
- * armor_severed (-2). Stacks with the equipped-armor bonus.
+ * Effective AC adjustment from status effects. armor_severed is -2,
+ * dodging is +4 for the duration of the dodge stance. Stacks with the
+ * equipped-armor bonus.
  */
 export function statusAcAdjustment(current: readonly StatusEffect[] | undefined): number {
   if (!current) return 0;
-  return current.some((e) => e.kind === 'armor_severed' && e.remainingRounds > 0) ? -2 : 0;
+  let adj = 0;
+  for (const e of current) {
+    if (e.remainingRounds <= 0) continue;
+    if (e.kind === 'armor_severed') adj -= 2;
+    if (e.kind === 'dodging') adj += 4;
+  }
+  return adj;
 }
 
 /**

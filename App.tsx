@@ -9,6 +9,7 @@ import { ExplorationScreen } from './app/screens/ExplorationScreen';
 import { LogScreen } from './app/screens/LogScreen';
 import { LoreScreen } from './app/screens/LoreScreen';
 import { AboutScreen } from './app/screens/AboutScreen';
+import { InventoryScreen } from './app/screens/InventoryScreen';
 
 export default function App() {
   const screen = useGameStore((s) => s.currentScreen);
@@ -54,6 +55,7 @@ export default function App() {
         {screen === 'log' && <LogScreen />}
         {screen === 'lore' && <LoreScreen />}
         {screen === 'about' && <AboutScreen />}
+        {screen === 'inventory' && <InventoryScreen />}
       </SafeAreaView>
     </SafeAreaProvider>
   );

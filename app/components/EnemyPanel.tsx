@@ -5,6 +5,7 @@ import {
   StyleSheet,
   FlatList,
   Dimensions,
+  TouchableOpacity,
   type NativeSyntheticEvent,
   type NativeScrollEvent,
   type ListRenderItem,
@@ -14,6 +15,8 @@ import type { Enemy } from '../engine/types';
 export interface EnemyView {
   enemy: Enemy;
   currentHp: number;
+  /** Optional range indicator. Defaults to true (engine is single-enemy / in-melee). */
+  inRange?: boolean;
 }
 
 interface Props {
@@ -40,7 +43,18 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive }: Props) {
 
   if (enemies.length === 0) return null;
 
-  const renderItem: ListRenderItem<EnemyView> = ({ item }) => <EnemyCard view={item} />;
+  // Tap on the panel cycles to the next enemy when more than one is staged.
+  // This is in addition to horizontal swipe paging.
+  const cycleNext = () => {
+    if (enemies.length <= 1) return;
+    onSelectActive((activeIndex + 1) % enemies.length);
+  };
+
+  const renderItem: ListRenderItem<EnemyView> = ({ item }) => (
+    <TouchableOpacity activeOpacity={enemies.length > 1 ? 0.7 : 1} onPress={cycleNext}>
+      <EnemyCard view={item} />
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.wrap}>
@@ -74,6 +88,10 @@ function EnemyCard({ view }: { view: EnemyView }) {
   const atkLabel = Number.isFinite(attackNum) ? `+${attackNum}` : String(view.enemy.attack);
   const hpPct = Math.max(0, Math.min(1, view.currentHp / Math.max(1, view.enemy.hp)));
   const hpColor = hpPct > 0.5 ? '#9ec96a' : hpPct > 0.2 ? '#c9a86a' : '#e07a5f';
+  // Range indicator. Engine doesn't track per-enemy positioning yet —
+  // anyone staged in the scene is in arm's reach. Once positioning is
+  // added this becomes view.inRange.
+  const inRange = view.inRange ?? true;
 
   return (
     <View style={[styles.card, { width: CARD_WIDTH }]}>
@@ -81,7 +99,12 @@ function EnemyCard({ view }: { view: EnemyView }) {
         <Text style={styles.name} numberOfLines={1}>
           {view.enemy.name}
         </Text>
-        <Text style={styles.rarity}>{view.enemy.rarity}</Text>
+        <View style={styles.headRight}>
+          <Text style={[styles.range, inRange ? styles.rangeIn : styles.rangeOut]}>
+            {inRange ? 'IN RANGE' : 'OUT OF RANGE'}
+          </Text>
+          <Text style={styles.rarity}>{view.enemy.rarity}</Text>
+        </View>
       </View>
       <Text style={styles.subline} numberOfLines={1}>
         {view.enemy.type}
@@ -122,8 +145,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'baseline',
   },
+  headRight: { flexDirection: 'row', alignItems: 'baseline', gap: 6 },
   name: { color: '#e07a5f', fontSize: 14, fontWeight: '700', letterSpacing: 1, flexShrink: 1 },
   rarity: { color: '#7a705c', fontSize: 10, letterSpacing: 1 },
+  range: { fontSize: 9, fontWeight: '700', letterSpacing: 1, paddingHorizontal: 4, paddingVertical: 1, borderRadius: 2, borderWidth: 1 },
+  rangeIn: { color: '#9ec96a', borderColor: '#3d5a2c' },
+  rangeOut: { color: '#7a705c', borderColor: '#3a342c' },
   subline: { color: '#7a705c', fontSize: 11, marginBottom: 4 },
   hpBarBg: {
     height: 6,
