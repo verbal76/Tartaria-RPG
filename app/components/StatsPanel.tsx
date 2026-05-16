@@ -57,7 +57,7 @@ export function StatsPanel({ player }: Props) {
         <Stat label="WIS" value={formatStat(player.stats.wisdom, eff.wisdom)} />
         <Stat label="CHA" value={formatStat(player.stats.charisma, eff.charisma)} />
       </View>
-      <Text style={styles.equipped} numberOfLines={3}>
+      <Text style={styles.equipped} numberOfLines={4} ellipsizeMode="tail">
         Equipped: {equippedLabel}
       </Text>
       {player.statusEffects && player.statusEffects.length > 0 && (
@@ -100,16 +100,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#13110f',
     borderColor: '#3a342c',
     borderWidth: 1,
-    padding: 10,
+    padding: 8,
     borderRadius: 4,
   },
-  name: { color: '#e6d8b3', fontSize: 16, fontWeight: '700' },
-  subline: { color: '#7a705c', fontSize: 11, marginBottom: 4 },
-  equipped: { color: '#c9a86a', fontSize: 10, marginTop: 4, letterSpacing: 1 },
-  effects: { color: '#e07a5f', fontSize: 10, marginTop: 2, letterSpacing: 1 },
-  contracts: { color: '#9ec96a', fontSize: 10, marginTop: 2, letterSpacing: 1 },
-  row: { flexDirection: 'row', gap: 8, marginTop: 4 },
-  stat: { flex: 1 },
-  label: { color: '#7a705c', fontSize: 10 },
-  value: { color: '#e6d8b3', fontSize: 13, fontWeight: '600' },
+  name: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
+  subline: { color: '#7a705c', fontSize: 10, marginBottom: 2 },
+  equipped: { color: '#c9a86a', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
+  effects: { color: '#e07a5f', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
+  contracts: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
+  row: { flexDirection: 'row', gap: 4, marginTop: 3 },
+  stat: { flex: 1, minWidth: 0 },
+  label: { color: '#7a705c', fontSize: 9 },
+  value: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
 });

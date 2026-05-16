@@ -59,6 +59,7 @@ export function InputBox({ onSubmit, onOpenInventory, inCombat, equippedMain, eq
             {range && range !== 'far' && (
               <QuickBtn label="step back" onPress={() => onSubmit('step back')} />
             )}
+            <QuickBtn label="pack" onPress={onOpenInventory} />
           </>
         ) : (
           <>
