@@ -15,6 +15,7 @@
 // 2026-05-15m: APK refresh — adds CHECK FOR OTA UPDATE button on About screen + live Updates.* diagnostics (runtimeVersion, channel, updateId, isEnabled, isEmbeddedLaunch). User can manually pull OTAs when automatic check-on-load fails.
 // 2026-05-15n: APK refresh — About screen rewrite. APK build number from native versionCode (set by build-apk.yml from github.run_number), last OTA applied + published-at timestamp from Updates.* live values, cleaned up the "policy" object display. expo-application 6.0.0 added.
 // 2026-05-15o: APK refresh — always start at main menu (no auto-resume), permadeath marks character "DEAD" on slot list instead of erasing, Resurrection Gems dropped ~0.5% per kill saved install-wide, dead slots gated behind gem spend.
+// 2026-05-15p: APK refresh — Arbiter now actively shapes story. Proactive scene-intro narration (~45% on scene start, combat-aware when enemy is staged) gestures at what to do here, not just describes what's here. Soft-fallback inventory hint replaced with contextual scoring (low HP → food, dark hazard → light, curious mood → detection items, combat → weapons). The Arbiter mentions things because they matter, not at random.
 
 const { getDefaultConfig } = require('expo/metro-config');
 

@@ -38,6 +38,7 @@ import {
   buildArbiterRemark,
   shouldArbiterSpeak,
   buildSoftArbiterFallback,
+  buildArbiterSceneIntro,
 } from '../engine/narrativeGenerator';
 import { parseInput, type ParseContext } from '../engine/parser';
 import { rollDie, rollFromNotation, pick, chance } from '../engine/rng';
@@ -374,8 +375,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene: CurrentScene = { weather, location, hazard, enemy };
     set({ currentScene: scene, currentEnemyHp: enemy?.hp ?? null, pendingRolls: null });
     get().appendLog('world', buildScene({ weather, location, hazard, enemy, quest: player.activeQuests[0] }));
-    if (shouldArbiterSpeak()) {
-      get().appendLog('arbiter', buildArbiterRemark({ location, hazard }));
+    // Arbiter gets two voices on scene entry:
+    //   1) ~45% chance — a proactive "scene intro" that gestures at what
+    //      to do here. This is the Arbiter actively shaping the story
+    //      rather than commenting after the fact.
+    //   2) ~25% chance — a reactive remark (mood/intent/location pool).
+    // Both can fire in rare cases but the intro tends to anchor first.
+    if (chance(45)) {
+      get().appendLog('arbiter', buildArbiterSceneIntro(location, enemy));
+    } else if (shouldArbiterSpeak()) {
+      get().appendLog('arbiter', buildArbiterRemark({ location, hazard, enemy }));
     }
     set((s) => ({
       worldMemory: recordTags(
@@ -421,6 +430,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
 
     if (parsed.intent === 'unknown' || parsed.confidence < 0.5) {
+      const lastCog = get().cognitiveLastResponse;
       get().appendLog(
         'arbiter',
         buildSoftArbiterFallback({
@@ -429,6 +439,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           enemy: currentScene.enemy,
           location: currentScene.location,
           hazard: currentScene.hazard,
+          playerHpFraction: player.hpMax > 0 ? player.hp / player.hpMax : 1,
+          mood: lastCog?.inferredEmotions[0],
         }),
       );
       if (parsed.suggestions.length) {

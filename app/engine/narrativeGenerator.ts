@@ -351,6 +351,55 @@ export interface SoftArbiterContext {
   enemy?: Enemy | null;
   location: Location;
   hazard?: Hazard | null;
+  /** 0..1 — used to bias the Arbiter toward suggesting food when the player is hurt. */
+  playerHpFraction?: number;
+  /** Cognitive layer's most recent dominant emotion, used to bias hints. */
+  mood?: string;
+}
+
+// Score an inventory item by relevance to the current situation. Higher score
+// = better hint candidate. Used in soft fallback so the Arbiter mentions an
+// item that actually fits the moment, not a random one from the pack.
+function scoreItemForHint(item: InventoryItem, ctx: SoftArbiterContext): number {
+  let score = 0;
+  const tags = item.tags ?? [];
+  const hazardTags = ctx.hazard?.tags ?? [];
+  const hpHurt = (ctx.playerHpFraction ?? 1) < 0.5;
+  const hpCritical = (ctx.playerHpFraction ?? 1) < 0.25;
+
+  // Light sources in dark / obscured hazards or fearful mood.
+  if (tags.includes('light')) {
+    if (hazardTags.some((t) => /dark|obscure|fog|haze|night/.test(t))) score += 5;
+    if (ctx.mood === 'FEAR') score += 2;
+    if (ctx.enemy) score += 1;
+  }
+  // Food / consumables when the player is hurt.
+  if (tags.includes('food') || item.kind === 'consumable') {
+    if (hpCritical) score += 6;
+    else if (hpHurt) score += 3;
+  }
+  // Detection / lore items when curious or facing mystery.
+  if (tags.includes('detection') || tags.includes('relic')) {
+    if (ctx.mood === 'CURIOSITY') score += 3;
+    if (hazardTags.some((t) => /mystery|unknown|aether/.test(t))) score += 2;
+  }
+  // Weapons / blades in combat.
+  if (tags.some((t) => /weapon|blade|edge|runecaster/.test(t))) {
+    if (ctx.enemy) score += 4;
+  }
+  return score;
+}
+
+function pickContextualItem(inventory: InventoryItem[], ctx: SoftArbiterContext): InventoryItem | null {
+  if (inventory.length === 0) return null;
+  const scored = inventory.map((item) => ({ item, score: scoreItemForHint(item, ctx) }));
+  scored.sort((a, b) => b.score - a.score);
+  const top = scored[0]!;
+  if (top.score > 0) {
+    const tied = scored.filter((s) => s.score === top.score).map((s) => s.item);
+    return pick(tied);
+  }
+  return pick(inventory);
 }
 
 export function buildSoftArbiterFallback(ctx: SoftArbiterContext): string {
@@ -367,9 +416,21 @@ export function buildSoftArbiterFallback(ctx: SoftArbiterContext): string {
     ]);
   }
 
-  if (inventory.length > 0) {
-    const item = pick(inventory);
-    return `The Arbiter glances at your pack. "Your ${item.name.toLowerCase()} is still there, if it suits the moment."`;
+  const item = pickContextualItem(inventory, ctx);
+  if (item) {
+    // Tagline depends on WHY it was picked, so the hint feels intentional.
+    const name = item.name.toLowerCase();
+    const tags = item.tags ?? [];
+    if ((ctx.playerHpFraction ?? 1) < 0.5 && (tags.includes('food') || item.kind === 'consumable')) {
+      return `The Arbiter notes your wounds and your pack in the same glance. "The ${name} would mend you, if you stopped to take it."`;
+    }
+    if (tags.includes('light') && (ctx.hazard || ctx.mood === 'FEAR')) {
+      return `The Arbiter looks at the dark around you. "The ${name} was made for moments like this."`;
+    }
+    if (tags.includes('detection') && ctx.mood === 'CURIOSITY') {
+      return `The Arbiter's eyes find your pack. "The ${name} hums in places like this. Worth a moment of attention."`;
+    }
+    return `The Arbiter glances at your pack. "Your ${name} is still there, if it suits the moment."`;
   }
 
   return pick([
@@ -377,4 +438,33 @@ export function buildSoftArbiterFallback(ctx: SoftArbiterContext): string {
     `"Search, rest, or move on," the Arbiter offers. "Even small choices echo in ${location.name}."`,
     `The Arbiter studies you. "Phrase it as the deed you mean to do. Look. Search. Strike. Flee."`,
   ]);
+}
+
+// Proactive Arbiter beats fired at scene start. These shape the story by
+// gesturing at a direction the player might take — not "describe what's
+// here" but "here is what to do about it." Combat scenes get a different
+// pool so the Arbiter stays on-topic when an enemy is staged.
+const ARBITER_SCENE_INTROS = [
+  `The Arbiter steps to the edge of {locationName} and watches. "Worth a careful look before the dust settles."`,
+  `"This place has changed since I last passed through," the Arbiter says. "Or perhaps it has not, and I have."`,
+  `The Arbiter inhales the air of {locationName}. "Tartaria is louder here than it was an hour ago. Move carefully."`,
+  `"There are paths from this place," the Arbiter murmurs. "Ask, and I will tell you what I know."`,
+  `The Arbiter eyes one corner of {locationName}. "Begin there, if you must begin somewhere."`,
+  `"You could rest here," the Arbiter says. "Or push on. Tartaria does not insist."`,
+  `The Arbiter watches the dust hang. "The room has not been disturbed in some time. Or it has, and you should look closer."`,
+  `"Three things in this place would reward attention," the Arbiter says, without naming them. "I would start with the one you cannot quite see."`,
+];
+
+const ARBITER_COMBAT_INTROS = [
+  `The Arbiter watches the {enemyName}. "It has not moved on its own yet. That means something."`,
+  `"You can take it, or you can leave it," the Arbiter says. "It will remember either way."`,
+  `The Arbiter's gaze stays on the {enemyName}. "Strike, hide, or speak — the choice is yours and it is brief."`,
+  `"That one bleeds slow," the Arbiter says quietly. "Plan two moves, not one."`,
+];
+
+export function buildArbiterSceneIntro(location: Location, enemy?: Enemy | null): string {
+  if (enemy) {
+    return pick(ARBITER_COMBAT_INTROS).replace('{enemyName}', enemy.name.toLowerCase());
+  }
+  return pick(ARBITER_SCENE_INTROS).replace('{locationName}', location.name);
 }
