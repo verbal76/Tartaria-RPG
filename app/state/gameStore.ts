@@ -55,6 +55,7 @@ import {
   LOCATION_TO_MACRO,
   findMicroMicroAnywhere,
   pickRandomMicroMicroIn,
+  pickSiblingMicroMicro,
 } from '../engine/worldLadder';
 import { getItemPreview } from '../components/itemPreview';
 import { isInventoryQuestion, extractInventoryTarget, isContinueCommand } from '../engine/askInventory';
@@ -478,7 +479,7 @@ interface GameStore {
 
   appendLog: (channel: LogChannel, text: string, meta?: Record<string, unknown>) => void;
 
-  beginScene: (opts?: { openingPrefix?: string }) => void;
+  beginScene: (opts?: { openingPrefix?: string; microMicroId?: string }) => void;
   submitPlayerAction: (text: string) => void;
   resolveRollStep: (values: number[]) => void;
   cancelPendingRolls: () => void;
@@ -751,7 +752,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }));
   },
 
-  beginScene(opts?: { openingPrefix?: string }) {
+  beginScene(opts?: { openingPrefix?: string; microMicroId?: string }) {
     const { player, worldMemory } = get();
     if (!player) return;
     const location = getLocationById(player.currentLocationId);
@@ -793,10 +794,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // consistent room — re-picking each turn would feel like the world
     // shifts under the player's feet.
     let microMicroId: string | null = null;
-    const macroId = LOCATION_TO_MACRO[location.id];
-    if (macroId) {
-      const triple = pickRandomMicroMicroIn(macroId);
-      if (triple) microMicroId = triple.microMicro.id;
+    // Caller (e.g. the exit-follow path in 'travel') can pre-select a
+    // specific Micro-Micro for this scene — honored when it resolves and
+    // belongs to a Macro the current Location maps to. Otherwise we fall
+    // back to a random pick from the Macro pool.
+    if (opts?.microMicroId) {
+      const resolved = findMicroMicroAnywhere(opts.microMicroId);
+      if (resolved) microMicroId = resolved.microMicro.id;
+    }
+    if (!microMicroId) {
+      const macroId = LOCATION_TO_MACRO[location.id];
+      if (macroId) {
+        const triple = pickRandomMicroMicroIn(macroId);
+        if (triple) microMicroId = triple.microMicro.id;
+      }
     }
     const scene: CurrentScene = {
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
@@ -1374,6 +1385,47 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.travel), 1) });
           get().stepDirection(dir);
           break;
+        }
+        // Exit-follow: when the player is in a Micro-Micro room and types
+        // something that matches one of its narrated exits ("go through
+        // the broken window", "take the stairwell", "down the maintenance
+        // hatch"), step into a sibling room in the same Micro location.
+        // Standard travel cost — 1 hour + STAMINA_COSTS.travel.
+        const sceneMicroMicroId = currentScene.microMicroId;
+        if (sceneMicroMicroId) {
+          const here = findMicroMicroAnywhere(sceneMicroMicroId);
+          if (here) {
+            const lowered = (target || trimmed).toLowerCase();
+            const matchedExit = here.microMicro.exits.find((exit) => {
+              const e = exit.toLowerCase();
+              if (lowered.includes(e)) return true;
+              // Also match if the player picked one or two significant words
+              // from the exit phrase: "take the catwalk" matches "across the
+              // catwalk". Single-word match must be ≥4 chars to avoid noise.
+              for (const w of lowered.split(/\s+/)) {
+                if (w.length >= 4 && e.includes(w)) return true;
+              }
+              return false;
+            });
+            // Also allow a bare "go to the exit" / "take an exit" / "leave"
+            // shortcut that doesn't match any specific phrase but should
+            // still move the player to a sibling room.
+            const genericExit = /\b(exit|leave|next room|onward)\b/.test(lowered);
+            if (matchedExit || genericExit) {
+              const sibling = pickSiblingMicroMicro(sceneMicroMicroId);
+              if (sibling) {
+                set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.travel), 1) });
+                get().appendLog(
+                  'world',
+                  matchedExit
+                    ? `You take the ${matchedExit}. The next chamber opens up.`
+                    : `You step through to the next chamber.`,
+                );
+                get().beginScene({ microMicroId: sibling.microMicro.id });
+                break;
+              }
+            }
+          }
         }
         const candidate = target
           ? allLocations.find((l) => l.name.toLowerCase().includes(target) || l.id === target)

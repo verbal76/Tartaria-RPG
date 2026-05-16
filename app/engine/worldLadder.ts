@@ -167,3 +167,38 @@ export function pickRandomMicroMicroIn(
   const idx = Math.floor(rng() * candidates.length);
   return candidates[idx] ?? null;
 }
+
+/**
+ * Picks a Micro-Micro DIFFERENT from the given one, preferring siblings
+ * in the same parent Micro location and falling back to the wider Macro.
+ * Used by the exit-following travel path so the player who types "go
+ * through the broken window" gets a thematically nearby room rather than
+ * a teleport to an unrelated biome.
+ *
+ * Returns null if the source id is unknown or its parents contain no
+ * other rooms.
+ */
+export function pickSiblingMicroMicro(
+  sourceMicroMicroId: string,
+  rng: () => number = Math.random,
+): LadderTriple | null {
+  const source = findMicroMicroAnywhere(sourceMicroMicroId);
+  if (!source) return null;
+  // Tier 1: sibling rooms in the same Micro location.
+  const intraMicro = source.micro.microMicroLocations.filter(
+    (mm) => mm.id !== sourceMicroMicroId,
+  );
+  if (intraMicro.length > 0) {
+    const pick = intraMicro[Math.floor(rng() * intraMicro.length)]!;
+    return { macro: source.macro, micro: source.micro, microMicro: pick };
+  }
+  // Tier 2: any other room anywhere in the same Macro biome.
+  const intraMacro: LadderTriple[] = [];
+  for (const micro of source.macro.microLocations) {
+    for (const mm of micro.microMicroLocations) {
+      if (mm.id !== sourceMicroMicroId) intraMacro.push({ macro: source.macro, micro, microMicro: mm });
+    }
+  }
+  if (intraMacro.length === 0) return null;
+  return intraMacro[Math.floor(rng() * intraMacro.length)] ?? null;
+}

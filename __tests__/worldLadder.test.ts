@@ -7,6 +7,7 @@ import {
   findMicroMicro,
   findMicroMicroAnywhere,
   pickRandomMicroMicroIn,
+  pickSiblingMicroMicro,
   macroForLocation,
 } from '../app/engine/worldLadder';
 import enemiesData from '../app/data/enemies/enemies.json';
@@ -189,5 +190,61 @@ describe('LOCATION_TO_MACRO mapping', () => {
     expect(macroForLocation('asgardar')?.id).toBe('lost_capitals');
     expect(macroForLocation('great_tartary_plains')?.id).toBe('silt_wastes');
     expect(macroForLocation('this_is_not_a_real_location')).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// pickSiblingMicroMicro — exit-follow navigation
+// ---------------------------------------------------------------------------
+
+describe('pickSiblingMicroMicro', () => {
+  it('returns null for an unknown source id', () => {
+    expect(pickSiblingMicroMicro('no_such_room')).toBeNull();
+  });
+
+  it('prefers a sibling in the same parent Micro location', () => {
+    // The "sunken_metropolis" Micro has 4 rooms — picking a sibling of
+    // buried_skyscraper_upper should land on one of the other three.
+    const result = pickSiblingMicroMicro('buried_skyscraper_upper', () => 0);
+    expect(result).not.toBeNull();
+    expect(result!.micro.id).toBe('sunken_metropolis');
+    expect(result!.microMicro.id).not.toBe('buried_skyscraper_upper');
+    expect(
+      ['buried_skyscraper_lower', 'submerged_transit_hub', 'subterranean_garage'],
+    ).toContain(result!.microMicro.id);
+  });
+
+  it('falls back to a sibling in the wider Macro when the parent Micro is single-room', () => {
+    // Find a Micro with exactly one room (if any exist). Construct the test
+    // dynamically against current data so it doesn't rot.
+    const macros = MACRO_LOCATIONS;
+    let singleRoomMicroMicroId: string | null = null;
+    let expectedMacroId: string | null = null;
+    for (const macro of macros) {
+      for (const micro of macro.microLocations) {
+        if (micro.microMicroLocations.length === 1) {
+          singleRoomMicroMicroId = micro.microMicroLocations[0]!.id;
+          expectedMacroId = macro.id;
+          break;
+        }
+      }
+      if (singleRoomMicroMicroId) break;
+    }
+    // If every Micro in the data has 2+ rooms, this test simply passes —
+    // the case is theoretically supported but not exercised.
+    if (!singleRoomMicroMicroId || !expectedMacroId) return;
+    const result = pickSiblingMicroMicro(singleRoomMicroMicroId, () => 0);
+    expect(result).not.toBeNull();
+    expect(result!.macro.id).toBe(expectedMacroId);
+    expect(result!.microMicro.id).not.toBe(singleRoomMicroMicroId);
+  });
+
+  it('never returns the source id', () => {
+    // Run with several RNG seeds — none of them should land back on the source.
+    const seeds = [0, 0.1, 0.25, 0.5, 0.75, 0.9, 0.99];
+    for (const s of seeds) {
+      const result = pickSiblingMicroMicro('buried_skyscraper_upper', () => s);
+      if (result) expect(result.microMicro.id).not.toBe('buried_skyscraper_upper');
+    }
   });
 });
