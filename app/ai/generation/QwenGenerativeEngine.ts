@@ -1,4 +1,8 @@
-import * as FileSystem from 'expo-file-system';
+import { ModelDownloader } from '../ota/ModelDownloader';
+import {
+  LlamaRuntime,
+  type QwenChatMessage,
+} from './LlamaRuntime';
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -6,112 +10,74 @@ import * as FileSystem from 'expo-file-system';
 
 export type QwenStatus = 'idle' | 'downloading' | 'loading' | 'ready' | 'failed';
 
-export interface ChatMessage {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
-}
+/**
+ * Chat-shaped message. Aliased from LlamaRuntime so callers don't have to
+ * import from two places. Same shape as Qwen's ChatML schema.
+ */
+export type ChatMessage = QwenChatMessage;
 
 export interface QwenInitOptions {
-  /** HuggingFace model ID. Default: onnx-community/Qwen2.5-0.5B-Instruct. */
-  modelId?: string;
-  /** Quantization dtype. Default 'q4' (INT4). */
-  dtype?: 'q4' | 'q8' | 'fp16' | 'fp32';
-  /** Device hint. Default 'cpu' — onnxruntime-react-native runs on CPU. */
-  device?: 'cpu' | 'wasm' | 'webgpu';
-  /** Optional progress callback for download + load stages. */
+  /** Override the HF URL the GGUF is downloaded from. */
+  modelUrl?: string;
+  /** Override the on-device cache path (test hook). */
+  modelPath?: string;
+  /** Inject a custom downloader for tests. */
+  downloader?: { ensureQwenGguf(opts: { url?: string; onProgress?: (f: number) => void }): Promise<string> };
+  /** Inject a custom LlamaRuntime instance for tests. */
+  runtime?: LlamaRuntime;
+  /** Optional progress callback fired during download + load. */
   onProgress?: (status: QwenStatus, fraction: number) => void;
+  /** Context window in tokens. Default 2048 (plenty for Arbiter prompts). */
+  contextSize?: number;
+  /** Inference threads. Default 4 (sane for mid-tier mobile CPU). */
+  threads?: number;
 }
 
 export interface GenerateOptions {
-  /** Max new tokens to produce. Default 200. */
+  /** Cap on tokens the model will emit. Default 120. */
   maxNewTokens?: number;
   /** Sampling temperature. Default 0.8. */
   temperature?: number;
   /** Top-p nucleus sampling. Default 0.9. */
   topP?: number;
-  /** Whether to sample (true) or greedy decode (false). Default true. */
-  doSample?: boolean;
-  /** Abort signal — if fired mid-generation, throws AbortError. */
-  signal?: AbortSignal;
+  /** Top-k sampling. Default 40. */
+  topK?: number;
 }
 
 // ---------------------------------------------------------------------------
-// transformers.js loader (stubbed in React Native)
+// Defaults
 // ---------------------------------------------------------------------------
-// The @huggingface/transformers v3 package is NOT React Native compatible
-// despite some claims to the contrary. Its src/env.js does
-//   import fs from 'node:fs';
-//   import path from 'node:path';
-//   import url from 'node:url';
-// at the top of the file — Node.js core modules that Metro cannot bundle
-// for React Native. Including the package in package.json caused the
-// 2026-05-16 preview-APK build to fail at the createBundleReleaseJsAndAssets
-// step with "Unable to resolve module node:fs".
-//
-// The engine architecture stays in place — the public API of this class
-// (initialize / generate / stream / status) is the integration point any
-// future LLM swap will plug into. For now, loadTransformers always returns
-// null, the engine reports 'failed' on init, and the existing template
-// narration pool carries the Arbiter (the pre-Phase-3 behavior, just with
-// the v2.0.1 context-aware fire-rate tuning still active).
-//
-// To restore generative narration, the path forward is one of:
-//   a) react-native-transformers (separate package, RN-native build target)
-//   b) a native bridge to llama.cpp / MLC LLM / executorch
-//   c) hosted inference over HTTPS (HF Inference Providers, OpenRouter, etc.)
-// Each plugs in via this file alone — no callers of QwenGenerativeEngine
-// need to change.
 
-// Minimal interface kept in place so the test hooks below still type-check.
-type TransformersModuleShape = {
-  pipeline: (task: string, modelId: string, options?: unknown) => Promise<unknown>;
-  TextStreamer: new (tokenizer: unknown, opts: unknown) => unknown;
-  env: Record<string, unknown>;
-};
-
-let transformersCache: TransformersModuleShape | null = null;
-let transformersLoadAttempted = false;
-
-function loadTransformers(): TransformersModuleShape | null {
-  // STUB: no static or dynamic reference to '@huggingface/transformers' so
-  // Metro never resolves the package and the bundle never hits node:fs.
-  // Tests inject a fake module via __setTransformersModuleForTests below.
-  return transformersCache;
-}
-
-/** Test hook — lets unit tests inject a fake module. */
-export function __setTransformersModuleForTests(mod: TransformersModuleShape | null): void {
-  transformersCache = mod;
-  transformersLoadAttempted = true;
-}
-
-/** Test hook — resets the loader so the next call re-attempts. */
-export function __resetTransformersLoaderForTests(): void {
-  transformersCache = null;
-  transformersLoadAttempted = false;
-}
+/** Label shown in About / debug surfaces. Not a registry id. */
+export const DEFAULT_QWEN_MODEL_ID = 'Qwen2.5-0.5B-Instruct (Q4_K_M GGUF)';
 
 // ---------------------------------------------------------------------------
 // QwenGenerativeEngine
 // ---------------------------------------------------------------------------
-
-export const DEFAULT_QWEN_MODEL_ID = 'onnx-community/Qwen2.5-0.5B-Instruct';
-export const DEFAULT_QWEN_DTYPE: NonNullable<QwenInitOptions['dtype']> = 'q4';
+//
+// Bridge between the game's narration code (gameStore.narrateViaArbiter)
+// and whatever inference backend we wire up underneath. Currently uses
+// llama.rn + a Q4_K_M GGUF of Qwen 2.5 0.5B Instruct, downloaded on first
+// run via ModelDownloader and held in memory by LlamaRuntime.
+//
+// Public API (initialize / generate / stream / isReady / getStatus / etc.)
+// is intentionally stable — earlier iterations used @huggingface/transformers
+// (broken on RN — see commit 0492434) and the next backend swap should
+// only touch the inside of this file.
 
 export class QwenGenerativeEngine {
   private status: QwenStatus = 'idle';
-  private pipe: unknown = null;
   private downloadFraction = 0;
   private lastError: string | null = null;
+  private runtime: LlamaRuntime | null = null;
   private modelId: string = DEFAULT_QWEN_MODEL_ID;
-  private dtype: NonNullable<QwenInitOptions['dtype']> = DEFAULT_QWEN_DTYPE;
 
   getStatus(): QwenStatus {
     return this.status;
   }
 
   isReady(): boolean {
-    return this.status === 'ready' && this.pipe !== null;
+    return this.status === 'ready' && this.runtime !== null && this.runtime.isReady();
   }
 
   getDownloadFraction(): number {
@@ -127,179 +93,117 @@ export class QwenGenerativeEngine {
   }
 
   /**
-   * Loads the model. Idempotent — calling while already ready/loading is a no-op.
-   * On any failure, status moves to 'failed' and lastError is set. Throws only
-   * if the caller wants to propagate; callers in the game store catch and log.
+   * Downloads the GGUF (~398 MB on first launch, instant on subsequent
+   * launches) and initializes the llama.rn context. Idempotent — calling
+   * while already ready/loading/downloading is a no-op.
+   *
+   * On any failure: status moves to 'failed' and lastError is set. Doesn't
+   * throw; gameStore.bootQwen catches and logs anyway. Templates carry the
+   * Arbiter when the engine isn't ready.
    */
   async initialize(opts: QwenInitOptions = {}): Promise<void> {
     if (this.status === 'ready' || this.status === 'loading' || this.status === 'downloading') {
       return;
     }
-
-    this.modelId = opts.modelId ?? DEFAULT_QWEN_MODEL_ID;
-    this.dtype = opts.dtype ?? DEFAULT_QWEN_DTYPE;
-    const device = opts.device ?? 'cpu';
     const onProgress = opts.onProgress;
-
     this.status = 'downloading';
     this.downloadFraction = 0;
     this.lastError = null;
     onProgress?.('downloading', 0);
 
-    const transformers = loadTransformers();
-    if (!transformers) {
+    // ── 1) Ensure the GGUF is on disk ─────────────────────────────────────
+    const downloader = opts.downloader ?? new ModelDownloader();
+    let modelPath: string;
+    try {
+      if (opts.modelPath) {
+        modelPath = opts.modelPath;
+      } else {
+        modelPath = await downloader.ensureQwenGguf({
+          url: opts.modelUrl,
+          onProgress: (frac) => {
+            this.downloadFraction = frac;
+            onProgress?.('downloading', frac);
+          },
+        });
+      }
+    } catch (err) {
       this.status = 'failed';
-      this.lastError = '@huggingface/transformers not available in this build';
+      this.lastError = err instanceof Error ? `GGUF download failed: ${err.message}` : String(err);
       return;
     }
 
-    // Configure cache directory so model shards land in our expo-file-system
-    // managed dir instead of wherever transformers.js defaults to.
+    // ── 2) Load the model into a llama.cpp context ────────────────────────
+    this.status = 'loading';
+    onProgress?.('loading', 0);
     try {
-      const root = FileSystem.documentDirectory;
-      if (root) {
-        transformers.env.allowLocalModels = false;
-        transformers.env.cacheDir = root + 'tartaria-models/qwen/';
-      }
-    } catch {
-      // env config is best-effort; not fatal
-    }
-
-    try {
-      const pipelineOpts = {
-        dtype: this.dtype,
-        device,
-        progress_callback: (data: unknown) => {
-          // transformers.js emits { status, progress, file, ... } objects.
-          // We collapse them into a single 0..1 fraction for the UI.
-          const d = data as { status?: string; progress?: number };
-          if (d && typeof d.progress === 'number') {
-            const frac = Math.max(0, Math.min(1, d.progress / 100));
-            this.downloadFraction = frac;
-            onProgress?.('downloading', frac);
-          }
-          if (d && d.status === 'done') {
-            this.status = 'loading';
-            onProgress?.('loading', 0);
-          }
-        },
-      };
-
-      this.pipe = await transformers.pipeline('text-generation', this.modelId, pipelineOpts);
+      const runtime = opts.runtime ?? new LlamaRuntime();
+      await runtime.initialize({
+        modelPath,
+        contextSize: opts.contextSize ?? 2048,
+        threads: opts.threads ?? 4,
+      });
+      this.runtime = runtime;
       this.status = 'ready';
       this.downloadFraction = 1;
       onProgress?.('ready', 1);
     } catch (err) {
       this.status = 'failed';
-      this.lastError = err instanceof Error ? err.message : String(err);
-      this.pipe = null;
+      this.lastError = err instanceof Error ? `Load failed: ${err.message}` : String(err);
+      this.runtime = null;
     }
   }
 
   /**
-   * Generates a complete response (no streaming). Used for short, non-blocking
-   * uses where the caller would rather wait for the whole string.
+   * Generates a complete response (no streaming). Used when the caller would
+   * rather wait for the whole string than render token-by-token.
    */
-  async generate(messages: ChatMessage[], opts: GenerateOptions = {}): Promise<string> {
-    if (!this.isReady() || !this.pipe) {
+  async generate(messages: readonly ChatMessage[], opts: GenerateOptions = {}): Promise<string> {
+    if (!this.runtime || !this.isReady()) {
       throw new Error('QwenGenerativeEngine not ready (status=' + this.status + ')');
     }
-    const pipe = this.pipe as (msgs: unknown, opts: unknown) => Promise<unknown>;
-    const result = await pipe(messages, {
-      max_new_tokens: opts.maxNewTokens ?? 200,
+    return this.runtime.generate(messages, {
+      maxTokens: opts.maxNewTokens ?? 120,
       temperature: opts.temperature ?? 0.8,
-      top_p: opts.topP ?? 0.9,
-      do_sample: opts.doSample ?? true,
+      topP: opts.topP ?? 0.9,
+      topK: opts.topK ?? 40,
     });
-    return extractAssistantText(result);
   }
 
   /**
-   * Streams tokens to the callback as they're produced. Returns the final
-   * assembled text. If the caller wants to render token-by-token, they should
-   * accumulate from the onToken callback rather than waiting for the return.
+   * Streams tokens to the callback as they're emitted. Returns the final
+   * assembled text once generation completes. Callers typically accumulate
+   * from the onToken callback for live UI rather than waiting for the return.
    */
   async stream(
-    messages: ChatMessage[],
+    messages: readonly ChatMessage[],
     onToken: (token: string) => void,
     opts: GenerateOptions = {},
   ): Promise<string> {
-    if (!this.isReady() || !this.pipe) {
+    if (!this.runtime || !this.isReady()) {
       throw new Error('QwenGenerativeEngine not ready (status=' + this.status + ')');
     }
-    const transformers = loadTransformers();
-    if (!transformers) {
-      throw new Error('@huggingface/transformers not available');
-    }
-
-    let assembled = '';
-    const pipeAny = this.pipe as { tokenizer: unknown } & ((msgs: unknown, opts: unknown) => Promise<unknown>);
-    const tokenizer = pipeAny.tokenizer;
-    const streamer = new transformers.TextStreamer(tokenizer, {
-      skip_prompt: true,
-      skip_special_tokens: true,
-      callback_function: (token: string) => {
-        if (typeof token === 'string') {
-          assembled += token;
-          try { onToken(token); } catch { /* user callback errors swallowed */ }
-        }
-      },
-    });
-
-    const result = await pipeAny(messages, {
-      max_new_tokens: opts.maxNewTokens ?? 200,
+    return this.runtime.generate(messages, {
+      maxTokens: opts.maxNewTokens ?? 120,
       temperature: opts.temperature ?? 0.8,
-      top_p: opts.topP ?? 0.9,
-      do_sample: opts.doSample ?? true,
-      streamer,
+      topP: opts.topP ?? 0.9,
+      topK: opts.topK ?? 40,
+      onToken,
     });
-    // Prefer the streamer-assembled text (already strips the prompt). Fall back
-    // to extracting from the full result if the streamer never fired.
-    return assembled || extractAssistantText(result);
   }
 
-  /** Tear down the pipeline. Used on OTA reload to free memory cleanly. */
+  /**
+   * Tears down the llama context. Used on backgrounding / OTA reload to
+   * free memory cleanly.
+   */
   async dispose(): Promise<void> {
-    if (this.pipe) {
-      try {
-        const p = this.pipe as { dispose?: () => Promise<void> };
-        await p.dispose?.();
-      } catch {
-        // ignore — best effort
-      }
-      this.pipe = null;
+    if (this.runtime) {
+      try { await this.runtime.dispose(); } catch { /* best effort */ }
+      this.runtime = null;
     }
     this.status = 'idle';
     this.downloadFraction = 0;
   }
 }
 
-// ---------------------------------------------------------------------------
-// Internals
-// ---------------------------------------------------------------------------
-
-/**
- * transformers.js pipeline returns either:
- *   - Array<{ generated_text: string }>   (raw text mode)
- *   - Array<{ generated_text: ChatMessage[] }>  (chat mode — returns the full
- *     conversation including the new assistant turn)
- * We normalize both into the final assistant text.
- */
-function extractAssistantText(result: unknown): string {
-  if (!result) return '';
-  if (Array.isArray(result) && result.length > 0) {
-    const first = result[0] as { generated_text?: unknown };
-    const gen = first?.generated_text;
-    if (typeof gen === 'string') return gen.trim();
-    if (Array.isArray(gen)) {
-      // Chat-shaped output. Find the last assistant turn.
-      for (let i = gen.length - 1; i >= 0; i--) {
-        const turn = gen[i] as { role?: string; content?: string };
-        if (turn?.role === 'assistant' && typeof turn.content === 'string') {
-          return turn.content.trim();
-        }
-      }
-    }
-  }
-  return '';
-}
+/** Re-export so callers can use it as the parameter to opts.runtime. */
+export { LlamaRuntime } from './LlamaRuntime';
