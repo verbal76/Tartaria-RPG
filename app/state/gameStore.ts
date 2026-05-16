@@ -777,7 +777,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const newInventory = player.inventory
             .map((i) => (i.id === consumable.id ? { ...i, quantity: i.quantity - 1 } : i))
             .filter((i) => i.quantity > 0);
-          set({ player: { ...player, hp: player.hp + heal, inventory: newInventory } });
+          // Eating still costs a slice of the day — half an hour to break
+          // and chew a ration, so the clock advances too.
+          set({
+            player: advanceTime(
+              { ...player, hp: player.hp + heal, inventory: newInventory },
+              0.5,
+            ),
+          });
           const tail = heal > 0
             ? `2d6 → ${heal} HP recovered.`
             : 'You were already at full strength — the ration steadies you, nothing more.';
@@ -875,7 +882,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // still in their effective range.
         const stillInReach = enemyCanReach(currentScene.enemy, next);
         if (stillInReach) {
-          applyEnemyCounter(currentScene.enemy, player, get, set);
+          applyEnemyCounter(currentScene.enemy, get().player ?? player, get, set);
         }
         break;
       }
@@ -1315,8 +1322,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
 
       // Weapon wear: any successful hit chips one point off the weapon
-      // that landed it. Bare hands aren't tracked.
-      const weaponInUse = player.equipped?.main ?? player.equipped?.weaponName ?? null;
+      // that landed it. Bare hands aren't tracked. Mirrors the off-hand
+      // detection in buildCombatSteps so the right blade takes the wear.
+      const usedOffHand = /\boff[- ]?hand\b/.test(actionText.toLowerCase());
+      const weaponInUse = usedOffHand
+        ? (player.equipped?.off ?? player.equipped?.main ?? null)
+        : (player.equipped?.main ?? player.equipped?.weaponName ?? player.equipped?.off ?? null);
       if (weaponInUse) {
         set((s) => (s.player ? { player: wearEquippedItem(s.player, weaponInUse, get) } : s));
       }
@@ -1332,7 +1343,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     } else {
       get().appendLog('combat', attackMiss(weaponName, enemy.name));
-      applyEnemyCounter(enemy, player, get, set);
+      applyEnemyCounter(enemy, get().player ?? player, get, set);
     }
 
     if (shouldArbiterSpeak()) {

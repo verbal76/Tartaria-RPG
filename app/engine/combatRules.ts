@@ -61,7 +61,10 @@ export function buildCombatSteps(
 ): RollStep[] {
   // Equipped weapon takes precedence over text-based weapon-class detection.
   // No equip = fall back to the original behavior (rusted blade / fists).
-  const equipped = getEquippedWeapon(player);
+  // Off-hand attack: when the player says "off-hand" or "off hand", route
+  // through the off-slot weapon instead of the main.
+  const prefersOff = /\boff[- ]?hand\b/.test(actionText.toLowerCase());
+  const equipped = getEquippedWeapon(player, prefersOff ? 'off' : 'main');
   const wc: WeaponClass = equipped?.weaponKind ?? detectWeaponClass(actionText);
   // Stat used for the attack roll factors in any equipped accessory bonuses
   // (rings/amulets boosting STR/DEX/INT/WIS/CHA).

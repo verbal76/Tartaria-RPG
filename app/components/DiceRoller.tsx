@@ -24,6 +24,10 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
   const isCombat = state.steps.some((s) => s.id === 'attack');
   const stepLabel = isCombat ? 'COMBAT' : 'SKILL CHECK';
 
+  // Capture the dice config now so the closure isn't re-narrowing on
+  // every invocation — TS can't prove the step survives across renders.
+  const { count: stepCount, sides: stepSides } = step;
+
   function handleRoll() {
     Animated.sequence([
       Animated.timing(scale, { toValue: 1.15, duration: 80, useNativeDriver: true }),
@@ -32,7 +36,7 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
     ]).start();
 
     const values: number[] = [];
-    for (let i = 0; i < step.count; i++) values.push(rollDie(step.sides));
+    for (let i = 0; i < stepCount; i++) values.push(rollDie(stepSides));
     setRolledValues(values);
   }
 

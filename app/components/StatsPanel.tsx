@@ -65,13 +65,17 @@ export function StatsPanel({ player }: Props) {
           Effects: {formatEffectSummary(player.statusEffects)}
         </Text>
       )}
-      {player.activeFactionQuestIds && player.activeFactionQuestIds.length > 0 && (
-        <Text style={styles.contracts} numberOfLines={2}>
-          Contracts: {player.activeFactionQuestIds
-            .map((id) => findFactionQuestById(id)?.title ?? id)
-            .join(' · ')}
-        </Text>
-      )}
+      {(() => {
+        const titles = (player.activeFactionQuestIds ?? [])
+          .map((id) => findFactionQuestById(id)?.title)
+          .filter((t): t is string => !!t);
+        if (titles.length === 0) return null;
+        return (
+          <Text style={styles.contracts} numberOfLines={2}>
+            Contracts: {titles.join(' · ')}
+          </Text>
+        );
+      })()}
       <Text style={styles.subline}>Faction standing: {factionStanding}</Text>
     </View>
   );
