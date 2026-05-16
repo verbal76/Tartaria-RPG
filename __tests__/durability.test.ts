@@ -1,0 +1,73 @@
+import {
+  stampDurability,
+  wearItemByName,
+  repairCost,
+  repairItem,
+} from '../app/engine/durability';
+import type { InventoryItem } from '../app/engine/types';
+
+describe('durability', () => {
+  it('stamps catalog baseDurability on a fresh weapon', () => {
+    const raw: InventoryItem = {
+      id: 'w1',
+      name: 'Rusted Blade',
+      kind: 'weapon',
+      quantity: 1,
+      tags: [],
+    };
+    const stamped = stampDurability(raw);
+    expect(stamped.durability).toBeDefined();
+    expect(stamped.durability!.max).toBeGreaterThan(0);
+    expect(stamped.durability!.current).toBe(stamped.durability!.max);
+  });
+
+  it('leaves non-catalog items alone', () => {
+    const raw: InventoryItem = {
+      id: 'x1',
+      name: 'Not A Real Thing',
+      kind: 'misc',
+      quantity: 1,
+      tags: [],
+    };
+    expect(stampDurability(raw).durability).toBeUndefined();
+  });
+
+  it('wears a named item by one and reports a break', () => {
+    const inv: InventoryItem[] = [
+      { id: 'a', name: 'Mud-Stalker Leggings', kind: 'armor', quantity: 1, tags: [], durability: { current: 1, max: 30 } },
+    ];
+    const r = wearItemByName(inv, 'Mud-Stalker Leggings');
+    expect(r.broken).toBe(true);
+    expect(r.brokenName).toBe('Mud-Stalker Leggings');
+    expect(r.inventory).toHaveLength(0);
+  });
+
+  it('reduces durability without breaking when above zero', () => {
+    const inv: InventoryItem[] = [
+      { id: 'a', name: 'Aetheric Vest', kind: 'armor', quantity: 1, tags: [], durability: { current: 10, max: 45 } },
+    ];
+    const r = wearItemByName(inv, 'Aetheric Vest');
+    expect(r.broken).toBe(false);
+    expect(r.inventory[0]!.durability!.current).toBe(9);
+  });
+
+  it('repairCost equals points missing (min 1)', () => {
+    const item: InventoryItem = {
+      id: 'a',
+      name: 'X',
+      kind: 'armor',
+      quantity: 1,
+      tags: [],
+      durability: { current: 10, max: 30 },
+    };
+    expect(repairCost(item)).toBe(20);
+  });
+
+  it('repairItem restores to max', () => {
+    const inv: InventoryItem[] = [
+      { id: 'a', name: 'X', kind: 'armor', quantity: 1, tags: [], durability: { current: 5, max: 30 } },
+    ];
+    const next = repairItem(inv, 'a');
+    expect(next[0]!.durability!.current).toBe(30);
+  });
+});

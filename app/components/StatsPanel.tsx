@@ -3,8 +3,9 @@ import { View, Text, StyleSheet } from 'react-native';
 import type { PlayerCharacter } from '../engine/types';
 import racesData from '../data/races/races.json';
 import { findArmorByName } from '../engine/crafting';
-import { ARMOR_SLOTS } from '../engine/equipment';
+import { ARMOR_SLOTS, effectiveStats } from '../engine/equipment';
 import { formatEffectSummary } from '../engine/statusEffects';
+import { findFactionQuestById } from '../engine/factionQuests';
 
 interface Props { player: PlayerCharacter; }
 
@@ -20,6 +21,10 @@ export function StatsPanel({ player }: Props) {
     armorAc += findArmorByName(name)?.acBonus ?? 0;
   }
   const effectiveAc = player.ac + armorAc;
+
+  // Stats with accessory + armor bonuses folded in so the player sees the
+  // numbers combat will actually use.
+  const eff = effectiveStats(player);
 
   // Compose a single-line summary of every filled slot so the panel
   // stays compact even with eight slots tracked.
@@ -46,11 +51,11 @@ export function StatsPanel({ player }: Props) {
         <Stat label="Corr" value={`${player.corruption}`} />
       </View>
       <View style={styles.row}>
-        <Stat label="STR" value={`${player.stats.strength}`} />
-        <Stat label="DEX" value={`${player.stats.dexterity}`} />
-        <Stat label="INT" value={`${player.stats.intelligence}`} />
-        <Stat label="WIS" value={`${player.stats.wisdom}`} />
-        <Stat label="CHA" value={`${player.stats.charisma}`} />
+        <Stat label="STR" value={formatStat(player.stats.strength, eff.strength)} />
+        <Stat label="DEX" value={formatStat(player.stats.dexterity, eff.dexterity)} />
+        <Stat label="INT" value={formatStat(player.stats.intelligence, eff.intelligence)} />
+        <Stat label="WIS" value={formatStat(player.stats.wisdom, eff.wisdom)} />
+        <Stat label="CHA" value={formatStat(player.stats.charisma, eff.charisma)} />
       </View>
       <Text style={styles.equipped} numberOfLines={3}>
         Equipped: {equippedLabel}
@@ -60,9 +65,21 @@ export function StatsPanel({ player }: Props) {
           Effects: {formatEffectSummary(player.statusEffects)}
         </Text>
       )}
+      {player.activeFactionQuestIds && player.activeFactionQuestIds.length > 0 && (
+        <Text style={styles.contracts} numberOfLines={2}>
+          Contracts: {player.activeFactionQuestIds
+            .map((id) => findFactionQuestById(id)?.title ?? id)
+            .join(' · ')}
+        </Text>
+      )}
       <Text style={styles.subline}>Faction standing: {factionStanding}</Text>
     </View>
   );
+}
+
+// Render a stat as "base" or "base (+bonus)" when gear boosts it.
+function formatStat(base: number, effective: number): string {
+  return effective > base ? `${effective} (+${effective - base})` : `${base}`;
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
@@ -86,6 +103,7 @@ const styles = StyleSheet.create({
   subline: { color: '#7a705c', fontSize: 11, marginBottom: 4 },
   equipped: { color: '#c9a86a', fontSize: 10, marginTop: 4, letterSpacing: 1 },
   effects: { color: '#e07a5f', fontSize: 10, marginTop: 2, letterSpacing: 1 },
+  contracts: { color: '#9ec96a', fontSize: 10, marginTop: 2, letterSpacing: 1 },
   row: { flexDirection: 'row', gap: 8, marginTop: 4 },
   stat: { flex: 1 },
   label: { color: '#7a705c', fontSize: 10 },

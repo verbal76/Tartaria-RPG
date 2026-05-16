@@ -1,4 +1,4 @@
-import type { InventoryItem, EquipSlot } from './types';
+import type { InventoryItem, EquipSlot, PlayerCharacter, Stats } from './types';
 import { findWeaponByName, findArmorByName, findAmuletByName, findRingByName, GEAR } from './crafting';
 
 /**
@@ -46,3 +46,51 @@ export const SLOT_LABEL: Record<EquipSlot, string> = {
 
 /** Slots that hold armor pieces (used to aggregate AC + resistances). */
 export const ARMOR_SLOTS: readonly EquipSlot[] = ['head', 'chest', 'legs', 'feet'];
+
+// Stat names the equipment system can boost. Includes 'constitution' for
+// future use (some accessories grant it) — it routes to HP/stamina math.
+type StatKey = keyof Stats;
+const STAT_KEYS: StatKey[] = ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma'];
+
+// Sum stat bonuses from every equipped piece (armor pieces with statBonus,
+// amulets, rings). Items broken or unequipped contribute nothing. The
+// returned object only includes the five base stats; non-stat bonuses
+// (constitution, etc.) are dropped.
+export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<Stats> {
+  const bonus: Partial<Record<StatKey, number>> = {};
+  const eq = player.equipped ?? {};
+  const add = (stat: string, amount: number) => {
+    const key = stat as StatKey;
+    if (!STAT_KEYS.includes(key)) return;
+    bonus[key] = (bonus[key] ?? 0) + amount;
+  };
+  for (const slot of ARMOR_SLOTS) {
+    const name = eq[slot];
+    if (!name) continue;
+    const piece = findArmorByName(name);
+    if (piece?.statBonus) add(piece.statBonus.stat, piece.statBonus.amount);
+  }
+  if (eq.amulet) {
+    const a = findAmuletByName(eq.amulet);
+    if (a?.statBonus) add(a.statBonus.stat, a.statBonus.amount);
+  }
+  if (eq.ring) {
+    const r = findRingByName(eq.ring);
+    if (r?.statBonus) add(r.statBonus.stat, r.statBonus.amount);
+  }
+  return bonus;
+}
+
+// Apply the aggregated stat bonuses on top of the player's base stats.
+// Used by combat (attack rolls, damage rolls, skill checks) so equipped
+// gear actually changes the math.
+export function effectiveStats(player: PlayerCharacter): Stats {
+  const bonus = aggregateEquippedStatBonuses(player);
+  return {
+    strength: player.stats.strength + (bonus.strength ?? 0),
+    dexterity: player.stats.dexterity + (bonus.dexterity ?? 0),
+    intelligence: player.stats.intelligence + (bonus.intelligence ?? 0),
+    wisdom: player.stats.wisdom + (bonus.wisdom ?? 0),
+    charisma: player.stats.charisma + (bonus.charisma ?? 0),
+  };
+}

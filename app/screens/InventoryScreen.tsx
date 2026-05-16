@@ -151,6 +151,16 @@ function ItemRow({
         </View>
         <View style={styles.rowMetaRow}>
           {item.rarity && <Text style={styles.rowMeta}>{item.rarity}</Text>}
+          {item.durability && (
+            <Text
+              style={[
+                styles.rowMeta,
+                item.durability.current <= Math.ceil(item.durability.max * 0.25) && styles.rowDurabilityLow,
+              ]}
+            >
+              dur {item.durability.current}/{item.durability.max}
+            </Text>
+          )}
           {canEquip && !isEquipped && <Text style={styles.rowEquippable}>tap to equip</Text>}
           {isEquipped && <Text style={styles.rowEquipped}>EQUIPPED</Text>}
         </View>
@@ -211,6 +221,7 @@ const styles = StyleSheet.create({
   rowQty: { color: '#cdbf99', fontSize: 12 },
   rowMetaRow: { flexDirection: 'row', gap: 8, marginTop: 2 },
   rowMeta: { color: '#7a705c', fontSize: 10, letterSpacing: 1 },
+  rowDurabilityLow: { color: '#e07a5f' },
   rowEquipped: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   rowEquippable: { color: '#7a705c', fontSize: 10, letterSpacing: 1, fontStyle: 'italic' },
   empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 30 },

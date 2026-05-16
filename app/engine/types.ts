@@ -21,6 +21,9 @@ export type Intent =
   | 'dodge'
   | 'advance'
   | 'retreat'
+  | 'repair'
+  | 'accept'
+  | 'turn_in'
   | 'unknown';
 
 export interface ParsedInput {
@@ -286,6 +289,10 @@ export interface PlayerCharacter {
   statusEffects?: StatusEffect[];
   /** Hours elapsed since the character entered Tartaria. Day = 24 hours. */
   hoursElapsed?: number;
+  /** IDs of faction quests the player has accepted but not finished. */
+  activeFactionQuestIds?: string[];
+  /** IDs of faction quests the player has turned in. */
+  completedFactionQuestIds?: string[];
 }
 
 export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive';

@@ -1,6 +1,7 @@
 import type { RollStep, PlayerCharacter, Enemy } from './types';
 import { rollDie } from './rng';
 import { findWeaponByName, type CatalogWeapon } from './crafting';
+import { effectiveStats } from './equipment';
 
 type WeaponClass = 'ranged' | 'melee' | 'runecaster' | 'barehanded';
 
@@ -62,9 +63,12 @@ export function buildCombatSteps(
   // No equip = fall back to the original behavior (rusted blade / fists).
   const equipped = getEquippedWeapon(player);
   const wc: WeaponClass = equipped?.weaponKind ?? detectWeaponClass(actionText);
+  // Stat used for the attack roll factors in any equipped accessory bonuses
+  // (rings/amulets boosting STR/DEX/INT/WIS/CHA).
+  const stats = effectiveStats(player);
   const stat = equipped
-    ? { value: player.stats[equipped.stat], label: STAT_LABEL[equipped.stat] }
-    : attackStatFor(wc, player.stats);
+    ? { value: stats[equipped.stat], label: STAT_LABEL[equipped.stat] }
+    : attackStatFor(wc, stats);
   const ac = enemyAC(enemy);
   const enemyInit = rollDie(10);
   // Use equipped damage dice if available; parse "2d6" or "1d10+1d6".
@@ -167,7 +171,8 @@ export function buildSkillSteps(
   player: PlayerCharacter,
 ): RollStep[] {
   const statKey = SKILL_STAT[intent] ?? 'wisdom';
-  const statVal = player.stats[statKey];
+  const stats = effectiveStats(player);
+  const statVal = stats[statKey];
   const statLabel = STAT_LABEL[statKey];
   const dc = SKILL_DC[intent] ?? 12;
   const dcName = DC_NAME[dc] ?? '';

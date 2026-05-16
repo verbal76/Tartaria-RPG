@@ -27,6 +27,9 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   dodge: ['dodge', 'parry', 'block', 'brace', 'evade', 'guard'],
   advance: ['advance', 'approach', 'rush', 'sprint', 'closein'],
   retreat: ['backoff', 'backaway', 'pullback', 'stepback', 'reposition'],
+  repair: ['repair', 'mend', 'restore', 'refurbish', 'patch'],
+  accept: ['accept', 'take', 'undertake', 'agree'],
+  turn_in: ['turnin', 'complete', 'finish', 'deliver', 'report', 'redeem', 'claim'],
 };
 
 const ALL_INTENTS = Object.keys(VERB_SYNONYMS) as Exclude<Intent, 'unknown'>[];
@@ -53,7 +56,8 @@ export function normalizeInput(raw: string): string {
     .replace(/\bstep back\b/g, 'stepback')
     .replace(/\bback off\b/g, 'backoff')
     .replace(/\bback away\b/g, 'backaway')
-    .replace(/\bpull back\b/g, 'pullback');
+    .replace(/\bpull back\b/g, 'pullback')
+    .replace(/\bturn in\b/g, 'turnin');
   return s;
 }
 

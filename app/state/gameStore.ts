@@ -66,6 +66,7 @@ import {
 import { getEquippedWeapon } from '../engine/combatRules';
 import { pickRandomVendor, type VendorInstance } from '../engine/vendors';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS } from '../engine/equipment';
+import { stampDurability, wearItemByName, repairCost, repairItem } from '../engine/durability';
 import type { EquipSlot } from '../engine/types';
 import {
   WEAPONS,
@@ -81,6 +82,11 @@ import {
   meetsJoinThreshold,
   JOIN_THRESHOLD,
 } from '../engine/factions';
+import {
+  findFactionQuestById,
+  availableFactionQuests,
+  fuzzyFindFactionQuest,
+} from '../engine/factionQuests';
 import {
   rollIncomingStatusEffect,
   applyEffect,
@@ -211,14 +217,20 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     amulet: eq.amulet,
     ring: eq.ring,
   };
+  // Stamp durability on any catalog item that doesn't already have it.
+  // Older saves predate the durability field.
+  const inventory = (p.inventory ?? []).map((i) => stampDurability(i));
   return {
     ...p,
+    inventory,
     staminaMax: stamMax,
     stamina: p.stamina ?? stamMax,
     milestones: p.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 },
     equipped,
     statusEffects: p.statusEffects ?? [],
     hoursElapsed: p.hoursElapsed ?? 0,
+    activeFactionQuestIds: p.activeFactionQuestIds ?? [],
+    completedFactionQuestIds: p.completedFactionQuestIds ?? [],
   };
 }
 
@@ -286,6 +298,13 @@ function spendStamina(player: PlayerCharacter, amount: number): PlayerCharacter 
   return { ...player, stamina: Math.max(0, player.stamina - amount) };
 }
 
+// Advance the in-game clock by `hours`. Used by anything that isn't a rest
+// — travel (long), attack (short), skill check (short) — so the day/night
+// cycle progresses naturally even without explicit camping.
+function advanceTime(player: PlayerCharacter, hours: number): PlayerCharacter {
+  return { ...player, hoursElapsed: (player.hoursElapsed ?? 0) + hours };
+}
+
 function restoreStamina(player: PlayerCharacter, amount: number): PlayerCharacter {
   return { ...player, stamina: Math.min(player.staminaMax, player.stamina + amount) };
 }
@@ -336,6 +355,9 @@ interface GameStore {
   buyFromVendor: (itemName: string) => void;
   giftToVendor: (itemName: string) => void;
   stealFromVendor: (itemName: string) => void;
+  repairWithVendor: (itemName: string) => void;
+  acceptFactionQuest: (titleOrId: string) => void;
+  turnInFactionQuest: (titleOrId: string) => void;
   dismissVendor: () => void;
   joinFaction: (factionId: string) => void;
   equipItem: (itemName: string, slot: EquipSlot) => void;
@@ -550,6 +572,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'arbiter',
         `The Arbiter inclines their head toward the newcomer. "${vendor.name}, ${vendor.title}. ${vendor.description}"`,
       );
+      // Faction vendors may offer a contract the player qualifies for.
+      if (vendor.faction) {
+        const pool = availableFactionQuests(
+          vendor.faction,
+          getStanding(player.factionStanding, vendor.faction),
+          player.activeFactionQuestIds ?? [],
+          player.completedFactionQuestIds ?? [],
+        );
+        if (pool.length > 0) {
+          const q = pool[0]!;
+          get().appendLog(
+            'arbiter',
+            `${vendor.name} leans in. "Got a contract for someone like you. ${q.title}. ${q.description} Reward: ${q.reward.tc} TC, +${q.reward.rep} rep. Say 'accept ${q.title.split(' ').slice(0, 2).join(' ').toLowerCase()}' to take it."`,
+          );
+        }
+        // Active quest with this faction's agent? Hint at the turn-in.
+        const turnable = (player.activeFactionQuestIds ?? [])
+          .map((id) => findFactionQuestById(id))
+          .filter((q): q is NonNullable<typeof q> => !!q && q.factionId === vendor.faction);
+        if (turnable.length > 0) {
+          const t = turnable[0]!;
+          get().appendLog(
+            'arbiter',
+            `${vendor.name} looks at you sideways. "You still owe us '${t.title}'. Say 'turn in ${t.title.split(' ').slice(0, 2).join(' ').toLowerCase()}' when you're ready."`,
+          );
+        }
+      }
     }
     // Arbiter gets two voices on scene entry:
     //   1) ~45% chance — a proactive "scene intro" that gestures at what
@@ -680,7 +729,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             break;
           }
-          set({ player: spendStamina(player, STAMINA_COSTS.attack) });
+          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.attack), 0.1) });
           const steps = buildCombatSteps(trimmed, player, currentScene.enemy);
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
           get().appendLog('world', attackOpener(currentScene.enemy.name, parsed.resolvedNoun));
@@ -697,7 +746,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         // 2) Targeted look ("examine the locket", "dig up the rubble") — roll.
         if (parsed.resolvedNoun || parsed.resolvedItemId) {
-          set({ player: spendStamina(player, STAMINA_COSTS.skillCheck) });
+          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
           const steps = buildSkillSteps('investigate', player);
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
           break;
@@ -711,7 +760,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       case 'escape':
       case 'cast':
       case 'use_relic': {
-        set({ player: spendStamina(player, STAMINA_COSTS.skillCheck) });
+        set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
         const steps = buildSkillSteps(parsed.intent, player);
         set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
         break;
@@ -752,10 +801,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? allLocations.find((l) => l.name.toLowerCase().includes(target) || l.id === target)
           : undefined;
         if (candidate) {
-          set({ player: spendStamina(player, STAMINA_COSTS.travel) });
+          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.travel), 2) });
           get().travelTo(candidate.id);
         } else {
-          set({ player: spendStamina(player, STAMINA_COSTS.wander) });
+          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.wander), 1) });
           narrateWanderingJourney(get, currentScene);
         }
         break;
@@ -898,6 +947,36 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().equipItem(inInventory.name, slot);
         break;
       }
+      case 'repair': {
+        const target = parsed.resolvedNoun ?? parsed.target ?? '';
+        if (!target.trim()) {
+          get().appendLog('arbiter', `The Arbiter taps your pack. "Repair what? Name the gear."`);
+          break;
+        }
+        get().repairWithVendor(target);
+        break;
+      }
+      case 'accept': {
+        const target = parsed.target ?? parsed.resolvedNoun ?? '';
+        if (!target.trim()) {
+          get().appendLog('arbiter', `The Arbiter raises a brow. "Accept what? Ask the agent what is on offer."`);
+          break;
+        }
+        get().acceptFactionQuest(target);
+        break;
+      }
+      case 'turn_in': {
+        const target = parsed.target ?? parsed.resolvedNoun ?? '';
+        if (!target.trim()) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter folds their arms. "Name the contract you mean to turn in."`,
+          );
+          break;
+        }
+        get().turnInFactionQuest(target);
+        break;
+      }
       case 'gift': {
         if (!currentScene.vendor) {
           get().appendLog('arbiter', `The Arbiter glances at the empty road. "No one here to gift to."`);
@@ -991,14 +1070,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         const remaining = consumeIngredients(player.inventory, recipe);
         const catEntry = lookupCraftedItem(recipe.result);
-        const crafted: InventoryItem = {
+        const crafted: InventoryItem = stampDurability({
           id: `crafted_${Date.now()}`,
           name: recipe.result,
-          kind: catEntry.kind === 'weapon' || catEntry.kind === 'armor' ? 'misc' : catEntry.kind,
+          kind: catEntry.kind === 'weapon' ? 'weapon' : catEntry.kind === 'armor' ? 'armor' : catEntry.kind,
           rarity: catEntry.rarity,
           quantity: 1,
           tags: catEntry.tags,
-        };
+        });
         set((s) => ({
           player: s.player ? { ...s.player, inventory: [...remaining, crafted] } : s.player,
         }));
@@ -1235,6 +1314,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('combat', `${enemy.name} shrugs off the ${weaponType}. (resisted, ×0.5 → ${dmg})`);
       }
 
+      // Weapon wear: any successful hit chips one point off the weapon
+      // that landed it. Bare hands aren't tracked.
+      const weaponInUse = player.equipped?.main ?? player.equipped?.weaponName ?? null;
+      if (weaponInUse) {
+        set((s) => (s.player ? { player: wearEquippedItem(s.player, weaponInUse, get) } : s));
+      }
+
       if (newEnemyHp <= 0) {
         get().appendLog('combat', attackKill(weaponName, enemy.name, dmg));
         get().resolveEnemyDefeat();
@@ -1242,7 +1328,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       } else {
         set({ currentEnemyHp: newEnemyHp });
         get().appendLog('combat', attackHit(weaponName, enemy.name, dmg, newEnemyHp));
-        applyEnemyCounter(enemy, player, get, set);
+        applyEnemyCounter(enemy, get().player ?? player, get, set);
       }
     } else {
       get().appendLog('combat', attackMiss(weaponName, enemy.name));
@@ -1427,14 +1513,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? 'misc'
             : 'misc';
     const tags = cat?.tags ?? [];
-    const newItem: InventoryItem = {
+    const newItem: InventoryItem = stampDurability({
       id: `bought_${Date.now()}`,
       name: offer.itemName,
       kind,
       rarity: cat?.rarity,
       quantity: 1,
       tags,
-    };
+    });
 
     // Small reputation boost with the vendor's faction for honest custom.
     const vendorFaction = scene.vendor.faction;
@@ -1545,14 +1631,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         gear?.kind === 'consumable' || gear?.kind === 'relic' || gear?.kind === 'misc'
           ? gear.kind
           : 'misc';
-      const stolen: InventoryItem = {
+      const stolen: InventoryItem = stampDurability({
         id: `stolen_${Date.now()}`,
         name: offer.itemName,
         kind,
         rarity: cat?.rarity,
         quantity: 1,
         tags: cat?.tags ?? [],
-      };
+      });
       set((s) => {
         if (!s.player || !s.currentScene?.vendor) return s;
         const newOffers = s.currentScene.vendor.offers.filter((o) => o !== offer);
@@ -1630,6 +1716,143 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) => ({
       currentScene: s.currentScene ? { ...s.currentScene, vendor: null } : s.currentScene,
     }));
+  },
+
+  repairWithVendor(itemName) {
+    const state = get();
+    const scene = state.currentScene;
+    const player = state.player;
+    if (!player) return;
+    if (!scene?.vendor) {
+      get().appendLog('arbiter', `The Arbiter shakes their head. "No one here repairs gear. Find a smith."`);
+      return;
+    }
+    const target = itemName.toLowerCase();
+    const item = player.inventory.find(
+      (i) => i.name.toLowerCase() === target && i.durability && i.durability.current < i.durability.max,
+    );
+    if (!item) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter glances at your pack. "Nothing in your pack matches that — or it's already in good order."`,
+      );
+      return;
+    }
+    const cost = repairCost(item);
+    if (player.tc < cost) {
+      get().appendLog(
+        'arbiter',
+        `${scene.vendor.name} looks at your purse. "That mends for ${cost} TC. You don't have it."`,
+      );
+      return;
+    }
+    const newInventory = repairItem(player.inventory, item.id);
+    set((s) =>
+      s.player ? { player: { ...s.player, tc: s.player.tc - cost, inventory: newInventory } } : s,
+    );
+    get().appendLog(
+      'reward',
+      `${scene.vendor.name} mends your ${item.name}. ${cost} TC. (durability restored)`,
+    );
+    void get().persist();
+  },
+
+  acceptFactionQuest(titleOrId) {
+    const state = get();
+    const player = state.player;
+    const scene = state.currentScene;
+    if (!player) return;
+    if (!scene?.vendor || !scene.vendor.faction) {
+      get().appendLog('arbiter', `The Arbiter shrugs. "No faction agent here to take a contract from."`);
+      return;
+    }
+    // Direct id match first, then fuzzy title within this faction's pool.
+    const direct = findFactionQuestById(titleOrId);
+    const pool = availableFactionQuests(
+      scene.vendor.faction,
+      getStanding(player.factionStanding, scene.vendor.faction),
+      player.activeFactionQuestIds ?? [],
+      player.completedFactionQuestIds ?? [],
+    );
+    const quest = direct && pool.includes(direct) ? direct : fuzzyFindFactionQuest(titleOrId, pool);
+    if (!quest) {
+      const titles = pool.map((q) => `"${q.title}"`).join(', ');
+      get().appendLog(
+        'arbiter',
+        titles
+          ? `${scene.vendor.name} looks you over. "Not that one. Currently on offer: ${titles}."`
+          : `${scene.vendor.name} shakes their head. "Nothing on offer for you right now."`,
+      );
+      return;
+    }
+    set((s) =>
+      s.player
+        ? {
+            player: {
+              ...s.player,
+              activeFactionQuestIds: [...(s.player.activeFactionQuestIds ?? []), quest.id],
+            },
+          }
+        : s,
+    );
+    get().appendLog(
+      'reward',
+      `New faction contract — ${quest.title}. ${quest.objective} (${scene.vendor.faction.replace(/_/g, ' ')})`,
+    );
+    void get().persist();
+  },
+
+  turnInFactionQuest(titleOrId) {
+    const state = get();
+    const player = state.player;
+    const scene = state.currentScene;
+    if (!player) return;
+    if (!scene?.vendor || !scene.vendor.faction) {
+      get().appendLog('arbiter', `The Arbiter waves. "Find a faction agent before you can turn that in."`);
+      return;
+    }
+    const active = player.activeFactionQuestIds ?? [];
+    // Direct id, then fuzzy title across active list.
+    const direct = findFactionQuestById(titleOrId);
+    const candidate = direct ?? fuzzyFindFactionQuest(
+      titleOrId,
+      active.map((id) => findFactionQuestById(id)).filter((q): q is NonNullable<typeof q> => !!q),
+    );
+    if (!candidate || !active.includes(candidate.id)) {
+      get().appendLog(
+        'arbiter',
+        `${scene.vendor.name} squints. "That one isn't on your active slate."`,
+      );
+      return;
+    }
+    if (candidate.factionId !== scene.vendor.faction) {
+      get().appendLog(
+        'arbiter',
+        `${scene.vendor.name} shakes their head. "Wrong faction. Take that to ${candidate.factionId.replace(/_/g, ' ')}."`,
+      );
+      return;
+    }
+    // Pay out reward + record completion.
+    const repResult = applyRepChange(player.factionStanding, candidate.factionId, candidate.reward.rep);
+    set((s) =>
+      s.player
+        ? {
+            player: {
+              ...s.player,
+              tc: s.player.tc + candidate.reward.tc,
+              factionStanding: repResult.standing,
+              activeFactionQuestIds: (s.player.activeFactionQuestIds ?? []).filter((id) => id !== candidate.id),
+              completedFactionQuestIds: [...(s.player.completedFactionQuestIds ?? []), candidate.id],
+            },
+          }
+        : s,
+    );
+    get().appendLog(
+      'reward',
+      `✦ Faction contract complete — ${candidate.title}. +${candidate.reward.tc} TC, +${candidate.reward.rep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
+    );
+    logRepChanges(get, repResult.changed);
+    void get().persist();
   },
 
   equipItem(itemName, slot) {
@@ -1826,6 +2049,30 @@ function playerWeaponReach(player: PlayerCharacter): { bands: CombatRange[]; lab
   }
 }
 
+// Wear the named equipped item by one point. If it breaks, remove it from
+// inventory AND clear it from every slot that referenced it. Returns a new
+// PlayerCharacter; the caller persists.
+function wearEquippedItem(
+  player: PlayerCharacter,
+  itemName: string,
+  get: () => GameStore,
+): PlayerCharacter {
+  const result = wearItemByName(player.inventory, itemName);
+  let equipped = player.equipped ?? {};
+  if (result.broken && result.brokenName) {
+    const next = { ...equipped };
+    for (const k of Object.keys(next) as (keyof typeof next)[]) {
+      if (next[k] === result.brokenName) next[k] = undefined;
+    }
+    equipped = next;
+    // Defer the log so the caller's main set() lands first.
+    void Promise.resolve().then(() =>
+      get().appendLog('combat', `Your ${result.brokenName} shatters from wear. It is gone.`),
+    );
+  }
+  return { ...player, inventory: result.inventory, equipped };
+}
+
 // Sum AC bonus and gather resistances from every equipped armor piece
 // (head/chest/legs/feet). Used by combat to compute effective AC and to
 // halve damage of types the armor resists.
@@ -1883,10 +2130,21 @@ function applyEnemyCounter(
     // Roll for a status effect to apply based on the damage type.
     const newEffect = rollIncomingStatusEffect(enemyDamageType, player.statusEffects ?? []);
 
+    // Armor wear: every armor piece that actually contributes to the
+    // player's defence chips one point. Pieces with 0 durability or no
+    // catalog entry are skipped.
+    const wornSlots = ARMOR_SLOTS.filter((s) => !!player.equipped?.[s]);
+
     let killed = false;
     set((s) => {
       if (!s.player) return {};
-      const newHp = Math.max(0, s.player.hp - dmg);
+      let nextPlayer = s.player;
+      for (const slot of wornSlots) {
+        const name = nextPlayer.equipped?.[slot];
+        if (!name) continue;
+        nextPlayer = wearEquippedItem(nextPlayer, name, get);
+      }
+      const newHp = Math.max(0, nextPlayer.hp - dmg);
       killed = newHp <= 0;
       const resistTag = resisted.blocked ? ` (armor halves the ${enemyDamageType})` : '';
       const msg = killed
@@ -1894,9 +2152,9 @@ function applyEnemyCounter(
         : `${enemy.name} deals ${dmg} damage${resistTag}. You have ${newHp} HP remaining.`;
       void Promise.resolve().then(() => get().appendLog('combat', msg));
       const effects = newEffect
-        ? applyEffect(s.player.statusEffects ?? [], newEffect.effect)
-        : s.player.statusEffects;
-      return { player: { ...s.player, hp: newHp, statusEffects: effects } };
+        ? applyEffect(nextPlayer.statusEffects ?? [], newEffect.effect)
+        : nextPlayer.statusEffects;
+      return { player: { ...nextPlayer, hp: newHp, statusEffects: effects } };
     });
 
     if (newEffect) {
