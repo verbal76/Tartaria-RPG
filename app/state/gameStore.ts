@@ -58,6 +58,12 @@ import {
 } from '../engine/worldLadder';
 import { getItemPreview } from '../components/itemPreview';
 import { isInventoryQuestion, extractInventoryTarget, isContinueCommand } from '../engine/askInventory';
+import {
+  parseDirectionQuestion,
+  findNamedByQuery,
+  findNearestNamed,
+  describeAllDirections,
+} from '../engine/worldDirections';
 import locationsData from '../data/locations/locations.json';
 import enemiesData from '../data/enemies/enemies.json';
 import conceptsData from '../data/lore/concepts.json';
@@ -1499,6 +1505,51 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       case 'ask': {
         const lookup = parsed.target ?? parsed.resolvedNoun ?? trimmed;
+        // Spatial awareness — "where is Asgardar", "how far to Voronov",
+        // "nearest town", "directions to the spire". The Arbiter knows the
+        // map regardless of whether the player carries a compass; this is a
+        // game-feel item, not gated content.
+        const dirQ = parseDirectionQuestion(trimmed);
+        if (dirQ && dirQ.kind !== 'survey') {
+          const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
+          const map = generateWorldMap(seed, player.currentLocationId);
+          const fromX = player.mapX ?? 4;
+          const fromY = player.mapY ?? 4;
+          if (dirQ.kind === 'nearest') {
+            const near = findNearestNamed(map, fromX, fromY, {
+              excludeId: player.currentLocationId,
+            });
+            if (near) {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter points ${near.direction}. "Nearest is ${near.locationName} — ${near.travelPhrase} ${near.direction}, give or take. Vendors come and go, but that's the closest hub you'll find."`,
+              );
+            } else {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter scans the horizon. "Nothing named within reach. Walk and one will turn up."`,
+              );
+            }
+            break;
+          }
+          // 'specific' — name lookup
+          const found = findNamedByQuery(map, fromX, fromY, dirQ.target);
+          if (found) {
+            const here = found.tiles === 0;
+            get().appendLog(
+              'arbiter',
+              here
+                ? `The Arbiter taps the ground. "You're standing on ${found.locationName}."`
+                : `The Arbiter gestures ${found.direction}. "${found.locationName} lies ${found.travelPhrase} ${found.direction}."`,
+            );
+          } else {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter scans the horizon. "I cannot place '${dirQ.target}'. Try a name I might recognize — Asgardar, Varakush, the Cradle."`,
+            );
+          }
+          break;
+        }
         // "where am I" / "what is around" / "compass" → directional survey
         // if the player has a compass; otherwise a vaguer answer.
         const wantsBearings = /where.*am|what.*around|what.*near|which way|compass|bearings|surroundings/i.test(trimmed);
