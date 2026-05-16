@@ -18,6 +18,10 @@ export function AboutScreen() {
   const cognitiveError = useGameStore((s) => s.cognitiveError);
   const cognitiveLastResponse = useGameStore((s) => s.cognitiveLastResponse);
   const cognitiveModelInfo = useGameStore((s) => s.cognitiveModelInfo);
+  const qwenStatus = useGameStore((s) => s.qwenStatus);
+  const qwenFraction = useGameStore((s) => s.qwenFraction);
+  const qwenError = useGameStore((s) => s.qwenError);
+  const qwenModelId = useGameStore((s) => s.qwenModelId);
   const gameLogLength = useGameStore((s) => s.gameLog.length);
   const player = useGameStore((s) => s.player);
 
@@ -168,7 +172,7 @@ export function AboutScreen() {
       `Platform: ${Platform.OS} ${Platform.Version}`,
       `Hermes: ${typeof (globalThis as { HermesInternal?: unknown }).HermesInternal !== 'undefined' ? 'yes' : 'no'}`,
       ``,
-      `Cognitive layer`,
+      `Cognitive layer (classifier)`,
       `  Status: ${cognitiveStatus}`,
       `  Progress: ${(cognitiveFraction * 100).toFixed(0)}%`,
       `  Error: ${cognitiveError ?? 'none'}`,
@@ -176,7 +180,13 @@ export function AboutScreen() {
         ? `  Last response: ${cognitiveLastResponse.inferredEmotions.join(',') || '-'} / ${cognitiveLastResponse.inferredIntentions.join(',') || '-'} (${cognitiveLastResponse.embeddingMs.toFixed(1)}ms embed, ${cognitiveLastResponse.inferenceMs.toFixed(1)}ms infer)`
         : `  Last response: none yet`,
       ``,
-      `Model`,
+      `Qwen generator (Arbiter narration)`,
+      `  Status: ${qwenStatus}`,
+      `  Progress: ${(qwenFraction * 100).toFixed(0)}%`,
+      `  Model: ${qwenModelId}`,
+      `  Error: ${qwenError ?? 'none'}`,
+      ``,
+      `Classifier model`,
       cognitiveModelInfo
         ? [
             `  Name: ${cognitiveModelInfo.name}`,
@@ -195,7 +205,7 @@ export function AboutScreen() {
       `  Log entries in memory: ${gameLogLength}`,
     ];
     return lines.join('\n');
-  }, [cognitiveStatus, cognitiveFraction, cognitiveError, cognitiveLastResponse, cognitiveModelInfo, player, gameLogLength, updateStatus, updateError]);
+  }, [cognitiveStatus, cognitiveFraction, cognitiveError, cognitiveLastResponse, cognitiveModelInfo, qwenStatus, qwenFraction, qwenError, qwenModelId, player, gameLogLength, updateStatus, updateError]);
 
   async function handleCopy() {
     await Clipboard.setStringAsync(info);

@@ -23,29 +23,41 @@ export default function App() {
   const bootCognitive = useGameStore((s) => s.bootCognitive);
   const shutdownCognitive = useGameStore((s) => s.shutdownCognitive);
   const resumeCognitive = useGameStore((s) => s.resumeCognitive);
+  const bootQwen = useGameStore((s) => s.bootQwen);
+  const shutdownQwen = useGameStore((s) => s.shutdownQwen);
 
   useEffect(() => {
     void hydrate().then(() => {
-      void bootCognitive();
+      // Boot order: classifier (small, fast) first so target resolution is
+      // available as soon as the player starts a game. Generative model
+      // (large, slow) kicks off afterward without blocking — templates carry
+      // the Arbiter until it's ready.
+      void bootCognitive().then(() => {
+        void bootQwen();
+      });
       void bootAudio().then(() => startAudioController());
     });
     return () => {
       stopAudioController();
       void disposeAudio();
     };
-  }, [hydrate, bootCognitive]);
+  }, [hydrate, bootCognitive, bootQwen]);
 
   useEffect(() => {
     const onChange = (status: AppStateStatus) => {
       if (status === 'background' || status === 'inactive') {
         void shutdownCognitive();
+        void shutdownQwen();
       } else if (status === 'active') {
         void resumeCognitive();
+        // Qwen does not auto-resume — re-bootQwen would re-trigger the
+        // download UI; we leave it dormant and let the user restart it
+        // manually from the About screen if they want it back.
       }
     };
     const sub = AppState.addEventListener('change', onChange);
     return () => sub.remove();
-  }, [shutdownCognitive, resumeCognitive]);
+  }, [shutdownCognitive, resumeCognitive, shutdownQwen]);
 
   if (!hydrated) {
     return (
