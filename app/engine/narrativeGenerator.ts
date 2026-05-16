@@ -463,8 +463,35 @@ const ARBITER_COMBAT_INTROS = [
 ];
 
 export function buildArbiterSceneIntro(location: Location, enemy?: Enemy | null): string {
+  // ~18% of intros are personal — the Arbiter drops a fragment of who they
+  // are or where they have been. Conversational, never expository. These
+  // never reference the player's current location directly so they read
+  // as memory rather than reaction.
+  if (!enemy && Math.random() < 0.18) {
+    return pick(ARBITER_PERSONAL_BEATS);
+  }
   if (enemy) {
     return pick(ARBITER_COMBAT_INTROS).replace('{enemyName}', enemy.name.toLowerCase());
   }
   return pick(ARBITER_SCENE_INTROS).replace('{locationName}', location.name);
 }
+
+// Personal-history lines the Arbiter drops in passing — bits of backstory
+// that imply who they are and what they've seen. Conversational tone,
+// never exposition-dump. Designed so the player accumulates a sense of
+// the Arbiter as a person over many sessions.
+const ARBITER_PERSONAL_BEATS = [
+  `"When I used to walk these ruins, there were three more towers," the Arbiter says, almost to themselves. "I do not remember which fell first."`,
+  `"I knew a Reclaimer once who collected Aetherstone the way some collect coins," the Arbiter says. "It did not end the way they expected."`,
+  `"There was a time I would have eaten the food before answering," the Arbiter says. "Tartaria taught me to listen first."`,
+  `The Arbiter glances at their own hand for a moment. "I carried a relic, once. I no longer do."`,
+  `"Three things I have stopped believing in," the Arbiter says quietly. "The buried world is no longer one of them."`,
+  `"My last guide carried only a length of wire and a worn knife," the Arbiter says. "They lasted longer than most."`,
+  `"You are not the first I have walked with through this stretch," the Arbiter says. "I will not say how many of them I remember by name."`,
+  `The Arbiter touches a faint mark at their temple. "I forget what gave me this. Tartaria forgets nothing, which is the trade."`,
+  `"I was younger when I last saw a sentinel wake," the Arbiter murmurs. "I do not want to be younger again."`,
+  `"The Reclaimers offered me a place," the Arbiter says, after a pause. "I gave them a reason. We were both polite about it."`,
+  `"I came up through the Forgotten Order, before there was much to forget," the Arbiter says. "The order is what changed, not the forgetting."`,
+  `"There is a name I have not used in a long time," the Arbiter says. "Not even to myself. Not yet to you."`,
+  `"The Aetherstone hummed differently before the Flood," the Arbiter says. "I am one of the few who can still hear the difference."`,
+];

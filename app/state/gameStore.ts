@@ -126,8 +126,34 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     ...p,
     staminaMax: stamMax,
     stamina: p.stamina ?? stamMax,
+    milestones: p.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 },
   };
 }
+
+// Milestone thresholds. Hit one of these counters and the character gets a
+// permanent stat bump. Numbers are intentionally generous so growth feels
+// earned, not handed out.
+const MILESTONE_KILL_STEP = 5;     // every 5 enemies defeated → +1 HP max
+const MILESTONE_TRAVEL_STEP = 5;   // every 5 travels → +1 stamina max
+const MILESTONE_CHECK_STEP = 10;   // every 10 successful skill checks → +1 to the relevant stat
+
+function checkMilestone(
+  counter: number,
+  step: number,
+): boolean {
+  return counter > 0 && counter % step === 0;
+}
+
+// Which stat each skill-check intent trains. Mirrors the combatRules SKILL_STAT
+// map but inlined here so the gameStore doesn't have to import from there.
+const INTENT_TO_STAT: Record<string, keyof PlayerCharacter['stats']> = {
+  stealth: 'dexterity',
+  diplomacy: 'charisma',
+  escape: 'dexterity',
+  investigate: 'intelligence',
+  cast: 'intelligence',
+  use_relic: 'wisdom',
+};
 
 function spendStamina(player: PlayerCharacter, amount: number): PlayerCharacter {
   return { ...player, stamina: Math.max(0, player.stamina - amount) };
@@ -643,6 +669,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (skill) {
       const { intent } = parseInput(actionText);
       if (skill.success) {
+        // Skill-check milestone: every 10 successful checks → +1 to the stat
+        // the check used. Tracked across the character's lifetime.
+        const prevMs = player.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 };
+        const newChecks = prevMs.checksSucceeded + 1;
+        const hitMilestone = checkMilestone(newChecks, MILESTONE_CHECK_STEP);
+        const statKey = INTENT_TO_STAT[intent] ?? 'wisdom';
+        const bumpedStats = hitMilestone
+          ? { ...player.stats, [statKey]: player.stats[statKey] + 1 }
+          : player.stats;
+        set((s) => ({
+          player: s.player
+            ? {
+                ...s.player,
+                stats: bumpedStats,
+                milestones: { ...prevMs, checksSucceeded: newChecks },
+              }
+            : s.player,
+        }));
+        if (hitMilestone) {
+          get().appendLog(
+            'reward',
+            `✦ Practice sharpens you. +1 ${statKey.toUpperCase().slice(0, 3)} (now ${bumpedStats[statKey]}). [${newChecks} checks succeeded]`,
+          );
+        }
         switch (intent) {
           case 'stealth':
             get().appendLog('world', 'You move low and quiet. Whatever watches does not see you.');
@@ -764,11 +814,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
   travelTo(locationId) {
     const player = get().player;
     if (!player) return;
+
+    // Travel milestone: every 5 distinct travels → +1 stamina max.
+    const prevMs = player.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 };
+    const newTravels = prevMs.travelsCompleted + 1;
+    const hitMilestone = checkMilestone(newTravels, MILESTONE_TRAVEL_STEP);
+    const newStaminaMax = hitMilestone ? player.staminaMax + 1 : player.staminaMax;
+    const newStamina = hitMilestone ? player.stamina + 1 : player.stamina;
+
     set({
-      player: { ...player, currentLocationId: locationId },
+      player: {
+        ...player,
+        currentLocationId: locationId,
+        stamina: newStamina,
+        staminaMax: newStaminaMax,
+        milestones: { ...prevMs, travelsCompleted: newTravels },
+      },
       worldMemory: discoverLocation(get().worldMemory, locationId),
     });
     get().appendLog('world', `You make your way to ${getLocationById(locationId).name}.`);
+    if (hitMilestone) {
+      get().appendLog(
+        'reward',
+        `✦ The road has built you up. +1 max stamina (now ${newStaminaMax}). [${newTravels} travels completed]`,
+      );
+    }
     get().beginScene();
     void get().persist();
   },
@@ -790,17 +860,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const enemy = currentScene.enemy;
     const loot = enemy.loot[Math.floor(Math.random() * enemy.loot.length)] ?? 'Aether dust';
     get().appendLog('reward', `${enemy.name} defeated. You recover ${loot}.`);
+
+    // Increment lifetime kill count and check for a milestone bump.
+    const prevMs = player.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 };
+    const newKills = prevMs.enemiesDefeated + 1;
+    const hitMilestone = checkMilestone(newKills, MILESTONE_KILL_STEP);
+    const newHpMax = hitMilestone ? player.hpMax + 1 : player.hpMax;
+    const newHp = hitMilestone ? player.hp + 1 : player.hp;
+
     set({
       currentScene: { ...currentScene, enemy: null },
       worldMemory: recordEnemyDefeat(worldMemory, enemy.name),
       player: {
         ...player,
+        hp: newHp,
+        hpMax: newHpMax,
         inventory: [
           ...player.inventory,
           { id: `loot_${Date.now()}`, name: loot, kind: 'misc', quantity: 1, tags: ['loot'] },
         ],
+        milestones: { ...prevMs, enemiesDefeated: newKills },
       },
     });
+    if (hitMilestone) {
+      get().appendLog(
+        'reward',
+        `✦ You feel hardier from your trials. +1 max HP (now ${newHpMax}). [${newKills} enemies defeated]`,
+      );
+    }
     // Very rare Resurrection Gem drop. ~0.5% per kill — most playtests
     // will never see one; long campaigns will see a handful. The gem
     // saves to the install-wide stash, not the active character, so it

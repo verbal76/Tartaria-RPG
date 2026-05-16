@@ -50,7 +50,7 @@ export function buildCombatSteps(
   return [
     {
       id: 'initiative',
-      label: 'Initiative',
+      label: 'Roll for INITIATIVE',
       sides: 10,
       count: 1,
       bonus: 0,
@@ -61,18 +61,18 @@ export function buildCombatSteps(
     },
     {
       id: 'attack',
-      label: 'Attack Roll',
+      label: 'Roll to ATTACK',
       sides: 20,
       count: 1,
       bonus: stat.value,
       bonusLabel: `${stat.label} ${stat.value}`,
       target: ac,
       targetLabel: `AC ${ac}`,
-      context: `to hit ${enemy.name}`,
+      context: `d20 + ${stat.label} to hit ${enemy.name}`,
     },
     {
       id: 'damage',
-      label: 'Damage Roll',
+      label: 'Roll for DAMAGE',
       sides: dmg.sides,
       count: dmg.count,
       bonus: 0,
@@ -116,6 +116,17 @@ const DC_NAME: Record<number, string> = {
   6: 'Easy', 9: 'Moderate', 12: 'Hard', 15: 'Very Hard', 18: 'Difficult',
 };
 
+// Human-readable label for what the skill check is FOR — the player should
+// always know "I'm rolling to STEALTH" not "Skill Check".
+const INTENT_ACTION_VERB: Record<string, string> = {
+  stealth: 'STEALTH',
+  diplomacy: 'PERSUADE',
+  escape: 'ESCAPE',
+  investigate: 'INVESTIGATE',
+  cast: 'CAST',
+  use_relic: 'USE RELIC',
+};
+
 export function buildSkillSteps(
   intent: string,
   player: PlayerCharacter,
@@ -125,7 +136,8 @@ export function buildSkillSteps(
   const statLabel = STAT_LABEL[statKey];
   const dc = SKILL_DC[intent] ?? 12;
   const dcName = DC_NAME[dc] ?? '';
-  const label = intent.charAt(0).toUpperCase() + intent.slice(1).replace(/_/g, ' ') + ' Check';
+  const verb = INTENT_ACTION_VERB[intent] ?? intent.toUpperCase();
+  const label = `Roll to ${verb}`;
 
   return [{
     id: 'skill_check',

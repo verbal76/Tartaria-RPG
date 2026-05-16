@@ -182,6 +182,12 @@ export interface InventoryItem {
 
 export interface FactionStanding { factionId: string; standing: number; }
 
+export interface PlayerMilestones {
+  enemiesDefeated: number;
+  travelsCompleted: number;
+  checksSucceeded: number;
+}
+
 export interface PlayerCharacter {
   name: string;
   raceId: string;
@@ -200,6 +206,8 @@ export interface PlayerCharacter {
   activeQuests: Quest[];
   /** Set when HP hits 0; the character is barred from play until a Resurrection Gem revives them. */
   dead?: boolean;
+  /** Lifetime counters; thresholds trigger stat growth. */
+  milestones?: PlayerMilestones;
 }
 
 export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive';
