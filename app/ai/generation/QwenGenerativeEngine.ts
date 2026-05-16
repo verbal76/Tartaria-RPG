@@ -36,38 +36,46 @@ export interface GenerateOptions {
 }
 
 // ---------------------------------------------------------------------------
-// transformers.js loader (deferred)
+// transformers.js loader (stubbed in React Native)
 // ---------------------------------------------------------------------------
-// The @huggingface/transformers package is large and has its own native
-// dependencies. We load it indirectly so:
-//   1. tsc doesn't require the package to be installed in every sandbox.
-//   2. If transformers.js fails to load in React Native (polyfill mismatch,
-//      WASM init failure, etc.), the engine reports 'failed' instead of
-//      crashing the whole bundle. Templates carry the game until it works.
+// The @huggingface/transformers v3 package is NOT React Native compatible
+// despite some claims to the contrary. Its src/env.js does
+//   import fs from 'node:fs';
+//   import path from 'node:path';
+//   import url from 'node:url';
+// at the top of the file — Node.js core modules that Metro cannot bundle
+// for React Native. Including the package in package.json caused the
+// 2026-05-16 preview-APK build to fail at the createBundleReleaseJsAndAssets
+// step with "Unable to resolve module node:fs".
+//
+// The engine architecture stays in place — the public API of this class
+// (initialize / generate / stream / status) is the integration point any
+// future LLM swap will plug into. For now, loadTransformers always returns
+// null, the engine reports 'failed' on init, and the existing template
+// narration pool carries the Arbiter (the pre-Phase-3 behavior, just with
+// the v2.0.1 context-aware fire-rate tuning still active).
+//
+// To restore generative narration, the path forward is one of:
+//   a) react-native-transformers (separate package, RN-native build target)
+//   b) a native bridge to llama.cpp / MLC LLM / executorch
+//   c) hosted inference over HTTPS (HF Inference Providers, OpenRouter, etc.)
+// Each plugs in via this file alone — no callers of QwenGenerativeEngine
+// need to change.
 
-// Minimal interface we use — keeps us decoupled from transformers.js internals.
+// Minimal interface kept in place so the test hooks below still type-check.
 type TransformersModuleShape = {
   pipeline: (task: string, modelId: string, options?: unknown) => Promise<unknown>;
   TextStreamer: new (tokenizer: unknown, opts: unknown) => unknown;
   env: Record<string, unknown>;
 };
 
-declare const require: (id: string) => unknown;
-
 let transformersCache: TransformersModuleShape | null = null;
 let transformersLoadAttempted = false;
 
 function loadTransformers(): TransformersModuleShape | null {
-  if (transformersLoadAttempted) return transformersCache;
-  transformersLoadAttempted = true;
-  try {
-    // Indirection hides the require from static analysis — the package must
-    // be present at runtime for this to succeed; the build doesn't gate on it.
-    const moduleName = '@huggingface/transformers';
-    transformersCache = require(moduleName) as TransformersModuleShape;
-  } catch {
-    transformersCache = null;
-  }
+  // STUB: no static or dynamic reference to '@huggingface/transformers' so
+  // Metro never resolves the package and the bundle never hits node:fs.
+  // Tests inject a fake module via __setTransformersModuleForTests below.
   return transformersCache;
 }
 
