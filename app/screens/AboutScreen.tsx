@@ -137,11 +137,16 @@ export function AboutScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => setScreen(player ? 'exploration' : 'title')}>
-          <Text style={styles.back}>← back</Text>
+        <TouchableOpacity
+          onPress={() => setScreen(player ? 'exploration' : 'title')}
+          style={styles.backBtn}
+          hitSlop={12}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.back}>← BACK</Text>
         </TouchableOpacity>
         <Text style={styles.title}>ABOUT</Text>
-        <View style={{ width: 40 }} />
+        <View style={{ width: 80 }} />
       </View>
 
       <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
@@ -187,7 +192,17 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     marginBottom: 8,
   },
-  back: { color: '#7a705c', fontSize: 12, letterSpacing: 1, paddingHorizontal: 4 },
+  backBtn: {
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  back: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
   title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
   body: {
     flex: 1,
