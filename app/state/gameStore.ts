@@ -400,6 +400,8 @@ interface GameStore {
   currentScene: CurrentScene | null;
   pendingRolls: PendingRollState | null;
   hydrated: boolean;
+  /** Set when a slot load fails — UI surfaces this and offers recovery. */
+  slotLoadError: string | null;
 
   slots: SlotSummary[];
   activeSlotId: string | null;
@@ -416,6 +418,7 @@ interface GameStore {
 
   refreshSlots: () => Promise<void>;
   loadSlotIntoGame: (slotId: string) => Promise<void>;
+  clearSlotLoadError: () => void;
   deleteSlotById: (slotId: string) => Promise<void>;
   resurrectSlot: (slotId: string) => Promise<boolean>;
 
@@ -477,6 +480,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   currentScene: null,
   pendingRolls: null,
   hydrated: false,
+  slotLoadError: null,
 
   slots: [],
   activeSlotId: null,
@@ -513,22 +517,49 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   async loadSlotIntoGame(slotId) {
-    const saved = await loadSlot(slotId);
-    if (!saved || !saved.player) return;
+    set({ slotLoadError: null });
+    let saved;
+    try {
+      saved = await loadSlot(slotId);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      set({ slotLoadError: `Failed to read save: ${msg}` });
+      return;
+    }
+    if (!saved) {
+      set({ slotLoadError: 'No save data found for this character. The slot index may be out of sync with storage.' });
+      return;
+    }
+    if (!saved.player) {
+      set({ slotLoadError: 'Save file is missing the character record. Try a refresh, or delete the slot to clear it.' });
+      return;
+    }
     if (saved.player.dead === true) return; // Dead characters need a Resurrection Gem first.
-    await setActiveSlot(slotId);
-    set({
-      player: backfillPlayer(saved.player),
-      worldMemory: saved.worldMemory,
-      gameLog: saved.gameLog,
-      currentScreen: 'exploration',
-      activeSlotId: slotId,
-      currentScene: null,
-      pendingRolls: null,
-    });
-    // Saves don't store the scene; generate a fresh one so the player can
-    // immediately interact with the exploration screen.
-    get().beginScene();
+    try {
+      await setActiveSlot(slotId);
+      const player = backfillPlayer(saved.player);
+      set({
+        player,
+        worldMemory: saved.worldMemory,
+        gameLog: saved.gameLog,
+        currentScreen: 'exploration',
+        activeSlotId: slotId,
+        currentScene: null,
+        pendingRolls: null,
+      });
+      // Saves don't store the scene; generate a fresh one so the player can
+      // immediately interact with the exploration screen.
+      get().beginScene();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      // Roll the active slot back so we don't leave a half-set state.
+      try { await setActiveSlot(null); } catch { /* ignore */ }
+      set({
+        player: null,
+        currentScreen: 'title',
+        slotLoadError: `Failed to restore character: ${msg}`,
+      });
+    }
   },
 
   async resurrectSlot(slotId) {
@@ -705,6 +736,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('world', h.plantedLine);
     }
     if (vendor) {
+      // Narrate the arrival in the world channel first — vendors don't
+      // appear out of nowhere. The player should see they showed up
+      // alongside the rest of the scene paragraph, with their
+      // descriptive blurb. Then the Arbiter chimes in.
+      const arrivalLines = [
+        `A figure crests the rise — ${vendor.name}, ${vendor.title}, pack heavy across the shoulders. They set down to trade.`,
+        `${vendor.name} (${vendor.title}) is already here when you arrive, stall half-unpacked. They look up and nod once.`,
+        `Hoofbeats on the silt. ${vendor.name} draws up beside you, ${vendor.title}'s mark on the pack. "Trade?" they ask.`,
+        `${vendor.name}, ${vendor.title}, sits at a folding table at the edge of the ground, wares laid out neat. They beckon.`,
+        `You hear a kettle whistling before you see them. ${vendor.name}, ${vendor.title}, has made camp here.`,
+      ];
+      get().appendLog('world', pick(arrivalLines));
       get().appendLog(
         'arbiter',
         `The Arbiter inclines their head toward the newcomer. "${vendor.name}, ${vendor.title}. ${vendor.description}"`,
@@ -3094,6 +3137,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // typed `craft <name>` via submitPlayerAction.
   craftRecipe(recipeName: string) {
     get().submitPlayerAction(`craft ${recipeName}`);
+  },
+
+  clearSlotLoadError() {
+    set({ slotLoadError: null });
   },
 
   setActiveEnemyIdx(idx: number) {

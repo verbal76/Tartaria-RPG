@@ -37,6 +37,8 @@ export function TitleScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const refreshSlots = useGameStore((s) => s.refreshSlots);
   const loadSlotIntoGame = useGameStore((s) => s.loadSlotIntoGame);
+  const slotLoadError = useGameStore((s) => s.slotLoadError);
+  const clearSlotLoadError = useGameStore((s) => s.clearSlotLoadError);
   const deleteSlotById = useGameStore((s) => s.deleteSlotById);
   const resurrectSlot = useGameStore((s) => s.resurrectSlot);
   const resurrectionGems = useGameStore((s) => s.resurrectionGems);
@@ -61,6 +63,8 @@ export function TitleScreen() {
     setPendingAction({ kind: 'delete', slot });
   };
 
+  const [lastTappedSlot, setLastTappedSlot] = useState<SlotSummary | null>(null);
+
   const onSlotTap = (slot: SlotSummary) => {
     if (slot.dead) {
       if (resurrectionGems > 0) {
@@ -70,7 +74,24 @@ export function TitleScreen() {
       }
       return;
     }
+    setLastTappedSlot(slot);
     void loadSlotIntoGame(slot.slotId);
+  };
+
+  const retryLoad = () => {
+    if (!lastTappedSlot) return;
+    clearSlotLoadError();
+    void loadSlotIntoGame(lastTappedSlot.slotId);
+  };
+  const refreshAndCancel = () => {
+    clearSlotLoadError();
+    void refreshSlots();
+  };
+  const deleteAfterError = () => {
+    if (!lastTappedSlot) return;
+    const id = lastTappedSlot.slotId;
+    clearSlotLoadError();
+    void deleteSlotById(id);
   };
 
   const closeModal = () => setPendingAction(null);
@@ -181,6 +202,22 @@ export function TitleScreen() {
           : [{ label: 'OK', onPress: closeModal, tone: 'neutral' }]
         }
         onRequestClose={closeModal}
+      />
+
+      <BrandedModal
+        visible={!!slotLoadError}
+        title="Could not open character"
+        body={
+          slotLoadError
+            ? `${slotLoadError}\n\nThis usually means a save was interrupted. Retry — if it still fails, refresh the list or delete the slot.`
+            : undefined
+        }
+        buttons={[
+          { label: 'Refresh', onPress: refreshAndCancel, tone: 'neutral' },
+          { label: 'Delete', onPress: deleteAfterError, tone: 'destructive' },
+          { label: 'Retry', onPress: retryLoad, tone: 'primary' },
+        ]}
+        onRequestClose={clearSlotLoadError}
       />
     </View>
   );

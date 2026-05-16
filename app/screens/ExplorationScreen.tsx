@@ -6,7 +6,6 @@ import { AdventureFeed } from '../components/AdventureFeed';
 import { InputBox } from '../components/InputBox';
 import { DiceRoller } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
-import { VendorPanel } from '../components/VendorPanel';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
 import { findWeaponByName } from '../engine/crafting';
@@ -33,8 +32,6 @@ export function ExplorationScreen() {
   const resolveRollStep = useGameStore((s) => s.resolveRollStep);
   const cancelPendingRolls = useGameStore((s) => s.cancelPendingRolls);
   const saveAndExitToTitle = useGameStore((s) => s.saveAndExitToTitle);
-  const buyFromVendor = useGameStore((s) => s.buyFromVendor);
-  const dismissVendor = useGameStore((s) => s.dismissVendor);
   const setActiveEnemyIdx = useGameStore((s) => s.setActiveEnemyIdx);
 
   const [searchOpen, setSearchOpen] = useState(false);
@@ -121,12 +118,18 @@ export function ExplorationScreen() {
       </View>
 
       {currentScene?.vendor && (
-        <VendorPanel
-          vendor={currentScene.vendor}
-          playerTc={player.tc}
-          onBuy={buyFromVendor}
-          onDismiss={dismissVendor}
-        />
+        <TouchableOpacity
+          style={styles.vendorBanner}
+          onPress={() => setScreen('vendor')}
+          activeOpacity={0.7}
+        >
+          <View style={styles.vendorBannerStripe} />
+          <View style={styles.vendorBannerBody}>
+            <Text style={styles.vendorBannerName}>{currentScene.vendor.name}</Text>
+            <Text style={styles.vendorBannerHint}>tap to approach · {currentScene.vendor.offers.length} offers</Text>
+          </View>
+          <Text style={styles.vendorBannerArrow}>›</Text>
+        </TouchableOpacity>
       )}
 
       <View style={styles.feed}>
@@ -197,5 +200,20 @@ const styles = StyleSheet.create({
   menuRow: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 4 },
   menu: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },
   gear: { color: '#c9a86a', fontSize: 18, lineHeight: 18 },
+  vendorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#13110f',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 4,
+    overflow: 'hidden',
+    minHeight: 44,
+  },
+  vendorBannerStripe: { width: 4, backgroundColor: '#c9a86a', alignSelf: 'stretch' },
+  vendorBannerBody: { flex: 1, paddingHorizontal: 10, paddingVertical: 6 },
+  vendorBannerName: { color: '#c9a86a', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
+  vendorBannerHint: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginTop: 1 },
+  vendorBannerArrow: { color: '#c9a86a', fontSize: 22, paddingHorizontal: 12 },
   placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
 });
