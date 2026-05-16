@@ -15,6 +15,9 @@ export type Intent =
   | 'ask'
   | 'craft'
   | 'equip'
+  | 'gift'
+  | 'steal'
+  | 'join'
   | 'unknown';
 
 export interface ParsedInput {

@@ -69,6 +69,14 @@ import {
   GEAR,
   MATERIALS,
 } from '../engine/crafting';
+import {
+  FACTIONS,
+  findFaction,
+  applyRepChange,
+  getStanding,
+  meetsJoinThreshold,
+  JOIN_THRESHOLD,
+} from '../engine/factions';
 
 interface Concept {
   id: string;
@@ -259,7 +267,10 @@ interface GameStore {
   resolveEnemyDefeat: () => void;
   rest: () => void;
   buyFromVendor: (itemName: string) => void;
+  giftToVendor: (itemName: string) => void;
+  stealFromVendor: (itemName: string) => void;
   dismissVendor: () => void;
+  joinFaction: (factionId: string) => void;
 
   bootCognitive: () => Promise<void>;
   skipCognitiveBoot: () => void;
@@ -714,6 +725,55 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const resistList = armor.resistances?.length ? ` Resists ${armor.resistances.join(', ')}.` : '';
           get().appendLog('world', `You don the ${armor.name}. +${armor.acBonus} AC.${resistList}`);
         }
+        break;
+      }
+      case 'gift': {
+        if (!currentScene.vendor) {
+          get().appendLog('arbiter', `The Arbiter glances at the empty road. "No one here to gift to."`);
+          break;
+        }
+        const target = parsed.resolvedNoun ?? parsed.target ?? '';
+        if (!target.trim()) {
+          get().appendLog('arbiter', `The Arbiter tilts their head. "Gift what? Name a thing from your pack."`);
+          break;
+        }
+        get().giftToVendor(target);
+        break;
+      }
+      case 'steal': {
+        if (!currentScene.vendor) {
+          get().appendLog('arbiter', `The Arbiter watches the empty path. "Nothing to steal here."`);
+          break;
+        }
+        const target = parsed.resolvedNoun ?? parsed.target ?? '';
+        if (!target.trim()) {
+          get().appendLog('arbiter', `The Arbiter narrows their eyes. "Steal what? Name it precisely."`);
+          break;
+        }
+        get().stealFromVendor(target);
+        break;
+      }
+      case 'join': {
+        // Resolve the player's target text to a faction id.
+        const target = (parsed.target ?? '').toLowerCase().trim();
+        if (!target) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter waits. "Which faction? Mud Monarchs, Forgotten Order, Reclaimers Guild, True Tartarians, Eternal Dynasty."`,
+          );
+          break;
+        }
+        const match = FACTIONS.find(
+          (f) => f.name.toLowerCase().includes(target) || target.includes(f.name.toLowerCase()) || f.id === target,
+        );
+        if (!match) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter looks puzzled. "I do not know a faction by that name."`,
+          );
+          break;
+        }
+        get().joinFaction(match.id);
         break;
       }
       case 'craft': {
@@ -1188,8 +1248,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       tags,
     };
 
-    // Remove the offer so it can't be bought twice; this stack of inventory
-    // changes commits as one set call so the UI doesn't flicker.
+    // Small reputation boost with the vendor's faction for honest custom.
+    const vendorFaction = scene.vendor.faction;
+    const repResult = vendorFaction
+      ? applyRepChange(player.factionStanding, vendorFaction, 1)
+      : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
+
     set((s) => {
       if (!s.player || !s.currentScene?.vendor) return s;
       const newOffers = s.currentScene.vendor.offers.filter((o) => o !== offer);
@@ -1198,6 +1262,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ...s.player,
           tc: s.player.tc - offer.price,
           inventory: [...s.player.inventory, newItem],
+          factionStanding: repResult.standing,
         },
         currentScene: {
           ...s.currentScene,
@@ -1208,6 +1273,157 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().appendLog(
       'reward',
       `Bought ${offer.itemName} from ${scene.vendor.name} for ${offer.price} TC. (${player.tc - offer.price} TC left)`,
+    );
+    logRepChanges(get, repResult.changed);
+    void get().persist();
+  },
+
+  giftToVendor(itemName) {
+    const state = get();
+    const scene = state.currentScene;
+    const player = state.player;
+    if (!scene?.vendor || !player) return;
+
+    const itemIdx = player.inventory.findIndex(
+      (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
+    );
+    if (itemIdx < 0) {
+      get().appendLog('arbiter', `The Arbiter shakes their head. "You do not carry any ${itemName}."`);
+      return;
+    }
+    const item = player.inventory[itemIdx]!;
+
+    // Decrement quantity (remove row at 0).
+    const newInventory = player.inventory
+      .map((it, i) =>
+        i === itemIdx ? { ...it, quantity: it.quantity - 1 } : it,
+      )
+      .filter((it) => it.quantity > 0);
+
+    const vendorFaction = scene.vendor.faction;
+    const repResult = vendorFaction
+      ? applyRepChange(player.factionStanding, vendorFaction, 5)
+      : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
+
+    set((s) =>
+      s.player
+        ? {
+            player: { ...s.player, inventory: newInventory, factionStanding: repResult.standing },
+          }
+        : s,
+    );
+    get().appendLog(
+      'reward',
+      `You gift ${item.name} to ${scene.vendor.name}. They acknowledge it with a slow nod.`,
+    );
+    logRepChanges(get, repResult.changed);
+    void get().persist();
+  },
+
+  stealFromVendor(itemName) {
+    const state = get();
+    const scene = state.currentScene;
+    const player = state.player;
+    if (!scene?.vendor || !player) return;
+
+    const offer = scene.vendor.offers.find(
+      (o) => o.itemName.toLowerCase() === itemName.toLowerCase(),
+    );
+    if (!offer) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter watches you eye the pack. "They are not carrying a ${itemName}."`,
+      );
+      return;
+    }
+
+    // Immediate stealth check — d20 + DEX vs DC 12 (Hard per the rulebook).
+    // Skipping the pendingRolls UI here because a theft attempt resolves
+    // fast and the player won't expect a separate roll screen.
+    const dc = 12;
+    const roll = rollDie(20);
+    const total = roll + player.stats.dexterity;
+    const success = total >= dc;
+    get().appendLog('combat', `Stealth — d20 → ${roll} + DEX ${player.stats.dexterity} = ${total} vs DC ${dc} — ${success ? '✓ HIT' : '✗ CAUGHT'}`);
+
+    if (success) {
+      // Catalog lookup to set proper kind/rarity/tags.
+      const weapon = WEAPONS.find((w) => w.name === offer.itemName);
+      const armor = !weapon ? ARMOR.find((a) => a.name === offer.itemName) : null;
+      const gear = !weapon && !armor ? GEAR.find((g) => g.name === offer.itemName) : null;
+      const material = !weapon && !armor && !gear ? MATERIALS.find((m) => m.name === offer.itemName) : null;
+      const cat = weapon ?? armor ?? gear ?? material ?? null;
+      const kind: InventoryItem['kind'] =
+        gear?.kind === 'consumable' || gear?.kind === 'relic' || gear?.kind === 'misc'
+          ? gear.kind
+          : 'misc';
+      const stolen: InventoryItem = {
+        id: `stolen_${Date.now()}`,
+        name: offer.itemName,
+        kind,
+        rarity: cat?.rarity,
+        quantity: 1,
+        tags: cat?.tags ?? [],
+      };
+      set((s) => {
+        if (!s.player || !s.currentScene?.vendor) return s;
+        const newOffers = s.currentScene.vendor.offers.filter((o) => o !== offer);
+        return {
+          player: { ...s.player, inventory: [...s.player.inventory, stolen] },
+          currentScene: { ...s.currentScene, vendor: { ...s.currentScene.vendor, offers: newOffers } },
+        };
+      });
+      get().appendLog('reward', `You palm the ${offer.itemName}. ${scene.vendor.name} doesn't notice.`);
+    } else {
+      // Caught. Big rep hit and the vendor leaves immediately.
+      const vendorFaction = scene.vendor.faction;
+      const repResult = vendorFaction
+        ? applyRepChange(player.factionStanding, vendorFaction, -10)
+        : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
+      set((s) =>
+        s.player && s.currentScene
+          ? {
+              player: { ...s.player, factionStanding: repResult.standing },
+              currentScene: { ...s.currentScene, vendor: null },
+            }
+          : s,
+      );
+      get().appendLog(
+        'world',
+        `${scene.vendor.name} catches your wrist. "I see you." They pack up and leave without another word.`,
+      );
+      logRepChanges(get, repResult.changed);
+    }
+    void get().persist();
+  },
+
+  joinFaction(factionId) {
+    const state = get();
+    const player = state.player;
+    if (!player) return;
+    const target = findFaction(factionId);
+    if (!target) {
+      get().appendLog('arbiter', `The Arbiter looks puzzled. "I do not know that faction."`);
+      return;
+    }
+    if (player.factionId === factionId) {
+      get().appendLog('arbiter', `The Arbiter raises a brow. "You are already one of the ${target.name}."`);
+      return;
+    }
+    if (!meetsJoinThreshold(player.factionStanding, factionId)) {
+      const current = getStanding(player.factionStanding, factionId);
+      get().appendLog(
+        'arbiter',
+        `The Arbiter shakes their head. "The ${target.name} do not take strangers. Standing ${current} — they want at least ${JOIN_THRESHOLD}."`,
+      );
+      return;
+    }
+    set((s) =>
+      s.player ? { player: { ...s.player, factionId } } : s,
+    );
+    get().appendLog(
+      'reward',
+      `You are accepted into the ${target.name}. The Arbiter watches you make the pledge in silence.`,
     );
     void get().persist();
   },
@@ -1516,4 +1732,20 @@ function attackKill(weapon: string | null, enemyName: string, dmg: number): stri
     `Final strike${wp} for ${dmg}. ${enemyName} is still. The Aetherstone hums on, indifferent.`,
     `The killing blow${wp}: ${dmg}. ${enemyName} drops where it stood.`,
   ]);
+}
+
+// Log faction-rep changes one line per affected faction so the player
+// can see propagation (e.g. gifting the Forgotten Order also nudges
+// the Reclaimers Guild via the situational alliance, and dings the
+// Mud Monarchs as their rival).
+function logRepChanges(
+  get: () => GameStore,
+  changes: { factionId: string; delta: number; newStanding: number }[],
+): void {
+  for (const c of changes) {
+    const faction = FACTIONS.find((f) => f.id === c.factionId);
+    const name = faction?.name ?? c.factionId;
+    const sign = c.delta > 0 ? '+' : '';
+    get().appendLog('system', `${name} standing ${sign}${c.delta} (now ${c.newStanding})`);
+  }
 }

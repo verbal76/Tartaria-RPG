@@ -194,6 +194,24 @@
       "keywords": ["vendor", "vendors", "merchant", "broker", "shop", "buy", "trade"],
       "title": "Vendors",
       "answer": "Wandering traders appear in peaceful scenes — Reclaimer brokers, Forgotten Order scholars, True Tartarian quartermasters, the occasional unaffiliated drifter. Each carries a handful of items for TC. Tap an item in their panel to buy. They leave when you do."
+    },
+    {
+      "id": "gifting",
+      "keywords": ["gift", "gifting", "give", "offer"],
+      "title": "Gifting",
+      "answer": "Type 'gift <item>' while a vendor is in the scene. The item leaves your pack and the vendor's faction gains 5 standing — with half that propagating to their allies and the inverse to their rivals. Honest currency for politics."
+    },
+    {
+      "id": "stealing",
+      "keywords": ["steal", "stealing", "thief", "pilfer", "pocket"],
+      "title": "Stealing",
+      "answer": "Type 'steal <item>' to attempt a theft from the current vendor. A d20 + DEX vs DC 12 stealth check resolves immediately. Success: the item is yours, free. Failure: the vendor catches you, faction standing drops 10, and they pack up and leave."
+    },
+    {
+      "id": "factions_join",
+      "keywords": ["join", "joining", "enlist", "pledge"],
+      "title": "Joining a faction",
+      "answer": "Type 'join <faction name>'. Requires at least 20 standing with that faction. Faction standing rises through purchases (+1), gifts (+5), and certain quests; it falls through theft (-10) and aligned actions against them."
     }
   ]
 }
