@@ -3502,17 +3502,22 @@ const RANGE_LABEL: Record<CombatRange, string> = {
 
 // Apply a single HookEffect to player + world state. Returns true if the
 // effect caused a fatal HP drop so the caller can stage the death handler.
+// Apply a single hook effect. Mutates player / world state. Returns
+//   inlineSummary: short string to be folded into the parent world log
+//     entry (e.g. "Recovered Aether Crystal", "+30 TC"). Null for effects
+//     that are silent (memo / time advance) or that emit their own
+//     separate logs (damage / enemy spawn / rep change).
+//   fatal: true when the effect dropped HP to 0.
 function applyHookEffect(
   effect: HookEffect,
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
-): boolean {
+): { inlineSummary: string | null; fatal: boolean } {
   switch (effect.type) {
     case 'grant_tc': {
       const amt = effect.amount;
       set((s) => (s.player ? { player: { ...s.player, tc: Math.max(0, s.player.tc + amt) } } : s));
-      get().appendLog('reward', amt >= 0 ? `+${amt} TC.` : `${amt} TC.`);
-      return false;
+      return { inlineSummary: amt >= 0 ? `+${amt} TC` : `${amt} TC`, fatal: false };
     }
     case 'grant_item': {
       const catEntry = lookupCraftedItem(effect.name);
@@ -3525,8 +3530,7 @@ function applyHookEffect(
         tags: catEntry.tags,
       });
       set((s) => (s.player ? { player: { ...s.player, inventory: [...s.player.inventory, item] } } : s));
-      get().appendLog('reward', `Recovered ${effect.name}.`);
-      return false;
+      return { inlineSummary: effect.name, fatal: false };
     }
     case 'heal': {
       const amt = effect.amount;
@@ -3535,8 +3539,7 @@ function applyHookEffect(
           ? { player: { ...s.player, hp: Math.min(s.player.hpMax, s.player.hp + amt) } }
           : s,
       );
-      get().appendLog('reward', `You feel restored. +${amt} HP.`);
-      return false;
+      return { inlineSummary: `+${amt} HP`, fatal: false };
     }
     case 'damage': {
       const amt = effect.amount;
@@ -3548,36 +3551,34 @@ function applyHookEffect(
         return { player: { ...s.player, hp: newHp } };
       });
       get().appendLog('combat', `You take ${amt} damage from ${effect.cause}.`);
-      return killed;
+      return { inlineSummary: null, fatal: killed };
     }
     case 'advance_time': {
       set((s) => (s.player ? { player: advanceTime(s.player, effect.hours) } : s));
-      return false;
+      return { inlineSummary: null, fatal: false };
     }
     case 'rep_change': {
       const player = get().player;
-      if (!player) return false;
+      if (!player) return { inlineSummary: null, fatal: false };
       const result = applyRepChange(player.factionStanding, effect.factionId, effect.amount);
       set((s) => (s.player ? { player: { ...s.player, factionStanding: result.standing } } : s));
       logRepChanges(get, result.changed);
-      return false;
+      return { inlineSummary: null, fatal: false };
     }
     case 'spawn_enemy_tag': {
-      // Spawn an enemy whose `type` matches the requested tag at this scene.
-      // Falls back gracefully if no matching enemy exists for the location.
       const tag = effect.tag;
       const candidates = (enemiesData as Enemy[]).filter((e) => e.type === tag);
       const spawn = candidates.length > 0
         ? candidates[Math.floor(Math.random() * candidates.length)]!
         : pickEnemyForLocation(get().currentScene?.location ?? getLocationById('tartarian_outskirts'));
-      if (!spawn) return false;
+      if (!spawn) return { inlineSummary: null, fatal: false };
       set((s) =>
         s.currentScene
           ? { currentScene: { ...s.currentScene, enemies: [spawn], enemyHps: [spawn.hp], activeEnemyIdx: 0, range: 'close' } }
           : s,
       );
       get().appendLog('combat', `${spawn.name} emerges from the hook. Combat begins at close range.`);
-      return false;
+      return { inlineSummary: null, fatal: false };
     }
     case 'unlock_location': {
       set((s) => ({
@@ -3586,8 +3587,7 @@ function applyHookEffect(
           discoveredLocationIds: Array.from(new Set([...(s.worldMemory.discoveredLocationIds ?? []), effect.locationId])),
         },
       }));
-      get().appendLog('reward', `New location uncovered.`);
-      return false;
+      return { inlineSummary: 'New location uncovered', fatal: false };
     }
     case 'memo': {
       set((s) => ({
@@ -3596,7 +3596,7 @@ function applyHookEffect(
           chainMemos: [...(s.worldMemory.chainMemos ?? []), { text: effect.text, ts: Date.now() }].slice(-12),
         },
       }));
-      return false;
+      return { inlineSummary: null, fatal: false };
     }
   }
 }
@@ -3610,12 +3610,21 @@ function resolveHookOneStep(
 ): void {
   const outcome = getHookOutcome(hook.kind, hook.stage);
   if (!outcome) return;
-  get().appendLog('world', outcome.line);
-  if (outcome.arbiterLine) get().appendLog('arbiter', outcome.arbiterLine);
+  // Apply every effect first so we can fold the inline rewards INTO the
+  // narration line. Damage / enemy spawn / rep changes still log
+  // separately (they have their own combat / reward tone).
   let fatal = false;
+  const inlineSummaries: string[] = [];
   for (const eff of outcome.effects) {
-    if (applyHookEffect(eff, get, set)) fatal = true;
+    const r = applyHookEffect(eff, get, set);
+    if (r.fatal) fatal = true;
+    if (r.inlineSummary) inlineSummaries.push(r.inlineSummary);
   }
+  // One world log entry combining the stage's narration + a reward
+  // callout when relevant.
+  const rewardTail = inlineSummaries.length > 0 ? `  ✦ ${inlineSummaries.join(', ')}.` : '';
+  get().appendLog('world', `${outcome.line}${rewardTail}`);
+  if (outcome.arbiterLine) get().appendLog('arbiter', outcome.arbiterLine);
   // Advance hook stage / mark resolved.
   set((s) => {
     if (!s.currentScene) return {};
