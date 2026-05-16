@@ -2654,7 +2654,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene = state.currentScene;
     if (!player) return;
     if (!scene?.vendor || !scene.vendor.faction) {
-      get().appendLog('arbiter', `The Arbiter shrugs. "No faction agent here to take a contract from."`);
+      // HANDOFF §5 #8: name the vendor *type* so the player knows what to
+      // look for, not just "a faction agent." Contracts come from the
+      // wandering vendors that appear in scenes; calling them out by name
+      // makes the next move concrete.
+      get().appendLog(
+        'arbiter',
+        `The Arbiter shrugs. "Contracts come from wandering faction vendors — keep walking until one shows up at your scene."`,
+      );
       return;
     }
     // Direct id match first, then fuzzy title within this faction's pool.
@@ -2699,7 +2706,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene = state.currentScene;
     if (!player) return;
     if (!scene?.vendor || !scene.vendor.faction) {
-      get().appendLog('arbiter', `The Arbiter waves. "Find a faction agent before you can turn that in."`);
+      // Surface the actual faction(s) the player owes a turn-in to so they
+      // know WHO to seek, not just "a faction agent." HANDOFF §5 #8.
+      const active = (player.activeFactionQuestIds ?? [])
+        .map((id) => findFactionQuestById(id))
+        .filter((q): q is NonNullable<ReturnType<typeof findFactionQuestById>> => !!q);
+      if (active.length > 0) {
+        const factionNames = Array.from(
+          new Set(
+            active.map((q) => {
+              const f = FACTIONS.find((x) => x.id === q.factionId);
+              return f?.name ?? q.factionId.replace(/_/g, ' ');
+            }),
+          ),
+        );
+        const list =
+          factionNames.length === 1
+            ? `a ${factionNames[0]} vendor`
+            : `a vendor from one of: ${factionNames.join(', ')}`;
+      get().appendLog(
+        'arbiter',
+          `The Arbiter waves. "Find ${list} to turn that contract in."`,
+      );
+      } else {
+        get().appendLog(
+          'arbiter',
+          `The Arbiter waves. "You have no active contracts. Find a faction vendor first."`,
+        );
+      }
       return;
     }
     const active = player.activeFactionQuestIds ?? [];
@@ -2752,7 +2786,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene = state.currentScene;
     if (!player) return;
     if (!scene?.vendor) {
-      get().appendLog('arbiter', `The Arbiter shakes their head. "Hunts come from people. Find someone first."`);
+      get().appendLog(
+        'arbiter',
+        `The Arbiter shakes their head. "Hunts come from wandering faction vendors. Keep walking until one turns up at your scene."`,
+      );
       return;
     }
     const factionId = scene.vendor.faction;
