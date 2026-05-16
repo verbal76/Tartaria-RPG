@@ -187,18 +187,26 @@ export async function setActiveContext(desired: Context | null): Promise<void> {
   }
 }
 
-// Apply a settings change immediately — bump the live track's volume or
-// stop entirely when the user toggles off.
+// Apply a settings change immediately — bump the live track's volume,
+// stop entirely when the user toggles off, OR start a fresh track when
+// they toggle on after having been disabled.
 async function applySettings(): Promise<void> {
   const s = getAudioSettings();
+  if (!s.enabled) {
+    if (activeTrackId) await stopWithFade(activeTrackId);
+    return;
+  }
+  // Enabled: if there's an active context but no live track (we were
+  // off and just turned on), kick off a fresh pick from the pool.
+  if (activeContext && !activeTrackId) {
+    const pick = pickFromPool(POOLS[activeContext], null);
+    activeTrackId = pick.id;
+    await playWithFade(pick);
+    return;
+  }
   if (!activeTrackId) return;
   const entry = findEntry(activeTrackId);
   if (!entry) return;
-  if (!s.enabled) {
-    await stopWithFade(activeTrackId);
-    return;
-  }
-  // Live: ensure the track is playing then ramp to the new target volume.
   const sound = sounds[activeTrackId];
   if (sound) {
     const status = await sound.getStatusAsync();
@@ -210,6 +218,17 @@ async function applySettings(): Promise<void> {
       await setSoundVolume(activeTrackId, effectiveVolume(entry));
     }
   }
+}
+
+// Force a full audio reset. Stops any live track, drops the cached
+// context, then re-derives from the caller's input. Used by the Apply
+// button when the user wants to push settings through.
+export async function forceReapplyAudio(targetContext: Context | null): Promise<void> {
+  const prevId = activeTrackId;
+  activeTrackId = null;
+  activeContext = null;
+  if (prevId) await stopWithFade(prevId);
+  await setActiveContext(targetContext);
 }
 
 let settingsUnsub: (() => void) | null = null;

@@ -143,8 +143,8 @@ export function TitleScreen() {
           <TouchableOpacity style={styles.subBtn} onPress={() => setScreen('lore')}>
             <Text style={styles.subBtnText}>Lore Codex</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.subBtn} onPress={() => setScreen('about')}>
-            <Text style={styles.subBtnText}>About</Text>
+          <TouchableOpacity style={[styles.subBtn, styles.subBtnGear]} onPress={() => setScreen('about')}>
+            <Text style={styles.gear}>⚙</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -243,5 +243,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   subBtnText: { color: '#cdbf99', fontSize: 11, letterSpacing: 1 },
+  subBtnGear: { flex: 0, minWidth: 44, paddingHorizontal: 0 },
+  gear: { color: '#c9a86a', fontSize: 18, lineHeight: 18, textAlign: 'center' },
   footer: { color: '#3a342c', fontSize: 10, textAlign: 'center', marginTop: 8 },
 });

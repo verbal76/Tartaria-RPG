@@ -8,7 +8,7 @@
 //   4. Anything else while playing → explore
 
 import { useGameStore } from '../state/gameStore';
-import { setActiveContext } from './AudioManager';
+import { setActiveContext, forceReapplyAudio } from './AudioManager';
 
 type GameState = ReturnType<typeof useGameStore.getState>;
 
@@ -48,4 +48,14 @@ async function apply(state: GameState): Promise<void> {
   if (ctx === lastContext) return;
   lastContext = ctx;
   await setActiveContext(ctx);
+}
+
+// Hard reset — flushes the audio manager's cache and re-derives the
+// context from current store state. Wired to the settings "Apply"
+// button so the user can force a reload if live wiring gets stuck.
+export async function forceReapplyAudioFromState(): Promise<void> {
+  const state = useGameStore.getState();
+  const ctx = deriveContext(state);
+  lastContext = ctx;
+  await forceReapplyAudio(ctx);
 }

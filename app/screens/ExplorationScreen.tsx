@@ -158,8 +158,8 @@ export function ExplorationScreen() {
           <TouchableOpacity onPress={() => setScreen('log')}>
             <Text style={styles.menu}>full log</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setScreen('about')}>
-            <Text style={styles.menu}>about</Text>
+          <TouchableOpacity onPress={() => setScreen('about')} hitSlop={8}>
+            <Text style={styles.gear}>⚙</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -195,5 +195,6 @@ const styles = StyleSheet.create({
   controls: { gap: 6 },
   menuRow: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 4 },
   menu: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },
+  gear: { color: '#c9a86a', fontSize: 18, lineHeight: 18 },
   placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
 });

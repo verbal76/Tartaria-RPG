@@ -8,6 +8,7 @@ import { useGameStore } from '../state/gameStore';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { SimpleSlider } from '../components/SimpleSlider';
 import { getAudioSettings, setAudioSettings, onAudioSettingsChange, type AudioSettings } from '../audio/audioSettings';
+import { forceReapplyAudioFromState } from '../audio/AudioController';
 
 export function AboutScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
@@ -30,8 +31,15 @@ export function AboutScreen() {
     return onAudioSettingsChange(setAudio);
   }, []);
 
+  const [applyFlash, setApplyFlash] = useState(false);
   const toggleMusic = () => { void setAudioSettings({ enabled: !audio.enabled }); };
   const setMusicVolume = (v: number) => { void setAudioSettings({ volume: v }); };
+  const applyMusic = () => {
+    void forceReapplyAudioFromState().then(() => {
+      setApplyFlash(true);
+      setTimeout(() => setApplyFlash(false), 1200);
+    });
+  };
 
   async function checkForUpdate() {
     if (updateBusy) return;
@@ -181,6 +189,15 @@ export function AboutScreen() {
             </View>
             <Text style={styles.musicValue}>{Math.round(audio.volume * 100)}%</Text>
           </View>
+          <TouchableOpacity
+            style={[styles.applyBtn, applyFlash && styles.applyBtnFlash]}
+            onPress={applyMusic}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.applyBtnText, applyFlash && styles.applyBtnTextFlash]}>
+              {applyFlash ? 'APPLIED' : 'APPLY'}
+            </Text>
+          </TouchableOpacity>
         </View>
         <Text style={styles.mono}>{info}</Text>
       </ScrollView>
@@ -276,6 +293,18 @@ const styles = StyleSheet.create({
   musicRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   musicLabel: { color: '#7a705c', fontSize: 11, letterSpacing: 1, width: 60 },
   musicValue: { color: '#cdbf99', fontSize: 11, fontVariant: ['tabular-nums'], width: 44, textAlign: 'right' },
+  applyBtn: {
+    marginTop: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: '#c9a86a',
+    alignSelf: 'flex-end',
+  },
+  applyBtnFlash: { backgroundColor: '#c9a86a' },
+  applyBtnText: { color: '#c9a86a', fontSize: 11, fontWeight: '700', letterSpacing: 2 },
+  applyBtnTextFlash: { color: '#13110f' },
   copyBtn: {
     backgroundColor: '#c9a86a',
     borderRadius: 4,
