@@ -10,6 +10,7 @@ import { LogScreen } from './app/screens/LogScreen';
 import { LoreScreen } from './app/screens/LoreScreen';
 import { AboutScreen } from './app/screens/AboutScreen';
 import { InventoryScreen } from './app/screens/InventoryScreen';
+import { CraftingScreen } from './app/screens/CraftingScreen';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
 import { startAudioController, stopAudioController } from './app/audio/AudioController';
 
@@ -63,6 +64,7 @@ export default function App() {
         {screen === 'lore' && <LoreScreen />}
         {screen === 'about' && <AboutScreen />}
         {screen === 'inventory' && <InventoryScreen />}
+        {screen === 'crafting' && <CraftingScreen />}
       </SafeAreaView>
     </SafeAreaProvider>
   );

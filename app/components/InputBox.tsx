@@ -5,6 +5,7 @@ interface Props {
   onSubmit: (text: string) => void;
   onOpenInventory: () => void;
   onOpenSearch: () => void;
+  onOpenCrafting: () => void;
   inCombat: boolean;
   equippedMain: string | null;
   equippedOff: string | null;
@@ -27,7 +28,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, inCombat, equippedMain, equippedOff, range }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, inCombat, equippedMain, equippedOff, range }: Props) {
   const [text, setText] = useState('');
 
   const handleSubmit = () => {
@@ -72,6 +73,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, inCombat, eq
               <QuickBtn key={qa} label={qa} onPress={() => onSubmit(qa)} />
             ))}
             <QuickBtn label="search" onPress={onOpenSearch} />
+            <QuickBtn label="craft" onPress={onOpenCrafting} />
             <QuickBtn label="inventory" onPress={onOpenInventory} />
           </>
         )}

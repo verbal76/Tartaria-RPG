@@ -452,6 +452,8 @@ interface GameStore {
   digHere: () => void;
   stepDirection: (dir: Direction) => void;
   setActiveEnemyIdx: (idx: number) => void;
+  /** Craft a specific recipe directly (used by the CraftingScreen list). */
+  craftRecipe: (recipeName: string) => void;
   dismissVendor: () => void;
   joinFaction: (factionId: string) => void;
   equipItem: (itemName: string, slot: EquipSlot) => void;
@@ -3087,6 +3089,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   // Set the enemy the player is currently targeting. Bound to taps and
   // horizontal swipes on the EnemyPanel.
+  // Direct craft entry point — used by the CraftingScreen so taps don't
+  // have to round-trip through the parser. Calls the same code path as
+  // typed `craft <name>` via submitPlayerAction.
+  craftRecipe(recipeName: string) {
+    get().submitPlayerAction(`craft ${recipeName}`);
+  },
+
   setActiveEnemyIdx(idx: number) {
     set((s) => {
       if (!s.currentScene || s.currentScene.enemies.length === 0) return {};

@@ -145,6 +145,7 @@ export function ExplorationScreen() {
             onSubmit={submit}
             onOpenInventory={() => setScreen('inventory')}
             onOpenSearch={() => setSearchOpen(true)}
+            onOpenCrafting={() => setScreen('crafting')}
             inCombat={inCombat}
             equippedMain={equippedMain}
             equippedOff={equippedOff}

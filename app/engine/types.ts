@@ -389,7 +389,8 @@ export type ScreenName =
   | 'log'
   | 'lore'
   | 'about'
-  | 'inventory';
+  | 'inventory'
+  | 'crafting';
 
 export interface SaveState {
   version: 1;
