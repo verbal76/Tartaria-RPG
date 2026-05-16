@@ -51,6 +51,54 @@ export interface WorldLadder {
 export const WORLD_LADDER = worldLadderData as WorldLadder;
 export const MACRO_LOCATIONS: MacroLocation[] = WORLD_LADDER.macroLocations;
 
+/**
+ * Maps a top-level Location id (from `app/data/locations/locations.json`) to
+ * the Macro biome it sits inside. Locations not in this table fall back to
+ * the flat Location description on scene entry — they have no Micro-Micro
+ * override and the LLM gets the legacy environmental text.
+ *
+ * The taxonomy:
+ *   lost_capitals       — Tartarian capital cities + their landmarks
+ *   subterranean_empire — True Tartarian underground enclaves
+ *   aetherstone_deep    — buried Tartarian facilities / vaults
+ *   silt_wastes         — surface mud-flood terrain
+ *   borderlands         — liminal markets / dig sites / frontier scenes
+ */
+export const LOCATION_TO_MACRO: Record<string, string> = {
+  // Capital cities + landmarks → Lost Capitals
+  asgardar: 'lost_capitals',
+  grand_spire_of_etheria: 'lost_capitals',
+  samarran: 'lost_capitals',
+  thametans_tower: 'lost_capitals',
+  nimari: 'lost_capitals',
+  red_tower_of_nimari: 'lost_capitals',
+  drakova: 'lost_capitals',
+  // Subterranean enclaves → Subterranean Empire
+  varakush: 'subterranean_empire',
+  // Tartarian deep facilities → Aetherstone Deep
+  obsidian_pillars: 'aetherstone_deep',
+  endless_stair: 'aetherstone_deep',
+  zharaks_teeth: 'aetherstone_deep',
+  cradle_of_dusk: 'aetherstone_deep',
+  giant_vault: 'aetherstone_deep',
+  etheric_chamber: 'aetherstone_deep',
+  mud_flood_nexus: 'aetherstone_deep',
+  // Surface mud wastes → Silt Wastes
+  great_tartary_plains: 'silt_wastes',
+  mud_seas: 'silt_wastes',
+  sinking_cathedral: 'silt_wastes',
+  buried_cities: 'silt_wastes',
+  voronov: 'silt_wastes',
+  // Edge / liminal → Borderlands
+  tartarian_outskirts: 'borderlands',
+};
+
+/** Convenience: returns the Macro for a Location, or null if not mapped. */
+export function macroForLocation(locationId: string): MacroLocation | null {
+  const macroId = LOCATION_TO_MACRO[locationId];
+  return macroId ? findMacro(macroId) : null;
+}
+
 // ---------------------------------------------------------------------------
 // Lookups
 // ---------------------------------------------------------------------------

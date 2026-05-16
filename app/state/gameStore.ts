@@ -51,6 +51,11 @@ import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrat
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
 import { buildLlmContext, buildSystemPrompt, type SceneSlice } from '../engine/contextInjector';
+import {
+  LOCATION_TO_MACRO,
+  findMicroMicroAnywhere,
+  pickRandomMicroMicroIn,
+} from '../engine/worldLadder';
 import { getItemPreview } from '../components/itemPreview';
 import { isInventoryQuestion, extractInventoryTarget, isContinueCommand } from '../engine/askInventory';
 import locationsData from '../data/locations/locations.json';
@@ -191,6 +196,12 @@ interface CurrentScene {
    *  scene paragraph mentioned that the player can ask / investigate /
    *  search against. */
   ambientNouns: string[];
+  /** When this Location maps to a Macro biome in worldLadder.json, the
+   *  scene picks a specific Micro-Micro room to flavor the Arbiter's
+   *  narration. Stored here (not regenerated each turn) so a single
+   *  visit reads as one consistent room. Null for legacy/unmapped
+   *  locations — the LLM context falls back to flat Location text. */
+  microMicroId: string | null;
 }
 
 // Helper: which enemy is the player currently targeting? Returns null
@@ -767,9 +778,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       consumedChainIds.push(next.chainId);
     }
     const ambientNouns = extractAmbientNouns(location.description);
+    // World-ladder Micro-Micro pick. When this Location maps to a Macro
+    // biome in worldLadder.json, sample a random room from that Macro so
+    // the Arbiter narrates at the room tier ("Buried Skyscraper — Upper
+    // Floors", "Crystal Pylon Chamber") instead of the flat Location text.
+    // The id is stored on the scene so a single visit reads as one
+    // consistent room — re-picking each turn would feel like the world
+    // shifts under the player's feet.
+    let microMicroId: string | null = null;
+    const macroId = LOCATION_TO_MACRO[location.id];
+    if (macroId) {
+      const triple = pickRandomMicroMicroIn(macroId);
+      if (triple) microMicroId = triple.microMicro.id;
+    }
     const scene: CurrentScene = {
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
-      vendor, range, hooks: initialHooks, ambientNouns,
+      vendor, range, hooks: initialHooks, ambientNouns, microMicroId,
     };
     set({ currentScene: scene, pendingRolls: null });
     if (consumedChainIds.length > 0) {
@@ -4458,7 +4482,18 @@ async function narrateViaArbiter(
       ? { name: scene.vendor.name, affiliation: scene.vendor.faction ?? undefined }
       : null,
   };
-  const ctx = buildLlmContext({ player, scene: sceneSlice, gameLog: state.gameLog });
+  // World-ladder override — when beginScene picked a Micro-Micro for this
+  // visit, fold it into the context so the Arbiter narrates at the room
+  // tier instead of the flat Location tier.
+  const ladder = scene.microMicroId
+    ? findMicroMicroAnywhere(scene.microMicroId)
+    : null;
+  const ctx = buildLlmContext({
+    player,
+    scene: sceneSlice,
+    gameLog: state.gameLog,
+    ladder,
+  });
   const messages = buildSystemPrompt(ctx);
   const myEpoch = ++arbiterGenerationEpoch;
   set({ isGenerating: true, partialArbiterText: '' });

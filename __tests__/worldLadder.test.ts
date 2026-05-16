@@ -1,14 +1,18 @@
 import {
   WORLD_LADDER,
   MACRO_LOCATIONS,
+  LOCATION_TO_MACRO,
   findMacro,
   findMicro,
   findMicroMicro,
   findMicroMicroAnywhere,
   pickRandomMicroMicroIn,
+  macroForLocation,
 } from '../app/engine/worldLadder';
 import enemiesData from '../app/data/enemies/enemies.json';
 import lootData from '../app/data/relics/loot_tables.json';
+import locationsData from '../app/data/locations/locations.json';
+import type { Location } from '../app/engine/types';
 
 // ---------------------------------------------------------------------------
 // Structural sanity — verifies the JSON file is shaped correctly.
@@ -153,5 +157,37 @@ describe('worldLadder lookups', () => {
     expect(triple?.macro.id).toBe('borderlands');
     expect(triple?.microMicro).toBeTruthy();
     expect(pickRandomMicroMicroIn('not_a_macro')).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// LOCATION_TO_MACRO — the bridge between locations.json and worldLadder.json
+// ---------------------------------------------------------------------------
+
+describe('LOCATION_TO_MACRO mapping', () => {
+  const locations = locationsData as Location[];
+  const locationIds = new Set(locations.map((l) => l.id));
+  const macroIds = new Set(MACRO_LOCATIONS.map((m) => m.id));
+
+  it('every mapped location id exists in locations.json', () => {
+    const orphans: string[] = [];
+    for (const locId of Object.keys(LOCATION_TO_MACRO)) {
+      if (!locationIds.has(locId)) orphans.push(locId);
+    }
+    expect(orphans).toEqual([]);
+  });
+
+  it('every mapped target is a real macro in the ladder', () => {
+    const orphans: Array<[string, string]> = [];
+    for (const [locId, macroId] of Object.entries(LOCATION_TO_MACRO)) {
+      if (!macroIds.has(macroId)) orphans.push([locId, macroId]);
+    }
+    expect(orphans).toEqual([]);
+  });
+
+  it('macroForLocation resolves mapped locations and rejects unmapped ones', () => {
+    expect(macroForLocation('asgardar')?.id).toBe('lost_capitals');
+    expect(macroForLocation('great_tartary_plains')?.id).toBe('silt_wastes');
+    expect(macroForLocation('this_is_not_a_real_location')).toBeNull();
   });
 });
