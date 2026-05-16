@@ -30,6 +30,32 @@ const STOPWORDS = new Set([
 // they look adjective-y — they get matched as standalone search targets.
 const ALLOW_SHORT = new Set(['mud', 'ash', 'aether', 'cold', 'air', 'dust', 'stone', 'silt']);
 
+// Pure-adjective blocklist. HANDOFF §5 #6 complaint: ambient noun extractor
+// was offering "buried", "vast", "ancient" as searchable targets in scenes
+// where those words were descriptors of the room, not things the player
+// could interact with. These never carry an interaction in our data files
+// and should not pollute the noun pool. Keep this list small — when in
+// doubt, leave a word out and let the longer-token / -ed/-ing filter catch
+// it.
+const ADJECTIVE_BLOCKLIST = new Set([
+  'vast', 'ancient', 'great', 'small', 'old', 'new', 'dark', 'bright',
+  'cold', 'hot', 'wet', 'dry', 'soft', 'hard', 'sharp', 'dull',
+  'fast', 'slow', 'long', 'short', 'tall', 'deep', 'wide', 'narrow',
+  'thick', 'thin', 'big', 'little', 'grand', 'lost',
+  // Tartaria-specific adjectives that show up constantly in flavor text but
+  // are never targets of player action. Note 'aether' itself stays in
+  // ALLOW_SHORT — it IS a valid concept query.
+  'aetheric', 'etheric',
+]);
+
+// Strip -ed / -ing tokens — almost always participles ("buried", "humming",
+// "charged"). Some real nouns end in these suffixes ("ring", "string",
+// "string") but those are too short to clear the length gate on line 70.
+function looksLikeParticiple(token: string): boolean {
+  if (token.length < 5) return false; // "ring" / "sing" etc. are too short anyway
+  return token.endsWith('ed') || token.endsWith('ing');
+}
+
 // Multi-word phrases worth treating as a unit. The extractor scans for
 // these BEFORE the word-level pass so they don't get split apart.
 const MULTI_WORD_PHRASES = [
@@ -66,6 +92,11 @@ export function extractAmbientNouns(description: string | undefined | null): str
     if (STOPWORDS.has(t)) continue;
     // Words ending in -ly are adverbs, drop them.
     if (t.length > 3 && t.endsWith('ly')) continue;
+    // Pure adjectives — never interactable, just descriptors.
+    if (ADJECTIVE_BLOCKLIST.has(t)) continue;
+    // Participles ("buried", "humming", "charged") — descriptors, not
+    // things you can investigate or search.
+    if (looksLikeParticiple(t)) continue;
     // Numbers / short tokens — keep only if explicitly allowlisted.
     if (t.length < 4 && !ALLOW_SHORT.has(t)) continue;
     out.add(t);
