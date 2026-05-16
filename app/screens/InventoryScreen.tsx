@@ -16,6 +16,7 @@ export function InventoryScreen() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
   const equipItem = useGameStore((s) => s.equipItem);
+  const unequipSlot = useGameStore((s) => s.unequipSlot);
   const [pending, setPending] = useState<{ item: InventoryItem; slots: EquipSlot[] } | null>(null);
 
   if (!player) {
@@ -27,33 +28,33 @@ export function InventoryScreen() {
   }
 
   const grouped = groupInventoryByCategory(player.inventory);
-  const equippedSet = new Set(
-    [
-      player.equipped?.main,
-      player.equipped?.off,
-      player.equipped?.head,
-      player.equipped?.chest,
-      player.equipped?.legs,
-      player.equipped?.feet,
-      player.equipped?.amulet,
-      player.equipped?.ring,
-    ].filter((x): x is string => !!x),
-  );
+  // Map equipped item name → the slot(s) it's currently in. Used so the
+  // modal can offer Unequip on items already worn.
+  const slotsByEquippedName = new Map<string, EquipSlot[]>();
+  const allSlotPairs: Array<[EquipSlot, string | undefined]> = [
+    ['main', player.equipped?.main],
+    ['off', player.equipped?.off],
+    ['head', player.equipped?.head],
+    ['chest', player.equipped?.chest],
+    ['legs', player.equipped?.legs],
+    ['feet', player.equipped?.feet],
+    ['amulet', player.equipped?.amulet],
+    ['ring', player.equipped?.ring],
+  ];
+  for (const [slot, name] of allSlotPairs) {
+    if (!name) continue;
+    const list = slotsByEquippedName.get(name) ?? [];
+    list.push(slot);
+    slotsByEquippedName.set(name, list);
+  }
+  const equippedSet = new Set(slotsByEquippedName.keys());
 
+  // ALWAYS show the modal. Auto-equipping silently when there was only one
+  // valid slot (e.g. amulet) made the player think the tap did nothing —
+  // and left no path to unequip. Modal always opens; player picks Equip
+  // (specific slot) or Unequip (if currently worn) or Close.
   const handleItemTap = (item: InventoryItem) => {
-    const slots = validSlotsForItem(item);
-    if (slots.length === 0) {
-      // Still show the modal — so the player gets the description / stats
-      // even when the item can't be equipped (helps decide whether to keep
-      // it, sell it, or use it).
-      setPending({ item, slots: [] });
-      return;
-    }
-    if (slots.length === 1) {
-      equipItem(item.name, slots[0]!);
-      return;
-    }
-    setPending({ item, slots });
+    setPending({ item, slots: validSlotsForItem(item) });
   };
 
   const closeModal = () => setPending(null);
@@ -62,8 +63,45 @@ export function InventoryScreen() {
     equipItem(pending.item.name, slot);
     setPending(null);
   };
+  const unequipFromSlot = (slot: EquipSlot) => {
+    unequipSlot(slot);
+    setPending(null);
+  };
+
+  // Build the modal's button list based on the item's state.
+  const buildModalButtons = (): {
+    label: string;
+    onPress: () => void;
+    tone?: 'primary' | 'destructive' | 'neutral';
+  }[] => {
+    if (!pending) return [{ label: 'Close', onPress: closeModal, tone: 'neutral' }];
+    const equippedInSlots = slotsByEquippedName.get(pending.item.name) ?? [];
+    const buttons: ReturnType<typeof buildModalButtons> = [];
+    // Unequip buttons — one per slot the item is currently in.
+    for (const slot of equippedInSlots) {
+      buttons.push({
+        label: `Unequip (${SLOT_LABEL[slot]})`,
+        onPress: () => unequipFromSlot(slot),
+        tone: 'destructive',
+      });
+    }
+    // Equip buttons — one per valid slot the item ISN'T currently in.
+    for (const slot of pending.slots) {
+      if (equippedInSlots.includes(slot)) continue;
+      buttons.push({
+        label: `Equip (${SLOT_LABEL[slot]})`,
+        onPress: () => chooseSlot(slot),
+        tone: 'primary',
+      });
+    }
+    buttons.push({ label: 'Close', onPress: closeModal, tone: 'neutral' });
+    return buttons;
+  };
 
   const modalPreview = pending ? getItemPreview(pending.item.name) : null;
+  const modalBody = pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0
+    ? 'This item cannot be equipped, but you can still keep, gift, sell, or use it.'
+    : undefined;
 
   return (
     <View style={styles.container}>
@@ -124,34 +162,15 @@ export function InventoryScreen() {
 
       <BrandedModal
         visible={pending !== null}
-        title={pending && pending.slots.length === 0 ? pending.item.name : pending ? `Equip ${pending.item.name}` : ''}
+        title={pending ? pending.item.name : ''}
         itemPreview={modalPreview}
         contextLine={
           pending && pending.item.durability
             ? `Durability: ${pending.item.durability.current}/${pending.item.durability.max}`
             : undefined
         }
-        body={
-          pending && pending.slots.length === 0
-            ? 'This item cannot be equipped, but you can still keep, gift, sell, or use it.'
-            : pending
-              ? 'Which slot?'
-              : undefined
-        }
-        buttons={
-          pending
-            ? pending.slots.length === 0
-              ? [{ label: 'Close', onPress: closeModal, tone: 'neutral' }]
-              : [
-                  ...pending.slots.map((s) => ({
-                    label: SLOT_LABEL[s],
-                    onPress: () => chooseSlot(s),
-                    tone: 'primary' as const,
-                  })),
-                  { label: 'Cancel', onPress: closeModal, tone: 'neutral' as const },
-                ]
-            : [{ label: 'OK', onPress: closeModal, tone: 'neutral' }]
-        }
+        body={modalBody}
+        buttons={buildModalButtons()}
         onRequestClose={closeModal}
       />
     </View>
