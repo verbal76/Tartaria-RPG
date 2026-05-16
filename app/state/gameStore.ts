@@ -428,7 +428,7 @@ interface GameStore {
 
   appendLog: (channel: LogChannel, text: string, meta?: Record<string, unknown>) => void;
 
-  beginScene: () => void;
+  beginScene: (opts?: { openingPrefix?: string }) => void;
   submitPlayerAction: (text: string) => void;
   resolveRollStep: (values: number[]) => void;
   cancelPendingRolls: () => void;
@@ -638,8 +638,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       activeSlotId: slotId,
     });
     get().appendLog('system', `${player.name} steps into Tartaria.`);
-    get().appendLog('world', buildOpening());
-    get().beginScene();
+    // Opening line gets woven INTO the scene paragraph rather than printed
+    // as its own log entry, so the player sees one flowing intro instead
+    // of three stacked statements.
+    get().beginScene({ openingPrefix: buildOpening() });
     await get().persist();
     const slots = await listSlots();
     set({ slots });
@@ -673,7 +675,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }));
   },
 
-  beginScene() {
+  beginScene(opts?: { openingPrefix?: string }) {
     const { player, worldMemory } = get();
     if (!player) return;
     const location = getLocationById(player.currentLocationId);
@@ -724,7 +726,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // The full group is surfaced via the EnemyPanel + a follow-up line
     // when it's actually a pack.
     const sceneEnemy = enemies[0] ?? null;
-    get().appendLog('world', buildScene({ weather, location, hazard, enemy: sceneEnemy, quest: player.activeQuests[0] }));
+    // When an opening prefix is supplied (new-game intro), weave it into
+    // the scene paragraph so the player sees ONE flowing line instead of
+    // a stack of three separate log entries. We collapse the paragraph
+    // breaks inside the scene text so it reads like prose.
+    const sceneText = buildScene({ weather, location, hazard, enemy: sceneEnemy, quest: player.activeQuests[0] });
+    const finalSceneLog = opts?.openingPrefix
+      ? `${opts.openingPrefix.trim()} ${sceneText.replace(/\n\n+/g, ' ')}`
+      : sceneText;
+    get().appendLog('world', finalSceneLog);
     if (enemies.length > 1) {
       get().appendLog(
         'combat',

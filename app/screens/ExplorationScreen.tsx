@@ -108,7 +108,7 @@ export function ExplorationScreen() {
           </Text>
         </View>
         <View style={styles.sceneBarBtns}>
-          <TouchableOpacity onPress={beginScene} hitSlop={8}>
+          <TouchableOpacity onPress={() => beginScene()} hitSlop={8}>
             <Text style={styles.sceneBtn}>↻</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setScreen('about')} hitSlop={8}>
