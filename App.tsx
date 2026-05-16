@@ -10,6 +10,8 @@ import { LogScreen } from './app/screens/LogScreen';
 import { LoreScreen } from './app/screens/LoreScreen';
 import { AboutScreen } from './app/screens/AboutScreen';
 import { InventoryScreen } from './app/screens/InventoryScreen';
+import { bootAudio, disposeAudio } from './app/audio/AudioManager';
+import { startAudioController, stopAudioController } from './app/audio/AudioController';
 
 export default function App() {
   const screen = useGameStore((s) => s.currentScreen);
@@ -22,7 +24,12 @@ export default function App() {
   useEffect(() => {
     void hydrate().then(() => {
       void bootCognitive();
+      void bootAudio().then(() => startAudioController());
     });
+    return () => {
+      stopAudioController();
+      void disposeAudio();
+    };
   }, [hydrate, bootCognitive]);
 
   useEffect(() => {

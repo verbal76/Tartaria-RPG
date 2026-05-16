@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import Constants from 'expo-constants';
 import * as Clipboard from 'expo-clipboard';
@@ -6,6 +6,8 @@ import * as Updates from 'expo-updates';
 import * as Application from 'expo-application';
 import { useGameStore } from '../state/gameStore';
 import { OTA_BUILD_ID } from '../buildInfo';
+import { SimpleSlider } from '../components/SimpleSlider';
+import { getAudioSettings, setAudioSettings, onAudioSettingsChange, type AudioSettings } from '../audio/audioSettings';
 
 export function AboutScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
@@ -21,6 +23,15 @@ export function AboutScreen() {
   const [updateStatus, setUpdateStatus] = useState<string>('Idle');
   const [updateBusy, setUpdateBusy] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
+  const [audio, setAudio] = useState<AudioSettings>(() => getAudioSettings());
+
+  useEffect(() => {
+    setAudio(getAudioSettings());
+    return onAudioSettingsChange(setAudio);
+  }, []);
+
+  const toggleMusic = () => { void setAudioSettings({ enabled: !audio.enabled }); };
+  const setMusicVolume = (v: number) => { void setAudioSettings({ volume: v }); };
 
   async function checkForUpdate() {
     if (updateBusy) return;
@@ -150,6 +161,27 @@ export function AboutScreen() {
       </View>
 
       <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
+        <View style={styles.musicCard}>
+          <View style={styles.musicHeader}>
+            <Text style={styles.musicTitle}>MUSIC</Text>
+            <TouchableOpacity
+              onPress={toggleMusic}
+              style={[styles.musicToggle, audio.enabled && styles.musicToggleOn]}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.musicToggleText, audio.enabled && styles.musicToggleTextOn]}>
+                {audio.enabled ? 'ON' : 'OFF'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.musicRow}>
+            <Text style={styles.musicLabel}>Volume</Text>
+            <View style={{ flex: 1 }}>
+              <SimpleSlider value={audio.volume} onChange={setMusicVolume} />
+            </View>
+            <Text style={styles.musicValue}>{Math.round(audio.volume * 100)}%</Text>
+          </View>
+        </View>
         <Text style={styles.mono}>{info}</Text>
       </ScrollView>
 
@@ -214,6 +246,36 @@ const styles = StyleSheet.create({
   },
   bodyContent: { paddingBottom: 24 },
   mono: { color: '#cdbf99', fontSize: 12, lineHeight: 18, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
+  musicCard: {
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 3,
+    padding: 10,
+    marginBottom: 14,
+    backgroundColor: '#1a1714',
+  },
+  musicHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  musicTitle: { color: '#c9a86a', fontSize: 12, fontWeight: '800', letterSpacing: 3 },
+  musicToggle: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: '#3a342c',
+    minWidth: 56,
+    alignItems: 'center',
+  },
+  musicToggleOn: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
+  musicToggleText: { color: '#7a705c', fontSize: 11, fontWeight: '700', letterSpacing: 2 },
+  musicToggleTextOn: { color: '#13110f' },
+  musicRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  musicLabel: { color: '#7a705c', fontSize: 11, letterSpacing: 1, width: 60 },
+  musicValue: { color: '#cdbf99', fontSize: 11, fontVariant: ['tabular-nums'], width: 44, textAlign: 'right' },
   copyBtn: {
     backgroundColor: '#c9a86a',
     borderRadius: 4,
