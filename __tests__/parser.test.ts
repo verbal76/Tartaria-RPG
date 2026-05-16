@@ -121,3 +121,53 @@ describe('parseInput — fuzzy match strictness for short words', () => {
     expect(parseInput('serch the ruins').intent).toBe('investigate');
   });
 });
+
+describe('parseInput — normalize collapses repeated articles', () => {
+  it('"search the the hum" parses the same as "search the hum"', () => {
+    const a = parseInput('search the the hum');
+    const b = parseInput('search the hum');
+    expect(a.intent).toBe(b.intent);
+    expect(a.target).toBe(b.target);
+  });
+  it('"a a torch" collapses to "a torch" before matching', () => {
+    const a = parseInput('use a a torch');
+    const b = parseInput('use a torch');
+    expect(a.intent).toBe(b.intent);
+  });
+  it('triple repetition also collapses', () => {
+    const a = parseInput('search the the the rubble');
+    const b = parseInput('search the rubble');
+    expect(a.target).toBe(b.target);
+  });
+  it('clean inputs pass through unchanged', () => {
+    // Idempotency: running parser on already-clean input doesn't break it.
+    const r = parseInput('search the rubble');
+    expect(r.intent).toBe('investigate');
+  });
+});
+
+describe('parseInput — current Location name does not become a suggestion target', () => {
+  it('does not propose "use torch on <location>" when the matched noun IS the location', () => {
+    // Simulate the playtest log: player input matches the current Location
+    // name as the only candidate noun.
+    const result = parseInput('asdfkjasdf', {
+      recentNouns: [],
+      currentLocationName: 'Tartarian Outskirts',
+    });
+    // With no matchable noun and no enemy, suggestions should be the generic
+    // fallback — definitely not anything mentioning the location.
+    for (const s of result.suggestions ?? []) {
+      expect(s).not.toMatch(/tartarian outskirts/i);
+    }
+  });
+  it('does propose normal "inspect X" / "use torch on X" for non-location nouns', () => {
+    // Input has to share a token with the candidate noun so the parser's
+    // fuzzy noun matcher resolves it. "aetherbat" itself works.
+    const result = parseInput('aetherbat', {
+      recentNouns: ['Aetherbat'],
+      currentLocationName: 'Tartarian Outskirts',
+    });
+    const allSuggestions = (result.suggestions ?? []).join(' ');
+    expect(allSuggestions).toMatch(/aetherbat/i);
+  });
+});

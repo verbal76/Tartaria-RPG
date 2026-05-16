@@ -61,6 +61,15 @@ export function normalizeInput(raw: string): string {
     .replace(/\bback away\b/g, 'backaway')
     .replace(/\bpull back\b/g, 'pullback')
     .replace(/\bturn in\b/g, 'turnin');
+  // Collapse repeated articles — "search the the hum" → "search the hum",
+  // "a a torch" → "a torch". Works whether or not stopword filtering catches
+  // them downstream. Runs in a loop so triple-the survives ("the the the" →
+  // "the the" → "the"). Idempotent for clean inputs.
+  let prev: string;
+  do {
+    prev = s;
+    s = s.replace(/\b(a|an|the)\s+\1\b/g, '$1');
+  } while (s !== prev);
   return s;
 }
 
@@ -138,6 +147,10 @@ export interface ParseContext {
   inventory?: InventoryItem[];
   recentNouns?: string[];
   enemyPresent?: boolean;
+  /** Name of the Location the player is currently in. The parser uses it
+   *  to filter nonsense suggestions like "use torch on <location>" —
+   *  locations are containers, not interactable targets. */
+  currentLocationName?: string;
 }
 
 export function parseInput(raw: string, context: ParseContext = {}): ParsedInput {
@@ -184,7 +197,17 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
     const noun = resolveContextNoun(tokens.filter((t) => !STOPWORDS.has(t)), recentNouns);
     const item = resolveItem(tokens.filter((t) => !STOPWORDS.has(t)), inventory);
     const suggestions: string[] = [];
-    if (noun) suggestions.push(`inspect ${noun.toLowerCase()}`, `use torch on ${noun.toLowerCase()}`);
+    // A noun that matches the player's current Location name is a container,
+    // not a target — "use torch on tartarian outskirts" reads as nonsense and
+    // should not be offered. Fall back to generic look/search suggestions in
+    // that case.
+    const nounIsLocation = !!(
+      noun && context.currentLocationName &&
+      noun.toLowerCase() === context.currentLocationName.toLowerCase()
+    );
+    if (noun && !nounIsLocation) {
+      suggestions.push(`inspect ${noun.toLowerCase()}`, `use torch on ${noun.toLowerCase()}`);
+    }
     if (item) suggestions.push(`use ${item.name.toLowerCase()}`);
     if (context.enemyPresent) suggestions.push('attack', 'hide', 'parley');
     if (!suggestions.length) suggestions.push('look around', 'search', 'rest');

@@ -224,7 +224,13 @@ function activeEnemyHp(scene: CurrentScene | null): number | null {
 }
 
 function collectSceneNouns(scene: CurrentScene): string[] {
-  const nouns = [scene.location.name, scene.weather.name];
+  // Locations are containers, not interactable targets — never include
+  // scene.location.name here. The Location name shouldn't surface as
+  // "investigate X" / "use torch on X" since it leads to nonsense
+  // suggestions like "use torch on tartarian outskirts." The parser still
+  // gets the Location name separately via ParseContext.currentLocationName
+  // so it can recognize the name without treating it as a noun.
+  const nouns = [scene.weather.name];
   if (scene.hazard) nouns.push(scene.hazard.name);
   for (const e of scene.enemies) {
     nouns.push(e.name, e.type);
@@ -1108,6 +1114,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       inventory: player.inventory,
       recentNouns: collectSceneNouns(currentScene),
       enemyPresent: currentScene.enemies.length > 0,
+      currentLocationName: currentScene.location.name,
     };
     const parsed = parseInput(trimmed, parseCtx);
     get().appendLog('player', trimmed, {
