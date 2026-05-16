@@ -421,6 +421,72 @@
       "keywords": ["lucius kincaid", "kincaid", "dr kincaid", "expedition sponsor"],
       "title": "Dr. Lucius Kincaid",
       "answer": "A reclusive scholar who funds expeditions into Tartaria, supplying maps and resources that shouldn't exist. His true motives are unknown to everyone, including possibly himself. The resources are real; the help is real; the unanswered questions multiply every time you talk to him."
+    },
+    {
+      "id": "tartarian_giants",
+      "keywords": ["tartarian giants", "the giants", "giant", "giant-kin", "tartarian giant"],
+      "title": "The Tartarian Giants",
+      "answer": "A divine race that walked alongside the Tartarian Empire at its height. The Giants held the deepest knowledge of Aetheric power and refused to share it; in 1280 they retreated to the Ural Mountains in the Lost Covenant schism, leaving the empire to govern itself. The Servants of the Giants believe they are sleeping, not gone."
+    },
+    {
+      "id": "lost_covenant_of_giants",
+      "keywords": ["lost covenant", "the covenant", "giants schism", "1280"],
+      "title": "The Lost Covenant of the Giants",
+      "answer": "In 1280, the Tartarian Giants refused to share their Aetheric secrets with the noble families and withdrew to the Ural Mountains. The schism weakened Tartarian leadership and set the stage for the experiments at Thametan's Tower three centuries later. The Servants of the Giants regard the Covenant as a sacred event; the Mud Monarchs treat it as the first crack in the empire's foundation."
+    },
+    {
+      "id": "etheric_resonance",
+      "keywords": ["etheric resonance", "aetheric resonance", "resonance", "zalmar theory", "aetheron"],
+      "title": "Etheric Resonance",
+      "answer": "Elior Zalmar's theory that Aether is built of particles called Aetherons that vibrate at distinct frequencies. Tuning a device to the right resonance lets you draw on Aether without burning fuel. Pushing the resonance past its envelope is what blew the Etheric Engine apart and triggered the Mud Flood."
+    },
+    {
+      "id": "temporal_loops",
+      "keywords": ["temporal loop", "time loop", "time anomaly", "time distortion"],
+      "title": "Temporal Loops",
+      "answer": "Aetheric anomalies in which the flow of time tangles back on itself. An hour passes inside what feels like a day, or a day vanishes between footsteps. Most common near buried Tartarian cities where the old grids are still leaking. The only reliable escape is to walk back out the way you came in."
+    },
+    {
+      "id": "spatial_distortions",
+      "keywords": ["spatial distortion", "spatial anomaly", "spatial warp", "warp"],
+      "title": "Spatial Distortions",
+      "answer": "Aetheric anomalies that fold distance the wrong way. Doorways open onto rooms that should not connect, corridors stretch into the unreachable, a step forward lands you behind yourself. Explorers who push deeper sometimes don't come back, because the back-door never existed in the first place."
+    },
+    {
+      "id": "etheric_storms",
+      "keywords": ["etheric storm", "aetheric storm", "aether storm", "lightning storm"],
+      "title": "Etheric Storms",
+      "answer": "Charged storms that crack the sky in violet and blue. The lightning warps reality where it touches — metal flows like liquid, time hiccups, ghosts of old Tartaria flash across the eye. Caught out in one, you don't get wet, you get unmade by degrees. The storms tend to peak above buried cities."
+    },
+    {
+      "id": "etheric_cores",
+      "keywords": ["etheric core", "aetheric core", "core", "tartarian core"],
+      "title": "Etheric Cores",
+      "answer": "The power sources that ran Tartaria. A single Core could light a city, hover a citadel, or grind a war machine into a continent. Most are buried with their cities; a working one is the most dangerous treasure a faction can pull out of the mud."
+    },
+    {
+      "id": "conspiracy_architects",
+      "keywords": ["conspiracy architects", "architects", "narrative control"],
+      "title": "The Conspiracy Architects",
+      "answer": "The covert cabal that erases Tartaria from public memory. Embedded in media, academia, and intelligence networks worldwide; aligned with and funded by the Mud Monarchs. Their philosophy is that knowledge of the old empire would destabilize the modern one — silence as a service, the lie as a kindness."
+    },
+    {
+      "id": "stone_builders",
+      "keywords": ["stone builders", "architectural sorcery", "tartarian engineers"],
+      "title": "The Stone Builders",
+      "answer": "A scholarly order studying Architectural Sorcery — the Tartarian fusion of engineering and Aetheric principles. They believe the empire's buildings were scripture in stone. Lodges cluster near major ruins; they cooperate with the Forgotten Order on engineering questions but keep their findings tightly held."
+    },
+    {
+      "id": "servants_of_giants",
+      "keywords": ["servants of the giants", "servants of giants", "giant cult", "giant worshippers"],
+      "title": "The Servants of the Giants",
+      "answer": "A religious faction devoted to the sleeping Tartarian Giants. They conduct rituals and pilgrimages at Tartarian ruins, believing the Giants will wake when the empire is ready to rise again. Loosely allied with the True Tartarians, more fervent and less political."
+    },
+    {
+      "id": "tartarian_revivalists",
+      "keywords": ["tartarian revivalists", "revivalists", "sasha's faction", "ironheart faction"],
+      "title": "The Tartarian Revivalists",
+      "answer": "Sasha Ironheart's faction. They want Tartaria's Etheric Power back online at full strength, and they will gamble a second Mud Flood to get it. Decentralized cells, single goal, no patience for half-measures. Most other factions call them extremists; the Revivalists call back, 'we are the only ones doing the thing.'"
     }
   ]
 }

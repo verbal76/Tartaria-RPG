@@ -318,5 +318,67 @@
       "term": "The Buried Cities",
       "definition": "Formerly vibrant Tartarian cities now sealed beneath Aetherstone mud. These cities hold Tartaria's most powerful secrets, preserved by impenetrable mud that resists excavation, where Etheric energy creates time distortions and magnetic anomalies."
     }
+  ],
+  "timeline_events": [
+    {
+      "id": "lost_covenant_1280",
+      "year": 1280,
+      "name": "The Lost Covenant of the Giants",
+      "summary": "Tartarian Giants refuse to share Aetheric secrets and retreat to the Ural Mountains. The schism weakens the empire's leadership."
+    },
+    {
+      "id": "etheric_conflux_war_1505",
+      "year": 1505,
+      "name": "The Etheric Conflux War",
+      "summary": "A critical Conflux malfunctions near the Caspian Sea. Rebels and rogue nobles try to seize the surge. Whole regions are cut off from the Etheric grid — the first visible cracks in Tartarian dominance."
+    },
+    {
+      "id": "great_mud_flood_1567",
+      "year": 1567,
+      "name": "Fall of the Tartarian Capital",
+      "summary": "Thametan's Etheric Engine pushes Aetheric resonance past its envelope. Mud charged with Aether rises through the empire and entombs it. Surviving nobles flee to the highest spires and become the Mud Monarchs."
+    },
+    {
+      "id": "aetheric_accords_1603",
+      "year": 1603,
+      "name": "The Aetheric Accords",
+      "summary": "Tartarian noble families sign accords in the Urals to safeguard surviving Etheric technology. The Mud Monarchs consolidate from this treaty."
+    },
+    {
+      "id": "reclaimers_uprising_1645",
+      "year": 1645,
+      "name": "The Reclaimers' Uprising",
+      "summary": "Beneath Paris, Reclaimers strike a violent compromise with the Forgotten Order and Mud Monarchs. The Reclaimers Guild is formalized as the black market in Tartarian relics."
+    },
+    {
+      "id": "northern_plague_1682",
+      "year": 1682,
+      "name": "The Northern Plague (Etheric Rot)",
+      "summary": "A plague linked to malfunctioning relics breaks out in Siberia. The Mud Monarchs attempt containment; entire underground cities are abandoned and lost."
+    },
+    {
+      "id": "munich_coup_1778",
+      "year": 1778,
+      "name": "The Munich Coup",
+      "summary": "The Conspiracy Architects split from the Mud Monarchs, seizing relics and tightening control over what the world is allowed to remember about Tartaria."
+    },
+    {
+      "id": "great_purge_1814",
+      "year": 1814,
+      "name": "The Great Purge of Forgotten Knowledge",
+      "summary": "Conspiracy Architects and allied governments destroy Tartarian archives beneath Istanbul. The historical record of the empire is wiped to near-myth."
+    },
+    {
+      "id": "antarctic_pulse_1973",
+      "year": 1973,
+      "name": "The Antarctic Etheric Pulse",
+      "summary": "An Etheric pulse beneath the Antarctic ice draws a Forgotten Order expedition. Sabotage and discovery both follow; the existence of a global Etheric network beneath Tartaria's outposts is hinted at."
+    },
+    {
+      "id": "singapore_seizure_2023",
+      "year": 2023,
+      "name": "The Singapore Relic Seizure",
+      "summary": "Reclaimers outmaneuver both the Mud Monarchs and the Forgotten Order to capture a major Tartarian relic cache. Relic-hunting interest spikes across Southeast Asia."
+    }
   ]
 }

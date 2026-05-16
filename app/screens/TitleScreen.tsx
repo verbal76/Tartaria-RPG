@@ -172,7 +172,7 @@ export function TitleScreen() {
       />
 
       <View style={styles.bottomBar}>
-        <Text style={styles.footer}>v0.1.0  /  2148</Text>
+        <Text style={styles.footer}>v2.0.1  /  2148</Text>
         <TouchableOpacity
           style={styles.gearBtn}
           onPress={() => setScreen('about')}
