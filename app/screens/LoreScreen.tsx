@@ -16,11 +16,16 @@ export function LoreScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => setScreen('title')}>
-          <Text style={styles.back}>← back</Text>
+        <TouchableOpacity
+          onPress={() => setScreen('title')}
+          style={styles.backBtn}
+          hitSlop={8}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
         <Text style={styles.title}>LORE CODEX</Text>
-        <View style={{ width: 60 }} />
+        <View style={{ width: 80 }} />
       </View>
 
       <View style={styles.tabs}>
@@ -73,7 +78,17 @@ export function LoreScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0a0908', padding: 12 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  back: { color: '#7a705c', fontSize: 13 },
+  backBtn: {
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
   title: { color: '#e6d8b3', letterSpacing: 4, fontSize: 14 },
   tabs: { flexDirection: 'row', gap: 6, marginBottom: 8 },
   tab: { flex: 1, paddingVertical: 6, borderWidth: 1, borderColor: '#3a342c', borderRadius: 4, alignItems: 'center' },

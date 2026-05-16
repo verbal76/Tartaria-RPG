@@ -145,31 +145,43 @@ export function TitleScreen() {
         }
         ListEmptyComponent={
           <Text style={styles.empty}>
-            No Tartarians yet. Swipe down to refresh — pull a New Expedition below.
+            No Tartarians yet. Swipe down to refresh — or pull a New Expedition below.
           </Text>
         }
         ListHeaderComponent={
           slots.length > 0 ? <Text style={styles.listLabel}>YOUR TARTARIANS  ·  swipe left to delete</Text> : null
         }
+        ListFooterComponent={
+          <View style={styles.footerActions}>
+            <TouchableOpacity
+              style={styles.primaryBtn}
+              onPress={() => setScreen('character_creation')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.primaryBtnText}>New Tartarian</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.secondaryBtn}
+              onPress={() => setScreen('lore')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.secondaryBtnText}>Lore Codex</Text>
+            </TouchableOpacity>
+          </View>
+        }
       />
 
-      <View style={styles.menu}>
-        <TouchableOpacity style={styles.primaryBtn} onPress={() => setScreen('character_creation')}>
-          <Text style={styles.primaryBtnText}>New Tartarian</Text>
+      <View style={styles.bottomBar}>
+        <Text style={styles.footer}>v0.1.0  /  2148</Text>
+        <TouchableOpacity
+          style={styles.gearBtn}
+          onPress={() => setScreen('about')}
+          activeOpacity={0.7}
+          hitSlop={10}
+        >
+          <Text style={styles.gear}>⚙</Text>
         </TouchableOpacity>
-        <View style={styles.subRow}>
-          <TouchableOpacity style={styles.subBtn} onPress={() => setScreen('log')}>
-            <Text style={styles.subBtnText}>Game Log</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.subBtn} onPress={() => setScreen('lore')}>
-            <Text style={styles.subBtnText}>Lore Codex</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.subBtn, styles.subBtnGear]} onPress={() => setScreen('about')}>
-            <Text style={styles.gear}>⚙</Text>
-          </TouchableOpacity>
-        </View>
       </View>
-      <Text style={styles.footer}>v0.1.0  /  2148</Text>
 
       <BrandedModal
         visible={pendingAction !== null}
@@ -259,7 +271,7 @@ const styles = StyleSheet.create({
   slotTime: { color: '#7a705c', fontSize: 11 },
   slotMeta: { color: '#7a705c', fontSize: 12, marginTop: 2 },
   gems: { color: '#c9a86a', fontSize: 12, textAlign: 'center', marginBottom: 8, letterSpacing: 1 },
-  menu: { gap: 8, marginTop: 8 },
+  footerActions: { gap: 8, marginTop: 12 },
   primaryBtn: {
     backgroundColor: '#3a342c',
     paddingVertical: 14,
@@ -269,18 +281,31 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   primaryBtnText: { color: '#e6d8b3', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
-  subRow: { flexDirection: 'row', gap: 6 },
-  subBtn: {
-    flex: 1,
+  secondaryBtn: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',
     borderWidth: 1,
-    paddingVertical: 10,
+    paddingVertical: 12,
     alignItems: 'center',
     borderRadius: 4,
   },
-  subBtnText: { color: '#cdbf99', fontSize: 11, letterSpacing: 1 },
-  subBtnGear: { flex: 0, minWidth: 44, paddingHorizontal: 0 },
+  secondaryBtnText: { color: '#cdbf99', fontSize: 12, letterSpacing: 1, fontWeight: '700' },
+  bottomBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 8,
+  },
+  gearBtn: {
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    minWidth: 44,
+    alignItems: 'center',
+  },
   gear: { color: '#c9a86a', fontSize: 18, lineHeight: 18, textAlign: 'center' },
-  footer: { color: '#3a342c', fontSize: 10, textAlign: 'center', marginTop: 8 },
+  footer: { color: '#3a342c', fontSize: 10, marginLeft: 2 },
 });
