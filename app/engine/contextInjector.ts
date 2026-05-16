@@ -31,6 +31,12 @@ export interface LlmContext {
   player_stats: string;
   full_inventory: string;
   recent_history: string;
+  /** True when at least one hostile entity is present. Drives a tighter
+   *  combat-focused instruction in buildSystemPrompt — the small Qwen
+   *  model has been observed to take "describe the room" too literally
+   *  mid-fight and write atmospheric tour-guide prose instead of
+   *  narrating the action. */
+  in_combat: boolean;
 }
 
 /** What buildLlmContext needs from the store. Explicit deps, no store import. */
@@ -85,6 +91,7 @@ export function buildLlmContext(input: ContextInputs): LlmContext {
     player_stats: formatPlayerStats(player),
     full_inventory: stringifyInventory(player?.inventory ?? [], player?.equipped, player?.tc ?? 0),
     recent_history: formatRecentHistory(gameLog),
+    in_combat: (scene?.enemies?.length ?? 0) > 0,
   };
 }
 
@@ -108,7 +115,30 @@ function buildLadderEnvironment(
  * user role that just says "narrate" — most chat-tuned models behave better
  * with a non-empty user turn than with a system-only prompt.
  */
+// Two final instructions — one for peaceful turns ("describe the room") and
+// one for active combat ("DO NOT describe the room"). Qwen 0.5B is small
+// enough that whichever instruction is loudest is what it follows; observed
+// behavior was atmospheric tour-guide prose mid-knife-fight when the peaceful
+// instruction fired during combat (the player took a bite of trail rations
+// while a Scrap Drone was attacking, the chatter check fired, and Qwen wrote
+// a sky description). The combat variant is shorter, more verb-heavy, and
+// explicitly forbids room description so the model lands on the action.
+const PEACEFUL_INSTRUCTION =
+  "Narrate the player's current situation in a grim, atmospheric tone. " +
+  'Acknowledge their last action, describe the room, and feel free to subtly ' +
+  'reference items they are carrying if relevant to the environment. ' +
+  'Stay under 80 words. Do not invent enemies, exits, or items not listed above.';
+
+const COMBAT_INSTRUCTION =
+  'The player is in ACTIVE COMBAT. Narrate the tension of their last action ' +
+  'against the entities listed above. Keep it brief, violent, and grim — ' +
+  'no more than 40 words. DO NOT describe the room or its scenery; the ' +
+  'player has no time for atmosphere. Reference inventory items only if ' +
+  'they are weapons or directly relevant to the strike. Do not invent ' +
+  'enemies, exits, or items not listed above.';
+
 export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
+  const instruction = ctx.in_combat ? COMBAT_INSTRUCTION : PEACEFUL_INSTRUCTION;
   const system = [
     'You are the Arbiter, the ancient narrator of Tartaria.',
     '[SYSTEM FACTS - DO NOT INVENT EXITS OR ENEMIES]',
@@ -122,10 +152,7 @@ export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
     `Inventory & Equipment: ${ctx.full_inventory}`,
     `Player's Last Action: ${ctx.recent_history}`,
     '',
-    'Narrate the player\'s current situation in a grim, atmospheric tone. ' +
-    'Acknowledge their last action, describe the room, and feel free to subtly ' +
-    'reference items they are carrying if relevant to the environment. ' +
-    'Stay under 80 words. Do not invent enemies, exits, or items that are not listed above.',
+    instruction,
   ].join('\n');
   return [
     { role: 'system', content: system },

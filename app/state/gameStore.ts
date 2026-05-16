@@ -4628,6 +4628,11 @@ async function narrateViaArbiter(
   const myEpoch = ++arbiterGenerationEpoch;
   set({ isGenerating: true, partialArbiterText: '' });
   try {
+    // Tighten the token budget when combat is live so the model's 40-word
+    // combat instruction lands cleanly under the cap, instead of trailing
+    // off mid-sentence like the first observed Qwen output did. Peaceful
+    // turns get the standard 120-token budget for atmospheric writing.
+    const maxTokens = ctx.in_combat ? 70 : 120;
     const text = await qwen.stream(
       messages,
       (token: string) => {
@@ -4636,7 +4641,7 @@ async function narrateViaArbiter(
         const current = get().partialArbiterText ?? '';
         set({ partialArbiterText: current + token });
       },
-      { maxNewTokens: 120 },
+      { maxNewTokens: maxTokens },
     );
     if (myEpoch !== arbiterGenerationEpoch) return; // cancelled mid-flight
     const finalText = text.trim();

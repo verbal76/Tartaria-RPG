@@ -164,6 +164,45 @@ describe('buildLlmContext', () => {
     const ctx = buildLlmContext({ player: makePlayer(), scene: fullHpScene, gameLog: [] });
     expect(ctx.active_entities).toBe('Mud Golem');
   });
+
+  it('sets in_combat true when any enemy is in the scene', () => {
+    const scene: SceneSlice = {
+      location: makeLocation(),
+      weather: makeWeather(),
+      hazard: null,
+      enemies: [makeEnemy()],
+      enemyHps: [10],
+      vendor: null,
+    };
+    const ctx = buildLlmContext({ player: makePlayer(), scene, gameLog: [] });
+    expect(ctx.in_combat).toBe(true);
+  });
+
+  it('sets in_combat false when the scene is peaceful', () => {
+    const peaceful: SceneSlice = {
+      location: makeLocation(),
+      weather: makeWeather(),
+      hazard: null,
+      enemies: [],
+      enemyHps: [],
+      vendor: null,
+    };
+    const ctx = buildLlmContext({ player: makePlayer(), scene: peaceful, gameLog: [] });
+    expect(ctx.in_combat).toBe(false);
+  });
+
+  it('sets in_combat false when only a vendor is present (no enemies)', () => {
+    const vendorScene: SceneSlice = {
+      location: makeLocation(),
+      weather: makeWeather(),
+      hazard: null,
+      enemies: [],
+      enemyHps: [],
+      vendor: { name: 'Thalan', affiliation: 'Reclaimers' },
+    };
+    const ctx = buildLlmContext({ player: makePlayer(), scene: vendorScene, gameLog: [] });
+    expect(ctx.in_combat).toBe(false);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -327,6 +366,7 @@ describe('buildSystemPrompt', () => {
       player_stats: 'HP 22/22',
       full_inventory: 'Knife | Wearing: main hand Knife',
       recent_history: 'go north',
+      in_combat: false,
     };
     const messages = buildSystemPrompt(ctx);
     expect(messages).toHaveLength(2);
@@ -340,6 +380,48 @@ describe('buildSystemPrompt', () => {
     expect(system).toContain('80 words');
   });
 
+  it('switches to the combat instruction when in_combat is true', () => {
+    const ctx: LlmContext = {
+      current_biome: 'Aetherstone Deep',
+      room_name: 'Crystal Pylon Chamber',
+      environmental_description: 'A cathedral-sized vault.',
+      available_exits: 'out, up, down',
+      active_entities: 'Scrap Drone (4/15 HP)',
+      player_stats: 'HP 18/22',
+      full_inventory: 'Rusted Pipe',
+      recent_history: 'eat trail rations',
+      in_combat: true,
+    };
+    const system = buildSystemPrompt(ctx)[0]!.content;
+    // Loudest line is the combat instruction.
+    expect(system).toContain('ACTIVE COMBAT');
+    expect(system).toContain('DO NOT describe the room');
+    expect(system).toContain('40 words');
+    // The peaceful instruction must NOT be present — that's the bug the
+    // toggle exists to fix (the model was writing tour-guide prose mid-
+    // combat because both instructions were in scope).
+    expect(system).not.toMatch(/describe the room, and feel free/i);
+    expect(system).not.toContain('80 words');
+  });
+
+  it('stays on the peaceful instruction when in_combat is false', () => {
+    const ctx: LlmContext = {
+      current_biome: 'Borderlands',
+      room_name: 'Triage Tent',
+      environmental_description: 'A canvas surgery.',
+      available_exits: 'back to the bazaar',
+      active_entities: 'None.',
+      player_stats: 'HP 22/22',
+      full_inventory: 'Bandage',
+      recent_history: 'look around',
+      in_combat: false,
+    };
+    const system = buildSystemPrompt(ctx)[0]!.content;
+    expect(system).toContain('atmospheric tone');
+    expect(system).toContain('80 words');
+    expect(system).not.toContain('ACTIVE COMBAT');
+  });
+
   it('emits the same prompt for the same context (deterministic)', () => {
     const ctx: LlmContext = {
       current_biome: 'A',
@@ -350,6 +432,7 @@ describe('buildSystemPrompt', () => {
       player_stats: 'F',
       full_inventory: 'G',
       recent_history: 'H',
+      in_combat: false,
     };
     const a = buildSystemPrompt(ctx);
     const b = buildSystemPrompt(ctx);
