@@ -58,6 +58,7 @@ import {
 } from '../engine/worldLadder';
 import { getItemPreview } from '../components/itemPreview';
 import { isInventoryQuestion, extractInventoryTarget, isContinueCommand } from '../engine/askInventory';
+import { mergeOrPushItem } from '../engine/inventory';
 import {
   parseDirectionQuestion,
   findNamedByQuery,
@@ -1242,7 +1243,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               tags: itemCat.tags,
             });
             set((s) =>
-              s.player ? { player: { ...s.player, inventory: [...s.player.inventory, newItem] } } : s,
+              s.player
+                ? { player: { ...s.player, inventory: mergeOrPushItem(s.player.inventory, newItem) } }
+                : s,
             );
             get().appendLog('reward', `✦ ${outcome.itemName} (${outcome.rarity}).`);
           } else if (outcome.kind === 'tc') {
@@ -1860,7 +1863,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           tags: catEntry.tags,
         });
         set((s) => ({
-          player: s.player ? { ...s.player, inventory: [...remaining, crafted] } : s.player,
+          player: s.player ? { ...s.player, inventory: mergeOrPushItem(remaining, crafted) } : s.player,
         }));
         get().appendLog('reward', `✦ Crafted ${recipe.result}. The Arbiter watches you set the last piece.`);
         break;
@@ -2372,10 +2375,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ...player,
         hp: newHp,
         hpMax: newHpMax,
-        inventory: [
-          ...player.inventory,
-          { id: `loot_${Date.now()}`, name: loot, kind: 'misc', quantity: 1, tags: ['loot'] },
-        ],
+        inventory: mergeOrPushItem(player.inventory, {
+          id: `loot_${Date.now()}`,
+          name: loot,
+          kind: 'misc',
+          quantity: 1,
+          tags: ['loot'],
+        }),
         milestones: { ...prevMs, enemiesDefeated: newKills },
       },
     });
@@ -2501,7 +2507,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         player: {
           ...s.player,
           tc: s.player.tc - offer.price,
-          inventory: [...s.player.inventory, newItem],
+          inventory: mergeOrPushItem(s.player.inventory, newItem),
           factionStanding: repResult.standing,
         },
         currentScene: {
@@ -2609,7 +2615,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!s.player || !s.currentScene?.vendor) return s;
         const newOffers = s.currentScene.vendor.offers.filter((o) => o !== offer);
         return {
-          player: { ...s.player, inventory: [...s.player.inventory, stolen] },
+          player: { ...s.player, inventory: mergeOrPushItem(s.player.inventory, stolen) },
           currentScene: { ...s.currentScene, vendor: { ...s.currentScene.vendor, offers: newOffers } },
         };
       });
@@ -3584,7 +3590,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       tags: lookupCraftedItem(found.name).tags,
     });
     set((s) =>
-      s.player ? { player: { ...s.player, inventory: [...s.player.inventory, newItem] } } : s,
+      s.player
+        ? { player: { ...s.player, inventory: mergeOrPushItem(s.player.inventory, newItem) } }
+        : s,
     );
     get().appendLog(
       'reward',
@@ -3847,7 +3855,11 @@ function applyHookEffect(
         quantity: 1,
         tags: catEntry.tags,
       });
-      set((s) => (s.player ? { player: { ...s.player, inventory: [...s.player.inventory, item] } } : s));
+      set((s) =>
+        s.player
+          ? { player: { ...s.player, inventory: mergeOrPushItem(s.player.inventory, item) } }
+          : s,
+      );
       return { inlineSummary: effect.name, fatal: false };
     }
     case 'heal': {
