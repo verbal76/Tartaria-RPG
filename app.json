@@ -9,6 +9,7 @@
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "backgroundColor": "#0a0908",
+    "icon": "./assets/icon.png",
     "assetBundlePatterns": [
       "assets/**/*"
     ],
@@ -17,7 +18,11 @@
       "bundleIdentifier": "com.verbal76.tartariarealms"
     },
     "android": {
-      "package": "com.verbal76.tartariarealms"
+      "package": "com.verbal76.tartariarealms",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#0a0908"
+      }
     },
     "web": {
       "bundler": "metro"

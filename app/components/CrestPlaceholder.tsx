@@ -1,15 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
 
 // Decorative tile that sits in the top-right slot of the exploration
-// screen when no enemy is staged. Placeholder for the lore-guide crest
-// art that the user will drop in as assets/icon.png later.
+// screen when no enemy is staged. Shows the Tartaria crest art.
 export function CrestPlaceholder() {
   return (
     <View style={styles.wrap}>
-      <Text style={styles.crest}>✧</Text>
-      <Text style={styles.title}>TARTARIA</Text>
-      <Text style={styles.subtitle}>realms</Text>
+      <Image
+        source={require('../../assets/icon.png')}
+        style={styles.crest}
+        resizeMode="contain"
+      />
     </View>
   );
 }
@@ -21,11 +22,10 @@ const styles = StyleSheet.create({
     borderColor: '#3a342c',
     borderWidth: 1,
     borderRadius: 4,
-    padding: 10,
+    padding: 4,
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
-  crest: { color: '#c9a86a', fontSize: 40, marginBottom: 4 },
-  title: { color: '#e6d8b3', fontSize: 14, letterSpacing: 4, fontWeight: '800' },
-  subtitle: { color: '#7a705c', fontSize: 10, letterSpacing: 4 },
+  crest: { width: '100%', height: '100%' },
 });

@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   TouchableOpacity,
   FlatList,
@@ -109,6 +110,11 @@ export function TitleScreen() {
 
   return (
     <View style={styles.container}>
+      <Image
+        source={require('../../assets/icon.png')}
+        style={styles.crest}
+        resizeMode="contain"
+      />
       <Text style={styles.title}>TARTARIA</Text>
       <Text style={styles.subtitle}>REALMS</Text>
       <Text style={styles.flavor}>A procedural narrative of the buried world.</Text>
@@ -157,7 +163,8 @@ export function TitleScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0a0908', padding: 16, paddingTop: 32 },
+  container: { flex: 1, backgroundColor: '#0a0908', padding: 16, paddingTop: 24 },
+  crest: { width: 180, height: 180, alignSelf: 'center', marginBottom: 8 },
   title: { fontSize: 36, color: '#e6d8b3', letterSpacing: 8, fontWeight: '800', textAlign: 'center' },
   subtitle: { fontSize: 14, color: '#c9a86a', letterSpacing: 14, marginTop: -4, textAlign: 'center' },
   flavor: { color: '#7a705c', fontSize: 12, marginTop: 10, fontStyle: 'italic', textAlign: 'center', marginBottom: 14 },
