@@ -61,9 +61,23 @@ export function AboutScreen() {
       setUpdateStatus('Restarting to apply…');
       setTimeout(() => { void Updates.reloadAsync(); }, 600);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
+      // Capture as much detail as possible — name, message, stack head,
+      // any wrapped code property. expo-updates' generic 'Failed to check
+      // for update' isn't actionable on its own; we surface everything
+      // available so the next playtest screenshot is diagnostic.
+      let detail: string;
+      if (err instanceof Error) {
+        const code = (err as Error & { code?: string }).code;
+        const parts = [err.name, code ? `[${code}]` : '', err.message]
+          .filter(Boolean)
+          .join(' ');
+        const stackHead = err.stack ? err.stack.split('\n').slice(0, 2).join(' | ') : '';
+        detail = stackHead ? `${parts}\n      ${stackHead}` : parts;
+      } else {
+        detail = String(err);
+      }
       setUpdateStatus('Error');
-      setUpdateError(msg);
+      setUpdateError(detail);
     } finally {
       setUpdateBusy(false);
     }
