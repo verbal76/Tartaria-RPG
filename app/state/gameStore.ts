@@ -12,6 +12,7 @@ import type {
   LogChannel,
   RollStep,
   PendingRollState,
+  InventoryItem,
 } from '../engine/types';
 import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat } from '../engine/worldMemory';
 import {
@@ -47,6 +48,14 @@ import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrat
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import locationsData from '../data/locations/locations.json';
 import conceptsData from '../data/lore/concepts.json';
+import {
+  listCraftableRecipes,
+  findRecipeByResult,
+  consumeIngredients,
+  lookupCraftedItem,
+  RECIPES,
+  type Recipe,
+} from '../engine/crafting';
 
 interface Concept {
   id: string;
@@ -617,6 +626,64 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         break;
       }
+      case 'craft': {
+        // No target — list what's currently craftable from inventory.
+        const target = parsed.target?.trim() ?? '';
+        if (!target) {
+          const available = listCraftableRecipes(player.inventory);
+          if (available.length === 0) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter glances at your pack. "Nothing fits together yet. Keep hunting — Tartaria gives up its pieces slowly."`,
+            );
+          } else {
+            const names = available.slice(0, 4).map((r) => r.result).join(', ');
+            get().appendLog(
+              'arbiter',
+              `The Arbiter looks over your materials. "You have the pieces for: ${names}. Say 'craft ' and one of those names."`,
+            );
+          }
+          break;
+        }
+        // Targeted craft — try to match recipe and consume materials.
+        const recipe = findRecipeByResult(target);
+        if (!recipe) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter shakes their head. "I do not know that recipe. Try 'craft' alone — I will tell you what your pack can become."`,
+          );
+          break;
+        }
+        const missing = recipe.ingredients.filter(
+          (ing) =>
+            player.inventory
+              .filter((i) => i.name.toLowerCase() === ing.name.toLowerCase())
+              .reduce((sum, i) => sum + i.quantity, 0) < ing.quantity,
+        );
+        if (missing.length > 0) {
+          const list = missing.map((m) => `${m.quantity}× ${m.name}`).join(', ');
+          get().appendLog(
+            'arbiter',
+            `"Not yet." the Arbiter says. "${recipe.result} needs ${list}."`,
+          );
+          break;
+        }
+        const remaining = consumeIngredients(player.inventory, recipe);
+        const catEntry = lookupCraftedItem(recipe.result);
+        const crafted: InventoryItem = {
+          id: `crafted_${Date.now()}`,
+          name: recipe.result,
+          kind: catEntry.kind === 'weapon' || catEntry.kind === 'armor' ? 'misc' : catEntry.kind,
+          rarity: catEntry.rarity,
+          quantity: 1,
+          tags: catEntry.tags,
+        };
+        set((s) => ({
+          player: s.player ? { ...s.player, inventory: [...remaining, crafted] } : s.player,
+        }));
+        get().appendLog('reward', `✦ Crafted ${recipe.result}. The Arbiter watches you set the last piece.`);
+        break;
+      }
     }
 
     if (!get().pendingRolls && shouldArbiterSpeak()) {
@@ -940,6 +1007,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         `✦ You feel hardier from your trials. +1 max HP (now ${newHpMax}). [${newKills} enemies defeated]`,
       );
     }
+
+    // Arbiter watches the pack: did the new loot just unlock a recipe?
+    const before = listCraftableRecipes(player.inventory);
+    const after = listCraftableRecipes(get().player?.inventory ?? []);
+    const newly = after.filter((r) => !before.some((b) => b.result === r.result));
+    if (newly.length > 0) {
+      const r = newly[0]!;
+      get().appendLog(
+        'arbiter',
+        `The Arbiter eyes your new pieces. "You could make a ${r.result} now, if you wanted."`,
+      );
+    }
+
     // Very rare Resurrection Gem drop. ~0.5% per kill — most playtests
     // will never see one; long campaigns will see a handful. The gem
     // saves to the install-wide stash, not the active character, so it

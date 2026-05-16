@@ -182,6 +182,12 @@
       "keywords": ["eternal dynasty"],
       "title": "Eternal Dynasty",
       "answer": "The ruling house of the Aetherborn. Pre-Flood lineage that bound itself to Aether for longevity. Counts time in centuries and never forgives a debt."
+    },
+    {
+      "id": "crafting",
+      "keywords": ["craft", "crafting", "recipe", "recipes", "forge", "make"],
+      "title": "Crafting",
+      "answer": "Type 'craft' alone and I will list what your pack can become. Type 'craft' followed by an item name to try it — if you have the pieces, the work is done. Materials come from enemies and ruins. The list will grow as we walk."
     }
   ]
 }

@@ -1,0 +1,66 @@
+{
+  "recipes": [
+    {
+      "result": "Aetheric Torch",
+      "ingredients": [
+        { "name": "Aether Crystal", "quantity": 1 },
+        { "name": "Mud Fragment", "quantity": 1 },
+        { "name": "Aether Residue", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "First Aid Kit",
+      "ingredients": [
+        { "name": "Spider Silk", "quantity": 2 },
+        { "name": "Aether Residue", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Aetheric Crystal Blade",
+      "ingredients": [
+        { "name": "Aetheric Shard", "quantity": 1 },
+        { "name": "Spider Silk", "quantity": 1 },
+        { "name": "Aether Crystal", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Storm Rod",
+      "ingredients": [
+        { "name": "Energy Fragment", "quantity": 1 },
+        { "name": "Aetheric Dust", "quantity": 1 },
+        { "name": "Aetheric Cloth", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Aetheric Compass",
+      "ingredients": [
+        { "name": "Aether Crystal", "quantity": 1 },
+        { "name": "Mudstone", "quantity": 1 },
+        { "name": "Aetheric Shard", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Aetherstone Vest",
+      "ingredients": [
+        { "name": "Aetheric Shard", "quantity": 3 },
+        { "name": "Aetheric Cloth", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Sentinel Cleaver",
+      "ingredients": [
+        { "name": "Scrap Metal", "quantity": 1 },
+        { "name": "Drone Core", "quantity": 1 },
+        { "name": "Aetheric Shard", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Founder's Edge",
+      "ingredients": [
+        { "name": "Golem Core", "quantity": 1 },
+        { "name": "Aetheric Pelt", "quantity": 1 },
+        { "name": "Aetheric Shard", "quantity": 2 }
+      ]
+    }
+  ]
+}

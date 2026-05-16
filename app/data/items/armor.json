@@ -1,0 +1,12 @@
+{
+  "armor": [
+    { "name": "Patched Cloth", "acBonus": 1, "resistances": [], "rarity": "Common", "tags": ["armor", "cloth"], "description": "Salvaged cloth, mended in three colours of thread." },
+    { "name": "Tattered Leather", "acBonus": 1, "resistances": ["slashing"], "rarity": "Common", "tags": ["armor", "leather"], "description": "Worn leather, soft from years of mud. Turns a casual cut." },
+    { "name": "Aetherstone Vest", "acBonus": 3, "resistances": ["aetheric"], "rarity": "Uncommon", "tags": ["armor", "aetheric"], "description": "A vest panelled with Aetherstone slabs. Hums softly when Aether is near." },
+    { "name": "Ceremonial Robes", "acBonus": 2, "resistances": [], "statBonus": { "stat": "intelligence", "amount": 1 }, "rarity": "Uncommon", "tags": ["armor", "cloth", "runic"], "description": "Robes embroidered with old Tartarian sigils. Quickens the runecasting hand." },
+    { "name": "Mud-glass Scales", "acBonus": 2, "resistances": ["degradation"], "rarity": "Uncommon", "tags": ["armor", "scaled"], "description": "Mud-glass plates lashed over leather. Sheds the corrosive runoff." },
+    { "name": "Sentinel Plate", "acBonus": 4, "resistances": ["piercing", "slashing"], "rarity": "Rare", "tags": ["armor", "plate", "sentinel"], "description": "Reclaimed Architectural Sentinel plating. Heavy, but it remembers how to stand." },
+    { "name": "Runic Mantle", "acBonus": 3, "resistances": ["burn", "electrical"], "rarity": "Rare", "tags": ["armor", "cloth", "runic", "aetheric"], "description": "A mantle stitched with cooling runes. The shoulders never quite warm up." },
+    { "name": "Founder's Harness", "acBonus": 5, "resistances": ["aetheric", "burn", "electrical", "radiation"], "rarity": "Legendary", "tags": ["armor", "plate", "founder"], "description": "Harness of the first builders. The Aether seems to step around it on instinct." }
+  ]
+}

@@ -13,6 +13,7 @@ export type Intent =
   | 'cast'
   | 'wait'
   | 'ask'
+  | 'craft'
   | 'unknown';
 
 export interface ParsedInput {
