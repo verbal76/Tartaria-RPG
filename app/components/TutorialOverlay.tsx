@@ -1,46 +1,29 @@
-import React, { useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet, Pressable, Dimensions } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { TUTORIAL_STEPS, type HighlightArea } from './tutorialSteps';
 
-// Resolve a tutorial step's highlight region. Real screen coordinates
-// come from tutorialTargets — components register their layout via
-// TutorialTarget + onLayout. We pad the region by a few pixels so the
-// amber border doesn't sit flush on the component edge.
-type Bounds = { x: number; y: number; width: number; height: number };
-function regionFor(
-  area: HighlightArea,
-  targets: Record<string, Bounds>,
-): { top: number; left: number; width: number; height: number } | null {
-  if (area === 'fullscreen') return null;
-  const t = targets[area];
-  if (!t) return null;
-  const pad = 4;
-  return {
-    top: t.y - pad,
-    left: t.x - pad,
-    width: t.width + pad * 2,
-    height: t.height + pad * 2,
-  };
-}
-
-// Decide whether the info card sits above or below the highlight, so it
-// doesn't cover the thing it's describing.
-function cardPositionFor(area: HighlightArea): 'top' | 'bottom' | 'center' {
+// Card position: keep the popup away from the area it's describing so
+// the player can see what's being highlighted. Top-row regions push the
+// card down; bottom-row regions push it up; mid-screen + screens that
+// have their OWN content (inventory / vendor) get a compact top card so
+// the screen below stays visible.
+function cardPositionFor(area: HighlightArea): 'top' | 'bottom' {
   switch (area) {
     case 'top-left-stats':
     case 'top-right-enemy':
     case 'scene-bar':
       return 'bottom';
-    case 'feed':
-    case 'fullscreen':
-      return 'center';
     case 'quick-row':
     case 'input-row':
     case 'bottom-menu':
       return 'top';
+    case 'feed':
+    case 'fullscreen':
     default:
-      return 'center';
+      // Push to bottom for feed (so the feed itself is unobscured) and
+      // for inventory / vendor (so the screen behind the card reads).
+      return 'bottom';
   }
 }
 
@@ -50,7 +33,6 @@ export function TutorialOverlay() {
   const skipTutorial = useGameStore((s) => s.skipTutorial);
   const setScreen = useGameStore((s) => s.setScreen);
   const currentScreen = useGameStore((s) => s.currentScreen);
-  const tutorialTargets = useGameStore((s) => s.tutorialTargets);
 
   const step = tutorialStep !== null ? TUTORIAL_STEPS[tutorialStep] ?? null : null;
 
@@ -63,99 +45,42 @@ export function TutorialOverlay() {
     }
   }, [step, currentScreen, setScreen]);
 
-  const { width: vw, height: vh } = Dimensions.get('window');
-  const region = useMemo(
-    () => (step ? regionFor(step.area, tutorialTargets) : null),
-    [step, tutorialTargets],
-  );
-  const cardPos = step ? cardPositionFor(step.area) : 'center';
-
   if (!step) return null;
-
-  // Build the four dim rectangles around the highlighted region. When
-  // region is null (fullscreen), one big dim covers everything.
-  const dims: { top: number; left: number; width: number; height: number }[] = [];
-  if (region) {
-    // Above
-    dims.push({ top: 0, left: 0, width: vw, height: region.top });
-    // Below
-    dims.push({ top: region.top + region.height, left: 0, width: vw, height: vh - (region.top + region.height) });
-    // Left
-    dims.push({ top: region.top, left: 0, width: region.left, height: region.height });
-    // Right
-    dims.push({ top: region.top, left: region.left + region.width, width: vw - (region.left + region.width), height: region.height });
-  } else {
-    dims.push({ top: 0, left: 0, width: vw, height: vh });
-  }
 
   const isWelcome = step.welcome === true;
   const isLast = tutorialStep === TUTORIAL_STEPS.length - 1;
-
-  // Card position: top half / bottom half / centered.
-  const cardWrapStyle =
-    cardPos === 'top' ? styles.cardWrapTop
-    : cardPos === 'bottom' ? styles.cardWrapBottom
-    : styles.cardWrapCenter;
+  const pos = cardPositionFor(step.area);
 
   return (
-    <View style={styles.root} pointerEvents="box-none">
-      {/* Dim layers — pointerEvents 'auto' so they block taps on the
-          underlying UI while the tutorial is active. */}
-      {dims.map((d, i) => (
-        <View
-          key={i}
-          style={[styles.dim, { top: d.top, left: d.left, width: d.width, height: d.height }]}
-          pointerEvents="auto"
-        />
-      ))}
-      {/* Amber highlight border around the focused region. */}
-      {region && (
-        <View
-          pointerEvents="none"
-          style={[styles.highlight, region]}
-        />
-      )}
-      {/* Info card. */}
-      <View style={cardWrapStyle} pointerEvents="box-none">
-        <View style={styles.card}>
-          <Text style={styles.title}>{step.title.toUpperCase()}</Text>
-          <View style={styles.rule} />
-          <Text style={styles.body}>{step.body}</Text>
+    // No backdrop. The targeted component glows itself (via TutorialTarget)
+    // so the screen stays fully readable. Card is anchored to one edge.
+    <View
+      style={[styles.root, pos === 'top' ? styles.rootTop : styles.rootBottom]}
+      pointerEvents="box-none"
+    >
+      <View style={styles.card}>
+        <Text style={styles.title}>{step.title.toUpperCase()}</Text>
+        <View style={styles.rule} />
+        <Text style={styles.body}>{step.body}</Text>
+        <View style={styles.bottomRow}>
           <Text style={styles.stepIndicator}>
             Step {(tutorialStep ?? 0) + 1} of {TUTORIAL_STEPS.length}
           </Text>
           <View style={styles.btnRow}>
-            {isWelcome ? (
-              <>
-                <Pressable
-                  style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
-                  onPress={skipTutorial}
-                >
-                  <Text style={styles.btnTextNeutral}>SKIP</Text>
-                </Pressable>
-                <Pressable
-                  style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}
-                  onPress={advanceTutorial}
-                >
-                  <Text style={styles.btnTextPrimary}>CONTINUE</Text>
-                </Pressable>
-              </>
-            ) : (
-              <>
-                <Pressable
-                  style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
-                  onPress={skipTutorial}
-                >
-                  <Text style={styles.btnTextNeutral}>SKIP</Text>
-                </Pressable>
-                <Pressable
-                  style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}
-                  onPress={advanceTutorial}
-                >
-                  <Text style={styles.btnTextPrimary}>{isLast ? 'BEGIN' : 'NEXT →'}</Text>
-                </Pressable>
-              </>
-            )}
+            <Pressable
+              style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
+              onPress={skipTutorial}
+            >
+              <Text style={styles.btnTextNeutral}>SKIP</Text>
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}
+              onPress={advanceTutorial}
+            >
+              <Text style={styles.btnTextPrimary}>
+                {isWelcome ? 'CONTINUE' : isLast ? 'BEGIN' : 'NEXT →'}
+              </Text>
+            </Pressable>
           </View>
         </View>
       </View>
@@ -167,49 +92,10 @@ const styles = StyleSheet.create({
   root: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 1000,
+    paddingHorizontal: 12,
   },
-  dim: {
-    position: 'absolute',
-    backgroundColor: 'rgba(0,0,0,0.78)',
-  },
-  highlight: {
-    position: 'absolute',
-    borderColor: '#c9a86a',
-    borderWidth: 2,
-    borderRadius: 6,
-    // Subtle glow effect via shadow on iOS, default on Android.
-    shadowColor: '#c9a86a',
-    shadowOpacity: 0.8,
-    shadowRadius: 6,
-  },
-  cardWrapTop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    paddingTop: 60,
-    paddingHorizontal: 16,
-    alignItems: 'center',
-  },
-  cardWrapBottom: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingBottom: 60,
-    paddingHorizontal: 16,
-    alignItems: 'center',
-  },
-  cardWrapCenter: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
+  rootTop: { justifyContent: 'flex-start', paddingTop: 60, alignItems: 'center' },
+  rootBottom: { justifyContent: 'flex-end', paddingBottom: 60, alignItems: 'center' },
   card: {
     width: '100%',
     maxWidth: 380,
@@ -217,24 +103,31 @@ const styles = StyleSheet.create({
     borderColor: '#c9a86a',
     borderWidth: 1,
     borderRadius: 4,
-    padding: 16,
+    padding: 12,
+    // Drop shadow so the card reads on top of whatever screen is below.
+    shadowColor: '#000',
+    shadowOpacity: 0.8,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 8,
   },
-  title: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
-  rule: { height: 1, backgroundColor: '#3a342c', marginTop: 8, marginBottom: 12 },
-  body: { color: '#e6d8b3', fontSize: 13, lineHeight: 19, marginBottom: 12 },
-  stepIndicator: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginBottom: 12 },
-  btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8 },
+  title: { color: '#c9a86a', fontSize: 13, fontWeight: '800', letterSpacing: 3 },
+  rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 8 },
+  body: { color: '#e6d8b3', fontSize: 12, lineHeight: 17, marginBottom: 10 },
+  bottomRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  stepIndicator: { color: '#7a705c', fontSize: 10, letterSpacing: 1 },
+  btnRow: { flexDirection: 'row', gap: 6 },
   btn: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 3,
     borderWidth: 1,
-    minWidth: 100,
+    minWidth: 80,
     alignItems: 'center',
   },
   btnPressed: { opacity: 0.7 },
   btnPrimary: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
   btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
-  btnTextPrimary: { color: '#13110f', fontWeight: '800', letterSpacing: 2, fontSize: 12 },
-  btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  btnTextPrimary: { color: '#13110f', fontWeight: '800', letterSpacing: 2, fontSize: 11 },
+  btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 11 },
 });

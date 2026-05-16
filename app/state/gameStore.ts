@@ -407,11 +407,6 @@ interface GameStore {
   /** When set, the vendor screen displays this stub vendor for the
    *  tutorial's trading-screen step. Cleared on tutorial end. */
   tutorialDemoVendor: VendorInstance | null;
-  /** Measured screen positions of tutorial target regions, populated via
-   *  onLayout + measureInWindow on the components that own each area.
-   *  TutorialOverlay reads from this so its amber border lands on the
-   *  ACTUAL component instead of a fractional viewport guess. */
-  tutorialTargets: Record<string, { x: number; y: number; width: number; height: number }>;
 
   slots: SlotSummary[];
   activeSlotId: string | null;
@@ -433,10 +428,6 @@ interface GameStore {
   startTutorial: () => void;
   advanceTutorial: () => void;
   skipTutorial: () => void;
-  setTutorialTarget: (
-    area: string,
-    bounds: { x: number; y: number; width: number; height: number },
-  ) => void;
   deleteSlotById: (slotId: string) => Promise<void>;
   resurrectSlot: (slotId: string) => Promise<boolean>;
 
@@ -501,7 +492,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
   slotLoadError: null,
   tutorialStep: null,
   tutorialDemoVendor: null,
-  tutorialTargets: {},
 
   slots: [],
   activeSlotId: null,
@@ -3246,14 +3236,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     set({ tutorialStep: next });
-  },
-  setTutorialTarget(area, bounds) {
-    // Components call this from onLayout to register their absolute
-    // screen position so the tutorial overlay's highlight box lands on
-    // the actual rendered area instead of a fractional guess.
-    set((s) => ({
-      tutorialTargets: { ...s.tutorialTargets, [area]: bounds },
-    }));
   },
   skipTutorial() {
     // Clear any tutorial-injected vendor from the scene.
