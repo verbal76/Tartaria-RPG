@@ -47,7 +47,19 @@ export function InventoryScreen() {
     list.push(slot);
     slotsByEquippedName.set(name, list);
   }
-  const equippedSet = new Set(slotsByEquippedName.keys());
+  // Resolve each equipped name to the SPECIFIC inventory row that owns it
+  // (the first matching id). PlayerEquipped stores names rather than ids
+  // today, so two items with the same name would otherwise both render as
+  // EQUIPPED — the player only equipped one. Pinning to the first matching
+  // id stops the duplicate badge. The proper schema fix (name → id) is a
+  // future refactor.
+  const equippedItemIds = new Set<string>();
+  for (const equippedName of slotsByEquippedName.keys()) {
+    const owner = player.inventory.find(
+      (it) => it.name === equippedName && it.quantity > 0,
+    );
+    if (owner) equippedItemIds.add(owner.id);
+  }
 
   // ALWAYS show the modal. Auto-equipping silently when there was only one
   // valid slot (e.g. amulet) made the player think the tap did nothing —
@@ -75,7 +87,12 @@ export function InventoryScreen() {
     tone?: 'primary' | 'destructive' | 'neutral';
   }[] => {
     if (!pending) return [{ label: 'Close', onPress: closeModal, tone: 'neutral' }];
-    const equippedInSlots = slotsByEquippedName.get(pending.item.name) ?? [];
+    // Only show Unequip buttons when THIS specific item is the equipped one
+    // (not just same-named). Prevents the modal on a second locket from
+    // offering to unequip the first locket's slot.
+    const equippedInSlots = equippedItemIds.has(pending.item.id)
+      ? slotsByEquippedName.get(pending.item.name) ?? []
+      : [];
     const buttons: ReturnType<typeof buildModalButtons> = [];
     // Unequip buttons — one per slot the item is currently in.
     for (const slot of equippedInSlots) {
@@ -139,7 +156,7 @@ export function InventoryScreen() {
                   key={item.id}
                   item={item}
                   color={CATEGORY_COLORS[cat]}
-                  isEquipped={equippedSet.has(item.name)}
+                  isEquipped={equippedItemIds.has(item.id)}
                   onPress={() => handleItemTap(item)}
                 />
               ))}
