@@ -7,6 +7,7 @@ import { AdventureFeed } from '../components/AdventureFeed';
 import { InputBox } from '../components/InputBox';
 import { DiceRoller } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
+import { VendorPanel } from '../components/VendorPanel';
 
 export function ExplorationScreen() {
   const player = useGameStore((s) => s.player);
@@ -20,6 +21,8 @@ export function ExplorationScreen() {
   const resolveRollStep = useGameStore((s) => s.resolveRollStep);
   const cancelPendingRolls = useGameStore((s) => s.cancelPendingRolls);
   const saveAndExitToTitle = useGameStore((s) => s.saveAndExitToTitle);
+  const buyFromVendor = useGameStore((s) => s.buyFromVendor);
+  const dismissVendor = useGameStore((s) => s.dismissVendor);
 
   const [activeEnemyIdx, setActiveEnemyIdx] = useState(0);
 
@@ -78,6 +81,15 @@ export function ExplorationScreen() {
           enemies={enemyViews}
           activeIndex={Math.min(activeEnemyIdx, enemyViews.length - 1)}
           onSelectActive={setActiveEnemyIdx}
+        />
+      )}
+
+      {currentScene?.vendor && (
+        <VendorPanel
+          vendor={currentScene.vendor}
+          playerTc={player.tc}
+          onBuy={buyFromVendor}
+          onDismiss={dismissVendor}
         />
       )}
 

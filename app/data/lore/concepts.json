@@ -188,6 +188,12 @@
       "keywords": ["craft", "crafting", "recipe", "recipes", "forge", "make"],
       "title": "Crafting",
       "answer": "Type 'craft' alone and I will list what your pack can become. Type 'craft' followed by an item name to try it — if you have the pieces, the work is done. Materials come from enemies and ruins. The list will grow as we walk."
+    },
+    {
+      "id": "vendors",
+      "keywords": ["vendor", "vendors", "merchant", "broker", "shop", "buy", "trade"],
+      "title": "Vendors",
+      "answer": "Wandering traders appear in peaceful scenes — Reclaimer brokers, Forgotten Order scholars, True Tartarian quartermasters, the occasional unaffiliated drifter. Each carries a handful of items for TC. Tap an item in their panel to buy. They leave when you do."
     }
   ]
 }

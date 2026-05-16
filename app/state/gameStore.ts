@@ -62,6 +62,13 @@ import {
   type Recipe,
 } from '../engine/crafting';
 import { getEquippedWeapon } from '../engine/combatRules';
+import { pickRandomVendor, type VendorInstance } from '../engine/vendors';
+import {
+  WEAPONS,
+  ARMOR,
+  GEAR,
+  MATERIALS,
+} from '../engine/crafting';
 
 interface Concept {
   id: string;
@@ -97,6 +104,7 @@ interface CurrentScene {
   location: Location;
   hazard: Hazard | null;
   enemy: Enemy | null;
+  vendor: VendorInstance | null;
 }
 
 function collectSceneNouns(scene: CurrentScene): string[] {
@@ -250,6 +258,8 @@ interface GameStore {
   generateNewQuest: () => Quest;
   resolveEnemyDefeat: () => void;
   rest: () => void;
+  buyFromVendor: (itemName: string) => void;
+  dismissVendor: () => void;
 
   bootCognitive: () => Promise<void>;
   skipCognitiveBoot: () => void;
@@ -442,9 +452,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const weather = pickWeather(worldMemory);
     const hazard = pickHazardForLocation(location);
     const enemy = pickEnemyForLocation(location);
-    const scene: CurrentScene = { weather, location, hazard, enemy };
+    // Vendor only appears in peaceful scenes (no enemy). ~22% chance.
+    const vendor = !enemy && Math.random() < 0.22 ? pickRandomVendor() : null;
+    const scene: CurrentScene = { weather, location, hazard, enemy, vendor };
     set({ currentScene: scene, currentEnemyHp: enemy?.hp ?? null, pendingRolls: null });
     get().appendLog('world', buildScene({ weather, location, hazard, enemy, quest: player.activeQuests[0] }));
+    if (vendor) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter inclines their head toward the newcomer. "${vendor.name}, ${vendor.title}. ${vendor.description}"`,
+      );
+    }
     // Arbiter gets two voices on scene entry:
     //   1) ~45% chance — a proactive "scene intro" that gestures at what
     //      to do here. This is the Arbiter actively shaping the story
@@ -1092,6 +1110,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
     }
 
+    // TC drop. 30% chance per kill, amount scaled by enemy rarity. This is
+    // what fuels the vendor economy — combat is the primary way to earn TC.
+    if (Math.random() < 0.3) {
+      const rarityMul = enemy.rarity === 'Legendary' ? 6 : enemy.rarity === 'Rare' ? 3 : enemy.rarity === 'Uncommon' ? 2 : 1;
+      const tcGained = (rollDie(6) + rollDie(6)) * rarityMul;
+      set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + tcGained } } : s));
+      get().appendLog('reward', `+${tcGained} TC pried from the dust.`);
+    }
+
     // Arbiter watches the pack: did the new loot just unlock a recipe?
     const before = listCraftableRecipes(player.inventory);
     const after = listCraftableRecipes(get().player?.inventory ?? []);
@@ -1118,6 +1145,77 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
     }
     void get().persist();
+  },
+
+  buyFromVendor(itemName) {
+    const state = get();
+    const scene = state.currentScene;
+    const player = state.player;
+    if (!scene?.vendor || !player) return;
+
+    const offer = scene.vendor.offers.find((o) => o.itemName.toLowerCase() === itemName.toLowerCase());
+    if (!offer) return;
+    if (player.tc < offer.price) {
+      get().appendLog(
+        'system',
+        `Not enough TC. ${offer.itemName} costs ${offer.price}, you have ${player.tc}.`,
+      );
+      return;
+    }
+
+    // Look up the catalog entry to know what kind of inventory item to write.
+    const weapon = WEAPONS.find((w) => w.name === offer.itemName);
+    const armor = !weapon ? ARMOR.find((a) => a.name === offer.itemName) : null;
+    const gear = !weapon && !armor ? GEAR.find((g) => g.name === offer.itemName) : null;
+    const material = !weapon && !armor && !gear ? MATERIALS.find((m) => m.name === offer.itemName) : null;
+    const cat = weapon ?? armor ?? gear ?? material ?? null;
+    const kind: InventoryItem['kind'] = weapon
+      ? 'misc'
+      : armor
+        ? 'misc'
+        : gear?.kind === 'consumable' || gear?.kind === 'relic' || gear?.kind === 'misc'
+          ? gear.kind
+          : material
+            ? 'misc'
+            : 'misc';
+    const tags = cat?.tags ?? [];
+    const newItem: InventoryItem = {
+      id: `bought_${Date.now()}`,
+      name: offer.itemName,
+      kind,
+      rarity: cat?.rarity,
+      quantity: 1,
+      tags,
+    };
+
+    // Remove the offer so it can't be bought twice; this stack of inventory
+    // changes commits as one set call so the UI doesn't flicker.
+    set((s) => {
+      if (!s.player || !s.currentScene?.vendor) return s;
+      const newOffers = s.currentScene.vendor.offers.filter((o) => o !== offer);
+      return {
+        player: {
+          ...s.player,
+          tc: s.player.tc - offer.price,
+          inventory: [...s.player.inventory, newItem],
+        },
+        currentScene: {
+          ...s.currentScene,
+          vendor: { ...s.currentScene.vendor, offers: newOffers },
+        },
+      };
+    });
+    get().appendLog(
+      'reward',
+      `Bought ${offer.itemName} from ${scene.vendor.name} for ${offer.price} TC. (${player.tc - offer.price} TC left)`,
+    );
+    void get().persist();
+  },
+
+  dismissVendor() {
+    set((s) => ({
+      currentScene: s.currentScene ? { ...s.currentScene, vendor: null } : s.currentScene,
+    }));
   },
 
   rest() {

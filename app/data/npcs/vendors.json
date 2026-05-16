@@ -1,0 +1,62 @@
+{
+  "vendors": [
+    {
+      "id": "scrap_broker",
+      "name": "Tellin Mak",
+      "title": "Scrap Broker",
+      "faction": "reclaimers_guild",
+      "description": "A Reclaimer who knows the price of everything and the value of most things. Will trade you nearly anything for TC.",
+      "offers": [
+        { "itemName": "Trail Rations", "price": 8 },
+        { "itemName": "Climbing Rope", "price": 12 },
+        { "itemName": "Aetheric Torch", "price": 25 },
+        { "itemName": "First Aid Kit", "price": 35 },
+        { "itemName": "Rusted Blade", "price": 30 },
+        { "itemName": "Patched Cloth", "price": 20 }
+      ]
+    },
+    {
+      "id": "order_scholar",
+      "name": "Vesryn of Varakush",
+      "title": "Order Scholar",
+      "faction": "forgotten_order",
+      "description": "A Forgotten Order scholar carrying relics and runecasters for the careful researcher. Speaks in long sentences.",
+      "offers": [
+        { "itemName": "Aetheric Compass", "price": 80 },
+        { "itemName": "Aetheric Locket", "price": 45 },
+        { "itemName": "Pyric Wand", "price": 90 },
+        { "itemName": "Storm Rod", "price": 220 },
+        { "itemName": "Ceremonial Robes", "price": 110 },
+        { "itemName": "Runic Mantle", "price": 280 }
+      ]
+    },
+    {
+      "id": "tartarian_quartermaster",
+      "name": "Korash of the Deep",
+      "title": "True Tartarian Quartermaster",
+      "faction": "true_tartarians",
+      "description": "A subterranean quartermaster trading in heavier gear. Speaks little. Watches your hands.",
+      "offers": [
+        { "itemName": "Tartarian Spear", "price": 150 },
+        { "itemName": "Aetheric Crystal Blade", "price": 180 },
+        { "itemName": "Bone Crossbow", "price": 160 },
+        { "itemName": "Mud-glass Scales", "price": 130 },
+        { "itemName": "Aetherstone Vest", "price": 240 }
+      ]
+    },
+    {
+      "id": "wandering_drifter",
+      "name": "Naha",
+      "title": "Wandering Drifter",
+      "faction": null,
+      "description": "An unaffiliated traveller with a mixed pack. The prices are sometimes generous, sometimes not. Depends on the day.",
+      "offers": [
+        { "itemName": "Trail Rations", "price": 6 },
+        { "itemName": "Aetheric Torch", "price": 22 },
+        { "itemName": "Mud-fist Wraps", "price": 18 },
+        { "itemName": "Salvaged Bow", "price": 40 },
+        { "itemName": "First Aid Kit", "price": 30 }
+      ]
+    }
+  ]
+}
