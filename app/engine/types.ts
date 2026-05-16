@@ -59,6 +59,10 @@ export interface Race {
   tags: string[];
   traits: string[];
   description: string;
+  /** Short second-person flavor blurb shown on the character-creation
+   *  screen under the mechanical description. 2-3 sentences max. Voice:
+   *  what it feels like to wake up as this race. */
+  flavor?: string;
 }
 
 export interface Faction {
@@ -74,6 +78,10 @@ export interface Faction {
   joinRequirements: string;
   tags: string[];
   startingStanding: number;
+  /** Short second-person flavor blurb shown on the character-creation
+   *  screen under the faction goal. 2-3 sentences max. Voice: what it
+   *  feels like to wear this colors. */
+  flavor?: string;
 }
 
 export interface Enemy {

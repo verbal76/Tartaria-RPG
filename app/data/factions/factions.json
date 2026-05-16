@@ -11,7 +11,8 @@
     "allies": ["conspiracy_architects"],
     "joinRequirements": "Bloodline ties, demonstrated loyalty to suppression, willingness to silence rediscoverers.",
     "tags": ["suppressive", "elite", "global_reach", "fading_power"],
-    "startingStanding": -10
+    "startingStanding": -10,
+    "flavor": "You keep what your ancestors took. The world will not remember Tartaria if you have anything to say about it — and you have everything to say. The throne is crumbling, but it is still a throne."
   },
   {
     "id": "forgotten_order",
@@ -25,7 +26,8 @@
     "allies": ["reclaimers_guild_situational"],
     "joinRequirements": "Demonstrated scholarship, recovery of a Tartarian artifact, or referral by an existing member.",
     "tags": ["scholarly", "exploratory", "covert", "idealistic"],
-    "startingStanding": 0
+    "startingStanding": 0,
+    "flavor": "Knowledge was meant to be lit, not buried. You dig because the world above is dying of forgetting, and the only cure is in the mud. You have a notebook, a lamp, and a long way to walk."
   },
   {
     "id": "reclaimers_guild",
@@ -39,7 +41,8 @@
     "allies": ["anyone_paying"],
     "joinRequirements": "A relic worth selling, or a contract delivered without complaint.",
     "tags": ["mercenary", "scavenger", "neutral", "well_connected"],
-    "startingStanding": 0
+    "startingStanding": 0,
+    "flavor": "Whoever pays best gets the relic. Ideology is a tax other people pay. The Guild has brokers in every city and grudges in none of them. You bring the haul, they handle the rest."
   },
   {
     "id": "true_tartarians",
@@ -53,7 +56,8 @@
     "allies": ["forgotten_order_partial"],
     "joinRequirements": "Mud Dweller heritage or demonstrated devotion to the old empire.",
     "tags": ["subterranean", "traditional", "aethercraft", "religious"],
-    "startingStanding": 0
+    "startingStanding": 0,
+    "flavor": "The surface forgot. You didn't. Every tunnel you carve is a road home; every relic you find is a stone returned to its rightful wall. When the Giants wake, you will already be marching."
   },
   {
     "id": "eternal_dynasty",
@@ -67,7 +71,8 @@
     "allies": [],
     "joinRequirements": "Aetherborn blood, demonstrated power, and passing the Dynasty's tests of purity.",
     "tags": ["bloodline", "supremacist", "secretive", "ruthless"],
-    "startingStanding": 0
+    "startingStanding": 0,
+    "flavor": "The fall was a culling. The survivors were the test. The next empire is yours by blood — provided your blood is purer than the others' and you can prove it. The Dynasty does not flinch at what it asks."
   },
   {
     "id": "conspiracy_architects",
@@ -81,7 +86,8 @@
     "allies": ["mud_monarchs"],
     "joinRequirements": "Demonstrated ability to suppress information and evidence. An existing member's vouchsafe.",
     "tags": ["covert", "suppressive", "narrative_control", "global_reach"],
-    "startingStanding": -20
+    "startingStanding": -20,
+    "flavor": "Truth is the most expensive substance on Earth and you are its merchant. You sell silence by the page, by the city, by the century. The lie is a kindness. The silence is a service. Nobody thanks you, and nobody is supposed to."
   },
   {
     "id": "servants_of_giants",
@@ -95,7 +101,8 @@
     "allies": ["true_tartarians", "tartarian_revivalists"],
     "joinRequirements": "Demonstrated faith and willingness to participate in ritual expeditions to Tartarian ruins.",
     "tags": ["religious", "ritual", "giants", "reclamation"],
-    "startingStanding": 0
+    "startingStanding": 0,
+    "flavor": "Faith asks one question — when they wake, will you be ready? You will. The Giants did not fall; they only laid down. Every ritual you walk, every ruin you visit, you are telling them you remember."
   },
   {
     "id": "stone_builders",
@@ -109,7 +116,8 @@
     "allies": ["forgotten_order"],
     "joinRequirements": "Demonstrated knowledge of Tartarian architectural principles or Aetheric engineering. Submission of original research.",
     "tags": ["scholarly", "architectural", "religious", "reconstructive"],
-    "startingStanding": 0
+    "startingStanding": 0,
+    "flavor": "Every Tartarian wall is a sentence and you can almost read them. You take notes by lamplight in chambers no surface scholar will ever see. The lodge knows you. The world above does not. Yet."
   },
   {
     "id": "tartarian_revivalists",
@@ -123,6 +131,7 @@
     "allies": ["servants_of_giants"],
     "joinRequirements": "Absolute commitment to Tartaria's revival. Willingness to act where others hesitate.",
     "tags": ["radical", "maximalist", "reckless", "driven"],
-    "startingStanding": -5
+    "startingStanding": -5,
+    "flavor": "Half measures are how empires die. You will turn the engine back on, second mud flood be damned. Sasha Ironheart will not ask you to be careful. She will ask you to be brave."
   }
 ]

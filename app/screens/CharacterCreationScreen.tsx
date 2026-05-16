@@ -81,6 +81,9 @@ export function CharacterCreationScreen() {
             <Text style={styles.optionMeta}>
               Base AC {r.baseAC} · {r.startingTCFormula} TC · HP bonus +{r.startingHPBonus}
             </Text>
+            {raceId === r.id && r.flavor && (
+              <Text style={styles.optionFlavor}>{r.flavor}</Text>
+            )}
           </TouchableOpacity>
         ))}
 
@@ -97,6 +100,9 @@ export function CharacterCreationScreen() {
                 <Text style={styles.optionName}>{f.name}</Text>
                 <Text style={styles.optionDesc}>{f.subtitle}</Text>
                 <Text style={styles.optionMeta}>{f.goal}</Text>
+                {factionId === f.id && f.flavor && (
+                  <Text style={styles.optionFlavor}>{f.flavor}</Text>
+                )}
               </TouchableOpacity>
             ))}
           </>
@@ -105,6 +111,12 @@ export function CharacterCreationScreen() {
         {step === 'name' && (
           <View style={styles.nameBlock}>
             <Text style={styles.contextLine}>{selectedRace.name} · {selectedFaction.name}</Text>
+            {selectedRace.flavor && (
+              <Text style={styles.optionFlavor}>{selectedRace.flavor}</Text>
+            )}
+            {selectedFaction.flavor && (
+              <Text style={styles.optionFlavor}>{selectedFaction.flavor}</Text>
+            )}
             <Text style={styles.label}>Name</Text>
             <TextInput
               ref={nameInputRef}
@@ -191,6 +203,16 @@ const styles = StyleSheet.create({
   optionName: { color: '#e6d8b3', fontWeight: '700', fontSize: 14 },
   optionDesc: { color: '#cdbf99', fontSize: 12, marginTop: 2 },
   optionMeta: { color: '#7a705c', fontSize: 11, marginTop: 4 },
+  optionFlavor: {
+    color: '#a89776',
+    fontSize: 12,
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopColor: '#3a342c',
+    borderTopWidth: 1,
+    fontStyle: 'italic',
+    lineHeight: 17,
+  },
   footer: { flexDirection: 'row', gap: 8, paddingTop: 8 },
   backBtn: {
     backgroundColor: '#1a1714',
