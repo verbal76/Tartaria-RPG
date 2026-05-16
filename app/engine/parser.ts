@@ -1,4 +1,5 @@
 import type { Intent, ParsedInput, InventoryItem } from './types';
+import { levenshtein } from './editDistance';
 
 const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   stealth: ['hide', 'sneak', 'crawl', 'creep', 'lurk', 'crouch', 'silently', 'shadow', 'conceal', 'slink'],
@@ -61,24 +62,6 @@ export function normalizeInput(raw: string): string {
     .replace(/\bpull back\b/g, 'pullback')
     .replace(/\bturn in\b/g, 'turnin');
   return s;
-}
-
-function levenshtein(a: string, b: string): number {
-  if (a === b) return 0;
-  if (!a.length) return b.length;
-  if (!b.length) return a.length;
-  const prev = new Array(b.length + 1);
-  const curr = new Array(b.length + 1);
-  for (let j = 0; j <= b.length; j++) prev[j] = j;
-  for (let i = 1; i <= a.length; i++) {
-    curr[0] = i;
-    for (let j = 1; j <= b.length; j++) {
-      const cost = a.charCodeAt(i - 1) === b.charCodeAt(j - 1) ? 0 : 1;
-      curr[j] = Math.min(curr[j - 1] + 1, prev[j] + 1, prev[j - 1] + cost);
-    }
-    for (let j = 0; j <= b.length; j++) prev[j] = curr[j];
-  }
-  return prev[b.length];
 }
 
 function fuzzyEqual(word: string, candidate: string): boolean {
