@@ -5,6 +5,13 @@ import { effectiveStats } from './equipment';
 
 type WeaponClass = 'ranged' | 'melee' | 'runecaster' | 'barehanded';
 
+// Did the player explicitly call for a bare-hand attack? "punch", "kick",
+// "fist", etc. — these always route through bare hands regardless of what
+// the player has equipped, and never wear down the equipped weapon.
+export function isBareHandAttack(actionText: string): boolean {
+  return /\b(punch|kick|fist|knee|headbutt|elbow|bare[- ]?hand)\b/.test(actionText.toLowerCase());
+}
+
 // Resolve the player's currently-equipped weapon to a catalog entry, if any.
 // `prefer` lets the caller bias toward an off-hand strike when the player
 // explicitly chooses it; defaults to the main-hand weapon.
@@ -63,8 +70,13 @@ export function buildCombatSteps(
   // No equip = fall back to the original behavior (rusted blade / fists).
   // Off-hand attack: when the player says "off-hand" or "off hand", route
   // through the off-slot weapon instead of the main.
+  // Bare-hand attack: explicit "punch" / "kick" / "fist" forces barehanded
+  // regardless of what's equipped — lets the player choose to sacrifice
+  // damage in exchange for the bludgeoning damage type or to spare the
+  // weapon's durability.
+  const forcesBarehand = isBareHandAttack(actionText);
   const prefersOff = /\boff[- ]?hand\b/.test(actionText.toLowerCase());
-  const equipped = getEquippedWeapon(player, prefersOff ? 'off' : 'main');
+  const equipped = forcesBarehand ? null : getEquippedWeapon(player, prefersOff ? 'off' : 'main');
   const wc: WeaponClass = equipped?.weaponKind ?? detectWeaponClass(actionText);
   // Stat used for the attack roll factors in any equipped accessory bonuses
   // (rings/amulets boosting STR/DEX/INT/WIS/CHA).
@@ -76,7 +88,9 @@ export function buildCombatSteps(
   const enemyInit = rollDie(10);
   // Use equipped damage dice if available; parse "2d6" or "1d10+1d6".
   const dmg = equipped ? parseDamageDice(equipped.damageDice) : damageDice(wc);
-  const damageTypeNote = equipped ? ` (${equipped.damageType})` : '';
+  const damageTypeNote = equipped
+    ? ` (${equipped.damageType})`
+    : forcesBarehand ? ' (bludgeoning)' : '';
 
   return [
     {

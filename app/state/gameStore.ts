@@ -65,7 +65,7 @@ import {
   applyArmorResistance,
   type Recipe,
 } from '../engine/crafting';
-import { getEquippedWeapon } from '../engine/combatRules';
+import { getEquippedWeapon, isBareHandAttack } from '../engine/combatRules';
 import { pickRandomVendor, type VendorInstance } from '../engine/vendors';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS } from '../engine/equipment';
 import { stampDurability, wearItemByName, repairCost, repairItem } from '../engine/durability';
@@ -930,9 +930,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       case 'attack': {
         if (currentScene.enemy) {
           // Range check: melee weapons need arm's reach; ranged weapons can
-          // hit at close or far; bare hands need arm's reach.
+          // hit at close or far; bare hands need arm's reach. Bare-hand
+          // verbs (punch/kick) force the bare-hand reach regardless of
+          // what's equipped.
           const range = currentScene.range ?? 'close';
-          const reach = playerWeaponReach(player);
+          const barehand = isBareHandAttack(trimmed);
+          const reach = barehand
+            ? { bands: ['arm'] as CombatRange[], label: 'Bare hands' }
+            : playerWeaponReach(player);
           if (!reach.bands.includes(range)) {
             get().appendLog(
               'arbiter',
@@ -1660,8 +1665,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     if (attack?.success) {
       const rawDmg = damage?.total ?? rollDie(6);
-      const equipped = getEquippedWeapon(player);
-      const weaponType = equipped?.damageType ?? null;
+      const barehand = isBareHandAttack(actionText);
+      const equipped = barehand ? null : getEquippedWeapon(player);
+      // Bare-hand strikes are bludgeoning by default so the player can
+      // exploit Aetheric Mutation / Construct / Automation bludgeoning
+      // weaknesses without sacrificing their weapon's durability.
+      const weaponType = barehand ? 'bludgeoning' : (equipped?.damageType ?? null);
       const mod = applyDamageTypeModifier(rawDmg, weaponType, enemy.type);
       const dmg = mod.damage;
       const prevHp = currentEnemyHp ?? enemy.hp;
@@ -1676,14 +1685,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
 
       // Weapon wear: any successful hit chips one point off the weapon
-      // that landed it. Bare hands aren't tracked. Mirrors the off-hand
-      // detection in buildCombatSteps so the right blade takes the wear.
-      const usedOffHand = /\boff[- ]?hand\b/.test(actionText.toLowerCase());
-      const weaponInUse = usedOffHand
-        ? (player.equipped?.off ?? player.equipped?.main ?? null)
-        : (player.equipped?.main ?? player.equipped?.weaponName ?? player.equipped?.off ?? null);
-      if (weaponInUse) {
-        set((s) => (s.player ? { player: wearEquippedItem(s.player, weaponInUse, get) } : s));
+      // that landed it. Bare hands aren't tracked at all. Mirrors the
+      // off-hand detection in buildCombatSteps so the right blade takes
+      // the wear.
+      if (!barehand) {
+        const usedOffHand = /\boff[- ]?hand\b/.test(actionText.toLowerCase());
+        const weaponInUse = usedOffHand
+          ? (player.equipped?.off ?? player.equipped?.main ?? null)
+          : (player.equipped?.main ?? player.equipped?.weaponName ?? player.equipped?.off ?? null);
+        if (weaponInUse) {
+          set((s) => (s.player ? { player: wearEquippedItem(s.player, weaponInUse, get) } : s));
+        }
       }
 
       if (newEnemyHp <= 0) {
