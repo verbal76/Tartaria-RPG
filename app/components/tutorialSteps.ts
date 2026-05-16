@@ -105,18 +105,20 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     area: 'fullscreen',
     title: 'Your pack',
     body:
-      'Tap any item to see its description, stats, and equip / unequip buttons. ' +
-      'Items are grouped by category (weapons, armor, amulets & rings, consumables, ' +
-      'relics, materials, loot). Durability is shown next to gear that wears.',
+      'This is your pack — already stocked with your starter kit. Tap any item to see its ' +
+      'description, stats, and equip / unequip buttons. Items are grouped by category ' +
+      '(weapons, armor, amulets & rings, consumables, relics, materials, loot). Durability ' +
+      'is shown next to gear that wears.',
   },
   {
     screen: 'vendor',
     area: 'fullscreen',
     title: 'Trading',
     body:
-      'When a vendor is in the scene, the orange banner on the exploration screen opens ' +
-      'their shop. Each offer shows the item kind, rarity, stats, and how many you ' +
-      'already have. Tap to open the buy dialog with the full preview and wallet math.',
+      'Traders behave like your pack — same layout, same tap-for-details flow, plus a price ' +
+      'next to each offer and a "you have N" tag when you already own one. ' +
+      '\n\nHow you get here: when a vendor is in the scene, an orange banner appears at the ' +
+      'top of the world text feed showing the trader\'s name. Tap that banner to enter the shop.',
   },
   {
     screen: 'exploration',

@@ -68,8 +68,11 @@ export default function App() {
         {screen === 'inventory' && <InventoryScreen />}
         {screen === 'crafting' && <CraftingScreen />}
         {screen === 'vendor' && <VendorScreen />}
-        <TutorialOverlay />
       </SafeAreaView>
+      {/* TutorialOverlay sits OUTSIDE SafeAreaView so its absolute
+          positioning matches measureInWindow coords from the targets
+          (which report screen-absolute, not safe-area-relative). */}
+      <TutorialOverlay />
     </SafeAreaProvider>
   );
 }

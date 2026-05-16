@@ -8,6 +8,7 @@ import { DiceRoller } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
+import { TutorialTarget } from '../components/TutorialTarget';
 import { findWeaponByName } from '../engine/crafting';
 
 function describeTime(hours: number): string {
@@ -79,10 +80,10 @@ export function ExplorationScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.topRow}>
-        <View style={styles.statsCol}>
+        <TutorialTarget area="top-left-stats" style={styles.statsCol}>
           <StatsPanel player={player} />
-        </View>
-        <View style={styles.rightCol}>
+        </TutorialTarget>
+        <TutorialTarget area="top-right-enemy" style={styles.rightCol}>
           {inCombat ? (
             <EnemyPanel
               enemies={enemyViews}
@@ -92,10 +93,10 @@ export function ExplorationScreen() {
           ) : (
             <CrestPlaceholder />
           )}
-        </View>
+        </TutorialTarget>
       </View>
 
-      <View style={styles.sceneBar}>
+      <TutorialTarget area="scene-bar" style={styles.sceneBar}>
         <View style={{ flex: 1 }}>
           <Text style={styles.sceneText} numberOfLines={1}>
             {currentScene
@@ -111,7 +112,7 @@ export function ExplorationScreen() {
             <Text style={styles.sceneBtn}>⚙</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </TutorialTarget>
 
       {currentScene?.vendor && (
         <TouchableOpacity
@@ -128,9 +129,9 @@ export function ExplorationScreen() {
         </TouchableOpacity>
       )}
 
-      <View style={styles.feed}>
+      <TutorialTarget area="feed" style={styles.feed}>
         <AdventureFeed entries={gameLog} />
-      </View>
+      </TutorialTarget>
 
       <View style={styles.controls}>
         {pendingRolls ? (
@@ -151,7 +152,7 @@ export function ExplorationScreen() {
             range={currentScene?.range ?? null}
           />
         )}
-        <View style={styles.menuRow}>
+        <TutorialTarget area="bottom-menu" style={styles.menuRow}>
           <TouchableOpacity onPress={() => { void saveAndExitToTitle(); }}>
             <Text style={styles.menu}>save & exit</Text>
           </TouchableOpacity>
@@ -161,7 +162,7 @@ export function ExplorationScreen() {
           <TouchableOpacity onPress={() => setScreen('about')} hitSlop={8}>
             <Text style={styles.gear}>⚙</Text>
           </TouchableOpacity>
-        </View>
+        </TutorialTarget>
       </View>
 
       <SearchModal

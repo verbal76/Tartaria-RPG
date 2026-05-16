@@ -3,21 +3,25 @@ import { View, Text, StyleSheet, Pressable, Dimensions } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { TUTORIAL_STEPS, type HighlightArea } from './tutorialSteps';
 
-// Highlight regions as fractional positions of the viewport. Imperfect
-// but no native deps — close enough that the player understands which
-// area the popup is talking about.
-function regionFor(area: HighlightArea, vw: number, vh: number) {
-  switch (area) {
-    case 'top-left-stats':   return { top: vh * 0.04, left: vw * 0.02, width: vw * 0.58, height: vh * 0.22 };
-    case 'top-right-enemy':  return { top: vh * 0.04, left: vw * 0.60, width: vw * 0.38, height: vh * 0.22 };
-    case 'scene-bar':        return { top: vh * 0.27, left: vw * 0.02, width: vw * 0.96, height: vh * 0.05 };
-    case 'feed':             return { top: vh * 0.33, left: vw * 0.02, width: vw * 0.96, height: vh * 0.42 };
-    case 'quick-row':        return { top: vh * 0.77, left: vw * 0.02, width: vw * 0.96, height: vh * 0.06 };
-    case 'input-row':        return { top: vh * 0.84, left: vw * 0.02, width: vw * 0.96, height: vh * 0.07 };
-    case 'bottom-menu':      return { top: vh * 0.92, left: vw * 0.02, width: vw * 0.96, height: vh * 0.05 };
-    case 'fullscreen':
-    default:                 return null;
-  }
+// Resolve a tutorial step's highlight region. Real screen coordinates
+// come from tutorialTargets — components register their layout via
+// TutorialTarget + onLayout. We pad the region by a few pixels so the
+// amber border doesn't sit flush on the component edge.
+type Bounds = { x: number; y: number; width: number; height: number };
+function regionFor(
+  area: HighlightArea,
+  targets: Record<string, Bounds>,
+): { top: number; left: number; width: number; height: number } | null {
+  if (area === 'fullscreen') return null;
+  const t = targets[area];
+  if (!t) return null;
+  const pad = 4;
+  return {
+    top: t.y - pad,
+    left: t.x - pad,
+    width: t.width + pad * 2,
+    height: t.height + pad * 2,
+  };
 }
 
 // Decide whether the info card sits above or below the highlight, so it
@@ -46,6 +50,7 @@ export function TutorialOverlay() {
   const skipTutorial = useGameStore((s) => s.skipTutorial);
   const setScreen = useGameStore((s) => s.setScreen);
   const currentScreen = useGameStore((s) => s.currentScreen);
+  const tutorialTargets = useGameStore((s) => s.tutorialTargets);
 
   const step = tutorialStep !== null ? TUTORIAL_STEPS[tutorialStep] ?? null : null;
 
@@ -59,7 +64,10 @@ export function TutorialOverlay() {
   }, [step, currentScreen, setScreen]);
 
   const { width: vw, height: vh } = Dimensions.get('window');
-  const region = useMemo(() => (step ? regionFor(step.area, vw, vh) : null), [step, vw, vh]);
+  const region = useMemo(
+    () => (step ? regionFor(step.area, tutorialTargets) : null),
+    [step, tutorialTargets],
+  );
   const cardPos = step ? cardPositionFor(step.area) : 'center';
 
   if (!step) return null;

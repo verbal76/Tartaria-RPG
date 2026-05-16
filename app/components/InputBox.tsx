@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { TutorialTarget } from './TutorialTarget';
 
 interface Props {
   onSubmit: (text: string) => void;
@@ -40,7 +41,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
 
   return (
     <View style={styles.container}>
-      <View style={styles.quickRow}>
+      <TutorialTarget area="quick-row" style={styles.quickRow}>
         {inCombat ? (
           <>
             <QuickBtn label="punch" onPress={() => onSubmit('punch')} />
@@ -77,8 +78,8 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             <QuickBtn label="inventory" onPress={onOpenInventory} />
           </>
         )}
-      </View>
-      <View style={styles.inputRow}>
+      </TutorialTarget>
+      <TutorialTarget area="input-row" style={styles.inputRow}>
         <TextInput
           style={styles.input}
           value={text}
@@ -93,7 +94,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
         <TouchableOpacity style={styles.send} onPress={handleSubmit}>
           <Text style={styles.sendText}>Act</Text>
         </TouchableOpacity>
-      </View>
+      </TutorialTarget>
     </View>
   );
 }
