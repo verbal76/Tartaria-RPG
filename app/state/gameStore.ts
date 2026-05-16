@@ -408,7 +408,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     //   2) ~25% chance — a reactive remark (mood/intent/location pool).
     // Both can fire in rare cases but the intro tends to anchor first.
     if (chance(45)) {
-      get().appendLog('arbiter', buildArbiterSceneIntro(location, enemy));
+      get().appendLog(
+        'arbiter',
+        buildArbiterSceneIntro({
+          location,
+          enemy,
+          player,
+          worldMemory: get().worldMemory,
+        }),
+      );
     } else if (shouldArbiterSpeak()) {
       get().appendLog('arbiter', buildArbiterRemark({ location, hazard, enemy }));
     }

@@ -1,4 +1,15 @@
-import type { WeatherEntry, Hazard, Enemy, Location, Quest, InventoryItem, ParsedInput, Intent } from './types';
+import type {
+  WeatherEntry,
+  Hazard,
+  Enemy,
+  Location,
+  Quest,
+  InventoryItem,
+  ParsedInput,
+  Intent,
+  PlayerCharacter,
+  WorldMemory,
+} from './types';
 import { pick, chance } from './rng';
 import openings from '../data/events/openings.json';
 import moodQuotes from '../data/lore/arbiter-mood-quotes.json';
@@ -462,18 +473,195 @@ const ARBITER_COMBAT_INTROS = [
   `"That one bleeds slow," the Arbiter says quietly. "Plan two moves, not one."`,
 ];
 
-export function buildArbiterSceneIntro(location: Location, enemy?: Enemy | null): string {
-  // ~18% of intros are personal — the Arbiter drops a fragment of who they
-  // are or where they have been. Conversational, never expository. These
-  // never reference the player's current location directly so they read
-  // as memory rather than reaction.
-  if (!enemy && Math.random() < 0.18) {
-    return pick(ARBITER_PERSONAL_BEATS);
-  }
+export interface SceneIntroContext {
+  location: Location;
+  enemy?: Enemy | null;
+  player?: PlayerCharacter | null;
+  worldMemory?: WorldMemory | null;
+}
+
+export function buildArbiterSceneIntro(ctx: SceneIntroContext): string {
+  const { location, enemy, player, worldMemory } = ctx;
+
+  // Combat scenes stay tight on the threat — no identity / timeline drift
+  // while a hostile is staged.
   if (enemy) {
     return pick(ARBITER_COMBAT_INTROS).replace('{enemyName}', enemy.name.toLowerCase());
   }
+
+  // ~12% — timeline callback. Builds dynamically from milestones and the
+  // world's defeated-enemies / discovered-locations memory. Most evocative
+  // option when it fires (Arbiter actually references what you've done).
+  if (Math.random() < 0.12) {
+    const cb = pickTimelineCallback(player, worldMemory);
+    if (cb) return cb;
+  }
+
+  // ~12% — race-specific remark. The Arbiter acknowledges the heritage
+  // the player picked at character creation.
+  if (player && Math.random() < 0.12) {
+    const pool = ARBITER_RACE_REMARKS[player.raceId];
+    if (pool && pool.length > 0) return pick(pool);
+  }
+
+  // ~12% — faction-specific remark. The Arbiter acknowledges the faction
+  // the player aligned with at start.
+  if (player && Math.random() < 0.12) {
+    const pool = ARBITER_FACTION_REMARKS[player.factionId];
+    if (pool && pool.length > 0) return pick(pool);
+  }
+
+  // ~15% — personal beat (who the Arbiter is, in passing).
+  if (Math.random() < 0.15) {
+    return pick(ARBITER_PERSONAL_BEATS);
+  }
+
+  // Default — generic scene intro from earlier work.
   return pick(ARBITER_SCENE_INTROS).replace('{locationName}', location.name);
+}
+
+// Race-specific remarks. Conversational acknowledgments of the heritage
+// the player picked at character creation. Each pool is 4–5 lines.
+const ARBITER_RACE_REMARKS: Record<string, string[]> = {
+  tartarian_giant: [
+    `The Arbiter looks up at you, briefly. "A Tartarian Giant in the open. The dust feels something it has not in a long time."`,
+    `"Your size opens doors that closed when the cities fell," the Arbiter says. "Some of them should have stayed shut."`,
+    `"The first builders stood as tall as you do," the Arbiter murmurs. "I have wondered what they saw, looking down."`,
+    `"Be careful in the low caves," the Arbiter warns. "Your ancestors made them, then forgot why."`,
+    `"Aether knows your kind," the Arbiter says. "It always has."`,
+  ],
+  mud_dweller: [
+    `"A Mud Dweller above ground," the Arbiter notes. "The surface feels different up here, doesn't it."`,
+    `"Your people remember Tartaria as it was," the Arbiter says. "You do not need me to describe what's buried — you have walked it."`,
+    `"Aethercraft sits in your hands the way breath sits in mine," the Arbiter says. "Use it without flinching."`,
+    `"The True Tartarians watch you," the Arbiter says. "Whether they approve depends on the day."`,
+    `"Subterranean eyes adjust quickly to surface light," the Arbiter observes. "Slower the other way around."`,
+  ],
+  reclaimer: [
+    `The Arbiter watches you read the room. "A Reclaimer through and through. You see a ledger where most see ruins."`,
+    `"Profit before ideology," the Arbiter says. "There is an honesty in that, at least."`,
+    `"I have walked with Reclaimers before," the Arbiter says. "The careful ones survive. The greedy ones decorate the floor."`,
+    `"Aetherstone signatures bend to your attention," the Arbiter says. "Trust the sense."`,
+    `"Locks unmake themselves around your fingers," the Arbiter says. "A small magic. Use it well."`,
+  ],
+  architectural_sentinel: [
+    `The Arbiter inclines their head. "Time does not touch you the way it touches the rest. A useful trait, where we walk."`,
+    `"Your runic skin remembers the old protocols," the Arbiter says. "They are listening even now."`,
+    `"Defense protocols hum under your hand," the Arbiter says. "Do not waste them on the first thing that moves."`,
+    `"I have wondered, sometimes, what an Architectural Sentinel dreams of," the Arbiter says. "I have not yet asked."`,
+  ],
+  mud_golem: [
+    `"A Mud Golem walking the Outskirts," the Arbiter says. "Tartaria made your kind in fear. Use that."`,
+    `"Aetherstone fills you when it is near," the Arbiter says. "Save the recharge for when it matters."`,
+    `"Your makers cast you for a purpose," the Arbiter says. "Some Golems still hold theirs. Others forget. Which one are you today?"`,
+    `"The stones whisper to you in a language I do not have," the Arbiter admits. "Listen for both of us."`,
+  ],
+  unknowing_mass: [
+    `"Surface-born, walking Tartaria," the Arbiter says. "The first time is always the worst time."`,
+    `"You did not grow up knowing about any of this," the Arbiter says. "Some advantage in that — fewer assumptions to unmake."`,
+    `"Your kind learns fast or dies fast," the Arbiter says. "Few stop in the middle."`,
+    `"Beginner's luck has a half-life," the Arbiter warns. "Use the early grace well."`,
+  ],
+};
+
+// Faction-specific remarks. Reference the faction the player aligned with
+// at character creation — its goals, philosophy, and politics.
+const ARBITER_FACTION_REMARKS: Record<string, string[]> = {
+  mud_monarchs: [
+    `"A Monarch's mark, even faint," the Arbiter says. "You did not come here to discover, did you."`,
+    `"The Mud Monarchs would prefer Tartaria stayed forgotten," the Arbiter says. "Standing here, you are already disobeying."`,
+    `"You serve people who would rather burn the past than read it," the Arbiter says. "I know the type."`,
+    `"The Monarchs reach further than they admit," the Arbiter says quietly. "Be careful who you talk to."`,
+  ],
+  forgotten_order: [
+    `"Forgotten Order," the Arbiter says, with something like approval. "The buried world owes you a hearing, and you owe it the listening."`,
+    `"Varakush sends scholars into places like this and expects them to come back changed," the Arbiter says. "So far you are still intact."`,
+    `"Your Order names me, sometimes," the Arbiter says. "I do not return the favor."`,
+    `"Aether is humanity's birthright, your charter says," the Arbiter says. "Tartaria has opinions on inheritance."`,
+  ],
+  reclaimers_guild: [
+    `"Reclaimers Guild," the Arbiter says. "The buyer gets what they pay for, and you get what's left."`,
+    `"The Guild's brokers count their cuts before the relic is even dug out," the Arbiter notes. "You are one of them, now."`,
+    `"A clean transaction is its own ethic," the Arbiter says. "Some of your peers forget that."`,
+    `"The Guild has no rivals, only invoices," the Arbiter says drily.`,
+  ],
+  true_tartarians: [
+    `"A True Tartarian, on the surface," the Arbiter says. "The empire was your inheritance long before it was your destination."`,
+    `"Your enclave will want to know what you find here," the Arbiter says. "They will not always be patient about the wait."`,
+    `"The Giants are watching," the Arbiter says. "Or they are not. Hard to tell with them."`,
+    `"Your people remember the old kingdoms by their names," the Arbiter says. "Use the right ones."`,
+  ],
+  eternal_dynasty: [
+    `"Aetherborn blood," the Arbiter says, gaze steady. "I have known some of your kind. Few of them well."`,
+    `"The Dynasty would have the Aether for themselves," the Arbiter says. "You may want it for less."`,
+    `"Your house's patience is older than most empires," the Arbiter notes. "Try not to confuse patience with permission."`,
+  ],
+};
+
+// Timeline callbacks built dynamically from the player's milestones and the
+// world's defeated-enemies / discovered-locations memory. Returns null if
+// the player has not yet earned any callback-worthy beats.
+function pickTimelineCallback(
+  player: PlayerCharacter | null | undefined,
+  worldMemory: WorldMemory | null | undefined,
+): string | null {
+  if (!player) return null;
+  const ms = player.milestones;
+  const options: string[] = [];
+
+  if (ms) {
+    if (ms.enemiesDefeated >= 3) {
+      options.push(
+        `"You have put down ${ms.enemiesDefeated} things in Tartaria so far," the Arbiter says. "None of them got up. That counts for something."`,
+      );
+    }
+    if (ms.enemiesDefeated >= 10) {
+      options.push(
+        `"${ms.enemiesDefeated} kills behind you," the Arbiter notes. "The buried world begins to step aside, slightly, when it sees you coming."`,
+      );
+    }
+    if (ms.travelsCompleted >= 3) {
+      options.push(
+        `"${ms.travelsCompleted} crossings already," the Arbiter says. "The dust has begun to recognize your shape."`,
+      );
+    }
+    if (ms.travelsCompleted >= 10) {
+      options.push(
+        `"You have walked more of Tartaria than most who claim to know it," the Arbiter murmurs. "Stop sometimes. Listen for what you have passed."`,
+      );
+    }
+    if (ms.checksSucceeded >= 5) {
+      options.push(
+        `"I have watched you succeed at things you should not have," the Arbiter says. "${ms.checksSucceeded} times now. It begins to feel like a pattern."`,
+      );
+    }
+  }
+
+  const defeated = worldMemory?.defeatedEnemies ?? [];
+  const first = defeated[0];
+  if (first) {
+    options.push(
+      `"The ${first.toLowerCase()} was the first thing you put down here," the Arbiter says quietly. "I remember it. I think you do too."`,
+    );
+  }
+  if (defeated.length >= 4) {
+    const recent = defeated[defeated.length - 1];
+    if (recent) {
+      options.push(
+        `"You have a way of attracting the wrong company," the Arbiter says. "Lately the ${recent.toLowerCase()}, before that something with more legs. Tartaria keeps an inventory."`,
+      );
+    }
+  }
+
+  const discovered = worldMemory?.discoveredLocationIds ?? [];
+  if (discovered.length >= 3) {
+    options.push(
+      `"Three places now you have stood and not left," the Arbiter says. "Tartaria notices the ones who keep coming back."`,
+    );
+  }
+
+  if (options.length === 0) return null;
+  return pick(options);
 }
 
 // Personal-history lines the Arbiter drops in passing — bits of backstory
