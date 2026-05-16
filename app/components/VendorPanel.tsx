@@ -1,6 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import type { VendorInstance } from '../engine/vendors';
+import { BrandedModal } from './BrandedModal';
+import { getItemPreview } from './itemPreview';
 
 interface Props {
   vendor: VendorInstance;
@@ -10,20 +12,20 @@ interface Props {
 }
 
 export function VendorPanel({ vendor, playerTc, onBuy, onDismiss }: Props) {
-  const confirmBuy = (itemName: string, price: number) => {
-    if (playerTc < price) {
-      Alert.alert('Not enough TC', `${itemName} costs ${price}. You have ${playerTc}.`);
-      return;
-    }
-    Alert.alert(
-      'Buy from vendor',
-      `Buy ${itemName} for ${price} TC? (You have ${playerTc})`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Buy', onPress: () => onBuy(itemName) },
-      ],
-    );
+  const [pending, setPending] = useState<{ itemName: string; price: number } | null>(null);
+
+  const openConfirm = (itemName: string, price: number) => {
+    setPending({ itemName, price });
   };
+  const cancel = () => setPending(null);
+  const confirmBuy = () => {
+    if (!pending) return;
+    onBuy(pending.itemName);
+    setPending(null);
+  };
+
+  const preview = pending ? getItemPreview(pending.itemName) : null;
+  const canAffordPending = pending ? playerTc >= pending.price : false;
 
   return (
     <View style={styles.wrap}>
@@ -50,7 +52,7 @@ export function VendorPanel({ vendor, playerTc, onBuy, onDismiss }: Props) {
               <TouchableOpacity
                 key={`${o.itemName}_${i}`}
                 style={[styles.item, !canAfford && styles.itemBroke]}
-                onPress={() => confirmBuy(o.itemName, o.price)}
+                onPress={() => openConfirm(o.itemName, o.price)}
                 activeOpacity={0.7}
               >
                 <Text style={styles.itemName} numberOfLines={1}>
@@ -64,6 +66,28 @@ export function VendorPanel({ vendor, playerTc, onBuy, onDismiss }: Props) {
           })}
         </ScrollView>
       )}
+
+      <BrandedModal
+        visible={pending !== null}
+        title={canAffordPending ? `Buy from ${vendor.name}` : 'Not enough TC'}
+        itemPreview={preview}
+        contextLine={
+          pending
+            ? canAffordPending
+              ? `Price: ${pending.price} TC   ·   You have: ${playerTc} TC   →   After: ${playerTc - pending.price} TC`
+              : `Price: ${pending.price} TC   ·   You only have ${playerTc} TC.`
+            : undefined
+        }
+        buttons={
+          canAffordPending
+            ? [
+                { label: 'Cancel', onPress: cancel, tone: 'neutral' },
+                { label: 'Buy', onPress: confirmBuy, tone: 'primary' },
+              ]
+            : [{ label: 'OK', onPress: cancel, tone: 'neutral' }]
+        }
+        onRequestClose={cancel}
+      />
     </View>
   );
 }

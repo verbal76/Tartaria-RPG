@@ -6,11 +6,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  Alert,
   RefreshControl,
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { SwipeableRow } from '../components/SwipeableRow';
+import { BrandedModal } from '../components/BrandedModal';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
 import type { SlotSummary } from '../engine/saveSystem';
@@ -41,6 +41,12 @@ export function TitleScreen() {
   const resurrectSlot = useGameStore((s) => s.resurrectSlot);
   const resurrectionGems = useGameStore((s) => s.resurrectionGems);
   const [refreshing, setRefreshing] = useState(false);
+  const [pendingAction, setPendingAction] = useState<
+    | { kind: 'delete'; slot: SlotSummary }
+    | { kind: 'resurrect'; slot: SlotSummary }
+    | { kind: 'fallen'; slot: SlotSummary }
+    | null
+  >(null);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -52,37 +58,22 @@ export function TitleScreen() {
   }, [refreshSlots]);
 
   const confirmDelete = (slot: SlotSummary) => {
-    Alert.alert(
-      'Delete Tartarian',
-      `${slot.playerName} will be lost to the buried world. This cannot be undone.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: () => void deleteSlotById(slot.slotId) },
-      ],
-    );
+    setPendingAction({ kind: 'delete', slot });
   };
 
   const onSlotTap = (slot: SlotSummary) => {
     if (slot.dead) {
       if (resurrectionGems > 0) {
-        Alert.alert(
-          'Resurrect Tartarian',
-          `${slot.playerName} has fallen. Spend 1 Resurrection Gem (you have ${resurrectionGems}) to bring them back?`,
-          [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Resurrect', onPress: () => void resurrectSlot(slot.slotId) },
-          ],
-        );
+        setPendingAction({ kind: 'resurrect', slot });
       } else {
-        Alert.alert(
-          'Fallen',
-          `${slot.playerName} has fallen and you have no Resurrection Gems. The buried world keeps them for now.`,
-        );
+        setPendingAction({ kind: 'fallen', slot });
       }
       return;
     }
     void loadSlotIntoGame(slot.slotId);
   };
+
+  const closeModal = () => setPendingAction(null);
 
   const renderItem = ({ item }: { item: SlotSummary }) => (
     <SwipeableRow onDelete={() => confirmDelete(item)}>
@@ -158,6 +149,39 @@ export function TitleScreen() {
         </View>
       </View>
       <Text style={styles.footer}>v0.1.0  /  2148</Text>
+
+      <BrandedModal
+        visible={pendingAction !== null}
+        title={
+          pendingAction?.kind === 'delete' ? 'Delete Tartarian'
+          : pendingAction?.kind === 'resurrect' ? 'Resurrect Tartarian'
+          : pendingAction?.kind === 'fallen' ? 'Fallen'
+          : ''
+        }
+        body={
+          pendingAction?.kind === 'delete'
+            ? `${pendingAction.slot.playerName} will be lost to the buried world. This cannot be undone.`
+          : pendingAction?.kind === 'resurrect'
+            ? `${pendingAction.slot.playerName} has fallen. Spend 1 Resurrection Gem (you hold ${resurrectionGems}) to bring them back?`
+          : pendingAction?.kind === 'fallen'
+            ? `${pendingAction.slot.playerName} has fallen and you hold no Resurrection Gems. The buried world keeps them for now.`
+          : undefined
+        }
+        buttons={
+          pendingAction?.kind === 'delete'
+            ? [
+                { label: 'Cancel', onPress: closeModal, tone: 'neutral' },
+                { label: 'Delete', onPress: () => { void deleteSlotById(pendingAction.slot.slotId); closeModal(); }, tone: 'destructive' },
+              ]
+          : pendingAction?.kind === 'resurrect'
+            ? [
+                { label: 'Cancel', onPress: closeModal, tone: 'neutral' },
+                { label: 'Resurrect', onPress: () => { void resurrectSlot(pendingAction.slot.slotId); closeModal(); }, tone: 'primary' },
+              ]
+          : [{ label: 'OK', onPress: closeModal, tone: 'neutral' }]
+        }
+        onRequestClose={closeModal}
+      />
     </View>
   );
 }

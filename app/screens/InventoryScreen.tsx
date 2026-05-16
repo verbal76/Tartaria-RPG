@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import {
   CATEGORY_COLORS,
@@ -9,11 +9,14 @@ import {
 } from '../components/InventoryCategorize';
 import type { InventoryItem, EquipSlot } from '../engine/types';
 import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
+import { BrandedModal } from '../components/BrandedModal';
+import { getItemPreview } from '../components/itemPreview';
 
 export function InventoryScreen() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
   const equipItem = useGameStore((s) => s.equipItem);
+  const [pending, setPending] = useState<{ item: InventoryItem; slots: EquipSlot[] } | null>(null);
 
   if (!player) {
     return (
@@ -40,27 +43,27 @@ export function InventoryScreen() {
   const handleItemTap = (item: InventoryItem) => {
     const slots = validSlotsForItem(item);
     if (slots.length === 0) {
-      Alert.alert(item.name, 'You cannot equip this.');
+      // Still show the modal — so the player gets the description / stats
+      // even when the item can't be equipped (helps decide whether to keep
+      // it, sell it, or use it).
+      setPending({ item, slots: [] });
       return;
     }
     if (slots.length === 1) {
       equipItem(item.name, slots[0]!);
       return;
     }
-    // Multiple valid slots — let the player choose. Weapons get a
-    // main-hand / off-hand prompt.
-    Alert.alert(
-      `Equip ${item.name}`,
-      'Which slot?',
-      [
-        ...slots.map((s) => ({
-          text: SLOT_LABEL[s],
-          onPress: () => equipItem(item.name, s),
-        })),
-        { text: 'Cancel', style: 'cancel' as const },
-      ],
-    );
+    setPending({ item, slots });
   };
+
+  const closeModal = () => setPending(null);
+  const chooseSlot = (slot: EquipSlot) => {
+    if (!pending) return;
+    equipItem(pending.item.name, slot);
+    setPending(null);
+  };
+
+  const modalPreview = pending ? getItemPreview(pending.item.name) : null;
 
   return (
     <View style={styles.container}>
@@ -118,6 +121,39 @@ export function InventoryScreen() {
           </View>
         ))}
       </View>
+
+      <BrandedModal
+        visible={pending !== null}
+        title={pending && pending.slots.length === 0 ? pending.item.name : pending ? `Equip ${pending.item.name}` : ''}
+        itemPreview={modalPreview}
+        contextLine={
+          pending && pending.item.durability
+            ? `Durability: ${pending.item.durability.current}/${pending.item.durability.max}`
+            : undefined
+        }
+        body={
+          pending && pending.slots.length === 0
+            ? 'This item cannot be equipped, but you can still keep, gift, sell, or use it.'
+            : pending
+              ? 'Which slot?'
+              : undefined
+        }
+        buttons={
+          pending
+            ? pending.slots.length === 0
+              ? [{ label: 'Close', onPress: closeModal, tone: 'neutral' }]
+              : [
+                  ...pending.slots.map((s) => ({
+                    label: SLOT_LABEL[s],
+                    onPress: () => chooseSlot(s),
+                    tone: 'primary' as const,
+                  })),
+                  { label: 'Cancel', onPress: closeModal, tone: 'neutral' as const },
+                ]
+            : [{ label: 'OK', onPress: closeModal, tone: 'neutral' }]
+        }
+        onRequestClose={closeModal}
+      />
     </View>
   );
 }
@@ -138,8 +174,7 @@ function ItemRow({
     <TouchableOpacity
       style={styles.row}
       onPress={onPress}
-      activeOpacity={canEquip ? 0.7 : 1}
-      disabled={!canEquip}
+      activeOpacity={0.7}
     >
       <View style={[styles.rowStripe, { backgroundColor: color }]} />
       <View style={styles.rowBody}>
@@ -162,6 +197,7 @@ function ItemRow({
             </Text>
           )}
           {canEquip && !isEquipped && <Text style={styles.rowEquippable}>tap to equip</Text>}
+          {!canEquip && !isEquipped && <Text style={styles.rowEquippable}>tap for details</Text>}
           {isEquipped && <Text style={styles.rowEquipped}>EQUIPPED</Text>}
         </View>
       </View>
