@@ -22,6 +22,8 @@ export interface CatalogWeapon {
   stat: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma';
   rarity: Rarity;
   baseDurability?: number;
+  /** Bonus to a d20 block roll. 0 = can't block (ranged), 6 = heavy two-hander. */
+  defense?: number;
   tags: string[];
   description: string;
 }

@@ -57,6 +57,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, inCombat, eq
               />
             ) : null}
             <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} />
+            <QuickBtn label="block" defensive onPress={() => onSubmit('block')} />
             {range && range !== 'arm' && (
               <QuickBtn label="advance" onPress={() => onSubmit('advance')} />
             )}

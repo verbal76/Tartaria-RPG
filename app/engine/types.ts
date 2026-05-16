@@ -19,6 +19,7 @@ export type Intent =
   | 'steal'
   | 'join'
   | 'dodge'
+  | 'block'
   | 'advance'
   | 'retreat'
   | 'repair'
@@ -253,7 +254,8 @@ export type StatusEffectKind =
   | 'armor_severed'
   | 'paralyzed'
   | 'poisoned'
-  | 'dodging';
+  | 'dodging'
+  | 'blocking';
 
 export interface StatusEffect {
   kind: StatusEffectKind;
@@ -371,6 +373,10 @@ export interface WorldMemory {
   /** Short narrative memos surfaced during chain resolutions. The Arbiter can
    *  reference these in remarks, and they help the player keep narrative thread. */
   chainMemos?: { text: string; ts: number }[];
+  /** Scenes since the player last fought. Used to enforce a peaceful cooldown
+   *  after combat — gives the player room to wander, dig, search, inspect
+   *  without immediately rolling another encounter. */
+  scenesSinceCombat?: number;
 }
 
 export type ScreenName =

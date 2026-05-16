@@ -645,9 +645,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const location = getLocationById(player.currentLocationId);
     const weather = pickWeather(worldMemory);
     const hazard = pickHazardForLocation(location);
-    // Group encounter first (rare), single-enemy fallback (common), else
-    // peaceful. rollEncounter returns [] when no one shows up.
-    const encounter = rollEncounter(location);
+    // Combat cooldown — after a fight resolves, give the player at least
+    // 2 scenes of peace to dig / search / wander. Skip the encounter roll
+    // entirely during the cooldown window.
+    const peaceCounter = worldMemory.scenesSinceCombat ?? 99;
+    const enforcePeace = peaceCounter < 2;
+    const encounter = enforcePeace ? [] : rollEncounter(location);
     const enemies: Enemy[] = encounter;
     const enemyHps: number[] = enemies.map((e) => e.hp);
     const activeEnemyIdx = 0;
@@ -829,12 +832,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
         .map((h) => ({ kind: h.kind, nouns: h.nouns }));
       get().appendLog('arbiter', buildArbiterRemark({ location, hazard, enemy: sceneEnemy, unresolvedHooks }));
     }
-    set((s) => ({
-      worldMemory: recordTags(
+    set((s) => {
+      const taggedMem = recordTags(
         recordTags(recordTags(s.worldMemory, weather.tags), location.tags),
         hazard?.tags ?? [],
-      ),
-    }));
+      );
+      // Combat cooldown counter — bump every peaceful scene, reset to 0
+      // when combat lands so the next 2 scenes are guaranteed peaceful.
+      const nextSinceCombat = hasEnemies ? 0 : (taggedMem.scenesSinceCombat ?? 0) + 1;
+      return {
+        worldMemory: { ...taggedMem, scenesSinceCombat: nextSinceCombat },
+      };
+    });
     void get().persist();
   },
 
@@ -1157,6 +1166,44 @@ export const useGameStore = create<GameStore>((set, get) => ({
           currentScene.enemies.length > 0
             ? `You drop into a dodging stance. ${activeEnemy(currentScene)?.name ?? 'they'}'s next attack will have to find you.`
             : `You shift your weight, ready to evade. Nothing tests it.`,
+        );
+        break;
+      }
+      case 'block': {
+        // Block stance: stake your equipped weapon on the next enemy
+        // attack. If the block roll lands, damage is halved and there's
+        // a small chance to riposte for 1d4. Weapon takes wear either
+        // way — that's the cost. Ranged weapons (defense 0) can still
+        // attempt but almost never succeed.
+        const equippedMainName = player.equipped?.main ?? player.equipped?.weaponName;
+        const blockWeapon = equippedMainName ? findWeaponByName(equippedMainName) : null;
+        if (!blockWeapon || (blockWeapon.defense ?? 0) <= 0) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter shakes their head. "${blockWeapon?.name ?? 'Bare hands'} is no shield. Try dodging instead."`,
+          );
+          break;
+        }
+        const blocking: StatusEffect = {
+          kind: 'blocking',
+          remainingRounds: 1,
+          label: 'blocking',
+        };
+        set((s) =>
+          s.player
+            ? {
+                player: {
+                  ...s.player,
+                  statusEffects: applyEffect(s.player.statusEffects ?? [], blocking),
+                },
+              }
+            : s,
+        );
+        get().appendLog(
+          'world',
+          currentScene.enemies.length > 0
+            ? `You raise the ${blockWeapon.name} into a block. (defense +${blockWeapon.defense})`
+            : `You take a defensive stance, ${blockWeapon.name} raised. Nothing tests it.`,
         );
         break;
       }
@@ -3490,7 +3537,39 @@ function applyEnemyCounter(
     }
 
     const resisted = applyArmorResistance(rawDmg, enemyDamageType, armorPieces.resistances);
-    const dmg = resisted.damage;
+    let dmg = resisted.damage;
+
+    // BLOCK — the player committed a defensive stance with their weapon.
+    // d20 + weapon.defense vs the enemy's attack total. Success halves
+    // damage and rolls for a riposte (25% chance for 1d4 to the enemy).
+    // Weapon takes 2 durability either way — the cost of attempting.
+    const blockingActive = (player.statusEffects ?? []).some((e) => e.kind === 'blocking');
+    let blockNarration: string | null = null;
+    let riposteDamage = 0;
+    if (blockingActive) {
+      const mainName = player.equipped?.main ?? player.equipped?.weaponName ?? null;
+      const blockWeapon = mainName ? findWeaponByName(mainName) : null;
+      const def = blockWeapon?.defense ?? 0;
+      const blockRoll = rollDie(20);
+      const blockTotal = blockRoll + def;
+      const success = blockTotal >= atkTotal;
+      if (success) {
+        const before = dmg;
+        dmg = Math.max(0, Math.floor(dmg / 2));
+        blockNarration = `Block — d20 → ${blockRoll} + DEF ${def} = ${blockTotal} vs ATK ${atkTotal}. ✓ Damage halved (${before} → ${dmg}).`;
+        if (Math.random() < 0.25) {
+          riposteDamage = rollDie(4);
+        }
+      } else {
+        blockNarration = `Block — d20 → ${blockRoll} + DEF ${def} = ${blockTotal} vs ATK ${atkTotal}. ✗ Beat through.`;
+      }
+      // Weapon wear: 2 points regardless of success.
+      if (mainName) {
+        for (let i = 0; i < 2; i++) {
+          set((s) => (s.player ? { player: wearEquippedItem(s.player, mainName, get) } : s));
+        }
+      }
+    }
 
     // Roll for a status effect to apply based on the damage type.
     const newEffect = rollIncomingStatusEffect(enemyDamageType, player.statusEffects ?? []);
@@ -3522,11 +3601,52 @@ function applyEnemyCounter(
       return { player: { ...nextPlayer, hp: newHp, statusEffects: effects } };
     });
 
+    if (blockNarration) {
+      void Promise.resolve().then(() => get().appendLog('combat', blockNarration!));
+    }
+
     if (newEffect) {
       const verb = newEffect.isNew ? 'inflicts' : 'refreshes';
       void Promise.resolve().then(() =>
         get().appendLog('combat', `The ${enemyDamageType} ${verb} ${newEffect.effect.label}.`),
       );
+    }
+
+    // RIPOSTE — successful block landed a counter-strike. Find the live
+    // enemy index and apply the damage to enemyHps. Death from riposte
+    // resolves normally on the next attack cycle.
+    if (riposteDamage > 0) {
+      const live = get().currentScene;
+      if (live) {
+        const idx = live.enemies.findIndex((e) => e === enemy);
+        if (idx >= 0) {
+          const hpNow = live.enemyHps[idx] ?? enemy.hp;
+          const hpAfter = Math.max(0, hpNow - riposteDamage);
+          set((s) => {
+            if (!s.currentScene) return {};
+            const hps = [...s.currentScene.enemyHps];
+            hps[idx] = hpAfter;
+            return { currentScene: { ...s.currentScene, enemyHps: hps } };
+          });
+          void Promise.resolve().then(() =>
+            get().appendLog('combat', `Riposte! Your block opens a gap — ${enemy.name} takes ${riposteDamage} damage.`),
+          );
+          // If the riposte killed the enemy, resolve their defeat now so
+          // the rest of the group counter-volley doesn't skip them.
+          if (hpAfter <= 0) {
+            void Promise.resolve().then(() => {
+              const scene = get().currentScene;
+              if (!scene) return;
+              const i = scene.enemies.findIndex((e) => e === enemy);
+              if (i < 0) return;
+              // Re-point the active idx to the riposted enemy so
+              // resolveEnemyDefeat splices the right one.
+              set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: i } } : s));
+              get().resolveEnemyDefeat();
+            });
+          }
+        }
+      }
     }
 
     if (killed) {
