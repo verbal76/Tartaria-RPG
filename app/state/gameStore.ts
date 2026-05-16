@@ -245,6 +245,14 @@ function collectSceneNouns(scene: CurrentScene): string[] {
       if (!h.resolved) nouns.push(...h.nouns);
     }
   }
+  // When a vendor is present, the scene has all the trappings of a market
+  // even if the location description doesn't spell it out. Add the obvious
+  // commerce vocabulary so the player can type "search the market" /
+  // "investigate the stall" without getting the soft "I don't see a market
+  // here" refusal. Cheap — 8 strings per vendor-bearing scene.
+  if (scene.vendor) {
+    nouns.push('market', 'stall', 'bazaar', 'shop', 'trader', 'trade', 'wares', 'counter');
+  }
   return nouns;
 }
 
