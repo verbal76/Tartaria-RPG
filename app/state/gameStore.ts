@@ -42,6 +42,7 @@ import {
   shouldArbiterSpeak,
   buildSoftArbiterFallback,
   buildArbiterSceneIntro,
+  USE_RELIC_FAILURE_LINES,
 } from '../engine/narrativeGenerator';
 import { parseInput, type ParseContext } from '../engine/parser';
 import { rollDie, rollFromNotation, pick, chance } from '../engine/rng';
@@ -50,6 +51,8 @@ import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrat
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
 import { buildLlmContext, buildSystemPrompt, type SceneSlice } from '../engine/contextInjector';
+import { getItemPreview } from '../components/itemPreview';
+import { isInventoryQuestion, extractInventoryTarget } from '../engine/askInventory';
 import locationsData from '../data/locations/locations.json';
 import enemiesData from '../data/enemies/enemies.json';
 import conceptsData from '../data/lore/concepts.json';
@@ -1163,7 +1166,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         }
         // 3) Targeted item/noun the parser DID resolve — skill check it.
+        // If the resolved target is one of the player's inventory items, surface
+        // its catalog preview FIRST so the player sees what the item actually
+        // does ("inspect locket" → description + stats), then the skill check
+        // rolls for deeper / hidden insight on top of that flavor.
         if (parsed.resolvedNoun || parsed.resolvedItemId) {
+          const invItem = parsed.resolvedItemId
+            ? player.inventory.find((i) => i.id === parsed.resolvedItemId)
+            : null;
+          if (invItem) {
+            const preview = getItemPreview(invItem.name);
+            const headline = preview.rarity
+              ? `${preview.name} — ${preview.rarity} ${preview.kindLabel}.`
+              : `${preview.name} — ${preview.kindLabel}.`;
+            get().appendLog('world', `You turn the ${invItem.name} in your hands. ${headline}`);
+            if (preview.description && preview.description.toLowerCase() !== 'no record of this item in the catalog.') {
+              get().appendLog('world', preview.description);
+            }
+            if (preview.stats.length > 0) {
+              get().appendLog('world', preview.stats.join(' · '));
+            }
+          }
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
           const steps = buildSkillSteps('investigate', player);
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
@@ -1467,6 +1490,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
           }
           break;
+        }
+        // Inventory question — "is the fungus in my pack", "do i have a
+        // locket", "got any bandages". Matched before the concept lookup so
+        // a real inventory check beats a no-match Aether trivia answer.
+        // Pattern matching + target extraction live in engine/askInventory.ts
+        // so they're testable without the store.
+        if (isInventoryQuestion(trimmed)) {
+          const target = extractInventoryTarget(trimmed);
+          if (target) {
+            const matches = player.inventory.filter(
+              (i) => i.quantity > 0 && i.name.toLowerCase().includes(target),
+            );
+            if (matches.length > 0) {
+              const itemized = matches
+                .map((i) => (i.quantity > 1 ? `${i.name} (x${i.quantity})` : i.name))
+                .join(', ');
+              get().appendLog(
+                'arbiter',
+                `The Arbiter glances at your pack. "Yes — ${itemized}."`,
+              );
+            } else {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter shakes their head. "No ${target} on you."`,
+              );
+            }
+            break;
+          }
         }
         // Otherwise normal concept lookup.
         const concept = findConcept(lookup);
@@ -2009,7 +2060,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
             get().appendLog('world', 'The Aether slips through your focus. The glow flickers and dies.');
             break;
           case 'use_relic':
-            get().appendLog('world', 'The relic stutters. The connection does not hold.');
+            // Frame the failure as the player's fumble, not the relic's
+            // refusal — HANDOFF §5 #5 complaint: "use torch on aetherstone"
+            // failure used to sound like the relic was broken when really
+            // the attempt was a miss. Pool lives in narrativeGenerator so
+            // the test can assert against it.
+            get().appendLog('world', pick(USE_RELIC_FAILURE_LINES));
             break;
           default:
             get().appendLog('world', 'The action fails.');

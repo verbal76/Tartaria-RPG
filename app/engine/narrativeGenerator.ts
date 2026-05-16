@@ -374,6 +374,22 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
 }
 
 /**
+ * Failure narration pool for the `use_relic` skill check. Framed as the
+ * player's fumble — "you tried but it didn't work" — rather than the relic
+ * outright refusing the player. HANDOFF §5 #5 complaint: the old line
+ * "The relic stutters. The connection does not hold." read as a hard
+ * rejection from the device.
+ *
+ * Invariant the test asserts: none of these lines say "fail", "broken",
+ * "refuse", or any other word that frames the relic as the problem.
+ */
+export const USE_RELIC_FAILURE_LINES: readonly string[] = [
+  'You focus on the relic, but the Aether slips through your grasp. The connection wavers and breaks.',
+  'You press the relic harder than it wants. The hum dies under your hand.',
+  'You try to coax the relic to life — it answers only with a thin, faltering pulse, then nothing.',
+];
+
+/**
  * Decides whether the Arbiter should speak this turn. Replaces the previous
  * flat 45% gate (HANDOFF §5 #1: "Arbiter feels disconnected"). The baseline
  * sits at 20% and earns context-aware boosts: combat, unresolved hooks, mood,
