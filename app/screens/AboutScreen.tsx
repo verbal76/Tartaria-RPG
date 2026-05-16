@@ -9,6 +9,7 @@ import { OTA_BUILD_ID } from '../buildInfo';
 import { SimpleSlider } from '../components/SimpleSlider';
 import { getAudioSettings, setAudioSettings, onAudioSettingsChange, type AudioSettings } from '../audio/audioSettings';
 import { forceReapplyAudioFromState } from '../audio/AudioController';
+import { disposeAudio } from '../audio/AudioManager';
 
 export function AboutScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
@@ -70,6 +71,20 @@ export function AboutScreen() {
         const m = persistErr instanceof Error ? persistErr.message : String(persistErr);
         setUpdateError(`Save flush warning: ${m}`);
       }
+
+      // Tear down native resources BEFORE reloadAsync. Both expo-av Sound
+      // objects and the ONNX runtime session can hold native handles that
+      // block the JS bridge from cleanly restarting — that's why
+      // reloadAsync was hanging on a black screen forever. Releasing
+      // these explicitly lets the bridge finish reload.
+      setUpdateStatus('Releasing resources…');
+      try {
+        await disposeAudio();
+      } catch { /* ignore */ }
+      try {
+        await useGameStore.getState().shutdownCognitive();
+      } catch { /* ignore */ }
+
       setUpdateStatus('Restarting to apply…');
       // Await reloadAsync directly + log if it throws. The old fire-and-
       // forget setTimeout swallowed reload errors and gave us no signal
@@ -266,8 +281,9 @@ export function AboutScreen() {
             </View>
             <Text style={styles.updateStatusLine}>{updateStatus}</Text>
             <Text style={styles.updateHint}>
-              Tartaria is replacing its bones. The screen will go dark for a moment as the new
-              bundle loads — give it a few seconds before assuming anything is wrong.
+              Tartaria is replacing its bones. The screen will go dark for ~10 seconds while
+              the new bundle loads. If it stays black past a minute, force-close the app and
+              reopen it — your progress is saved.
             </Text>
           </View>
         </View>
