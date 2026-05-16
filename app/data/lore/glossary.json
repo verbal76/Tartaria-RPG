@@ -141,6 +141,16 @@
       "id": "architects_key",
       "term": "Architect's Key",
       "definition": "A small but powerful Tartarian relic that can unlock ancient Tartarian doors and machines."
+    },
+    {
+      "id": "architectural_sentinels",
+      "term": "Architectural Sentinels",
+      "definition": "Semi-conscious Aetheric-powered machines built by the Tartarian Giants to guard their cities. Many still patrol the buried ruins, learning and adapting across centuries; some have developed quirks from prolonged Aetherstone exposure."
+    },
+    {
+      "id": "aethercraft",
+      "term": "Aethercraft",
+      "definition": "The magic system developed by the True Tartarians during their underground exile. Practitioners draw on Aetherstone to shape earth and stone, construct temporary golems, and mend wounds. Heavy use leaves the caster scarred in body or mind."
     }
   ],
   "factions": [

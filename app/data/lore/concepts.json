@@ -487,6 +487,36 @@
       "keywords": ["tartarian revivalists", "revivalists", "sasha's faction", "ironheart faction"],
       "title": "The Tartarian Revivalists",
       "answer": "Sasha Ironheart's faction. They want Tartaria's Etheric Power back online at full strength, and they will gamble a second Mud Flood to get it. Decentralized cells, single goal, no patience for half-measures. Most other factions call them extremists; the Revivalists call back, 'we are the only ones doing the thing.'"
+    },
+    {
+      "id": "architectural_sentinels",
+      "keywords": ["architectural sentinels", "sentinels", "tartarian sentinels", "ancient guardians", "stone guardians"],
+      "title": "The Architectural Sentinels",
+      "answer": "Semi-conscious machines the Tartarian Giants built to guard their cities. Aetheric-powered, self-repairing, capable of learning. Most still patrol the buried ruins five centuries on — eyes flicker with Aether light when they catch a heat signature. Few intruders survive direct contact. Centuries of exposure to Aetherstone have warped some: a few hesitate, a few are curious. The rest just kill."
+    },
+    {
+      "id": "aethercraft",
+      "keywords": ["aethercraft", "ether craft", "true tartarian magic", "aetherstone magic"],
+      "title": "Aethercraft",
+      "answer": "The magic the True Tartarians developed in their centuries underground. Aethercraft pulls energy from Aetherstone and shapes it — stone bent into walls, mud lifted into golems, wounds knit closed. Each settlement keeps an Aetherforge where the senior practitioners work. Prolonged use scars the body and frays the mind, so the best Aethercrafters are also the most haunted."
+    },
+    {
+      "id": "aether_golem_constructor",
+      "keywords": ["aether golem constructor", "golem constructor", "golem crafting", "build a golem"],
+      "title": "Aether Golem Constructor",
+      "answer": "An Aethercraft discipline — pulling Aetherstone and raw Aetheric energy together into a temporary golem to fight beside you or hold a tunnel mouth. The golem is loyal but unstable; it can collapse mid-swing without warning. Mud Dweller practitioners use them as expendable infantry. Constructing one is a ritual, not a snap of the fingers."
+    },
+    {
+      "id": "aetherstone_manipulation",
+      "keywords": ["aetherstone manipulation", "stone shaping", "earth shaping", "shape the earth"],
+      "title": "Aetherstone Manipulation",
+      "answer": "Aethercraft applied to stone and earth — raise a wall mid-fight, sink a pathway across a flooded chamber, sharpen a chip of Aetherstone into a blade. The effects fade once the practitioner's attention slips, so it's a tool for the moment, not a permanent build. Useful underground, where stone is everything and most fights are short."
+    },
+    {
+      "id": "aetheric_healing",
+      "keywords": ["aetheric healing", "aether healing", "etheric healing", "mend with aether"],
+      "title": "Aetheric Healing",
+      "answer": "The rarest Aethercraft discipline. The practitioner channels Aetherstone energy into a wound and pulls the flesh back together — bone, muscle, skin in whatever order the Aether picks. Costs the healer in mental strain or fresh physical scarring, so most who can do it only do it once or twice a season. Saves lives. Shortens the healer's."
     }
   ]
 }
