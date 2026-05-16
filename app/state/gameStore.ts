@@ -14,6 +14,7 @@ import type {
   PendingRollState,
   InventoryItem,
   CombatRange,
+  Intent,
 } from '../engine/types';
 import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat } from '../engine/worldMemory';
 import {
@@ -48,6 +49,7 @@ import { buildCombatSteps, buildSkillSteps } from '../engine/combatRules';
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import locationsData from '../data/locations/locations.json';
+import enemiesData from '../data/enemies/enemies.json';
 import conceptsData from '../data/lore/concepts.json';
 import {
   listCraftableRecipes,
@@ -67,6 +69,14 @@ import { getEquippedWeapon } from '../engine/combatRules';
 import { pickRandomVendor, type VendorInstance } from '../engine/vendors';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS } from '../engine/equipment';
 import { stampDurability, wearItemByName, repairCost, repairItem } from '../engine/durability';
+import {
+  type Hook,
+  type HookEffect,
+  getHookOutcome,
+  matchHookNoun,
+  pickRandomHookKind,
+  plantHookByKind,
+} from '../engine/hooks';
 import type { EquipSlot } from '../engine/types';
 import {
   WEAPONS,
@@ -87,6 +97,14 @@ import {
   availableFactionQuests,
   fuzzyFindFactionQuest,
 } from '../engine/factionQuests';
+import {
+  HUNTS,
+  findHuntById,
+  availableHunts,
+  fuzzyFindHunt,
+  scaleHuntBoss,
+} from '../engine/hunts';
+import { tickWeather, weatherBlocksRepositioning } from '../engine/weatherEffects';
 import {
   rollIncomingStatusEffect,
   applyEffect,
@@ -135,6 +153,8 @@ interface CurrentScene {
   vendor: VendorInstance | null;
   /** Distance from the player to the enemy. Null when no enemy is present. */
   range: CombatRange | null;
+  /** Live narrative hooks the player can follow into multi-stage chains. */
+  hooks: Hook[];
 }
 
 function collectSceneNouns(scene: CurrentScene): string[] {
@@ -231,6 +251,8 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     hoursElapsed: p.hoursElapsed ?? 0,
     activeFactionQuestIds: p.activeFactionQuestIds ?? [],
     completedFactionQuestIds: p.completedFactionQuestIds ?? [],
+    activeHunts: p.activeHunts ?? [],
+    completedHuntIds: p.completedHuntIds ?? [],
   };
 }
 
@@ -358,6 +380,9 @@ interface GameStore {
   repairWithVendor: (itemName: string) => void;
   acceptFactionQuest: (titleOrId: string) => void;
   turnInFactionQuest: (titleOrId: string) => void;
+  acceptHunt: (titleOrId: string) => void;
+  advanceHunt: (huntId: string) => void;
+  turnInHunt: (titleOrId: string) => void;
   dismissVendor: () => void;
   joinFaction: (factionId: string) => void;
   equipItem: (itemName: string, slot: EquipSlot) => void;
@@ -564,9 +589,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // already swinging. Players have to advance (or be charged) to land
     // melee, retreat to set up ranged shots.
     const range: CombatRange | null = enemy ? 'close' : null;
-    const scene: CurrentScene = { weather, location, hazard, enemy, vendor, range };
+    // Hooks — pending cross-scene chains land first; otherwise no hook is
+    // planted at scene start. Wandering / exploration plants fresh hooks.
+    const initialHooks: Hook[] = [];
+    const pendingChains = worldMemory.pendingChains ?? [];
+    const consumedChainIds: string[] = [];
+    if (pendingChains.length > 0 && !enemy) {
+      // Pick at most one pending chain to land in this scene so the player
+      // gets a clear payoff trail instead of an avalanche.
+      const next = pendingChains[0]!;
+      const h = plantHookByKind(next.kind as Hook['kind'], next.chainId);
+      initialHooks.push(h);
+      consumedChainIds.push(next.chainId);
+    }
+    const scene: CurrentScene = { weather, location, hazard, enemy, vendor, range, hooks: initialHooks };
     set({ currentScene: scene, currentEnemyHp: enemy?.hp ?? null, pendingRolls: null });
+    if (consumedChainIds.length > 0) {
+      set((s) => ({
+        worldMemory: {
+          ...s.worldMemory,
+          pendingChains: (s.worldMemory.pendingChains ?? []).filter((c) => !consumedChainIds.includes(c.chainId)),
+        },
+      }));
+    }
     get().appendLog('world', buildScene({ weather, location, hazard, enemy, quest: player.activeQuests[0] }));
+    // Announce any landed chain-hook so the player knows the thread continued.
+    for (const h of initialHooks) {
+      get().appendLog('world', h.plantedLine);
+    }
     if (vendor) {
       get().appendLog(
         'arbiter',
@@ -598,6 +648,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
             `${vendor.name} looks at you sideways. "You still owe us '${t.title}'. Say 'turn in ${t.title.split(' ').slice(0, 2).join(' ').toLowerCase()}' when you're ready."`,
           );
         }
+        // Hunt board: post one hunt the vendor's faction has available.
+        const huntPool = availableHunts(
+          vendor.faction,
+          getStanding(player.factionStanding, vendor.faction),
+          (player.activeHunts ?? []).map((h) => h.id),
+          player.completedHuntIds ?? [],
+        );
+        if (huntPool.length > 0) {
+          const h = huntPool[0]!;
+          get().appendLog(
+            'arbiter',
+            `${vendor.name} taps a notice on the post. "Bounty up — ${h.title}. ${h.posterText} Say 'accept ${h.title.split(' ').slice(1, 4).join(' ').toLowerCase()}' to take it."`,
+          );
+        }
+        // Active hunt with this faction's agent? Prompt for turn-in.
+        const huntTurnable = (player.activeHunts ?? [])
+          .map((rec) => ({ rec, def: findHuntById(rec.id) }))
+          .filter(({ def }) => def && def.factionId === vendor.faction)
+          .filter(({ rec, def }) => def && rec.stage >= def.stages.length);
+        if (huntTurnable.length > 0) {
+          const ht = huntTurnable[0]!.def!;
+          get().appendLog(
+            'arbiter',
+            `${vendor.name} eyes the trophy on your belt. "You finished ${ht.title}? Turn it in — say 'turn in ${ht.title.split(' ').slice(1, 4).join(' ').toLowerCase()}'."`,
+          );
+        }
       }
     }
     // Arbiter gets two voices on scene entry:
@@ -617,7 +693,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }),
       );
     } else if (shouldArbiterSpeak()) {
-      get().appendLog('arbiter', buildArbiterRemark({ location, hazard, enemy }));
+      const unresolvedHooks = (initialHooks.length > 0 ? initialHooks : [])
+        .filter((h) => !h.resolved)
+        .map((h) => ({ kind: h.kind, nouns: h.nouns }));
+      get().appendLog('arbiter', buildArbiterRemark({ location, hazard, enemy, unresolvedHooks }));
     }
     set((s) => ({
       worldMemory: recordTags(
@@ -673,6 +752,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
+    // Weather pressure — active weather has a chance to chip HP, drain
+    // stamina, or notch corruption on every action. Lore makes weather
+    // hostile in this world; the math reflects that.
+    const wtick = tickWeather(get().currentScene?.weather ?? null, player);
+    if (wtick.line) {
+      let weatherKilled = false;
+      set((s) => {
+        if (!s.player) return {};
+        const newHp = Math.max(0, s.player.hp + wtick.hpDelta);
+        const newStam = Math.max(0, Math.min(s.player.staminaMax, s.player.stamina + wtick.staminaDelta));
+        const newCorr = Math.max(0, s.player.corruption + wtick.corruptionDelta);
+        weatherKilled = newHp <= 0;
+        return { player: { ...s.player, hp: newHp, stamina: newStam, corruption: newCorr } };
+      });
+      get().appendLog('world', wtick.line);
+      if (weatherKilled) {
+        void Promise.resolve().then(() => handlePlayerDeath(get, set));
+        return;
+      }
+    }
+
     // If the scene was lost (e.g. slot restore on an older save before this
     // fix) auto-recover before bailing — silent no-ops on submit are the
     // worst possible UX for a text RPG.
@@ -715,6 +815,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
+    // Hook routing: if the player's target noun (or resolved noun) names an
+    // active hook in this scene, advance that hook's chain instead of
+    // running the generic intent handler. Stealth / investigate / approach /
+    // travel verbs are the most common ways to engage a hook; combat verbs
+    // intentionally pass through to attack.
+    const hookEligible: Intent[] = [
+      'investigate',
+      'stealth',
+      'travel',
+      'use_relic',
+      'cast',
+      'advance',
+      'ask',
+    ];
+    if (hookEligible.includes(parsed.intent) && currentScene.hooks && currentScene.hooks.length > 0) {
+      const targetText = (parsed.resolvedNoun ?? parsed.target ?? trimmed).toLowerCase();
+      const hook = matchHookNoun(targetText, currentScene.hooks);
+      if (hook && !hook.resolved) {
+        // Small stamina cost for engaging a hook (same as a skill check).
+        set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+        resolveHookOneStep(hook, get, set);
+        void get().persist();
+        return;
+      }
+    }
+
     switch (parsed.intent) {
       case 'attack': {
         if (currentScene.enemy) {
@@ -752,7 +878,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         // 3) Generic look-around — no roll, atmospheric narration with optional hook.
-        narrateCasualLook(get, currentScene);
+        narrateCasualLook(get, set, currentScene);
         break;
       }
       case 'stealth':
@@ -812,7 +938,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().travelTo(candidate.id);
         } else {
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.wander), 1) });
-          narrateWanderingJourney(get, currentScene);
+          narrateWanderingJourney(get, set, currentScene);
         }
         break;
       }
@@ -855,6 +981,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // isn't an enemy in the scene.
         if (!currentScene.enemy) {
           get().appendLog('arbiter', `The Arbiter shrugs. "Nothing to advance on. The ground here is quiet."`);
+          break;
+        }
+        // Iron fog / silent blizzard block sense of direction — no repositioning.
+        if (weatherBlocksRepositioning(currentScene.weather)) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter holds up a hand. "${currentScene.weather.name} has taken the ground from you. You cannot reposition."`,
+          );
           break;
         }
         const order: CombatRange[] = ['arm', 'close', 'far'];
@@ -969,7 +1103,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog('arbiter', `The Arbiter raises a brow. "Accept what? Ask the agent what is on offer."`);
           break;
         }
-        get().acceptFactionQuest(target);
+        // Prefer hunt match if the word "hunt" / "bounty" appears or a hunt
+        // title matches; otherwise route to faction quest.
+        const lower = target.toLowerCase();
+        const huntHint = /hunt|bounty|titan|dragon|behemoth|chimera|wyvern|monarch|siren|queen/.test(lower);
+        if (huntHint && fuzzyFindHunt(target, HUNTS)) {
+          get().acceptHunt(target);
+        } else {
+          get().acceptFactionQuest(target);
+        }
         break;
       }
       case 'turn_in': {
@@ -981,7 +1123,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
-        get().turnInFactionQuest(target);
+        const lower = target.toLowerCase();
+        const huntHint = /hunt|bounty|titan|dragon|behemoth|chimera|wyvern|monarch|siren|queen|trophy/.test(lower);
+        if (huntHint && fuzzyFindHunt(target, HUNTS)) {
+          get().turnInHunt(target);
+        } else {
+          get().turnInFactionQuest(target);
+        }
         break;
       }
       case 'gift': {
@@ -1100,6 +1248,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         .gameLog.filter((e) => e.channel === 'player')
         .slice(-3)
         .map((e) => e.text);
+      const unresolvedHooks = (currentScene.hooks ?? [])
+        .filter((h) => !h.resolved)
+        .map((h) => ({ kind: h.kind, nouns: h.nouns }));
       get().appendLog(
         'arbiter',
         buildArbiterRemark({
@@ -1109,6 +1260,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           intent: parsed.intent,
           mood,
           recentActions,
+          unresolvedHooks,
         }),
       );
     }
@@ -1195,6 +1347,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (skill) {
       const { intent } = parseInput(actionText);
       if (skill.success) {
+        // Hunt advancement: if the player has an active hunt whose next
+        // stage expects this skill intent, advance one stage of the hunt.
+        const huntMatch = (player.activeHunts ?? [])
+          .map((rec) => ({ rec, def: findHuntById(rec.id) }))
+          .find(({ rec, def }) => {
+            if (!def) return false;
+            const next = def.stages[rec.stage];
+            if (!next) return false;
+            // Map intents to the hunt's expected check kinds. Any of these
+            // intent matches advances the hunt one beat.
+            return (
+              (next.checkKind === 'investigate' && intent === 'investigate') ||
+              (next.checkKind === 'stealth' && intent === 'stealth') ||
+              (next.checkKind === 'diplomacy' && intent === 'diplomacy') ||
+              (next.checkKind === 'escape' && intent === 'escape') ||
+              (next.checkKind === 'cast' && intent === 'cast') ||
+              (next.checkKind === 'attack_provoke' && intent === 'attack') ||
+              (next.checkKind === 'boss' && intent === 'attack')
+            );
+          });
+        if (huntMatch) {
+          void Promise.resolve().then(() => get().advanceHunt(huntMatch.rec.id));
+        }
+
         // Skill-check milestone: every 10 successful checks → +1 to the stat
         // the check used. Tracked across the character's lifetime.
         const prevMs = player.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 };
@@ -1407,6 +1583,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { currentScene, player, worldMemory } = get();
     if (!currentScene?.enemy || !player) return;
     const enemy = currentScene.enemy;
+    // Hunt-boss kill: if the slain enemy's name matches a target of an
+    // active hunt currently at its boss stage, advance the hunt one more
+    // beat (past the boss stage) so the player can turn it in.
+    const matchingHunt = (player.activeHunts ?? [])
+      .map((rec) => ({ rec, def: findHuntById(rec.id) }))
+      .find(({ rec, def }) => {
+        if (!def) return false;
+        // Boss enemy names are tagged " (hunted)" by scaleHuntBoss.
+        return enemy.name === `${def.targetEnemyName} (hunted)` && rec.stage > 0;
+      });
+    if (matchingHunt && matchingHunt.def) {
+      set((s) =>
+        s.player
+          ? {
+              player: {
+                ...s.player,
+                activeHunts: (s.player.activeHunts ?? []).map((h) =>
+                  h.id === matchingHunt.rec.id ? { ...h, stage: matchingHunt.def!.stages.length } : h,
+                ),
+              },
+            }
+          : s,
+      );
+      get().appendLog(
+        'reward',
+        `✦ ${matchingHunt.def.targetEnemyName} slain. Return to a posting agent to turn in "${matchingHunt.def.title}" for the bounty.`,
+      );
+    }
     const loot = enemy.loot[Math.floor(Math.random() * enemy.loot.length)] ?? 'Aether dust';
     get().appendLog('reward', `${enemy.name} defeated. You recover ${loot}.`);
 
@@ -1418,7 +1622,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const newHp = hitMilestone ? player.hp + 1 : player.hp;
 
     set({
-      currentScene: { ...currentScene, enemy: null, range: null },
+      currentScene: { ...currentScene, enemy: null, range: null, hooks: currentScene.hooks ?? [] },
       worldMemory: recordEnemyDefeat(worldMemory, enemy.name),
       player: {
         ...player,
@@ -1866,6 +2070,204 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
+  acceptHunt(titleOrId) {
+    const state = get();
+    const player = state.player;
+    const scene = state.currentScene;
+    if (!player) return;
+    if (!scene?.vendor) {
+      get().appendLog('arbiter', `The Arbiter shakes their head. "Hunts come from people. Find someone first."`);
+      return;
+    }
+    const factionId = scene.vendor.faction;
+    const playerRep = factionId ? getStanding(player.factionStanding, factionId) : 0;
+    const direct = findHuntById(titleOrId);
+    const pool = availableHunts(
+      factionId,
+      playerRep,
+      (player.activeHunts ?? []).map((h) => h.id),
+      player.completedHuntIds ?? [],
+    );
+    const hunt = direct && pool.includes(direct) ? direct : fuzzyFindHunt(titleOrId, pool);
+    if (!hunt) {
+      const titles = pool.map((h) => `"${h.title}"`).join(', ');
+      get().appendLog(
+        'arbiter',
+        titles
+          ? `${scene.vendor.name} thumbs through papers. "Not that one. Currently posted: ${titles}."`
+          : `${scene.vendor.name} shakes their head. "No bounties for you right now."`,
+      );
+      return;
+    }
+    set((s) =>
+      s.player
+        ? {
+            player: {
+              ...s.player,
+              activeHunts: [
+                ...(s.player.activeHunts ?? []),
+                { id: hunt.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now() },
+              ],
+            },
+          }
+        : s,
+    );
+    // Play the first stage immediately so the player has narrative momentum.
+    const stage0 = hunt.stages[0];
+    if (stage0) {
+      get().appendLog('reward', `✦ Hunt accepted — ${hunt.title}. ${hunt.posterText}`);
+      get().appendLog('world', stage0.narration);
+      if (stage0.arbiter) get().appendLog('arbiter', stage0.arbiter);
+    }
+    set((s) =>
+      s.player
+        ? {
+            player: {
+              ...s.player,
+              activeHunts: (s.player.activeHunts ?? []).map((h) =>
+                h.id === hunt.id ? { ...h, stage: 1 } : h,
+              ),
+            },
+          }
+        : s,
+    );
+    void get().persist();
+  },
+
+  // Advance the player's most relevant active hunt one stage. Called by
+  // skill-check successes when the player's intent matches the next stage's
+  // expected check kind. Final stage spawns the scaled boss into the scene.
+  advanceHunt(huntId) {
+    const state = get();
+    const player = state.player;
+    if (!player) return;
+    const active = player.activeHunts ?? [];
+    const record = active.find((h) => h.id === huntId);
+    const hunt = findHuntById(huntId);
+    if (!record || !hunt) return;
+    const stageDef = hunt.stages[record.stage];
+    if (!stageDef) return;
+    get().appendLog('world', stageDef.narration);
+    if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
+    // Boss stage spawns the scaled enemy and freezes the hunt at this stage
+    // until the boss dies; otherwise advance the stage counter.
+    if (stageDef.checkKind === 'boss') {
+      const boss = scaleHuntBoss(player, hunt);
+      if (boss) {
+        set((s) =>
+          s.currentScene
+            ? {
+                currentScene: { ...s.currentScene, enemy: boss, range: 'close' },
+                currentEnemyHp: boss.hp,
+              }
+            : s,
+        );
+        get().appendLog('combat', `${boss.name} closes the distance. The hunt comes to its end.`);
+      }
+    }
+    set((s) =>
+      s.player
+        ? {
+            player: {
+              ...s.player,
+              activeHunts: (s.player.activeHunts ?? []).map((h) =>
+                h.id === huntId ? { ...h, stage: h.stage + 1 } : h,
+              ),
+            },
+          }
+        : s,
+    );
+    void get().persist();
+  },
+
+  turnInHunt(titleOrId) {
+    const state = get();
+    const player = state.player;
+    const scene = state.currentScene;
+    if (!player) return;
+    if (!scene?.vendor) {
+      get().appendLog('arbiter', `The Arbiter folds their arms. "Need someone to pay you. Find a vendor."`);
+      return;
+    }
+    const active = player.activeHunts ?? [];
+    const direct = findHuntById(titleOrId);
+    const candidate = direct ?? fuzzyFindHunt(
+      titleOrId,
+      active.map((r) => findHuntById(r.id)).filter((h): h is NonNullable<typeof h> => !!h),
+    );
+    if (!candidate) {
+      get().appendLog('arbiter', `${scene.vendor.name} squints. "That hunt is not on your slate."`);
+      return;
+    }
+    const record = active.find((h) => h.id === candidate.id);
+    if (!record) {
+      get().appendLog('arbiter', `${scene.vendor.name} squints. "That hunt is not on your slate."`);
+      return;
+    }
+    if (record.stage < candidate.stages.length) {
+      get().appendLog(
+        'arbiter',
+        `${scene.vendor.name} reads your face. "The trophy is the proof. You don't have it yet."`,
+      );
+      return;
+    }
+    if (candidate.factionId && candidate.factionId !== scene.vendor.faction) {
+      get().appendLog(
+        'arbiter',
+        `${scene.vendor.name} shakes their head. "Wrong agent. ${candidate.factionId.replace(/_/g, ' ')} posted that one."`,
+      );
+      return;
+    }
+    // Pay out: TC + optional item + optional rep + always the trophy.
+    const trophy: InventoryItem = stampDurability({
+      id: `trophy_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      name: candidate.trophyName,
+      kind: 'relic',
+      rarity: 'Rare',
+      quantity: 1,
+      tags: ['trophy', 'hunt'],
+      description: `Trophy from the hunt for the ${candidate.targetEnemyName}.`,
+    });
+    const newInventory = candidate.rewardItem
+      ? [...player.inventory, trophy, stampDurability({
+          id: `huntreward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          name: candidate.rewardItem,
+          kind: lookupCraftedItem(candidate.rewardItem).kind === 'weapon' ? 'weapon' : 'misc',
+          rarity: lookupCraftedItem(candidate.rewardItem).rarity,
+          quantity: 1,
+          tags: lookupCraftedItem(candidate.rewardItem).tags,
+        })]
+      : [...player.inventory, trophy];
+    const repResult = candidate.factionId && candidate.rewardRep
+      ? applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep)
+      : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
+    set((s) =>
+      s.player
+        ? {
+            player: {
+              ...s.player,
+              tc: s.player.tc + candidate.rewardTc,
+              inventory: newInventory,
+              factionStanding: repResult.standing,
+              activeHunts: (s.player.activeHunts ?? []).filter((h) => h.id !== candidate.id),
+              completedHuntIds: [...(s.player.completedHuntIds ?? []), candidate.id],
+            },
+          }
+        : s,
+    );
+    get().appendLog(
+      'reward',
+      `✦ Hunt complete — ${candidate.title}. +${candidate.rewardTc} TC${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy recovered.`,
+    );
+    if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
+    recordMemorableEvent(get, set, {
+      kind: 'rare_kill',
+      text: `Completed the hunt for the ${candidate.targetEnemyName}.`,
+      enemyName: candidate.targetEnemyName,
+    });
+    void get().persist();
+  },
+
   equipItem(itemName, slot) {
     const state = get();
     const player = state.player;
@@ -2023,6 +2425,149 @@ const RANGE_LABEL: Record<CombatRange, string> = {
   close: 'close',
   far: 'far',
 };
+
+// Apply a single HookEffect to player + world state. Returns true if the
+// effect caused a fatal HP drop so the caller can stage the death handler.
+function applyHookEffect(
+  effect: HookEffect,
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): boolean {
+  switch (effect.type) {
+    case 'grant_tc': {
+      const amt = effect.amount;
+      set((s) => (s.player ? { player: { ...s.player, tc: Math.max(0, s.player.tc + amt) } } : s));
+      get().appendLog('reward', amt >= 0 ? `+${amt} TC.` : `${amt} TC.`);
+      return false;
+    }
+    case 'grant_item': {
+      const catEntry = lookupCraftedItem(effect.name);
+      const item: InventoryItem = stampDurability({
+        id: `hook_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        name: effect.name,
+        kind: catEntry.kind === 'weapon' ? 'weapon' : catEntry.kind === 'armor' ? 'armor' : catEntry.kind,
+        rarity: catEntry.rarity,
+        quantity: 1,
+        tags: catEntry.tags,
+      });
+      set((s) => (s.player ? { player: { ...s.player, inventory: [...s.player.inventory, item] } } : s));
+      get().appendLog('reward', `Recovered ${effect.name}.`);
+      return false;
+    }
+    case 'heal': {
+      const amt = effect.amount;
+      set((s) =>
+        s.player
+          ? { player: { ...s.player, hp: Math.min(s.player.hpMax, s.player.hp + amt) } }
+          : s,
+      );
+      get().appendLog('reward', `You feel restored. +${amt} HP.`);
+      return false;
+    }
+    case 'damage': {
+      const amt = effect.amount;
+      let killed = false;
+      set((s) => {
+        if (!s.player) return {};
+        const newHp = Math.max(0, s.player.hp - amt);
+        killed = newHp <= 0;
+        return { player: { ...s.player, hp: newHp } };
+      });
+      get().appendLog('combat', `You take ${amt} damage from ${effect.cause}.`);
+      return killed;
+    }
+    case 'advance_time': {
+      set((s) => (s.player ? { player: advanceTime(s.player, effect.hours) } : s));
+      return false;
+    }
+    case 'rep_change': {
+      const player = get().player;
+      if (!player) return false;
+      const result = applyRepChange(player.factionStanding, effect.factionId, effect.amount);
+      set((s) => (s.player ? { player: { ...s.player, factionStanding: result.standing } } : s));
+      logRepChanges(get, result.changed);
+      return false;
+    }
+    case 'spawn_enemy_tag': {
+      // Spawn an enemy whose `type` matches the requested tag at this scene.
+      // Falls back gracefully if no matching enemy exists for the location.
+      const tag = effect.tag;
+      const candidates = (enemiesData as Enemy[]).filter((e) => e.type === tag);
+      const spawn = candidates.length > 0
+        ? candidates[Math.floor(Math.random() * candidates.length)]!
+        : pickEnemyForLocation(get().currentScene?.location ?? getLocationById('tartarian_outskirts'));
+      if (!spawn) return false;
+      set((s) =>
+        s.currentScene
+          ? { currentScene: { ...s.currentScene, enemy: spawn, range: 'close' }, currentEnemyHp: spawn.hp }
+          : s,
+      );
+      get().appendLog('combat', `${spawn.name} emerges from the hook. Combat begins at close range.`);
+      return false;
+    }
+    case 'unlock_location': {
+      set((s) => ({
+        worldMemory: {
+          ...s.worldMemory,
+          discoveredLocationIds: Array.from(new Set([...(s.worldMemory.discoveredLocationIds ?? []), effect.locationId])),
+        },
+      }));
+      get().appendLog('reward', `New location uncovered.`);
+      return false;
+    }
+    case 'memo': {
+      set((s) => ({
+        worldMemory: {
+          ...s.worldMemory,
+          chainMemos: [...(s.worldMemory.chainMemos ?? []), { text: effect.text, ts: Date.now() }].slice(-12),
+        },
+      }));
+      return false;
+    }
+  }
+}
+
+// Resolve a hook one stage forward. Plays the line, applies effects, marks
+// resolved if done, queues any next-chain plant in worldMemory.
+function resolveHookOneStep(
+  hook: Hook,
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const outcome = getHookOutcome(hook.kind, hook.stage);
+  if (!outcome) return;
+  get().appendLog('world', outcome.line);
+  if (outcome.arbiterLine) get().appendLog('arbiter', outcome.arbiterLine);
+  let fatal = false;
+  for (const eff of outcome.effects) {
+    if (applyHookEffect(eff, get, set)) fatal = true;
+  }
+  // Advance hook stage / mark resolved.
+  set((s) => {
+    if (!s.currentScene) return {};
+    const nextHooks = (s.currentScene.hooks ?? []).map((h) =>
+      h.id === hook.id
+        ? { ...h, stage: h.stage + 1, resolved: outcome.done }
+        : h,
+    );
+    return { currentScene: { ...s.currentScene, hooks: nextHooks } };
+  });
+  // Queue any next-chain hook to plant on the next scene.
+  if (outcome.nextChain) {
+    set((s) => ({
+      worldMemory: {
+        ...s.worldMemory,
+        pendingChains: [
+          ...(s.worldMemory.pendingChains ?? []),
+          { kind: outcome.nextChain!.kind, chainId: outcome.nextChain!.chainId },
+        ],
+      },
+    }));
+  }
+  if (fatal) {
+    void Promise.resolve().then(() => handlePlayerDeath(get, set));
+  }
+}
 
 // Whether an enemy can still strike the player at the given range.
 // Lore: melee = arm's reach, ranged = close + far, runecasters mostly close
@@ -2260,16 +2805,40 @@ function handlePlayerDeath(
 // challenge that warrants a check.
 // ---------------------------------------------------------------------------
 
-function narrateCasualLook(get: () => GameStore, _scene: CurrentScene): void {
+function narrateCasualLook(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  scene: CurrentScene,
+): void {
   const baseLine = pick(CASUAL_LOOK_LINES);
-  const hook = chance(30) ? pick(CASUAL_LOOK_HOOKS) : null;
-  get().appendLog('world', hook ? `${baseLine}  ${hook}` : baseLine);
+  // 30% chance to plant a typed hook on a casual look, unless one is already
+  // active in this scene (don't drown the player in threads).
+  const activeUnresolved = (scene.hooks ?? []).some((h) => !h.resolved);
+  if (!activeUnresolved && chance(30)) {
+    const hook = plantHookByKind(pickRandomHookKind());
+    set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } } : s));
+    get().appendLog('world', `${baseLine}  ${hook.plantedLine}`);
+    return;
+  }
+  get().appendLog('world', baseLine);
 }
 
-function narrateWanderingJourney(get: () => GameStore, _scene: CurrentScene): void {
+function narrateWanderingJourney(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  scene: CurrentScene,
+): void {
   const lead = pick(WANDERING_LEADS);
-  const sighting = pick(FEATURE_SIGHTINGS);
-  get().appendLog('world', `${lead}  ${sighting}`);
+  // Wandering always plants a hook — it's the player asking the world to
+  // show them something. Skip if one is already active so we don't pile up.
+  const activeUnresolved = (scene.hooks ?? []).some((h) => !h.resolved);
+  if (activeUnresolved) {
+    get().appendLog('world', `${lead}  The thread you were following waits where you left it.`);
+    return;
+  }
+  const hook = plantHookByKind(pickRandomHookKind());
+  set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } } : s));
+  get().appendLog('world', `${lead}  ${hook.plantedLine}`);
 }
 
 function narratePossibleDirections(get: () => GameStore, scene: CurrentScene): void {

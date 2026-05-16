@@ -259,6 +259,12 @@ export interface ArbiterContext {
    * occasionally reference the most recent one in passing.
    */
   recentActions?: string[];
+  /**
+   * Unresolved narrative hooks in the current scene. When present, the
+   * Arbiter has a chance to reference the thread instead of pulling a
+   * random mood line — this is what makes the world feel coherent.
+   */
+  unresolvedHooks?: { kind: string; nouns: string[] }[];
 }
 
 function pickMoodPool(mood: string | undefined): string[] | undefined {
@@ -311,6 +317,21 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
     if (r < 0.8 && intentAttack && intentAttack.length > 0) return pick(intentAttack);
     if (aggressionPool) return pick(aggressionPool).replace('this place', ctx.location.name);
     return combatRemark(ctx.enemy!);
+  }
+
+  // ~40% chance to reference an unresolved narrative hook in this scene —
+  // this is the one that ties the world together. The player saw smoke /
+  // footprints / a spire on their last action; the Arbiter calls back to it.
+  if (ctx.unresolvedHooks && ctx.unresolvedHooks.length > 0 && Math.random() < 0.4) {
+    const hook = ctx.unresolvedHooks[0]!;
+    const noun = hook.nouns[0] ?? hook.kind;
+    const callbacks = [
+      `"The ${noun} hasn't gone anywhere," the Arbiter says. "Decide if it matters."`,
+      `"You saw the ${noun}," the Arbiter notes. "That memory will rot if you leave it."`,
+      `"Threads in Tartaria don't wait long," the Arbiter says quietly. "The ${noun} won't either."`,
+      `The Arbiter glances toward the ${noun}. "That is still there. Still yours, if you take it."`,
+    ];
+    return pick(callbacks);
   }
 
   // ~15% chance to acknowledge the player's most recent action, wrapped in

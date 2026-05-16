@@ -1,0 +1,116 @@
+{
+  "hunts": [
+    {
+      "id": "hunt_bog_dragon",
+      "title": "The Bog Dragon of Old Drakova",
+      "posterText": "Drakovan reeve seeks proof of death — a long-shadow has been seen over the Mud Seas at dawn. Wing-mark longer than a barn. 800 TC on confirmed kill.",
+      "targetEnemyName": "Bog Dragon",
+      "biomeTag": "mud_seas",
+      "minRep": 0,
+      "factionId": null,
+      "rewardTc": 800,
+      "rewardItem": "Aetheric Cloth",
+      "rewardRep": null,
+      "trophyName": "Bog Dragon Scale",
+      "stages": [
+        { "narration": "You take the Drakovan poster down off the post. The reeve confirms the bounty over a low cup of mud-beer: \"Wing-mark over the marsh, two dawns running. Bring me a scale or do not come back.\"", "arbiter": "\"Posters in this country mean someone is desperate or someone has died,\" the Arbiter says. \"Read the room before you sign.\"", "checkKind": null },
+        { "narration": "Out on the silt flats you find the first sign — a crater of broken Aetherstone, scoured clean by something that did not land lightly.", "arbiter": null, "checkKind": "investigate" },
+        { "narration": "A goat-herder's daughter saw it pass over twice. She points east, toward where the cathedral steeple breaks the water. \"It roosts there now,\" she says. \"My uncle would not go close.\"", "arbiter": null, "checkKind": "diplomacy" },
+        { "narration": "You creep around the flooded approach. Bones in the silt — Reclaimer kit, mostly. The dragon has been feeding here for a while.", "arbiter": "\"It chose this place because the water hides its weight,\" the Arbiter says.", "checkKind": "stealth" },
+        { "narration": "The dragon stirs. You loose an arrow at its flank and it screams once before vanishing into the mist — wounded, furious, and now hunting back.", "arbiter": null, "checkKind": "attack_provoke" },
+        { "narration": "You back-track to higher ground. The herder's daughter has set out the offering she promised — fresh meat and a torch — to draw it down to the open.", "arbiter": null, "checkKind": null },
+        { "narration": "It comes for the offering. Now or never.", "arbiter": "\"Whatever you do, do not let it get airborne again,\" the Arbiter says.", "checkKind": "boss" }
+      ]
+    },
+    {
+      "id": "hunt_mud_titan",
+      "title": "The Mud Titan of the Endless Stair",
+      "posterText": "True Tartarian agent in the Outskirts wants a Mud Titan put down. It is collapsing the descent to a buried capital. 600 TC and reputation with the enclave.",
+      "targetEnemyName": "Mud Titan",
+      "biomeTag": "buried_capital",
+      "minRep": 0,
+      "factionId": "true_tartarians",
+      "rewardTc": 600,
+      "rewardItem": "Hardened Mudstone",
+      "rewardRep": 10,
+      "trophyName": "Titan Core",
+      "stages": [
+        { "narration": "The True Tartarian agent meets you in a back alley. \"Endless Stair. Halfway down, a Titan has come awake. Every shake pushes more mud into the descent. Our work cannot continue.\"", "arbiter": "\"They never ask quietly,\" the Arbiter says. \"They ask only when it is bad.\"", "checkKind": null },
+        { "narration": "You reach the top of the Stair. The first hundred steps are sound. Then a tremor — the railing across from you crumbles into nothing. The Titan is below, and it is moving.", "arbiter": null, "checkKind": null },
+        { "narration": "You descend cautiously. Aetherstone dust comes off every wall. Six landings down, you find a Tartarian Sentinel — long dead, but with its core still loaded.", "arbiter": "\"Sentinels were built to fight what was here before us,\" the Arbiter says. \"Their old loads may still recognise the Titan as enemy.\"", "checkKind": "investigate" },
+        { "narration": "You rig the Sentinel's core to a tripwire near a chokepoint. Bait laid.", "arbiter": null, "checkKind": "cast" },
+        { "narration": "Tremor below. You see the Titan now — a hulk of moving mudstone, its shoulders scraping both walls. It is heading up.", "arbiter": null, "checkKind": null },
+        { "narration": "The tripwire fires. The Sentinel core detonates against the Titan's chest. It staggers — wounded, but unkilled, and now it sees you.", "arbiter": null, "checkKind": "attack_provoke" },
+        { "narration": "The Titan charges up the steps. The wall behind you collapses, cutting off retreat. There is no second chance here.", "arbiter": "\"Finish it. Tartaria does not want a witness left,\" the Arbiter says.", "checkKind": "boss" }
+      ]
+    },
+    {
+      "id": "hunt_sludge_behemoth",
+      "title": "The Sludge Behemoth at the Cradle of Dusk",
+      "posterText": "Reclaimers Guild Speaker offers 500 TC for the head of a Behemoth that has begun crushing dive-camps near the Cradle. No fewer than four crews missing in a fortnight.",
+      "targetEnemyName": "Sludge Behemoth",
+      "biomeTag": "mud_seas",
+      "minRep": 0,
+      "factionId": "reclaimers_guild",
+      "rewardTc": 500,
+      "rewardItem": "Mud Gem",
+      "rewardRep": 8,
+      "trophyName": "Behemoth Horn",
+      "stages": [
+        { "narration": "The Speaker reads the contract aloud. \"Four crews. Eleven Reclaimers. The Behemoth has decided our dive-points are its feeding ground. End it.\"", "arbiter": null, "checkKind": null },
+        { "narration": "The first camp is a crater. Tarpaulins ripped, equipment crushed flat. The Behemoth came up from beneath.", "arbiter": "\"It is using the silt as cover,\" the Arbiter says. \"Watch the ground, not the horizon.\"", "checkKind": "investigate" },
+        { "narration": "You set out for the second dive-point. Halfway there, the silt under your feet shifts wrong. You dive aside. The Behemoth's claw passes a hand's width from your shoulder.", "arbiter": null, "checkKind": "escape" },
+        { "narration": "The Behemoth retreats — too smart to fight on hard ground. You follow its mud-trail toward the Cradle of Dusk proper.", "arbiter": null, "checkKind": "stealth" },
+        { "narration": "Inside the Cradle, ships frozen in glass watch from every side. The Behemoth has dug itself a den between two of them. The Aetheric haze here is thick — your torch will not light.", "arbiter": "\"This place keeps what it takes,\" the Arbiter says. \"Including the Behemoth, if you fail.\"", "checkKind": "investigate" },
+        { "narration": "You bait the den. A signal flare into the silt at the entrance. The Behemoth emerges.", "arbiter": null, "checkKind": "attack_provoke" },
+        { "narration": "It is wounded but not down. It backs toward open water — if it submerges, you lose it forever.", "arbiter": null, "checkKind": null },
+        { "narration": "You cut the Behemoth off at the shallows. Hold ground. Finish it.", "arbiter": "\"Eleven Reclaimers,\" the Arbiter says. \"This is the bill.\"", "checkKind": "boss" }
+      ]
+    },
+    {
+      "id": "hunt_iron_titan",
+      "title": "The Iron Titan in the Sentinel Ward",
+      "posterText": "Forgotten Order requests the deactivation of an Iron Titan still patrolling a Sentinel Ward. Order scholars cannot enter their target archive. 1000 TC. Order standing.",
+      "targetEnemyName": "Iron Titan",
+      "biomeTag": "sentinel_ward",
+      "minRep": 5,
+      "factionId": "forgotten_order",
+      "rewardTc": 1000,
+      "rewardItem": "Aether Shard",
+      "rewardRep": 15,
+      "trophyName": "Titan Armor Plate",
+      "stages": [
+        { "narration": "Vesryn of Varakush meets you in the back of the Order safe-house. \"The Iron Titan in the south Ward has not deviated from its patrol in two hundred years. We need it deactivated for a single night. Bring me its core.\"", "arbiter": "\"Two hundred years is a long time to compile grudges,\" the Arbiter says.", "checkKind": null },
+        { "narration": "You map the Titan's patrol arc from a safe distance. Twelve-hour loop, precise to the second. Three blind spots, none long enough.", "arbiter": null, "checkKind": "investigate" },
+        { "narration": "An Order scholar gives you a partial override key — Tartarian make, old and unreliable. \"It will give you maybe sixty seconds of confusion. Use them.\"", "arbiter": null, "checkKind": null },
+        { "narration": "You creep into the Ward. The air is dense with Aetheric resonance — every step the Titan takes vibrates the floor under your boots.", "arbiter": "\"Move only when it moves,\" the Arbiter says quietly.", "checkKind": "stealth" },
+        { "narration": "You wedge into a service alcove as the Titan passes — close enough to touch. You can hear the Aetheric core under its plate cycling.", "arbiter": null, "checkKind": "stealth" },
+        { "narration": "You burn the override. The Titan stutters for fifty-eight seconds. You move.", "arbiter": null, "checkKind": "cast" },
+        { "narration": "Mid-strike, the override fails earlier than promised. The Titan turns, sees you, and the Ward seals itself shut behind it.", "arbiter": null, "checkKind": "attack_provoke" },
+        { "narration": "No retreat. The Titan calls for backup that will not arrive in time. You have to end it before it ends you.", "arbiter": "\"This is what Reclaimers die doing,\" the Arbiter says. \"Be better than that.\"", "checkKind": "boss" }
+      ]
+    },
+    {
+      "id": "hunt_mud_siren_queen",
+      "title": "The Siren Queen of Zharak's Teeth",
+      "posterText": "Drifters and Reclaimers alike have lost crews to the spires of Zharak's Teeth — a Mud Siren Queen leads the song. Anyone who silences her can keep what they salvage. 700 TC posted by a wandering drifter.",
+      "targetEnemyName": "Mud Siren Queen",
+      "biomeTag": "mud_seas",
+      "minRep": 0,
+      "factionId": null,
+      "rewardTc": 700,
+      "rewardItem": "Aetheric Song",
+      "rewardRep": null,
+      "trophyName": "Siren Crystal",
+      "stages": [
+        { "narration": "Naha hands you the poster at the wandering camp. \"Drifter put this up,\" she says. \"He won't say which crew was his. Don't ask.\"", "arbiter": null, "checkKind": null },
+        { "narration": "Zharak's Teeth crest the water like broken jaws. Even from the shore you hear the singing — pitched too low for any human throat.", "arbiter": "\"Stuff your ears, and stuff them well,\" the Arbiter says. \"That song has killed cleverer than you.\"", "checkKind": null },
+        { "narration": "You wade in past the first spire. Drowned figures stand in the water around its base, perfectly still — Sirens, sleeping or watching, you cannot tell which.", "arbiter": null, "checkKind": "stealth" },
+        { "narration": "The song shifts pitch. The standing Sirens turn their heads — not toward you. Toward something deeper. The Queen has noticed.", "arbiter": null, "checkKind": "escape" },
+        { "narration": "You find her between the two largest spires, seated on a throne of mud-glass. She is singing softly, almost lovingly, to the wreckage of the last crew that came here.", "arbiter": null, "checkKind": "investigate" },
+        { "narration": "She breaks the song to address you. \"You should not have come,\" she says, voice low and warm and utterly without anger. \"But since you have — sing, or die quiet.\"", "arbiter": "\"She means it,\" the Arbiter says. \"And neither option works in your favour.\"", "checkKind": "diplomacy" },
+        { "narration": "Diplomacy bought you ten seconds. The Queen rises. The standing Sirens turn now — all of them, all toward you.", "arbiter": null, "checkKind": "boss" }
+      ]
+    }
+  ]
+}

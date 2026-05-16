@@ -293,6 +293,10 @@ export interface PlayerCharacter {
   activeFactionQuestIds?: string[];
   /** IDs of faction quests the player has turned in. */
   completedFactionQuestIds?: string[];
+  /** Active monster hunts with per-stage progress. */
+  activeHunts?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number }[];
+  /** IDs of hunts that have been turned in. */
+  completedHuntIds?: string[];
 }
 
 export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive';
@@ -347,6 +351,12 @@ export interface WorldMemory {
   defeatedEnemies: string[];
   completedQuestIds: string[];
   memorableEvents?: MemorableEvent[];
+  /** Active multi-scene hook chains — a hook resolution may queue a follow-up
+   *  hook kind to plant in a future wander. */
+  pendingChains?: { kind: string; chainId: string; plantedInLocationId?: string }[];
+  /** Short narrative memos surfaced during chain resolutions. The Arbiter can
+   *  reference these in remarks, and they help the player keep narrative thread. */
+  chainMemos?: { text: string; ts: number }[];
 }
 
 export type ScreenName =
