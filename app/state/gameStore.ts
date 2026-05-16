@@ -3080,9 +3080,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The Arbiter shakes their head. "Not while ${digBlocker.name} is on you."`);
       return;
     }
+    // Per-spot lockout — exhaust this patch on a successful dig (and any
+    // dig attempt). To dig again the player must move: step direction,
+    // travel to a new location, or refresh the scene at a new tile.
+    const spotKey = `${player.currentLocationId}:${player.mapX ?? 0}:${player.mapY ?? 0}`;
+    if (player.lastDugSpot === spotKey) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter taps their boot. "You've already turned this patch. Move on — try a few paces north, east, south, or west."`,
+      );
+      return;
+    }
     const { item, score } = bestDigTool(player.inventory);
     // Digging takes a beat and a little stamina.
     set((s) => (s.player ? { player: advanceTime(spendStamina(s.player, 1), 0.4) } : s));
+    // Lock the spot up-front so even failed digs count as "worked".
+    set((s) => (s.player ? { player: { ...s.player, lastDugSpot: spotKey } } : s));
     const toolLabel = item ? `the ${item.name.toLowerCase()}` : 'your bare hands';
     const result = rollDig(score);
     // Dig damage scales with tool — a brittle knife loses 3 durability,

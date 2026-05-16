@@ -310,6 +310,9 @@ export interface PlayerCharacter {
   completedStorylineIds?: string[];
   /** Deterministic seed used to generate this character's procedural world map. */
   mapSeed?: string;
+  /** Last spot key the player dug at (`locationId:x:y`). Must move away
+   *  before digging again — prevents stand-still spam farming. */
+  lastDugSpot?: string;
   /** Current (x, y) on the procedural grid. Defaults to map center. */
   mapX?: number;
   mapY?: number;
