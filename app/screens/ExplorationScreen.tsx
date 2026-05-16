@@ -29,45 +29,41 @@ export function ExplorationScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const beginScene = useGameStore((s) => s.beginScene);
   const currentScene = useGameStore((s) => s.currentScene);
-  const currentEnemyHp = useGameStore((s) => s.currentEnemyHp);
   const pendingRolls = useGameStore((s) => s.pendingRolls);
   const resolveRollStep = useGameStore((s) => s.resolveRollStep);
   const cancelPendingRolls = useGameStore((s) => s.cancelPendingRolls);
   const saveAndExitToTitle = useGameStore((s) => s.saveAndExitToTitle);
   const buyFromVendor = useGameStore((s) => s.buyFromVendor);
   const dismissVendor = useGameStore((s) => s.dismissVendor);
+  const setActiveEnemyIdx = useGameStore((s) => s.setActiveEnemyIdx);
 
-  const [activeEnemyIdx, setActiveEnemyIdx] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
 
-  // Engine still single-enemy; panel takes an array for future multi-enemy.
+  // Build one view per enemy in the scene. Tap-to-cycle is wired through
+  // the store's setActiveEnemyIdx so combat handlers always target the
+  // enemy the player is currently looking at.
   const enemyViews: EnemyView[] = useMemo(() => {
-    if (!currentScene?.enemy) return [];
+    if (!currentScene || currentScene.enemies.length === 0) return [];
     const range = currentScene.range ?? 'close';
     const rangeLabel = range === 'arm' ? "arm's reach" : range === 'far' ? 'far' : 'close';
-    // In-range = the player's current weapon can hit at the scene's range.
     const mainName = player?.equipped?.main ?? player?.equipped?.weaponName;
     const w = mainName ? findWeaponByName(mainName) : null;
     let canHit = false;
-    if (!w) {
-      canHit = range === 'arm'; // bare hands
-    } else if (w.weaponKind === 'melee') {
-      canHit = range === 'arm';
-    } else if (w.weaponKind === 'ranged') {
-      canHit = true;
-    } else {
-      // runecaster — arm + close always, far only with INT ≥ 9
-      canHit = range !== 'far' || (player?.stats?.intelligence ?? 0) >= 9;
-    }
-    return [
-      {
-        enemy: currentScene.enemy,
-        currentHp: currentEnemyHp ?? currentScene.enemy.hp,
-        rangeLabel,
-        inRange: canHit,
-      },
-    ];
-  }, [currentScene?.enemy, currentScene?.range, currentEnemyHp, player?.equipped?.main, player?.equipped?.weaponName, player?.stats?.intelligence]);
+    if (!w) canHit = range === 'arm';
+    else if (w.weaponKind === 'melee') canHit = range === 'arm';
+    else if (w.weaponKind === 'ranged') canHit = true;
+    else canHit = range !== 'far' || (player?.stats?.intelligence ?? 0) >= 9;
+    return currentScene.enemies.map((e, i) => ({
+      enemy: e,
+      currentHp: currentScene.enemyHps[i] ?? e.hp,
+      rangeLabel,
+      inRange: canHit,
+    }));
+  }, [
+    currentScene?.enemies, currentScene?.enemyHps, currentScene?.range,
+    player?.equipped?.main, player?.equipped?.weaponName, player?.stats?.intelligence,
+  ]);
+  const activeIdx = Math.min(currentScene?.activeEnemyIdx ?? 0, Math.max(0, enemyViews.length - 1));
 
   const inCombat = enemyViews.length > 0;
   const equippedMain = player?.equipped?.main ?? null;
@@ -94,7 +90,7 @@ export function ExplorationScreen() {
           {inCombat ? (
             <EnemyPanel
               enemies={enemyViews}
-              activeIndex={Math.min(activeEnemyIdx, enemyViews.length - 1)}
+              activeIndex={activeIdx}
               onSelectActive={setActiveEnemyIdx}
             />
           ) : (

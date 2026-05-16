@@ -34,7 +34,7 @@ import {
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { createCharacter, type CreateCharacterInput } from '../engine/character';
 import { generateQuest } from '../engine/questGenerator';
-import { pickWeather, pickHazardForLocation, pickEnemyForLocation, getLocationById } from '../engine/encounter';
+import { pickWeather, pickHazardForLocation, pickEnemyForLocation, rollEncounter, getLocationById } from '../engine/encounter';
 import {
   buildOpening,
   buildScene,
@@ -170,9 +170,14 @@ interface CurrentScene {
   weather: WeatherEntry;
   location: Location;
   hazard: Hazard | null;
-  enemy: Enemy | null;
+  /** All enemies engaged in this scene. Empty when peaceful. */
+  enemies: Enemy[];
+  /** Current HP per enemy, aligned by index to `enemies`. */
+  enemyHps: number[];
+  /** Index of the enemy the player is currently targeting. */
+  activeEnemyIdx: number;
   vendor: VendorInstance | null;
-  /** Distance from the player to the enemy. Null when no enemy is present. */
+  /** Distance from the player to the enemy group. Null when peaceful. */
   range: CombatRange | null;
   /** Live narrative hooks the player can follow into multi-stage chains. */
   hooks: Hook[];
@@ -182,10 +187,23 @@ interface CurrentScene {
   ambientNouns: string[];
 }
 
+// Helper: which enemy is the player currently targeting? Returns null
+// when no enemies are present.
+function activeEnemy(scene: CurrentScene | null): Enemy | null {
+  if (!scene || scene.enemies.length === 0) return null;
+  return scene.enemies[scene.activeEnemyIdx] ?? scene.enemies[0] ?? null;
+}
+function activeEnemyHp(scene: CurrentScene | null): number | null {
+  if (!scene || scene.enemyHps.length === 0) return null;
+  return scene.enemyHps[scene.activeEnemyIdx] ?? scene.enemyHps[0] ?? null;
+}
+
 function collectSceneNouns(scene: CurrentScene): string[] {
   const nouns = [scene.location.name, scene.weather.name];
   if (scene.hazard) nouns.push(scene.hazard.name);
-  if (scene.enemy) nouns.push(scene.enemy.name, scene.enemy.type);
+  for (const e of scene.enemies) {
+    nouns.push(e.name, e.type);
+  }
   // Ambient nouns from the location description so the parser can resolve
   // "investigate the traps" / "ask about buried cities" against the same
   // content the player just read in the scene paragraph.
@@ -379,7 +397,6 @@ interface GameStore {
   gameLog: GameLogEntry[];
   currentScreen: ScreenName;
   currentScene: CurrentScene | null;
-  currentEnemyHp: number | null;
   pendingRolls: PendingRollState | null;
   hydrated: boolean;
 
@@ -433,6 +450,7 @@ interface GameStore {
   turnInStoryline: (titleOrId: string) => void;
   digHere: () => void;
   stepDirection: (dir: Direction) => void;
+  setActiveEnemyIdx: (idx: number) => void;
   dismissVendor: () => void;
   joinFaction: (factionId: string) => void;
   equipItem: (itemName: string, slot: EquipSlot) => void;
@@ -454,7 +472,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
   gameLog: [],
   currentScreen: 'title',
   currentScene: null,
-  currentEnemyHp: null,
   pendingRolls: null,
   hydrated: false,
 
@@ -504,7 +521,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentScreen: 'exploration',
       activeSlotId: slotId,
       currentScene: null,
-      currentEnemyHp: null,
       pendingRolls: null,
     });
     // Saves don't store the scene; generate a fresh one so the player can
@@ -537,7 +553,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       activeSlotId: slotId,
       resurrectionGems: remainingGems,
       currentScene: null,
-      currentEnemyHp: null,
       pendingRolls: null,
     });
     get().beginScene();
@@ -562,7 +577,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       activeSlotId: activeId,
       // If we just deleted the currently-loaded character, drop player state too.
       ...(get().activeSlotId === slotId
-        ? { player: null, gameLog: [], currentScene: null, currentEnemyHp: null, pendingRolls: null }
+        ? { player: null, gameLog: [], currentScene: null, pendingRolls: null }
         : {}),
     });
   },
@@ -585,7 +600,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       gameLog: [],
       currentScreen: 'exploration',
       currentScene: null,
-      currentEnemyHp: null,
       pendingRolls: null,
       activeSlotId: slotId,
     });
@@ -610,7 +624,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       worldMemory: emptyMemory(),
       gameLog: [],
       currentScene: null,
-      currentEnemyHp: null,
       pendingRolls: null,
       currentScreen: 'title',
       activeSlotId: null,
@@ -632,29 +645,36 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const location = getLocationById(player.currentLocationId);
     const weather = pickWeather(worldMemory);
     const hazard = pickHazardForLocation(location);
-    const enemy = pickEnemyForLocation(location);
-    // Vendor only appears in peaceful scenes (no enemy). ~22% chance.
-    const vendor = !enemy && Math.random() < 0.22 ? pickRandomVendor() : null;
+    // Group encounter first (rare), single-enemy fallback (common), else
+    // peaceful. rollEncounter returns [] when no one shows up.
+    const encounter = rollEncounter(location);
+    const enemies: Enemy[] = encounter;
+    const enemyHps: number[] = enemies.map((e) => e.hp);
+    const activeEnemyIdx = 0;
+    const hasEnemies = enemies.length > 0;
+    // Vendor only appears in peaceful scenes. ~22% chance.
+    const vendor = !hasEnemies && Math.random() < 0.22 ? pickRandomVendor() : null;
     // Enemies start at 'close' range — close enough to be a problem but not
     // already swinging. Players have to advance (or be charged) to land
     // melee, retreat to set up ranged shots.
-    const range: CombatRange | null = enemy ? 'close' : null;
+    const range: CombatRange | null = hasEnemies ? 'close' : null;
     // Hooks — pending cross-scene chains land first; otherwise no hook is
     // planted at scene start. Wandering / exploration plants fresh hooks.
     const initialHooks: Hook[] = [];
     const pendingChains = worldMemory.pendingChains ?? [];
     const consumedChainIds: string[] = [];
-    if (pendingChains.length > 0 && !enemy) {
-      // Pick at most one pending chain to land in this scene so the player
-      // gets a clear payoff trail instead of an avalanche.
+    if (pendingChains.length > 0 && !hasEnemies) {
       const next = pendingChains[0]!;
       const h = plantHookByKind(next.kind as Hook['kind'], next.chainId);
       initialHooks.push(h);
       consumedChainIds.push(next.chainId);
     }
     const ambientNouns = extractAmbientNouns(location.description);
-    const scene: CurrentScene = { weather, location, hazard, enemy, vendor, range, hooks: initialHooks, ambientNouns };
-    set({ currentScene: scene, currentEnemyHp: enemy?.hp ?? null, pendingRolls: null });
+    const scene: CurrentScene = {
+      weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
+      vendor, range, hooks: initialHooks, ambientNouns,
+    };
+    set({ currentScene: scene, pendingRolls: null });
     if (consumedChainIds.length > 0) {
       set((s) => ({
         worldMemory: {
@@ -663,7 +683,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         },
       }));
     }
-    get().appendLog('world', buildScene({ weather, location, hazard, enemy, quest: player.activeQuests[0] }));
+    // For narration, use the first enemy as the scene representative.
+    // The full group is surfaced via the EnemyPanel + a follow-up line
+    // when it's actually a pack.
+    const sceneEnemy = enemies[0] ?? null;
+    get().appendLog('world', buildScene({ weather, location, hazard, enemy: sceneEnemy, quest: player.activeQuests[0] }));
+    if (enemies.length > 1) {
+      get().appendLog(
+        'combat',
+        `${enemies.length} ${enemies[0]!.name}${enemies.length > 1 ? 's' : ''} close on you. Tap the right-side panel to cycle targets.`,
+      );
+    }
     // Announce any landed chain-hook so the player knows the thread continued.
     for (const h of initialHooks) {
       get().appendLog('world', h.plantedLine);
@@ -788,7 +818,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'arbiter',
         buildArbiterSceneIntro({
           location,
-          enemy,
+          enemy: sceneEnemy,
           player,
           worldMemory: get().worldMemory,
         }),
@@ -797,7 +827,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const unresolvedHooks = (initialHooks.length > 0 ? initialHooks : [])
         .filter((h) => !h.resolved)
         .map((h) => ({ kind: h.kind, nouns: h.nouns }));
-      get().appendLog('arbiter', buildArbiterRemark({ location, hazard, enemy, unresolvedHooks }));
+      get().appendLog('arbiter', buildArbiterRemark({ location, hazard, enemy: sceneEnemy, unresolvedHooks }));
     }
     set((s) => ({
       worldMemory: recordTags(
@@ -886,7 +916,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const parseCtx: ParseContext = {
       inventory: player.inventory,
       recentNouns: collectSceneNouns(currentScene),
-      enemyPresent: !!currentScene.enemy,
+      enemyPresent: currentScene.enemies.length > 0,
     };
     const parsed = parseInput(trimmed, parseCtx);
     get().appendLog('player', trimmed, {
@@ -902,7 +932,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         buildSoftArbiterFallback({
           parsed,
           inventory: player.inventory,
-          enemy: currentScene.enemy,
+          enemy: activeEnemy(currentScene),
           location: currentScene.location,
           hazard: currentScene.hazard,
           playerHpFraction: player.hpMax > 0 ? player.hp / player.hpMax : 1,
@@ -944,11 +974,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     switch (parsed.intent) {
       case 'attack': {
-        if (currentScene.enemy) {
-          // Range check: melee weapons need arm's reach; ranged weapons can
-          // hit at close or far; bare hands need arm's reach. Bare-hand
-          // verbs (punch/kick) force the bare-hand reach regardless of
-          // what's equipped.
+        const targetEnemy = activeEnemy(currentScene);
+        if (targetEnemy) {
           const range = currentScene.range ?? 'close';
           const barehand = isBareHandAttack(trimmed);
           const reach = barehand
@@ -962,9 +989,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.attack), 0.1) });
-          const steps = buildCombatSteps(trimmed, player, currentScene.enemy);
+          const steps = buildCombatSteps(trimmed, player, targetEnemy);
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
-          get().appendLog('world', attackOpener(currentScene.enemy.name, parsed.resolvedNoun));
+          get().appendLog('world', attackOpener(targetEnemy.name, parsed.resolvedNoun));
         } else {
           get().appendLog('world', 'Nothing in arm\'s reach answers your blade. The motion echoes off Aetherstone.');
         }
@@ -996,10 +1023,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
           break;
         }
-        // 4) Player aimed at something specific the engine can't recognise —
-        // re-prompt with the things they CAN search for. Better than a
-        // silent atmospheric one-liner that ignores their intent.
+        // 4) Player aimed at something specific the engine can't recognise.
+        // First try a semantic resolution via MiniLM — embed the raw target
+        // + scene candidates, find the closest cosine match. If it lands
+        // above threshold, re-run the action with the inferred target.
+        // Otherwise re-prompt politely.
         if (rawTarget) {
+          if (cognitive.isReady()) {
+            const candidates = [
+              ...(currentScene.ambientNouns ?? []),
+              ...(currentScene.hooks ?? []).filter((h) => !h.resolved).flatMap((h) => h.nouns),
+              ...currentScene.enemies.map((e) => e.name),
+              currentScene.location.name,
+              ...(currentScene.hazard ? [currentScene.hazard.name] : []),
+            ];
+            void cognitive.inferTarget(rawTarget, candidates).then((match) => {
+              if (match) {
+                get().appendLog(
+                  'cognitive',
+                  `Resolved "${rawTarget}" → "${match.target}" (sim ${match.score.toFixed(2)}).`,
+                );
+                get().submitPlayerAction(`search the ${match.target}`);
+              } else {
+                repromptUnknownTarget(get, currentScene, rawTarget);
+              }
+            }).catch(() => repromptUnknownTarget(get, currentScene, rawTarget));
+            break;
+          }
           repromptUnknownTarget(get, currentScene, rawTarget);
           break;
         }
@@ -1104,21 +1154,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
         get().appendLog(
           'world',
-          currentScene.enemy
-            ? `You drop into a dodging stance. ${currentScene.enemy.name}'s next attack will have to find you.`
+          currentScene.enemies.length > 0
+            ? `You drop into a dodging stance. ${activeEnemy(currentScene)?.name ?? 'they'}'s next attack will have to find you.`
             : `You shift your weight, ready to evade. Nothing tests it.`,
         );
         break;
       }
       case 'advance':
       case 'retreat': {
-        // Move one band toward or away from the enemy. No-op when there
-        // isn't an enemy in the scene.
-        if (!currentScene.enemy) {
+        const moveEnemy = activeEnemy(currentScene);
+        if (!moveEnemy) {
           get().appendLog('arbiter', `The Arbiter shrugs. "Nothing to advance on. The ground here is quiet."`);
           break;
         }
-        // Iron fog / silent blizzard block sense of direction — no repositioning.
         if (weatherBlocksRepositioning(currentScene.weather)) {
           get().appendLog(
             'arbiter',
@@ -1131,12 +1179,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const curIdx = order.indexOf(cur);
         const nextIdx = parsed.intent === 'advance' ? Math.max(0, curIdx - 1) : Math.min(order.length - 1, curIdx + 1);
         const next = order[nextIdx]!;
+        const groupLabel = currentScene.enemies.length > 1
+          ? `the ${currentScene.enemies.length} ${moveEnemy.name}s`
+          : moveEnemy.name;
         if (next === cur) {
           get().appendLog(
             'world',
             parsed.intent === 'advance'
-              ? `You are already at arm's reach with ${currentScene.enemy.name}.`
-              : `You cannot put more ground between you and ${currentScene.enemy.name}.`,
+              ? `You are already at arm's reach with ${groupLabel}.`
+              : `You cannot put more ground between you and ${groupLabel}.`,
           );
           break;
         }
@@ -1144,14 +1195,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog(
           'world',
           parsed.intent === 'advance'
-            ? `You close the gap with ${currentScene.enemy.name}. (range: ${RANGE_LABEL[next]})`
-            : `You pull back from ${currentScene.enemy.name}. (range: ${RANGE_LABEL[next]})`,
+            ? `You close the gap with ${groupLabel}. (range: ${RANGE_LABEL[next]})`
+            : `You pull back from ${groupLabel}. (range: ${RANGE_LABEL[next]})`,
         );
-        // Movement takes a beat — let the enemy counter-attack if they're
-        // still in their effective range.
-        const stillInReach = enemyCanReach(currentScene.enemy, next);
-        if (stillInReach) {
-          applyEnemyCounter(currentScene.enemy, get().player ?? player, get, set);
+        // Movement takes a beat — let any enemy still in their effective
+        // range counter-attack. Group: every reaching enemy fires.
+        const reachers = currentScene.enemies.filter((e, i) =>
+          enemyCanReach(e, next) && (currentScene.enemyHps[i] ?? 0) > 0,
+        );
+        if (reachers.length > 0) {
+          runEnemyGroupCounters(get, set, get().player ?? player);
         }
         break;
       }
@@ -1436,7 +1489,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         buildArbiterRemark({
           location: currentScene.location,
           hazard: currentScene.hazard,
-          enemy: currentScene.enemy,
+          enemy: activeEnemy(currentScene),
           intent: parsed.intent,
           mood,
           recentActions,
@@ -1515,7 +1568,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   concludeRolls(steps: RollStep[], actionText: string) {
-    const { player, currentScene, currentEnemyHp } = get();
+    const { player, currentScene } = get();
     if (!player || !currentScene) return;
 
     const initiative = steps.find((s) => s.id === 'initiative');
@@ -1623,7 +1676,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           case 'escape':
             get().appendLog('world', 'You break for the entrance. Behind you the chamber settles back into silence.');
-            if (currentScene.enemy) set((s) => ({ currentScene: s.currentScene ? { ...s.currentScene, enemy: null } : null }));
+            if (currentScene.enemies.length > 0) {
+              set((s) => (s.currentScene
+                ? { currentScene: { ...s.currentScene, enemies: [], enemyHps: [], activeEnemyIdx: 0, range: null } }
+                : s));
+            }
             break;
           case 'investigate': {
             // Narrate against the actual thing the player searched, not the whole location.
@@ -1681,8 +1738,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     // ── COMBAT ────────────────────────────────────────────────────────────
-    if (!currentScene.enemy) { void get().persist(); return; }
-    const enemy = currentScene.enemy;
+    const enemy = activeEnemy(currentScene);
+    if (!enemy) { void get().persist(); return; }
+    const activeIdx = currentScene.activeEnemyIdx;
 
     // Re-parse with full context so we can pull the resolved weapon name
     // back out of the original action text (e.g. "use my torch to attack").
@@ -1709,7 +1767,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const weaponType = barehand ? 'bludgeoning' : (equipped?.damageType ?? null);
       const mod = applyDamageTypeModifier(rawDmg, weaponType, enemy.type);
       const dmg = mod.damage;
-      const prevHp = currentEnemyHp ?? enemy.hp;
+      const prevHp = currentScene.enemyHps[activeIdx] ?? enemy.hp;
       const newEnemyHp = prevHp - dmg;
 
       // Narrate the resistance/weakness modifier on its own line so the
@@ -1736,16 +1794,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
       if (newEnemyHp <= 0) {
         get().appendLog('combat', attackKill(weaponName, enemy.name, dmg));
+        // Splice this enemy out of the scene (loot + scene clear handled
+        // in resolveEnemyDefeat which now operates per-active-enemy).
         get().resolveEnemyDefeat();
-        set({ currentEnemyHp: null });
       } else {
-        set({ currentEnemyHp: newEnemyHp });
+        // Write the new HP back into the aligned array.
+        set((s) => {
+          if (!s.currentScene) return {};
+          const hps = [...s.currentScene.enemyHps];
+          hps[activeIdx] = newEnemyHp;
+          return { currentScene: { ...s.currentScene, enemyHps: hps } };
+        });
         get().appendLog('combat', attackHit(weaponName, enemy.name, dmg, newEnemyHp));
-        applyEnemyCounter(enemy, get().player ?? player, get, set);
+        // After the player's strike, every still-living enemy in the
+        // scene counter-attacks. The group acts as a group.
+        runEnemyGroupCounters(get, set, player);
       }
     } else {
       get().appendLog('combat', attackMiss(weaponName, enemy.name));
-      applyEnemyCounter(enemy, get().player ?? player, get, set);
+      runEnemyGroupCounters(get, set, player);
     }
 
     if (shouldArbiterSpeak()) {
@@ -1754,7 +1821,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         buildArbiterRemark({
           location: currentScene.location,
           hazard: currentScene.hazard,
-          enemy: get().currentScene?.enemy ?? null,
+          enemy: activeEnemy(get().currentScene),
           intent: 'attack',
         }),
       );
@@ -1807,8 +1874,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   resolveEnemyDefeat() {
     const { currentScene, player, worldMemory } = get();
-    if (!currentScene?.enemy || !player) return;
-    const enemy = currentScene.enemy;
+    const enemy = activeEnemy(currentScene);
+    if (!currentScene || !enemy || !player) return;
+    const activeIdx = currentScene.activeEnemyIdx;
     // Hunt-boss kill: if the slain enemy's name matches a target of an
     // active hunt currently at its boss stage, advance the hunt one more
     // beat (past the boss stage) so the player can turn it in.
@@ -1847,8 +1915,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const newHpMax = hitMilestone ? player.hpMax + 1 : player.hpMax;
     const newHp = hitMilestone ? player.hp + 1 : player.hp;
 
+    // Splice the defeated enemy out of the scene. If others remain, drop
+    // the active index to a still-living index. If the list empties,
+    // clear range so the scene is peaceful again.
+    const remainingEnemies = currentScene.enemies.filter((_, i) => i !== activeIdx);
+    const remainingHps = currentScene.enemyHps.filter((_, i) => i !== activeIdx);
+    const nextActiveIdx = remainingEnemies.length > 0 ? Math.min(activeIdx, remainingEnemies.length - 1) : 0;
+    const stillFighting = remainingEnemies.length > 0;
     set({
-      currentScene: { ...currentScene, enemy: null, range: null, hooks: currentScene.hooks ?? [] },
+      currentScene: {
+        ...currentScene,
+        enemies: remainingEnemies,
+        enemyHps: remainingHps,
+        activeEnemyIdx: nextActiveIdx,
+        range: stillFighting ? currentScene.range : null,
+        hooks: currentScene.hooks ?? [],
+      },
       worldMemory: recordEnemyDefeat(worldMemory, enemy.name),
       player: {
         ...player,
@@ -1861,6 +1943,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         milestones: { ...prevMs, enemiesDefeated: newKills },
       },
     });
+    if (stillFighting) {
+      const next = remainingEnemies[nextActiveIdx]!;
+      get().appendLog(
+        'combat',
+        `${remainingEnemies.length} attacker${remainingEnemies.length > 1 ? 's' : ''} remain${remainingEnemies.length === 1 ? 's' : ''}. ${next.name} now in your sights.`,
+      );
+    }
     if (hitMilestone) {
       get().appendLog(
         'reward',
@@ -2383,8 +2472,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set((s) =>
           s.currentScene
             ? {
-                currentScene: { ...s.currentScene, enemy: boss, range: 'close' },
-                currentEnemyHp: boss.hp,
+                currentScene: {
+                  ...s.currentScene,
+                  enemies: [boss],
+                  enemyHps: [boss.hp],
+                  activeEnemyIdx: 0,
+                  range: 'close',
+                },
               }
             : s,
         );
@@ -2880,13 +2974,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     narrateWanderingJourney(get, set, scene);
   },
 
+  // Set the enemy the player is currently targeting. Bound to taps and
+  // horizontal swipes on the EnemyPanel.
+  setActiveEnemyIdx(idx: number) {
+    set((s) => {
+      if (!s.currentScene || s.currentScene.enemies.length === 0) return {};
+      const clamped = Math.max(0, Math.min(s.currentScene.enemies.length - 1, idx));
+      return { currentScene: { ...s.currentScene, activeEnemyIdx: clamped } };
+    });
+  },
+
   digHere() {
     const state = get();
     const player = state.player;
     const scene = state.currentScene;
     if (!player) return;
-    if (scene?.enemy) {
-      get().appendLog('arbiter', `The Arbiter shakes their head. "Not while ${scene.enemy.name} is on you."`);
+    const digBlocker = activeEnemy(scene);
+    if (digBlocker) {
+      get().appendLog('arbiter', `The Arbiter shakes their head. "Not while ${digBlocker.name} is on you."`);
       return;
     }
     const { item, score } = bestDigTool(player.inventory);
@@ -3172,7 +3277,7 @@ function applyHookEffect(
       if (!spawn) return false;
       set((s) =>
         s.currentScene
-          ? { currentScene: { ...s.currentScene, enemy: spawn, range: 'close' }, currentEnemyHp: spawn.hp }
+          ? { currentScene: { ...s.currentScene, enemies: [spawn], enemyHps: [spawn.hp], activeEnemyIdx: 0, range: 'close' } }
           : s,
       );
       get().appendLog('combat', `${spawn.name} emerges from the hook. Combat begins at close range.`);
@@ -3321,6 +3426,37 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
 }
 
 // Arbiter rolls enemy counter-attack — transparent to player per rulebook
+// Run a counter-attack from every living enemy in the current scene. The
+// player's single action provoked the whole group. Bail early if the
+// player dies mid-volley so the rest of the group don't pile damage on a
+// corpse.
+function runEnemyGroupCounters(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  fallbackPlayer: PlayerCharacter,
+): void {
+  const scene = get().currentScene;
+  if (!scene || scene.enemies.length === 0) return;
+  // Snapshot the enemies up-front so a death mid-volley (player killing
+  // one by reaction, etc) doesn't reshape the iteration.
+  const attackers = [...scene.enemies];
+  for (let i = 0; i < attackers.length; i++) {
+    const enemy = attackers[i]!;
+    // Skip enemies that died earlier this round (HP <= 0 in the live
+    // scene array).
+    const liveScene = get().currentScene;
+    if (!liveScene) return;
+    const liveIdx = liveScene.enemies.findIndex((e) => e === enemy);
+    if (liveIdx < 0) continue;
+    const hpAtCounter = liveScene.enemyHps[liveIdx];
+    if (hpAtCounter === undefined || hpAtCounter <= 0) continue;
+    // Bail if the player is dead.
+    const livePlayer = get().player;
+    if (!livePlayer || livePlayer.hp <= 0 || livePlayer.dead) return;
+    applyEnemyCounter(enemy, livePlayer ?? fallbackPlayer, get, set);
+  }
+}
+
 function applyEnemyCounter(
   enemy: Enemy,
   player: PlayerCharacter,
@@ -3464,7 +3600,6 @@ function handlePlayerDeath(
       // active. The slot itself is preserved on disk.
       player: null,
       currentScene: null,
-      currentEnemyHp: null,
       pendingRolls: null,
       activeSlotId: null,
     }));

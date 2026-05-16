@@ -95,5 +95,7 @@
   { "name": "Mud Giant", "type": "Mud Creature", "abilityPoint": "Strength 10", "attack": "Stomp", "damage": "4D6", "hp": 360, "rarity": "Legendary", "loot": ["Giant's Club", "Mud Gem"] },
   { "name": "Aetheric Necromancer", "type": "Aetheric Mutation", "abilityPoint": "Intelligence 9", "attack": "Life Drain", "damage": "3D10", "hp": 446, "rarity": "Legendary", "loot": ["Necromancer Staff", "Aetheric Scroll"] },
   { "name": "Aetheric Behemoth", "type": "Aetheric Mutation", "abilityPoint": "Strength 10", "attack": "Aether Smash", "damage": "4D10", "hp": 458, "rarity": "Legendary", "loot": ["Behemoth Heart", "Aetheric Shard"] },
-  { "name": "Aetherkin", "type": "Etheric Undead", "abilityPoint": "Strength 7", "attack": "Etheric Burst", "damage": "3D6 Aetheric", "hp": 180, "rarity": "Rare", "loot": ["Aetherstone Fragment", "Veil of Peace"] }
+  { "name": "Aetherkin", "type": "Etheric Undead", "abilityPoint": "Strength 7", "attack": "Etheric Burst", "damage": "3D6 Aetheric", "hp": 180, "rarity": "Rare", "loot": ["Aetherstone Fragment", "Veil of Peace"] },
+  { "name": "Reclaimer Ambusher", "type": "Human", "abilityPoint": "Dexterity 5", "attack": "Crossbow Volley", "damage": "1D6", "hp": 24, "rarity": "Uncommon", "loot": ["Bone Bolt", "Patched Cloth"] },
+  { "name": "Black Cloak Agent", "type": "Human", "abilityPoint": "Dexterity 6", "attack": "Concealed Blade", "damage": "2D6", "hp": 32, "rarity": "Rare", "loot": ["Aether Residue", "Patched Cloth"] }
 ]

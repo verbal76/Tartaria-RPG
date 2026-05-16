@@ -21,6 +21,7 @@
     { "name": "Hardened Mudstone", "rarity": "Rare", "tags": ["mud", "stone", "tartarian"], "description": "Mudstone fused under Etheric pressure — denser than iron, refuses to crack." },
     { "name": "Mud Gem", "rarity": "Rare", "tags": ["mud", "gem"], "description": "A nodule of Aetheric mud crystallised into a glassy gem. Pricey in Reclaimer markets." },
     { "name": "Aether Shard", "rarity": "Rare", "tags": ["aether", "crystal"], "description": "A single, clean shard of high-grade Aetheric crystal. Cores rare-tier relic work." },
-    { "name": "Aetheric Song", "rarity": "Rare", "tags": ["aether", "psychic"], "description": "A held-still Aetheric resonance, carried in a sealed phial. Plays a single Tartarian phrase when uncapped." }
+    { "name": "Aetheric Song", "rarity": "Rare", "tags": ["aether", "psychic"], "description": "A held-still Aetheric resonance, carried in a sealed phial. Plays a single Tartarian phrase when uncapped." },
+    { "name": "Bone Bolt", "rarity": "Common", "tags": ["ammunition", "bone"], "description": "A short, dense bone bolt fired from a crossbow. Holds its edge in Aetheric weather." }
   ]
 }

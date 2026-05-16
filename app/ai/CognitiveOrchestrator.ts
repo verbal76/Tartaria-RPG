@@ -1,4 +1,5 @@
 import { SemanticEmbeddingService } from './embedding/SemanticEmbeddingService';
+import { VectorSimilarityEngine } from './embedding/VectorSimilarityEngine';
 import { EmotionInferenceEngine } from './cognition/EmotionInferenceEngine';
 import { IntentInferenceEngine } from './cognition/IntentInferenceEngine';
 import { ModelDownloader, type DownloaderOptions, type ResolvedModelFiles } from './ota/ModelDownloader';
@@ -108,6 +109,44 @@ export class CognitiveOrchestrator {
       this.emotionEngine.setAnchors(await this.precomputeAnchors(EMOTION_ANCHORS));
       this.intentEngine.setAnchors(await this.precomputeAnchors(INTENT_ANCHORS));
       this.ready = this.embeddingService.isReady();
+    }
+  }
+
+  // Semantic target inference — given the player's input and a list of
+  // candidate scene nouns (ambient nouns, hook nouns, enemy names, etc.),
+  // return the candidate the player most likely meant. Used as a fallback
+  // when the regex-based parser doesn't resolve a target.
+  //
+  // Threshold tuned conservatively (0.45) so we don't false-match common
+  // verbs like "go" / "look" to random nouns.
+  async inferTarget(
+    input: string,
+    candidates: readonly string[],
+    threshold = 0.45,
+  ): Promise<{ target: string; score: number } | null> {
+    if (!this.isReady() || candidates.length === 0) return null;
+    const seen = new Set<string>();
+    const uniq: string[] = [];
+    for (const c of candidates) {
+      const k = c.toLowerCase().trim();
+      if (!k || seen.has(k)) continue;
+      seen.add(k);
+      uniq.push(c);
+    }
+    if (uniq.length === 0) return null;
+    try {
+      const inputVec = await this.embeddingService.embed(input);
+      let best: { target: string; score: number } | null = null;
+      for (const c of uniq) {
+        const cVec = await this.embeddingService.embed(c);
+        const score = VectorSimilarityEngine.cosineSimilarity(inputVec, cVec);
+        if (score >= threshold && (!best || score > best.score)) best = { target: c, score };
+      }
+      return best;
+    } catch {
+      // Embedding can fail under cold-boot / model swap — silently skip,
+      // caller falls back to regex resolution.
+      return null;
     }
   }
 
