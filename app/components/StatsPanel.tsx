@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import type { PlayerCharacter } from '../engine/types';
 import racesData from '../data/races/races.json';
 import { findArmorByName } from '../engine/crafting';
+import { formatEffectSummary } from '../engine/statusEffects';
 
 interface Props { player: PlayerCharacter; }
 
@@ -33,6 +34,11 @@ export function StatsPanel({ player }: Props) {
       <Text style={styles.equipped} numberOfLines={1}>
         {equippedLabel ? `Equipped: ${equippedLabel}` : 'Equipped: nothing'}
       </Text>
+      {player.statusEffects && player.statusEffects.length > 0 && (
+        <Text style={styles.effects} numberOfLines={1}>
+          Effects: {formatEffectSummary(player.statusEffects)}
+        </Text>
+      )}
       <Text style={styles.subline}>Faction standing: {factionStanding}</Text>
     </View>
   );
@@ -58,6 +64,7 @@ const styles = StyleSheet.create({
   name: { color: '#e6d8b3', fontSize: 16, fontWeight: '700' },
   subline: { color: '#7a705c', fontSize: 11, marginBottom: 4 },
   equipped: { color: '#c9a86a', fontSize: 10, marginTop: 4, letterSpacing: 1 },
+  effects: { color: '#e07a5f', fontSize: 10, marginTop: 2, letterSpacing: 1 },
   row: { flexDirection: 'row', gap: 8, marginTop: 4 },
   stat: { flex: 1 },
   label: { color: '#7a705c', fontSize: 10 },

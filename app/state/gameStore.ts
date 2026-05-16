@@ -77,6 +77,16 @@ import {
   meetsJoinThreshold,
   JOIN_THRESHOLD,
 } from '../engine/factions';
+import {
+  rollIncomingStatusEffect,
+  applyEffect,
+  tickEffects,
+  statusAcAdjustment,
+  statusAttackPenalty,
+  isIncapacitated,
+  aethericVulnerabilityMultiplier,
+} from '../engine/statusEffects';
+import type { StatusEffect, MemorableEvent } from '../engine/types';
 
 interface Concept {
   id: string;
@@ -187,7 +197,29 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     stamina: p.stamina ?? stamMax,
     milestones: p.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 },
     equipped: p.equipped ?? {},
+    statusEffects: p.statusEffects ?? [],
   };
+}
+
+// Record a discrete memorable event on the world memory. Used for the
+// Arbiter's "I remember when you..." callbacks. Kept lightweight (string +
+// kind + timestamp) — full per-event metadata isn't needed yet.
+function recordMemorableEvent(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  event: Omit<MemorableEvent, 'id' | 'timestamp'>,
+): void {
+  const e: MemorableEvent = {
+    id: `evt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    timestamp: Date.now(),
+    ...event,
+  };
+  set((s) => ({
+    worldMemory: {
+      ...s.worldMemory,
+      memorableEvents: [...(s.worldMemory.memorableEvents ?? []), e].slice(-40),
+    },
+  }));
 }
 
 // Milestone thresholds. Hit one of these counters and the character gets a
@@ -379,6 +411,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       `✦ Resurrection. ${revived.name} returns to Tartaria, restored. The Aetherstone hums in recognition.`,
     );
+    recordMemorableEvent(get, set, {
+      kind: 'death_revive',
+      text: `returned from death by a Resurrection Gem`,
+    });
     await get().refreshSlots();
     return true;
   },
@@ -513,6 +549,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // before screen transition). Swallow input rather than letting them
       // submit posthumous actions.
       return;
+    }
+
+    // Tick all active status effects one round. Bleed-style DOTs deal
+    // damage, expired effects drop off, and incapacitation (stun / paralyze)
+    // wastes the player's action with a narrated line.
+    const tick = tickEffects(player.statusEffects ?? []);
+    if (tick.dotDamage > 0 || tick.expired.length > 0 || tick.effects.length !== (player.statusEffects?.length ?? 0)) {
+      const incapacitated = isIncapacitated(player.statusEffects);
+      const newHp = Math.max(0, player.hp - tick.dotDamage);
+      set((s) =>
+        s.player
+          ? { player: { ...s.player, hp: newHp, statusEffects: tick.effects } }
+          : s,
+      );
+      if (tick.dotDamage > 0) {
+        get().appendLog('combat', `You bleed for ${tick.dotDamage} damage. (${newHp} HP)`);
+      }
+      for (const ex of tick.expired) {
+        get().appendLog('system', `${ex.label ?? ex.kind} fades.`);
+      }
+      if (incapacitated) {
+        get().appendLog('world', `You cannot move. Your action is lost.`);
+        if (newHp <= 0) {
+          void Promise.resolve().then(() => handlePlayerDeath(get, set));
+        }
+        void get().persist();
+        return;
+      }
+      if (newHp <= 0) {
+        void Promise.resolve().then(() => handlePlayerDeath(get, set));
+        return;
+      }
     }
 
     // If the scene was lost (e.g. slot restore on an older save before this
@@ -1170,6 +1238,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
     }
 
+    // First-kill and rare-kill milestones are noted in the memorable-event
+    // log so the Arbiter can reference them later.
+    if (newKills === 1) {
+      recordMemorableEvent(get, set, {
+        kind: 'first_kill',
+        text: `put down your first ${enemy.name}`,
+        enemyName: enemy.name,
+      });
+    }
+    if (enemy.rarity === 'Rare' || enemy.rarity === 'Legendary') {
+      recordMemorableEvent(get, set, {
+        kind: 'rare_kill',
+        text: `cut down the ${enemy.name} in ${currentScene.location.name}`,
+        enemyName: enemy.name,
+      });
+    }
+
     // TC drop. 30% chance per kill, amount scaled by enemy rarity. This is
     // what fuels the vendor economy — combat is the primary way to earn TC.
     if (Math.random() < 0.3) {
@@ -1393,6 +1478,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         `${scene.vendor.name} catches your wrist. "I see you." They pack up and leave without another word.`,
       );
       logRepChanges(get, repResult.changed);
+      recordMemorableEvent(get, set, {
+        kind: 'theft_caught',
+        text: `were caught stealing from ${scene.vendor.name}`,
+        factionId: vendorFaction ?? undefined,
+      });
     }
     void get().persist();
   },
@@ -1425,6 +1515,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       `You are accepted into the ${target.name}. The Arbiter watches you make the pledge in silence.`,
     );
+    recordMemorableEvent(get, set, {
+      kind: 'faction_join',
+      text: `joined the ${target.name}`,
+      factionId,
+    });
     void get().persist();
   },
 
@@ -1535,9 +1630,12 @@ function applyEnemyCounter(
   const atkBonus = parseInt(String(enemy.attack), 10) || 3;
   const atkRoll = rollDie(20);
   const atkTotal = atkRoll + atkBonus;
-  // Effective AC includes any equipped armor's acBonus.
+  // Effective AC = race base + armor bonus + status modifier (e.g. -2 from
+  // armor_severed). Status floor at 1 so a player isn't completely impossible
+  // to defend.
   const armor = player.equipped?.armorName ? findArmorByName(player.equipped.armorName) : null;
-  const effectiveAc = player.ac + (armor?.acBonus ?? 0);
+  const acFromGear = player.ac + (armor?.acBonus ?? 0);
+  const effectiveAc = Math.max(1, acFromGear + statusAcAdjustment(player.statusEffects));
   const hit = atkTotal >= effectiveAc;
 
   get().appendLog(
@@ -1547,11 +1645,20 @@ function applyEnemyCounter(
 
   if (hit) {
     let rawDmg = rollFromNotation(String(enemy.damage)) || rollDie(6);
-    // Detect damage type from the enemy.damage string (e.g. "2D6 Psychic",
-    // "1D10 Aetheric"). Falls back to a generic physical class.
     const enemyDamageType = parseIncomingDamageType(String(enemy.damage));
+
+    // Burn scars (aetheric vulnerability) amplify incoming aetheric damage.
+    if (enemyDamageType === 'aetheric') {
+      const mul = aethericVulnerabilityMultiplier(player.statusEffects);
+      if (mul > 1) rawDmg = Math.ceil(rawDmg * mul);
+    }
+
     const resisted = applyArmorResistance(rawDmg, enemyDamageType, armor);
     const dmg = resisted.damage;
+
+    // Roll for a status effect to apply based on the damage type.
+    const newEffect = rollIncomingStatusEffect(enemyDamageType, player.statusEffects ?? []);
+
     let killed = false;
     set((s) => {
       if (!s.player) return {};
@@ -1562,8 +1669,19 @@ function applyEnemyCounter(
         ? `${enemy.name} deals ${dmg} damage${resistTag}. You fall.`
         : `${enemy.name} deals ${dmg} damage${resistTag}. You have ${newHp} HP remaining.`;
       void Promise.resolve().then(() => get().appendLog('combat', msg));
-      return { player: { ...s.player, hp: newHp } };
+      const effects = newEffect
+        ? applyEffect(s.player.statusEffects ?? [], newEffect.effect)
+        : s.player.statusEffects;
+      return { player: { ...s.player, hp: newHp, statusEffects: effects } };
     });
+
+    if (newEffect) {
+      const verb = newEffect.isNew ? 'inflicts' : 'refreshes';
+      void Promise.resolve().then(() =>
+        get().appendLog('combat', `The ${enemyDamageType} ${verb} ${newEffect.effect.label}.`),
+      );
+    }
+
     if (killed) {
       void Promise.resolve().then(() => handlePlayerDeath(get, set));
     }

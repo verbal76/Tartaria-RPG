@@ -609,6 +609,27 @@ function pickTimelineCallback(
   const ms = player.milestones;
   const options: string[] = [];
 
+  // Memorable-event callbacks — the Arbiter pulls a discrete event from
+  // history and references it by detail. These are the highest-fidelity
+  // continuity beats we can offer.
+  const events = worldMemory?.memorableEvents ?? [];
+  if (events.length > 0) {
+    const recent = events[events.length - 1];
+    if (recent) {
+      if (recent.kind === 'rare_kill') {
+        options.push(`"You ${recent.text}," the Arbiter says, almost to themselves. "Few who try that walk away."`);
+      } else if (recent.kind === 'theft_caught') {
+        options.push(`"You ${recent.text}," the Arbiter says. "Word travels. Decide how you want it to travel next."`);
+      } else if (recent.kind === 'faction_join') {
+        options.push(`"You ${recent.text}," the Arbiter notes. "They will remember you in their own way."`);
+      } else if (recent.kind === 'death_revive') {
+        options.push(`"You ${recent.text}," the Arbiter says quietly. "Few things in Tartaria come back from the buried side. The Aetherstone marks the ones that do."`);
+      } else if (recent.kind === 'first_kill') {
+        options.push(`"You ${recent.text}," the Arbiter says. "I remember the way you stood after. Tell me — has the way you stand changed?"`);
+      }
+    }
+  }
+
   if (ms) {
     if (ms.enemiesDefeated >= 3) {
       options.push(

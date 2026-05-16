@@ -211,6 +211,23 @@ export type DamageType =
   | 'slashing'
   | 'stun';
 
+export type StatusEffectKind =
+  | 'bleed'
+  | 'stun'
+  | 'burn_scar'
+  | 'armor_severed'
+  | 'paralyzed'
+  | 'poisoned';
+
+export interface StatusEffect {
+  kind: StatusEffectKind;
+  remainingRounds: number;
+  /** Per-round damage for DOT effects (bleed, etc.). */
+  perRoundDamage?: number;
+  /** Display label, defaulted from kind. */
+  label?: string;
+}
+
 export interface PlayerCharacter {
   name: string;
   raceId: string;
@@ -233,6 +250,8 @@ export interface PlayerCharacter {
   milestones?: PlayerMilestones;
   /** Currently-equipped weapon and armor (by catalog name). */
   equipped?: PlayerEquipped;
+  /** Active combat status effects; tick down each player action. */
+  statusEffects?: StatusEffect[];
 }
 
 export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive';
@@ -266,11 +285,27 @@ export interface GameLogEntry {
   meta?: Record<string, unknown>;
 }
 
+export interface MemorableEvent {
+  id: string;
+  kind:
+    | 'faction_join'
+    | 'death_revive'
+    | 'rare_kill'
+    | 'theft_caught'
+    | 'first_travel'
+    | 'first_kill';
+  text: string;
+  timestamp: number;
+  factionId?: string;
+  enemyName?: string;
+}
+
 export interface WorldMemory {
   tagCounts: Record<string, number>;
   discoveredLocationIds: string[];
   defeatedEnemies: string[];
   completedQuestIds: string[];
+  memorableEvents?: MemorableEvent[];
 }
 
 export type ScreenName =
