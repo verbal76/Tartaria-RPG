@@ -58,8 +58,29 @@ export function AboutScreen() {
       }
       setUpdateStatus('Downloading update…');
       await Updates.fetchUpdateAsync();
+      // Flush the player's progress to disk BEFORE handing control to
+      // expo-updates. If reloadAsync starts while AsyncStorage is still
+      // mid-write, the slot can end up persisted with player=null —
+      // which is exactly what was corrupting saves across updates.
+      setUpdateStatus('Saving progress…');
+      try {
+        await useGameStore.getState().persist();
+      } catch (persistErr) {
+        // Don't block the update on persist failure, but record it.
+        const m = persistErr instanceof Error ? persistErr.message : String(persistErr);
+        setUpdateError(`Save flush warning: ${m}`);
+      }
       setUpdateStatus('Restarting to apply…');
-      setTimeout(() => { void Updates.reloadAsync(); }, 600);
+      // Await reloadAsync directly + log if it throws. The old fire-and-
+      // forget setTimeout swallowed reload errors and gave us no signal
+      // when reload simply didn't happen.
+      try {
+        await Updates.reloadAsync();
+      } catch (reloadErr) {
+        const m = reloadErr instanceof Error ? reloadErr.message : String(reloadErr);
+        setUpdateStatus('Restart failed');
+        setUpdateError(`reloadAsync error: ${m}. Please restart the app manually — your progress was saved.`);
+      }
     } catch (err) {
       // Capture as much detail as possible — name, message, stack head,
       // any wrapped code property. expo-updates' generic 'Failed to check

@@ -45,7 +45,7 @@ import {
 } from '../engine/narrativeGenerator';
 import { parseInput, type ParseContext } from '../engine/parser';
 import { rollDie, rollFromNotation, pick, chance } from '../engine/rng';
-import { buildCombatSteps, buildSkillSteps } from '../engine/combatRules';
+import { buildCombatSteps, buildSkillSteps, buildRestSteps } from '../engine/combatRules';
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import locationsData from '../data/locations/locations.json';
@@ -553,10 +553,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       // Roll the active slot back so we don't leave a half-set state.
+      // CRITICAL: also clear the in-memory activeSlotId — otherwise the
+      // next persist() will write player=null over the slot's storage
+      // and corrupt the save we were trying to recover.
       try { await setActiveSlot(null); } catch { /* ignore */ }
       set({
         player: null,
         currentScreen: 'title',
+        activeSlotId: null,
         slotLoadError: `Failed to restore character: ${msg}`,
       });
     }
@@ -1196,7 +1200,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog('world', `You consume one ${consumable.name}. ${tail}`);
           void get().persist();
         } else {
-          get().rest();
+          // Open the interactive dice roller for rest duration. concludeRolls
+          // sees the rest_hours step and applies heal/stamina/time.
+          const steps = buildRestSteps();
+          set({ pendingRolls: { actionText: 'rest', steps, currentStep: 0 } });
         }
         break;
       }
@@ -1741,6 +1748,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const attack = steps.find((s) => s.id === 'attack');
     const damage = steps.find((s) => s.id === 'damage');
     const skill = steps.find((s) => s.id === 'skill_check');
+    const restRoll = steps.find((s) => s.id === 'rest_hours');
+
+    // ── REST ──────────────────────────────────────────────────────────────
+    if (restRoll) {
+      const hours = restRoll.total ?? 4;
+      const hpRoom = player.hpMax - player.hp;
+      const stamRoom = player.staminaMax - player.stamina;
+      // Deterministic: 2 HP per hour, 1 stamina per hour, capped.
+      const heal = Math.min(hpRoom, hours * 2);
+      const stamGain = Math.min(stamRoom, hours);
+      const newHours = (player.hoursElapsed ?? 0) + hours;
+      set({
+        player: {
+          ...player,
+          hp: player.hp + heal,
+          stamina: player.stamina + stamGain,
+          hoursElapsed: newHours,
+        },
+      });
+      const parts: string[] = [];
+      if (heal > 0) parts.push(`+${heal} HP`);
+      if (stamGain > 0) parts.push(`+${stamGain} stamina`);
+      const tail = parts.length > 0 ? parts.join(', ') + ' recovered.' : 'Whole already — the Aetherstone hums steady.';
+      get().appendLog('world', `You rest for ${hours} hours. ${tail} (${describeTime(newHours)})`);
+      void get().persist();
+      return;
+    }
 
     // ── SKILL CHECK ───────────────────────────────────────────────────────
     if (skill) {
@@ -3376,6 +3410,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
   async persist() {
     const { player, worldMemory, gameLog, currentScreen, activeSlotId } = get();
     if (!activeSlotId) return; // No active slot — nothing to write to.
+    // CRITICAL: refuse to overwrite a save with player=null. This guards
+    // against transient states (mid-load, mid-death-cleanup, mid-OTA-
+    // reload) where activeSlotId is still set but player has been
+    // cleared. Writing player=null silently here was a major source of
+    // "save file is missing the character record" errors across updates.
+    if (!player) return;
     await saveSlot(activeSlotId, {
       version: 1,
       savedAt: Date.now(),

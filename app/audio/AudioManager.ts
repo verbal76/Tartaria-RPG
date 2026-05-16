@@ -47,6 +47,12 @@ const loading: Record<string, Promise<void>> = {};
 let activeContext: Context | null = null;
 let activeTrackId: string | null = null;
 let audioModeReady = false;
+// Monotonic transition counter — bumped on every setActiveContext call.
+// In-flight fade loops capture the counter at start and abort if it's
+// been superseded by a newer transition. Stops the overlap-during-fade
+// bug where rapid state changes (e.g. wander → combat → wander) would
+// leave two tracks playing simultaneously.
+let transitionEpoch = 0;
 const FADE_MS = 400;
 const FADE_STEPS = 8;
 
@@ -109,9 +115,13 @@ async function setSoundVolume(id: string, vol: number): Promise<void> {
   }
 }
 
-async function fadeVolume(id: string, from: number, to: number): Promise<void> {
+async function fadeVolume(id: string, from: number, to: number, epoch: number): Promise<void> {
   const stepMs = FADE_MS / FADE_STEPS;
   for (let i = 1; i <= FADE_STEPS; i++) {
+    // Bail if a newer transition started — the new flow will set the
+    // correct volume / stop state. This prevents a stale fade from
+    // overwriting the live track's volume.
+    if (epoch !== transitionEpoch) return;
     const t = i / FADE_STEPS;
     const v = from + (to - from) * t;
     await setSoundVolume(id, v);
@@ -119,14 +129,16 @@ async function fadeVolume(id: string, from: number, to: number): Promise<void> {
   }
 }
 
-async function stopWithFade(id: string): Promise<void> {
+async function stopWithFade(id: string, epoch: number): Promise<void> {
   const sound = sounds[id];
   if (!sound) return;
   try {
     const status = await sound.getStatusAsync();
     if (!status.isLoaded || !status.isPlaying) return;
     const from = typeof status.volume === 'number' ? status.volume : 0.5;
-    await fadeVolume(id, from, 0);
+    await fadeVolume(id, from, 0, epoch);
+    // Always stop, regardless of whether the fade was superseded —
+    // otherwise a stale track keeps playing under the new one.
     await sound.stopAsync();
     await sound.setPositionAsync(0);
   } catch {
@@ -134,7 +146,21 @@ async function stopWithFade(id: string): Promise<void> {
   }
 }
 
-async function playWithFade(entry: TrackEntry): Promise<void> {
+// Hard stop with no fade — used during transitions to guarantee the
+// previous track is silenced before the new one comes up.
+async function stopHard(id: string): Promise<void> {
+  const sound = sounds[id];
+  if (!sound) return;
+  try {
+    await sound.setVolumeAsync(0);
+    await sound.stopAsync();
+    await sound.setPositionAsync(0);
+  } catch {
+    // ignore
+  }
+}
+
+async function playWithFade(entry: TrackEntry, epoch: number): Promise<void> {
   await loadTrack(entry);
   const sound = sounds[entry.id];
   if (!sound) return;
@@ -146,7 +172,7 @@ async function playWithFade(entry: TrackEntry): Promise<void> {
     if (!status.isPlaying) {
       await sound.playAsync();
     }
-    await fadeVolume(entry.id, 0, effectiveVolume(entry));
+    await fadeVolume(entry.id, 0, effectiveVolume(entry), epoch);
   } catch {
     // ignore
   }
@@ -163,13 +189,14 @@ function pickFromPool(pool: TrackEntry[], excludeId: string | null): TrackEntry 
 
 export async function setActiveContext(desired: Context | null): Promise<void> {
   if (desired === activeContext) return;
+  // Bump the transition epoch FIRST so any in-flight fades abort.
+  const epoch = ++transitionEpoch;
   const settings = getAudioSettings();
-  // If the user has audio disabled, just record the context — don't
-  // start the track. When they re-enable, the controller will re-fire.
   if (!settings.enabled) {
     activeContext = desired;
-    if (activeTrackId) await stopWithFade(activeTrackId);
+    const prev = activeTrackId;
     activeTrackId = null;
+    if (prev) await stopHard(prev);
     return;
   }
   const prevId = activeTrackId;
@@ -177,13 +204,15 @@ export async function setActiveContext(desired: Context | null): Promise<void> {
   if (desired) {
     const pick = pickFromPool(POOLS[desired], prevId);
     activeTrackId = pick.id;
-    // Crossfade: kick off prev fade-out and new fade-in in parallel.
-    const out = prevId && prevId !== pick.id ? stopWithFade(prevId) : Promise.resolve();
-    const inP = playWithFade(pick);
-    await Promise.all([out, inP]);
+    // Hard-stop the previous track BEFORE starting the new one — no
+    // crossfade overlap. The new track fades IN from 0; the old goes
+    // silent in one frame. Eliminates the dual-playback bug at the
+    // cost of a slightly less smooth transition.
+    if (prevId && prevId !== pick.id) await stopHard(prevId);
+    await playWithFade(pick, epoch);
   } else {
     activeTrackId = null;
-    if (prevId) await stopWithFade(prevId);
+    if (prevId) await stopHard(prevId);
   }
 }
 
@@ -192,16 +221,15 @@ export async function setActiveContext(desired: Context | null): Promise<void> {
 // they toggle on after having been disabled.
 async function applySettings(): Promise<void> {
   const s = getAudioSettings();
+  const epoch = ++transitionEpoch;
   if (!s.enabled) {
-    if (activeTrackId) await stopWithFade(activeTrackId);
+    if (activeTrackId) await stopHard(activeTrackId);
     return;
   }
-  // Enabled: if there's an active context but no live track (we were
-  // off and just turned on), kick off a fresh pick from the pool.
   if (activeContext && !activeTrackId) {
     const pick = pickFromPool(POOLS[activeContext], null);
     activeTrackId = pick.id;
-    await playWithFade(pick);
+    await playWithFade(pick, epoch);
     return;
   }
   if (!activeTrackId) return;
@@ -213,21 +241,24 @@ async function applySettings(): Promise<void> {
     if (!status.isLoaded) return;
     if (!status.isPlaying) {
       await sound.playAsync();
-      await fadeVolume(activeTrackId, 0, effectiveVolume(entry));
+      await fadeVolume(activeTrackId, 0, effectiveVolume(entry), epoch);
     } else {
       await setSoundVolume(activeTrackId, effectiveVolume(entry));
     }
   }
 }
 
-// Force a full audio reset. Stops any live track, drops the cached
-// context, then re-derives from the caller's input. Used by the Apply
-// button when the user wants to push settings through.
 export async function forceReapplyAudio(targetContext: Context | null): Promise<void> {
+  // Bump the epoch and hard-stop EVERY loaded track — defensive nuke,
+  // since this is the user pressing APPLY to recover from a stuck state.
+  ++transitionEpoch;
   const prevId = activeTrackId;
   activeTrackId = null;
   activeContext = null;
-  if (prevId) await stopWithFade(prevId);
+  for (const id of Object.keys(sounds)) {
+    await stopHard(id);
+  }
+  void prevId;
   await setActiveContext(targetContext);
 }
 

@@ -26,7 +26,6 @@ export function ExplorationScreen() {
   const gameLog = useGameStore((s) => s.gameLog);
   const submit = useGameStore((s) => s.submitPlayerAction);
   const setScreen = useGameStore((s) => s.setScreen);
-  const beginScene = useGameStore((s) => s.beginScene);
   const currentScene = useGameStore((s) => s.currentScene);
   const pendingRolls = useGameStore((s) => s.pendingRolls);
   const resolveRollStep = useGameStore((s) => s.resolveRollStep);
@@ -108,9 +107,6 @@ export function ExplorationScreen() {
           </Text>
         </View>
         <View style={styles.sceneBarBtns}>
-          <TouchableOpacity onPress={() => beginScene()} hitSlop={8}>
-            <Text style={styles.sceneBtn}>↻</Text>
-          </TouchableOpacity>
           <TouchableOpacity onPress={() => setScreen('about')} hitSlop={8}>
             <Text style={styles.sceneBtn}>⚙</Text>
           </TouchableOpacity>
