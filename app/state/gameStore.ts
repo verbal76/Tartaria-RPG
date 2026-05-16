@@ -48,6 +48,7 @@ import { rollDie, rollFromNotation, pick, chance } from '../engine/rng';
 import { buildCombatSteps, buildSkillSteps, buildRestSteps } from '../engine/combatRules';
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
+import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
 import locationsData from '../data/locations/locations.json';
 import enemiesData from '../data/enemies/enemies.json';
 import conceptsData from '../data/lore/concepts.json';
@@ -222,6 +223,13 @@ export type CognitiveStatus = 'idle' | BootStage | 'failed' | 'skipped';
 
 // Module-level singleton — class instances don't belong in zustand state.
 const cognitive = new CognitiveOrchestrator();
+
+// Second AI engine — the generative Arbiter narrator. Loaded lazily on demand;
+// initialization is slow (~hundreds of MB download on first launch) so we keep
+// it on a separate boot path from the MiniLM classifier above. Until it
+// reports ready, the narrative pipeline keeps using the existing template
+// pools — there is no degraded mode.
+const qwen = new QwenGenerativeEngine();
 
 // Casual-look narration: the player asked to look around but didn't target
 // anything specific. We narrate the scene without a roll, and occasionally
@@ -418,6 +426,17 @@ interface GameStore {
   cognitiveLastResponse: CognitiveResponse | null;
   cognitiveModelInfo: ModelInfo | null;
 
+  // Qwen generative model — separate lifecycle from the MiniLM classifier.
+  // status mirrors the engine's internal state machine. `partialArbiterText`
+  // is the streaming buffer the UI tail-renders while a generation is in
+  // flight; `isGenerating` gates against overlapping generation calls.
+  qwenStatus: QwenStatus | 'skipped';
+  qwenFraction: number;
+  qwenError: string | null;
+  qwenModelId: string;
+  partialArbiterText: string | null;
+  isGenerating: boolean;
+
   hydrate: () => Promise<void>;
   setScreen: (screen: ScreenName) => void;
 
@@ -476,6 +495,10 @@ interface GameStore {
   shutdownCognitive: () => Promise<void>;
   resumeCognitive: () => Promise<void>;
 
+  bootQwen: () => Promise<void>;
+  skipQwenBoot: () => void;
+  shutdownQwen: () => Promise<void>;
+
   persist: () => Promise<void>;
 }
 
@@ -502,6 +525,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   cognitiveError: null,
   cognitiveLastResponse: null,
   cognitiveModelInfo: null,
+
+  qwenStatus: 'idle',
+  qwenFraction: 0,
+  qwenError: null,
+  qwenModelId: qwen.getModelId(),
+  partialArbiterText: null,
+  isGenerating: false,
 
   async hydrate() {
     // One-shot migration from the v1 single-slot save, if present.
@@ -3471,6 +3501,50 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const message = err instanceof Error ? err.message : String(err);
       set({ cognitiveStatus: 'failed', cognitiveError: message });
     }
+  },
+
+  async bootQwen() {
+    const current = get().qwenStatus;
+    if (current !== 'idle' && current !== 'failed') return;
+    set({ qwenStatus: 'downloading', qwenFraction: 0, qwenError: null });
+    try {
+      await qwen.initialize({
+        onProgress: (status, fraction) => {
+          set({ qwenStatus: status, qwenFraction: fraction });
+        },
+      });
+      // qwen.initialize() swallows errors and sets its own internal status to
+      // 'failed' rather than throwing — mirror that onto the store.
+      if (qwen.isReady()) {
+        set({
+          qwenStatus: 'ready',
+          qwenFraction: 1,
+          qwenError: null,
+          qwenModelId: qwen.getModelId(),
+        });
+      } else {
+        set({
+          qwenStatus: 'failed',
+          qwenError: qwen.getLastError() ?? 'Qwen failed to initialize',
+        });
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      set({ qwenStatus: 'failed', qwenError: message });
+    }
+  },
+
+  skipQwenBoot() {
+    set({ qwenStatus: 'skipped' });
+  },
+
+  async shutdownQwen() {
+    try {
+      await qwen.dispose();
+    } catch {
+      // best effort
+    }
+    set({ qwenStatus: 'idle', qwenFraction: 0, partialArbiterText: null, isGenerating: false });
   },
 
   async persist() {

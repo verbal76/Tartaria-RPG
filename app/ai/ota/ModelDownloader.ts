@@ -3,6 +3,8 @@ import * as FileSystem from 'expo-file-system';
 const MODEL_DIR_NAME = 'tartaria-models/';
 const MODEL_FILE_NAME = 'model_quantized.onnx';
 const VOCAB_FILE_NAME = 'vocab.txt';
+/** Subdirectory transformers.js uses to cache Qwen shards. Mirrors QwenGenerativeEngine. */
+const QWEN_CACHE_SUBDIR = 'tartaria-models/qwen/';
 
 export const DEFAULT_MODEL_URL =
   'https://huggingface.co/Xenova/all-MiniLM-L6-v2/resolve/main/onnx/model_quantized.onnx';
@@ -87,6 +89,26 @@ export class ModelDownloader {
   private async exists(path: string): Promise<boolean> {
     const info = await FileSystem.getInfoAsync(path);
     return info.exists;
+  }
+
+  /**
+   * Returns true if transformers.js has already cached at least one Qwen
+   * artifact locally. Used by boot UI to decide whether to show a "first-run
+   * download" message or a faster "loading model" one. Best-effort — the
+   * actual readiness check still belongs to QwenGenerativeEngine.isReady().
+   */
+  async isQwenCached(): Promise<boolean> {
+    const root = FileSystem.documentDirectory;
+    if (!root) return false;
+    const dir = root + QWEN_CACHE_SUBDIR;
+    try {
+      const info = await FileSystem.getInfoAsync(dir);
+      if (!info.exists || !info.isDirectory) return false;
+      const entries = await FileSystem.readDirectoryAsync(dir);
+      return entries.length > 0;
+    } catch {
+      return false;
+    }
   }
 
   private async downloadWithProgress(
