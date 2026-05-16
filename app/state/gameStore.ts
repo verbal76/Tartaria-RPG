@@ -1519,9 +1519,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           break;
         }
-        // Targeted craft — try to match recipe and consume materials.
+        // Targeted craft — try substring match first, then MiniLM semantic
+        // resolution (handles typos + paraphrased names like "aether sword"
+        // → "Aetheric Crystal Blade").
         const recipe = findRecipeByResult(target);
         if (!recipe) {
+          if (cognitive.isReady()) {
+            const recipeNames = RECIPES.map((r) => r.result);
+            void cognitive.inferTarget(target, recipeNames, 0.5).then((match) => {
+              if (match) {
+                get().appendLog(
+                  'cognitive',
+                  `Resolved "${target}" → "${match.target}" (sim ${match.score.toFixed(2)}).`,
+                );
+                get().submitPlayerAction(`craft ${match.target}`);
+              } else {
+                get().appendLog(
+                  'arbiter',
+                  `The Arbiter shakes their head. "I do not know that recipe. Try 'craft' alone — I will tell you what your pack can become."`,
+                );
+              }
+            }).catch(() => {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter shakes their head. "I do not know that recipe. Try 'craft' alone — I will tell you what your pack can become."`,
+              );
+            });
+            break;
+          }
           get().appendLog(
             'arbiter',
             `The Arbiter shakes their head. "I do not know that recipe. Try 'craft' alone — I will tell you what your pack can become."`,

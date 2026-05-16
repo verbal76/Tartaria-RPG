@@ -121,10 +121,56 @@ export function listCraftableRecipes(inventory: readonly InventoryItem[]): Recip
 export function findRecipeByResult(target: string): Recipe | null {
   const t = target.toLowerCase().trim();
   if (!t) return null;
+  // Pass 1 — substring match either direction. Cheap, covers most cases.
   for (const r of RECIPES) {
     if (r.result.toLowerCase().includes(t) || t.includes(r.result.toLowerCase())) return r;
   }
-  return null;
+  // Pass 2 — Levenshtein fuzzy match per word, so single-letter typos
+  // resolve without needing the cognitive layer. "aethetic vest" → "Aetheric Vest"
+  // works because "aethetic" → "aetheric" (distance 1, length 8 allows 2).
+  // We compare token-by-token against the recipe name's tokens, accepting
+  // when EVERY input token has a close match in the recipe.
+  const tTokens = t.split(/\s+/).filter(Boolean);
+  if (tTokens.length === 0) return null;
+  let best: { recipe: Recipe; totalDistance: number } | null = null;
+  for (const r of RECIPES) {
+    const rTokens = r.result.toLowerCase().split(/\s+/).filter(Boolean);
+    let totalDistance = 0;
+    let allMatched = true;
+    for (const it of tTokens) {
+      let bestForToken = Infinity;
+      for (const rt of rTokens) {
+        const maxLen = Math.max(it.length, rt.length);
+        const allowed = maxLen <= 4 ? 1 : maxLen <= 7 ? 2 : 3;
+        const d = levenshtein(it, rt);
+        if (d <= allowed && d < bestForToken) bestForToken = d;
+      }
+      if (bestForToken === Infinity) { allMatched = false; break; }
+      totalDistance += bestForToken;
+    }
+    if (allMatched && (!best || totalDistance < best.totalDistance)) {
+      best = { recipe: r, totalDistance };
+    }
+  }
+  return best?.recipe ?? null;
+}
+
+function levenshtein(a: string, b: string): number {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  const prev: number[] = new Array(b.length + 1);
+  const curr: number[] = new Array(b.length + 1);
+  for (let j = 0; j <= b.length; j++) prev[j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    curr[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a.charCodeAt(i - 1) === b.charCodeAt(j - 1) ? 0 : 1;
+      curr[j] = Math.min(curr[j - 1]! + 1, prev[j]! + 1, prev[j - 1]! + cost);
+    }
+    for (let j = 0; j <= b.length; j++) prev[j] = curr[j]!;
+  }
+  return prev[b.length] ?? 0;
 }
 
 export function consumeIngredients(
