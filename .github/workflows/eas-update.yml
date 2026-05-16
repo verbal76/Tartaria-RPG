@@ -93,6 +93,30 @@ jobs:
             --json \
             > update-result.json
 
+          # CHANNEL → BRANCH MAPPING — the device sends 'expo-channel-name:
+          # preview' and EAS routes that to whichever branch the channel is
+          # mapped to. If no mapping exists (or it points to the wrong
+          # branch), the manifest endpoint returns no compatible update and
+          # expo-updates throws ERR_UPDATES_CHECK on the device — even though
+          # the publish itself succeeded. We ensure the mapping every run.
+          # Idempotent: if it already matches, EAS reports no change.
+          echo "=== Channel mapping check ==="
+          set +e
+          eas channel:view "$CHANNEL" --non-interactive > channel-info.txt 2>&1
+          VIEW_EXIT=$?
+          set -e
+          if [ $VIEW_EXIT -eq 0 ]; then
+            echo "Channel '$CHANNEL' exists:"
+            cat channel-info.txt
+          else
+            echo "Channel '$CHANNEL' does not exist — creating."
+            eas channel:create "$CHANNEL" --non-interactive 2>&1 || echo "::warning::channel:create returned non-zero (channel may already exist)"
+          fi
+          echo "Binding channel '$CHANNEL' → branch '$CHANNEL'..."
+          eas channel:edit "$CHANNEL" --branch "$CHANNEL" --non-interactive 2>&1 \
+            || echo "::warning::channel:edit failed — mapping may need manual fix in the EAS dashboard"
+          echo "============================"
+
           echo "=== OTA publish — result ==="
           cat update-result.json | node -e '
             const r = JSON.parse(require("fs").readFileSync(0, "utf8"));
