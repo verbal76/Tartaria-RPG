@@ -195,7 +195,22 @@ export interface PlayerMilestones {
   checksSucceeded: number;
 }
 
+export type EquipSlot = 'main' | 'off' | 'armor' | 'amulet' | 'ring';
+
 export interface PlayerEquipped {
+  /** Catalog name of the weapon in the main (dominant) hand. */
+  main?: string;
+  /** Catalog name of the weapon in the off-hand. */
+  off?: string;
+  /** Catalog name of equipped body armor. */
+  armor?: string;
+  /** Catalog name of equipped amulet (relic with neck/detection tag). */
+  amulet?: string;
+  /** Catalog name of equipped ring (relic with accessory tag). */
+  ring?: string;
+
+  // Legacy fields kept on the type so existing saves still deserialize
+  // cleanly. backfillPlayer migrates them to `main` / `armor` on hydrate.
   weaponName?: string;
   armorName?: string;
 }

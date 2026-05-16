@@ -5,10 +5,18 @@ import { findWeaponByName, type CatalogWeapon } from './crafting';
 type WeaponClass = 'ranged' | 'melee' | 'runecaster' | 'barehanded';
 
 // Resolve the player's currently-equipped weapon to a catalog entry, if any.
-// Used by combat resolution to override the generic 1d6 / weapon-class
-// detection with the actual stats of the gear they're wielding.
-export function getEquippedWeapon(player: PlayerCharacter): CatalogWeapon | null {
-  const name = player.equipped?.weaponName;
+// `prefer` lets the caller bias toward an off-hand strike when the player
+// explicitly chooses it; defaults to the main-hand weapon.
+export function getEquippedWeapon(
+  player: PlayerCharacter,
+  prefer: 'main' | 'off' = 'main',
+): CatalogWeapon | null {
+  const eq = player.equipped;
+  if (!eq) return null;
+  const name =
+    prefer === 'off'
+      ? eq.off ?? eq.main ?? eq.weaponName
+      : eq.main ?? eq.weaponName ?? eq.off;
   return name ? findWeaponByName(name) : null;
 }
 

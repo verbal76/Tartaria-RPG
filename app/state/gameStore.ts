@@ -63,6 +63,8 @@ import {
 } from '../engine/crafting';
 import { getEquippedWeapon } from '../engine/combatRules';
 import { pickRandomVendor, type VendorInstance } from '../engine/vendors';
+import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
+import type { EquipSlot } from '../engine/types';
 import {
   WEAPONS,
   ARMOR,
@@ -191,12 +193,21 @@ const TRAVEL_MIN_STAMINA = STAMINA_COSTS.travel;
 
 function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
   const stamMax = p.staminaMax ?? 8 + Math.floor((p.stats?.strength ?? 5) / 2);
+  // Migrate legacy single-slot equipped fields to the multi-slot shape.
+  const eq = p.equipped ?? {};
+  const equipped = {
+    main: eq.main ?? eq.weaponName,
+    off: eq.off,
+    armor: eq.armor ?? eq.armorName,
+    amulet: eq.amulet,
+    ring: eq.ring,
+  };
   return {
     ...p,
     staminaMax: stamMax,
     stamina: p.stamina ?? stamMax,
     milestones: p.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 },
-    equipped: p.equipped ?? {},
+    equipped,
     statusEffects: p.statusEffects ?? [],
     hoursElapsed: p.hoursElapsed ?? 0,
   };
@@ -318,6 +329,8 @@ interface GameStore {
   stealFromVendor: (itemName: string) => void;
   dismissVendor: () => void;
   joinFaction: (factionId: string) => void;
+  equipItem: (itemName: string, slot: EquipSlot) => void;
+  unequipSlot: (slot: EquipSlot) => void;
 
   bootCognitive: () => Promise<void>;
   skipCognitiveBoot: () => void;
@@ -778,32 +791,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (isUnequip) {
           const target = (parsed.target ?? '').toLowerCase();
           const onlyArmor = /armou?r|plate|vest|robe|cloth|mantle|scales|harness/.test(target);
-          const onlyWeapon = /blade|sword|wand|rod|stave|bow|gauntlet|spear|cleaver|edge|crown|fist|crossbow/.test(target);
-          const newEquipped: { weaponName?: string; armorName?: string } = { ...(player.equipped ?? {}) };
-          if (onlyArmor && !onlyWeapon) {
-            newEquipped.armorName = undefined;
-            get().appendLog('world', `You shrug off your armor.`);
-          } else if (onlyWeapon && !onlyArmor) {
-            newEquipped.weaponName = undefined;
-            get().appendLog('world', `You sheathe your weapon.`);
-          } else {
-            newEquipped.weaponName = undefined;
-            newEquipped.armorName = undefined;
-            get().appendLog('world', `You set everything aside. Your hands are empty.`);
+          const onlyAmulet = /amulet|locket|necklace/.test(target);
+          const onlyRing = /ring|band/.test(target);
+          if (onlyArmor) get().unequipSlot('armor');
+          else if (onlyAmulet) get().unequipSlot('amulet');
+          else if (onlyRing) get().unequipSlot('ring');
+          else {
+            // No specific target — clear hands.
+            get().unequipSlot('main');
+            get().unequipSlot('off');
           }
-          set((s) => ({ player: s.player ? { ...s.player, equipped: newEquipped } : s.player }));
           break;
         }
-        // EQUIP path
+        // EQUIP path — defaults to main hand for weapons, armor slot for armor.
         const lookup = parsed.resolvedNoun ?? parsed.target ?? '';
         if (!lookup.trim()) {
           get().appendLog(
             'arbiter',
-            `The Arbiter raises an eyebrow. "Equip what? Say it by name — a blade, a vest, a rod."`,
+            `The Arbiter raises an eyebrow. "Equip what? Open your inventory and tap an item."`,
           );
           break;
         }
-        // Must be in inventory before they can equip it.
         const inInventory = player.inventory.find((i) => i.name.toLowerCase() === lookup.toLowerCase());
         if (!inInventory) {
           get().appendLog(
@@ -812,29 +820,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
-        const weapon = fuzzyFindWeapon(inInventory.name);
-        const armor = !weapon ? fuzzyFindArmor(inInventory.name) : null;
-        if (!weapon && !armor) {
-          get().appendLog(
-            'arbiter',
-            `The Arbiter frowns. "That is not a thing you can wear or wield."`,
-          );
+        const validSlots = validSlotsForItem(inInventory);
+        if (validSlots.length === 0) {
+          get().appendLog('arbiter', `The Arbiter frowns. "That is not a thing you can wear or wield."`);
           break;
         }
-        const newEquipped: { weaponName?: string; armorName?: string } = { ...(player.equipped ?? {}) };
-        if (weapon) {
-          newEquipped.weaponName = weapon.name;
-          set((s) => ({ player: s.player ? { ...s.player, equipped: newEquipped } : s.player }));
-          get().appendLog(
-            'world',
-            `You take up the ${weapon.name}. ${weapon.damageDice} ${weapon.damageType} — ${weapon.stat.toUpperCase().slice(0, 3)} to hit.`,
-          );
-        } else if (armor) {
-          newEquipped.armorName = armor.name;
-          set((s) => ({ player: s.player ? { ...s.player, equipped: newEquipped } : s.player }));
-          const resistList = armor.resistances?.length ? ` Resists ${armor.resistances.join(', ')}.` : '';
-          get().appendLog('world', `You don the ${armor.name}. +${armor.acBonus} AC.${resistList}`);
-        }
+        const slot: EquipSlot = trimmed.toLowerCase().includes('off') && validSlots.includes('off')
+          ? 'off'
+          : validSlots[0]!;
+        get().equipItem(inInventory.name, slot);
         break;
       }
       case 'gift': {
@@ -1571,6 +1565,57 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }));
   },
 
+  equipItem(itemName, slot) {
+    const state = get();
+    const player = state.player;
+    if (!player) return;
+    const item = player.inventory.find(
+      (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
+    );
+    if (!item) {
+      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
+      return;
+    }
+    const valid = validSlotsForItem(item);
+    if (!valid.includes(slot)) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter shakes their head. "The ${item.name} doesn't go in the ${SLOT_LABEL[slot]} slot."`,
+      );
+      return;
+    }
+    set((s) =>
+      s.player
+        ? {
+            player: {
+              ...s.player,
+              equipped: { ...(s.player.equipped ?? {}), [slot]: item.name },
+            },
+          }
+        : s,
+    );
+    get().appendLog(
+      'world',
+      `You equip ${item.name} (${SLOT_LABEL[slot]}).`,
+    );
+    void get().persist();
+  },
+
+  unequipSlot(slot) {
+    set((s) =>
+      s.player
+        ? {
+            player: {
+              ...s.player,
+              equipped: { ...(s.player.equipped ?? {}), [slot]: undefined },
+            },
+          }
+        : s,
+    );
+    get().appendLog('world', `You set aside what was in your ${SLOT_LABEL[slot]} slot.`);
+    void get().persist();
+  },
+
   rest() {
     const player = get().player;
     if (!player) return;
@@ -1684,7 +1729,7 @@ function applyEnemyCounter(
   // Effective AC = race base + armor bonus + status modifier (e.g. -2 from
   // armor_severed). Status floor at 1 so a player isn't completely impossible
   // to defend.
-  const armor = player.equipped?.armorName ? findArmorByName(player.equipped.armorName) : null;
+  const armor = player.equipped?.armor ? findArmorByName(player.equipped.armor) : null;
   const acFromGear = player.ac + (armor?.acBonus ?? 0);
   const effectiveAc = Math.max(1, acFromGear + statusAcAdjustment(player.statusEffects));
   const hit = atkTotal >= effectiveAc;

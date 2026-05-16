@@ -5,15 +5,23 @@ interface Props {
   onSubmit: (text: string) => void;
   onOpenInventory: () => void;
   inCombat: boolean;
-  hasEquippedWeapon: boolean;
+  equippedMain: string | null;
+  equippedOff: string | null;
 }
 
-// Context-aware quick actions. Out of combat the player has the
-// exploration verbs they need; in combat the row swaps to fast
-// physical options + a dodge defensive stance.
 const PEACE_QUICK = ['look', 'search', 'rest'] as const;
 
-export function InputBox({ onSubmit, onOpenInventory, inCombat, hasEquippedWeapon }: Props) {
+// Trim a weapon name down to fit comfortably on a button. Examples:
+// "Aetheric Crystal Blade" → "Crystal Blade"
+// "Mud-fist Wraps"          → "Mud-fist"
+// "Sentinel Cleaver"        → "Cleaver"
+function shortWeaponLabel(name: string): string {
+  const tokens = name.split(/\s+/);
+  if (tokens.length <= 2) return name;
+  return tokens.slice(-2).join(' ');
+}
+
+export function InputBox({ onSubmit, onOpenInventory, inCombat, equippedMain, equippedOff }: Props) {
   const [text, setText] = useState('');
 
   const handleSubmit = () => {
@@ -30,11 +38,18 @@ export function InputBox({ onSubmit, onOpenInventory, inCombat, hasEquippedWeapo
           <>
             <QuickBtn label="punch" onPress={() => onSubmit('punch')} />
             <QuickBtn label="kick" onPress={() => onSubmit('kick')} />
-            <QuickBtn
-              label={hasEquippedWeapon ? 'weapon' : 'weapon —'}
-              dim={!hasEquippedWeapon}
-              onPress={() => onSubmit(hasEquippedWeapon ? 'attack with my weapon' : 'attack')}
-            />
+            {equippedMain ? (
+              <QuickBtn
+                label={shortWeaponLabel(equippedMain).toLowerCase()}
+                onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)}
+              />
+            ) : null}
+            {equippedOff ? (
+              <QuickBtn
+                label={`off: ${shortWeaponLabel(equippedOff).toLowerCase()}`}
+                onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)}
+              />
+            ) : null}
             <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} />
           </>
         ) : (
@@ -69,17 +84,15 @@ export function InputBox({ onSubmit, onOpenInventory, inCombat, hasEquippedWeapo
 function QuickBtn({
   label,
   onPress,
-  dim,
   defensive,
 }: {
   label: string;
   onPress: () => void;
-  dim?: boolean;
   defensive?: boolean;
 }) {
   return (
     <TouchableOpacity
-      style={[styles.quick, defensive && styles.quickDefensive, dim && styles.quickDim]}
+      style={[styles.quick, defensive && styles.quickDefensive]}
       onPress={onPress}
     >
       <Text style={[styles.quickText, defensive && styles.quickDefensiveText]}>{label}</Text>
@@ -98,7 +111,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 4,
   },
-  quickDim: { opacity: 0.45 },
   quickDefensive: { borderColor: '#6a9bbf' },
   quickText: { color: '#cdbf99', fontSize: 12 },
   quickDefensiveText: { color: '#6a9bbf' },

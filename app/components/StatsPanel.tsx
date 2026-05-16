@@ -10,9 +10,19 @@ interface Props { player: PlayerCharacter; }
 export function StatsPanel({ player }: Props) {
   const race = (racesData as { id: string; name: string }[]).find((r) => r.id === player.raceId);
   const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
-  const equippedArmor = player.equipped?.armorName ? findArmorByName(player.equipped.armorName) : null;
+  const equippedArmor = player.equipped?.armor ? findArmorByName(player.equipped.armor) : null;
   const effectiveAc = player.ac + (equippedArmor?.acBonus ?? 0);
-  const equippedLabel = [player.equipped?.weaponName, player.equipped?.armorName].filter(Boolean).join(' · ');
+
+  // Compose a single-line summary of every filled slot so the panel
+  // stays compact even with five slots tracked.
+  const slotParts: string[] = [];
+  if (player.equipped?.main) slotParts.push(`R: ${player.equipped.main}`);
+  if (player.equipped?.off) slotParts.push(`L: ${player.equipped.off}`);
+  if (player.equipped?.armor) slotParts.push(`Arm: ${player.equipped.armor}`);
+  if (player.equipped?.amulet) slotParts.push(`Aml: ${player.equipped.amulet}`);
+  if (player.equipped?.ring) slotParts.push(`Rg: ${player.equipped.ring}`);
+  const equippedLabel = slotParts.length > 0 ? slotParts.join(' · ') : 'nothing';
+
   return (
     <View style={styles.container}>
       <Text style={styles.name}>{player.name}</Text>
@@ -31,8 +41,8 @@ export function StatsPanel({ player }: Props) {
         <Stat label="WIS" value={`${player.stats.wisdom}`} />
         <Stat label="CHA" value={`${player.stats.charisma}`} />
       </View>
-      <Text style={styles.equipped} numberOfLines={1}>
-        {equippedLabel ? `Equipped: ${equippedLabel}` : 'Equipped: nothing'}
+      <Text style={styles.equipped} numberOfLines={2}>
+        Equipped: {equippedLabel}
       </Text>
       {player.statusEffects && player.statusEffects.length > 0 && (
         <Text style={styles.effects} numberOfLines={1}>

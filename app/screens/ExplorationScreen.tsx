@@ -49,7 +49,8 @@ export function ExplorationScreen() {
   }, [currentScene?.enemy, currentEnemyHp]);
 
   const inCombat = enemyViews.length > 0;
-  const hasEquippedWeapon = !!player?.equipped?.weaponName;
+  const equippedMain = player?.equipped?.main ?? null;
+  const equippedOff = player?.equipped?.off ?? null;
 
   if (!player) {
     return (
@@ -127,7 +128,8 @@ export function ExplorationScreen() {
             onSubmit={submit}
             onOpenInventory={() => setScreen('inventory')}
             inCombat={inCombat}
-            hasEquippedWeapon={hasEquippedWeapon}
+            equippedMain={equippedMain}
+            equippedOff={equippedOff}
           />
         )}
         <View style={styles.menuRow}>

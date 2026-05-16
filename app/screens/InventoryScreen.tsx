@@ -1,18 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import {
   CATEGORY_COLORS,
   CATEGORY_LABEL,
   CATEGORY_ORDER,
   groupInventoryByCategory,
-  type InventoryCategory,
 } from '../components/InventoryCategorize';
-import type { InventoryItem } from '../engine/types';
+import type { InventoryItem, EquipSlot } from '../engine/types';
+import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
 
 export function InventoryScreen() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
+  const equipItem = useGameStore((s) => s.equipItem);
 
   if (!player) {
     return (
@@ -23,8 +24,40 @@ export function InventoryScreen() {
   }
 
   const grouped = groupInventoryByCategory(player.inventory);
-  const equippedWeapon = player.equipped?.weaponName;
-  const equippedArmor = player.equipped?.armorName;
+  const equippedSet = new Set(
+    [
+      player.equipped?.main,
+      player.equipped?.off,
+      player.equipped?.armor,
+      player.equipped?.amulet,
+      player.equipped?.ring,
+    ].filter((x): x is string => !!x),
+  );
+
+  const handleItemTap = (item: InventoryItem) => {
+    const slots = validSlotsForItem(item);
+    if (slots.length === 0) {
+      Alert.alert(item.name, 'You cannot equip this.');
+      return;
+    }
+    if (slots.length === 1) {
+      equipItem(item.name, slots[0]!);
+      return;
+    }
+    // Multiple valid slots — let the player choose. Weapons get a
+    // main-hand / off-hand prompt.
+    Alert.alert(
+      `Equip ${item.name}`,
+      'Which slot?',
+      [
+        ...slots.map((s) => ({
+          text: SLOT_LABEL[s],
+          onPress: () => equipItem(item.name, s),
+        })),
+        { text: 'Cancel', style: 'cancel' as const },
+      ],
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -62,8 +95,8 @@ export function InventoryScreen() {
                   key={item.id}
                   item={item}
                   color={CATEGORY_COLORS[cat]}
-                  equippedWeapon={equippedWeapon}
-                  equippedArmor={equippedArmor}
+                  isEquipped={equippedSet.has(item.name)}
+                  onPress={() => handleItemTap(item)}
                 />
               ))}
             </View>
@@ -89,17 +122,22 @@ export function InventoryScreen() {
 function ItemRow({
   item,
   color,
-  equippedWeapon,
-  equippedArmor,
+  isEquipped,
+  onPress,
 }: {
   item: InventoryItem;
   color: string;
-  equippedWeapon?: string;
-  equippedArmor?: string;
+  isEquipped: boolean;
+  onPress: () => void;
 }) {
-  const isEquipped = item.name === equippedWeapon || item.name === equippedArmor;
+  const canEquip = validSlotsForItem(item).length > 0;
   return (
-    <View style={styles.row}>
+    <TouchableOpacity
+      style={styles.row}
+      onPress={onPress}
+      activeOpacity={canEquip ? 0.7 : 1}
+      disabled={!canEquip}
+    >
       <View style={[styles.rowStripe, { backgroundColor: color }]} />
       <View style={styles.rowBody}>
         <View style={styles.rowHead}>
@@ -110,10 +148,11 @@ function ItemRow({
         </View>
         <View style={styles.rowMetaRow}>
           {item.rarity && <Text style={styles.rowMeta}>{item.rarity}</Text>}
+          {canEquip && !isEquipped && <Text style={styles.rowEquippable}>tap to equip</Text>}
           {isEquipped && <Text style={styles.rowEquipped}>EQUIPPED</Text>}
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -170,6 +209,7 @@ const styles = StyleSheet.create({
   rowMetaRow: { flexDirection: 'row', gap: 8, marginTop: 2 },
   rowMeta: { color: '#7a705c', fontSize: 10, letterSpacing: 1 },
   rowEquipped: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  rowEquippable: { color: '#7a705c', fontSize: 10, letterSpacing: 1, fontStyle: 'italic' },
   empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 30 },
   legend: {
     flexDirection: 'row',
