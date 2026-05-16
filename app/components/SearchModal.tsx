@@ -56,8 +56,10 @@ export function SearchModal({ visible, hints, onSubmit, onCancel }: Props) {
               <Text style={styles.title}>SEARCH</Text>
               <View style={styles.rule} />
               <Text style={styles.body}>
-                Name what you are searching for. Be specific — a handprint, a marking,
-                a sound, an object you noticed.
+                Name an area or thing to search. Be specific with your words —
+                "the mud", "the rubble", "the doorway", "the area to my left",
+                "the wagon", "behind the column". The Arbiter will try to read
+                your meaning, but vague rolls find vague things.
               </Text>
 
               <TextInput
@@ -65,7 +67,7 @@ export function SearchModal({ visible, hints, onSubmit, onCancel }: Props) {
                 style={styles.input}
                 value={text}
                 onChangeText={setText}
-                placeholder="e.g. handprints, traps, the obelisk"
+                placeholder='e.g. "the mud", "the doorway", "left side"'
                 placeholderTextColor="#5a5246"
                 onSubmitEditing={handleSubmit}
                 returnKeyType="search"
@@ -73,9 +75,15 @@ export function SearchModal({ visible, hints, onSubmit, onCancel }: Props) {
                 autoCapitalize="none"
               />
 
+              <Text style={styles.examples}>
+                Try: the mud · the rubble · the doorway · the wagon · the column ·
+                behind me · the area to my left · the area to my right ·
+                the floor · the walls · the silt · the dust
+              </Text>
+
               {hints && hints.length > 0 ? (
                 <Text style={styles.hints}>
-                  Visible here: {hints.slice(0, 4).join(', ')}
+                  Mentioned in this scene: {hints.slice(0, 5).join(', ')}
                 </Text>
               ) : null}
 
@@ -138,6 +146,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   hints: { color: '#7a705c', fontSize: 11, marginTop: 8, fontStyle: 'italic' },
+  examples: { color: '#9ec96a', fontSize: 11, marginTop: 8, lineHeight: 16, letterSpacing: 0.5 },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 14 },
   btn: {
     paddingHorizontal: 14,

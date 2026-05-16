@@ -118,6 +118,7 @@ import {
 } from '../engine/factionStorylines';
 import { tickWeather, weatherBlocksRepositioning } from '../engine/weatherEffects';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
+import { isAreaSearch, rollAreaSearch } from '../engine/areaSearch';
 import { bestDigTool, rollDig } from '../engine/digging';
 import {
   generateWorldMap,
@@ -1032,7 +1033,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
           break;
         }
-        // 4) Player aimed at something specific the engine can't recognise.
+        // 4) Generic area / surface / direction search ("the mud", "the
+        // rubble", "the doorway", "the area to my left"). Roll an
+        // outcome on the spot — nothing, small material, small TC, or
+        // an atmospheric hook plant. Always engaging, never reprompting
+        // for these.
+        if (rawTarget && isAreaSearch(rawTarget)) {
+          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+          const outcome = rollAreaSearch(rawTarget);
+          get().appendLog('world', outcome.line);
+          if (outcome.kind === 'material') {
+            const itemCat = lookupCraftedItem(outcome.itemName);
+            const newItem: InventoryItem = stampDurability({
+              id: `search_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              name: outcome.itemName,
+              kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
+              rarity: outcome.rarity,
+              quantity: 1,
+              tags: itemCat.tags,
+            });
+            set((s) =>
+              s.player ? { player: { ...s.player, inventory: [...s.player.inventory, newItem] } } : s,
+            );
+            get().appendLog('reward', `✦ ${outcome.itemName} (${outcome.rarity}).`);
+          } else if (outcome.kind === 'tc') {
+            set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + outcome.amount } } : s));
+            get().appendLog('reward', `+${outcome.amount} TC.`);
+          } else if (outcome.kind === 'hook') {
+            const activeUnresolved = (currentScene.hooks ?? []).some((h) => !h.resolved);
+            if (!activeUnresolved) {
+              const hook = plantHookByKind(pickRandomHookKind());
+              set((s) => (s.currentScene
+                ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } }
+                : s));
+              get().appendLog('world', hook.plantedLine);
+            }
+          }
+          break;
+        }
+        // 5) Player aimed at something specific the engine can't recognise.
         // First try a semantic resolution via MiniLM — embed the raw target
         // + scene candidates, find the closest cosine match. If it lands
         // above threshold, re-run the action with the inferred target.
