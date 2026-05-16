@@ -19,6 +19,8 @@ export type Intent =
   | 'steal'
   | 'join'
   | 'dodge'
+  | 'advance'
+  | 'retreat'
   | 'unknown';
 
 export interface ParsedInput {
@@ -185,7 +187,11 @@ export interface InventoryItem {
   description?: string;
   quantity: number;
   tags: string[];
+  /** Per-instance durability for wear-prone gear. Absent for stackable/consumable items. */
+  durability?: { current: number; max: number };
 }
+
+export type CombatRange = 'arm' | 'close' | 'far';
 
 export interface FactionStanding { factionId: string; standing: number; }
 
@@ -195,24 +201,33 @@ export interface PlayerMilestones {
   checksSucceeded: number;
 }
 
-export type EquipSlot = 'main' | 'off' | 'armor' | 'amulet' | 'ring';
+export type EquipSlot =
+  | 'main'
+  | 'off'
+  | 'head'
+  | 'chest'
+  | 'legs'
+  | 'feet'
+  | 'amulet'
+  | 'ring';
 
 export interface PlayerEquipped {
   /** Catalog name of the weapon in the main (dominant) hand. */
   main?: string;
   /** Catalog name of the weapon in the off-hand. */
   off?: string;
-  /** Catalog name of equipped body armor. */
-  armor?: string;
-  /** Catalog name of equipped amulet (relic with neck/detection tag). */
+  head?: string;
+  chest?: string;
+  legs?: string;
+  feet?: string;
   amulet?: string;
-  /** Catalog name of equipped ring (relic with accessory tag). */
   ring?: string;
 
   // Legacy fields kept on the type so existing saves still deserialize
-  // cleanly. backfillPlayer migrates them to `main` / `armor` on hydrate.
+  // cleanly. backfillPlayer migrates them to the new slot shape.
   weaponName?: string;
   armorName?: string;
+  armor?: string;
 }
 
 export type DamageType =

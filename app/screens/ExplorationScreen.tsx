@@ -8,6 +8,7 @@ import { DiceRoller } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
 import { VendorPanel } from '../components/VendorPanel';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
+import { findWeaponByName } from '../engine/crafting';
 
 function describeTime(hours: number): string {
   const day = Math.floor(hours / 24) + 1;
@@ -40,13 +41,31 @@ export function ExplorationScreen() {
   // Engine still single-enemy; panel takes an array for future multi-enemy.
   const enemyViews: EnemyView[] = useMemo(() => {
     if (!currentScene?.enemy) return [];
+    const range = currentScene.range ?? 'close';
+    const rangeLabel = range === 'arm' ? "arm's reach" : range === 'far' ? 'far' : 'close';
+    // In-range = the player's current weapon can hit at the scene's range.
+    const mainName = player?.equipped?.main ?? player?.equipped?.weaponName;
+    const w = mainName ? findWeaponByName(mainName) : null;
+    let canHit = false;
+    if (!w) {
+      canHit = range === 'arm'; // bare hands
+    } else if (w.weaponKind === 'melee') {
+      canHit = range === 'arm';
+    } else if (w.weaponKind === 'ranged') {
+      canHit = true;
+    } else {
+      // runecaster — arm + close always, far only with INT ≥ 9
+      canHit = range !== 'far' || (player?.stats?.intelligence ?? 0) >= 9;
+    }
     return [
       {
         enemy: currentScene.enemy,
         currentHp: currentEnemyHp ?? currentScene.enemy.hp,
+        rangeLabel,
+        inRange: canHit,
       },
     ];
-  }, [currentScene?.enemy, currentEnemyHp]);
+  }, [currentScene?.enemy, currentScene?.range, currentEnemyHp, player?.equipped?.main, player?.equipped?.weaponName, player?.stats?.intelligence]);
 
   const inCombat = enemyViews.length > 0;
   const equippedMain = player?.equipped?.main ?? null;
@@ -130,6 +149,7 @@ export function ExplorationScreen() {
             inCombat={inCombat}
             equippedMain={equippedMain}
             equippedOff={equippedOff}
+            range={currentScene?.range ?? null}
           />
         )}
         <View style={styles.menuRow}>

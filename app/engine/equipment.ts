@@ -1,5 +1,5 @@
 import type { InventoryItem, EquipSlot } from './types';
-import { findWeaponByName, findArmorByName, GEAR } from './crafting';
+import { findWeaponByName, findArmorByName, findAmuletByName, findRingByName, GEAR } from './crafting';
 
 /**
  * Return the list of slots an item could legally be equipped into.
@@ -10,9 +10,12 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   if (findWeaponByName(item.name)) {
     return ['main', 'off']; // any weapon can go in either hand
   }
-  if (findArmorByName(item.name)) {
-    return ['armor'];
+  const armor = findArmorByName(item.name);
+  if (armor) {
+    return [armor.slot];
   }
+  if (findAmuletByName(item.name)) return ['amulet'];
+  if (findRingByName(item.name)) return ['ring'];
   // Gear-side: relics with detection / locket-ish tags can be amulets.
   const gear = GEAR.find((g) => g.name.toLowerCase() === nameLower);
   if (gear) {
@@ -33,7 +36,13 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
 export const SLOT_LABEL: Record<EquipSlot, string> = {
   main: 'Main hand',
   off: 'Off hand',
-  armor: 'Armor',
+  head: 'Head',
+  chest: 'Chest',
+  legs: 'Legs',
+  feet: 'Feet',
   amulet: 'Amulet',
   ring: 'Ring',
 };
+
+/** Slots that hold armor pieces (used to aggregate AC + resistances). */
+export const ARMOR_SLOTS: readonly EquipSlot[] = ['head', 'chest', 'legs', 'feet'];

@@ -13,6 +13,7 @@ import type {
   RollStep,
   PendingRollState,
   InventoryItem,
+  CombatRange,
 } from '../engine/types';
 import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat } from '../engine/worldMemory';
 import {
@@ -57,13 +58,14 @@ import {
   fuzzyFindWeapon,
   fuzzyFindArmor,
   findArmorByName,
+  findWeaponByName,
   applyDamageTypeModifier,
   applyArmorResistance,
   type Recipe,
 } from '../engine/crafting';
 import { getEquippedWeapon } from '../engine/combatRules';
 import { pickRandomVendor, type VendorInstance } from '../engine/vendors';
-import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS } from '../engine/equipment';
 import type { EquipSlot } from '../engine/types';
 import {
   WEAPONS,
@@ -125,6 +127,8 @@ interface CurrentScene {
   hazard: Hazard | null;
   enemy: Enemy | null;
   vendor: VendorInstance | null;
+  /** Distance from the player to the enemy. Null when no enemy is present. */
+  range: CombatRange | null;
 }
 
 function collectSceneNouns(scene: CurrentScene): string[] {
@@ -194,11 +198,16 @@ const TRAVEL_MIN_STAMINA = STAMINA_COSTS.travel;
 function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
   const stamMax = p.staminaMax ?? 8 + Math.floor((p.stats?.strength ?? 5) / 2);
   // Migrate legacy single-slot equipped fields to the multi-slot shape.
+  // Old saves may have a single `armor` field — promote it to the chest slot.
   const eq = p.equipped ?? {};
-  const equipped = {
+  const legacyArmor = eq.chest ?? eq.armor ?? eq.armorName;
+  const equipped: PlayerCharacter['equipped'] = {
     main: eq.main ?? eq.weaponName,
     off: eq.off,
-    armor: eq.armor ?? eq.armorName,
+    head: eq.head,
+    chest: legacyArmor,
+    legs: eq.legs,
+    feet: eq.feet,
     amulet: eq.amulet,
     ring: eq.ring,
   };
@@ -529,7 +538,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const enemy = pickEnemyForLocation(location);
     // Vendor only appears in peaceful scenes (no enemy). ~22% chance.
     const vendor = !enemy && Math.random() < 0.22 ? pickRandomVendor() : null;
-    const scene: CurrentScene = { weather, location, hazard, enemy, vendor };
+    // Enemies start at 'close' range — close enough to be a problem but not
+    // already swinging. Players have to advance (or be charged) to land
+    // melee, retreat to set up ranged shots.
+    const range: CombatRange | null = enemy ? 'close' : null;
+    const scene: CurrentScene = { weather, location, hazard, enemy, vendor, range };
     set({ currentScene: scene, currentEnemyHp: enemy?.hp ?? null, pendingRolls: null });
     get().appendLog('world', buildScene({ weather, location, hazard, enemy, quest: player.activeQuests[0] }));
     if (vendor) {
@@ -656,6 +669,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     switch (parsed.intent) {
       case 'attack': {
         if (currentScene.enemy) {
+          // Range check: melee weapons need arm's reach; ranged weapons can
+          // hit at close or far; bare hands need arm's reach.
+          const range = currentScene.range ?? 'close';
+          const reach = playerWeaponReach(player);
+          if (!reach.bands.includes(range)) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter holds up a hand. "${reach.label} cannot reach at ${RANGE_LABEL[range]}. Close the gap, or swap to something with range."`,
+            );
+            break;
+          }
           set({ player: spendStamina(player, STAMINA_COSTS.attack) });
           const steps = buildCombatSteps(trimmed, player, currentScene.enemy);
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
@@ -769,6 +793,43 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
         break;
       }
+      case 'advance':
+      case 'retreat': {
+        // Move one band toward or away from the enemy. No-op when there
+        // isn't an enemy in the scene.
+        if (!currentScene.enemy) {
+          get().appendLog('arbiter', `The Arbiter shrugs. "Nothing to advance on. The ground here is quiet."`);
+          break;
+        }
+        const order: CombatRange[] = ['arm', 'close', 'far'];
+        const cur = currentScene.range ?? 'close';
+        const curIdx = order.indexOf(cur);
+        const nextIdx = parsed.intent === 'advance' ? Math.max(0, curIdx - 1) : Math.min(order.length - 1, curIdx + 1);
+        const next = order[nextIdx]!;
+        if (next === cur) {
+          get().appendLog(
+            'world',
+            parsed.intent === 'advance'
+              ? `You are already at arm's reach with ${currentScene.enemy.name}.`
+              : `You cannot put more ground between you and ${currentScene.enemy.name}.`,
+          );
+          break;
+        }
+        set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, range: next } } : s));
+        get().appendLog(
+          'world',
+          parsed.intent === 'advance'
+            ? `You close the gap with ${currentScene.enemy.name}. (range: ${RANGE_LABEL[next]})`
+            : `You pull back from ${currentScene.enemy.name}. (range: ${RANGE_LABEL[next]})`,
+        );
+        // Movement takes a beat — let the enemy counter-attack if they're
+        // still in their effective range.
+        const stillInReach = enemyCanReach(currentScene.enemy, next);
+        if (stillInReach) {
+          applyEnemyCounter(currentScene.enemy, player, get, set);
+        }
+        break;
+      }
       case 'ask': {
         // Look up the player's question in the concepts knowledge base. The
         // target text is whatever followed the question verb (the parser
@@ -790,10 +851,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const isUnequip = /^un|^remove|^sheathe/.test(verb) || /^un|^remove|^sheathe|take off/.test(trimmed.toLowerCase());
         if (isUnequip) {
           const target = (parsed.target ?? '').toLowerCase();
-          const onlyArmor = /armou?r|plate|vest|robe|cloth|mantle|scales|harness/.test(target);
-          const onlyAmulet = /amulet|locket|necklace/.test(target);
-          const onlyRing = /ring|band/.test(target);
-          if (onlyArmor) get().unequipSlot('armor');
+          const onlyHead = /helm|hood|cap|crown|circlet/.test(target);
+          const onlyChest = /chest|plate|vest|robe|cloth|mantle|harness|breastplate|cuirass/.test(target);
+          const onlyLegs = /legg|greav|pants|trouser|kilt/.test(target);
+          const onlyFeet = /boot|shoe|sandal|sabaton/.test(target);
+          const onlyAmulet = /amulet|locket|necklace|diadem|charm/.test(target);
+          const onlyRing = /ring|band|seal/.test(target);
+          if (onlyHead) get().unequipSlot('head');
+          else if (onlyChest) get().unequipSlot('chest');
+          else if (onlyLegs) get().unequipSlot('legs');
+          else if (onlyFeet) get().unequipSlot('feet');
           else if (onlyAmulet) get().unequipSlot('amulet');
           else if (onlyRing) get().unequipSlot('ring');
           else {
@@ -1254,7 +1321,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const newHp = hitMilestone ? player.hp + 1 : player.hp;
 
     set({
-      currentScene: { ...currentScene, enemy: null },
+      currentScene: { ...currentScene, enemy: null, range: null },
       worldMemory: recordEnemyDefeat(worldMemory, enemy.name),
       player: {
         ...player,
@@ -1716,6 +1783,67 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 }));
 
+// Human-readable label for the combat range bands.
+const RANGE_LABEL: Record<CombatRange, string> = {
+  arm: "arm's reach",
+  close: 'close',
+  far: 'far',
+};
+
+// Whether an enemy can still strike the player at the given range.
+// Lore: melee = arm's reach, ranged = close + far, runecasters mostly close
+// + arm. We use a conservative default — most generic enemies threaten arm
+// and close, plus anything carrying a ranged hint reaches at far.
+function enemyCanReach(enemy: Enemy, range: CombatRange): boolean {
+  if (range === 'arm' || range === 'close') return true;
+  // 'far' — only ranged enemies (loose hint via attack/damage string).
+  const sig = `${enemy.attack ?? ''} ${enemy.damage ?? ''} ${enemy.abilityPoint ?? ''}`.toLowerCase();
+  return /(bow|arrow|crossbow|ranged|projectile|firearm|sling|dart)/.test(sig);
+}
+
+// Which range bands the player's current weapon can reach. Bare hands and
+// melee weapons = arm only. Ranged = close + far (the lore allows ranged
+// at arm but with poor effect; we still permit it). Runecasters by tier:
+// common/uncommon = arm+close, rare/legendary = all bands.
+function playerWeaponReach(player: PlayerCharacter): { bands: CombatRange[]; label: string } {
+  const eq = player.equipped ?? {};
+  const main = eq.main ?? eq.weaponName;
+  if (!main) return { bands: ['arm'], label: 'Bare hands' };
+  const w = findWeaponByName(main);
+  if (!w) return { bands: ['arm'], label: main };
+  switch (w.weaponKind) {
+    case 'melee':
+      return { bands: ['arm'], label: w.name };
+    case 'ranged':
+      return { bands: ['arm', 'close', 'far'], label: w.name };
+    case 'runecaster': {
+      const intel = player.stats.intelligence ?? 0;
+      const farReach = intel >= 9; // Rare/Legendary access
+      return { bands: farReach ? ['arm', 'close', 'far'] : ['arm', 'close'], label: w.name };
+    }
+    default:
+      return { bands: ['arm'], label: w.name };
+  }
+}
+
+// Sum AC bonus and gather resistances from every equipped armor piece
+// (head/chest/legs/feet). Used by combat to compute effective AC and to
+// halve damage of types the armor resists.
+function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances: string[] } {
+  let acBonus = 0;
+  const resistances: string[] = [];
+  const eq = player.equipped ?? {};
+  for (const slot of ARMOR_SLOTS) {
+    const name = eq[slot];
+    if (!name) continue;
+    const piece = findArmorByName(name);
+    if (!piece) continue;
+    acBonus += piece.acBonus;
+    for (const r of piece.resistances) resistances.push(r);
+  }
+  return { acBonus, resistances };
+}
+
 // Arbiter rolls enemy counter-attack — transparent to player per rulebook
 function applyEnemyCounter(
   enemy: Enemy,
@@ -1726,11 +1854,11 @@ function applyEnemyCounter(
   const atkBonus = parseInt(String(enemy.attack), 10) || 3;
   const atkRoll = rollDie(20);
   const atkTotal = atkRoll + atkBonus;
-  // Effective AC = race base + armor bonus + status modifier (e.g. -2 from
-  // armor_severed). Status floor at 1 so a player isn't completely impossible
-  // to defend.
-  const armor = player.equipped?.armor ? findArmorByName(player.equipped.armor) : null;
-  const acFromGear = player.ac + (armor?.acBonus ?? 0);
+  // Effective AC = race base + summed armor bonus from head/chest/legs/feet
+  // + status modifier (e.g. -2 from armor_severed). Status floor at 1 so a
+  // player isn't completely impossible to defend.
+  const armorPieces = aggregateArmor(player);
+  const acFromGear = player.ac + armorPieces.acBonus;
   const effectiveAc = Math.max(1, acFromGear + statusAcAdjustment(player.statusEffects));
   const hit = atkTotal >= effectiveAc;
 
@@ -1749,7 +1877,7 @@ function applyEnemyCounter(
       if (mul > 1) rawDmg = Math.ceil(rawDmg * mul);
     }
 
-    const resisted = applyArmorResistance(rawDmg, enemyDamageType, armor);
+    const resisted = applyArmorResistance(rawDmg, enemyDamageType, armorPieces.resistances);
     const dmg = resisted.damage;
 
     // Roll for a status effect to apply based on the damage type.

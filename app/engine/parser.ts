@@ -25,6 +25,8 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   steal: ['steal', 'pocket', 'pilfer', 'lift', 'pinch', 'swipe'],
   join: ['join', 'enlist', 'pledge', 'swear', 'sign'],
   dodge: ['dodge', 'parry', 'block', 'brace', 'evade', 'guard'],
+  advance: ['advance', 'approach', 'rush', 'sprint', 'closein'],
+  retreat: ['backoff', 'backaway', 'pullback', 'stepback', 'reposition'],
 };
 
 const ALL_INTENTS = Object.keys(VERB_SYNONYMS) as Exclude<Intent, 'unknown'>[];
@@ -39,11 +41,20 @@ const STOPWORDS = new Set([
 ]);
 
 export function normalizeInput(raw: string): string {
-  return raw
+  let s = raw
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9\s']/g, ' ')
     .replace(/\s+/g, ' ');
+  // Collapse a few movement phrases into single tokens so the verb matcher
+  // can fire on them (tokenize splits on whitespace).
+  s = s
+    .replace(/\bclose in\b/g, 'closein')
+    .replace(/\bstep back\b/g, 'stepback')
+    .replace(/\bback off\b/g, 'backoff')
+    .replace(/\bback away\b/g, 'backaway')
+    .replace(/\bpull back\b/g, 'pullback');
+  return s;
 }
 
 function levenshtein(a: string, b: string): number {

@@ -7,6 +7,8 @@ interface Props {
   inCombat: boolean;
   equippedMain: string | null;
   equippedOff: string | null;
+  /** Current combat range — surfaces advance/retreat buttons when meaningful. */
+  range?: 'arm' | 'close' | 'far' | null;
 }
 
 const PEACE_QUICK = ['look', 'search', 'rest'] as const;
@@ -21,7 +23,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, inCombat, equippedMain, equippedOff }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, inCombat, equippedMain, equippedOff, range }: Props) {
   const [text, setText] = useState('');
 
   const handleSubmit = () => {
@@ -51,6 +53,12 @@ export function InputBox({ onSubmit, onOpenInventory, inCombat, equippedMain, eq
               />
             ) : null}
             <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} />
+            {range && range !== 'arm' && (
+              <QuickBtn label="advance" onPress={() => onSubmit('advance')} />
+            )}
+            {range && range !== 'far' && (
+              <QuickBtn label="step back" onPress={() => onSubmit('step back')} />
+            )}
           </>
         ) : (
           <>

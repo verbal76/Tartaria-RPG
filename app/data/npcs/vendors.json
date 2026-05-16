@@ -27,7 +27,9 @@
         { "itemName": "Pyric Wand", "price": 90 },
         { "itemName": "Storm Rod", "price": 220 },
         { "itemName": "Ceremonial Robes", "price": 110 },
-        { "itemName": "Runic Mantle", "price": 280 }
+        { "itemName": "Runic Mantle", "price": 280 },
+        { "itemName": "Aetheric Diadem", "price": 130 },
+        { "itemName": "Rusted Band of Knowledge", "price": 60 }
       ]
     },
     {
@@ -41,7 +43,8 @@
         { "itemName": "Aetheric Crystal Blade", "price": 180 },
         { "itemName": "Bone Crossbow", "price": 160 },
         { "itemName": "Mud-glass Scales", "price": 130 },
-        { "itemName": "Aetherstone Vest", "price": 240 }
+        { "itemName": "Aetherstone Vest", "price": 240 },
+        { "itemName": "Tartarian Stoneband", "price": 320 }
       ]
     },
     {
@@ -56,6 +59,113 @@
         { "itemName": "Mud-fist Wraps", "price": 18 },
         { "itemName": "Salvaged Bow", "price": 40 },
         { "itemName": "First Aid Kit", "price": 30 }
+      ]
+    },
+    {
+      "id": "thalan_wanderer",
+      "name": "Thalan",
+      "title": "the Wanderer",
+      "faction": null,
+      "description": "Friendly and talkative, Thalan walks the roadside outposts with a horse and a limited pack. Trades common weapons and tools, sometimes coin advice.",
+      "offers": [
+        { "itemName": "Rusted Blade", "price": 28 },
+        { "itemName": "Mud-Stalker Leggings", "price": 55 },
+        { "itemName": "Mud-Lurker Boots", "price": 45 },
+        { "itemName": "Trail Rations", "price": 7 },
+        { "itemName": "Climbing Rope", "price": 10 }
+      ]
+    },
+    {
+      "id": "irma_ironhand",
+      "name": "Irma Ironhand",
+      "title": "Heavy Armorer",
+      "faction": "true_tartarians",
+      "description": "A gruff, no-nonsense smith from the Tartarian Giant encampments. Specializes in durable armor for melee combatants.",
+      "offers": [
+        { "itemName": "Rough-Hewn Chestplate", "price": 110 },
+        { "itemName": "Sentinel's Chestplate", "price": 280 },
+        { "itemName": "Aetheric Helm of Command", "price": 130 },
+        { "itemName": "Forgotten Leggings", "price": 95 }
+      ]
+    },
+    {
+      "id": "velar_shadowblade",
+      "name": "Velar Shadowblade",
+      "title": "Stealth Outfitter",
+      "faction": null,
+      "description": "Secretive and suspicious, Velar deals out of the hidden Mud Dweller market. Sells light armor and rogue gear for those who prefer to be unseen.",
+      "offers": [
+        { "itemName": "Echoing Steps Boots", "price": 220 },
+        { "itemName": "Mud-Stalker Leggings", "price": 60 },
+        { "itemName": "Reclaimer's Quick Band", "price": 140 },
+        { "itemName": "Reclaimer's Salvage Cap", "price": 35 }
+      ]
+    },
+    {
+      "id": "jorah_scholar",
+      "name": "Jorah the Scholar",
+      "title": "Tomekeeper",
+      "faction": "forgotten_order",
+      "description": "Kind and knowledgeable, Jorah keeps a stall at the Reclaimers' University. Focuses on wisdom-based items, scrolls, and staves.",
+      "offers": [
+        { "itemName": "Minor Aetheric Amulet", "price": 50 },
+        { "itemName": "Mud-Seer's Hood", "price": 40 },
+        { "itemName": "Whisperer's Charm", "price": 35 },
+        { "itemName": "Aetheric Compass", "price": 75 }
+      ]
+    },
+    {
+      "id": "elara_lightfinger",
+      "name": "Elara Lightfinger",
+      "title": "Trinketmonger",
+      "faction": null,
+      "description": "Chatty and cunning, Elara works the urban bazaars among the Unknowing Masses. Specializes in small tools and trinkets favored by the stealthy.",
+      "offers": [
+        { "itemName": "Reclaimer's Quick Band", "price": 145 },
+        { "itemName": "Whisperer's Charm", "price": 40 },
+        { "itemName": "Climbing Rope", "price": 11 },
+        { "itemName": "First Aid Kit", "price": 32 }
+      ]
+    },
+    {
+      "id": "halem_trader",
+      "name": "Halem the Trader",
+      "title": "General Goods",
+      "faction": null,
+      "description": "Friendly and trustworthy, Halem runs the village trading post — basic weapons, food, potions, perfect for restocking before the road.",
+      "offers": [
+        { "itemName": "Trail Rations", "price": 6 },
+        { "itemName": "Climbing Rope", "price": 10 },
+        { "itemName": "Aetheric Torch", "price": 22 },
+        { "itemName": "First Aid Kit", "price": 28 },
+        { "itemName": "Rusted Blade", "price": 26 },
+        { "itemName": "Patched Cloth", "price": 18 }
+      ]
+    },
+    {
+      "id": "tarek_tinkerer",
+      "name": "Tarek the Tinkerer",
+      "title": "Mechanical Outfitter",
+      "faction": "reclaimers_guild",
+      "description": "Eccentric and energetic, Tarek runs a Reclaimer workshop full of half-finished gadgets. Carries golem parts and experimental gear.",
+      "offers": [
+        { "itemName": "Golem Controller Ring", "price": 200 },
+        { "itemName": "Aetheric Compass", "price": 70 },
+        { "itemName": "Aetheric Torch", "price": 24 },
+        { "itemName": "Aether-Runner Boots", "price": 170 }
+      ]
+    },
+    {
+      "id": "felra_swiftfoot",
+      "name": "Felra Swiftfoot",
+      "title": "Boot-Smith",
+      "faction": null,
+      "description": "Friendly but sneaky, Felra peddles light armor and boots from a Mud Dweller hidden camp — anything that adds a little dexterity to a step.",
+      "offers": [
+        { "itemName": "Mud-Lurker Boots", "price": 42 },
+        { "itemName": "Aether-Runner Boots", "price": 165 },
+        { "itemName": "Echoing Steps Boots", "price": 230 },
+        { "itemName": "Mud-Stalker Leggings", "price": 50 }
       ]
     }
   ]

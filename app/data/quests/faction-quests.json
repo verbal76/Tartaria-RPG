@@ -1,0 +1,67 @@
+{
+  "quests": [
+    {
+      "id": "fq_order_relic",
+      "factionId": "forgotten_order",
+      "title": "Salvage the buried lens",
+      "description": "Varakush has heard of a Relic Seeker's Lens half-buried in the Outskirts. Recover it.",
+      "objective": "Defeat any Aetheric creature and return.",
+      "requirement": { "rep": 5 },
+      "reward": { "tc": 80, "rep": 10 }
+    },
+    {
+      "id": "fq_order_field",
+      "factionId": "forgotten_order",
+      "title": "Field a scholar",
+      "description": "Travel to two new locations and bring back what you saw.",
+      "objective": "Discover 2 locations.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 60, "rep": 8 }
+    },
+    {
+      "id": "fq_reclaimers_haul",
+      "factionId": "reclaimers_guild",
+      "title": "Run the haul",
+      "description": "The Guild needs 100 TC worth of relic salvage. Deliver, no questions asked.",
+      "objective": "Reach 100 TC, then complete the quest.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 40, "rep": 8 }
+    },
+    {
+      "id": "fq_reclaimers_pinch",
+      "factionId": "reclaimers_guild",
+      "title": "Pinch from the Monarchs",
+      "description": "Steal something from a Mud Monarchs vendor without being caught.",
+      "objective": "Steal successfully from any vendor.",
+      "requirement": { "rep": 5 },
+      "reward": { "tc": 70, "rep": 12 }
+    },
+    {
+      "id": "fq_tartarians_pilgrimage",
+      "factionId": "true_tartarians",
+      "title": "Walk the buried road",
+      "description": "Make a pilgrimage to a buried capital — every True Tartarian who matters has done it.",
+      "objective": "Travel 5 times.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 60, "rep": 10 }
+    },
+    {
+      "id": "fq_tartarians_giant",
+      "factionId": "true_tartarians",
+      "title": "Cut down a rare beast",
+      "description": "The enclave hears you. Prove you fight like one of them.",
+      "objective": "Defeat a Rare or Legendary enemy.",
+      "requirement": { "rep": 10 },
+      "reward": { "tc": 120, "rep": 15 }
+    },
+    {
+      "id": "fq_monarchs_silence",
+      "factionId": "mud_monarchs",
+      "title": "Silence a rediscoverer",
+      "description": "Someone has been talking about Tartaria where they should not. End the conversation.",
+      "objective": "Defeat 3 enemies.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 80, "rep": 12 }
+    }
+  ]
+}

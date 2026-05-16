@@ -1,0 +1,84 @@
+{
+  "npcs": [
+    {
+      "id": "elior_zalmar",
+      "name": "Elior Zalmar",
+      "title": "Lost Architect of the Flood",
+      "affiliation": "tartarian_giants",
+      "status": "deceased",
+      "role": "Tartarian philosopher-scientist whose Etheric Engine experiments at Thametan's Tower triggered the Great Mud Flood.",
+      "summary": "Spoken of in Forgotten Order debates as both visionary and cautionary tale. Some say his notes survive in Voronov.",
+      "tags": ["historical", "aether", "tartarian"]
+    },
+    {
+      "id": "harlan_moore",
+      "name": "Professor Harlan Moore",
+      "title": "Tartarian Historian",
+      "affiliation": "forgotten_order",
+      "status": "alive",
+      "role": "Historian obsessed with uncovering Tartaria's secrets — willing to betray allies if it brings him closer to lost knowledge.",
+      "summary": "Often pays handsomely for relic translations. Trust him with maps, not with friends.",
+      "tags": ["scholar", "patron", "untrustworthy"]
+    },
+    {
+      "id": "sasha_ironheart",
+      "name": "Sasha Ironheart",
+      "title": "Leader of the Tartarian Revivalists",
+      "affiliation": "true_tartarians",
+      "status": "alive",
+      "role": "Believes reviving the Tartarian Giants could be humanity's salvation. Formidable, occasionally dangerous.",
+      "summary": "Recruits openly among True Tartarian sympathizers. Her dedication can pull a whole town under.",
+      "tags": ["leader", "zealot", "tartarian"]
+    },
+    {
+      "id": "drake_volkov",
+      "name": "Drake Volkov",
+      "title": "Mercenary",
+      "affiliation": null,
+      "status": "alive",
+      "role": "Seasoned mercenary hired to protect Tartarian expeditions. Murky past, loyalty for hire.",
+      "summary": "If you can outbid the last contract, he's your shield. If not, he's the spear.",
+      "tags": ["mercenary", "hireable", "neutral"]
+    },
+    {
+      "id": "ivy_solis",
+      "name": "Ivy Solis",
+      "title": "Treasure Hunter",
+      "affiliation": "reclaimers_guild",
+      "status": "alive",
+      "role": "Reclaimer fascinated by Tartarian relics; loyalty driven by the value of the find.",
+      "summary": "Will partner on a dive if the cut is fair. Will walk if a richer one opens up.",
+      "tags": ["reclaimer", "rival", "treasure"]
+    },
+    {
+      "id": "lucius_kincaid",
+      "name": "Dr. Lucius Kincaid",
+      "title": "Reclusive Patron",
+      "affiliation": "mud_monarchs",
+      "status": "alive",
+      "role": "Enigmatic sponsor of expeditions — supplies ancient maps and resources to those willing to seek Tartaria's lost secrets.",
+      "summary": "His true motives stay hidden. The maps work. The bills always come due.",
+      "tags": ["patron", "monarch", "ambiguous"]
+    },
+    {
+      "id": "varakush_warden",
+      "name": "Varakush",
+      "title": "Warden of the Forgotten Order",
+      "affiliation": "forgotten_order",
+      "status": "alive",
+      "role": "Steward of the Forgotten Order's hidden base on the edge of the Great Tartary Plains; gatekeeper for Order-quest contracts.",
+      "summary": "Hands out the Order's relic-recovery contracts. Hard to impress, fair when impressed.",
+      "tags": ["order", "questgiver", "warden"]
+    },
+    {
+      "id": "grand_assembly_speaker",
+      "name": "Speaker of the Grand Assembly",
+      "title": "Reclaimers Guild Voice",
+      "affiliation": "reclaimers_guild",
+      "status": "alive",
+      "role": "The current public face of the Reclaimers' Grand Assembly — coordinates the haul market and posts Guild contracts.",
+      "summary": "Rotates yearly. Whoever it is, they answer to the Assembly. Whoever it is, they don't pay extra.",
+      "tags": ["reclaimer", "questgiver", "assembly"]
+    }
+  ]
+}

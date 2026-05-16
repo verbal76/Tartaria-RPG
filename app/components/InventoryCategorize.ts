@@ -1,9 +1,10 @@
 import type { InventoryItem } from '../engine/types';
-import { WEAPONS, ARMOR, MATERIALS, GEAR } from '../engine/crafting';
+import { WEAPONS, ARMOR, MATERIALS, GEAR, AMULETS, RINGS } from '../engine/crafting';
 
 export type InventoryCategory =
   | 'weapon'
   | 'armor'
+  | 'accessory'
   | 'consumable'
   | 'relic'
   | 'material'
@@ -14,6 +15,7 @@ export type InventoryCategory =
 export const CATEGORY_COLORS: Record<InventoryCategory, string> = {
   weapon: '#e07a5f',
   armor: '#6a9bbf',
+  accessory: '#d4a55a',
   consumable: '#9ec96a',
   relic: '#b88ce0',
   material: '#c9a86a',
@@ -23,6 +25,7 @@ export const CATEGORY_COLORS: Record<InventoryCategory, string> = {
 export const CATEGORY_LABEL: Record<InventoryCategory, string> = {
   weapon: 'Weapons',
   armor: 'Armor',
+  accessory: 'Amulets & Rings',
   consumable: 'Consumables',
   relic: 'Relics',
   material: 'Materials',
@@ -30,11 +33,12 @@ export const CATEGORY_LABEL: Record<InventoryCategory, string> = {
 };
 
 // Order the categories appear in. Weapons first (most actionable),
-// then armor, then consumables, then relics, then crafting stock, then
-// generic loot.
+// then armor, then accessories, then consumables, then relics, then
+// crafting stock, then generic loot.
 export const CATEGORY_ORDER: InventoryCategory[] = [
   'weapon',
   'armor',
+  'accessory',
   'consumable',
   'relic',
   'material',
@@ -48,6 +52,8 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   // resolve to 'relic' via the GEAR catalog.
   if (WEAPONS.some((w) => w.name.toLowerCase() === nameLower)) return 'weapon';
   if (ARMOR.some((a) => a.name.toLowerCase() === nameLower)) return 'armor';
+  if (AMULETS.some((a) => a.name.toLowerCase() === nameLower)) return 'accessory';
+  if (RINGS.some((r) => r.name.toLowerCase() === nameLower)) return 'accessory';
   if (GEAR.some((g) => g.name.toLowerCase() === nameLower)) {
     const gearKind = GEAR.find((g) => g.name.toLowerCase() === nameLower)?.kind;
     if (gearKind === 'consumable') return 'consumable';
@@ -59,6 +65,7 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   // Fallback by kind/tags.
   if (item.kind === 'weapon') return 'weapon';
   if (item.kind === 'armor') return 'armor';
+  if (item.tags.some((t) => /^(amulet|ring|locket|necklace|band|seal|diadem|charm)$/i.test(t))) return 'accessory';
   if (item.kind === 'consumable' || item.tags.some((t) => /food|healing/i.test(t))) return 'consumable';
   if (item.kind === 'relic' || item.tags.some((t) => /relic|detection|light/i.test(t))) return 'relic';
   if (item.tags.some((t) => /aether|crystal|mud|metal|cloth|fiber|construct/i.test(t))) return 'material';
@@ -71,6 +78,7 @@ export function groupInventoryByCategory(
   const groups: Record<InventoryCategory, InventoryItem[]> = {
     weapon: [],
     armor: [],
+    accessory: [],
     consumable: [],
     relic: [],
     material: [],

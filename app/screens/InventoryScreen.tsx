@@ -28,7 +28,10 @@ export function InventoryScreen() {
     [
       player.equipped?.main,
       player.equipped?.off,
-      player.equipped?.armor,
+      player.equipped?.head,
+      player.equipped?.chest,
+      player.equipped?.legs,
+      player.equipped?.feet,
       player.equipped?.amulet,
       player.equipped?.ring,
     ].filter((x): x is string => !!x),

@@ -1,9 +1,11 @@
-import type { InventoryItem, Rarity } from './types';
+import type { InventoryItem, Rarity, DamageType } from './types';
 import materialsData from '../data/items/materials.json';
 import weaponsData from '../data/items/weapons.json';
 import armorData from '../data/items/armor.json';
 import gearData from '../data/items/gear.json';
 import recipesData from '../data/items/recipes.json';
+import amuletsData from '../data/items/amulets.json';
+import ringsData from '../data/items/rings.json';
 
 export interface CatalogMaterial {
   name: string;
@@ -15,20 +17,25 @@ export interface CatalogMaterial {
 export interface CatalogWeapon {
   name: string;
   weaponKind: 'melee' | 'ranged' | 'runecaster';
-  damageType: string;
+  damageType: DamageType;
   damageDice: string;
   stat: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma';
   rarity: Rarity;
+  baseDurability?: number;
   tags: string[];
   description: string;
 }
 
+export type ArmorSlot = 'head' | 'chest' | 'legs' | 'feet';
+
 export interface CatalogArmor {
   name: string;
+  slot: ArmorSlot;
   acBonus: number;
   resistances: string[];
   statBonus?: { stat: string; amount: number };
   rarity: Rarity;
+  baseDurability?: number;
   tags: string[];
   description: string;
 }
@@ -37,6 +44,16 @@ export interface CatalogGear {
   name: string;
   kind: 'consumable' | 'relic' | 'misc';
   rarity: Rarity;
+  tags: string[];
+  description: string;
+}
+
+export interface CatalogAccessory {
+  name: string;
+  rarity: Rarity;
+  statBonus?: { stat: string; amount: number };
+  resistances: string[];
+  baseDurability?: number;
   tags: string[];
   description: string;
 }
@@ -56,27 +73,32 @@ export const WEAPONS = (weaponsData as { weapons: CatalogWeapon[] }).weapons;
 export const ARMOR = (armorData as { armor: CatalogArmor[] }).armor;
 export const GEAR = (gearData as { gear: CatalogGear[] }).gear;
 export const RECIPES = (recipesData as { recipes: Recipe[] }).recipes;
+export const AMULETS = (amuletsData as { amulets: CatalogAccessory[] }).amulets;
+export const RINGS = (ringsData as { rings: CatalogAccessory[] }).rings;
 
-// Resolve a recipe's result name to a full catalog entry so we know what
-// kind of item to write into the player's inventory (weapon vs armor vs
-// gear). Falls back to a generic misc item if not found.
+const DEFAULT_DURABILITY = 25;
+
 export function lookupCraftedItem(resultName: string): {
   kind: 'weapon' | 'armor' | 'consumable' | 'relic' | 'misc';
   rarity: Rarity;
   tags: string[];
+  baseDurability?: number;
 } {
   const w = WEAPONS.find((x) => x.name === resultName);
-  if (w) return { kind: 'weapon', rarity: w.rarity, tags: w.tags };
+  if (w) return { kind: 'weapon', rarity: w.rarity, tags: w.tags, baseDurability: w.baseDurability ?? DEFAULT_DURABILITY };
   const a = ARMOR.find((x) => x.name === resultName);
-  if (a) return { kind: 'armor', rarity: a.rarity, tags: a.tags };
+  if (a) return { kind: 'armor', rarity: a.rarity, tags: a.tags, baseDurability: a.baseDurability ?? DEFAULT_DURABILITY };
   const g = GEAR.find((x) => x.name === resultName);
   if (g) return { kind: g.kind, rarity: g.rarity, tags: g.tags };
+  const am = AMULETS.find((x) => x.name === resultName);
+  if (am) return { kind: 'relic', rarity: am.rarity, tags: am.tags, baseDurability: am.baseDurability ?? DEFAULT_DURABILITY };
+  const r = RINGS.find((x) => x.name === resultName);
+  if (r) return { kind: 'relic', rarity: r.rarity, tags: r.tags, baseDurability: r.baseDurability ?? DEFAULT_DURABILITY };
+  const m = MATERIALS.find((x) => x.name === resultName);
+  if (m) return { kind: 'misc', rarity: m.rarity, tags: m.tags };
   return { kind: 'misc', rarity: 'Common', tags: [] };
 }
 
-// Sum total quantity available across all matching inventory rows. We match
-// case-insensitively so loot drops always line up with material names from
-// the catalog regardless of casing drift.
 function totalQuantity(inventory: readonly InventoryItem[], materialName: string): number {
   const target = materialName.toLowerCase();
   let total = 0;
@@ -94,9 +116,6 @@ export function listCraftableRecipes(inventory: readonly InventoryItem[]): Recip
   return RECIPES.filter((r) => canCraft(r, inventory));
 }
 
-// Find a recipe whose result name matches a target string (the player's
-// "craft X" text). Substring + case-insensitive so "craft a torch" and
-// "craft aetheric torch" both resolve to "Aetheric Torch".
 export function findRecipeByResult(target: string): Recipe | null {
   const t = target.toLowerCase().trim();
   if (!t) return null;
@@ -104,6 +123,25 @@ export function findRecipeByResult(target: string): Recipe | null {
     if (r.result.toLowerCase().includes(t) || t.includes(r.result.toLowerCase())) return r;
   }
   return null;
+}
+
+export function consumeIngredients(
+  inventory: readonly InventoryItem[],
+  recipe: Recipe,
+): InventoryItem[] {
+  const next: InventoryItem[] = inventory.map((i) => ({ ...i }));
+  for (const ing of recipe.ingredients) {
+    let need = ing.quantity;
+    const target = ing.name.toLowerCase();
+    for (const item of next) {
+      if (need <= 0) break;
+      if (item.name.toLowerCase() !== target) continue;
+      const take = Math.min(item.quantity, need);
+      item.quantity -= take;
+      need -= take;
+    }
+  }
+  return next.filter((i) => i.quantity > 0);
 }
 
 // Catalog lookup helpers — find an item entry by name across the four
@@ -120,8 +158,18 @@ export function findArmorByName(name: string): CatalogArmor | null {
   return ARMOR.find((a) => a.name.toLowerCase() === t) ?? null;
 }
 
-// Looser match — used when the player types "equip the crystal blade"
-// and we want to resolve to "Aetheric Crystal Blade".
+export function findAmuletByName(name: string): CatalogAccessory | null {
+  const t = name.toLowerCase().trim();
+  if (!t) return null;
+  return AMULETS.find((a) => a.name.toLowerCase() === t) ?? null;
+}
+
+export function findRingByName(name: string): CatalogAccessory | null {
+  const t = name.toLowerCase().trim();
+  if (!t) return null;
+  return RINGS.find((r) => r.name.toLowerCase() === t) ?? null;
+}
+
 export function fuzzyFindWeapon(text: string): CatalogWeapon | null {
   const t = text.toLowerCase().trim();
   if (!t) return null;
@@ -138,10 +186,6 @@ export function fuzzyFindArmor(text: string): CatalogArmor | null {
   return ARMOR.find((a) => a.name.toLowerCase().includes(t) || t.includes(a.name.toLowerCase())) ?? null;
 }
 
-// Damage-type modifier matrix keyed by enemy `type` (the field already on
-// every Enemy row, e.g. "Mud Creature", "Aetheric Mutation"). Resistances
-// halve incoming damage; weaknesses multiply by 1.5. Centralized here so
-// both combat resolution and Arbiter narration can read the same data.
 const TYPE_RESISTANCE_MAP: Record<string, { resist: string[]; weak: string[] }> = {
   Animal: { resist: [], weak: ['piercing'] },
   'Mud Creature': { resist: ['slashing', 'piercing'], weak: ['burn', 'radiation'] },
@@ -167,39 +211,15 @@ export function applyDamageTypeModifier(
   return { damage: rawDamage, match: 'normal' };
 }
 
-// Player armor resistance — halves incoming damage when the armor lists
-// the damage type. Returns a 1-tuple of the new amount; armor resistances
-// don't scale beyond 50% in this pass.
 export function applyArmorResistance(
   incomingDamage: number,
   damageType: string | null | undefined,
-  armor: CatalogArmor | null | undefined,
+  resistances: readonly string[] | null | undefined,
 ): { damage: number; blocked: boolean } {
-  if (!armor || !damageType) return { damage: incomingDamage, blocked: false };
+  if (!resistances || resistances.length === 0 || !damageType) return { damage: incomingDamage, blocked: false };
   const dt = damageType.toLowerCase();
-  if (armor.resistances?.some((r) => r.toLowerCase() === dt)) {
+  if (resistances.some((r) => r.toLowerCase() === dt)) {
     return { damage: Math.max(1, Math.floor(incomingDamage / 2)), blocked: true };
   }
   return { damage: incomingDamage, blocked: false };
-}
-
-// Subtract ingredients from inventory, return the new inventory. Mutates
-// quantities in-place on cloned rows; removes rows that hit 0.
-export function consumeIngredients(
-  inventory: readonly InventoryItem[],
-  recipe: Recipe,
-): InventoryItem[] {
-  const next: InventoryItem[] = inventory.map((i) => ({ ...i }));
-  for (const ing of recipe.ingredients) {
-    let need = ing.quantity;
-    const target = ing.name.toLowerCase();
-    for (const item of next) {
-      if (need <= 0) break;
-      if (item.name.toLowerCase() !== target) continue;
-      const take = Math.min(item.quantity, need);
-      item.quantity -= take;
-      need -= take;
-    }
-  }
-  return next.filter((i) => i.quantity > 0);
 }

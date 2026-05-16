@@ -17,6 +17,8 @@ export interface EnemyView {
   currentHp: number;
   /** Optional range indicator. Defaults to true (engine is single-enemy / in-melee). */
   inRange?: boolean;
+  /** Human-readable range label — "arm's reach", "close", "far". */
+  rangeLabel?: string;
 }
 
 interface Props {
@@ -101,7 +103,9 @@ function EnemyCard({ view }: { view: EnemyView }) {
         </Text>
         <View style={styles.headRight}>
           <Text style={[styles.range, inRange ? styles.rangeIn : styles.rangeOut]}>
-            {inRange ? 'IN RANGE' : 'OUT OF RANGE'}
+            {view.rangeLabel
+              ? `${view.rangeLabel.toUpperCase()}${inRange ? '' : ' · OUT'}`
+              : inRange ? 'IN RANGE' : 'OUT OF RANGE'}
           </Text>
           <Text style={styles.rarity}>{view.enemy.rarity}</Text>
         </View>

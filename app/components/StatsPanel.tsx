@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import type { PlayerCharacter } from '../engine/types';
 import racesData from '../data/races/races.json';
 import { findArmorByName } from '../engine/crafting';
+import { ARMOR_SLOTS } from '../engine/equipment';
 import { formatEffectSummary } from '../engine/statusEffects';
 
 interface Props { player: PlayerCharacter; }
@@ -10,15 +11,25 @@ interface Props { player: PlayerCharacter; }
 export function StatsPanel({ player }: Props) {
   const race = (racesData as { id: string; name: string }[]).find((r) => r.id === player.raceId);
   const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
-  const equippedArmor = player.equipped?.armor ? findArmorByName(player.equipped.armor) : null;
-  const effectiveAc = player.ac + (equippedArmor?.acBonus ?? 0);
+
+  // Effective AC = race base + summed armor bonus across head/chest/legs/feet.
+  let armorAc = 0;
+  for (const slot of ARMOR_SLOTS) {
+    const name = player.equipped?.[slot];
+    if (!name) continue;
+    armorAc += findArmorByName(name)?.acBonus ?? 0;
+  }
+  const effectiveAc = player.ac + armorAc;
 
   // Compose a single-line summary of every filled slot so the panel
-  // stays compact even with five slots tracked.
+  // stays compact even with eight slots tracked.
   const slotParts: string[] = [];
   if (player.equipped?.main) slotParts.push(`R: ${player.equipped.main}`);
   if (player.equipped?.off) slotParts.push(`L: ${player.equipped.off}`);
-  if (player.equipped?.armor) slotParts.push(`Arm: ${player.equipped.armor}`);
+  if (player.equipped?.head) slotParts.push(`Hd: ${player.equipped.head}`);
+  if (player.equipped?.chest) slotParts.push(`Ch: ${player.equipped.chest}`);
+  if (player.equipped?.legs) slotParts.push(`Lg: ${player.equipped.legs}`);
+  if (player.equipped?.feet) slotParts.push(`Ft: ${player.equipped.feet}`);
   if (player.equipped?.amulet) slotParts.push(`Aml: ${player.equipped.amulet}`);
   if (player.equipped?.ring) slotParts.push(`Rg: ${player.equipped.ring}`);
   const equippedLabel = slotParts.length > 0 ? slotParts.join(' · ') : 'nothing';
@@ -41,7 +52,7 @@ export function StatsPanel({ player }: Props) {
         <Stat label="WIS" value={`${player.stats.wisdom}`} />
         <Stat label="CHA" value={`${player.stats.charisma}`} />
       </View>
-      <Text style={styles.equipped} numberOfLines={2}>
+      <Text style={styles.equipped} numberOfLines={3}>
         Equipped: {equippedLabel}
       </Text>
       {player.statusEffects && player.statusEffects.length > 0 && (

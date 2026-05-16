@@ -27,19 +27,24 @@ describe('applyDamageTypeModifier — enemy resistances/weaknesses', () => {
 });
 
 describe('applyArmorResistance — armor halves matching incoming damage', () => {
-  const aetherstoneVest = { acBonus: 3, resistances: ['aetheric'], rarity: 'Uncommon' as const, tags: [], description: '', name: 'Aetherstone Vest' };
+  const aetherstoneResists = ['aetheric'];
   it('halves incoming damage when armor lists the type', () => {
-    const r = applyArmorResistance(8, 'aetheric', aetherstoneVest);
+    const r = applyArmorResistance(8, 'aetheric', aetherstoneResists);
     expect(r.damage).toBe(4);
     expect(r.blocked).toBe(true);
   });
   it('passes through damage for unmatched types', () => {
-    const r = applyArmorResistance(8, 'slashing', aetherstoneVest);
+    const r = applyArmorResistance(8, 'slashing', aetherstoneResists);
     expect(r.damage).toBe(8);
     expect(r.blocked).toBe(false);
   });
-  it('returns unchanged when armor or type is null', () => {
-    expect(applyArmorResistance(8, 'aetheric', null).damage).toBe(8);
-    expect(applyArmorResistance(8, null, aetherstoneVest).damage).toBe(8);
+  it('aggregates across pieces — first match still halves', () => {
+    const r = applyArmorResistance(10, 'burn', ['poison', 'burn', 'radiation']);
+    expect(r.damage).toBe(5);
+    expect(r.blocked).toBe(true);
+  });
+  it('returns unchanged when resistances list is empty or type is null', () => {
+    expect(applyArmorResistance(8, 'aetheric', []).damage).toBe(8);
+    expect(applyArmorResistance(8, null, aetherstoneResists).damage).toBe(8);
   });
 });
