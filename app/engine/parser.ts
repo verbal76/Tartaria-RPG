@@ -18,6 +18,7 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   use_relic: ['use', 'activate', 'invoke', 'apply', 'wield', 'shine', 'light', 'channel through'],
   cast: ['cast', 'channel', 'mold', 'shape', 'unleash', 'weave'],
   wait: ['wait', 'stay', 'hold', 'pause', 'still', 'linger'],
+  ask: ['what', 'explain', 'define', 'who', 'how', 'why', 'tell'],
 };
 
 const ALL_INTENTS = Object.keys(VERB_SYNONYMS) as Exclude<Intent, 'unknown'>[];

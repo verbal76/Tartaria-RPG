@@ -46,6 +46,34 @@ import { buildCombatSteps, buildSkillSteps } from '../engine/combatRules';
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import locationsData from '../data/locations/locations.json';
+import conceptsData from '../data/lore/concepts.json';
+
+interface Concept {
+  id: string;
+  keywords: string[];
+  title: string;
+  answer: string;
+}
+const ALL_CONCEPTS = (conceptsData as { concepts: Concept[] }).concepts;
+
+// Match a player's "what is X / explain X / tell me about X" target text
+// against the concepts knowledge base. First substring hit on any keyword
+// wins; returns null if nothing matches so the caller can fall back.
+function findConcept(targetText: string | undefined): Concept | null {
+  if (!targetText) return null;
+  const t = targetText.toLowerCase();
+  if (!t.trim()) return null;
+  // Prefer longer keyword matches (so "burn damage" matches before "burn").
+  const sorted = [...ALL_CONCEPTS].sort(
+    (a, b) => Math.max(...b.keywords.map((k) => k.length)) - Math.max(...a.keywords.map((k) => k.length)),
+  );
+  for (const c of sorted) {
+    for (const kw of c.keywords) {
+      if (t.includes(kw.toLowerCase())) return c;
+    }
+  }
+  return null;
+}
 
 const allLocations = locationsData as Location[];
 
@@ -573,6 +601,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       case 'inventory':
         get().appendLog('system', 'Pack is on the right.');
         break;
+      case 'ask': {
+        // Look up the player's question in the concepts knowledge base. The
+        // target text is whatever followed the question verb (the parser
+        // strips stopwords like "is", "the", "me", "about" already).
+        const lookup = parsed.target ?? parsed.resolvedNoun ?? trimmed;
+        const concept = findConcept(lookup);
+        if (concept) {
+          get().appendLog('arbiter', `"${concept.title}." the Arbiter says. "${concept.answer}"`);
+        } else {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter considers. "I do not have a clean answer for that yet. Try a damage type, a faction, or one of the basic systems — HP, stamina, AC, corruption, the Aether."`,
+          );
+        }
+        break;
+      }
     }
 
     if (!get().pendingRolls && shouldArbiterSpeak()) {

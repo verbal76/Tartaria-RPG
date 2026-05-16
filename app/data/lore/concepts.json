@@ -1,0 +1,187 @@
+{
+  "concepts": [
+    {
+      "id": "burn",
+      "keywords": ["burn", "fire", "flame", "burning"],
+      "title": "Burn damage",
+      "answer": "Intense Aetheric heat from overloaded relics or high-energy Aetherstone. Burn leaves Aetheric scars that weaken your resistance to further Aetheric attacks for 1d6 rounds, and halves natural healing until you rest an hour or take magical healing."
+    },
+    {
+      "id": "aetheric",
+      "keywords": ["aetheric", "etheric"],
+      "title": "Aetheric damage",
+      "answer": "Invisible, concussive force from raw Aetheric energy. Knocks creatures back one distance range and, in severe cases, disorients them so they cannot move or act for a round. Disrupts concentration — any ongoing effect must save."
+    },
+    {
+      "id": "electrical",
+      "keywords": ["electrical", "electric", "shock", "lightning"],
+      "title": "Electrical damage",
+      "answer": "Shock from Aetheric storms, relic discharges, or Tartarian grids. Can paralyze muscles for a round — the target cannot move or react, and remains vulnerable for one more turn after unparalyzing."
+    },
+    {
+      "id": "piercing",
+      "keywords": ["piercing", "pierce", "puncture"],
+      "title": "Piercing damage",
+      "answer": "Puncture from shards, crystal weapons, pointed constructs. Aetheric piercing can leave a bleeding wound that ticks 1d6-2 per turn until healed, with disadvantage on attacks while bleeding."
+    },
+    {
+      "id": "slashing",
+      "keywords": ["slashing", "slash", "cut", "cutting"],
+      "title": "Slashing damage",
+      "answer": "Edged cuts from blades or slicing constructs. Aetheric slashing can sever armor straps, lowering AC by 2 until repaired. A creature with slashing injuries takes 1d6 extra on any Dex-check action."
+    },
+    {
+      "id": "bludgeoning",
+      "keywords": ["bludgeoning", "blunt", "crush", "crushing", "impact"],
+      "title": "Bludgeoning damage",
+      "answer": "Blunt impact — falling debris, collapsing tunnels, hammer relics. Can knock a target prone (half movement to stand) and, in severe hits, daze them for a round with disadvantage on Dex attacks and checks."
+    },
+    {
+      "id": "poison",
+      "keywords": ["poison", "toxic", "venom", "gas"],
+      "title": "Poison damage",
+      "answer": "Toxic spread by contact, ingestion, or inhalation. Causes nausea — disadvantage on attacks and checks for 1d6 rounds. Severe poisoning forces a First Aid save each round to avoid incapacitation."
+    },
+    {
+      "id": "radiation",
+      "keywords": ["radiation", "radioactive", "core"],
+      "title": "Radiation damage",
+      "answer": "Aetheric light and cosmic energy from cores or relics. Weakens for 1d6 rounds with disadvantage on Strength and First Aid checks. Prolonged exposure can leave lasting conditions requiring real recovery."
+    },
+    {
+      "id": "stun",
+      "keywords": ["stun", "stunned", "stunning"],
+      "title": "Stun damage",
+      "answer": "Non-lethal Aetheric disruption that incapacitates for a round — no movement, no speech, no runecasting. Stunned creatures auto-fail Dex saves and have disadvantage on every other save until it wears off."
+    },
+    {
+      "id": "degradation",
+      "keywords": ["degradation", "corrode", "corrosive", "decay"],
+      "title": "Degradation damage",
+      "answer": "Corrosive damage from Aetheric mud or sludge. Decays organic matter, armor, and weapons — reduces armor effectiveness or weapon durability by one step per prolonged exposure, until the item is repaired."
+    },
+
+    {
+      "id": "ac",
+      "keywords": ["ac", "armor class", "armor", "defense"],
+      "title": "Armor Class (AC)",
+      "answer": "Your AC is the number an attacker must meet or beat on a d20 + attack mod to hit you. Higher is better. Race gives a baseline; armor and shields add to it; some hazards or slashing damage can lower it temporarily."
+    },
+    {
+      "id": "hp",
+      "keywords": ["hp", "hit points", "health"],
+      "title": "Hit Points",
+      "answer": "Your survival pool. At 0 you fall. Restored by rest (2d6) and food / consumables. Max HP grows every 5 enemies you defeat — Tartaria builds you up if it doesn't kill you first."
+    },
+    {
+      "id": "stamina",
+      "keywords": ["stamina", "tired", "exhaustion"],
+      "title": "Stamina",
+      "answer": "Your effort pool. Travel and combat spend it. Rest restores d6+2. Below 2 you cannot travel — only rest will get you moving again. Max stamina grows every 5 travels you complete."
+    },
+    {
+      "id": "tc",
+      "keywords": ["tc", "tartarian coin", "money", "coin", "currency"],
+      "title": "Tartarian Coin (TC)",
+      "answer": "Tartaria's currency, salvaged or earned. Used to buy from vendors and broker relics. Your race determines your starting TC roll. The Reclaimers Guild deals exclusively in it."
+    },
+    {
+      "id": "corruption",
+      "keywords": ["corruption", "corrupted"],
+      "title": "Corruption",
+      "answer": "Aether's price. Accumulates from exposure to raw Aetheric energy, prolonged hazards, or certain relic abuse. High corruption attracts attention from things you would rather not see. The Forgotten Order calls it a sickness; the True Tartarians call it an inheritance."
+    },
+    {
+      "id": "initiative",
+      "keywords": ["initiative", "first", "act first"],
+      "title": "Initiative",
+      "answer": "A d10 roll at the start of combat. Meet or beat the enemy's roll to act first. Going first means your strike or escape lands before their counter."
+    },
+    {
+      "id": "dc",
+      "keywords": ["dc", "difficulty", "difficulty class", "easy", "moderate", "hard", "very hard"],
+      "title": "Difficulty Ratings",
+      "answer": "Skill checks roll d20 + stat against a DC. Easy is 6, Moderate 9, Hard 12, Very Hard 15. The Arbiter sets it; the dice decide it."
+    },
+    {
+      "id": "resurrection_gem",
+      "keywords": ["resurrection", "gem", "gems", "revive", "resurrect"],
+      "title": "Resurrection Gems",
+      "answer": "Install-wide rare drops (about half a percent per kill). One gem revives a fallen character at full HP and stamina from the title screen. They survive death — the only thing in Tartaria that does."
+    },
+    {
+      "id": "skill_check",
+      "keywords": ["skill check", "check", "roll"],
+      "title": "Skill checks",
+      "answer": "d20 + the relevant stat, against a DC. Stealth uses DEX. Diplomacy uses CHA. Investigate uses INT. Cast uses INT. Use Relic uses WIS. Escape uses DEX."
+    },
+
+    {
+      "id": "aether",
+      "keywords": ["aether", "ether"],
+      "title": "Aether",
+      "answer": "Tartaria's lost elemental power — a living energy field that ran the empire's machines and shaped its mud. After the Flood it sleeps in pockets and pulses. Some draw on it; most are drawn by it."
+    },
+    {
+      "id": "aetherstone",
+      "keywords": ["aetherstone", "etherstone", "stone"],
+      "title": "Aetherstone",
+      "answer": "Crystallized Aether — the buried world's currency, weapon stock, and battery. Hums when something resonates with it. Most relics are built around an Aetherstone core."
+    },
+    {
+      "id": "tartaria",
+      "keywords": ["tartaria", "the world"],
+      "title": "Tartaria",
+      "answer": "The buried empire beneath the Mud Flood. Once vast, now ruins and survivors. The surface forgot it on purpose. Most of the world is still down there — and most of it is still awake."
+    },
+    {
+      "id": "arbiter",
+      "keywords": ["arbiter", "you", "yourself"],
+      "title": "The Arbiter",
+      "answer": "I have walked these places longer than I will tell you. I do not roll your dice and I do not decide your story. I notice. I narrate. I remember more than I let on. Some of it is mine."
+    },
+    {
+      "id": "aetherborn",
+      "keywords": ["aetherborn", "dynasty"],
+      "title": "Aetherborn",
+      "answer": "An ageless cabal — descendants of Tartarians who bound themselves to Aether before the Flood. The Eternal Dynasty rules them. Their patience is older than most empires; their methods are not."
+    },
+    {
+      "id": "runecaster",
+      "keywords": ["runecaster", "rune", "casting", "spell", "spells"],
+      "title": "Runecasters",
+      "answer": "Aether-channeling implements — staves, gauntlets, woven cloaks. Scale with Intelligence. Tiers go Common (1d6) through Legendary (2d10). Switching between a weapon and a runecaster in a turn costs an action."
+    },
+
+    {
+      "id": "forgotten_order",
+      "keywords": ["forgotten order", "order", "varakush"],
+      "title": "Forgotten Order",
+      "answer": "Scholars and engineers descended from Tartaria's makers. Operate out of Varakush. Want to recover Aether and rebuild. Idealistic, careful, and quietly numerous."
+    },
+    {
+      "id": "mud_monarchs",
+      "keywords": ["mud monarchs", "monarchs", "monarch"],
+      "title": "Mud Monarchs",
+      "answer": "The world's surface elite. Want Tartaria forgotten because remembering it ends them. Reach through intelligence networks, assassins, and dying Aetheric machines. Dangerous when threatened, and they always feel threatened."
+    },
+    {
+      "id": "reclaimers_guild",
+      "keywords": ["reclaimers guild", "guild"],
+      "title": "Reclaimers Guild",
+      "answer": "Treasure hunters and mercenaries. Brokers in every major city. Take any contract, deliver any relic. Have no rivals, only invoices."
+    },
+    {
+      "id": "true_tartarians",
+      "keywords": ["true tartarians", "true tartarian"],
+      "title": "True Tartarians",
+      "answer": "Survivors of the buried empire, living in subterranean enclaves. Worship the Tartarian Giants. Want to reclaim the surface. Patient, traditional, and harder than they look."
+    },
+    {
+      "id": "eternal_dynasty",
+      "keywords": ["eternal dynasty"],
+      "title": "Eternal Dynasty",
+      "answer": "The ruling house of the Aetherborn. Pre-Flood lineage that bound itself to Aether for longevity. Counts time in centuries and never forgives a debt."
+    }
+  ]
+}

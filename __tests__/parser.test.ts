@@ -86,6 +86,18 @@ describe('parseInput — combat context override', () => {
   });
 });
 
+describe('parseInput — ask intent for game concept questions', () => {
+  it('routes "what is corruption" to ask', () => {
+    expect(parseInput('what is corruption').intent).toBe('ask');
+  });
+  it('routes "explain burn damage" to ask', () => {
+    expect(parseInput('explain burn damage').intent).toBe('ask');
+  });
+  it('routes "tell me about the aether" to ask', () => {
+    expect(parseInput('tell me about the aether').intent).toBe('ask');
+  });
+});
+
 describe('parseInput — fuzzy match strictness for short words', () => {
   it('does not fuzzy-match "dead" to "read" (investigate) — question, not action', () => {
     // "am i dead?" was routing to investigate intent because dead and read

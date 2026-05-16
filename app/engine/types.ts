@@ -12,6 +12,7 @@ export type Intent =
   | 'use_relic'
   | 'cast'
   | 'wait'
+  | 'ask'
   | 'unknown';
 
 export interface ParsedInput {
