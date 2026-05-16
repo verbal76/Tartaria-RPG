@@ -18,7 +18,6 @@ export function VendorScreen() {
   const scene = useGameStore((s) => s.currentScene);
   const setScreen = useGameStore((s) => s.setScreen);
   const buyFromVendor = useGameStore((s) => s.buyFromVendor);
-  const dismissVendor = useGameStore((s) => s.dismissVendor);
 
   const [pending, setPending] = useState<{ itemName: string; price: number } | null>(null);
 
@@ -47,11 +46,6 @@ export function VendorScreen() {
     setPending(null);
   };
 
-  const leave = () => {
-    dismissVendor();
-    setScreen('exploration');
-  };
-
   const preview = pending ? getItemPreview(pending.itemName) : null;
   const canAffordPending = pending ? player.tc >= pending.price : false;
 
@@ -67,9 +61,7 @@ export function VendorScreen() {
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
         <Text style={styles.title}>SHOP</Text>
-        <TouchableOpacity onPress={leave} hitSlop={8}>
-          <Text style={styles.leave}>LEAVE ✕</Text>
-        </TouchableOpacity>
+        <View style={{ width: 80 }} />
       </View>
 
       <View style={styles.vendorCard}>
@@ -90,6 +82,11 @@ export function VendorScreen() {
           vendor.offers.map((o, i) => {
             const canAfford = player.tc >= o.price;
             const itemPreview = getItemPreview(o.itemName);
+            // Count how many of this item the player already owns so they
+            // can see at a glance whether to bother buying another.
+            const owned = player.inventory
+              .filter((inv) => inv.name.toLowerCase() === o.itemName.toLowerCase())
+              .reduce((sum, inv) => sum + inv.quantity, 0);
             return (
               <TouchableOpacity
                 key={`${o.itemName}_${i}`}
@@ -105,9 +102,14 @@ export function VendorScreen() {
                       {o.price} TC
                     </Text>
                   </View>
-                  <Text style={styles.offerKind} numberOfLines={1}>
-                    {itemPreview.kindLabel}{itemPreview.rarity ? ` · ${itemPreview.rarity}` : ''}
-                  </Text>
+                  <View style={styles.offerSubHead}>
+                    <Text style={styles.offerKind} numberOfLines={1}>
+                      {itemPreview.kindLabel}{itemPreview.rarity ? ` · ${itemPreview.rarity}` : ''}
+                    </Text>
+                    {owned > 0 && (
+                      <Text style={styles.offerOwned}>you have {owned}</Text>
+                    )}
+                  </View>
                   {itemPreview.stats.length > 0 && (
                     <Text style={styles.offerStats} numberOfLines={2}>
                       {itemPreview.stats.join(' · ')}
@@ -166,7 +168,6 @@ const styles = StyleSheet.create({
   },
   backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
   title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
-  leave: { color: '#e07a5f', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
   vendorCard: {
     backgroundColor: '#13110f',
     borderColor: '#c9a86a',
@@ -205,7 +206,9 @@ const styles = StyleSheet.create({
   offerName: { color: '#e6d8b3', fontSize: 14, fontWeight: '700', flex: 1, marginRight: 8 },
   offerPrice: { color: '#c9a86a', fontSize: 12, fontWeight: '700' },
   offerPriceBroke: { color: '#7a705c' },
-  offerKind: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginTop: 2 },
+  offerSubHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 2 },
+  offerKind: { color: '#7a705c', fontSize: 10, letterSpacing: 1, flex: 1 },
+  offerOwned: { color: '#9ec96a', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
   offerStats: { color: '#cdbf99', fontSize: 11, marginTop: 4 },
   empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 40 },
   placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },

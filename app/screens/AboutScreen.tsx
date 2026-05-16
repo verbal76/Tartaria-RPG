@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, Modal, ActivityIndicator } from 'react-native';
 import Constants from 'expo-constants';
 import * as Clipboard from 'expo-clipboard';
 import * as Updates from 'expo-updates';
@@ -251,6 +251,27 @@ export function AboutScreen() {
       <TouchableOpacity style={styles.copyBtn} onPress={handleCopy} activeOpacity={0.7}>
         <Text style={styles.copyText}>{copied ? 'COPIED' : 'COPY ALL'}</Text>
       </TouchableOpacity>
+
+      {/* OTA UPDATE OVERLAY — covers the screen while the update is being
+          downloaded / saved / applied. Without it, the screen freezes on
+          reloadAsync() and the player thinks the app crashed. The spinner
+          + status line keeps them informed through the tear-down gap. */}
+      <Modal visible={updateBusy} transparent animationType="fade" statusBarTranslucent>
+        <View style={styles.updateScrim}>
+          <View style={styles.updateCard}>
+            <Text style={styles.updateTitle}>UPDATING</Text>
+            <View style={styles.updateRule} />
+            <View style={styles.updateSpinnerRow}>
+              <ActivityIndicator color="#c9a86a" size="large" />
+            </View>
+            <Text style={styles.updateStatusLine}>{updateStatus}</Text>
+            <Text style={styles.updateHint}>
+              Tartaria is replacing its bones. The screen will go dark for a moment as the new
+              bundle loads — give it a few seconds before assuming anything is wrong.
+            </Text>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -348,6 +369,28 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   copyText: { color: '#0a0908', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
+  updateScrim: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  updateCard: {
+    width: '100%',
+    maxWidth: 360,
+    backgroundColor: '#13110f',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 18,
+    alignItems: 'center',
+  },
+  updateTitle: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
+  updateRule: { height: 1, alignSelf: 'stretch', backgroundColor: '#3a342c', marginTop: 8, marginBottom: 14 },
+  updateSpinnerRow: { paddingVertical: 6, marginBottom: 8 },
+  updateStatusLine: { color: '#e6d8b3', fontSize: 13, letterSpacing: 1, marginBottom: 10 },
+  updateHint: { color: '#7a705c', fontSize: 11, lineHeight: 16, textAlign: 'center', fontStyle: 'italic' },
   updateBtn: {
     backgroundColor: '#3a342c',
     borderColor: '#c9a86a',
