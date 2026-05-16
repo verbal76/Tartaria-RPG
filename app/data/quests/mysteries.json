@@ -1,0 +1,88 @@
+{
+  "mysteries": [
+    {
+      "id": "mystery_red_tower",
+      "title": "Fragment of the Red Tower",
+      "posterText": "A Forgotten Order scholar will pay handsomely for a confirmed Fragment of the Red Tower — the cursed Etheric core's outer casing, never recovered intact. 400 TC.",
+      "trophyName": "Fragment of the Red Tower",
+      "minRep": 0,
+      "factionId": "forgotten_order",
+      "rewardTc": 400,
+      "rewardItem": "Aetheric Shard",
+      "rewardRep": 8,
+      "stages": [
+        { "narration": "The scholar slides a sketch across the table — a hexagonal Tartarian ironwork, the seal of Nimari embossed into one face. \"The Red Tower's outer ring shed pieces when it cooled. They turn up. Find one.\"", "arbiter": null, "checkKind": null },
+        { "narration": "You think back through old salvage notes. Nimari, Red Tower, Etheric core. Reclaimers say the fragments roll downhill — anywhere mud collects, eventually one ends up. Mudstone-rich ground is the place to look.", "arbiter": "\"You know the where,\" the Arbiter says. \"Now do the work.\"", "checkKind": "investigate" },
+        { "narration": "You dig along a Mudstone vein where the silt has built up a lip. After an hour, a piece of the casing catches your blade — hexagonal, faintly warm to the touch.", "arbiter": null, "checkKind": "investigate" },
+        { "narration": "You wipe the casing clean. The seal of Nimari is intact. This will satisfy the scholar.", "arbiter": "\"That fragment is centuries old,\" the Arbiter says. \"It remembers the Tower. Carry it carefully.\"", "checkKind": "boss" }
+      ]
+    },
+    {
+      "id": "mystery_cradle_compass",
+      "title": "Cradle of Dusk Compass",
+      "posterText": "Halem the Trader offers 300 TC for a working Cradle of Dusk Compass — one of the few instruments that holds steady in Aetheric storms.",
+      "trophyName": "Cradle of Dusk Compass",
+      "minRep": 0,
+      "factionId": null,
+      "rewardTc": 300,
+      "rewardItem": "Aetheric Dust",
+      "rewardRep": null,
+      "stages": [
+        { "narration": "Halem unrolls a worn map of the Mud Seas, taps the Cradle of Dusk. \"Old Tartarian surveying instrument. Brass face, three needles. Anyone who sails the Mud Seas wants one. Bring me a working piece.\"", "arbiter": null, "checkKind": null },
+        { "narration": "You make your way to the Cradle's edge. The wreckage of an old surveying vessel sits half-glassed in the haze. Inside, a Tartarian instrument console — and one of the compasses still intact in its bracket.", "arbiter": "\"They never abandoned this place willingly,\" the Arbiter says. \"Take what is still here to take.\"", "checkKind": "stealth" },
+        { "narration": "You pry the compass free. The three needles snap to attention immediately, aligned with currents you cannot feel. Halem will pay for this without bargaining.", "arbiter": null, "checkKind": "boss" }
+      ]
+    },
+    {
+      "id": "mystery_leviathan_eye",
+      "title": "The Leviathan's Eye",
+      "posterText": "True Tartarian agents will pay 500 TC and faith-favor for the preserved eye of a Mud Seas Leviathan — said to see through Etheric storms.",
+      "trophyName": "Preserved Leviathan Eye",
+      "minRep": 5,
+      "factionId": "true_tartarians",
+      "rewardTc": 500,
+      "rewardItem": "Aetheric Shard",
+      "rewardRep": 12,
+      "stages": [
+        { "narration": "The True Tartarian agent meets you in the dark. \"Leviathan, Mud Seas. Old beast. It died long ago, but its eye does not rot in Aetherstone — find the carcass, take the eye, bring it here.\"", "arbiter": "\"Bones of leviathans show up in the most unflattering places,\" the Arbiter says. \"Look where the Seas have receded.\"", "checkKind": null },
+        { "narration": "You walk the receding edge of the Mud Seas. The Leviathan's spine breaks the surface like a ridge of ribbed stone — long dead, every scale fossilised.", "arbiter": null, "checkKind": "investigate" },
+        { "narration": "You climb the spine to where the skull lies submerged. The eye-socket is the size of a window. You reach in — the eye is still there, fossilised but intact, the size of a melon.", "arbiter": "\"The leviathans were watching the storms before there were Tartarians,\" the Arbiter says.", "checkKind": "stealth" },
+        { "narration": "You wrap the eye in your pack and back away from the carcass. The Mud Seas resettle behind you — the only witness is the haze.", "arbiter": null, "checkKind": "boss" }
+      ]
+    },
+    {
+      "id": "mystery_temporal_watch",
+      "title": "Temporal Distortion Watch",
+      "posterText": "Reclaimers Guild Speaker pays 600 TC and will move you up the haul board for a working Temporal Distortion Watch — Tartarian-make, useful in deep ruins.",
+      "trophyName": "Temporal Distortion Watch",
+      "minRep": 5,
+      "factionId": "reclaimers_guild",
+      "rewardTc": 600,
+      "rewardItem": "Energy Fragment",
+      "rewardRep": 10,
+      "stages": [
+        { "narration": "The Speaker spreads the contract. \"Watch — Tartarian make, hexagonal face, three dials. Counts the way the local Etheric time bends. Reclaimers used to wear them. Find a working one.\"", "arbiter": null, "checkKind": null },
+        { "narration": "Old Reclaimer wisdom: the watches turn up in preserved corpses — anyone who died in a temporal eddy got their watch fossilised with them. You head into the eddies.", "arbiter": "\"Time bent backward for these people,\" the Arbiter says. \"Their gear bent with them.\"", "checkKind": "investigate" },
+        { "narration": "You find a Reclaimer body in an eddy zone — perfectly preserved, the watch still on the wrist, ticking in slow waves.", "arbiter": null, "checkKind": "stealth" },
+        { "narration": "You unstrap the watch. The dials settle into normal time as you leave the eddy. The Speaker will pay without question.", "arbiter": null, "checkKind": "boss" }
+      ]
+    },
+    {
+      "id": "mystery_obsidian_orb",
+      "title": "Shifting Obsidian Orb",
+      "posterText": "Mud Monarch courier offers 700 TC for a Shifting Obsidian Orb — an Obsidian Pillar fragment fused with Aetherstone. Reshapes itself.",
+      "trophyName": "Shifting Obsidian Orb",
+      "minRep": 0,
+      "factionId": "mud_monarchs",
+      "rewardTc": 700,
+      "rewardItem": "Aetheric Cloth",
+      "rewardRep": 8,
+      "stages": [
+        { "narration": "The courier is well-dressed and brief. \"Obsidian Pillars. The Orbs only form where one of the pillars cracks under an Aetheric storm. Find a recently-storm-struck pillar. Recover the Orb.\"", "arbiter": "\"Mud Monarchs do not pay seven hundred TC for nothing,\" the Arbiter says. \"Make sure you know what you carry.\"", "checkKind": null },
+        { "narration": "You find a pillar with fresh damage — Aetheric scoring along one face. The Orb has rolled into the silt at its base. Black as obsidian, but it does not hold a single shape.", "arbiter": null, "checkKind": "investigate" },
+        { "narration": "You pick the Orb out of the silt. It is heavy in a way that changes — sometimes a stone's weight, sometimes a feather's.", "arbiter": null, "checkKind": "stealth" },
+        { "narration": "You secure the Orb. The courier's coin is good. Whatever the Monarchs want it for is their concern, not yours — yet.", "arbiter": "\"You may meet this Orb again,\" the Arbiter says. \"In other hands.\"", "checkKind": "boss" }
+      ]
+    }
+  ]
+}

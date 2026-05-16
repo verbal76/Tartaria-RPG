@@ -1,0 +1,84 @@
+{
+  "storylines": [
+    {
+      "id": "story_order_red_tower",
+      "title": "The Red Tower's Mouth",
+      "posterText": "Vesryn of Varakush wants you to gather every Fragment of the Red Tower you can find and bring them to the Order. Multi-step contract. 1500 TC and faction standing on completion.",
+      "factionId": "forgotten_order",
+      "minRep": 5,
+      "rewardTc": 1500,
+      "rewardItem": "Runic Mantle",
+      "rewardRep": 25,
+      "stages": [
+        { "narration": "Vesryn spreads a map of the south plains. \"We need every Fragment of the Red Tower we can put hands on. There are at least seven scattered across the silt belt. Find them. Bring them. We pay for each.\"", "arbiter": "\"The Order doesn't ask for this lightly,\" the Arbiter says. \"They're rebuilding something.\"", "checkKind": null },
+        { "narration": "You head south. The first Fragment shows up where Vesryn promised — a hexagonal piece of cooled Tartarian iron, still warm. You pocket it.", "arbiter": null, "checkKind": "investigate" },
+        { "narration": "A second Fragment turns up in an old Reclaimer caravan-wreck. You haggle with the survivor over the price of letting you take it.", "arbiter": null, "checkKind": "diplomacy" },
+        { "narration": "A Mud Monarch courier is also looking for the Fragments — they pass you on the road and you stay clear of their notice.", "arbiter": "\"Whoever assembles all seven first wins something we do not yet understand,\" the Arbiter says.", "checkKind": "stealth" },
+        { "narration": "Third Fragment is in a Sentinel patrol zone. You time the loop.", "arbiter": null, "checkKind": "stealth" },
+        { "narration": "Fourth and fifth come from a single buried vault. The locking glyphs nearly take your hand off.", "arbiter": null, "checkKind": "investigate" },
+        { "narration": "Sixth is under an Aether Golem. You don't fight it — you wait until it wanders off and dig where it had been standing.", "arbiter": null, "checkKind": "stealth" },
+        { "narration": "Seventh is buried in a Mud Spirit's nesting ground. You convince the lesser spirits to let you through.", "arbiter": null, "checkKind": "diplomacy" },
+        { "narration": "You assemble all seven and study them. They fit together — partially. Vesryn was right: something is being rebuilt. You carry the bundle back to Varakush.", "arbiter": "\"The Order will not tell you what comes next,\" the Arbiter says. \"But you have done what they could not.\"", "checkKind": "boss" }
+      ]
+    },
+    {
+      "id": "story_tartarian_ascension",
+      "title": "The Path of the True Tartarian",
+      "posterText": "Korash of the Deep offers a full True Tartarian ascension trial. Seven steps. Pass them all and the enclave will treat you as one of their own. 1200 TC and major rep.",
+      "factionId": "true_tartarians",
+      "minRep": 10,
+      "rewardTc": 1200,
+      "rewardItem": "Tartarian Stoneband",
+      "rewardRep": 30,
+      "stages": [
+        { "narration": "Korash motions you to sit. \"You have shown enough. The trial is seven steps. Refuse any, walk away. Complete them all and the enclave will know you as kin.\"", "arbiter": "\"This is not a gift the True Tartarians give twice,\" the Arbiter says.", "checkKind": null },
+        { "narration": "Step one — the silent pilgrimage. You walk a buried road without speaking, without resting, for the better part of a day.", "arbiter": null, "checkKind": "escape" },
+        { "narration": "Step two — the rune trial. A Tartarian glyph is set into a wall. You must read it and trace your name beneath in Aetheric chalk.", "arbiter": null, "checkKind": "cast" },
+        { "narration": "Step three — the dive. A flooded antechamber. You swim into the dark with a single torch and bring back what the elders left there.", "arbiter": "\"Most fail here,\" the Arbiter says. \"Do not breathe in.\"", "checkKind": "investigate" },
+        { "narration": "Step four — the standing watch. You hold the night-shift at the enclave's mouth, alone. Whatever comes by, you do not call for help.", "arbiter": null, "checkKind": "stealth" },
+        { "narration": "Step five — the fast. You go a full day without rations. The hunger sharpens you. Korash brings you water once.", "arbiter": null, "checkKind": "escape" },
+        { "narration": "Step six — the duel. A young Tartarian challenges you to a non-lethal sparring match. You win or lose with honour.", "arbiter": null, "checkKind": "attack_provoke" },
+        { "narration": "Step seven — the oath. Korash and three elders stand witness. You say the words. They repeat them back. It is done.", "arbiter": "\"You belong to them now, in part,\" the Arbiter says. \"It will count when it counts.\"", "checkKind": "boss" }
+      ]
+    },
+    {
+      "id": "story_reclaimer_relic_run",
+      "title": "The Reclaimer Relic Run",
+      "posterText": "Reclaimers Guild Speaker offers a five-stop relic run — five hidden caches, five takes, no questions. 1000 TC, Guild standing, and a permanent slot on the haul board.",
+      "factionId": "reclaimers_guild",
+      "minRep": 5,
+      "rewardTc": 1000,
+      "rewardItem": "Echoing Steps Boots",
+      "rewardRep": 20,
+      "stages": [
+        { "narration": "The Speaker hands you a sealed map with five marks. \"Each is a relic cache. Hit them in order. You keep nothing of the haul beyond a finder's cut — but you walk out a name in the Guild.\"", "arbiter": null, "checkKind": null },
+        { "narration": "First mark — a half-buried Tartarian utility room. You crack the lock-glyph and pull the haul.", "arbiter": null, "checkKind": "investigate" },
+        { "narration": "Second mark — a Reclaimer rival has been here recently. You read their tracks, decide they will not be back for hours, and finish the work.", "arbiter": "\"The Guild rewards the quiet ones,\" the Arbiter says.", "checkKind": "stealth" },
+        { "narration": "Third mark — a Sentinel guards the approach. You time the patrol again and slip past.", "arbiter": null, "checkKind": "stealth" },
+        { "narration": "Fourth mark — a Mud Spirit nests on top of the cache. You talk it down to a small offering of rations and it lets you in.", "arbiter": null, "checkKind": "diplomacy" },
+        { "narration": "Fifth mark — the Speaker did not mention this one is mid-collapse. You dig fast.", "arbiter": null, "checkKind": "investigate" },
+        { "narration": "You return all five hauls to the Speaker. They count them once, look at you once, and nod.", "arbiter": "\"You are on the board now,\" the Arbiter says. \"That carries weight here.\"", "checkKind": "boss" }
+      ]
+    },
+    {
+      "id": "story_monarch_silence",
+      "title": "Silence Across the Border",
+      "posterText": "Dr. Lucius Kincaid will pay for a six-stop silencing run — six people who have been talking too loudly about Tartaria. Discretion required. 1300 TC. Monarch standing.",
+      "factionId": "mud_monarchs",
+      "minRep": 5,
+      "rewardTc": 1300,
+      "rewardItem": "Mud Monarch Seal",
+      "rewardRep": 25,
+      "stages": [
+        { "narration": "Kincaid passes you a list of six names across a polished table. \"All of these have been writing about Tartaria where they should not. We do not require them dead. We require them quiet. Means are your business.\"", "arbiter": "\"The Monarchs deal in silence,\" the Arbiter says quietly. \"Not in mercy.\"", "checkKind": null },
+        { "narration": "First name — a Reclaimer who has been talking to Order scholars. You make a compelling case for them to keep their finds to themselves.", "arbiter": null, "checkKind": "diplomacy" },
+        { "narration": "Second name — an Unknowing Masses journalist with a draft article. You take the draft.", "arbiter": null, "checkKind": "stealth" },
+        { "narration": "Third name — a Forgotten Order scholar's apprentice. You don't approach them directly; you make sure their next field expedition turns up nothing.", "arbiter": null, "checkKind": "investigate" },
+        { "narration": "Fourth name — a True Tartarian sympathiser in the surface enclave. You convince them you are also a sympathiser.", "arbiter": "\"Lies cost something in this country,\" the Arbiter says. \"Make sure you can pay it.\"", "checkKind": "diplomacy" },
+        { "narration": "Fifth name — a Reclaimer's Guild middleman selling photographs of buried sites. You intercept their next courier.", "arbiter": null, "checkKind": "stealth" },
+        { "narration": "Sixth and last — Kincaid's own former assistant, gone rogue. They expect you. They are not happy.", "arbiter": null, "checkKind": "attack_provoke" },
+        { "narration": "You return to Kincaid. He counts the items you brought back, looks at you once, and slides a heavy purse across the table.", "arbiter": "\"The Monarchs remember you now,\" the Arbiter says. \"This is not always a gift.\"", "checkKind": "boss" }
+      ]
+    }
+  ]
+}

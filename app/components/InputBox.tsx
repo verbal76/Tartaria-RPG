@@ -11,7 +11,7 @@ interface Props {
   range?: 'arm' | 'close' | 'far' | null;
 }
 
-const PEACE_QUICK = ['look', 'search', 'rest'] as const;
+const PEACE_QUICK = ['look', 'search', 'rest', 'dig'] as const;
 
 // Trim a weapon name down to fit comfortably on a button. Examples:
 // "Aetheric Crystal Blade" → "Crystal Blade"

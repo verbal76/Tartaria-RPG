@@ -104,7 +104,27 @@ import {
   fuzzyFindHunt,
   scaleHuntBoss,
 } from '../engine/hunts';
+import {
+  MYSTERIES,
+  findMysteryById,
+  availableMysteries,
+  fuzzyFindMystery,
+} from '../engine/mysteries';
+import {
+  STORYLINES,
+  findStorylineById,
+  availableStorylines,
+  fuzzyFindStoryline,
+} from '../engine/factionStorylines';
 import { tickWeather, weatherBlocksRepositioning } from '../engine/weatherEffects';
+import { bestDigTool, rollDig } from '../engine/digging';
+import {
+  generateWorldMap,
+  stepInDirection,
+  surveyAll,
+  type Direction,
+  type WorldMap,
+} from '../engine/worldMap';
 import {
   rollIncomingStatusEffect,
   applyEffect,
@@ -253,6 +273,13 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     completedFactionQuestIds: p.completedFactionQuestIds ?? [],
     activeHunts: p.activeHunts ?? [],
     completedHuntIds: p.completedHuntIds ?? [],
+    activeMysteries: p.activeMysteries ?? [],
+    completedMysteryIds: p.completedMysteryIds ?? [],
+    activeStorylines: p.activeStorylines ?? [],
+    completedStorylineIds: p.completedStorylineIds ?? [],
+    mapSeed: p.mapSeed ?? `${p.name}|${p.raceId}|${p.factionId}|legacy`,
+    mapX: p.mapX ?? 4,
+    mapY: p.mapY ?? 4,
   };
 }
 
@@ -383,6 +410,14 @@ interface GameStore {
   acceptHunt: (titleOrId: string) => void;
   advanceHunt: (huntId: string) => void;
   turnInHunt: (titleOrId: string) => void;
+  acceptMystery: (titleOrId: string) => void;
+  advanceMystery: (mysteryId: string) => void;
+  turnInMystery: (titleOrId: string) => void;
+  acceptStoryline: (titleOrId: string) => void;
+  advanceStoryline: (storylineId: string) => void;
+  turnInStoryline: (titleOrId: string) => void;
+  digHere: () => void;
+  stepDirection: (dir: Direction) => void;
   dismissVendor: () => void;
   joinFaction: (factionId: string) => void;
   equipItem: (itemName: string, slot: EquipSlot) => void;
@@ -674,6 +709,56 @@ export const useGameStore = create<GameStore>((set, get) => ({
             `${vendor.name} eyes the trophy on your belt. "You finished ${ht.title}? Turn it in — say 'turn in ${ht.title.split(' ').slice(1, 4).join(' ').toLowerCase()}'."`,
           );
         }
+        // Mystery board.
+        const mysteryPool = availableMysteries(
+          vendor.faction,
+          getStanding(player.factionStanding, vendor.faction),
+          (player.activeMysteries ?? []).map((m) => m.id),
+          player.completedMysteryIds ?? [],
+        );
+        if (mysteryPool.length > 0) {
+          const m = mysteryPool[0]!;
+          get().appendLog(
+            'arbiter',
+            `${vendor.name} taps a different notice. "Mystery work — ${m.title}. ${m.posterText} Say 'accept ${m.title.split(' ').slice(0, 3).join(' ').toLowerCase()}' to take it."`,
+          );
+        }
+        const mysteryTurnable = (player.activeMysteries ?? [])
+          .map((rec) => ({ rec, def: findMysteryById(rec.id) }))
+          .filter(({ def }) => def && def.factionId === vendor.faction)
+          .filter(({ rec, def }) => def && rec.stage >= def.stages.length);
+        if (mysteryTurnable.length > 0) {
+          const mt = mysteryTurnable[0]!.def!;
+          get().appendLog(
+            'arbiter',
+            `${vendor.name} eyes your pack. "You finished ${mt.title}? Turn it in — say 'turn in ${mt.title.split(' ').slice(0, 3).join(' ').toLowerCase()}'."`,
+          );
+        }
+        // Storylines — heavyweight multi-step faction work.
+        const storyPool = availableStorylines(
+          vendor.faction,
+          getStanding(player.factionStanding, vendor.faction),
+          (player.activeStorylines ?? []).map((s) => s.id),
+          player.completedStorylineIds ?? [],
+        );
+        if (storyPool.length > 0) {
+          const s = storyPool[0]!;
+          get().appendLog(
+            'arbiter',
+            `${vendor.name} unrolls a thick scroll. "Long-form work — ${s.title}. ${s.posterText} Say 'accept ${s.title.split(' ').slice(0, 3).join(' ').toLowerCase()}' to take it."`,
+          );
+        }
+        const storyTurnable = (player.activeStorylines ?? [])
+          .map((rec) => ({ rec, def: findStorylineById(rec.id) }))
+          .filter(({ def }) => def && def.factionId === vendor.faction)
+          .filter(({ rec, def }) => def && rec.stage >= def.stages.length);
+        if (storyTurnable.length > 0) {
+          const st = storyTurnable[0]!.def!;
+          get().appendLog(
+            'arbiter',
+            `${vendor.name} reads your face. "${st.title} finished? Turn it in — say 'turn in ${st.title.split(' ').slice(0, 3).join(' ').toLowerCase()}'."`,
+          );
+        }
       }
     }
     // Arbiter gets two voices on scene entry:
@@ -930,6 +1015,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         const target = parsed.target?.toLowerCase() ?? '';
+        // Directional travel: "go north" / "head east" / "walk south" /
+        // "travel west" — walk one tile on the procedural map.
+        const dirMatch = /\b(north|south|east|west)\b/.exec(target);
+        if (dirMatch) {
+          const dir = dirMatch[1] as Direction;
+          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.travel), 1) });
+          get().stepDirection(dir);
+          break;
+        }
         const candidate = target
           ? allLocations.find((l) => l.name.toLowerCase().includes(target) || l.id === target)
           : undefined;
@@ -1021,10 +1115,41 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'ask': {
-        // Look up the player's question in the concepts knowledge base. The
-        // target text is whatever followed the question verb (the parser
-        // strips stopwords like "is", "the", "me", "about" already).
         const lookup = parsed.target ?? parsed.resolvedNoun ?? trimmed;
+        // "where am I" / "what is around" / "compass" → directional survey
+        // if the player has a compass; otherwise a vaguer answer.
+        const wantsBearings = /where.*am|what.*around|what.*near|which way|compass|bearings|surroundings/i.test(trimmed);
+        if (wantsBearings) {
+          const hasCompass = player.inventory.some(
+            (i) => /compass/i.test(i.name) && i.quantity > 0,
+          );
+          const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
+          const map = generateWorldMap(seed, player.currentLocationId);
+          const fromX = player.mapX ?? 4;
+          const fromY = player.mapY ?? 4;
+          if (hasCompass) {
+            const survey = surveyAll(map, fromX, fromY);
+            const fragments: string[] = [];
+            for (const dir of ['north', 'east', 'south', 'west'] as Direction[]) {
+              const s = survey[dir];
+              if (s) fragments.push(`${dir}: ${s.name} (${s.distance} stretch${s.distance > 1 ? 'es' : ''})`);
+            }
+            const summary = fragments.length > 0
+              ? fragments.join(' · ')
+              : 'every direction reads open ground';
+            get().appendLog(
+              'arbiter',
+              `The Arbiter watches you read the compass. "Bearings, then: ${summary}."`,
+            );
+          } else {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter shrugs. "You have no compass. The mud-flood country looks the same in every direction — find one or guess."`,
+            );
+          }
+          break;
+        }
+        // Otherwise normal concept lookup.
         const concept = findConcept(lookup);
         if (concept) {
           get().appendLog('arbiter', `"${concept.title}." the Arbiter says. "${concept.answer}"`);
@@ -1097,17 +1222,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().repairWithVendor(target);
         break;
       }
+      case 'dig': {
+        get().digHere();
+        break;
+      }
       case 'accept': {
         const target = parsed.target ?? parsed.resolvedNoun ?? '';
         if (!target.trim()) {
           get().appendLog('arbiter', `The Arbiter raises a brow. "Accept what? Ask the agent what is on offer."`);
           break;
         }
-        // Prefer hunt match if the word "hunt" / "bounty" appears or a hunt
-        // title matches; otherwise route to faction quest.
         const lower = target.toLowerCase();
         const huntHint = /hunt|bounty|titan|dragon|behemoth|chimera|wyvern|monarch|siren|queen/.test(lower);
-        if (huntHint && fuzzyFindHunt(target, HUNTS)) {
+        const mysteryHint = /mystery|fragment|compass|orb|eye|watch|red tower|cradle|leviathan|obsidian|temporal/.test(lower);
+        const storyHint = /storyline|story|path|ascension|run|relic run|silence|red tower|tartarian path|true tartarian/.test(lower);
+        if (storyHint && fuzzyFindStoryline(target, STORYLINES)) {
+          get().acceptStoryline(target);
+        } else if (mysteryHint && fuzzyFindMystery(target, MYSTERIES)) {
+          get().acceptMystery(target);
+        } else if (huntHint && fuzzyFindHunt(target, HUNTS)) {
           get().acceptHunt(target);
         } else {
           get().acceptFactionQuest(target);
@@ -1125,7 +1258,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         const lower = target.toLowerCase();
         const huntHint = /hunt|bounty|titan|dragon|behemoth|chimera|wyvern|monarch|siren|queen|trophy/.test(lower);
-        if (huntHint && fuzzyFindHunt(target, HUNTS)) {
+        const mysteryHint = /mystery|fragment|compass|orb|eye|watch|red tower|cradle|leviathan|obsidian|temporal/.test(lower);
+        const storyHint = /storyline|story|path|ascension|run|relic run|silence|red tower|tartarian path/.test(lower);
+        if (storyHint && fuzzyFindStoryline(target, STORYLINES)) {
+          get().turnInStoryline(target);
+        } else if (mysteryHint && fuzzyFindMystery(target, MYSTERIES)) {
+          get().turnInMystery(target);
+        } else if (huntHint && fuzzyFindHunt(target, HUNTS)) {
           get().turnInHunt(target);
         } else {
           get().turnInFactionQuest(target);
@@ -1369,6 +1508,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
           });
         if (huntMatch) {
           void Promise.resolve().then(() => get().advanceHunt(huntMatch.rec.id));
+        }
+        // Mystery auto-advance — same rule, no boss spawn at the end.
+        const mysteryMatch = (player.activeMysteries ?? [])
+          .map((rec) => ({ rec, def: findMysteryById(rec.id) }))
+          .find(({ rec, def }) => {
+            if (!def) return false;
+            const next = def.stages[rec.stage];
+            if (!next) return false;
+            return (
+              (next.checkKind === 'investigate' && intent === 'investigate') ||
+              (next.checkKind === 'stealth' && intent === 'stealth') ||
+              (next.checkKind === 'diplomacy' && intent === 'diplomacy') ||
+              (next.checkKind === 'escape' && intent === 'escape') ||
+              (next.checkKind === 'cast' && intent === 'cast') ||
+              (next.checkKind === 'boss' && intent === 'investigate')
+            );
+          });
+        if (mysteryMatch) {
+          void Promise.resolve().then(() => get().advanceMystery(mysteryMatch.rec.id));
+        }
+        // Storyline auto-advance — same rule.
+        const storyMatch = (player.activeStorylines ?? [])
+          .map((rec) => ({ rec, def: findStorylineById(rec.id) }))
+          .find(({ rec, def }) => {
+            if (!def) return false;
+            const next = def.stages[rec.stage];
+            if (!next) return false;
+            return (
+              (next.checkKind === 'investigate' && intent === 'investigate') ||
+              (next.checkKind === 'stealth' && intent === 'stealth') ||
+              (next.checkKind === 'diplomacy' && intent === 'diplomacy') ||
+              (next.checkKind === 'escape' && intent === 'escape') ||
+              (next.checkKind === 'cast' && intent === 'cast') ||
+              (next.checkKind === 'attack_provoke' && intent === 'attack') ||
+              (next.checkKind === 'boss' && intent === 'diplomacy')
+            );
+          });
+        if (storyMatch) {
+          void Promise.resolve().then(() => get().advanceStoryline(storyMatch.rec.id));
         }
 
         // Skill-check milestone: every 10 successful checks → +1 to the stat
@@ -2265,6 +2443,453 @@ export const useGameStore = create<GameStore>((set, get) => ({
       text: `Completed the hunt for the ${candidate.targetEnemyName}.`,
       enemyName: candidate.targetEnemyName,
     });
+    void get().persist();
+  },
+
+  acceptMystery(titleOrId) {
+    const state = get();
+    const player = state.player;
+    const scene = state.currentScene;
+    if (!player) return;
+    if (!scene?.vendor) {
+      get().appendLog('arbiter', `The Arbiter shakes their head. "Mystery work needs a buyer. Find a vendor."`);
+      return;
+    }
+    const factionId = scene.vendor.faction;
+    const playerRep = factionId ? getStanding(player.factionStanding, factionId) : 0;
+    const direct = findMysteryById(titleOrId);
+    const pool = availableMysteries(
+      factionId,
+      playerRep,
+      (player.activeMysteries ?? []).map((m) => m.id),
+      player.completedMysteryIds ?? [],
+    );
+    const m = direct && pool.includes(direct) ? direct : fuzzyFindMystery(titleOrId, pool);
+    if (!m) {
+      const titles = pool.map((m2) => `"${m2.title}"`).join(', ');
+      get().appendLog(
+        'arbiter',
+        titles
+          ? `${scene.vendor.name} unrolls a list. "Not that one. Currently posted: ${titles}."`
+          : `${scene.vendor.name} shakes their head. "No mystery work for you right now."`,
+      );
+      return;
+    }
+    set((s) =>
+      s.player
+        ? {
+            player: {
+              ...s.player,
+              activeMysteries: [
+                ...(s.player.activeMysteries ?? []),
+                { id: m.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now() },
+              ],
+            },
+          }
+        : s,
+    );
+    const stage0 = m.stages[0];
+    if (stage0) {
+      get().appendLog('reward', `✦ Mystery accepted — ${m.title}. ${m.posterText}`);
+      get().appendLog('world', stage0.narration);
+      if (stage0.arbiter) get().appendLog('arbiter', stage0.arbiter);
+    }
+    set((s) =>
+      s.player
+        ? {
+            player: {
+              ...s.player,
+              activeMysteries: (s.player.activeMysteries ?? []).map((mm) =>
+                mm.id === m.id ? { ...mm, stage: 1 } : mm,
+              ),
+            },
+          }
+        : s,
+    );
+    void get().persist();
+  },
+
+  advanceMystery(mysteryId) {
+    const state = get();
+    const player = state.player;
+    if (!player) return;
+    const active = player.activeMysteries ?? [];
+    const record = active.find((m) => m.id === mysteryId);
+    const mystery = findMysteryById(mysteryId);
+    if (!record || !mystery) return;
+    const stageDef = mystery.stages[record.stage];
+    if (!stageDef) return;
+    get().appendLog('world', stageDef.narration);
+    if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
+    // Final stage is the "synthesis" — the player has the trophy in hand
+    // (narratively); advance the stage past the end so turn-in unlocks.
+    const nextStage = record.stage + 1;
+    set((s) =>
+      s.player
+        ? {
+            player: {
+              ...s.player,
+              activeMysteries: (s.player.activeMysteries ?? []).map((m) =>
+                m.id === mysteryId ? { ...m, stage: nextStage } : m,
+              ),
+            },
+          }
+        : s,
+    );
+    if (nextStage >= mystery.stages.length) {
+      get().appendLog(
+        'reward',
+        `✦ ${mystery.trophyName} recovered. Return to a posting agent to turn in "${mystery.title}".`,
+      );
+    }
+    void get().persist();
+  },
+
+  turnInMystery(titleOrId) {
+    const state = get();
+    const player = state.player;
+    const scene = state.currentScene;
+    if (!player) return;
+    if (!scene?.vendor) {
+      get().appendLog('arbiter', `The Arbiter folds their arms. "Need a buyer. Find a vendor."`);
+      return;
+    }
+    const active = player.activeMysteries ?? [];
+    const direct = findMysteryById(titleOrId);
+    const candidate = direct ?? fuzzyFindMystery(
+      titleOrId,
+      active.map((r) => findMysteryById(r.id)).filter((m): m is NonNullable<typeof m> => !!m),
+    );
+    if (!candidate) {
+      get().appendLog('arbiter', `${scene.vendor.name} squints. "That mystery is not on your slate."`);
+      return;
+    }
+    const record = active.find((m) => m.id === candidate.id);
+    if (!record) {
+      get().appendLog('arbiter', `${scene.vendor.name} squints. "That mystery is not on your slate."`);
+      return;
+    }
+    if (record.stage < candidate.stages.length) {
+      get().appendLog(
+        'arbiter',
+        `${scene.vendor.name} reads your face. "The artifact is the proof. You don't have it yet."`,
+      );
+      return;
+    }
+    if (candidate.factionId && candidate.factionId !== scene.vendor.faction) {
+      get().appendLog(
+        'arbiter',
+        `${scene.vendor.name} shakes their head. "Wrong agent. ${candidate.factionId.replace(/_/g, ' ')} posted that."`,
+      );
+      return;
+    }
+    const trophy: InventoryItem = stampDurability({
+      id: `mystery_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      name: candidate.trophyName,
+      kind: 'relic',
+      rarity: 'Rare',
+      quantity: 1,
+      tags: ['trophy', 'mystery'],
+      description: `Recovered from the mystery: ${candidate.title}.`,
+    });
+    const newInventory = candidate.rewardItem
+      ? [...player.inventory, trophy, stampDurability({
+          id: `mysteryreward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          name: candidate.rewardItem,
+          kind: 'misc',
+          rarity: lookupCraftedItem(candidate.rewardItem).rarity,
+          quantity: 1,
+          tags: lookupCraftedItem(candidate.rewardItem).tags,
+        })]
+      : [...player.inventory, trophy];
+    const repResult = candidate.factionId && candidate.rewardRep
+      ? applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep)
+      : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
+    set((s) =>
+      s.player
+        ? {
+            player: {
+              ...s.player,
+              tc: s.player.tc + candidate.rewardTc,
+              inventory: newInventory,
+              factionStanding: repResult.standing,
+              activeMysteries: (s.player.activeMysteries ?? []).filter((m) => m.id !== candidate.id),
+              completedMysteryIds: [...(s.player.completedMysteryIds ?? []), candidate.id],
+            },
+          }
+        : s,
+    );
+    get().appendLog(
+      'reward',
+      `✦ Mystery complete — ${candidate.title}. +${candidate.rewardTc} TC${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}.`,
+    );
+    if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
+    void get().persist();
+  },
+
+  acceptStoryline(titleOrId) {
+    const state = get();
+    const player = state.player;
+    const scene = state.currentScene;
+    if (!player) return;
+    if (!scene?.vendor?.faction) {
+      get().appendLog('arbiter', `The Arbiter shakes their head. "Storylines come from faction agents. Find one."`);
+      return;
+    }
+    const factionId = scene.vendor.faction;
+    const playerRep = getStanding(player.factionStanding, factionId);
+    const direct = findStorylineById(titleOrId);
+    const pool = availableStorylines(
+      factionId,
+      playerRep,
+      (player.activeStorylines ?? []).map((s) => s.id),
+      player.completedStorylineIds ?? [],
+    );
+    const s = direct && pool.includes(direct) ? direct : fuzzyFindStoryline(titleOrId, pool);
+    if (!s) {
+      const titles = pool.map((s2) => `"${s2.title}"`).join(', ');
+      get().appendLog(
+        'arbiter',
+        titles
+          ? `${scene.vendor.name} unrolls a thicker scroll. "Not that one. Currently posted storyline: ${titles}."`
+          : `${scene.vendor.name} shakes their head. "No long-form work for you right now."`,
+      );
+      return;
+    }
+    set((st) =>
+      st.player
+        ? {
+            player: {
+              ...st.player,
+              activeStorylines: [
+                ...(st.player.activeStorylines ?? []),
+                { id: s.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now() },
+              ],
+            },
+          }
+        : st,
+    );
+    const stage0 = s.stages[0];
+    if (stage0) {
+      get().appendLog('reward', `✦ Storyline accepted — ${s.title}. ${s.posterText}`);
+      get().appendLog('world', stage0.narration);
+      if (stage0.arbiter) get().appendLog('arbiter', stage0.arbiter);
+    }
+    set((st) =>
+      st.player
+        ? {
+            player: {
+              ...st.player,
+              activeStorylines: (st.player.activeStorylines ?? []).map((rec) =>
+                rec.id === s.id ? { ...rec, stage: 1 } : rec,
+              ),
+            },
+          }
+        : st,
+    );
+    void get().persist();
+  },
+
+  advanceStoryline(storylineId) {
+    const state = get();
+    const player = state.player;
+    if (!player) return;
+    const active = player.activeStorylines ?? [];
+    const record = active.find((s) => s.id === storylineId);
+    const def = findStorylineById(storylineId);
+    if (!record || !def) return;
+    const stageDef = def.stages[record.stage];
+    if (!stageDef) return;
+    get().appendLog('world', stageDef.narration);
+    if (stageDef.arbiter) get().appendLog('arbiter', stageDef.arbiter);
+    const nextStage = record.stage + 1;
+    set((s) =>
+      s.player
+        ? {
+            player: {
+              ...s.player,
+              activeStorylines: (s.player.activeStorylines ?? []).map((rec) =>
+                rec.id === storylineId ? { ...rec, stage: nextStage } : rec,
+              ),
+            },
+          }
+        : s,
+    );
+    if (nextStage >= def.stages.length) {
+      get().appendLog(
+        'reward',
+        `✦ Storyline complete in the field — ${def.title}. Return to a posting agent to turn it in.`,
+      );
+    }
+    void get().persist();
+  },
+
+  turnInStoryline(titleOrId) {
+    const state = get();
+    const player = state.player;
+    const scene = state.currentScene;
+    if (!player) return;
+    if (!scene?.vendor) {
+      get().appendLog('arbiter', `The Arbiter folds their arms. "Find an agent."`);
+      return;
+    }
+    const active = player.activeStorylines ?? [];
+    const direct = findStorylineById(titleOrId);
+    const candidate = direct ?? fuzzyFindStoryline(
+      titleOrId,
+      active.map((r) => findStorylineById(r.id)).filter((s): s is NonNullable<typeof s> => !!s),
+    );
+    if (!candidate) {
+      get().appendLog('arbiter', `${scene.vendor.name} squints. "Not on your slate."`);
+      return;
+    }
+    const record = active.find((s) => s.id === candidate.id);
+    if (!record) {
+      get().appendLog('arbiter', `${scene.vendor.name} squints. "Not on your slate."`);
+      return;
+    }
+    if (record.stage < candidate.stages.length) {
+      get().appendLog(
+        'arbiter',
+        `${scene.vendor.name} reads your face. "Storyline isn't finished. Come back."`,
+      );
+      return;
+    }
+    if (candidate.factionId !== scene.vendor.faction) {
+      get().appendLog(
+        'arbiter',
+        `${scene.vendor.name} shakes their head. "Wrong faction. ${candidate.factionId.replace(/_/g, ' ')} posted that one."`,
+      );
+      return;
+    }
+    const newInventory = candidate.rewardItem
+      ? [...player.inventory, stampDurability({
+          id: `story_reward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          name: candidate.rewardItem,
+          kind: 'misc',
+          rarity: lookupCraftedItem(candidate.rewardItem).rarity,
+          quantity: 1,
+          tags: lookupCraftedItem(candidate.rewardItem).tags,
+        })]
+      : [...player.inventory];
+    const repResult = applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep);
+    set((s) =>
+      s.player
+        ? {
+            player: {
+              ...s.player,
+              tc: s.player.tc + candidate.rewardTc,
+              inventory: newInventory,
+              factionStanding: repResult.standing,
+              activeStorylines: (s.player.activeStorylines ?? []).filter((rec) => rec.id !== candidate.id),
+              completedStorylineIds: [...(s.player.completedStorylineIds ?? []), candidate.id],
+            },
+          }
+        : s,
+    );
+    get().appendLog(
+      'reward',
+      `✦ Storyline complete — ${candidate.title}. +${candidate.rewardTc} TC, +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
+    );
+    if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
+    void get().persist();
+  },
+
+  // Walk one tile on the procedural map. If the tile contains a named
+  // location, switch to it; otherwise narrate a wander. A compass in the
+  // inventory upgrades the narration with directional hints.
+  stepDirection(dir: Direction) {
+    const player = get().player;
+    const scene = get().currentScene;
+    if (!player || !scene) return;
+    const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
+    const map: WorldMap = generateWorldMap(seed, player.currentLocationId);
+    const fromX = player.mapX ?? 4;
+    const fromY = player.mapY ?? 4;
+    const step = stepInDirection(map, fromX, fromY, dir);
+    set((s) => (s.player ? { player: { ...s.player, mapX: step.x, mapY: step.y } } : s));
+    if (step.landedOn && step.landedOn.locationId !== player.currentLocationId) {
+      get().appendLog('world', `You walk ${dir}. You arrive at ${step.landedOn.locationName}.`);
+      get().travelTo(step.landedOn.locationId);
+      return;
+    }
+    // Open ground — narrate a wander and plant a hook. Compass in pack
+    // adds direction-aware hint of what's ahead.
+    const hasCompass = player.inventory.some(
+      (i) => /compass|cradle of dusk compass/i.test(i.name) && i.quantity > 0,
+    );
+    if (hasCompass) {
+      const survey = surveyAll(map, step.x, step.y);
+      const ahead = survey[dir];
+      const hint = ahead
+        ? `The compass tells you ${ahead.name} lies ${ahead.distance} stretch${ahead.distance > 1 ? 'es' : ''} further ${dir}.`
+        : `The compass points ${dir} into open ground.`;
+      get().appendLog('world', `You walk ${dir} through open silt. ${hint}`);
+    } else {
+      get().appendLog('world', `You walk ${dir}. The ground here looks much like the ground behind you. You have lost track of distance.`);
+    }
+    // Plant a hook on the wander (same as narrateWanderingJourney does).
+    narrateWanderingJourney(get, set, scene);
+  },
+
+  digHere() {
+    const state = get();
+    const player = state.player;
+    const scene = state.currentScene;
+    if (!player) return;
+    if (scene?.enemy) {
+      get().appendLog('arbiter', `The Arbiter shakes their head. "Not while ${scene.enemy.name} is on you."`);
+      return;
+    }
+    const { item, score } = bestDigTool(player.inventory);
+    // Digging takes a beat and a little stamina.
+    set((s) => (s.player ? { player: advanceTime(spendStamina(s.player, 1), 0.4) } : s));
+    const toolLabel = item ? `the ${item.name.toLowerCase()}` : 'your bare hands';
+    const result = rollDig(score);
+    // Dig damage scales with tool — a brittle knife loses 3 durability,
+    // a beefy spear loses 1. Bare hands cost nothing but find less. The
+    // tradeoff: digging with your best weapon is fast, but breaks it.
+    const wearAmount = item ? Math.max(1, 4 - score) : 0;
+    if (result.nothing) {
+      get().appendLog(
+        'world',
+        `You scrape at the silt with ${toolLabel}. ${item ? '' : 'Hard going. '}Nothing of worth.`,
+      );
+      // Failed dig still wears the tool, but less.
+      if (item) {
+        for (let i = 0; i < Math.max(1, wearAmount - 1); i++) {
+          set((s) => (s.player ? { player: wearEquippedItem(s.player, item.name, get) } : s));
+        }
+      }
+      void get().persist();
+      return;
+    }
+    const found = result.found!;
+    const newItem: InventoryItem = stampDurability({
+      id: `dug_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      name: found.name,
+      kind: lookupCraftedItem(found.name).kind === 'weapon'
+        ? 'weapon'
+        : lookupCraftedItem(found.name).kind === 'armor'
+          ? 'armor'
+          : lookupCraftedItem(found.name).kind,
+      rarity: found.rarity,
+      quantity: 1,
+      tags: lookupCraftedItem(found.name).tags,
+    });
+    set((s) =>
+      s.player ? { player: { ...s.player, inventory: [...s.player.inventory, newItem] } } : s,
+    );
+    get().appendLog(
+      'reward',
+      `You scrape at the silt with ${toolLabel}. ✦ Recovered ${found.name} (${found.rarity}).`,
+    );
+    // Successful dig wears the tool — brittle tools lose more.
+    if (item) {
+      for (let i = 0; i < wearAmount; i++) {
+        set((s) => (s.player ? { player: wearEquippedItem(s.player, item.name, get) } : s));
+      }
+    }
     void get().persist();
   },
 

@@ -24,6 +24,7 @@ export type Intent =
   | 'repair'
   | 'accept'
   | 'turn_in'
+  | 'dig'
   | 'unknown';
 
 export interface ParsedInput {
@@ -297,6 +298,19 @@ export interface PlayerCharacter {
   activeHunts?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number }[];
   /** IDs of hunts that have been turned in. */
   completedHuntIds?: string[];
+  /** Active mystery-object quests. */
+  activeMysteries?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number }[];
+  /** IDs of mystery quests turned in. */
+  completedMysteryIds?: string[];
+  /** Active long-form faction storylines (5-10 step). */
+  activeStorylines?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number }[];
+  /** IDs of storylines completed. */
+  completedStorylineIds?: string[];
+  /** Deterministic seed used to generate this character's procedural world map. */
+  mapSeed?: string;
+  /** Current (x, y) on the procedural grid. Defaults to map center. */
+  mapX?: number;
+  mapY?: number;
 }
 
 export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive';
