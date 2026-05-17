@@ -2448,6 +2448,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           mood,
           recentActions,
           unresolvedHooks,
+          playerTargetNoun: parsed.resolvedNoun ?? parsed.target ?? undefined,
         });
         void narrateViaArbiter(get, set, template, parsed.intent);
       }
@@ -2554,6 +2555,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const hours = restRoll.total ?? 4;
       const hpRoom = player.hpMax - player.hp;
       const stamRoom = player.staminaMax - player.stamina;
+      // Refuse pointless rest. Playtest: rapid-tapping rest at full
+      // HP+stamina was burning game-time hours for no benefit, advancing
+      // from Day 1 evening to Day 2 afternoon in four taps.
+      if (hpRoom === 0 && stamRoom === 0) {
+        get().appendLog(
+          'world',
+          'You are whole, breath steady, HP and stamina topped. No reason to lie down — the day still has road left.',
+        );
+        void get().persist();
+        return;
+      }
       // Deterministic: 2 HP per hour, 1 stamina per hour, capped.
       const heal = Math.min(hpRoom, hours * 2);
       const stamGain = Math.min(stamRoom, hours);
@@ -2799,7 +2811,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
       if (shouldArbiterSpeak()) {
-        get().appendLog('arbiter', buildArbiterRemark({ location: currentScene.location, hazard: currentScene.hazard }));
+        const reparsed = parseInput(actionText);
+        get().appendLog(
+          'arbiter',
+          buildArbiterRemark({
+            location: currentScene.location,
+            hazard: currentScene.hazard,
+            intent: reparsed.intent,
+            playerTargetNoun: reparsed.resolvedNoun ?? reparsed.target ?? undefined,
+          }),
+        );
       }
       void get().persist();
       return;
@@ -4142,7 +4163,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : `The compass points ${dir} into open ground.`;
       get().appendLog('world', `You walk ${dir} through open silt. ${hint}`);
     } else {
-      get().appendLog('world', `You walk ${dir}. The ground here looks much like the ground behind you. You have lost track of distance.`);
+      const directional = rotatingPick(
+        [
+          `You walk ${dir}. The ground here looks much like the ground behind you. You have lost track of distance.`,
+          `You push ${dir}. The silt is heavy underfoot, the horizon unchanged.`,
+          `You head ${dir}. Mud-flats stretch the same in every direction — only the wind tells you you've moved.`,
+          `You strike out ${dir}. The country resists you with sameness more than distance.`,
+        ],
+        `wander.directional.${dir}`,
+      );
+      get().appendLog('world', directional);
     }
     // Plant a hook on the wander (same as narrateWanderingJourney does).
     narrateWanderingJourney(get, set, scene);
@@ -5293,7 +5323,7 @@ function narrateWanderingJourney(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   scene: CurrentScene,
 ): void {
-  const lead = pick(WANDERING_LEADS);
+  const lead = rotatingPick(WANDERING_LEADS, 'wander.lead');
   // Wandering always plants a hook — it's the player asking the world to
   // show them something. Skip if one is already active so we don't pile up.
   const activeUnresolved = (scene.hooks ?? []).some((h) => !h.resolved);

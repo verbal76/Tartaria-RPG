@@ -270,6 +270,14 @@ export interface ArbiterContext {
    * random mood line — this is what makes the world feel coherent.
    */
   unresolvedHooks?: { kind: string; nouns: string[] }[];
+  /**
+   * The specific noun the player named in this turn (steal dagger, attack
+   * figure, throw stone at the camp...). When set, the Arbiter's hook
+   * callback fork is suppressed so the response doesn't drift off-target
+   * — "you stole the dagger" should not be followed by "the Arbiter
+   * glances at the statue, still waiting." Stay on the player's noun.
+   */
+  playerTargetNoun?: string;
 }
 
 function pickMoodPool(mood: string | undefined): string[] | undefined {
@@ -336,7 +344,16 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
   // ~40% chance to reference an unresolved narrative hook in this scene —
   // this is the one that ties the world together. The player saw smoke /
   // footprints / a spire on their last action; the Arbiter calls back to it.
-  if (ctx.unresolvedHooks && ctx.unresolvedHooks.length > 0 && Math.random() < 0.4) {
+  //
+  // BUT: when the player named a specific noun this turn (steal dagger,
+  // attack figure, throw stone at the camp), suppress the hook callback —
+  // jumping to a different noun reads as the Arbiter ignoring what the
+  // player just did. Stay on-target.
+  if (
+    !ctx.playerTargetNoun &&
+    ctx.unresolvedHooks && ctx.unresolvedHooks.length > 0 &&
+    Math.random() < 0.4
+  ) {
     const hook = ctx.unresolvedHooks[0]!;
     const noun = hook.nouns[0] ?? hook.kind;
     // Plural-safe phrasings only — playtest log caught "The footprints hasn't
@@ -348,6 +365,20 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
       `The Arbiter glances toward the ${noun}. "Still there. Still yours, if you take it."`,
     ];
     return pick(callbacks);
+  }
+
+  // Player named a specific noun this turn — keep the Arbiter on-target.
+  // Pick a comment that references THAT noun instead of pulling random
+  // flavor that would drift the focus.
+  if (ctx.playerTargetNoun) {
+    const n = ctx.playerTargetNoun;
+    const onTopic = [
+      `The Arbiter watches you work on the ${n}. "Either it gives or it doesn't."`,
+      `"The ${n}," the Arbiter says, weighing the word. "Worth the attention."`,
+      `The Arbiter inclines their head toward the ${n}. "Patient hands, patient hands."`,
+      `"You picked the ${n}," the Arbiter notes. "Pick what comes after, too."`,
+    ];
+    return rotatingPick(onTopic, 'arbiter.target-callback');
   }
 
   // ~15% chance to acknowledge the player's most recent action, wrapped in
