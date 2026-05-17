@@ -85,14 +85,20 @@ export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<S
 
 // Apply the aggregated stat bonuses on top of the player's base stats.
 // Used by combat (attack rolls, damage rolls, skill checks) so equipped
-// gear actually changes the math.
-export function effectiveStats(player: PlayerCharacter): Stats {
+// gear actually changes the math. Optional `weatherMod` parameter folds
+// in the active weather's stat modifiers (Iron Fog −1 DEX, Etheric Storm
+// +1 INT, etc.) so the world has a voice in every roll.
+export function effectiveStats(
+  player: PlayerCharacter,
+  weatherMod?: Partial<Stats>,
+): Stats {
   const bonus = aggregateEquippedStatBonuses(player);
+  const w = weatherMod ?? {};
   return {
-    strength: player.stats.strength + (bonus.strength ?? 0),
-    dexterity: player.stats.dexterity + (bonus.dexterity ?? 0),
-    intelligence: player.stats.intelligence + (bonus.intelligence ?? 0),
-    wisdom: player.stats.wisdom + (bonus.wisdom ?? 0),
-    charisma: player.stats.charisma + (bonus.charisma ?? 0),
+    strength: player.stats.strength + (bonus.strength ?? 0) + (w.strength ?? 0),
+    dexterity: player.stats.dexterity + (bonus.dexterity ?? 0) + (w.dexterity ?? 0),
+    intelligence: player.stats.intelligence + (bonus.intelligence ?? 0) + (w.intelligence ?? 0),
+    wisdom: player.stats.wisdom + (bonus.wisdom ?? 0) + (w.wisdom ?? 0),
+    charisma: player.stats.charisma + (bonus.charisma ?? 0) + (w.charisma ?? 0),
   };
 }

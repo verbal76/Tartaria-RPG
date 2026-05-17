@@ -1,4 +1,4 @@
-import type { RollStep, PlayerCharacter, Enemy } from './types';
+import type { RollStep, PlayerCharacter, Enemy, Stats } from './types';
 import { rollDie } from './rng';
 import { findWeaponByName, type CatalogWeapon } from './crafting';
 import { effectiveStats } from './equipment';
@@ -66,11 +66,21 @@ export function buildCombatSteps(
   player: PlayerCharacter,
   enemy: Enemy,
   opts?: {
-    /** When set, the attack is being made out of normal weapon range
-     *  (e.g. melee swing at close range during Iron Fog, when
-     *  repositioning is locked). Applies a -5 to the attack roll and
-     *  notes it in the bonus label so the player sees why it missed. */
+    /** When set, the attack is being made out of normal weapon range.
+     *  Applies a -5 to the attack roll and notes it in the bonus label
+     *  so the player sees why it missed. */
     blindSwing?: boolean;
+    /** Visibility / atmospheric penalty from the active weather
+     *  (Iron Fog, Whisper Fog, Ash Storm, etc.). Subtracted from the
+     *  attack roll on top of any blindSwing penalty. */
+    visibilityPenalty?: number;
+    /** Optional descriptor for the visibility penalty (e.g. "Iron Fog")
+     *  so the bonus label can name the source. */
+    visibilityLabel?: string;
+    /** Active weather's per-stat modifiers (Iron Fog −1 DEX etc.). When
+     *  passed, effectiveStats folds these into the stat used for the
+     *  attack/damage roll. */
+    weatherMod?: Partial<Stats>;
   },
 ): RollStep[] {
   // Equipped weapon takes precedence over text-based weapon-class detection.
@@ -86,8 +96,10 @@ export function buildCombatSteps(
   const equipped = forcesBarehand ? null : getEquippedWeapon(player, prefersOff ? 'off' : 'main');
   const wc: WeaponClass = equipped?.weaponKind ?? detectWeaponClass(actionText);
   // Stat used for the attack roll factors in any equipped accessory bonuses
-  // (rings/amulets boosting STR/DEX/INT/WIS/CHA).
-  const stats = effectiveStats(player);
+  // (rings/amulets boosting STR/DEX/INT/WIS/CHA) PLUS the active weather's
+  // stat modifiers (Iron Fog −1 DEX etc.) so the world's mood is in every
+  // swing.
+  const stats = effectiveStats(player, opts?.weatherMod);
   const stat = equipped
     ? { value: stats[equipped.stat], label: STAT_LABEL[equipped.stat] }
     : attackStatFor(wc, stats);
@@ -111,21 +123,28 @@ export function buildCombatSteps(
       targetLabel: `Enemy rolled ${enemyInit}`,
       context: `d10 — meet or beat the enemy to act first`,
     },
-    {
-      id: 'attack',
-      label: 'Roll to ATTACK',
-      sides: 20,
-      count: 1,
-      bonus: stat.value + (opts?.blindSwing ? -5 : 0),
-      bonusLabel: opts?.blindSwing
-        ? `${stat.label} ${stat.value} − 5 (blind swing)`
-        : `${stat.label} ${stat.value}`,
-      target: ac,
-      targetLabel: `AC ${ac}`,
-      context: opts?.blindSwing
-        ? `d20 + ${stat.label} − 5 (out of reach, swinging blind) to hit ${enemy.name}`
-        : `d20 + ${stat.label} to hit ${enemy.name}`,
-    },
+    (() => {
+      const blindPen = opts?.blindSwing ? -5 : 0;
+      const visPen = -(opts?.visibilityPenalty ?? 0);
+      const totalMod = blindPen + visPen;
+      const pieces: string[] = [`${stat.label} ${stat.value}`];
+      if (blindPen) pieces.push(`− 5 (blind swing)`);
+      if (visPen) pieces.push(`− ${Math.abs(visPen)} (${opts?.visibilityLabel ?? 'visibility'})`);
+      const ctxPieces: string[] = [`d20 + ${stat.label}`];
+      if (blindPen) ctxPieces.push(`− 5 (out of reach)`);
+      if (visPen) ctxPieces.push(`− ${Math.abs(visPen)} (${opts?.visibilityLabel ?? 'low visibility'})`);
+      return {
+        id: 'attack',
+        label: 'Roll to ATTACK',
+        sides: 20,
+        count: 1,
+        bonus: stat.value + totalMod,
+        bonusLabel: pieces.join(' '),
+        target: ac,
+        targetLabel: `AC ${ac}`,
+        context: `${ctxPieces.join(' ')} to hit ${enemy.name}`,
+      };
+    })(),
     {
       id: 'damage',
       label: 'Roll for DAMAGE',
@@ -213,9 +232,10 @@ export function buildRestSteps(): RollStep[] {
 export function buildSkillSteps(
   intent: string,
   player: PlayerCharacter,
+  opts?: { weatherMod?: Partial<Stats> },
 ): RollStep[] {
   const statKey = SKILL_STAT[intent] ?? 'wisdom';
-  const stats = effectiveStats(player);
+  const stats = effectiveStats(player, opts?.weatherMod);
   const statVal = stats[statKey];
   const statLabel = STAT_LABEL[statKey];
   const dc = SKILL_DC[intent] ?? 12;

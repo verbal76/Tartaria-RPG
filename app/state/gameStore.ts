@@ -148,7 +148,7 @@ import {
   availableStorylines,
   fuzzyFindStoryline,
 } from '../engine/factionStorylines';
-import { tickWeather, weatherBlocksRepositioning } from '../engine/weatherEffects';
+import { tickWeather, weatherBlocksRepositioning, weatherRepositionCost, weatherAttackPenalty, weatherStatModifiers, describeWeatherStatModifiers } from '../engine/weatherEffects';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
 import { levenshtein } from '../engine/editDistance';
 import { isAreaSearch, rollAreaSearch } from '../engine/areaSearch';
@@ -225,6 +225,15 @@ interface CurrentScene {
    *  visit reads as one consistent room. Null for legacy/unmapped
    *  locations — the LLM context falls back to flat Location text. */
   microMicroId: string | null;
+  /** Slow-weather repositioning progress (Iron Fog etc.). Counts player
+   *  advance/retreat actions toward the next range change. Reset to 0
+   *  whenever range actually changes, the player switches direction, or
+   *  the weather clears. */
+  repositionPartial?: number;
+  /** Last advance/retreat direction the player committed under slow
+   *  weather. Used to detect direction changes so partial progress
+   *  doesn't carry from "advance" into a later "retreat". */
+  repositionDir?: 'advance' | 'retreat';
 }
 
 // Helper: which enemy is the player currently targeting? Returns null
@@ -958,6 +967,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ? `${opts.openingPrefix.trim()} ${sceneText.replace(/\n\n+/g, ' ')}`
       : sceneText;
     get().appendLog('world', finalSceneLog);
+    // Surface the active weather's stat modifiers so the player can see
+    // what's pressing on them this scene. Empty for "calm" or weathers
+    // without modifiers.
+    const weatherMods = describeWeatherStatModifiers(weather);
+    if (weatherMods) {
+      get().appendLog('system', `Weather effect — ${weather.name}: ${weatherMods}`);
+    }
     // Phase 4 §3.3 — the "Radar" block. Deterministic compass summary so
     // the player ALWAYS knows where they are and what's in each cardinal
     // direction without needing a compass item or asking the Arbiter.
@@ -1328,32 +1344,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (!reach.bands.includes(range)) {
             // Don't strand the player on a refusal — close the gap (or
             // pull back) automatically and treat THIS turn as the
-            // movement. Playtest log: players typed attack repeatedly at
-            // close range with a melee weapon, got the same refusal
-            // message dedup-suppressed, and concluded the game was broken.
-            //
-            // BUT if weather has locked repositioning (Iron Fog, Silent
-            // Blizzard), auto-movement won't work either — and the
-            // existing escape valve was nothing. Player was hard stuck.
-            // In that case the attack proceeds at a -5 "blind swing"
-            // penalty so combat can still resolve; the Arbiter narrates
-            // the disadvantage so the player understands the miss math.
-            const movementLocked = weatherBlocksRepositioning(currentScene.weather);
+            // movement. Iron Fog / Silent Blizzard slow the move to two
+            // turns each but no longer block entirely, so the auto-move
+            // always makes progress.
             const needArm = reach.bands.includes('arm') && range !== 'arm';
             const needRanged = !reach.bands.includes(range) && (reach.bands.includes('close') || reach.bands.includes('far'));
-            if (movementLocked && (needArm || needRanged)) {
-              get().appendLog(
-                'arbiter',
-                `The Arbiter narrows their eyes through the ${currentScene.weather?.name ?? 'haze'}. "${reach.label} won't find a clean line. Swing blind — −5 on the roll."`,
-                { skipDedup: true },
-              );
-              get().appendLog('debug', `attack: blind-swing path (weather=${currentScene.weather?.name ?? '-'} range=${range} reach=[${reach.bands.join(',')}])`);
-              set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.attack), 0.1) });
-              const steps = buildCombatSteps(trimmed, player, targetEnemy, { blindSwing: true });
-              set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
-              get().appendLog('world', attackOpener(targetEnemy.name, parsed.resolvedNoun));
-              break;
-            }
             if (needArm) {
               get().appendLog(
                 'arbiter',
@@ -1384,7 +1379,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.attack), 0.1) });
-          const steps = buildCombatSteps(trimmed, player, targetEnemy);
+          const visPenalty = weatherAttackPenalty(currentScene.weather);
+          if (visPenalty > 0) {
+            get().appendLog(
+              'arbiter',
+              `${currentScene.weather!.name} hangs between you. "−${visPenalty} to the swing — see what you can," the Arbiter says.`,
+              { skipDedup: true },
+            );
+            get().appendLog('debug', `attack: visibility penalty −${visPenalty} (${currentScene.weather!.name})`);
+          }
+          const steps = buildCombatSteps(trimmed, player, targetEnemy, {
+            visibilityPenalty: visPenalty,
+            visibilityLabel: currentScene.weather?.name,
+            weatherMod: weatherStatModifiers(currentScene.weather),
+          });
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
           get().appendLog('world', attackOpener(targetEnemy.name, parsed.resolvedNoun));
         } else {
@@ -1441,7 +1449,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
           }
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
-          const steps = buildSkillSteps('investigate', player);
+          const steps = buildSkillSteps('investigate', player, {
+            weatherMod: weatherStatModifiers(currentScene.weather),
+          });
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
           break;
         }
@@ -1525,7 +1535,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       case 'cast':
       case 'use_relic': {
         set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
-        const steps = buildSkillSteps(parsed.intent, player);
+        const steps = buildSkillSteps(parsed.intent, player, {
+          weatherMod: weatherStatModifiers(currentScene.weather),
+        });
         set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
         break;
       }
@@ -4378,23 +4390,15 @@ function runMoveCombatRange(
   scene: CurrentScene,
   direction: 'advance' | 'retreat',
 ): void {
+  const cost = weatherRepositionCost(scene.weather);
   get().appendLog(
     'debug',
-    `move: ${direction} from range=${scene.range ?? '-'} enemies=${scene.enemies.length} weather=${scene.weather?.name ?? '-'}`,
+    `move: ${direction} from range=${scene.range ?? '-'} enemies=${scene.enemies.length} weather=${scene.weather?.name ?? '-'} cost=${cost} partial=${scene.repositionPartial ?? 0}`,
   );
   const moveEnemy = activeEnemy(scene);
   if (!moveEnemy) {
     get().appendLog('debug', 'move: bail — no active enemy');
     get().appendLog('arbiter', `The Arbiter shrugs. "Nothing to ${direction === 'advance' ? 'advance on' : 'pull back from'}. The ground here is quiet."`);
-    return;
-  }
-  if (weatherBlocksRepositioning(scene.weather)) {
-    get().appendLog('debug', `move: bail — weather blocks (${scene.weather.name})`);
-    get().appendLog(
-      'arbiter',
-      `The Arbiter holds up a hand. "${scene.weather.name} has taken the ground from you. You cannot reposition."`,
-      { skipDedup: true },
-    );
     return;
   }
   const order: CombatRange[] = ['arm', 'close', 'far'];
@@ -4414,7 +4418,42 @@ function runMoveCombatRange(
     );
     return;
   }
-  set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, range: next } } : s));
+
+  // Slow-weather progression. Each advance/retreat under Iron Fog or
+  // Silent Blizzard counts as one tick toward `cost`. Once accumulated
+  // ticks reach cost, range actually changes and progress resets.
+  // Direction change resets progress so you don't carry "advance" credit
+  // into a later "retreat".
+  const lastDir = scene.repositionDir;
+  const carriedPartial = lastDir === direction ? (scene.repositionPartial ?? 0) : 0;
+  const partial = carriedPartial + 1;
+
+  if (cost > 1 && partial < cost) {
+    set((s) => (s.currentScene
+      ? { currentScene: { ...s.currentScene, repositionPartial: partial, repositionDir: direction } }
+      : s));
+    const weatherName = scene.weather?.name ?? 'the haze';
+    get().appendLog(
+      'world',
+      direction === 'advance'
+        ? `${weatherName} slows you down. You push toward ${groupLabel} but the compass spins and your footing drags. (${partial}/${cost} — type 'advance' again to close)`
+        : `${weatherName} slows you down. You strain to pull back from ${groupLabel}, but every step costs double. (${partial}/${cost} — type 'step back' again to break contact)`,
+    );
+    get().appendLog('debug', `move: slow weather progress ${partial}/${cost}`);
+    // Slow movement still takes the turn — enemy counter-attacks.
+    const reachers = scene.enemies.filter((e, i) =>
+      enemyCanReach(e, cur) && (scene.enemyHps[i] ?? 0) > 0,
+    );
+    if (reachers.length > 0) {
+      runEnemyGroupCounters(get, set, get().player ?? player);
+    }
+    return;
+  }
+
+  // Full move — range actually changes. Reset progress.
+  set((s) => (s.currentScene
+    ? { currentScene: { ...s.currentScene, range: next, repositionPartial: 0, repositionDir: undefined } }
+    : s));
   get().appendLog('debug', `move: range ${cur} -> ${next}`);
   get().appendLog(
     'world',

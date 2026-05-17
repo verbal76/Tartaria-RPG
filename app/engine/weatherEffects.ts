@@ -118,9 +118,87 @@ export function tickWeather(weather: WeatherEntry | null, player: PlayerCharacte
   return cfg.build(player);
 }
 
-// Iron fog blocks the player's compass / sense of direction — combat
-// repositioning (advance/retreat) becomes impossible until weather changes.
+// Iron fog used to block repositioning entirely — playtest showed this
+// could hard-lock combat. The new model slows movement (2 turns to move
+// one band) and adds a visibility penalty to attacks instead. Silent
+// blizzard follows the same pattern.
 export function weatherBlocksRepositioning(weather: WeatherEntry | null): boolean {
-  if (!weather) return false;
-  return weather.id === 'iron_fog' || weather.id === 'silent_blizzard';
+  // Kept for backwards-compatibility — nothing currently blocks fully.
+  return false;
+}
+
+/**
+ * Number of "advance" / "retreat" actions the player must spend to move
+ * one combat band under the given weather. 1 = normal. 2 = slow (Iron Fog,
+ * Silent Blizzard). The scene tracks partial progress so the player can
+ * see they're making headway across multiple turns.
+ */
+export function weatherRepositionCost(weather: WeatherEntry | null): number {
+  if (!weather) return 1;
+  if (weather.id === 'iron_fog' || weather.id === 'silent_blizzard') return 2;
+  return 1;
+}
+
+/**
+ * Penalty subtracted from the player's attack roll under the given
+ * weather. Iron fog blinds, ash storm chokes, etc. Stacks with the
+ * existing blindSwing penalty when both apply.
+ */
+export function weatherAttackPenalty(weather: WeatherEntry | null): number {
+  if (!weather) return 0;
+  switch (weather.id) {
+    case 'iron_fog': return 2;       // can barely see the target
+    case 'whisper_fog': return 1;    // mild visibility loss
+    case 'silent_blizzard': return 2;// snow blindness
+    case 'ash_storm': return 1;      // burning eyes
+    case 'glass_hail': return 1;     // ducking shards
+    default: return 0;
+  }
+}
+
+export interface StatModifier {
+  strength?: number;
+  dexterity?: number;
+  intelligence?: number;
+  wisdom?: number;
+  charisma?: number;
+}
+
+/**
+ * Per-weather modifiers applied on top of the player's base stats while
+ * the weather is active. Negative numbers nerf, positive numbers buff.
+ * Calm and clear conditions give small positives; hostile weather nerfs
+ * the stat the lore says it punishes (Iron Fog → DEX because compasses
+ * spin and footing drags; Whisper Fog → WIS because the fog speaks your
+ * name in old Tartarian; Etheric Storm → INT bump from Aether
+ * resonance, but at the cost of WIS).
+ *
+ * Stacks with race / faction / equipment bonuses in effectiveStats().
+ */
+export function weatherStatModifiers(weather: WeatherEntry | null): StatModifier {
+  if (!weather) return {};
+  switch (weather.id) {
+    case 'iron_fog':         return { dexterity: -1 };
+    case 'silent_blizzard':  return { dexterity: -1, strength: -1 };
+    case 'ash_storm':        return { strength: -1 };
+    case 'whisper_fog':      return { wisdom: -1 };
+    case 'etheric_storm':    return { intelligence: 1, wisdom: -1 };
+    case 'aether_lightning': return { intelligence: 1 };
+    case 'glass_hail':       return { dexterity: -1 };
+    case 'black_rain':       return { charisma: -1 };
+    case 'calm':             return { wisdom: 1 };
+    default: return {};
+  }
+}
+
+/** Human-readable summary of the active weather modifiers for the UI. */
+export function describeWeatherStatModifiers(weather: WeatherEntry | null): string {
+  const mods = weatherStatModifiers(weather);
+  const parts: string[] = [];
+  for (const [k, v] of Object.entries(mods) as [keyof StatModifier, number][]) {
+    if (!v) continue;
+    const label = k.slice(0, 3).toUpperCase();
+    parts.push(`${v > 0 ? '+' : ''}${v} ${label}`);
+  }
+  return parts.join(' · ');
 }
