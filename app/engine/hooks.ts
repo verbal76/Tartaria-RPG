@@ -151,6 +151,12 @@ export interface HookOutcome {
   arbiterLine?: string;
   effects: HookEffect[];
   done: boolean;
+  /** Nouns the stage's narration introduced that should NOW match this hook
+   *  going forward. Lets a multi-stage chain stay reachable after the
+   *  scene reveals new objects/people — "approach the smoke" reveals "a
+   *  figure crouched over the coals", so subsequent "talk to the figure"
+   *  / "approach the figure" should advance the chain, not bail. */
+  addNouns?: string[];
   /** Optional next hook to plant for the player's next wander (cross-scene chain). */
   nextChain?: { kind: HookKind; chainId: string };
 }
@@ -173,11 +179,13 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       arbiterLine: '"Approach openly or not at all," the Arbiter says quietly. "This one is watching the road."',
       effects: [],
       done: false,
+      addNouns: ['figure', 'camp', 'firepit', 'fire', 'coals', 'person', 'stranger', 'lean-to'],
     },
     {
       line: 'The figure looks up. A Reclaimer, mud to the knees, pack half-emptied. They wave you in. "Sit. Trade if you want. I have heard of a hollow two ridges over — old Tartarian work, no Sentinels."',
       effects: [{ type: 'memo', text: 'A Reclaimer at a roadside fire spoke of an unmapped hollow two ridges over.' }],
       done: false,
+      addNouns: ['reclaimer', 'figure', 'stranger', 'them', 'they'],
       nextChain: { kind: 'arch', chainId: 'reclaimer_hollow' },
     },
     {

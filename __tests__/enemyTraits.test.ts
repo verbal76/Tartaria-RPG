@@ -5,6 +5,7 @@ import {
   traitOnHitStatus,
   traitRegen,
   traitAmbushBonus,
+  traitDodgeChance,
   describeTrait,
   describeTraits,
 } from '../app/engine/enemyTraits';
@@ -86,6 +87,22 @@ describe('traitRegen + traitAmbushBonus', () => {
   it('ambush_strike = +2 first-strike', () => {
     expect(traitAmbushBonus(['ambush_strike'])).toBe(2);
     expect(traitAmbushBonus([])).toBe(0);
+  });
+});
+
+describe('traitDodgeChance — agile / quick enemies dodge', () => {
+  it('agile returns the strongest dodge', () => {
+    expect(traitDodgeChance(['agile'])).toBe(0.25);
+  });
+  it('quick alone returns a slimmer dodge', () => {
+    expect(traitDodgeChance(['quick'])).toBe(0.15);
+  });
+  it('agile + quick takes the higher value', () => {
+    expect(traitDodgeChance(['quick', 'agile'])).toBe(0.25);
+  });
+  it('returns 0 for nothing matching', () => {
+    expect(traitDodgeChance(['armored', 'slow'])).toBe(0);
+    expect(traitDodgeChance(undefined)).toBe(0);
   });
 });
 

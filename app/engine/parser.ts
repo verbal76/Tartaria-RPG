@@ -33,6 +33,7 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   accept: ['accept', 'take', 'undertake', 'agree'],
   turn_in: ['turnin', 'complete', 'finish', 'deliver', 'report', 'redeem', 'claim'],
   dig: ['dig', 'excavate', 'unearth', 'scrape', 'shovel', 'burrow'],
+  throw: ['throw', 'toss', 'hurl', 'lob', 'chuck', 'fling', 'pitch'],
 };
 
 const ALL_INTENTS = Object.keys(VERB_SYNONYMS) as Exclude<Intent, 'unknown'>[];

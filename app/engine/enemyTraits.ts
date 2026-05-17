@@ -91,6 +91,19 @@ export function traitAmbushBonus(traits: readonly string[] | undefined): number 
   return 0;
 }
 
+/** Chance (0..1) that this enemy can dodge an otherwise-successful player
+ *  attack. `agile` enemies have the strongest dodge; `quick` enemies
+ *  catch a slimmer save. Slow enemies dodge nothing (returns 0). */
+export function traitDodgeChance(traits: readonly string[] | undefined): number {
+  if (!traits) return 0;
+  let chance = 0;
+  for (const t of traits) {
+    if (t === 'agile') chance = Math.max(chance, 0.25);
+    else if (t === 'quick') chance = Math.max(chance, 0.15);
+  }
+  return chance;
+}
+
 /** Human-readable trait summary for the EnemyPanel. Shortens to badges
  *  the UI can chip-list. Unknown ids passed through verbatim so the data
  *  team can experiment without code changes. */

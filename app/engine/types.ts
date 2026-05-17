@@ -26,6 +26,7 @@ export type Intent =
   | 'accept'
   | 'turn_in'
   | 'dig'
+  | 'throw'
   | 'unknown';
 
 export interface ParsedInput {

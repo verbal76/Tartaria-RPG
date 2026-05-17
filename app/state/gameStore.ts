@@ -99,7 +99,7 @@ import {
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack } from '../engine/combatRules';
 import { pickRandomVendor, type VendorInstance } from '../engine/vendors';
-import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, effectiveStats } from '../engine/equipment';
 import { stampDurability, wearItemByName, repairCost, repairItem } from '../engine/durability';
 import {
   type Hook,
@@ -149,7 +149,8 @@ import {
   fuzzyFindStoryline,
 } from '../engine/factionStorylines';
 import { tickWeather, weatherBlocksRepositioning, weatherRepositionCost, weatherAttackPenalty, weatherStatModifiers, describeWeatherStatModifiers } from '../engine/weatherEffects';
-import { traitAttackBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, describeTraits } from '../engine/enemyTraits';
+import { traitAttackBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, traitDodgeChance, describeTraits } from '../engine/enemyTraits';
+import { rollThrowDamage, weightLabel, itemWeight } from '../engine/itemWeight';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
 import { levenshtein } from '../engine/editDistance';
 import { isAreaSearch, rollAreaSearch } from '../engine/areaSearch';
@@ -1322,6 +1323,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // running the generic intent handler. Stealth / investigate / approach /
     // travel verbs are the most common ways to engage a hook; combat verbs
     // intentionally pass through to attack.
+    // Verbs that should advance a multi-stage hook when the player names
+    // one of its known nouns. Diplomacy added because "talk to the figure"
+    // / "call out to them" was hitting the empty-scene refusal even though
+    // the figure was a hook NPC mid-chain. Attack stays OUT — committing
+    // violence is intentionally distinct from following the thread.
     const hookEligible: Intent[] = [
       'investigate',
       'stealth',
@@ -1330,6 +1336,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'cast',
       'advance',
       'ask',
+      'diplomacy',
+      'gift',
+      'steal',
     ];
     if (hookEligible.includes(parsed.intent) && currentScene.hooks && currentScene.hooks.length > 0) {
       const targetText = (parsed.resolvedNoun ?? parsed.target ?? trimmed).toLowerCase();
@@ -2052,6 +2061,104 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().digHere();
         break;
       }
+      case 'throw': {
+        // Player-driven projectile use. The player picked something from
+        // their pack (or a generic noun) and chucked it at a target. We
+        // resolve in order of permissiveness:
+        //   1) Resolved inventory item → spend a quantity, narrate.
+        //   2) Target matches an enemy → roll a thrown attack at -2.
+        //   3) Target is a hook noun → engage the hook (someone notices).
+        //   4) Target is an ambient noun → narrate a thunk.
+        const tgt = (parsed.target ?? '').toLowerCase().trim();
+        const invItem = parsed.resolvedItemId
+          ? player.inventory.find((i) => i.id === parsed.resolvedItemId)
+          : null;
+        const itemUsed = invItem ?? player.inventory.find(
+          (i) => tgt && i.name.toLowerCase().split(/\s+/).some((w) => tgt.includes(w)),
+        );
+        const enemyHit = currentScene.enemies.find((e) =>
+          tgt && (e.name.toLowerCase().includes(tgt) || (e.aliases ?? []).some((a) => tgt.includes(a))),
+        );
+        const hookMatch = matchHookNoun(tgt, currentScene.hooks ?? []);
+        const ambient = matchAmbientNoun(tgt, currentScene.ambientNouns ?? []);
+        // Consume the item if we had one — throwing it spends a quantity.
+        if (itemUsed) {
+          set((s) => s.player ? {
+            player: {
+              ...s.player,
+              inventory: s.player.inventory
+                .map((i) => i.id === itemUsed.id ? { ...i, quantity: i.quantity - 1 } : i)
+                .filter((i) => i.quantity > 0),
+            },
+          } : s);
+        }
+        if (enemyHit) {
+          // Improvised ranged attack at -2. Quick narration, no full dice
+          // prompt — this is a desperate action, not a primary attack mode.
+          const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather));
+          const roll = rollDie(20);
+          const total = roll + stats.dexterity - 2;
+          const ac = Math.max(5, Math.min(18, 5 + (parseInt(String(enemyHit.abilityPoint), 10) || 0)));
+          let hit = total >= ac;
+          const projectile = itemUsed ? itemUsed.name.toLowerCase() : 'a stone';
+          get().appendLog(
+            'combat',
+            `You — thrown ${projectile} → d20 ${roll} + DEX ${stats.dexterity} − 2 (improvised) = ${total} vs ${enemyHit.name} AC ${ac} — ${hit ? '✓ HIT' : '✗ MISS'}`,
+          );
+          // Agile / quick enemies get a dodge save against a thrown
+          // projectile just like a melee swing.
+          if (hit) {
+            const dodgeChance = traitDodgeChance(enemyHit.traits);
+            if (dodgeChance > 0 && Math.random() < dodgeChance) {
+              get().appendLog('combat', `${enemyHit.name} sidesteps the ${projectile}. (dodged)`);
+              hit = false;
+            }
+          }
+          if (hit) {
+            // Damage scales by the projectile's weight. A locket does 1.
+            // A weapon does 1d6. A stone core does 1d8+1.
+            const dmg = Math.max(1, rollThrowDamage(itemUsed ?? null));
+            const wLabel = itemUsed ? ` (${weightLabel(itemWeight(itemUsed))})` : '';
+            const idx = currentScene.enemies.indexOf(enemyHit);
+            const hps = [...currentScene.enemyHps];
+            hps[idx] = Math.max(0, (hps[idx] ?? enemyHit.hp) - dmg);
+            set((s) => s.currentScene ? { currentScene: { ...s.currentScene, enemyHps: hps } } : s);
+            get().appendLog('combat', `The ${projectile}${wLabel} hits ${enemyHit.name} for ${dmg}. (${hps[idx]}/${enemyHit.hp} HP)`);
+            if ((hps[idx] ?? 0) <= 0) get().resolveEnemyDefeat();
+          } else {
+            get().appendLog('world', `The ${projectile} skitters past ${enemyHit.name} and lands in the silt.`);
+          }
+          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.attack), 0.1) });
+          break;
+        }
+        if (hookMatch && !hookMatch.resolved) {
+          // Thrown object lands near a hook entity — the noise wakes the
+          // chain whether they like it or not.
+          get().appendLog(
+            'world',
+            itemUsed
+              ? `You throw the ${itemUsed.name.toLowerCase()} toward ${tgt || 'the noise'}. It thumps into the dust.`
+              : `You throw a stone toward ${tgt}. It clatters off something.`,
+          );
+          resolveHookOneStep(hookMatch, get, set);
+          break;
+        }
+        if (ambient || tgt) {
+          const noun = ambient ?? tgt;
+          get().appendLog(
+            'world',
+            itemUsed
+              ? `You hurl the ${itemUsed.name.toLowerCase()} at ${noun}. It bounces off and rolls into the dust.`
+              : `You toss a stone at ${noun}. The sound carries, then dies.`,
+          );
+          break;
+        }
+        get().appendLog(
+          'arbiter',
+          `The Arbiter raises a brow. "Throw what, where? Name an item from your pack and a target."`,
+        );
+        break;
+      }
       case 'accept': {
         const target = parsed.target ?? parsed.resolvedNoun ?? '';
         if (!target.trim()) {
@@ -2111,16 +2218,57 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'steal': {
-        if (!currentScene.vendor) {
-          get().appendLog('arbiter', `The Arbiter watches the empty path. "Nothing to steal here."`);
+        const stealTarget = (parsed.resolvedNoun ?? parsed.target ?? '').trim();
+        // Vendor present → real theft attempt against their inventory.
+        if (currentScene.vendor) {
+          if (!stealTarget) {
+            get().appendLog('arbiter', `The Arbiter narrows their eyes. "Steal what? Name it precisely."`);
+            break;
+          }
+          get().stealFromVendor(stealTarget);
           break;
         }
-        const target = parsed.resolvedNoun ?? parsed.target ?? '';
-        if (!target.trim()) {
-          get().appendLog('arbiter', `The Arbiter narrows their eyes. "Steal what? Name it precisely."`);
+        // No vendor — but the player wants to pocket something the world
+        // narrated (a green lantern by the wall, a tool on a bench). If
+        // the target matches an ambient noun, treat it as an opportunistic
+        // grab with a DEX check. Soft outcome — you get a token salvage
+        // material or you get nothing, you do NOT get the actual described
+        // object as a typed inventory item unless the catalog has one.
+        const ambient = stealTarget
+          ? matchAmbientNoun(stealTarget, currentScene.ambientNouns ?? [])
+          : null;
+        if (ambient) {
+          const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather));
+          const roll = rollDie(20);
+          const total = roll + stats.dexterity;
+          const success = total >= 10;
+          get().appendLog(
+            'combat',
+            `You — sleight of hand on ${ambient} → d20 ${roll} + DEX ${stats.dexterity} = ${total} vs DC 10 — ${success ? '✓ HIT' : '✗ MISS'}`,
+          );
+          if (success) {
+            // Grant a small generic salvage item — represents whatever
+            // detached from the scene fixture.
+            const salvage: InventoryItem = stampDurability({
+              id: `salvage_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              name: 'Aether Residue',
+              kind: 'misc',
+              rarity: 'Common',
+              quantity: 1,
+              tags: ['salvage', 'scrap'],
+            });
+            set((s) =>
+              s.player ? { player: { ...s.player, inventory: mergeOrPushItem(s.player.inventory, salvage) } } : s,
+            );
+            get().appendLog('world', `You pry loose what you can from the ${ambient}. A small handful of residue goes into your pack.`);
+            get().appendLog('reward', `✦ Aether Residue (Common).`);
+          } else {
+            get().appendLog('world', `Your hand slips on the ${ambient}. It stays where it was.`);
+          }
+          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
           break;
         }
-        get().stealFromVendor(target);
+        get().appendLog('arbiter', `The Arbiter watches the empty path. "Nothing to steal here."`);
         break;
       }
       case 'join': {
@@ -2625,6 +2773,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     if (attack?.success) {
+      // Agile / quick enemies get a save against the incoming hit. Roll
+      // against the trait's dodge chance — success completely negates
+      // damage AND the on-hit status that would have applied. Misses fall
+      // through to normal damage math.
+      const dodgeChance = traitDodgeChance(enemy.traits);
+      if (dodgeChance > 0 && Math.random() < dodgeChance) {
+        get().appendLog(
+          'combat',
+          `${enemy.name} reads the swing and twists clear — the blow finds nothing. (dodged, ${enemy.traits?.includes('agile') ? 'agile' : 'quick'})`,
+        );
+        // The dodge still costs the player the action — let any reaching
+        // enemy counter-attack, same as a miss path.
+        runEnemyGroupCounters(get, set, player);
+        // Surface clock movement before we early-return.
+        const hoursAfterDodge = get().player?.hoursElapsed ?? hoursBeforeConclude;
+        const dt = hoursAfterDodge - hoursBeforeConclude;
+        if (dt > 0) {
+          const label = dt < 1 ? `${Math.round(dt * 60)} min` : `${Math.round(dt * 10) / 10}h`;
+          get().appendLog('system', `⏳ Time passed: ${label}`);
+        }
+        void get().persist();
+        return;
+      }
       const rawDmg = damage?.total ?? rollDie(6);
       const barehand = isBareHandAttack(actionText);
       const equipped = barehand ? null : getEquippedWeapon(player);
@@ -4422,14 +4593,23 @@ function resolveHookOneStep(
   const rewardTail = inlineSummaries.length > 0 ? `  ✦ ${inlineSummaries.join(', ')}.` : '';
   get().appendLog('world', `${outcome.line}${rewardTail}`);
   if (outcome.arbiterLine) get().appendLog('arbiter', outcome.arbiterLine);
-  // Advance hook stage / mark resolved.
+  // Advance hook stage / mark resolved. Fold any newly-revealed nouns
+  // (figure, camp, firepit, reclaimer...) into the hook's noun list so
+  // later player input like "talk to the figure" or "approach the
+  // reclaimer" routes back into this chain instead of falling through to
+  // the empty-scene diplomacy refusal.
   set((s) => {
     if (!s.currentScene) return {};
-    const nextHooks = (s.currentScene.hooks ?? []).map((h) =>
-      h.id === hook.id
-        ? { ...h, stage: h.stage + 1, resolved: outcome.done }
-        : h,
-    );
+    const nextHooks = (s.currentScene.hooks ?? []).map((h) => {
+      if (h.id !== hook.id) return h;
+      const merged = new Set([...h.nouns, ...(outcome.addNouns ?? [])]);
+      return {
+        ...h,
+        stage: h.stage + 1,
+        resolved: outcome.done,
+        nouns: Array.from(merged),
+      };
+    });
     return { currentScene: { ...s.currentScene, hooks: nextHooks } };
   });
   // Queue any next-chain hook to plant on the next scene.
