@@ -123,19 +123,35 @@ function buildLadderEnvironment(
 // while a Scrap Drone was attacking, the chatter check fired, and Qwen wrote
 // a sky description). The combat variant is shorter, more verb-heavy, and
 // explicitly forbids room description so the model lands on the action.
+// Hard rules every instruction shares. Voice + anti-hallucination guardrails
+// pulled out so the combat and peaceful prompts can't diverge on them.
+// Specifically reacting to Qwen 0.5B's observed failure modes:
+//   - "The player, driven by rage..." → third person + invented emotion
+//   - "triggered the Tartarian Trap, energy lance strikes began..." →
+//     hallucinated events that never happened
+//   - Mid-sentence trailing cutoffs
+const VOICE_RULES =
+  "Speak directly to the player. Use 'you' and 'your' — never write " +
+  "'the player' or 'they' as the subject. Do not invent emotions, " +
+  'motivations, traps, mechanics, events, or outcomes that are not ' +
+  'listed in the SYSTEM FACTS above. Only narrate the player\'s last ' +
+  'action and the static facts already present. End on a complete ' +
+  'sentence.';
+
 const PEACEFUL_INSTRUCTION =
-  "Narrate the player's current situation in a grim, atmospheric tone. " +
-  'Acknowledge their last action, describe the room, and feel free to subtly ' +
-  'reference items they are carrying if relevant to the environment. ' +
-  'Stay under 80 words. Do not invent enemies, exits, or items not listed above.';
+  'Narrate the situation in a grim, atmospheric tone. Acknowledge the ' +
+  'last action, describe what is around the player, and you may subtly ' +
+  'reference equipped or carried items if they fit the moment. Keep it ' +
+  'to TWO short sentences — about 35 words. ' +
+  VOICE_RULES;
 
 const COMBAT_INSTRUCTION =
-  'The player is in ACTIVE COMBAT. Narrate the tension of their last action ' +
-  'against the entities listed above. Keep it brief, violent, and grim — ' +
-  'no more than 40 words. DO NOT describe the room or its scenery; the ' +
-  'player has no time for atmosphere. Reference inventory items only if ' +
-  'they are weapons or directly relevant to the strike. Do not invent ' +
-  'enemies, exits, or items not listed above.';
+  'The player is in ACTIVE COMBAT. Narrate the tension of the last ' +
+  'action against the entities listed above. Brief, violent, grim — ' +
+  'ONE short sentence, no more than 20 words. DO NOT describe the room ' +
+  'or its scenery; the player has no time for atmosphere. Reference ' +
+  'inventory items only if they are the weapon being used. ' +
+  VOICE_RULES;
 
 export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
   const instruction = ctx.in_combat ? COMBAT_INSTRUCTION : PEACEFUL_INSTRUCTION;

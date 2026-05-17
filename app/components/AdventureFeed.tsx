@@ -14,21 +14,27 @@ const channelColors: Record<LogChannel, string> = {
   cognitive: '#7a705c',  // dim grey — debug-style, not story content
 };
 
+// The `cognitive` channel is MiniLM's emotion/intent classifier output —
+// useful as a dev diagnostic but pure noise to the player. We keep the
+// entries in the underlying gameLog (and they still show up in the LogScreen
+// / About debug panel) but hide them from the in-game adventure feed.
+const HIDDEN_CHANNELS: ReadonlySet<LogChannel> = new Set(['cognitive']);
+
 export function AdventureFeed({ entries }: Props) {
   const scrollRef = useRef<ScrollView>(null);
+  const visible = entries.filter((e) => !HIDDEN_CHANNELS.has(e.channel));
 
   useEffect(() => {
     scrollRef.current?.scrollToEnd({ animated: true });
-  }, [entries.length]);
+  }, [visible.length]);
 
   return (
     <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={styles.content}>
-      {entries.map((entry) => (
+      {visible.map((entry) => (
         <View key={entry.id} style={styles.entry}>
           <Text style={[styles.channel, { color: channelColors[entry.channel] }]}>
             {entry.channel === 'player' ? 'YOU'
               : entry.channel === 'system' && entry.text.startsWith('d') ? 'ROLL'
-              : entry.channel === 'cognitive' ? 'AI'
               : entry.channel.toUpperCase()}
           </Text>
           <Text style={[styles.body, { color: channelColors[entry.channel] }]}>

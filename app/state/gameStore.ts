@@ -4585,6 +4585,31 @@ function logRepChanges(
 // fade-epoch pattern.
 let arbiterGenerationEpoch = 0;
 
+// Trim Qwen output back to the last sentence-terminating punctuation so we
+// don't display fragments like "...echoing in the". Looks for the final
+// ., !, ?, ", or — followed (optionally) by trailing space/quote and keeps
+// everything up to and including that character. Falls back to the raw
+// text if nothing terminal is present (rare — would only happen on a
+// single-fragment generation that never landed a punctuation mark).
+function trimToLastSentence(raw: string): string {
+  const s = (raw ?? '').trim();
+  if (!s) return '';
+  // Iterate backwards looking for terminal punctuation followed by either
+  // end-of-string or a space + capital letter (i.e. an actual sentence
+  // boundary, not an abbreviation period).
+  for (let i = s.length - 1; i >= 0; i--) {
+    const c = s[i]!;
+    if (c === '.' || c === '!' || c === '?') {
+      // Allow a closing quote to immediately follow.
+      const tail = s[i + 1];
+      if (tail === undefined || tail === ' ' || tail === '\n' || tail === '"' || tail === "'") {
+        return s.slice(0, i + 1).trim();
+      }
+    }
+  }
+  return s; // no terminal punctuation found — keep the raw text
+}
+
 async function narrateViaArbiter(
   get: () => GameStore,
   set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
@@ -4628,11 +4653,12 @@ async function narrateViaArbiter(
   const myEpoch = ++arbiterGenerationEpoch;
   set({ isGenerating: true, partialArbiterText: '' });
   try {
-    // Tighten the token budget when combat is live so the model's 40-word
-    // combat instruction lands cleanly under the cap, instead of trailing
-    // off mid-sentence like the first observed Qwen output did. Peaceful
-    // turns get the standard 120-token budget for atmospheric writing.
-    const maxTokens = ctx.in_combat ? 70 : 120;
+    // Token budgets matched to the prompts:
+    //   combat instruction:  1 short sentence  ≈  35 tokens → cap 55
+    //   peaceful instruction: 2 short sentences ≈  60 tokens → cap 90
+    // Plus headroom so the model has space to land on a terminal punctuation
+    // mark naturally before we hit the cap.
+    const maxTokens = ctx.in_combat ? 55 : 90;
     const text = await qwen.stream(
       messages,
       (token: string) => {
@@ -4644,8 +4670,12 @@ async function narrateViaArbiter(
       { maxNewTokens: maxTokens },
     );
     if (myEpoch !== arbiterGenerationEpoch) return; // cancelled mid-flight
-    const finalText = text.trim();
-    get().appendLog('arbiter', finalText || trimmed);
+    // Trim to the last complete sentence so we never display a partial
+    // ending like "...each stroke echoing in the". Falls back to the raw
+    // text only when nothing terminal-punctuated is present, then to the
+    // template if that's empty.
+    const finalText = trimToLastSentence(text) || trimmed;
+    get().appendLog('arbiter', finalText);
   } catch {
     if (myEpoch === arbiterGenerationEpoch && trimmed) {
       get().appendLog('arbiter', trimmed);

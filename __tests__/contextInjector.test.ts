@@ -377,7 +377,12 @@ describe('buildSystemPrompt', () => {
     expect(system).toContain('DO NOT INVENT EXITS OR ENEMIES');
     expect(system).toContain('Asgardar');
     expect(system).toContain('go north');
-    expect(system).toContain('80 words');
+    // Voice guardrails apply to every prompt — second-person, no fabrication,
+    // complete sentences.
+    expect(system).toContain("'you' and 'your'");
+    expect(system).toMatch(/do not invent.*events/i);
+    // Peaceful instruction sets the length cap.
+    expect(system).toMatch(/35 words/);
   });
 
   it('switches to the combat instruction when in_combat is true', () => {
@@ -396,12 +401,14 @@ describe('buildSystemPrompt', () => {
     // Loudest line is the combat instruction.
     expect(system).toContain('ACTIVE COMBAT');
     expect(system).toContain('DO NOT describe the room');
-    expect(system).toContain('40 words');
+    expect(system).toMatch(/20 words/);
     // The peaceful instruction must NOT be present — that's the bug the
     // toggle exists to fix (the model was writing tour-guide prose mid-
     // combat because both instructions were in scope).
-    expect(system).not.toMatch(/describe the room, and feel free/i);
-    expect(system).not.toContain('80 words');
+    expect(system).not.toMatch(/describe what is around the player/i);
+    expect(system).not.toMatch(/35 words/);
+    // Voice guardrails apply in combat too.
+    expect(system).toContain("'you' and 'your'");
   });
 
   it('stays on the peaceful instruction when in_combat is false', () => {
@@ -418,7 +425,7 @@ describe('buildSystemPrompt', () => {
     };
     const system = buildSystemPrompt(ctx)[0]!.content;
     expect(system).toContain('atmospheric tone');
-    expect(system).toContain('80 words');
+    expect(system).toMatch(/35 words/);
     expect(system).not.toContain('ACTIVE COMBAT');
   });
 
