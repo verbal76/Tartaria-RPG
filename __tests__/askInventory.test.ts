@@ -3,6 +3,7 @@ import {
   extractInventoryTarget,
   isContinueCommand,
   isCountQuestion,
+  INVENTORY_CATEGORIES,
 } from '../app/engine/askInventory';
 
 describe('isInventoryQuestion', () => {
@@ -124,6 +125,45 @@ describe('extractInventoryTarget — count + state-verb regressions', () => {
   it('does not regress simple yes/no extractions', () => {
     expect(extractInventoryTarget('is the fungus in my pack')).toBe('fungus');
     expect(extractInventoryTarget('do I have a locket')).toBe('locket');
+  });
+});
+
+// Playtest log triggered an unprompted d20 "Armor Class" rules paragraph
+// because "tell me about my armor" parsed as an `ask` and the concept
+// dictionary had "armor" keyed to the AC explanation. The fix gates on
+// possessive frames ("my X") and on a category map so the handler answers
+// with what the player owns instead of the rules dump.
+
+describe('isInventoryQuestion — possessive frames are inventory, not concepts', () => {
+  it.each([
+    'tell me about my armor',
+    'show me my weapons',
+    'list my rings',
+    'check my amulets',
+    'what about my gear',
+  ])('treats "%s" as an inventory question', (text) => {
+    expect(isInventoryQuestion(text)).toBe(true);
+  });
+
+  it('does not catch plain concept queries without a possessive', () => {
+    expect(isInventoryQuestion('what is armor')).toBe(false);
+    expect(isInventoryQuestion('explain the Aether')).toBe(false);
+  });
+});
+
+describe('extractInventoryTarget — leading question words stripped', () => {
+  it('drops "what" / "which" so category lookups land cleanly', () => {
+    expect(extractInventoryTarget('what armor do I have')).toBe('armor');
+    expect(extractInventoryTarget('which weapons do I have')).toBe('weapons');
+    expect(extractInventoryTarget('tell me about my rings')).toBe('rings');
+  });
+});
+
+describe('INVENTORY_CATEGORIES — covers the ones that used to trigger AC dump', () => {
+  it('maps armor / weapon / ring / amulet / ac / defense to inventory categories', () => {
+    for (const k of ['armor', 'armour', 'weapon', 'weapons', 'ring', 'rings', 'amulet', 'ac', 'defense']) {
+      expect(INVENTORY_CATEGORIES[k]).toBeDefined();
+    }
   });
 });
 

@@ -71,6 +71,7 @@ import {
   extractInventoryTarget,
   isContinueCommand,
   isCountQuestion,
+  INVENTORY_CATEGORIES,
 } from '../engine/askInventory';
 import { mergeOrPushItem } from '../engine/inventory';
 import {
@@ -1797,6 +1798,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (isInventoryQuestion(trimmed)) {
           const target = extractInventoryTarget(trimmed);
           const countQuestion = isCountQuestion(trimmed);
+          // Category fallback — "what armor do I have", "tell me about my
+          // weapons", "show me my rings". The target word lines up with a
+          // gear category, not an item name, so list everything that fits
+          // the kind/slot instead of doing a substring match that would
+          // come back empty and route to the d20 rules dump.
+          const category = INVENTORY_CATEGORIES[target];
+          if (category) {
+            const owned = player.inventory.filter((i) => {
+              if (i.quantity <= 0) return false;
+              if (category.kind && category.kind.includes(i.kind)) return true;
+              if (category.slot) {
+                const validSlots = validSlotsForItem(i);
+                if (validSlots.some((s) => category.slot!.includes(s))) return true;
+              }
+              return false;
+            });
+            if (owned.length > 0) {
+              const itemized = owned
+                .map((i) => (i.quantity > 1 ? `${i.name} (x${i.quantity})` : i.name))
+                .join(', ');
+              const equippedNames = Object.values(player.equipped ?? {}).filter(Boolean) as string[];
+              const equippedSubset = owned
+                .filter((i) => equippedNames.includes(i.name))
+                .map((i) => i.name);
+              const equippedNote = equippedSubset.length > 0
+                ? ` Worn: ${equippedSubset.join(', ')}.`
+                : '';
+              get().appendLog(
+                'arbiter',
+                `The Arbiter glances at your pack. "${category.label.charAt(0).toUpperCase()}${category.label.slice(1)}: ${itemized}.${equippedNote}"`,
+              );
+            } else {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter shakes their head. "No ${category.label} on you."`,
+              );
+            }
+            break;
+          }
           if (target) {
             const matches = player.inventory.filter(
               (i) => i.quantity > 0 && i.name.toLowerCase().includes(target),
