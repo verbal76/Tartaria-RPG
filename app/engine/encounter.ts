@@ -4,11 +4,16 @@ import enemiesData from '../data/enemies/enemies.json';
 import weatherData from '../data/weather/weather.json';
 import hazardsData from '../data/hazards/hazards.json';
 import locationsData from '../data/locations/locations.json';
+import lootData from '../data/relics/loot_tables.json';
+import type { LadderTriple } from './worldLadder';
 
 const enemies = enemiesData as Enemy[];
 const weather = weatherData as WeatherEntry[];
 const hazards = hazardsData as Hazard[];
 const locations = locationsData as Location[];
+
+interface LootEntry { name: string; rarity: Rarity }
+const loot = lootData as LootEntry[];
 
 const rarityWeights: Record<Rarity, number> = {
   Common: 10,
@@ -98,4 +103,55 @@ function rarityRank(r: Rarity): number {
 
 export function getLocationById(id: string): Location {
   return locations.find((l) => l.id === id) ?? locations[0]!;
+}
+
+// ---------------------------------------------------------------------------
+// World-ladder pool pickers — Phase 4 §4.3
+// ---------------------------------------------------------------------------
+//
+// The Micro-Micro nodes in worldLadder.json carry `possibleEncounters` and
+// `lootTable` arrays curated per room (Buried Skyscraper Upper has Aetherbat,
+// Aetheric Raven, Reclaimer Ambusher, Black Cloak Agent — not Mud Lich).
+// Until this commit the engine ignored both arrays for actual gameplay and
+// only fed them to the LLM as context. These pickers wire them through so
+// the scene the player walks into matches its hand-authored biome curation.
+//
+// Rarity weighting is preserved inside the curated pool — Common enemies
+// still spawn more often than Legendary ones, but everything that DOES
+// spawn comes from the room's allowed list. Same for loot.
+
+const enemiesByName = new Map<string, Enemy>();
+for (const e of enemies) enemiesByName.set(e.name, e);
+const lootByName = new Map<string, LootEntry>();
+for (const l of loot) lootByName.set(l.name, l);
+
+/**
+ * Picks one enemy from the Micro-Micro's `possibleEncounters` pool,
+ * weighted by rarity (Common 10 / Uncommon 5 / Rare 2 / Legendary 1).
+ * Returns null when the pool is empty or every name fails to resolve to
+ * a real enemy in enemies.json — caller should fall back to
+ * `pickEnemyForLocation` in that case.
+ */
+export function pickEncounterFromLadder(triple: LadderTriple | null | undefined): Enemy | null {
+  if (!triple) return null;
+  const pool = triple.microMicro.possibleEncounters
+    .map((name) => enemiesByName.get(name))
+    .filter((e): e is Enemy => !!e);
+  if (pool.length === 0) return null;
+  return pickWeighted(pool, (e) => rarityWeights[e.rarity]);
+}
+
+/**
+ * Picks one loot item NAME from the Micro-Micro's `lootTable` pool,
+ * weighted by rarity. Returns null when the pool is empty or all names
+ * fail to resolve. The caller (area-search, dig, etc.) builds the actual
+ * InventoryItem from the name via lookupCraftedItem.
+ */
+export function pickLootFromLadder(triple: LadderTriple | null | undefined): string | null {
+  if (!triple) return null;
+  const pool = triple.microMicro.lootTable
+    .map((name) => lootByName.get(name))
+    .filter((l): l is LootEntry => !!l);
+  if (pool.length === 0) return null;
+  return pickWeighted(pool, (l) => rarityWeights[l.rarity]).name;
 }

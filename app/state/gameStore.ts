@@ -34,7 +34,14 @@ import {
 import { makeEntry, persistEntry } from '../engine/gameLog';
 import { createCharacter, type CreateCharacterInput } from '../engine/character';
 import { generateQuest } from '../engine/questGenerator';
-import { pickWeather, pickHazardForLocation, pickEnemyForLocation, rollEncounter, getLocationById } from '../engine/encounter';
+import {
+  pickWeather,
+  pickHazardForLocation,
+  pickEnemyForLocation,
+  rollEncounter,
+  getLocationById,
+  pickEncounterFromLadder,
+} from '../engine/encounter';
 import {
   buildOpening,
   buildScene,
@@ -799,12 +806,44 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const location = getLocationById(player.currentLocationId);
     const weather = pickWeather(worldMemory);
     const hazard = pickHazardForLocation(location);
+    // Resolve the Micro-Micro EARLY so encounter and loot rolls can use
+    // the room's curated pools from worldLadder.json. Caller can pre-pick
+    // (exit-follow path); otherwise we sample a random Micro-Micro from
+    // the location's parent Macro biome.
+    let microMicroId: string | null = null;
+    if (opts?.microMicroId) {
+      const resolved = findMicroMicroAnywhere(opts.microMicroId);
+      if (resolved) microMicroId = resolved.microMicro.id;
+    }
+    if (!microMicroId) {
+      const macroId = LOCATION_TO_MACRO[location.id];
+      if (macroId) {
+        const triple = pickRandomMicroMicroIn(macroId);
+        if (triple) microMicroId = triple.microMicro.id;
+      }
+    }
+    const ladderTriple = microMicroId ? findMicroMicroAnywhere(microMicroId) : null;
     // Combat cooldown — after a fight resolves, give the player at least
     // 2 scenes of peace to dig / search / wander. Skip the encounter roll
     // entirely during the cooldown window.
     const peaceCounter = worldMemory.scenesSinceCombat ?? 99;
     const enforcePeace = peaceCounter < 2;
-    const encounter = enforcePeace ? [] : rollEncounter(location);
+    // Phase 4 §4.3 — biome-curated encounter pools. If the Micro-Micro
+    // has a possibleEncounters list, pick rarity-weighted from THAT pool
+    // (so the Buried Skyscraper Upper only spawns Aetherbats, Reclaimer
+    // Ambushers, etc., not random global enemies). Falls back to the
+    // legacy global roll when no ladder or when the curated pool returns
+    // nothing (data drift safety).
+    let encounter: Enemy[] = [];
+    if (!enforcePeace) {
+      if (ladderTriple && chance(40 + location.danger * 8)) {
+        const curated = pickEncounterFromLadder(ladderTriple);
+        if (curated) encounter = [curated];
+      }
+      if (encounter.length === 0) {
+        encounter = rollEncounter(location);
+      }
+    }
     const enemies: Enemy[] = encounter;
     const enemyHps: number[] = enemies.map((e) => e.hp);
     const activeEnemyIdx = 0;
@@ -827,29 +866,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       consumedChainIds.push(next.chainId);
     }
     const ambientNouns = extractAmbientNouns(location.description);
-    // World-ladder Micro-Micro pick. When this Location maps to a Macro
-    // biome in worldLadder.json, sample a random room from that Macro so
-    // the Arbiter narrates at the room tier ("Buried Skyscraper — Upper
-    // Floors", "Crystal Pylon Chamber") instead of the flat Location text.
-    // The id is stored on the scene so a single visit reads as one
-    // consistent room — re-picking each turn would feel like the world
-    // shifts under the player's feet.
-    let microMicroId: string | null = null;
-    // Caller (e.g. the exit-follow path in 'travel') can pre-select a
-    // specific Micro-Micro for this scene — honored when it resolves and
-    // belongs to a Macro the current Location maps to. Otherwise we fall
-    // back to a random pick from the Macro pool.
-    if (opts?.microMicroId) {
-      const resolved = findMicroMicroAnywhere(opts.microMicroId);
-      if (resolved) microMicroId = resolved.microMicro.id;
-    }
-    if (!microMicroId) {
-      const macroId = LOCATION_TO_MACRO[location.id];
-      if (macroId) {
-        const triple = pickRandomMicroMicroIn(macroId);
-        if (triple) microMicroId = triple.microMicro.id;
-      }
-    }
+    // microMicroId was resolved at the top of beginScene so the
+    // encounter / loot rolls could use the ladder's curated pools.
     const scene: CurrentScene = {
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
       vendor, range, hooks: initialHooks, ambientNouns, microMicroId,
