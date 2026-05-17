@@ -894,5 +894,325 @@
       "rare"
     ],
     "description": "Emits light and repels shadow creatures."
+  },
+  {
+    "name": "Giant's Bone Pickaxe",
+    "abilityReq": "Strength Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Tartarian Giants",
+    "tcBuy": 22,
+    "tags": ["exploration", "tool", "common", "race_starter", "tartarian_giant"],
+    "description": "Excavation and breaking through rock. Breaks Aether-infused rock faster than standard tools."
+  },
+  {
+    "name": "Aetheric Vision Lens",
+    "abilityReq": "Intelligence Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Tartarian Giants",
+    "tcBuy": 18,
+    "tags": ["exploration", "relic", "common", "race_starter", "tartarian_giant"],
+    "description": "Vision aid for Aetheric anomalies. Reveals Aetheric disturbances for short periods."
+  },
+  {
+    "name": "Hardened Climbing Strap",
+    "abilityReq": "Dexterity Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Tartarian Giants",
+    "tcBuy": 20,
+    "tags": ["exploration", "tool", "common", "race_starter", "tartarian_giant"],
+    "description": "Climbing support sized for large bodies. Supports heavy weights and prevents falls in rugged terrain."
+  },
+  {
+    "name": "Resonant Echo Horn",
+    "abilityReq": "Wisdom Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Tartarian Giants",
+    "tcBuy": 16,
+    "tags": ["exploration", "tool", "common", "race_starter", "tartarian_giant"],
+    "description": "Communication across great distances. Sends signals over vast distances — useful in mountains."
+  },
+  {
+    "name": "Mud Dweller Water Catcher",
+    "abilityReq": "Wisdom Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Mud Dwellers",
+    "tcBuy": 15,
+    "tags": ["exploration", "tool", "common", "race_starter", "mud_dweller"],
+    "description": "Moisture collection underground. Traps moisture and stores up to 5 gallons of water."
+  },
+  {
+    "name": "Golem Leather Gloves",
+    "abilityReq": "Strength Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Mud Dwellers",
+    "tcBuy": 17,
+    "tags": ["exploration", "tool", "common", "race_starter", "mud_dweller"],
+    "description": "Handling Aetheric stones and crystals. Provides resistance to Aetheric shocks."
+  },
+  {
+    "name": "Cavern Sound Stones",
+    "abilityReq": "Intelligence Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Mud Dwellers",
+    "tcBuy": 14,
+    "tags": ["exploration", "relic", "common", "race_starter", "mud_dweller"],
+    "description": "Echo-location for cavern mapping. Helps map caverns and detect hollow areas."
+  },
+  {
+    "name": "Aether-Binder Tool",
+    "abilityReq": "Wisdom Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Mud Dwellers",
+    "tcBuy": 20,
+    "tags": ["exploration", "tool", "common", "race_starter", "mud_dweller"],
+    "description": "Aetheric manipulation tool. Bends small Aetheric currents to shape materials."
+  },
+  {
+    "name": "Aether-Breath Mask",
+    "abilityReq": "Wisdom Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Mud Dwellers",
+    "tcBuy": 22,
+    "tags": ["exploration", "tool", "common", "race_starter", "mud_dweller"],
+    "description": "Breathing in Aether-heavy environments. Filters Aetheric air for safe breathing."
+  },
+  {
+    "name": "Aether Grip Pads",
+    "abilityReq": "Dexterity Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Mud Dwellers",
+    "tcBuy": 16,
+    "tags": ["exploration", "tool", "common", "race_starter", "mud_dweller"],
+    "description": "Climbing in Aetheric ruins. Enhanced grip on Aetheric-infused surfaces."
+  },
+  {
+    "name": "Compact Aetheric Forge",
+    "abilityReq": "Intelligence Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Mud Dwellers",
+    "tcBuy": 25,
+    "tags": ["exploration", "tool", "common", "race_starter", "mud_dweller"],
+    "description": "Portable forge for Aetheric tool repairs. Repairs or modifies basic Aetheric tools on the go."
+  },
+  {
+    "name": "Runecaster-Reader Tablet",
+    "abilityReq": "Intelligence Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Mud Dwellers",
+    "tcBuy": 18,
+    "tags": ["exploration", "relic", "common", "race_starter", "mud_dweller"],
+    "description": "Interpreting Tartarian runecasters. Translates basic Aetheric runecasters and symbols."
+  },
+  {
+    "name": "Reclaimer's Rope",
+    "abilityReq": "Dexterity Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Reclaimers",
+    "tcBuy": 15,
+    "tags": ["exploration", "tool", "common", "race_starter", "reclaimer"],
+    "description": "Reinforced rope woven with Aetheric fibers. Withstands Aetheric anomalies and high tension."
+  },
+  {
+    "name": "Salvage Pouch",
+    "abilityReq": "Strength Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Reclaimers",
+    "tcBuy": 17,
+    "tags": ["exploration", "tool", "common", "race_starter", "reclaimer"],
+    "description": "Carrying delicate artifacts. Stabilizes Aetheric items during transport."
+  },
+  {
+    "name": "Basic Aether Detector",
+    "abilityReq": "Intelligence Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Reclaimers",
+    "tcBuy": 22,
+    "tags": ["exploration", "relic", "common", "race_starter", "reclaimer"],
+    "description": "Detects basic Aetheric energy signatures. Short-range Aetheric field detection."
+  },
+  {
+    "name": "Pry-Breaker Tool",
+    "abilityReq": "Strength Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Reclaimers",
+    "tcBuy": 20,
+    "tags": ["exploration", "tool", "common", "race_starter", "reclaimer"],
+    "description": "Opens ancient sealed doors or containers. Pries open Aetheric-lock mechanisms."
+  },
+  {
+    "name": "Echoing Steps Boots",
+    "abilityReq": "Dexterity Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Reclaimers",
+    "tcBuy": 16,
+    "tags": ["exploration", "tool", "common", "race_starter", "reclaimer"],
+    "description": "Boots tuned for silent movement in ruins. Reduces noise when walking on debris."
+  },
+  {
+    "name": "Resonance Sifter",
+    "abilityReq": "Intelligence Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Aetherborn",
+    "tcBuy": 24,
+    "tags": ["exploration", "relic", "common", "race_starter", "aetherborn"],
+    "description": "Sifts through Aetheric distortions. Locates weak Aetheric spots for exploration."
+  },
+  {
+    "name": "Aetheric Harmonics Tuner",
+    "abilityReq": "Intelligence Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Aetherborn",
+    "tcBuy": 23,
+    "tags": ["exploration", "relic", "common", "race_starter", "aetherborn"],
+    "description": "Tunes into Aetheric energy patterns. Identifies Aetheric disturbances and flows."
+  },
+  {
+    "name": "Glyph-Sealed Scroll",
+    "abilityReq": "Wisdom Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Aetherborn",
+    "tcBuy": 20,
+    "tags": ["exploration", "relic", "common", "race_starter", "aetherborn"],
+    "description": "Contains minor Aetheric runecasters for protection. Creates temporary Aetheric wards around the user."
+  },
+  {
+    "name": "Architect's Rest Stone",
+    "abilityReq": "Wisdom Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Architectural Sentinels",
+    "tcBuy": 20,
+    "tags": ["exploration", "relic", "common", "race_starter", "architectural_sentinel"],
+    "description": "A stone that aids Sentinels in standby mode. Speeds up energy recovery when resting."
+  },
+  {
+    "name": "Aetheric Circuit Repair Kit",
+    "abilityReq": "Intelligence Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Architectural Sentinels",
+    "tcBuy": 18,
+    "tags": ["exploration", "tool", "common", "race_starter", "architectural_sentinel"],
+    "description": "Repairs minor Aetheric circuits. Restores basic Aetheric functions in broken systems."
+  },
+  {
+    "name": "Pulse Scanner",
+    "abilityReq": "Intelligence Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Architectural Sentinels",
+    "tcBuy": 22,
+    "tags": ["exploration", "relic", "common", "race_starter", "architectural_sentinel"],
+    "description": "Scans Aetheric fields for anomalies. Detects nearby Aetheric energy distortions."
+  },
+  {
+    "name": "Mechanical Self-Locker",
+    "abilityReq": "Strength Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Architectural Sentinels",
+    "tcBuy": 16,
+    "tags": ["exploration", "tool", "common", "race_starter", "architectural_sentinel"],
+    "description": "Locks or unlocks mechanical joints. Secures or releases mechanical joints quickly."
+  },
+  {
+    "name": "Golemstone Stabilizer",
+    "abilityReq": "Strength Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Mud Golems",
+    "tcBuy": 22,
+    "tags": ["exploration", "relic", "common", "race_starter", "mud_golem"],
+    "description": "Stabilizes Aetheric energy within Golems. Prevents Golems from losing energy over time."
+  },
+  {
+    "name": "Mud-Sealer Gauntlets",
+    "abilityReq": "Strength Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Mud Golems",
+    "tcBuy": 18,
+    "tags": ["exploration", "tool", "common", "race_starter", "mud_golem"],
+    "description": "Gauntlets for shaping mud and clay. Enhances mud-shaping and solidification."
+  },
+  {
+    "name": "Aetheric Core Cooler",
+    "abilityReq": "Intelligence Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Mud Golems",
+    "tcBuy": 23,
+    "tags": ["exploration", "tool", "common", "race_starter", "mud_golem"],
+    "description": "Cools down overactive Aetheric cores. Extends the lifespan of Aetheric cores."
+  },
+  {
+    "name": "Mud-Rend Blade",
+    "abilityReq": "Dexterity Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Mud Golems",
+    "tcBuy": 17,
+    "tags": ["exploration", "weapon", "common", "race_starter", "mud_golem"],
+    "description": "Basic Aether-infused blade. Cuts through Aetheric clay and soft rock."
+  },
+  {
+    "name": "Lost Echo Compass",
+    "abilityReq": "Intelligence Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Unknowing Masses",
+    "tcBuy": 15,
+    "tags": ["exploration", "relic", "common", "race_starter", "unknowing_mass"],
+    "description": "Tracks lost echoes of Aetheric ruins. Detects ancient Aetheric structures within a 50-meter radius."
+  },
+  {
+    "name": "Whisperer's Charm",
+    "abilityReq": "Charisma Level 2",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Unknowing Masses",
+    "tcBuy": 18,
+    "tags": ["exploration", "relic", "common", "race_starter", "unknowing_mass"],
+    "description": "A charm for calming animals. Calms animals and encourages basic commands."
+  },
+  {
+    "name": "Minor Aetheric Amulet",
+    "abilityReq": "Wisdom Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Unknowing Masses",
+    "tcBuy": 21,
+    "tags": ["exploration", "relic", "common", "race_starter", "unknowing_mass"],
+    "description": "Protects against minor Aetheric energy. Reduces minor Aetheric interference."
+  },
+  {
+    "name": "Field Crafter's Kit",
+    "abilityReq": "Strength Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Unknowing Masses",
+    "tcBuy": 20,
+    "tags": ["exploration", "tool", "common", "race_starter", "unknowing_mass"],
+    "description": "Basic field repair kit. Tools for mending basic machines and gear."
   }
 ]

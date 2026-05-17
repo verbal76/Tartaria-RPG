@@ -190,6 +190,7 @@ Damage / enemy spawn / rep change effects still log separately (different tone).
 13. **Long-form quest UI** — active hunts / mysteries / storylines only show in StatsPanel as a comma-separated string. A dedicated CONTRACTS screen would help.
 14. **Vendor screen item count of currency** — sometimes vendors offer items the player already owns; could let players sell from the vendor screen instead of only buying.
 15. **Companion / NPC follower** — system stub'd via important_npcs but no follower mechanics yet.
+16. **Two-handed weapons table (rulebook)** — deferred from the race-starter-items session. The rulebook's Two-Handed Weapons table has ~30 entries spanning Common → Legendary (Rust Rifle, Bone Maul, Mud Long Axe, Aether Lance, Gravity Pike, Mud Army War Hammer, etc.). `weapons.json` currently has only 17 weapons total across all styles, mostly Common. Adding the rulebook's two-handed table would fill out the late-game combat catalog. Each entry has a name, Strength req, damage roll, special effect, rarity, faction/origin, and TC price already laid out — straightforward additions, just needs the JSON and a few tests covering rarity/stat scaling.
 
 ---
 

@@ -2,6 +2,7 @@ import type { Race, Faction, PlayerCharacter, Stats, FactionStanding, InventoryI
 import { rollDie, rollDice, rollFromNotation } from './rng';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
+import explorationData from '../data/items/exploration.json';
 import { stampDurability } from './durability';
 
 // Race + faction starter weapon kits. Every character begins with:
@@ -9,11 +10,13 @@ import { stampDurability } from './durability';
 //      where they're from. Damage is reasonable for combat.
 //   2) A "knife" — a cheap-but-sharp tool. Useful for digging without
 //      sacrificing the primary. Faction-themed.
+//   3) Two race-themed exploration items pulled from the Tartaria Prima
+//      rulebook's "Starter Items" table (catalogued in exploration.json).
 //
 // The kit reflects WHO the character is: a True Tartarian carries
-// Mud-fist Wraps and a Bone Shiv; a Reclaimer carries a Rusted Blade
-// and a Trowel; a Forgotten Order scholar carries a Pyric Wand and a
-// Letter-Opener; Mud Monarch agents are equipped pragmatically.
+// Mud-fist Wraps, a Bone Shiv, and a Cavern Sound Stones + Aether-Breath
+// Mask; a Reclaimer carries a Rusted Blade, a Trowel, a Reclaimer's Rope
+// + Echoing Steps Boots. Etc.
 
 const RACE_PRIMARY: Record<string, string> = {
   tartarian_giants: 'Mud-fist Wraps', // their bare-hand combat tradition
@@ -31,6 +34,49 @@ const FACTION_KNIFE: Record<string, string> = {
   mud_monarchs: 'Pocket Knife',
   eternal_dynasty: 'Pocket Knife',
 };
+
+// Each race ships with TWO items from their rulebook starter table —
+// kept tight so the default 10-slot Player's Backpack still has room for
+// the shared starter items (Aetheric Torch + Trail Rations + Locket) plus
+// the primary weapon + faction knife. Total = 7 slots used. Remaining
+// items from the table live in exploration.json and can be acquired from
+// vendors / loot pools.
+export const RACE_STARTER_EXPLORATION: Record<string, string[]> = {
+  tartarian_giant: ['Aetheric Vision Lens', 'Hardened Climbing Strap'],
+  mud_dweller: ['Cavern Sound Stones', 'Aether-Breath Mask'],
+  reclaimer: ["Reclaimer's Rope", 'Echoing Steps Boots'],
+  architectural_sentinel: ['Aetheric Circuit Repair Kit', 'Pulse Scanner'],
+  mud_golem: ['Golemstone Stabilizer', 'Mud-Rend Blade'],
+  unknowing_mass: ['Lost Echo Compass', "Field Crafter's Kit"],
+  aetherborn: ['Aetheric Harmonics Tuner', 'Glyph-Sealed Scroll'],
+};
+
+interface CatalogExplorationItem {
+  name: string;
+  abilityReq: string;
+  kind: string;
+  rarity: string;
+  faction: string;
+  tcBuy: number;
+  tags: string[];
+  description: string;
+}
+const EXPLORATION_BY_NAME = new Map<string, CatalogExplorationItem>();
+for (const item of explorationData as CatalogExplorationItem[]) {
+  EXPLORATION_BY_NAME.set(item.name, item);
+}
+
+/**
+ * Maps the catalog's loose `kind: 'exploration'` to a PlayerCharacter
+ * InventoryItem kind. Weapons stay weapons; Aetheric-flavored items
+ * become 'relic' (so they sort with the player's other Aetheric relics
+ * in the InventoryScreen); everything else is 'misc'.
+ */
+function explorationToInventoryKind(item: CatalogExplorationItem): InventoryItem['kind'] {
+  if (item.tags.includes('weapon')) return 'weapon';
+  if (item.tags.includes('relic')) return 'relic';
+  return 'misc';
+}
 
 function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
   const items: InventoryItem[] = [
@@ -58,6 +104,25 @@ function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
     tags: ['weapon', 'starter', 'knife', 'tool'],
     description: 'Your faction starter knife — primarily a dig tool, sharp enough in a pinch.',
   }));
+  // Race-themed exploration items from the rulebook starter table.
+  const raceStarterNames = RACE_STARTER_EXPLORATION[race.id] ?? [];
+  for (let i = 0; i < raceStarterNames.length; i++) {
+    const itemName = raceStarterNames[i]!;
+    const catalog = EXPLORATION_BY_NAME.get(itemName);
+    if (!catalog) continue; // safety — skip silently if the catalog is missing
+    const kind = explorationToInventoryKind(catalog);
+    const item: InventoryItem = {
+      id: `starter_explore_${i}_${Date.now()}`,
+      name: catalog.name,
+      kind,
+      rarity: 'Common',
+      quantity: 1,
+      tags: catalog.tags,
+      description: catalog.description,
+    };
+    // Weapons need durability stamped; relics and misc don't track it.
+    items.push(kind === 'weapon' ? stampDurability(item) : item);
+  }
   return items;
 }
 
