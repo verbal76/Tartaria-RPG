@@ -122,41 +122,45 @@ The previous HANDOFF.md ended at OTA `2026-05-16-052`. We're now at `2026-05-17-
 
 ## 4. What's still open
 
-### High priority
+Numbered in **work order** — pick up at item 1 and go down the list. Smaller / less risky items first; the biggest authored-content piece sits at the bottom of the high-priority block by design so you don't get stuck on it.
 
-1. **Two-Handed Weapons table from the rulebook** — ~30 entries spanning Common → Legendary (Rust Rifle, Bone Maul, Mud Long Axe, Aether Lance, Gravity Pike, Mud Army War Hammer, etc.) deferred from the race-starter-items session. `weapons.json` has ~22 entries total. Each rulebook row has name / STR requirement / damage roll / special effect / rarity / faction-origin / TC price already laid out — straightforward additions, just needs the JSON and a few tests covering rarity/stat scaling.
+### High priority (smallest first)
 
-2. **Vendor accept/turn-in faction-specific feedback** — when the player tries to `accept X` or `turn in X` without a vendor present, the response is generic "find a faction agent" without distinguishing which faction. Could pre-check by quest title.
+1. **Vendor accept/turn-in faction-specific feedback** — when the player tries to `accept X` or `turn in X` without a vendor present, the response is generic "find a faction agent" without distinguishing which faction. Could pre-check by quest title and tell the player which vendor archetype to seek.
 
-3. **Vendor sell-back** — currently only buying. Closes the trading loop, especially relevant once the two-handed weapons table lands.
+2. **Vendor sell-back** — currently only buying. Closes the trading loop, especially relevant once the two-handed weapons table lands (you'll have stuff to offload to fund the rare gear). Mirror of the existing buy path on `VendorScreen`.
 
-### Medium priority
+3. **Two-Handed Weapons table from the rulebook** — ~30 entries spanning Common → Legendary (Rust Rifle, Bone Maul, Mud Long Axe, Aether Lance, Gravity Pike, Mud Army War Hammer, etc.) deferred from the race-starter-items session. `weapons.json` has ~22 entries total. Each rulebook row has name / STR requirement / damage roll / special effect / rarity / faction-origin / TC price already laid out — straightforward additions, just needs the JSON and a few tests covering rarity/stat scaling.
 
-4. **iOS OTA reload untested.** All current testing is Android. iOS path through `reloadAsync` + audio teardown is untested.
+### Medium priority (smallest first)
 
-5. **Contracts screen** — quests / hunts / storylines / mysteries only show in StatsPanel as a comma-separated string. A dedicated screen (parallel to ActionReferenceScreen) would surface active threads.
+4. **`appendLog` debounce for rapid same-channel writes** — partially mitigated by dedup, but rapid rest spam / dig + system-hint pairings still feel disjointed. Consider a 500ms merge.
 
-6. **`appendLog` debounce for rapid same-channel writes** — partially mitigated by dedup, but rapid rest spam / dig + system-hint pairings still feel disjointed. Consider a 500ms merge.
+5. **Pulsing_mud hook-resolution reward tone** — the green REWARD channel was folded into world during the hook-resolution refactor. May read as flat; visual verification on device wanted.
 
-7. **Pulsing_mud hook-resolution reward tone** — the green REWARD channel was folded into world during the hook-resolution refactor. May read as flat; visual verification on device wanted.
+6. **Contracts screen** — quests / hunts / storylines / mysteries only show in StatsPanel as a comma-separated string. A dedicated screen (parallel to ActionReferenceScreen) would surface active threads.
 
-### Low priority / future ideas
+7. **iOS OTA reload untested.** All current testing is Android. iOS path through `reloadAsync` + audio teardown is untested.
+
+### Low priority / future ideas (smallest first)
 
 8. **Achievement / milestone ribbon** — milestones fire (every 10 checks = +1 stat, every 5 enemies = +1 HP max) but only as one line. A small persistent ribbon would surface them better.
 
 9. **Day/night visual tint** — the time-of-day label exists; the screen could tint during night/morning/afternoon/evening.
 
-10. **Companion / NPC follower** — `important_npcs.json` exists but no follower mechanics yet.
+10. **Per-maneuver routing** — Fighting Maneuver currently uses STR check for everything. Disarm / trip / shove could route to DEX. Defender's actual stats (not just build) could oppose.
 
-11. **Persistent MapGraph (Zustand)** (Phase 4 §3.1) — replaces the current X/Y math + per-visit room re-roll with a discrete `Map<roomId, RoomState>` graph. When the player goes N then S they re-enter the exact same room id with the same loot-already-taken / enemies-already-defeated state. Requires save migration + rewrite of `stepDirection` + `beginScene`. Book a dedicated session.
+11. **Vertical / intra-location navigation** — "go down there" when the player is on a surface scene and wants to enter the buried structure below. Requires Location → Macro mapping for "downward" semantics. Different problem from intra-Macro sibling traversal.
 
-12. **Hand-authored 15-20 room starting hub** (Phase 4 §3.2) — companion to #11. `static_world.json` with the Reclaimers' Outpost → Culvert → Shallow Digs path, hardcoded N/S/E/W pointers, fixed NPC anchor positions. Lands the MUD-style "the hub I know" feel. Author AFTER MapGraph lands.
+12. **Vendor sell-back UI polish** — depends on #2. Buyback price scaling (50% of buy price), category sort.
 
-13. **Bonus die / penalty die proper system** — engine currently treats each die as ±2 flat, which is close enough but not exact to Call of Cthulhu math. A real dice-pool layer with reroll-better-of-two semantics would be more authentic.
+13. **Companion / NPC follower** — `important_npcs.json` exists but no follower mechanics yet.
 
-14. **Per-maneuver routing** — Fighting Maneuver currently uses STR check for everything. Disarm / trip / shove could route to DEX. Defender's actual stats (not just build) could oppose.
+14. **Bonus die / penalty die proper system** — engine currently treats each die as ±2 flat, which is close enough but not exact to Call of Cthulhu math. A real dice-pool layer with reroll-better-of-two semantics would be more authentic.
 
-15. **Vertical / intra-location navigation** — "go down there" when the player is on a surface scene and wants to enter the buried structure below. Requires Location → Macro mapping for "downward" semantics. Different problem from Commit 3's intra-Macro sibling traversal.
+15. **Persistent MapGraph (Zustand)** (Phase 4 §3.1) — replaces the current X/Y math + per-visit room re-roll with a discrete `Map<roomId, RoomState>` graph. When the player goes N then S they re-enter the exact same room id with the same loot-already-taken / enemies-already-defeated state. Requires save migration + rewrite of `stepDirection` + `beginScene`. Book a dedicated session.
+
+16. **Hand-authored 15-20 room starting hub** (Phase 4 §3.2) — companion to #15. `static_world.json` with the Reclaimers' Outpost → Culvert → Shallow Digs path, hardcoded N/S/E/W pointers, fixed NPC anchor positions. Lands the MUD-style "the hub I know" feel. Author AFTER MapGraph lands.
 
 ---
 
@@ -256,4 +260,4 @@ Set on enemy entries in `enemies.json`. Read at combat time via `enemyTraits.ts`
 
 ---
 
-That's the lay of the land at the close of this chat. Next session should pick up at the **Two-Handed Weapons table** (item #1) unless the user steers elsewhere — that's the largest piece of authored content still outstanding and the new firearms/maneuver mechanics need late-game weapon variety to chew on.
+That's the lay of the land at the close of this chat. Next session should pick up at **item 1** (vendor accept/turn-in faction-specific feedback) — small, contained, closes a long-standing rough edge in the vendor flow. Work down the list in numerical order; smaller / less risky items are deliberately at the top of each priority tier.
