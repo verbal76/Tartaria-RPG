@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { TutorialTarget } from './TutorialTarget';
 
@@ -31,12 +31,19 @@ function shortWeaponLabel(name: string): string {
 
 export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, inCombat, equippedMain, equippedOff, range }: Props) {
   const [text, setText] = useState('');
+  const inputRef = useRef<TextInput>(null);
 
   const handleSubmit = () => {
     const trimmed = text.trim();
     if (!trimmed) return;
     onSubmit(trimmed);
+    // Android IME composition buffer keeps the tail of long inputs even
+    // after setText('') — controlled-value pattern alone isn't enough.
+    // Call the native clear() method too so the on-screen input actually
+    // empties out. Playtest screenshot showed "? it should make that
+    // what is going on right now" stuck in the box after Act.
     setText('');
+    inputRef.current?.clear();
   };
 
   return (
@@ -90,6 +97,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
       </TutorialTarget>
       <TutorialTarget area="input-row" style={styles.inputRow}>
         <TextInput
+          ref={inputRef}
           style={styles.input}
           value={text}
           onChangeText={setText}
@@ -97,8 +105,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           placeholderTextColor="#5a5246"
           onSubmitEditing={handleSubmit}
           returnKeyType="send"
+          // Disable autocorrect AND autocomplete so Android IME doesn't
+          // reinsert composition tail after submit.
           autoCorrect={false}
           autoCapitalize="none"
+          autoComplete="off"
+          textContentType="none"
         />
         <TouchableOpacity style={styles.send} onPress={handleSubmit}>
           <Text style={styles.sendText}>Act</Text>
