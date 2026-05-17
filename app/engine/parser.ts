@@ -4,8 +4,9 @@ import { levenshtein } from './editDistance';
 const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   stealth: ['hide', 'sneak', 'crawl', 'creep', 'lurk', 'crouch', 'silently', 'shadow', 'conceal', 'slink'],
   attack: [
-    'attack', 'strike', 'slash', 'stab', 'shoot', 'hit', 'kill', 'fight', 'charge', 'fire',
+    'attack', 'strike', 'slash', 'stab', 'shoot', 'kill', 'fight', 'charge', 'fire',
     'swing', 'pierce', 'blast', 'smash', 'punch', 'kick', 'cleave', 'loose', 'engage',
+    'shatter', 'break', 'destroy', 'crush', 'bash',
   ],
   diplomacy: ['convince', 'persuade', 'negotiate', 'parley', 'bargain', 'plead', 'speak', 'talk', 'ask', 'greet'],
   escape: ['run', 'flee', 'retreat', 'escape', 'withdraw', 'bolt', 'dash', 'fall back'],

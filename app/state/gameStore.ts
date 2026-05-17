@@ -349,9 +349,13 @@ const FEATURE_SIGHTINGS = [
 const DIRECTION_KEYWORDS = /\b(direction|way|paths?|exits?|route|where to go|which way)\b/i;
 
 // Per-action stamina costs. Casual look, wait, inventory, talk = 0.
+// Tuned down after playtest feedback: "stamina goes by a little bit too
+// fast in this game. I shouldn't have to rest after I walk across the
+// room." Wander/attack/skillCheck now cost half what they did, and
+// intra-scene movement uses 1 stamina (handled at the call site).
 const STAMINA_COSTS = {
   travel: 2,
-  wander: 2,
+  wander: 1,
   attack: 1,
   skillCheck: 1,
 } as const;
@@ -1692,19 +1696,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Fuzzy location lookup — playtest typed "Walk to dracova" (one
         // letter off from Drakova) and got narrateWanderingJourney instead
         // of a real route. Try exact-substring first, then a Levenshtein
-        // fallback that allows a misspelling per city name.
+        // fallback. TIGHTENED: target must be ≥5 chars and edit distance
+        // ≤ 1 so "stall" no longer fuzzy-matches "stair" inside Endless
+        // Stair and teleports the player out of a market scene they were
+        // trying to navigate.
         let candidate = target
           ? allLocations.find((l) => l.name.toLowerCase().includes(target) || l.id === target)
           : undefined;
-        if (!candidate && target && target.length >= 4) {
-          let bestDist = 3;
+        if (!candidate && target && target.length >= 5) {
+          let bestDist = 2;
           for (const l of allLocations) {
             const lname = l.name.toLowerCase();
-            // Compare against each word in the location name so "dracova"
-            // matches "Drakova" inside "City of Drakova" too.
             const words = lname.split(/\s+/);
             for (const w of words) {
-              if (Math.abs(w.length - target.length) > 2) continue;
+              if (Math.abs(w.length - target.length) > 1) continue;
               const d = levenshtein(target, w);
               if (d < bestDist) {
                 bestDist = d;
@@ -1716,10 +1721,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (candidate) {
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.travel), 2) });
           get().travelTo(candidate.id);
-        } else {
-          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.wander), 1) });
-          narrateWanderingJourney(get, set, currentScene);
+          break;
         }
+        // No external destination matched — but the player named something
+        // the current scene mentioned (ambient noun / hook / enemy / item).
+        // That's an INTRA-SCENE movement: walking across a room to a
+        // stall, dagger, figure, etc. Low cost — 15 min, 1 stamina — not
+        // a multi-hour map trek. Playtest: "Go to a stall" was teleporting
+        // the player out of the market entirely because the engine treated
+        // every walk verb as map travel.
+        const ambientHit = target ? matchAmbientNoun(target, currentScene.ambientNouns ?? []) : null;
+        const hookHit = target ? matchHookNoun(target, currentScene.hooks ?? []) : null;
+        const enemyHit = target
+          ? currentScene.enemies.find((e) => e.name.toLowerCase().includes(target) || (e.aliases ?? []).some((a) => target.includes(a)))
+          : null;
+        const intraSceneNoun = ambientHit ?? hookHit?.nouns[0] ?? enemyHit?.name ?? null;
+        if (intraSceneNoun) {
+          set({ player: advanceTime(spendStamina(player, 1), 0.25) });
+          get().appendLog(
+            'world',
+            `You move across the ground to the ${intraSceneNoun.toLowerCase()}. Close enough now to act on it.`,
+          );
+          break;
+        }
+        // Fall-through: wander.
+        set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.wander), 1) });
+        narrateWanderingJourney(get, set, currentScene);
         break;
       }
       case 'wait':
@@ -2681,9 +2708,48 @@ export const useGameStore = create<GameStore>((set, get) => ({
           case 'cast':
             get().appendLog('world', 'You shape the Aether around your hand. A pale violet glow answers, steady and true.');
             break;
-          case 'use_relic':
-            get().appendLog('world', 'The relic hums in pitch — it recognises your intent.');
+          case 'use_relic': {
+            // Concrete feedback per relic + target. Playtest: trying
+            // torch / locket / vision lens on mud-glass all gave the same
+            // "relic hums in pitch" line — felt broken because the player
+            // couldn't tell anything was happening. Re-parse the action
+            // text for the resolved item + target so the narration names
+            // what's actually in your hand and what you aimed it at.
+            const useParse = parseInput(actionText, { inventory: player.inventory });
+            const itemName = useParse.resolvedNoun ?? 'the relic';
+            const tgtTokens = (useParse.target ?? '').split(/\s+/).filter(Boolean);
+            // Strip the item name's words out of target so "use torch on
+            // mud glass" leaves "mud glass" not "torch mud glass".
+            const itemWords = itemName.toLowerCase().split(/\s+/);
+            const tgtWords = tgtTokens.filter((w) => !itemWords.includes(w.toLowerCase()));
+            const tgt = tgtWords.join(' ').trim();
+            const lc = itemName.toLowerCase();
+            // Pick a vignette by relic kind so each item feels distinct.
+            let line: string;
+            if (/torch|lantern|lamp/.test(lc)) {
+              line = tgt
+                ? `You raise the ${itemName} to the ${tgt}. Aetheric flame licks across its surface — for a heartbeat, hidden detail flares into view, then fades.`
+                : `You hold the ${itemName} high. The flame steadies, and dim corners of the scene reveal what was hiding.`;
+            } else if (/locket|amulet|pendant/.test(lc)) {
+              line = tgt
+                ? `The ${itemName} grows warm against your fingers as you direct it at the ${tgt}. The metal pulses once, hard, then settles.`
+                : `The ${itemName} grows warm. A faint resonance threads through your bones — something nearby is also listening.`;
+            } else if (/lens|monocle|glass/.test(lc)) {
+              line = tgt
+                ? `You bring the ${itemName} up and peer through it at the ${tgt}. Layers shift — Aetheric grain, structural lines, the ghost of a maker's mark.`
+                : `Through the ${itemName} the room shifts. Aetheric grain becomes visible in the air itself.`;
+            } else if (/compass|sextant/.test(lc)) {
+              line = tgt
+                ? `The needle of the ${itemName} swings toward the ${tgt} and locks. Whatever's there matters.`
+                : `The ${itemName} steadies, then pulls. Direction, finally — somewhere worth walking.`;
+            } else {
+              line = tgt
+                ? `The ${itemName} responds to the ${tgt}. A pitch, a hum, a recognition — the relic confirms there is something here.`
+                : `The ${itemName} hums in pitch — it recognises your intent.`;
+            }
+            get().appendLog('world', line);
             break;
+          }
           default:
             get().appendLog('world', 'The action resolves in your favour.');
         }
@@ -5499,7 +5565,17 @@ async function narrateViaArbiter(
     // Cap sentences before trimming so we never emit the 4-sentence
     // hallucination paragraphs the playtest log caught.
     const capped = clampSentences(text, ctx.in_combat ? 1 : 2);
-    const finalText = trimToLastSentence(capped) || trimmed;
+    // Anti-third-person filter. Qwen still occasionally writes "The
+    // player paused..." despite the prompt. Drop those sentences and
+    // fall back to the template if NOTHING usable survives, so the
+    // arbiter feed never reads as a recap about someone else.
+    const survivors = capped
+      .split(/(?<=[.!?])\s+/)
+      .filter((s) => !/\b(the player|the adventurer|the explorer|the figure)\b/i.test(s))
+      .filter((s) => !/^\s*they\s/i.test(s))
+      .join(' ')
+      .trim();
+    const finalText = trimToLastSentence(survivors) || trimmed;
     get().appendLog('arbiter', finalText);
   } catch {
     if (myEpoch === arbiterGenerationEpoch && trimmed) {

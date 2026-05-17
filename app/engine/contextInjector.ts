@@ -132,11 +132,15 @@ function buildLadderEnvironment(
 //     hallucinated events that never happened
 //   - Mid-sentence trailing cutoffs
 const VOICE_RULES =
-  "Speak directly to the player. Use 'you' and 'your' — never write " +
-  "'the player' or 'they' as the subject. Do not invent emotions, " +
-  'motivations, traps, mechanics, events, or outcomes that are not ' +
-  'listed in the SYSTEM FACTS above. Only narrate the player\'s last ' +
-  'action and the static facts already present. ' +
+  "**SECOND PERSON ONLY.** Every sentence MUST address the player as " +
+  "'you' / 'your'. NEVER write 'The player', NEVER write 'they', " +
+  "NEVER write 'the adventurer', 'the figure', 'the explorer', or any " +
+  'third-person stand-in for the player. Sentences must START with ' +
+  '"You" or "Your" or with a direct action verb in second person. ' +
+  'If a draft sentence begins with "The player" or "They", rewrite it. ' +
+  'Do not invent emotions, motivations, traps, mechanics, events, or ' +
+  'outcomes that are not listed in the SYSTEM FACTS above. Only narrate ' +
+  "the player's last action and the static facts already present. " +
   'DO NOT name any location, room, weather, or NPC that is not in the ' +
   'SYSTEM FACTS — no "Aetherstone Deep", no "Grand Hall", no "Ash Storm", ' +
   'no sarcophagi or vaulted ceilings unless they appear in Environment. ' +

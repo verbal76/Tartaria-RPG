@@ -379,7 +379,7 @@ describe('buildSystemPrompt', () => {
     expect(system).toContain('go north');
     // Voice guardrails apply to every prompt — second-person, no fabrication,
     // complete sentences.
-    expect(system).toContain("'you' and 'your'");
+    expect(system).toContain("SECOND PERSON ONLY");
     expect(system).toMatch(/do not invent.*events/i);
     // Peaceful instruction sets the length cap.
     expect(system).toMatch(/35 words/);
@@ -408,7 +408,7 @@ describe('buildSystemPrompt', () => {
     expect(system).not.toMatch(/describe what is around the player/i);
     expect(system).not.toMatch(/35 words/);
     // Voice guardrails apply in combat too.
-    expect(system).toContain("'you' and 'your'");
+    expect(system).toContain("SECOND PERSON ONLY");
   });
 
   it('stays on the peaceful instruction when in_combat is false', () => {
