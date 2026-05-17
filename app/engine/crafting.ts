@@ -15,6 +15,8 @@ export interface CatalogMaterial {
   description: string;
 }
 
+export type WeaponStyle = 'two_handed' | 'dual_wield' | 'single_handed' | 'ranged' | 'shield' | 'runecaster';
+
 export interface CatalogWeapon {
   name: string;
   weaponKind: 'melee' | 'ranged' | 'runecaster';
@@ -27,6 +29,17 @@ export interface CatalogWeapon {
   defense?: number;
   tags: string[];
   description: string;
+  /** Optional rulebook-aligned metadata. All four added together to
+   *  carry the canonical weapon-table fields without breaking the
+   *  existing engine. */
+  style?: WeaponStyle;
+  statRequirement?: number;
+  faction?: string;
+  tc?: number;
+  /** Free-text "Effect or Special Property" column from the rulebook.
+   *  Some get wired into mechanics (bleed, stun); the rest read as
+   *  flavor at the moment but the data is preserved for future hooks. */
+  effect?: string;
 }
 
 export type ArmorSlot = 'head' | 'chest' | 'legs' | 'feet';
