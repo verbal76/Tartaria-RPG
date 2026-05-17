@@ -77,11 +77,13 @@ export const INVENTORY_CATEGORIES: Record<string, { kind?: string[]; slot?: stri
 export function extractInventoryTarget(text: string): string {
   return text
     .toLowerCase()
+    // Strip punctuation early so frame regexes don't get fooled by
+    // "tell me. all of it" leaving a period stranded mid-target.
+    .replace(/[.,!?;:]/g, ' ')
     .replace(
-      /\b(how (?:many|much)|do i have|do i got|have i got|have i|is there a|is there any|is there|is the|is a|is any|got any|got the|got a|in my (?:pack|inventory|bag|pockets)|tell me about|show me|list|check|what about)\b/g,
+      /\b(how (?:many|much)|do i have|do i got|have i got|have i|is there a|is there any|is there|is the|is a|is any|got any|got the|got a|in my (?:pack|inventory|bag|pockets)|tell me about|tell me|show me|list|check|what about|all of it|everything)\b/g,
       ' ',
     )
-    .replace(/\?/g, ' ')
     // Leading question words — "what armor do I have" should extract to
     // "armor", not "what armor". They're verb synonyms for `ask` so they
     // can't be stripped at parser level without losing intent detection,
@@ -92,7 +94,7 @@ export function extractInventoryTarget(text: string): string {
     // ("how many rations ARE in my pack" / "what bandages DO i HAVE"). Without
     // stripping these the responder gets "No how many rations are on you."
     .replace(/\b(are|is|was|were|do|does|did|have|has)\b/g, ' ')
-    .replace(/\b(any|some|the|my|a|an|on me|with me)\b/g, ' ')
+    .replace(/\b(any|some|the|my|a|an|on me|with me|it|of)\b/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }

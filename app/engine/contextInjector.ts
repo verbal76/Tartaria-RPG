@@ -135,8 +135,12 @@ const VOICE_RULES =
   "'the player' or 'they' as the subject. Do not invent emotions, " +
   'motivations, traps, mechanics, events, or outcomes that are not ' +
   'listed in the SYSTEM FACTS above. Only narrate the player\'s last ' +
-  'action and the static facts already present. End on a complete ' +
-  'sentence.';
+  'action and the static facts already present. ' +
+  'DO NOT name any location, room, weather, or NPC that is not in the ' +
+  'SYSTEM FACTS — no "Aetherstone Deep", no "Grand Hall", no "Ash Storm", ' +
+  'no sarcophagi or vaulted ceilings unless they appear in Environment. ' +
+  'If you would have to invent scenery to fill a sentence, end early. ' +
+  'End on a complete sentence.';
 
 const PEACEFUL_INSTRUCTION =
   'Narrate the situation in a grim, atmospheric tone. Acknowledge the ' +

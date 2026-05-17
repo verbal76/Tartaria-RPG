@@ -159,6 +159,26 @@ describe('extractInventoryTarget — leading question words stripped', () => {
   });
 });
 
+describe('extractInventoryTarget — punctuation + filler cleanup', () => {
+  // Playtest log produced "No tell me . all of it on you." because the
+  // extractor left a period and "all of it" stranded inside the target.
+  // Punctuation now gets scrubbed early and filler phrases are stripped.
+  it('strips stray punctuation', () => {
+    expect(extractInventoryTarget('tell me. all of it')).toBe('');
+    expect(extractInventoryTarget('do I have. rations,')).toBe('rations');
+  });
+
+  it('strips "all of it" / "everything" filler', () => {
+    expect(extractInventoryTarget('tell me everything')).toBe('');
+    expect(extractInventoryTarget('do I have all of it')).toBe('');
+  });
+
+  it('never returns a target containing a period or comma', () => {
+    const out = extractInventoryTarget('tell me, everything, in my pack.');
+    expect(out).not.toMatch(/[.,]/);
+  });
+});
+
 describe('INVENTORY_CATEGORIES — covers the ones that used to trigger AC dump', () => {
   it('maps armor / weapon / ring / amulet / ac / defense to inventory categories', () => {
     for (const k of ['armor', 'armour', 'weapon', 'weapons', 'ring', 'rings', 'amulet', 'ac', 'defense']) {

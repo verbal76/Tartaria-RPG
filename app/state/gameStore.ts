@@ -1837,7 +1837,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
             break;
           }
-          if (target) {
+          // Bail to a clean message when the target survived as something
+          // noisy (more than 3 words, or it still contains stray punctuation
+          // /question fragments). Playtest log produced "No tell me . all of
+          // it on you." because messy target text was echoed verbatim.
+          const targetIsNoisy = target.split(/\s+/).length > 3 || /[.,;:!?]/.test(target);
+          if (target && !targetIsNoisy) {
             const matches = player.inventory.filter(
               (i) => i.quantity > 0 && i.name.toLowerCase().includes(target),
             );
@@ -4848,6 +4853,40 @@ function trimToLastSentence(raw: string): string {
   return s; // no terminal punctuation found — keep the raw text
 }
 
+/**
+ * Hard-cap a generated paragraph to the first `maxSentences` sentences.
+ * The peaceful prompt asks for ~2 sentences and combat asks for 1, but
+ * Qwen 0.5B routinely produces 3–4 when it gets going. The post-generation
+ * trim already lops trailing fragments — this enforces the count.
+ *
+ * Playtest log triggered this: a 4-sentence hallucination naming
+ * "Aetherstone Deep" / "Grand Hall" / "Ash Storm" — none of which
+ * matched the actual scene. Capping won't stop hallucination on its own,
+ * but it shortens the surface area the LLM can fill with invention.
+ */
+function clampSentences(raw: string, maxSentences: number): string {
+  const s = (raw ?? '').trim();
+  if (!s) return '';
+  let count = 0;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i]!;
+    if (c === '.' || c === '!' || c === '?') {
+      // Skip ellipses ("..." counts as one boundary, not three).
+      while (i + 1 < s.length && (s[i + 1] === '.' || s[i + 1] === '!' || s[i + 1] === '?')) {
+        i++;
+      }
+      count++;
+      if (count >= maxSentences) {
+        // Include any immediately following closing quote.
+        const next = s[i + 1];
+        const cut = next === '"' || next === "'" ? i + 2 : i + 1;
+        return s.slice(0, cut).trim();
+      }
+    }
+  }
+  return s;
+}
+
 async function narrateViaArbiter(
   get: () => GameStore,
   set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
@@ -4931,7 +4970,10 @@ async function narrateViaArbiter(
     // ending like "...each stroke echoing in the". Falls back to the raw
     // text only when nothing terminal-punctuated is present, then to the
     // template if that's empty.
-    const finalText = trimToLastSentence(text) || trimmed;
+    // Cap sentences before trimming so we never emit the 4-sentence
+    // hallucination paragraphs the playtest log caught.
+    const capped = clampSentences(text, ctx.in_combat ? 1 : 2);
+    const finalText = trimToLastSentence(capped) || trimmed;
     get().appendLog('arbiter', finalText);
   } catch {
     if (myEpoch === arbiterGenerationEpoch && trimmed) {
