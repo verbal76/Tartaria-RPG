@@ -443,7 +443,8 @@ export type ScreenName =
   | 'about'
   | 'inventory'
   | 'crafting'
-  | 'vendor';
+  | 'vendor'
+  | 'actions';
 
 export interface SaveState {
   version: 1;

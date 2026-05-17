@@ -132,7 +132,14 @@ export function InventoryScreen() {
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
         <Text style={styles.title}>INVENTORY</Text>
-        <View style={{ width: 80 }} />
+        <TouchableOpacity
+          onPress={() => setScreen('actions')}
+          style={styles.actionsBtn}
+          hitSlop={8}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.actionsText}>ACTIONS</Text>
+        </TouchableOpacity>
       </View>
 
       <Text style={styles.tc}>TC: {player.tc}</Text>
@@ -261,6 +268,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
+  actionsBtn: {
+    backgroundColor: '#1a1714',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderColor: '#5a4a2e',
+    borderWidth: 1,
+    borderRadius: 4,
+    width: 80,
+    alignItems: 'center',
+  },
+  actionsText: { color: '#c9a86a', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
   title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
   tc: { color: '#c9a86a', fontSize: 12, letterSpacing: 1, marginBottom: 6, textAlign: 'right' },
   scroll: { flex: 1 },

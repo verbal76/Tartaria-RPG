@@ -691,127 +691,224 @@
     },
 
     {
+      "id": "move_action",
+      "keywords": ["move", "move action", "basic move"],
+      "title": "Move",
+      "answer": "A simple move action. Players can move equal yards to their MOV stat. Cost: 1 Move Action."
+    },
+    {
       "id": "sprint_action",
       "keywords": ["sprint", "running", "push for distance"],
       "title": "Sprint",
-      "answer": "Push past a regular move — extra movement in a single turn at the cost of opportunity. Opponents striking at you while you sprint get +1 to their attack roll. Counts as a Dash variant."
+      "answer": "Travel up to 5x further than a regular move action in a single turn. Any combat actions made this round either before or following the Sprint must incur a penalty die. If you have a MOV of 8 or more, opponents using firearms against you while sprinting will incur +1 penalty die against you. Cost: 1 Move Action, +1 penalty die. Gain: 5x movement distance, opponent penalty +1 if using firearms (MOV 8+ only)."
     },
     {
       "id": "take_cover_action",
       "keywords": ["take cover", "cover up", "duck behind", "dive to cover"],
       "title": "Take Cover",
-      "answer": "Position behind cover, full or partial. Under full cover you can't be targeted; under partial cover, attacks against you fire at Disadvantage. You may still attack out from behind cover at the same Disadvantage."
+      "answer": "Position self behind cover, either full or partial. If under partial cover, all ranged firearm attacks made against you will receive a penalty die. If in full cover, ranged attacks will be unable to hit, however you will automatically enter partial cover as exposed if you move (for example, leaning out of cover to take a shot). Cost: 1 Move Action. Gain: +1 Penalty Die on opponent's attack / firearms immunity."
     },
     {
       "id": "perform_action",
       "keywords": ["perform action", "use skill in combat"],
       "title": "Perform Action",
-      "answer": "Use a non-combat skill in the middle of a fight — pick a lock, read an inscription, use a tool. Each skill has its own cost and depending on the action you may need an Apply or Use roll. Some perform actions take less than a full combat action."
+      "answer": "Using your combat action, perform any non-combat action, such as apply first aid, lockpick a door, or climb up to a vantage point. Depending on the action you wish to take, the keeper may ask you to roll a specific skill. Cost: 1 Combat Action."
     },
     {
       "id": "assist_action_combat",
       "keywords": ["assist action", "assist in combat"],
       "title": "Assist Action (Combat)",
-      "answer": "Offer another player help during your turn — let them perform their action on your initiative slot, or distract an enemy away from them by drawing fire. Costs your action this turn."
+      "answer": "Offer another player help during your turn this round so they can perform an action (e.g. handing them their medical equipment to them during first aid, distracting enemies away from them, giving them a lift up during a climb, etc), granting them an additional bonus die for their roll. Cost: 1 Combat Action. Gain: +1 Bonus Die for assisted player."
     },
     {
       "id": "hold_action",
       "keywords": ["hold action", "delay action", "withhold turn"],
       "title": "Hold Action",
-      "answer": "Spend your turn waiting for a triggering condition you name in advance. When the trigger fires, you spend your held action. Useful for ambushes, defensive lines, or coordinating with allies."
+      "answer": "Spend both your movement and combat action holding your turn, effectively not acting this round. Depending on your description given to how you're holding your action, you may be granted a bonus die for your next turn (e.g. if you hold your turn to anticipate an attack, you may get a bonus die for your dodge or fight back). May require additional skill rolls if reasoning for holding your action requires verification. Cost: 1 turn. Gain: +1 Bonus Die next turn (if GM agrees upon player's reasoning)."
+    },
+    {
+      "id": "flee_action",
+      "keywords": ["flee action", "flee combat", "run from fight"],
+      "title": "Flee",
+      "answer": "Spend both your movement and combat action disengaging and fleeing the combat area. It will take one full round for you to successfully flee the area; even if you have already announced your intention to flee by disengaging this combat round, enemies may still attempt to attack or stop you until you reach your next turn. If you successfully flee a scene, a chase sequence may follow. Cost: 1 turn."
     },
 
     {
       "id": "brawl_action",
       "keywords": ["brawl", "fistfight", "unarmed", "knuckles"],
-      "title": "Brawl",
-      "answer": "Unarmed close-quarters attack. Punches, kicks, headbutts, knees. Damage is small (1d3 in our scale) but durability-free — your fists don't break. Bludgeoning, so it exploits weaknesses in Constructs / Automations / Aetheric Mutations."
+      "title": "Brawl — Skill: Fighting (Brawl)",
+      "answer": "A simple unarmed attack. All unarmed brawl attacks do 1d3+DB (damage bonus) damage. An extreme success (1/5th of Fighting Brawl skill) does maximum weapon and damage bonus damage. Cost: 1 Combat Action."
     },
     {
       "id": "use_weapon_action",
       "keywords": ["use weapon", "wield weapon"],
-      "title": "Use Weapon",
-      "answer": "Attack with the weapon you have equipped. Specialty weapons (runecasters, bolt-casters, two-handed blades) require their proper weapon skill; basic weapons run off the stat the catalog tags them with."
+      "title": "Use Weapon — Skill: Fighting (Brawl) / Fighting (Weapon)",
+      "answer": "Attack using your melee weapon. If using a specialised weapon (axe, sword, spear, garrote, flail, chainsaw, etc.) it will require a specialised weapon skill roll instead of Fighting Brawl. Check weapon description for damage. An extreme success (1/5th of Fighting skill) does maximum weapon and damage bonus damage. If an edged weapon, an extreme success will do an impaling strike. Cost: 1 Combat Action."
     },
     {
       "id": "fighting_maneuver",
       "keywords": ["fighting maneuver", "disarm", "trip", "grapple", "shove", "maneuver"],
-      "title": "Fighting Maneuver",
-      "answer": "A special move that does little or no direct damage but creates an opening — disarm, trip, grapple, shove, pin. Resolves as an opposed STR or DEX check. Success knocks your target off-balance for a round (Disadvantage on their next attack)."
+      "title": "Fighting Maneuver — Skill: Fighting (Brawl)",
+      "answer": "An attack that describes a goal other than simply inflicting physical harm, such as a disarm, hold, push, breaking holds, and knock-out blows. Compare the builds of both attacker and defender; if the defender's build is higher by +1, the attacker receives +1 penalty die. If the defender's build is higher by +2, the attacker receives +2 penalty die. If defender's build is higher by 3+, the maneuver is impossible. Cost: 1 Combat Action, plus up to 2 potential penalty dice."
     },
     {
       "id": "overwhelm_action",
       "keywords": ["overwhelm", "gang up", "swarm attack"],
-      "title": "Overwhelm",
-      "answer": "Two or more attackers on a single target gain Advantage on their attack rolls and the target loses any Dodge bonus. The math punishes lone fighters; bring allies."
+      "title": "Overwhelm — Skill: Fighting (Brawl) / Fighting (Weapon)",
+      "answer": "MELEE ONLY. If multiple attackers are targeting the same opponent AND the opponent has already attempted a number of evasive actions during this round, all further melee attacks this round will receive a Bonus Die. The number of times an opponent may dodge/fight back before being overwhelmed is the same as their number of attacks they can make in a single combat round. Cost: 1 Combat Action."
+    },
+    {
+      "id": "throw_action",
+      "keywords": ["throw action", "throw skill"],
+      "title": "Throw — Skill: Toss",
+      "answer": "A palm sized object can be thrown 1/5th of a character's strength in yards at base range. It can be thrown twice as far with a hard difficulty roll (1/2 of Throw Skill) and up to 4× that amount with an extreme difficulty roll (1/5th of Throw Skill). Thrown melee weapons will still do damage as normal, but any damage bonus (DB) for a thrown weapon is halved. Throw attacks can be dodged but they cannot be fought back unless the opponent is 1/5th of their DEX away from the attacker in feet. Cost: 1 Combat Action."
     },
 
     {
       "id": "fire_weapon_action",
       "keywords": ["fire weapon", "shoot firearm", "ranged attack", "fire bolt"],
-      "title": "Fire Weapon",
-      "answer": "A single ranged attack with a firearm — in Tartaria that means a Bolt-Caster (or its lore cousins: Bone Crossbow, Salvaged Bow, runecasters). One bolt, one roll, one chance to reload before the next shot."
+      "title": "Fire Weapon — Skill: Firearms (Weapon)",
+      "answer": "A single shot attack with your drawn firearm. Success in using the weapon depends on a player's skill in the weapon type (Handgun, Rifle / Shotgun, Bow, Heavy Weapons, Flamethrower, Machine Gun and SMG — in Tartaria, the bolt-caster family). Check weapon description for damage. An extreme success for all firearms except flamethrowers will result in an impaling strike. Cost: 1 Combat Action."
     },
     {
       "id": "quick_fire_action",
       "keywords": ["quick fire", "snap shot", "rapid shot"],
-      "title": "Quick Fire",
-      "answer": "A hurried bolt-caster shot. -1 to the roll, but you take it on your initiative instead of waiting to aim. Useful when the target is moving and you can't afford a full action to line up."
+      "title": "Quick Fire — Skill: Firearms (Weapon)",
+      "answer": "FIREARMS ONLY. When a combat round starts, state you plan to fire as your first action and add 50 points to your initiative score (DEX). Your only action this round is to fire your weapon. If you move, brawl, take damage or use an evasive action before firing, you lose your Initiative bonus. You may dodge, counter an attack or take damage as normal once you have made your shot. After that round, initiative order returns to normal unless you perform another quick fire action in the following round. Cost: 1 turn. Gain: +50 Initiative (DEX) for one round."
     },
     {
       "id": "aim_action",
       "keywords": ["aim", "aim weapon", "sight target", "draw bead"],
-      "title": "Aim Weapon",
-      "answer": "Spend your turn aiming instead of firing. Your next ranged attack on the same target rolls with Advantage (+2). Useful at long range or against armored targets. Lose the bonus if you take damage or your target moves out of sight."
+      "title": "Aim Weapon — Skill: Firearms (Weapon)",
+      "answer": "Spend an entire turn this round to aim your weapon. Upon your next turn, you may roll an additional Bonus die if you spend your first action firing your weapon. If the shooter takes damage or moves before their next turn, the aim bonus is lost. Cost: 1 turn. Gain: +1 Bonus Die next round."
     },
     {
       "id": "point_blank_range",
       "keywords": ["point blank", "point-blank", "close shot"],
-      "title": "Point Blank Range",
-      "answer": "If the target is within 5 yards (or 5 ft / arm's reach), bolt-caster shots get a bonus on the attack roll and damage. Easier to land, harder to miss. Risk: you're inside their reach too."
+      "title": "Point Blank Range — Skill: Firearms (Weapon)",
+      "answer": "If an opponent is within 1/5th of the shooter's DEX in feet, the shooter gets a bonus die to their attack roll. Note that any shooter within point blank range of an opponent may be targeted by melee attacks and could be disarmed, however an opponent will not be able to fight back or dodge against firearm attacks. Cost: 1 Combat Action. Gain: +1 Bonus Die."
     },
     {
       "id": "multiple_shot",
       "keywords": ["multiple shot", "double tap", "two shots"],
-      "title": "Multiple Shot",
-      "answer": "Some bolt-casters and most runecasters can fire two or three shots in a single action at a -1 penalty per shot after the first. Resolves each shot separately. Burns through ammo faster."
+      "title": "Multiple Shot — Skill: Firearms (Handguns)",
+      "answer": "HANDGUNS OR BURST FIRE WEAPONS ONLY. If your firearm allows multiple shots with a single turn, you may fire up to the max number of bullets listed in the firearm's 'Attacks' box in a single round. However, each shot taken during this attack must take a penalty die. Cost: 1 Combat Action, +1 penalty die for each shot taken."
     },
     {
       "id": "fire_automatic",
       "keywords": ["fire automatic", "automatic fire", "full auto"],
-      "title": "Fire Automatic",
-      "answer": "A burst from an automatic-capable bolt-caster (rare; Reclaimer and Order experimental kit only). Sprays a cone, hits multiple targets in a 5-yard arc, but burns half the magazine and applies a -1 penalty to every roll in the burst."
+      "title": "Fire Automatic — Skill: Firearms (Machine Gun // SMG)",
+      "answer": "AUTOMATIC WEAPONS ONLY. With an automatic weapon, you can fire up to [X] number of bullets in a single volley, [X] being your weapon skill divided by 10 and rounded down (minimum of 3 bullets per volley). Upon a successful hit, half of bullets (rounded down) fired in a volley hit the target. In an extreme success all bullets hit, plus half rounded down are impaling strikes. Successive volleys can be fired in a single turn, however each successive volley increases the difficulty of the skill check. Cost: 1 Combat Action for single volley, 1 Turn for multiple volleys, +1 penalty die / difficulty increase for each successive volley in a single turn."
     },
     {
       "id": "reload_action",
       "keywords": ["reload", "reload weapon", "reload firearm"],
       "title": "Reload Weapon",
-      "answer": "Reset a ranged weapon for the next shot. Bolt-casters reload one bolt at a time as a free flick of the action, or take a full action to swap a magazine. Out-of-combat reloads are free."
+      "answer": "Reload your weapon. Each weapon has a different reload speed. It takes one combat action to load 2 shells into any weapon that requires manual loading of individual bullets, such as revolvers and shotguns. Weapons that use magazine clips take 1 combat action to reload a whole clip. It takes two full turns to reload heavy weapon ammunition. You cannot reload during the same action as a sprint. Cost: 1 Combat Action."
     },
     {
       "id": "single_bullet_reload",
       "keywords": ["single bullet reload", "one shot reload"],
       "title": "Single Bullet Reload",
-      "answer": "Top off a partially-empty bolt-caster magazine without swapping the whole stick. Costs 1 penalty die on the next shot — you reloaded mid-stance and your hand is full."
+      "answer": "On weapons with manual reloading, you can load a single shell into the weapon and fire in the same combat round, however that combat action will incur a penalty die. Cost: +1 Penalty die for combat roll."
     },
 
     {
       "id": "dodge_melee",
       "keywords": ["dodge melee", "evade melee", "side-step blade"],
-      "title": "Dodge Melee",
-      "answer": "Reactive dodge against an incoming MELEE attack. Roll DEX against the attacker's total. Success negates the hit; failure means you committed to the dodge and the strike still lands. Costs your next reaction."
+      "title": "Dodge Melee — Skill: Dodge",
+      "answer": "MELEE ATTACKS ONLY. Dodge an attacker's melee attack or combat maneuver using an opposed dodge skill check. A defender's dodge check is an opposed skill roll to the attacker's fighting skill check, so it may still be possible to fail a successful dodge if the attacker rolls a higher success. In the case of a skill check draw, the success goes to the defender. If both fail their skill checks, no damage is inflicted. Cost: 1 Evasive Action."
     },
     {
       "id": "fight_back",
       "keywords": ["fight back", "counter strike", "defensive attack"],
-      "title": "Fight Back",
-      "answer": "Instead of dodging, opt to trade. Both you and the attacker roll your attack; whoever wins lands their hit. Risky — you can both miss, or you can both connect. Used when retreat is not on the table."
+      "title": "Fight Back — Skill: Fighting (Brawl) / Fighting (Weapon)",
+      "answer": "MELEE ATTACKS ONLY. Fight back an attacker's melee attack or combat maneuver using an opposed Fighting skill check. A defender's fighting check is an opposed skill roll to the attacker's fighting skill check, so it may still be possible to fail a successful fight back if the attacker rolls a higher success. In the case of a skill check draw, the success goes to your attacker. If both fail their skill checks, you're both at an impasse. Critical strikes / impaling strikes do not occur on extreme successes during a fight back. Cost: 1 Evasive Action."
     },
     {
       "id": "dive_for_cover",
       "keywords": ["dive for cover", "dive aside", "drop and roll"],
-      "title": "Dive for Cover",
-      "answer": "FIREARMS-DEFENSE ONLY. If you are aware they are about to shoot, you can dive into cover before the attack lands. Made as a DEX check against the shooter's roll. Success drops you behind something; failure leaves you exposed AND prone."
+      "title": "Dive for Cover — Skill: Dodge",
+      "answer": "FIREARM ATTACKS ONLY. If you are aware they are about to be shot at, you may state before the attacker rolls their firearms check that you wish to dive for cover. Make a dodge check; if your dodge check is successful, your attacker will receive a penalty die during their firearms check to hit you. You may dive for cover in any direction and will dive at a distance equal to 1/5th of your DEX in feet. Diving for cover will automatically lose the defender their next combat round. Cost: 1 Evasive Action, next combat round. Gain: Attacker receives +1 penalty die."
+    },
+
+    {
+      "id": "mod_sprinting",
+      "keywords": ["sprinting modifier", "sprinting attacker"],
+      "title": "Sprinting (Modifier — Firearms Attacks Only)",
+      "answer": "Player is sprinting during combat round. +1 Penalty Die on shots. Trying to aim a bolt-caster while running drops your accuracy by a die — the breath isn't steady, the sight isn't level."
+    },
+    {
+      "id": "mod_player_size",
+      "keywords": ["player size modifier", "target size", "size penalty"],
+      "title": "Target Size (Modifier — Firearms Attacks Only)",
+      "answer": "Target build is -2 → +1 penalty die. Target build is +4 → +1 bonus die. Smaller targets are harder to hit; larger targets are easier. Build is the target's racial baseline plus armor bulk."
+    },
+    {
+      "id": "mod_attacker_range",
+      "keywords": ["attacker range modifier", "target range", "range penalty"],
+      "title": "Target Range (Modifier — Firearms Attacks Only)",
+      "answer": "Target distance is x2 to x4 weapon range: Hard difficulty roll. Beyond x4: Extreme difficulty roll. Bolt-casters drop sharply outside the band they were tuned for."
+    },
+    {
+      "id": "mod_player_armour",
+      "keywords": ["player armour modifier", "target armour", "armour reduction"],
+      "title": "Target Armour (Modifier)",
+      "answer": "Enemy is armoured. Damage taken is reduced by armour. Wired engine-side: aggregateArmor sums every armor piece's AC bonus and resistance list, applied automatically on every incoming hit."
+    },
+    {
+      "id": "mod_fire_into_melee",
+      "keywords": ["fire into melee modifier", "friendly fire"],
+      "title": "Fire Into Melee (Modifier — Firearms Attacks Only)",
+      "answer": "Target is engaged in melee combat with an ally. +1 penalty die, friendly fire on fumble. Putting a bolt through a fight risks hitting the wrong silhouette on a bad roll."
+    },
+    {
+      "id": "mod_overwhelmed",
+      "keywords": ["overwhelmed modifier", "outnumbered penalty"],
+      "title": "Overwhelmed (Modifier — Melee Attacks Only)",
+      "answer": "Attacked more than once in a single round. +1 Penalty Die on evasive actions. Multiple attackers strip your ability to defend cleanly — pick which blow gets your full attention, eat the rest."
+    },
+    {
+      "id": "mod_surprise_attack",
+      "keywords": ["surprise attack modifier", "ambush bonus"],
+      "title": "Surprise Attack (Modifier — Firearms Attacks Only)",
+      "answer": "Target does not anticipate attack. +1 Bonus Die. The 'ambush_strike' enemy trait implements this engine-side — enemies with that trait get +2 on their first attack of an encounter. (The melee/evasive card variant gives Automatic success OR +1 Bonus Die.)"
+    },
+    {
+      "id": "mod_impaling_strike",
+      "keywords": ["impaling strike modifier", "impaling damage"],
+      "title": "Impaling Strike (Modifier)",
+      "answer": "Roll Extreme Success with firearm: Full Damage + Damage Roll. (Melee variant: Opponent rolls Extreme Success with edged weapon. Full Damage + Full DB + Damage Roll.) Bolt-casters and edged melee can both impale; bludgeoning weapons cannot. Engine critical hits deliver max-die + damage roll."
+    },
+    {
+      "id": "mod_action_fumble",
+      "keywords": ["action fumble", "fumble", "critical fail"],
+      "title": "Action Fumble (Modifier)",
+      "answer": "Roll 96+ (if skill below 50) or 100 (if skill above 50). Failure with unintended consequences — your bolt-caster jams, your blade slips through your guard, your maneuver puts you on the ground. Engine equivalent: natural 1 on a d20 attack roll lands the auto-miss path AND can chip durability on the weapon you used."
+    },
+    {
+      "id": "mod_fast_moving_target",
+      "keywords": ["fast moving target", "moving target modifier"],
+      "title": "Fast-Moving Target (Modifier — Firearms Attacks Only)",
+      "answer": "Target is sprinting (MOV 8+). +1 Penalty Die on shots. Putting a bolt into something at a full run is the same problem as shooting from one — extra die against you."
+    },
+    {
+      "id": "mod_target_dive",
+      "keywords": ["target dive modifier", "dive penalty"],
+      "title": "Target Dive (Modifier — Firearms Attacks Only)",
+      "answer": "Target dives for cover and makes a successful dodge roll. +1 Penalty Die on shots. The dive succeeded — your bolt is going wider than the silhouette you aimed at."
+    },
+    {
+      "id": "mod_in_cover",
+      "keywords": ["in cover modifier", "cover penalty"],
+      "title": "In Cover (Modifier — Firearms Attacks Only)",
+      "answer": "Target is in partial / full cover. Partial: +1 Penalty Die on shots. Full: unable to hit. Find an angle, take the Penalty Die, or wait them out — those are your three options."
+    },
+    {
+      "id": "mod_weapon_malfunction",
+      "keywords": ["weapon malfunction", "jam", "fumble firearm"],
+      "title": "Weapon Malfunction (Modifier — Firearms)",
+      "answer": "Roll 96+ (if skill below 50) or 100 (if skill above 50). Weapon malfunction or other consequence. Bolt-caster jam, magazine flips, runecaster overheats — the shot doesn't land and your next action is fixing what just broke."
     },
 
     {
