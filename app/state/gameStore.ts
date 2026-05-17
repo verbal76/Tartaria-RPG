@@ -621,18 +621,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
     try {
       await setActiveSlot(slotId);
       const player = backfillPlayer(saved.player);
+      // If the save captured the live scene (v1+ saves do, older saves
+      // may not), drop the player back into it exactly as it was — no
+      // Arbiter rehash, no fresh weather roll, no re-spawned enemies.
+      // Resume is player-first: they take the next action.
+      const restoredScene = (saved.currentScene ?? null) as CurrentScene | null;
       set({
         player,
         worldMemory: saved.worldMemory,
         gameLog: saved.gameLog,
         currentScreen: 'exploration',
         activeSlotId: slotId,
-        currentScene: null,
+        currentScene: restoredScene,
         pendingRolls: null,
       });
-      // Saves don't store the scene; generate a fresh one so the player can
-      // immediately interact with the exploration screen.
-      get().beginScene();
+      // Only fall back to beginScene when the save predates scene
+      // capture. New saves restore the exact scene above and skip this.
+      if (!restoredScene) {
+        get().beginScene();
+      } else {
+        // Drop a small "back to the world" cue so the player can orient
+        // without a fresh narration block dominating the feed. Just the
+        // location name and a hint that they're resuming.
+        get().appendLog(
+          'world',
+          `You step back into ${restoredScene.location.name}. The world waits for your move.`,
+        );
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       // Roll the active slot back so we don't leave a half-set state.
@@ -3885,7 +3900,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   async persist() {
-    const { player, worldMemory, gameLog, currentScreen, activeSlotId } = get();
+    const { player, worldMemory, gameLog, currentScreen, currentScene, activeSlotId } = get();
     if (!activeSlotId) return; // No active slot — nothing to write to.
     // CRITICAL: refuse to overwrite a save with player=null. This guards
     // against transient states (mid-load, mid-death-cleanup, mid-OTA-
@@ -3900,6 +3915,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       worldMemory,
       gameLog: gameLog.slice(-MAX_LOG_IN_MEMORY),
       currentScreen,
+      // Snapshot the live scene so resume picks up exactly where the player
+      // left off — no fresh Arbiter narration, no re-rolled weather /
+      // enemies / vendor. The player should be the next actor on resume,
+      // not the AI. Skipped only when currentScene is null (player on the
+      // title screen, mid-load, etc.).
+      currentScene: currentScene ?? undefined,
     });
   },
 }));

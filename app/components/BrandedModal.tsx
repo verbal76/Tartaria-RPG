@@ -188,17 +188,22 @@ const styles = StyleSheet.create({
   body: { color: '#e6d8b3', fontSize: 13, lineHeight: 18, marginBottom: 4 },
   context: { color: '#9ec96a', fontSize: 12, marginTop: 8, letterSpacing: 1 },
   buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    // Buttons stack vertically so three-action modals (Equip Main Hand /
+    // Equip Off Hand / Close) don't overflow the left edge of the card
+    // when their combined width exceeds the container — previously the
+    // row laid them out with justifyContent: 'flex-end' and the leftmost
+    // button ran off the screen. Vertical stacking is also a bigger tap
+    // target per button.
+    flexDirection: 'column',
+    alignItems: 'stretch',
     gap: 8,
     marginTop: 14,
   },
   btn: {
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderRadius: 3,
     borderWidth: 1,
-    minWidth: 80,
     alignItems: 'center',
   },
   btnPressed: { opacity: 0.7 },

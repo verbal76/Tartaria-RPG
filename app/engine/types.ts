@@ -93,6 +93,10 @@ export interface Enemy {
   hp: number;
   rarity: Rarity;
   loot: string[];
+  /** Synonyms the parser accepts for this enemy. "Architectural Sentinel"
+   *  might list ["sentinel", "guardian", "statue"] so `attack the sentinel`
+   *  resolves to the canonical entity. Lowercase, no punctuation. */
+  aliases?: string[];
 }
 
 export interface WeatherEntry {
@@ -136,6 +140,11 @@ export interface Location {
   discoverable: boolean;
   parent?: string;
   controlledBy?: string;
+  /** Synonyms the parser will accept when the player references this
+   *  location. "tartarian arch" might list ["arch", "workroom", "hollow"]
+   *  so `search workroom` resolves correctly even when the canonical name
+   *  is verbose. Lowercase, no punctuation. */
+  aliases?: string[];
 }
 
 export interface QuestObjective { id: string; verb: string; target: string; tags: string[]; }
@@ -418,4 +427,12 @@ export interface SaveState {
   worldMemory: WorldMemory;
   gameLog: GameLogEntry[];
   currentScreen: ScreenName;
+  /** Scene the player was in when they saved. Optional for back-compat
+   *  with older saves that did not capture it — those still fall back to
+   *  beginScene() on load. When present, loadSlotIntoGame restores it
+   *  as-is so the player resumes exactly where they left off without a
+   *  fresh Arbiter narration or a re-rolled scene. Typed `unknown` here
+   *  because the CurrentScene shape lives in the game store; the load
+   *  flow casts it back at boundary. */
+  currentScene?: unknown;
 }
