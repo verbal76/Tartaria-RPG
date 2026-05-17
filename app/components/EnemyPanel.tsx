@@ -11,6 +11,7 @@ import {
   type ListRenderItem,
 } from 'react-native';
 import type { Enemy } from '../engine/types';
+import { describeTrait, traitACBonus } from '../engine/enemyTraits';
 
 export interface EnemyView {
   enemy: Enemy;
@@ -85,7 +86,8 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive }: Props) {
 
 function EnemyCard({ view }: { view: EnemyView }) {
   const apNum = parseInt(view.enemy.abilityPoint, 10);
-  const ac = Math.max(5, Math.min(18, 5 + (Number.isFinite(apNum) ? apNum : 0)));
+  const baseAc = Math.max(5, Math.min(18, 5 + (Number.isFinite(apNum) ? apNum : 0)));
+  const ac = Math.max(1, baseAc + traitACBonus(view.enemy.traits));
   const attackNum = parseInt(String(view.enemy.attack), 10);
   const atkLabel = Number.isFinite(attackNum) ? `+${attackNum}` : String(view.enemy.attack);
   const hpPct = Math.max(0, Math.min(1, view.currentHp / Math.max(1, view.enemy.hp)));
@@ -122,6 +124,15 @@ function EnemyCard({ view }: { view: EnemyView }) {
         <Stat label="ATK" value={atkLabel} />
         <Stat label="DMG" value={String(view.enemy.damage)} />
       </View>
+      {view.enemy.traits && view.enemy.traits.length > 0 && (
+        <View style={styles.traitRow}>
+          {view.enemy.traits.map((t) => (
+            <Text key={t} style={styles.traitBadge}>
+              {describeTrait(t)}
+            </Text>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
@@ -169,6 +180,17 @@ const styles = StyleSheet.create({
   stat: { flex: 1 },
   statLabel: { color: '#7a705c', fontSize: 9, letterSpacing: 1 },
   statValue: { color: '#e6d8b3', fontSize: 12, fontWeight: '600' },
+  traitRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
+  traitBadge: {
+    color: '#c9a86a',
+    fontSize: 9,
+    letterSpacing: 1,
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderColor: '#5a4a2e',
+    borderWidth: 1,
+    borderRadius: 2,
+  },
   dots: {
     flexDirection: 'row',
     alignItems: 'center',

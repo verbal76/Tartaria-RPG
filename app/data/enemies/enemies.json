@@ -11,7 +11,8 @@
       "Boar Hide",
       "Aether Mud"
     ],
-    "aliases": ["boar", "pig", "hog", "the boar"]
+    "aliases": ["boar", "pig", "hog", "the boar"],
+    "traits": ["savage", "ambush_strike"]
   },
   {
     "name": "Mud Wasp",
@@ -24,7 +25,8 @@
     "loot": [
       "Wasp Venom",
       "Aether Residue"
-    ]
+    ],
+    "traits": ["quick", "venomous"]
   },
   {
     "name": "Swamp Crab",
@@ -93,7 +95,8 @@
       "Ooze Residue",
       "Aether Crystal"
     ],
-    "aliases": ["ooze", "slime", "the ooze", "blob"]
+    "aliases": ["ooze", "slime", "the ooze", "blob"],
+    "traits": ["regenerate", "vulnerable:burn", "resist:slashing"]
   },
   {
     "name": "Aetherbat",
@@ -146,7 +149,8 @@
     "loot": [
       "Tortoise Shell",
       "Mud Fragment"
-    ]
+    ],
+    "traits": ["armored", "slow", "resist:slashing", "resist:piercing"]
   },
   {
     "name": "Aetheric Spider",
@@ -156,6 +160,7 @@
     "damage": "1D6",
     "hp": 12,
     "rarity": "Common",
+    "traits": ["quick", "ambush_strike", "venomous"],
     "loot": [
       "Spider Silk",
       "Aether Venom"
@@ -170,6 +175,7 @@
     "damage": "2D6",
     "hp": 15,
     "rarity": "Common",
+    "traits": ["armored", "resist:piercing", "vulnerable:burn"],
     "loot": [
       "Drone Processor",
       "Aetheric Cog"

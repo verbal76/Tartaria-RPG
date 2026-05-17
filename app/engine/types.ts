@@ -97,6 +97,18 @@ export interface Enemy {
    *  might list ["sentinel", "guardian", "statue"] so `attack the sentinel`
    *  resolves to the canonical entity. Lowercase, no punctuation. */
   aliases?: string[];
+  /** Per-enemy perks layered on top of the macro type-resistance map.
+   *  Supported ids live in engine/enemyTraits.ts; examples:
+   *  - "armored"            (+2 AC)
+   *  - "quick"              (+1 attack roll)
+   *  - "slow"               (−1 attack roll)
+   *  - "regenerate"         (+1 HP per round, capped at starting HP)
+   *  - "bleeder"            (50% chance to apply bleed on hit)
+   *  - "resist:slashing"    (halve incoming slashing damage)
+   *  - "vulnerable:burn"    (1.5× incoming burn damage)
+   *  - "ambush_strike"      (+2 to the first hit on a target)
+   *  Unknown ids are ignored — safe to extend the catalog. */
+  traits?: string[];
 }
 
 export interface WeatherEntry {

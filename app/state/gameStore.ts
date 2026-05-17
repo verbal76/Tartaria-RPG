@@ -149,6 +149,7 @@ import {
   fuzzyFindStoryline,
 } from '../engine/factionStorylines';
 import { tickWeather, weatherBlocksRepositioning, weatherRepositionCost, weatherAttackPenalty, weatherStatModifiers, describeWeatherStatModifiers } from '../engine/weatherEffects';
+import { traitAttackBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, describeTraits } from '../engine/enemyTraits';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
 import { levenshtein } from '../engine/editDistance';
 import { isAreaSearch, rollAreaSearch } from '../engine/areaSearch';
@@ -2583,7 +2584,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // weaknesses without sacrificing their weapon's durability.
       const weaponType = barehand ? 'bludgeoning' : (equipped?.damageType ?? null);
       const mod = applyDamageTypeModifier(rawDmg, weaponType, enemy.type);
-      const dmg = mod.damage;
+      // Layer per-enemy trait modifiers on top of the type-resistance map.
+      // Stacks multiplicatively — an Iron Spider with "resist:slashing"
+      // halves AGAIN on top of the Construct type's slashing resist.
+      const traitMod = traitDamageMultiplier(enemy.traits, weaponType);
+      const dmg = Math.max(1, Math.round(mod.damage * traitMod.multiplier));
       const prevHp = currentScene.enemyHps[activeIdx] ?? enemy.hp;
       const newEnemyHp = prevHp - dmg;
 
@@ -2593,6 +2598,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('combat', `Weakness exposed — ${enemy.name} flinches. (${weaponType} ×1.5 → ${dmg})`);
       } else if (mod.match === 'resist') {
         get().appendLog('combat', `${enemy.name} shrugs off the ${weaponType}. (resisted, ×0.5 → ${dmg})`);
+      }
+      if (traitMod.match === 'vulnerable') {
+        get().appendLog('combat', `${enemy.name} is vulnerable to ${weaponType}. (trait ×1.5)`);
+      } else if (traitMod.match === 'resist') {
+        get().appendLog('combat', `${enemy.name}'s perks resist ${weaponType}. (trait ×0.5)`);
       }
 
       // Weapon wear: any successful hit chips one point off the weapon
@@ -4587,7 +4597,9 @@ function applyEnemyCounter(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
 ) {
-  const atkBonus = parseInt(String(enemy.attack), 10) || 3;
+  const baseAtk = parseInt(String(enemy.attack), 10) || 3;
+  const traitAtk = traitAttackBonus(enemy.traits);
+  const atkBonus = baseAtk + traitAtk;
   const atkRoll = rollDie(20);
   const atkTotal = atkRoll + atkBonus;
   // Effective AC = race base + summed armor bonus from head/chest/legs/feet
@@ -4650,6 +4662,10 @@ function applyEnemyCounter(
 
     // Roll for a status effect to apply based on the damage type.
     const newEffect = rollIncomingStatusEffect(enemyDamageType, player.statusEffects ?? []);
+    // Per-enemy trait effects on a successful hit (bleeder / corrupting /
+    // concussive). Independent of the damage-type roll so a trait can
+    // stack with a type-based status.
+    const traitHit = traitOnHitStatus(enemy.traits);
 
     // Armor wear: every armor piece that actually contributes to the
     // player's defence chips one point. Pieces with 0 durability or no
@@ -4672,9 +4688,16 @@ function applyEnemyCounter(
         ? `${enemy.name} deals ${dmg} damage${resistTag}. You fall.`
         : `${enemy.name} deals ${dmg} damage${resistTag}. You have ${newHp} HP remaining.`;
       void Promise.resolve().then(() => get().appendLog('combat', msg));
-      const effects = newEffect
+      let effects = newEffect
         ? applyEffect(nextPlayer.statusEffects ?? [], newEffect.effect)
         : nextPlayer.statusEffects;
+      if (traitHit) {
+        effects = applyEffect(effects ?? [], {
+          kind: traitHit.kind,
+          remainingRounds: traitHit.rounds,
+          label: traitHit.label,
+        });
+      }
       return { player: { ...nextPlayer, hp: newHp, statusEffects: effects } };
     });
 
@@ -4686,6 +4709,12 @@ function applyEnemyCounter(
       const verb = newEffect.isNew ? 'inflicts' : 'refreshes';
       void Promise.resolve().then(() =>
         get().appendLog('combat', `The ${enemyDamageType} ${verb} ${newEffect.effect.label}.`),
+      );
+    }
+
+    if (traitHit) {
+      void Promise.resolve().then(() =>
+        get().appendLog('combat', `${enemy.name}'s strike leaves you ${traitHit.label}.`),
       );
     }
 
@@ -4728,6 +4757,30 @@ function applyEnemyCounter(
 
     if (killed) {
       void Promise.resolve().then(() => handlePlayerDeath(get, set));
+    }
+  }
+  // End-of-round regen for the attacking enemy. Caps at its starting HP
+  // so a player can't out-wait a regenerator past its base.
+  const regen = traitRegen(enemy.traits);
+  if (regen > 0) {
+    const live = get().currentScene;
+    if (live) {
+      const idx = live.enemies.findIndex((e) => e === enemy);
+      if (idx >= 0) {
+        const cur = live.enemyHps[idx] ?? 0;
+        if (cur > 0 && cur < enemy.hp) {
+          const next = Math.min(enemy.hp, cur + regen);
+          set((s) => {
+            if (!s.currentScene) return {};
+            const hps = [...s.currentScene.enemyHps];
+            hps[idx] = next;
+            return { currentScene: { ...s.currentScene, enemyHps: hps } };
+          });
+          void Promise.resolve().then(() =>
+            get().appendLog('combat', `${enemy.name} regenerates ${regen} HP (${next}/${enemy.hp}).`),
+          );
+        }
+      }
     }
   }
 }

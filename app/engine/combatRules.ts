@@ -2,6 +2,7 @@ import type { RollStep, PlayerCharacter, Enemy, Stats } from './types';
 import { rollDie } from './rng';
 import { findWeaponByName, type CatalogWeapon } from './crafting';
 import { effectiveStats } from './equipment';
+import { traitACBonus } from './enemyTraits';
 
 type WeaponClass = 'ranged' | 'melee' | 'runecaster' | 'barehanded';
 
@@ -49,7 +50,8 @@ function attackStatFor(
 
 function enemyAC(enemy: Enemy): number {
   const ap = parseInt(String(enemy.abilityPoint), 10);
-  return isNaN(ap) ? 8 : Math.max(5, Math.min(18, 5 + ap));
+  const base = isNaN(ap) ? 8 : Math.max(5, Math.min(18, 5 + ap));
+  return Math.max(1, base + traitACBonus(enemy.traits));
 }
 
 // Rulebook: Common 1d6 / Uncommon 2d6 / Rare 1d10+1d6 / Legendary 2d10
