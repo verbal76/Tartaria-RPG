@@ -152,19 +152,41 @@ export async function deleteSlot(slotId: string): Promise<void> {
   }
 }
 
-export async function appendLogToDisk(line: string): Promise<void> {
-  if (!activeSlotId) return;
-  try {
-    const key = slotLogKey(activeSlotId);
-    const existing = (await AsyncStorage.getItem(key)) ?? '';
-    await AsyncStorage.setItem(key, existing + line + '\n');
-  } catch (e) {
-    console.warn('appendLogToDisk failed', e);
-  }
+// Serialize writes through a single promise chain. The previous version
+// did read-modify-write per call non-awaited, which raced under burst
+// load — many entries would silently disappear when several persistEntry
+// calls landed within the same JS tick. Now every appendLogToDisk
+// chains onto the previous one, so the disk log keeps the whole
+// sequence.
+let logWriteChain: Promise<void> = Promise.resolve();
+
+export function appendLogToDisk(line: string): Promise<void> {
+  if (!activeSlotId) return Promise.resolve();
+  logWriteChain = logWriteChain.then(async () => {
+    if (!activeSlotId) return;
+    try {
+      const key = slotLogKey(activeSlotId);
+      const existing = (await AsyncStorage.getItem(key)) ?? '';
+      await AsyncStorage.setItem(key, existing + line + '\n');
+    } catch (e) {
+      console.warn('appendLogToDisk failed', e);
+    }
+  });
+  return logWriteChain;
+}
+
+// Block until every queued log write has flushed to disk. Called by
+// LogScreen before reading so COPY ALL captures the entire history,
+// not whatever snapshot won the race at unmount time.
+export async function flushLogWrites(): Promise<void> {
+  await logWriteChain;
 }
 
 export async function readFullLog(): Promise<string> {
   if (!activeSlotId) return '';
+  // Drain any in-flight writes before reading so the snapshot includes
+  // everything that fired up to this moment.
+  await logWriteChain;
   try {
     return (await AsyncStorage.getItem(slotLogKey(activeSlotId))) ?? '';
   } catch {

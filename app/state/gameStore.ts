@@ -2611,6 +2611,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : `${enemy.name} moves first. The pressure is immediate.`);
     }
 
+    // Always log the player's attack roll math so the combat log mirrors
+    // the enemy's "d20 → X + ATK Y = Z vs AC W" line. Without this the
+    // disk log only shows enemy attack rolls, which reads as one-sided.
+    if (attack && typeof attack.total === 'number' && attack.target !== undefined) {
+      const naturalRoll = attack.values?.[0] ?? attack.total - attack.bonus;
+      const acTag = `vs ${enemy.name} AC ${attack.target}`;
+      const outcome = attack.success ? '✓ HIT' : '✗ MISS';
+      get().appendLog(
+        'combat',
+        `You — d20 → ${naturalRoll} + ${attack.bonusLabel} = ${attack.total} ${acTag} — ${outcome}`,
+      );
+    }
+
     if (attack?.success) {
       const rawDmg = damage?.total ?? rollDie(6);
       const barehand = isBareHandAttack(actionText);
