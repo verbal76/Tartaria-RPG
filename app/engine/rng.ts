@@ -34,6 +34,46 @@ export function pick<T>(items: readonly T[]): T {
   return items[i] as T;
 }
 
+// Module-level cursors so a given pool cycles through its entries before
+// repeating, regardless of how many times it's called. Use a stable string
+// key per pool (caller-provided) so unrelated pools don't share state.
+const rotationCursors = new Map<string, number>();
+const lastSeenIndex = new Map<string, number>();
+
+/**
+ * Round-robin picker — every entry shows up once before any entry shows
+ * up twice. The cursor is module-scoped and per-key, so callers using
+ * the same `key` from different sites share the rotation.
+ *
+ * Playtest log showed the same Arbiter filler line (e.g. "Tartaria was a
+ * place of life and power once") appearing ~5 minutes apart because
+ * `pick()` is random and the dedup window only catches near-immediate
+ * repeats. This makes filler feel curated even on long sessions.
+ *
+ * The optional `avoidLast` flag also refuses to return the immediately
+ * previous pick for the same key — useful when you want sequential calls
+ * to look different even if the pool gets reset.
+ */
+export function rotatingPick<T>(items: readonly T[], key: string, avoidLast = true): T {
+  if (items.length === 0) throw new Error('rotatingPick() called on empty array');
+  if (items.length === 1) return items[0] as T;
+  const prev = rotationCursors.get(key) ?? -1;
+  let next = (prev + 1) % items.length;
+  if (avoidLast) {
+    const last = lastSeenIndex.get(key);
+    if (last === next) next = (next + 1) % items.length;
+  }
+  rotationCursors.set(key, next);
+  lastSeenIndex.set(key, next);
+  return items[next] as T;
+}
+
+// Test-only escape hatch — clears rotation state so tests start fresh.
+export function resetRotationCursors(): void {
+  rotationCursors.clear();
+  lastSeenIndex.clear();
+}
+
 export function pickWeighted<T>(items: readonly T[], weight: (item: T) => number): T {
   if (items.length === 0) throw new Error('pickWeighted() called on empty array');
   const weights = items.map(weight);

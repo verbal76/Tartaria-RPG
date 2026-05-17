@@ -10,7 +10,7 @@ import type {
   PlayerCharacter,
   WorldMemory,
 } from './types';
-import { pick, chance } from './rng';
+import { pick, chance, rotatingPick } from './rng';
 import openings from '../data/events/openings.json';
 import moodQuotes from '../data/lore/arbiter-mood-quotes.json';
 import intentQuotes from '../data/lore/arbiter-intent-quotes.json';
@@ -245,6 +245,11 @@ const GENERIC_REMARKS = [
   `"Few return from these ruins unchanged," the Arbiter murmurs.`,
   `The Arbiter watches the dust hang in the air. "It always does that, here. I've never known why."`,
   `"Tartaria was a place of life and power once," the Arbiter says. "Now mostly whispers."`,
+  `The Arbiter glances at the horizon. "Pick a direction. Tartaria rewards motion more than thought."`,
+  `"The Aether listens to verbs, not adjectives," the Arbiter notes. "Try doing something."`,
+  `The Arbiter waits, expression unreadable. "Decide."`,
+  `"The road is patient," the Arbiter says. "You are not. Use that."`,
+  `The Arbiter shifts their weight. "I will know what you mean when you act."`,
 ];
 
 export interface ArbiterContext {
@@ -299,23 +304,32 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
   if (inCombat) {
     // ~20% chance to ack the player's most recent action even in combat —
     // gives the Arbiter a beat of awareness before the combat color.
+    // recentActions is pre-filtered in gameStore so meta-questions don't
+    // land here, but defense-in-depth: bail if it looks like a sentence
+    // rather than a verb phrase.
     if (
       ctx.recentActions &&
       ctx.recentActions.length > 0 &&
       Math.random() < 0.2
     ) {
       const lastAction = ctx.recentActions[ctx.recentActions.length - 1];
-      if (lastAction && lastAction.trim().length > 0) {
+      if (
+        lastAction &&
+        lastAction.trim().length > 0 &&
+        lastAction.length <= 30 &&
+        !lastAction.includes('?') &&
+        !/^\s*(what|how|why|who|when|where|i am|i'm|am i)\b/i.test(lastAction)
+      ) {
         return `The Arbiter notes how you ${lastAction.trim()}. ${combatRemark(ctx.enemy!)}`;
       }
     }
-    // Mood/intent pools still get a turn so combat remarks vary in color.
-    const aggressionPool = pickMoodPool('AGGRESSION');
+    // Combat color rotates between enemy-aware remarks and the attack
+    // intent pool. Mood-pool lines (Mud Monarchs etc.) used to fire here
+    // and read as off-topic mid-knife-fight; cut that branch entirely.
     const intentAttack = INTENT_REMARKS.attack;
     const r = Math.random();
-    if (r < 0.55) return combatRemark(ctx.enemy!);
-    if (r < 0.8 && intentAttack && intentAttack.length > 0) return pick(intentAttack);
-    if (aggressionPool) return pick(aggressionPool).replace('this place', ctx.location.name);
+    if (r < 0.65) return combatRemark(ctx.enemy!);
+    if (intentAttack && intentAttack.length > 0) return rotatingPick(intentAttack, 'arbiter.combat.attack');
     return combatRemark(ctx.enemy!);
   }
 
@@ -372,7 +386,10 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
   if (ctx.hazard && Math.random() < 0.4) {
     return `The Arbiter eyes the ${ctx.hazard.name.toLowerCase()}. "I'd place that at a Hard, if I had to guess."`;
   }
-  return pick(GENERIC_REMARKS);
+  // Rotating pick — every entry shows up once before repeating, so the
+  // five filler lines stop landing twice in five minutes the way the
+  // playtest log captured.
+  return rotatingPick(GENERIC_REMARKS, 'arbiter.generic');
 }
 
 /**

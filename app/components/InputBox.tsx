@@ -58,6 +58,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)}
               />
             ) : null}
+            {/* Inventory access stays prominent in combat — playtest report
+                flagged "pack" at the end of the row as easy to miss. Sits
+                right after the weapons so swap/quaff flows are reachable
+                without scanning past dodge/block/advance. */}
+            <QuickBtn label="inventory" onPress={onOpenInventory} />
             <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} />
             <QuickBtn label="block" defensive onPress={() => onSubmit('block')} />
             {range && range !== 'arm' && (
@@ -66,7 +71,6 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             {range && range !== 'far' && (
               <QuickBtn label="step back" onPress={() => onSubmit('step back')} />
             )}
-            <QuickBtn label="pack" onPress={onOpenInventory} />
           </>
         ) : (
           <>

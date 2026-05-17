@@ -53,7 +53,7 @@ import {
   QWEN_ALLOWED_INTENTS,
 } from '../engine/narrativeGenerator';
 import { parseInput, type ParseContext } from '../engine/parser';
-import { rollDie, rollFromNotation, pick, chance } from '../engine/rng';
+import { rollDie, rollFromNotation, pick, chance, rotatingPick } from '../engine/rng';
 import { buildCombatSteps, buildSkillSteps, buildRestSteps } from '../engine/combatRules';
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
@@ -803,13 +803,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const entry = makeEntry(channel, text, meta);
     void persistEntry(entry);
     // Duplicate-chatter suppression. If the Arbiter just spoke the same
-    // line within the last 8 entries, swallow the repeat. Was producing
+    // line within the last 16 entries, swallow the repeat. Was producing
     // "I'd place that at a Hard, if I had to guess." twice in 30 seconds
-    // in the playtest log.
+    // in the playtest log. Widened from 8 to 16 to catch the slower
+    // duplicate-Arbiter cases like the same combat-flavor line firing
+    // across two rounds of player-vs-monster turns.
     if (channel === 'arbiter') {
-      const recent = get().gameLog.slice(-8);
+      const recent = get().gameLog.slice(-16);
       for (const prev of recent) {
         if (prev.channel === 'arbiter' && prev.text === text) return;
+      }
+    }
+    // World channel: dedup bracket-prefixed banner lines (radar / direction
+    // summaries / scene labels). Playtest log printed the same
+    // "[Endless Stair] north: Nimari (2 days' travel)..." twice within 65
+    // seconds with nothing in between to justify a repeat.
+    if (channel === 'world' && text.startsWith('[')) {
+      const recent = get().gameLog.slice(-8);
+      for (const prev of recent) {
+        if (prev.channel === 'world' && prev.text === text) return;
       }
     }
     set((state) => {
@@ -1491,6 +1503,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         const target = parsed.target?.toLowerCase() ?? '';
+        // Combat redirect — when an enemy is on the field and the player
+        // types "go to him" / "walk over" / "enter the fight" / any travel
+        // verb without a cardinal direction or named destination, treat it
+        // as combat advance instead of map travel. Playtest log: player
+        // typed something that read as "approach the reclaimer" and the
+        // travel handler dropped into narrateWanderingJourney while the
+        // enemy still stood across the room.
+        if (currentScene.enemies.length > 0) {
+          const isCardinalTravel = /\b(north|south|east|west|northeast|northwest|southeast|southwest)\b/.test(target);
+          if (!isCardinalTravel) {
+            runMoveCombatRange(get, set, player, currentScene, 'advance');
+            break;
+          }
+        }
         // Continue / keep going / onward — repeat the player's last cardinal
         // direction without making them retype it. If there's no last
         // direction recorded (player just spawned, or last move was a named
@@ -1664,50 +1690,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       case 'advance':
       case 'retreat': {
-        const moveEnemy = activeEnemy(currentScene);
-        if (!moveEnemy) {
-          get().appendLog('arbiter', `The Arbiter shrugs. "Nothing to advance on. The ground here is quiet."`);
-          break;
-        }
-        if (weatherBlocksRepositioning(currentScene.weather)) {
-          get().appendLog(
-            'arbiter',
-            `The Arbiter holds up a hand. "${currentScene.weather.name} has taken the ground from you. You cannot reposition."`,
-          );
-          break;
-        }
-        const order: CombatRange[] = ['arm', 'close', 'far'];
-        const cur = currentScene.range ?? 'close';
-        const curIdx = order.indexOf(cur);
-        const nextIdx = parsed.intent === 'advance' ? Math.max(0, curIdx - 1) : Math.min(order.length - 1, curIdx + 1);
-        const next = order[nextIdx]!;
-        const groupLabel = currentScene.enemies.length > 1
-          ? `the ${currentScene.enemies.length} ${moveEnemy.name}s`
-          : moveEnemy.name;
-        if (next === cur) {
-          get().appendLog(
-            'world',
-            parsed.intent === 'advance'
-              ? `You are already at arm's reach with ${groupLabel}.`
-              : `You cannot put more ground between you and ${groupLabel}.`,
-          );
-          break;
-        }
-        set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, range: next } } : s));
-        get().appendLog(
-          'world',
-          parsed.intent === 'advance'
-            ? `You close the gap with ${groupLabel}. (range: ${RANGE_LABEL[next]})`
-            : `You pull back from ${groupLabel}. (range: ${RANGE_LABEL[next]})`,
-        );
-        // Movement takes a beat — let any enemy still in their effective
-        // range counter-attack. Group: every reaching enemy fires.
-        const reachers = currentScene.enemies.filter((e, i) =>
-          enemyCanReach(e, next) && (currentScene.enemyHps[i] ?? 0) > 0,
-        );
-        if (reachers.length > 0) {
-          runEnemyGroupCounters(get, set, get().player ?? player);
-        }
+        runMoveCombatRange(get, set, player, currentScene, parsed.intent);
         break;
       }
       case 'ask': {
@@ -1889,10 +1872,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (concept) {
           get().appendLog('arbiter', `"${concept.title}." the Arbiter says. "${concept.answer}"`);
         } else {
-          get().appendLog(
-            'arbiter',
+          // Rotating concept-miss replies — playtest log showed the same
+          // "I do not have a clean answer" line firing twice ~5 minutes
+          // apart. Variety prevents the "broken record" feeling.
+          const missReplies = [
             `The Arbiter considers. "I do not have a clean answer for that yet. Try a damage type, a faction, or one of the basic systems — HP, stamina, AC, corruption, the Aether."`,
-          );
+            `The Arbiter tilts their head. "Not a thing I have words for. Try a faction name, a damage type, or a system like HP or AC."`,
+            `The Arbiter exhales. "That sits outside what I know. Ask about HP, stamina, AC, corruption, the Aether — or a faction."`,
+            `The Arbiter shrugs. "I cannot place that. The basic systems — HP, stamina, AC, corruption, the Aether — those I can answer."`,
+          ];
+          get().appendLog('arbiter', rotatingPick(missReplies, 'arbiter.concept-miss'));
         }
         break;
       }
@@ -2143,10 +2132,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!get().pendingRolls) {
       const lastCog = get().cognitiveLastResponse;
       const mood = lastCog?.inferredEmotions[0];
+      // Filter out player questions / meta-commentary before treating them as
+      // "recent actions" the Arbiter can reference. Playtest log showed the
+      // Arbiter stitching a frustrated meta-question into a narrative:
+      //   "The Arbiter notes how you there is a reclaimer ambusher in the
+      //    top right window, I am supposed to be in active combat, how does
+      //    advance not take me to an enemy?."
+      // Heuristic: drop anything with a question mark, anything beginning
+      // with a question word, and anything that looks too long to be a
+      // single action phrase.
       const recentActions = get()
         .gameLog.filter((e) => e.channel === 'player')
         .slice(-3)
-        .map((e) => e.text);
+        .map((e) => e.text)
+        .filter((t) => {
+          if (!t || t.length > 40) return false;
+          if (t.includes('?')) return false;
+          if (/^\s*(what|how|why|who|when|where|which|am i|is this|can i|do i)\b/i.test(t)) return false;
+          return true;
+        });
       const unresolvedHooks = (currentScene.hooks ?? [])
         .filter((h) => !h.resolved)
         .map((h) => ({ kind: h.kind, nouns: h.nouns }));
@@ -4289,6 +4293,64 @@ function resolveHookOneStep(
   }
   if (fatal) {
     void Promise.resolve().then(() => handlePlayerDeath(get, set));
+  }
+}
+
+// Step the combat range one band toward the enemy (advance) or away
+// (retreat). Extracted so non-combat verbs can route here — e.g. a player
+// typing "go to him" or "approach the reclaimer" mid-combat should close
+// distance the same way "advance" does, instead of falling through to
+// narrateWanderingJourney.
+function runMoveCombatRange(
+  get: () => GameStore,
+  set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
+  player: PlayerCharacter,
+  scene: CurrentScene,
+  direction: 'advance' | 'retreat',
+): void {
+  const moveEnemy = activeEnemy(scene);
+  if (!moveEnemy) {
+    get().appendLog('arbiter', `The Arbiter shrugs. "Nothing to ${direction === 'advance' ? 'advance on' : 'pull back from'}. The ground here is quiet."`);
+    return;
+  }
+  if (weatherBlocksRepositioning(scene.weather)) {
+    get().appendLog(
+      'arbiter',
+      `The Arbiter holds up a hand. "${scene.weather.name} has taken the ground from you. You cannot reposition."`,
+    );
+    return;
+  }
+  const order: CombatRange[] = ['arm', 'close', 'far'];
+  const cur = scene.range ?? 'close';
+  const curIdx = order.indexOf(cur);
+  const nextIdx = direction === 'advance' ? Math.max(0, curIdx - 1) : Math.min(order.length - 1, curIdx + 1);
+  const next = order[nextIdx]!;
+  const groupLabel = scene.enemies.length > 1
+    ? `the ${scene.enemies.length} ${moveEnemy.name}s`
+    : moveEnemy.name;
+  if (next === cur) {
+    get().appendLog(
+      'world',
+      direction === 'advance'
+        ? `You are already at arm's reach with ${groupLabel}.`
+        : `You cannot put more ground between you and ${groupLabel}.`,
+    );
+    return;
+  }
+  set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, range: next } } : s));
+  get().appendLog(
+    'world',
+    direction === 'advance'
+      ? `You close the gap with ${groupLabel}. (range: ${RANGE_LABEL[next]})`
+      : `You pull back from ${groupLabel}. (range: ${RANGE_LABEL[next]})`,
+  );
+  // Movement takes a beat — let any enemy still in their effective
+  // range counter-attack. Group: every reaching enemy fires.
+  const reachers = scene.enemies.filter((e, i) =>
+    enemyCanReach(e, next) && (scene.enemyHps[i] ?? 0) > 0,
+  );
+  if (reachers.length > 0) {
+    runEnemyGroupCounters(get, set, get().player ?? player);
   }
 }
 
