@@ -12,13 +12,15 @@ const channelColors: Record<LogChannel, string> = {
   combat: '#e07a5f',
   reward: '#9ec96a',
   cognitive: '#7a705c',  // dim grey — debug-style, not story content
+  debug: '#605648',  // dimmer still — only shows up in the COPY ALL log
 };
 
 // The `cognitive` channel is MiniLM's emotion/intent classifier output —
-// useful as a dev diagnostic but pure noise to the player. We keep the
-// entries in the underlying gameLog (and they still show up in the LogScreen
-// / About debug panel) but hide them from the in-game adventure feed.
-const HIDDEN_CHANNELS: ReadonlySet<LogChannel> = new Set(['cognitive']);
+// useful as a dev diagnostic but pure noise to the player. The `debug`
+// channel is engine-side diagnostics (parser decisions, combat range
+// transitions). Both still land in the on-disk log so we can read them in
+// LogScreen → COPY ALL when chasing a bug.
+const HIDDEN_CHANNELS: ReadonlySet<LogChannel> = new Set(['cognitive', 'debug']);
 
 export function AdventureFeed({ entries }: Props) {
   const scrollRef = useRef<ScrollView>(null);

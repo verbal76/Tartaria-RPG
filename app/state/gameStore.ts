@@ -815,7 +815,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (channel === 'arbiter' && !meta?.skipDedup) {
       const recent = get().gameLog.slice(-16);
       for (const prev of recent) {
-        if (prev.channel === 'arbiter' && prev.text === text) return;
+        if (prev.channel === 'arbiter' && prev.text === text) {
+          // Log the suppression so a "nothing happened" playtest report
+          // can be traced back to dedup eating the line.
+          void persistEntry(makeEntry('debug', `dedup: suppressed arbiter repeat — "${text.slice(0, 60)}${text.length > 60 ? '…' : ''}"`));
+          return;
+        }
       }
     }
     // World channel: dedup bracket-prefixed banner lines (radar / direction
@@ -825,7 +830,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (channel === 'world' && text.startsWith('[')) {
       const recent = get().gameLog.slice(-8);
       for (const prev of recent) {
-        if (prev.channel === 'world' && prev.text === text) return;
+        if (prev.channel === 'world' && prev.text === text) {
+          void persistEntry(makeEntry('debug', `dedup: suppressed banner repeat — "${text.slice(0, 60)}${text.length > 60 ? '…' : ''}"`));
+          return;
+        }
       }
     }
     set((state) => {
@@ -1248,6 +1256,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       confidence: parsed.confidence,
       resolvedNoun: parsed.resolvedNoun,
     });
+    // Diagnostic — what the parser decided. Lands in the on-disk log
+    // (LogScreen → COPY ALL) but not the in-game feed. Lets us trace
+    // "I typed X and nothing happened" reports without guessing.
+    get().appendLog(
+      'debug',
+      `parser: intent=${parsed.intent} conf=${parsed.confidence.toFixed(2)} verb=${parsed.matchedVerb ?? '-'} target=${parsed.target ?? '-'} resolved=${parsed.resolvedNoun ?? '-'} range=${currentScene.range ?? '-'} enemies=${currentScene.enemies.length} hooks=${currentScene.hooks?.length ?? 0}`,
+    );
 
     if (parsed.intent === 'unknown' || parsed.confidence < 0.5) {
       const lastCog = get().cognitiveLastResponse;
@@ -1288,6 +1303,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const targetText = (parsed.resolvedNoun ?? parsed.target ?? trimmed).toLowerCase();
       const hook = matchHookNoun(targetText, currentScene.hooks);
       if (hook && !hook.resolved) {
+        get().appendLog('debug', `route: hook intercept (kind=${hook.kind}, target="${targetText}") — original intent=${parsed.intent}`);
         // Small stamina cost for engaging a hook (same as a skill check).
         set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
         resolveHookOneStep(hook, get, set);
@@ -1305,6 +1321,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const reach = barehand
             ? { bands: ['arm'] as CombatRange[], label: 'Bare hands' }
             : playerWeaponReach(player);
+          get().appendLog(
+            'debug',
+            `attack: target=${targetEnemy.name} range=${range} reach.bands=[${reach.bands.join(',')}] reach.label=${reach.label} bareHand=${barehand}`,
+          );
           if (!reach.bands.includes(range)) {
             // Don't strand the player on a refusal — close the gap (or
             // pull back) automatically and treat THIS turn as the
@@ -4340,12 +4360,18 @@ function runMoveCombatRange(
   scene: CurrentScene,
   direction: 'advance' | 'retreat',
 ): void {
+  get().appendLog(
+    'debug',
+    `move: ${direction} from range=${scene.range ?? '-'} enemies=${scene.enemies.length} weather=${scene.weather?.name ?? '-'}`,
+  );
   const moveEnemy = activeEnemy(scene);
   if (!moveEnemy) {
+    get().appendLog('debug', 'move: bail — no active enemy');
     get().appendLog('arbiter', `The Arbiter shrugs. "Nothing to ${direction === 'advance' ? 'advance on' : 'pull back from'}. The ground here is quiet."`);
     return;
   }
   if (weatherBlocksRepositioning(scene.weather)) {
+    get().appendLog('debug', `move: bail — weather blocks (${scene.weather.name})`);
     get().appendLog(
       'arbiter',
       `The Arbiter holds up a hand. "${scene.weather.name} has taken the ground from you. You cannot reposition."`,
@@ -4371,6 +4397,7 @@ function runMoveCombatRange(
     return;
   }
   set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, range: next } } : s));
+  get().appendLog('debug', `move: range ${cur} -> ${next}`);
   get().appendLog(
     'world',
     direction === 'advance'

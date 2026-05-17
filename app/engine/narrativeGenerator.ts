@@ -292,7 +292,7 @@ const COMBAT_REMARKS = [
 ];
 
 function combatRemark(enemy: Enemy): string {
-  return pick(COMBAT_REMARKS).replace('{enemy}', enemy.name.toLowerCase());
+  return rotatingPick(COMBAT_REMARKS, 'arbiter.combat.remark').replace('{enemy}', enemy.name.toLowerCase());
 }
 
 export function buildArbiterRemark(ctx: ArbiterContext): string {

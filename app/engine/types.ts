@@ -345,7 +345,7 @@ export interface PlayerCharacter {
   lastTravelDirection?: 'north' | 'east' | 'south' | 'west';
 }
 
-export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive';
+export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive' | 'debug';
 
 export interface RollStep {
   id: string;
