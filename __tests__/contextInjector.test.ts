@@ -374,7 +374,7 @@ describe('buildSystemPrompt', () => {
     expect(messages[1]!.role).toBe('user');
     const system = messages[0]!.content;
     expect(system).toContain('You are the Arbiter');
-    expect(system).toContain('DO NOT INVENT EXITS OR ENEMIES');
+    expect(system).toContain('DO NOT INVENT');
     expect(system).toContain('Asgardar');
     expect(system).toContain('go north');
     // Voice guardrails apply to every prompt — second-person, no fabrication,

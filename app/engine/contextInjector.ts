@@ -11,6 +11,7 @@ import type {
 } from './types';
 import type { ChatMessage } from '../ai/generation/QwenGenerativeEngine';
 import type { MacroLocation, MicroLocation, MicroMicroLocation } from './worldLadder';
+import { describeTraits } from './enemyTraits';
 
 /**
  * The strict, comma-light fact sheet that gets injected into the Qwen
@@ -160,10 +161,16 @@ const COMBAT_INSTRUCTION =
 
 export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
   const instruction = ctx.in_combat ? COMBAT_INSTRUCTION : PEACEFUL_INSTRUCTION;
+  // Strict location anchor — playtest log: Qwen narrated "The Borderlands,
+  // a twisted shadowy landscape..." while the player was in Tartarian
+  // Outskirts. The model needs an explicit "this is the only place that
+  // exists" instruction or it pulls names from training data.
+  const locationName = ctx.room_name;
   const system = [
     'You are the Arbiter, the ancient narrator of Tartaria.',
-    '[SYSTEM FACTS - DO NOT INVENT EXITS OR ENEMIES]',
+    `[SYSTEM FACTS - DO NOT INVENT EXITS, ENEMIES, OR PLACE NAMES]`,
     `Location: ${ctx.current_biome} - ${ctx.room_name}`,
+    `**The player is at "${locationName}". If you name any place, it MUST be "${locationName}". NEVER name "Borderlands", "Aetheric Deep", "Grand Hall", or any other location not listed.**`,
     `Environment: ${ctx.environmental_description}`,
     `Exits: ${ctx.available_exits}`,
     `Entities Present: ${ctx.active_entities}`,
@@ -224,7 +231,13 @@ export function formatActiveEntities(scene: SceneSlice | null): string {
     const entries = scene.enemies.map((enemy, idx) => {
       const hp = scene.enemyHps?.[idx];
       const hpFrag = typeof hp === 'number' && hp < enemy.hp ? ` (${hp}/${enemy.hp} HP)` : '';
-      return `${enemy.name}${hpFrag}`;
+      // Surface enemy perks to the LLM so narration can reference them
+      // accurately ("the armored Mud Tortoise shrugs off your strike").
+      // Bracket-delimited so Qwen treats them as metadata, not flowing prose.
+      const traitsFrag = enemy.traits && enemy.traits.length > 0
+        ? ` [${describeTraits(enemy.traits)}]`
+        : '';
+      return `${enemy.name}${hpFrag}${traitsFrag}`;
     });
     parts.push(entries.join(', '));
   }

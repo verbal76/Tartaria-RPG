@@ -8,8 +8,15 @@ import { QWEN_ALLOWED_INTENTS } from '../app/engine/narrativeGenerator';
 describe('QWEN_ALLOWED_INTENTS', () => {
   it('includes the narrative intents where an LLM paragraph adds value', () => {
     expect(QWEN_ALLOWED_INTENTS.has('travel')).toBe(true);
-    expect(QWEN_ALLOWED_INTENTS.has('investigate')).toBe(true);
     expect(QWEN_ALLOWED_INTENTS.has('diplomacy')).toBe(true);
+  });
+
+  it('excludes investigate — Qwen hallucinated location names on look/search', () => {
+    // Playtest log: typing "look" produced a four-sentence paragraph about
+    // "The Borderlands, a twisted shadowy landscape..." while the player
+    // was in Tartarian Outskirts. Investigate now takes the deterministic
+    // template path so the model can't drift the scene name.
+    expect(QWEN_ALLOWED_INTENTS.has('investigate')).toBe(false);
   });
 
   it('includes the synthetic scene_intro intent for new-room narration', () => {

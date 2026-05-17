@@ -428,7 +428,6 @@ export const USE_RELIC_FAILURE_LINES: readonly string[] = [
  */
 export const QWEN_ALLOWED_INTENTS: ReadonlySet<string> = new Set([
   'travel',
-  'investigate',
   'diplomacy',
   'scene_intro',
 ]);

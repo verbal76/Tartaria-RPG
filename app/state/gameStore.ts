@@ -1198,6 +1198,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // submit posthumous actions.
       return;
     }
+    // Snapshot time-elapsed so we can surface "(took N hours)" at the end
+    // of every action. Playtest log: player typed a long question begging
+    // for time tracking ("how long does each encounter take? time is
+    // important"). The engine has the data — just wasn't logging it.
+    const hoursBefore = player.hoursElapsed ?? 0;
 
     // Tick all active status effects one round. Bleed-style DOTs deal
     // damage, expired effects drop off, and incapacitation (stun / paralyze)
@@ -2289,6 +2294,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         });
     }
 
+    // Surface the time the action consumed so the player can feel the day
+    // shrink. Only logs when the action actually advanced the clock — a
+    // pure parser miss doesn't print "0h passed".
+    const hoursAfter = get().player?.hoursElapsed ?? hoursBefore;
+    const dt = hoursAfter - hoursBefore;
+    if (dt > 0) {
+      const label = dt < 1
+        ? `${Math.round(dt * 60)} min`
+        : dt < 24
+          ? `${Math.round(dt * 10) / 10}h`
+          : `${Math.floor(dt / 24)}d ${Math.round(dt % 24)}h`;
+      get().appendLog('system', `⏳ Time passed: ${label}`);
+    }
     void get().persist();
   },
 
@@ -2331,6 +2349,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   concludeRolls(steps: RollStep[], actionText: string) {
     const { player, currentScene } = get();
     if (!player || !currentScene) return;
+
+    // Snapshot time so we can append "⏳ Time passed: Xh" at the end of
+    // the resolver. Rolls (attack / skill / rest) all push the clock.
+    const hoursBeforeConclude = player.hoursElapsed ?? 0;
 
     const initiative = steps.find((s) => s.id === 'initiative');
     const attack = steps.find((s) => s.id === 'attack');
@@ -2652,6 +2674,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
           intent: 'attack',
         }),
       );
+    }
+    // Surface clock movement for dice-resolved actions too (attack, skill,
+    // rest). The pre-action snapshot lives at hoursBeforeConclude.
+    const hoursAfterConclude = get().player?.hoursElapsed ?? hoursBeforeConclude;
+    const concludeDt = hoursAfterConclude - hoursBeforeConclude;
+    if (concludeDt > 0) {
+      const label = concludeDt < 1
+        ? `${Math.round(concludeDt * 60)} min`
+        : concludeDt < 24
+          ? `${Math.round(concludeDt * 10) / 10}h`
+          : `${Math.floor(concludeDt / 24)}d ${Math.round(concludeDt % 24)}h`;
+      get().appendLog('system', `⏳ Time passed: ${label}`);
     }
     void get().persist();
   },

@@ -113,9 +113,22 @@ function tokenize(normalized: string): string[] {
 // echoed back as target text ("You examine compass where").
 const QUESTION_WORDS = new Set(['where', 'when', 'what', 'who', 'why', 'how', 'which']);
 
+// Indefinite reference words that read as nouns but aren't interactable.
+// Playtest log: "is there anything else near me" → parser took "else" as
+// the target and the handler asked the player what they want to do with
+// "else". Suggestion bar then offered "inspect else · use torch on else".
+// These tokens should never make it through as target nouns.
+const JUNK_NOUNS = new Set([
+  'else', 'anything', 'something', 'everything', 'nothing',
+  'stuff', 'things', 'thing', 'one', 'some', 'all',
+  'here', 'there', 'around', 'near', 'nearby', 'else',
+]);
+
 function extractTargetTokens(tokens: string[], verbIdx: number): string[] {
   const after = tokens.slice(verbIdx + 1);
-  return after.filter((t) => !STOPWORDS.has(t) && !QUESTION_WORDS.has(t));
+  return after.filter(
+    (t) => !STOPWORDS.has(t) && !QUESTION_WORDS.has(t) && !JUNK_NOUNS.has(t),
+  );
 }
 
 function resolveItem(targetTokens: string[], inventory: InventoryItem[]): InventoryItem | undefined {
