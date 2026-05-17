@@ -808,7 +808,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // in the playtest log. Widened from 8 to 16 to catch the slower
     // duplicate-Arbiter cases like the same combat-flavor line firing
     // across two rounds of player-vs-monster turns.
-    if (channel === 'arbiter') {
+    //
+    // Callers can pass meta.skipDedup = true to force the line through —
+    // direct-response Arbiter lines (bearings, concept answers, range
+    // refusals) must always reach the player, even on repeat queries.
+    if (channel === 'arbiter' && !meta?.skipDedup) {
       const recent = get().gameLog.slice(-16);
       for (const prev of recent) {
         if (prev.channel === 'arbiter' && prev.text === text) return;
@@ -1302,16 +1306,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? { bands: ['arm'] as CombatRange[], label: 'Bare hands' }
             : playerWeaponReach(player);
           if (!reach.bands.includes(range)) {
-            // Tell the player WHAT TO TYPE, not just what's wrong. The
-            // playtest log showed the old "Close the gap, or swap to
-            // something with range" left players stranded — they didn't
-            // know which verbs to use.
+            // Don't strand the player on a refusal — close the gap (or
+            // pull back) automatically and treat THIS turn as the
+            // movement. The player can attack again next input and it
+            // will land. Playtest log showed players typing attack
+            // repeatedly at close range with a melee weapon, getting the
+            // same refusal message dedup-suppressed, and concluding the
+            // game was broken. Auto-movement makes intent succeed instead
+            // of just diagnosing the failure.
+            const needArm = reach.bands.includes('arm') && range !== 'arm';
+            const needRanged = !reach.bands.includes(range) && (reach.bands.includes('close') || reach.bands.includes('far'));
+            if (needArm) {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter nods at the distance. "${reach.label} needs arm's reach — closing the gap for you."`,
+              );
+              runMoveCombatRange(get, set, player, currentScene, 'advance');
+              break;
+            }
+            if (needRanged && range === 'arm') {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter steps back with you. "${reach.label} needs space — pulling you back."`,
+              );
+              runMoveCombatRange(get, set, player, currentScene, 'retreat');
+              break;
+            }
+            // Last-resort refusal (e.g. a weapon with no bands matching
+            // any reachable range) — keep the old message but exempt from
+            // dedup so the player sees the diagnosis on every failed try.
             const remedy = range === 'arm'
               ? `type 'retreat' to step back for a ranged shot`
               : `type 'advance' to close in for melee`;
             get().appendLog(
               'arbiter',
               `The Arbiter holds up a hand. "${reach.label} can't reach at ${RANGE_LABEL[range]} range. ${remedy[0]!.toUpperCase()}${remedy.slice(1)}."`,
+              { skipDedup: true },
             );
             break;
           }
@@ -1764,11 +1794,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             get().appendLog(
               'arbiter',
               `The Arbiter watches you read the compass. "Bearings, then: ${summary}."`,
+              { skipDedup: true },
             );
           } else {
             get().appendLog(
               'arbiter',
               `The Arbiter shrugs. "You have no compass. The mud-flood country looks the same in every direction — find one or guess."`,
+              { skipDedup: true },
             );
           }
           break;
@@ -4317,6 +4349,7 @@ function runMoveCombatRange(
     get().appendLog(
       'arbiter',
       `The Arbiter holds up a hand. "${scene.weather.name} has taken the ground from you. You cannot reposition."`,
+      { skipDedup: true },
     );
     return;
   }
