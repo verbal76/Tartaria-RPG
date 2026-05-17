@@ -27,6 +27,18 @@ const INTENT_ANCHORS = {
   USE_ITEM: 'I reach into my pack and use an item, a relic, a runecaster, or an Aetherstone charge to help me',
   REST: 'I sit down to rest and recover my strength and HP, sheltering from the Aetheric storms inside the quiet ruins',
   TRAVEL: 'I travel onward to another place, journeying across the ruined Tartarian landscape toward the next buried city or settlement',
+  AIM: 'I bring my bolt-caster up and steady my breath, lining up the shot, taking my time to aim before firing',
+  RELOAD: 'I reload my bolt-caster or runecaster, sliding fresh bolts into the magazine before the next shot',
+  TAKE_COVER: 'I duck behind cover, the wall or rubble between me and the shooter, ranged attacks against me at penalty',
+  DASH: 'I sprint forward, doubling my movement, breath ragged, pushing speed over precision this turn',
+  DISENGAGE: 'I peel out of the melee, footwork careful, breaking contact without giving the enemy an opening',
+  THROW: 'I throw the object — rock, ration, relic — at the target, an improvised projectile arcing through the air',
+  HELP: 'I move beside my ally to assist them, giving them a leg up or covering them while they work',
+  READY: 'I hold my action, watching for the trigger, ready to react the instant the thing I am waiting for happens',
+  CLIMB: 'I climb the surface, hands finding holds, hauling myself up rung by rung against gravity',
+  SWIM: 'I wade into the water, swimming forward against the current, mud-water lapping at my gear',
+  JUMP: 'I leap across the gap, springing from the edge, hanging for a moment in the air before landing',
+  MANEUVER: 'I commit to a maneuver — disarm, grapple, trip — going for control rather than damage in this exchange',
 } as const;
 
 export interface BootOptions {

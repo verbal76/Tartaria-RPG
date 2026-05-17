@@ -54,7 +54,7 @@ import {
 } from '../engine/narrativeGenerator';
 import { parseInput, type ParseContext } from '../engine/parser';
 import { rollDie, rollFromNotation, pick, chance, rotatingPick } from '../engine/rng';
-import { buildCombatSteps, buildSkillSteps, buildRestSteps } from '../engine/combatRules';
+import { buildCombatSteps, buildSkillSteps, buildRestSteps, rollMods } from '../engine/combatRules';
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
@@ -1417,11 +1417,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             get().appendLog('debug', `attack: visibility penalty −${visPenalty} (${currentScene.weather!.name})`);
           }
+          // Aggregate the player's status-effect modifiers (aim, sprint,
+          // surprise, etc.) so the dice prompt and the final attack
+          // total honor every action-card buff/penalty the player
+          // earned. Ranged attacks get aim bonus, melee don't.
+          const isRangedAttack = !barehand && (playerWeaponReach(player).bands.length > 1);
+          const statusMods = rollMods(player.statusEffects, isRangedAttack ? 'attack_ranged' : 'attack_melee');
+          // Point-blank bonus: ranged weapon at arm's reach is a bonus
+          // die on the attack roll (offset by the disarm/melee risk
+          // described in the action card).
+          const pointBlankBonus = isRangedAttack && range === 'arm';
+          if (statusMods.sources.length > 0) {
+            get().appendLog('debug', `attack: status mods ${statusMods.sources.join(' · ')}`);
+          }
           const steps = buildCombatSteps(trimmed, player, targetEnemy, {
             visibilityPenalty: visPenalty,
             visibilityLabel: currentScene.weather?.name,
             weatherMod: weatherStatModifiers(currentScene.weather),
+            statusMods,
+            pointBlankBonus,
           });
+          // Drop one-shot status effects consumed by this roll (aiming
+          // burns on use).
+          if (statusMods.consume.length > 0) {
+            set((s) =>
+              s.player
+                ? {
+                    player: {
+                      ...s.player,
+                      statusEffects: (s.player.statusEffects ?? []).filter(
+                        (e) => !statusMods.consume.includes(e.kind),
+                      ),
+                    },
+                  }
+                : s,
+            );
+          }
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
           get().appendLog('world', attackOpener(targetEnemy.name, parsed.resolvedNoun));
         } else {
@@ -2221,10 +2252,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'dash': {
-        set({ player: advanceTime(spendStamina(player, 2), 0.25) });
+        // Sprint / dash. Doubles movement but next attack/defense rolls
+        // take a 2-penalty (sprinting status, 1 round).
+        const sprinting: StatusEffect = {
+          kind: 'sprinting',
+          remainingRounds: 1,
+          label: 'sprinting',
+        };
+        set((s) =>
+          s.player
+            ? {
+                player: {
+                  ...s.player,
+                  statusEffects: applyEffect(s.player.statusEffects ?? [], sprinting),
+                  hoursElapsed: (s.player.hoursElapsed ?? 0) + 0.25,
+                  stamina: Math.max(0, s.player.stamina - 2),
+                },
+              }
+            : s,
+        );
         get().appendLog(
           'world',
-          `You break into a run. Movement doubles this turn — total Speed paid forward, no time to react to anything subtle.`,
+          `You break into a run. Movement doubles this turn — but any combat action this round and next takes a penalty die (-2). Cost: 2 stamina, 15 min.`,
         );
         break;
       }
@@ -2236,10 +2285,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
-        // Apply a 1-round dodging effect as a stand-in for "no opportunity
-        // attack on the way out" — the effect ticks down on next action.
+        // Apply the in_cover effect briefly — represents the careful
+        // footwork that denies the opportunity attack. The label clarifies.
         const disengaging: StatusEffect = {
-          kind: 'dodging',
+          kind: 'in_cover',
           remainingRounds: 1,
           label: 'disengaging',
         };
@@ -2256,25 +2305,47 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
         get().appendLog(
           'world',
-          `You peel off the line, footwork careful. No opportunity attack as you break contact (1 round).`,
+          `You peel off the line, footwork careful. No opportunity attack as you break contact (+4 defense this round).`,
         );
         break;
       }
       case 'help': {
         set({ player: advanceTime(spendStamina(player, 1), 0.1) });
         const tgt = parsed.target ?? parsed.resolvedNoun ?? 'the nearest ally';
+        // Apply 'helping' status — narrative-only in single-player; in
+        // future multi-actor scenes the ally's next roll would consume it.
+        const helping: StatusEffect = {
+          kind: 'helping',
+          remainingRounds: 1,
+          label: `helping ${tgt}`,
+        };
+        set((s) =>
+          s.player
+            ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], helping) } }
+            : s,
+        );
         get().appendLog(
           'world',
-          `You shoulder in beside ${tgt}. Their next ability check or attack rolls at Advantage — if they're within 5 ft.`,
+          `You shoulder in beside ${tgt}. Their next ability check or attack rolls at Advantage — if they're within 5 ft. Cost: 1 Combat Action.`,
         );
         break;
       }
       case 'ready': {
         set({ player: advanceTime(spendStamina(player, 1), 0.1) });
         const tgt = parsed.target ?? 'whatever moves next';
+        const readying: StatusEffect = {
+          kind: 'ready',
+          remainingRounds: 1,
+          label: `ready: ${tgt}`,
+        };
+        set((s) =>
+          s.player
+            ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], readying) } }
+            : s,
+        );
         get().appendLog(
           'world',
-          `You set yourself. The next thing that triggers — ${tgt} — gets your reaction first.`,
+          `You hold your turn, watching for ${tgt}. When that trigger fires you get a +1 bonus die on the reaction. Cost: 1 turn.`,
         );
         break;
       }
@@ -2287,13 +2358,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'take_cover': {
-        // Apply a dodge-style effect — +4 AC for one round, same buff as
-        // the dodge action. Costs nothing but the turn. Works in or out of
-        // combat; out of combat reads as caution.
+        // Apply the in_cover status. Partial vs full cover would be a
+        // future refinement (currently treats every take-cover as
+        // partial: +4 to defense rolls, ranged attacks land at penalty).
         const cover: StatusEffect = {
-          kind: 'dodging',
-          remainingRounds: 1,
-          label: 'in cover',
+          kind: 'in_cover',
+          remainingRounds: 2,
+          label: 'partial cover',
         };
         set((s) =>
           s.player
@@ -2309,16 +2380,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog(
           'world',
           currentScene.enemies.length > 0
-            ? `You dive behind whatever the room offers. +4 AC this round; attacks against you fire at Disadvantage.`
+            ? `You dive behind whatever the room offers. Partial cover — ranged attacks against you take a penalty die (+4 to your defense).`
             : `You tuck against the nearest cover. The world keeps moving without you for a beat.`,
         );
         break;
       }
       case 'aim': {
-        // Stage a +2 bonus on the next ranged attack. Tracked as a
-        // dodging-kind status effect with a custom label so the combat
-        // panel can show it. Counters trigger if the player still in
-        // range of melee; we accept that as a cost of aiming.
+        // Stage a +2 bonus on the next ranged attack via the aiming
+        // status kind. Consumed on the next ranged attack via the
+        // rollMods consume list.
         const equipped = player.equipped?.main ? findWeaponByName(player.equipped.main) : null;
         if (!equipped || equipped.weaponKind === 'melee') {
           get().appendLog(
@@ -2328,7 +2398,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         const aiming: StatusEffect = {
-          kind: 'dodging',
+          kind: 'aiming',
           remainingRounds: 1,
           label: 'aiming',
         };
@@ -2345,7 +2415,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
         get().appendLog(
           'world',
-          `You bring the ${equipped.name} up and breathe out. Next shot rolls with Advantage — +2 to hit.`,
+          `You bring the ${equipped.name} up and breathe out. Next shot rolls with Advantage — +2 to hit, lost if you take damage or your target moves before firing.`,
         );
         break;
       }

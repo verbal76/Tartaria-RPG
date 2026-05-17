@@ -144,6 +144,8 @@ export function statusAcAdjustment(current: readonly StatusEffect[] | undefined)
     if (e.remainingRounds <= 0) continue;
     if (e.kind === 'armor_severed') adj -= 2;
     if (e.kind === 'dodging') adj += 4;
+    if (e.kind === 'in_cover') adj += 4;
+    if (e.kind === 'blocking') adj += 4;
   }
   return adj;
 }

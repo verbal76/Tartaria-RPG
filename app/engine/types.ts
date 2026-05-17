@@ -297,7 +297,16 @@ export type StatusEffectKind =
   | 'paralyzed'
   | 'poisoned'
   | 'dodging'
-  | 'blocking';
+  | 'blocking'
+  // Action-card status effects. Each one is a one-round die modifier
+  // routed through rollMods() in combatRules.ts.
+  | 'aiming'         // +2 on next ranged attack vs the same target
+  | 'sprinting'      // -2 on attack rolls this turn (post-sprint penalty)
+  | 'in_cover'       // +4 AC vs ranged; partial cover, full cover blocks entirely
+  | 'ready'          // bonus die on the held action when its trigger fires
+  | 'helping'        // bonus die for an ally next check (single-player: narrative)
+  | 'overwhelmed'    // -2 on dodge/evade after multiple hits in one round
+  | 'surprised';     // -2 on first reaction; consumed once
 
 export interface StatusEffect {
   kind: StatusEffectKind;

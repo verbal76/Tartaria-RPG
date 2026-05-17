@@ -1,8 +1,89 @@
-import type { RollStep, PlayerCharacter, Enemy, Stats } from './types';
+import type { RollStep, PlayerCharacter, Enemy, Stats, StatusEffect } from './types';
 import { rollDie } from './rng';
 import { findWeaponByName, type CatalogWeapon } from './crafting';
 import { effectiveStats } from './equipment';
 import { traitACBonus } from './enemyTraits';
+
+/**
+ * Roll-modifier aggregator. Walks the player's status effects and sums
+ * bonus / penalty dice for a given action class. Returns the net flat
+ * modifier (each die ≈ ±2 on a d20 in our scale) plus the labels that
+ * fed into it so the combat log can show what stacked.
+ *
+ * Phase 2: scene context (target in cover, point-blank range, etc.) and
+ * enemy traits should also fold in here — for now the helper covers the
+ * player-side status pool from the action-card actions.
+ */
+export interface RollMods {
+  bonus: number;       // +N to the final roll
+  penalty: number;     // -N to the final roll (positive integer)
+  net: number;         // bonus - penalty
+  sources: string[];   // human-readable labels for the log
+  consume: StatusEffect['kind'][];  // effects to drop after this roll
+}
+
+export function rollMods(
+  effects: readonly StatusEffect[] | undefined,
+  action: 'attack_ranged' | 'attack_melee' | 'defense' | 'skill',
+): RollMods {
+  const fx = effects ?? [];
+  let bonus = 0;
+  let penalty = 0;
+  const sources: string[] = [];
+  const consume: StatusEffect['kind'][] = [];
+  for (const e of fx) {
+    switch (e.kind) {
+      case 'aiming':
+        if (action === 'attack_ranged') {
+          bonus += 2;
+          sources.push('aim +2');
+          consume.push('aiming');
+        }
+        break;
+      case 'sprinting':
+        if (action === 'attack_ranged' || action === 'attack_melee') {
+          penalty += 2;
+          sources.push('sprinting -2');
+        }
+        break;
+      case 'in_cover':
+        if (action === 'defense') {
+          bonus += 4;
+          sources.push('cover +4');
+        }
+        break;
+      case 'dodging':
+        if (action === 'defense') {
+          bonus += 4;
+          sources.push((e.label === 'in cover' ? 'cover' : e.label === 'aiming' ? 'aim' : e.label === 'disengaging' ? 'disengage' : 'dodge') + ' +4');
+        }
+        if (action === 'attack_ranged' && e.label === 'aiming') {
+          bonus += 2;
+          sources.push('aim +2');
+          consume.push('dodging');
+        }
+        break;
+      case 'blocking':
+        if (action === 'defense') {
+          bonus += 4;
+          sources.push('block +4');
+        }
+        break;
+      case 'overwhelmed':
+        if (action === 'defense') {
+          penalty += 2;
+          sources.push('overwhelmed -2');
+        }
+        break;
+      case 'surprised':
+        penalty += 2;
+        sources.push('surprised -2');
+        consume.push('surprised');
+        break;
+    }
+  }
+  return { bonus, penalty, net: bonus - penalty, sources, consume };
+}
 
 type WeaponClass = 'ranged' | 'melee' | 'runecaster' | 'barehanded';
 
@@ -83,6 +164,14 @@ export function buildCombatSteps(
      *  passed, effectiveStats folds these into the stat used for the
      *  attack/damage roll. */
     weatherMod?: Partial<Stats>;
+    /** Pre-computed roll modifier from the player's status pool — aim
+     *  bonus, sprinting penalty, surprise penalty, etc. Caller computes
+     *  this so the dice-prompt label can also surface the consume list
+     *  (effects expire on use). */
+    statusMods?: RollMods;
+    /** Point-blank bonus from being at arm's reach with a ranged weapon
+     *  designed for it. +2 to the attack roll. */
+    pointBlankBonus?: boolean;
   },
 ): RollStep[] {
   // Equipped weapon takes precedence over text-based weapon-class detection.
@@ -128,13 +217,19 @@ export function buildCombatSteps(
     (() => {
       const blindPen = opts?.blindSwing ? -5 : 0;
       const visPen = -(opts?.visibilityPenalty ?? 0);
-      const totalMod = blindPen + visPen;
+      const statusNet = opts?.statusMods?.net ?? 0;
+      const pointBlank = opts?.pointBlankBonus ? 2 : 0;
+      const totalMod = blindPen + visPen + statusNet + pointBlank;
       const pieces: string[] = [`${stat.label} ${stat.value}`];
       if (blindPen) pieces.push(`− 5 (blind swing)`);
       if (visPen) pieces.push(`− ${Math.abs(visPen)} (${opts?.visibilityLabel ?? 'visibility'})`);
+      if (pointBlank) pieces.push('+ 2 (point blank)');
+      if (opts?.statusMods?.sources?.length) pieces.push(...opts.statusMods.sources);
       const ctxPieces: string[] = [`d20 + ${stat.label}`];
       if (blindPen) ctxPieces.push(`− 5 (out of reach)`);
       if (visPen) ctxPieces.push(`− ${Math.abs(visPen)} (${opts?.visibilityLabel ?? 'low visibility'})`);
+      if (pointBlank) ctxPieces.push('+ 2 (point blank)');
+      if (opts?.statusMods?.sources?.length) ctxPieces.push(...opts.statusMods.sources);
       return {
         id: 'attack',
         label: 'Roll to ATTACK',

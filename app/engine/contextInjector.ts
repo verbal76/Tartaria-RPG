@@ -145,6 +145,13 @@ const VOICE_RULES =
   'SYSTEM FACTS — no "Aetherstone Deep", no "Grand Hall", no "Ash Storm", ' +
   'no sarcophagi or vaulted ceilings unless they appear in Environment. ' +
   'If you would have to invent scenery to fill a sentence, end early. ' +
+  'AVAILABLE PLAYER ACTIONS the engine resolves mechanically: attack, ' +
+  'brawl, throw, dodge, block, advance, retreat / step back, flee / escape, ' +
+  'aim, fire, reload, take cover, dash / sprint, disengage, help, ready, ' +
+  'climb, swim, jump, hide / sneak, search / look, equip / unequip, use ' +
+  '(relic / item / torch / locket), dig, craft, steal, gift, ask, rest. ' +
+  'Aetheric verbs: cast, channel, weave, incant. Use these vocabulary ' +
+  'choices in narration so the player learns the system. ' +
   'End on a complete sentence.';
 
 const PEACEFUL_INSTRUCTION =
