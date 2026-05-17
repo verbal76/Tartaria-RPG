@@ -100,6 +100,7 @@ import {
 import { getEquippedWeapon, isBareHandAttack } from '../engine/combatRules';
 import { pickRandomVendor, VENDORS, type VendorInstance } from '../engine/vendors';
 import { findQuestFactionHint } from '../engine/factionHint';
+import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, effectiveStats } from '../engine/equipment';
 import { stampDurability, wearItemByName, repairCost, repairItem } from '../engine/durability';
 import {
@@ -547,6 +548,7 @@ interface GameStore {
   resolveEnemyDefeat: () => void;
   rest: () => void;
   buyFromVendor: (itemName: string) => void;
+  sellToVendor: (itemName: string) => void;
   giftToVendor: (itemName: string) => void;
   stealFromVendor: (itemName: string) => void;
   repairWithVendor: (itemName: string) => void;
@@ -3673,6 +3675,60 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
+  sellToVendor(itemName) {
+    const state = get();
+    const scene = state.currentScene;
+    const player = state.player;
+    if (!scene?.vendor || !player) return;
+    // Refuse if the item is equipped — don't quietly strip the player's
+    // loadout. They have to unequip first.
+    const equipped = player.equipped ?? {};
+    const equippedNames = Object.values(equipped).filter(Boolean) as string[];
+    const item = player.inventory.find((i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0);
+    if (!item) {
+      get().appendLog('system', `You don't have any ${itemName} to sell.`);
+      return;
+    }
+    if (equippedNames.includes(item.name)) {
+      get().appendLog(
+        'arbiter',
+        `${scene.vendor.name} eyes the ${item.name} on your person. "Take it off first. I don't haggle for what's still on a man."`,
+      );
+      return;
+    }
+    if (isUnsellable(item)) {
+      get().appendLog(
+        'arbiter',
+        `${scene.vendor.name} shakes their head. "That one's not for sale. Not by you, not by me."`,
+      );
+      return;
+    }
+    const price = sellPriceFor(item, scene.vendor);
+    if (price <= 0) {
+      get().appendLog('system', `${scene.vendor.name} won't pay for ${item.name} — no resale value.`);
+      return;
+    }
+    set((s) => {
+      if (!s.player || !s.currentScene?.vendor) return s;
+      const newInventory = s.player.inventory
+        .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
+        .filter((i) => i.quantity > 0);
+      return {
+        player: {
+          ...s.player,
+          tc: s.player.tc + price,
+          inventory: newInventory,
+        },
+      };
+    });
+    get().appendLog(
+      'reward',
+      `Sold ${item.name} to ${scene.vendor.name} for ${price} TC. (${player.tc + price} TC on hand)`,
+    );
+    void get().persist();
+  },
+
+
   giftToVendor(itemName) {
     const state = get();
     const scene = state.currentScene;
@@ -3834,9 +3890,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   dismissVendor() {
+    const state = get();
+    const scene = state.currentScene;
+    if (!scene?.vendor) return;
+    const vendorName = scene.vendor.name;
     set((s) => ({
       currentScene: s.currentScene ? { ...s.currentScene, vendor: null } : s.currentScene,
+      currentScreen: 'exploration',
     }));
+    get().appendLog(
+      'world',
+      `${vendorName} packs up their wares with a nod and slips back into the crowd. The space they held is empty now.`,
+    );
+    void get().persist();
   },
 
   repairWithVendor(itemName) {

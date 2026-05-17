@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useGameStore } from '../state/gameStore';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview } from '../components/itemPreview';
+import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 
 function rarityColor(rarity: string | null | undefined): string {
   switch (rarity) {
@@ -13,13 +14,23 @@ function rarityColor(rarity: string | null | undefined): string {
   }
 }
 
+type Mode = 'buy' | 'sell';
+type Pending =
+  | { mode: 'buy'; itemName: string; price: number }
+  | { mode: 'sell'; itemName: string; price: number }
+  | { mode: 'dismiss' }
+  | null;
+
 export function VendorScreen() {
   const player = useGameStore((s) => s.player);
   const scene = useGameStore((s) => s.currentScene);
   const setScreen = useGameStore((s) => s.setScreen);
   const buyFromVendor = useGameStore((s) => s.buyFromVendor);
+  const sellToVendor = useGameStore((s) => s.sellToVendor);
+  const dismissVendor = useGameStore((s) => s.dismissVendor);
 
-  const [pending, setPending] = useState<{ itemName: string; price: number } | null>(null);
+  const [mode, setMode] = useState<Mode>('buy');
+  const [pending, setPending] = useState<Pending>(null);
 
   const vendor = scene?.vendor ?? null;
 
@@ -38,16 +49,30 @@ export function VendorScreen() {
     );
   }
 
-  const openConfirm = (itemName: string, price: number) => setPending({ itemName, price });
+  const openBuy = (itemName: string, price: number) => setPending({ mode: 'buy', itemName, price });
+  const openSell = (itemName: string, price: number) => setPending({ mode: 'sell', itemName, price });
+  const openDismiss = () => setPending({ mode: 'dismiss' });
   const cancel = () => setPending(null);
-  const confirmBuy = () => {
+  const confirmAction = () => {
     if (!pending) return;
-    buyFromVendor(pending.itemName);
+    if (pending.mode === 'buy') buyFromVendor(pending.itemName);
+    else if (pending.mode === 'sell') sellToVendor(pending.itemName);
+    else if (pending.mode === 'dismiss') dismissVendor();
     setPending(null);
   };
 
-  const preview = pending ? getItemPreview(pending.itemName) : null;
-  const canAffordPending = pending ? player.tc >= pending.price : false;
+  const preview = pending && pending.mode !== 'dismiss'
+    ? getItemPreview(pending.itemName)
+    : null;
+  const canAffordPending = pending?.mode === 'buy' ? player.tc >= pending.price : true;
+  // Inventory items the player can sell — exclude equipped + unsellable.
+  const equippedNames = new Set(
+    Object.values(player.equipped ?? {}).filter((n): n is string => !!n),
+  );
+  const sellable = player.inventory
+    .filter((i) => i.quantity > 0 && !equippedNames.has(i.name) && !isUnsellable(i))
+    .map((i) => ({ item: i, price: sellPriceFor(i, vendor) }))
+    .filter((x) => x.price > 0);
 
   return (
     <View style={styles.container}>
@@ -61,7 +86,14 @@ export function VendorScreen() {
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
         <Text style={styles.title}>SHOP</Text>
-        <View style={{ width: 80 }} />
+        <TouchableOpacity
+          onPress={openDismiss}
+          style={styles.dismissBtn}
+          hitSlop={8}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.dismissText}>DISMISS</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.vendorCard}>
@@ -75,71 +107,149 @@ export function VendorScreen() {
         <Text style={styles.walletValue}>{player.tc} TC</Text>
       </View>
 
+      <View style={styles.tabRow}>
+        <TouchableOpacity
+          style={[styles.tab, mode === 'buy' && styles.tabActive]}
+          onPress={() => setMode('buy')}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.tabText, mode === 'buy' && styles.tabTextActive]}>BUY</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, mode === 'sell' && styles.tabActive]}
+          onPress={() => setMode('sell')}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.tabText, mode === 'sell' && styles.tabTextActive]}>SELL</Text>
+        </TouchableOpacity>
+      </View>
+
       <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
-        {vendor.offers.length === 0 ? (
-          <Text style={styles.empty}>The vendor's pack is empty. Nothing more to trade.</Text>
-        ) : (
-          vendor.offers.map((o, i) => {
-            const canAfford = player.tc >= o.price;
-            const itemPreview = getItemPreview(o.itemName);
-            // Count how many of this item the player already owns so they
-            // can see at a glance whether to bother buying another.
-            const owned = player.inventory
-              .filter((inv) => inv.name.toLowerCase() === o.itemName.toLowerCase())
-              .reduce((sum, inv) => sum + inv.quantity, 0);
-            return (
-              <TouchableOpacity
-                key={`${o.itemName}_${i}`}
-                style={[styles.offerRow, !canAfford && styles.offerRowBroke]}
-                onPress={() => openConfirm(o.itemName, o.price)}
-                activeOpacity={0.7}
-              >
-                <View style={[styles.offerStripe, { backgroundColor: rarityColor(itemPreview.rarity) }]} />
-                <View style={styles.offerBody}>
-                  <View style={styles.offerHead}>
-                    <Text style={styles.offerName} numberOfLines={1}>{o.itemName}</Text>
-                    <Text style={[styles.offerPrice, !canAfford && styles.offerPriceBroke]}>
-                      {o.price} TC
-                    </Text>
-                  </View>
-                  <View style={styles.offerSubHead}>
-                    <Text style={styles.offerKind} numberOfLines={1}>
-                      {itemPreview.kindLabel}{itemPreview.rarity ? ` · ${itemPreview.rarity}` : ''}
-                    </Text>
-                    {owned > 0 && (
-                      <Text style={styles.offerOwned}>you have {owned}</Text>
+        {mode === 'buy' ? (
+          vendor.offers.length === 0 ? (
+            <Text style={styles.empty}>The vendor's pack is empty. Nothing more to trade.</Text>
+          ) : (
+            vendor.offers.map((o, i) => {
+              const canAfford = player.tc >= o.price;
+              const itemPreview = getItemPreview(o.itemName);
+              const owned = player.inventory
+                .filter((inv) => inv.name.toLowerCase() === o.itemName.toLowerCase())
+                .reduce((sum, inv) => sum + inv.quantity, 0);
+              return (
+                <TouchableOpacity
+                  key={`buy_${o.itemName}_${i}`}
+                  style={[styles.offerRow, !canAfford && styles.offerRowBroke]}
+                  onPress={() => openBuy(o.itemName, o.price)}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.offerStripe, { backgroundColor: rarityColor(itemPreview.rarity) }]} />
+                  <View style={styles.offerBody}>
+                    <View style={styles.offerHead}>
+                      <Text style={styles.offerName} numberOfLines={1}>{o.itemName}</Text>
+                      <Text style={[styles.offerPrice, !canAfford && styles.offerPriceBroke]}>
+                        {o.price} TC
+                      </Text>
+                    </View>
+                    <View style={styles.offerSubHead}>
+                      <Text style={styles.offerKind} numberOfLines={1}>
+                        {itemPreview.kindLabel}{itemPreview.rarity ? ` · ${itemPreview.rarity}` : ''}
+                      </Text>
+                      {owned > 0 && (
+                        <Text style={styles.offerOwned}>you have {owned}</Text>
+                      )}
+                    </View>
+                    {itemPreview.stats.length > 0 && (
+                      <Text style={styles.offerStats} numberOfLines={2}>
+                        {itemPreview.stats.join(' · ')}
+                      </Text>
                     )}
                   </View>
-                  {itemPreview.stats.length > 0 && (
-                    <Text style={styles.offerStats} numberOfLines={2}>
-                      {itemPreview.stats.join(' · ')}
-                    </Text>
-                  )}
-                </View>
-              </TouchableOpacity>
-            );
-          })
+                </TouchableOpacity>
+              );
+            })
+          )
+        ) : (
+          // SELL mode — inventory list with sell prices.
+          sellable.length === 0 ? (
+            <Text style={styles.empty}>
+              Nothing in your pack worth selling. Unequip the gear you want to move first.
+            </Text>
+          ) : (
+            sellable.map(({ item, price }) => {
+              const preview = getItemPreview(item.name);
+              return (
+                <TouchableOpacity
+                  key={`sell_${item.id}`}
+                  style={styles.offerRow}
+                  onPress={() => openSell(item.name, price)}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.offerStripe, { backgroundColor: rarityColor(preview.rarity) }]} />
+                  <View style={styles.offerBody}>
+                    <View style={styles.offerHead}>
+                      <Text style={styles.offerName} numberOfLines={1}>
+                        {item.name}{item.quantity > 1 ? ` (x${item.quantity})` : ''}
+                      </Text>
+                      <Text style={styles.sellPrice}>+{price} TC</Text>
+                    </View>
+                    <View style={styles.offerSubHead}>
+                      <Text style={styles.offerKind} numberOfLines={1}>
+                        {preview.kindLabel}{preview.rarity ? ` · ${preview.rarity}` : ''}
+                      </Text>
+                      {item.durability && (
+                        <Text style={styles.offerOwned}>
+                          {item.durability.current}/{item.durability.max} dur
+                        </Text>
+                      )}
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              );
+            })
+          )
         )}
       </ScrollView>
 
       <BrandedModal
         visible={pending !== null}
-        title={canAffordPending ? `Buy from ${vendor.name}` : 'Not enough TC'}
+        title={
+          pending?.mode === 'dismiss'
+            ? `Dismiss ${vendor.name}?`
+            : pending?.mode === 'sell'
+              ? `Sell to ${vendor.name}`
+              : canAffordPending
+                ? `Buy from ${vendor.name}`
+                : 'Not enough TC'
+        }
         itemPreview={preview}
         contextLine={
-          pending
-            ? canAffordPending
-              ? `Price: ${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc - pending.price} TC`
-              : `Price: ${pending.price} TC   ·   You only have ${player.tc} TC.`
-            : undefined
+          pending?.mode === 'dismiss'
+            ? 'They leave the scene. New offers will come from the next vendor who shows up.'
+            : pending?.mode === 'sell'
+              ? `Price: +${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.price} TC`
+              : pending?.mode === 'buy'
+                ? canAffordPending
+                  ? `Price: ${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc - pending.price} TC`
+                  : `Price: ${pending.price} TC   ·   You only have ${player.tc} TC.`
+                : undefined
         }
         buttons={
-          canAffordPending
+          pending?.mode === 'dismiss'
             ? [
                 { label: 'Cancel', onPress: cancel, tone: 'neutral' },
-                { label: 'Buy', onPress: confirmBuy, tone: 'primary' },
+                { label: 'Dismiss', onPress: confirmAction, tone: 'destructive' },
               ]
-            : [{ label: 'OK', onPress: cancel, tone: 'neutral' }]
+            : pending?.mode === 'sell'
+              ? [
+                  { label: 'Cancel', onPress: cancel, tone: 'neutral' },
+                  { label: 'Sell', onPress: confirmAction, tone: 'primary' },
+                ]
+              : pending?.mode === 'buy' && canAffordPending
+                ? [
+                    { label: 'Cancel', onPress: cancel, tone: 'neutral' },
+                    { label: 'Buy', onPress: confirmAction, tone: 'primary' },
+                  ]
+                : [{ label: 'OK', onPress: cancel, tone: 'neutral' }]
         }
         onRequestClose={cancel}
       />
@@ -167,6 +277,38 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
+  dismissBtn: {
+    backgroundColor: '#1a1714',
+    borderColor: '#7a4040',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  dismissText: { color: '#e07a5f', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
+  tabRow: {
+    flexDirection: 'row',
+    gap: 6,
+    marginBottom: 8,
+  },
+  tab: {
+    flex: 1,
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+  tabActive: {
+    backgroundColor: '#2a2520',
+    borderColor: '#c9a86a',
+  },
+  tabText: { color: '#7a705c', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
+  tabTextActive: { color: '#c9a86a' },
+  sellPrice: { color: '#9ec96a', fontSize: 12, fontWeight: '700' },
   title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
   vendorCard: {
     backgroundColor: '#13110f',
