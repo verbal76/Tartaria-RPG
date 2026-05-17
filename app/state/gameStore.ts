@@ -98,7 +98,8 @@ import {
   type Recipe,
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack } from '../engine/combatRules';
-import { pickRandomVendor, type VendorInstance } from '../engine/vendors';
+import { pickRandomVendor, VENDORS, type VendorInstance } from '../engine/vendors';
+import { findQuestFactionHint } from '../engine/factionHint';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, effectiveStats } from '../engine/equipment';
 import { stampDurability, wearItemByName, repairCost, repairItem } from '../engine/durability';
 import {
@@ -128,6 +129,7 @@ import {
   findFactionQuestById,
   availableFactionQuests,
   fuzzyFindFactionQuest,
+  FACTION_QUESTS,
 } from '../engine/factionQuests';
 import {
   HUNTS,
@@ -3882,14 +3884,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene = state.currentScene;
     if (!player) return;
     if (!scene?.vendor || !scene.vendor.faction) {
-      // HANDOFF §5 #8: name the vendor *type* so the player knows what to
-      // look for, not just "a faction agent." Contracts come from the
-      // wandering vendors that appear in scenes; calling them out by name
-      // makes the next move concrete.
-      get().appendLog(
-        'arbiter',
-        `The Arbiter shrugs. "Contracts come from wandering faction vendors — keep walking until one shows up at your scene."`,
-      );
+      // Resolve the named contract to its faction so we can tell the
+      // player WHICH vendor archetype to seek, not just "a faction
+      // agent." Falls back to the generic line if the input doesn't
+      // fuzzy-match any cataloged hunt / mystery / storyline / quest.
+      const hint = findQuestFactionHint(titleOrId);
+      if (hint && hint.vendorNames.length > 0) {
+        const sample = hint.vendorNames.slice(0, 2).join(' or ');
+        get().appendLog(
+          'arbiter',
+          `The Arbiter looks past you. "${hint.contractTitle} is a ${hint.kind} of the ${hint.factionLabel}. Find ${sample} — or any other ${hint.factionLabel} agent — to pick it up."`,
+        );
+      } else if (hint) {
+        get().appendLog(
+          'arbiter',
+          `The Arbiter shrugs. "${hint.contractTitle} is a ${hint.kind} of the ${hint.factionLabel}. Find a ${hint.factionLabel} agent."`,
+        );
+      } else {
+        get().appendLog(
+          'arbiter',
+          `The Arbiter shrugs. "Contracts come from wandering faction vendors — keep walking until one shows up at your scene."`,
+        );
+      }
       return;
     }
     // Direct id match first, then fuzzy title within this faction's pool.
@@ -3934,28 +3950,44 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene = state.currentScene;
     if (!player) return;
     if (!scene?.vendor || !scene.vendor.faction) {
-      // Surface the actual faction(s) the player owes a turn-in to so they
-      // know WHO to seek, not just "a faction agent." HANDOFF §5 #8.
+      // If the player named a specific contract, fuzzy-match it and tell
+      // them the exact faction + sample vendor names. Otherwise fall
+      // back to listing the factions they owe across all active quests.
+      const namedHint = findQuestFactionHint(titleOrId);
+      if (namedHint && namedHint.vendorNames.length > 0) {
+        const sample = namedHint.vendorNames.slice(0, 2).join(' or ');
+        get().appendLog(
+          'arbiter',
+          `The Arbiter waves. "${namedHint.contractTitle} closes out with the ${namedHint.factionLabel}. Find ${sample} — or any other ${namedHint.factionLabel} agent — to turn it in."`,
+        );
+        return;
+      }
       const active = (player.activeFactionQuestIds ?? [])
         .map((id) => findFactionQuestById(id))
         .filter((q): q is NonNullable<ReturnType<typeof findFactionQuestById>> => !!q);
       if (active.length > 0) {
-        const factionNames = Array.from(
-          new Set(
+        // List the unique factions the player owes a turn-in to AND a
+        // sample vendor name from each so they know what to look for.
+        const factionEntries = Array.from(
+          new Map(
             active.map((q) => {
               const f = FACTIONS.find((x) => x.id === q.factionId);
-              return f?.name ?? q.factionId.replace(/_/g, ' ');
+              return [q.factionId, f?.name ?? q.factionId.replace(/_/g, ' ')];
             }),
-          ),
+          ).entries(),
         );
+        const lines = factionEntries.map(([fid, fname]) => {
+          const sample = VENDORS.filter((v) => v.faction === fid).slice(0, 2).map((v) => v.name).join(' / ');
+          return sample ? `${fname} (e.g. ${sample})` : fname;
+        });
         const list =
-          factionNames.length === 1
-            ? `a ${factionNames[0]} vendor`
-            : `a vendor from one of: ${factionNames.join(', ')}`;
-      get().appendLog(
-        'arbiter',
+          lines.length === 1
+            ? `a ${lines[0]} vendor`
+            : `a vendor from one of: ${lines.join('; ')}`;
+        get().appendLog(
+          'arbiter',
           `The Arbiter waves. "Find ${list} to turn that contract in."`,
-      );
+        );
       } else {
         get().appendLog(
           'arbiter',
@@ -4014,10 +4046,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene = state.currentScene;
     if (!player) return;
     if (!scene?.vendor) {
-      get().appendLog(
-        'arbiter',
-        `The Arbiter shakes their head. "Hunts come from wandering faction vendors. Keep walking until one turns up at your scene."`,
-      );
+      const hint = findQuestFactionHint(titleOrId);
+      if (hint && hint.vendorNames.length > 0) {
+        const sample = hint.vendorNames.slice(0, 2).join(' or ');
+        get().appendLog(
+          'arbiter',
+          `The Arbiter shakes their head. "${hint.contractTitle} is a hunt of the ${hint.factionLabel}. Find ${sample} — or any other ${hint.factionLabel} agent — to take it on."`,
+        );
+      } else {
+        get().appendLog(
+          'arbiter',
+          `The Arbiter shakes their head. "Hunts come from wandering faction vendors. Keep walking until one turns up at your scene."`,
+        );
+      }
       return;
     }
     const factionId = scene.vendor.faction;
@@ -4220,7 +4261,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene = state.currentScene;
     if (!player) return;
     if (!scene?.vendor) {
-      get().appendLog('arbiter', `The Arbiter shakes their head. "Mystery work needs a buyer. Find a vendor."`);
+      const hint = findQuestFactionHint(titleOrId);
+      if (hint && hint.vendorNames.length > 0) {
+        const sample = hint.vendorNames.slice(0, 2).join(' or ');
+        get().appendLog(
+          'arbiter',
+          `The Arbiter shakes their head. "${hint.contractTitle} is a mystery the ${hint.factionLabel} pay for. Find ${sample} — or any other ${hint.factionLabel} agent — to take it on."`,
+        );
+      } else {
+        get().appendLog('arbiter', `The Arbiter shakes their head. "Mystery work needs a buyer. Find a vendor."`);
+      }
       return;
     }
     const factionId = scene.vendor.faction;
@@ -4401,7 +4451,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene = state.currentScene;
     if (!player) return;
     if (!scene?.vendor?.faction) {
-      get().appendLog('arbiter', `The Arbiter shakes their head. "Storylines come from faction agents. Find one."`);
+      const hint = findQuestFactionHint(titleOrId);
+      if (hint && hint.vendorNames.length > 0) {
+        const sample = hint.vendorNames.slice(0, 2).join(' or ');
+        get().appendLog(
+          'arbiter',
+          `The Arbiter shakes their head. "${hint.contractTitle} is a storyline of the ${hint.factionLabel}. Find ${sample} — or any other ${hint.factionLabel} agent — to take it on."`,
+        );
+      } else {
+        get().appendLog('arbiter', `The Arbiter shakes their head. "Storylines come from faction agents. Find one."`);
+      }
       return;
     }
     const factionId = scene.vendor.faction;
