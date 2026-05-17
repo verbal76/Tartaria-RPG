@@ -10,7 +10,8 @@
     "loot": [
       "Boar Hide",
       "Aether Mud"
-    ]
+    ],
+    "aliases": ["boar", "pig", "hog", "the boar"]
   },
   {
     "name": "Mud Wasp",
@@ -49,7 +50,8 @@
     "loot": [
       "Rat Fur",
       "Disease Sample"
-    ]
+    ],
+    "aliases": ["rat", "rodent", "vermin", "the rat"]
   },
   {
     "name": "Bog Hound",
@@ -62,7 +64,8 @@
     "loot": [
       "Hound Fur",
       "Aetheric Teeth"
-    ]
+    ],
+    "aliases": ["hound", "dog", "wolf", "the hound", "the dog"]
   },
   {
     "name": "Mudling",
@@ -75,7 +78,8 @@
     "loot": [
       "Aetheric Sludge",
       "Minor Relic"
-    ]
+    ],
+    "aliases": ["mudling", "imp", "the mudling", "mud thing"]
   },
   {
     "name": "Aetheric Ooze",
@@ -88,7 +92,8 @@
     "loot": [
       "Ooze Residue",
       "Aether Crystal"
-    ]
+    ],
+    "aliases": ["ooze", "slime", "the ooze", "blob"]
   },
   {
     "name": "Aetherbat",
@@ -101,7 +106,8 @@
     "loot": [
       "Aetherwing",
       "Crystalline Echo"
-    ]
+    ],
+    "aliases": ["bat", "aether bat", "the bat", "flying thing"]
   },
   {
     "name": "Mud Strider",
@@ -153,7 +159,8 @@
     "loot": [
       "Spider Silk",
       "Aether Venom"
-    ]
+    ],
+    "aliases": ["spider", "aether spider", "the spider", "web spinner", "webber"]
   },
   {
     "name": "Scrap Drone",
@@ -166,7 +173,8 @@
     "loot": [
       "Drone Processor",
       "Aetheric Cog"
-    ]
+    ],
+    "aliases": ["drone", "robot", "machine", "the drone", "automaton"]
   },
   {
     "name": "Aetheric Worm",
@@ -215,6 +223,7 @@
     "damage": "2D6",
     "hp": 18,
     "rarity": "Common",
+    "aliases": ["spider", "mud crawler", "the spider", "crawler"],
     "loot": [
       "Spider Silk",
       "Mud Poison"
@@ -231,7 +240,8 @@
     "loot": [
       "Raven Feather",
       "Aether Wing"
-    ]
+    ],
+    "aliases": ["raven", "crow", "bird", "the raven"]
   },
   {
     "name": "Mud Lurker",
@@ -244,7 +254,8 @@
     "loot": [
       "Aetheric Mud Fragment",
       "Relic Key"
-    ]
+    ],
+    "aliases": ["lurker", "mud thing", "the lurker"]
   },
   {
     "name": "Silt Serpent",
@@ -257,7 +268,8 @@
     "loot": [
       "Serpent Fang",
       "Mud Essence"
-    ]
+    ],
+    "aliases": ["serpent", "snake", "the serpent", "silt snake"]
   },
   {
     "name": "Aetheric Drone",
@@ -270,7 +282,8 @@
     "loot": [
       "Drone Core",
       "Energy Fragment"
-    ]
+    ],
+    "aliases": ["drone", "aether drone", "machine", "the drone"]
   },
   {
     "name": "Silt Stalker",
@@ -322,7 +335,8 @@
     "loot": [
       "Rusted Parts",
       "Scrap Metal"
-    ]
+    ],
+    "aliases": ["lurker", "rust thing", "the lurker", "rusted thing"]
   },
   {
     "name": "Bog Creeper",
@@ -881,7 +895,8 @@
     "loot": [
       "Sentinel Core",
       "Relic Shard"
-    ]
+    ],
+    "aliases": ["sentinel", "guardian", "statue", "the sentinel", "construct", "tartarian sentinel"]
   },
   {
     "name": "Mud Elemental",
@@ -1076,7 +1091,8 @@
     "loot": [
       "Guardian Core",
       "Aetheric Shield"
-    ]
+    ],
+    "aliases": ["guardian", "the guardian", "aether guardian", "watcher"]
   },
   {
     "name": "Aetheric Phoenix",
@@ -1258,7 +1274,8 @@
     "loot": [
       "Aetherstone Fragment",
       "Veil of Peace"
-    ]
+    ],
+    "aliases": ["aetherkin", "undead", "the dead", "risen", "the aetherkin", "the kin"]
   },
   {
     "name": "Reclaimer Ambusher",
@@ -1268,6 +1285,7 @@
     "damage": "1D6",
     "hp": 24,
     "rarity": "Uncommon",
+    "aliases": ["ambusher", "reclaimer", "raider", "the ambusher", "scavenger"],
     "loot": [
       "Bone Bolt",
       "Patched Cloth"
@@ -1284,6 +1302,7 @@
     "loot": [
       "Aether Residue",
       "Patched Cloth"
-    ]
+    ],
+    "aliases": ["agent", "cloak", "black cloak", "the agent", "monarch agent", "spy", "assassin"]
   }
 ]

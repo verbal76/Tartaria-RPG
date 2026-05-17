@@ -111,10 +111,14 @@ export function extractAmbientNouns(description: string | undefined | null): str
 export function matchAmbientNoun(target: string, ambient: readonly string[]): string | null {
   const t = target.toLowerCase().trim();
   if (!t) return null;
-  // Prefer longest match so "buried cities" beats "cities".
+  // Prefer longest match so "buried cities" beats "cities". Both sides
+  // get lowercased before the includes() comparison — the pool can hold
+  // mixed-case canonical names ("Mud Spider") alongside lowercase
+  // aliases ("spider"), and the player's input is always lowercased.
   const sorted = [...ambient].sort((a, b) => b.length - a.length);
   for (const noun of sorted) {
-    if (t.includes(noun) || noun.includes(t)) return noun;
+    const n = noun.toLowerCase();
+    if (t.includes(n) || n.includes(t)) return noun;
   }
   return null;
 }

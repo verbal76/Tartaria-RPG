@@ -6,7 +6,8 @@
     "description": "A vast Etheric-charged expanse covering ancient Tartaria. Magnetic anomalies, Etheric storms, time dilation. Ground zero for the cataclysm.",
     "danger": 4,
     "tags": ["region", "etheric_anomaly", "open"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["plains", "tartary", "great plains", "wastes", "the plains"]
   },
   {
     "id": "asgardar",
@@ -15,7 +16,8 @@
     "description": "The ancient capital of Tartaria. Home of the Grand Spire of Etheria, which once channeled cosmic Aether into the city grid.",
     "danger": 5,
     "tags": ["capital", "buried", "spire", "grand_spire"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["capital", "the capital", "city", "buried capital", "asgard"]
   },
   {
     "id": "grand_spire_of_etheria",
@@ -25,7 +27,8 @@
     "description": "A monumental tower in Asgardar that drew Aether from celestial realms. Said to be one of the most powerful Aetheric structures ever built.",
     "danger": 5,
     "tags": ["tower", "aetheric_node", "spire"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["spire", "grand spire", "the spire", "tower", "etheria"]
   },
   {
     "id": "samarran",
@@ -34,7 +37,8 @@
     "description": "A research hub of Tartaria. Home of Thametan's Tower and the Etheric Engine whose malfunction triggered the Great Mud Flood.",
     "danger": 5,
     "tags": ["research_hub", "experimental", "ground_zero"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["city", "research city", "research hub", "engine city"]
   },
   {
     "id": "thametans_tower",
@@ -44,7 +48,8 @@
     "description": "Houses the catastrophic Etheric Engine. Site of Elior Zalmar's final resonance cascade. The walls still hum.",
     "danger": 5,
     "tags": ["tower", "ground_zero", "etheric_engine"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["tower", "thametan", "engine tower", "the engine"]
   },
   {
     "id": "voronov",
@@ -53,7 +58,8 @@
     "description": "A significant Tartarian city deeply scarred by the Mud Flood. Rumored to hide intact remnants of Tartarian technology.",
     "danger": 4,
     "tags": ["buried", "tech_cache"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["city", "buried city", "scar city"]
   },
   {
     "id": "nimari",
@@ -62,7 +68,8 @@
     "description": "Half-swallowed. The Red Tower of Nimari is rumored to house one of the last operational Aetheric Cores.",
     "danger": 4,
     "tags": ["partial", "red_tower"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["city", "half-buried city", "red tower city"]
   },
   {
     "id": "red_tower_of_nimari",
@@ -72,7 +79,8 @@
     "description": "Believed to contain a functional Aetheric Core. A critical objective for every faction.",
     "danger": 5,
     "tags": ["tower", "aetheric_core", "objective"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["red tower", "tower", "the tower", "red spire"]
   },
   {
     "id": "varakush",
@@ -82,7 +90,8 @@
     "danger": 1,
     "tags": ["safe_zone", "forgotten_order", "stronghold"],
     "discoverable": true,
-    "controlledBy": "forgotten_order"
+    "controlledBy": "forgotten_order",
+    "aliases": ["stronghold", "base", "order base", "library", "refuge", "the order"]
   },
   {
     "id": "drakova",
@@ -91,7 +100,8 @@
     "description": "A legendary Lost Capital, sealed beneath Aetherstone mud. Believed to hold an intact Aetheric Core.",
     "danger": 5,
     "tags": ["lost_capital", "aetheric_core", "objective"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["lost capital", "city", "sealed city", "drak"]
   },
   {
     "id": "obsidian_pillars",
@@ -100,7 +110,8 @@
     "description": "Black, magnetically charged spires rising from the mud near a former Tartarian observatory. Disrupt all technology.",
     "danger": 3,
     "tags": ["formation", "magnetic", "tech_disruptor"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["pillars", "obsidian", "black pillars", "the pillars", "spires"]
   },
   {
     "id": "endless_stair",
@@ -109,7 +120,8 @@
     "description": "A vast staircase descending into mud, terminating beneath an impassable Etheric disturbance. No one has reached its bottom.",
     "danger": 4,
     "tags": ["ruin", "stair", "etheric_lock"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["stair", "stairs", "staircase", "the stair", "endless steps"]
   },
   {
     "id": "zharaks_teeth",
@@ -118,7 +130,8 @@
     "description": "Towering spires jutting from shallow waters. Beautiful architecture, deadly mud sirens.",
     "danger": 3,
     "tags": ["formation", "mud_siren_lair"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["teeth", "zharak", "ridge", "the teeth", "siren spires"]
   },
   {
     "id": "sinking_cathedral",
@@ -127,7 +140,8 @@
     "description": "Only the steeple remains above the mud. Said to contain a powerful artifact. None who enter return.",
     "danger": 5,
     "tags": ["ruin", "cathedral", "objective", "no_returns"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["cathedral", "church", "steeple", "the cathedral", "sunken church"]
   },
   {
     "id": "cradle_of_dusk",
@@ -136,7 +150,8 @@
     "description": "A pocket within the Mud Seas where the sky glows with residual Aether. Wrecks of ships and frozen statues of their crews litter the ground.",
     "danger": 4,
     "tags": ["region", "etheric_storm", "wreck_field"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["cradle", "dusk", "the cradle", "wreck field"]
   },
   {
     "id": "mud_seas",
@@ -145,7 +160,8 @@
     "description": "Shallow, murky waters covering Tartarian ruins. Currents are unpredictable, storms catastrophic, the creatures within mutated.",
     "danger": 4,
     "tags": ["region", "aquatic", "mutated_fauna"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["sea", "the sea", "seas", "swamp", "the waters", "mud water"]
   },
   {
     "id": "giant_vault",
@@ -154,7 +170,8 @@
     "description": "Ancient vault rumored to hold the last resting place of the Tartarian Giants. Are they sleeping, or imprisoned?",
     "danger": 5,
     "tags": ["vault", "giants", "objective"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["vault", "the vault", "giants vault", "tomb"]
   },
   {
     "id": "mud_flood_nexus",
@@ -163,7 +180,8 @@
     "description": "The subterranean control center believed to have regulated the disaster itself. Touching it might mean rebirth — or a second flood.",
     "danger": 5,
     "tags": ["nexus", "objective", "high_stakes"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["nexus", "the nexus", "control center", "flood control"]
   },
   {
     "id": "etheric_chamber",
@@ -172,7 +190,8 @@
     "description": "The primary power source and control hub for Tartarian technology, buried deep. Guarded by ancient automatons and Etheric traps.",
     "danger": 5,
     "tags": ["vault", "core", "guarded"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["chamber", "the chamber", "etheric core", "power chamber"]
   },
   {
     "id": "tartarian_outskirts",
@@ -181,7 +200,8 @@
     "description": "Borderlands around buried cities. Littered with traps, dormant defenses, and clues. A reasonable place for a new expedition to die.",
     "danger": 2,
     "tags": ["region", "trap_field", "starter_friendly"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["outskirts", "borderlands", "edge", "the edge", "frontier", "trap field"]
   },
   {
     "id": "buried_cities",
@@ -190,6 +210,7 @@
     "description": "Tartaria's most powerful secrets, sealed under Aetherstone. Time distortions and magnetic anomalies make every step a gamble.",
     "danger": 4,
     "tags": ["region", "buried", "time_distortion"],
-    "discoverable": true
+    "discoverable": true,
+    "aliases": ["buried cities", "buried", "the buried cities", "ruins", "sealed cities"]
   }
 ]

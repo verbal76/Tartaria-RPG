@@ -235,7 +235,18 @@ function collectSceneNouns(scene: CurrentScene): string[] {
   if (scene.hazard) nouns.push(scene.hazard.name);
   for (const e of scene.enemies) {
     nouns.push(e.name, e.type);
+    // Phase 4 §2.2 — aliases. Enemies can list synonyms ("sentinel",
+    // "guardian", "statue" for an Architectural Sentinel) so the parser
+    // matches what the player actually types, not just the canonical
+    // name. Empty / missing arrays are safe — the spread is a no-op.
+    if (e.aliases) nouns.push(...e.aliases);
   }
+  // Location aliases — "workroom" / "arch" / "hollow" should resolve to
+  // a Tartarian Arch even though we don't pool the canonical Location
+  // name itself. The parser uses recentNouns for matchAmbientNoun, so
+  // adding the aliases here lets a player type "search the workroom"
+  // and have the engine recognize it.
+  if (scene.location?.aliases) nouns.push(...scene.location.aliases);
   // Ambient nouns from the location description so the parser can resolve
   // "investigate the traps" / "ask about buried cities" against the same
   // content the player just read in the scene paragraph.
