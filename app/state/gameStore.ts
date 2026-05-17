@@ -968,6 +968,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ? `${opts.openingPrefix.trim()} ${sceneText.replace(/\n\n+/g, ' ')}`
       : sceneText;
     get().appendLog('world', finalSceneLog);
+    // When we're in a Micro-Micro room, surface its named exits on its own
+    // line so the player has a deterministic list of things to type
+    // ("take the stairwell", "out the broken window"). This is the room-
+    // level navigation the macro-tier cardinal radar doesn't cover.
+    if (ladderTriple?.microMicro.exits && ladderTriple.microMicro.exits.length > 0) {
+      get().appendLog(
+        'world',
+        `Exits from this room: ${ladderTriple.microMicro.exits.join(' · ')}.`,
+      );
+    }
     // Surface the active weather's stat modifiers so the player can see
     // what's pressing on them this scene. Empty for "calm" or weathers
     // without modifiers.
@@ -1828,8 +1838,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         // "where am I" / "what is around" / "compass" → directional survey
         // if the player has a compass; otherwise a vaguer answer.
-        const wantsBearings = /where.*am|what.*around|what.*near|which way|compass|bearings|surroundings/i.test(trimmed);
+        const wantsBearings = /where.*am|what.*around|what.*near|which way|compass|bearings|surroundings|describe|what.*here/i.test(trimmed);
         if (wantsBearings) {
+          // Lead with the full structured scene description (location +
+          // micro-room env + entities + room exits). The cardinal summary
+          // then follows as the macro-tier answer.
+          narrateCasualLook(get, set as never, currentScene);
           const hasCompass = player.inventory.some(
             (i) => /compass/i.test(i.name) && i.quantity > 0,
           );
@@ -4949,17 +4963,70 @@ function narrateCasualLook(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   scene: CurrentScene,
 ): void {
-  const baseLine = pick(CASUAL_LOOK_LINES);
-  // 30% chance to plant a typed hook on a casual look, unless one is already
-  // active in this scene (don't drown the player in threads).
-  const activeUnresolved = (scene.hooks ?? []).some((h) => !h.resolved);
-  if (!activeUnresolved && chance(30)) {
+  // Build a structured scene description from the data we already have.
+  // Playtest feedback: "look should say 'you are standing by yourself in a
+  // room. there is a table and two chairs. one wall has a window and
+  // another has a door' so I know what's around me." Pull every layer:
+  // macro location, micro-micro environment, present entities, exits.
+  const parts: string[] = [];
+
+  // 1. Where you are (macro).
+  parts.push(`You are in ${scene.location.name}.`);
+
+  // 2. The immediate space — Micro-Micro environmental description if
+  // mapped, otherwise the flat Location description.
+  const ladder = scene.microMicroId ? findMicroMicroAnywhere(scene.microMicroId) : null;
+  const envDesc = ladder?.microMicro.environmental_description?.trim()
+    ?? scene.location.description?.trim()
+    ?? '';
+  if (envDesc) parts.push(envDesc);
+
+  // 3. Weather / hazard on the table.
+  if (scene.weather?.name && scene.weather.id !== 'calm') {
+    parts.push(`Weather: ${scene.weather.name}.`);
+  }
+  if (scene.hazard) {
+    parts.push(`Hazard: ${scene.hazard.name} — ${scene.hazard.description}`);
+  }
+
+  // 4. What's present.
+  const presenceFragments: string[] = [];
+  if (scene.enemies.length > 0) {
+    const groups = new Map<string, number>();
+    for (const e of scene.enemies) groups.set(e.name, (groups.get(e.name) ?? 0) + 1);
+    const labels = Array.from(groups.entries()).map(([n, c]) => (c > 1 ? `${c} ${n}s` : n));
+    presenceFragments.push(`You see ${labels.join(', ')}.`);
+  }
+  if (scene.vendor) {
+    presenceFragments.push(`${scene.vendor.name} is here, ready to trade.`);
+  }
+  const unresolvedHooks = (scene.hooks ?? []).filter((h) => !h.resolved);
+  if (unresolvedHooks.length > 0) {
+    const hookNoun = unresolvedHooks[0]!.nouns[0] ?? unresolvedHooks[0]!.kind;
+    presenceFragments.push(`The ${hookNoun} is still here, unaddressed.`);
+  }
+  if (presenceFragments.length === 0) {
+    presenceFragments.push('You stand alone — nothing alive moves near you.');
+  }
+  parts.push(presenceFragments.join(' '));
+
+  // 5. Exits — named Micro-Micro exits when in a mapped room, plus the
+  // four cardinals for the macro tier so the player always has a move.
+  if (ladder?.microMicro.exits && ladder.microMicro.exits.length > 0) {
+    parts.push(`Exits: ${ladder.microMicro.exits.join(' · ')}.`);
+  }
+  parts.push('You can also head north, east, south, or west to walk the map.');
+
+  get().appendLog('world', parts.join(' '));
+
+  // 6. Optional hook plant — 30% chance, only if no hook is already active.
+  // Kept separate from the description so the look-summary always reads
+  // the same way regardless of whether a new lead drops.
+  if (unresolvedHooks.length === 0 && chance(30)) {
     const hook = plantHookByKind(pickRandomHookKind());
     set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } } : s));
-    get().appendLog('world', `${baseLine}  ${hook.plantedLine}`);
-    return;
+    get().appendLog('world', hook.plantedLine);
   }
-  get().appendLog('world', baseLine);
 }
 
 function narrateWanderingJourney(
