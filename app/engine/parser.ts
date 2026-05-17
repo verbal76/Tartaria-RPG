@@ -106,9 +106,16 @@ function tokenize(normalized: string): string[] {
   return normalized.split(' ').filter((t) => t.length > 0);
 }
 
+// Question/interrogative words that often slip into the tail of inputs like
+// "examine the compass where" or "look at the door how". They're verb
+// synonyms for the `ask` intent so they can't live in the global STOPWORDS,
+// but once another intent has already won the verb slot we don't want them
+// echoed back as target text ("You examine compass where").
+const QUESTION_WORDS = new Set(['where', 'when', 'what', 'who', 'why', 'how', 'which']);
+
 function extractTargetTokens(tokens: string[], verbIdx: number): string[] {
   const after = tokens.slice(verbIdx + 1);
-  return after.filter((t) => !STOPWORDS.has(t));
+  return after.filter((t) => !STOPWORDS.has(t) && !QUESTION_WORDS.has(t));
 }
 
 function resolveItem(targetTokens: string[], inventory: InventoryItem[]): InventoryItem | undefined {

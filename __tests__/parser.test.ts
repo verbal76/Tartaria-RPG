@@ -75,6 +75,25 @@ describe('parseInput — never hard fails', () => {
   });
 });
 
+describe('parseInput — drops trailing question words from targets', () => {
+  // Playtest: "examine compass where" produced
+  // "You examine compass where. The Aetherstone hums..." — the bare
+  // question word was echoed because question-frame tokens aren't in
+  // STOPWORDS (they're ask-intent verbs). Once another verb has won the
+  // slot they should fall off the target tail.
+  it('strips a trailing "where" from an investigate target', () => {
+    const r = parseInput('examine compass where');
+    expect(r.intent).toBe('investigate');
+    expect(r.target).toBe('compass');
+  });
+
+  it('strips "how" / "why" / "what" from the target tail', () => {
+    expect(parseInput('look at the door how').target).toBe('door');
+    expect(parseInput('search the rubble why').target).toBe('rubble');
+    expect(parseInput('inspect the shard what').target).toBe('shard');
+  });
+});
+
 describe('parseInput — combat-aware fallback suggestions', () => {
   // Playtest log: when the parser couldn't resolve a verb mid-fight, it only
   // suggested 'attack / hide / parley'. Players had no idea that 'advance',

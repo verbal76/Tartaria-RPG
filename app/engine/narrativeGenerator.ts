@@ -325,11 +325,13 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
   if (ctx.unresolvedHooks && ctx.unresolvedHooks.length > 0 && Math.random() < 0.4) {
     const hook = ctx.unresolvedHooks[0]!;
     const noun = hook.nouns[0] ?? hook.kind;
+    // Plural-safe phrasings only — playtest log caught "The footprints hasn't
+    // gone anywhere." Avoid is/are/has/have around ${noun} entirely.
     const callbacks = [
-      `"The ${noun} hasn't gone anywhere," the Arbiter says. "Decide if it matters."`,
+      `"The ${noun} — still waiting," the Arbiter says. "Decide if it matters."`,
       `"You saw the ${noun}," the Arbiter notes. "That memory will rot if you leave it."`,
       `"Threads in Tartaria don't wait long," the Arbiter says quietly. "The ${noun} won't either."`,
-      `The Arbiter glances toward the ${noun}. "That is still there. Still yours, if you take it."`,
+      `The Arbiter glances toward the ${noun}. "Still there. Still yours, if you take it."`,
     ];
     return pick(callbacks);
   }

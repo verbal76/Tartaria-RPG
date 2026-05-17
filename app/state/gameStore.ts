@@ -149,6 +149,7 @@ import {
 } from '../engine/factionStorylines';
 import { tickWeather, weatherBlocksRepositioning } from '../engine/weatherEffects';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
+import { levenshtein } from '../engine/editDistance';
 import { isAreaSearch, rollAreaSearch } from '../engine/areaSearch';
 import { bestDigTool, rollDig } from '../engine/digging';
 import {
@@ -1347,8 +1348,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (preview.description && preview.description.toLowerCase() !== 'no record of this item in the catalog.') {
               get().appendLog('world', preview.description);
             }
-            if (preview.stats.length > 0) {
-              get().appendLog('world', preview.stats.join(' · '));
+            // Skip stats lines that are tags-only ("Tags: detection, ...") —
+            // they read as orphan metadata in the game log and the description
+            // already conveys what the item is for. Real mechanical stats
+            // (damage, AC, stat bonuses, durability) still surface.
+            const meaningfulStats = preview.stats.filter(
+              (s) => !/^Tags:/i.test(s),
+            );
+            if (meaningfulStats.length > 0) {
+              get().appendLog('world', meaningfulStats.join(' · '));
             }
           }
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
@@ -1549,9 +1557,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
           }
         }
-        const candidate = target
+        // Fuzzy location lookup — playtest typed "Walk to dracova" (one
+        // letter off from Drakova) and got narrateWanderingJourney instead
+        // of a real route. Try exact-substring first, then a Levenshtein
+        // fallback that allows a misspelling per city name.
+        let candidate = target
           ? allLocations.find((l) => l.name.toLowerCase().includes(target) || l.id === target)
           : undefined;
+        if (!candidate && target && target.length >= 4) {
+          let bestDist = 3;
+          for (const l of allLocations) {
+            const lname = l.name.toLowerCase();
+            // Compare against each word in the location name so "dracova"
+            // matches "Drakova" inside "City of Drakova" too.
+            const words = lname.split(/\s+/);
+            for (const w of words) {
+              if (Math.abs(w.length - target.length) > 2) continue;
+              const d = levenshtein(target, w);
+              if (d < bestDist) {
+                bestDist = d;
+                candidate = l;
+              }
+            }
+          }
+        }
         if (candidate) {
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.travel), 2) });
           get().travelTo(candidate.id);
@@ -2298,9 +2327,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
           case 'stealth':
             get().appendLog('world', 'You move low and quiet. Whatever watches does not see you.');
             break;
-          case 'diplomacy':
-            get().appendLog('world', 'Your words find purchase. Something in this place is listening.');
+          case 'diplomacy': {
+            // Gate the "someone heard you" line on someone actually being
+            // present. Playtest: player typed "ask the monk if he has food"
+            // on an empty road and the world replied "Your words find
+            // purchase." against nobody.
+            const hasAudience = currentScene.enemies.length > 0 || !!currentScene.vendor;
+            const line = hasAudience
+              ? 'Your words find purchase. Something in this place is listening.'
+              : "Your voice carries across empty ground. No one is here to answer — try this where the world has people.";
+            get().appendLog('world', line);
             break;
+          }
           case 'escape':
             get().appendLog('world', 'You break for the entrance. Behind you the chamber settles back into silence.');
             if (currentScene.enemies.length > 0) {
@@ -2338,9 +2376,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
           case 'stealth':
             get().appendLog('world', 'Your foot scrapes stone. Something stirs in the dark.');
             break;
-          case 'diplomacy':
-            get().appendLog('world', 'Your words hang unanswered. The silence has heard better arguments.');
+          case 'diplomacy': {
+            const hasAudience = currentScene.enemies.length > 0 || !!currentScene.vendor;
+            const line = hasAudience
+              ? 'Your words hang unanswered. The silence has heard better arguments.'
+              : 'No one is here to negotiate with. The wind takes the words.';
+            get().appendLog('world', line);
             break;
+          }
           case 'escape': {
             // Stranded escape — without follow-up guidance the player just
             // re-typed "retreat" three times in the playtest log. Tell them
@@ -3833,6 +3876,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    // Capture what was already in this slot so the swap is visible.
+    // Playtest: player equipped a locket, then a compass to the same Amulet
+    // slot and got two "You equip ..." lines with no signal that the locket
+    // was actually displaced.
+    const previousInSlot = player.equipped?.[slot];
     set((s) =>
       s.player
         ? {
@@ -3843,10 +3891,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
-    get().appendLog(
-      'world',
-      `You equip ${item.name} (${SLOT_LABEL[slot]}).`,
-    );
+    if (previousInSlot && previousInSlot !== item.name) {
+      get().appendLog(
+        'world',
+        `You stow the ${previousInSlot} and equip ${item.name} (${SLOT_LABEL[slot]}).`,
+      );
+    } else {
+      get().appendLog('world', `You equip ${item.name} (${SLOT_LABEL[slot]}).`);
+    }
     void get().persist();
   },
 
