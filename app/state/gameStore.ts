@@ -800,9 +800,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
   appendLog(channel, text, meta) {
     const entry = makeEntry(channel, text, meta);
     void persistEntry(entry);
-    set((state) => ({
-      gameLog: [...state.gameLog, entry].slice(-MAX_LOG_IN_MEMORY),
-    }));
+    // Duplicate-chatter suppression. If the Arbiter just spoke the same
+    // line within the last 8 entries, swallow the repeat. Was producing
+    // "I'd place that at a Hard, if I had to guess." twice in 30 seconds
+    // in the playtest log.
+    if (channel === 'arbiter') {
+      const recent = get().gameLog.slice(-8);
+      for (const prev of recent) {
+        if (prev.channel === 'arbiter' && prev.text === text) return;
+      }
+    }
+    set((state) => {
+      const nextLog = [...state.gameLog, entry].slice(-MAX_LOG_IN_MEMORY);
+      // Phase 4 follow-up §1 — last-world-line vocabulary. Every noun in a
+      // [world] line gets folded into the scene's ambient noun pool so the
+      // parser matches the player's natural next move. If the world just
+      // said "a foot print, far larger than any human boot" then typing
+      // "investigate footprint" resolves cleanly next turn instead of the
+      // "I do not see a 'footprint' here" rejection that dominated the
+      // playtest log.
+      if (channel === 'world' && state.currentScene) {
+        const newNouns = extractAmbientNouns(text);
+        if (newNouns.length > 0) {
+          const merged = new Set(state.currentScene.ambientNouns ?? []);
+          for (const n of newNouns) merged.add(n);
+          // Cap at 80 to prevent unbounded growth across a long visit.
+          // The matcher's longest-first sort means recent additions still
+          // win even when older nouns are present.
+          const next = Array.from(merged).slice(-80);
+          return {
+            gameLog: nextLog,
+            currentScene: { ...state.currentScene, ambientNouns: next },
+          };
+        }
+      }
+      return { gameLog: nextLog };
+    });
   },
 
   beginScene(opts?: { openingPrefix?: string; microMicroId?: string }) {
@@ -1255,9 +1288,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? { bands: ['arm'] as CombatRange[], label: 'Bare hands' }
             : playerWeaponReach(player);
           if (!reach.bands.includes(range)) {
+            // Tell the player WHAT TO TYPE, not just what's wrong. The
+            // playtest log showed the old "Close the gap, or swap to
+            // something with range" left players stranded — they didn't
+            // know which verbs to use.
+            const remedy = range === 'arm'
+              ? `type 'retreat' to step back for a ranged shot`
+              : `type 'advance' to close in for melee`;
             get().appendLog(
               'arbiter',
-              `The Arbiter holds up a hand. "${reach.label} cannot reach at ${RANGE_LABEL[range]}. Close the gap, or swap to something with range."`,
+              `The Arbiter holds up a hand. "${reach.label} can't reach at ${RANGE_LABEL[range]} range. ${remedy[0]!.toUpperCase()}${remedy.slice(1)}."`,
             );
             break;
           }
@@ -1437,7 +1477,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (player.stamina < TRAVEL_MIN_STAMINA) {
           get().appendLog(
             'world',
-            'You take one step and the buried world refuses. Your legs will not. Rest first, then the road.',
+            `You take one step and the buried world refuses. Your legs will not. Type 'rest' to recover (≈4h), then the road will hold you again.`,
           );
           break;
         }
@@ -2301,9 +2341,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           case 'diplomacy':
             get().appendLog('world', 'Your words hang unanswered. The silence has heard better arguments.');
             break;
-          case 'escape':
-            get().appendLog('world', 'The way is longer than you remembered. You circle back, breathing hard.');
+          case 'escape': {
+            // Stranded escape — without follow-up guidance the player just
+            // re-typed "retreat" three times in the playtest log. Tell them
+            // what else is on the table.
+            const inCombat = currentScene.enemies.length > 0;
+            const hint = inCombat
+              ? " Try 'block' to brace, 'attack' to commit, or another 'retreat' to break contact."
+              : ' The way out is blocked for now — try a different direction, or rest before pushing through.';
+            get().appendLog(
+              'world',
+              `The way is longer than you remembered. You circle back, breathing hard.${hint}`,
+            );
             break;
+          }
           case 'investigate':
             get().appendLog('world', `You sweep ${currentScene.location.name} but find only dust and old silence.`);
             break;

@@ -218,7 +218,7 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
       suggestions.push(`inspect ${noun.toLowerCase()}`, `use torch on ${noun.toLowerCase()}`);
     }
     if (item) suggestions.push(`use ${item.name.toLowerCase()}`);
-    if (context.enemyPresent) suggestions.push('attack', 'hide', 'parley');
+    if (context.enemyPresent) suggestions.push('attack', 'block', 'advance', 'retreat', 'hide', 'parley');
     if (!suggestions.length) suggestions.push('look around', 'search', 'rest');
     return { intent: 'unknown', raw, normalized, confidence: 0.1, suggestions, resolvedNoun: noun };
   }

@@ -75,6 +75,27 @@ describe('parseInput — never hard fails', () => {
   });
 });
 
+describe('parseInput — combat-aware fallback suggestions', () => {
+  // Playtest log: when the parser couldn't resolve a verb mid-fight, it only
+  // suggested 'attack / hide / parley'. Players had no idea that 'advance',
+  // 'retreat', 'block' were legal verbs. The fallback now exposes them so
+  // the Try: bar teaches the full combat verb set.
+  it('offers movement + defense verbs in fallback when enemy is present', () => {
+    const r = parseInput('asdfghjkl', { enemyPresent: true });
+    expect(r.intent).toBe('unknown');
+    for (const v of ['attack', 'block', 'advance', 'retreat', 'hide', 'parley']) {
+      expect(r.suggestions).toContain(v);
+    }
+  });
+
+  it('does not push combat verbs when no enemy is present', () => {
+    const r = parseInput('asdfghjkl', { enemyPresent: false });
+    expect(r.suggestions).not.toContain('block');
+    expect(r.suggestions).not.toContain('advance');
+    expect(r.suggestions).not.toContain('retreat');
+  });
+});
+
 describe('parseInput — combat context override', () => {
   it('routes "use my torch to attack the moth" to attack when enemy is present', () => {
     const r = parseInput('use my torch to attack the moth', { inventory: [torch], enemyPresent: true });
