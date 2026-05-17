@@ -67,7 +67,13 @@ export const HOOK_PLANTS: Record<HookKind, { line: string; nouns: string[] }[]> 
     { line: 'A wagon, abandoned and broken-axled, leans into the mud ahead.', nouns: ['wagon', 'cart', 'wreck', 'caravan'] },
   ],
   arch: [
-    { line: 'You spot what looks like a stone arch, half-swallowed by old mud.', nouns: ['arch', 'gate', 'archway', 'doorway', 'ruin'] },
+    {
+      line: 'You spot what looks like a stone arch, half-swallowed by old mud.',
+      // The arch chain always leads to a Tartarian work-room; pre-seed the
+      // vocabulary so "search workroom" / "search the work room" resolves
+      // against the same planted hook the player followed in.
+      nouns: ['arch', 'gate', 'archway', 'doorway', 'ruin', 'workroom', 'work-room', 'work room', 'hollow', 'passage'],
+    },
   ],
   glint: [
     { line: 'A glint of metal — too small to name yet — lies in the rubble.', nouns: ['glint', 'metal', 'shine', 'rubble'] },

@@ -197,13 +197,22 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
     const noun = resolveContextNoun(tokens.filter((t) => !STOPWORDS.has(t)), recentNouns);
     const item = resolveItem(tokens.filter((t) => !STOPWORDS.has(t)), inventory);
     const suggestions: string[] = [];
-    // A noun that matches the player's current Location name is a container,
-    // not a target — "use torch on tartarian outskirts" reads as nonsense and
-    // should not be offered. Fall back to generic look/search suggestions in
-    // that case.
+    // A noun that matches the player's current Location name (or any
+    // substring of it) is a container, not a target — "use torch on
+    // tartarian outskirts" reads as nonsense, and so does "use torch on
+    // buried cities" when the location is "The Buried Cities" and the
+    // ambient noun extractor picked up the bare phrase. Suppress
+    // suggestions for any noun that is a substring of OR contains the
+    // location name. Player can still TYPE the action and the handler
+    // will respond; we just stop offering it as a default.
+    const lowerLocation = (context.currentLocationName ?? '').toLowerCase();
+    const lowerNoun = noun?.toLowerCase() ?? '';
     const nounIsLocation = !!(
-      noun && context.currentLocationName &&
-      noun.toLowerCase() === context.currentLocationName.toLowerCase()
+      lowerNoun && lowerLocation && (
+        lowerNoun === lowerLocation ||
+        lowerLocation.includes(lowerNoun) ||
+        lowerNoun.includes(lowerLocation)
+      )
     );
     if (noun && !nounIsLocation) {
       suggestions.push(`inspect ${noun.toLowerCase()}`, `use torch on ${noun.toLowerCase()}`);

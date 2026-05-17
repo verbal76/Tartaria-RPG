@@ -66,7 +66,12 @@ import {
   pickSiblingMicroMicro,
 } from '../engine/worldLadder';
 import { getItemPreview } from '../components/itemPreview';
-import { isInventoryQuestion, extractInventoryTarget, isContinueCommand } from '../engine/askInventory';
+import {
+  isInventoryQuestion,
+  extractInventoryTarget,
+  isContinueCommand,
+  isCountQuestion,
+} from '../engine/askInventory';
 import { mergeOrPushItem } from '../engine/inventory';
 import {
   parseDirectionQuestion,
@@ -1722,23 +1727,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // so they're testable without the store.
         if (isInventoryQuestion(trimmed)) {
           const target = extractInventoryTarget(trimmed);
+          const countQuestion = isCountQuestion(trimmed);
           if (target) {
             const matches = player.inventory.filter(
               (i) => i.quantity > 0 && i.name.toLowerCase().includes(target),
             );
             if (matches.length > 0) {
-              const itemized = matches
-                .map((i) => (i.quantity > 1 ? `${i.name} (x${i.quantity})` : i.name))
-                .join(', ');
-              get().appendLog(
-                'arbiter',
-                `The Arbiter glances at your pack. "Yes — ${itemized}."`,
-              );
+              if (countQuestion) {
+                // "how many rations do I have" → name the count by item, not
+                // a "yes — N rations" phrasing that reads like a yes/no.
+                const itemized = matches
+                  .map((i) => `${i.quantity} ${i.name}`)
+                  .join(', ');
+                get().appendLog(
+                  'arbiter',
+                  `The Arbiter counts your pack. "${itemized}."`,
+                );
+              } else {
+                const itemized = matches
+                  .map((i) => (i.quantity > 1 ? `${i.name} (x${i.quantity})` : i.name))
+                  .join(', ');
+                get().appendLog(
+                  'arbiter',
+                  `The Arbiter glances at your pack. "Yes — ${itemized}."`,
+                );
+              }
             } else {
-              get().appendLog(
-                'arbiter',
-                `The Arbiter shakes their head. "No ${target} on you."`,
-              );
+              // Count question with zero matches reads as "0 X" — keeps the
+              // phrasing aligned with the count branch above.
+              if (countQuestion) {
+                get().appendLog(
+                  'arbiter',
+                  `The Arbiter shakes their head. "Zero ${target}."`,
+                );
+              } else {
+                get().appendLog(
+                  'arbiter',
+                  `The Arbiter shakes their head. "No ${target} on you."`,
+                );
+              }
             }
             break;
           }

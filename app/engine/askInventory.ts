@@ -19,6 +19,11 @@ export function isInventoryQuestion(text: string): boolean {
   // "do i have / got X", "have i got X" — match anywhere; these phrasings are
   // ~always inventory questions.
   if (/\b(do i (?:have|got)|have i (?:got)?|got any|got the|got a)\b/i.test(text)) return true;
+  // "how many X" / "how much X" — count question variant. The handler can
+  // detect this via isCountQuestion() and answer with a quantity instead of
+  // yes/no. Anchored to the sentence opening so "tell me how many rats are
+  // here" (concept-ish) doesn't get caught.
+  if (/^\s*how\s+(?:many|much)\b/i.test(text)) return true;
   // "is X / is the Y in my pack/inventory/bag/pockets" — explicit container
   // reference is the strongest signal an inventory question is in flight.
   if (/\bin my (?:pack|inventory|bag|pockets)\b/i.test(text)) return true;
@@ -36,21 +41,36 @@ export function isInventoryQuestion(text: string): boolean {
  * player.inventory by substring match.
  *
  * Examples:
- *   "is the fungus in my pack?" → "fungus"
- *   "do I have a locket"        → "locket"
- *   "got any bandages"          → "bandages"
+ *   "is the fungus in my pack?"        → "fungus"
+ *   "do I have a locket"               → "locket"
+ *   "got any bandages"                 → "bandages"
+ *   "how many rations are in my pack"  → "rations"
+ *   "how much aetherstone do I have"   → "aetherstone"
  */
 export function extractInventoryTarget(text: string): string {
   return text
     .toLowerCase()
     .replace(
-      /\b(do i have|do i got|have i got|have i|is there a|is there any|is there|is the|is a|is any|got any|got the|got a|in my (?:pack|inventory|bag|pockets))\b/g,
+      /\b(how (?:many|much)|do i have|do i got|have i got|have i|is there a|is there any|is there|is the|is a|is any|got any|got the|got a|in my (?:pack|inventory|bag|pockets))\b/g,
       ' ',
     )
     .replace(/\?/g, ' ')
+    // Linking words / state-of-being verbs that creep into question phrasings
+    // ("how many rations ARE in my pack" / "what bandages DO i HAVE"). Without
+    // stripping these the responder gets "No how many rations are on you."
+    .replace(/\b(are|is|was|were|do|does|did|have|has)\b/g, ' ')
     .replace(/\b(any|some|the|my|a|an|on me|with me)\b/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+/**
+ * True when the inventory question is asking for a COUNT ("how many rations
+ * do I have?") rather than a yes/no ("do I have rations?"). The caller
+ * answers with the actual quantity instead of a binary.
+ */
+export function isCountQuestion(text: string): boolean {
+  return /\bhow\s+(?:many|much)\b/i.test(text);
 }
 
 /**
