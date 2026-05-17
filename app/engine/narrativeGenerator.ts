@@ -390,6 +390,31 @@ export const USE_RELIC_FAILURE_LINES: readonly string[] = [
 ];
 
 /**
+ * Whitelist of player intents where Qwen (the generative Arbiter) is
+ * actually a good fit. Travel, investigate, and diplomacy are the
+ * intents where the player wants atmosphere or curiosity — exactly the
+ * cases where a paragraph of generated prose adds value.
+ *
+ * Every other intent (attack, dodge, rest, use_relic, craft, inventory,
+ * equip, dig, vendor flows…) wants instant feedback. The deterministic
+ * template path covers those much faster than a 10–20 second LLM round
+ * trip and never hallucinates events the engine didn't actually do.
+ *
+ * narrateViaArbiter checks this set AND scene combat state before
+ * deciding to call the model. Outside the whitelist, or in active
+ * combat, the template fires immediately and no LLM call is made.
+ *
+ * `scene_intro` is a synthetic intent the scene-entry path uses so the
+ * Arbiter can narrate a new room with the same Qwen permission.
+ */
+export const QWEN_ALLOWED_INTENTS: ReadonlySet<string> = new Set([
+  'travel',
+  'investigate',
+  'diplomacy',
+  'scene_intro',
+]);
+
+/**
  * Decides whether the Arbiter should speak this turn. Replaces the previous
  * flat 45% gate (HANDOFF §5 #1: "Arbiter feels disconnected"). The baseline
  * sits at 20% and earns context-aware boosts: combat, unresolved hooks, mood,

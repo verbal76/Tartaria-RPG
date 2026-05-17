@@ -427,6 +427,9 @@ describe('buildSystemPrompt', () => {
     expect(system).toContain('atmospheric tone');
     expect(system).toMatch(/35 words/);
     expect(system).not.toContain('ACTIVE COMBAT');
+    // Phase 4 §1.3 — peaceful instruction must tell the model to weave
+    // exits into the description so the player learns the map.
+    expect(system).toMatch(/AVAILABLE EXITS/i);
   });
 
   it('emits the same prompt for the same context (deterministic)', () => {

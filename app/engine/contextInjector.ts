@@ -140,9 +140,10 @@ const VOICE_RULES =
 
 const PEACEFUL_INSTRUCTION =
   'Narrate the situation in a grim, atmospheric tone. Acknowledge the ' +
-  'last action, describe what is around the player, and you may subtly ' +
-  'reference equipped or carried items if they fit the moment. Keep it ' +
-  'to TWO short sentences — about 35 words. ' +
+  'last action and weave the AVAILABLE EXITS naturally into your ' +
+  'description so the player learns the map as they move. You may ' +
+  'subtly reference equipped or carried items if they fit the moment. ' +
+  'Keep it to TWO short sentences — about 35 words. ' +
   VOICE_RULES;
 
 const COMBAT_INSTRUCTION =

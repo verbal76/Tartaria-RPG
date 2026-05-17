@@ -43,6 +43,7 @@ import {
   buildSoftArbiterFallback,
   buildArbiterSceneIntro,
   USE_RELIC_FAILURE_LINES,
+  QWEN_ALLOWED_INTENTS,
 } from '../engine/narrativeGenerator';
 import { parseInput, type ParseContext } from '../engine/parser';
 import { rollDie, rollFromNotation, pick, chance } from '../engine/rng';
@@ -849,6 +850,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ? `${opts.openingPrefix.trim()} ${sceneText.replace(/\n\n+/g, ' ')}`
       : sceneText;
     get().appendLog('world', finalSceneLog);
+    // Phase 4 §3.3 — the "Radar" block. Deterministic compass summary so
+    // the player ALWAYS knows where they are and what's in each cardinal
+    // direction without needing a compass item or asking the Arbiter.
+    // Pulls from the same character-seeded world map the travel system
+    // uses, so the directions are consistent across the session.
+    try {
+      const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
+      const map = generateWorldMap(seed, player.currentLocationId);
+      const fromX = player.mapX ?? 4;
+      const fromY = player.mapY ?? 4;
+      const radar = describeAllDirections(map, fromX, fromY);
+      get().appendLog('world', `[${location.name}] ${radar}`);
+    } catch {
+      // best-effort radar — never block the scene on a map-generation hiccup
+    }
     if (enemies.length > 1) {
       get().appendLog(
         'combat',
@@ -1004,6 +1020,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           player,
           worldMemory: get().worldMemory,
         }),
+        'scene_intro',
       );
     } else if (
       shouldArbiterSpeak({
@@ -1020,6 +1037,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           enemy: sceneEnemy,
           unresolvedHooks: unresolvedHookList,
         }),
+        'scene_intro',
       );
     }
     set((s) => {
@@ -1965,7 +1983,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           recentActions,
           unresolvedHooks,
         });
-        void narrateViaArbiter(get, set, template);
+        void narrateViaArbiter(get, set, template, parsed.intent);
       }
     }
 
@@ -4614,15 +4632,34 @@ async function narrateViaArbiter(
   get: () => GameStore,
   set: (partial: Partial<GameStore> | ((s: GameStore) => Partial<GameStore>)) => void,
   templateFallback: string,
+  /**
+   * Intent that triggered this narration. Used as the routing key for the
+   * Qwen allowlist (see QWEN_ALLOWED_INTENTS). Intents outside the
+   * allowlist take the template path even when Qwen is ready — this is
+   * Phase 4 §1.1, "kill the randomizer." The synthetic 'scene_intro'
+   * intent lets the scene-entry path through.
+   */
+  intent: string = 'scene_intro',
 ): Promise<void> {
   const trimmed = (templateFallback ?? '').trim();
-  if (!qwen.isReady() || get().isGenerating) {
+  const scene = get().currentScene;
+  // Phase 4 §1.2 — the Combat Muzzle. Any hostile entity in the scene
+  // forces template-only narration regardless of Qwen readiness or the
+  // configured intent. The model has been observed to hallucinate trap
+  // sequences and tour-guide prose during combat; the deterministic
+  // template path is faster AND safer here.
+  const inCombat = !!scene && scene.enemies.length > 0;
+  // Phase 4 §1.1 — Intent allowlist. Outside the small whitelist (travel,
+  // investigate, diplomacy, scene_intro), the deterministic templates
+  // carry the narration. Random Qwen chatter on attack / rest / dig /
+  // equip etc. is gone.
+  const intentAllowsQwen = QWEN_ALLOWED_INTENTS.has(intent);
+  if (!qwen.isReady() || get().isGenerating || inCombat || !intentAllowsQwen) {
     if (trimmed) get().appendLog('arbiter', trimmed);
     return;
   }
   const state = get();
   const player = state.player;
-  const scene = state.currentScene;
   if (!player || !scene) {
     if (trimmed) get().appendLog('arbiter', trimmed);
     return;
