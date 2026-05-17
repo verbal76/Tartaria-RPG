@@ -77,6 +77,13 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   help: ['help', 'assist', 'aid', 'support', 'back up', 'cover', 'bolster', 'defend', 'reinforce', 'abet'],
   ready: ['ready', 'prepare', 'set up', 'focus', 'watch', 'await', 'prep', 'steady', 'anticipate', 'cock'],
   mount: ['mount', 'saddle', 'ride', 'bridle', 'horse up', 'climb on', 'astride', 'dismount', 'unsaddle', 'get off'],
+  // NEW from firearms / evasive cards. Sprint stays as a dash alias
+  // (already covered in dash synonyms); flee stays as escape; brawl is
+  // bare-hand attack (already covered via punch/kick). Genuinely new:
+  take_cover: ['takecover', 'cover up', 'hunker', 'crouch behind', 'duck behind', 'shelter', 'tuck', 'dive for cover', 'go prone', 'flatten'],
+  aim: ['aim', 'sight', 'target', 'line up', 'draw bead', 'level', 'lock on', 'sightin', 'tracksight', 'zero'],
+  reload: ['reload', 'reloading', 'reset', 'rearm', 'rerack', 'refill', 'recharge', 'top up', 'load up', 'feed'],
+  maneuver: ['maneuver', 'disarm', 'grapple', 'trip', 'shove', 'sweep', 'pin', 'hook', 'wrench', 'manoeuvre'],
 };
 
 const ALL_INTENTS = Object.keys(VERB_SYNONYMS) as Exclude<Intent, 'unknown'>[];

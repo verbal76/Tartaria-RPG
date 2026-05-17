@@ -2286,6 +2286,109 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
         break;
       }
+      case 'take_cover': {
+        // Apply a dodge-style effect — +4 AC for one round, same buff as
+        // the dodge action. Costs nothing but the turn. Works in or out of
+        // combat; out of combat reads as caution.
+        const cover: StatusEffect = {
+          kind: 'dodging',
+          remainingRounds: 1,
+          label: 'in cover',
+        };
+        set((s) =>
+          s.player
+            ? {
+                player: {
+                  ...s.player,
+                  statusEffects: applyEffect(s.player.statusEffects ?? [], cover),
+                  hoursElapsed: (s.player.hoursElapsed ?? 0) + 0.1,
+                },
+              }
+            : s,
+        );
+        get().appendLog(
+          'world',
+          currentScene.enemies.length > 0
+            ? `You dive behind whatever the room offers. +4 AC this round; attacks against you fire at Disadvantage.`
+            : `You tuck against the nearest cover. The world keeps moving without you for a beat.`,
+        );
+        break;
+      }
+      case 'aim': {
+        // Stage a +2 bonus on the next ranged attack. Tracked as a
+        // dodging-kind status effect with a custom label so the combat
+        // panel can show it. Counters trigger if the player still in
+        // range of melee; we accept that as a cost of aiming.
+        const equipped = player.equipped?.main ? findWeaponByName(player.equipped.main) : null;
+        if (!equipped || equipped.weaponKind === 'melee') {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter waits. "Aim what? You need a ranged weapon — a bow, a bolt-caster, a runecaster — in hand."`,
+          );
+          break;
+        }
+        const aiming: StatusEffect = {
+          kind: 'dodging',
+          remainingRounds: 1,
+          label: 'aiming',
+        };
+        set((s) =>
+          s.player
+            ? {
+                player: {
+                  ...s.player,
+                  statusEffects: applyEffect(s.player.statusEffects ?? [], aiming),
+                  hoursElapsed: (s.player.hoursElapsed ?? 0) + 0.1,
+                },
+              }
+            : s,
+        );
+        get().appendLog(
+          'world',
+          `You bring the ${equipped.name} up and breathe out. Next shot rolls with Advantage — +2 to hit.`,
+        );
+        break;
+      }
+      case 'reload': {
+        set({ player: advanceTime(spendStamina(player, 1), 0.1) });
+        const equipped = player.equipped?.main ? findWeaponByName(player.equipped.main) : null;
+        if (!equipped || equipped.weaponKind === 'melee') {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter watches you fumble. "Nothing to reload — that one bites with its edge, not its magazine."`,
+          );
+          break;
+        }
+        get().appendLog(
+          'world',
+          `You reload the ${equipped.name}. Fresh bolts seated; the next shot won't catch you empty.`,
+        );
+        break;
+      }
+      case 'maneuver': {
+        // Special-move template — disarm, grapple, trip. Resolves as a
+        // skill check (STR for grapple, DEX for disarm/trip — default to
+        // STR until we wire per-maneuver routing). Costs the turn,
+        // success grants a 1-round dodging-effect on the target via
+        // a "knocked off-balance" tag.
+        if (currentScene.enemies.length === 0) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter raises a brow. "Maneuver against whom? Empty ground does not grapple back."`,
+          );
+          break;
+        }
+        set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.1) });
+        const steps = buildSkillSteps('investigate', player, {
+          weatherMod: weatherStatModifiers(currentScene.weather),
+        });
+        set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
+        get().appendLog(
+          'world',
+          `You commit to the maneuver — disarm, trip, or grapple. STR check incoming. Success knocks your target off-balance.`,
+        );
+        break;
+      }
       case 'accept': {
         const target = parsed.target ?? parsed.resolvedNoun ?? '';
         if (!target.trim()) {

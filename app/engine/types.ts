@@ -35,6 +35,10 @@ export type Intent =
   | 'help'
   | 'ready'
   | 'mount'
+  | 'take_cover'
+  | 'aim'
+  | 'reload'
+  | 'maneuver'
   | 'unknown';
 
 export interface ParsedInput {
