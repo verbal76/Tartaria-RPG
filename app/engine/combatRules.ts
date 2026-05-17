@@ -65,6 +65,13 @@ export function buildCombatSteps(
   actionText: string,
   player: PlayerCharacter,
   enemy: Enemy,
+  opts?: {
+    /** When set, the attack is being made out of normal weapon range
+     *  (e.g. melee swing at close range during Iron Fog, when
+     *  repositioning is locked). Applies a -5 to the attack roll and
+     *  notes it in the bonus label so the player sees why it missed. */
+    blindSwing?: boolean;
+  },
 ): RollStep[] {
   // Equipped weapon takes precedence over text-based weapon-class detection.
   // No equip = fall back to the original behavior (rusted blade / fists).
@@ -109,11 +116,15 @@ export function buildCombatSteps(
       label: 'Roll to ATTACK',
       sides: 20,
       count: 1,
-      bonus: stat.value,
-      bonusLabel: `${stat.label} ${stat.value}`,
+      bonus: stat.value + (opts?.blindSwing ? -5 : 0),
+      bonusLabel: opts?.blindSwing
+        ? `${stat.label} ${stat.value} − 5 (blind swing)`
+        : `${stat.label} ${stat.value}`,
       target: ac,
       targetLabel: `AC ${ac}`,
-      context: `d20 + ${stat.label} to hit ${enemy.name}`,
+      context: opts?.blindSwing
+        ? `d20 + ${stat.label} − 5 (out of reach, swinging blind) to hit ${enemy.name}`
+        : `d20 + ${stat.label} to hit ${enemy.name}`,
     },
     {
       id: 'damage',

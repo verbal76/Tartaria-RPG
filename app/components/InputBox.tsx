@@ -71,6 +71,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             {range && range !== 'far' && (
               <QuickBtn label="step back" onPress={() => onSubmit('step back')} />
             )}
+            {/* Always-available escape. Iron Fog can lock advance/step
+                back, so the player needs a visible flee button or they'll
+                think the game is stuck. Routes to escape intent → skill
+                check → enemies cleared on success. */}
+            <QuickBtn label="flee" defensive onPress={() => onSubmit('flee')} />
           </>
         ) : (
           <>

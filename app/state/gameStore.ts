@@ -1328,14 +1328,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (!reach.bands.includes(range)) {
             // Don't strand the player on a refusal — close the gap (or
             // pull back) automatically and treat THIS turn as the
-            // movement. The player can attack again next input and it
-            // will land. Playtest log showed players typing attack
-            // repeatedly at close range with a melee weapon, getting the
-            // same refusal message dedup-suppressed, and concluding the
-            // game was broken. Auto-movement makes intent succeed instead
-            // of just diagnosing the failure.
+            // movement. Playtest log: players typed attack repeatedly at
+            // close range with a melee weapon, got the same refusal
+            // message dedup-suppressed, and concluded the game was broken.
+            //
+            // BUT if weather has locked repositioning (Iron Fog, Silent
+            // Blizzard), auto-movement won't work either — and the
+            // existing escape valve was nothing. Player was hard stuck.
+            // In that case the attack proceeds at a -5 "blind swing"
+            // penalty so combat can still resolve; the Arbiter narrates
+            // the disadvantage so the player understands the miss math.
+            const movementLocked = weatherBlocksRepositioning(currentScene.weather);
             const needArm = reach.bands.includes('arm') && range !== 'arm';
             const needRanged = !reach.bands.includes(range) && (reach.bands.includes('close') || reach.bands.includes('far'));
+            if (movementLocked && (needArm || needRanged)) {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter narrows their eyes through the ${currentScene.weather?.name ?? 'haze'}. "${reach.label} won't find a clean line. Swing blind — −5 on the roll."`,
+                { skipDedup: true },
+              );
+              get().appendLog('debug', `attack: blind-swing path (weather=${currentScene.weather?.name ?? '-'} range=${range} reach=[${reach.bands.join(',')}])`);
+              set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.attack), 0.1) });
+              const steps = buildCombatSteps(trimmed, player, targetEnemy, { blindSwing: true });
+              set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
+              get().appendLog('world', attackOpener(targetEnemy.name, parsed.resolvedNoun));
+              break;
+            }
             if (needArm) {
               get().appendLog(
                 'arbiter',
