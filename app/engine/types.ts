@@ -27,6 +27,14 @@ export type Intent =
   | 'turn_in'
   | 'dig'
   | 'throw'
+  | 'climb'
+  | 'swim'
+  | 'jump'
+  | 'dash'
+  | 'disengage'
+  | 'help'
+  | 'ready'
+  | 'mount'
   | 'unknown';
 
 export interface ParsedInput {

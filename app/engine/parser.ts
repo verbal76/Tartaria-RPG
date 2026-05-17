@@ -1,6 +1,11 @@
 import type { Intent, ParsedInput, InventoryItem } from './types';
 import { levenshtein } from './editDistance';
 
+// Verb pools. Goal of 10 synonyms per intent for natural-language
+// robustness — the player can phrase the same intent ten ways and the
+// parser still routes it correctly. Verbs marked NEW in comments were
+// added from the action-card reference (dash, disengage, help, ready,
+// mount, climb, swim, jump).
 const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   stealth: ['hide', 'sneak', 'crawl', 'creep', 'lurk', 'crouch', 'silently', 'shadow', 'conceal', 'slink'],
   attack: [
@@ -8,33 +13,70 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'swing', 'pierce', 'blast', 'smash', 'punch', 'kick', 'cleave', 'loose', 'engage',
     'shatter', 'break', 'destroy', 'crush', 'bash',
   ],
-  diplomacy: ['convince', 'persuade', 'negotiate', 'parley', 'bargain', 'plead', 'speak', 'talk', 'ask', 'greet'],
-  escape: ['run', 'flee', 'retreat', 'escape', 'withdraw', 'bolt', 'dash', 'fall back'],
+  diplomacy: [
+    'convince', 'persuade', 'negotiate', 'parley', 'bargain', 'plead', 'speak', 'talk',
+    'ask', 'greet', 'address', 'hail', 'call', 'beseech', 'entreat',
+  ],
+  escape: [
+    'run', 'flee', 'retreat', 'escape', 'withdraw', 'bolt', 'dash', 'sprint', 'scram',
+    'abscond', 'fall back',
+  ],
   investigate: [
     'look', 'examine', 'inspect', 'search', 'study', 'check', 'investigate', 'scan',
     'observe', 'view', 'read', 'open', 'probe', 'survey', 'find', 'scavenge', 'hunt',
+    'peruse', 'scrutinise', 'scrutinize', 'comb',
   ],
-  rest: ['rest', 'sleep', 'recover', 'camp', 'heal', 'eat', 'consume', 'devour', 'drink'],
-  inventory: ['inventory', 'pack', 'bag', 'gear', 'items', 'supplies', 'stuff'],
-  travel: ['go', 'travel', 'walk', 'head', 'move', 'journey', 'enter', 'descend', 'climb', 'wander', 'follow'],
-  use_relic: ['use', 'activate', 'invoke', 'apply', 'wield', 'shine', 'light', 'channel through'],
-  cast: ['cast', 'channel', 'mold', 'shape', 'unleash', 'weave'],
-  wait: ['wait', 'stay', 'hold', 'pause', 'still', 'linger'],
-  ask: ['what', 'explain', 'define', 'who', 'how', 'why', 'tell'],
-  craft: ['craft', 'make', 'forge', 'fashion', 'build', 'assemble'],
-  equip: ['equip', 'wear', 'wield', 'don', 'unequip', 'remove', 'sheathe'],
-  gift: ['gift', 'give', 'offer', 'present', 'hand'],
-  steal: ['steal', 'pocket', 'pilfer', 'lift', 'pinch', 'swipe'],
-  join: ['join', 'enlist', 'pledge', 'swear', 'sign'],
-  dodge: ['dodge', 'evade', 'sidestep', 'duck'],
-  block: ['block', 'parry', 'deflect', 'shield', 'brace', 'guard'],
-  advance: ['advance', 'approach', 'rush', 'sprint', 'closein'],
-  retreat: ['backoff', 'backaway', 'pullback', 'stepback', 'reposition'],
-  repair: ['repair', 'mend', 'restore', 'refurbish', 'patch'],
-  accept: ['accept', 'take', 'undertake', 'agree'],
-  turn_in: ['turnin', 'complete', 'finish', 'deliver', 'report', 'redeem', 'claim'],
-  dig: ['dig', 'excavate', 'unearth', 'scrape', 'shovel', 'burrow'],
-  throw: ['throw', 'toss', 'hurl', 'lob', 'chuck', 'fling', 'pitch'],
+  rest: [
+    'rest', 'sleep', 'recover', 'camp', 'heal', 'eat', 'consume', 'devour', 'drink',
+    'nap', 'doze',
+  ],
+  inventory: [
+    'inventory', 'pack', 'bag', 'gear', 'items', 'supplies', 'stuff', 'kit', 'satchel',
+    'pockets', 'backpack',
+  ],
+  travel: [
+    'go', 'travel', 'walk', 'head', 'move', 'journey', 'enter', 'descend', 'wander',
+    'follow', 'march', 'trek', 'cross', 'proceed', 'depart',
+  ],
+  use_relic: [
+    'use', 'activate', 'invoke', 'apply', 'wield', 'shine', 'light', 'channel through',
+    'trigger', 'employ',
+  ],
+  cast: [
+    'cast', 'channel', 'mold', 'shape', 'unleash', 'weave', 'incant', 'summon', 'evoke',
+    'conjure',
+  ],
+  wait: ['wait', 'stay', 'hold', 'pause', 'still', 'linger', 'tarry', 'idle', 'bide', 'remain'],
+  ask: ['what', 'explain', 'define', 'who', 'how', 'why', 'tell', 'describe', 'clarify', 'mean'],
+  craft: ['craft', 'make', 'forge', 'fashion', 'build', 'assemble', 'construct', 'fabricate', 'weld', 'sculpt'],
+  equip: ['equip', 'wear', 'wield', 'don', 'unequip', 'remove', 'sheathe', 'strap', 'fit', 'fasten'],
+  gift: ['gift', 'give', 'offer', 'present', 'hand', 'bestow', 'donate', 'tender', 'grant', 'pass'],
+  steal: ['steal', 'pocket', 'pilfer', 'lift', 'pinch', 'swipe', 'snatch', 'filch', 'nick', 'grab'],
+  join: ['join', 'enlist', 'pledge', 'swear', 'sign', 'ally', 'bond', 'commit', 'enroll', 'side'],
+  dodge: ['dodge', 'evade', 'sidestep', 'duck', 'weave', 'juke', 'tumble', 'slip', 'twist', 'roll'],
+  block: ['block', 'parry', 'deflect', 'shield', 'brace', 'guard', 'fend', 'absorb', 'cover', 'ward'],
+  advance: [
+    'advance', 'approach', 'rush', 'sprint', 'closein', 'press', 'lunge', 'forward',
+    'charge in', 'near',
+  ],
+  retreat: [
+    'backoff', 'backaway', 'pullback', 'stepback', 'reposition', 'recoil', 'edgeback',
+    'pace back', 'fall away', 'inch back',
+  ],
+  repair: ['repair', 'mend', 'restore', 'refurbish', 'patch', 'fix', 'rebuild', 'renew', 'overhaul', 'tune'],
+  accept: ['accept', 'take', 'undertake', 'agree', 'yes', 'consent', 'embrace', 'assent', 'okay', 'aye'],
+  turn_in: ['turnin', 'complete', 'finish', 'deliver', 'report', 'redeem', 'claim', 'present', 'submit', 'hand in'],
+  dig: ['dig', 'excavate', 'unearth', 'scrape', 'shovel', 'burrow', 'tunnel', 'mine', 'spade', 'pry'],
+  throw: ['throw', 'toss', 'hurl', 'lob', 'chuck', 'fling', 'pitch', 'cast at', 'launch', 'whip'],
+  // NEW from action card.
+  climb: ['climb', 'scale', 'ascend', 'clamber', 'shimmy', 'scramble', 'vault up', 'hoist', 'ladder', 'rope up'],
+  swim: ['swim', 'wade', 'paddle', 'splash', 'dive', 'ford', 'submerge', 'surface', 'tread', 'drift'],
+  jump: ['jump', 'leap', 'hop', 'vault', 'bound', 'spring', 'hurdle', 'pounce', 'skip', 'launch over'],
+  dash: ['dash forward', 'sprintto', 'doubletime', 'gogo', 'sprint forward', 'hustle', 'bolt forward', 'race', 'dart', 'scamper'],
+  disengage: ['disengage', 'peel off', 'break off', 'slip away', 'pull away', 'extract', 'fade back', 'detach', 'unstick', 'shake off'],
+  help: ['help', 'assist', 'aid', 'support', 'back up', 'cover', 'bolster', 'defend', 'reinforce', 'abet'],
+  ready: ['ready', 'prepare', 'set up', 'focus', 'watch', 'await', 'prep', 'steady', 'anticipate', 'cock'],
+  mount: ['mount', 'saddle', 'ride', 'bridle', 'horse up', 'climb on', 'astride', 'dismount', 'unsaddle', 'get off'],
 };
 
 const ALL_INTENTS = Object.keys(VERB_SYNONYMS) as Exclude<Intent, 'unknown'>[];

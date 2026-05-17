@@ -4,7 +4,7 @@
       "id": "burn",
       "keywords": ["burn", "fire", "flame", "burning"],
       "title": "Burn damage",
-      "answer": "Intense Aetheric heat from overloaded relics or high-energy Aetherstone. Burn leaves Aetheric scars that weaken your resistance to further Aetheric attacks for 1d6 rounds, and halves natural healing until you rest an hour or take magical healing."
+      "answer": "Intense Aetheric heat from overloaded relics or high-energy Aetherstone. Burn leaves Aetheric scars that weaken your resistance to further Aetheric attacks for 1d6 rounds, and halves natural healing until you rest an hour or take Aetheric healing."
     },
     {
       "id": "aetheric",
@@ -496,9 +496,9 @@
     },
     {
       "id": "aethercraft",
-      "keywords": ["aethercraft", "ether craft", "true tartarian magic", "aetherstone magic"],
+      "keywords": ["aethercraft", "ether craft", "true tartarian magic", "aetherstone magic", "aetheric craft"],
       "title": "Aethercraft",
-      "answer": "The magic the True Tartarians developed in their centuries underground. Aethercraft pulls energy from Aetherstone and shapes it — stone bent into walls, mud lifted into golems, wounds knit closed. Each settlement keeps an Aetherforge where the senior practitioners work. Prolonged use scars the body and frays the mind, so the best Aethercrafters are also the most haunted."
+      "answer": "The Aetheric discipline the True Tartarians developed in their centuries underground. Aethercraft pulls energy from Aetherstone and shapes it — stone bent into walls, mud lifted into golems, wounds knit closed. Each settlement keeps an Aetherforge where the senior practitioners work. Prolonged use scars the body and frays the mind, so the best Aethercrafters are also the most haunted."
     },
     {
       "id": "aether_golem_constructor",
@@ -517,6 +517,177 @@
       "keywords": ["aetheric healing", "aether healing", "etheric healing", "mend with aether"],
       "title": "Aetheric Healing",
       "answer": "The rarest Aethercraft discipline. The practitioner channels Aetherstone energy into a wound and pulls the flesh back together — bone, muscle, skin in whatever order the Aether picks. Costs the healer in mental strain or fresh physical scarring, so most who can do it only do it once or twice a season. Saves lives. Shortens the healer's."
+    },
+
+    {
+      "id": "classic_move",
+      "keywords": ["classic move", "speed", "movement", "move per turn"],
+      "title": "Classic Move",
+      "answer": "Your Speed tells you how many squares you can move in one turn. That total can be split across your actions — walk three, attack, walk the rest, for example."
+    },
+    {
+      "id": "difficult_terrain",
+      "keywords": ["difficult terrain", "rough ground", "broken ground"],
+      "title": "Difficult Terrain",
+      "answer": "Every 1 square of movement costs 2 in difficult terrain — mud-flats after rain, scree, dense rubble. Plan distance accordingly."
+    },
+    {
+      "id": "crawl",
+      "keywords": ["crawl", "prone movement", "low movement"],
+      "title": "Crawl",
+      "answer": "Move while prone. 1 square of movement costs 2. Used to get under things, slip below sight lines, or push on after you've been knocked down."
+    },
+    {
+      "id": "climb",
+      "keywords": ["climb", "climbing", "scaling", "ascending"],
+      "title": "Climb",
+      "answer": "Go up. 1 square of climb costs 2 squares of movement. Surfaces that fight back (smooth Tartarian glass, weeping mud-stone) may also require a STR or DEX check."
+    },
+    {
+      "id": "swim",
+      "keywords": ["swim", "wade", "swimming", "wading"],
+      "title": "Swim",
+      "answer": "Move through water — silt-lakes, flooded culverts, the Mud Seas at the shore. 1 square of swim costs 2 squares of movement. Heavy armor makes it a STR check on top."
+    },
+    {
+      "id": "standing_long_jump",
+      "keywords": ["standing long jump", "long jump", "jump"],
+      "title": "Standing Long Jump",
+      "answer": "Cover 3 squares horizontally from a standing position, no check needed. With a STR check, you can push the distance further — DM picks the DC by gap size."
+    },
+    {
+      "id": "running_long_jump",
+      "keywords": ["running long jump", "running jump"],
+      "title": "Running Long Jump",
+      "answer": "After a run-up of at least 10 ft, you cover a distance equivalent to your STR + a roll. Counts as your total Speed for the turn."
+    },
+    {
+      "id": "attack_action",
+      "keywords": ["attack action", "the attack action", "what is attack"],
+      "title": "Attack (Action)",
+      "answer": "Make a melee or ranged attack using a weapon you are wielding. Roll d20 + the weapon's stat (STR for most melee, DEX for finesse, INT for runecasters) against the target's AC. Hit, then roll damage."
+    },
+    {
+      "id": "dash_action",
+      "keywords": ["dash", "dash action", "sprint action"],
+      "title": "Dash",
+      "answer": "Double your total movement this turn after applying any movement modifiers (difficult terrain, climb, swim still cost double). You can cover a lot of ground but give up the chance to act precisely."
+    },
+    {
+      "id": "disengage_action",
+      "keywords": ["disengage", "disengage action", "withdraw safely"],
+      "title": "Disengage from Combat",
+      "answer": "Actively disengage. You avoid opportunity attacks when moving away from enemies in melee range this turn. Best used when low on HP and you need to reach cover or an ally."
+    },
+    {
+      "id": "dodge_action",
+      "keywords": ["dodge action", "what is dodge", "dodging"],
+      "title": "Dodge",
+      "answer": "You have Advantage on DEX saving throws, and any attack roll made against you has Disadvantage — if you can see the attacker. Defensive action of choice when you cannot kill or escape this turn."
+    },
+    {
+      "id": "help_action",
+      "keywords": ["help action", "help an ally", "assist"],
+      "title": "Help",
+      "answer": "You can help another player or creature with something they are trying to achieve. Award Advantage to either: a) a friendly creature on their next ability check, or b) a friendly creature's attack roll, if their target is within 5 ft of you."
+    },
+    {
+      "id": "use_object_action",
+      "keywords": ["use object", "use an object", "free action"],
+      "title": "Use an Object",
+      "answer": "Use an interactable in the scene — pull a lever, throw a switch, drink a potion already in hand. Generally a Free Action, costs nothing extra. Bigger object interactions (lockpicking, breaking down a door) require a real action and skill check."
+    },
+    {
+      "id": "hide_action",
+      "keywords": ["hide action", "hiding", "stealth roll"],
+      "title": "Hide",
+      "answer": "Attempt to hide from an enemy. Roll DEX (Stealth) to see if you succeed. Failed Hide attempts leave you visible AND committed — the enemy knows you tried."
+    },
+    {
+      "id": "ready_action",
+      "keywords": ["ready action", "get ready", "prepared action", "ready a trigger"],
+      "title": "Get Ready",
+      "answer": "Create a Ready trigger for something you can react to. Name the trigger (\"if the door opens\", \"when the cultist starts to cast\") and the action you'll take. Spends your next reaction when the trigger fires."
+    },
+    {
+      "id": "search_action",
+      "keywords": ["search action", "searching", "perception check"],
+      "title": "Search",
+      "answer": "Devote your attention to finding something. Make a WIS (Perception) check or INT (Investigation) check, depending on whether you are using your senses or your reasoning."
+    },
+    {
+      "id": "mount_action",
+      "keywords": ["mount", "dismount", "ride", "mounting"],
+      "title": "Mount / Dismount",
+      "answer": "Once during your turn, you can mount a creature that is within 5 ft of you, or dismount a creature you are riding. Costs half your total Speed for the turn. Tartaria forgot mounts a long time ago — the frame is here for when a beast worth riding shows up."
+    },
+
+    {
+      "id": "gathering_information",
+      "keywords": ["gathering information", "gather info", "intel gathering"],
+      "title": "Gathering Information",
+      "answer": "Active research: question locals, examine documents, consult experts, analyze cryptic symbols, look under things, reach out to contacts, tail a suspect, search containers, eavesdrop, copy documents. Most of these are CHA-driven (Social) or INT-driven (Library, Archaeology, Cryptography) skill rolls."
+    },
+    {
+      "id": "social_interactions",
+      "keywords": ["social interactions", "social skills", "negotiation"],
+      "title": "Social Interactions",
+      "answer": "Persuasion, building rapport, finding an interpreter, negotiating with someone suspicious, disguise, distraction, gambling, hunting side jobs, palming items (Sleight of Hand), observing others. CHA-driven where you are the actor; WIS-driven where you are reading the room."
+    },
+    {
+      "id": "preparation_and_planning",
+      "keywords": ["preparation and planning", "prep", "planning"],
+      "title": "Preparation and Planning",
+      "answer": "Pre-action work: check and buy supplies, set traps, study maps, draft plans from intel, craft items / weapons / traps / poisons, hide and wait, precast an Aetheric buff, build an Aetheric weapon, hire muscle, find a trainer, seek armor, rally allies. The fight you prepare for is the one you win."
+    },
+    {
+      "id": "psychological_actions",
+      "keywords": ["psychological actions", "mental actions"],
+      "title": "Psychological Actions",
+      "answer": "Read or alter mental state: assess someone's mood, bolster an ally with psychoanalysis or hypnotism, run rituals or meditate, seek counseling, cope with phobia, barter and haggle, detect disguise, discern motive, sniff a lie, see through delusion. WIS / INT for reading, CHA for influence."
+    },
+    {
+      "id": "skill_based_actions",
+      "keywords": ["skill based", "skill actions"],
+      "title": "Skill Based Actions",
+      "answer": "Hand-trained tasks: pick a lock, track an enemy, move undetected, repair damaged items (Craft / Mechanical / Electrical Repair), craft an item, hypnotize an NPC, create medicine / drugs / poisons, forge documents. Each leans on the appropriate Craft / DEX / INT proficiency."
+    },
+    {
+      "id": "aetheric_related_actions",
+      "keywords": ["aetheric related", "aetheric actions", "aether magic", "aether spells"],
+      "title": "Aetheric-Related Actions",
+      "answer": "Aetheric craft is Tartaria's discipline of pulling Aetherstone energy into shape — what the surface world would call magic. Initial read of a tome, cast a working, teach another caster, create a powder or Aetheric drug, translate a tome, study a tome, learn a working from another caster, consult occult sources if you have the contacts. INT-driven, scarring at higher pulls."
+    },
+
+    {
+      "id": "pick_a_lock",
+      "keywords": ["pick a lock", "lockpick", "lockpicking"],
+      "title": "Pick a Lock",
+      "answer": "Defeat a mechanical lock with tools and patience. DEX (Sleight of Hand) check against the lock's DC. Failure usually only costs time; critical failure can jam the lock or break your picks."
+    },
+    {
+      "id": "track_an_enemy",
+      "keywords": ["track an enemy", "track", "follow tracks"],
+      "title": "Track an Enemy",
+      "answer": "Follow signs left by a target — footprints, broken stalks, traces of Aether residue. WIS (Survival) check. The DC rises the older the trail, harsher the terrain, more rain since they passed."
+    },
+    {
+      "id": "set_traps",
+      "keywords": ["set traps", "lay a trap", "trapping"],
+      "title": "Set Traps",
+      "answer": "Place a snare, deadfall, tripwire, or Aetheric charge for someone to walk into. INT (or DEX, depending on the trap) versus the target's awareness when they enter the area. Costs materials and time."
+    },
+    {
+      "id": "translate_tome",
+      "keywords": ["translate a tome", "translate", "decipher tome"],
+      "title": "Translate a Tome",
+      "answer": "Render an unfamiliar script into one you can use. INT (Linguistics) against the tome's DC. Failures don't waste the tome — they just cost the session."
+    },
+    {
+      "id": "learn_spell",
+      "keywords": ["learn a spell", "learn aether working", "study a working"],
+      "title": "Learn an Aetheric Working",
+      "answer": "Acquire a new working from a teacher or a tome. INT check against the working's DC. Costs days of study, scars on heavy pulls. Working scales in cost with rarity — Common, Uncommon, Rare, Legendary."
     }
   ]
 }

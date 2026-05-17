@@ -2186,6 +2186,106 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
         break;
       }
+      // New action-card intents. Lightweight handlers — narrate the
+      // attempt + cost a slice of stamina/time so the world feels
+      // responsive. Most route through skill-check templates when there's
+      // something specific to interact with. The Arbiter explains each
+      // via concept lookup ("what is dash", "what is disengage").
+      case 'climb': {
+        set({ player: advanceTime(spendStamina(player, 2), 0.5) });
+        const tgt = parsed.target ?? parsed.resolvedNoun ?? 'the surface in front of you';
+        get().appendLog(
+          'world',
+          `You set hands on ${tgt} and start to climb. Hand over hand, breath measured. (1 sq counts as 2 — Climb spends double movement.)`,
+        );
+        break;
+      }
+      case 'swim': {
+        set({ player: advanceTime(spendStamina(player, 2), 0.5) });
+        const tgt = parsed.target ?? 'the water';
+        get().appendLog(
+          'world',
+          `You wade into ${tgt}, mud-water lapping at your gear. Each stroke costs double. The current has opinions.`,
+        );
+        break;
+      }
+      case 'jump': {
+        set({ player: advanceTime(spendStamina(player, 1), 0.1) });
+        const tgt = parsed.target ?? '';
+        get().appendLog(
+          'world',
+          tgt
+            ? `You launch yourself toward ${tgt}. Standing long jump — 3 squares without a STR check, more with one.`
+            : `You leap. Standing long jump — 3 squares clean. With a STR check, you could push it further.`,
+        );
+        break;
+      }
+      case 'dash': {
+        set({ player: advanceTime(spendStamina(player, 2), 0.25) });
+        get().appendLog(
+          'world',
+          `You break into a run. Movement doubles this turn — total Speed paid forward, no time to react to anything subtle.`,
+        );
+        break;
+      }
+      case 'disengage': {
+        if (currentScene.enemies.length === 0) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter tilts their head. "Disengage from what? No one is on you."`,
+          );
+          break;
+        }
+        // Apply a 1-round dodging effect as a stand-in for "no opportunity
+        // attack on the way out" — the effect ticks down on next action.
+        const disengaging: StatusEffect = {
+          kind: 'dodging',
+          remainingRounds: 1,
+          label: 'disengaging',
+        };
+        set((s) =>
+          s.player
+            ? {
+                player: {
+                  ...s.player,
+                  statusEffects: applyEffect(s.player.statusEffects ?? [], disengaging),
+                  hoursElapsed: (s.player.hoursElapsed ?? 0) + 0.1,
+                },
+              }
+            : s,
+        );
+        get().appendLog(
+          'world',
+          `You peel off the line, footwork careful. No opportunity attack as you break contact (1 round).`,
+        );
+        break;
+      }
+      case 'help': {
+        set({ player: advanceTime(spendStamina(player, 1), 0.1) });
+        const tgt = parsed.target ?? parsed.resolvedNoun ?? 'the nearest ally';
+        get().appendLog(
+          'world',
+          `You shoulder in beside ${tgt}. Their next ability check or attack rolls at Advantage — if they're within 5 ft.`,
+        );
+        break;
+      }
+      case 'ready': {
+        set({ player: advanceTime(spendStamina(player, 1), 0.1) });
+        const tgt = parsed.target ?? 'whatever moves next';
+        get().appendLog(
+          'world',
+          `You set yourself. The next thing that triggers — ${tgt} — gets your reaction first.`,
+        );
+        break;
+      }
+      case 'mount': {
+        set({ player: advanceTime(spendStamina(player, 1), 0.1) });
+        get().appendLog(
+          'arbiter',
+          `The Arbiter shrugs. "Tartaria forgot mounts a long time ago. The frame is here for when a beast worth riding shows up — until then it costs half your Speed to climb on nothing."`,
+        );
+        break;
+      }
       case 'accept': {
         const target = parsed.target ?? parsed.resolvedNoun ?? '';
         if (!target.trim()) {
