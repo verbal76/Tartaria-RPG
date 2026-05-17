@@ -76,11 +76,14 @@ export function AboutScreen() {
         setUpdateError(`Save flush warning: ${m}`);
       }
 
-      // Tear down native resources BEFORE reloadAsync. Both expo-av Sound
-      // objects and the ONNX runtime session can hold native handles that
-      // block the JS bridge from cleanly restarting — that's why
+      // Tear down native resources BEFORE reloadAsync. expo-av Sound,
+      // ONNX runtime session, AND llama.rn (Qwen) all hold native
+      // handles that block the JS bridge from cleanly restarting —
       // reloadAsync was hanging on a black screen forever. Releasing
-      // these explicitly lets the bridge finish reload.
+      // these explicitly lets the bridge finish reload. HANDOFF #7:
+      // Qwen teardown was previously missing from this sequence; iOS
+      // is especially sensitive to lingering native modules because
+      // the bridge restart on iOS can deadlock on dangling jobjects.
       setUpdateStatus('Releasing resources…');
       try {
         await disposeAudio();
@@ -88,6 +91,15 @@ export function AboutScreen() {
       try {
         await useGameStore.getState().shutdownCognitive();
       } catch { /* ignore */ }
+      try {
+        await useGameStore.getState().shutdownQwen();
+      } catch { /* ignore */ }
+      // iOS-specific belt-and-suspenders: give the native side an extra
+      // event-loop tick to fully release. Android tolerates the
+      // immediate reload; iOS doesn't always.
+      if (Platform.OS === 'ios') {
+        await new Promise((r) => setTimeout(r, 250));
+      }
 
       setUpdateStatus('Restarting to apply…');
       // Await reloadAsync directly + log if it throws. The old fire-and-

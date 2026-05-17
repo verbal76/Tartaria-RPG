@@ -42,6 +42,7 @@ export type Intent =
   | 'quick_fire'
   | 'multi_fire'
   | 'fight_back'
+  | 'recruit'
   | 'unknown';
 
 export interface ParsedInput {
@@ -343,6 +344,17 @@ export interface PlayerCharacter {
   dead?: boolean;
   /** Lifetime counters; thresholds trigger stat growth. */
   milestones?: PlayerMilestones;
+  /** HANDOFF #13 — first-cut companion system. A single NPC follower
+   *  the player recruits from a vendor scene. Persists across scenes.
+   *  Currently narrative-only; mechanical effects (advantage dice on
+   *  skill checks, combat assist) are a follow-on session. Keep
+   *  optional so old saves keep loading. */
+  companion?: {
+    name: string;
+    title?: string;
+    factionId?: string | null;
+    recruitedAt: number;  // hoursElapsed snapshot
+  } | null;
   /** Currently-equipped weapon and armor (by catalog name). */
   equipped?: PlayerEquipped;
   /** Active combat status effects; tick down each player action. */

@@ -65,6 +65,11 @@ export function StatsPanel({ player }: Props) {
           Effects: {formatEffectSummary(player.statusEffects)}
         </Text>
       )}
+      {player.companion && (
+        <Text style={styles.companion} numberOfLines={1}>
+          Companion: {player.companion.name}
+        </Text>
+      )}
       {(() => {
         const titles = (player.activeFactionQuestIds ?? [])
           .map((id) => findFactionQuestById(id)?.title)
@@ -107,6 +112,7 @@ const styles = StyleSheet.create({
   subline: { color: '#7a705c', fontSize: 10, marginBottom: 2 },
   equipped: { color: '#c9a86a', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
   effects: { color: '#e07a5f', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
+  companion: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5, fontWeight: '700' },
   contracts: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
   row: { flexDirection: 'row', gap: 4, marginTop: 3 },
   stat: { flex: 1, minWidth: 0 },

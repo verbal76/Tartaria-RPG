@@ -2705,6 +2705,60 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
         break;
       }
+      case 'recruit': {
+        // HANDOFF #13 first-cut companion system. Recruit a vendor as a
+        // companion: they leave the scene and follow the player. Player
+        // can only have one companion at a time. Dismiss with "leave"
+        // or "dismiss companion".
+        const wantsDismiss = /\b(leave|dismiss|part ways|farewell|goodbye)\b/i.test(trimmed) && /\b(companion|follower|ally|friend)\b/i.test(trimmed);
+        if (wantsDismiss) {
+          if (!player.companion) {
+            get().appendLog('arbiter', `The Arbiter raises a brow. "You're traveling alone. No one to dismiss."`);
+            break;
+          }
+          const name = player.companion.name;
+          set((s) => (s.player ? { player: { ...s.player, companion: null } } : s));
+          get().appendLog('world', `${name} steps back from your path. They tip their head and turn down a different road. You travel alone again.`);
+          break;
+        }
+        if (player.companion) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter glances at ${player.companion.name}. "You already have a companion. Dismiss them first."`,
+          );
+          break;
+        }
+        if (!currentScene.vendor) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter shakes their head. "No one here to recruit. Find a vendor scene — a face is needed."`,
+          );
+          break;
+        }
+        const v = currentScene.vendor;
+        set((s) => {
+          if (!s.player || !s.currentScene) return s;
+          return {
+            player: {
+              ...s.player,
+              companion: {
+                name: v.name,
+                title: v.title,
+                factionId: v.faction ?? null,
+                recruitedAt: s.player.hoursElapsed ?? 0,
+              },
+            },
+            // Vendor leaves the scene — they're with you now.
+            currentScene: { ...s.currentScene, vendor: null },
+          };
+        });
+        get().appendLog(
+          'world',
+          `${v.name} closes their pack and steps in beside you. "Lead, then." You have a companion. (Type "dismiss companion" to part ways.)`,
+        );
+        void get().persist();
+        break;
+      }
       case 'accept': {
         const target = parsed.target ?? parsed.resolvedNoun ?? '';
         if (!target.trim()) {
@@ -5324,10 +5378,16 @@ function resolveHookOneStep(
     if (r.fatal) fatal = true;
     if (r.inlineSummary) inlineSummaries.push(r.inlineSummary);
   }
-  // One world log entry combining the stage's narration + a reward
-  // callout when relevant.
-  const rewardTail = inlineSummaries.length > 0 ? `  ✦ ${inlineSummaries.join(', ')}.` : '';
-  get().appendLog('world', `${outcome.line}${rewardTail}`);
+  // HANDOFF #5 — the previous handoff inlined the ✦ reward summary into
+  // the world line as a tail. That kept the line count down but lost
+  // the green REWARD channel color cue, so payoff lines read as flat.
+  // Split them again: world line for narration (no tail), reward line
+  // for the ✦ callout. The 500ms debounce will keep them visually tight
+  // but the two channels paint distinct colors.
+  get().appendLog('world', outcome.line);
+  if (inlineSummaries.length > 0) {
+    get().appendLog('reward', `✦ ${inlineSummaries.join(', ')}.`);
+  }
   if (outcome.arbiterLine) get().appendLog('arbiter', outcome.arbiterLine);
   // Advance hook stage / mark resolved. Fold any newly-revealed nouns
   // (figure, camp, firepit, reclaimer...) into the hook's noun list so

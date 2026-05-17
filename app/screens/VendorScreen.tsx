@@ -69,10 +69,25 @@ export function VendorScreen() {
   const equippedNames = new Set(
     Object.values(player.equipped ?? {}).filter((n): n is string => !!n),
   );
+  const [sellSort, setSellSort] = useState<'name' | 'value' | 'rarity'>('value');
+  // HANDOFF #12 — sell-back UI polish. Sort options so the player can
+  // surface the most valuable junk first (default), alphabetize for
+  // hunting, or group by rarity for clearing low-tier clutter.
+  const RARITY_ORDER: Record<string, number> = { Legendary: 0, Rare: 1, Uncommon: 2, Common: 3 };
   const sellable = player.inventory
     .filter((i) => i.quantity > 0 && !equippedNames.has(i.name) && !isUnsellable(i))
     .map((i) => ({ item: i, price: sellPriceFor(i, vendor) }))
-    .filter((x) => x.price > 0);
+    .filter((x) => x.price > 0)
+    .sort((a, b) => {
+      if (sellSort === 'name') return a.item.name.localeCompare(b.item.name);
+      if (sellSort === 'rarity') {
+        const ra = RARITY_ORDER[a.item.rarity ?? 'Common'] ?? 99;
+        const rb = RARITY_ORDER[b.item.rarity ?? 'Common'] ?? 99;
+        if (ra !== rb) return ra - rb;
+        return b.price - a.price;
+      }
+      return b.price - a.price; // default: most valuable first
+    });
 
   return (
     <View style={styles.container}>
@@ -170,12 +185,30 @@ export function VendorScreen() {
           )
         ) : (
           // SELL mode — inventory list with sell prices.
-          sellable.length === 0 ? (
-            <Text style={styles.empty}>
-              Nothing in your pack worth selling. Unequip the gear you want to move first.
-            </Text>
-          ) : (
-            sellable.map(({ item, price }) => {
+          <>
+            {sellable.length > 0 && (
+              <View style={styles.sortRow}>
+                <Text style={styles.sortLabel}>Sort:</Text>
+                {(['value', 'rarity', 'name'] as const).map((s) => (
+                  <TouchableOpacity
+                    key={s}
+                    onPress={() => setSellSort(s)}
+                    style={[styles.sortTab, sellSort === s && styles.sortTabActive]}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.sortTabText, sellSort === s && styles.sortTabTextActive]}>
+                      {s === 'value' ? 'VALUE' : s === 'rarity' ? 'RARITY' : 'NAME'}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+            {sellable.length === 0 ? (
+              <Text style={styles.empty}>
+                Nothing in your pack worth selling. Unequip the gear you want to move first.
+              </Text>
+            ) : (
+              sellable.map(({ item, price }) => {
               const preview = getItemPreview(item.name);
               return (
                 <TouchableOpacity
@@ -206,7 +239,8 @@ export function VendorScreen() {
                 </TouchableOpacity>
               );
             })
-          )
+            )}
+          </>
         )}
       </ScrollView>
 
@@ -309,6 +343,12 @@ const styles = StyleSheet.create({
   tabText: { color: '#7a705c', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
   tabTextActive: { color: '#c9a86a' },
   sellPrice: { color: '#9ec96a', fontSize: 12, fontWeight: '700' },
+  sortRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 6, paddingHorizontal: 2 },
+  sortLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginRight: 4 },
+  sortTab: { paddingHorizontal: 8, paddingVertical: 3, borderColor: '#3a342c', borderWidth: 1, borderRadius: 2 },
+  sortTabActive: { borderColor: '#c9a86a' },
+  sortTabText: { color: '#7a705c', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
+  sortTabTextActive: { color: '#c9a86a' },
   title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
   vendorCard: {
     backgroundColor: '#13110f',
