@@ -22,6 +22,17 @@ function describeTime(hours: number): string {
   return `Day ${day} · ${part}`;
 }
 
+/** Subtle background tint per time-of-day. Always darker than the base
+ *  charcoal so text stays legible; nightly is the bluest, morning the
+ *  warmest, evening the dustiest. */
+function timeOfDayTint(hours: number): string {
+  const hourOfDay = Math.floor(hours % 24);
+  if (hourOfDay < 6) return '#080a10';   // night — cool, deep blue
+  if (hourOfDay < 12) return '#0f0d0a';  // morning — warm amber undertone
+  if (hourOfDay < 18) return '#0a0908';  // afternoon — neutral (the default)
+  return '#0e0b08';                       // evening — dusty rust
+}
+
 export function ExplorationScreen() {
   const player = useGameStore((s) => s.player);
   const gameLog = useGameStore((s) => s.gameLog);
@@ -76,9 +87,11 @@ export function ExplorationScreen() {
     );
   }
 
+  const bgTint = timeOfDayTint(player.hoursElapsed ?? 0);
+
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: bgTint }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.topRow}>

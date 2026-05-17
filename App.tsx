@@ -13,6 +13,7 @@ import { InventoryScreen } from './app/screens/InventoryScreen';
 import { CraftingScreen } from './app/screens/CraftingScreen';
 import { VendorScreen } from './app/screens/VendorScreen';
 import { ActionReferenceScreen } from './app/screens/ActionReferenceScreen';
+import { ContractsScreen } from './app/screens/ContractsScreen';
 import { TutorialOverlay } from './app/components/TutorialOverlay';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
 import { startAudioController, stopAudioController } from './app/audio/AudioController';
@@ -82,6 +83,7 @@ export default function App() {
         {screen === 'crafting' && <CraftingScreen />}
         {screen === 'vendor' && <VendorScreen />}
         {screen === 'actions' && <ActionReferenceScreen />}
+        {screen === 'contracts' && <ContractsScreen />}
       </SafeAreaView>
       {/* TutorialOverlay sits OUTSIDE SafeAreaView so its absolute
           positioning matches measureInWindow coords from the targets

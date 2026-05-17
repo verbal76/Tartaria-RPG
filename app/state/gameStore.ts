@@ -54,7 +54,7 @@ import {
 } from '../engine/narrativeGenerator';
 import { parseInput, type ParseContext } from '../engine/parser';
 import { rollDie, rollFromNotation, pick, chance, rotatingPick } from '../engine/rng';
-import { buildCombatSteps, buildSkillSteps, buildRestSteps, rollMods } from '../engine/combatRules';
+import { buildCombatSteps, buildSkillSteps, buildRestSteps, rollMods, classifyManeuver } from '../engine/combatRules';
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
@@ -858,6 +858,39 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     set((state) => {
       const nextLog = [...state.gameLog, entry].slice(-MAX_LOG_IN_MEMORY);
+      // HANDOFF #4 — same-channel debounce. When two `world` entries land
+      // within 500ms (typical: dig outcome + hook callback firing in the
+      // same handler), merge the second into the first so the feed reads
+      // as one continuous beat instead of a stutter. Only world+system,
+      // never arbiter (has dedup) or combat (one beat per d20) or reward
+      // (player-positive notifications stay distinct).
+      const lastEntry = state.gameLog[state.gameLog.length - 1];
+      const canMerge =
+        lastEntry &&
+        lastEntry.channel === channel &&
+        (channel === 'world' || channel === 'system') &&
+        entry.ts - lastEntry.ts < 500 &&
+        // Don't merge time-passed markers — they're discrete clock beats.
+        !text.startsWith('⏳') &&
+        !lastEntry.text.startsWith('⏳');
+      if (canMerge) {
+        const merged = { ...lastEntry, text: `${lastEntry.text}  ${text}`, ts: entry.ts };
+        const mergedLog = [...state.gameLog.slice(0, -1), merged].slice(-MAX_LOG_IN_MEMORY);
+        // World-channel noun extraction still fires on the new fragment.
+        if (channel === 'world' && state.currentScene) {
+          const newNouns = extractAmbientNouns(text);
+          if (newNouns.length > 0) {
+            const mergedSet = new Set(state.currentScene.ambientNouns ?? []);
+            for (const n of newNouns) mergedSet.add(n);
+            const nextNouns = Array.from(mergedSet).slice(-80);
+            return {
+              gameLog: mergedLog,
+              currentScene: { ...state.currentScene, ambientNouns: nextNouns },
+            };
+          }
+        }
+        return { gameLog: mergedLog };
+      }
       // Phase 4 follow-up §1 — last-world-line vocabulary. Every noun in a
       // [world] line gets folded into the scene's ambient noun pool so the
       // parser matches the player's natural next move. If the world just
@@ -1729,6 +1762,48 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
           }
         }
+        // Vertical / "downward" navigation. When the player types "go
+        // down" / "descend" / "into the depths" / "below ground", drop
+        // into a Micro-Micro of the current Macro biome — the buried
+        // sub-rooms the location's ladder defines. Picks a random one
+        // since explicit downward-mapping isn't authored yet.
+        const wantsDown = /\b(down|descend|below|under|into the depths|into the deep|beneath|sub[- ]level|basement|crypt|cellar|undercroft)\b/i.test(trimmed);
+        if (wantsDown && !currentScene.microMicroId) {
+          const macroId = LOCATION_TO_MACRO[currentScene.location.id];
+          if (macroId) {
+            const target = pickRandomMicroMicroIn(macroId);
+            if (target) {
+              set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.travel), 1) });
+              get().appendLog(
+                'world',
+                `You descend below the surface. The air thickens, the light fails, and the buried world opens around you.`,
+              );
+              get().beginScene({ microMicroId: target.microMicro.id });
+              break;
+            }
+          }
+          get().appendLog(
+            'arbiter',
+            `The Arbiter shrugs. "Nothing buried opens here. You'd need a vault door, a stairwell, a culvert — and this stretch has none."`,
+          );
+          break;
+        }
+        // Inverse — "go up" / "surface" / "back to the ground" when in a
+        // Micro-Micro returns to the parent macro tile.
+        const wantsUp = /\b(surface|aboveground|topside|back up|climb out|leave the depths)\b/i.test(trimmed);
+        if (wantsUp && currentScene.microMicroId) {
+          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.travel), 1) });
+          get().appendLog(
+            'world',
+            `You climb back to the surface. The sky's gray weight returns to your shoulders.`,
+          );
+          // beginScene with no microMicroId — the random picker will choose,
+          // but we want the flat macro view. Pass an empty string to force
+          // the no-ladder path; beginScene's resolver will treat that as
+          // "no specific room, sample fresh".
+          get().beginScene();
+          break;
+        }
         // Fuzzy location lookup — playtest typed "Walk to dracova" (one
         // letter off from Drakova) and got narrateWanderingJourney instead
         // of a real route. Try exact-substring first, then a Levenshtein
@@ -2480,7 +2555,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
         set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.1) });
-        const steps = buildSkillSteps('investigate', player, {
+        // Route the maneuver to the right stat per the action card —
+        // disarm/trip/sweep/hook → DEX; grapple/shove/pin → STR.
+        const maneuverKind = classifyManeuver(trimmed);
+        const steps = buildSkillSteps(maneuverKind, player, {
           weatherMod: weatherStatModifiers(currentScene.weather),
         });
         set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });

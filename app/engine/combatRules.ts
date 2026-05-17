@@ -303,7 +303,30 @@ const SKILL_STAT: Record<string, keyof PlayerCharacter['stats']> = {
   investigate: 'intelligence',
   cast: 'intelligence',
   use_relic: 'wisdom',
+  // Maneuver sub-types — route to the right stat for the kind of move.
+  maneuver_disarm: 'dexterity',
+  maneuver_trip: 'dexterity',
+  maneuver_grapple: 'strength',
+  maneuver_shove: 'strength',
+  maneuver_pin: 'strength',
+  maneuver_sweep: 'dexterity',
+  maneuver_hook: 'dexterity',
 };
+
+/** Classify a player's maneuver verb to one of the sub-types so the
+ *  skill check routes through the correct stat. Default = grapple
+ *  (STR) when nothing matches. */
+export function classifyManeuver(actionText: string): string {
+  const t = actionText.toLowerCase();
+  if (/disarm|knock.*weapon|strip.*weapon/.test(t)) return 'maneuver_disarm';
+  if (/trip|sweep.*leg|leg.*sweep|knock down/.test(t)) return 'maneuver_trip';
+  if (/grapple|wrestle|tackle|bear hug/.test(t)) return 'maneuver_grapple';
+  if (/shove|push|knock back|ram/.test(t)) return 'maneuver_shove';
+  if (/pin|hold down|restrain/.test(t)) return 'maneuver_pin';
+  if (/sweep|sweep.*aside/.test(t)) return 'maneuver_sweep';
+  if (/hook|catch|snag/.test(t)) return 'maneuver_hook';
+  return 'maneuver_grapple';
+}
 
 const STAT_LABEL: Record<keyof PlayerCharacter['stats'], string> = {
   strength: 'STR',

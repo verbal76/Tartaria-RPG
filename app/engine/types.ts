@@ -459,7 +459,8 @@ export type ScreenName =
   | 'inventory'
   | 'crafting'
   | 'vendor'
-  | 'actions';
+  | 'actions'
+  | 'contracts';
 
 export interface SaveState {
   version: 1;
