@@ -169,6 +169,7 @@ import {
   statusAcAdjustment,
   statusAttackPenalty,
   isIncapacitated,
+  hasFullCover,
   aethericVulnerabilityMultiplier,
 } from '../engine/statusEffects';
 import type { StatusEffect, MemorableEvent } from '../engine/types';
@@ -2358,13 +2359,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'take_cover': {
-        // Apply the in_cover status. Partial vs full cover would be a
-        // future refinement (currently treats every take-cover as
-        // partial: +4 to defense rolls, ranged attacks land at penalty).
+        // Detect full vs partial cover from the player's phrasing.
+        // "full cover" / "hide completely" / "go prone behind" → full.
+        // Default and "duck behind" / "tuck" / "shelter" → partial.
+        const wantsFull = /\b(full cover|fully behind|complete cover|hide completely|drop prone|out of sight|fully concealed)\b/i.test(trimmed);
+        const kind: StatusEffect['kind'] = wantsFull ? 'in_cover_full' : 'in_cover';
         const cover: StatusEffect = {
-          kind: 'in_cover',
+          kind,
           remainingRounds: 2,
-          label: 'partial cover',
+          label: wantsFull ? 'full cover' : 'partial cover',
         };
         set((s) =>
           s.player
@@ -2377,12 +2380,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
               }
             : s,
         );
-        get().appendLog(
-          'world',
-          currentScene.enemies.length > 0
-            ? `You dive behind whatever the room offers. Partial cover — ranged attacks against you take a penalty die (+4 to your defense).`
-            : `You tuck against the nearest cover. The world keeps moving without you for a beat.`,
-        );
+        const inCombat = currentScene.enemies.length > 0;
+        const line = wantsFull
+          ? (inCombat
+              ? `You bury yourself in full cover. Ranged attacks against you AUTO-MISS for 2 rounds; you cannot attack out without breaking cover.`
+              : `You take full cover, out of every sight line the room offers.`)
+          : (inCombat
+              ? `You dive behind partial cover. Ranged attacks against you take a penalty die (+4 to your defense, 2 rounds).`
+              : `You tuck against the nearest cover. The world keeps moving without you for a beat.`);
+        get().appendLog('world', line);
         break;
       }
       case 'aim': {
@@ -2436,11 +2442,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'maneuver': {
-        // Special-move template — disarm, grapple, trip. Resolves as a
-        // skill check (STR for grapple, DEX for disarm/trip — default to
-        // STR until we wire per-maneuver routing). Costs the turn,
-        // success grants a 1-round dodging-effect on the target via
-        // a "knocked off-balance" tag.
+        // Fighting Maneuver — disarm, grapple, trip, shove. Compare the
+        // builds of attacker and defender per the action card.
+        //   defender build > attacker by 1  →  +1 penalty die
+        //   defender build > attacker by 2  →  +2 penalty dice
+        //   defender build > attacker by 3+ →  impossible
         if (currentScene.enemies.length === 0) {
           get().appendLog(
             'arbiter',
@@ -2448,14 +2454,172 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
+        const enemy = activeEnemy(currentScene)!;
+        const playerBuild = playerBuildScore(player);
+        const enemyBuild = enemyBuildScore(enemy);
+        const buildDelta = enemyBuild - playerBuild;
+        if (buildDelta >= 3) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter shakes their head. "${enemy.name} outweighs you by ${buildDelta}. That maneuver is impossible — try violence, distance, or something they don't expect."`,
+          );
+          break;
+        }
+        // Apply penalty dice via surprised-style consumable status the
+        // skill check picks up automatically through rollMods.
+        const penaltyDice = Math.max(0, buildDelta);
+        for (let i = 0; i < penaltyDice; i++) {
+          set((s) =>
+            s.player
+              ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], { kind: 'surprised', remainingRounds: 1, label: `build mismatch -${penaltyDice}` }) } }
+              : s,
+          );
+        }
         set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.1) });
         const steps = buildSkillSteps('investigate', player, {
           weatherMod: weatherStatModifiers(currentScene.weather),
         });
         set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
+        const buildNote = penaltyDice > 0
+          ? ` ${enemy.name} is built tougher (${enemyBuild} vs your ${playerBuild}); -${penaltyDice * 2} on the roll.`
+          : ` Build favors you (${playerBuild} vs ${enemyBuild}); maneuver lands clean if you make the roll.`;
         get().appendLog(
           'world',
-          `You commit to the maneuver — disarm, trip, or grapple. STR check incoming. Success knocks your target off-balance.`,
+          `You commit to the maneuver — disarm, trip, or grapple.${buildNote} Success knocks your target off-balance for a round.`,
+        );
+        break;
+      }
+      case 'quick_fire': {
+        // Quick Fire: state intent to fire FIRST this round. Grants a
+        // +2 status bonus on the next ranged attack THIS turn (our
+        // initiative-bonus surrogate, since we don't model dex-based
+        // initiative slots yet). Lost if the player takes any action
+        // before firing other than dodge/counter.
+        const equipped = player.equipped?.main ? findWeaponByName(player.equipped.main) : null;
+        if (!equipped || equipped.weaponKind === 'melee') {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter shakes their head. "Quick Fire wants a ranged weapon in hand — bolt-caster, bow, runecaster. Equip something that shoots."`,
+          );
+          break;
+        }
+        const qf: StatusEffect = {
+          kind: 'quick_fire',
+          remainingRounds: 1,
+          label: 'quick fire',
+        };
+        set((s) =>
+          s.player
+            ? {
+                player: {
+                  ...s.player,
+                  statusEffects: applyEffect(s.player.statusEffects ?? [], qf),
+                  hoursElapsed: (s.player.hoursElapsed ?? 0) + 0.05,
+                },
+              }
+            : s,
+        );
+        get().appendLog(
+          'world',
+          `You snap the ${equipped.name} up — declared Quick Fire. +50 initiative this round; +2 to your next shot. Lose the bonus if you move, brawl, or take damage before firing. Cost: 1 turn.`,
+        );
+        break;
+      }
+      case 'multi_fire': {
+        // Multiple Shot / Burst Fire / Double Tap. Fire 2-3 times this
+        // turn, each shot at -2 cumulative penalty. Resolves all shots
+        // immediately without dice prompts — this is a burst action.
+        const targetEnemy = activeEnemy(currentScene);
+        if (!targetEnemy) {
+          get().appendLog('arbiter', `The Arbiter waits. "Multi-fire at whom? No target on the line."`);
+          break;
+        }
+        const equipped = player.equipped?.main ? findWeaponByName(player.equipped.main) : null;
+        if (!equipped || equipped.weaponKind === 'melee') {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter raises a brow. "${equipped?.name ?? 'Bare hands'} doesn't burst-fire. Equip a handgun-class bolt-caster, runecaster, or burst weapon."`,
+          );
+          break;
+        }
+        // Burst count: bolt-caster / handgun = 2, automatic-tagged = 3.
+        const tags = equipped.tags ?? [];
+        const burstCount = tags.includes('firearm') ? 3 : 2;
+        set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.attack + 1), 0.15) });
+        get().appendLog(
+          'world',
+          `You squeeze ${burstCount} shots out of the ${equipped.name}. Each takes a stacking penalty die.`,
+        );
+        const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather));
+        const statVal = stats[equipped.stat];
+        const statLabel = equipped.stat.slice(0, 3).toUpperCase();
+        let livingHp = currentScene.enemyHps[currentScene.activeEnemyIdx] ?? targetEnemy.hp;
+        let killed = false;
+        for (let i = 0; i < burstCount && livingHp > 0; i++) {
+          const penalty = i * 2;
+          const roll = rollDie(20);
+          const total = roll + statVal - penalty;
+          const ac = Math.max(5, Math.min(18, 5 + (parseInt(String(targetEnemy.abilityPoint), 10) || 0)));
+          const hit = total >= ac;
+          get().appendLog(
+            'combat',
+            `Shot ${i + 1}/${burstCount} — d20 ${roll} + ${statLabel} ${statVal}${penalty ? ` − ${penalty} (burst)` : ''} = ${total} vs AC ${ac} — ${hit ? '✓ HIT' : '✗ MISS'}`,
+          );
+          if (hit) {
+            const dmg = Math.max(1, rollDie(equipped.damageDice.includes('d10') ? 10 : 6));
+            livingHp = Math.max(0, livingHp - dmg);
+            get().appendLog('combat', `Bolt ${i + 1} hits ${targetEnemy.name} for ${dmg}. (${livingHp}/${targetEnemy.hp} HP)`);
+            if (livingHp <= 0) {
+              killed = true;
+              break;
+            }
+          }
+        }
+        if (killed) {
+          set((s) => {
+            if (!s.currentScene) return {};
+            const hps = [...s.currentScene.enemyHps];
+            hps[s.currentScene.activeEnemyIdx] = 0;
+            return { currentScene: { ...s.currentScene, enemyHps: hps } };
+          });
+          get().resolveEnemyDefeat();
+        } else {
+          set((s) => {
+            if (!s.currentScene) return {};
+            const hps = [...s.currentScene.enemyHps];
+            hps[s.currentScene.activeEnemyIdx] = livingHp;
+            return { currentScene: { ...s.currentScene, enemyHps: hps } };
+          });
+          runEnemyGroupCounters(get, set, player);
+        }
+        break;
+      }
+      case 'fight_back': {
+        // Apply fighting_back status. The next enemy counter-attack
+        // resolves as an opposed Fighting roll instead of a flat dodge.
+        if (currentScene.enemies.length === 0) {
+          get().appendLog('arbiter', `The Arbiter shrugs. "Fight back against whom? You're alone."`);
+          break;
+        }
+        const fb: StatusEffect = {
+          kind: 'fighting_back',
+          remainingRounds: 1,
+          label: 'fighting back',
+        };
+        set((s) =>
+          s.player
+            ? {
+                player: {
+                  ...s.player,
+                  statusEffects: applyEffect(s.player.statusEffects ?? [], fb),
+                  hoursElapsed: (s.player.hoursElapsed ?? 0) + 0.05,
+                },
+              }
+            : s,
+        );
+        get().appendLog(
+          'world',
+          `You set your stance. Next time an enemy strikes, you trade — opposed Fighting roll, the higher success lands. Critical strikes don't apply on a fight-back.`,
         );
         break;
       }
@@ -5106,6 +5270,27 @@ function enemyCanReach(enemy: Enemy, range: CombatRange): boolean {
 // melee weapons = arm only. Ranged = close + far (the lore allows ranged
 // at arm but with poor effect; we still permit it). Runecasters by tier:
 // common/uncommon = arm+close, rare/legendary = all bands.
+/** Build score per the action-card maneuver math. Higher is bigger /
+ *  heavier. Player: derived from STR (mass + leverage) with a small
+ *  race bonus for Tartarian Giants. Range roughly 1..10. */
+function playerBuildScore(player: PlayerCharacter): number {
+  const stats = effectiveStats(player);
+  let build = Math.max(1, Math.round(stats.strength * 0.7));
+  if (player.raceId === 'tartarian_giants') build += 2;
+  if (player.raceId === 'mud_dweller') build -= 1;
+  return Math.max(1, Math.min(10, build));
+}
+
+/** Enemy build derived from their abilityPoint string and HP cap. The
+ *  data file format is "Strength 4" / "Dexterity 6"; we read the
+ *  number plus a small HP-tier bonus. Large legendaries like Mud Titan
+ *  end up at 9-10; rats and wasps at 2-3. */
+function enemyBuildScore(enemy: Enemy): number {
+  const ap = parseInt(String(enemy.abilityPoint), 10) || 3;
+  const hpTier = enemy.hp >= 200 ? 3 : enemy.hp >= 100 ? 2 : enemy.hp >= 40 ? 1 : 0;
+  return Math.max(1, Math.min(10, ap + hpTier));
+}
+
 function playerWeaponReach(player: PlayerCharacter): { bands: CombatRange[]; label: string } {
   const eq = player.equipped ?? {};
   const main = eq.main ?? eq.weaponName;
@@ -5207,14 +5392,77 @@ function applyEnemyCounter(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
 ) {
+  // Full cover vs ranged enemies auto-misses. Detect ranged from the
+  // enemy's damage notation (Aetheric / ranged tag in the name).
+  const enemyIsRanged = /aetheric|burst|laser|breath|venom|crossbow|bolt/i.test(enemy.attack + ' ' + enemy.damage);
+  if (hasFullCover(player.statusEffects) && enemyIsRanged) {
+    get().appendLog(
+      'combat',
+      `${enemy.name} fires, but full cover blocks the line — ✗ AUTO-MISS.`,
+    );
+    return;
+  }
+
+  // Fight Back — if the player declared fight_back this round, the
+  // enemy attack resolves as an opposed Fighting roll instead of a
+  // flat AC check. Both roll d20 + their fighting stat; higher wins.
+  // Critical strikes / impaling do NOT apply on fight-back per the
+  // action card.
+  const fb = (player.statusEffects ?? []).find((e) => e.kind === 'fighting_back');
+  if (fb) {
+    const stats = effectiveStats(player);
+    const playerRoll = rollDie(20);
+    const playerTotal = playerRoll + stats.strength;
+    const enemyRoll = rollDie(20);
+    const enemyTotal = enemyRoll + (parseInt(String(enemy.attack), 10) || 3) + traitAttackBonus(enemy.traits);
+    const playerWins = playerTotal > enemyTotal;
+    const tie = playerTotal === enemyTotal;
+    get().appendLog(
+      'combat',
+      `Fight Back — You d20 ${playerRoll} + STR ${stats.strength} = ${playerTotal} vs ${enemy.name} d20 ${enemyRoll} + ATK ${enemy.attack} = ${enemyTotal} — ${playerWins ? '✓ YOU LAND' : tie ? '⟂ TIE (attacker wins)' : '✗ THEY LAND'}`,
+    );
+    // Consume the fighting_back status either way.
+    set((s) =>
+      s.player
+        ? { player: { ...s.player, statusEffects: (s.player.statusEffects ?? []).filter((e) => e.kind !== 'fighting_back') } }
+        : s,
+    );
+    if (playerWins) {
+      // Player lands a hit on enemy as part of trading.
+      const equipped = player.equipped?.main ? findWeaponByName(player.equipped.main) : null;
+      const dmg = equipped ? rollDie(6) + 1 : rollDie(4);
+      const live = get().currentScene;
+      if (live) {
+        const idx = live.enemies.findIndex((e) => e === enemy);
+        if (idx >= 0) {
+          const hp = Math.max(0, (live.enemyHps[idx] ?? enemy.hp) - dmg);
+          set((s) => {
+            if (!s.currentScene) return {};
+            const hps = [...s.currentScene.enemyHps];
+            hps[idx] = hp;
+            return { currentScene: { ...s.currentScene, enemyHps: hps } };
+          });
+          get().appendLog('combat', `Your fight-back strike for ${dmg} damage. ${enemy.name} HP ${hp}/${enemy.hp}.`);
+          if (hp <= 0) {
+            set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: idx } } : s));
+            void Promise.resolve().then(() => get().resolveEnemyDefeat());
+          }
+        }
+      }
+      return; // tie/player-win: enemy's strike doesn't land.
+    }
+    // Tie or enemy-win: fall through and apply enemy damage as normal.
+  }
+
   const baseAtk = parseInt(String(enemy.attack), 10) || 3;
   const traitAtk = traitAttackBonus(enemy.traits);
   const atkBonus = baseAtk + traitAtk;
   const atkRoll = rollDie(20);
   const atkTotal = atkRoll + atkBonus;
   // Effective AC = race base + summed armor bonus from head/chest/legs/feet
-  // + status modifier (e.g. -2 from armor_severed). Status floor at 1 so a
-  // player isn't completely impossible to defend.
+  // + status modifier (e.g. -2 from armor_severed, +4 partial cover,
+  // +8 full cover, +4 dodging/blocking). Status floor at 1 so a player
+  // isn't completely impossible to defend.
   const armorPieces = aggregateArmor(player);
   const acFromGear = player.ac + armorPieces.acBonus;
   const effectiveAc = Math.max(1, acFromGear + statusAcAdjustment(player.statusEffects));

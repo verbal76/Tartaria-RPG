@@ -95,3 +95,32 @@ describe('rollMods — combined pool sums correctly', () => {
     expect(m.net).toBe(2);
   });
 });
+
+describe('rollMods — quick_fire status (action-card layer)', () => {
+  it('grants +2 on next ranged attack and is consumed', () => {
+    const m = rollMods([eff('quick_fire')], 'attack_ranged');
+    expect(m.bonus).toBe(2);
+    expect(m.consume).toContain('quick_fire');
+  });
+
+  it('does NOT apply on a melee swing', () => {
+    expect(rollMods([eff('quick_fire')], 'attack_melee').net).toBe(0);
+  });
+});
+
+describe('rollMods — full cover gives +8 on defense', () => {
+  it('full cover stacks higher than partial', () => {
+    expect(rollMods([eff('in_cover_full')], 'defense').net).toBe(8);
+  });
+
+  it('does not affect attack rolls', () => {
+    expect(rollMods([eff('in_cover_full')], 'attack_ranged').net).toBe(0);
+  });
+});
+
+describe('rollMods — fighting_back is a flag, not a modifier', () => {
+  it('returns zero net (the handler reads the kind separately)', () => {
+    expect(rollMods([eff('fighting_back')], 'defense').net).toBe(0);
+    expect(rollMods([eff('fighting_back')], 'attack_melee').net).toBe(0);
+  });
+});

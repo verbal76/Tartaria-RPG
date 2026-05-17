@@ -145,9 +145,18 @@ export function statusAcAdjustment(current: readonly StatusEffect[] | undefined)
     if (e.kind === 'armor_severed') adj -= 2;
     if (e.kind === 'dodging') adj += 4;
     if (e.kind === 'in_cover') adj += 4;
+    if (e.kind === 'in_cover_full') adj += 8;
     if (e.kind === 'blocking') adj += 4;
   }
   return adj;
+}
+
+/** True if the player is in full cover and the incoming attack is
+ *  ranged — caller treats this as an automatic miss for firearms.
+ *  Melee still resolves normally; full cover doesn't block someone
+ *  walking up and stabbing you. */
+export function hasFullCover(current: readonly StatusEffect[] | undefined): boolean {
+  return hasEffect(current, 'in_cover_full');
 }
 
 /**

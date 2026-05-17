@@ -52,6 +52,24 @@ export function rollMods(
           sources.push('cover +4');
         }
         break;
+      case 'in_cover_full':
+        if (action === 'defense') {
+          bonus += 8;
+          sources.push('full cover +8');
+        }
+        break;
+      case 'quick_fire':
+        if (action === 'attack_ranged') {
+          bonus += 2;
+          sources.push('quick fire +2');
+          consume.push('quick_fire');
+        }
+        break;
+      case 'fighting_back':
+        // No direct attack-roll modifier; flag is read by the enemy
+        // counter-attack handler in gameStore to switch defense to an
+        // opposed Fighting roll.
+        break;
       case 'dodging':
         if (action === 'defense') {
           bonus += 4;

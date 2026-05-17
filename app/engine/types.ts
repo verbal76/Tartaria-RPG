@@ -39,6 +39,9 @@ export type Intent =
   | 'aim'
   | 'reload'
   | 'maneuver'
+  | 'quick_fire'
+  | 'multi_fire'
+  | 'fight_back'
   | 'unknown';
 
 export interface ParsedInput {
@@ -302,11 +305,14 @@ export type StatusEffectKind =
   // routed through rollMods() in combatRules.ts.
   | 'aiming'         // +2 on next ranged attack vs the same target
   | 'sprinting'      // -2 on attack rolls this turn (post-sprint penalty)
-  | 'in_cover'       // +4 AC vs ranged; partial cover, full cover blocks entirely
+  | 'in_cover'       // +4 AC vs ranged (partial cover)
+  | 'in_cover_full'  // ranged attacks against you auto-miss (full cover)
   | 'ready'          // bonus die on the held action when its trigger fires
   | 'helping'        // bonus die for an ally next check (single-player: narrative)
   | 'overwhelmed'    // -2 on dodge/evade after multiple hits in one round
-  | 'surprised';     // -2 on first reaction; consumed once
+  | 'surprised'      // -2 on first reaction; consumed once
+  | 'fighting_back'  // next enemy counter resolves as opposed Fighting roll
+  | 'quick_fire';    // +2 on the next ranged attack THIS turn (initiative bonus surrogate)
 
 export interface StatusEffect {
   kind: StatusEffectKind;
