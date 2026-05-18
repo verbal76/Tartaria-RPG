@@ -241,7 +241,73 @@ export interface ParseContext {
    *  torch on <enemy>" suggestions — that reads as nonsense; the
    *  player should attack, throw, or use a weapon-like item. */
   enemyNames?: string[];
+  /** Nouns from active (unresolved) hooks in the scene. Lets the
+   *  suggester surface hook-friendly verbs (search, inspect, follow,
+   *  investigate) when the player names one. */
+  hookNouns?: string[];
+  /** Ambient nouns extracted from the scene paragraph. Used to
+   *  classify the player's input as a generic-area target. */
+  ambientNouns?: string[];
+  /** Name of the vendor currently in the scene, if any. Lets the
+   *  suggester offer 'trade with X' / 'buy from X' style verbs. */
+  vendorName?: string;
 }
+
+/** Classification of a parsed noun against the live scene. Drives the
+ *  suggestion engine: each verb has an allowlist of NounKinds it
+ *  makes sense for, so the parser stops offering "use torch on goblin"
+ *  / "inspect <location>" / etc. nonsense in the no-verb fallback. */
+export type NounKind = 'item' | 'enemy' | 'hook' | 'ambient' | 'location' | 'vendor';
+
+export function classifyNoun(
+  noun: string | undefined | null,
+  context: ParseContext,
+): NounKind | null {
+  if (!noun) return null;
+  const lower = noun.toLowerCase();
+  // Item match — exact-ish name match against inventory.
+  const item = (context.inventory ?? []).find(
+    (i) => i.name.toLowerCase() === lower || i.name.toLowerCase().includes(lower),
+  );
+  if (item) return 'item';
+  // Enemy match (canonical name or alias).
+  const enemyNames = (context.enemyNames ?? []).map((n) => n.toLowerCase());
+  if (enemyNames.some((n) => n === lower || n.includes(lower) || lower.includes(n))) {
+    return 'enemy';
+  }
+  // Vendor match.
+  if (context.vendorName && context.vendorName.toLowerCase().includes(lower)) {
+    return 'vendor';
+  }
+  // Hook noun.
+  if ((context.hookNouns ?? []).some((n) => n.toLowerCase() === lower)) {
+    return 'hook';
+  }
+  // Location name — substring match either way (matches existing logic).
+  const locName = (context.currentLocationName ?? '').toLowerCase();
+  if (locName && (locName === lower || locName.includes(lower) || lower.includes(locName))) {
+    return 'location';
+  }
+  // Ambient noun — falls through as the catch-all when nothing else matches.
+  if ((context.ambientNouns ?? []).some((n) => n.toLowerCase() === lower || n.toLowerCase().includes(lower) || lower.includes(n.toLowerCase()))) {
+    return 'ambient';
+  }
+  return null;
+}
+
+/** Per-suggestion verb, the NounKinds that make sense as targets.
+ *  Used by the no-verb fallback so the suggestion bar only offers
+ *  combinations the engine can actually resolve. */
+const VERB_NOUN_KINDS: Record<string, NounKind[]> = {
+  inspect: ['item', 'enemy', 'hook', 'ambient', 'vendor'],
+  search: ['ambient', 'hook'],
+  attack: ['enemy'],
+  throw: ['enemy'],
+  'use torch on': ['ambient', 'hook'],
+  'talk to': ['vendor', 'enemy'],
+  steal: ['ambient', 'hook', 'vendor'],
+  follow: ['hook', 'enemy'],
+};
 
 export function parseInput(raw: string, context: ParseContext = {}): ParsedInput {
   const normalized = normalizeInput(raw);
@@ -283,42 +349,36 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
   }
 
   if (!bestMatch) {
-    // Try treating the entire input as a possible noun reference and suggest verbs
+    // No verb matched — fall back to suggestion generation driven by
+    // the noun taxonomy. classifyNoun() puts the player's target into
+    // one of: item / enemy / hook / ambient / location / vendor. Each
+    // suggestion verb has a NounKind allowlist (VERB_NOUN_KINDS) — we
+    // only offer the verb-noun pairs the engine can actually resolve.
     const noun = resolveContextNoun(tokens.filter((t) => !STOPWORDS.has(t)), recentNouns);
     const item = resolveItem(tokens.filter((t) => !STOPWORDS.has(t)), inventory);
-    const suggestions: string[] = [];
-    // A noun that matches the player's current Location name (or any
-    // substring of it) is a container, not a target — "use torch on
-    // tartarian outskirts" reads as nonsense, and so does "use torch on
-    // buried cities" when the location is "The Buried Cities" and the
-    // ambient noun extractor picked up the bare phrase. Suppress
-    // suggestions for any noun that is a substring of OR contains the
-    // location name. Player can still TYPE the action and the handler
-    // will respond; we just stop offering it as a default.
-    const lowerLocation = (context.currentLocationName ?? '').toLowerCase();
+    const nounKind = classifyNoun(noun, context);
     const lowerNoun = noun?.toLowerCase() ?? '';
-    const nounIsLocation = !!(
-      lowerNoun && lowerLocation && (
-        lowerNoun === lowerLocation ||
-        lowerLocation.includes(lowerNoun) ||
-        lowerNoun.includes(lowerLocation)
-      )
-    );
-    // 'use torch on X' only makes sense when the player actually has a
-    // torch AND the noun isn't an enemy (you don't "use torch on a
-    // goblin" — you attack it). Inspect is always safe.
     const hasTorch = (context.inventory ?? []).some(
       (i) => /torch/i.test(i.name) && i.quantity > 0,
     );
-    const enemyNamesLower = (context.enemyNames ?? []).map((n) => n.toLowerCase());
-    const nounIsEnemy = !!lowerNoun && enemyNamesLower.some(
-      (n) => n.includes(lowerNoun) || lowerNoun.includes(n),
-    );
-    if (noun && !nounIsLocation) {
-      suggestions.push(`inspect ${noun.toLowerCase()}`);
-      if (hasTorch && !nounIsEnemy) {
-        suggestions.push(`use torch on ${noun.toLowerCase()}`);
-      }
+
+    const suggestions: string[] = [];
+    const suggestIfAllowed = (verb: string, withNoun = true) => {
+      const allowed = VERB_NOUN_KINDS[verb];
+      if (!allowed) return;
+      if (!nounKind) return;
+      if (!allowed.includes(nounKind)) return;
+      suggestions.push(withNoun ? `${verb} ${lowerNoun}` : verb);
+    };
+
+    if (noun && nounKind) {
+      // Always-safe verbs that don't require any item / context.
+      suggestIfAllowed('inspect');
+      if (nounKind === 'ambient' || nounKind === 'hook') suggestIfAllowed('search');
+      if (nounKind === 'enemy') suggestIfAllowed('attack');
+      if (nounKind === 'vendor') suggestIfAllowed('talk to');
+      // 'use torch on X' only if the player carries one.
+      if (hasTorch) suggestIfAllowed('use torch on');
     }
     if (item) suggestions.push(`use ${item.name.toLowerCase()}`);
     if (context.enemyPresent) suggestions.push('attack', 'block', 'advance', 'retreat', 'hide', 'parley');

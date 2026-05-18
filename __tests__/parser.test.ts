@@ -202,10 +202,24 @@ describe('parseInput — current Location name does not become a suggestion targ
   });
   it('does propose normal "inspect X" / "use torch on X" for non-location nouns', () => {
     // Input has to share a token with the candidate noun so the parser's
-    // fuzzy noun matcher resolves it. "aetherbat" itself works.
+    // fuzzy noun matcher resolves it. The taxonomy now requires the
+    // noun to land in a real bucket (item / enemy / hook / ambient /
+    // vendor) before suggestion generation runs — recentNouns alone
+    // isn't enough. Aetherbat is offered as a hook noun here.
     const result = parseInput('aetherbat', {
       recentNouns: ['Aetherbat'],
+      hookNouns: ['Aetherbat'],
       currentLocationName: 'Tartarian Outskirts',
+      inventory: [
+        {
+          id: 't',
+          name: 'Aetheric Torch',
+          kind: 'misc',
+          rarity: 'Common',
+          quantity: 1,
+          tags: ['light'],
+        },
+      ],
     });
     const allSuggestions = (result.suggestions ?? []).join(' ');
     expect(allSuggestions).toMatch(/aetherbat/i);

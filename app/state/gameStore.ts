@@ -1526,6 +1526,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ...currentScene.enemies.map((e) => e.name),
         ...currentScene.enemies.flatMap((e) => e.aliases ?? []),
       ],
+      hookNouns: (currentScene.hooks ?? [])
+        .filter((h) => !h.resolved)
+        .flatMap((h) => h.nouns),
+      ambientNouns: currentScene.ambientNouns ?? [],
+      vendorName: currentScene.vendor?.name,
     };
     const parsed = parseInput(trimmed, parseCtx);
     get().appendLog('player', trimmed, {
