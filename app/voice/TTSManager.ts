@@ -9,6 +9,13 @@
 
 import * as Speech from 'expo-speech';
 import { getVoiceSettings, loadVoiceSettings, onVoiceSettingsChange } from './voiceSettings';
+import {
+  speak as piperSpeak,
+  stopAndClear as piperStopAndClear,
+  isSpeaking as piperIsSpeaking,
+  isPiperAvailable,
+  disposePiperEngine,
+} from './PiperTTSManager';
 
 interface QueuedUtterance {
   /** Monotonic id so callers can debounce / dedupe if needed. */
@@ -64,18 +71,27 @@ export async function getTTSVoices(): Promise<Speech.Voice[]> {
   return voicesCache;
 }
 
-/** True if anything is in the queue or actively being spoken. */
+/** True if anything is in the queue or actively being spoken.
+ *  Aware of both engines so the InputBox MIC / SILENCE button swap
+ *  fires correctly regardless of which engine is active. */
 export function isSpeaking(): boolean {
+  const settings = getVoiceSettings();
+  if (settings.engine === 'bundled') return piperIsSpeaking();
   return currentlySpeaking !== null || queue.length > 0;
 }
 
-/** Queue a line to be spoken. No-op if TTS is disabled in settings.
- *  Returns the queue id (useful for tests + future debug logging). */
+/** Queue a line to be spoken. Routes to either the system TTS
+ *  (expo-speech) or the bundled Piper engine based on
+ *  voiceSettings.engine. No-op if TTS is disabled in settings.
+ *  Returns the queue id (negative when nothing was queued). */
 export function speak(text: string, channel?: string): number {
   const settings = getVoiceSettings();
   if (!settings.ttsEnabled) return -1;
   const trimmed = text.trim();
   if (!trimmed) return -1;
+  if (settings.engine === 'bundled') {
+    return piperSpeak(trimmed);
+  }
   const id = nextId++;
   queue.push({ id, text: trimmed, channel });
   drain();
@@ -83,11 +99,14 @@ export function speak(text: string, channel?: string): number {
 }
 
 /** Stop whatever's currently speaking + clear the queue entirely.
- *  Used by the SILENCE ARBITER button and the OFF settings toggle. */
+ *  Used by the SILENCE ARBITER button and the OFF settings toggle.
+ *  Stops BOTH engines so the player can flip toggles without leaving
+ *  audio bleeding in the background. */
 export function stopAndClear(): void {
   queue.length = 0;
   currentlySpeaking = null;
   try { void Speech.stop(); } catch { /* ignore */ }
+  void piperStopAndClear();
 }
 
 /** Keep the currently-speaking sentence, but drop everything queued

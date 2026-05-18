@@ -15,13 +15,20 @@ export interface VoiceSettings {
   /** Master toggle for the mic / silence-arbiter buttons + push-to-talk
    *  speech input. Default OFF. */
   sttEnabled: boolean;
+  /** Which engine voices the game. 'system' = device TTS via
+   *  expo-speech (default). 'bundled' = neural Piper voice via
+   *  sherpa-onnx (better quality, ~63 MB download on first use). */
+  engine: 'system' | 'bundled';
   /** Playback rate for TTS. 1.0 = normal. expo-speech accepts 0.1–2.0
-   *  on Android; we clamp the UI slider 0.5–1.5 for sanity. */
+   *  on Android; we clamp the UI slider 0.5–1.5 for sanity. Used by
+   *  both engines. */
   rate: number;
-  /** Pitch for TTS. 1.0 = normal. Clamped 0.5–2.0. */
+  /** Pitch for TTS. 1.0 = normal. Clamped 0.5–2.0. System engine
+   *  only — Piper voices have fixed pitch per voice. */
   pitch: number;
   /** Selected voice identifier from expo-speech.getAvailableVoicesAsync.
-   *  null = let the OS pick the default voice for the device locale. */
+   *  null = let the OS pick the default voice for the device locale.
+   *  Ignored when engine = 'bundled'. */
   voiceId: string | null;
   /** When true, a recognised STT transcript immediately fires
    *  submitPlayerAction. When false, the transcript lands in the text
@@ -33,6 +40,7 @@ export interface VoiceSettings {
 const DEFAULTS: VoiceSettings = {
   ttsEnabled: false,
   sttEnabled: false,
+  engine: 'system',
   rate: 1.0,
   pitch: 1.0,
   voiceId: null,
@@ -51,6 +59,7 @@ export async function loadVoiceSettings(): Promise<VoiceSettings> {
       cache = {
         ttsEnabled: typeof parsed.ttsEnabled === 'boolean' ? parsed.ttsEnabled : DEFAULTS.ttsEnabled,
         sttEnabled: typeof parsed.sttEnabled === 'boolean' ? parsed.sttEnabled : DEFAULTS.sttEnabled,
+        engine: parsed.engine === 'bundled' ? 'bundled' : DEFAULTS.engine,
         rate: typeof parsed.rate === 'number' ? clampRate(parsed.rate) : DEFAULTS.rate,
         pitch: typeof parsed.pitch === 'number' ? clampPitch(parsed.pitch) : DEFAULTS.pitch,
         voiceId: typeof parsed.voiceId === 'string' ? parsed.voiceId : DEFAULTS.voiceId,
@@ -74,6 +83,7 @@ export async function setVoiceSettings(patch: Partial<VoiceSettings>): Promise<V
   const next: VoiceSettings = {
     ttsEnabled: patch.ttsEnabled !== undefined ? patch.ttsEnabled : current.ttsEnabled,
     sttEnabled: patch.sttEnabled !== undefined ? patch.sttEnabled : current.sttEnabled,
+    engine: patch.engine !== undefined ? patch.engine : current.engine,
     rate: patch.rate !== undefined ? clampRate(patch.rate) : current.rate,
     pitch: patch.pitch !== undefined ? clampPitch(patch.pitch) : current.pitch,
     voiceId: patch.voiceId !== undefined ? patch.voiceId : current.voiceId,

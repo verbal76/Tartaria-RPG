@@ -18,6 +18,7 @@ import {
 } from '../voice/voiceSettings';
 import { isTTSAvailable, getTTSVoices, stopAndClear as stopTTS } from '../voice/TTSManager';
 import { isSTTAvailable } from '../voice/STTManager';
+import { isPiperInstalled, downloadPiperVoice, type PiperDownloadStatus } from '../voice/PiperDownloader';
 import type * as Speech from 'expo-speech';
 
 export function AboutScreen() {
@@ -43,6 +44,8 @@ export function AboutScreen() {
   const [voicesList, setVoicesList] = useState<Speech.Voice[]>([]);
   const [ttsAvailable, setTtsAvailable] = useState<boolean>(true);
   const [sttAvailable, setSttAvailable] = useState<boolean>(true);
+  const [piperInstalled, setPiperInstalled] = useState<boolean>(false);
+  const [piperStatus, setPiperStatus] = useState<PiperDownloadStatus | null>(null);
 
   useEffect(() => {
     setAudio(getAudioSettings());
@@ -52,11 +55,12 @@ export function AboutScreen() {
   useEffect(() => {
     setVoice(getVoiceSettings());
     const unsub = onVoiceSettingsChange(setVoice);
-    void Promise.all([isTTSAvailable(), getTTSVoices(), isSTTAvailable()]).then(
-      ([ttsOk, voices, sttOk]) => {
+    void Promise.all([isTTSAvailable(), getTTSVoices(), isSTTAvailable(), isPiperInstalled()]).then(
+      ([ttsOk, voices, sttOk, piperOk]) => {
         setTtsAvailable(ttsOk);
         setVoicesList(voices);
         setSttAvailable(sttOk);
+        setPiperInstalled(piperOk);
       },
     );
     return unsub;
@@ -71,6 +75,17 @@ export function AboutScreen() {
   const setRate = (v: number) => { void setVoiceSettings({ rate: 0.5 + v * 1.0 }); };
   const setPitch = (v: number) => { void setVoiceSettings({ pitch: 0.5 + v * 1.5 }); };
   const toggleAutoSubmit = () => { void setVoiceSettings({ autoSubmit: !voice.autoSubmit }); };
+  const switchEngine = (next: 'system' | 'bundled') => {
+    stopTTS();
+    void setVoiceSettings({ engine: next });
+  };
+  const startPiperDownload = () => {
+    void downloadPiperVoice({
+      onProgress: (s) => setPiperStatus({ ...s }),
+    }).then(() => {
+      void isPiperInstalled().then(setPiperInstalled);
+    });
+  };
   const cycleVoice = (dir: 1 | -1) => {
     if (voicesList.length === 0) return;
     const idx = voicesList.findIndex((v) => v.identifier === voice.voiceId);
@@ -381,6 +396,57 @@ export function AboutScreen() {
 
           {voice.ttsEnabled && (
             <>
+              {/* Engine picker — System uses expo-speech (lightweight,
+                  device-dependent quality); Bundled uses the Piper
+                  neural voice via sherpa-onnx (better quality, requires
+                  one-time ~63 MB download). */}
+              <View style={styles.musicRow}>
+                <Text style={styles.musicLabel}>Engine</Text>
+                <View style={{ flexDirection: 'row', gap: 6 }}>
+                  <TouchableOpacity
+                    onPress={() => switchEngine('system')}
+                    style={[styles.musicToggle, voice.engine === 'system' && styles.musicToggleOn]}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.musicToggleText, voice.engine === 'system' && styles.musicToggleTextOn]}>SYSTEM</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => switchEngine('bundled')}
+                    style={[styles.musicToggle, voice.engine === 'bundled' && styles.musicToggleOn]}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.musicToggleText, voice.engine === 'bundled' && styles.musicToggleTextOn]}>BUNDLED</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              {voice.engine === 'bundled' && (
+                <>
+                  <Text style={styles.voiceNote}>
+                    Bundled = Piper neural voice (en_US-amy-medium) via sherpa-onnx. Higher quality,
+                    fully offline once installed. {piperInstalled ? 'Installed.' : 'Not yet installed.'}
+                  </Text>
+                  {!piperInstalled && (
+                    <TouchableOpacity
+                      onPress={startPiperDownload}
+                      style={[styles.applyBtn, { marginTop: 4 }]}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.applyBtnText}>
+                        {piperStatus
+                          ? piperStatus.error
+                            ? 'RETRY'
+                            : `${Math.round((piperStatus.fraction ?? 0) * 100)}% — ${piperStatus.label}`
+                          : 'INSTALL BUNDLED VOICE'}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                  {piperStatus?.error && (
+                    <Text style={[styles.voiceNote, { color: '#e07a5f' }]}>
+                      {piperStatus.error}
+                    </Text>
+                  )}
+                </>
+              )}
               <View style={styles.musicRow}>
                 <Text style={styles.musicLabel}>Rate</Text>
                 <View style={{ flex: 1 }}>
