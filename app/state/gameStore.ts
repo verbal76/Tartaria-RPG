@@ -56,7 +56,7 @@ import {
 } from '../engine/narrativeGenerator';
 import { parseInput, type ParseContext } from '../engine/parser';
 import { rollDie, rollFromNotation, pick, chance, rotatingPick } from '../engine/rng';
-import { buildCombatSteps, buildSkillSteps, buildRestSteps, rollMods, classifyManeuver } from '../engine/combatRules';
+import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver } from '../engine/combatRules';
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
 import type { CognitiveResponse, WorldContext, ModelInfo } from '../ai/types';
 import { QwenGenerativeEngine, type QwenStatus } from '../ai/generation/QwenGenerativeEngine';
@@ -1848,10 +1848,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog('world', `You consume one ${consumable.name}. ${tail}`);
           void get().persist();
         } else {
-          // Open the interactive dice roller for rest duration. concludeRolls
-          // sees the rest_hours step and applies heal/stamina/time.
-          const steps = buildRestSteps();
-          set({ pendingRolls: { actionText: 'rest', steps, currentStep: 0 } });
+          // Deterministic 8-hour rest. The old d4+3 prompt had no
+          // gameplay surface — the player couldn't influence or fail the
+          // roll, and the only difference between 4h and 7h was time
+          // passing. Real cost of rest is the clock advance (which
+          // matters when a hunt / mystery / storyline is timed); the
+          // heal/stamina ceiling is a separate dial.
+          const hpRoom = player.hpMax - player.hp;
+          const stamRoom = player.staminaMax - player.stamina;
+          if (hpRoom === 0 && stamRoom === 0) {
+            get().appendLog(
+              'world',
+              'You are whole, breath steady, HP and stamina topped. No reason to lie down — the day still has road left.',
+            );
+            void get().persist();
+            break;
+          }
+          const hours = 8;
+          const heal = Math.min(hpRoom, hours * 2);
+          const stamGain = Math.min(stamRoom, hours);
+          const newHours = (player.hoursElapsed ?? 0) + hours;
+          set({
+            player: {
+              ...player,
+              hp: player.hp + heal,
+              stamina: player.stamina + stamGain,
+              hoursElapsed: newHours,
+            },
+          });
+          const parts: string[] = [];
+          if (heal > 0) parts.push(`+${heal} HP`);
+          if (stamGain > 0) parts.push(`+${stamGain} stamina`);
+          const tail = parts.length > 0 ? parts.join(', ') + ' recovered.' : 'Whole already — the Aetherstone hums steady.';
+          get().appendLog('world', `You rest for ${hours} hours. ${tail} (${describeTime(newHours)})`);
+          void get().persist();
         }
         break;
       }
