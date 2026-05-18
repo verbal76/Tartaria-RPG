@@ -9,7 +9,7 @@ import { OTA_BUILD_ID } from '../buildInfo';
 import { SimpleSlider } from '../components/SimpleSlider';
 import { getAudioSettings, setAudioSettings, onAudioSettingsChange, type AudioSettings } from '../audio/audioSettings';
 import { forceReapplyAudioFromState } from '../audio/AudioController';
-import { disposeAudio } from '../audio/AudioManager';
+import { checkAndApplyOTA } from '../updates/checkAndApplyOTA';
 import {
   getVoiceSettings,
   setVoiceSettings,
@@ -192,85 +192,10 @@ export function AboutScreen() {
     setUpdateBusy(true);
     setUpdateError(null);
     try {
-      if (!Updates.isEnabled) {
-        setUpdateStatus('Disabled (dev build / Expo Go)');
-        return;
-      }
-      setUpdateStatus('Checking…');
-      const result = await Updates.checkForUpdateAsync();
-      if (!result.isAvailable) {
-        setUpdateStatus('Already up to date');
-        return;
-      }
-      setUpdateStatus('Downloading update…');
-      await Updates.fetchUpdateAsync();
-      // Flush the player's progress to disk BEFORE handing control to
-      // expo-updates. If reloadAsync starts while AsyncStorage is still
-      // mid-write, the slot can end up persisted with player=null —
-      // which is exactly what was corrupting saves across updates.
-      setUpdateStatus('Saving progress…');
-      try {
-        await useGameStore.getState().persist();
-      } catch (persistErr) {
-        // Don't block the update on persist failure, but record it.
-        const m = persistErr instanceof Error ? persistErr.message : String(persistErr);
-        setUpdateError(`Save flush warning: ${m}`);
-      }
-
-      // Tear down native resources BEFORE reloadAsync. expo-av Sound,
-      // ONNX runtime session, AND llama.rn (Qwen) all hold native
-      // handles that block the JS bridge from cleanly restarting —
-      // reloadAsync was hanging on a black screen forever. Releasing
-      // these explicitly lets the bridge finish reload. HANDOFF #7:
-      // Qwen teardown was previously missing from this sequence; iOS
-      // is especially sensitive to lingering native modules because
-      // the bridge restart on iOS can deadlock on dangling jobjects.
-      setUpdateStatus('Releasing resources…');
-      try {
-        await disposeAudio();
-      } catch { /* ignore */ }
-      try {
-        await useGameStore.getState().shutdownCognitive();
-      } catch { /* ignore */ }
-      try {
-        await useGameStore.getState().shutdownQwen();
-      } catch { /* ignore */ }
-      // iOS-specific belt-and-suspenders: give the native side an extra
-      // event-loop tick to fully release. Android tolerates the
-      // immediate reload; iOS doesn't always.
-      if (Platform.OS === 'ios') {
-        await new Promise((r) => setTimeout(r, 250));
-      }
-
-      setUpdateStatus('Restarting to apply…');
-      // Await reloadAsync directly + log if it throws. The old fire-and-
-      // forget setTimeout swallowed reload errors and gave us no signal
-      // when reload simply didn't happen.
-      try {
-        await Updates.reloadAsync();
-      } catch (reloadErr) {
-        const m = reloadErr instanceof Error ? reloadErr.message : String(reloadErr);
-        setUpdateStatus('Restart failed');
-        setUpdateError(`reloadAsync error: ${m}. Please restart the app manually — your progress was saved.`);
-      }
-    } catch (err) {
-      // Capture as much detail as possible — name, message, stack head,
-      // any wrapped code property. expo-updates' generic 'Failed to check
-      // for update' isn't actionable on its own; we surface everything
-      // available so the next playtest screenshot is diagnostic.
-      let detail: string;
-      if (err instanceof Error) {
-        const code = (err as Error & { code?: string }).code;
-        const parts = [err.name, code ? `[${code}]` : '', err.message]
-          .filter(Boolean)
-          .join(' ');
-        const stackHead = err.stack ? err.stack.split('\n').slice(0, 2).join(' | ') : '';
-        detail = stackHead ? `${parts}\n      ${stackHead}` : parts;
-      } else {
-        detail = String(err);
-      }
-      setUpdateStatus('Error');
-      setUpdateError(detail);
+      await checkAndApplyOTA({
+        onStatus: setUpdateStatus,
+        onError: setUpdateError,
+      });
     } finally {
       setUpdateBusy(false);
     }

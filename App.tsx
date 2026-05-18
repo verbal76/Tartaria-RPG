@@ -20,6 +20,7 @@ import { startAudioController, stopAudioController } from './app/audio/AudioCont
 import { initTTSManager } from './app/voice/TTSManager';
 import { startTTSController, stopTTSController } from './app/voice/TTSController';
 import { createExpoFileSystemAdapter } from './app/voice/executorchAdapter';
+import { checkAndApplyOTA } from './app/updates/checkAndApplyOTA';
 
 // Wire react-native-executorch's resource fetcher at module load (before
 // React renders) so any later TextToSpeechModule.fromModelName call has
@@ -58,8 +59,22 @@ export default function App() {
       void bootAudio().then(() => startAudioController());
       // Voice (TTS + STT) — opt-in via settings; init is cheap so
       // the controller can subscribe immediately. If TTS is disabled
-      // the controller short-circuits inside onState.
+      // the controller short-circuits inside onState. initTTSManager
+      // ALSO prewarms Kokoro in the background when bundled engine is
+      // enabled — model download / load / graph-compile all happen
+      // while the player is on the title screen, so the first spoken
+      // line plays without cold-start lag.
       void initTTSManager().then(() => startTTSController());
+      // Auto-fire the same OTA check the player can run manually from
+      // Settings → About → CHECK FOR OTA UPDATE. Silent: errors are
+      // swallowed (a tap from the button surfaces them if they want
+      // to investigate). If an update is available, the sequence
+      // persists save state + tears down native handles + reloads.
+      // Delayed slightly so we don't compete with the boot sequence
+      // (model loads, audio init) on a slow device.
+      setTimeout(() => {
+        void checkAndApplyOTA({ silent: true });
+      }, 1500);
     });
     return () => {
       stopAudioController();
