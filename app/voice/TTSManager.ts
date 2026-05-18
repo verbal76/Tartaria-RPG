@@ -143,18 +143,30 @@ export function applySettings(): void {
   // exists so the settings observer has a stable hook to call.
 }
 
+/** Ensure each merged segment ends in terminal punctuation so the
+ *  TTS engine reads a natural pause between them. Most narration
+ *  lines already end with ./!/?; we only append a period for the
+ *  rare line that doesn't (e.g. a status line or a stat readout). */
+function withTerminator(text: string): string {
+  const t = text.trim();
+  if (/[.!?…:;]$/.test(t)) return t;
+  return t + '.';
+}
+
 function drain(): void {
   if (currentlySpeaking) return;
   if (queue.length === 0) return;
   // Merge everything currently queued into a single utterance so
-  // Android TTS's per-utterance init gap doesn't land between
-  // consecutive log lines from the same action. The joiner is two
-  // spaces so the engine still pauses naturally at the sentence
-  // boundary without a full reinit.
+  // Android TTS's per-utterance init gap (~1-2s of reinit) doesn't
+  // land between consecutive log lines from the same action. We
+  // still want a perceptible breath between distinct sections —
+  // joining with "\n" and force-terminating each segment makes the
+  // engine read a natural paragraph pause (~0.4s on most Android
+  // builds) WITHIN the single utterance.
   const batch = queue.splice(0, queue.length);
   const next: QueuedUtterance = {
     id: batch[0]!.id,
-    text: batch.map((it) => it.text).join('  '),
+    text: batch.map((it) => withTerminator(it.text)).join('\n'),
     channel: batch[0]!.channel,
   };
   currentlySpeaking = next;
