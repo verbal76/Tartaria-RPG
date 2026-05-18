@@ -38,7 +38,7 @@
         }
       ],
       [
-        "@react-native-voice/voice",
+        "expo-speech-recognition",
         {
           "microphonePermission": "Allow Tartaria Realms to access the microphone for speech-to-text input.",
           "speechRecognitionPermission": "Allow Tartaria Realms to recognize your speech for in-game commands."
