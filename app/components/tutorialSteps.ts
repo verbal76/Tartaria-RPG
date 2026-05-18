@@ -62,8 +62,11 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     area: 'scene-bar',
     title: 'Scene bar',
     body:
-      'Where you are right now: location · weather · hazard. ' +
-      'The line below shows the in-game time (Day N · morning/afternoon/evening/night).',
+      'Where you are right now: location · weather · hazard. The line below shows in-game time ' +
+      '(Day N · morning / afternoon / evening / night). ' +
+      'The ACTIONS chip on the right opens a full reference of every verb the parser knows — what ' +
+      'each action does and exactly what to type. QUESTS opens your active hunts, mysteries, ' +
+      'storylines, and faction contracts.',
   },
   {
     screen: 'exploration',
@@ -78,8 +81,9 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     area: 'quick-row',
     title: 'Quick actions',
     body:
-      'Tappable shortcuts for the most common actions. In peace: look, rest, dig, search, craft, ' +
-      'inventory. In combat: punch, kick, your equipped weapons, dodge, block, advance / step back, ' +
+      'Tappable shortcuts for the most common actions. In peace: look, rest, search, craft, ' +
+      'inventory. (Searching the mud / silt / ground digs — your best tool decides what comes up.) ' +
+      'In combat: punch, kick, your equipped weapons, dodge, block, advance / step back, ' +
       'pack (open inventory mid-fight).',
   },
   {
@@ -98,7 +102,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     body:
       'SAVE & EXIT writes the slot and returns you to the title screen. ' +
       'FULL LOG shows the entire history of this character\'s play session. ' +
-      'The ⚙ gear top-right opens settings (music, OTA update, diagnostics).',
+      'The ⚙ gear on the right opens settings (music, OTA update, diagnostics).',
   },
   {
     screen: 'inventory',
