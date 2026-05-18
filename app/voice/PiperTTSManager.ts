@@ -23,6 +23,7 @@
 
 import { Audio } from 'expo-av';
 import { getVoiceSettings } from './voiceSettings';
+import { applyLoreLexicon } from './loreLexicon';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const exec = require('react-native-executorch') as {
@@ -178,7 +179,11 @@ async function ensureModel(): Promise<any | null> {
 export function speak(text: string): number {
   const settings = getVoiceSettings();
   if (!settings.ttsEnabled) return -1;
-  const trimmed = text.trim();
+  // Apply the lore-respelling lexicon so words like "Aetheric" /
+  // "Tartarian" / "Reclaimer" are pronounced naturally instead of
+  // mangled by the default phonemizer. Pure transform — doesn't
+  // change the visible game log, just what Kokoro speaks.
+  const trimmed = applyLoreLexicon(text).trim();
   if (!trimmed) return -1;
   const id = nextId++;
   queue.push({ id, text: trimmed });
