@@ -31,7 +31,14 @@ jest.mock('expo-file-system', () => ({
   EncodingType: { UTF8: 'utf8', Base64: 'base64' },
 }));
 jest.mock('expo-speech', () => ({ speak: jest.fn(), stop: jest.fn(), isSpeakingAsync: jest.fn(async () => false) }));
-jest.mock('expo-av', () => ({ Audio: { setAudioModeAsync: jest.fn(), Sound: class { static createAsync = jest.fn(async () => ({ sound: { playAsync: jest.fn(), unloadAsync: jest.fn() } })); } } }));
+jest.mock('expo-av', () => ({
+  Audio: {
+    setAudioModeAsync: jest.fn(),
+    Sound: class {
+      static createAsync: (...args: unknown[]) => Promise<{ sound: { playAsync: () => Promise<void>; unloadAsync: () => Promise<void> } }> = jest.fn(async () => ({ sound: { playAsync: jest.fn(async () => {}), unloadAsync: jest.fn(async () => {}) } }));
+    },
+  },
+}));
 jest.mock('expo-application', () => ({ nativeApplicationVersion: '0', applicationId: 'test' }));
 jest.mock('expo-asset', () => ({ Asset: { fromModule: () => ({ downloadAsync: jest.fn(async () => {}), localUri: '' }) } }));
 jest.mock('expo-clipboard', () => ({ setStringAsync: jest.fn(async () => {}) }));
@@ -288,7 +295,7 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
         }
       }
       lastEnemyName = enemyNow?.name ?? null;
-      prevEnemyHp = enemyHpNow;
+      prevEnemyHp = enemyHpNow ?? null;
 
       // Track quests
       for (const id of pBefore.completedFactionQuestIds ?? []) questsCompleted.add(id);

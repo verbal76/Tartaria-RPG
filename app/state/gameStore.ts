@@ -2204,11 +2204,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       case 'dodge': {
         // Defensive stance: +4 AC for one round, costs nothing else.
-        // Implemented as a status effect so it ticks down like everything
-        // else and shows in the StatsPanel "Effects" line.
+        // remainingRounds=2 so the stance survives the next turn's
+        // tickEffects (2→1) AND is still active when that turn's
+        // enemy counter resolves. Without this, tickEffects would
+        // decrement 1→0 before the counter saw the +4 AC.
         const dodging: StatusEffect = {
           kind: 'dodging',
-          remainingRounds: 1,
+          remainingRounds: 2,
           label: 'dodging',
         };
         set((s) =>
@@ -2246,7 +2248,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         const blocking: StatusEffect = {
           kind: 'blocking',
-          remainingRounds: 1,
+          remainingRounds: 2,
           label: 'blocking',
         };
         set((s) =>
@@ -3022,7 +3024,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         const fb: StatusEffect = {
           kind: 'fighting_back',
-          remainingRounds: 1,
+          remainingRounds: 2,
           label: 'fighting back',
         };
         set((s) =>
@@ -3807,7 +3809,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       const rawDmg = damage?.total ?? rollDie(6);
       const barehand = isBareHandAttack(actionText);
-      const equipped = barehand ? null : getEquippedWeapon(player);
+      // If the player invoked the off-hand explicitly (via the OFF
+      // quick button or "attack with the off-hand X"), look up the
+      // off-hand weapon for damage type / effect / wear so the
+      // resistance + weakness math reads from the actual blade in
+      // play. Without this hint, getEquippedWeapon defaults to the
+      // main-hand and every off-hand swing was being scored against
+      // main-hand resistances.
+      const usedOffHandForDmg = /\boff[- ]?hand\b/.test(actionText.toLowerCase());
+      const equipped = barehand ? null : getEquippedWeapon(player, usedOffHandForDmg ? 'off' : 'main');
       // Bare-hand strikes are bludgeoning by default so the player can
       // exploit Aetheric Mutation / Construct / Automation bludgeoning
       // weaknesses without sacrificing their weapon's durability.
@@ -6355,6 +6365,11 @@ function runEnemyGroupCounters(
     if (liveIdx < 0) continue;
     const hpAtCounter = liveScene.enemyHps[liveIdx];
     if (hpAtCounter === undefined || hpAtCounter <= 0) continue;
+    // Range gate — melee enemies can't counter when the player is at
+    // 'far'. Ranged enemies (matched on attack/damage flavor) reach
+    // all bands. Mirrors enemyCanReach used by movement intents.
+    const liveRange = liveScene.range ?? 'close';
+    if (!enemyCanReach(enemy, liveRange)) continue;
     // Bail if the player is dead.
     const livePlayer = get().player;
     if (!livePlayer || livePlayer.hp <= 0 || livePlayer.dead) return;
