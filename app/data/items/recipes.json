@@ -19,7 +19,7 @@
       "ingredients": [
         { "name": "Stick", "quantity": 1 },
         { "name": "Small Rock", "quantity": 1 },
-        { "name": "Spider Silk", "quantity": 1 }
+        { "name": "Patched Cloth", "quantity": 1 }
       ]
     },
     {
@@ -27,7 +27,7 @@
       "ingredients": [
         { "name": "Stick", "quantity": 1 },
         { "name": "Scrap Metal", "quantity": 1 },
-        { "name": "Spider Silk", "quantity": 1 }
+        { "name": "Patched Cloth", "quantity": 1 }
       ]
     },
     {
