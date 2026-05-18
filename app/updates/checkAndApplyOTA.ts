@@ -13,6 +13,9 @@ import { Platform } from 'react-native';
 import * as Updates from 'expo-updates';
 import { useGameStore } from '../state/gameStore';
 import { disposeAudio } from '../audio/AudioManager';
+import { stopTTSController } from '../voice/TTSController';
+import { stopAndClear as stopTTS } from '../voice/TTSManager';
+import { disposePiperEngine } from '../voice/PiperTTSManager';
 
 export interface CheckAndApplyOptions {
   /** Called as the sequence progresses. The button on AboutScreen
@@ -73,6 +76,13 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
     try { await disposeAudio(); } catch { /* ignore */ }
     try { await useGameStore.getState().shutdownCognitive(); } catch { /* ignore */ }
     try { await useGameStore.getState().shutdownQwen(); } catch { /* ignore */ }
+    // Voice native handles — both engines AND the controller's store
+    // subscription. Without these, the executorch (Kokoro) module's
+    // PyTorch handle and the expo-av Sound created by playPcm can
+    // keep the bridge from cleanly tearing down on reloadAsync.
+    try { stopTTSController(); } catch { /* ignore */ }
+    try { stopTTS(); } catch { /* ignore */ }
+    try { await disposePiperEngine(); } catch { /* ignore */ }
     if (Platform.OS === 'ios') {
       // iOS belt-and-suspenders: give the native side an extra
       // event-loop tick to fully release.

@@ -70,6 +70,13 @@ describe('cleanForSpeech', () => {
     expect(cleanForSpeech('(-3 stamina)')).toBe('(negative 3 stamina)');
   });
 
+  it('rewrites Unicode minus (U+2212) the same way', () => {
+    // Combat / dice formatters emit U+2212, not ASCII -, so the
+    // negative-number rule needs to catch both.
+    expect(cleanForSpeech('−2 AC')).toBe('negative 2 AC');
+    expect(cleanForSpeech('roll −1 to attack')).toBe('roll negative 1 to attack');
+  });
+
   it('leaves word-internal hyphens alone', () => {
     expect(cleanForSpeech('well-known scholar')).toBe('well-known scholar');
     expect(cleanForSpeech('Mud-fist Wraps')).toBe('Mud-fist Wraps');

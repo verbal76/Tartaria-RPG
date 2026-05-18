@@ -3101,7 +3101,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
       case 'accept': {
         const target = parsed.target ?? parsed.resolvedNoun ?? '';
         if (!target.trim()) {
-          get().appendLog('arbiter', `The Arbiter raises a brow. "Accept what? Ask the agent what is on offer."`);
+          // QA finding: the simulator ran 999 actions through faction
+          // territory and never accepted a quest because "accept" with
+          // no target just refused. When a faction vendor IS present,
+          // list what's on offer so the player can name one. Otherwise
+          // keep the generic refusal — quests come from vendors.
+          const vendor = currentScene.vendor;
+          if (vendor?.faction) {
+            const pool = availableFactionQuests(
+              vendor.faction,
+              getStanding(player.factionStanding, vendor.faction),
+              player.activeFactionQuestIds ?? [],
+              player.completedFactionQuestIds ?? [],
+            );
+            const titles = pool.map((q) => `"${q.title}"`).join(', ');
+            get().appendLog(
+              'arbiter',
+              titles
+                ? `${vendor.name} folds their arms. "On offer: ${titles}. Type 'accept <title>' to take one."`
+                : `${vendor.name} shrugs. "Nothing for you right now — check back after I've travelled."`,
+            );
+          } else {
+            get().appendLog('arbiter', `The Arbiter raises a brow. "Accept what? Find a faction vendor and ask what's on offer."`);
+          }
           break;
         }
         const lower = target.toLowerCase();

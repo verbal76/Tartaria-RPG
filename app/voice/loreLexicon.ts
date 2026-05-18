@@ -105,6 +105,10 @@ export function cleanForSpeech(text: string): string {
   out = out.replace(/\s*->\s*/g, ' to ');
   // Middle-dot separator becomes a comma+space so we get a breath.
   out = out.replace(/\s*·\s*/g, ', ');
+  // Unicode "minus sign" (U+2212) shows up in combat lines emitted by
+  // the dice/roll formatter and weapon-effect narration. Normalize it
+  // to the ASCII "-" so the negative-number rule below catches it.
+  out = out.replace(/−/g, '-');
   // Negative numbers — only when "-" is at a word boundary preceding
   // a digit, so word-internal hyphens (e.g. "well-known", "Mud-fist
   // Wraps") aren't touched.

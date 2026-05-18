@@ -70,9 +70,14 @@ export default function App() {
       // swallowed (a tap from the button surfaces them if they want
       // to investigate). If an update is available, the sequence
       // persists save state + tears down native handles + reloads.
-      // Delayed slightly so we don't compete with the boot sequence
-      // (model loads, audio init) on a slow device.
+      //
+      // Only runs while the player is still on the title screen — if
+      // they've already tapped a slot and `loadSlotIntoGame` is mid-
+      // flight, an OTA reload here would yank them mid-save-load and
+      // potentially corrupt the slot. Manual button (from Settings)
+      // has no such guard because the player explicitly opted in.
       setTimeout(() => {
+        if (useGameStore.getState().currentScreen !== 'title') return;
         void checkAndApplyOTA({ silent: true });
       }, 1500);
     });
