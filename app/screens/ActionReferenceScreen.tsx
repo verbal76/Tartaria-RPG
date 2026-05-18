@@ -70,56 +70,54 @@ function lookup(id: string): Concept | null {
   return concepts.find((c) => c.id === id) ?? null;
 }
 
-// Sample inputs the parser will route to each action. Surfaced under
-// every card in green so new players can see EXACTLY what to type for
-// the verb / intent the card describes. Pulled from the parser's
-// synonym pool (app/engine/parser.ts) — adding a new synonym there
-// without updating this map is fine, but adding the example here makes
-// it discoverable from the reference screen.
+// Sample inputs the parser will route to each action. 2-3 examples
+// per action — kept distinct so new players see the full shape of the
+// verb (with / without a target, with / without a noun) without
+// repetition. Surfaced under every card in reward-green.
 const EXAMPLES: Record<string, string[]> = {
   // Movement
-  move_action: ['walk', 'go north', 'head east', 'continue'],
+  move_action: ['walk', 'go north', 'continue'],
   sprint_action: ['sprint', 'dash west', 'run to the wall'],
   take_cover_action: ['take cover', 'hide behind the rubble', 'duck for cover'],
   perform_action: ['perform', 'sing', 'play a tune'],
-  assist_action_combat: ['help', 'assist the reclaimer', 'back them up'],
-  hold_action: ['ready', 'hold my action', 'wait for an opening'],
+  assist_action_combat: ['help', 'assist the reclaimer'],
+  hold_action: ['ready', 'wait for an opening'],
   flee_action: ['flee', 'run away', 'retreat'],
   classic_move: ['walk', 'step forward', 'move closer'],
   difficult_terrain: ['cross the mud', 'wade through the silt'],
-  crawl: ['crawl', 'crawl forward', 'crawl under'],
+  crawl: ['crawl', 'crawl forward'],
   climb: ['climb', 'climb the ladder', 'climb the wall'],
-  swim: ['swim', 'swim across', 'wade through the water'],
-  standing_long_jump: ['jump', 'jump the gap', 'leap across'],
+  swim: ['swim', 'swim across'],
+  standing_long_jump: ['jump', 'jump the gap'],
   running_long_jump: ['jump while sprinting', 'leap the chasm at a run'],
 
   // Combat
-  attack_action: ['attack the goblin', 'swing at the worm', 'strike the sentinel'],
+  attack_action: ['attack the goblin', 'strike the sentinel', 'swing at it'],
   brawl_action: ['punch', 'kick', 'grapple the goblin'],
   use_weapon_action: ['attack with the rust rifle', 'use the bone maul'],
-  fighting_maneuver: ['disarm', 'trip the goblin', 'shove', 'grapple', 'pin', 'sweep', 'hook'],
+  fighting_maneuver: ['disarm', 'trip the goblin', 'shove'],
   overwhelm_action: ['overwhelm', 'press the attack'],
   throw_action: ['throw the knife', 'hurl the rock at the goblin'],
-  dash_action: ['dash', 'sprint at them', 'rush forward'],
-  disengage_action: ['disengage', 'back away safely', 'step back'],
+  dash_action: ['dash', 'rush forward'],
+  disengage_action: ['disengage', 'step back', 'back away safely'],
   dodge_action: ['dodge', 'duck'],
   help_action: ['help', 'assist'],
   use_object_action: ['use torch on the door', 'use rope on the gap'],
-  hide_action: ['hide', 'sneak', 'slip into shadow'],
-  ready_action: ['ready', 'hold for opening', 'wait to react'],
+  hide_action: ['hide', 'sneak'],
+  ready_action: ['ready', 'wait to react'],
   search_action: ['search', 'search the room', 'look around'],
   mount_action: ['mount', 'mount the horse'],
 
   // Firearms
-  fire_weapon_action: ['fire', 'shoot the goblin', 'shoot the sentinel'],
-  quick_fire_action: ['quick fire', 'snap shot', 'fire fast'],
-  aim_action: ['aim', 'aim at the goblin', 'take aim'],
-  point_blank_range: ['fire point blank', 'shoot at point-blank'],
+  fire_weapon_action: ['fire', 'shoot the goblin'],
+  quick_fire_action: ['quick fire', 'snap shot'],
+  aim_action: ['aim', 'aim at the goblin'],
+  point_blank_range: ['fire point blank'],
   multiple_shot: ['fire two shots', 'shoot three times'],
-  fire_automatic: ['full auto', 'spray', 'open up with the rifle'],
+  fire_automatic: ['full auto', 'spray'],
   reload_action: ['reload', 'reload my rifle'],
-  single_bullet_reload: ['load two shells', 'load a bullet'],
-  bolt_caster: ['fire the bolt caster', 'shoot the bolt caster'],
+  single_bullet_reload: ['load two shells'],
+  bolt_caster: ['fire the bolt caster'],
 
   // Evasive
   dodge_melee: ['dodge the swing', 'duck the blow'],
@@ -127,10 +125,10 @@ const EXAMPLES: Record<string, string[]> = {
   dive_for_cover: ['dive for cover', 'dive behind the wall'],
 
   // Skills
-  pick_a_lock: ['pick the lock', 'pick the chest lock'],
-  track_an_enemy: ['track', 'follow the tracks', 'track the goblin'],
-  set_traps: ['set a trap', 'lay a trap'],
-  translate_tome: ['translate the tome', 'translate the inscription'],
+  pick_a_lock: ['pick the lock'],
+  track_an_enemy: ['track', 'follow the tracks'],
+  set_traps: ['set a trap'],
+  translate_tome: ['translate the tome'],
 
   // Aetheric
   learn_spell: ['study the spell', 'learn the rune'],
@@ -138,9 +136,81 @@ const EXAMPLES: Record<string, string[]> = {
   // Social / info
   gathering_information: ['ask about the merchant', 'gather information'],
   social_interactions: ['talk to Halem', 'persuade the guard', 'intimidate the thug'],
-  preparation_and_planning: ['rest', 'plan ahead', 'prepare for travel'],
+  preparation_and_planning: ['rest', 'plan ahead'],
   psychological_actions: ['steady myself', 'calm down'],
 };
+
+// Short, action-screen-specific explanations. The full lore answers in
+// concepts.json are used by the Arbiter's "ask about X" lookups and
+// stay verbose by design; here we want a one-line "what it does" so
+// the player can scan the reference quickly. Fallback: original answer.
+const SHORT: Record<string, string> = {
+  // Movement
+  move_action: 'Walk a short distance — one square, one cardinal direction.',
+  sprint_action: 'Move up to 5× a normal step. Attacks this round take a penalty die.',
+  take_cover_action: 'Get behind cover. Partial = +4 AC vs ranged; full = ranged auto-miss.',
+  perform_action: 'Sing / play / perform for an audience or distraction. CHA-based.',
+  assist_action_combat: 'Aid an ally. They get a bonus die on their next roll.',
+  hold_action: "Ready an action — trigger fires on the condition you name.",
+  flee_action: 'Leave the fight. Provokes opportunity attacks if enemies are adjacent.',
+  classic_move: 'Default movement — one square in one direction.',
+  difficult_terrain: 'Mud, rubble, water. Each square costs double movement.',
+  crawl: 'Move while prone. Half speed, harder to hit at range.',
+  climb: 'Go up. 1 climb square = 2 movement. STR/DEX check on bad surfaces.',
+  swim: 'Through water. 1 swim square = 2 movement. STR check in heavy armor.',
+  standing_long_jump: 'Jump from stand. STR × 2 feet, or DEX check to clear obstacles.',
+  running_long_jump: 'Jump after a sprint. STR × 4 feet. Costs the sprint penalty.',
+
+  // Combat
+  attack_action: "d20 + weapon stat vs target's AC. Hit → roll damage.",
+  brawl_action: 'Unarmed strike — punch, kick, grapple. STR-based, low damage.',
+  use_weapon_action: 'Attack with a specific weapon. Use the weapon name.',
+  fighting_maneuver: 'Disarm, trip, grapple, shove, pin, sweep, hook — opposed STR/DEX.',
+  overwhelm_action: 'Press the attack — gain advantage but enemy fights back next round.',
+  throw_action: 'Hurl a weapon / object. DEX-based; damage scales with item weight.',
+  dash_action: 'Double your movement this round at the cost of your attack.',
+  disengage_action: 'Step back without provoking an opportunity attack.',
+  dodge_action: 'Defensive stance — +4 AC and advantage on DEX saves this round.',
+  help_action: "Aid an ally's next roll. They roll with advantage.",
+  use_object_action: 'Apply an item to a target. "use X on Y".',
+  hide_action: 'Slip into cover / shadow. Opposed DEX vs the area\'s spotters.',
+  ready_action: 'Hold for a trigger. Fires when the condition you stated occurs.',
+  search_action: 'Look closer. Reveals hidden things, traps, items.',
+  mount_action: 'Get on a mount. Adjusts speed and reach for combat.',
+
+  // Firearms
+  fire_weapon_action: "Shoot a ranged weapon. d20 + DEX vs target's AC.",
+  quick_fire_action: 'Fire first — +50 initiative but only the shot. No moves.',
+  aim_action: 'Spend a turn aiming. Next shot rolls advantage. Lost if you move/take damage.',
+  point_blank_range: 'Fire at arm\'s reach. +2 attack, but provokes a melee response.',
+  multiple_shot: 'Fire 2-3 rounds at once. Penalty die per extra shot.',
+  fire_automatic: 'Full-auto burst. Damage to all in cone; ammo cost is steep.',
+  reload_action: 'Reload a ranged weapon. Magazine = 1 action; loose rounds = 2/action.',
+  single_bullet_reload: 'Slow reload for revolver / shotgun shells. 2 per action.',
+  bolt_caster: 'Tartaria\'s firearm equivalent — magnetic bolt accelerator. INT or DEX.',
+
+  // Evasive
+  dodge_melee: 'Side-step a melee swing. Opposed DEX. Success negates damage.',
+  fight_back: 'Counter the attacker with your own Fighting check. Risky.',
+  dive_for_cover: 'Hit the ground behind cover. Free movement, but you\'re prone.',
+
+  // Skills
+  pick_a_lock: 'DEX check vs lock difficulty. Tools matter.',
+  track_an_enemy: 'Follow a trail. WIS check; terrain modifies.',
+  set_traps: 'Place a trap. DEX check, opposed by the target\'s perception.',
+  translate_tome: 'Read a foreign / ancient text. INT check vs complexity.',
+  learn_spell: 'Study a rune or text. INT check; success teaches you the spell.',
+
+  // Social / info / planning
+  gathering_information: 'Ask around. CHA check vs the locals\' suspicion.',
+  social_interactions: 'Talk, persuade, intimidate, lie. CHA-based.',
+  preparation_and_planning: 'Rest, plan, gather kit before a push.',
+  psychological_actions: 'Steady yourself against fear / shock. WIS check.',
+};
+
+function explanationFor(c: Concept): string {
+  return SHORT[c.id] ?? c.answer;
+}
 
 export function ActionReferenceScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
@@ -175,7 +245,7 @@ export function ActionReferenceScreen() {
               return (
                 <View key={id} style={styles.card}>
                   <Text style={styles.cardTitle}>{c.title}</Text>
-                  <Text style={styles.cardBody}>{c.answer}</Text>
+                  <Text style={styles.cardBody}>{explanationFor(c)}</Text>
                   {examples.length > 0 && (
                     <Text style={styles.cardExamples}>
                       <Text style={styles.cardExamplesLabel}>Type: </Text>
