@@ -9,6 +9,7 @@
 
 import * as Speech from 'expo-speech';
 import { getVoiceSettings, loadVoiceSettings, onVoiceSettingsChange } from './voiceSettings';
+import { cleanForSpeech } from './loreLexicon';
 import {
   speak as piperSpeak,
   stopAndClear as piperStopAndClear,
@@ -94,7 +95,12 @@ export function isSpeaking(): boolean {
 export function speak(text: string, channel?: string): number {
   const settings = getVoiceSettings();
   if (!settings.ttsEnabled) return -1;
-  const trimmed = text.trim();
+  // Symbol cleanup before either engine — strips arrows so the player
+  // doesn't hear "right arrow", rewrites "-N" as "negative N", etc.
+  // The bundled engine ALSO applies the lore-respelling lexicon
+  // internally; the system engine relies on the OS phonemizer which
+  // usually handles English-orthography lore words well enough.
+  const trimmed = cleanForSpeech(text).trim();
   if (!trimmed) return -1;
   if (settings.engine === 'bundled') {
     return piperSpeak(trimmed);

@@ -4,7 +4,7 @@
 // substitutions so a future regex change doesn't silently regress
 // the lore words we've already manually tuned.
 
-import { applyLoreLexicon, getLexiconSize } from '../app/voice/loreLexicon';
+import { applyLoreLexicon, cleanForSpeech, getLexiconSize } from '../app/voice/loreLexicon';
 
 describe('applyLoreLexicon', () => {
   it('respells Aetheric (case-insensitive)', () => {
@@ -54,5 +54,34 @@ describe('applyLoreLexicon', () => {
 
   it('lexicon is non-empty', () => {
     expect(getLexiconSize()).toBeGreaterThan(10);
+  });
+});
+
+describe('cleanForSpeech', () => {
+  it('rewrites travel arrows as "to"', () => {
+    expect(cleanForSpeech('north → Armory')).toBe('north to Armory');
+    expect(cleanForSpeech('east ← gate')).toBe('east to gate');
+    expect(cleanForSpeech('north -> Armory')).toBe('north to Armory');
+  });
+
+  it('rewrites "-N" as "negative N" at word boundaries', () => {
+    expect(cleanForSpeech('-2 AC')).toBe('negative 2 AC');
+    expect(cleanForSpeech('grants -1 to attack')).toBe('grants negative 1 to attack');
+    expect(cleanForSpeech('(-3 stamina)')).toBe('(negative 3 stamina)');
+  });
+
+  it('leaves word-internal hyphens alone', () => {
+    expect(cleanForSpeech('well-known scholar')).toBe('well-known scholar');
+    expect(cleanForSpeech('Mud-fist Wraps')).toBe('Mud-fist Wraps');
+    expect(cleanForSpeech('e-mail')).toBe('e-mail');
+  });
+
+  it('rewrites middle-dot separator as comma', () => {
+    expect(cleanForSpeech('north: Asgardar · east: Voronov')).toBe('north: Asgardar, east: Voronov');
+  });
+
+  it('is idempotent (safe to apply twice)', () => {
+    const once = cleanForSpeech('north → Armory · -2 AC');
+    expect(cleanForSpeech(once)).toBe(once);
   });
 });

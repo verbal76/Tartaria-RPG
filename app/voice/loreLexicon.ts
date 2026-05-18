@@ -79,6 +79,39 @@ export function applyLoreLexicon(text: string): string {
   return out;
 }
 
+/**
+ * TTS-only text cleanup. Strips / rewrites symbols that the engine
+ * would otherwise read literally (the player would hear "right
+ * arrow" for → or "minus two" for -2). The visible game log keeps
+ * the original symbols — this transform applies only to the copy
+ * we hand to the engine.
+ *
+ * Rules:
+ *   - " → " / " ← " / " ⇒ " / " -> "  →  " to " (travel arrows)
+ *     Bare-symbol fallback (no surrounding spaces) drops to " to "
+ *     too, just in case.
+ *   - "-N" preceded by start / whitespace / punctuation  →
+ *     "negative N" (the visible "-2 AC" stays; the spoken line
+ *     becomes "negative 2 AC"). Word-internal hyphens like
+ *     "well-known" or "Mud-fist" are untouched.
+ *   - "×N" / "x N" stays — engine handles "times" fine.
+ *   - "·" middle-dot → ", " so the engine pauses naturally instead
+ *     of reading "middle dot".
+ */
+export function cleanForSpeech(text: string): string {
+  let out = text;
+  // Arrows — single or surrounded by spaces.
+  out = out.replace(/\s*[→←⇒⇐]\s*/g, ' to ');
+  out = out.replace(/\s*->\s*/g, ' to ');
+  // Middle-dot separator becomes a comma+space so we get a breath.
+  out = out.replace(/\s*·\s*/g, ', ');
+  // Negative numbers — only when "-" is at a word boundary preceding
+  // a digit, so word-internal hyphens (e.g. "well-known", "Mud-fist
+  // Wraps") aren't touched.
+  out = out.replace(/(^|[\s(\[{,;])-(\d)/g, '$1negative $2');
+  return out;
+}
+
 /** Exposed for tests + the settings card so we can show the player
  *  the override count ("12 lore words pronounced manually"). */
 export function getLexiconSize(): number {

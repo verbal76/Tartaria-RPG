@@ -1202,7 +1202,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         .filter((d) => d.id)
         .map((d) => {
           const r = findHubRoom(d.id);
-          return r ? `${d.dir} → ${r.shortName}` : null;
+          return r ? `${d.dir} to ${r.shortName}` : null;
         })
         .filter(Boolean) as string[];
       if (labels.length > 0) {
@@ -3831,9 +3831,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Narrate the resistance/weakness modifier on its own line so the
       // player can see WHY the damage changed.
       if (mod.match === 'weak') {
-        get().appendLog('combat', `Weakness exposed — ${enemy.name} flinches. (${weaponType} ×1.5 → ${dmg})`);
+        get().appendLog('combat', `Weakness exposed — ${enemy.name} flinches. (${weaponType} ×1.5 for ${dmg})`);
       } else if (mod.match === 'resist') {
-        get().appendLog('combat', `${enemy.name} shrugs off the ${weaponType}. (resisted, ×0.5 → ${dmg})`);
+        get().appendLog('combat', `${enemy.name} shrugs off the ${weaponType}. (resisted, ×0.5 for ${dmg})`);
       }
       if (traitMod.match === 'vulnerable') {
         get().appendLog('combat', `${enemy.name} is vulnerable to ${weaponType}. (trait ×1.5)`);
@@ -4322,7 +4322,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const roll = rollDie(20);
     const total = roll + player.stats.dexterity;
     const success = total >= dc;
-    get().appendLog('combat', `Stealth — d20 → ${roll} + DEX ${player.stats.dexterity} = ${total} vs DC ${dc} — ${success ? '✓ HIT' : '✗ CAUGHT'}`);
+    get().appendLog('combat', `Stealth — d20 rolled ${roll} + DEX ${player.stats.dexterity} = ${total} vs DC ${dc} — ${success ? '✓ HIT' : '✗ CAUGHT'}`);
 
     if (success) {
       // Catalog lookup to set proper kind/rarity/tags.

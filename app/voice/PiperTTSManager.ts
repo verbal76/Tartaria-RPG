@@ -23,7 +23,8 @@
 
 import { Audio } from 'expo-av';
 import { getVoiceSettings } from './voiceSettings';
-import { applyLoreLexicon } from './loreLexicon';
+import { applyLoreLexicon, cleanForSpeech } from './loreLexicon';
+import { splitSentences } from './sentenceSplitter';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const exec = require('react-native-executorch') as {
@@ -179,14 +180,26 @@ async function ensureModel(): Promise<any | null> {
 export function speak(text: string): number {
   const settings = getVoiceSettings();
   if (!settings.ttsEnabled) return -1;
-  // Apply the lore-respelling lexicon so words like "Aetheric" /
-  // "Tartarian" / "Reclaimer" are pronounced naturally instead of
-  // mangled by the default phonemizer. Pure transform — doesn't
-  // change the visible game log, just what Kokoro speaks.
-  const trimmed = applyLoreLexicon(text).trim();
-  if (!trimmed) return -1;
+  // Lexicon respellings (Aetheric, Tartarian, etc.) + symbol cleanup
+  // (arrows → "to", "-N" → "negative N"). Pure transform on the
+  // engine-bound copy; the visible log keeps the original symbols.
+  const prepared = cleanForSpeech(applyLoreLexicon(text)).trim();
+  if (!prepared) return -1;
   const id = nextId++;
-  queue.push({ id, text: trimmed });
+  // Split into sentence-sized chunks so the first audio plays as
+  // soon as one sentence finishes inference — without this, a big
+  // intro paragraph would take 10-30 seconds to phonemize + run
+  // through Kokoro before ANY sound starts. Subsequent sentences
+  // queue behind the first and stream as they're produced.
+  const { sentences, remainder } = splitSentences(prepared);
+  const chunks = sentences.length > 0 ? [...sentences] : [];
+  if (remainder.trim()) chunks.push(remainder.trim());
+  // Fallback: if the text has zero terminators (rare — usually a
+  // status line), speak it as one chunk.
+  if (chunks.length === 0) chunks.push(prepared);
+  for (const chunk of chunks) {
+    queue.push({ id: nextId++, text: chunk });
+  }
   void drain();
   return id;
 }
