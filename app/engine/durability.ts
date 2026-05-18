@@ -61,6 +61,32 @@ export function wearItemByName(
   return { inventory: next, broken: false, brokenName: null };
 }
 
+/** Wear a specific item instance by id. Preferred over wearItemByName
+ *  when the caller knows which copy is equipped — e.g. the player
+ *  holds two Aetheric Lockets and only the one in the amulet slot
+ *  should take durability damage. Falls back silently when the id
+ *  isn't in the inventory (item already removed / never had
+ *  durability). */
+export function wearItemById(
+  inventory: readonly InventoryItem[],
+  itemId: string,
+  amount = 1,
+): { inventory: InventoryItem[]; broken: boolean; brokenName: string | null } {
+  const idx = inventory.findIndex((i) => i.id === itemId && i.durability);
+  if (idx < 0) {
+    return { inventory: inventory.map((i) => ({ ...i })), broken: false, brokenName: null };
+  }
+  const next = inventory.map((i) => ({ ...i }));
+  const item = next[idx]!;
+  const cur = item.durability!.current - amount;
+  if (cur <= 0) {
+    next.splice(idx, 1);
+    return { inventory: next, broken: true, brokenName: item.name };
+  }
+  item.durability = { ...item.durability!, current: cur };
+  return { inventory: next, broken: false, brokenName: null };
+}
+
 // Compute the TC cost to fully restore an item's durability. Convention:
 // 1 TC per point missing, with a minimum of 1.
 export function repairCost(item: InventoryItem): number {

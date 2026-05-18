@@ -266,7 +266,8 @@ export type EquipSlot =
   | 'ring';
 
 export interface PlayerEquipped {
-  /** Catalog name of the weapon in the main (dominant) hand. */
+  /** Catalog name of the weapon in the main (dominant) hand.
+   *  Kept as the canonical display + catalog-lookup key. */
   main?: string;
   /** Catalog name of the weapon in the off-hand. */
   off?: string;
@@ -276,6 +277,20 @@ export interface PlayerEquipped {
   feet?: string;
   amulet?: string;
   ring?: string;
+
+  /** Per-slot instance id (matches InventoryItem.id). When set, the
+   *  durability-wear path and InventoryScreen dedupe shim use this
+   *  to identify exactly WHICH copy of a same-named item is equipped.
+   *  Set alongside the name field by equipItem; populated for legacy
+   *  saves by backfillPlayer. */
+  mainId?: string;
+  offId?: string;
+  headId?: string;
+  chestId?: string;
+  legsId?: string;
+  feetId?: string;
+  amuletId?: string;
+  ringId?: string;
 
   // Legacy fields kept on the type so existing saves still deserialize
   // cleanly. backfillPlayer migrates them to the new slot shape.

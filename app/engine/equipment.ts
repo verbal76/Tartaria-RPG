@@ -49,6 +49,46 @@ export const SLOT_LABEL: Record<EquipSlot, string> = {
 /** Slots that hold armor pieces (used to aggregate AC + resistances). */
 export const ARMOR_SLOTS: readonly EquipSlot[] = ['head', 'chest', 'legs', 'feet'];
 
+/** Map an equip slot to its corresponding `*Id` key on PlayerEquipped.
+ *  When set, the id key identifies the exact inventory instance bound
+ *  to that slot (important when the player holds two of the same item). */
+export const SLOT_ID_KEY: Record<EquipSlot, 'mainId' | 'offId' | 'headId' | 'chestId' | 'legsId' | 'feetId' | 'amuletId' | 'ringId'> = {
+  main: 'mainId',
+  off: 'offId',
+  head: 'headId',
+  chest: 'chestId',
+  legs: 'legsId',
+  feet: 'feetId',
+  amulet: 'amuletId',
+  ring: 'ringId',
+};
+
+/** Resolve the InventoryItem currently equipped in the named slot.
+ *  Prefers an id match on PlayerEquipped[slot+'Id'] (the instance the
+ *  player actually wore); falls back to first-by-name for legacy
+ *  saves where no id was recorded. Returns null when the slot is
+ *  empty or the bound item has been consumed / removed. */
+export function resolveEquippedItem(
+  player: PlayerCharacter,
+  slot: EquipSlot,
+): InventoryItem | null {
+  const eq = player.equipped;
+  if (!eq) return null;
+  const name = eq[slot];
+  if (!name) return null;
+  const idKey = SLOT_ID_KEY[slot];
+  const wantedId = eq[idKey];
+  if (wantedId) {
+    const byId = player.inventory.find((i) => i.id === wantedId && i.quantity > 0);
+    if (byId) return byId;
+  }
+  // Legacy save (no id stored) — first-by-name. Same behaviour as before
+  // the refactor, so saves without ids still equip correctly.
+  return player.inventory.find(
+    (i) => i.name.toLowerCase() === name.toLowerCase() && i.quantity > 0,
+  ) ?? null;
+}
+
 // Stat names the equipment system can boost. Includes 'constitution' for
 // future use (some accessories grant it) — it routes to HP/stamina math.
 type StatKey = keyof Stats;

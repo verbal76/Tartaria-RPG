@@ -111,8 +111,8 @@ import {
   isLeaveHubCommand,
 } from '../engine/hub';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
-import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, effectiveStats } from '../engine/equipment';
-import { stampDurability, wearItemByName, repairCost, repairItem } from '../engine/durability';
+import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, resolveEquippedItem, effectiveStats } from '../engine/equipment';
+import { stampDurability, wearItemByName, wearItemById, repairCost, repairItem } from '../engine/durability';
 import {
   type Hook,
   type HookEffect,
@@ -382,6 +382,19 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
   // Old saves may have a single `armor` field — promote it to the chest slot.
   const eq = p.equipped ?? {};
   const legacyArmor = eq.chest ?? eq.armor ?? eq.armorName;
+  // Stamp durability on any catalog item that doesn't already have it.
+  // Older saves predate the durability field. Do this BEFORE id backfill
+  // so newly-stamped items show up in the inventory lookup below.
+  const inventory = (p.inventory ?? []).map((i) => stampDurability(i));
+  // Backfill the per-slot instance ids. A pre-refactor save records only
+  // the equipped name; we map each name to the first matching inventory
+  // id so later wear / dedupe paths can point at a specific instance.
+  // Skip slots that already have an id (newer saves).
+  const findFirstId = (name: string | undefined): string | undefined => {
+    if (!name) return undefined;
+    const lower = name.toLowerCase();
+    return inventory.find((i) => i.name.toLowerCase() === lower && i.quantity > 0)?.id;
+  };
   const equipped: PlayerCharacter['equipped'] = {
     main: eq.main ?? eq.weaponName,
     off: eq.off,
@@ -391,10 +404,15 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     feet: eq.feet,
     amulet: eq.amulet,
     ring: eq.ring,
+    mainId: eq.mainId ?? findFirstId(eq.main ?? eq.weaponName),
+    offId: eq.offId ?? findFirstId(eq.off),
+    headId: eq.headId ?? findFirstId(eq.head),
+    chestId: eq.chestId ?? findFirstId(legacyArmor),
+    legsId: eq.legsId ?? findFirstId(eq.legs),
+    feetId: eq.feetId ?? findFirstId(eq.feet),
+    amuletId: eq.amuletId ?? findFirstId(eq.amulet),
+    ringId: eq.ringId ?? findFirstId(eq.ring),
   };
-  // Stamp durability on any catalog item that doesn't already have it.
-  // Older saves predate the durability field.
-  const inventory = (p.inventory ?? []).map((i) => stampDurability(i));
   return {
     ...p,
     inventory,
@@ -5472,12 +5490,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // slot and got two "You equip ..." lines with no signal that the locket
     // was actually displaced.
     const previousInSlot = player.equipped?.[slot];
+    // Store both the catalog name (for display + catalog lookup) AND the
+    // specific InventoryItem.id so durability wear, the InventoryScreen
+    // "EQUIPPED" badge, and any other instance-sensitive code knows
+    // EXACTLY which copy is in the slot.
+    const slotIdKey = SLOT_ID_KEY[slot];
     set((s) =>
       s.player
         ? {
             player: {
               ...s.player,
-              equipped: { ...(s.player.equipped ?? {}), [slot]: item.name },
+              equipped: {
+                ...(s.player.equipped ?? {}),
+                [slot]: item.name,
+                [slotIdKey]: item.id,
+              },
             },
           }
         : s,
@@ -5499,7 +5526,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? {
             player: {
               ...s.player,
-              equipped: { ...(s.player.equipped ?? {}), [slot]: undefined },
+              equipped: {
+                ...(s.player.equipped ?? {}),
+                [slot]: undefined,
+                [SLOT_ID_KEY[slot]]: undefined,
+              },
             },
           }
         : s,
@@ -6106,13 +6137,46 @@ function wearEquippedItem(
   itemName: string,
   get: () => GameStore,
 ): PlayerCharacter {
-  const result = wearItemByName(player.inventory, itemName);
+  // Prefer wearing the specific instance bound to a slot — when the
+  // player holds two Aetheric Lockets the equipped one (whose id was
+  // captured by equipItem) should take damage, not the duplicate
+  // sitting in the pack. Fall back to wear-by-name for legacy saves
+  // where no id was stored, or items wearing outside any slot (e.g.
+  // tools used for digging — those just match by name).
+  const eq = player.equipped ?? {};
+  const target = itemName.toLowerCase();
+  let boundId: string | undefined;
+  for (const slot of Object.keys(SLOT_ID_KEY) as EquipSlot[]) {
+    if ((eq[slot] ?? '').toLowerCase() !== target) continue;
+    const idKey = SLOT_ID_KEY[slot];
+    if (eq[idKey]) {
+      boundId = eq[idKey];
+      break;
+    }
+  }
+  const result = boundId
+    ? wearItemById(player.inventory, boundId)
+    : wearItemByName(player.inventory, itemName);
   let equipped = player.equipped ?? {};
   if (result.broken && result.brokenName) {
-    const next = { ...equipped };
-    for (const k of Object.keys(next) as (keyof typeof next)[]) {
-      if (next[k] === result.brokenName) next[k] = undefined;
+    const next: PlayerCharacter['equipped'] = { ...equipped };
+    // Clear both the name AND the bound id for any slot referencing
+    // the broken item. Without id-clearance, a new pickup with the
+    // same name could resurrect the empty slot via stale mapping.
+    for (const slot of Object.keys(SLOT_ID_KEY) as EquipSlot[]) {
+      const idKey = SLOT_ID_KEY[slot];
+      if (boundId && next[idKey] === boundId) {
+        next[slot] = undefined;
+        next[idKey] = undefined;
+      } else if (!boundId && next[slot] === result.brokenName) {
+        next[slot] = undefined;
+        next[idKey] = undefined;
+      }
     }
+    // Also clear the legacy single-slot fields if they referenced this.
+    if (next.weaponName === result.brokenName) next.weaponName = undefined;
+    if (next.armor === result.brokenName) next.armor = undefined;
+    if (next.armorName === result.brokenName) next.armorName = undefined;
     equipped = next;
     // Defer the log so the caller's main set() lands first.
     void Promise.resolve().then(() =>

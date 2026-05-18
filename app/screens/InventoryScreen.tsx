@@ -47,14 +47,27 @@ export function InventoryScreen() {
     list.push(slot);
     slotsByEquippedName.set(name, list);
   }
-  // Resolve each equipped name to the SPECIFIC inventory row that owns it
-  // (the first matching id). PlayerEquipped stores names rather than ids
-  // today, so two items with the same name would otherwise both render as
-  // EQUIPPED — the player only equipped one. Pinning to the first matching
-  // id stops the duplicate badge. The proper schema fix (name → id) is a
-  // future refactor.
+  // PlayerEquipped now carries per-slot instance ids (mainId / offId /
+  // amuletId / etc.) alongside the names, so the dedupe is exact: the
+  // EQUIPPED badge lands on the specific InventoryItem the player put
+  // in the slot, never on a duplicate. Legacy saves where ids aren't
+  // recorded fall back to the previous "first-matching-name" shim.
   const equippedItemIds = new Set<string>();
+  const eq = player.equipped ?? {};
+  const idSlots: (string | undefined)[] = [
+    eq.mainId, eq.offId, eq.headId, eq.chestId,
+    eq.legsId, eq.feetId, eq.amuletId, eq.ringId,
+  ];
+  for (const id of idSlots) {
+    if (id) equippedItemIds.add(id);
+  }
+  // Legacy fallback for saves that only have names (no ids yet).
   for (const equippedName of slotsByEquippedName.keys()) {
+    const hasIdForThisName = idSlots.some((id) => {
+      const item = player.inventory.find((i) => i.id === id);
+      return item?.name === equippedName;
+    });
+    if (hasIdForThisName) continue;
     const owner = player.inventory.find(
       (it) => it.name === equippedName && it.quantity > 0,
     );
