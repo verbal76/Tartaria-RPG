@@ -420,32 +420,13 @@ export function AboutScreen() {
                 </View>
               </View>
               {voice.engine === 'bundled' && (
-                <>
-                  <Text style={styles.voiceNote}>
-                    Bundled = Piper neural voice (en_US-amy-medium) via sherpa-onnx. Higher quality,
-                    fully offline once installed. {piperInstalled ? 'Installed.' : 'Not yet installed.'}
-                  </Text>
-                  {!piperInstalled && (
-                    <TouchableOpacity
-                      onPress={startPiperDownload}
-                      style={[styles.applyBtn, { marginTop: 4 }]}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={styles.applyBtnText}>
-                        {piperStatus
-                          ? piperStatus.error
-                            ? 'RETRY'
-                            : `${Math.round((piperStatus.fraction ?? 0) * 100)}% — ${piperStatus.label}`
-                          : 'INSTALL BUNDLED VOICE'}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-                  {piperStatus?.error && (
-                    <Text style={[styles.voiceNote, { color: '#e07a5f' }]}>
-                      {piperStatus.error}
-                    </Text>
-                  )}
-                </>
+                <Text style={styles.voiceNote}>
+                  Bundled neural voice is parked in this build — the library that ships it
+                  conflicts with the on-device classifier's ONNX runtime. For higher voice
+                  quality right now: install Google Text-to-Speech from the Play Store,
+                  enable it in Android Settings → Accessibility → Text-to-speech, then switch
+                  to SYSTEM here and use the voice picker below.
+                </Text>
               )}
               <View style={styles.musicRow}>
                 <Text style={styles.musicLabel}>Rate</Text>

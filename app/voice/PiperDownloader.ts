@@ -80,17 +80,22 @@ export async function downloadPiperVoice(
     return status;
   }
 
-  // Placeholder — the actual fetch + extraction is staged for a
-  // follow-up commit. For now, surface a clear message so the
-  // settings UI can render an error instead of pretending to work.
+  // Bundled-voice path is parked. The integration via sherpa-onnx
+  // ran into an ABI collision against onnxruntime-react-native that
+  // can't be resolved at the current version pair (see commit notes
+  // for the full diagnosis). Will revisit when sherpa-onnx ships a
+  // release that consumes ORT as a Maven coord rather than vendoring
+  // its own .so.
   emit({
     fraction: 0,
-    label: 'Bundled voice install not yet wired',
+    label: 'Bundled voice parked',
     installed: false,
     error:
-      'Bundled Piper voice download is staged for the next build. ' +
-      'Use the system TTS toggle for now — switching back to bundled ' +
-      'will pick up the model once a release ships it.',
+      'Bundled neural voice is not available in this build. The library that ships it ' +
+      'conflicts with the cognitive layer\'s ONNX runtime; we\'re waiting for an upstream ' +
+      'fix. For higher-quality voice now, install Google Text-to-Speech from the Play Store ' +
+      '(Android Settings → Accessibility → Text-to-speech), then pick a Neural voice in the ' +
+      'voice picker above.',
   });
   return status;
 }
