@@ -17,6 +17,8 @@ import { ContractsScreen } from './app/screens/ContractsScreen';
 import { TutorialOverlay } from './app/components/TutorialOverlay';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
 import { startAudioController, stopAudioController } from './app/audio/AudioController';
+import { initTTSManager } from './app/voice/TTSManager';
+import { startTTSController, stopTTSController } from './app/voice/TTSController';
 
 export default function App() {
   const screen = useGameStore((s) => s.currentScreen);
@@ -38,9 +40,14 @@ export default function App() {
         void bootQwen();
       });
       void bootAudio().then(() => startAudioController());
+      // Voice (TTS + STT) — opt-in via settings; init is cheap so
+      // the controller can subscribe immediately. If TTS is disabled
+      // the controller short-circuits inside onState.
+      void initTTSManager().then(() => startTTSController());
     });
     return () => {
       stopAudioController();
+      stopTTSController();
       void disposeAudio();
     };
   }, [hydrate, bootCognitive, bootQwen]);

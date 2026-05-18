@@ -10,6 +10,15 @@ import { SimpleSlider } from '../components/SimpleSlider';
 import { getAudioSettings, setAudioSettings, onAudioSettingsChange, type AudioSettings } from '../audio/audioSettings';
 import { forceReapplyAudioFromState } from '../audio/AudioController';
 import { disposeAudio } from '../audio/AudioManager';
+import {
+  getVoiceSettings,
+  setVoiceSettings,
+  onVoiceSettingsChange,
+  type VoiceSettings,
+} from '../voice/voiceSettings';
+import { isTTSAvailable, getTTSVoices, stopAndClear as stopTTS } from '../voice/TTSManager';
+import { isSTTAvailable } from '../voice/STTManager';
+import type * as Speech from 'expo-speech';
 
 export function AboutScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
@@ -30,11 +39,50 @@ export function AboutScreen() {
   const [updateBusy, setUpdateBusy] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
   const [audio, setAudio] = useState<AudioSettings>(() => getAudioSettings());
+  const [voice, setVoice] = useState<VoiceSettings>(() => getVoiceSettings());
+  const [voicesList, setVoicesList] = useState<Speech.Voice[]>([]);
+  const [ttsAvailable, setTtsAvailable] = useState<boolean>(true);
+  const [sttAvailable, setSttAvailable] = useState<boolean>(true);
 
   useEffect(() => {
     setAudio(getAudioSettings());
     return onAudioSettingsChange(setAudio);
   }, []);
+
+  useEffect(() => {
+    setVoice(getVoiceSettings());
+    const unsub = onVoiceSettingsChange(setVoice);
+    void Promise.all([isTTSAvailable(), getTTSVoices(), isSTTAvailable()]).then(
+      ([ttsOk, voices, sttOk]) => {
+        setTtsAvailable(ttsOk);
+        setVoicesList(voices);
+        setSttAvailable(sttOk);
+      },
+    );
+    return unsub;
+  }, []);
+
+  const toggleTTS = () => {
+    const next = !voice.ttsEnabled;
+    if (!next) stopTTS();
+    void setVoiceSettings({ ttsEnabled: next });
+  };
+  const toggleSTT = () => { void setVoiceSettings({ sttEnabled: !voice.sttEnabled }); };
+  const setRate = (v: number) => { void setVoiceSettings({ rate: 0.5 + v * 1.0 }); };
+  const setPitch = (v: number) => { void setVoiceSettings({ pitch: 0.5 + v * 1.5 }); };
+  const toggleAutoSubmit = () => { void setVoiceSettings({ autoSubmit: !voice.autoSubmit }); };
+  const cycleVoice = (dir: 1 | -1) => {
+    if (voicesList.length === 0) return;
+    const idx = voicesList.findIndex((v) => v.identifier === voice.voiceId);
+    const next = (idx + dir + voicesList.length) % voicesList.length;
+    void setVoiceSettings({ voiceId: voicesList[next]?.identifier ?? null });
+  };
+  const currentVoiceLabel = (() => {
+    if (voicesList.length === 0) return 'No voices installed';
+    const v = voicesList.find((vv) => vv.identifier === voice.voiceId) ?? voicesList[0];
+    if (!v) return 'Default';
+    return `${v.name ?? v.identifier} (${v.language ?? '?'})`;
+  })();
 
   const [applyFlash, setApplyFlash] = useState(false);
   const toggleMusic = () => { void setAudioSettings({ enabled: !audio.enabled }); };
@@ -271,6 +319,112 @@ export function AboutScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+
+        {/* Voice card — opt-in TTS + STT. Defaults OFF on first install.
+            Toggles, rate / pitch sliders, voice picker, and an
+            auto-submit toggle for STT all wire through voiceSettings. */}
+        <View style={styles.musicCard}>
+          <View style={styles.musicHeader}>
+            <Text style={styles.musicTitle}>VOICE</Text>
+          </View>
+
+          <View style={styles.musicRow}>
+            <Text style={styles.musicLabel}>Read aloud (TTS)</Text>
+            <View style={{ flex: 1 }} />
+            <TouchableOpacity
+              onPress={toggleTTS}
+              disabled={!ttsAvailable}
+              style={[
+                styles.musicToggle,
+                voice.ttsEnabled && styles.musicToggleOn,
+                !ttsAvailable && { opacity: 0.4 },
+              ]}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.musicToggleText, voice.ttsEnabled && styles.musicToggleTextOn]}>
+                {voice.ttsEnabled ? 'ON' : 'OFF'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.musicRow}>
+            <Text style={styles.musicLabel}>Speak input (STT)</Text>
+            <View style={{ flex: 1 }} />
+            <TouchableOpacity
+              onPress={toggleSTT}
+              disabled={!sttAvailable}
+              style={[
+                styles.musicToggle,
+                voice.sttEnabled && styles.musicToggleOn,
+                !sttAvailable && { opacity: 0.4 },
+              ]}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.musicToggleText, voice.sttEnabled && styles.musicToggleTextOn]}>
+                {voice.sttEnabled ? 'ON' : 'OFF'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {!ttsAvailable && (
+            <Text style={styles.voiceNote}>
+              No TTS engine found on this device. Install Google TTS from the Play Store to enable.
+            </Text>
+          )}
+          {!sttAvailable && (
+            <Text style={styles.voiceNote}>
+              Speech recognition not available on this device. STT will be disabled.
+            </Text>
+          )}
+
+          {voice.ttsEnabled && (
+            <>
+              <View style={styles.musicRow}>
+                <Text style={styles.musicLabel}>Rate</Text>
+                <View style={{ flex: 1 }}>
+                  <SimpleSlider value={(voice.rate - 0.5) / 1.0} onChange={setRate} />
+                </View>
+                <Text style={styles.musicValue}>{voice.rate.toFixed(2)}x</Text>
+              </View>
+              <View style={styles.musicRow}>
+                <Text style={styles.musicLabel}>Pitch</Text>
+                <View style={{ flex: 1 }}>
+                  <SimpleSlider value={(voice.pitch - 0.5) / 1.5} onChange={setPitch} />
+                </View>
+                <Text style={styles.musicValue}>{voice.pitch.toFixed(2)}</Text>
+              </View>
+              <View style={styles.musicRow}>
+                <Text style={styles.musicLabel}>Voice</Text>
+                <TouchableOpacity onPress={() => cycleVoice(-1)} style={styles.voiceCycleBtn}>
+                  <Text style={styles.voiceCycleText}>◀</Text>
+                </TouchableOpacity>
+                <View style={{ flex: 1, paddingHorizontal: 6 }}>
+                  <Text style={styles.voicePickerLabel} numberOfLines={1}>{currentVoiceLabel}</Text>
+                </View>
+                <TouchableOpacity onPress={() => cycleVoice(1)} style={styles.voiceCycleBtn}>
+                  <Text style={styles.voiceCycleText}>▶</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+
+          {voice.sttEnabled && (
+            <View style={styles.musicRow}>
+              <Text style={styles.musicLabel}>Auto-submit speech</Text>
+              <View style={{ flex: 1 }} />
+              <TouchableOpacity
+                onPress={toggleAutoSubmit}
+                style={[styles.musicToggle, voice.autoSubmit && styles.musicToggleOn]}
+                activeOpacity={0.7}
+              >
+                <Text style={[styles.musicToggleText, voice.autoSubmit && styles.musicToggleTextOn]}>
+                  {voice.autoSubmit ? 'ON' : 'OFF'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+
         <Text style={styles.mono}>{info}</Text>
       </ScrollView>
 
@@ -399,6 +553,17 @@ const styles = StyleSheet.create({
   applyBtnFlash: { backgroundColor: '#c9a86a' },
   applyBtnText: { color: '#c9a86a', fontSize: 11, fontWeight: '700', letterSpacing: 2 },
   applyBtnTextFlash: { color: '#13110f' },
+  voiceNote: { color: '#7a705c', fontSize: 11, marginTop: 4, fontStyle: 'italic' },
+  voiceCycleBtn: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 3,
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    backgroundColor: '#1a1612',
+  },
+  voiceCycleText: { color: '#c9a86a', fontSize: 12, fontWeight: '700' },
+  voicePickerLabel: { color: '#cdbf99', fontSize: 11, textAlign: 'center' },
   copyBtn: {
     backgroundColor: '#c9a86a',
     borderRadius: 4,

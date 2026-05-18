@@ -35,6 +35,13 @@
             "kotlinVersion": "1.9.25"
           }
         }
+      ],
+      [
+        "@react-native-voice/voice",
+        {
+          "microphonePermission": "Allow Tartaria Realms to access the microphone for speech-to-text input.",
+          "speechRecognitionPermission": "Allow Tartaria Realms to recognize your speech for in-game commands."
+        }
       ]
     ],
     "extra": {

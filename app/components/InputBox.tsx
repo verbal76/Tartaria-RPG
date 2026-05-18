@@ -1,6 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { TutorialTarget } from './TutorialTarget';
+import { getVoiceSettings, onVoiceSettingsChange } from '../voice/voiceSettings';
+import { isSpeaking as ttsIsSpeaking, stopAndClear as stopTTS } from '../voice/TTSManager';
+import { startListening, stopListening, isListening } from '../voice/STTManager';
 
 interface Props {
   onSubmit: (text: string) => void;
@@ -35,6 +38,24 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
 
+  // Voice state — both flags drive a tiny render loop so the MIC /
+  // SILENCE ARBITER button swaps live when TTS starts / stops or the
+  // mic begins recording. Polling once per ~250ms is cheaper than
+  // wiring observers on the TTS / STT singletons.
+  const [voice, setVoice] = useState(() => getVoiceSettings());
+  const [speaking, setSpeaking] = useState(false);
+  const [listening, setListening] = useState(false);
+
+  useEffect(() => onVoiceSettingsChange(setVoice), []);
+  useEffect(() => {
+    if (!voice.ttsEnabled && !voice.sttEnabled) return;
+    const t = setInterval(() => {
+      setSpeaking(ttsIsSpeaking());
+      setListening(isListening());
+    }, 250);
+    return () => clearInterval(t);
+  }, [voice.ttsEnabled, voice.sttEnabled]);
+
   const handleSubmit = () => {
     const trimmed = text.trim();
     if (!trimmed) return;
@@ -46,6 +67,49 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     // what is going on right now" stuck in the box after Act.
     setText('');
     inputRef.current?.clear();
+  };
+
+  const handleMic = async () => {
+    if (listening) {
+      await stopListening();
+      setListening(false);
+      return;
+    }
+    try {
+      await startListening(
+        (r) => {
+          // Drop transcripts into the text box. Final results auto-submit
+          // when voice.autoSubmit is on; partial results just preview so
+          // the player can see what's being captured.
+          setText(r.text);
+          if (r.isFinal && voice.autoSubmit) {
+            onSubmit(r.text.trim());
+            setText('');
+            inputRef.current?.clear();
+          }
+        },
+        (msg) => {
+          // Surface the error in the input as a placeholder hint and
+          // bail. The player can re-tap the mic to retry.
+          setText(`(mic: ${msg.slice(0, 60)})`);
+          setListening(false);
+        },
+      );
+      setListening(true);
+    } catch {
+      setListening(false);
+    }
+  };
+
+  const handleSilenceArbiter = async () => {
+    stopTTS();
+    setSpeaking(false);
+    // After silencing, the player almost always wants to respond —
+    // open the mic if STT is enabled. If not, just leave them at
+    // text input.
+    if (voice.sttEnabled) {
+      await handleMic();
+    }
   };
 
   return (
@@ -114,6 +178,24 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           autoComplete="off"
           textContentType="none"
         />
+        {/* Voice controls — only render when the player opted in via
+            Settings. SILENCE ARBITER takes the slot whenever TTS is
+            actively speaking (always-visible interrupt); otherwise the
+            MIC button is the always-visible push-to-talk. */}
+        {(voice.ttsEnabled || voice.sttEnabled) && (
+          speaking && voice.ttsEnabled ? (
+            <TouchableOpacity style={styles.silenceBtn} onPress={handleSilenceArbiter}>
+              <Text style={styles.silenceBtnText}>🛑</Text>
+            </TouchableOpacity>
+          ) : voice.sttEnabled ? (
+            <TouchableOpacity
+              style={[styles.micBtn, listening && styles.micBtnActive]}
+              onPress={handleMic}
+            >
+              <Text style={styles.micBtnText}>🎙</Text>
+            </TouchableOpacity>
+          ) : null
+        )}
         <TouchableOpacity style={styles.send} onPress={handleSubmit}>
           <Text style={styles.sendText}>Act</Text>
         </TouchableOpacity>
@@ -174,4 +256,31 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   sendText: { color: '#e6d8b3', fontWeight: '700' },
+  // Voice push-to-talk button. Sits between the input and Act.
+  micBtn: {
+    backgroundColor: '#1a1612',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 4,
+    marginRight: 6,
+  },
+  micBtnActive: {
+    backgroundColor: '#3a342c',
+    borderColor: '#c9a86a',
+  },
+  micBtnText: { color: '#cdbf99', fontSize: 18 },
+  // SILENCE ARBITER button — replaces the mic while TTS is active.
+  // Red tint so the player knows it's an interrupt, not a regular tap.
+  silenceBtn: {
+    backgroundColor: '#3a201c',
+    borderColor: '#e07a5f',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 4,
+    marginRight: 6,
+  },
+  silenceBtnText: { color: '#e07a5f', fontSize: 18 },
 });
