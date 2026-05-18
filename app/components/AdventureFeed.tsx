@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   content: { paddingBottom: 12 },
-  entry: { marginBottom: 10 },
+  entry: { marginBottom: 14 },
   tag: { fontSize: 10, fontWeight: '700', letterSpacing: 2, marginBottom: 2 },
-  body: { fontSize: 14, lineHeight: 20 },
+  body: { fontSize: 14, lineHeight: 21 },
 });

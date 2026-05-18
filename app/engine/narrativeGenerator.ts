@@ -23,6 +23,69 @@ export function buildOpening(): string {
   return pick(openingsList);
 }
 
+/**
+ * Three-paragraph opening narrative for the first scene of a brand-new
+ * character. Each paragraph is emitted as its own log entry so the
+ * AdventureFeed renders them with real visual gaps. Order:
+ *   1. Character framing — who they are, the buried world they woke into.
+ *   2. Setting — the room / location they stand in (hub room when at
+ *      the outpost, else the procedural location description).
+ *   3. Atmosphere — an Arbiter-flavored line + the active weather's
+ *      pressure on their stats, then the agency hand-off.
+ * The Paths: line is emitted separately by the caller and reads as a
+ * fourth, utility-flavoured paragraph.
+ */
+export function buildOpeningNarrative(input: {
+  playerName: string;
+  raceName: string;
+  factionName: string;
+  weather: WeatherEntry;
+  weatherDescriptor: string;
+  location: Location;
+  hubRoomName?: string | null;
+  hubRoomDescription?: string | null;
+  hubName?: string | null;
+}): [string, string, string] {
+  const {
+    playerName,
+    raceName,
+    factionName,
+    weather,
+    weatherDescriptor,
+    location,
+    hubRoomName,
+    hubRoomDescription,
+    hubName,
+  } = input;
+
+  // P1 — character framing. Pulls race + faction so the opening feels
+  // earned rather than generic. The buried-world line is the same beat
+  // every character gets; the specifics flex around it.
+  const p1Variants = [
+    `You are ${playerName} of the ${raceName}, walking under the colors of the ${factionName}. A thousand years ago the Aetherstone flood drowned Tartaria and most of what made it. The world above kept turning. The world below waited. Today the waiting ends — you have woken into the buried country.`,
+    `Your name is ${playerName}. Your blood is ${raceName}. Your work, from this hour on, belongs to the ${factionName}. The continent under your boots is Tartaria — a civilization the surface forgot to remember. The flood that buried it is older than every kingdom drawn on every honest map. Today it lets you in.`,
+    `${playerName}, of the ${raceName}, sworn to the ${factionName}: you have crossed into Tartaria. The buried country. The cataclysm that made it was called the Aetherstone Flood, and it ended a thousand years ago — yet here, at ground level, it never quite stopped. The mud still moves. The air still hums.`,
+  ];
+  const p1 = pick(p1Variants);
+
+  // P2 — setting. Hub mode anchors at the authored room; otherwise the
+  // procedural location description carries the load.
+  const p2 = hubRoomName && hubRoomDescription
+    ? `${hubName ?? "Reclaimers' Outpost"} rises out of the silt at the edge of the ${location.name}. You arrive at ${hubRoomName.replace(/^The\s+/i, 'the ').toLowerCase().replace(/^the /, 'The ')}. ${hubRoomDescription}`
+    : `You arrive at the edge of the ${location.name}. ${location.description}`;
+
+  // P3 — atmosphere + agency hand-off. The openings.json line carries
+  // the Arbiter's voice; the weather clause makes the mechanical
+  // pressure visible without printing a separate "Weather effect" row.
+  const arbiterLine = pick(openingsList);
+  const weatherClause = weatherDescriptor
+    ? ` A ${weather.name.toLowerCase()} presses on the world — ${weatherDescriptor}.`
+    : '';
+  const p3 = `${arbiterLine}${weatherClause} What you do here is yours to choose.`;
+
+  return [p1, p2, p3];
+}
+
 export interface SceneInput {
   weather: WeatherEntry;
   location: Location;

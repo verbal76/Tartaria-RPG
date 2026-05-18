@@ -33,7 +33,7 @@ import {
   type SlotSummary,
 } from '../engine/saveSystem';
 import { makeEntry, persistEntry } from '../engine/gameLog';
-import { createCharacter, type CreateCharacterInput } from '../engine/character';
+import { createCharacter, getRaces, getFactions, type CreateCharacterInput } from '../engine/character';
 import { generateQuest } from '../engine/questGenerator';
 import {
   pickWeather,
@@ -45,6 +45,7 @@ import {
 } from '../engine/encounter';
 import {
   buildOpening,
+  buildOpeningNarrative,
   buildScene,
   buildArbiterRemark,
   shouldArbiterSpeak,
@@ -1071,24 +1072,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // entirely — its location-pool prose doesn't apply when you're
     // standing inside a hand-authored room.
     const sceneText = hubRoom
-      ? `${HUB.hubName} — ${hubRoom.name}.\n\n${hubRoom.description}`
+      ? `${HUB.hubName} — ${hubRoom.name}. ${hubRoom.description}`
       : buildScene({ weather, location, hazard, enemy: sceneEnemy, quest: player.activeQuests[0] });
-    // On the opening scene we fold the player's name and the active
-    // weather descriptor into the prefix so the very first paragraph
-    // reads as one piece of prose instead of three stacked log lines
-    // (system "X steps into Tartaria" + system "Weather effect" +
-    // world scene text).
-    let openingPrefix = opts?.openingPrefix;
+    // Opening scene — emit a three-paragraph introduction narrative as
+    // SEPARATE log entries so AdventureFeed renders real paragraph
+    // breaks between them:
+    //   P1. Character framing (name + race + faction + buried-world arc)
+    //   P2. Setting (hub room or procedural location description)
+    //   P3. Atmosphere (Arbiter line + weather pressure + agency cue)
+    // The Paths: line below stays as its own utility entry.
     if (opts?.isOpening) {
-      const baseOpening = (opts.openingPrefix ?? '').trim();
-      const weatherClause = describeWeatherStatModifiers(weather)
-        ? ` A ${weather.name.toLowerCase()} presses on the world — ${describeWeatherStatModifiers(weather)}.`
-        : '';
-      openingPrefix = `${player.name} steps into Tartaria. ${baseOpening}${weatherClause}`.trim();
+      const raceName = getRaces().find((r) => r.id === player.raceId)?.name ?? 'Unknown';
+      const factionName = getFactions().find((f) => f.id === player.factionId)?.name ?? 'no banner';
+      const [p1, p2, p3] = buildOpeningNarrative({
+        playerName: player.name,
+        raceName,
+        factionName,
+        weather,
+        weatherDescriptor: describeWeatherStatModifiers(weather),
+        location,
+        hubRoomName: hubRoom?.name ?? null,
+        hubRoomDescription: hubRoom?.description ?? null,
+        hubName: HUB.hubName,
+      });
+      get().appendLog('world', p1);
+      get().appendLog('world', p2);
+      get().appendLog('world', p3);
+    } else if (opts?.openingPrefix) {
+      const final = `${opts.openingPrefix.trim()} ${sceneText.replace(/\n\n+/g, ' ')}`;
+      get().appendLog('world', final);
+    } else {
+      get().appendLog('world', sceneText);
     }
-    const finalSceneLog = openingPrefix
-      ? `${openingPrefix.trim()} ${sceneText.replace(/\n\n+/g, ' ')}`
-      : sceneText;
     // Track hub-room visits separately from the procedural visitedRooms
     // map so hub-specific UI can read it without scanning roomKeys.
     if (hubRoom) {
@@ -1098,7 +1113,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return { worldMemory: { ...s.worldMemory, hubVisited: Array.from(seen) } };
       });
     }
-    get().appendLog('world', finalSceneLog);
     // HANDOFF #15 — record this room visit in the MapGraph. The key
     // combines macro location + micro-micro id + map coords so two
     // visits to the SAME room get the same key, but two different
