@@ -1713,6 +1713,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
           get().appendLog('world', attackOpener(targetEnemy.name, parsed.resolvedNoun));
         } else {
+          // No enemy — the player might have meant "kick the rubble"
+          // / "smash the wall" / "punch the ground" as a clumsy way
+          // to search or dig. Route to the same handlers the
+          // `investigate` case would. QA finding: previously a flat
+          // refusal even when the target was a ground noun.
+          const rawTarget = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
+          if (rawTarget && isGroundSearch(rawTarget)) {
+            get().digHere();
+            break;
+          }
+          if (rawTarget && isAreaSearch(rawTarget)) {
+            // Narrate the outcome directly — same pattern the
+            // investigate case uses for area searches.
+            const outcome = rollAreaSearch(rawTarget);
+            set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+            get().appendLog('world', outcome.line);
+            break;
+          }
           get().appendLog('world', 'Nothing in arm\'s reach answers your blade. The motion echoes off Aetherstone.');
         }
         break;

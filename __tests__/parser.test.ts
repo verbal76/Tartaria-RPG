@@ -225,3 +225,59 @@ describe('parseInput — current Location name does not become a suggestion targ
     expect(allSuggestions).toMatch(/aetherbat/i);
   });
 });
+
+describe('parser — QA regressions', () => {
+  it('"leave" no longer routes to attack via cleave', () => {
+    const r = parseInput('leave the market', {
+      recentNouns: [],
+      hookNouns: [],
+      currentLocationName: 'Reclaimers Outpost',
+      inventory: [],
+    });
+    // Prior bug: maxLen=6 (cleave) allowed 1 edit, levenshtein
+    // between "leave" and "cleave" was 1, so the verb matcher picked
+    // attack. With the new prepended-letter guard the match is
+    // rejected; "leave" routes to travel/exit handling instead.
+    expect(r.intent).not.toBe('attack');
+  });
+
+  it('multi-word synonym "snap shot" routes to quick_fire', () => {
+    const r = parseInput('snap shot at the sentinel', {
+      recentNouns: ['Sentinel'],
+      hookNouns: [],
+      currentLocationName: 'Aetherstone Spire',
+      inventory: [],
+    });
+    expect(r.intent).toBe('quick_fire');
+  });
+
+  it('multi-word synonym "fight back" routes to fight_back', () => {
+    const r = parseInput('fight back', {
+      recentNouns: [],
+      hookNouns: [],
+      currentLocationName: 'Borderlands',
+      inventory: [],
+    });
+    expect(r.intent).toBe('fight_back');
+  });
+
+  it('multi-word synonym "double tap" routes to multi_fire', () => {
+    const r = parseInput('double tap the bandit', {
+      recentNouns: ['Bandit'],
+      hookNouns: [],
+      currentLocationName: 'Silt Wastes',
+      inventory: [],
+    });
+    expect(r.intent).toBe('multi_fire');
+  });
+
+  it('multi-word synonym "hand in" routes to turn_in', () => {
+    const r = parseInput('hand in the contract', {
+      recentNouns: [],
+      hookNouns: [],
+      currentLocationName: 'Reclaimers Outpost',
+      inventory: [],
+    });
+    expect(r.intent).toBe('turn_in');
+  });
+});

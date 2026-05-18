@@ -112,15 +112,15 @@ export function normalizeInput(raw: string): string {
     .replace(/[^a-z0-9\s']/g, ' ')
     .replace(/'+/g, '')
     .replace(/\s+/g, ' ');
-  // Collapse a few movement phrases into single tokens so the verb matcher
-  // can fire on them (tokenize splits on whitespace).
-  s = s
-    .replace(/\bclose in\b/g, 'closein')
-    .replace(/\bstep back\b/g, 'stepback')
-    .replace(/\bback off\b/g, 'backoff')
-    .replace(/\bback away\b/g, 'backaway')
-    .replace(/\bpull back\b/g, 'pullback')
-    .replace(/\bturn in\b/g, 'turnin');
+  // Collapse multi-word verb synonyms into single tokens so the
+  // verb matcher (which splits input on whitespace) can fire on them.
+  // The full list is derived once at module load from VERB_SYNONYMS
+  // so adding "snap shot" to the quick_fire list automatically makes
+  // user-typed "snap shot" route correctly — no second registration
+  // step. See MULTI_WORD_COLLAPSES below.
+  for (const [phrase, collapsed] of MULTI_WORD_COLLAPSES) {
+    s = s.replace(phrase, collapsed);
+  }
   // Collapse repeated articles — "search the the hum" → "search the hum",
   // "a a torch" → "a torch". Works whether or not stopword filtering catches
   // them downstream. Runs in a loop so triple-the survives ("the the the" →
@@ -133,6 +133,48 @@ export function normalizeInput(raw: string): string {
   return s;
 }
 
+// Build a single regex pass over the verb synonyms — every entry that
+// contains an internal space gets a /\bphrase\b/g pattern paired with
+// the same string sans spaces. normalizeInput applies the pass before
+// tokenizing; VERB_SYNONYMS_LOOKUP holds the collapsed form so the
+// match is exact-token. This keeps adding a new multi-word synonym
+// (e.g. another "snap fire" alias) a single-line change to the
+// synonym table.
+const MULTI_WORD_COLLAPSES: Array<[RegExp, string]> = (() => {
+  const seen = new Set<string>();
+  const out: Array<[RegExp, string]> = [];
+  for (const intent of ALL_INTENTS) {
+    for (const verb of VERB_SYNONYMS[intent]) {
+      if (!verb.includes(' ')) continue;
+      if (seen.has(verb)) continue;
+      seen.add(verb);
+      const collapsed = verb.replace(/\s+/g, '');
+      // Escape regex-special characters in the phrase. None of our
+      // verbs use them today but the safety is free.
+      const escaped = verb.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      out.push([new RegExp(`\\b${escaped}\\b`, 'g'), collapsed]);
+    }
+  }
+  // Sort longest phrase first so "double tap" doesn't get partially
+  // collapsed by a hypothetical shorter pattern.
+  out.sort((a, b) => b[0].source.length - a[0].source.length);
+  return out;
+})();
+
+// Precomputed lookup that the verb matcher uses — same shape as
+// VERB_SYNONYMS but with multi-word entries collapsed to single
+// tokens so input tokenization can find them.
+const VERB_SYNONYMS_LOOKUP: Record<Exclude<Intent, 'unknown'>, string[]> =
+  (() => {
+    const out = {} as Record<Exclude<Intent, 'unknown'>, string[]>;
+    for (const intent of ALL_INTENTS) {
+      out[intent] = VERB_SYNONYMS[intent].map((v) =>
+        v.includes(' ') ? v.replace(/\s+/g, '') : v,
+      );
+    }
+    return out;
+  })();
+
 function fuzzyEqual(word: string, candidate: string): boolean {
   if (word === candidate) return true;
   if (word.length < 3 || candidate.length < 3) return false;
@@ -140,11 +182,22 @@ function fuzzyEqual(word: string, candidate: string): boolean {
   if (candidate.startsWith(word) || word.startsWith(candidate)) {
     return Math.abs(word.length - candidate.length) <= 3;
   }
+  // Reject "prepended-letter" false positives — pairs where one word
+  // is exactly the other with a single leading character added (or
+  // removed) are usually distinct meanings: leave/cleave, ward/sward,
+  // word/sword, care/scare, hide/chide, lade/blade. Levenshtein gives
+  // these a distance of 1, but they don't share a stem so semantic
+  // overlap is near zero. QA flagged the previous threshold still let
+  // "leave" route to "cleave" (attack intent) despite the comment.
+  const [shorter, longer] = word.length <= candidate.length
+    ? [word, candidate]
+    : [candidate, word];
+  if (longer.length === shorter.length + 1 && longer.slice(1) === shorter) {
+    return false;
+  }
   const maxLen = Math.max(word.length, candidate.length);
-  // Tightened for short words: 5-char words now require exact match too.
-  // Playtest: "leave" (5) → "cleave" (6) Levenshtein 1 was routing the
-  // exit-the-market input to attack intent. 4–5 chars exact, 6–7 allow
-  // 1 edit, 8+ allow 2.
+  // 4–5 chars exact, 6–7 allow 1 edit (gated by the rule above), 8+
+  // allow 2.
   const allowed = maxLen <= 5 ? 0 : maxLen <= 7 ? 1 : 2;
   return levenshtein(word, candidate) <= allowed;
 }
@@ -152,7 +205,7 @@ function fuzzyEqual(word: string, candidate: string): boolean {
 function bestVerbMatch(token: string): { intent: Exclude<Intent, 'unknown'>; verb: string; distance: number } | null {
   let best: { intent: Exclude<Intent, 'unknown'>; verb: string; distance: number } | null = null;
   for (const intent of ALL_INTENTS) {
-    for (const verb of VERB_SYNONYMS[intent]) {
+    for (const verb of VERB_SYNONYMS_LOOKUP[intent]) {
       if (token === verb) return { intent, verb, distance: 0 };
       if (fuzzyEqual(token, verb)) {
         const d = levenshtein(token, verb);
