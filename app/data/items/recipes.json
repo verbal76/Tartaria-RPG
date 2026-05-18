@@ -1,6 +1,44 @@
 {
   "recipes": [
     {
+      "result": "Club",
+      "ingredients": [
+        { "name": "Stick", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Cudgel",
+      "ingredients": [
+        { "name": "Stick", "quantity": 1 },
+        { "name": "Big Rock", "quantity": 1 },
+        { "name": "Patched Cloth", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Stone Spear",
+      "ingredients": [
+        { "name": "Stick", "quantity": 1 },
+        { "name": "Small Rock", "quantity": 1 },
+        { "name": "Spider Silk", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Iron Spear",
+      "ingredients": [
+        { "name": "Stick", "quantity": 1 },
+        { "name": "Scrap Metal", "quantity": 1 },
+        { "name": "Spider Silk", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Aether-Shard Spear",
+      "ingredients": [
+        { "name": "Stick", "quantity": 1 },
+        { "name": "Aetheric Shard", "quantity": 1 },
+        { "name": "Spider Silk", "quantity": 1 }
+      ]
+    },
+    {
       "result": "Aetheric Torch",
       "ingredients": [
         { "name": "Aether Crystal", "quantity": 1 },

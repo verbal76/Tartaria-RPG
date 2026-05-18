@@ -39,6 +39,26 @@ export function isAreaSearch(target: string): boolean {
   return false;
 }
 
+// Ground-type targets — these are diggable surfaces. When the player
+// searches one of these AND has a dig tool, the engine routes to the
+// dig loot path (rare access, tool wear) instead of the small area
+// search pool. The full AREA_TOKENS list still triggers a search, but
+// only ground tokens unlock the dig path.
+const GROUND_TOKENS = [
+  'mud', 'silt', 'dust', 'ash', 'sand', 'rock', 'rocks', 'stone', 'stones',
+  'rubble', 'gravel', 'debris', 'pile', 'piles',
+  'floor', 'ground', 'patch', 'spot', 'pit',
+];
+
+export function isGroundSearch(target: string): boolean {
+  const t = target.toLowerCase();
+  for (const w of GROUND_TOKENS) {
+    const re = new RegExp(`\\b${w}\\b`);
+    if (re.test(t)) return true;
+  }
+  return false;
+}
+
 export type AreaSearchOutcome =
   | { kind: 'nothing'; line: string }
   | { kind: 'material'; itemName: string; rarity: Rarity; line: string }
@@ -51,6 +71,9 @@ const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
   { name: 'Mud Fragment', rarity: 'Common', weight: 18 },
   { name: 'Aether Residue', rarity: 'Common', weight: 14 },
   { name: 'Aether Mud', rarity: 'Common', weight: 10 },
+  { name: 'Small Rock', rarity: 'Common', weight: 12 },
+  { name: 'Big Rock', rarity: 'Common', weight: 4 },
+  { name: 'Stick', rarity: 'Common', weight: 10 },
   { name: 'Spider Silk', rarity: 'Common', weight: 8 },
   { name: 'Patched Cloth', rarity: 'Common', weight: 7 },
   { name: 'Aether Crystal', rarity: 'Common', weight: 6 },

@@ -15,9 +15,11 @@ interface Props {
 }
 
 // Peace-mode quick buttons. 'look' = generic look-around (no target).
-// 'search' = opens a search prompt where the player names what to search.
-// 'rest', 'dig' = direct verbs.
-const PEACE_QUICK_DIRECT = ['look', 'rest', 'dig'] as const;
+// 'search' = opens a search prompt where the player names what to search
+// (also covers digging — searching the mud/silt/ground routes through
+// the dig path when the player carries a tool).
+// 'rest' = direct verb.
+const PEACE_QUICK_DIRECT = ['look', 'rest'] as const;
 
 // Trim a weapon name down to fit comfortably on a button. Examples:
 // "Aetheric Crystal Blade" → "Crystal Blade"

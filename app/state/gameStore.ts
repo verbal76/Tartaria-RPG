@@ -75,7 +75,7 @@ import {
   isCountQuestion,
   INVENTORY_CATEGORIES,
 } from '../engine/askInventory';
-import { mergeOrPushItem } from '../engine/inventory';
+import { mergeOrPushItem, grantItem } from '../engine/inventory';
 import {
   parseDirectionQuestion,
   findNamedByQuery,
@@ -167,7 +167,7 @@ import { parseWeaponEffect, rollEffectBonusDamage } from '../engine/weaponEffect
 import { rollThrowDamage, weightLabel, itemWeight } from '../engine/itemWeight';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
 import { levenshtein } from '../engine/editDistance';
-import { isAreaSearch, rollAreaSearch } from '../engine/areaSearch';
+import { isAreaSearch, isGroundSearch, rollAreaSearch } from '../engine/areaSearch';
 import { bestDigTool, rollDig } from '../engine/digging';
 import {
   generateWorldMap,
@@ -1716,8 +1716,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
           break;
         }
-        // 4) Generic area / surface / direction search ("the mud", "the
-        // rubble", "the doorway", "the area to my left"). Roll an
+        // 3.5) Ground search ("the mud", "the silt", "the ground", "the
+        // rubble" …). When the player targets a diggable surface, route
+        // to the dig path so the loot pool includes the rare buried
+        // items AND any dig tool they're carrying wears down. Without
+        // a tool, digHere refuses and the player sees an Arbiter line
+        // explaining what they need. This collapses the old separate
+        // 'dig' verb into the unified search vocabulary.
+        if (rawTarget && isGroundSearch(rawTarget)) {
+          get().digHere();
+          break;
+        }
+        // 4) Generic area / surface / direction search ("the doorway",
+        // "the area to my left", "the wall", "the shelf"). Roll an
         // outcome on the spot — nothing, small material, small TC, or
         // an atmospheric hook plant. Always engaging, never reprompting
         // for these.
@@ -5245,6 +5256,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const { item, score } = bestDigTool(player.inventory);
+    // Require a real tool. bestDigTool returns score=1 for bare hands;
+    // anything 2+ means the player has at least an improvised edge
+    // (knife, trowel, blade, spear, sturdy rock). Without one, refuse
+    // — surface dirt with bare fingers isn't the game's loot path.
+    if (!item || score < 2) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter shakes their head. "You cannot dig — you have no tool that can. Find a knife, a trowel, or even a sharp scrap to scrape with."`,
+      );
+      return;
+    }
     // Digging takes a beat and a little stamina.
     set((s) => (s.player ? { player: advanceTime(spendStamina(s.player, 1), 0.4) } : s));
     // Lock the spot up-front so even failed digs count as "worked".
