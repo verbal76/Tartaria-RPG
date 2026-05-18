@@ -135,8 +135,13 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 8,
   },
-  content: { paddingBottom: 12 },
-  entry: { marginBottom: 14 },
-  tag: { fontSize: 10, fontWeight: '700', letterSpacing: 2, marginBottom: 2 },
-  body: { fontSize: 14, lineHeight: 21 },
+  // Each entry gets its own "paragraph" — a generous bottom margin
+  // plus an explicit empty-line gap above the next entry's body so a
+  // sequence of world / arbiter lines reads as paragraphs in prose,
+  // not as cramped chat bubbles. The opening narrative's three world
+  // entries should feel like three paragraphs of a single story.
+  content: { paddingBottom: 16 },
+  entry: { marginBottom: 24 },
+  tag: { fontSize: 10, fontWeight: '700', letterSpacing: 2, marginBottom: 4 },
+  body: { fontSize: 14, lineHeight: 22 },
 });

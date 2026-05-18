@@ -69,9 +69,10 @@ export function buildOpeningNarrative(input: {
   const p1 = pick(p1Variants);
 
   // P2 — setting. Hub mode anchors at the authored room; otherwise the
-  // procedural location description carries the load.
+  // procedural location description carries the load. Preserves the
+  // hub room's authored casing ("The Gate", not "The gate").
   const p2 = hubRoomName && hubRoomDescription
-    ? `${hubName ?? "Reclaimers' Outpost"} rises out of the silt at the edge of the ${location.name}. You arrive at ${hubRoomName.replace(/^The\s+/i, 'the ').toLowerCase().replace(/^the /, 'The ')}. ${hubRoomDescription}`
+    ? `${hubName ?? "Reclaimers' Outpost"} rises out of the silt at the edge of the ${location.name}. You arrive at ${hubRoomName}. ${hubRoomDescription}`
     : `You arrive at the edge of the ${location.name}. ${location.description}`;
 
   // P3 — atmosphere + agency hand-off. The openings.json line carries
