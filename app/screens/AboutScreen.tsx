@@ -310,9 +310,28 @@ export function AboutScreen() {
       `Session`,
       `  Player: ${player?.name ?? 'none'}`,
       `  Log entries in memory: ${gameLogLength}`,
+      ``,
+      `Voice`,
+      `  TTS enabled: ${voice.ttsEnabled ? 'yes' : 'no'}`,
+      `  STT enabled: ${voice.sttEnabled ? 'yes' : 'no'}`,
+      `  Engine: ${voice.engine}`,
+      `  Rate: ${voice.rate.toFixed(2)} · Pitch: ${voice.pitch.toFixed(2)}`,
+      `  System voice id: ${voice.voiceId ?? '(default)'}`,
+      `  Kokoro voice: ${voice.kokoroVoice}`,
+      `  Auto-submit STT: ${voice.autoSubmit ? 'yes' : 'no'}`,
+      `  TTS availability: ${ttsAvailable ? 'yes' : 'no'}`,
+      `  STT availability: ${sttAvailable ? 'yes' : 'no'}`,
+      `  Installed voices: ${voicesList.length}`,
+      `  Kokoro state: ${
+        kokoroState.phase === 'idle' ? 'idle (not loaded yet)' :
+        kokoroState.phase === 'downloading' ? `downloading ${Math.round(kokoroState.fraction * 100)}%` :
+        kokoroState.phase === 'loading' ? 'loading model into memory' :
+        kokoroState.phase === 'ready' ? 'ready' :
+        `error: ${kokoroState.message}`
+      }`,
     ];
     return lines.join('\n');
-  }, [cognitiveStatus, cognitiveFraction, cognitiveError, cognitiveLastResponse, cognitiveModelInfo, qwenStatus, qwenFraction, qwenError, qwenModelId, player, gameLogLength, updateStatus, updateError]);
+  }, [cognitiveStatus, cognitiveFraction, cognitiveError, cognitiveLastResponse, cognitiveModelInfo, qwenStatus, qwenFraction, qwenError, qwenModelId, player, gameLogLength, updateStatus, updateError, voice, ttsAvailable, sttAvailable, voicesList, kokoroState]);
 
   async function handleCopy() {
     await Clipboard.setStringAsync(info);
