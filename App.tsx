@@ -19,6 +19,22 @@ import { bootAudio, disposeAudio } from './app/audio/AudioManager';
 import { startAudioController, stopAudioController } from './app/audio/AudioController';
 import { initTTSManager } from './app/voice/TTSManager';
 import { startTTSController, stopTTSController } from './app/voice/TTSController';
+import { createExpoFileSystemAdapter } from './app/voice/executorchAdapter';
+
+// Wire react-native-executorch's resource fetcher at module load (before
+// React renders) so any later TextToSpeechModule.fromModelName call has
+// the adapter already registered. The official Expo adapter requires
+// SDK 54; we're on 52 so we ship our own expo-file-system shim.
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const exec = require('react-native-executorch');
+  if (typeof exec.initExecutorch === 'function') {
+    exec.initExecutorch({ resourceFetcher: createExpoFileSystemAdapter() });
+  }
+} catch {
+  // Native module not present (e.g. dev web build) — voice falls back to
+  // system TTS automatically through TTSManager's engine routing.
+}
 
 export default function App() {
   const screen = useGameStore((s) => s.currentScreen);
