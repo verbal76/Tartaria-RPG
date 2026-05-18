@@ -94,18 +94,26 @@ function onState(state: GameState): void {
   }
 
   // 1) New log entries — only ones added since the last tick. Detect
-  // bulk replacement (save-load): when the entry that USED to sit at
-  // lastLogIndex - 1 is no longer there, the log was wholesale
-  // replaced. Resync silently so the resume line (the one entry the
-  // load handler appends after restore) is the only thing voiced.
+  // bulk replacement (save-load): there are two signals.
+  //   (a) ID mismatch: the entry that USED to sit at lastLogIndex - 1
+  //       is no longer there → the log was wholesale replaced.
+  //   (b) Cold-boot bulk arrival: the log was empty when we last
+  //       synced (lastLogIndex === 0), and suddenly contains multiple
+  //       entries in a single tick. Normal new-character play appends
+  //       one entry per tick (each appendLog is its own zustand set);
+  //       only a wholesale replacement (e.g. loadSlotIntoGame setting
+  //       gameLog to the saved array) lands many at once.
+  // In either case we resync silently — the next legitimate appendLog
+  // (e.g. "you step back into ...") falls through the speak path.
   const log = state.gameLog;
   const expectedPrev = lastLogIndex > 0 ? log[lastLogIndex - 1] : null;
-  const wholesaleReplaced =
+  const idMismatch =
     lastSpokenEntryId != null &&
     (lastLogIndex > log.length ||
       !expectedPrev ||
       expectedPrev.id !== lastSpokenEntryId);
-  if (wholesaleReplaced) {
+  const coldBootBulk = lastLogIndex === 0 && log.length >= 2;
+  if (idMismatch || coldBootBulk) {
     // Realign to current tail without speaking anything. The next
     // appendLog after this tick (e.g. the "you step back into ..."
     // resume cue) will fall through the normal speak path.
