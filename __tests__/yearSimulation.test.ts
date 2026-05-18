@@ -215,25 +215,32 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
         if (target) return `${verb} ${target}`;
       }
 
-      // Cycle exploration verbs / travel
+      // Cycle exploration verbs / travel — bias toward time-advancing
+      // verbs (travel/rest/search) so we hit 365 days in a reasonable
+      // number of submitPlayerAction calls.
       const roll = Math.random();
-      if (roll < 0.35) {
+      if (roll < 0.55) {
         const dir = directions[dirIdx % directions.length];
         dirIdx++;
         return `go ${dir}`;
       }
-      if (roll < 0.55) return 'look';
-      if (roll < 0.7) return 'search the ground';
-      if (roll < 0.8) return 'inventory';
-      if (roll < 0.9) return 'craft';
+      if (roll < 0.7) return 'rest';
+      if (roll < 0.82) return 'search the ground';
+      if (roll < 0.9) return 'look';
+      if (roll < 0.95) return 'craft';
       return tacticCycle[tacticIdx++ % tacticCycle.length]!;
     };
 
     // Main loop ---------------------------------------------------------
-    const MAX_ACTIONS = 3000;
+    const MAX_ACTIONS = 8000;
     let actions = 0;
     let endReason = 'max_actions';
     while (actions < MAX_ACTIONS) {
+      // Yield to event loop every 50 actions so setTimeout/microtask
+      // callbacks (death handler, persist) get a chance to run.
+      if (actions % 50 === 0) {
+        await new Promise<void>((r) => setImmediate(r));
+      }
       actions++;
       const sBefore = store.getState();
       const pBefore = sBefore.player;
@@ -374,7 +381,7 @@ TC current:         ${pFinal?.tc}
 TC earned (gross):  ${tcEarned}
 TC spent (gross):   ${tcSpent}
 Corruption:         ${pFinal?.corruption ?? 0}
-Stats:              STR ${pFinal?.stats.strength} DEX ${pFinal?.stats.dexterity} END ${pFinal?.stats.endurance} INT ${pFinal?.stats.intelligence} CHA ${pFinal?.stats.charisma} WIS ${pFinal?.stats.wisdom}
+Stats:              STR ${pFinal?.stats.strength} DEX ${pFinal?.stats.dexterity} INT ${pFinal?.stats.intelligence} WIS ${pFinal?.stats.wisdom} CHA ${pFinal?.stats.charisma}
 Race / Faction:     ${pFinal?.raceId} / ${pFinal?.factionId}
 Location:           ${sFinal.currentScene?.location.name ?? pFinal?.currentLocationId ?? '?'}
 Deaths/resurrects:  ${deaths} / ${resurrections}
