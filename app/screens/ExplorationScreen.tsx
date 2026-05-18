@@ -128,7 +128,7 @@ export function ExplorationScreen() {
             hitSlop={8}
             style={styles.sceneBarBtn}
           >
-            <Text style={styles.sceneBarBtnText}>ACTS</Text>
+            <Text style={styles.sceneBarBtnText}>ACTIONS</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setScreen('contracts')}

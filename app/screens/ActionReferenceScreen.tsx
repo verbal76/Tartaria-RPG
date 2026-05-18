@@ -70,6 +70,78 @@ function lookup(id: string): Concept | null {
   return concepts.find((c) => c.id === id) ?? null;
 }
 
+// Sample inputs the parser will route to each action. Surfaced under
+// every card in green so new players can see EXACTLY what to type for
+// the verb / intent the card describes. Pulled from the parser's
+// synonym pool (app/engine/parser.ts) — adding a new synonym there
+// without updating this map is fine, but adding the example here makes
+// it discoverable from the reference screen.
+const EXAMPLES: Record<string, string[]> = {
+  // Movement
+  move_action: ['walk', 'go north', 'head east', 'continue'],
+  sprint_action: ['sprint', 'dash west', 'run to the wall'],
+  take_cover_action: ['take cover', 'hide behind the rubble', 'duck for cover'],
+  perform_action: ['perform', 'sing', 'play a tune'],
+  assist_action_combat: ['help', 'assist the reclaimer', 'back them up'],
+  hold_action: ['ready', 'hold my action', 'wait for an opening'],
+  flee_action: ['flee', 'run away', 'retreat'],
+  classic_move: ['walk', 'step forward', 'move closer'],
+  difficult_terrain: ['cross the mud', 'wade through the silt'],
+  crawl: ['crawl', 'crawl forward', 'crawl under'],
+  climb: ['climb', 'climb the ladder', 'climb the wall'],
+  swim: ['swim', 'swim across', 'wade through the water'],
+  standing_long_jump: ['jump', 'jump the gap', 'leap across'],
+  running_long_jump: ['jump while sprinting', 'leap the chasm at a run'],
+
+  // Combat
+  attack_action: ['attack the goblin', 'swing at the worm', 'strike the sentinel'],
+  brawl_action: ['punch', 'kick', 'grapple the goblin'],
+  use_weapon_action: ['attack with the rust rifle', 'use the bone maul'],
+  fighting_maneuver: ['disarm', 'trip the goblin', 'shove', 'grapple', 'pin', 'sweep', 'hook'],
+  overwhelm_action: ['overwhelm', 'press the attack'],
+  throw_action: ['throw the knife', 'hurl the rock at the goblin'],
+  dash_action: ['dash', 'sprint at them', 'rush forward'],
+  disengage_action: ['disengage', 'back away safely', 'step back'],
+  dodge_action: ['dodge', 'duck'],
+  help_action: ['help', 'assist'],
+  use_object_action: ['use torch on the door', 'use rope on the gap'],
+  hide_action: ['hide', 'sneak', 'slip into shadow'],
+  ready_action: ['ready', 'hold for opening', 'wait to react'],
+  search_action: ['search', 'search the room', 'look around'],
+  mount_action: ['mount', 'mount the horse'],
+
+  // Firearms
+  fire_weapon_action: ['fire', 'shoot the goblin', 'shoot the sentinel'],
+  quick_fire_action: ['quick fire', 'snap shot', 'fire fast'],
+  aim_action: ['aim', 'aim at the goblin', 'take aim'],
+  point_blank_range: ['fire point blank', 'shoot at point-blank'],
+  multiple_shot: ['fire two shots', 'shoot three times'],
+  fire_automatic: ['full auto', 'spray', 'open up with the rifle'],
+  reload_action: ['reload', 'reload my rifle'],
+  single_bullet_reload: ['load two shells', 'load a bullet'],
+  bolt_caster: ['fire the bolt caster', 'shoot the bolt caster'],
+
+  // Evasive
+  dodge_melee: ['dodge the swing', 'duck the blow'],
+  fight_back: ['fight back', 'parry', 'counter'],
+  dive_for_cover: ['dive for cover', 'dive behind the wall'],
+
+  // Skills
+  pick_a_lock: ['pick the lock', 'pick the chest lock'],
+  track_an_enemy: ['track', 'follow the tracks', 'track the goblin'],
+  set_traps: ['set a trap', 'lay a trap'],
+  translate_tome: ['translate the tome', 'translate the inscription'],
+
+  // Aetheric
+  learn_spell: ['study the spell', 'learn the rune'],
+
+  // Social / info
+  gathering_information: ['ask about the merchant', 'gather information'],
+  social_interactions: ['talk to Halem', 'persuade the guard', 'intimidate the thug'],
+  preparation_and_planning: ['rest', 'plan ahead', 'prepare for travel'],
+  psychological_actions: ['steady myself', 'calm down'],
+};
+
 export function ActionReferenceScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
 
@@ -99,10 +171,17 @@ export function ActionReferenceScreen() {
             {section.ids.map((id) => {
               const c = lookup(id);
               if (!c) return null;
+              const examples = EXAMPLES[id] ?? [];
               return (
                 <View key={id} style={styles.card}>
                   <Text style={styles.cardTitle}>{c.title}</Text>
                   <Text style={styles.cardBody}>{c.answer}</Text>
+                  {examples.length > 0 && (
+                    <Text style={styles.cardExamples}>
+                      <Text style={styles.cardExamplesLabel}>Type: </Text>
+                      {examples.map((ex) => `"${ex}"`).join(' · ')}
+                    </Text>
+                  )}
                 </View>
               );
             })}
@@ -173,5 +252,21 @@ const styles = StyleSheet.create({
     color: '#cdbf99',
     fontSize: 12,
     lineHeight: 18,
+  },
+  // Examples appear under the answer in the reward-green tint so new
+  // players can see exactly what to type. The leading "Type:" label is
+  // the same green but bolder so the eye lands on it first.
+  cardExamples: {
+    color: '#9ec96a',
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 6,
+    fontStyle: 'italic',
+  },
+  cardExamplesLabel: {
+    color: '#9ec96a',
+    fontWeight: '700',
+    fontStyle: 'normal',
+    letterSpacing: 1,
   },
 });
