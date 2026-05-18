@@ -16,9 +16,20 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
   const step = state.steps[state.currentStep];
   if (!step) return null;
 
-  const total = rolledValues
-    ? rolledValues.reduce((a, b) => a + b, 0) + step.bonus
+  // HANDOFF #14b — attack-side advantage/disadvantage. When rollMode is
+  // set, we roll 2 dice and the KEPT die is the higher (advantage) or
+  // lower (disadvantage). The shadow die is shown faded so the player
+  // sees the swing. Only the kept value feeds into bonus/target math.
+  const isAdv = step.rollMode === 'advantage';
+  const isDis = step.rollMode === 'disadvantage';
+  const keptValue = rolledValues
+    ? isAdv
+      ? Math.max(...rolledValues)
+      : isDis
+        ? Math.min(...rolledValues)
+        : rolledValues.reduce((a, b) => a + b, 0)
     : null;
+  const total = keptValue !== null ? keptValue + step.bonus : null;
   const success = total !== null && step.target !== undefined ? total >= step.target : null;
 
   const isCombat = state.steps.some((s) => s.id === 'attack');
@@ -27,6 +38,8 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
   // Capture the dice config now so the closure isn't re-narrowing on
   // every invocation — TS can't prove the step survives across renders.
   const { count: stepCount, sides: stepSides } = step;
+  // For advantage/disadvantage we always roll 2 dice on this step.
+  const rollCount = isAdv || isDis ? 2 : stepCount;
 
   function handleRoll() {
     Animated.sequence([
@@ -36,17 +49,27 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
     ]).start();
 
     const values: number[] = [];
-    for (let i = 0; i < stepCount; i++) values.push(rollDie(stepSides));
+    for (let i = 0; i < rollCount; i++) values.push(rollDie(stepSides));
     setRolledValues(values);
   }
 
   function handleNext() {
     if (!rolledValues) return;
-    onRoll(rolledValues);
+    // Hand back the KEPT die in single-element form for advantage /
+    // disadvantage steps so the caller's bonus math is unchanged. The
+    // shadow die is purely UI.
+    if (isAdv || isDis) {
+      const kept = isAdv ? Math.max(...rolledValues) : Math.min(...rolledValues);
+      onRoll([kept]);
+    } else {
+      onRoll(rolledValues);
+    }
     setRolledValues(null);
   }
 
-  const diceLabel = `${step.count > 1 ? step.count : ''}d${step.sides}`;
+  const diceLabel = isAdv || isDis
+    ? `2d${step.sides}`
+    : `${step.count > 1 ? step.count : ''}d${step.sides}`;
 
   return (
     <View style={styles.container}>
@@ -70,21 +93,39 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
             <Text style={styles.diceNotation}>
               {diceLabel}{step.bonusLabel ? `  +  ${step.bonusLabel}` : ''}
             </Text>
+            {isAdv || isDis ? (
+              <Text style={[styles.advLabel, isAdv ? styles.advTint : styles.disTint]}>
+                {isAdv ? '↑ ADVANTAGE' : '↓ DISADVANTAGE'}
+                {step.rollModeLabel ? ` — ${step.rollModeLabel}` : ''}
+                {isAdv ? '  (keep higher)' : '  (keep lower)'}
+              </Text>
+            ) : null}
             {step.targetLabel ? (
               <Text style={styles.targetText}>vs  {step.targetLabel}</Text>
             ) : null}
           </View>
         ) : (
-          // Post-roll: show result
+          // Post-roll: show result. Highlight the kept die when
+          // advantage/disadvantage is in play.
           <View style={styles.postRoll}>
             <View style={styles.diceResults}>
-              {rolledValues.map((v, i) => (
-                <View key={i} style={styles.dieResult}>
-                  <Text style={styles.dieFace}>{dieFace(v, step.sides)}</Text>
-                  <Text style={styles.dieValue}>{v}</Text>
-                </View>
-              ))}
+              {rolledValues.map((v, i) => {
+                const kept = isAdv || isDis
+                  ? v === keptValue && rolledValues.indexOf(keptValue!) === i
+                  : true;
+                return (
+                  <View key={i} style={[styles.dieResult, !kept && styles.dieResultFaded]}>
+                    <Text style={[styles.dieFace, !kept && styles.dieFaceFaded]}>{dieFace(v, step.sides)}</Text>
+                    <Text style={[styles.dieValue, !kept && styles.dieValueFaded]}>{v}</Text>
+                  </View>
+                );
+              })}
             </View>
+            {(isAdv || isDis) && (
+              <Text style={[styles.advLabel, isAdv ? styles.advTint : styles.disTint]}>
+                {isAdv ? `↑ ${step.rollModeLabel ?? 'advantage'} — keep ${keptValue}` : `↓ ${step.rollModeLabel ?? 'disadvantage'} — keep ${keptValue}`}
+              </Text>
+            )}
             {step.bonus !== 0 && (
               <Text style={styles.bonusLine}>+ {step.bonusLabel}</Text>
             )}
@@ -188,6 +229,24 @@ const styles = StyleSheet.create({
     color: '#7a705c',
     fontSize: 13,
     letterSpacing: 1,
+  },
+  advLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 2,
+    marginTop: 2,
+  },
+  advTint: { color: '#9ec96a' },
+  disTint: { color: '#e07a5f' },
+  dieResultFaded: {
+    opacity: 0.32,
+  },
+  dieFaceFaded: {
+    color: '#5a5045',
+  },
+  dieValueFaded: {
+    color: '#5a5045',
+    fontWeight: '400',
   },
   postRoll: {
     alignItems: 'center',

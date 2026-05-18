@@ -1,11 +1,11 @@
 # Tartaria Realms — Session Handoff
 
 > Picked up by: the next chat continuing this branch.
-> Branch: `claude/new-session-MvF82`
-> Latest OTA: `2026-05-17-036` (pushed)
-> Tests: 474 passing across 38 suites
-> Working tree: clean
-> Weapons catalog: 228 entries · MapGraph live · hub data authored
+> Branch: `claude/tartaria-realms-continue-Hgual`
+> Latest OTA: `2026-05-18-037` (pending push)
+> Tests: 509 passing across 41 suites
+> Working tree: pending commit
+> Weapons catalog: 228 entries · MapGraph live · hub data authored · hub engine integrated
 
 ---
 
@@ -155,22 +155,21 @@ The previous HANDOFF.md ended at OTA `2026-05-16-052`. We're now at `2026-05-17-
 
 ✅ **CatalogWeapon.effect parser** — `app/engine/weaponEffects.ts` parses `+NdN against X` patterns from the rulebook effect column. Recognized conditions: large / construct / structure / mechanical / animal / shielded / magical / darkness / aetheric. Damage path now rolls bonus dice and narrates the trigger: `Aetherium Spear's effect triggers — +4 bonus damage.` 12 tests.
 
-### Still open — each needs its own dedicated session
+### Done in the continuation session (OTA 037)
 
-14b. **Attack-side advantage/disadvantage UI** — interactive dice prompt still rolls one d20. To match the defense-side advantage path, DiceRoller would need to roll 2 dice and surface picking. UI refactor — half a session.
+✅ **#15b Hub engine integration** — `app/engine/hub.ts` (HUB const + `isHubLocation` / `findHubRoom` / `hubEntryRoomId` / `resolveHubTravel` / `isLeaveHubCommand`). `PlayerCharacter.hubRoomId` lives on the player; `WorldMemory.hubVisited` lives on world memory. `beginScene` enters hub mode on first arrival at `tartarian_outskirts`, swaps the scene paragraph for the room's authored description, spawns the anchor NPC as the vendor (Halem / Irma / Tarek / Jorah), and prints a `Paths:` line summarizing cardinal exits. Travel handler now routes through `resolveHubTravel` first (cardinal + adjacent name + fast-travel to visited rooms) before falling back to procedural map travel. `leave outpost` / `exit hub` clears `hubRoomId` and resumes the wider world. 22 hub tests.
 
-15b. **Hub engine integration** — data file is in (`static_hub.json`). Engine doesn't yet consume it. Need: a "hub mode" that prefers static_hub rooms over the procedural generator when the player is at the hub location, and `go armory` / `go workshop` directional commands that resolve against `hub.rooms.exits`. 1-2 commits.
+✅ **#15c Loot restoration in MapGraph** — `VisitedRoom.lootGrabbed: string[]` added. `digHere` and the area-search outcome now write the recovered item name into the visited-room record; on re-entry, the same bespoke drop is suppressed and the player gets a "patch is picked clean" line instead. Consumable / misc commodities (`First Aid Kit`, `Mud Tubers`, etc.) are exempt — they can re-roll. 8 loot-restoration tests.
 
-15c. **Loot restoration in MapGraph** — kills are tracked, encounters suppressed; loot grabbed isn't yet persisted. Add `lootGrabbed: string[]` to VisitedRoom, update dig / area-search to write to it, suppress the same loot on re-entry.
+✅ **#14b Attack-side advantage / disadvantage UI** — `RollStep.rollMode` (`'advantage' | 'disadvantage'`) + `rollModeLabel`. `buildCombatSteps` sets advantage when the player is `aiming`, disadvantage when `surprised`, neutral when both / neither. DiceRoller rolls 2 dice on those steps, fades the discarded die, surfaces the kept value with a colored tag ("↑ aiming — keep 17" / "↓ surprised — keep 3"). The kept die is what feeds bonus+target math, so the existing flat bonus stacks on top — deliberate, makes "aim first" feel decisive. 5 attack-advantage tests.
 
 ---
 
 ## 5. Known-good state
 
 - TypeScript: 0 errors (`npx tsc --noEmit`).
-- Tests: 419/419 passing across 33 suites (`npx jest`).
-- Working tree clean at commit `5877545`.
-- Latest published OTA `2026-05-17-029`.
+- Tests: 509/509 passing across 41 suites (`npx jest`).
+- Latest OTA bumped to `2026-05-18-037` (pending push).
 
 ---
 
@@ -261,6 +260,4 @@ Set on enemy entries in `enemies.json`. Read at combat time via `enemyTraits.ts`
 
 ---
 
-That's the lay of the land at the close of this chat. **All 16 prior items have first-cut closures landed**, plus the followups noted in the previous handoff (companion mechanics / style integration / effect parser). The only items still open are the second-pass refinements (14b attack-UI / 15b hub integration / 15c loot restoration) — each is a focused 1-2 commit follow-on, not a fresh problem.
-
-Recommendation for the next chat: **15b (hub engine integration)** would be the most player-visible. The data is sitting in `static_hub.json` ready to consume; an engine path that prefers hub rooms over the procedural generator at the hub location would land "the camp I know" feel immediately.
+That's the lay of the land at the close of this chat. **All 16 prior items have closures landed**, including the three second-pass refinements (14b / 15b / 15c) that the previous handoff flagged as remaining work. There are no open items from the original list. Future sessions will pick up from playtest feedback or new feature requests rather than backfilling the matrix.

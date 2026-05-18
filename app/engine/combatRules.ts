@@ -248,6 +248,25 @@ export function buildCombatSteps(
       if (visPen) ctxPieces.push(`− ${Math.abs(visPen)} (${opts?.visibilityLabel ?? 'low visibility'})`);
       if (pointBlank) ctxPieces.push('+ 2 (point blank)');
       if (opts?.statusMods?.sources?.length) ctxPieces.push(...opts.statusMods.sources);
+      // HANDOFF #14b — attack-side advantage / disadvantage. Mirrors the
+      // defense-side logic in gameStore.applyEnemyCounter. Aiming gives
+      // the player advantage on their next attack (roll 2d20, keep higher);
+      // surprised gives disadvantage (keep lower). When both fire, they
+      // cancel out and the roll stays normal. The flat bonuses on these
+      // statuses still apply — advantage stacks on top, deliberately
+      // making aim-then-fire feel decisive.
+      const fx = player.statusEffects ?? [];
+      const hasAiming = fx.some((e) => e.kind === 'aiming' && e.remainingRounds > 0);
+      const hasSurprised = fx.some((e) => e.kind === 'surprised' && e.remainingRounds > 0);
+      let rollMode: 'advantage' | 'disadvantage' | undefined;
+      let rollModeLabel: string | undefined;
+      if (hasAiming && !hasSurprised) {
+        rollMode = 'advantage';
+        rollModeLabel = 'aiming';
+      } else if (hasSurprised && !hasAiming) {
+        rollMode = 'disadvantage';
+        rollModeLabel = 'surprised';
+      }
       return {
         id: 'attack',
         label: 'Roll to ATTACK',
@@ -258,6 +277,7 @@ export function buildCombatSteps(
         target: ac,
         targetLabel: `AC ${ac}`,
         context: `${ctxPieces.join(' ')} to hit ${enemy.name}`,
+        ...(rollMode ? { rollMode, rollModeLabel } : {}),
       };
     })(),
     {

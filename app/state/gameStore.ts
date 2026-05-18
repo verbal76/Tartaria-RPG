@@ -15,6 +15,7 @@ import type {
   InventoryItem,
   CombatRange,
   Intent,
+  VisitedRoom,
 } from '../engine/types';
 import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat } from '../engine/worldMemory';
 import {
@@ -98,8 +99,16 @@ import {
   type Recipe,
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack } from '../engine/combatRules';
-import { pickRandomVendor, VENDORS, type VendorInstance } from '../engine/vendors';
+import { pickRandomVendor, findVendorByName, VENDORS, type VendorInstance } from '../engine/vendors';
 import { findQuestFactionHint } from '../engine/factionHint';
+import {
+  HUB,
+  isHubLocation,
+  findHubRoom,
+  hubEntryRoomId,
+  resolveHubTravel,
+  isLeaveHubCommand,
+} from '../engine/hub';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, effectiveStats } from '../engine/equipment';
 import { stampDurability, wearItemByName, repairCost, repairItem } from '../engine/durability';
@@ -924,6 +933,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const location = getLocationById(player.currentLocationId);
     const weather = pickWeather(worldMemory);
     const hazard = pickHazardForLocation(location);
+    // HANDOFF #15b — hub mode. When player is at the hub location AND
+    // has a hubRoomId set (or default to entry), render the hub room
+    // instead of the procedural scene. Disables encounters; pulls
+    // vendor from the room's anchorNpc. Player is in their camp.
+    const inHub = isHubLocation(location.id);
+    let hubRoomId = player.hubRoomId ?? null;
+    if (inHub && !hubRoomId) {
+      hubRoomId = hubEntryRoomId();
+      set((s) => (s.player ? { player: { ...s.player, hubRoomId } } : s));
+    }
+    const hubRoom = inHub ? findHubRoom(hubRoomId) : null;
+    if (!inHub && hubRoomId) {
+      // Player left the hub — clear the hubRoomId.
+      set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+    }
     // Resolve the Micro-Micro EARLY so encounter and loot rolls can use
     // the room's curated pools from worldLadder.json. Caller can pre-pick
     // (exit-follow path); otherwise we sample a random Micro-Micro from
@@ -962,6 +986,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       !!priorVisit &&
       (priorVisit.enemiesCleared?.length ?? 0) > 0 &&
       hoursSinceLastVisit < RESPAWN_QUIET_HOURS;
+    // Hub is universally peaceful — never roll encounters here.
+    const suppressEncounter = enforcePeace || recentlyCleared || !!hubRoom;
     // Phase 4 §4.3 — biome-curated encounter pools. If the Micro-Micro
     // has a possibleEncounters list, pick rarity-weighted from THAT pool
     // (so the Buried Skyscraper Upper only spawns Aetherbats, Reclaimer
@@ -969,7 +995,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // legacy global roll when no ladder or when the curated pool returns
     // nothing (data drift safety).
     let encounter: Enemy[] = [];
-    if (!enforcePeace && !recentlyCleared) {
+    if (!suppressEncounter) {
       if (ladderTriple && chance(40 + location.danger * 8)) {
         const curated = pickEncounterFromLadder(ladderTriple);
         if (curated) encounter = [curated];
@@ -983,7 +1009,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const activeEnemyIdx = 0;
     const hasEnemies = enemies.length > 0;
     // Vendor only appears in peaceful scenes. ~22% chance.
-    const vendor = !hasEnemies && Math.random() < 0.22 ? pickRandomVendor() : null;
+    // Hub mode: the anchor NPC for the current room takes the vendor
+    // slot when one is defined. Deterministic — Halem at the gate is
+    // always Halem, every visit.
+    const vendor: VendorInstance | null = hubRoom && hubRoom.anchorNpc
+      ? (findVendorByName(hubRoom.anchorNpc) ?? null)
+      : (!hasEnemies && Math.random() < 0.22 ? pickRandomVendor() : null);
     // Enemies start at 'close' range — close enough to be a problem but not
     // already swinging. Players have to advance (or be charged) to land
     // melee, retreat to set up ranged shots.
@@ -1023,10 +1054,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // the scene paragraph so the player sees ONE flowing line instead of
     // a stack of three separate log entries. We collapse the paragraph
     // breaks inside the scene text so it reads like prose.
-    const sceneText = buildScene({ weather, location, hazard, enemy: sceneEnemy, quest: player.activeQuests[0] });
+    // Hub mode overrides the procedural scene with the room's authored
+    // description, plus a header line that identifies the room and the
+    // hub it belongs to. The procedural buildScene() ignores hub mode
+    // entirely — its location-pool prose doesn't apply when you're
+    // standing inside a hand-authored room.
+    const sceneText = hubRoom
+      ? `${HUB.hubName} — ${hubRoom.name}.\n\n${hubRoom.description}`
+      : buildScene({ weather, location, hazard, enemy: sceneEnemy, quest: player.activeQuests[0] });
     const finalSceneLog = opts?.openingPrefix
       ? `${opts.openingPrefix.trim()} ${sceneText.replace(/\n\n+/g, ' ')}`
       : sceneText;
+    // Track hub-room visits separately from the procedural visitedRooms
+    // map so hub-specific UI can read it without scanning roomKeys.
+    if (hubRoom) {
+      set((s) => {
+        const seen = new Set(s.worldMemory.hubVisited ?? []);
+        seen.add(hubRoom.id);
+        return { worldMemory: { ...s.worldMemory, hubVisited: Array.from(seen) } };
+      });
+    }
     get().appendLog('world', finalSceneLog);
     // HANDOFF #15 — record this room visit in the MapGraph. The key
     // combines macro location + micro-micro id + map coords so two
@@ -1065,6 +1112,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'world',
         `Exits from this room: ${ladderTriple.microMicro.exits.join(' · ')}.`,
       );
+    }
+    // Hub-mode exits — show the cardinal neighbours by their shortName so
+    // the player can type 'go armory' / 'north' interchangeably.
+    if (hubRoom) {
+      const dirs: Array<{ dir: string; id: string | null }> = [
+        { dir: 'north', id: hubRoom.exits.north },
+        { dir: 'south', id: hubRoom.exits.south },
+        { dir: 'east', id: hubRoom.exits.east },
+        { dir: 'west', id: hubRoom.exits.west },
+      ];
+      const labels = dirs
+        .filter((d) => d.id)
+        .map((d) => {
+          const r = findHubRoom(d.id);
+          return r ? `${d.dir} → ${r.shortName}` : null;
+        })
+        .filter(Boolean) as string[];
+      if (labels.length > 0) {
+        get().appendLog('world', `Paths: ${labels.join(' · ')}. (Type 'leave outpost' to head into the wilds.)`);
+      }
     }
     // Surface the active weather's stat modifiers so the player can see
     // what's pressing on them this scene. Empty for "calm" or weathers
@@ -1610,6 +1677,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog('world', outcome.line);
           if (outcome.kind === 'material') {
             const itemCat = lookupCraftedItem(outcome.itemName);
+            const isStackableCommodity = itemCat.kind === 'consumable' || itemCat.kind === 'misc';
+            const searchRoomKey = makeRoomKey(
+              player.currentLocationId,
+              currentScene.microMicroId,
+              player.mapX,
+              player.mapY,
+            );
+            // HANDOFF #15c — same gate as digHere: a bespoke drop from
+            // this room doesn't reappear if the player already grabbed it.
+            if (!isStackableCommodity && roomLootAlreadyGrabbed(get().worldMemory, searchRoomKey, outcome.itemName)) {
+              get().appendLog(
+                'world',
+                `Nothing new here — anything worth the bend in your back was already in your pack.`,
+              );
+              break;
+            }
             const newItem: InventoryItem = stampDurability({
               id: `search_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
               name: outcome.itemName,
@@ -1623,6 +1706,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 ? { player: { ...s.player, inventory: mergeOrPushItem(s.player.inventory, newItem) } }
                 : s,
             );
+            if (!isStackableCommodity) {
+              set((s) => recordRoomLootGrabbed(s, searchRoomKey, outcome.itemName));
+            }
             get().appendLog('reward', `✦ ${outcome.itemName} (${outcome.rarity}).`);
           } else if (outcome.kind === 'tc') {
             set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + outcome.amount } } : s));
@@ -1741,6 +1827,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
             runMoveCombatRange(get, set, player, currentScene, 'advance');
             break;
           }
+        }
+        // Hub mode — when the player has a hubRoomId set, route travel
+        // through the hand-authored room graph BEFORE the procedural
+        // world handles cardinal/named-location lookups. This keeps
+        // 'go north' meaning the gate→square step instead of a Macro
+        // tile shift, and 'go armory' a direct room jump.
+        if (player.hubRoomId) {
+          if (isLeaveHubCommand(trimmed)) {
+            set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+            set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.travel), 1) });
+            get().appendLog(
+              'world',
+              `You walk back through the gate and out into the open ground. The outpost falls away behind you.`,
+            );
+            get().beginScene();
+            break;
+          }
+          const visited = new Set(get().worldMemory.hubVisited ?? []);
+          const move = resolveHubTravel(player.hubRoomId, trimmed, visited);
+          if (move) {
+            set((s) => (s.player ? { player: { ...s.player, hubRoomId: move.roomId } } : s));
+            const cost = move.via === 'fast_travel' ? 0.25 : 1;
+            const stam = move.via === 'fast_travel' ? 1 : STAMINA_COSTS.travel;
+            set({ player: advanceTime(spendStamina(get().player!, stam), cost) });
+            const dest = findHubRoom(move.roomId);
+            if (dest) {
+              get().appendLog(
+                'world',
+                move.via === 'fast_travel'
+                  ? `You cut across the outpost to the ${dest.shortName}.`
+                  : `You head ${move.via === 'cardinal' ? 'on' : 'over'} to the ${dest.shortName}.`,
+              );
+            }
+            get().beginScene();
+            break;
+          }
+          // No hub-exit matched — fall through. This lets 'go to drakova'
+          // still resolve via the wider location index, treating the hub
+          // gate as a launch point.
         }
         // Continue / keep going / onward — repeat the player's last cardinal
         // direction without making them retype it. If there's no last
@@ -5065,23 +5190,50 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const found = result.found!;
+    // HANDOFF #15c — if the player already pulled this exact item from
+    // THIS room on a prior visit, the room is "tapped" for it. Skip the
+    // grant and narrate the bare patch instead of handing out duplicates.
+    // Stackable consumables/misc are exempt — those can plausibly be
+    // re-found because they're commodities, not bespoke drops.
+    const dugCat = lookupCraftedItem(found.name);
+    const isStackableCommodity = dugCat.kind === 'consumable' || dugCat.kind === 'misc';
+    const dugRoomKey = makeRoomKey(player.currentLocationId, scene?.microMicroId, player.mapX, player.mapY);
+    if (!isStackableCommodity && roomLootAlreadyGrabbed(get().worldMemory, dugRoomKey, found.name)) {
+      get().appendLog(
+        'world',
+        `You scrape at the silt with ${toolLabel}. The patch is picked clean — you've already taken what was here.`,
+      );
+      if (item) {
+        // Tool still wears a little — you swung it.
+        for (let i = 0; i < Math.max(1, wearAmount - 1); i++) {
+          set((s) => (s.player ? { player: wearEquippedItem(s.player, item.name, get) } : s));
+        }
+      }
+      void get().persist();
+      return;
+    }
     const newItem: InventoryItem = stampDurability({
       id: `dug_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
       name: found.name,
-      kind: lookupCraftedItem(found.name).kind === 'weapon'
+      kind: dugCat.kind === 'weapon'
         ? 'weapon'
-        : lookupCraftedItem(found.name).kind === 'armor'
+        : dugCat.kind === 'armor'
           ? 'armor'
-          : lookupCraftedItem(found.name).kind,
+          : dugCat.kind,
       rarity: found.rarity,
       quantity: 1,
-      tags: lookupCraftedItem(found.name).tags,
+      tags: dugCat.tags,
     });
     set((s) =>
       s.player
         ? { player: { ...s.player, inventory: mergeOrPushItem(s.player.inventory, newItem) } }
         : s,
     );
+    // Record this loot against the room so a re-entry doesn't drop the
+    // same item again (handled above before the grant).
+    if (!isStackableCommodity) {
+      set((s) => recordRoomLootGrabbed(s, dugRoomKey, found.name));
+    }
     get().appendLog(
       'reward',
       `You scrape at the silt with ${toolLabel}. ✦ Recovered ${found.name} (${found.rarity}).`,
@@ -5646,6 +5798,54 @@ function makeRoomKey(
   const x = typeof mapX === 'number' ? mapX : '_';
   const y = typeof mapY === 'number' ? mapY : '_';
   return `${locationId}@${mm}@${x},${y}`;
+}
+
+// HANDOFF #15c — has the player already grabbed this loot in this room?
+// Used by dig and area-search to avoid handing out the same scarce drop
+// on re-entry. Item names are compared lowercased; consumables and
+// commodities are intentionally permitted to re-roll (handled by the
+// caller via a "stackable" flag).
+function roomLootAlreadyGrabbed(
+  worldMemory: { visitedRooms?: Record<string, VisitedRoom> },
+  roomKey: string,
+  itemName: string,
+): boolean {
+  const room = worldMemory.visitedRooms?.[roomKey];
+  if (!room?.lootGrabbed) return false;
+  return room.lootGrabbed.includes(itemName.toLowerCase());
+}
+
+// Record an item the player just picked up from this room. Caller is
+// responsible for first writing the loot to the player's inventory;
+// this just notes the room's memory so a return visit can suppress
+// re-issuing the same drop.
+function recordRoomLootGrabbed(
+  state: { worldMemory: WorldMemory },
+  roomKey: string,
+  itemName: string,
+): { worldMemory: WorldMemory } {
+  const prevRooms = state.worldMemory.visitedRooms ?? {};
+  const prev = prevRooms[roomKey];
+  // If the room hasn't been visited yet (shouldn't happen — both call
+  // sites come from inside an active scene that already wrote a visit
+  // record), seed minimal metadata so the loot list still persists.
+  const base: VisitedRoom = prev ?? {
+    firstVisitAt: Date.now(),
+    lastVisitAt: Date.now(),
+    visitCount: 1,
+    enemiesCleared: [],
+  };
+  const grabbed = new Set((base.lootGrabbed ?? []).map((n) => n.toLowerCase()));
+  grabbed.add(itemName.toLowerCase());
+  return {
+    worldMemory: {
+      ...state.worldMemory,
+      visitedRooms: {
+        ...prevRooms,
+        [roomKey]: { ...base, lootGrabbed: Array.from(grabbed) },
+      },
+    },
+  };
 }
 
 function playerBuildScore(player: PlayerCharacter): number {

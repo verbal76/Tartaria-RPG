@@ -355,6 +355,11 @@ export interface PlayerCharacter {
     factionId?: string | null;
     recruitedAt: number;  // hoursElapsed snapshot
   } | null;
+  /** HANDOFF #15b — current hub room id when the player is at the
+   *  hand-authored hub location. Null/undefined when wandering the
+   *  procedural world. Set on first hub entry (defaults to entry
+   *  room), cleared on "leave outpost". */
+  hubRoomId?: string | null;
   /** Currently-equipped weapon and armor (by catalog name). */
   equipped?: PlayerEquipped;
   /** Active combat status effects; tick down each player action. */
@@ -412,6 +417,17 @@ export interface RollStep {
   values?: number[];
   total?: number;
   success?: boolean;
+  /** HANDOFF #14b — when set, the dice prompt rolls 2 dice on this
+   *  step instead of `count` and keeps the higher ('advantage') or
+   *  lower ('disadvantage') one. Used for player attack rolls when
+   *  the player is aiming (advantage) or surprised (disadvantage).
+   *  Mirrors the defense-side handling in applyEnemyCounter. The
+   *  bonus / target arithmetic still applies to the kept die. */
+  rollMode?: 'advantage' | 'disadvantage';
+  /** Optional source-of-truth label so the dice card can name WHY
+   *  the player has advantage/disadvantage on this swing. Surfaces
+   *  next to the kept die in the post-roll readout. */
+  rollModeLabel?: string;
 }
 
 export interface PendingRollState {
@@ -466,6 +482,12 @@ export interface WorldMemory {
    *  re-entry doesn't re-roll a fresh scene. Optional + defaulted so
    *  legacy saves load cleanly. */
   visitedRooms?: Record<string, VisitedRoom>;
+  /** HANDOFF #15b — hub rooms the player has visited at least once.
+   *  Used by hub fast-travel to gate "jump to the workshop" against
+   *  rooms the player actually knows. Stored separately from
+   *  visitedRooms because hub rooms have stable string ids, not the
+   *  composite map key. */
+  hubVisited?: string[];
 }
 
 export interface VisitedRoom {
@@ -479,6 +501,12 @@ export interface VisitedRoom {
    *  visits. The next scene roll can use this to suppress respawns
    *  feel rather than re-spawning fresh waves. */
   enemiesCleared?: string[];
+  /** HANDOFF #15c — keys identifying loot the player has already
+   *  collected from this room. Used to suppress re-grants of the same
+   *  rare drop on re-entry (the dagger you dug up shouldn't keep being
+   *  diggable). Each key is the lowercased item name; cheap to compare
+   *  without changing the catalog. */
+  lootGrabbed?: string[];
 }
 
 export type ScreenName =

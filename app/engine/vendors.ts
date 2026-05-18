@@ -41,3 +41,21 @@ export function pickRandomVendor(): VendorInstance {
     offers: v.offers.map((o) => ({ ...o })),
   };
 }
+
+// Look up a vendor by display name. Used by the hub system to spawn
+// the anchored NPC for a given hub room (Halem the Trader at the gate,
+// Irma Ironhand at the armory, etc.). Returns a fresh VendorInstance
+// or null if no template matches.
+export function findVendorByName(name: string): VendorInstance | null {
+  const lowered = name.toLowerCase();
+  const v = VENDORS.find((vt) => vt.name.toLowerCase() === lowered);
+  if (!v) return null;
+  return {
+    id: v.id,
+    name: v.name,
+    title: v.title,
+    faction: v.faction,
+    description: v.description,
+    offers: v.offers.map((o) => ({ ...o })),
+  };
+}
