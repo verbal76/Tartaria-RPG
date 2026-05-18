@@ -469,12 +469,7 @@ export function AboutScreen() {
             <View style={{ flex: 1 }} />
             <TouchableOpacity
               onPress={toggleSTT}
-              disabled={!sttAvailable}
-              style={[
-                styles.musicToggle,
-                voice.sttEnabled && styles.musicToggleOn,
-                !sttAvailable && { opacity: 0.5 },
-              ]}
+              style={[styles.musicToggle, voice.sttEnabled && styles.musicToggleOn]}
               activeOpacity={0.7}
             >
               <Text style={[styles.musicToggleText, voice.sttEnabled && styles.musicToggleTextOn]}>
@@ -493,7 +488,10 @@ export function AboutScreen() {
           )}
           {!sttAvailable && (
             <Text style={styles.voiceNote}>
-              Speech recognition not available on this device. STT will be disabled.
+              Speech recognition reports as unavailable on this device — many Android devices
+              gate availability on the first mic request. Toggle on and tap the 🎙 button in
+              the input box; the OS will prompt for microphone permission. Grant it and
+              speech recognition should start working.
             </Text>
           )}
 
