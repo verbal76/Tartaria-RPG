@@ -102,7 +102,20 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     body:
       'SAVE & EXIT writes the slot and returns you to the title screen. ' +
       'FULL LOG shows the entire history of this character\'s play session. ' +
-      'The ⚙ gear on the right opens settings (music, OTA update, diagnostics).',
+      'The ⚙ gear on the right opens Settings (music, voice, diagnostics).',
+  },
+  {
+    screen: 'exploration',
+    area: 'bottom-menu',
+    title: 'Optional: voice mode',
+    body:
+      'Tartaria can read the world aloud and listen for your responses. Open Settings (the ⚙ gear) ' +
+      '→ VOICE tab. Flip Read aloud (TTS) ON and the Arbiter speaks. Flip Speak input (STT) ON ' +
+      'and a 🎙 mic button appears next to Act — tap it, say your action, and the game routes ' +
+      'your speech through the same parser as typing. While the Arbiter is speaking the mic ' +
+      'becomes a 🛑 SILENCE button — tap it to cut narration short and start listening. ' +
+      'Both default OFF; the game plays in text mode unless you opt in. For higher voice quality ' +
+      'try Engine: BUNDLED (downloads ~100 MB of neural voice once, then runs fully offline).',
   },
   {
     screen: 'inventory',

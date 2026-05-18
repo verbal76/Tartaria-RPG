@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, Modal, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, Modal, ActivityIndicator, PermissionsAndroid } from 'react-native';
 import Constants from 'expo-constants';
 import * as Clipboard from 'expo-clipboard';
 import * as Updates from 'expo-updates';
@@ -110,7 +110,39 @@ export function AboutScreen() {
     if (!next) stopTTS();
     void setVoiceSettings({ ttsEnabled: next });
   };
-  const toggleSTT = () => { void setVoiceSettings({ sttEnabled: !voice.sttEnabled }); };
+  const toggleSTT = async () => {
+    const next = !voice.sttEnabled;
+    if (next && Platform.OS === 'android') {
+      // Request RECORD_AUDIO up-front when the player enables STT —
+      // surfaces the Android permission prompt right at the moment of
+      // intent rather than waiting until they tap the mic button mid-
+      // game. If they deny, leave the toggle OFF + show a one-time
+      // hint via the voice note below.
+      try {
+        const perm = PermissionsAndroid.PERMISSIONS.RECORD_AUDIO;
+        if (!perm) return;
+        const granted = await PermissionsAndroid.request(
+          perm,
+          {
+            title: 'Microphone access',
+            message:
+              'Tartaria Realms needs the microphone so you can speak commands to the Arbiter. ' +
+              'You can disable speech input any time from Settings → Voice.',
+            buttonPositive: 'Allow',
+            buttonNegative: 'Deny',
+          },
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          // Permission denied — leave the toggle OFF.
+          return;
+        }
+      } catch {
+        // Best-effort; if the prompt errors we still toggle so the
+        // user can try via the mic button anyway.
+      }
+    }
+    void setVoiceSettings({ sttEnabled: next });
+  };
   const setRate = (v: number) => { void setVoiceSettings({ rate: 0.5 + v * 1.0 }); };
   const setPitch = (v: number) => { void setVoiceSettings({ pitch: 0.5 + v * 1.5 }); };
   const toggleAutoSubmit = () => { void setVoiceSettings({ autoSubmit: !voice.autoSubmit }); };
