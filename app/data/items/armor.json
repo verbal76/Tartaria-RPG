@@ -7937,6 +7937,24 @@
         "unknowing_masses"
       ],
       "description": "Gauntlets of the Lost King. Legendary hands armor from the Unknowing Masses tradition."
+    },
+    {
+      "name": "Aetheric Vest",
+      "slot": "chest",
+      "raceAffinity": "Aetherborn",
+      "acBonus": 3,
+      "resistances": ["aetheric"],
+      "statBonus": { "stat": "intelligence", "amount": 1 },
+      "statBonuses": [
+        { "stat": "intelligence", "amount": 1 }
+      ],
+      "rarity": "Rare",
+      "dexReq": 2,
+      "tcBuy": 180,
+      "tcSell": 72,
+      "baseDurability": 30,
+      "tags": ["armor", "chest", "cloth", "aether", "rare"],
+      "description": "Aetheric Vest. Aether-thread cloth bound to a shard lattice — turns aside blade and stray Aetheric current alike."
     }
   ]
 }

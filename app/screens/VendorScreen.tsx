@@ -205,7 +205,8 @@ export function VendorScreen() {
             )}
             {sellable.length === 0 ? (
               <Text style={styles.empty}>
-                Nothing in your pack worth selling. Unequip the gear you want to move first.
+                Nothing in your pack worth selling. Equipped gear can't be sold — unequip from the
+                Inventory tab first, then come back to trade.
               </Text>
             ) : (
               sellable.map(({ item, price }) => {

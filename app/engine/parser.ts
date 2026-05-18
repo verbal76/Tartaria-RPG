@@ -181,7 +181,12 @@ const QUESTION_WORDS = new Set(['where', 'when', 'what', 'who', 'why', 'how', 'w
 const JUNK_NOUNS = new Set([
   'else', 'anything', 'something', 'everything', 'nothing',
   'stuff', 'things', 'thing', 'one', 'some', 'all',
-  'here', 'there', 'around', 'near', 'nearby', 'else',
+  'here', 'there', 'around', 'near', 'nearby',
+  // Indefinite / vague placeholders the player sometimes types but
+  // never wants the parser to resolve to a target. ("Is there another
+  // way out" → 'another' / 'way' shouldn't become the search target.)
+  'other', 'another', 'anyone', 'someone', 'anybody', 'somebody',
+  'way', 'place', 'side',
 ]);
 
 function extractTargetTokens(tokens: string[], verbIdx: number): string[] {

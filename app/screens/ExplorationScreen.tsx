@@ -112,8 +112,8 @@ export function ExplorationScreen() {
       </View>
 
       <TutorialTarget area="scene-bar" style={styles.sceneBar}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.sceneText} numberOfLines={1}>
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text style={styles.sceneText} numberOfLines={1} ellipsizeMode="tail">
             {currentScene
               ? `${currentScene.location.name}  /  ${currentScene.weather.name}${currentScene.hazard ? `  /  ${currentScene.hazard.name}` : ''}`
               : 'No scene'}

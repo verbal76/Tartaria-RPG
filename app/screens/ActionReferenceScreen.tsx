@@ -206,6 +206,21 @@ const SHORT: Record<string, string> = {
   social_interactions: 'Talk, persuade, intimidate, lie. CHA-based.',
   preparation_and_planning: 'Rest, plan, gather kit before a push.',
   psychological_actions: 'Steady yourself against fear / shock. WIS check.',
+
+  // Modifiers — short rules-of-thumb so the reference page reads at a glance.
+  mod_impaling_strike: 'Roll max damage on a critical hit with a piercing weapon.',
+  mod_attacker_range: 'Out of weapon range = -5 to hit (blind swing) plus auto-advance.',
+  mod_surprise_attack: 'First hit of the encounter from hiding: +2 attack, target rolls disadvantage.',
+  mod_player_size: 'Smaller targets are harder to hit (+2 AC for Small / -2 for Large).',
+  mod_sprinting: 'Attacks the round you sprint take a -2 penalty die.',
+  mod_fast_moving_target: 'Ranged shots vs a sprinting / fleeing target: -2 to hit.',
+  mod_target_dive: 'Target dove for cover this round: ranged attacks against them disadvantage.',
+  mod_in_cover: 'Partial cover +4 AC vs ranged; full cover blocks ranged entirely.',
+  mod_weapon_malfunction: 'Roll a natural 1 on a firearm: jam. Spend an action to clear.',
+  mod_player_armour: 'Armor adds AC + damage resistance by type (see armor description).',
+  mod_fire_into_melee: 'Shooting into a melee crowd: -2 + 25% chance to hit an ally.',
+  mod_overwhelmed: 'Two+ enemies adjacent: -2 to defensive rolls.',
+  mod_action_fumble: 'Natural 1 on an action roll: something goes wrong (dropped weapon, slip, etc.).',
 };
 
 function explanationFor(c: Concept): string {

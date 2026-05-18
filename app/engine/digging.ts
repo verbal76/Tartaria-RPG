@@ -34,6 +34,13 @@ const ITEM_DIG_SCORE: Record<string, number> = {
   'Bone Shiv': 4,
   "Reclaimer's Trowel": 5,
   'Order Letter-Opener': 3,
+  // Improvised emergency weapons — sticks and rocks dig poorly; iron
+  // and shard heads pry decently because they have an edge to scrape with.
+  'Club': 1,            // dry wood; bare-hands tier
+  'Cudgel': 2,          // rock-headed, can pry
+  'Stone Spear': 3,     // chipped rock point digs like a knife
+  'Iron Spear': 4,      // proper iron edge, scrapes well
+  'Aether-Shard Spear': 4,
   // Cooking / camp:
   'Trail Rations': 0,
   'First Aid Kit': 0,

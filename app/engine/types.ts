@@ -250,6 +250,9 @@ export interface PlayerMilestones {
   enemiesDefeated: number;
   travelsCompleted: number;
   checksSucceeded: number;
+  /** Number of accepted quests / hunts / mysteries / storylines / faction
+   *  quests. Used to fire a one-time "first contract" Arbiter callback. */
+  questsAccepted?: number;
 }
 
 export type EquipSlot =

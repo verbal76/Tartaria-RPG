@@ -4477,6 +4477,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
+    bumpQuestsAccepted(get, set);
     get().appendLog(
       'reward',
       `New faction contract — ${quest.title}. ${quest.objective} (${scene.vendor.faction.replace(/_/g, ' ')})`,
@@ -4634,6 +4635,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
+    bumpQuestsAccepted(get, set);
     // Play the first stage immediately so the player has narrative momentum.
     const stage0 = hunt.stages[0];
     if (stage0) {
@@ -4846,6 +4848,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
+    bumpQuestsAccepted(get, set);
     const stage0 = m.stages[0];
     if (stage0) {
       get().appendLog('reward', `✦ Mystery accepted — ${m.title}. ${m.posterText}`);
@@ -5036,6 +5039,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : st,
     );
+    bumpQuestsAccepted(get, set);
     const stage0 = s.stages[0];
     if (stage0) {
       get().appendLog('reward', `✦ Storyline accepted — ${s.title}. ${s.posterText}`);
@@ -5963,6 +5967,38 @@ function enemyCanReach(enemy: Enemy, range: CombatRange): boolean {
 /** HANDOFF #15 — deterministic room key for MapGraph lookups. Two
  *  visits to the same room (same macro location + same micro-micro id
  *  + same X/Y on the procedural map) collapse to the same key. */
+
+// Bump milestones.questsAccepted by one and surface a one-time Arbiter
+// callback when the player accepts their first contract of any kind
+// (faction quest / hunt / mystery / storyline). Audit fix #17.
+function bumpQuestsAccepted(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const player = get().player;
+  if (!player) return;
+  const prev = player.milestones?.questsAccepted ?? 0;
+  set((s) =>
+    s.player
+      ? {
+          player: {
+            ...s.player,
+            milestones: {
+              ...(s.player.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 }),
+              questsAccepted: prev + 1,
+            },
+          },
+        }
+      : s,
+  );
+  if (prev === 0) {
+    get().appendLog(
+      'arbiter',
+      `The Arbiter watches you take the contract. "First one. The work begins now — not when you finish it, not when you cash it in. Now."`,
+    );
+  }
+}
+
 function makeRoomKey(
   locationId: string,
   microMicroId: string | null | undefined,
