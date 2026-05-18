@@ -554,18 +554,27 @@ export function AboutScreen() {
                 </View>
                 <Text style={styles.musicValue}>{voice.pitch.toFixed(2)}</Text>
               </View>
-              <View style={styles.musicRow}>
-                <Text style={styles.musicLabel}>Voice</Text>
-                <TouchableOpacity onPress={() => cycleVoice(-1)} style={styles.voiceCycleBtn}>
-                  <Text style={styles.voiceCycleText}>◀</Text>
-                </TouchableOpacity>
-                <View style={{ flex: 1, paddingHorizontal: 6 }}>
-                  <Text style={styles.voicePickerLabel} numberOfLines={1}>{currentVoiceLabel}</Text>
+              {/* System-engine voice picker — only relevant when the
+                  player is on the SYSTEM engine. When BUNDLED is
+                  selected, the Kokoro voice picker above is the
+                  active one; this row would just show "No voices
+                  installed" because the system voice cache is empty
+                  on devices where the bundled engine is the user's
+                  choice. */}
+              {voice.engine === 'system' && (
+                <View style={styles.musicRow}>
+                  <Text style={styles.musicLabel}>Voice</Text>
+                  <TouchableOpacity onPress={() => cycleVoice(-1)} style={styles.voiceCycleBtn}>
+                    <Text style={styles.voiceCycleText}>◀</Text>
+                  </TouchableOpacity>
+                  <View style={{ flex: 1, paddingHorizontal: 6 }}>
+                    <Text style={styles.voicePickerLabel} numberOfLines={1}>{currentVoiceLabel}</Text>
+                  </View>
+                  <TouchableOpacity onPress={() => cycleVoice(1)} style={styles.voiceCycleBtn}>
+                    <Text style={styles.voiceCycleText}>▶</Text>
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={() => cycleVoice(1)} style={styles.voiceCycleBtn}>
-                  <Text style={styles.voiceCycleText}>▶</Text>
-                </TouchableOpacity>
-              </View>
+              )}
             </>
           )}
 
