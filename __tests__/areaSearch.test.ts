@@ -1,4 +1,4 @@
-import { isAreaSearch, rollAreaSearch } from '../app/engine/areaSearch';
+import { isAreaSearch, isGroundSearch, rollAreaSearch } from '../app/engine/areaSearch';
 
 describe('areaSearch', () => {
   it('recognises spatial / surface / direction terms', () => {
@@ -46,5 +46,33 @@ describe('areaSearch', () => {
     expect(counts.material).toBeGreaterThan(0);
     expect(counts.tc).toBeGreaterThan(0);
     expect(counts.hook).toBeGreaterThan(0);
+  });
+
+  // Audit follow-up: isGroundSearch fires BEFORE isAreaSearch in the
+  // gameStore's investigate handler, so overlapping inputs ("search
+  // the rubble on the floor") need to resolve to ground-search even
+  // when they contain non-ground area tokens. Both sets share ground
+  // tokens (mud, silt, etc.), so we lock the precedence with tests.
+  describe('isGroundSearch precedence over generic area search', () => {
+    it('recognises every ground-type token as ground AND area', () => {
+      for (const t of ['mud', 'silt', 'ground', 'floor', 'rubble', 'patch', 'spot']) {
+        expect(isGroundSearch(`the ${t}`)).toBe(true);
+        expect(isAreaSearch(`the ${t}`)).toBe(true);
+      }
+    });
+
+    it('non-ground area tokens stay area-only', () => {
+      for (const t of ['doorway', 'wagon', 'shelf', 'crate', 'wall']) {
+        expect(isGroundSearch(`the ${t}`)).toBe(false);
+        expect(isAreaSearch(`the ${t}`)).toBe(true);
+      }
+    });
+
+    it('mixed input matches ground (the gameStore checks ground first)', () => {
+      // "search the rubble on the floor" contains both ground tokens —
+      // both fire true; ordering in the caller decides which path wins.
+      expect(isGroundSearch('the rubble on the floor')).toBe(true);
+      expect(isAreaSearch('the rubble on the floor')).toBe(true);
+    });
   });
 });
