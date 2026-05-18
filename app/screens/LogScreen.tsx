@@ -23,7 +23,7 @@ export function LogScreen() {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => setScreen('title')}
+          onPress={() => setScreen('exploration')}
           style={styles.backBtn}
           hitSlop={8}
           activeOpacity={0.7}

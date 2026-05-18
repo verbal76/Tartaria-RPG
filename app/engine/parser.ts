@@ -18,7 +18,7 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'ask', 'greet', 'address', 'hail', 'call', 'beseech', 'entreat',
   ],
   escape: [
-    'run', 'flee', 'retreat', 'escape', 'withdraw', 'bolt', 'dash', 'sprint', 'scram',
+    'run', 'flee', 'retreat', 'escape', 'withdraw', 'bolt', 'scram',
     'abscond', 'fall back',
   ],
   investigate: [
@@ -39,22 +39,22 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'follow', 'march', 'trek', 'cross', 'proceed', 'depart',
   ],
   use_relic: [
-    'use', 'activate', 'invoke', 'apply', 'wield', 'shine', 'light', 'channel through',
+    'use', 'activate', 'invoke', 'apply', 'shine', 'light', 'channel through',
     'trigger', 'employ',
   ],
   cast: [
-    'cast', 'channel', 'mold', 'shape', 'unleash', 'weave', 'incant', 'summon', 'evoke',
+    'cast', 'channel', 'mold', 'shape', 'unleash', 'incant', 'summon', 'evoke',
     'conjure',
   ],
   wait: ['wait', 'stay', 'hold', 'pause', 'still', 'linger', 'tarry', 'idle', 'bide', 'remain'],
   ask: ['what', 'explain', 'define', 'who', 'how', 'why', 'tell', 'describe', 'clarify', 'mean'],
   craft: ['craft', 'make', 'forge', 'fashion', 'build', 'assemble', 'construct', 'fabricate', 'weld', 'sculpt'],
   equip: ['equip', 'wear', 'wield', 'don', 'unequip', 'remove', 'sheathe', 'strap', 'fit', 'fasten'],
-  gift: ['gift', 'give', 'offer', 'present', 'hand', 'bestow', 'donate', 'tender', 'grant', 'pass'],
+  gift: ['gift', 'give', 'offer', 'hand', 'bestow', 'donate', 'tender', 'grant', 'pass'],
   steal: ['steal', 'pocket', 'pilfer', 'lift', 'pinch', 'swipe', 'snatch', 'filch', 'nick', 'grab'],
-  join: ['join', 'enlist', 'pledge', 'swear', 'sign', 'ally', 'bond', 'commit', 'enroll', 'side'],
-  dodge: ['dodge', 'evade', 'sidestep', 'duck', 'weave', 'juke', 'tumble', 'slip', 'twist', 'roll'],
-  block: ['block', 'parry', 'deflect', 'shield', 'brace', 'guard', 'fend', 'absorb', 'cover', 'ward'],
+  join: ['join', 'pledge', 'swear', 'sign', 'ally', 'bond', 'commit', 'enroll', 'side'],
+  dodge: ['dodge', 'evade', 'sidestep', 'duck', 'juke', 'tumble', 'slip', 'twist', 'roll'],
+  block: ['block', 'parry', 'deflect', 'shield', 'brace', 'guard', 'fend', 'absorb', 'ward'],
   advance: [
     'advance', 'approach', 'rush', 'sprint', 'closein', 'press', 'lunge', 'forward',
     'charge in', 'near',
@@ -72,7 +72,7 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   climb: ['climb', 'scale', 'ascend', 'clamber', 'shimmy', 'scramble', 'vault up', 'hoist', 'ladder', 'rope up'],
   swim: ['swim', 'wade', 'paddle', 'splash', 'dive', 'ford', 'submerge', 'surface', 'tread', 'drift'],
   jump: ['jump', 'leap', 'hop', 'vault', 'bound', 'spring', 'hurdle', 'pounce', 'skip', 'launch over'],
-  dash: ['dash forward', 'sprintto', 'doubletime', 'gogo', 'sprint forward', 'hustle', 'bolt forward', 'race', 'dart', 'scamper'],
+  dash: ['dash', 'dash forward', 'sprintto', 'doubletime', 'gogo', 'sprint forward', 'hustle', 'bolt forward', 'race', 'dart', 'scamper'],
   disengage: ['disengage', 'peel off', 'break off', 'slip away', 'pull away', 'extract', 'fade back', 'detach', 'unstick', 'shake off'],
   help: ['help', 'assist', 'aid', 'support', 'back up', 'cover', 'bolster', 'defend', 'reinforce', 'abet'],
   ready: ['ready', 'prepare', 'set up', 'focus', 'watch', 'await', 'prep', 'steady', 'anticipate', 'cock'],
@@ -87,7 +87,7 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   quick_fire: ['quickfire', 'snap shot', 'snap fire', 'fast fire', 'rush shot', 'panic shot', 'quick shot', 'quick draw', 'fast draw', 'first shot'],
   multi_fire: ['burst fire', 'double tap', 'triple tap', 'multi shot', 'multiple shots', 'spray', 'fire twice', 'fire three', 'rapid fire', 'volley'],
   fight_back: ['fight back', 'counter', 'counter strike', 'opposed strike', 'meet the blade', 'trade blows', 'parry and strike', 'return fire', 'riposte', 'hit back'],
-  recruit: ['recruit', 'hire', 'enlist', 'follow me', 'come with', 'join me', 'bring along', 'travel together', 'companion', 'walk with me'],
+  recruit: ['recruit', 'hire', 'follow me', 'come with', 'join me', 'bring along', 'travel together', 'companion', 'walk with me'],
 };
 
 const ALL_INTENTS = Object.keys(VERB_SYNONYMS) as Exclude<Intent, 'unknown'>[];

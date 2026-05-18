@@ -5252,6 +5252,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog(
         'arbiter',
         `The Arbiter taps their boot. "You've already turned this patch. Move on — try a few paces north, east, south, or west."`,
+        { skipDedup: true },
       );
       return;
     }
@@ -5264,6 +5265,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog(
         'arbiter',
         `The Arbiter shakes their head. "You cannot dig — you have no tool that can. Find a knife, a trowel, or even a sharp scrap to scrape with."`,
+        { skipDedup: true },
       );
       return;
     }
@@ -5326,20 +5328,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
       quantity: 1,
       tags: dugCat.tags,
     });
+    // Use grantItem so we can surface per-name caps (Big Rock = 1,
+    // Small Rock = 10, etc.) — silent drops feel like the game is
+    // eating loot.
+    const grantResult = grantItem(player.inventory, newItem);
     set((s) =>
       s.player
-        ? { player: { ...s.player, inventory: mergeOrPushItem(s.player.inventory, newItem) } }
+        ? { player: { ...s.player, inventory: grantResult.inventory } }
         : s,
     );
     // Record this loot against the room so a re-entry doesn't drop the
-    // same item again (handled above before the grant).
-    if (!isStackableCommodity) {
+    // same item again (handled above before the grant). Only record
+    // when at least one unit actually landed.
+    if (!isStackableCommodity && grantResult.accepted > 0) {
       set((s) => recordRoomLootGrabbed(s, dugRoomKey, found.name));
     }
-    get().appendLog(
-      'reward',
-      `You scrape at the silt with ${toolLabel}. ✦ Recovered ${found.name} (${found.rarity}).`,
-    );
+    if (grantResult.accepted > 0) {
+      get().appendLog(
+        'reward',
+        `You scrape at the silt with ${toolLabel}. ✦ Recovered ${found.name} (${found.rarity}).`,
+      );
+    } else {
+      // Cap hit before any unit landed — already at the maximum.
+      get().appendLog(
+        'world',
+        `You scrape at the silt with ${toolLabel}. You turn up another ${found.name}, but your pack already holds as many as it can carry. You leave it in the silt.`,
+      );
+    }
+    if (grantResult.dropped > 0 && grantResult.accepted > 0) {
+      // Partial accept — some landed, some clamped.
+      get().appendLog(
+        'world',
+        `Your pack is full of ${found.name.toLowerCase()}${grantResult.dropped > 1 ? 's' : ''}; ${grantResult.dropped} left behind.`,
+      );
+    }
     // Successful dig wears the tool — brittle tools lose more.
     if (item) {
       for (let i = 0; i < wearAmount; i++) {

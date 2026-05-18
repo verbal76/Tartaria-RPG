@@ -23,6 +23,21 @@ export function buildOpening(): string {
   return pick(openingsList);
 }
 
+// Coverage helpers — exported so callers (and regression tests) can
+// confirm a race / faction id resolves to an authored Arbiter line.
+// Returns null when the id has no pool entries.
+export function pickArbiterRaceRemark(raceId: string): string | null {
+  const pool = ARBITER_RACE_REMARKS[raceId];
+  if (!pool || pool.length === 0) return null;
+  return pick(pool);
+}
+
+export function pickArbiterFactionRemark(factionId: string): string | null {
+  const pool = ARBITER_FACTION_REMARKS[factionId];
+  if (!pool || pool.length === 0) return null;
+  return pick(pool);
+}
+
 /**
  * Three-paragraph opening narrative for the first scene of a brand-new
  * character. Each paragraph is emitted as its own log entry so the
@@ -758,6 +773,12 @@ const ARBITER_RACE_REMARKS: Record<string, string[]> = {
     `"Your kind learns fast or dies fast," the Arbiter says. "Few stop in the middle."`,
     `"Beginner's luck has a half-life," the Arbiter warns. "Use the early grace well."`,
   ],
+  aetherborn: [
+    `"Aetherborn," the Arbiter says, slowly. "Your bloodline survived the Flood because Aetherstone chose it. Do not waste the favour."`,
+    `"The Aether reads your pulse like a page," the Arbiter notes. "Whatever you intend, it will know first."`,
+    `"Few Aetherborn walk far from their houses," the Arbiter says. "Fewer still come back the same as they left."`,
+    `"Your kind opens locks no other race can hear," the Arbiter says. "Some of those doors were locked for a reason."`,
+  ],
 };
 
 // Faction-specific remarks. Reference the faction the player aligned with
@@ -791,6 +812,30 @@ const ARBITER_FACTION_REMARKS: Record<string, string[]> = {
     `"Aetherborn blood," the Arbiter says, gaze steady. "I have known some of your kind. Few of them well."`,
     `"The Dynasty would have the Aether for themselves," the Arbiter says. "You may want it for less."`,
     `"Your house's patience is older than most empires," the Arbiter notes. "Try not to confuse patience with permission."`,
+  ],
+  conspiracy_architects: [
+    `"An Architect's eye," the Arbiter says. "You don't look at the world. You look at what's holding it up."`,
+    `"The Conspiracy plays a long game," the Arbiter says. "Most of its players never see the end."`,
+    `"You serve a faction that prefers the levers stayed hidden," the Arbiter says. "You will be asked to break a few in the open. Be ready."`,
+    `"Architects whisper to Architects," the Arbiter says. "Choose what you say in front of whom."`,
+  ],
+  servants_of_giants: [
+    `"You serve the Giants," the Arbiter says. "An older oath than most of what walks this country."`,
+    `"The Servants keep the old roads open even when the Giants forget them," the Arbiter says. "That is no small work."`,
+    `"Loyalty older than language has its own weight," the Arbiter notes. "Wear it without sinking."`,
+    `"Some of the Giants still answer," the Arbiter says. "If you ask correctly. If you have anything to say worth their hearing."`,
+  ],
+  stone_builders: [
+    `"A Stone Builder," the Arbiter says. "You raise things again that the Flood would not let stand."`,
+    `"The Builders count in centuries," the Arbiter says. "Try to feel the shape of that pace."`,
+    `"Foundations remember who laid them," the Arbiter notes. "Be the kind of builder that's worth remembering."`,
+    `"The Stone Builders work where most have given up the ground," the Arbiter says. "It shows in their hands. And eventually in yours."`,
+  ],
+  tartarian_revivalists: [
+    `"A Revivalist," the Arbiter says. "You believe Tartaria can come back. The country itself has not yet voted."`,
+    `"The Revivalists are loud," the Arbiter notes. "Loud is sometimes brave and sometimes loud. Time will sort it."`,
+    `"Restoring an empire is the kind of work that becomes the work of generations," the Arbiter says. "Do not expect to finish."`,
+    `"Some Revivalists forget that what they revive will not be quite the same," the Arbiter warns. "Watch for that, in others. And in yourself."`,
   ],
 };
 

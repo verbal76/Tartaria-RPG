@@ -41,8 +41,11 @@ export function parseWeaponEffect(effect: string | undefined | null): ParsedWeap
   const out: ParsedWeaponEffect = {};
   let touched = false;
 
-  // "+NdN against X" — extract the dice and the condition.
-  const dmgMatch = text.match(/\+\s*(\d+d\d+)\s+(?:damage\s+)?(?:against|to|vs\.?|versus)\s+([^.;,]+)/);
+  // "+NdN [type] [damage] against X" — extract dice and condition.
+  // The optional middle group allows a damage-type adjective between the
+  // dice and "damage" / "against": "+1d4 aetheric damage against …",
+  // "+2d6 burn against …", "+1d6 to large creatures".
+  const dmgMatch = text.match(/\+\s*(\d+d\d+)(?:\s+\w+)?\s+(?:damage\s+)?(?:against|to|vs\.?|versus)\s+([^.;,]+)/);
   if (dmgMatch) {
     out.bonusDamageDice = dmgMatch[1];
     const tgt = dmgMatch[2]!.trim();

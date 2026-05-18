@@ -42,6 +42,25 @@ describe('parseWeaponEffect — recognizes catalog-effect patterns', () => {
     expect(p?.onHitBleed).toBe(true);
   });
 
+  // Regression: the original regex required either an immediate "against"
+  // or the literal "damage" word right after the dice. Aether-Shard
+  // Spear's catalog effect inserts a damage-type noun in between
+  // ("aetheric damage against …") and the regex was silently failing,
+  // so the bonus die never rolled. Widened regex now tolerates an
+  // optional middle word.
+  it('parses "+1d4 aetheric damage against aetheric or magical targets"', () => {
+    const p = parseWeaponEffect('+1d4 aetheric damage against aetheric or magical targets.');
+    expect(p?.bonusDamageDice).toBe('1d4');
+    // Effect lists two conditions; either is a valid match.
+    expect(['aetheric', 'magical']).toContain(p?.bonusCondition);
+  });
+
+  it('parses "+2d6 burn against constructs"', () => {
+    const p = parseWeaponEffect('+2d6 burn damage against constructs');
+    expect(p?.bonusDamageDice).toBe('2d6');
+    expect(p?.bonusCondition).toBe('construct');
+  });
+
   it('returns null for plain flavor text', () => {
     expect(parseWeaponEffect('Heavy bone maul with a large crack in it')).toBeNull();
     expect(parseWeaponEffect('')).toBeNull();
