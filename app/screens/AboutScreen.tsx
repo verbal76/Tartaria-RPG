@@ -44,6 +44,8 @@ export function AboutScreen() {
   const player = useGameStore((s) => s.player);
 
   const [copied, setCopied] = useState(false);
+  const [voiceCopied, setVoiceCopied] = useState(false);
+  const [tab, setTab] = useState<'music' | 'voice' | 'about'>('music');
   const [updateStatus, setUpdateStatus] = useState<string>('Idle');
   const [updateBusy, setUpdateBusy] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
@@ -310,6 +312,21 @@ export function AboutScreen() {
       `Session`,
       `  Player: ${player?.name ?? 'none'}`,
       `  Log entries in memory: ${gameLogLength}`,
+    ];
+    return lines.join('\n');
+  }, [cognitiveStatus, cognitiveFraction, cognitiveError, cognitiveLastResponse, cognitiveModelInfo, qwenStatus, qwenFraction, qwenError, qwenModelId, player, gameLogLength, updateStatus, updateError]);
+
+  // Voice tab COPY ALL — same identifier header as About so we can
+  // tell which device / build the report came from regardless of
+  // which tab the player copied from.
+  const voiceInfo = useMemo(() => {
+    const apkBuildNumber = Application.nativeBuildVersion ?? '(unknown)';
+    const apkAppVersion = Application.nativeApplicationVersion ?? Constants.expoConfig?.version ?? '0.0.0';
+    const lines = [
+      `Tartaria Realms`,
+      `App version: ${apkAppVersion}`,
+      `APK build: ${apkBuildNumber}`,
+      `OTA build ID: ${OTA_BUILD_ID}`,
       ``,
       `Voice`,
       `  TTS enabled: ${voice.ttsEnabled ? 'yes' : 'no'}`,
@@ -331,12 +348,17 @@ export function AboutScreen() {
       }`,
     ];
     return lines.join('\n');
-  }, [cognitiveStatus, cognitiveFraction, cognitiveError, cognitiveLastResponse, cognitiveModelInfo, qwenStatus, qwenFraction, qwenError, qwenModelId, player, gameLogLength, updateStatus, updateError, voice, ttsAvailable, sttAvailable, voicesList, kokoroState]);
+  }, [voice, ttsAvailable, sttAvailable, voicesList, kokoroState]);
 
   async function handleCopy() {
     await Clipboard.setStringAsync(info);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
+  }
+  async function handleVoiceCopy() {
+    await Clipboard.setStringAsync(voiceInfo);
+    setVoiceCopied(true);
+    setTimeout(() => setVoiceCopied(false), 1500);
   }
 
   return (
@@ -350,11 +372,30 @@ export function AboutScreen() {
         >
           <Text style={styles.back}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>ABOUT</Text>
+        <Text style={styles.title}>SETTINGS</Text>
         <View style={{ width: 80 }} />
       </View>
 
+      {/* Tab row — three sections in one screen so the player has
+          one stable settings entry point. Music first (most tweaked),
+          then Voice, then the technical About / diagnostic block. */}
+      <View style={styles.tabRow}>
+        {(['music', 'voice', 'about'] as const).map((id) => (
+          <TouchableOpacity
+            key={id}
+            onPress={() => setTab(id)}
+            style={[styles.tabBtn, tab === id && styles.tabBtnActive]}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.tabBtnText, tab === id && styles.tabBtnTextActive]}>
+              {id.toUpperCase()}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
       <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
+        {tab === 'music' && (
         <View style={styles.musicCard}>
           <View style={styles.musicHeader}>
             <Text style={styles.musicTitle}>MUSIC</Text>
@@ -385,10 +426,9 @@ export function AboutScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+        )}
 
-        {/* Voice card — opt-in TTS + STT. Defaults OFF on first install.
-            Toggles, rate / pitch sliders, voice picker, and an
-            auto-submit toggle for STT all wire through voiceSettings. */}
+        {tab === 'voice' && (
         <View style={styles.musicCard}>
           <View style={styles.musicHeader}>
             <Text style={styles.musicTitle}>VOICE</Text>
@@ -467,6 +507,23 @@ export function AboutScreen() {
                     activeOpacity={0.7}
                   >
                     <Text style={[styles.musicToggleText, voice.engine === 'bundled' && styles.musicToggleTextOn]}>BUNDLED</Text>
+                  </TouchableOpacity>
+                  {/* Third button — kicks the Kokoro install / re-check.
+                      Independent of the engine toggle so a player can
+                      force a download or re-verify the model even while
+                      SYSTEM is active. Label adapts to install state. */}
+                  <TouchableOpacity
+                    onPress={testKokoro}
+                    style={[styles.musicToggle, kokoroState.phase === 'ready' && styles.musicToggleOn]}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.musicToggleText, kokoroState.phase === 'ready' && styles.musicToggleTextOn]}>
+                      {kokoroState.phase === 'downloading' ? `${Math.round(kokoroState.fraction * 100)}%` :
+                       kokoroState.phase === 'loading' ? 'LOAD' :
+                       kokoroState.phase === 'ready' ? 'READY' :
+                       kokoroState.phase === 'error' ? 'RETRY' :
+                       'DOWNLOAD'}
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -560,25 +617,44 @@ export function AboutScreen() {
               </TouchableOpacity>
             </View>
           )}
-        </View>
 
+          {/* Voice tab has its own COPY ALL — copies just the
+              Voice diagnostic block (plus the identifier header) so
+              the player can hand-off voice-specific issues without
+              the full About dump. */}
+          <TouchableOpacity
+            onPress={handleVoiceCopy}
+            style={[styles.applyBtn, { marginTop: 8 }]}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.applyBtnText}>{voiceCopied ? 'COPIED' : 'COPY VOICE INFO'}</Text>
+          </TouchableOpacity>
+        </View>
+        )}
+
+        {tab === 'about' && (
         <Text style={styles.mono}>{info}</Text>
+        )}
       </ScrollView>
 
-      <TouchableOpacity
-        style={[styles.updateBtn, updateBusy && styles.updateBtnBusy]}
-        onPress={() => { void checkForUpdate(); }}
-        activeOpacity={0.7}
-        disabled={updateBusy}
-      >
-        <Text style={styles.updateBtnText}>
-          {updateBusy ? updateStatus.toUpperCase() : 'CHECK FOR OTA UPDATE'}
-        </Text>
-      </TouchableOpacity>
+      {tab === 'about' && (
+        <>
+          <TouchableOpacity
+            style={[styles.updateBtn, updateBusy && styles.updateBtnBusy]}
+            onPress={() => { void checkForUpdate(); }}
+            activeOpacity={0.7}
+            disabled={updateBusy}
+          >
+            <Text style={styles.updateBtnText}>
+              {updateBusy ? updateStatus.toUpperCase() : 'CHECK FOR OTA UPDATE'}
+            </Text>
+          </TouchableOpacity>
 
-      <TouchableOpacity style={styles.copyBtn} onPress={handleCopy} activeOpacity={0.7}>
-        <Text style={styles.copyText}>{copied ? 'COPIED' : 'COPY ALL'}</Text>
-      </TouchableOpacity>
+          <TouchableOpacity style={styles.copyBtn} onPress={handleCopy} activeOpacity={0.7}>
+            <Text style={styles.copyText}>{copied ? 'COPIED' : 'COPY ALL'}</Text>
+          </TouchableOpacity>
+        </>
+      )}
 
       {/* OTA UPDATE OVERLAY — covers the screen while the update is being
           downloaded / saved / applied. Without it, the screen freezes on
@@ -648,6 +724,36 @@ const styles = StyleSheet.create({
   },
   bodyContent: { paddingBottom: 24 },
   mono: { color: '#cdbf99', fontSize: 12, lineHeight: 18, fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
+  // Tab row sits below the header. Three equal-flex chips; the active
+  // one is filled (amber on dark) and the others are outlined.
+  tabRow: {
+    flexDirection: 'row',
+    gap: 6,
+    paddingHorizontal: 12,
+    marginBottom: 8,
+  },
+  tabBtn: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 4,
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    backgroundColor: '#1a1612',
+    alignItems: 'center',
+  },
+  tabBtnActive: {
+    backgroundColor: '#c9a86a',
+    borderColor: '#c9a86a',
+  },
+  tabBtnText: {
+    color: '#cdbf99',
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 2,
+  },
+  tabBtnTextActive: {
+    color: '#13110f',
+  },
   musicCard: {
     borderColor: '#3a342c',
     borderWidth: 1,
