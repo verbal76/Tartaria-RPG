@@ -19,6 +19,7 @@ import {
 import { isTTSAvailable, getTTSVoices, stopAndClear as stopTTS } from '../voice/TTSManager';
 import { isSTTAvailable } from '../voice/STTManager';
 import { isPiperInstalled, downloadPiperVoice, type PiperDownloadStatus } from '../voice/PiperDownloader';
+import { listKokoroVoices, onDownloadProgress as onKokoroProgress } from '../voice/PiperTTSManager';
 import type * as Speech from 'expo-speech';
 
 export function AboutScreen() {
@@ -46,6 +47,7 @@ export function AboutScreen() {
   const [sttAvailable, setSttAvailable] = useState<boolean>(true);
   const [piperInstalled, setPiperInstalled] = useState<boolean>(false);
   const [piperStatus, setPiperStatus] = useState<PiperDownloadStatus | null>(null);
+  const [kokoroProgress, setKokoroProgress] = useState<number>(0);
 
   useEffect(() => {
     setAudio(getAudioSettings());
@@ -64,6 +66,12 @@ export function AboutScreen() {
       },
     );
     return unsub;
+  }, []);
+
+  // Subscribe to Kokoro model-download progress (only emits during the
+  // first-launch fetch; afterwards stays at 1.0).
+  useEffect(() => {
+    return onKokoroProgress(setKokoroProgress);
   }, []);
 
   const toggleTTS = () => {
@@ -91,6 +99,13 @@ export function AboutScreen() {
     const idx = voicesList.findIndex((v) => v.identifier === voice.voiceId);
     const next = (idx + dir + voicesList.length) % voicesList.length;
     void setVoiceSettings({ voiceId: voicesList[next]?.identifier ?? null });
+  };
+  const cycleKokoroVoice = (dir: 1 | -1) => {
+    const list = listKokoroVoices();
+    if (list.length === 0) return;
+    const idx = list.indexOf(voice.kokoroVoice);
+    const next = (idx + dir + list.length) % list.length;
+    void setVoiceSettings({ kokoroVoice: list[next] });
   };
   const currentVoiceLabel = (() => {
     if (voicesList.length === 0) return 'No voices installed';
@@ -420,13 +435,32 @@ export function AboutScreen() {
                 </View>
               </View>
               {voice.engine === 'bundled' && (
-                <Text style={styles.voiceNote}>
-                  Bundled neural voice is parked in this build — the library that ships it
-                  conflicts with the on-device classifier's ONNX runtime. For higher voice
-                  quality right now: install Google Text-to-Speech from the Play Store,
-                  enable it in Android Settings → Accessibility → Text-to-speech, then switch
-                  to SYSTEM here and use the voice picker below.
-                </Text>
+                <>
+                  <Text style={styles.voiceNote}>
+                    Bundled = Kokoro-82M neural voice via react-native-executorch. Higher
+                    quality than the system engine, fully offline. ~100 MB one-time download
+                    on first use; cached forever after.
+                  </Text>
+                  {kokoroProgress > 0 && kokoroProgress < 1 && (
+                    <Text style={styles.voiceNote}>
+                      Downloading model… {Math.round(kokoroProgress * 100)}%
+                    </Text>
+                  )}
+                  <View style={styles.musicRow}>
+                    <Text style={styles.musicLabel}>Voice</Text>
+                    <TouchableOpacity onPress={() => cycleKokoroVoice(-1)} style={styles.voiceCycleBtn}>
+                      <Text style={styles.voiceCycleText}>◀</Text>
+                    </TouchableOpacity>
+                    <View style={{ flex: 1, paddingHorizontal: 6 }}>
+                      <Text style={styles.voicePickerLabel} numberOfLines={1}>
+                        {voice.kokoroVoice.toUpperCase().replace(/_/g, ' ')}
+                      </Text>
+                    </View>
+                    <TouchableOpacity onPress={() => cycleKokoroVoice(1)} style={styles.voiceCycleBtn}>
+                      <Text style={styles.voiceCycleText}>▶</Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
               )}
               <View style={styles.musicRow}>
                 <Text style={styles.musicLabel}>Rate</Text>

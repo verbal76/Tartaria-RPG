@@ -16,8 +16,9 @@ export interface VoiceSettings {
    *  speech input. Default OFF. */
   sttEnabled: boolean;
   /** Which engine voices the game. 'system' = device TTS via
-   *  expo-speech (default). 'bundled' = neural Piper voice via
-   *  sherpa-onnx (better quality, ~63 MB download on first use). */
+   *  expo-speech (default). 'bundled' = Kokoro neural voice via
+   *  react-native-executorch (~100 MB one-time download on first
+   *  use, then fully offline). */
   engine: 'system' | 'bundled';
   /** Playback rate for TTS. 1.0 = normal. expo-speech accepts 0.1–2.0
    *  on Android; we clamp the UI slider 0.5–1.5 for sanity. Used by
@@ -28,8 +29,12 @@ export interface VoiceSettings {
   pitch: number;
   /** Selected voice identifier from expo-speech.getAvailableVoicesAsync.
    *  null = let the OS pick the default voice for the device locale.
-   *  Ignored when engine = 'bundled'. */
+   *  Used when engine = 'system'. */
   voiceId: string | null;
+  /** Selected Kokoro voice (af_heart / af_river / af_sarah / am_adam /
+   *  am_michael / bf_emma / bm_daniel). Used when engine = 'bundled'.
+   *  Defaults to af_heart — American female, natural-sounding. */
+  kokoroVoice: string;
   /** When true, a recognised STT transcript immediately fires
    *  submitPlayerAction. When false, the transcript lands in the text
    *  box and the player taps Act to submit (lets them correct
@@ -44,6 +49,7 @@ const DEFAULTS: VoiceSettings = {
   rate: 1.0,
   pitch: 1.0,
   voiceId: null,
+  kokoroVoice: 'af_heart',
   autoSubmit: false,
 };
 
@@ -63,6 +69,7 @@ export async function loadVoiceSettings(): Promise<VoiceSettings> {
         rate: typeof parsed.rate === 'number' ? clampRate(parsed.rate) : DEFAULTS.rate,
         pitch: typeof parsed.pitch === 'number' ? clampPitch(parsed.pitch) : DEFAULTS.pitch,
         voiceId: typeof parsed.voiceId === 'string' ? parsed.voiceId : DEFAULTS.voiceId,
+        kokoroVoice: typeof parsed.kokoroVoice === 'string' ? parsed.kokoroVoice : DEFAULTS.kokoroVoice,
         autoSubmit: typeof parsed.autoSubmit === 'boolean' ? parsed.autoSubmit : DEFAULTS.autoSubmit,
       };
     } else {
@@ -87,6 +94,7 @@ export async function setVoiceSettings(patch: Partial<VoiceSettings>): Promise<V
     rate: patch.rate !== undefined ? clampRate(patch.rate) : current.rate,
     pitch: patch.pitch !== undefined ? clampPitch(patch.pitch) : current.pitch,
     voiceId: patch.voiceId !== undefined ? patch.voiceId : current.voiceId,
+    kokoroVoice: patch.kokoroVoice !== undefined ? patch.kokoroVoice : current.kokoroVoice,
     autoSubmit: patch.autoSubmit !== undefined ? patch.autoSubmit : current.autoSubmit,
   };
   cache = next;
