@@ -56,6 +56,36 @@ let availabilityCache: boolean | null = null;
 let lastDownloadProgress = 0;
 const downloadListeners = new Set<(p: number) => void>();
 
+/** Public install/load state machine. The settings UI subscribes to
+ *  these so the player can SEE what's happening instead of guessing
+ *  whether the bundled voice is downloading, loading, ready, or failed. */
+export type KokoroState =
+  | { phase: 'idle' }
+  | { phase: 'downloading'; fraction: number }
+  | { phase: 'loading' }
+  | { phase: 'ready' }
+  | { phase: 'error'; message: string };
+
+let state: KokoroState = { phase: 'idle' };
+const stateListeners = new Set<(s: KokoroState) => void>();
+
+export function getKokoroState(): KokoroState {
+  return state;
+}
+
+export function onKokoroStateChange(fn: (s: KokoroState) => void): () => void {
+  stateListeners.add(fn);
+  fn(state);
+  return () => stateListeners.delete(fn);
+}
+
+function setKokoroState(next: KokoroState): void {
+  state = next;
+  for (const l of stateListeners) {
+    try { l(next); } catch { /* ignore */ }
+  }
+}
+
 // Voice id → executorch constant lookup. Default AF_HEART (American
 // female, natural-sounding default per the Kokoro docs).
 const VOICES: Record<string, unknown> = {
@@ -115,18 +145,28 @@ async function ensureModel(): Promise<any | null> {
   if (!exec?.TextToSpeechModule?.fromModelName) return null;
   ttsPromise = (async () => {
     try {
+      if (!exec) {
+        setKokoroState({ phase: 'error', message: 'react-native-executorch module not present.' });
+        return null;
+      }
+      setKokoroState({ phase: 'downloading', fraction: 0 });
       const m = await exec.TextToSpeechModule.fromModelName(
         { model: exec.KOKORO_MEDIUM, voice: pickVoice() },
         (p: number) => {
           lastDownloadProgress = p;
+          setKokoroState({ phase: 'downloading', fraction: p });
           for (const l of downloadListeners) {
             try { l(p); } catch { /* ignore */ }
           }
         },
       );
+      setKokoroState({ phase: 'loading' });
       tts = m;
+      setKokoroState({ phase: 'ready' });
       return m;
-    } catch {
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setKokoroState({ phase: 'error', message: msg.slice(0, 240) });
       return null;
     } finally {
       ttsPromise = null;
@@ -165,8 +205,9 @@ async function drain(): Promise<void> {
       return;
     }
     await playPcm(samples, KOKORO_SAMPLE_RATE);
-  } catch {
-    /* swallow — fall through to next */
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    setKokoroState({ phase: 'error', message: msg.slice(0, 240) });
   } finally {
     currentlySpeaking = null;
     void drain();

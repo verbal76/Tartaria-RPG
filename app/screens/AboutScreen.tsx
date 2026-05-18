@@ -19,7 +19,14 @@ import {
 import { isTTSAvailable, getTTSVoices, stopAndClear as stopTTS } from '../voice/TTSManager';
 import { isSTTAvailable } from '../voice/STTManager';
 import { isPiperInstalled, downloadPiperVoice, type PiperDownloadStatus } from '../voice/PiperDownloader';
-import { listKokoroVoices, onDownloadProgress as onKokoroProgress } from '../voice/PiperTTSManager';
+import {
+  listKokoroVoices,
+  onDownloadProgress as onKokoroProgress,
+  onKokoroStateChange,
+  speak as kokoroSpeak,
+  getKokoroState,
+  type KokoroState,
+} from '../voice/PiperTTSManager';
 import type * as Speech from 'expo-speech';
 
 export function AboutScreen() {
@@ -48,6 +55,7 @@ export function AboutScreen() {
   const [piperInstalled, setPiperInstalled] = useState<boolean>(false);
   const [piperStatus, setPiperStatus] = useState<PiperDownloadStatus | null>(null);
   const [kokoroProgress, setKokoroProgress] = useState<number>(0);
+  const [kokoroState, setKokoroState] = useState<KokoroState>(() => getKokoroState());
 
   useEffect(() => {
     setAudio(getAudioSettings());
@@ -73,6 +81,15 @@ export function AboutScreen() {
   useEffect(() => {
     return onKokoroProgress(setKokoroProgress);
   }, []);
+
+  // Subscribe to Kokoro install/load state machine.
+  useEffect(() => {
+    return onKokoroStateChange(setKokoroState);
+  }, []);
+
+  const testKokoro = () => {
+    kokoroSpeak('Welcome to Tartaria. This is the bundled neural voice — Kokoro.');
+  };
 
   const toggleTTS = () => {
     const next = !voice.ttsEnabled;
@@ -441,11 +458,29 @@ export function AboutScreen() {
                     quality than the system engine, fully offline. ~100 MB one-time download
                     on first use; cached forever after.
                   </Text>
-                  {kokoroProgress > 0 && kokoroProgress < 1 && (
-                    <Text style={styles.voiceNote}>
-                      Downloading model… {Math.round(kokoroProgress * 100)}%
+                  {/* Explicit status — never make the player guess. */}
+                  <Text style={styles.voiceNote}>
+                    Status:{' '}
+                    {kokoroState.phase === 'idle' && 'Not loaded yet. Tap TEST VOICE to start.'}
+                    {kokoroState.phase === 'downloading' &&
+                      `Downloading model… ${Math.round(kokoroState.fraction * 100)}%`}
+                    {kokoroState.phase === 'loading' && 'Loading model into memory…'}
+                    {kokoroState.phase === 'ready' && '✓ Installed and ready.'}
+                    {kokoroState.phase === 'error' && (
+                      <Text style={{ color: '#e07a5f' }}>Error: {kokoroState.message}</Text>
+                    )}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={testKokoro}
+                    style={[styles.applyBtn, { marginTop: 4 }]}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.applyBtnText}>
+                      {kokoroState.phase === 'ready' ? 'TEST VOICE' :
+                       kokoroState.phase === 'downloading' || kokoroState.phase === 'loading' ? 'WORKING…' :
+                       'TEST VOICE (downloads on first tap)'}
                     </Text>
-                  )}
+                  </TouchableOpacity>
                   <View style={styles.musicRow}>
                     <Text style={styles.musicLabel}>Voice</Text>
                     <TouchableOpacity onPress={() => cycleKokoroVoice(-1)} style={styles.voiceCycleBtn}>
