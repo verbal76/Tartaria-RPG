@@ -105,7 +105,12 @@ export function normalizeInput(raw: string): string {
   let s = raw
     .toLowerCase()
     .trim()
+    // Strip possessive 's BEFORE the punctuation pass so "my rifle's"
+    // collapses to "my rifle" instead of leaving an orphan "s" token.
+    // Also dissolve standalone apostrophes (curly + straight).
+    .replace(/['‘’]s\b/g, '')
     .replace(/[^a-z0-9\s']/g, ' ')
+    .replace(/'+/g, '')
     .replace(/\s+/g, ' ');
   // Collapse a few movement phrases into single tokens so the verb matcher
   // can fire on them (tokenize splits on whitespace).
@@ -226,6 +231,10 @@ export interface ParseContext {
    *  to filter nonsense suggestions like "use torch on <location>" —
    *  locations are containers, not interactable targets. */
   currentLocationName?: string;
+  /** Names + aliases of enemies on the field. Used to suppress "use
+   *  torch on <enemy>" suggestions — that reads as nonsense; the
+   *  player should attack, throw, or use a weapon-like item. */
+  enemyNames?: string[];
 }
 
 export function parseInput(raw: string, context: ParseContext = {}): ParsedInput {
@@ -289,8 +298,21 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
         lowerNoun.includes(lowerLocation)
       )
     );
+    // 'use torch on X' only makes sense when the player actually has a
+    // torch AND the noun isn't an enemy (you don't "use torch on a
+    // goblin" — you attack it). Inspect is always safe.
+    const hasTorch = (context.inventory ?? []).some(
+      (i) => /torch/i.test(i.name) && i.quantity > 0,
+    );
+    const enemyNamesLower = (context.enemyNames ?? []).map((n) => n.toLowerCase());
+    const nounIsEnemy = !!lowerNoun && enemyNamesLower.some(
+      (n) => n.includes(lowerNoun) || lowerNoun.includes(n),
+    );
     if (noun && !nounIsLocation) {
-      suggestions.push(`inspect ${noun.toLowerCase()}`, `use torch on ${noun.toLowerCase()}`);
+      suggestions.push(`inspect ${noun.toLowerCase()}`);
+      if (hasTorch && !nounIsEnemy) {
+        suggestions.push(`use torch on ${noun.toLowerCase()}`);
+      }
     }
     if (item) suggestions.push(`use ${item.name.toLowerCase()}`);
     if (context.enemyPresent) suggestions.push('attack', 'block', 'advance', 'retreat', 'hide', 'parley');

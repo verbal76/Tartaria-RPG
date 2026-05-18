@@ -986,8 +986,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const candidateKey = makeRoomKey(player.currentLocationId, microMicroId, player.mapX, player.mapY);
     const priorVisit = worldMemory.visitedRooms?.[candidateKey];
     const hoursElapsed = player.hoursElapsed ?? 0;
+    // Prefer the in-game hour delta when available so idling in real
+    // time doesn't accidentally clear the respawn cooldown. Fall back
+    // to the wall-clock heuristic for legacy saves that pre-date the
+    // hoursElapsedAtVisit field.
     const hoursSinceLastVisit = priorVisit
-      ? (Date.now() - priorVisit.lastVisitAt) / (1000 * 60 * 60)  // wall-clock fallback
+      ? (typeof priorVisit.hoursElapsedAtVisit === 'number'
+          ? hoursElapsed - priorVisit.hoursElapsedAtVisit
+          : (Date.now() - priorVisit.lastVisitAt) / (1000 * 60 * 60))
       : Infinity;
     const recentlyCleared =
       !!priorVisit &&
@@ -1137,6 +1143,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             lastVisitAt: Date.now(),
             visitCount: (existing?.visitCount ?? 0) + 1,
             enemiesCleared: existing?.enemiesCleared ?? [],
+            lootGrabbed: existing?.lootGrabbed ?? [],
+            hoursElapsedAtVisit: hoursElapsed,
           },
         },
       },
@@ -1486,6 +1494,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       recentNouns: collectSceneNouns(currentScene),
       enemyPresent: currentScene.enemies.length > 0,
       currentLocationName: currentScene.location.name,
+      enemyNames: [
+        ...currentScene.enemies.map((e) => e.name),
+        ...currentScene.enemies.flatMap((e) => e.aliases ?? []),
+      ],
     };
     const parsed = parseInput(trimmed, parseCtx);
     get().appendLog('player', trimmed, {
@@ -1762,15 +1774,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
               quantity: 1,
               tags: itemCat.tags,
             });
+            // grantItem honors per-name caps (Big Rock = 1, Small Rock = 10, etc.)
+            // and tells us if anything got clamped so the player isn't gaslit
+            // by a "✦ Recovered" line that didn't actually grant the item.
+            const grantResult = grantItem(player.inventory, newItem);
             set((s) =>
               s.player
-                ? { player: { ...s.player, inventory: mergeOrPushItem(s.player.inventory, newItem) } }
+                ? { player: { ...s.player, inventory: grantResult.inventory } }
                 : s,
             );
-            if (!isStackableCommodity) {
+            if (!isStackableCommodity && grantResult.accepted > 0) {
               set((s) => recordRoomLootGrabbed(s, searchRoomKey, outcome.itemName));
             }
-            get().appendLog('reward', `✦ ${outcome.itemName} (${outcome.rarity}).`);
+            if (grantResult.accepted > 0) {
+              get().appendLog('reward', `✦ ${outcome.itemName} (${outcome.rarity}).`);
+            } else {
+              get().appendLog('world', `Found a ${outcome.itemName.toLowerCase()}, but your pack is already full of them.`);
+            }
           } else if (outcome.kind === 'tc') {
             set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + outcome.amount } } : s));
             get().appendLog('reward', `+${outcome.amount} TC.`);
@@ -1813,6 +1833,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }).catch(() => repromptUnknownTarget(get, currentScene, rawTarget));
             break;
           }
+          // MiniLM is not ready (model download failed, or still loading) —
+          // log a one-time-per-action debug crumb so support / playtesters
+          // can see why fuzzy match isn't firing. Hidden channel, won't
+          // clutter the world view, but visible in COPY ALL.
+          get().appendLog(
+            'debug',
+            `MiniLM unavailable — using heuristic match only for "${rawTarget}".`,
+          );
           repromptUnknownTarget(get, currentScene, rawTarget);
           break;
         }
@@ -3235,8 +3263,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           quantity: 1,
           tags: catEntry.tags,
         });
+        // Refuse the craft if the result can't fit (per-name cap). The
+        // ingredients have not been consumed yet at this point — fail
+        // before we spend materials the player can't store the output of.
+        const craftGrant = grantItem(remaining, crafted);
+        if (craftGrant.accepted <= 0) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter raises a brow. "Your pack already holds the limit on ${recipe.result.toLowerCase()}. Free a slot first."`,
+            { skipDedup: true },
+          );
+          break;
+        }
         set((s) => ({
-          player: s.player ? { ...s.player, inventory: mergeOrPushItem(remaining, crafted) } : s.player,
+          player: s.player ? { ...s.player, inventory: craftGrant.inventory } : s.player,
         }));
         get().appendLog('reward', `✦ Crafted ${recipe.result}. The Arbiter watches you set the last piece.`);
         break;
@@ -4074,6 +4114,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ? applyRepChange(player.factionStanding, vendorFaction, 1)
       : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
 
+    // Check cap BEFORE charging TC. If the player can't carry it, refuse
+    // the sale instead of taking their coin for nothing.
+    const dryRun = grantItem(player.inventory, newItem);
+    if (dryRun.accepted <= 0) {
+      get().appendLog(
+        'arbiter',
+        `${scene.vendor.name} pauses. "Your pack is already heavy with ${offer.itemName.toLowerCase()}. Drop one first if you want this."`,
+        { skipDedup: true },
+      );
+      return;
+    }
     set((s) => {
       if (!s.player || !s.currentScene?.vendor) return s;
       const newOffers = s.currentScene.vendor.offers.filter((o) => o !== offer);
@@ -4081,7 +4132,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         player: {
           ...s.player,
           tc: s.player.tc - offer.price,
-          inventory: mergeOrPushItem(s.player.inventory, newItem),
+          inventory: dryRun.inventory,
           factionStanding: repResult.standing,
         },
         currentScene: {

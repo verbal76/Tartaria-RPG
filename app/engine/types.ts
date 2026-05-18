@@ -507,6 +507,12 @@ export interface VisitedRoom {
    *  diggable). Each key is the lowercased item name; cheap to compare
    *  without changing the catalog. */
   lootGrabbed?: string[];
+  /** Audit fix — in-game hours elapsed at the most recent visit.
+   *  Used by respawn-quiet calculation so idling for 6 real hours
+   *  doesn't accidentally trigger respawn even when no in-game time
+   *  passed. Wall-clock fallback (lastVisitAt) remains for legacy
+   *  saves that don't carry this field. */
+  hoursElapsedAtVisit?: number;
 }
 
 export type ScreenName =
