@@ -328,17 +328,16 @@ export function AboutScreen() {
             <Text style={styles.musicTitle}>VOICE</Text>
           </View>
 
+          {/* Toggles stay tappable even when the availability probe
+              came back empty — some Android devices return no voice
+              catalog but the TTS bridge still works. Notes below the
+              row tell the player what to expect. */}
           <View style={styles.musicRow}>
             <Text style={styles.musicLabel}>Read aloud (TTS)</Text>
             <View style={{ flex: 1 }} />
             <TouchableOpacity
               onPress={toggleTTS}
-              disabled={!ttsAvailable}
-              style={[
-                styles.musicToggle,
-                voice.ttsEnabled && styles.musicToggleOn,
-                !ttsAvailable && { opacity: 0.4 },
-              ]}
+              style={[styles.musicToggle, voice.ttsEnabled && styles.musicToggleOn]}
               activeOpacity={0.7}
             >
               <Text style={[styles.musicToggleText, voice.ttsEnabled && styles.musicToggleTextOn]}>
@@ -356,7 +355,7 @@ export function AboutScreen() {
               style={[
                 styles.musicToggle,
                 voice.sttEnabled && styles.musicToggleOn,
-                !sttAvailable && { opacity: 0.4 },
+                !sttAvailable && { opacity: 0.5 },
               ]}
               activeOpacity={0.7}
             >
@@ -368,7 +367,10 @@ export function AboutScreen() {
 
           {!ttsAvailable && (
             <Text style={styles.voiceNote}>
-              No TTS engine found on this device. Install Google TTS from the Play Store to enable.
+              Voice catalog appears empty on this device — toggle on and listen for the first
+              line of narration. If nothing plays, check Android Settings → Accessibility →
+              Text-to-speech output, and confirm an engine (Google TTS, Samsung TTS, etc.) is
+              installed and selected.
             </Text>
           )}
           {!sttAvailable && (

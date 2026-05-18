@@ -26,15 +26,27 @@ let currentlySpeaking: QueuedUtterance | null = null;
 let availabilityCache: boolean | null = null;
 let voicesCache: Speech.Voice[] | null = null;
 
-/** Returns true if expo-speech can run on this device (i.e. there's
- *  at least one installed voice). Result is cached after the first
- *  call so the settings UI can render synchronously after init. */
+/** Returns true if expo-speech can run on this device. We try two
+ *  probes because `getAvailableVoicesAsync` returns an empty list on
+ *  some Android devices that DO have a working TTS engine (Samsung
+ *  TTS, some custom ROMs, OEM-skinned Android variants). If the voice
+ *  catalog is empty we fall back to a bridge-only probe: calling
+ *  isSpeakingAsync (a cheap status query that just hits the native
+ *  module). If the bridge responds without throwing, we report TTS as
+ *  available — actual speech may still fail per-utterance, but the
+ *  player can at least flip the toggle and find out. */
 export async function isTTSAvailable(): Promise<boolean> {
   if (availabilityCache !== null) return availabilityCache;
   try {
     const voices = await Speech.getAvailableVoicesAsync();
     voicesCache = voices;
-    availabilityCache = voices.length > 0;
+    if (voices.length > 0) {
+      availabilityCache = true;
+      return true;
+    }
+    // Empty catalog — try the bridge probe.
+    await Speech.isSpeakingAsync();
+    availabilityCache = true;
   } catch {
     availabilityCache = false;
   }
