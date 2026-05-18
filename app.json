@@ -28,6 +28,7 @@
       "bundler": "metro"
     },
     "plugins": [
+      "./plugins/withJetifier",
       [
         "expo-build-properties",
         {
