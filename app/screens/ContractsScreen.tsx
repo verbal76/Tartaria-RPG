@@ -57,8 +57,21 @@ export function ContractsScreen() {
     run: s,
     def: findStorylineById(s.id),
   }));
-  const factionQuests = (player.activeFactionQuestIds ?? []).map((id) => ({
-    def: findFactionQuestById(id),
+  // Faction quests — prefer the new staged shape (activeFactionQuests)
+  // and fall back to the legacy id list. The legacy list will be empty
+  // after backfillPlayer runs on load, but the dual read keeps the
+  // screen safe across mid-session migrations.
+  const factionQuestRecords =
+    player.activeFactionQuests ??
+    (player.activeFactionQuestIds ?? []).map((id) => ({
+      id,
+      stage: 0,
+      postedByFaction: findFactionQuestById(id)?.factionId ?? 'unknown',
+      acceptedAt: Date.now(),
+    }));
+  const factionQuests = factionQuestRecords.map((rec) => ({
+    rec,
+    def: findFactionQuestById(rec.id),
   }));
 
   const totalActive =
@@ -185,12 +198,18 @@ export function ContractsScreen() {
           {factionQuests.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>FACTION QUESTS</Text>
-              {factionQuests.map(({ def }, i) =>
+              {factionQuests.map(({ rec, def }, i) =>
                 def ? (
                   <View key={`q_${def.id}_${i}`} style={styles.card}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{def.title}</Text>
-                      <Text style={styles.stagePill}>open</Text>
+                      <Text style={styles.stagePill}>
+                        {def.stages && def.stages.length > 0
+                          ? rec.stage >= def.stages.length
+                            ? 'ready to turn in'
+                            : `stage ${rec.stage + 1} / ${def.stages.length}`
+                          : 'open'}
+                      </Text>
                     </View>
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     <Text style={styles.cardBody}>{def.objective}</Text>

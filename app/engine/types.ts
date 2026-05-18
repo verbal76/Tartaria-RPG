@@ -384,8 +384,17 @@ export interface PlayerCharacter {
   statusEffects?: StatusEffect[];
   /** Hours elapsed since the character entered Tartaria. Day = 24 hours. */
   hoursElapsed?: number;
-  /** IDs of faction quests the player has accepted but not finished. */
+  /** IDs of faction quests the player has accepted but not finished.
+   *  LEGACY: pre-refactor saves used this flat string array. New saves
+   *  populate `activeFactionQuests` (with stage tracking) instead.
+   *  backfillPlayer migrates the legacy list into the new shape on
+   *  load. The flat array is kept here so old serialized state still
+   *  deserializes cleanly. */
   activeFactionQuestIds?: string[];
+  /** Active faction quests with per-stage progress. Mirrors activeHunts
+   *  / activeMysteries / activeStorylines so all four contract types
+   *  share the same accept / advance / turn-in flow. */
+  activeFactionQuests?: { id: string; stage: number; postedByFaction: string; acceptedAt: number }[];
   /** IDs of faction quests the player has turned in. */
   completedFactionQuestIds?: string[];
   /** Active monster hunts with per-stage progress. */

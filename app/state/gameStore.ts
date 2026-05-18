@@ -423,6 +423,18 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     statusEffects: p.statusEffects ?? [],
     hoursElapsed: p.hoursElapsed ?? 0,
     activeFactionQuestIds: p.activeFactionQuestIds ?? [],
+    // Migrate legacy flat-id list into the new staged shape. We don't
+    // know the original posting faction; pull it from the FactionQuestDef
+    // catalog. Saves that already wrote activeFactionQuests pass through.
+    activeFactionQuests: p.activeFactionQuests ?? (p.activeFactionQuestIds ?? []).map((id) => {
+      const def = findFactionQuestById(id);
+      return {
+        id,
+        stage: 0,
+        postedByFaction: def?.factionId ?? 'unknown',
+        acceptedAt: Date.now(),
+      };
+    }),
     completedFactionQuestIds: p.completedFactionQuestIds ?? [],
     activeHunts: p.activeHunts ?? [],
     completedHuntIds: p.completedHuntIds ?? [],
@@ -3926,6 +3938,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         `✦ The road has built you up. +1 max stamina (now ${newStaminaMax}). [${newTravels} travels completed]`,
       );
     }
+    // Travel completion advances staged faction quests by one beat.
+    advanceActiveFactionQuests(get, set);
     get().beginScene();
     void get().persist();
   },
@@ -4045,6 +4059,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         `✦ You feel hardier from your trials. +1 max HP (now ${newHpMax}). [${newKills} enemies defeated]`,
       );
     }
+
+    // Staged faction quests advance one beat on every kill — the
+    // player's progress through the world is what carries narrative
+    // contracts forward. Quests with no stages stay at stage 0
+    // (immediately turn-in-able).
+    advanceActiveFactionQuests(get, set);
 
     // First-kill and rare-kill milestones are noted in the memorable-event
     // log so the Arbiter can reference them later.
@@ -4500,12 +4520,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    const factionId = scene.vendor.faction;
     set((s) =>
       s.player
         ? {
             player: {
               ...s.player,
               activeFactionQuestIds: [...(s.player.activeFactionQuestIds ?? []), quest.id],
+              activeFactionQuests: [
+                ...(s.player.activeFactionQuests ?? []),
+                { id: quest.id, stage: 0, postedByFaction: factionId, acceptedAt: Date.now() },
+              ],
             },
           }
         : s,
@@ -4513,8 +4538,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     bumpQuestsAccepted(get, set);
     get().appendLog(
       'reward',
-      `New faction contract — ${quest.title}. ${quest.objective} (${scene.vendor.faction.replace(/_/g, ' ')})`,
+      `New faction contract — ${quest.title}. ${quest.objective} (${factionId.replace(/_/g, ' ')})`,
     );
+    // Play the first stage immediately so the player has narrative
+    // momentum, mirroring how hunts / mysteries / storylines open.
+    const stage0 = quest.stages?.[0];
+    if (stage0) {
+      get().appendLog('world', stage0.narration);
+      if (stage0.arbiter) get().appendLog('arbiter', stage0.arbiter);
+    }
     void get().persist();
   },
 
@@ -4591,6 +4623,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    // Stage gate — quests with authored stages require the player to
+    // reach the final stage before turn-in. Quests without stages
+    // (legacy single-objective) are turn-in-able immediately, matching
+    // the pre-refactor behavior.
+    const activeRecord = (player.activeFactionQuests ?? []).find((q) => q.id === candidate.id);
+    if (candidate.stages && candidate.stages.length > 0) {
+      const currentStage = activeRecord?.stage ?? 0;
+      if (currentStage < candidate.stages.length) {
+        get().appendLog(
+          'arbiter',
+          `${scene.vendor.name} eyes you carefully. "${candidate.title} isn't done. You're on step ${currentStage + 1} of ${candidate.stages.length}. Come back when the work's behind you."`,
+        );
+        return;
+      }
+    }
     // Pay out reward + record completion.
     const repResult = applyRepChange(player.factionStanding, candidate.factionId, candidate.reward.rep);
     set((s) =>
@@ -4601,6 +4648,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               tc: s.player.tc + candidate.reward.tc,
               factionStanding: repResult.standing,
               activeFactionQuestIds: (s.player.activeFactionQuestIds ?? []).filter((id) => id !== candidate.id),
+              activeFactionQuests: (s.player.activeFactionQuests ?? []).filter((q) => q.id !== candidate.id),
               completedFactionQuestIds: [...(s.player.completedFactionQuestIds ?? []), candidate.id],
             },
           }
@@ -6035,6 +6083,51 @@ function enemyCanReach(enemy: Enemy, range: CombatRange): boolean {
 // Bump milestones.questsAccepted by one and surface a one-time Arbiter
 // callback when the player accepts their first contract of any kind
 // (faction quest / hunt / mystery / storyline). Audit fix #17.
+// Advance every staged active faction quest by one beat and surface
+// its narration. Called from progress events (kill / skill check
+// success / travel completion). Quests with no `stages` array stay
+// at stage 0 forever — they're single-objective and turn-in-able
+// immediately, matching pre-refactor behavior.
+function advanceActiveFactionQuests(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const player = get().player;
+  if (!player) return;
+  const active = player.activeFactionQuests ?? [];
+  if (active.length === 0) return;
+  let mutated = false;
+  const next = active.map((rec) => {
+    const def = findFactionQuestById(rec.id);
+    if (!def?.stages || def.stages.length === 0) return rec;
+    if (rec.stage >= def.stages.length) return rec; // already done
+    const nextStage = rec.stage + 1;
+    mutated = true;
+    const stageDef = def.stages[nextStage - 1]; // 0-indexed stage just played; new stage is nextStage
+    // We just BUMPED to stage `nextStage`. If a stage exists at the new
+    // index (nextStage), narrate it. Otherwise the quest is now ready
+    // for turn-in (no more stages to play).
+    const justPlayed = def.stages[nextStage];
+    if (justPlayed) {
+      get().appendLog('world', justPlayed.narration);
+      if (justPlayed.arbiter) get().appendLog('arbiter', justPlayed.arbiter);
+    } else {
+      // Crossed past the last stage — quest is turn-in-ready. Surface
+      // a one-line nudge so the player knows where to take it.
+      const fname = def.factionId.replace(/_/g, ' ');
+      get().appendLog(
+        'arbiter',
+        `The Arbiter glances at you. "${def.title} is done. Bring word to any ${fname} agent."`,
+      );
+    }
+    return { ...rec, stage: nextStage };
+  });
+  if (!mutated) return;
+  set((s) =>
+    s.player ? { player: { ...s.player, activeFactionQuests: next } } : s,
+  );
+}
+
 function bumpQuestsAccepted(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,

@@ -1,5 +1,12 @@
 import factionQuestsData from '../data/quests/faction-quests.json';
 
+export interface FactionQuestStageDef {
+  /** What the player sees in the world feed when this stage opens. */
+  narration: string;
+  /** Optional Arbiter remark layered under the narration. */
+  arbiter?: string | null;
+}
+
 export interface FactionQuestDef {
   id: string;
   factionId: string;
@@ -10,6 +17,23 @@ export interface FactionQuestDef {
   requirement: { rep: number };
   /** Reward on completion. */
   reward: { tc: number; rep: number };
+  /** Narrative stages. Each accepted quest plays stage 0 immediately
+   *  and advances on player progress. Turn-in is allowed when stage >=
+   *  stages.length. When omitted (legacy data), the engine treats it as
+   *  a single objective whose narration is the existing description. */
+  stages?: FactionQuestStageDef[];
+}
+
+/** A faction quest the player has accepted. Mirrors ActiveHunt /
+ *  ActiveMystery / ActiveStoryline so the same render + turn-in flow
+ *  works across every contract type. */
+export interface ActiveFactionQuest {
+  id: string;
+  stage: number;
+  /** ID of the faction whose vendor handed it out — used to validate
+   *  turn-in (you turn in to someone of the same faction). */
+  postedByFaction: string;
+  acceptedAt: number;
 }
 
 export const FACTION_QUESTS = (factionQuestsData as { quests: FactionQuestDef[] }).quests;
