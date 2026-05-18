@@ -36,7 +36,7 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   ],
   travel: [
     'go', 'travel', 'walk', 'head', 'move', 'journey', 'enter', 'descend', 'wander',
-    'follow', 'march', 'trek', 'cross', 'proceed', 'depart',
+    'follow', 'march', 'trek', 'cross', 'proceed', 'depart', 'leave', 'exit',
   ],
   use_relic: [
     'use', 'activate', 'invoke', 'apply', 'shine', 'light', 'channel through',
@@ -141,10 +141,11 @@ function fuzzyEqual(word: string, candidate: string): boolean {
     return Math.abs(word.length - candidate.length) <= 3;
   }
   const maxLen = Math.max(word.length, candidate.length);
-  // Tightened for short words: 4-char words now require exact match. This
-  // stops noise like "dead" → "read" (distance 1) silently routing "am i
-  // dead?" to investigate intent. 5–7 chars still allow 1 edit, 8+ allow 2.
-  const allowed = maxLen <= 4 ? 0 : maxLen <= 7 ? 1 : 2;
+  // Tightened for short words: 5-char words now require exact match too.
+  // Playtest: "leave" (5) → "cleave" (6) Levenshtein 1 was routing the
+  // exit-the-market input to attack intent. 4–5 chars exact, 6–7 allow
+  // 1 edit, 8+ allow 2.
+  const allowed = maxLen <= 5 ? 0 : maxLen <= 7 ? 1 : 2;
   return levenshtein(word, candidate) <= allowed;
 }
 

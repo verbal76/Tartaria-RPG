@@ -90,17 +90,39 @@ export function buildOpeningNarrative(input: {
     ? `${hubName ?? "Reclaimers' Outpost"} rises out of the silt at the edge of the ${location.name}. You arrive at ${hubRoomName}. ${hubRoomDescription}`
     : `You arrive at the edge of the ${location.name}. ${location.description}`;
 
-  // P3 — atmosphere + agency hand-off. The openings.json line carries
-  // the Arbiter's voice; the weather clause makes the mechanical
-  // pressure visible without printing a separate "Weather effect" row.
-  const arbiterLine = pick(openingsList);
+  // P3 — atmosphere + agency hand-off. In the hub we use a hub-flavored
+  // line (we're indoors at the outpost — no Rust Monks on the road),
+  // otherwise pick from the surface openings pool. Weather clause uses
+  // "A / An" properly so we don't print "A etheric storm".
+  const isHubScene = !!(hubRoomName && hubRoomDescription);
+  const arbiterLine = isHubScene ? pick(HUB_OPENING_LINES) : pick(openingsList);
   const weatherClause = weatherDescriptor
-    ? ` A ${weather.name.toLowerCase()} presses on the world — ${weatherDescriptor}.`
+    ? ` ${aOrAn(weather.name)} ${weather.name.toLowerCase()} presses on the world — ${weatherDescriptor}.`
     : '';
   const p3 = `${arbiterLine}${weatherClause} What you do here is yours to choose.`;
 
   return [p1, p2, p3];
 }
+
+// "A" / "An" based on whether the next word starts with a vowel sound.
+// Cheap heuristic — matches common cases (etheric, iron, ash, aether,
+// echoing, ominous) without a full phonetic table.
+function aOrAn(nextWord: string): string {
+  return /^[aeiou]/i.test(nextWord.trim()) ? 'An' : 'A';
+}
+
+// Hub-flavored opening lines — used in P3 of the opening narrative when
+// the player spawns inside the Reclaimers' Outpost. Generic Tartaria-
+// world openings (Rust Monks on the road, footprints in the silt, etc.)
+// read as out-of-place when the player is standing in an authored room.
+const HUB_OPENING_LINES = [
+  `The outpost's lanterns sway in a draft that should not reach this far inside.`,
+  `Reclaimers move past you on small errands — checking ropes, counting beads, pretending not to study the new arrival.`,
+  `Somewhere behind the back wall, a kettle whistles itself empty and no one moves to take it off.`,
+  `The Arbiter is already here, of course. They were here before the outpost; they will be here after.`,
+  `A map-stone hums softly at the center of the camp — old enough to remember roads the Flood erased.`,
+  `Smoke from the cook-fires turns blue where the Aether crosses it. No one comments.`,
+];
 
 export interface SceneInput {
   weather: WeatherEntry;

@@ -1482,6 +1482,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // hostile in this world; the math reflects that.
     const wtick = tickWeather(get().currentScene?.weather ?? null, player);
     if (wtick.line) {
+      // Rate-limit the weather-tick line: don't print the SAME line if
+      // it already appeared within the last 6 log entries. The numeric
+      // effect (hp/stam/corruption delta) still applies — only the
+      // visible narration is suppressed so the feed doesn't read
+      // "The fog whispers your name… The fog whispers your name…"
+      // four entries in a row.
+      const recent = get().gameLog.slice(-6);
+      const recentlyShown = recent.some((e) => e.text === wtick.line);
       let weatherKilled = false;
       set((s) => {
         if (!s.player) return {};
@@ -1491,7 +1499,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         weatherKilled = newHp <= 0;
         return { player: { ...s.player, hp: newHp, stamina: newStam, corruption: newCorr } };
       });
-      get().appendLog('world', wtick.line);
+      if (!recentlyShown) {
+        get().appendLog('world', wtick.line);
+      }
       if (weatherKilled) {
         void Promise.resolve().then(() => handlePlayerDeath(get, set));
         return;
@@ -1699,6 +1709,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // The target the player named (raw, before resolution).
         const rawTarget = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
 
+        // 1.5) Ground-type search ("search the mud", "search the ground")
+        // routes to the dig path before ambient noun match. "ground" is
+        // often in ambientNouns and would otherwise fire generic
+        // narrate-ambient-find instead of the dig loot path.
+        if (rawTarget && isGroundSearch(rawTarget)) {
+          get().digHere();
+          break;
+        }
         // 2) Ambient noun match — the player named something the scene
         // paragraph actually mentioned ("investigate the traps" → match).
         // Narrate a flavored find. May plant a hook.
@@ -1746,17 +1764,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
           break;
         }
-        // 3.5) Ground search ("the mud", "the silt", "the ground", "the
-        // rubble" …). When the player targets a diggable surface, route
-        // to the dig path so the loot pool includes the rare buried
-        // items AND any dig tool they're carrying wears down. Without
-        // a tool, digHere refuses and the player sees an Arbiter line
-        // explaining what they need. This collapses the old separate
-        // 'dig' verb into the unified search vocabulary.
-        if (rawTarget && isGroundSearch(rawTarget)) {
-          get().digHere();
-          break;
-        }
+        // (Ground search routing was moved earlier — step 1.5 — so it
+        // takes priority over ambient-noun narration when the target is
+        // a diggable surface noun.)
         // 4) Generic area / surface / direction search ("the doorway",
         // "the area to my left", "the wall", "the shelf"). Roll an
         // outcome on the spot — nothing, small material, small TC, or
@@ -5317,10 +5327,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The Arbiter shakes their head. "Not while ${digBlocker.name} is on you."`);
       return;
     }
+    // Hub rooms are hand-authored — mud-bricks, board floors, stone
+    // tile — not silt to scrape. Refuse with a hub-flavored message
+    // so "search the ground" inside the outpost reads as the player
+    // expects (no dig path, no rare loot, no tool wear).
+    if (player.hubRoomId) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter shakes their head. "The outpost floors are board and brick, not silt. Dig outside the gate."`,
+        { skipDedup: true },
+      );
+      return;
+    }
     // Per-spot lockout — exhaust this patch on a successful dig (and any
     // dig attempt). To dig again the player must move: step direction,
     // travel to a new location, or refresh the scene at a new tile.
-    const spotKey = `${player.currentLocationId}:${player.mapX ?? 0}:${player.mapY ?? 0}`;
+    // Include hub room + Micro-Micro id in the lockout key so digging
+    // one hub room doesn't lock all the others (they share mapX/mapY),
+    // and digging one chamber within a buried Micro-Micro doesn't lock
+    // the rest of the labyrinth.
+    const hubPart = player.hubRoomId ?? '_';
+    const microPart = scene?.microMicroId ?? '_';
+    const spotKey = `${player.currentLocationId}:${hubPart}:${microPart}:${player.mapX ?? 0}:${player.mapY ?? 0}`;
     if (player.lastDugSpot === spotKey) {
       get().appendLog(
         'arbiter',
@@ -6603,12 +6631,17 @@ function narrateAmbientFind(
   scene: CurrentScene,
   noun: string,
 ): void {
+  // Grammar: assume the noun is singular unless it already ends in 's'.
+  // ("stalls" stays plural; "ground" stays singular.) Pronoun follows.
+  const isPlural = /s$/i.test(noun);
+  const pronoun = isPlural ? 'them' : 'it';
+  const aroundPronoun = isPlural ? 'them' : 'it';
   const lines = [
     `You look closer at the ${noun}. Mud-glazed, undisturbed for a long while.`,
     `You examine the ${noun}. Tartaria has not given up its secrets here.`,
-    `You study the ${noun}. The Aetheric haze around them thickens, then settles.`,
+    `You study the ${noun}. The Aetheric haze around ${aroundPronoun} thickens, then settles.`,
     `You inspect the ${noun}. Whatever was here once, this is what remains.`,
-    `You crouch beside the ${noun}. The silt has half-swallowed them.`,
+    `You crouch beside the ${noun}. The silt has half-swallowed ${pronoun}.`,
   ];
   get().appendLog('world', pick(lines));
   // ~25% chance the investigation turns into a real hook in this scene.
