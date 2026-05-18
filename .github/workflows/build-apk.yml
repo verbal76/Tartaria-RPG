@@ -161,6 +161,11 @@ jobs:
 
           # Final guard: a no-op when versions match, but if anything upstream
           # still mismatches at compile time, suppress the Compose-compiler check.
+          # Ensure the file ends with a newline before appending — Expo's
+          # propertiesListToString writes the last entry without a trailing \n,
+          # and a bare `echo >>` would concatenate onto that last line.
+          # (Caused a build break when withJetifier landed its entries last.)
+          [ -n "$(tail -c1 android/gradle.properties)" ] && echo "" >> android/gradle.properties
           echo "kotlin.suppressKotlinVersionCompatibilityCheck=1.9.25" >> android/gradle.properties
 
       - name: Ensure debug keystore exists (for release signing fallback)
