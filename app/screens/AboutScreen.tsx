@@ -25,6 +25,7 @@ import {
   onKokoroStateChange,
   speak as kokoroSpeak,
   getKokoroState,
+  refreshPiperEngine,
   type KokoroState,
 } from '../voice/PiperTTSManager';
 import type * as Speech from 'expo-speech';
@@ -91,6 +92,17 @@ export function AboutScreen() {
 
   const testKokoro = () => {
     kokoroSpeak('Welcome to Tartaria. This is the bundled neural voice — Kokoro.');
+  };
+  const handleEngineThirdBtn = () => {
+    // When ready, the third button means UPDATE — wipe cache + dispose
+    // engine + reset state so the next test re-downloads. Otherwise
+    // it's the DOWNLOAD / RETRY action which kicks the same install
+    // flow via testKokoro (which lazily triggers fromModelName).
+    if (kokoroState.phase === 'ready') {
+      void refreshPiperEngine();
+      return;
+    }
+    testKokoro();
   };
 
   const toggleTTS = () => {
@@ -513,14 +525,14 @@ export function AboutScreen() {
                       force a download or re-verify the model even while
                       SYSTEM is active. Label adapts to install state. */}
                   <TouchableOpacity
-                    onPress={testKokoro}
+                    onPress={handleEngineThirdBtn}
                     style={[styles.musicToggle, kokoroState.phase === 'ready' && styles.musicToggleOn]}
                     activeOpacity={0.7}
                   >
                     <Text style={[styles.musicToggleText, kokoroState.phase === 'ready' && styles.musicToggleTextOn]}>
                       {kokoroState.phase === 'downloading' ? `${Math.round(kokoroState.fraction * 100)}%` :
                        kokoroState.phase === 'loading' ? 'LOAD' :
-                       kokoroState.phase === 'ready' ? 'READY' :
+                       kokoroState.phase === 'ready' ? 'UPDATE' :
                        kokoroState.phase === 'error' ? 'RETRY' :
                        'DOWNLOAD'}
                     </Text>

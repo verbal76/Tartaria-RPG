@@ -233,6 +233,32 @@ export async function disposePiperEngine(): Promise<void> {
   ttsPromise = null;
 }
 
+/** Force a model refresh: dispose the loaded engine, wipe the
+ *  adapter's executorch cache, and reset state to idle. The next
+ *  speak() call will trigger a fresh download — which fetches the
+ *  current model URLs (so if Software Mansion ships a newer
+ *  kokoro-medium build the player picks it up).
+ *
+ *  Called by the UPDATE button on the Voice settings tab. */
+export async function refreshPiperEngine(): Promise<void> {
+  await disposePiperEngine();
+  try {
+    // Adapter writes downloads to this directory; clearing it forces
+    // the next fetch to re-pull from the source URL.
+    const FileSystem = require('expo-file-system');
+    const dir = (FileSystem.documentDirectory ?? '') + 'tartaria-executorch/';
+    const info = await FileSystem.getInfoAsync(dir);
+    if (info.exists) {
+      await FileSystem.deleteAsync(dir, { idempotent: true });
+    }
+  } catch {
+    /* swallow — UPDATE is best-effort */
+  }
+  availabilityCache = null;
+  lastDownloadProgress = 0;
+  setKokoroState({ phase: 'idle' });
+}
+
 // ── PCM → WAV → expo-av playback ────────────────────────────────────
 
 /** Wrap a Float32Array PCM buffer in a WAV header and play it via
