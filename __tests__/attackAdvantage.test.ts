@@ -43,10 +43,13 @@ function makePlayer(effects: StatusEffect[] = []): PlayerCharacter {
 
 const goblin: Enemy = {
   name: 'Mud Goblin',
-  hp: 10,
-  attack: 2,
+  type: 'mud',
+  abilityPoint: 'str',
+  attack: '2',
   damage: '1d4',
-  ac: 11,
+  hp: 10,
+  rarity: 'Common',
+  loot: [],
 };
 
 function findAttackStep(player: PlayerCharacter) {

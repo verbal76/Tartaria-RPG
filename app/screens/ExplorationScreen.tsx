@@ -145,7 +145,7 @@ export function ExplorationScreen() {
       )}
 
       <TutorialTarget area="feed" style={styles.feed}>
-        <AdventureFeed entries={gameLog} />
+        <AdventureFeed entries={gameLog} enemyNames={currentScene?.enemies.map((e) => e.name)} />
         {isGenerating && (partialArbiterText || partialArbiterText === '') && (
           <View style={styles.streamingTail}>
             <Text style={styles.streamingPrefix}>The Arbiter:</Text>

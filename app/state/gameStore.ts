@@ -548,7 +548,7 @@ interface GameStore {
 
   appendLog: (channel: LogChannel, text: string, meta?: Record<string, unknown>) => void;
 
-  beginScene: (opts?: { openingPrefix?: string; microMicroId?: string }) => void;
+  beginScene: (opts?: { openingPrefix?: string; microMicroId?: string; isOpening?: boolean }) => void;
   submitPlayerAction: (text: string) => void;
   resolveRollStep: (values: number[]) => void;
   cancelPendingRolls: () => void;
@@ -794,11 +794,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       pendingRolls: null,
       activeSlotId: slotId,
     });
-    get().appendLog('system', `${player.name} steps into Tartaria.`);
-    // Opening line gets woven INTO the scene paragraph rather than printed
-    // as its own log entry, so the player sees one flowing intro instead
-    // of three stacked statements.
-    get().beginScene({ openingPrefix: buildOpening() });
+    // Opening line + player name + weather get woven INTO the scene
+    // paragraph rather than printed as their own log entries, so the
+    // player sees one flowing intro instead of three stacked statements.
+    // The isOpening flag also suppresses vendor spawn, the macro radar,
+    // the system Weather effect line, and the random Arbiter intros.
+    get().beginScene({ openingPrefix: buildOpening(), isOpening: true });
     await get().persist();
     const slots = await listSlots();
     set({ slots });
@@ -927,7 +928,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
-  beginScene(opts?: { openingPrefix?: string; microMicroId?: string }) {
+  beginScene(opts?: { openingPrefix?: string; microMicroId?: string; isOpening?: boolean }) {
     const { player, worldMemory } = get();
     if (!player) return;
     const location = getLocationById(player.currentLocationId);
@@ -952,16 +953,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // the room's curated pools from worldLadder.json. Caller can pre-pick
     // (exit-follow path); otherwise we sample a random Micro-Micro from
     // the location's parent Macro biome.
+    // In HUB mode, skip ladder resolution entirely — the hub room is
+    // ground truth for description + exits, and the procedural ladder
+    // would print a competing "Exits from this room" line.
     let microMicroId: string | null = null;
-    if (opts?.microMicroId) {
-      const resolved = findMicroMicroAnywhere(opts.microMicroId);
-      if (resolved) microMicroId = resolved.microMicro.id;
-    }
-    if (!microMicroId) {
-      const macroId = LOCATION_TO_MACRO[location.id];
-      if (macroId) {
-        const triple = pickRandomMicroMicroIn(macroId);
-        if (triple) microMicroId = triple.microMicro.id;
+    if (!hubRoom) {
+      if (opts?.microMicroId) {
+        const resolved = findMicroMicroAnywhere(opts.microMicroId);
+        if (resolved) microMicroId = resolved.microMicro.id;
+      }
+      if (!microMicroId) {
+        const macroId = LOCATION_TO_MACRO[location.id];
+        if (macroId) {
+          const triple = pickRandomMicroMicroIn(macroId);
+          if (triple) microMicroId = triple.microMicro.id;
+        }
       }
     }
     const ladderTriple = microMicroId ? findMicroMicroAnywhere(microMicroId) : null;
@@ -1012,9 +1018,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Hub mode: the anchor NPC for the current room takes the vendor
     // slot when one is defined. Deterministic — Halem at the gate is
     // always Halem, every visit.
-    const vendor: VendorInstance | null = hubRoom && hubRoom.anchorNpc
-      ? (findVendorByName(hubRoom.anchorNpc) ?? null)
-      : (!hasEnemies && Math.random() < 0.22 ? pickRandomVendor() : null);
+    // Opening scene (brand-new character): no vendor. The first roll is
+    // for the player to land in the world cleanly — vendors arrive on
+    // the next scene or on travel.
+    const vendor: VendorInstance | null = opts?.isOpening
+      ? null
+      : hubRoom && hubRoom.anchorNpc
+        ? (findVendorByName(hubRoom.anchorNpc) ?? null)
+        : (!hasEnemies && Math.random() < 0.22 ? pickRandomVendor() : null);
     // Enemies start at 'close' range — close enough to be a problem but not
     // already swinging. Players have to advance (or be charged) to land
     // melee, retreat to set up ranged shots.
@@ -1062,8 +1073,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const sceneText = hubRoom
       ? `${HUB.hubName} — ${hubRoom.name}.\n\n${hubRoom.description}`
       : buildScene({ weather, location, hazard, enemy: sceneEnemy, quest: player.activeQuests[0] });
-    const finalSceneLog = opts?.openingPrefix
-      ? `${opts.openingPrefix.trim()} ${sceneText.replace(/\n\n+/g, ' ')}`
+    // On the opening scene we fold the player's name and the active
+    // weather descriptor into the prefix so the very first paragraph
+    // reads as one piece of prose instead of three stacked log lines
+    // (system "X steps into Tartaria" + system "Weather effect" +
+    // world scene text).
+    let openingPrefix = opts?.openingPrefix;
+    if (opts?.isOpening) {
+      const baseOpening = (opts.openingPrefix ?? '').trim();
+      const weatherClause = describeWeatherStatModifiers(weather)
+        ? ` A ${weather.name.toLowerCase()} presses on the world — ${describeWeatherStatModifiers(weather)}.`
+        : '';
+      openingPrefix = `${player.name} steps into Tartaria. ${baseOpening}${weatherClause}`.trim();
+    }
+    const finalSceneLog = openingPrefix
+      ? `${openingPrefix.trim()} ${sceneText.replace(/\n\n+/g, ' ')}`
       : sceneText;
     // Track hub-room visits separately from the procedural visitedRooms
     // map so hub-specific UI can read it without scanning roomKeys.
@@ -1135,9 +1159,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // Surface the active weather's stat modifiers so the player can see
     // what's pressing on them this scene. Empty for "calm" or weathers
-    // without modifiers.
+    // without modifiers. Suppressed on the opening scene — the weather
+    // description is woven into the opening paragraph instead, so a
+    // brand-new player isn't greeted with a mechanical line break.
     const weatherMods = describeWeatherStatModifiers(weather);
-    if (weatherMods) {
+    if (weatherMods && !opts?.isOpening) {
       get().appendLog('system', `Weather effect — ${weather.name}: ${weatherMods}`);
     }
     // Phase 4 §3.3 — the "Radar" block. Deterministic compass summary so
@@ -1145,15 +1171,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // direction without needing a compass item or asking the Arbiter.
     // Pulls from the same character-seeded world map the travel system
     // uses, so the directions are consistent across the session.
-    try {
-      const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
-      const map = generateWorldMap(seed, player.currentLocationId);
-      const fromX = player.mapX ?? 4;
-      const fromY = player.mapY ?? 4;
-      const radar = describeAllDirections(map, fromX, fromY);
-      get().appendLog('world', `[${location.name}] ${radar}`);
-    } catch {
-      // best-effort radar — never block the scene on a map-generation hiccup
+    // Skipped on the opening scene — the player is being introduced;
+    // the macro radar lands on their next move, when context is welcome.
+    if (!opts?.isOpening) {
+      try {
+        const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
+        const map = generateWorldMap(seed, player.currentLocationId);
+        const fromX = player.mapX ?? 4;
+        const fromY = player.mapY ?? 4;
+        const radar = describeAllDirections(map, fromX, fromY);
+        get().appendLog('world', `[${location.name}] ${radar}`);
+      } catch {
+        // best-effort radar — never block the scene on a map-generation hiccup
+      }
     }
     if (enemies.length > 1) {
       get().appendLog(
@@ -1300,35 +1330,41 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const unresolvedHookList = (initialHooks.length > 0 ? initialHooks : [])
       .filter((h) => !h.resolved)
       .map((h) => ({ kind: h.kind, nouns: h.nouns }));
-    if (chance(45)) {
-      void narrateViaArbiter(
-        get,
-        set,
-        buildArbiterSceneIntro({
-          location,
-          enemy: sceneEnemy,
-          player,
-          worldMemory: get().worldMemory,
-        }),
-        'scene_intro',
-      );
-    } else if (
-      shouldArbiterSpeak({
-        hasEnemy: !!sceneEnemy,
-        hasUnresolvedHooks: unresolvedHookList.length > 0,
-      })
-    ) {
-      void narrateViaArbiter(
-        get,
-        set,
-        buildArbiterRemark({
-          location,
-          hazard,
-          enemy: sceneEnemy,
-          unresolvedHooks: unresolvedHookList,
-        }),
-        'scene_intro',
-      );
+    // Suppress the random Arbiter intros on the opening scene — the
+    // openingPrefix already carries an authored Arbiter line; piling
+    // another on top creates the "scene built twice" feel the playtest
+    // log flagged.
+    if (!opts?.isOpening) {
+      if (chance(45)) {
+        void narrateViaArbiter(
+          get,
+          set,
+          buildArbiterSceneIntro({
+            location,
+            enemy: sceneEnemy,
+            player,
+            worldMemory: get().worldMemory,
+          }),
+          'scene_intro',
+        );
+      } else if (
+        shouldArbiterSpeak({
+          hasEnemy: !!sceneEnemy,
+          hasUnresolvedHooks: unresolvedHookList.length > 0,
+        })
+      ) {
+        void narrateViaArbiter(
+          get,
+          set,
+          buildArbiterRemark({
+            location,
+            hazard,
+            enemy: sceneEnemy,
+            unresolvedHooks: unresolvedHookList,
+          }),
+          'scene_intro',
+        );
+      }
     }
     set((s) => {
       const taggedMem = recordTags(

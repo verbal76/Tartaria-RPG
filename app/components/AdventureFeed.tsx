@@ -1,30 +1,101 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import type { GameLogEntry, LogChannel } from '../engine/types';
 
-interface Props { entries: GameLogEntry[]; }
+interface Props {
+  entries: GameLogEntry[];
+  /** Names of enemies currently on the field, used to highlight enemy
+   *  mentions inline within world / combat / reward text in the combat
+   *  color so they stand out as the live threats. */
+  enemyNames?: string[];
+}
+
+// Color palette per the user's spec:
+//   - WORLD = one unified color (description, system meta, rewards).
+//   - ARBITER = amber, gets a label so you know who is talking.
+//   - PLAYER = blue (their own input echoed back).
+//   - COMBAT = warning red — used both as the combat log color AND as
+//     the inline highlight for enemy names appearing inside world text
+//     so the live threat is easy to scan.
+const WORLD_COLOR = '#cdbf99';
+const ARBITER_COLOR = '#c9a86a';
+const PLAYER_COLOR = '#7fb8ff';
+const COMBAT_COLOR = '#e07a5f';
+const REWARD_COLOR = '#9ec96a';
 
 const channelColors: Record<LogChannel, string> = {
-  player: '#7fb8ff',
-  arbiter: '#c9a86a',
-  world: '#cdbf99',
-  system: '#a89a7a',  // dice roll results — warm amber, readable
-  combat: '#e07a5f',
-  reward: '#9ec96a',
-  cognitive: '#7a705c',  // dim grey — debug-style, not story content
-  debug: '#605648',  // dimmer still — only shows up in the COPY ALL log
+  player: PLAYER_COLOR,
+  arbiter: ARBITER_COLOR,
+  world: WORLD_COLOR,
+  system: WORLD_COLOR,
+  combat: COMBAT_COLOR,
+  reward: REWARD_COLOR,
+  cognitive: '#7a705c',
+  debug: '#605648',
 };
 
-// The `cognitive` channel is MiniLM's emotion/intent classifier output —
-// useful as a dev diagnostic but pure noise to the player. The `debug`
-// channel is engine-side diagnostics (parser decisions, combat range
-// transitions). Both still land in the on-disk log so we can read them in
-// LogScreen → COPY ALL when chasing a bug.
+// `cognitive` (MiniLM emotion/intent) and `debug` (parser, combat range
+// transitions) are diagnostic noise — kept in the on-disk log via
+// COPY ALL but never shown in-game. `system` is now folded visually into
+// the world voice; the underlying channel is preserved so the on-disk
+// log is still searchable.
 const HIDDEN_CHANNELS: ReadonlySet<LogChannel> = new Set(['cognitive', 'debug']);
 
-export function AdventureFeed({ entries }: Props) {
+// Only these channels get a label tag above the text. Everything else
+// is rendered as voiceless prose — colored, but without a SYSTEM /
+// WORLD / REWARD chip on top.
+function tagForChannel(channel: LogChannel): string | null {
+  if (channel === 'arbiter') return 'ARBITER';
+  return null;
+}
+
+// Split body text into spans, highlighting any occurrence of a known
+// enemy name in the combat color. Case-insensitive match; preserves
+// non-matching text verbatim. When `names` is empty or no match is
+// found, returns a single-text-fragment shortcut for perf.
+function renderBodyWithEnemyHighlight(
+  text: string,
+  baseColor: string,
+  names: string[],
+): React.ReactNode {
+  if (names.length === 0) {
+    return <Text style={[styles.body, { color: baseColor }]}>{text}</Text>;
+  }
+  // Build a single regex matching any enemy name (longest first so
+  // "Mud Goblin" beats "Goblin"). Escape regex metachars.
+  const escaped = names
+    .slice()
+    .sort((a, b) => b.length - a.length)
+    .map((n) => n.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'));
+  const re = new RegExp(`(${escaped.join('|')})`, 'gi');
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  let key = 0;
+  while ((match = re.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+    parts.push(
+      <Text key={`e${key++}`} style={{ color: COMBAT_COLOR, fontWeight: '700' }}>
+        {match[0]}
+      </Text>,
+    );
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+  return <Text style={[styles.body, { color: baseColor }]}>{parts}</Text>;
+}
+
+export function AdventureFeed({ entries, enemyNames }: Props) {
   const scrollRef = useRef<ScrollView>(null);
   const visible = entries.filter((e) => !HIDDEN_CHANNELS.has(e.channel));
+  const names = useMemo(
+    () => (enemyNames ?? []).filter((n) => n && n.trim().length > 0),
+    [enemyNames],
+  );
 
   useEffect(() => {
     scrollRef.current?.scrollToEnd({ animated: true });
@@ -32,18 +103,25 @@ export function AdventureFeed({ entries }: Props) {
 
   return (
     <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={styles.content}>
-      {visible.map((entry) => (
-        <View key={entry.id} style={styles.entry}>
-          <Text style={[styles.channel, { color: channelColors[entry.channel] }]}>
-            {entry.channel === 'player' ? 'YOU'
-              : entry.channel === 'system' && entry.text.startsWith('d') ? 'ROLL'
-              : entry.channel.toUpperCase()}
-          </Text>
-          <Text style={[styles.body, { color: channelColors[entry.channel] }]}>
-            {entry.text}
-          </Text>
-        </View>
-      ))}
+      {visible.map((entry) => {
+        const color = channelColors[entry.channel];
+        const tag = tagForChannel(entry.channel);
+        // Enemy highlighting only applies to ambient narration — skip it
+        // on player echo (their own input) and on the arbiter's own
+        // voice (we don't want to recolor a name inside their dialogue).
+        const allowHighlight = entry.channel === 'world'
+          || entry.channel === 'combat'
+          || entry.channel === 'system'
+          || entry.channel === 'reward';
+        return (
+          <View key={entry.id} style={styles.entry}>
+            {tag ? <Text style={[styles.tag, { color }]}>{tag}</Text> : null}
+            {allowHighlight
+              ? renderBodyWithEnemyHighlight(entry.text, color, names)
+              : <Text style={[styles.body, { color }]}>{entry.text}</Text>}
+          </View>
+        );
+      })}
     </ScrollView>
   );
 }
@@ -58,7 +136,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   content: { paddingBottom: 12 },
-  entry: { marginBottom: 8 },
-  channel: { fontSize: 10, fontWeight: '700', letterSpacing: 1, marginBottom: 2 },
+  entry: { marginBottom: 10 },
+  tag: { fontSize: 10, fontWeight: '700', letterSpacing: 2, marginBottom: 2 },
   body: { fontSize: 14, lineHeight: 20 },
 });
