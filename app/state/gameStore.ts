@@ -1011,6 +1011,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ? `${opts.openingPrefix.trim()} ${sceneText.replace(/\n\n+/g, ' ')}`
       : sceneText;
     get().appendLog('world', finalSceneLog);
+    // HANDOFF #15 — record this room visit in the MapGraph. The key
+    // combines macro location + micro-micro id + map coords so two
+    // visits to the SAME room get the same key, but two different
+    // micro-micros within the same Macro stay distinct.
+    const roomKey = makeRoomKey(player.currentLocationId, microMicroId, player.mapX, player.mapY);
+    const prevVisits = get().worldMemory.visitedRooms ?? {};
+    const existing = prevVisits[roomKey];
+    if (existing) {
+      const tag = existing.visitCount >= 5 ? 'many times' : existing.visitCount >= 2 ? 'again' : 'before';
+      get().appendLog('world', `You've stood here ${tag}. (visit ${existing.visitCount + 1})`);
+    }
+    set((s) => ({
+      worldMemory: {
+        ...s.worldMemory,
+        visitedRooms: {
+          ...(s.worldMemory.visitedRooms ?? {}),
+          [roomKey]: {
+            firstVisitAt: existing?.firstVisitAt ?? Date.now(),
+            lastVisitAt: Date.now(),
+            visitCount: (existing?.visitCount ?? 0) + 1,
+            enemiesCleared: existing?.enemiesCleared ?? [],
+          },
+        },
+      },
+    }));
     // When we're in a Micro-Micro room, surface its named exits on its own
     // line so the player has a deterministic list of things to type
     // ("take the stairwell", "out the broken window"). This is the room-
@@ -1549,6 +1574,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
           const steps = buildSkillSteps('investigate', player, {
             weatherMod: weatherStatModifiers(currentScene.weather),
+            companionAssist: !!player.companion,
           });
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
           break;
@@ -1635,6 +1661,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
         const steps = buildSkillSteps(parsed.intent, player, {
           weatherMod: weatherStatModifiers(currentScene.weather),
+          companionAssist: !!player.companion,
         });
         set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
         break;
@@ -2560,6 +2587,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const maneuverKind = classifyManeuver(trimmed);
         const steps = buildSkillSteps(maneuverKind, player, {
           weatherMod: weatherStatModifiers(currentScene.weather),
+          companionAssist: !!player.companion,
         });
         set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
         const buildNote = penaltyDice > 0
@@ -3599,6 +3627,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const enemy = activeEnemy(currentScene);
     if (!currentScene || !enemy || !player) return;
     const activeIdx = currentScene.activeEnemyIdx;
+    // HANDOFF #15 — record the kill against the current room so re-entry
+    // narration can reference it ("you cleared this room before"). Pure
+    // bookkeeping; doesn't yet suppress respawns.
+    {
+      const roomKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY);
+      const rooms = worldMemory.visitedRooms ?? {};
+      const room = rooms[roomKey];
+      if (room) {
+        const cleared = Array.from(new Set([...(room.enemiesCleared ?? []), enemy.name]));
+        set((s) => ({
+          worldMemory: {
+            ...s.worldMemory,
+            visitedRooms: { ...(s.worldMemory.visitedRooms ?? {}), [roomKey]: { ...room, enemiesCleared: cleared } },
+          },
+        }));
+      }
+    }
     // Hunt-boss kill: if the slain enemy's name matches a target of an
     // active hunt currently at its boss stage, advance the hunt one more
     // beat (past the boss stage) so the player can turn it in.
@@ -5536,6 +5581,21 @@ function enemyCanReach(enemy: Enemy, range: CombatRange): boolean {
 /** Build score per the action-card maneuver math. Higher is bigger /
  *  heavier. Player: derived from STR (mass + leverage) with a small
  *  race bonus for Tartarian Giants. Range roughly 1..10. */
+/** HANDOFF #15 — deterministic room key for MapGraph lookups. Two
+ *  visits to the same room (same macro location + same micro-micro id
+ *  + same X/Y on the procedural map) collapse to the same key. */
+function makeRoomKey(
+  locationId: string,
+  microMicroId: string | null | undefined,
+  mapX: number | null | undefined,
+  mapY: number | null | undefined,
+): string {
+  const mm = microMicroId ?? '_';
+  const x = typeof mapX === 'number' ? mapX : '_';
+  const y = typeof mapY === 'number' ? mapY : '_';
+  return `${locationId}@${mm}@${x},${y}`;
+}
+
 function playerBuildScore(player: PlayerCharacter): number {
   const stats = effectiveStats(player);
   let build = Math.max(1, Math.round(stats.strength * 0.7));
@@ -5720,7 +5780,29 @@ function applyEnemyCounter(
   const baseAtk = parseInt(String(enemy.attack), 10) || 3;
   const traitAtk = traitAttackBonus(enemy.traits);
   const atkBonus = baseAtk + traitAtk;
-  const atkRoll = rollDie(20);
+  // HANDOFF #14 — true advantage/disadvantage for defensive status
+  // effects. When the player has cover/dodge/block active, the enemy's
+  // attack rolls 2d20 and takes the LOWER (disadvantage on attacker).
+  // When the player has 'surprised' active, the enemy rolls 2d20 and
+  // takes the HIGHER (advantage on attacker). One-die path stays for
+  // the neutral case so the log reads cleanly.
+  const fx = player.statusEffects ?? [];
+  const defenderAdvantage = fx.some((e) => ['in_cover', 'in_cover_full', 'dodging', 'blocking'].includes(e.kind) && e.remainingRounds > 0);
+  const attackerAdvantage = fx.some((e) => e.kind === 'surprised' && e.remainingRounds > 0);
+  let atkRoll = rollDie(20);
+  let shadowRoll: number | null = null;
+  let advLabel = '';
+  if (defenderAdvantage && !attackerAdvantage) {
+    shadowRoll = rollDie(20);
+    const used = Math.min(atkRoll, shadowRoll);
+    advLabel = ` [adv defense: ${atkRoll}/${shadowRoll} → ${used}]`;
+    atkRoll = used;
+  } else if (attackerAdvantage && !defenderAdvantage) {
+    shadowRoll = rollDie(20);
+    const used = Math.max(atkRoll, shadowRoll);
+    advLabel = ` [surprise: ${atkRoll}/${shadowRoll} → ${used}]`;
+    atkRoll = used;
+  }
   const atkTotal = atkRoll + atkBonus;
   // Effective AC = race base + summed armor bonus from head/chest/legs/feet
   // + status modifier (e.g. -2 from armor_severed, +4 partial cover,
@@ -5733,7 +5815,7 @@ function applyEnemyCounter(
 
   get().appendLog(
     'combat',
-    `${enemy.name} — d20 → ${atkRoll} + ATK ${atkBonus} = ${atkTotal} vs your AC ${effectiveAc} — ${hit ? '✓ HIT' : '✗ MISS'}`,
+    `${enemy.name} — d20 → ${atkRoll}${advLabel} + ATK ${atkBonus} = ${atkTotal} vs your AC ${effectiveAc} — ${hit ? '✓ HIT' : '✗ MISS'}`,
   );
 
   if (hit) {

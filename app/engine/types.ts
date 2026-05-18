@@ -459,6 +459,26 @@ export interface WorldMemory {
    *  after combat — gives the player room to wander, dig, search, inspect
    *  without immediately rolling another encounter. */
   scenesSinceCombat?: number;
+  /** HANDOFF #15 — first cut MapGraph. Tracks every room the player has
+   *  set foot in, keyed by `locationId@microMicroId@mapX,mapY`. First
+   *  use is "you've been here before" narration on look + scene entry.
+   *  Future: persist enemiesCleared, lootGrabbed, hooksResolved so a
+   *  re-entry doesn't re-roll a fresh scene. Optional + defaulted so
+   *  legacy saves load cleanly. */
+  visitedRooms?: Record<string, VisitedRoom>;
+}
+
+export interface VisitedRoom {
+  /** Unix ms of first visit. */
+  firstVisitAt: number;
+  /** Unix ms of most recent visit. */
+  lastVisitAt: number;
+  /** How many distinct visits — useful for "you've been here many times". */
+  visitCount: number;
+  /** Names of enemies the player has defeated in this room on prior
+   *  visits. The next scene roll can use this to suppress respawns
+   *  feel rather than re-spawning fresh waves. */
+  enemiesCleared?: string[];
 }
 
 export type ScreenName =

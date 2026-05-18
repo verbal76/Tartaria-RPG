@@ -370,7 +370,7 @@ export function buildRestSteps(): RollStep[] {
 export function buildSkillSteps(
   intent: string,
   player: PlayerCharacter,
-  opts?: { weatherMod?: Partial<Stats> },
+  opts?: { weatherMod?: Partial<Stats>; companionAssist?: boolean },
 ): RollStep[] {
   const statKey = SKILL_STAT[intent] ?? 'wisdom';
   const stats = effectiveStats(player, opts?.weatherMod);
@@ -380,16 +380,21 @@ export function buildSkillSteps(
   const dcName = DC_NAME[dc] ?? '';
   const verb = INTENT_ACTION_VERB[intent] ?? intent.toUpperCase();
   const label = `Roll to ${verb}`;
+  // Companion assist — +2 bonus when a companion is present. Stacks
+  // with weather + equipped stat bonuses. Narrative: the follower is
+  // helping you.
+  const assistBonus = opts?.companionAssist ? 2 : 0;
+  const assistLabel = assistBonus ? ` + ${assistBonus} (companion assist)` : '';
 
   return [{
     id: 'skill_check',
     label,
     sides: 20,
     count: 1,
-    bonus: statVal,
-    bonusLabel: `${statLabel} ${statVal}`,
+    bonus: statVal + assistBonus,
+    bonusLabel: `${statLabel} ${statVal}${assistLabel}`,
     target: dc,
     targetLabel: `DC ${dc}${dcName ? ` — ${dcName}` : ''}`,
-    context: `d20 + ${statLabel} vs ${dcName || 'DC'} ${dc}`,
+    context: `d20 + ${statLabel}${assistLabel} vs ${dcName || 'DC'} ${dc}`,
   }];
 }
