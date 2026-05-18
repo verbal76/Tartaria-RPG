@@ -109,8 +109,8 @@ export function onDownloadProgress(fn: (p: number) => void): () => void {
 }
 
 function pickVoice(): unknown {
-  const id = getVoiceSettings().kokoroVoice ?? 'af_heart';
-  return VOICES[id] ?? exec.KOKORO_VOICE_AF_HEART;
+  const id = getVoiceSettings().kokoroVoice ?? 'am_michael';
+  return VOICES[id] ?? exec.KOKORO_VOICE_AM_MICHAEL;
 }
 
 /** True once the model has been loaded into memory at least once. */

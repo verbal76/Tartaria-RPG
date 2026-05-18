@@ -33,7 +33,7 @@ export interface VoiceSettings {
   voiceId: string | null;
   /** Selected Kokoro voice (af_heart / af_river / af_sarah / am_adam /
    *  am_michael / bf_emma / bm_daniel). Used when engine = 'bundled'.
-   *  Defaults to af_heart — American female, natural-sounding. */
+   *  Defaults to am_michael — American male, even-toned narrator. */
   kokoroVoice: string;
   /** When true, a recognised STT transcript immediately fires
    *  submitPlayerAction. When false, the transcript lands in the text
@@ -49,7 +49,7 @@ const DEFAULTS: VoiceSettings = {
   rate: 1.0,
   pitch: 1.0,
   voiceId: null,
-  kokoroVoice: 'af_heart',
+  kokoroVoice: 'am_michael',
   autoSubmit: false,
 };
 
