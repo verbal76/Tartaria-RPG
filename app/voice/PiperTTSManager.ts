@@ -131,6 +131,36 @@ export function resetPiperAvailability(): void {
   availabilityCache = null;
 }
 
+let prewarmStarted = false;
+
+/** Kick off model download + load + a tiny silent warm-up inference
+ *  in the background. Idempotent — first call starts the work, later
+ *  calls just resolve when the in-flight load finishes. The warm-up
+ *  forward() ensures the executorch graph is compiled so the player's
+ *  first real speak() doesn't pay the cold-start tax.
+ *
+ *  Called at app boot from TTSManager when engine='bundled', and
+ *  also when the player flips engine to bundled mid-session. Safe
+ *  to call when the model is already ready (returns immediately). */
+export async function prewarmKokoro(): Promise<void> {
+  if (prewarmStarted) return;
+  prewarmStarted = true;
+  try {
+    const m = await ensureModel();
+    if (!m) return;
+    // Warm inference — minimal text so the graph compiles fast. Audio
+    // output is discarded; we never call playPcm here. Some
+    // executorch backends compile lazily on first forward(), which is
+    // what we want to pay now (in the background) rather than on the
+    // player's first heard line.
+    try {
+      const samples: Float32Array = await m.forward('ok.', 1.0);
+      // No-op — we only wanted the side effect of compiling the graph.
+      void samples;
+    } catch { /* ignore warm-up errors; real speak() will surface them */ }
+  } catch { /* ignore — state machine already surfaced the error */ }
+}
+
 export function isSpeaking(): boolean {
   return currentlySpeaking !== null || queue.length > 0;
 }

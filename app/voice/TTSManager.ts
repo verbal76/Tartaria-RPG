@@ -16,6 +16,7 @@ import {
   isSpeaking as piperIsSpeaking,
   isPiperAvailable,
   disposePiperEngine,
+  prewarmKokoro,
 } from './PiperTTSManager';
 
 interface QueuedUtterance {
@@ -206,6 +207,15 @@ function drain(): void {
 export async function initTTSManager(): Promise<void> {
   await loadVoiceSettings();
   await isTTSAvailable(); // primes the availability + voice cache
+  // Preload Kokoro in the background if the player has bundled TTS
+  // enabled. The download (~100 MB on first install) and graph-
+  // compile happen while the player is on the title screen or
+  // making a character, so the first narration line doesn't wait
+  // on cold-start.
+  const initial = getVoiceSettings();
+  if (initial.ttsEnabled && initial.engine === 'bundled') {
+    void prewarmKokoro();
+  }
   onVoiceSettingsChange((s) => {
     if (!s.ttsEnabled) {
       // Finish the current sentence, drop everything queued behind it.
@@ -213,6 +223,13 @@ export async function initTTSManager(): Promise<void> {
       // tail. If the player wanted immediate silence they'd hit
       // SILENCE ARBITER which calls stopAndClear directly.
       clearQueueKeepCurrent();
+      return;
+    }
+    // Player flipped TTS on OR switched to bundled engine — preload
+    // Kokoro so the next speak() finds it ready. prewarmKokoro is
+    // idempotent; subsequent calls are cheap no-ops.
+    if (s.engine === 'bundled') {
+      void prewarmKokoro();
     }
   });
 }
