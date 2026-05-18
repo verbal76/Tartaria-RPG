@@ -123,8 +123,19 @@ export function ExplorationScreen() {
           </Text>
         </View>
         <View style={styles.sceneBarBtns}>
-          <TouchableOpacity onPress={() => setScreen('about')} hitSlop={8}>
-            <Text style={styles.sceneBtn}>⚙</Text>
+          <TouchableOpacity
+            onPress={() => setScreen('actions')}
+            hitSlop={8}
+            style={styles.sceneBarBtn}
+          >
+            <Text style={styles.sceneBarBtnText}>ACTS</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setScreen('contracts')}
+            hitSlop={8}
+            style={styles.sceneBarBtn}
+          >
+            <Text style={styles.sceneBarBtnText}>QUESTS</Text>
           </TouchableOpacity>
         </View>
       </TutorialTarget>
@@ -177,13 +188,13 @@ export function ExplorationScreen() {
           />
         )}
         <TutorialTarget area="bottom-menu" style={styles.menuRow}>
-          <TouchableOpacity onPress={() => { void saveAndExitToTitle(); }}>
-            <Text style={styles.menu}>save & exit</Text>
+          <TouchableOpacity onPress={() => { void saveAndExitToTitle(); }} style={styles.menuBtn}>
+            <Text style={styles.menuBtnText}>save & exit</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setScreen('log')}>
-            <Text style={styles.menu}>full log</Text>
+          <TouchableOpacity onPress={() => setScreen('log')} style={styles.menuBtn}>
+            <Text style={styles.menuBtnText}>full log</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setScreen('about')} hitSlop={8}>
+          <TouchableOpacity onPress={() => setScreen('about')} hitSlop={8} style={styles.menuBtnGear}>
             <Text style={styles.gear}>⚙</Text>
           </TouchableOpacity>
         </TutorialTarget>
@@ -209,13 +220,28 @@ const styles = StyleSheet.create({
   rightCol: { flex: 1 },
   sceneBar: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingHorizontal: 8, paddingVertical: 4, backgroundColor: '#13110f',
+    paddingHorizontal: 8, paddingVertical: 6, backgroundColor: '#13110f',
     borderColor: '#3a342c', borderWidth: 1, borderRadius: 4,
+    gap: 6,
   },
-  sceneText: { color: '#c9a86a', fontSize: 11, letterSpacing: 1 },
-  timeText: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginTop: 1 },
-  sceneBarBtns: { flexDirection: 'row', gap: 4 },
+  sceneText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1 },
+  timeText: { color: '#7a705c', fontSize: 9, letterSpacing: 1, marginTop: 1 },
+  sceneBarBtns: { flexDirection: 'row', gap: 4, flexShrink: 0 },
   sceneBtn: { color: '#cdbf99', fontSize: 16, paddingHorizontal: 8 },
+  // Compact bordered chips on the scene bar — 'ACTS' opens the action
+  // reference, 'QUESTS' opens the active hunts / mysteries / storylines /
+  // faction quests board. Short labels keep the row from crowding the
+  // location + weather text on narrow Android screens. Settings stays
+  // accessible via the gear in the bottom menu row.
+  sceneBarBtn: {
+    backgroundColor: '#1a1612',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+  },
+  sceneBarBtnText: { color: '#c9a86a', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
   feed: { flex: 1 },
   streamingTail: {
     paddingHorizontal: 10,
@@ -229,9 +255,32 @@ const styles = StyleSheet.create({
   streamingText: { color: '#cdbf99', fontSize: 13, lineHeight: 18 },
   streamingCursor: { color: '#c9a86a', fontSize: 13 },
   controls: { gap: 6 },
-  menuRow: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 4 },
+  menuRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 4, gap: 6 },
   menu: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },
-  gear: { color: '#c9a86a', fontSize: 18, lineHeight: 18 },
+  // Bordered chips for the bottom menu row so 'save & exit' and 'full
+  // log' read as proper buttons, matching the scene-bar action chips.
+  menuBtn: {
+    backgroundColor: '#1a1612',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    flex: 1,
+    alignItems: 'center',
+  },
+  menuBtnText: { color: '#cdbf99', fontSize: 11, fontWeight: '700', letterSpacing: 1 },
+  menuBtnGear: {
+    backgroundColor: '#1a1612',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  gear: { color: '#c9a86a', fontSize: 16, lineHeight: 18 },
   vendorBanner: {
     flexDirection: 'row',
     alignItems: 'center',
