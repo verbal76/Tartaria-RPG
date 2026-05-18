@@ -32,6 +32,13 @@ const queue: QueuedUtterance[] = [];
 let currentlySpeaking: QueuedUtterance | null = null;
 let availabilityCache: boolean | null = null;
 let voicesCache: Speech.Voice[] | null = null;
+/** Timer that holds off the first Speech.speak() call by a short
+ *  window so consecutive speak() calls in the same action (world +
+ *  arbiter + reward bursts) coalesce into one utterance. Android TTS
+ *  inserts a ~0.5-2s init gap between separate utterances; merging
+ *  them eliminates the pause the player hears between sections. */
+let coalesceTimer: ReturnType<typeof setTimeout> | null = null;
+const COALESCE_MS = 150;
 
 /** Returns true if expo-speech can run on this device. We try two
  *  probes because `getAvailableVoicesAsync` returns an empty list on
@@ -94,7 +101,16 @@ export function speak(text: string, channel?: string): number {
   }
   const id = nextId++;
   queue.push({ id, text: trimmed, channel });
-  drain();
+  // If something is already being spoken, drain() will merge the
+  // queue when it finishes — no timer needed. If the engine is idle,
+  // hold off briefly so additional speak() calls landing in the same
+  // tick get bundled into one utterance.
+  if (currentlySpeaking) return id;
+  if (coalesceTimer != null) return id;
+  coalesceTimer = setTimeout(() => {
+    coalesceTimer = null;
+    drain();
+  }, COALESCE_MS);
   return id;
 }
 
@@ -105,6 +121,7 @@ export function speak(text: string, channel?: string): number {
 export function stopAndClear(): void {
   queue.length = 0;
   currentlySpeaking = null;
+  if (coalesceTimer != null) { clearTimeout(coalesceTimer); coalesceTimer = null; }
   try { void Speech.stop(); } catch { /* ignore */ }
   void piperStopAndClear();
 }
@@ -114,6 +131,7 @@ export function stopAndClear(): void {
  *  seconds behind the visible scene. */
 export function clearQueueKeepCurrent(): void {
   queue.length = 0;
+  if (coalesceTimer != null) { clearTimeout(coalesceTimer); coalesceTimer = null; }
 }
 
 /** Re-apply rate / pitch / voice from settings. Called after the
@@ -127,8 +145,18 @@ export function applySettings(): void {
 
 function drain(): void {
   if (currentlySpeaking) return;
-  const next = queue.shift();
-  if (!next) return;
+  if (queue.length === 0) return;
+  // Merge everything currently queued into a single utterance so
+  // Android TTS's per-utterance init gap doesn't land between
+  // consecutive log lines from the same action. The joiner is two
+  // spaces so the engine still pauses naturally at the sentence
+  // boundary without a full reinit.
+  const batch = queue.splice(0, queue.length);
+  const next: QueuedUtterance = {
+    id: batch[0]!.id,
+    text: batch.map((it) => it.text).join('  '),
+    channel: batch[0]!.channel,
+  };
   currentlySpeaking = next;
   const settings = getVoiceSettings();
   try {

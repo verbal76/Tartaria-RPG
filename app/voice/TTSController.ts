@@ -36,6 +36,13 @@ const SPOKEN_CHANNELS: ReadonlySet<LogChannel> = new Set([
 let unsub: (() => void) | null = null;
 let unsubSettings: (() => void) | null = null;
 let lastLogIndex = 0;
+/** Id of the last log entry we processed. Used to detect bulk
+ *  replacement of gameLog (save-load): if the entry at the previous
+ *  position no longer matches this id, the log was wholesale replaced
+ *  and we must NOT re-speak the saved backlog. Only the next new
+ *  entry (typically the "you step back into..." resume line) should
+ *  be voiced. */
+let lastSpokenEntryId: string | null = null;
 let streamBuffer = '';
 /** Ids of arbiter entries we already voiced via the streaming buffer.
  *  When the matching final entry lands on the arbiter channel via
@@ -70,18 +77,42 @@ function flushStreamBuffer(): void {
   streamBuffer = '';
 }
 
+function syncToCurrent(state: GameState): void {
+  lastLogIndex = state.gameLog.length;
+  const last = state.gameLog[state.gameLog.length - 1];
+  lastSpokenEntryId = last ? last.id : null;
+  streamBuffer = '';
+}
+
 function onState(state: GameState): void {
   const settings = getVoiceSettings();
   if (!settings.ttsEnabled) {
-    // Keep lastLogIndex synced so a mid-game toggle ON doesn't
-    // re-speak old entries.
-    lastLogIndex = state.gameLog.length;
-    streamBuffer = '';
+    // Keep state synced so a mid-game toggle ON doesn't re-speak
+    // old entries.
+    syncToCurrent(state);
     return;
   }
 
-  // 1) New log entries — only ones added since the last tick.
+  // 1) New log entries — only ones added since the last tick. Detect
+  // bulk replacement (save-load): when the entry that USED to sit at
+  // lastLogIndex - 1 is no longer there, the log was wholesale
+  // replaced. Resync silently so the resume line (the one entry the
+  // load handler appends after restore) is the only thing voiced.
   const log = state.gameLog;
+  const expectedPrev = lastLogIndex > 0 ? log[lastLogIndex - 1] : null;
+  const wholesaleReplaced =
+    lastSpokenEntryId != null &&
+    (lastLogIndex > log.length ||
+      !expectedPrev ||
+      expectedPrev.id !== lastSpokenEntryId);
+  if (wholesaleReplaced) {
+    // Realign to current tail without speaking anything. The next
+    // appendLog after this tick (e.g. the "you step back into ..."
+    // resume cue) will fall through the normal speak path.
+    syncToCurrent(state);
+    return;
+  }
+
   if (log.length > lastLogIndex) {
     for (let i = lastLogIndex; i < log.length; i++) {
       const entry = log[i] as GameLogEntry | undefined;
@@ -93,6 +124,8 @@ function onState(state: GameState): void {
       speak(entry.text, entry.channel);
     }
     lastLogIndex = log.length;
+    const tail = log[log.length - 1];
+    if (tail) lastSpokenEntryId = tail.id;
   }
 
   // 2) Streaming Arbiter narration — accumulate the buffer, ship
@@ -123,16 +156,14 @@ function onState(state: GameState): void {
  *  once at app boot, AFTER initTTSManager(). */
 export function startTTSController(): void {
   if (unsub) return;
-  lastLogIndex = useGameStore.getState().gameLog.length;
-  streamBuffer = '';
+  syncToCurrent(useGameStore.getState());
   unsub = useGameStore.subscribe(onState);
   unsubSettings = onVoiceSettingsChange((s) => {
     if (!s.ttsEnabled) {
       // Settings flipped OFF — manager handles the queue (keeps the
       // current sentence, drops the rest); we just resync indices so
       // an OFF→ON toggle doesn't replay anything.
-      lastLogIndex = useGameStore.getState().gameLog.length;
-      streamBuffer = '';
+      syncToCurrent(useGameStore.getState());
     }
   });
 }

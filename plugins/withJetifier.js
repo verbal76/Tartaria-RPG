@@ -15,7 +15,12 @@
 // jetifier is OFF by default (AndroidX-only mode). This plugin flips
 // it ON only for builds that need it.
 
-const { withGradleProperties } = require('@expo/config-plugins');
+// Import path: `expo/config-plugins` is the canonical entry point that
+// ships with the `expo` package itself, so we don't need `@expo/config-
+// plugins` as a project dependency. (It used to land in our tree as a
+// transitive dep of @react-native-voice/voice; once we removed that
+// package the import path broke at prebuild — Cannot find module.)
+const { withGradleProperties } = require('expo/config-plugins');
 
 function withJetifier(config) {
   return withGradleProperties(config, (cfg) => {
