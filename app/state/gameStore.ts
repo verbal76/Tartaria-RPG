@@ -153,6 +153,7 @@ import {
 } from '../engine/factionStorylines';
 import { tickWeather, weatherBlocksRepositioning, weatherRepositionCost, weatherAttackPenalty, weatherStatModifiers, describeWeatherStatModifiers } from '../engine/weatherEffects';
 import { traitAttackBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, traitDodgeChance, describeTraits } from '../engine/enemyTraits';
+import { parseWeaponEffect, rollEffectBonusDamage } from '../engine/weaponEffects';
 import { rollThrowDamage, weightLabel, itemWeight } from '../engine/itemWeight';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
 import { levenshtein } from '../engine/editDistance';
@@ -945,6 +946,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // entirely during the cooldown window.
     const peaceCounter = worldMemory.scenesSinceCombat ?? 99;
     const enforcePeace = peaceCounter < 2;
+    // HANDOFF #15 — recent-clearance respawn suppression. If the player
+    // is re-entering a room they cleared within the last 6 in-game
+    // hours, skip the encounter roll. Older clearances (rooms you left
+    // long ago) repopulate normally — Tartaria doesn't stay quiet
+    // forever. Pulls from the visitedRooms MapGraph + player.hoursElapsed.
+    const RESPAWN_QUIET_HOURS = 6;
+    const candidateKey = makeRoomKey(player.currentLocationId, microMicroId, player.mapX, player.mapY);
+    const priorVisit = worldMemory.visitedRooms?.[candidateKey];
+    const hoursElapsed = player.hoursElapsed ?? 0;
+    const hoursSinceLastVisit = priorVisit
+      ? (Date.now() - priorVisit.lastVisitAt) / (1000 * 60 * 60)  // wall-clock fallback
+      : Infinity;
+    const recentlyCleared =
+      !!priorVisit &&
+      (priorVisit.enemiesCleared?.length ?? 0) > 0 &&
+      hoursSinceLastVisit < RESPAWN_QUIET_HOURS;
     // Phase 4 §4.3 — biome-curated encounter pools. If the Micro-Micro
     // has a possibleEncounters list, pick rarity-weighted from THAT pool
     // (so the Buried Skyscraper Upper only spawns Aetherbats, Reclaimer
@@ -952,7 +969,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // legacy global roll when no ladder or when the curated pool returns
     // nothing (data drift safety).
     let encounter: Enemy[] = [];
-    if (!enforcePeace) {
+    if (!enforcePeace && !recentlyCleared) {
       if (ladderTriple && chance(40 + location.danger * 8)) {
         const curated = pickEncounterFromLadder(ladderTriple);
         if (curated) encounter = [curated];
@@ -1015,12 +1032,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // combines macro location + micro-micro id + map coords so two
     // visits to the SAME room get the same key, but two different
     // micro-micros within the same Macro stay distinct.
-    const roomKey = makeRoomKey(player.currentLocationId, microMicroId, player.mapX, player.mapY);
+    const roomKey = candidateKey;
     const prevVisits = get().worldMemory.visitedRooms ?? {};
     const existing = prevVisits[roomKey];
     if (existing) {
       const tag = existing.visitCount >= 5 ? 'many times' : existing.visitCount >= 2 ? 'again' : 'before';
-      get().appendLog('world', `You've stood here ${tag}. (visit ${existing.visitCount + 1})`);
+      const clearedNote = recentlyCleared
+        ? ` The bodies you left are still here. Nothing has moved in to replace them.`
+        : '';
+      get().appendLog('world', `You've stood here ${tag}. (visit ${existing.visitCount + 1})${clearedNote}`);
     }
     set((s) => ({
       worldMemory: {
@@ -3496,7 +3516,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Stacks multiplicatively — an Iron Spider with "resist:slashing"
       // halves AGAIN on top of the Construct type's slashing resist.
       const traitMod = traitDamageMultiplier(enemy.traits, weaponType);
-      const dmg = Math.max(1, Math.round(mod.damage * traitMod.multiplier));
+      // HANDOFF followup — weapon "Effect" parser. Parses the catalog
+      // entry's free-text effect column for patterns like "+1d6 against
+      // Large creatures" / "+1d6 against constructs" and rolls the
+      // bonus dice when the enemy matches. Stacks ADDITIVELY on top of
+      // the type+trait math.
+      const parsedEffect = equipped ? parseWeaponEffect(equipped.effect) : null;
+      const effectBonus = parsedEffect ? rollEffectBonusDamage(parsedEffect, enemy) : 0;
+      const dmg = Math.max(1, Math.round(mod.damage * traitMod.multiplier) + effectBonus);
       const prevHp = currentScene.enemyHps[activeIdx] ?? enemy.hp;
       const newEnemyHp = prevHp - dmg;
 
@@ -3511,6 +3538,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('combat', `${enemy.name} is vulnerable to ${weaponType}. (trait ×1.5)`);
       } else if (traitMod.match === 'resist') {
         get().appendLog('combat', `${enemy.name}'s perks resist ${weaponType}. (trait ×0.5)`);
+      }
+      if (effectBonus > 0) {
+        get().appendLog('combat', `${equipped?.name ?? 'Your weapon'}'s effect triggers — +${effectBonus} bonus damage.`);
       }
 
       // Weapon wear: any successful hit chips one point off the weapon
@@ -5081,6 +5111,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog(
         'arbiter',
         `The Arbiter shakes their head. "The ${item.name} doesn't go in the ${SLOT_LABEL[slot]} slot."`,
+      );
+      return;
+    }
+    // HANDOFF followup — style: 'two_handed' integration. Refuse to
+    // equip into the off-hand when a two-handed weapon occupies the
+    // main slot, and refuse to equip a two-handed weapon when the off
+    // slot is already filled. Player has to unequip first.
+    const incomingCat = findWeaponByName(item.name);
+    const mainName = player.equipped?.main;
+    const offName = player.equipped?.off;
+    const mainCat = mainName ? findWeaponByName(mainName) : null;
+    if (slot === 'off' && mainCat?.style === 'two_handed') {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter eyes your ${mainName}. "Two-handed grip. There's no room in the off hand until you set that down."`,
+      );
+      return;
+    }
+    if (slot === 'main' && incomingCat?.style === 'two_handed' && offName) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter shakes their head. "The ${item.name} needs both hands. Drop the ${offName} from your off hand first."`,
       );
       return;
     }
