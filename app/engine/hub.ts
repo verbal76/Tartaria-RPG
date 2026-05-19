@@ -29,6 +29,11 @@ export interface HubRoom {
   };
   anchorNpc: string | null;
   tags: string[];
+  /** Author-declared searchable / approachable nouns in this room.
+   *  Surfaced as Search / Approach modal chips and recognised as
+   *  parser targets. Replaces the noun extractor for hub rooms.
+   *  Lowercase, no punctuation, singular preferred. */
+  interactables?: string[];
 }
 
 interface HubData {

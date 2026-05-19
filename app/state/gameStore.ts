@@ -798,14 +798,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Arbiter rehash, no fresh weather roll, no re-spawned enemies.
       // Resume is player-first: they take the next action.
       const restoredScene = (saved.currentScene ?? null) as CurrentScene | null;
-      // Re-extract ambientNouns from the canonical location.description.
-      // Older saves captured polluted noun lists (verbs / abstractions
-      // leaked in from Arbiter refusal prose under the old auto-extract
-      // path), which would otherwise resurface as Search / Approach chips
-      // until the player triggered a fresh beginScene. The extractor is
-      // pure + cheap, so we just rerun it on every restore.
-      if (restoredScene && restoredScene.location?.description) {
-        restoredScene.ambientNouns = extractAmbientNouns(restoredScene.location.description);
+      // Refresh ambientNouns from the canonical source. Prefer the
+      // authored location.interactables list when present; fall back
+      // to extractAmbientNouns(description) otherwise. Older saves
+      // captured polluted noun lists that would otherwise resurface
+      // as Search / Approach chips until beginScene fired again.
+      if (restoredScene?.location) {
+        const loc = restoredScene.location;
+        restoredScene.ambientNouns = (loc.interactables && loc.interactables.length > 0)
+          ? [...loc.interactables]
+          : extractAmbientNouns(loc.description);
       }
       set({
         player,
@@ -1184,18 +1186,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
       initialHooks.push(h);
       consumedChainIds.push(next.chainId);
     }
-    // Pull ambient nouns from the macro location description. In hub
-    // mode, ALSO pull from the hub room description so noun targets
-    // like "map-stone" (Central Square), "anvil" (Armory), "kettle"
-    // (Mess Hall), "tarpaulin" (Workshop) become approachable +
-    // searchable. Without this merge, hub-room interactables fall
-    // through to "Nothing to advance on. The ground here is quiet."
-    const ambientNouns = hubRoom
-      ? Array.from(new Set([
-          ...extractAmbientNouns(location.description),
-          ...extractAmbientNouns(hubRoom.description),
-        ]))
+    // Source the scene's interactable nouns. Preference order:
+    //   1. Hand-authored `interactables` arrays on the location and
+    //      (when in hub mode) the hub room. These are the canonical
+    //      lists — every entry is a concrete noun the room actually
+    //      contains, vetted by hand.
+    //   2. Heuristic extraction from the description. Only fires when
+    //      the authored list is missing — keeps procedural / future
+    //      content working without forcing every new room author to
+    //      remember the field. Kept tight via the verb / abstraction
+    //      blocklist in ambientNouns.ts.
+    //
+    // The Search / Approach modal chips pull from this list (via
+    // buildChipPool in ExplorationScreen) so authoring this field
+    // directly controls what targets the player sees as one-tap
+    // buttons. Phase 2 of the parser-treadmill cleanup: stop chasing
+    // every abstract-noun false-positive the extractor surfaces and
+    // just write down what the room contains.
+    const locNouns = (location.interactables && location.interactables.length > 0)
+      ? location.interactables
       : extractAmbientNouns(location.description);
+    const hubNouns = hubRoom
+      ? (hubRoom.interactables && hubRoom.interactables.length > 0
+          ? hubRoom.interactables
+          : extractAmbientNouns(hubRoom.description))
+      : [];
+    const ambientNouns = Array.from(new Set([...locNouns, ...hubNouns]));
     // microMicroId was resolved at the top of beginScene so the
     // encounter / loot rolls could use the ladder's curated pools.
     const scene: CurrentScene = {
@@ -2493,10 +2509,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
               const patch: Partial<GameStore> = {
                 player: { ...s.player, hubRoomId: null },
               };
-              if (s.currentScene?.location?.description) {
+              if (s.currentScene?.location) {
+                const loc = s.currentScene.location;
                 patch.currentScene = {
                   ...s.currentScene,
-                  ambientNouns: extractAmbientNouns(s.currentScene.location.description),
+                  ambientNouns: (loc.interactables && loc.interactables.length > 0)
+                    ? [...loc.interactables]
+                    : extractAmbientNouns(loc.description),
                 };
               }
               return patch;

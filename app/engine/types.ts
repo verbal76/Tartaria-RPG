@@ -177,6 +177,14 @@ export interface Location {
    *  so `search workroom` resolves correctly even when the canonical name
    *  is verbose. Lowercase, no punctuation. */
   aliases?: string[];
+  /** Author-declared interactable nouns surfaced as Search / Approach
+   *  chips and as parser target candidates. Replaces the heuristic
+   *  noun-extraction pass for hand-authored content (the extractor
+   *  stays as a fallback when this field is missing). Every entry
+   *  should be something the player could plausibly point at — concrete
+   *  nouns, no verbs / abstractions / measurements. Lowercase,
+   *  no punctuation, singular preferred. */
+  interactables?: string[];
 }
 
 export interface QuestObjective { id: string; verb: string; target: string; tags: string[]; }
