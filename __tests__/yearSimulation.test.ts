@@ -287,11 +287,19 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
       }
       resolveAnyPendingRoll();
       const sAfter = store.getState();
+      const hubAfter = sAfter.player?.hubRoomId ?? null;
       if (actionTrace.length < TRACE_LIMIT) {
         const newLogs = sAfter.gameLog.slice(logLenBefore);
-        const firstNew = newLogs[0]?.text.slice(0, 90) ?? '(no log)';
+        // Skip the player-echo entry (always first) and grab the
+        // first WORLD / ARBITER / SYSTEM response so we see what the
+        // engine actually replied with.
+        const response = newLogs.find((l) =>
+          l.channel !== 'player' && l.channel !== 'debug',
+        );
+        const respText = response?.text.slice(0, 100) ?? '(no response)';
+        const respChan = response?.channel ?? '-';
         actionTrace.push(
-          `[${actionsAttempted}] hub=${hubBefore?.slice(0, 12) ?? '-'} loc=${locBefore?.slice(0, 18) ?? '-'} stam=${stamBefore} "${text}" → ${firstNew}`,
+          `[${actionsAttempted}] hub=${hubBefore?.slice(0, 12) ?? '-'}→${hubAfter?.slice(0, 12) ?? '-'} loc=${locBefore?.slice(0, 18) ?? '-'} stam=${stamBefore} "${text}" → [${respChan}] ${respText}`,
         );
       }
     };
