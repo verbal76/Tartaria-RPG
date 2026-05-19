@@ -22,6 +22,13 @@ export interface MicroMicroLocation {
   possibleEncounters: string[];
   /** Names of loot items (matching loot_tables.json) found here. */
   lootTable: string[];
+  /** Author-declared interactable nouns for this room. Same contract as
+   *  Location.interactables / HubRoom.interactables — surfaced as Search /
+   *  Approach modal chips and recognised as parser targets. Lowercase,
+   *  no punctuation, singular preferred. When present, replaces the
+   *  heuristic extractor pass on environmental_description for this
+   *  sub-room. Part of the Phase 2 author-declared-content rollout. */
+  interactables?: string[];
 }
 
 /** A neighborhood / quarter inside a Macro biome. */

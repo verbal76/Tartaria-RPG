@@ -1216,7 +1216,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? hubRoom.interactables
           : extractAmbientNouns(hubRoom.description))
       : [];
-    const ambientNouns = Array.from(new Set([...locNouns, ...hubNouns]));
+    // Micro-Micro sub-room interactables — same author-declared
+    // preference. When the player is in a specific sub-room
+    // (skyscraper upper floor, royal vaults, dispatch board, etc.)
+    // we merge its declared interactables into the chip pool so
+    // search / approach surfaces what's actually in front of them
+    // instead of just the macro-tier nouns.
+    const microMicroNouns = ladderTriple?.microMicro
+      ? ((ladderTriple.microMicro.interactables && ladderTriple.microMicro.interactables.length > 0)
+          ? ladderTriple.microMicro.interactables
+          : extractAmbientNouns(ladderTriple.microMicro.environmental_description))
+      : [];
+    const ambientNouns = Array.from(new Set([...locNouns, ...hubNouns, ...microMicroNouns]));
     // microMicroId was resolved at the top of beginScene so the
     // encounter / loot rolls could use the ladder's curated pools.
     const scene: CurrentScene = {

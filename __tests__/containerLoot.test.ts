@@ -49,6 +49,28 @@ describe('classifyContainer', () => {
     expect(classifyContainer('wreckage')?.archetypeId).toBe('wreckage');
   });
 
+  it('matches observatory-array nouns (Obsidian Pillars instruments)', () => {
+    expect(classifyContainer('observatory')?.archetypeId).toBe('observatory_array');
+    expect(classifyContainer('the brass telescope')?.archetypeId).toBe('observatory_array');
+    expect(classifyContainer('Tartarian array')?.archetypeId).toBe('observatory_array');
+    expect(classifyContainer('a salvaged dish')?.archetypeId).toBe('observatory_array');
+  });
+
+  it('matches spire-conduit nouns (Grand Spire / standing stones)', () => {
+    expect(classifyContainer('spire')?.archetypeId).toBe('spire_conduit');
+    expect(classifyContainer('the obelisk')?.archetypeId).toBe('spire_conduit');
+    expect(classifyContainer('Tartarian pylon')?.archetypeId).toBe('spire_conduit');
+    expect(classifyContainer('a buried monolith')?.archetypeId).toBe('spire_conduit');
+  });
+
+  it('matches tomb / crypt nouns (Drakova / Voronov burials)', () => {
+    expect(classifyContainer('sarcophagus')?.archetypeId).toBe('tomb');
+    expect(classifyContainer('the crypt')?.archetypeId).toBe('tomb');
+    expect(classifyContainer('a Tartarian grave')?.archetypeId).toBe('tomb');
+    expect(classifyContainer('ossuary')?.archetypeId).toBe('tomb');
+    expect(classifyContainer('a stone casket')?.archetypeId).toBe('tomb');
+  });
+
   it('returns null for doors, walls, and bare ground', () => {
     expect(classifyContainer('door')).toBeNull();
     expect(classifyContainer('the wall')).toBeNull();

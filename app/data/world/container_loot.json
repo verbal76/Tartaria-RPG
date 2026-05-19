@@ -65,5 +65,39 @@
       { "name": "Patched Cloth", "weight": 20, "min": 1, "max": 2, "tags": ["cloth"], "kind": "misc" },
       { "name": "Small Rock",    "weight": 15, "min": 1, "max": 2, "tags": ["stone"], "kind": "misc" }
     ]
+  },
+
+  "observatory_array": {
+    "matchers": ["observatory", "scope", "lens", "telescope", "array", "dish", "antenna"],
+    "narration": "The {target} gives up its lenses and brass. You wrap what survives.",
+    "pool": [
+      { "name": "Aether Crystal", "weight": 25, "min": 1, "max": 1, "tags": ["aether","crystal"], "kind": "misc" },
+      { "name": "Aetheric Shard", "weight": 20, "min": 1, "max": 1, "tags": ["aether","shard"],   "kind": "misc" },
+      { "name": "Scrap Metal",    "weight": 35, "min": 1, "max": 3, "tags": ["metal","brass"],    "kind": "misc" },
+      { "name": "Aether Residue", "weight": 20, "min": 1, "max": 1, "tags": ["aether"],           "kind": "misc" }
+    ]
+  },
+
+  "spire_conduit": {
+    "matchers": ["spire", "obelisk", "pylon", "pillar", "monolith"],
+    "narration": "You crack the {target}'s casing. Aether-stone weeps loose into your hand.",
+    "pool": [
+      { "name": "Aetherstone",    "weight": 20, "min": 1, "max": 1, "tags": ["aether","stone"],   "kind": "misc" },
+      { "name": "Aether Crystal", "weight": 30, "min": 1, "max": 2, "tags": ["aether","crystal"], "kind": "misc" },
+      { "name": "Aether Residue", "weight": 30, "min": 1, "max": 2, "tags": ["aether"],           "kind": "misc" },
+      { "name": "Small Rock",     "weight": 20, "min": 1, "max": 2, "tags": ["stone"],            "kind": "misc" }
+    ]
+  },
+
+  "tomb": {
+    "matchers": ["sarcophagus", "tomb", "crypt", "grave", "ossuary", "casket", "burial"],
+    "narration": "You pry the {target} open. The buried do not protest.",
+    "pool": [
+      { "name": "Bone Fragment",  "weight": 30, "min": 1, "max": 3, "tags": ["bone"],             "kind": "misc" },
+      { "name": "Aether Crystal", "weight": 15, "min": 1, "max": 1, "tags": ["aether","crystal"], "kind": "misc" },
+      { "name": "Patched Cloth",  "weight": 25, "min": 1, "max": 2, "tags": ["cloth","shroud"],   "kind": "misc" },
+      { "name": "Scrap Metal",    "weight": 20, "min": 1, "max": 2, "tags": ["metal","grave"],    "kind": "misc" },
+      { "name": "Aether Residue", "weight": 10, "min": 1, "max": 1, "tags": ["aether"],           "kind": "misc" }
+    ]
   }
 }

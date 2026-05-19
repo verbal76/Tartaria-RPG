@@ -325,14 +325,13 @@ const styles = StyleSheet.create({
 
 // Build the chip pool the search / approach modals show.
 //
-// Hook nouns are surfaced FIRST — they're hand-written and always
-// concrete (a hook plant says "A handprint pressed into Aetherstone
-// dust" with nouns ['handprint', 'print', 'mark', 'dust'] — every
-// entry is a real interactable). Ambient nouns extracted from prose
-// run a heuristic filter and slip in abstract tokens occasionally
-// ("states", "repair", "back" from hub-room descriptions). The
-// filter has been tightened, but hooks-first means the GOOD chips
-// land at the top of the row where the player taps.
+// Order matters: author-declared interactables (Phase 2 OTA 113) lead,
+// then ONE hook noun per active hook (the primary one — the rest of a
+// hook's noun list is parser-disambiguation aliases like ['draft',
+// 'breeze', 'cold', 'air'] for the SAME thread-of-cold-air plant, and
+// the alternates don't make good standalone chips — playtest log
+// caught "cold / air / draft / breeze" leaking in as five separate
+// chips and pushing the real interactables off the visible list).
 //
 // Returns up to 10 unique entries.
 function buildChipPool(
@@ -343,17 +342,24 @@ function buildChipPool(
   const out: string[] = [];
   const seen = new Set<string>();
   const push = (n: string) => {
-    const key = n.toLowerCase();
+    const key = (n ?? '').toLowerCase();
     if (!key || seen.has(key)) return;
     seen.add(key);
     out.push(n);
   };
-  // 1) Unresolved hook nouns first.
+  // 1) Author-declared interactables from the scene's location +
+  //    hub-room (and procedural Micro-Micro). These are concrete by
+  //    construction — every entry is a noun the room actually
+  //    contains.
+  for (const n of scene.ambientNouns ?? []) push(n);
+  // 2) The FIRST noun from each unresolved hook. The rest of a hook's
+  //    noun array exists for parser-disambiguation (so 'breeze' /
+  //    'air' / 'draft' all resolve to the cold-air-leak hook), not
+  //    as user-facing chip suggestions.
   for (const h of scene.hooks ?? []) {
     if (h.resolved) continue;
-    for (const n of h.nouns ?? []) push(n);
+    const primary = h.nouns?.[0];
+    if (primary) push(primary);
   }
-  // 2) Then extracted ambient nouns.
-  for (const n of scene.ambientNouns ?? []) push(n);
   return out.slice(0, 10);
 }
