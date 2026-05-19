@@ -112,6 +112,7 @@ import {
 } from '../engine/hub';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, resolveEquippedItem, effectiveStats } from '../engine/equipment';
+import { canScrap, scrapOutputFor } from '../engine/scrapEngine';
 import { stampDurability, wearItemByName, wearItemById, repairCost, repairItem } from '../engine/durability';
 import {
   type Hook,
@@ -658,6 +659,20 @@ interface GameStore {
   joinFaction: (factionId: string) => void;
   equipItem: (itemName: string, slot: EquipSlot) => void;
   unequipSlot: (slot: EquipSlot) => void;
+  /** Drop one of the named item from the player's inventory onto the
+   *  ground of the current room (worldMemory.visitedRooms[key].droppedItems).
+   *  Mirrors the typed 'drop X' verb so InventoryScreen taps can
+   *  invoke it without going through the parser. Refuses equipped items
+   *  with an Arbiter line. */
+  dropInventoryItem: (itemName: string) => void;
+  /** Use the named item. Consumables call through the eat path (HP
+   *  recovery + time advance). Anything else equips into the off-hand
+   *  slot per playtest feedback ("to use it, it needs to replace the
+   *  item in your offhand"). */
+  useInventoryItem: (itemName: string) => void;
+  /** Disassemble a built item (weapon / armor / relic / built gear)
+   *  into stock materials via scrapEngine. Refuses raw materials. */
+  scrapInventoryItem: (itemName: string) => void;
 
   bootCognitive: () => Promise<void>;
   skipCognitiveBoot: () => void;
@@ -6098,6 +6113,104 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : s,
     );
     get().appendLog('world', `You set aside what was in your ${SLOT_LABEL[slot]} slot.`);
+    void get().persist();
+  },
+
+  dropInventoryItem(itemName) {
+    // Route through the typed drop verb so equipped-item refusal,
+    // room-state writes, and persistence all share one code path.
+    get().submitPlayerAction(`drop ${itemName}`);
+  },
+
+  useInventoryItem(itemName) {
+    const player = get().player;
+    if (!player) return;
+    const item = player.inventory.find(
+      (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
+    );
+    if (!item) {
+      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
+      return;
+    }
+    // Consumables → eat (HP recovery + time advance + quantity
+    // decrement). Routed through submitPlayerAction so the existing
+    // rest-with-resolvedItemId path handles all the state mutations.
+    if (item.kind === 'consumable') {
+      get().submitPlayerAction(`eat ${item.name}`);
+      return;
+    }
+    // Anything else — torch / compass / locket / relic — gets
+    // equipped to the off-hand per playtest spec ("to use it it
+    // needs to replace the item in your offhand"). Refuse for
+    // items the equipment rules don't let live in 'off'.
+    const validSlots = validSlotsForItem(item);
+    if (validSlots.includes('off')) {
+      get().equipItem(item.name, 'off');
+      return;
+    }
+    // Items that aren't off-hand-eligible — amulets, rings, armor —
+    // route to their canonical slot instead so 'use' always does
+    // something useful.
+    if (validSlots.length > 0) {
+      get().equipItem(item.name, validSlots[0]!);
+      return;
+    }
+    get().appendLog('arbiter', `The Arbiter shrugs. "The ${item.name} doesn't have a single obvious 'use' — keep it, gift it, or scrap it."`);
+  },
+
+  scrapInventoryItem(itemName) {
+    const player = get().player;
+    if (!player) return;
+    const item = player.inventory.find(
+      (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
+    );
+    if (!item) {
+      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
+      return;
+    }
+    if (!canScrap(item)) {
+      get().appendLog('arbiter', `The Arbiter taps the ${item.name}. "Nothing here to break down — it already IS stock material."`);
+      return;
+    }
+    // Refuse to scrap the item if it's currently equipped — would
+    // leave a phantom slot referencing a deleted item.
+    const eq = player.equipped ?? {};
+    const equippedSlots = ['main', 'off', 'head', 'chest', 'legs', 'feet', 'amulet', 'ring'] as const;
+    const isEquipped = equippedSlots.some((s) => eq[s] === item.name);
+    if (isEquipped) {
+      get().appendLog('arbiter', `The Arbiter taps your hand. "Unequip the ${item.name} first — can't scrap what you're wearing."`);
+      return;
+    }
+    const output = scrapOutputFor(item);
+    set((s) => {
+      if (!s.player) return s;
+      // Remove one unit of the source item.
+      const newInventory = s.player.inventory
+        .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
+        .filter((i) => i.quantity > 0);
+      // Add each granted scrap material, merging into existing
+      // stacks where possible.
+      for (const grant of output.grants) {
+        const existing = newInventory.findIndex((i) => i.name === grant.name);
+        if (existing >= 0) {
+          newInventory[existing] = {
+            ...newInventory[existing]!,
+            quantity: newInventory[existing]!.quantity + grant.quantity,
+          };
+        } else {
+          newInventory.push({
+            id: `scrap_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            name: grant.name,
+            kind: 'misc',
+            rarity: 'Common',
+            quantity: grant.quantity,
+            tags: [],
+          });
+        }
+      }
+      return { player: { ...s.player, inventory: newInventory } };
+    });
+    get().appendLog('world', `You break the ${item.name} down. ✦ Recovered: ${output.summary}.`);
     void get().persist();
   },
 

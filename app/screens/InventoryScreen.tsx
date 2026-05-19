@@ -9,6 +9,7 @@ import {
 } from '../components/InventoryCategorize';
 import type { InventoryItem, EquipSlot } from '../engine/types';
 import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
+import { canScrap } from '../engine/scrapEngine';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview } from '../components/itemPreview';
 
@@ -17,6 +18,9 @@ export function InventoryScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const equipItem = useGameStore((s) => s.equipItem);
   const unequipSlot = useGameStore((s) => s.unequipSlot);
+  const dropInventoryItem = useGameStore((s) => s.dropInventoryItem);
+  const useInventoryItem = useGameStore((s) => s.useInventoryItem);
+  const scrapInventoryItem = useGameStore((s) => s.scrapInventoryItem);
   const [pending, setPending] = useState<{ item: InventoryItem; slots: EquipSlot[] } | null>(null);
 
   if (!player) {
@@ -93,6 +97,22 @@ export function InventoryScreen() {
     setPending(null);
   };
 
+  const doUse = () => {
+    if (!pending) return;
+    useInventoryItem(pending.item.name);
+    setPending(null);
+  };
+  const doDrop = () => {
+    if (!pending) return;
+    dropInventoryItem(pending.item.name);
+    setPending(null);
+  };
+  const doScrap = () => {
+    if (!pending) return;
+    scrapInventoryItem(pending.item.name);
+    setPending(null);
+  };
+
   // Build the modal's button list based on the item's state.
   const buildModalButtons = (): {
     label: string;
@@ -107,6 +127,15 @@ export function InventoryScreen() {
       ? slotsByEquippedName.get(pending.item.name) ?? []
       : [];
     const buttons: ReturnType<typeof buildModalButtons> = [];
+    // Equip buttons — one per valid slot the item ISN'T currently in.
+    for (const slot of pending.slots) {
+      if (equippedInSlots.includes(slot)) continue;
+      buttons.push({
+        label: `Equip (${SLOT_LABEL[slot]})`,
+        onPress: () => chooseSlot(slot),
+        tone: 'primary',
+      });
+    }
     // Unequip buttons — one per slot the item is currently in.
     for (const slot of equippedInSlots) {
       buttons.push({
@@ -115,13 +144,37 @@ export function InventoryScreen() {
         tone: 'destructive',
       });
     }
-    // Equip buttons — one per valid slot the item ISN'T currently in.
-    for (const slot of pending.slots) {
-      if (equippedInSlots.includes(slot)) continue;
+    // USE — consumables eat, off-hand-eligible items equip to off,
+    // others fall back to their canonical slot. Hide when the
+    // item's already equipped everywhere it could go.
+    const isConsumable = pending.item.kind === 'consumable';
+    const offEligible = pending.slots.includes('off') && !equippedInSlots.includes('off');
+    const anySlotFree = pending.slots.some((s) => !equippedInSlots.includes(s));
+    if (isConsumable || (anySlotFree && (offEligible || pending.slots.length > 0))) {
       buttons.push({
-        label: `Equip (${SLOT_LABEL[slot]})`,
-        onPress: () => chooseSlot(slot),
+        label: isConsumable ? 'Use (eat)' : (offEligible ? 'Use (off hand)' : 'Use'),
+        onPress: doUse,
         tone: 'primary',
+      });
+    }
+    // SCRAP — only for built items with material content. Hidden for
+    // raw stock (already material) and for items currently equipped
+    // (would leave a phantom slot).
+    if (canScrap(pending.item) && equippedInSlots.length === 0) {
+      buttons.push({
+        label: 'Scrap',
+        onPress: doScrap,
+        tone: 'destructive',
+      });
+    }
+    // DROP — always available unless the item is currently equipped.
+    // Drop handler in the engine also refuses equipped items, but
+    // hiding the button cuts down on noise.
+    if (equippedInSlots.length === 0) {
+      buttons.push({
+        label: 'Drop',
+        onPress: doDrop,
+        tone: 'destructive',
       });
     }
     buttons.push({ label: 'Close', onPress: closeModal, tone: 'neutral' });
