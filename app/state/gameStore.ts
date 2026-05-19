@@ -772,6 +772,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Arbiter rehash, no fresh weather roll, no re-spawned enemies.
       // Resume is player-first: they take the next action.
       const restoredScene = (saved.currentScene ?? null) as CurrentScene | null;
+      // Re-extract ambientNouns from the canonical location.description.
+      // Older saves captured polluted noun lists (verbs / abstractions
+      // leaked in from Arbiter refusal prose under the old auto-extract
+      // path), which would otherwise resurface as Search / Approach chips
+      // until the player triggered a fresh beginScene. The extractor is
+      // pure + cheap, so we just rerun it on every restore.
+      if (restoredScene && restoredScene.location?.description) {
+        restoredScene.ambientNouns = extractAmbientNouns(restoredScene.location.description);
+      }
       set({
         player,
         worldMemory: saved.worldMemory,

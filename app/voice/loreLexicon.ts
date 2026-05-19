@@ -65,6 +65,12 @@ const LEXICON: Array<[RegExp, string]> = [
   [/\bRunecaster\b/gi, 'rune caster'],
   [/\bRunecasters\b/gi, 'rune casters'],
   [/\bAetherbat\b/gi, 'eether bat'],
+
+  // English contractions where espeak's letter-to-sound rule lands on
+  // the wrong vowel. "doesn't" comes out as "DOSE-ent" (like "rose")
+  // instead of "DUZ-ent". Match with or without the apostrophe in case
+  // the pipeline strips it before we get here.
+  [/\bdoesn'?t\b/gi, 'duzzent'],
 ];
 
 /**

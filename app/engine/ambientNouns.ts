@@ -84,6 +84,20 @@ const VERB_BLOCKLIST = new Set([
   // stative
   'remains', 'remain', 'remained', 'remaining',
   'stays', 'stayed', 'staying',
+  // social / dialogue verbs and intangibles — playtest screenshot
+  // surfaced "negotiate / wind / words / voice / carries" as chip
+  // suggestions, pulled out of Arbiter refusal prose ("No one to
+  // negotiate with. The wind takes the words. Your voice carries
+  // across empty ground"). None are physical objects the player can
+  // approach or search.
+  'negotiate', 'negotiates', 'negotiated', 'negotiating',
+  'speak', 'speaks', 'spoke', 'spoken', 'speaking',
+  'talk', 'talks', 'talked', 'talking',
+  'ask', 'asks', 'asked', 'asking',
+  'say', 'says', 'said', 'saying',
+  'carry', 'carries', 'carried', 'carrying',
+  'words', 'voice', 'voices', 'wind', 'winds',
+  'sound', 'sounds', 'echo', 'echoes',
 ]);
 
 // Strip -ed / -ing tokens — almost always participles ("buried", "humming",
