@@ -88,6 +88,9 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   multi_fire: ['burst fire', 'double tap', 'triple tap', 'multi shot', 'multiple shots', 'spray', 'fire twice', 'fire three', 'rapid fire', 'volley'],
   fight_back: ['fight back', 'counter', 'counter strike', 'opposed strike', 'meet the blade', 'trade blows', 'parry and strike', 'return fire', 'riposte', 'hit back'],
   recruit: ['recruit', 'hire', 'follow me', 'come with', 'join me', 'bring along', 'travel together', 'companion', 'walk with me'],
+  drop: ['drop', 'discard', 'put down', 'leave behind', 'release', 'jettison'],
+  pickup: ['pickup', 'pick up', 'retrieve', 'collect', 'scoop up'],
+  open: ['open', 'unlock', 'crack', 'pry open', 'lift the lid', 'breach', 'disarm'],
 };
 
 const ALL_INTENTS = Object.keys(VERB_SYNONYMS) as Exclude<Intent, 'unknown'>[];

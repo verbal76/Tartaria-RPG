@@ -43,6 +43,9 @@ export type Intent =
   | 'multi_fire'
   | 'fight_back'
   | 'recruit'
+  | 'drop'
+  | 'pickup'
+  | 'open'
   | 'unknown';
 
 export interface ParsedInput {
@@ -538,6 +541,17 @@ export interface VisitedRoom {
    *  diggable). Each key is the lowercased item name; cheap to compare
    *  without changing the catalog. */
   lootGrabbed?: string[];
+  /** Items the player dropped on the floor of this room (via the
+   *  drop verb). Each item is a full InventoryItem so quantity / kind
+   *  / rarity round-trip cleanly back into player.inventory when the
+   *  player picks them up. Persists across re-entry so the Tourist
+   *  and Vandal stress test can validate object state serialization. */
+  droppedItems?: InventoryItem[];
+  /** Names of containers / props the player has explicitly opened or
+   *  disarmed in this room (chest, crate, trap, etc.). The
+   *  area-search / open / disarm handlers consult this to keep
+   *  containers from re-closing themselves on re-entry. */
+  containersOpened?: string[];
   /** Audit fix — in-game hours elapsed at the most recent visit.
    *  Used by respawn-quiet calculation so idling for 6 real hours
    *  doesn't accidentally trigger respawn even when no in-game time

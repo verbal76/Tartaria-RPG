@@ -479,10 +479,49 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
         return 'leave outpost';
       }
 
-      // ─── Scavenger sweep: exhaust ambient nouns first ───────────
+      // ─── Context-priority: vendor / hook exhaustion (BEFORE scavenger) ───
+      // Brief F: when a vendor or unresolved hook is in the scene,
+      // halt all other mechanism rotation and exhaust this context
+      // before moving on. Vendors and hooks are RARE — when the sim
+      // walks past one, it must engage or the run never exercises
+      // accept_quest / buy / sell / gift / steal / hook_resolve.
+      if (scene?.vendor && !enemy && p.stamina > 2) {
+        const v = scene.vendor;
+        if (v.faction && tryOnce('accept_quest')) return 'accept';
+        if (v.offers && v.offers.length > 0 && p.tc >= 10 && tryOnce('buy')) {
+          const cheap = [...v.offers].sort((a: any, b: any) => a.price - b.price)[0];
+          if (cheap) return `buy ${cheap.itemName}`;
+        }
+        if (p.inventory.length > 1 && tryOnce('sell')) {
+          const sellable = p.inventory.find((it) => it.kind !== 'relic') ?? p.inventory[0]!;
+          return `sell ${sellable.name}`;
+        }
+        if (p.inventory.length > 0 && tryOnce('gift')) {
+          return `gift ${p.inventory[0]!.name}`;
+        }
+        if (v.offers && v.offers.length > 0 && tryOnce('steal')) {
+          return `steal ${(v.offers[0] as any).itemName}`;
+        }
+        if (p.tc > 5 && tryOnce('repair')) return 'repair';
+        if (!p.companion && tryOnce('recruit')) return `recruit ${v.name}`;
+        // Vendor exhausted — also try turn-in if the player picked up
+        // a quest from this vendor.
+        if ((p.activeFactionQuests?.length ?? 0) > 0 && tryOnce('turn_in_quest')) {
+          const q = p.activeFactionQuests![0]!;
+          return `turn in ${q.id}`;
+        }
+      }
+      if (scene?.hooks?.length && !enemy && p.stamina > 2 && tryOnce('hook_resolve')) {
+        const hook = scene.hooks[0]!;
+        const target = (hook as any).target || (hook as any).name || (hook as any).kind || '';
+        if (target) return `investigate ${target}`;
+      }
+
+      // ─── Scavenger sweep: exhaust ambient nouns next ───────────
       // Brief: "Upon entering any new room … the sim must halt
       // travel and execute an exhaustive sweep before moving on."
-      // Prime queue when this scene's nouns are unseen, then pop.
+      // Vendors and hooks already got their turn above; the sweep
+      // now picks up the ambient noun pool.
       primeScavengerQueue(scene, p);
       if (scavengerQueue.length > 0 && !enemy && p.stamina > 2) {
         scavengerTotal++;
@@ -538,33 +577,10 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
       }
       if (hpFrac < 0.55 || stamFrac < 0.5) return 'rest';
 
-      // ─── Vendor present ─────────────────────────────────────────
-      if (scene?.vendor) {
-        const v = scene.vendor;
-        if (v.faction && tryOnce('accept_quest')) return 'accept';
-        if (v.offers && v.offers.length > 0 && p.tc >= 10 && tryOnce('buy')) {
-          const cheap = [...v.offers].sort((a: any, b: any) => a.price - b.price)[0];
-          if (cheap) return `buy ${cheap.itemName}`;
-        }
-        if (p.inventory.length > 1 && tryOnce('sell')) {
-          const sellable = p.inventory.find((it) => it.kind !== 'relic') ?? p.inventory[0]!;
-          return `sell ${sellable.name}`;
-        }
-        if (p.inventory.length > 0 && tryOnce('gift')) {
-          return `gift ${p.inventory[0]!.name}`;
-        }
-        if (v.offers && v.offers.length > 0 && tryOnce('steal')) {
-          return `steal ${(v.offers[0] as any).itemName}`;
-        }
-        if (p.tc > 5 && tryOnce('repair')) return 'repair';
-        if (!p.companion && tryOnce('recruit')) return `recruit ${v.name}`;
-      }
-
-      // ─── Quest turn-in ──────────────────────────────────────────
-      if ((p.activeFactionQuests?.length ?? 0) > 0 && tryOnce('turn_in_quest')) {
-        const q = p.activeFactionQuests![0]!;
-        return `turn in ${q.id}`;
-      }
+      // (Vendor + hook + quest turn-in moved to context-priority
+      // block above so they fire before the Scavenger sweep when
+      // available. The exhaustion-by-tryOnce pattern preserves the
+      // 3-attempt cap.)
 
       // ─── Join faction ───────────────────────────────────────────
       if (tryOnce('join_faction')) {
@@ -592,12 +608,7 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
         return `craft ${tries[Math.floor(Math.random() * tries.length)]!}`;
       }
 
-      // ─── Hooks ──────────────────────────────────────────────────
-      if (scene?.hooks?.length && tryOnce('hook_resolve')) {
-        const hook = scene.hooks[0]!;
-        const target = (hook as any).target || (hook as any).name || '';
-        if (target) return `investigate ${target}`;
-      }
+      // (Hooks moved to context-priority block above.)
 
       // ─── Exploration leftovers ──────────────────────────────────
       if (tryOnce('dig')) return 'dig';

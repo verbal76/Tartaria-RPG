@@ -1200,6 +1200,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? ` The bodies you left are still here. Nothing has moved in to replace them.`
         : '';
       get().appendLog('world', `You've stood here ${tag}. (visit ${existing.visitCount + 1})${clearedNote}`);
+      // Tourist-and-Vandal persistence — surface the room's leftover
+      // state from prior visits so the narration reflects what's
+      // actually on disk. Dropped items show as a "still on the
+      // ground" line; opened containers as a "still open" line.
+      if ((existing.droppedItems?.length ?? 0) > 0) {
+        const itemList = existing
+          .droppedItems!.map((d) => d.quantity > 1 ? `${d.name} x${d.quantity}` : d.name)
+          .join(', ');
+        get().appendLog('world', `On the ground: ${itemList}. (left here by you, type 'pick up' to retrieve.)`);
+      }
+      if ((existing.containersOpened?.length ?? 0) > 0) {
+        get().appendLog('world', `Still open from before: ${existing.containersOpened!.join(', ')}.`);
+      }
     }
     set((s) => ({
       worldMemory: {
@@ -1212,6 +1225,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
             visitCount: (existing?.visitCount ?? 0) + 1,
             enemiesCleared: existing?.enemiesCleared ?? [],
             lootGrabbed: existing?.lootGrabbed ?? [],
+            // Persist the room's "vandal state" across re-entries —
+            // dropped items + opened containers carry forward
+            // unchanged. The drop / pickup / open handlers mutate
+            // these arrays directly when the player acts.
+            droppedItems: existing?.droppedItems ?? [],
+            containersOpened: existing?.containersOpened ?? [],
             hoursElapsedAtVisit: hoursElapsed,
           },
         },
@@ -3202,6 +3221,138 @@ export const useGameStore = create<GameStore>((set, get) => ({
           'world',
           `${v.name} closes their pack and steps in beside you. "Lead, then." You have a companion. (Type "dismiss companion" to part ways.)`,
         );
+        void get().persist();
+        break;
+      }
+      case 'drop': {
+        const target = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
+        if (!target) {
+          get().appendLog('arbiter', `The Arbiter raises a brow. "Drop what? Name an item from your pack."`);
+          break;
+        }
+        const item = player.inventory.find(
+          (i) => i.name.toLowerCase() === target.toLowerCase() || i.id === target,
+        );
+        if (!item) {
+          get().appendLog('arbiter', `The Arbiter shakes their head. "${target} isn't in your pack."`);
+          break;
+        }
+        // Equipped items can't be dropped without unequipping first —
+        // would otherwise leave the player wielding a phantom blade.
+        const eq = player.equipped ?? {};
+        const equippedSlots = ['main', 'off', 'head', 'chest', 'legs', 'feet', 'amulet', 'ring'] as const;
+        const isEquipped = equippedSlots.some((slot) => eq[slot] === item.name);
+        if (isEquipped) {
+          get().appendLog('arbiter', `The Arbiter taps your hand. "Unequip the ${item.name} first — you can't drop what you're wielding."`);
+          break;
+        }
+        const dropKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY);
+        const dropOne: InventoryItem = { ...item, quantity: 1 };
+        // Remove one from player inventory.
+        const newInventory = player.inventory
+          .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
+          .filter((i) => i.quantity > 0);
+        set((s) => {
+          if (!s.player) return s;
+          const room = s.worldMemory.visitedRooms?.[dropKey] ?? {
+            firstVisitAt: Date.now(),
+            lastVisitAt: Date.now(),
+            visitCount: 1,
+          };
+          // Merge with any existing dropped pile (same name → bump qty).
+          const dropped = [...(room.droppedItems ?? [])];
+          const exist = dropped.findIndex((d) => d.name === dropOne.name);
+          if (exist >= 0) dropped[exist] = { ...dropped[exist]!, quantity: dropped[exist]!.quantity + 1 };
+          else dropped.push(dropOne);
+          return {
+            player: { ...s.player, inventory: newInventory },
+            worldMemory: {
+              ...s.worldMemory,
+              visitedRooms: {
+                ...(s.worldMemory.visitedRooms ?? {}),
+                [dropKey]: { ...room, droppedItems: dropped },
+              },
+            },
+          };
+        });
+        get().appendLog('world', `You drop the ${item.name}. It lies on the ground here.`);
+        void get().persist();
+        break;
+      }
+      case 'pickup': {
+        const target = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
+        const dropKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY);
+        const room = get().worldMemory.visitedRooms?.[dropKey];
+        const dropped = room?.droppedItems ?? [];
+        if (dropped.length === 0) {
+          get().appendLog('world', `The ground here is bare. Nothing to pick up.`);
+          break;
+        }
+        const pickItem = target
+          ? dropped.find((d) => d.name.toLowerCase().includes(target.toLowerCase()) || d.id === target)
+          : dropped[0];
+        if (!pickItem) {
+          const names = dropped.map((d) => `"${d.name}"`).join(', ');
+          get().appendLog('arbiter', `The Arbiter scans the ground. "I see ${names} here. Name one."`);
+          break;
+        }
+        const remaining = dropped
+          .map((d) => (d.name === pickItem.name ? { ...d, quantity: d.quantity - 1 } : d))
+          .filter((d) => d.quantity > 0);
+        set((s) => {
+          if (!s.player || !s.worldMemory.visitedRooms?.[dropKey]) return s;
+          // Merge into player inventory.
+          const inv = [...s.player.inventory];
+          const existing = inv.findIndex((i) => i.name === pickItem.name);
+          if (existing >= 0) inv[existing] = { ...inv[existing]!, quantity: inv[existing]!.quantity + 1 };
+          else inv.push({ ...pickItem, quantity: 1 });
+          return {
+            player: { ...s.player, inventory: inv },
+            worldMemory: {
+              ...s.worldMemory,
+              visitedRooms: {
+                ...s.worldMemory.visitedRooms,
+                [dropKey]: { ...s.worldMemory.visitedRooms[dropKey]!, droppedItems: remaining },
+              },
+            },
+          };
+        });
+        get().appendLog('world', `You pick up the ${pickItem.name}.`);
+        void get().persist();
+        break;
+      }
+      case 'open': {
+        // Open / unlock / disarm — persistent room state. Once
+        // touched, the container / trap remains open on re-entry.
+        // Doesn't issue rolls — that's the area-search / dig path's
+        // job. This handler just marks the state and narrates.
+        const target = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
+        if (!target) {
+          get().appendLog('arbiter', `The Arbiter raises a brow. "Open what? Name the chest, crate, or door."`);
+          break;
+        }
+        const dropKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY);
+        const room = get().worldMemory.visitedRooms?.[dropKey] ?? {
+          firstVisitAt: Date.now(),
+          lastVisitAt: Date.now(),
+          visitCount: 1,
+        };
+        const key = target.toLowerCase();
+        if ((room.containersOpened ?? []).includes(key)) {
+          get().appendLog('world', `The ${target} is already open from earlier. Nothing new inside.`);
+          break;
+        }
+        const opened = [...(room.containersOpened ?? []), key];
+        set((s) => ({
+          worldMemory: {
+            ...s.worldMemory,
+            visitedRooms: {
+              ...(s.worldMemory.visitedRooms ?? {}),
+              [dropKey]: { ...room, containersOpened: opened },
+            },
+          },
+        }));
+        get().appendLog('world', `You force the ${target} open. It stays open.`);
         void get().persist();
         break;
       }
