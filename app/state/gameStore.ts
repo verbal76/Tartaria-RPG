@@ -1765,10 +1765,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
           inventoryNames: player.inventory.map((i) => i.name),
           locationName: currentScene.location.name,
         };
-        // Hold the player's input visible so they don't think the
-        // game ignored them. The "Arbiter considers" placeholder
-        // gets replaced when the resolved action's narration lands.
-        get().appendLog('debug', 'parse-fallback: arbiter considering…');
+        // Visible "the Arbiter considers" placeholder. Without this
+        // the player sits through a 200-400ms silent gap and tends to
+        // re-submit the input thinking the game ate it. The resolved
+        // action's narration lands AFTER this line and reads naturally
+        // — the placeholder ends up being a tiny pause beat that hints
+        // the parse was non-trivial. Hidden on re-submission (the
+        // canonical rephrasing already went through this once).
+        get().appendLog(
+          'system',
+          'The Arbiter considers your words…',
+        );
         void parseInputViaLLM(trimmed, llmCtx, qwen).then((result) => {
           if (!result) {
             get().appendLog('debug', 'parse-fallback: qwen no usable result → soft refusal');
@@ -2472,7 +2479,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // closure — otherwise the spendStamina/advanceTime set below
           // overwrites the cleared hubRoomId with the stale value.
           if (player.hubRoomId) {
-            set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+            // Clear hubRoomId AND rebuild ambientNouns from just the
+            // macro location description. Otherwise the scene keeps
+            // the hub room's nouns (anvil, racks, kettle, map-stone)
+            // even though the player has walked out the gate — and
+            // "sneak up on racks" / "search the anvil" succeeds in
+            // the open silt. Playtest log caught it: player went east
+            // from the Armory then typed `sneak up on racks` in the
+            // wilds and the parser happily resolved 'racks' as a hook
+            // noun left over from the Armory hub room.
+            set((s) => {
+              if (!s.player) return s;
+              const patch: Partial<GameStore> = {
+                player: { ...s.player, hubRoomId: null },
+              };
+              if (s.currentScene?.location?.description) {
+                patch.currentScene = {
+                  ...s.currentScene,
+                  ambientNouns: extractAmbientNouns(s.currentScene.location.description),
+                };
+              }
+              return patch;
+            });
             get().appendLog(
               'world',
               `You walk ${dir} past the gate. The outpost falls away behind you.`,
