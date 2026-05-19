@@ -7211,25 +7211,33 @@ function narrateCasualLook(
   // surfaced the same scene paragraph emitted 5x verbatim — that's
   // the player spamming `look`. Give them a one-line refresher
   // varied by their current state instead.
-  const sceneKey = `${player?.currentLocationId ?? '?'}@${scene.microMicroId ?? '_'}@${player?.mapX ?? 0},${player?.mapY ?? 0}`;
+  const sceneKey = `${player?.currentLocationId ?? '?'}@${scene.microMicroId ?? '_'}@${player?.mapX ?? 0},${player?.mapY ?? 0}@${player?.hubRoomId ?? '_'}`;
   const lastLook = (get() as unknown as { _lastLookAt?: { key: string; hour: number } })._lastLookAt;
   const nowHour = player?.hoursElapsed ?? 0;
   const consecutive = lastLook && lastLook.key === sceneKey && (nowHour - lastLook.hour) <= 2;
   (get() as unknown as { _lastLookAt?: { key: string; hour: number } })._lastLookAt = { key: sceneKey, hour: nowHour };
   if (consecutive) {
     // State-aware short look — picks ONE sentence varied by HP /
-    // time-of-day / weather so 5 consecutive looks aren't identical.
+    // time-of-day / weather. Inside a hub room we reference the
+    // hub room by name ("The Armory", "The Mess Hall") instead of
+    // the macro biome so the short look reads as "Same room. The
+    // anvil's still ringing." instead of pointing at the open
+    // Tartarian Outskirts the player is no longer experiencing.
     const hp = player?.hp ?? 0;
     const hpMax = player?.hpMax ?? 1;
     const hpFrac = hp / Math.max(1, hpMax);
     const hourOfDay = Math.floor(nowHour % 24);
     const isNight = hourOfDay >= 20 || hourOfDay < 6;
     const isDawnDusk = (hourOfDay >= 5 && hourOfDay < 8) || (hourOfDay >= 18 && hourOfDay < 21);
+    const inHub = isHubLocation(player?.currentLocationId ?? null) && !!player?.hubRoomId;
+    const hubRoom = inHub ? findHubRoom(player!.hubRoomId!) : null;
+    const placeName = hubRoom?.name ?? scene.location.name;
     const pieces: string[] = [];
     if (hpFrac < 0.25) pieces.push(`The world looks darker than it is — you're bleeding out at the edges. (${hp}/${hpMax} HP)`);
     else if (hpFrac < 0.5) pieces.push(`Your breath is shallow; everything feels heavier than it should. (${hp}/${hpMax} HP)`);
-    else if (isNight) pieces.push(`Night sits on ${scene.location.name}. Shapes are suggestions, not certainties.`);
-    else if (isDawnDusk) pieces.push(`The light is thin. ${scene.location.name} hovers between hours.`);
+    else if (hubRoom) pieces.push(`Same room. ${hubRoom.name} carries on around you.`);
+    else if (isNight) pieces.push(`Night sits on ${placeName}. Shapes are suggestions, not certainties.`);
+    else if (isDawnDusk) pieces.push(`The light is thin. ${placeName} hovers between hours.`);
     else if (scene.weather?.name && scene.weather.id !== 'calm') pieces.push(`The ${scene.weather.name.toLowerCase()} hasn't moved. Same ground, same pressure on your shoulders.`);
     else pieces.push(`Same ground. You've already mapped this patch.`);
     get().appendLog('world', pieces[0]!);
@@ -7240,13 +7248,32 @@ function narrateCasualLook(
   // has passed). Build the structured description from every layer.
   const parts: string[] = [];
 
-  // 1. Where you are (macro).
-  parts.push(`You are in ${scene.location.name}.`);
+  // Hub-room state takes precedence over the macro-biome
+  // description. Playtest caught a desync where standing in
+  // "The Gate" (hub room) and typing `look` returned the generic
+  // Tartarian Outskirts biome paragraph ("Borderlands around
+  // buried cities. … You stand alone."). The hub room has its own
+  // description + named exits + (usually) an anchor NPC; surface
+  // those when we're in hub mode.
+  const inHub = isHubLocation(player?.currentLocationId ?? null) && !!player?.hubRoomId;
+  const hubRoom = inHub ? findHubRoom(player!.hubRoomId!) : null;
 
-  // 2. The immediate space — Micro-Micro environmental description if
-  // mapped, otherwise the flat Location description.
-  const ladder = scene.microMicroId ? findMicroMicroAnywhere(scene.microMicroId) : null;
-  const envDesc = ladder?.microMicro.environmental_description?.trim()
+  // 1. Where you are. Use the hub room's name when applicable, so
+  // `look` reads "You are in The Gate." instead of "You are in
+  // Tartarian Outskirts." while standing inside the outpost.
+  if (hubRoom) {
+    parts.push(`You are in ${hubRoom.name} — ${scene.location.name}.`);
+  } else {
+    parts.push(`You are in ${scene.location.name}.`);
+  }
+
+  // 2. The immediate space.
+  //    Hub room   → room.description (specific to the room)
+  //    Micro-Micro → ladder.environmental_description
+  //    Otherwise  → macro location.description
+  const ladder = !hubRoom && scene.microMicroId ? findMicroMicroAnywhere(scene.microMicroId) : null;
+  const envDesc = hubRoom?.description?.trim()
+    ?? ladder?.microMicro.environmental_description?.trim()
     ?? scene.location.description?.trim()
     ?? '';
   if (envDesc) parts.push(envDesc);
@@ -7294,16 +7321,37 @@ function narrateCasualLook(
     presenceFragments.push(`The ${hookNoun} is still here, unaddressed.`);
   }
   if (presenceFragments.length === 0) {
-    presenceFragments.push('You stand alone — nothing alive moves near you.');
+    // In a hub room the outpost is busy with daily life — don't
+    // narrate "you stand alone" inside a populated camp.
+    if (hubRoom) {
+      presenceFragments.push(`Reclaimers move past on small errands. The outpost runs around you.`);
+    } else {
+      presenceFragments.push('You stand alone — nothing alive moves near you.');
+    }
   }
   parts.push(presenceFragments.join(' '));
 
-  // 5. Exits — named Micro-Micro exits when in a mapped room, plus the
-  // four cardinals for the macro tier so the player always has a move.
-  if (ladder?.microMicro.exits && ladder.microMicro.exits.length > 0) {
-    parts.push(`Exits: ${ladder.microMicro.exits.join(' · ')}.`);
+  // 5. Exits.
+  //    Hub room   → list the actual room exits (Square, Armory, …)
+  //                 + `leave outpost` hint to drop into the wilds.
+  //    Micro-Micro → ladder exits + cardinal fallback.
+  //    Otherwise  → cardinal directions only.
+  if (hubRoom) {
+    const labels: string[] = [];
+    for (const dir of ['north', 'east', 'south', 'west'] as const) {
+      const id = hubRoom.exits[dir];
+      if (!id) continue;
+      const r = findHubRoom(id);
+      if (r) labels.push(`${dir} to ${r.shortName}`);
+    }
+    if (labels.length > 0) parts.push(`Paths: ${labels.join(' · ')}.`);
+    parts.push(`(Type 'leave outpost' to head into the wilds.)`);
+  } else {
+    if (ladder?.microMicro.exits && ladder.microMicro.exits.length > 0) {
+      parts.push(`Exits: ${ladder.microMicro.exits.join(' · ')}.`);
+    }
+    parts.push('You can also head north, east, south, or west to walk the map.');
   }
-  parts.push('You can also head north, east, south, or west to walk the map.');
 
   get().appendLog('world', parts.join(' '));
 
