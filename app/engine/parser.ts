@@ -456,8 +456,40 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
   }
 
   const targetTokens = extractTargetTokens(tokens, bestMatch.index);
-  const item = resolveItem(targetTokens, inventory);
-  const noun = item ? undefined : resolveContextNoun(targetTokens, recentNouns);
+  // Enemy names win over inventory when an enemy is actually present
+  // in the scene AND a token from the target matches the enemy's name
+  // (substring or fuzzy). Playtest log: "sneak up on Aetheric Drone"
+  // resolved to "Aetheric Torch" because resolveItem matched on
+  // 'aetheric' before any enemy lookup ran. Now: check enemies first;
+  // a hit returns the enemy's display name as the resolved noun and
+  // skips inventory.
+  const enemyNamesLower = (context.enemyNames ?? []).map((n) => n.toLowerCase());
+  let enemyHit: string | undefined = undefined;
+  if (enemyNamesLower.length > 0 && targetTokens.length > 0) {
+    // Exact substring first.
+    for (const eRaw of context.enemyNames ?? []) {
+      const e = eRaw.toLowerCase();
+      if (targetTokens.some((t) => e.includes(t) || t.includes(e))) {
+        enemyHit = eRaw;
+        break;
+      }
+    }
+    // Fuzzy fallback against individual words in each enemy name.
+    if (!enemyHit) {
+      for (const eRaw of context.enemyNames ?? []) {
+        const words = eRaw.toLowerCase().split(/\s+/);
+        for (const t of targetTokens) {
+          if (words.some((w) => fuzzyEqual(t, w))) {
+            enemyHit = eRaw;
+            break;
+          }
+        }
+        if (enemyHit) break;
+      }
+    }
+  }
+  const item = enemyHit ? undefined : resolveItem(targetTokens, inventory);
+  const noun = enemyHit ?? (item ? undefined : resolveContextNoun(targetTokens, recentNouns));
 
   // Confidence: 1.0 exact verb, falls off with distance; small boost from resolved target.
   const verbConfidence = Math.max(0.4, 1 - bestMatch.distance * 0.18);

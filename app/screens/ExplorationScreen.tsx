@@ -205,7 +205,7 @@ export function ExplorationScreen() {
 
       <SearchModal
         visible={searchOpen}
-        hints={currentScene?.ambientNouns}
+        hints={buildChipPool(currentScene)}
         onSubmit={(target) => {
           setSearchOpen(false);
           submit(`search the ${target}`);
@@ -216,7 +216,7 @@ export function ExplorationScreen() {
       <ApproachModal
         visible={approachOpen}
         enemyHints={currentScene?.enemies.map((e) => e.name) ?? []}
-        sceneHints={currentScene?.ambientNouns ?? []}
+        sceneHints={buildChipPool(currentScene)}
         vendorName={currentScene?.vendor?.name}
         onSubmit={(target, useStealth) => {
           setApproachOpen(false);
@@ -322,3 +322,38 @@ const styles = StyleSheet.create({
   vendorBannerArrow: { color: '#c9a86a', fontSize: 22, paddingHorizontal: 12 },
   placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
 });
+
+// Build the chip pool the search / approach modals show.
+//
+// Hook nouns are surfaced FIRST — they're hand-written and always
+// concrete (a hook plant says "A handprint pressed into Aetherstone
+// dust" with nouns ['handprint', 'print', 'mark', 'dust'] — every
+// entry is a real interactable). Ambient nouns extracted from prose
+// run a heuristic filter and slip in abstract tokens occasionally
+// ("states", "repair", "back" from hub-room descriptions). The
+// filter has been tightened, but hooks-first means the GOOD chips
+// land at the top of the row where the player taps.
+//
+// Returns up to 10 unique entries.
+function buildChipPool(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  scene: any,
+): string[] {
+  if (!scene) return [];
+  const out: string[] = [];
+  const seen = new Set<string>();
+  const push = (n: string) => {
+    const key = n.toLowerCase();
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    out.push(n);
+  };
+  // 1) Unresolved hook nouns first.
+  for (const h of scene.hooks ?? []) {
+    if (h.resolved) continue;
+    for (const n of h.nouns ?? []) push(n);
+  }
+  // 2) Then extracted ambient nouns.
+  for (const n of scene.ambientNouns ?? []) push(n);
+  return out.slice(0, 10);
+}

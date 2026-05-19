@@ -98,6 +98,27 @@ const VERB_BLOCKLIST = new Set([
   'carry', 'carries', 'carried', 'carrying',
   'words', 'voice', 'voices', 'wind', 'winds',
   'sound', 'sounds', 'echo', 'echoes',
+  // Abstract state / measurement words — playtest report: search /
+  // approach chips were surfacing things like "states", "repair",
+  // "back", "various", "amount" pulled from hub-room descriptions
+  // ("bolt-casters in various states of repair", "anvil rings from
+  // the back"). None of these are physical interactables.
+  'state', 'states', 'condition', 'conditions',
+  'repair', 'repairs', 'amount', 'amounts',
+  'number', 'numbers', 'rate', 'rates',
+  'top', 'bottom', 'middle', 'edge', 'edges',
+  'front', 'back', 'sides',
+  'time', 'times', 'while', 'awhile',
+  'rest', 'all', 'half', 'most', 'least',
+  'such', 'kind', 'kinds', 'sort', 'sorts', 'type', 'types',
+  'work', 'works', 'job', 'jobs',
+  'note', 'notes', 'thing', 'things',
+  'space', 'spaces', 'room', 'rooms',
+  // Generic body-language verbs that look noun-y after participle pass
+  'rings',     // "anvil rings from the back" — verb not noun
+  'turns',     // "turns blue", "turns to ash"
+  'leans',     // "leans in"
+  'closes', 'opens',
 ]);
 
 // Strip -ed / -ing tokens — almost always participles ("buried", "humming",
