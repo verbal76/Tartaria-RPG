@@ -1993,15 +1993,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const hours = 8;
           const heal = Math.min(hpRoom, hours * 2);
           const stamGain = Math.min(stamRoom, hours);
-          // Corruption decay — 8 hours of clean rest sloughs off one
-          // point of accumulated corruption. The weather tick at the
-          // top of submitPlayerAction fires BEFORE this, so resting
-          // in Whisper Fog / Silent Blizzard nets to 0 (the tick adds
-          // +1, the decay takes -1). In normal weather, corruption
-          // actually drops. Without this the sim showed corruption
-          // climbing monotonically over the play session.
-          const corrDecay = (player.corruption ?? 0) > 0 ? 1 : 0;
+          // Corruption decay — clean rest sheds one point of
+          // corruption ONLY when both of:
+          //   - the current weather isn't corrupting (Whisper Fog /
+          //     Silent Blizzard stain you back as fast as rest can
+          //     clear; the lore is that those biomes attack the
+          //     soul)
+          //   - the player actually has corruption to lose
+          // Original implementation decayed every rest regardless of
+          // biome, which the year-sim showed effectively zeroed out
+          // the long-term loop. Subsequent attempt added a 24h rate
+          // limit which over-corrected (corruption climbed to 145
+          // over a sim year because most rests were too close
+          // together to qualify). Final balance: every clean-weather
+          // rest decays one, every corrupting-weather rest decays
+          // none. Players who spend their year in dangerous biomes
+          // wear the stain; players who travel safely shed it
+          // slowly.
           const newHours = (player.hoursElapsed ?? 0) + hours;
+          const weatherIsCorrupting = (() => {
+            const w = currentScene.weather;
+            if (!w) return false;
+            return /whisper.*fog|silent.*blizzard/i.test(w.name ?? '')
+              || (w.corruptionChance ?? 0) > 0;
+          })();
+          const corrDecay = (player.corruption ?? 0) > 0 && !weatherIsCorrupting ? 1 : 0;
           set({
             player: {
               ...player,
