@@ -240,20 +240,36 @@ export async function startListening(
   if (listening) {
     try { lib.module.stop(); } catch { /* ignore */ }
   }
-  // continuous:true on Android keeps the recognizer open across brief
-  // pauses — closer to "talk normally" than "talk fast or it gives up."
-  // interimResults:true so the player sees partial transcripts land in
-  // the text box as they speak (visible feedback that the mic IS
-  // working, even if the recognizer hasn't finalized yet).
-  diag('debug', `stt: start lang=${locale} interim=true continuous=true`);
+  // continuous=true and addsPunctuation=true are BOTH Android 13+ only.
+  // OTA 105 set continuous=true and the native module silently swallowed
+  // the start request on a device running Android 12 — log showed
+  // `stt: start lang=en-US interim=true continuous=true` followed by
+  // dead silence, no `started`, no `error`, no events of any kind.
+  // Going back to safe defaults that work everywhere, even at the cost
+  // of the recognizer giving up after a brief pause.
+  //
+  // Also: log the speech-recognition services the device actually
+  // exposes. Helps diagnose silent failures on ROMs without GMS
+  // (LineageOS, Samsung-without-Google, etc.) — if the list is empty
+  // the player needs to install Google Speech Services from the Play
+  // Store before STT will work at all.
+  try {
+    const services = typeof lib.module.getSpeechRecognitionServices === 'function'
+      ? lib.module.getSpeechRecognitionServices()
+      : null;
+    diag('debug', `stt: services=${JSON.stringify(services)}`);
+  } catch (err) {
+    diag('debug', `stt: services lookup threw ${err instanceof Error ? err.message : String(err)}`);
+  }
+  diag('debug', `stt: start lang=${locale} interim=true continuous=false`);
   try {
     lib.module.start({
       lang: locale,
       interimResults: true,
       maxAlternatives: 1,
-      continuous: true,
+      continuous: false,
       requiresOnDeviceRecognition: false,
-      addsPunctuation: true,
+      addsPunctuation: false,
     });
     listening = true;
   } catch (err) {
