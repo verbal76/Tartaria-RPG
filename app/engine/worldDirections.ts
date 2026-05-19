@@ -177,13 +177,29 @@ export function describeAllDirections(
  * lookup (specific id / fuzzy name / nearest-of-type / all-directions).
  */
 export function parseDirectionQuestion(text: string): {
-  kind: 'specific' | 'nearest' | 'survey';
+  kind: 'specific' | 'nearest' | 'survey' | 'directional';
   target: string;
 } | null {
   const t = text.trim();
   // "what's around" / "what is around" / "what's nearby" → survey
   if (/^\s*(what'?s|what\s+is)\s+(around|nearby|near\s+me|out\s+there)/i.test(t)) {
     return { kind: 'survey', target: '' };
+  }
+  // Directional nearest — "what city is north of me" / "what's to the
+  // east" / "what city am I close to in the north" / "closest city
+  // west". Captures the cardinal direction so the handler can answer
+  // with the closest named tile in THAT direction, not the global
+  // nearest. Playtest hit this when the player typed "what city am I
+  // close to in the north" and fell into the generic "I don't have a
+  // clean answer for that yet" fallback.
+  const directional =
+    /\b(north|south|east|west)(?:\s+of\s+(?:me|here))?\b/i.exec(t);
+  const directionAsked =
+    /\b(what|which)\b.*\b(city|town|settlement|location|hub|outpost|place|trader|vendor)\b/i.test(t) ||
+    /^\s*(what'?s|what\s+is)\s+(?:to\s+)?(?:the\s+)?(north|south|east|west)/i.test(t) ||
+    /\b(close|closest|near|nearest)\b.*\b(north|south|east|west)/i.test(t);
+  if (directional && directionAsked) {
+    return { kind: 'directional', target: directional[1]!.toLowerCase() };
   }
   // "nearest town" / "closest vendor" / "where is a vendor" → nearest
   if (/\b(nearest|closest)\s+(town|city|settlement|safe|trader|vendor|market|hub|outpost)\b/i.test(t)) {

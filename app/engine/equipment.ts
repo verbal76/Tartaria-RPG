@@ -31,6 +31,36 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   // Tag-based fallback for items not in the catalog yet.
   if (item.tags.some((t) => /amulet|locket|necklace/i.test(t))) return ['amulet'];
   if (item.tags.some((t) => /ring|band/i.test(t))) return ['ring'];
+  // Name-based fallback for items the catalog doesn't know yet.
+  // Playtest report: player picked up "Mud-Rend Blade" — clearly a
+  // weapon by name — but the inventory modal said "No record of this
+  // item in the catalog" and only offered SCRAP / DROP / CLOSE. The
+  // user's rule: anything that LOOKS equippable should BE equippable,
+  // even if the catalog row hasn't been written yet. Damage rolls fall
+  // back to the bare-hands path inside combat, so an unknown weapon
+  // still swings — it just doesn't get bonus dice or special tags
+  // until the catalog catches up.
+  if (/\b(blade|sword|axe|spear|bow|crossbow|dagger|knife|club|mace|hammer|maul|staff|wand|rod|scepter|gun|rifle|pistol|sling|javelin|lance|glaive|halberd|pike|scythe|whip|claw|fang|baton|cudgel|cleaver|saber|sabre|katana|machete|tomahawk|trowel|hatchet|warblade|thornblade|shadowblade|nightblade|deathblade|etherblade)\b/i.test(nameLower)) {
+    return ['main', 'off'];
+  }
+  if (/\b(helm|helmet|hood|headpiece|faceplate|faceguard|faceshroud|crown|circlet|coif|skullcap|mask)\b/i.test(nameLower)) {
+    return ['head'];
+  }
+  if (/\b(chestplate|breastplate|chestpiece|cuirass|hauberk|jerkin|vest|tunic|robe|battlecoat|coat|mantle|cloak|chest|warplate|plate)\b/i.test(nameLower)) {
+    return ['chest'];
+  }
+  if (/\b(leggings|legguards|legplates|greaves|chausses|trousers|breeches|pants|leg)\b/i.test(nameLower)) {
+    return ['legs'];
+  }
+  if (/\b(boots|sandals|footwraps|sabatons|stompers|sole|shoe)\b/i.test(nameLower)) {
+    return ['feet'];
+  }
+  if (/\b(amulet|locket|necklace|pendant|medallion|charm|talisman|brooch)\b/i.test(nameLower)) {
+    return ['amulet'];
+  }
+  if (/\b(ring|band|signet)\b/i.test(nameLower)) {
+    return ['ring'];
+  }
   return [];
 }
 

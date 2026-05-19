@@ -2602,6 +2602,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
             break;
           }
+          // 'directional' — closest named tile in a SPECIFIC cardinal
+          // direction. Uses surveyAll's per-direction sense to pull the
+          // first named neighbor along that vector, then formats with
+          // the existing travelPhrase math.
+          if (dirQ.kind === 'directional') {
+            const survey = surveyAll(map, fromX, fromY);
+            const dir = dirQ.target as Direction;
+            const hit = survey[dir];
+            if (hit) {
+              const days = hit.distance;
+              const travelPhrase = days <= 1 ? 'a day\'s travel' : `${days} days' travel`;
+              get().appendLog(
+                'arbiter',
+                `The Arbiter gestures ${dir}. "${hit.name} lies ${travelPhrase} ${dir}."`,
+              );
+            } else {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter looks ${dir}. "Empty horizon that way. Nothing named within reach."`,
+              );
+            }
+            break;
+          }
           // 'specific' — name lookup
           const found = findNamedByQuery(map, fromX, fromY, dirQ.target);
           if (found) {
@@ -6661,13 +6684,17 @@ function runMoveCombatRange(
         : `${weatherName} slows you down. You strain to pull back from ${groupLabel}, but every step costs double. (${partial}/${cost} — type 'step back' again to break contact)`,
     );
     get().appendLog('debug', `move: slow weather progress ${partial}/${cost}`);
-    // Slow movement still takes the turn — enemy counter-attacks.
-    const reachers = scene.enemies.filter((e, i) =>
-      enemyCanReach(e, cur) && (scene.enemyHps[i] ?? 0) > 0,
-    );
-    if (reachers.length > 0) {
-      runEnemyGroupCounters(get, set, get().player ?? player);
-    }
+    // Partial moves under bad weather used to grant a FULL enemy counter
+    // round per tick — which compounded with the auto-close-to-attack
+    // enemy round to turn weather penalties into death spirals (playtest
+    // log Observer @ Zharak's Teeth: 4 Gutter Rats took 31 HP off a fresh
+    // L1 character in three rounds, two of which were partial movement
+    // ticks where the player couldn't act). Now: only the FULL move
+    // (range actually changes) provokes the counter round. Partial moves
+    // still cost a beat of in-fiction time, but enemies hold their swing
+    // until the player commits — same way real combat in tabletop RPGs
+    // grants reactions on movement INTO threatened squares, not on
+    // half-steps that fail to close.
     return;
   }
 

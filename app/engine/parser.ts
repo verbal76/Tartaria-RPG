@@ -67,7 +67,13 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'pace back', 'fall away', 'inch back',
   ],
   repair: ['repair', 'mend', 'restore', 'refurbish', 'patch', 'fix', 'rebuild', 'renew', 'overhaul', 'tune'],
-  accept: ['accept', 'take', 'undertake', 'agree', 'yes', 'consent', 'embrace', 'assent', 'okay', 'aye'],
+  // 'take' was here originally — playtest log surfaced the failure mode:
+  // "take the trap apart and keep the materials" matched accept on
+  // 'take' and the Arbiter replied about wandering faction vendors.
+  // Players who want to accept a contract always say "accept" (the
+  // Arbiter's prompts spell it out: "say 'accept road'"). The other
+  // verbs here cover the rare "yes/agree/sure" path.
+  accept: ['accept', 'undertake', 'agree', 'yes', 'consent', 'embrace', 'assent', 'okay', 'aye'],
   turn_in: ['turnin', 'complete', 'finish', 'deliver', 'report', 'redeem', 'claim', 'present', 'submit', 'hand in'],
   dig: ['dig', 'excavate', 'unearth', 'scrape', 'shovel', 'burrow', 'tunnel', 'mine', 'spade', 'pry'],
   throw: ['throw', 'toss', 'hurl', 'lob', 'chuck', 'fling', 'pitch', 'cast at', 'launch', 'whip'],
@@ -86,14 +92,18 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   take_cover: ['takecover', 'cover up', 'hunker', 'crouch behind', 'duck behind', 'shelter', 'tuck', 'dive for cover', 'go prone', 'flatten'],
   aim: ['aim', 'sight', 'target', 'line up', 'draw bead', 'level', 'lock on', 'sightin', 'tracksight', 'zero'],
   reload: ['reload', 'reloading', 'reset', 'rearm', 'rerack', 'refill', 'recharge', 'top up', 'load up', 'feed'],
-  maneuver: ['maneuver', 'disarm', 'grapple', 'trip', 'shove', 'sweep', 'pin', 'hook', 'wrench', 'manoeuvre'],
+  // 'disarm' lived in both maneuver AND open — and because maneuver
+  // comes first in the iteration order, "disarm the trap" routed to
+  // grappling ("Maneuver against whom? Empty ground does not grapple
+  // back."). It belongs in the disable/open pool instead, never here.
+  maneuver: ['maneuver', 'grapple', 'trip', 'shove', 'sweep', 'pin', 'hook', 'wrench', 'manoeuvre'],
   quick_fire: ['quickfire', 'snap shot', 'snap fire', 'fast fire', 'rush shot', 'panic shot', 'quick shot', 'quick draw', 'fast draw', 'first shot'],
   multi_fire: ['burst fire', 'double tap', 'triple tap', 'multi shot', 'multiple shots', 'spray', 'fire twice', 'fire three', 'rapid fire', 'volley'],
   fight_back: ['fight back', 'counter', 'counter strike', 'opposed strike', 'meet the blade', 'trade blows', 'parry and strike', 'return fire', 'riposte', 'hit back'],
   recruit: ['recruit', 'hire', 'follow me', 'come with', 'join me', 'bring along', 'travel together', 'companion', 'walk with me'],
   drop: ['drop', 'discard', 'put down', 'leave behind', 'release', 'jettison'],
-  pickup: ['pickup', 'pick up', 'retrieve', 'collect', 'scoop up'],
-  open: ['open', 'unlock', 'crack', 'pry open', 'lift the lid', 'breach', 'disarm'],
+  pickup: ['pickup', 'pick up', 'retrieve', 'collect', 'scoop up', 'take'],
+  open: ['open', 'unlock', 'crack', 'pry open', 'lift the lid', 'breach', 'disarm', 'disable', 'dismantle', 'deactivate', 'take apart'],
 };
 
 const ALL_INTENTS = Object.keys(VERB_SYNONYMS) as Exclude<Intent, 'unknown'>[];
