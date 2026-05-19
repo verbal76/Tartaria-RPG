@@ -4029,8 +4029,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         text: `walked your first road, to ${getLocationById(locationId).name}`,
       });
     }
-    // Travel completion advances staged faction quests by one beat.
-    advanceActiveFactionQuests(get, set);
+    // Travel completion advances staged faction quests gated on
+    // travel; kill-gated stages ignore this trigger.
+    advanceActiveFactionQuests(get, set, 'travel');
     get().beginScene();
     void get().persist();
   },
@@ -4151,11 +4152,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
     }
 
-    // Staged faction quests advance one beat on every kill — the
-    // player's progress through the world is what carries narrative
-    // contracts forward. Quests with no stages stay at stage 0
-    // (immediately turn-in-able).
-    advanceActiveFactionQuests(get, set);
+    // Staged faction quests advance on kill if the current stage's
+    // advanceOn is 'kill' or 'any'. Travel-gated stages (pilgrimage,
+    // scholar field-trip) ignore this trigger and only advance
+    // when the player completes a travel.
+    advanceActiveFactionQuests(get, set, 'kill');
 
     // First-kill and rare-kill milestones are noted in the memorable-event
     // log so the Arbiter can reference them later.
@@ -6195,6 +6196,7 @@ function enemyCanReach(enemy: Enemy, range: CombatRange): boolean {
 function advanceActiveFactionQuests(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  trigger: 'kill' | 'travel' = 'kill',
 ): void {
   const player = get().player;
   if (!player) return;
@@ -6205,9 +6207,18 @@ function advanceActiveFactionQuests(
     const def = findFactionQuestById(rec.id);
     if (!def?.stages || def.stages.length === 0) return rec;
     if (rec.stage >= def.stages.length) return rec; // already done
+    // Gate stage progression by trigger kind. The stage we just
+    // completed (index = current rec.stage) carries its advanceOn
+    // hint; if it doesn't match the player's action, skip. Legacy
+    // stages without the field stay 'any' so existing JSON keeps
+    // working — but the shipped quests now set it explicitly to
+    // stop kills from auto-completing travel pilgrimages and
+    // vice versa.
+    const currentStage = def.stages[rec.stage];
+    const gate = currentStage?.advanceOn ?? 'any';
+    if (gate !== 'any' && gate !== trigger) return rec;
     const nextStage = rec.stage + 1;
     mutated = true;
-    const stageDef = def.stages[nextStage - 1]; // 0-indexed stage just played; new stage is nextStage
     // We just BUMPED to stage `nextStage`. If a stage exists at the new
     // index (nextStage), narrate it. Otherwise the quest is now ready
     // for turn-in (no more stages to play).

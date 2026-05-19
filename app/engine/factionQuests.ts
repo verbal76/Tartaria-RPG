@@ -1,10 +1,28 @@
 import factionQuestsData from '../data/quests/faction-quests.json';
 
+/** What kind of player action advances this stage.
+ *   - 'kill'   — only enemy defeats trigger progress (the quest is
+ *                about combat)
+ *   - 'travel' — only completed travels trigger progress (the quest
+ *                is about exploration / pilgrimage)
+ *   - 'any'    — both trigger (legacy default; mostly used for
+ *                quests where the stage is just a beat the player
+ *                can't directly satisfy and is meant to advance on
+ *                the next significant action)
+ * Default is 'any' so legacy JSON without the field keeps current
+ * behavior. QA flagged that defaulting to 'any' was the source of
+ * 4-stage pilgrimages auto-completing on 3 generic rat-kills — each
+ * stage of the new JSON now sets this explicitly. */
+export type StageAdvanceTrigger = 'kill' | 'travel' | 'any';
+
 export interface FactionQuestStageDef {
   /** What the player sees in the world feed when this stage opens. */
   narration: string;
   /** Optional Arbiter remark layered under the narration. */
   arbiter?: string | null;
+  /** Which player-action kind advances PAST this stage to the next.
+   *  Omit to mean 'any'. */
+  advanceOn?: StageAdvanceTrigger;
 }
 
 export interface FactionQuestDef {

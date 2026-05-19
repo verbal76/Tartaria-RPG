@@ -69,3 +69,35 @@ describe('stage gate', () => {
     expect(canTurnIn([], 0)).toBe(true);
   });
 });
+
+describe('faction quest stage advanceOn gating (batch D)', () => {
+  // QA finding: 4-stage pilgrimage auto-completed on 3 generic
+  // kills because every stage advanced on any trigger.
+  it('every shipped stage declares an advanceOn trigger', () => {
+    for (const q of FACTION_QUESTS) {
+      for (const s of q.stages ?? []) {
+        expect(['kill', 'travel', 'any']).toContain(s.advanceOn);
+      }
+    }
+  });
+
+  it('pilgrimage (travel-themed) advances only on travel', () => {
+    const q = findFactionQuestById('fq_tartarians_pilgrimage');
+    expect(q?.stages?.every((s) => s.advanceOn === 'travel')).toBe(true);
+  });
+
+  it('silence-a-rediscoverer (combat-themed) advances only on kill', () => {
+    const q = findFactionQuestById('fq_monarchs_silence');
+    expect(q?.stages?.every((s) => s.advanceOn === 'kill')).toBe(true);
+  });
+
+  it('field-a-scholar advances only on travel', () => {
+    const q = findFactionQuestById('fq_order_field');
+    expect(q?.stages?.every((s) => s.advanceOn === 'travel')).toBe(true);
+  });
+
+  it('cut-down-a-rare-beast advances only on kill', () => {
+    const q = findFactionQuestById('fq_tartarians_giant');
+    expect(q?.stages?.every((s) => s.advanceOn === 'kill')).toBe(true);
+  });
+});
