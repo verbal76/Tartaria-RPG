@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, ActivityIndicator, StyleSheet, AppState, type AppStateStatus } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, AppState, Platform, StatusBar as RNStatusBar, type AppStateStatus } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useGameStore } from './app/state/gameStore';
@@ -136,7 +136,22 @@ export default function App() {
   );
 }
 
+// Android-12+ edge-to-edge default means SafeAreaView's top inset can
+// come through as 0 on some OEM ROMs (Pixel + most Samsung), leaving
+// the app's top row of UI overlapping the status bar (BACK / SETTINGS
+// title sitting on top of the clock + battery icons — playtest
+// screenshot caught this on the Settings screen). Pinning a minimum
+// paddingTop to RNStatusBar.currentHeight on Android guarantees the
+// top row always clears the system bar, no matter how the OEM
+// configures insets.
+const ANDROID_STATUS_PAD =
+  Platform.OS === 'android' ? RNStatusBar.currentHeight ?? 24 : 0;
+
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#0a0908' },
+  safe: {
+    flex: 1,
+    backgroundColor: '#0a0908',
+    paddingTop: ANDROID_STATUS_PAD,
+  },
   loading: { flex: 1, backgroundColor: '#0a0908', alignItems: 'center', justifyContent: 'center' },
 });
