@@ -27,6 +27,12 @@ interface QueuedUtterance {
    *  rate / pitch per channel (combat lines could be faster, etc.).
    *  Not used in v1; reserved. */
   channel?: string;
+  /** Per-utterance voice override (system-engine only). When set,
+   *  the queue will NOT batch this item with adjacent items that
+   *  carry a different voiceId — multi-voice conversations need
+   *  each speaker on their own Speech.speak call. Null / undefined
+   *  falls back to the player's configured voiceId from settings. */
+  voiceId?: string | null;
 }
 
 let nextId = 1;
@@ -98,21 +104,22 @@ export function isSpeaking(): boolean {
  *  (expo-speech) or the bundled Piper engine based on
  *  voiceSettings.engine. No-op if TTS is disabled in settings.
  *  Returns the queue id (negative when nothing was queued). */
-export function speak(text: string, channel?: string): number {
+export function speak(text: string, channel?: string, voiceId?: string | null): number {
   const settings = getVoiceSettings();
   if (!settings.ttsEnabled) return -1;
   // Symbol cleanup before either engine — strips arrows so the player
   // doesn't hear "right arrow", rewrites "-N" as "negative N", etc.
-  // The bundled engine ALSO applies the lore-respelling lexicon
-  // internally; the system engine relies on the OS phonemizer which
-  // usually handles English-orthography lore words well enough.
   const trimmed = cleanForSpeech(text).trim();
   if (!trimmed) return -1;
   if (settings.engine === 'bundled') {
+    // Kokoro can't switch voice per utterance (the voice is baked
+    // into the model instance at load time). Per-vendor voices only
+    // work on the system engine. Bundled keeps the player's
+    // configured voice for everything.
     return piperSpeak(trimmed);
   }
   const id = nextId++;
-  queue.push({ id, text: trimmed, channel });
+  queue.push({ id, text: trimmed, channel, voiceId });
   // If something is already being spoken, drain() will merge the
   // queue when it finishes — no timer needed. If the engine is idle,
   // hold off briefly so additional speak() calls landing in the same
@@ -174,29 +181,39 @@ function withTerminator(text: string): string {
 function drain(): void {
   if (currentlySpeaking) return;
   if (queue.length === 0) return;
-  // Merge everything currently queued into a single utterance so
-  // Android TTS's per-utterance init gap (~1-2s of reinit) doesn't
-  // land between consecutive log lines from the same action. We
-  // still want a perceptible breath between distinct sections —
-  // joining with a single space and force-terminating each segment
-  // makes the engine read a natural SENTENCE-end pause (~0.2s on
-  // most Android builds) inside the single utterance. Previous
-  // joiner was "\n" which produced a paragraph break (~0.4–0.5s)
-  // and broke up the reading flow into discrete announcements
-  // rather than connected prose.
-  const batch = queue.splice(0, queue.length);
+  // Merge ADJACENT same-voice items into a single utterance so
+  // Android TTS's per-utterance reinit gap doesn't break up
+  // consecutive lines from the same speaker. Voice-change forces
+  // a batch break — different speakers each get their own
+  // Speech.speak call. The next drain (fired from onDone) picks up
+  // the next voice in line, preserving conversation order.
+  const head = queue[0]!;
+  const headVoice = head.voiceId ?? null;
+  const batch: QueuedUtterance[] = [];
+  while (queue.length > 0) {
+    const peek = queue[0]!;
+    const peekVoice = peek.voiceId ?? null;
+    if (peekVoice !== headVoice) break;
+    batch.push(queue.shift()!);
+  }
   const next: QueuedUtterance = {
     id: batch[0]!.id,
     text: batch.map((it) => withTerminator(it.text)).join(' '),
     channel: batch[0]!.channel,
+    voiceId: headVoice,
   };
   currentlySpeaking = next;
   const settings = getVoiceSettings();
+  // Per-utterance voice override beats the configured default,
+  // so vendor lines render in their assigned voice while the
+  // Arbiter's lines (no voiceId override) use the player's
+  // setting.
+  const utteranceVoice = next.voiceId ?? settings.voiceId ?? undefined;
   try {
     Speech.speak(next.text, {
       rate: settings.rate,
       pitch: settings.pitch,
-      voice: settings.voiceId ?? undefined,
+      voice: utteranceVoice,
       onDone: () => {
         currentlySpeaking = null;
         drain();

@@ -31,7 +31,9 @@
           "itemName": "Patched Cloth",
           "price": 20
         }
-      ]
+      ],
+      "gender": "male",
+      "voiceId": "am_adam"
     },
     {
       "id": "order_scholar",
@@ -72,7 +74,9 @@
           "itemName": "Rusted Band of Knowledge",
           "price": 60
         }
-      ]
+      ],
+      "gender": "male",
+      "voiceId": "bm_daniel"
     },
     {
       "id": "tartarian_quartermaster",
@@ -105,7 +109,9 @@
           "itemName": "Tartarian Stoneband",
           "price": 320
         }
-      ]
+      ],
+      "gender": "male",
+      "voiceId": "am_adam"
     },
     {
       "id": "wandering_drifter",
@@ -134,7 +140,9 @@
           "itemName": "First Aid Kit",
           "price": 30
         }
-      ]
+      ],
+      "gender": "female",
+      "voiceId": "af_river"
     },
     {
       "id": "thalan_wanderer",
@@ -163,7 +171,9 @@
           "itemName": "Climbing Rope",
           "price": 10
         }
-      ]
+      ],
+      "gender": "male",
+      "voiceId": "bm_daniel"
     },
     {
       "id": "irma_ironhand",
@@ -188,7 +198,9 @@
           "itemName": "Forgotten Leggings",
           "price": 95
         }
-      ]
+      ],
+      "gender": "female",
+      "voiceId": "af_sarah"
     },
     {
       "id": "velar_shadowblade",
@@ -213,7 +225,9 @@
           "itemName": "Reclaimer's Salvage Cap",
           "price": 35
         }
-      ]
+      ],
+      "gender": "male",
+      "voiceId": "am_adam"
     },
     {
       "id": "jorah_scholar",
@@ -238,7 +252,9 @@
           "itemName": "Aetheric Compass",
           "price": 75
         }
-      ]
+      ],
+      "gender": "male",
+      "voiceId": "bm_daniel"
     },
     {
       "id": "elara_lightfinger",
@@ -263,14 +279,16 @@
           "itemName": "First Aid Kit",
           "price": 32
         }
-      ]
+      ],
+      "gender": "female",
+      "voiceId": "af_heart"
     },
     {
       "id": "halem_trader",
       "name": "Halem the Trader",
       "title": "General Goods",
       "faction": null,
-      "description": "Friendly and trustworthy, Halem runs the village trading post \u2014 basic weapons, food, potions, perfect for restocking before the road.",
+      "description": "Friendly and trustworthy, Halem runs the village trading post — basic weapons, food, potions, perfect for restocking before the road.",
       "offers": [
         {
           "itemName": "Trail Rations",
@@ -296,7 +314,9 @@
           "itemName": "Patched Cloth",
           "price": 18
         }
-      ]
+      ],
+      "gender": "male",
+      "voiceId": "am_adam"
     },
     {
       "id": "tarek_tinkerer",
@@ -321,14 +341,16 @@
           "itemName": "Aether-Runner Boots",
           "price": 170
         }
-      ]
+      ],
+      "gender": "male",
+      "voiceId": "bm_daniel"
     },
     {
       "id": "felra_swiftfoot",
       "name": "Felra Swiftfoot",
       "title": "Boot-Smith",
       "faction": null,
-      "description": "Friendly but sneaky, Felra peddles light armor and boots from a Mud Dweller hidden camp \u2014 anything that adds a little dexterity to a step.",
+      "description": "Friendly but sneaky, Felra peddles light armor and boots from a Mud Dweller hidden camp — anything that adds a little dexterity to a step.",
       "offers": [
         {
           "itemName": "Mud-Lurker Boots",
@@ -346,7 +368,9 @@
           "itemName": "Mud-Stalker Leggings",
           "price": 50
         }
-      ]
+      ],
+      "gender": "female",
+      "voiceId": "af_river"
     },
     {
       "id": "korr_stonefoot",
@@ -356,7 +380,9 @@
       "location": "Mud Golem Stronghold",
       "description": "Stoic and slow to trust. Carries large two-handed weapons and heavy armor pieces.",
       "personality": "Stoic",
-      "offers": []
+      "offers": [],
+      "gender": "male",
+      "voiceId": "am_adam"
     },
     {
       "id": "cassia_nightwind",
@@ -366,7 +392,9 @@
       "location": "Forest Trading Post",
       "description": "Friendly but mysterious. Sells bows, crossbows, and projectiles, sometimes rare arrows or bolts.",
       "personality": "Friendly",
-      "offers": []
+      "offers": [],
+      "gender": "female",
+      "voiceId": "bf_emma"
     },
     {
       "id": "odar_flameforge",
@@ -376,7 +404,9 @@
       "location": "Forge City of the Sentinels",
       "description": "Proud and loud. Known for crafting fire-imbued weapons and armor with fire resistance.",
       "personality": "Proud",
-      "offers": []
+      "offers": [],
+      "gender": "male",
+      "voiceId": "bm_daniel"
     },
     {
       "id": "silvan_the_quiet",
@@ -386,7 +416,9 @@
       "location": "Aetherborn Temple",
       "description": "Calm and quiet. Sells rare and unique magic-based items, often has relics or enchanted gear.",
       "personality": "Calm",
-      "offers": []
+      "offers": [],
+      "gender": "male",
+      "voiceId": "am_adam"
     },
     {
       "id": "bran_the_beastmaster",
@@ -396,7 +428,9 @@
       "location": "Wilderness Encampments",
       "description": "Enthusiastic and passionate. Animal-handling gear, potions for mounts, unique animal accessories.",
       "personality": "Enthusiastic",
-      "offers": []
+      "offers": [],
+      "gender": "male",
+      "voiceId": "bm_daniel"
     },
     {
       "id": "vela_ironheart",
@@ -406,7 +440,9 @@
       "location": "Tartarian Giant Fortress",
       "description": "Stern and disciplined. High-quality swords, axes, and shields for melee fighters.",
       "personality": "Stern",
-      "offers": []
+      "offers": [],
+      "gender": "female",
+      "voiceId": "af_heart"
     },
     {
       "id": "mara_stoneskin",
@@ -416,7 +452,9 @@
       "location": "Mud Golem Caves",
       "description": "Warm but distrustful. Stone-infused weapons and armor, protection from earth-based hazards.",
       "personality": "Warm",
-      "offers": []
+      "offers": [],
+      "gender": "female",
+      "voiceId": "af_sarah"
     },
     {
       "id": "yara_windcaller",
@@ -426,7 +464,9 @@
       "location": "Aetherborn Floating City",
       "description": "Soft-spoken and patient. Light armor and wind-imbued weapons that enhance movement and speed.",
       "personality": "Patient",
-      "offers": []
+      "offers": [],
+      "gender": "female",
+      "voiceId": "bf_emma"
     },
     {
       "id": "zorin_nightblade",
@@ -436,7 +476,9 @@
       "location": "Dark Alleys",
       "description": "Silent and mysterious. Rare and exotic weapons, including legendary and cursed items. Expensive and risky.",
       "personality": "Mysterious",
-      "offers": []
+      "offers": [],
+      "gender": "male",
+      "voiceId": "am_adam"
     },
     {
       "id": "kirin_spellweaver",
@@ -444,9 +486,11 @@
       "title": "Arcane Gear Dealer",
       "faction": "aetherborn",
       "location": "Aetherborn Academy",
-      "description": "Wise and thoughtful. Magical staves, armor, and wands \u2014 often enchanted for magic users.",
+      "description": "Wise and thoughtful. Magical staves, armor, and wands — often enchanted for magic users.",
       "personality": "Wise",
-      "offers": []
+      "offers": [],
+      "gender": "female",
+      "voiceId": "af_river"
     },
     {
       "id": "drakos_mercenary",
@@ -456,7 +500,9 @@
       "location": "Mountain Fort",
       "description": "Bold and aggressive. High-damage two-handed weapons, ideal for strength-based characters.",
       "personality": "Bold",
-      "offers": []
+      "offers": [],
+      "gender": "male",
+      "voiceId": "bm_daniel"
     },
     {
       "id": "nalren_frostgrip",
@@ -466,7 +512,9 @@
       "location": "Frozen Outpost",
       "description": "Cold and distant. Frost-imbued weapons and frost-resistant armor, rare but effective in cold environments.",
       "personality": "Cold",
-      "offers": []
+      "offers": [],
+      "gender": "male",
+      "voiceId": "am_adam"
     }
   ]
 }

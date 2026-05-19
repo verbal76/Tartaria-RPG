@@ -29,8 +29,21 @@ export { splitSentences };
 
 type GameState = ReturnType<typeof useGameStore.getState>;
 
+// Player feedback (verbatim): "how about we make the voice only for
+// the arbiter and they read it like they are saying it to you. not
+// like they are narrating his parts. that makes the voice more
+// immersive."
+//
+// Before: TTS voiced world / arbiter / combat / reward — every line
+// of narration including roll results, weather effects, item pickups,
+// and the Arbiter's lines. The Arbiter's lines were narrated like
+// stage directions ("The Arbiter inclines their head and says, 'X'")
+// which read as a third party announcing the Arbiter rather than the
+// Arbiter speaking. Now: arbiter channel only, and stripArbiterFrame
+// (below) pulls the quoted speech out so the voice reads as the
+// Arbiter speaking TO the player.
 const SPOKEN_CHANNELS: ReadonlySet<LogChannel> = new Set([
-  'world', 'arbiter', 'combat', 'reward',
+  'arbiter',
 ]);
 
 let unsub: (() => void) | null = null;
@@ -58,6 +71,27 @@ let streamBuffer = '';
 let recentStreamedTexts: string[] = [];
 const RECENT_STREAM_WINDOW = 4;
 
+// stripArbiterFrame + detectArbiterSpeaker live in arbiterFrame.ts so
+// tests can import them without dragging the whole gameStore +
+// AsyncStorage chain in.
+import { stripArbiterFrame, detectArbiterSpeaker } from './arbiterFrame';
+import { voiceForSpeaker } from './speakerVoices';
+
+function speakArbiter(text: string): void {
+  const stripped = stripArbiterFrame(text);
+  if (!stripped) return;
+  // Per-NPC voice assignment for the system TTS engine. The Arbiter's
+  // voice resolves to null → falls back to the player-configured
+  // setting (am_michael by default). Vendor names ("Irma Ironhand",
+  // "Halem", "Naha", …) resolve to the voice authored in
+  // vendors.json. Unknown speakers get a stable hash-picked voice.
+  // Bundled (Kokoro) engine ignores the override — it uses one voice
+  // per model instance and can't switch per utterance.
+  const speaker = detectArbiterSpeaker(text);
+  const voiceId = voiceForSpeaker(speaker);
+  speak(stripped, 'arbiter', voiceId);
+}
+
 function rememberStreamed(text: string): void {
   recentStreamedTexts.push(text);
   if (recentStreamedTexts.length > RECENT_STREAM_WINDOW) {
@@ -76,7 +110,7 @@ function wasAlreadyStreamed(text: string): boolean {
 function flushStreamBuffer(): void {
   const trimmed = streamBuffer.trim();
   if (trimmed) {
-    speak(trimmed, 'arbiter');
+    speakArbiter(trimmed);
     rememberStreamed(trimmed);
   }
   streamBuffer = '';
@@ -151,7 +185,10 @@ function onState(state: GameState): void {
       // Suppress the arbiter follow-up if we already spoke it
       // sentence-by-sentence via the streaming buffer.
       if (entry.channel === 'arbiter' && wasAlreadyStreamed(entry.text)) continue;
-      speak(entry.text, entry.channel);
+      // arbiter-only channel (per OTA 123 player request) — frame
+      // strip + speak. The SPOKEN_CHANNELS set is now {'arbiter'}
+      // so this is always the arbiter path.
+      speakArbiter(entry.text);
     }
     lastLogIndex = log.length;
     const tail = log[log.length - 1];
@@ -171,7 +208,7 @@ function onState(state: GameState): void {
     streamBuffer = partial;
     const { sentences, remainder } = splitSentences(streamBuffer);
     for (const s of sentences) {
-      speak(s, 'arbiter');
+      speakArbiter(s);
       rememberStreamed(s);
     }
     streamBuffer = remainder;
