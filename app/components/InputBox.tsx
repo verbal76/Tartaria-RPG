@@ -18,12 +18,17 @@ interface Props {
   range?: 'arm' | 'close' | 'far' | null;
 }
 
-// Peace-mode quick buttons. 'look' = generic look-around (no target).
+// Peace-mode quick buttons. The "look around you" button submits 'look' —
+// the parser still routes via the look verb, but the label is more
+// inviting + more clearly tells the player what the button does.
 // 'search' = opens a search prompt where the player names what to search
 // (also covers digging — searching the mud/silt/ground routes through
 // the dig path when the player carries a tool).
 // 'rest' = direct verb.
-const PEACE_QUICK_DIRECT = ['look', 'rest'] as const;
+const PEACE_QUICK_DIRECT: Array<{ label: string; submit: string }> = [
+  { label: 'look around you', submit: 'look' },
+  { label: 'rest', submit: 'rest' },
+];
 
 // Trim a weapon name down to fit comfortably on a button. Examples:
 // "Aetheric Crystal Blade" → "Crystal Blade"
@@ -192,7 +197,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
         ) : (
           <>
             {PEACE_QUICK_DIRECT.map((qa) => (
-              <QuickBtn key={qa} label={qa} onPress={() => onSubmit(qa)} />
+              <QuickBtn key={qa.submit} label={qa.label} onPress={() => onSubmit(qa.submit)} />
             ))}
             <QuickBtn label="search" onPress={onOpenSearch} />
             <QuickBtn label="approach" onPress={onOpenApproach} />
