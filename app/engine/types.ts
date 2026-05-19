@@ -479,7 +479,8 @@ export interface MemorableEvent {
     | 'rare_kill'
     | 'theft_caught'
     | 'first_travel'
-    | 'first_kill';
+    | 'first_kill'
+    | 'first_quest';
   text: string;
   timestamp: number;
   factionId?: string;

@@ -889,6 +889,10 @@ function pickTimelineCallback(
         options.push(`"You ${recent.text}," the Arbiter says quietly. "Few things in Tartaria come back from the buried side. The Aetherstone marks the ones that do."`);
       } else if (recent.kind === 'first_kill') {
         options.push(`"You ${recent.text}," the Arbiter says. "I remember the way you stood after. Tell me — has the way you stand changed?"`);
+      } else if (recent.kind === 'first_travel') {
+        options.push(`"You ${recent.text}," the Arbiter says. "The world widens for those who walk it. It also takes."`);
+      } else if (recent.kind === 'first_quest') {
+        options.push(`"You ${recent.text}," the Arbiter notes. "Contracts pay in coin and in story. See which one matters more by the end of it."`);
       }
     }
   }

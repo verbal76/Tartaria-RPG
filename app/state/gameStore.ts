@@ -1969,18 +1969,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const hours = 8;
           const heal = Math.min(hpRoom, hours * 2);
           const stamGain = Math.min(stamRoom, hours);
+          // Corruption decay — 8 hours of clean rest sloughs off one
+          // point of accumulated corruption. The weather tick at the
+          // top of submitPlayerAction fires BEFORE this, so resting
+          // in Whisper Fog / Silent Blizzard nets to 0 (the tick adds
+          // +1, the decay takes -1). In normal weather, corruption
+          // actually drops. Without this the sim showed corruption
+          // climbing monotonically over the play session.
+          const corrDecay = (player.corruption ?? 0) > 0 ? 1 : 0;
           const newHours = (player.hoursElapsed ?? 0) + hours;
           set({
             player: {
               ...player,
               hp: player.hp + heal,
               stamina: player.stamina + stamGain,
+              corruption: Math.max(0, (player.corruption ?? 0) - corrDecay),
               hoursElapsed: newHours,
             },
           });
           const parts: string[] = [];
           if (heal > 0) parts.push(`+${heal} HP`);
           if (stamGain > 0) parts.push(`+${stamGain} stamina`);
+          if (corrDecay > 0) parts.push(`−${corrDecay} corruption`);
           const tail = parts.length > 0 ? parts.join(', ') + ' recovered.' : 'Whole already — the Aetherstone hums steady.';
           get().appendLog('world', `You rest for ${hours} hours. ${tail} (${describeTime(newHours)})`);
           void get().persist();
@@ -3274,22 +3284,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'craft': {
-        // No target — list what's currently craftable from inventory.
+        // No target — open the CraftingScreen so the player can see
+        // every recipe visually (matches the quick-button behavior).
+        // Previously this only logged an Arbiter blurb listing 4
+        // recipes; the QA sim flagged the mismatch with the button.
         const target = parsed.target?.trim() ?? '';
         if (!target) {
-          const available = listCraftableRecipes(player.inventory);
-          if (available.length === 0) {
-            get().appendLog(
-              'arbiter',
-              `The Arbiter glances at your pack. "Nothing fits together yet. Keep hunting — Tartaria gives up its pieces slowly."`,
-            );
-          } else {
-            const names = available.slice(0, 4).map((r) => r.result).join(', ');
-            get().appendLog(
-              'arbiter',
-              `The Arbiter looks over your materials. "You have the pieces for: ${names}. Say 'craft ' and one of those names."`,
-            );
-          }
+          get().setScreen('crafting');
           break;
         }
         // Targeted craft — try substring match first, then MiniLM semantic
@@ -3988,6 +3989,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         `✦ The road has built you up. +1 max stamina (now ${newStaminaMax}). [${newTravels} travels completed]`,
       );
     }
+    // First-travel milestone is noted in the memorable-event log so
+    // the Arbiter can reference "your first long road" later. Fires
+    // only on the player's first completed travel of the run; type
+    // already supports 'first_travel' but nothing was writing it.
+    if (newTravels === 1) {
+      recordMemorableEvent(get, set, {
+        kind: 'first_travel',
+        text: `walked your first road, to ${getLocationById(locationId).name}`,
+      });
+    }
     // Travel completion advances staged faction quests by one beat.
     advanceActiveFactionQuests(get, set);
     get().beginScene();
@@ -4571,6 +4582,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const factionId = scene.vendor.faction;
+    const wasFirstQuest = (player.activeFactionQuestIds?.length ?? 0) === 0
+      && (player.completedFactionQuestIds?.length ?? 0) === 0;
     set((s) =>
       s.player
         ? {
@@ -4586,6 +4599,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : s,
     );
     bumpQuestsAccepted(get, set);
+    // First-quest milestone — Arbiter can reference "the first
+    // contract you took" later. Fires only on the first accept of
+    // the run; type union added in this batch.
+    if (wasFirstQuest) {
+      recordMemorableEvent(get, set, {
+        kind: 'first_quest',
+        text: `took your first contract — ${quest.title}`,
+        factionId,
+      });
+    }
     get().appendLog(
       'reward',
       `New faction contract — ${quest.title}. ${quest.objective} (${factionId.replace(/_/g, ' ')})`,
