@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet, AppState, Platform, StatusBar as RNStatusBar, type AppStateStatus } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useGameStore } from './app/state/gameStore';
 import { TitleScreen } from './app/screens/TitleScreen';
 import { CharacterCreationScreen } from './app/screens/CharacterCreationScreen';
@@ -114,20 +114,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-        <StatusBar style="light" />
-        {screen === 'title' && <TitleScreen />}
-        {screen === 'character_creation' && <CharacterCreationScreen />}
-        {screen === 'exploration' && <ExplorationScreen />}
-        {screen === 'log' && <LogScreen />}
-        {screen === 'lore' && <LoreScreen />}
-        {screen === 'about' && <AboutScreen />}
-        {screen === 'inventory' && <InventoryScreen />}
-        {screen === 'crafting' && <CraftingScreen />}
-        {screen === 'vendor' && <VendorScreen />}
-        {screen === 'actions' && <ActionReferenceScreen />}
-        {screen === 'contracts' && <ContractsScreen />}
-      </SafeAreaView>
+      <AppShell screen={screen} />
       {/* TutorialOverlay sits OUTSIDE SafeAreaView so its absolute
           positioning matches measureInWindow coords from the targets
           (which report screen-absolute, not safe-area-relative). */}
@@ -136,14 +123,41 @@ export default function App() {
   );
 }
 
-// Android-12+ edge-to-edge default means SafeAreaView's top inset can
-// come through as 0 on some OEM ROMs (Pixel + most Samsung), leaving
-// the app's top row of UI overlapping the status bar (BACK / SETTINGS
-// title sitting on top of the clock + battery icons — playtest
-// screenshot caught this on the Settings screen). Pinning a minimum
-// paddingTop to RNStatusBar.currentHeight on Android guarantees the
-// top row always clears the system bar, no matter how the OEM
-// configures insets.
+// Inner shell — needs useSafeAreaInsets which only resolves inside a
+// SafeAreaProvider. We compute one paddingTop = max(insets.top,
+// android-status-bar-height) so the top row clears the system bar on
+// every device without DOUBLING the inset (the previous SafeAreaView
+// edges='top' + my custom paddingTop stacked on devices where the
+// OEM does report a top inset — the player called this out as
+// over-padded). Math.max is the right merge: take whichever is bigger,
+// not both.
+function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>['currentScreen'] }) {
+  const insets = useSafeAreaInsets();
+  const top = Math.max(insets.top, ANDROID_STATUS_PAD);
+  const bottom = insets.bottom;
+  return (
+    <View style={[styles.safe, { paddingTop: top, paddingBottom: bottom }]}>
+      <StatusBar style="light" />
+      {screen === 'title' && <TitleScreen />}
+      {screen === 'character_creation' && <CharacterCreationScreen />}
+      {screen === 'exploration' && <ExplorationScreen />}
+      {screen === 'log' && <LogScreen />}
+      {screen === 'lore' && <LoreScreen />}
+      {screen === 'about' && <AboutScreen />}
+      {screen === 'inventory' && <InventoryScreen />}
+      {screen === 'crafting' && <CraftingScreen />}
+      {screen === 'vendor' && <VendorScreen />}
+      {screen === 'actions' && <ActionReferenceScreen />}
+      {screen === 'contracts' && <ContractsScreen />}
+    </View>
+  );
+}
+
+// Floor value used when SafeAreaView's reported top inset is 0 on
+// edge-to-edge Android ROMs (Pixel + some Samsung). AppShell does
+// Math.max(insets.top, ANDROID_STATUS_PAD) so we get the bigger of
+// the two — never both stacked, never the BACK button under the
+// clock.
 const ANDROID_STATUS_PAD =
   Platform.OS === 'android' ? RNStatusBar.currentHeight ?? 24 : 0;
 
@@ -151,7 +165,6 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: '#0a0908',
-    paddingTop: ANDROID_STATUS_PAD,
   },
   loading: { flex: 1, backgroundColor: '#0a0908', alignItems: 'center', justifyContent: 'center' },
 });

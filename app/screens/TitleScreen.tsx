@@ -15,6 +15,7 @@ import { BrandedModal } from '../components/BrandedModal';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
+import { OTA_BUILD_ID } from '../buildInfo';
 
 const races = racesData as { id: string; name: string }[];
 const locations = locationsData as { id: string; name: string }[];
@@ -43,6 +44,8 @@ export function TitleScreen() {
   const deleteSlotById = useGameStore((s) => s.deleteSlotById);
   const resurrectSlot = useGameStore((s) => s.resurrectSlot);
   const resurrectionGems = useGameStore((s) => s.resurrectionGems);
+  const justUpdatedFromBuild = useGameStore((s) => s.justUpdatedFromBuild);
+  const dismissJustUpdated = useGameStore((s) => s.dismissJustUpdated);
   const [refreshing, setRefreshing] = useState(false);
   const [pendingAction, setPendingAction] = useState<
     | { kind: 'delete'; slot: SlotSummary }
@@ -249,6 +252,27 @@ export function TitleScreen() {
           : [{ label: 'OK', onPress: closeModal, tone: 'neutral' }]
         }
         onRequestClose={closeModal}
+      />
+
+      {/* Just-updated popup. checkAndApplyOTA → Updates.reloadAsync
+          can swap the JS bundle without warning; the auto-reload
+          looks like a glitch to the player. hydrate compares the
+          current OTA_BUILD_ID against the previous value stashed
+          in AsyncStorage and surfaces this modal once when they
+          differ. Dismiss clears justUpdatedFromBuild so it doesn't
+          reappear on subsequent title-screen visits this session. */}
+      <BrandedModal
+        visible={!!justUpdatedFromBuild}
+        title="Just updated"
+        body={
+          justUpdatedFromBuild
+            ? `Tartaria Realms refreshed itself in the background.\n\nPrevious build: ${justUpdatedFromBuild}\nNow running: ${OTA_BUILD_ID}\n\nYour characters and saves are untouched — the sudden reload was the new bundle taking over.`
+            : undefined
+        }
+        buttons={[
+          { label: 'OK', onPress: dismissJustUpdated, tone: 'primary' },
+        ]}
+        onRequestClose={dismissJustUpdated}
       />
 
       <BrandedModal

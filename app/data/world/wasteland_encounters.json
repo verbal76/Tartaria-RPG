@@ -1,0 +1,130 @@
+{
+  "_description": "Wasteland encounters surfaced during long-distance cardinal travel. After every N steps within the same macro location, the engine rolls against this pool. Each archetype declares: matchers (biome / location tags it fires in), narration template ({biome}, {direction} substituted), optional loot drop with material kinds, optional NPC dialogue, optional follow-up hook the player can chase. Adding a new encounter type is a JSON edit, no engine code. Drives the 'walking is enjoyable' goal — player feedback: 'walking into the desert and finding an old bus with a note in it that tells you a direction to travel and to look for a rock... a body with a sad story and a small keepsake. Layer those up every 2 or 3 movements and you can make the world massive.'",
+
+  "abandoned_caravan": {
+    "type": "treasure",
+    "weight": 12,
+    "matchers": ["mud", "outskirts", "open", "borderlands", "surface", "buried"],
+    "narration": "You crest a low rise and a Reclaimer caravan slumps in the silt — axle snapped, banner half-buried. Whoever drove it left in a hurry, or didn't leave at all.",
+    "loot": [
+      { "name": "Trail Rations", "weight": 40, "min": 1, "max": 2, "kind": "consumable", "tags": ["food"] },
+      { "name": "Scrap Metal", "weight": 30, "min": 1, "max": 3, "kind": "misc", "tags": ["metal"] },
+      { "name": "Patched Cloth", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["cloth"] },
+      { "name": "Worn Tartarian Coin", "weight": 10, "min": 1, "max": 3, "kind": "misc", "tags": ["currency","ancient"] }
+    ],
+    "lore_note": "A note tucked under the bench reads: 'East three days, the Pillars. We didn't make it.'"
+  },
+
+  "frozen_traveller": {
+    "type": "treasure",
+    "weight": 8,
+    "matchers": ["mud", "outskirts", "ruin", "buried", "etheric_anomaly"],
+    "narration": "A body sits cross-legged in the silt, mud-glassed in place. The pose is patient. Whatever they were waiting for never arrived.",
+    "loot": [
+      { "name": "Worn Tartarian Coin", "weight": 25, "min": 2, "max": 5, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Aether Crystal", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Spider Silk", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["fiber"] },
+      { "name": "Aether Dust", "weight": 30, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","dust","distillable"] },
+      { "name": "Bone Fragment", "weight": 20, "min": 1, "max": 3, "kind": "misc", "tags": ["bone"] }
+    ],
+    "lore_note": "A locket on their chest holds a pre-flood photograph — a face you don't recognise, smiling at a sky that doesn't exist anymore."
+  },
+
+  "wandering_drifter": {
+    "type": "npc",
+    "weight": 14,
+    "matchers": ["mud", "outskirts", "open", "ruin", "borderlands"],
+    "narration": "A figure trudges toward you across the silt — staff, mud-cloak, eyes that have been further than yours.",
+    "npc_lines": [
+      "\"There's a buried gate two days east,\" the drifter says, not stopping. \"I wouldn't open it.\"",
+      "\"You're newer than the last one I passed. They didn't make it either.\"",
+      "\"The Aether's loud tonight. I'd rest if I were you.\"",
+      "\"Mud Monarchs running patrols north of here. Step careful or step around.\"",
+      "\"The flats remember every step. Walk like you mean it.\""
+    ],
+    "loot": [
+      { "name": "Trail Rations", "weight": 30, "min": 1, "max": 1, "kind": "consumable", "tags": ["food","gift"] }
+    ]
+  },
+
+  "scavenger_camp": {
+    "type": "npc",
+    "weight": 10,
+    "matchers": ["mud", "outskirts", "ruin"],
+    "narration": "Smoke first, then voices. Two scavengers crouched around a hooded brazier, sorting what looked like brass fittings and pre-flood wire.",
+    "npc_lines": [
+      "\"You want a fitting? Two coin. You want both? Three coin and don't look at the third pile.\"",
+      "\"Heard there's a body in a wagon south of here. We don't go south.\"",
+      "\"Aether's been thick all week. Anything mechanical is half-junk by morning.\""
+    ],
+    "loot": [
+      { "name": "Scrap Metal", "weight": 40, "min": 1, "max": 2, "kind": "misc", "tags": ["metal"] },
+      { "name": "Aether Residue", "weight": 30, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","distillable"] },
+      { "name": "Patched Cloth", "weight": 30, "min": 1, "max": 1, "kind": "misc", "tags": ["cloth"] }
+    ]
+  },
+
+  "skirmish_pack": {
+    "type": "skirmish",
+    "weight": 18,
+    "matchers": ["mud", "outskirts", "open", "ruin", "borderlands"],
+    "narration": "Movement low and fast — a {enemy} cuts across your path. You're closer than either of you wanted to be.",
+    "enemyPool": ["Gutter Rat", "Aetheric Slug", "Mud Lurker", "Aetherbat", "Bog Hound"],
+    "loot": []
+  },
+
+  "fungal_patch": {
+    "type": "treasure",
+    "weight": 9,
+    "matchers": ["mud", "buried", "fungal", "ruin"],
+    "narration": "A patch of luminous fungus grows in a low pocket of mud. Three colours: pale blue at the centre, copper-orange at the rim, deep violet under the wettest spots.",
+    "loot": [
+      { "name": "Blue Aetheric Fungus", "weight": 35, "min": 1, "max": 3, "kind": "misc", "tags": ["fungus","blue","distillable"] },
+      { "name": "Orange Sporecap", "weight": 30, "min": 1, "max": 2, "kind": "misc", "tags": ["fungus","orange","distillable"] },
+      { "name": "Violet Mushroom", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["fungus","violet","distillable"] },
+      { "name": "Bioluminescent Fungus", "weight": 10, "min": 1, "max": 1, "kind": "misc", "tags": ["fungus","light","gear"] }
+    ],
+    "lore_note": "Halem the Trader pays for fungi by the colour. Blue for clarity. Orange for fire. Violet for the dreaming road."
+  },
+
+  "old_bus_with_note": {
+    "type": "mini_dungeon",
+    "weight": 5,
+    "matchers": ["mud", "outskirts", "open", "buried"],
+    "narration": "Pre-flood transport, gutted and tipped onto its side. The destination scroll above the driver's seat still reads 'OUTER LINE — DRAKOVA.' Inside, a duffel bag sits propped against the back wheel-well. A note pinned to the bag.",
+    "loot": [
+      { "name": "Trail Rations", "weight": 30, "min": 1, "max": 2, "kind": "consumable", "tags": ["food"] },
+      { "name": "Scrap Metal", "weight": 25, "min": 1, "max": 3, "kind": "misc", "tags": ["metal"] },
+      { "name": "Worn Tartarian Coin", "weight": 25, "min": 3, "max": 8, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Aether Crystal", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","crystal"] }
+    ],
+    "lore_note": "Note reads: 'If you find this, keep walking east. Three days, look for the standing stone — the one with the chip on its crown. There's something buried at its base. I never made it back.'"
+  },
+
+  "still_with_alcohol": {
+    "type": "treasure",
+    "weight": 7,
+    "matchers": ["mud", "outskirts", "ruin", "buried"],
+    "narration": "A makeshift still — copper coil, clay vessel, charred wood. Whoever ran it abandoned the rig but left two sealed jugs in the shade.",
+    "loot": [
+      { "name": "Reclaimer's Mud-Beer", "weight": 40, "min": 1, "max": 2, "kind": "consumable", "tags": ["alcohol","drink"] },
+      { "name": "Aether-Distilled Spirit", "weight": 25, "min": 1, "max": 1, "kind": "consumable", "tags": ["alcohol","aether","drink"] },
+      { "name": "Scrap Metal", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["metal","copper"] },
+      { "name": "Aether Dust", "weight": 10, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","dust","distillable"] }
+    ],
+    "lore_note": "A tin cup hangs from a nail. The owner's name is scratched into the bottom: 'YORK — DON'T DRINK THE VIOLET.'"
+  },
+
+  "etheric_storm_debris": {
+    "type": "treasure",
+    "weight": 6,
+    "matchers": ["etheric_anomaly", "open", "mud"],
+    "narration": "An Aetheric storm passed through here recently. The ground is scattered with small fused chunks of mud-glass and the still-warm remains of something pre-flood that the storm pulled out of the earth.",
+    "loot": [
+      { "name": "Aether Crystal", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Aetheric Shard", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","shard"] },
+      { "name": "Mud Fragment", "weight": 30, "min": 1, "max": 3, "kind": "misc", "tags": ["mud","glass"] },
+      { "name": "Aether Dust", "weight": 20, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","dust","distillable"] }
+    ]
+  }
+}

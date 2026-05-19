@@ -572,21 +572,20 @@ export const USE_RELIC_FAILURE_LINES: readonly string[] = [
 
 /**
  * Whitelist of player intents where Qwen (the generative Arbiter) is
- * actually a good fit. Travel, investigate, and diplomacy are the
- * intents where the player wants atmosphere or curiosity — exactly the
- * cases where a paragraph of generated prose adds value.
+ * actually a good fit. Travel and diplomacy are the intents where the
+ * player wants atmosphere or curiosity — exactly the cases where a
+ * paragraph of generated prose adds value. `scene_intro` is the
+ * synthetic intent the scene-entry path uses so the Arbiter can
+ * narrate a new room with the same permission.
  *
  * Every other intent (attack, dodge, rest, use_relic, craft, inventory,
- * equip, dig, vendor flows…) wants instant feedback. The deterministic
- * template path covers those much faster than a 10–20 second LLM round
- * trip and never hallucinates events the engine didn't actually do.
+ * equip, dig, vendor flows, investigate…) wants instant feedback. The
+ * deterministic template path covers those much faster than a 10–20 s
+ * LLM round trip and never hallucinates events the engine didn't do.
  *
  * narrateViaArbiter checks this set AND scene combat state before
  * deciding to call the model. Outside the whitelist, or in active
  * combat, the template fires immediately and no LLM call is made.
- *
- * `scene_intro` is a synthetic intent the scene-entry path uses so the
- * Arbiter can narrate a new room with the same Qwen permission.
  */
 export const QWEN_ALLOWED_INTENTS: ReadonlySet<string> = new Set([
   'travel',

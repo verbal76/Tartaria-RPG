@@ -62,6 +62,9 @@ import {
   rollFromPool,
   narrate as containerNarrate,
 } from '../engine/containerLoot';
+import { pickWastelandEncounter } from '../engine/wastelandEncounters';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { OTA_BUILD_ID } from '../buildInfo';
 import { rollDie, rollFromNotation, pick, chance, rotatingPick } from '../engine/rng';
 import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver } from '../engine/combatRules';
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
@@ -612,6 +615,26 @@ interface GameStore {
   qwenModelId: string;
   partialArbiterText: string | null;
   isGenerating: boolean;
+  /** Last scene the player called `look` on, plus the in-game hour
+   *  at the time. Drives the consecutive-look short-form path in
+   *  narrateCasualLook so spamming `look` doesn't reprint the full
+   *  bearings block every tap. Transient — not persisted across
+   *  app launches. Was a monkey-patch on the store object before
+   *  the audit promoted it to a proper field. */
+  lastLookAt: { key: string; hour: number } | null;
+  /** Count of cardinal travel steps since the last wasteland
+   *  encounter fired. stepDirection increments this every step;
+   *  pickWastelandEncounter resets to 0 when an encounter lands.
+   *  Tuned with a 3-step minimum gate so the world doesn't roll on
+   *  every footstep. Transient. */
+  wastelandStepsSinceEncounter: number;
+  /** When the app boots on a different OTA bundle than the one
+   *  recorded in AsyncStorage, this holds the PREVIOUS build id.
+   *  TitleScreen reads it and surfaces a one-shot "Updated" modal
+   *  so a sudden auto-reload doesn't look like a crash. Set by
+   *  hydrate; cleared by dismissJustUpdated. */
+  justUpdatedFromBuild: string | null;
+  dismissJustUpdated: () => void;
 
   hydrate: () => Promise<void>;
   setScreen: (screen: ScreenName) => void;
@@ -705,12 +728,10 @@ interface GameStore {
   scrapInventoryItem: (itemName: string) => void;
 
   bootCognitive: () => Promise<void>;
-  skipCognitiveBoot: () => void;
   shutdownCognitive: () => Promise<void>;
   resumeCognitive: () => Promise<void>;
 
   bootQwen: () => Promise<void>;
-  skipQwenBoot: () => void;
   shutdownQwen: () => Promise<void>;
   /** Discards the in-flight Arbiter generation buffer. The model keeps
    *  running but its output will be dropped on the floor instead of appended
@@ -742,6 +763,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   cognitiveFraction: 0,
   cognitiveError: null,
   cognitiveLastResponse: null,
+  lastLookAt: null,
+  wastelandStepsSinceEncounter: 0,
+  justUpdatedFromBuild: null,
   cognitiveModelInfo: null,
 
   qwenStatus: 'idle',
@@ -772,6 +796,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
         });
       }
     } catch { /* STT module not present — fine. */ }
+    // Just-updated detection. checkAndApplyOTA → Updates.reloadAsync
+    // can yank the app to a new bundle mid-stride and reading the
+    // result feels like a crash. Compare current OTA_BUILD_ID against
+    // the value stored last time we hydrated; if different (and a
+    // value was stored — fresh installs skip), surface the previous
+    // build via justUpdatedFromBuild and TitleScreen pops a one-shot
+    // modal explaining the system was just updated.
+    let justUpdatedFromBuild: string | null = null;
+    try {
+      const LAST_BUILD_KEY = 'tartaria.lastSeenOTA.v1';
+      const lastSeen = await AsyncStorage.getItem(LAST_BUILD_KEY);
+      if (lastSeen && lastSeen !== OTA_BUILD_ID) {
+        justUpdatedFromBuild = lastSeen;
+      }
+      await AsyncStorage.setItem(LAST_BUILD_KEY, OTA_BUILD_ID);
+    } catch { /* AsyncStorage hiccup — silently skip the popup. */ }
     // ALWAYS land on the title screen at app launch, regardless of what
     // currentScreen the active slot was last saved at. Tapping a character
     // in the slot list is one tap away — but the player chooses, not the
@@ -782,7 +822,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       resurrectionGems: stash.resurrectionGems,
       currentScreen: 'title',
       hydrated: true,
+      justUpdatedFromBuild,
     });
+  },
+
+  dismissJustUpdated() {
+    set({ justUpdatedFromBuild: null });
   },
 
   async refreshSlots() {
@@ -1037,28 +1082,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // NOTE: previously this branch extracted ambient nouns from
         // the merged text and pushed them into scene.ambientNouns.
         // Playtest report: the search modal's in-scene chips started
-        // showing "negotiate / wind / words / voice / carries" —
-        // verbs and abstract nouns pulled out of Arbiter REFUSAL
-        // prose (e.g. "No one is here to negotiate with. The wind
-        // takes the words.") that had nothing to do with the actual
-        // scene's interactable props. The auto-extraction is gone.
-        // beginScene's one-time extractAmbientNouns(location.description)
-        // pass remains the canonical source; hook plants push new
+        // showing verbs and abstract nouns pulled out of Arbiter
+        // refusal prose. Auto-extraction is gone. Authored
+        // Location.interactables (Phase 2) is the canonical source
+        // for the noun pool; extractAmbientNouns() is the fallback
+        // for content without an authored list. Hook plants push
         // nouns via Hook.nouns explicitly.
         return { gameLog: mergedLog };
       }
       // NOTE: previously this extracted ambient nouns from every
       // world-channel log entry to fold into the scene's noun pool.
-      // Playtest caught the failure mode — the search modal's in-
-      // scene chips were showing "negotiate / wind / words / voice /
-      // carries", verbs and abstractions pulled out of Arbiter
-      // refusal prose ("No one is here to negotiate with. The wind
-      // takes the words. Your voice carries across empty ground.").
-      // The 80-noun cap also slowly pushed legitimate scene nouns
-      // (crates, brazier, guards) OUT of the pool as junk piled in.
-      // Disabled — beginScene's one-time
-      // extractAmbientNouns(location.description) pass is canonical;
-      // hook plants push genuine nouns via Hook.nouns explicitly.
+      // Same failure mode as above — disabled. Authored
+      // Location.interactables / HubRoom.interactables /
+      // MicroMicroLocation.interactables (Phase 2) is canonical;
+      // extractAmbientNouns() is the fallback only.
       return { gameLog: nextLog };
     });
   },
@@ -2774,6 +2811,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // tickEffects (2→1) AND is still active when that turn's
         // enemy counter resolves. Without this, tickEffects would
         // decrement 1→0 before the counter saw the +4 AC.
+        //
+        // Stance-already-active guard: chaos-sim flagged repeat
+        // dodge / block / flee taps producing zero feedback because
+        // applyEffect silently overwrites the existing effect and
+        // the same-channel-debounce in appendLog merges the world
+        // line into the prior one. Surface a clear ack so the
+        // player knows the tap registered.
+        const alreadyDodging = (player.statusEffects ?? []).some((e) => e.kind === 'dodging');
+        if (alreadyDodging) {
+          get().appendLog('world', `You're already in the dodging stance — no need to spend another beat on it.`);
+          break;
+        }
         const dodging: StatusEffect = {
           kind: 'dodging',
           remainingRounds: 2,
@@ -2801,8 +2850,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Block stance: stake your equipped weapon on the next enemy
         // attack. If the block roll lands, damage is halved and there's
         // a small chance to riposte for 1d4. Weapon takes wear either
-        // way — that's the cost. Ranged weapons (defense 0) can still
-        // attempt but almost never succeed.
+        // way — that's the cost.
+        const alreadyBlocking = (player.statusEffects ?? []).some((e) => e.kind === 'blocking');
+        if (alreadyBlocking) {
+          get().appendLog('world', `You're already braced into a block — the stance holds.`);
+          break;
+        }
         const equippedMainName = player.equipped?.main ?? player.equipped?.weaponName;
         const blockWeapon = equippedMainName ? findWeaponByName(equippedMainName) : null;
         if (!blockWeapon || (blockWeapon.defense ?? 0) <= 0) {
@@ -2951,7 +3004,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // Lead with the full structured scene description (location +
           // micro-room env + entities + room exits). The cardinal summary
           // then follows as the macro-tier answer.
-          narrateCasualLook(get, set as never, currentScene);
+          narrateCasualLook(get, set, currentScene);
           const hasCompass = player.inventory.some(
             (i) => /compass/i.test(i.name) && i.quantity > 0,
           );
@@ -6190,6 +6243,56 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       get().appendLog('world', directional);
     }
+    // Wasteland encounter roll — every ~7-8 cardinal steps the player
+    // walks into something: an abandoned caravan with a note, a
+    // wandering drifter with a tip, a fungal patch, a skirmish, the
+    // old bus with a duffel bag, etc. Data-driven via
+    // app/data/world/wasteland_encounters.json. Tuned with a
+    // 3-step minimum + 40% chance per eligible roll so the world
+    // feels populated without becoming a theme park. Skipped during
+    // active combat (the scene already has plenty going on).
+    if (scene.enemies.length === 0) {
+      const wasteSteps = (get().wastelandStepsSinceEncounter ?? 0) + 1;
+      set(() => ({ wastelandStepsSinceEncounter: wasteSteps }));
+      const enc = pickWastelandEncounter(scene.location, {
+        stepsSinceLastEncounter: wasteSteps,
+      });
+      if (enc) {
+        set(() => ({ wastelandStepsSinceEncounter: 0 }));
+        get().appendLog('world', enc.narration);
+        if (enc.npcLine) get().appendLog('arbiter', enc.npcLine);
+        if (enc.loreNote) get().appendLog('world', enc.loreNote);
+        if (enc.loot) {
+          const livePlayer = get().player;
+          if (livePlayer) {
+            const grantResult = grantItem(livePlayer.inventory, {
+              id: `${enc.loot.name}_${Date.now()}`,
+              name: enc.loot.name,
+              kind: enc.loot.kind,
+              quantity: enc.loot.quantity,
+              tags: enc.loot.tags,
+            });
+            set((s) => (s.player
+              ? { player: { ...s.player, inventory: grantResult.inventory } }
+              : s));
+            if (grantResult.accepted > 0) {
+              get().appendLog(
+                'reward',
+                `✦ Recovered ${enc.loot.name}${grantResult.accepted > 1 ? ` x${grantResult.accepted}` : ''}.`,
+              );
+            }
+          }
+        }
+        if (enc.type === 'skirmish' && enc.enemyName) {
+          get().appendLog(
+            'combat',
+            `${enc.enemyName} closes — combat starts. (Skirmish-spawn integration pending; for now the encounter narrates and resolves.)`,
+          );
+        }
+        void get().persist();
+      }
+    }
+
     // Plant a hook on the wander (same as narrateWanderingJourney does).
     narrateWanderingJourney(get, set, scene);
   },
@@ -6677,10 +6780,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
 
-  skipCognitiveBoot() {
-    set({ cognitiveStatus: 'skipped' });
-  },
-
   async shutdownCognitive() {
     try {
       await cognitive.shutdown();
@@ -6728,10 +6827,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const message = err instanceof Error ? err.message : String(err);
       set({ qwenStatus: 'failed', qwenError: message });
     }
-  },
-
-  skipQwenBoot() {
-    set({ qwenStatus: 'skipped' });
   },
 
   async shutdownQwen() {
@@ -7822,10 +7917,10 @@ function narrateCasualLook(
   // the player spamming `look`. Give them a one-line refresher
   // varied by their current state instead.
   const sceneKey = `${player?.currentLocationId ?? '?'}@${scene.microMicroId ?? '_'}@${player?.mapX ?? 0},${player?.mapY ?? 0}@${player?.hubRoomId ?? '_'}`;
-  const lastLook = (get() as unknown as { _lastLookAt?: { key: string; hour: number } })._lastLookAt;
+  const lastLook = get().lastLookAt;
   const nowHour = player?.hoursElapsed ?? 0;
   const consecutive = lastLook && lastLook.key === sceneKey && (nowHour - lastLook.hour) <= 2;
-  (get() as unknown as { _lastLookAt?: { key: string; hour: number } })._lastLookAt = { key: sceneKey, hour: nowHour };
+  set(() => ({ lastLookAt: { key: sceneKey, hour: nowHour } }));
   if (consecutive) {
     // Consecutive look — bearings refresher, no flavor reread.
     // Player just looked moments ago; they want a one-liner of
@@ -8165,8 +8260,8 @@ async function narrateViaArbiter(
   // sequences and tour-guide prose during combat; the deterministic
   // template path is faster AND safer here.
   const inCombat = !!scene && scene.enemies.length > 0;
-  // Phase 4 §1.1 — Intent allowlist. Outside the small whitelist (travel,
-  // investigate, diplomacy, scene_intro), the deterministic templates
+  // Phase 4 §1.1 — Intent allowlist. Outside the small whitelist
+  // (travel, diplomacy, scene_intro), the deterministic templates
   // carry the narration. Random Qwen chatter on attack / rest / dig /
   // equip etc. is gone.
   const intentAllowsQwen = QWEN_ALLOWED_INTENTS.has(intent);

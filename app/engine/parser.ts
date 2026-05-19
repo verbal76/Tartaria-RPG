@@ -352,13 +352,22 @@ export function classifyNoun(
   if ((context.hookNouns ?? []).some((n) => n.toLowerCase() === lower)) {
     return 'hook';
   }
-  // Location name — substring match either way (matches existing logic).
+  // Length floor on substring fuzzy match — guards against 3-char
+  // input over-matching ("war" → "ward", "ax" → "axle"). Both sides
+  // must be ≥4 chars before we'll accept a substring hit. Exact-match
+  // path stays open regardless of length.
+  const fuzzyMatch = (candidate: string, input: string): boolean => {
+    if (candidate === input) return true;
+    if (candidate.length < 4 || input.length < 4) return false;
+    return candidate.includes(input) || input.includes(candidate);
+  };
+  // Location name.
   const locName = (context.currentLocationName ?? '').toLowerCase();
-  if (locName && (locName === lower || locName.includes(lower) || lower.includes(locName))) {
+  if (locName && fuzzyMatch(locName, lower)) {
     return 'location';
   }
   // Ambient noun — falls through as the catch-all when nothing else matches.
-  if ((context.ambientNouns ?? []).some((n) => n.toLowerCase() === lower || n.toLowerCase().includes(lower) || lower.includes(n.toLowerCase()))) {
+  if ((context.ambientNouns ?? []).some((n) => fuzzyMatch(n.toLowerCase(), lower))) {
     return 'ambient';
   }
   return null;
