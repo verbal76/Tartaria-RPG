@@ -1579,9 +1579,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
         if (pool.length > 0) {
           const q = pool[0]!;
+          // Short summary line — playtest feedback: "the arbiter
+          // shouldn't read the contracts. he can just say contract
+          // accepted." Title + accept verb only; full description
+          // lives in the Contracts screen if the player wants it.
           get().appendLog(
-            'arbiter',
-            `${vendor.name} leans in. "Got a contract for someone like you. ${q.title}. ${q.description} Reward: ${q.reward.tc} TC, +${q.reward.rep} rep. Say 'accept ${acceptKeyword(q.title)}' to take it."`,
+            'world',
+            `${vendor.name} offers a contract: "${q.title}." (Say 'accept ${acceptKeyword(q.title)}' or open Contracts for details.)`,
           );
         }
         // Active quest with this faction's agent? Hint at the turn-in.
@@ -1605,8 +1609,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (huntPool.length > 0) {
           const h = huntPool[0]!;
           get().appendLog(
-            'arbiter',
-            `${vendor.name} taps a notice on the post. "Bounty up — ${h.title}. ${h.posterText} Say 'accept ${acceptKeyword(h.title)}' to take it."`,
+            'world',
+            `${vendor.name} points at the bounty board: "${h.title}." (Say 'accept ${acceptKeyword(h.title)}' or open Contracts.)`,
           );
         }
         // Active hunt with this faction's agent? Prompt for turn-in.
@@ -1631,8 +1635,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (mysteryPool.length > 0) {
           const m = mysteryPool[0]!;
           get().appendLog(
-            'arbiter',
-            `${vendor.name} taps a different notice. "Mystery work — ${m.title}. ${m.posterText} Say 'accept ${acceptKeyword(m.title)}' to take it."`,
+            'world',
+            `${vendor.name} nods at a mystery notice: "${m.title}." (Say 'accept ${acceptKeyword(m.title)}' or open Contracts.)`,
           );
         }
         const mysteryTurnable = (player.activeMysteries ?? [])
@@ -7936,32 +7940,17 @@ function narrateCasualLook(
   // surfaced the same scene paragraph emitted 5x verbatim — that's
   // the player spamming `look`. Give them a one-line refresher
   // varied by their current state instead.
+  // NOTE: the consecutive-look short-form was removed by player
+  // request — "every time I say look around you, give me a new full
+  // debrief and those nouns are in the search and approach bar. I
+  // don't need a shortened version the second or third time that I
+  // say it, otherwise I have to scroll all the way back up the text
+  // log to see what's still around me that I haven't looked at."
+  // lastLookAt still tracked for any future use; the short-form
+  // branch is intentionally absent.
   const sceneKey = `${player?.currentLocationId ?? '?'}@${scene.microMicroId ?? '_'}@${player?.mapX ?? 0},${player?.mapY ?? 0}@${player?.hubRoomId ?? '_'}`;
-  const lastLook = get().lastLookAt;
   const nowHour = player?.hoursElapsed ?? 0;
-  const consecutive = lastLook && lastLook.key === sceneKey && (nowHour - lastLook.hour) <= 2;
   set(() => ({ lastLookAt: { key: sceneKey, hour: nowHour } }));
-  if (consecutive) {
-    // Consecutive look — bearings refresher, no flavor reread.
-    // Player just looked moments ago; they want a one-liner of
-    // "yes you're still here, exits still here, anything new?"
-    // not a re-read of the room description.
-    const inHubShort = isHubLocation(player?.currentLocationId ?? null) && !!player?.hubRoomId;
-    const hubRoomShort = inHubShort ? findHubRoom(player!.hubRoomId!) : null;
-    const placeShort = hubRoomShort?.name ?? scene.location.name;
-    const hp = player?.hp ?? 0;
-    const hpMax = player?.hpMax ?? 1;
-    const hpFrac = hp / Math.max(1, hpMax);
-    const bits: string[] = [`Still in ${placeShort}.`];
-    if (scene.enemies.length > 0) {
-      bits.push(`${scene.enemies.length} enemy within reach.`);
-    } else if (scene.vendor) {
-      bits.push(`${scene.vendor.name} still here.`);
-    }
-    if (hpFrac < 0.5) bits.push(`(${hp}/${hpMax} HP.)`);
-    get().appendLog('world', bits.join(' '));
-    return;
-  }
 
   // Full look — bearings, not flavor. Player feedback (verbatim):
   // "the responses from look shouldn't be flavor heavy it's you
