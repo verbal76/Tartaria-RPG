@@ -71,6 +71,19 @@ let onResultCb: ((r: STTResult) => void) | null = null;
 let onErrorCb: ((msg: string) => void) | null = null;
 let subs: EventSubscription[] = [];
 
+// Optional diagnostics callback. Wired by the game store on init so STT
+// events land in the on-disk game log (and the on-screen feed via the
+// system channel). Without this the recognizer can fail silently in
+// half a dozen ways — no permission, no-speech timeout, network-only
+// service, etc. — and the player just sees nothing change.
+let onDiag: ((channel: 'system' | 'debug', line: string) => void) | null = null;
+export function setSTTDiag(cb: ((channel: 'system' | 'debug', line: string) => void) | null): void {
+  onDiag = cb;
+}
+function diag(channel: 'system' | 'debug', line: string): void {
+  try { onDiag?.(channel, line); } catch { /* ignore */ }
+}
+
 /** True if the device has a usable speech-recognition engine. */
 export async function isSTTAvailable(): Promise<boolean> {
   if (!lib.available || !lib.module) return false;
@@ -96,24 +109,64 @@ function attachListeners(): void {
   detachListeners();
   if (!lib.addListener) return;
   try {
+    // result — partial + final transcripts. Log every result with a
+    // tiny prefix so the playtest log shows whether the recognizer is
+    // actually capturing words. Empty transcripts get logged too so we
+    // can tell "engine fired result event with nothing" apart from
+    // "engine never fired."
     subs.push(
       lib.addListener('result', (e: { isFinal?: boolean; results?: Array<{ transcript?: string }> }) => {
         const text = e.results?.[0]?.transcript ?? '';
-        if (text && onResultCb) onResultCb({ text, isFinal: !!e.isFinal });
+        const final = !!e.isFinal;
+        diag('debug', `stt: result final=${final} text="${text}"`);
+        if (text && onResultCb) onResultCb({ text, isFinal: final });
       }),
     );
     subs.push(
       lib.addListener('error', (e: { message?: string; error?: string }) => {
         listening = false;
-        const msg = e?.message || e?.error || 'Speech recognition failed.';
+        const code = e?.error || 'unknown';
+        const msg = e?.message || code;
+        diag('debug', `stt: error code=${code} msg="${msg}"`);
+        // Show ONLY actionable errors in the player-visible feed.
+        // "no-speech" and "aborted" happen normally (user paused too
+        // long, or tapped mic again to cancel) — surfacing those would
+        // be noise.
+        if (code !== 'no-speech' && code !== 'aborted') {
+          const hint =
+            code === 'not-allowed' || code === 'service-not-allowed'
+              ? ' — open Android Settings → Apps → Tartaria Realms → Permissions and enable Microphone.'
+              : code === 'network'
+                ? ' — the speech engine needs network. Try again with mobile data or wifi on.'
+                : code === 'language-not-supported'
+                  ? ' — your device does not have offline speech for this language.'
+                  : '';
+          diag('system', `Mic: ${msg}${hint}`);
+        }
         if (onErrorCb) onErrorCb(msg);
       }),
     );
     subs.push(
       lib.addListener('end', () => {
         listening = false;
+        diag('debug', 'stt: end (session closed)');
       }),
     );
+    // Lifecycle events — these tell us whether the recognizer ever
+    // even opened the mic. If we see start but never speechstart, the
+    // mic is hot but no audio is coming in (gain too low, hardware
+    // muted, etc.). If we see speechstart but never result, the engine
+    // is hearing audio but not turning it into words (locale wrong,
+    // recognizer service crashed, etc.).
+    subs.push(lib.addListener('start', () => diag('debug', 'stt: started')));
+    subs.push(lib.addListener('speechstart', () => diag('debug', 'stt: speechstart (audio detected)')));
+    subs.push(lib.addListener('speechend', () => diag('debug', 'stt: speechend')));
+    subs.push(lib.addListener('audiostart', () => diag('debug', 'stt: audiostart')));
+    subs.push(lib.addListener('audioend', () => diag('debug', 'stt: audioend')));
+    subs.push(lib.addListener('nomatch', () => {
+      diag('debug', 'stt: nomatch (engine heard you but could not turn it into words)');
+      diag('system', 'Mic: heard you but could not transcribe. Try speaking more clearly or check your device locale.');
+    }));
   } catch (err) {
     // If addListener itself blows up, swallow it — we still want the
     // start path to surface a clean error rather than crash the app.
@@ -133,41 +186,72 @@ export async function startListening(
   onResultCb = onResult;
   onErrorCb = onError;
 
-  // Fail closed if the native module isn't installed. Previously a
-  // call to a missing native method could hard-crash the app on
-  // older APKs running new JS — now the player gets a clean message
-  // and the input row stays alive.
+  // Fail closed if the native module isn't installed.
   if (!lib.available || !lib.module) {
+    diag('system', `Mic: ${lib.loadError ?? 'unavailable'}`);
     onError(lib.loadError ?? 'Mic input is unavailable on this build.');
     return;
   }
 
-  attachListeners();
-
-  // Request mic + speech-recognition permissions on first use.
+  // Availability check — does the device actually have a speech
+  // recognition service installed? Some Android builds (especially
+  // GMS-less ROMs) ship without one. Log + bail instead of starting
+  // into a hung mic.
   try {
-    const perm = await lib.module.requestPermissionsAsync();
-    if (!perm?.granted) {
-      onError('Microphone permission denied. Enable it in Settings → Apps.');
+    const ok = !!lib.module.isRecognitionAvailable();
+    diag('debug', `stt: isRecognitionAvailable=${ok}`);
+    if (!ok) {
+      diag('system', 'Mic: no speech-recognition service on this device. Install Google app from Play Store.');
+      onError('No speech recognition service installed.');
       return;
     }
   } catch (err) {
-    // Some Android builds don't expose the helper; fall through and
-    // let start() raise a clearer error if mic is actually blocked.
+    diag('debug', `stt: availability check threw ${err instanceof Error ? err.message : String(err)}`);
+  }
+
+  attachListeners();
+
+  // Permission gate. Check current state first — if previously denied,
+  // requestPermissionsAsync will NOT re-prompt (Android holds the
+  // decision until the player flips it manually in Settings).
+  try {
+    const cur = await lib.module.getPermissionsAsync();
+    diag('debug', `stt: getPermissions granted=${cur?.granted} canAskAgain=${cur?.canAskAgain}`);
+    if (!cur?.granted) {
+      if (cur?.canAskAgain === false) {
+        diag('system', 'Mic: permission was denied earlier. Open Android Settings → Apps → Tartaria Realms → Permissions → Microphone and turn it on.');
+        onError('Mic permission denied. Enable in Settings.');
+        return;
+      }
+      const perm = await lib.module.requestPermissionsAsync();
+      diag('debug', `stt: requestPermissions granted=${perm?.granted}`);
+      if (!perm?.granted) {
+        diag('system', 'Mic: permission denied. Tap mic again to retry, or enable in Settings.');
+        onError('Mic permission denied.');
+        return;
+      }
+    }
+  } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    // Non-fatal — try start anyway.
-    void msg;
+    diag('debug', `stt: permission helper threw ${msg}`);
+    // Fall through — let start() raise a clearer error if mic is blocked.
   }
 
   if (listening) {
     try { lib.module.stop(); } catch { /* ignore */ }
   }
+  // continuous:true on Android keeps the recognizer open across brief
+  // pauses — closer to "talk normally" than "talk fast or it gives up."
+  // interimResults:true so the player sees partial transcripts land in
+  // the text box as they speak (visible feedback that the mic IS
+  // working, even if the recognizer hasn't finalized yet).
+  diag('debug', `stt: start lang=${locale} interim=true continuous=true`);
   try {
     lib.module.start({
       lang: locale,
       interimResults: true,
       maxAlternatives: 1,
-      continuous: false,
+      continuous: true,
       requiresOnDeviceRecognition: false,
       addsPunctuation: true,
     });
@@ -175,10 +259,10 @@ export async function startListening(
   } catch (err) {
     listening = false;
     const msg = err instanceof Error ? err.message : 'Could not start microphone.';
+    diag('debug', `stt: start threw ${msg}`);
+    diag('system', `Mic: could not start — ${msg}`);
     onError(msg);
-    // Do NOT rethrow — the InputBox handler swallows, but throwing
-    // can still propagate to the React render scheduler on some
-    // Android setups and crash the bridge.
+    // Do NOT rethrow.
   }
 }
 

@@ -727,6 +727,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const activeId = await loadActiveSlotId();
     const slots = await listSlots();
     const stash = await loadGlobalStash();
+    // Wire STT diagnostics into the game log so the next playtest log
+    // includes a full trace of what the mic is actually doing — start,
+    // speechstart, audiostart, result, error code, end. Without this,
+    // STT can fail silently in half a dozen ways and the player sees
+    // nothing on screen.
+    try {
+      // Lazy require so a build without the STT module never trips here.
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const stt = require('../voice/STTManager');
+      if (typeof stt.setSTTDiag === 'function') {
+        stt.setSTTDiag((channel: 'system' | 'debug', line: string) => {
+          try { get().appendLog(channel, line); } catch { /* ignore */ }
+        });
+      }
+    } catch { /* STT module not present — fine. */ }
     // ALWAYS land on the title screen at app launch, regardless of what
     // currentScreen the active slot was last saved at. Tapping a character
     // in the slot list is one tap away — but the player chooses, not the

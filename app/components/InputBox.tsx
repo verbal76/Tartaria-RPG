@@ -207,8 +207,14 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           style={styles.input}
           value={text}
           onChangeText={setText}
-          placeholder={inCombat ? 'What do you do? (or use quick buttons)' : 'What do you do?'}
-          placeholderTextColor="#5a5246"
+          placeholder={
+            listening
+              ? '🎙 LISTENING — speak now'
+              : inCombat
+                ? 'What do you do? (or use quick buttons)'
+                : 'What do you do?'
+          }
+          placeholderTextColor={listening ? '#6a9bbf' : '#5a5246'}
           onSubmitEditing={handleSubmit}
           returnKeyType="send"
           // Disable autocorrect AND autocomplete so Android IME doesn't
@@ -329,8 +335,8 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   micBtnActive: {
-    backgroundColor: '#3a342c',
-    borderColor: '#c9a86a',
+    backgroundColor: '#1c2a35',
+    borderColor: '#6a9bbf',
   },
   micBtnText: { color: '#cdbf99', fontSize: 18 },
   // SILENCE ARBITER button — replaces the mic while TTS is active.
