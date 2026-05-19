@@ -1312,6 +1312,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
       vendor, range, hooks: initialHooks, ambientNouns, microMicroId,
       enemyAmbushUsed: enemies.map(() => false),
     };
+    // Vendor voice pool — lifecycle hooks on scene transitions.
+    // When this scene introduces a new vendor, warm their Kokoro
+    // voice in the background so the model graph is ready by the
+    // time their first dialogue line lands (typically ~1 second
+    // later). When the previous scene HAD a vendor and the new one
+    // doesn't (or has a different vendor), evict the prior vendor's
+    // slot. Net result: only the Arbiter + at most ONE vendor voice
+    // is loaded at any moment (~200 MB peak), but every distinct
+    // vendor the player meets gets their own voice on demand.
+    //
+    // Wrapped in a try / void so an executorch hiccup never blocks
+    // scene setup. System TTS doesn't go through this path.
+    const prevVendorVoice = get().currentScene?.vendor?.voiceId ?? null;
+    const nextVendorVoice = vendor?.voiceId ?? null;
+    if (prevVendorVoice && prevVendorVoice !== nextVendorVoice) {
+      try {
+        const piper = require('../voice/PiperTTSManager');
+        if (typeof piper.disposeVoice === 'function') piper.disposeVoice(prevVendorVoice);
+      } catch { /* PiperTTSManager may not be loaded in tests */ }
+    }
+    if (nextVendorVoice) {
+      try {
+        const piper = require('../voice/PiperTTSManager');
+        if (typeof piper.warmVoice === 'function') void piper.warmVoice(nextVendorVoice);
+      } catch { /* same */ }
+    }
     set({ currentScene: scene, pendingRolls: null });
     const dropIds = [...consumedChainIds, ...expiredChainIds];
     if (dropIds.length > 0) {

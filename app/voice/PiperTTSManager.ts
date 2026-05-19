@@ -44,16 +44,43 @@ const KOKORO_SAMPLE_RATE = 22050;
 interface QueuedUtterance {
   id: number;
   text: string;
+  /** Resolved Kokoro voice id for this utterance. null = use the
+   *  current Arbiter voice (player's kokoroVoice setting). Vendor
+   *  lines pass their assigned voice; the pool spins up an instance
+   *  for that voice on demand. */
+  voiceId: string | null;
 }
+
+// Voice pool. Holds at most POOL_MAX loaded Kokoro instances. The
+// Arbiter slot is sticky (never evicted) — the player hears it most.
+// The remaining slots cycle through vendor voices on an LRU basis,
+// disposed when the player walks away from the vendor or another
+// vendor needs the slot. Memory cost: ~80-150 MB per loaded instance;
+// POOL_MAX=2 keeps peak around 200 MB on Pixel-class hardware.
+interface LoadedVoice {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  module: any;
+  lastUsedAt: number;
+  /** True only for the Arbiter slot; sticky entries don't evict. */
+  sticky: boolean;
+}
+const POOL_MAX = 2;
+const VOICE_POOL: Map<string, LoadedVoice> = new Map();
+// In-flight loads keyed by voiceId so concurrent ensureLoaded() calls
+// (e.g. beginScene's warm + the vendor's first line both hitting at
+// once) share one fromModelName promise instead of double-loading.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const LOADING: Map<string, Promise<any | null>> = new Map();
 
 let nextId = 1;
 const queue: QueuedUtterance[] = [];
 let currentlySpeaking: QueuedUtterance | null = null;
 let currentSound: Audio.Sound | null = null;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let tts: any | null = null;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let ttsPromise: Promise<any | null> | null = null;
+// Backwards-compat: TTSController checks isPiperAvailable / getKokoroState
+// which both read from setKokoroState. The state machine now tracks the
+// ARBITER slot's status specifically — that's the voice the player
+// downloads + warms on engine-on, and the "ready" UI signal is gated on
+// that one being loaded.
 let availabilityCache: boolean | null = null;
 let lastDownloadProgress = 0;
 const downloadListeners = new Set<(p: number) => void>();
@@ -146,19 +173,11 @@ export async function prewarmKokoro(): Promise<void> {
   if (prewarmStarted) return;
   prewarmStarted = true;
   try {
-    const m = await ensureModel();
-    if (!m) return;
-    // Warm inference — minimal text so the graph compiles fast. Audio
-    // output is discarded; we never call playPcm here. Some
-    // executorch backends compile lazily on first forward(), which is
-    // what we want to pay now (in the background) rather than on the
-    // player's first heard line.
-    try {
-      const samples: Float32Array = await m.forward('ok.', 1.0);
-      // No-op — we only wanted the side effect of compiling the graph.
-      void samples;
-    } catch { /* ignore warm-up errors; real speak() will surface them */ }
-  } catch { /* ignore — state machine already surfaced the error */ }
+    // Load the Arbiter voice — sticky, drives the public state machine
+    // (download progress + ready signal). ensureLoaded does its own
+    // warm-up forward() so this single call covers both pieces.
+    await ensureLoaded(arbiterVoiceId());
+  } catch { /* ignore — state machine surfaced the error */ }
 }
 
 export function isSpeaking(): boolean {
@@ -170,44 +189,107 @@ export function getModelDir(): string {
   return 'executorch-cache://kokoro/';
 }
 
+function arbiterVoiceId(): string {
+  return getVoiceSettings().kokoroVoice ?? 'am_michael';
+}
+
+function voiceRefFor(voiceId: string): unknown {
+  return VOICES[voiceId] ?? exec.KOKORO_VOICE_AM_MICHAEL;
+}
+
+// Evict the least-recently-used non-sticky voice from the pool when
+// at capacity. Sticky (Arbiter) is never selected.
+function evictLRU(): void {
+  if (VOICE_POOL.size < POOL_MAX) return;
+  const candidates = Array.from(VOICE_POOL.entries())
+    .filter(([, v]) => !v.sticky)
+    .sort((a, b) => a[1].lastUsedAt - b[1].lastUsedAt);
+  const victim = candidates[0];
+  if (!victim) return;
+  const [vid, entry] = victim;
+  try {
+    if (typeof entry.module?.delete === 'function') entry.module.delete();
+  } catch { /* ignore */ }
+  VOICE_POOL.delete(vid);
+}
+
+/** Ensure a Kokoro instance is loaded for the given voice. Returns
+ *  the loaded module, or null on failure. Concurrent calls for the
+ *  same voiceId share one in-flight load promise. The Arbiter voice
+ *  is loaded as sticky (never evicted); all other voices are
+ *  evictable. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function ensureModel(): Promise<any | null> {
-  if (tts) return tts;
-  if (ttsPromise) return ttsPromise;
+async function ensureLoaded(voiceId: string): Promise<any | null> {
+  const existing = VOICE_POOL.get(voiceId);
+  if (existing) {
+    existing.lastUsedAt = Date.now();
+    return existing.module;
+  }
+  const inFlight = LOADING.get(voiceId);
+  if (inFlight) return inFlight;
   if (!exec?.TextToSpeechModule?.fromModelName) return null;
-  ttsPromise = (async () => {
+  const sticky = voiceId === arbiterVoiceId();
+  // If we're about to exceed capacity, evict before the load completes.
+  if (VOICE_POOL.size + LOADING.size >= POOL_MAX) evictLRU();
+  const promise = (async () => {
     try {
-      if (!exec) {
-        setKokoroState({ phase: 'error', message: 'react-native-executorch module not present.' });
-        return null;
-      }
-      setKokoroState({ phase: 'downloading', fraction: 0 });
+      // First-time load on the Arbiter voice drives the public state
+      // machine (download progress, ready signal). Vendor voices load
+      // silently — players don't need a UI for every vendor swap.
+      if (sticky) setKokoroState({ phase: 'downloading', fraction: 0 });
       const m = await exec.TextToSpeechModule.fromModelName(
-        { model: exec.KOKORO_MEDIUM, voice: pickVoice() },
+        { model: exec.KOKORO_MEDIUM, voice: voiceRefFor(voiceId) },
         (p: number) => {
-          lastDownloadProgress = p;
-          setKokoroState({ phase: 'downloading', fraction: p });
-          for (const l of downloadListeners) {
-            try { l(p); } catch { /* ignore */ }
+          if (sticky) {
+            lastDownloadProgress = p;
+            setKokoroState({ phase: 'downloading', fraction: p });
+            for (const l of downloadListeners) {
+              try { l(p); } catch { /* ignore */ }
+            }
           }
         },
       );
-      setKokoroState({ phase: 'loading' });
-      tts = m;
-      setKokoroState({ phase: 'ready' });
+      if (sticky) setKokoroState({ phase: 'loading' });
+      // Warm-up forward — compiles the graph so the player's first
+      // real line doesn't pay cold-start latency. Output discarded.
+      try { const samples: Float32Array = await m.forward('ok.', 1.0); void samples; } catch { /* ignore */ }
+      VOICE_POOL.set(voiceId, { module: m, lastUsedAt: Date.now(), sticky });
+      if (sticky) setKokoroState({ phase: 'ready' });
       return m;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      setKokoroState({ phase: 'error', message: msg.slice(0, 240) });
+      if (sticky) setKokoroState({ phase: 'error', message: msg.slice(0, 240) });
       return null;
     } finally {
-      ttsPromise = null;
+      LOADING.delete(voiceId);
     }
   })();
-  return ttsPromise;
+  LOADING.set(voiceId, promise);
+  return promise;
 }
 
-export function speak(text: string): number {
+/** Pre-load a vendor voice without speaking. Called by beginScene
+ *  when a vendor appears so the model graph is compiled by the time
+ *  the vendor's first line lands. Idempotent — no-op if already
+ *  loaded. */
+export async function warmVoice(voiceId: string): Promise<void> {
+  await ensureLoaded(voiceId);
+}
+
+/** Explicitly evict a vendor voice from the pool. Called when the
+ *  player leaves a scene with a vendor / the vendor walks off, so
+ *  memory drops to the Arbiter slot only. Sticky (Arbiter) voices
+ *  are protected — pass-through no-op. */
+export function disposeVoice(voiceId: string): void {
+  const entry = VOICE_POOL.get(voiceId);
+  if (!entry || entry.sticky) return;
+  try {
+    if (typeof entry.module?.delete === 'function') entry.module.delete();
+  } catch { /* ignore */ }
+  VOICE_POOL.delete(voiceId);
+}
+
+export function speak(text: string, voiceId?: string | null): number {
   const settings = getVoiceSettings();
   if (!settings.ttsEnabled) return -1;
   // Lexicon respellings (Aetheric, Tartarian, etc.) + symbol cleanup
@@ -227,8 +309,9 @@ export function speak(text: string): number {
   // Fallback: if the text has zero terminators (rare — usually a
   // status line), speak it as one chunk.
   if (chunks.length === 0) chunks.push(prepared);
+  const resolvedVoice = voiceId ?? arbiterVoiceId();
   for (const chunk of chunks) {
-    queue.push({ id: nextId++, text: chunk });
+    queue.push({ id: nextId++, text: chunk, voiceId: resolvedVoice });
   }
   void drain();
   return id;
@@ -239,9 +322,11 @@ async function drain(): Promise<void> {
   const next = queue.shift();
   if (!next) return;
   currentlySpeaking = next;
-  const model = await ensureModel();
+  const targetVoice = next.voiceId ?? arbiterVoiceId();
+  const model = await ensureLoaded(targetVoice);
   if (!model) {
     currentlySpeaking = null;
+    void drain();
     return;
   }
   try {
@@ -274,11 +359,16 @@ export async function stopAndClear(): Promise<void> {
 
 export async function disposePiperEngine(): Promise<void> {
   await stopAndClear();
-  if (tts && typeof tts.delete === 'function') {
-    try { tts.delete(); } catch { /* ignore */ }
+  // Drop every loaded voice in the pool — Arbiter + any vendor still
+  // resident. The next prewarm() call will re-load the Arbiter slot.
+  for (const [, entry] of VOICE_POOL) {
+    try {
+      if (typeof entry.module?.delete === 'function') entry.module.delete();
+    } catch { /* ignore */ }
   }
-  tts = null;
-  ttsPromise = null;
+  VOICE_POOL.clear();
+  LOADING.clear();
+  prewarmStarted = false;
 }
 
 /** Force a model refresh: dispose the loaded engine, wipe the

@@ -12,6 +12,15 @@ export interface VendorTemplate {
   faction: string | null;
   description: string;
   offers: VendorOffer[];
+  /** Per-NPC Kokoro voice id. Authored per vendor in vendors.json
+   *  so each speaker sounds distinct on the bundled engine. The
+   *  vendor's voice slot in the Kokoro pool is lazy-loaded by
+   *  beginScene when the vendor enters the scene and disposed when
+   *  the player walks away. */
+  voiceId?: string;
+  /** 'male' / 'female' — used as a hint for the system-TTS fallback
+   *  and (eventually) for any gender-flavoured narration. */
+  gender?: 'male' | 'female';
 }
 
 // A live vendor in the current scene. Carries a mutable offer list so
@@ -24,6 +33,8 @@ export interface VendorInstance {
   faction: string | null;
   description: string;
   offers: VendorOffer[];
+  voiceId?: string;
+  gender?: 'male' | 'female';
 }
 
 export const VENDORS = (vendorsData as { vendors: VendorTemplate[] }).vendors;
@@ -39,6 +50,8 @@ export function pickRandomVendor(): VendorInstance {
     faction: v.faction,
     description: v.description,
     offers: v.offers.map((o) => ({ ...o })),
+    voiceId: v.voiceId,
+    gender: v.gender,
   };
 }
 
@@ -57,5 +70,7 @@ export function findVendorByName(name: string): VendorInstance | null {
     faction: v.faction,
     description: v.description,
     offers: v.offers.map((o) => ({ ...o })),
+    voiceId: v.voiceId,
+    gender: v.gender,
   };
 }

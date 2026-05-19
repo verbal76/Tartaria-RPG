@@ -113,10 +113,13 @@ export function speak(text: string, channel?: string, voiceId?: string | null): 
   if (!trimmed) return -1;
   if (settings.engine === 'bundled') {
     // Kokoro can't switch voice per utterance (the voice is baked
-    // into the model instance at load time). Per-vendor voices only
-    // work on the system engine. Bundled keeps the player's
-    // configured voice for everything.
-    return piperSpeak(trimmed);
+    // Bundled engine now ALSO supports per-vendor voices via the
+    // Kokoro voice pool (PiperTTSManager). Each vendor's assigned
+    // voiceId triggers a lazy-load of that voice on first use, and
+    // beginScene's warm hook keeps the latency invisible. Pool is
+    // capped at 2 simultaneous voices (Arbiter sticky + 1 vendor
+    // slot, LRU-evicted).
+    return piperSpeak(trimmed, voiceId);
   }
   const id = nextId++;
   queue.push({ id, text: trimmed, channel, voiceId });
