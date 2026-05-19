@@ -8,12 +8,13 @@ import {
   FlatList,
   RefreshControl,
 } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import { SwipeableRow } from '../components/SwipeableRow';
 import { BrandedModal } from '../components/BrandedModal';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
-import type { SlotSummary } from '../engine/saveSystem';
+import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
 
 const races = racesData as { id: string; name: string }[];
 const locations = locationsData as { id: string; name: string }[];
@@ -96,6 +97,21 @@ export function TitleScreen() {
 
   const closeModal = () => setPendingAction(null);
 
+  // Per-slot transient "COPIED" flash so the button confirms the action
+  // visually for ~1.5s without needing a modal. Keyed by slotId.
+  const [copiedSlotId, setCopiedSlotId] = useState<string | null>(null);
+  const copyDeadLog = async (slot: SlotSummary) => {
+    try {
+      const log = await readSlotLog(slot.slotId);
+      await Clipboard.setStringAsync(log || `(no log captured for ${slot.playerName})`);
+      setCopiedSlotId(slot.slotId);
+      setTimeout(() => setCopiedSlotId((cur) => (cur === slot.slotId ? null : cur)), 1500);
+    } catch {
+      // Silent — clipboard rarely fails on Android; if it does, the
+      // player can still try LogScreen via the active session.
+    }
+  };
+
   const renderItem = ({ item }: { item: SlotSummary }) => (
     <SwipeableRow onDelete={() => confirmDelete(item)}>
       <TouchableOpacity
@@ -116,6 +132,25 @@ export function TitleScreen() {
         <Text style={styles.slotMeta}>
           HP {item.hp}/{item.hpMax}
         </Text>
+        {item.dead && (
+          // Dead characters can't be loaded into a live session, so the
+          // LogScreen path is closed to the player. This row-local button
+          // reads the slot's persisted log straight off disk and drops
+          // the full text on the clipboard so the player can keep the
+          // record of how the run ended.
+          <TouchableOpacity
+            style={styles.copyLogBtn}
+            onPress={(e) => {
+              e.stopPropagation?.();
+              void copyDeadLog(item);
+            }}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.copyLogText}>
+              {copiedSlotId === item.slotId ? '✓ COPIED' : 'COPY LOG'}
+            </Text>
+          </TouchableOpacity>
+        )}
       </TouchableOpacity>
     </SwipeableRow>
   );
@@ -270,6 +305,22 @@ const styles = StyleSheet.create({
   },
   slotTime: { color: '#7a705c', fontSize: 11 },
   slotMeta: { color: '#7a705c', fontSize: 12, marginTop: 2 },
+  copyLogBtn: {
+    alignSelf: 'flex-start',
+    marginTop: 8,
+    backgroundColor: '#1a1714',
+    borderColor: '#5a2a26',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  copyLogText: {
+    color: '#e07a5f',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 2,
+  },
   gems: { color: '#c9a86a', fontSize: 12, textAlign: 'center', marginBottom: 8, letterSpacing: 1 },
   footerActions: { gap: 8, marginTop: 12 },
   primaryBtn: {

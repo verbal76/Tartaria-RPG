@@ -194,6 +194,19 @@ export async function readFullLog(): Promise<string> {
   }
 }
 
+// Read any slot's log directly without activating it. Used by the title
+// screen so a player can copy out a fallen character's history without
+// loading the save (dead characters can't be selected). Drains pending
+// writes so the snapshot reflects the moment of death.
+export async function readSlotLog(slotId: string): Promise<string> {
+  await logWriteChain;
+  try {
+    return (await AsyncStorage.getItem(slotLogKey(slotId))) ?? '';
+  } catch {
+    return '';
+  }
+}
+
 // One-shot migration: if a legacy single-slot save exists, fold it into the
 // new multi-slot system as a new slot and remove the legacy keys. Returns
 // the new slot id if migration ran, null otherwise.
