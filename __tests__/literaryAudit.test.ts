@@ -265,49 +265,113 @@ describe('Literary and Atmosphere Audit', () => {
     avgSim = pairCount > 0 ? avgSim / pairCount : 0;
 
     // ─── 3. SENSORY SHIFT — same scene under state changes ────
-    // Force a fresh scene so the player has somewhere to look at.
-    // The 500-turn loop + groundhog sweep can leave the player in a
-    // dead / scene-less state where look() returns no world output
-    // (which would trivially score the two looks as 100% identical).
+    // Start a COMPLETELY fresh character so the look path isn't
+    // tripping on the carry-over state from 500 turns + 15
+    // groundhog rounds. The earlier diagnostic showed sceneOk=true
+    // / hp>0 / pending=false but captured=0 — meaning some other
+    // unobvious early-return in submitPlayerAction (probably an
+    // edge case around weather or status effects mid-flight) was
+    // silently swallowing the look. A clean character bypasses
+    // that entirely.
+    await store.getState().startNewGame({
+      name: 'Critic2',
+      raceId: race.id,
+      factionId: fac.id,
+    });
+    store.getState().skipTutorial?.();
+    submit('leave outpost');
     restUntil(8);
-    if (!store.getState().currentScene || (store.getState().player?.hp ?? 0) <= 0) {
-      // Re-bootstrap into a known scene.
-      const slot = store.getState().activeSlotId;
-      if (slot) {
-        try { await store.getState().loadSlotIntoGame(slot); } catch { /* ignore */ }
+
+    const cleanForLook = () => {
+      try { store.getState().cancelPendingRolls(); } catch { /* ignore */ }
+      if (!store.getState().currentScene) {
+        try { store.getState().beginScene(); } catch { /* ignore */ }
       }
-      try { store.getState().beginScene(); } catch { /* ignore */ }
-    }
-    // Ensure the player has HP — clamp away from death so the
-    // baseline look isn't fighting weather damage.
+    };
+
+    cleanForLook();
+    // Set a known clean player state — full HP, full stamina, noon.
+    // Use a buffer above 1 HP so the next submit's weather tick
+    // doesn't murder the player before look fires.
     {
       const p0 = store.getState().player;
       if (p0) {
-        store.setState({ player: { ...p0, hp: p0.hpMax, stamina: p0.staminaMax, hoursElapsed: Math.floor((p0.hoursElapsed ?? 0) / 24) * 24 + 12 /* high noon */ } });
+        store.setState({
+          player: {
+            ...p0,
+            hp: p0.hpMax,
+            stamina: p0.staminaMax,
+            // High noon — far from night thresholds.
+            hoursElapsed: Math.floor((p0.hoursElapsed ?? 0) / 24) * 24 + 12,
+            statusEffects: [],
+          },
+        });
       }
     }
+    // Diagnostic snapshot so the report shows WHY a capture is
+    // empty when one is.
+    const sensoryDiag: { phase: string; sceneOk: boolean; hp: number; stam: number; pending: boolean; logBefore: number; capturedLines: number; err?: string }[] = [];
+    let lastErr: string | undefined;
+    const snapState = (phase: string, beforeIdx: number, capturedLen: number) => {
+      const ss = store.getState();
+      sensoryDiag.push({
+        phase,
+        sceneOk: !!ss.currentScene,
+        hp: ss.player?.hp ?? -1,
+        stam: ss.player?.stamina ?? -1,
+        pending: !!ss.pendingRolls,
+        logBefore: beforeIdx,
+        capturedLines: capturedLen,
+        err: lastErr,
+      });
+      lastErr = undefined;
+    };
+    // Submit without swallowing — record the error in diagnostic so
+    // we can see what the look path actually throws (if anything).
+    const submitDirect = (text: string) => {
+      try { store.getState().submitPlayerAction(text); }
+      catch (e: any) { lastErr = `${e?.name ?? 'Error'}: ${e?.message ?? e}`; }
+      try {
+        let safety = 0;
+        while (store.getState().pendingRolls && safety < 20) {
+          const pr = store.getState().pendingRolls!;
+          const step = pr.steps[pr.currentStep];
+          if (!step) { try { store.getState().cancelPendingRolls(); } catch { /* ignore */ } break; }
+          const values: number[] = [];
+          for (let i = 0; i < (step.count ?? 1); i++) values.push(1 + Math.floor(Math.random() * (step.sides ?? 6)));
+          try { store.getState().resolveRollStep(values); } catch { break; }
+          safety++;
+        }
+      } catch { /* ignore */ }
+    };
     let baselineBefore = store.getState().gameLog.length;
-    submit('look');
+    submitDirect('look');
     const baselineLines = store.getState().gameLog.slice(baselineBefore)
       .filter((l) => l.channel === 'world')
       .map((l) => l.text)
       .join(' ');
+    snapState('baseline', baselineBefore, store.getState().gameLog.length - baselineBefore);
 
-    // Mutate state for the stressed look.
+    // Mutate state for the stressed look. HP=3 (not 1) so the next
+    // submit's weather tick can't kill the player and trip the
+    // hp<=0 guard before look executes.
+    cleanForLook();
     const beforePlayer = store.getState().player!;
     store.setState({
       player: {
         ...beforePlayer,
-        hp: 1,
+        hp: 3,
+        // Push the clock 12h forward — covers day → night shift.
         hoursElapsed: (beforePlayer.hoursElapsed ?? 0) + 12,
       },
     });
     const stressedBefore = store.getState().gameLog.length;
-    submit('look');
+    submitDirect('look');
     const stressedLines = store.getState().gameLog.slice(stressedBefore)
       .filter((l) => l.channel === 'world')
       .map((l) => l.text)
       .join(' ');
+    snapState('stressed', stressedBefore, store.getState().gameLog.length - stressedBefore);
 
     const sensorySim = jaccard(baselineLines, stressedLines);
     // Heuristic: if the two look-narrations are nearly identical
@@ -359,9 +423,11 @@ ${pairFlags.slice(0, 3).map((p) => `  visit ${p.i}↔${p.j}: ${(p.sim * 100).toF
 
 ─── 3. SENSORY SHIFT (dynamic awareness) ────────────
 Baseline (full HP, day):    "${baselineLines.slice(0, 110).replace(/\n/g, ' ')}…"
-Stressed (1 HP, +12h):      "${stressedLines.slice(0, 110).replace(/\n/g, ' ')}…"
+Stressed (3 HP, +12h):      "${stressedLines.slice(0, 110).replace(/\n/g, ' ')}…"
 Similarity:                 ${(sensorySim * 100).toFixed(1)}%
 ${sensoryStagnation ? '⚠ NO DYNAMIC SHIFT — state changes did not vary the template' : '✓ Template responded to state change'}
+Diagnostic:
+${sensoryDiag.map((d) => `  ${d.phase.padEnd(10)} sceneOk=${d.sceneOk} hp=${d.hp} stam=${d.stam} pending=${d.pending} captured=${d.capturedLines}${d.err ? ' ERR: ' + d.err : ''}`).join('\n')}
 
 ─── 4. TROPE TRACKER (lexical diversity) ────────────
 Total tokens:               ${totalTokens}
