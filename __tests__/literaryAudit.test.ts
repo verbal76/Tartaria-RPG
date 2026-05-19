@@ -242,12 +242,14 @@ describe('Literary and Atmosphere Audit', () => {
       const before = store.getState().gameLog.length;
       submit('go north');
       submit('go south');
-      // Capture world lines from this round-trip — focus on
-      // re-entry narration. The first world line after the second
-      // submit is what we want.
+      // Capture every world line from this round-trip and join — the
+      // earlier narrower filter (`/Your boots find|You walk south.../`)
+      // missed everything because the test stepped through many
+      // narration variants and weather ticks. Joining the whole
+      // round-trip gives Jaccard a real corpus to compare per visit.
       const after = store.getState().gameLog.slice(before).filter((l) => l.channel === 'world');
-      const reentryLine = after.find((l) => /On the ground|Still open|Your boots find|You walk south|You push south|You head south/i.test(l.text));
-      if (reentryLine) groundhogLines.push(reentryLine.text);
+      const combined = after.map((l) => l.text).join(' ');
+      if (combined.length > 0) groundhogLines.push(combined);
     }
     // Pairwise similarity.
     const pairFlags: Array<{ i: number; j: number; sim: number }> = [];

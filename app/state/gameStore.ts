@@ -7149,11 +7149,40 @@ function narrateCasualLook(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   scene: CurrentScene,
 ): void {
-  // Build a structured scene description from the data we already have.
-  // Playtest feedback: "look should say 'you are standing by yourself in a
-  // room. there is a table and two chairs. one wall has a window and
-  // another has a door' so I know what's around me." Pull every layer:
-  // macro location, micro-micro environment, present entities, exits.
+  const player = get().player;
+  // Short-form fallback: if the player JUST looked at this scene
+  // (last look within ~2 in-game hours, same scene key), don't
+  // re-read the full ~70-word location description. The audit
+  // surfaced the same scene paragraph emitted 5x verbatim — that's
+  // the player spamming `look`. Give them a one-line refresher
+  // varied by their current state instead.
+  const sceneKey = `${player?.currentLocationId ?? '?'}@${scene.microMicroId ?? '_'}@${player?.mapX ?? 0},${player?.mapY ?? 0}`;
+  const lastLook = (get() as unknown as { _lastLookAt?: { key: string; hour: number } })._lastLookAt;
+  const nowHour = player?.hoursElapsed ?? 0;
+  const consecutive = lastLook && lastLook.key === sceneKey && (nowHour - lastLook.hour) <= 2;
+  (get() as unknown as { _lastLookAt?: { key: string; hour: number } })._lastLookAt = { key: sceneKey, hour: nowHour };
+  if (consecutive) {
+    // State-aware short look — picks ONE sentence varied by HP /
+    // time-of-day / weather so 5 consecutive looks aren't identical.
+    const hp = player?.hp ?? 0;
+    const hpMax = player?.hpMax ?? 1;
+    const hpFrac = hp / Math.max(1, hpMax);
+    const hourOfDay = Math.floor(nowHour % 24);
+    const isNight = hourOfDay >= 20 || hourOfDay < 6;
+    const isDawnDusk = (hourOfDay >= 5 && hourOfDay < 8) || (hourOfDay >= 18 && hourOfDay < 21);
+    const pieces: string[] = [];
+    if (hpFrac < 0.25) pieces.push(`The world looks darker than it is — you're bleeding out at the edges. (${hp}/${hpMax} HP)`);
+    else if (hpFrac < 0.5) pieces.push(`Your breath is shallow; everything feels heavier than it should. (${hp}/${hpMax} HP)`);
+    else if (isNight) pieces.push(`Night sits on ${scene.location.name}. Shapes are suggestions, not certainties.`);
+    else if (isDawnDusk) pieces.push(`The light is thin. ${scene.location.name} hovers between hours.`);
+    else if (scene.weather?.name && scene.weather.id !== 'calm') pieces.push(`The ${scene.weather.name.toLowerCase()} hasn't moved. Same ground, same pressure on your shoulders.`);
+    else pieces.push(`Same ground. You've already mapped this patch.`);
+    get().appendLog('world', pieces[0]!);
+    return;
+  }
+
+  // Full look — first time at this scene (or after enough time
+  // has passed). Build the structured description from every layer.
   const parts: string[] = [];
 
   // 1. Where you are (macro).
@@ -7173,6 +7202,24 @@ function narrateCasualLook(
   }
   if (scene.hazard) {
     parts.push(`Hazard: ${scene.hazard.name} — ${scene.hazard.description}`);
+  }
+  // 3b. State-aware sensory layer — HP / time-of-day awareness so
+  // the full look isn't blind to whether the player is bleeding
+  // out at midnight or rested at noon. Heuristics tuned to feel
+  // like a narrator who's tracking the character, not just the room.
+  if (player) {
+    const hp = player.hp ?? 0;
+    const hpMax = player.hpMax ?? 1;
+    const hpFrac = hp / Math.max(1, hpMax);
+    const hourOfDay = Math.floor((player.hoursElapsed ?? 0) % 24);
+    const isNight = hourOfDay >= 20 || hourOfDay < 6;
+    const isDawnDusk = (hourOfDay >= 5 && hourOfDay < 8) || (hourOfDay >= 18 && hourOfDay < 21);
+    const stateLine: string[] = [];
+    if (hpFrac < 0.25) stateLine.push(`Your hands shake on the look. (${hp}/${hpMax} HP — bleeding out.)`);
+    else if (hpFrac < 0.5) stateLine.push(`You're carrying wounds. (${hp}/${hpMax} HP.)`);
+    if (isNight) stateLine.push(`It's night here.`);
+    else if (isDawnDusk) stateLine.push(`The light is the grey between hours.`);
+    if (stateLine.length > 0) parts.push(stateLine.join(' '));
   }
 
   // 4. What's present.
