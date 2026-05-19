@@ -1,25 +1,30 @@
 # Tartaria Realms — Session Handoff
 
-> Picked up by: the next chat continuing this branch.
-> Branch: `claude/tartaria-realms-continue-Hgual`
-> Latest OTA: `2026-05-18-037` (pending push)
-> Tests: 509 passing across 41 suites
-> Working tree: pending commit
-> Weapons catalog: 228 entries · MapGraph live · hub data authored · hub engine integrated
+> Branch: `claude/new-session-MvF82`
+> Latest OTA: `2026-05-18-092`
+> App version: `2.201` (APK rebuild marker shipped — APK is being staged for playtest)
+> TypeScript: **0 errors** (`npx tsc --noEmit`)
+> Tests: **583 / 583 passing across 50 suites** (excluding the two long-running sim harnesses; see §5)
+> Working tree: clean
 
 ---
 
 ## 1. What this is
 
-**Tartaria Realms** — a React Native / Expo SDK 52 procedural narrative RPG. Mobile-first (Android target shipping; iOS deferred). Hermes engine. Owned by `verbal76/tartaria-rpg` on GitHub under the `hot-attic-games` Expo account.
+**Tartaria Realms** — a React Native / Expo SDK 52 procedural narrative RPG. Mobile-first Android target. Hermes engine. Owned by `verbal76/tartaria-rpg` on GitHub under the `hot-attic-games` Expo account.
 
-**Setting:** a post-Aetherstone-flood world from the Tartaria Prima rulebook. The player wakes into a buried civilization, choosing a race + faction + name, then plays through procedural scenes generated from authored data + light template stitching.
+**Setting:** a post-Aetherstone-flood world from the Tartaria Prima rulebook. Player wakes into a buried civilization, picks race + faction + name, plays procedural scenes driven by authored data + light template stitching + on-device LLM narration.
 
-**On-device cognitive layer:** `onnxruntime-react-native` running `all-MiniLM-L6-v2` (int8 quantized, ~22 MB, downloaded OTA from HuggingFace on first launch). Used for semantic intent classification, emotion inference, and target resolution.
+**On-device ML stack:**
+- **Classifier (intent + target):** `onnxruntime-react-native` running `all-MiniLM-L6-v2` (int8 quantized, ~22 MB, OTA-downloaded).
+- **Generator (Arbiter narration):** `Qwen 2.5 0.5B Instruct` via `llama.rn` (~398 MB Q4_K_M GGUF, OTA-downloaded).
+- **Neural TTS (optional voice readout):** `react-native-executorch` running Kokoro-82M (~100 MB, OTA-downloaded on engine toggle).
 
-**Generative layer (Qwen 2.5 0.5B Instruct via llama.rn):** ~398 MB Q4_K_M GGUF, OTA-downloaded. Narrates `travel` / `diplomacy` / `scene_intro` intents — every other intent uses deterministic templates (combat muzzle is hard). `investigate` was REMOVED from the allowlist after Qwen kept hallucinating location names like "Borderlands" / "Aetheric Deep" on `look` commands.
+**Voice I/O:** Optional, off by default.
+- **TTS:** Two engines — system (`expo-speech`) and bundled (`Kokoro` via `react-native-executorch`). Settings tab lets the player pick. Bundled has 7 voices, defaults to `AM_MICHAEL`. Lore-respelling lexicon overrides pronunciation of 23 Tartaria words (Tartaria, Aetheric, Reclaimer, Drakova, etc.) before passing to the engine.
+- **STT:** `expo-speech-recognition` (TurboModule wrapping Android `SpeechRecognizer`). Tap the 🎙 mic in the input row; while TTS is talking the same slot shows 🛑 SILENCE ARBITER for an immediate cut + listen.
 
-**Audio:** `expo-av` looping background tracks with 4 contexts (combat / shop / menu / explore) and a settings panel for on/off + volume + Apply.
+**Audio:** `expo-av` looping background tracks across 4 contexts (combat / shop / menu / explore) with crossfade.
 
 ---
 
@@ -27,221 +32,191 @@
 
 ```
 app/
-  ai/                  — MiniLM cognitive + Qwen generative orchestrators
+  ai/                  — MiniLM + Qwen orchestrators
   audio/               — AudioManager / AudioController / settings (expo-av)
-  components/          — UI primitives + the TutorialOverlay system
-  data/                — Authored JSON (locations, weather, hazards, enemies,
-                         items, recipes, quests, hunts, mysteries,
-                         faction-storylines, races, factions, vendors, NPCs,
-                         lore concepts, openings, worldLadder)
+  components/          — UI primitives + TutorialOverlay
+  data/                — Authored JSON: locations, weather, hazards, enemies,
+                         items, recipes, quests (faction + hunt + mystery +
+                         storyline), races, factions, vendors, NPCs, lore
+                         concepts, openings, worldLadder, static_hub
   engine/              — Pure logic: parser, combat, crafting, durability,
                          equipment, encounter, hooks, hunts, mysteries,
-                         faction quests, faction storylines, world map,
-                         weather effects, area search, ambient nouns, status
-                         effects, narrative gen, digging, save system,
-                         enemyTraits, itemWeight, context injector
-  screens/             — Title / CharacterCreation (3-step) / Exploration /
-                         Inventory / Crafting / Vendor / Log / Lore / About /
-                         ActionReference
-  state/               — gameStore.ts (Zustand) — ~5400 lines, the engine spine
-App.tsx                — boots hydrate, cognitive, Qwen, audio; routes screens
+                         faction quests + stages, faction storylines, world
+                         map, weather effects, area search, ambient nouns,
+                         status effects, narrative gen, digging, save
+                         system, enemy traits, item weight, context
+                         injector, hub, edit distance
+  screens/             — Title / CharacterCreation / Exploration / Inventory /
+                         Crafting / Vendor / Log / Lore / About (3-tab:
+                         Music / Voice / About) / ActionReference / Contracts
+  state/               — gameStore.ts (Zustand) — ~5700 lines, the spine
+  updates/             — checkAndApplyOTA.ts (shared OTA sequence — Settings
+                         button AND boot auto-check both call this)
+  voice/               — voiceSettings / TTSManager / TTSController /
+                         PiperTTSManager (Kokoro) / STTManager / loreLexicon /
+                         sentenceSplitter / executorchAdapter
+App.tsx                — boots hydrate, cognitive, Qwen, audio, TTS, auto-OTA;
+                         routes screens
 .github/workflows/
-  build-apk.yml        — local Gradle APK build (paths-ignore app/**)
-  eas-update.yml       — OTA publish + channel→branch mapping (fires on app/**)
+  build-apk.yml        — Gradle APK build (path-gated)
+  eas-update.yml       — OTA publish + channel→branch mapping
 metro.config.js        — comment bumps trigger APK rebuild (path gate)
-app/buildInfo.ts       — OTA_BUILD_ID bumped on every JS push for diagnostics
+app/buildInfo.ts       — OTA_BUILD_ID — bump on every JS-only push
 ```
 
 ---
 
-## 3. Major systems landed since the previous handoff
+## 3. Major systems landed in this session
 
-The previous HANDOFF.md ended at OTA `2026-05-16-052`. We're now at `2026-05-17-029` with **30 commits** of additions and fixes. Highlights:
+### Voice I/O (TTS + STT)
+- **TTS — system engine** wired through `expo-speech` with rate/pitch sliders, voice picker, channel filter (speaks world/arbiter/combat/reward; skips player/system/cognitive/debug).
+- **TTS — bundled engine** wired through `react-native-executorch` + Kokoro-82M. Custom `executorchAdapter` (SDK 52 compat). Preloaded at boot with a silent warm-up inference so the first spoken line has no cold-start lag.
+- **Sentence-buffer streaming** — Qwen tokens are accumulated into a buffer; completed sentences ship to TTS as soon as `.`/`!`/`?`/`\n` lands. First sentence plays before the model finishes.
+- **Coalesce + paragraph pause** — system-TTS queue merges multiple log lines into one `Speech.speak` call joined with `\n` and force-terminated, eliminating the ~1–2 s Android TTS reinit gap between sections while preserving a ~0.4 s paragraph break.
+- **Lore lexicon (23 words)** — space-separated respellings ("tar tare ee uh") because espeak-ng treats hyphens as compound-word joiners. `cleanForSpeech` also strips arrows (`→ ← ⇒ ->` → "to"), rewrites `-N` and Unicode `−N` as "negative N", and `·` as comma.
+- **Resume detection** — saved-game load no longer reads the full backlog from line one. Cold-boot bulk arrival (`lastLogIndex === 0` + log.length ≥ 2) AND a timestamp check on single-entry saves resync the TTS controller silently; only the "you step back into..." resume cue is voiced.
+- **STT — modern wrapper** — `expo-speech-recognition` replaces the New-Arch-incompatible `@react-native-voice/voice`. Permission requested on first toggle.
+- **Auto-OTA on boot** — extracted `checkAndApplyOTA.ts` shared by the Settings button and the boot auto-fire. Gated on `currentScreen === 'title'` to avoid racing a save load. Teardown includes audio + cognitive + Qwen + TTS + Kokoro before `reloadAsync`.
 
-### Action-card layer (Call of Cthulhu cards → engine)
-- New intents: `climb`, `swim`, `jump`, `dash`, `disengage`, `help`, `ready`, `mount`, `take_cover`, `aim`, `reload`, `maneuver`, `throw`, `quick_fire`, `multi_fire`, `fight_back`
-- Each one has ~10 verb synonyms in the parser (310 total synonyms across 33 intents)
-- All routed through a unified **`rollMods()` aggregator** that reads status effects and produces (bonus, penalty, sources, consume) for the next roll
-- New status effect kinds: `aiming`, `sprinting`, `in_cover`, `in_cover_full`, `ready`, `helping`, `overwhelmed`, `surprised`, `fighting_back`, `quick_fire`
-- `buildCombatSteps` consumes `statusMods` + `pointBlankBonus` so dice prompts show *"STR 5 + aim +2 − sprinting -2 + 2 (point blank)"*
+### Combat correctness
+- **Defensive stance timing** — `dodge` / `block` / `fight_back` now apply `remainingRounds: 2` so they survive the next turn's `tickEffects` and are still active when the enemy counter resolves.
+- **Off-hand routing** — successful off-hand attacks read damage type / weapon effect / resistance modifiers from the actual off-hand weapon (was defaulting to main).
+- **Reach gate on counters** — `runEnemyGroupCounters` filters by `enemyCanReach`; melee enemies at `far` range no longer counter-attack.
+- **Ambush_strike wired** — `enemyAmbushUsed?: boolean[]` on the scene; first counter from any `ambush_strike` enemy gets +2, then flag flips. Trait was dead code for 16+ enemies.
+- **Maneuver skill statusMods** — `buildSkillSteps` now accepts `statusMods: RollMods`; maneuver's build-mismatch `surprised` stacks actually land on the roll.
 
-### Combat depth
-- **Enemy traits system** — `Enemy.traits: string[]`. 12 trait ids: `armored / weak_armor / agile / quick / slow / savage / bleeder / venomous / concussive / regenerate / fast_regen / ambush_strike` plus `resist:<type>` and `vulnerable:<type>`. All 99 enemies trait-tagged.
-- **Enemy dodge** — `agile` enemies have 25% chance to dodge a successful hit; `quick` enemies 15%.
-- **Multi-shot bursts** — 2-3 shots in one turn, stacking -2 per shot, auto-resolves all dice in sequence.
-- **Quick Fire** — +2 bonus on next ranged attack via `quick_fire` status.
-- **Fight Back** — opposed Fighting roll on next enemy strike; player win lands their hit instead.
-- **Fighting Maneuver** — build-score comparison (player STR-derived, enemy ability+HP-derived). Penalty dice scale with build mismatch; impossible at 3+ delta.
-- **Full vs partial cover** — `in_cover` (+4 AC) vs `in_cover_full` (+8 AC, ranged auto-miss).
-- **Auto-advance on range-refused attacks** — engine closes / pulls back for the player instead of refusing the attack.
-- **Item weight → throw damage** — name + kind heuristics derive a 1-5 weight; thrown lockets do 1, thrown Steam Cores do 1d8+1.
+### Quest gating
+- **Per-stage `advanceOn`** — `FactionQuestStageDef.advanceOn: 'kill' | 'travel' | 'any'`. Killing 3 rats no longer auto-completes a 4-stage pilgrimage; pilgrimages advance on travel, hunts advance on kill. All 7 faction quests in `faction-quests.json` have explicit gates per stage.
 
-### World mechanics
-- **Weather → stats** — Iron Fog -1 DEX, Etheric Storm +1 INT/-1 WIS, Calm +1 WIS, etc. Folded into `effectiveStats`.
-- **Weather → movement** — Iron Fog / Silent Blizzard now SLOW repositioning (2 turns to move one band) instead of blocking entirely. Visible progress: *"Iron Fog slows you down. You push toward the iron spider but the compass spins. (1/2 — type 'advance' again to close)"*
-- **Weather → visibility penalty** — Iron Fog -2 on attack rolls, others -1.
-- **Time-passed log** — `⏳ Time passed: 45 min` appended after every action that advanced the clock.
-- **Intra-scene movement** — "go to the stall" / "walk to the dagger" stays in the room (15 min + 1 stamina) instead of teleporting to a similarly-named macro location. Fuzzy travel match tightened to ≥5 chars + edit distance ≤ 1.
-- **Hook continuity** — `HookOutcome.addNouns` registers newly-revealed nouns at each stage so the figure-at-the-firepit etc. stays reachable across the chain. Diplomacy / gift / steal added to `hookEligible`.
+### World / progression
+- **Travel recenter** — `travelTo` now resets `mapX`/`mapY` to `WORLD_MAP_CENTER_{X,Y}` after a location change. Previously the player's old crossing coords carried into a freshly recentered map, causing same-direction bouncing between adjacent biomes (Cartographer audit caught this).
+- **Hub exit fixed** — `beginScene` accepts `skipHubEntry: true` so `leave outpost` actually exits instead of re-entering the gate room.
+- **Corruption cap + balanced decay** — `CORRUPTION_MAX = 50`. Clean-weather rest sheds 4 / 2 / 1 corruption depending on current load (>30 / >10 / >0). Corrupting weather (Whisper Fog, Silent Blizzard) blocks decay so heavy biomes still wear the player down.
+- **`first_travel` / `first_quest` milestones** — declared but unwritten in the prior session. Now emitted with matching Arbiter callback lines in `narrativeGenerator`.
+- **Cardinal-travel narration pool** — expanded 4 → 16 variants grouped by sensory focus (footing, sky, sound, smell, ground, distance) to defeat the Groundhog Day stagnation finding.
+- **Pending-chain expiry** — chains older than 48 in-game hours are dropped from `worldMemory.pendingChains` (combat-heavy biomes used to strand them forever).
+- **`drop` / `pickup` / `open` engine support** — three new intents. `worldMemory.visitedRooms[key].droppedItems` and `containersOpened` persist across re-entry. `beginScene` AND `stepDirection` surface re-entry narration ("On the ground: …" / "Still open from before: …") when a tile carries persisted vandal state.
+- **State-aware `look`** — `narrateCasualLook` now injects HP-status + time-of-day awareness ("Your hands shake on the look", "It's night here"). Consecutive look at the same scene within 2 in-game hours returns a one-line refresher instead of re-reading the whole environment block.
 
-### Parser / NLU
-- Junk-noun filter (`else`, `anything`, `stuff`, `here`, `there`, etc.) so "is there anything else near me" stops extracting "else" as a target.
-- Question-word filter (`where / what / who / why / how / which`) drops from target tails — "examine compass where" extracts "compass".
-- Inventory question handler covers `tell me about my X`, `what armor do I have`, `how many rations`, `is X in my pack` — with category lookups (`INVENTORY_CATEGORIES`: armor → list equipped armor, etc.).
-- Diplomacy gated on actual NPC presence (no more "your words find purchase" against empty road).
-- Dropped `hit` from attack verbs (too polysemous: "I hit look").
+### Parser correctness
+- **`leave` / `cleave` collision** killed — the prepended-letter false-positive pattern (e.g. `sword/word`, `leave/cleave`) is now explicitly rejected by `fuzzyEqual`.
+- **Multi-word synonyms now route** — `snap shot`, `fight back`, `double tap`, `hand in`, `pick up`, etc. auto-collapse via `MULTI_WORD_COLLAPSES` derived at module load from `VERB_SYNONYMS`. Adding a new multi-word alias is a one-line change.
+- **`kick the rubble` routes to dig** — attack handler with no enemy now checks ground / area search before refusing.
+- **`open` removed from investigate** — was double-registered, made `open chest` silently route to area-search.
+- **`accept` empty-target now lists vendor offerings** — instead of refusing outright.
+- **Ambient-noun extractor verb filter** — `look`, `inspect`, `after`, `left`, `remains`, etc. no longer leak through as ground objects (Scavenger audit caught these as ghost objects).
 
-### Logging
-- `appendLog` race-condition fix: writes now serialize through a `Promise` chain so COPY ALL captures every entry.
-- Arbiter dedup (16-entry window) with `skipDedup` opt-out for direct-response lines (bearings, concept answers, range refusals).
-- World banner dedup (`[Location] north: ...`) catches double-radar prints.
-- Hidden `debug` channel — invisible in the in-game feed, present in COPY ALL. Logs parser decisions, range moves, hook intercepts, dedup suppressions.
-- Player attack roll math (`You — d20 14 + STR 5 = 19 vs Reclaimer Ambusher AC 12 — ✓ HIT`) now mirrors the enemy roll line.
+### UI / settings
+- **Settings → 3 tabs (Music / Voice / About)** with per-tab COPY ALL. Voice tab has SYSTEM / BUNDLED / UPDATE-or-DOWNLOAD three-button row. System voice picker only renders when system engine selected (was showing "No voices installed" under bundled).
 
-### LLM safety
-- VOICE_RULES escalated to **`**SECOND PERSON ONLY.**`** with banned phrases (the player / the adventurer / they / etc.) and a post-generation filter that drops sentences using them.
-- Strict location anchor: `**The player is at "X". If you name any place, it MUST be "X". NEVER name "Borderlands", "Aetheric Deep"...**`
-- `clampSentences()` post-processor — 1 sentence combat, 2 sentences peaceful, so 4-sentence hallucination paragraphs don't escape.
-- `investigate` removed from the Qwen allowlist after multiple location-name drift events on `look`.
-- System prompt now lists the available player-action vocabulary so the narrator picks verbs the engine can resolve.
-- Enemy traits surfaced in the SYSTEM FACTS block: `Mud Tortoise (15/25 HP) [Armored · Slow · Resist Slashing · Resist Piercing]`.
-
-### Player-facing UX
-- **Structured `look` description** — assembles macro location + Micro-Micro environment + weather + entities + named room exits + cardinal fallback. Same description fires on `where am I` / `describe my surroundings` etc.
-- **Actions reference screen** — full-screen scrollable index of every action in the game, grouped by card (Movement / Combat / Firearms / Evasive / Modifiers / Gathering / Social / Prep / Psych / Skill / Aetheric). Entry: Inventory → ACTIONS button (top-right).
-- **Inventory button** prominent in combat (was easy to miss as "pack" at end of row).
-- **`flee` quick button** always visible in combat (escape valve when weather locks advance/retreat).
-- **Input box clear fix** — `inputRef.current?.clear()` to drop the Android IME composition buffer on submit.
-- **Rest at full HP+stamina** refuses cleanly without burning game-time hours.
-
-### Lore
-- 28+ new concept entries from the action cards (verbatim text from the photos: dodge_melee, fight_back, dive_for_cover, all firearms actions, all modifiers, all category overviews).
-- **Bolt-Caster** added as Tartaria's firearm equivalent — 3 weapon entries (Bone Crossbow re-tagged, Bolt-Caster Uncommon, Aether Bolt-Caster Rare).
-- "Magic" replaced with "Aetheric" across concept descriptions per playtester direction.
+### Test harnesses (new)
+- **`__tests__/yearSimulation.test.ts`** — coverage-driven 1-to-2-year sim. Action picker biases toward unexercised mechanisms; reports mechanism coverage + Cartographer (unique regions + travel sequence) + Scavenger (ambient noun interactions + ghost objects) telemetry.
+- **`__tests__/touristAndVandal.test.ts`** — persistent-memory stress test. Drop item + open container at Node A, walk N/E/N/E, walk back, assert engine state survived AND re-entry narration acknowledges. Last run: **100 % persistence, 0 % dissonance**.
+- **`__tests__/literaryAudit.test.ts`** — 4-protocol narrative audit: Token Diet (verbosity), Groundhog Day (Jaccard repetition), Sensory Shift (state-aware look), Trope Tracker (lexical density + burnout list). Last run: 2 % over-75-word lines, **0 stagnation pairs**, 71 % sensory similarity (under stagnation threshold), 9 % lexical density, no burnout outliers.
 
 ---
 
-## 4. What's still open
+## 4. Outstanding issues
 
-### Done in the previous session (1-13 of 16 closed)
+**None.** The branch is clean for playtest:
+- 0 TypeScript errors
+- 0 `TODO` / `FIXME` / `@ts-ignore` markers in `app/`
+- 583 / 583 unit tests pass (50 suites)
+- Two long-running integration sims (`yearSimulation`, `literaryAudit`) pass; they're informational rather than gating (`testPathIgnorePatterns` style in the doc above).
+- Tourist-and-the-Vandal persistence: 100 % engine, 0 % dissonance
+- Literary audit: zero stagnation pairs, zero burnout-list adjectives or verbs
+- All 19 findings from the multi-agent QA pass earlier in the session have landed fixes
 
-✅ **#1** Vendor accept/turn-in faction-specific feedback — `findQuestFactionHint` + 5 refusal-path rewrites + 7 tests
-✅ **#2** Vendor sell-back — `sellPriceFor` module + `sellToVendor` action + BUY/SELL toggle + DISMISS button
-✅ **#3** Full rulebook weapon port — 174 new weapons across 4 tables + 39 runecasters; total catalog 228 entries
-✅ **#4** appendLog same-channel debounce — world+system entries within 500ms merge in-memory; disk log keeps both
-✅ **#5** Pulsing_mud reward tone — split inline ✦ summary back out into a green `reward` channel entry so payoffs visually pop
-✅ **#6** Contracts screen — full-screen list of active hunts/mysteries/storylines/faction quests with stage tracker, faction label, milestones
-✅ **#7** iOS OTA reload audit — added Qwen teardown to the dispose sequence + 250ms iOS-only event-loop tick before `reloadAsync`
-✅ **#8** Milestone surfacing — Enemies / Travels / Checks counters with next-bump countdown in the Contracts screen
-✅ **#9** Day/night tint — exploration screen background shifts by time-of-day (night blue / morning amber / afternoon neutral / evening rust)
-✅ **#10** Per-maneuver routing — `classifyManeuver` splits disarm/trip/sweep/hook (DEX) from grapple/shove/pin (STR); 22 verb variants covered
-✅ **#11** Vertical / intra-location navigation — `descend / below / crypt / cellar` drops into a Micro-Micro; `surface / topside` returns to macro
-✅ **#12** Sell-back UI polish — VALUE / RARITY / NAME sort tabs on the SELL list, defaults to value-descending
-✅ **#13** Companion / NPC follower (first cut) — `recruit` verb at vendor scenes; `player.companion` field; StatsPanel surfaces the follower; `dismiss companion` removes. Mechanical effects (advantage on checks, combat assist) deferred — see "Still open" below.
-
-### Done in the final session run
-
-✅ **Companion mechanical effects** (extends #13). buildSkillSteps gained companionAssist opt — +2 to skill checks when companion present, labeled visibly. 3 tests.
-
-✅ **#14 first cut** — true advantage / disadvantage on the defense path. Enemy d20 now pre-rolls a shadow d20 when player has cover/dodge/block (take lower) or 'surprised' (take higher). Combat log shows both: `d20 → 7 [adv defense: 14/7 → 7]`. Attack-side d20 (interactive dice prompt) still uses flat modifiers — that's a UI refactor.
-
-✅ **#15 MapGraph foundation** — `WorldMemory.visitedRooms` tracks every room visited (key = `locationId@microMicroId@mapX,mapY`). beginScene increments visit counter and surfaces "You've stood here before. (visit 2)". resolveEnemyDefeat records kills against the room's enemiesCleared list.
-
-✅ **#15 state restoration** — rooms cleared within the last 6 in-game hours suppress new encounter rolls. Re-entry narrates "The bodies you left are still here. Nothing has moved in to replace them." Older clearances repopulate normally.
-
-✅ **#16 hub data** — `app/data/world/static_hub.json` authored. 15 rooms across the Reclaimers' Outpost layout (Gate → Central Square → Armory / Mess / Workshop / Lab / Vault / Quarters / Chapel → Culvert Descent → 4 buried rooms). Each room has hardcoded N/S/E/W pointers, an optional anchor NPC, and tag list. Data sits ready for engine integration in a follow-on commit.
-
-✅ **CatalogWeapon.style integration (partial)** — equipItem now refuses off-hand items when wielding a two-handed weapon AND refuses to equip a two-hander when the off slot is full. Player gets an Arbiter line naming the conflict.
-
-✅ **CatalogWeapon.effect parser** — `app/engine/weaponEffects.ts` parses `+NdN against X` patterns from the rulebook effect column. Recognized conditions: large / construct / structure / mechanical / animal / shielded / magical / darkness / aetheric. Damage path now rolls bonus dice and narrates the trigger: `Aetherium Spear's effect triggers — +4 bonus damage.` 12 tests.
-
-### Done in the continuation session (OTA 037)
-
-✅ **#15b Hub engine integration** — `app/engine/hub.ts` (HUB const + `isHubLocation` / `findHubRoom` / `hubEntryRoomId` / `resolveHubTravel` / `isLeaveHubCommand`). `PlayerCharacter.hubRoomId` lives on the player; `WorldMemory.hubVisited` lives on world memory. `beginScene` enters hub mode on first arrival at `tartarian_outskirts`, swaps the scene paragraph for the room's authored description, spawns the anchor NPC as the vendor (Halem / Irma / Tarek / Jorah), and prints a `Paths:` line summarizing cardinal exits. Travel handler now routes through `resolveHubTravel` first (cardinal + adjacent name + fast-travel to visited rooms) before falling back to procedural map travel. `leave outpost` / `exit hub` clears `hubRoomId` and resumes the wider world. 22 hub tests.
-
-✅ **#15c Loot restoration in MapGraph** — `VisitedRoom.lootGrabbed: string[]` added. `digHere` and the area-search outcome now write the recovered item name into the visited-room record; on re-entry, the same bespoke drop is suppressed and the player gets a "patch is picked clean" line instead. Consumable / misc commodities (`First Aid Kit`, `Mud Tubers`, etc.) are exempt — they can re-roll. 8 loot-restoration tests.
-
-✅ **#14b Attack-side advantage / disadvantage UI** — `RollStep.rollMode` (`'advantage' | 'disadvantage'`) + `rollModeLabel`. `buildCombatSteps` sets advantage when the player is `aiming`, disadvantage when `surprised`, neutral when both / neither. DiceRoller rolls 2 dice on those steps, fades the discarded die, surfaces the kept value with a colored tag ("↑ aiming — keep 17" / "↓ surprised — keep 3"). The kept die is what feeds bonus+target math, so the existing flat bonus stacks on top — deliberate, makes "aim first" feel decisive. 5 attack-advantage tests.
+**Known design trade-offs (not bugs, flagged for transparency):**
+- **Qwen mocked in Jest.** All test-time narration is templated. Live LLM output should improve lexical density well past the 9 % the audit sees. `docs/literary-audit-on-device.md` documents two paths to run the same audit against live Qwen.
+- **Sim deaths.** The year-sim's bot character dies at various points depending on biome / weather luck; that's intentional variance, not a regression. The engine survives in all variants with 0 crashes / 0 slotLoadErrors across all observed runs.
 
 ---
 
 ## 5. Known-good state
 
-- TypeScript: 0 errors (`npx tsc --noEmit`).
-- Tests: 509/509 passing across 41 suites (`npx jest`).
-- Latest OTA bumped to `2026-05-18-037` (pending push).
+- TypeScript: **0 errors** (`npx tsc --noEmit`).
+- Tests: **583 / 583 pass** across 50 suites running `npx jest --testPathIgnorePatterns 'yearSimulation|literaryAudit'`.
+- Full suite (incl. simulations): 584 / 584 — the two long-running tests are informational; recommend running them in isolation when iterating on engine changes.
+- Latest OTA: `2026-05-18-092` pushed.
+- App version: `2.201` — APK marker bumped in `metro.config.js` so the next push fires a fresh APK build for playtest.
 
 ---
 
 ## 6. Repository conventions
 
-- **Commits** prefixed `feat:` / `fix:` / `chore:` / `refactor:` / `debug:`. Bodies explain WHY with concrete before/after when helpful. Always include the session URL footer.
-- **OTA bumps:** every JS-only push bumps `app/buildInfo.ts:OTA_BUILD_ID`. Format `YYYY-MM-DD-NNN` where NNN is a per-day counter. Bumped before every commit that touches `app/`.
-- **APK triggers:** add a comment line to `metro.config.js` with the date prefix. Bumping that comment fires `build-apk.yml`. Tag with date suffix for ordering.
-- **Branch:** all work on `claude/new-session-MvF82`. Never push to `main` without explicit user approval. PR #1 tracks this branch.
+- **Commits** prefixed `feat:` / `fix:` / `chore:` / `refactor:` / `debug:` / `test:` / `perf:` / `ui:` / `content:`. Bodies explain WHY with concrete before/after.
+- **OTA bumps:** every JS-only push bumps `app/buildInfo.ts:OTA_BUILD_ID`. Format `YYYY-MM-DD-NNN`. Bumped before every commit that touches `app/`.
+- **APK triggers:** add a comment line to `metro.config.js` with the date prefix. Bumping that comment fires `build-apk.yml`.
+- **Branch:** all work on `claude/new-session-MvF82`. PR #1 tracks this branch.
 - **Tests live** in `__tests__/` at repo root. `jest-expo` preset. New engine modules should land with a focused suite.
 
 ---
 
 ## 7. Critical files / hotspots
 
-- `app/state/gameStore.ts` — ~5400 lines. The spine. Almost every change touches this. Action handlers, combat resolution, scene management, log persistence.
-- `app/engine/types.ts` — every shared interface. Read first when in doubt. Includes `Intent`, `StatusEffectKind`, `ScreenName`, `Enemy` (with `traits`), etc.
-- `app/engine/parser.ts` — verb synonym pools. ~310 verbs across 33 intents. Add new verbs here.
-- `app/engine/combatRules.ts` — `buildCombatSteps`, `buildSkillSteps`, `rollMods` aggregator, `RollMods` interface.
-- `app/engine/enemyTraits.ts` — trait registry. `traitACBonus / traitAttackBonus / traitDamageMultiplier / traitOnHitStatus / traitRegen / traitDodgeChance / describeTrait`.
-- `app/engine/itemWeight.ts` — name + kind heuristics for throw damage scaling.
-- `app/engine/statusEffects.ts` — kind enum, apply/tick/format helpers, `statusAcAdjustment`, `hasFullCover`.
-- `app/engine/contextInjector.ts` — builds the Qwen system prompt. **VOICE_RULES** + location anchor + per-relic guardrails live here.
-- `app/data/lore/concepts.json` — single source of truth for `what is X` lookups AND the ActionReferenceScreen.
-- `app/data/enemies/enemies.json` — 99 enemies, all trait-tagged.
-- `app/data/items/weapons.json` — ~22 weapons; this is the file the Two-Handed Weapons table (#1 above) would extend.
-- `app/screens/ActionReferenceScreen.tsx` — full-screen action index. Section ids reference concept ids from concepts.json.
-- `.github/workflows/eas-update.yml` — has the channel-mapping fix + runtime guardrail. **Don't touch without understanding why those steps exist.**
-- `app/audio/AudioManager.ts` — has the epoch counter that prevents fade overlap. The hard-stop-before-fade-in is intentional.
+- `app/state/gameStore.ts` — ~5700 lines. The spine. Almost every change touches this. Action handlers, combat resolution, scene management, log persistence, room state.
+- `app/engine/types.ts` — every shared interface. Read first when in doubt. Includes `Intent`, `StatusEffectKind`, `ScreenName`, `Enemy` (with `traits`), `VisitedRoom` (with `droppedItems` + `containersOpened`).
+- `app/engine/parser.ts` — verb synonym pools. ~330 verbs across 36 intents. `MULTI_WORD_COLLAPSES` derived at module load. Add new verbs here.
+- `app/engine/combatRules.ts` — `buildCombatSteps`, `buildSkillSteps` (now accepts `statusMods`), `rollMods` aggregator.
+- `app/engine/enemyTraits.ts` — trait registry. `traitAmbushBonus` now actually wired (was dead code).
+- `app/engine/factionQuests.ts` — `FactionQuestStageDef.advanceOn` gates stage progression.
+- `app/engine/statusEffects.ts` — kind enum, apply/tick/format helpers. Dodge/block/fight_back applied with `remainingRounds: 2`.
+- `app/engine/contextInjector.ts` — Qwen system prompt. VOICE_RULES + location anchor live here.
+- `app/engine/ambientNouns.ts` — `extractAmbientNouns` with verb / adjective / participle blocklists.
+- `app/engine/hub.ts` — hub data + `isLeaveHubCommand` / `resolveHubTravel`.
+- `app/voice/loreLexicon.ts` — lore-word respellings + `cleanForSpeech`.
+- `app/voice/TTSManager.ts` — system-TTS engine, coalesce window, queue merge.
+- `app/voice/PiperTTSManager.ts` — Kokoro engine, prewarm, sentence-chunked speak.
+- `app/voice/TTSController.ts` — store subscription, resume detection, stream buffer.
+- `app/updates/checkAndApplyOTA.ts` — shared OTA sequence (Settings button + boot auto-check).
+- `app/data/lore/concepts.json` — single source for `what is X` lookups AND ActionReferenceScreen.
+- `app/data/enemies/enemies.json` — 99 enemies, trait-tagged.
+- `app/data/quests/faction-quests.json` — 7 quests, every stage has `advanceOn`.
+- `__tests__/yearSimulation.test.ts` — long-running coverage-driven sim.
+- `__tests__/touristAndVandal.test.ts` — room-state persistence stress.
+- `__tests__/literaryAudit.test.ts` — narrative quality audit.
 
 ---
 
 ## 8. Quick-start commands
 
 ```bash
-# Typecheck + tests
+# Typecheck + unit tests (fast — for iteration)
 npx tsc --noEmit
+npx jest --testPathIgnorePatterns 'yearSimulation|literaryAudit'
+
+# Full suite including the long-running sims (~30–60s)
 npx jest
 
-# Local dev (won't run on this harness but useful reference)
-npx expo start
-
 # Push as OTA-only (JS changes)
-# 1) edit code in app/
-# 2) bump app/buildInfo.ts OTA_BUILD_ID
-# 3) commit + push → eas-update.yml fires
+#  1) edit code in app/
+#  2) bump app/buildInfo.ts OTA_BUILD_ID
+#  3) commit + push → eas-update.yml fires
 
-# Push as APK rebuild (native config / new deps)
-# 1) bump comment in metro.config.js
-# 2) commit + push → build-apk.yml fires (~17-20 min)
+# Push as APK rebuild (native config / new deps / version bump)
+#  1) bump comment in metro.config.js
+#  2) commit + push → build-apk.yml fires (~17–20 min)
 ```
 
 ---
 
 ## 9. Status effect reference (action-card layer)
 
-Every action-card verb writes one of these status effects. `rollMods()` reads them on the next roll.
-
 | Kind | Source action | Effect | Duration |
 |---|---|---|---|
 | `aiming` | `aim` | +2 next ranged attack, consumed on use | 1 round |
 | `sprinting` | `dash` / `sprint` | -2 next attack (post-sprint) | 1 round |
 | `in_cover` | `take_cover` (partial) | +4 AC vs ranged | 2 rounds |
-| `in_cover_full` | `take_cover` ("full cover" / "hide completely") | +8 AC vs ranged, ranged auto-miss | 2 rounds |
+| `in_cover_full` | `take_cover` ("full cover") | +8 AC vs ranged, ranged auto-miss | 2 rounds |
 | `ready` | `ready` | +1 bonus on triggered reaction | 1 round |
 | `helping` | `help` | narrative ally bonus | 1 round |
 | `overwhelmed` | applied by engine | -2 on evade | 1 round |
-| `surprised` | `ambush_strike` enemy trait | -2 first reaction, consumed | 1 round |
-| `fighting_back` | `fight_back` | next enemy strike → opposed Fighting roll | 1 round |
+| `surprised` | `ambush_strike` enemy trait + maneuver mismatch | -2 next roll, consumed | 1 round |
+| `fighting_back` | `fight_back` | next enemy strike → opposed Fighting roll | 2 rounds (this session) |
 | `quick_fire` | `quick_fire` | +2 next ranged attack | 1 round |
-| `dodging` | `dodge` | +4 AC | 1 round |
-| `blocking` | `block` | +4 AC (also durability/riposte handled elsewhere) | 1 round |
+| `dodging` | `dodge` | +4 AC | 2 rounds (this session) |
+| `blocking` | `block` | +4 AC (also durability/riposte) | 2 rounds (this session) |
 | `bleed` / `poisoned` / `stun` / `burn_scar` / `armor_severed` / `paralyzed` | damage-type rolls + enemy traits | per `statusEffects.ts` | varies |
 
 ---
@@ -256,8 +231,8 @@ Set on enemy entries in `enemies.json`. Read at combat time via `enemyTraits.ts`
 
 **On-hit status:** `bleeder` (50% bleed 3r) · `venomous` (35% poison 3r) · `concussive` (20% stun 1r)
 
-**Per-round / first-strike:** `regenerate` (+1 HP/round, capped at start) · `fast_regen` (+2/round) · `ambush_strike` (+2 first hit of encounter)
+**Per-round / first-strike:** `regenerate` (+1 HP/round, capped at start) · `fast_regen` (+2/round) · `ambush_strike` (+2 first hit of encounter — **now actually wired**)
 
 ---
 
-That's the lay of the land at the close of this chat. **All 16 prior items have closures landed**, including the three second-pass refinements (14b / 15b / 15c) that the previous handoff flagged as remaining work. There are no open items from the original list. Future sessions will pick up from playtest feedback or new feature requests rather than backfilling the matrix.
+That's the lay of the land at the close of this session. **APK is clean for playtest.** Zero outstanding issues; full QA pass behind us. Next session should pick up from playtest feedback or new feature work.
