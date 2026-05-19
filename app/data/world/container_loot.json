@@ -1,0 +1,69 @@
+{
+  "description": "Container archetypes used by the open intent. Each archetype declares (1) noun-keyword matchers that classify what the player named, (2) a narration template (`{target}` interpolates the player's word), (3) a weighted loot pool. Adding a new container type = add a new key here, no engine code change. Used by app/engine/containerLoot.ts.",
+
+  "lockbox": {
+    "matchers": ["lockbox", "strongbox", "coffer", "safe", "vault"],
+    "narration": "The {target} cracks open. You sift what was kept inside.",
+    "pool": [
+      { "name": "Scrap Metal",    "weight": 30, "min": 1, "max": 2, "tags": ["metal"],            "kind": "misc" },
+      { "name": "Aether Crystal", "weight": 12, "min": 1, "max": 1, "tags": ["aether","crystal"], "kind": "misc" },
+      { "name": "Aetheric Shard", "weight": 8,  "min": 1, "max": 1, "tags": ["aether","shard"],   "kind": "misc" },
+      { "name": "Patched Cloth",  "weight": 20, "min": 1, "max": 2, "tags": ["cloth"],            "kind": "misc" }
+    ]
+  },
+
+  "trap": {
+    "matchers": ["trap", "snare", "tripwire", "deadfall"],
+    "narration": "You take the {target} apart for parts.",
+    "pool": [
+      { "name": "Scrap Metal",  "weight": 40, "min": 1, "max": 2, "tags": ["metal"], "kind": "misc" },
+      { "name": "Stick",        "weight": 25, "min": 1, "max": 2, "tags": ["wood"],  "kind": "misc" },
+      { "name": "Spider Silk",  "weight": 10, "min": 1, "max": 1, "tags": ["fiber"], "kind": "misc" },
+      { "name": "Small Rock",   "weight": 25, "min": 1, "max": 2, "tags": ["stone"], "kind": "misc" }
+    ]
+  },
+
+  "crate": {
+    "matchers": ["crate", "chest", "box", "cache", "stash", "barrel"],
+    "narration": "The {target} swings open. The contents are humble.",
+    "pool": [
+      { "name": "Scrap Metal",   "weight": 25, "min": 1, "max": 2, "tags": ["metal"], "kind": "misc" },
+      { "name": "Stick",         "weight": 25, "min": 1, "max": 2, "tags": ["wood"],  "kind": "misc" },
+      { "name": "Patched Cloth", "weight": 25, "min": 1, "max": 2, "tags": ["cloth"], "kind": "misc" },
+      { "name": "Small Rock",    "weight": 25, "min": 1, "max": 2, "tags": ["stone"], "kind": "misc" }
+    ]
+  },
+
+  "automaton": {
+    "matchers": ["defenses", "defense", "defences", "defence", "automaton", "construct", "drone", "sentinel", "golem"],
+    "narration": "You strip the {target} for usable parts.",
+    "pool": [
+      { "name": "Scrap Metal",    "weight": 45, "min": 1, "max": 3, "tags": ["metal"],            "kind": "misc" },
+      { "name": "Aether Crystal", "weight": 15, "min": 1, "max": 1, "tags": ["aether","crystal"], "kind": "misc" },
+      { "name": "Aether Residue", "weight": 15, "min": 1, "max": 1, "tags": ["aether"],           "kind": "misc" },
+      { "name": "Small Rock",     "weight": 25, "min": 1, "max": 2, "tags": ["stone"],            "kind": "misc" }
+    ]
+  },
+
+  "relic_console": {
+    "matchers": ["console", "panel", "conduit", "terminal", "altar", "core"],
+    "narration": "The {target} hums and falls dark. You pull what you can from its insides.",
+    "pool": [
+      { "name": "Aether Crystal", "weight": 30, "min": 1, "max": 1, "tags": ["aether","crystal"], "kind": "misc" },
+      { "name": "Aetheric Shard", "weight": 20, "min": 1, "max": 1, "tags": ["aether","shard"],   "kind": "misc" },
+      { "name": "Aether Residue", "weight": 25, "min": 1, "max": 2, "tags": ["aether"],           "kind": "misc" },
+      { "name": "Scrap Metal",    "weight": 25, "min": 1, "max": 2, "tags": ["metal"],            "kind": "misc" }
+    ]
+  },
+
+  "wreckage": {
+    "matchers": ["wreck", "wreckage", "wagon", "axle", "hull", "boat", "vessel"],
+    "narration": "You break down the {target}. The old wood gives up its iron.",
+    "pool": [
+      { "name": "Scrap Metal",   "weight": 30, "min": 1, "max": 2, "tags": ["metal"], "kind": "misc" },
+      { "name": "Stick",         "weight": 35, "min": 1, "max": 3, "tags": ["wood"],  "kind": "misc" },
+      { "name": "Patched Cloth", "weight": 20, "min": 1, "max": 2, "tags": ["cloth"], "kind": "misc" },
+      { "name": "Small Rock",    "weight": 15, "min": 1, "max": 2, "tags": ["stone"], "kind": "misc" }
+    ]
+  }
+}

@@ -1,10 +1,10 @@
 # Tartaria Realms — Session Handoff
 
 > Branch: `claude/new-session-MvF82`
-> Latest OTA: `2026-05-18-092`
-> App version: `2.201` (APK rebuild marker shipped — APK is being staged for playtest)
+> Latest OTA: `2026-05-19-113`
+> App version: `2.201` (no APK rebuild needed since OTA 092; all changes have been JS-only)
 > TypeScript: **0 errors** (`npx tsc --noEmit`)
-> Tests: **583 / 583 passing across 50 suites** (excluding the two long-running sim harnesses; see §5)
+> Tests: **623 / 623 passing across 55 suites**
 > Working tree: clean
 
 ---
@@ -17,12 +17,12 @@
 
 **On-device ML stack:**
 - **Classifier (intent + target):** `onnxruntime-react-native` running `all-MiniLM-L6-v2` (int8 quantized, ~22 MB, OTA-downloaded).
-- **Generator (Arbiter narration):** `Qwen 2.5 0.5B Instruct` via `llama.rn` (~398 MB Q4_K_M GGUF, OTA-downloaded).
+- **Generator (Arbiter narration AND parse-fallback):** `Qwen 2.5 0.5B Instruct` via `llama.rn` (~398 MB Q4_K_M GGUF, OTA-downloaded). As of OTA 111 it ALSO handles parser fallback when the dictionary parser returns unknown / low-confidence.
 - **Neural TTS (optional voice readout):** `react-native-executorch` running Kokoro-82M (~100 MB, OTA-downloaded on engine toggle).
 
 **Voice I/O:** Optional, off by default.
-- **TTS:** Two engines — system (`expo-speech`) and bundled (`Kokoro` via `react-native-executorch`). Settings tab lets the player pick. Bundled has 7 voices, defaults to `AM_MICHAEL`. Lore-respelling lexicon overrides pronunciation of 23 Tartaria words (Tartaria, Aetheric, Reclaimer, Drakova, etc.) before passing to the engine.
-- **STT:** `expo-speech-recognition` (TurboModule wrapping Android `SpeechRecognizer`). Tap the 🎙 mic in the input row; while TTS is talking the same slot shows 🛑 SILENCE ARBITER for an immediate cut + listen.
+- **TTS:** Two engines — system (`expo-speech`) and bundled (`Kokoro` via `react-native-executorch`). Settings tab lets the player pick. Bundled has 7 voices, defaults to `AM_MICHAEL`. Lore-respelling lexicon overrides pronunciation of 24 Tartaria words before passing to the engine (added `doesn't` → "duzzent" in OTA 102).
+- **STT:** `expo-speech-recognition`. Service-selection logic in `STTManager` queries `getSpeechRecognitionServices()` and picks Android System Intelligence (`com.google.android.as`) on Pixel-class devices, Google Search box (`com.google.android.googlequicksearchbox`) on stock GMS. **Unverified end-to-end on player's device** — see §4.
 
 **Audio:** `expo-av` looping background tracks across 4 contexts (combat / shop / menu / explore) with crossfade.
 
@@ -34,29 +34,27 @@
 app/
   ai/                  — MiniLM + Qwen orchestrators
   audio/               — AudioManager / AudioController / settings (expo-av)
-  components/          — UI primitives + TutorialOverlay
+  components/          — UI primitives + TutorialOverlay + Search / Approach modals
   data/                — Authored JSON: locations, weather, hazards, enemies,
-                         items, recipes, quests (faction + hunt + mystery +
-                         storyline), races, factions, vendors, NPCs, lore
-                         concepts, openings, worldLadder, static_hub
-  engine/              — Pure logic: parser, combat, crafting, durability,
-                         equipment, encounter, hooks, hunts, mysteries,
-                         faction quests + stages, faction storylines, world
-                         map, weather effects, area search, ambient nouns,
-                         status effects, narrative gen, digging, save
-                         system, enemy traits, item weight, context
-                         injector, hub, edit distance
+                         items, recipes, quests, races, factions, vendors, NPCs,
+                         lore concepts, openings, worldLadder, static_hub.
+                         **Each location + hub room declares an `interactables`
+                         array** as of OTA 113 — see §3.
+  engine/              — Pure logic: parser, llmParser (NEW), combat, crafting,
+                         durability, equipment, encounter, hooks, hunts,
+                         mysteries, faction quests + stages, faction storylines,
+                         world map, weather effects, area search, ambient nouns,
+                         status effects, narrative gen, digging, save system,
+                         enemy traits, item weight, context injector, hub,
+                         edit distance, container loot (NEW in Phase 3)
   screens/             — Title / CharacterCreation / Exploration / Inventory /
-                         Crafting / Vendor / Log / Lore / About (3-tab:
-                         Music / Voice / About) / ActionReference / Contracts
-  state/               — gameStore.ts (Zustand) — ~5700 lines, the spine
-  updates/             — checkAndApplyOTA.ts (shared OTA sequence — Settings
-                         button AND boot auto-check both call this)
+                         Crafting / Vendor / Log / Lore / About (3-tab) /
+                         ActionReference / Contracts
+  state/               — gameStore.ts (Zustand) — ~6800 lines, the spine
+  updates/             — checkAndApplyOTA.ts
   voice/               — voiceSettings / TTSManager / TTSController /
-                         PiperTTSManager (Kokoro) / STTManager / loreLexicon /
-                         sentenceSplitter / executorchAdapter
-App.tsx                — boots hydrate, cognitive, Qwen, audio, TTS, auto-OTA;
-                         routes screens
+                         PiperTTSManager (Kokoro) / STTManager / loreLexicon
+App.tsx                — boots hydrate, cognitive, Qwen, audio, TTS, auto-OTA
 .github/workflows/
   build-apk.yml        — Gradle APK build (path-gated)
   eas-update.yml       — OTA publish + channel→branch mapping
@@ -66,130 +64,119 @@ app/buildInfo.ts       — OTA_BUILD_ID — bump on every JS-only push
 
 ---
 
-## 3. Major systems landed in this session
+## 3. Major systems landed THIS session (OTA 093 → 113)
 
-### Voice I/O (TTS + STT)
-- **TTS — system engine** wired through `expo-speech` with rate/pitch sliders, voice picker, channel filter (speaks world/arbiter/combat/reward; skips player/system/cognitive/debug).
-- **TTS — bundled engine** wired through `react-native-executorch` + Kokoro-82M. Custom `executorchAdapter` (SDK 52 compat). Preloaded at boot with a silent warm-up inference so the first spoken line has no cold-start lag.
-- **Sentence-buffer streaming** — Qwen tokens are accumulated into a buffer; completed sentences ship to TTS as soon as `.`/`!`/`?`/`\n` lands. First sentence plays before the model finishes.
-- **Coalesce + paragraph pause** — system-TTS queue merges multiple log lines into one `Speech.speak` call joined with `\n` and force-terminated, eliminating the ~1–2 s Android TTS reinit gap between sections while preserving a ~0.4 s paragraph break.
-- **Lore lexicon (23 words)** — space-separated respellings ("tar tare ee uh") because espeak-ng treats hyphens as compound-word joiners. `cleanForSpeech` also strips arrows (`→ ← ⇒ ->` → "to"), rewrites `-N` and Unicode `−N` as "negative N", and `·` as comma.
-- **Resume detection** — saved-game load no longer reads the full backlog from line one. Cold-boot bulk arrival (`lastLogIndex === 0` + log.length ≥ 2) AND a timestamp check on single-entry saves resync the TTS controller silently; only the "you step back into..." resume cue is voiced.
-- **STT — modern wrapper** — `expo-speech-recognition` replaces the New-Arch-incompatible `@react-native-voice/voice`. Permission requested on first toggle.
-- **Auto-OTA on boot** — extracted `checkAndApplyOTA.ts` shared by the Settings button and the boot auto-fire. Gated on `currentScreen === 'title'` to avoid racing a save load. Teardown includes audio + cognitive + Qwen + TTS + Kokoro before `reloadAsync`.
+### Parser architecture overhaul (the headline)
 
-### Combat correctness
-- **Defensive stance timing** — `dodge` / `block` / `fight_back` now apply `remainingRounds: 2` so they survive the next turn's `tickEffects` and are still active when the enemy counter resolves.
-- **Off-hand routing** — successful off-hand attacks read damage type / weapon effect / resistance modifiers from the actual off-hand weapon (was defaulting to main).
-- **Reach gate on counters** — `runEnemyGroupCounters` filters by `enemyCanReach`; melee enemies at `far` range no longer counter-attack.
-- **Ambush_strike wired** — `enemyAmbushUsed?: boolean[]` on the scene; first counter from any `ambush_strike` enemy gets +2, then flag flips. Trait was dead code for 16+ enemies.
-- **Maneuver skill statusMods** — `buildSkillSteps` now accepts `statusMods: RollMods`; maneuver's build-mismatch `surprised` stacks actually land on the roll.
+**The "stop building stop-gaps" plan** in three phases:
 
-### Quest gating
-- **Per-stage `advanceOn`** — `FactionQuestStageDef.advanceOn: 'kill' | 'travel' | 'any'`. Killing 3 rats no longer auto-completes a 4-stage pilgrimage; pilgrimages advance on travel, hunts advance on kill. All 7 faction quests in `faction-quests.json` have explicit gates per stage.
+#### Phase 1 — Qwen-backed LLM parse-fallback (OTA 111)
+- New file `app/engine/llmParser.ts`. When the dictionary parser returns `intent=unknown` OR `confidence < 0.5`, the input flows to Qwen 2.5 0.5B with a structured prompt: *"Translate to JSON {intent, target}. Available intents: [...]. Scene targets: [...]."*
+- Qwen response is defensively parsed (handles markdown fences + prose preamble + invalid intents). Validates against the `Intent` union. Returns `{intent, target, rephrasing}` or null.
+- On resolution: re-submits the canonical "verb noun" rephrasing through the dictionary parser via a new `skipPreChecks` flag on `submitPlayerAction`. All intent dispatch code stays untouched — it only ever sees clean parser output.
+- On null: falls through to the existing soft refusal.
+- Cost: ~200–400 ms on Pixel-class hardware for the fallback path. Fast majority of actions (verb-in-dictionary, noun-in-pool) still resolve in <10 ms.
+- Visible UX: "The Arbiter considers your words…" system line lands within 5 ms of fallback trigger (OTA 112) so the player isn't staring at silence.
+- Tests: 18 covering not-ready, empty input, clean JSON, markdown fences, prose preamble, canonical-verb routing, "none" intent (meta comments), invalid intent, garbage response, engine throw, empty target, article rules, prompt smoke test.
 
-### World / progression
-- **Travel recenter** — `travelTo` now resets `mapX`/`mapY` to `WORLD_MAP_CENTER_{X,Y}` after a location change. Previously the player's old crossing coords carried into a freshly recentered map, causing same-direction bouncing between adjacent biomes (Cartographer audit caught this).
-- **Hub exit fixed** — `beginScene` accepts `skipHubEntry: true` so `leave outpost` actually exits instead of re-entering the gate room.
-- **Corruption cap + balanced decay** — `CORRUPTION_MAX = 50`. Clean-weather rest sheds 4 / 2 / 1 corruption depending on current load (>30 / >10 / >0). Corrupting weather (Whisper Fog, Silent Blizzard) blocks decay so heavy biomes still wear the player down.
-- **`first_travel` / `first_quest` milestones** — declared but unwritten in the prior session. Now emitted with matching Arbiter callback lines in `narrativeGenerator`.
-- **Cardinal-travel narration pool** — expanded 4 → 16 variants grouped by sensory focus (footing, sky, sound, smell, ground, distance) to defeat the Groundhog Day stagnation finding.
-- **Pending-chain expiry** — chains older than 48 in-game hours are dropped from `worldMemory.pendingChains` (combat-heavy biomes used to strand them forever).
-- **`drop` / `pickup` / `open` engine support** — three new intents. `worldMemory.visitedRooms[key].droppedItems` and `containersOpened` persist across re-entry. `beginScene` AND `stepDirection` surface re-entry narration ("On the ground: …" / "Still open from before: …") when a tile carries persisted vandal state.
-- **State-aware `look`** — `narrateCasualLook` now injects HP-status + time-of-day awareness ("Your hands shake on the look", "It's night here"). Consecutive look at the same scene within 2 in-game hours returns a one-line refresher instead of re-reading the whole environment block.
+#### Phase 2 — Author-declared interactables (OTA 113)
+- New schema field: `Location.interactables?: string[]` and `HubRoom.interactables?: string[]`.
+- **21 macro locations** now declare 4–8 concrete nouns each (`locations.json`).
+- **15 hub rooms** now declare 4–7 concrete nouns each (`static_hub.json`).
+- `beginScene` sources `ambientNouns` with preference order: authored → `extractAmbientNouns(description)` fallback for procedural / unauthored content.
+- Save-restore path AND hub-exit reset path apply the same preference, so older saves get refreshed against authored lists on load.
+- Search / Approach modal chips are now deterministic and intentional. No more "states / repair / back" leaking from prose extraction.
+- Tests: 9 covering coverage, lowercase, uniqueness, no-banned-tokens (states, repair, time, voice, wind, etc.), 4-noun floor.
 
-### Parser correctness
-- **`leave` / `cleave` collision** killed — the prepended-letter false-positive pattern (e.g. `sword/word`, `leave/cleave`) is now explicitly rejected by `fuzzyEqual`.
-- **Multi-word synonyms now route** — `snap shot`, `fight back`, `double tap`, `hand in`, `pick up`, etc. auto-collapse via `MULTI_WORD_COLLAPSES` derived at module load from `VERB_SYNONYMS`. Adding a new multi-word alias is a one-line change.
-- **`kick the rubble` routes to dig** — attack handler with no enemy now checks ground / area search before refusing.
-- **`open` removed from investigate** — was double-registered, made `open chest` silently route to area-search.
-- **`accept` empty-target now lists vendor offerings** — instead of refusing outright.
-- **Ambient-noun extractor verb filter** — `look`, `inspect`, `after`, `left`, `remains`, etc. no longer leak through as ground objects (Scavenger audit caught these as ghost objects).
+#### Phase 3 — Tag-driven container loot (current — see §4)
 
-### UI / settings
-- **Settings → 3 tabs (Music / Voice / About)** with per-tab COPY ALL. Voice tab has SYSTEM / BUNDLED / UPDATE-or-DOWNLOAD three-button row. System voice picker only renders when system engine selected (was showing "No voices installed" under bundled).
+### Other major fixes landed this session
 
-### Test harnesses (new)
-- **`__tests__/yearSimulation.test.ts`** — coverage-driven 1-to-2-year sim. Action picker biases toward unexercised mechanisms; reports mechanism coverage + Cartographer (unique regions + travel sequence) + Scavenger (ambient noun interactions + ghost objects) telemetry.
-- **`__tests__/touristAndVandal.test.ts`** — persistent-memory stress test. Drop item + open container at Node A, walk N/E/N/E, walk back, assert engine state survived AND re-entry narration acknowledges. Last run: **100 % persistence, 0 % dissonance**.
-- **`__tests__/literaryAudit.test.ts`** — 4-protocol narrative audit: Token Diet (verbosity), Groundhog Day (Jaccard repetition), Sensory Shift (state-aware look), Trope Tracker (lexical density + burnout list). Last run: 2 % over-75-word lines, **0 stagnation pairs**, 71 % sensory similarity (under stagnation threshold), 9 % lexical density, no burnout outliers.
+- **Partial-move death spiral fixed (OTA 104)** — `runMoveCombatRange` no longer grants enemy counter-attacks on weather-slowed PARTIAL moves. Only the full move (range actually changes) provokes counters. Playtest log Observer @ Zharak's Teeth: had 4 Gutter Rats taking 31 HP off a L1 character in three rounds where the player couldn't act.
+- **`disarm`/`disable`/`dismantle`/`take apart` verbs route to `open`** (OTA 104). `disarm` removed from `maneuver` (grappling).
+- **`take` removed from `accept` synonyms, added to `pickup`** (OTA 104). Long phrasings like "take the trap apart and keep the materials" no longer fire the contract-accept intent.
+- **Equip-anything fallback** (OTA 104) — `validSlotsForItem` infers a slot from the item name when the catalog has no entry. Mud-Rend Blade → main/off, *plate/coat/vest → chest, *helm/mask → head, etc.
+- **Directional bearing queries** (OTA 104) — `parseDirectionQuestion` recognises "what city is north of me", "what's to the east" with a new `directional` kind. Routes to `surveyAll(map)[direction]`.
+- **`doesn't` → "duzzent" + scrub stale ambient pool on load** (OTA 102).
+- **COPY LOG button on dead-character rows** (OTA 103). Reads slot's persisted log via new `readSlotLog(slotId)` helper bypassing active-slot indirection.
+- **Hub-room descriptions merged into ambient pool** (OTA 108, superseded by Phase 2 authored lists).
+- **Modal autofocus removed** (OTA 109) — Search / Approach chips no longer require a second tap to fire (keyboard popup was reflowing the modal).
+- **`hubRoomId` closure bug** (OTA 109) — cardinal-travel handler was rewriting the cleared flag back via a stale closure on `player`. Fixed by re-pulling player from `get()` between sets.
+- **Enemy preference over inventory in target resolution** (OTA 110) — "sneak up on Aetheric Drone" now resolves to the drone, not the player's Aetheric Torch.
+- **Hooks-first chip pool** (OTA 110) — `buildChipPool` in ExplorationScreen surfaces unresolved hook nouns FIRST in the modal, then ambient extracted. Caps at 10, deduped.
+- **Long meta-comment guard** (OTA 107) — inputs >100 chars matching "ok ", "we should", "I think", "btw" route to a noted-but-no-action ack instead of firing intents.
+- **Open-container loot RNG** (OTA 107) — first open on a recognisable container (lockbox / trap / crate / defenses) grants 1–3 materials via a weighted pool. Now being moved to Phase 3 architecture.
+- **STT service selection** (OTA 107) — `STTManager` queries `getSpeechRecognitionServices()`, picks `com.google.android.as` on Pixels / `com.google.android.googlequicksearchbox` on stock GMS instead of relying on the module default which silently fails on Pixels.
+- **Cross-scene noun leakage fix** (OTA 112) — when player walks east out of a hub, `ambientNouns` rebuilds from just the macro location, dropping hub-room nouns that were leaking into the wilds scene.
+
+### Pronunciation worksheet
+- Generated at `docs/pronunciation-worksheet.md`. Scanned 87 k tokens across `docs/lore-source.txt` + every JSON under `app/data/`, filtered against a 60 k-word American English dictionary plus a fantasy-vocabulary allowlist. Lists 13 invented Tartaria terms (Ae- pre-suggested), 109 names, 60 hyphenated compounds, plus a re-tune column for the existing 24 lexicon entries. **Sitting with the player to fill in.**
 
 ---
 
 ## 4. Outstanding issues
 
-**None.** The branch is clean for playtest:
-- 0 TypeScript errors
-- 0 `TODO` / `FIXME` / `@ts-ignore` markers in `app/`
-- 583 / 583 unit tests pass (50 suites)
-- Two long-running integration sims (`yearSimulation`, `literaryAudit`) pass; they're informational rather than gating (`testPathIgnorePatterns` style in the doc above).
-- Tourist-and-the-Vandal persistence: 100 % engine, 0 % dissonance
-- Literary audit: zero stagnation pairs, zero burnout-list adjectives or verbs
-- All 19 findings from the multi-agent QA pass earlier in the session have landed fixes
+**Active punchlist:**
 
-**Known design trade-offs (not bugs, flagged for transparency):**
-- **Qwen mocked in Jest.** All test-time narration is templated. Live LLM output should improve lexical density well past the 9 % the audit sees. `docs/literary-audit-on-device.md` documents two paths to run the same audit against live Qwen.
-- **Sim deaths.** The year-sim's bot character dies at various points depending on biome / weather luck; that's intentional variance, not a regression. The engine survives in all variants with 0 crashes / 0 slotLoadErrors across all observed runs.
+- **Phase 3 — tag-driven container loot.** **IN PROGRESS in this session.** Replaces the hardcoded 4-pool table from OTA 107 with derivation from container tags. Same pattern as `scrapEngine` for items. Adding a new container type becomes a data edit, not a code edit.
+- **Pronunciation worksheet** — sitting with the player. ~30 min to fold in once filled.
+- **STT verification** — player hasn't tested the recognizer service selection (OTA 107) end-to-end yet. Confirmed locally that `start()` runs without throwing on a device list including `com.google.android.as`. Whether events fire after that is the open question. If still broken on next test → STT comes out of the build (player's call: "if it doesn't work it's bloat").
+
+**Known design trade-offs (not bugs):**
+
+- **Qwen mocked in Jest.** All test-time narration AND parse-fallback is templated / mocked. Live behavior should be measured during playtest.
+- **LLM parse-fallback adds 200–400 ms** to the unknown / low-confidence path. By design — placeholder Arbiter line fires within 5 ms so the player gets a "considering" beat instead of dead air.
 
 ---
 
 ## 5. Known-good state
 
 - TypeScript: **0 errors** (`npx tsc --noEmit`).
-- Tests: **583 / 583 pass** across 50 suites running `npx jest --testPathIgnorePatterns 'yearSimulation|literaryAudit'`.
-- Full suite (incl. simulations): 584 / 584 — the two long-running tests are informational; recommend running them in isolation when iterating on engine changes.
-- Latest OTA: `2026-05-18-092` pushed.
-- App version: `2.201` — APK marker bumped in `metro.config.js` so the next push fires a fresh APK build for playtest.
+- Tests: **623 / 623 pass** across 55 suites.
+- Latest OTA: `2026-05-19-113`.
+- APK version: `2.201` — no APK rebuild needed since OTA 092; the on-device native modules (llama.rn, executorch, expo-speech-recognition, onnxruntime) haven't changed.
 
 ---
 
 ## 6. Repository conventions
 
 - **Commits** prefixed `feat:` / `fix:` / `chore:` / `refactor:` / `debug:` / `test:` / `perf:` / `ui:` / `content:`. Bodies explain WHY with concrete before/after.
-- **OTA bumps:** every JS-only push bumps `app/buildInfo.ts:OTA_BUILD_ID`. Format `YYYY-MM-DD-NNN`. Bumped before every commit that touches `app/`.
+- **OTA bumps:** every JS-only push bumps `app/buildInfo.ts:OTA_BUILD_ID`. Format `YYYY-MM-DD-NNN`.
 - **APK triggers:** add a comment line to `metro.config.js` with the date prefix. Bumping that comment fires `build-apk.yml`.
-- **Branch:** all work on `claude/new-session-MvF82`. PR #1 tracks this branch.
-- **Tests live** in `__tests__/` at repo root. `jest-expo` preset. New engine modules should land with a focused suite.
+- **Branch:** all work on `claude/new-session-MvF82`.
+- **Tests live** in `__tests__/` at repo root. `jest-expo` preset.
 
 ---
 
 ## 7. Critical files / hotspots
 
-- `app/state/gameStore.ts` — ~5700 lines. The spine. Almost every change touches this. Action handlers, combat resolution, scene management, log persistence, room state.
-- `app/engine/types.ts` — every shared interface. Read first when in doubt. Includes `Intent`, `StatusEffectKind`, `ScreenName`, `Enemy` (with `traits`), `VisitedRoom` (with `droppedItems` + `containersOpened`).
-- `app/engine/parser.ts` — verb synonym pools. ~330 verbs across 36 intents. `MULTI_WORD_COLLAPSES` derived at module load. Add new verbs here.
-- `app/engine/combatRules.ts` — `buildCombatSteps`, `buildSkillSteps` (now accepts `statusMods`), `rollMods` aggregator.
-- `app/engine/enemyTraits.ts` — trait registry. `traitAmbushBonus` now actually wired (was dead code).
-- `app/engine/factionQuests.ts` — `FactionQuestStageDef.advanceOn` gates stage progression.
-- `app/engine/statusEffects.ts` — kind enum, apply/tick/format helpers. Dodge/block/fight_back applied with `remainingRounds: 2`.
-- `app/engine/contextInjector.ts` — Qwen system prompt. VOICE_RULES + location anchor live here.
-- `app/engine/ambientNouns.ts` — `extractAmbientNouns` with verb / adjective / participle blocklists.
-- `app/engine/hub.ts` — hub data + `isLeaveHubCommand` / `resolveHubTravel`.
-- `app/voice/loreLexicon.ts` — lore-word respellings + `cleanForSpeech`.
-- `app/voice/TTSManager.ts` — system-TTS engine, coalesce window, queue merge.
-- `app/voice/PiperTTSManager.ts` — Kokoro engine, prewarm, sentence-chunked speak.
-- `app/voice/TTSController.ts` — store subscription, resume detection, stream buffer.
-- `app/updates/checkAndApplyOTA.ts` — shared OTA sequence (Settings button + boot auto-check).
+- `app/state/gameStore.ts` — ~6800 lines. The spine. Action handlers, combat resolution, scene management, log persistence, room state, Qwen parse-fallback wiring.
+- `app/engine/types.ts` — every shared interface. `Location.interactables` + `HubRoom.interactables` live here.
+- `app/engine/parser.ts` — dictionary parser. ~330 verbs across 36 intents. Fast path.
+- `app/engine/llmParser.ts` — **NEW**. Qwen-backed fallback. `parseInputViaLLM(text, ctx, qwen)`.
+- `app/engine/ambientNouns.ts` — `extractAmbientNouns` heuristic extractor. **Now a fallback only** when a location/hub room doesn't declare `interactables`.
+- `app/engine/combatRules.ts` — `buildCombatSteps`, `buildSkillSteps`, `rollMods` aggregator.
+- `app/engine/hub.ts` — hub data + `isLeaveHubCommand` / `resolveHubTravel`. `HubRoom.interactables` lives here.
+- `app/engine/equipment.ts` — `validSlotsForItem` with name-based slot inference fallback.
+- `app/voice/loreLexicon.ts` — 24 lore-word respellings + `cleanForSpeech`.
+- `app/voice/STTManager.ts` — speech recognition with service-selection logic.
+- `app/data/locations/locations.json` — 21 macro locations, every one declares `interactables`.
+- `app/data/world/static_hub.json` — 15 hub rooms, every one declares `interactables`.
 - `app/data/lore/concepts.json` — single source for `what is X` lookups AND ActionReferenceScreen.
-- `app/data/enemies/enemies.json` — 99 enemies, trait-tagged.
-- `app/data/quests/faction-quests.json` — 7 quests, every stage has `advanceOn`.
-- `__tests__/yearSimulation.test.ts` — long-running coverage-driven sim.
-- `__tests__/touristAndVandal.test.ts` — room-state persistence stress.
-- `__tests__/literaryAudit.test.ts` — narrative quality audit.
+- `docs/pronunciation-worksheet.md` — current worksheet for lexicon fills.
+- `__tests__/llmParser.test.ts` — 18 tests for the Qwen-fallback module.
+- `__tests__/interactables.test.ts` — 9 tests locking in the authored-interactables contract.
 
 ---
 
 ## 8. Quick-start commands
 
 ```bash
-# Typecheck + unit tests (fast — for iteration)
+# Typecheck + unit tests (fast)
 npx tsc --noEmit
-npx jest --testPathIgnorePatterns 'yearSimulation|literaryAudit'
-
-# Full suite including the long-running sims (~30–60s)
 npx jest
 
-# Push as OTA-only (JS changes)
+# Push as OTA-only
 #  1) edit code in app/
 #  2) bump app/buildInfo.ts OTA_BUILD_ID
 #  3) commit + push → eas-update.yml fires
@@ -213,10 +200,10 @@ npx jest
 | `helping` | `help` | narrative ally bonus | 1 round |
 | `overwhelmed` | applied by engine | -2 on evade | 1 round |
 | `surprised` | `ambush_strike` enemy trait + maneuver mismatch | -2 next roll, consumed | 1 round |
-| `fighting_back` | `fight_back` | next enemy strike → opposed Fighting roll | 2 rounds (this session) |
+| `fighting_back` | `fight_back` | next enemy strike → opposed Fighting roll | 2 rounds |
 | `quick_fire` | `quick_fire` | +2 next ranged attack | 1 round |
-| `dodging` | `dodge` | +4 AC | 2 rounds (this session) |
-| `blocking` | `block` | +4 AC (also durability/riposte) | 2 rounds (this session) |
+| `dodging` | `dodge` | +4 AC | 2 rounds |
+| `blocking` | `block` | +4 AC (also durability/riposte) | 2 rounds |
 | `bleed` / `poisoned` / `stun` / `burn_scar` / `armor_severed` / `paralyzed` | damage-type rolls + enemy traits | per `statusEffects.ts` | varies |
 
 ---
@@ -231,8 +218,8 @@ Set on enemy entries in `enemies.json`. Read at combat time via `enemyTraits.ts`
 
 **On-hit status:** `bleeder` (50% bleed 3r) · `venomous` (35% poison 3r) · `concussive` (20% stun 1r)
 
-**Per-round / first-strike:** `regenerate` (+1 HP/round, capped at start) · `fast_regen` (+2/round) · `ambush_strike` (+2 first hit of encounter — **now actually wired**)
+**Per-round / first-strike:** `regenerate` (+1 HP/round, capped at start) · `fast_regen` (+2/round) · `ambush_strike` (+2 first hit of encounter)
 
 ---
 
-That's the lay of the land at the close of this session. **APK is clean for playtest.** Zero outstanding issues; full QA pass behind us. Next session should pick up from playtest feedback or new feature work.
+That's the lay of the land at OTA 113. The parser-treadmill is functionally retired: dictionary handles 99% of input fast, LLM catches the rest, authored interactables make noun pools deterministic. Phase 3 (tag-driven container loot) is the last big architectural piece on the punchlist.

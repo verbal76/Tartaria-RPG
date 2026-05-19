@@ -56,6 +56,11 @@ import {
 } from '../engine/narrativeGenerator';
 import { parseInput, type ParseContext } from '../engine/parser';
 import { parseInputViaLLM } from '../engine/llmParser';
+import {
+  classifyContainer,
+  rollFromPool,
+  narrate as containerNarrate,
+} from '../engine/containerLoot';
 import { rollDie, rollFromNotation, pick, chance, rotatingPick } from '../engine/rng';
 import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver } from '../engine/combatRules';
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
@@ -3734,11 +3739,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       case 'open': {
         // Open / unlock / disarm / dismantle — persistent room state.
         // First open on a recognisable container type ALSO rolls a
-        // small loot bundle (player feedback: "we should have a
-        // dismantle/loot button so I can RNG roll for loot once I do
-        // something to an item, like how I opened a lockbox and
-        // opened the trap"). Pool is keyed by noun keyword so any
-        // container the player names lands in a sensible category.
+        // small loot bundle. Container archetypes (lockbox / trap /
+        // crate / automaton / relic_console / wreckage / …) live in
+        // app/data/world/container_loot.json — adding a new type is a
+        // JSON edit, not a code edit. See app/engine/containerLoot.ts.
         const target = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
         if (!target) {
           get().appendLog('arbiter', `The Arbiter raises a brow. "Open what? Name the chest, crate, or door."`);
@@ -3765,89 +3769,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
             },
           },
         }));
-        // Pick a loot pool from the noun. Order matters — match the
-        // most-specific terms first ('lockbox' before 'box'). Doors
-        // and walls fall through to null and just narrate the open.
-        const lower = key;
-        type LootPool = { name: string; weight: number; minQty: number; maxQty: number; tags: string[]; kind: 'misc' | 'consumable' };
-        const POOLS: Array<{ match: RegExp; pool: LootPool[]; narration: string }> = [
-          {
-            match: /\b(lockbox|strongbox|coffer|safe)\b/,
-            pool: [
-              { name: 'Scrap Metal', weight: 30, minQty: 1, maxQty: 2, tags: ['metal'], kind: 'misc' },
-              { name: 'Aether Crystal', weight: 12, minQty: 1, maxQty: 1, tags: ['aether','crystal'], kind: 'misc' },
-              { name: 'Aetheric Shard', weight: 8, minQty: 1, maxQty: 1, tags: ['aether','shard'], kind: 'misc' },
-              { name: 'Patched Cloth', weight: 20, minQty: 1, maxQty: 2, tags: ['cloth'], kind: 'misc' },
-            ],
-            narration: `The ${target} cracks open. You sift what was kept inside.`,
-          },
-          {
-            match: /\btrap\b/,
-            pool: [
-              { name: 'Scrap Metal', weight: 40, minQty: 1, maxQty: 2, tags: ['metal'], kind: 'misc' },
-              { name: 'Stick', weight: 25, minQty: 1, maxQty: 2, tags: ['wood'], kind: 'misc' },
-              { name: 'Spider Silk', weight: 10, minQty: 1, maxQty: 1, tags: ['fiber'], kind: 'misc' },
-              { name: 'Small Rock', weight: 25, minQty: 1, maxQty: 2, tags: ['stone'], kind: 'misc' },
-            ],
-            narration: `You take the ${target} apart for parts.`,
-          },
-          {
-            match: /\b(crate|chest|box|cache|stash)\b/,
-            pool: [
-              { name: 'Scrap Metal', weight: 25, minQty: 1, maxQty: 2, tags: ['metal'], kind: 'misc' },
-              { name: 'Stick', weight: 25, minQty: 1, maxQty: 2, tags: ['wood'], kind: 'misc' },
-              { name: 'Patched Cloth', weight: 25, minQty: 1, maxQty: 2, tags: ['cloth'], kind: 'misc' },
-              { name: 'Small Rock', weight: 25, minQty: 1, maxQty: 2, tags: ['stone'], kind: 'misc' },
-            ],
-            narration: `The ${target} swings open. The contents are humble.`,
-          },
-          {
-            match: /\b(defenses|defense|defences|defence|automaton|construct|drone|sentinel)\b/,
-            pool: [
-              { name: 'Scrap Metal', weight: 45, minQty: 1, maxQty: 3, tags: ['metal'], kind: 'misc' },
-              { name: 'Aether Crystal', weight: 15, minQty: 1, maxQty: 1, tags: ['aether','crystal'], kind: 'misc' },
-              { name: 'Aether Residue', weight: 15, minQty: 1, maxQty: 1, tags: ['aether'], kind: 'misc' },
-              { name: 'Small Rock', weight: 25, minQty: 1, maxQty: 2, tags: ['stone'], kind: 'misc' },
-            ],
-            narration: `You strip the ${target} for usable parts.`,
-          },
-        ];
-        const matched = POOLS.find((p) => p.match.test(lower));
+        const matched = classifyContainer(target);
         if (!matched) {
-          // No loot pool — door / wall / generic mechanism. Just narrate.
+          // No archetype — door / wall / generic mechanism. Just narrate.
           get().appendLog('world', `You force the ${target} open. It stays open.`);
           void get().persist();
           break;
         }
-        // Weighted pick — sum weights, roll, walk.
-        const totalWeight = matched.pool.reduce((acc, p) => acc + p.weight, 0);
-        const roll = rollDie(totalWeight);
-        let cumulative = 0;
-        let picked = matched.pool[0]!;
-        for (const entry of matched.pool) {
-          cumulative += entry.weight;
-          if (roll <= cumulative) { picked = entry; break; }
+        const rolled = rollFromPool(matched.pool);
+        if (!rolled) {
+          get().appendLog('world', containerNarrate(matched, target));
+          void get().persist();
+          break;
         }
-        const qty = picked.minQty + Math.floor(Math.random() * (picked.maxQty - picked.minQty + 1));
         const grantResult = grantItem(player.inventory, {
-          id: `${picked.name}_${Date.now()}`,
-          name: picked.name,
-          kind: picked.kind,
-          quantity: qty,
-          tags: picked.tags,
+          id: `${rolled.entry.name}_${Date.now()}`,
+          name: rolled.entry.name,
+          kind: rolled.entry.kind,
+          quantity: rolled.quantity,
+          tags: rolled.entry.tags,
         });
         set((s) =>
           s.player ? { player: { ...s.player, inventory: grantResult.inventory } } : s,
         );
-        get().appendLog('world', matched.narration);
+        get().appendLog('world', containerNarrate(matched, target));
         const actualQty = grantResult.accepted;
         if (actualQty > 0) {
           get().appendLog(
             'reward',
-            `✦ Recovered ${picked.name}${actualQty > 1 ? ` x${actualQty}` : ''} from the ${target}.`,
+            `✦ Recovered ${rolled.entry.name}${actualQty > 1 ? ` x${actualQty}` : ''} from the ${target}.`,
           );
         } else {
-          get().appendLog('world', `Inventory cap reached — the ${picked.name} stays behind.`);
+          get().appendLog('world', `Inventory cap reached — the ${rolled.entry.name} stays behind.`);
         }
         void get().persist();
         break;
