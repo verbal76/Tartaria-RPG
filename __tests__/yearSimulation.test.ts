@@ -175,6 +175,21 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
       }
     };
 
+    // Attempt-count throttling — the picker prioritizes unexercised
+    // mechanisms, but if a mechanism's coverage pattern fails to
+    // match its actual narration, the picker will retry that
+    // mechanism on every loop forever (sim #5 was stuck on
+    // `use Aetheric Torch` for thousands of actions). Cap each
+    // priority attempt at 3 tries; treat as "tried, move on" past
+    // the cap.
+    const attempts: Counter = {};
+    const tryOnce = (mech: string): boolean => {
+      if (exercised.has(mech)) return false;
+      if ((attempts[mech] ?? 0) >= 3) return false;
+      bump(attempts, mech);
+      return true;
+    };
+
     // Inspect a single log entry and credit any mechanisms whose
     // narration patterns appear in it. Only world / arbiter / combat /
     // reward channels — debug / cognitive / system lines contain raw
@@ -351,29 +366,27 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
           return 'flee';
         }
         if (hpFrac < 0.4) {
-          // Cycle defensive verbs to exercise them
-          if (!exercised.has('dodge')) return 'dodge';
-          if (!exercised.has('block')) return 'block';
-          if (!exercised.has('fight_back')) return 'fight back';
+          if (tryOnce('dodge')) return 'dodge';
+          if (tryOnce('block')) return 'block';
+          if (tryOnce('fight_back')) return 'fight back';
           return Math.random() < 0.5 ? 'dodge' : 'block';
         }
-        // Try uncovered combat mechanisms first
-        if (!exercised.has('maneuver')) return `grapple ${ename}`;
-        if (!exercised.has('aim')) return 'aim';
-        if (!exercised.has('reload')) return 'reload';
-        if (!exercised.has('quick_fire')) return `snap shot at ${ename}`;
-        if (!exercised.has('multi_fire')) return `double tap ${ename}`;
-        if (!exercised.has('take_cover')) return 'take cover';
-        if (!exercised.has('advance') && scene?.range !== 'arm') return 'advance';
-        if (!exercised.has('retreat') && scene?.range !== 'far') return 'step back';
-        if (!exercised.has('throw') && p.inventory.length > 0) {
+        if (tryOnce('maneuver')) return `grapple ${ename}`;
+        if (tryOnce('aim')) return 'aim';
+        if (tryOnce('reload')) return 'reload';
+        if (tryOnce('quick_fire')) return `snap shot at ${ename}`;
+        if (tryOnce('multi_fire')) return `double tap ${ename}`;
+        if (tryOnce('take_cover')) return 'take cover';
+        if (scene?.range !== 'arm' && tryOnce('advance')) return 'advance';
+        if (scene?.range !== 'far' && tryOnce('retreat')) return 'step back';
+        if (p.inventory.length > 0 && tryOnce('throw')) {
           const it = p.inventory.find((i) => i.kind === 'misc') ?? p.inventory[0]!;
           return `throw ${it.name} at ${ename}`;
         }
-        if (!exercised.has('ready')) return 'ready';
-        if (!exercised.has('help') && p.companion) return 'help';
-        if (!exercised.has('disengage')) return 'disengage';
-        if (!exercised.has('dash')) return 'dash forward';
+        if (tryOnce('ready')) return 'ready';
+        if (p.companion && tryOnce('help')) return 'help';
+        if (tryOnce('disengage')) return 'disengage';
+        if (tryOnce('dash')) return 'dash forward';
         return `attack ${ename}`;
       }
 
@@ -394,93 +407,74 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
       // ─── Vendor present ─────────────────────────────────────────
       if (scene?.vendor) {
         const v = scene.vendor;
-        // First: accept a quest if available and not yet tried
-        if (!exercised.has('accept_quest') && v.faction) {
-          // Try a generic "accept" — handler lists available titles
-          // and we can name one next loop; or directly accept a
-          // known quest title from the JSON if we know any.
-          return 'accept';
-        }
-        // Buy something — pick the cheapest offer
-        if (!exercised.has('buy') && v.offers && v.offers.length > 0 && p.tc >= 10) {
+        if (v.faction && tryOnce('accept_quest')) return 'accept';
+        if (v.offers && v.offers.length > 0 && p.tc >= 10 && tryOnce('buy')) {
           const cheap = [...v.offers].sort((a: any, b: any) => a.price - b.price)[0];
           if (cheap) return `buy ${cheap.itemName}`;
         }
-        // Sell something — pick anything in inventory
-        if (!exercised.has('sell') && p.inventory.length > 1) {
+        if (p.inventory.length > 1 && tryOnce('sell')) {
           const sellable = p.inventory.find((it) => it.kind !== 'relic') ?? p.inventory[0]!;
           return `sell ${sellable.name}`;
         }
-        // Gift for rep
-        if (!exercised.has('gift') && p.inventory.length > 0) {
+        if (p.inventory.length > 0 && tryOnce('gift')) {
           return `gift ${p.inventory[0]!.name}`;
         }
-        // Steal
-        if (!exercised.has('steal') && v.offers && v.offers.length > 0) {
+        if (v.offers && v.offers.length > 0 && tryOnce('steal')) {
           return `steal ${(v.offers[0] as any).itemName}`;
         }
-        // Repair (only if anything is damaged)
-        if (!exercised.has('repair') && p.tc > 5) {
-          return 'repair';
-        }
-        // Recruit
-        if (!exercised.has('recruit') && !p.companion) {
-          return `recruit ${v.name}`;
-        }
+        if (p.tc > 5 && tryOnce('repair')) return 'repair';
+        if (!p.companion && tryOnce('recruit')) return `recruit ${v.name}`;
       }
 
       // ─── Quest turn-in ──────────────────────────────────────────
-      if (!exercised.has('turn_in_quest') && (p.activeFactionQuests?.length ?? 0) > 0) {
+      if ((p.activeFactionQuests?.length ?? 0) > 0 && tryOnce('turn_in_quest')) {
         const q = p.activeFactionQuests![0]!;
         return `turn in ${q.id}`;
       }
 
       // ─── Join faction ───────────────────────────────────────────
-      if (!exercised.has('join_faction')) {
-        // try to join the faction we have highest rep with that we
-        // aren't already in
+      if (tryOnce('join_faction')) {
         const standings = p.factionStanding ?? [];
         const eligible = standings.find((st) => st.standing >= 20 && st.factionId !== p.factionId);
         if (eligible) return `join ${eligible.factionId}`;
       }
 
       // ─── Inventory ──────────────────────────────────────────────
-      if (!exercised.has('equip')) {
+      if (tryOnce('equip')) {
         const eq = p.inventory.find((it) => it.kind === 'weapon' || it.kind === 'armor');
         if (eq) return `equip ${eq.name}`;
       }
-      if (!exercised.has('unequip') && (p.equipped?.main || p.equipped?.off)) {
+      if ((p.equipped?.main || p.equipped?.off) && tryOnce('unequip')) {
         return `unequip ${p.equipped.main ?? p.equipped.off}`;
       }
-      if (!exercised.has('use_relic')) {
+      if (tryOnce('use_relic')) {
         const relic = p.inventory.find((it) => it.kind === 'relic');
         if (relic) return `use ${relic.name}`;
       }
 
       // ─── Crafting ───────────────────────────────────────────────
-      if (!exercised.has('craft_named')) {
-        // Try common starter recipes
+      if (tryOnce('craft_named')) {
         const tries = ['Club', 'Cudgel', 'Stone Spear', 'Patched Cloth'];
         return `craft ${tries[Math.floor(Math.random() * tries.length)]!}`;
       }
 
       // ─── Hooks ──────────────────────────────────────────────────
-      if (scene?.hooks?.length && !exercised.has('hook_resolve')) {
+      if (scene?.hooks?.length && tryOnce('hook_resolve')) {
         const hook = scene.hooks[0]!;
         const target = (hook as any).target || (hook as any).name || '';
         if (target) return `investigate ${target}`;
       }
 
       // ─── Exploration leftovers ──────────────────────────────────
-      if (!exercised.has('dig')) return 'dig';
-      if (!exercised.has('ask')) return 'where am I';
-      if (!exercised.has('investigate') && scene?.ambientNouns?.length) {
+      if (tryOnce('dig')) return 'dig';
+      if (tryOnce('ask')) return 'where am I';
+      if (scene?.ambientNouns?.length && tryOnce('investigate')) {
         return `inspect ${scene.ambientNouns[0]!}`;
       }
-      if (!exercised.has('climb')) return 'climb';
-      if (!exercised.has('swim')) return 'swim';
-      if (!exercised.has('jump')) return 'jump';
-      if (!exercised.has('search_area')) return 'search the rubble';
+      if (tryOnce('climb')) return 'climb';
+      if (tryOnce('swim')) return 'swim';
+      if (tryOnce('jump')) return 'jump';
+      if (tryOnce('search_area')) return 'search the rubble';
 
       // Default rotation — bias HEAVILY toward named travel so the
       // sim moves between Locations (each move beginScene rolls
