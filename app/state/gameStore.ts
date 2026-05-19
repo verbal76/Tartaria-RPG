@@ -5616,12 +5616,36 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : `The compass points ${dir} into open ground.`;
       get().appendLog('world', `You walk ${dir} through open silt. ${hint}`);
     } else {
+      // Cardinal-travel narration pool. Previous 4-variant set hit
+      // 100% Jaccard repetition by the 9th visit in the literary
+      // audit's Groundhog Day test — across 15 same-tile re-entries,
+      // 10 of 105 pairs were >80% similar. Expanded to 16 variants
+      // grouped loosely by sensory focus (footing, sky, sound,
+      // smell, ground texture, distance perception) so consecutive
+      // visits hit different aspects of the wilderness.
       const directional = rotatingPick(
         [
+          // Footing / ground
           `You walk ${dir}. The ground here looks much like the ground behind you. You have lost track of distance.`,
           `You push ${dir}. The silt is heavy underfoot, the horizon unchanged.`,
-          `You head ${dir}. Mud-flats stretch the same in every direction — only the wind tells you you've moved.`,
+          `You set out ${dir}. Your boots sink half an inch into the mud-flats and pull free with each step.`,
           `You strike out ${dir}. The country resists you with sameness more than distance.`,
+          // Sky / weather memory
+          `You head ${dir}. Mud-flats stretch the same in every direction — only the wind tells you you've moved.`,
+          `You move ${dir} under a sky the color of rust. Whatever sun there was has been wrung out by the haze.`,
+          `You press ${dir}. Clouds drag along the horizon like silt in still water, slow and indifferent.`,
+          // Sound / silence
+          `You walk ${dir}. The silence has the weight of old metal. Your breath is the only thing that disagrees.`,
+          `You step ${dir}. Somewhere distant, something settles — a stone giving up, or a structure remembering it once stood.`,
+          `You push ${dir}. The wind has a voice today; mostly it just murmurs old syllables you don't quite catch.`,
+          // Smell / atmosphere
+          `You head ${dir}. The air smells like wet iron and forge ash. Tartaria's signature.`,
+          `You strike out ${dir}. Whatever ferments under the mud sends up a sweet, wrong note as you cross it.`,
+          // Distance / perception
+          `You move ${dir}. After a while the road stops counting itself. You take it on faith you've made progress.`,
+          `You press ${dir}. The horizon stays a promise you can't quite collect on.`,
+          `You walk ${dir}. The world unscrolls slowly, more topography than landmark.`,
+          `You head ${dir}. You measure the trek in changes of pressure, not in feet.`,
         ],
         `wander.directional.${dir}`,
       );
