@@ -151,6 +151,37 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
     let actionsAttempted = 0;
     let pendingResolves = 0;
     let dirIdx = 0;
+    // ─── Cartographer / Scavenger telemetry ──────────────────────
+    /** Unique macro-region locationIds the sim has set foot in.
+     *  Counted via player.currentLocationId after each action. */
+    const uniqueLocations = new Set<string>();
+    /** Sequence of (locationId, dirIssued) pairs we walked. If the
+     *  sim later issues the opposite cardinal and lands somewhere
+     *  OTHER than the earlier origin, that's a bidirectional break
+     *  and gets recorded. */
+    const travelSequence: Array<{ from: string; dir: string; to: string }> = [];
+    /** Times the sim attempted to interact with an ambient noun the
+     *  scene paragraph mentioned. Two counters: attempted (we
+     *  issued the verb) vs succeeded (the response was anything
+     *  other than the parser's generic refusal lines). */
+    let interactionsAttempted = 0;
+    let interactionsSucceeded = 0;
+    /** Ambient nouns the scene mentioned that we attempted to
+     *  interact with and were silently refused — "ghost objects",
+     *  text the engine generated but never wired to a verb. */
+    const ghostObjects = new Set<string>();
+    /** Scenes the Scavenger has already swept (to avoid re-sweeping
+     *  the same scene every loop). Keyed by `${locationId}@${microMicroId|''}@${enemiesCount}`. */
+    const sweptScenes = new Set<string>();
+    /** Pending Scavenger sweep — when set, the picker will pop the
+     *  next interact-verb from this list instead of running the
+     *  normal mechanism rotation. */
+    let scavengerQueue: string[] = [];
+    /** Narrative-dissonance flags — current locationId vs. a
+     *  keyword in the last world-channel narration that contradicts
+     *  it (e.g. location says "Whispering Woods" but text says
+     *  "cobblestone streets"). Best-effort heuristic. */
+    const narrativeDissonance: string[] = [];
     const directions = ['north', 'east', 'south', 'west'];
     // Fallback rotation when every mechanism has been exercised at
     // least once and there's no in-context priority pick.
@@ -196,7 +227,7 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
     // parser dumps and location descriptions that produce false
     // positives ("on to the Square" should not credit "jump").
     const PATTERNS: Array<[RegExp, string]> = [
-      [/\battacks? the\b|\bswing(?:s|ing)? at\b|\bstrike(?:s)? the\b|punches the|kicks the|cleaves the|bashes the|smashes the/i, 'attack'],
+      [/✓ HIT.*for \d+ damage|hits .* for \d+|deals \d+ damage|drops .* dead|✗ MISS/i, 'attack'],
       [/dodging stance|drop into a dodging/i, 'dodge'],
       [/raise the .* into a block|defensive stance/i, 'block'],
       [/set your stance.*fight back|Fight Back —/i, 'fight_back'],
@@ -247,9 +278,12 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
 
     const inspectLog = (entry: { text: string; channel: string }) => {
       bump(channelCounts, entry.channel);
-      // Skip debug / cognitive / system — those contain raw parser
-      // dumps + state diagnostics that match unrelated patterns.
-      if (entry.channel === 'debug' || entry.channel === 'cognitive' || entry.channel === 'system') return;
+      // Skip debug / cognitive / system / player — those contain raw
+      // parser dumps, state diagnostics, AND the player-input echo
+      // (which would credit "snap shot" coverage just because the
+      // sim TYPED that text, not because the engine narrated it).
+      if (entry.channel === 'debug' || entry.channel === 'cognitive'
+        || entry.channel === 'system' || entry.channel === 'player') return;
       for (const [re, mech] of PATTERNS) {
         if (re.test(entry.text)) mark(mech, entry.text);
       }
@@ -288,13 +322,30 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
       }
     };
 
+    // Refusal heuristics — if the response matches any of these,
+    // count the interaction as "attempted but failed" (the engine
+    // refused to route the verb to a real handler).
+    const REFUSAL_PATTERNS: RegExp[] = [
+      /Arbiter (raises a brow|shrugs|shakes their head|tilts|considers)/i,
+      /Nothing in arm's reach/i,
+      /I cannot place|I do not have a clean answer/i,
+      /you (can't|cannot)\b/i,
+      /does not (open|respond|move|answer)/i,
+      /no .* on the field|no enemy/i,
+    ];
+
     const submit = (text: string) => {
       actionsAttempted++;
       const sBefore = store.getState();
       const logLenBefore = sBefore.gameLog.length;
       const stamBefore = sBefore.player?.stamina ?? 0;
       const hubBefore = sBefore.player?.hubRoomId ?? null;
-      const locBefore = sBefore.currentScene?.location.id ?? null;
+      const locBefore = sBefore.player?.currentLocationId ?? null;
+      // Detect Scavenger interactions so we can track Attempted vs
+      // Succeeded. Match the verbs we use in SCAVENGER_VERBS.
+      const isScavengerInteract = /^(inspect|search)\s+\S+/.test(text);
+      const interactNoun = isScavengerInteract ? text.split(/\s+/).slice(1).join(' ') : '';
+
       try {
         store.getState().submitPlayerAction(text);
       } catch (e: any) {
@@ -303,11 +354,47 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
       resolveAnyPendingRoll();
       const sAfter = store.getState();
       const hubAfter = sAfter.player?.hubRoomId ?? null;
+      const locAfter = sAfter.player?.currentLocationId ?? null;
+
+      // ─── Cartographer: location set + sequence ────────────────
+      if (locAfter) uniqueLocations.add(locAfter);
+      if (locBefore && locAfter && locBefore !== locAfter) {
+        const dirMatch = /\bgo\s+(north|south|east|west)\b|\btravel\s+(?:to\s+)?(\S+)/i.exec(text);
+        const dir = dirMatch?.[1]?.toLowerCase()
+          ?? (dirMatch?.[2] ? `to:${dirMatch[2].toLowerCase()}` : 'other');
+        travelSequence.push({ from: locBefore, dir, to: locAfter });
+      }
+
+      // ─── Scavenger: success vs ghost-object ────────────────────
+      if (isScavengerInteract) {
+        interactionsAttempted++;
+        const newLogs = sAfter.gameLog.slice(logLenBefore);
+        const response = newLogs.find((l) => l.channel !== 'player' && l.channel !== 'debug');
+        const respText = response?.text ?? '';
+        const refused = REFUSAL_PATTERNS.some((r) => r.test(respText));
+        if (!refused && respText.length > 0) interactionsSucceeded++;
+        else ghostObjects.add(interactNoun);
+      }
+
+      // ─── Narrative dissonance check (heuristic) ────────────────
+      // If a world-channel line mentions a locale keyword that
+      // contradicts the current location's name family, flag it.
+      const newWorldLines = sAfter.gameLog.slice(logLenBefore)
+        .filter((l) => l.channel === 'world');
+      for (const l of newWorldLines) {
+        const loc = sAfter.currentScene?.location.name?.toLowerCase() ?? '';
+        const txt = l.text.toLowerCase();
+        // Cobblestone streets in a Mud Seas / Silt Wastes scene? etc.
+        if (/cobblestone street|dungeon wall|throne room|grand stair/i.test(txt)
+            && !/cradle|spire|tower|outpost|asgardar|drakova/i.test(loc)) {
+          if (narrativeDissonance.length < 20) {
+            narrativeDissonance.push(`@${loc}: "${l.text.slice(0, 80)}"`);
+          }
+        }
+      }
+
       if (actionTrace.length < TRACE_LIMIT) {
         const newLogs = sAfter.gameLog.slice(logLenBefore);
-        // Skip the player-echo entry (always first) and grab the
-        // first WORLD / ARBITER / SYSTEM response so we see what the
-        // engine actually replied with.
         const response = newLogs.find((l) =>
           l.channel !== 'player' && l.channel !== 'debug',
         );
@@ -336,6 +423,29 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
     const actionTrace: string[] = [];
     const TRACE_LIMIT = 200;
 
+    // Interact verbs the Scavenger sweep tries against each ambient
+    // noun. Two verbs per noun per visit, per the brief — enough to
+    // catch ghost objects without hammering the parser.
+    const SCAVENGER_VERBS = ['inspect', 'search'];
+
+    // Prime the Scavenger queue when the player has just walked into
+    // a peaceful scene with ambient nouns we haven't swept yet.
+    const primeScavengerQueue = (scene: any, p: any): void => {
+      if (!scene || scene.enemies?.length > 0) return; // combat first
+      const key = `${scene.location?.id ?? '?'}@${scene.microMicroId ?? ''}@${(scene.ambientNouns ?? []).join('|')}`;
+      if (sweptScenes.has(key)) return;
+      sweptScenes.add(key);
+      const nouns = (scene.ambientNouns ?? []) as string[];
+      if (nouns.length === 0) return;
+      const q: string[] = [];
+      for (const n of nouns.slice(0, 4)) {
+        for (const v of SCAVENGER_VERBS) q.push(`${v} ${n}`);
+      }
+      scavengerQueue = q;
+      // Note: an "interaction attempted" is bumped when we actually
+      // pop one from the queue (submit fires).
+    };
+
     // Action picker: bias toward unexercised mechanisms when context
     // makes them legal; fall back to a balanced rotation otherwise.
     const pickAction = (): string => {
@@ -349,19 +459,27 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
         : null;
 
       // ─── Exit the hub once so encounters can fire ───────────────
-      // The Reclaimers Outpost is peaceful — staying inside its room
-      // graph forever means we never roll combat / hooks. Issue
-      // 'leave outpost' once to drop into the open world.
       if (p.hubRoomId && !leftHub) {
         leftHub = true;
         return 'leave outpost';
       }
 
+      // ─── Scavenger sweep: exhaust ambient nouns first ───────────
+      // Brief: "Upon entering any new room … the sim must halt
+      // travel and execute an exhaustive sweep before moving on."
+      // Prime queue when this scene's nouns are unseen, then pop.
+      primeScavengerQueue(scene, p);
+      if (scavengerQueue.length > 0 && !enemy && p.stamina > 2) {
+        return scavengerQueue.shift()!;
+      }
+
       // ─── Combat ─────────────────────────────────────────────────
       if (enemy) {
         const ename = enemy.name;
-        // Survival first
-        if (hpFrac < 0.18) {
+        // Survival first — flee if HP critical OR if stamina ran
+        // out (a 0-stamina player can't attack effectively and was
+        // getting stuck in combat indefinitely without flee).
+        if (hpFrac < 0.18 || p.stamina <= 0) {
           mark('flee', 'survival flee');
           return 'flee';
         }
@@ -502,7 +620,7 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
     // 1 year baseline; extend to 2 if mechanism coverage is incomplete.
     const TARGET_DAY = 365;
     const EXTENDED_DAY = 730;
-    const MAX_ACTIONS = 16000;
+    const MAX_ACTIONS = 32000;
     let actions = 0;
     let endReason = 'max_actions';
     let targetDay = TARGET_DAY;
@@ -707,6 +825,21 @@ Crafted items:      ${Object.keys(craftedItems).length} unique
                     ${topN(craftedItems, 5).map(([k, v]) => `${k}×${v}`).join(', ') || '(none)'}
 
 Top log channels:   ${topN(channelCounts, 5).map(([k, v]) => `${k}=${v}`).join(', ')}
+
+─── Cartographer ─────────────────────────────────────
+Unique macro-regions: ${uniqueLocations.size}
+  ${[...uniqueLocations].join(', ') || '(none)'}
+Travel transitions:   ${travelSequence.length}
+First 6 travels:      ${travelSequence.slice(0, 6).map((t) => `${t.from}→${t.to}(${t.dir})`).join(' | ') || '(none)'}
+
+─── Scavenger ────────────────────────────────────────
+Interactions attempted: ${interactionsAttempted}
+Interactions succeeded: ${interactionsSucceeded} (${interactionsAttempted ? Math.round(interactionsSucceeded / interactionsAttempted * 100) : 0}%)
+Ghost objects:          ${ghostObjects.size}
+  ${[...ghostObjects].slice(0, 8).join(', ') || '(none)'}
+
+─── Narrative dissonance flags ────────────────────────
+${narrativeDissonance.length > 0 ? narrativeDissonance.slice(0, 5).join('\n') : '(none detected)'}
 
 ─── Mechanism coverage: ${exercised.size}/${MECHANISMS.length} ───
 ${exercisedList}
