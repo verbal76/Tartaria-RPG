@@ -635,6 +635,15 @@ interface GameStore {
    *  hydrate; cleared by dismissJustUpdated. */
   justUpdatedFromBuild: string | null;
   dismissJustUpdated: () => void;
+  /** Pre-fill text staged by ActionReferenceScreen (or any other
+   *  helper screen) for the next mount of InputBox on the exploration
+   *  screen. InputBox reads this once on mount + on changes, drops
+   *  it into the TextInput, and consumes it via consumeInputDraft.
+   *  Lets the player tap a help-card example like "ask about the"
+   *  and have it appear in the input box ready to finish typing. */
+  pendingInputDraft: string | null;
+  queueInputDraft: (text: string) => void;
+  consumeInputDraft: () => string | null;
 
   hydrate: () => Promise<void>;
   setScreen: (screen: ScreenName) => void;
@@ -766,6 +775,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   lastLookAt: null,
   wastelandStepsSinceEncounter: 0,
   justUpdatedFromBuild: null,
+  pendingInputDraft: null,
   cognitiveModelInfo: null,
 
   qwenStatus: 'idle',
@@ -828,6 +838,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   dismissJustUpdated() {
     set({ justUpdatedFromBuild: null });
+  },
+
+  queueInputDraft(text) {
+    set({ pendingInputDraft: text });
+  },
+
+  consumeInputDraft() {
+    const draft = get().pendingInputDraft;
+    if (draft !== null) set({ pendingInputDraft: null });
+    return draft;
   },
 
   async refreshSlots() {

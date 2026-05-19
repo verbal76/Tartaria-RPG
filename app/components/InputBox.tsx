@@ -4,6 +4,7 @@ import { TutorialTarget } from './TutorialTarget';
 import { getVoiceSettings, onVoiceSettingsChange } from '../voice/voiceSettings';
 import { isSpeaking as ttsIsSpeaking, stopAndClear as stopTTS } from '../voice/TTSManager';
 import { startListening, stopListening, isListening } from '../voice/STTManager';
+import { useGameStore } from '../state/gameStore';
 
 interface Props {
   onSubmit: (text: string) => void;
@@ -53,6 +54,25 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const [listening, setListening] = useState(false);
 
   useEffect(() => onVoiceSettingsChange(setVoice), []);
+
+  // Pull a pre-filled draft (e.g. an example phrase the player tapped
+  // on ActionReferenceScreen). Consume → reads + clears the store
+  // field in one shot so the draft doesn't keep re-applying every
+  // render. Polled at 250ms via the same loop as voice state since
+  // we're already there.
+  const consumeDraft = useGameStore((s) => s.consumeInputDraft);
+  const pendingDraft = useGameStore((s) => s.pendingInputDraft);
+  useEffect(() => {
+    if (pendingDraft !== null) {
+      const draft = consumeDraft();
+      if (draft) {
+        setText(draft);
+        // Defer focus by one tick so the TextInput is mounted +
+        // ready to receive the cursor.
+        setTimeout(() => inputRef.current?.focus(), 50);
+      }
+    }
+  }, [pendingDraft, consumeDraft]);
   useEffect(() => {
     if (!voice.ttsEnabled && !voice.sttEnabled) return;
     const t = setInterval(() => {

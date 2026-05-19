@@ -1,5 +1,6 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import conceptsData from '../data/lore/concepts.json';
 
@@ -229,6 +230,38 @@ function explanationFor(c: Concept): string {
 
 export function ActionReferenceScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
+  const queueInputDraft = useGameStore((s) => s.queueInputDraft);
+
+  // Per-card cycle index. Tapping a card cycles its example list:
+  // tap once → example[0] queues to input + clipboard; tap again →
+  // example[1]; wraps back to [0] after the last. Visual feedback is
+  // the "→ queued: '<phrase>'" line that appears under the card.
+  // Index defaults to -1 so the first tap shows example[0] cleanly
+  // (we increment THEN render).
+  const [cycleIdx, setCycleIdx] = useState<Record<string, number>>({});
+
+  // Same flag for the inline "✓ queued" pulse — keyed by card id with
+  // a timestamp so the pulse hides itself after ~1.4s without forcing
+  // a re-render dance.
+  const [pulseAt, setPulseAt] = useState<Record<string, number>>({});
+
+  const handleCardTap = (id: string, examples: string[]) => {
+    if (examples.length === 0) return;
+    const nextIdx = ((cycleIdx[id] ?? -1) + 1) % examples.length;
+    setCycleIdx((prev) => ({ ...prev, [id]: nextIdx }));
+    const phrase = examples[nextIdx]!;
+    queueInputDraft(phrase);
+    // Belt-and-suspenders — also drop on the clipboard so power-
+    // users can paste anywhere if they wanted (Google search, a
+    // note app, etc.). Fire-and-forget; we don't await.
+    void Clipboard.setStringAsync(phrase).catch(() => { /* ignore */ });
+    setPulseAt((prev) => ({ ...prev, [id]: Date.now() }));
+  };
+
+  const isQueued = (id: string) => {
+    const t = pulseAt[id];
+    return t !== undefined && Date.now() - t < 1400;
+  };
 
   return (
     <View style={styles.container}>
@@ -246,9 +279,9 @@ export function ActionReferenceScreen() {
       </View>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
         <Text style={styles.intro}>
-          What every action does, with the exact mechanics. Type the verb in
-          the input box and the engine routes it — or just tap any quick
-          button you see.
+          What every action does, with the exact mechanics. Tap any card to
+          drop its first example into the input box — tap again to cycle
+          through alternate phrasings. Hit BACK and finish the sentence.
         </Text>
         {SECTIONS.map((section) => (
           <View key={section.title} style={styles.section}>
@@ -257,17 +290,36 @@ export function ActionReferenceScreen() {
               const c = lookup(id);
               if (!c) return null;
               const examples = EXAMPLES[id] ?? [];
+              const queuedIdx = cycleIdx[id];
+              const queuedPhrase = queuedIdx !== undefined ? examples[queuedIdx] : null;
+              const queued = isQueued(id);
               return (
-                <View key={id} style={styles.card}>
+                <Pressable
+                  key={id}
+                  style={({ pressed }) => [
+                    styles.card,
+                    pressed && styles.cardPressed,
+                    queued && styles.cardQueued,
+                  ]}
+                  onPress={() => handleCardTap(id, examples)}
+                >
                   <Text style={styles.cardTitle}>{c.title}</Text>
                   <Text style={styles.cardBody}>{explanationFor(c)}</Text>
                   {examples.length > 0 && (
                     <Text style={styles.cardExamples}>
-                      <Text style={styles.cardExamplesLabel}>Type: </Text>
-                      {examples.map((ex) => `"${ex}"`).join(' · ')}
+                      <Text style={styles.cardExamplesLabel}>Tap to queue: </Text>
+                      {examples.map((ex, i) =>
+                        i === queuedIdx ? `[${ex}]` : `"${ex}"`,
+                      ).join(' · ')}
                     </Text>
                   )}
-                </View>
+                  {queued && queuedPhrase && (
+                    <Text style={styles.queuedHint}>
+                      ✓ &quot;{queuedPhrase}&quot; staged for the input box
+                      {examples.length > 1 ? ` (${(queuedIdx ?? 0) + 1}/${examples.length} — tap again to cycle)` : ''}
+                    </Text>
+                  )}
+                </Pressable>
               );
             })}
           </View>
@@ -326,6 +378,20 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 10,
     marginBottom: 6,
+  },
+  cardPressed: {
+    backgroundColor: '#1a1714',
+    borderColor: '#9ec96a',
+  },
+  cardQueued: {
+    borderColor: '#9ec96a',
+  },
+  queuedHint: {
+    color: '#9ec96a',
+    fontSize: 11,
+    marginTop: 4,
+    fontWeight: '700',
+    letterSpacing: 1,
   },
   cardTitle: {
     color: '#e6d8b3',
