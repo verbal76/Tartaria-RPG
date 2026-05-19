@@ -10,6 +10,7 @@ interface Props {
   onOpenInventory: () => void;
   onOpenSearch: () => void;
   onOpenCrafting: () => void;
+  onOpenApproach: () => void;
   inCombat: boolean;
   equippedMain: string | null;
   equippedOff: string | null;
@@ -34,7 +35,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, inCombat, equippedMain, equippedOff, range }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, inCombat, equippedMain, equippedOff, range }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
 
@@ -132,17 +133,18 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
 
   return (
     <View style={styles.container}>
-      {/* Quick-travel row — N / S / E / W as one-tap buttons. Travel
-          is the most-issued verb in playtest; pulling it onto the
-          quick row removes "go north" / "head east" typing every
-          step. Hidden in combat (cardinal travel is gated by enemy
-          presence anyway and the slot is needed for combat verbs). */}
+      {/* Quick-travel row — full-word buttons so they're easy to hit
+          without fat-fingering an adjacent direction. Travel is the
+          most-issued verb in playtest; pulling it onto the quick row
+          removes "go north" / "head east" typing every step. Hidden
+          in combat (cardinal travel is gated by enemy presence
+          anyway and the slot is needed for combat verbs). */}
       {!inCombat && (
         <View style={styles.travelRow}>
-          <QuickBtn label="N" onPress={() => onSubmit('go north')} />
-          <QuickBtn label="S" onPress={() => onSubmit('go south')} />
-          <QuickBtn label="E" onPress={() => onSubmit('go east')} />
-          <QuickBtn label="W" onPress={() => onSubmit('go west')} />
+          <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} />
+          <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} />
+          <TravelBtn label="EAST" onPress={() => onSubmit('go east')} />
+          <TravelBtn label="WEST" onPress={() => onSubmit('go west')} />
         </View>
       )}
       <TutorialTarget area="quick-row" style={styles.quickRow}>
@@ -167,6 +169,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 right after the weapons so swap/quaff flows are reachable
                 without scanning past dodge/block/advance. */}
             <QuickBtn label="inventory" onPress={onOpenInventory} />
+            {/* Approach in combat lets the player pick a SPECIFIC enemy
+                out of a multi-target encounter ("approach the human"
+                while the dragon and hellhound watch) plus optionally
+                slip in via stealth instead of closing the gap in the
+                open. */}
+            <QuickBtn label="approach" onPress={onOpenApproach} />
             <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} />
             <QuickBtn label="block" defensive onPress={() => onSubmit('block')} />
             {range && range !== 'arm' && (
@@ -187,6 +195,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               <QuickBtn key={qa} label={qa} onPress={() => onSubmit(qa)} />
             ))}
             <QuickBtn label="search" onPress={onOpenSearch} />
+            <QuickBtn label="approach" onPress={onOpenApproach} />
             <QuickBtn label="craft" onPress={onOpenCrafting} />
             <QuickBtn label="inventory" onPress={onOpenInventory} />
           </>
@@ -254,10 +263,31 @@ function QuickBtn({
   );
 }
 
+/** Bigger button for the travel row so it's easy to hit without
+ *  fat-fingering an adjacent direction. Equal-width flex layout
+ *  splits the available horizontal space across all four buttons. */
+function TravelBtn({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <TouchableOpacity style={styles.travelBtn} onPress={onPress} activeOpacity={0.7}>
+      <Text style={styles.travelBtnText}>{label}</Text>
+    </TouchableOpacity>
+  );
+}
+
 const styles = StyleSheet.create({
   container: { gap: 6 },
   quickRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
-  travelRow: { flexDirection: 'row', gap: 6, marginBottom: 4 },
+  travelRow: { flexDirection: 'row', gap: 6, marginBottom: 6 },
+  travelBtn: {
+    flex: 1,
+    backgroundColor: '#1a1714',
+    borderColor: '#5a4a2e',
+    borderWidth: 1,
+    paddingVertical: 10,
+    borderRadius: 4,
+    alignItems: 'center',
+  },
+  travelBtnText: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
   quick: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',

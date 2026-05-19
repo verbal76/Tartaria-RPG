@@ -8,6 +8,7 @@ import { DiceRoller } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
+import { ApproachModal } from '../components/ApproachModal';
 import { TutorialTarget } from '../components/TutorialTarget';
 import { findWeaponByName } from '../engine/crafting';
 
@@ -48,6 +49,7 @@ export function ExplorationScreen() {
   const setActiveEnemyIdx = useGameStore((s) => s.setActiveEnemyIdx);
 
   const [searchOpen, setSearchOpen] = useState(false);
+  const [approachOpen, setApproachOpen] = useState(false);
 
   // Build one view per enemy in the scene. Tap-to-cycle is wired through
   // the store's setActiveEnemyIdx so combat handlers always target the
@@ -181,6 +183,7 @@ export function ExplorationScreen() {
             onOpenInventory={() => setScreen('inventory')}
             onOpenSearch={() => setSearchOpen(true)}
             onOpenCrafting={() => setScreen('crafting')}
+            onOpenApproach={() => setApproachOpen(true)}
             inCombat={inCombat}
             equippedMain={equippedMain}
             equippedOff={equippedOff}
@@ -208,6 +211,27 @@ export function ExplorationScreen() {
           submit(`search the ${target}`);
         }}
         onCancel={() => setSearchOpen(false)}
+      />
+
+      <ApproachModal
+        visible={approachOpen}
+        enemyHints={currentScene?.enemies.map((e) => e.name) ?? []}
+        sceneHints={currentScene?.ambientNouns ?? []}
+        vendorName={currentScene?.vendor?.name}
+        onSubmit={(target, useStealth) => {
+          setApproachOpen(false);
+          // Stealth-on routes through the stealth intent (sneak verb
+          // → DEX skill check). Stealth-off routes through the
+          // approach/advance verb chain — in combat that closes the
+          // gap and switches focus to the named enemy; out of combat
+          // it runs the intra-scene move-toward narration.
+          if (useStealth) {
+            submit(`sneak up on ${target}`);
+          } else {
+            submit(`approach ${target}`);
+          }
+        }}
+        onCancel={() => setApproachOpen(false)}
       />
     </KeyboardAvoidingView>
   );

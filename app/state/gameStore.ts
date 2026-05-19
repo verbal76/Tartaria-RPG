@@ -978,43 +978,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (canMerge) {
         const merged = { ...lastEntry, text: `${lastEntry.text}  ${text}`, ts: entry.ts };
         const mergedLog = [...state.gameLog.slice(0, -1), merged].slice(-MAX_LOG_IN_MEMORY);
-        // World-channel noun extraction still fires on the new fragment.
-        if (channel === 'world' && state.currentScene) {
-          const newNouns = extractAmbientNouns(text);
-          if (newNouns.length > 0) {
-            const mergedSet = new Set(state.currentScene.ambientNouns ?? []);
-            for (const n of newNouns) mergedSet.add(n);
-            const nextNouns = Array.from(mergedSet).slice(-80);
-            return {
-              gameLog: mergedLog,
-              currentScene: { ...state.currentScene, ambientNouns: nextNouns },
-            };
-          }
-        }
+        // NOTE: previously this branch extracted ambient nouns from
+        // the merged text and pushed them into scene.ambientNouns.
+        // Playtest report: the search modal's in-scene chips started
+        // showing "negotiate / wind / words / voice / carries" —
+        // verbs and abstract nouns pulled out of Arbiter REFUSAL
+        // prose (e.g. "No one is here to negotiate with. The wind
+        // takes the words.") that had nothing to do with the actual
+        // scene's interactable props. The auto-extraction is gone.
+        // beginScene's one-time extractAmbientNouns(location.description)
+        // pass remains the canonical source; hook plants push new
+        // nouns via Hook.nouns explicitly.
         return { gameLog: mergedLog };
       }
-      // Phase 4 follow-up §1 — last-world-line vocabulary. Every noun in a
-      // [world] line gets folded into the scene's ambient noun pool so the
-      // parser matches the player's natural next move. If the world just
-      // said "a foot print, far larger than any human boot" then typing
-      // "investigate footprint" resolves cleanly next turn instead of the
-      // "I do not see a 'footprint' here" rejection that dominated the
-      // playtest log.
-      if (channel === 'world' && state.currentScene) {
-        const newNouns = extractAmbientNouns(text);
-        if (newNouns.length > 0) {
-          const merged = new Set(state.currentScene.ambientNouns ?? []);
-          for (const n of newNouns) merged.add(n);
-          // Cap at 80 to prevent unbounded growth across a long visit.
-          // The matcher's longest-first sort means recent additions still
-          // win even when older nouns are present.
-          const next = Array.from(merged).slice(-80);
-          return {
-            gameLog: nextLog,
-            currentScene: { ...state.currentScene, ambientNouns: next },
-          };
-        }
-      }
+      // NOTE: previously this extracted ambient nouns from every
+      // world-channel log entry to fold into the scene's noun pool.
+      // Playtest caught the failure mode — the search modal's in-
+      // scene chips were showing "negotiate / wind / words / voice /
+      // carries", verbs and abstractions pulled out of Arbiter
+      // refusal prose ("No one is here to negotiate with. The wind
+      // takes the words. Your voice carries across empty ground.").
+      // The 80-noun cap also slowly pushed legitimate scene nouns
+      // (crates, brazier, guards) OUT of the pool as junk piled in.
+      // Disabled — beginScene's one-time
+      // extractAmbientNouns(location.description) pass is canonical;
+      // hook plants push genuine nouns via Hook.nouns explicitly.
       return { gameLog: nextLog };
     });
   },
@@ -2539,6 +2527,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       case 'advance':
       case 'retreat': {
+        // Approach <enemy name> in a multi-enemy fight should switch
+        // active focus to that enemy first, then close the gap.
+        // Playtest spec: "if I'm getting attacked by a dragon, a
+        // hellhound and a human I can hit approach human which might
+        // take me out of damage range of the other two and put me in
+        // striking range of that one."
+        const advanceTarget = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
+        if (advanceTarget && currentScene.enemies.length > 1) {
+          const t = advanceTarget.toLowerCase();
+          const idx = currentScene.enemies.findIndex((e) =>
+            e.name.toLowerCase().includes(t)
+            || (e.aliases ?? []).some((a) => a.toLowerCase().includes(t)),
+          );
+          if (idx >= 0 && idx !== currentScene.activeEnemyIdx) {
+            set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: idx } } : s));
+            get().appendLog('world', `You shift focus to ${currentScene.enemies[idx]!.name}.`);
+          }
+        }
+        // Outside combat, advance with an in-scene target turns into
+        // an intra-scene walk-to. Without a target it still hits the
+        // "nothing to advance on" refusal in runMoveCombatRange.
+        if (currentScene.enemies.length === 0 && advanceTarget) {
+          const ambient = matchAmbientNoun(advanceTarget, currentScene.ambientNouns ?? []);
+          const hookHit = matchHookNoun(advanceTarget, currentScene.hooks ?? []);
+          const vendorHit = currentScene.vendor && advanceTarget.toLowerCase().includes((currentScene.vendor.name.toLowerCase().split(/\s+/)[0] ?? ''))
+            ? currentScene.vendor.name
+            : null;
+          const noun = ambient ?? hookHit?.nouns[0] ?? vendorHit;
+          if (noun) {
+            set({ player: advanceTime(spendStamina(player, 1), 0.25) });
+            get().appendLog('world', `You move across the ground to the ${noun.toLowerCase()}. Close enough now to act on it.`);
+            break;
+          }
+        }
         runMoveCombatRange(get, set, player, currentScene, parsed.intent);
         break;
       }
