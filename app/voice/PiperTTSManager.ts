@@ -313,6 +313,14 @@ export async function refreshPiperEngine(): Promise<void> {
  *  expo-av Sound. Returns once playback finishes (so the queue drains
  *  in order). */
 async function playPcm(samples: Float32Array, sampleRate: number): Promise<void> {
+  // Smooth the head + tail of the waveform to eliminate the audible
+  // click between sentences. Kokoro's PCM output starts / ends at
+  // non-zero amplitude on most utterances; cutting playback on
+  // didJustFinish then immediately starting the next utterance
+  // produces a sharp transient at the join. A 10ms linear ramp at
+  // each end (≈ 220 samples at 22.05 kHz) is inaudible as a fade
+  // but kills the click.
+  applyFadeEnvelope(samples, sampleRate, 10);
   const wavBase64 = encodeWav(samples, sampleRate);
   const { sound } = await Audio.Sound.createAsync(
     { uri: `data:audio/wav;base64,${wavBase64}` },
@@ -329,6 +337,21 @@ async function playPcm(samples: Float32Array, sampleRate: number): Promise<void>
       }
     });
   });
+}
+
+/** Apply a linear fade-in to the first `fadeMs` and fade-out to the
+ *  last `fadeMs` of the buffer. Mutates the array in place. */
+function applyFadeEnvelope(samples: Float32Array, sampleRate: number, fadeMs: number): void {
+  const fadeSamples = Math.min(
+    Math.floor((sampleRate * fadeMs) / 1000),
+    Math.floor(samples.length / 2),
+  );
+  if (fadeSamples <= 1) return;
+  for (let i = 0; i < fadeSamples; i++) {
+    const g = i / fadeSamples;
+    samples[i] = samples[i]! * g;
+    samples[samples.length - 1 - i] = samples[samples.length - 1 - i]! * g;
+  }
 }
 
 /** Convert Float32Array PCM samples [-1, 1] to a 16-bit mono WAV file,

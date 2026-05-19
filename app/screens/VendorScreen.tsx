@@ -4,6 +4,11 @@ import { useGameStore } from '../state/gameStore';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview } from '../components/itemPreview';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
+import { availableFactionQuests, FACTION_QUESTS } from '../engine/factionQuests';
+import { availableHunts, HUNTS } from '../engine/hunts';
+import { availableMysteries, MYSTERIES } from '../engine/mysteries';
+import { availableStorylines, STORYLINES } from '../engine/factionStorylines';
+import { getStanding } from '../engine/factions';
 
 function rarityColor(rarity: string | null | undefined): string {
   switch (rarity) {
@@ -14,11 +19,12 @@ function rarityColor(rarity: string | null | undefined): string {
   }
 }
 
-type Mode = 'buy' | 'sell';
+type Mode = 'buy' | 'sell' | 'contracts';
 type Pending =
   | { mode: 'buy'; itemName: string; price: number }
   | { mode: 'sell'; itemName: string; price: number }
   | { mode: 'dismiss' }
+  | { mode: 'accept'; kind: 'faction' | 'hunt' | 'mystery' | 'storyline'; title: string; reward: string }
   | null;
 
 export function VendorScreen() {
@@ -28,6 +34,10 @@ export function VendorScreen() {
   const buyFromVendor = useGameStore((s) => s.buyFromVendor);
   const sellToVendor = useGameStore((s) => s.sellToVendor);
   const dismissVendor = useGameStore((s) => s.dismissVendor);
+  const acceptFactionQuest = useGameStore((s) => s.acceptFactionQuest);
+  const acceptHunt = useGameStore((s) => s.acceptHunt);
+  const acceptMystery = useGameStore((s) => s.acceptMystery);
+  const acceptStoryline = useGameStore((s) => s.acceptStoryline);
 
   const [mode, setMode] = useState<Mode>('buy');
   const [pending, setPending] = useState<Pending>(null);
@@ -58,10 +68,16 @@ export function VendorScreen() {
     if (pending.mode === 'buy') buyFromVendor(pending.itemName);
     else if (pending.mode === 'sell') sellToVendor(pending.itemName);
     else if (pending.mode === 'dismiss') dismissVendor();
+    else if (pending.mode === 'accept') {
+      if (pending.kind === 'faction') acceptFactionQuest(pending.title);
+      else if (pending.kind === 'hunt') acceptHunt(pending.title);
+      else if (pending.kind === 'mystery') acceptMystery(pending.title);
+      else if (pending.kind === 'storyline') acceptStoryline(pending.title);
+    }
     setPending(null);
   };
 
-  const preview = pending && pending.mode !== 'dismiss'
+  const preview = pending && (pending.mode === 'buy' || pending.mode === 'sell')
     ? getItemPreview(pending.itemName)
     : null;
   const canAffordPending = pending?.mode === 'buy' ? player.tc >= pending.price : true;
@@ -137,10 +153,153 @@ export function VendorScreen() {
         >
           <Text style={[styles.tabText, mode === 'sell' && styles.tabTextActive]}>SELL</Text>
         </TouchableOpacity>
+        {vendor.faction && (
+          <TouchableOpacity
+            style={[styles.tab, mode === 'contracts' && styles.tabActive]}
+            onPress={() => setMode('contracts')}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.tabText, mode === 'contracts' && styles.tabTextActive]}>CONTRACTS</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
-        {mode === 'buy' ? (
+        {mode === 'contracts' ? (
+          (() => {
+            if (!vendor.faction) return <Text style={styles.empty}>This trader doesn't carry contracts.</Text>;
+            const rep = getStanding(player.factionStanding, vendor.faction);
+            const quests = availableFactionQuests(
+              vendor.faction,
+              rep,
+              player.activeFactionQuestIds ?? [],
+              player.completedFactionQuestIds ?? [],
+            );
+            const hunts = availableHunts(
+              vendor.faction,
+              rep,
+              (player.activeHunts ?? []).map((h) => h.id),
+              player.completedHuntIds ?? [],
+            );
+            const mysteries = availableMysteries(
+              vendor.faction,
+              rep,
+              (player.activeMysteries ?? []).map((m) => m.id),
+              player.completedMysteryIds ?? [],
+            );
+            const stories = availableStorylines(
+              vendor.faction,
+              rep,
+              (player.activeStorylines ?? []).map((s) => s.id),
+              player.completedStorylineIds ?? [],
+            );
+            const total = quests.length + hunts.length + mysteries.length + stories.length;
+            if (total === 0) {
+              return (
+                <Text style={styles.empty}>
+                  {vendor.name} has no contracts on offer for you right now. Build reputation with the {vendor.faction.replace(/_/g, ' ')} or finish what you're already carrying.
+                </Text>
+              );
+            }
+            return (
+              <>
+                {quests.length > 0 && (
+                  <View style={styles.contractSection}>
+                    <Text style={styles.contractSectionTitle}>FACTION CONTRACTS</Text>
+                    {quests.map((q) => (
+                      <TouchableOpacity
+                        key={`fq_${q.id}`}
+                        style={styles.contractRow}
+                        onPress={() => setPending({ mode: 'accept', kind: 'faction', title: q.title, reward: `${q.reward.tc} TC, +${q.reward.rep} rep` })}
+                        activeOpacity={0.7}
+                      >
+                        <View style={[styles.offerStripe, { backgroundColor: '#c9a86a' }]} />
+                        <View style={styles.offerBody}>
+                          <View style={styles.offerHead}>
+                            <Text style={styles.offerName} numberOfLines={2}>{q.title}</Text>
+                            <Text style={styles.contractReward}>{q.reward.tc} TC</Text>
+                          </View>
+                          <Text style={styles.contractBody}>{q.objective}</Text>
+                          <Text style={styles.contractDesc} numberOfLines={3}>{q.description}</Text>
+                          <Text style={styles.contractAccept}>tap to accept</Text>
+                        </View>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+                {hunts.length > 0 && (
+                  <View style={styles.contractSection}>
+                    <Text style={styles.contractSectionTitle}>BOUNTIES</Text>
+                    {hunts.map((h) => (
+                      <TouchableOpacity
+                        key={`h_${h.id}`}
+                        style={styles.contractRow}
+                        onPress={() => setPending({ mode: 'accept', kind: 'hunt', title: h.title, reward: `${h.rewardTc} TC${h.rewardRep ? `, +${h.rewardRep} rep` : ''}` })}
+                        activeOpacity={0.7}
+                      >
+                        <View style={[styles.offerStripe, { backgroundColor: '#e07a5f' }]} />
+                        <View style={styles.offerBody}>
+                          <View style={styles.offerHead}>
+                            <Text style={styles.offerName} numberOfLines={2}>{h.title}</Text>
+                            <Text style={styles.contractReward}>{h.rewardTc} TC</Text>
+                          </View>
+                          <Text style={styles.contractDesc} numberOfLines={3}>{h.posterText}</Text>
+                          <Text style={styles.contractAccept}>tap to accept</Text>
+                        </View>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+                {mysteries.length > 0 && (
+                  <View style={styles.contractSection}>
+                    <Text style={styles.contractSectionTitle}>MYSTERIES</Text>
+                    {mysteries.map((m) => (
+                      <TouchableOpacity
+                        key={`m_${m.id}`}
+                        style={styles.contractRow}
+                        onPress={() => setPending({ mode: 'accept', kind: 'mystery', title: m.title, reward: `${m.rewardTc} TC${m.rewardRep ? `, +${m.rewardRep} rep` : ''}` })}
+                        activeOpacity={0.7}
+                      >
+                        <View style={[styles.offerStripe, { backgroundColor: '#b88ce0' }]} />
+                        <View style={styles.offerBody}>
+                          <View style={styles.offerHead}>
+                            <Text style={styles.offerName} numberOfLines={2}>{m.title}</Text>
+                            <Text style={styles.contractReward}>{m.rewardTc} TC</Text>
+                          </View>
+                          <Text style={styles.contractDesc} numberOfLines={3}>{m.posterText}</Text>
+                          <Text style={styles.contractAccept}>tap to accept</Text>
+                        </View>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+                {stories.length > 0 && (
+                  <View style={styles.contractSection}>
+                    <Text style={styles.contractSectionTitle}>STORYLINES</Text>
+                    {stories.map((s) => (
+                      <TouchableOpacity
+                        key={`s_${s.id}`}
+                        style={styles.contractRow}
+                        onPress={() => setPending({ mode: 'accept', kind: 'storyline', title: s.title, reward: `${s.rewardTc} TC, +${s.rewardRep} rep` })}
+                        activeOpacity={0.7}
+                      >
+                        <View style={[styles.offerStripe, { backgroundColor: '#9ec96a' }]} />
+                        <View style={styles.offerBody}>
+                          <View style={styles.offerHead}>
+                            <Text style={styles.offerName} numberOfLines={2}>{s.title}</Text>
+                            <Text style={styles.contractReward}>{s.rewardTc} TC</Text>
+                          </View>
+                          <Text style={styles.contractDesc} numberOfLines={3}>{s.posterText}</Text>
+                          <Text style={styles.contractAccept}>tap to accept</Text>
+                        </View>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+              </>
+            );
+          })()
+        ) : mode === 'buy' ? (
           vendor.offers.length === 0 ? (
             <Text style={styles.empty}>The vendor's pack is empty. Nothing more to trade.</Text>
           ) : (
@@ -252,21 +411,25 @@ export function VendorScreen() {
             ? `Dismiss ${vendor.name}?`
             : pending?.mode === 'sell'
               ? `Sell to ${vendor.name}`
-              : canAffordPending
-                ? `Buy from ${vendor.name}`
-                : 'Not enough TC'
+              : pending?.mode === 'accept'
+                ? `Accept "${pending.title}"`
+                : canAffordPending
+                  ? `Buy from ${vendor.name}`
+                  : 'Not enough TC'
         }
-        itemPreview={preview}
+        itemPreview={pending?.mode === 'accept' ? null : preview}
         contextLine={
           pending?.mode === 'dismiss'
             ? 'They leave the scene. New offers will come from the next vendor who shows up.'
             : pending?.mode === 'sell'
               ? `Price: +${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.price} TC`
-              : pending?.mode === 'buy'
-                ? canAffordPending
-                  ? `Price: ${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc - pending.price} TC`
-                  : `Price: ${pending.price} TC   ·   You only have ${player.tc} TC.`
-                : undefined
+              : pending?.mode === 'accept'
+                ? `Reward on completion: ${pending.reward}. The contract starts now — you can review it on the Contracts screen.`
+                : pending?.mode === 'buy'
+                  ? canAffordPending
+                    ? `Price: ${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc - pending.price} TC`
+                    : `Price: ${pending.price} TC   ·   You only have ${player.tc} TC.`
+                  : undefined
         }
         buttons={
           pending?.mode === 'dismiss'
@@ -279,12 +442,17 @@ export function VendorScreen() {
                   { label: 'Cancel', onPress: cancel, tone: 'neutral' },
                   { label: 'Sell', onPress: confirmAction, tone: 'primary' },
                 ]
-              : pending?.mode === 'buy' && canAffordPending
+              : pending?.mode === 'accept'
                 ? [
                     { label: 'Cancel', onPress: cancel, tone: 'neutral' },
-                    { label: 'Buy', onPress: confirmAction, tone: 'primary' },
+                    { label: 'Accept', onPress: confirmAction, tone: 'primary' },
                   ]
-                : [{ label: 'OK', onPress: cancel, tone: 'neutral' }]
+                : pending?.mode === 'buy' && canAffordPending
+                  ? [
+                      { label: 'Cancel', onPress: cancel, tone: 'neutral' },
+                      { label: 'Buy', onPress: confirmAction, tone: 'primary' },
+                    ]
+                  : [{ label: 'OK', onPress: cancel, tone: 'neutral' }]
         }
         onRequestClose={cancel}
       />
@@ -385,6 +553,25 @@ const styles = StyleSheet.create({
   offerRowBroke: { opacity: 0.45 },
   offerStripe: { width: 4 },
   offerBody: { flex: 1, padding: 10 },
+  // CONTRACTS tab — vendor-side list of available hunts / mysteries
+  // / storylines / faction quests. Reuses offerStripe / offerHead /
+  // offerName from the BUY rows but with quest-specific reward +
+  // body styling.
+  contractSection: { marginBottom: 10 },
+  contractSectionTitle: { color: '#c9a86a', fontSize: 11, letterSpacing: 2, fontWeight: '700', marginBottom: 6 },
+  contractRow: {
+    flexDirection: 'row',
+    backgroundColor: '#13110f',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    marginBottom: 6,
+    overflow: 'hidden',
+  },
+  contractReward: { color: '#9ec96a', fontSize: 13, fontWeight: '700' },
+  contractBody: { color: '#cdbf99', fontSize: 12, marginTop: 2, marginBottom: 4, fontStyle: 'italic' },
+  contractDesc: { color: '#a89c7a', fontSize: 11, lineHeight: 15 },
+  contractAccept: { color: '#c9a86a', fontSize: 10, marginTop: 6, letterSpacing: 1, fontStyle: 'italic' },
   offerHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   offerName: { color: '#e6d8b3', fontSize: 14, fontWeight: '700', flex: 1, marginRight: 8 },
   offerPrice: { color: '#c9a86a', fontSize: 12, fontWeight: '700' },
