@@ -552,6 +552,12 @@ export interface VisitedRoom {
    *  area-search / open / disarm handlers consult this to keep
    *  containers from re-closing themselves on re-entry. */
   containersOpened?: string[];
+  /** Ambient nouns the player has already area-searched in this
+   *  room. The investigate handler checks this BEFORE rolling fresh
+   *  area-search dice — a repeat search hits a hard "already
+   *  searched, nothing more to do" line instead of looping the
+   *  player on the same prop. */
+  searchedAmbientNouns?: string[];
   /** Audit fix — in-game hours elapsed at the most recent visit.
    *  Used by respawn-quiet calculation so idling for 6 real hours
    *  doesn't accidentally trigger respawn even when no in-game time

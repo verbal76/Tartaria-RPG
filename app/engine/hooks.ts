@@ -660,6 +660,20 @@ export function matchHookNoun(target: string | undefined, hooks: readonly Hook[]
   return null;
 }
 
+/** Same as matchHookNoun but does NOT skip resolved hooks. Used by
+ *  the investigate handler to detect a player re-targeting a hook
+ *  they've already exhausted, so we can hard-print "already
+ *  searched" instead of falling through to MiniLM / area-search and
+ *  giving them noisy guess-text. */
+export function matchAnyHookNoun(target: string | undefined, hooks: readonly Hook[]): Hook | null {
+  if (!target) return null;
+  const t = target.toLowerCase();
+  for (const hook of hooks) {
+    if (hook.nouns.some((n) => t.includes(n) || n.includes(t))) return hook;
+  }
+  return null;
+}
+
 // Atmospheric hooks plant less often so chains feel earned. The lore-heavy
 // ones (Sentinel, Giant, Black Cloak, Storm) are deliberately rarer so they
 // land like events.

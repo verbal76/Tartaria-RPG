@@ -129,12 +129,18 @@ export class CognitiveOrchestrator {
   // return the candidate the player most likely meant. Used as a fallback
   // when the regex-based parser doesn't resolve a target.
   //
-  // Threshold tuned conservatively (0.45) so we don't false-match common
-  // verbs like "go" / "look" to random nouns.
+  // Threshold raised to 0.85 after playtest caught a semantic-drift
+  // bug: "search tarek" (NPC name) resolved to "great tartary" at
+  // 0.66 similarity and silently hijacked the action. 0.85 is a
+  // hard guard against the embedding model picking the
+  // least-bad match when no real candidate exists. Callers that
+  // want a looser match (e.g. crafting recipe disambiguation —
+  // "aethetic vest" → "Aetheric Vest") pass an explicit lower
+  // threshold; raw target → scene-noun resolution uses this floor.
   async inferTarget(
     input: string,
     candidates: readonly string[],
-    threshold = 0.45,
+    threshold = 0.85,
   ): Promise<{ target: string; score: number } | null> {
     if (!this.isReady() || candidates.length === 0) return null;
     const seen = new Set<string>();

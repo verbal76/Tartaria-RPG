@@ -118,6 +118,7 @@ import {
   type HookEffect,
   getHookOutcome,
   matchHookNoun,
+  matchAnyHookNoun,
   pickRandomHookKind,
   plantHookByKind,
 } from '../engine/hooks';
@@ -1262,6 +1263,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // these arrays directly when the player acts.
             droppedItems: existing?.droppedItems ?? [],
             containersOpened: existing?.containersOpened ?? [],
+            searchedAmbientNouns: existing?.searchedAmbientNouns ?? [],
             hoursElapsedAtVisit: hoursElapsed,
           },
         },
@@ -1902,9 +1904,59 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // an atmospheric hook plant. Always engaging, never reprompting
         // for these.
         if (rawTarget && isAreaSearch(rawTarget)) {
+          // One-and-done — has the player already area-searched this
+          // exact noun in this room? Hard-print the already-searched
+          // line and bail (no stamina cost, no dice). Playtest
+          // feedback on lockboxes / wagons / crates: repeat searches
+          // were spinning loot rolls forever instead of telling the
+          // player the prop was done.
+          const searchRoomKey = makeRoomKey(
+            player.currentLocationId,
+            currentScene.microMicroId,
+            player.mapX,
+            player.mapY,
+          );
+          const priorVisit = get().worldMemory.visitedRooms?.[searchRoomKey];
+          const loweredTarget = rawTarget.toLowerCase().trim();
+          const alreadySearched = (priorVisit?.searchedAmbientNouns ?? []).some(
+            (n) => n === loweredTarget || loweredTarget.includes(n) || n.includes(loweredTarget),
+          );
+          if (alreadySearched) {
+            get().appendLog(
+              'world',
+              `You already searched the ${loweredTarget}. There is nothing more to do with it.`,
+            );
+            break;
+          }
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
           const outcome = rollAreaSearch(rawTarget);
           get().appendLog('world', outcome.line);
+          // Mark this noun as searched on the visited-room record so
+          // a re-search hits the alreadySearched branch above. We
+          // record every outcome kind — even materials/TC/hooks
+          // count as "you've inspected this prop; come back when you
+          // find something new to do with it".
+          set((s) => {
+            const room = s.worldMemory.visitedRooms?.[searchRoomKey] ?? {
+              firstVisitAt: Date.now(),
+              lastVisitAt: Date.now(),
+              visitCount: 1,
+            };
+            const prevSearched = room.searchedAmbientNouns ?? [];
+            if (prevSearched.includes(loweredTarget)) return s;
+            return {
+              worldMemory: {
+                ...s.worldMemory,
+                visitedRooms: {
+                  ...(s.worldMemory.visitedRooms ?? {}),
+                  [searchRoomKey]: {
+                    ...room,
+                    searchedAmbientNouns: [...prevSearched, loweredTarget],
+                  },
+                },
+              },
+            };
+          });
           if (outcome.kind === 'material') {
             const itemCat = lookupCraftedItem(outcome.itemName);
             const isStackableCommodity = itemCat.kind === 'consumable' || itemCat.kind === 'misc';
@@ -1963,17 +2015,59 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           break;
         }
+        // 4.5) NPC hard-match — fires BEFORE MiniLM so "search tarek"
+        // can't drift to "great tartary" via cosine similarity.
+        // Playtest log: MiniLM resolved "tarek" → "tartary" at 0.66
+        // and hijacked the action into a wilderness search. Hard-
+        // matching the active vendor (which IS the hub-room anchor
+        // NPC when in a hub room) catches the player's intent
+        // cleanly and short-circuits the cognitive layer.
+        if (rawTarget && currentScene.vendor?.name) {
+          const lowered = rawTarget.toLowerCase().trim();
+          const npcName = currentScene.vendor.name.toLowerCase();
+          // First word of the NPC name (Tarek / Irma / Halem / Jorah)
+          // is the common short form the player types.
+          const firstName = npcName.split(/\s+/)[0] ?? npcName;
+          const isNpcMatch = npcName.includes(lowered) || lowered.includes(firstName);
+          if (isNpcMatch) {
+            get().appendLog(
+              'world',
+              `You turn your attention to ${currentScene.vendor.name}. They glance up — focused on their own work, not yours. (Use 'gift', 'sell', 'accept', or 'recruit' if you mean to engage.)`,
+            );
+            break;
+          }
+        }
+        // 4.6) Resolved-hook hard-print — if the player's target
+        // matches a hook they've already exhausted (the wagon, the
+        // lockbox, etc.), bypass loot tables / LLM flavor and tell
+        // them straight up. Playtest feedback: "Lockbox / Wagon"
+        // bug — players were getting noisy guess-text instead of a
+        // definitive "you already searched this".
+        if (rawTarget) {
+          const anyHook = matchAnyHookNoun(rawTarget, currentScene.hooks ?? []);
+          if (anyHook?.resolved) {
+            const noun = anyHook.nouns[0] ?? 'it';
+            get().appendLog('world', `You already searched the ${noun}. There is nothing more to do with it.`);
+            break;
+          }
+        }
         // 5) Player aimed at something specific the engine can't recognise.
         // First try a semantic resolution via MiniLM — embed the raw target
         // + scene candidates, find the closest cosine match. If it lands
-        // above threshold, re-run the action with the inferred target.
-        // Otherwise re-prompt politely.
+        // above threshold (0.85), re-run the action with the inferred
+        // target. Otherwise re-prompt politely.
         if (rawTarget) {
           if (cognitive.isReady()) {
             const candidates = [
               ...(currentScene.ambientNouns ?? []),
               ...(currentScene.hooks ?? []).filter((h) => !h.resolved).flatMap((h) => h.nouns),
               ...currentScene.enemies.map((e) => e.name),
+              // Vendor name in the candidate pool as a backstop —
+              // hard-match above catches it first, but if a future
+              // playtest finds an alias we haven't covered, MiniLM
+              // can still resolve it (at the new 0.85 floor, only a
+              // genuinely-confident match will land).
+              ...(currentScene.vendor?.name ? [currentScene.vendor.name] : []),
               currentScene.location.name,
               ...(currentScene.hazard ? [currentScene.hazard.name] : []),
             ];

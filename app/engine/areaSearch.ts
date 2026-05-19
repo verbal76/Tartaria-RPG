@@ -82,11 +82,13 @@ const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
   { name: 'Aetheric Shard', rarity: 'Uncommon', weight: 3 },
 ];
 
+// Empty-search narration. Per the playtest "Lockbox/Wagon"
+// feedback, this line MUST be definitive — players were rolling
+// atmospheric flavor lines repeatedly and not realising there was
+// nothing to find. The line below is the one hard mechanical
+// signal the player needs to move on.
 const NOTHING_LINES = [
-  'You sift through. {target}. Nothing of worth — silt over silt.',
-  'You comb {target}. Dust, dust, and more dust.',
-  'You feel through {target}. Cold, empty, slightly damp.',
-  'You search {target}. Whatever was here is long gone.',
+  'You search {target}. It is completely empty.',
 ];
 
 const MATERIAL_LINES = [
