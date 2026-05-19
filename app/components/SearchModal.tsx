@@ -8,6 +8,7 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Pressable,
+  Keyboard,
 } from 'react-native';
 
 interface Props {
@@ -29,25 +30,33 @@ export function SearchModal({ visible, hints, onSubmit, onCancel }: Props) {
   useEffect(() => {
     if (visible) {
       setText('');
-      // Wait for the modal to mount before focusing.
-      const t = setTimeout(() => inputRef.current?.focus(), 100);
-      return () => clearTimeout(t);
     }
     return undefined;
   }, [visible]);
+  // NOTE: previously auto-focused the TextInput on open. That popped
+  // the keyboard up, which reflowed the modal layout — and the first
+  // tap on a chip landed where the chip USED to be, requiring a
+  // second tap to actually fire. Don't auto-focus; the player can
+  // tap the input field if they want to type. Chip-tap is the
+  // primary interaction.
 
   const handleSubmit = () => {
     const trimmed = text.trim();
     if (!trimmed) return;
+    Keyboard.dismiss();
     onSubmit(trimmed);
   };
 
   // One-tap search targets. Playtest feedback: "I'm not typing the
   // ground or the hall or the wall over and over again." Chip taps
-  // submit directly so the player doesn't fight the keyboard. Scene-
-  // mentioned nouns (from props.hints) come first so the player can
-  // see exactly what the current room offers.
-  const tapToSearch = (target: string) => onSubmit(target);
+  // submit directly so the player doesn't fight the keyboard.
+  // Keyboard.dismiss() before submit so if the player DID focus the
+  // input first, the keyboard collapses cleanly before the modal
+  // closes.
+  const tapToSearch = (target: string) => {
+    Keyboard.dismiss();
+    onSubmit(target);
+  };
   const sceneHints = (hints ?? []).slice(0, 5);
   const commonHints = ['the ground', 'the wall', 'the rubble', 'the silt', 'the doorway'];
 

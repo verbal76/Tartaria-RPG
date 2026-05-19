@@ -8,6 +8,7 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
   Pressable,
+  Keyboard,
 } from 'react-native';
 
 interface Props {
@@ -52,19 +53,25 @@ export function ApproachModal({
   useEffect(() => {
     if (visible) {
       setText('');
-      const t = setTimeout(() => inputRef.current?.focus(), 100);
-      return () => clearTimeout(t);
     }
     return undefined;
   }, [visible]);
+  // No auto-focus on the TextInput — the keyboard popping up reflows
+  // the modal layout and the first tap on a chip lands where the chip
+  // used to be (forcing a second tap to actually fire). Player can
+  // tap the input field if they want to type.
 
   const handleSubmit = () => {
     const trimmed = text.trim();
     if (!trimmed) return;
+    Keyboard.dismiss();
     onSubmit(trimmed, useStealth);
   };
 
-  const tapToApproach = (target: string) => onSubmit(target, useStealth);
+  const tapToApproach = (target: string) => {
+    Keyboard.dismiss();
+    onSubmit(target, useStealth);
+  };
 
   // Common things players approach when no scene-specific target
   // jumps out. Mix of combat-y and exploration-y so the button works

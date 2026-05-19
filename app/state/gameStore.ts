@@ -2374,10 +2374,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // a hub-internal exit. Cardinal travel out of a hub room
           // means the player is leaving the outpost into the wilds —
           // clear hubRoomId now so subsequent dig / search calls don't
-          // get refused with "the outpost floors are board and brick"
-          // (playtest log: player walked east twice out of the Armory,
-          // tried to dig, got the still-in-the-outpost refusal). Also
-          // narrate the exit so the player knows the world changed.
+          // get refused with "the outpost floors are board and brick."
+          // Compute the next player from get() not the captured `player`
+          // closure — otherwise the spendStamina/advanceTime set below
+          // overwrites the cleared hubRoomId with the stale value.
           if (player.hubRoomId) {
             set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
             get().appendLog(
@@ -2385,7 +2385,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
               `You walk ${dir} past the gate. The outpost falls away behind you.`,
             );
           }
-          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.travel), 1) });
+          const currentPlayer = get().player ?? player;
+          set({ player: advanceTime(spendStamina(currentPlayer, STAMINA_COSTS.travel), 1) });
           get().stepDirection(dir);
           break;
         }
