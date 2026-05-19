@@ -390,7 +390,7 @@ export function buildRestSteps(): RollStep[] {
 export function buildSkillSteps(
   intent: string,
   player: PlayerCharacter,
-  opts?: { weatherMod?: Partial<Stats>; companionAssist?: boolean },
+  opts?: { weatherMod?: Partial<Stats>; companionAssist?: boolean; statusMods?: RollMods },
 ): RollStep[] {
   const statKey = SKILL_STAT[intent] ?? 'wisdom';
   const stats = effectiveStats(player, opts?.weatherMod);
@@ -405,16 +405,23 @@ export function buildSkillSteps(
   // helping you.
   const assistBonus = opts?.companionAssist ? 2 : 0;
   const assistLabel = assistBonus ? ` + ${assistBonus} (companion assist)` : '';
+  // Status-effect mods — e.g. maneuver's build-mismatch applies one
+  // or more `surprised` stacks for -2 each. Caller passes rollMods
+  // computed for 'skill' action. QA flagged that this layer existed
+  // for attack rolls but never reached skill checks.
+  const sMods = opts?.statusMods;
+  const statusNet = sMods?.net ?? 0;
+  const statusLabel = sMods && sMods.sources.length > 0 ? ` ${statusNet >= 0 ? '+' : ''}${statusNet} (${sMods.sources.join(', ')})` : '';
 
   return [{
     id: 'skill_check',
     label,
     sides: 20,
     count: 1,
-    bonus: statVal + assistBonus,
-    bonusLabel: `${statLabel} ${statVal}${assistLabel}`,
+    bonus: statVal + assistBonus + statusNet,
+    bonusLabel: `${statLabel} ${statVal}${assistLabel}${statusLabel}`,
     target: dc,
     targetLabel: `DC ${dc}${dcName ? ` — ${dcName}` : ''}`,
-    context: `d20 + ${statLabel}${assistLabel} vs ${dcName || 'DC'} ${dc}`,
+    context: `d20 + ${statLabel}${assistLabel}${statusLabel} vs ${dcName || 'DC'} ${dc}`,
   }];
 }

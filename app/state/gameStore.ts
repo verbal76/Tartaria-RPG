@@ -162,7 +162,7 @@ import {
   fuzzyFindStoryline,
 } from '../engine/factionStorylines';
 import { tickWeather, weatherBlocksRepositioning, weatherRepositionCost, weatherAttackPenalty, weatherStatModifiers, describeWeatherStatModifiers } from '../engine/weatherEffects';
-import { traitAttackBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, traitDodgeChance, describeTraits } from '../engine/enemyTraits';
+import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, traitDodgeChance, describeTraits } from '../engine/enemyTraits';
 import { parseWeaponEffect, rollEffectBonusDamage } from '../engine/weaponEffects';
 import { rollThrowDamage, weightLabel, itemWeight } from '../engine/itemWeight';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
@@ -251,6 +251,11 @@ interface CurrentScene {
    *  weather. Used to detect direction changes so partial progress
    *  doesn't carry from "advance" into a later "retreat". */
   repositionDir?: 'advance' | 'retreat';
+  /** Whether each enemy in `enemies` has already used its
+   *  ambush_strike trait this scene. Parallel to enemyHps. Trait
+   *  fires only on the first counter; the +2 bonus is consumed and
+   *  the flag set true. Initialized empty in beginScene. */
+  enemyAmbushUsed?: boolean[];
 }
 
 // Helper: which enemy is the player currently targeting? Returns null
@@ -1070,7 +1075,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Hooks — pending cross-scene chains land first; otherwise no hook is
     // planted at scene start. Wandering / exploration plants fresh hooks.
     const initialHooks: Hook[] = [];
-    const pendingChains = worldMemory.pendingChains ?? [];
+    // Expire chains that have sat unused for too long. The QA pass
+    // flagged that combat-heavy biomes stranded chains forever
+    // because they only fire on peaceful scenes — chains with no
+    // exit window kept stacking. 48 in-game hours is generous: a
+    // narrative thread that hasn't found a quiet scene in two days
+    // can be safely dropped.
+    const playerHours = get().player?.hoursElapsed ?? 0;
+    const STALE_CHAIN_HOURS = 48;
+    const liveChains = (worldMemory.pendingChains ?? []).filter((c) => {
+      // Chains without a plantedAtHour are pre-fix saves; treat as
+      // fresh so we don't drop them silently on load.
+      if (typeof c.plantedAtHour !== 'number') return true;
+      return playerHours - c.plantedAtHour <= STALE_CHAIN_HOURS;
+    });
+    const expiredChainIds = (worldMemory.pendingChains ?? [])
+      .filter((c) => !liveChains.includes(c))
+      .map((c) => c.chainId);
+    const pendingChains = liveChains;
     const consumedChainIds: string[] = [];
     if (pendingChains.length > 0 && !hasEnemies) {
       const next = pendingChains[0]!;
@@ -1084,13 +1106,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene: CurrentScene = {
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
       vendor, range, hooks: initialHooks, ambientNouns, microMicroId,
+      enemyAmbushUsed: enemies.map(() => false),
     };
     set({ currentScene: scene, pendingRolls: null });
-    if (consumedChainIds.length > 0) {
+    const dropIds = [...consumedChainIds, ...expiredChainIds];
+    if (dropIds.length > 0) {
       set((s) => ({
         worldMemory: {
           ...s.worldMemory,
-          pendingChains: (s.worldMemory.pendingChains ?? []).filter((c) => !consumedChainIds.includes(c.chainId)),
+          pendingChains: (s.worldMemory.pendingChains ?? []).filter((c) => !dropIds.includes(c.chainId)),
         },
       }));
     }
@@ -2924,9 +2948,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Route the maneuver to the right stat per the action card —
         // disarm/trip/sweep/hook → DEX; grapple/shove/pin → STR.
         const maneuverKind = classifyManeuver(trimmed);
+        // Read current statusEffects AFTER the surprised stack was
+        // applied above. rollMods('skill') picks up surprised's -2
+        // per stack so the build-mismatch penalty actually lands on
+        // the roll instead of vanishing silently.
+        const liveFx = get().player?.statusEffects;
         const steps = buildSkillSteps(maneuverKind, player, {
           weatherMod: weatherStatModifiers(currentScene.weather),
           companionAssist: !!player.companion,
+          statusMods: rollMods(liveFx, 'skill'),
         });
         set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
         const buildNote = penaltyDice > 0
@@ -6023,12 +6053,13 @@ function resolveHookOneStep(
   });
   // Queue any next-chain hook to plant on the next scene.
   if (outcome.nextChain) {
+    const plantedAtHour = get().player?.hoursElapsed ?? 0;
     set((s) => ({
       worldMemory: {
         ...s.worldMemory,
         pendingChains: [
           ...(s.worldMemory.pendingChains ?? []),
-          { kind: outcome.nextChain!.kind, chainId: outcome.nextChain!.chainId },
+          { kind: outcome.nextChain!.kind, chainId: outcome.nextChain!.chainId, plantedAtHour },
         ],
       },
     }));
@@ -6436,7 +6467,9 @@ function runEnemyGroupCounters(
     // Bail if the player is dead.
     const livePlayer = get().player;
     if (!livePlayer || livePlayer.hp <= 0 || livePlayer.dead) return;
-    applyEnemyCounter(enemy, livePlayer ?? fallbackPlayer, get, set);
+    // Pass live index so applyEnemyCounter can resolve ambush_strike
+    // (one-shot +2 to the first counter for enemies with the trait).
+    applyEnemyCounter(enemy, livePlayer ?? fallbackPlayer, get, set, liveIdx);
   }
 }
 
@@ -6445,6 +6478,7 @@ function applyEnemyCounter(
   player: PlayerCharacter,
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  enemyIdx?: number,
 ) {
   // Full cover vs ranged enemies auto-misses. Detect ranged from the
   // enemy's damage notation (Aetheric / ranged tag in the name).
@@ -6510,7 +6544,29 @@ function applyEnemyCounter(
 
   const baseAtk = parseInt(String(enemy.attack), 10) || 3;
   const traitAtk = traitAttackBonus(enemy.traits);
-  const atkBonus = baseAtk + traitAtk;
+  // Ambush bonus — one-shot +2 on the FIRST counter this enemy makes
+  // in the scene (~16 enemies in data/enemies/enemies.json declare
+  // 'ambush_strike'; previously the trait was exported but never
+  // referenced, so it did nothing). enemyIdx is set by the caller;
+  // when present and the slot's flag is false, apply the bonus and
+  // mark the slot true so subsequent counters get the base value.
+  const liveScene = get().currentScene;
+  const ambushBonus = (() => {
+    if (enemyIdx == null || !liveScene) return 0;
+    const used = liveScene.enemyAmbushUsed?.[enemyIdx] ?? true;
+    if (used) return 0;
+    const bonus = traitAmbushBonus(enemy.traits);
+    if (bonus > 0) {
+      set((s) => {
+        if (!s.currentScene) return s;
+        const used = [...(s.currentScene.enemyAmbushUsed ?? s.currentScene.enemies.map(() => false))];
+        used[enemyIdx] = true;
+        return { currentScene: { ...s.currentScene, enemyAmbushUsed: used } };
+      });
+    }
+    return bonus;
+  })();
+  const atkBonus = baseAtk + traitAtk + ambushBonus;
   // HANDOFF #14 — true advantage/disadvantage for defensive status
   // effects. When the player has cover/dodge/block active, the enemy's
   // attack rolls 2d20 and takes the LOWER (disadvantage on attacker).

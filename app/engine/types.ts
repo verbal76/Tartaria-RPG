@@ -494,8 +494,11 @@ export interface WorldMemory {
   completedQuestIds: string[];
   memorableEvents?: MemorableEvent[];
   /** Active multi-scene hook chains — a hook resolution may queue a follow-up
-   *  hook kind to plant in a future wander. */
-  pendingChains?: { kind: string; chainId: string; plantedInLocationId?: string }[];
+   *  hook kind to plant in a future wander. plantedAtHour lets beginScene
+   *  expire chains that have sat unused too long (combat-heavy biomes
+   *  used to strand them forever, since chains only fire on peaceful
+   *  scenes). */
+  pendingChains?: { kind: string; chainId: string; plantedInLocationId?: string; plantedAtHour?: number }[];
   /** Short narrative memos surfaced during chain resolutions. The Arbiter can
    *  reference these in remarks, and they help the player keep narrative thread. */
   chainMemos?: { text: string; ts: number }[];
