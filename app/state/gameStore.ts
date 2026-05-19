@@ -55,6 +55,7 @@ import {
   QWEN_ALLOWED_INTENTS,
 } from '../engine/narrativeGenerator';
 import { parseInput, type ParseContext } from '../engine/parser';
+import { parseInputViaLLM } from '../engine/llmParser';
 import { rollDie, rollFromNotation, pick, chance, rotatingPick } from '../engine/rng';
 import { buildCombatSteps, buildSkillSteps, rollMods, classifyManeuver } from '../engine/combatRules';
 import { CognitiveOrchestrator, type BootStage } from '../ai/CognitiveOrchestrator';
@@ -626,7 +627,17 @@ interface GameStore {
   appendLog: (channel: LogChannel, text: string, meta?: Record<string, unknown>) => void;
 
   beginScene: (opts?: { openingPrefix?: string; microMicroId?: string; isOpening?: boolean; skipHubEntry?: boolean }) => void;
-  submitPlayerAction: (text: string) => void;
+  /**
+   * Submit a player action through the parse → dispatch pipeline.
+   *
+   * The optional `_opts.skipPreChecks` is set internally by the LLM
+   * parse-fallback path when it re-submits a canonical "verb noun"
+   * rephrasing — it suppresses the meta-comment guard and the second
+   * status-effect tick so one player input still equals one game beat,
+   * even when the dictionary parser only resolves it on the second
+   * pass. External callers should never set this.
+   */
+  submitPlayerAction: (text: string, _opts?: { skipPreChecks?: boolean }) => void;
   resolveRollStep: (values: number[]) => void;
   cancelPendingRolls: () => void;
   concludeRolls: (steps: RollStep[], actionText: string) => void;
@@ -1561,7 +1572,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  submitPlayerAction(text) {
+  submitPlayerAction(text, _opts) {
     const trimmed = text.trim();
     if (!trimmed || get().pendingRolls) return;
 
@@ -1578,6 +1589,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // through the verb parser — log the note so we can review it
     // later, surface a small Arbiter ack, and bail.
     if (
+      !_opts?.skipPreChecks &&
       trimmed.length > 100 &&
       /^(ok\b|btw\b|fyi\b|hey\b|so\b)|(\bwe should\b|\byou should\b|\bi think\b|\bi wish\b|\bi'?d like\b|\bcan we\b|\bshould have\b|\bneeds? to be\b)/i.test(trimmed)
     ) {
@@ -1621,8 +1633,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // dodging 2r → 1r) never persisted their decrement, so counters
     // were frozen until the array changed shape. Now: whenever the
     // player has ANY status going in, write the ticked result back.
-    const tick = tickEffects(player.statusEffects ?? []);
-    if ((player.statusEffects?.length ?? 0) > 0) {
+    // skipPreChecks: the LLM parse-fallback re-submits a canonical
+    // rephrasing of the same player input, and we don't want to tick
+    // statuses twice for one action. The first pass already ran the
+    // tick; the second pass jumps straight to the parser.
+    const tick = _opts?.skipPreChecks
+      ? { effects: player.statusEffects ?? [], dotDamage: 0, expired: [] as ReturnType<typeof tickEffects>['expired'] }
+      : tickEffects(player.statusEffects ?? []);
+    if (!_opts?.skipPreChecks && (player.statusEffects?.length ?? 0) > 0) {
       const incapacitated = isIncapacitated(player.statusEffects);
       const newHp = Math.max(0, player.hp - tick.dotDamage);
       set((s) =>
@@ -1726,6 +1744,81 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
 
     if (parsed.intent === 'unknown' || parsed.confidence < 0.5) {
+      // Qwen-backed parse fallback. The dictionary parser missed —
+      // before showing the soft refusal, hand the input to Qwen with
+      // the scene's noun pool and let it pick an intent + target. If
+      // it resolves we re-submit a canonical "verb noun" rephrasing
+      // which the dictionary parser CAN handle cleanly, so all the
+      // intent dispatch below stays in one place. If Qwen isn't ready
+      // or can't resolve, fall through to the existing soft refusal.
+      // The skipPreChecks flag suppresses the second status tick on
+      // the re-submission so one player action remains one game beat.
+      if (qwen.isReady() && !_opts?.skipPreChecks) {
+        get().appendLog('debug', `parse-fallback: handing "${trimmed}" to qwen`);
+        // Snapshot the parse context once — it's a pure read of the
+        // scene and inventory, both of which are stable for the
+        // duration of the LLM call.
+        const llmCtx = {
+          recentNouns: collectSceneNouns(currentScene),
+          enemyNames: parseCtx.enemyNames ?? [],
+          vendorName: parseCtx.vendorName,
+          inventoryNames: player.inventory.map((i) => i.name),
+          locationName: currentScene.location.name,
+        };
+        // Hold the player's input visible so they don't think the
+        // game ignored them. The "Arbiter considers" placeholder
+        // gets replaced when the resolved action's narration lands.
+        get().appendLog('debug', 'parse-fallback: arbiter considering…');
+        void parseInputViaLLM(trimmed, llmCtx, qwen).then((result) => {
+          if (!result) {
+            get().appendLog('debug', 'parse-fallback: qwen no usable result → soft refusal');
+            const lastCog2 = get().cognitiveLastResponse;
+            get().appendLog(
+              'arbiter',
+              buildSoftArbiterFallback({
+                parsed,
+                inventory: player.inventory,
+                enemy: activeEnemy(currentScene),
+                location: currentScene.location,
+                hazard: currentScene.hazard,
+                playerHpFraction: player.hpMax > 0 ? player.hp / player.hpMax : 1,
+                mood: lastCog2?.inferredEmotions[0],
+              }),
+            );
+            if (parsed.suggestions.length) {
+              get().appendLog('system', `Try: ${parsed.suggestions.slice(0, 3).join(' · ')}`);
+            }
+            void get().persist();
+            return;
+          }
+          get().appendLog(
+            'debug',
+            `parse-fallback: qwen → intent=${result.intent} target="${result.target}" rephrase="${result.rephrasing}"`,
+          );
+          // Re-dispatch through the dictionary parser. skipPreChecks
+          // prevents meta-guard re-evaluation + status-tick double-fire.
+          get().submitPlayerAction(result.rephrasing, { skipPreChecks: true });
+        }).catch((err) => {
+          get().appendLog('debug', `parse-fallback: threw ${err instanceof Error ? err.message : String(err)}`);
+          // Best-effort soft refusal even if the LLM crashed.
+          const lastCog3 = get().cognitiveLastResponse;
+          get().appendLog(
+            'arbiter',
+            buildSoftArbiterFallback({
+              parsed,
+              inventory: player.inventory,
+              enemy: activeEnemy(currentScene),
+              location: currentScene.location,
+              hazard: currentScene.hazard,
+              playerHpFraction: player.hpMax > 0 ? player.hp / player.hpMax : 1,
+              mood: lastCog3?.inferredEmotions[0],
+            }),
+          );
+        });
+        return; // async path now owns the rest
+      }
+      // Qwen not ready (or this is a re-submission already going through
+      // the fallback once) — show the soft refusal immediately.
       const lastCog = get().cognitiveLastResponse;
       get().appendLog(
         'arbiter',
