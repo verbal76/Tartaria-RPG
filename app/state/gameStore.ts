@@ -1173,7 +1173,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       initialHooks.push(h);
       consumedChainIds.push(next.chainId);
     }
-    const ambientNouns = extractAmbientNouns(location.description);
+    // Pull ambient nouns from the macro location description. In hub
+    // mode, ALSO pull from the hub room description so noun targets
+    // like "map-stone" (Central Square), "anvil" (Armory), "kettle"
+    // (Mess Hall), "tarpaulin" (Workshop) become approachable +
+    // searchable. Without this merge, hub-room interactables fall
+    // through to "Nothing to advance on. The ground here is quiet."
+    const ambientNouns = hubRoom
+      ? Array.from(new Set([
+          ...extractAmbientNouns(location.description),
+          ...extractAmbientNouns(hubRoom.description),
+        ]))
+      : extractAmbientNouns(location.description);
     // microMicroId was resolved at the top of beginScene so the
     // encounter / loot rolls could use the ladder's curated pools.
     const scene: CurrentScene = {
