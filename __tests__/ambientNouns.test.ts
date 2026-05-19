@@ -71,4 +71,16 @@ describe('matchAmbientNoun — still works against the cleaner pool', () => {
     expect(matchAmbientNoun('the vast', nouns)).toBeNull();
     expect(matchAmbientNoun('the ancient', nouns)).toBeNull();
   });
+
+  it('does not surface verbs / positional words as ambient nouns', () => {
+    // Cartographer/Scavenger sim found ghost objects "look", "after",
+    // "left", "inspect" — text the engine extracted from prose like
+    // "Two Monarch overseers look on" but had no handler for.
+    const nouns = extractAmbientNouns(
+      'Two Monarch overseers look on after the convoy left the camp. Inspect the remains.',
+    );
+    for (const banned of ['look', 'after', 'left', 'inspect', 'remains']) {
+      expect(nouns).not.toContain(banned);
+    }
+  });
 });

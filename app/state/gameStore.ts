@@ -173,6 +173,8 @@ import {
   generateWorldMap,
   stepInDirection,
   surveyAll,
+  WORLD_MAP_CENTER_X,
+  WORLD_MAP_CENTER_Y,
   type Direction,
   type WorldMap,
 } from '../engine/worldMap';
@@ -379,6 +381,12 @@ const STAMINA_COSTS = {
   attack: 1,
   skillCheck: 1,
 } as const;
+/** Soft ceiling on accumulated corruption. Without this the weather
+ *  tick can climb a player into thousands of corruption — the sim
+ *  surfaced 7868 over 10 in-game days. 50 keeps it a meaningful
+ *  gameplay signal (and within the range the narration / Arbiter
+ *  remarks were authored to react to). */
+const CORRUPTION_MAX = 50;
 const TRAVEL_MIN_STAMINA = STAMINA_COSTS.travel;
 
 function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
@@ -1537,7 +1545,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!s.player) return {};
         const newHp = Math.max(0, s.player.hp + wtick.hpDelta);
         const newStam = Math.max(0, Math.min(s.player.staminaMax, s.player.stamina + wtick.staminaDelta));
-        const newCorr = Math.max(0, s.player.corruption + wtick.corruptionDelta);
+        // Cap corruption at CORRUPTION_MAX. QA sim showed a player
+        // stuck in Whisper Fog accumulated 7868 corruption over 10
+        // in-game days — well past the point where any number is
+        // meaningful as a gameplay signal. 50 is the design ceiling
+        // (matches the threshold at which Aetheric content opens
+        // permadeath checks); anything beyond is decorative.
+        const newCorr = Math.max(0, Math.min(CORRUPTION_MAX, s.player.corruption + wtick.corruptionDelta));
         weatherKilled = newHp <= 0;
         return { player: { ...s.player, hp: newHp, stamina: newStam, corruption: newCorr } };
       });
@@ -2023,7 +2037,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
             return /whisper.*fog|silent.*blizzard/i.test(w.name ?? '')
               || (w.corruptionChance ?? 0) > 0;
           })();
-          const corrDecay = (player.corruption ?? 0) > 0 && !weatherIsCorrupting ? 1 : 0;
+          // Decay scales with the current load — high corruption sheds
+          // faster so a player who got stuck in Whisper Fog for a week
+          // can recover in a few clean rests, but a single point still
+          // lingers (lore: the Aether doesn't fully wash off). The
+          // weather tick at the top of submitPlayerAction has already
+          // fired before this branch, so resting in a corrupting biome
+          // still nets nothing.
+          const curCorr = player.corruption ?? 0;
+          const corrDecay = !weatherIsCorrupting && curCorr > 0
+            ? (curCorr > 30 ? 4 : curCorr > 10 ? 2 : 1)
+            : 0;
           set({
             player: {
               ...player,
@@ -4031,6 +4055,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         stamina: newStamina,
         staminaMax: newStaminaMax,
         milestones: { ...prevMs, travelsCompleted: newTravels },
+        // Recenter on the new map. generateWorldMap is recentered on
+        // currentLocationId per call, so without this the player's
+        // mapX/mapY keep the OLD map's crossing position — next
+        // cardinal step walks into whatever tile sits at that offset
+        // on the freshly generated map, often a neighbor of the old
+        // location (sim trace showed `south` bouncing A→B→A→B).
+        mapX: WORLD_MAP_CENTER_X,
+        mapY: WORLD_MAP_CENTER_Y,
         // Named travelTo breaks the cardinal-step flow — clear the saved
         // direction so "continue" can't snap back to the old bearing.
         lastTravelDirection: undefined,

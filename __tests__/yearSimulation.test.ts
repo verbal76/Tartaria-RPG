@@ -137,6 +137,11 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
     const exerciseSamples: Record<string, string> = {};
     let lastEnemyName: string | null = null;
     let prevEnemyHp: number | null = null;
+    /** Last seen milestones.enemiesDefeated — when it ticks, credit
+     *  the active enemy. The name-tracking approach in earlier sims
+     *  missed kills when the enemy died mid-volley before the next
+     *  loop's snapshot. */
+    let prevEnemiesDefeated = 0;
     let deaths = 0;
     let resurrections = 0;
     let tcEarned = 0;
@@ -228,9 +233,9 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
     // positives ("on to the Square" should not credit "jump").
     const PATTERNS: Array<[RegExp, string]> = [
       [/✓ HIT.*for \d+ damage|hits .* for \d+|deals \d+ damage|drops .* dead|✗ MISS/i, 'attack'],
-      [/dodging stance|drop into a dodging/i, 'dodge'],
-      [/raise the .* into a block|defensive stance/i, 'block'],
-      [/set your stance.*fight back|Fight Back —/i, 'fight_back'],
+      [/dodging stance|drop into a dodging|shift your weight, ready to evade/i, 'dodge'],
+      [/raise the .* into a block|take a defensive stance|defense [+]\d/i, 'block'],
+      [/set your stance|fight back against|Fight Back —|opposed Fighting roll/i, 'fight_back'],
       [/You flee|You break and run|escape attempt|✓ ESCAPE/i, 'flee'],
       [/You advance|You close the gap|moved closer/i, 'advance'],
       [/You step back|opened distance|fell back|backed off/i, 'retreat'],
@@ -267,9 +272,9 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
       [/You repair|repaired the/i, 'repair'],
       [/joins you|follows you|recruited/i, 'recruit'],
       [/sworn to|pledged to|joined the/i, 'join_faction'],
-      [/You equip/i, 'equip'],
-      [/You unequip|removed.*from your/i, 'unequip'],
-      [/You use the|relic activates|invoked/i, 'use_relic'],
+      [/You equip|equipped to (?:main|off|head|chest|legs|feet|amulet|ring)/i, 'equip'],
+      [/You unequip|removed.*from your|set aside what was in your/i, 'unequip'],
+      [/You use the|relic activates|invoked|ash burns your throat|breath you spend on this action/i, 'use_relic'],
       [/You craft|crafted the|forged the/i, 'craft_named'],
       [/✦.*max|milestone|reached/i, 'milestone'],
       [/Whisper Fog|Etheric Storm|Iron Fog|Ash Storm|Silent Blizzard|Glass Hail/i, 'weather_effect'],
@@ -424,26 +429,36 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
     const TRACE_LIMIT = 200;
 
     // Interact verbs the Scavenger sweep tries against each ambient
-    // noun. Two verbs per noun per visit, per the brief — enough to
-    // catch ghost objects without hammering the parser.
+    // noun. Two verbs per noun per visit — enough to catch ghost
+    // objects without hammering the parser.
     const SCAVENGER_VERBS = ['inspect', 'search'];
+    // Hard cap on queue length and on total Scavenger interactions
+    // per run — sim #7 burned ~3000 actions on Scavenger sweeps
+    // alone (174 interactions × pending-roll resolutions), which
+    // ate most of the time budget and capped us at Day 10. The
+    // ghost-object detection signal is mostly captured in the
+    // first ~20 sweeps; beyond that we just want the simulator
+    // to keep playing the game.
+    const SCAVENGER_MAX_PER_SCENE = 6;
+    const SCAVENGER_TOTAL_LIMIT = 80;
+    let scavengerTotal = 0;
 
     // Prime the Scavenger queue when the player has just walked into
     // a peaceful scene with ambient nouns we haven't swept yet.
     const primeScavengerQueue = (scene: any, p: any): void => {
       if (!scene || scene.enemies?.length > 0) return; // combat first
+      if (scavengerTotal >= SCAVENGER_TOTAL_LIMIT) return;
       const key = `${scene.location?.id ?? '?'}@${scene.microMicroId ?? ''}@${(scene.ambientNouns ?? []).join('|')}`;
       if (sweptScenes.has(key)) return;
       sweptScenes.add(key);
       const nouns = (scene.ambientNouns ?? []) as string[];
       if (nouns.length === 0) return;
       const q: string[] = [];
-      for (const n of nouns.slice(0, 4)) {
+      for (const n of nouns.slice(0, 3)) {
         for (const v of SCAVENGER_VERBS) q.push(`${v} ${n}`);
+        if (q.length >= SCAVENGER_MAX_PER_SCENE) break;
       }
-      scavengerQueue = q;
-      // Note: an "interaction attempted" is bumped when we actually
-      // pop one from the queue (submit fires).
+      scavengerQueue = q.slice(0, SCAVENGER_MAX_PER_SCENE);
     };
 
     // Action picker: bias toward unexercised mechanisms when context
@@ -470,6 +485,7 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
       // Prime queue when this scene's nouns are unseen, then pop.
       primeScavengerQueue(scene, p);
       if (scavengerQueue.length > 0 && !enemy && p.stamina > 2) {
+        scavengerTotal++;
         return scavengerQueue.shift()!;
       }
 
@@ -672,8 +688,21 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
       const enemyHpNow = sBefore.currentScene && sBefore.currentScene.enemyHps.length > 0
         ? sBefore.currentScene.enemyHps[sBefore.currentScene.activeEnemyIdx] ?? sBefore.currentScene.enemyHps[0]
         : null;
+      // Kill credit — milestones.enemiesDefeated is the canonical
+      // source. When it ticks up, credit the enemy that was active
+      // when the credit landed. Name-tracking alone missed kills
+      // where the enemy died mid-volley and the scene already
+      // shifted before the next loop snapshot.
+      const curEnemiesDefeated = pBefore.milestones?.enemiesDefeated ?? 0;
+      if (curEnemiesDefeated > prevEnemiesDefeated) {
+        const credit = lastEnemyName ?? enemyNow?.name ?? 'unknown';
+        bump(killCounts, credit);
+        prevEnemiesDefeated = curEnemiesDefeated;
+      }
       if (lastEnemyName && (!enemyNow || enemyNow.name !== lastEnemyName)) {
         if ((prevEnemyHp ?? 1) <= 0) {
+          // Backup credit path — only fires if enemy went to 0 HP
+          // and disappeared without the milestone catching it.
           bump(killCounts, lastEnemyName);
         }
       }

@@ -65,6 +65,14 @@ const GRID_W = 21;
 const GRID_H = 21;
 const CENTER_X = 10;
 const CENTER_Y = 10;
+/** Exported so travelTo can reset the player to the new map's center
+ *  after a location change — without this, mapX/mapY carry the old
+ *  crossing position into a freshly regenerated map and the next
+ *  cardinal step lands on whatever tile happens to be at that
+ *  offset (manifested in the QA sim as "south" bouncing between two
+ *  neighbors). */
+export const WORLD_MAP_CENTER_X = CENTER_X;
+export const WORLD_MAP_CENTER_Y = CENTER_Y;
 
 export interface WorldMap {
   /** GRID_H × GRID_W matrix. tiles[y][x] */
