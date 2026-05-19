@@ -132,6 +132,19 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
 
   return (
     <View style={styles.container}>
+      {/* Quick-travel row — N / S / E / W as one-tap buttons. Travel
+          is the most-issued verb in playtest; pulling it onto the
+          quick row removes "go north" / "head east" typing every
+          step. Hidden in combat (cardinal travel is gated by enemy
+          presence anyway and the slot is needed for combat verbs). */}
+      {!inCombat && (
+        <View style={styles.travelRow}>
+          <QuickBtn label="N" onPress={() => onSubmit('go north')} />
+          <QuickBtn label="S" onPress={() => onSubmit('go south')} />
+          <QuickBtn label="E" onPress={() => onSubmit('go east')} />
+          <QuickBtn label="W" onPress={() => onSubmit('go west')} />
+        </View>
+      )}
       <TutorialTarget area="quick-row" style={styles.quickRow}>
         {inCombat ? (
           <>
@@ -244,6 +257,7 @@ function QuickBtn({
 const styles = StyleSheet.create({
   container: { gap: 6 },
   quickRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
+  travelRow: { flexDirection: 'row', gap: 6, marginBottom: 4 },
   quick: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',

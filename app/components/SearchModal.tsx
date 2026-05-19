@@ -41,6 +41,15 @@ export function SearchModal({ visible, hints, onSubmit, onCancel }: Props) {
     onSubmit(trimmed);
   };
 
+  // One-tap search targets. Playtest feedback: "I'm not typing the
+  // ground or the hall or the wall over and over again." Chip taps
+  // submit directly so the player doesn't fight the keyboard. Scene-
+  // mentioned nouns (from props.hints) come first so the player can
+  // see exactly what the current room offers.
+  const tapToSearch = (target: string) => onSubmit(target);
+  const sceneHints = (hints ?? []).slice(0, 5);
+  const commonHints = ['the ground', 'the wall', 'the rubble', 'the silt', 'the doorway'];
+
   return (
     <Modal
       visible={visible}
@@ -75,17 +84,34 @@ export function SearchModal({ visible, hints, onSubmit, onCancel }: Props) {
                 autoCapitalize="none"
               />
 
-              <Text style={styles.examples}>
-                Try: the mud · the rubble · the doorway · the wagon · the column ·
-                behind me · the area to my left · the area to my right ·
-                the floor · the walls · the silt · the dust
-              </Text>
-
-              {hints && hints.length > 0 ? (
-                <Text style={styles.hints}>
-                  Mentioned in this scene: {hints.slice(0, 5).join(', ')}
-                </Text>
-              ) : null}
+              {sceneHints.length > 0 && (
+                <>
+                  <Text style={styles.chipLabel}>In this scene</Text>
+                  <View style={styles.chipRow}>
+                    {sceneHints.map((h) => (
+                      <Pressable
+                        key={`scene-${h}`}
+                        style={({ pressed }) => [styles.chip, styles.chipScene, pressed && styles.btnPressed]}
+                        onPress={() => tapToSearch(h)}
+                      >
+                        <Text style={styles.chipTextScene} numberOfLines={1}>{h}</Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                </>
+              )}
+              <Text style={styles.chipLabel}>Common</Text>
+              <View style={styles.chipRow}>
+                {commonHints.map((h) => (
+                  <Pressable
+                    key={`common-${h}`}
+                    style={({ pressed }) => [styles.chip, pressed && styles.btnPressed]}
+                    onPress={() => tapToSearch(h)}
+                  >
+                    <Text style={styles.chipText} numberOfLines={1}>{h}</Text>
+                  </Pressable>
+                ))}
+              </View>
 
               <View style={styles.btnRow}>
                 <Pressable
@@ -147,6 +173,19 @@ const styles = StyleSheet.create({
   },
   hints: { color: '#7a705c', fontSize: 11, marginTop: 8, fontStyle: 'italic' },
   examples: { color: '#9ec96a', fontSize: 11, marginTop: 8, lineHeight: 16, letterSpacing: 0.5 },
+  chipLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
+  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  chip: {
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  chipScene: { borderColor: '#9ec96a' },
+  chipText: { color: '#cdbf99', fontSize: 12 },
+  chipTextScene: { color: '#9ec96a', fontSize: 12 },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 14 },
   btn: {
     paddingHorizontal: 14,

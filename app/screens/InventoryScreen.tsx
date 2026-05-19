@@ -114,12 +114,19 @@ export function InventoryScreen() {
   };
 
   // Build the modal's button list based on the item's state.
+  // Wrapped in try/catch so a malformed item / missing field can't
+  // crash the screen — playtest reported an inventory hang-then-
+  // crash and the most likely vector is something downstream of
+  // canScrap / getItemPreview throwing on an unexpected item shape.
+  // Fallback is the safe Close-only menu; the player can still
+  // navigate away.
   const buildModalButtons = (): {
     label: string;
     onPress: () => void;
     tone?: 'primary' | 'destructive' | 'neutral';
   }[] => {
     if (!pending) return [{ label: 'Close', onPress: closeModal, tone: 'neutral' }];
+    try {
     // Only show Unequip buttons when THIS specific item is the equipped one
     // (not just same-named). Prevents the modal on a second locket from
     // offering to unequip the first locket's slot.
@@ -179,9 +186,18 @@ export function InventoryScreen() {
     }
     buttons.push({ label: 'Close', onPress: closeModal, tone: 'neutral' });
     return buttons;
+    } catch {
+      return [{ label: 'Close', onPress: closeModal, tone: 'neutral' }];
+    }
   };
 
-  const modalPreview = pending ? getItemPreview(pending.item.name) : null;
+  // Wrap preview lookup too — getItemPreview reads multiple catalog
+  // tables and could throw if an item name isn't in any of them.
+  let modalPreview: ReturnType<typeof getItemPreview> | null = null;
+  if (pending) {
+    try { modalPreview = getItemPreview(pending.item.name); }
+    catch { modalPreview = null; }
+  }
   const modalBody = pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0
     ? 'This item cannot be equipped, but you can still keep, gift, sell, or use it.'
     : undefined;

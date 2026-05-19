@@ -1564,9 +1564,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     // Tick all active status effects one round. Bleed-style DOTs deal
     // damage, expired effects drop off, and incapacitation (stun / paralyze)
-    // wastes the player's action with a narrated line.
+    // wastes the player's action with a narrated line. EVERY player
+    // action is one round — playtest report: "I was poisoned at the
+    // start of combat (3r) and 20 turns later still poisoned." The
+    // previous conditional skipped the state write unless DOT damage
+    // landed OR an effect expired OR the array length changed —
+    // statuses with no DOT and unchanged length (poisoned 3r → 2r,
+    // dodging 2r → 1r) never persisted their decrement, so counters
+    // were frozen until the array changed shape. Now: whenever the
+    // player has ANY status going in, write the ticked result back.
     const tick = tickEffects(player.statusEffects ?? []);
-    if (tick.dotDamage > 0 || tick.expired.length > 0 || tick.effects.length !== (player.statusEffects?.length ?? 0)) {
+    if ((player.statusEffects?.length ?? 0) > 0) {
       const incapacitated = isIncapacitated(player.statusEffects);
       const newHp = Math.max(0, player.hp - tick.dotDamage);
       set((s) =>
