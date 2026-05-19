@@ -375,18 +375,20 @@ describe('Two-year chaos simulation of Tartaria Realms', () => {
       }
       lastIntent = intent;
 
-      // Geographic loop check — counts DISTINCT loop patterns. Once
-      // a streak crosses 10 we flag it. The flag clears only when the
-      // player moves to a NEW geo key, so subsequent ticks while
-      // pinned do not inflate the counter.
+      // Geographic loop check — counts DISTINCT loop patterns. We
+      // only count when the action was a movement attempt (go/travel)
+      // and the player still didn't move; resting/looking/inventory
+      // in the same tile is expected, not a glitch.
+      const movementVerbs = /^(go|travel|move|walk|head|advance|retreat|step|dash|run|leave|enter)\b/i;
+      const isMoveAttempt = movementVerbs.test(text.trim());
       const geoKey = `${pAfter?.currentLocationId ?? '?'}@${pAfter?.mapX ?? '?'},${pAfter?.mapY ?? '?'}`;
-      if (geoKey === lastGeoKey) {
+      if (isMoveAttempt && geoKey === lastGeoKey) {
         geoStreak++;
         if (geoStreak === 10) {
           geographicLoopPatterns++;
           geoLoopFlagged = true;
         }
-      } else {
+      } else if (geoKey !== lastGeoKey) {
         geoStreak = 1;
         geoLoopFlagged = false;
       }
@@ -453,7 +455,10 @@ describe('Two-year chaos simulation of Tartaria Realms', () => {
         return `travel to ${loc}`;
       }
       if (roll < 0.65) {
-        const dir = directions[dirIdx % directions.length]!;
+        // Randomize direction selection — round-robin would walk the
+        // same N/E/S/W loop forever from a corner tile and inflate
+        // the geographic-loop counter.
+        const dir = directions[Math.floor(Math.random() * directions.length)]!;
         dirIdx++;
         return `go ${dir}`;
       }
@@ -540,6 +545,8 @@ describe('Two-year chaos simulation of Tartaria Realms', () => {
     let actions = 0;
     let chaosIdx = 0;
     let combatStreak = 0;
+    let hoursElapsedBaseline = 0;
+    let noPlayerRetries = 0;
 
     while (actions < MAX_ACTIONS) {
       if (actions % 50 === 0) {
@@ -548,10 +555,37 @@ describe('Two-year chaos simulation of Tartaria Realms', () => {
       actions++;
       const sBefore = store.getState();
       const pBefore = sBefore.player;
-      if (!pBefore) { endReason = 'no_player'; break; }
+      if (!pBefore) {
+        // No player — try to bootstrap a fresh character. Happens
+        // after an unsuccessful restart or if hydrate produced an
+        // empty slot. Allow a small retry budget before giving up.
+        if (noPlayerRetries < 3) {
+          noPlayerRetries++;
+          try {
+            await store.getState().startNewGame({
+              name: `Chaosling-fresh-${noPlayerRetries}`,
+              raceId: race.id,
+              factionId: fac.id,
+            });
+            store.getState().skipTutorial?.();
+            leftHub = false;
+          } catch (e: any) {
+            crashes.push({ input: 'startNewGame (no-player retry)', err: e?.message ?? String(e) });
+          }
+          continue;
+        }
+        endReason = 'no_player';
+        break;
+      }
+      noPlayerRetries = 0;
 
       const hoursElapsed = pBefore.hoursElapsed ?? 0;
-      const day = Math.floor(hoursElapsed / 24) + 1;
+      // Accumulated hours across reincarnations — when the player
+      // dies + restarts, the per-life clock resets. We add the
+      // cumulative offset so the sim's 730-day target tracks total
+      // simulated time, not just the current life.
+      const totalHours = hoursElapsedBaseline + hoursElapsed;
+      const day = Math.floor(totalHours / 24) + 1;
       if (day >= TARGET_DAY) { endReason = 'reached_730_days'; break; }
 
       if (pBefore.dead) {
@@ -567,8 +601,25 @@ describe('Two-year chaos simulation of Tartaria Realms', () => {
             }
           }
         }
-        endReason = 'died_no_gems';
-        break;
+        // Permadeath — bank the current life's hours and start a new
+        // character so the chaos sim keeps exercising the parser
+        // instead of grinding to a halt. Day counter uses
+        // hoursElapsedBaseline + currentLifeHours.
+        hoursElapsedBaseline += hoursElapsed;
+        try {
+          await store.getState().startNewGame({
+            name: `Chaosling-${deaths + 1}`,
+            raceId: race.id,
+            factionId: fac.id,
+          });
+          store.getState().skipTutorial?.();
+          leftHub = false;
+          continue;
+        } catch (e: any) {
+          crashes.push({ input: 'startNewGame (post-death)', err: e?.message ?? String(e) });
+          endReason = 'died_restart_failed';
+          break;
+        }
       }
 
       // Track log offset for next iteration's measurement loop.
@@ -626,7 +677,8 @@ describe('Two-year chaos simulation of Tartaria Realms', () => {
     // Final stats -------------------------------------------------------
     const sFinal = store.getState();
     const pFinal = sFinal.player;
-    const finalHours = pFinal?.hoursElapsed ?? 0;
+    const finalLifeHours = pFinal?.hoursElapsed ?? 0;
+    const finalHours = hoursElapsedBaseline + finalLifeHours;
     const finalDay = Math.floor(finalHours / 24) + 1;
     const tailLogs = sFinal.gameLog.slice(prevLogLen);
     inspectNewLogs(tailLogs);
