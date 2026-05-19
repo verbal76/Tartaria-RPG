@@ -584,7 +584,7 @@ interface GameStore {
 
   appendLog: (channel: LogChannel, text: string, meta?: Record<string, unknown>) => void;
 
-  beginScene: (opts?: { openingPrefix?: string; microMicroId?: string; isOpening?: boolean }) => void;
+  beginScene: (opts?: { openingPrefix?: string; microMicroId?: string; isOpening?: boolean; skipHubEntry?: boolean }) => void;
   submitPlayerAction: (text: string) => void;
   resolveRollStep: (values: number[]) => void;
   cancelPendingRolls: () => void;
@@ -964,7 +964,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
-  beginScene(opts?: { openingPrefix?: string; microMicroId?: string; isOpening?: boolean }) {
+  beginScene(opts?: { openingPrefix?: string; microMicroId?: string; isOpening?: boolean; skipHubEntry?: boolean }) {
     const { player, worldMemory } = get();
     if (!player) return;
     const location = getLocationById(player.currentLocationId);
@@ -976,11 +976,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // vendor from the room's anchorNpc. Player is in their camp.
     const inHub = isHubLocation(location.id);
     let hubRoomId = player.hubRoomId ?? null;
-    if (inHub && !hubRoomId) {
+    // Skip auto-entry when the caller is intentionally leaving the
+    // hub. Without this flag, "leave outpost" would clear hubRoomId
+    // then immediately re-enter the gate on the very next beginScene
+    // call (the player's currentLocationId is still the hub's macro
+    // location). QA sim caught this — `leave outpost` printed the
+    // exit narration but the player stayed locked in the hub graph.
+    if (inHub && !hubRoomId && !opts?.skipHubEntry) {
       hubRoomId = hubEntryRoomId();
       set((s) => (s.player ? { player: { ...s.player, hubRoomId } } : s));
     }
-    const hubRoom = inHub ? findHubRoom(hubRoomId) : null;
+    const hubRoom = inHub && hubRoomId ? findHubRoom(hubRoomId) : null;
     if (!inHub && hubRoomId) {
       // Player left the hub — clear the hubRoomId.
       set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
@@ -2073,7 +2079,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
               'world',
               `You walk back through the gate and out into the open ground. The outpost falls away behind you.`,
             );
-            get().beginScene();
+            // skipHubEntry — otherwise beginScene re-enters the gate
+            // because the player's currentLocationId is still the
+            // hub's macro location.
+            get().beginScene({ skipHubEntry: true });
             break;
           }
           const visited = new Set(get().worldMemory.hubVisited ?? []);
