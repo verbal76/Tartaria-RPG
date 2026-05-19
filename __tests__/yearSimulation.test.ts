@@ -176,59 +176,65 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
     };
 
     // Inspect a single log entry and credit any mechanisms whose
-    // narration patterns appear in it.
+    // narration patterns appear in it. Only world / arbiter / combat /
+    // reward channels — debug / cognitive / system lines contain raw
+    // parser dumps and location descriptions that produce false
+    // positives ("on to the Square" should not credit "jump").
     const PATTERNS: Array<[RegExp, string]> = [
-      [/^You attack|swing|strike|punch|kick|cleave|bash|smash/i, 'attack'],
+      [/\battacks? the\b|\bswing(?:s|ing)? at\b|\bstrike(?:s)? the\b|punches the|kicks the|cleaves the|bashes the|smashes the/i, 'attack'],
       [/dodging stance|drop into a dodging/i, 'dodge'],
       [/raise the .* into a block|defensive stance/i, 'block'],
       [/set your stance.*fight back|Fight Back —/i, 'fight_back'],
       [/You flee|You break and run|escape attempt|✓ ESCAPE/i, 'flee'],
-      [/You advance|You close|moved closer/i, 'advance'],
-      [/You retreat|You step back|opened distance|fell back/i, 'retreat'],
+      [/You advance|You close the gap|moved closer/i, 'advance'],
+      [/You step back|opened distance|fell back|backed off/i, 'retreat'],
       [/take cover|You hunker|crouch behind/i, 'take_cover'],
       [/You aim|sight in on|line up your/i, 'aim'],
       [/You reload|fresh magazine|rerack|refill/i, 'reload'],
       [/quick.*fire|snap shot|panic shot/i, 'quick_fire'],
       [/burst fire|double tap|multi shot|rapid fire/i, 'multi_fire'],
-      [/grapple|disarm|trip|shove|sweep|pin|hook|maneuver/i, 'maneuver'],
+      [/\bgrapple\b|\bdisarm\b|\btrip\b|\bshove\b|\bpin\b/i, 'maneuver'],
       [/You throw|You hurl|tossed at|lobbed/i, 'throw'],
-      [/You climb|scale|clamber|shimmy/i, 'climb'],
-      [/You swim|wade|paddle/i, 'swim'],
-      [/You jump|leap|hop|vault/i, 'jump'],
+      [/You climb|scale the|clamber/i, 'climb'],
+      [/You swim|wade into|paddle/i, 'swim'],
+      [/You jump|leap toward|hop over|vault over/i, 'jump'],
       [/You dash|sprint forward|hustle|bolt forward/i, 'dash'],
       [/You disengage|peel off|break off|fade back/i, 'disengage'],
-      [/You help|assist|aid|reinforce/i, 'help'],
-      [/You ready|prepare|cock the/i, 'ready'],
+      [/You assist|come to help|reinforce/i, 'help'],
+      [/You ready|prepare to act|cock the/i, 'ready'],
       [/You mount|saddle/i, 'mount'],
-      [/You look|You glance|scan the/i, 'look'],
+      [/You look around|You glance|scan the/i, 'look'],
       [/area search|You search the/i, 'search_area'],
       [/You investigate|You examine|You inspect/i, 'investigate'],
       [/You dig|excavate|unearth/i, 'dig'],
-      [/You make your way to|You travel/i, 'travel'],
-      [/You step into|step back into|head .* into/i, 'go_dir'],
+      [/You make your way to|You travel to/i, 'travel'],
+      [/You head .*|step back into|walk out into/i, 'go_dir'],
       [/You rest for|HP recovered|stamina recovered|corruption recovered/i, 'rest'],
       [/You consume|You eat|2d6 → \d+ HP/i, 'eat'],
-      [/The Arbiter|Arbiter points|Arbiter taps|Arbiter scans|Arbiter shrugs/i, 'ask'],
-      [/New faction contract|Contracts come from/i, 'accept_quest'],
-      [/Contract complete|turn in|delivered|reported back/i, 'turn_in_quest'],
-      [/You buy|purchased|paid \d+ TC/i, 'buy'],
+      [/Arbiter points|Arbiter taps|Arbiter scans|Arbiter gestures/i, 'ask'],
+      [/New faction contract/i, 'accept_quest'],
+      [/Contract complete|turn in.*delivered|reported back/i, 'turn_in_quest'],
+      [/You buy|purchased.*for \d+|paid \d+ TC/i, 'buy'],
       [/You sell|sold .* for|earned \d+ TC/i, 'sell'],
-      [/You gift|gave .* to|presented .*/i, 'gift'],
-      [/You steal|✓ HIT.*Stealth|✗ CAUGHT/i, 'steal'],
-      [/You repair|repaired/i, 'repair'],
+      [/You gift|gave .* to|presented .* to/i, 'gift'],
+      [/✓ HIT.*Stealth|✗ CAUGHT|You pocket|You pilfer/i, 'steal'],
+      [/You repair|repaired the/i, 'repair'],
       [/joins you|follows you|recruited/i, 'recruit'],
-      [/You join|sworn to|pledged/i, 'join_faction'],
-      [/You equip|equipped/i, 'equip'],
+      [/sworn to|pledged to|joined the/i, 'join_faction'],
+      [/You equip/i, 'equip'],
       [/You unequip|removed.*from your/i, 'unequip'],
-      [/You use the|relic|invoked/i, 'use_relic'],
-      [/You craft|crafted|forged/i, 'craft_named'],
-      [/✦.*max|milestone|achievement/i, 'milestone'],
+      [/You use the|relic activates|invoked/i, 'use_relic'],
+      [/You craft|crafted the|forged the/i, 'craft_named'],
+      [/✦.*max|milestone|reached/i, 'milestone'],
       [/Whisper Fog|Etheric Storm|Iron Fog|Ash Storm|Silent Blizzard|Glass Hail/i, 'weather_effect'],
-      [/hook|chain|signal|resonance/i, 'hook_resolve'],
+      [/hook resolved|chain advances|the thread continues/i, 'hook_resolve'],
     ];
 
     const inspectLog = (entry: { text: string; channel: string }) => {
       bump(channelCounts, entry.channel);
+      // Skip debug / cognitive / system — those contain raw parser
+      // dumps + state diagnostics that match unrelated patterns.
+      if (entry.channel === 'debug' || entry.channel === 'cognitive' || entry.channel === 'system') return;
       for (const [re, mech] of PATTERNS) {
         if (re.test(entry.text)) mark(mech, entry.text);
       }
@@ -277,6 +283,17 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
       resolveAnyPendingRoll();
     };
 
+    // Known location names to round-robin through for named travel,
+    // so encounters fire across many distinct scenes instead of the
+    // sim looping the same two map tiles.
+    const NAMED_LOCATIONS = [
+      'Drakova', 'Varakush', 'Asgardar', 'Tartarian Outskirts',
+      'Mud Seas', 'Cradle', 'Aetherstone Spire', 'Silt Wastes',
+      'Reclaimers Outpost', 'Borderlands',
+    ];
+    let locIdx = 0;
+    let leftHub = false;
+
     // Action picker: bias toward unexercised mechanisms when context
     // makes them legal; fall back to a balanced rotation otherwise.
     const pickAction = (): string => {
@@ -288,6 +305,15 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
       const enemy = scene && scene.enemies.length > 0
         ? scene.enemies[scene.activeEnemyIdx] ?? scene.enemies[0]
         : null;
+
+      // ─── Exit the hub once so encounters can fire ───────────────
+      // The Reclaimers Outpost is peaceful — staying inside its room
+      // graph forever means we never roll combat / hooks. Issue
+      // 'leave outpost' once to drop into the open world.
+      if (p.hubRoomId && !leftHub) {
+        leftHub = true;
+        return 'leave outpost';
+      }
 
       // ─── Combat ─────────────────────────────────────────────────
       if (enemy) {
@@ -425,14 +451,23 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
       if (!exercised.has('jump')) return 'jump';
       if (!exercised.has('search_area')) return 'search the rubble';
 
-      // Default rotation — bias toward time-advancing verbs.
+      // Default rotation — bias HEAVILY toward named travel so the
+      // sim moves between Locations (each move beginScene rolls
+      // weather, hooks, possibly an encounter). Cardinal direction
+      // travel only walks the procedural 21x21 grid and doesn't
+      // spawn macro-Location-level events.
       const roll = Math.random();
-      if (roll < 0.5) {
+      if (roll < 0.4) {
+        const loc = NAMED_LOCATIONS[locIdx % NAMED_LOCATIONS.length]!;
+        locIdx++;
+        return `travel to ${loc}`;
+      }
+      if (roll < 0.6) {
         const dir = directions[dirIdx % directions.length]!;
         dirIdx++;
         return `go ${dir}`;
       }
-      if (roll < 0.7) return 'rest';
+      if (roll < 0.72) return 'rest';
       if (roll < 0.82) return 'search the ground';
       if (roll < 0.9) return 'look';
       return tacticCycle[tacticIdx++ % tacticCycle.length]!;
@@ -609,6 +644,8 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
 
     console.log = _origLog;
 
+    // Build the report (also dumped to disk so the full block survives
+    // Jest's console truncation).
     const report = `
 ================ YEAR SIMULATION REPORT ================
 End reason:         ${endReason}
@@ -655,6 +692,11 @@ First 3 slotErrs:   ${slotLoadErrors.slice(0, 3).join(' | ') || '(none)'}
 ========================================================
 `.trim();
     console.log(report);
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const fs = require('fs');
+      fs.writeFileSync('/tmp/tartaria-year-sim-report.txt', report);
+    } catch { /* ignore — best-effort artifact */ }
 
     expect(actionsAttempted).toBeGreaterThan(0);
   });
