@@ -317,10 +317,13 @@ async function playPcm(samples: Float32Array, sampleRate: number): Promise<void>
   // click between sentences. Kokoro's PCM output starts / ends at
   // non-zero amplitude on most utterances; cutting playback on
   // didJustFinish then immediately starting the next utterance
-  // produces a sharp transient at the join. A 10ms linear ramp at
-  // each end (≈ 220 samples at 22.05 kHz) is inaudible as a fade
-  // but kills the click.
-  applyFadeEnvelope(samples, sampleRate, 10);
+  // produces a sharp transient at the join. Originally 10ms ramp,
+  // but playtest reported the first / last word of each sentence
+  // getting clipped — 10ms (~220 samples) is long enough to touch
+  // real phoneme content. Dropped to 3ms (~66 samples at 22.05 kHz),
+  // which is well under any single phoneme and still kills the
+  // click.
+  applyFadeEnvelope(samples, sampleRate, 3);
   const wavBase64 = encodeWav(samples, sampleRate);
   const { sound } = await Audio.Sound.createAsync(
     { uri: `data:audio/wav;base64,${wavBase64}` },

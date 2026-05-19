@@ -5868,29 +5868,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (player.hubRoomId) {
       get().appendLog(
         'arbiter',
-        `The Arbiter shakes their head. "The outpost floors are board and brick, not silt. Dig outside the gate."`,
+        `The Arbiter shakes their head. "The outpost floors are board and brick — no silt to scrape. Type 'leave outpost' to head outside the gate; once on the silt you can dig for rocks, sticks, scraps, and the other stock that builds clubs and spears."`,
         { skipDedup: true },
       );
       return;
     }
-    // Per-spot lockout — exhaust this patch on a successful dig (and any
-    // dig attempt). To dig again the player must move: step direction,
-    // travel to a new location, or refresh the scene at a new tile.
-    // Include hub room + Micro-Micro id in the lockout key so digging
-    // one hub room doesn't lock all the others (they share mapX/mapY),
-    // and digging one chamber within a buried Micro-Micro doesn't lock
-    // the rest of the labyrinth.
+    // The previous per-spot lockout (`lastDugSpot === spotKey →
+    // refuse`) was too aggressive — playtest report: "50 attempts,
+    // 0 rocks or sticks." Each tile only yielded ONE successful
+    // dig, then refused all follow-ups. The new approach: rely on
+    // roomLootAlreadyGrabbed (below) to handle non-stackable
+    // uniqueness, AND on stamina cost (1 / dig) to throttle the
+    // loop. Stackable commodities — Mud Fragment, Small Rock, Big
+    // Rock, Stick, Spider Silk, Patched Cloth, Trail Rations,
+    // Aether Mud / Residue / Crystal, Scrap Metal, Aetheric Shard
+    // — re-roll freely so the player can actually gather enough
+    // crafting stock to build a Stone Spear or Cudgel without
+    // walking 30 tiles between digs.
     const hubPart = player.hubRoomId ?? '_';
     const microPart = scene?.microMicroId ?? '_';
     const spotKey = `${player.currentLocationId}:${hubPart}:${microPart}:${player.mapX ?? 0}:${player.mapY ?? 0}`;
-    if (player.lastDugSpot === spotKey) {
-      get().appendLog(
-        'arbiter',
-        `The Arbiter taps their boot. "You've already turned this patch. Move on — try a few paces north, east, south, or west."`,
-        { skipDedup: true },
-      );
-      return;
-    }
+    // Still record the last-dug spot for any callers that read it,
+    // but no longer use it as a refusal gate.
+    void spotKey;
     const { item, score } = bestDigTool(player.inventory);
     // Require a real tool. bestDigTool returns score=1 for bare hands;
     // anything 2+ means the player has at least an improvised edge
