@@ -1,25 +1,20 @@
 // STTManager — push-to-talk speech recognition.
 //
 // Backed by expo-speech-recognition, which is an Expo-native module
-// that calls Android's built-in SpeechRecognizer (the same service
-// Google Assistant uses for dictation). No bundled model — the OS
-// already ships one.
+// that calls Android's built-in SpeechRecognizer. The previous
+// implementation used a STATIC `import { ExpoSpeechRecognitionModule
+// } from 'expo-speech-recognition'`, which is fine when the native
+// side is installed — but a player running an OLDER APK (one built
+// before the swap from @react-native-voice/voice) gets the new JS
+// bundle via OTA on top of native code that doesn't have
+// expo-speech-recognition. Calling a method on the missing native
+// bridge can hard-crash the React Native process (drops to the
+// phone's home screen).
 //
-// We previously wrapped @react-native-voice/voice, but that package
-// is a classic NativeModule that does not register under the New
-// Architecture (newArchEnabled: true in app.json), so its JS handle
-// came back null at runtime and Voice.start() threw "Cannot read
-// property 'startSpeech' of null". expo-speech-recognition is a
-// TurboModule and works under New Arch.
-//
-// Permissions: RECORD_AUDIO is declared via the package's Expo config
-// plugin in app.json. The first startListening() call triggers the
-// platform's permission prompt; subsequent calls reuse the grant.
+// Fix: lazy + defensive require. If the module isn't present, every
+// public function fails CLOSED with an arbiter-style error message
+// — the app never tries to invoke a null native method.
 
-import {
-  ExpoSpeechRecognitionModule,
-  addSpeechRecognitionListener,
-} from 'expo-speech-recognition';
 import type { EventSubscription } from 'expo-modules-core';
 
 export interface STTResult {
@@ -30,6 +25,47 @@ export interface STTResult {
   isFinal: boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type RecognitionModule = any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AddListener = (eventName: string, listener: (e: any) => void) => EventSubscription;
+
+interface ExpoSpeechRecognition {
+  module: RecognitionModule | null;
+  addListener: AddListener | null;
+  available: boolean;
+  loadError: string | null;
+}
+
+// Resolve the package lazily. Catching require errors here means an
+// older APK (no native module) can still load this JS file without
+// blowing up — public functions then return clean errors.
+const lib: ExpoSpeechRecognition = (() => {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const pkg = require('expo-speech-recognition');
+    const m = pkg?.ExpoSpeechRecognitionModule;
+    const al = pkg?.addSpeechRecognitionListener;
+    // Sanity-check the shape — start / stop / abort must exist as
+    // functions before we'll route player input through this module.
+    const looksOk = m && typeof m.start === 'function' && typeof m.stop === 'function';
+    return {
+      module: looksOk ? m : null,
+      addListener: looksOk && typeof al === 'function' ? al : null,
+      available: !!looksOk,
+      loadError: looksOk ? null : 'expo-speech-recognition native module not detected on this device. The APK may pre-date the STT swap — install the latest APK from the Play Store / GitHub release to enable mic input.',
+    };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return {
+      module: null,
+      addListener: null,
+      available: false,
+      loadError: `Failed to load expo-speech-recognition: ${msg}. Install the latest APK to enable mic input.`,
+    };
+  }
+})();
+
 let listening = false;
 let onResultCb: ((r: STTResult) => void) | null = null;
 let onErrorCb: ((msg: string) => void) | null = null;
@@ -37,11 +73,9 @@ let subs: EventSubscription[] = [];
 
 /** True if the device has a usable speech-recognition engine. */
 export async function isSTTAvailable(): Promise<boolean> {
+  if (!lib.available || !lib.module) return false;
   try {
-    // Synchronous probe — returns false if no Android RecognitionService
-    // is installed (extremely rare; Google's service is on every device
-    // that has Play Services).
-    return ExpoSpeechRecognitionModule.isRecognitionAvailable();
+    return !!lib.module.isRecognitionAvailable();
   } catch {
     return false;
   }
@@ -60,31 +94,37 @@ function detachListeners(): void {
 
 function attachListeners(): void {
   detachListeners();
-  subs.push(
-    addSpeechRecognitionListener('result', (e) => {
-      // Pick the highest-confidence alternative; isFinal differentiates
-      // streaming partials from the closing transcript.
-      const text = e.results?.[0]?.transcript ?? '';
-      if (text && onResultCb) onResultCb({ text, isFinal: e.isFinal });
-    }),
-  );
-  subs.push(
-    addSpeechRecognitionListener('error', (e) => {
-      listening = false;
-      const msg = e?.message || e?.error || 'Speech recognition failed.';
-      if (onErrorCb) onErrorCb(msg);
-    }),
-  );
-  subs.push(
-    addSpeechRecognitionListener('end', () => {
-      listening = false;
-    }),
-  );
+  if (!lib.addListener) return;
+  try {
+    subs.push(
+      lib.addListener('result', (e: { isFinal?: boolean; results?: Array<{ transcript?: string }> }) => {
+        const text = e.results?.[0]?.transcript ?? '';
+        if (text && onResultCb) onResultCb({ text, isFinal: !!e.isFinal });
+      }),
+    );
+    subs.push(
+      lib.addListener('error', (e: { message?: string; error?: string }) => {
+        listening = false;
+        const msg = e?.message || e?.error || 'Speech recognition failed.';
+        if (onErrorCb) onErrorCb(msg);
+      }),
+    );
+    subs.push(
+      lib.addListener('end', () => {
+        listening = false;
+      }),
+    );
+  } catch (err) {
+    // If addListener itself blows up, swallow it — we still want the
+    // start path to surface a clean error rather than crash the app.
+    const msg = err instanceof Error ? err.message : String(err);
+    if (onErrorCb) onErrorCb(`STT listener wiring failed: ${msg}`);
+  }
 }
 
 /** Start a listening session. Pass callbacks for partial + final
  *  results and for errors. Resolves once the engine has started
- *  (or rejects with a reason). */
+ *  (or surfaces a reason via onError). */
 export async function startListening(
   onResult: (r: STTResult) => void,
   onError: (msg: string) => void,
@@ -92,35 +132,42 @@ export async function startListening(
 ): Promise<void> {
   onResultCb = onResult;
   onErrorCb = onError;
+
+  // Fail closed if the native module isn't installed. Previously a
+  // call to a missing native method could hard-crash the app on
+  // older APKs running new JS — now the player gets a clean message
+  // and the input row stays alive.
+  if (!lib.available || !lib.module) {
+    onError(lib.loadError ?? 'Mic input is unavailable on this build.');
+    return;
+  }
+
   attachListeners();
 
-  // Request mic + speech-recognition permissions on first use. The
-  // settings toggle also requests RECORD_AUDIO via PermissionsAndroid,
-  // but going through the package's own helper covers iOS too and is
-  // a no-op when already granted.
+  // Request mic + speech-recognition permissions on first use.
   try {
-    const perm = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
-    if (!perm.granted) {
+    const perm = await lib.module.requestPermissionsAsync();
+    if (!perm?.granted) {
       onError('Microphone permission denied. Enable it in Settings → Apps.');
       return;
     }
-  } catch {
+  } catch (err) {
     // Some Android builds don't expose the helper; fall through and
     // let start() raise a clearer error if mic is actually blocked.
+    const msg = err instanceof Error ? err.message : String(err);
+    // Non-fatal — try start anyway.
+    void msg;
   }
 
   if (listening) {
-    try { ExpoSpeechRecognitionModule.stop(); } catch { /* ignore */ }
+    try { lib.module.stop(); } catch { /* ignore */ }
   }
   try {
-    ExpoSpeechRecognitionModule.start({
+    lib.module.start({
       lang: locale,
       interimResults: true,
       maxAlternatives: 1,
       continuous: false,
-      // Prefer on-device when supported so the player isn't reliant on
-      // a network round-trip. Falls back automatically on devices that
-      // don't have an installed locale model.
       requiresOnDeviceRecognition: false,
       addsPunctuation: true,
     });
@@ -129,7 +176,9 @@ export async function startListening(
     listening = false;
     const msg = err instanceof Error ? err.message : 'Could not start microphone.';
     onError(msg);
-    throw err;
+    // Do NOT rethrow — the InputBox handler swallows, but throwing
+    // can still propagate to the React render scheduler on some
+    // Android setups and crash the bridge.
   }
 }
 
@@ -137,8 +186,12 @@ export async function startListening(
  *  listening (no-op). */
 export async function stopListening(): Promise<void> {
   if (!listening) return;
+  if (!lib.module) {
+    listening = false;
+    return;
+  }
   try {
-    ExpoSpeechRecognitionModule.stop();
+    lib.module.stop();
   } catch {
     // ignore — the listener was likely already torn down
   } finally {
@@ -149,7 +202,9 @@ export async function stopListening(): Promise<void> {
 /** Tear down listeners + cancel any in-flight session. Used on
  *  STT-disabled settings toggle. */
 export async function shutdownSTT(): Promise<void> {
-  try { ExpoSpeechRecognitionModule.abort(); } catch { /* ignore */ }
+  if (lib.module) {
+    try { lib.module.abort(); } catch { /* ignore */ }
+  }
   detachListeners();
   listening = false;
   onResultCb = null;

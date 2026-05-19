@@ -70,45 +70,63 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   };
 
   const handleMic = async () => {
-    if (listening) {
-      await stopListening();
-      setListening(false);
-      return;
-    }
+    // Wrap EVERYTHING — even the stop path. Tapping mic / silence
+    // was kicking some players out to the home screen because
+    // unhandled errors (or unhandled promise rejections from the
+    // native side) propagated into the React Native bridge and
+    // crashed the process. Catch them all here; the player can
+    // re-tap to retry.
     try {
+      if (listening) {
+        try { await stopListening(); } catch { /* ignore */ }
+        setListening(false);
+        return;
+      }
       await startListening(
         (r) => {
           // Drop transcripts into the text box. Final results auto-submit
           // when voice.autoSubmit is on; partial results just preview so
           // the player can see what's being captured.
-          setText(r.text);
-          if (r.isFinal && voice.autoSubmit) {
-            onSubmit(r.text.trim());
-            setText('');
-            inputRef.current?.clear();
-          }
+          try {
+            setText(r.text);
+            if (r.isFinal && voice.autoSubmit) {
+              onSubmit(r.text.trim());
+              setText('');
+              inputRef.current?.clear();
+            }
+          } catch { /* ignore — recognition continues */ }
         },
         (msg) => {
           // Surface the error in the input as a placeholder hint and
           // bail. The player can re-tap the mic to retry.
-          setText(`(mic: ${msg.slice(0, 60)})`);
+          try {
+            setText(`(mic: ${msg.slice(0, 60)})`);
+          } catch { /* ignore */ }
           setListening(false);
         },
       );
       setListening(true);
-    } catch {
+    } catch (err) {
+      // Last-resort catch — any error from startListening / stopListening
+      // / setState lands here, the input stays alive, the player sees
+      // a hint in the text field.
+      const msg = err instanceof Error ? err.message : String(err);
+      try { setText(`(mic error: ${msg.slice(0, 60)})`); } catch { /* ignore */ }
       setListening(false);
     }
   };
 
   const handleSilenceArbiter = async () => {
-    stopTTS();
-    setSpeaking(false);
+    // Same defensive shell — stopTTS hits two native engines
+    // (expo-speech + executorch) and any unhandled rejection can
+    // kill the bridge.
+    try { stopTTS(); } catch { /* ignore */ }
+    try { setSpeaking(false); } catch { /* ignore */ }
     // After silencing, the player almost always wants to respond —
     // open the mic if STT is enabled. If not, just leave them at
     // text input.
     if (voice.sttEnabled) {
-      await handleMic();
+      try { await handleMic(); } catch { /* handleMic has its own catch */ }
     }
   };
 

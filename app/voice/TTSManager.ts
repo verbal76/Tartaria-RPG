@@ -40,7 +40,12 @@ let voicesCache: Speech.Voice[] | null = null;
  *  inserts a ~0.5-2s init gap between separate utterances; merging
  *  them eliminates the pause the player hears between sections. */
 let coalesceTimer: ReturnType<typeof setTimeout> | null = null;
-const COALESCE_MS = 150;
+// Bumped from 150 → 400ms so streaming Arbiter sentences arriving
+// from token-by-token Qwen generation (≈ 200–500ms per sentence)
+// have a chance to batch into ONE utterance. Each sentence in its
+// own utterance pays Android TTS's ~0.5–2s reinit gap; one merged
+// utterance gives a natural sentence-end pause (~0.2s).
+const COALESCE_MS = 400;
 
 /** Returns true if expo-speech can run on this device. We try two
  *  probes because `getAvailableVoicesAsync` returns an empty list on
@@ -130,7 +135,13 @@ export function stopAndClear(): void {
   currentlySpeaking = null;
   if (coalesceTimer != null) { clearTimeout(coalesceTimer); coalesceTimer = null; }
   try { void Speech.stop(); } catch { /* ignore */ }
-  void piperStopAndClear();
+  // Unhandled-rejection-safe — piperStopAndClear awaits expo-av
+  // teardown which can reject on Android when a sound is mid-load
+  // or already-unloaded. Without this .catch the rejection
+  // propagates into the React Native bridge and (on some Android
+  // builds) crashes the process to the home screen when the
+  // SILENCE ARBITER button is tapped.
+  void piperStopAndClear().catch(() => { /* ignore */ });
 }
 
 /** Keep the currently-speaking sentence, but drop everything queued
@@ -167,13 +178,16 @@ function drain(): void {
   // Android TTS's per-utterance init gap (~1-2s of reinit) doesn't
   // land between consecutive log lines from the same action. We
   // still want a perceptible breath between distinct sections —
-  // joining with "\n" and force-terminating each segment makes the
-  // engine read a natural paragraph pause (~0.4s on most Android
-  // builds) WITHIN the single utterance.
+  // joining with a single space and force-terminating each segment
+  // makes the engine read a natural SENTENCE-end pause (~0.2s on
+  // most Android builds) inside the single utterance. Previous
+  // joiner was "\n" which produced a paragraph break (~0.4–0.5s)
+  // and broke up the reading flow into discrete announcements
+  // rather than connected prose.
   const batch = queue.splice(0, queue.length);
   const next: QueuedUtterance = {
     id: batch[0]!.id,
-    text: batch.map((it) => withTerminator(it.text)).join('\n'),
+    text: batch.map((it) => withTerminator(it.text)).join(' '),
     channel: batch[0]!.channel,
   };
   currentlySpeaking = next;
