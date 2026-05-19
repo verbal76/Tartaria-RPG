@@ -1554,6 +1554,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const trimmed = text.trim();
     if (!trimmed || get().pendingRolls) return;
 
+    // Meta-comment guard. Playtest log: the player typed a long
+    // feedback note — "ok it doesn't realize I left the outpost.
+    // also we should have a dismantle/loot button so I can RNG roll
+    // for loot once I do something to an item, like how I opened a
+    // lockbox and opened the trap" — and the parser found 'dismantle'
+    // in the middle of the prose, fired the open intent, and the
+    // game responded "You force the loot button can rng roll loot
+    // once item like opened lockbox opened trap open." The fix:
+    // when the input is long AND contains a conversational marker
+    // ("ok ", "we should", "you should", "btw", etc.), don't route
+    // through the verb parser — log the note so we can review it
+    // later, surface a small Arbiter ack, and bail.
+    if (
+      trimmed.length > 100 &&
+      /^(ok\b|btw\b|fyi\b|hey\b|so\b)|(\bwe should\b|\byou should\b|\bi think\b|\bi wish\b|\bi'?d like\b|\bcan we\b|\bshould have\b|\bneeds? to be\b)/i.test(trimmed)
+    ) {
+      get().appendLog('player', trimmed, { meta: true });
+      get().appendLog(
+        'arbiter',
+        `The Arbiter listens but does not act. "Noted. Phrase it as a verb when you want me to do it — 'dismantle the trap', 'search the floor', 'go east'."`,
+      );
+      get().appendLog('debug', `meta-comment guard: skipped intent parse on ${trimmed.length}-char input`);
+      return;
+    }
+
     // A new player action invalidates any in-flight Arbiter generation. The
     // stale stream's tokens would land below the new scene, which feels
     // disjointed. cancelGeneration bumps the epoch so the dropped text is
@@ -2333,6 +2358,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const dirMatch = /\b(north|south|east|west)\b/.exec(target);
         if (dirMatch) {
           const dir = dirMatch[1] as Direction;
+          // Hub-mode cleanup. If we reached this point the player was
+          // in a hub room AND the hub-travel block above didn't match
+          // a hub-internal exit. Cardinal travel out of a hub room
+          // means the player is leaving the outpost into the wilds —
+          // clear hubRoomId now so subsequent dig / search calls don't
+          // get refused with "the outpost floors are board and brick"
+          // (playtest log: player walked east twice out of the Armory,
+          // tried to dig, got the still-in-the-outpost refusal). Also
+          // narrate the exit so the player knows the world changed.
+          if (player.hubRoomId) {
+            set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+            get().appendLog(
+              'world',
+              `You walk ${dir} past the gate. The outpost falls away behind you.`,
+            );
+          }
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.travel), 1) });
           get().stepDirection(dir);
           break;
@@ -3539,10 +3580,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'open': {
-        // Open / unlock / disarm — persistent room state. Once
-        // touched, the container / trap remains open on re-entry.
-        // Doesn't issue rolls — that's the area-search / dig path's
-        // job. This handler just marks the state and narrates.
+        // Open / unlock / disarm / dismantle — persistent room state.
+        // First open on a recognisable container type ALSO rolls a
+        // small loot bundle (player feedback: "we should have a
+        // dismantle/loot button so I can RNG roll for loot once I do
+        // something to an item, like how I opened a lockbox and
+        // opened the trap"). Pool is keyed by noun keyword so any
+        // container the player names lands in a sensible category.
         const target = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
         if (!target) {
           get().appendLog('arbiter', `The Arbiter raises a brow. "Open what? Name the chest, crate, or door."`);
@@ -3569,7 +3613,90 @@ export const useGameStore = create<GameStore>((set, get) => ({
             },
           },
         }));
-        get().appendLog('world', `You force the ${target} open. It stays open.`);
+        // Pick a loot pool from the noun. Order matters — match the
+        // most-specific terms first ('lockbox' before 'box'). Doors
+        // and walls fall through to null and just narrate the open.
+        const lower = key;
+        type LootPool = { name: string; weight: number; minQty: number; maxQty: number; tags: string[]; kind: 'misc' | 'consumable' };
+        const POOLS: Array<{ match: RegExp; pool: LootPool[]; narration: string }> = [
+          {
+            match: /\b(lockbox|strongbox|coffer|safe)\b/,
+            pool: [
+              { name: 'Scrap Metal', weight: 30, minQty: 1, maxQty: 2, tags: ['metal'], kind: 'misc' },
+              { name: 'Aether Crystal', weight: 12, minQty: 1, maxQty: 1, tags: ['aether','crystal'], kind: 'misc' },
+              { name: 'Aetheric Shard', weight: 8, minQty: 1, maxQty: 1, tags: ['aether','shard'], kind: 'misc' },
+              { name: 'Patched Cloth', weight: 20, minQty: 1, maxQty: 2, tags: ['cloth'], kind: 'misc' },
+            ],
+            narration: `The ${target} cracks open. You sift what was kept inside.`,
+          },
+          {
+            match: /\btrap\b/,
+            pool: [
+              { name: 'Scrap Metal', weight: 40, minQty: 1, maxQty: 2, tags: ['metal'], kind: 'misc' },
+              { name: 'Stick', weight: 25, minQty: 1, maxQty: 2, tags: ['wood'], kind: 'misc' },
+              { name: 'Spider Silk', weight: 10, minQty: 1, maxQty: 1, tags: ['fiber'], kind: 'misc' },
+              { name: 'Small Rock', weight: 25, minQty: 1, maxQty: 2, tags: ['stone'], kind: 'misc' },
+            ],
+            narration: `You take the ${target} apart for parts.`,
+          },
+          {
+            match: /\b(crate|chest|box|cache|stash)\b/,
+            pool: [
+              { name: 'Scrap Metal', weight: 25, minQty: 1, maxQty: 2, tags: ['metal'], kind: 'misc' },
+              { name: 'Stick', weight: 25, minQty: 1, maxQty: 2, tags: ['wood'], kind: 'misc' },
+              { name: 'Patched Cloth', weight: 25, minQty: 1, maxQty: 2, tags: ['cloth'], kind: 'misc' },
+              { name: 'Small Rock', weight: 25, minQty: 1, maxQty: 2, tags: ['stone'], kind: 'misc' },
+            ],
+            narration: `The ${target} swings open. The contents are humble.`,
+          },
+          {
+            match: /\b(defenses|defense|defences|defence|automaton|construct|drone|sentinel)\b/,
+            pool: [
+              { name: 'Scrap Metal', weight: 45, minQty: 1, maxQty: 3, tags: ['metal'], kind: 'misc' },
+              { name: 'Aether Crystal', weight: 15, minQty: 1, maxQty: 1, tags: ['aether','crystal'], kind: 'misc' },
+              { name: 'Aether Residue', weight: 15, minQty: 1, maxQty: 1, tags: ['aether'], kind: 'misc' },
+              { name: 'Small Rock', weight: 25, minQty: 1, maxQty: 2, tags: ['stone'], kind: 'misc' },
+            ],
+            narration: `You strip the ${target} for usable parts.`,
+          },
+        ];
+        const matched = POOLS.find((p) => p.match.test(lower));
+        if (!matched) {
+          // No loot pool — door / wall / generic mechanism. Just narrate.
+          get().appendLog('world', `You force the ${target} open. It stays open.`);
+          void get().persist();
+          break;
+        }
+        // Weighted pick — sum weights, roll, walk.
+        const totalWeight = matched.pool.reduce((acc, p) => acc + p.weight, 0);
+        const roll = rollDie(totalWeight);
+        let cumulative = 0;
+        let picked = matched.pool[0]!;
+        for (const entry of matched.pool) {
+          cumulative += entry.weight;
+          if (roll <= cumulative) { picked = entry; break; }
+        }
+        const qty = picked.minQty + Math.floor(Math.random() * (picked.maxQty - picked.minQty + 1));
+        const grantResult = grantItem(player.inventory, {
+          id: `${picked.name}_${Date.now()}`,
+          name: picked.name,
+          kind: picked.kind,
+          quantity: qty,
+          tags: picked.tags,
+        });
+        set((s) =>
+          s.player ? { player: { ...s.player, inventory: grantResult.inventory } } : s,
+        );
+        get().appendLog('world', matched.narration);
+        const actualQty = grantResult.accepted;
+        if (actualQty > 0) {
+          get().appendLog(
+            'reward',
+            `✦ Recovered ${picked.name}${actualQty > 1 ? ` x${actualQty}` : ''} from the ${target}.`,
+          );
+        } else {
+          get().appendLog('world', `Inventory cap reached — the ${picked.name} stays behind.`);
+        }
         void get().persist();
         break;
       }

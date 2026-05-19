@@ -107,7 +107,15 @@ function detachListeners(): void {
 
 function attachListeners(): void {
   detachListeners();
-  if (!lib.addListener) return;
+  if (!lib.module) return;
+  // Call addListener THROUGH the module so `this` binds correctly.
+  // The standalone `addSpeechRecognitionListener` export is just a
+  // reference to module.addListener — when called free-standing,
+  // `this` is undefined and some Expo versions throw silently in
+  // that path.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const add = (eventName: string, listener: (e: any) => void) =>
+    lib.module.addListener(eventName, listener);
   try {
     // result — partial + final transcripts. Log every result with a
     // tiny prefix so the playtest log shows whether the recognizer is
@@ -115,7 +123,7 @@ function attachListeners(): void {
     // can tell "engine fired result event with nothing" apart from
     // "engine never fired."
     subs.push(
-      lib.addListener('result', (e: { isFinal?: boolean; results?: Array<{ transcript?: string }> }) => {
+      add('result', (e: { isFinal?: boolean; results?: Array<{ transcript?: string }> }) => {
         const text = e.results?.[0]?.transcript ?? '';
         const final = !!e.isFinal;
         diag('debug', `stt: result final=${final} text="${text}"`);
@@ -123,7 +131,7 @@ function attachListeners(): void {
       }),
     );
     subs.push(
-      lib.addListener('error', (e: { message?: string; error?: string }) => {
+      add('error', (e: { message?: string; error?: string }) => {
         listening = false;
         const code = e?.error || 'unknown';
         const msg = e?.message || code;
@@ -147,7 +155,7 @@ function attachListeners(): void {
       }),
     );
     subs.push(
-      lib.addListener('end', () => {
+      add('end', () => {
         listening = false;
         diag('debug', 'stt: end (session closed)');
       }),
@@ -158,12 +166,12 @@ function attachListeners(): void {
     // muted, etc.). If we see speechstart but never result, the engine
     // is hearing audio but not turning it into words (locale wrong,
     // recognizer service crashed, etc.).
-    subs.push(lib.addListener('start', () => diag('debug', 'stt: started')));
-    subs.push(lib.addListener('speechstart', () => diag('debug', 'stt: speechstart (audio detected)')));
-    subs.push(lib.addListener('speechend', () => diag('debug', 'stt: speechend')));
-    subs.push(lib.addListener('audiostart', () => diag('debug', 'stt: audiostart')));
-    subs.push(lib.addListener('audioend', () => diag('debug', 'stt: audioend')));
-    subs.push(lib.addListener('nomatch', () => {
+    subs.push(add('start', () => diag('debug', 'stt: started')));
+    subs.push(add('speechstart', () => diag('debug', 'stt: speechstart (audio detected)')));
+    subs.push(add('speechend', () => diag('debug', 'stt: speechend')));
+    subs.push(add('audiostart', () => diag('debug', 'stt: audiostart')));
+    subs.push(add('audioend', () => diag('debug', 'stt: audioend')));
+    subs.push(add('nomatch', () => {
       diag('debug', 'stt: nomatch (engine heard you but could not turn it into words)');
       diag('system', 'Mic: heard you but could not transcribe. Try speaking more clearly or check your device locale.');
     }));
@@ -248,29 +256,64 @@ export async function startListening(
   // Going back to safe defaults that work everywhere, even at the cost
   // of the recognizer giving up after a brief pause.
   //
-  // Also: log the speech-recognition services the device actually
-  // exposes. Helps diagnose silent failures on ROMs without GMS
-  // (LineageOS, Samsung-without-Google, etc.) — if the list is empty
-  // the player needs to install Google Speech Services from the Play
-  // Store before STT will work at all.
+  // Log available services + the system default so we can see which
+  // recognizer the player's device actually uses. Then pick one
+  // explicitly — the module's default behavior assumes
+  // com.google.android.googlequicksearchbox (Google Search app), but
+  // Pixels and many modern Android builds use com.google.android.as
+  // (Android System Intelligence) instead. If start() falls back to
+  // the missing default package, it succeeds but binds to nothing
+  // and never fires any event (the exact failure mode from playtest
+  // log OTA 106).
+  let services: string[] | null = null;
+  let defaultService: string | null = null;
   try {
-    const services = typeof lib.module.getSpeechRecognitionServices === 'function'
+    services = typeof lib.module.getSpeechRecognitionServices === 'function'
       ? lib.module.getSpeechRecognitionServices()
       : null;
     diag('debug', `stt: services=${JSON.stringify(services)}`);
   } catch (err) {
     diag('debug', `stt: services lookup threw ${err instanceof Error ? err.message : String(err)}`);
   }
+  try {
+    defaultService = typeof lib.module.getDefaultRecognitionService === 'function'
+      ? lib.module.getDefaultRecognitionService()?.packageName ?? null
+      : null;
+    diag('debug', `stt: defaultService=${defaultService}`);
+  } catch (err) {
+    diag('debug', `stt: defaultService lookup threw ${err instanceof Error ? err.message : String(err)}`);
+  }
+  // Preference order: system default → Android System Intelligence
+  // (Pixel) → Google Search box (most other Androids) → first
+  // available recognition service that isn't a TTS-only package.
+  const RECOGNITION_PREFS = [
+    defaultService,
+    'com.google.android.as',
+    'com.google.android.googlequicksearchbox',
+  ].filter((s): s is string => !!s);
+  // Filter the available services to drop anything that is plainly
+  // not a recognizer (TTS engines, third-party apps that registered
+  // themselves but don't actually serve RECOGNIZE_SPEECH).
+  const recognizers = (services ?? []).filter(
+    (s) => !s.includes('.tts') && !s.includes('anthropic') && !s.includes('whisper'),
+  );
+  const chosenService =
+    RECOGNITION_PREFS.find((s) => recognizers.includes(s)) ??
+    recognizers[0] ??
+    null;
+  diag('debug', `stt: chosenService=${chosenService ?? '(module default)'}`);
   diag('debug', `stt: start lang=${locale} interim=true continuous=false`);
   try {
-    lib.module.start({
+    const startOptions: Record<string, unknown> = {
       lang: locale,
       interimResults: true,
       maxAlternatives: 1,
       continuous: false,
       requiresOnDeviceRecognition: false,
       addsPunctuation: false,
-    });
+    };
+    if (chosenService) startOptions.androidRecognitionServicePackage = chosenService;
+    lib.module.start(startOptions);
     listening = true;
   } catch (err) {
     listening = false;
