@@ -265,11 +265,27 @@ describe('Literary and Atmosphere Audit', () => {
     avgSim = pairCount > 0 ? avgSim / pairCount : 0;
 
     // ─── 3. SENSORY SHIFT — same scene under state changes ────
-    // Baseline look. Then manually mutate player state (HP → 1,
-    // clock → +12 hours simulating day→night) and look again.
-    // The narration should ideally vary with the player's state;
-    // if templates are static, they won't.
+    // Force a fresh scene so the player has somewhere to look at.
+    // The 500-turn loop + groundhog sweep can leave the player in a
+    // dead / scene-less state where look() returns no world output
+    // (which would trivially score the two looks as 100% identical).
     restUntil(8);
+    if (!store.getState().currentScene || (store.getState().player?.hp ?? 0) <= 0) {
+      // Re-bootstrap into a known scene.
+      const slot = store.getState().activeSlotId;
+      if (slot) {
+        try { await store.getState().loadSlotIntoGame(slot); } catch { /* ignore */ }
+      }
+      try { store.getState().beginScene(); } catch { /* ignore */ }
+    }
+    // Ensure the player has HP — clamp away from death so the
+    // baseline look isn't fighting weather damage.
+    {
+      const p0 = store.getState().player;
+      if (p0) {
+        store.setState({ player: { ...p0, hp: p0.hpMax, stamina: p0.staminaMax, hoursElapsed: Math.floor((p0.hoursElapsed ?? 0) / 24) * 24 + 12 /* high noon */ } });
+      }
+    }
     let baselineBefore = store.getState().gameLog.length;
     submit('look');
     const baselineLines = store.getState().gameLog.slice(baselineBefore)
@@ -277,7 +293,7 @@ describe('Literary and Atmosphere Audit', () => {
       .map((l) => l.text)
       .join(' ');
 
-    // Mutate state.
+    // Mutate state for the stressed look.
     const beforePlayer = store.getState().player!;
     store.setState({
       player: {
