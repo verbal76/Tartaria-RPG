@@ -198,14 +198,18 @@ export function ContractsScreen() {
           {factionQuests.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>FACTION QUESTS</Text>
-              {factionQuests.map(({ rec, def }, i) =>
-                def ? (
+              {factionQuests.map(({ rec, def }, i) => {
+                if (!def) return null;
+                const stageDef = def.stages?.[rec.stage];
+                const readyToTurnIn =
+                  def.stages && def.stages.length > 0 && rec.stage >= def.stages.length;
+                return (
                   <View key={`q_${def.id}_${i}`} style={styles.card}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{def.title}</Text>
                       <Text style={styles.stagePill}>
                         {def.stages && def.stages.length > 0
-                          ? rec.stage >= def.stages.length
+                          ? readyToTurnIn
                             ? 'ready to turn in'
                             : `stage ${rec.stage + 1} / ${def.stages.length}`
                           : 'open'}
@@ -213,9 +217,34 @@ export function ContractsScreen() {
                     </View>
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     <Text style={styles.cardBody}>{def.objective}</Text>
+                    {/* Current-stage narration — playtest feedback:
+                        "I should be able to tap on the listed quest and
+                        see instructions on my next step". Surface the
+                        stage line directly so the player sees what to
+                        do next without needing to remember the vendor
+                        intro. Hunt / Mystery / Storyline cards already
+                        do this — this brings faction quests to parity. */}
+                    {!readyToTurnIn && stageDef && (
+                      <>
+                        <Text style={styles.cardStageLabel}>Next step</Text>
+                        <Text style={styles.cardStageBody}>{stageDef.narration}</Text>
+                        {stageDef.advanceOn && stageDef.advanceOn !== 'any' && (
+                          <Text style={styles.cardStageHint}>
+                            {stageDef.advanceOn === 'kill'
+                              ? '→ Advance by defeating an enemy.'
+                              : '→ Advance by traveling to a new location.'}
+                          </Text>
+                        )}
+                      </>
+                    )}
+                    {readyToTurnIn && (
+                      <Text style={styles.cardStageHint}>
+                        → Return to any {factionLabel(def.factionId)} agent and turn in.
+                      </Text>
+                    )}
                   </View>
-                ) : null,
-              )}
+                );
+              })}
             </View>
           )}
       </ScrollView>
@@ -299,5 +328,8 @@ const styles = StyleSheet.create({
   },
   cardFaction: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginBottom: 4 },
   cardBody: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
+  cardStageLabel: { color: '#c9a86a', fontSize: 10, letterSpacing: 2, fontWeight: '700', marginTop: 8, marginBottom: 2 },
+  cardStageBody: { color: '#e6d8b3', fontSize: 12, lineHeight: 17, marginBottom: 4 },
+  cardStageHint: { color: '#9ec96a', fontSize: 11, fontStyle: 'italic', marginTop: 2 },
   milestoneRow: { flexDirection: 'row', backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, padding: 10 },
 });

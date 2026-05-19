@@ -389,6 +389,37 @@ const STAMINA_COSTS = {
 const CORRUPTION_MAX = 50;
 const TRAVEL_MIN_STAMINA = STAMINA_COSTS.travel;
 
+/** Pick a single distinctive keyword from a contract title for the
+ *  "Say 'accept X' to take it" hint. Returns the LAST word ≥ 4 chars
+ *  that isn't a stopword — for English titles that's almost always
+ *  the head noun. Examples:
+ *    "Walk the buried road"           → "road"
+ *    "The Bog Dragon of Old Drakova"  → "Drakova"
+ *    "Cradle of Dusk Compass"         → "Compass"
+ *    "The Path of the True Tartarian" → "Tartarian"
+ *    "Field a scholar"                → "scholar"
+ *    "Cut down a rare beast"          → "beast"
+ *  The accept-handler uses substring fuzzy matching against the
+ *  contract pool, so any unique-enough word in the title resolves.
+ *  Replaces the previous "first three words" slice which produced
+ *  awkward hints like "accept walk the". */
+const ACCEPT_HINT_STOPWORDS = new Set([
+  'a', 'an', 'the', 'of', 'in', 'on', 'to', 'for', 'with', 'from',
+  'by', 'at', 'and', 'or', 'old', 'new', 'true', 'down', 'up',
+]);
+function acceptKeyword(title: string): string {
+  const tokens = title.split(/\s+/).filter(Boolean);
+  for (let i = tokens.length - 1; i >= 0; i--) {
+    const raw = tokens[i]!;
+    const clean = raw.replace(/[^a-zA-Z']/g, '');
+    if (clean.length < 4) continue;
+    if (ACCEPT_HINT_STOPWORDS.has(clean.toLowerCase())) continue;
+    return clean.toLowerCase();
+  }
+  // Fallback — title was unusually short; just lowercase the first token.
+  return (tokens[0] ?? title).toLowerCase();
+}
+
 function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
   const stamMax = p.staminaMax ?? 8 + Math.floor((p.stats?.strength ?? 5) / 2);
   // Migrate legacy single-slot equipped fields to the multi-slot shape.
@@ -1333,7 +1364,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const q = pool[0]!;
           get().appendLog(
             'arbiter',
-            `${vendor.name} leans in. "Got a contract for someone like you. ${q.title}. ${q.description} Reward: ${q.reward.tc} TC, +${q.reward.rep} rep. Say 'accept ${q.title.split(' ').slice(0, 2).join(' ').toLowerCase()}' to take it."`,
+            `${vendor.name} leans in. "Got a contract for someone like you. ${q.title}. ${q.description} Reward: ${q.reward.tc} TC, +${q.reward.rep} rep. Say 'accept ${acceptKeyword(q.title)}' to take it."`,
           );
         }
         // Active quest with this faction's agent? Hint at the turn-in.
@@ -1358,7 +1389,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const h = huntPool[0]!;
           get().appendLog(
             'arbiter',
-            `${vendor.name} taps a notice on the post. "Bounty up — ${h.title}. ${h.posterText} Say 'accept ${h.title.split(' ').slice(1, 4).join(' ').toLowerCase()}' to take it."`,
+            `${vendor.name} taps a notice on the post. "Bounty up — ${h.title}. ${h.posterText} Say 'accept ${acceptKeyword(h.title)}' to take it."`,
           );
         }
         // Active hunt with this faction's agent? Prompt for turn-in.
@@ -1384,7 +1415,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const m = mysteryPool[0]!;
           get().appendLog(
             'arbiter',
-            `${vendor.name} taps a different notice. "Mystery work — ${m.title}. ${m.posterText} Say 'accept ${m.title.split(' ').slice(0, 3).join(' ').toLowerCase()}' to take it."`,
+            `${vendor.name} taps a different notice. "Mystery work — ${m.title}. ${m.posterText} Say 'accept ${acceptKeyword(m.title)}' to take it."`,
           );
         }
         const mysteryTurnable = (player.activeMysteries ?? [])
@@ -1409,7 +1440,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const s = storyPool[0]!;
           get().appendLog(
             'arbiter',
-            `${vendor.name} unrolls a thick scroll. "Long-form work — ${s.title}. ${s.posterText} Say 'accept ${s.title.split(' ').slice(0, 3).join(' ').toLowerCase()}' to take it."`,
+            `${vendor.name} unrolls a thick scroll. "Long-form work — ${s.title}. ${s.posterText} Say 'accept ${acceptKeyword(s.title)}' to take it."`,
           );
         }
         const storyTurnable = (player.activeStorylines ?? [])
