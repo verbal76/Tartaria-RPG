@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   examples: { color: '#9ec96a', fontSize: 11, marginTop: 8, lineHeight: 16, letterSpacing: 0.5 },
   chipLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  chipScrollRow: { flexDirection: 'row', gap: 6, paddingRight: 8 },
+  chipScrollRow: { flexDirection: 'row', gap: 6, paddingLeft: 2, paddingRight: 8 },
   chip: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',

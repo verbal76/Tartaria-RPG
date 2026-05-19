@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   input: { backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1, color: '#e6d8b3', paddingHorizontal: 10, paddingVertical: 9, borderRadius: 3, fontSize: 14 },
   chipLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  chipScrollRow: { flexDirection: 'row', gap: 6, paddingRight: 8 },
+  chipScrollRow: { flexDirection: 'row', gap: 6, paddingLeft: 2, paddingRight: 8 },
   chip: { backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1, borderRadius: 3, paddingHorizontal: 10, paddingVertical: 6 },
   chipScene: { borderColor: '#9ec96a' },
   chipEnemy: { borderColor: '#e07a5f' },
