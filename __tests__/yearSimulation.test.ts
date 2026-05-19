@@ -275,24 +275,43 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
 
     const submit = (text: string) => {
       actionsAttempted++;
+      const sBefore = store.getState();
+      const logLenBefore = sBefore.gameLog.length;
+      const stamBefore = sBefore.player?.stamina ?? 0;
+      const hubBefore = sBefore.player?.hubRoomId ?? null;
+      const locBefore = sBefore.currentScene?.location.id ?? null;
       try {
         store.getState().submitPlayerAction(text);
       } catch (e: any) {
         crashes.push(`submitPlayerAction("${text}"): ${e?.message ?? e}`);
       }
       resolveAnyPendingRoll();
+      const sAfter = store.getState();
+      if (actionTrace.length < TRACE_LIMIT) {
+        const newLogs = sAfter.gameLog.slice(logLenBefore);
+        const firstNew = newLogs[0]?.text.slice(0, 90) ?? '(no log)';
+        actionTrace.push(
+          `[${actionsAttempted}] hub=${hubBefore?.slice(0, 12) ?? '-'} loc=${locBefore?.slice(0, 18) ?? '-'} stam=${stamBefore} "${text}" → ${firstNew}`,
+        );
+      }
     };
 
     // Known location names to round-robin through for named travel,
     // so encounters fire across many distinct scenes instead of the
-    // sim looping the same two map tiles.
+    // sim looping the same two map tiles. Reclaimers Outpost is the
+    // starting hub — listing it would re-enter hub mode and lock us
+    // out of the open world again.
     const NAMED_LOCATIONS = [
-      'Drakova', 'Varakush', 'Asgardar', 'Tartarian Outskirts',
-      'Mud Seas', 'Cradle', 'Aetherstone Spire', 'Silt Wastes',
-      'Reclaimers Outpost', 'Borderlands',
+      'Drakova', 'Varakush', 'Asgardar', 'Mud Seas',
+      'Tartarian Outskirts', 'Cradle', 'Silt Wastes',
+      'Borderlands', 'Iron Wastes', 'Glass Hills',
     ];
     let locIdx = 0;
     let leftHub = false;
+    // Trace the first N actions to a file so we can debug what the
+    // sim is actually doing if coverage stays low.
+    const actionTrace: string[] = [];
+    const TRACE_LIMIT = 200;
 
     // Action picker: bias toward unexercised mechanisms when context
     // makes them legal; fall back to a balanced rotation otherwise.
@@ -351,14 +370,18 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
       }
 
       // ─── Stamina / HP critical ──────────────────────────────────
-      if (p.stamina <= 1) {
+      // Rest aggressively — if stamina is below half we can't reliably
+      // travel (TRAVEL_MIN_STAMINA = 2), so the sim was getting stuck
+      // running out of stamina and never hitting macro travel.
+      const stamFrac = p.stamina / Math.max(1, p.staminaMax);
+      if (p.stamina <= 2) {
         const ration = p.inventory.find((it) =>
           /ration|bread|food|jerky|fruit|meat|fish|stew|berry|mushroom/i.test(it.name),
         );
         if (ration) return `eat ${ration.name}`;
         return 'rest';
       }
-      if (hpFrac < 0.55) return 'rest';
+      if (hpFrac < 0.55 || stamFrac < 0.5) return 'rest';
 
       // ─── Vendor present ─────────────────────────────────────────
       if (scene?.vendor) {
@@ -696,6 +719,14 @@ First 3 slotErrs:   ${slotLoadErrors.slice(0, 3).join(' | ') || '(none)'}
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const fs = require('fs');
       fs.writeFileSync('/tmp/tartaria-year-sim-report.txt', report);
+      // Trace of the first 200 actions — what the sim issued, the
+      // player's stamina + hub + location before each, and the first
+      // log line that followed. Critical for diagnosing why coverage
+      // gaps exist.
+      fs.writeFileSync(
+        '/tmp/tartaria-year-sim-trace.txt',
+        actionTrace.join('\n'),
+      );
     } catch { /* ignore — best-effort artifact */ }
 
     expect(actionsAttempted).toBeGreaterThan(0);
