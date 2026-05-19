@@ -5583,6 +5583,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().travelTo(step.landedOn.locationId);
       return;
     }
+    // Re-entry narration — when a cardinal step lands on a tile the
+    // player has been to before AND that tile has persisted
+    // vandal-state (dropped items / opened containers), surface it.
+    // beginScene already does this, but it only fires on Location
+    // change. Without this hook, stepping back to a previously-
+    // vandalized tile would silently skip the narration even though
+    // the engine state is still on disk.
+    const reentryKey = makeRoomKey(player.currentLocationId, scene.microMicroId, step.x, step.y);
+    const visited = get().worldMemory.visitedRooms?.[reentryKey];
+    if (visited && (visited.droppedItems?.length || visited.containersOpened?.length)) {
+      if (visited.droppedItems?.length) {
+        const itemList = visited.droppedItems
+          .map((d) => d.quantity > 1 ? `${d.name} x${d.quantity}` : d.name)
+          .join(', ');
+        get().appendLog('world', `On the ground: ${itemList}. (left here by you, type 'pick up' to retrieve.)`);
+      }
+      if (visited.containersOpened?.length) {
+        get().appendLog('world', `Still open from before: ${visited.containersOpened.join(', ')}.`);
+      }
+    }
     // Open ground — narrate a wander and plant a hook. Compass in pack
     // adds direction-aware hint of what's ahead.
     const hasCompass = player.inventory.some(

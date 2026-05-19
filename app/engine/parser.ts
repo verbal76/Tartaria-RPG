@@ -23,8 +23,11 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   ],
   investigate: [
     'look', 'examine', 'inspect', 'search', 'study', 'check', 'investigate', 'scan',
-    'observe', 'view', 'read', 'open', 'probe', 'survey', 'find', 'scavenge', 'hunt',
+    'observe', 'view', 'read', 'probe', 'survey', 'find', 'scavenge', 'hunt',
     'peruse', 'scrutinise', 'scrutinize', 'comb',
+    // 'open' belongs to the dedicated open intent — it persists
+    // container state across re-entry. Including it here too would
+    // make "open the chest" silently route to a generic area search.
   ],
   rest: [
     'rest', 'sleep', 'recover', 'camp', 'heal', 'eat', 'consume', 'devour', 'drink',
