@@ -231,38 +231,14 @@ describe('Literary and Atmosphere Audit', () => {
     const avgWords = wordCounts.length > 0 ? wordCounts.reduce((s, n) => s + n, 0) / wordCounts.length : 0;
 
     // ─── 2. GROUNDHOG DAY — re-enter the same tile 15 times ───
-    // Stand on a tile; step out one direction; step back. Capture
-    // the first world-channel line after each return. Jaccard
-    // similarity > 0.8 between any pair flags stagnation.
-    restUntil(8);
+    // (Moved AFTER the fresh-character bootstrap below — same
+    // reason as Sensory Shift: the post-500-turn state silently
+    // swallows the round-trips' world output. Section runs on the
+    // clean character.)
     const groundhogLines: string[] = [];
-    for (let i = 0; i < 15; i++) {
-      // Make sure we have stamina for a round-trip.
-      restUntil(6);
-      const before = store.getState().gameLog.length;
-      submit('go north');
-      submit('go south');
-      // Capture every world line from this round-trip and join — the
-      // earlier narrower filter (`/Your boots find|You walk south.../`)
-      // missed everything because the test stepped through many
-      // narration variants and weather ticks. Joining the whole
-      // round-trip gives Jaccard a real corpus to compare per visit.
-      const after = store.getState().gameLog.slice(before).filter((l) => l.channel === 'world');
-      const combined = after.map((l) => l.text).join(' ');
-      if (combined.length > 0) groundhogLines.push(combined);
-    }
-    // Pairwise similarity.
     const pairFlags: Array<{ i: number; j: number; sim: number }> = [];
     let avgSim = 0;
     let pairCount = 0;
-    for (let i = 0; i < groundhogLines.length; i++) {
-      for (let j = i + 1; j < groundhogLines.length; j++) {
-        const s = jaccard(groundhogLines[i]!, groundhogLines[j]!);
-        avgSim += s; pairCount++;
-        if (s > 0.8) pairFlags.push({ i, j, sim: s });
-      }
-    }
-    avgSim = pairCount > 0 ? avgSim / pairCount : 0;
 
     // ─── 3. SENSORY SHIFT — same scene under state changes ────
     // Start a COMPLETELY fresh character so the look path isn't
@@ -281,6 +257,29 @@ describe('Literary and Atmosphere Audit', () => {
     store.getState().skipTutorial?.();
     submit('leave outpost');
     restUntil(8);
+
+    // ─── 2 (RELOCATED). GROUNDHOG DAY on the fresh character ──
+    // Round-trips on this clean state actually produce world
+    // output the filter can capture. Each iteration: rest →
+    // snapshot log → step north + step south → collect every
+    // world line emitted. Pairwise Jaccard between the 15 visits.
+    for (let i = 0; i < 15; i++) {
+      restUntil(6);
+      const before = store.getState().gameLog.length;
+      submit('go north');
+      submit('go south');
+      const after = store.getState().gameLog.slice(before).filter((l) => l.channel === 'world');
+      const combined = after.map((l) => l.text).join(' ');
+      if (combined.length > 0) groundhogLines.push(combined);
+    }
+    for (let i = 0; i < groundhogLines.length; i++) {
+      for (let j = i + 1; j < groundhogLines.length; j++) {
+        const s = jaccard(groundhogLines[i]!, groundhogLines[j]!);
+        avgSim += s; pairCount++;
+        if (s > 0.8) pairFlags.push({ i, j, sim: s });
+      }
+    }
+    avgSim = pairCount > 0 ? avgSim / pairCount : 0;
 
     const cleanForLook = () => {
       try { store.getState().cancelPendingRolls(); } catch { /* ignore */ }
