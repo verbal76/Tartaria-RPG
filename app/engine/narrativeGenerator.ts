@@ -273,7 +273,9 @@ const INTENT_REMARKS: Partial<Record<Intent, string[]>> = mergePools<Intent>(
   intentQuotes as Partial<Record<Intent, string[]>>,
 );
 
-const LOCATION_FLAVORS = locationFlavors as Record<string, string[]>;
+// Exported so gameStore's arrival-flavor composer can pull a lore beat
+// from the same canonical pool without duplicating the JSON import.
+export const LOCATION_FLAVORS = locationFlavors as Record<string, string[]>;
 const SCENE_FLAVORS = sceneFlavors as Record<string, string[]>;
 
 // Pick the best-matching scene flavor category for the current scene.
@@ -340,17 +342,23 @@ export function buildScene(input: SceneInput): string {
   return parts.join('\n\n');
 }
 
+// Last-resort fallback when NO location flavor, NO mood pool, NO intent
+// pool, NO hook, NO target noun, and NO recent action matched. Used to
+// hold meaningless Yoda-mantras ("Decide", "Patient hands, patient
+// hands", "Either it gives or it doesn't") — the player called those
+// out as nonsense narration that surfaces without context. Replaced
+// with short lore-grounded statements about Tartaria as a setting so
+// even the bottom of the fallback chain teaches the player something
+// about the world.
 const GENERIC_REMARKS = [
-  `The Arbiter inclines their head and says nothing for a moment.`,
-  `"The Aetherstone hums when you are close to the right question," the Arbiter says.`,
-  `"Few return from these ruins unchanged," the Arbiter murmurs.`,
-  `The Arbiter watches the dust hang in the air. "It always does that, here. I've never known why."`,
   `"Tartaria was a place of life and power once," the Arbiter says. "Now mostly whispers."`,
-  `The Arbiter glances at the horizon. "Pick a direction. Tartaria rewards motion more than thought."`,
-  `"The Aether listens to verbs, not adjectives," the Arbiter notes. "Try doing something."`,
-  `The Arbiter waits, expression unreadable. "Decide."`,
-  `"The road is patient," the Arbiter says. "You are not. Use that."`,
-  `The Arbiter shifts their weight. "I will know what you mean when you act."`,
+  `"The Aetherstone Flood ended a thousand years ago," the Arbiter says, "but at ground level it never quite stopped moving."`,
+  `"Every faction down here is hunting the same thing," the Arbiter says. "They just call it different names."`,
+  `"The mud remembers what the surface forgot," the Arbiter murmurs.`,
+  `"The Reclaimers Guild maps what they can," the Arbiter says. "What they can't, they pay you to chart."`,
+  `"The Forgotten Order won't say what they're rebuilding," the Arbiter notes. "Only that it's older than the flood."`,
+  `"True Tartarians walked these roads before the mud came. Some of them still do."`,
+  `"Aetherstone is the bedrock of this country," the Arbiter says. "Touch it carefully — it has opinions."`,
 ];
 
 export interface ArbiterContext {
@@ -469,17 +477,31 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
   }
 
   // Player named a specific noun this turn — keep the Arbiter on-target.
-  // Pick a comment that references THAT noun instead of pulling random
-  // flavor that would drift the focus.
+  // The OLD lines here ("Either it gives or it doesn't", "Patient hands,
+  // patient hands", "Pick what comes after") were the Yoda-mantras the
+  // player complained about: surface noise that says nothing about the
+  // noun or the world. Replaced with location-anchored callbacks that
+  // either give a small lore beat OR explicitly defer to the player's
+  // next move — never both, never neither.
   if (ctx.playerTargetNoun) {
     const n = ctx.playerTargetNoun;
-    const onTopic = [
-      `The Arbiter watches you work on the ${n}. "Either it gives or it doesn't."`,
-      `"The ${n}," the Arbiter says, weighing the word. "Worth the attention."`,
-      `The Arbiter inclines their head toward the ${n}. "Patient hands, patient hands."`,
-      `"You picked the ${n}," the Arbiter notes. "Pick what comes after, too."`,
+    // ~60% of the time, anchor the on-target line in the location's
+    // lore pool — "the spire" + "The Spire still drinks. From what
+    // celestial well, no one will answer." reads as the Arbiter
+    // actually KNOWING what they're at.
+    const locPool = LOCATION_FLAVORS[ctx.location.id];
+    if (locPool && locPool.length > 0 && Math.random() < 0.6) {
+      return `The Arbiter glances at the ${n}. "${pick(locPool)}"`;
+    }
+    // Otherwise a short defer-to-player line that names the noun
+    // without pretending to know more than it does. Three options
+    // only — small pool, rotating, no mantras.
+    const deferLines = [
+      `"The ${n}," the Arbiter says. "Tell me what you mean to do with it."`,
+      `The Arbiter watches you and the ${n} both. "Your move."`,
+      `"What you make of the ${n} is on you," the Arbiter says.`,
     ];
-    return rotatingPick(onTopic, 'arbiter.target-callback');
+    return rotatingPick(deferLines, 'arbiter.target-callback');
   }
 
   // ~15% chance to acknowledge the player's most recent action, wrapped in
@@ -498,29 +520,37 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
     }
   }
 
-  // ~10% chance to drop a location-specific flavor line.
+  // Location-specific flavor — the PRIMARY ambient remark when nothing
+  // more specific (combat / hook / target / recent action) has fired.
+  // Previously gated at 10%, falling through to mood/intent/generic
+  // mantras 90% of the time and producing the "yeah, either the
+  // torches or the torch isn't" gibberish the player flagged. Now this
+  // is the default: at the Pillars the Arbiter talks about the
+  // Pillars, at Voronov they talk about Voronov, at the Cathedral
+  // about the Cathedral. Wrapped with rotatingPick so the same scene
+  // doesn't repeat the same lore line two replies in a row.
   const locPool = LOCATION_FLAVORS[ctx.location.id];
-  if (locPool && locPool.length > 0 && Math.random() < 0.1) {
-    return `The Arbiter looks around. "${pick(locPool)}"`;
+  if (locPool && locPool.length > 0) {
+    return `The Arbiter looks around. "${rotatingPick(locPool, `arbiter.loc.${ctx.location.id}`)}"`;
   }
 
-  // Mood (from cognitive layer) wins if available.
+  // Mood pool — only fires when the location has no authored flavor
+  // (procedural / future content). Replaces "this place" with the
+  // actual location name so the line stays anchored.
   const moodPool = pickMoodPool(ctx.mood);
   if (moodPool) {
     return pick(moodPool).replace('this place', ctx.location.name);
   }
-  // Otherwise pick by deterministic intent.
+  // Intent-specific — same constraint, only when no location flavor.
   const intentPool = ctx.intent ? INTENT_REMARKS[ctx.intent] : undefined;
   if (intentPool && intentPool.length > 0) {
     return pick(intentPool);
   }
-  // Hazard-flavored.
+  // Hazard fallback — names the active hazard, useful bearing.
   if (ctx.hazard && Math.random() < 0.4) {
-    return `The Arbiter eyes the ${ctx.hazard.name.toLowerCase()}. "I'd place that at a Hard, if I had to guess."`;
+    return `The Arbiter eyes the ${ctx.hazard.name.toLowerCase()}. "Tartaria's older hazards are the ones you can't see coming. This one you can."`;
   }
-  // Rotating pick — every entry shows up once before repeating, so the
-  // five filler lines stop landing twice in five minutes the way the
-  // playtest log captured.
+  // Last resort — lore-grounded setting remarks (no Yoda mantras).
   return rotatingPick(GENERIC_REMARKS, 'arbiter.generic');
 }
 

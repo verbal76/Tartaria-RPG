@@ -53,6 +53,7 @@ import {
   buildArbiterSceneIntro,
   USE_RELIC_FAILURE_LINES,
   QWEN_ALLOWED_INTENTS,
+  LOCATION_FLAVORS,
 } from '../engine/narrativeGenerator';
 import { parseInput, type ParseContext } from '../engine/parser';
 import { parseInputViaLLM } from '../engine/llmParser';
@@ -631,7 +632,20 @@ interface GameStore {
 
   appendLog: (channel: LogChannel, text: string, meta?: Record<string, unknown>) => void;
 
-  beginScene: (opts?: { openingPrefix?: string; microMicroId?: string; isOpening?: boolean; skipHubEntry?: boolean }) => void;
+  beginScene: (opts?: {
+    openingPrefix?: string;
+    microMicroId?: string;
+    isOpening?: boolean;
+    skipHubEntry?: boolean;
+    /** Set by travelTo when the player just crossed a location boundary.
+     *  Drives a single consolidated arrival flavor line in place of the
+     *  multi-paragraph default scene narration, per playtest spec:
+     *  "You've left the flats and have fully entered the endless stairs.
+     *  No one has ever made it to the bottom. It's dusk and you see
+     *  nobody around. The stairs go down…" — one paragraph synthesising
+     *  departure + lore beat + time of day + presence + bearings. */
+    arrivalFromName?: string;
+  }) => void;
   /**
    * Submit a player action through the parse → dispatch pipeline.
    *
@@ -1049,7 +1063,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
-  beginScene(opts?: { openingPrefix?: string; microMicroId?: string; isOpening?: boolean; skipHubEntry?: boolean }) {
+  beginScene(opts?: {
+    openingPrefix?: string;
+    microMicroId?: string;
+    isOpening?: boolean;
+    skipHubEntry?: boolean;
+    arrivalFromName?: string;
+  }) {
     const { player, worldMemory } = get();
     if (!player) return;
     const location = getLocationById(player.currentLocationId);
@@ -1288,6 +1308,63 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } else if (opts?.openingPrefix) {
       const final = `${opts.openingPrefix.trim()} ${sceneText.replace(/\n\n+/g, ' ')}`;
       get().appendLog('world', final);
+    } else if (opts?.arrivalFromName) {
+      // Consolidated arrival flavor — one paragraph that synthesises
+      // departure + lore beat + time of day + presence + bearings.
+      // Replaces the default multi-paragraph sceneText so crossing
+      // INTO a new location reads as a single coherent beat instead
+      // of 6 lines of layered narration.
+      const fromName = opts.arrivalFromName;
+      const toName = location.name;
+      // Time-of-day phrase from hoursElapsed % 24.
+      const hourOfDay = Math.floor((player.hoursElapsed ?? 0) % 24);
+      const timePhrase =
+        hourOfDay < 5 ? 'pre-dawn dark' :
+        hourOfDay < 8 ? 'dawn' :
+        hourOfDay < 11 ? 'morning' :
+        hourOfDay < 14 ? 'midday' :
+        hourOfDay < 17 ? 'afternoon' :
+        hourOfDay < 20 ? 'dusk' :
+        'night';
+      // One lore beat from the location pool. rotatingPick so two
+      // arrivals at the same place don't repeat.
+      const locPool = (LOCATION_FLAVORS as Record<string, string[]>)[location.id];
+      const loreBeat = (locPool && locPool.length > 0)
+        ? rotatingPick(locPool, `arrival.lore.${location.id}`)
+        : null;
+      // Presence read — enemies / vendor / nobody.
+      let presenceLine: string;
+      if (enemies.length > 0) {
+        const groups = new Map<string, number>();
+        for (const e of enemies) groups.set(e.name, (groups.get(e.name) ?? 0) + 1);
+        const labels = Array.from(groups.entries()).map(([n, c]) => (c > 1 ? `${c} ${n}s` : `a ${n.toLowerCase()}`));
+        presenceLine = `${labels.join(' and ')} ${enemies.length === 1 ? 'is' : 'are'} already here.`;
+      } else if (vendor) {
+        presenceLine = `${vendor.name} is the only soul in sight.`;
+      } else {
+        presenceLine = `Nobody else is in sight.`;
+      }
+      // Bearings — neighbour-tile names from the surrounding world map.
+      const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
+      const map = generateWorldMap(seed, location.id);
+      const survey = surveyAll(map, player.mapX ?? WORLD_MAP_CENTER_X, player.mapY ?? WORLD_MAP_CENTER_Y);
+      const directionLines: string[] = [];
+      const emptyDirs: string[] = [];
+      for (const dir of ['north', 'east', 'south', 'west'] as const) {
+        const hit = survey[dir];
+        if (hit) directionLines.push(`${dir} leads to ${hit.name}`);
+        else emptyDirs.push(dir);
+      }
+      const bearingsLine =
+        directionLines.length > 0
+          ? `${directionLines.join('; ')}${emptyDirs.length > 0 ? `. ${emptyDirs.length === 4 ? 'Open ground all around' : 'Nothing named to the ' + emptyDirs.join(' or ')}` : ''}.`
+          : `Open ground in every direction.`;
+      const arrival =
+        `You've left ${fromName} and entered ${toName}. ` +
+        (loreBeat ? `${loreBeat} ` : '') +
+        `It's ${timePhrase}. ${presenceLine} ` +
+        bearingsLine;
+      get().appendLog('world', arrival);
     } else {
       get().appendLog('world', sceneText);
     }
@@ -4652,6 +4729,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = get().player;
     if (!player) return;
 
+    // Capture the FROM location BEFORE we mutate player. beginScene's
+    // arrival-flavor composer reads this back to print the departure
+    // framing ("You've left The Mud Flats and entered the Endless
+    // Stair.").
+    const fromLocationName = getLocationById(player.currentLocationId).name;
+
     // Travel milestone: every 5 distinct travels → +1 stamina max.
     const prevMs = player.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 };
     const newTravels = prevMs.travelsCompleted + 1;
@@ -4680,27 +4763,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       },
       worldMemory: discoverLocation(get().worldMemory, locationId),
     });
-    get().appendLog('world', `You make your way to ${getLocationById(locationId).name}.`);
+    // The "You make your way to X" line was removed in favour of the
+    // consolidated arrival flavor that beginScene now emits when
+    // opts.arrivalFromName is set. One paragraph, not five.
     if (hitMilestone) {
       get().appendLog(
         'reward',
         `✦ The road has built you up. +1 max stamina (now ${newStaminaMax}). [${newTravels} travels completed]`,
       );
     }
-    // First-travel milestone is noted in the memorable-event log so
-    // the Arbiter can reference "your first long road" later. Fires
-    // only on the player's first completed travel of the run; type
-    // already supports 'first_travel' but nothing was writing it.
     if (newTravels === 1) {
       recordMemorableEvent(get, set, {
         kind: 'first_travel',
         text: `walked your first road, to ${getLocationById(locationId).name}`,
       });
     }
-    // Travel completion advances staged faction quests gated on
-    // travel; kill-gated stages ignore this trigger.
     advanceActiveFactionQuests(get, set, 'travel');
-    get().beginScene();
+    get().beginScene({ arrivalFromName: fromLocationName });
     void get().persist();
   },
 
