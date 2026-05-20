@@ -472,6 +472,11 @@ export interface RollStep {
    *  the player has advantage/disadvantage on this swing. Surfaces
    *  next to the kept die in the post-roll readout. */
   rollModeLabel?: string;
+  /** Set true when the attack step rolled a natural 20 — the
+   *  attack hits regardless of bonuses, and the follow-up damage
+   *  step doubles its dice (classic crit). Also set on natural-1
+   *  to force a miss; the damage step is skipped. */
+  critical?: boolean;
 }
 
 export interface PendingRollState {

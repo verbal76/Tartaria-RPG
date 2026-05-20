@@ -968,7 +968,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // catalog match or not, you can't put them in a backpack. Tactful
     // in-character refusal instead of a silent grant or a stiff error.
     if (isOversized(ambientHit)) {
-      get().appendLog('arbiter', refusalLine(ambientHit));
+      get().appendLog('arbiter', refusalLine(ambientHit), { skipDedup: true });
       return;
     }
     const cat = findCatalogItem(ambientHit);
@@ -1055,7 +1055,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     if (isOversized(ambientHit)) {
-      get().appendLog('arbiter', refusalLine(ambientHit));
+      get().appendLog('arbiter', refusalLine(ambientHit), { skipDedup: true });
       return;
     }
     const cat = findCatalogItem(ambientHit);
@@ -2612,38 +2612,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const outcome = rollAreaSearch(rawTarget);
             set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
             get().appendLog('world', outcome.line);
-            // Record the search so subsequent attempts at the same
-            // target on the same tile hit the dedupe gate. ONLY when
-            // the outcome actually consumed the noun — 'nothing' rolls
-            // leave the prop available for another try / for the
-            // pickup path.
-            if (outcome.kind !== 'nothing') set((s) => {
-              const room = s.worldMemory.visitedRooms?.[fallbackRoomKey] ?? {
-                firstVisitAt: Date.now(),
-                lastVisitAt: Date.now(),
-                visitCount: 1,
-              };
-              const prevSearched = room.searchedAmbientNouns ?? [];
-              return {
-                worldMemory: {
-                  ...s.worldMemory,
-                  visitedRooms: {
-                    ...(s.worldMemory.visitedRooms ?? {}),
-                    [fallbackRoomKey]: {
-                      ...room,
-                      searchedAmbientNouns: [...prevSearched, loweredFallback],
-                    },
-                  },
-                },
-              };
-            });
-            // Actually grant the outcome — previously this path only
-            // narrated the line ("A useful scrap turns up in your
-            // hand") without ever calling grantItem / awarding TC /
-            // planting the hook. Playtest log caught the disconnect:
-            // narration claimed loot, inventory had none. Mirror the
-            // canonical investigate path so attack-fallback finishes
-            // what its narration promises.
+            // Dispatch outcome first, then dedupe based on whether
+            // anything actually produced — mirrors the harvest-verb
+            // path so attack-fallback also stops consuming nouns on
+            // hook-no-op.
+            let producedFb = false;
             if (outcome.kind === 'material') {
               const itemCat = lookupCraftedItem(outcome.itemName);
               const newItem: InventoryItem = stampDurability({
@@ -2663,9 +2636,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } else {
                 get().appendLog('world', `Found a ${outcome.itemName.toLowerCase()}, but your pack is already full of them.`);
               }
+              producedFb = true;
             } else if (outcome.kind === 'tc') {
               set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + outcome.amount } } : s));
               get().appendLog('reward', `+${outcome.amount} TC.`);
+              producedFb = true;
             } else if (outcome.kind === 'hook') {
               const activeUnresolved = (currentScene.hooks ?? []).some((h) => !h.resolved);
               if (!activeUnresolved) {
@@ -2674,8 +2649,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } }
                   : s));
                 get().appendLog('world', hook.plantedLine);
+                producedFb = true;
+              } else {
+                get().appendLog(
+                  'world',
+                  `Something in the ${rawTarget} catches the eye, but there's already an open thread here that wants finishing first.`,
+                );
+                // producedFb stays false — noun NOT consumed.
               }
             }
+            if (producedFb) set((s) => {
+              const room = s.worldMemory.visitedRooms?.[fallbackRoomKey] ?? {
+                firstVisitAt: Date.now(),
+                lastVisitAt: Date.now(),
+                visitCount: 1,
+              };
+              const prevSearched = room.searchedAmbientNouns ?? [];
+              return {
+                worldMemory: {
+                  ...s.worldMemory,
+                  visitedRooms: {
+                    ...(s.worldMemory.visitedRooms ?? {}),
+                    [fallbackRoomKey]: {
+                      ...room,
+                      searchedAmbientNouns: [...prevSearched, loweredFallback],
+                    },
+                  },
+                },
+              };
+            });
             break;
           }
           get().appendLog('world', 'Nothing in arm\'s reach answers your blade. The motion echoes off Aetherstone.');
@@ -2752,14 +2754,64 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const outcome = salvage ?? rollAreaSearch(harvestAmbient);
             get().appendLog('world', outcome.line);
             // Dedupe only on outcomes that actually CONSUMED the noun
-            // (material grant / tc / hook plant). A 'nothing' roll
-            // leaves the noun on the board — playtest log caught this:
-            // player tried `salvage rusted blade`, rolled nothing, then
-            // couldn't `take` the blade later because the dedupe gate
-            // had marked it consumed. Failed salvage shouldn't destroy
-            // the thing.
-            const consumed = outcome.kind !== 'nothing';
-            if (consumed) set((s) => {
+            // Dispatch first, then dedupe based on whether anything
+            // actually produced. Stress-test caught this: hook outcomes
+            // skipped their plant when the scene already had an
+            // unresolved hook — but the dedupe still fired, consuming
+            // the noun for no observable benefit (~50% of salvage
+            // attempts in long runs landed here).
+            let produced = false;
+            if (outcome.kind === 'material') {
+              const itemCat = lookupCraftedItem(outcome.itemName!);
+              const qty = ('quantity' in outcome && typeof outcome.quantity === 'number')
+                ? outcome.quantity
+                : 1;
+              const newItem: InventoryItem = stampDurability({
+                id: `salvage_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                name: outcome.itemName!,
+                kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
+                rarity: outcome.rarity!,
+                quantity: qty,
+                tags: itemCat.tags,
+              });
+              const grantResult = grantItem(player.inventory, newItem);
+              set((s) => (s.player ? { player: { ...s.player, inventory: grantResult.inventory } } : s));
+              if (grantResult.accepted > 0) {
+                const qtyLabel = grantResult.accepted > 1 ? ` x${grantResult.accepted}` : '';
+                get().appendLog('reward', `✦ ${outcome.itemName}${qtyLabel} (${outcome.rarity}).`);
+                produced = true;
+              } else {
+                get().appendLog('world', `Found a ${outcome.itemName!.toLowerCase()}, but your pack is already full of them.`);
+                // Pack-full counts as produced (you've worked over the
+                // noun and the item rolled, you just couldn't carry it).
+                produced = true;
+              }
+            } else if (outcome.kind === 'tc') {
+              set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + outcome.amount } } : s));
+              get().appendLog('reward', `+${outcome.amount} TC.`);
+              produced = true;
+            } else if (outcome.kind === 'hook') {
+              const activeUnresolved = (currentScene.hooks ?? []).some((h) => !h.resolved);
+              if (!activeUnresolved) {
+                const hook = plantHookByKind(pickRandomHookKind());
+                set((s) => (s.currentScene
+                  ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } }
+                  : s));
+                get().appendLog('world', hook.plantedLine);
+                produced = true;
+              } else {
+                // Hook rolled but the scene already has an unresolved
+                // thread. Emit a one-line consolation so the noun
+                // doesn't vanish silently from the player's options.
+                get().appendLog(
+                  'world',
+                  `Something in the ${harvestAmbient} nudges at the edge of attention, but there's already a thread in this scene that wants finishing first.`,
+                );
+                // produced stays false — noun NOT consumed; player can
+                // try the noun again after resolving the existing hook.
+              }
+            }
+            if (produced) set((s) => {
               const room = s.worldMemory.visitedRooms?.[harvestRoomKey] ?? {
                 firstVisitAt: Date.now(),
                 lastVisitAt: Date.now(),
@@ -2779,43 +2831,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 },
               };
             });
-            if (outcome.kind === 'material') {
-              const itemCat = lookupCraftedItem(outcome.itemName!);
-              // Salvage pool outcomes carry a quantity (1-N depending
-              // on the entry's min/max). Area-search material outcomes
-              // don't set it; default to 1.
-              const qty = ('quantity' in outcome && typeof outcome.quantity === 'number')
-                ? outcome.quantity
-                : 1;
-              const newItem: InventoryItem = stampDurability({
-                id: `salvage_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-                name: outcome.itemName!,
-                kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
-                rarity: outcome.rarity!,
-                quantity: qty,
-                tags: itemCat.tags,
-              });
-              const grantResult = grantItem(player.inventory, newItem);
-              set((s) => (s.player ? { player: { ...s.player, inventory: grantResult.inventory } } : s));
-              if (grantResult.accepted > 0) {
-                const qtyLabel = grantResult.accepted > 1 ? ` x${grantResult.accepted}` : '';
-                get().appendLog('reward', `✦ ${outcome.itemName}${qtyLabel} (${outcome.rarity}).`);
-              } else {
-                get().appendLog('world', `Found a ${outcome.itemName!.toLowerCase()}, but your pack is already full of them.`);
-              }
-            } else if (outcome.kind === 'tc') {
-              set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + outcome.amount } } : s));
-              get().appendLog('reward', `+${outcome.amount} TC.`);
-            } else if (outcome.kind === 'hook') {
-              const activeUnresolved = (currentScene.hooks ?? []).some((h) => !h.resolved);
-              if (!activeUnresolved) {
-                const hook = plantHookByKind(pickRandomHookKind());
-                set((s) => (s.currentScene
-                  ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } }
-                  : s));
-                get().appendLog('world', hook.plantedLine);
-              }
-            }
             break;
           }
         }
@@ -2902,32 +2917,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
           const outcome = rollAreaSearch(rawTarget);
           get().appendLog('world', outcome.line);
-          // Mark this noun as searched on the visited-room record so
-          // a re-search hits the alreadySearched branch above. Only
-          // when the outcome actually CONSUMED the noun — 'nothing'
-          // outcomes leave it on the board for another try (or for
-          // the pickup path to claim instead).
-          if (outcome.kind !== 'nothing') set((s) => {
-            const room = s.worldMemory.visitedRooms?.[searchRoomKey] ?? {
-              firstVisitAt: Date.now(),
-              lastVisitAt: Date.now(),
-              visitCount: 1,
-            };
-            const prevSearched = room.searchedAmbientNouns ?? [];
-            if (prevSearched.includes(loweredTarget)) return s;
-            return {
-              worldMemory: {
-                ...s.worldMemory,
-                visitedRooms: {
-                  ...(s.worldMemory.visitedRooms ?? {}),
-                  [searchRoomKey]: {
-                    ...room,
-                    searchedAmbientNouns: [...prevSearched, loweredTarget],
-                  },
-                },
-              },
-            };
-          });
+          // Dispatch outcome first, then dedupe based on whether
+          // anything actually produced — mirrors the harvest-verb +
+          // attack-fallback paths. Hook outcomes that can't plant
+          // (scene has unresolved hook) get a one-line consolation
+          // and do NOT consume the noun.
+          let producedInv = false;
           if (outcome.kind === 'material') {
             const itemCat = lookupCraftedItem(outcome.itemName);
             const isStackableCommodity = itemCat.kind === 'consumable' || itemCat.kind === 'misc';
@@ -2971,9 +2966,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             } else {
               get().appendLog('world', `Found a ${outcome.itemName.toLowerCase()}, but your pack is already full of them.`);
             }
+            producedInv = true;
           } else if (outcome.kind === 'tc') {
             set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + outcome.amount } } : s));
             get().appendLog('reward', `+${outcome.amount} TC.`);
+            producedInv = true;
           } else if (outcome.kind === 'hook') {
             const activeUnresolved = (currentScene.hooks ?? []).some((h) => !h.resolved);
             if (!activeUnresolved) {
@@ -2982,8 +2979,36 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } }
                 : s));
               get().appendLog('world', hook.plantedLine);
+              producedInv = true;
+            } else {
+              get().appendLog(
+                'world',
+                `You catch a thread of something in the ${rawTarget}, but the scene already has an open question that wants answering first.`,
+              );
+              // producedInv stays false — noun NOT consumed.
             }
           }
+          if (producedInv) set((s) => {
+            const room = s.worldMemory.visitedRooms?.[searchRoomKey] ?? {
+              firstVisitAt: Date.now(),
+              lastVisitAt: Date.now(),
+              visitCount: 1,
+            };
+            const prevSearched = room.searchedAmbientNouns ?? [];
+            if (prevSearched.includes(loweredTarget)) return s;
+            return {
+              worldMemory: {
+                ...s.worldMemory,
+                visitedRooms: {
+                  ...(s.worldMemory.visitedRooms ?? {}),
+                  [searchRoomKey]: {
+                    ...room,
+                    searchedAmbientNouns: [...prevSearched, loweredTarget],
+                  },
+                },
+              },
+            };
+          });
           break;
         }
         // 4.5) NPC hard-match — fires BEFORE MiniLM so "search tarek"
@@ -4548,7 +4573,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // typed 'take wagon' / 'take pillar' with the tactful
               // in-character refusal.
               if (isOversized(ambientHit)) {
-                get().appendLog('arbiter', refusalLine(ambientHit));
+                get().appendLog('arbiter', refusalLine(ambientHit), { skipDedup: true });
                 break;
               }
               const cat = findCatalogItem(ambientHit);
@@ -5122,17 +5147,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!step) return;
 
     const total = values.reduce((a, b) => a + b, 0) + step.bonus;
-    const success = step.target !== undefined ? total >= step.target : undefined;
-    const filled: RollStep = { ...step, values, total, success };
+    let success = step.target !== undefined ? total >= step.target : undefined;
+    let critical: boolean | undefined;
+    // Natural 1 / natural 20 rule on d20 attack rolls. Forces the
+    // floor (5% always-miss) and ceiling (5% always-hit + crit damage)
+    // so even a high-stat character can't grind through Common AC
+    // with 100% accuracy. Mirrors the standard D&D 5e crit/fumble.
+    if (step.id === 'attack' && step.sides === 20) {
+      const natural = values[0];
+      if (natural === 1) {
+        success = false;
+      } else if (natural === 20) {
+        success = true;
+        critical = true;
+      }
+    }
+    const filled: RollStep = { ...step, values, total, success, ...(critical ? { critical } : {}) };
     const updatedSteps = state.steps.map((s, i) => (i === idx ? filled : s));
 
-    // Skip damage roll if attack missed
+    // Skip damage roll if attack missed. Double damage dice on crit
+    // so the follow-up roll naturally produces the bigger number.
     let nextIdx = idx + 1;
     if (nextIdx < updatedSteps.length) {
       const nextStep = updatedSteps[nextIdx];
       const attackStep = updatedSteps.find((s) => s.id === 'attack');
       if (nextStep?.id === 'damage' && attackStep?.success === false) {
         nextIdx++;
+      } else if (nextStep?.id === 'damage' && attackStep?.critical) {
+        updatedSteps[nextIdx] = {
+          ...nextStep,
+          count: nextStep.count * 2,
+          context: `${nextStep.context} — CRIT (double dice)`,
+        };
       }
     }
 
@@ -5465,7 +5511,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (attack && typeof attack.total === 'number' && attack.target !== undefined) {
       const naturalRoll = attack.values?.[0] ?? attack.total - attack.bonus;
       const acTag = `vs ${enemy.name} AC ${attack.target}`;
-      const outcome = attack.success ? '✓ HIT' : '✗ MISS';
+      const outcome = attack.critical
+        ? '✓ CRITICAL HIT'
+        : naturalRoll === 1
+          ? '✗ FUMBLE'
+          : attack.success ? '✓ HIT' : '✗ MISS';
       get().appendLog(
         'combat',
         `You — d20 → ${naturalRoll} + ${attack.bonusLabel} = ${attack.total} ${acTag} — ${outcome}`,
@@ -8646,15 +8696,30 @@ function applyEnemyCounter(
   const armorPieces = aggregateArmor(player);
   const acFromGear = player.ac + armorPieces.acBonus;
   const effectiveAc = Math.max(1, acFromGear + statusAcAdjustment(player.statusEffects));
-  const hit = atkTotal >= effectiveAc;
+  // Natural 1 / natural 20 rule — same floor and ceiling that applies
+  // to the player. A nat-1 forces a miss regardless of bonuses; a nat-20
+  // forces a hit AND doubles the damage roll below.
+  const enemyCrit = atkRoll === 20;
+  const enemyFumble = atkRoll === 1;
+  const hit = enemyFumble ? false : enemyCrit ? true : atkTotal >= effectiveAc;
+  const outcomeTag = enemyCrit
+    ? '✓ CRITICAL HIT'
+    : enemyFumble
+      ? '✗ FUMBLE'
+      : hit ? '✓ HIT' : '✗ MISS';
 
   get().appendLog(
     'combat',
-    `${enemy.name} — d20 → ${atkRoll}${advLabel} + ATK ${atkBonus} = ${atkTotal} vs your AC ${effectiveAc} — ${hit ? '✓ HIT' : '✗ MISS'}`,
+    `${enemy.name} — d20 → ${atkRoll}${advLabel} + ATK ${atkBonus} = ${atkTotal} vs your AC ${effectiveAc} — ${outcomeTag}`,
   );
 
   if (hit) {
     let rawDmg = rollFromNotation(String(enemy.damage)) || rollDie(6);
+    // Critical: roll damage twice and sum, mirroring the player's
+    // double-dice crit treatment so the bite hurts.
+    if (enemyCrit) {
+      rawDmg += rollFromNotation(String(enemy.damage)) || rollDie(6);
+    }
     const enemyDamageType = parseIncomingDamageType(String(enemy.damage));
 
     // Burn scars (aetheric vulnerability) amplify incoming aetheric damage.

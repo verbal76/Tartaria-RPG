@@ -649,7 +649,7 @@
       "description": "Sentinel King's Visor. Legendary head armor from the Architectural Sentinels tradition."
     },
     {
-      "name": "Rusted Band of Knowledge",
+      "name": "Scholar's Headband of Knowledge",
       "slot": "head",
       "raceAffinity": "Mud Golems",
       "acBonus": 1,
@@ -676,7 +676,7 @@
         "helmet",
         "mud_golems"
       ],
-      "description": "Rusted Band of Knowledge. Common head armor from the Mud Golems tradition."
+      "description": "Scholar's Headband of Knowledge. Common head armor from the Mud Golems tradition."
     },
     {
       "name": "Stone Seeker's Brow Guard",
@@ -811,7 +811,7 @@
       "description": "Crown of the Golem King. Legendary head armor from the Mud Golems tradition."
     },
     {
-      "name": "Aetheric Diadem",
+      "name": "Aetheric Helm of Insight",
       "slot": "head",
       "raceAffinity": "Aetherborn",
       "acBonus": 1,
@@ -838,7 +838,7 @@
         "helmet",
         "aetherborn"
       ],
-      "description": "Aetheric Diadem. Common head armor from the Aetherborn tradition."
+      "description": "Aetheric Helm of Insight. Common head armor from the Aetherborn tradition."
     },
     {
       "name": "Arcane Observer's Circlet",

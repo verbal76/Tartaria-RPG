@@ -212,16 +212,19 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
           try { store.getState().cancelPendingRolls(); } catch {}
           break;
         }
-        // Track attack hit/miss by inspecting the resolved step.
-        if (step.id === 'attack' && typeof step.target === 'number') {
-          // success isn't on the step object yet — read from updated pendingRolls
-          const pr2 = store.getState().pendingRolls;
-          const justResolved = pr2?.steps[pr.currentStep] ?? null;
-          if (justResolved && typeof justResolved.success === 'boolean') {
-            // verb context is captured externally; we just count global hit/miss
-            if (justResolved.success) bump(verbHits, '_any');
-            else bump(verbMisses, '_any');
-          }
+        // Track attack hit/miss. Computed locally because a missed
+        // attack drains pendingRolls (damage step is skipped) before
+        // we can read the resolved success field back off the store.
+        // Natural 1 / natural 20 rule mirrors resolveRollStep — keep
+        // this in sync if the floor / ceiling rule ever changes.
+        if (step.id === 'attack' && step.sides === 20 && typeof step.target === 'number') {
+          const natural = values[0] ?? 0;
+          const total = values.reduce((a, b) => a + b, 0) + step.bonus;
+          let success = total >= step.target;
+          if (natural === 1) success = false;
+          else if (natural === 20) success = true;
+          if (success) bump(verbHits, '_any');
+          else bump(verbMisses, '_any');
         }
         safety++;
       }

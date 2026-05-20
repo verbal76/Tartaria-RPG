@@ -4,6 +4,7 @@ import {
   findArmorByName,
   findAmuletByName,
   findRingByName,
+  GEAR,
 } from './crafting';
 
 // Default durability for catalog entries that don't declare one. Materials,
@@ -21,6 +22,19 @@ function lookupBaseDurability(name: string): number | null {
   if (am) return am.baseDurability ?? DEFAULT_DURABILITY;
   const r = findRingByName(name);
   if (r) return r.baseDurability ?? DEFAULT_DURABILITY;
+  // GEAR catalog entries typed as 'relic' (Aetheric Torch, Aetheric
+  // Locket, Aetheric Compass, etc.) were previously skipped — the
+  // 'every relic has durability' invariant broke for them. Stress
+  // test caught the gap. Treat any GEAR row whose kind is 'relic' /
+  // 'weapon' / 'armor' as durability-tracked.
+  const nameLower = name.toLowerCase();
+  const g = GEAR.find((x) => x.name.toLowerCase() === nameLower);
+  if (g && g.kind === 'relic') {
+    // GEAR rows don't currently declare baseDurability, but the door
+    // is open for them to do so. Honor it if present.
+    const gAny = g as typeof g & { baseDurability?: number };
+    return gAny.baseDurability ?? DEFAULT_DURABILITY;
+  }
   return null;
 }
 
