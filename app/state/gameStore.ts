@@ -3467,10 +3467,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const intraSceneNoun = ambientHit ?? hookHit?.nouns[0] ?? enemyHit?.name ?? null;
         if (intraSceneNoun) {
           set({ player: advanceTime(spendStamina(player, 1), 0.25) });
-          get().appendLog(
-            'world',
-            `You move across the ground to the ${intraSceneNoun.toLowerCase()}. Close enough now to act on it.`,
-          );
+          get().appendLog('world', approachLine(intraSceneNoun));
           break;
         }
         // Fall-through: wander.
@@ -3599,7 +3596,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const noun = ambient ?? hookHit?.nouns[0] ?? vendorHit;
           if (noun) {
             set({ player: advanceTime(spendStamina(player, 1), 0.25) });
-            get().appendLog('world', `You move across the ground to the ${noun.toLowerCase()}. Close enough now to act on it.`);
+            get().appendLog('world', approachLine(noun));
             break;
           }
         }
@@ -9213,6 +9210,30 @@ function narrateCasualLook(
     set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } } : s));
     get().appendLog('world', hook.plantedLine);
   }
+}
+
+// Variant pool for the intra-scene approach line. Six rotations so a
+// rapid sequence of approaches (the player tapping each interactable
+// in turn) doesn't reduce the prose to a mantra. rotatingPick keeps
+// each line cycling on its own offset.
+const APPROACH_LINES: Array<(noun: string) => string> = [
+  (n) => `You move across the ground to the ${n}. Close enough now to act on it.`,
+  (n) => `You close the distance to the ${n}, boots finding their own rhythm. Arm's reach.`,
+  (n) => `A few steps and the ${n} is right in front of you, well within reach.`,
+  (n) => `You cross to the ${n} — close enough to put a hand on it if you choose.`,
+  (n) => `You stride up to the ${n}. The space between you and it is gone.`,
+  (n) => `You approach the ${n} until it fills the foreground. Nothing between you and it now.`,
+];
+
+function approachLine(noun: string): string {
+  const idx = (() => {
+    // rotatingPick uses a string key to anchor the cycle; per-noun would
+    // make repeated taps on the SAME noun roll fresh lines, but the
+    // intent here is global variety, so a single shared key is correct.
+    const pool = APPROACH_LINES;
+    return rotatingPick(pool.map((_, i) => i), 'approach.intra-scene');
+  })();
+  return APPROACH_LINES[idx]!(noun.toLowerCase());
 }
 
 function narrateWanderingJourney(

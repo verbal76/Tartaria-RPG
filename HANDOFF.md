@@ -363,4 +363,58 @@ Set on enemy entries in `enemies.json`. Read via `enemyTraits.ts`.
 
 ---
 
-That's the lay of the land at OTA 141. State is healthy, tests are green, OTA pipeline is delivering cleanly to the existing APK fleet. Next big moves are gated on either content (Salvage button needs UI work + user sign-off) or player input (pronunciation worksheet).
+## 13. Combat loot lands in `player.inventory`, not `droppedItems`
+
+When the player kills an enemy, the loot path in `resolveEnemyDefeat`
+grants items directly into `player.inventory` (and bumps the
+`enemiesDefeated` milestone). It does NOT populate
+`currentScene.droppedItems`. The dropped-items pool is reserved for
+**unclaimed** loot — items the player leaves on the ground after a
+fight, or items dropped by stealing / scattering. Stress-test authors
+who check `droppedItems.length` after combat will see 0 and conclude
+nothing dropped; they should look at `player.inventory` deltas
+instead. (See `combatStress.test.ts:633-635` for the metric that
+got this right after the first pass got it wrong.)
+
+## 14. `gameLog` has a 500-entry cap with same-channel merge
+
+`appendLog` (gameStore.ts, ~864–958) caps the log at 500 entries and
+**collapses consecutive same-channel lines** into a single multi-line
+entry when they fire within the same render tick. This keeps the
+scrollback tidy but has consequences for any test that asserts on
+log shape:
+
+- Counting `gameLog.length` will under-count when the system emits a
+  burst of same-channel messages (e.g. a single combat round can
+  emit 6+ `'combat'` lines that show as 1 entry).
+- Searching for a specific line should use `gameLog.flatMap` over
+  the text content, not slot-position arithmetic.
+- Old entries fall off the front when the cap is hit, so long
+  stress tests (700+ days) can't read entries from early-game and
+  expect them to still be in `gameLog`. Persist what you need before
+  the cap evicts it.
+
+## 15. Combat: nat-1 always misses, nat-20 always crits (OTA 168)
+
+In `resolveRollStep` and `applyEnemyCounter`, the d20 attack roll's
+**raw value** overrides the bonus math at the floor and ceiling:
+
+- Natural 1 → forced miss (success = false), no damage step.
+- Natural 20 → forced hit (success = true) AND `critical = true`, which
+  doubles the dice count on the follow-up damage step (player) or
+  re-rolls and sums the damage notation (enemy).
+
+Symmetric — applies to both sides of combat. Combat log surfaces
+`✓ CRITICAL HIT` / `✗ FUMBLE` on the trigger. This is what keeps
+high-stat characters from grinding through Common AC at 100% — even
+STR 14 vs AC 7 still fumbles 5% of the time, and enemy crits make
+"things you have to run from" feel real.
+
+If you write a combat stress test, mirror the rule when computing
+hit rate locally (see `combatStress.test.ts:217-228`) — a missed
+attack drains `pendingRolls` before you can read `success` back
+off the store.
+
+---
+
+That's the lay of the land at OTA 168. State is healthy, tests are green, OTA pipeline is delivering cleanly to the existing APK fleet. Next big moves are gated on either content (Salvage button needs UI work + user sign-off) or player input (pronunciation worksheet).
