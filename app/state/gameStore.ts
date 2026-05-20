@@ -398,6 +398,16 @@ const DIRECTION_KEYWORDS = /\b(direction|way|paths?|exits?|route|where to go|whi
 // fast in this game. I shouldn't have to rest after I walk across the
 // room." Wander/attack/skillCheck now cost half what they did, and
 // intra-scene movement uses 1 stamina (handled at the call site).
+// Intents that, when fired with a target, count as the player having
+// already ACTED on the noun. The post-action Arbiter remark suppresses
+// its "Tell me what you mean to do with it" defer line for these —
+// the player just told the engine what they meant to do.
+const ARBITER_ENGAGED_INTENTS: ReadonlySet<string> = new Set([
+  'attack', 'investigate', 'open', 'pickup', 'use_relic', 'cast',
+  'steal', 'gift', 'craft', 'equip', 'throw', 'dig', 'repair',
+  'accept', 'turn_in', 'sell', 'buy',
+]);
+
 const STAMINA_COSTS = {
   travel: 2,
   wander: 1,
@@ -4221,6 +4231,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const room = get().worldMemory.visitedRooms?.[dropKey];
         const dropped = room?.droppedItems ?? [];
         if (dropped.length === 0) {
+          // Pickup only finds DROPPED items (from kills, container opens,
+          // wasteland encounters). Ambient scene props (the wagon, the
+          // rusted blade in the description) are not "pickupable" via
+          // take — the player has to salvage / open / use them depending
+          // on the prop. Playtest log: player saw 'rusted blade' in the
+          // scene, approached it, tried to take it, got 'ground is bare'.
+          // Confusing. Detect ambient-noun match and redirect.
+          if (target) {
+            const ambientHit = matchAmbientNoun(target, currentScene.ambientNouns ?? []);
+            if (ambientHit) {
+              get().appendLog(
+                'world',
+                `The ${ambientHit} is part of the scene, not a loose drop. Try 'salvage ${ambientHit}' to harvest it, or 'open ${ambientHit}' if it has compartments.`,
+              );
+              break;
+            }
+          }
           get().appendLog('world', `The ground here is bare. Nothing to pick up.`);
           break;
         }
@@ -4660,7 +4687,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
           mood,
           recentActions,
           unresolvedHooks,
-          playerTargetNoun: parsed.resolvedNoun ?? parsed.target ?? undefined,
+          // Suppress on-target Arbiter remark when the action ALREADY
+          // engaged with the noun. The on-target branch produces
+          // "Tell me what you mean to do with it" — fine when the
+          // player just MENTIONED the noun ("the wagon") but wrong
+          // after they ACTED on it (salvage / search / attack /
+          // open / use). Playtest log: 'salvage rusted blade' fired
+          // the harvest path, THEN the Arbiter said "Tell me what
+          // you mean to do with it" — the player just did.
+          playerTargetNoun: ARBITER_ENGAGED_INTENTS.has(parsed.intent)
+            ? undefined
+            : parsed.resolvedNoun ?? parsed.target ?? undefined,
           playerHpFraction:
             livePlayer.hpMax > 0 ? livePlayer.hp / livePlayer.hpMax : 1,
           playerStaminaFraction:

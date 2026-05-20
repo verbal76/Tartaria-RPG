@@ -120,7 +120,16 @@ function pickWeighted<T extends { weight: number }>(arr: T[]): T {
 }
 
 function format(line: string, target: string): string {
-  return line.replace(/\{target\}/g, target);
+  // Auto-prepend "the " when the target reads as a bare noun phrase.
+  // Playtest log caught "You search rusted blade. It is completely
+  // empty." — missing article. We skip when the target already starts
+  // with an article / possessive / quantifier OR when it's a known
+  // collective ("ground", "rubble", "area") where bare reads natural.
+  const t = target.trim();
+  const hasLeadingArticle = /^(the|a|an|some|my|your|this|that|these|those)\s/i.test(t);
+  const isCollective = /^(ground|rubble|area|dirt|silt|mud|sand|water|dust)\b/i.test(t);
+  const display = hasLeadingArticle || isCollective ? t : `the ${t}`;
+  return line.replace(/\{target\}/g, display);
 }
 
 // Roll a result. Outcome mix:
