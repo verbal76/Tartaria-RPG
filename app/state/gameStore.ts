@@ -182,7 +182,7 @@ import { rollThrowDamage, weightLabel, itemWeight } from '../engine/itemWeight';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
 import { levenshtein } from '../engine/editDistance';
 import { isAreaSearch, isGroundSearch, rollAreaSearch } from '../engine/areaSearch';
-import { isClimbable, isSwimmable } from '../engine/interactionTags';
+import { isClimbable, isSwimmable, isSearchable } from '../engine/interactionTags';
 import { rollSalvagePool } from '../engine/salvagePools';
 import { bestDigTool, rollDig } from '../engine/digging';
 import {
@@ -1695,10 +1695,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const isAnchor = !!(hubRoom?.anchorNpc && vendor.name === hubRoom.anchorNpc);
       const isReturnVisit = isAnchor && !!existing && (existing.visitCount ?? 0) >= 1;
       if (isReturnVisit) {
-        get().appendLog(
-          'world',
-          `${vendor.name} is still at their post — pack open, wares laid out. They nod without looking up.`,
-        );
+        // Warmth scales with the player's standing in the anchor
+        // vendor's faction. The player called the original "they nod
+        // without looking up" line flat — fair, since by visit 5 or
+        // 10 the relationship should have texture. ≥10 standing
+        // (1-2 completed faction contracts' worth) earns a familiar
+        // line; ≥25 (regular customer) earns a warm one.
+        const standing = vendor.faction
+          ? getStanding(player.factionStanding, vendor.faction)
+          : 0;
+        let line: string;
+        if (standing >= 25) {
+          line = `${vendor.name} looks up before you've finished crossing the room — already reaching for the pot, already smiling. "Back so soon. Sit. Tell me what kind of day it's been."`;
+        } else if (standing >= 10) {
+          line = `${vendor.name} catches your eye and nods — the kind of nod that knows your name. "You're back. Good. Come look at what came in this week."`;
+        } else {
+          line = `${vendor.name} is still at their post — pack open, wares laid out. They nod without looking up.`;
+        }
+        get().appendLog('world', line);
       } else {
       // Narrate the arrival in the world channel first — vendors don't
       // appear out of nowhere. The player should see they showed up
@@ -8658,6 +8672,20 @@ function shuffleSlice<T>(arr: readonly T[], n: number): T[] {
   return indices.slice(0, n).map((i) => arr[i]!);
 }
 
+// Hidden-text outcome lines for searchable nouns. Walls / tablets /
+// murals / inscriptions sometimes reveal an old Tartarian carving
+// the player wouldn't have noticed on a casual pass. Pure flavour —
+// no inventory grant — but lands the "search wall for secret writing"
+// promise from the design call.
+const HIDDEN_TEXT_LINES = [
+  `You run a hand along the ${`{noun}`}. Etched faint under the silt: old Tartarian, three lines, the first word a name you do not know.`,
+  `You crouch low. A symbol surfaces under the dust on the ${`{noun}`} — the Aetheric eye, open. Whoever marked it left in a hurry.`,
+  `You feel the ${`{noun}`} with the flat of your palm. Carved into it, fine as a knife-cut: a date older than every kingdom on every honest map.`,
+  `You catch a glint on the ${`{noun}`}. A single character pressed deep, then crossed out by a second hand. Someone disagreed with the first one.`,
+  `You tilt your head. Light strikes the ${`{noun}`} at an angle the casual pass missed — a map fragment scratched in, four lines, a route to nowhere named.`,
+  `You wipe the ${`{noun}`}. Underneath, a child's name written badly, then a second hand has written 'rest now' in old Tartarian beneath it.`,
+];
+
 function narrateAmbientFind(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -8677,6 +8705,13 @@ function narrateAmbientFind(
     `You crouch beside the ${noun}. The silt has half-swallowed ${pronoun}.`,
   ];
   get().appendLog('world', pick(lines));
+  // Searchable nouns (walls, tablets, murals, inscriptions, journals,
+  // maps, etc.) get a ~12% chance to reveal a hidden-text line on top
+  // of the normal descriptive narration. Lore-only — no grant.
+  if (isSearchable(noun) && chance(12)) {
+    const hiddenLine = pick(HIDDEN_TEXT_LINES).replace('{noun}', noun);
+    get().appendLog('world', hiddenLine);
+  }
   // ~25% chance the investigation turns into a real hook in this scene.
   const activeUnresolved = (scene.hooks ?? []).some((h) => !h.resolved);
   if (!activeUnresolved && chance(25)) {
