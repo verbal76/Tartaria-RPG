@@ -1833,7 +1833,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // sailed past the old length gate. Also added "we need" /
       // "could you" / "it should" / "add a" patterns to the regex.
       trimmed.length > 60 &&
-      /^(ok\b|btw\b|fyi\b|hey\b|so\b)|(\bwe (should|need|could|gotta)\b|\byou should\b|\bi think\b|\bi wish\b|\bi'?d like\b|\bcan we\b|\bcould you\b|\bshould have\b|\bneeds? to be\b|\bit should (have|be|also)\b|\badd a\b|\bplease add\b)/i.test(trimmed)
+      /^(ok\b|btw\b|fyi\b|hey\b|so\b|when (i|the)\b)|(\b(we|i) ((\w+)\s+)?(should|need|could|gotta|gonna|wish|want|really)\b|\byou should\b|\bi think\b|\bi'?d like\b|\bcan we\b|\bcould you\b|\bshould have\b|\bneeds? to be\b|\bit should (have|be|also)\b|\badd a\b|\bplease add\b)/i.test(trimmed)
     ) {
       get().appendLog('player', trimmed, { meta: true });
       get().appendLog(
@@ -3499,7 +3499,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       case 'swim': {
         set({ player: advanceTime(spendStamina(player, 2), 0.5) });
-        const tgt = parsed.target ?? 'the water';
+        // Prefer the resolved noun (the catalog/scene name like
+        // "Flooded Tunnel") over the raw target — "swim through the
+        // tunnel" was narrating "you wade into through tunnel" because
+        // the verb-stripped target retained the preposition. Strip
+        // common prepositions from the raw target as a fallback when
+        // no canonical noun resolved.
+        const raw = (parsed.target ?? '').replace(/^(through|into|across|to|over|under|past|the)\s+/i, '').trim();
+        const tgt = parsed.resolvedNoun ?? (raw.length > 0 ? raw : 'the water');
         get().appendLog(
           'world',
           `You wade into ${tgt}, mud-water lapping at your gear. Each stroke costs double. The current has opinions.`,

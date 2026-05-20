@@ -8,6 +8,7 @@ import { DiceRoller } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
+import { SalvageModal } from '../components/SalvageModal';
 import { ApproachModal } from '../components/ApproachModal';
 import { TutorialTarget } from '../components/TutorialTarget';
 import { findWeaponByName } from '../engine/crafting';
@@ -50,6 +51,7 @@ export function ExplorationScreen() {
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [approachOpen, setApproachOpen] = useState(false);
+  const [salvageOpen, setSalvageOpen] = useState(false);
 
   // Build one view per enemy in the scene. Tap-to-cycle is wired through
   // the store's setActiveEnemyIdx so combat handlers always target the
@@ -184,6 +186,7 @@ export function ExplorationScreen() {
             onOpenSearch={() => setSearchOpen(true)}
             onOpenCrafting={() => setScreen('crafting')}
             onOpenApproach={() => setApproachOpen(true)}
+            onOpenSalvage={() => setSalvageOpen(true)}
             inCombat={inCombat}
             equippedMain={equippedMain}
             equippedOff={equippedOff}
@@ -211,6 +214,21 @@ export function ExplorationScreen() {
           submit(`search the ${target}`);
         }}
         onCancel={() => setSearchOpen(false)}
+      />
+
+      <SalvageModal
+        visible={salvageOpen}
+        hints={buildChipPool(currentScene)}
+        onSubmit={(target) => {
+          setSalvageOpen(false);
+          // Submit raw target — the modal's chip text already includes
+          // a definite article when appropriate ("the construct"), and
+          // typed text is passed through verbatim. The investigate
+          // intent picks up 'salvage' as a verb synonym (OTA 140) and
+          // routes through the hook system + scene-noun matcher.
+          submit(`salvage ${target}`);
+        }}
+        onCancel={() => setSalvageOpen(false)}
       />
 
       <ApproachModal

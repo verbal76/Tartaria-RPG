@@ -297,7 +297,11 @@ describe('Uniqueness Audit — Tartaria Realms content pools', () => {
   // ----------------------------------------------------------------- 3
   it('Wasteland encounters — every archetype fires + ≥3 distinct loot items each', () => {
     const loc = mkLocation('synthetic_outskirts', 'Outskirts', ['mud', 'outskirts', 'open']);
-    const FIRES = 1000;
+    // Bumped from 1000 → 3000 fires. With 45 archetypes now sharing
+    // this biome (post-batch-3 mini-dungeons), low-weight entries
+    // (weight 2-3) need more samples before their ≥3 distinct loot
+    // assertion lands consistently.
+    const FIRES = 3000;
     const byArchetype: Counter = {};
     const lootByArch: Record<string, Counter> = {};
     const narrByArch: Record<string, Counter> = {};
