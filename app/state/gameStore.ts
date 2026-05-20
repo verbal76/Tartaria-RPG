@@ -253,14 +253,13 @@ interface CurrentScene {
    *  scene paragraph mentioned that the player can ask / investigate /
    *  search against. */
   ambientNouns: string[];
-  /** A shuffled 10-noun subset of ambientNouns, fixed for this scene
-   *  visit. look-around shows the first 8 of these; the chip pool
-   *  (Search / Approach / Salvage) shows up to 10. Set once during
-   *  beginScene so consecutive looks at the same room return a
-   *  stable view of the scene — leave and come back to re-roll.
-   *  When ambientNouns has ≤10 entries this just mirrors them in
-   *  order; when the pool is larger (most macros now hold 50-100+
-   *  authored interactables), it picks a fresh 10 per visit. */
+  /** A shuffled 8-noun subset of ambientNouns, fixed for this scene
+   *  visit. Both look-around AND the chip pool (Search / Approach /
+   *  Salvage) read from this exact list — STRICT MATCH: if a noun
+   *  isn't in your look, it isn't in your chips either. Hook
+   *  primaries are appended on top of chips because they're separate
+   *  narrative threads, not ambient props. Set once during
+   *  beginScene; leave and come back to re-roll. */
   displayedAmbientNouns?: string[];
   /** When this Location maps to a Macro biome in worldLadder.json, the
    *  scene picks a specific Micro-Micro room to flavor the Arbiter's
@@ -1377,15 +1376,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       : [];
     const ambientNouns = Array.from(new Set([...locNouns, ...hubNouns, ...microMicroNouns]));
     // Lock the visible subset for THIS scene visit. Look-around and
-    // the chip pool (Search/Approach/Salvage) both read from this
-    // cache, so five consecutive looks at the same room show the
-    // same nouns. Travel away + return fires beginScene again,
-    // re-rolling a fresh subset — the "leave and come back to see
-    // different things" model the player asked for. Cap at 10 to
-    // fit the chip-pool ceiling; look-around takes the first 8.
-    const displayedAmbientNouns = ambientNouns.length <= 10
+    // the chip pool (Search/Approach/Salvage) BOTH read from this
+    // same cache — strict match. If a noun isn't in your look-around,
+    // it isn't in your chips either. Five consecutive looks show the
+    // same eight; leave and come back to re-roll. Hook primaries get
+    // appended to chips separately because they're active narrative
+    // threads, not ambient props.
+    const displayedAmbientNouns = ambientNouns.length <= 8
       ? [...ambientNouns]
-      : shuffleSlice(ambientNouns, 10);
+      : shuffleSlice(ambientNouns, 8);
     // microMicroId was resolved at the top of beginScene so the
     // encounter / loot rolls could use the ladder's curated pools.
     const scene: CurrentScene = {
@@ -8642,15 +8641,17 @@ function narrateCasualLook(
   // Read from the cached displayedAmbientNouns subset (set ONCE in
   // beginScene). Five consecutive looks at the same room show the
   // same nouns; travel away + return re-rolls the subset on the
-  // next beginScene. Fallback to ambientNouns if the field is
-  // missing (legacy saves predating the cache).
+  // next beginScene. Strict match with the chip pool — what you
+  // see here is exactly what Search/Approach/Salvage chips offer.
+  // Fallback to ambientNouns[..8] for legacy saves predating the
+  // cache field.
   const interactables: string[] = [];
-  const source = scene.displayedAmbientNouns ?? scene.ambientNouns ?? [];
+  const source = scene.displayedAmbientNouns ?? (scene.ambientNouns ?? []).slice(0, 8);
   for (const n of source) {
     if (!interactables.includes(n)) interactables.push(n);
   }
   if (interactables.length > 0) {
-    parts.push(`You see: ${interactables.slice(0, 8).join(', ')}.`);
+    parts.push(`You see: ${interactables.join(', ')}.`);
   }
 
   // 3. Anything alive nearby — combat-relevant. Vendor, enemies,
