@@ -2278,12 +2278,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // to search or dig. Route to the same handlers the
           // `investigate` case would. QA finding: previously a flat
           // refusal even when the target was a ground noun.
-          const rawTarget = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
+          // Prefer the resolved canonical noun when present so the
+          // narration shows "the wagon" instead of "wagon down parts"
+          // for inputs like "break the wagon down for parts".
+          const rawTarget = (parsed.resolvedNoun ?? parsed.target ?? '').trim();
           if (rawTarget && isGroundSearch(rawTarget)) {
             get().digHere();
             break;
           }
-          if (rawTarget && isAreaSearch(rawTarget)) {
+          // Also treat ambient-noun hits as area-searchable in the
+          // attack-fallback. "break the wagon" should harvest the
+          // wagon, not silently miss because 'wagon' isn't in
+          // AREA_TOKENS.
+          const ambientHitInAttack = rawTarget
+            ? matchAmbientNoun(rawTarget, currentScene.ambientNouns ?? [])
+            : null;
+          if (rawTarget && (isAreaSearch(rawTarget) || ambientHitInAttack)) {
             // Honor the same per-tile dedupe the canonical investigate
             // path uses. Without this, a player typing "smash the wall"
             // repeatedly could re-roll loot for free (audit caught
@@ -2330,6 +2340,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 },
               };
             });
+            // Actually grant the outcome — previously this path only
+            // narrated the line ("A useful scrap turns up in your
+            // hand") without ever calling grantItem / awarding TC /
+            // planting the hook. Playtest log caught the disconnect:
+            // narration claimed loot, inventory had none. Mirror the
+            // canonical investigate path so attack-fallback finishes
+            // what its narration promises.
+            if (outcome.kind === 'material') {
+              const itemCat = lookupCraftedItem(outcome.itemName);
+              const newItem: InventoryItem = stampDurability({
+                id: `search_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                name: outcome.itemName,
+                kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
+                rarity: outcome.rarity,
+                quantity: 1,
+                tags: itemCat.tags,
+              });
+              const grantResult = grantItem(player.inventory, newItem);
+              set((s) =>
+                s.player ? { player: { ...s.player, inventory: grantResult.inventory } } : s,
+              );
+              if (grantResult.accepted > 0) {
+                get().appendLog('reward', `✦ ${outcome.itemName} (${outcome.rarity}).`);
+              } else {
+                get().appendLog('world', `Found a ${outcome.itemName.toLowerCase()}, but your pack is already full of them.`);
+              }
+            } else if (outcome.kind === 'tc') {
+              set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + outcome.amount } } : s));
+              get().appendLog('reward', `+${outcome.amount} TC.`);
+            } else if (outcome.kind === 'hook') {
+              const activeUnresolved = (currentScene.hooks ?? []).some((h) => !h.resolved);
+              if (!activeUnresolved) {
+                const hook = plantHookByKind(pickRandomHookKind());
+                set((s) => (s.currentScene
+                  ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } }
+                  : s));
+                get().appendLog('world', hook.plantedLine);
+              }
+            }
             break;
           }
           get().appendLog('world', 'Nothing in arm\'s reach answers your blade. The motion echoes off Aetherstone.');
@@ -2369,6 +2418,90 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (rawTarget && isGroundSearch(rawTarget)) {
           get().digHere();
           break;
+        }
+        // Harvest verbs (salvage / strip / pry / scavenge / comb) on
+        // an ambient noun should ROLL FOR LOOT, not just narrate "you
+        // look closer." When the matched verb is one of these AND
+        // the target hits an ambient noun, treat it as an area-search
+        // on that noun — grants material / TC / plants a hook, with
+        // dedupe so a re-tap doesn't re-roll.
+        const harvestVerbs = new Set(['salvage', 'strip', 'pry', 'scavenge', 'comb']);
+        const isHarvestVerb = parsed.matchedVerb
+          ? harvestVerbs.has(parsed.matchedVerb.toLowerCase())
+          : false;
+        if (rawTarget && isHarvestVerb) {
+          const harvestAmbient = matchAmbientNoun(rawTarget, currentScene.ambientNouns ?? []);
+          if (harvestAmbient) {
+            const harvestRoomKey = makeRoomKey(
+              player.currentLocationId,
+              currentScene.microMicroId,
+              player.mapX,
+              player.mapY,
+            );
+            const harvestPrior = get().worldMemory.visitedRooms?.[harvestRoomKey];
+            const harvestLowered = harvestAmbient.toLowerCase();
+            const harvestAlreadyDone = (harvestPrior?.searchedAmbientNouns ?? []).some(
+              (n) => n === harvestLowered || harvestLowered.includes(n) || n.includes(harvestLowered),
+            );
+            if (harvestAlreadyDone) {
+              get().appendLog('world', `You've already worked over the ${harvestAmbient} here. Nothing more to find.`);
+              break;
+            }
+            set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+            const outcome = rollAreaSearch(harvestAmbient);
+            get().appendLog('world', outcome.line);
+            set((s) => {
+              const room = s.worldMemory.visitedRooms?.[harvestRoomKey] ?? {
+                firstVisitAt: Date.now(),
+                lastVisitAt: Date.now(),
+                visitCount: 1,
+              };
+              const prevSearched = room.searchedAmbientNouns ?? [];
+              return {
+                worldMemory: {
+                  ...s.worldMemory,
+                  visitedRooms: {
+                    ...(s.worldMemory.visitedRooms ?? {}),
+                    [harvestRoomKey]: {
+                      ...room,
+                      searchedAmbientNouns: [...prevSearched, harvestLowered],
+                    },
+                  },
+                },
+              };
+            });
+            if (outcome.kind === 'material') {
+              const itemCat = lookupCraftedItem(outcome.itemName);
+              const newItem: InventoryItem = stampDurability({
+                id: `salvage_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                name: outcome.itemName,
+                kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
+                rarity: outcome.rarity,
+                quantity: 1,
+                tags: itemCat.tags,
+              });
+              const grantResult = grantItem(player.inventory, newItem);
+              set((s) => (s.player ? { player: { ...s.player, inventory: grantResult.inventory } } : s));
+              if (grantResult.accepted > 0) {
+                get().appendLog('reward', `✦ ${outcome.itemName} (${outcome.rarity}).`);
+              } else {
+                get().appendLog('world', `Found a ${outcome.itemName.toLowerCase()}, but your pack is already full of them.`);
+              }
+            } else if (outcome.kind === 'tc') {
+              set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + outcome.amount } } : s));
+              get().appendLog('reward', `+${outcome.amount} TC.`);
+            } else if (outcome.kind === 'hook') {
+              const activeUnresolved = (currentScene.hooks ?? []).some((h) => !h.resolved);
+              if (!activeUnresolved) {
+                const hook = plantHookByKind(pickRandomHookKind());
+                set((s) => (s.currentScene
+                  ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } }
+                  : s));
+                get().appendLog('world', hook.plantedLine);
+              }
+            }
+            break;
+          }
         }
         // 2) Ambient noun match — the player named something the scene
         // paragraph actually mentioned ("investigate the traps" → match).

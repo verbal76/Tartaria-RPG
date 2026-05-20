@@ -180,6 +180,11 @@ const ALL_INTENTS = Object.keys(VERB_SYNONYMS) as Exclude<Intent, 'unknown'>[];
 const STOPWORDS = new Set([
   'a', 'an', 'the', 'my', 'your', 'his', 'her', 'their', 'this', 'that', 'these', 'those',
   'to', 'at', 'in', 'on', 'off', 'with', 'for', 'into', 'onto', 'from', 'of', 'by',
+  // Directional / spatial prepositions added after playtest log caught
+  // "break the wagon down for parts" parsing as target "wagon down
+  // parts". Stripping these lets resolveContextNoun + resolveItem
+  // see just the meaningful noun.
+  'down', 'up', 'over', 'under', 'across', 'through', 'behind', 'beside', 'between',
   'and', 'or', 'but', 'then', 'now', 'so', 'as', 'it', 'them',
   'i', 'me', 'you', 'we', 'us', 'they',
   'is', 'am', 'are', 'was', 'were', 'be', 'been', 'being',
