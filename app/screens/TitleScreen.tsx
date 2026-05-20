@@ -7,8 +7,15 @@ import {
   TouchableOpacity,
   FlatList,
   RefreshControl,
+  Linking,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
+import {
+  isApkOutdated,
+  LATEST_APK_URL,
+  LATEST_APK_HIGHLIGHTS,
+  LATEST_APK_BUILD,
+} from '../updates/apkRelease';
 import { useGameStore } from '../state/gameStore';
 import { SwipeableRow } from '../components/SwipeableRow';
 import { BrandedModal } from '../components/BrandedModal';
@@ -178,6 +185,32 @@ export function TitleScreen() {
       )}
 
       <KokoroDownloadBanner />
+
+      {isApkOutdated() && LATEST_APK_URL.length > 0 && (
+        <TouchableOpacity
+          style={styles.apkBanner}
+          activeOpacity={0.8}
+          onPress={() => {
+            // Linking.openURL hands off to Android — the browser /
+            // file manager opens the URL, the player downloads the
+            // APK, taps it, approves install-from-unknown-sources
+            // if needed. We don't (and can't) automate the install
+            // itself; this just removes the "find the link" step.
+            void Linking.openURL(LATEST_APK_URL).catch(() => {
+              // Best-effort. If the URL won't open, fall through
+              // silently — the player can copy it from About →
+              // diagnostics if they're motivated.
+            });
+          }}
+        >
+          <Text style={styles.apkBannerTitle}>
+            NEW APK AVAILABLE — TAP TO DOWNLOAD (build {LATEST_APK_BUILD})
+          </Text>
+          <Text style={styles.apkBannerBody}>
+            {LATEST_APK_HIGHLIGHTS || 'Native feature update. OTAs reach your current APK, but the new build adds capabilities only a fresh APK can ship.'}
+          </Text>
+        </TouchableOpacity>
+      )}
 
       {pendingOTAUpdate && (
         <TouchableOpacity
@@ -400,6 +433,28 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   updateBannerBody: {
+    color: '#cdbf99',
+    fontSize: 10,
+    textAlign: 'center',
+    marginTop: 3,
+  },
+  apkBanner: {
+    backgroundColor: '#1a2a14',
+    borderColor: '#9ec96a',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    marginBottom: 8,
+  },
+  apkBannerTitle: {
+    color: '#9ec96a',
+    fontSize: 11,
+    letterSpacing: 2,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  apkBannerBody: {
     color: '#cdbf99',
     fontSize: 10,
     textAlign: 'center',
