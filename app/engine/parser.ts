@@ -1,5 +1,6 @@
 import type { Intent, ParsedInput, InventoryItem } from './types';
 import { levenshtein } from './editDistance';
+import { FILLER_DESCRIPTORS } from './fillerWords';
 
 // Verb pools. Goal of 10 synonyms per intent for natural-language
 // robustness — the player can phrase the same intent ten ways and the
@@ -338,7 +339,11 @@ const JUNK_NOUNS = new Set([
 function extractTargetTokens(tokens: string[], verbIdx: number): string[] {
   const after = tokens.slice(verbIdx + 1);
   return after.filter(
-    (t) => !STOPWORDS.has(t) && !QUESTION_WORDS.has(t) && !JUNK_NOUNS.has(t),
+    (t) =>
+      !STOPWORDS.has(t) &&
+      !QUESTION_WORDS.has(t) &&
+      !JUNK_NOUNS.has(t) &&
+      !FILLER_DESCRIPTORS.has(t),
   );
 }
 
@@ -508,8 +513,9 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
     // one of: item / enemy / hook / ambient / location / vendor. Each
     // suggestion verb has a NounKind allowlist (VERB_NOUN_KINDS) — we
     // only offer the verb-noun pairs the engine can actually resolve.
-    const noun = resolveContextNoun(tokens.filter((t) => !STOPWORDS.has(t)), recentNouns);
-    const item = resolveItem(tokens.filter((t) => !STOPWORDS.has(t)), inventory);
+    const cleanTokens = tokens.filter((t) => !STOPWORDS.has(t) && !FILLER_DESCRIPTORS.has(t));
+    const noun = resolveContextNoun(cleanTokens, recentNouns);
+    const item = resolveItem(cleanTokens, inventory);
     const nounKind = classifyNoun(noun, context);
     const lowerNoun = noun?.toLowerCase() ?? '';
     const hasTorch = (context.inventory ?? []).some(
