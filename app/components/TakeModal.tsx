@@ -9,7 +9,7 @@
 // player gets 100% certainty their tap lands the thing in their
 // pack.
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -25,11 +25,21 @@ interface Props {
   /** Pre-filtered list of takeable ambient nouns — catalog-resolvable
    *  and not already consumed in this room. */
   takeable: string[];
+  /** Open take (no roll, always succeeds). */
   onTake: (noun: string) => void;
+  /** Stealth take — DEX vs DC 10 sleight check. Routes to
+   *  stealFromVendor when a vendor is present in the scene. */
+  onStealthTake: (noun: string) => void;
   onCancel: () => void;
 }
 
-export function TakeModal({ visible, takeable, onTake, onCancel }: Props) {
+export function TakeModal({ visible, takeable, onTake, onStealthTake, onCancel }: Props) {
+  const [useStealth, setUseStealth] = useState(false);
+  // Reset the toggle each time the modal opens so the player has to
+  // re-arm the sneaky path on purpose — no surprise pickpockets.
+  useEffect(() => {
+    if (visible) setUseStealth(false);
+  }, [visible]);
   return (
     <Modal
       visible={visible}
@@ -49,6 +59,24 @@ export function TakeModal({ visible, takeable, onTake, onCancel }: Props) {
                 in your pack with full stats. No re-tapping needed.
               </Text>
 
+              {/* USE STEALTH toggle. When on, taps route through the
+                  stealth handler — DEX vs DC 10 sleight check, vendor
+                  theft when a vendor is in the scene. Defaults to OFF
+                  on every modal open so casual takes don't accidentally
+                  cost the player their faction standing. */}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.stealthToggle,
+                  useStealth && styles.stealthToggleActive,
+                  pressed && styles.chipPressed,
+                ]}
+                onPress={() => setUseStealth((s) => !s)}
+              >
+                <Text style={[styles.stealthToggleText, useStealth && styles.stealthToggleTextActive]}>
+                  {useStealth ? '✓ USE STEALTH (DEX roll)' : 'USE STEALTH (off)'}
+                </Text>
+              </Pressable>
+
               {takeable.length === 0 ? (
                 <Text style={styles.empty}>
                   Nothing here you can pocket. Scene features (pillars, walls,
@@ -60,10 +88,12 @@ export function TakeModal({ visible, takeable, onTake, onCancel }: Props) {
                     <Pressable
                       key={n}
                       style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]}
-                      onPress={() => onTake(n)}
+                      onPress={() => (useStealth ? onStealthTake(n) : onTake(n))}
                     >
                       <Text style={styles.chipText}>{n}</Text>
-                      <Text style={styles.chipArrow}>→ pack</Text>
+                      <Text style={useStealth ? styles.chipArrowStealth : styles.chipArrow}>
+                        {useStealth ? '→ lift quietly' : '→ pack'}
+                      </Text>
                     </Pressable>
                   ))}
                 </ScrollView>
@@ -122,6 +152,20 @@ const styles = StyleSheet.create({
   chipPressed: { opacity: 0.7 },
   chipText: { color: '#e6d8b3', fontSize: 14, fontWeight: '600' },
   chipArrow: { color: '#9ec96a', fontSize: 11, letterSpacing: 1 },
+  chipArrowStealth: { color: '#6a9bbf', fontSize: 11, letterSpacing: 1 },
+  stealthToggle: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 3,
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  stealthToggleActive: { borderColor: '#6a9bbf', backgroundColor: '#1c2a35' },
+  stealthToggleText: { color: '#7a705c', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
+  stealthToggleTextActive: { color: '#6a9bbf' },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 14 },
   btn: {
     paddingHorizontal: 14,

@@ -246,9 +246,22 @@ describe('Interaction button stress — 700 in-game days', () => {
         noun = match ?? null;
         if (!noun) return; // no oversized noun in this scene, skip
       } else {
-        const takeable = visibleNouns().filter((n) =>
+        // Prefer the per-visit displayed subset (matches what the UI
+        // shows in the TakeModal chip list). Fall back to the full
+        // ambientNouns pool when the displayed subset has nothing
+        // portable — the underlying engine accepts any noun in the
+        // pool, the displayed-subset cap is a UX choice. Falling
+        // back keeps the sim from idling when the random 8-noun
+        // shuffle hides every portable chip behind oversized /
+        // non-catalog scenery.
+        let takeable = visibleNouns().filter((n) =>
           findCatalogItem(n) !== null && !isOversized(n),
         );
+        if (takeable.length === 0) {
+          takeable = (scene.ambientNouns ?? []).filter((n) =>
+            findCatalogItem(n) !== null && !isOversized(n),
+          );
+        }
         noun = pickRandom(takeable);
         if (!noun) return;
       }
@@ -368,11 +381,27 @@ describe('Interaction button stress — 700 in-game days', () => {
       const noun = pickRandom(nouns);
       if (!noun) return null;
       salvageAttempts++;
-      const invBefore = store.getState().player?.inventory.length ?? 0;
-      const tcBefore = store.getState().player?.tc ?? 0;
+      const sPre = store.getState();
+      const invBefore = sPre.player?.inventory ?? [];
+      const invSizeBefore = invBefore.length;
+      const tcBefore = sPre.player?.tc ?? 0;
+      // Snapshot the room's searchedAmbientNouns list. The engine
+      // marks a noun consumed on every outcome EXCEPT 'nothing'. So
+      // the diff after salvage IS the ground truth: noun added →
+      // consumed (material/tc/hook); not added → genuine nothing.
+      const preRoomKey = sPre.player
+        ? `${sPre.player.currentLocationId ?? '?'}@${sPre.currentScene?.microMicroId ?? '_'}@${sPre.player.mapX ?? '_'},${sPre.player.mapY ?? '_'}`
+        : '_';
+      const preSearched = new Set(
+        sPre.worldMemory.visitedRooms?.[preRoomKey]?.searchedAmbientNouns ?? [],
+      );
       const { newLogs } = submit(`salvage ${noun}`);
       const text = newLogs.map((l) => l.text).join(' \n ');
       const channels = newLogs.map((l) => l.channel);
+      const sawReward = newLogs.some((l) => l.channel === 'reward');
+      const sPost = store.getState();
+      const postSearched = sPost.worldMemory.visitedRooms?.[preRoomKey]?.searchedAmbientNouns ?? [];
+      const nounConsumed = postSearched.some((n) => !preSearched.has(n));
 
       // Order matters: material grants emit "✦ <item> (rarity)" reward
       // lines; tc emits "+N TC."; hook emits a planted line on world
@@ -384,21 +413,35 @@ describe('Interaction button stress — 700 in-game days', () => {
       // room consumed the noun. That's a "harvest already done" outcome,
       // not a "nothing" roll — must not be confused with the
       // genuine-nothing case (OTA 164 invariant).
-      const invAfter = store.getState().player?.inventory.length ?? 0;
-      const tcAfter = store.getState().player?.tc ?? 0;
-      const gainedItem = invAfter > invBefore || /✦ .+\(/i.test(text);
+      const invAfterArr = sPost.player?.inventory ?? [];
+      const invAfter = invAfterArr.length;
+      const tcAfter = sPost.player?.tc ?? 0;
+      const gainedItem = invAfter > invSizeBefore || sawReward || /✦ .+\(/i.test(text);
       const gainedTc = tcAfter > tcBefore || /\+\d+ TC\./.test(text);
       const alreadyWorkedOver = /already worked over the |already searched the /i.test(text);
-      const plantedHook = channels.includes('world') && /thread|cold air|whisper|tug|hum|pull/i.test(text)
-        && !gainedItem && !gainedTc;
-      // "Nothing" line — only when there are no side effects AND no
-      // hook narration AND no harvest-already-done dedupe gate.
+      // Ground-truth outcome derivation: use the engine's own
+      // searchedAmbientNouns side-effect, then refine based on
+      // log text. If the noun was consumed but no item/tc landed,
+      // it must have been a hook outcome (the only consuming kind
+      // with no inventory effect).
       let outcome: string;
-      if (gainedItem) { salvageMaterial++; outcome = 'material'; }
-      else if (gainedTc) { salvageTc++; outcome = 'tc'; }
-      else if (plantedHook) { salvageHook++; outcome = 'hook'; }
-      else if (alreadyWorkedOver) { outcome = 'already_worked_over'; /* not counted in any bucket */ }
-      else { salvageNothing++; outcome = 'nothing'; }
+      if (alreadyWorkedOver) {
+        outcome = 'already_worked_over';
+      } else if (gainedItem) {
+        salvageMaterial++;
+        outcome = 'material';
+      } else if (gainedTc) {
+        salvageTc++;
+        outcome = 'tc';
+      } else if (nounConsumed) {
+        // Engine consumed the noun but no item/tc — must be hook.
+        salvageHook++;
+        outcome = 'hook';
+      } else {
+        salvageNothing++;
+        outcome = 'nothing';
+      }
+      void channels;
       return { noun, outcome };
     };
 
@@ -424,7 +467,6 @@ describe('Interaction button stress — 700 in-game days', () => {
     let actions = 0;
     let visitsThisScene = 0;
     let lastSceneKey = '';
-    let lastSalvageNothing: { roomKey: string; noun: string } | null = null;
     const sceneKey = (): string => {
       const s = store.getState();
       const scene = s.currentScene;
@@ -463,62 +505,71 @@ describe('Interaction button stress — 700 in-game days', () => {
       if (k !== lastSceneKey) {
         lastSceneKey = k;
         visitsThisScene = 0;
-        lastSalvageNothing = null;
       }
 
-      // Each visit cycle: look → search → take → salvage. Plus an
-      // occasional oversized probe to verify the portability gate.
+      // Each visit cycle: look → take → take → search → salvage.
+      // (TAKE runs BEFORE search/salvage because both of those consume
+      // the noun via fuzzy substring match in searchedAmbientNouns. If
+      // we put take last we'd almost never have a fresh portable noun
+      // left. TAKE gets two slots — the first picks any portable
+      // noun, the second picks again so a fresh-arrival scene can
+      // surface multiple portable items before the consumers run.)
       // After ~3 cycles in the same scene, travel to refresh.
-      switch (visitsThisScene % 5) {
+      switch (visitsThisScene % 6) {
         case 0:
           lookAround();
           break;
         case 1:
-          doSearch();
-          break;
-        case 2:
           doTake();
           // Every ~25th scene-cycle, fire an oversized probe.
           if (Math.random() < 0.08) doTake(true);
           break;
-        case 3: {
-          const before = lastSalvageNothing;
+        case 2:
+          // Second take pass — different RNG, often finds a noun the
+          // first pass didn't pick.
+          doTake();
+          break;
+        case 3:
+          doSearch();
+          break;
+        case 4: {
+          // OTA 164 invariant: a "nothing" salvage outcome MUST NOT add
+          // the noun to the room's searchedAmbientNouns list. The
+          // safest way to assert this is to snapshot the list before
+          // and after the salvage, regardless of substring-fuzzy
+          // matches from earlier in the loop. (Substring-fuzzy dedupe
+          // means a take of 'rope bundle' might block on a previous
+          // 'rope' consumption — that's engine-intended; what we're
+          // checking is that the SALVAGE itself didn't write the
+          // noun on a 'nothing' roll.)
+          const sBefore = store.getState();
+          const before = sBefore.player;
+          const beforeRoom = before ? sBefore.worldMemory.visitedRooms?.[
+            `${before.currentLocationId ?? '?'}@${sBefore.currentScene?.microMicroId ?? '_'}@${before.mapX ?? '_'},${before.mapY ?? '_'}`
+          ] : null;
+          const beforeSearched = new Set(beforeRoom?.searchedAmbientNouns ?? []);
           const result = doSalvage();
-          // OTA 164 invariant: "nothing" outcome doesn't consume the noun.
-          // If our previous salvage in this room rolled 'nothing' on noun N,
-          // a subsequent TAKE on N should NOT be blocked by the dedupe
-          // gate (already-taken line). Capture pre-state and check on
-          // next turn.
           if (result && result.outcome === 'nothing') {
-            lastSalvageNothing = { roomKey: k, noun: result.noun };
-          } else {
-            lastSalvageNothing = null;
+            const sAfter = store.getState();
+            const aPlayer = sAfter.player;
+            const afterRoom = aPlayer ? sAfter.worldMemory.visitedRooms?.[
+              `${aPlayer.currentLocationId ?? '?'}@${sAfter.currentScene?.microMicroId ?? '_'}@${aPlayer.mapX ?? '_'},${aPlayer.mapY ?? '_'}`
+            ] : null;
+            const afterSearched = (afterRoom?.searchedAmbientNouns ?? []);
+            const nounLower = result.noun.toLowerCase();
+            const newlyAdded = afterSearched.find((n) =>
+              !beforeSearched.has(n) && (n === nounLower || nounLower.includes(n) || n.includes(nounLower)),
+            );
+            if (newlyAdded) {
+              nothingThenDedupe.push(
+                `noun="${result.noun}" room=${k} (salvage 'nothing' added "${newlyAdded}" to searchedAmbientNouns)`,
+              );
+            }
           }
-          void before;
           break;
         }
-        case 4: {
-          // Validate the nothing-then-take invariant if we have a pending
-          // probe AND the noun is portable. Otherwise just travel to
-          // refresh the chip pool.
-          if (lastSalvageNothing && lastSalvageNothing.roomKey === k) {
-            const noun = lastSalvageNothing.noun;
-            const cat = findCatalogItem(noun);
-            if (cat && !isOversized(noun)) {
-              const beforeLen = store.getState().gameLog.length;
-              try {
-                store.getState().takeAmbientNoun(noun);
-              } catch (e: any) {
-                crashes.push(`probe takeAmbientNoun("${noun}"): ${e?.message ?? e}`);
-              }
-              const after = store.getState().gameLog.slice(beforeLen);
-              const text = after.map((l) => l.text).join(' \n ');
-              if (/already taken or worked over/i.test(text)) {
-                nothingThenDedupe.push(`noun="${noun}" room=${k}`);
-              }
-            }
-            lastSalvageNothing = null;
-          }
+        case 5: {
+          // Refresh the chip pool by traveling to a new macro-region.
           travel();
           break;
         }

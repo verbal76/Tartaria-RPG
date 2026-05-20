@@ -81,7 +81,8 @@ import { RECIPES, findWeaponByName, lookupCraftedItem } from '../app/engine/craf
 import { stampDurability, wearItemByName, repairItem } from '../app/engine/durability';
 import { effectiveStats, validSlotsForItem, SLOT_ID_KEY } from '../app/engine/equipment';
 import { canScrap, scrapOutputFor } from '../app/engine/scrapEngine';
-import type { InventoryItem, PlayerCharacter, Recipe } from '../app/engine/types';
+import type { InventoryItem, PlayerCharacter } from '../app/engine/types';
+import type { Recipe } from '../app/engine/crafting';
 
 // ──────────────────────────────────────────────────────────────────────
 // Helpers
@@ -243,15 +244,21 @@ describe('Domestic / utility quick-action stress (700 in-game days)', () => {
     //   rejects and the slot stays empty. The stat bonus declared on
     //   the ring / amulet row never reaches effectiveStats. Pick names
     //   that exist in ONE catalog only.
-    const STAT_RINGS = [
-      { name: 'Tartarian Stoneband', stat: 'strength' as const, amount: 2 },
-      { name: 'Reclaimer\'s Quick Band', stat: 'dexterity' as const, amount: 1 },
-      { name: 'Golem Controller Ring', stat: 'intelligence' as const, amount: 1 },
+    // Typed as a generic stat-key union so the equal-stat branch below
+    // compiles cleanly even though ring + amulet pools currently use
+    // disjoint stats (ring → STR/DEX/INT, amulet → WIS/CHA). If we
+    // ever add an INT amulet or a WIS ring the equal-stat path will
+    // light up without a recompile.
+    type StatKey = 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma';
+    const STAT_RINGS: { name: string; stat: StatKey; amount: number }[] = [
+      { name: 'Tartarian Stoneband', stat: 'strength', amount: 2 },
+      { name: 'Reclaimer\'s Quick Band', stat: 'dexterity', amount: 1 },
+      { name: 'Golem Controller Ring', stat: 'intelligence', amount: 1 },
     ];
-    const STAT_AMULETS = [
-      { name: 'Lightstone Amulet', stat: 'wisdom' as const, amount: 2 },
-      { name: 'Minor Aetheric Amulet', stat: 'wisdom' as const, amount: 1 },
-      { name: 'Whisperer\'s Charm', stat: 'charisma' as const, amount: 1 },
+    const STAT_AMULETS: { name: string; stat: StatKey; amount: number }[] = [
+      { name: 'Lightstone Amulet', stat: 'wisdom', amount: 2 },
+      { name: 'Minor Aetheric Amulet', stat: 'wisdom', amount: 1 },
+      { name: 'Whisperer\'s Charm', stat: 'charisma', amount: 1 },
     ];
 
     let iter = 0;

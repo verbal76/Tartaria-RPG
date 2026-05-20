@@ -57,6 +57,7 @@ export function ExplorationScreen() {
   const [salvageOpen, setSalvageOpen] = useState(false);
   const [takeOpen, setTakeOpen] = useState(false);
   const takeAmbientNoun = useGameStore((s) => s.takeAmbientNoun);
+  const stealthTakeAmbientNoun = useGameStore((s) => s.stealthTakeAmbientNoun);
 
   // Build one view per enemy in the scene. Tap-to-cycle is wired through
   // the store's setActiveEnemyIdx so combat handlers always target the
@@ -229,6 +230,10 @@ export function ExplorationScreen() {
         onTake={(noun) => {
           setTakeOpen(false);
           takeAmbientNoun(noun);
+        }}
+        onStealthTake={(noun) => {
+          setTakeOpen(false);
+          stealthTakeAmbientNoun(noun);
         }}
         onCancel={() => setTakeOpen(false)}
       />
