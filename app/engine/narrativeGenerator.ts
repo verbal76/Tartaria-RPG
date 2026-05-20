@@ -697,6 +697,16 @@ export interface SoftArbiterContext {
   playerHpFraction?: number;
   /** Cognitive layer's most recent dominant emotion, used to bias hints. */
   mood?: string;
+  /** The most recently mentioned noun across the last few player turns —
+   *  used to ground "what's inside?" / "is it open?" follow-ups so the
+   *  Arbiter doesn't pull a random inventory item that has nothing to
+   *  do with what the player was looking at. */
+  lastInteractedNoun?: string | null;
+  /** Original player input — lets the fallback match question patterns
+   *  ("is there anything inside?", "what's in it?") that the parser
+   *  classifies as unknown but which clearly refer to the most recent
+   *  noun. */
+  rawText?: string;
 }
 
 // Score an inventory item by relevance to the current situation. Higher score
@@ -749,6 +759,19 @@ export function buildSoftArbiterFallback(ctx: SoftArbiterContext): string {
 
   if (parsed.resolvedNoun) {
     return `The Arbiter follows your gaze toward the ${parsed.resolvedNoun.toLowerCase()}. "Tell me what you would do with it."`;
+  }
+
+  // "What's inside?" / "is there anything in it?" / "is it open?" —
+  // questions about contents or state of the LAST noun the player
+  // interacted with. Pulling a random inventory item here produced
+  // "Your cavern sound stones is still there" when the player asked
+  // about a locket. Ground the answer in the recent noun instead.
+  const rawLower = (ctx.rawText ?? '').toLowerCase();
+  const isContentsQuestion = /\b(inside|contents?|in it|in there|in the|what'?s? in)\b/i.test(rawLower)
+    && /\?$|\bany\b|\bwhat\b/i.test(rawLower);
+  if (isContentsQuestion && ctx.lastInteractedNoun) {
+    const n = ctx.lastInteractedNoun.toLowerCase();
+    return `The Arbiter glances at the ${n}. "If the ${n} were hiding something, it would have shown by now. What you took from it is what it had."`;
   }
 
   if (enemy) {

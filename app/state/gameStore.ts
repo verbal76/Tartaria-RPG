@@ -623,6 +623,11 @@ interface GameStore {
    *  Tuned with a 3-step minimum gate so the world doesn't roll on
    *  every footstep. Transient. */
   wastelandStepsSinceEncounter: number;
+  /** Last noun the player named in an action — used by the soft
+   *  Arbiter fallback so "is there anything inside?" can reference
+   *  the locket/wreck/etc. the player was working with, instead of
+   *  pulling a random unrelated inventory item. */
+  lastInteractedNoun: string | null;
   /** When the app boots on a different OTA bundle than the one
    *  recorded in AsyncStorage, this holds the PREVIOUS build id.
    *  TitleScreen reads it and surfaces a one-shot "Updated" modal
@@ -776,6 +781,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   cognitiveError: null,
   cognitiveLastResponse: null,
   wastelandStepsSinceEncounter: 0,
+  lastInteractedNoun: null,
   justUpdatedFromBuild: null,
   pendingOTAUpdate: false,
   pendingInputDraft: null,
@@ -1821,8 +1827,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // later, surface a small Arbiter ack, and bail.
     if (
       !_opts?.skipPreChecks &&
-      trimmed.length > 100 &&
-      /^(ok\b|btw\b|fyi\b|hey\b|so\b)|(\bwe should\b|\byou should\b|\bi think\b|\bi wish\b|\bi'?d like\b|\bcan we\b|\bshould have\b|\bneeds? to be\b)/i.test(trimmed)
+      // Dropped from >100 to >60 chars — playtest log caught a 95-char
+      // feature request ("we need to add salvage as a button like
+      // search, it should also have a pop-up and pull on nouns.") that
+      // sailed past the old length gate. Also added "we need" /
+      // "could you" / "it should" / "add a" patterns to the regex.
+      trimmed.length > 60 &&
+      /^(ok\b|btw\b|fyi\b|hey\b|so\b)|(\bwe (should|need|could|gotta)\b|\byou should\b|\bi think\b|\bi wish\b|\bi'?d like\b|\bcan we\b|\bcould you\b|\bshould have\b|\bneeds? to be\b|\bit should (have|be|also)\b|\badd a\b|\bplease add\b)/i.test(trimmed)
     ) {
       get().appendLog('player', trimmed, { meta: true });
       get().appendLog(
@@ -1974,6 +1985,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       `parser: intent=${parsed.intent} conf=${parsed.confidence.toFixed(2)} verb=${parsed.matchedVerb ?? '-'} target=${parsed.target ?? '-'} resolved=${parsed.resolvedNoun ?? '-'} range=${currentScene.range ?? '-'} enemies=${currentScene.enemies.length} hooks=${currentScene.hooks?.length ?? 0}`,
     );
 
+    // Track the noun the player just named so the soft Arbiter
+    // fallback can ground follow-up questions ("is there anything
+    // inside?") in the right object instead of pulling a random
+    // inventory item. Only update on a confident parse with a target —
+    // unknown/low-confidence inputs preserve the previous noun.
+    if (parsed.confidence >= 0.5) {
+      const noun = parsed.resolvedNoun ?? parsed.target ?? null;
+      if (noun && noun.trim().length > 0) {
+        set({ lastInteractedNoun: noun.trim() });
+      }
+    }
+
     if (parsed.intent === 'unknown' || parsed.confidence < 0.5) {
       // Qwen-backed parse fallback. The dictionary parser missed —
       // before showing the soft refusal, hand the input to Qwen with
@@ -2021,6 +2044,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 hazard: currentScene.hazard,
                 playerHpFraction: player.hpMax > 0 ? player.hp / player.hpMax : 1,
                 mood: lastCog2?.inferredEmotions[0],
+                lastInteractedNoun: get().lastInteractedNoun,
+                rawText: trimmed,
               }),
             );
             if (parsed.suggestions.length) {
@@ -2050,6 +2075,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
               hazard: currentScene.hazard,
               playerHpFraction: player.hpMax > 0 ? player.hp / player.hpMax : 1,
               mood: lastCog3?.inferredEmotions[0],
+              lastInteractedNoun: get().lastInteractedNoun,
+              rawText: trimmed,
             }),
           );
         });
@@ -2068,6 +2095,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           hazard: currentScene.hazard,
           playerHpFraction: player.hpMax > 0 ? player.hp / player.hpMax : 1,
           mood: lastCog?.inferredEmotions[0],
+          lastInteractedNoun: get().lastInteractedNoun,
+          rawText: trimmed,
         }),
       );
       if (parsed.suggestions.length) {
@@ -4038,7 +4067,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }));
         const matched = classifyContainer(target);
         if (!matched) {
-          // No archetype — door / wall / generic mechanism. Just narrate.
+          // If the target is something the player is carrying, narrate
+          // it as an inspection rather than a door-forcing — "open the
+          // locket" should not return "you force the locket open, it
+          // stays open." The locket has no compartment; say so plainly.
+          const inv = player.inventory ?? [];
+          const heldItem = inv.find(
+            (it) =>
+              it.name.toLowerCase() === key ||
+              it.name.toLowerCase().includes(key) ||
+              key.includes(it.name.toLowerCase()),
+          );
+          if (heldItem) {
+            get().appendLog(
+              'world',
+              `You turn the ${heldItem.name} over in your hands. No clasp, no compartment — it is solid where it looks like it should open. The thing it carries, it carries in its hum.`,
+            );
+            void get().persist();
+            break;
+          }
+          // No archetype, not an inventory item — door / wall / generic
+          // mechanism. Just narrate.
           get().appendLog('world', `You force the ${target} open. It stays open.`);
           void get().persist();
           break;

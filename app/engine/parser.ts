@@ -29,6 +29,11 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'look', 'examine', 'inspect', 'search', 'study', 'check', 'investigate', 'scan',
     'observe', 'view', 'read', 'probe', 'survey', 'find', 'scavenge', 'hunt',
     'peruse', 'scrutinise', 'scrutinize', 'comb',
+    // 'salvage' / 'strip' / 'pry' — playtest caught "salvage the
+    // construct" failing to advance the wreck_construct hook because
+    // there was no salvage verb. Investigate is hook-eligible, so
+    // mapping salvage here advances the hook with the right noun.
+    'salvage', 'strip', 'pry',
     // From the track / translate / learn / gather cards.
     'track', 'translate', 'learn', 'gather',
     // 'open' belongs to the dedicated open intent — it persists
@@ -61,7 +66,13 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   wait: ['wait', 'stay', 'hold', 'pause', 'still', 'linger', 'tarry', 'idle', 'bide', 'remain'],
   ask: ['what', 'explain', 'define', 'who', 'how', 'why', 'tell', 'describe', 'clarify', 'mean'],
   craft: [
-    'craft', 'make', 'forge', 'fashion', 'build', 'assemble', 'construct', 'fabricate', 'weld', 'sculpt',
+    // 'construct' removed — playtest caught "salvage the construct"
+    // routing to craft because 'construct' matched as a verb here,
+    // swallowing the salvage target noun. 'build' / 'assemble' /
+    // 'fashion' / 'fabricate' / 'forge' / 'weld' / 'make' cover the
+    // crafting intent without claiming the noun "construct" used
+    // for Aetheric automaton wrecks.
+    'craft', 'make', 'forge', 'fashion', 'build', 'assemble', 'fabricate', 'weld', 'sculpt',
     // "set a trap" — multi-word so 'set' alone doesn't fire (too
     // ambiguous with set-up / set-stance verbs).
     'set a trap', 'set the trap', 'set trap',
