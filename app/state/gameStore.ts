@@ -184,6 +184,7 @@ import { levenshtein } from '../engine/editDistance';
 import { isAreaSearch, isGroundSearch, rollAreaSearch } from '../engine/areaSearch';
 import { isClimbable, isSwimmable, isSearchable } from '../engine/interactionTags';
 import { rollSalvagePool } from '../engine/salvagePools';
+import { isOversized, refusalLine } from '../engine/portability';
 import { bestDigTool, rollDig } from '../engine/digging';
 import {
   generateWorldMap,
@@ -954,6 +955,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     if (alreadyConsumed) {
       get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to claim.`);
+      return;
+    }
+    // Portability gate. Wagons, pillars, sentinels, boulders, water —
+    // catalog match or not, you can't put them in a backpack. Tactful
+    // in-character refusal instead of a silent grant or a stiff error.
+    if (isOversized(ambientHit)) {
+      get().appendLog('arbiter', refusalLine(ambientHit));
       return;
     }
     const cat = findCatalogItem(ambientHit);
@@ -4423,6 +4431,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
               );
               if (alreadyConsumed) {
                 get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to claim.`);
+                break;
+              }
+              // Portability gate — same as takeAmbientNoun. Catches
+              // typed 'take wagon' / 'take pillar' with the tactful
+              // in-character refusal.
+              if (isOversized(ambientHit)) {
+                get().appendLog('arbiter', refusalLine(ambientHit));
                 break;
               }
               const cat = findCatalogItem(ambientHit);

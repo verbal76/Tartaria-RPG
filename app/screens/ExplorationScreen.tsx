@@ -11,6 +11,7 @@ import { SearchModal } from '../components/SearchModal';
 import { SalvageModal } from '../components/SalvageModal';
 import { TakeModal } from '../components/TakeModal';
 import { findCatalogItem } from '../engine/crafting';
+import { isOversized } from '../engine/portability';
 import { ApproachModal } from '../components/ApproachModal';
 import { TutorialTarget } from '../components/TutorialTarget';
 import { findWeaponByName } from '../engine/crafting';
@@ -224,7 +225,7 @@ export function ExplorationScreen() {
       <TakeModal
         visible={takeOpen}
         takeable={(currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])
-          .filter((n) => findCatalogItem(n) !== null)}
+          .filter((n) => findCatalogItem(n) !== null && !isOversized(n))}
         onTake={(noun) => {
           setTakeOpen(false);
           takeAmbientNoun(noun);
