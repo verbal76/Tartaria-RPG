@@ -957,16 +957,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const roomKey = makeRoomKey(player.currentLocationId, scene.microMicroId, player.mapX, player.mapY);
     const room = state.worldMemory.visitedRooms?.[roomKey];
     const ambientLower = ambientHit.toLowerCase();
-    const alreadyConsumed = (room?.searchedAmbientNouns ?? []).some(
-      (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
-    );
-    if (alreadyConsumed) {
-      get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to claim.`);
-      return;
-    }
-    // Portability gate. Wagons, pillars, sentinels, boulders, water —
-    // catalog match or not, you can't put them in a backpack. Tactful
-    // in-character refusal instead of a silent grant or a stiff error.
+    // Portability gate runs BEFORE the dedup check so the catalog
+    // lookup below can self-heal corrupted dedup state. Wagons,
+    // pillars, sentinels, boulders, water — catalog match or not,
+    // you can't put them in a backpack.
     if (isOversized(ambientHit)) {
       get().appendLog('arbiter', refusalLine(ambientHit), { skipDedup: true });
       return;
@@ -980,6 +974,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
         `The ${ambientHit} is part of the scene, not a loose drop. Try the SALVAGE button instead to harvest it for parts.`,
       );
       return;
+    }
+    // Self-healing dedup: a noun is "really consumed" only when the
+    // matching catalog item is currently in inventory. Without that,
+    // the searchedAmbientNouns entry is most likely a pre-OTA-173
+    // salvage-on-nothing bug-write, OR the player sold / dropped the
+    // item — either way they should be able to take from the scene
+    // again. This unsticks corrupted save state without breaking
+    // legitimate dedup for normal takes.
+    const alreadyConsumed = (room?.searchedAmbientNouns ?? []).some(
+      (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
+    );
+    if (alreadyConsumed) {
+      const catNameLower = cat.name.toLowerCase();
+      const ownsCatalogItem = player.inventory.some(
+        (i) => i.name.toLowerCase() === catNameLower && i.quantity > 0,
+      );
+      if (ownsCatalogItem) {
+        get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to claim.`);
+        return;
+      }
+      // Fall through to grant — the entry is corrupt / stale.
     }
     const newItem: InventoryItem = stampDurability({
       id: `take_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
@@ -4589,21 +4604,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
               const ambientRoomKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY);
               const ambientRoom = get().worldMemory.visitedRooms?.[ambientRoomKey];
               const ambientLower = ambientHit.toLowerCase();
-              const alreadyConsumed = (ambientRoom?.searchedAmbientNouns ?? []).some(
-                (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
-              );
-              if (alreadyConsumed) {
-                get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to claim.`);
-                break;
-              }
-              // Portability gate — same as takeAmbientNoun. Catches
-              // typed 'take wagon' / 'take pillar' with the tactful
-              // in-character refusal.
+              // Portability gate before dedup so the catalog lookup
+              // below can self-heal corrupted dedup state.
               if (isOversized(ambientHit)) {
                 get().appendLog('arbiter', refusalLine(ambientHit), { skipDedup: true });
                 break;
               }
               const cat = findCatalogItem(ambientHit);
+              // Self-healing dedup — see takeAmbientNoun (~line 960)
+              // for full rationale. Treat consumed-but-not-in-pack
+              // entries as stale.
+              const alreadyConsumed = (ambientRoom?.searchedAmbientNouns ?? []).some(
+                (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
+              );
+              if (alreadyConsumed && cat) {
+                const catNameLower = cat.name.toLowerCase();
+                const ownsCatalogItem = player.inventory.some(
+                  (i) => i.name.toLowerCase() === catNameLower && i.quantity > 0,
+                );
+                if (ownsCatalogItem) {
+                  get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to claim.`);
+                  break;
+                }
+                // Fall through — stale entry, allow the grant.
+              } else if (alreadyConsumed && !cat) {
+                // Non-catalog scene feature already consumed (e.g. an
+                // ambient noun the player searched on). Preserve the
+                // old behavior since there's no catalog item to
+                // gate self-heal against.
+                get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to claim.`);
+                break;
+              }
               if (cat) {
                 // Real catalog item — grant a fully-specced copy.
                 const newItem: InventoryItem = stampDurability({

@@ -61,9 +61,23 @@ export function ExplorationScreen() {
   const worldMemory = useGameStore((s) => s.worldMemory);
 
   // Per-room dedup list — drives the "already taken" gating on the
-  // TAKE modal chips so once you grab the rope, the chip greys out
-  // instead of staying green and tappable. Mirrors the lookup logic
-  // in gameStore.takeAmbientNoun so the UI matches the engine's gate.
+  // TAKE modal chips. Two tightenings vs the first cut at this:
+  //
+  //   1. EXACT name match only, not bidirectional substring. The
+  //      engine's substring match was greying out chips for nouns
+  //      that weren't actually blocked (e.g. a save with "rope" in
+  //      searchedAmbientNouns also greyed an unrelated "scrap pile"
+  //      because some entries cross-matched). UI errs on the side
+  //      of green; if the engine actually rejects on tap, the log
+  //      line surfaces it.
+  //
+  //   2. Self-healing: the chip only greys when the player ACTUALLY
+  //      has the catalog item for that noun in their inventory. If
+  //      the dedup entry exists but the item isn't in the pack, the
+  //      noun was either (a) marked consumed by the OTA<=172 salvage
+  //      bug that wrote on 'nothing' outcomes, or (b) the player
+  //      sold / lost the item. Either way, the chip should be
+  //      re-tappable so the player isn't stuck.
   const consumedAmbientNouns = useMemo(() => {
     if (!player || !currentScene) return new Set<string>();
     const microMicroId = currentScene.microMicroId ?? '_';
@@ -80,15 +94,22 @@ export function ExplorationScreen() {
     worldMemory.visitedRooms,
   ]);
 
-  // Same matching logic the takeAmbientNoun action uses — substring
-  // match either direction so "rope" in searched matches a "rope"
-  // chip, and a "buried rope" chip is blocked if "rope" was searched.
   const isAmbientConsumed = (noun: string): boolean => {
     const lower = noun.toLowerCase();
-    for (const n of consumedAmbientNouns) {
-      if (n === lower || lower.includes(n) || n.includes(lower)) return true;
-    }
-    return false;
+    if (!consumedAmbientNouns.has(lower)) return false;
+    // Self-heal: only treat as consumed when the catalog item is
+    // currently in inventory. Without inventory backing, the entry
+    // is either a bug-write (pre-OTA 173 salvage) or the player no
+    // longer owns the item — either way they should be able to try
+    // again. The engine's own dedup will still gate if it disagrees.
+    if (!player) return true;
+    const cat = findCatalogItem(noun);
+    if (!cat) return true; // not a catalog item; honor engine dedup as-is
+    const targetName = cat.name.toLowerCase();
+    const owns = player.inventory.some(
+      (i) => i.name.toLowerCase() === targetName && i.quantity > 0,
+    );
+    return owns;
   };
 
   // Build one view per enemy in the scene. Tap-to-cycle is wired through

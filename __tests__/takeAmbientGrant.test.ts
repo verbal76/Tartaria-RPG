@@ -144,6 +144,99 @@ describe('TAKE modal → takeAmbientNoun → inventory', () => {
     expect(bladesAfter[bladesAfter.length - 1]!.durability).toBeTruthy();
   });
 
+  it('self-heals stale searchedAmbientNouns: noun marked consumed but item not in inventory → still grants', async () => {
+    // This covers the post-OTA-172 recovery case. Pre-fix, salvage
+    // on a "nothing" outcome wrote the ambient noun into
+    // searchedAmbientNouns even though no item was granted.
+    // Players ended up with chips that read "already taken" forever
+    // for items they never actually had. OTA 177+ self-heals: if
+    // the catalog item isn't in inventory, treat the entry as
+    // stale and allow the take.
+    const store = useGameStore;
+    await store.getState().hydrate();
+    const race = getRaces()[0]!;
+    const fac = getFactions()[0]!;
+    await store.getState().startNewGame({ name: 'StaleConsumed', raceId: race.id, factionId: fac.id });
+    store.getState().skipTutorial?.();
+
+    // Force the scene to have rope in ambient.
+    const scene = store.getState().currentScene!;
+    store.setState({
+      currentScene: {
+        ...scene,
+        ambientNouns: ['rope'],
+        displayedAmbientNouns: ['rope'],
+      },
+    });
+    // Strip any starter Climbing Rope so we know the player doesn't
+    // own it. Starter kits don't ship one, but be defensive.
+    const p0 = store.getState().player!;
+    store.setState({
+      player: { ...p0, inventory: p0.inventory.filter((i) => i.name !== 'Climbing Rope') },
+    });
+
+    // Plant the stale dedup entry — what the pre-fix salvage path
+    // would have left behind on a "nothing" outcome.
+    const locId = p0.currentLocationId;
+    const microMicroId = store.getState().currentScene!.microMicroId ?? '_';
+    const mx = typeof p0.mapX === 'number' ? p0.mapX : '_';
+    const my = typeof p0.mapY === 'number' ? p0.mapY : '_';
+    const roomKey = `${locId}@${microMicroId}@${mx},${my}`;
+    store.setState((s) => ({
+      worldMemory: {
+        ...s.worldMemory,
+        visitedRooms: {
+          ...(s.worldMemory.visitedRooms ?? {}),
+          [roomKey]: {
+            firstVisitAt: Date.now(),
+            lastVisitAt: Date.now(),
+            visitCount: 1,
+            searchedAmbientNouns: ['rope'],
+          },
+        },
+      },
+    }));
+
+    // Take should now SUCCEED despite the stale dedup entry.
+    store.getState().takeAmbientNoun('rope');
+    const inv = store.getState().player!.inventory;
+    const got = inv.find((i) => i.name === 'Climbing Rope');
+    expect(got).toBeTruthy();
+    expect(got!.quantity).toBe(1);
+  });
+
+  it('legit dedup still blocks: noun marked consumed AND item in inventory → rejects', async () => {
+    // Counterpoint to the self-heal test — make sure normal dedup
+    // still works when the player actually has the item.
+    const store = useGameStore;
+    await store.getState().hydrate();
+    const race = getRaces()[0]!;
+    const fac = getFactions()[0]!;
+    await store.getState().startNewGame({ name: 'LegitDedup', raceId: race.id, factionId: fac.id });
+    store.getState().skipTutorial?.();
+
+    const scene = store.getState().currentScene!;
+    store.setState({
+      currentScene: {
+        ...scene,
+        ambientNouns: ['rope'],
+        displayedAmbientNouns: ['rope'],
+      },
+    });
+
+    // First take — should succeed.
+    store.getState().takeAmbientNoun('rope');
+    const afterFirst = store.getState().player!.inventory.filter((i) => i.name === 'Climbing Rope');
+    expect(afterFirst.length).toBe(1);
+    expect(afterFirst[0]!.quantity).toBe(1);
+
+    // Second take — should be blocked by dedup (player owns rope).
+    store.getState().takeAmbientNoun('rope');
+    const afterSecond = store.getState().player!.inventory.filter((i) => i.name === 'Climbing Rope');
+    const totalQty = afterSecond.reduce((s, i) => s + i.quantity, 0);
+    expect(totalQty).toBe(1); // No double-grant.
+  });
+
   it('lands Scrap Metal under kind:misc (material) when player taps "scrap pile"', async () => {
     const store = useGameStore;
     await store.getState().hydrate();
