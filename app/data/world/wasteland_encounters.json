@@ -218,5 +218,204 @@
     ],
     "lore_note": "Pinned inside the lead wagon, a hand-drawn map. The destination is circled in red ink: Old Drakova. In the margin, in a different hand: 'the dragon is real. they were not exaggerating. turn back.'",
     "quest_hook": { "kind": "hunt", "id": "hunt_bog_dragon" }
+  },
+
+  "_v2_description": "Mini-dungeon + encounter batch 2 — authored from the lore-book content drop. Mechanics-heavy beats translated to narrative-only (no skill-check minigames yet); custom enemies remapped to the existing catalog. Quest hooks distributed across the unclaimed hunts and mysteries.",
+
+  "disturbed_rest": {
+    "type": "npc",
+    "weight": 5,
+    "matchers": ["mud", "buried", "ruin"],
+    "narration": "Your boot sinks past the silt into something softer. The Aetherstone underneath cracks with a tone that does not belong to stone. A figure rises out of the mud at your feet — outline of a person, edges of light, eyes that have not closed for a long time. An Aetherkin. Torn from a sleep you did not mean to disturb.",
+    "npc_lines": [
+      "The Aetherkin's voice arrives without sound. 'I was at rest. I was at rest. I was at rest.'",
+      "The Aetherkin turns its head a quarter inch and you feel it across your sternum. 'Why,' it asks. The question is not for you specifically.",
+      "The Aetherkin stares at the place its body would have been. 'The mud agreed with me,' it says. 'Until you.'"
+    ],
+    "lore_note": "When you back away, the Aetherkin sinks back into the silt without resistance. The mud closes over it the way water closes over a thrown stone. The pulse it leaves behind in the ground takes a slow minute to fade."
+  },
+
+  "black_cloak_tail": {
+    "type": "skirmish",
+    "weight": 4,
+    "matchers": ["outskirts", "ruin", "borderlands"],
+    "narration": "You catch the same grey cloak in the corner of your eye for the third time today. The figure does not pretend not to be following. They want you to know they are there. When they finally close the distance their hand is already inside their coat. A Mud Monarch agent — Black Cloak division, the kind that does not arrest people because the Monarchs do not arrest people.",
+    "enemyPool": ["Mud Monarch"],
+    "loot": []
+  },
+
+  "etheric_storm_surge": {
+    "type": "treasure",
+    "weight": 4,
+    "matchers": ["etheric_anomaly", "open", "mud"],
+    "narration": "The sky tightens. Violet thread above, blue thread below, both pulled taut by a hand you cannot see. An Aether-storm cell, small but dense, has crystallised right on top of you. For one long minute you taste an hour of your own life out of sequence — a morning that has not arrived, a meal you have not eaten — and when the storm releases you the ground at your feet is scattered with what it forgot to keep.",
+    "loot": [
+      { "name": "Aether Crystal", "weight": 30, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Aetheric Shard", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","shard"] },
+      { "name": "Aether Dust", "weight": 25, "min": 1, "max": 4, "kind": "misc", "tags": ["aether","dust","distillable"] },
+      { "name": "Tartarian Map Fragment", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["ancient","map","fragment"] }
+    ],
+    "lore_note": "The map fragment is in old Tartarian and shows a stretch of coastline that does not exist on any current map. The cartographer's mark in the corner is a single Aetheric eye, open."
+  },
+
+  "failing_automaton": {
+    "type": "skirmish",
+    "weight": 3,
+    "matchers": ["ruin", "buried", "etheric_anomaly"],
+    "narration": "A pre-flood Scrap Drone runs the same thirty-second patrol it was running the day the mud arrived. Six steps forward, scan, turn, six steps back, scan, turn. It has not been relieved. When its scanner cone passes over you it stutters — recognises a citizen-class signature that should not be here, then forgets it, then notices you again. The next pass it will not forget.",
+    "enemyPool": ["Scrap Drone"],
+    "loot": []
+  },
+
+  "aetherborn_awakening": {
+    "type": "npc",
+    "weight": 4,
+    "matchers": ["outskirts", "open", "etheric_anomaly"],
+    "narration": "A young Reclaimer kneels at the edge of the road, hands cupped around something that is not in their hands. Their breath comes in counted intervals — they are trying not to be a problem. Around them the air is striped with thin sparks that connect nothing to nothing. Latent Power, breaking through. The Eternal Dynasty would call this a recruitment. The Mud Monarchs would call it a problem to be erased.",
+    "npc_lines": [
+      "The Reclaimer does not look up. 'Don't touch me. I don't know what happens if you touch me. I don't know what happens if I touch me.'",
+      "The Reclaimer's mouth moves out of sync with their voice. 'It's like a name I almost remember. It hurts to almost remember.'",
+      "The Reclaimer steadies. 'If you see anyone in grey, do not point them this way. Please.'"
+    ],
+    "lore_note": "By the time you have decided whether to help, the sparks have closed back into the Reclaimer's chest and left them shaking. They will be different by morning. They do not yet know in what direction."
+  },
+
+  "reclaimers_gamble": {
+    "type": "npc",
+    "weight": 5,
+    "matchers": ["outskirts", "open", "borderlands", "ruin"],
+    "narration": "A Reclaimer waves you down from a folding stool. Their wares are spread on a square of oilcloth — three lenses, a coil of copper wire, a small object wrapped in red silk. They unwrap the silk slowly. 'Whispering Vault Key,' they say. 'Pre-flood. Real one. I'll take eighty TC. You'll thank me at the first vault.' The thing in the silk is a cracked Ether Lens with the engraving filed off.",
+    "npc_lines": [
+      "'You drive a hard bargain. Sixty TC. I will weep. I will eat dust. I will be honest.'",
+      "'Fine. Fifty. But you are robbing me. Tell my mother — if you find her — that I died honest.'",
+      "'If you do not buy this, the next walker will. The vault waits for no one.'"
+    ],
+    "lore_note": "If you walk away the Reclaimer is gone in two minutes. The stool, the oilcloth, the lenses, the lie. All of it, as if it had been a story you almost remembered telling someone else."
+  },
+
+  "mud_boar_stampede": {
+    "type": "skirmish",
+    "weight": 6,
+    "matchers": ["mud", "outskirts", "open"],
+    "narration": "The ground rolls before you hear them. A herd of Mud Boars breaks the rise at full panic — something behind them, probably an Aether-storm cell, has driven them past the threshold a Boar usually keeps. They do not see you. They do not need to.",
+    "enemyPool": ["Mud Boar"],
+    "loot": []
+  },
+
+  "ghostly_asgardar": {
+    "type": "treasure",
+    "weight": 3,
+    "matchers": ["mud", "open", "buried"],
+    "narration": "The plain in front of you folds, very slightly, the way fabric folds when something is laid on it from the other side. For a long blink the city of Asgardar stands in front of you — the capital at its height, lanterns burning at every level of every tower, traffic in the streets, breath in the air. You step forward; the fold lets go. The city is not there. What it left at your feet is real.",
+    "loot": [
+      { "name": "Worn Tartarian Coin", "weight": 35, "min": 8, "max": 15, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Aetheric Locket", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] },
+      { "name": "Aether Crystal", "weight": 20, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Aetheric Shard", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","shard"] }
+    ],
+    "lore_note": "The locket is warm and engraved on the back with a name in old Tartarian. You will not know what it says, but you will not be able to forget that you cannot read it."
+  },
+
+  "aetherkin_mourner": {
+    "type": "npc",
+    "weight": 4,
+    "matchers": ["buried", "ruin", "mud"],
+    "narration": "An Aetherkin stands with its back to you, very still, facing a section of buried wall where the silhouettes of the Entombed are pressed into the Aetherstone like coins into wax. Twelve of them. Maybe fourteen. The Aetherkin does not turn when you approach. The pressure in the air says it is aware of you and does not yet care.",
+    "npc_lines": [
+      "The Aetherkin speaks without turning. 'This one. This one. This one. This one. This one.' It is naming the silhouettes. It does not skip any.",
+      "The Aetherkin's voice fits between the breaths you would take. 'Leave them their coin. The mud takes payment in patience.'",
+      "The Aetherkin tilts its head a quarter inch and the air pulls toward it. 'You will not need what is in their pockets. They needed it more.'"
+    ],
+    "lore_note": "If you pass by without disturbing the Entombed the Aetherkin lets you go. If you reach for a coin, you will not reach it twice."
+  },
+
+  "scrap_drone_swarm": {
+    "type": "skirmish",
+    "weight": 5,
+    "matchers": ["ruin", "outskirts", "buried"],
+    "narration": "A bridge of fused mud-glass, and at the centre of it a small cache: three sealed crates, an old uniform folded on top. The instant your foot lands on the bridge, four drill-armed Scrap Drones unspool from the rust-shadow at the underside of the arch. They are not negotiating. The crates are theirs now and have been theirs for a long time.",
+    "enemyPool": ["Scrap Drone"],
+    "loot": []
+  },
+
+  "obsidian_observatory": {
+    "type": "mini_dungeon",
+    "weight": 3,
+    "matchers": ["etheric_anomaly", "open", "ruin"],
+    "narration": "A small low door at the base of one of the Obsidian Pillars, polished smooth by centuries of magnetic wind. Inside, the observatory's main chamber: a great brass armillary the size of a wagon, still turning slowly under its own weight, charting skies that no longer exist as charted. The air bends compass needles and turns pocket watches into ornaments. A pre-flood Sentinel-class drone still patrols the inner ring, its servos starved but functional.",
+    "loot": [
+      { "name": "Aetheric Compass", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["relic","navigation"] },
+      { "name": "Aether Crystal", "weight": 25, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Obsidian Shard", "weight": 25, "min": 2, "max": 4, "kind": "misc", "tags": ["obsidian","crystal"] },
+      { "name": "Automaton Circuit", "weight": 15, "min": 1, "max": 2, "kind": "misc", "tags": ["automaton","circuit","tech"] },
+      { "name": "Worn Tartarian Coin", "weight": 10, "min": 4, "max": 10, "kind": "misc", "tags": ["currency","ancient"] }
+    ],
+    "bandit_pool": ["Scrap Drone"],
+    "lore_note": "A logbook on the central desk records, in careful hand: 'Day 1,847 since the surface stopped answering. The sky charts still match. We have stopped checking.'",
+    "quest_hook": { "kind": "mystery", "id": "mystery_obsidian_orb" }
+  },
+
+  "thametan_engine_room": {
+    "type": "mini_dungeon",
+    "weight": 3,
+    "matchers": ["ruin", "buried", "etheric_anomaly"],
+    "narration": "A side chamber off Thametan's Tower, accessible only because the mud broke a wall it should not have broken. The Etheric Engine itself is two floors above; this is one of the auxiliary chambers, where the Engine's overflow used to be bled into reservoir tanks. The tanks are still here. So is the overflow. A patch of intelligent Aetheric Ooze patrols the chamber the way a guard would, in patterns that suggest someone trained it to.",
+    "loot": [
+      { "name": "Aether Crystal", "weight": 25, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Aetheric Shard", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","shard"] },
+      { "name": "Rune Engraving Kit", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["tool","rune","crafting"] },
+      { "name": "Aether Dust", "weight": 20, "min": 2, "max": 5, "kind": "misc", "tags": ["aether","dust","distillable"] },
+      { "name": "Aetheric Locket", "weight": 10, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] }
+    ],
+    "bandit_pool": ["Aetheric Ooze"],
+    "lore_note": "On the wall, scratched in a hand made unsteady by too much Aether: 'the Engine is awake. it has always been awake. we were the ones asleep.'"
+  },
+
+  "zharaks_grotto": {
+    "type": "mini_dungeon",
+    "weight": 3,
+    "matchers": ["mud", "buried", "ruin"],
+    "narration": "A spur of one of Zharak's Teeth bends low enough to enter at the waterline. Inside: a grotto carved by mud and patience. A True Tartarian shrine occupies the back wall — three standing stones, an iron bowl, an offering of coins that no living hand has touched in centuries. Silt Serpents nest in the warm hollows under the shrine. They do not share.",
+    "loot": [
+      { "name": "Worn Tartarian Coin", "weight": 35, "min": 10, "max": 20, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Aetheric Locket", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] },
+      { "name": "Aether Crystal", "weight": 20, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Mud Fragment", "weight": 20, "min": 2, "max": 4, "kind": "misc", "tags": ["mud","glass"] }
+    ],
+    "bandit_pool": ["Silt Serpent"],
+    "lore_note": "An offering tablet in the iron bowl, in old Tartarian: 'For the Siren-Queen of the Teeth. Sing softly. We are listening.' The script is fresh. The iron is not.",
+    "quest_hook": { "kind": "hunt", "id": "hunt_mud_siren_queen" }
+  },
+
+  "varakush_vault": {
+    "type": "mini_dungeon",
+    "weight": 2,
+    "matchers": ["buried", "ruin"],
+    "narration": "A side door from one of the lesser-used Varakush corridors, sealed by the Forgotten Order behind a knot of rune-glass the Order's apprentices use as a final exam. The knot loosens for a careful hand. Inside: a training vault, a row of practice runecasters, a wall of tools meant for a class that will not be taught again. The Order has not catalogued this room in a long time. They will not catalogue it tomorrow either.",
+    "loot": [
+      { "name": "Rune Engraving Kit", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["tool","rune","crafting"] },
+      { "name": "Aetheric Shard", "weight": 25, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","shard"] },
+      { "name": "First Aid Kit", "weight": 20, "min": 1, "max": 2, "kind": "consumable", "tags": ["medical"] },
+      { "name": "Aetheric Torch", "weight": 15, "min": 1, "max": 2, "kind": "misc", "tags": ["tool","aether"] },
+      { "name": "Aether Crystal", "weight": 15, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","crystal"] }
+    ],
+    "lore_note": "An exam paper still pinned to the practice rack, in a young Tartarian's hand: 'Question 7 — Define the failure mode of an unmoored Aether reservoir. Show your work.' The answer underneath is one word: 'mud.'"
+  },
+
+  "cradle_shipwreck": {
+    "type": "mini_dungeon",
+    "weight": 3,
+    "matchers": ["etheric_anomaly", "mud", "open"],
+    "narration": "A graveyard of pre-flood ships, their hulls petrified mid-storm, their crews still standing on deck where the Aether took them. The sky overhead is bruised in the Cradle's colours — old purple, older blue. You climb the lowest deck. The cargo holds are intact. The crew, frozen mid-gesture, do not seem to mind. One of the lockboxes in the captain's quarters is half-open. Something inside is humming.",
+    "loot": [
+      { "name": "Aether Crystal", "weight": 25, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Void Ether Shard", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","shard","void"] },
+      { "name": "Aetheric Compass", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["relic","navigation"] },
+      { "name": "Worn Tartarian Coin", "weight": 20, "min": 10, "max": 20, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Aether Dust", "weight": 10, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","dust","distillable"] }
+    ],
+    "bandit_pool": ["Aetheric Slug"],
+    "lore_note": "The captain's log is open to the last entry. A single sentence: 'It is not a storm. It is a hand.'",
+    "quest_hook": { "kind": "mystery", "id": "mystery_leviathan_eye" }
   }
 }

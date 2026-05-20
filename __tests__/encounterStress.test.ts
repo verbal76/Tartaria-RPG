@@ -239,9 +239,11 @@ describe('encounterStress — wasteland + container systems', () => {
       let triesUsed = 0;
       for (let i = 0; i < 200 && !spawned; i++) {
         triesUsed = i + 1;
-        // Reset rng cycle + steps counter every iteration so each
-        // step has a fresh shot at firing an encounter.
-        seq = 0;
+        // The deterministic prefix seeds the first attempt; from there
+        // real entropy (mock falls through to realRandom past seq=8)
+        // drives variation across the 200-try window so the larger
+        // archetype pool from the mini-dungeon batch still produces
+        // at least one skirmish / bandit spawn within the budget.
         const liveScene = store.getState().currentScene;
         if (liveScene) {
           // Re-pin the scene tags before each step in case stepDirection
