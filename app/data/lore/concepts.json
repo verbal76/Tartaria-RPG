@@ -494,6 +494,56 @@
       "title": "The Architectural Sentinels",
       "answer": "Semi-conscious machines the Tartarian Giants built to guard their cities. Aetheric-powered, self-repairing, capable of learning. Most still patrol the buried ruins five centuries on — eyes flicker with Aether light when they catch a heat signature. Few intruders survive direct contact. Centuries of exposure to Aetherstone have warped some: a few hesitate, a few are curious. The rest just kill."
     },
+
+    {
+      "id": "aetheric_lich",
+      "keywords": ["aetheric lich", "lich", "the lich", "aetheric_lich"],
+      "title": "Aetheric Lich",
+      "answer": "A scholar of the Forgotten Order — or, by some accounts, a Tartarian-Path zealot — who tried to outlive the Flood by binding their soul into an Aetherstone phylactery. The working held. The man did not. What remains drifts in pale robes, hollow-eyed, drawing the living dry of warmth and will at a touch. Until the phylactery anchoring it is found and shattered, the lich returns to its haunt no matter how many times you put it down."
+    },
+    {
+      "id": "mud_tyrant",
+      "keywords": ["mud tyrant", "tyrant", "the tyrant", "mud king"],
+      "title": "Mud Tyrant",
+      "answer": "Once a Mud Dweller chieftain; now a sovereign of corruption. Centuries of feeding on Aether-saturated mud swelled the body past anything that should still move — slabs of armoured silt over slow, monstrous strength. It rules a stretch of bog or ruin like a feudal lord, and the local Mud Dwellers either serve it or feed it. A single sovereign blow can crush a man into the ground he was standing on."
+    },
+    {
+      "id": "hollow_king",
+      "keywords": ["hollow king", "the king", "hollowed king"],
+      "title": "Hollow King",
+      "answer": "The monarch of a city whose name the surface forgot. When the Mud Flood came, he sealed himself into his own tomb with rite and ration, intending to wait out the catastrophe and return to his throne. Centuries later something walked back out of the tomb wearing his crown — savage, immensely strong, and emptied of whatever made the man a ruler. He still calls the buried hall his court, and he still treats every intruder as a usurper."
+    },
+    {
+      "id": "iron_worm",
+      "keywords": ["iron worm", "worm", "the worm"],
+      "title": "Iron Worm",
+      "answer": "A pre-Flood industrial automaton — built to bore tunnels, lay rail, chew through slag — that the Aether got into and never let go of. Plate-segments the length of a wagon, coiled around a core that should have burned out four centuries ago. It tunnels through ruins and slag-plains by feel, slow until it isn't, and a full coil-crush folds armour and the man inside it together. Heavy weapons mark it; nothing yet has stopped it for long."
+    },
+    {
+      "id": "bog_wyrm",
+      "keywords": ["bog wyrm", "wyrm", "the wyrm", "serpent"],
+      "title": "Bog Wyrm",
+      "answer": "An ordinary swamp viper that found a vein of Aetherstone and never stopped feeding. Two centuries on it is the length of a barge, fast in water, faster in reeds, and — worst of all — smart. It baits, it waits, it picks the smallest in a party. Mud Dwellers leave offerings where the water blackens; Reclaimers who go in for the Aetherstone in its gut rarely come back out."
+    },
+    {
+      "id": "voidspawn_matriarch",
+      "keywords": ["voidspawn matriarch", "matriarch", "voidspawn", "queen"],
+      "title": "Voidspawn Matriarch",
+      "answer": "An Aetheric mutation that crossed a line nothing else has — it learned to breed. Where the lesser voidspawn skitter and tear, the matriarch sits at the back of the brood-chamber and lays. Found in deep tombs and sealed vaults where the Aether has pooled for centuries, surrounded by clutches of eggs at every stage of swelling. Killing her is the work; killing the brood she has already seeded is the rest of the year."
+    },
+    {
+      "id": "tartarian_reaver",
+      "keywords": ["tartarian reaver", "reaver", "the reaver"],
+      "title": "Tartarian Reaver",
+      "answer": "A Mud Monarch elite-strike legionnaire who walked off his post and never reported back. He leads no army — he doesn't need to. The name travels ahead of him through caravan camps and ruin towns, and small crews bend to him without being asked. Heavy plate, a Monarch officer's blade, and the patience of a man who has already decided how the fight ends. The bounty on him has been raised four times and collected none."
+    },
+    {
+      "id": "aetheric_behemoth",
+      "keywords": ["aetheric behemoth", "behemoth", "the behemoth"],
+      "title": "Aetheric Behemoth",
+      "answer": "An apex Aetheric mutation — a beast grown past any natural ceiling on Aetherstone alone. Bone fused with crystal, hide pebbled with raw Aether, every breath a low pressure in the chest of anyone within reach. Behemoths roam the deepest mud-seas and the buried plains, and where one passes it leaves a corridor of stripped ruin and salted earth. The Reclaimers Guild has standing offers for proof of one downed; the offers have stood for a long time."
+    },
+
     {
       "id": "aethercraft",
       "keywords": ["aethercraft", "ether craft", "true tartarian magic", "aetherstone magic", "aetheric craft"],

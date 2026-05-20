@@ -1068,7 +1068,7 @@
     "damage": "4D10",
     "hp": 458,
     "rarity": "Legendary",
-    "loot": ["Behemoth Heart", "Aetheric Shard", "Resurrection Gem"],
+    "loot": ["Behemoth Heart", "Behemoth Plate", "Aetheric Shard", "Resurrection Gem"],
     "aliases": ["behemoth", "the behemoth", "aetheric behemoth"],
     "traits": ["armored", "savage", "slow", "concussive", "fast_regen", "vulnerable:bludgeoning"],
     "boss": true
@@ -1117,7 +1117,7 @@
     "damage": "3D8 Aetheric",
     "hp": 520,
     "rarity": "Legendary",
-    "loot": ["Lich Phylactery", "Aetherstone Heart", "Resurrection Gem"],
+    "loot": ["Lich Phylactery", "Lich-Bone Mantle", "Aetherstone Heart", "Resurrection Gem"],
     "aliases": ["lich", "the lich", "aetheric lich"],
     "traits": ["fast_regen", "ambush_strike", "concussive", "resist:slashing", "resist:piercing", "vulnerable:burn"],
     "boss": true
@@ -1169,7 +1169,7 @@
     "damage": "3D8",
     "hp": 540,
     "rarity": "Legendary",
-    "loot": ["Wyrm Fang", "Bog-Heart Pearl", "Resurrection Gem"],
+    "loot": ["Wyrm Fang", "Wyrm-Scale Hide", "Bog-Heart Pearl", "Resurrection Gem"],
     "aliases": ["wyrm", "the wyrm", "bog wyrm", "serpent"],
     "traits": ["agile", "quick", "venomous", "bleeder", "fast_regen", "resist:piercing", "vulnerable:burn"],
     "boss": true

@@ -25,6 +25,13 @@
     { "name": "Bone Bolt", "rarity": "Common", "tags": ["ammunition", "bone"], "description": "A short, dense bone bolt fired from a crossbow. Holds its edge in Aetheric weather." },
     { "name": "Small Rock", "rarity": "Common", "tags": ["thrown", "stone", "improvised"], "description": "Fist-sized stone — heavy enough to bruise, light enough to throw. Stack up to 10 in your pack." },
     { "name": "Big Rock", "rarity": "Common", "tags": ["thrown", "stone", "improvised", "heavy"], "description": "A two-handed brick of mudstone. Devastating if it lands. You can only carry one." },
-    { "name": "Stick", "rarity": "Common", "tags": ["wood", "improvised", "kindling"], "description": "A length of dry wood. Fuels a torch, props a door, or whacks a goblin in a pinch." }
+    { "name": "Stick", "rarity": "Common", "tags": ["wood", "improvised", "kindling"], "description": "A length of dry wood. Fuels a torch, props a door, or whacks a goblin in a pinch." },
+    { "name": "Aetherstone Heart", "rarity": "Legendary", "tags": ["aether", "crystal", "boss", "legendary"], "description": "Aetherstone Heart. The cold, slow-pulsing core of an Aetheric Lich. Keeps its rhythm even out of the chest — the Lich was never quite the one keeping time." },
+    { "name": "Throne Shard", "rarity": "Legendary", "tags": ["aether", "stone", "boss", "legendary"], "description": "Throne Shard. A jagged piece of the Hollow King's seat, fused mud-iron and old gilt. The voices it carried have not yet noticed it's been broken off." },
+    { "name": "Iron Core", "rarity": "Legendary", "tags": ["construct", "metal", "boss", "legendary"], "description": "Iron Core. The Aetherstone-fed power cell at the centre of the Iron Worm. Still warm, still humming the worm's old digging rhythm." },
+    { "name": "Wyrm Fang", "rarity": "Legendary", "tags": ["organic", "bone", "boss", "legendary"], "description": "Wyrm Fang. A curving tooth from the Bog Wyrm, the root still wet with venom-bog. Cores any blade you care to commit to." },
+    { "name": "Voidspawn Egg", "rarity": "Legendary", "tags": ["organic", "aether", "boss", "legendary"], "description": "Voidspawn Egg. A leathery, fist-sized sac drawn from the Matriarch's clutch. Something inside it still shifts when no one is watching." },
+    { "name": "Mud-Iron Heart", "rarity": "Legendary", "tags": ["mud", "metal", "boss", "legendary"], "description": "Mud-Iron Heart. A dense knot of slag and mud-iron pulled from the Mud Tyrant's chest cavity. Heavier than it ought to be, the way old crowns are." },
+    { "name": "Behemoth Heart", "rarity": "Legendary", "tags": ["organic", "aether", "boss", "legendary"], "description": "Behemoth Heart. The fist-sized, Aether-veined heart of an Aetheric Behemoth. Beats once an hour, regardless of which body it's in." }
   ]
 }

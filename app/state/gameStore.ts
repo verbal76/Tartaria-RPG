@@ -3100,6 +3100,36 @@ export const useGameStore = create<GameStore>((set, get) => ({
       case 'escape':
       case 'cast':
       case 'use_relic': {
+        // Consumable shortcut — "use first aid kit" / "use ration" /
+        // any catalog consumable should consume one and apply its
+        // healing effect, not roll a Wisdom check on the bandages.
+        // The skill-check path stays the fallback for actual relics
+        // (Aetheric Torch, Locket, Compass, etc.).
+        const usedConsumable = parsed.resolvedItemId
+          ? player.inventory.find((i) => i.id === parsed.resolvedItemId && i.kind === 'consumable')
+          : undefined;
+        if (usedConsumable) {
+          // First Aid Kit's catalog description promises 1d6 HP; we use
+          // the same dice for any consumable invoked through "use" so
+          // the verb is well-defined regardless of which item lands here.
+          const room = Math.max(0, player.hpMax - player.hp);
+          const heal = Math.min(room, rollDie(6));
+          const newInventory = player.inventory
+            .map((i) => (i.id === usedConsumable.id ? { ...i, quantity: i.quantity - 1 } : i))
+            .filter((i) => i.quantity > 0);
+          set({
+            player: advanceTime(
+              { ...player, hp: player.hp + heal, inventory: newInventory },
+              0.25,
+            ),
+          });
+          const tail = heal > 0
+            ? `1d6 → ${heal} HP recovered.`
+            : 'You were already at full strength — the salve goes back in the pouch.';
+          get().appendLog('world', `You use one ${usedConsumable.name}. ${tail}`);
+          void get().persist();
+          break;
+        }
         set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
         const steps = buildSkillSteps(parsed.intent, player, {
           weatherMod: weatherStatModifiers(currentScene.weather),
