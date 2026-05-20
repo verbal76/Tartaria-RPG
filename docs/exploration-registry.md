@@ -165,11 +165,47 @@ fungus stalk · glowing spores · water basin · mud trench · harvest basket ·
 
 ---
 
+# v2.1 — partial 50-section index additions
+
+Sections 25-45 not yet authored. Sections 46-50 ingested below.
+
+## 46. The Crumbling Observatory
+*A ruined astronomical station still tracking Etheric anomalies.*
+*(Mapped to `obsidian_pillars`.)*
+
+telescope lens · star chart · broken gear · rotating platform · cracked dome · signal relay · dust console · hanging cable · observation chair · ether crystal · burnt notes · rusted hatch · broken compass · sky monitor · static field · relay spark · cracked railing · frost residue · weather vane · stone stair · void reading · shadow stain · archive drawer · power conduit · echo chamber
+
+## 47. The Tide Vault
+*A flooded relic chamber hidden beneath the Mud Seas.*
+*(Mapped to `cradle_of_dusk`.)*
+
+flood gate · rusted chest · barnacle pillar · chain hook · water current · tide debris · coral growth · slime coating · broken lock · flood lantern · leviathan tooth · deep silt · wreck beam · sea fungus · drowned skeleton · rusted harpoon · water crack · tide valve · echo chamber · flood seal · broken ladder · mud vent · rope bundle · driftwood · fog cloud
+
+## 48. The Pumping Gallery
+*Industrial maintenance corridors surrounding the Nexus.*
+*(Mapped to `mud_flood_nexus`.)*
+
+pump housing · pressure gauge · cooling pipe · steam burst · rusted ladder · relay conduit · flood residue · sludge vent · maintenance rail · hanging cable · broken valve · gear assembly · dust terminal · signal spark · drain hatch · emergency mask · reactor hum · oil stain · warning siren · broken conduit · observation hatch · mud crack · pump motor · rusted chain · flood map
+
+## 49. Avalanche Pass
+*Frozen mountain choke point leading toward the Giant Vaults.*
+*(Mapped to `giant_vault`.)*
+
+ice wall · snow drift · avalanche debris · frozen rope · cliff crack · bone marker · frost lantern · rusted spike · wind tunnel · stone bridge · ice fissure · broken sled · frozen corpse · mountain rail · storm flag · ice ladder · frost chain · rockslide debris · bone spear · snow trench · cracked cairn · blizzard fog · echo horn · frozen torch · cliff edge
+
+## 50. The Silent Gallery
+*A burial corridor lined with preserved Entombed citizens.*
+*(Mapped to `buried_cities`.)*
+
+burial shelf · stone coffin · dust trail · bone fragment · ritual candle · prayer tablet · echo chamber · burial cloth · cracked idol · moss patch · fungus bloom · rusted lantern · hollow shaft · skull pile · root cluster · cave crack · burial urn · sound stone · dusty stair · ancient mask · grave seal · bone tool · sludge puddle · shadow stain · whispering vent
+
+---
+
 # Macros not yet expanded (still at base interactables)
 
-These are the 5 of 21 macros that v2 didn't touch. Authoring opportunities for v3:
+Authoring opportunities for v3 — these macros got minimal coverage from v1 and nothing from v2/v2.1:
 - `samarran` — research city, lab/scholarship feel
 - `voronov` — half-buried disaster zone
 - `endless_stair` — vertical descent
-- `zharaks_teeth` — siren-spire shoreline (got 12 from initial pass)
-- `sinking_cathedral` — drowned chapel (got 14 from initial pass)
+- `zharaks_teeth` — siren-spire shoreline (12 from initial pass)
+- `sinking_cathedral` — drowned chapel (14 from initial pass)

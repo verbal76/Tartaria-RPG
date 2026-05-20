@@ -770,7 +770,29 @@
       "echo residue",
       "crumbling wall",
       "shadow stain",
-      "void vent"
+      "void vent",
+      "telescope lens",
+      "star chart",
+      "broken gear",
+      "rotating platform",
+      "cracked dome",
+      "signal relay",
+      "dust console",
+      "hanging cable",
+      "observation chair",
+      "ether crystal",
+      "burnt notes",
+      "rusted hatch",
+      "sky monitor",
+      "relay spark",
+      "cracked railing",
+      "frost residue",
+      "weather vane",
+      "stone stair",
+      "void reading",
+      "archive drawer",
+      "power conduit",
+      "echo chamber"
     ]
   },
   {
@@ -931,7 +953,21 @@
       "coral shard",
       "wreck beam",
       "flooded chest",
-      "echo chamber"
+      "echo chamber",
+      "rusted chest",
+      "chain hook",
+      "water current",
+      "slime coating",
+      "broken lock",
+      "flood lantern",
+      "leviathan tooth",
+      "sea fungus",
+      "drowned skeleton",
+      "rusted harpoon",
+      "tide valve",
+      "flood seal",
+      "broken ladder",
+      "rope bundle"
     ]
   },
   {
@@ -1066,7 +1102,23 @@
       "cracked crown",
       "frozen skeleton",
       "wind tunnel",
-      "cliff edge"
+      "cliff edge",
+      "frozen rope",
+      "cliff crack",
+      "bone marker",
+      "rusted spike",
+      "stone bridge",
+      "broken sled",
+      "frozen corpse",
+      "mountain rail",
+      "storm flag",
+      "ice ladder",
+      "frost chain",
+      "rockslide debris",
+      "snow trench",
+      "cracked cairn",
+      "blizzard fog",
+      "frozen torch"
     ]
   },
   {
@@ -1136,7 +1188,19 @@
       "drain hatch",
       "pump motor",
       "flood residue",
-      "warning siren"
+      "warning siren",
+      "pump housing",
+      "steam burst",
+      "rusted ladder",
+      "relay conduit",
+      "hanging cable",
+      "broken valve",
+      "dust terminal",
+      "signal spark",
+      "oil stain",
+      "observation hatch",
+      "mud crack",
+      "rusted chain"
     ]
   },
   {
@@ -1373,7 +1437,12 @@
       "bone fertilizer",
       "clay pot",
       "rotten sack",
-      "echo drip"
+      "echo drip",
+      "bone fragment",
+      "rusted lantern",
+      "skull pile",
+      "shadow stain",
+      "whispering vent"
     ]
   }
 ]
