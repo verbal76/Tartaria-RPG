@@ -51,14 +51,18 @@ describe('voiceSettings', () => {
     await (AsyncStorage as { clear?: () => Promise<void> }).clear?.();
   });
 
-  it('defaults voice mode to OFF on a fresh install', async () => {
+  it('defaults TTS ON + bundled engine on a fresh install (OTA 127+)', async () => {
+    // Per playtest direction — voice is the default experience now.
+    // STT stays OFF (it needs explicit consent for mic access).
     const mod = freshImport();
     const s = await mod.loadVoiceSettings();
-    expect(s.ttsEnabled).toBe(false);
+    expect(s.ttsEnabled).toBe(true);
+    expect(s.engine).toBe('bundled');
     expect(s.sttEnabled).toBe(false);
     expect(s.rate).toBe(1.0);
     expect(s.pitch).toBe(1.0);
     expect(s.voiceId).toBeNull();
+    expect(s.kokoroVoice).toBe('am_michael');
     expect(s.autoSubmit).toBe(false);
   });
 

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
 import { OTA_BUILD_ID } from '../buildInfo';
+import { getKokoroState, onKokoroStateChange, type KokoroState } from '../voice/PiperTTSManager';
 
 const races = racesData as { id: string; name: string }[];
 const locations = locationsData as { id: string; name: string }[];
@@ -171,6 +172,8 @@ export function TitleScreen() {
       {resurrectionGems > 0 && (
         <Text style={styles.gems}>✦ {resurrectionGems} Resurrection Gem{resurrectionGems === 1 ? '' : 's'} held</Text>
       )}
+
+      <KokoroDownloadBanner />
 
       <FlatList
         style={styles.list}
@@ -383,4 +386,66 @@ const styles = StyleSheet.create({
   },
   gear: { color: '#c9a86a', fontSize: 18, lineHeight: 18, textAlign: 'center' },
   footer: { color: '#3a342c', fontSize: 10, marginLeft: 2 },
+  kokoroBanner: {
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  kokoroBannerText: { color: '#c9a86a', fontSize: 12, letterSpacing: 1 },
+  kokoroBannerProgress: { color: '#7a705c', fontSize: 11, marginTop: 2 },
 });
+
+// Surfaces the bundled-voice download state on the title screen so
+// the playtester sees what's happening when they first install.
+// Defaults flipped to bundled+TTS-on in OTA 127 — the ~100 MB Kokoro
+// download fires automatically at boot. While they pick a character
+// the model arrives in the background; "Voice ready" briefly confirms
+// the install before fading. Errors surface so a tester on metered
+// data can see why their voice isn't working.
+function KokoroDownloadBanner(): React.ReactElement | null {
+  const [state, setState] = useState<KokoroState>(() => getKokoroState());
+  useEffect(() => onKokoroStateChange(setState), []);
+  if (state.phase === 'idle') return null;
+  if (state.phase === 'ready') {
+    // Auto-hide the ready confirmation after 4 seconds so it doesn't
+    // sit on the title screen forever once the voice is installed.
+    return <ReadyFlash />;
+  }
+  return (
+    <View style={styles.kokoroBanner}>
+      <Text style={styles.kokoroBannerText}>
+        {state.phase === 'downloading' ? '⬇  Installing premium voice (Kokoro)' :
+         state.phase === 'loading'     ? '⚙  Loading premium voice…' :
+                                          `⚠  Voice engine: ${state.message ?? 'error'}`}
+      </Text>
+      {state.phase === 'downloading' && (
+        <Text style={styles.kokoroBannerProgress}>
+          {(state.fraction * 100).toFixed(0)}%  ·  one-time download (~100 MB), runs fully offline after this
+        </Text>
+      )}
+      {state.phase === 'error' && (
+        <Text style={styles.kokoroBannerProgress}>
+          The system voice will be used instead. Pull-to-refresh from Settings to retry.
+        </Text>
+      )}
+    </View>
+  );
+}
+
+function ReadyFlash(): React.ReactElement | null {
+  const [show, setShow] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setShow(false), 4000);
+    return () => clearTimeout(t);
+  }, []);
+  if (!show) return null;
+  return (
+    <View style={[styles.kokoroBanner, { borderColor: '#9ec96a' }]}>
+      <Text style={[styles.kokoroBannerText, { color: '#9ec96a' }]}>✓  Premium voice ready</Text>
+    </View>
+  );
+}

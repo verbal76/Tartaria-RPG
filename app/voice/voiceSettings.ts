@@ -2,8 +2,17 @@
 // survive across sessions. Mirrors audioSettings.ts; both managers and
 // the settings UI read/write through this single source of truth.
 //
-// Default: voice mode is OFF. The Voice card in Settings ships disabled
-// so a new install plays in pure text mode — players opt in.
+// Default: TTS ON, engine BUNDLED. Playtest feedback (verbatim): "we
+// pretty much made the kokoro voice mandatory for the arbiter ... I
+// don't want them to have to find the voice options later." Fresh
+// installs now boot with the Arbiter voice already enabled; the
+// Kokoro download (~100 MB) starts in the background at app launch
+// so it's ready by the time the player enters the world. STT stays
+// OFF by default (it needs explicit consent for mic access).
+//
+// Existing installs keep whatever the player previously saved —
+// loadVoiceSettings reads the stored row and only falls back to
+// DEFAULTS for keys the player has never touched.
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -43,9 +52,9 @@ export interface VoiceSettings {
 }
 
 const DEFAULTS: VoiceSettings = {
-  ttsEnabled: false,
+  ttsEnabled: true,
   sttEnabled: false,
-  engine: 'system',
+  engine: 'bundled',
   rate: 1.0,
   pitch: 1.0,
   voiceId: null,
