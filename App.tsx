@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, ActivityIndicator, StyleSheet, AppState, Platform, StatusBar as RNStatusBar, type AppStateStatus } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, AppState, Platform, StatusBar as RNStatusBar, type AppStateStatus } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import * as NavigationBar from 'expo-navigation-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -170,13 +170,72 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <AppShell screen={screen} />
+      <ScreenErrorBoundary>
+        <AppShell screen={screen} />
+      </ScreenErrorBoundary>
       {/* TutorialOverlay sits OUTSIDE SafeAreaView so its absolute
           positioning matches measureInWindow coords from the targets
           (which report screen-absolute, not safe-area-relative). */}
       <TutorialOverlay />
     </SafeAreaProvider>
   );
+}
+
+// Per-screen render guard. Wraps the screen switch in a React error
+// boundary so a single screen crash falls back to a recovery card
+// instead of leaving the app on a frozen gray background (which is
+// what JS render errors do when no boundary catches them — Android
+// renders the View container and nothing inside it). The recovery
+// card dumps the error message + offers "RESTART" (reloadAsync) and
+// "BACK TO TITLE" (setScreen('title')) so the player has a path out
+// without killing the process.
+class ScreenErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { error: null };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+  componentDidCatch(error: Error) {
+    // Surface to the JS log so the next bug report COPY ALL captures it.
+    // eslint-disable-next-line no-console
+    console.warn('ScreenErrorBoundary caught:', error?.message, error?.stack);
+  }
+  reset = () => this.setState({ error: null });
+  render() {
+    if (!this.state.error) return this.props.children;
+    return (
+      <View style={styles.errorRoot}>
+        <Text style={styles.errorTitle}>SOMETHING BROKE</Text>
+        <Text style={styles.errorBody}>{this.state.error.message || 'Unknown render error.'}</Text>
+        <Text style={styles.errorHint}>
+          Your progress is saved. Tap RESTART for a fresh process, or BACK TO TITLE to keep playing
+          without a restart.
+        </Text>
+        <View style={styles.errorBtnRow}>
+          <View style={styles.errorBtn} onTouchEnd={() => {
+            this.reset();
+            useGameStore.setState({ currentScreen: 'title', tutorialStep: null });
+          }}>
+            <Text style={styles.errorBtnText}>BACK TO TITLE</Text>
+          </View>
+          <View style={styles.errorBtn} onTouchEnd={() => {
+            try {
+              // eslint-disable-next-line @typescript-eslint/no-var-requires
+              const Updates = require('expo-updates') as typeof import('expo-updates');
+              if (Updates?.isEnabled) void Updates.reloadAsync().catch(() => { /* ignore */ });
+            } catch { /* ignore */ }
+          }}>
+            <Text style={styles.errorBtnText}>RESTART</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
 }
 
 // Inner shell — needs useSafeAreaInsets which only resolves inside a
@@ -223,4 +282,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#0a0908',
   },
   loading: { flex: 1, backgroundColor: '#0a0908', alignItems: 'center', justifyContent: 'center' },
+  errorRoot: { flex: 1, backgroundColor: '#0a0908', padding: 24, justifyContent: 'center' },
+  errorTitle: { color: '#c9a86a', fontSize: 16, fontWeight: '800', letterSpacing: 3, textAlign: 'center', marginBottom: 10 },
+  errorBody: { color: '#e07a5f', fontSize: 12, textAlign: 'center', marginBottom: 12, fontFamily: Platform.OS === 'android' ? 'monospace' : undefined },
+  errorHint: { color: '#cdbf99', fontSize: 12, textAlign: 'center', lineHeight: 18, marginBottom: 18 },
+  errorBtnRow: { flexDirection: 'row', justifyContent: 'center', gap: 12 },
+  errorBtn: {
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 3,
+    backgroundColor: '#2a1f12',
+  },
+  errorBtnText: { color: '#c9a86a', fontSize: 11, fontWeight: '800', letterSpacing: 2 },
 });

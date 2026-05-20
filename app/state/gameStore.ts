@@ -6534,28 +6534,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().skipTutorial();
       return;
     }
-    // The vendor tutorial step needs a stub vendor in the scene so the
-    // real VendorScreen has something to render. Detect by step screen
-    // (no hard-coded index — survives reordering). Use Irma Ironhand as
-    // the demo so the player sees a named vendor with real offers.
     const currentStep = TUTORIAL_STEPS[current];
     const nextStep = TUTORIAL_STEPS[next];
     const enteringVendor = nextStep?.screen === 'vendor';
     const leavingVendor = currentStep?.screen === 'vendor' && nextStep?.screen !== 'vendor';
+    // Drive the screen swap atomically with the step change. Previously
+    // we relied on TutorialOverlay's useEffect to dispatch setScreen
+    // after a re-render — that opened a one-frame window where the
+    // old screen rendered against new tutorial state (e.g. vendor
+    // screen with vendor=null after leaving the demo). Putting
+    // currentScreen in the same set() removes the in-between frame
+    // and the freeze it occasionally triggered.
+    const nextScreen = nextStep?.screen ?? 'exploration';
     if (enteringVendor) {
       const vendor = findVendorByName('Irma Ironhand') ?? pickRandomVendor();
-      set((s) => (s.currentScene
-        ? { currentScene: { ...s.currentScene, vendor }, tutorialDemoVendor: vendor, tutorialStep: next }
-        : { tutorialDemoVendor: vendor, tutorialStep: next }));
+      set((s) => ({
+        currentScene: s.currentScene
+          ? { ...s.currentScene, vendor }
+          : s.currentScene,
+        tutorialDemoVendor: vendor,
+        tutorialStep: next,
+        currentScreen: nextScreen,
+      }));
       return;
     }
     if (leavingVendor) {
-      set((s) => (s.currentScene
-        ? { currentScene: { ...s.currentScene, vendor: null }, tutorialDemoVendor: null, tutorialStep: next }
-        : { tutorialDemoVendor: null, tutorialStep: next }));
+      set((s) => ({
+        currentScene: s.currentScene
+          ? { ...s.currentScene, vendor: null }
+          : s.currentScene,
+        tutorialDemoVendor: null,
+        tutorialStep: next,
+        currentScreen: nextScreen,
+      }));
       return;
     }
-    set({ tutorialStep: next });
+    set({ tutorialStep: next, currentScreen: nextScreen });
   },
   skipTutorial() {
     // Clear any tutorial-injected vendor from the scene.
