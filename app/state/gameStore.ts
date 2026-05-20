@@ -182,6 +182,7 @@ import { rollThrowDamage, weightLabel, itemWeight } from '../engine/itemWeight';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
 import { levenshtein } from '../engine/editDistance';
 import { isAreaSearch, isGroundSearch, rollAreaSearch } from '../engine/areaSearch';
+import { isClimbable, isSwimmable } from '../engine/interactionTags';
 import { bestDigTool, rollDig } from '../engine/digging';
 import {
   generateWorldMap,
@@ -3701,27 +3702,47 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // something specific to interact with. The Arbiter explains each
       // via concept lookup ("what is dash", "what is disengage").
       case 'climb': {
+        // Strip leading prepositions ("climb up the pole" → "pole",
+        // "climb in the window" → "window"). Then check whether the
+        // target is actually climbable per interactionTags. Refuses
+        // gracefully on bad targets ("climb the mud" → "Nothing here
+        // worth climbing.") so the verb stops feeling like an empty
+        // narration on every input.
+        const climbRaw = (parsed.target ?? '').replace(/^(up|down|in|into|onto|over|across|through|to|the)\s+/i, '').trim();
+        const climbTarget = parsed.resolvedNoun ?? (climbRaw.length > 0 ? climbRaw : '');
+        if (climbTarget && !isClimbable(climbTarget)) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter glances at the ${climbTarget}. "Not something hands take to. Pick a pole, ladder, wall, stair, vine — anything with grip."`,
+          );
+          break;
+        }
         set({ player: advanceTime(spendStamina(player, 2), 0.5) });
-        const tgt = parsed.target ?? parsed.resolvedNoun ?? 'the surface in front of you';
+        const tgt = climbTarget || 'the surface in front of you';
         get().appendLog(
           'world',
-          `You set hands on ${tgt} and start to climb. Hand over hand, breath measured. (1 sq counts as 2 — Climb spends double movement.)`,
+          `You set hands on the ${tgt} and start to climb. Hand over hand, breath measured. (1 sq counts as 2 — Climb spends double movement.)`,
         );
         break;
       }
       case 'swim': {
+        // Same preposition strip + tag check as climb. "swim through
+        // the tunnel" → target "tunnel" → isSwimmable true → narrate.
+        // "swim the wagon" → not swimmable → refuse gracefully.
+        const swimRaw = (parsed.target ?? '').replace(/^(through|into|across|to|over|under|past|the)\s+/i, '').trim();
+        const swimTarget = parsed.resolvedNoun ?? (swimRaw.length > 0 ? swimRaw : '');
+        if (swimTarget && !isSwimmable(swimTarget)) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter shakes their head. "The ${swimTarget} isn't water. Find a current, a tunnel, a flooded chamber — something that takes a stroke."`,
+          );
+          break;
+        }
         set({ player: advanceTime(spendStamina(player, 2), 0.5) });
-        // Prefer the resolved noun (the catalog/scene name like
-        // "Flooded Tunnel") over the raw target — "swim through the
-        // tunnel" was narrating "you wade into through tunnel" because
-        // the verb-stripped target retained the preposition. Strip
-        // common prepositions from the raw target as a fallback when
-        // no canonical noun resolved.
-        const raw = (parsed.target ?? '').replace(/^(through|into|across|to|over|under|past|the)\s+/i, '').trim();
-        const tgt = parsed.resolvedNoun ?? (raw.length > 0 ? raw : 'the water');
+        const tgt = swimTarget || 'the water';
         get().appendLog(
           'world',
-          `You wade into ${tgt}, mud-water lapping at your gear. Each stroke costs double. The current has opinions.`,
+          `You wade into the ${tgt}, mud-water lapping at your gear. Each stroke costs double. The current has opinions.`,
         );
         break;
       }
