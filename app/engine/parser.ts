@@ -89,7 +89,12 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   // NEW from firearms / evasive cards. Sprint stays as a dash alias
   // (already covered in dash synonyms); flee stays as escape; brawl is
   // bare-hand attack (already covered via punch/kick). Genuinely new:
-  take_cover: ['takecover', 'cover up', 'hunker', 'crouch behind', 'duck behind', 'shelter', 'tuck', 'dive for cover', 'go prone', 'flatten'],
+  // "take cover" needs to be a multi-word entry so MULTI_WORD_COLLAPSES
+  // picks it up. The previous "takecover" (no space) was already-collapsed
+  // and never matched player input "take cover" — the parser saw verb
+  // 'take' first and routed to the pickup intent. Fix: declare with the
+  // space, let the collapse pass do the work.
+  take_cover: ['take cover', 'cover up', 'hunker', 'crouch behind', 'duck behind', 'shelter', 'tuck', 'dive for cover', 'go prone', 'flatten'],
   aim: ['aim', 'sight', 'target', 'line up', 'draw bead', 'level', 'lock on', 'sightin', 'tracksight', 'zero'],
   reload: ['reload', 'reloading', 'reset', 'rearm', 'rerack', 'refill', 'recharge', 'top up', 'load up', 'feed'],
   // 'disarm' lived in both maneuver AND open — and because maneuver
@@ -110,7 +115,7 @@ const ALL_INTENTS = Object.keys(VERB_SYNONYMS) as Exclude<Intent, 'unknown'>[];
 
 const STOPWORDS = new Set([
   'a', 'an', 'the', 'my', 'your', 'his', 'her', 'their', 'this', 'that', 'these', 'those',
-  'to', 'at', 'in', 'on', 'with', 'for', 'into', 'onto', 'from', 'of', 'by',
+  'to', 'at', 'in', 'on', 'off', 'with', 'for', 'into', 'onto', 'from', 'of', 'by',
   'and', 'or', 'but', 'then', 'now', 'so', 'as', 'it', 'them',
   'i', 'me', 'you', 'we', 'us', 'they',
   'is', 'am', 'are', 'was', 'were', 'be', 'been', 'being',
@@ -194,8 +199,16 @@ const VERB_SYNONYMS_LOOKUP: Record<Exclude<Intent, 'unknown'>, string[]> =
 function fuzzyEqual(word: string, candidate: string): boolean {
   if (word === candidate) return true;
   if (word.length < 3 || candidate.length < 3) return false;
-  // Prefix match handles "ration" → "rations" and similar
+  // Prefix match handles "ration" → "rations" and similar — but only
+  // when the SHORTER side is ≥4 chars. 3-char prefixes are too loose:
+  // playtest log caught "off" → "offer" (gift intent) firing on "rop
+  // boards OFF the wagon", routing the whole sentence to a gift the
+  // player never meant. Floor the prefix length at 4 to kill that
+  // class of over-match. Tests still pass on "ration → rations",
+  // "snap → snapshot", etc. because their shorter side is ≥4.
   if (candidate.startsWith(word) || word.startsWith(candidate)) {
+    const shorterLen = Math.min(word.length, candidate.length);
+    if (shorterLen < 4) return false;
     return Math.abs(word.length - candidate.length) <= 3;
   }
   // Reject "prepended-letter" false positives — pairs where one word

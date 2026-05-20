@@ -8075,9 +8075,26 @@ function narrateCasualLook(
   if (scene.vendor) {
     presenceFragments.push(`${scene.vendor.name} is here.`);
   }
+  // Distance / atmospheric nouns shouldn't trigger the "unaddressed"
+  // nag — the player can't walk over to "the smoke in the distance"
+  // and resolve it from the current tile, so calling them out every
+  // look reads as a bug (playtest caught "The smoke is unaddressed"
+  // recurring across 4+ looks at the Armory). Only flag CONCRETE
+  // local nouns the player could actually act on.
+  const ATMOSPHERIC_NOUNS = new Set([
+    'smoke', 'steam', 'plume', 'column',
+    'fog', 'haze', 'draft', 'breeze', 'cold', 'air',
+    'sound', 'echo', 'wind',
+    'glow', 'light', 'shimmer',
+    'distance', 'horizon', 'sky',
+  ]);
   const unresolvedHooks = (scene.hooks ?? []).filter((h) => !h.resolved);
-  if (unresolvedHooks.length > 0) {
-    const hookNoun = unresolvedHooks[0]!.nouns[0] ?? unresolvedHooks[0]!.kind;
+  const concreteHook = unresolvedHooks.find((h) => {
+    const n = (h.nouns[0] ?? h.kind ?? '').toLowerCase();
+    return n && !ATMOSPHERIC_NOUNS.has(n);
+  });
+  if (concreteHook) {
+    const hookNoun = concreteHook.nouns[0] ?? concreteHook.kind;
     presenceFragments.push(`The ${hookNoun} is unaddressed.`);
   }
   if (presenceFragments.length > 0) parts.push(presenceFragments.join(' '));
