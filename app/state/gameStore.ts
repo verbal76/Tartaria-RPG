@@ -7146,6 +7146,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().travelTo(step.landedOn.locationId);
       return;
     }
+    // Re-shuffle the displayed ambient subset based on the new tile's
+    // coordinates. The macro location's full ambientNouns pool can be
+    // 30-100+ entries (e.g. Tartarian Outskirts has 36, Buried Cities
+    // has 90+), but displayedAmbientNouns gets locked at scene
+    // creation to one 8-noun strict subset. Without this re-shuffle,
+    // every cardinal step within the same location replays the same
+    // 8, so the player sees "lantern, arch, watchtower, scrap pile…"
+    // tile after tile. The seed is (mapX, mapY) so re-entering the
+    // same tile shows the same nouns (consistency) while neighbouring
+    // tiles get different picks (variety). Only re-rolls when the
+    // pool is bigger than the display window — small pools (≤8) show
+    // everything either way.
+    set((s) => {
+      if (!s.currentScene) return s;
+      const pool = s.currentScene.ambientNouns ?? [];
+      if (pool.length <= 8) return s;
+      // Cantor-pairing-style mix: hashes (x, y) → a single 32-bit
+      // seed that distinguishes (-3, 5) from (5, -3) and from (3, 5).
+      const seed = (((step.x + 1000) & 0xffff) * 65537) ^ ((step.y + 1000) & 0xffff);
+      const next = shuffleSliceSeeded(pool, 8, seed);
+      return { currentScene: { ...s.currentScene, displayedAmbientNouns: next } };
+    });
     // Re-entry narration — when a cardinal step lands on a tile the
     // player has been to before AND that tile has persisted
     // vandal-state (dropped items / opened containers), surface it.
@@ -9083,6 +9105,32 @@ function shuffleSlice<T>(arr: readonly T[], n: number): T[] {
   const indices = arr.map((_, i) => i);
   for (let i = indices.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j]!, indices[i]!];
+  }
+  return indices.slice(0, n).map((i) => arr[i]!);
+}
+
+// Deterministic seeded version of shuffleSlice. Same seed → same n
+// nouns out of the pool, every time. Used by stepDirection to give
+// each (mapX, mapY) wilderness tile its own subset of the macro
+// location's ambient pool — the player sees variety as they walk
+// without re-rolls when they back-track over the same ground.
+function shuffleSliceSeeded<T>(arr: readonly T[], n: number, seed: number): T[] {
+  if (arr.length <= n) return [...arr];
+  const indices = arr.map((_, i) => i);
+  // Mulberry32 — small, deterministic PRNG. Good enough for shuffle
+  // seeding, doesn't need cryptographic quality. Adapted from
+  // https://github.com/bryc/code/blob/master/jshash/PRNGs.md
+  let state = (seed >>> 0) || 0x9e3779b1;
+  const rand = (): number => {
+    state |= 0;
+    state = (state + 0x6d2b79f5) | 0;
+    let t = Math.imul(state ^ (state >>> 15), 1 | state);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
     [indices[i], indices[j]] = [indices[j]!, indices[i]!];
   }
   return indices.slice(0, n).map((i) => arr[i]!);
