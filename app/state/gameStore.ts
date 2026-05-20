@@ -183,6 +183,7 @@ import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
 import { levenshtein } from '../engine/editDistance';
 import { isAreaSearch, isGroundSearch, rollAreaSearch } from '../engine/areaSearch';
 import { isClimbable, isSwimmable } from '../engine/interactionTags';
+import { rollSalvagePool } from '../engine/salvagePools';
 import { bestDigTool, rollDig } from '../engine/digging';
 import {
   generateWorldMap,
@@ -2495,7 +2496,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
               break;
             }
             set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
-            const outcome = rollAreaSearch(harvestAmbient);
+            // Try the per-noun salvage pool first (drone → automaton
+            // circuit, wagon → rations + rope, etc.). Falls through to
+            // the generic area-search pool when no pool matches.
+            const salvage = rollSalvagePool(harvestAmbient);
+            const outcome = salvage ?? rollAreaSearch(harvestAmbient);
             get().appendLog('world', outcome.line);
             set((s) => {
               const room = s.worldMemory.visitedRooms?.[harvestRoomKey] ?? {
@@ -2518,21 +2523,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
               };
             });
             if (outcome.kind === 'material') {
-              const itemCat = lookupCraftedItem(outcome.itemName);
+              const itemCat = lookupCraftedItem(outcome.itemName!);
+              // Salvage pool outcomes carry a quantity (1-N depending
+              // on the entry's min/max). Area-search material outcomes
+              // don't set it; default to 1.
+              const qty = ('quantity' in outcome && typeof outcome.quantity === 'number')
+                ? outcome.quantity
+                : 1;
               const newItem: InventoryItem = stampDurability({
                 id: `salvage_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-                name: outcome.itemName,
+                name: outcome.itemName!,
                 kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
-                rarity: outcome.rarity,
-                quantity: 1,
+                rarity: outcome.rarity!,
+                quantity: qty,
                 tags: itemCat.tags,
               });
               const grantResult = grantItem(player.inventory, newItem);
               set((s) => (s.player ? { player: { ...s.player, inventory: grantResult.inventory } } : s));
               if (grantResult.accepted > 0) {
-                get().appendLog('reward', `✦ ${outcome.itemName} (${outcome.rarity}).`);
+                const qtyLabel = grantResult.accepted > 1 ? ` x${grantResult.accepted}` : '';
+                get().appendLog('reward', `✦ ${outcome.itemName}${qtyLabel} (${outcome.rarity}).`);
               } else {
-                get().appendLog('world', `Found a ${outcome.itemName.toLowerCase()}, but your pack is already full of them.`);
+                get().appendLog('world', `Found a ${outcome.itemName!.toLowerCase()}, but your pack is already full of them.`);
               }
             } else if (outcome.kind === 'tc') {
               set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + outcome.amount } } : s));
