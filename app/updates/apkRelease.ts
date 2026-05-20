@@ -34,9 +34,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  *  hidden. */
 export const LATEST_APK_BUILD = 152;
 
-/** Direct link to the newest APK. Update via OTA when you upload a
- *  new build to GitHub releases / a CDN / a shared drive. */
-export const LATEST_APK_URL = 'https://github.com/verbal76/Tartaria-RPG/releases/download/apk-build-152/tartaria-realms-apk-build-152.apk';
+/** URL the banner opens. Should be the GitHub release PAGE (html_url),
+ *  NOT the direct asset (browser_download_url). Direct .apk links
+ *  trigger Android browser quarantine on Chrome/Samsung Internet —
+ *  the download "completes" but lands in a sandboxed cache the file
+ *  manager and package installer can't see. The release page hosts
+ *  the asset in a normal click-to-download UI that uses the public
+ *  Downloads/ folder. Trade-off: one extra tap, but the file
+ *  actually lands somewhere the user can install it from. */
+export const LATEST_APK_URL = 'https://github.com/verbal76/Tartaria-RPG/releases/tag/apk-build-152';
 
 /** One-line summary of what the new APK enables that an OTA cannot.
  *  Surfaces on the banner so the player knows why they should install. */
@@ -57,6 +63,14 @@ const GH_RELEASES_URL = 'https://api.github.com/repos/verbal76/tartaria-rpg/rele
 
 let livePointer: LivePointer | null = null;
 let inFlight: Promise<void> | null = null;
+
+/** Test-only: wipe in-memory pointer + in-flight promise so the
+ *  next refreshFromGitHub call goes through the real fetch path.
+ *  Production callers should never use this. */
+export function __resetApkPointerForTests(): void {
+  livePointer = null;
+  inFlight = null;
+}
 
 function effectiveBuild(): number {
   if (livePointer && livePointer.build > LATEST_APK_BUILD) return livePointer.build;
@@ -144,6 +158,7 @@ export async function refreshFromGitHub(): Promise<void> {
       const json = await res.json() as {
         tag_name?: string;
         body?: string;
+        html_url?: string;
         assets?: Array<{ name?: string; browser_download_url?: string; content_type?: string }>;
       };
       const tag = json.tag_name ?? '';
@@ -151,14 +166,13 @@ export async function refreshFromGitHub(): Promise<void> {
       if (!buildMatch) return;
       const build = Number.parseInt(buildMatch[1]!, 10);
       if (!Number.isFinite(build) || build <= 0) return;
-      const asset = (json.assets ?? []).find((a) =>
-        a.content_type === 'application/vnd.android.package-archive'
-          || (a.name ?? '').toLowerCase().endsWith('.apk'),
-      );
-      if (!asset?.browser_download_url) return;
+      // Prefer html_url (the release page) over browser_download_url
+      // (the direct asset). See LATEST_APK_URL comment for why.
+      // Fall back to a constructed page URL if html_url is missing.
+      const pageUrl = json.html_url ?? `https://github.com/verbal76/Tartaria-RPG/releases/tag/${tag}`;
       const next: LivePointer = {
         build,
-        url: asset.browser_download_url,
+        url: pageUrl,
         highlights: LATEST_APK_HIGHLIGHTS, // GitHub body is verbose; keep our concise blurb
         fetchedAt: Date.now(),
       };

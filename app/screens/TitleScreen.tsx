@@ -83,6 +83,7 @@ export function TitleScreen() {
   // re-runs the gate. Boot flow: load cached pointer (sync paint with
   // last-known build), then fire network fetch, then bump the tick.
   const [apkPointerTick, setApkPointerTick] = useState(0);
+  const [apkUrlCopied, setApkUrlCopied] = useState(false);
   useEffect(() => {
     let cancelled = false;
     void (async () => {
@@ -213,30 +214,50 @@ export function TitleScreen() {
         void apkPointerTick;
         const url = getLatestApkUrl();
         if (!isApkOutdated() || url.length === 0) return null;
+        const copied = apkUrlCopied;
         return (
-          <TouchableOpacity
-            style={styles.apkBanner}
-            activeOpacity={0.8}
-            onPress={() => {
-              // Linking.openURL hands off to Android — the browser /
-              // file manager opens the URL, the player downloads the
-              // APK, taps it, approves install-from-unknown-sources
-              // if needed. We don't (and can't) automate the install
-              // itself; this just removes the "find the link" step.
-              void Linking.openURL(url).catch(() => {
-                // Best-effort. If the URL won't open, fall through
-                // silently — the player can copy it from About →
-                // diagnostics if they're motivated.
-              });
-            }}
-          >
-            <Text style={styles.apkBannerTitle}>
-              NEW APK AVAILABLE — TAP TO DOWNLOAD (build {getLatestApkBuild()})
-            </Text>
-            <Text style={styles.apkBannerBody}>
-              {getLatestApkHighlights() || 'Native feature update. OTAs reach your current APK, but the new build adds capabilities only a fresh APK can ship.'}
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.apkBanner}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => {
+                // Linking.openURL hands off to Android — the system
+                // opens the URL (now the GitHub release PAGE) in the
+                // user's default browser. The page has a normal
+                // click-to-download .apk link that lands in Downloads/
+                // where the file manager and package installer can
+                // see it. We don't (and can't) automate the install
+                // itself; this just removes the "find the link" step.
+                void Linking.openURL(url).catch(() => {
+                  // Best-effort. If the URL won't open, the COPY
+                  // button below is the fallback.
+                });
+              }}
+            >
+              <Text style={styles.apkBannerTitle}>
+                NEW APK AVAILABLE — TAP TO OPEN RELEASE PAGE (build {getLatestApkBuild()})
+              </Text>
+              <Text style={styles.apkBannerBody}>
+                {getLatestApkHighlights() || 'Native feature update. OTAs reach your current APK, but the new build adds capabilities only a fresh APK can ship.'}
+              </Text>
+              <Text style={styles.apkBannerHint}>
+                On the release page, tap the .apk file under Assets to download. If your browser blocks the download, use COPY URL and paste it into a desktop browser.
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.apkBannerCopyBtn}
+              activeOpacity={0.7}
+              onPress={() => {
+                void Clipboard.setStringAsync(url).then(() => {
+                  setApkUrlCopied(true);
+                  setTimeout(() => setApkUrlCopied(false), 1500);
+                });
+              }}
+            >
+              <Text style={styles.apkBannerCopyText}>
+                {copied ? '✓ COPIED' : 'COPY URL'}
+              </Text>
+            </TouchableOpacity>
+          </View>
         );
       })()}
 
@@ -487,6 +508,28 @@ const styles = StyleSheet.create({
     fontSize: 10,
     textAlign: 'center',
     marginTop: 3,
+  },
+  apkBannerHint: {
+    color: '#8b8576',
+    fontSize: 9,
+    textAlign: 'center',
+    marginTop: 4,
+    fontStyle: 'italic',
+  },
+  apkBannerCopyBtn: {
+    marginTop: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 3,
+    borderColor: '#9ec96a',
+    borderWidth: 1,
+    alignSelf: 'center',
+  },
+  apkBannerCopyText: {
+    color: '#9ec96a',
+    fontSize: 10,
+    letterSpacing: 1.5,
+    fontWeight: '700',
   },
   footerActions: { gap: 8, marginTop: 12 },
   primaryBtn: {

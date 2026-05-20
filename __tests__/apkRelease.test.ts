@@ -18,6 +18,7 @@ import {
   getLatestApkBuild,
   getLatestApkUrl,
   LATEST_APK_BUILD,
+  __resetApkPointerForTests,
 } from '../app/updates/apkRelease';
 
 describe('apkRelease pointer', () => {
@@ -25,9 +26,7 @@ describe('apkRelease pointer', () => {
   beforeEach(async () => {
     originalFetch = global.fetch;
     await AsyncStorage.clear();
-    // Reset module-level state by re-importing isn't trivial with
-    // jest's cache; the tests are designed to layer their assertions
-    // so cross-test pollution doesn't matter.
+    __resetApkPointerForTests();
   });
   afterEach(() => {
     global.fetch = originalFetch;
@@ -45,13 +44,20 @@ describe('apkRelease pointer', () => {
     expect(isApkOutdated()).toBe(true);
   });
 
-  it('refreshFromGitHub parses tag_name "apk-build-N" into a build number and grabs the .apk asset URL', async () => {
+  it('refreshFromGitHub parses tag_name "apk-build-N" and prefers html_url (release page) over the direct asset', async () => {
+    // We INTENTIONALLY route through the release page rather than
+    // the direct browser_download_url because the direct .apk link
+    // gets quarantined by Android's browser sandbox on Chrome /
+    // Samsung Internet — download "completes" but the file isn't
+    // visible to the file manager or package installer. The page
+    // URL renders a click-to-download UI that uses Downloads/.
     const mockResponse = {
       tag_name: 'apk-build-200',
+      html_url: 'https://github.com/verbal76/Tartaria-RPG/releases/tag/apk-build-200',
       assets: [
         {
           name: 'tartaria-realms-apk-build-200.apk',
-          browser_download_url: 'https://example.com/apk-build-200.apk',
+          browser_download_url: 'https://example.com/direct/apk-build-200.apk',
           content_type: 'application/vnd.android.package-archive',
         },
       ],
@@ -64,12 +70,28 @@ describe('apkRelease pointer', () => {
     await refreshFromGitHub();
 
     expect(getLatestApkBuild()).toBe(200);
-    expect(getLatestApkUrl()).toBe('https://example.com/apk-build-200.apk');
-    // Cache should have been written.
+    // Note: html_url, NOT the asset's browser_download_url.
+    expect(getLatestApkUrl()).toBe('https://github.com/verbal76/Tartaria-RPG/releases/tag/apk-build-200');
     const cached = await AsyncStorage.getItem('tartaria.apk.releasePointer.v1');
     expect(cached).not.toBeNull();
     const parsed = JSON.parse(cached!);
     expect(parsed.build).toBe(200);
+    expect(parsed.url).toContain('/releases/tag/apk-build-200');
+  });
+
+  it('falls back to a constructed release-page URL when html_url is missing', async () => {
+    global.fetch = jest.fn(async () => ({
+      ok: true,
+      json: async () => ({
+        tag_name: 'apk-build-201',
+        // no html_url
+        assets: [],
+      }),
+    })) as unknown as typeof fetch;
+
+    await refreshFromGitHub();
+
+    expect(getLatestApkUrl()).toContain('/releases/tag/apk-build-201');
   });
 
   it('refreshFromGitHub silently no-ops when GitHub returns non-OK', async () => {
