@@ -542,6 +542,17 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
   // next move — never both, never neither.
   if (ctx.playerTargetNoun) {
     const n = ctx.playerTargetNoun;
+    // Sanity gate — if the "noun" is clearly garbage prose (4+ words,
+    // contains a question mark, or runs over 40 chars) the player
+    // didn't actually name a thing. Echoing it back as if it were a
+    // noun produces lines like "The should also pop up pull nouns,"
+    // the Arbiter says. Fall through to the confused-Arbiter
+    // response below instead.
+    const wordCount = n.trim().split(/\s+/).length;
+    const isGarbageNoun = wordCount > 3 || n.length > 40 || /[?!]/.test(n);
+    if (isGarbageNoun) {
+      return `The Arbiter studies you, plainly. "I'm not sure what you're trying to tell me. Phrase it as the deed you mean to do — 'search', 'attack', 'go east'."`;
+    }
     // ~60% of the time, anchor the on-target line in the location's
     // lore pool — "the spire" + "The Spire still drinks. From what
     // celestial well, no one will answer." reads as the Arbiter

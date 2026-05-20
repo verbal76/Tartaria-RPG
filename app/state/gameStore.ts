@@ -1838,7 +1838,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('player', trimmed, { meta: true });
       get().appendLog(
         'arbiter',
-        `The Arbiter listens but does not act. "Noted. Phrase it as a verb when you want me to do it — 'dismantle the trap', 'search the floor', 'go east'."`,
+        `The Arbiter studies you, plainly. "I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb — 'search the rubble', 'go east', 'attack the figure'."`,
       );
       get().appendLog('debug', `meta-comment guard: skipped intent parse on ${trimmed.length}-char input`);
       return;
@@ -2311,6 +2311,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         // The target the player named (raw, before resolution).
         const rawTarget = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
+
+        // Sanity gate — if the player's "target" is clearly garbage
+        // prose (4+ words, question mark, oversized) they were typing
+        // a comment / question, not a noun. Don't narrate searching
+        // it. Plainly admit confusion and let them rephrase. The
+        // meta-comment guard above is the primary defense; this is
+        // belt-and-suspenders for inputs that slip past the regex.
+        if (rawTarget) {
+          const wordCount = rawTarget.split(/\s+/).length;
+          if (wordCount > 3 || rawTarget.length > 40 || /[?!]/.test(rawTarget)) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter studies you, plainly. "I'm not sure what you're trying to tell me. Phrase it as the deed you mean to do — 'search the rubble', 'attack the figure', 'go east'."`,
+            );
+            break;
+          }
+        }
 
         // 1.5) Ground-type search ("search the mud", "search the ground")
         // routes to the dig path before ambient noun match. "ground" is
