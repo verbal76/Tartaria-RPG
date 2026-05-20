@@ -140,6 +140,7 @@ import {
   ARMOR,
   GEAR,
   MATERIALS,
+  findCatalogItem,
 } from '../engine/crafting';
 import {
   FACTIONS,
@@ -4232,18 +4233,76 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const dropped = room?.droppedItems ?? [];
         if (dropped.length === 0) {
           // Pickup only finds DROPPED items (from kills, container opens,
-          // wasteland encounters). Ambient scene props (the wagon, the
-          // rusted blade in the description) are not "pickupable" via
-          // take — the player has to salvage / open / use them depending
-          // on the prop. Playtest log: player saw 'rusted blade' in the
-          // scene, approached it, tried to take it, got 'ground is bare'.
-          // Confusing. Detect ambient-noun match and redirect.
+          // wasteland encounters) BY DEFAULT. But playtest feedback:
+          // 'I should have walked up to that knife and picked it up'.
+          // Honored — if the ambient noun matches a real catalog item
+          // (Rusted Blade, Aetheric Locket, Climbing Rope, etc.), grant
+          // the canonical item directly. Per-room dedupe via
+          // searchedAmbientNouns so you can't farm the same blade
+          // twice. Scene features (pillar, arch, fountain) don't match
+          // the catalog and fall through to the salvage-redirect hint.
           if (target) {
             const ambientHit = matchAmbientNoun(target, currentScene.ambientNouns ?? []);
             if (ambientHit) {
+              const ambientRoomKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY);
+              const ambientRoom = get().worldMemory.visitedRooms?.[ambientRoomKey];
+              const ambientLower = ambientHit.toLowerCase();
+              const alreadyConsumed = (ambientRoom?.searchedAmbientNouns ?? []).some(
+                (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
+              );
+              if (alreadyConsumed) {
+                get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to claim.`);
+                break;
+              }
+              const cat = findCatalogItem(ambientHit);
+              if (cat) {
+                // Real catalog item — grant a fully-specced copy.
+                const newItem: InventoryItem = stampDurability({
+                  id: `pickup_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                  name: cat.name,
+                  kind: cat.kind,
+                  rarity: cat.rarity,
+                  quantity: 1,
+                  tags: cat.tags,
+                });
+                const grantResult = grantItem(player.inventory, newItem);
+                set((s) => (s.player
+                  ? { player: { ...s.player, inventory: grantResult.inventory } }
+                  : s));
+                // Mark consumed so re-pickup AND re-salvage on the same
+                // ambient in this room are blocked.
+                set((s) => {
+                  const r = s.worldMemory.visitedRooms?.[ambientRoomKey] ?? {
+                    firstVisitAt: Date.now(),
+                    lastVisitAt: Date.now(),
+                    visitCount: 1,
+                  };
+                  return {
+                    worldMemory: {
+                      ...s.worldMemory,
+                      visitedRooms: {
+                        ...(s.worldMemory.visitedRooms ?? {}),
+                        [ambientRoomKey]: {
+                          ...r,
+                          searchedAmbientNouns: [...(r.searchedAmbientNouns ?? []), ambientLower],
+                        },
+                      },
+                    },
+                  };
+                });
+                if (grantResult.accepted > 0) {
+                  get().appendLog('world', `You take the ${cat.name} from where it lay.`);
+                  get().appendLog('reward', `✦ ${cat.name} (${cat.rarity}).`);
+                } else {
+                  get().appendLog('world', `Found a ${cat.name.toLowerCase()}, but your pack is already full of them.`);
+                }
+                break;
+              }
+              // Not in the catalog — it's a scene feature, not a portable
+              // item. Redirect to salvage so the player knows what to do.
               get().appendLog(
                 'world',
-                `The ${ambientHit} is part of the scene, not a loose drop. Try 'salvage ${ambientHit}' to harvest it, or 'open ${ambientHit}' if it has compartments.`,
+                `The ${ambientHit} is part of the scene, not a loose drop. Try 'salvage ${ambientHit}' to harvest it for parts.`,
               );
               break;
             }

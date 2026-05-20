@@ -117,6 +117,36 @@ export function lookupCraftedItem(resultName: string): {
   return { kind: 'misc', rarity: 'Common', tags: [] };
 }
 
+/** Case-insensitive catalog match. Returns the canonical (title-case)
+ *  name + kind + rarity + tags when the input maps to a REAL catalog
+ *  item — weapon, armor, gear, amulet, ring, or material. Returns
+ *  null for scene features that aren't pickupable items (pillar,
+ *  arch, fountain, lever, fissure, etc.). Used by pickup-on-ambient
+ *  to decide: grant a real item, or redirect to salvage. */
+export function findCatalogItem(name: string): {
+  name: string;
+  kind: 'weapon' | 'armor' | 'consumable' | 'relic' | 'misc';
+  rarity: Rarity;
+  tags: string[];
+  baseDurability?: number;
+} | null {
+  const q = name.trim().toLowerCase();
+  if (!q) return null;
+  const w = WEAPONS.find((x) => x.name.toLowerCase() === q);
+  if (w) return { name: w.name, kind: 'weapon', rarity: w.rarity, tags: w.tags, baseDurability: w.baseDurability ?? DEFAULT_DURABILITY };
+  const a = ARMOR.find((x) => x.name.toLowerCase() === q);
+  if (a) return { name: a.name, kind: 'armor', rarity: a.rarity, tags: a.tags, baseDurability: a.baseDurability ?? DEFAULT_DURABILITY };
+  const g = GEAR.find((x) => x.name.toLowerCase() === q);
+  if (g) return { name: g.name, kind: g.kind, rarity: g.rarity, tags: g.tags };
+  const am = AMULETS.find((x) => x.name.toLowerCase() === q);
+  if (am) return { name: am.name, kind: 'relic', rarity: am.rarity, tags: am.tags, baseDurability: am.baseDurability ?? DEFAULT_DURABILITY };
+  const r = RINGS.find((x) => x.name.toLowerCase() === q);
+  if (r) return { name: r.name, kind: 'relic', rarity: r.rarity, tags: r.tags, baseDurability: r.baseDurability ?? DEFAULT_DURABILITY };
+  const m = MATERIALS.find((x) => x.name.toLowerCase() === q);
+  if (m) return { name: m.name, kind: 'misc', rarity: m.rarity, tags: m.tags };
+  return null;
+}
+
 function totalQuantity(inventory: readonly InventoryItem[], materialName: string): number {
   const target = materialName.toLowerCase();
   let total = 0;
