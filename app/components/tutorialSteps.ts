@@ -6,7 +6,8 @@
 import type { ScreenName } from '../engine/types';
 
 export type HighlightArea =
-  // Exploration screen regions (percentages of the viewport).
+  // World screen regions (the main exploration view — the player's
+  // whole world lives on this one screen, per the project's framing).
   | 'top-left-stats'
   | 'top-right-enemy'
   | 'scene-bar'
@@ -170,9 +171,10 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'Traders behave like your pack — same layout, same tap-for-details flow, plus a price ' +
       'next to each offer and a "you have N" tag when you already own one. SELL flips to your ' +
       'pack with sell prices alongside. ' +
-      '\n\nIn-game: when a vendor is in the scene, an orange banner appears at the top of the ' +
-      'world feed with the trader\'s name. Tap that banner to enter the shop. Irma will vanish ' +
-      'when this tour ends.',
+      '\n\nTour mode disables buy / sell / contract-accept so you can poke around without ' +
+      'cheesing the game before play starts. In-game, when a vendor is in the scene, an orange ' +
+      'banner appears at the top of the world feed on the world screen with the trader\'s name. ' +
+      'Tap that banner to enter the shop. Irma will vanish when this tour ends.',
   },
   {
     screen: 'about',

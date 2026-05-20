@@ -5151,6 +5151,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene = state.currentScene;
     const player = state.player;
     if (!scene?.vendor || !player) return;
+    // Tour mode — Irma is a demo vendor injected for the intro walkthrough.
+    // No transactions: stops the player from cheesing the game by buying
+    // out the armory before play actually starts.
+    if (state.tutorialDemoVendor) {
+      get().appendLog('system', 'Tour mode — purchases disabled while the tutorial is running.');
+      return;
+    }
 
     const offer = scene.vendor.offers.find((o) => o.itemName.toLowerCase() === itemName.toLowerCase());
     if (!offer) return;
@@ -5233,6 +5240,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const scene = state.currentScene;
     const player = state.player;
     if (!scene?.vendor || !player) return;
+    if (state.tutorialDemoVendor) {
+      get().appendLog('system', 'Tour mode — selling is disabled while the tutorial is running.');
+      return;
+    }
     // Refuse if the item is equipped — don't quietly strip the player's
     // loadout. They have to unequip first.
     const equipped = player.equipped ?? {};
@@ -5502,6 +5513,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = state.player;
     const scene = state.currentScene;
     if (!player) return;
+    if (state.tutorialDemoVendor) {
+      get().appendLog('system', 'Tour mode — contracts can\'t be accepted until the tutorial ends.');
+      return;
+    }
     if (!scene?.vendor || !scene.vendor.faction) {
       // Resolve the named contract to its faction so we can tell the
       // player WHICH vendor archetype to seek, not just "a faction
@@ -5705,6 +5720,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = state.player;
     const scene = state.currentScene;
     if (!player) return;
+    if (state.tutorialDemoVendor) {
+      get().appendLog('system', 'Tour mode — contracts can\'t be accepted until the tutorial ends.');
+      return;
+    }
     if (!scene?.vendor) {
       const hint = findQuestFactionHint(titleOrId);
       if (hint && hint.vendorNames.length > 0) {
@@ -5921,6 +5940,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = state.player;
     const scene = state.currentScene;
     if (!player) return;
+    if (state.tutorialDemoVendor) {
+      get().appendLog('system', 'Tour mode — contracts can\'t be accepted until the tutorial ends.');
+      return;
+    }
     if (!scene?.vendor) {
       const hint = findQuestFactionHint(titleOrId);
       if (hint && hint.vendorNames.length > 0) {
@@ -6112,6 +6135,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = state.player;
     const scene = state.currentScene;
     if (!player) return;
+    if (state.tutorialDemoVendor) {
+      get().appendLog('system', 'Tour mode — contracts can\'t be accepted until the tutorial ends.');
+      return;
+    }
     if (!scene?.vendor?.faction) {
       const hint = findQuestFactionHint(titleOrId);
       if (hint && hint.vendorNames.length > 0) {

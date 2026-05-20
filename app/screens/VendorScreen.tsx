@@ -38,6 +38,7 @@ export function VendorScreen() {
   const acceptHunt = useGameStore((s) => s.acceptHunt);
   const acceptMystery = useGameStore((s) => s.acceptMystery);
   const acceptStoryline = useGameStore((s) => s.acceptStoryline);
+  const tutorialDemoVendor = useGameStore((s) => s.tutorialDemoVendor);
 
   const [mode, setMode] = useState<Mode>('buy');
   const [pending, setPending] = useState<Pending>(null);
@@ -132,6 +133,14 @@ export function VendorScreen() {
         <Text style={styles.vendorTitle}>{vendor.title}</Text>
         <Text style={styles.vendorDesc}>{vendor.description}</Text>
       </View>
+
+      {tutorialDemoVendor && (
+        <View style={styles.tourBanner}>
+          <Text style={styles.tourBannerText}>
+            TOUR MODE — buy, sell, and contracts are disabled. Irma vanishes when the tour ends.
+          </Text>
+        </View>
+      )}
 
       <View style={styles.walletRow}>
         <Text style={styles.walletLabel}>Your purse</Text>
@@ -539,6 +548,22 @@ const styles = StyleSheet.create({
   },
   walletLabel: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },
   walletValue: { color: '#c9a86a', fontSize: 13, fontWeight: '700' },
+  tourBanner: {
+    backgroundColor: '#2a1f12',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    marginBottom: 6,
+  },
+  tourBannerText: {
+    color: '#c9a86a',
+    fontSize: 10,
+    letterSpacing: 1,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
   list: { flex: 1 },
   listContent: { paddingBottom: 12 },
   offerRow: {
