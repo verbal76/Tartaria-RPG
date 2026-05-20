@@ -244,20 +244,31 @@ describe('movementStress — cardinal travel + approach quick-action', () => {
       totalAttempts++;
       const sBefore = store.getState();
       const pBefore = sBefore.player;
-      const logLenBefore = sBefore.gameLog.length;
-      // Capture the LAST entry's text too. The store debounces
-      // same-channel world/system writes within 500ms by MERGING the
-      // new text into the previous entry instead of appending — so
-      // `gameLog.length` doesn't grow on rapid sequential calls and
-      // `slice(logLenBefore)` returns []. Holding onto the last
-      // entry's pre-call text lets us detect a merged response by
-      // comparing post-call text. (Real player input can't trigger
-      // this debounce in production — sub-500ms inputs aren't
-      // physically possible — but the test rips through actions in
-      // <1ms each, so we need to handle it.)
+      // Two log-tracking signals together:
+      //   1. `tsBefore` — the latest ts in the log right now. The
+      //      store also caps gameLog at MAX_LOG_IN_MEMORY = 500 in
+      //      the appendLog reducer, so a length-based diff
+      //      (slice(logLenBefore)) returns nothing once the cap is
+      //      hit — old entries get dropped from the head at the
+      //      same rate new ones are appended at the tail. Filtering
+      //      by ts > tsBefore is stable across the cap.
+      //   2. `lastEntryBefore` — the same-channel debounce in
+      //      appendLog merges world/system writes < 500ms apart
+      //      into the previous entry. ts is preserved on the
+      //      merged entry as the NEW write's ts, so the ts filter
+      //      catches it, but only if we also look at the SUFFIX
+      //      that got merged in. The lastTextBefore + length-grew
+      //      heuristic teases that apart.
       const lastEntryBefore = sBefore.gameLog[sBefore.gameLog.length - 1];
       const lastTextBefore = lastEntryBefore?.text ?? '';
       const lastChanBefore = lastEntryBefore?.channel ?? '';
+      const tsBefore = lastEntryBefore?.ts ?? 0;
+      // Ensure the next ts (Date.now()) is strictly greater than
+      // tsBefore. Without this, multiple submits inside the same
+      // ms tick land at the same ts and the > filter excludes
+      // them. We just spin until the clock advances — typical
+      // wait is 0-1ms.
+      while (Date.now() <= tsBefore) { /* spin to next ms */ }
       const locBefore = pBefore?.currentLocationId ?? null;
       const mxBefore = pBefore?.mapX;
       const myBefore = pBefore?.mapY;
@@ -276,20 +287,20 @@ describe('movementStress — cardinal travel + approach quick-action', () => {
 
       const sAfter = store.getState();
       const pAfter = sAfter.player;
-      const rawNewLogs = sAfter.gameLog.slice(logLenBefore);
-      // Synthesize a "newLogs" view that surfaces the merged-debounce
-      // case. If gameLog.length didn't grow but the last entry's
-      // text expanded (debounce merge), treat the appended suffix
-      // as a brand-new world-channel line so detection works.
+      // ts-based diff — survives the 500-entry log cap that
+      // .slice(logLenBefore) does not.
+      const rawNewLogs = sAfter.gameLog.filter((e) => e.ts > tsBefore);
+      // Surface merged-debounce entries as a synthetic suffix line.
       let newLogs: Array<{ text: string; channel: string }> = rawNewLogs;
-      if (rawNewLogs.length === 0 && lastEntryBefore) {
-        const lastNow = sAfter.gameLog[sAfter.gameLog.length - 1];
-        if (lastNow && lastNow.channel === lastChanBefore && lastNow.text.length > lastTextBefore.length
-            && lastNow.text.startsWith(lastTextBefore)) {
-          const suffix = lastNow.text.slice(lastTextBefore.length).trim();
-          if (suffix.length > 0) {
-            newLogs = [{ text: suffix, channel: lastChanBefore }];
-          }
+      if (lastEntryBefore) {
+        // If the previous tail entry's ts ALSO got bumped (merge case),
+        // the new content is the suffix of its updated text.
+        const sameSlot = sAfter.gameLog.find((e) =>
+          e.channel === lastChanBefore && e.ts > tsBefore && e.text.startsWith(lastTextBefore) && e.text.length > lastTextBefore.length,
+        );
+        if (sameSlot && !rawNewLogs.includes(sameSlot)) {
+          const suffix = sameSlot.text.slice(lastTextBefore.length).trim();
+          if (suffix) newLogs = [...rawNewLogs, { text: suffix, channel: lastChanBefore }];
         }
       }
       const locAfter = pAfter?.currentLocationId ?? null;

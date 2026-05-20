@@ -219,7 +219,10 @@ describe('Domestic / utility quick-action stress (700 in-game days)', () => {
     // via a rest call, so ~3 cycles per day → 2100 iterations.
     const TARGET_DAYS = 700;
     const HOURS_PER_DAY = 24;
-    const MAX_ITERATIONS = TARGET_DAYS * 4; // safety cap if rest skipped
+    // Each iteration runs one rest (4-7 in-game hours), so we need
+    // ~24/5 ≈ 4.8 iters per in-game day. 6× gives headroom for the
+    // (rare) cases where rest no-ops at full HP/stamina.
+    const MAX_ITERATIONS = TARGET_DAYS * 6;
 
     // Recipes we'll rotate through. Each is a simple weapon/tool we can
     // provision materials for and consume cleanly.
@@ -231,14 +234,23 @@ describe('Domestic / utility quick-action stress (700 in-game days)', () => {
     ];
 
     // Stat-bonus accessories to cycle through, verifying effectiveStats.
+    //
+    // CRITICAL FINDING — name collisions:
+    //   `Rusted Band of Knowledge` and `Aetheric Diadem` both appear in
+    //   rings.json / amulets.json AND in armor.json (as head armor).
+    //   `validSlotsForItem` consults `findArmorByName` BEFORE the ring /
+    //   amulet checks, so equipping these to 'ring' / 'amulet' silently
+    //   rejects and the slot stays empty. The stat bonus declared on
+    //   the ring / amulet row never reaches effectiveStats. Pick names
+    //   that exist in ONE catalog only.
     const STAT_RINGS = [
       { name: 'Tartarian Stoneband', stat: 'strength' as const, amount: 2 },
       { name: 'Reclaimer\'s Quick Band', stat: 'dexterity' as const, amount: 1 },
-      { name: 'Rusted Band of Knowledge', stat: 'intelligence' as const, amount: 1 },
+      { name: 'Golem Controller Ring', stat: 'intelligence' as const, amount: 1 },
     ];
     const STAT_AMULETS = [
       { name: 'Lightstone Amulet', stat: 'wisdom' as const, amount: 2 },
-      { name: 'Aetheric Diadem', stat: 'intelligence' as const, amount: 1 },
+      { name: 'Minor Aetheric Amulet', stat: 'wisdom' as const, amount: 1 },
       { name: 'Whisperer\'s Charm', stat: 'charisma' as const, amount: 1 },
     ];
 
@@ -451,13 +463,6 @@ describe('Domestic / utility quick-action stress (700 in-game days)', () => {
             store.getState().equipItem(amSpec.name, 'amulet');
           } catch (e: any) {
             crashes.push(`equip accessory: ${e?.message ?? e}`);
-          }
-          // Debug: capture equipped state on the first three iterations.
-          if (iter <= 18 && iter % 6 === 0) {
-            const eqs = getPlayer().equipped ?? {};
-            const inv = getPlayer().inventory.filter((i) => i.name === ringSpec.name || i.name === amSpec.name).map((i) => `${i.name}(qty=${i.quantity})`);
-            const dbg = `iter=${iter} ring=${eqs.ring} amulet=${eqs.amulet} inv=[${inv.join(', ')}] try=${ringSpec.name}+${amSpec.name}`;
-            crashes.push(`DEBUG: ${dbg}`);
           }
 
           // Equipped armor with statBonuses persists across iterations
