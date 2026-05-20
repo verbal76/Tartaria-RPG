@@ -369,40 +369,20 @@ function buildChipPool(
     seen.add(key);
     out.push(n);
   };
-  // 1) Author-declared interactables from the scene's location +
-  //    hub-room (and procedural Micro-Micro). These are concrete by
-  //    construction — every entry is a noun the room actually
-  //    contains.
-  for (const n of scene.ambientNouns ?? []) push(n);
-  // 2) The FIRST noun from each unresolved hook. The rest of a hook's
-  //    noun array exists for parser-disambiguation (so 'breeze' /
-  //    'air' / 'draft' all resolve to the cold-air-leak hook), not
-  //    as user-facing chip suggestions.
+  // 1) Read from the per-visit cached subset (scene.displayedAmbientNouns,
+  //    set once in beginScene). Stable across consecutive Search /
+  //    Approach / Salvage taps in the same room — leave and come back
+  //    to re-roll. Falls back to the full ambientNouns list for legacy
+  //    saves predating the cache field.
+  const source = scene.displayedAmbientNouns ?? scene.ambientNouns ?? [];
+  for (const n of source) push(n);
+  // 2) The FIRST noun from each unresolved hook. Hook nouns aren't
+  //    in the cached subset (they live on scene.hooks separately),
+  //    so they get added on top and don't dilute the rotation.
   for (const h of scene.hooks ?? []) {
     if (h.resolved) continue;
     const primary = h.nouns?.[0];
     if (primary) push(primary);
   }
-  // After the v2/v2.1 registry expansion, many macros have 50-100+
-  // authored interactables. Showing the same first 10 every time
-  // the modal opens would defeat the look-around rotation that
-  // OTA 149 added. Shuffle when the pool is larger than 10 so each
-  // Search / Approach / Salvage tap surfaces a fresh subset. Hook
-  // primaries always sort to the front of the shown set because
-  // they're the most actionable suggestions in the scene.
-  const hookPrimaries = (scene.hooks ?? [])
-    .filter((h: { resolved?: boolean }) => !h.resolved)
-    .map((h: { nouns?: string[] }) => h.nouns?.[0])
-    .filter((n: string | undefined): n is string => !!n);
-  const hookSet = new Set(hookPrimaries.map((n: string) => n.toLowerCase()));
-  if (out.length <= 10) return out;
-  const hooks = out.filter((n) => hookSet.has(n.toLowerCase()));
-  const ambients = out.filter((n) => !hookSet.has(n.toLowerCase()));
-  // Fisher-Yates shuffle of the ambient pool, then take however many
-  // we need to fill out to 10 after the hook primaries.
-  for (let i = ambients.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [ambients[i], ambients[j]] = [ambients[j]!, ambients[i]!];
-  }
-  return [...hooks, ...ambients].slice(0, 10);
+  return out.slice(0, 10);
 }
