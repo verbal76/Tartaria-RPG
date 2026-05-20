@@ -387,6 +387,17 @@ export interface ArbiterContext {
    * glances at the statue, still waiting." Stay on the player's noun.
    */
   playerTargetNoun?: string;
+  /**
+   * Player vitals + inventory hints for the wellness fork. The Arbiter
+   * occasionally drops a friend-chat remark — "you holding up? eat
+   * something / there's a first-aid kit in your pack" — when HP or
+   * stamina is in the rough zone. All optional; missing values disable
+   * the fork.
+   */
+  playerHpFraction?: number;
+  playerStaminaFraction?: number;
+  hasFirstAidKit?: boolean;
+  hasFood?: boolean;
 }
 
 function pickMoodPool(mood: string | undefined): string[] | undefined {
@@ -450,6 +461,52 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
     return combatRemark(ctx.enemy!);
   }
 
+  // ~15% chance to drop a friend-chat / wellness remark when the player
+  // is genuinely hurt or tired AND has a useful item in their pack.
+  // Fires out-of-combat only (the combat branch above already returned).
+  // Suppressed when the player named a target this turn — staying
+  // on-noun beats checking in. Tracked through rotatingPick so the
+  // same line doesn't fire twice in a row.
+  if (!ctx.playerTargetNoun && Math.random() < 0.15) {
+    const hpFrac = ctx.playerHpFraction ?? 1;
+    const stamFrac = ctx.playerStaminaFraction ?? 1;
+    const wellnessLines: string[] = [];
+    if (hpFrac < 0.4 && ctx.hasFirstAidKit) {
+      wellnessLines.push(
+        `The Arbiter softens. "You're carrying a first-aid kit. Crack it before the next swing comes."`,
+        `"Field-dress that," the Arbiter says quietly. "Kit's in your pack. Use it now, not after."`,
+        `The Arbiter watches you a moment. "You look rough. The kit is for moments like this — don't hoard it."`,
+      );
+    } else if (hpFrac < 0.4) {
+      wellnessLines.push(
+        `The Arbiter's voice drops. "You're bleeding more than you think. Find cover, find a bandage."`,
+        `"You holding up?" the Arbiter says. "Honest answer. If it's no, fix that before you push on."`,
+      );
+    }
+    if (stamFrac < 0.35 && ctx.hasFood) {
+      wellnessLines.push(
+        `"Eat something," the Arbiter says, almost gentle. "Stamina doesn't refill on grit. You've got rations."`,
+        `The Arbiter taps the air near your pack. "Rations. Now. Tartaria does not forgive an empty stomach."`,
+      );
+    } else if (stamFrac < 0.35) {
+      wellnessLines.push(
+        `"You're running on fumes," the Arbiter says. "Sit a moment. Catch your breath before something catches you."`,
+        `The Arbiter studies you. "Tired hands miss. Rest, even briefly, beats pressing through."`,
+      );
+    }
+    if (hpFrac > 0.85 && stamFrac > 0.85 && Math.random() < 0.5) {
+      // Quiet check-in when the player is fine — keeps the friend tone
+      // present in the rotation instead of only firing on damage.
+      wellnessLines.push(
+        `"You're carrying yourself well today," the Arbiter says, almost casual.`,
+        `The Arbiter glances at you. "Steady. Good. Tartaria rewards steady."`,
+      );
+    }
+    if (wellnessLines.length > 0) {
+      return rotatingPick(wellnessLines, 'arbiter.wellness');
+    }
+  }
+
   // ~40% chance to reference an unresolved narrative hook in this scene —
   // this is the one that ties the world together. The player saw smoke /
   // footprints / a spire on their last action; the Arbiter calls back to it.
@@ -496,10 +553,22 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
     // Otherwise a short defer-to-player line that names the noun
     // without pretending to know more than it does. Three options
     // only — small pool, rotating, no mantras.
+    // Expanded from 3 to 10 lines per uniqueness audit — the
+    // original three-line pool saturated within ~6 fires and
+    // dominated the top-repeated Arbiter remarks list. Ten variants
+    // grouped loosely by tone (patient / dry / wary / curious /
+    // resigned) so back-to-back fires don't read as the same beat.
     const deferLines = [
       `"The ${n}," the Arbiter says. "Tell me what you mean to do with it."`,
       `The Arbiter watches you and the ${n} both. "Your move."`,
       `"What you make of the ${n} is on you," the Arbiter says.`,
+      `The Arbiter considers the ${n}. "Name your intent and I'll grade it."`,
+      `"You've got a ${n} and a question," the Arbiter says. "Pair them."`,
+      `"The ${n} won't act for you," the Arbiter says, dry. "Choose a verb."`,
+      `The Arbiter glances between you and the ${n}. "Decide while it's still yours to."`,
+      `"I will know what you mean when you act on the ${n}," the Arbiter says.`,
+      `"The ${n} is here. So are you. Make something of that."`,
+      `The Arbiter waits. "${n[0]?.toUpperCase()}${n.slice(1)}. What's the verb?"`,
     ];
     return rotatingPick(deferLines, 'arbiter.target-callback');
   }

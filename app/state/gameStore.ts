@@ -616,13 +616,6 @@ interface GameStore {
   qwenModelId: string;
   partialArbiterText: string | null;
   isGenerating: boolean;
-  /** Last scene the player called `look` on, plus the in-game hour
-   *  at the time. Drives the consecutive-look short-form path in
-   *  narrateCasualLook so spamming `look` doesn't reprint the full
-   *  bearings block every tap. Transient — not persisted across
-   *  app launches. Was a monkey-patch on the store object before
-   *  the audit promoted it to a proper field. */
-  lastLookAt: { key: string; hour: number } | null;
   /** Count of cardinal travel steps since the last wasteland
    *  encounter fired. stepDirection increments this every step;
    *  pickWastelandEncounter resets to 0 when an encounter lands.
@@ -773,7 +766,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
   cognitiveFraction: 0,
   cognitiveError: null,
   cognitiveLastResponse: null,
-  lastLookAt: null,
   wastelandStepsSinceEncounter: 0,
   justUpdatedFromBuild: null,
   pendingInputDraft: null,
@@ -916,6 +908,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         activeSlotId: slotId,
         currentScene: restoredScene,
         pendingRolls: null,
+        wastelandStepsSinceEncounter: 0,
       });
       // Only fall back to beginScene when the save predates scene
       // capture. New saves restore the exact scene above and skip this.
@@ -972,6 +965,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       resurrectionGems: remainingGems,
       currentScene: null,
       pendingRolls: null,
+      wastelandStepsSinceEncounter: 0,
     });
     get().beginScene();
     get().appendLog(
@@ -1338,21 +1332,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // vendor the player meets gets their own voice on demand.
     //
     // Wrapped in a try / void so an executorch hiccup never blocks
-    // scene setup. System TTS doesn't go through this path.
-    const prevVendorVoice = get().currentScene?.vendor?.voiceId ?? null;
-    const nextVendorVoice = vendor?.voiceId ?? null;
-    if (prevVendorVoice && prevVendorVoice !== nextVendorVoice) {
-      try {
-        const piper = require('../voice/PiperTTSManager');
-        if (typeof piper.disposeVoice === 'function') piper.disposeVoice(prevVendorVoice);
-      } catch { /* PiperTTSManager may not be loaded in tests */ }
-    }
-    if (nextVendorVoice) {
-      try {
-        const piper = require('../voice/PiperTTSManager');
-        if (typeof piper.warmVoice === 'function') void piper.warmVoice(nextVendorVoice);
-      } catch { /* same */ }
-    }
+    // scene setup. ONLY fires when the bundled (Kokoro) engine is
+    // active — audit caught that system-engine players were paying
+    // a ~100 MB Kokoro download the first time they walked past a
+    // vendor because the lifecycle hooks ran unconditionally.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const voiceSettings = require('../voice/voiceSettings');
+      const engine = voiceSettings.getVoiceSettings?.().engine;
+      if (engine === 'bundled') {
+        const prevVendorVoice = get().currentScene?.vendor?.voiceId ?? null;
+        const nextVendorVoice = vendor?.voiceId ?? null;
+        if (prevVendorVoice && prevVendorVoice !== nextVendorVoice) {
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const piper = require('../voice/PiperTTSManager');
+            if (typeof piper.disposeVoice === 'function') piper.disposeVoice(prevVendorVoice);
+          } catch { /* PiperTTSManager may not be loaded in tests */ }
+        }
+        if (nextVendorVoice) {
+          try {
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            const piper = require('../voice/PiperTTSManager');
+            if (typeof piper.warmVoice === 'function') void piper.warmVoice(nextVendorVoice);
+          } catch { /* same */ }
+        }
+      }
+    } catch { /* voice modules not present in tests */ }
     set({ currentScene: scene, pendingRolls: null });
     const dropIds = [...consumedChainIds, ...expiredChainIds];
     if (dropIds.length > 0) {
@@ -2202,11 +2208,52 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
           if (rawTarget && isAreaSearch(rawTarget)) {
-            // Narrate the outcome directly — same pattern the
-            // investigate case uses for area searches.
+            // Honor the same per-tile dedupe the canonical investigate
+            // path uses. Without this, a player typing "smash the wall"
+            // repeatedly could re-roll loot for free (audit caught
+            // this as a free-loot exploit). Mirror the lookup +
+            // gate + state-write so attack-fallback area searches
+            // are indistinguishable from the canonical path.
+            const fallbackRoomKey = makeRoomKey(
+              player.currentLocationId,
+              currentScene.microMicroId,
+              player.mapX,
+              player.mapY,
+            );
+            const fallbackPrior = get().worldMemory.visitedRooms?.[fallbackRoomKey];
+            const loweredFallback = rawTarget.toLowerCase().trim();
+            const fallbackAlreadySearched = (fallbackPrior?.searchedAmbientNouns ?? []).some(
+              (n) => n === loweredFallback || loweredFallback.includes(n) || n.includes(loweredFallback),
+            );
+            if (fallbackAlreadySearched) {
+              get().appendLog('world', `You've already worked over the ${rawTarget} here. Nothing more to find.`);
+              break;
+            }
             const outcome = rollAreaSearch(rawTarget);
             set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
             get().appendLog('world', outcome.line);
+            // Record the search so subsequent attempts at the same
+            // target on the same tile hit the dedupe gate.
+            set((s) => {
+              const room = s.worldMemory.visitedRooms?.[fallbackRoomKey] ?? {
+                firstVisitAt: Date.now(),
+                lastVisitAt: Date.now(),
+                visitCount: 1,
+              };
+              const prevSearched = room.searchedAmbientNouns ?? [];
+              return {
+                worldMemory: {
+                  ...s.worldMemory,
+                  visitedRooms: {
+                    ...(s.worldMemory.visitedRooms ?? {}),
+                    [fallbackRoomKey]: {
+                      ...room,
+                      searchedAmbientNouns: [...prevSearched, loweredFallback],
+                    },
+                  },
+                },
+              };
+            });
             break;
           }
           get().appendLog('world', 'Nothing in arm\'s reach answers your blade. The motion echoes off Aetherstone.');
@@ -4290,6 +4337,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
           hasMood: !!mood,
         })
       ) {
+        // Pull vitals fresh — the action just resolved and HP/stamina
+        // may have changed mid-call (combat damage, food consumed, etc.).
+        const livePlayer = get().player ?? player;
+        const inv = livePlayer.inventory ?? [];
+        const hasFirstAidKit = inv.some(
+          (it) => /first aid/i.test(it.name) && (it.quantity ?? 1) > 0,
+        );
+        const hasFood = inv.some(
+          (it) =>
+            ((it.tags?.includes('food')) ||
+              /rations|jerky|biscuit|bread/i.test(it.name)) &&
+            (it.quantity ?? 1) > 0,
+        );
         const template = buildArbiterRemark({
           location: currentScene.location,
           hazard: currentScene.hazard,
@@ -4299,6 +4359,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
           recentActions,
           unresolvedHooks,
           playerTargetNoun: parsed.resolvedNoun ?? parsed.target ?? undefined,
+          playerHpFraction:
+            livePlayer.hpMax > 0 ? livePlayer.hp / livePlayer.hpMax : 1,
+          playerStaminaFraction:
+            (livePlayer.staminaMax ?? 0) > 0
+              ? (livePlayer.stamina ?? 0) / livePlayer.staminaMax!
+              : 1,
+          hasFirstAidKit,
+          hasFood,
         });
         void narrateViaArbiter(get, set, template, parsed.intent);
       }
@@ -8017,11 +8085,8 @@ function narrateCasualLook(
   // don't need a shortened version the second or third time that I
   // say it, otherwise I have to scroll all the way back up the text
   // log to see what's still around me that I haven't looked at."
-  // lastLookAt still tracked for any future use; the short-form
-  // branch is intentionally absent.
-  const sceneKey = `${player?.currentLocationId ?? '?'}@${scene.microMicroId ?? '_'}@${player?.mapX ?? 0},${player?.mapY ?? 0}@${player?.hubRoomId ?? '_'}`;
-  const nowHour = player?.hoursElapsed ?? 0;
-  set(() => ({ lastLookAt: { key: sceneKey, hour: nowHour } }));
+  // lastLookAt field was removed in the post-audit cleanup — no
+  // consumer remained after the short-form revert.
 
   // Full look — bearings, not flavor. Player feedback (verbatim):
   // "the responses from look shouldn't be flavor heavy it's you

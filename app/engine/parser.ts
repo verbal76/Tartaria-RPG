@@ -40,7 +40,10 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'nap', 'doze',
   ],
   inventory: [
-    'inventory', 'pack', 'bag', 'gear', 'items', 'supplies', 'stuff', 'kit', 'satchel',
+    // 'bag' removed — too greedy: "bag the goblin" / "tea bag" / "sandbag"
+    // all routed here. 'pack' kept; players who type just "pack" are
+    // asking for inventory in practice.
+    'inventory', 'pack', 'gear', 'items', 'supplies', 'stuff', 'kit', 'satchel',
     'pockets', 'backpack',
   ],
   travel: [
@@ -65,7 +68,9 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   ],
   equip: ['equip', 'wear', 'wield', 'don', 'unequip', 'remove', 'sheathe', 'strap', 'fit', 'fasten'],
   gift: ['gift', 'give', 'offer', 'hand', 'bestow', 'donate', 'tender', 'grant', 'pass'],
-  steal: ['steal', 'pocket', 'pilfer', 'lift', 'pinch', 'swipe', 'snatch', 'filch', 'nick', 'grab'],
+  // 'pocket' removed — clashes with the noun "pockets" / "in his pocket"
+  // and the inventory channel. 'grab' kept (genuine steal verb).
+  steal: ['steal', 'pilfer', 'lift', 'pinch', 'swipe', 'snatch', 'filch', 'nick', 'grab'],
   join: ['join', 'pledge', 'swear', 'sign', 'ally', 'bond', 'commit', 'enroll', 'side'],
   dodge: ['dodge', 'evade', 'sidestep', 'duck', 'juke', 'tumble', 'slip', 'twist', 'roll'],
   block: ['block', 'parry', 'deflect', 'shield', 'brace', 'guard', 'fend', 'absorb', 'ward'],
@@ -74,7 +79,10 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     // movement, not the "close one combat range band" beat that
     // advance is. Keeps "advance / approach / lunge" focused on its
     // own meaning.
-    'advance', 'approach', 'closein', 'press', 'lunge', 'forward',
+    // 'press' removed — clashes with "press the button" / "press on the
+    // wound" / "press my luck". Players who want the combat beat say
+    // advance/approach/lunge/forward.
+    'advance', 'approach', 'closein', 'lunge', 'forward',
     'charge in', 'near',
   ],
   retreat: [
@@ -93,7 +101,11 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   // Players who want to accept a contract always say "accept" (the
   // Arbiter's prompts spell it out: "say 'accept road'"). The other
   // verbs here cover the rare "yes/agree/sure" path.
-  accept: ['accept', 'undertake', 'agree', 'yes', 'consent', 'embrace', 'assent', 'okay', 'aye'],
+  // 'okay' removed — almost always a conversational filler ("okay, I
+  // look around" / "okay sure"); accept fires when contract context is
+  // active anyway, but the synonym kept dragging unrelated lines into
+  // the accept path.
+  accept: ['accept', 'undertake', 'agree', 'yes', 'consent', 'embrace', 'assent', 'aye'],
   turn_in: ['turn in', 'complete', 'finish', 'deliver', 'report', 'redeem', 'claim', 'present', 'submit', 'hand in'],
   dig: ['dig', 'excavate', 'unearth', 'scrape', 'shovel', 'burrow', 'tunnel', 'mine', 'spade', 'pry'],
   throw: ['throw', 'toss', 'hurl', 'lob', 'chuck', 'fling', 'pitch', 'cast at', 'launch', 'whip'],

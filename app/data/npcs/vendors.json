@@ -515,6 +515,24 @@
       "offers": [],
       "gender": "male",
       "voiceId": "am_adam"
+    },
+    {
+      "id": "monarch_agent",
+      "name": "Veska of the Hollow",
+      "title": "Monarch Agent",
+      "faction": "mud_monarchs",
+      "location": "Mud Monarch Hollow",
+      "description": "A Mud Monarch agent in a flat grey hood. Talks little. Buys silences and pays in tokens with no marks. Carries small useful things for travelers who don't want to be remembered.",
+      "personality": "Flat",
+      "offers": [
+        { "itemName": "First Aid Kit", "price": 35 },
+        { "itemName": "Trail Rations", "price": 8 },
+        { "itemName": "Aetheric Torch", "price": 25 },
+        { "itemName": "Climbing Rope", "price": 12 },
+        { "itemName": "Throwing Knife", "price": 18 }
+      ],
+      "gender": "female",
+      "voiceId": "af_river"
     }
   ]
 }

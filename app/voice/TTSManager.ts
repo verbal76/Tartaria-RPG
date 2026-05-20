@@ -17,6 +17,7 @@ import {
   isPiperAvailable,
   disposePiperEngine,
   prewarmKokoro,
+  disposeStickyArbiterVoice,
 } from './PiperTTSManager';
 
 interface QueuedUtterance {
@@ -250,18 +251,20 @@ export async function initTTSManager(): Promise<void> {
   if (initial.ttsEnabled && initial.engine === 'bundled') {
     void prewarmKokoro();
   }
+  let lastKokoroVoice = getVoiceSettings().kokoroVoice;
   onVoiceSettingsChange((s) => {
     if (!s.ttsEnabled) {
-      // Finish the current sentence, drop everything queued behind it.
-      // Per the plan: a hard mid-sentence cut feels worse than a 2s
-      // tail. If the player wanted immediate silence they'd hit
-      // SILENCE ARBITER which calls stopAndClear directly.
       clearQueueKeepCurrent();
       return;
     }
-    // Player flipped TTS on OR switched to bundled engine — preload
-    // Kokoro so the next speak() finds it ready. prewarmKokoro is
-    // idempotent; subsequent calls are cheap no-ops.
+    // Player changed kokoroVoice mid-session — evict the old sticky
+    // Arbiter voice so it doesn't leak memory. Without this, every
+    // voice swap added ~100 MB to the pool and only disposePiperEngine
+    // could clear it. Audit caught this as a CRITICAL finding.
+    if (s.kokoroVoice !== lastKokoroVoice) {
+      try { disposeStickyArbiterVoice(); } catch { /* ignore */ }
+      lastKokoroVoice = s.kokoroVoice;
+    }
     if (s.engine === 'bundled') {
       void prewarmKokoro();
     }

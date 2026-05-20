@@ -177,7 +177,18 @@ export async function prewarmKokoro(): Promise<void> {
     // (download progress + ready signal). ensureLoaded does its own
     // warm-up forward() so this single call covers both pieces.
     await ensureLoaded(arbiterVoiceId());
-  } catch { /* ignore — state machine surfaced the error */ }
+    // If the load failed (network blip, metered-data refusal, etc.)
+    // ensureLoaded returns null silently. Reset the latch so a
+    // subsequent toggle / retry can fire fresh; otherwise the player
+    // is stuck with engine=bundled + no download + no retry path
+    // until they hit the UPDATE button.
+    if (!VOICE_POOL.has(arbiterVoiceId())) {
+      prewarmStarted = false;
+    }
+  } catch {
+    prewarmStarted = false;
+    /* state machine surfaced the error */
+  }
 }
 
 export function isSpeaking(): boolean {
@@ -229,8 +240,16 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
   if (inFlight) return inFlight;
   if (!exec?.TextToSpeechModule?.fromModelName) return null;
   const sticky = voiceId === arbiterVoiceId();
-  // If we're about to exceed capacity, evict before the load completes.
-  if (VOICE_POOL.size + LOADING.size >= POOL_MAX) evictLRU();
+  // Evict BEFORE registering the new in-flight load so two concurrent
+  // ensureLoaded calls don't both pass the capacity gate. Audit caught
+  // a race where two vendor swaps in the same tick both saw size=1 +
+  // LOADING=0, both skipped eviction, both loaded → pool hit 3.
+  // Counting the new load in advance closes the window.
+  while (VOICE_POOL.size + LOADING.size + 1 > POOL_MAX) {
+    const evictableExists = Array.from(VOICE_POOL.values()).some((v) => !v.sticky);
+    if (!evictableExists) break; // pool only has sticky entries — accept overflow rather than infinite-loop
+    evictLRU();
+  }
   const promise = (async () => {
     try {
       // First-time load on the Arbiter voice drives the public state
@@ -287,6 +306,24 @@ export function disposeVoice(voiceId: string): void {
     if (typeof entry.module?.delete === 'function') entry.module.delete();
   } catch { /* ignore */ }
   VOICE_POOL.delete(voiceId);
+}
+
+/** Drop the currently-loaded Arbiter voice (and clear sticky flag).
+ *  Called by the voice-settings observer when the player changes
+ *  their kokoroVoice setting — without this, the old sticky entry
+ *  is unevictable and the pool leaks ~100 MB per swap. The new
+ *  voice loads on the next speak() call. */
+export function disposeStickyArbiterVoice(): void {
+  for (const [vid, entry] of VOICE_POOL) {
+    if (entry.sticky) {
+      try {
+        if (typeof entry.module?.delete === 'function') entry.module.delete();
+      } catch { /* ignore */ }
+      VOICE_POOL.delete(vid);
+    }
+  }
+  // Reset the latch so prewarmKokoro can re-fire for the new voice.
+  prewarmStarted = false;
 }
 
 export function speak(text: string, voiceId?: string | null): number {
