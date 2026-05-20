@@ -76,15 +76,17 @@ function lookup(id: string): Concept | null {
 // verb (with / without a target, with / without a noun) without
 // repetition. Surfaced under every card in reward-green.
 const EXAMPLES: Record<string, string[]> = {
-  // Movement
-  move_action: ['walk', 'go north', 'continue'],
-  sprint_action: ['sprint', 'dash west', 'run to the wall'],
-  take_cover_action: ['take cover', 'hide behind the rubble', 'duck for cover'],
+  // Movement — every example here passes the
+  // __tests__/actionReferenceExamples.test contract: each phrase
+  // resolves to the parent card's intent.
+  move_action: ['walk', 'go north', 'head onward'],
+  sprint_action: ['sprint', 'dash west', 'sprint to the wall'],
+  take_cover_action: ['take cover', 'hide behind the rubble', 'duck behind the wall'],
   perform_action: ['perform', 'sing', 'play a tune'],
   assist_action_combat: ['help', 'assist the reclaimer'],
   hold_action: ['ready', 'wait for an opening'],
   flee_action: ['flee', 'run away', 'retreat'],
-  classic_move: ['walk', 'step forward', 'move closer'],
+  classic_move: ['walk', 'walk forward', 'move closer'],
   difficult_terrain: ['cross the mud', 'wade through the silt'],
   crawl: ['crawl', 'crawl forward'],
   climb: ['climb', 'climb the ladder', 'climb the wall'],
@@ -122,7 +124,7 @@ const EXAMPLES: Record<string, string[]> = {
 
   // Evasive
   dodge_melee: ['dodge the swing', 'duck the blow'],
-  fight_back: ['fight back', 'parry', 'counter'],
+  fight_back: ['fight back', 'riposte', 'counter'],
   dive_for_cover: ['dive for cover', 'dive behind the wall'],
 
   // Skills

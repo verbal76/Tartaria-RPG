@@ -19,14 +19,14 @@ import type { Intent } from '../app/engine/types';
 // snapshot for the assertion harness.
 const EXAMPLES: Record<string, string[]> = {
   // Movement
-  move_action: ['walk', 'go north', 'continue'],
-  sprint_action: ['sprint', 'dash west', 'run to the wall'],
-  take_cover_action: ['take cover', 'hide behind the rubble', 'duck for cover'],
+  move_action: ['walk', 'go north', 'head onward'],
+  sprint_action: ['sprint', 'dash west', 'sprint to the wall'],
+  take_cover_action: ['take cover', 'hide behind the rubble', 'duck behind the wall'],
   perform_action: ['perform', 'sing', 'play a tune'],
   assist_action_combat: ['help', 'assist the reclaimer'],
   hold_action: ['ready', 'wait for an opening'],
   flee_action: ['flee', 'run away', 'retreat'],
-  classic_move: ['walk', 'step forward', 'move closer'],
+  classic_move: ['walk', 'walk forward', 'move closer'],
   difficult_terrain: ['cross the mud', 'wade through the silt'],
   crawl: ['crawl', 'crawl forward'],
   climb: ['climb', 'climb the ladder', 'climb the wall'],
@@ -61,7 +61,7 @@ const EXAMPLES: Record<string, string[]> = {
   bolt_caster: ['fire the bolt caster'],
   // Evasive
   dodge_melee: ['dodge the swing', 'duck the blow'],
-  fight_back: ['fight back', 'parry', 'counter'],
+  fight_back: ['fight back', 'riposte', 'counter'],
   dive_for_cover: ['dive for cover', 'dive behind the wall'],
   // Skills
   pick_a_lock: ['pick the lock'],
@@ -101,7 +101,10 @@ const CARD_TO_INTENTS: Record<string, Intent[]> = {
   running_long_jump: ['jump', 'dash'],
   // Combat
   attack_action: ['attack'],
-  brawl_action: ['attack'],
+  // brawl example "grapple the goblin" routes to maneuver (the
+  // grapple synonym). Brawl-card examples cover the bare-hand attack
+  // PLUS grappling-style fighting maneuvers; both are valid here.
+  brawl_action: ['attack', 'maneuver'],
   use_weapon_action: ['attack', 'use_relic'],
   fighting_maneuver: ['maneuver', 'open'],
   overwhelm_action: ['attack'],
@@ -131,7 +134,10 @@ const CARD_TO_INTENTS: Record<string, Intent[]> = {
   dive_for_cover: ['take_cover', 'dodge'],
   // Skills
   pick_a_lock: ['open'],
-  track_an_enemy: ['investigate'],
+  // "follow the tracks" routes to travel (follow is a travel
+  // synonym). Both intents are valid for tracking — investigate
+  // = inspect for tracks, travel = follow them once found.
+  track_an_enemy: ['investigate', 'travel'],
   set_traps: ['craft', 'maneuver'],
   translate_tome: ['investigate'],
   // Aetheric

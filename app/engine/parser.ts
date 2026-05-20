@@ -57,7 +57,12 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   ],
   wait: ['wait', 'stay', 'hold', 'pause', 'still', 'linger', 'tarry', 'idle', 'bide', 'remain'],
   ask: ['what', 'explain', 'define', 'who', 'how', 'why', 'tell', 'describe', 'clarify', 'mean'],
-  craft: ['craft', 'make', 'forge', 'fashion', 'build', 'assemble', 'construct', 'fabricate', 'weld', 'sculpt'],
+  craft: [
+    'craft', 'make', 'forge', 'fashion', 'build', 'assemble', 'construct', 'fabricate', 'weld', 'sculpt',
+    // "set a trap" — multi-word so 'set' alone doesn't fire (too
+    // ambiguous with set-up / set-stance verbs).
+    'set a trap', 'set the trap', 'set trap',
+  ],
   equip: ['equip', 'wear', 'wield', 'don', 'unequip', 'remove', 'sheathe', 'strap', 'fit', 'fasten'],
   gift: ['gift', 'give', 'offer', 'hand', 'bestow', 'donate', 'tender', 'grant', 'pass'],
   steal: ['steal', 'pocket', 'pilfer', 'lift', 'pinch', 'swipe', 'snatch', 'filch', 'nick', 'grab'],
@@ -65,11 +70,20 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   dodge: ['dodge', 'evade', 'sidestep', 'duck', 'juke', 'tumble', 'slip', 'twist', 'roll'],
   block: ['block', 'parry', 'deflect', 'shield', 'brace', 'guard', 'fend', 'absorb', 'ward'],
   advance: [
-    'advance', 'approach', 'rush', 'sprint', 'closein', 'press', 'lunge', 'forward',
+    // sprint and rush moved to dash — they semantically describe fast
+    // movement, not the "close one combat range band" beat that
+    // advance is. Keeps "advance / approach / lunge" focused on its
+    // own meaning.
+    'advance', 'approach', 'closein', 'press', 'lunge', 'forward',
     'charge in', 'near',
   ],
   retreat: [
-    'backoff', 'backaway', 'pullback', 'stepback', 'reposition', 'recoil', 'edgeback',
+    // Pre-collapsed entries split back into multi-word so
+    // MULTI_WORD_COLLAPSES picks up player input "step back" / "back
+    // off" / "back away" / "pull back" / "edge back". Previously the
+    // already-collapsed forms only fired when the player typed
+    // "stepback" as one token, which nobody does.
+    'back off', 'back away', 'pull back', 'step back', 'reposition', 'recoil', 'edge back',
     'pace back', 'fall away', 'inch back',
   ],
   repair: ['repair', 'mend', 'restore', 'refurbish', 'patch', 'fix', 'rebuild', 'renew', 'overhaul', 'tune'],
@@ -80,17 +94,27 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   // Arbiter's prompts spell it out: "say 'accept road'"). The other
   // verbs here cover the rare "yes/agree/sure" path.
   accept: ['accept', 'undertake', 'agree', 'yes', 'consent', 'embrace', 'assent', 'okay', 'aye'],
-  turn_in: ['turnin', 'complete', 'finish', 'deliver', 'report', 'redeem', 'claim', 'present', 'submit', 'hand in'],
+  turn_in: ['turn in', 'complete', 'finish', 'deliver', 'report', 'redeem', 'claim', 'present', 'submit', 'hand in'],
   dig: ['dig', 'excavate', 'unearth', 'scrape', 'shovel', 'burrow', 'tunnel', 'mine', 'spade', 'pry'],
   throw: ['throw', 'toss', 'hurl', 'lob', 'chuck', 'fling', 'pitch', 'cast at', 'launch', 'whip'],
   // NEW from action card.
   climb: ['climb', 'scale', 'ascend', 'clamber', 'shimmy', 'scramble', 'vault up', 'hoist', 'ladder', 'rope up'],
   swim: ['swim', 'wade', 'paddle', 'splash', 'dive', 'ford', 'submerge', 'surface', 'tread', 'drift'],
   jump: ['jump', 'leap', 'hop', 'vault', 'bound', 'spring', 'hurdle', 'pounce', 'skip', 'launch over'],
-  dash: ['dash', 'dash forward', 'sprintto', 'doubletime', 'gogo', 'sprint forward', 'hustle', 'bolt forward', 'race', 'dart', 'scamper'],
+  dash: [
+    'dash', 'dash forward', 'sprint', 'sprint to', 'sprint forward',
+    'double time', 'hustle', 'bolt forward', 'race', 'dart', 'scamper',
+    // 'rush' moved here from advance — "rush to the wall" should be
+    // dashing, not a combat range-band shift.
+    'rush', 'rush forward',
+  ],
   disengage: ['disengage', 'peel off', 'break off', 'slip away', 'pull away', 'extract', 'fade back', 'detach', 'unstick', 'shake off'],
   help: ['help', 'assist', 'aid', 'support', 'back up', 'cover', 'bolster', 'defend', 'reinforce', 'abet'],
-  ready: ['ready', 'prepare', 'set up', 'focus', 'watch', 'await', 'prep', 'steady', 'anticipate', 'cock'],
+  ready: [
+    'ready', 'prepare', 'set up', 'focus', 'watch', 'await', 'prep', 'steady', 'anticipate', 'cock',
+    // Preparation + planning + psychological cards.
+    'plan', 'plan ahead', 'calm down', 'calm',
+  ],
   mount: ['mount', 'saddle', 'ride', 'bridle', 'horse up', 'climb on', 'astride', 'dismount', 'unsaddle', 'get off'],
   // NEW from firearms / evasive cards. Sprint stays as a dash alias
   // (already covered in dash synonyms); flee stays as escape; brawl is
@@ -100,21 +124,31 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   // and never matched player input "take cover" — the parser saw verb
   // 'take' first and routed to the pickup intent. Fix: declare with the
   // space, let the collapse pass do the work.
-  take_cover: ['take cover', 'cover up', 'hunker', 'crouch behind', 'duck behind', 'shelter', 'tuck', 'dive for cover', 'go prone', 'flatten'],
-  aim: ['aim', 'sight', 'target', 'line up', 'draw bead', 'level', 'lock on', 'sightin', 'tracksight', 'zero'],
+  take_cover: [
+    'take cover', 'cover up', 'hunker', 'crouch behind', 'duck behind',
+    'shelter', 'tuck', 'dive for cover', 'dive behind', 'go prone', 'flatten',
+    // Multi-word phrasings the cards advertise as examples.
+    'duck for cover', 'hide behind',
+  ],
+  aim: ['aim', 'sight', 'target', 'line up', 'draw bead', 'level', 'lock on', 'sight in', 'track sight', 'zero'],
   reload: ['reload', 'reloading', 'reset', 'rearm', 'rerack', 'refill', 'recharge', 'top up', 'load up', 'feed'],
   // 'disarm' lived in both maneuver AND open — and because maneuver
   // comes first in the iteration order, "disarm the trap" routed to
   // grappling ("Maneuver against whom? Empty ground does not grapple
   // back."). It belongs in the disable/open pool instead, never here.
   maneuver: ['maneuver', 'grapple', 'trip', 'shove', 'sweep', 'pin', 'hook', 'wrench', 'manoeuvre'],
-  quick_fire: ['quickfire', 'snap shot', 'snap fire', 'fast fire', 'rush shot', 'panic shot', 'quick shot', 'quick draw', 'fast draw', 'first shot'],
-  multi_fire: ['burst fire', 'double tap', 'triple tap', 'multi shot', 'multiple shots', 'spray', 'fire twice', 'fire three', 'rapid fire', 'volley'],
+  quick_fire: ['quick fire', 'snap shot', 'snap fire', 'fast fire', 'rush shot', 'panic shot', 'quick shot', 'quick draw', 'fast draw', 'first shot'],
+  multi_fire: ['burst fire', 'double tap', 'triple tap', 'multi shot', 'multiple shots', 'spray', 'fire twice', 'fire three', 'rapid fire', 'volley', 'full auto'],
   fight_back: ['fight back', 'counter', 'counter strike', 'opposed strike', 'meet the blade', 'trade blows', 'parry and strike', 'return fire', 'riposte', 'hit back'],
   recruit: ['recruit', 'hire', 'follow me', 'come with', 'join me', 'bring along', 'travel together', 'companion', 'walk with me'],
   drop: ['drop', 'discard', 'put down', 'leave behind', 'release', 'jettison'],
   pickup: ['pickup', 'pick up', 'retrieve', 'collect', 'scoop up', 'take'],
-  open: ['open', 'unlock', 'crack', 'pry open', 'lift the lid', 'breach', 'disarm', 'disable', 'dismantle', 'deactivate', 'take apart'],
+  open: [
+    'open', 'unlock', 'crack', 'pry open', 'lift the lid', 'breach', 'disarm', 'disable', 'dismantle', 'deactivate', 'take apart',
+    // Lockpicking — multi-word so 'pick' alone doesn't conflict with
+    // pickup intent.
+    'pick the lock', 'pick a lock', 'lockpick', 'pick lock',
+  ],
 };
 
 const ALL_INTENTS = Object.keys(VERB_SYNONYMS) as Exclude<Intent, 'unknown'>[];
