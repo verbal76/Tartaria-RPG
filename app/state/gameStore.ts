@@ -8494,6 +8494,23 @@ function handlePlayerDeath(
 // location description. Sometimes plants a hook (the player's interest in
 // "the traps" was rewarded with finding actual rigged-trap remnants);
 // usually just enriches the scene without a payoff.
+
+// Pick `n` distinct random elements from `arr` (Fisher-Yates partial).
+// Used by buildLookAroundLine to rotate which interactables surface on
+// each look when the authored pool is larger than what fits in one
+// readable line. Same pool, varied presentation — kills the "I always
+// see the same things" effect without changing what's actually
+// searchable in the scene.
+function shuffleSlice<T>(arr: readonly T[], n: number): T[] {
+  if (arr.length <= n) return [...arr];
+  const indices = arr.map((_, i) => i);
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j]!, indices[i]!];
+  }
+  return indices.slice(0, n).map((i) => arr[i]!);
+}
+
 function narrateAmbientFind(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -8595,12 +8612,23 @@ function narrateCasualLook(
   //    authored interactables array (or extractor fallback). This
   //    is the "bookshelf on the north wall, spears on the southern
   //    wall" line — concrete nouns, not mood prose.
+  //
+  //    Per playtest feedback ("why do I always see the same few
+  //    things, are there broken wagons everywhere?"): when the pool
+  //    is larger than 8, shuffle and show a random 8 each look. The
+  //    full pool is still authored and searchable; the rotation just
+  //    keeps the surface description from feeling static. With ~20-
+  //    25 authored nouns per location now, two consecutive looks
+  //    almost never show the same set.
   const interactables: string[] = [];
   for (const n of scene.ambientNouns ?? []) {
     if (!interactables.includes(n)) interactables.push(n);
   }
   if (interactables.length > 0) {
-    parts.push(`You see: ${interactables.slice(0, 8).join(', ')}.`);
+    const shown = interactables.length <= 8
+      ? interactables
+      : shuffleSlice(interactables, 8);
+    parts.push(`You see: ${shown.join(', ')}.`);
   }
 
   // 3. Anything alive nearby — combat-relevant. Vendor, enemies,

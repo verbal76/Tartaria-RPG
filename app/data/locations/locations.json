@@ -26,7 +26,20 @@
       "pillar",
       "crater",
       "marker",
-      "flat"
+      "flat",
+      "wave",
+      "mound",
+      "rift",
+      "wagon",
+      "track",
+      "well",
+      "compass",
+      "stone",
+      "flare",
+      "sphere",
+      "spark stone",
+      "tent",
+      "tracks"
     ]
   },
   {
@@ -57,7 +70,20 @@
       "mosaic",
       "pavement",
       "gate",
-      "crypt"
+      "crypt",
+      "capacitor",
+      "sentinel",
+      "drone",
+      "lantern",
+      "tapestry",
+      "chandelier",
+      "necklace",
+      "fountain",
+      "pedestal",
+      "archive",
+      "throne",
+      "seal",
+      "tablet"
     ]
   },
   {
@@ -147,7 +173,25 @@
       "crystal",
       "pipe",
       "panel",
-      "archive"
+      "archive",
+      "vat",
+      "hammer",
+      "frame",
+      "recipe",
+      "prototype",
+      "filter",
+      "log",
+      "compass",
+      "beacon",
+      "tank",
+      "anvil",
+      "journal",
+      "gauge",
+      "glove",
+      "rune-glass",
+      "bellows",
+      "capacitor",
+      "blueprint"
     ]
   },
   {
@@ -200,7 +244,20 @@
       "wall",
       "window",
       "pavement",
-      "red tower"
+      "red tower",
+      "port",
+      "circuit",
+      "vent",
+      "fungus",
+      "cache",
+      "shard",
+      "fungal patch",
+      "horn",
+      "insignia",
+      "mirror",
+      "pebble",
+      "pendant",
+      "core"
     ]
   },
   {
@@ -262,7 +319,18 @@
       "crate",
       "banner",
       "wagon",
-      "lookout"
+      "lookout",
+      "skeleton",
+      "cipherstone",
+      "manifesto",
+      "chest",
+      "flagstone",
+      "key",
+      "grate",
+      "passage",
+      "lever",
+      "tome",
+      "ash"
     ]
   },
   {
@@ -290,7 +358,17 @@
       "crypt",
       "mud",
       "inscription",
-      "cistern"
+      "cistern",
+      "pike",
+      "core",
+      "emitter",
+      "trench",
+      "shrapnel",
+      "mask",
+      "potion",
+      "rifle",
+      "stone",
+      "badge"
     ]
   },
   {
@@ -319,7 +397,20 @@
       "sand",
       "shard",
       "observatory",
-      "inscription"
+      "inscription",
+      "lockbox",
+      "rack",
+      "panel",
+      "core",
+      "knight",
+      "plate",
+      "cleaver",
+      "kit",
+      "chain",
+      "staff",
+      "sphere",
+      "gauntlet",
+      "scanner"
     ]
   },
   {
@@ -377,7 +468,12 @@
       "shore",
       "wreckage",
       "shell",
-      "crag"
+      "crag",
+      "nest",
+      "shedding",
+      "horror",
+      "bell",
+      "hull"
     ]
   },
   {
@@ -408,7 +504,13 @@
       "door",
       "altar",
       "water",
-      "mud"
+      "mud",
+      "bell",
+      "harpoon",
+      "hull",
+      "deposit",
+      "anchor",
+      "scale"
     ]
   },
   {
@@ -436,7 +538,15 @@
       "hull",
       "water",
       "shore",
-      "cargo"
+      "cargo",
+      "statue",
+      "crystal",
+      "scale",
+      "harpoon",
+      "spyglass",
+      "anchor",
+      "map",
+      "eye"
     ]
   },
   {
@@ -466,7 +576,18 @@
       "flotsam",
       "shore",
       "pier",
-      "boat"
+      "boat",
+      "hull",
+      "nest",
+      "debris",
+      "scale",
+      "spyglass",
+      "anchor",
+      "harpoon",
+      "vortex",
+      "tendril",
+      "deposit",
+      "echo"
     ]
   },
   {
@@ -494,14 +615,31 @@
       "pillar",
       "inscription",
       "bone",
-      "crypt"
+      "crypt",
+      "throne",
+      "crown",
+      "horn",
+      "greaves",
+      "sledge",
+      "mask",
+      "emitter",
+      "blueprint",
+      "longbow",
+      "armor",
+      "warhammer",
+      "axe",
+      "knuckles",
+      "shield",
+      "jar",
+      "skeleton",
+      "keyway"
     ]
   },
   {
     "id": "mud_flood_nexus",
     "name": "Mud Flood Nexus",
     "type": "control_center",
-    "description": "The subterranean control center believed to have regulated the disaster itself. Touching it might mean rebirth — or a second flood.",
+    "description": "The subterranean control center believed to have regulated the disaster itself. Touching it might mean rebirth \u2014 or a second flood.",
     "danger": 5,
     "tags": [
       "nexus",
@@ -522,7 +660,24 @@
       "panel",
       "pipe",
       "corridor",
-      "archive"
+      "archive",
+      "valve",
+      "sensor",
+      "gauge",
+      "blueprint",
+      "anchor",
+      "lever",
+      "stabilizer",
+      "skeleton",
+      "diagram",
+      "core",
+      "pathway",
+      "pump",
+      "code",
+      "mask",
+      "logbook",
+      "shrine",
+      "horn"
     ]
   },
   {
@@ -581,7 +736,20 @@
       "trap",
       "pillar",
       "arch",
-      "footprint"
+      "footprint",
+      "spike",
+      "ladder",
+      "barricade",
+      "marker",
+      "torch",
+      "skeleton",
+      "fissure",
+      "brambles",
+      "smear",
+      "lever",
+      "header",
+      "portcullis",
+      "detector"
     ]
   },
   {
@@ -611,7 +779,23 @@
       "inscription",
       "stair",
       "gate",
-      "crypt"
+      "crypt",
+      "shelf",
+      "moss",
+      "tablet",
+      "well",
+      "burrow",
+      "horn",
+      "stalactite",
+      "toy",
+      "rope",
+      "chisel",
+      "filter",
+      "leather",
+      "coin",
+      "mask",
+      "map",
+      "shrine"
     ]
   }
 ]
