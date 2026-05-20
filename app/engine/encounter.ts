@@ -12,6 +12,18 @@ const weather = weatherData as WeatherEntry[];
 const hazards = hazardsData as Hazard[];
 const locations = locationsData as Location[];
 
+/** Lookup an enemy by name. Used by the wasteland-encounter skirmish
+ *  spawner to convert a name in the encounter pool into a real Enemy
+ *  the combat system can use. Returns a fresh copy so trait state
+ *  doesn't bleed between scenes. */
+export function findEnemyByName(name: string): Enemy | null {
+  const t = name.toLowerCase().trim();
+  if (!t) return null;
+  const match = enemies.find((e) => e.name.toLowerCase() === t);
+  if (!match) return null;
+  return JSON.parse(JSON.stringify(match)) as Enemy;
+}
+
 interface LootEntry { name: string; rarity: Rarity }
 const loot = lootData as LootEntry[];
 

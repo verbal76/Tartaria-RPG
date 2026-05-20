@@ -42,6 +42,7 @@ import {
   rollEncounter,
   getLocationById,
   pickEncounterFromLadder,
+  findEnemyByName,
 } from '../engine/encounter';
 import {
   buildOpening,
@@ -6318,8 +6319,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (scene.enemies.length === 0) {
       const wasteSteps = (get().wastelandStepsSinceEncounter ?? 0) + 1;
       set(() => ({ wastelandStepsSinceEncounter: wasteSteps }));
+      // Tuning per playtest: a long run with zero combat at all means
+      // the gate was too cautious. Tightened from threshold=3 /
+      // chance=0.4 (≈ 7% combat per step after skirmish-weight math)
+      // to threshold=2 / chance=0.55 — combined with the bumped
+      // skirmish weight in container_loot.json, this lands around
+      // 18-22% combat per step. Walking through Tartaria SHOULD feel
+      // dangerous.
       const enc = pickWastelandEncounter(scene.location, {
         stepsSinceLastEncounter: wasteSteps,
+        threshold: 2,
+        rollChance: 0.55,
       });
       if (enc) {
         set(() => ({ wastelandStepsSinceEncounter: 0 }));
@@ -6348,10 +6358,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         }
         if (enc.type === 'skirmish' && enc.enemyName) {
-          get().appendLog(
-            'combat',
-            `${enc.enemyName} closes — combat starts. (Skirmish-spawn integration pending; for now the encounter narrates and resolves.)`,
-          );
+          // Spawn the enemy into the scene. Combat starts as soon as
+          // the player submits their next action — the engine's combat
+          // resolution checks scene.enemies.length on every player turn.
+          const spawned = findEnemyByName(enc.enemyName);
+          if (spawned) {
+            set((s) => {
+              if (!s.currentScene) return s;
+              return {
+                currentScene: {
+                  ...s.currentScene,
+                  enemies: [...s.currentScene.enemies, spawned],
+                  enemyHps: [...s.currentScene.enemyHps, spawned.hp],
+                  activeEnemyIdx: s.currentScene.enemies.length,
+                  range: s.currentScene.range ?? 'close',
+                  enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
+                },
+              };
+            });
+            get().appendLog(
+              'combat',
+              `${spawned.name} closes — ${spawned.attack} ready, ${spawned.damage} damage on a hit. (range: close)`,
+            );
+          } else {
+            get().appendLog('debug', `wasteland-encounter: skirmish spawn missed (no enemy "${enc.enemyName}" in catalog).`);
+          }
         }
         void get().persist();
       }

@@ -66,10 +66,10 @@
 
   "skirmish_pack": {
     "type": "skirmish",
-    "weight": 18,
+    "weight": 35,
     "matchers": ["mud", "outskirts", "open", "ruin", "borderlands"],
     "narration": "Movement low and fast — a {enemy} cuts across your path. You're closer than either of you wanted to be.",
-    "enemyPool": ["Gutter Rat", "Aetheric Slug", "Mud Lurker", "Aetherbat", "Bog Hound"],
+    "enemyPool": ["Gutter Rat", "Aetheric Slug", "Mud Lurker", "Aetherbat", "Bog Hound", "Mud Spider", "Silt Serpent", "Aetheric Worm", "Rust Lurker", "Scrap Drone"],
     "loot": []
   },
 
