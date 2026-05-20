@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Keyboard } from 'react-native';
 import { TutorialTarget } from './TutorialTarget';
+import { BrandedKeyboard } from './BrandedKeyboard';
 import { getVoiceSettings, onVoiceSettingsChange } from '../voice/voiceSettings';
 import { isSpeaking as ttsIsSpeaking, stopAndClear as stopTTS } from '../voice/TTSManager';
 import { startListening, stopListening, isListening } from '../voice/STTManager';
@@ -45,6 +46,13 @@ function shortWeaponLabel(name: string): string {
 export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, inCombat, equippedMain, equippedOff, range }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
+  // BrandedKeyboard is the Tartaria-themed on-screen keyboard. We
+  // suppress the system IME (showSoftInputOnFocus={false}) and mount
+  // the branded one below the input row when the player taps in.
+  // The preview line at the top of the keyboard panel shows what
+  // they're typing, so the system-keyboard "covers the input"
+  // problem the playtest log flagged is solved structurally.
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
 
   // Voice state — both flags drive a tiny render loop so the MIC /
   // SILENCE ARBITER button swaps live when TTS starts / stops or the
@@ -94,6 +102,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     // what is going on right now" stuck in the box after Act.
     setText('');
     inputRef.current?.clear();
+    // Close the branded keyboard on submit. Player can re-open it
+    // by tapping the input again.
+    setKeyboardOpen(false);
   };
 
   const handleMic = async () => {
@@ -244,8 +255,19 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           placeholderTextColor={listening ? '#6a9bbf' : '#5a5246'}
           onSubmitEditing={handleSubmit}
           returnKeyType="send"
-          // Disable autocorrect AND autocomplete so Android IME doesn't
-          // reinsert composition tail after submit.
+          // System IME is suppressed; the BrandedKeyboard below
+          // takes its place. showSoftInputOnFocus={false} stops
+          // Android from raising the OS keyboard; we still want
+          // the cursor + selection behaviour of TextInput, so we
+          // keep editability but route keystrokes through our own
+          // panel via the keyboardOpen state.
+          showSoftInputOnFocus={false}
+          onFocus={() => {
+            setKeyboardOpen(true);
+            // Belt-and-suspenders: if any OS keyboard ever sneaks up,
+            // dismiss it. (Some Android ROMs ignore showSoftInputOnFocus.)
+            Keyboard.dismiss();
+          }}
           autoCorrect={false}
           autoCapitalize="none"
           autoComplete="off"
@@ -273,6 +295,15 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           <Text style={styles.sendText}>Act</Text>
         </TouchableOpacity>
       </TutorialTarget>
+      {keyboardOpen && (
+        <BrandedKeyboard
+          value={text}
+          onKey={(ch) => setText((t) => t + ch)}
+          onBackspace={() => setText((t) => t.slice(0, -1))}
+          onSubmit={handleSubmit}
+          onDismiss={() => setKeyboardOpen(false)}
+        />
+      )}
     </View>
   );
 }

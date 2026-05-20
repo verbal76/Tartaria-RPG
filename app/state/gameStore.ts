@@ -1653,6 +1653,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('world', h.plantedLine);
     }
     if (vendor) {
+      // Return-visit gate: when this is an anchor NPC the player has
+      // already met in this room, don't re-narrate the dramatic
+      // "Hoofbeats on the silt — Irma draws up beside you" arrival on
+      // every revisit. Playtest log caught this — Irma kept "arriving"
+      // every time the player walked back to the Armory, which broke
+      // the room's continuity. First visit gets the full arrival; later
+      // visits get a quieter "still here" line. Random non-anchor
+      // vendors always get the arrival line (they aren't permanent).
+      const isAnchor = !!(hubRoom?.anchorNpc && vendor.name === hubRoom.anchorNpc);
+      const isReturnVisit = isAnchor && !!existing && (existing.visitCount ?? 0) >= 1;
+      if (isReturnVisit) {
+        get().appendLog(
+          'world',
+          `${vendor.name} is still at their post — pack open, wares laid out. They nod without looking up.`,
+        );
+      } else {
       // Narrate the arrival in the world channel first — vendors don't
       // appear out of nowhere. The player should see they showed up
       // alongside the rest of the scene paragraph, with their
@@ -1669,6 +1685,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'arbiter',
         `The Arbiter inclines their head toward the newcomer. "${vendor.name}, ${vendor.title}. ${vendor.description}"`,
       );
+      }
       // Faction vendors may offer a contract the player qualifies for.
       if (vendor.faction) {
         const pool = availableFactionQuests(
