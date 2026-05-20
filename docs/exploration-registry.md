@@ -201,11 +201,25 @@ burial shelf · stone coffin · dust trail · bone fragment · ritual candle · 
 
 ---
 
-# Macros not yet expanded (still at base interactables)
+# v3 — last five macros expanded
 
-Authoring opportunities for v3 — these macros got minimal coverage from v1 and nothing from v2/v2.1:
-- `samarran` — research city, lab/scholarship feel
-- `voronov` — half-buried disaster zone
-- `endless_stair` — vertical descent
-- `zharaks_teeth` — siren-spire shoreline (12 from initial pass)
-- `sinking_cathedral` — drowned chapel (14 from initial pass)
+OTA 162. ~27 nouns each authored speculatively per macro's character:
+
+## Samarran (research city)
+laboratory glass · brass instrument · copper coil · beaker rack · slide rule · calibration weight · etheric meter · lecture hall · blackboard · chalk dust · microscope · prism · mercury vial · salt lamp · papyrus stack · vellum scroll · ink ledger · ledger book · journal stack · student bench · scribe's quill · broken telescope · observatory dish · dust-covered desk · research chart · experiment notes · rune-glass slide
+
+## Voronov (half-buried suburb)
+child's toy · broken doll · hearth stone · kettle · copper pot · dining chair · family portrait · mantle clock · family ledger · garden gate · picket fence · mailbox · lamppost · street sign · road marker · half-buried wagon · abandoned cart · water main · telephone pole · bell pull · door knocker · window shutter · front step · kitchen tile · child's drawing · wedding ring · rocking chair
+
+## Endless Stair (vertical descent)
+hand rope · descent rope · rappel hook · pulley wheel · harness clip · broken pulley · depth marker · mile post · rest landing · sealed door · sealed plaque · abandoned pack · fallen pickaxe · frozen explorer · dropped lantern · broken rope · rusted pulley · descent bell · signal cord · climbing crampon · ice axe · anchor bolt · climbing piton · rope ladder · safety chain · carved waypoint · depth gauge
+
+## Zharak's Teeth (siren-spire shoreline)
+siren shell · sea fungus patch · kelp drift · tidal pool · oyster bed · hermit crab · crab claw · coral shelf · anemone bloom · whale bone · tide line · salt crust · barnacle ridge · seaweed mass · fisher's net · broken net · tangle line · fish hook · lobster trap · mooring post · sea-glass shard · abandoned skiff · fisherman's lantern · salted line · tackle box · siren song-stone
+
+## Sinking Cathedral (drowned chapel)
+stained glass · broken pew · prayer cushion · communion cup · hymnal · choir loft · organ pipe · organ bench · kneeler · candleholder · tithing box · prayer beads · votive candle · baptismal font · holy water basin · censer · vestment · reliquary · processional cross · pulpit · lectern · bell rope · stained chalice · monstrance · missal · altar cloth · sacristy door
+
+All 21 macros are now at 30+ authored interactables. The thinnest
+pools (samarran, voronov, endless_stair, zharaks_teeth, sinking_cathedral)
+are now at 35-41 each.
