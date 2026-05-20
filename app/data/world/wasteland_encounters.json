@@ -126,5 +126,97 @@
       { "name": "Mud Fragment", "weight": 30, "min": 1, "max": 3, "kind": "misc", "tags": ["mud","glass"] },
       { "name": "Aether Dust", "weight": 20, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","dust","distillable"] }
     ]
+  },
+
+  "sunken_chapel": {
+    "type": "mini_dungeon",
+    "weight": 4,
+    "matchers": ["mud", "buried", "ruin"],
+    "narration": "A church steeple breaks the mud at a sideways angle — the rest of the building swallowed whole. The steeple's broken door yawns open and lets you down into what used to be the choir balcony. Inside the air is dry, dimmer than outside, and the pews below the mudline are still arranged for a service that never ended. A pre-flood reliquary lies overturned on the altar. You pick through what the flood spared.",
+    "loot": [
+      { "name": "Aetheric Locket", "weight": 30, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] },
+      { "name": "Worn Tartarian Coin", "weight": 35, "min": 4, "max": 10, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "First Aid Kit", "weight": 20, "min": 1, "max": 1, "kind": "consumable", "tags": ["medical"] },
+      { "name": "Aether Crystal", "weight": 15, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] }
+    ],
+    "lore_note": "A burned ledger names every Tartarian who took shelter here when the flood came. The last entry is in a child's handwriting: 'we are still inside. someone knock on the steeple if you find us.'"
+  },
+
+  "bandit_cave": {
+    "type": "mini_dungeon",
+    "weight": 5,
+    "matchers": ["mud", "outskirts", "open", "ruin", "borderlands"],
+    "narration": "A natural cave mouth, low, half-curtained by a tarp pulled aside. Inside: a cold cookfire, three bedrolls, a strongbox kicked open in haste. Someone left in a hurry — but someone else is on their way back, and you can hear footsteps in the throat of the cave behind you.",
+    "loot": [
+      { "name": "Throwing Knife", "weight": 30, "min": 2, "max": 4, "kind": "misc", "tags": ["weapon","throwable"] },
+      { "name": "Worn Tartarian Coin", "weight": 30, "min": 6, "max": 14, "kind": "misc", "tags": ["currency"] },
+      { "name": "Rusted Blade", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["weapon","melee"] },
+      { "name": "Trail Rations", "weight": 15, "min": 1, "max": 3, "kind": "consumable", "tags": ["food"] }
+    ],
+    "bandit_pool": ["Reclaimer Ambusher", "Mud Monarch"],
+    "lore_note": "Scratched on the cave wall: a tally of marks in three colours. Whatever they were counting, the count was high."
+  },
+
+  "drowned_bunker": {
+    "type": "mini_dungeon",
+    "weight": 3,
+    "matchers": ["mud", "buried", "open"],
+    "narration": "A blast door, half-buried, the steel still warm to the touch even in the cold. It opens with effort. Inside: a sealed pre-flood bunker. Emergency lights still throb on a slow pulse. Cots, sealed crates, a wall map with cities still labeled by their original names. Whoever lived down here did not run out of supplies. They ran out of reasons.",
+    "loot": [
+      { "name": "First Aid Kit", "weight": 30, "min": 1, "max": 2, "kind": "consumable", "tags": ["medical"] },
+      { "name": "Aetheric Compass", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["relic","navigation"] },
+      { "name": "Trail Rations", "weight": 25, "min": 2, "max": 4, "kind": "consumable", "tags": ["food"] },
+      { "name": "Climbing Rope", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["tool"] },
+      { "name": "Aether Crystal", "weight": 10, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] }
+    ],
+    "lore_note": "On the central desk: a logbook in three different hands. The final entry, written calmly: 'The Compass keeps pointing at the Cradle. None of us have argued with it for weeks. Tomorrow we walk.' The compass on the desk is the one in your pack now.",
+    "quest_hook": { "kind": "mystery", "id": "mystery_cradle_compass" }
+  },
+
+  "monarch_cache": {
+    "type": "mini_dungeon",
+    "weight": 3,
+    "matchers": ["mud", "outskirts", "ruin", "borderlands"],
+    "narration": "A grey stone, no carving, no name. You almost walk past it. The mud at its base has been disturbed recently in a pattern too regular for weather. Underneath: a flat tin box. Inside the box: a coded note, a small purse, an obsidian token cut to the shape of an open eye. You have just walked into one end of a Mud Monarch dead-drop.",
+    "loot": [
+      { "name": "Worn Tartarian Coin", "weight": 35, "min": 10, "max": 20, "kind": "misc", "tags": ["currency"] },
+      { "name": "Aether Crystal", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Aetheric Shard", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","shard"] },
+      { "name": "Obsidian Eye Token", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["faction","mud_monarchs","token"] }
+    ],
+    "bandit_pool": ["Mud Monarch"],
+    "lore_note": "The coded note is short. The plaintext underneath is just a name and a road. The road is one you've been on."
+  },
+
+  "drowned_library": {
+    "type": "mini_dungeon",
+    "weight": 2,
+    "matchers": ["mud", "buried", "ruin"],
+    "narration": "A reading room — small, panelled in waterlogged wood, the shelves bowing under the weight of books the mud forgot to destroy. A single oil lantern, dry, still has fuel. You touch a book on the nearest shelf and the binding holds. The titles are in old Tartarian; the most recent stamp on every cover is older than every kingdom on every honest map.",
+    "loot": [
+      { "name": "Aether Crystal", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Worn Tartarian Coin", "weight": 25, "min": 6, "max": 12, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Aetheric Locket", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] },
+      { "name": "Aetheric Compass", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["relic","navigation"] },
+      { "name": "Aether Dust", "weight": 15, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","dust","distillable"] }
+    ],
+    "lore_note": "A single book is laid open on the reading desk. The marginalia, in two different hands, runs the length of the page. The conclusion both hands reach is: the Red Tower's Core is not what we were taught. Someone went there to confirm it. They never came back.",
+    "quest_hook": { "kind": "mystery", "id": "mystery_red_tower" }
+  },
+
+  "buried_caravan": {
+    "type": "mini_dungeon",
+    "weight": 4,
+    "matchers": ["mud", "outskirts", "open"],
+    "narration": "A line of three wagons, their axles buried, their canvas tops cracked open by the mud. The horses are gone — pulled free in a panic or eaten in one. The wagons themselves are intact. Whoever drove them packed for a long trip and made it nowhere.",
+    "loot": [
+      { "name": "Trail Rations", "weight": 30, "min": 2, "max": 5, "kind": "consumable", "tags": ["food"] },
+      { "name": "Worn Tartarian Coin", "weight": 25, "min": 5, "max": 12, "kind": "misc", "tags": ["currency"] },
+      { "name": "Climbing Rope", "weight": 20, "min": 1, "max": 2, "kind": "misc", "tags": ["tool"] },
+      { "name": "Aetheric Torch", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["tool","aether"] },
+      { "name": "Aether Crystal", "weight": 10, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","crystal"] }
+    ],
+    "lore_note": "Pinned inside the lead wagon, a hand-drawn map. The destination is circled in red ink: Old Drakova. In the margin, in a different hand: 'the dragon is real. they were not exaggerating. turn back.'",
+    "quest_hook": { "kind": "hunt", "id": "hunt_bog_dragon" }
   }
 }

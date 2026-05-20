@@ -51,6 +51,18 @@ export interface WastelandArchetype {
   lore_note?: string;
   /** For skirmish archetypes: pool of enemy names to spawn (one). */
   enemyPool?: string[];
+  /** Mini-dungeon only — optional bandit pool. When set, an enemy
+   *  spawns INTO the dungeon scene alongside the loot. The player
+   *  has to fight (or flee) to walk away with what they found.
+   *  Same enemy names as enemyPool; separate field so authors can
+   *  write loot-only mini-dungeons too. */
+  bandit_pool?: string[];
+  /** Mini-dungeon only — optional quest hook. When the player
+   *  enters this dungeon, the named hunt or mystery is added to
+   *  their active contract board WITHOUT a vendor handoff — the
+   *  user's explicit ask: "we need a way to start quests" that
+   *  isn't tied to a faction vendor. */
+  quest_hook?: { kind: 'hunt' | 'mystery'; id: string };
 }
 
 // Filter out the "_description" key from the JSON.
@@ -72,8 +84,12 @@ export interface WastelandEncounter {
   npcLine: string | null;
   /** Optional follow-up narration appended on a separate log entry. */
   loreNote: string | null;
-  /** For skirmishes: resolved enemy name to spawn. */
+  /** For skirmishes AND mini-dungeons with bandit_pool: resolved
+   *  enemy name to spawn into the scene. */
   enemyName: string | null;
+  /** Mini-dungeon only — quest to auto-add to the player's active
+   *  board. Null when the dungeon is loot-only. */
+  questHook: { kind: 'hunt' | 'mystery'; id: string } | null;
 }
 
 interface PickOptions {
@@ -125,9 +141,15 @@ export function pickWastelandEncounter(
   }
 
   const archetype = picked.archetype;
-  const enemyName = (archetype.type === 'skirmish' && archetype.enemyPool && archetype.enemyPool.length > 0)
-    ? archetype.enemyPool[Math.floor(rng() * archetype.enemyPool.length)] ?? null
-    : null;
+  // Skirmish enemies come from enemyPool; mini-dungeon bandits come
+  // from bandit_pool. Same shape, separate fields so authors can write
+  // loot-only mini-dungeons.
+  let enemyName: string | null = null;
+  if (archetype.type === 'skirmish' && archetype.enemyPool && archetype.enemyPool.length > 0) {
+    enemyName = archetype.enemyPool[Math.floor(rng() * archetype.enemyPool.length)] ?? null;
+  } else if (archetype.type === 'mini_dungeon' && archetype.bandit_pool && archetype.bandit_pool.length > 0) {
+    enemyName = archetype.bandit_pool[Math.floor(rng() * archetype.bandit_pool.length)] ?? null;
+  }
 
   // Narration — substitute {enemy} when present and we have one.
   let narration = archetype.narration;
@@ -149,6 +171,7 @@ export function pickWastelandEncounter(
     npcLine,
     loreNote: archetype.lore_note ?? null,
     enemyName,
+    questHook: archetype.quest_hook ?? null,
   };
 }
 

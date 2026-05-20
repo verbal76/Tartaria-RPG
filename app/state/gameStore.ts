@@ -6471,10 +6471,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
           }
         }
-        if (enc.type === 'skirmish' && enc.enemyName) {
-          // Spawn the enemy into the scene. Combat starts as soon as
-          // the player submits their next action — the engine's combat
-          // resolution checks scene.enemies.length on every player turn.
+        // Skirmish enemy spawn OR mini-dungeon bandit spawn — same flow,
+        // either route lands an enemy in the scene that combat resolution
+        // picks up on the next player turn.
+        if ((enc.type === 'skirmish' || enc.type === 'mini_dungeon') && enc.enemyName) {
           const spawned = findEnemyByName(enc.enemyName);
           if (spawned) {
             set((s) => {
@@ -6490,13 +6490,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 },
               };
             });
-            get().appendLog(
-              'combat',
-              `${spawned.name} closes — ${spawned.attack} ready, ${spawned.damage} damage on a hit. (range: close)`,
-            );
+            const flavour = enc.type === 'mini_dungeon'
+              ? `${spawned.name} steps out of the shadows of the place — ${spawned.attack} ready, ${spawned.damage} damage on a hit. The loot you found will leave with whoever walks out alive. (range: close)`
+              : `${spawned.name} closes — ${spawned.attack} ready, ${spawned.damage} damage on a hit. (range: close)`;
+            get().appendLog('combat', flavour);
           } else {
-            get().appendLog('debug', `wasteland-encounter: skirmish spawn missed (no enemy "${enc.enemyName}" in catalog).`);
+            get().appendLog('debug', `wasteland-encounter: ${enc.type} spawn missed (no enemy "${enc.enemyName}" in catalog).`);
           }
+        }
+        // Mini-dungeon quest hook — add the named hunt or mystery to
+        // the player's active board without going through a vendor.
+        // Skips silently if the player already has it active or has
+        // completed it, OR if the id doesn't resolve (data drift).
+        if (enc.type === 'mini_dungeon' && enc.questHook) {
+          grantQuestHook(get, set, enc.questHook);
         }
         void get().persist();
       }
@@ -7408,6 +7415,72 @@ function enemyCanReach(enemy: Enemy, range: CombatRange): boolean {
 // success / travel completion). Quests with no `stages` array stay
 // at stage 0 forever — they're single-objective and turn-in-able
 // immediately, matching pre-refactor behavior.
+// Force-add a hunt or mystery to the player's active board without
+// the usual vendor-faction handoff. Mini-dungeon quest hooks use
+// this: finding a buried wagon train with a "the Dragon is real"
+// note auto-starts the Bog Dragon hunt, no vendor required. The
+// user's explicit ask: a way to start quests that isn't a vendor.
+// Silent no-op if the player already has the quest active / done
+// or if the id doesn't resolve (data drift).
+function grantQuestHook(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  hook: { kind: 'hunt' | 'mystery'; id: string },
+): void {
+  const player = get().player;
+  if (!player) return;
+  if (hook.kind === 'hunt') {
+    const def = findHuntById(hook.id);
+    if (!def) return;
+    const active = (player.activeHunts ?? []).some((h) => h.id === def.id);
+    const done = (player.completedHuntIds ?? []).includes(def.id);
+    if (active || done) return;
+    set((s) =>
+      s.player
+        ? {
+            player: {
+              ...s.player,
+              activeHunts: [
+                ...(s.player.activeHunts ?? []),
+                { id: def.id, stage: 0, postedByFaction: def.factionId, acceptedAt: Date.now() },
+              ],
+            },
+          }
+        : s,
+    );
+    bumpQuestsAccepted(get, set);
+    get().appendLog(
+      'reward',
+      `✦ Hunt found in the field — ${def.title}. ${def.posterText}`,
+    );
+    return;
+  }
+  // Mystery branch.
+  const def = findMysteryById(hook.id);
+  if (!def) return;
+  const active = (player.activeMysteries ?? []).some((m) => m.id === def.id);
+  const done = (player.completedMysteryIds ?? []).includes(def.id);
+  if (active || done) return;
+  set((s) =>
+    s.player
+      ? {
+          player: {
+            ...s.player,
+            activeMysteries: [
+              ...(s.player.activeMysteries ?? []),
+              { id: def.id, stage: 0, postedByFaction: def.factionId, acceptedAt: Date.now() },
+            ],
+          },
+        }
+      : s,
+  );
+  bumpQuestsAccepted(get, set);
+  get().appendLog(
+    'reward',
+    `✦ Mystery found in the field — ${def.title}. ${def.posterText}`,
+  );
+}
+
 function advanceActiveFactionQuests(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
