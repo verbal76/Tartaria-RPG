@@ -11,6 +11,7 @@ export type HighlightArea =
   | 'top-right-enemy'
   | 'scene-bar'
   | 'feed'
+  | 'travel-row'
   | 'quick-row'
   | 'input-row'
   | 'bottom-menu'
@@ -64,12 +65,9 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     body:
       'Where you are right now: location · weather · hazard. The line below shows in-game time ' +
       '(Day N · morning / afternoon / evening / night). ' +
-      '\n\nACTIONS opens a full reference of every verb the engine understands. New: tap any ' +
-      'card and its first example phrase drops into the input box, ready to finish typing — ' +
-      'tap the same card again to cycle through alternate phrasings. ' +
-      '\n\nCONTRACTS opens your active hunts, mysteries, storylines, and faction contracts ' +
-      '(vendor pitches now point at this screen for the full text instead of reading every ' +
-      'line out loud).',
+      '\n\nACTIONS opens a full reference of every verb the engine understands — we\'ll visit ' +
+      'it in a moment. QUESTS opens your active hunts, mysteries, storylines, and faction ' +
+      'contracts; we\'ll see that one too.',
   },
   {
     screen: 'exploration',
@@ -81,6 +79,17 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       '\n\nLong travel doesn\'t just count steps — every few cardinal moves the engine rolls a ' +
       'wasteland encounter: an abandoned caravan with a note, a wandering drifter with a tip, ' +
       'a fungal patch you can harvest, an old bus with a duffel, etc. Watch the feed.',
+  },
+  {
+    screen: 'exploration',
+    area: 'travel-row',
+    title: 'Cardinal travel',
+    body:
+      'NORTH / SOUTH / EAST / WEST — one tap = one step in that direction on the world map. ' +
+      'These hide during combat (you can\'t walk away from a fight that\'s already on you). ' +
+      '\n\nEvery few cardinal moves can trigger a wasteland encounter — caravans, drifters, ' +
+      'fungal patches, derelict buses, faction patrols. Cardinal travel is also how you reach ' +
+      'cities and hubs; ask the Arbiter "what\'s north of me" any time.',
   },
   {
     screen: 'exploration',
@@ -115,25 +124,29 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     body:
       'SAVE & EXIT writes the slot and returns you to the title screen. ' +
       'FULL LOG shows the entire history of this character\'s play session. ' +
-      'The ⚙ gear on the right opens Settings (music, voice, diagnostics).',
+      'The ⚙ gear on the right opens Settings — we\'ll see that screen in a moment.',
   },
   {
-    screen: 'exploration',
-    area: 'bottom-menu',
-    title: 'Optional: voice mode',
+    screen: 'actions',
+    area: 'fullscreen',
+    title: 'Action reference',
     body:
-      'Tartaria can read out loud and listen for your speech. Open Settings (⚙ gear) → VOICE. ' +
-      '\n\nRead aloud (TTS) — the Arbiter and every NPC speak their lines. Voice is character-' +
-      'specific now: the Arbiter sounds like AM_MICHAEL (you can change it), and every vendor ' +
-      'has their own assigned voice — Irma in af_sarah, Halem in am_adam, Naha in af_river, ' +
-      'and so on. They take turns like a real conversation, not all at once. World narration is ' +
-      'silent — only character dialogue is voiced. ' +
-      '\n\nSpeak input (STT) — a 🎙 mic button appears next to Act. Tap, speak, and the game ' +
-      'parses your speech the same way as typing. While the Arbiter is speaking the mic becomes ' +
-      'a 🛑 SILENCE button — tap to cut narration short. ' +
-      '\n\nBoth default OFF. Engine: BUNDLED downloads ~100 MB of neural voice once + loads ' +
-      'one vendor voice on demand (200 MB peak) for the premium quality path; SYSTEM uses ' +
-      'Android\'s built-in TTS — lighter, supports every voice simultaneously.',
+      'This is the full list of every verb the engine understands, grouped by category — ' +
+      'movement, combat, social, crafting, world. ' +
+      '\n\nTap any card and its first example phrase drops straight into the input box, ' +
+      'ready for you to finish typing. Tap the same card again to cycle through alternate ' +
+      'phrasings. Great when you forget the exact wording for "take cover" or "set a trap".',
+  },
+  {
+    screen: 'contracts',
+    area: 'fullscreen',
+    title: 'Quests & contracts',
+    body:
+      'Your active work, all in one place: faction quests (with stages and rewards), hunts, ' +
+      'mysteries, and storylines. The board shows objective, progress, and the vendor / NPC ' +
+      'to turn each one in to. ' +
+      '\n\nVendor pitches now point at this screen for the full text instead of reading ' +
+      'every contract aloud. Tap a contract to expand it.',
   },
   {
     screen: 'inventory',
@@ -151,12 +164,28 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     screen: 'vendor',
     area: 'fullscreen',
-    title: 'Trading',
+    title: 'Trading — meet Irma',
     body:
+      'Here\'s Irma Ironhand, a Tartarian Giant heavy armorer, dropped in just for the tour. ' +
       'Traders behave like your pack — same layout, same tap-for-details flow, plus a price ' +
-      'next to each offer and a "you have N" tag when you already own one. ' +
-      '\n\nHow you get here: when a vendor is in the scene, an orange banner appears at the ' +
-      'top of the world text feed showing the trader\'s name. Tap that banner to enter the shop.',
+      'next to each offer and a "you have N" tag when you already own one. SELL flips to your ' +
+      'pack with sell prices alongside. ' +
+      '\n\nIn-game: when a vendor is in the scene, an orange banner appears at the top of the ' +
+      'world feed with the trader\'s name. Tap that banner to enter the shop. Irma will vanish ' +
+      'when this tour ends.',
+  },
+  {
+    screen: 'about',
+    area: 'fullscreen',
+    title: 'Settings — three tabs',
+    body:
+      'The ⚙ gear opens this screen. Three tabs across the top: ' +
+      '\n\nMUSIC — track toggle, volume, per-mood selection. ' +
+      '\n\nVOICE — read-aloud (TTS) and speak-input (STT). Voice is character-specific: the ' +
+      'Arbiter has their own voice (AM_MICHAEL by default), and each vendor — Irma, Halem, ' +
+      'Naha — speaks in their own. Engine choice: BUNDLED downloads ~100 MB of neural voice ' +
+      'once for premium quality; SYSTEM uses Android\'s built-in TTS, lighter. Both default OFF. ' +
+      '\n\nABOUT — build info, diagnostics, OTA build ID, full COPY ALL for bug reports.',
   },
   {
     screen: 'exploration',

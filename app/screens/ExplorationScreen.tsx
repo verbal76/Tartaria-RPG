@@ -239,7 +239,11 @@ export function ExplorationScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0a0908', padding: 8, gap: 6 },
-  topRow: { flexDirection: 'row', gap: 6, height: 165 },
+  // minHeight (not fixed height) — characters with multiple active
+  // contracts / effects / a companion overflow 165px; the fixed height
+  // clipped the bottom rows behind the scene bar. Letting the row grow
+  // to fit content keeps every stat visible.
+  topRow: { flexDirection: 'row', gap: 6, minHeight: 165 },
   statsCol: { flex: 1.2 },
   rightCol: { flex: 1 },
   sceneBar: {

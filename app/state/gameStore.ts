@@ -202,6 +202,7 @@ import {
   aethericVulnerabilityMultiplier,
 } from '../engine/statusEffects';
 import type { StatusEffect, MemorableEvent } from '../engine/types';
+import { TUTORIAL_STEPS } from '../components/tutorialSteps';
 
 interface Concept {
   id: string;
@@ -6480,26 +6481,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ tutorialStep: 0 });
   },
   advanceTutorial() {
-    const next = (get().tutorialStep ?? 0) + 1;
-    // 11 steps total — index 10 is the final one. Past that, end.
-    const TOTAL_STEPS = 11;
-    if (next >= TOTAL_STEPS) {
+    const current = get().tutorialStep ?? 0;
+    const next = current + 1;
+    // Total count comes from the step array — no more magic numbers
+    // drifting out of sync when steps are added or reordered.
+    if (next >= TUTORIAL_STEPS.length) {
       get().skipTutorial();
       return;
     }
-    // The vendor tutorial step (index 9) needs a stub vendor in the
-    // scene so the real VendorScreen has something to render. Inject one
-    // when entering, clear it when leaving.
-    if (next === 9) {
-      const vendor = pickRandomVendor();
-      set({ tutorialDemoVendor: vendor });
+    // The vendor tutorial step needs a stub vendor in the scene so the
+    // real VendorScreen has something to render. Detect by step screen
+    // (no hard-coded index — survives reordering). Use Irma Ironhand as
+    // the demo so the player sees a named vendor with real offers.
+    const currentStep = TUTORIAL_STEPS[current];
+    const nextStep = TUTORIAL_STEPS[next];
+    const enteringVendor = nextStep?.screen === 'vendor';
+    const leavingVendor = currentStep?.screen === 'vendor' && nextStep?.screen !== 'vendor';
+    if (enteringVendor) {
+      const vendor = findVendorByName('Irma Ironhand') ?? pickRandomVendor();
       set((s) => (s.currentScene
-        ? { currentScene: { ...s.currentScene, vendor }, tutorialStep: next }
-        : { tutorialStep: next }));
+        ? { currentScene: { ...s.currentScene, vendor }, tutorialDemoVendor: vendor, tutorialStep: next }
+        : { tutorialDemoVendor: vendor, tutorialStep: next }));
       return;
     }
-    // If leaving the vendor step (10 follows 9), strip the demo vendor.
-    if (get().tutorialStep === 9) {
+    if (leavingVendor) {
       set((s) => (s.currentScene
         ? { currentScene: { ...s.currentScene, vendor: null }, tutorialDemoVendor: null, tutorialStep: next }
         : { tutorialDemoVendor: null, tutorialStep: next }));

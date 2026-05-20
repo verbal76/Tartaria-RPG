@@ -165,12 +165,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           in combat (cardinal travel is gated by enemy presence
           anyway and the slot is needed for combat verbs). */}
       {!inCombat && (
-        <View style={styles.travelRow}>
+        <TutorialTarget area="travel-row" style={styles.travelRow}>
           <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} />
           <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} />
           <TravelBtn label="EAST" onPress={() => onSubmit('go east')} />
           <TravelBtn label="WEST" onPress={() => onSubmit('go west')} />
-        </View>
+        </TutorialTarget>
       )}
       <TutorialTarget area="quick-row" style={styles.quickRow}>
         {inCombat ? (

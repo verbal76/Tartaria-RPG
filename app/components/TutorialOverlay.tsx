@@ -14,6 +14,7 @@ function cardPositionFor(area: HighlightArea): 'top' | 'bottom' {
     case 'top-right-enemy':
     case 'scene-bar':
       return 'bottom';
+    case 'travel-row':
     case 'quick-row':
     case 'input-row':
     case 'bottom-menu':
