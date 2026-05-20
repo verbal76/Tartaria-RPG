@@ -17,6 +17,7 @@ import locationsData from '../data/locations/locations.json';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { getKokoroState, onKokoroStateChange, type KokoroState } from '../voice/PiperTTSManager';
+import { checkAndApplyOTA } from '../updates/checkAndApplyOTA';
 
 const races = racesData as { id: string; name: string }[];
 const locations = locationsData as { id: string; name: string }[];
@@ -47,6 +48,9 @@ export function TitleScreen() {
   const resurrectionGems = useGameStore((s) => s.resurrectionGems);
   const justUpdatedFromBuild = useGameStore((s) => s.justUpdatedFromBuild);
   const dismissJustUpdated = useGameStore((s) => s.dismissJustUpdated);
+  const pendingOTAUpdate = useGameStore((s) => s.pendingOTAUpdate);
+  const clearPendingOTAUpdate = useGameStore((s) => s.clearPendingOTAUpdate);
+  const [applyingOTA, setApplyingOTA] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [pendingAction, setPendingAction] = useState<
     | { kind: 'delete'; slot: SlotSummary }
@@ -174,6 +178,36 @@ export function TitleScreen() {
       )}
 
       <KokoroDownloadBanner />
+
+      {pendingOTAUpdate && (
+        <TouchableOpacity
+          style={styles.updateBanner}
+          activeOpacity={0.8}
+          disabled={applyingOTA !== null}
+          onPress={() => {
+            setApplyingOTA('Preparing…');
+            void checkAndApplyOTA({
+              onStatus: (s) => setApplyingOTA(s),
+              onError: (msg) => {
+                setApplyingOTA(null);
+                clearPendingOTAUpdate();
+                // Surface the error via the same slot-load-error
+                // channel so the player sees it on the title screen.
+                useGameStore.setState({ slotLoadError: `Update failed: ${msg}` });
+              },
+            });
+          }}
+        >
+          <Text style={styles.updateBannerTitle}>
+            {applyingOTA ? `APPLYING UPDATE — ${applyingOTA.toUpperCase()}` : 'UPDATE READY — TAP TO APPLY'}
+          </Text>
+          <Text style={styles.updateBannerBody}>
+            {applyingOTA
+              ? 'Tearing down audio + AI handles before the reload. One moment.'
+              : 'A new build is downloaded and waiting. Tap to restart and apply.'}
+          </Text>
+        </TouchableOpacity>
+      )}
 
       <FlatList
         style={styles.list}
@@ -349,6 +383,28 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   gems: { color: '#c9a86a', fontSize: 12, textAlign: 'center', marginBottom: 8, letterSpacing: 1 },
+  updateBanner: {
+    backgroundColor: '#2a1f12',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    marginBottom: 8,
+  },
+  updateBannerTitle: {
+    color: '#c9a86a',
+    fontSize: 11,
+    letterSpacing: 2,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  updateBannerBody: {
+    color: '#cdbf99',
+    fontSize: 10,
+    textAlign: 'center',
+    marginTop: 3,
+  },
   footerActions: { gap: 8, marginTop: 12 },
   primaryBtn: {
     backgroundColor: '#3a342c',

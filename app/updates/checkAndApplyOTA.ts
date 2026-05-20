@@ -29,17 +29,29 @@ export interface CheckAndApplyOptions {
   /** True for boot auto-check. Suppresses the disabled-environment
    *  short-circuit message (dev builds simply skip). */
   silent?: boolean;
+  /** Download the update but DO NOT reload. Used by the silent
+   *  boot-time auto-check — auto-applying mid-boot crashes the
+   *  process because native modules (executorch Kokoro, llama.rn
+   *  Qwen, ONNX MiniLM, expo-av Sound) are still spinning up while
+   *  reloadAsync swaps the JS bundle in. The boot path sets the
+   *  pendingOTAUpdate store flag instead; the TitleScreen banner
+   *  offers the player a one-tap apply that runs the full reload
+   *  sequence from a clean state. */
+  fetchOnly?: boolean;
 }
 
 /** Result the caller can inspect. `applied` means we triggered a
  *  reload (this call won't return cleanly — the JS bridge restarts).
- *  `noUpdate` means we checked successfully and there was nothing
- *  to apply. `skipped` means we didn't even check (Updates disabled
- *  in dev). `errored` means the sequence failed. */
-export type CheckAndApplyResult = 'applied' | 'noUpdate' | 'skipped' | 'errored';
+ *  `pending` means we downloaded the update but stopped short of
+ *  reloading (fetchOnly mode); the caller's banner / button should
+ *  invite the player to apply on their own tap. `noUpdate` means we
+ *  checked successfully and there was nothing to apply. `skipped`
+ *  means we didn't even check (Updates disabled in dev). `errored`
+ *  means the sequence failed. */
+export type CheckAndApplyResult = 'applied' | 'pending' | 'noUpdate' | 'skipped' | 'errored';
 
 export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise<CheckAndApplyResult> {
-  const { onStatus, onError, silent = false } = opts;
+  const { onStatus, onError, silent = false, fetchOnly = false } = opts;
   try {
     if (!Updates.isEnabled) {
       if (!silent) onStatus?.('Disabled (dev build / Expo Go)');
@@ -53,6 +65,15 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
     }
     onStatus?.('Downloading update…');
     await Updates.fetchUpdateAsync();
+    // fetchOnly path — silent boot check. Don't reload mid-boot;
+    // native modules are still initialising and reloadAsync at
+    // this point reliably crashes the process to home screen.
+    // The boot caller flips the pendingOTAUpdate store flag so the
+    // title screen can offer a one-tap apply from a clean state.
+    if (fetchOnly) {
+      onStatus?.('Update downloaded — restart to apply');
+      return 'pending';
+    }
     // Flush the player's progress to disk BEFORE handing control to
     // expo-updates. If reloadAsync starts while AsyncStorage is still
     // mid-write, the slot can end up persisted with player=null —

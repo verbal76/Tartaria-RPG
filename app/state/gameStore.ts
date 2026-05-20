@@ -630,6 +630,14 @@ interface GameStore {
    *  hydrate; cleared by dismissJustUpdated. */
   justUpdatedFromBuild: string | null;
   dismissJustUpdated: () => void;
+  /** Set when the silent boot-time OTA check downloaded an update
+   *  but did NOT apply it (auto-applying mid-boot crashes the
+   *  process — native modules from the old session are still
+   *  releasing while the new JS bundle tries to init). TitleScreen
+   *  surfaces a banner offering to apply the update on the player's
+   *  tap; that path tears down cleanly before reloadAsync. */
+  pendingOTAUpdate: boolean;
+  clearPendingOTAUpdate: () => void;
   /** Pre-fill text staged by ActionReferenceScreen (or any other
    *  helper screen) for the next mount of InputBox on the exploration
    *  screen. InputBox reads this once on mount + on changes, drops
@@ -769,6 +777,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   cognitiveLastResponse: null,
   wastelandStepsSinceEncounter: 0,
   justUpdatedFromBuild: null,
+  pendingOTAUpdate: false,
   pendingInputDraft: null,
   cognitiveModelInfo: null,
 
@@ -846,6 +855,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   dismissJustUpdated() {
     set({ justUpdatedFromBuild: null });
+  },
+
+  clearPendingOTAUpdate() {
+    set({ pendingOTAUpdate: false });
   },
 
   queueInputDraft(text) {
@@ -5595,10 +5608,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     // Play the first stage immediately so the player has narrative
     // momentum, mirroring how hunts / mysteries / storylines open.
+    // Per-quest stage0.arbiter SUPPRESSED on accept — when the player
+    // chip-taps six contracts in a row the per-quest Arbiter lines
+    // pile up as offhand reactions to descriptions the player has
+    // already moved past. bumpQuestsAccepted handles the meta-level
+    // commentary (first-quest line, burst-start, "stacking", "slow
+    // down") instead.
     const stage0 = quest.stages?.[0];
     if (stage0) {
       get().appendLog('world', stage0.narration);
-      if (stage0.arbiter) get().appendLog('arbiter', stage0.arbiter);
     }
     void get().persist();
   },
@@ -5774,12 +5792,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : s,
     );
     bumpQuestsAccepted(get, set);
-    // Play the first stage immediately so the player has narrative momentum.
+    // Per-hunt stage0.arbiter suppressed on accept (see acceptFactionQuest
+    // for rationale). Burst-aware meta line comes from bumpQuestsAccepted.
     const stage0 = hunt.stages[0];
     if (stage0) {
       get().appendLog('reward', `✦ Hunt accepted — ${hunt.title}. ${hunt.posterText}`);
       get().appendLog('world', stage0.narration);
-      if (stage0.arbiter) get().appendLog('arbiter', stage0.arbiter);
     }
     set((s) =>
       s.player
@@ -5991,11 +6009,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : s,
     );
     bumpQuestsAccepted(get, set);
+    // Per-mystery stage0.arbiter suppressed (burst-aware line above).
     const stage0 = m.stages[0];
     if (stage0) {
       get().appendLog('reward', `✦ Mystery accepted — ${m.title}. ${m.posterText}`);
       get().appendLog('world', stage0.narration);
-      if (stage0.arbiter) get().appendLog('arbiter', stage0.arbiter);
     }
     set((s) =>
       s.player
@@ -6186,11 +6204,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : st,
     );
     bumpQuestsAccepted(get, set);
+    // Per-storyline stage0.arbiter suppressed (burst-aware line above).
     const stage0 = s.stages[0];
     if (stage0) {
       get().appendLog('reward', `✦ Storyline accepted — ${s.title}. ${s.posterText}`);
       get().appendLog('world', stage0.narration);
-      if (stage0.arbiter) get().appendLog('arbiter', stage0.arbiter);
     }
     set((st) =>
       st.player
@@ -7426,6 +7444,37 @@ function advanceActiveFactionQuests(
   );
 }
 
+// Burst tracker — transient (not persisted). When the player chip-taps
+// through 6 contracts in 4 seconds at the same vendor we don't want 6
+// Arbiter lines reacting to each individual quest description; the
+// player has already moved on by the time he finishes the first
+// sentence. Instead we fire ONE meta-aware line per tier transition:
+// burst-start, "stacking" at 3, "slow down" at 5. Resets after 5s of
+// silence so the next bursty session opens cleanly.
+let _burstLastAt = 0;
+let _burstCount = 0;
+const BURST_WINDOW_MS = 5000;
+
+const BURST_START_LINES = [
+  `The Arbiter watches you sign. "Another for the slate."`,
+  `The Arbiter nods. "On the board it goes."`,
+  `"Adding another," the Arbiter says, dry. "Make good on it."`,
+  `The Arbiter glances at the page. "Promise made. Hold yourself to it."`,
+  `"Another contract," the Arbiter says. "Tartaria notes."`,
+];
+const BURST_STACKING_LINES = [
+  `The Arbiter raises an eyebrow. "You're stacking promises. They don't pay until the work does."`,
+  `"That's three now," the Arbiter says. "Make sure you remember what you owe whom."`,
+  `The Arbiter's mouth twitches. "Collecting contracts is the easy part. Try finishing one."`,
+  `"You like having debts to the factions, do you?" the Arbiter says.`,
+];
+const BURST_SLOW_DOWN_LINES = [
+  `The Arbiter's voice cools. "Slow down. The work is real. You can only walk one road at a time."`,
+  `"Five on the slate," the Arbiter says. "Tartaria does not negotiate down a list you over-bought."`,
+  `The Arbiter sighs. "Every contract is a debt. You're stacking debts faster than legs to walk them."`,
+  `"That's a lot of promises," the Arbiter says quietly. "Plan your route, or you'll forget half."`,
+];
+
 function bumpQuestsAccepted(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -7446,12 +7495,37 @@ function bumpQuestsAccepted(
         }
       : s,
   );
+
+  // First-ever contract — life-of-character one-shot. Takes priority
+  // over any burst chatter; the burst counter still gets initialised
+  // below so the NEXT accept lands on the burst-start line cleanly.
   if (prev === 0) {
     get().appendLog(
       'arbiter',
       `The Arbiter watches you take the contract. "First one. The work begins now — not when you finish it, not when you cash it in. Now."`,
     );
+    _burstLastAt = Date.now();
+    _burstCount = 1;
+    return;
   }
+
+  const now = Date.now();
+  if (now - _burstLastAt > BURST_WINDOW_MS) {
+    // Fresh burst — say one ambient line and start counting.
+    _burstCount = 1;
+    _burstLastAt = now;
+    get().appendLog('arbiter', rotatingPick(BURST_START_LINES, 'arbiter.contract.burst-start'));
+    return;
+  }
+  // Continuing burst — silent except at tier transitions.
+  _burstCount += 1;
+  _burstLastAt = now;
+  if (_burstCount === 3) {
+    get().appendLog('arbiter', rotatingPick(BURST_STACKING_LINES, 'arbiter.contract.burst-stacking'));
+  } else if (_burstCount === 5) {
+    get().appendLog('arbiter', rotatingPick(BURST_SLOW_DOWN_LINES, 'arbiter.contract.burst-slow'));
+  }
+  // 2, 4, 6+: silent. Player is chip-tapping — let them.
 }
 
 function makeRoomKey(

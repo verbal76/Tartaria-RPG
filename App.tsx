@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet, AppState, Platform, StatusBar as RNStatusBar, type AppStateStatus } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import * as NavigationBar from 'expo-navigation-bar';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useGameStore } from './app/state/gameStore';
 import { TitleScreen } from './app/screens/TitleScreen';
@@ -37,6 +38,40 @@ try {
   // system TTS automatically through TTSManager's engine routing.
 }
 
+// Global crash safety net. If anything during boot or runtime throws
+// uncaught, the default React Native red-box on a release build is a
+// black screen → home screen kick-out. Installing a handler that logs
+// the error and triggers Updates.reloadAsync() instead lets the player
+// see one black flash and come back into a clean process — far better
+// than dropping them to the launcher with no signal anything happened.
+// Errors during the FIRST 5 seconds after boot are ignored for reload
+// purposes (the player's about to relaunch anyway and a reload loop
+// would hide the real bug); after that, one reload per crash window.
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const Updates = require('expo-updates') as typeof import('expo-updates');
+  const bootTime = Date.now();
+  let reloaded = false;
+  const errorUtils = (globalThis as unknown as { ErrorUtils?: { getGlobalHandler: () => (err: Error, isFatal?: boolean) => void; setGlobalHandler: (h: (err: Error, isFatal?: boolean) => void) => void } }).ErrorUtils;
+  if (errorUtils?.setGlobalHandler) {
+    const prev = errorUtils.getGlobalHandler();
+    errorUtils.setGlobalHandler((err, isFatal) => {
+      try { prev?.(err, isFatal); } catch { /* ignore */ }
+      const sinceBoot = Date.now() - bootTime;
+      if (isFatal && !reloaded && sinceBoot > 5000 && Updates?.isEnabled) {
+        reloaded = true;
+        // Brief delay so any pending React render / log flush completes
+        // before the bridge swap. reloadAsync is async; we don't await
+        // because the handler can't return a promise.
+        setTimeout(() => { void Updates.reloadAsync().catch(() => { /* native side will surface */ }); }, 800);
+      }
+    });
+  }
+} catch {
+  // expo-updates missing (dev build / Expo Go) — no safety net, but
+  // the dev environment surfaces errors well enough on its own.
+}
+
 export default function App() {
   const screen = useGameStore((s) => s.currentScreen);
   const hydrated = useGameStore((s) => s.hydrated);
@@ -46,6 +81,21 @@ export default function App() {
   const resumeCognitive = useGameStore((s) => s.resumeCognitive);
   const bootQwen = useGameStore((s) => s.bootQwen);
   const shutdownQwen = useGameStore((s) => s.shutdownQwen);
+
+  // Android immersive mode — hide the navigation bar (3-button bar at
+  // the bottom) and let the status bar overlay-swipe back. Same UX as
+  // Wordscapes / most full-screen games: gain the system bar real
+  // estate, swipe up from the bottom (or down from the top) to peek
+  // them back when needed. No-op on iOS.
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    void NavigationBar.setBehaviorAsync('overlay-swipe').catch(() => { /* ignore */ });
+    void NavigationBar.setVisibilityAsync('hidden').catch(() => { /* ignore */ });
+    // The system can re-show the navigation bar when the keyboard opens
+    // or a system dialog appears; AppState 'active' transitions are a
+    // reliable hook to reassert hidden state. The listener below in the
+    // other useEffect already handles 'active' — we re-hide there too.
+  }, []);
 
   useEffect(() => {
     void hydrate().then(() => {
@@ -65,20 +115,20 @@ export default function App() {
       // while the player is on the title screen, so the first spoken
       // line plays without cold-start lag.
       void initTTSManager().then(() => startTTSController());
-      // Auto-fire the same OTA check the player can run manually from
-      // Settings → About → CHECK FOR OTA UPDATE. Silent: errors are
-      // swallowed (a tap from the button surfaces them if they want
-      // to investigate). If an update is available, the sequence
-      // persists save state + tears down native handles + reloads.
-      //
-      // Only runs while the player is still on the title screen — if
-      // they've already tapped a slot and `loadSlotIntoGame` is mid-
-      // flight, an OTA reload here would yank them mid-save-load and
-      // potentially corrupt the slot. Manual button (from Settings)
-      // has no such guard because the player explicitly opted in.
+      // Boot-time OTA check. fetchOnly: download the update in the
+      // background but DO NOT reload here — auto-reload mid-boot
+      // crashes the process to home because native modules
+      // (executorch Kokoro, llama.rn Qwen, ONNX MiniLM, expo-av Sound)
+      // are still spinning up while reloadAsync swaps the JS bundle.
+      // The pendingOTAUpdate flag drives a TitleScreen banner that
+      // offers the player a one-tap apply from a clean state.
       setTimeout(() => {
         if (useGameStore.getState().currentScreen !== 'title') return;
-        void checkAndApplyOTA({ silent: true });
+        void checkAndApplyOTA({ silent: true, fetchOnly: true }).then((result) => {
+          if (result === 'pending') {
+            useGameStore.setState({ pendingOTAUpdate: true });
+          }
+        });
       }, 1500);
     });
     return () => {
@@ -95,6 +145,12 @@ export default function App() {
         void shutdownQwen();
       } else if (status === 'active') {
         void resumeCognitive();
+        // Re-hide the navigation bar — Android sometimes restores it
+        // after the app comes back from background (system dialogs,
+        // keyboard close events). Idempotent and cheap.
+        if (Platform.OS === 'android') {
+          void NavigationBar.setVisibilityAsync('hidden').catch(() => { /* ignore */ });
+        }
         // Qwen does not auto-resume — re-bootQwen would re-trigger the
         // download UI; we leave it dormant and let the user restart it
         // manually from the About screen if they want it back.
@@ -137,7 +193,7 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
   const bottom = insets.bottom;
   return (
     <View style={[styles.safe, { paddingTop: top, paddingBottom: bottom }]}>
-      <StatusBar style="light" />
+      <StatusBar style="light" hidden />
       {screen === 'title' && <TitleScreen />}
       {screen === 'character_creation' && <CharacterCreationScreen />}
       {screen === 'exploration' && <ExplorationScreen />}
