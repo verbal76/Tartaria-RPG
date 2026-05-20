@@ -157,23 +157,27 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     gap: 6,
   },
-  previewPrompt: { color: '#c9a86a', fontSize: 14, fontWeight: '700' },
-  previewText: { color: '#e6d8b3', fontSize: 14, flex: 1 },
-  previewCursor: { color: '#c9a86a', fontSize: 14, fontWeight: '700' },
+  // Sizing scaled to 2.5x per playtest feedback — keys at 38px were
+  // too small to reliably tap. minHeight 95 lands accessible touch
+  // targets; font 24 reads cleanly without dominating the multi-
+  // letter labels (space / abc / 123).
+  previewPrompt: { color: '#c9a86a', fontSize: 18, fontWeight: '700' },
+  previewText: { color: '#e6d8b3', fontSize: 18, flex: 1 },
+  previewCursor: { color: '#c9a86a', fontSize: 18, fontWeight: '700' },
   dismissBtn: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderColor: '#3a342c',
     borderWidth: 1,
     borderRadius: 2,
   },
-  dismissBtnText: { color: '#7a705c', fontSize: 14, fontWeight: '700' },
-  keyRow: { flexDirection: 'row', gap: 3, justifyContent: 'center' },
-  keyRowIndent: { paddingHorizontal: 14 },
+  dismissBtnText: { color: '#7a705c', fontSize: 18, fontWeight: '700' },
+  keyRow: { flexDirection: 'row', gap: 4, justifyContent: 'center' },
+  keyRowIndent: { paddingHorizontal: 18 },
   key: {
     flex: 1,
-    minHeight: 38,
-    paddingHorizontal: 2,
+    minHeight: 95,
+    paddingHorizontal: 6,
     backgroundColor: '#1a1612',
     borderColor: '#3a342c',
     borderWidth: 1,
@@ -184,6 +188,6 @@ const styles = StyleSheet.create({
   keyWide: { flex: 1.6 },
   keyExtraWide: { flex: 4 },
   keyHighlight: { backgroundColor: '#2a1f12', borderColor: '#c9a86a' },
-  keyText: { color: '#e6d8b3', fontSize: 15, fontWeight: '600' },
+  keyText: { color: '#e6d8b3', fontSize: 24, fontWeight: '600' },
   keyTextHighlight: { color: '#c9a86a' },
 });
