@@ -15,9 +15,15 @@ import {
   getLatestApkUrl,
   getLatestApkHighlights,
   getLatestApkBuild,
+  getLatestApkAssetUrl,
   hydrateApkPointer,
   refreshFromGitHub,
 } from '../updates/apkRelease';
+import {
+  isInAppInstallAvailable,
+  downloadAndInstallApk,
+  type InstallProgress,
+} from '../updates/apkInstaller';
 import { useGameStore } from '../state/gameStore';
 import { SwipeableRow } from '../components/SwipeableRow';
 import { BrandedModal } from '../components/BrandedModal';
@@ -84,6 +90,25 @@ export function TitleScreen() {
   // last-known build), then fire network fetch, then bump the tick.
   const [apkPointerTick, setApkPointerTick] = useState(0);
   const [apkUrlCopied, setApkUrlCopied] = useState(false);
+  const [apkInstallProgress, setApkInstallProgress] = useState<InstallProgress | null>(null);
+
+  const inAppInstall = useCallback(() => {
+    const assetUrl = getLatestApkAssetUrl();
+    const build = getLatestApkBuild();
+    if (!assetUrl) return;
+    setApkInstallProgress({ fraction: null, received: 0, total: 0, phase: 'starting' });
+    void downloadAndInstallApk(assetUrl, build, (p) => {
+      setApkInstallProgress(p);
+      if (p.phase === 'done') {
+        // Leave the "Tap Install in the Android prompt" message up
+        // for a few seconds, then clear so the banner returns to
+        // normal in case the user backs out of the installer.
+        setTimeout(() => setApkInstallProgress(null), 6000);
+      }
+    }).catch(() => {
+      // Error already surfaced via onProgress phase='failed'.
+    });
+  }, []);
   useEffect(() => {
     let cancelled = false;
     void (async () => {
@@ -215,34 +240,62 @@ export function TitleScreen() {
         const url = getLatestApkUrl();
         if (!isApkOutdated() || url.length === 0) return null;
         const copied = apkUrlCopied;
+        const inAppOK = isInAppInstallAvailable() && getLatestApkAssetUrl().length > 0;
+        const progress = apkInstallProgress;
+        const downloading = progress !== null && progress.phase !== 'failed' && progress.phase !== 'done';
+        const failed = progress?.phase === 'failed';
         return (
           <View style={styles.apkBanner}>
+            <Text style={styles.apkBannerTitle}>
+              NEW APK AVAILABLE — build {getLatestApkBuild()}
+            </Text>
+            <Text style={styles.apkBannerBody}>
+              {getLatestApkHighlights() || 'Native feature update. OTAs reach your current APK, but the new build adds capabilities only a fresh APK can ship.'}
+            </Text>
+
+            {inAppOK && (
+              <TouchableOpacity
+                style={[styles.apkBannerInstallBtn, downloading && styles.apkBannerInstallBtnBusy]}
+                activeOpacity={0.7}
+                disabled={downloading}
+                onPress={inAppInstall}
+              >
+                <Text style={styles.apkBannerInstallText}>
+                  {progress?.phase === 'starting' && 'STARTING…'}
+                  {progress?.phase === 'downloading' && (
+                    progress.fraction != null
+                      ? `DOWNLOADING ${Math.round(progress.fraction * 100)}%`
+                      : `DOWNLOADING… (${Math.round(progress.received / 1024 / 1024)} MB)`
+                  )}
+                  {progress?.phase === 'handing-off' && 'OPENING INSTALLER…'}
+                  {progress?.phase === 'done' && '✓ TAP INSTALL IN THE ANDROID PROMPT'}
+                  {failed && '⚠ DOWNLOAD FAILED — TAP TO RETRY'}
+                  {progress === null && '⬇ INSTALL NOW (one tap)'}
+                </Text>
+              </TouchableOpacity>
+            )}
+
+            {/* Fallback path: open the release page in browser. Always
+                shown so the player has a manual escape if the in-app
+                path fails or isn't available on this APK. */}
             <TouchableOpacity
-              activeOpacity={0.8}
+              style={styles.apkBannerSecondary}
+              activeOpacity={0.7}
               onPress={() => {
-                // Linking.openURL hands off to Android — the system
-                // opens the URL (now the GitHub release PAGE) in the
-                // user's default browser. The page has a normal
-                // click-to-download .apk link that lands in Downloads/
-                // where the file manager and package installer can
-                // see it. We don't (and can't) automate the install
-                // itself; this just removes the "find the link" step.
-                void Linking.openURL(url).catch(() => {
-                  // Best-effort. If the URL won't open, the COPY
-                  // button below is the fallback.
-                });
+                void Linking.openURL(url).catch(() => {});
               }}
             >
-              <Text style={styles.apkBannerTitle}>
-                NEW APK AVAILABLE — TAP TO OPEN RELEASE PAGE (build {getLatestApkBuild()})
-              </Text>
-              <Text style={styles.apkBannerBody}>
-                {getLatestApkHighlights() || 'Native feature update. OTAs reach your current APK, but the new build adds capabilities only a fresh APK can ship.'}
-              </Text>
-              <Text style={styles.apkBannerHint}>
-                On the release page, tap the .apk file under Assets to download. If your browser blocks the download, use COPY URL and paste it into a desktop browser.
+              <Text style={styles.apkBannerSecondaryText}>
+                {inAppOK ? 'or open release page →' : 'TAP TO OPEN RELEASE PAGE →'}
               </Text>
             </TouchableOpacity>
+
+            {!inAppOK && (
+              <Text style={styles.apkBannerHint}>
+                On the release page, tap the .apk file under Assets to download. If your browser blocks it, use COPY URL and paste into a desktop browser.
+              </Text>
+            )}
+
             <TouchableOpacity
               style={styles.apkBannerCopyBtn}
               activeOpacity={0.7}
@@ -257,6 +310,12 @@ export function TitleScreen() {
                 {copied ? '✓ COPIED' : 'COPY URL'}
               </Text>
             </TouchableOpacity>
+
+            {failed && (
+              <Text style={styles.apkBannerError}>
+                {progress?.error ?? 'Unknown error.'} Try the release page link above.
+              </Text>
+            )}
           </View>
         );
       })()}
@@ -530,6 +589,43 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 1.5,
     fontWeight: '700',
+  },
+  apkBannerInstallBtn: {
+    marginTop: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 4,
+    backgroundColor: '#9ec96a',
+    alignSelf: 'stretch',
+  },
+  apkBannerInstallBtnBusy: {
+    backgroundColor: '#5e7a3f',
+  },
+  apkBannerInstallText: {
+    color: '#0a0908',
+    fontSize: 12,
+    letterSpacing: 1.5,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  apkBannerSecondary: {
+    marginTop: 6,
+    paddingVertical: 4,
+    alignSelf: 'center',
+  },
+  apkBannerSecondaryText: {
+    color: '#9ec96a',
+    fontSize: 10,
+    letterSpacing: 1,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
+  apkBannerError: {
+    color: '#c97a6a',
+    fontSize: 10,
+    textAlign: 'center',
+    marginTop: 6,
+    fontStyle: 'italic',
   },
   footerActions: { gap: 8, marginTop: 12 },
   primaryBtn: {

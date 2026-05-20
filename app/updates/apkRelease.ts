@@ -48,11 +48,21 @@ export const LATEST_APK_URL = 'https://github.com/verbal76/Tartaria-RPG/releases
  *  Surfaces on the banner so the player knows why they should install. */
 export const LATEST_APK_HIGHLIGHTS = 'Boss-tier enemies + dedicated boss-fight music. The new MP3 assets can only ship with a fresh APK.';
 
+/** Direct .apk asset URL — used by the in-app install path when the
+ *  installed APK has expo-intent-launcher available. Older APKs
+ *  without the native module fall through to LATEST_APK_URL (page). */
+export const LATEST_APK_ASSET_URL = 'https://github.com/verbal76/Tartaria-RPG/releases/download/apk-build-152/tartaria-realms-apk-build-152.apk';
+
 // ── Live pointer (overrides constants when fresher) ────────────────
 
 interface LivePointer {
   build: number;
+  /** Page URL — opens in browser, user clicks .apk under Assets. */
   url: string;
+  /** Direct .apk asset URL — used by the in-app install flow when
+   *  the installed APK has expo-intent-launcher. May be empty if
+   *  the GitHub release somehow has no .apk asset. */
+  assetUrl: string;
   highlights: string;
   fetchedAt: number;
 }
@@ -87,6 +97,13 @@ function effectiveHighlights(): string {
   return LATEST_APK_HIGHLIGHTS;
 }
 
+function effectiveAssetUrl(): string {
+  if (livePointer && livePointer.build > LATEST_APK_BUILD && livePointer.assetUrl.length > 0) {
+    return livePointer.assetUrl;
+  }
+  return LATEST_APK_ASSET_URL;
+}
+
 /** Returns true when the installed APK build is older than the
  *  current pointer (live OR hard-coded, whichever is newer). Returns
  *  false on any failure to read the native build (dev builds, Expo
@@ -116,6 +133,14 @@ export function getLatestApkHighlights(): string {
 /** Build number the banner should display. */
 export function getLatestApkBuild(): number {
   return effectiveBuild();
+}
+
+/** Direct .apk URL for the in-app install flow. Empty string when
+ *  no asset is known (rare; the live fetcher captures it when GitHub
+ *  returns one). Callers should fall back to getLatestApkUrl() when
+ *  this returns ''. */
+export function getLatestApkAssetUrl(): string {
+  return effectiveAssetUrl();
 }
 
 /** Load a cached pointer from AsyncStorage. Called at app boot before
@@ -170,9 +195,17 @@ export async function refreshFromGitHub(): Promise<void> {
       // (the direct asset). See LATEST_APK_URL comment for why.
       // Fall back to a constructed page URL if html_url is missing.
       const pageUrl = json.html_url ?? `https://github.com/verbal76/Tartaria-RPG/releases/tag/${tag}`;
+      // Capture the direct .apk asset for the in-app install path.
+      // Falls back to '' if no .apk asset is present — the page URL
+      // still gives the user a manual path.
+      const apkAsset = (json.assets ?? []).find((a) =>
+        a.content_type === 'application/vnd.android.package-archive'
+          || (a.name ?? '').toLowerCase().endsWith('.apk'),
+      );
       const next: LivePointer = {
         build,
         url: pageUrl,
+        assetUrl: apkAsset?.browser_download_url ?? '',
         highlights: LATEST_APK_HIGHLIGHTS, // GitHub body is verbose; keep our concise blurb
         fetchedAt: Date.now(),
       };
