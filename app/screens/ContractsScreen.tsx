@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { findHuntById, HUNTS } from '../engine/hunts';
@@ -6,6 +6,7 @@ import { findMysteryById, MYSTERIES } from '../engine/mysteries';
 import { findStorylineById, STORYLINES } from '../engine/factionStorylines';
 import { findFactionQuestById, FACTION_QUESTS } from '../engine/factionQuests';
 import { FACTIONS } from '../engine/factions';
+import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS } from '../engine/collectables';
 
 function MilestoneStat({ label, value, next, suffix }: { label: string; value: number; next: number; suffix: string }) {
   const toNext = next - (value % next);
@@ -31,9 +32,12 @@ function factionLabel(factionId: string | null | undefined): string {
   return f?.name ?? factionId.replace(/_/g, ' ');
 }
 
+type Tab = 'contracts' | 'collectables';
+
 export function ContractsScreen() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
+  const [tab, setTab] = useState<Tab>('contracts');
 
   if (!player) {
     return (
@@ -83,6 +87,10 @@ export function ContractsScreen() {
   // → +1 stamina max).
   const ms = player.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 };
 
+  const progress = computeAllProgress(player.collectables ?? []);
+  const totalFragmentsFound = progress.reduce((acc, p) => acc + p.found.length, 0);
+  const totalFragments = ALL_FRAGMENTS.length;
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -98,6 +106,30 @@ export function ContractsScreen() {
         <View style={{ width: 80 }} />
       </View>
 
+      <View style={styles.tabRow}>
+        <TouchableOpacity
+          onPress={() => setTab('contracts')}
+          style={[styles.tabBtn, tab === 'contracts' && styles.tabBtnActive]}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.tabBtnText, tab === 'contracts' && styles.tabBtnTextActive]}>
+            CONTRACTS
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setTab('collectables')}
+          style={[styles.tabBtn, tab === 'collectables' && styles.tabBtnActive]}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.tabBtnText, tab === 'collectables' && styles.tabBtnTextActive]}>
+            COLLECTIBLES {totalFragments > 0 ? `(${totalFragmentsFound}/${totalFragments})` : ''}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {tab === 'collectables' ? (
+        <CollectablesTab progress={progress} />
+      ) : (
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>MILESTONES</Text>
@@ -248,7 +280,81 @@ export function ContractsScreen() {
             </View>
           )}
       </ScrollView>
+      )}
     </View>
+  );
+}
+
+// Collectibles tab — per-character story progress with expandable
+// fragments. Tap a character card to expand; tap again to collapse.
+// Found fragments show their full body; undiscovered fragments show
+// the discovery hint as a teaser.
+function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllProgress> }) {
+  const [openId, setOpenId] = useState<string | null>(null);
+  if (CHARACTER_STORIES.length === 0) {
+    return (
+      <View style={styles.emptyInline}>
+        <Text style={styles.emptyTitle}>No collectibles authored yet.</Text>
+      </View>
+    );
+  }
+  return (
+    <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>CHARACTER STORIES</Text>
+        <Text style={styles.collectIntro}>
+          Notes, letters, and journal pages from ten people who walked Tartaria
+          before you. Find every fragment to read each story end to end.
+        </Text>
+      </View>
+      {progress.map(({ story, found, missing, fraction, complete }) => {
+        const isOpen = openId === story.id;
+        const pct = Math.round(fraction * 100);
+        return (
+          <View key={story.id} style={[styles.card, styles.collectCard]}>
+            <TouchableOpacity
+              onPress={() => setOpenId(isOpen ? null : story.id)}
+              activeOpacity={0.7}
+            >
+              <View style={styles.cardHead}>
+                <Text style={styles.cardTitle}>{story.characterName}</Text>
+                <Text style={complete ? styles.completePill : styles.stagePill}>
+                  {found.length}/{story.fragments.length}
+                </Text>
+              </View>
+              <Text style={styles.cardFaction}>{story.characterBlurb}</Text>
+              <View style={styles.progressBar}>
+                <View style={[styles.progressFill, { width: `${pct}%` }]} />
+              </View>
+            </TouchableOpacity>
+            {isOpen && (
+              <View style={styles.fragmentList}>
+                {story.fragments.map((frag) => {
+                  const isFound = found.some((f) => f.id === frag.id);
+                  return (
+                    <View key={frag.id} style={styles.fragmentRow}>
+                      <Text style={isFound ? styles.fragTitleFound : styles.fragTitleMissing}>
+                        {isFound ? `${frag.title} (${frag.kind})` : `?? — ${frag.kind}`}
+                      </Text>
+                      {isFound ? (
+                        <Text style={styles.fragBody}>{frag.body}</Text>
+                      ) : (
+                        <Text style={styles.fragHint}>{frag.discoveryHint}</Text>
+                      )}
+                    </View>
+                  );
+                })}
+                {missing.length === 0 && (
+                  <Text style={styles.completeBanner}>
+                    ✦ Story complete — every fragment recovered.
+                  </Text>
+                )}
+              </View>
+            )}
+          </View>
+        );
+      })}
+    </ScrollView>
   );
 }
 
@@ -332,4 +438,53 @@ const styles = StyleSheet.create({
   cardStageBody: { color: '#e6d8b3', fontSize: 12, lineHeight: 17, marginBottom: 4 },
   cardStageHint: { color: '#9ec96a', fontSize: 11, fontStyle: 'italic', marginTop: 2 },
   milestoneRow: { flexDirection: 'row', backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, padding: 10 },
+  tabRow: {
+    flexDirection: 'row',
+    backgroundColor: '#13110f',
+    borderColor: '#3a342c',
+    borderBottomWidth: 1,
+  },
+  tabBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderBottomColor: 'transparent',
+    borderBottomWidth: 2,
+  },
+  tabBtnActive: { borderBottomColor: '#c9a86a' },
+  tabBtnText: { color: '#7a705c', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
+  tabBtnTextActive: { color: '#c9a86a' },
+  collectIntro: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 4 },
+  collectCard: { marginBottom: 8 },
+  completePill: {
+    color: '#13110f',
+    backgroundColor: '#9ec96a',
+    fontSize: 10,
+    letterSpacing: 1,
+    fontWeight: '800',
+    borderRadius: 2,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  progressBar: {
+    height: 4,
+    backgroundColor: '#1a1714',
+    borderRadius: 2,
+    marginTop: 6,
+    overflow: 'hidden',
+  },
+  progressFill: { height: 4, backgroundColor: '#c9a86a' },
+  fragmentList: { marginTop: 10, gap: 8 },
+  fragmentRow: {
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 3,
+    padding: 8,
+  },
+  fragTitleFound: { color: '#c9a86a', fontSize: 11, fontWeight: '700', letterSpacing: 1, marginBottom: 4 },
+  fragTitleMissing: { color: '#5a5246', fontSize: 11, fontWeight: '700', letterSpacing: 1, fontStyle: 'italic', marginBottom: 4 },
+  fragBody: { color: '#e6d8b3', fontSize: 12, lineHeight: 17 },
+  fragHint: { color: '#7a705c', fontSize: 11, fontStyle: 'italic', lineHeight: 16 },
+  completeBanner: { color: '#9ec96a', fontSize: 11, letterSpacing: 1, fontWeight: '700', marginTop: 4 },
 });

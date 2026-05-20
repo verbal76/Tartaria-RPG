@@ -203,6 +203,7 @@ import {
 } from '../engine/statusEffects';
 import type { StatusEffect, MemorableEvent } from '../engine/types';
 import { TUTORIAL_STEPS } from '../components/tutorialSteps';
+import { findFragmentById, findStoryByFragmentId } from '../engine/collectables';
 
 interface Concept {
   id: string;
@@ -494,6 +495,7 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
       };
     }),
     completedFactionQuestIds: p.completedFactionQuestIds ?? [],
+    collectables: p.collectables ?? [],
     activeHunts: p.activeHunts ?? [],
     completedHuntIds: p.completedHuntIds ?? [],
     activeMysteries: p.activeMysteries ?? [],
@@ -643,6 +645,11 @@ interface GameStore {
    *  tap; that path tears down cleanly before reloadAsync. */
   pendingOTAUpdate: boolean;
   clearPendingOTAUpdate: () => void;
+  /** Add a collectable story-fragment id to the player's set. Silent
+   *  no-op if the fragment is unknown OR already owned. Safe to call
+   *  from any loot path. Logs a reward line on first acquisition.
+   *  See app/engine/collectables.ts for the fragment catalog. */
+  grantCollectableFragment: (fragmentId: string) => void;
   /** Pre-fill text staged by ActionReferenceScreen (or any other
    *  helper screen) for the next mount of InputBox on the exploration
    *  screen. InputBox reads this once on mount + on changes, drops
@@ -865,6 +872,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   clearPendingOTAUpdate() {
     set({ pendingOTAUpdate: false });
+  },
+
+  grantCollectableFragment(fragmentId) {
+    const player = get().player;
+    if (!player) return;
+    const frag = findFragmentById(fragmentId);
+    if (!frag) return;
+    const owned = player.collectables ?? [];
+    if (owned.includes(fragmentId)) return;
+    const story = findStoryByFragmentId(fragmentId);
+    set((s) =>
+      s.player
+        ? {
+            player: {
+              ...s.player,
+              collectables: [...(s.player.collectables ?? []), fragmentId],
+            },
+          }
+        : s,
+    );
+    const storyLabel = story ? story.characterName : 'an unknown hand';
+    get().appendLog(
+      'reward',
+      `✦ Found ${frag.title} — ${storyLabel}. (open Contracts → Collectibles to read)`,
+    );
+    void get().persist();
   },
 
   queueInputDraft(text) {

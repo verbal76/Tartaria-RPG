@@ -429,6 +429,12 @@ export interface PlayerCharacter {
    *  tutorial. Set once, never reset; ensures the walkthrough only runs
    *  on the first session of a fresh character. */
   hasSeenIntro?: boolean;
+  /** Story-fragment ids the player has collected. Each fragment id maps
+   *  to an entry in app/data/collectables/character_stories.json under
+   *  one of the 10 character stories. The Collectables tab in
+   *  ContractsScreen reads this list to compute per-character progress
+   *  and reveal which fragments are still in the field. */
+  collectables?: string[];
   /** Current (x, y) on the procedural grid. Defaults to map center. */
   mapX?: number;
   mapY?: number;
