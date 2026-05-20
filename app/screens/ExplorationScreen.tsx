@@ -9,6 +9,8 @@ import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
 import { SalvageModal } from '../components/SalvageModal';
+import { TakeModal } from '../components/TakeModal';
+import { findCatalogItem } from '../engine/crafting';
 import { ApproachModal } from '../components/ApproachModal';
 import { TutorialTarget } from '../components/TutorialTarget';
 import { findWeaponByName } from '../engine/crafting';
@@ -52,6 +54,8 @@ export function ExplorationScreen() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [approachOpen, setApproachOpen] = useState(false);
   const [salvageOpen, setSalvageOpen] = useState(false);
+  const [takeOpen, setTakeOpen] = useState(false);
+  const takeAmbientNoun = useGameStore((s) => s.takeAmbientNoun);
 
   // Build one view per enemy in the scene. Tap-to-cycle is wired through
   // the store's setActiveEnemyIdx so combat handlers always target the
@@ -187,6 +191,7 @@ export function ExplorationScreen() {
             onOpenCrafting={() => setScreen('crafting')}
             onOpenApproach={() => setApproachOpen(true)}
             onOpenSalvage={() => setSalvageOpen(true)}
+            onOpenTake={() => setTakeOpen(true)}
             inCombat={inCombat}
             equippedMain={equippedMain}
             equippedOff={equippedOff}
@@ -214,6 +219,17 @@ export function ExplorationScreen() {
           submit(`search the ${target}`);
         }}
         onCancel={() => setSearchOpen(false)}
+      />
+
+      <TakeModal
+        visible={takeOpen}
+        takeable={(currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])
+          .filter((n) => findCatalogItem(n) !== null)}
+        onTake={(noun) => {
+          setTakeOpen(false);
+          takeAmbientNoun(noun);
+        }}
+        onCancel={() => setTakeOpen(false)}
       />
 
       <SalvageModal

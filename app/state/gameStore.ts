@@ -671,6 +671,12 @@ interface GameStore {
    *  from any loot path. Logs a reward line on first acquisition.
    *  See app/engine/collectables.ts for the fragment catalog. */
   grantCollectableFragment: (fragmentId: string) => void;
+  /** Direct take of an ambient-noun scene prop, bypassing the
+   *  parser. Resolves the noun via findCatalogItem (with alias
+   *  layer), checks per-room dedupe, grants the canonical item.
+   *  Used by the TAKE quick-action chip modal so the player gets
+   *  100% certainty their tap lands the thing in their pack. */
+  takeAmbientNoun: (noun: string) => void;
   /** Pre-fill text staged by ActionReferenceScreen (or any other
    *  helper screen) for the next mount of InputBox on the exploration
    *  screen. InputBox reads this once on mount + on changes, drops
@@ -918,6 +924,85 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       `✦ Found ${frag.title} — ${storyLabel}. (open Contracts → Collectibles to read)`,
     );
+    void get().persist();
+  },
+
+  takeAmbientNoun(noun) {
+    const state = get();
+    const player = state.player;
+    const scene = state.currentScene;
+    if (!player || !scene) return;
+    const trimmed = noun.trim();
+    if (!trimmed) return;
+    // Match the noun against the scene's full ambient pool (not just
+    // the displayed 8) so e.g. 'rusted blade' resolves whether or
+    // not it's currently surfaced. Strict via matchAmbientNoun for
+    // case-insensitive substring matching.
+    const ambientHit = matchAmbientNoun(trimmed, scene.ambientNouns ?? []);
+    if (!ambientHit) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter looks around. "I don't see ${trimmed} here. Choose words carefully — try one of the visible interactables."`,
+      );
+      return;
+    }
+    const roomKey = makeRoomKey(player.currentLocationId, scene.microMicroId, player.mapX, player.mapY);
+    const room = state.worldMemory.visitedRooms?.[roomKey];
+    const ambientLower = ambientHit.toLowerCase();
+    const alreadyConsumed = (room?.searchedAmbientNouns ?? []).some(
+      (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
+    );
+    if (alreadyConsumed) {
+      get().appendLog('world', `You've already taken or worked over the ${ambientHit} here. Nothing more to claim.`);
+      return;
+    }
+    const cat = findCatalogItem(ambientHit);
+    if (!cat) {
+      // Scene feature, not a portable item. Same redirect as the
+      // verb-routed pickup path uses.
+      get().appendLog(
+        'world',
+        `The ${ambientHit} is part of the scene, not a loose drop. Try the SALVAGE button instead to harvest it for parts.`,
+      );
+      return;
+    }
+    const newItem: InventoryItem = stampDurability({
+      id: `take_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      name: cat.name,
+      kind: cat.kind,
+      rarity: cat.rarity,
+      quantity: 1,
+      tags: cat.tags,
+    });
+    const grantResult = grantItem(player.inventory, newItem);
+    set((s) => (s.player ? { player: { ...s.player, inventory: grantResult.inventory } } : s));
+    // Mark consumed so re-take AND re-salvage on the same ambient
+    // in this room hit the dedupe gate.
+    set((s) => {
+      const r = s.worldMemory.visitedRooms?.[roomKey] ?? {
+        firstVisitAt: Date.now(),
+        lastVisitAt: Date.now(),
+        visitCount: 1,
+      };
+      return {
+        worldMemory: {
+          ...s.worldMemory,
+          visitedRooms: {
+            ...(s.worldMemory.visitedRooms ?? {}),
+            [roomKey]: {
+              ...r,
+              searchedAmbientNouns: [...(r.searchedAmbientNouns ?? []), ambientLower],
+            },
+          },
+        },
+      };
+    });
+    if (grantResult.accepted > 0) {
+      get().appendLog('world', `You take the ${cat.name} from where it lay.`);
+      get().appendLog('reward', `✦ ${cat.name} (${cat.rarity}).`);
+    } else {
+      get().appendLog('world', `Found a ${cat.name.toLowerCase()}, but your pack is already full of them.`);
+    }
     void get().persist();
   },
 

@@ -14,6 +14,7 @@ interface Props {
   onOpenCrafting: () => void;
   onOpenApproach: () => void;
   onOpenSalvage: () => void;
+  onOpenTake: () => void;
   inCombat: boolean;
   equippedMain: string | null;
   equippedOff: string | null;
@@ -43,7 +44,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, inCombat, equippedMain, equippedOff, range }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, inCombat, equippedMain, equippedOff, range }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
   // BrandedKeyboard is the Tartaria-themed on-screen keyboard. We
@@ -233,6 +234,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             ))}
             <QuickBtn label="search" onPress={onOpenSearch} />
             <QuickBtn label="approach" onPress={onOpenApproach} />
+            <QuickBtn label="take" onPress={onOpenTake} />
             <QuickBtn label="salvage" onPress={onOpenSalvage} />
             <QuickBtn label="craft" onPress={onOpenCrafting} />
             <QuickBtn label="inventory" onPress={onOpenInventory} />
