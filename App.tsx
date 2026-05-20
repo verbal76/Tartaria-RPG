@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, AppState, Platform, StatusBar as RNStatusBar, type AppStateStatus } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import * as NavigationBar from 'expo-navigation-bar';
+// expo-navigation-bar is a NATIVE module — only present in APKs built
+// after it was added. Loaded via lazy require() inside the effect
+// below so older APKs (testers on builds before the native module
+// shipped) don't fail to load the JS bundle at import time. The
+// require returns null on those builds; the effect no-ops.
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useGameStore } from './app/state/gameStore';
 import { TitleScreen } from './app/screens/TitleScreen';
@@ -22,6 +26,25 @@ import { initTTSManager } from './app/voice/TTSManager';
 import { startTTSController, stopTTSController } from './app/voice/TTSController';
 import { createExpoFileSystemAdapter } from './app/voice/executorchAdapter';
 import { checkAndApplyOTA } from './app/updates/checkAndApplyOTA';
+
+// Lazy-load expo-navigation-bar. The package is a native module bridged
+// only in APKs built AFTER it was added to dependencies — older
+// installed APKs (existing testers) don't have the bridge. A static
+// import at the top of App.tsx could blow up at JS-bundle-load time on
+// those builds and leave testers stuck. require() inside a try/catch
+// resolves the JS shim if present and returns null otherwise; callers
+// no-op on null. Cached after first successful load.
+let _navigationBarCache: typeof import('expo-navigation-bar') | null | undefined;
+function loadNavigationBar(): typeof import('expo-navigation-bar') | null {
+  if (_navigationBarCache !== undefined) return _navigationBarCache;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    _navigationBarCache = require('expo-navigation-bar');
+  } catch {
+    _navigationBarCache = null;
+  }
+  return _navigationBarCache ?? null;
+}
 
 // Wire react-native-executorch's resource fetcher at module load (before
 // React renders) so any later TextToSpeechModule.fromModelName call has
@@ -89,8 +112,10 @@ export default function App() {
   // them back when needed. No-op on iOS.
   useEffect(() => {
     if (Platform.OS !== 'android') return;
-    void NavigationBar.setBehaviorAsync('overlay-swipe').catch(() => { /* ignore */ });
-    void NavigationBar.setVisibilityAsync('hidden').catch(() => { /* ignore */ });
+    const NB = loadNavigationBar();
+    if (!NB) return;
+    void NB.setBehaviorAsync('overlay-swipe').catch(() => { /* ignore */ });
+    void NB.setVisibilityAsync('hidden').catch(() => { /* ignore */ });
     // The system can re-show the navigation bar when the keyboard opens
     // or a system dialog appears; AppState 'active' transitions are a
     // reliable hook to reassert hidden state. The listener below in the
@@ -149,7 +174,8 @@ export default function App() {
         // after the app comes back from background (system dialogs,
         // keyboard close events). Idempotent and cheap.
         if (Platform.OS === 'android') {
-          void NavigationBar.setVisibilityAsync('hidden').catch(() => { /* ignore */ });
+          const NB = loadNavigationBar();
+          if (NB) void NB.setVisibilityAsync('hidden').catch(() => { /* ignore */ });
         }
         // Qwen does not auto-resume — re-bootQwen would re-trigger the
         // download UI; we leave it dormant and let the user restart it
