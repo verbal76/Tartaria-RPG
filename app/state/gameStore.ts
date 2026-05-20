@@ -203,7 +203,7 @@ import {
 } from '../engine/statusEffects';
 import type { StatusEffect, MemorableEvent } from '../engine/types';
 import { TUTORIAL_STEPS } from '../components/tutorialSteps';
-import { findFragmentById, findStoryByFragmentId } from '../engine/collectables';
+import { findFragmentById, findStoryByFragmentId, pickFragmentForBiome } from '../engine/collectables';
 
 interface Concept {
   id: string;
@@ -4155,6 +4155,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           void get().persist();
           break;
         }
+        // Collectable-fragment substitution. Same gate as wasteland
+        // encounters — biome match + un-owned + 8% chance. When it
+        // fires, the fragment replaces the rolled item entirely
+        // (consumes the drop slot per the design spec).
+        const containerFragId = pickFragmentForBiome(
+          player.collectables ?? [],
+          currentScene.location.tags ?? [],
+        );
+        if (containerFragId) {
+          get().appendLog('world', containerNarrate(matched, target));
+          get().grantCollectableFragment(containerFragId);
+          void get().persist();
+          break;
+        }
         const grantResult = grantItem(player.inventory, {
           id: `${rolled.entry.name}_${Date.now()}`,
           name: rolled.entry.name,
@@ -6559,21 +6573,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (enc.loot) {
           const livePlayer = get().player;
           if (livePlayer) {
-            const grantResult = grantItem(livePlayer.inventory, {
-              id: `${enc.loot.name}_${Date.now()}`,
-              name: enc.loot.name,
-              kind: enc.loot.kind,
-              quantity: enc.loot.quantity,
-              tags: enc.loot.tags,
-            });
-            set((s) => (s.player
-              ? { player: { ...s.player, inventory: grantResult.inventory } }
-              : s));
-            if (grantResult.accepted > 0) {
-              get().appendLog(
-                'reward',
-                `✦ Recovered ${enc.loot.name}${grantResult.accepted > 1 ? ` x${grantResult.accepted}` : ''}.`,
-              );
+            // Collectable-fragment substitution. Per design: low spawn
+            // rate, consumes the drop slot, biome-matched. If a fragment
+            // fires, skip the normal loot grant entirely — the fragment
+            // IS the loot for this encounter.
+            const fragId = pickFragmentForBiome(
+              livePlayer.collectables ?? [],
+              scene.location.tags ?? [],
+            );
+            if (fragId) {
+              get().grantCollectableFragment(fragId);
+            } else {
+              const grantResult = grantItem(livePlayer.inventory, {
+                id: `${enc.loot.name}_${Date.now()}`,
+                name: enc.loot.name,
+                kind: enc.loot.kind,
+                quantity: enc.loot.quantity,
+                tags: enc.loot.tags,
+              });
+              set((s) => (s.player
+                ? { player: { ...s.player, inventory: grantResult.inventory } }
+                : s));
+              if (grantResult.accepted > 0) {
+                get().appendLog(
+                  'reward',
+                  `✦ Recovered ${enc.loot.name}${grantResult.accepted > 1 ? ` x${grantResult.accepted}` : ''}.`,
+                );
+              }
             }
           }
         }

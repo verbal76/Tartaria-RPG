@@ -20,6 +20,11 @@ export interface CollectableFragment {
    *  concrete enough that the player can guess WHICH kind of place
    *  to look — biome, location name, or a faction reference. */
   discoveryHint: string;
+  /** Biome tags this fragment is eligible to drop in. ANY-match against
+   *  the scene's location.tags. Each fragment is tagged in the JSON
+   *  during authoring; the substitute helper below uses this to gate
+   *  which fragments can be considered for a given encounter. */
+  biomeTags: string[];
 }
 
 export interface CharacterStory {
@@ -77,6 +82,47 @@ export interface CharacterProgress {
   fraction: number;
   /** True when every fragment for this character has been found. */
   complete: boolean;
+}
+
+/** Probability that an eligible loot roll is substituted with a
+ *  fragment grant. Per the player's spec: low spawn rate, consumes
+ *  the drop slot (caller skips normal loot when this returns a
+ *  fragment id). 8% lands at "you'll find one every dozen-ish
+ *  containers in the right biome" without making them feel rare-rare. */
+export const FRAGMENT_SUBSTITUTE_CHANCE = 0.08;
+
+/** Pick a fragment to drop in place of normal loot, given the
+ *  player's already-owned fragment list + the scene's biome tags.
+ *  Returns the fragment id on substitute, or null when:
+ *   - no eligible un-owned fragments match this biome
+ *   - the substitution roll missed (FRAGMENT_SUBSTITUTE_CHANCE gate)
+ *
+ *  The caller (wasteland encounter handler, container loot, etc.)
+ *  should call grantCollectableFragment(id) and SKIP its normal loot
+ *  grant — the fragment counts AGAINST the drop volume by design.
+ *
+ *  rng injectable for tests; defaults to Math.random.
+ */
+export function pickFragmentForBiome(
+  playerCollectables: readonly string[],
+  sceneTags: readonly string[],
+  opts?: { chance?: number; rng?: () => number },
+): string | null {
+  const chance = opts?.chance ?? FRAGMENT_SUBSTITUTE_CHANCE;
+  const rng = opts?.rng ?? Math.random;
+  if (rng() >= chance) return null;
+  const owned = new Set(playerCollectables);
+  const tagSet = new Set(sceneTags.map((t) => t.toLowerCase()));
+  const eligible: CollectableFragment[] = [];
+  for (const frag of ALL_FRAGMENTS) {
+    if (owned.has(frag.id)) continue;
+    if (frag.biomeTags.some((t) => tagSet.has(t.toLowerCase()))) {
+      eligible.push(frag);
+    }
+  }
+  if (eligible.length === 0) return null;
+  const idx = Math.floor(rng() * eligible.length);
+  return eligible[idx]?.id ?? null;
 }
 
 /** Compute progress for every authored character given the player's

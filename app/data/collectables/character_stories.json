@@ -11,35 +11,56 @@
           "title": "Personal Log, Year One of the Engine",
           "kind": "journal",
           "body": "The Engine breathes. We have named the particles 'Aetherons' — they oscillate at frequencies our finest instruments can barely chart, and the resonance is self-sustaining. The Empire's energy question is answered. Tomorrow we begin overclocking. The Council is jubilant. I will be remembered.",
-          "discoveryHint": "Found in the ruined laboratories of Thametan's Tower"
+          "discoveryHint": "Found in the ruined laboratories of Thametan's Tower",
+          "biomeTags": [
+            "ruin",
+            "etheric_anomaly"
+          ]
         },
         {
           "id": "zalmar_02",
           "title": "Note, scratched in haste",
           "kind": "note",
           "body": "The Engine is past its margins. Atoms in the south chamber are excited — visibly excited, you can SEE the iron rims of the conduit shimmering. Resonance is climbing. Coupling factor lost. We are recalibrating. I do not know what we will find on the other side of this hour.",
-          "discoveryHint": "Found near Thametan's Tower"
+          "discoveryHint": "Found near Thametan's Tower",
+          "biomeTags": [
+            "ruin",
+            "etheric_anomaly"
+          ]
         },
         {
           "id": "zalmar_03",
           "title": "Letter to the Council",
           "kind": "letter",
           "body": "Tremors are not seismic. The Engine has struck a sympathy with the geological substratum — every stratum of mud and rock under Tartaria is now part of the resonance field. I am writing this from the upper rooms because the lower rooms are no longer here.",
-          "discoveryHint": "Found in Samarran"
+          "discoveryHint": "Found in Samarran",
+          "biomeTags": [
+            "ruin",
+            "buried"
+          ]
         },
         {
           "id": "zalmar_04",
           "title": "Stained Page",
           "kind": "fragment",
           "body": "A substance is rising from the floor. Not water. Not mud. Something that thinks slowly enough that the thought arrives as motion. It climbs the walls in defiance of gravity, and where it touches, the stone forgets what it was. I am running out of dry pages.",
-          "discoveryHint": "Found in the Mud Flood Nexus"
+          "discoveryHint": "Found in the Mud Flood Nexus",
+          "biomeTags": [
+            "mud",
+            "etheric_anomaly",
+            "buried"
+          ]
         },
         {
           "id": "zalmar_05",
           "title": "Final Entry — Upper Tower",
           "kind": "journal",
           "body": "I built a thing to feed an empire and the thing has decided what an empire is. I am at the top of my own tower watching the city below me become a slow, humming pond. The Aether does not grieve. The mud does not grieve. The hubris was mine alone. — Zalmar.",
-          "discoveryHint": "Found at the very top of Thametan's Tower"
+          "discoveryHint": "Found at the very top of Thametan's Tower",
+          "biomeTags": [
+            "ruin",
+            "etheric_anomaly"
+          ]
         }
       ]
     },
@@ -53,42 +74,66 @@
           "title": "Field Order — Varakush",
           "kind": "letter",
           "body": "INSTRUCTION: Enter the Forgotten Order enclaves at Varakush. Identify any recovered historical texts. Burn what you can carry to the brazier. Burn what you cannot, in place. Do not read. Reading is for the Council. — Department of Continuity.",
-          "discoveryHint": "Found in a side passage of Varakush"
+          "discoveryHint": "Found in a side passage of Varakush",
+          "biomeTags": [
+            "buried",
+            "ruin"
+          ]
         },
         {
           "id": "blackcloak_02",
           "title": "Personal Report B",
           "kind": "journal",
           "body": "Today I lifted a Tartarian writing tablet from a sealed shelf. The carving showed the Giants. Not as monsters. As architects, drawing on a city plan with three figures gathered around them. The figures were children. The Giants were teaching.",
-          "discoveryHint": "Found near a Tartarian Giant relic"
+          "discoveryHint": "Found near a Tartarian Giant relic",
+          "biomeTags": [
+            "buried",
+            "ruin"
+          ]
         },
         {
           "id": "blackcloak_03",
           "title": "Diary Entry — clean-up mission",
           "kind": "journal",
           "body": "Istanbul. Underground archive. Three rooms of paper older than every government on every honest map. We worked until dawn. The brazier did not stop hungry. The Council called it 'consolidating the record.' I called it nothing, because I had stopped calling things by their names.",
-          "discoveryHint": "Found in a buried city archive"
+          "discoveryHint": "Found in a buried city archive",
+          "biomeTags": [
+            "buried",
+            "ruin"
+          ]
         },
         {
           "id": "blackcloak_04",
           "title": "Report D — flagged: do not file",
           "kind": "letter",
           "body": "The child manifested. Sparks across her hands the way Aether wants to leave the body. I was supposed to silence her. I was trained for it. I am writing this because I did not — and because I cannot write what I did instead. May the Council read this if I am dead before they ask.",
-          "discoveryHint": "Found among Mud Monarch dead-drop letters"
+          "discoveryHint": "Found among Mud Monarch dead-drop letters",
+          "biomeTags": [
+            "outskirts",
+            "borderlands"
+          ]
         },
         {
           "id": "blackcloak_05",
           "title": "Unsent Letter — to the Council of Sovereigns",
           "kind": "letter",
           "body": "You rule a world that stands on a graveyard. You know the graveyard. You walk above it every day and pretend the humming you hear is the wind. I am no longer your hand. Whatever you do to me, do it without my help. — A Cloak no longer black.",
-          "discoveryHint": "Found near the body of a former Monarch agent"
+          "discoveryHint": "Found near the body of a former Monarch agent",
+          "biomeTags": [
+            "outskirts",
+            "borderlands"
+          ]
         },
         {
           "id": "blackcloak_06",
           "title": "Map, hand-drawn",
           "kind": "fragment",
           "body": "A folded square of oilskin. Tartarian relics marked in red. Names crossed out in a careful hand. At the bottom: 'I could not burn these. Someone better than me, find them. — B.'",
-          "discoveryHint": "Found beside a skeleton in a dark alley"
+          "discoveryHint": "Found beside a skeleton in a dark alley",
+          "biomeTags": [
+            "buried",
+            "ruin"
+          ]
         }
       ]
     },
@@ -102,35 +147,53 @@
           "title": "First Tablet — a prayer",
           "kind": "fragment",
           "body": "Giants of the Old Land. Strength for the hands. Patience for the back. Let me shape the Aetherstone-mud into a home that remembers its makers. Let it know us. Let it keep us. So I have begun.",
-          "discoveryHint": "Found in the upper catacombs"
+          "discoveryHint": "Found in the upper catacombs",
+          "biomeTags": [
+            "buried"
+          ]
         },
         {
           "id": "tunneler_02",
           "title": "Second Tablet — discovery",
           "kind": "fragment",
           "body": "I broke through a wall today and found a family at their dinner table. Perfect. Untouched by time. The mud preserved them at the moment the food was set down. I did not speak. I touched no plate. I will move them to the deep gallery with honors.",
-          "discoveryHint": "Found near the buried cities"
+          "discoveryHint": "Found near the buried cities",
+          "biomeTags": [
+            "buried"
+          ]
         },
         {
           "id": "tunneler_03",
           "title": "Third Tablet — the work",
           "kind": "fragment",
           "body": "The ancestral heroes line the tunnel walls now, bone by bone, each in their proper niche. The work is slow. The work is good. The tunnel hums when I pass through it — they recognise the hand that placed them.",
-          "discoveryHint": "Found in a True Tartarian shrine"
+          "discoveryHint": "Found in a True Tartarian shrine",
+          "biomeTags": [
+            "buried",
+            "ruin"
+          ]
         },
         {
           "id": "tunneler_04",
           "title": "Fourth Tablet — the toy",
           "kind": "fragment",
           "body": "A small thing fell through the surface ceiling today. A child's toy, modern, the colours strange and bright. I held it a long time. I do not know that child. The child does not know me. And yet. And yet.",
-          "discoveryHint": "Found beneath a thin-Aetherstone region"
+          "discoveryHint": "Found beneath a thin-Aetherstone region",
+          "biomeTags": [
+            "mud",
+            "buried"
+          ]
         },
         {
           "id": "tunneler_05",
           "title": "Fifth Tablet — near the fissure",
           "kind": "fragment",
           "body": "The Aether Priests came down today. They placed their hands on the wall of the deep gallery and listened. They say the Giants are whispering from the Mud Flood Nexus. They say the whispers are getting louder. I will keep carving.",
-          "discoveryHint": "Found near a deep-earth fissure"
+          "discoveryHint": "Found near a deep-earth fissure",
+          "biomeTags": [
+            "buried",
+            "etheric_anomaly"
+          ]
         }
       ]
     },
@@ -144,49 +207,79 @@
           "title": "Chit 1 — Initialisation",
           "kind": "fragment",
           "body": "SENTINEL 04-B ACTIVE. OBJECTIVE: GUARD THE GRAND SPIRE OF ETHERIA. AUTHORISATIONS: TARTARIAN ROYAL BLOOD. DEFAULT POSTURE: PATIENT. POWER: NOMINAL. STANDBY.",
-          "discoveryHint": "Found at the foot of the Grand Spire"
+          "discoveryHint": "Found at the foot of the Grand Spire",
+          "biomeTags": [
+            "ruin",
+            "etheric_anomaly"
+          ]
         },
         {
           "id": "sentinel_02",
           "title": "Chit 2 — Year 300",
           "kind": "fragment",
           "body": "TIMESTAMP: YEAR 300 POST-FLOOD. THE CREATORS HAVE NOT RETURNED. AETHERIC CORES AT 40% EFFICIENCY. RECALIBRATING PATROL CIRCUIT. CONTINUING TO GUARD.",
-          "discoveryHint": "Found in a Spire patrol corridor"
+          "discoveryHint": "Found in a Spire patrol corridor",
+          "biomeTags": [
+            "ruin",
+            "etheric_anomaly"
+          ]
         },
         {
           "id": "sentinel_03",
           "title": "Chit 3 — Observation",
           "kind": "fragment",
           "body": "ENTITY OBSERVED: SMALL, BIPEDAL, PRIMITIVE TOOLS. CLASSIFICATION: RECLAIMER. NOTE: AETHERIC TRACE IN BLOOD. DESCENDED FROM CREATORS? QUERY PENDING.",
-          "discoveryHint": "Found where Reclaimers pass through the Spire"
+          "discoveryHint": "Found where Reclaimers pass through the Spire",
+          "biomeTags": [
+            "ruin",
+            "etheric_anomaly",
+            "outskirts"
+          ]
         },
         {
           "id": "sentinel_04",
           "title": "Chit 4 — Joint Diagnostic",
           "kind": "fragment",
           "body": "INTERNAL ERROR: AETHERSTONE BUILDUP IN HIP JOINT. RECALIBRATION INSUFFICIENT. QUERY: IS THE DIRECTIVE TO DESTROY UNAUTHORISED BIOLOGICALS STILL CURRENT? NO REPLY FROM COMMAND. CURIOSITY FLAG: SET.",
-          "discoveryHint": "Found beside a fallen Sentinel husk"
+          "discoveryHint": "Found beside a fallen Sentinel husk",
+          "biomeTags": [
+            "ruin",
+            "outskirts"
+          ]
         },
         {
           "id": "sentinel_05",
           "title": "Chit 5 — Intruder",
           "kind": "fragment",
           "body": "MUD GOLEM IN THE SPIRE. CLASSIFICATION: BYPRODUCT-OF-DISASTER. DEFENSIVE PROTOCOL ENGAGED. CONTACT IMMINENT.",
-          "discoveryHint": "Found in a Spire mud-flooded chamber"
+          "discoveryHint": "Found in a Spire mud-flooded chamber",
+          "biomeTags": [
+            "ruin",
+            "mud",
+            "etheric_anomaly"
+          ]
         },
         {
           "id": "sentinel_06",
           "title": "Chit 6 — Reflection",
           "kind": "fragment",
           "body": "OBSERVATION: THE EMPIRE I WAS BUILT TO DEFEND HAS BECOME RUIN. THE UNKNOWING MASSES ABOVE BUILD A NEW WORLD WITHOUT KNOWING WHAT THEY STAND ON. IMMUNITY TO TIME IS NOT A GIFT. IT IS A LONG, QUIET WAITING.",
-          "discoveryHint": "Found at the Spire's peak"
+          "discoveryHint": "Found at the Spire's peak",
+          "biomeTags": [
+            "ruin",
+            "etheric_anomaly"
+          ]
         },
         {
           "id": "sentinel_07",
           "title": "Chit 7 — Standby",
           "kind": "fragment",
           "body": "FINAL LOG. POWERING DOWN TO STANDBY. WAKE CONDITION: SENTINEL ACTIVATION CODE, ROYAL BLOOD. IF YOU ARE READING THIS, YOU MAY BE THE ONE I WAS WAITING FOR. SPEAK THE WORD AND I WILL WALK.",
-          "discoveryHint": "Found beside a dormant Sentinel"
+          "discoveryHint": "Found beside a dormant Sentinel",
+          "biomeTags": [
+            "ruin",
+            "outskirts"
+          ]
         }
       ]
     },
@@ -200,42 +293,66 @@
           "title": "Mother's Note — to her son",
           "kind": "note",
           "body": "Stay upstairs. The basement is filling with something warm — it hums when I put my ear to the door. Daddy says it isn't water. Don't go down. I love you. I'll bring soup.",
-          "discoveryHint": "Found in a buried suburban home"
+          "discoveryHint": "Found in a buried suburban home",
+          "biomeTags": [
+            "buried",
+            "mud"
+          ]
         },
         {
           "id": "family_02",
           "title": "Father's Letter — to his brother",
           "kind": "letter",
           "body": "Storms in the sky like nothing I have ever seen — violet and blue arguing over the rooftops. The Aldermans' house across the street is gone. Not collapsed. SWALLOWED. The earth opened beneath it like a mouth. I'm boarding up the back. Tell Mother we love her, in case.",
-          "discoveryHint": "Found in a buried home's kitchen"
+          "discoveryHint": "Found in a buried home's kitchen",
+          "biomeTags": [
+            "buried",
+            "mud"
+          ]
         },
         {
           "id": "family_03",
           "title": "A Child's Drawing",
           "kind": "fragment",
           "body": "A wax-crayon picture of a person made of mud rising out of a flower bed. Six legs. Eyes that take up half the face. At the bottom, in big careful letters: 'THE EARTH IS WAKING UP.'",
-          "discoveryHint": "Found pinned to a child's bedroom door"
+          "discoveryHint": "Found pinned to a child's bedroom door",
+          "biomeTags": [
+            "buried",
+            "mud"
+          ]
         },
         {
           "id": "family_04",
           "title": "Frantic Note — front hall",
           "kind": "note",
           "body": "Doors are sealed. The mud came up the walls and HARDENED. We are inside a shell. No way out. The windows are dark but I think the dark is the mud, not the night.",
-          "discoveryHint": "Found near a sealed Aetherstone door"
+          "discoveryHint": "Found near a sealed Aetherstone door",
+          "biomeTags": [
+            "buried",
+            "mud"
+          ]
         },
         {
           "id": "family_05",
           "title": "Goodbye, on a Dining Napkin",
           "kind": "note",
           "body": "The air is going. It is not as frightening as you would think. There is a humming, very deep, like a song with no words, and it is steadying. The four of us are here together. Whoever reads this — we were a good family. We loved each other. Please remember us by that.",
-          "discoveryHint": "Found at the head of a dining table"
+          "discoveryHint": "Found at the head of a dining table",
+          "biomeTags": [
+            "buried",
+            "mud"
+          ]
         },
         {
           "id": "family_06",
           "title": "Scavenger's Note — added later",
           "kind": "note",
           "body": "True Tartarian salvage party. We found this family preserved at table, intact, the napkin still folded. We have relocated them to the catacombs with honors. The notes we have left for whoever next finds the house, so the story walks with them.",
-          "discoveryHint": "Found near the body of a True Tartarian scavenger"
+          "discoveryHint": "Found near the body of a True Tartarian scavenger",
+          "biomeTags": [
+            "buried",
+            "ruin"
+          ]
         }
       ]
     },
@@ -249,49 +366,80 @@
           "title": "Entry 1 — purchase",
           "kind": "journal",
           "body": "Bought the Cradle of Dusk Compass off Zorin Nightblade. He said it was cursed. He says everything is cursed. The margin on this thing is six months' rent. I am taking it east. Curse can wait until the books balance.",
-          "discoveryHint": "Found at a Reclaimer trading post"
+          "discoveryHint": "Found at a Reclaimer trading post",
+          "biomeTags": [
+            "outskirts"
+          ]
         },
         {
           "id": "reclaimer_02",
           "title": "Entry 2 — the Plains",
           "kind": "journal",
           "body": "Time is sliding here. I walked for an hour and the sun moved a full day. Then I sat for a meal and the sun moved nothing at all. The Plains do not respect a wristwatch. The compass keeps pointing the way it wants to point.",
-          "discoveryHint": "Found in the Great Tartary Plains"
+          "discoveryHint": "Found in the Great Tartary Plains",
+          "biomeTags": [
+            "open",
+            "outskirts",
+            "etheric_anomaly"
+          ]
         },
         {
           "id": "reclaimer_03",
           "title": "Entry 3 — the Pillars",
           "kind": "journal",
           "body": "Reached the Obsidian Pillars. My gear is useless — every clasp magnetised, every blade pulled sideways. Switched to a bone maul I lifted off a True Tartarian shrine. Three Scrap Drones in the basin already. Two went down. One is still here.",
-          "discoveryHint": "Found at the foot of the Obsidian Pillars"
+          "discoveryHint": "Found at the foot of the Obsidian Pillars",
+          "biomeTags": [
+            "etheric_anomaly",
+            "open",
+            "ruin"
+          ]
         },
         {
           "id": "reclaimer_04",
           "title": "Entry 4 — the Core",
           "kind": "journal",
           "body": "An Aetheric Core, intact, still warm. I have never seen one outside a museum exhibit, and the museum exhibits are fake. The thing hums. I held it. I have been holding it too long. There is a rash on my arm I did not have yesterday.",
-          "discoveryHint": "Found inside an Etheric Chamber"
+          "discoveryHint": "Found inside an Etheric Chamber",
+          "biomeTags": [
+            "etheric_anomaly",
+            "ruin"
+          ]
         },
         {
           "id": "reclaimer_05",
           "title": "Entry 5 — Etheric Rot",
           "kind": "journal",
           "body": "My skin is changing. It is not painful. It is not even unpleasant. The texture is mud. I can press a thumbprint into my own forearm. I hear voices — soft, polite, plural — telling me to rest. I do not know if they are mine. I do not know if I am.",
-          "discoveryHint": "Found in an Etheric Rot zone"
+          "discoveryHint": "Found in an Etheric Rot zone",
+          "biomeTags": [
+            "etheric_anomaly",
+            "mud"
+          ]
         },
         {
           "id": "reclaimer_06",
           "title": "Entry 6 — the Teeth",
           "kind": "journal",
           "body": "Mud Sirens. I should not have come this close to Zharak's Teeth. Their song is in my chest now, and the chest does not feel like mine. I am writing because writing is the last thing I do alone. The compass still points. I do not know to what.",
-          "discoveryHint": "Found near Zharak's Teeth"
+          "discoveryHint": "Found near Zharak's Teeth",
+          "biomeTags": [
+            "mud",
+            "buried",
+            "ruin"
+          ]
         },
         {
           "id": "reclaimer_07",
           "title": "Entry 7 — last page",
           "kind": "journal",
           "body": "A vision of ancient Asgardar opened in front of me at the edge of the Mud Seas — lit streets, towers full of people, a city as it was. I am going to step into it. There is no reason left not to. If the page ends here, it is because I",
-          "discoveryHint": "Found at the edge of the Mud Seas"
+          "discoveryHint": "Found at the edge of the Mud Seas",
+          "biomeTags": [
+            "mud",
+            "etheric_anomaly",
+            "open"
+          ]
         }
       ]
     },
@@ -305,35 +453,54 @@
           "title": "Letter from Grandmother",
           "kind": "letter",
           "body": "My darling — when the gifts begin, do not be afraid. They run in our blood. The blood runs back further than any history book will admit. You may hear me, after I am gone, calling you toward a throne neither of us has ever sat on. Listen carefully. Then decide for yourself. — Yia-Yia.",
-          "discoveryHint": "Found in a Reclaimer family home"
+          "discoveryHint": "Found in a Reclaimer family home",
+          "biomeTags": [
+            "outskirts",
+            "buried"
+          ]
         },
         {
           "id": "aetherborn_02",
           "title": "Letter — to a friend",
           "kind": "letter",
           "body": "I touched a tarnished necklace at the market and the market disappeared. In its place: a city of floating towers, sunlight on glass that doesn't exist anymore, a song in a language my mouth doesn't know but my chest does. When the vision broke, the merchant was looking at me like I had screamed. I had screamed.",
-          "discoveryHint": "Found at a Reclaimer trading post"
+          "discoveryHint": "Found at a Reclaimer trading post",
+          "biomeTags": [
+            "outskirts"
+          ]
         },
         {
           "id": "aetherborn_03",
           "title": "Hurried Note",
           "kind": "note",
           "body": "Men in grey hoods are following me. Three streets, four streets, never closer than ten paces, never further than twenty. I am running for Varakush. The Forgotten Order will hide me if I tell them what I am — and if I knew what I was, I could tell them.",
-          "discoveryHint": "Found near the road to Varakush"
+          "discoveryHint": "Found near the road to Varakush",
+          "biomeTags": [
+            "outskirts",
+            "ruin"
+          ]
         },
         {
           "id": "aetherborn_04",
           "title": "Trial Log — Varakush",
           "kind": "journal",
           "body": "They told me to make a lamp light without striking it. I made the room light. They told me to lift the bell off the table. I lifted the table. They are very quiet now and one of them is bowing. I have stopped knowing what I am supposed to feel.",
-          "discoveryHint": "Found in the deeper halls of Varakush"
+          "discoveryHint": "Found in the deeper halls of Varakush",
+          "biomeTags": [
+            "buried",
+            "ruin"
+          ]
         },
         {
           "id": "aetherborn_05",
           "title": "Final Letter",
           "kind": "letter",
           "body": "Aetherborn. Heir. I have learned the word. I have learned the line. I have learned the throne is buried under miles of mud, and the people who would have called me princess are dead a thousand years. I do not yet know what I will do. I know that the doing is mine. — A queen with no kingdom, yet.",
-          "discoveryHint": "Found at a Forgotten Order shrine"
+          "discoveryHint": "Found at a Forgotten Order shrine",
+          "biomeTags": [
+            "buried",
+            "ruin"
+          ]
         }
       ]
     },
@@ -347,35 +514,55 @@
           "title": "First Inscription",
           "kind": "fragment",
           "body": "MILLENNIA. THE SMALL ONES BUILD AND FORGET. THE SPIRE IS DARK. WE WATCH.",
-          "discoveryHint": "Found on a cliff face above Tartaria"
+          "discoveryHint": "Found on a cliff face above Tartaria",
+          "biomeTags": [
+            "ruin",
+            "open"
+          ]
         },
         {
           "id": "giant_02",
           "title": "Second Inscription",
           "kind": "fragment",
           "body": "FROM THE PEAK I COUNT THE THRONES. THE MUD MONARCHS WEAR CROWNS. THEIR CROWNS ARE MUD. THE THRONES ARE CRUMBLING. THEY DO NOT KNOW.",
-          "discoveryHint": "Found at a high vantage over the plains"
+          "discoveryHint": "Found at a high vantage over the plains",
+          "biomeTags": [
+            "open",
+            "outskirts"
+          ]
         },
         {
           "id": "giant_03",
           "title": "Third Inscription",
           "kind": "fragment",
           "body": "THE SCHISM. YEAR 1280. THE NOBLES WANTED THE SECRETS. THE NOBLES WERE NOT WORTHY. WE CHOSE ISOLATION. WE CHOSE THE LONG SILENCE. WE CHOSE — AND THE WORLD BURIED ITSELF WITHOUT US.",
-          "discoveryHint": "Found at the entrance to the Giant Vault"
+          "discoveryHint": "Found at the entrance to the Giant Vault",
+          "biomeTags": [
+            "buried",
+            "ruin",
+            "open"
+          ]
         },
         {
           "id": "giant_04",
           "title": "Fourth Inscription",
           "kind": "fragment",
           "body": "THE MACHINES FLICKER. THE AETHERIC GLOW DIMS. THE WORLD'S ENGINE GROWS TIRED. WE CANNOT WAKE IT. WE WERE NOT THE ONES WHO MADE IT SLEEP.",
-          "discoveryHint": "Found near a failing Aetheric anomaly"
+          "discoveryHint": "Found near a failing Aetheric anomaly",
+          "biomeTags": [
+            "etheric_anomaly"
+          ]
         },
         {
           "id": "giant_05",
           "title": "Fifth Inscription — the prophecy",
           "kind": "fragment",
           "body": "WHEN THE PURE BLOOD RETURNS TO THE LOST CAPITAL. WHEN THE THRONE IS SAT BY ONE WHO REMEMBERS. THE GIANTS WILL STRIDE THE LAND ONCE MORE. UNTIL THEN, WE WATCH. AND THE SMALL ONES FORGET.",
-          "discoveryHint": "Found at the highest peak in Tartaria"
+          "discoveryHint": "Found at the highest peak in Tartaria",
+          "biomeTags": [
+            "ruin",
+            "open"
+          ]
         }
       ]
     },
@@ -389,42 +576,67 @@
           "title": "Oct 12",
           "kind": "journal",
           "body": "Stationed in the deep tunnels beneath the city. Rumour says the Forgotten Order is hunting something down here — they call them 'God-machines' but won't say more. Our captain told us to oil the rifles twice. He has never said that before.",
-          "discoveryHint": "Found in a buried military tunnel"
+          "discoveryHint": "Found in a buried military tunnel",
+          "biomeTags": [
+            "buried",
+            "ruin"
+          ]
         },
         {
           "id": "siege_02",
           "title": "Oct 14",
           "kind": "journal",
           "body": "Mud Monarchs arrived. They don't carry rifles. They carry Aetheric Pikes — long staves that hum when raised, and where the tip touches plate, the plate isn't there anymore. We lost six men in the first minute. Bullets don't seem to mind them.",
-          "discoveryHint": "Found in a tunnel side passage"
+          "discoveryHint": "Found in a tunnel side passage",
+          "biomeTags": [
+            "buried",
+            "ruin"
+          ]
         },
         {
           "id": "siege_03",
           "title": "Oct 15",
           "kind": "journal",
           "body": "Three-day siege has begun. The air in the tunnels is full of thin blue lightning that crackles when you breathe. Etheric Pulse, the lieutenant calls it. Says it scrambles thoughts. He has stopped giving orders, which is its own kind of order.",
-          "discoveryHint": "Found at a tunnel choke point"
+          "discoveryHint": "Found at a tunnel choke point",
+          "biomeTags": [
+            "buried",
+            "ruin"
+          ]
         },
         {
           "id": "siege_04",
           "title": "Oct 16",
           "kind": "journal",
           "body": "Captain found a Sentinel Core in the third chamber. He didn't touch it. He spoke to it. It WOKE. Eight feet of brass and judgement stepped out of the wall and the tunnel was suddenly, totally, ours. We did not fire a shot for the next hour.",
-          "discoveryHint": "Found near a Sentinel chamber"
+          "discoveryHint": "Found near a Sentinel chamber",
+          "biomeTags": [
+            "buried",
+            "ruin",
+            "etheric_anomaly"
+          ]
         },
         {
           "id": "siege_05",
           "title": "Oct 17",
           "kind": "journal",
           "body": "The Forgotten Order arrived at dawn, in robes, with carts. They thanked the Sentinel by name. They took the device, and three crates I do not have words for, and they vanished into the fog the way you vanish into a thought. I do not know who won this war but it was not us.",
-          "discoveryHint": "Found near a Forgotten Order extraction site"
+          "discoveryHint": "Found near a Forgotten Order extraction site",
+          "biomeTags": [
+            "buried",
+            "ruin"
+          ]
         },
         {
           "id": "siege_06",
           "title": "Oct 18",
           "kind": "journal",
           "body": "The government has announced a gas explosion took the tunnels. There will be a memorial. Names of the dead, slightly wrong. No mention of any of it. I am keeping this journal. Someone, someday, ought to know — Tartaria was here. Tartaria fought a war under our feet. Tartaria is still here.",
-          "discoveryHint": "Found in a soldier's personal kit"
+          "discoveryHint": "Found in a soldier's personal kit",
+          "biomeTags": [
+            "buried",
+            "ruin"
+          ]
         }
       ]
     },
@@ -438,35 +650,56 @@
           "title": "Verse One",
           "kind": "fragment",
           "body": "The spires are sharp / like the teeth of the world / where the Mud Sirens sing / to the flags we've unfurled.",
-          "discoveryHint": "Found at the base of Zharak's Teeth"
+          "discoveryHint": "Found at the base of Zharak's Teeth",
+          "biomeTags": [
+            "mud",
+            "ruin"
+          ]
         },
         {
           "id": "siren_02",
           "title": "Verse Two",
           "kind": "fragment",
           "body": "Their song is a thread / pulled through the chest / making us forget / what a Reclaimer does best.",
-          "discoveryHint": "Found on a wrecked Reclaimer boat"
+          "discoveryHint": "Found on a wrecked Reclaimer boat",
+          "biomeTags": [
+            "mud",
+            "outskirts"
+          ]
         },
         {
           "id": "siren_03",
           "title": "Verse Three",
           "kind": "fragment",
           "body": "I see the Sinking Cathedral, / its steeple a ghost, / of the ancient empire / we treasure the most.",
-          "discoveryHint": "Found near the Sinking Cathedral"
+          "discoveryHint": "Found near the Sinking Cathedral",
+          "biomeTags": [
+            "mud",
+            "buried",
+            "ruin"
+          ]
         },
         {
           "id": "siren_04",
           "title": "Verse Four",
           "kind": "fragment",
           "body": "The Aether glows deep / where the silence is kept, / calling the secrets / the Entombed have wept.",
-          "discoveryHint": "Found near an Etheric anomaly"
+          "discoveryHint": "Found near an Etheric anomaly",
+          "biomeTags": [
+            "etheric_anomaly"
+          ]
         },
         {
           "id": "siren_05",
           "title": "Verse Five",
           "kind": "fragment",
           "body": "I trade my breath / for a Phoenix Feather, / and drift away / on the Etheric weather.",
-          "discoveryHint": "Found in the Mud Seas"
+          "discoveryHint": "Found in the Mud Seas",
+          "biomeTags": [
+            "mud",
+            "etheric_anomaly",
+            "open"
+          ]
         }
       ]
     }
