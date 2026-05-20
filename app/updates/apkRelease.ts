@@ -32,7 +32,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 /** Most recent APK build number distributed to playtesters. Bumped
  *  whenever a new APK ships. 0 = no newer APK on offer; banner stays
  *  hidden. */
-export const LATEST_APK_BUILD = 152;
+export const LATEST_APK_BUILD = 158;
 
 /** URL the banner opens. Should be the GitHub release PAGE (html_url),
  *  NOT the direct asset (browser_download_url). Direct .apk links
@@ -42,16 +42,16 @@ export const LATEST_APK_BUILD = 152;
  *  the asset in a normal click-to-download UI that uses the public
  *  Downloads/ folder. Trade-off: one extra tap, but the file
  *  actually lands somewhere the user can install it from. */
-export const LATEST_APK_URL = 'https://github.com/verbal76/Tartaria-RPG/releases/tag/apk-build-152';
+export const LATEST_APK_URL = 'https://github.com/verbal76/Tartaria-RPG/releases/tag/apk-build-158';
 
 /** One-line summary of what the new APK enables that an OTA cannot.
  *  Surfaces on the banner so the player knows why they should install. */
-export const LATEST_APK_HIGHLIGHTS = 'Boss-tier enemies + dedicated boss-fight music. The new MP3 assets can only ship with a fresh APK.';
+export const LATEST_APK_HIGHLIGHTS = 'Boss-tier enemies + dedicated boss-fight music + one-tap in-app installer for future updates. The new MP3 assets and intent-launcher native module can only ship with a fresh APK.';
 
 /** Direct .apk asset URL — used by the in-app install path when the
  *  installed APK has expo-intent-launcher available. Older APKs
  *  without the native module fall through to LATEST_APK_URL (page). */
-export const LATEST_APK_ASSET_URL = 'https://github.com/verbal76/Tartaria-RPG/releases/download/apk-build-152/tartaria-realms-apk-build-152.apk';
+export const LATEST_APK_ASSET_URL = 'https://github.com/verbal76/Tartaria-RPG/releases/download/apk-build-158/tartaria-realms-apk-build-158.apk';
 
 // ── Live pointer (overrides constants when fresher) ────────────────
 
