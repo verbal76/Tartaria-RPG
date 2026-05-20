@@ -12,9 +12,11 @@ import {
 import * as Clipboard from 'expo-clipboard';
 import {
   isApkOutdated,
-  LATEST_APK_URL,
-  LATEST_APK_HIGHLIGHTS,
-  LATEST_APK_BUILD,
+  getLatestApkUrl,
+  getLatestApkHighlights,
+  getLatestApkBuild,
+  hydrateApkPointer,
+  refreshFromGitHub,
 } from '../updates/apkRelease';
 import { useGameStore } from '../state/gameStore';
 import { SwipeableRow } from '../components/SwipeableRow';
@@ -74,6 +76,25 @@ export function TitleScreen() {
       setRefreshing(false);
     }
   }, [refreshSlots]);
+
+  // Tick counter so the APK banner re-renders when the live pointer
+  // updates after the GitHub fetch returns. Without this, the banner
+  // reads the stale module-level state on first paint and never
+  // re-runs the gate. Boot flow: load cached pointer (sync paint with
+  // last-known build), then fire network fetch, then bump the tick.
+  const [apkPointerTick, setApkPointerTick] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      await hydrateApkPointer();
+      if (cancelled) return;
+      setApkPointerTick((t) => t + 1);
+      await refreshFromGitHub();
+      if (cancelled) return;
+      setApkPointerTick((t) => t + 1);
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const confirmDelete = (slot: SlotSummary) => {
     setPendingAction({ kind: 'delete', slot });
@@ -186,31 +207,38 @@ export function TitleScreen() {
 
       <KokoroDownloadBanner />
 
-      {isApkOutdated() && LATEST_APK_URL.length > 0 && (
-        <TouchableOpacity
-          style={styles.apkBanner}
-          activeOpacity={0.8}
-          onPress={() => {
-            // Linking.openURL hands off to Android — the browser /
-            // file manager opens the URL, the player downloads the
-            // APK, taps it, approves install-from-unknown-sources
-            // if needed. We don't (and can't) automate the install
-            // itself; this just removes the "find the link" step.
-            void Linking.openURL(LATEST_APK_URL).catch(() => {
-              // Best-effort. If the URL won't open, fall through
-              // silently — the player can copy it from About →
-              // diagnostics if they're motivated.
-            });
-          }}
-        >
-          <Text style={styles.apkBannerTitle}>
-            NEW APK AVAILABLE — TAP TO DOWNLOAD (build {LATEST_APK_BUILD})
-          </Text>
-          <Text style={styles.apkBannerBody}>
-            {LATEST_APK_HIGHLIGHTS || 'Native feature update. OTAs reach your current APK, but the new build adds capabilities only a fresh APK can ship.'}
-          </Text>
-        </TouchableOpacity>
-      )}
+      {(() => {
+        // apkPointerTick is read here so the gate re-evaluates after
+        // hydrateApkPointer + refreshFromGitHub flip the live pointer.
+        void apkPointerTick;
+        const url = getLatestApkUrl();
+        if (!isApkOutdated() || url.length === 0) return null;
+        return (
+          <TouchableOpacity
+            style={styles.apkBanner}
+            activeOpacity={0.8}
+            onPress={() => {
+              // Linking.openURL hands off to Android — the browser /
+              // file manager opens the URL, the player downloads the
+              // APK, taps it, approves install-from-unknown-sources
+              // if needed. We don't (and can't) automate the install
+              // itself; this just removes the "find the link" step.
+              void Linking.openURL(url).catch(() => {
+                // Best-effort. If the URL won't open, fall through
+                // silently — the player can copy it from About →
+                // diagnostics if they're motivated.
+              });
+            }}
+          >
+            <Text style={styles.apkBannerTitle}>
+              NEW APK AVAILABLE — TAP TO DOWNLOAD (build {getLatestApkBuild()})
+            </Text>
+            <Text style={styles.apkBannerBody}>
+              {getLatestApkHighlights() || 'Native feature update. OTAs reach your current APK, but the new build adds capabilities only a fresh APK can ship.'}
+            </Text>
+          </TouchableOpacity>
+        );
+      })()}
 
       {pendingOTAUpdate && (
         <TouchableOpacity
