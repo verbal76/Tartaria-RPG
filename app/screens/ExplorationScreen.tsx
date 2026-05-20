@@ -58,6 +58,38 @@ export function ExplorationScreen() {
   const [takeOpen, setTakeOpen] = useState(false);
   const takeAmbientNoun = useGameStore((s) => s.takeAmbientNoun);
   const stealthTakeAmbientNoun = useGameStore((s) => s.stealthTakeAmbientNoun);
+  const worldMemory = useGameStore((s) => s.worldMemory);
+
+  // Per-room dedup list — drives the "already taken" gating on the
+  // TAKE modal chips so once you grab the rope, the chip greys out
+  // instead of staying green and tappable. Mirrors the lookup logic
+  // in gameStore.takeAmbientNoun so the UI matches the engine's gate.
+  const consumedAmbientNouns = useMemo(() => {
+    if (!player || !currentScene) return new Set<string>();
+    const microMicroId = currentScene.microMicroId ?? '_';
+    const x = typeof player.mapX === 'number' ? player.mapX : '_';
+    const y = typeof player.mapY === 'number' ? player.mapY : '_';
+    const roomKey = `${player.currentLocationId}@${microMicroId}@${x},${y}`;
+    const room = worldMemory.visitedRooms?.[roomKey];
+    return new Set((room?.searchedAmbientNouns ?? []).map((n) => n.toLowerCase()));
+  }, [
+    player?.currentLocationId,
+    player?.mapX,
+    player?.mapY,
+    currentScene?.microMicroId,
+    worldMemory.visitedRooms,
+  ]);
+
+  // Same matching logic the takeAmbientNoun action uses — substring
+  // match either direction so "rope" in searched matches a "rope"
+  // chip, and a "buried rope" chip is blocked if "rope" was searched.
+  const isAmbientConsumed = (noun: string): boolean => {
+    const lower = noun.toLowerCase();
+    for (const n of consumedAmbientNouns) {
+      if (n === lower || lower.includes(n) || n.includes(lower)) return true;
+    }
+    return false;
+  };
 
   // Build one view per enemy in the scene. Tap-to-cycle is wired through
   // the store's setActiveEnemyIdx so combat handlers always target the
@@ -226,7 +258,8 @@ export function ExplorationScreen() {
       <TakeModal
         visible={takeOpen}
         takeable={(currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])
-          .filter((n) => findCatalogItem(n) !== null && !isOversized(n))}
+          .filter((n) => findCatalogItem(n) !== null && !isOversized(n))
+          .map((n) => ({ noun: n, consumed: isAmbientConsumed(n) }))}
         onTake={(noun) => {
           setTakeOpen(false);
           takeAmbientNoun(noun);

@@ -20,11 +20,22 @@ import {
   Pressable,
 } from 'react-native';
 
+export interface TakeableChip {
+  /** Display noun (matches the look-around ambient text). */
+  noun: string;
+  /** Already taken / worked over in this room. Rendered greyed-out
+   *  and untappable. */
+  consumed: boolean;
+}
+
 interface Props {
   visible: boolean;
   /** Pre-filtered list of takeable ambient nouns — catalog-resolvable
-   *  and not already consumed in this room. */
-  takeable: string[];
+   *  and not over-sized. Each entry carries a `consumed` flag so the
+   *  modal can grey out chips that have already been claimed in this
+   *  room without removing them entirely (player keeps the visual
+   *  reminder of what was in the scene). */
+  takeable: TakeableChip[];
   /** Open take (no roll, always succeeds). */
   onTake: (noun: string) => void;
   /** Stealth take — DEX vs DC 10 sleight check. Routes to
@@ -84,15 +95,31 @@ export function TakeModal({ visible, takeable, onTake, onStealthTake, onCancel }
                 </Text>
               ) : (
                 <ScrollView style={styles.chipScroll} contentContainerStyle={styles.chipList}>
-                  {takeable.map((n) => (
+                  {takeable.map(({ noun, consumed }) => (
                     <Pressable
-                      key={n}
-                      style={({ pressed }) => [styles.chip, pressed && styles.chipPressed]}
-                      onPress={() => (useStealth ? onStealthTake(n) : onTake(n))}
+                      key={noun}
+                      style={({ pressed }) => [
+                        styles.chip,
+                        consumed && styles.chipConsumed,
+                        pressed && !consumed && styles.chipPressed,
+                      ]}
+                      disabled={consumed}
+                      onPress={() => (useStealth ? onStealthTake(noun) : onTake(noun))}
                     >
-                      <Text style={styles.chipText}>{n}</Text>
-                      <Text style={useStealth ? styles.chipArrowStealth : styles.chipArrow}>
-                        {useStealth ? '→ lift quietly' : '→ pack'}
+                      <Text style={[styles.chipText, consumed && styles.chipTextConsumed]}>
+                        {noun}
+                      </Text>
+                      <Text
+                        style={[
+                          useStealth ? styles.chipArrowStealth : styles.chipArrow,
+                          consumed && styles.chipArrowConsumed,
+                        ]}
+                      >
+                        {consumed
+                          ? '✓ taken'
+                          : useStealth
+                            ? '→ lift quietly'
+                            : '→ pack'}
                       </Text>
                     </Pressable>
                   ))}
@@ -153,6 +180,18 @@ const styles = StyleSheet.create({
   chipText: { color: '#e6d8b3', fontSize: 14, fontWeight: '600' },
   chipArrow: { color: '#9ec96a', fontSize: 11, letterSpacing: 1 },
   chipArrowStealth: { color: '#6a9bbf', fontSize: 11, letterSpacing: 1 },
+  // Consumed (already-taken) state — chip stays in the list so the
+  // player can see what was here, but its border drops to a muted
+  // gray and the text and arrow lose color so it reads as
+  // "exhausted" rather than "actionable". disabled=true on the
+  // Pressable suppresses taps.
+  chipConsumed: {
+    backgroundColor: '#13110f',
+    borderColor: '#3a342c',
+    opacity: 0.55,
+  },
+  chipTextConsumed: { color: '#7a705c', fontStyle: 'italic' },
+  chipArrowConsumed: { color: '#5e5547' },
   stealthToggle: {
     paddingHorizontal: 12,
     paddingVertical: 8,
