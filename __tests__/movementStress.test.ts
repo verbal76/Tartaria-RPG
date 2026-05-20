@@ -396,12 +396,23 @@ describe('movementStress — cardinal travel + approach quick-action', () => {
           /there is no /i,
           /not in arm'?s reach|nothing to approach/i,
         ];
-        // Engine narration stems for a successful approach. Drawn
-        // from the actual hits we captured in the first run plus the
-        // shared "you move across the ground to the X" template
-        // documented in ApproachModal.tsx.
+        // Engine narration stems for a successful approach. The
+        // engine has TWO templates: (a) the canonical "You move
+        // across the ground to the X" line emitted by the advance
+        // intent in gameStore.ts when the noun resolves via
+        // matchAmbientNoun, and (b) hook-specific narration the
+        // hook plant uses when its noun is approached — these
+        // open with verbs like crouch, kneel, follow, circle,
+        // chip, pull, duck, pry, examine, brush, etc. and don't
+        // share a uniform shape. We accept any second-person verb
+        // that's followed (within a clause) by either the named
+        // noun OR a positional preposition (toward / over /
+        // beside / under / etc.). Refusal patterns are checked
+        // separately so we don't catch a soft-Arbiter line by
+        // accident.
         const APPROACH_NARRATION = new RegExp(
-          'you (?:move|stride|advance|close|step|walk|push|cross|come|head|make your way|duck|kneel|approach)\\b.*\\b(?:across|to|toward|on|in|under|over|up|beside|alongside|onto|past)\\b' +
+          // canonical approach
+          'you (?:move|stride|advance|close|step|walk|push|cross|come|head|make your way|duck|kneel|approach|crouch|circle|chip|pull|pry|brush|examine|study|follow|trace|reach|lean|bend|stoop|peer|set foot|edge|sidle|pace)\\b' +
           '|close enough now to act|closer now|within arm\'?s reach|near enough|now you can act',
           'i',
         );

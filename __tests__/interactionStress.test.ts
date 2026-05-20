@@ -378,19 +378,26 @@ describe('Interaction button stress — 700 in-game days', () => {
       // lines; tc emits "+N TC."; hook emits a planted line on world
       // channel; nothing emits a flavor "nothing" line. We classify
       // by side-effects rather than text where possible.
+      //
+      // The salvage path ALSO has a dedupe gate ("already worked over
+      // the X") that fires when a previous search/salvage in the same
+      // room consumed the noun. That's a "harvest already done" outcome,
+      // not a "nothing" roll — must not be confused with the
+      // genuine-nothing case (OTA 164 invariant).
       const invAfter = store.getState().player?.inventory.length ?? 0;
       const tcAfter = store.getState().player?.tc ?? 0;
       const gainedItem = invAfter > invBefore || /✦ .+\(/i.test(text);
       const gainedTc = tcAfter > tcBefore || /\+\d+ TC\./.test(text);
+      const alreadyWorkedOver = /already worked over the |already searched the /i.test(text);
       const plantedHook = channels.includes('world') && /thread|cold air|whisper|tug|hum|pull/i.test(text)
         && !gainedItem && !gainedTc;
       // "Nothing" line — only when there are no side effects AND no
-      // hook narration. The engine uses phrases like "you find nothing",
-      // "comes up empty", "scrape clean", "no joy" etc.
+      // hook narration AND no harvest-already-done dedupe gate.
       let outcome: string;
       if (gainedItem) { salvageMaterial++; outcome = 'material'; }
       else if (gainedTc) { salvageTc++; outcome = 'tc'; }
       else if (plantedHook) { salvageHook++; outcome = 'hook'; }
+      else if (alreadyWorkedOver) { outcome = 'already_worked_over'; /* not counted in any bucket */ }
       else { salvageNothing++; outcome = 'nothing'; }
       return { noun, outcome };
     };
