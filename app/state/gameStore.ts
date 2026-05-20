@@ -2409,8 +2409,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
             get().appendLog('world', outcome.line);
             // Record the search so subsequent attempts at the same
-            // target on the same tile hit the dedupe gate.
-            set((s) => {
+            // target on the same tile hit the dedupe gate. ONLY when
+            // the outcome actually consumed the noun — 'nothing' rolls
+            // leave the prop available for another try / for the
+            // pickup path.
+            if (outcome.kind !== 'nothing') set((s) => {
               const room = s.worldMemory.visitedRooms?.[fallbackRoomKey] ?? {
                 firstVisitAt: Date.now(),
                 lastVisitAt: Date.now(),
@@ -2544,7 +2547,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const salvage = rollSalvagePool(harvestAmbient);
             const outcome = salvage ?? rollAreaSearch(harvestAmbient);
             get().appendLog('world', outcome.line);
-            set((s) => {
+            // Dedupe only on outcomes that actually CONSUMED the noun
+            // (material grant / tc / hook plant). A 'nothing' roll
+            // leaves the noun on the board — playtest log caught this:
+            // player tried `salvage rusted blade`, rolled nothing, then
+            // couldn't `take` the blade later because the dedupe gate
+            // had marked it consumed. Failed salvage shouldn't destroy
+            // the thing.
+            const consumed = outcome.kind !== 'nothing';
+            if (consumed) set((s) => {
               const room = s.worldMemory.visitedRooms?.[harvestRoomKey] ?? {
                 firstVisitAt: Date.now(),
                 lastVisitAt: Date.now(),
@@ -2688,11 +2699,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const outcome = rollAreaSearch(rawTarget);
           get().appendLog('world', outcome.line);
           // Mark this noun as searched on the visited-room record so
-          // a re-search hits the alreadySearched branch above. We
-          // record every outcome kind — even materials/TC/hooks
-          // count as "you've inspected this prop; come back when you
-          // find something new to do with it".
-          set((s) => {
+          // a re-search hits the alreadySearched branch above. Only
+          // when the outcome actually CONSUMED the noun — 'nothing'
+          // outcomes leave it on the board for another try (or for
+          // the pickup path to claim instead).
+          if (outcome.kind !== 'nothing') set((s) => {
             const room = s.worldMemory.visitedRooms?.[searchRoomKey] ?? {
               firstVisitAt: Date.now(),
               lastVisitAt: Date.now(),

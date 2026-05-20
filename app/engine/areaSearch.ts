@@ -88,7 +88,8 @@ const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
 // nothing to find. The line below is the one hard mechanical
 // signal the player needs to move on.
 const NOTHING_LINES = [
-  'You search {target}. It is completely empty.',
+  'You search {target}. Nothing turns up — but the thing itself is still here for another pass.',
+  'You go over {target} carefully and find nothing this time. It will still be here when you come back.',
 ];
 
 const MATERIAL_LINES = [

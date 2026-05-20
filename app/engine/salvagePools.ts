@@ -157,9 +157,9 @@ const POOLS: SalvagePool[] = [
 ];
 
 const NOTHING_LINES = [
-  'You break {target} apart. Nothing in the wreckage answered.',
-  'You strip {target} down to its bones. The bones were already empty.',
-  'You salvage {target}. The work tires you out and the take is nothing.',
+  'You work over {target} but nothing comes loose. It still sits there for another try.',
+  'You strip at {target}, get nothing for it. The work was wasted; the thing is still whole.',
+  'You try to salvage {target}. The bones hold, the joints hold, and your hands come away empty.',
 ];
 
 const MATERIAL_LINES = [
