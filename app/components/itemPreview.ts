@@ -11,6 +11,12 @@ import {
   type CatalogGear,
   type CatalogMaterial,
 } from '../engine/crafting';
+import {
+  inferWeapon,
+  inferArmor,
+  inferAccessory,
+  inferGear,
+} from '../engine/itemDefaults';
 
 export type ItemPreview = {
   name: string;
@@ -47,14 +53,27 @@ export function getItemPreview(itemName: string): ItemPreview {
   const m = MATERIALS.find((x) => x.name.toLowerCase() === lower);
   if (m) return previewMaterial(m);
 
-  // Unknown — return a minimal record so the modal still renders.
-  return {
-    name: itemName,
-    kindLabel: 'Item',
-    rarity: null,
-    description: 'No record of this item in the catalog.',
-    stats: [],
-  };
+  // No catalog entry — infer stats from the item name so the modal
+  // shows real numbers instead of "No record." Inferred items are
+  // flagged (description prefix) so the player knows the stats are
+  // a guess and they can ship a backfill log to the dev later.
+  // Order: armor > accessory > weapon > gear (most-specific to least).
+  const armorInfer = inferArmor(itemName);
+  if (armorInfer) return previewArmor(armorInfer);
+  const accInfer = inferAccessory(itemName);
+  if (accInfer) {
+    const kind: 'Amulet' | 'Ring' = /\b(ring|band|signet)\b/i.test(itemName) ? 'Ring' : 'Amulet';
+    return previewAccessory(accInfer, kind);
+  }
+  // Weapon inference is permissive — falls back to a generic
+  // improvised melee for any unmatched name. Gate it behind a
+  // "looks like a weapon" name check so plain materials don't
+  // wrongly render as weapons.
+  const looksLikeWeapon = /\b(blade|sword|axe|spear|bow|crossbow|dagger|knife|club|mace|hammer|maul|staff|wand|rod|scepter|gun|rifle|pistol|sling|javelin|lance|glaive|halberd|pike|scythe|whip|claw|fang|baton|cudgel|cleaver|saber|sabre|katana|machete|tomahawk|trowel|hatchet|warblade|thornblade|shadowblade|nightblade|deathblade|etherblade|caster|runecaster)\b/i.test(itemName);
+  if (looksLikeWeapon) return previewWeapon(inferWeapon(itemName));
+  // Otherwise treat as inferred gear (consumable / light / rope /
+  // generic) so we still surface a description.
+  return previewGear(inferGear(itemName));
 }
 
 function previewWeapon(w: CatalogWeapon): ItemPreview {

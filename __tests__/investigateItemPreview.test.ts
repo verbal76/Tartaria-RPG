@@ -37,12 +37,24 @@ describe('getItemPreview — contract for the investigate handler', () => {
     }
   });
 
-  it('returns a minimal record for unknown items (no exception)', () => {
+  it('infers a usable preview for unknown items (no "no record" gap)', () => {
+    // Previously this returned "No record of this item in the
+    // catalog." Now itemDefaults.inferGear / inferWeapon / inferArmor
+    // synthesize stats from the name so the player always sees
+    // something. The description still flags it as inferred so a
+    // catalog backfill can populate the real row later.
     const preview = getItemPreview('Definitely Not A Real Item');
     expect(preview.name).toBe('Definitely Not A Real Item');
-    expect(preview.kindLabel).toBe('Item');
-    expect(preview.description).toMatch(/no record/i);
-    expect(preview.stats).toEqual([]);
+    expect(preview.description.length).toBeGreaterThan(0);
+    expect(preview.description.toLowerCase()).toMatch(/field-inferred|inferred|backfill|catalog/);
+  });
+
+  it('infers weapon stats for an uncatalogued blade name', () => {
+    // Mud-Rend Blade isn't in the test catalog scope here — the
+    // inference path should kick in and produce 1d8 slashing.
+    const preview = getItemPreview('Phantom Blade');
+    expect(preview.kindLabel).toMatch(/weapon/i);
+    expect(preview.stats.some((s) => /1d/.test(s))).toBe(true);
   });
 
   it('handles case-insensitive lookup', () => {

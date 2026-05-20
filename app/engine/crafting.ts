@@ -7,6 +7,7 @@ import gearData from '../data/items/gear.json';
 import recipesData from '../data/items/recipes.json';
 import amuletsData from '../data/items/amulets.json';
 import ringsData from '../data/items/rings.json';
+import { inferWeapon, inferArmor, inferAccessory } from './itemDefaults';
 
 export interface CatalogMaterial {
   name: string;
@@ -191,28 +192,54 @@ export function consumeIngredients(
 
 // Catalog lookup helpers — find an item entry by name across the four
 // catalog buckets. Used by the equip flow and combat damage resolution.
+//
+// Unknown items fall back to itemDefaults.infer* so the engine ALWAYS
+// has stats to work with: no more bare-hands damage on un-catalogued
+// weapons, no more "no record" preview on inventory items. The
+// inference also logs the name once-per-session via setOnInferred so
+// the player can ship a backfill log to the dev and we populate the
+// real catalog row later.
 export function findWeaponByName(name: string): CatalogWeapon | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  return WEAPONS.find((w) => w.name.toLowerCase() === t) ?? null;
+  const direct = WEAPONS.find((w) => w.name.toLowerCase() === t);
+  if (direct) return direct;
+  // Inference fallback — only fires for names that READ as a weapon,
+  // so plain materials ("Scrap Metal", "Stick") don't get false-
+  // promoted into weapons.
+  const looksLikeWeapon = /\b(blade|sword|axe|spear|bow|crossbow|dagger|knife|club|mace|hammer|maul|staff|wand|rod|scepter|gun|rifle|pistol|sling|javelin|lance|glaive|halberd|pike|scythe|whip|claw|fang|baton|cudgel|cleaver|saber|sabre|katana|machete|tomahawk|trowel|hatchet|warblade|thornblade|shadowblade|nightblade|deathblade|etherblade|caster|runecaster)\b/i.test(name);
+  if (!looksLikeWeapon) return null;
+  return inferWeapon(name);
 }
 
 export function findArmorByName(name: string): CatalogArmor | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  return ARMOR.find((a) => a.name.toLowerCase() === t) ?? null;
+  const direct = ARMOR.find((a) => a.name.toLowerCase() === t);
+  if (direct) return direct;
+  return inferArmor(name);
 }
 
 export function findAmuletByName(name: string): CatalogAccessory | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  return AMULETS.find((a) => a.name.toLowerCase() === t) ?? null;
+  const direct = AMULETS.find((a) => a.name.toLowerCase() === t);
+  if (direct) return direct;
+  if (/\b(amulet|locket|necklace|pendant|medallion|charm|talisman|brooch)\b/i.test(name)) {
+    return inferAccessory(name);
+  }
+  return null;
 }
 
 export function findRingByName(name: string): CatalogAccessory | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
-  return RINGS.find((r) => r.name.toLowerCase() === t) ?? null;
+  const direct = RINGS.find((r) => r.name.toLowerCase() === t);
+  if (direct) return direct;
+  if (/\b(ring|band|signet)\b/i.test(name)) {
+    return inferAccessory(name);
+  }
+  return null;
 }
 
 export function fuzzyFindWeapon(text: string): CatalogWeapon | null {

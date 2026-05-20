@@ -64,9 +64,12 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     body:
       'Where you are right now: location · weather · hazard. The line below shows in-game time ' +
       '(Day N · morning / afternoon / evening / night). ' +
-      'The ACTIONS chip on the right opens a full reference of every verb the parser knows — what ' +
-      'each action does and exactly what to type. QUESTS opens your active hunts, mysteries, ' +
-      'storylines, and faction contracts.',
+      '\n\nACTIONS opens a full reference of every verb the engine understands. New: tap any ' +
+      'card and its first example phrase drops into the input box, ready to finish typing — ' +
+      'tap the same card again to cycle through alternate phrasings. ' +
+      '\n\nCONTRACTS opens your active hunts, mysteries, storylines, and faction contracts ' +
+      '(vendor pitches now point at this screen for the full text instead of reading every ' +
+      'line out loud).',
   },
   {
     screen: 'exploration',
@@ -74,16 +77,23 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'The world feed',
     body:
       'Every event lands here as a colored line: world description, your actions, combat rolls, ' +
-      'Arbiter remarks, rewards, system hints. Scroll to look back at anything you missed.',
+      'Arbiter remarks, rewards, system hints. Scroll to look back at anything you missed. ' +
+      '\n\nLong travel doesn\'t just count steps — every few cardinal moves the engine rolls a ' +
+      'wasteland encounter: an abandoned caravan with a note, a wandering drifter with a tip, ' +
+      'a fungal patch you can harvest, an old bus with a duffel, etc. Watch the feed.',
   },
   {
     screen: 'exploration',
     area: 'quick-row',
     title: 'Quick actions',
     body:
-      'Tappable shortcuts for the most common actions. In peace: look, rest, search, craft, ' +
-      'inventory. (Searching the mud / silt / ground digs — your best tool decides what comes up.) ' +
-      'In combat: punch, kick, your equipped weapons, dodge, block, advance / step back, ' +
+      'Tappable shortcuts for the most common actions. In peace: "look around you", rest, ' +
+      'search, approach, craft, inventory. ' +
+      '\n\nSearch and Approach open one-tap modals: each scene\'s authored nouns (anvil, ' +
+      'map-stone, wagon, rubble, trap, …) appear as chips at the top — the same nouns you see ' +
+      'in the "look around you" bearings line, so it all stays consistent. Approach has a ' +
+      'USE STEALTH toggle for sneak-up routing. ' +
+      '\n\nIn combat: punch, kick, your equipped weapons, dodge, block, advance / step back, ' +
       'pack (open inventory mid-fight).',
   },
   {
@@ -91,9 +101,12 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     area: 'input-row',
     title: 'Type anything',
     body:
-      'You don\'t have to use the buttons. Type any action — "search the rubble", "talk to the smith", ' +
-      '"throw a rock". The Arbiter parses your intent and resolves it. Misspellings and ' +
-      'paraphrased item names are handled by the cognitive layer.',
+      'You don\'t have to use the buttons. Type any action — "search the rubble", ' +
+      '"talk to the smith", "throw a rock", "take the trap apart and keep the materials". ' +
+      'The fast dictionary parser handles common verbs in milliseconds. Novel phrasings ' +
+      'flow to Qwen on-device, which figures out what you meant and re-dispatches it — ' +
+      'you\'ll see "The Arbiter considers your words…" while it thinks. ' +
+      '\n\nMisspellings and paraphrased item names are handled by the cognitive layer.',
   },
   {
     screen: 'exploration',
@@ -109,13 +122,18 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     area: 'bottom-menu',
     title: 'Optional: voice mode',
     body:
-      'Tartaria can read the world aloud and listen for your responses. Open Settings (the ⚙ gear) ' +
-      '→ VOICE tab. Flip Read aloud (TTS) ON and the Arbiter speaks. Flip Speak input (STT) ON ' +
-      'and a 🎙 mic button appears next to Act — tap it, say your action, and the game routes ' +
-      'your speech through the same parser as typing. While the Arbiter is speaking the mic ' +
-      'becomes a 🛑 SILENCE button — tap it to cut narration short and start listening. ' +
-      'Both default OFF; the game plays in text mode unless you opt in. For higher voice quality ' +
-      'try Engine: BUNDLED (downloads ~100 MB of neural voice once, then runs fully offline).',
+      'Tartaria can read out loud and listen for your speech. Open Settings (⚙ gear) → VOICE. ' +
+      '\n\nRead aloud (TTS) — the Arbiter and every NPC speak their lines. Voice is character-' +
+      'specific now: the Arbiter sounds like AM_MICHAEL (you can change it), and every vendor ' +
+      'has their own assigned voice — Irma in af_sarah, Halem in am_adam, Naha in af_river, ' +
+      'and so on. They take turns like a real conversation, not all at once. World narration is ' +
+      'silent — only character dialogue is voiced. ' +
+      '\n\nSpeak input (STT) — a 🎙 mic button appears next to Act. Tap, speak, and the game ' +
+      'parses your speech the same way as typing. While the Arbiter is speaking the mic becomes ' +
+      'a 🛑 SILENCE button — tap to cut narration short. ' +
+      '\n\nBoth default OFF. Engine: BUNDLED downloads ~100 MB of neural voice once + loads ' +
+      'one vendor voice on demand (200 MB peak) for the premium quality path; SYSTEM uses ' +
+      'Android\'s built-in TTS — lighter, supports every voice simultaneously.',
   },
   {
     screen: 'inventory',
@@ -123,9 +141,12 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'Your pack',
     body:
       'This is your pack — already stocked with your starter kit. Tap any item to see its ' +
-      'description, stats, and equip / unequip buttons. Items are grouped by category ' +
-      '(weapons, armor, amulets & rings, consumables, relics, materials, loot). Durability ' +
-      'is shown next to gear that wears.',
+      'description, stats, equip / unequip / use / drop / scrap buttons. Items are grouped by ' +
+      'category (weapons, armor, amulets & rings, consumables, relics, materials, loot). ' +
+      'Durability shows next to gear that wears. ' +
+      '\n\nIf an item is from new content the catalog hasn\'t formally tracked yet, the engine ' +
+      'will infer reasonable stats from the name (a blade gets 1d8 slashing, boots get +1 AC ' +
+      'to feet, etc.) so you never see a blank record. Inferred items are flagged in the log.',
   },
   {
     screen: 'vendor',
@@ -143,7 +164,11 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'You\'re set.',
     body:
       'Tartaria is procedural — every move resolves something, even if it\'s just dust. ' +
-      'When in doubt: search the area around you, ask the Arbiter ("ask about X"), and rest ' +
-      'when you need to. Good hunting.',
+      'When in doubt: tap "look around you" for full bearings, then search or approach the ' +
+      'nouns in the chips. Ask the Arbiter ("ask about X"), "what city is north of me", ' +
+      '"closest hub", and rest when you need to. ' +
+      '\n\nOpening containers (lockboxes, traps, crates, defenses, sarcophagi, spires, ' +
+      'observatories) rolls a small loot drop — type "open the X" or "dismantle the X". ' +
+      'Good hunting.',
   },
 ];

@@ -806,6 +806,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         });
       }
     } catch { /* STT module not present — fine. */ }
+    // Item-defaults inference flag. The engine falls back to
+    // synthesized stats whenever an inventory item has no catalog
+    // row (Mud-Rend Blade, Aetheric Locket, Golemstone Stabilizer,
+    // etc.). Each unique inferred item name fires ONE debug-channel
+    // log line so a future log capture can drive catalog backfill.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const itemDefaults = require('../engine/itemDefaults');
+      if (typeof itemDefaults.setOnInferred === 'function') {
+        itemDefaults.setOnInferred((label: string) => {
+          try { get().appendLog('debug', `inferred-stats: ${label} — engine guessed stats; add catalog row when convenient.`); } catch { /* ignore */ }
+        });
+      }
+    } catch { /* ignore — module is small + always present */ }
     // Just-updated detection. checkAndApplyOTA → Updates.reloadAsync
     // can yank the app to a new bundle mid-stride and reading the
     // result feels like a crash. Compare current OTA_BUILD_ID against
