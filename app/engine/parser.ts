@@ -12,10 +12,14 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'attack', 'strike', 'slash', 'stab', 'shoot', 'kill', 'fight', 'charge', 'fire',
     'swing', 'pierce', 'blast', 'smash', 'punch', 'kick', 'cleave', 'loose', 'engage',
     'shatter', 'break', 'destroy', 'crush', 'bash',
+    // From the overwhelm action card — semantically a flavour of attack.
+    'overwhelm', 'press the attack',
   ],
   diplomacy: [
     'convince', 'persuade', 'negotiate', 'parley', 'bargain', 'plead', 'speak', 'talk',
     'ask', 'greet', 'address', 'hail', 'call', 'beseech', 'entreat',
+    // Social + performance card verbs.
+    'intimidate', 'perform', 'sing', 'play',
   ],
   escape: [
     'run', 'flee', 'retreat', 'escape', 'withdraw', 'bolt', 'scram',
@@ -25,6 +29,8 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'look', 'examine', 'inspect', 'search', 'study', 'check', 'investigate', 'scan',
     'observe', 'view', 'read', 'probe', 'survey', 'find', 'scavenge', 'hunt',
     'peruse', 'scrutinise', 'scrutinize', 'comb',
+    // From the track / translate / learn / gather cards.
+    'track', 'translate', 'learn', 'gather',
     // 'open' belongs to the dedicated open intent — it persists
     // container state across re-entry. Including it here too would
     // make "open the chest" silently route to a generic area search.
