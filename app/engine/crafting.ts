@@ -1,5 +1,6 @@
 import type { InventoryItem, Rarity, DamageType } from './types';
 import { levenshtein } from './editDistance';
+import { resolveItemAlias } from './itemAliases';
 import materialsData from '../data/items/materials.json';
 import weaponsData from '../data/items/weapons.json';
 import armorData from '../data/items/armor.json';
@@ -130,7 +131,14 @@ export function findCatalogItem(name: string): {
   tags: string[];
   baseDurability?: number;
 } | null {
-  const q = name.trim().toLowerCase();
+  if (!name) return null;
+  // Try alias resolution first — many ambient-noun variants
+  // ('rope coil', 'broken compass', 'frost lantern', 'rusted
+  // harpoon') map to a single canonical catalog item. Aliases
+  // give the pickup path 30+ extra recognisable nouns without
+  // authoring new catalog entries.
+  const aliased = resolveItemAlias(name);
+  const q = (aliased ?? name).trim().toLowerCase();
   if (!q) return null;
   const w = WEAPONS.find((x) => x.name.toLowerCase() === q);
   if (w) return { name: w.name, kind: 'weapon', rarity: w.rarity, tags: w.tags, baseDurability: w.baseDurability ?? DEFAULT_DURABILITY };
