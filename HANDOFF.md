@@ -1,230 +1,357 @@
 # Tartaria Realms — Session Handoff
 
-> Branch: `claude/new-session-MvF82`
-> Latest OTA: `2026-05-19-117` (pending bump for current commit)
-> App version: `2.201` (no APK rebuild since OTA 092; all changes JS-only OTA)
-> TypeScript: **0 errors** (`npx tsc --noEmit`)
-> Tests: **652 / 652 passing across 56 suites**
-> Working tree: clean
+> **Branch:** `claude/new-session-MvF82` (active work)
+> **Latest OTA:** `2026-05-20-141`
+> **APK build:** `138` (`version: 2.201` — runtime stream all OTAs target)
+> **TypeScript:** 0 errors (`npx tsc --noEmit`)
+> **Tests:** 941 / 941 across 66 suites
+> **Working tree:** clean
 
 ---
 
 ## 1. What this is
 
-**Tartaria Realms** — a React Native / Expo SDK 52 procedural narrative RPG. Mobile-first Android target. Hermes engine. Owned by `verbal76/tartaria-rpg` on GitHub under the `hot-attic-games` Expo account.
+**Tartaria Realms** — React Native / Expo SDK 52 procedural narrative RPG. Android-first, Hermes engine. Repo: `verbal76/tartaria-rpg`. Distribution: EAS channel `preview` for OTAs.
 
-**Setting:** post-Aetherstone-flood world from the Tartaria Prima rulebook. Player wakes into a buried civilization, picks race + faction + name, plays procedural scenes driven by authored data + light template stitching + on-device LLM narration.
+**Setting:** post-Aetherstone-flood Tartaria — player wakes into a buried civilization, picks race + faction + name, plays procedural scenes driven by authored data + light template stitching + on-device LLM narration.
 
 **On-device ML stack:**
-- **Classifier (intent + target):** `onnxruntime-react-native` running `all-MiniLM-L6-v2` (int8 quantized, ~22 MB, OTA-downloaded).
-- **Generator (Arbiter narration AND parse-fallback):** `Qwen 2.5 0.5B Instruct` via `llama.rn` (~398 MB Q4_K_M GGUF, OTA-downloaded). As of OTA 111 it ALSO handles parser fallback when the dictionary parser returns unknown / low-confidence.
-- **Neural TTS (optional voice readout):** `react-native-executorch` running Kokoro-82M (~100 MB, OTA-downloaded on engine toggle).
-
-**Voice I/O:** Optional, off by default.
-- **TTS:** Two engines — system (`expo-speech`) and bundled (`Kokoro`). 24-word lore lexicon for pronunciation overrides.
-- **STT:** `expo-speech-recognition`. Service-selection logic in `STTManager` queries `getSpeechRecognitionServices()` and picks Android System Intelligence (`com.google.android.as`) on Pixels, Google Search box on stock GMS. **Unverified end-to-end on player's device.**
+- **Classifier (intent + target):** `onnxruntime-react-native` running `all-MiniLM-L6-v2` int8 (~22 MB, OTA-downloaded)
+- **Generator (Arbiter narration + parse-fallback):** `Qwen 2.5 0.5B Instruct` via `llama.rn` (~398 MB Q4_K_M GGUF, OTA-downloaded)
+- **Neural TTS (optional):** `react-native-executorch` running Kokoro-82M (~100 MB, OTA-downloaded)
+- **STT (optional):** `expo-speech-recognition` with service-selection logic for Pixel devices
 
 **Audio:** `expo-av` looping background tracks across 4 contexts (combat / shop / menu / explore) with crossfade.
 
 ---
 
-## 2. Architecture cheat-sheet
+## 2. Model identity for the assistant
+
+**This session runs on `claude-opus-4-7[1m]`.** Use that exact string when asked which model you are. Never include the model identifier in commit messages, PR titles/bodies, code comments, or any artifact pushed to the repo — chat replies only.
+
+---
+
+## 3. Branch hierarchy & workflow
+
+### Branches
+
+- **`main`** — production. Tagged releases live here. Do NOT push directly.
+- **`claude/new-session-MvF82`** — the active session branch for everything you ship. Every OTA flows from here. Push to this branch only.
+- (Other `claude/*` branches may exist from prior sessions — leave them alone unless the user asks.)
+
+The harness sometimes preconfigures a different branch name at session start. **If you're already on `claude/new-session-MvF82` with uncommitted/recent work, stay on it.** Don't switch branches mid-stream — that risks losing work in flight.
+
+### Per-push workflow (OTA-only, ~95% of pushes)
+
+```
+1. Edit code in app/
+2. npx tsc --noEmit   → must be 0 errors
+3. npx jest --silent  → all suites must pass (see flakes section)
+4. Bump app/buildInfo.ts → OTA_BUILD_ID format YYYY-MM-DD-NNN
+5. git add -A && git commit -m "fix|feat|chore: <short subject>
+
+   <body explaining the WHY with concrete before/after>"
+6. git push -u origin claude/new-session-MvF82
+```
+
+The `.github/workflows/eas-update.yml` workflow auto-publishes to channel `preview` on every push to this branch. Player's device pulls the OTA on next launch via the boot-time silent check.
+
+### When a new APK build is needed
+
+Only when you add a NATIVE module (new dependency that ships native code) or change `app.json` native config. Steps:
+1. Confirm with the user before adding the native dep
+2. Add to `package.json` + `npm install`
+3. Decide whether to bump `version` in `app.json`:
+   - **Keep at `2.201`** if you want existing testers' APK to still receive OTAs and the new APK to share the same OTA stream (recommended default — no fragmentation)
+   - **Bump to e.g. `2.202`** only if old APKs CANNOT safely no-op past the new module. After this, OTAs to `2.202` will not reach old APKs.
+4. Bump comment in `metro.config.js` to trigger `build-apk.yml`
+5. The user redistributes the APK manually to testers
+
+**Lazy-load any native module that might not be in older APKs.** Static `import * as X from 'native-module'` at the top of a file can crash the JS bundle on APKs that don't have the native bridge. Use `require()` inside a try/catch helper (see `loadNavigationBar()` in `App.tsx` for the pattern). This way ALL OTAs reach all APKs regardless of native-module additions.
+
+### OTA / APK runtime model (critical)
+
+- `app.json` has `"runtimeVersion": { "policy": "appVersion" }` — meaning **runtimeVersion = the `version` field at build time** (currently `2.201`).
+- OTAs are delivered to **every device on the same runtime + channel**. Multiple APKs on the same `version` share the OTA stream.
+- Testers may be on different APK build numbers but the same runtime — they still get every OTA. APK build number is just the binary version; the runtime key is what matters for OTA delivery.
+
+---
+
+## 4. How the player works with you
+
+**The user types runtime feedback into the in-game text input.** They paste me the play log between sessions. So when a log includes player turns like *"we need to add salvage as a button"* or *"this should pop up nouns"*, that's the player talking TO ME through the game — not an in-fiction action.
+
+Two implications:
+1. The meta-comment guard in `submitPlayerAction` (around line 1822) catches these and shows a confused-Arbiter response that includes "I'll keep your note in the log either way." That response is what the player sees — keep it honest, don't mock-narrate the request.
+2. When reviewing logs, treat any sentence that's clearly meta-feedback as a feature request to triage, not a parser miss to debug.
+
+**Log review is the primary feedback channel.** Player pastes a log → you find issues, prioritise, and ship fixes the same OTA. You will not have direct verification of fixes most of the time. Trust their next log to surface what worked and what didn't.
+
+---
+
+## 5. Architecture cheat-sheet
 
 ```
 app/
   ai/                  — MiniLM + Qwen orchestrators
   audio/               — AudioManager / AudioController / settings
-  components/          — UI primitives, Search / Approach modals
-  data/                — Authored JSON. Each location + hub room + Micro-Micro
-                         room declares an `interactables` array (Phase 2 OTA 113+
-                         OTA 115). container_loot.json holds 9 archetypes
-                         (Phase 3 OTA 114, expanded OTA 115).
+  components/          — UI primitives, Search / Approach modals,
+                         TutorialOverlay + TutorialTarget
+  data/                — Authored JSON. Locations / hubs / Micro-Micro rooms
+                         all declare `interactables` arrays. wasteland_encounters.json
+                         holds 45 archetypes (Phase 3 + 3 batches of mini-dungeons +
+                         encounters). container_loot.json holds 9 archetypes.
   engine/              — Pure logic: parser, llmParser (Qwen fallback),
-                         combat, crafting, durability, equipment, encounter,
-                         hooks, hunts, mysteries, faction quests, world map,
-                         weather effects, area search, ambient nouns,
-                         status effects, narrative gen, digging, save system,
-                         enemy traits, item weight, context injector, hub,
-                         containerLoot
+                         combat, crafting, durability, equipment, hooks,
+                         hunts, mysteries, faction quests, world map,
+                         weather, area search, ambient nouns, status effects,
+                         narrative gen, digging, save system, enemy traits,
+                         item weight, context injector, hub, containerLoot,
+                         wastelandEncounters
   screens/             — Title / CharacterCreation / Exploration / Inventory /
                          Crafting / Vendor / Log / Lore / About (3-tab) /
                          ActionReference / Contracts
-  state/               — gameStore.ts (Zustand) — ~6900 lines, the spine
-  updates/             — checkAndApplyOTA.ts
+  state/               — gameStore.ts (Zustand) — ~7000 lines, the spine
+  updates/             — checkAndApplyOTA.ts — fetchOnly mode for boot,
+                         full reload on player tap
   voice/               — voiceSettings / TTSManager / TTSController /
-                         PiperTTSManager / STTManager / loreLexicon
+                         PiperTTSManager / STTManager / loreLexicon /
+                         speakerVoices / executorchAdapter
 App.tsx                — boots hydrate, cognitive, Qwen, audio, TTS, auto-OTA;
-                         pins Android status-bar padding to clear system bar
+                         pins Android status-bar padding; lazy-loads
+                         expo-navigation-bar; global ErrorUtils handler;
+                         ScreenErrorBoundary wrapping AppShell.
 .github/workflows/
-  build-apk.yml        — Gradle APK build (path-gated)
+  build-apk.yml        — Gradle APK build (path-gated; touches metro.config.js)
   eas-update.yml       — OTA publish + channel→branch mapping
 metro.config.js        — comment bumps trigger APK rebuild
 app/buildInfo.ts       — OTA_BUILD_ID — bump on every JS-only push
+docs/                  — pronunciation worksheet (pending player input)
 ```
 
 ---
 
-## 3. Major systems landed this session (OTA 092 → 117)
+## 6. Systems shipped this session (OTA 117 → 141)
 
-### Parser architecture overhaul — three phases
+### Tutorial — 15 steps, screen-driven (OTAs 132–135)
 
-**Phase 1 — Qwen-backed LLM parse-fallback (OTA 111)**
-- New `app/engine/llmParser.ts`. When dictionary parser returns `intent=unknown` OR `confidence<0.5`, input flows to Qwen with a structured prompt. JSON `{intent, target}` extracted, validated, rephrased as canonical "verb noun", re-submitted through the dictionary parser via the `skipPreChecks` flag on `submitPlayerAction`.
-- Visible "The Arbiter considers your words…" placeholder lands within 5ms of fallback trigger (OTA 112) so the ~300ms wait isn't a silent gap.
-- 18 unit tests cover the module.
+- `app/components/tutorialSteps.ts` defines `TUTORIAL_STEPS`. Each step has `screen`, `area` (`HighlightArea`), `title`, `body`.
+- `advanceTutorial` in gameStore drives `currentScreen` ATOMICALLY with `tutorialStep` (single `set()` call) — earlier split caused a one-frame race where VendorScreen rendered against null vendor and the AboutScreen swap landed on a gray screen.
+- Vendor step spawns **Irma Ironhand** as a demo vendor via `findVendorByName('Irma Ironhand')`. Cleared on step-leave.
+- **Transactions disabled during tour:** `buyFromVendor`, `sellToVendor`, `acceptFactionQuest`, `acceptHunt`, `acceptMystery`, `acceptStoryline` all early-return with a "Tour mode" system line when `tutorialDemoVendor` is set. Visible TOUR MODE banner on VendorScreen.
+- `ScreenErrorBoundary` wraps `AppShell` for crash recovery (RESTART / BACK TO TITLE buttons).
 
-**Phase 2 — Author-declared interactables (OTAs 113 + 115)**
-- New schema field on Location / HubRoom / MicroMicroLocation: `interactables?: string[]`.
-- 21 macro locations, 15 hub rooms, **27 procedural Micro-Micro rooms** all declare 4-8 concrete nouns each.
-- `beginScene` sources `ambientNouns` with preference: authored → `extractAmbientNouns()` fallback for unauthored content.
-- Save-restore + hub-exit reset paths apply the same preference.
-- 13 regression tests lock the schema in.
+### Mini-dungeons + encounters (OTAs 136–138)
 
-**Phase 3 — Tag-driven container loot (OTAs 114 + 115)**
-- New `app/data/world/container_loot.json` — **9 archetypes**: lockbox, trap, crate, automaton, relic_console, wreckage, observatory_array, spire_conduit, tomb.
-- New `app/engine/containerLoot.ts` — `classifyContainer()`, `rollFromPool()`, `narrate()`. Pure + rng-injectable.
-- Open intent handler now data-driven. Adding a container type is a JSON edit.
-- 25 unit tests.
+- **45 archetypes** in `app/data/world/wasteland_encounters.json`, types: `treasure` / `npc` / `skirmish` / `mini_dungeon`.
+- Mini-dungeons added two schema fields: `bandit_pool` (enemy names to spawn) and `quest_hook` (`{ kind: 'hunt'|'mystery', id }` — auto-adds to active board without vendor handoff).
+- **All 10 authored hunts and mysteries have at least one in-world discovery path** — no quest is vendor-only.
+- New helper: `grantQuestHook()` in gameStore — bypass-vendor add to active list, silent no-op if already active/completed.
+- Authoring template for new archetypes lives in chat history (give it to the user when they want to generate more via Notebook LM).
 
-### Other major fixes landed this session
+### Voice fixes + lifecycle (OTAs 117–130)
 
-- **Partial-move death spiral fixed** (OTA 104) — weather-slowed PARTIAL moves no longer grant enemy counter rounds.
-- **disarm / disable / dismantle / take-apart verbs** route to open intent (OTA 104). `take` removed from accept synonyms, moved to pickup.
-- **Equip-anything fallback** (OTA 104) — `validSlotsForItem` infers slots from item name when the catalog has no entry.
-- **Directional bearing queries** (OTA 104) — "what city is north of me" routes to `surveyAll(map)[direction]`.
-- **`doesn't` → "duzzent"** pronunciation entry (OTA 102).
-- **COPY LOG button on dead-character rows** (OTA 103).
-- **Modal autofocus removed** (OTA 109) — Search / Approach chips fire first-tap.
-- **`hubRoomId` closure bug fixed** (OTA 109) — cardinal travel from hub.
-- **Enemy preference over inventory in target resolution** (OTA 110) — "sneak up on Aetheric Drone" resolves to drone, not Aetheric Torch.
-- **Authored interactables lead chip pool, only PRIMARY hook noun chips** (OTA 115) — atmospheric hook nouns like "cold/air/draft/breeze" no longer push real interactables off the visible chip row.
-- **Long meta-comment guard** (OTA 107).
-- **STT recognizer service selection** (OTA 107) — picks `com.google.android.as` on Pixels.
-- **Cross-scene noun leakage fix** (OTA 112) — `ambientNouns` rebuilds on hub-exit.
-- **First chip clipping** (OTA 116) — `paddingLeft: 2` on Search + Approach modal chip rows.
-- **Status-bar overlap fix** (OTA 117 — this commit) — App-level safe view pins `paddingTop: RNStatusBar.currentHeight` on Android so the top row (BACK button, screen titles) clears the system bar on edge-to-edge Android 12+ ROMs.
+- Per-vendor + per-NPC Kokoro voice assignment via `app/voice/speakerVoices.ts` (lazy-loaded into a 2-slot LRU pool, Arbiter sticky + 1 vendor slot).
+- `disposeStickyArbiterVoice()` wired into `TTSManager.onVoiceSettingsChange` — fixes ~100 MB/swap memory leak when player changed `kokoroVoice` setting.
+- Vendor voice prewarm gated on `engine === 'bundled'` (was unconditionally downloading Kokoro for system-TTS players).
+- `prewarmKokoro()` resets `prewarmStarted = false` on failure so transient errors don't permanently latch.
+- STT service-selection picks `com.google.android.as` on Pixels.
 
-### Pronunciation worksheet
-- Generated at `docs/pronunciation-worksheet.md`. Scanned 87k tokens, filtered against 60k-word American English dictionary plus fantasy-vocabulary allowlist. Lists 13 invented Tartaria terms, 109 names, 60 hyphenated compounds, plus re-tune column for 24 existing lexicon entries. **Sitting with the player to fill in.**
+### OTA crash-on-apply fix (OTA 134)
 
----
+- Boot-time auto-check was calling `Updates.reloadAsync()` while executorch/llama.rn/ONNX/expo-av were mid-init. Bundle swap mid-init = home-screen kick-out (player saw this on every OTA).
+- Now `checkAndApplyOTA({ fetchOnly: true })` from boot — downloads + sets `pendingOTAUpdate` flag. TitleScreen shows "UPDATE READY — TAP TO APPLY" banner. Full teardown + reload only on explicit player tap.
+- Global `ErrorUtils.setGlobalHandler` auto-reloads on uncaught fatal errors >5s after boot (avoids restart loops within the first 5s where bugs are easier to diagnose).
+- `ScreenErrorBoundary` adds a per-screen recovery card with the error message + RESTART/BACK-TO-TITLE buttons.
 
-## 4. Outstanding tasks (validated current as of OTA 117)
+### Contract burst-aware Arbiter chatter (OTA 134)
 
-### Open — needs player action
+- Suppressed `stage0.arbiter` on all 4 accept paths (faction quest / hunt / mystery / storyline). Chip-tapping 6 contracts no longer produces 6 offhand reactions.
+- `bumpQuestsAccepted` is burst-aware: first-ever contract → milestone line (one-shot per character); fresh burst (>5s since last accept) → one "another for the slate" line; tier transitions at count 3 ("stacking") and count 5 ("slow down"); other in-burst accepts → silent.
 
-- **Pronunciation worksheet** — fill rows in `docs/pronunciation-worksheet.md` and send back. I batch them into `loreLexicon.ts` (~30 min). No engineering risk.
-- **STT verification end-to-end** — pull latest OTA, tap mic, paste the `stt: chosenService=…` log line. Required to confirm OTA 107's service-selection fix works. **Per player request, no dedicated STT section is being expanded** — this stays a single-line punchlist item. If broken on next test → STT comes out of the build.
-- **OTA-cache verification at Sinking Cathedral** — playtest screenshot at this scene showed hook-first chip ordering (`statue, figure, frozen, body, steeple, w…`) which is the pre-OTA-115 behavior. Either (a) device hadn't restarted to load the new bundle, or (b) a real bug specific to wild biomes. Player needs to force-close + relaunch the app and re-test. If still broken after restart → I instrument `buildChipPool` to dump the actual scene shape.
+### Companion-chat wellness remarks (OTA 131)
 
-### Open — engineering work I can do without player
+- New fields on `ArbiterContext`: `playerHpFraction`, `playerStaminaFraction`, `hasFirstAidKit`, `hasFood`.
+- ~15% out-of-combat chance: Arbiter drops a wellness remark when player is hurt/tired, with item awareness when relevant.
 
-- **Sim harness for the LLM fallback** — extension of `yearSimulation.test.ts` that fires a batch of novel phrasings through the dictionary→Qwen→re-dispatch pipeline and reports resolution rate. Started this session but had to back out because of an incorrect action signature (`createNewCharacter` is not the actual export name); needs a re-pass with the right API surface.
-- **More container archetypes (optional)** — current 9 cover most cases. Possible additions: `mud_pile` (digging spots), `aether_well` (lore wells), `fungal_grove` (organic harvest). Each is a JSON entry.
+### Immersive system bars (OTA 134+, native-bound)
 
-### Closed / verified working
+- `expo-navigation-bar` (lazy-loaded) hides Android nav bar with `overlay-swipe` behavior. Status bar hidden via `expo-status-bar`.
+- **Requires APK rebuild** to activate — the JS calls no-op on the existing APK 138.
 
-- Phase 1 LLM parse-fallback architecture ✅
-- Phase 2 authored interactables ✅
-- Phase 3 tag-driven container loot ✅
-- HANDOFF.md refreshed ✅
-- Hub-leave cardinal-travel narration (no longer fires every step) — confirmed clean in playtest log after OTA 112
-- Partial-move death spiral (combat survivable) — confirmed clean
-- Modal first-chip clipping ("rap" → "trap") — fixed in OTA 116, confirmed in playtest
+### Parser fixes (multiple OTAs)
 
-### Won't do (decided)
+- Removed greedy synonyms: `okay` from `accept`, `bag` from `inventory`, `pocket` from `steal`, `press` from `advance`, `construct` from `craft`.
+- Added `salvage` / `strip` / `pry` to `investigate` (hook-eligible).
+- Meta-comment guard tightened: threshold 60 chars (down from 100), expanded regex catches `we need`, `could you`, `it should`, `add a`, `please add`.
+- Sanity gate on garbage-prose targets in both `buildArbiterRemark` and the investigate handler — no more "The [garbage phrase]," the Arbiter says.
 
-- **STT fix iteration past current state** — player said "if it doesn't work it's bloat." If next verification round fails, STT comes out entirely rather than further investment.
+### Content variety (OTA 131)
+
+- Every location-flavor pool expanded from 6–7 lines to 10+ — uniqueness audit passes 50% threshold for all 21 locations.
+- `deferLines` (Arbiter on-target-callback pool) expanded from 3 to 10.
+
+### State hygiene
+
+- `wastelandStepsSinceEncounter` reset on slot-load and resurrect (no cross-character bleed).
+- Dead `lastLookAt` field removed.
+- Duplicate area-search exploit in attack-fallback path closed.
+- New `lastInteractedNoun` tracked on every confident parse so soft Arbiter fallback can ground "what's inside?" questions in the right noun.
 
 ---
 
-## 5. Known-good state
+## 7. Open tasks
 
-- TypeScript: **0 errors**.
-- Tests: **652 / 652 pass** across 56 suites.
-- Latest OTA: `2026-05-19-117` (pending bump for this commit).
-- APK version: `2.201` — no rebuild needed; all changes JS-only.
+### Player-requested features (engineering work to do)
+
+- **Salvage quick-action button** — explicit player request from OTA 141 log. Symmetric with Search/Approach: chip-tap modal listing scene nouns that can be salvaged (constructs, wrecks, automatons, drone husks). Needs new modal component + chip pool source + wiring in `InputBox`. Defer-until-confirmed by player.
+
+### Player action needed
+
+- **Pronunciation worksheet** — `docs/pronunciation-worksheet.md`. Player fills rows and sends back. Batch into `loreLexicon.ts` (~30 min, no engineering risk).
+- **APK rebuild** — to activate immersive system bars. User triggers `eas build` when they're ready to redistribute to testers. Keep `version: 2.201` in `app.json` for the new build so existing testers keep getting OTAs.
+
+### Watch list (not blocking)
+
+- **`questProgressionAudit.test.ts` + `uniquenessAudit.test.ts` parallel-run flake** — both pass in isolation, intermittently fail in full `npx jest` runs. Module-level state leak between concurrent test workers. Real-world impact: zero. Don't chase unless it gets worse.
+- **`encounterStress` test cycle tuning** — `seq` reset removed in OTA 137 so real entropy drives variation; if archetype pool grows past ~50, may need re-tuning.
+
+### Closed this session
+
+- Tutorial vendor → about freeze ✅ (OTA 135)
+- OTA-apply crash ✅ (OTA 134)
+- Mid-tour Irma cheese ✅ (OTA 133)
+- Tutorial coverage gaps (cardinal travel, actions, contracts, settings) ✅ (OTA 132)
+- Stats panel clipping behind scene bar ✅ (OTA 132)
+- Parser mis-routes (okay/bag/pocket/press/construct) ✅ (OTAs 131, 140)
+- Salvage → craft+construct misparse ✅ (OTA 140)
+- Locket "force open" dead-end ✅ (OTA 140)
+- "What's inside?" hallucinated inventory item ✅ (OTA 140)
+- Garbage-prose Arbiter echo ✅ (OTA 141)
+- Mud Monarchs vendor missing ✅ (OTA 131)
+- Location-flavor uniqueness ✅ (OTA 131)
+- `wastelandStepsSinceEncounter` cross-character leak ✅ (OTA 131)
+- Mini-dungeon system + 36 new archetypes ✅ (OTAs 136–138)
+- Burst-aware contract chatter ✅ (OTA 134)
+- Companion-chat wellness lines ✅ (OTA 131)
+
+### Decided won't-do
+
+- **STT investment beyond service-selection** — player said "if it doesn't work it's bloat." Next failure → STT comes out entirely.
+- **Cloud TTS** — offline-first per project architecture.
+- **Continuous listening / hot-word** — battery + privacy; push-to-talk only.
 
 ---
 
-## 6. Repository conventions
+## 8. Workflow conventions
 
-- **Commits** prefixed `feat:` / `fix:` / `chore:` / `refactor:` / `debug:` / `test:` / `perf:` / `ui:` / `content:`. Bodies explain WHY with concrete before/after.
-- **OTA bumps:** every JS-only push bumps `app/buildInfo.ts:OTA_BUILD_ID`. Format `YYYY-MM-DD-NNN`.
-- **APK triggers:** add a comment line to `metro.config.js` with the date prefix. Bumping that comment fires `build-apk.yml`.
-- **Branch:** all work on `claude/new-session-MvF82`.
-- **Tests live** in `__tests__/` at repo root. `jest-expo` preset.
+### Commits
+
+- **Prefix:** `feat:` / `fix:` / `chore:` / `refactor:` / `debug:` / `test:` / `perf:` / `ui:` / `content:`
+- **Subject:** one line, lowercase after prefix, concrete and specific
+- **Body:** explain the WHY with concrete before/after. Reference OTA numbers when fixing earlier bugs.
+- **Never include** the model identifier (`claude-opus-4-7[1m]`) in any committed artifact.
+
+### OTA bumps
+
+- Format `YYYY-MM-DD-NNN`. NNN is monotonic counter; today's first OTA is 001, second is 002, etc.
+- Bump on EVERY push that ships JS changes (which is ~all of them).
+
+### Tests
+
+- Live in `__tests__/` at repo root, `jest-expo` preset.
+- 66 suites, 941 tests as of OTA 141.
+- Two suites have a known parallel-run flake (see Watch list). Re-run in isolation to confirm; safe to push if isolated runs pass.
+
+### Code style
+
+- Default to writing no comments. Only comment when WHY is non-obvious (hidden constraint, subtle invariant, workaround for a specific bug).
+- Never write multi-paragraph docstrings or multi-line comment blocks — one short line max.
+- Don't reference "the current task" or PR-level context in code comments — those belong in commit bodies and rot inline.
 
 ---
 
-## 7. Critical files / hotspots
+## 9. Critical files / hotspots
 
-- `app/state/gameStore.ts` — ~6900 lines. The spine. Action handlers, combat resolution, scene management, log persistence, room state, Qwen parse-fallback wiring.
-- `app/engine/types.ts` — shared interfaces. `Location.interactables`, `MicroMicroLocation.interactables` live here.
-- `app/engine/parser.ts` — dictionary parser. ~330 verbs across 36 intents. Fast path.
+- `app/state/gameStore.ts` — ~7000 lines. Action handlers, combat resolution, scene management, log persistence, room state, Qwen parse-fallback wiring, tutorial advance, OTA-update flag, burst-quest tracker, `lastInteractedNoun` tracker.
+- `app/engine/types.ts` — shared interfaces. `Location.interactables`, `MicroMicroLocation.interactables`, `ScreenName`.
+- `app/engine/parser.ts` — dictionary parser. ~330 verbs across 36 intents.
 - `app/engine/llmParser.ts` — Qwen-backed fallback. `parseInputViaLLM(text, ctx, qwen)`.
-- `app/engine/containerLoot.ts` — open-intent loot resolver. `classifyContainer()` + `rollFromPool()`.
-- `app/engine/ambientNouns.ts` — heuristic extractor. **Fallback only** when authored `interactables` missing.
-- `app/engine/hub.ts` — hub data + `isLeaveHubCommand` / `resolveHubTravel`. `HubRoom.interactables` lives here.
-- `app/engine/worldLadder.ts` — Micro-Micro schema. `MicroMicroLocation.interactables` lives here.
-- `app/engine/equipment.ts` — `validSlotsForItem` with name-based slot inference fallback.
-- `app/voice/loreLexicon.ts` — 24 lore-word respellings + `cleanForSpeech`.
-- `app/voice/STTManager.ts` — speech recognition with service-selection logic.
-- `app/screens/ExplorationScreen.tsx` — `buildChipPool()` lives here.
+- `app/engine/wastelandEncounters.ts` — pickWastelandEncounter + 45 archetype types.
+- `app/engine/containerLoot.ts` — open-intent loot resolver.
+- `app/engine/hooks.ts` — multi-stage scene hooks (`wreck_construct`, `submerged_steeple`, etc.).
+- `app/engine/hub.ts` — hub data + `isLeaveHubCommand` / `resolveHubTravel`.
+- `app/engine/narrativeGenerator.ts` — Arbiter remark builder, soft fallback, opening narrative, location flavors.
+- `app/voice/PiperTTSManager.ts` — Kokoro engine, voice pool (2-slot LRU).
+- `app/voice/TTSManager.ts` — engine routing + queue + coalesce.
+- `app/voice/STTManager.ts` — speech recognition with service selection.
+- `app/voice/speakerVoices.ts` — per-vendor/NPC voice mapping.
+- `app/components/tutorialSteps.ts` — TUTORIAL_STEPS array (15 steps).
+- `app/components/TutorialOverlay.tsx` + `TutorialTarget.tsx` — overlay + glow wrapper.
+- `app/screens/ExplorationScreen.tsx` — `buildChipPool()` + main game UI.
 - `app/data/locations/locations.json` — 21 locations, all declare `interactables`.
-- `app/data/world/static_hub.json` — 15 hub rooms, all declare `interactables`.
-- `app/data/world/worldLadder.json` — 27 Micro-Micro rooms, all declare `interactables`.
+- `app/data/world/wasteland_encounters.json` — 45 archetypes.
 - `app/data/world/container_loot.json` — 9 container archetypes.
-- `App.tsx` — Android status-bar padding pinned here.
-- `docs/pronunciation-worksheet.md` — current worksheet for lexicon fills.
-- `__tests__/llmParser.test.ts` — 18 tests for Qwen-fallback module.
-- `__tests__/interactables.test.ts` — 13 tests locking in authored-interactables contract.
-- `__tests__/containerLoot.test.ts` — 25 tests for archetype matching + weighted rolls.
+- `app/data/npcs/vendors.json` — vendor catalog (Mud Monarch Agent added OTA 131).
+- `App.tsx` — boot sequence, AppState handling, error boundary, lazy native-module loader, OTA flag wiring.
+- `app/updates/checkAndApplyOTA.ts` — fetchOnly mode + full reload sequence.
+- `app/buildInfo.ts` — bump every push.
+- `docs/pronunciation-worksheet.md` — pending player input.
 
 ---
 
-## 8. Quick-start commands
+## 10. Quick-start commands
 
 ```bash
-# Typecheck + unit tests (fast)
-npx tsc --noEmit
-npx jest
+# Typecheck + tests (run both before every push)
+npx tsc --noEmit && echo TS-OK || echo TS-FAIL
+npx jest --silent
 
-# Push as OTA-only
+# Re-run a single suite (e.g. after a fix or to verify a flake)
+npx jest <suite-name>
+
+# Status / log style
+git log --oneline -10
+git status
+
+# Push as OTA-only (typical path)
 #  1) edit code in app/
 #  2) bump app/buildInfo.ts OTA_BUILD_ID
 #  3) commit + push → eas-update.yml fires
+git add -A && git commit -m "fix: ..."
+git push -u origin claude/new-session-MvF82
 
-# Push as APK rebuild (native config / new deps / version bump)
-#  1) bump comment in metro.config.js
-#  2) commit + push → build-apk.yml fires (~17–20 min)
+# Push as APK rebuild (native deps / version bump)
+#  1) confirm with user first
+#  2) bump comment in metro.config.js
+#  3) commit + push → build-apk.yml fires (~17–20 min)
 ```
 
 ---
 
-## 9. Status effect reference (action-card layer)
+## 11. Status effect reference
 
-| Kind | Source action | Effect | Duration |
+| Kind | Source | Effect | Duration |
 |---|---|---|---|
-| `aiming` | `aim` | +2 next ranged attack, consumed on use | 1 round |
+| `aiming` | `aim` | +2 next ranged, consumed on use | 1 round |
 | `sprinting` | `dash` / `sprint` | -2 next attack (post-sprint) | 1 round |
 | `in_cover` | `take_cover` (partial) | +4 AC vs ranged | 2 rounds |
 | `in_cover_full` | `take_cover` ("full cover") | +8 AC vs ranged, ranged auto-miss | 2 rounds |
-| `ready` | `ready` | +1 bonus on triggered reaction | 1 round |
+| `ready` | `ready` | +1 on triggered reaction | 1 round |
 | `helping` | `help` | narrative ally bonus | 1 round |
-| `overwhelmed` | applied by engine | -2 on evade | 1 round |
-| `surprised` | `ambush_strike` enemy trait + maneuver mismatch | -2 next roll, consumed | 1 round |
+| `overwhelmed` | engine | -2 on evade | 1 round |
+| `surprised` | `ambush_strike` + maneuver mismatch | -2 next roll, consumed | 1 round |
 | `fighting_back` | `fight_back` | next enemy strike → opposed Fighting roll | 2 rounds |
-| `quick_fire` | `quick_fire` | +2 next ranged attack | 1 round |
+| `quick_fire` | `quick_fire` | +2 next ranged | 1 round |
 | `dodging` | `dodge` | +4 AC | 2 rounds |
-| `blocking` | `block` | +4 AC (also durability/riposte) | 2 rounds |
-| `bleed` / `poisoned` / `stun` / `burn_scar` / `armor_severed` / `paralyzed` | damage-type rolls + enemy traits | per `statusEffects.ts` | varies |
+| `blocking` | `block` | +4 AC, durability/riposte | 2 rounds |
+| `bleed`/`poisoned`/`stun`/`burn_scar`/`armor_severed`/`paralyzed` | per `statusEffects.ts` | varies | varies |
 
 ---
 
-## 10. Enemy trait reference
+## 12. Enemy trait reference
 
-Set on enemy entries in `enemies.json`. Read at combat time via `enemyTraits.ts`.
+Set on enemy entries in `enemies.json`. Read via `enemyTraits.ts`.
 
 **Stat mods:** `armored` (+2 AC) · `weak_armor` (-2 AC) · `agile` (+1 AC) · `quick` (+1 attack) · `slow` (-1 attack) · `savage` (+1 attack)
 
@@ -232,8 +359,8 @@ Set on enemy entries in `enemies.json`. Read at combat time via `enemyTraits.ts`
 
 **On-hit status:** `bleeder` (50% bleed 3r) · `venomous` (35% poison 3r) · `concussive` (20% stun 1r)
 
-**Per-round / first-strike:** `regenerate` (+1 HP/round, capped at start) · `fast_regen` (+2/round) · `ambush_strike` (+2 first hit of encounter)
+**Per-round / first-strike:** `regenerate` (+1 HP/round) · `fast_regen` (+2/round) · `ambush_strike` (+2 first hit)
 
 ---
 
-That's the lay of the land at OTA 117. Three architectural phases of the parser-treadmill cleanup are done. Open items are short and concrete (worksheet fill-in, STT verification, OTA cache verification, optional sim harness rebuild).
+That's the lay of the land at OTA 141. State is healthy, tests are green, OTA pipeline is delivering cleanly to the existing APK fleet. Next big moves are gated on either content (Salvage button needs UI work + user sign-off) or player input (pronunciation worksheet).
