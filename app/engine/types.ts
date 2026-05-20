@@ -129,6 +129,15 @@ export interface Enemy {
    *  - "ambush_strike"      (+2 to the first hit on a target)
    *  Unknown ids are ignored — safe to extend the catalog. */
   traits?: string[];
+  /** Boss tier — a named, story-class threat. Engine treats boss
+   *  enemies as: AC +6, +1d6 bonus damage per swing, TWO counter-attacks
+   *  per round, arrival narration warns the player ("not a fight you
+   *  can win head-on — find another way, or run"), and the kill always
+   *  drops a Resurrection Gem. Bosses are absent from the random
+   *  encounter pools — they only spawn from explicit story triggers
+   *  or the boss-spawn gate (~1% on wasteland encounters once the
+   *  player has cleared 3+ Legendaries). */
+  boss?: boolean;
 }
 
 export interface WeatherEntry {

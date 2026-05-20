@@ -19,7 +19,7 @@
 import { Audio } from 'expo-av';
 import { getAudioSettings, loadAudioSettings, onAudioSettingsChange } from './audioSettings';
 
-type Context = 'combat' | 'shop' | 'menu' | 'explore';
+type Context = 'boss' | 'combat' | 'shop' | 'menu' | 'explore';
 
 interface TrackEntry {
   id: string;
@@ -29,6 +29,13 @@ interface TrackEntry {
 }
 
 const POOLS: Record<Context, TrackEntry[]> = {
+  // Boss tier — heavier mix, dedicated tracks. Activated when ANY enemy
+  // in the active scene carries `boss: true`. Sits above regular combat
+  // in the priority chain (see AudioController.deriveContext).
+  boss: [
+    { id: 'boss-iron-boss', source: require('../../assets/audio/boss-iron-boss.mp3'), baseVolume: 0.7 },
+    { id: 'boss-iron-gate-raid', source: require('../../assets/audio/boss-iron-gate-raid.mp3'), baseVolume: 0.7 },
+  ],
   combat: [
     { id: 'combat-moon-map-1', source: require('../../assets/audio/combat-moon-map-1.mp3'), baseVolume: 0.6 },
     { id: 'combat-map-of-echoes', source: require('../../assets/audio/combat-map-of-echoes.mp3'), baseVolume: 0.6 },

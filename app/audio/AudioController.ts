@@ -12,7 +12,9 @@ import { setActiveContext, forceReapplyAudio } from './AudioManager';
 
 type GameState = ReturnType<typeof useGameStore.getState>;
 
-function deriveContext(s: GameState): 'combat' | 'shop' | 'menu' | 'explore' | null {
+type AudioContext = 'boss' | 'combat' | 'shop' | 'menu' | 'explore';
+
+function deriveContext(s: GameState): AudioContext | null {
   // Menu screens — title, character creation, and the settings (about)
   // screen play the dedicated Misty Compass menu track regardless of
   // whether a character is loaded or what's happening in the scene.
@@ -21,14 +23,21 @@ function deriveContext(s: GameState): 'combat' | 'shop' | 'menu' | 'explore' | n
   }
   if (!s.player) return null;
   const enemies = s.currentScene?.enemies ?? [];
-  if (enemies.length > 0) return 'combat';
+  if (enemies.length > 0) {
+    // Boss-tier track takes priority over regular combat when ANY
+    // enemy in the active scene carries the boss flag. As soon as the
+    // boss is defeated or fled, the controller falls back to the
+    // normal combat / explore tracks on the next state tick.
+    if (enemies.some((e) => e.boss)) return 'boss';
+    return 'combat';
+  }
   const vendor = s.currentScene?.vendor ?? null;
   if (vendor || s.currentScreen === 'inventory' || s.currentScreen === 'vendor') return 'shop';
   return 'explore';
 }
 
 let unsub: (() => void) | null = null;
-let lastContext: 'combat' | 'shop' | 'menu' | 'explore' | null | undefined = undefined;
+let lastContext: AudioContext | null | undefined = undefined;
 
 // Bind the controller to the store. Call once at app boot.
 export function startAudioController(): void {

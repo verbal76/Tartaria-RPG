@@ -5871,17 +5871,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
     }
 
-    // Very rare Resurrection Gem drop. ~0.5% per kill — most playtests
-    // will never see one; long campaigns will see a handful. The gem
-    // saves to the install-wide stash, not the active character, so it
-    // survives the character's eventual death.
-    if (Math.random() < 0.005) {
+    // Resurrection Gem drop. Boss kills guarantee a gem — the risk of
+    // a boss fight should always pay back in something that survives
+    // the character's eventual death. Regular kills roll at ~0.5%, so
+    // most playtests will never see one organically; long campaigns
+    // will see a handful. The gem saves to the install-wide stash, not
+    // the active character.
+    const gemDropped = enemy.boss || Math.random() < 0.005;
+    if (gemDropped) {
       void addResurrectionGems(1).then((total) => {
         set({ resurrectionGems: total });
-        get().appendLog(
-          'reward',
-          `✦ A Resurrection Gem flickers from the dust — gathered to your stash. (${total} held)`,
-        );
+        const line = enemy.boss
+          ? `✦ A Resurrection Gem pulses in the wreckage where ${enemy.name} fell — yours, and the buried world is one boss lighter. (${total} held)`
+          : `✦ A Resurrection Gem flickers from the dust — gathered to your stash. (${total} held)`;
+        get().appendLog('reward', line);
       });
     }
     void get().persist();
@@ -7215,24 +7218,44 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // either route lands an enemy in the scene that combat resolution
         // picks up on the next player turn.
         if ((enc.type === 'skirmish' || enc.type === 'mini_dungeon') && enc.enemyName) {
-          const spawned = findEnemyByName(enc.enemyName);
+          // Boss-spawn gate. Once the player has cleared 3+ Legendaries
+          // (across the lifetime of the character in worldMemory), a
+          // 1% roll on any wasteland skirmish swaps the regular spawn
+          // for a random boss-flagged enemy. This is where the world's
+          // teeth come out — the player can be Day 30, comfortable
+          // with Legendaries, and walk into a Hollow King without
+          // warning. Bosses are NEVER in the random roll otherwise.
+          let spawned = findEnemyByName(enc.enemyName);
+          const legendaryNames = new Set(
+            (enemiesData as Enemy[]).filter((e) => e.rarity === 'Legendary' && !e.boss).map((e) => e.name),
+          );
+          const legendaryKills = (get().worldMemory.defeatedEnemies ?? []).filter((n) => legendaryNames.has(n)).length;
+          if (legendaryKills >= 3 && Math.random() < 0.01) {
+            const bossPool = (enemiesData as Enemy[]).filter((e) => e.boss);
+            if (bossPool.length > 0) {
+              spawned = JSON.parse(JSON.stringify(bossPool[Math.floor(Math.random() * bossPool.length)]!));
+            }
+          }
           if (spawned) {
+            const finalSpawn: Enemy = spawned;
             set((s) => {
               if (!s.currentScene) return s;
               return {
                 currentScene: {
                   ...s.currentScene,
-                  enemies: [...s.currentScene.enemies, spawned],
-                  enemyHps: [...s.currentScene.enemyHps, spawned.hp],
+                  enemies: [...s.currentScene.enemies, finalSpawn],
+                  enemyHps: [...s.currentScene.enemyHps, finalSpawn.hp],
                   activeEnemyIdx: s.currentScene.enemies.length,
                   range: s.currentScene.range ?? 'close',
                   enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
                 },
               };
             });
-            const flavour = enc.type === 'mini_dungeon'
-              ? `${spawned.name} steps out of the shadows of the place — ${spawned.attack} ready, ${spawned.damage} damage on a hit. The loot you found will leave with whoever walks out alive. (range: close)`
-              : `${spawned.name} closes — ${spawned.attack} ready, ${spawned.damage} damage on a hit. (range: close)`;
+            const flavour = finalSpawn.boss
+              ? `${finalSpawn.name} unfolds into the world — ${finalSpawn.attack}, ${finalSpawn.damage} per swing, and the air itself goes thin around it. This is not a fight you can win head-on. Find another way, or run. (range: close)`
+              : enc.type === 'mini_dungeon'
+                ? `${finalSpawn.name} steps out of the shadows of the place — ${finalSpawn.attack} ready, ${finalSpawn.damage} damage on a hit. The loot you found will leave with whoever walks out alive. (range: close)`
+                : `${finalSpawn.name} closes — ${finalSpawn.attack} ready, ${finalSpawn.damage} damage on a hit. (range: close)`;
             get().appendLog('combat', flavour);
           } else {
             get().appendLog('debug', `wasteland-encounter: ${enc.type} spawn missed (no enemy "${enc.enemyName}" in catalog).`);
@@ -8565,6 +8588,21 @@ function runEnemyGroupCounters(
     // Pass live index so applyEnemyCounter can resolve ambush_strike
     // (one-shot +2 to the first counter for enemies with the trait).
     applyEnemyCounter(enemy, livePlayer ?? fallbackPlayer, get, set, liveIdx);
+    // Boss tier: a second counter swing after the first lands. Skipped
+    // if the first counter killed the player, or if the enemy itself
+    // dropped (riposte / fight-back path).
+    if (enemy.boss) {
+      const liveAfter = get().player;
+      const sceneAfter = get().currentScene;
+      if (!liveAfter || liveAfter.hp <= 0 || liveAfter.dead) return;
+      const enemyStillAlive = sceneAfter
+        && (sceneAfter.enemyHps[liveIdx] ?? 0) > 0
+        && sceneAfter.enemies[liveIdx] === enemy;
+      if (enemyStillAlive) {
+        get().appendLog('combat', `${enemy.name} presses the second strike — bosses do not yield the tempo.`);
+        applyEnemyCounter(enemy, liveAfter, get, set, liveIdx);
+      }
+    }
   }
 }
 
@@ -8716,6 +8754,11 @@ function applyEnemyCounter(
     // double-dice crit treatment so the bite hurts.
     if (enemyCrit) {
       rawDmg += rollFromNotation(String(enemy.damage)) || rollDie(6);
+    }
+    // Boss-tier bonus damage — +1d6 on every connecting swing on top
+    // of the enemy's declared damage notation. Stacks with crits.
+    if (enemy.boss) {
+      rawDmg += rollDie(6);
     }
     const enemyDamageType = parseIncomingDamageType(String(enemy.damage));
 

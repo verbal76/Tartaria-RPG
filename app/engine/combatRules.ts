@@ -150,7 +150,11 @@ function attackStatFor(
 function enemyAC(enemy: Enemy): number {
   const ap = parseInt(String(enemy.abilityPoint), 10);
   const base = isNaN(ap) ? 8 : Math.max(5, Math.min(18, 5 + ap));
-  return Math.max(1, base + traitACBonus(enemy.traits));
+  // Boss tier: +6 over the standard scaling so even a power character
+  // (STR 14 + 1d8 weapon) can't auto-hit. Combined with double counters
+  // and bonus damage downstream, bosses become "find another way" walls.
+  const bossBonus = enemy.boss ? 6 : 0;
+  return Math.max(1, base + traitACBonus(enemy.traits) + bossBonus);
 }
 
 // Rulebook: Common 1d6 / Uncommon 2d6 / Rare 1d10+1d6 / Legendary 2d10

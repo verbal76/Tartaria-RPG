@@ -1068,8 +1068,10 @@
     "damage": "4D10",
     "hp": 458,
     "rarity": "Legendary",
-    "loot": ["Behemoth Heart", "Aetheric Shard"],
-    "traits": ["armored", "savage", "slow", "concussive", "fast_regen", "vulnerable:bludgeoning"]
+    "loot": ["Behemoth Heart", "Aetheric Shard", "Resurrection Gem"],
+    "aliases": ["behemoth", "the behemoth", "aetheric behemoth"],
+    "traits": ["armored", "savage", "slow", "concussive", "fast_regen", "vulnerable:bludgeoning"],
+    "boss": true
   },
   {
     "name": "Aetherkin",
@@ -1106,5 +1108,96 @@
     "loot": ["Aether Residue", "Patched Cloth"],
     "aliases": ["agent", "cloak", "black cloak", "the agent", "monarch agent", "spy", "assassin"],
     "traits": ["quick", "ambush_strike", "venomous", "bleeder"]
+  },
+  {
+    "name": "Aetheric Lich",
+    "type": "Etheric Undead",
+    "abilityPoint": "Intelligence 13",
+    "attack": "Soul Drain",
+    "damage": "3D8 Aetheric",
+    "hp": 520,
+    "rarity": "Legendary",
+    "loot": ["Lich Phylactery", "Aetherstone Heart", "Resurrection Gem"],
+    "aliases": ["lich", "the lich", "aetheric lich"],
+    "traits": ["fast_regen", "ambush_strike", "concussive", "resist:slashing", "resist:piercing", "vulnerable:burn"],
+    "boss": true
+  },
+  {
+    "name": "Mud Tyrant",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Strength 13",
+    "attack": "Sovereign Crush",
+    "damage": "4D8",
+    "hp": 640,
+    "rarity": "Legendary",
+    "loot": ["Tyrant's Crown", "Mud-Iron Heart", "Resurrection Gem"],
+    "aliases": ["tyrant", "the tyrant", "mud tyrant", "mud king"],
+    "traits": ["armored", "savage", "concussive", "bleeder", "fast_regen", "vulnerable:bludgeoning"],
+    "boss": true
+  },
+  {
+    "name": "Hollow King",
+    "type": "Etheric Undead",
+    "abilityPoint": "Strength 12",
+    "attack": "Hollow Cleave",
+    "damage": "3D10",
+    "hp": 580,
+    "rarity": "Legendary",
+    "loot": ["Hollow Crown", "Throne Shard", "Resurrection Gem"],
+    "aliases": ["king", "the king", "hollow king", "hollowed king"],
+    "traits": ["armored", "savage", "ambush_strike", "fast_regen", "resist:piercing", "vulnerable:burn"],
+    "boss": true
+  },
+  {
+    "name": "Iron Worm",
+    "type": "Mech-Construct",
+    "abilityPoint": "Strength 13",
+    "attack": "Coiling Crush",
+    "damage": "4D6",
+    "hp": 700,
+    "rarity": "Legendary",
+    "loot": ["Worm Plating", "Iron Core", "Resurrection Gem"],
+    "aliases": ["worm", "iron worm", "the worm"],
+    "traits": ["armored", "slow", "savage", "fast_regen", "concussive", "resist:slashing", "resist:piercing", "vulnerable:burn"],
+    "boss": true
+  },
+  {
+    "name": "Bog Wyrm",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Dexterity 11",
+    "attack": "Wyrm Bite",
+    "damage": "3D8",
+    "hp": 540,
+    "rarity": "Legendary",
+    "loot": ["Wyrm Fang", "Bog-Heart Pearl", "Resurrection Gem"],
+    "aliases": ["wyrm", "the wyrm", "bog wyrm", "serpent"],
+    "traits": ["agile", "quick", "venomous", "bleeder", "fast_regen", "resist:piercing", "vulnerable:burn"],
+    "boss": true
+  },
+  {
+    "name": "Voidspawn Matriarch",
+    "type": "Aetheric Mutation",
+    "abilityPoint": "Intelligence 12",
+    "attack": "Voidspawn Spittle",
+    "damage": "3D8 Aetheric",
+    "hp": 560,
+    "rarity": "Legendary",
+    "loot": ["Matriarch's Carapace", "Voidspawn Egg", "Resurrection Gem"],
+    "aliases": ["matriarch", "the matriarch", "voidspawn", "voidspawn matriarch", "queen"],
+    "traits": ["armored", "venomous", "bleeder", "fast_regen", "concussive", "resist:burn", "vulnerable:slashing"],
+    "boss": true
+  },
+  {
+    "name": "Tartarian Reaver",
+    "type": "Human",
+    "abilityPoint": "Strength 12",
+    "attack": "Reaver's Sweep",
+    "damage": "3D8",
+    "hp": 480,
+    "rarity": "Legendary",
+    "loot": ["Reaver's Greatsword", "Reaver's Pauldron", "Resurrection Gem"],
+    "aliases": ["reaver", "the reaver", "tartarian reaver"],
+    "traits": ["armored", "savage", "quick", "ambush_strike", "bleeder", "concussive", "vulnerable:piercing"],
+    "boss": true
   }
 ]
