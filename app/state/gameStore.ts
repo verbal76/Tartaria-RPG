@@ -970,9 +970,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // as Search / Approach chips until beginScene fired again.
       if (restoredScene?.location) {
         const loc = restoredScene.location;
-        restoredScene.ambientNouns = (loc.interactables && loc.interactables.length > 0)
+        // Rebuild ambientNouns from the FULL noun stack at this scene:
+        // location.interactables + hub-room.interactables (when the
+        // player is inside a hub like The Gate / Armory) + the
+        // active Micro-Micro room's interactables. Previously this
+        // path only restored location.interactables and silently
+        // dropped hub-room nouns (rope / lantern / table / etc.).
+        // Look-around's cached subset still showed them — but
+        // matchAmbientNoun in pickup / approach / salvage missed them
+        // because the full pool didn't contain them after load.
+        // Playtest log caught this: 'approach rope' bailed and
+        // 'take the rope' said the ground was bare.
+        const baseNouns = (loc.interactables && loc.interactables.length > 0)
           ? [...loc.interactables]
           : extractAmbientNouns(loc.description);
+        const hubRoom = findHubRoom(player.hubRoomId);
+        const hubNouns = (hubRoom?.interactables ?? []);
+        // Micro-Micro nouns: the scene already carries microMicroId; we
+        // resolve via the worldLadder lookup so we mirror beginScene
+        // exactly. If the ladder lookup misses, fall through to no
+        // micro-micro nouns (older saves before the ladder shipped).
+        const ladderTriple = restoredScene.microMicroId
+          ? findMicroMicroAnywhere(restoredScene.microMicroId)
+          : null;
+        const microMicroNouns = ladderTriple?.microMicro
+          ? (ladderTriple.microMicro.interactables && ladderTriple.microMicro.interactables.length > 0
+              ? [...ladderTriple.microMicro.interactables]
+              : extractAmbientNouns(ladderTriple.microMicro.environmental_description))
+          : [];
+        restoredScene.ambientNouns = Array.from(
+          new Set([...baseNouns, ...hubNouns, ...microMicroNouns]),
+        );
       }
       set({
         player,
