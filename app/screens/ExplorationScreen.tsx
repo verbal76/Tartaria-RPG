@@ -10,6 +10,7 @@ import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
 import { SalvageModal } from '../components/SalvageModal';
 import { TakeModal } from '../components/TakeModal';
+import { FeedbackModal } from '../components/FeedbackModal';
 import { findCatalogItem } from '../engine/crafting';
 import { isOversized } from '../engine/portability';
 import { playerHasScannerEquipped } from '../engine/equipment';
@@ -58,6 +59,10 @@ export function ExplorationScreen() {
   const [approachOpen, setApproachOpen] = useState(false);
   const [salvageOpen, setSalvageOpen] = useState(false);
   const [takeOpen, setTakeOpen] = useState(false);
+  // OTA 202 — designer-note modal. Wired to the 📝 button in the
+  // input row (InputBox.onOpenFeedback prop).
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const appendFeedback = useGameStore((s) => s.appendFeedback);
   const takeAmbientNoun = useGameStore((s) => s.takeAmbientNoun);
   const stealthTakeAmbientNoun = useGameStore((s) => s.stealthTakeAmbientNoun);
   const worldMemory = useGameStore((s) => s.worldMemory);
@@ -249,6 +254,7 @@ export function ExplorationScreen() {
             onOpenApproach={() => setApproachOpen(true)}
             onOpenSalvage={() => setSalvageOpen(true)}
             onOpenTake={() => setTakeOpen(true)}
+            onOpenFeedback={() => setFeedbackOpen(true)}
             inCombat={inCombat}
             equippedMain={equippedMain}
             equippedOff={equippedOff}
@@ -336,6 +342,15 @@ export function ExplorationScreen() {
           submit(`salvage ${target}`);
         }}
         onCancel={() => setSalvageOpen(false)}
+      />
+
+      <FeedbackModal
+        visible={feedbackOpen}
+        onSubmit={(text) => {
+          setFeedbackOpen(false);
+          appendFeedback(text);
+        }}
+        onCancel={() => setFeedbackOpen(false)}
       />
 
       <ApproachModal

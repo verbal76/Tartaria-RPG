@@ -723,6 +723,13 @@ interface GameStore {
   saveAndExitToTitle: () => Promise<void>;
 
   appendLog: (channel: LogChannel, text: string, meta?: Record<string, unknown>) => void;
+  /** OTA 202 — designer's note. Writes the given text to the log on
+   *  the dedicated `feedback` channel, bypassing the action parser
+   *  entirely. Used by the in-game FEEDBACK button so playtest
+   *  observations don't get mis-classified as game commands (the
+   *  prior pattern: typing "search isn't working" into the input
+   *  parsed as a search verb and cleared the player's hands). */
+  appendFeedback: (text: string) => void;
 
   beginScene: (opts?: {
     openingPrefix?: string;
@@ -1480,6 +1487,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // extractAmbientNouns() is the fallback only.
       return { gameLog: nextLog };
     });
+  },
+
+  appendFeedback(text) {
+    // OTA 202 — bypass the action parser. The text lands on the
+    // `feedback` log channel and is appended to disk via the same
+    // path as any other log entry, so it survives the COPY ALL out
+    // of LogScreen and the dead-slot Copy Log on the title. No
+    // dedup, no scene timing, no time advance — purely an
+    // out-of-band designer note. Empty / whitespace-only strings
+    // are dropped so a misfired tap can't pollute the log.
+    const trimmed = (text ?? '').trim();
+    if (!trimmed) return;
+    get().appendLog('feedback', `📝 ${trimmed}`);
   },
 
   beginScene(opts?: {

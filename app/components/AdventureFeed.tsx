@@ -32,6 +32,10 @@ const channelColors: Record<LogChannel, string> = {
   reward: REWARD_COLOR,
   cognitive: '#7a705c',
   debug: '#605648',
+  // OTA 202 — designer notes from the 📝 button. Distinct accent so
+  // a glance distinguishes them from world prose during a long
+  // copy-paste / scroll-back review.
+  feedback: '#c97aa8',
 };
 
 // `cognitive` (MiniLM emotion/intent) and `debug` (parser, combat range
@@ -46,6 +50,7 @@ const HIDDEN_CHANNELS: ReadonlySet<LogChannel> = new Set(['cognitive', 'debug'])
 // WORLD / REWARD chip on top.
 function tagForChannel(channel: LogChannel): string | null {
   if (channel === 'arbiter') return 'ARBITER';
+  if (channel === 'feedback') return 'NOTE';
   return null;
 }
 

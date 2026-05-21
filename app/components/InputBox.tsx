@@ -14,6 +14,11 @@ interface Props {
   onOpenApproach: () => void;
   onOpenSalvage: () => void;
   onOpenTake: () => void;
+  /** OTA 202 — open the designer-note (FeedbackModal) overlay. The
+   *  📝 button next to the text input dispatches this; bypasses the
+   *  action parser entirely so playtest notes land cleanly on the
+   *  `feedback` log channel. */
+  onOpenFeedback: () => void;
   inCombat: boolean;
   equippedMain: string | null;
   equippedOff: string | null;
@@ -43,7 +48,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, inCombat, equippedMain, equippedOff, range }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenFeedback, inCombat, equippedMain, equippedOff, range }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
   // BrandedKeyboard removed 2026-05-21 per playtester: "it is not
@@ -281,6 +286,18 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             </TouchableOpacity>
           ) : null
         )}
+        {/* OTA 202 — designer-note button. Tap opens the
+            FeedbackModal which writes straight to the log on the
+            `feedback` channel, bypassing the action parser entirely.
+            Sits between mic and Act so the touch target lives in the
+            same gesture zone as the other input-row controls. */}
+        <TouchableOpacity
+          style={styles.feedbackBtn}
+          onPress={onOpenFeedback}
+          hitSlop={6}
+        >
+          <Text style={styles.feedbackBtnText}>📝</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.send} onPress={handleSubmit}>
           <Text style={styles.sendText}>Act</Text>
         </TouchableOpacity>
@@ -378,6 +395,21 @@ const styles = StyleSheet.create({
     borderColor: '#6a9bbf',
   },
   micBtnText: { color: '#cdbf99', fontSize: 18 },
+  // OTA 202 — designer-note button (📝). Same footprint as the mic
+  // so the input row stays balanced; lower-key border because it's
+  // a tool button, not a primary action.
+  feedbackBtn: {
+    marginLeft: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderRadius: 3,
+    borderWidth: 1,
+    borderColor: '#3a342c',
+    backgroundColor: '#1a1714',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  feedbackBtnText: { fontSize: 16 },
   // SILENCE ARBITER button — replaces the mic while TTS is active.
   // Red tint so the player knows it's an interrupt, not a regular tap.
   silenceBtn: {
