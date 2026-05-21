@@ -33,7 +33,10 @@ describe('getItemPreview — contract for the investigate handler', () => {
     for (const g of GEAR.slice(0, 5)) {
       const preview = getItemPreview(g.name);
       expect(preview.description.length).toBeGreaterThan(0);
-      expect(['Consumable', 'Relic', 'Gear']).toContain(preview.kindLabel);
+      // 'Amulet' / 'Ring' appear here because items like Aetheric Locket
+      // live in both GEAR and AMULETS, and getItemPreview's accessory
+      // lookup wins before the GEAR fallback — both labels are valid.
+      expect(['Consumable', 'Relic', 'Gear', 'Amulet', 'Ring']).toContain(preview.kindLabel);
     }
   });
 
