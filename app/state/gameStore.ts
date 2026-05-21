@@ -2355,7 +2355,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('player', trimmed, { meta: true });
       get().appendLog(
         'arbiter',
-        `The Arbiter studies you, plainly. "I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb — 'search the rubble', 'go east', 'attack the figure'."`,
+        `The Arbiter studies you, plainly. "I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb — 'investigate the rubble', 'go east', 'attack the figure'."`,
       );
       get().appendLog('debug', `meta-comment guard: skipped intent parse on ${trimmed.length}-char input`);
       return;
@@ -2973,7 +2973,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (wordCount > 3 || rawTarget.length > 40 || /[?!]/.test(rawTarget)) {
             get().appendLog(
               'arbiter',
-              `The Arbiter studies you, plainly. "I'm not sure what you're trying to tell me. Phrase it as the deed you mean to do — 'search the rubble', 'attack the figure', 'go east'."`,
+              `The Arbiter studies you, plainly. "I'm not sure what you're trying to tell me. Phrase it as the deed you mean to do — 'investigate the rubble', 'attack the figure', 'go east'."`,
             );
             break;
           }

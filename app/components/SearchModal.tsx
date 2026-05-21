@@ -88,13 +88,13 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
         <View style={styles.scrim}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>SEARCH</Text>
+              <Text style={styles.title}>INVESTIGATE</Text>
               <View style={styles.rule} />
               <Text style={styles.body}>
-                Name an area or thing to search. Be specific with your words —
+                Name a thing in the scene to examine. Be specific —
                 "the mud", "the rubble", "the doorway", "the area to my left",
-                "the wagon", "behind the column". The Arbiter will try to read
-                your meaning, but vague rolls find vague things.
+                "the wagon", "behind the column". The Arbiter will try to
+                read your meaning, but vague targets find vague things.
               </Text>
 
               <TextInput
@@ -193,7 +193,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
                   onPress={handleSubmit}
                   disabled={!text.trim()}
                 >
-                  <Text style={styles.btnTextPrimary}>SEARCH</Text>
+                  <Text style={styles.btnTextPrimary}>INVESTIGATE</Text>
                 </Pressable>
               </View>
             </View>

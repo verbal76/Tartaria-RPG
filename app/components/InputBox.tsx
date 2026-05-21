@@ -297,7 +297,16 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             {PEACE_QUICK_DIRECT.map((qa) => (
               <QuickBtn key={qa.submit} label={qa.label} onPress={() => onSubmit(qa.submit)} />
             ))}
-            <QuickBtn label="search" onPress={onOpenSearch} />
+            {/* OTA 208 — label renamed from "search" to "investigate"
+                per playtester's semantic distinction: "I searched my
+                drawer for the right pair of socks" (looking for one
+                specific thing inside a container) vs "investigate
+                the dresser" (examining a context to learn what's
+                going on). The modal lets the player tap any scene
+                noun to learn about it — that's investigation, not
+                search. The parser intent is already 'investigate'
+                internally; this aligns the button with the intent. */}
+            <QuickBtn label="investigate" onPress={onOpenSearch} />
             <QuickBtn label="approach" onPress={onOpenApproach} />
             <QuickBtn label="take" onPress={onOpenTake} />
             <QuickBtn label="salvage" onPress={onOpenSalvage} />

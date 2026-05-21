@@ -305,7 +305,13 @@ export function ExplorationScreen() {
         ]}
         onSubmit={(target) => {
           setSearchOpen(false);
-          submit(`search ${target}`);
+          // OTA 208 — verb renamed from 'search' to 'investigate' to
+          // match the new button label and the engine intent. Parser
+          // VERB_SYNONYMS already routes both verbs to the same
+          // 'investigate' intent, so this is cosmetic (log lines
+          // read "investigate the trap" now) — no engine behavior
+          // change.
+          submit(`investigate ${target}`);
         }}
         onCancel={() => setSearchOpen(false)}
       />
