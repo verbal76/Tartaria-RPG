@@ -2870,9 +2870,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // routes to the dig path before ambient noun match. "ground" is
         // often in ambientNouns and would otherwise fire generic
         // narrate-ambient-find instead of the dig loot path.
+        //
+        // OTA 201 — exception: if the search target is ALSO a named
+        // ambient noun in this scene (e.g. 'rubble' appears in the
+        // scene's ambient list AND in GROUND_TOKENS), prefer the
+        // ambient path so the OTA 194 dedup fires and the chip is
+        // removed from the Search popup. Playtester:
+        //   "you can only search it once, then remove it from the popup"
+        // Without this exception, `search rubble` short-circuited to
+        // digHere() — which has its own per-spot mechanics and never
+        // marked searchedAmbientNouns — so the player could keep
+        // farming the same noun.
         if (rawTarget && isGroundSearch(rawTarget)) {
-          get().digHere();
-          break;
+          const sceneNouns = currentScene.ambientNouns ?? [];
+          const matchesAmbient = matchAmbientNoun(rawTarget, sceneNouns) !== null;
+          if (!matchesAmbient) {
+            get().digHere();
+            break;
+          }
+          // Falls through to the ambient match below.
         }
         // Harvest verbs (salvage / strip / pry / scavenge / comb) on
         // an ambient noun should ROLL FOR LOOT, not just narrate "you
