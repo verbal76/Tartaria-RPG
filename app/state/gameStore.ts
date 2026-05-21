@@ -3349,38 +3349,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // closure — otherwise the spendStamina/advanceTime set below
           // overwrites the cleared hubRoomId with the stale value.
           if (player.hubRoomId) {
-            // Clear hubRoomId AND rebuild ambientNouns from just the
-            // macro location description. Otherwise the scene keeps
-            // the hub room's nouns (anvil, racks, kettle, map-stone)
-            // even though the player has walked out the gate — and
-            // "sneak up on racks" / "search the anvil" succeeds in
-            // the open silt. Playtest log caught it: player went east
-            // from the Armory then typed `sneak up on racks` in the
-            // wilds and the parser happily resolved 'racks' as a hook
-            // noun left over from the Armory hub room.
-            set((s) => {
-              if (!s.player) return s;
-              const patch: Partial<GameStore> = {
-                player: { ...s.player, hubRoomId: null },
-              };
-              if (s.currentScene?.location) {
-                const loc = s.currentScene.location;
-                patch.currentScene = {
-                  ...s.currentScene,
-                  ambientNouns: (loc.interactables && loc.interactables.length > 0)
-                    ? [...loc.interactables]
-                    : extractAmbientNouns(loc.description),
-                };
-              }
-              return patch;
-            });
+            // Clear hubRoomId + rebuild the entire scene as wilderness
+            // (skipHubEntry so beginScene doesn't drop the player back
+            // through the gate). Earlier in this file we only patched
+            // ambientNouns and left vendor / hooks / displayedAmbient /
+            // microMicroId in place. Result: Irma followed the player
+            // out of the Armory into open silt — the look-around line
+            // read "Irma Ironhand is here" after the gate fell away.
+            // Same applies to leftover hooks and chip pools. beginScene
+            // is the canonical scene-rebuild path; use it.
+            set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+            const currentPlayer = get().player ?? player;
+            set({ player: advanceTime(spendStamina(currentPlayer, STAMINA_COSTS.travel), 1) });
             get().appendLog(
               'world',
               `You walk ${dir} past the gate. The outpost falls away behind you.`,
             );
+            get().beginScene({ skipHubEntry: true });
+            // beginScene already settled the new wilderness scene;
+            // skip stepDirection so we don't double-roll narration +
+            // double-charge stamina. stepDirection's per-tile ambient
+            // shuffle runs on subsequent cardinal moves once the
+            // player is committed to open ground.
+            break;
           }
-          const currentPlayer = get().player ?? player;
-          set({ player: advanceTime(spendStamina(currentPlayer, STAMINA_COSTS.travel), 1) });
+          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.travel), 1) });
           get().stepDirection(dir);
           break;
         }
