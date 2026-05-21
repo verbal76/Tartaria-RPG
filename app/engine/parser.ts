@@ -201,6 +201,51 @@ const STOPWORDS = new Set([
   'do', 'does', 'did', 'have', 'has', 'had',
 ]);
 
+// ---------------------------------------------------------------------------
+// OTA 205 — Multi-clause input splitter
+// ---------------------------------------------------------------------------
+// Splits raw player input into separate command clauses for sequential
+// execution. References:
+//   - Jurafsky & Martin §12.3.7 (Coordination) — coordinated clauses
+//     joined by 'and', 'then', 'or', ';'
+//   - Sleator & Temperley §6 (Coordination phenomena) — clause-level
+//     'and' coordination handled by structural splitting before parsing
+//
+// Conservative split rules (V1):
+//   - Only split on clause-level connectives that introduce a new
+//     verb phrase: 'then', 'and then', ';' (and rare: '. ').
+//   - DO NOT split on bare 'and' — that's usually object-coordination
+//     ("search the trap and the bench"), Sleator §6 territory we're
+//     deferring to V2. Bare 'and' between two verbs is ambiguous
+//     enough that V1 picks the safer "parse as single clause" path.
+//   - DO NOT split inside a verb's argument list (the splitter runs
+//     before parseInput so it has no awareness of argument structure;
+//     we just trust that 'then' isn't an argument).
+//
+// Each returned clause is passed independently to parseInput; the
+// engine (gameStore.submitPlayerAction) iterates them sequentially,
+// stopping the chain when a clause parses as 'unknown' or when the
+// player's state changes incompatibly (HP 0, scene transition).
+// Semicolons separate clauses without needing whitespace on both sides
+// ("look around; rest"). Period requires a trailing space so floats
+// and abbreviations don't trigger ("5.5 hours" stays one clause).
+const CLAUSE_SPLITTER = /\s+(?:and\s+then|then)\s+|\s*;\s*|\.\s+/i;
+
+export function splitClauses(raw: string): string[] {
+  const trimmed = raw.trim();
+  // Short inputs are never multi-clause — guards against accidental
+  // splits on conversational tail like "ok then" / "well then".
+  if (trimmed.length < 12) return [trimmed];
+  const parts = trimmed
+    .split(CLAUSE_SPLITTER)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+  // Single clause → return raw unchanged so downstream sees the
+  // exact same string it would have before V2.
+  if (parts.length <= 1) return [trimmed];
+  return parts;
+}
+
 export function normalizeInput(raw: string): string {
   let s = raw
     .toLowerCase()
@@ -394,6 +439,12 @@ const PREPOSITION_TO_ROLE: Record<string, ArgRole> = {
   towards: 'destination',
   into: 'destination',
   onto: 'destination',
+  // 'at' is overloaded — "throw rock AT the goblin" (destination),
+  // "look AT the wall" (direct). Default to destination since the
+  // throw frame uses it; for verbs without destination in their
+  // frame, buildArgs() folds it back into direct (look's frame has
+  // only {direct, manner}, so "look at the wall" still works).
+  at: 'destination',
   from: 'source',
   on: 'direct', // "use torch on wall" — direct, not destination
 };
@@ -843,15 +894,21 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
     context.enemyNames ?? [],
   );
 
-  // Mirror args[0] (the direct object) into the legacy fields so the
-  // 25+ gameStore handlers that read parsed.target / resolvedItemId /
-  // resolvedNoun keep working without per-handler edits. Prefer the
-  // segmenter's resolution when available; fall back to the legacy
-  // single-target resolution (item, noun, enemyHit) otherwise.
+  // Back-compat for the 25+ gameStore handlers that read
+  // parsed.target / resolvedItemId / resolvedNoun. Prefer the LEGACY
+  // single-target resolution (computed against the full post-verb
+  // token stream) over the segmenter's per-segment resolution.
+  // Reason: a handler like throw — "throw the rock at the goblin" —
+  // historically reads parsed.target = "rock goblin" to match the
+  // goblin enemy. The new segmenter splits direct=rock,
+  // destination=goblin; legacy target derived from args[0] would
+  // shrink to just "rock" and break enemy resolution.
+  // Migrated handlers opt into args.* explicitly (Phase 2). Unmigrated
+  // handlers see exactly the same legacy fields they always did.
   const directArg = args.find((a) => a.role === 'direct');
-  const legacyTarget = directArg?.text ?? (targetTokens.length ? targetTokens.join(' ') : undefined);
-  const legacyItemId = directArg?.resolvedItemId ?? item?.id;
-  const legacyNoun = directArg?.resolvedNoun ?? item?.name ?? noun;
+  const legacyTarget = targetTokens.length ? targetTokens.join(' ') : directArg?.text;
+  const legacyItemId = item?.id ?? directArg?.resolvedItemId;
+  const legacyNoun = item?.name ?? noun ?? directArg?.resolvedNoun;
 
   const candidate: ParsedInput = {
     intent: bestMatch.intent,
@@ -872,7 +929,12 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
   // instead of acting on a junk parse. This is the layer that fixes
   // the playtest regression where "it is supposed to remove a noun
   // item from the popup..." parsed as equip and cleared both hands.
-  const issues = validateParse(candidate);
+  const issues = validateParse(candidate, {
+    inventory: context.inventory,
+    ambientNouns: context.ambientNouns,
+    vendorName: context.vendorName,
+    enemyNames: context.enemyNames,
+  });
   if (shouldRejectParse(issues)) {
     return {
       intent: 'unknown',

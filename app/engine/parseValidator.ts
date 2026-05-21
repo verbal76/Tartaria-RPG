@@ -36,8 +36,18 @@
 // do with them. shouldRejectParse() is the helper for the "if any
 // issue → demote to unknown" policy.
 
-import type { ParsedInput } from './types';
+import type { ParsedInput, InventoryItem } from './types';
 import { frameFor, type VerbFrame } from './verbFrames';
+
+/** OTA 205 — context for the selectional-restriction rules
+ *  (Sleator & Temperley §7.3). Optional; if omitted, the validator
+ *  skips type checks on resolved args. */
+export interface ValidationContext {
+  inventory?: InventoryItem[];
+  ambientNouns?: string[];
+  vendorName?: string;
+  enemyNames?: string[];
+}
 
 export type ValidationIssue =
   | 'meta_talk'                  // feedback typed into action input
@@ -46,7 +56,11 @@ export type ValidationIssue =
   | 'missing_required_recipient' // verb requires a recipient, none extracted
   | 'junk_in_direct'             // direct slot contains UI/meta tokens
   | 'junk_in_recipient'          // recipient slot contains UI/meta tokens
-  | 'junk_in_instrument';        // instrument slot contains UI/meta tokens
+  | 'junk_in_instrument'         // instrument slot contains UI/meta tokens
+  // OTA 205 — selectional restrictions (Sleator & Temperley §7.3)
+  | 'instrument_not_a_tool'      // instrument slot resolved to consumable
+  | 'recipient_not_an_npc'       // recipient slot resolved to a wall / ambient
+  | 'destination_not_a_place';   // destination slot resolved to an item
 
 /** Meta-talk markers — sentences starting with these patterns are
  *  feedback / commentary / questions, not commands. Anchored at the
@@ -79,8 +93,10 @@ function contentTokenCount(normalized: string): number {
 }
 
 /** Returns the list of validation issues found. Empty list = parse
- *  is clean. Caller decides whether to act on the issues. */
-export function validateParse(parsed: ParsedInput): ValidationIssue[] {
+ *  is clean. Caller decides whether to act on the issues.
+ *  Optional ValidationContext enables the selectional-restriction
+ *  rules (Sleator §7.3) which need scene + inventory awareness. */
+export function validateParse(parsed: ParsedInput, ctx?: ValidationContext): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   if (parsed.intent === 'unknown') return issues; // already rejected upstream
 
@@ -129,6 +145,59 @@ export function validateParse(parsed: ParsedInput): ValidationIssue[] {
     }
   }
 
+  // OTA 205 — selectional restrictions (Sleator & Temperley §7.3).
+  // The frames in verbFrames.ts say WHICH roles a verb takes; these
+  // rules check that what filled the slot makes SEMANTIC sense.
+  // Skipped entirely when no ctx is provided (parser.ts always
+  // passes one).
+  if (ctx && parsed.args) {
+    for (const arg of parsed.args) {
+      // Rule: instrument should be a weapon / runecaster / relic / misc-tool,
+      // not a consumable. "Attack the drone with the trail rations" is the
+      // canonical wrong case.
+      if (arg.role === 'instrument' && arg.resolvedItemId && ctx.inventory) {
+        const item = ctx.inventory.find((i) => i.id === arg.resolvedItemId);
+        if (item && item.kind === 'consumable') {
+          issues.push('instrument_not_a_tool');
+        }
+      }
+      // Rule: recipient should be an NPC (vendor or named character),
+      // not an ambient scene noun. "Give the locket to the wall" is wrong.
+      // Uses arg.text rather than arg.resolvedNoun because the
+      // segmenter only resolves against inventory + recentNouns —
+      // ambient nouns can legitimately appear in recipient text
+      // ("the wall") without ever being "resolved" formally.
+      // Approximation: NPC = matches vendor name; ambient noun match
+      // (substring either direction) rejects.
+      if (arg.role === 'recipient') {
+        const recipText = arg.text.toLowerCase().trim().replace(/^the\s+/, '');
+        if (recipText.length > 0) {
+          const isVendor = !!(
+            ctx.vendorName &&
+            (ctx.vendorName.toLowerCase().includes(recipText) ||
+              recipText.includes(ctx.vendorName.toLowerCase()))
+          );
+          const isAmbient = (ctx.ambientNouns ?? []).some((n) => {
+            const an = n.toLowerCase();
+            return an === recipText || recipText.includes(an) || an.includes(recipText);
+          });
+          const isEnemy = (ctx.enemyNames ?? []).some((n) =>
+            n.toLowerCase().includes(recipText) || recipText.includes(n.toLowerCase()),
+          );
+          if ((isAmbient || isEnemy) && !isVendor) {
+            issues.push('recipient_not_an_npc');
+          }
+        }
+      }
+      // Rule: destination should be a place / direction / exit, not an
+      // inventory item. "Go into the bolt-caster" is wrong. We approximate
+      // by rejecting destination args that resolved to a catalog item.
+      if (arg.role === 'destination' && arg.resolvedItemId) {
+        issues.push('destination_not_a_place');
+      }
+    }
+  }
+
   return issues;
 }
 
@@ -158,6 +227,15 @@ export function describeIssues(issues: ValidationIssue[]): string {
   }
   if (issues.includes('missing_required_recipient')) {
     return 'Who is the recipient? Try "give the locket to Yulka".';
+  }
+  if (issues.includes('instrument_not_a_tool')) {
+    return "That isn't a tool you can use that way. Pick a weapon or relic instead.";
+  }
+  if (issues.includes('recipient_not_an_npc')) {
+    return "That isn't someone you can give things to. Pick a person — a vendor, a companion, or a named NPC.";
+  }
+  if (issues.includes('destination_not_a_place')) {
+    return "That isn't a place you can go to. Try a direction (north / east) or an exit named by the room.";
   }
   return 'I am not sure what you mean. Try a short, specific action.';
 }

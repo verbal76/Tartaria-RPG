@@ -56,7 +56,7 @@ import {
   QWEN_ALLOWED_INTENTS,
   LOCATION_FLAVORS,
 } from '../engine/narrativeGenerator';
-import { parseInput, type ParseContext } from '../engine/parser';
+import { parseInput, splitClauses, type ParseContext } from '../engine/parser';
 import { parseInputViaLLM } from '../engine/llmParser';
 import {
   classifyContainer,
@@ -2321,6 +2321,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
+    // OTA 205 — multi-clause splitting. If the input contains
+    // clause-level connectives ('then', 'and then', ';', '. '),
+    // split into separate commands and run them sequentially. Each
+    // sub-clause goes through this same submitPlayerAction so all
+    // pre-checks, time advances, status ticks, and post-checks run
+    // per clause — matches what the player would see if they typed
+    // each clause one at a time. Stops the chain early if a clause
+    // demotes to intent:'unknown' (validation rejection) so the
+    // player isn't surprised by 3 ghost actions firing after the
+    // first one failed.
+    if (!_opts?.skipPreChecks) {
+      const clauses = splitClauses(trimmed);
+      if (clauses.length > 1) {
+        get().appendLog('debug', `multi-clause: ${clauses.length} parts`);
+        for (let i = 0; i < clauses.length; i++) {
+          const clause = clauses[i]!;
+          // Re-check player state between clauses — death, scene
+          // transition, or pending rolls (combat dice prompt) all
+          // break the chain. The next clause won't fire until the
+          // player resolves what's blocking.
+          const p = get().player;
+          if (!p || p.hp <= 0 || get().pendingRolls) {
+            get().appendLog('debug', `multi-clause: stopped at clause ${i + 1}/${clauses.length}`);
+            break;
+          }
+          get().submitPlayerAction(clause, { skipPreChecks: true });
+        }
+        return;
+      }
+    }
+
     // A new player action invalidates any in-flight Arbiter generation. The
     // stale stream's tokens would land below the new scene, which feels
     // disjointed. cancelGeneration bumps the epoch so the dropped text is
@@ -2648,6 +2679,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
       case 'attack': {
         const targetEnemy = activeEnemy(currentScene);
         if (targetEnemy) {
+          // OTA 205 — Phase 2 args migration. If the player named an
+          // instrument explicitly ("attack the drone with the bolt-
+          // caster"), swap that into the main hand BEFORE the reach
+          // check so the rest of the attack flow (reach bands,
+          // damage dice, point-blank bonus) uses the weapon the
+          // player actually called out. Only swaps to weapons /
+          // runecasters that aren't already equipped — silently
+          // skips for non-weapons (a Layer 4 selectional restriction
+          // already rejected those upstream).
+          const instrumentArg = parsed.args?.find((a) => a.role === 'instrument');
+          if (instrumentArg?.resolvedItemId) {
+            const swapTo = player.inventory.find((i) => i.id === instrumentArg.resolvedItemId);
+            const currentMain = player.equipped?.main;
+            if (
+              swapTo &&
+              swapTo.name !== currentMain &&
+              (swapTo.kind === 'weapon' || swapTo.kind === 'runecaster')
+            ) {
+              get().appendLog('world', `You shift grip and bring up the ${swapTo.name}.`);
+              get().equipItem(swapTo.name, 'main');
+            }
+          }
           const range = currentScene.range ?? 'close';
           const barehand = isBareHandAttack(trimmed);
           const reach = barehand
@@ -4287,7 +4340,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         //   2) Target matches an enemy → roll a thrown attack at -2.
         //   3) Target is a hook noun → engage the hook (someone notices).
         //   4) Target is an ambient noun → narrate a thunk.
-        const tgt = (parsed.target ?? '').toLowerCase().trim();
+        //
+        // OTA 205 Phase 2 — read args.destination for the actual
+        // throw target when the player used a preposition: "throw
+        // the rock AT the goblin" → direct=rock, destination=goblin.
+        // Falls back to parsed.target (which still includes the full
+        // post-verb text for back-compat) when no destination was
+        // extracted. Net effect: the rock-vs-goblin disambiguation
+        // is now driven by argument structure instead of substring
+        // matching on the joined target text.
+        const destArg = parsed.args?.find((a) => a.role === 'destination');
+        const tgt = (destArg?.text ?? parsed.target ?? '').toLowerCase().trim();
         const invItem = parsed.resolvedItemId
           ? player.inventory.find((i) => i.id === parsed.resolvedItemId)
           : null;
@@ -5255,6 +5318,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!currentScene.vendor) {
           get().appendLog('arbiter', `The Arbiter glances at the empty road. "No one here to gift to."`);
           break;
+        }
+        // OTA 205 Phase 2 — if the player named a recipient
+        // explicitly ("give X to Yulka"), validate it matches the
+        // active vendor. Catches "give X to Bob" when Yulka is the
+        // one actually present. Falls through if no recipient was
+        // named (parser only attaches it when "to <name>" appears).
+        const recipArg = parsed.args?.find((a) => a.role === 'recipient');
+        if (recipArg?.text) {
+          const recipText = recipArg.text.toLowerCase().trim();
+          const vendorName = currentScene.vendor.name.toLowerCase();
+          const match = vendorName.includes(recipText) || recipText.includes(vendorName);
+          if (!match) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter glances around. "${currentScene.vendor.name} is here, not ${recipArg.text}. Drop the 'to ${recipArg.text}' if you mean them."`,
+            );
+            break;
+          }
         }
         const target = parsed.resolvedNoun ?? parsed.target ?? '';
         if (!target.trim()) {
