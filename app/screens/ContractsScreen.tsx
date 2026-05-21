@@ -7,6 +7,7 @@ import { findStorylineById, STORYLINES } from '../engine/factionStorylines';
 import { findFactionQuestById, FACTION_QUESTS } from '../engine/factionQuests';
 import { FACTIONS } from '../engine/factions';
 import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS } from '../engine/collectables';
+import { describeWhisperStage, describeWhisperTitle, findChain } from '../engine/whispers';
 
 function MilestoneStat({ label, value, next, suffix }: { label: string; value: number; next: number; suffix: string }) {
   const toNext = next - (value % next);
@@ -78,8 +79,19 @@ export function ContractsScreen() {
     def: findFactionQuestById(rec.id),
   }));
 
+  // Whispers (OTA 187) — the emergent Pittsburgh-loop chains. Tipped
+  // off by non-vendor NPCs in hubs, tracked here so they're not lost
+  // in the log scroll. No expiry — they stay open until the player
+  // resolves them one way or another.
+  const whispers = (player.activeWhispers ?? []).map((w) => ({
+    rec: w,
+    chain: findChain(w.id),
+    title: describeWhisperTitle(w),
+    stageDesc: describeWhisperStage(w),
+  }));
+
   const totalActive =
-    hunts.length + mysteries.length + storylines.length + factionQuests.length;
+    hunts.length + mysteries.length + storylines.length + factionQuests.length + whispers.length;
 
   // Lifetime milestone counters — surfaced here so players have a single
   // place to see progress toward stat bumps (every 10 checks succeeded
@@ -279,6 +291,27 @@ export function ContractsScreen() {
               })}
             </View>
           )}
+
+          {whispers.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>WHISPERS</Text>
+              <Text style={styles.whispersBlurb}>
+                Tips overheard from non-vendor NPCs. No formal contract,
+                no faction rep — just rumour. Follow them or don't.
+              </Text>
+              {whispers.map(({ rec, title, stageDesc }) => (
+                <View key={`w_${rec.id}`} style={styles.card}>
+                  <View style={styles.cardHead}>
+                    <Text style={styles.cardTitle}>{title}</Text>
+                    <Text style={styles.stagePill}>{rec.stage}</Text>
+                  </View>
+                  <Text style={styles.cardFaction}>Whisper · informal</Text>
+                  <Text style={styles.cardStageLabel}>Next step</Text>
+                  <Text style={styles.cardStageBody}>{stageDesc}</Text>
+                </View>
+              ))}
+            </View>
+          )}
       </ScrollView>
       )}
     </View>
@@ -436,6 +469,7 @@ const styles = StyleSheet.create({
   cardBody: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
   cardStageLabel: { color: '#c9a86a', fontSize: 10, letterSpacing: 2, fontWeight: '700', marginTop: 8, marginBottom: 2 },
   cardStageBody: { color: '#e6d8b3', fontSize: 12, lineHeight: 17, marginBottom: 4 },
+  whispersBlurb: { color: '#7a705c', fontSize: 11, fontStyle: 'italic', lineHeight: 15, marginBottom: 8 },
   cardStageHint: { color: '#9ec96a', fontSize: 11, fontStyle: 'italic', marginTop: 2 },
   milestoneRow: { flexDirection: 'row', backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, padding: 10 },
   tabRow: {

@@ -63,14 +63,19 @@ describe('Whisper engine — pure helpers', () => {
     expect(isHourInWindow(4, 20, 4)).toBe(true);   // 4am exact
   });
 
-  it('reapExpiredWhispers drops entries past their expiry hour', () => {
+  it('reapExpiredWhispers is a no-op since OTA 187 — whispers stay open until resolved', () => {
+    // Expiration removed per playtester: "I don't think the quest
+    // expiration is a good idea, keep them open." Whispers persist
+    // until the player resolves them. The reap function is kept as
+    // a no-op landing pad so future time-pressure chains have a
+    // place to wire in if we ever change our minds.
     const whispers: WhisperRecord[] = [
-      { id: 'a', stage: 'planted', plantedAtHour: 0, expiresAtHour: 48, targetMapX: 0, targetMapY: 0, targetLocationId: 'x' },
-      { id: 'b', stage: 'planted', plantedAtHour: 0, expiresAtHour: 10, targetMapX: 0, targetMapY: 0, targetLocationId: 'x' },
+      { id: 'a', stage: 'planted', plantedAtHour: 0, targetMapX: 0, targetMapY: 0, targetLocationId: 'x' },
+      { id: 'b', stage: 'planted', plantedAtHour: 0, targetMapX: 0, targetMapY: 0, targetLocationId: 'x' },
     ];
-    const { kept, expired } = reapExpiredWhispers(whispers, 20);
-    expect(kept.map((w) => w.id)).toEqual(['a']);
-    expect(expired.map((w) => w.id)).toEqual(['b']);
+    const { kept, expired } = reapExpiredWhispers(whispers, 9999);
+    expect(kept.map((w) => w.id)).toEqual(['a', 'b']);
+    expect(expired.length).toBe(0);
   });
 
   it('pickTargetTile picks within the chain range, deterministically against the player tile', () => {

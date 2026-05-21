@@ -284,10 +284,12 @@ export interface WhisperRecord {
   /** In-game hour the whisper was planted. Used for expiry math and
    *  the Whispers-panel "heard 3 hours ago" line. */
   plantedAtHour: number;
-  /** In-game hour the whisper goes stale. Default ~48 hours after
-   *  planting; the resolution check drops it silently on the next
-   *  scene tick once we pass this. */
-  expiresAtHour: number;
+  /** Vestigial — Whispers no longer expire as of 2026-05-21 per
+   *  playtester request ("I don't think the quest expiration is a
+   *  good idea, keep them open"). Kept on the type so old saves
+   *  with the field deserialize cleanly; the reaping pass in
+   *  whispers.ts is a no-op. */
+  expiresAtHour?: number;
   /** Map tile the player should travel to. The chain's planting
    *  step resolves the offset against the player's location at
    *  plant-time so each character gets its own randomised location

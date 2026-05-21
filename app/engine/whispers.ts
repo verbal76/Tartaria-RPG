@@ -35,6 +35,8 @@ export function isHourInWindow(hour: number, from: number | undefined, to: numbe
  *  stage-language stabilises. */
 export interface ChainDef {
   id: string;
+  /** Player-facing title for the ContractsScreen Whispers section. */
+  title: string;
   /** Hub-room id where this whisper plants (e.g. 'reclaimer_mess'). */
   plantLocations: string[];
   /** Per-visit roll. 0.15 = 15%. */
@@ -42,8 +44,6 @@ export interface ChainDef {
   /** Authored Arbiter / world lines spoken when the whisper plants.
    *  rotatingPick keeps repeats from grating; one is picked. */
   plantLines: string[];
-  /** Hours of in-game time before the whisper expires. */
-  expiryHours: number;
   /** How the target tile is computed from the player's plant-time
    *  position. Random within a per-chain offset range. */
   targetOffset: { dxRange: [number, number]; dyRange: [number, number] };
@@ -55,6 +55,7 @@ export interface ChainDef {
 export const CHAINS: ChainDef[] = [
   {
     id: 'yulka_discs',
+    title: 'Yulka and the Aetheric Discs',
     plantLocations: ['outpost_messhall'],
     plantChance: 0.15,
     plantLines: [
@@ -62,7 +63,6 @@ export const CHAINS: ChainDef[] = [
       `A Reclaimer one table over leans back: "If you need Aetheric Discs and don't want to pay Irma's mark-up, walk south after dark. Yulka. She's there some nights, gone others. Two tiles, three. You'll see her fire."`,
       `An off-duty Reclaimer presses a thumb into the salt of her plate. "Yulka. South. Night work. Aetheric Discs at half the going rate. If she's there." She doesn't say what to do if she's not.`,
     ],
-    expiryHours: 48,
     targetOffset: { dxRange: [-1, 1], dyRange: [-3, -2] },
     activeHours: [20, 4],
   },
@@ -140,22 +140,52 @@ export function findReadyReturnWhisper(
   return null;
 }
 
-/** Reaping pass: drop expired whispers. Called from the scene-tick
- *  resolver each beginScene + stepDirection. Returns the surviving
- *  list and the names of any that expired (so the engine can fire
- *  a "the trail went cold" log line). */
+/** Reaping pass — DISABLED 2026-05-21 per playtester feedback:
+ *  "I don't think the quest expiration is a good idea, keep them
+ *  open." Whispers now persist until the player resolves them one
+ *  way or another. Kept as a no-op so the resolver call site
+ *  doesn't have to special-case nothing. The `expired` array is
+ *  always empty; `kept` mirrors the input. If we ever decide to
+ *  re-introduce time-pressure on Whispers, re-enable the check
+ *  inside this function. */
 export function reapExpiredWhispers(
   whispers: readonly WhisperRecord[] | undefined,
-  hoursElapsed: number,
+  _hoursElapsed: number,
 ): { kept: WhisperRecord[]; expired: WhisperRecord[] } {
-  if (!whispers) return { kept: [], expired: [] };
-  const kept: WhisperRecord[] = [];
-  const expired: WhisperRecord[] = [];
-  for (const w of whispers) {
-    if (hoursElapsed >= w.expiresAtHour) expired.push(w);
-    else kept.push(w);
+  return { kept: whispers ? [...whispers] : [], expired: [] };
+}
+
+/** Per-stage human-readable description for the Whispers panel in
+ *  ContractsScreen. Tells the player what they should do next on
+ *  this chain. Falls back to the raw stage name if the chain
+ *  doesn't define one (which means I forgot to add it; loud-fail
+ *  in dev would be nice). */
+export function describeWhisperStage(whisper: WhisperRecord): string {
+  if (whisper.id === 'yulka_discs') {
+    switch (whisper.stage) {
+      case 'planted':
+        return `Travel south of the outpost. Yulka camps somewhere in tiles 2-3 south, after dark (8 pm to 4 am).`;
+      case 'met_yulka':
+        return `You're at Yulka's fire. Type 'accept yulka' to take the fetch (5 Discs on return), 'buy from yulka' to pay 50 TC for 5 Discs, or 'leave yulka' to walk.`;
+      case 'fetch_in_progress':
+        return `Travel east of Yulka's tile. The thief is 2-3 tiles over.`;
+      case 'fetch_active':
+        return `Defeat the Silt Thief and recover the Aetheric Discs.`;
+      case 'fetch_returned':
+        return `Return to Yulka's tile with the recovered Discs. She owes you 5.`;
+      case 'ambush_armed':
+        return `Walk home with the Discs. Someone may notice.`;
+      default:
+        return `Stage: ${whisper.stage}`;
+    }
   }
-  return { kept, expired };
+  return `Stage: ${whisper.stage}`;
+}
+
+/** Friendly summary line for the chain title bar (one-liner). */
+export function describeWhisperTitle(whisper: WhisperRecord): string {
+  const chain = findChain(whisper.id);
+  return chain?.title ?? whisper.id;
 }
 
 /** Helper used by the spawn step — clones an enemy proto with a

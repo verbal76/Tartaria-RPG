@@ -1686,7 +1686,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
             id: chain.id,
             stage: 'planted',
             plantedAtHour: hours,
-            expiresAtHour: hours + chain.expiryHours,
             targetMapX: tile.x,
             targetMapY: tile.y,
             targetLocationId: livePlayer.currentLocationId,
@@ -8703,23 +8702,10 @@ function resolveWhispersForTile(
   if (!live) return;
   const hours = live.hoursElapsed ?? 0;
 
-  // 1) Reap expired whispers.
-  const { kept, expired } = reapExpiredWhispers(live.activeWhispers, hours);
-  if (expired.length > 0) {
-    set((s) => (s.player ? {
-      player: {
-        ...s.player,
-        activeWhispers: kept,
-        completedWhisperIds: Array.from(new Set([...(s.player.completedWhisperIds ?? []), ...expired.map((e) => e.id)])),
-      },
-    } : s));
-    for (const e of expired) {
-      get().appendLog('arbiter', `The Arbiter, quieter: "Whatever trail the ${e.id.replace(/_/g, ' ')} whisper carried — it's cold now. Time outpaced you."`);
-    }
-  }
-
-  // Re-read after the reap so the rest of the dispatch sees the
-  // surviving list.
+  // Reap pass kept for forward compatibility — currently a no-op
+  // (Whispers don't expire). Future time-pressure chains would
+  // wire in here.
+  reapExpiredWhispers(live.activeWhispers, hours);
   const p = get().player;
   if (!p) return;
 
