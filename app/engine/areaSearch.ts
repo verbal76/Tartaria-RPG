@@ -67,19 +67,28 @@ export type AreaSearchOutcome =
 
 // Small loot pool for generic area searches. Common only — chunky relic
 // finds come from typed hooks, not from poking the mud.
+// Rebalanced 2026-05-21 — playtester report "haven't seen rocks or
+// sticks for a while". Pre-fix weights had rocks+sticks at 26/111
+// = ~23% of material outcomes (and material is only ~25% of all
+// search rolls, so net ~5.8% per attempt). The rulebook framing
+// promises these as the cheap stock items every starter relies on
+// to build clubs / spears, so they should dominate the pool.
+// Bumped Small Rock / Big Rock / Stick to be 50% of the material
+// pool by weight. Mud / Aether commodity weights lowered slightly
+// to compensate.
 const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
-  { name: 'Mud Fragment', rarity: 'Common', weight: 18 },
-  { name: 'Aether Residue', rarity: 'Common', weight: 14 },
-  { name: 'Aether Mud', rarity: 'Common', weight: 10 },
-  { name: 'Small Rock', rarity: 'Common', weight: 12 },
-  { name: 'Big Rock', rarity: 'Common', weight: 4 },
-  { name: 'Stick', rarity: 'Common', weight: 10 },
-  { name: 'Spider Silk', rarity: 'Common', weight: 8 },
-  { name: 'Patched Cloth', rarity: 'Common', weight: 7 },
-  { name: 'Aether Crystal', rarity: 'Common', weight: 6 },
-  { name: 'Bone Bolt', rarity: 'Common', weight: 5 },
-  { name: 'Trail Rations', rarity: 'Common', weight: 4 },
-  { name: 'Aetheric Shard', rarity: 'Uncommon', weight: 3 },
+  { name: 'Mud Fragment', rarity: 'Common', weight: 12 },
+  { name: 'Aether Residue', rarity: 'Common', weight: 8 },
+  { name: 'Aether Mud', rarity: 'Common', weight: 6 },
+  { name: 'Small Rock', rarity: 'Common', weight: 26 },
+  { name: 'Big Rock', rarity: 'Common', weight: 10 },
+  { name: 'Stick', rarity: 'Common', weight: 22 },
+  { name: 'Spider Silk', rarity: 'Common', weight: 6 },
+  { name: 'Patched Cloth', rarity: 'Common', weight: 6 },
+  { name: 'Aether Crystal', rarity: 'Common', weight: 4 },
+  { name: 'Bone Bolt', rarity: 'Common', weight: 4 },
+  { name: 'Trail Rations', rarity: 'Common', weight: 3 },
+  { name: 'Aetheric Shard', rarity: 'Uncommon', weight: 2 },
 ];
 
 // Empty-search narration. Per the playtest "Lockbox/Wagon"

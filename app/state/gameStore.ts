@@ -3366,6 +3366,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
               `You walk ${dir} past the gate. The outpost falls away behind you.`,
             );
             get().beginScene({ skipHubEntry: true });
+            // First-silt hint — playtest 2026-05-21: player asked
+            // "where are the rocks and sticks?" The dig refusal inside
+            // the outpost already says "leave outpost ... once on the
+            // silt you can dig for rocks, sticks, scraps" but only
+            // fires when the player tries `dig` inside the hub. Plenty
+            // of players never try. Surface the same info proactively
+            // the first time they leave a hub onto open ground.
+            const ms = get().player?.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 };
+            if (!ms.firstSiltCrossed) {
+              set((s) => (s.player ? {
+                player: {
+                  ...s.player,
+                  milestones: { ...(s.player.milestones ?? ms), firstSiltCrossed: true },
+                },
+              } : s));
+              get().appendLog(
+                'arbiter',
+                `The Arbiter nods at the ground. "Silt under your boots now — type 'dig' (or 'search the ground') here to scrape rocks, sticks, and scrap from it. Stock for clubs, spears, the cheap kit."`,
+              );
+            }
             // beginScene already settled the new wilderness scene;
             // skip stepDirection so we don't double-roll narration +
             // double-charge stamina. stepDirection's per-tile ambient
@@ -3558,6 +3578,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? `You drop into a dodging stance. ${activeEnemy(currentScene)?.name ?? 'they'}'s next attack will have to find you.`
             : `You shift your weight, ready to evade. Nothing tests it.`,
         );
+        // Defensive stances consume the player's combat action — the
+        // enemy gets a swing afterwards so the +AC actually matters.
+        // Without this, dodge/block read as a pause: the player taps
+        // dodge, nothing happens, and they have to attack to advance
+        // the round (which defeats the point of going defensive).
+        if (currentScene.enemies.length > 0) {
+          runEnemyGroupCounters(get, set, get().player ?? player);
+        }
         break;
       }
       case 'block': {
@@ -3600,6 +3628,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? `You raise the ${blockWeapon.name} into a block. (defense +${blockWeapon.defense})`
             : `You take a defensive stance, ${blockWeapon.name} raised. Nothing tests it.`,
         );
+        // Same as dodge: blocking consumes the player's action; the
+        // enemy swings against the raised guard so the block-roll +
+        // potential riposte happen this round.
+        if (currentScene.enemies.length > 0) {
+          runEnemyGroupCounters(get, set, get().player ?? player);
+        }
         break;
       }
       case 'advance':
@@ -4182,6 +4216,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           'world',
           `You hold your turn, watching for ${tgt}. When that trigger fires you get a +1 bonus die on the reaction. Cost: 1 turn.`,
         );
+        if (currentScene.enemies.length > 0) {
+          runEnemyGroupCounters(get, set, get().player ?? player);
+        }
         break;
       }
       case 'mount': {
@@ -4223,6 +4260,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ? `You dive behind partial cover. Ranged attacks against you take a penalty die (+4 to your defense, 2 rounds).`
               : `You tuck against the nearest cover. The world keeps moving without you for a beat.`);
         get().appendLog('world', line);
+        if (currentScene.enemies.length > 0) {
+          runEnemyGroupCounters(get, set, get().player ?? player);
+        }
         break;
       }
       case 'aim': {
@@ -4257,6 +4297,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           'world',
           `You bring the ${equipped.name} up and breathe out. Next shot rolls with Advantage — +2 to hit, lost if you take damage or your target moves before firing.`,
         );
+        if (currentScene.enemies.length > 0) {
+          runEnemyGroupCounters(get, set, get().player ?? player);
+        }
         break;
       }
       case 'reload': {

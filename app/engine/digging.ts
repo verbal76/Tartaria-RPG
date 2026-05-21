@@ -114,16 +114,19 @@ interface DigEntry {
 
 const DIG_LOOT: DigEntry[] = [
   // Common — silt-tier finds, most of what you'll pull up.
-  { name: 'Mud Fragment', rarity: 'Common', baseWeight: 30 },
-  { name: 'Aether Residue', rarity: 'Common', baseWeight: 25 },
-  { name: 'Aether Mud', rarity: 'Common', baseWeight: 20 },
-  { name: 'Small Rock', rarity: 'Common', baseWeight: 22 },
-  { name: 'Big Rock', rarity: 'Common', baseWeight: 8 },
-  { name: 'Stick', rarity: 'Common', baseWeight: 14 },
-  { name: 'Spider Silk', rarity: 'Common', baseWeight: 12 },
-  { name: 'Patched Cloth', rarity: 'Common', baseWeight: 10 },
-  { name: 'Trail Rations', rarity: 'Common', baseWeight: 8 },
-  { name: 'Aether Crystal', rarity: 'Common', baseWeight: 8 },
+  // Rebalanced 2026-05-21 so the cheap stock items the rulebook
+  // promises (rocks / sticks / scraps) actually dominate the
+  // common tier. Mud / Aether commodity weights lowered slightly.
+  { name: 'Mud Fragment', rarity: 'Common', baseWeight: 18 },
+  { name: 'Aether Residue', rarity: 'Common', baseWeight: 14 },
+  { name: 'Aether Mud', rarity: 'Common', baseWeight: 10 },
+  { name: 'Small Rock', rarity: 'Common', baseWeight: 36 },
+  { name: 'Big Rock', rarity: 'Common', baseWeight: 14 },
+  { name: 'Stick', rarity: 'Common', baseWeight: 28 },
+  { name: 'Spider Silk', rarity: 'Common', baseWeight: 8 },
+  { name: 'Patched Cloth', rarity: 'Common', baseWeight: 8 },
+  { name: 'Trail Rations', rarity: 'Common', baseWeight: 6 },
+  { name: 'Aether Crystal', rarity: 'Common', baseWeight: 6 },
   // Uncommon — relic-grade finds.
   { name: 'Aetheric Shard', rarity: 'Uncommon', baseWeight: 5 },
   { name: 'Aetheric Dust', rarity: 'Uncommon', baseWeight: 4 },

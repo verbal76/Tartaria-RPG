@@ -273,6 +273,11 @@ export interface PlayerMilestones {
   /** Number of accepted quests / hunts / mysteries / storylines / faction
    *  quests. Used to fire a one-time "first contract" Arbiter callback. */
   questsAccepted?: number;
+  /** Latched once when the player first crosses out of a hub into open
+   *  silt. The next scene-rebuild surfaces a one-shot tip about
+   *  digging for rocks / sticks / scraps so the player learns the
+   *  basic crafting-stock loop without having to read the wiki. */
+  firstSiltCrossed?: boolean;
 }
 
 export type EquipSlot =

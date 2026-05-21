@@ -52,7 +52,6 @@ jest.mock('expo-updates', () => ({}));
 
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
-import type { Hook, HubVendor, CurrentScene } from '../app/engine/types';
 
 describe('leaving a hub via an unsupported cardinal direction', () => {
   beforeAll(() => {
@@ -73,18 +72,15 @@ describe('leaving a hub via an unsupported cardinal direction', () => {
     // a hub-flavored ambient noun on the scene so we can assert
     // they're cleared on exit.
     const scene = store.getState().currentScene!;
-    const ghostVendor: HubVendor = {
-      name: 'Irma Ironhand',
-      offers: [],
-    };
-    const ghostHook: Hook = {
+    const ghostVendor = { name: 'Irma Ironhand', offers: [] } as never;
+    const ghostHook = {
       id: 'hub_ghost_hook',
       kind: 'footprints',
       nouns: ['anvil ghost'],
       stage: 0,
       resolved: false,
       plantedLine: 'irrelevant',
-    };
+    } as never;
     store.setState({
       currentScene: {
         ...scene,
@@ -93,7 +89,7 @@ describe('leaving a hub via an unsupported cardinal direction', () => {
         ambientNouns: ['anvil', 'racks', 'kettle', 'map-stone'],
         displayedAmbientNouns: ['anvil', 'racks', 'kettle', 'map-stone'],
         microMicroId: 'reclaimer_armory',
-      } as CurrentScene,
+      },
     });
     const p0 = store.getState().player!;
     store.setState({
