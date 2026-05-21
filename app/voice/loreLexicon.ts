@@ -39,12 +39,15 @@ const LEXICON: Array<[RegExp, string]> = [
   [/\bAether\b/gi, 'eether'],
 
   // Place names — long-vowel + multi-syllable mishaps.
-  // Tartaria = "tar TAR ee uh" — stress on the second syllable,
-  // "tar" pronounced like the substance (not "tare" / "hare").
-  // Playtester correction OTA 216.
-  [/\bTartaria\b/gi, 'tar tar ee uh'],
-  [/\bTartarian\b/gi, 'tar tar ee an'],
-  [/\bTartarians\b/gi, 'tar tar ee anz'],
+  // Playtester spec OTA 217:
+  //   Tartaria   = "tar tair ee uh"  (first "tar" like the substance,
+  //                                   "tair" rhymes with "air")
+  //   Tartarian  = "tar tair ee un"
+  //   Tartarians = "tar tair ee unz"
+  //   Tartary    = "tar tar ee"      (both syllables = "tar")
+  [/\bTartaria\b/gi, 'tar tair ee uh'],
+  [/\bTartarian\b/gi, 'tar tair ee un'],
+  [/\bTartarians\b/gi, 'tar tair ee unz'],
   [/\bTartary\b/gi, 'tar tar ee'],
   [/\bDrakova\b/gi, 'druh koh vah'],
   [/\bVarakush\b/gi, 'var ah koosh'],

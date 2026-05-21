@@ -21,9 +21,9 @@ describe('applyLoreLexicon', () => {
   });
 
   it('respells Tartaria / Tartarian / Tartarians', () => {
-    expect(applyLoreLexicon('walk into Tartaria')).toBe('walk into tar tar ee uh');
-    expect(applyLoreLexicon('a Tartarian Giant')).toBe('a tar tar ee an Giant');
-    expect(applyLoreLexicon('Tartarians remember')).toBe('tar tar ee anz remember');
+    expect(applyLoreLexicon('walk into Tartaria')).toBe('walk into tar tair ee uh');
+    expect(applyLoreLexicon('a Tartarian Giant')).toBe('a tar tair ee un Giant');
+    expect(applyLoreLexicon('Tartarians remember')).toBe('tar tair ee unz remember');
   });
 
   it('respells Reclaimer / Reclaimers (apostrophe stays attached)', () => {
