@@ -63,6 +63,15 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive }: Props) {
     <View style={styles.wrap}>
       <FlatList
         data={enemies}
+        // OTA 197 — extraData forces FlatList to re-render the
+        // visible cells when a value not present in `data` itself
+        // changes. Without this, FlatList's PureComponent cell
+        // virtualization treats items at the same index as "same"
+        // even when the EnemyView object identity changed — so the
+        // HP bar didn't reflect damage. Joining the per-enemy
+        // currentHp values into a single key is the most explicit
+        // signal: any HP change forces a fresh render pass.
+        extraData={enemies.map((v) => `${v.currentHp}/${v.enemy.hp}`).join('|')}
         keyExtractor={(_, i) => String(i)}
         horizontal
         pagingEnabled
