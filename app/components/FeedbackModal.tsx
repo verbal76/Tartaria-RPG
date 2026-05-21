@@ -13,6 +13,24 @@
 // arrives. Tapping the field flips into manual-typing mode and
 // stops the mic, so the player can correct or extend what was
 // transcribed.
+//
+// OTA 226 — continuous capture + zero auto-save.
+// Playtester: "voice auto detect glitches and tries to save
+// multiple times when it thinks I am done. when I am adding a
+// note it shouldn't save the note until I press the button."
+//
+// Fixes:
+//   1. STT runs continuous=false on this device, so each speech-
+//      pause ends the recognition session. The modal now tracks
+//      a `committedRef` of all FINALIZED text from prior sessions
+//      and re-arms startListening as soon as one closes. The
+//      visible text is committed + current partial — so when the
+//      player pauses, the displayed text never shrinks back to
+//      just the new fragment.
+//   2. onSubmit ONLY fires from the SAVE NOTE button press. There
+//      is no isFinal=true→submit path here; STT finals just commit
+//      to the buffer. Belt-and-suspenders: a `savingRef` guard
+//      blocks rapid double-taps on SAVE from firing onSubmit twice.
 
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -41,6 +59,16 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
   // Once the user taps the text field we lock out the auto-STT
   // restart logic so re-renders don't fight the mic back on.
   const manualMode = useRef(false);
+  // Text from past finalized STT sessions. Re-armed startListening
+  // sessions append to this so pauses don't lose prior content.
+  const committedRef = useRef('');
+  // True while we're in the middle of restarting STT — used to
+  // suppress the spurious "Mic: no speech" error the engine emits
+  // on a clean session end before we re-arm.
+  const restartingRef = useRef(false);
+  // Guard against double-tap saving — once a save is in flight the
+  // button is locked until the modal closes.
+  const savingRef = useRef(false);
 
   useEffect(() => {
     if (!visible) {
@@ -49,37 +77,73 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
         void stopListening().catch(() => { /* ignore */ });
       }
       setListening(false);
+      committedRef.current = '';
+      restartingRef.current = false;
+      savingRef.current = false;
       return;
     }
     // Modal opening — reset state and kick off voice capture.
     setText('');
     setMicError(null);
     manualMode.current = false;
-    void (async () => {
-      try {
-        await startListening(
-          (r) => {
-            // Drop the transcript into the text field. We always
-            // overwrite (rather than append) — the recognizer
-            // sends the accumulating partial each tick, so simple
-            // assignment gives a clean live preview.
-            if (manualMode.current) return;
-            try { setText(r.text); } catch { /* ignore */ }
-          },
-          (msg) => {
-            setMicError(msg.slice(0, 80));
-            setListening(false);
-          },
-        );
-        setListening(true);
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        setMicError(msg.slice(0, 80));
-        setListening(false);
-      }
-    })();
+    committedRef.current = '';
+    savingRef.current = false;
+    void armSTT();
     return undefined;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
+
+  // Arm a fresh STT session. Called on modal open and again every
+  // time a session finalizes (continuous-capture loop).
+  const armSTT = async () => {
+    if (manualMode.current || !visible) return;
+    restartingRef.current = false;
+    try {
+      await startListening(
+        (r) => {
+          if (manualMode.current) return;
+          // Render committed + current-session partial. When
+          // committed is empty (first session) we just show the
+          // partial directly; otherwise join with a space so the
+          // sentence boundaries read naturally.
+          const live = r.text.trim();
+          const display = committedRef.current
+            ? (live ? `${committedRef.current} ${live}` : committedRef.current)
+            : live;
+          try { setText(display); } catch { /* ignore */ }
+
+          if (r.isFinal) {
+            // Commit and re-arm. We do NOT submit on isFinal — only
+            // the SAVE NOTE button submits.
+            committedRef.current = display;
+            restartingRef.current = true;
+            // Small delay so the underlying recognition module has
+            // a clean handoff between sessions; without this the
+            // re-arm sometimes lands while the prior session's
+            // teardown is still in flight and the new one errors
+            // immediately.
+            setTimeout(() => {
+              if (visible && !manualMode.current) {
+                void armSTT();
+              }
+            }, 150);
+          }
+        },
+        (msg) => {
+          // Swallow the "no speech detected" / clean-end errors
+          // that fire between sessions during continuous capture.
+          if (restartingRef.current) return;
+          setMicError(msg.slice(0, 80));
+          setListening(false);
+        },
+      );
+      setListening(true);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setMicError(msg.slice(0, 80));
+      setListening(false);
+    }
+  };
 
   const switchToManual = () => {
     manualMode.current = true;
@@ -91,6 +155,8 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
   };
 
   const handleSave = () => {
+    if (savingRef.current) return;
+    savingRef.current = true;
     if (isListening()) {
       void stopListening().catch(() => { /* ignore */ });
     }
@@ -124,7 +190,8 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
               <Text style={styles.body}>
                 Drops straight into the game log on the `feedback`
                 channel — bypasses the action parser. Speak now;
-                tap the field if you'd rather type.
+                tap the field if you'd rather type. Nothing saves
+                until you press SAVE NOTE.
               </Text>
 
               {/* Live status row — green pulse while listening, amber
@@ -143,7 +210,7 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
                 />
                 <Text style={styles.statusText}>
                   {listening
-                    ? 'Listening — speak your note'
+                    ? 'Listening — speak; pauses are fine'
                     : micError
                       ? `Mic: ${micError}`
                       : manualMode.current

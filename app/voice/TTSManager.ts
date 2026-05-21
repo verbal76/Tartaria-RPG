@@ -120,9 +120,17 @@ export function speak(text: string, channel?: string, voiceId?: string | null): 
     // beginScene's warm hook keeps the latency invisible. Pool is
     // capped at 2 simultaneous voices (Arbiter sticky + 1 vendor
     // slot, LRU-evicted).
-    return piperSpeak(trimmed, voiceId);
+    return piperSpeak(trimmed, voiceId, channel);
   }
   const id = nextId++;
+  // OTA 226 — same Arbiter spam-collapse rule as the bundled engine.
+  // When a new arbiter line lands, drop other queued arbiter lines so
+  // the player isn't lectured for two minutes after rapid-tapping.
+  if (channel === 'arbiter' && queue.length > 0) {
+    for (let i = queue.length - 1; i >= 0; i--) {
+      if (queue[i]!.channel === 'arbiter') queue.splice(i, 1);
+    }
+  }
   queue.push({ id, text: trimmed, channel, voiceId });
   // If something is already being spoken, drain() will merge the
   // queue when it finishes — no timer needed. If the engine is idle,

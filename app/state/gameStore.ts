@@ -750,6 +750,10 @@ interface GameStore {
   saveAndExitToTitle: () => Promise<void>;
 
   appendLog: (channel: LogChannel, text: string, meta?: Record<string, unknown>) => void;
+  /** OTA 226 — wipe the in-memory game log + re-persist so the next
+   *  resume doesn't restore the old entries. Mirrors the disk-side
+   *  clearActiveSlotLog call from the CLEAR LOG button. */
+  clearGameLog: () => void;
   /** OTA 202 — designer's note. Writes the given text to the log on
    *  the dedicated `feedback` channel, bypassing the action parser
    *  entirely. Used by the in-game FEEDBACK button so playtest
@@ -1514,6 +1518,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // extractAmbientNouns() is the fallback only.
       return { gameLog: nextLog };
     });
+  },
+
+  clearGameLog() {
+    // OTA 226 — replace gameLog with a fresh empty array (new
+    // reference so subscribers re-render) and persist immediately
+    // so the save slot doesn't restore the wiped entries on the
+    // next load. The disk-side log key is wiped separately by
+    // clearActiveSlotLog (called from the CLEAR LOG button), so
+    // both halves of the log subsystem reset together.
+    set({ gameLog: [] });
+    void get().persist();
   },
 
   appendFeedback(text) {

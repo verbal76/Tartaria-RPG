@@ -310,12 +310,19 @@ export function ExplorationScreen() {
               the same hand-zone the player already uses. */}
           <Pressable
             onPress={async () => {
+              // Clear in-memory feed FIRST so the visible adventure
+              // log clears immediately, then wipe the disk key. OTA
+              // 224's useGameStore.setState pattern wasn't reliably
+              // triggering the AdventureFeed subscriber on every
+              // device — the dedicated clearGameLog action goes
+              // through the store's own set() so the subscription
+              // path is the same one appendLog uses.
+              useGameStore.getState().clearGameLog();
               try {
                 await clearActiveSlotLog();
-                useGameStore.setState({ gameLog: [] });
-                setLogCleared(true);
-                setTimeout(() => setLogCleared(false), 1500);
               } catch { /* tolerated — log will repopulate on next append */ }
+              setLogCleared(true);
+              setTimeout(() => setLogCleared(false), 1500);
             }}
             style={styles.menuBtn}
           >

@@ -49,6 +49,15 @@ interface QueuedUtterance {
    *  lines pass their assigned voice; the pool spins up an instance
    *  for that voice on demand. */
   voiceId: string | null;
+  /** Log channel that produced this line, when known. Used by the
+   *  spam-collapse rule: when the player rapid-taps a direction the
+   *  Arbiter queues 5-10 flavor lines and chain-reads them all. On
+   *  push, the queue drops any prior QUEUED (not currently speaking)
+   *  utterances on the same channel so only the newest survives —
+   *  the line being spoken now finishes naturally, then the most
+   *  recent queued line plays. Other channels (world / combat /
+   *  reward) are unaffected. */
+  channel?: string;
   /** Prefetched samples + the rate they were inferred at. drain()
    *  pre-runs forward() on the NEXT queued utterance while the
    *  current one is still playing, so the next sentence's audio is
@@ -334,7 +343,7 @@ export function disposeStickyArbiterVoice(): void {
   prewarmStarted = false;
 }
 
-export function speak(text: string, voiceId?: string | null): number {
+export function speak(text: string, voiceId?: string | null, channel?: string): number {
   const settings = getVoiceSettings();
   if (!settings.ttsEnabled) return -1;
   // Lexicon respellings (Aetheric, Tartarian, etc.) + symbol cleanup
@@ -343,6 +352,27 @@ export function speak(text: string, voiceId?: string | null): number {
   const prepared = cleanForSpeech(applyLoreLexicon(text)).trim();
   if (!prepared) return -1;
   const id = nextId++;
+  // OTA 226 — Arbiter spam collapse. Playtester: "if somebody spams
+  // a direction the Arbiter fires off a bunch of flavor lines and
+  // talks for 5 minutes afterwards. Finish the one he's reading,
+  // skip the ones in between, jump to the latest." Implementation:
+  // when a new arbiter utterance lands, drop every other queued
+  // arbiter chunk (the currently-speaking one keeps playing — we
+  // only touch `queue`, not `currentlySpeaking`). World / combat /
+  // reward channels are untouched so action results still chain.
+  if (channel === 'arbiter' && queue.length > 0) {
+    const before = queue.length;
+    for (let i = queue.length - 1; i >= 0; i--) {
+      if (queue[i]!.channel === 'arbiter') queue.splice(i, 1);
+    }
+    const dropped = before - queue.length;
+    if (dropped > 0) {
+      // Cancel any prefetch promises attached to the dropped lines
+      // by simply letting them resolve into the ether — drain() only
+      // consumes prefetch from items it actually shifts off the
+      // queue, so orphaned promises GC harmlessly.
+    }
+  }
   // Split into sentence-sized chunks so the first audio plays as
   // soon as one sentence finishes inference — without this, a big
   // intro paragraph would take 10-30 seconds to phonemize + run
@@ -356,7 +386,7 @@ export function speak(text: string, voiceId?: string | null): number {
   if (chunks.length === 0) chunks.push(prepared);
   const resolvedVoice = voiceId ?? arbiterVoiceId();
   for (const chunk of chunks) {
-    queue.push({ id: nextId++, text: chunk, voiceId: resolvedVoice });
+    queue.push({ id: nextId++, text: chunk, voiceId: resolvedVoice, channel });
   }
   void drain();
   return id;
