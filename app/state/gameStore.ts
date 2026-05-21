@@ -428,6 +428,32 @@ const STAMINA_COSTS = {
   attack: 1,
   skillCheck: 1,
 } as const;
+
+// Verbs that strike with the body rather than a weapon. Used by the
+// no-enemy attack handler to narrate "kick the pulse emitter" as
+// futile flesh-on-machine instead of falling through to a generic
+// blade line — playtester wanted to feel the bruise.
+const BODY_ATTACK_VERBS = new Set([
+  'kick', 'punch', 'headbutt', 'stomp', 'knee', 'elbow', 'bash',
+]);
+const BODY_VERB_PAST: Record<string, string> = {
+  kick: 'kicked',
+  punch: 'punched',
+  headbutt: 'headbutted',
+  stomp: 'stomped',
+  knee: 'kneed',
+  elbow: 'elbowed',
+  bash: 'bashed',
+};
+const BODY_VERB_PART: Record<string, string> = {
+  kick: 'foot',
+  punch: 'knuckles',
+  headbutt: 'forehead',
+  stomp: 'heel',
+  knee: 'knee',
+  elbow: 'elbow',
+  bash: 'shoulder',
+};
 /** Soft ceiling on accumulated corruption. Without this the weather
  *  tick can climb a player into thousands of corruption — the sim
  *  surfaced 7868 over 10 in-game days. 50 keeps it a meaningful
@@ -2841,10 +2867,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // to search or dig. Route to the same handlers the
           // `investigate` case would. QA finding: previously a flat
           // refusal even when the target was a ground noun.
-          // Prefer the resolved canonical noun when present so the
-          // narration shows "the wagon" instead of "wagon down parts"
-          // for inputs like "break the wagon down for parts".
-          const rawTarget = (parsed.resolvedNoun ?? parsed.target ?? '').trim();
+          //
+          // OTA 212 — prefer parsed.target over parsed.resolvedNoun
+          // for scene-noun matching. The parser sets resolvedNoun to
+          // the resolved INVENTORY ITEM when one matches (e.g. "kick
+          // the pulse emitter" resolves to inventory's Pulse Scanner),
+          // which then fails ambient-noun lookup against the scene's
+          // actual "pulse emitter" entry. Use the raw typed target
+          // for scene-side intent, fall back to resolvedNoun only if
+          // target is empty.
+          const rawTarget = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
           if (rawTarget && isGroundSearch(rawTarget)) {
             get().digHere();
             break;
@@ -2856,6 +2888,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const ambientHitInAttack = rawTarget
             ? matchAmbientNoun(rawTarget, currentScene.ambientNouns ?? [])
             : null;
+          // OTA 212 — verb-aware futile-attack narration. Playtester:
+          //   "punch and kick are both attack commands... it keeps
+          //    saying nothing reaches your blade. I'm not trying to
+          //    stab the pulsometer. I'm angry. I want to go kick it.
+          //    You should say something like you kicked the pulse
+          //    emitter you hurt your foot. You take one damage."
+          // Body verbs (kick/punch/headbutt/...) on a named scene
+          // noun deserve a real reaction, not the generic blade line.
+          // Cost 1 HP and a beat of time. We branch BEFORE the
+          // area-search routing so kicking a wagon doesn't farm
+          // scrap — body attacks are pure RP, not a salvage path.
+          const matchedVerb = (parsed.matchedVerb ?? '').toLowerCase();
+          if (rawTarget && ambientHitInAttack && BODY_ATTACK_VERBS.has(matchedVerb)) {
+            const past = BODY_VERB_PAST[matchedVerb] ?? `${matchedVerb}ed`;
+            const part = BODY_VERB_PART[matchedVerb] ?? 'hand';
+            set((s) =>
+              s.player
+                ? {
+                    player: advanceTime(
+                      spendStamina(
+                        { ...s.player, hp: Math.max(0, s.player.hp - 1) },
+                        STAMINA_COSTS.attack,
+                      ),
+                      0.1,
+                    ),
+                  }
+                : s,
+            );
+            get().appendLog(
+              'world',
+              `You ${past} the ${ambientHitInAttack}. It does not care. Your ${part} does. -1 HP, briefly heroic.`,
+            );
+            break;
+          }
           if (rawTarget && (isAreaSearch(rawTarget) || ambientHitInAttack)) {
             // Honor the same per-tile dedupe the canonical investigate
             // path uses. Without this, a player typing "smash the wall"
