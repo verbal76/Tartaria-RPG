@@ -6,7 +6,6 @@ import * as Updates from 'expo-updates';
 import * as Application from 'expo-application';
 import { useGameStore } from '../state/gameStore';
 import { OTA_BUILD_ID } from '../buildInfo';
-import { SimpleSlider } from '../components/SimpleSlider';
 import { NumberStepper } from '../components/NumberStepper';
 import { getAudioSettings, setAudioSettings, onAudioSettingsChange, type AudioSettings } from '../audio/audioSettings';
 import { forceReapplyAudioFromState } from '../audio/AudioController';
@@ -384,10 +383,23 @@ export function AboutScreen() {
           </View>
           <View style={styles.musicRow}>
             <Text style={styles.musicLabel}>Volume</Text>
-            <View style={{ flex: 1 }}>
-              <SimpleSlider value={audio.volume} onChange={setMusicVolume} />
+            <View style={{ flex: 1, alignItems: 'flex-end' }}>
+              {/* OTA 225 — same NumberStepper pattern as voice Rate /
+                  Pitch. SimpleSlider was twitchy on a fingertip
+                  contact patch. Stepper works in 5% increments;
+                  tap the number to type an exact value. Volume is
+                  stored 0..1 internally so the on-change converts
+                  back from the displayed percent. */}
+              <NumberStepper
+                value={Math.round(audio.volume * 100)}
+                min={0}
+                max={100}
+                step={5}
+                decimals={0}
+                suffix="%"
+                onChange={(v) => setMusicVolume(v / 100)}
+              />
             </View>
-            <Text style={styles.musicValue}>{Math.round(audio.volume * 100)}%</Text>
           </View>
           <TouchableOpacity
             style={[styles.applyBtn, applyFlash && styles.applyBtnFlash]}
