@@ -6,9 +6,13 @@
 // gameStore.appendFeedback, so notes always survive into the
 // COPY-LOG-out pipeline without being interpreted.
 //
-// Brief on purpose — one text field, two buttons. The store
-// action strips empty/whitespace input, so an accidental tap +
-// SAVE on an empty field is a no-op.
+// OTA 222 — voice-first capture. Playtester: "when I hit the
+// add a note button always assume that I want auto text capture
+// but if I tap then I'll type." On open we kick off STT
+// immediately; transcript streams into the text field as it
+// arrives. Tapping the field flips into manual-typing mode and
+// stops the mic, so the player can correct or extend what was
+// transcribed.
 
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -21,6 +25,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
+import { startListening, stopListening, isListening } from '../voice/STTManager';
 
 interface Props {
   visible: boolean;
@@ -30,22 +35,76 @@ interface Props {
 
 export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
   const [text, setText] = useState('');
+  const [listening, setListening] = useState(false);
+  const [micError, setMicError] = useState<string | null>(null);
   const inputRef = useRef<TextInput>(null);
+  // Once the user taps the text field we lock out the auto-STT
+  // restart logic so re-renders don't fight the mic back on.
+  const manualMode = useRef(false);
 
   useEffect(() => {
-    if (visible) {
-      setText('');
-      // Focus on open — designer wants to type immediately, no
-      // chip-tap interaction to fight over (the SearchModal
-      // disables auto-focus for that reason; this modal has only
-      // the text field, so focus is correct).
-      setTimeout(() => inputRef.current?.focus(), 100);
+    if (!visible) {
+      // Modal closing — make sure we don't leave the mic hot.
+      if (isListening()) {
+        void stopListening().catch(() => { /* ignore */ });
+      }
+      setListening(false);
+      return;
     }
+    // Modal opening — reset state and kick off voice capture.
+    setText('');
+    setMicError(null);
+    manualMode.current = false;
+    void (async () => {
+      try {
+        await startListening(
+          (r) => {
+            // Drop the transcript into the text field. We always
+            // overwrite (rather than append) — the recognizer
+            // sends the accumulating partial each tick, so simple
+            // assignment gives a clean live preview.
+            if (manualMode.current) return;
+            try { setText(r.text); } catch { /* ignore */ }
+          },
+          (msg) => {
+            setMicError(msg.slice(0, 80));
+            setListening(false);
+          },
+        );
+        setListening(true);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        setMicError(msg.slice(0, 80));
+        setListening(false);
+      }
+    })();
+    return undefined;
   }, [visible]);
 
+  const switchToManual = () => {
+    manualMode.current = true;
+    if (isListening()) {
+      void stopListening().catch(() => { /* ignore */ });
+    }
+    setListening(false);
+    inputRef.current?.focus();
+  };
+
   const handleSave = () => {
+    if (isListening()) {
+      void stopListening().catch(() => { /* ignore */ });
+    }
+    setListening(false);
     Keyboard.dismiss();
     onSubmit(text);
+  };
+
+  const handleCancel = () => {
+    if (isListening()) {
+      void stopListening().catch(() => { /* ignore */ });
+    }
+    setListening(false);
+    onCancel();
   };
 
   return (
@@ -53,41 +112,67 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={onCancel}
+      onRequestClose={handleCancel}
       statusBarTranslucent
     >
-      <TouchableWithoutFeedback onPress={onCancel}>
+      <TouchableWithoutFeedback onPress={handleCancel}>
         <View style={styles.scrim}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
               <Text style={styles.title}>DESIGNER NOTE</Text>
               <View style={styles.rule} />
               <Text style={styles.body}>
-                This text drops straight into the game log on the
-                `feedback` channel. It does NOT go through the action
-                parser, so typing "search isn't working" here won't
-                fire a search verb. Use for bug reports, design notes,
-                playtest observations.
+                Drops straight into the game log on the `feedback`
+                channel — bypasses the action parser. Speak now;
+                tap the field if you'd rather type.
               </Text>
 
-              <TextInput
-                ref={inputRef}
-                style={styles.input}
-                value={text}
-                onChangeText={setText}
-                placeholder='e.g. "Pulse Scanner chip stayed in the popup after I searched the vent"'
-                placeholderTextColor="#5a5246"
-                multiline
-                numberOfLines={4}
-                textAlignVertical="top"
-                autoCorrect={false}
-                autoCapitalize="sentences"
-              />
+              {/* Live status row — green pulse while listening, amber
+                  if the mic failed, neutral once the player has tapped
+                  in to type. */}
+              <View style={styles.statusRow}>
+                <View
+                  style={[
+                    styles.statusDot,
+                    listening
+                      ? styles.statusDotLive
+                      : micError
+                        ? styles.statusDotError
+                        : styles.statusDotIdle,
+                  ]}
+                />
+                <Text style={styles.statusText}>
+                  {listening
+                    ? 'Listening — speak your note'
+                    : micError
+                      ? `Mic: ${micError}`
+                      : manualMode.current
+                        ? 'Typing — mic stopped'
+                        : 'Mic idle'}
+                </Text>
+              </View>
+
+              <Pressable onPress={switchToManual}>
+                <TextInput
+                  ref={inputRef}
+                  style={styles.input}
+                  value={text}
+                  onChangeText={setText}
+                  onFocus={switchToManual}
+                  placeholder='Tap to type, or just speak. e.g. "vendor chips disappeared after I purchased"'
+                  placeholderTextColor="#5a5246"
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                  autoCorrect={false}
+                  autoCapitalize="sentences"
+                />
+              </Pressable>
 
               <View style={styles.btnRow}>
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
-                  onPress={onCancel}
+                  onPress={handleCancel}
                 >
                   <Text style={styles.btnTextNeutral}>CANCEL</Text>
                 </Pressable>
@@ -132,6 +217,12 @@ const styles = StyleSheet.create({
   title: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
   rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
   body: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 10, fontStyle: 'italic' },
+  statusRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8, gap: 8 },
+  statusDot: { width: 10, height: 10, borderRadius: 5 },
+  statusDotLive: { backgroundColor: '#9ec96a' },
+  statusDotIdle: { backgroundColor: '#3a342c' },
+  statusDotError: { backgroundColor: '#c97a5f' },
+  statusText: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },
   input: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',

@@ -40,10 +40,17 @@ interface Props {
   /** Stealth take — DEX vs DC 10 sleight check. Routes to
    *  stealFromVendor when a vendor is present in the scene. */
   onStealthTake: (noun: string) => void;
+  /** OTA 222 — batch open-take. Fires onTake for every visible
+   *  non-consumed chip in sequence, then closes. Only surfaced when
+   *  there are 2+ visible items and stealth is OFF (batch DEX rolls
+   *  with cascading rep loss would be hostile UX). Playtester:
+   *  "we need a take all button so we don't tap each chip
+   *  individually." */
+  onTakeAll: (nouns: string[]) => void;
   onCancel: () => void;
 }
 
-export function TakeModal({ visible, takeable, onTake, onStealthTake, onCancel }: Props) {
+export function TakeModal({ visible, takeable, onTake, onStealthTake, onTakeAll, onCancel }: Props) {
   const [useStealth, setUseStealth] = useState(false);
   // Reset the toggle each time the modal opens so the player has to
   // re-arm the sneaky path on purpose — no surprise pickpockets.
@@ -133,6 +140,30 @@ export function TakeModal({ visible, takeable, onTake, onStealthTake, onCancel }
               );
               })()}
 
+              {/* OTA 222 — TAKE ALL surfaces only when there are
+                  multiple grabbable items and stealth is off. Batch
+                  DEX rolls with cascading rep loss aren't a UX we
+                  want to offer. The button fires onTakeAll with the
+                  visible non-consumed nouns; parent iterates the
+                  takes and closes. */}
+              {(() => {
+                const grabbable = takeable
+                  .filter((c) => !c.consumed || c.alwaysShow)
+                  .filter((c) => !c.consumed)
+                  .map((c) => c.noun);
+                if (grabbable.length < 2 || useStealth) return null;
+                return (
+                  <Pressable
+                    style={({ pressed }) => [styles.takeAllBtn, pressed && styles.btnPressed]}
+                    onPress={() => onTakeAll(grabbable)}
+                  >
+                    <Text style={styles.takeAllText}>
+                      TAKE ALL ({grabbable.length})
+                    </Text>
+                  </Pressable>
+                );
+              })()}
+
               <View style={styles.btnRow}>
                 <Pressable
                   style={({ pressed }) => [styles.btn, pressed && styles.btnPressed]}
@@ -212,6 +243,16 @@ const styles = StyleSheet.create({
   stealthToggleActive: { borderColor: '#6a9bbf', backgroundColor: '#1c2a35' },
   stealthToggleText: { color: '#7a705c', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
   stealthToggleTextActive: { color: '#6a9bbf' },
+  takeAllBtn: {
+    marginTop: 10,
+    backgroundColor: '#9ec96a',
+    borderColor: '#9ec96a',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  takeAllText: { color: '#0a0908', fontWeight: '800', letterSpacing: 2, fontSize: 13 },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 14 },
   btn: {
     paddingHorizontal: 14,

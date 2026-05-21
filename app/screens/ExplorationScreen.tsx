@@ -277,15 +277,18 @@ export function ExplorationScreen() {
       <SearchModal
         visible={searchOpen}
         chips={[
-          // 'the ground' pinned at the top of the scene chip row
-          // with alwaysShow so it greys (not removed) after a dig
-          // in this room. Per OTA 191: dig replaces the old
-          // dig-only ground search and the chip should persist as
-          // a permanent affordance per room.
+          // 'the ground' pinned at the top of the scene chip row.
+          // OTA 222 — playtester wanted consistency: other consumed
+          // nouns disappear from the chip list, but the ground used
+          // to grey out + check (alwaysShow:true). They now behave
+          // the same — when consumed, the chip is dropped from the
+          // visible list. The engine still allows manual typing of
+          // "investigate the ground" to gather more stock material,
+          // since unlimited stamina-throttled re-digging is by
+          // design (clubs + spears need lots of stock).
           {
             noun: 'the ground',
             consumed: isAmbientConsumed('ground'),
-            alwaysShow: true,
           },
           ...buildChipPool(currentScene).map((n) => {
             // OTA 195 — compute per-chip requirement. An Aether-coded
@@ -328,6 +331,15 @@ export function ExplorationScreen() {
         onStealthTake={(noun) => {
           setTakeOpen(false);
           stealthTakeAmbientNoun(noun);
+        }}
+        onTakeAll={(nouns) => {
+          // OTA 222 — fire each take in sequence then close. Each
+          // takeAmbientNoun call runs through the same gating
+          // (already-taken dedup, inventory cap, etc.) that an
+          // individual chip tap would, so partial success is
+          // handled per-item by the store.
+          setTakeOpen(false);
+          for (const n of nouns) takeAmbientNoun(n);
         }}
         onCancel={() => setTakeOpen(false)}
       />
