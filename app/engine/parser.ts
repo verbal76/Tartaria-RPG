@@ -1,6 +1,8 @@
-import type { Intent, ParsedInput, InventoryItem } from './types';
+import type { Intent, ParsedInput, InventoryItem, ArgRole, ParsedArg } from './types';
 import { levenshtein } from './editDistance';
 import { FILLER_DESCRIPTORS } from './fillerWords';
+import { frameFor } from './verbFrames';
+import { validateParse, shouldRejectParse, META_TALK_REGEX } from './parseValidator';
 
 // Verb pools. Goal of 10 synonyms per intent for natural-language
 // robustness — the player can phrase the same intent ten ways and the
@@ -360,6 +362,211 @@ function extractTargetTokens(tokens: string[], verbIdx: number): string[] {
   );
 }
 
+// ---------------------------------------------------------------------------
+// OTA 204 — Argument segmentation
+// ---------------------------------------------------------------------------
+// Walks the post-verb token stream and splits it on preposition
+// boundaries into role-tagged segments. References:
+//   - Jurafsky & Martin §12.3.5 (subcategorization frames) — the
+//     verb frame in verbFrames.ts says which roles to accept;
+//     unaccepted prepositional segments collapse back into direct.
+//   - Sleator & Temperley §3.7 (Prepositions, adverbs) — same
+//     preposition-introduces-PP pattern.
+//   - Universal Dependencies role labels (obl:instr, obl:to,
+//     obl:from, advmod) — documented in types.ts ArgRole comments.
+//
+// Algorithm (greedy, left-to-right, no backtracking):
+//   tokens = [drone, with, the, bolt-caster]
+//   segments = [{prep:null, tokens:[drone]}, {prep:'with', tokens:[bolt-caster]}]
+//   First no-prep segment → role: 'direct'
+//   Subsequent prepped segment → role from PREPOSITION_TO_ROLE
+//   Verb's frame.withRole overrides 'with' (instrument vs companion)
+//   Adverbs (-ly suffix) peel off as their own {role:'manner'} entry
+
+/** Default mapping from preposition → argument role. Per-verb
+ *  overrides live in VERB_FRAMES[verb].withRole. */
+const PREPOSITION_TO_ROLE: Record<string, ArgRole> = {
+  with: 'instrument',
+  using: 'instrument',
+  by: 'instrument',
+  to: 'recipient',
+  toward: 'destination',
+  towards: 'destination',
+  into: 'destination',
+  onto: 'destination',
+  from: 'source',
+  on: 'direct', // "use torch on wall" — direct, not destination
+};
+
+/** -ly suffix adverbs become a separate manner argument so they
+ *  don't pollute the direct-object text. */
+const ADVERB_SUFFIX = /ly$/i;
+
+interface RawSegment {
+  prep: string | null;
+  tokens: string[];
+}
+
+/** Split the post-verb tail into preposition-bounded segments.
+ *  Filler tokens (stopwords, junk nouns, question words) are skipped.
+ *  Adverbs (-ly suffix) are collected separately. */
+function segmentPostVerb(
+  tokens: string[],
+  verbIdx: number,
+): { segments: RawSegment[]; adverbs: string[] } {
+  const tail = tokens.slice(verbIdx + 1);
+  const segments: RawSegment[] = [{ prep: null, tokens: [] }];
+  const adverbs: string[] = [];
+
+  for (const t of tail) {
+    if (!t) continue;
+    // Preposition? Start a new segment IF the current one already
+    // has content. (Leading prepositions get folded into the next
+    // segment.)
+    if (PREPOSITION_TO_ROLE[t]) {
+      const last = segments[segments.length - 1]!;
+      if (last.tokens.length > 0) {
+        segments.push({ prep: t, tokens: [] });
+      } else {
+        last.prep = t;
+      }
+      continue;
+    }
+    // Adverbs peel off as manner.
+    if (ADVERB_SUFFIX.test(t) && t.length > 3 && !STOPWORDS.has(t)) {
+      adverbs.push(t);
+      continue;
+    }
+    // Filler? Skip silently.
+    if (
+      STOPWORDS.has(t) ||
+      QUESTION_WORDS.has(t) ||
+      JUNK_NOUNS.has(t) ||
+      FILLER_DESCRIPTORS.has(t)
+    ) {
+      continue;
+    }
+    // Real content token — accumulate into current segment.
+    segments[segments.length - 1]!.tokens.push(t);
+  }
+
+  // Drop empty segments (e.g. a trailing preposition with no NP).
+  return {
+    segments: segments.filter((s) => s.tokens.length > 0),
+    adverbs,
+  };
+}
+
+/** Resolve each segment to inventory / enemy / scene noun and tag
+ *  it with the right ArgRole based on the verb's frame.
+ *
+ *  Returns an ordered list of ParsedArg. The first arg (if any) is
+ *  always the direct object — its resolution mirrors into the
+ *  legacy ParsedInput.target / resolvedItemId / resolvedNoun fields
+ *  for back-compat with existing handlers. */
+function buildArgs(
+  segments: RawSegment[],
+  adverbs: string[],
+  intent: Exclude<Intent, 'unknown'>,
+  inventory: InventoryItem[],
+  recentNouns: string[],
+  enemyNames: string[],
+): ParsedArg[] {
+  const frame = frameFor(intent);
+  const args: ParsedArg[] = [];
+
+  let directAssigned = false;
+  for (const seg of segments) {
+    let role: ArgRole;
+    if (!seg.prep) {
+      // No preposition → direct object (first one) or fold into
+      // existing direct.
+      if (!directAssigned) {
+        role = 'direct';
+        directAssigned = true;
+      } else {
+        // Second NP with no preposition — DITRANS pattern ("give
+        // Yulka the locket"). For our V1 command set we treat the
+        // second as recipient when the frame accepts it, else fold
+        // back into direct.text.
+        if (frame.acceptRoles.includes('recipient')) {
+          role = 'recipient';
+        } else {
+          const existingDirect = args.find((a) => a.role === 'direct');
+          if (existingDirect) {
+            existingDirect.text = `${existingDirect.text} ${seg.tokens.join(' ')}`.trim();
+          }
+          continue;
+        }
+      }
+    } else {
+      // Preposition-introduced segment → role from the table, with
+      // verb-specific overrides for 'with'.
+      const base = PREPOSITION_TO_ROLE[seg.prep] ?? 'direct';
+      if (seg.prep === 'with' && frame.withRole === 'companion') {
+        // V1: companion collapses into direct since we don't have
+        // a separate companion role. Fold the tokens back.
+        const existingDirect = args.find((a) => a.role === 'direct');
+        if (existingDirect) {
+          existingDirect.text = `${existingDirect.text} with ${seg.tokens.join(' ')}`.trim();
+          continue;
+        }
+        role = 'direct';
+        directAssigned = true;
+      } else {
+        role = base;
+      }
+      // If the frame doesn't accept this role, fold into direct.
+      if (!frame.acceptRoles.includes(role)) {
+        const existingDirect = args.find((a) => a.role === 'direct');
+        if (existingDirect) {
+          existingDirect.text = `${existingDirect.text} ${seg.tokens.join(' ')}`.trim();
+          continue;
+        }
+        role = 'direct';
+        directAssigned = true;
+      }
+    }
+
+    const text = seg.tokens.join(' ');
+    // Resolve against enemies → inventory → scene nouns, mirroring
+    // the original single-target resolver in parseInput. We do not
+    // re-implement enemy fuzzy logic here; for V1 the per-segment
+    // resolver is simpler (substring item match + recent-noun
+    // fallback). The legacy enemy-first logic in parseInput still
+    // populates the direct slot via resolvedNoun.
+    const item = resolveItem(seg.tokens, inventory);
+    const noun = item ? undefined : resolveContextNoun(seg.tokens, recentNouns);
+    // Enemy hit on segment tokens — only relevant for direct.
+    let enemyHit: string | undefined;
+    if (!item && !noun && role === 'direct' && enemyNames.length > 0) {
+      const lower = text.toLowerCase();
+      for (const e of enemyNames) {
+        const el = e.toLowerCase();
+        if (seg.tokens.some((t) => el.includes(t) || t.includes(el)) || lower === el) {
+          enemyHit = e;
+          break;
+        }
+      }
+    }
+
+    args.push({
+      role,
+      text,
+      resolvedItemId: item?.id,
+      resolvedNoun: enemyHit ?? noun,
+      preposition: seg.prep ?? undefined,
+    });
+  }
+
+  // Adverbs → one combined manner arg.
+  if (adverbs.length > 0 && frame.acceptRoles.includes('manner')) {
+    args.push({ role: 'manner', text: adverbs.join(' ') });
+  }
+
+  return args;
+}
+
 function resolveItem(targetTokens: string[], inventory: InventoryItem[]): InventoryItem | undefined {
   if (!targetTokens.length || !inventory.length) return undefined;
   // Exact substring match first
@@ -556,7 +763,25 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
     if (item) suggestions.push(`use ${item.name.toLowerCase()}`);
     if (context.enemyPresent) suggestions.push('attack', 'dodge', 'advance', 'retreat', 'hide', 'parley');
     if (!suggestions.length) suggestions.push('look around', 'search', 'rest');
-    return { intent: 'unknown', raw, normalized, confidence: 0.1, suggestions, resolvedNoun: noun };
+    // OTA 204 — even when no verb matched, run the meta-talk regex so
+    // feedback-style inputs without a recognized verb still get the
+    // validationIssues tag. Lets the engine surface a helpful message
+    // ("use the 📝 button to leave a note") instead of the generic
+    // unknown-verb prompt. Direct call to validateParse() on a
+    // synthetic ParsedInput would loop on intent==='unknown'; instead
+    // we re-check the regex inline (kept in sync via the
+    // META_TALK_REGEX export from parseValidator).
+    const metaIssues: string[] = [];
+    if (META_TALK_REGEX.test(normalized)) metaIssues.push('meta_talk');
+    return {
+      intent: 'unknown',
+      raw,
+      normalized,
+      confidence: 0.1,
+      suggestions,
+      resolvedNoun: noun,
+      ...(metaIssues.length > 0 ? { validationIssues: metaIssues } : {}),
+    };
   }
 
   const targetTokens = extractTargetTokens(tokens, bestMatch.index);
@@ -600,15 +825,64 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
   const targetBoost = item ? 0.1 : noun ? 0.06 : targetTokens.length > 0 ? 0.02 : 0;
   const confidence = Math.min(1, verbConfidence + targetBoost);
 
-  return {
+  // OTA 204 — argument extraction pass + post-processing validator.
+  // The segmenter walks the same post-verb token stream as
+  // extractTargetTokens but splits it on preposition boundaries into
+  // role-tagged segments per the verb's subcategorization frame
+  // (Jurafsky & Martin §12.3.5). The validator (Sleator §7 analog)
+  // then catches garbage parses (meta-talk, junk-in-required-slot)
+  // and demotes them to intent:'unknown' so the engine doesn't act
+  // on them. See verbFrames.ts and parseValidator.ts.
+  const { segments, adverbs } = segmentPostVerb(tokens, bestMatch.index);
+  const args = buildArgs(
+    segments,
+    adverbs,
+    bestMatch.intent,
+    inventory,
+    recentNouns,
+    context.enemyNames ?? [],
+  );
+
+  // Mirror args[0] (the direct object) into the legacy fields so the
+  // 25+ gameStore handlers that read parsed.target / resolvedItemId /
+  // resolvedNoun keep working without per-handler edits. Prefer the
+  // segmenter's resolution when available; fall back to the legacy
+  // single-target resolution (item, noun, enemyHit) otherwise.
+  const directArg = args.find((a) => a.role === 'direct');
+  const legacyTarget = directArg?.text ?? (targetTokens.length ? targetTokens.join(' ') : undefined);
+  const legacyItemId = directArg?.resolvedItemId ?? item?.id;
+  const legacyNoun = directArg?.resolvedNoun ?? item?.name ?? noun;
+
+  const candidate: ParsedInput = {
     intent: bestMatch.intent,
     raw,
     normalized,
     matchedVerb: bestMatch.verb,
-    target: targetTokens.length ? targetTokens.join(' ') : undefined,
-    resolvedItemId: item?.id,
-    resolvedNoun: item?.name ?? noun,
+    target: legacyTarget,
+    resolvedItemId: legacyItemId,
+    resolvedNoun: legacyNoun,
     confidence,
     suggestions: [],
+    args: args.length > 0 ? args : undefined,
   };
+
+  // Validator runs over the candidate. Non-empty issues → demote to
+  // intent:'unknown' with the issue list attached, so callers can
+  // surface a helpful message via parseValidator.describeIssues()
+  // instead of acting on a junk parse. This is the layer that fixes
+  // the playtest regression where "it is supposed to remove a noun
+  // item from the popup..." parsed as equip and cleared both hands.
+  const issues = validateParse(candidate);
+  if (shouldRejectParse(issues)) {
+    return {
+      intent: 'unknown',
+      raw,
+      normalized,
+      confidence: 0,
+      suggestions: ['look around', 'inventory', 'rest'],
+      validationIssues: issues,
+    };
+  }
+
+  return candidate;
 }

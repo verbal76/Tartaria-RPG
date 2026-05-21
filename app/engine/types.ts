@@ -58,6 +58,55 @@ export interface ParsedInput {
   matchedVerb?: string;
   confidence: number;
   suggestions: string[];
+  /** OTA 204 — predicate-argument structure. Each entry is one
+   *  argument the verb takes (direct object, instrument, recipient,
+   *  etc.) along with its resolution (catalog item / scene noun /
+   *  enemy). Populated alongside the legacy `target` / `resolvedNoun`
+   *  / `resolvedItemId` fields, which now mirror `args[0]` for back-
+   *  compat with the 25+ gameStore handlers that already read them.
+   *
+   *  Role names map to linguistic conventions (J&M Ch.12 §12.7
+   *  dependency labels / Universal Dependencies):
+   *    direct      ≈ obj  (patient/theme)
+   *    instrument  ≈ obl:instr
+   *    recipient   ≈ iobj / obl:to (goal)
+   *    destination ≈ obl:to  (locative goal)
+   *    source      ≈ obl:from
+   *    manner      ≈ advmod  (adverbial) */
+  args?: ParsedArg[];
+  /** OTA 204 — non-empty when the parser rejected this input for
+   *  validation reasons (meta-talk feedback, frame-required arg
+   *  missing, junk nouns in a required slot). Sibling to `intent:
+   *  'unknown'` returns. Lets the engine surface useful feedback
+   *  instead of silently rewriting state. */
+  validationIssues?: string[];
+}
+
+/** OTA 204 — argument role taxonomy. See ParsedInput.args for the
+ *  mapping to linguistic conventions (Jurafsky & Martin Ch.12 §12.7,
+ *  Universal Dependencies labels). */
+export type ArgRole =
+  | 'direct'       // patient/theme — "attack the DRONE"
+  | 'instrument'   // tool / means — "with the BOLT-CASTER"
+  | 'recipient'    // give-to / for-whom — "to YULKA"
+  | 'destination'  // movement goal — "into the HALL"
+  | 'source'       // origin — "from the CRATE"
+  | 'manner';      // adverbial — "CAREFULLY"
+
+export interface ParsedArg {
+  role: ArgRole;
+  /** Raw segment text (joined tokens after stopword strip). */
+  text: string;
+  /** Set when the segment resolved to a catalog item in the player's
+   *  inventory. */
+  resolvedItemId?: string;
+  /** Set when the segment resolved to a scene noun / enemy / ambient
+   *  noun / hook. */
+  resolvedNoun?: string;
+  /** The preposition that introduced this segment, if any
+   *  ('with' / 'to' / 'from' / 'into'). Undefined for the direct
+   *  object and for manner adverbs. */
+  preposition?: string;
 }
 
 export interface Stats {
