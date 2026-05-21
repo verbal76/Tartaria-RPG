@@ -810,7 +810,25 @@ interface GameStore {
   persist: () => Promise<void>;
 }
 
-const MAX_LOG_IN_MEMORY = 500;
+// OTA 199 — in-memory log cap removed per playtester: "the log
+// stops populating after a while, see what the cap is and remove
+// it." Previously capped at 500 lines (.slice(-500) on every
+// append), which evicted older entries from the live AdventureFeed
+// once a long session crossed the threshold. The disk-side log
+// (appendLogToDisk in saveSystem) was already unbounded — the in-
+// memory cap was only there for older device safety. Now both
+// sides grow with the session.
+//
+// Trade-off: each appendLog now spreads the full array on update.
+// For a 10k-line session that's ~10k entries per spread which is
+// still <1ms in practice. If a future device hits memory pressure
+// we can revisit (windowed feed vs. periodic compaction). The
+// disk log remains the source of truth for cross-session history;
+// in-memory exists purely for the live feed render.
+//
+// Kept the constant exported as a no-op landing pad so any future
+// "show me last N lines" feature has a documented anchor.
+const MAX_LOG_IN_MEMORY = Number.POSITIVE_INFINITY;
 
 export const useGameStore = create<GameStore>((set, get) => ({
   player: null,
