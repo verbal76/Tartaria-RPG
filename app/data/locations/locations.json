@@ -1038,7 +1038,10 @@
     "tags": [
       "region",
       "etheric_storm",
-      "wreck_field"
+      "wreck_field",
+      "etheric_anomaly",
+      "ruin",
+      "open"
     ],
     "discoverable": true,
     "aliases": [
@@ -1113,7 +1116,9 @@
     "tags": [
       "region",
       "aquatic",
-      "mutated_fauna"
+      "mutated_fauna",
+      "mud",
+      "open"
     ],
     "discoverable": true,
     "aliases": [
@@ -1399,7 +1404,11 @@
     "tags": [
       "region",
       "trap_field",
-      "starter_friendly"
+      "starter_friendly",
+      "outskirts",
+      "borderlands",
+      "mud",
+      "open"
     ],
     "discoverable": true,
     "aliases": [
