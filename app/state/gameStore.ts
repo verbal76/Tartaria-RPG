@@ -1943,7 +1943,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // line so the player has a deterministic list of things to type
     // ("take the stairwell", "out the broken window"). This is the room-
     // level navigation the macro-tier cardinal radar doesn't cover.
-    if (ladderTriple?.microMicro.exits && ladderTriple.microMicro.exits.length > 0) {
+    //
+    // Skip when the scene is wilderness — open silt with no hub room.
+    // Playtest 2026-05-21 caught the dispatch_board microMicro (authored
+    // for borderlands → culvert_markets) bleeding into an Outskirts
+    // encounter: "A Swamp Crab emerges. Exits from this room: out to
+    // the bazaar · to the dispatcher's cubby." The microMicro's
+    // interactables still feed the ambient pool (that part reads as
+    // scene texture), but the named exits only make narrative sense
+    // inside their authored hub. enemies-present check: gates further
+    // so an active combat scene isn't broken with bazaar exits either.
+    const isWilderness = !hubRoom;
+    const inCombatNow = enemies.length > 0;
+    if (
+      !isWilderness && !inCombatNow
+      && ladderTriple?.microMicro.exits
+      && ladderTriple.microMicro.exits.length > 0
+    ) {
       get().appendLog(
         'world',
         `Exits from this room: ${ladderTriple.microMicro.exits.join(' · ')}.`,
