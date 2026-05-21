@@ -278,6 +278,10 @@ export interface PlayerMilestones {
    *  digging for rocks / sticks / scraps so the player learns the
    *  basic crafting-stock loop without having to read the wiki. */
   firstSiltCrossed?: boolean;
+  /** Latched once when the player sees the "ask me what X is" Arbiter
+   *  affordance. Opens the door to the 158-entry concepts.json layer
+   *  for players who would never otherwise discover the Q&A path. */
+  firstQAHintShown?: boolean;
 }
 
 export type EquipSlot =

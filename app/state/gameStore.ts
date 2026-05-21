@@ -1740,6 +1740,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('world', p1);
       get().appendLog('world', p2);
       get().appendLog('world', p3);
+      // OTA 185 — Q&A affordance hint. 158 lore concepts live in
+      // concepts.json and only surface when the player types
+      // 'what is X' / 'who are X'. Without this hint, most players
+      // never discover the path. Latched once per character via
+      // milestones.firstQAHintShown.
+      const msNow = get().player?.milestones;
+      if (!msNow?.firstQAHintShown) {
+        get().appendLog(
+          'arbiter',
+          `The Arbiter watches you settle. "If you want to know what something is — the Aether, a faction, a place — ask. 'What is the Aether.' 'Who are the Reclaimers.' 'What is Drakova.' I keep what I remember of the buried world."`,
+        );
+        set((s) => (s.player ? {
+          player: {
+            ...s.player,
+            milestones: {
+              ...(s.player.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 }),
+              firstQAHintShown: true,
+            },
+          },
+        } : s));
+      }
     } else if (opts?.openingPrefix) {
       const final = `${opts.openingPrefix.trim()} ${sceneText.replace(/\n\n+/g, ' ')}`;
       get().appendLog('world', final);
@@ -4865,15 +4886,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           break;
         }
-        const lower = target.toLowerCase();
-        const huntHint = /hunt|bounty|titan|dragon|behemoth|chimera|wyvern|monarch|siren|queen/.test(lower);
-        const mysteryHint = /mystery|fragment|compass|orb|eye|watch|red tower|cradle|leviathan|obsidian|temporal/.test(lower);
-        const storyHint = /storyline|story|path|ascension|run|relic run|silence|red tower|tartarian path|true tartarian/.test(lower);
-        if (storyHint && fuzzyFindStoryline(target, STORYLINES)) {
+        // OTA 185 — dropped the category-hint regex prefilter. Old code
+        // gated each accept path behind a hardcoded keyword regex
+        // (e.g. /hunt|bounty|titan|dragon|.../) that missed location-
+        // named hunts. 'accept drakova' for the Bog Dragon of Old
+        // Drakova never matched, fell through to faction-quest, and
+        // refused. The fuzzy-finders below already do substring
+        // matching against their own pools and return null cleanly
+        // when nothing matches — just try them in priority order.
+        if (fuzzyFindStoryline(target, STORYLINES)) {
           get().acceptStoryline(target);
-        } else if (mysteryHint && fuzzyFindMystery(target, MYSTERIES)) {
+        } else if (fuzzyFindMystery(target, MYSTERIES)) {
           get().acceptMystery(target);
-        } else if (huntHint && fuzzyFindHunt(target, HUNTS)) {
+        } else if (fuzzyFindHunt(target, HUNTS)) {
           get().acceptHunt(target);
         } else {
           get().acceptFactionQuest(target);
@@ -6545,7 +6570,41 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('system', 'Tour mode — contracts can\'t be accepted until the tutorial ends.');
       return;
     }
+    // OTA 185 — faction-neutral hunts (factionId === null in the
+    // catalog) skip the vendor-in-scene requirement. The playtest
+    // case: Irma offered the Bog Dragon hunt in the Armory, player
+    // walked away, tried 'accept drakova' on the road — fell into
+    // this branch and got redirected back to the vendor. But the
+    // hunt is faction-neutral; any wandering agent could have
+    // posted it; the player already heard the offer. Let them take
+    // it. Faction-aligned hunts still gate at the vendor.
     if (!scene?.vendor) {
+      const direct = findHuntById(titleOrId);
+      const neutralMatch = direct && direct.factionId === null
+        ? direct
+        : fuzzyFindHunt(titleOrId, HUNTS.filter((h) => h.factionId === null));
+      const alreadyActive = neutralMatch
+        && (player.activeHunts ?? []).some((h) => h.id === neutralMatch.id);
+      const alreadyDone = neutralMatch
+        && (player.completedHuntIds ?? []).includes(neutralMatch.id);
+      if (neutralMatch && !alreadyActive && !alreadyDone) {
+        set((s) => (s.player ? {
+          player: {
+            ...s.player,
+            activeHunts: [
+              ...(s.player.activeHunts ?? []),
+              { id: neutralMatch.id, stage: 0, postedByFaction: null, acceptedAt: Date.now() },
+            ],
+          },
+        } : s));
+        bumpQuestsAccepted(get, set);
+        get().appendLog(
+          'arbiter',
+          `The Arbiter nods. "You take the ${neutralMatch.title} on. Open the Contracts board to see the stages."`,
+        );
+        void get().persist();
+        return;
+      }
       const hint = findQuestFactionHint(titleOrId);
       if (hint && hint.vendorNames.length > 0) {
         const sample = hint.vendorNames.slice(0, 2).join(' or ');
@@ -6765,7 +6824,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('system', 'Tour mode — contracts can\'t be accepted until the tutorial ends.');
       return;
     }
+    // OTA 185 — faction-neutral mysteries accept without a vendor in
+    // scene. Same rationale as acceptHunt: if the player heard the
+    // offer in a hub and walked off, the second 'accept' tap from
+    // anywhere should land the contract.
     if (!scene?.vendor) {
+      const directMatch = findMysteryById(titleOrId);
+      const neutralMatch = directMatch && directMatch.factionId === null
+        ? directMatch
+        : fuzzyFindMystery(titleOrId, MYSTERIES.filter((m) => m.factionId === null));
+      const alreadyActive = neutralMatch
+        && (player.activeMysteries ?? []).some((m) => m.id === neutralMatch.id);
+      const alreadyDone = neutralMatch
+        && (player.completedMysteryIds ?? []).includes(neutralMatch.id);
+      if (neutralMatch && !alreadyActive && !alreadyDone) {
+        set((s) => (s.player ? {
+          player: {
+            ...s.player,
+            activeMysteries: [
+              ...(s.player.activeMysteries ?? []),
+              { id: neutralMatch.id, stage: 0, postedByFaction: null, acceptedAt: Date.now() },
+            ],
+          },
+        } : s));
+        bumpQuestsAccepted(get, set);
+        get().appendLog(
+          'arbiter',
+          `The Arbiter nods. "You take the ${neutralMatch.title} on. Open the Contracts board to see the stages."`,
+        );
+        void get().persist();
+        return;
+      }
       const hint = findQuestFactionHint(titleOrId);
       if (hint && hint.vendorNames.length > 0) {
         const sample = hint.vendorNames.slice(0, 2).join(' or ');
@@ -7198,6 +7287,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (visited.containersOpened?.length) {
         get().appendLog('world', `Still open from before: ${visited.containersOpened.join(', ')}.`);
       }
+    }
+    // Travel-time lore beat — 5% chance per cardinal step that the
+    // Arbiter drops an unprompted world-color line drawn from the
+    // TRAVEL_LORE_BEATS pool. Surfaces the lore layer for players who
+    // never explicitly ask 'what is X'. rotatingPick keeps the same
+    // line from firing twice in a row across the session.
+    if (TRAVEL_LORE_BEATS.length > 0 && Math.random() < 0.05) {
+      const idx = rotatingPick(TRAVEL_LORE_BEATS.map((_, i) => i), 'travel.lore.beat');
+      get().appendLog('arbiter', TRAVEL_LORE_BEATS[idx]!);
     }
     // Open ground — narrate a wander and plant a hook. Compass in pack
     // adds direction-aware hint of what's ahead.
@@ -9196,6 +9294,47 @@ const HIDDEN_TEXT_LINES = [
   `You wipe the ${`{noun}`}. Underneath, a child's name written badly, then a second hand has written 'rest now' in old Tartarian beneath it.`,
 ];
 
+// Travel-time lore beats — surfaced on a 5% chance per cardinal step
+// in stepDirection. Short Tartarian-world observations the Arbiter
+// drops without prompt. Different from AMBIENT_FLAVOR_LINES because
+// these don't reference a noun; they're standalone world-color
+// beats. Surfaces the 158-concept lore layer for players who never
+// type 'what is X'. Rate kept low so it doesn't spam over a long
+// walk; one beat every ~20 steps on average.
+const TRAVEL_LORE_BEATS = [
+  `The Arbiter, walking with you: "Tartaria was a continent once. A flood older than any honest map drowned it. We are crossing the top of it."`,
+  `The Arbiter, half to themselves: "The Aether you breathe out here is the same Aether the pre-flood engineers stored. Most of it is theirs, leaking back."`,
+  `The Arbiter: "The Reclaimers tag, recover, return. The Forgotten Order kneels. The Mud Monarchs collect. The Aetherborn watch. Five answers to one buried country."`,
+  `The Arbiter glances at the horizon. "Buried cities under us. The flood didn't bury them all at once — some sank slowly enough that the people inside knew."`,
+  `The Arbiter: "Aetherstone holds light. It holds heat. It holds memory, sometimes. The cores you'll find are not always inert."`,
+  `The Arbiter: "Mud-glass is silt fused under Aetheric pressure during the flood. It traps what it traps. Don't break it without a reason."`,
+  `The Arbiter, quieter: "Tartarian Giants walked here. Their footprints are in the mud-glass under your boots, if you know what to look for."`,
+  `The Arbiter: "Etheric Undead are not the same as dead. They are people the Aether kept past the threshold. They remember. That is the cruelty."`,
+  `The Arbiter: "The Red Tower in the Order's keeping has forty-seven visible rings. It had more, once. Each ring was a doctrine the Order forgot or denied."`,
+  `The Arbiter: "Drakova is south. Old Drakova is south, and under. The new Drakova lives on top of its grave and rarely admits it."`,
+  `The Arbiter: "The Mud Seas are not seas. They are silt over the Cradle of Dusk, and the storms there are Aetheric, not weather."`,
+  `The Arbiter: "Reclaimer code: salvage the relic, return the body, leave the place better than you found it. Most of them keep two of three."`,
+  `The Arbiter: "Aetherstone Sentinels — the architectural ones — patrol the buried passes. Some have been awake for a thousand years. You will know them when they speak."`,
+  `The Arbiter: "Tartary above and Tartaria below — same name, different country. We are walking on the one most maps refuse to name."`,
+  `The Arbiter, half-amused: "The Monarchs say the buried world is theirs by right. The buried world hasn't responded yet."`,
+];
+
+// Ambient lore pool — surfaced on a 25% chance from every search,
+// regardless of whether the noun is in the hidden-text writing-surface
+// gate. Lifts the lore-during-exploration rate from ~3% (12% × narrow
+// isSearchable subset) to ~25% across the full ambient set. Lines are
+// in app/data/lore/ambient-flavor.json so a writer can extend without
+// touching gameStore.ts.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const AMBIENT_FLAVOR_LINES: string[] = ((): string[] => {
+  try {
+    const data = require('../data/lore/ambient-flavor.json') as { lines?: string[] };
+    return Array.isArray(data.lines) ? data.lines : [];
+  } catch {
+    return [];
+  }
+})();
+
 function narrateAmbientFind(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -9232,10 +9371,23 @@ function narrateAmbientFind(
   ];
   const lines = inHub ? indoor : wilderness;
   get().appendLog('world', pick(lines));
-  // Searchable nouns (walls, tablets, murals, inscriptions, journals,
-  // maps, etc.) get a ~12% chance to reveal a hidden-text line on top
-  // of the normal descriptive narration. Lore-only — no grant.
-  if (isSearchable(noun) && chance(12)) {
+  // Ambient-flavor lore reveal — 25% chance on EVERY search. Pulls a
+  // one-line Tartarian factoid from app/data/lore/ambient-flavor.json
+  // and {noun}-substitutes it. Lifted from ~3% pre-OTA-185 (gated by
+  // both narrow isSearchable AND 12% RNG) to ~25% so normal
+  // exploration actually surfaces lore. rotatingPick keeps repeats
+  // from piling up across consecutive searches.
+  if (AMBIENT_FLAVOR_LINES.length > 0 && chance(25)) {
+    const idx = rotatingPick(AMBIENT_FLAVOR_LINES.map((_, i) => i), 'ambient.flavor');
+    const factoid = AMBIENT_FLAVOR_LINES[idx]!.replace(/\{noun\}/g, noun);
+    get().appendLog('world', factoid);
+  }
+  // Hidden-text reveal — for writing surfaces (walls, tablets, scrolls,
+  // and now broken machinery with maker plates per the widened
+  // isSearchable list in interactionTags.ts). Rare, lore-rich.
+  // Bumped 12 → 25 so when a player DOES land on a searchable noun
+  // the reveal feels rewarding instead of statistically invisible.
+  if (isSearchable(noun) && chance(25)) {
     const hiddenLine = pick(HIDDEN_TEXT_LINES).replace('{noun}', noun);
     get().appendLog('world', hiddenLine);
   }

@@ -57,12 +57,28 @@ const TAG_RULES: TagRule[] = [
   },
   {
     tag: 'searchable',
+    // OTA 185 — widened to cover the physical-mechanism nouns players
+    // actually try to search in The Gate / Outskirts (chain, lever,
+    // spike, emitter, portcullis, etc.). Broken machinery in the
+    // wreck regularly carries identifying plates, etched serial
+    // numbers, faction stamps — fair game for the hidden-text
+    // reveal. Original pure-writing-surface list (wall, tablet,
+    // scroll, etc.) preserved at the top so the rare-relic reveals
+    // still trigger on the original nouns.
     patterns: [
+      // Writing surfaces — original list
       'wall', 'inscription', 'mural', 'archive', 'tablet', 'tome',
       'ledger', 'slate', 'book', 'letter', 'parchment', 'log',
       'journal', 'blueprint', 'map', 'paper', 'note', 'scroll',
       'tapestry', 'sign', 'header', 'marker', 'flagstone',
       'placard', 'shelf', 'cabinet', 'drawer',
+      // Physical mechanisms — playtester noted these were the
+      // verbs they actually used. Often have manufacturer plates,
+      // ID stamps, paint marks, etched lore.
+      'lever', 'emitter', 'spike', 'chain', 'portcullis', 'valve',
+      'gear', 'conduit', 'machinery', 'pipe', 'panel', 'coil',
+      'circuit', 'cable', 'console', 'pillar', 'arch', 'beam',
+      'fissure', 'pulse emitter', 'broken chain',
     ],
   },
   {
