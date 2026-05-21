@@ -4,6 +4,7 @@ import {
   AMULETS,
   RINGS,
   GEAR,
+  EXPLORATION,
   MATERIALS,
   type CatalogWeapon,
   type CatalogArmor,
@@ -49,6 +50,25 @@ export function getItemPreview(itemName: string): ItemPreview {
 
   const g = GEAR.find((x) => x.name.toLowerCase() === lower);
   if (g) return previewGear(g);
+
+  // OTA 193 — exploration catalog lookup. Without this, items like
+  // Pulse Scanner / Aetheric Circuit Repair Kit (both authored in
+  // exploration.json with full effect tags) miss every catalog
+  // and fall through to inferGear(), firing a noisy "inferred-
+  // stats: gear:NAME" debug line every render even though the
+  // catalog DOES have them. Treat exploration rows as gear-shaped
+  // for preview rendering (kind/rarity/desc/tags all present).
+  const exp = EXPLORATION.find((x) => x.name.toLowerCase() === lower);
+  if (exp) {
+    return previewGear({
+      name: exp.name,
+      kind: 'misc',
+      rarity: exp.rarity,
+      tags: exp.tags,
+      description: exp.description,
+      effect: exp.effect,
+    });
+  }
 
   const m = MATERIALS.find((x) => x.name.toLowerCase() === lower);
   if (m) return previewMaterial(m);

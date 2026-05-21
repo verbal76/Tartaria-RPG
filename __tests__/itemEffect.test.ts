@@ -61,10 +61,15 @@ describe('itemEffect — gate lookup', () => {
   });
 });
 
-describe('itemEffect — Pulse Scanner is no longer orphaned', () => {
-  // The original complaint that drove OTA 192.
-  it('catalog row carries a consumable effect with revealScene:true', () => {
+describe('itemEffect — Pulse Scanner: Geiger-counter redesign (OTA 193)', () => {
+  // The user's mental model from the playtest discussion:
+  // "Pulse scanner is like a geiger counter, it's a device to track
+  //  Aetheric energy, it should give you a stat boost to finding
+  //  Aetheric items when using search. If you search a vent fissure
+  //  with it equipped then you might find Aetheric shards or dust or
+  //  Aetheric fungus. You would use it in your off hand."
+  it('catalog row carries a scanner effect with aetheric bias and off slot', () => {
     const fx = resolveItemEffect('Pulse Scanner', [findExplorationItemByName]);
-    expect(fx).toEqual({ kind: 'consumable', revealScene: true });
+    expect(fx).toEqual({ kind: 'scanner', bias: 'aetheric', slot: 'off' });
   });
 });

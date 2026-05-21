@@ -63,7 +63,20 @@ export type ItemEffect =
       extendLight?: number;
       revealScene?: boolean;
     }
-  | { kind: 'gate'; unlocks: GateKind };
+  | { kind: 'gate'; unlocks: GateKind }
+  | {
+      /** Off-hand equippable scanner — a Geiger-counter analog
+       *  that biases search outcomes toward a tagged loot pool
+       *  when the player is searching physical features. Pulse
+       *  Scanner uses bias='aetheric' to surface Aetheric
+       *  Shards, Aether Dust, Aetheric Fungus, etc. on a
+       *  successful d20 check. The slot is fixed on the item
+       *  side ('off'); validSlotsForItem reads this to make
+       *  the scanner equippable in the off hand. */
+      kind: 'scanner';
+      bias: 'aetheric';
+      slot: 'off';
+    };
 
 /** A minimal lookup signature: any function that returns an item
  *  row with an optional `effect` field given a name. Lets us pass
@@ -118,4 +131,17 @@ export function inventoryHasGate(
     if (fx?.kind === 'gate' && fx.unlocks === gate) return true;
   }
   return false;
+}
+
+/** True iff the given item name is a scanner with the given bias.
+ *  Used by the equip-slot resolver (scanner items are valid in
+ *  off-hand) and by the search action (scanner-equipped player
+ *  gets an Aether-find roll on every ambient search). */
+export function isScanner(
+  name: string,
+  bias: 'aetheric',
+  resolvers: EffectResolver[],
+): boolean {
+  const fx = resolveItemEffect(name, resolvers);
+  return fx?.kind === 'scanner' && fx.bias === bias;
 }

@@ -1639,10 +1639,11 @@
       "race_starter",
       "architectural_sentinel"
     ],
-    "description": "Scans Aetheric fields for anomalies. Detects nearby Aetheric energy distortions.",
+    "description": "Aether Geiger-counter. Equip in your off hand; while equipped, searching physical features carries a chance to surface Aetheric finds \u2014 shards, dust, fungus \u2014 that bare-eye searches miss.",
     "effect": {
-      "kind": "consumable",
-      "revealScene": true
+      "kind": "scanner",
+      "bias": "aetheric",
+      "slot": "off"
     }
   },
   {

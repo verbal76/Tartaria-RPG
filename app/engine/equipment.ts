@@ -1,6 +1,6 @@
 import type { InventoryItem, EquipSlot, PlayerCharacter, Stats } from './types';
 import { findWeaponByName, findArmorByName, findAmuletByName, findRingByName, GEAR, findExplorationItemByName, findGearByName, findMaterialByName } from './crafting';
-import { aggregateInventoryPassives, inventoryHasGate, type EffectResolver, type GateKind } from './itemEffect';
+import { aggregateInventoryPassives, inventoryHasGate, isScanner, type EffectResolver, type GateKind } from './itemEffect';
 
 /**
  * Return the list of slots an item could legally be equipped into.
@@ -10,6 +10,15 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   const nameLower = item.name.toLowerCase();
   if (findWeaponByName(item.name)) {
     return ['main', 'off']; // any weapon can go in either hand
+  }
+  // OTA 193 — exploration items with effect.kind='scanner' (Pulse
+  // Scanner today, future Geiger-counter analogs tomorrow) are
+  // off-hand equippable so they can sit alongside a one-handed
+  // weapon. Check this BEFORE amulet/ring inference so a scanner
+  // name containing "amulet" / "ring" wouldn't get re-routed.
+  const exp = findExplorationItemByName(item.name);
+  if (exp?.effect?.kind === 'scanner') {
+    return [exp.effect.slot]; // currently always 'off'
   }
   const armor = findArmorByName(item.name);
   if (armor) {
@@ -160,6 +169,22 @@ export function aggregateInventoryPassiveStatBonuses(player: PlayerCharacter): P
 export function playerHasGate(player: PlayerCharacter, gate: GateKind): boolean {
   const names = (player.inventory ?? []).map((i) => i.name);
   return inventoryHasGate(names, gate, EFFECT_RESOLVERS);
+}
+
+/** OTA 193 — true iff the player has a scanner with the given
+ *  bias EQUIPPED in the off-hand. Carried-but-not-equipped
+ *  scanners don't fire — the player has to commit the slot.
+ *  Used by the search verb to grant Aetheric drops when
+ *  searching physical features ("search the vent" + Pulse
+ *  Scanner in off-hand → small chance at Aether Shard / Dust /
+ *  Fungus). */
+export function playerHasScannerEquipped(
+  player: PlayerCharacter,
+  bias: 'aetheric',
+): boolean {
+  const off = player.equipped?.off;
+  if (!off) return false;
+  return isScanner(off, bias, EFFECT_RESOLVERS);
 }
 
 // Sum stat bonuses from every equipped piece (armor pieces with statBonus,
