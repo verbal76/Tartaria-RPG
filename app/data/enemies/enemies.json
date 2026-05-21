@@ -1199,5 +1199,29 @@
     "aliases": ["reaver", "the reaver", "tartarian reaver"],
     "traits": ["armored", "savage", "quick", "ambush_strike", "bleeder", "concussive", "vulnerable:piercing"],
     "boss": true
+  },
+  {
+    "name": "Silt Thief",
+    "type": "Human",
+    "abilityPoint": "Dexterity 5",
+    "attack": "Quick Knife",
+    "damage": "1D8",
+    "hp": 28,
+    "rarity": "Uncommon",
+    "loot": ["Patched Cloth", "Aether Residue"],
+    "aliases": ["thief", "silt thief", "the thief", "pendejo"],
+    "traits": ["quick", "ambush_strike", "bleeder"]
+  },
+  {
+    "name": "Disc Hijacker",
+    "type": "Human",
+    "abilityPoint": "Strength 4",
+    "attack": "Cudgel Smash",
+    "damage": "2D6",
+    "hp": 32,
+    "rarity": "Uncommon",
+    "loot": ["Aether Residue", "Patched Cloth"],
+    "aliases": ["hijacker", "disc hijacker", "the hijacker", "mugger"],
+    "traits": ["savage", "concussive"]
   }
 ]

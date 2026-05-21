@@ -205,7 +205,17 @@ import {
   hasFullCover,
   aethericVulnerabilityMultiplier,
 } from '../engine/statusEffects';
-import type { StatusEffect, MemorableEvent } from '../engine/types';
+import type { StatusEffect, MemorableEvent, WhisperRecord } from '../engine/types';
+import {
+  CHAINS,
+  pickTargetTile,
+  findReadyMeetWhisper,
+  findReadyFetchWhisper,
+  findReadyReturnWhisper,
+  reapExpiredWhispers,
+  spawnChainEnemy,
+  makeStolenDiscs,
+} from '../engine/whispers';
 import { TUTORIAL_STEPS } from '../components/tutorialSteps';
 import { findFragmentById, findStoryByFragmentId, pickFragmentForBiome } from '../engine/collectables';
 
@@ -1652,6 +1662,53 @@ export const useGameStore = create<GameStore>((set, get) => ({
       vendor, range, hooks: initialHooks, ambientNouns, displayedAmbientNouns, microMicroId,
       enemyAmbushUsed: enemies.map(() => false),
     };
+    // Whisper plant — hub-room entry can drop a tip into the
+    // player's Whispers panel. Pittsburgh loop: walk into the
+    // Mess, a Reclaimer at the next table mentions Yulka sells
+    // Aetheric Discs cheap south after dark, that becomes a
+    // traceable Whisper. See app/engine/whispers.ts for chain
+    // definitions + rate.
+    if (hubRoom && hubRoom.id) {
+      const livePlayer = get().player;
+      if (livePlayer) {
+        const eligibleChains = CHAINS.filter((c) =>
+          c.plantLocations.includes(hubRoom.id)
+          && !(livePlayer.completedWhisperIds ?? []).includes(c.id)
+          && !(livePlayer.activeWhispers ?? []).some((w) => w.id === c.id),
+        );
+        for (const chain of eligibleChains) {
+          if (Math.random() >= chain.plantChance) continue;
+          const px = typeof livePlayer.mapX === 'number' ? livePlayer.mapX : 0;
+          const py = typeof livePlayer.mapY === 'number' ? livePlayer.mapY : 0;
+          const tile = pickTargetTile(chain, px, py);
+          const hours = livePlayer.hoursElapsed ?? 0;
+          const whisper: WhisperRecord = {
+            id: chain.id,
+            stage: 'planted',
+            plantedAtHour: hours,
+            expiresAtHour: hours + chain.expiryHours,
+            targetMapX: tile.x,
+            targetMapY: tile.y,
+            targetLocationId: livePlayer.currentLocationId,
+            activeFromHour: chain.activeHours?.[0],
+            activeToHour: chain.activeHours?.[1],
+          };
+          set((s) => (s.player ? {
+            player: {
+              ...s.player,
+              activeWhispers: [...(s.player.activeWhispers ?? []), whisper],
+            },
+          } : s));
+          get().appendLog(
+            'arbiter',
+            chain.plantLines[Math.floor(Math.random() * chain.plantLines.length)]!,
+          );
+          // One whisper per scene entry — don't pile up tips on the
+          // same visit. The next entry can plant another.
+          break;
+        }
+      }
+    }
     // Vendor voice pool — lifecycle hooks on scene transitions.
     // When this scene introduces a new vendor, warm their Kokoro
     // voice in the background so the model graph is ready by the
@@ -2334,6 +2391,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ambientNouns: currentScene.ambientNouns ?? [],
       vendorName: currentScene.vendor?.name,
     };
+    // Whisper-chain command short-circuit. The Yulka chain offers
+    // three branches when the player meets her ('accept yulka',
+    // 'buy from yulka', 'leave yulka'). Catch these before the
+    // generic parser so the right stage transition fires.
+    const yulkaActive = (player.activeWhispers ?? []).find((w) => w.id === 'yulka_discs' && w.stage === 'met_yulka');
+    if (yulkaActive) {
+      const t = trimmed.toLowerCase();
+      if (/^accept (yulka|the (fetch|job|deal))/.test(t) || /\baccept yulka\b/.test(t)) {
+        get().appendLog('player', trimmed);
+        handleYulkaAccept(get, set, yulkaActive);
+        void get().persist();
+        return;
+      }
+      if (/^buy (from )?yulka\b/.test(t) || /^buy (the )?discs\b/.test(t)) {
+        get().appendLog('player', trimmed);
+        handleYulkaBuy(get, set, yulkaActive);
+        void get().persist();
+        return;
+      }
+      if (/^leave yulka\b/.test(t) || /^walk away\b/.test(t)) {
+        get().appendLog('player', trimmed);
+        handleYulkaLeave(get, set, yulkaActive);
+        void get().persist();
+        return;
+      }
+    }
     const parsed = parseInput(trimmed, parseCtx);
     get().appendLog('player', trimmed, {
       intent: parsed.intent,
@@ -5824,6 +5907,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const enemy = activeEnemy(currentScene);
     if (!currentScene || !enemy || !player) return;
     const activeIdx = currentScene.activeEnemyIdx;
+    // Whisper-chain hook — Silt Thief death grants Stolen Aetheric
+    // Discs and advances the Yulka chain to its return stage.
+    // Other chains can plug in here when they get authored.
+    if (enemy.name === 'Silt Thief') {
+      const live = (player.activeWhispers ?? []).find((w) => w.id === 'yulka_discs' && w.stage === 'fetch_active');
+      if (live) {
+        const stolen = makeStolenDiscs(12);
+        set((s) => (s.player ? {
+          player: {
+            ...s.player,
+            inventory: [...s.player.inventory, stolen],
+            activeWhispers: (s.player.activeWhispers ?? []).map((w) =>
+              w.id === 'yulka_discs' ? { ...w, stage: 'fetch_returned' } : w,
+            ),
+          },
+        } : s));
+        get().appendLog(
+          'world',
+          `The Silt Thief drops. Under their cloak, wrapped in oilcloth, half-stamped Aetheric Discs spill across the silt. You scoop them into your own pack. Yulka's stock, recovered.`,
+        );
+        get().appendLog('reward', `✦ Stolen Aetheric Discs (12).`);
+      }
+    }
     // HANDOFF #15 — record the kill against the current room so re-entry
     // narration can reference it ("you cleared this room before"). Pure
     // bookkeeping; doesn't yet suppress respawns.
@@ -7288,6 +7394,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('world', `Still open from before: ${visited.containersOpened.join(', ')}.`);
       }
     }
+    // Whisper resolution — does this cardinal step land on a tile
+    // that triggers an active whisper stage? Order matters:
+    //   1. Drop expired whispers first (so we don't accidentally
+    //      fire a meet for an entry the player can no longer act on)
+    //   2. Meet check — planted whisper, right tile, right hour
+    //   3. Fetch check — ongoing fetch, arrived at thief tile
+    //   4. Return check — back at Yulka's tile with stolen stock
+    //   5. Ambush check — completed-and-armed whisper triggers a
+    //      one-shot ambush on the NEXT cardinal step after reward
+    resolveWhispersForTile(get, set, step.x, step.y);
     // Travel-time lore beat — 5% chance per cardinal step that the
     // Arbiter drops an unprompted world-color line drawn from the
     // TRAVEL_LORE_BEATS pool. Surfaces the lore layer for players who
@@ -8568,6 +8684,367 @@ function bumpQuestsAccepted(
     get().appendLog('arbiter', rotatingPick(BURST_SLOW_DOWN_LINES, 'arbiter.contract.burst-slow'));
   }
   // 2, 4, 6+: silent. Player is chip-tapping — let them.
+}
+
+// --- Whisper resolver ---------------------------------------------------------
+// Per-tile dispatch for whisper chains. Called from stepDirection
+// after the player's coords + scene state have updated. Each stage
+// of each chain has its own check + side effects. Authoring a new
+// chain means adding a stage block here AND a CHAINS entry in
+// app/engine/whispers.ts. The Yulka chain is the only chain right
+// now — it ships as the Pittsburgh-loop MVP.
+function resolveWhispersForTile(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  mapX: number,
+  mapY: number,
+): void {
+  const live = get().player;
+  if (!live) return;
+  const hours = live.hoursElapsed ?? 0;
+
+  // 1) Reap expired whispers.
+  const { kept, expired } = reapExpiredWhispers(live.activeWhispers, hours);
+  if (expired.length > 0) {
+    set((s) => (s.player ? {
+      player: {
+        ...s.player,
+        activeWhispers: kept,
+        completedWhisperIds: Array.from(new Set([...(s.player.completedWhisperIds ?? []), ...expired.map((e) => e.id)])),
+      },
+    } : s));
+    for (const e of expired) {
+      get().appendLog('arbiter', `The Arbiter, quieter: "Whatever trail the ${e.id.replace(/_/g, ' ')} whisper carried — it's cold now. Time outpaced you."`);
+    }
+  }
+
+  // Re-read after the reap so the rest of the dispatch sees the
+  // surviving list.
+  const p = get().player;
+  if (!p) return;
+
+  // 2) Meet check — planted whisper, right tile, right time.
+  const meet = findReadyMeetWhisper(p.activeWhispers, hours, mapX, mapY);
+  if (meet && meet.id === 'yulka_discs') {
+    fireYulkaMeet(get, set, meet);
+    return;
+  }
+
+  // 3) Fetch combat — player arrived at the thief's tile.
+  const fetch = findReadyFetchWhisper(p.activeWhispers, mapX, mapY);
+  if (fetch && fetch.id === 'yulka_discs') {
+    fireYulkaFetch(get, set, fetch);
+    return;
+  }
+
+  // 4) Return-to-Yulka with the recovered Discs.
+  const ret = findReadyReturnWhisper(p.activeWhispers, mapX, mapY);
+  if (ret && ret.id === 'yulka_discs') {
+    fireYulkaReturn(get, set, ret);
+    return;
+  }
+
+  // 5) Ambush armed by a recent completion. Fires on the NEXT
+  //    cardinal step after the reward, then disarms itself.
+  const ambushers = (p.activeWhispers ?? []).filter((w) => w.stage === 'ambush_armed');
+  if (ambushers.length > 0) {
+    fireYulkaAmbush(get, set, ambushers[0]!);
+  }
+}
+
+function fireYulkaMeet(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  whisper: WhisperRecord,
+): void {
+  // Yulka camps three tiles east of the thief — randomise within a
+  // small range so two playthroughs of the chain have different
+  // chase coordinates. Stored on the whisper's ctx so the fetch
+  // step knows where to spawn the thief encounter.
+  const thiefDx = 2 + Math.floor(Math.random() * 2); // 2-3 east
+  const thiefMapX = whisper.targetMapX + thiefDx;
+  const thiefMapY = whisper.targetMapY;
+  // Spawn Yulka as a transient combat-style NPC line + offer chip.
+  // She is NOT a full vendor object (the vendor system is anchored
+  // to hub rooms), so the chain manages her dialogue through the
+  // world log + status. A type-Yulka-action input drives stage
+  // advance.
+  get().appendLog(
+    'world',
+    `A hooded figure crouches over a small Aether-fire ahead. She watches you approach without standing. The fire's blue glow plays across a flat tin tray covered in palm-sized Aetheric Discs.`,
+  );
+  get().appendLog(
+    'arbiter',
+    `"Yulka," she says without asking your name. "If you came for Discs, sit. Five for fifty TC. If you came for trouble, keep walking." She watches your hands more than your face. "There's a third option. Some pendejo took half my stock — three tiles east, that direction." She nods at the dark. "Get them back, you keep five. I keep the rest. Either way, decide now. I've got somewhere to be by sunrise."`,
+  );
+  get().appendLog(
+    'system',
+    `Type "accept yulka" to take the fetch (five Discs on return). Type "buy from yulka" to skip the fetch and trade 50 TC for 5 Discs. Type "leave yulka" to walk away.`,
+  );
+  set((s) => (s.player ? {
+    player: {
+      ...s.player,
+      activeWhispers: (s.player.activeWhispers ?? []).map((w) =>
+        w.id === whisper.id
+          ? { ...w, stage: 'met_yulka', ctx: { ...(w.ctx ?? {}), thiefMapX, thiefMapY } }
+          : w,
+      ),
+    },
+  } : s));
+}
+
+function handleYulkaAccept(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  whisper: WhisperRecord,
+): void {
+  const tx = whisper.ctx?.thiefMapX as number | undefined;
+  const ty = whisper.ctx?.thiefMapY as number | undefined;
+  if (tx == null || ty == null) return;
+  set((s) => (s.player ? {
+    player: {
+      ...s.player,
+      activeWhispers: (s.player.activeWhispers ?? []).map((w) =>
+        w.id === whisper.id ? { ...w, stage: 'fetch_in_progress' } : w,
+      ),
+    },
+  } : s));
+  get().appendLog(
+    'arbiter',
+    `"Three tiles east." Yulka jerks her chin at the dark. "If you don't come back, I never knew your face." She turns to her tray and doesn't look up again.`,
+  );
+}
+
+function handleYulkaBuy(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  whisper: WhisperRecord,
+): void {
+  const live = get().player;
+  if (!live) return;
+  if (live.tc < 50) {
+    get().appendLog(
+      'arbiter',
+      `Yulka glances at your hands. "Fifty TC for five. You're short." She doesn't bargain.`,
+    );
+    return;
+  }
+  set((s) => {
+    if (!s.player) return s;
+    return {
+      player: {
+        ...s.player,
+        tc: s.player.tc - 50,
+        inventory: [...s.player.inventory, {
+          id: `disc_buy_${Date.now()}`,
+          name: 'Aetheric Disc',
+          kind: 'misc' as const,
+          rarity: 'Uncommon' as const,
+          quantity: 5,
+          tags: ['aether', 'currency'],
+        }],
+        activeWhispers: (s.player.activeWhispers ?? []).filter((w) => w.id !== whisper.id),
+        completedWhisperIds: Array.from(new Set([
+          ...(s.player.completedWhisperIds ?? []),
+          whisper.id,
+        ])),
+      },
+    };
+  });
+  get().appendLog(
+    'world',
+    `You count out fifty TC into Yulka's palm. She drops five Discs into yours and tips her cup to you. "Cleanest sale I've made in a week."`,
+  );
+  get().appendLog('reward', `✦ Aetheric Disc × 5.`);
+  get().appendLog('system', `-50 TC.`);
+}
+
+function handleYulkaLeave(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  whisper: WhisperRecord,
+): void {
+  set((s) => (s.player ? {
+    player: {
+      ...s.player,
+      activeWhispers: (s.player.activeWhispers ?? []).filter((w) => w.id !== whisper.id),
+      completedWhisperIds: Array.from(new Set([
+        ...(s.player.completedWhisperIds ?? []),
+        whisper.id,
+      ])),
+    },
+  } : s));
+  get().appendLog(
+    'world',
+    `You step back from Yulka's fire. She watches you go without comment. By morning she'll be three tiles over, telling someone else the same story.`,
+  );
+}
+
+function fireYulkaFetch(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  whisper: WhisperRecord,
+): void {
+  // Spawn the Silt Thief into the current scene with stolen-Discs
+  // on death drop. Done via the standard enemy-spawn pattern.
+  const proto = spawnChainEnemy('Silt Thief');
+  set((s) => {
+    if (!s.currentScene) return s;
+    return {
+      currentScene: {
+        ...s.currentScene,
+        enemies: [...s.currentScene.enemies, proto],
+        enemyHps: [...s.currentScene.enemyHps, proto.hp],
+        activeEnemyIdx: s.currentScene.enemies.length,
+        range: 'close',
+        enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
+      },
+    };
+  });
+  get().appendLog(
+    'world',
+    `A figure rises out of the silt ahead, hands inside a slick mud-cloak. The cloak's lining glints — Aetheric Discs, more than they should be carrying. The Silt Thief sees you, and decides you saw too much.`,
+  );
+  get().appendLog(
+    'combat',
+    `${proto.name} closes — ${proto.attack} ready, ${proto.damage} damage on a hit. (range: close)`,
+  );
+  // Mark the whisper as awaiting the kill. The combat-resolution
+  // path checks for this when an enemy of name 'Silt Thief' dies
+  // and grants the stolen Discs + advances the stage.
+  set((s) => (s.player ? {
+    player: {
+      ...s.player,
+      activeWhispers: (s.player.activeWhispers ?? []).map((w) =>
+        w.id === whisper.id ? { ...w, stage: 'fetch_active' } : w,
+      ),
+    },
+  } : s));
+}
+
+function fireYulkaReturn(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  whisper: WhisperRecord,
+): void {
+  const live = get().player;
+  if (!live) return;
+  // Confirm the player actually has the stolen Discs in their pack.
+  // Anti-cheese: don't pay out if they just walked back without
+  // recovering the loot (e.g. fled the thief).
+  const stolen = live.inventory.find((i) => i.name === 'Stolen Aetheric Discs' && i.quantity > 0);
+  if (!stolen) {
+    get().appendLog(
+      'world',
+      `You return to Yulka's fire. She looks past you, looking for the bundle that isn't there. "Empty hands. Then this conversation's empty too." She turns back to her tray.`,
+    );
+    return;
+  }
+  // Pay out: consume the stolen stack, grant 5 Aetheric Discs +
+  // 30 TC. Mark the whisper as armed for the ambush on the next
+  // step.
+  set((s) => {
+    if (!s.player) return s;
+    const newInventory = s.player.inventory
+      .map((i) => (i.id === stolen.id ? { ...i, quantity: 0 } : i))
+      .filter((i) => i.quantity > 0)
+      .concat([{
+        id: `disc_reward_${Date.now()}`,
+        name: 'Aetheric Disc',
+        kind: 'misc' as const,
+        rarity: 'Uncommon' as const,
+        quantity: 5,
+        tags: ['aether', 'currency'],
+      }]);
+    return {
+      player: {
+        ...s.player,
+        inventory: newInventory,
+        tc: s.player.tc + 30,
+        activeWhispers: (s.player.activeWhispers ?? []).map((w) =>
+          w.id === whisper.id ? { ...w, stage: 'ambush_armed' } : w,
+        ),
+      },
+    };
+  });
+  get().appendLog(
+    'world',
+    `Yulka takes the bundle and counts without looking up. "Faster than I thought." She pulls five clean Discs from her own tray and stacks them in your palm, then drops thirty TC on top. "Don't come back. We're done."`,
+  );
+  get().appendLog('reward', `✦ Aetheric Disc × 5.`);
+  get().appendLog('reward', `+30 TC.`);
+}
+
+function fireYulkaAmbush(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  whisper: WhisperRecord,
+): void {
+  // 30% chance per qualifying step. If it doesn't fire this step,
+  // leave the status armed for the next one. After firing OR after
+  // the player has taken 5 steps without rolling it, retire the
+  // chain to completedWhisperIds.
+  const ctx = whisper.ctx ?? {};
+  const stepsSinceArmed = ((ctx.stepsSinceArmed as number) ?? 0) + 1;
+  if (Math.random() < 0.30) {
+    const proto = spawnChainEnemy('Disc Hijacker');
+    set((s) => {
+      if (!s.currentScene) return s;
+      return {
+        currentScene: {
+          ...s.currentScene,
+          enemies: [...s.currentScene.enemies, proto],
+          enemyHps: [...s.currentScene.enemyHps, proto.hp],
+          activeEnemyIdx: s.currentScene.enemies.length,
+          range: 'close',
+          enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
+        },
+      };
+    });
+    get().appendLog(
+      'world',
+      `A figure steps out of the silt-haze ahead of you and plants their feet across your path. "Heard you came up on Aetheric Discs. Hand them over and you walk away with your teeth."`,
+    );
+    get().appendLog(
+      'combat',
+      `${proto.name} closes — ${proto.attack} ready, ${proto.damage} damage on a hit. (range: close)`,
+    );
+    // Retire the chain after the ambush fires regardless of outcome.
+    set((s) => (s.player ? {
+      player: {
+        ...s.player,
+        activeWhispers: (s.player.activeWhispers ?? []).filter((w) => w.id !== whisper.id),
+        completedWhisperIds: Array.from(new Set([
+          ...(s.player.completedWhisperIds ?? []),
+          whisper.id,
+        ])),
+      },
+    } : s));
+    return;
+  }
+  if (stepsSinceArmed >= 5) {
+    // Player got home clean. Disarm.
+    set((s) => (s.player ? {
+      player: {
+        ...s.player,
+        activeWhispers: (s.player.activeWhispers ?? []).filter((w) => w.id !== whisper.id),
+        completedWhisperIds: Array.from(new Set([
+          ...(s.player.completedWhisperIds ?? []),
+          whisper.id,
+        ])),
+      },
+    } : s));
+    return;
+  }
+  // Still armed, just tick the counter.
+  set((s) => (s.player ? {
+    player: {
+      ...s.player,
+      activeWhispers: (s.player.activeWhispers ?? []).map((w) =>
+        w.id === whisper.id ? { ...w, ctx: { ...(w.ctx ?? {}), stepsSinceArmed } } : w,
+      ),
+    },
+  } : s));
 }
 
 function makeRoomKey(

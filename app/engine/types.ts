@@ -266,6 +266,51 @@ export type CombatRange = 'arm' | 'close' | 'far';
 
 export interface FactionStanding { factionId: string; standing: number; }
 
+/** A Whisper — a tip the player overheard from a non-vendor NPC,
+ *  tracked per-character. Distinct from posted Contracts: no faction
+ *  signs you up, no rep changes, the source might be lying. Each
+ *  whisper has a target (where to go), an optional time window
+ *  (when to go), and a stage that advances as the player follows it.
+ *  Expire on their own after `expiresAtHour` so the Whispers panel
+ *  doesn't pile up forever. */
+export interface WhisperRecord {
+  /** Unique chain id (e.g. 'yulka_discs'). Each whisper has authored
+   *  text + spawn rules in the engine; this field is the lookup key. */
+  id: string;
+  /** Where the player is in the chain. Values are chain-specific —
+   *  the engine looks up the chain definition by id and consults
+   *  its stage table to know what 'met_yulka' should do. */
+  stage: string;
+  /** In-game hour the whisper was planted. Used for expiry math and
+   *  the Whispers-panel "heard 3 hours ago" line. */
+  plantedAtHour: number;
+  /** In-game hour the whisper goes stale. Default ~48 hours after
+   *  planting; the resolution check drops it silently on the next
+   *  scene tick once we pass this. */
+  expiresAtHour: number;
+  /** Map tile the player should travel to. The chain's planting
+   *  step resolves the offset against the player's location at
+   *  plant-time so each character gets its own randomised location
+   *  (a different patron in a different visit might point at a
+   *  different patch of silt). */
+  targetMapX: number;
+  targetMapY: number;
+  /** Macro location id the target tile is in (usually the player's
+   *  current location when planted; the chain doesn't currently
+   *  cross macro boundaries). */
+  targetLocationId: string;
+  /** Active hour window for the rendezvous, [from, to] inclusive.
+   *  When to is < from, the window wraps midnight (e.g. [20, 4] =
+   *  8pm to 4am). Both inclusive in 0-23 hour-of-day terms. Null
+   *  on both = no time gating. */
+  activeFromHour?: number;
+  activeToHour?: number;
+  /** Chain-specific extra state — e.g. for the Yulka fetch, this
+   *  carries the thief's tile coords so the chain knows where to
+   *  spawn the combat encounter. */
+  ctx?: Record<string, number | string>;
+}
+
 export interface PlayerMilestones {
   enemiesDefeated: number;
   travelsCompleted: number;
@@ -438,6 +483,18 @@ export interface PlayerCharacter {
   activeStorylines?: { id: string; stage: number; postedByFaction: string | null; acceptedAt: number }[];
   /** IDs of storylines completed. */
   completedStorylineIds?: string[];
+  /** Active Whispers — informal NPC-to-NPC tips the player has
+   *  overheard, not posted contracts. Time-of-day + tile-targeted,
+   *  expire after a window (default ~48 in-game hours). The
+   *  Pittsburgh loop: bar-patron drops a tip, player follows it to
+   *  a rendezvous, finds a fetch quest, returns, gets paid, walks
+   *  home, gets jumped. Tracked per-character, separate from
+   *  Contracts so a Whisper feels like rumour, not employment. */
+  activeWhispers?: WhisperRecord[];
+  /** IDs of Whispers the player has resolved (any terminal stage:
+   *  completed, expired, declined). Prevents re-planting the same
+   *  whisper twice on the same character. */
+  completedWhisperIds?: string[];
   /** Deterministic seed used to generate this character's procedural world map. */
   mapSeed?: string;
   /** Last spot key the player dug at (`locationId:x:y`). Must move away
