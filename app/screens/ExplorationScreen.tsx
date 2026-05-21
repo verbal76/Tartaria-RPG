@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
+import { readFullLog, flushLogWrites } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
 import { AdventureFeed } from '../components/AdventureFeed';
 import { InputBox } from '../components/InputBox';
@@ -62,6 +64,10 @@ export function ExplorationScreen() {
   // OTA 202 — designer-note modal. Wired to the 📝 button in the
   // input row (InputBox.onOpenFeedback prop).
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  // OTA 223 — transient "COPIED" flash on the FULL LOG button so
+  // the tap-to-copy shortcut gives visible confirmation without a
+  // separate screen.
+  const [logCopied, setLogCopied] = useState(false);
   const appendFeedback = useGameStore((s) => s.appendFeedback);
   const takeAmbientNoun = useGameStore((s) => s.takeAmbientNoun);
   const stealthTakeAmbientNoun = useGameStore((s) => s.stealthTakeAmbientNoun);
@@ -265,9 +271,32 @@ export function ExplorationScreen() {
           <TouchableOpacity onPress={() => { void saveAndExitToTitle(); }} style={styles.menuBtn}>
             <Text style={styles.menuBtnText}>save & exit</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setScreen('log')} style={styles.menuBtn}>
-            <Text style={styles.menuBtnText}>full log</Text>
-          </TouchableOpacity>
+          {/* OTA 223 — single tap copies the full disk log to the
+              clipboard directly (no intermediate screen). Long press
+              still opens the LogScreen for occasions when the player
+              wants to scroll, share, or visually review. Playtester:
+              "the log is really only for troubleshooting at the
+              moment ... can we just hit the log button and
+              automatically have that copy of the entire log and
+              just skip the whole separate screen and copy process?"
+              */}
+          <Pressable
+            onPress={async () => {
+              try {
+                await flushLogWrites();
+                const fresh = await readFullLog();
+                await Clipboard.setStringAsync(fresh);
+                setLogCopied(true);
+                setTimeout(() => setLogCopied(false), 1500);
+              } catch { /* clipboard rarely fails on Android */ }
+            }}
+            onLongPress={() => setScreen('log')}
+            style={styles.menuBtn}
+          >
+            <Text style={styles.menuBtnText}>
+              {logCopied ? 'COPIED' : 'copy log'}
+            </Text>
+          </Pressable>
           <TouchableOpacity onPress={() => setScreen('about')} hitSlop={8} style={styles.menuBtnGear}>
             <Text style={styles.gear}>⚙</Text>
           </TouchableOpacity>

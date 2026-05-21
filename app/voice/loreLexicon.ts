@@ -124,6 +124,22 @@ export function cleanForSpeech(text: string): string {
   // a digit, so word-internal hyphens (e.g. "well-known", "Mud-fist
   // Wraps") aren't touched.
   out = out.replace(/(^|[\s(\[{,;])-(\d)/g, '$1negative $2');
+  // OTA 223 — strip single-quote wrappers around a quoted word.
+  // Playtester: "the Arbiter said 'I do not see a 'wreck' here' but
+  // Kokoro skipped 'wreck' because of the single quotes." The
+  // visible log keeps the quotes for emphasis (they read fine on
+  // screen) but the TTS-bound copy drops them so espeak / Kokoro
+  // pronounces the word cleanly.
+  //
+  // Pattern: 'TOKEN' where TOKEN has letters/digits/space/hyphen
+  // (not another apostrophe) and is bounded outside by whitespace
+  // or punctuation. This leaves possessives ("Mark's") and
+  // contractions ("don't") untouched because they have letters on
+  // both sides of the apostrophe.
+  out = out.replace(/(^|[\s(\[{>])'([A-Za-z0-9][A-Za-z0-9 \-]{0,30}[A-Za-z0-9])'(?=$|[\s)\].,!?;:])/g, '$1$2');
+  // Same rule for "smart" single quotes ' and ' (U+2018 / U+2019)
+  // — emitted by some authoring sources.
+  out = out.replace(/(^|[\s(\[{>])[‘’]([A-Za-z0-9][A-Za-z0-9 \-]{0,30}[A-Za-z0-9])[‘’](?=$|[\s)\].,!?;:])/g, '$1$2');
   return out;
 }
 

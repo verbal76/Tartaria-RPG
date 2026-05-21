@@ -87,6 +87,20 @@ describe('cleanForSpeech', () => {
     expect(cleanForSpeech('north: Asgardar · east: Voronov')).toBe('north: Asgardar, east: Voronov');
   });
 
+  it('strips wrapping single quotes around quoted words', () => {
+    // Playtester report: Kokoro skipped the word entirely when wrapped in quotes.
+    expect(cleanForSpeech("I do not see a 'wreck' here.")).toBe('I do not see a wreck here.');
+    expect(cleanForSpeech("try: 'rest' or 'look'")).toBe('try: rest or look');
+    // Smart-quote variant.
+    expect(cleanForSpeech('She said ‘run’ and ran.')).toBe('She said run and ran.');
+  });
+
+  it('leaves contractions and possessives alone', () => {
+    expect(cleanForSpeech("don't stop now")).toBe("don't stop now");
+    expect(cleanForSpeech("Mark's blade")).toBe("Mark's blade");
+    expect(cleanForSpeech("Reclaimers' Outpost")).toBe("Reclaimers' Outpost");
+  });
+
   it('is idempotent (safe to apply twice)', () => {
     const once = cleanForSpeech('north → Armory · -2 AC');
     expect(cleanForSpeech(once)).toBe(once);
