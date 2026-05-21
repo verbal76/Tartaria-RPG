@@ -35,9 +35,9 @@ describe('applyLoreLexicon', () => {
   });
 
   it('respells place names (Drakova, Varakush, Asgardar, etc.)', () => {
-    expect(applyLoreLexicon('north to Drakova')).toBe('north to druh koh vah');
-    expect(applyLoreLexicon('Varakush sends scholars')).toBe('var ah koosh sends scholars');
-    expect(applyLoreLexicon('the Asgardar capital')).toBe('the ahz gar dar capital');
+    expect(applyLoreLexicon('north to Drakova')).toBe('north to dra koh vah');
+    expect(applyLoreLexicon('Varakush sends scholars')).toBe('vara koosh sends scholars');
+    expect(applyLoreLexicon('the Asgardar capital')).toBe('the az gar dar capital');
   });
 
   it('leaves non-matching text untouched', () => {

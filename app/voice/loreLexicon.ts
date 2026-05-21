@@ -51,14 +51,15 @@ const LEXICON: Array<[RegExp, string]> = [
   [/\bTartarian\b/gi, 'tar tair ee un'],
   [/\bTartarians\b/gi, 'tar tair ee unz'],
   [/\bTartary\b/gi, 'tar tar ee'],
-  [/\bDrakova\b/gi, 'druh koh vah'],
-  [/\bVarakush\b/gi, 'var ah koosh'],
-  [/\bAsgardar\b/gi, 'ahz gar dar'],
-  [/\bVoronov\b/gi, 'vor uh nov'],
+  // Playtester spec OTA 219.
+  [/\bDrakova\b/gi, 'dra koh vah'],
+  [/\bVarakush\b/gi, 'vara koosh'],
+  [/\bAsgardar\b/gi, 'az gar dar'],
+  [/\bVoronov\b/gi, 'voro nov'],
   [/\bSamarran\b/gi, 'sam ah ran'],
   [/\bThametan\b/gi, 'thuh meh tahn'],
   [/\bNimari\b/gi, 'nih mar ee'],
-  [/\bZharak\b/gi, 'zhuh rak'],
+  [/\bZharak\b/gi, 'zah rak'],
 
   // Faction / role nouns sometimes mangled by stress placement.
   [/\bReclaimer\b/gi, 'ree clay mer'],
