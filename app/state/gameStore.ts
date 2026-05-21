@@ -1922,6 +1922,46 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } else {
       get().appendLog('world', sceneText);
     }
+    // OTA 207 — encounter range status. When an encounter just
+    // spawned, emit a 'combat' line showing which of the player's
+    // equipped weapons can reach at the starting range. Playtester:
+    // "I never know if I'm close enough to attack." This makes the
+    // reach state explicit on the same screen as the enemy
+    // announcement, matching the GREEN / YELLOW tones on the
+    // weapon buttons in InputBox.
+    if (hasEnemies && range) {
+      // Widen the literal type — `range` was inferred as 'close' from
+      // the assignment above, but reachLabelFor compares against all
+      // three bands for the future case where this block ever fires
+      // at a different starting range.
+      const r = range as CombatRange;
+      const eq = player.equipped ?? {};
+      const mainName = eq.main ?? eq.weaponName ?? null;
+      const offName = eq.off ?? null;
+      const reachLabelFor = (name: string | null): string => {
+        if (!name) return `bare hands ${r === 'arm' ? '✓' : '— need to close'}`;
+        const w = findWeaponByName(name);
+        if (!w) return `${name} ${r === 'arm' ? '✓' : '— need to close'}`;
+        let bands: CombatRange[];
+        switch (w.weaponKind) {
+          case 'melee': bands = ['arm']; break;
+          case 'ranged': bands = ['arm', 'close', 'far']; break;
+          case 'runecaster':
+            bands = (player.stats.intelligence ?? 0) >= 9 ? ['arm', 'close', 'far'] : ['arm', 'close'];
+            break;
+          default: bands = ['arm'];
+        }
+        const inReach = bands.includes(r);
+        return `${name} ${inReach ? '✓ in range' : '— needs approach'}`;
+      };
+      const rangeLabel = r === 'arm' ? "arm's reach" : r === 'far' ? 'far' : 'close range';
+      const lines = [reachLabelFor(mainName)];
+      if (offName) lines.push(reachLabelFor(offName));
+      get().appendLog(
+        'combat',
+        `Distance: ${rangeLabel}. ${lines.join(' · ')}.`,
+      );
+    }
     // Track hub-room visits separately from the procedural visitedRooms
     // map so hub-specific UI can read it without scanning roomKeys.
     if (hubRoom) {

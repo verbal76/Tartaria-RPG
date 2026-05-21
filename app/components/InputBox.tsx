@@ -5,6 +5,43 @@ import { getVoiceSettings, onVoiceSettingsChange } from '../voice/voiceSettings'
 import { isSpeaking as ttsIsSpeaking, stopAndClear as stopTTS } from '../voice/TTSManager';
 import { startListening, stopListening, isListening } from '../voice/STTManager';
 import { useGameStore } from '../state/gameStore';
+import { findWeaponByName } from '../engine/crafting';
+
+/** OTA 207 — does the equipped weapon reach the current combat range?
+ *  Mirrors playerWeaponReach() in gameStore but takes weapon name +
+ *  range as plain inputs so the component layer can call it. Returns
+ *  the tone the QuickBtn should render: 'ready' when the weapon can
+ *  hit at this range, 'needs-approach' when it can't. Returns
+ *  undefined when there's no combat in progress so neutral grey
+ *  rendering applies (we don't tone weapons out-of-combat). */
+function weaponTone(
+  weaponName: string | null | undefined,
+  range: 'arm' | 'close' | 'far' | null | undefined,
+  intelligence: number,
+): 'ready' | 'needs-approach' | undefined {
+  if (!range) return undefined;
+  // Bare hands — arm reach only.
+  if (!weaponName) return range === 'arm' ? 'ready' : 'needs-approach';
+  const w = findWeaponByName(weaponName);
+  if (!w) return range === 'arm' ? 'ready' : 'needs-approach';
+  // Reach bands per kind. Runecasters: 'arm'+'close' baseline,
+  // Int >= 9 extends to 'far' (matches the gameStore rule).
+  let bands: Array<'arm' | 'close' | 'far'>;
+  switch (w.weaponKind) {
+    case 'melee':
+      bands = ['arm'];
+      break;
+    case 'ranged':
+      bands = ['arm', 'close', 'far'];
+      break;
+    case 'runecaster':
+      bands = intelligence >= 9 ? ['arm', 'close', 'far'] : ['arm', 'close'];
+      break;
+    default:
+      bands = ['arm'];
+  }
+  return bands.includes(range) ? 'ready' : 'needs-approach';
+}
 
 interface Props {
   onSubmit: (text: string) => void;
@@ -75,6 +112,10 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // we're already there.
   const consumeDraft = useGameStore((s) => s.consumeInputDraft);
   const pendingDraft = useGameStore((s) => s.pendingInputDraft);
+  // OTA 207 — Intelligence determines runecaster reach (Int ≥ 9
+  // extends to 'far'). Read it from the store so the weapon tone
+  // updates whenever the player's effective stats change.
+  const playerInt = useGameStore((s) => s.player?.stats.intelligence ?? 0);
   useEffect(() => {
     if (pendingDraft !== null) {
       const draft = consumeDraft();
@@ -190,18 +231,36 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
       <TutorialTarget area="quick-row" style={styles.quickRow}>
         {inCombat ? (
           <>
-            <QuickBtn label="punch" onPress={() => onSubmit('punch')} />
-            <QuickBtn label="kick" onPress={() => onSubmit('kick')} />
+            {/* OTA 207 — color-code weapon buttons by reach.
+                GREEN  = can hit at the current combat range
+                YELLOW = equipped but needs an advance to connect
+                BLUE   = defensive alternative (dodge / flee)
+                Bare-hand attacks (punch/kick) are always arm-only,
+                so they tone exactly with the current range. Weapon
+                buttons use weaponTone() which mirrors the same
+                reach rules as gameStore.playerWeaponReach. */}
+            <QuickBtn
+              label="punch"
+              onPress={() => onSubmit('punch')}
+              tone={weaponTone(null, range, playerInt)}
+            />
+            <QuickBtn
+              label="kick"
+              onPress={() => onSubmit('kick')}
+              tone={weaponTone(null, range, playerInt)}
+            />
             {equippedMain ? (
               <QuickBtn
                 label={shortWeaponLabel(equippedMain).toLowerCase()}
                 onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)}
+                tone={weaponTone(equippedMain, range, playerInt)}
               />
             ) : null}
             {equippedOff ? (
               <QuickBtn
                 label={`off: ${shortWeaponLabel(equippedOff).toLowerCase()}`}
                 onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)}
+                tone={weaponTone(equippedOff, range, playerInt)}
               />
             ) : null}
             {/* Inventory access stays prominent in combat — playtest report
@@ -306,28 +365,47 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   );
 }
 
+/** OTA 207 — combat-tone props for weapon buttons.
+ *  'ready'         (green)  — weapon can hit the current range
+ *  'needs-approach' (yellow) — equipped but won't reach from here
+ *  'defensive'     (blue)   — alternate actions (dodge / flee /
+ *                             block); existing styling kept via the
+ *                             legacy `defensive` boolean which is
+ *                             treated as tone='defensive'
+ *  undefined       (grey)   — neutral (inventory, search, etc.) */
+type QuickBtnTone = 'ready' | 'needs-approach' | 'defensive';
+
 function QuickBtn({
   label,
   onPress,
   defensive,
+  tone,
 }: {
   label: string;
   onPress: () => void;
   defensive?: boolean;
+  tone?: QuickBtnTone;
 }) {
+  const resolvedTone: QuickBtnTone | undefined = tone ?? (defensive ? 'defensive' : undefined);
+  const containerStyle = [
+    styles.quick,
+    resolvedTone === 'defensive' && styles.quickDefensive,
+    resolvedTone === 'ready' && styles.quickReady,
+    resolvedTone === 'needs-approach' && styles.quickNeedsApproach,
+  ];
+  const textStyle = [
+    styles.quickText,
+    resolvedTone === 'defensive' && styles.quickDefensiveText,
+    resolvedTone === 'ready' && styles.quickReadyText,
+    resolvedTone === 'needs-approach' && styles.quickNeedsApproachText,
+  ];
   return (
-    <TouchableOpacity
-      style={[styles.quick, defensive && styles.quickDefensive]}
-      onPress={onPress}
-    >
+    <TouchableOpacity style={containerStyle} onPress={onPress}>
       {/* OTA 206 — all action-button labels uppercased per playtester:
           "all of the action buttons Dodge flee search take… all of
           those should be all in capitals. Being all in lowercase
-          makes them look insignificant." Applied here at the render
-          site so every QuickBtn caller (static labels, weapon names
-          via shortWeaponLabel, peace-mode quick actions) gets the
-          uppercase treatment without per-call edits. */}
-      <Text style={[styles.quickText, defensive && styles.quickDefensiveText]}>{label.toUpperCase()}</Text>
+          makes them look insignificant." */}
+      <Text style={textStyle}>{label.toUpperCase()}</Text>
     </TouchableOpacity>
   );
 }
@@ -366,8 +444,16 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   quickDefensive: { borderColor: '#6a9bbf' },
+  // OTA 207 — combat tone colors. Green for weapons that can hit
+  // the current range, yellow for weapons that need an advance to
+  // reach (player has it equipped but the swing won't connect from
+  // here). Blue/defensive is the existing dodge / flee treatment.
+  quickReady: { borderColor: '#9ec96a', backgroundColor: '#1a201410' },
+  quickNeedsApproach: { borderColor: '#c9a86a' },
   quickText: { color: '#cdbf99', fontSize: 12 },
   quickDefensiveText: { color: '#6a9bbf' },
+  quickReadyText: { color: '#9ec96a' },
+  quickNeedsApproachText: { color: '#c9a86a' },
   inputRow: { flexDirection: 'row', gap: 6, alignItems: 'center' },
   input: {
     flex: 1,
