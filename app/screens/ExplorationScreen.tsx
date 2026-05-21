@@ -162,7 +162,7 @@ export function ExplorationScreen() {
   return (
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: bgTint }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.topRow}>
         <TutorialTarget area="top-left-stats" style={styles.statsCol}>

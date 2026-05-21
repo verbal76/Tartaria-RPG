@@ -9,6 +9,8 @@ import {
   TouchableWithoutFeedback,
   Pressable,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 
 import type { InteractableChip } from './InteractableChip';
@@ -85,7 +87,10 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={onCancel}>
-        <View style={styles.scrim}>
+        <KeyboardAvoidingView
+          style={styles.scrim}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
           <TouchableWithoutFeedback>
             <View style={styles.card}>
               <Text style={styles.title}>INVESTIGATE</Text>
@@ -198,7 +203,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
               </View>
             </View>
           </TouchableWithoutFeedback>
-        </View>
+        </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </Modal>
   );
