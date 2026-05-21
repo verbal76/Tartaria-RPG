@@ -182,6 +182,7 @@ import { rollThrowDamage, weightLabel, itemWeight } from '../engine/itemWeight';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
 import { levenshtein } from '../engine/editDistance';
 import { isAreaSearch, isGroundSearch, rollAreaSearch } from '../engine/areaSearch';
+import { classifyNoun, rollBreakLoot } from '../engine/sceneNounMaterial';
 import { isClimbable, isSwimmable, isSearchable } from '../engine/interactionTags';
 import { rollSalvagePool } from '../engine/salvagePools';
 import { isOversized, refusalLine } from '../engine/portability';
@@ -2888,39 +2889,195 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const ambientHitInAttack = rawTarget
             ? matchAmbientNoun(rawTarget, currentScene.ambientNouns ?? [])
             : null;
-          // OTA 212 — verb-aware futile-attack narration. Playtester:
-          //   "punch and kick are both attack commands... it keeps
-          //    saying nothing reaches your blade. I'm not trying to
-          //    stab the pulsometer. I'm angry. I want to go kick it.
-          //    You should say something like you kicked the pulse
-          //    emitter you hurt your foot. You take one damage."
-          // Body verbs (kick/punch/headbutt/...) on a named scene
-          // noun deserve a real reaction, not the generic blade line.
-          // Cost 1 HP and a beat of time. We branch BEFORE the
-          // area-search routing so kicking a wagon doesn't farm
-          // scrap — body attacks are pure RP, not a salvage path.
+          // OTA 214 — material × hardness matrix for futile attacks.
+          // Replaces the OTA 212 body-only stub. Playtester asked:
+          //   "what decides whether I get a bruise and laughed at or
+          //    if something happens? kick the door open -> wooden
+          //    plank / scrap. kick a pillar -> bruise. stomp the
+          //    jewelry box -> locket / gem."
+          // Classify the named noun into a material (wood / stone /
+          // metal / glass / jewelry_box / bone / fabric / unknown)
+          // and a hardness (fragile / sturdy / hard). Body verbs
+          // (kick / punch / stomp / ...) branch on hardness; weapon
+          // verbs route hard targets to a "blade glances off" line
+          // and sturdy / fragile targets continue to the existing
+          // area-search loot path.
           const matchedVerb = (parsed.matchedVerb ?? '').toLowerCase();
-          if (rawTarget && ambientHitInAttack && BODY_ATTACK_VERBS.has(matchedVerb)) {
-            const past = BODY_VERB_PAST[matchedVerb] ?? `${matchedVerb}ed`;
-            const part = BODY_VERB_PART[matchedVerb] ?? 'hand';
-            set((s) =>
-              s.player
-                ? {
-                    player: advanceTime(
-                      spendStamina(
-                        { ...s.player, hp: Math.max(0, s.player.hp - 1) },
-                        STAMINA_COSTS.attack,
+          const isBodyVerb = BODY_ATTACK_VERBS.has(matchedVerb);
+          // We classify ONLY when we have something to classify —
+          // either an explicit ambient-noun match or a recognized
+          // area-search target. A noun the engine never heard of
+          // falls through to the existing "nothing in arm's reach"
+          // line so we don't invent loot for "kick the unicorn".
+          const targetForNarration = ambientHitInAttack ?? rawTarget;
+          const hasClassifiableTarget = !!ambientHitInAttack || (rawTarget && isAreaSearch(rawTarget));
+          if (rawTarget && hasClassifiableTarget) {
+            const { material, hardness } = classifyNoun(rawTarget);
+
+            // Helper: take the bruise. Costs 1 HP + attack stamina,
+            // burns the same beat the swing-into-air did.
+            const bruise = () => {
+              const past = isBodyVerb ? (BODY_VERB_PAST[matchedVerb] ?? `${matchedVerb}ed`) : 'swung at';
+              const part = isBodyVerb ? (BODY_VERB_PART[matchedVerb] ?? 'hand') : 'arm';
+              set((s) =>
+                s.player
+                  ? {
+                      player: advanceTime(
+                        spendStamina(
+                          { ...s.player, hp: Math.max(0, s.player.hp - 1) },
+                          STAMINA_COSTS.attack,
+                        ),
+                        0.1,
                       ),
-                      0.1,
-                    ),
-                  }
-                : s,
+                    }
+                  : s,
+              );
+              get().appendLog(
+                'world',
+                isBodyVerb
+                  ? `You ${past} the ${targetForNarration}. It does not care. Your ${part} does. -1 HP, briefly heroic.`
+                  : `Your strike scrapes the ${targetForNarration}. ${material === 'stone' ? 'Stone' : material === 'metal' ? 'Aetherstone-cast metal' : 'It'} does not concede.`,
+              );
+            };
+
+            // Helper: break it open. Grants material loot if any,
+            // marks the noun as worked over, narrates the win.
+            const breakOpen = (success: boolean) => {
+              const fallbackRoomKey = makeRoomKey(
+                player.currentLocationId,
+                currentScene.microMicroId,
+                player.mapX,
+                player.mapY,
+              );
+              const loweredFallback = rawTarget.toLowerCase().trim();
+              set((s) =>
+                s.player
+                  ? {
+                      player: advanceTime(
+                        spendStamina(s.player, STAMINA_COSTS.attack),
+                        0.15,
+                      ),
+                    }
+                  : s,
+              );
+              const past = isBodyVerb
+                ? (BODY_VERB_PAST[matchedVerb] ?? `${matchedVerb}ed`)
+                : 'smashed';
+              const breakLine = material === 'jewelry_box'
+                ? `You ${past} the ${targetForNarration}. The lid splinters; something rolls free.`
+                : material === 'fabric'
+                  ? `You tear the ${targetForNarration} apart by hand.`
+                  : material === 'wood'
+                    ? `You ${past} the ${targetForNarration}. Wood gives, then breaks.`
+                    : material === 'bone'
+                      ? `You ${past} the ${targetForNarration}. The remains crack open.`
+                      : `You ${past} the ${targetForNarration} open.`;
+              get().appendLog('world', success ? breakLine : `You ${past} the ${targetForNarration}. It gives way.`);
+
+              const loot = rollBreakLoot(material);
+              if (loot) {
+                const itemCat = lookupCraftedItem(loot.itemName);
+                const newItem: InventoryItem = stampDurability({
+                  id: `break_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                  name: loot.itemName,
+                  kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
+                  rarity: loot.rarity,
+                  quantity: loot.quantity,
+                  tags: itemCat.tags,
+                });
+                const grantResult = grantItem(player.inventory, newItem);
+                set((s) =>
+                  s.player ? { player: { ...s.player, inventory: grantResult.inventory } } : s,
+                );
+                if (grantResult.accepted > 0) {
+                  const qtyTag = loot.quantity > 1 ? ` x${loot.quantity}` : '';
+                  get().appendLog('reward', `✦ ${loot.itemName}${qtyTag} (${loot.rarity}).`);
+                } else {
+                  get().appendLog(
+                    'world',
+                    `${loot.itemName} tumbles out, but your pack can't hold another.`,
+                  );
+                }
+              }
+
+              // Mark this noun as worked over so a second body attack
+              // doesn't re-loot it. Mirrors the dedupe used by the
+              // area-search path below.
+              set((s) => {
+                const room = s.worldMemory.visitedRooms?.[fallbackRoomKey] ?? {
+                  firstVisitAt: Date.now(),
+                  lastVisitAt: Date.now(),
+                  visitCount: 1,
+                };
+                const prevSearched = room.searchedAmbientNouns ?? [];
+                return {
+                  worldMemory: {
+                    ...s.worldMemory,
+                    visitedRooms: {
+                      ...(s.worldMemory.visitedRooms ?? {}),
+                      [fallbackRoomKey]: {
+                        ...room,
+                        searchedAmbientNouns: [...prevSearched, loweredFallback],
+                      },
+                    },
+                  },
+                };
+              });
+            };
+
+            // Dedupe: if this noun was already worked over here,
+            // refuse a re-attack with a cheap line. Prevents
+            // free-loot grinding on a fragile box that the player
+            // already cracked open.
+            const fallbackRoomKey = makeRoomKey(
+              player.currentLocationId,
+              currentScene.microMicroId,
+              player.mapX,
+              player.mapY,
             );
-            get().appendLog(
-              'world',
-              `You ${past} the ${ambientHitInAttack}. It does not care. Your ${part} does. -1 HP, briefly heroic.`,
+            const fallbackPrior = get().worldMemory.visitedRooms?.[fallbackRoomKey];
+            const loweredFallback = rawTarget.toLowerCase().trim();
+            const fallbackAlreadySearched = (fallbackPrior?.searchedAmbientNouns ?? []).some(
+              (n) => n === loweredFallback || loweredFallback.includes(n) || n.includes(loweredFallback),
             );
-            break;
+
+            if (isBodyVerb) {
+              if (hardness === 'hard') {
+                // Stone / metal / machinery — body attack only bruises.
+                bruise();
+                break;
+              }
+              if (fallbackAlreadySearched) {
+                get().appendLog('world', `You've already cracked the ${targetForNarration} here. Nothing more inside.`);
+                break;
+              }
+              if (hardness === 'fragile') {
+                // Glass / jewelry box / fabric — body attack wins clean.
+                breakOpen(true);
+                break;
+              }
+              // Sturdy — STR roll vs DC 12. Stamina + time burn either way.
+              const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather));
+              const roll = rollDie(20);
+              const total = roll + stats.strength;
+              const success = total >= 12;
+              get().appendLog(
+                'combat',
+                `You — ${matchedVerb} the ${targetForNarration} → d20 ${roll} + STR ${stats.strength} = ${total} vs DC 12 — ${success ? '✓ HIT' : '✗ MISS'}`,
+              );
+              if (success) breakOpen(true);
+              else bruise();
+              break;
+            }
+            // Weapon verb path: hard targets give a scuff (no loot,
+            // no dedupe consume — the noun stays workable). Sturdy /
+            // fragile fall through to the existing area-search path
+            // below, which is the canonical salvage flow players
+            // already know ("smash the wagon" → scrap).
+            if (hardness === 'hard') {
+              bruise();
+              break;
+            }
           }
           if (rawTarget && (isAreaSearch(rawTarget) || ambientHitInAttack)) {
             // Honor the same per-tile dedupe the canonical investigate
