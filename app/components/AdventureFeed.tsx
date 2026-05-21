@@ -109,7 +109,16 @@ export function AdventureFeed({ entries, enemyNames }: Props) {
   return (
     <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={styles.content}>
       {visible.map((entry) => {
-        const color = channelColors[entry.channel];
+        // OTA 221 — combat-outcome color override. Lines tagged with
+        // meta.combatOutcome='player_dmg' (player landed damage)
+        // render in green so the win pops out of the red roll math.
+        // Lines tagged 'enemy_miss' stay red overall but the trailing
+        // outcome marker (MISS / FUMBLE / AUTO-MISS) renders green
+        // for the same at-a-glance scan. Playtester: "if I do damage
+        // please put that wording in green ... if they attack and
+        // miss me put just the word Miss in green at the end".
+        const meta = entry.meta as { combatOutcome?: 'player_dmg' | 'enemy_miss' } | undefined;
+        const outcome = entry.channel === 'combat' ? meta?.combatOutcome : undefined;
         const tag = tagForChannel(entry.channel);
         // Enemy highlighting only applies to ambient narration — skip it
         // on player echo (their own input) and on the arbiter's own
@@ -118,6 +127,25 @@ export function AdventureFeed({ entries, enemyNames }: Props) {
           || entry.channel === 'combat'
           || entry.channel === 'system'
           || entry.channel === 'reward';
+
+        if (outcome === 'player_dmg') {
+          return (
+            <View key={entry.id} style={styles.entry}>
+              <Text style={[styles.body, { color: REWARD_COLOR, fontWeight: '600' }]}>
+                {entry.text}
+              </Text>
+            </View>
+          );
+        }
+        if (outcome === 'enemy_miss') {
+          return (
+            <View key={entry.id} style={styles.entry}>
+              {renderEnemyMissLine(entry.text)}
+            </View>
+          );
+        }
+
+        const color = channelColors[entry.channel];
         return (
           <View key={entry.id} style={styles.entry}>
             {tag ? <Text style={[styles.tag, { color }]}>{tag}</Text> : null}
@@ -128,6 +156,25 @@ export function AdventureFeed({ entries, enemyNames }: Props) {
         );
       })}
     </ScrollView>
+  );
+}
+
+// Render an enemy-roll line with the trailing MISS / FUMBLE /
+// AUTO-MISS in green. The whole line stays in the combat color
+// (red) so it still reads as "their attack" — the green marker
+// just gives the player an instant "I'm safe" cue at the end.
+function renderEnemyMissLine(text: string): React.ReactNode {
+  const m = /(✗\s*(?:AUTO-MISS|MISS|FUMBLE))\s*\.?\s*$/.exec(text);
+  if (!m) {
+    return <Text style={[styles.body, { color: COMBAT_COLOR }]}>{text}</Text>;
+  }
+  const head = text.slice(0, m.index);
+  const marker = m[1]!;
+  return (
+    <Text style={[styles.body, { color: COMBAT_COLOR }]}>
+      {head}
+      <Text style={{ color: REWARD_COLOR, fontWeight: '700' }}>{marker}</Text>
+    </Text>
   );
 }
 

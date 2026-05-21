@@ -4667,7 +4667,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const hps = [...currentScene.enemyHps];
             hps[idx] = Math.max(0, (hps[idx] ?? enemyHit.hp) - dmg);
             set((s) => s.currentScene ? { currentScene: { ...s.currentScene, enemyHps: hps } } : s);
-            get().appendLog('combat', `The ${projectile}${wLabel} hits ${enemyHit.name} for ${dmg}. (${hps[idx]}/${enemyHit.hp} HP)`);
+            get().appendLog('combat', `The ${projectile}${wLabel} hits ${enemyHit.name} for ${dmg}. (${hps[idx]}/${enemyHit.hp} HP)`, { combatOutcome: 'player_dmg' });
             if ((hps[idx] ?? 0) <= 0) get().resolveEnemyDefeat();
           } else {
             get().appendLog('world', `The ${projectile} skitters past ${enemyHit.name} and lands in the silt.`);
@@ -5099,7 +5099,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (hit) {
             const dmg = Math.max(1, rollDie(equipped.damageDice.includes('d10') ? 10 : 6));
             livingHp = Math.max(0, livingHp - dmg);
-            get().appendLog('combat', `Bolt ${i + 1} hits ${targetEnemy.name} for ${dmg}. (${livingHp}/${targetEnemy.hp} HP)`);
+            get().appendLog('combat', `Bolt ${i + 1} hits ${targetEnemy.name} for ${dmg}. (${livingHp}/${targetEnemy.hp} HP)`, { combatOutcome: 'player_dmg' });
             if (livingHp <= 0) {
               killed = true;
               break;
@@ -6368,7 +6368,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
 
       if (newEnemyHp <= 0) {
-        get().appendLog('combat', attackKill(weaponName, enemy.name, dmg));
+        // OTA 221 — tag with combatOutcome so AdventureFeed can color
+        // damage-out-to-enemy narration green for at-a-glance
+        // scannability. Playtester: red text on red background made
+        // it hard to spot "did I land damage" mid-fight.
+        get().appendLog('combat', attackKill(weaponName, enemy.name, dmg), { combatOutcome: 'player_dmg' });
         // Splice this enemy out of the scene (loot + scene clear handled
         // in resolveEnemyDefeat which now operates per-active-enemy).
         get().resolveEnemyDefeat();
@@ -6380,7 +6384,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           hps[activeIdx] = newEnemyHp;
           return { currentScene: { ...s.currentScene, enemyHps: hps } };
         });
-        get().appendLog('combat', attackHit(weaponName, enemy.name, dmg, newEnemyHp));
+        get().appendLog('combat', attackHit(weaponName, enemy.name, dmg, newEnemyHp), { combatOutcome: 'player_dmg' });
         // After the player's strike, every still-living enemy in the
         // scene counter-attacks. The group acts as a group.
         runEnemyGroupCounters(get, set, player);
@@ -9930,7 +9934,7 @@ function applyEnemyCounter(
             hps[idx] = hp;
             return { currentScene: { ...s.currentScene, enemyHps: hps } };
           });
-          get().appendLog('combat', `Your fight-back strike for ${dmg} damage. ${enemy.name} HP ${hp}/${enemy.hp}.`);
+          get().appendLog('combat', `Your fight-back strike for ${dmg} damage. ${enemy.name} HP ${hp}/${enemy.hp}.`, { combatOutcome: 'player_dmg' });
           if (hp <= 0) {
             set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, activeEnemyIdx: idx } } : s));
             void Promise.resolve().then(() => get().resolveEnemyDefeat());
@@ -10014,9 +10018,14 @@ function applyEnemyCounter(
       ? '✗ FUMBLE'
       : hit ? '✓ HIT' : '✗ MISS';
 
+  // OTA 221 — tag enemy whiffs so AdventureFeed can color the
+  // outcome marker (MISS / FUMBLE) green at the end of the line.
+  // Playtester wanted at-a-glance confirmation that an enemy attack
+  // didn't land without scanning the whole red roll line.
   get().appendLog(
     'combat',
     `${enemy.name} — d20 → ${atkRoll}${advLabel} + ATK ${atkBonus} = ${atkTotal} vs your AC ${effectiveAc} — ${outcomeTag}`,
+    hit ? undefined : { combatOutcome: 'enemy_miss' },
   );
 
   if (hit) {
@@ -10180,7 +10189,7 @@ function applyEnemyCounter(
             return { currentScene: { ...s.currentScene, enemyHps: hps } };
           });
           void Promise.resolve().then(() =>
-            get().appendLog('combat', `Counter-strike! Your parry opens a gap — ${enemy.name} takes ${riposteDamage} damage.`),
+            get().appendLog('combat', `Counter-strike! Your parry opens a gap — ${enemy.name} takes ${riposteDamage} damage.`, { combatOutcome: 'player_dmg' }),
           );
           // If the riposte killed the enemy, resolve their defeat now so
           // the rest of the group counter-volley doesn't skip them.
