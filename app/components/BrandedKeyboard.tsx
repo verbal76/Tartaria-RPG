@@ -143,7 +143,11 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     paddingHorizontal: 4,
     paddingVertical: 4,
-    gap: 4,
+    // Row spacing — previously 4 (rows flush against each other).
+    // Playtester (2026-05-21): "Introduce a vertical margin of about
+    // 6px to 10px between each row. This visually separates the rows
+    // and drastically reduces fat-finger errors."
+    gap: 8,
   },
   previewRow: {
     flexDirection: 'row',
@@ -157,10 +161,12 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     gap: 6,
   },
-  // Sizing scaled to 2.5x per playtest feedback — keys at 38px were
-  // too small to reliably tap. minHeight 95 lands accessible touch
-  // targets; font 24 reads cleanly without dominating the multi-
-  // letter labels (space / abc / 123).
+  // Sizing redone 2026-05-21 per playtester. Previous 95px minHeight
+  // produced 1:2.5 width-to-height keys that read as "stretched tall
+  // rectangles" — every row, including the bottom control row, was
+  // ~95px tall. Mobile-standard is fixed 40-50px height, font ~18,
+  // with the wide / extra-wide keys deriving their HORIZONTAL
+  // dimension from flex (no vertical inflation).
   previewPrompt: { color: '#c9a86a', fontSize: 18, fontWeight: '700' },
   previewText: { color: '#e6d8b3', fontSize: 18, flex: 1 },
   previewCursor: { color: '#c9a86a', fontSize: 18, fontWeight: '700' },
@@ -176,7 +182,9 @@ const styles = StyleSheet.create({
   keyRowIndent: { paddingHorizontal: 18 },
   key: {
     flex: 1,
-    minHeight: 95,
+    // 46px fixed height — middle of the 40-50 mobile-standard band.
+    // Replaces minHeight: 95 which produced 1:2.5 stretched keys.
+    height: 46,
     paddingHorizontal: 6,
     backgroundColor: '#1a1612',
     borderColor: '#3a342c',
@@ -185,9 +193,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  keyWide: { flex: 1.6 },
+  // Shift / Backspace / 123 / Return — 1.4x a standard letter key,
+  // within the 1.25-1.5x mobile-standard band. Wide enough to be an
+  // easy target, narrow enough that letter row keys aren't squeezed.
+  keyWide: { flex: 1.4 },
+  // Space bar — dominates the bottom row horizontally as expected on
+  // a phone keyboard. Vertical height matches every other key now.
   keyExtraWide: { flex: 4 },
   keyHighlight: { backgroundColor: '#2a1f12', borderColor: '#c9a86a' },
-  keyText: { color: '#e6d8b3', fontSize: 24, fontWeight: '600' },
+  // Font scaled to 18 to read cleanly on the new 46px keys. Multi-
+  // letter labels (space / abc / 123 / ⇧ / ⌫ / ↵) still fit.
+  keyText: { color: '#e6d8b3', fontSize: 18, fontWeight: '600' },
   keyTextHighlight: { color: '#c9a86a' },
 });
