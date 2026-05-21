@@ -2971,93 +2971,97 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // 2) Ambient noun match — the player named something the scene
         // paragraph actually mentioned ("investigate the traps" → match).
         // Narrate a flavored find. May plant a hook.
+        //
+        // OTA 194 — per-room dedup. Playtest log caught the player
+        // typing 'search bench' twice in a row and getting two
+        // different narration lines for the same noun. Cheap to
+        // farm, breaks the "once searched it's worked over" rule
+        // the chip UI (OTA 191) already enforces visually. The fix
+        // shares the same searchedAmbientNouns store the chip
+        // dedup reads, so engine + UI stay aligned: searched →
+        // removed from Search modal AND refused at the parser.
         if (rawTarget) {
           const ambient = matchAmbientNoun(rawTarget, currentScene.ambientNouns ?? []);
           if (ambient) {
+            const ambientLower = ambient.toLowerCase();
+            const searchRoomKey = makeRoomKey(
+              player.currentLocationId,
+              currentScene.microMicroId,
+              player.mapX,
+              player.mapY,
+            );
+            const searchPrior = get().worldMemory.visitedRooms?.[searchRoomKey];
+            const alreadySearched = (searchPrior?.searchedAmbientNouns ?? []).some(
+              (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
+            );
+            if (alreadySearched) {
+              get().appendLog(
+                'world',
+                `You've already worked the ${ambient} over here. Nothing more to find.`,
+              );
+              break;
+            }
             narrateAmbientFind(get, set, currentScene, ambient);
-            // OTA 193 — Pulse Scanner pass. If the player has a
-            // scanner equipped in off-hand (currently only the
-            // Pulse Scanner qualifies), roll a d20 for an
-            // Aetheric drop on top of the ambient narration. The
-            // scanner is a Geiger analog — searching physical
-            // features WITH it surfaces Aether traces that bare-
-            // eye searches miss. Dedupe via the same
-            // searchedAmbientNouns store the chip UI reads, so a
-            // re-tap on the same feature won't keep firing.
+            // OTA 193 — Pulse Scanner pass. If a scanner is equipped
+            // in off-hand (Pulse Scanner today; future Geiger-like
+            // tools tomorrow), roll a d20 for an Aetheric drop on
+            // top of the narration. Surfaces shards / dust / mud
+            // that bare-eye searches miss.
             const { playerHasScannerEquipped } = require('../engine/equipment');
             if (playerHasScannerEquipped(player, 'aetheric')) {
-              const scannerRoomKey = makeRoomKey(
-                player.currentLocationId,
-                currentScene.microMicroId,
-                player.mapX,
-                player.mapY,
-              );
-              const scannerPrior = get().worldMemory.visitedRooms?.[scannerRoomKey];
-              const ambientLower = ambient.toLowerCase();
-              const alreadyScanned = (scannerPrior?.searchedAmbientNouns ?? []).some(
-                (n) => n === ambientLower,
-              );
-              if (!alreadyScanned) {
-                // d20: 12+ surfaces a find. Slightly under 50% so
-                // the scanner feels like an edge, not a guarantee.
-                const roll = rollDie(20);
-                const hit = roll >= 12;
-                if (hit) {
-                  // Random Aetheric drop. Quantities favour the
-                  // lower end so a long search session yields a
-                  // steady trickle, not a flood.
-                  const aetherFinds: Array<{ name: string; qty: [number, number]; rarity: 'Common' | 'Uncommon' }> = [
-                    { name: 'Aether Mud',     qty: [1, 2], rarity: 'Common' },
-                    { name: 'Aether Residue', qty: [1, 1], rarity: 'Common' },
-                    { name: 'Aetheric Shard', qty: [1, 1], rarity: 'Uncommon' },
-                    { name: 'Aether Dust',    qty: [1, 2], rarity: 'Common' },
-                  ];
-                  const pick = aetherFinds[Math.floor(Math.random() * aetherFinds.length)]!;
-                  const qty = pick.qty[0] === pick.qty[1]
-                    ? pick.qty[0]
-                    : pick.qty[0] + Math.floor(Math.random() * (pick.qty[1] - pick.qty[0] + 1));
-                  const itemCat = lookupCraftedItem(pick.name);
-                  const newItem: InventoryItem = stampDurability({
-                    id: `scan_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-                    name: pick.name,
-                    kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
-                    rarity: pick.rarity,
-                    quantity: qty,
-                    tags: itemCat.tags,
-                  });
-                  const granted = grantItem(player.inventory, newItem);
-                  set((s) => (s.player ? { player: { ...s.player, inventory: granted.inventory } } : s));
-                  get().appendLog('world', `Pulse Scanner ticks — Aether trace in the ${ambient}.`);
-                  const qtyLabel = granted.accepted > 1 ? ` x${granted.accepted}` : '';
-                  get().appendLog('reward', `✦ ${pick.name}${qtyLabel} (${pick.rarity}).`);
-                } else {
-                  get().appendLog('world', `Pulse Scanner reads flat. Nothing Aetheric in the ${ambient}.`);
-                }
-                // Mark the noun as scanned regardless of outcome
-                // so a re-tap doesn't farm it. This also greys
-                // the chip in the Search modal per OTA 191.
-                set((s) => {
-                  const room = s.worldMemory.visitedRooms?.[scannerRoomKey] ?? {
-                    firstVisitAt: Date.now(),
-                    lastVisitAt: Date.now(),
-                    visitCount: 1,
-                  };
-                  if ((room.searchedAmbientNouns ?? []).includes(ambientLower)) return s;
-                  return {
-                    worldMemory: {
-                      ...s.worldMemory,
-                      visitedRooms: {
-                        ...(s.worldMemory.visitedRooms ?? {}),
-                        [scannerRoomKey]: {
-                          ...room,
-                          searchedAmbientNouns: [...(room.searchedAmbientNouns ?? []), ambientLower],
-                        },
-                      },
-                    },
-                  };
+              const roll = rollDie(20);
+              if (roll >= 12) {
+                const aetherFinds: Array<{ name: string; qty: [number, number]; rarity: 'Common' | 'Uncommon' }> = [
+                  { name: 'Aether Mud',     qty: [1, 2], rarity: 'Common' },
+                  { name: 'Aether Residue', qty: [1, 1], rarity: 'Common' },
+                  { name: 'Aetheric Shard', qty: [1, 1], rarity: 'Uncommon' },
+                  { name: 'Aether Dust',    qty: [1, 2], rarity: 'Common' },
+                ];
+                const pick = aetherFinds[Math.floor(Math.random() * aetherFinds.length)]!;
+                const qty = pick.qty[0] === pick.qty[1]
+                  ? pick.qty[0]
+                  : pick.qty[0] + Math.floor(Math.random() * (pick.qty[1] - pick.qty[0] + 1));
+                const itemCat = lookupCraftedItem(pick.name);
+                const newItem: InventoryItem = stampDurability({
+                  id: `scan_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                  name: pick.name,
+                  kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
+                  rarity: pick.rarity,
+                  quantity: qty,
+                  tags: itemCat.tags,
                 });
+                const granted = grantItem(player.inventory, newItem);
+                set((s) => (s.player ? { player: { ...s.player, inventory: granted.inventory } } : s));
+                get().appendLog('world', `Pulse Scanner ticks — Aether trace in the ${ambient}.`);
+                const qtyLabel = granted.accepted > 1 ? ` x${granted.accepted}` : '';
+                get().appendLog('reward', `✦ ${pick.name}${qtyLabel} (${pick.rarity}).`);
+              } else {
+                get().appendLog('world', `Pulse Scanner reads flat. Nothing Aetheric in the ${ambient}.`);
               }
             }
+            // Mark the noun as searched (single mark for both the
+            // narration and any scanner outcome). The Search modal
+            // reads this same store and will remove the chip per
+            // OTA 191's hide-on-consume rule.
+            set((s) => {
+              const room = s.worldMemory.visitedRooms?.[searchRoomKey] ?? {
+                firstVisitAt: Date.now(),
+                lastVisitAt: Date.now(),
+                visitCount: 1,
+              };
+              return {
+                worldMemory: {
+                  ...s.worldMemory,
+                  visitedRooms: {
+                    ...(s.worldMemory.visitedRooms ?? {}),
+                    [searchRoomKey]: {
+                      ...room,
+                      searchedAmbientNouns: [...(room.searchedAmbientNouns ?? []), ambientLower],
+                    },
+                  },
+                },
+              };
+            });
             break;
           }
         }
