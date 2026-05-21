@@ -83,6 +83,11 @@ const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
   { name: 'Small Rock', rarity: 'Common', weight: 26 },
   { name: 'Big Rock', rarity: 'Common', weight: 10 },
   { name: 'Stick', rarity: 'Common', weight: 22 },
+  // OTA 227 — Firewood drops fairly often from look-around / area
+  // search. Weightless, single-purpose (campfire fuel — cook system
+  // pending). Playtester: "make them a fairly common thing to take
+  // when you look around. they're only good for making campfires."
+  { name: 'Firewood', rarity: 'Common', weight: 18 },
   { name: 'Spider Silk', rarity: 'Common', weight: 6 },
   { name: 'Patched Cloth', rarity: 'Common', weight: 6 },
   { name: 'Aether Crystal', rarity: 'Common', weight: 4 },
