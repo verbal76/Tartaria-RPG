@@ -7,6 +7,7 @@ import * as Application from 'expo-application';
 import { useGameStore } from '../state/gameStore';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { SimpleSlider } from '../components/SimpleSlider';
+import { ScrollDial } from '../components/ScrollDial';
 import { getAudioSettings, setAudioSettings, onAudioSettingsChange, type AudioSettings } from '../audio/audioSettings';
 import { forceReapplyAudioFromState } from '../audio/AudioController';
 import { checkAndApplyOTA } from '../updates/checkAndApplyOTA';
@@ -543,14 +544,14 @@ export function AboutScreen() {
               <View style={styles.musicRow}>
                 <Text style={styles.musicLabel}>Rate</Text>
                 <View style={{ flex: 1 }}>
-                  <SimpleSlider value={(voice.rate - 0.5) / 1.0} onChange={setRate} />
+                  <ScrollDial value={(voice.rate - 0.5) / 1.0} onChange={setRate} />
                 </View>
                 <Text style={styles.musicValue}>{voice.rate.toFixed(2)}x</Text>
               </View>
               <View style={styles.musicRow}>
                 <Text style={styles.musicLabel}>Pitch</Text>
                 <View style={{ flex: 1 }}>
-                  <SimpleSlider value={(voice.pitch - 0.5) / 1.5} onChange={setPitch} />
+                  <ScrollDial value={(voice.pitch - 0.5) / 1.5} onChange={setPitch} />
                 </View>
                 <Text style={styles.musicValue}>{voice.pitch.toFixed(2)}</Text>
               </View>
