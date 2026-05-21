@@ -1,33 +1,72 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, Share } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
-import { readFullLog } from '../engine/saveSystem';
+import { readFullLog, flushLogWrites } from '../engine/saveSystem';
 
 export function LogScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const [diskLog, setDiskLog] = useState<string>('Loading…');
   const [copied, setCopied] = useState(false);
+  const [shared, setShared] = useState(false);
 
+  // OTA 215 — re-read on focus and after a small interval while the
+  // screen is open. The previous version captured a single snapshot
+  // at mount; if the player came in mid-write or the game generated
+  // new entries while LogScreen was visible, those lines didn't
+  // appear unless the user navigated away and back. Now the view
+  // refreshes every second so what you see is what you'd copy.
   useEffect(() => {
-    readFullLog().then((text) => setDiskLog(text || '(no log yet)'));
+    let cancelled = false;
+    const refresh = async () => {
+      const text = await readFullLog();
+      if (!cancelled) setDiskLog(text || '(no log yet)');
+    };
+    void refresh();
+    const interval = setInterval(() => { void refresh(); }, 1000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, []);
 
+  // OTA 215 — always re-read from disk at the moment of copy. The
+  // previous version copied the captured-at-mount state, which could
+  // miss writes that landed between mount and tap. flushLogWrites()
+  // drains any in-flight appendLogToDisk chain first so the read
+  // sees every line that fired.
   async function handleCopy() {
-    // OTA 200 — full disk log copied to clipboard (no cap).
-    // Playtester reversed the 500-line clipboard cap from OTA 199:
-    // "uncap log limits so it always records every event and I
-    // can copy it and paste it into another program when needed."
-    // Live LogScreen now copies the entire disk log, same as the
-    // dead-slot Copy Log button on TitleScreen. The disk log
-    // grows unbounded (appendLogToDisk has no cap); the only hard
-    // ceiling is AsyncStorage's per-key size, which on this
-    // Android default is ~6 MB ≈ 52k lines — beyond any
-    // realistic single-session need.
-    await Clipboard.setStringAsync(diskLog);
+    await flushLogWrites();
+    const fresh = await readFullLog();
+    await Clipboard.setStringAsync(fresh);
+    setDiskLog(fresh || '(no log yet)');
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }
+
+  // OTA 215 — share-sheet path. Android's Share intent doesn't go
+  // through the system clipboard, so destinations that silently
+  // truncate long pastes (some chat apps, email composers) are
+  // bypassed. The user picks where the log goes — file, email, chat.
+  async function handleShare() {
+    await flushLogWrites();
+    const fresh = await readFullLog();
+    setDiskLog(fresh || '(no log yet)');
+    try {
+      await Share.share({ message: fresh, title: 'Tartaria-RPG game log' });
+      setShared(true);
+      setTimeout(() => setShared(false), 1500);
+    } catch {
+      // User-cancelled or unsupported on this platform — no-op.
+    }
+  }
+
+  // Character count gives the player visual confirmation that the
+  // buffer matches what lands in their paste target. If the paste
+  // destination silently truncates, the discrepancy is easy to spot.
+  const charCount = diskLog === 'Loading…' || diskLog === '(no log yet)'
+    ? 0
+    : diskLog.length;
 
   return (
     <View style={styles.container}>
@@ -44,11 +83,21 @@ export function LogScreen() {
         <View style={{ width: 80 }} />
       </View>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
-        <Text style={styles.body}>{diskLog}</Text>
+        {/* selectable={true} so long-press → Select All works as a
+            third fallback alongside COPY / SHARE. iOS+Android both
+            honor it. */}
+        <Text style={styles.body} selectable>{diskLog}</Text>
       </ScrollView>
-      <TouchableOpacity style={styles.copyBtn} onPress={handleCopy} activeOpacity={0.7}>
-        <Text style={styles.copyText}>{copied ? 'COPIED' : 'COPY ALL'}</Text>
-      </TouchableOpacity>
+      <View style={styles.btnRow}>
+        <TouchableOpacity style={styles.copyBtn} onPress={handleCopy} activeOpacity={0.7}>
+          <Text style={styles.copyText}>
+            {copied ? `COPIED ${charCount.toLocaleString()} CHARS` : `COPY ALL · ${charCount.toLocaleString()}`}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.shareBtn} onPress={handleShare} activeOpacity={0.7}>
+          <Text style={styles.shareText}>{shared ? 'SHARED' : 'SHARE'}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -71,12 +120,23 @@ const styles = StyleSheet.create({
   scroll: { flex: 1, backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, padding: 8 },
   content: { paddingBottom: 24 },
   body: { color: '#cdbf99', fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace', fontSize: 11, lineHeight: 16 },
+  btnRow: { flexDirection: 'row', gap: 8, marginTop: 12 },
   copyBtn: {
+    flex: 2,
     backgroundColor: '#c9a86a',
     borderRadius: 4,
     paddingVertical: 12,
     alignItems: 'center',
-    marginTop: 12,
   },
   copyText: { color: '#0a0908', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
+  shareBtn: {
+    flex: 1,
+    backgroundColor: '#1a1714',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  shareText: { color: '#c9a86a', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
 });
