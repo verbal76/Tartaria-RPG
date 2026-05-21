@@ -14,17 +14,17 @@ export function LogScreen() {
   }, []);
 
   async function handleCopy() {
-    // OTA 199 — Copy from live session caps at the last 500 lines.
-    // Playtester: "make the copy log only copy the last 500 lines,
-    // but if you're dead the copy log copies the entire log."
-    // LogScreen is only reachable from a live (alive) session;
-    // dead-character full-log copy lives on the TitleScreen
-    // per-slot button (TitleScreen.copyDeadLog), which reads the
-    // full disk log and copies it whole. The full disk log stays
-    // available for reading here; only the clipboard payload is
-    // capped to keep the chat-paste manageable.
-    const tail = diskLog.split('\n').slice(-500).join('\n');
-    await Clipboard.setStringAsync(tail);
+    // OTA 200 — full disk log copied to clipboard (no cap).
+    // Playtester reversed the 500-line clipboard cap from OTA 199:
+    // "uncap log limits so it always records every event and I
+    // can copy it and paste it into another program when needed."
+    // Live LogScreen now copies the entire disk log, same as the
+    // dead-slot Copy Log button on TitleScreen. The disk log
+    // grows unbounded (appendLogToDisk has no cap); the only hard
+    // ceiling is AsyncStorage's per-key size, which on this
+    // Android default is ~6 MB ≈ 52k lines — beyond any
+    // realistic single-session need.
+    await Clipboard.setStringAsync(diskLog);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }
@@ -47,7 +47,7 @@ export function LogScreen() {
         <Text style={styles.body}>{diskLog}</Text>
       </ScrollView>
       <TouchableOpacity style={styles.copyBtn} onPress={handleCopy} activeOpacity={0.7}>
-        <Text style={styles.copyText}>{copied ? 'COPIED' : 'COPY LAST 500 LINES'}</Text>
+        <Text style={styles.copyText}>{copied ? 'COPIED' : 'COPY ALL'}</Text>
       </TouchableOpacity>
     </View>
   );

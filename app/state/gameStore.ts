@@ -810,24 +810,28 @@ interface GameStore {
   persist: () => Promise<void>;
 }
 
-// OTA 199 — in-memory log cap removed per playtester: "the log
-// stops populating after a while, see what the cap is and remove
-// it." Previously capped at 500 lines (.slice(-500) on every
-// append), which evicted older entries from the live AdventureFeed
-// once a long session crossed the threshold. The disk-side log
-// (appendLogToDisk in saveSystem) was already unbounded — the in-
-// memory cap was only there for older device safety. Now both
-// sides grow with the session.
+// OTA 199-200 — log fully uncapped per playtester directive:
+// "uncap log limits so it always records every event and I can
+// copy it and paste it into another program when needed."
 //
-// Trade-off: each appendLog now spreads the full array on update.
-// For a 10k-line session that's ~10k entries per spread which is
-// still <1ms in practice. If a future device hits memory pressure
-// we can revisit (windowed feed vs. periodic compaction). The
-// disk log remains the source of truth for cross-session history;
-// in-memory exists purely for the live feed render.
+// Every path is now unbounded:
+//   - in-memory log (this constant)            — Infinity
+//   - disk log (appendLogToDisk in saveSystem) — already was
+//   - LogScreen Copy button                    — full disk
+//   - TitleScreen dead-slot Copy Log           — full disk
 //
-// Kept the constant exported as a no-op landing pad so any future
-// "show me last N lines" feature has a documented anchor.
+// The .slice(-MAX_LOG_IN_MEMORY) calls scattered through this
+// file still exist; with -Infinity as the start index, slice
+// clamps to 0 and returns the full array (effective no-op). The
+// constant is kept so a future "cap at N" experiment can flip it
+// without re-wiring every call site.
+//
+// Hard ceiling (informational): AsyncStorage's per-key Android
+// default is ~6 MB. At ~116 bytes per persisted line, that's
+// ~52,000 lines — well past any realistic single-session need.
+// If we ever ship a build for marathon sessions, bump
+// AsyncStorage_db_size_in_MB in android/gradle.properties (native
+// build required, not OTA).
 const MAX_LOG_IN_MEMORY = Number.POSITIVE_INFINITY;
 
 export const useGameStore = create<GameStore>((set, get) => ({
