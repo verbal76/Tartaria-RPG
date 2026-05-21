@@ -99,6 +99,110 @@
         { "name": "Aetheric Pelt", "quantity": 1 },
         { "name": "Aetheric Shard", "quantity": 2 }
       ]
+    },
+    {
+      "result": "Sludge-Forged Vest",
+      "ingredients": [
+        { "name": "Aetheric Sludge", "quantity": 2 },
+        { "name": "Patched Cloth", "quantity": 1 },
+        { "name": "Spider Silk", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Aether-Wing Cloak",
+      "ingredients": [
+        { "name": "Aether Wing", "quantity": 2 },
+        { "name": "Aetheric Cloth", "quantity": 1 },
+        { "name": "Spider Silk", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Mudstone Bulwark",
+      "ingredients": [
+        { "name": "Hardened Mudstone", "quantity": 2 },
+        { "name": "Scrap Metal", "quantity": 2 },
+        { "name": "Patched Cloth", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Mud Gem Amulet",
+      "ingredients": [
+        { "name": "Mud Gem", "quantity": 1 },
+        { "name": "Aetheric Shard", "quantity": 1 },
+        { "name": "Spider Silk", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Aether-Shard Ring",
+      "ingredients": [
+        { "name": "Aether Shard", "quantity": 1 },
+        { "name": "Scrap Metal", "quantity": 1 },
+        { "name": "Aether Residue", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Resonant Song Phial",
+      "ingredients": [
+        { "name": "Aetheric Song", "quantity": 1 },
+        { "name": "Aether Crystal", "quantity": 1 },
+        { "name": "Aetheric Dust", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Lich-Heart Pendant",
+      "ingredients": [
+        { "name": "Aetherstone Heart", "quantity": 1 },
+        { "name": "Aetheric Shard", "quantity": 2 },
+        { "name": "Aetheric Cloth", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Hollow Crown Circlet",
+      "ingredients": [
+        { "name": "Throne Shard", "quantity": 1 },
+        { "name": "Mudstone", "quantity": 1 },
+        { "name": "Aetheric Shard", "quantity": 2 }
+      ]
+    },
+    {
+      "result": "Iron-Worm Engine",
+      "ingredients": [
+        { "name": "Iron Core", "quantity": 1 },
+        { "name": "Scrap Metal", "quantity": 3 },
+        { "name": "Drone Core", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Wyrm-Fang Blade",
+      "ingredients": [
+        { "name": "Wyrm Fang", "quantity": 1 },
+        { "name": "Scrap Metal", "quantity": 2 },
+        { "name": "Spider Silk", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Voidspawn Bolt",
+      "ingredients": [
+        { "name": "Voidspawn Egg", "quantity": 1 },
+        { "name": "Energy Fragment", "quantity": 1 },
+        { "name": "Aetheric Dust", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Mud-Iron Greatblade",
+      "ingredients": [
+        { "name": "Mud-Iron Heart", "quantity": 1 },
+        { "name": "Hardened Mudstone", "quantity": 1 },
+        { "name": "Scrap Metal", "quantity": 2 }
+      ]
+    },
+    {
+      "result": "Behemoth-Heart Talisman",
+      "ingredients": [
+        { "name": "Behemoth Heart", "quantity": 1 },
+        { "name": "Aetheric Pelt", "quantity": 1 },
+        { "name": "Aetheric Shard", "quantity": 2 }
+      ]
     }
   ]
 }

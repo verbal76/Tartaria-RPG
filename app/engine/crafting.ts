@@ -1,4 +1,5 @@
 import type { InventoryItem, Rarity, DamageType } from './types';
+import type { ItemEffect } from './itemEffect';
 import { levenshtein } from './editDistance';
 import { resolveItemAlias } from './itemAliases';
 import materialsData from '../data/items/materials.json';
@@ -8,6 +9,7 @@ import gearData from '../data/items/gear.json';
 import recipesData from '../data/items/recipes.json';
 import amuletsData from '../data/items/amulets.json';
 import ringsData from '../data/items/rings.json';
+import explorationData from '../data/items/exploration.json';
 import { inferWeapon, inferArmor, inferAccessory } from './itemDefaults';
 
 export interface CatalogMaterial {
@@ -15,6 +17,9 @@ export interface CatalogMaterial {
   rarity: Rarity;
   tags: string[];
   description: string;
+  /** OTA 192 — optional effect tag. See engine/itemEffect.ts for
+   *  the schema and how the engine consumes it. */
+  effect?: ItemEffect;
 }
 
 export type WeaponStyle = 'two_handed' | 'dual_wield' | 'single_handed' | 'ranged' | 'shield' | 'runecaster';
@@ -65,6 +70,24 @@ export interface CatalogGear {
   rarity: Rarity;
   tags: string[];
   description: string;
+  effect?: ItemEffect;
+}
+
+/** Exploration items — the catalog the OTA 192 audit identified as
+ *  the largest orphan source (78 of 96 had no mechanical hook).
+ *  After OTA 192 every row may carry an `effect` field that drives
+ *  passive stat bonuses, consumable use-actions, or scene-gate
+ *  unlocks. */
+export interface CatalogExploration {
+  name: string;
+  kind: string;
+  rarity: Rarity;
+  faction?: string;
+  abilityReq?: string;
+  tcBuy?: number;
+  tags: string[];
+  description: string;
+  effect?: ItemEffect;
 }
 
 export interface CatalogAccessory {
@@ -75,6 +98,7 @@ export interface CatalogAccessory {
   baseDurability?: number;
   tags: string[];
   description: string;
+  effect?: ItemEffect;
 }
 
 export interface RecipeIngredient {
@@ -94,6 +118,10 @@ export const GEAR = (gearData as { gear: CatalogGear[] }).gear;
 export const RECIPES = (recipesData as { recipes: Recipe[] }).recipes;
 export const AMULETS = (amuletsData as { amulets: CatalogAccessory[] }).amulets;
 export const RINGS = (ringsData as { rings: CatalogAccessory[] }).rings;
+// Note: exploration.json is a bare top-level array, unlike the
+// other catalogs which wrap in { weapons: [...] }, { armor: [...] },
+// etc. Don't try to unwrap.
+export const EXPLORATION = explorationData as CatalogExploration[];
 
 const DEFAULT_DURABILITY = 25;
 
@@ -278,6 +306,35 @@ export function findRingByName(name: string): CatalogAccessory | null {
     return inferAccessory(name);
   }
   return null;
+}
+
+/** OTA 192 — name → exploration catalog row. Used by the new
+ *  effect resolver (itemEffect.ts) so any inventory item that
+ *  carries an `effect` field can be looked up and applied
+ *  (passive stat bonus, consumable use, gate unlock). Returns
+ *  null when not found — no inference fallback, since the
+ *  exploration catalog is a closed list. */
+export function findExplorationItemByName(name: string): CatalogExploration | null {
+  const t = name.toLowerCase().trim();
+  if (!t) return null;
+  return EXPLORATION.find((e) => e.name.toLowerCase() === t) ?? null;
+}
+
+/** Same for materials. The 13 orphan materials from the OTA 192
+ *  audit now carry recipe-consumer relationships, but other code
+ *  paths (salvage, lore lookup) want catalog access too. */
+export function findMaterialByName(name: string): CatalogMaterial | null {
+  const t = name.toLowerCase().trim();
+  if (!t) return null;
+  return MATERIALS.find((m) => m.name.toLowerCase() === t) ?? null;
+}
+
+/** Same for gear — small catalog (6 items as of OTA 192) but the
+ *  effect resolver needs a uniform lookup interface. */
+export function findGearByName(name: string): CatalogGear | null {
+  const t = name.toLowerCase().trim();
+  if (!t) return null;
+  return GEAR.find((g) => g.name.toLowerCase() === t) ?? null;
 }
 
 export function fuzzyFindWeapon(text: string): CatalogWeapon | null {

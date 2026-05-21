@@ -1,5 +1,6 @@
 import type { InventoryItem, EquipSlot, PlayerCharacter, Stats } from './types';
-import { findWeaponByName, findArmorByName, findAmuletByName, findRingByName, GEAR } from './crafting';
+import { findWeaponByName, findArmorByName, findAmuletByName, findRingByName, GEAR, findExplorationItemByName, findGearByName, findMaterialByName } from './crafting';
+import { aggregateInventoryPassives, inventoryHasGate, type EffectResolver, type GateKind } from './itemEffect';
 
 /**
  * Return the list of slots an item could legally be equipped into.
@@ -124,6 +125,43 @@ export function resolveEquippedItem(
 type StatKey = keyof Stats;
 const STAT_KEYS: StatKey[] = ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma'];
 
+// Shared resolver list — the effect system can be backed by any
+// catalog row that carries an `effect` field. As of OTA 192 that's
+// exploration / gear / material rows in addition to the existing
+// armor / amulet / ring rows. Order doesn't matter (no item appears
+// in more than one catalog by name).
+const EFFECT_RESOLVERS: EffectResolver[] = [
+  (n) => findExplorationItemByName(n),
+  (n) => findGearByName(n),
+  (n) => findMaterialByName(n),
+  // Equipped-class catalogs also flow through so a future ring or
+  // amulet author can attach an `effect` (e.g. a ring that grants
+  // a gate) without needing extra wiring here.
+  (n) => findAmuletByName(n),
+  (n) => findRingByName(n),
+];
+
+/** OTA 192 — sum passive stat bonuses from items that just LIVE in
+ *  the player's inventory (no equip required). Capped per stat by
+ *  PASSIVE_STAT_CAP inside itemEffect.ts so a backpack full of
+ *  +1 INT exploration tools can't inflate the build past +2 INT.
+ *  Stackable items (e.g. 3 Communicators) contribute their effect
+ *  per-stack-entry — the cap is the real ceiling. */
+export function aggregateInventoryPassiveStatBonuses(player: PlayerCharacter): Partial<Stats> {
+  const names = (player.inventory ?? []).map((i) => i.name);
+  return aggregateInventoryPassives(names, EFFECT_RESOLVERS);
+}
+
+/** OTA 192 — public helper for scene/travel code that needs to gate
+ *  a tile on owning the right tool. Pass the gate kind (e.g.
+ *  'breathe_toxic'); we'll scan the player's inventory for any
+ *  item whose effect.unlocks matches and return true on the first
+ *  hit. False if no item grants it. */
+export function playerHasGate(player: PlayerCharacter, gate: GateKind): boolean {
+  const names = (player.inventory ?? []).map((i) => i.name);
+  return inventoryHasGate(names, gate, EFFECT_RESOLVERS);
+}
+
 // Sum stat bonuses from every equipped piece (armor pieces with statBonus,
 // amulets, rings). Items broken or unequipped contribute nothing. The
 // returned object only includes the five base stats; non-stat bonuses
@@ -163,12 +201,15 @@ export function effectiveStats(
   weatherMod?: Partial<Stats>,
 ): Stats {
   const bonus = aggregateEquippedStatBonuses(player);
+  // OTA 192 — inventory passives stack on top (capped per-stat to
+  // prevent backpack-build inflation).
+  const inv = aggregateInventoryPassiveStatBonuses(player);
   const w = weatherMod ?? {};
   return {
-    strength: player.stats.strength + (bonus.strength ?? 0) + (w.strength ?? 0),
-    dexterity: player.stats.dexterity + (bonus.dexterity ?? 0) + (w.dexterity ?? 0),
-    intelligence: player.stats.intelligence + (bonus.intelligence ?? 0) + (w.intelligence ?? 0),
-    wisdom: player.stats.wisdom + (bonus.wisdom ?? 0) + (w.wisdom ?? 0),
-    charisma: player.stats.charisma + (bonus.charisma ?? 0) + (w.charisma ?? 0),
+    strength: player.stats.strength + (bonus.strength ?? 0) + (inv.strength ?? 0) + (w.strength ?? 0),
+    dexterity: player.stats.dexterity + (bonus.dexterity ?? 0) + (inv.dexterity ?? 0) + (w.dexterity ?? 0),
+    intelligence: player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (w.intelligence ?? 0),
+    wisdom: player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (w.wisdom ?? 0),
+    charisma: player.stats.charisma + (bonus.charisma ?? 0) + (inv.charisma ?? 0) + (w.charisma ?? 0),
   };
 }

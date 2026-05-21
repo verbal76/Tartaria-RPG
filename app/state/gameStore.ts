@@ -3234,11 +3234,76 @@ export const useGameStore = create<GameStore>((set, get) => ({
       case 'escape':
       case 'cast':
       case 'use_relic': {
-        // Consumable shortcut — "use first aid kit" / "use ration" /
-        // any catalog consumable should consume one and apply its
-        // healing effect, not roll a Wisdom check on the bandages.
-        // The skill-check path stays the fallback for actual relics
-        // (Aetheric Torch, Locket, Compass, etc.).
+        // OTA 192 — effect-driven consumable use. If the resolved
+        // inventory item has effect.kind === 'consumable' in its
+        // catalog row, fire each effect field (heal, stamina,
+        // corruption-reduce, etc.) and consume one. Items that
+        // carry an effect tag take precedence over the legacy
+        // kind === 'consumable' 1d6-heal default below, which
+        // means a Pulse Scanner (kind:'exploration') with a
+        // consumable effect now finally works when the player
+        // types 'use pulse scanner'.
+        if (parsed.resolvedItemId) {
+          const used = player.inventory.find((i) => i.id === parsed.resolvedItemId);
+          if (used) {
+            const { resolveItemEffect } = require('../engine/itemEffect');
+            const { findExplorationItemByName, findGearByName, findMaterialByName } = require('../engine/crafting');
+            const resolvers = [findExplorationItemByName, findGearByName, findMaterialByName];
+            const fx = resolveItemEffect(used.name, resolvers);
+            if (fx?.kind === 'consumable') {
+              const messages: string[] = [];
+              let p = { ...player };
+              if (fx.healHP) {
+                const room = Math.max(0, p.hpMax - p.hp);
+                const amt = Math.min(room, fx.healHP);
+                p = { ...p, hp: p.hp + amt };
+                messages.push(amt > 0 ? `+${amt} HP` : 'HP already full');
+              }
+              if (fx.restoreStamina) {
+                const room = Math.max(0, p.staminaMax - p.stamina);
+                const amt = Math.min(room, fx.restoreStamina);
+                p = { ...p, stamina: p.stamina + amt };
+                messages.push(amt > 0 ? `+${amt} stamina` : 'stamina already full');
+              }
+              if (fx.reduceCorruption) {
+                const before = p.corruption;
+                p = { ...p, corruption: Math.max(0, before - fx.reduceCorruption) };
+                const cleared = before - p.corruption;
+                messages.push(cleared > 0 ? `-${cleared} corruption` : 'no corruption to clear');
+              }
+              if (fx.revealScene) {
+                // Surface up to three hidden hooks the player hasn't
+                // tripped yet — the use of the scanner / detector
+                // makes the room legible. We don't mutate scene
+                // state here (no per-tile "revealed" flag exists);
+                // a quick narration line is the effect.
+                const hooks = currentScene.hooks ?? [];
+                const visible = hooks
+                  .filter((h) => !h.resolved)
+                  .slice(0, 3)
+                  .map((h) => h.nouns[0] ?? h.id);
+                messages.push(visible.length > 0 ? `pings: ${visible.join(', ')}` : 'no resonance to surface');
+              }
+              if (fx.extendLight) {
+                messages.push(`+${fx.extendLight}h light buff`);
+                // Light-buff carrier wiring is future work — for now
+                // surface the line so the player knows the item
+                // fired. Cheap deliverable until the buff system
+                // lands.
+              }
+              const newInventory = p.inventory
+                .map((i) => (i.id === used.id ? { ...i, quantity: i.quantity - 1 } : i))
+                .filter((i) => i.quantity > 0);
+              p = { ...p, inventory: newInventory };
+              set({ player: advanceTime(p, 0.25) });
+              get().appendLog('world', `You use one ${used.name}. ${messages.join(', ')}.`);
+              void get().persist();
+              break;
+            }
+          }
+        }
+        // Legacy path — generic 1d6 heal for catalog-kind consumables
+        // that don't carry an effect tag yet (First Aid Kit, etc.).
         const usedConsumable = parsed.resolvedItemId
           ? player.inventory.find((i) => i.id === parsed.resolvedItemId && i.kind === 'consumable')
           : undefined;
