@@ -9161,13 +9161,30 @@ function narrateAmbientFind(
   const isPlural = /s$/i.test(noun);
   const pronoun = isPlural ? 'them' : 'it';
   const aroundPronoun = isPlural ? 'them' : 'it';
-  const lines = [
-    `You look closer at the ${noun}. Mud-glazed, undisturbed for a long while.`,
+  // Hub rooms (the outpost gate, square, mess, armory) have authored
+  // floors — boards and brick, not silt. Outdoor wilderness is silt
+  // and mud-glass. Two pools so a Reclaimers' Outpost lever stops
+  // being "half-swallowed by silt" while the dig action refuses with
+  // "the outpost floors are board and brick — no silt to scrape".
+  // Three neutral lines sit in both pools so the rotation overlaps
+  // sensibly when the player searches across both room types.
+  const inHub = !!get().player?.hubRoomId;
+  const neutral = [
     `You examine the ${noun}. Tartaria has not given up its secrets here.`,
     `You study the ${noun}. The Aetheric haze around ${aroundPronoun} thickens, then settles.`,
     `You inspect the ${noun}. Whatever was here once, this is what remains.`,
+  ];
+  const wilderness = [
+    ...neutral,
+    `You look closer at the ${noun}. Mud-glazed, undisturbed for a long while.`,
     `You crouch beside the ${noun}. The silt has half-swallowed ${pronoun}.`,
   ];
+  const indoor = [
+    ...neutral,
+    `You look closer at the ${noun}. Dust-glazed, undisturbed for a long while.`,
+    `You crouch beside the ${noun}. The floorboards have warped around ${pronoun} over the years.`,
+  ];
+  const lines = inHub ? indoor : wilderness;
   get().appendLog('world', pick(lines));
   // Searchable nouns (walls, tablets, murals, inscriptions, journals,
   // maps, etc.) get a ~12% chance to reveal a hidden-text line on top
