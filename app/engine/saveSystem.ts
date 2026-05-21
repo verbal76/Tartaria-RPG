@@ -194,6 +194,21 @@ export async function readFullLog(): Promise<string> {
   }
 }
 
+// Wipe the on-disk log for the active slot. Used by the CLEAR LOG
+// button on the exploration screen so the player can submit fresh
+// playtest deltas instead of re-sending the same accumulated history
+// on every troubleshooting round. Drains pending writes first so a
+// write racing with the clear doesn't leave a one-line leftover.
+export async function clearActiveSlotLog(): Promise<void> {
+  if (!activeSlotId) return;
+  await logWriteChain;
+  try {
+    await AsyncStorage.removeItem(slotLogKey(activeSlotId));
+  } catch {
+    /* ignore — the log will repopulate from the next append */
+  }
+}
+
 // Read any slot's log directly without activating it. Used by the title
 // screen so a player can copy out a fallen character's history without
 // loading the save (dead characters can't be selected). Drains pending
