@@ -320,7 +320,14 @@ function QuickBtn({
       style={[styles.quick, defensive && styles.quickDefensive]}
       onPress={onPress}
     >
-      <Text style={[styles.quickText, defensive && styles.quickDefensiveText]}>{label}</Text>
+      {/* OTA 206 — all action-button labels uppercased per playtester:
+          "all of the action buttons Dodge flee search take… all of
+          those should be all in capitals. Being all in lowercase
+          makes them look insignificant." Applied here at the render
+          site so every QuickBtn caller (static labels, weapon names
+          via shortWeaponLabel, peace-mode quick actions) gets the
+          uppercase treatment without per-call edits. */}
+      <Text style={[styles.quickText, defensive && styles.quickDefensiveText]}>{label.toUpperCase()}</Text>
     </TouchableOpacity>
   );
 }
