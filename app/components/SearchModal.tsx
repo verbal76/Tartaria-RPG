@@ -11,10 +11,18 @@ import {
   Keyboard,
 } from 'react-native';
 
+import type { InteractableChip } from './InteractableChip';
+
 interface Props {
   visible: boolean;
-  /** Hints surfaced to the player as suggested search targets. Optional. */
-  hints?: string[];
+  /** Per-room searchable chips. Each entry carries a `consumed`
+   *  flag so the modal can drop the chip from the list once the
+   *  noun has been worked over (rule shared across Search /
+   *  Salvage / Take modals as of OTA 191). One chip — 'the
+   *  ground' — sets alwaysShow:true so it persists in the list
+   *  greyed after a dig, since the ground is a permanent
+   *  affordance per room. ExplorationScreen builds this list. */
+  chips?: InteractableChip[];
   onSubmit: (target: string) => void;
   onCancel: () => void;
 }
@@ -23,7 +31,7 @@ interface Props {
 // for. The submitted text is routed to the investigate intent with the
 // target — letting the engine try hook, ambient noun, item, then
 // re-prompt if nothing matches.
-export function SearchModal({ visible, hints, onSubmit, onCancel }: Props) {
+export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
 
@@ -57,8 +65,16 @@ export function SearchModal({ visible, hints, onSubmit, onCancel }: Props) {
     Keyboard.dismiss();
     onSubmit(target);
   };
-  const sceneHints = (hints ?? []).slice(0, 5);
-  const commonHints = ['the ground', 'the wall', 'the rubble', 'the silt', 'the doorway'];
+  // Visible scene chips — drop consumed nouns unless alwaysShow.
+  // OTA 191 spec: 'the ground' is pinned at top with alwaysShow so it
+  // greys out after a dig; every other consumed noun (rusted blade
+  // after take, scrap pile after salvage) disappears from the list.
+  const visibleChips = (chips ?? []).filter((c) => !c.consumed || c.alwaysShow);
+  // Keep a short Common row for fallback verbs the scene might not
+  // explicitly surface. 'the ground' moved out of this row into the
+  // pinned scene chips so it lives alongside the visible nouns
+  // instead of buried below.
+  const commonHints = ['the wall', 'the rubble', 'the silt', 'the doorway'];
 
   return (
     <Modal
@@ -94,7 +110,7 @@ export function SearchModal({ visible, hints, onSubmit, onCancel }: Props) {
                 autoCapitalize="none"
               />
 
-              {sceneHints.length > 0 && (
+              {visibleChips.length > 0 && (
                 <>
                   <Text style={styles.chipLabel}>In this scene</Text>
                   <ScrollView
@@ -102,13 +118,27 @@ export function SearchModal({ visible, hints, onSubmit, onCancel }: Props) {
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={styles.chipScrollRow}
                   >
-                    {sceneHints.map((h) => (
+                    {visibleChips.map((c) => (
                       <Pressable
-                        key={`scene-${h}`}
-                        style={({ pressed }) => [styles.chip, styles.chipScene, pressed && styles.btnPressed]}
-                        onPress={() => tapToSearch(h)}
+                        key={`scene-${c.noun}`}
+                        style={({ pressed }) => [
+                          styles.chip,
+                          styles.chipScene,
+                          c.consumed && styles.chipConsumed,
+                          pressed && !c.consumed && styles.btnPressed,
+                        ]}
+                        disabled={c.consumed}
+                        onPress={() => tapToSearch(c.noun)}
                       >
-                        <Text style={styles.chipTextScene} numberOfLines={1}>{h}</Text>
+                        <Text
+                          style={[
+                            styles.chipTextScene,
+                            c.consumed && styles.chipTextConsumed,
+                          ]}
+                          numberOfLines={1}
+                        >
+                          {c.noun}{c.consumed ? ' ✓' : ''}
+                        </Text>
                       </Pressable>
                     ))}
                   </ScrollView>
@@ -201,6 +231,15 @@ const styles = StyleSheet.create({
   chipScene: { borderColor: '#9ec96a' },
   chipText: { color: '#cdbf99', fontSize: 12 },
   chipTextScene: { color: '#9ec96a', fontSize: 12 },
+  // Consumed chip — used by 'the ground' after a dig (alwaysShow
+  // keeps it in the list). Muted border + reduced opacity so it
+  // reads as exhausted but still visible.
+  chipConsumed: {
+    backgroundColor: '#13110f',
+    borderColor: '#3a342c',
+    opacity: 0.55,
+  },
+  chipTextConsumed: { color: '#7a705c', fontStyle: 'italic' },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 14 },
   btn: {
     paddingHorizontal: 14,

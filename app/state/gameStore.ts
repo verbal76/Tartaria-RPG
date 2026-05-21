@@ -7728,6 +7728,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Still record the last-dug spot for any callers that read it,
     // but no longer use it as a refusal gate.
     void spotKey;
+    // Mark 'ground' as searched in this room's searchedAmbientNouns
+    // so the Search modal's pinned ground chip greys out (per OTA
+    // 191 chip-rendering spec). Every dig attempt — successful or
+    // not — counts; the chip stays consumed for the whole room
+    // visit. The dig itself is still re-rollable engine-side
+    // (stamina-throttled, no per-spot lockout); the chip is just
+    // a UI signal that the player has worked the ground here.
+    const groundRoomKey = makeRoomKey(player.currentLocationId, scene?.microMicroId, player.mapX, player.mapY);
+    set((s) => {
+      const room = s.worldMemory.visitedRooms?.[groundRoomKey] ?? {
+        firstVisitAt: Date.now(),
+        lastVisitAt: Date.now(),
+        visitCount: 1,
+      };
+      if ((room.searchedAmbientNouns ?? []).includes('ground')) return s;
+      return {
+        worldMemory: {
+          ...s.worldMemory,
+          visitedRooms: {
+            ...(s.worldMemory.visitedRooms ?? {}),
+            [groundRoomKey]: {
+              ...room,
+              searchedAmbientNouns: [...(room.searchedAmbientNouns ?? []), 'ground'],
+            },
+          },
+        },
+      };
+    });
     const { item, score } = bestDigTool(player.inventory);
     // Require a real tool. bestDigTool returns score=1 for bare hands;
     // anything 2+ means the player has at least an improvised edge

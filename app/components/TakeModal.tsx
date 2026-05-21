@@ -20,22 +20,21 @@ import {
   Pressable,
 } from 'react-native';
 
-export interface TakeableChip {
-  /** Display noun (matches the look-around ambient text). */
-  noun: string;
-  /** Already taken / worked over in this room. Rendered greyed-out
-   *  and untappable. */
-  consumed: boolean;
-}
+// Re-export the shared chip type so existing imports continue to
+// resolve. The InteractableChip rules drive the take modal's
+// hide-vs-grey behaviour now.
+export type { InteractableChip as TakeableChip } from './InteractableChip';
 
 interface Props {
   visible: boolean;
   /** Pre-filtered list of takeable ambient nouns — catalog-resolvable
-   *  and not over-sized. Each entry carries a `consumed` flag so the
-   *  modal can grey out chips that have already been claimed in this
-   *  room without removing them entirely (player keeps the visual
-   *  reminder of what was in the scene). */
-  takeable: TakeableChip[];
+   *  and not over-sized. Per OTA 191, the modal HIDES chips marked
+   *  consumed (rather than greying them) unless alwaysShow=true on
+   *  the chip. Take chips never use alwaysShow, so a successful take
+   *  removes the noun from the list. The previous grey-out behaviour
+   *  was confusing per playtester ("once successful, it should
+   *  disappear from the noun list on all actions"). */
+  takeable: import('./InteractableChip').InteractableChip[];
   /** Open take (no roll, always succeeds). */
   onTake: (noun: string) => void;
   /** Stealth take — DEX vs DC 10 sleight check. Routes to
@@ -88,14 +87,21 @@ export function TakeModal({ visible, takeable, onTake, onStealthTake, onCancel }
                 </Text>
               </Pressable>
 
-              {takeable.length === 0 ? (
+              {(() => {
+                // Per OTA 191: hide consumed chips unless alwaysShow.
+                // Take chips never use alwaysShow → consumed chips
+                // disappear entirely once grabbed. This matches the
+                // playtester spec ("once successful, it is removed
+                // from that locations noun list on all actions").
+                const visible = takeable.filter((c) => !c.consumed || c.alwaysShow);
+                return visible.length === 0 ? (
                 <Text style={styles.empty}>
                   Nothing here you can pocket. Scene features (pillars, walls,
                   arches) can't be taken — try SALVAGE for parts instead.
                 </Text>
               ) : (
                 <ScrollView style={styles.chipScroll} contentContainerStyle={styles.chipList}>
-                  {takeable.map(({ noun, consumed }) => (
+                  {visible.map(({ noun, consumed }) => (
                     <Pressable
                       key={noun}
                       style={({ pressed }) => [
@@ -124,7 +130,8 @@ export function TakeModal({ visible, takeable, onTake, onStealthTake, onCancel }
                     </Pressable>
                   ))}
                 </ScrollView>
-              )}
+              );
+              })()}
 
               <View style={styles.btnRow}>
                 <Pressable

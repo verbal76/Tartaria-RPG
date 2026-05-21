@@ -268,10 +268,25 @@ export function ExplorationScreen() {
 
       <SearchModal
         visible={searchOpen}
-        hints={buildChipPool(currentScene)}
+        chips={[
+          // 'the ground' pinned at the top of the scene chip row
+          // with alwaysShow so it greys (not removed) after a dig
+          // in this room. Per OTA 191: dig replaces the old
+          // dig-only ground search and the chip should persist as
+          // a permanent affordance per room.
+          {
+            noun: 'the ground',
+            consumed: isAmbientConsumed('ground'),
+            alwaysShow: true,
+          },
+          ...buildChipPool(currentScene).map((n) => ({
+            noun: n,
+            consumed: isAmbientConsumed(n),
+          })),
+        ]}
         onSubmit={(target) => {
           setSearchOpen(false);
-          submit(`search the ${target}`);
+          submit(`search ${target}`);
         }}
         onCancel={() => setSearchOpen(false)}
       />
@@ -294,7 +309,10 @@ export function ExplorationScreen() {
 
       <SalvageModal
         visible={salvageOpen}
-        hints={buildChipPool(currentScene)}
+        chips={buildChipPool(currentScene).map((n) => ({
+          noun: n,
+          consumed: isAmbientConsumed(n),
+        }))}
         onSubmit={(target) => {
           setSalvageOpen(false);
           // Submit raw target — the modal's chip text already includes

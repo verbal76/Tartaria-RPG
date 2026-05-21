@@ -13,13 +13,21 @@ import {
 import { useGameStore } from '../state/gameStore';
 import type { InventoryItem } from '../engine/types';
 import { computeInventoryDelta, type InventoryDelta } from './inventoryDelta';
+import type { InteractableChip } from './InteractableChip';
 
 interface Props {
   visible: boolean;
   /** Scene-noun pool from buildChipPool. We filter for things that
    *  look salvageable (constructs, drones, wreckage, machinery, etc.)
-   *  and surface those as the chip row. */
+   *  and surface those as the chip row.
+   *  Legacy string[] form kept for back-compat callers; the OTA 191
+   *  callers pass `chips: InteractableChip[]` so consumed nouns can
+   *  be dropped from the list (matches Search / Take behaviour). */
   hints?: string[];
+  /** Per-room interactable chips with consumed flags. When passed,
+   *  takes precedence over `hints`. Consumed chips are removed from
+   *  the list entirely (no alwaysShow use case in salvage). */
+  chips?: InteractableChip[];
   onSubmit: (target: string) => void;
   onCancel: () => void;
 }
@@ -37,7 +45,7 @@ function isSalvageable(noun: string): boolean {
   return SALVAGE_PATTERN.test(noun);
 }
 
-export function SalvageModal({ visible, hints, onSubmit, onCancel }: Props) {
+export function SalvageModal({ visible, hints, chips, onSubmit, onCancel }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
   // Modal phase. 'select' shows the input + chip row; 'results' shows
@@ -94,7 +102,16 @@ export function SalvageModal({ visible, hints, onSubmit, onCancel }: Props) {
     runSubmit(target);
   };
 
-  const sceneHints = (hints ?? []).filter(isSalvageable).slice(0, 5);
+  // Prefer the new chips form (with consumed flags) when caller
+  // passes it; fall back to the legacy hints list. Either way the
+  // result is filtered to salvage-pattern matches and capped at 5.
+  const sceneHints = chips
+    ? chips
+        .filter((c) => !c.consumed) // hide consumed scene nouns entirely
+        .filter((c) => isSalvageable(c.noun))
+        .slice(0, 5)
+        .map((c) => c.noun)
+    : (hints ?? []).filter(isSalvageable).slice(0, 5);
   const commonHints = ['the wreck', 'the construct', 'the drone', 'the machinery', 'the husk'];
 
   return (
