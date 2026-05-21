@@ -119,7 +119,11 @@ const HUB_OPENING_LINES = [
   `The outpost's lanterns sway in a draft that should not reach this far inside.`,
   `Reclaimers move past you on small errands — checking ropes, counting beads, pretending not to study the new arrival.`,
   `Somewhere behind the back wall, a kettle whistles itself empty and no one moves to take it off.`,
-  `The Arbiter is already here, of course. They were here before the outpost; they will be here after.`,
+  // OTA 203 — Arbiter intro updated for the new vibe. Old line was
+  // narrator-mystical ("they were here before the outpost"); new
+  // line plants the cloak + the I-don't-care + the watching-you
+  // beat so first impressions land closer to the actual character.
+  `The Arbiter is already here, slouched against a post under a cloak that has seen more weather than most people. He looks asleep. He isn't. His eyes track you for one quiet beat before he goes back to looking at nothing.`,
   `A map-stone hums softly at the center of the camp — old enough to remember roads the Flood erased.`,
   `Smoke from the cook-fires turns blue where the Aether crosses it. No one comments.`,
 ];
@@ -136,6 +140,29 @@ export interface SceneInput {
 // Lore pool wiring
 // ---------------------------------------------------------------------------
 
+// OTA 203 — Arbiter voice refresh.
+// The vibe brief: he looks old and unassuming under a cloak, talks in
+// cryptic shorthand that reads as nonsense until you parse it ("the
+// desert walks with you" = you're being followed). Casual, terse,
+// slightly bored on the surface. Under the cloak he carries dual
+// bolt-casters; he's killed more out here than he's ever said. He
+// knows the Aether, the old machinery, the old ways — he just
+// doesn't care to flaunt it. He sees something in YOU, watches you
+// for reasons he won't explain. He likes you. Don't read that as
+// benevolence — cross him and he'll snap your neck, bury you where
+// you fell, and walk on.
+//
+// Implementation: ADD new lines alongside the existing
+// philosophical-narrator pools (don't replace — diverse rotation
+// is healthier than wholesale rewrite). Three new registers
+// distributed across the pools below:
+//   1. CRYPTIC-SHORTHAND ("desert walks with you", "how many shadows")
+//   2. CASUAL-DON'T-CARE ("Yes. It's behind you. Has been for two days.")
+//   3. LETHALITY-UNDERCURRENT ("two killers in this room", "loosens
+//      something inside the cloak")
+// Plus a few "he sees something in you" lines that fire rarely in
+// peace mode.
+
 // Mood pools — picked when the cognitive layer detects a dominant emotion.
 // Hardcoded baselines stay as fallbacks; lore-curated lines from
 // `arbiter-mood-quotes.json` are concatenated so the pool grows organically.
@@ -146,6 +173,10 @@ const BASE_MOOD_REMARKS: Record<string, string[]> = {
     `"Fear is information," the Arbiter murmurs. "What does yours tell you?"`,
     `"You are not the first to feel this dread in ${'this place'}," the Arbiter says. "Some of them lived."`,
     `The Arbiter's hand tightens on something unseen. "Make your next breath count."`,
+    // OTA 203 — casual / cryptic
+    `The Arbiter does not turn. "Yes. It's behind you. Has been for two days. You're slow."`,
+    `"How many shadows do you have today?" the Arbiter asks. He does not look up.`,
+    `"You picked up something three days back," the Arbiter says. "Hasn't introduced itself yet."`,
   ],
   CURIOSITY: [
     `"The buried world rewards a careful eye," the Arbiter says. "Look longer."`,
@@ -153,6 +184,9 @@ const BASE_MOOD_REMARKS: Record<string, string[]> = {
     `The Arbiter watches your hands. "What you don't understand isn't empty. It's waiting."`,
     `"Half of Tartaria is what was never written down," the Arbiter says. "You're reading the rest."`,
     `"Curiosity buys nothing in the market," the Arbiter says, "but it buys you the next door."`,
+    // OTA 203 — sees something in you
+    `The Arbiter studies you a beat too long. "Hm." He doesn't elaborate.`,
+    `"Tartaria's been quiet about you," the Arbiter says. "That usually means it's paying attention."`,
   ],
   AGGRESSION: [
     `"A blade is a question," the Arbiter says. "Be sure you want the answer."`,
@@ -160,6 +194,10 @@ const BASE_MOOD_REMARKS: Record<string, string[]> = {
     `"Strike like you mean to walk away," the Arbiter says. "Anything less is wasted."`,
     `The Arbiter's gaze stays level. "Violence here is older than language. It will outlast yours."`,
     `"Don't celebrate," the Arbiter says quietly. "Tartaria keeps the body count."`,
+    // OTA 203 — lethality undercurrent
+    `The Arbiter loosens something inside the cloak. "If it comes for both of us, mind the angle."`,
+    `"There are two killers in this room right now," the Arbiter says. "One of them is calmer about it."`,
+    `"Don't make me decide which one of you to leave breathing," the Arbiter says, voice flat.`,
   ],
   CAUTIOUSNESS: [
     `"Patience is a relic too," the Arbiter says. "Few think to carry it."`,
@@ -167,18 +205,28 @@ const BASE_MOOD_REMARKS: Record<string, string[]> = {
     `"Listen for what doesn't repeat," the Arbiter murmurs. "That is where the danger lives."`,
     `"You have not died yet," the Arbiter says. "Find out why before you change anything."`,
     `The Arbiter watches the dust settle. "Move when the stones forget you. Not before."`,
+    // OTA 203 — cryptic-shorthand register
+    `"The desert walks with you," the Arbiter says, and goes back to his cup.`,
+    `"Nothing out here is alone," the Arbiter says, glancing at the horizon. "Including you."`,
+    `The Arbiter watches your shadow. "More of it than the sun explains."`,
   ],
   RESOLVE: [
     `"Resolve is the only relic Tartaria does not corrupt," the Arbiter says.`,
     `The Arbiter inclines their head. "Then keep walking. The road remembers feet that don't stop."`,
     `"Good," the Arbiter says simply. "The next part is harder."`,
     `"Tartaria buries the wavering," the Arbiter says. "It does not bury you yet."`,
+    // OTA 203 — terse approval, sees something in you
+    `The Arbiter nods, once. "That's the first useful thing I've seen you do."`,
+    `"Good," the Arbiter says. The cloak settles. He says nothing else.`,
   ],
   DESPAIR: [
     `"Sit if you must," the Arbiter says. "The ruins will still be here. So will you, if you choose."`,
     `The Arbiter does not look at you. "Despair is fast. Resolve is slow. Pick your speed."`,
     `"Many before you found this same wall," the Arbiter says. "A few walked around it."`,
     `"Rest the body, not the watch," the Arbiter says. "Tartaria does not stop watching."`,
+    // OTA 203 — don't-give-a-shit register
+    `"Pull yourself together," the Arbiter says, voice flat. "Or don't. I've buried both."`,
+    `The Arbiter watches you fold. "I'm not in the business of carrying anyone. Decide which of us walks out."`,
   ],
 };
 
@@ -189,11 +237,16 @@ const BASE_INTENT_REMARKS: Partial<Record<Intent, string[]>> = {
     `The Arbiter watches the blow land or fail. "Both are answers."`,
     `"Make the next strike count for two," the Arbiter says. "Tartaria taxes the first."`,
     `"You attack as if you mean to leave," the Arbiter murmurs. "Good."`,
+    // OTA 203 — casual / lethal
+    `The Arbiter does not look up. "Hit it before it hits you. That's the entire trick."`,
+    `"Either you walk away or it does," the Arbiter says. "I'm not particular."`,
   ],
   stealth: [
     `"The Aetherstone hears breath before it hears footsteps," the Arbiter says quietly. "Mind both."`,
     `The Arbiter's eyes drift across the room. "Quiet is a kind of armour. Wear it well."`,
     `"The watchers here have patience," the Arbiter murmurs. "Match theirs."`,
+    // OTA 203 — first-person flicker, lethality
+    `"I learned to walk this country quiet," the Arbiter says. "It still kills the loud ones first."`,
   ],
   diplomacy: [
     `"Tartaria has more old voices than living ones," the Arbiter says. "Address the right one."`,
@@ -204,26 +257,39 @@ const BASE_INTENT_REMARKS: Partial<Record<Intent, string[]>> = {
     `"Retreat is a relic too," the Arbiter says. "Almost no one carries it."`,
     `The Arbiter steps aside. "Better feet than blood. Go."`,
     `"You can leave and come back," the Arbiter says. "Tartaria will recognise you."`,
+    // OTA 203 — dry
+    `The Arbiter shrugs under the cloak. "Living is a strategy. Pick it more often."`,
   ],
   investigate: [
     `"What you find is half of what is there," the Arbiter says. "Look again later."`,
     `The Arbiter nods at the dust. "Notice what doesn't disturb. That tells you who else moved here."`,
     `"Search the room a second time once you've left it once," the Arbiter says. "Different things will be visible."`,
     `"A relic does not announce itself," the Arbiter murmurs. "It corrects the shape of the room around it."`,
+    // OTA 203 — terse, slightly bored
+    `"Look twice," the Arbiter says. "Tartaria hides the second thing under the first."`,
+    `The Arbiter sips at nothing. "A real find changes the shape of the room. The rest is dust."`,
   ],
   rest: [
     `The Arbiter inclines their head. "Sleep watched is still sleep."`,
     `"Tartaria does not forget the wounded," the Arbiter says. "But it will wait for them."`,
     `"Drink something," the Arbiter says. "The stones drink whatever you don't."`,
+    // OTA 203 — he's watching while you sleep
+    `"Sleep," the Arbiter says. "I'll wake one of us if anything comes. Probably."`,
+    `The Arbiter does not sit. "Rest if you must. I keep my eyes open by habit."`,
   ],
   travel: [
     `"Every road in Tartaria leads down," the Arbiter says, "even when it climbs."`,
     `The Arbiter watches you go. "Mark the way back. Few here remember how to retrace."`,
     `"The buried world is wide," the Arbiter says. "Walk it like it knows you."`,
+    // OTA 203 — cryptic / dry
+    `"East," the Arbiter repeats. "Good. The east is where I'd go if I wanted what's left of me to be a story."`,
+    `The Arbiter watches you walk. "Light feet. The silt is reading you, whether you noticed."`,
   ],
   cast: [
     `"Aether bends to want, not need," the Arbiter says. "Choose carefully."`,
     `"Every channel costs the channeller something," the Arbiter murmurs. "Notice what is gone."`,
+    // OTA 203 — he knows the Aether, just doesn't talk about it
+    `The Arbiter watches the channel without comment. He has seen better. He has seen worse.`,
   ],
   use_relic: [
     `"Relics remember their first hand," the Arbiter says. "You are not it."`,
@@ -408,6 +474,10 @@ function pickMoodPool(mood: string | undefined): string[] | undefined {
 
 // Combat-only Arbiter lines that reference the specific enemy. Used when the
 // scene has an active hostile; takes priority over the generic intent pool.
+// OTA 203 — highest-fired pool (65% chance per combat turn). New lines lean
+// on the lethality-undercurrent and casual-killer registers; he's seen
+// worse, the cloak hides more than it shows, and if you fold he might
+// solve it himself just to keep his afternoon quiet.
 const COMBAT_REMARKS = [
   `The Arbiter watches the {enemy}. "It is not the first thing here that decided to keep its distance, then changed its mind."`,
   `"Footwork over fury," the Arbiter says quietly. "The {enemy} is patient. Be patienter."`,
@@ -417,6 +487,14 @@ const COMBAT_REMARKS = [
   `The Arbiter's hand drifts to nothing in particular. "The {enemy} will not tire before you do. Spend wisely."`,
   `"That one bleeds slow," the Arbiter says. "Make the hit count."`,
   `"You can fight, hide, or speak," the Arbiter says low. "The {enemy} is already deciding for itself."`,
+  // OTA 203 — lethality undercurrent, casual delivery
+  `The Arbiter loosens something inside the cloak, not looking down. "The {enemy} is closer than you think it is."`,
+  `"There are two killers here right now," the Arbiter says, watching the {enemy}. "Be the calmer one."`,
+  `The Arbiter does not move. "If you can't finish the {enemy}, I will. I'd rather not. My afternoon's planned."`,
+  `"That {enemy} is making the same mistake," the Arbiter says, almost bored. "Capitalize."`,
+  `The Arbiter glances at the {enemy} the way you'd glance at weather. "Storm. Pass through it."`,
+  `"Don't tell me what the {enemy} is," the Arbiter says, eyes flat. "Show me what it was."`,
+  `The Arbiter does not look at you. "Kill it before it gets a name. They're harder once they've earned one."`,
 ];
 
 function combatRemark(enemy: Enemy): string {
