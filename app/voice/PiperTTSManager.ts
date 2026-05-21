@@ -49,6 +49,14 @@ interface QueuedUtterance {
    *  lines pass their assigned voice; the pool spins up an instance
    *  for that voice on demand. */
   voiceId: string | null;
+  /** Prefetched samples + the rate they were inferred at. drain()
+   *  pre-runs forward() on the NEXT queued utterance while the
+   *  current one is still playing, so the next sentence's audio is
+   *  ready to play the instant didJustFinish fires. Without this, the
+   *  inter-sentence gap was 0.75–1.25s (next chunk's inference time +
+   *  expo-av's 500ms status poll). With prefetch + 50ms poll the gap
+   *  drops to ~100ms. */
+  prefetch?: Promise<Float32Array | null>;
 }
 
 // Voice pool. Holds at most POOL_MAX loaded Kokoro instances. The
@@ -368,11 +376,29 @@ async function drain(): Promise<void> {
   }
   try {
     const settings = getVoiceSettings();
-    const samples: Float32Array = await model.forward(next.text, settings.rate);
+    // Use the prefetched samples if drain's previous iteration already
+    // kicked off inference for this chunk; otherwise run forward() now.
+    const samples: Float32Array | null = next.prefetch
+      ? await next.prefetch
+      : await model.forward(next.text, settings.rate);
     if (!samples || samples.length === 0) {
       currentlySpeaking = null;
       void drain();
       return;
+    }
+    // Kick off inference for the NEXT queued chunk in parallel with
+    // this chunk's playback. Only prefetch when the next chunk uses
+    // the same loaded voice — switching voices mid-queue would force
+    // a model swap and defeat the win. If forward() rejects, the
+    // catch on the next iteration handles it.
+    const upcoming = queue[0];
+    if (upcoming && !upcoming.prefetch) {
+      const upcomingVoice = upcoming.voiceId ?? arbiterVoiceId();
+      if (upcomingVoice === targetVoice) {
+        upcoming.prefetch = model
+          .forward(upcoming.text, settings.rate)
+          .catch(() => null);
+      }
     }
     await playPcm(samples, KOKORO_SAMPLE_RATE);
   } catch (err) {
@@ -452,9 +478,14 @@ async function playPcm(samples: Float32Array, sampleRate: number): Promise<void>
   // click.
   applyFadeEnvelope(samples, sampleRate, 3);
   const wavBase64 = encodeWav(samples, sampleRate);
+  // progressUpdateIntervalMillis defaults to 500ms in expo-av, which
+  // means didJustFinish fires up to half a second AFTER the audio
+  // actually ends — that latency is the bulk of the inter-sentence
+  // gap players described as too long. Drop to 50ms so the queue
+  // advances within one frame of playback finishing.
   const { sound } = await Audio.Sound.createAsync(
     { uri: `data:audio/wav;base64,${wavBase64}` },
-    { shouldPlay: true },
+    { shouldPlay: true, progressUpdateIntervalMillis: 50 },
   );
   currentSound = sound;
   await new Promise<void>((resolve) => {
