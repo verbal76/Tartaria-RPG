@@ -301,7 +301,7 @@ export function buildCombatSteps(
 // {sides, count} we can roll. For multi-die notations we pick the larger
 // die and double the count to roughly preserve the range (close enough
 // for a single roll step — we don't currently animate multiple groups).
-function parseDamageDice(notation: string): { sides: number; count: number } {
+export function parseDamageDice(notation: string): { sides: number; count: number } {
   const m = /(\d+)d(\d+)/i.exec(notation);
   if (!m) return { sides: 6, count: 1 };
   // For compound like "1d10+1d6" the first match captures the larger.

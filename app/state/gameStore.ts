@@ -110,7 +110,7 @@ import {
   applyArmorResistance,
   type Recipe,
 } from '../engine/crafting';
-import { getEquippedWeapon, isBareHandAttack } from '../engine/combatRules';
+import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
 import { pickRandomVendor, findVendorByName, VENDORS, type VendorInstance } from '../engine/vendors';
 import { findQuestFactionHint } from '../engine/factionHint';
 import {
@@ -3552,15 +3552,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // the same-channel-debounce in appendLog merges the world
         // line into the prior one. Surface a clear ack so the
         // player knows the tap registered.
+        // Active parry. Status flags the next incoming attack for a
+        // post-hit dodge check inside applyEnemyCounter:
+        //   - Roll d20 + DEX vs the enemy's attack total.
+        //   - Success → damage negated AND counter-strike at 2× the
+        //     equipped weapon's damage dice (free, no roll-to-hit).
+        //   - Failure → damage lands normally.
+        // Either outcome consumes the status, costs 2 weapon
+        // durability (1.5× normal hit-wear, rounded up), and ends
+        // the dodge window.
+        //
+        // 'block' was folded into this verb 2026-05-21 per playtester
+        // request — too many parallel defensive options diluted both.
+        // The parser still accepts 'block', 'parry', 'deflect', etc.
+        // as synonyms via the existing verb table, but they all route
+        // through this single dodge intent now.
         const alreadyDodging = (player.statusEffects ?? []).some((e) => e.kind === 'dodging');
         if (alreadyDodging) {
-          get().appendLog('world', `You're already in the dodging stance — no need to spend another beat on it.`);
+          get().appendLog('world', `You're already poised to parry — no need to spend another beat on it.`);
           break;
         }
         const dodging: StatusEffect = {
           kind: 'dodging',
-          remainingRounds: 2,
-          label: 'dodging',
+          // Single-shot reaction. Consumed by the next incoming
+          // attack via applyEnemyCounter; expires on its own next
+          // turn if nothing swung.
+          remainingRounds: 1,
+          label: 'dodging (parry)',
         };
         set((s) =>
           s.player
@@ -3575,65 +3593,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog(
           'world',
           currentScene.enemies.length > 0
-            ? `You drop into a dodging stance. ${activeEnemy(currentScene)?.name ?? 'they'}'s next attack will have to find you.`
-            : `You shift your weight, ready to evade. Nothing tests it.`,
+            ? `You set your stance. The next ${activeEnemy(currentScene)?.name ?? 'attacker'} swing — you intend to turn into your own.`
+            : `You shift into a parry-ready stance. Nothing tests it.`,
         );
-        // Defensive stances consume the player's combat action — the
-        // enemy gets a swing afterwards so the +AC actually matters.
-        // Without this, dodge/block read as a pause: the player taps
-        // dodge, nothing happens, and they have to attack to advance
-        // the round (which defeats the point of going defensive).
         if (currentScene.enemies.length > 0) {
           runEnemyGroupCounters(get, set, get().player ?? player);
         }
         break;
       }
       case 'block': {
-        // Block stance: stake your equipped weapon on the next enemy
-        // attack. If the block roll lands, damage is halved and there's
-        // a small chance to riposte for 1d4. Weapon takes wear either
-        // way — that's the cost.
-        const alreadyBlocking = (player.statusEffects ?? []).some((e) => e.kind === 'blocking');
-        if (alreadyBlocking) {
-          get().appendLog('world', `You're already braced into a block — the stance holds.`);
-          break;
-        }
-        const equippedMainName = player.equipped?.main ?? player.equipped?.weaponName;
-        const blockWeapon = equippedMainName ? findWeaponByName(equippedMainName) : null;
-        if (!blockWeapon || (blockWeapon.defense ?? 0) <= 0) {
-          get().appendLog(
-            'arbiter',
-            `The Arbiter shakes their head. "${blockWeapon?.name ?? 'Bare hands'} is no shield. Try dodging instead."`,
-          );
-          break;
-        }
-        const blocking: StatusEffect = {
-          kind: 'blocking',
-          remainingRounds: 2,
-          label: 'blocking',
-        };
-        set((s) =>
-          s.player
-            ? {
-                player: {
-                  ...s.player,
-                  statusEffects: applyEffect(s.player.statusEffects ?? [], blocking),
-                },
-              }
-            : s,
-        );
-        get().appendLog(
-          'world',
-          currentScene.enemies.length > 0
-            ? `You raise the ${blockWeapon.name} into a block. (defense +${blockWeapon.defense})`
-            : `You take a defensive stance, ${blockWeapon.name} raised. Nothing tests it.`,
-        );
-        // Same as dodge: blocking consumes the player's action; the
-        // enemy swings against the raised guard so the block-roll +
-        // potential riposte happen this round.
-        if (currentScene.enemies.length > 0) {
-          runEnemyGroupCounters(get, set, get().player ?? player);
-        }
+        // Unreachable as of 2026-05-21 — parser.ts maps every
+        // block-flavored verb (block / parry / deflect / shield /
+        // brace / guard / fend / absorb / ward) to the 'dodge'
+        // intent above. Kept as a sealed-switch landing pad so
+        // legacy saves with cached intent='block' still resolve
+        // cleanly instead of falling into the default branch.
+        get().appendLog('world', `You set your stance. (block folded into dodge — see the parry mechanic above.)`);
         break;
       }
       case 'advance':
@@ -5537,7 +5512,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // what else is on the table.
             const inCombat = currentScene.enemies.length > 0;
             const hint = inCombat
-              ? " Try 'block' to brace, 'attack' to commit, or another 'retreat' to break contact."
+              ? " Try 'dodge' to set a parry, 'attack' to commit, or another 'retreat' to break contact."
               : ' The way out is blocked for now — try a different direction, or rest before pushing through.';
             get().appendLog(
               'world',
@@ -8826,7 +8801,11 @@ function applyEnemyCounter(
   // takes the HIGHER (advantage on attacker). One-die path stays for
   // the neutral case so the log reads cleanly.
   const fx = player.statusEffects ?? [];
-  const defenderAdvantage = fx.some((e) => ['in_cover', 'in_cover_full', 'dodging', 'blocking'].includes(e.kind) && e.remainingRounds > 0);
+  // 'dodging' and 'blocking' deliberately NOT in this list as of
+  // 2026-05-21 — the dodge rework moved their effect from a passive
+  // 2d20-keep-lower defender advantage into an active post-hit
+  // parry roll (see below). Cover statuses still apply normally.
+  const defenderAdvantage = fx.some((e) => ['in_cover', 'in_cover_full'].includes(e.kind) && e.remainingRounds > 0);
   const attackerAdvantage = fx.some((e) => e.kind === 'surprised' && e.remainingRounds > 0);
   let atkRoll = rollDie(20);
   let shadowRoll: number | null = null;
@@ -8890,36 +8869,67 @@ function applyEnemyCounter(
     const resisted = applyArmorResistance(rawDmg, enemyDamageType, armorPieces.resistances);
     let dmg = resisted.damage;
 
-    // BLOCK — the player committed a defensive stance with their weapon.
-    // d20 + weapon.defense vs the enemy's attack total. Success halves
-    // damage and rolls for a riposte (25% chance for 1d4 to the enemy).
-    // Weapon takes 2 durability either way — the cost of attempting.
-    const blockingActive = (player.statusEffects ?? []).some((e) => e.kind === 'blocking');
-    let blockNarration: string | null = null;
+    // ACTIVE PARRY — the player committed a dodge before this swing
+    // landed. Opposed roll: d20 + DEX vs the enemy's attack total.
+    //   - Success → damage NEGATED + free counter-strike at 2× the
+    //     equipped weapon's damage dice (no roll-to-hit on the
+    //     counter; it just lands).
+    //   - Failure → damage stays as already rolled.
+    // Either way: status consumed, equipped weapon takes 2 durability
+    // (1.5× normal hit-wear, rounded up). Bare-handed dodging still
+    // rolls — you just can't deal counter damage without a weapon.
+    //
+    // Folded the old 'block' verb into this 2026-05-21. The
+    // half-damage / 25%-1d4-riposte block was diluted vs an
+    // all-or-nothing parry, and players were getting confused about
+    // which defensive option to pick. Now there's one defensive
+    // commit and one clear payoff.
+    const dodgingActive = (player.statusEffects ?? []).some((e) => e.kind === 'dodging');
+    let parryNarration: string | null = null;
     let riposteDamage = 0;
-    if (blockingActive) {
+    if (dodgingActive) {
+      const stats = effectiveStats(player);
+      const parryRoll = rollDie(20);
+      const parryTotal = parryRoll + stats.dexterity;
+      const success = parryRoll === 20 ? true : parryRoll === 1 ? false : parryTotal >= atkTotal;
       const mainName = player.equipped?.main ?? player.equipped?.weaponName ?? null;
-      const blockWeapon = mainName ? findWeaponByName(mainName) : null;
-      const def = blockWeapon?.defense ?? 0;
-      const blockRoll = rollDie(20);
-      const blockTotal = blockRoll + def;
-      const success = blockTotal >= atkTotal;
+      const equipped = mainName ? findWeaponByName(mainName) : null;
       if (success) {
         const before = dmg;
-        dmg = Math.max(0, Math.floor(dmg / 2));
-        blockNarration = `Block — d20 → ${blockRoll} + DEF ${def} = ${blockTotal} vs ATK ${atkTotal}. ✓ Damage halved (${before} → ${dmg}).`;
-        if (Math.random() < 0.25) {
-          riposteDamage = rollDie(4);
+        dmg = 0;
+        if (equipped) {
+          // Counter-strike at 2× the weapon's damage notation.
+          const parsed = parseDamageDice(equipped.damageDice);
+          let counterDmg = 0;
+          for (let i = 0; i < parsed.count * 2; i++) counterDmg += rollDie(parsed.sides);
+          // Per-weapon-effect bonus damage if the active weapon's
+          // effect line matches this enemy (e.g. +1d4 vs constructs).
+          const fx = parseWeaponEffect(equipped.effect);
+          if (fx) counterDmg += rollEffectBonusDamage(fx, enemy);
+          riposteDamage = Math.max(1, counterDmg);
+          parryNarration = `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✓ Caught the blade. Counter-strike for ${riposteDamage} (2× ${equipped.damageDice}).`;
+        } else {
+          parryNarration = `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✓ Slipped clean (no weapon to counter).`;
         }
+        void before;
       } else {
-        blockNarration = `Block — d20 → ${blockRoll} + DEF ${def} = ${blockTotal} vs ATK ${atkTotal}. ✗ Beat through.`;
+        parryNarration = `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✗ Read through.`;
       }
-      // Weapon wear: 2 points regardless of success.
+      // 1.5× normal hit-wear, rounded up = 2 durability per parry,
+      // regardless of outcome. The cost of committing the stance.
       if (mainName) {
         for (let i = 0; i < 2; i++) {
           set((s) => (s.player ? { player: wearEquippedItem(s.player, mainName, get) } : s));
         }
       }
+      // Consume the dodging status — single-shot reaction, gone
+      // whether it landed or not.
+      set((s) => (s.player ? {
+        player: {
+          ...s.player,
+          statusEffects: (s.player.statusEffects ?? []).filter((e) => e.kind !== 'dodging'),
+        },
+      } : s));
     }
 
     // Roll for a status effect to apply based on the damage type.
@@ -8963,8 +8973,8 @@ function applyEnemyCounter(
       return { player: { ...nextPlayer, hp: newHp, statusEffects: effects } };
     });
 
-    if (blockNarration) {
-      void Promise.resolve().then(() => get().appendLog('combat', blockNarration!));
+    if (parryNarration) {
+      void Promise.resolve().then(() => get().appendLog('combat', parryNarration!));
     }
 
     if (newEffect) {
@@ -8997,7 +9007,7 @@ function applyEnemyCounter(
             return { currentScene: { ...s.currentScene, enemyHps: hps } };
           });
           void Promise.resolve().then(() =>
-            get().appendLog('combat', `Riposte! Your block opens a gap — ${enemy.name} takes ${riposteDamage} damage.`),
+            get().appendLog('combat', `Counter-strike! Your parry opens a gap — ${enemy.name} takes ${riposteDamage} damage.`),
           );
           // If the riposte killed the enemy, resolve their defeat now so
           // the rest of the group counter-volley doesn't skip them.

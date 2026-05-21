@@ -84,8 +84,16 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   // and the inventory channel. 'grab' kept (genuine steal verb).
   steal: ['steal', 'pilfer', 'lift', 'pinch', 'swipe', 'snatch', 'filch', 'nick', 'grab'],
   join: ['join', 'pledge', 'swear', 'sign', 'ally', 'bond', 'commit', 'enroll', 'side'],
-  dodge: ['dodge', 'evade', 'sidestep', 'duck', 'juke', 'tumble', 'slip', 'twist', 'roll'],
-  block: ['block', 'parry', 'deflect', 'shield', 'brace', 'guard', 'fend', 'absorb', 'ward'],
+  // 'block' verbs (block / parry / deflect / shield / brace / guard /
+  // fend / absorb / ward) all route through 'dodge' as of 2026-05-21.
+  // The block intent itself stays in the type signature for any save
+  // data that has it cached, but the parser maps every block-flavored
+  // verb to dodge so they all reach the new active-parry mechanic.
+  dodge: [
+    'dodge', 'evade', 'sidestep', 'duck', 'juke', 'tumble', 'slip', 'twist', 'roll',
+    'block', 'parry', 'deflect', 'shield', 'brace', 'guard', 'fend', 'absorb', 'ward',
+  ],
+  block: [],
   advance: [
     // sprint and rush moved to dash — they semantically describe fast
     // movement, not the "close one combat range band" beat that
@@ -546,7 +554,7 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
       if (hasTorch) suggestIfAllowed('use torch on');
     }
     if (item) suggestions.push(`use ${item.name.toLowerCase()}`);
-    if (context.enemyPresent) suggestions.push('attack', 'block', 'advance', 'retreat', 'hide', 'parley');
+    if (context.enemyPresent) suggestions.push('attack', 'dodge', 'advance', 'retreat', 'hide', 'parley');
     if (!suggestions.length) suggestions.push('look around', 'search', 'rest');
     return { intent: 'unknown', raw, normalized, confidence: 0.1, suggestions, resolvedNoun: noun };
   }

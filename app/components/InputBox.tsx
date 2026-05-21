@@ -213,8 +213,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 slip in via stealth instead of closing the gap in the
                 open. */}
             <QuickBtn label="approach" onPress={onOpenApproach} />
+            {/* `block` quick-action removed 2026-05-21 — folded into
+                dodge. The dodge button now triggers the active-parry
+                mechanic: opposed d20+DEX roll on the next incoming
+                attack, full negation + 2× counter-strike on success,
+                2 durability wear either way. */}
             <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} />
-            <QuickBtn label="block" defensive onPress={() => onSubmit('block')} />
             {range && range !== 'arm' && (
               <QuickBtn label="advance" onPress={() => onSubmit('advance')} />
             )}

@@ -143,10 +143,15 @@ export function statusAcAdjustment(current: readonly StatusEffect[] | undefined)
   for (const e of current) {
     if (e.remainingRounds <= 0) continue;
     if (e.kind === 'armor_severed') adj -= 2;
-    if (e.kind === 'dodging') adj += 4;
     if (e.kind === 'in_cover') adj += 4;
     if (e.kind === 'in_cover_full') adj += 8;
-    if (e.kind === 'blocking') adj += 4;
+    // 'dodging' deliberately NOT here as of 2026-05-21 — the dodge
+    // rework moved it from a passive +4 AC into an active post-hit
+    // parry roll handled in applyEnemyCounter. The roll itself is
+    // what gates the swing now, not a passive AC bump.
+    // 'blocking' status kind is retired (no engine path applies it
+    // anymore) but the type-union entry is kept so legacy saves
+    // with a cached blocking effect deserialize cleanly.
   }
   return adj;
 }
