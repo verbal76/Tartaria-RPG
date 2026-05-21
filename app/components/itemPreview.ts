@@ -129,6 +129,15 @@ function previewAccessory(x: CatalogAccessory, kind: 'Amulet' | 'Ring'): ItemPre
 function previewGear(g: CatalogGear): ItemPreview {
   const kindLabel = g.kind === 'consumable' ? 'Consumable' : g.kind === 'relic' ? 'Relic' : 'Gear';
   const stats: string[] = [];
+  // OTA 220 — surface passive stat bonuses ({ kind: 'passive', stat,
+  // bonus }) that exploration items use. Without this, Echoing Steps
+  // Boots and similar render with no stat line even though they
+  // grant +1 DEX while equipped. Playtester: "echoing steps boots
+  // don't have any stats but they're for sale in the store."
+  if (g.effect && g.effect.kind === 'passive' && g.effect.bonus !== 0) {
+    const sign = g.effect.bonus > 0 ? '+' : '';
+    stats.push(`${sign}${g.effect.bonus} ${g.effect.stat.toUpperCase().slice(0, 3)} (passive)`);
+  }
   if (g.tags.length > 0) stats.push(`Tags: ${g.tags.slice(0, 4).join(', ')}`);
   return { name: g.name, kindLabel, rarity: g.rarity, description: g.description, stats };
 }

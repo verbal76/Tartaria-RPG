@@ -90,8 +90,19 @@ export function ContractsScreen() {
     stageDesc: describeWhisperStage(w),
   }));
 
+  // OTA 220 — leads from the investigate-spawn path
+  // (generateNewQuest). The store pushes them into player.activeQuests
+  // but until this OTA there was no UI to display them, so the
+  // "New lead: Retrieve a confused Aetherkin..." reward line in the
+  // adventure log went nowhere. Surface them as a LEADS section
+  // beneath the formal contracts so the player can actually track
+  // what they're chasing.
+  const leads = (player.activeQuests ?? []).filter(
+    (q) => q.state === 'open' || q.state === 'in_progress',
+  );
+
   const totalActive =
-    hunts.length + mysteries.length + storylines.length + factionQuests.length + whispers.length;
+    hunts.length + mysteries.length + storylines.length + factionQuests.length + whispers.length + leads.length;
 
   // Lifetime milestone counters — surfaced here so players have a single
   // place to see progress toward stat bumps (every 10 checks succeeded
@@ -312,10 +323,46 @@ export function ContractsScreen() {
               ))}
             </View>
           )}
+
+          {leads.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>LEADS</Text>
+              <Text style={styles.whispersBlurb}>
+                Tips picked up by investigating the world. No tracker,
+                no objective marker — just the place and the deed. Go
+                find it.
+              </Text>
+              {leads.map((q) => {
+                const title = `${cap(q.objective.verb)} ${q.objective.target}`;
+                const reward = q.reward.amount
+                  ? `${q.reward.amount} ${q.reward.type === 'currency' ? 'TC' : q.reward.type}`
+                  : q.reward.label;
+                return (
+                  <View key={`lead_${q.id}`} style={styles.card}>
+                    <View style={styles.cardHead}>
+                      <Text style={styles.cardTitle}>{title}</Text>
+                      <Text style={styles.stagePill}>{q.state}</Text>
+                    </View>
+                    <Text style={styles.cardFaction}>Lead · {q.location.name}</Text>
+                    <Text style={styles.cardStageLabel}>Complication</Text>
+                    <Text style={styles.cardStageBody}>{q.complication.text}</Text>
+                    <Text style={styles.cardStageLabel}>Reward</Text>
+                    <Text style={styles.cardStageBody}>{reward}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          )}
       </ScrollView>
       )}
     </View>
   );
+}
+
+// Capitalize a single word — used for the LEADS section titles
+// ("retrieve a confused Aetherkin" → "Retrieve a confused Aetherkin").
+function cap(s: string): string {
+  return s.length === 0 ? s : s[0]!.toUpperCase() + s.slice(1);
 }
 
 // Collectibles tab — per-character story progress with expandable

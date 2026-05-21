@@ -176,14 +176,24 @@ export function VendorScreen() {
       <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
         {mode === 'contracts' ? (
           (() => {
-            if (!vendor.faction) return <Text style={styles.empty}>This trader doesn't carry contracts.</Text>;
-            const rep = getStanding(player.factionStanding, vendor.faction);
-            const quests = availableFactionQuests(
-              vendor.faction,
-              rep,
-              player.activeFactionQuestIds ?? [],
-              player.completedFactionQuestIds ?? [],
-            );
+            // OTA 220 — faction-less vendors (Velar Shadowblade etc.)
+            // can still offer "open contracts" — hunts/mysteries
+            // authored with factionId=null. Previously this branch
+            // returned a flat refusal. Faction quests + storylines
+            // remain factional by design (they're authored per
+            // faction) so we only fetch hunts + mysteries for
+            // unaffiliated traders. Playtester: "how come velar
+            // shadowblade doesn't have any quests? was there an
+            // update that took the quests away from the vendors?"
+            const rep = vendor.faction ? getStanding(player.factionStanding, vendor.faction) : 0;
+            const quests = vendor.faction
+              ? availableFactionQuests(
+                  vendor.faction,
+                  rep,
+                  player.activeFactionQuestIds ?? [],
+                  player.completedFactionQuestIds ?? [],
+                )
+              : [];
             const hunts = availableHunts(
               vendor.faction,
               rep,
@@ -196,17 +206,22 @@ export function VendorScreen() {
               (player.activeMysteries ?? []).map((m) => m.id),
               player.completedMysteryIds ?? [],
             );
-            const stories = availableStorylines(
-              vendor.faction,
-              rep,
-              (player.activeStorylines ?? []).map((s) => s.id),
-              player.completedStorylineIds ?? [],
-            );
+            const stories = vendor.faction
+              ? availableStorylines(
+                  vendor.faction,
+                  rep,
+                  (player.activeStorylines ?? []).map((s) => s.id),
+                  player.completedStorylineIds ?? [],
+                )
+              : [];
             const total = quests.length + hunts.length + mysteries.length + stories.length;
             if (total === 0) {
+              const tail = vendor.faction
+                ? `Build reputation with the ${vendor.faction.replace(/_/g, ' ')} or finish what you're already carrying.`
+                : `No open contracts pending for this trader right now — check back after the next hunt cycle, or finish what you're already carrying.`;
               return (
                 <Text style={styles.empty}>
-                  {vendor.name} has no contracts on offer for you right now. Build reputation with the {vendor.faction.replace(/_/g, ' ')} or finish what you're already carrying.
+                  {vendor.name} has no contracts on offer for you right now. {tail}
                 </Text>
               );
             }
