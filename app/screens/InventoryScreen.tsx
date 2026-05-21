@@ -12,6 +12,7 @@ import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
 import { canScrap } from '../engine/scrapEngine';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview } from '../components/itemPreview';
+import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
 
 export function InventoryScreen() {
   const player = useGameStore((s) => s.player);
@@ -22,6 +23,11 @@ export function InventoryScreen() {
   const useInventoryItem = useGameStore((s) => s.useInventoryItem);
   const scrapInventoryItem = useGameStore((s) => s.scrapInventoryItem);
   const [pending, setPending] = useState<{ item: InventoryItem; slots: EquipSlot[] } | null>(null);
+  // After-scrap result list. When non-null, the action-modal body
+  // switches from "Equip / Drop / Scrap" buttons to a "✦ Added to
+  // pack" summary with a single CLOSE button. Cleared on next
+  // item-tap.
+  const [scrapResult, setScrapResult] = useState<InventoryDelta[] | null>(null);
 
   if (!player) {
     return (
@@ -83,10 +89,14 @@ export function InventoryScreen() {
   // and left no path to unequip. Modal always opens; player picks Equip
   // (specific slot) or Unequip (if currently worn) or Close.
   const handleItemTap = (item: InventoryItem) => {
+    setScrapResult(null); // fresh modal — clear any prior result
     setPending({ item, slots: validSlotsForItem(item) });
   };
 
-  const closeModal = () => setPending(null);
+  const closeModal = () => {
+    setPending(null);
+    setScrapResult(null);
+  };
   const chooseSlot = (slot: EquipSlot) => {
     if (!pending) return;
     equipItem(pending.item.name, slot);
@@ -109,8 +119,14 @@ export function InventoryScreen() {
   };
   const doScrap = () => {
     if (!pending) return;
+    // Snapshot inventory BEFORE scrap so we can diff what landed.
+    // scrapInventoryItem is synchronous, so by the time we re-read
+    // useGameStore.getState() the mutation has already happened.
+    const before = (useGameStore.getState().player?.inventory ?? []).map((i) => ({ ...i }));
     scrapInventoryItem(pending.item.name);
-    setPending(null);
+    const after = useGameStore.getState().player?.inventory ?? [];
+    const delta = computeInventoryDelta(before, after);
+    setScrapResult(delta);
   };
 
   // Build the modal's button list based on the item's state.
@@ -202,6 +218,19 @@ export function InventoryScreen() {
     ? 'This item cannot be equipped, but you can still keep, gift, sell, or use it.'
     : undefined;
 
+  // Post-scrap result body. Overrides the equip/drop/etc body when
+  // scrapResult is populated. Lists what landed in the pack with ✦
+  // markers, or a "no parts" line when scrapOutputFor returned an
+  // empty grant set.
+  const scrapResultBody = scrapResult !== null
+    ? (scrapResult.length > 0
+        ? `✦ Added to your pack:\n${scrapResult.map((r) => `  • ${r.name}${r.quantity > 1 ? ` × ${r.quantity}` : ''}${r.rarity && r.name !== 'TC' ? ` (${r.rarity})` : ''}`).join('\n')}`
+        : 'The breakdown yielded nothing usable this time. Some salvage simply refuses.')
+    : undefined;
+  const scrapResultButtons = scrapResult !== null
+    ? [{ label: 'Close', onPress: closeModal, tone: 'neutral' as const }]
+    : null;
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -278,15 +307,19 @@ export function InventoryScreen() {
 
       <BrandedModal
         visible={pending !== null}
-        title={pending ? pending.item.name : ''}
-        itemPreview={modalPreview}
+        title={scrapResult !== null
+          ? `${pending?.item.name ?? ''} — Salvaged`
+          : pending?.item.name ?? ''}
+        itemPreview={scrapResult !== null ? null : modalPreview}
         contextLine={
-          pending && pending.item.durability
-            ? `Durability: ${pending.item.durability.current}/${pending.item.durability.max}`
-            : undefined
+          scrapResult !== null
+            ? undefined
+            : pending && pending.item.durability
+              ? `Durability: ${pending.item.durability.current}/${pending.item.durability.max}`
+              : undefined
         }
-        body={modalBody}
-        buttons={buildModalButtons()}
+        body={scrapResultBody ?? modalBody}
+        buttons={scrapResultButtons ?? buildModalButtons()}
         onRequestClose={closeModal}
       />
     </View>
