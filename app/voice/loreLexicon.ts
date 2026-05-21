@@ -31,12 +31,14 @@
 // how espeak's letter-to-sound rules treat specific letter combos.
 
 const LEXICON: Array<[RegExp, string]> = [
-  // Aether family — "Ae" is the tricky one. Default phonemizers
-  // often read it as "aye" or "eh". Lore canon is "ee-ther".
-  [/\bAetherstone\b/gi, 'eether stone'],
-  [/\bAetheric\b/gi, 'eetheric'],
-  [/\bAetherborn\b/gi, 'eether born'],
-  [/\bAether\b/gi, 'eether'],
+  // Aether family — playtester spec OTA 218: "ay thur", long A as
+  // in "say", not "ee". Default phonemizers often read "Ae" as
+  // "aye" or "eh"; we force the long-A + schwa with "ay thur".
+  [/\bAetherstone\b/gi, 'ay thur stone'],
+  [/\bAetheric\b/gi, 'ay thur ik'],
+  [/\bAetherborn\b/gi, 'ay thur born'],
+  [/\bAetherbat\b/gi, 'ay thur bat'],
+  [/\bAether\b/gi, 'ay thur'],
 
   // Place names — long-vowel + multi-syllable mishaps.
   // Playtester spec OTA 217:
@@ -67,7 +69,6 @@ const LEXICON: Array<[RegExp, string]> = [
   // Lore objects.
   [/\bRunecaster\b/gi, 'rune caster'],
   [/\bRunecasters\b/gi, 'rune casters'],
-  [/\bAetherbat\b/gi, 'eether bat'],
 
   // English contractions where espeak's letter-to-sound rule lands on
   // the wrong vowel. "doesn't" comes out as "DOSE-ent" (like "rose")

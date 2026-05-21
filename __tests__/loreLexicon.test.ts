@@ -8,16 +8,16 @@ import { applyLoreLexicon, cleanForSpeech, getLexiconSize } from '../app/voice/l
 
 describe('applyLoreLexicon', () => {
   it('respells Aetheric (case-insensitive)', () => {
-    expect(applyLoreLexicon('Aetheric Spear')).toBe('eetheric Spear');
-    expect(applyLoreLexicon('aetheric')).toBe('eetheric');
-    expect(applyLoreLexicon('AETHERIC')).toBe('eetheric');
+    expect(applyLoreLexicon('Aetheric Spear')).toBe('ay thur ik Spear');
+    expect(applyLoreLexicon('aetheric')).toBe('ay thur ik');
+    expect(applyLoreLexicon('AETHERIC')).toBe('ay thur ik');
   });
 
   it('respells Aetherstone / Aether / Aetherborn distinctly', () => {
-    expect(applyLoreLexicon('the Aetherstone Flood')).toBe('the eether stone Flood');
+    expect(applyLoreLexicon('the Aetherstone Flood')).toBe('the ay thur stone Flood');
     // Verify Aetherstone matches before plain Aether (longest first).
-    expect(applyLoreLexicon('Aether vs Aetherstone')).toBe('eether vs eether stone');
-    expect(applyLoreLexicon('an Aetherborn warrior')).toBe('an eether born warrior');
+    expect(applyLoreLexicon('Aether vs Aetherstone')).toBe('ay thur vs ay thur stone');
+    expect(applyLoreLexicon('an Aetherborn warrior')).toBe('an ay thur born warrior');
   });
 
   it('respells Tartaria / Tartarian / Tartarians', () => {
