@@ -27,4 +27,14 @@ export interface InteractableChip {
    *  rendered greyed + disabled. When false (default), consumed
    *  chips are removed from the list entirely. */
   alwaysShow?: boolean;
+  /** OTA 195 — search-only. When set, this noun requires the
+   *  player to equip the named item (or category — "Aether
+   *  scanner") to search it. ExplorationScreen sets this when
+   *  the player doesn't have the required tool equipped; the
+   *  Search modal renders the chip grayed-with-tag, still
+   *  tappable. Tapping fires the search verb anyway; the
+   *  engine emits a "Equip X to search this" refusal. After
+   *  the player equips the right tool, the chip is no longer
+   *  marked unmetRequirement and renders normally green. */
+  unmetRequirement?: string;
 }

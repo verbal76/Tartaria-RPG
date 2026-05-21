@@ -9,6 +9,7 @@ import {
   aggregateInventoryPassives,
   inventoryHasGate,
   resolveItemEffect,
+  searchRequirementFor,
   PASSIVE_STAT_CAP,
 } from '../app/engine/itemEffect';
 import { findExplorationItemByName } from '../app/engine/crafting';
@@ -58,6 +59,38 @@ describe('itemEffect — gate lookup', () => {
 
   it('empty inventory grants nothing', () => {
     expect(inventoryHasGate([], 'breathe_toxic', resolvers)).toBe(false);
+  });
+});
+
+describe('itemEffect — search noun requirements (OTA 195)', () => {
+  // Playtester spec: "certain things can only be searched with a
+  // pulse scanner or other item related. Once you search something
+  // you remove it from the popup. And if you need a certain item
+  // to search it, it is grayed out, and when you hit it, it tells
+  // you what you need to equip."
+  it('a vent fissure requires an Aether scanner', () => {
+    const req = searchRequirementFor('vent fissure');
+    expect(req).not.toBeNull();
+    expect(req!.scannerBias).toBe('aetheric');
+    expect(req!.hint).toContain('Pulse Scanner');
+  });
+
+  it('an aether glyph requires an Aether scanner', () => {
+    const req = searchRequirementFor('aether glyph');
+    expect(req?.scannerBias).toBe('aetheric');
+  });
+
+  it('a ley line requires an Aether scanner', () => {
+    const req = searchRequirementFor('ley line');
+    expect(req?.scannerBias).toBe('aetheric');
+  });
+
+  it('a plain bench has no requirement (freely searchable)', () => {
+    expect(searchRequirementFor('bench')).toBeNull();
+  });
+
+  it('a plain trap has no requirement', () => {
+    expect(searchRequirementFor('trap')).toBeNull();
   });
 });
 

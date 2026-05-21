@@ -3001,6 +3001,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
               );
               break;
             }
+            // OTA 195 — noun-requirement gate. Aether-coded nouns
+            // (fissure / glyph / ley line / etc.) only yield to a
+            // search when the right tool is equipped. Refuse with
+            // the requirement hint when the player lacks it. No
+            // dedup mark fires on refusal, so the chip stays in
+            // the Search modal (grayed via unmetRequirement) for
+            // the player to retry after equipping.
+            const { searchRequirementFor } = require('../engine/itemEffect');
+            const { playerHasScannerEquipped: hasScanner } = require('../engine/equipment');
+            const req = searchRequirementFor(ambient);
+            if (req && !hasScanner(player, req.scannerBias)) {
+              get().appendLog('arbiter', `The Arbiter shakes their head. "${req.hint}"`);
+              break;
+            }
             narrateAmbientFind(get, set, currentScene, ambient);
             // OTA 193 — Pulse Scanner pass. If a scanner is equipped
             // in off-hand (Pulse Scanner today; future Geiger-like

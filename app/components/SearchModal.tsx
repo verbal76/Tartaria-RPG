@@ -118,29 +118,48 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={styles.chipScrollRow}
                   >
-                    {visibleChips.map((c) => (
-                      <Pressable
-                        key={`scene-${c.noun}`}
-                        style={({ pressed }) => [
-                          styles.chip,
-                          styles.chipScene,
-                          c.consumed && styles.chipConsumed,
-                          pressed && !c.consumed && styles.btnPressed,
-                        ]}
-                        disabled={c.consumed}
-                        onPress={() => tapToSearch(c.noun)}
-                      >
-                        <Text
-                          style={[
-                            styles.chipTextScene,
-                            c.consumed && styles.chipTextConsumed,
+                    {visibleChips.map((c) => {
+                      // OTA 195 — chip state machine:
+                      //   consumed         → grayed + ✓ (only ever
+                      //                      "the ground" since the
+                      //                      hide-on-consume rule
+                      //                      removes others entirely)
+                      //   unmetRequirement → grayed + "requires X"
+                      //                      subtext, still tappable
+                      //                      (tap fires the engine's
+                      //                      refusal which tells the
+                      //                      player what to equip)
+                      //   default          → green, normal tap
+                      const grayed = c.consumed || !!c.unmetRequirement;
+                      return (
+                        <Pressable
+                          key={`scene-${c.noun}`}
+                          style={({ pressed }) => [
+                            styles.chip,
+                            styles.chipScene,
+                            grayed && styles.chipConsumed,
+                            pressed && !c.consumed && styles.btnPressed,
                           ]}
-                          numberOfLines={1}
+                          disabled={c.consumed}
+                          onPress={() => tapToSearch(c.noun)}
                         >
-                          {c.noun}{c.consumed ? ' ✓' : ''}
-                        </Text>
-                      </Pressable>
-                    ))}
+                          <Text
+                            style={[
+                              styles.chipTextScene,
+                              grayed && styles.chipTextConsumed,
+                            ]}
+                            numberOfLines={1}
+                          >
+                            {c.noun}{c.consumed ? ' ✓' : c.unmetRequirement ? ' 🔒' : ''}
+                          </Text>
+                          {c.unmetRequirement && !c.consumed && (
+                            <Text style={styles.chipRequiresText} numberOfLines={1}>
+                              {c.unmetRequirement}
+                            </Text>
+                          )}
+                        </Pressable>
+                      );
+                    })}
                   </ScrollView>
                 </>
               )}
@@ -240,6 +259,15 @@ const styles = StyleSheet.create({
     opacity: 0.55,
   },
   chipTextConsumed: { color: '#7a705c', fontStyle: 'italic' },
+  // Subtext under a gated noun — "requires Aether scanner" etc.
+  // Sits below the noun text inside the same chip, smaller font so
+  // the chip stays roughly the same height.
+  chipRequiresText: {
+    color: '#7a705c',
+    fontSize: 9,
+    fontStyle: 'italic',
+    marginTop: 1,
+  },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 14 },
   btn: {
     paddingHorizontal: 14,

@@ -12,6 +12,8 @@ import { SalvageModal } from '../components/SalvageModal';
 import { TakeModal } from '../components/TakeModal';
 import { findCatalogItem } from '../engine/crafting';
 import { isOversized } from '../engine/portability';
+import { playerHasScannerEquipped } from '../engine/equipment';
+import { searchRequirementFor } from '../engine/itemEffect';
 import { ApproachModal } from '../components/ApproachModal';
 import { TutorialTarget } from '../components/TutorialTarget';
 import { findWeaponByName } from '../engine/crafting';
@@ -279,10 +281,21 @@ export function ExplorationScreen() {
             consumed: isAmbientConsumed('ground'),
             alwaysShow: true,
           },
-          ...buildChipPool(currentScene).map((n) => ({
-            noun: n,
-            consumed: isAmbientConsumed(n),
-          })),
+          ...buildChipPool(currentScene).map((n) => {
+            // OTA 195 — compute per-chip requirement. An Aether-coded
+            // noun (vent fissure, ley line, glyph, etc.) requires a
+            // scanner equipped. If the player doesn't have one,
+            // mark unmetRequirement so SearchModal renders the chip
+            // grayed with a "requires Aether scanner" tag.
+            const req = searchRequirementFor(n);
+            const hasScanner = player ? playerHasScannerEquipped(player, 'aetheric') : false;
+            const unmetRequirement = req && !hasScanner ? req.shortLabel : undefined;
+            return {
+              noun: n,
+              consumed: isAmbientConsumed(n),
+              unmetRequirement,
+            };
+          }),
         ]}
         onSubmit={(target) => {
           setSearchOpen(false);

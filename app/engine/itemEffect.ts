@@ -145,3 +145,45 @@ export function isScanner(
   const fx = resolveItemEffect(name, resolvers);
   return fx?.kind === 'scanner' && fx.bias === bias;
 }
+
+/** Search-gating per ambient noun. Some nouns can only be
+ *  searched when the right tool is equipped — e.g. an Aetheric
+ *  vent fissure needs a Pulse Scanner (or other scanner with
+ *  aetheric bias). The chip UI renders gated-but-unequipped
+ *  nouns as grayed, and the engine refuses the search verb
+ *  with a "equip X to search this" line when the requirement
+ *  isn't met.
+ *
+ *  Pattern-matched on the noun text so new authored nouns can
+ *  just say "ley line fissure" / "aether glyph" and inherit
+ *  the gate without per-noun authoring.
+ *
+ *  Returns null when the noun is freely searchable (the default
+ *  for all the everyday outpost nouns — bench, trap, wall, etc.). */
+export interface NounSearchRequirement {
+  /** Human-readable hint shown when the requirement isn't met
+   *  ("Equip Pulse Scanner (or other Aether scanner) in your
+   *  off hand to search this.") */
+  hint: string;
+  /** Scanner bias the equipped item must match. Caller checks
+   *  this against playerHasScannerEquipped. */
+  scannerBias: 'aetheric';
+  /** Short label for the gray chip's "requires" tag — kept
+   *  brief so the chip stays readable ("requires: scanner"). */
+  shortLabel: string;
+}
+
+export function searchRequirementFor(noun: string): NounSearchRequirement | null {
+  // Aether-coded nouns — anything that reads as a pre-flood
+  // Aetheric artifact or phenomenon. The Pulse Scanner (or any
+  // future scanner with aetheric bias) is the gate.
+  const aether = /\b(vent fissure|fissure|aether|aetheric|etheric|ether|glyph|rune|crystal|conduit|ley[- ]?line|sigil|leystone)\b/i;
+  if (aether.test(noun)) {
+    return {
+      hint: `Equip a Pulse Scanner (or other Aether scanner) in your off hand to search the ${noun}.`,
+      scannerBias: 'aetheric',
+      shortLabel: 'requires Aether scanner',
+    };
+  }
+  return null;
+}
