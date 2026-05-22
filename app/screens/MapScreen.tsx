@@ -292,9 +292,13 @@ export function MapScreen() {
       offsetX = 0;
       offsetY = (imgBox.height - renderedH) / 2;
     }
+    // OTA 057 — marker is offset by HALF its constant screen-size
+    // (not its scaled size — the inverse-scale on markerWrapper
+    // cancels the parent's transform). Anchoring on the marker's
+    // center keeps the figure visually 'standing on' the location.
     dotStyle = {
-      left: offsetX + renderedW * atlasPos.fx - DOT_SIZE / 2,
-      top: offsetY + renderedH * atlasPos.fy - DOT_SIZE / 2,
+      left: offsetX + renderedW * atlasPos.fx - MARKER_W / 2,
+      top: offsetY + renderedH * atlasPos.fy - MARKER_H / 2,
     };
   }
 
@@ -351,10 +355,27 @@ export function MapScreen() {
             resizeMode="contain"
           />
           {dotStyle && (
-            <>
-              <View style={[styles.pulseRing, dotStyle]} pointerEvents="none" />
-              <View style={[styles.dot, dotStyle]} pointerEvents="none" />
-            </>
+            // OTA 057 — player marker. Inverse-scale via Animated.divide
+            // keeps the marker at a constant 32 × 22 px on screen
+            // regardless of the parent Animated.View's zoom (baseline
+            // ~3.3x on portrait phones, up to 5x on pinch). Without
+            // this, the marker would scale with the map and dominate.
+            // The marker silhouette anchors at its center on the
+            // atlas position.
+            <Animated.View
+              style={[
+                styles.markerWrapper,
+                dotStyle,
+                { transform: [{ scale: Animated.divide(1, scale) }] },
+              ]}
+              pointerEvents="none"
+            >
+              <Image
+                source={require('../../assets/player-marker.png')}
+                style={styles.markerImage}
+                resizeMode="contain"
+              />
+            </Animated.View>
           )}
         </Animated.View>
       </View>
@@ -376,7 +397,13 @@ export function MapScreen() {
   );
 }
 
-const DOT_SIZE = 14;
+// OTA 057 — silhouette marker dimensions in SCREEN pixels (held
+// constant via inverse-scale, see the markerWrapper transform). The
+// asset is 1536 × 1024 (1.5:1 landscape canvas) with the figure
+// centered. At 32 × 22 the marker reads as a small Reclaimer figure
+// without obscuring the map underneath.
+const MARKER_W = 32;
+const MARKER_H = 22;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0a0908', padding: 12 },
@@ -436,24 +463,17 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  dot: {
+  // OTA 057 — silhouette player marker. The wrapper handles the
+  // inverse-scale; the image inside fills the wrapper. Marker size
+  // is its screen footprint (constant regardless of map zoom).
+  markerWrapper: {
     position: 'absolute',
-    width: DOT_SIZE,
-    height: DOT_SIZE,
-    borderRadius: DOT_SIZE / 2,
-    backgroundColor: '#e07a5f',
-    borderColor: '#fff7e0',
-    borderWidth: 2,
+    width: MARKER_W,
+    height: MARKER_H,
   },
-  pulseRing: {
-    position: 'absolute',
-    width: DOT_SIZE,
-    height: DOT_SIZE,
-    borderRadius: DOT_SIZE / 2,
-    borderColor: '#e07a5f',
-    borderWidth: 2,
-    transform: [{ scale: 2.2 }],
-    opacity: 0.45,
+  markerImage: {
+    width: '100%',
+    height: '100%',
   },
 
   footer: {
