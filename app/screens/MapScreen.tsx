@@ -1,46 +1,170 @@
-// OTA 049 — Atlas map screen. Renders the hand-illustrated world
-// atlas (assets/world-atlas.png) with a "you are here" dot anchored
-// to the player's procedural grid position relative to the
-// Reclaimers' Outpost ring at the image's center.
+// OTA 050 — Atlas map screen with pinch-zoom + pan gestures. Renders
+// the hand-illustrated world atlas (assets/world-atlas.png) with a
+// "you are here" dot anchored to the player's procedural grid position
+// relative to the Reclaimers' Outpost ring at the image's center.
+//
+// Gesture model (built on RN's Animated + PanResponder so no extra
+// native dependency):
+//   - 1 finger drag    → pan the map
+//   - 2 finger pinch   → zoom in/out (anchored to the pinch midpoint)
+//   - double-tap       → reset to 1× scale + centered
+//   - scale clamped to [0.8, 5]; translate clamped so the image
+//     doesn't slide entirely off the visible area
+//
+// The dot lives inside the same transformed Animated.View as the
+// image, so it scales + translates with the map — its anchor at
+// the Outpost ring stays correct at any zoom level.
 //
 // Reality check on the dot:
-//   The atlas image depicts a CANONICAL geography (Asgardar to the
-//   east, Mud Seas to the south, Varakush to the southeast). The
-//   engine's per-character procedural grid SHUFFLES the cardinal
-//   positions of individual locations — two characters get two
-//   different layouts. The dot therefore represents the player's
-//   true grid offset from the Outpost (mapX-10, mapY-10), NOT
-//   "the player is on Asgardar tile." Use the rings for distance,
-//   the named features for direction-of-travel intuition.
-//
-// Calibration:
-//   Image is laid out with resizeMode='contain'. The Outpost ring
-//   sits at approximately (50%, 38%) of the image's pixel area
-//   (measured visually from the rendered atlas). One grid tile is
-//   roughly 2.6% of the image's narrower dimension — calibrated so
-//   the Danger 4 ring (8-16 tile radius) falls inside the "Middle
-//   Rim" band drawn on the atlas. Tweak DOT_TILE_FRAC if a
-//   playtester says the dot is off.
+//   The atlas image depicts a CANONICAL geography (Asgardar east,
+//   Mud Seas south, Varakush southeast). The engine's per-character
+//   procedural grid shuffles individual cardinal positions, so two
+//   characters get two different layouts. The dot represents the
+//   player's true grid offset from the Outpost (mapX-10, mapY-10).
+//   Use rings for distance, named features for direction-of-travel
+//   intuition only.
 
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import React, { useRef, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Animated,
+  PanResponder,
+  type GestureResponderEvent,
+} from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from '../engine/worldMap';
 
 // Atlas anchor points, as fractions of the rendered image box.
-// Outpost ring center sits a bit above middle on the portrait image.
 const OUTPOST_FRAC_X = 0.50;
 const OUTPOST_FRAC_Y = 0.385;
-// One grid tile as a fraction of the image's height (the rings span
-// vertically ~38% from outpost center to Deep Frontier edge, covering
-// 19 tiles of max radius, so each tile is ~2% of image height).
 const DOT_TILE_FRAC = 0.02;
+
+// Gesture clamps.
+const MIN_SCALE = 0.8;
+const MAX_SCALE = 5;
+const DOUBLE_TAP_MS = 280;
+
+function distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function touchesOf(e: GestureResponderEvent): Array<{ x: number; y: number }> {
+  const touches = e.nativeEvent.touches ?? [];
+  return touches.map((t) => ({ x: t.pageX, y: t.pageY }));
+}
 
 export function MapScreen() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
 
-  const [imgBox, setImgBox] = React.useState<{ width: number; height: number } | null>(null);
+  // Rendered image-box layout, captured via onLayout.
+  const [imgBox, setImgBox] = useState<{ width: number; height: number } | null>(null);
+
+  // Animated transform values driven by the gesture handler.
+  const scale = useRef(new Animated.Value(1)).current;
+  const translateX = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(0)).current;
+
+  // Live mirrors of the Animated values so the PanResponder can read
+  // and update them without re-rendering on every frame.
+  const scaleRef = useRef(1);
+  const txRef = useRef(0);
+  const tyRef = useRef(0);
+  // Gesture-start snapshots — restored each time the responder grants.
+  const startScale = useRef(1);
+  const startTx = useRef(0);
+  const startTy = useRef(0);
+  const startPinchDist = useRef(0);
+  const lastTapAt = useRef(0);
+
+  const clampTranslate = (tx: number, ty: number, currentScale: number, box: { width: number; height: number } | null) => {
+    if (!box) return { tx, ty };
+    // Allow the image to be panned up to half its scaled bounds out
+    // of view, so the player can drag a corner to the center.
+    const maxX = (box.width * (currentScale - 1)) / 2 + box.width * 0.25;
+    const maxY = (box.height * (currentScale - 1)) / 2 + box.height * 0.25;
+    return {
+      tx: Math.max(-maxX, Math.min(maxX, tx)),
+      ty: Math.max(-maxY, Math.min(maxY, ty)),
+    };
+  };
+
+  const applyTransform = (s: number, tx: number, ty: number) => {
+    scaleRef.current = s;
+    txRef.current = tx;
+    tyRef.current = ty;
+    scale.setValue(s);
+    translateX.setValue(tx);
+    translateY.setValue(ty);
+  };
+
+  const resetTransform = () => {
+    Animated.parallel([
+      Animated.spring(scale, { toValue: 1, useNativeDriver: true, friction: 7, tension: 80 }),
+      Animated.spring(translateX, { toValue: 0, useNativeDriver: true, friction: 7, tension: 80 }),
+      Animated.spring(translateY, { toValue: 0, useNativeDriver: true, friction: 7, tension: 80 }),
+    ]).start(() => {
+      scaleRef.current = 1;
+      txRef.current = 0;
+      tyRef.current = 0;
+    });
+  };
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: (e) => {
+        const ts = touchesOf(e);
+        startScale.current = scaleRef.current;
+        startTx.current = txRef.current;
+        startTy.current = tyRef.current;
+        if (ts.length >= 2) {
+          startPinchDist.current = distance(ts[0]!, ts[1]!);
+        } else {
+          // Double-tap reset.
+          const now = Date.now();
+          if (now - lastTapAt.current < DOUBLE_TAP_MS) {
+            resetTransform();
+            lastTapAt.current = 0;
+          } else {
+            lastTapAt.current = now;
+          }
+        }
+      },
+      onPanResponderMove: (e, gestureState) => {
+        const ts = touchesOf(e);
+        if (ts.length >= 2 && startPinchDist.current > 0) {
+          // Pinch — scale around the gesture midpoint.
+          const newDist = distance(ts[0]!, ts[1]!);
+          const ratio = newDist / startPinchDist.current;
+          const nextScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, startScale.current * ratio));
+          // Pan during pinch: midpoint delta from start.
+          const tx = startTx.current + gestureState.dx;
+          const ty = startTy.current + gestureState.dy;
+          const clamped = clampTranslate(tx, ty, nextScale, imgBox);
+          applyTransform(nextScale, clamped.tx, clamped.ty);
+        } else {
+          // Single-finger pan.
+          const tx = startTx.current + gestureState.dx;
+          const ty = startTy.current + gestureState.dy;
+          const clamped = clampTranslate(tx, ty, scaleRef.current, imgBox);
+          applyTransform(scaleRef.current, clamped.tx, clamped.ty);
+        }
+      },
+      onPanResponderRelease: () => {
+        startPinchDist.current = 0;
+      },
+      onPanResponderTerminate: () => {
+        startPinchDist.current = 0;
+      },
+      onPanResponderTerminationRequest: () => false,
+    }),
+  ).current;
 
   if (!player) {
     return (
@@ -52,26 +176,19 @@ export function MapScreen() {
 
   const mapX = typeof player.mapX === 'number' ? player.mapX : WORLD_MAP_CENTER_X;
   const mapY = typeof player.mapY === 'number' ? player.mapY : WORLD_MAP_CENTER_Y;
-  // dx/dy in tiles from the Outpost (center of grid).
   const dx = mapX - WORLD_MAP_CENTER_X;
   const dy = mapY - WORLD_MAP_CENTER_Y;
   const tiles = Math.abs(dx) + Math.abs(dy);
-  // Cardinal hint for the chip below the map.
   const cardinal =
     dx === 0 && dy === 0 ? 'at the Outpost' :
     Math.abs(dx) >= Math.abs(dy)
       ? `${Math.abs(dx)} tile${Math.abs(dx) === 1 ? '' : 's'} ${dx >= 0 ? 'east' : 'west'} of the Outpost`
       : `${Math.abs(dy)} tile${Math.abs(dy) === 1 ? '' : 's'} ${dy >= 0 ? 'south' : 'north'} of the Outpost`;
 
-  // Translate dx/dy into an absolute pixel offset over the rendered image box.
-  // The image box dimensions arrive via onLayout; until then, hide the dot.
   let dotStyle: { left: number; top: number } | null = null;
   if (imgBox) {
     const cx = imgBox.width * OUTPOST_FRAC_X;
     const cy = imgBox.height * OUTPOST_FRAC_Y;
-    // Tile spacing is keyed off the image height (portrait), so the
-    // dot doesn't get squashed sideways when the image is letterboxed
-    // by resizeMode='contain'.
     const tile = imgBox.height * DOT_TILE_FRAC;
     dotStyle = {
       left: cx + dx * tile - DOT_SIZE / 2,
@@ -91,22 +208,29 @@ export function MapScreen() {
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
         <Text style={styles.title}>ATLAS</Text>
-        <View style={{ width: 80 }} />
+        <TouchableOpacity
+          onPress={resetTransform}
+          style={styles.resetBtn}
+          hitSlop={8}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.resetText}>RESET</Text>
+        </TouchableOpacity>
       </View>
 
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        maximumZoomScale={3}
-        minimumZoomScale={1}
-        bouncesZoom
+      <View
+        style={styles.imageBox}
+        onLayout={(e) => {
+          const { width, height } = e.nativeEvent.layout;
+          setImgBox({ width, height });
+        }}
+        {...panResponder.panHandlers}
       >
-        <View
-          style={styles.imageBox}
-          onLayout={(e) => {
-            const { width, height } = e.nativeEvent.layout;
-            setImgBox({ width, height });
-          }}
+        <Animated.View
+          style={[
+            styles.imageInner,
+            { transform: [{ translateX }, { translateY }, { scale }] },
+          ]}
         >
           <Image
             source={require('../../assets/world-atlas.png')}
@@ -119,8 +243,8 @@ export function MapScreen() {
               <View style={[styles.dot, dotStyle]} pointerEvents="none" />
             </>
           )}
-        </View>
-      </ScrollView>
+        </Animated.View>
+      </View>
 
       <View style={styles.footer}>
         <Text style={styles.footerHere}>● YOU ARE HERE</Text>
@@ -129,7 +253,8 @@ export function MapScreen() {
           {tiles === 0 ? 'At the Outpost.' : `${tiles} day${tiles === 1 ? '' : 's'} of travel from the Outpost.`}
         </Text>
         <Text style={styles.footerCaveat}>
-          Terrain rotates per character. The dot tracks your true grid offset; named features show canon directions, not your save's.
+          Drag to pan · pinch to zoom · double-tap to reset.
+          Terrain rotates per character; the dot tracks your true grid offset.
         </Text>
       </View>
     </View>
@@ -159,19 +284,31 @@ const styles = StyleSheet.create({
   },
   backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
   title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
+  resetBtn: {
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  resetText: { color: '#7a705c', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
   placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
 
-  scroll: { flex: 1 },
-  scrollContent: { flexGrow: 1, justifyContent: 'center' },
-
   imageBox: {
-    width: '100%',
-    aspectRatio: 1536 / 2752, // matches assets/world-atlas.png (1536 × 2752)
+    flex: 1,
     backgroundColor: '#13110f',
     borderColor: '#3a342c',
     borderWidth: 1,
     borderRadius: 4,
     overflow: 'hidden',
+    marginVertical: 4,
+  },
+  imageInner: {
+    width: '100%',
+    height: '100%',
     position: 'relative',
   },
   atlas: {
@@ -199,8 +336,8 @@ const styles = StyleSheet.create({
   },
 
   footer: {
-    marginTop: 10,
-    paddingHorizontal: 4,
+    marginTop: 4,
+    paddingHorizontal: 8,
     paddingVertical: 8,
     backgroundColor: '#13110f',
     borderColor: '#3a342c',
