@@ -3881,28 +3881,59 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       case 'rest': {
         // If the player resolved a consumable inventory item (e.g. "eat ration"),
-        // consume one and heal from a 2d6 roll instead of a generic camp-rest.
+        // consume one and heal from the item's per-catalog effect if any,
+        // falling back to a 2d6 roll for legacy consumables (Trail Rations,
+        // First Aid Kit) that don't declare an effect.
         const consumable = parsed.resolvedItemId
           ? player.inventory.find((i) => i.id === parsed.resolvedItemId && i.kind === 'consumable')
           : undefined;
         if (consumable) {
-          const room = player.hpMax - player.hp;
-          const heal = Math.min(Math.max(0, room), rollDie(6) + rollDie(6));
+          // OTA 002 — per-item healing. Wild foods declare
+          // { healHP, restoreStamina } in their effect block;
+          // honor those numbers. Items without an effect (Trail
+          // Rations, etc.) fall back to the original 2d6 roll so
+          // their behavior doesn't change.
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { resolveItemEffect } = require('../engine/itemEffect');
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { findExplorationItemByName, findGearByName, findMaterialByName } = require('../engine/crafting');
+          const fxRaw = resolveItemEffect(consumable.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
+          const fx = fxRaw && fxRaw.kind === 'consumable' ? fxRaw as { kind: 'consumable'; healHP?: number; restoreStamina?: number } : null;
+          const hpRoom = player.hpMax - player.hp;
+          const stamRoom = player.staminaMax - player.stamina;
+          const heal = fx
+            ? Math.min(Math.max(0, hpRoom), fx.healHP ?? 0)
+            : Math.min(Math.max(0, hpRoom), rollDie(6) + rollDie(6));
+          const stamGain = fx
+            ? Math.min(Math.max(0, stamRoom), fx.restoreStamina ?? 0)
+            : 0;
           const newInventory = player.inventory
             .map((i) => (i.id === consumable.id ? { ...i, quantity: i.quantity - 1 } : i))
             .filter((i) => i.quantity > 0);
           // Eating still costs a slice of the day — half an hour to break
           // and chew a ration, so the clock advances too.
+          const prevHpEat = player.hp;
+          const hpMaxEat = player.hpMax;
           set({
             player: advanceTime(
-              { ...player, hp: player.hp + heal, inventory: newInventory },
+              {
+                ...player,
+                hp: player.hp + heal,
+                stamina: player.stamina + stamGain,
+                inventory: newInventory,
+              },
               0.5,
             ),
           });
-          const tail = heal > 0
-            ? `2d6 → ${heal} HP recovered.`
-            : 'You were already at full strength — the ration steadies you, nothing more.';
+          const tailParts: string[] = [];
+          if (heal > 0) tailParts.push(`+${heal} HP`);
+          if (stamGain > 0) tailParts.push(`+${stamGain} stamina`);
+          const tail = tailParts.length > 0
+            ? `${tailParts.join(', ')} recovered.`
+            : (fx ? 'You were already topped up — the bite holds nothing back.' : 'You were already at full strength — the ration steadies you, nothing more.');
           get().appendLog('world', `You consume one ${consumable.name}. ${tail}`);
+          // Heal may push us back over the 5% latch threshold.
+          checkLowHpWarning(prevHpEat, prevHpEat + heal, hpMaxEat, get, set);
           void get().persist();
         } else {
           // Deterministic 8-hour rest. The old d4+3 prompt had no

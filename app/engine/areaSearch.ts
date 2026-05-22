@@ -77,6 +77,9 @@ export type AreaSearchOutcome =
 // pool by weight. Mud / Aether commodity weights lowered slightly
 // to compensate.
 const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
+  // Rocks / sticks / scrap — the "normal stuff you'd find on the
+  // ground." Highest weights so the player keeps stocking the
+  // cheap-kit pool the rulebook promises.
   { name: 'Mud Fragment', rarity: 'Common', weight: 12 },
   { name: 'Aether Residue', rarity: 'Common', weight: 8 },
   { name: 'Aether Mud', rarity: 'Common', weight: 6 },
@@ -84,9 +87,7 @@ const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
   { name: 'Big Rock', rarity: 'Common', weight: 10 },
   { name: 'Stick', rarity: 'Common', weight: 22 },
   // OTA 227 — Firewood drops fairly often from look-around / area
-  // search. Weightless, single-purpose (campfire fuel — cook system
-  // pending). Playtester: "make them a fairly common thing to take
-  // when you look around. they're only good for making campfires."
+  // search. Weightless, single-purpose (campfire fuel).
   { name: 'Firewood', rarity: 'Common', weight: 18 },
   { name: 'Spider Silk', rarity: 'Common', weight: 6 },
   { name: 'Patched Cloth', rarity: 'Common', weight: 6 },
@@ -94,6 +95,37 @@ const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
   { name: 'Bone Bolt', rarity: 'Common', weight: 4 },
   { name: 'Trail Rations', rarity: 'Common', weight: 3 },
   { name: 'Aetheric Shard', rarity: 'Uncommon', weight: 2 },
+
+  // OTA 002 — wild foods. Playtester: "I want to find wild onions,
+  // wild carrots... blueberries, raspberries, grapes picked from a
+  // vine. these foods need to be eaten or drank and they should
+  // all give you health back to varying degrees." Per-item HP /
+  // stamina lives in the catalog effect; eat handler reads it.
+  // Common foods (5-9 weight each — ~30% of all material drops
+  // combined). Uncommon fruits + protein at lower weight, rare
+  // Wild Chicken sparingly.
+  { name: 'Wild Onion', rarity: 'Common', weight: 8 },
+  { name: 'Wild Carrot', rarity: 'Common', weight: 8 },
+  { name: 'Wild Lettuce', rarity: 'Common', weight: 6 },
+  { name: 'Rhubarb Stalk', rarity: 'Common', weight: 5 },
+  { name: 'Wild Oats', rarity: 'Common', weight: 7 },
+  { name: 'Speckled Egg', rarity: 'Uncommon', weight: 3 },
+  { name: 'Blueberries', rarity: 'Uncommon', weight: 4 },
+  { name: 'Raspberries', rarity: 'Uncommon', weight: 4 },
+  { name: 'Wild Grapes', rarity: 'Uncommon', weight: 3 },
+  { name: 'Wild Chicken', rarity: 'Rare', weight: 1 },
+
+  // Colored mushrooms — Phase 4 will combine these in the craft
+  // tab for color-coded potions. Eaten raw, they give minimal
+  // healing — the real value comes from cooking / distilling.
+  { name: 'Red Cap Mushroom', rarity: 'Common', weight: 5 },
+  { name: 'Blue Cap Mushroom', rarity: 'Common', weight: 5 },
+  { name: 'Violet Cap Mushroom', rarity: 'Uncommon', weight: 2 },
+  { name: 'Orange Sporecap', rarity: 'Common', weight: 5 },
+
+  // Rare trinkets — "every now and then you'll find a trinket
+  // like a locket or ring or something good but rarely."
+  { name: 'Aetheric Locket', rarity: 'Common', weight: 1 },
 ];
 
 // Empty-search narration. Per the playtest "Lockbox/Wagon"
