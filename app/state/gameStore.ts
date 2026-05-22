@@ -8774,6 +8774,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
     //   5. Ambush check — completed-and-armed whisper triggers a
     //      one-shot ambush on the NEXT cardinal step after reward
     resolveWhispersForTile(get, set, step.x, step.y);
+
+    // OTA 034 — per-step roadside trader spawn. The cardinal-step
+    // handler stays inside the same macro scene, so beginScene never
+    // re-rolls the vendor slot — a player who paces within one
+    // location (e.g. the Outskirts wilderness) never encounters a
+    // roadside stall even with the 25% spawn rate. Roll here on
+    // every peaceful outdoor step: 15% chance, gated on no current
+    // vendor, no enemies, no hub-room. Stalls "materialize" as the
+    // player crests the next stretch of silt.
+    {
+      const liveScene = get().currentScene;
+      const livePlayer = get().player;
+      const outdoorPeaceful = !!liveScene
+        && (!liveScene.enemies || liveScene.enemies.length === 0)
+        && !liveScene.vendor;
+      const inAnyHubRoom = !!livePlayer?.hubRoomId;
+      if (outdoorPeaceful && !inAnyHubRoom && Math.random() < 0.15) {
+        const stall = pickRoadsideTrader();
+        set((s) => s.currentScene ? { currentScene: { ...s.currentScene, vendor: stall } } : s);
+        get().appendLog(
+          'world',
+          `A stall has been thrown up on the next stretch of ground — ${stall.name}, ${stall.title}. Tap the vendor banner to trade.`,
+        );
+      }
+    }
+
     // Travel-time lore beat — 5% chance per cardinal step that the
     // Arbiter drops an unprompted world-color line drawn from the
     // TRAVEL_LORE_BEATS pool. Surfaces the lore layer for players who
