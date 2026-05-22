@@ -203,6 +203,71 @@
         { "name": "Aetheric Pelt", "quantity": 1 },
         { "name": "Aetheric Shard", "quantity": 2 }
       ]
+    },
+
+    { "result": "Forager's Stew",
+      "ingredients": [
+        { "name": "Firewood", "quantity": 1 },
+        { "name": "Water Bottle", "quantity": 1 },
+        { "name": "Wild Onion", "quantity": 1 },
+        { "name": "Wild Carrot", "quantity": 1 }
+      ]
+    },
+    { "result": "Hearty Stew",
+      "ingredients": [
+        { "name": "Firewood", "quantity": 2 },
+        { "name": "Water Bottle", "quantity": 1 },
+        { "name": "Wild Chicken", "quantity": 1 },
+        { "name": "Wild Onion", "quantity": 1 },
+        { "name": "Wild Carrot", "quantity": 1 }
+      ]
+    },
+    { "result": "Mushroom Stew",
+      "ingredients": [
+        { "name": "Firewood", "quantity": 1 },
+        { "name": "Water Bottle", "quantity": 1 },
+        { "name": "Red Cap Mushroom", "quantity": 1 },
+        { "name": "Blue Cap Mushroom", "quantity": 1 }
+      ]
+    },
+
+    { "result": "Red Cap Tincture",
+      "ingredients": [
+        { "name": "Firewood", "quantity": 1 },
+        { "name": "Water Bottle", "quantity": 1 },
+        { "name": "Red Cap Mushroom", "quantity": 2 }
+      ]
+    },
+    { "result": "Blue Cap Draught",
+      "ingredients": [
+        { "name": "Firewood", "quantity": 1 },
+        { "name": "Water Bottle", "quantity": 1 },
+        { "name": "Blue Cap Mushroom", "quantity": 2 }
+      ]
+    },
+    { "result": "Violet Cap Distillate",
+      "ingredients": [
+        { "name": "Firewood", "quantity": 1 },
+        { "name": "Water Bottle", "quantity": 1 },
+        { "name": "Violet Cap Mushroom", "quantity": 2 }
+      ]
+    },
+    { "result": "Orange Sporecap Brew",
+      "ingredients": [
+        { "name": "Firewood", "quantity": 1 },
+        { "name": "Water Bottle", "quantity": 1 },
+        { "name": "Orange Sporecap", "quantity": 2 }
+      ]
+    },
+    { "result": "Many-Colored Tonic",
+      "ingredients": [
+        { "name": "Firewood", "quantity": 2 },
+        { "name": "Water Bottle", "quantity": 1 },
+        { "name": "Red Cap Mushroom", "quantity": 1 },
+        { "name": "Blue Cap Mushroom", "quantity": 1 },
+        { "name": "Violet Cap Mushroom", "quantity": 1 },
+        { "name": "Orange Sporecap", "quantity": 1 }
+      ]
     }
   ]
 }
