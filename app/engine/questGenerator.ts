@@ -36,7 +36,11 @@ export function generateQuest(memory: WorldMemory, preferredLocationId?: string)
   }
 
   return {
-    id: `quest_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+    // OTA 011 — was Math.floor(Math.random() * 1000) which
+    // collides at ~1-in-1000 odds within the same Date.now()
+    // millisecond. Higher-entropy slug with base-36 random
+    // makes collisions astronomical.
+    id: `quest_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
     objective,
     location,
     complication,

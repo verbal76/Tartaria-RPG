@@ -6816,7 +6816,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       .find(({ rec, def }) => {
         if (!def) return false;
         // Boss enemy names are tagged " (hunted)" by scaleHuntBoss.
-        return enemy.name === `${def.targetEnemyName} (hunted)` && rec.stage > 0;
+        // OTA 011 — was `rec.stage > 0`, which blocked completion
+        // when a hunt-target was killed on stage 0 (the spawn beat).
+        // Hunts now complete whenever the tagged boss dies,
+        // regardless of which stage the player happened to be in.
+        return enemy.name === `${def.targetEnemyName} (hunted)` && rec.stage >= 0;
       });
     if (matchingHunt && matchingHunt.def) {
       set((s) =>
@@ -6834,6 +6838,41 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog(
         'reward',
         `✦ ${matchingHunt.def.targetEnemyName} slain. Return to a posting agent to turn in "${matchingHunt.def.title}" for the bounty.`,
+      );
+    }
+    // OTA 011 — LEADS completion. Procedurally-generated quests
+    // (player.activeQuests) used to accumulate forever with no
+    // turn-in path; the LEADS section in Contracts displayed them
+    // but the engine never marked them done. Now: when the slain
+    // enemy's name matches an active lead's objective target AND
+    // the verb is kill-shaped, auto-complete the lead, grant the
+    // reward, and drop it from activeQuests.
+    const killVerbs = new Set(['kill', 'slay', 'defeat', 'hunt', 'retrieve']);
+    const matchingLeads = (player.activeQuests ?? []).filter(
+      (q) =>
+        (q.state === 'open' || q.state === 'in_progress') &&
+        killVerbs.has(q.objective.verb.toLowerCase()) &&
+        q.objective.target.toLowerCase().includes(enemy.name.toLowerCase().replace(/ \(hunted\)$/i, '')),
+    );
+    for (const lead of matchingLeads) {
+      const reward = lead.reward;
+      if (reward.type === 'currency' && reward.amount) {
+        set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + reward.amount! } } : s));
+        get().appendLog('reward', `Lead resolved: ${lead.objective.verb} ${lead.objective.target}. +${reward.amount} TC.`);
+      } else {
+        get().appendLog('reward', `Lead resolved: ${lead.objective.verb} ${lead.objective.target}. (${reward.label})`);
+      }
+      set((s) =>
+        s.player
+          ? {
+              player: {
+                ...s.player,
+                activeQuests: s.player.activeQuests.map((q) =>
+                  q.id === lead.id ? { ...q, state: 'completed' as const } : q,
+                ),
+              },
+            }
+          : s,
       );
     }
     const loot = enemy.loot[Math.floor(Math.random() * enemy.loot.length)] ?? 'Aether dust';
@@ -8149,7 +8188,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    if (candidate.factionId !== scene.vendor.faction) {
+    // OTA 011 — match hunt/mystery null-faction guard pattern. If a
+    // storyline ever ships with factionId=null (none currently do,
+    // but schema allows it) the old bare !== check would reject
+    // every vendor; the && short-circuits that.
+    if (candidate.factionId && candidate.factionId !== scene.vendor.faction) {
       get().appendLog(
         'arbiter',
         `${scene.vendor.name} shakes their head. "Wrong faction. ${candidate.factionId.replace(/_/g, ' ')} posted that one."`,

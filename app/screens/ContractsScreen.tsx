@@ -334,7 +334,12 @@ export function ContractsScreen() {
               </Text>
               {leads.map((q) => {
                 const title = `${cap(q.objective.verb)} ${q.objective.target}`;
-                const reward = q.reward.amount
+                // OTA 011 — `q.reward.amount > 0` instead of truthy
+                // check; was rendering "0 standing" when type was
+                // 'standing'/'knowledge' with amount=0 because 0 is
+                // falsy but the ternary fell into the with-amount
+                // branch via truthy coercion on a falsy 0.
+                const reward = (q.reward.amount != null && q.reward.amount > 0)
                   ? `${q.reward.amount} ${q.reward.type === 'currency' ? 'TC' : q.reward.type}`
                   : q.reward.label;
                 return (
