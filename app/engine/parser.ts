@@ -170,7 +170,11 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'duck for cover', 'hide behind',
   ],
   aim: ['aim', 'sight', 'target', 'line up', 'draw bead', 'level', 'lock on', 'sight in', 'track sight', 'zero'],
-  reload: ['reload', 'reloading', 'reset', 'rearm', 'rerack', 'refill', 'recharge', 'top up', 'load up', 'feed'],
+  // OTA 013 — 'refill' and 'top up' removed; they belonged to the
+  // water-bottle 'fill' intent and were colliding with reload's
+  // verb match. 'recharge' / 'load up' / 'feed' still cover the
+  // ammo / battery semantic.
+  reload: ['reload', 'reloading', 'reset', 'rearm', 'rerack', 'recharge', 'load up', 'feed'],
   // 'disarm' lived in both maneuver AND open — and because maneuver
   // comes first in the iteration order, "disarm the trap" routed to
   // grappling ("Maneuver against whom? Empty ground does not grapple

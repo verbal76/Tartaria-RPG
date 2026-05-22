@@ -78,13 +78,21 @@ const LEXICON: Array<[RegExp, string]> = [
   [/\bdoesn'?t\b/gi, 'duzzent'],
 ];
 
+// OTA 013 — sort lexicon entries by pattern length descending so
+// longer phrases always try first. "Aetherstone" should never be
+// pre-empted by "Aether" matching the first 6 chars (\b boundaries
+// usually prevent this, but the safety belt protects against future
+// authors adding overlapping entries out of order).
+const SORTED_LEXICON: Array<[RegExp, string]> = [...LEXICON]
+  .sort((a, b) => b[0].source.length - a[0].source.length);
+
 /**
  * Apply the lore lexicon to a chunk of text before it goes to the
  * Kokoro TTS engine. Pure function; safe to call on every speak().
  */
 export function applyLoreLexicon(text: string): string {
   let out = text;
-  for (const [pattern, replacement] of LEXICON) {
+  for (const [pattern, replacement] of SORTED_LEXICON) {
     out = out.replace(pattern, replacement);
   }
   return out;
@@ -136,10 +144,14 @@ export function cleanForSpeech(text: string): string {
   // or punctuation. This leaves possessives ("Mark's") and
   // contractions ("don't") untouched because they have letters on
   // both sides of the apostrophe.
-  out = out.replace(/(^|[\s(\[{>])'([A-Za-z0-9][A-Za-z0-9 \-]{0,30}[A-Za-z0-9])'(?=$|[\s)\].,!?;:])/g, '$1$2');
+  // OTA 013 — was {0,30} which silently passed longer quoted
+  // phrases through to Kokoro unstripped. Widened to {0,160} so
+  // any reasonable in-game quotation gets cleaned (most lines are
+  // < 80 chars; 160 covers Arbiter dialog in full).
+  out = out.replace(/(^|[\s(\[{>])'([A-Za-z0-9][A-Za-z0-9 \-]{0,160}[A-Za-z0-9])'(?=$|[\s)\].,!?;:])/g, '$1$2');
   // Same rule for "smart" single quotes ' and ' (U+2018 / U+2019)
   // — emitted by some authoring sources.
-  out = out.replace(/(^|[\s(\[{>])[‘’]([A-Za-z0-9][A-Za-z0-9 \-]{0,30}[A-Za-z0-9])[‘’](?=$|[\s)\].,!?;:])/g, '$1$2');
+  out = out.replace(/(^|[\s(\[{>])[‘’]([A-Za-z0-9][A-Za-z0-9 \-]{0,160}[A-Za-z0-9])[‘’](?=$|[\s)\].,!?;:])/g, '$1$2');
   return out;
 }
 

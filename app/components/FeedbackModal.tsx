@@ -124,7 +124,17 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
             // immediately.
             setTimeout(() => {
               if (visible && !manualMode.current) {
-                void armSTT();
+                // OTA 013 — wrap in catch so a failed re-arm doesn't
+                // leave the modal "Listening" forever with a dead
+                // mic. If startListening throws here, surface the
+                // error to the user and unlock the modal so they
+                // can switch to manual typing.
+                void armSTT().catch((err) => {
+                  const msg = err instanceof Error ? err.message : String(err);
+                  setMicError(msg.slice(0, 80));
+                  setListening(false);
+                  restartingRef.current = false;
+                });
               }
             }, 150);
           }

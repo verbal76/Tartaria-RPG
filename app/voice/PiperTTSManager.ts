@@ -66,6 +66,12 @@ interface QueuedUtterance {
    *  expo-av's 500ms status poll). With prefetch + 50ms poll the gap
    *  drops to ~100ms. */
   prefetch?: Promise<Float32Array | null>;
+  /** OTA 013 — the voiceId the prefetch was inferred with. Drain
+   *  validates this at consumption time: if the player switched
+   *  voices between prefetch-start and consume, the prefetched
+   *  audio is the wrong voice and gets discarded; we re-run
+   *  forward() with the current voice instead. */
+  prefetchVoiceId?: string | null;
 }
 
 // Voice pool. Holds at most POOL_MAX loaded Kokoro instances. The
@@ -407,9 +413,15 @@ async function drain(): Promise<void> {
   try {
     const settings = getVoiceSettings();
     // Use the prefetched samples if drain's previous iteration already
-    // kicked off inference for this chunk; otherwise run forward() now.
-    const samples: Float32Array | null = next.prefetch
-      ? await next.prefetch
+    // kicked off inference for this chunk AND the prefetched voice
+    // still matches what we're about to play with. OTA 013 — if the
+    // player switched the Arbiter voice between prefetch-start and
+    // consume, the prefetched audio is the wrong voice; discard and
+    // re-infer with the current model.
+    const prefetchStillValid = !!next.prefetch
+      && (next.prefetchVoiceId === undefined || next.prefetchVoiceId === targetVoice);
+    const samples: Float32Array | null = prefetchStillValid
+      ? await next.prefetch!
       : await model.forward(next.text, settings.rate);
     if (!samples || samples.length === 0) {
       currentlySpeaking = null;
@@ -425,6 +437,10 @@ async function drain(): Promise<void> {
     if (upcoming && !upcoming.prefetch) {
       const upcomingVoice = upcoming.voiceId ?? arbiterVoiceId();
       if (upcomingVoice === targetVoice) {
+        // OTA 013 — stamp the voice we inferred with. Drain's
+        // consume-side check uses prefetchVoiceId to detect a
+        // mid-stream voice switch and discard stale audio.
+        upcoming.prefetchVoiceId = targetVoice;
         upcoming.prefetch = model
           .forward(upcoming.text, settings.rate)
           .catch(() => null);
