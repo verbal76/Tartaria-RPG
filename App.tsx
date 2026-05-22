@@ -116,10 +116,24 @@ export default function App() {
     if (!NB) return;
     void NB.setBehaviorAsync('overlay-swipe').catch(() => { /* ignore */ });
     void NB.setVisibilityAsync('hidden').catch(() => { /* ignore */ });
-    // The system can re-show the navigation bar when the keyboard opens
-    // or a system dialog appears; AppState 'active' transitions are a
-    // reliable hook to reassert hidden state. The listener below in the
-    // other useEffect already handles 'active' — we re-hide there too.
+    // OTA 026 — re-hide the navigation bar EVERY time the keyboard
+    // shows or hides. Android often re-shows the system nav bar
+    // when a TextInput gains focus (FeedbackModal, exploration
+    // input bar, etc.). Playtester: "every time I go to use the
+    // take notes option ... all of the Android buttons come back
+    // on the screen." Keyboard.addListener fires on every show /
+    // hide; we re-assert hidden on both events so a brief flash
+    // is the worst the player sees.
+    const { Keyboard } = require('react-native');
+    const reHide = () => {
+      void NB.setVisibilityAsync('hidden').catch(() => { /* ignore */ });
+    };
+    const showSub = Keyboard.addListener('keyboardDidShow', reHide);
+    const hideSub = Keyboard.addListener('keyboardDidHide', reHide);
+    return () => {
+      try { showSub.remove(); } catch { /* ignore */ }
+      try { hideSub.remove(); } catch { /* ignore */ }
+    };
   }, []);
 
   useEffect(() => {

@@ -58,6 +58,7 @@
     { "name": "Aetheric Locket", "kind": "relic", "rarity": "Common", "tags": ["detection", "relic"], "description": "Hums when held close to a relic." },
     { "name": "First Aid Kit", "kind": "consumable", "rarity": "Uncommon", "tags": ["healing"], "description": "Sterile bandages, mud-glass needles, a single dose of Aetheric salve. Restores 1d6 HP on use." },
     { "name": "Aetheric Compass", "kind": "relic", "rarity": "Uncommon", "tags": ["detection", "navigation", "relic"], "description": "A compass that points at the strongest local Aether source. Rarely north." },
-    { "name": "Climbing Rope", "kind": "misc", "rarity": "Common", "tags": ["utility"], "description": "Fifty feet of mud-treated rope. Holds a Giant's weight if you don't push it." }
+    { "name": "Climbing Rope", "kind": "misc", "rarity": "Common", "tags": ["utility", "gate"], "description": "Fifty feet of mud-treated rope. Holds a Giant's weight if you don't push it. Carry one and you pass any climb-required check — the rope does the work.",
+      "effect": { "kind": "gate", "unlocks": "climb_steep" } }
   ]
 }
