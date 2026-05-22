@@ -80,7 +80,17 @@ let onDiag: ((channel: 'system' | 'debug', line: string) => void) | null = null;
 export function setSTTDiag(cb: ((channel: 'system' | 'debug', line: string) => void) | null): void {
   onDiag = cb;
 }
+// OTA 025 — debug-channel STT noise was flooding the on-disk log:
+// every voice session emitted ~14 setup lines + one per partial
+// transcript (30+ per spoken sentence). A single feedback note
+// dictation produced 50-100 entries; the playtester reported a
+// 51 KB log two locations from spawn, almost all of it STT chatter.
+// Suppress every debug-channel line by default. System-channel
+// lines (user-visible mic errors / hints) still flow. Flip this
+// switch to true for one session if you need the firehose back.
+const VERBOSE_STT_DEBUG = false;
 function diag(channel: 'system' | 'debug', line: string): void {
+  if (channel === 'debug' && !VERBOSE_STT_DEBUG) return;
   try { onDiag?.(channel, line); } catch { /* ignore */ }
 }
 
