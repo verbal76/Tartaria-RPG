@@ -38,6 +38,14 @@ export interface CheckAndApplyOptions {
    *  offers the player a one-tap apply that runs the full reload
    *  sequence from a clean state. */
   fetchOnly?: boolean;
+  /** OTA 047 — skip the check + fetch and go straight to teardown
+   *  + reloadAsync. Used by the title-screen tap-to-apply path
+   *  when a bundle has already been pre-staged by the boot
+   *  fetchOnly pass (pendingOTAUpdate flag is true). Without this,
+   *  a transient network hiccup at apply time threw
+   *  ERR_UPDATES_FETCH 'Failed to download new update' even
+   *  though the bundle was already on disk and ready to load. */
+  skipFetch?: boolean;
 }
 
 /** Result the caller can inspect. `applied` means we triggered a
@@ -51,28 +59,37 @@ export interface CheckAndApplyOptions {
 export type CheckAndApplyResult = 'applied' | 'pending' | 'noUpdate' | 'skipped' | 'errored';
 
 export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise<CheckAndApplyResult> {
-  const { onStatus, onError, silent = false, fetchOnly = false } = opts;
+  const { onStatus, onError, silent = false, fetchOnly = false, skipFetch = false } = opts;
   try {
     if (!Updates.isEnabled) {
       if (!silent) onStatus?.('Disabled (dev build / Expo Go)');
       return 'skipped';
     }
-    onStatus?.('Checking…');
-    const result = await Updates.checkForUpdateAsync();
-    if (!result.isAvailable) {
-      onStatus?.('Already up to date');
-      return 'noUpdate';
-    }
-    onStatus?.('Downloading update…');
-    await Updates.fetchUpdateAsync();
-    // fetchOnly path — silent boot check. Don't reload mid-boot;
-    // native modules are still initialising and reloadAsync at
-    // this point reliably crashes the process to home screen.
-    // The boot caller flips the pendingOTAUpdate store flag so the
-    // title screen can offer a one-tap apply from a clean state.
-    if (fetchOnly) {
-      onStatus?.('Update downloaded — restart to apply');
-      return 'pending';
+    // OTA 047 — skipFetch path: the boot pass already downloaded
+    // the bundle and set pendingOTAUpdate. Re-running check+fetch
+    // here was redundant AND failing on transient network hiccups
+    // (ERR_UPDATES_FETCH 'Failed to download new update') even
+    // though the bundle was already staged. Go straight to
+    // teardown + reload; expo-updates' reloadAsync boots into the
+    // most recently fetched update on disk.
+    if (!skipFetch) {
+      onStatus?.('Checking…');
+      const result = await Updates.checkForUpdateAsync();
+      if (!result.isAvailable) {
+        onStatus?.('Already up to date');
+        return 'noUpdate';
+      }
+      onStatus?.('Downloading update…');
+      await Updates.fetchUpdateAsync();
+      // fetchOnly path — silent boot check. Don't reload mid-boot;
+      // native modules are still initialising and reloadAsync at
+      // this point reliably crashes the process to home screen.
+      // The boot caller flips the pendingOTAUpdate store flag so the
+      // title screen can offer a one-tap apply from a clean state.
+      if (fetchOnly) {
+        onStatus?.('Update downloaded — restart to apply');
+        return 'pending';
+      }
     }
     // Flush the player's progress to disk BEFORE handing control to
     // expo-updates. If reloadAsync starts while AsyncStorage is still

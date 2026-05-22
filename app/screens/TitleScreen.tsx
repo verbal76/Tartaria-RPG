@@ -69,7 +69,6 @@ export function TitleScreen() {
   const justUpdatedFromBuild = useGameStore((s) => s.justUpdatedFromBuild);
   const dismissJustUpdated = useGameStore((s) => s.dismissJustUpdated);
   const pendingOTAUpdate = useGameStore((s) => s.pendingOTAUpdate);
-  const clearPendingOTAUpdate = useGameStore((s) => s.clearPendingOTAUpdate);
   const [applyingOTA, setApplyingOTA] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [pendingAction, setPendingAction] = useState<
@@ -337,14 +336,21 @@ export function TitleScreen() {
           disabled={applyingOTA !== null}
           onPress={() => {
             setApplyingOTA('Preparing…');
+            // OTA 047 — skipFetch: bundle is already on disk from
+            // the boot fetchOnly pass. Re-fetching here was throwing
+            // ERR_UPDATES_FETCH on transient network hiccups even
+            // with a perfectly good staged update sitting locally.
             void checkAndApplyOTA({
+              skipFetch: true,
               onStatus: (s) => setApplyingOTA(s),
               onError: (msg) => {
                 setApplyingOTA(null);
-                clearPendingOTAUpdate();
-                // Surface the error via the same slot-load-error
-                // channel so the player sees it on the title screen.
-                useGameStore.setState({ slotLoadError: `Update failed: ${msg}` });
+                // Leave pendingOTAUpdate set — the banner stays
+                // visible so the player can tap again to retry.
+                // Pre-OTA-047 the flag was cleared here, which
+                // hid the banner and forced a full app relaunch
+                // to recover.
+                useGameStore.setState({ slotLoadError: `Update failed: ${msg}\n\nTap UPDATE READY again to retry, or restart the app.` });
               },
             });
           }}
