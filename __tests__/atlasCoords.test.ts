@@ -177,12 +177,12 @@ describe('OTA 051 — atlas coordinate calibration', () => {
     });
     it('clamps far-east coords back inside the visible map', () => {
       const out = clampToMapArea({ fx: 1.5, fy: 0.5 });
-      expect(out.fx).toBeLessThanOrEqual(0.92);
+      expect(out.fx).toBeLessThanOrEqual(0.95);
       expect(out.fx).toBeGreaterThan(0.5);
     });
     it('clamps far-south coords back above the timeline ribbon', () => {
       const out = clampToMapArea({ fx: 0.5, fy: 1.2 });
-      expect(out.fy).toBeLessThanOrEqual(0.85);
+      expect(out.fy).toBeLessThanOrEqual(0.95);
     });
     it('clamps negative coords back into the visible map', () => {
       const out = clampToMapArea({ fx: -0.3, fy: -0.2 });

@@ -36,12 +36,10 @@ import {
   type GestureResponderEvent,
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from '../engine/worldMap';
+import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y, generateWorldMap } from '../engine/worldMap';
 import {
   atlasCoordForLocation,
-  OUTPOST_ATLAS_COORD,
-  DOT_TILE_FRAC,
-  clampToMapArea,
+  interpolateAtlasPosition,
 } from '../engine/atlasCoords';
 // OTA 051 — locations.json carries the human-readable name we want
 // to surface in the "You are here: <name>" chip when the player is
@@ -188,46 +186,40 @@ export function MapScreen() {
   const dy = mapY - WORLD_MAP_CENTER_Y;
   const tiles = Math.abs(dx) + Math.abs(dy);
 
-  // OTA 051 — two-tier dot anchoring.
+  // OTA 054 — inverse-distance-weighted dot plotting.
   //
-  // 1) If the player is at a depicted-on-atlas location, anchor the
-  //    dot directly to that location's icon (atlas-canonical coord).
-  //    The dot lands ON the Asgardar tower, the Mud Flood Nexus icon,
-  //    the Samarran ziggurat, etc.
-  // 2) Otherwise (the player is on an unnamed wandering tile, or on
-  //    a named location that isn't drawn on the atlas), fall back to
-  //    the grid-offset estimate from the Outpost.
-  const depictedCoord = atlasCoordForLocation(player.currentLocationId);
+  // Regenerate the player's procedural world map (deterministic per
+  // character seed) so we have the procedural grid positions of
+  // every named location. Then IDW-interpolate the player's atlas
+  // coord using each location's atlas coord weighted by inverse
+  // procedural distance. This gives:
+  //   - Snap-to-anchor when the player is on a named tile (the
+  //     anchor's weight dominates the average).
+  //   - Smooth glide between anchors during cardinal travel.
+  //   - Per-pair scaling for free: if two anchors are 26 tiles apart
+  //     procedurally and 2 inches apart visually, a halfway point
+  //     procedurally lands halfway visually.
+  //   - The dot is ALWAYS plotted — there's no "between locations"
+  //     fallback branch.
+  const seed = player.mapSeed
+    ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
+  const worldMap = generateWorldMap(seed, player.currentLocationId);
+  const atlasPos = interpolateAtlasPosition(mapX, mapY, worldMap.positions);
+
   const currentLocation = LOCATIONS.find((l) => l.id === player.currentLocationId) ?? null;
-  const onDepictedTile = !!depictedCoord;
+  const onDepictedTile = !!atlasCoordForLocation(player.currentLocationId);
 
   let dotStyle: { left: number; top: number } | null = null;
   if (imgBox) {
-    if (depictedCoord) {
-      // Tier 1 — anchor to the canonical drawn icon.
-      dotStyle = {
-        left: imgBox.width * depictedCoord.fx - DOT_SIZE / 2,
-        top: imgBox.height * depictedCoord.fy - DOT_SIZE / 2,
-      };
-    } else {
-      // Tier 2 — grid-offset fallback from the Outpost anchor.
-      // The Outpost now sits in the upper-left of the landscape
-      // atlas, so a player far east/south on the procedural grid
-      // would otherwise drift the dot off-image. clampToMapArea
-      // keeps the dot inside the painted world (away from the
-      // legend insets and the timeline ribbon).
-      const fx = OUTPOST_ATLAS_COORD.fx + dx * DOT_TILE_FRAC;
-      const fy = OUTPOST_ATLAS_COORD.fy + dy * DOT_TILE_FRAC;
-      const clamped = clampToMapArea({ fx, fy });
-      dotStyle = {
-        left: imgBox.width * clamped.fx - DOT_SIZE / 2,
-        top: imgBox.height * clamped.fy - DOT_SIZE / 2,
-      };
-    }
+    dotStyle = {
+      left: imgBox.width * atlasPos.fx - DOT_SIZE / 2,
+      top: imgBox.height * atlasPos.fy - DOT_SIZE / 2,
+    };
   }
 
   // Footer prose — when the player is on a depicted location, name
-  // it; when they're between tiles, give the grid-offset estimate.
+  // it; otherwise give the cardinal direction + tile count from the
+  // Outpost so the player has both a visual and a textual reference.
   const whereLine = onDepictedTile && currentLocation
     ? currentLocation.name
     : dx === 0 && dy === 0
@@ -295,8 +287,8 @@ export function MapScreen() {
         <Text style={styles.footerCaveat}>
           Drag to pan · pinch to zoom · double-tap to reset.
           {onDepictedTile
-            ? ' Dot anchored to the atlas drawing.'
-            : ' Terrain rotates per character; the dot tracks your grid offset.'}
+            ? ' Dot snapped to the atlas drawing.'
+            : ' Dot interpolated across the nearest named landmarks.'}
         </Text>
       </View>
     </View>
