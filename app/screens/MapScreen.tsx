@@ -49,6 +49,11 @@ import type { Location } from '../engine/types';
 
 const LOCATIONS = locationsData as Location[];
 
+// Atlas asset's pixel dimensions — used to compute the letterboxed
+// image rect inside the flex-filled imageBox.
+const ATLAS_W = 1408;
+const ATLAS_H = 768;
+
 // Gesture clamps.
 const MIN_SCALE = 0.8;
 const MAX_SCALE = 5;
@@ -211,9 +216,34 @@ export function MapScreen() {
 
   let dotStyle: { left: number; top: number } | null = null;
   if (imgBox) {
+    // OTA 055 — letterbox-aware dot positioning. The imageBox is
+    // now flex-filled (fills the available height between header
+    // and footer); the image inside uses resizeMode='contain' so it
+    // letterboxes within that larger window. Compute the actual
+    // image-rendered rect inside the box so the dot lands on real
+    // pixels, not the empty letterbox margins.
+    const imgAspect = ATLAS_W / ATLAS_H;
+    const boxAspect = imgBox.width / imgBox.height;
+    let renderedW: number;
+    let renderedH: number;
+    let offsetX: number;
+    let offsetY: number;
+    if (boxAspect > imgAspect) {
+      // Box wider than image — letterbox on left and right.
+      renderedH = imgBox.height;
+      renderedW = imgBox.height * imgAspect;
+      offsetX = (imgBox.width - renderedW) / 2;
+      offsetY = 0;
+    } else {
+      // Box narrower than image — letterbox on top and bottom.
+      renderedW = imgBox.width;
+      renderedH = imgBox.width / imgAspect;
+      offsetX = 0;
+      offsetY = (imgBox.height - renderedH) / 2;
+    }
     dotStyle = {
-      left: imgBox.width * atlasPos.fx - DOT_SIZE / 2,
-      top: imgBox.height * atlasPos.fy - DOT_SIZE / 2,
+      left: offsetX + renderedW * atlasPos.fx - DOT_SIZE / 2,
+      top: offsetY + renderedH * atlasPos.fy - DOT_SIZE / 2,
     };
   }
 
@@ -332,12 +362,13 @@ const styles = StyleSheet.create({
   placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
 
   imageBox: {
-    // Aspect-locked to the atlas asset (1408 × 768, landscape) so
-    // the dot's fractional coords land on actual image content.
-    // Flex-1 would have letterboxed the image with margins, and
-    // the dot would have drifted into the dead space.
-    width: '100%',
-    aspectRatio: 1408 / 768,
+    // OTA 055 — flex-filled. The previous aspect-locked sizing
+    // produced a thin landscape band on portrait phones with most
+    // of the vertical space empty. Now the box claims everything
+    // between header and footer; the image inside letterboxes via
+    // resizeMode='contain' and the dot computation accounts for the
+    // letterbox margins so dots still land on real image pixels.
+    flex: 1,
     backgroundColor: '#13110f',
     borderColor: '#3a342c',
     borderWidth: 1,
