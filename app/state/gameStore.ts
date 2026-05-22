@@ -3219,7 +3219,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
               break;
             }
           }
-          if (rawTarget && (isAreaSearch(rawTarget) || ambientHitInAttack)) {
+          // OTA 016 — hub-room gate. Player inside the outpost can't
+          // search "wagon" / "rubble" / "wall" via area-search fallback
+          // since those wasteland tokens aren't actually present
+          // indoors. Only honor a real ambient-noun match (which the
+          // hub-scoping fix in OTA 009 already restricts to interior
+          // interactables). Outside the outpost both paths work as
+          // before.
+          const inHubForAttack = !!player.hubRoomId;
+          if (rawTarget && ((isAreaSearch(rawTarget) && !inHubForAttack) || ambientHitInAttack)) {
             // Honor the same per-tile dedupe the canonical investigate
             // path uses. Without this, a player typing "smash the wall"
             // repeatedly could re-roll loot for free (audit caught
@@ -3535,7 +3543,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
               get().appendLog('arbiter', `The Arbiter shakes their head. "${req.hint}"`);
               break;
             }
-            narrateAmbientFind(get, set, currentScene, ambient);
+            const narrateResult = narrateAmbientFind(get, set, currentScene, ambient);
+            let scannerProduced = false;
             // OTA 193 — Pulse Scanner pass. If a scanner is equipped
             // in off-hand (Pulse Scanner today; future Geiger-like
             // tools tomorrow), roll a d20 for an Aetheric drop on
@@ -3569,33 +3578,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 get().appendLog('world', `Pulse Scanner ticks — Aether trace in the ${ambient}.`);
                 const qtyLabel = granted.accepted > 1 ? ` x${granted.accepted}` : '';
                 get().appendLog('reward', `✦ ${pick.name}${qtyLabel} (${pick.rarity}).`);
+                scannerProduced = true;
               } else {
                 get().appendLog('world', `Pulse Scanner reads flat. Nothing Aetheric in the ${ambient}.`);
               }
             }
-            // Mark the noun as searched (single mark for both the
-            // narration and any scanner outcome). The Search modal
-            // reads this same store and will remove the chip per
-            // OTA 191's hide-on-consume rule.
-            set((s) => {
-              const room = s.worldMemory.visitedRooms?.[searchRoomKey] ?? {
-                firstVisitAt: Date.now(),
-                lastVisitAt: Date.now(),
-                visitCount: 1,
-              };
-              return {
-                worldMemory: {
-                  ...s.worldMemory,
-                  visitedRooms: {
-                    ...(s.worldMemory.visitedRooms ?? {}),
-                    [searchRoomKey]: {
-                      ...room,
-                      searchedAmbientNouns: [...(room.searchedAmbientNouns ?? []), ambientLower],
+            // Mark the noun as searched ONLY when investigate
+            // produced something substantive: a hook plant, a
+            // hidden-text reveal, or a scanner loot drop. Bare
+            // flavor outcomes ("haze settles", "nothing turns up")
+            // don't consume the noun, so the player can still
+            // break / take / salvage it for material afterward.
+            //
+            // OTA 016 — playtester reported: "investigate the
+            // bench → break the bench → 'already worked over.'"
+            // The fix lets investigate-then-act flow naturally.
+            // The Search modal still removes the chip on real
+            // discoveries (the hide-on-consume rule still fires
+            // — just on actual production now).
+            if (narrateResult.producedSubstantive || scannerProduced) {
+              set((s) => {
+                const room = s.worldMemory.visitedRooms?.[searchRoomKey] ?? {
+                  firstVisitAt: Date.now(),
+                  lastVisitAt: Date.now(),
+                  visitCount: 1,
+                };
+                return {
+                  worldMemory: {
+                    ...s.worldMemory,
+                    visitedRooms: {
+                      ...(s.worldMemory.visitedRooms ?? {}),
+                      [searchRoomKey]: {
+                        ...room,
+                        searchedAmbientNouns: [...(room.searchedAmbientNouns ?? []), ambientLower],
+                      },
                     },
                   },
-                },
-              };
-            });
+                };
+              });
+            }
             break;
           }
         }
@@ -3644,7 +3665,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // outcome on the spot — nothing, small material, small TC, or
         // an atmospheric hook plant. Always engaging, never reprompting
         // for these.
-        if (rawTarget && isAreaSearch(rawTarget)) {
+        // OTA 016 — hub-room gate. "investigate wagon" inside the
+        // Armory used to route here via wagon being in AREA_TOKENS,
+        // returning loot from a wagon that isn't actually in the
+        // scene. Skip area-search in hub rooms; the ambient-noun
+        // path above handles real interior nouns.
+        const inHubForInvestigate = !!player.hubRoomId;
+        if (rawTarget && isAreaSearch(rawTarget) && !inHubForInvestigate) {
           // One-and-done — has the player already area-searched this
           // exact noun in this room? Hard-print the already-searched
           // line and bail (no stamina cost, no dice). Playtest
@@ -10848,7 +10875,7 @@ function narrateAmbientFind(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   scene: CurrentScene,
   noun: string,
-): void {
+): { producedSubstantive: boolean } {
   // Grammar: assume the noun is singular unless it already ends in 's'.
   // ("stalls" stays plural; "ground" stays singular.) Pronoun follows.
   const isPlural = /s$/i.test(noun);
@@ -10875,7 +10902,11 @@ function narrateAmbientFind(
   const indoor = [
     ...neutral,
     `You look closer at the ${noun}. Dust-glazed, undisturbed for a long while.`,
-    `You crouch beside the ${noun}. The floorboards have warped around ${pronoun} over the years.`,
+    // OTA 016 — was "floorboards have warped". Hub rooms have
+    // varied floors (mud-brick in The Gate, boards in The Armory,
+    // workshop deck in Workshop, stone in The Vault). Generalize
+    // so the line doesn't claim floorboards where none exist.
+    `You crouch beside the ${noun}. The room's grit has settled around ${pronoun} over the years.`,
   ];
   const lines = inHub ? indoor : wilderness;
   get().appendLog('world', pick(lines));
@@ -10895,9 +10926,16 @@ function narrateAmbientFind(
   // isSearchable list in interactionTags.ts). Rare, lore-rich.
   // Bumped 12 → 25 so when a player DOES land on a searchable noun
   // the reveal feels rewarding instead of statistically invisible.
+  // OTA 016 — track whether anything material came out so the
+  // caller can decide whether to mark the noun consumed.
+  // Hidden-text reveals and hook plants count as substantive
+  // discoveries; bare flavor lines (haze settles, nothing
+  // turns up) don't.
+  let producedSubstantive = false;
   if (isSearchable(noun) && chance(25)) {
     const hiddenLine = pick(HIDDEN_TEXT_LINES).replace('{noun}', noun);
     get().appendLog('world', hiddenLine);
+    producedSubstantive = true;
   }
   // ~25% chance the investigation turns into a real hook in this scene.
   const activeUnresolved = (scene.hooks ?? []).some((h) => !h.resolved);
@@ -10905,7 +10943,9 @@ function narrateAmbientFind(
     const hook = plantHookByKind(pickRandomHookKind());
     set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } } : s));
     get().appendLog('world', hook.plantedLine);
+    producedSubstantive = true;
   }
+  return { producedSubstantive };
 }
 
 // Politely re-prompt the player when they searched for something the
