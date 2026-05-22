@@ -10,6 +10,7 @@ import {
 import type { InventoryItem, EquipSlot } from '../engine/types';
 import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
 import { canScrap } from '../engine/scrapEngine';
+import { findWeaponByName } from '../engine/crafting';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview } from '../components/itemPreview';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
@@ -354,6 +355,21 @@ function ItemRow({
         </View>
         <View style={styles.rowMetaRow}>
           {item.rarity && <Text style={styles.rowMeta}>{item.rarity}</Text>}
+          {/* OTA 028 — surface the weapon's damage dice next to
+              durability so the player can compare swords at a
+              glance without opening a details modal. Playtester:
+              "I want to see the weapon durability and I also want
+              to see the attack dice roll like a 1d10 or a 1d20.
+              That's how I know which weapon is the strongest." */}
+          {(() => {
+            const w = findWeaponByName(item.name);
+            if (!w) return null;
+            return (
+              <Text style={[styles.rowMeta, styles.rowDamage]}>
+                {w.damageDice} {w.damageType}
+              </Text>
+            );
+          })()}
           {item.durability && (
             <Text
               style={[
@@ -438,6 +454,9 @@ const styles = StyleSheet.create({
   rowMetaRow: { flexDirection: 'row', gap: 8, marginTop: 2 },
   rowMeta: { color: '#7a705c', fontSize: 10, letterSpacing: 1 },
   rowDurabilityLow: { color: '#e07a5f' },
+  // OTA 028 — damage dice chip in green so it pops as the
+  // "how hard does this hit" signal at a glance.
+  rowDamage: { color: '#9ec96a' },
   rowEquipped: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   rowEquippable: { color: '#7a705c', fontSize: 10, letterSpacing: 1, fontStyle: 'italic' },
   empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 30 },
