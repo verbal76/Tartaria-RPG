@@ -125,7 +125,24 @@ export interface Race {
   id: string;
   name: string;
   baseAC: number;
+  /** Free-form description shown in lore screens. Author-prose. */
   racialACBonus: string;
+  /** OTA 038 — structured AC bonus rules applied at runtime in
+   *  effectiveAC(player, scene). Empty array = no conditional bonus. */
+  racialACBonusRules?: Array<{
+    condition: 'underground' | 'dark' | 'confined' | 'runic_gear' | 'aether_powers' | 'constructed_environment' | 'relic_armor';
+    delta: number;
+  }>;
+  /** OTA 038 — always-on racial stat bumps applied at every
+   *  effectiveStats read. Context-conditional bonuses stay in
+   *  `traits` strings for now. */
+  racialStatBonuses?: {
+    strength?: number;
+    dexterity?: number;
+    intelligence?: number;
+    wisdom?: number;
+    charisma?: number;
+  };
   startingTCFormula: string;
   startingHPBonus: number;
   barehandDamage: string;

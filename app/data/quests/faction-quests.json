@@ -161,6 +161,30 @@
           "advanceOn": "kill"
         }
       ]
+    },
+    {
+      "id": "fq_servants_tribute",
+      "factionId": "servants_of_giants",
+      "title": "Tribute at the Vault",
+      "description": "Walk the road to the Giant Vault and leave an offering at its threshold. The Giants are sleeping — the Servants ask only that we keep the path warm.",
+      "objective": "Travel to the Giant Vault and leave tribute.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 50, "rep": 8 },
+      "stages": [
+        {
+          "narration": "The Servant presses a small carved stone into your palm. 'This is the tribute. Carry it to the Vault. Set it on the threshold. Do not enter. We will know.'",
+          "arbiter": "The Arbiter watches the stone. \"What sleeps is not asleep because nothing is happening. It is asleep because we agreed not to wake it.\"",
+          "advanceOn": "travel"
+        },
+        {
+          "narration": "The road has narrowed. You can feel the weight of the carved stone in your hand — heavier than it has any right to be. The path forward feels older than the maps say it should.",
+          "advanceOn": "travel"
+        },
+        {
+          "narration": "The Vault rises ahead. Stone fitted by no living mason. You set the tribute on the threshold and step back. The hum that meets your palm is not a sound.",
+          "advanceOn": "travel"
+        }
+      ]
     }
   ]
 }

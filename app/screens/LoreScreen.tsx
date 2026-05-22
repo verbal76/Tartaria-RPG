@@ -37,14 +37,30 @@ export function LoreScreen() {
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={{ paddingBottom: 24 }}>
-        {section === 'races' && (racesData as Race[]).map((r) => (
-          <View key={r.id} style={styles.entry}>
-            <Text style={styles.name}>{r.name}</Text>
-            <Text style={styles.desc}>{r.description}</Text>
-            <Text style={styles.meta}>Base AC {r.baseAC} • {r.startingTCFormula} TC • HP bonus +{r.startingHPBonus} • Barehand {r.barehandDamage}</Text>
-            {r.traits.map((t, i) => <Text key={i} style={styles.trait}>• {t}</Text>)}
-          </View>
-        ))}
+        {section === 'races' && (racesData as Race[]).map((r) => {
+          // OTA 038 — match the CharacterCreationScreen layout: combat
+          // row (AC + barehand), conditional AC bonus, always-on stat
+          // bumps, then trait list, then kit row.
+          const statBumps = r.racialStatBonuses ?? {};
+          const statBumpStrs = Object.entries(statBumps)
+            .filter(([, v]) => (v ?? 0) !== 0)
+            .map(([k, v]) => `${v! > 0 ? '+' : ''}${v} ${k.slice(0, 3).toUpperCase()}`);
+          return (
+            <View key={r.id} style={styles.entry}>
+              <Text style={styles.name}>{r.name}</Text>
+              <Text style={styles.desc}>{r.description}</Text>
+              <Text style={styles.meta}>COMBAT • AC {r.baseAC} • Barehand {r.barehandDamage}</Text>
+              {r.racialACBonus && r.racialACBonus !== 'No inherent AC bonus' && (
+                <Text style={styles.meta}>↳ {r.racialACBonus}</Text>
+              )}
+              {statBumpStrs.length > 0 && (
+                <Text style={styles.meta}>STATS • {statBumpStrs.join(', ')} (always on)</Text>
+              )}
+              {r.traits.map((t, i) => <Text key={i} style={styles.trait}>• {t}</Text>)}
+              <Text style={styles.meta}>KIT • {r.startingTCFormula} TC • HP bonus +{r.startingHPBonus}</Text>
+            </View>
+          );
+        })}
         {section === 'factions' && (factionsData as Faction[]).map((f) => (
           <View key={f.id} style={styles.entry}>
             <Text style={styles.name}>{f.name}</Text>

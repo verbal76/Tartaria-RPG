@@ -112,6 +112,7 @@ import {
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, VENDORS, type VendorInstance } from '../engine/vendors';
+import { effectiveAC } from '../engine/raceMechanics';
 import { findQuestFactionHint } from '../engine/factionHint';
 import {
   HUB,
@@ -10962,11 +10963,15 @@ function applyEnemyCounter(
   }
   const atkTotal = atkRoll + atkBonus;
   // Effective AC = race base + summed armor bonus from head/chest/legs/feet
+  // + race-conditional bonus (OTA 038 — Mud Dweller +1 underground,
+  // Tartarian Giant -4 confined, Aetherborn +1 with aether gear, etc.)
   // + status modifier (e.g. -2 from armor_severed, +4 partial cover,
   // +8 full cover, +4 dodging/blocking). Status floor at 1 so a player
   // isn't completely impossible to defend.
   const armorPieces = aggregateArmor(player);
-  const acFromGear = player.ac + armorPieces.acBonus;
+  const racialAC = effectiveAC(player, get().currentScene);
+  // racialAC already includes player.ac; add the gear stack on top.
+  const acFromGear = racialAC + armorPieces.acBonus;
   const effectiveAc = Math.max(1, acFromGear + statusAcAdjustment(player.statusEffects));
   // Natural 1 / natural 20 rule — same floor and ceiling that applies
   // to the player. A nat-1 forces a miss regardless of bonuses; a nat-20

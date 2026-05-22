@@ -5,7 +5,9 @@
 
 ## 1. Executive Summary
 
-The current Android build is **substantially lore-aligned at the narrative-frame level and meaningfully divergent at the mechanics level**. Every faction, named NPC, major buried city, monument, and foundational world concept from the lorebook is present in the codebase — the world the player walks through reads as Tartaria. However, the lorebook's tabletop-RPG combat math (10-tier DC table, race-based AC table, race-based barehanded damage, parry-durability roll system, advantage/disadvantage dice pools, runecaster damage scaling, HP-per-stat-point progression) has been re-engineered into a leaner attack/dodge/skill-check engine that uses a 4-tier DC table, gear-based AC, and milestone-based HP growth. Two original factions and roughly two dozen vendors plus seven named bosses are code-first additions that need canonization. Two damage types from the lorebook (Degradation, Stun) and the entire race-as-distinct-from-faction layer are not yet implemented.
+The current Android build is **substantially lore-aligned at the narrative-frame level and meaningfully divergent at the mechanics level**. Every faction, named NPC, major buried city, monument, and foundational world concept from the lorebook is present in the codebase — the world the player walks through reads as Tartaria. The lorebook's tabletop-RPG combat math (10-tier DC table, race-based AC table, race-based barehanded damage, parry-durability roll system, advantage/disadvantage dice pools, runecaster damage scaling, HP-per-stat-point progression) has been re-engineered into a leaner attack/dodge/skill-check engine that uses a 4-tier DC table and milestone-based HP growth. Two original factions and roughly two dozen vendors plus seven named bosses are code-first additions that need canonization. Two damage types from the lorebook (Degradation, Stun) remain unimplemented.
+
+**OTA 038 updates**: the race-as-distinct-from-faction layer is now wired (barehand damage, conditional racial AC bonuses, always-on racial stat bumps surfaced through every skill check) and the previously-empty Servants of the Giants stash is now populated with a vendor and three contracts (1 faction quest, 1 hunt, 1 mystery).
 
 ## 2. Direct Matches (Faithful Implementations)
 
@@ -39,11 +41,11 @@ The current Android build is **substantially lore-aligned at the narrative-frame
 - **Codebase Reality**: Advantage = `+1d6` bonus die; Disadvantage = `-2` penalty + cap at 16.
 - **Impact Level**: **Major** — different probability curves entirely.
 
-### Race-based Armor Class and Barehanded Damage
+### ~~Race-based Armor Class and Barehanded Damage~~ — RESOLVED in OTA 038
 
 - **Lorebook Concept**: AC and unarmed damage are determined by race (Tartarian Giants AC 12, Aetherborn AC 11, etc.; Giants 1d6+2 unarmed, Mud Dwellers 1d6−3, etc.).
-- **Codebase Reality**: AC is gear-based; barehanded damage is uniform. Race is collapsed into faction in the data layer.
-- **Impact Level**: **Major** — the entire racial-identity mechanical layer is absent.
+- **Codebase Reality (OTA 038)**: Race-driven barehand damage now fires through `combatRules.buildCombatSteps` via `barehandDamageFor(player.raceId)` in `app/engine/raceMechanics.ts`. Conditional racial AC bonuses (Mud Dweller +1 underground, Giant −4 confined, Reclaimer +1 in ruins, Aetherborn +1 with aether gear, Sentinel +2 with runic gear, Golem +1 with relic armor) apply through `effectiveAC(player, scene)`. Always-on racial stat bumps (Giant +2 STR, Sentinel +2 STR +1 INT, Mud Dweller +2 DEX, Aetherborn +1 CHA, Reclaimer +1 DEX, Golem +2 STR) fold into every `effectiveStats` read, so all 30+ skill-check sites pick them up automatically. The Character Creation and Lore screens now surface combat row, conditional AC, always-on stat bumps, traits, and starting kit per race.
+- **Remaining (deferred)**: Architectural Sentinel's `1d10 even/odd` hit-gate is captured in the BarehandSpec but not yet branched on (lands as 1d10+0 currently). Per-day racial powers (Legacy of Power, Beginner's Luck, Defensive Protocols, Latent Powers, Mud Golem Regenerative Core), Sentinel hunger/fatigue immunity, and Aetherborn 1d6 self-damage on rare/legendary Aether use deferred to a follow-up OTA.
 
 ### Character progression model
 

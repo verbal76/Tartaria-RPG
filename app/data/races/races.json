@@ -4,6 +4,10 @@
     "name": "Tartarian Giants",
     "baseAC": 12,
     "racialACBonus": "+2 AC due to size and resilience; -4 in confined spaces (low caves, pre-flood dwellings)",
+    "racialACBonusRules": [
+      { "condition": "confined", "delta": -4 }
+    ],
+    "racialStatBonuses": { "strength": 2 },
     "startingTCFormula": "4d6 x 10",
     "startingHPBonus": 15,
     "barehandDamage": "1d6 +2",
@@ -21,6 +25,10 @@
     "name": "Mud Dwellers",
     "baseAC": 10,
     "racialACBonus": "+1 AC in underground areas",
+    "racialACBonusRules": [
+      { "condition": "underground", "delta": 1 }
+    ],
+    "racialStatBonuses": { "dexterity": 2 },
     "startingTCFormula": "3d6 x 10",
     "startingHPBonus": 0,
     "barehandDamage": "1d6 -3",
@@ -39,6 +47,10 @@
     "name": "Reclaimers",
     "baseAC": 10,
     "racialACBonus": "+1 AC in constructed environments (cities, ruins)",
+    "racialACBonusRules": [
+      { "condition": "constructed_environment", "delta": 1 }
+    ],
+    "racialStatBonuses": { "dexterity": 1 },
     "startingTCFormula": "5d6 x 10",
     "startingHPBonus": 0,
     "barehandDamage": "1d6",
@@ -57,6 +69,10 @@
     "name": "Architectural Sentinels",
     "baseAC": 10,
     "racialACBonus": "+2 AC when using or wearing runic gear",
+    "racialACBonusRules": [
+      { "condition": "runic_gear", "delta": 2 }
+    ],
+    "racialStatBonuses": { "strength": 2, "intelligence": 1 },
     "startingTCFormula": "3d6 x 10",
     "startingHPBonus": 0,
     "barehandDamage": "1d10 even/odd roll to land",
@@ -75,6 +91,10 @@
     "name": "Mud Golems",
     "baseAC": 8,
     "racialACBonus": "+1 AC with relic armor or shields",
+    "racialACBonusRules": [
+      { "condition": "relic_armor", "delta": 1 }
+    ],
+    "racialStatBonuses": { "strength": 2 },
     "startingTCFormula": "3d6 x 10",
     "startingHPBonus": 10,
     "barehandDamage": "1d6",
@@ -92,6 +112,8 @@
     "name": "Unknowing Masses",
     "baseAC": 10,
     "racialACBonus": "No inherent AC bonus",
+    "racialACBonusRules": [],
+    "racialStatBonuses": {},
     "startingTCFormula": "5d6 x 10",
     "startingHPBonus": 0,
     "barehandDamage": "1d6",
@@ -109,6 +131,10 @@
     "name": "Aetherborn",
     "baseAC": 11,
     "racialACBonus": "+1 AC with Aetheric powers or runecasters",
+    "racialACBonusRules": [
+      { "condition": "aether_powers", "delta": 1 }
+    ],
+    "racialStatBonuses": { "charisma": 1 },
     "startingTCFormula": "6d6 x 10",
     "startingHPBonus": 0,
     "barehandDamage": "1d6 -2",

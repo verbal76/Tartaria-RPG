@@ -533,6 +533,24 @@
       ],
       "gender": "female",
       "voiceId": "af_river"
+    },
+    {
+      "id": "servants_quartermaster",
+      "name": "Vael of the Listening Stone",
+      "title": "Devout Quartermaster",
+      "faction": "servants_of_giants",
+      "description": "A faith-soured pilgrim in dust-grey vestments. The carved stone they wear at their throat picks up a hum when Giants' relics pass within reach. Trades reverently, sells nothing without a small prayer first, and watches your eyes for doubt.",
+      "personality": "Devout",
+      "offers": [
+        { "itemName": "First Aid Kit", "price": 30 },
+        { "itemName": "Aetheric Torch", "price": 22 },
+        { "itemName": "Climbing Rope", "price": 14 },
+        { "itemName": "Aetheric Locket", "price": 80 },
+        { "itemName": "Trail Rations", "price": 8 },
+        { "itemName": "Aetheric Compass", "price": 65 }
+      ],
+      "gender": "neutral",
+      "voiceId": "af_river"
     }
   ]
 }

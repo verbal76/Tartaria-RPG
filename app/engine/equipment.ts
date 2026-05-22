@@ -1,6 +1,7 @@
 import type { InventoryItem, EquipSlot, PlayerCharacter, Stats } from './types';
 import { findWeaponByName, findArmorByName, findAmuletByName, findRingByName, GEAR, findExplorationItemByName, findGearByName, findMaterialByName } from './crafting';
 import { aggregateInventoryPassives, inventoryHasGate, isScanner, type EffectResolver, type GateKind } from './itemEffect';
+import { racialStatBonusesFor } from './raceMechanics';
 
 /**
  * Return the list of slots an item could legally be equipped into.
@@ -221,6 +222,12 @@ export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<S
 // gear actually changes the math. Optional `weatherMod` parameter folds
 // in the active weather's stat modifiers (Iron Fog −1 DEX, Etheric Storm
 // +1 INT, etc.) so the world has a voice in every roll.
+// OTA 038 — also folds in always-on racial stat bonuses (Tartarian
+// Giant +2 STR, Architectural Sentinel +2 STR +1 INT, Aetherborn +1 CHA,
+// etc.). Context-conditional bonuses (Mud Dweller +2 INT when using
+// Aethercraft, Aetherborn +2 INT near relics) stay strings in
+// race.traits for now; a follow-up OTA will wire them through a
+// contextMods arg.
 export function effectiveStats(
   player: PlayerCharacter,
   weatherMod?: Partial<Stats>,
@@ -238,11 +245,13 @@ export function effectiveStats(
     food[eff.buffStat] = (food[eff.buffStat] ?? 0) + eff.buffBonus;
   }
   const w = weatherMod ?? {};
+  // OTA 038 — race-derived always-on stat bonuses.
+  const racial = racialStatBonusesFor(player.raceId);
   return {
-    strength: player.stats.strength + (bonus.strength ?? 0) + (inv.strength ?? 0) + (food.strength ?? 0) + (w.strength ?? 0),
-    dexterity: player.stats.dexterity + (bonus.dexterity ?? 0) + (inv.dexterity ?? 0) + (food.dexterity ?? 0) + (w.dexterity ?? 0),
-    intelligence: player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (food.intelligence ?? 0) + (w.intelligence ?? 0),
-    wisdom: player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (food.wisdom ?? 0) + (w.wisdom ?? 0),
-    charisma: player.stats.charisma + (bonus.charisma ?? 0) + (inv.charisma ?? 0) + (food.charisma ?? 0) + (w.charisma ?? 0),
+    strength: player.stats.strength + (bonus.strength ?? 0) + (inv.strength ?? 0) + (food.strength ?? 0) + (w.strength ?? 0) + (racial.strength ?? 0),
+    dexterity: player.stats.dexterity + (bonus.dexterity ?? 0) + (inv.dexterity ?? 0) + (food.dexterity ?? 0) + (w.dexterity ?? 0) + (racial.dexterity ?? 0),
+    intelligence: player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (food.intelligence ?? 0) + (w.intelligence ?? 0) + (racial.intelligence ?? 0),
+    wisdom: player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (food.wisdom ?? 0) + (w.wisdom ?? 0) + (racial.wisdom ?? 0),
+    charisma: player.stats.charisma + (bonus.charisma ?? 0) + (inv.charisma ?? 0) + (food.charisma ?? 0) + (w.charisma ?? 0) + (racial.charisma ?? 0),
   };
 }

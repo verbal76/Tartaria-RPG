@@ -3,6 +3,7 @@ import { rollDie } from './rng';
 import { findWeaponByName, type CatalogWeapon } from './crafting';
 import { effectiveStats } from './equipment';
 import { traitACBonus } from './enemyTraits';
+import { barehandDamageFor } from './raceMechanics';
 
 /**
  * Roll-modifier aggregator. Walks the player's status effects and sums
@@ -219,7 +220,18 @@ export function buildCombatSteps(
   const ac = enemyAC(enemy);
   const enemyInit = rollDie(10);
   // Use equipped damage dice if available; parse "2d6" or "1d10+1d6".
-  const dmg = equipped ? parseDamageDice(equipped.damageDice) : damageDice(wc);
+  // OTA 038 — barehanded path now reads race.barehandDamage instead of
+  // the old hardcoded 1d6. Giants land 1d6+2, Mud Dwellers 1d6-3,
+  // Sentinels 1d10 (the lorebook even/odd hit-gate is captured in the
+  // BarehandSpec but not yet branched on — full Sentinel gate arrives
+  // alongside the per-day power tracker in a follow-up OTA).
+  const barehandSpec = !equipped ? barehandDamageFor(player.raceId) : null;
+  const dmg = equipped
+    ? parseDamageDice(equipped.damageDice)
+    : barehandSpec
+      ? { count: barehandSpec.count, sides: barehandSpec.sides }
+      : damageDice(wc);
+  const damageBonus = barehandSpec?.bonus ?? 0;
   const damageTypeNote = equipped
     ? ` (${equipped.damageType})`
     : forcesBarehand ? ' (bludgeoning)' : '';
@@ -289,8 +301,8 @@ export function buildCombatSteps(
       label: 'Roll for DAMAGE',
       sides: dmg.sides,
       count: dmg.count,
-      bonus: 0,
-      bonusLabel: '',
+      bonus: damageBonus,
+      bonusLabel: damageBonus !== 0 ? `${damageBonus > 0 ? '+' : ''}${damageBonus} (race)` : '',
       context: `damage dealt to ${enemy.name}${damageTypeNote}`,
       // no target — always applies if the attack hit
     },

@@ -83,6 +83,24 @@
         { "narration": "You pick the Orb out of the silt. It is heavy in a way that changes — sometimes a stone's weight, sometimes a feather's.", "arbiter": null, "checkKind": "stealth" },
         { "narration": "You secure the Orb. The courier's coin is good. Whatever the Monarchs want it for is their concern, not yours — yet.", "arbiter": "\"You may meet this Orb again,\" the Arbiter says. \"In other hands.\"", "checkKind": "boss" }
       ]
+    },
+    {
+      "id": "mystery_servants_hum",
+      "title": "The Hum Beneath Ural",
+      "posterText": "The Servants of the Giants hear a hum from the Urals that does not match any prayer in the canon. They will pay any pilgrim willing to walk the Outskirts and listen — three places, three readings, one answer. 120 TC posted at any Servants shrine.",
+      "trophyName": "Listening Stone Cluster",
+      "minRep": 10,
+      "factionId": "servants_of_giants",
+      "rewardTc": 120,
+      "rewardItem": null,
+      "rewardRep": 10,
+      "stages": [
+        { "narration": "Vael presses three small carved stones into your palm. 'One at the obsidian pillars. One at the endless stair. One at the sinking cathedral. They will know which note is which when you bring them back.'", "arbiter": "\"The Giants are sleeping,\" the Arbiter says. \"The Servants want to be sure they still are.\"", "checkKind": null },
+        { "narration": "You stand at the obsidian pillars and press the first stone to the rock. The hum that answers is not the empty hum of weather — it has shape.", "arbiter": null, "checkKind": "investigate" },
+        { "narration": "Endless Stair. The second stone hums lower. You hold it longer than you mean to. The stair, you remember, descends past where any explorer has come back.", "arbiter": null, "checkKind": "investigate" },
+        { "narration": "Sinking Cathedral. You stand on the spit of mud above where the steeple breaks the water. The third stone hums almost not at all. The Servants will want to know that, too.", "arbiter": null, "checkKind": "investigate" },
+        { "narration": "Three readings, three notes. Return them to a Servants shrine — Vael will know what the chord means.", "arbiter": null, "checkKind": "boss" }
+      ]
     }
   ]
 }

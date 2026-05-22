@@ -69,23 +69,58 @@ export function CharacterCreationScreen() {
       <Text style={styles.stepTitle}>{STEP_TITLE[step]}</Text>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-        {step === 'race' && races.map((r) => (
-          <TouchableOpacity
-            key={r.id}
-            style={[styles.option, raceId === r.id && styles.optionSelected]}
-            onPress={() => setRaceId(r.id)}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.optionName}>{r.name}</Text>
-            <Text style={styles.optionDesc}>{r.description}</Text>
-            <Text style={styles.optionMeta}>
-              Base AC {r.baseAC} · {r.startingTCFormula} TC · HP bonus +{r.startingHPBonus}
-            </Text>
-            {raceId === r.id && r.flavor && (
-              <Text style={styles.optionFlavor}>{r.flavor}</Text>
-            )}
-          </TouchableOpacity>
-        ))}
+        {step === 'race' && races.map((r) => {
+          // OTA 038 — surface full race mechanics on creation. Was
+          // showing only Base AC / TC / HP bonus; player had no way
+          // to see they were getting +2 STR (Giants) or +1 CHA
+          // (Aetherborn) or the barehand damage profile.
+          const statBumps = r.racialStatBonuses ?? {};
+          const statBumpStrs = Object.entries(statBumps)
+            .filter(([, v]) => (v ?? 0) !== 0)
+            .map(([k, v]) => `${v! > 0 ? '+' : ''}${v} ${k.slice(0, 3).toUpperCase()}`);
+          return (
+            <TouchableOpacity
+              key={r.id}
+              style={[styles.option, raceId === r.id && styles.optionSelected]}
+              onPress={() => setRaceId(r.id)}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.optionName}>{r.name}</Text>
+              <Text style={styles.optionDesc}>{r.description}</Text>
+              {/* Combat row — what your AC and unarmed attacks look like */}
+              <Text style={styles.optionMeta}>
+                COMBAT · AC {r.baseAC} · barehand {r.barehandDamage}
+              </Text>
+              {r.racialACBonus && r.racialACBonus !== 'No inherent AC bonus' && (
+                <Text style={styles.optionMetaSub}>↳ {r.racialACBonus}</Text>
+              )}
+              {/* Stat traits — always-on bumps + trait blurbs */}
+              {statBumpStrs.length > 0 && (
+                <Text style={styles.optionMeta}>
+                  STATS · {statBumpStrs.join(', ')} (always on)
+                </Text>
+              )}
+              {/* Per-trait list (some are conditional / per-day) */}
+              {raceId === r.id && r.traits && r.traits.length > 0 && (
+                <View style={styles.optionTraits}>
+                  {r.traits.map((t, i) => (
+                    <Text key={i} style={styles.optionTrait}>· {t}</Text>
+                  ))}
+                  <Text style={styles.optionTraitNote}>
+                    (Per-day powers and immunities arrive in a follow-up update.)
+                  </Text>
+                </View>
+              )}
+              {/* Starting kit */}
+              <Text style={styles.optionMeta}>
+                KIT · {r.startingTCFormula} TC · HP bonus +{r.startingHPBonus}
+              </Text>
+              {raceId === r.id && r.flavor && (
+                <Text style={styles.optionFlavor}>{r.flavor}</Text>
+              )}
+            </TouchableOpacity>
+          );
+        })}
 
         {step === 'faction' && (
           <>
@@ -202,7 +237,11 @@ const styles = StyleSheet.create({
   optionSelected: { borderColor: '#c9a86a' },
   optionName: { color: '#e6d8b3', fontWeight: '700', fontSize: 14 },
   optionDesc: { color: '#cdbf99', fontSize: 12, marginTop: 2 },
-  optionMeta: { color: '#7a705c', fontSize: 11, marginTop: 4 },
+  optionMeta: { color: '#7a705c', fontSize: 11, marginTop: 4, letterSpacing: 0.5 },
+  optionMetaSub: { color: '#5a5246', fontSize: 10, marginTop: 2, fontStyle: 'italic' },
+  optionTraits: { marginTop: 8, paddingLeft: 6, borderLeftColor: '#3a342c', borderLeftWidth: 2 },
+  optionTrait: { color: '#9ec96a', fontSize: 11, lineHeight: 16, marginBottom: 2 },
+  optionTraitNote: { color: '#5a5246', fontSize: 10, marginTop: 4, fontStyle: 'italic' },
   optionFlavor: {
     color: '#a89776',
     fontSize: 12,

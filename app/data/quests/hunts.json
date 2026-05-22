@@ -111,6 +111,24 @@
         { "narration": "She breaks the song to address you. \"You should not have come,\" she says, voice low and warm and utterly without anger. \"But since you have — sing, or die quiet.\"", "arbiter": "\"She means it,\" the Arbiter says. \"And neither option works in your favour.\"", "checkKind": "diplomacy" },
         { "narration": "Diplomacy bought you ten seconds. The Queen rises. The standing Sirens turn now — all of them, all toward you.", "arbiter": null, "checkKind": "boss" }
       ]
+    },
+    {
+      "id": "hunt_servants_doubter",
+      "title": "Silence the Doubter",
+      "posterText": "The Servants of the Giants name a Reaver who walks the Outskirts speaking against the Giants' return. The Servants do not raise their hand against him — they ask a hand that isn't theirs to. 150 TC posted at any Servants shrine.",
+      "targetEnemyName": "Tartarian Reaver",
+      "biomeTag": "outskirts",
+      "minRep": 5,
+      "factionId": "servants_of_giants",
+      "rewardTc": 150,
+      "rewardItem": null,
+      "rewardRep": 12,
+      "trophyName": "Reaver's Officer Pin",
+      "stages": [
+        { "narration": "Vael presses a slip of paper into your palm. 'He walks the Outskirts after dusk and speaks our doubts into other ears. The doubt spreads. Silence it.'", "arbiter": "\"The Servants pick their fights carefully,\" the Arbiter says. \"This is one they refuse to pick themselves.\"", "checkKind": null },
+        { "narration": "The Reaver's patrol is a known one. Mud Monarch plate, an officer's blade, a voice that carries further than it should.", "arbiter": null, "checkKind": "stealth" },
+        { "narration": "You find him at the end of his round, between watch-stations. He has not seen you yet — but he is listening.", "arbiter": null, "checkKind": "boss" }
+      ]
     }
   ]
 }
