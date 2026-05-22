@@ -41,6 +41,7 @@ import {
   atlasCoordForLocation,
   OUTPOST_ATLAS_COORD,
   DOT_TILE_FRAC,
+  clampToMapArea,
 } from '../engine/atlasCoords';
 // OTA 051 — locations.json carries the human-readable name we want
 // to surface in the "You are here: <name>" chip when the player is
@@ -203,17 +204,24 @@ export function MapScreen() {
   let dotStyle: { left: number; top: number } | null = null;
   if (imgBox) {
     if (depictedCoord) {
+      // Tier 1 — anchor to the canonical drawn icon.
       dotStyle = {
         left: imgBox.width * depictedCoord.fx - DOT_SIZE / 2,
         top: imgBox.height * depictedCoord.fy - DOT_SIZE / 2,
       };
     } else {
-      const cx = imgBox.width * OUTPOST_ATLAS_COORD.fx;
-      const cy = imgBox.height * OUTPOST_ATLAS_COORD.fy;
-      const tile = imgBox.height * DOT_TILE_FRAC;
+      // Tier 2 — grid-offset fallback from the Outpost anchor.
+      // The Outpost now sits in the upper-left of the landscape
+      // atlas, so a player far east/south on the procedural grid
+      // would otherwise drift the dot off-image. clampToMapArea
+      // keeps the dot inside the painted world (away from the
+      // legend insets and the timeline ribbon).
+      const fx = OUTPOST_ATLAS_COORD.fx + dx * DOT_TILE_FRAC;
+      const fy = OUTPOST_ATLAS_COORD.fy + dy * DOT_TILE_FRAC;
+      const clamped = clampToMapArea({ fx, fy });
       dotStyle = {
-        left: cx + dx * tile - DOT_SIZE / 2,
-        top: cy + dy * tile - DOT_SIZE / 2,
+        left: imgBox.width * clamped.fx - DOT_SIZE / 2,
+        top: imgBox.height * clamped.fy - DOT_SIZE / 2,
       };
     }
   }
@@ -332,7 +340,12 @@ const styles = StyleSheet.create({
   placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
 
   imageBox: {
-    flex: 1,
+    // Aspect-locked to the atlas asset (1408 × 768, landscape) so
+    // the dot's fractional coords land on actual image content.
+    // Flex-1 would have letterboxed the image with margins, and
+    // the dot would have drifted into the dead space.
+    width: '100%',
+    aspectRatio: 1408 / 768,
     backgroundColor: '#13110f',
     borderColor: '#3a342c',
     borderWidth: 1,

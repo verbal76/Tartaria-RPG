@@ -17,6 +17,7 @@ import {
   DOT_TILE_FRAC,
   atlasCoordForLocation,
   depictedLocationIds,
+  clampToMapArea,
 } from '../app/engine/atlasCoords';
 import locationsData from '../app/data/locations/locations.json';
 import type { Location } from '../app/engine/types';
@@ -32,22 +33,21 @@ describe('OTA 051 — atlas coordinate calibration', () => {
       }
     });
 
-    it('all coords are inside the image (fx, fy in [0, 1])', () => {
+    it('all coords are inside the image painted area', () => {
+      // The painted world spans fx ∈ [0.08, 0.92] and fy ∈ [0.08,
+      // 0.95] on the redrawn atlas (Outpost top-left, Mud Flood
+      // Nexus bottom-right). Bounds catch typos that would land a
+      // dot on the TARTARIA title, the Vertical Strata inset, the
+      // legend, or the Reclaimers' Outpost Interior inset.
       for (const [id, c] of Object.entries(LOCATION_ATLAS_COORDS)) {
         expect(c.fx).toBeGreaterThanOrEqual(0);
         expect(c.fx).toBeLessThanOrEqual(1);
         expect(c.fy).toBeGreaterThanOrEqual(0);
         expect(c.fy).toBeLessThanOrEqual(1);
-        // Catch typos that would put a dot in the title bar or the
-        // timeline ribbon: every depicted icon sits in the central
-        // ring band (roughly 15%-70% from the top of the image).
-        expect(c.fy).toBeGreaterThan(0.10);
-        expect(c.fy).toBeLessThan(0.75);
-        // Sanity check for the noun spread — the icon should not
-        // straddle the extreme left/right gutter either.
         expect(c.fx).toBeGreaterThan(0.05);
         expect(c.fx).toBeLessThan(0.95);
-        // ESLint complains about unused destructure parts without this:
+        expect(c.fy).toBeGreaterThan(0.05);
+        expect(c.fy).toBeLessThan(0.97);
         expect(id.length).toBeGreaterThan(0);
       }
     });
@@ -64,22 +64,33 @@ describe('OTA 051 — atlas coordinate calibration', () => {
     });
   });
 
-  describe('shared-icon containment', () => {
-    // The Grand Spire of Etheria is inside Asgardar — both anchor to
-    // the same tower icon at top-right. Same for Thametan's Tower
-    // inside Samarran.
-    it('Asgardar and Grand Spire of Etheria share an anchor', () => {
+  describe('lore-region adjacency', () => {
+    // OTA 052 — the redrawn atlas draws containment pairs as
+    // adjacent-but-separate labels rather than co-located icons.
+    // Asgardar + Grand Spire and Samarran + Thametan's Tower are
+    // drawn within ~10% of each other on both axes (matching the
+    // lore-canon 'tower inside city' relationship). The dot will
+    // shift slightly between them on travel, which is honest given
+    // the visual separation in the artwork.
+    const within = (a: { fx: number; fy: number }, b: { fx: number; fy: number }, max: number) =>
+      Math.abs(a.fx - b.fx) < max && Math.abs(a.fy - b.fy) < max;
+
+    it('Asgardar and Grand Spire of Etheria are drawn within 10% of each other', () => {
       const a = LOCATION_ATLAS_COORDS.asgardar!;
       const s = LOCATION_ATLAS_COORDS.grand_spire_of_etheria!;
-      expect(s.fx).toBe(a.fx);
-      expect(s.fy).toBe(a.fy);
+      expect(within(a, s, 0.10)).toBe(true);
     });
 
-    it('Samarran and Thametan\'s Tower share an anchor', () => {
+    it('Samarran and Thametan\'s Tower are drawn within 10% of each other', () => {
       const s = LOCATION_ATLAS_COORDS.samarran!;
       const t = LOCATION_ATLAS_COORDS.thametans_tower!;
-      expect(t.fx).toBe(s.fx);
-      expect(t.fy).toBe(s.fy);
+      expect(within(s, t, 0.10)).toBe(true);
+    });
+
+    it('Nimari and Red Tower of Nimari are drawn within 15% of each other', () => {
+      const n = LOCATION_ATLAS_COORDS.nimari!;
+      const r = LOCATION_ATLAS_COORDS.red_tower_of_nimari!;
+      expect(within(n, r, 0.15)).toBe(true);
     });
   });
 
@@ -90,22 +101,11 @@ describe('OTA 051 — atlas coordinate calibration', () => {
       }
     });
 
-    // The atlas only draws ~12 of the 21 named locations. The rest
-    // (Drakova, Endless Stair, Cradle of Dusk, Sinking Cathedral,
-    // The Giant Vault, Etheric Chamber, Nimari, Red Tower of Nimari,
-    // The Buried Cities) live in the legend only and must fall back
-    // to the grid-offset model — i.e., atlasCoordForLocation returns
-    // null so MapScreen takes the fallback branch.
+    // OTA 052 — the redrawn atlas depicts 20 of 21 locations. Only
+    // Obsidian Pillars is absent — it falls back to the grid-offset
+    // model.
     const NOT_DEPICTED = [
-      'drakova',
-      'endless_stair',
-      'cradle_of_dusk',
-      'sinking_cathedral',
-      'giant_vault',
-      'etheric_chamber',
-      'nimari',
-      'red_tower_of_nimari',
-      'buried_cities',
+      'obsidian_pillars',
     ];
     it.each(NOT_DEPICTED)('%s correctly returns null (falls back to grid-offset)', (id) => {
       expect(atlasCoordForLocation(id)).toBeNull();
@@ -133,12 +133,11 @@ describe('OTA 051 — atlas coordinate calibration', () => {
     it.each(LOCATIONS.map((l) => l.id))('travel to %s yields a well-formed dot path', (id) => {
       const coord = atlasCoordForLocation(id);
       if (coord) {
-        // Depicted — coord must point to a valid pixel-fraction
-        // inside the ring band.
+        // Depicted — coord must be inside the painted map area.
         expect(coord.fx).toBeGreaterThan(0.05);
         expect(coord.fx).toBeLessThan(0.95);
-        expect(coord.fy).toBeGreaterThan(0.10);
-        expect(coord.fy).toBeLessThan(0.75);
+        expect(coord.fy).toBeGreaterThan(0.05);
+        expect(coord.fy).toBeLessThan(0.97);
       } else {
         // Non-depicted — confirm by lookup that the table doesn't
         // accidentally hide a real location.
@@ -148,28 +147,49 @@ describe('OTA 051 — atlas coordinate calibration', () => {
   });
 
   describe('coverage report', () => {
-    // Soft-pin: at least half the named locations should be depicted
-    // so the player has a meaningful canonical map. If the atlas is
-    // ever redrawn with fewer icons, this will fail and force the
-    // table to grow.
-    it('at least 10 of the 21 locations are depicted', () => {
+    // OTA 052 — the redrawn atlas depicts 20 of 21 locations. If a
+    // future redraw drops coverage we want a failing test, not a
+    // silently-degraded map.
+    it('at least 20 of the 21 locations are depicted', () => {
       const depicted = depictedLocationIds().length;
-      expect(depicted).toBeGreaterThanOrEqual(10);
+      expect(depicted).toBeGreaterThanOrEqual(20);
     });
 
-    // Verify each lore-region has at least one depicted anchor so
-    // the player always has SOMETHING they can visually navigate to
-    // in each part of the world.
-    it('every cardinal quadrant has at least one depicted location', () => {
+    // OTA 052 — the Outpost is now in the upper-left, so most
+    // depicted locations are east and south of it. The atlas still
+    // needs spread on both axes, so we just assert that depicted
+    // x-coords span a wide range and y-coords span a wide range.
+    it('depicted locations spread across at least 60% of the map width', () => {
       const depicted = Object.values(LOCATION_ATLAS_COORDS);
-      const north = depicted.filter((c) => c.fy < OUTPOST_ATLAS_COORD.fy);
-      const south = depicted.filter((c) => c.fy > OUTPOST_ATLAS_COORD.fy);
-      const west = depicted.filter((c) => c.fx < OUTPOST_ATLAS_COORD.fx);
-      const east = depicted.filter((c) => c.fx > OUTPOST_ATLAS_COORD.fx);
-      expect(north.length).toBeGreaterThan(0);
-      expect(south.length).toBeGreaterThan(0);
-      expect(west.length).toBeGreaterThan(0);
-      expect(east.length).toBeGreaterThan(0);
+      const xs = depicted.map((c) => c.fx);
+      const span = Math.max(...xs) - Math.min(...xs);
+      expect(span).toBeGreaterThan(0.6);
+    });
+    it('depicted locations spread across at least 60% of the map height', () => {
+      const depicted = Object.values(LOCATION_ATLAS_COORDS);
+      const ys = depicted.map((c) => c.fy);
+      const span = Math.max(...ys) - Math.min(...ys);
+      expect(span).toBeGreaterThan(0.6);
+    });
+  });
+
+  describe('clampToMapArea (grid-offset fallback safety)', () => {
+    it('passes through coords already inside the map area', () => {
+      expect(clampToMapArea({ fx: 0.5, fy: 0.5 })).toEqual({ fx: 0.5, fy: 0.5 });
+    });
+    it('clamps far-east coords back inside the visible map', () => {
+      const out = clampToMapArea({ fx: 1.5, fy: 0.5 });
+      expect(out.fx).toBeLessThanOrEqual(0.92);
+      expect(out.fx).toBeGreaterThan(0.5);
+    });
+    it('clamps far-south coords back above the timeline ribbon', () => {
+      const out = clampToMapArea({ fx: 0.5, fy: 1.2 });
+      expect(out.fy).toBeLessThanOrEqual(0.85);
+    });
+    it('clamps negative coords back into the visible map', () => {
+      const out = clampToMapArea({ fx: -0.3, fy: -0.2 });
+      expect(out.fx).toBeGreaterThanOrEqual(0.06);
+      expect(out.fy).toBeGreaterThanOrEqual(0.06);
     });
   });
 });
