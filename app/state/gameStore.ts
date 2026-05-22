@@ -1340,9 +1340,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ? [...ladderTriple.microMicro.interactables]
               : extractAmbientNouns(ladderTriple.microMicro.environmental_description))
           : [];
-        restoredScene.ambientNouns = Array.from(
-          new Set([...baseNouns, ...hubNouns, ...microMicroNouns]),
-        );
+        // OTA 009 — see beginScene comment. Hub interior wins when
+        // it has authored interactables; wasteland nouns return when
+        // the player leaves the outpost.
+        const hubRoomActive = !!player.hubRoomId && hubNouns.length > 0;
+        restoredScene.ambientNouns = hubRoomActive
+          ? Array.from(new Set([...hubNouns, ...microMicroNouns]))
+          : Array.from(new Set([...baseNouns, ...hubNouns, ...microMicroNouns]));
       }
       set({
         player,
@@ -1810,7 +1814,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? ladderTriple.microMicro.interactables
           : extractAmbientNouns(ladderTriple.microMicro.environmental_description))
       : [];
-    const ambientNouns = Array.from(new Set([...locNouns, ...hubNouns, ...microMicroNouns]));
+    // OTA 009 — hub-room scoping. Playtester caught the floor-type
+    // contradiction: the Arbiter says outpost floors are "board and
+    // brick" (correct for a hub room interior), the look narration
+    // mentions "floorboards" (also interior), but the salvage
+    // refusal suggested "mud, silt, wagon, rubble" — wasteland nouns
+    // that don't belong inside the Armory. Root cause: scene noun
+    // pool merged the macro location's wasteland nouns with the hub
+    // room's interior interactables, so both leaked into the same
+    // suggestion list. When the player is INSIDE a hub room with
+    // authored interactables, use only the interior pool (hub +
+    // microMicro). The wasteland nouns reappear naturally when the
+    // player leaves the outpost.
+    const ambientNouns = (hubRoom && hubNouns.length > 0)
+      ? Array.from(new Set([...hubNouns, ...microMicroNouns]))
+      : Array.from(new Set([...locNouns, ...hubNouns, ...microMicroNouns]));
     // Lock the visible subset for THIS scene visit. Look-around and
     // the chip pool (Search/Approach/Salvage) BOTH read from this
     // same cache — strict match. If a noun isn't in your look-around,
