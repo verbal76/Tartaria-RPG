@@ -3898,7 +3898,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const { findExplorationItemByName, findGearByName, findMaterialByName } = require('../engine/crafting');
           const fxRaw = resolveItemEffect(consumable.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
-          const fx = fxRaw && fxRaw.kind === 'consumable' ? fxRaw as { kind: 'consumable'; healHP?: number; restoreStamina?: number } : null;
+          const fx = fxRaw && fxRaw.kind === 'consumable'
+            ? fxRaw as {
+                kind: 'consumable';
+                healHP?: number;
+                restoreStamina?: number;
+                buffStat?: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma';
+                buffBonus?: number;
+                buffDuration?: number;
+              }
+            : null;
           const hpRoom = player.hpMax - player.hp;
           const stamRoom = player.staminaMax - player.stamina;
           const heal = fx
@@ -3910,6 +3919,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const newInventory = player.inventory
             .map((i) => (i.id === consumable.id ? { ...i, quantity: i.quantity - 1 } : i))
             .filter((i) => i.quantity > 0);
+          // OTA 003 — register the food buff if the catalog declares one.
+          // remainingRounds = buffDuration; label encodes the food name +
+          // stat so the "Wild Carrot (+1 WIS) fades." line is readable.
+          let newStatusEffects = player.statusEffects ?? [];
+          let buffLine = '';
+          if (fx && fx.buffStat && fx.buffBonus && fx.buffDuration && fx.buffBonus > 0 && fx.buffDuration > 0) {
+            const buff: StatusEffect = {
+              kind: 'food_buff',
+              remainingRounds: fx.buffDuration,
+              buffStat: fx.buffStat,
+              buffBonus: fx.buffBonus,
+              label: `${consumable.name} (+${fx.buffBonus} ${fx.buffStat.toUpperCase().slice(0, 3)})`,
+            };
+            newStatusEffects = applyEffect(newStatusEffects, buff);
+            buffLine = ` Boost: +${fx.buffBonus} ${fx.buffStat.toUpperCase().slice(0, 3)} for ${fx.buffDuration} turns.`;
+          }
           // Eating still costs a slice of the day — half an hour to break
           // and chew a ration, so the clock advances too.
           const prevHpEat = player.hp;
@@ -3921,6 +3946,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 hp: player.hp + heal,
                 stamina: player.stamina + stamGain,
                 inventory: newInventory,
+                statusEffects: newStatusEffects,
               },
               0.5,
             ),
@@ -3931,7 +3957,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const tail = tailParts.length > 0
             ? `${tailParts.join(', ')} recovered.`
             : (fx ? 'You were already topped up — the bite holds nothing back.' : 'You were already at full strength — the ration steadies you, nothing more.');
-          get().appendLog('world', `You consume one ${consumable.name}. ${tail}`);
+          get().appendLog('world', `You consume one ${consumable.name}. ${tail}${buffLine}`);
           // Heal may push us back over the 5% latch threshold.
           checkLowHpWarning(prevHpEat, prevHpEat + heal, hpMaxEat, get, set);
           void get().persist();
@@ -10826,6 +10852,16 @@ function narrateCasualLook(
   //    the wounds reading is narrative flavor at the start, not a
   //    stark chip mid-paragraph. Slot intentionally kept as a
   //    comment so the section numbering still reads in order.
+  //
+  //    Active food / potion buffs are surfaced here as a chip line
+  //    so the player can see what's still ticking. OTA 003.
+  if (player) {
+    const active = (player.statusEffects ?? []).filter((e) => e.kind === 'food_buff' && e.buffBonus && e.buffStat);
+    if (active.length > 0) {
+      const chips = active.map((e) => `+${e.buffBonus} ${e.buffStat!.toUpperCase().slice(0, 3)} (${e.remainingRounds} turns)`);
+      parts.push(`Active boosts: ${chips.join(' · ')}.`);
+    }
+  }
 
   // 6. Exits — the bulk of bearings. Direction + destination when
   //    we have one (hub-room exits name the room; Micro-Micro

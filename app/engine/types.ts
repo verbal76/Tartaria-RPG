@@ -456,7 +456,11 @@ export type StatusEffectKind =
   | 'overwhelmed'    // -2 on dodge/evade after multiple hits in one round
   | 'surprised'      // -2 on first reaction; consumed once
   | 'fighting_back'  // next enemy counter resolves as opposed Fighting roll
-  | 'quick_fire';    // +2 on the next ranged attack THIS turn (initiative bonus surrogate)
+  | 'quick_fire'    // +2 on the next ranged attack THIS turn (initiative bonus surrogate)
+  // OTA 003 — timed stat boost from eating a food / drinking a
+  // potion. buffStat + buffBonus carry the actual modifier;
+  // effectiveStats sums every active food_buff matching the stat.
+  | 'food_buff';
 
 export interface StatusEffect {
   kind: StatusEffectKind;
@@ -465,6 +469,10 @@ export interface StatusEffect {
   perRoundDamage?: number;
   /** Display label, defaulted from kind. */
   label?: string;
+  /** OTA 003 — food_buff payload. Which stat is boosted and by
+   *  how much. effectiveStats reads these when summing buffs. */
+  buffStat?: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma';
+  buffBonus?: number;
 }
 
 export interface PlayerCharacter {

@@ -62,6 +62,11 @@ export type ItemEffect =
       reduceCorruption?: number;
       extendLight?: number;
       revealScene?: boolean;
+      // OTA 003 — timed stat buff on consumption. All three must be
+      // present together for the eat handler to register the buff.
+      buffStat?: StatKey;
+      buffBonus?: number;
+      buffDuration?: number;
     }
   | { kind: 'gate'; unlocks: GateKind }
   | {

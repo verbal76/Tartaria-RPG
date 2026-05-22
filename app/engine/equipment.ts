@@ -229,12 +229,20 @@ export function effectiveStats(
   // OTA 192 — inventory passives stack on top (capped per-stat to
   // prevent backpack-build inflation).
   const inv = aggregateInventoryPassiveStatBonuses(player);
+  // OTA 003 — timed food/potion buffs stack on top of everything
+  // else. Each food_buff status carries (buffStat, buffBonus); sum
+  // them per stat. No cap — these expire on their own.
+  const food: Partial<Stats> = {};
+  for (const eff of player.statusEffects ?? []) {
+    if (eff.kind !== 'food_buff' || !eff.buffStat || !eff.buffBonus) continue;
+    food[eff.buffStat] = (food[eff.buffStat] ?? 0) + eff.buffBonus;
+  }
   const w = weatherMod ?? {};
   return {
-    strength: player.stats.strength + (bonus.strength ?? 0) + (inv.strength ?? 0) + (w.strength ?? 0),
-    dexterity: player.stats.dexterity + (bonus.dexterity ?? 0) + (inv.dexterity ?? 0) + (w.dexterity ?? 0),
-    intelligence: player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (w.intelligence ?? 0),
-    wisdom: player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (w.wisdom ?? 0),
-    charisma: player.stats.charisma + (bonus.charisma ?? 0) + (inv.charisma ?? 0) + (w.charisma ?? 0),
+    strength: player.stats.strength + (bonus.strength ?? 0) + (inv.strength ?? 0) + (food.strength ?? 0) + (w.strength ?? 0),
+    dexterity: player.stats.dexterity + (bonus.dexterity ?? 0) + (inv.dexterity ?? 0) + (food.dexterity ?? 0) + (w.dexterity ?? 0),
+    intelligence: player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (food.intelligence ?? 0) + (w.intelligence ?? 0),
+    wisdom: player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (food.wisdom ?? 0) + (w.wisdom ?? 0),
+    charisma: player.stats.charisma + (bonus.charisma ?? 0) + (inv.charisma ?? 0) + (food.charisma ?? 0) + (w.charisma ?? 0),
   };
 }
