@@ -760,6 +760,7 @@ export type ScreenName =
   | 'about'
   | 'inventory'
   | 'character'
+  | 'map'
   | 'crafting'
   | 'vendor'
   | 'actions'

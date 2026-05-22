@@ -311,6 +311,7 @@ export function ExplorationScreen() {
               return elev as { noun: string; tier: number; totalTiers: number };
             })()}
             onOpenFeedback={() => setFeedbackOpen(true)}
+            onOpenMap={() => setScreen('map')}
             inCombat={inCombat}
             equippedMain={equippedMain}
             equippedOff={equippedOff}

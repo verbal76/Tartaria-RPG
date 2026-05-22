@@ -72,6 +72,11 @@ interface Props {
    *  action parser entirely so playtest notes land cleanly on the
    *  `feedback` log channel. */
   onOpenFeedback: () => void;
+  /** OTA 049 — open the world Atlas (MapScreen). Sits on the same row
+   *  as the cardinal direction buttons so the player can step out of
+   *  travel to consult the map without changing modes. Hidden in
+   *  combat alongside the rest of the travel row. */
+  onOpenMap: () => void;
   inCombat: boolean;
   equippedMain: string | null;
   equippedOff: string | null;
@@ -101,7 +106,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenFeedback, inCombat, equippedMain, equippedOff, range }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenFeedback, onOpenMap, inCombat, equippedMain, equippedOff, range }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
   // BrandedKeyboard removed 2026-05-21 per playtester: "it is not
@@ -242,6 +247,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} />
           <TravelBtn label="EAST" onPress={() => onSubmit('go east')} />
           <TravelBtn label="WEST" onPress={() => onSubmit('go west')} />
+          <TravelBtn label="MAP" onPress={onOpenMap} />
         </TutorialTarget>
       )}
       <TutorialTarget area="quick-row" style={styles.quickRow}>
