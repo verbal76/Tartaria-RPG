@@ -313,13 +313,19 @@ interface CurrentScene {
 
 // Helper: which enemy is the player currently targeting? Returns null
 // when no enemies are present.
+// OTA 037 — explicit runtime clamp on activeEnemyIdx. The existing
+// `?? scene.enemies[0]` fallback caught out-of-bounds reads via
+// undefined, but the clamp makes the intent obvious and protects
+// against an idx that's been left stale by rapid kills (AoE, traps).
 function activeEnemy(scene: CurrentScene | null): Enemy | null {
   if (!scene || scene.enemies.length === 0) return null;
-  return scene.enemies[scene.activeEnemyIdx] ?? scene.enemies[0] ?? null;
+  const idx = Math.max(0, Math.min(scene.activeEnemyIdx, scene.enemies.length - 1));
+  return scene.enemies[idx] ?? null;
 }
 function activeEnemyHp(scene: CurrentScene | null): number | null {
   if (!scene || scene.enemyHps.length === 0) return null;
-  return scene.enemyHps[scene.activeEnemyIdx] ?? scene.enemyHps[0] ?? null;
+  const idx = Math.max(0, Math.min(scene.activeEnemyIdx, scene.enemyHps.length - 1));
+  return scene.enemyHps[idx] ?? null;
 }
 
 function collectSceneNouns(scene: CurrentScene): string[] {
@@ -1881,6 +1887,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
       vendor, range, hooks: initialHooks, ambientNouns, displayedAmbientNouns, microMicroId,
       enemyAmbushUsed: enemies.map(() => false),
+      // OTA 037 — explicit null. Older code relied on undefined being
+      // falsy at every read site; making it explicit prevents stale
+      // values from leaking across scenes if any future code switches
+      // from currentScene replacement to merge.
+      elevatedOn: null,
     };
     // Whisper plant — hub-room entry can drop a tip into the
     // player's Whispers panel. Pittsburgh loop: walk into the
@@ -1897,7 +1908,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           && !(livePlayer.activeWhispers ?? []).some((w) => w.id === c.id),
         );
         for (const chain of eligibleChains) {
-          if (Math.random() >= chain.plantChance) continue;
+          // OTA 037 — clamp plantChance to [0,1] so a malformed data
+          // entry can't make the gate always fire (>1) or always skip
+          // (<0). Trust the data but verify at the boundary.
+          const p = Math.max(0, Math.min(1, chain.plantChance));
+          if (Math.random() >= p) continue;
           const px = typeof livePlayer.mapX === 'number' ? livePlayer.mapX : 0;
           const py = typeof livePlayer.mapY === 'number' ? livePlayer.mapY : 0;
           const tile = pickTargetTile(chain, px, py);
@@ -5131,9 +5146,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // of the third segment so we strip it before parseInt
         // (OTA 033 — was 'parseInt("t1") → NaN' which left
         // maxCleared at 0 forever and every tap read as tier 1).
+        // OTA 037 — also validate split length so a malformed marker
+        // ('climbed:noun' with no tier segment) doesn't index past
+        // the array and silently parse garbage.
         let maxCleared = 0;
         for (const m of climbMarks) {
-          const seg = m.split(':')[2] ?? '';
+          const parts = m.split(':');
+          if (parts.length < 3) continue;
+          const seg = parts[2] ?? '';
           const numStr = seg.startsWith('t') ? seg.slice(1) : seg;
           const t = parseInt(numStr, 10);
           if (!Number.isNaN(t) && t > maxCleared) maxCleared = t;

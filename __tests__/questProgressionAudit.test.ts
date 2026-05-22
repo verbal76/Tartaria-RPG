@@ -85,16 +85,33 @@ interface Failure {
 describe('Quest progression audit', () => {
   jest.setTimeout(180000);
 
+  // OTA 037 — deterministic seed. The engine uses Math.random
+  // heavily (weather, encounter, scene generation) and a handful of
+  // travel-only faction quests (fq_order_field, fq_tartarians_pilgrimage)
+  // intermittently failed turn-in across runs because the random
+  // path through beginScene occasionally inserted state that
+  // de-synced the audit's expectations. Seed Math.random with a
+  // simple LCG so every run sees the same path.
+  let _realRandom: typeof Math.random;
   beforeAll(() => {
     console.log = () => {};
     console.warn = () => {};
     console.error = () => {};
+    _realRandom = Math.random;
+    let seed = 0x12345678 >>> 0;
+    Math.random = () => {
+      // Numerical Recipes LCG — good enough for a deterministic test
+      // path; not cryptographic.
+      seed = (seed * 1664525 + 1013904223) >>> 0;
+      return seed / 0x100000000;
+    };
   });
 
   afterAll(() => {
     console.log = _origLog;
     console.warn = _origWarn;
     console.error = _origErr;
+    Math.random = _realRandom;
   });
 
   // ── Helper: rebuild the store with a fresh character + scene + vendor.
