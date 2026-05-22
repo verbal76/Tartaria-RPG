@@ -2,13 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, Share } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
-import { readFullLog, flushLogWrites } from '../engine/saveSystem';
+import { readFullLog, flushLogWrites, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
 
 export function LogScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const [diskLog, setDiskLog] = useState<string>('Loading…');
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
+  // OTA 017 — if the disk log dropped a write (cap hit), surface it
+  // as a banner above the COPY ALL button so the player knows the
+  // copy may be incomplete.
+  const [writeFailure, setWriteFailure] = useState<string | null>(null);
 
   // OTA 215 — re-read on focus and after a small interval while the
   // screen is open. The previous version captured a single snapshot
@@ -41,6 +45,15 @@ export function LogScreen() {
     await Clipboard.setStringAsync(fresh);
     setDiskLog(fresh || '(no log yet)');
     setCopied(true);
+    // OTA 017 — surface persisted write failures so the player knows
+    // when AsyncStorage dropped a recent entry (e.g. log size cap).
+    const writeErr = getLastLogWriteError();
+    if (writeErr) {
+      setWriteFailure(writeErr);
+      clearLastLogWriteError();
+    } else {
+      setWriteFailure(null);
+    }
     setTimeout(() => setCopied(false), 1500);
   }
 
@@ -88,6 +101,11 @@ export function LogScreen() {
             honor it. */}
         <Text style={styles.body} selectable>{diskLog}</Text>
       </ScrollView>
+      {writeFailure ? (
+        <Text style={styles.writeFailure}>
+          ⚠ Disk write failed: {writeFailure}. Some recent entries may be missing — use SHARE for a complete export.
+        </Text>
+      ) : null}
       <View style={styles.btnRow}>
         <TouchableOpacity style={styles.copyBtn} onPress={handleCopy} activeOpacity={0.7}>
           <Text style={styles.copyText}>
@@ -139,4 +157,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   shareText: { color: '#c9a86a', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
+  writeFailure: {
+    color: '#e07a5f',
+    fontSize: 11,
+    lineHeight: 15,
+    marginTop: 8,
+    paddingHorizontal: 4,
+    fontStyle: 'italic',
+  },
 });

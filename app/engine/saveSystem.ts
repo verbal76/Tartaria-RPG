@@ -160,6 +160,18 @@ export async function deleteSlot(slotId: string): Promise<void> {
 // sequence.
 let logWriteChain: Promise<void> = Promise.resolve();
 
+// OTA 017 — surface write failures so the player isn't surprised when
+// a long feedback note silently fails to land on disk. AsyncStorage
+// on Android has a default ~6MB per-key cap; a long enough log can
+// hit it. We track the last failure here and let callers report it.
+let lastLogWriteError: string | null = null;
+export function getLastLogWriteError(): string | null {
+  return lastLogWriteError;
+}
+export function clearLastLogWriteError(): void {
+  lastLogWriteError = null;
+}
+
 export function appendLogToDisk(line: string): Promise<void> {
   if (!activeSlotId) return Promise.resolve();
   logWriteChain = logWriteChain.then(async () => {
@@ -169,7 +181,10 @@ export function appendLogToDisk(line: string): Promise<void> {
       const existing = (await AsyncStorage.getItem(key)) ?? '';
       await AsyncStorage.setItem(key, existing + line + '\n');
     } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
       console.warn('appendLogToDisk failed', e);
+      // Stamp the latest failure for the COPY LOG button to surface.
+      lastLogWriteError = msg.slice(0, 200);
     }
   });
   return logWriteChain;

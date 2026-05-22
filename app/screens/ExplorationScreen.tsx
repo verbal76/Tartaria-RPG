@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
-import { readFullLog, flushLogWrites, clearActiveSlotLog } from '../engine/saveSystem';
+import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
 import { AdventureFeed } from '../components/AdventureFeed';
 import { InputBox } from '../components/InputBox';
@@ -68,6 +68,13 @@ export function ExplorationScreen() {
   // the tap-to-copy shortcut gives visible confirmation without a
   // separate screen.
   const [logCopied, setLogCopied] = useState(false);
+  // OTA 017 — char count displayed in the flash so the player can
+  // verify the clipboard buffer size matches what they expected.
+  // If their paste target shows fewer chars, the paste destination
+  // (some chat / email apps cap pastes at ~64-128 KB) is at fault,
+  // not the copy itself. SHARE bypasses the clipboard entirely for
+  // very long logs.
+  const [logCharCount, setLogCharCount] = useState(0);
   // OTA 224 — transient "CLEARED" flash on the CLEAR LOG button so
   // the wipe is acknowledged in the same chip-flash pattern as COPIED.
   const [logCleared, setLogCleared] = useState(false);
@@ -289,15 +296,36 @@ export function ExplorationScreen() {
                 await flushLogWrites();
                 const fresh = await readFullLog();
                 await Clipboard.setStringAsync(fresh);
+                setLogCharCount(fresh.length);
                 setLogCopied(true);
-                setTimeout(() => setLogCopied(false), 1500);
+                // OTA 017 — if the disk log dropped writes (AsyncStorage
+                // cap hit or similar), tell the player explicitly so a
+                // missing note isn't a silent surprise.
+                const writeErr = getLastLogWriteError();
+                if (writeErr) {
+                  useGameStore.setState((s) => ({
+                    gameLog: [
+                      ...s.gameLog,
+                      {
+                        id: `${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                        ts: Date.now(),
+                        channel: 'system' as const,
+                        text: `⚠ Log-write failure: ${writeErr}. Some entries may be missing from the copy — use SHARE on the full log screen for a complete export.`,
+                      },
+                    ],
+                  }));
+                  clearLastLogWriteError();
+                }
+                setTimeout(() => setLogCopied(false), 2500);
               } catch { /* clipboard rarely fails on Android */ }
             }}
             onLongPress={() => setScreen('log')}
             style={styles.menuBtn}
           >
             <Text style={styles.menuBtnText}>
-              {logCopied ? 'COPIED' : 'copy log'}
+              {logCopied
+                ? `${logCharCount.toLocaleString()} CHARS`
+                : 'copy log'}
             </Text>
           </Pressable>
           {/* OTA 224 — CLEAR LOG wipes the on-disk log + in-memory
