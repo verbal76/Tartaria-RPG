@@ -101,17 +101,14 @@ describe('OTA 051 — atlas coordinate calibration', () => {
       }
     });
 
-    // OTA 052 — the redrawn atlas depicts 20 of 21 locations. Only
-    // Obsidian Pillars is absent — it falls back to the grid-offset
-    // model.
-    const NOT_DEPICTED = [
-      'obsidian_pillars',
-    ];
-    it.each(NOT_DEPICTED)('%s correctly returns null (falls back to grid-offset)', (id) => {
-      expect(atlasCoordForLocation(id)).toBeNull();
-      // But the location should still be a real entry in locations.json —
-      // it just isn't drawn on the atlas image.
-      expect(LOC_BY_ID.has(id)).toBe(true);
+    // OTA 053 — every named location is depicted on the redrawn
+    // atlas. The not-depicted bucket is empty. We keep the
+    // grid-offset fallback wired in case the artwork is ever
+    // revised with fewer icons, but no current location needs it.
+    it('every named location resolves to a coord (no fallbacks needed)', () => {
+      for (const loc of LOCATIONS) {
+        expect(atlasCoordForLocation(loc.id)).not.toBeNull();
+      }
     });
 
     it('returns null for nullish input', () => {
@@ -147,12 +144,13 @@ describe('OTA 051 — atlas coordinate calibration', () => {
   });
 
   describe('coverage report', () => {
-    // OTA 052 — the redrawn atlas depicts 20 of 21 locations. If a
-    // future redraw drops coverage we want a failing test, not a
-    // silently-degraded map.
-    it('at least 20 of the 21 locations are depicted', () => {
+    // OTA 053 — the redrawn atlas now depicts ALL 21 locations.
+    // Any future redraw that drops coverage will fail this test
+    // rather than silently degrade the map.
+    it('all 21 locations are depicted', () => {
       const depicted = depictedLocationIds().length;
-      expect(depicted).toBeGreaterThanOrEqual(20);
+      expect(depicted).toBe(LOCATIONS.length);
+      expect(depicted).toBeGreaterThanOrEqual(21);
     });
 
     // OTA 052 — the Outpost is now in the upper-left, so most

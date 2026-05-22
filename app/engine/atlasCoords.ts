@@ -1,8 +1,9 @@
-// OTA 052 — Atlas dot calibration for the redrawn world map.
-// Replaces the OTA 051 portrait infographic with a landscape
-// hand-drawn atlas that depicts 20 of the 21 named locations as
-// labeled icons (only Obsidian Pillars is absent — falls back to
-// the grid-offset model).
+// OTA 053 — Atlas dot calibration for the redrawn world map.
+// OTA 052 hit 20/21 coverage on the redrawn landscape atlas; this
+// revision adds the previously-missing Obsidian Pillars icon (now
+// drawn with the Tartarian observatory alongside it). Full coverage:
+// every one of the 21 named locations resolves to a canonical icon
+// position.
 //
 // Image: assets/world-atlas.png — 1408 × 768 pixels, landscape.
 // Fractional coordinates measured against that pixel canvas.
@@ -43,6 +44,10 @@ export const LOCATION_ATLAS_COORDS: Record<string, AtlasCoord> = {
   buried_cities: { fx: 0.28, fy: 0.20 },
   great_tartary_plains: { fx: 0.50, fy: 0.21 },
   mud_seas: { fx: 0.70, fy: 0.22 },
+  // OTA 053 — Obsidian Pillars is now drawn alongside the
+  // Tartarian observatory in the upper-middle area, between
+  // Buried Cities and Mud Seas.
+  obsidian_pillars: { fx: 0.39, fy: 0.27 },
   zharaks_teeth: { fx: 0.50, fy: 0.30 },
 
   // Lost Capitals band — left of compass
