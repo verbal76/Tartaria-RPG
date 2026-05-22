@@ -4,6 +4,12 @@ import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import { readFullLog, flushLogWrites, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
 
+// OTA 024 — chunk size for the chunked-copy path. 25 KB is well
+// under the silent-truncation limit of the strictest common chat
+// app (~30 KB observed). Player paste tests can lower this if a
+// specific destination still cuts mid-line.
+const CHUNK_SIZE = 25_000;
+
 export function LogScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const [diskLog, setDiskLog] = useState<string>('Loading…');
@@ -13,6 +19,24 @@ export function LogScreen() {
   // as a banner above the COPY ALL button so the player knows the
   // copy may be incomplete.
   const [writeFailure, setWriteFailure] = useState<string | null>(null);
+  // OTA 024 — chunked-copy cursor. Index is 1-based for display
+  // ("PART 2 of 4"). chunkCopiedAt drives the brief flash.
+  const [chunkIndex, setChunkIndex] = useState(1);
+  const [chunkCopiedAt, setChunkCopiedAt] = useState<number | null>(null);
+
+  const totalChunks = Math.max(1, Math.ceil(diskLog.length / CHUNK_SIZE));
+
+  async function handleChunk() {
+    const start = (chunkIndex - 1) * CHUNK_SIZE;
+    const end = start + CHUNK_SIZE;
+    const slice = diskLog.slice(start, end);
+    const stamped = `=== TARTARIA LOG · PART ${chunkIndex} of ${totalChunks} · ${slice.length} CHARS · BEGIN ===\n${slice}\n=== END PART ${chunkIndex} of ${totalChunks} ===\n`;
+    await Clipboard.setStringAsync(stamped);
+    setChunkCopiedAt(Date.now());
+    // Advance to next part on the next tap; wrap to 1 after the last.
+    setChunkIndex((i) => (i >= totalChunks ? 1 : i + 1));
+    setTimeout(() => setChunkCopiedAt(null), 2500);
+  }
 
   // OTA 215 — re-read on focus and after a small interval while the
   // screen is open. The previous version captured a single snapshot
@@ -123,6 +147,21 @@ export function LogScreen() {
           <Text style={styles.shareText}>{shared ? 'SHARED' : 'SHARE'}</Text>
         </TouchableOpacity>
       </View>
+      {/* OTA 024 — chunked copy. Most chat apps cap pastes at
+          ~30-60KB, silently truncating beyond that. Player's
+          51,914-char log proved this: the BEGIN marker arrived,
+          the END marker didn't. The chunk button cycles through
+          ~25KB pieces of the log; each piece has its own
+          BEGIN/END PART markers so receiver can reassemble. */}
+      {diskLog.length > CHUNK_SIZE && (
+        <TouchableOpacity style={styles.chunkBtn} onPress={handleChunk} activeOpacity={0.7}>
+          <Text style={styles.chunkText}>
+            {chunkCopiedAt != null && Date.now() - chunkCopiedAt < 2500
+              ? `COPIED PART ${chunkIndex} / ${totalChunks} — TAP FOR NEXT`
+              : `COPY IN PARTS · ${totalChunks} pieces (next: ${chunkIndex} / ${totalChunks})`}
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -164,6 +203,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   shareText: { color: '#c9a86a', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
+  // OTA 024 — chunk button. Distinct color from COPY/SHARE so
+  // the player notices the new path; sits below the main button
+  // row only when the log is large enough to need chunking.
+  chunkBtn: {
+    marginTop: 8,
+    backgroundColor: '#9ec96a',
+    borderRadius: 4,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  chunkText: { color: '#0a0908', fontSize: 12, fontWeight: '800', letterSpacing: 1.5, textAlign: 'center' },
   writeFailure: {
     color: '#e07a5f',
     fontSize: 11,

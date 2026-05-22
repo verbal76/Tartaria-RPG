@@ -4009,7 +4009,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // If the player resolved a consumable inventory item (e.g. "eat ration"),
         // consume one and heal from the item's per-catalog effect if any,
         // falling back to a 2d6 roll for legacy consumables (Trail Rations,
-        // First Aid Kit) that don't declare an effect.
+        // First Aid Kit) that don't declare an effect. Strict kind check —
+        // non-consumable items with effects (Aetheric Torch's revealScene)
+        // belong on the 'use' verb (use_relic case), which handles the
+        // full sub-effect range.
         const consumable = parsed.resolvedItemId
           ? player.inventory.find((i) => i.id === parsed.resolvedItemId && i.kind === 'consumable')
           : undefined;
@@ -9092,6 +9095,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     if (!item) {
       get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
+      return;
+    }
+    // OTA 024 — items with a consumable-shaped effect route through
+    // the use_relic path REGARDLESS of inventory kind. Aetheric Torch
+    // is kind='relic' but carries effect.kind='consumable' with
+    // revealScene; without this check, USE just re-equipped the
+    // torch to off-hand silently, leaving the playtester with "why
+    // can the etheric torch not be used only scrapped or dropped."
+    // Now USE fires the effect (revealScene / extendLight / heal /
+    // stamina / etc.) and consumes one charge.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { resolveItemEffect: rie } = require('../engine/itemEffect');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { findExplorationItemByName: feib, findGearByName: fgbn, findMaterialByName: fmbn } = require('../engine/crafting');
+    const fxLookup = rie(item.name, [fgbn, feib, fmbn]);
+    if (fxLookup && fxLookup.kind === 'consumable') {
+      // Route through the use_relic case — it handles all the
+      // consumable sub-effects (heal / stamina / revealScene /
+      // reduceCorruption / extendLight) AND consumes one unit.
+      get().submitPlayerAction(`use ${item.name}`);
       return;
     }
     // Consumables → eat (HP recovery + time advance + quantity
