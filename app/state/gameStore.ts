@@ -123,7 +123,7 @@ import {
 } from '../engine/hub';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, resolveEquippedItem, effectiveStats } from '../engine/equipment';
-import { canScrap, scrapOutputFor } from '../engine/scrapEngine';
+import { canScrap, scrapOutputFor, repairCostMaterials } from '../engine/scrapEngine';
 import { stampDurability, wearItemByName, wearItemById, repairCost, repairItem } from '../engine/durability';
 import {
   type Hook,
@@ -430,6 +430,38 @@ const STAMINA_COSTS = {
   skillCheck: 1,
 } as const;
 
+// OTA 228 — Arbiter low-HP warning latch. Fires the moment HP
+// transitions from ≥5% to <5% of max; clears the latch the moment
+// HP returns to ≥5%. Playtester: "if your health is lower than 5%
+// the arbiter should say maybe you should eat something or look at
+// a first aid kit. but it shouldn't say it over and over... first
+// time you dropped below 5%, say it, then not again until your
+// health goes above 5% and then drops below again."
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function checkLowHpWarning(
+  prevHp: number,
+  newHp: number,
+  hpMax: number,
+  get: () => GameStore,
+  set: any,
+): void {
+  if (hpMax <= 0) return;
+  const threshold = hpMax * 0.05;
+  const prevBelow = prevHp < threshold;
+  const newBelow = newHp < threshold;
+  const wasWarned = get().lowHpWarned;
+  if (newBelow && !prevBelow && !wasWarned) {
+    get().appendLog(
+      'arbiter',
+      `The Arbiter holds your gaze. "You are nearly out of body. Eat what you have. Open the first-aid kit. The Outskirts do not return what they take."`,
+      { skipDedup: true },
+    );
+    set({ lowHpWarned: true });
+  } else if (!newBelow && wasWarned) {
+    set({ lowHpWarned: false });
+  }
+}
+
 // Verbs that strike with the body rather than a weapon. Used by the
 // no-enemy attack handler to narrate "kick the pulse emitter" as
 // futile flesh-on-machine instead of falling through to a generic
@@ -650,6 +682,13 @@ interface GameStore {
   currentScene: CurrentScene | null;
   pendingRolls: PendingRollState | null;
   hydrated: boolean;
+  /** OTA 228 — latch for the Arbiter's "you're badly hurt" warning.
+   *  Goes true the first time HP crosses below 5% of max in a session,
+   *  goes false again the first time HP returns above 5%. Suppresses
+   *  the warning while true so a player limping at 1 HP isn't lectured
+   *  on every combat round. Transient — not persisted across save / load
+   *  (player who reloads at 1 HP gets one fresh nudge, which is fine). */
+  lowHpWarned: boolean;
   /** Set when a slot load fails — UI surfaces this and offers recovery. */
   slotLoadError: string | null;
   /** Current tutorial step index, or null when no tutorial is active. */
@@ -833,6 +872,13 @@ interface GameStore {
   /** Disassemble a built item (weapon / armor / relic / built gear)
    *  into stock materials via scrapEngine. Refuses raw materials. */
   scrapInventoryItem: (itemName: string) => void;
+  /** OTA 228 — repair a durable item by consuming materials equal to
+   *  2× its scrap output. Looked up by item id so the player can
+   *  repair a specific damaged copy without merging the wrong one.
+   *  No-ops with a refusal Arbiter line if the item isn't found,
+   *  isn't durability-tracked, is already at full durability, or
+   *  the player doesn't have the materials in inventory. */
+  repairInventoryItem: (itemId: string) => void;
 
   bootCognitive: () => Promise<void>;
   shutdownCognitive: () => Promise<void>;
@@ -880,6 +926,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   currentScene: null,
   pendingRolls: null,
   hydrated: false,
+  lowHpWarned: false,
   slotLoadError: null,
   tutorialStep: null,
   tutorialDemoVendor: null,
@@ -3806,9 +3853,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const newInventory = player.inventory
             .map((i) => (i.id === usedConsumable.id ? { ...i, quantity: i.quantity - 1 } : i))
             .filter((i) => i.quantity > 0);
+          const prevHpHeal = player.hp;
+          const newHpHeal = player.hp + heal;
           set({
             player: advanceTime(
-              { ...player, hp: player.hp + heal, inventory: newInventory },
+              { ...player, hp: newHpHeal, inventory: newInventory },
               0.25,
             ),
           });
@@ -3816,6 +3865,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? `1d6 → ${heal} HP recovered.`
             : 'You were already at full strength — the salve goes back in the pouch.';
           get().appendLog('world', `You use one ${usedConsumable.name}. ${tail}`);
+          // OTA 228 — clear the low-HP latch if the heal pushed us
+          // back above the 5% threshold.
+          checkLowHpWarning(prevHpHeal, newHpHeal, player.hpMax ?? 1, get, set);
           void get().persist();
           break;
         }
@@ -8651,6 +8703,70 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
+  repairInventoryItem(itemId) {
+    const player = get().player;
+    if (!player) return;
+    const item = player.inventory.find((i) => i.id === itemId);
+    if (!item) {
+      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see that piece on you anymore."`);
+      return;
+    }
+    if (!item.durability) {
+      get().appendLog('arbiter', `The Arbiter taps the ${item.name}. "Nothing to repair — this one doesn't wear."`);
+      return;
+    }
+    if (item.durability.current >= item.durability.max) {
+      get().appendLog('arbiter', `The Arbiter looks the ${item.name} over. "Already whole. Don't waste materials."`);
+      return;
+    }
+    const cost = repairCostMaterials(item);
+    if (cost.length === 0) {
+      get().appendLog('arbiter', `The Arbiter taps the ${item.name}. "No recipe to mend this one. Sell it on or scrap for parts."`);
+      return;
+    }
+    // Verify we have every required material.
+    const shortages: string[] = [];
+    for (const need of cost) {
+      const have = player.inventory
+        .filter((i) => i.name.toLowerCase() === need.name.toLowerCase())
+        .reduce((s, i) => s + i.quantity, 0);
+      if (have < need.quantity) shortages.push(`${need.name} ${have}/${need.quantity}`);
+    }
+    if (shortages.length > 0) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter eyes the ${item.name}. "Short on stock: ${shortages.join(', ')}. Gather, then return."`,
+      );
+      return;
+    }
+    // Consume materials + restore durability.
+    set((s) => {
+      if (!s.player) return s;
+      let newInventory = [...s.player.inventory];
+      for (const need of cost) {
+        let remaining = need.quantity;
+        newInventory = newInventory
+          .map((i) => {
+            if (remaining <= 0) return i;
+            if (i.name.toLowerCase() !== need.name.toLowerCase()) return i;
+            const take = Math.min(i.quantity, remaining);
+            remaining -= take;
+            return { ...i, quantity: i.quantity - take };
+          })
+          .filter((i) => i.quantity > 0);
+      }
+      newInventory = newInventory.map((i) =>
+        i.id === itemId && i.durability
+          ? { ...i, durability: { ...i.durability, current: i.durability.max } }
+          : i,
+      );
+      return { player: { ...s.player, inventory: newInventory } };
+    });
+    const costSummary = cost.map((c) => c.quantity > 1 ? `${c.name} x${c.quantity}` : c.name).join(', ');
+    get().appendLog('world', `You repair the ${item.name}. Back to full. (spent: ${costSummary})`);
+    void get().persist();
+  },
+
   rest() {
     const player = get().player;
     if (!player) return;
@@ -8671,6 +8787,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     const heal = Math.min(hpRoom, rollDie(6) + rollDie(6));
     const stamGain = Math.min(stamRoom, rollDie(6) + 2);
+    const prevHpRest = player.hp;
+    const hpMaxRest = player.hpMax;
     set({
       player: {
         ...player,
@@ -8686,6 +8804,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'world',
       `You rest for ${hoursSlept} hours. ${parts.join(', ')} recovered. (${describeTime(newHours)})`,
     );
+    // OTA 228 — rest may push HP back over the 5% latch threshold.
+    checkLowHpWarning(prevHpRest, prevHpRest + heal, hpMaxRest, get, set);
     void get().persist();
   },
 
@@ -8855,16 +8975,22 @@ function applyHookEffect(
     }
     case 'heal': {
       const amt = effect.amount;
+      const prevHpHeal = get().player?.hp ?? 0;
+      const hpMaxHeal = get().player?.hpMax ?? 1;
       set((s) =>
         s.player
           ? { player: { ...s.player, hp: Math.min(s.player.hpMax, s.player.hp + amt) } }
           : s,
       );
+      // OTA 228 — heal may push us back above the 5% threshold.
+      checkLowHpWarning(prevHpHeal, Math.min(hpMaxHeal, prevHpHeal + amt), hpMaxHeal, get, set);
       return { inlineSummary: `+${amt} HP`, fatal: false };
     }
     case 'damage': {
       const amt = effect.amount;
       let killed = false;
+      const prevHpDmg = get().player?.hp ?? 0;
+      const hpMaxDmg = get().player?.hpMax ?? 1;
       set((s) => {
         if (!s.player) return {};
         const newHp = Math.max(0, s.player.hp - amt);
@@ -8872,6 +8998,8 @@ function applyHookEffect(
         return { player: { ...s.player, hp: newHp } };
       });
       get().appendLog('combat', `You take ${amt} damage from ${effect.cause}.`);
+      // OTA 228 — Arbiter low-HP warning latch on effect damage.
+      if (!killed) checkLowHpWarning(prevHpDmg, Math.max(0, prevHpDmg - amt), hpMaxDmg, get, set);
       return { inlineSummary: null, fatal: killed };
     }
     case 'advance_time': {
@@ -10156,7 +10284,16 @@ function applyEnemyCounter(
       const msg = killed
         ? `${enemy.name} deals ${dmg} damage${resistTag}. You fall.`
         : `${enemy.name} deals ${dmg} damage${resistTag}. You have ${newHp} HP remaining.`;
-      void Promise.resolve().then(() => get().appendLog('combat', msg));
+      const prevHpForWarn = nextPlayer.hp;
+      const hpMaxForWarn = nextPlayer.hpMax ?? 1;
+      void Promise.resolve().then(() => {
+        get().appendLog('combat', msg);
+        // OTA 228 — low-HP latch fires AFTER the combat line so the
+        // narrative reads "X damage. 1 HP." then "Arbiter: eat /
+        // first-aid kit." Skip when killed — falling already speaks
+        // for itself.
+        if (!killed) checkLowHpWarning(prevHpForWarn, newHp, hpMaxForWarn, get, set);
+      });
       let effects = newEffect
         ? applyEffect(nextPlayer.statusEffects ?? [], newEffect.effect)
         : nextPlayer.statusEffects;
@@ -10566,7 +10703,25 @@ function narrateCasualLook(
     : ladder?.microMicro.name
       ? `${ladder.microMicro.name}, in ${scene.location.name}`
       : scene.location.name;
-  parts.push(`You look around. You're in ${placeName}.`);
+  // OTA 228 — fold the HP gut-check into the opening sentence as
+  // narrative flavor instead of a stark mid-paragraph "wounds (X/Y)"
+  // line. Playtester: "you're carrying wounds in the look around —
+  // I like it, but put it in the first sentence as flavor, not red,
+  // narrative but draw your attention to it." Three bands:
+  //   < 25% hpMax → "favoring deep wounds"  (cold, present pain)
+  //   < 50%       → "favoring your wounds"  (existing trigger)
+  //   ≥ 50%       → no body-state phrase    (skip the chip entirely)
+  let opening = `You look around. You're in ${placeName}.`;
+  if (player) {
+    const hp = player.hp ?? 0;
+    const hpMax = player.hpMax ?? 1;
+    if (hp < hpMax * 0.25) {
+      opening = `You look around, favoring deep wounds (${hp}/${hpMax} HP). You're in ${placeName}.`;
+    } else if (hp < hpMax * 0.5) {
+      opening = `You look around, favoring your wounds (${hp}/${hpMax} HP). You're in ${placeName}.`;
+    }
+  }
+  parts.push(opening);
 
   // 2. Notable objects you can see / approach. Pulled from the
   //    authored interactables array (or extractor fallback). This
@@ -10636,13 +10791,10 @@ function narrateCasualLook(
   //    scene; the look just reminds the player it's active.
   if (scene.hazard) parts.push(`Hazard active: ${scene.hazard.name}.`);
 
-  // 5. HP gut-check — bearings-relevant ("can I fight right now?")
-  //    only when hurt. Drop the time-of-day flavor; not a bearing.
-  if (player) {
-    const hp = player.hp ?? 0;
-    const hpMax = player.hpMax ?? 1;
-    if (hp < hpMax * 0.5) parts.push(`You're carrying wounds (${hp}/${hpMax} HP).`);
-  }
+  // 5. HP gut-check moved up into the opening sentence (OTA 228) so
+  //    the wounds reading is narrative flavor at the start, not a
+  //    stark chip mid-paragraph. Slot intentionally kept as a
+  //    comment so the section numbering still reads in order.
 
   // 6. Exits — the bulk of bearings. Direction + destination when
   //    we have one (hub-room exits name the room; Micro-Micro

@@ -86,3 +86,16 @@ export function scrapOutputFor(item: InventoryItem): ScrapOutput {
     .join(', ');
   return { grants: finalGrants, summary };
 }
+
+/** Material cost to fully repair an item — exactly 2× its scrap
+ *  output. Playtester spec: "if your helmet scraps to 4 scrap metal
+ *  and 2 cloth, it should cost 8 scrap metal and 4 cloth to repair.
+ *  double the drop rate for the repair rate."
+ *
+ *  Returns an empty list when the item has no scrap output (raw
+ *  materials, consumables) — caller should not surface repair for
+ *  such items. */
+export function repairCostMaterials(item: InventoryItem): Array<{ name: string; quantity: number }> {
+  const out = scrapOutputFor(item);
+  return out.grants.map((g) => ({ name: g.name, quantity: g.quantity * 2 }));
+}
