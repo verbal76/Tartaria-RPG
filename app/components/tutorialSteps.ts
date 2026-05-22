@@ -50,6 +50,19 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'Equipped gear is listed underneath, along with any active contracts. ' +
       'Stat bonuses from rings, amulets, and armor show as "(+N)" next to the base value.',
   },
+  // OTA 040 — new step: Player Sheet screen.
+  {
+    screen: 'character',
+    area: 'fullscreen',
+    title: 'Tap for the full sheet',
+    body:
+      'Tap your stats panel any time to open the full Player Sheet (this screen). ' +
+      'Every number here breaks down into its sources — base race, equipped gear, food ' +
+      'buffs, weather modifiers, racial traits, corruption tier. If a stat surprised you ' +
+      'in a fight, this is where you find out why. ' +
+      '\n\nRead-only — equip / unequip / use lives on the Inventory screen. This sheet ' +
+      'is for understanding what you are right now.',
+  },
   {
     screen: 'exploration',
     area: 'top-right-enemy',
@@ -106,6 +119,24 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       '\n\nIn combat: punch, kick, your equipped weapons, dodge, block, advance / step back, ' +
       'pack (open inventory mid-fight).',
   },
+  // OTA 040 — new step: recent additions to the quick row + verbs.
+  {
+    screen: 'exploration',
+    area: 'quick-row',
+    title: 'New verbs and buttons',
+    body:
+      'Since the early builds, a few things landed here: ' +
+      '\n\n• CLIMB opens a noun picker for every climbable thing in the scene. Once you\'re ' +
+      'partway up, the button flips to CLIMB UP (n/total) + CLIMB DOWN — tier by tier, ' +
+      'with rope auto-passing every tier and chance-based loot at the top. ' +
+      '\n\n• Roadside trader stalls appear while you walk (~15% per cardinal step outdoors) — ' +
+      'a one-line announcement in the feed and a vendor banner at the top. Vendors also ' +
+      'have a STEAL button next to BUY with the DC stamped on it; skip the price by risking ' +
+      'a fight. ' +
+      '\n\n• Aethercraft verbs are real now. Type "shape stone", "summon golem", or "mend ' +
+      'wounds" with an Aether-tagged consumable in your pack (Aether Crystal / Mud / Shard / ' +
+      'Locket) to burn as fuel. Mud Dwellers cast at base DC; Aetherborn +2; everyone else +4.',
+  },
   {
     screen: 'exploration',
     area: 'input-row',
@@ -117,6 +148,23 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'flow to Qwen on-device, which figures out what you meant and re-dispatches it — ' +
       'you\'ll see "The Arbiter considers your words…" while it thinks. ' +
       '\n\nMisspellings and paraphrased item names are handled by the cognitive layer.',
+  },
+  // OTA 040 — new step: race mechanical layer.
+  {
+    screen: 'character',
+    area: 'fullscreen',
+    title: 'Race mechanics',
+    body:
+      'Your race is a real mechanical layer, not just flavor. ' +
+      '\n\n• Tartarian Giants land 1d6+2 barehand and take −4 AC in confined spaces. +2 STR always. ' +
+      '\n• Mud Dwellers get +1 AC underground and +2 INT when using Aethercraft. +2 DEX always. ' +
+      '\n• Aetherborn pay HP instead of corruption when they cast Aetheric Healing. +1 CHA always. ' +
+      '\n• Reclaimers gain +1 AC in ruins and cities. +1 DEX always. ' +
+      '\n• Architectural Sentinels punch with 1d10 (even/odd to land), +2 AC in runic gear. +2 STR / +1 INT. ' +
+      '\n• Mud Golems carry +1 AC with relic armor. +2 STR always. ' +
+      '\n• Unknowing Masses get no inherent bonuses — pure adaptability. ' +
+      '\n\nAll of this — barehand, conditional AC, always-on stat bumps, the trait list — is ' +
+      'visible on your Player Sheet (above). Tap the top-left stats panel any time to recheck.',
   },
   {
     screen: 'exploration',

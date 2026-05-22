@@ -75,3 +75,12 @@ export function tierCrossLine(prev: CorruptionTier, next: CorruptionTier): strin
 export function tierLabel(tier: CorruptionTier): string {
   return tier.charAt(0).toUpperCase() + tier.slice(1);
 }
+
+// One-line tier description for the player sheet. Plain language
+// so the player sees what each tier actually does to them.
+export function tierDescription(tier: CorruptionTier): string {
+  if (tier === 'clean') return 'No aether on you. Nothing reacting to you.';
+  if (tier === 'tainted') return 'CHA −1. Extra apparition encounters when you walk outdoors.';
+  if (tier === 'corrupted') return 'All stats −1. Vendors charge +15%. Encounters spike further.';
+  return 'All stats −2. Vendors charge +30%. Mud Monarch Purifiers will hunt you every few steps.';
+}

@@ -82,6 +82,10 @@ export function StatsPanel({ player }: Props) {
         );
       })()}
       <Text style={styles.subline}>Faction standing: {factionStanding}</Text>
+      {/* OTA 040 — affordance for the new Player Sheet screen. Tap
+          handler lives on the parent TouchableOpacity in
+          ExplorationScreen.tsx; this is the visual cue. */}
+      <Text style={styles.tapHint}>tap for full sheet ›</Text>
     </View>
   );
 }
@@ -112,6 +116,7 @@ const styles = StyleSheet.create({
   subline: { color: '#7a705c', fontSize: 10, marginBottom: 2 },
   equipped: { color: '#c9a86a', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
   effects: { color: '#e07a5f', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
+  tapHint: { color: '#7a705c', fontSize: 8, marginTop: 4, letterSpacing: 0.5, fontStyle: 'italic', textAlign: 'right' },
   companion: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5, fontWeight: '700' },
   contracts: { color: '#9ec96a', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },
   row: { flexDirection: 'row', gap: 4, marginTop: 3 },

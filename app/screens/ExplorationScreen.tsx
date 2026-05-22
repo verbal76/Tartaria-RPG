@@ -197,7 +197,15 @@ export function ExplorationScreen() {
     >
       <View style={styles.topRow}>
         <TutorialTarget area="top-left-stats" style={styles.statsCol}>
-          <StatsPanel player={player} />
+          {/* OTA 040 — tap the stats panel to open the full Player
+              Sheet. Wrapped INSIDE the TutorialTarget so the overlay
+              still measures the same layout box. */}
+          <TouchableOpacity
+            onPress={() => setScreen('character')}
+            activeOpacity={0.75}
+          >
+            <StatsPanel player={player} />
+          </TouchableOpacity>
         </TutorialTarget>
         <TutorialTarget area="top-right-enemy" style={styles.rightCol}>
           {inCombat ? (

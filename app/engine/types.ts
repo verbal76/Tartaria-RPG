@@ -759,6 +759,7 @@ export type ScreenName =
   | 'lore'
   | 'about'
   | 'inventory'
+  | 'character'
   | 'crafting'
   | 'vendor'
   | 'actions'

@@ -261,3 +261,61 @@ export function effectiveStats(
     charisma: player.stats.charisma + (bonus.charisma ?? 0) + (inv.charisma ?? 0) + (food.charisma ?? 0) + (w.charisma ?? 0) + (racial.charisma ?? 0) + (corrPen.charisma ?? 0),
   };
 }
+
+// OTA 040 — annotated effective-stats. Same math as effectiveStats
+// but returns per-source labels so the Player Sheet can show
+// "STR 12 (base 10, +2 race, +1 helm, +1 weather, −1 corruption)".
+// Doesn't change the existing effectiveStats signature; all 30+ call
+// sites that just want the value-only object stay on the old one.
+export type StatSource = { label: string; delta: number };
+export interface StatBreakdown {
+  base: number;
+  total: number;
+  sources: StatSource[];
+}
+export type EffectiveStatsBreakdown = Record<keyof Stats, StatBreakdown>;
+
+export function effectiveStatsBreakdown(
+  player: PlayerCharacter,
+  weatherMod?: Partial<Stats>,
+): EffectiveStatsBreakdown {
+  const bonus = aggregateEquippedStatBonuses(player);
+  const inv = aggregateInventoryPassiveStatBonuses(player);
+  // Food buffs — sum per stat, but also record each individual buff
+  // so the breakdown can show the source food name.
+  const foodBuffs: Array<{ stat: keyof Stats; delta: number; label: string }> = [];
+  for (const eff of player.statusEffects ?? []) {
+    if (eff.kind !== 'food_buff' || !eff.buffStat || !eff.buffBonus) continue;
+    foodBuffs.push({
+      stat: eff.buffStat,
+      delta: eff.buffBonus,
+      label: eff.label ? `${eff.label}` : `food (+${eff.buffBonus})`,
+    });
+  }
+  const racial = racialStatBonusesFor(player.raceId);
+  const tier = corruptionTierOf(player.corruption ?? 0);
+  const corrPen = corruptionStatPenalty(tier);
+  const w = weatherMod ?? {};
+
+  const build = (stat: keyof Stats): StatBreakdown => {
+    const base = player.stats[stat];
+    const sources: StatSource[] = [];
+    if ((racial[stat] ?? 0) !== 0) sources.push({ label: 'race', delta: racial[stat]! });
+    if ((bonus[stat] ?? 0) !== 0) sources.push({ label: 'equipped', delta: bonus[stat]! });
+    if ((inv[stat] ?? 0) !== 0) sources.push({ label: 'pack passive', delta: inv[stat]! });
+    for (const fb of foodBuffs) {
+      if (fb.stat === stat) sources.push({ label: fb.label, delta: fb.delta });
+    }
+    if ((w[stat] ?? 0) !== 0) sources.push({ label: 'weather', delta: w[stat]! });
+    if ((corrPen[stat] ?? 0) !== 0) sources.push({ label: `corruption (${tier})`, delta: corrPen[stat]! });
+    const total = base + sources.reduce((s, x) => s + x.delta, 0);
+    return { base, total, sources };
+  };
+  return {
+    strength: build('strength'),
+    dexterity: build('dexterity'),
+    intelligence: build('intelligence'),
+    wisdom: build('wisdom'),
+    charisma: build('charisma'),
+  };
+}
