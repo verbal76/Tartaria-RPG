@@ -7532,6 +7532,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       `Bought ${offer.itemName} from ${scene.vendor.name} for ${effectivePrice} TC${markupNote}. (${player.tc - effectivePrice} TC left)`,
     );
     logRepChanges(get, repResult.changed);
+    // OTA 059 — successful BUY trains CHA. You read the room well
+    // enough to close the deal at the price they offered. The
+    // diplomacy intent already trains CHA on typed verbs; this
+    // covers the tap-driven path so CHA grows naturally.
+    {
+      const liveBuyer = get().player;
+      if (liveBuyer) {
+        const tr = trainStat(liveBuyer, 'charisma', true);
+        set((s) => (s.player ? { player: tr.player } : s));
+        if (tr.leveled) {
+          get().appendLog(
+            'reward',
+            `✦ You read them well. +1 CHA (now ${tr.leveled.to}).`,
+          );
+        }
+      }
+    }
     void get().persist();
   },
 
@@ -7589,6 +7606,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       `Sold ${item.name} to ${scene.vendor.name} for ${price} TC. (${player.tc + price} TC on hand)`,
     );
+    // OTA 059 — successful SELL trains CHA. Closing the trade
+    // counts as social work.
+    {
+      const liveSeller = get().player;
+      if (liveSeller) {
+        const tr = trainStat(liveSeller, 'charisma', true);
+        set((s) => (s.player ? { player: tr.player } : s));
+        if (tr.leveled) {
+          get().appendLog(
+            'reward',
+            `✦ You named your price and held it. +1 CHA (now ${tr.leveled.to}).`,
+          );
+        }
+      }
+    }
     void get().persist();
   },
 
@@ -7632,6 +7664,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
       `You gift ${item.name} to ${scene.vendor.name}. They acknowledge it with a slow nod.`,
     );
     logRepChanges(get, repResult.changed);
+    // OTA 059 — gifting is pure social work; trains CHA reliably.
+    {
+      const liveGifter = get().player;
+      if (liveGifter) {
+        const tr = trainStat(liveGifter, 'charisma', true);
+        set((s) => (s.player ? { player: tr.player } : s));
+        if (tr.leveled) {
+          get().appendLog(
+            'reward',
+            `✦ Generosity carries weight. +1 CHA (now ${tr.leveled.to}).`,
+          );
+        }
+      }
+    }
     void get().persist();
   },
 
@@ -7950,6 +7996,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (stage0) {
       get().appendLog('world', stage0.narration);
     }
+    // OTA 059 — accepting a contract is a social close — you
+    // convinced the agent you were worth handing the work to.
+    // Trains CHA on every accept.
+    {
+      const liveAccepter = get().player;
+      if (liveAccepter) {
+        const tr = trainStat(liveAccepter, 'charisma', true);
+        set((s) => (s.player ? { player: tr.player } : s));
+        if (tr.leveled) {
+          get().appendLog(
+            'reward',
+            `✦ They handed you the contract. +1 CHA (now ${tr.leveled.to}).`,
+          );
+        }
+      }
+    }
     void get().persist();
   },
 
@@ -8177,6 +8239,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
+    // OTA 059 — same shape as faction-quest accept: trains CHA.
+    {
+      const liveAccepter = get().player;
+      if (liveAccepter) {
+        const tr = trainStat(liveAccepter, 'charisma', true);
+        set((s) => (s.player ? { player: tr.player } : s));
+        if (tr.leveled) {
+          get().appendLog(
+            'reward',
+            `✦ The hunt is yours to take. +1 CHA (now ${tr.leveled.to}).`,
+          );
+        }
+      }
+    }
     void get().persist();
   },
 
@@ -8423,6 +8499,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
+    // OTA 059 — same shape as faction-quest accept: trains CHA.
+    {
+      const liveAccepter = get().player;
+      if (liveAccepter) {
+        const tr = trainStat(liveAccepter, 'charisma', true);
+        set((s) => (s.player ? { player: tr.player } : s));
+        if (tr.leveled) {
+          get().appendLog(
+            'reward',
+            `✦ They confide the mystery to you. +1 CHA (now ${tr.leveled.to}).`,
+          );
+        }
+      }
+    }
     void get().persist();
   },
 
@@ -8618,6 +8708,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : st,
     );
+    // OTA 059 — same shape as faction-quest accept: trains CHA.
+    {
+      const liveAccepter = get().player;
+      if (liveAccepter) {
+        const tr = trainStat(liveAccepter, 'charisma', true);
+        set((s) => (s.player ? { player: tr.player } : s));
+        if (tr.leveled) {
+          get().appendLog(
+            'reward',
+            `✦ The storyline opens to you. +1 CHA (now ${tr.leveled.to}).`,
+          );
+        }
+      }
+    }
     void get().persist();
   },
 
