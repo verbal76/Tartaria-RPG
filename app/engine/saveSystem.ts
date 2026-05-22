@@ -197,16 +197,29 @@ export async function readFullLog(): Promise<string> {
 // Wipe the on-disk log for the active slot. Used by the CLEAR LOG
 // button on the exploration screen so the player can submit fresh
 // playtest deltas instead of re-sending the same accumulated history
-// on every troubleshooting round. Drains pending writes first so a
-// write racing with the clear doesn't leave a one-line leftover.
+// on every troubleshooting round.
+//
+// OTA 014 — chain the clear as a NEW step onto logWriteChain so it
+// runs FIFO with any concurrent appendLogToDisk calls. The previous
+// version awaited the chain then ran removeItem, which left a race:
+// an append that queued AFTER the drain await but BEFORE the
+// removeItem would land first, leaving a one-line leftover that the
+// removeItem then wiped — but a subsequent append would see an empty
+// key and start fresh, so the player saw line 1 of the new session
+// followed by silence. By chaining the clear, we guarantee atomic
+// ordering: every write before the clear is flushed; the clear runs;
+// every write after is appended to a fresh (empty) key.
 export async function clearActiveSlotLog(): Promise<void> {
   if (!activeSlotId) return;
+  logWriteChain = logWriteChain.then(async () => {
+    if (!activeSlotId) return;
+    try {
+      await AsyncStorage.removeItem(slotLogKey(activeSlotId));
+    } catch {
+      /* ignore — the log will repopulate from the next append */
+    }
+  });
   await logWriteChain;
-  try {
-    await AsyncStorage.removeItem(slotLogKey(activeSlotId));
-  } catch {
-    /* ignore — the log will repopulate from the next append */
-  }
 }
 
 // Read any slot's log directly without activating it. Used by the title

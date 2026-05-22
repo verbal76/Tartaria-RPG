@@ -187,14 +187,34 @@ export function extractAmbientNouns(description: string | undefined | null): str
 export function matchAmbientNoun(target: string, ambient: readonly string[]): string | null {
   const t = target.toLowerCase().trim();
   if (!t) return null;
-  // Prefer longest match so "buried cities" beats "cities". Both sides
-  // get lowercased before the includes() comparison — the pool can hold
-  // mixed-case canonical names ("Mud Spider") alongside lowercase
-  // aliases ("spider"), and the player's input is always lowercased.
+  // OTA 014 — Two-pass match. The previous version was
+  // bidirectional substring (t.includes(n) || n.includes(t)) which
+  // was too greedy: typing "wall" in a scene with both "wall" and
+  // "stone wall" would land on the LONGER first ("stone wall") via
+  // `n.includes(t)` and then never let the player target plain
+  // "wall" as a distinct noun. Now we prefer exact matches, then
+  // target-contains-noun (typed broader than canonical), then fall
+  // back to noun-contains-target (typed narrower / abbreviation) —
+  // but only when the target is at least 3 chars to avoid "ow"
+  // matching "shadow" etc.
   const sorted = [...ambient].sort((a, b) => b.length - a.length);
+  // Pass 1: exact match.
+  for (const noun of sorted) {
+    if (noun.toLowerCase() === t) return noun;
+  }
+  // Pass 2: target contains the noun ("the wall" → "wall").
   for (const noun of sorted) {
     const n = noun.toLowerCase();
-    if (t.includes(n) || n.includes(t)) return noun;
+    if (t.includes(n)) return noun;
+  }
+  // Pass 3: noun contains the target — only when target is
+  // meaningfully long (3+ chars) so common short words don't
+  // accidentally match longer nouns.
+  if (t.length >= 3) {
+    for (const noun of sorted) {
+      const n = noun.toLowerCase();
+      if (n.includes(t)) return noun;
+    }
   }
   return null;
 }

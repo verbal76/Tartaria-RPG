@@ -68,7 +68,11 @@ describe('classifyContainer', () => {
     expect(classifyContainer('the crypt')?.archetypeId).toBe('tomb');
     expect(classifyContainer('a Tartarian grave')?.archetypeId).toBe('tomb');
     expect(classifyContainer('ossuary')?.archetypeId).toBe('tomb');
-    expect(classifyContainer('a stone casket')?.archetypeId).toBe('tomb');
+    // OTA 012 — "casket" removed from tomb matchers; it now routes
+    // through sceneNounMaterial's jewelry_box override (locket /
+    // gem loot) for body-attack / break-open paths. The remaining
+    // tomb matchers cover the same burial semantic without the
+    // jewelry-box collision.
   });
 
   it('returns null for doors, walls, and bare ground', () => {

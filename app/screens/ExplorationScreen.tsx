@@ -341,17 +341,19 @@ export function ExplorationScreen() {
         chips={[
           // 'the ground' pinned at the top of the scene chip row.
           // OTA 222 — playtester wanted consistency: other consumed
-          // nouns disappear from the chip list, but the ground used
-          // to grey out + check (alwaysShow:true). They now behave
-          // the same — when consumed, the chip is dropped from the
-          // visible list. The engine still allows manual typing of
-          // "investigate the ground" to gather more stock material,
-          // since unlimited stamina-throttled re-digging is by
-          // design (clubs + spears need lots of stock).
-          {
-            noun: 'the ground',
-            consumed: isAmbientConsumed('ground'),
-          },
+          // nouns disappear from the chip list. The engine still
+          // allows manual typing of "investigate the ground" to
+          // gather more stock material.
+          //
+          // OTA 014 — hub-room scoping. Player inside the outpost
+          // sees board + brick floors; the dig handler refuses
+          // ("no silt to scrape"). Showing the chip in hub rooms
+          // is a false affordance — drop it. Player outside the
+          // outpost (hubRoomId null) still sees it.
+          ...(player.hubRoomId
+            ? []
+            : [{ noun: 'the ground', consumed: isAmbientConsumed('ground') }]
+          ),
           ...buildChipPool(currentScene).map((n) => {
             // OTA 195 — compute per-chip requirement. An Aether-coded
             // noun (vent fissure, ley line, glyph, etc.) requires a

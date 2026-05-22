@@ -1357,6 +1357,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         currentScene: restoredScene,
         pendingRolls: null,
         wastelandStepsSinceEncounter: 0,
+        // OTA 014 — transient flags always reset on slot load. A player
+        // who saved at 1 HP with the latch set then re-loaded wouldn't
+        // get a fresh warning otherwise.
+        lowHpWarned: false,
       });
       // Only fall back to beginScene when the save predates scene
       // capture. New saves restore the exact scene above and skip this.
@@ -9072,6 +9076,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // refresh the slot index so the title list reflects the latest summary.
     const slots = await listSlots();
     set({ slots, currentScreen: 'title' });
+    // OTA 014 — reset the welcome-back debounce latch on exit so the
+    // next resume gets a fresh Arbiter greeting. Without this, a
+    // player who quickly saved-and-exited then resumed wouldn't hear
+    // the welcome because the 60s debounce was still locked.
+    lastWelcomeBackAt = null;
   },
 
   async bootCognitive() {
