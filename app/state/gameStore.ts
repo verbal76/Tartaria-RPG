@@ -7489,7 +7489,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const roll = rollDie(20);
     const total = roll + stats.dexterity;
     const success = total >= dc;
-    get().appendLog('combat', `Steal ${offer.itemName} — d20 ${roll} + DEX ${stats.dexterity} = ${total} vs DC ${dc} — ${success ? '✓ HIT' : '✗ CAUGHT'}`);
+    // OTA 035 — only surface the combat-channel roll line on a CAUGHT
+    // miss (the player needs to see why the fight is starting).
+    // Success goes straight to a clean green reward line below —
+    // playtester: "instead of being all in red... just says in
+    // green you have successfully stolen and then the item name".
+    if (!success) {
+      get().appendLog('combat', `Steal ${offer.itemName} — d20 ${roll} + DEX ${stats.dexterity} = ${total} vs DC ${dc} — ✗ CAUGHT`);
+    }
 
     if (success) {
       // Catalog lookup to set proper kind/rarity/tags.
@@ -7518,7 +7525,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           currentScene: { ...s.currentScene, vendor: { ...s.currentScene.vendor, offers: newOffers } },
         };
       });
-      get().appendLog('reward', `You palm the ${offer.itemName}. ${scene.vendor.name} doesn't notice.`);
+      get().appendLog('reward', `✦ Successfully stole ${offer.itemName} from ${scene.vendor.name}.`);
     } else {
       // OTA 030 — caught. Vendor flips HOSTILE (was: walks away).
       // Spin up an Enemy scaled to the vendor's tier and clear the
