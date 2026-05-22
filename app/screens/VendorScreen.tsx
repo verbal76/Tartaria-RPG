@@ -23,6 +23,7 @@ type Mode = 'buy' | 'sell' | 'contracts';
 type Pending =
   | { mode: 'buy'; itemName: string; price: number }
   | { mode: 'sell'; itemName: string; price: number }
+  | { mode: 'steal'; itemName: string; dc: number }
   | { mode: 'dismiss' }
   | { mode: 'accept'; kind: 'faction' | 'hunt' | 'mystery' | 'storyline'; title: string; reward: string }
   | null;
@@ -33,6 +34,7 @@ export function VendorScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const buyFromVendor = useGameStore((s) => s.buyFromVendor);
   const sellToVendor = useGameStore((s) => s.sellToVendor);
+  const stealFromVendor = useGameStore((s) => s.stealFromVendor);
   const dismissVendor = useGameStore((s) => s.dismissVendor);
   const acceptFactionQuest = useGameStore((s) => s.acceptFactionQuest);
   const acceptHunt = useGameStore((s) => s.acceptHunt);
@@ -62,12 +64,19 @@ export function VendorScreen() {
 
   const openBuy = (itemName: string, price: number) => setPending({ mode: 'buy', itemName, price });
   const openSell = (itemName: string, price: number) => setPending({ mode: 'sell', itemName, price });
+  // OTA 030 — steal DC is tiered by vendor source. Hub vendors have no
+  // demeanor and default to DC 16 (alert, help nearby). Roadside
+  // sketchy = DC 11, honest = DC 14. Pre-compute here so the
+  // confirmation modal can show DEX vs DC up-front.
+  const stealDc = vendor.demeanor === 'sketchy' ? 11 : vendor.demeanor === 'honest' ? 14 : 16;
+  const openSteal = (itemName: string) => setPending({ mode: 'steal', itemName, dc: stealDc });
   const openDismiss = () => setPending({ mode: 'dismiss' });
   const cancel = () => setPending(null);
   const confirmAction = () => {
     if (!pending) return;
     if (pending.mode === 'buy') buyFromVendor(pending.itemName);
     else if (pending.mode === 'sell') sellToVendor(pending.itemName);
+    else if (pending.mode === 'steal') stealFromVendor(pending.itemName);
     else if (pending.mode === 'dismiss') dismissVendor();
     else if (pending.mode === 'accept') {
       if (pending.kind === 'faction') acceptFactionQuest(pending.title);
@@ -334,14 +343,16 @@ export function VendorScreen() {
                 .filter((inv) => inv.name.toLowerCase() === o.itemName.toLowerCase())
                 .reduce((sum, inv) => sum + inv.quantity, 0);
               return (
-                <TouchableOpacity
+                <View
                   key={`buy_${o.itemName}_${i}`}
                   style={[styles.offerRow, !canAfford && styles.offerRowBroke]}
-                  onPress={() => openBuy(o.itemName, o.price)}
-                  activeOpacity={0.7}
                 >
                   <View style={[styles.offerStripe, { backgroundColor: rarityColor(itemPreview.rarity) }]} />
-                  <View style={styles.offerBody}>
+                  <TouchableOpacity
+                    style={styles.offerBody}
+                    onPress={() => openBuy(o.itemName, o.price)}
+                    activeOpacity={0.7}
+                  >
                     <View style={styles.offerHead}>
                       <Text style={styles.offerName} numberOfLines={1}>{o.itemName}</Text>
                       <Text style={[styles.offerPrice, !canAfford && styles.offerPriceBroke]}>
@@ -361,8 +372,21 @@ export function VendorScreen() {
                         {itemPreview.stats.join(' · ')}
                       </Text>
                     )}
-                  </View>
-                </TouchableOpacity>
+                  </TouchableOpacity>
+                  {/* OTA 030 — STEAL button. DC stamped on the chip so the
+                      player knows the risk before tapping. */}
+                  {!tutorialDemoVendor && (
+                    <TouchableOpacity
+                      onPress={() => openSteal(o.itemName)}
+                      style={styles.stealBtn}
+                      hitSlop={6}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.stealText}>STEAL</Text>
+                      <Text style={styles.stealDc}>DC {stealDc}</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
               );
             })
           )
@@ -435,11 +459,13 @@ export function VendorScreen() {
             ? `Dismiss ${vendor.name}?`
             : pending?.mode === 'sell'
               ? `Sell to ${vendor.name}`
-              : pending?.mode === 'accept'
-                ? `Accept "${pending.title}"`
-                : canAffordPending
-                  ? `Buy from ${vendor.name}`
-                  : 'Not enough TC'
+              : pending?.mode === 'steal'
+                ? `Steal ${pending.itemName}?`
+                : pending?.mode === 'accept'
+                  ? `Accept "${pending.title}"`
+                  : canAffordPending
+                    ? `Buy from ${vendor.name}`
+                    : 'Not enough TC'
         }
         itemPreview={pending?.mode === 'accept' ? null : preview}
         contextLine={
@@ -447,13 +473,15 @@ export function VendorScreen() {
             ? 'They leave the scene. New offers will come from the next vendor who shows up.'
             : pending?.mode === 'sell'
               ? `Price: +${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.price} TC`
-              : pending?.mode === 'accept'
-                ? `Reward on completion: ${pending.reward}. The contract starts now — you can review it on the Contracts screen.`
-                : pending?.mode === 'buy'
-                  ? canAffordPending
-                    ? `Price: ${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc - pending.price} TC`
-                    : `Price: ${pending.price} TC   ·   You only have ${player.tc} TC.`
-                  : undefined
+              : pending?.mode === 'steal'
+                ? `DEX ${player.stats.dexterity} vs DC ${pending.dc}. On a miss, ${vendor.name} draws steel and the deal becomes a fight.${vendor.faction ? ` Caught theft tanks rep with ${vendor.faction.replace(/_/g, ' ')}.` : ''}`
+                : pending?.mode === 'accept'
+                  ? `Reward on completion: ${pending.reward}. The contract starts now — you can review it on the Contracts screen.`
+                  : pending?.mode === 'buy'
+                    ? canAffordPending
+                      ? `Price: ${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc - pending.price} TC`
+                      : `Price: ${pending.price} TC   ·   You only have ${player.tc} TC.`
+                    : undefined
         }
         buttons={
           pending?.mode === 'dismiss'
@@ -466,17 +494,22 @@ export function VendorScreen() {
                   { label: 'Cancel', onPress: cancel, tone: 'neutral' },
                   { label: 'Sell', onPress: confirmAction, tone: 'primary' },
                 ]
-              : pending?.mode === 'accept'
+              : pending?.mode === 'steal'
                 ? [
-                    { label: 'Cancel', onPress: cancel, tone: 'neutral' },
-                    { label: 'Accept', onPress: confirmAction, tone: 'primary' },
+                    { label: 'Back off', onPress: cancel, tone: 'neutral' },
+                    { label: 'Lift it', onPress: confirmAction, tone: 'destructive' },
                   ]
-                : pending?.mode === 'buy' && canAffordPending
+                : pending?.mode === 'accept'
                   ? [
                       { label: 'Cancel', onPress: cancel, tone: 'neutral' },
-                      { label: 'Buy', onPress: confirmAction, tone: 'primary' },
+                      { label: 'Accept', onPress: confirmAction, tone: 'primary' },
                     ]
-                  : [{ label: 'OK', onPress: cancel, tone: 'neutral' }]
+                  : pending?.mode === 'buy' && canAffordPending
+                    ? [
+                        { label: 'Cancel', onPress: cancel, tone: 'neutral' },
+                        { label: 'Buy', onPress: confirmAction, tone: 'primary' },
+                      ]
+                    : [{ label: 'OK', onPress: cancel, tone: 'neutral' }]
         }
         onRequestClose={cancel}
       />
@@ -622,4 +655,16 @@ const styles = StyleSheet.create({
   offerStats: { color: '#cdbf99', fontSize: 11, marginTop: 4 },
   empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 40 },
   placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  // OTA 030 — steal button sits at the right edge of every BUY row.
+  // Darker tone than BUY so the player reads it as the risky path.
+  stealBtn: {
+    paddingHorizontal: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#221512',
+    borderLeftColor: '#7a4040',
+    borderLeftWidth: 1,
+  },
+  stealText: { color: '#e07a5f', fontSize: 10, letterSpacing: 2, fontWeight: '700' },
+  stealDc: { color: '#7a4040', fontSize: 9, letterSpacing: 1, marginTop: 1 },
 });

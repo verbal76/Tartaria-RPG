@@ -104,8 +104,14 @@ describe('leaving a hub via an unsupported cardinal direction', () => {
     const after = store.getState();
     expect(after.player!.hubRoomId).toBeNull();
     const sceneAfter = after.currentScene!;
-    // Vendor must be gone. Irma should not be standing in open silt.
-    expect(sceneAfter.vendor).toBeFalsy();
+    // Vendor must be gone — specifically, Irma should not be standing
+    // in open silt. OTA 030 added procedural roadside traders to
+    // outdoor scenes (25% spawn) so the slot may hold one of those
+    // instead; that's expected and not a leak.
+    if (sceneAfter.vendor) {
+      expect(sceneAfter.vendor.name).not.toBe('Irma Ironhand');
+      expect(sceneAfter.vendor.id).toMatch(/^roadside_/);
+    }
     // The hub's microMicroId must NOT survive — wilderness may set
     // its own based on coords, but it can't still be the armory tag.
     expect(sceneAfter.microMicroId).not.toBe('reclaimer_armory');

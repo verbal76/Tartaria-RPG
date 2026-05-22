@@ -1,9 +1,31 @@
 import vendorsData from '../data/npcs/vendors.json';
+import roadsideData from '../data/npcs/roadside_traders.json';
+import { pickWeighted } from './rng';
+import type { Enemy } from './types';
 
 export interface VendorOffer {
   itemName: string;
   price: number;
 }
+
+// OTA 030 — roadside trader archetype shape. JSON-authored in
+// data/npcs/roadside_traders.json. demeanor drives the steal DC
+// (sketchy = easier to lift from, but bigger fight on a miss).
+interface RoadsidePoolEntry {
+  itemName: string;
+  priceMin: number;
+  priceMax: number;
+  weight: number;
+}
+interface RoadsideArchetype {
+  id: string;
+  name: string;
+  title: string;
+  demeanor: 'honest' | 'sketchy';
+  description: string;
+  pool: RoadsidePoolEntry[];
+}
+const ROADSIDE = (roadsideData as { archetypes: RoadsideArchetype[] });
 
 export interface VendorTemplate {
   id: string;
@@ -35,6 +57,10 @@ export interface VendorInstance {
   offers: VendorOffer[];
   voiceId?: string;
   gender?: 'male' | 'female';
+  /** OTA 030 — roadside traders only. Drives steal DC and
+   *  hostility-flip stats. Undefined on hub vendors → hub default
+   *  applies (DC 16 + armored guard). */
+  demeanor?: 'honest' | 'sketchy';
 }
 
 export const VENDORS = (vendorsData as { vendors: VendorTemplate[] }).vendors;
@@ -52,6 +78,85 @@ export function pickRandomVendor(): VendorInstance {
     offers: v.offers.map((o) => ({ ...o })),
     voiceId: v.voiceId,
     gender: v.gender,
+  };
+}
+
+// OTA 030 — procedural roadside trader. Picks an archetype, samples
+// 3-6 items from its weighted pool, mints a fresh VendorInstance with
+// per-spawn randomized prices and no faction. Used by beginScene for
+// outdoor (non-hub) peaceful scenes so the player has somewhere cheap
+// to spend small TC drops.
+export function pickRoadsideTrader(): VendorInstance {
+  const arch = ROADSIDE.archetypes[Math.floor(Math.random() * ROADSIDE.archetypes.length)]!;
+  const n = 3 + Math.floor(Math.random() * 4); // 3-6 offers
+  const picked = new Set<string>();
+  const offers: VendorOffer[] = [];
+  let safety = 0;
+  while (offers.length < n && picked.size < arch.pool.length && safety++ < 50) {
+    const item = pickWeighted(arch.pool, (p) => p.weight);
+    if (picked.has(item.itemName)) continue;
+    picked.add(item.itemName);
+    const price = item.priceMin + Math.floor(Math.random() * (item.priceMax - item.priceMin + 1));
+    offers.push({ itemName: item.itemName, price });
+  }
+  return {
+    id: `roadside_${arch.demeanor}_${Date.now()}`,
+    name: arch.name,
+    title: arch.title,
+    faction: null,
+    description: arch.description,
+    offers,
+    demeanor: arch.demeanor,
+  };
+}
+
+// OTA 030 — turn a vendor into an Enemy when a steal attempt is
+// caught. Stats scale by tier:
+//   sketchy (DC 11) → 18 HP, 1d8+1, quick + ambush_strike
+//   honest  (DC 14) → 12 HP, 1d6
+//   hub     (DC 16, no demeanor) → 24 HP, 1d10, armored
+// Loot inherits 1-2 entries from the vendor's current offers so
+// beating them yields their merchandise.
+export function buildTraderEnemy(vendor: VendorInstance): Enemy {
+  const tier = vendor.demeanor ?? 'hub';
+  const baseLoot = vendor.offers.slice(0, 2).map((o) => o.itemName);
+  const loot = baseLoot.length > 0 ? baseLoot : ['Aether Residue'];
+  if (tier === 'sketchy') {
+    return {
+      name: vendor.name,
+      type: 'Human',
+      abilityPoint: 'Dexterity 3',
+      attack: 'Hidden Blade',
+      damage: '1D8+1',
+      hp: 18,
+      rarity: 'Uncommon',
+      loot,
+      traits: ['quick', 'ambush_strike'],
+    };
+  }
+  if (tier === 'honest') {
+    return {
+      name: vendor.name,
+      type: 'Human',
+      abilityPoint: 'Strength 2',
+      attack: 'Cudgel Swing',
+      damage: '1D6',
+      hp: 12,
+      rarity: 'Common',
+      loot,
+    };
+  }
+  // Hub vendor — established merchant with help nearby.
+  return {
+    name: vendor.name,
+    type: 'Human',
+    abilityPoint: 'Strength 3',
+    attack: 'Guard Strike',
+    damage: '1D10',
+    hp: 24,
+    rarity: 'Uncommon',
+    loot,
+    traits: ['armored'],
   };
 }
 

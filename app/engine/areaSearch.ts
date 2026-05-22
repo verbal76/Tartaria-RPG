@@ -205,20 +205,23 @@ function format(line: string, target: string): string {
   return line.replace(/\{target\}/g, display);
 }
 
-// Roll a result. Outcome mix:
-//   45% nothing
+// Roll a result. Outcome mix (OTA 030 — bumped TC rate + amount so
+// that small TC drops compound into something a roadside trader can
+// actually take. Was 45/25/15/15 nothing/mat/tc/hook with 3-14 TC;
+// now 40/25/20/15 with 5-16 TC):
+//   40% nothing
 //   25% small material
-//   15% small TC
+//   20% small TC
 //   15% atmospheric hook plant (caller plants the hook)
 //
 // The caller already knows the target string the player used; we pass it
 // back into the line so narration uses the player's own phrasing.
 export function rollAreaSearch(target: string): AreaSearchOutcome {
   const r = Math.random();
-  if (r < 0.45) {
+  if (r < 0.40) {
     return { kind: 'nothing', line: format(pick(NOTHING_LINES), target) };
   }
-  if (r < 0.70) {
+  if (r < 0.65) {
     const found = pickWeighted(SMALL_FINDS);
     return {
       kind: 'material',
@@ -228,7 +231,7 @@ export function rollAreaSearch(target: string): AreaSearchOutcome {
     };
   }
   if (r < 0.85) {
-    const amount = 3 + Math.floor(Math.random() * 12);
+    const amount = 5 + Math.floor(Math.random() * 12);
     return { kind: 'tc', amount, line: format(pick(TC_LINES), target) };
   }
   return { kind: 'hook', line: format(pick(HOOK_LINES), target) };

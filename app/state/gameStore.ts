@@ -111,7 +111,7 @@ import {
   type Recipe,
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
-import { pickRandomVendor, findVendorByName, VENDORS, type VendorInstance } from '../engine/vendors';
+import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, VENDORS, type VendorInstance } from '../engine/vendors';
 import { findQuestFactionHint } from '../engine/factionHint';
 import {
   HUB,
@@ -1753,10 +1753,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const enemyHps: number[] = enemies.map((e) => e.hp);
     const activeEnemyIdx = 0;
     const hasEnemies = enemies.length > 0;
-    // Vendor only appears in peaceful scenes. ~22% chance.
+    // Vendor only appears in peaceful scenes.
     // Hub mode: the anchor NPC for the current room takes the vendor
     // slot when one is defined. Deterministic — Halem at the gate is
     // always Halem, every visit.
+    // Outdoor (non-hub) peaceful scenes: 25% chance of a roadside
+    // trader (OTA 030 — unnamed procedural stalls so small TC
+    // drops have somewhere to spend). Named hub vendors only
+    // appear in hubs now; outdoor never rolls them.
     // Opening scene (brand-new character): no vendor. The first roll is
     // for the player to land in the world cleanly — vendors arrive on
     // the next scene or on travel.
@@ -1764,7 +1768,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ? null
       : hubRoom && hubRoom.anchorNpc
         ? (findVendorByName(hubRoom.anchorNpc) ?? null)
-        : (!hasEnemies && Math.random() < 0.22 ? pickRandomVendor() : null);
+        : (!hasEnemies && !hubRoom && Math.random() < 0.25 ? pickRoadsideTrader() : null);
     // Enemies start at 'close' range — close enough to be a problem but not
     // already swinging. Players have to advance (or be charged) to land
     // melee, retreat to set up ranged shots.
@@ -5063,12 +5067,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
-        // OTA 027 — terminal-state climb. Was a no-op opener loop;
-        // player could climb the same arch forever. Now: one DEX vs
-        // DC 12 roll resolves the attempt outright. Climbing Rope
-        // (gate climb_steep) auto-passes. A success marks the noun
-        // in searchedAmbientNouns under a "climbed:" prefix so the
-        // next climb on the same noun in the same room refuses.
+        // OTA 030 — variable-height tier climb. Each climbable noun
+        // has a tier count (wall=2, tower=4, cliff=5, etc.) from
+        // climbHeightFor(). Each tap resolves ONE tier with its own
+        // DEX vs DC 12 roll. Progress markers live in
+        // searchedAmbientNouns under "climbed:<noun>:t<N>". Reaching
+        // the top tier rolls the climb-top loot pool (50% chance of
+        // an Uncommon-skewed item — chance-based so not every climb
+        // pays out).
         const tgt = climbTarget || 'the surface in front of you';
         const climbRoomKey = makeRoomKey(
           player.currentLocationId,
@@ -5076,10 +5082,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
           player.mapX,
           player.mapY,
         );
-        const climbedKey = `climbed:${tgt.toLowerCase()}`;
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { climbHeightFor, climbTierLabel, rollClimbTopLoot } = require('../engine/climbHeight');
+        const totalTiers: number = climbHeightFor(tgt);
         const climbRoom = get().worldMemory.visitedRooms?.[climbRoomKey];
-        const alreadyClimbed = (climbRoom?.searchedAmbientNouns ?? []).includes(climbedKey);
-        if (alreadyClimbed) {
+        const climbMarks = (climbRoom?.searchedAmbientNouns ?? []).filter(
+          (m) => m.startsWith(`climbed:${tgt.toLowerCase()}:`),
+        );
+        // Highest tier index already cleared (0 if none).
+        let maxCleared = 0;
+        for (const m of climbMarks) {
+          const t = parseInt(m.split(':')[2] ?? '0', 10);
+          if (!Number.isNaN(t) && t > maxCleared) maxCleared = t;
+        }
+        const currentTier = maxCleared + 1;
+        if (currentTier > totalTiers) {
           get().appendLog(
             'world',
             `You've already crested the ${tgt} here. The view from the top hasn't changed since the last time you stood up there.`,
@@ -5098,35 +5115,69 @@ export const useGameStore = create<GameStore>((set, get) => ({
           [fgbnC, fmbnC, feibC],
         );
         set({ player: advanceTime(spendStamina(player, 2), 0.5) });
-        let climbCrested = false;
+        let tierCleared = false;
         if (hasRope) {
           get().appendLog(
             'world',
-            `You loop the climbing rope around the ${tgt} and walk up the line. Top reached.`,
+            `You loop the climbing rope around the ${tgt} and walk the line. Tier ${currentTier}/${totalTiers} cleared.`,
           );
-          climbCrested = true;
+          tierCleared = true;
         } else {
           const climbRoll = rollDie(20);
           const climbTotal = climbRoll + climbStats.dexterity;
           const climbSuccess = climbTotal >= 12;
           get().appendLog(
             'combat',
-            `Climb the ${tgt} — d20 ${climbRoll} + DEX ${climbStats.dexterity} = ${climbTotal} vs DC 12 — ${climbSuccess ? '✓ HIT' : '✗ MISS'}`,
+            `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — d20 ${climbRoll} + DEX ${climbStats.dexterity} = ${climbTotal} vs DC 12 — ${climbSuccess ? '✓ HIT' : '✗ MISS'}`,
           );
           if (climbSuccess) {
-            get().appendLog(
-              'world',
-              `You crest the ${tgt}. The view changes; the room reads differently from here.`,
-            );
-            climbCrested = true;
+            tierCleared = true;
           } else {
             get().appendLog(
               'world',
-              `You slip halfway up the ${tgt} and drop back down. Try with a rope, or come back fresher.`,
+              `You slip on the ${tgt} and drop back to your last hold. Try again — rope auto-passes every tier.`,
+            );
+            set((s) =>
+              s.player ? { player: { ...s.player, hp: Math.max(0, s.player.hp - 1) } } : s,
             );
           }
         }
-        if (climbCrested) {
+        if (tierCleared) {
+          const isTop = currentTier === totalTiers;
+          const label = climbTierLabel(currentTier, totalTiers);
+          if (isTop) {
+            get().appendLog(
+              'world',
+              `You reach the top of the ${tgt} (tier ${currentTier}/${totalTiers}). The view changes; the room reads differently from here.`,
+            );
+            // Top reached — roll the chance-based loot.
+            const drop = rollClimbTopLoot();
+            if (drop) {
+              const grant: InventoryItem = stampDurability({
+                id: `climb_top_${Date.now()}`,
+                name: drop.name,
+                kind: 'misc',
+                rarity: drop.rarity,
+                quantity: 1,
+                tags: ['climb_top'],
+              });
+              set((s) =>
+                s.player
+                  ? { player: { ...s.player, inventory: mergeOrPushItem(s.player.inventory, grant) } }
+                  : s,
+              );
+              get().appendLog(
+                'reward',
+                `✦ ${drop.name} (${drop.rarity}) — tucked into a crack at the top of the ${tgt}.`,
+              );
+            }
+          } else {
+            get().appendLog(
+              'world',
+              `You reach the ${label} of the ${tgt} (tier ${currentTier}/${totalTiers}). Higher still to go.`,
+            );
+          }
+          const markKey = `climbed:${tgt.toLowerCase()}:t${currentTier}`;
           set((s) => {
             const room = s.worldMemory.visitedRooms?.[climbRoomKey] ?? {
               firstVisitAt: Date.now(),
@@ -5142,7 +5193,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     ...room,
                     searchedAmbientNouns: [
                       ...(room.searchedAmbientNouns ?? []),
-                      climbedKey,
+                      markKey,
                     ],
                   },
                 },
@@ -7375,14 +7426,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // Immediate stealth check — d20 + DEX vs DC 12 (Hard per the rulebook).
-    // Skipping the pendingRolls UI here because a theft attempt resolves
-    // fast and the player won't expect a separate roll screen.
-    const dc = 12;
+    // OTA 030 — tiered DC by vendor source. Steal works against any
+    // vendor in the game (hub or roadside); your DEX is the modifier
+    // so leveling DEX or wielding DEX-buffing food/gear directly
+    // improves theft odds. Sketchy roadside fences are inattentive
+    // (DC 11). Honest roadside hawkers watch the stall (DC 14).
+    // Established hub merchants are alert and have help nearby
+    // (DC 16, and the fight on failure is real).
+    const dc =
+      scene.vendor.demeanor === 'sketchy' ? 11
+      : scene.vendor.demeanor === 'honest' ? 14
+      : 16;
+    // Use effectiveStats so buffs / equipment / weather count.
+    const stats = effectiveStats(player, weatherStatModifiers(scene.weather));
     const roll = rollDie(20);
-    const total = roll + player.stats.dexterity;
+    const total = roll + stats.dexterity;
     const success = total >= dc;
-    get().appendLog('combat', `Stealth — d20 rolled ${roll} + DEX ${player.stats.dexterity} = ${total} vs DC ${dc} — ${success ? '✓ HIT' : '✗ CAUGHT'}`);
+    get().appendLog('combat', `Steal ${offer.itemName} — d20 ${roll} + DEX ${stats.dexterity} = ${total} vs DC ${dc} — ${success ? '✓ HIT' : '✗ CAUGHT'}`);
 
     if (success) {
       // Catalog lookup to set proper kind/rarity/tags.
@@ -7413,22 +7473,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
       get().appendLog('reward', `You palm the ${offer.itemName}. ${scene.vendor.name} doesn't notice.`);
     } else {
-      // Caught. Big rep hit and the vendor leaves immediately.
+      // OTA 030 — caught. Vendor flips HOSTILE (was: walks away).
+      // Spin up an Enemy scaled to the vendor's tier and clear the
+      // vendor slot. Faction-aligned vendors also tank rep on
+      // detection.
       const vendorFaction = scene.vendor.faction;
       const repResult = vendorFaction
         ? applyRepChange(player.factionStanding, vendorFaction, -10)
         : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
+      const enemy = buildTraderEnemy(scene.vendor);
       set((s) =>
         s.player && s.currentScene
           ? {
               player: { ...s.player, factionStanding: repResult.standing },
-              currentScene: { ...s.currentScene, vendor: null },
+              currentScene: {
+                ...s.currentScene,
+                vendor: null,
+                enemies: [enemy],
+                enemyHps: [enemy.hp],
+                activeEnemyIdx: 0,
+                range: 'close',
+                enemyAmbushUsed: [false],
+              },
             }
           : s,
       );
       get().appendLog(
-        'world',
-        `${scene.vendor.name} catches your wrist. "I see you." They pack up and leave without another word.`,
+        'combat',
+        `${scene.vendor.name} catches your hand mid-lift. "Thief!" — steel comes out.`,
       );
       logRepChanges(get, repResult.changed);
       recordMemorableEvent(get, set, {
