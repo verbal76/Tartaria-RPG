@@ -83,9 +83,15 @@ const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
   { name: 'Mud Fragment', rarity: 'Common', weight: 12 },
   { name: 'Aether Residue', rarity: 'Common', weight: 8 },
   { name: 'Aether Mud', rarity: 'Common', weight: 6 },
-  { name: 'Small Rock', rarity: 'Common', weight: 26 },
-  { name: 'Big Rock', rarity: 'Common', weight: 10 },
-  { name: 'Stick', rarity: 'Common', weight: 22 },
+  // OTA 021 — rocks / sticks bumped HARD because the playtester
+  // hadn't seen a Big Rock in their session at all. These are the
+  // rulebook-promised cheap-stock items every starter relies on
+  // for clubs / spears / improvised throwing. After the OTA 012
+  // food additions diluted the pool, rocks+sticks dropped to ~28%
+  // of material drops; the bumps below put them back at ~40%.
+  { name: 'Small Rock', rarity: 'Common', weight: 40 },
+  { name: 'Big Rock', rarity: 'Common', weight: 22 },
+  { name: 'Stick', rarity: 'Common', weight: 38 },
   // OTA 227 — Firewood drops fairly often from look-around / area
   // search. Weightless, single-purpose (campfire fuel).
   { name: 'Firewood', rarity: 'Common', weight: 18 },

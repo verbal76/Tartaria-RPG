@@ -120,9 +120,13 @@ const DIG_LOOT: DigEntry[] = [
   { name: 'Mud Fragment', rarity: 'Common', baseWeight: 18 },
   { name: 'Aether Residue', rarity: 'Common', baseWeight: 14 },
   { name: 'Aether Mud', rarity: 'Common', baseWeight: 10 },
-  { name: 'Small Rock', rarity: 'Common', baseWeight: 36 },
-  { name: 'Big Rock', rarity: 'Common', baseWeight: 14 },
-  { name: 'Stick', rarity: 'Common', baseWeight: 28 },
+  // OTA 021 — same bump as the area-search pool. Dig was at
+  // ~26% rocks/sticks at score 3 after the OTA 012 food
+  // additions; these weights restore ~38% so the player who
+  // digs with a real tool actually fills their pack with stock.
+  { name: 'Small Rock', rarity: 'Common', baseWeight: 55 },
+  { name: 'Big Rock', rarity: 'Common', baseWeight: 30 },
+  { name: 'Stick', rarity: 'Common', baseWeight: 50 },
   { name: 'Spider Silk', rarity: 'Common', baseWeight: 8 },
   { name: 'Patched Cloth', rarity: 'Common', baseWeight: 8 },
   { name: 'Trail Rations', rarity: 'Common', baseWeight: 6 },
