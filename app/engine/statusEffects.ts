@@ -90,13 +90,31 @@ export function applyEffect(
   current: readonly StatusEffect[],
   incoming: StatusEffect,
 ): StatusEffect[] {
-  const idx = current.findIndex((e) => e.kind === incoming.kind);
+  // OTA 010 — food_buff identity also depends on buffStat. Two
+  // different buffs (Blueberries +INT, Wild Carrot +WIS) used to
+  // collapse into one slot because both had kind='food_buff' and
+  // applyEffect dedupes by kind only. Now they share a kind but
+  // distinguish by stat — eating two foods buffing different
+  // stats stacks; eating two of the SAME food refreshes the
+  // single buff's duration (intentional, prevents trivial
+  // +N stacking from a single food source).
+  const matchKey = (e: StatusEffect) =>
+    e.kind === 'food_buff'
+      ? `food_buff:${e.buffStat ?? ''}`
+      : e.kind;
+  const incomingKey = matchKey(incoming);
+  const idx = current.findIndex((e) => matchKey(e) === incomingKey);
   if (idx < 0) return [...current, incoming];
   const next = current.map((e) => ({ ...e }));
   next[idx] = {
     ...next[idx]!,
     remainingRounds: Math.max(next[idx]!.remainingRounds, incoming.remainingRounds),
     perRoundDamage: incoming.perRoundDamage ?? next[idx]!.perRoundDamage,
+    // Preserve the buff payload from the incoming when refreshing
+    // (label may include the food name, bonus may have shifted).
+    buffStat: incoming.buffStat ?? next[idx]!.buffStat,
+    buffBonus: incoming.buffBonus ?? next[idx]!.buffBonus,
+    label: incoming.label ?? next[idx]!.label,
   };
   return next;
 }

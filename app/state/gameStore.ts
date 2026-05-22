@@ -2582,6 +2582,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       if (tick.dotDamage > 0) {
         get().appendLog('combat', `You bleed for ${tick.dotDamage} damage. (${newHp} HP)`);
+        // OTA 010 — DOT damage (bleed / poison / weather-coded) now
+        // honors the low-HP latch. Without this a poisoned player
+        // could tick from 6% → 0% without ever hearing the Arbiter's
+        // "eat / first-aid" warning.
+        if (newHp > 0) {
+          checkLowHpWarning(player.hp, newHp, player.hpMax ?? 1, get, set);
+        }
       }
       for (const ex of tick.expired) {
         get().appendLog('system', `${ex.label ?? ex.kind} fades.`);
@@ -2614,6 +2621,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const recent = get().gameLog.slice(-6);
       const recentlyShown = recent.some((e) => e.text === wtick.line);
       let weatherKilled = false;
+      // OTA 010 — capture prev HP for the low-HP latch check after
+      // weather mutates HP. Toxic fog at 6% HP dropping to 3% used to
+      // silently pass without the Arbiter warning.
+      const prevHpWeather = player.hp;
+      const hpMaxWeather = player.hpMax ?? 1;
       set((s) => {
         if (!s.player) return {};
         const newHp = Math.max(0, s.player.hp + wtick.hpDelta);
@@ -2630,6 +2642,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
       if (!recentlyShown) {
         get().appendLog('world', wtick.line);
+      }
+      if (!weatherKilled) {
+        checkLowHpWarning(prevHpWeather, Math.max(0, prevHpWeather + wtick.hpDelta), hpMaxWeather, get, set);
       }
       if (weatherKilled) {
         void Promise.resolve().then(() => handlePlayerDeath(get, set));
@@ -3034,6 +3049,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const bruise = () => {
               const past = isBodyVerb ? (BODY_VERB_PAST[matchedVerb] ?? `${matchedVerb}ed`) : 'swung at';
               const part = isBodyVerb ? (BODY_VERB_PART[matchedVerb] ?? 'hand') : 'arm';
+              // OTA 010 — capture prev HP for the low-HP latch check after
+              // the set(). Without this, body-attacking a wall while at
+              // 5.01% HP drops below the threshold silently.
+              const prevHpBruise = player.hp;
+              const hpMaxBruise = player.hpMax ?? 1;
               set((s) =>
                 s.player
                   ? {
@@ -3047,6 +3067,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     }
                   : s,
               );
+              checkLowHpWarning(prevHpBruise, Math.max(0, prevHpBruise - 1), hpMaxBruise, get, set);
               get().appendLog(
                 'world',
                 isBodyVerb
