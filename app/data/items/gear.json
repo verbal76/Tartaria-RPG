@@ -66,6 +66,14 @@
     { "name": "First Aid Kit", "kind": "consumable", "rarity": "Uncommon", "tags": ["healing"], "description": "Sterile bandages, mud-glass needles, a single dose of Aetheric salve. Restores 1d6 HP on use." },
     { "name": "Aetheric Compass", "kind": "relic", "rarity": "Uncommon", "tags": ["detection", "navigation", "relic"], "description": "A compass that points at the strongest local Aether source. Rarely north." },
     { "name": "Climbing Rope", "kind": "misc", "rarity": "Common", "tags": ["utility", "gate"], "description": "Fifty feet of mud-treated rope. Holds a Giant's weight if you don't push it. Carry one and you pass any climb-required check — the rope does the work.",
-      "effect": { "kind": "gate", "unlocks": "climb_steep" } }
+      "effect": { "kind": "gate", "unlocks": "climb_steep" } },
+
+    { "name": "Shaped Aetheric Shard", "kind": "misc", "rarity": "Common", "tags": ["throwable", "aether", "shaped"], "description": "A Small Rock pulled apart and reformed by Aethercraft into a sharp throwing edge. Single use; 1d6 piercing on impact." },
+
+    { "name": "Cleansing Tonic", "kind": "consumable", "rarity": "Uncommon", "tags": ["healing", "purification"], "description": "Bitter green draught brewed by Servants of the Giants. Drinks the aether back out of your blood. Drops corruption by 20.",
+      "effect": { "kind": "consumable", "reduceCorruption": 20 } },
+
+    { "name": "Purification Vial", "kind": "consumable", "rarity": "Uncommon", "tags": ["healing", "purification", "monarch"], "description": "Mud Monarch issue. A grey-clear vial that smells of clean stone. Carried by Purifiers; drops corruption by 15.",
+      "effect": { "kind": "consumable", "reduceCorruption": 15 } }
   ]
 }

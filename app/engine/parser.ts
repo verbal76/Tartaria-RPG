@@ -64,7 +64,7 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   ],
   cast: [
     'cast', 'channel', 'mold', 'shape', 'unleash', 'incant', 'summon', 'evoke',
-    'conjure',
+    'conjure', 'mend', 'manipulate',
   ],
   wait: ['wait', 'stay', 'hold', 'pause', 'still', 'linger', 'tarry', 'idle', 'bide', 'remain'],
   ask: ['what', 'explain', 'define', 'who', 'how', 'why', 'tell', 'describe', 'clarify', 'mean'],

@@ -163,6 +163,9 @@ export function statusAcAdjustment(current: readonly StatusEffect[] | undefined)
     if (e.kind === 'armor_severed') adj -= 2;
     if (e.kind === 'in_cover') adj += 4;
     if (e.kind === 'in_cover_full') adj += 8;
+    // OTA 039 — Aethercraft 'shape stone' applies a one-round +4 AC
+    // ward from raised Aetherstone.
+    if (e.kind === 'shaped_stone_ward') adj += 4;
     // 'dodging' deliberately NOT here as of 2026-05-21 — the dodge
     // rework moved it from a passive +4 AC into an active post-hit
     // parry roll handled in applyEnemyCounter. The roll itself is

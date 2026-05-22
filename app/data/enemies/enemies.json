@@ -1223,5 +1223,17 @@
     "loot": ["Aether Residue", "Patched Cloth"],
     "aliases": ["hijacker", "disc hijacker", "the hijacker", "mugger"],
     "traits": ["savage", "concussive"]
+  },
+  {
+    "name": "Mud Monarch Purifier",
+    "type": "Human",
+    "abilityPoint": "Wisdom 5",
+    "attack": "Radiant Lance",
+    "damage": "2D8",
+    "hp": 70,
+    "rarity": "Rare",
+    "loot": ["Purification Vial", "Aetheric Shard", "Patched Cloth"],
+    "aliases": ["purifier", "the purifier", "monarch purifier", "mud monarch agent"],
+    "traits": ["quick", "resist:aetheric"]
   }
 ]

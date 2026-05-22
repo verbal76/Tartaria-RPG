@@ -2678,6 +2678,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // silently pass without the Arbiter warning.
       const prevHpWeather = player.hp;
       const hpMaxWeather = player.hpMax ?? 1;
+      const prevCorrWeather = player.corruption ?? 0;
       set((s) => {
         if (!s.player) return {};
         const newHp = Math.max(0, s.player.hp + wtick.hpDelta);
@@ -2692,6 +2693,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         weatherKilled = newHp <= 0;
         return { player: { ...s.player, hp: newHp, stamina: newStam, corruption: newCorr } };
       });
+      // OTA 039 — emit a tier-cross line if the weather just bumped
+      // the player across a corruption threshold.
+      {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
+        const nowCorr = get().player?.corruption ?? 0;
+        const crossLine = tierCrossLine(corruptionTierOf(prevCorrWeather), corruptionTierOf(nowCorr));
+        if (crossLine) get().appendLog('reward', crossLine);
+      }
       if (!recentlyShown) {
         get().appendLog('world', wtick.line);
       }
@@ -3940,6 +3950,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
       case 'escape':
       case 'cast':
       case 'use_relic': {
+        // OTA 039 — Aethercraft branch. cast/shape/summon/mend with
+        // an Aethercraft-keyword target routes to the new disciplines
+        // BEFORE we try to resolve a relic use. The cast intent's
+        // synonym list (parser.ts) already includes shape / mold /
+        // summon / mend / manipulate, so the parser sees these as
+        // intent=cast; we just gate on the keyword in the action text.
+        if (parsed.intent === 'cast') {
+          const verbLow = trimmed.toLowerCase();
+          const tgtLow = (parsed.target ?? '').toLowerCase();
+          const wantShape = (/\b(shape|mold|manipulate)\b/.test(verbLow) && /\bstone\b/.test(tgtLow + ' ' + verbLow))
+            || /\baetherstone manipulation\b/.test(verbLow);
+          const wantSummon = (/\bsummon\b/.test(verbLow) && /\bgolem\b/.test(tgtLow + ' ' + verbLow))
+            || /\baether golem\b/.test(verbLow);
+          const wantMend = (/\b(mend|heal)\b/.test(verbLow) && /\b(wounds?|self|me|aetheric)\b/.test(tgtLow + ' ' + verbLow))
+            || /\baetheric healing\b/.test(verbLow);
+          if (wantShape || wantSummon || wantMend) {
+            const discipline: 'shape' | 'summon' | 'mend' = wantShape ? 'shape' : wantSummon ? 'summon' : 'mend';
+            runAethercraft(discipline, get, set, player, currentScene);
+            break;
+          }
+        }
         // OTA 192 — effect-driven consumable use. If the resolved
         // inventory item has effect.kind === 'consumable' in its
         // catalog row, fire each effect field (heal, stamina,
@@ -3976,6 +4007,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 p = { ...p, corruption: Math.max(0, before - fx.reduceCorruption) };
                 const cleared = before - p.corruption;
                 messages.push(cleared > 0 ? `-${cleared} corruption` : 'no corruption to clear');
+                // OTA 039 — tier-cross line on cleanse.
+                if (cleared > 0) {
+                  // eslint-disable-next-line @typescript-eslint/no-require-imports
+                  const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
+                  const crossLine = tierCrossLine(corruptionTierOf(before), corruptionTierOf(p.corruption));
+                  if (crossLine) {
+                    void Promise.resolve().then(() => get().appendLog('reward', crossLine));
+                  }
+                }
               }
               if (fx.revealScene) {
                 // Surface up to three hidden hooks the player hasn't
@@ -4209,15 +4249,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const corrDecay = !weatherIsCorrupting && curCorr > 0
             ? (curCorr > 30 ? 4 : curCorr > 10 ? 2 : 1)
             : 0;
+          const newCorrRest = Math.max(0, curCorr - corrDecay);
           set({
             player: {
               ...player,
               hp: player.hp + heal,
               stamina: player.stamina + stamGain,
-              corruption: Math.max(0, (player.corruption ?? 0) - corrDecay),
+              corruption: newCorrRest,
               hoursElapsed: newHours,
             },
           });
+          // OTA 039 — tier-cross line on rest decay.
+          if (corrDecay > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
+            const crossLine = tierCrossLine(corruptionTierOf(curCorr), corruptionTierOf(newCorrRest));
+            if (crossLine) get().appendLog('reward', crossLine);
+          }
           const parts: string[] = [];
           if (heal > 0) parts.push(`+${heal} HP`);
           if (stamGain > 0) parts.push(`+${stamGain} stamina`);
@@ -6874,7 +6922,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const effectBonus = parsedEffect ? rollEffectBonusDamage(parsedEffect, enemy) : 0;
       const dmg = Math.max(1, Math.round(mod.damage * traitMod.multiplier) + effectBonus);
       const prevHp = currentScene.enemyHps[activeIdx] ?? enemy.hp;
-      const newEnemyHp = prevHp - dmg;
+      let newEnemyHp = prevHp - dmg;
+
+      // OTA 039 — Aether Golem Constructor follow-up. If the player
+      // has an active golem_companion status, the golem fires a free
+      // 1d6 bludgeoning hit immediately after the player's swing
+      // (before the enemy counter). A lethal golem hit drops into
+      // the kill branch below the same way a lethal player hit would.
+      const livePlayerGolem = get().player ?? player;
+      const golemEff = (livePlayerGolem.statusEffects ?? []).find((e) => e.kind === 'golem_companion' && e.remainingRounds > 0);
+      if (golemEff && newEnemyHp > 0) {
+        const golemDmg = rollDie(6);
+        newEnemyHp -= golemDmg;
+        get().appendLog(
+          'combat',
+          `The golem brings its mud-fist down on ${enemy.name} — ${golemDmg} bludgeoning. (${Math.max(0, newEnemyHp)} HP)`,
+        );
+      }
 
       // Narrate the resistance/weakness modifier on its own line so the
       // player can see WHY the damage changed.
@@ -7303,10 +7367,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     const offer = scene.vendor.offers.find((o) => o.itemName.toLowerCase() === itemName.toLowerCase());
     if (!offer) return;
-    if (player.tc < offer.price) {
+    // OTA 039 — corruption-tier price markup. Corrupted players pay
+    // +15%, Hollowed +30%; vendors notice the aether on you.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { corruptionTierOf, corruptionPriceMultiplier } = require('../engine/corruption');
+    const tier = corruptionTierOf(player.corruption ?? 0);
+    const mult = corruptionPriceMultiplier(tier);
+    const effectivePrice = Math.ceil(offer.price * mult);
+    if (player.tc < effectivePrice) {
       get().appendLog(
         'system',
-        `Not enough TC. ${offer.itemName} costs ${offer.price}, you have ${player.tc}.`,
+        `Not enough TC. ${offer.itemName} costs ${effectivePrice}${mult > 1 ? ` (${offer.price} base + ${Math.round((mult - 1) * 100)}% corruption markup)` : ''}, you have ${player.tc}.`,
       );
       return;
     }
@@ -7366,7 +7437,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return {
         player: {
           ...s.player,
-          tc: s.player.tc - offer.price,
+          tc: s.player.tc - effectivePrice,
           inventory: dryRun.inventory,
           factionStanding: repResult.standing,
         },
@@ -7376,9 +7447,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         },
       };
     });
+    const markupNote = mult > 1 ? ` (${offer.price} base + ${Math.round((mult - 1) * 100)}% corruption)` : '';
     get().appendLog(
       'reward',
-      `Bought ${offer.itemName} from ${scene.vendor.name} for ${offer.price} TC. (${player.tc - offer.price} TC left)`,
+      `Bought ${offer.itemName} from ${scene.vendor.name} for ${effectivePrice} TC${markupNote}. (${player.tc - effectivePrice} TC left)`,
     );
     logRepChanges(get, repResult.changed);
     void get().persist();
@@ -8836,6 +8908,72 @@ export const useGameStore = create<GameStore>((set, get) => ({
           'world',
           `A stall has been thrown up on the next stretch of ground — ${stall.name}, ${stall.title}. Tap the vendor banner to trade.`,
         );
+      }
+    }
+
+    // OTA 039 — Corruption-driven extra-encounter pressure. Every
+    // outdoor cardinal step rolls an extra encounter chance scaled by
+    // corruption tier. At Hollowed, also forces a Mud Monarch
+    // Purifier spawn every 5 steps until the player decontaminates.
+    // Safety: skip the forced spawn if HP < 25% to avoid death
+    // spirals (lore-faithful — the Monarchs wait until you're worth
+    // collecting).
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { corruptionTierOf, corruptionExtraEncounterChance } = require('../engine/corruption');
+      const liveScene = get().currentScene;
+      const livePlayer = get().player;
+      if (livePlayer && liveScene && (!liveScene.enemies || liveScene.enemies.length === 0) && !livePlayer.hubRoomId) {
+        const tier = corruptionTierOf(livePlayer.corruption ?? 0);
+        const extraChance = corruptionExtraEncounterChance(tier);
+        const stepsSince = (livePlayer.stepsSinceLastPurifier ?? 0) + 1;
+        const hpFraction = livePlayer.hpMax > 0 ? livePlayer.hp / livePlayer.hpMax : 1;
+        const forcePurifier = tier === 'hollowed' && stepsSince >= 5 && hpFraction >= 0.25;
+        if (forcePurifier) {
+          const purifier = (enemiesData as Enemy[]).find((e) => e.name === 'Mud Monarch Purifier');
+          if (purifier) {
+            set((s) => s.currentScene && s.player ? {
+              currentScene: {
+                ...s.currentScene,
+                enemies: [{ ...purifier }],
+                enemyHps: [purifier.hp],
+                activeEnemyIdx: 0,
+                range: 'close',
+                enemyAmbushUsed: [false],
+              },
+              player: { ...s.player, stepsSinceLastPurifier: 0 },
+            } : s);
+            get().appendLog(
+              'combat',
+              `A Mud Monarch Purifier steps out of the haze — they have come for the aether under your skin.`,
+            );
+          }
+        } else {
+          // Tick the counter even when not firing so it's accurate
+          // the next chance.
+          set((s) => s.player ? { player: { ...s.player, stepsSinceLastPurifier: stepsSince } } : s);
+          // Extra apparition chance for sub-Hollowed tiers.
+          if (extraChance > 0 && Math.random() < extraChance) {
+            const candidates = (enemiesData as Enemy[]).filter((e) => /aetheric/i.test(e.type) && e.rarity !== 'Legendary');
+            const apparition = candidates[Math.floor(Math.random() * candidates.length)];
+            if (apparition) {
+              set((s) => s.currentScene ? {
+                currentScene: {
+                  ...s.currentScene,
+                  enemies: [{ ...apparition }],
+                  enemyHps: [apparition.hp],
+                  activeEnemyIdx: 0,
+                  range: 'close',
+                  enemyAmbushUsed: [false],
+                },
+              } : s);
+              get().appendLog(
+                'combat',
+                `The aether under your skin draws something out — ${apparition.name} forms from the haze.`,
+              );
+            }
+          }
+        }
       }
     }
 
@@ -11740,6 +11878,163 @@ function narratePossibleDirections(get: () => GameStore, scene: CurrentScene): v
 // player explicitly named one) into the strike/hit/miss/kill messages so the
 // combat log stops feeling like a Mad Lib.
 // ---------------------------------------------------------------------------
+
+// OTA 039 — Aethercraft discipline runner. Called from the cast
+// intent handler when the action text matches shape/summon/mend with
+// an Aethercraft-keyword target. Validates fuel + skill check +
+// applies the discipline outcome.
+//
+// Race gates: Mud Dweller base DC; Aetherborn +2; others +4.
+// Mud Dweller "Aethercraft Mastery" +2 INT applies through
+// aethercraftStatBonus before the roll.
+//
+// Fuel: 1 Aetherstone-tagged consumable (Aether Crystal, Aether Mud,
+// Aether Residue, Aetheric Shard, Golem Core).
+function runAethercraft(
+  discipline: 'shape' | 'summon' | 'mend',
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  player: PlayerCharacter,
+  scene: CurrentScene,
+): void {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { aethercraftDcModifier, aethercraftStatBonus } = require('../engine/raceMechanics');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
+
+  // 1. Locate an Aetherstone-tagged consumable in inventory.
+  const AETHER_FUEL_NAMES = [
+    'Aetheric Shard', 'Aether Crystal', 'Aether Mud', 'Aether Residue',
+    'Golem Core', 'Aetheric Locket',
+  ];
+  // Heal-only disciplines burn the rarer fuels harder; shape can use the
+  // mundane mud / residue.
+  const allowedForDiscipline: Record<typeof discipline, string[]> =
+    discipline === 'shape'
+      ? { shape: AETHER_FUEL_NAMES, summon: [], mend: [] }
+      : discipline === 'summon'
+        ? { shape: [], summon: ['Aetheric Shard', 'Aether Crystal', 'Golem Core'], mend: [] }
+        : { shape: [], mend: ['Aetheric Shard', 'Aether Crystal'], summon: [] };
+  const allowed = (allowedForDiscipline as Record<string, string[]>)[discipline] ?? [];
+  const fuelItem = player.inventory.find(
+    (i) => i.quantity > 0 && allowed.some((name) => name.toLowerCase() === i.name.toLowerCase()),
+  );
+  if (!fuelItem) {
+    get().appendLog(
+      'arbiter',
+      `"The Aether reaches for you," the Arbiter says, "finds nothing to pull on, and returns to itself."`,
+    );
+    return;
+  }
+
+  // 2. Skill check. Aethercraft uses INT for shape/summon and WIS
+  // for mend (the lorebook frames healing as wisdom-channelled).
+  const dcBase = discipline === 'summon' ? 15 : 12;
+  const dc = dcBase + aethercraftDcModifier(player.raceId);
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { effectiveStats } = require('../engine/equipment');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { weatherStatModifiers } = require('../engine/weatherEffects');
+  const stats = effectiveStats(player, weatherStatModifiers(scene.weather));
+  const racialBonus = aethercraftStatBonus(player.raceId);
+  const stat: keyof PlayerCharacter['stats'] = discipline === 'mend' ? 'wisdom' : 'intelligence';
+  const statValue = stats[stat] + (racialBonus[stat] ?? 0);
+  const statLabel = stat === 'wisdom' ? 'WIS' : 'INT';
+  const racialNote = (racialBonus[stat] ?? 0) > 0 ? ` (+${racialBonus[stat]} Aethercraft Mastery)` : '';
+  const roll = rollDie(20);
+  const total = roll + statValue;
+  const success = total >= dc;
+  const disciplineLabel =
+    discipline === 'shape' ? 'Aetherstone Manipulation' :
+    discipline === 'summon' ? 'Aether Golem Constructor' :
+    'Aetheric Healing';
+  get().appendLog(
+    'combat',
+    `${disciplineLabel} — d20 ${roll} + ${statLabel} ${statValue}${racialNote} = ${total} vs DC ${dc} — ${success ? '✓ HIT' : '✗ MISS'}`,
+  );
+
+  // 3. Consume fuel regardless of success ("the aether takes its
+  // due either way" — softens repeat-spam without making failure
+  // toothless).
+  const newInventory = player.inventory
+    .map((i) => i.id === fuelItem.id ? { ...i, quantity: i.quantity - 1 } : i)
+    .filter((i) => i.quantity > 0);
+  set((s) => s.player ? { player: { ...s.player, inventory: newInventory } } : s);
+  get().appendLog('world', `(1 ${fuelItem.name} consumed.)`);
+
+  // Failure path — log + 0.5h time advance, that's it.
+  if (!success) {
+    get().appendLog(
+      'world',
+      `The shape slips out of your hands. The aether returns to itself, indifferent.`,
+    );
+    set((s) => s.player ? { player: advanceTime(spendStamina(s.player, 2), 0.5) } : s);
+    return;
+  }
+
+  // 4. Success path — discipline-specific outcome.
+  if (discipline === 'shape') {
+    const inCombat = (scene.enemies?.length ?? 0) > 0;
+    if (inCombat) {
+      const ward: StatusEffect = { kind: 'shaped_stone_ward', remainingRounds: 1, label: 'shaped stone ward (+4 AC)' };
+      set((s) => s.player ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], ward) } } : s);
+      get().appendLog('world', `You shape Aetherstone into a curving ward around your stance. +4 AC for the next round.`);
+    } else {
+      // Convert a Small Rock to a Shaped Aetheric Shard.
+      const livePlayer = get().player ?? player;
+      const rock = livePlayer.inventory.find((i) => i.name === 'Small Rock' && i.quantity > 0);
+      if (!rock) {
+        get().appendLog('world', `You shape the Aetherstone but have no Small Rock to bind it to. The shape dissipates.`);
+      } else {
+        const consumedRock = livePlayer.inventory
+          .map((i) => i.id === rock.id ? { ...i, quantity: i.quantity - 1 } : i)
+          .filter((i) => i.quantity > 0);
+        const shard: InventoryItem = stampDurability({
+          id: `aether_shard_${Date.now()}`,
+          name: 'Shaped Aetheric Shard',
+          kind: 'misc',
+          rarity: 'Common',
+          quantity: 1,
+          tags: ['throwable', 'aether', 'shaped'],
+        });
+        set((s) => s.player ? { player: { ...s.player, inventory: mergeOrPushItem(consumedRock, shard) } } : s);
+        get().appendLog('reward', `✦ Shaped Aetheric Shard — pulled from a Small Rock by your own hands.`);
+      }
+    }
+  } else if (discipline === 'summon') {
+    const companion: StatusEffect = { kind: 'golem_companion', remainingRounds: 3, label: 'golem companion (3 rounds)' };
+    set((s) => s.player ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], companion) } } : s);
+    get().appendLog(
+      'world',
+      `Aetherstone lifts out of the ground and folds into a shape that walks. The golem is loyal — for three rounds.`,
+    );
+  } else if (discipline === 'mend') {
+    const livePlayer = get().player ?? player;
+    const heal = Math.min(livePlayer.hpMax - livePlayer.hp, rollDie(6) + rollDie(6));
+    // Aetherborn pay HP self-cost; others pay corruption.
+    if (livePlayer.raceId === 'aetherborn') {
+      const selfCost = rollDie(6);
+      const newHp = Math.max(0, livePlayer.hp + heal - selfCost);
+      set((s) => s.player ? { player: { ...s.player, hp: newHp } } : s);
+      get().appendLog(
+        'world',
+        `You channel the heal — the wound knits. Your bloodline pays for it: +${heal} HP, then −${selfCost} HP backlash. (HP ${newHp}/${livePlayer.hpMax})`,
+      );
+    } else {
+      const prevTier = corruptionTierOf(livePlayer.corruption ?? 0);
+      const newCorr = (livePlayer.corruption ?? 0) + 2;
+      const nextTier = corruptionTierOf(newCorr);
+      set((s) => s.player ? { player: { ...s.player, hp: livePlayer.hp + heal, corruption: newCorr } } : s);
+      get().appendLog(
+        'world',
+        `The wound closes. Something in you opens. +${heal} HP, +2 corruption. (HP ${livePlayer.hp + heal}/${livePlayer.hpMax})`,
+      );
+      const crossLine = tierCrossLine(prevTier, nextTier);
+      if (crossLine) get().appendLog('reward', crossLine);
+    }
+  }
+  set((s) => s.player ? { player: advanceTime(spendStamina(s.player, 2), 0.5) } : s);
+}
 
 function weaponPhrase(weapon: string | null): string {
   return weapon ? ` with the ${weapon.toLowerCase()}` : '';

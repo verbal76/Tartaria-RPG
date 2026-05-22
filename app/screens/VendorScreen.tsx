@@ -9,6 +9,7 @@ import { availableHunts, HUNTS } from '../engine/hunts';
 import { availableMysteries, MYSTERIES } from '../engine/mysteries';
 import { availableStorylines, STORYLINES } from '../engine/factionStorylines';
 import { getStanding } from '../engine/factions';
+import { corruptionTierOf, corruptionPriceMultiplier } from '../engine/corruption';
 
 function rarityColor(rarity: string | null | undefined): string {
   switch (rarity) {
@@ -91,6 +92,11 @@ export function VendorScreen() {
     ? getItemPreview(pending.itemName)
     : null;
   const canAffordPending = pending?.mode === 'buy' ? player.tc >= pending.price : true;
+  // OTA 039 — corruption-tier markup. Multiplied into every BUY
+  // display price + applied for real in gameStore.buyFromVendor.
+  const corruptionTier = corruptionTierOf(player.corruption ?? 0);
+  const corruptionMult = corruptionPriceMultiplier(corruptionTier);
+  const corruptionMarkupPct = Math.round((corruptionMult - 1) * 100);
   // Inventory items the player can sell — exclude equipped + unsellable.
   const equippedNames = new Set(
     Object.values(player.equipped ?? {}).filter((n): n is string => !!n),
@@ -155,6 +161,11 @@ export function VendorScreen() {
         <Text style={styles.walletLabel}>Your purse</Text>
         <Text style={styles.walletValue}>{player.tc} TC</Text>
       </View>
+      {corruptionMarkupPct > 0 && (
+        <Text style={styles.corruptionMarkup}>
+          ⚠ +{corruptionMarkupPct}% prices — your aether unsettles them. ({corruptionTier})
+        </Text>
+      )}
 
       <View style={styles.tabRow}>
         <TouchableOpacity
@@ -337,7 +348,11 @@ export function VendorScreen() {
             <Text style={styles.empty}>The vendor's pack is empty. Nothing more to trade.</Text>
           ) : (
             vendor.offers.map((o, i) => {
-              const canAfford = player.tc >= o.price;
+              // OTA 039 — corruption-tier markup. Show the marked-up
+              // price; canAfford / buyFromVendor both compute on the
+              // same value so the player never sees a mismatch.
+              const effPrice = Math.ceil(o.price * corruptionMult);
+              const canAfford = player.tc >= effPrice;
               const itemPreview = getItemPreview(o.itemName);
               const owned = player.inventory
                 .filter((inv) => inv.name.toLowerCase() === o.itemName.toLowerCase())
@@ -350,13 +365,13 @@ export function VendorScreen() {
                   <View style={[styles.offerStripe, { backgroundColor: rarityColor(itemPreview.rarity) }]} />
                   <TouchableOpacity
                     style={styles.offerBody}
-                    onPress={() => openBuy(o.itemName, o.price)}
+                    onPress={() => openBuy(o.itemName, effPrice)}
                     activeOpacity={0.7}
                   >
                     <View style={styles.offerHead}>
                       <Text style={styles.offerName} numberOfLines={1}>{o.itemName}</Text>
                       <Text style={[styles.offerPrice, !canAfford && styles.offerPriceBroke]}>
-                        {o.price} TC
+                        {effPrice} TC
                       </Text>
                     </View>
                     <View style={styles.offerSubHead}>
@@ -595,6 +610,15 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   walletLabel: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },
+  corruptionMarkup: {
+    color: '#e07a5f',
+    fontSize: 10,
+    letterSpacing: 1,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    paddingHorizontal: 4,
+    marginBottom: 6,
+  },
   walletValue: { color: '#c9a86a', fontSize: 13, fontWeight: '700' },
   tourBanner: {
     backgroundColor: '#2a1f12',

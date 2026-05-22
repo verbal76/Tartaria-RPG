@@ -196,3 +196,23 @@ export function applyRacialStatBonuses(stats: Stats, raceId: string | undefined)
     charisma: stats.charisma + (bonuses.charisma ?? 0),
   };
 }
+
+// ─── Aethercraft DC modifier ────────────────────────────────────────
+// OTA 039 — True Tartarians (Mud Dwellers) trained the discipline;
+// they cast at base DC. Aetherborn share Aetheric blood but lack the
+// True Tartarian training, so they cast at +2 DC. All other races
+// are guessing — +4 DC.
+export function aethercraftDcModifier(raceId: string | undefined): number {
+  if (raceId === 'mud_dweller') return 0;
+  if (raceId === 'aetherborn') return 2;
+  return 4;
+}
+
+// ─── Aethercraft context bonus ──────────────────────────────────────
+// Mud Dwellers' "Aethercraft Mastery: +2 Intelligence when using
+// Aethercraft" trait fires here. Verb handlers add this to the
+// effective INT before the skill check. Other races: no bonus.
+export function aethercraftStatBonus(raceId: string | undefined): Partial<Stats> {
+  if (raceId === 'mud_dweller') return { intelligence: 2 };
+  return {};
+}

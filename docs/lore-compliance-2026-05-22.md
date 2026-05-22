@@ -9,6 +9,8 @@ The current Android build is **substantially lore-aligned at the narrative-frame
 
 **OTA 038 updates**: the race-as-distinct-from-faction layer is now wired (barehand damage, conditional racial AC bonuses, always-on racial stat bumps surfaced through every skill check) and the previously-empty Servants of the Giants stash is now populated with a vendor and three contracts (1 faction quest, 1 hunt, 1 mystery).
 
+**OTA 039 updates**: Aethercraft is now playable. Three new disciplines fire as verbs (`shape stone` for +4 AC ward or Small-Rock → Shaped Aetheric Shard; `summon golem` for a 3-round companion that adds 1d6 bludgeoning after each player attack; `mend wounds` for 2d6 HP at the cost of +2 corruption — or 1d6 HP self-cost for Aetherborn per their `Destiny Unfolding` trait). All use Aetherstone fuel from inventory; race DC gates apply (Mud Dweller base, Aetherborn +2, others +4); Mud Dweller's "Aethercraft Mastery +2 INT" trait finally fires through the new context-bonus hook. Corruption now bites: 4 tiers (Clean / Tainted / Corrupted / Hollowed) with stat penalties through `effectiveStats`, vendor price markup (×1.15 Corrupted, ×1.30 Hollowed), extra-encounter chance per cardinal step, and forced Mud Monarch Purifier spawns every 5 steps when Hollowed (gated by HP-fraction safety so it can't death-spiral). Tier-cross log lines emit on every threshold crossing so the player sees what's happening.
+
 ## 2. Direct Matches (Faithful Implementations)
 
 - **All 7 lorebook factions present** in `app/data/factions/factions.json`: Mud Monarchs, Forgotten Order, True Tartarians, Reclaimers Guild, Eternal Dynasty, Conspiracy Architects, Tartarian Revivalists.

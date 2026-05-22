@@ -481,7 +481,12 @@ export type StatusEffectKind =
   // OTA 003 — timed stat boost from eating a food / drinking a
   // potion. buffStat + buffBonus carry the actual modifier;
   // effectiveStats sums every active food_buff matching the stat.
-  | 'food_buff';
+  | 'food_buff'
+  // OTA 039 — Aethercraft outcomes. shaped_stone_ward grants a
+  // one-round +4 AC; golem_companion fires a free 1d6 bludgeoning
+  // hit after each player attack for 3 rounds.
+  | 'shaped_stone_ward'
+  | 'golem_companion';
 
 export interface StatusEffect {
   kind: StatusEffectKind;
@@ -532,6 +537,12 @@ export interface PlayerCharacter {
    *  procedural world. Set on first hub entry (defaults to entry
    *  room), cleared on "leave outpost". */
   hubRoomId?: string | null;
+  /** OTA 039 — Hollowed corruption-tier forced-Purifier counter.
+   *  Increments on every outdoor cardinal step while Hollowed; when
+   *  it hits 5, the engine spawns a Mud Monarch Purifier and resets
+   *  to 0. Defaults to 0; legacy saves load as undefined and the
+   *  step handler treats undefined as 0. */
+  stepsSinceLastPurifier?: number;
   /** Currently-equipped weapon and armor (by catalog name). */
   equipped?: PlayerEquipped;
   /** Active combat status effects; tick down each player action. */
