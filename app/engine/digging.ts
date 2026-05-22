@@ -127,6 +127,21 @@ const DIG_LOOT: DigEntry[] = [
   { name: 'Patched Cloth', rarity: 'Common', baseWeight: 8 },
   { name: 'Trail Rations', rarity: 'Common', baseWeight: 6 },
   { name: 'Aether Crystal', rarity: 'Common', baseWeight: 6 },
+  // OTA 012 — Firewood / wild foods / Empty Water Bottle were
+  // wired into the area-search SMALL_FINDS pool but missed from
+  // the dig pool. Player digging with a tool would never find any
+  // of the Phase 1-3 items. Mirroring weights from the area-search
+  // table where parallel entries exist.
+  { name: 'Firewood', rarity: 'Common', baseWeight: 22 },
+  { name: 'Wild Onion', rarity: 'Common', baseWeight: 8 },
+  { name: 'Wild Carrot', rarity: 'Common', baseWeight: 8 },
+  { name: 'Wild Lettuce', rarity: 'Common', baseWeight: 6 },
+  { name: 'Rhubarb Stalk', rarity: 'Common', baseWeight: 5 },
+  { name: 'Wild Oats', rarity: 'Common', baseWeight: 7 },
+  { name: 'Red Cap Mushroom', rarity: 'Common', baseWeight: 5 },
+  { name: 'Blue Cap Mushroom', rarity: 'Common', baseWeight: 5 },
+  { name: 'Orange Sporecap', rarity: 'Common', baseWeight: 5 },
+  { name: 'Empty Water Bottle', rarity: 'Common', baseWeight: 4 },
   // Uncommon — relic-grade finds.
   { name: 'Aetheric Shard', rarity: 'Uncommon', baseWeight: 5 },
   { name: 'Aetheric Dust', rarity: 'Uncommon', baseWeight: 4 },
@@ -134,6 +149,14 @@ const DIG_LOOT: DigEntry[] = [
   { name: 'Drone Core', rarity: 'Uncommon', baseWeight: 2 },
   { name: 'Scrap Metal', rarity: 'Uncommon', baseWeight: 4 },
   { name: 'Energy Fragment', rarity: 'Uncommon', baseWeight: 2 },
+  // OTA 012 — uncommon wild foods.
+  { name: 'Speckled Egg', rarity: 'Uncommon', baseWeight: 3 },
+  { name: 'Blueberries', rarity: 'Uncommon', baseWeight: 4 },
+  { name: 'Raspberries', rarity: 'Uncommon', baseWeight: 4 },
+  { name: 'Wild Grapes', rarity: 'Uncommon', baseWeight: 3 },
+  { name: 'Violet Cap Mushroom', rarity: 'Uncommon', baseWeight: 2 },
+  // OTA 012 — rare drop, the chicken.
+  { name: 'Wild Chicken', rarity: 'Rare', baseWeight: 1 },
   // Rare — buried Tartarian goods. Dig score has to be high to pull these.
   { name: 'Aetheric Cloth', rarity: 'Rare', baseWeight: 1 },
   { name: 'Mudstone', rarity: 'Rare', baseWeight: 1 },

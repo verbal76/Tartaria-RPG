@@ -8921,30 +8921,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const output = scrapOutputFor(item);
+    // OTA 012 — route grants through grantItem so ITEM_CAPS apply.
+    // Was a manual merge that ignored caps: scrap an item yielding
+    // 8 Sticks landed all 8 in pack despite the 6 cap. Now overflow
+    // is dropped per item with a "pack is already full" line.
     set((s) => {
       if (!s.player) return s;
-      // Remove one unit of the source item.
-      const newInventory = s.player.inventory
+      let newInventory: InventoryItem[] = s.player.inventory
         .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
         .filter((i) => i.quantity > 0);
-      // Add each granted scrap material, merging into existing
-      // stacks where possible.
       for (const grant of output.grants) {
-        const existing = newInventory.findIndex((i) => i.name === grant.name);
-        if (existing >= 0) {
-          newInventory[existing] = {
-            ...newInventory[existing]!,
-            quantity: newInventory[existing]!.quantity + grant.quantity,
-          };
-        } else {
-          newInventory.push({
-            id: `scrap_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-            name: grant.name,
-            kind: 'misc',
-            rarity: 'Common',
-            quantity: grant.quantity,
-            tags: [],
-          });
+        const stamp: InventoryItem = stampDurability({
+          id: `scrap_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          name: grant.name,
+          kind: 'misc',
+          rarity: 'Common',
+          quantity: grant.quantity,
+          tags: [],
+        });
+        const result = grantItem(newInventory, stamp);
+        newInventory = result.inventory;
+        if (result.dropped > 0) {
+          // Buffered side-effect: we're still inside the set()
+          // closure, so defer the log so it fires after the state
+          // settles. Use a queue via void Promise.resolve().then.
+          const droppedQty = result.dropped;
+          void Promise.resolve().then(() =>
+            get().appendLog(
+              'world',
+              `${grant.name} x${droppedQty} from the scrap won't fit — your pack is already full of them.`,
+            ),
+          );
         }
       }
       return { player: { ...s.player, inventory: newInventory } };
