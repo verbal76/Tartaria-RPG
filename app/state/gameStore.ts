@@ -296,6 +296,11 @@ interface CurrentScene {
    *  fires only on the first counter; the +2 bonus is consumed and
    *  the flag set true. Initialized empty in beginScene. */
   enemyAmbushUsed?: boolean[];
+  /** OTA 031 — what the player is currently elevated on (climbed at
+   *  least one tier). Set on every successful climb tier, cleared by
+   *  climb down or by leaving the scene. Drives the CLIMB / CLIMB
+   *  DOWN button toggle in the exploration HUD. */
+  elevatedOn?: string | null;
 }
 
 // Helper: which enemy is the player currently targeting? Returns null
@@ -5052,6 +5057,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // something specific to interact with. The Arbiter explains each
       // via concept lookup ("what is dash", "what is disengage").
       case 'climb': {
+        // OTA 031 — climb-down branch. When the player is elevated on
+        // something (any tier cleared this scene) and the raw input
+        // names "down" / "descend", route to a quick descent narration
+        // and clear the elevated flag so the HUD button flips back
+        // from CLIMB DOWN → CLIMB.
+        const rawActionLower = trimmed.toLowerCase();
+        const wantsDown = /\b(down|descend)\b/.test(rawActionLower);
+        if (wantsDown && currentScene.elevatedOn) {
+          const downFrom = currentScene.elevatedOn;
+          set((s) => s.currentScene ? { currentScene: { ...s.currentScene, elevatedOn: null } } : s);
+          set({ player: advanceTime(spendStamina(player, 1), 0.25) });
+          get().appendLog(
+            'world',
+            `You make your way back down the ${downFrom}. Boots back on the ground.`,
+          );
+          break;
+        }
         // Strip leading prepositions ("climb up the pole" → "pole",
         // "climb in the window" → "window"). Then check whether the
         // target is actually climbable per interactionTags. Refuses
@@ -5198,6 +5220,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   },
                 },
               },
+              currentScene: s.currentScene ? { ...s.currentScene, elevatedOn: tgt } : s.currentScene,
             };
           });
         }

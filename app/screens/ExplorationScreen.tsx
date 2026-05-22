@@ -12,7 +12,10 @@ import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
 import { SalvageModal } from '../components/SalvageModal';
 import { TakeModal } from '../components/TakeModal';
+import { ClimbModal } from '../components/ClimbModal';
 import { FeedbackModal } from '../components/FeedbackModal';
+import { isClimbable } from '../engine/interactionTags';
+import { climbHeightFor } from '../engine/climbHeight';
 import { findCatalogItem } from '../engine/crafting';
 import { isOversized } from '../engine/portability';
 import { playerHasScannerEquipped } from '../engine/equipment';
@@ -61,6 +64,10 @@ export function ExplorationScreen() {
   const [approachOpen, setApproachOpen] = useState(false);
   const [salvageOpen, setSalvageOpen] = useState(false);
   const [takeOpen, setTakeOpen] = useState(false);
+  // OTA 031 — climb-target picker. Opens to a chip list of every
+  // climbable noun in the current scene; tapping one fires `climb
+  // <noun>` which resolves one tier in the climb handler.
+  const [climbOpen, setClimbOpen] = useState(false);
   // OTA 202 — designer-note modal. Wired to the 📝 button in the
   // input row (InputBox.onOpenFeedback prop).
   const [feedbackOpen, setFeedbackOpen] = useState(false);
@@ -278,6 +285,9 @@ export function ExplorationScreen() {
             onOpenApproach={() => setApproachOpen(true)}
             onOpenSalvage={() => setSalvageOpen(true)}
             onOpenTake={() => setTakeOpen(true)}
+            onOpenClimb={() => setClimbOpen(true)}
+            onClimbDown={() => submit('climb down')}
+            elevatedOn={currentScene?.elevatedOn ?? null}
             onOpenFeedback={() => setFeedbackOpen(true)}
             inCombat={inCombat}
             equippedMain={equippedMain}
@@ -499,6 +509,29 @@ export function ExplorationScreen() {
         }}
         onCancel={() => setApproachOpen(false)}
       />
+
+      {/* OTA 031 — CLIMB picker. Pull climbables from the same scene
+          noun pool the other modals read (displayedAmbientNouns →
+          ambientNouns) and filter through isClimbable, then attach
+          per-noun tier counts so the player sees commitment up-front
+          (wall=2, tower=4, cliff=5). */}
+      {(() => {
+        const sceneNouns = (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? []);
+        const climbables = sceneNouns.filter((n) => isClimbable(n));
+        const heights = climbables.map((n) => climbHeightFor(n));
+        return (
+          <ClimbModal
+            visible={climbOpen}
+            climbables={climbables}
+            heights={heights}
+            onSubmit={(target) => {
+              setClimbOpen(false);
+              submit(`climb ${target}`);
+            }}
+            onCancel={() => setClimbOpen(false)}
+          />
+        );
+      })()}
     </KeyboardAvoidingView>
   );
 }
