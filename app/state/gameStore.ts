@@ -5160,7 +5160,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // worth climbing.") so the verb stops feeling like an empty
         // narration on every input.
         const climbRaw = (parsed.target ?? '').replace(/^(up|down|in|into|onto|over|across|through|to|the)\s+/i, '').trim();
-        const climbTarget = parsed.resolvedNoun ?? (climbRaw.length > 0 ? climbRaw : '');
+        // OTA 045 — climb is a scene-noun verb, not an inventory-item
+        // verb. The parser's general policy is to prefer inventory
+        // items for resolution (so `use torch` works), but that means
+        // `climb rope` resolves to the player's Climbing Rope item
+        // when there's a literal `rope` noun in the scene. Result was
+        // gibberish narration ("You loop the climbing rope around the
+        // Climbing Rope and walk the line"). For climb specifically:
+        // check scene nouns first, only fall back to the parser's
+        // resolved name if no scene match exists.
+        const climbSceneNouns = collectSceneNouns(currentScene);
+        const climbSceneMatch = climbRaw
+          ? matchAmbientNoun(climbRaw, climbSceneNouns)
+          : null;
+        const climbTarget = climbSceneMatch ?? parsed.resolvedNoun ?? (climbRaw.length > 0 ? climbRaw : '');
         if (climbTarget && !isClimbable(climbTarget)) {
           get().appendLog(
             'arbiter',
@@ -5229,9 +5242,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set({ player: advanceTime(spendStamina(player, 2), 0.5) });
         let tierCleared = false;
         if (hasRope) {
+          // OTA 045 — when the climbed noun is itself a rope / line /
+          // chain (i.e. already a rope-shaped thing), don't narrate
+          // "loop the climbing rope around the rope" — read as
+          // "haul up the rope hand over hand" instead. Climbing Rope
+          // still grants the auto-pass; the prop just changes role.
+          const tgtLow = tgt.toLowerCase();
+          const tgtIsRope = /\b(rope|line|chain|cable|cord)\b/.test(tgtLow);
           get().appendLog(
             'world',
-            `You loop the climbing rope around the ${tgt} and walk the line. Tier ${currentTier}/${totalTiers} cleared.`,
+            tgtIsRope
+              ? `You haul up the ${tgt} hand over hand. Tier ${currentTier}/${totalTiers} cleared.`
+              : `You loop the climbing rope around the ${tgt} and walk the line. Tier ${currentTier}/${totalTiers} cleared.`,
           );
           tierCleared = true;
         } else {
