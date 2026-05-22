@@ -5196,30 +5196,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
           player.mapX,
           player.mapY,
         );
+        // OTA 046 — marker-parse logic moved into engine/climbHeight
+        // (maxClimbedTier) so the climb modal can read the same
+        // cleared-state without duplicating the parse. Original
+        // inline parse handled the OTA 033 'parseInt("t1")' fix and
+        // the OTA 037 marker-length guard; both preserved in the
+        // helper.
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { climbHeightFor, climbTierLabel, rollClimbTopLoot } = require('../engine/climbHeight');
+        const { climbHeightFor, climbTierLabel, rollClimbTopLoot, maxClimbedTier } = require('../engine/climbHeight');
         const totalTiers: number = climbHeightFor(tgt);
         const climbRoom = get().worldMemory.visitedRooms?.[climbRoomKey];
-        const climbMarks = (climbRoom?.searchedAmbientNouns ?? []).filter(
-          (m) => m.startsWith(`climbed:${tgt.toLowerCase()}:`),
-        );
-        // Highest tier index already cleared (0 if none). Marker
-        // format is 'climbed:<noun>:t<N>' — the 't' prefix is part
-        // of the third segment so we strip it before parseInt
-        // (OTA 033 — was 'parseInt("t1") → NaN' which left
-        // maxCleared at 0 forever and every tap read as tier 1).
-        // OTA 037 — also validate split length so a malformed marker
-        // ('climbed:noun' with no tier segment) doesn't index past
-        // the array and silently parse garbage.
-        let maxCleared = 0;
-        for (const m of climbMarks) {
-          const parts = m.split(':');
-          if (parts.length < 3) continue;
-          const seg = parts[2] ?? '';
-          const numStr = seg.startsWith('t') ? seg.slice(1) : seg;
-          const t = parseInt(numStr, 10);
-          if (!Number.isNaN(t) && t > maxCleared) maxCleared = t;
-        }
+        const climbMarks = climbRoom?.searchedAmbientNouns ?? [];
+        const maxCleared: number = maxClimbedTier(tgt, climbMarks);
         const currentTier = maxCleared + 1;
         if (currentTier > totalTiers) {
           get().appendLog(

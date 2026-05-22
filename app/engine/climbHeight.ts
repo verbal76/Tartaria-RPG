@@ -42,6 +42,31 @@ export function climbTierLabel(tier: number, total: number): string {
   return `tier ${tier}/${total}`;
 }
 
+// OTA 046 — extract the cleared-state lookup the climb verb has done
+// inline since OTA 033. The CLIMB modal needs the same answer to dim
+// cleared chips, so the parse logic lives here and gameStore / the
+// modal both call it. Marker format is 'climbed:<noun>:t<N>' written
+// per cleared tier.
+export function maxClimbedTier(noun: string, marks: readonly string[]): number {
+  const prefix = `climbed:${noun.toLowerCase()}:`;
+  let max = 0;
+  for (const m of marks) {
+    if (!m.startsWith(prefix)) continue;
+    const parts = m.split(':');
+    if (parts.length < 3) continue;
+    const seg = parts[2] ?? '';
+    const numStr = seg.startsWith('t') ? seg.slice(1) : seg;
+    const t = parseInt(numStr, 10);
+    if (!Number.isNaN(t) && t > max) max = t;
+  }
+  return max;
+}
+
+export function isClimbCleared(noun: string, marks: readonly string[]): boolean {
+  const total = climbHeightFor(noun);
+  return maxClimbedTier(noun, marks) >= total;
+}
+
 // Chance-based top-of-climb loot. ~50% of crested climbs yield
 // nothing (preserves the RNG-driven incentive the playtester asked
 // for); the other ~50% rolls one item from a pool that's chunkier

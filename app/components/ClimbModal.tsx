@@ -19,6 +19,11 @@ interface Props {
   /** Per-noun tier counts so the player sees commitment up-front
    *  (wall=2, tower=4, cliff=5). Aligned by index to climbables. */
   heights: number[];
+  /** OTA 046 — per-noun fully-cleared flags. Aligned by index. When
+   *  true, the chip renders dimmed with a ✓ TOP suffix; tap still
+   *  fires the climb verb so the engine can surface the "already
+   *  crested" log line (gameStore handles the no-op gracefully). */
+  cleared?: boolean[];
   onSubmit: (target: string) => void;
   onCancel: () => void;
 }
@@ -33,6 +38,7 @@ export function ClimbModal({
   visible,
   climbables,
   heights,
+  cleared,
   onSubmit,
   onCancel,
 }: Props) {
@@ -66,15 +72,25 @@ export function ClimbModal({
                 <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
                   {climbables.map((noun, i) => {
                     const h = heights[i] ?? 2;
+                    const isCleared = cleared?.[i] === true;
                     return (
                       <Pressable
                         key={`climb-${noun}-${i}`}
-                        style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
+                        style={({ pressed }) => [
+                          styles.row,
+                          isCleared && styles.rowCleared,
+                          pressed && styles.rowPressed,
+                        ]}
                         onPress={() => tapTo(noun)}
                       >
-                        <Text style={styles.rowName} numberOfLines={1}>{noun}</Text>
-                        <Text style={styles.rowHeight}>
-                          {h === 1 ? '1 tier' : `${h} tiers`}
+                        <Text
+                          style={[styles.rowName, isCleared && styles.rowNameCleared]}
+                          numberOfLines={1}
+                        >
+                          {noun}
+                        </Text>
+                        <Text style={[styles.rowHeight, isCleared && styles.rowHeightCleared]}>
+                          {isCleared ? '✓ TOP' : (h === 1 ? '1 tier' : `${h} tiers`)}
                         </Text>
                       </Pressable>
                     );
@@ -120,8 +136,11 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   rowPressed: { borderColor: '#c9a86a', opacity: 0.85 },
+  rowCleared: { backgroundColor: '#13110f', borderColor: '#2a2622' },
   rowName: { color: '#e6d8b3', fontSize: 14, flex: 1, marginRight: 8 },
+  rowNameCleared: { color: '#5a5246', fontStyle: 'italic' },
   rowHeight: { color: '#9ec96a', fontSize: 11, letterSpacing: 1, fontWeight: '700' },
+  rowHeightCleared: { color: '#5a5246' },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 14 },
   btn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 3, borderWidth: 1, minWidth: 80, alignItems: 'center' },
   btnPressed: { opacity: 0.7 },

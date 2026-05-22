@@ -15,7 +15,7 @@ import { TakeModal } from '../components/TakeModal';
 import { ClimbModal } from '../components/ClimbModal';
 import { FeedbackModal } from '../components/FeedbackModal';
 import { isClimbable } from '../engine/interactionTags';
-import { climbHeightFor } from '../engine/climbHeight';
+import { climbHeightFor, isClimbCleared } from '../engine/climbHeight';
 import { findCatalogItem } from '../engine/crafting';
 import { isOversized } from '../engine/portability';
 import { playerHasScannerEquipped } from '../engine/equipment';
@@ -532,20 +532,30 @@ export function ExplorationScreen() {
         onCancel={() => setApproachOpen(false)}
       />
 
-      {/* OTA 031 — CLIMB picker. Pull climbables from the same scene
+      {/* OTA 046 — CLIMB picker. Pull climbables from the same scene
           noun pool the other modals read (displayedAmbientNouns →
           ambientNouns) and filter through isClimbable, then attach
           per-noun tier counts so the player sees commitment up-front
-          (wall=2, tower=4, cliff=5). */}
+          (wall=2, tower=4, cliff=5). Also flag fully-cleared
+          climbables so the chip renders dimmed with a ✓ TOP suffix
+          — same room-key + marker convention the climb handler uses
+          in gameStore.ts. */}
       {(() => {
         const sceneNouns = (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? []);
         const climbables = sceneNouns.filter((n) => isClimbable(n));
         const heights = climbables.map((n) => climbHeightFor(n));
+        const microMicroId = currentScene?.microMicroId ?? '_';
+        const x = typeof player?.mapX === 'number' ? player.mapX : '_';
+        const y = typeof player?.mapY === 'number' ? player.mapY : '_';
+        const roomKey = `${player?.currentLocationId}@${microMicroId}@${x},${y}`;
+        const marks = worldMemory.visitedRooms?.[roomKey]?.searchedAmbientNouns ?? [];
+        const cleared = climbables.map((noun) => isClimbCleared(noun, marks));
         return (
           <ClimbModal
             visible={climbOpen}
             climbables={climbables}
             heights={heights}
+            cleared={cleared}
             onSubmit={(target) => {
               setClimbOpen(false);
               submit(`climb ${target}`);
