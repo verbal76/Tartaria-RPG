@@ -89,7 +89,10 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
       <TouchableWithoutFeedback onPress={onCancel}>
         <KeyboardAvoidingView
           style={styles.scrim}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          // OTA 022 — see ExplorationScreen comment. 'height' on
+          // Android double-shrinks; 'padding' keeps the scrim full
+          // size and only pushes the card up to avoid the keyboard.
+          behavior="padding"
         >
           <TouchableWithoutFeedback>
             <View style={styles.card}>

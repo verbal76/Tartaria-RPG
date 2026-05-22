@@ -178,7 +178,15 @@ export function ExplorationScreen() {
   return (
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: bgTint }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      // OTA 022 — was behavior='height' on Android (OTA 209 fix for
+      // keyboard covering the input). 'height' on Android double-
+      // shrinks the view: Android's native adjustResize already
+      // pulls the window up by keyboard height, then KAV's height
+      // mode shrinks the container again on top of that. Periodic
+      // "main screen smaller than available" was the visible result.
+      // 'padding' adds bottom padding (visual) without touching the
+      // container height — it doesn't compound with adjustResize.
+      behavior="padding"
     >
       <View style={styles.topRow}>
         <TutorialTarget area="top-left-stats" style={styles.statsCol}>
