@@ -31,6 +31,10 @@
       "effect": { "kind": "consumable", "healHP": 1, "restoreStamina": 3, "buffStat": "dexterity", "buffBonus": 1, "buffDuration": 4 } },
     { "name": "Orange Sporecap",     "kind": "consumable", "rarity": "Common",   "tags": ["food","foraged","mushroom","orange"], "description": "Bright orange cap, freckled with darker spots. Don't eat raw unless you know the color. You know the color.",
       "effect": { "kind": "consumable", "healHP": 2, "restoreStamina": 1 } },
+
+    { "name": "Empty Water Bottle", "kind": "misc",       "rarity": "Common",   "tags": ["container","water"],          "description": "A glass-and-cork bottle, scoured clean. Type 'fill bottle' near a puddle, lake, waterfall, or crevice-pool to draw water." },
+    { "name": "Water Bottle",       "kind": "consumable", "rarity": "Common",   "tags": ["drink","water","container"],   "description": "A full bottle of water — clean enough, cold enough. Drink to take the edge off thirst and the day. Leaves an empty bottle behind.",
+      "effect": { "kind": "consumable", "healHP": 2, "restoreStamina": 3 } },
     { "name": "Aetheric Torch", "kind": "relic", "rarity": "Common", "tags": ["light", "relic"], "description": "Reliable light. Faintly attracts Aether-drawn creatures." },
     { "name": "Aetheric Locket", "kind": "relic", "rarity": "Common", "tags": ["detection", "relic"], "description": "Hums when held close to a relic." },
     { "name": "First Aid Kit", "kind": "consumable", "rarity": "Uncommon", "tags": ["healing"], "description": "Sterile bandages, mud-glass needles, a single dose of Aetheric salve. Restores 1d6 HP on use." },

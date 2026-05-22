@@ -91,6 +91,7 @@ const CANONICAL_VERB: Record<Intent, string> = {
   drop: 'drop',
   pickup: 'pick up',
   open: 'open',
+  fill: 'fill',
   unknown: 'look',
 };
 

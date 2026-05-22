@@ -3916,9 +3916,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const stamGain = fx
             ? Math.min(Math.max(0, stamRoom), fx.restoreStamina ?? 0)
             : 0;
-          const newInventory = player.inventory
+          let newInventory = player.inventory
             .map((i) => (i.id === consumable.id ? { ...i, quantity: i.quantity - 1 } : i))
             .filter((i) => i.quantity > 0);
+          // OTA 004 — drinking a Water Bottle leaves an Empty Water
+          // Bottle behind so the player can refill it. Merge into an
+          // existing empty-bottle stack if one exists.
+          if (consumable.name === 'Water Bottle') {
+            const existingEmpty = newInventory.findIndex((i) => i.name === 'Empty Water Bottle');
+            if (existingEmpty >= 0) {
+              newInventory[existingEmpty] = {
+                ...newInventory[existingEmpty]!,
+                quantity: newInventory[existingEmpty]!.quantity + 1,
+              };
+            } else {
+              newInventory.push({
+                id: `empty_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                name: 'Empty Water Bottle',
+                kind: 'misc',
+                rarity: 'Common',
+                quantity: 1,
+                tags: ['container', 'water'],
+              });
+            }
+          }
           // OTA 003 — register the food buff if the catalog declares one.
           // remainingRounds = buffDuration; label encodes the food name +
           // stat so the "Wild Carrot (+1 WIS) fades." line is readable.
@@ -4717,6 +4738,61 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       case 'dig': {
         get().digHere();
+        break;
+      }
+      case 'fill': {
+        // OTA 004 — Phase 3 water bottles. Requires an Empty Water
+        // Bottle in inventory + a water-source noun in the scene
+        // ambient list. Consumes one empty, grants one full.
+        const WATER_SOURCE_NOUNS = [
+          'puddle', 'puddles', 'lake', 'pond', 'river', 'stream', 'creek',
+          'waterfall', 'spring', 'well', 'crevice', 'fountain', 'pool',
+          'cistern', 'trough',
+        ];
+        const sceneNouns = (currentScene.ambientNouns ?? []).map((n) => n.toLowerCase());
+        const sourceNoun = WATER_SOURCE_NOUNS.find((w) => sceneNouns.some((sn) => sn.includes(w)));
+        if (!sourceNoun) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter glances around. "No water to draw from here. Try a puddle, lake, waterfall, crevice pool, well — anywhere the wet collects."`,
+          );
+          break;
+        }
+        const emptyBottle = player.inventory.find(
+          (i) => i.name.toLowerCase() === 'empty water bottle' && i.quantity > 0,
+        );
+        if (!emptyBottle) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter taps your pack. "No empty bottle to fill. Find one first — crates and ground-leavings will have them."`,
+          );
+          break;
+        }
+        // Swap empty → full.
+        set((s) => {
+          if (!s.player) return s;
+          let newInventory = s.player.inventory
+            .map((i) => (i.id === emptyBottle.id ? { ...i, quantity: i.quantity - 1 } : i))
+            .filter((i) => i.quantity > 0);
+          const existingFull = newInventory.findIndex((i) => i.name === 'Water Bottle');
+          if (existingFull >= 0) {
+            newInventory[existingFull] = {
+              ...newInventory[existingFull]!,
+              quantity: newInventory[existingFull]!.quantity + 1,
+            };
+          } else {
+            newInventory.push({
+              id: `bottle_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              name: 'Water Bottle',
+              kind: 'consumable',
+              rarity: 'Common',
+              quantity: 1,
+              tags: ['drink', 'water', 'container'],
+            });
+          }
+          return { player: { ...s.player, inventory: newInventory } };
+        });
+        get().appendLog('world', `You scoop water from the ${sourceNoun} into the bottle. (✦ Water Bottle, ✗ Empty Water Bottle)`);
         break;
       }
       case 'throw': {

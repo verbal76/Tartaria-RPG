@@ -46,6 +46,10 @@ export type Intent =
   | 'drop'
   | 'pickup'
   | 'open'
+  // OTA 004 — Phase 3 water bottles. Fill an empty bottle from a
+  // water source in the current scene (puddle / lake / waterfall /
+  // crevice / stream / well).
+  | 'fill'
   | 'unknown';
 
 export interface ParsedInput {

@@ -27,11 +27,12 @@
     "matchers": ["crate", "chest", "box", "cache", "stash", "barrel"],
     "narration": "The {target} swings open. The contents are humble.",
     "pool": [
-      { "name": "Scrap Metal",   "weight": 25, "min": 1, "max": 2, "tags": ["metal"], "kind": "misc" },
-      { "name": "Stick",         "weight": 25, "min": 1, "max": 2, "tags": ["wood"],  "kind": "misc" },
-      { "name": "Firewood",      "weight": 20, "min": 1, "max": 3, "tags": ["wood","fuel"], "kind": "misc" },
-      { "name": "Patched Cloth", "weight": 25, "min": 1, "max": 2, "tags": ["cloth"], "kind": "misc" },
-      { "name": "Small Rock",    "weight": 25, "min": 1, "max": 2, "tags": ["stone"], "kind": "misc" }
+      { "name": "Scrap Metal",        "weight": 25, "min": 1, "max": 2, "tags": ["metal"], "kind": "misc" },
+      { "name": "Stick",              "weight": 25, "min": 1, "max": 2, "tags": ["wood"],  "kind": "misc" },
+      { "name": "Firewood",           "weight": 20, "min": 1, "max": 3, "tags": ["wood","fuel"], "kind": "misc" },
+      { "name": "Empty Water Bottle", "weight": 12, "min": 1, "max": 1, "tags": ["container"], "kind": "misc" },
+      { "name": "Patched Cloth",      "weight": 25, "min": 1, "max": 2, "tags": ["cloth"], "kind": "misc" },
+      { "name": "Small Rock",         "weight": 25, "min": 1, "max": 2, "tags": ["stone"], "kind": "misc" }
     ]
   },
 

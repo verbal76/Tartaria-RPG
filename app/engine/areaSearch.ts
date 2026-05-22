@@ -123,6 +123,11 @@ const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
   { name: 'Violet Cap Mushroom', rarity: 'Uncommon', weight: 2 },
   { name: 'Orange Sporecap', rarity: 'Common', weight: 5 },
 
+  // Empty bottles — water-bottle Phase 3 (OTA 004). Low weight so
+  // the player has to do some looking before bottle stock outpaces
+  // the new fill-bottle verb's water-source detection.
+  { name: 'Empty Water Bottle', rarity: 'Common', weight: 4 },
+
   // Rare trinkets — "every now and then you'll find a trinket
   // like a locket or ring or something good but rarely."
   { name: 'Aetheric Locket', rarity: 'Common', weight: 1 },

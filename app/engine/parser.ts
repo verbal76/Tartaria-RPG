@@ -130,6 +130,11 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   accept: ['accept', 'undertake', 'agree', 'yes', 'consent', 'embrace', 'assent', 'aye'],
   turn_in: ['turn in', 'complete', 'finish', 'deliver', 'report', 'redeem', 'claim', 'present', 'submit', 'hand in'],
   dig: ['dig', 'excavate', 'unearth', 'scrape', 'shovel', 'burrow', 'tunnel', 'mine', 'spade', 'pry'],
+  // OTA 004 — Phase 3 water bottles. Most fills are typed as
+  // "fill bottle" / "fill the bottle from puddle" etc.; the handler
+  // doesn't require a target since it auto-resolves the empty
+  // bottle from inventory + the water source from scene ambient.
+  fill: ['fill', 'refill', 'top up', 'top off', 'scoop', 'draw'],
   throw: ['throw', 'toss', 'hurl', 'lob', 'chuck', 'fling', 'pitch', 'cast at', 'launch', 'whip'],
   // NEW from action card.
   climb: ['climb', 'scale', 'ascend', 'clamber', 'shimmy', 'scramble', 'vault up', 'hoist', 'ladder', 'rope up'],
