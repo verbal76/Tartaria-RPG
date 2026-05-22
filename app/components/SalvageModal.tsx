@@ -32,14 +32,54 @@ interface Props {
   onCancel: () => void;
 }
 
-// Salvage chip filter — match nouns that suggest mechanical / metal /
-// pre-flood relic the player could strip for parts. Player-explicit
-// quick-action mirroring Search/Approach. The submitted text routes
-// through the investigate intent (salvage is a synonym there as of
-// OTA 140), so an active wreck_construct / fallen_sentinel / etc.
-// hook advances naturally; otherwise the engine narrates a generic
-// salvage outcome via the investigate handler.
-const SALVAGE_PATTERN = /construct|automaton|drone|sentinel|wreck|husk|machinery|machine|scrap|circuit|gear|plating|core|relic|robot|rust|broken|fallen|toppled|cog|rig|engine|hull|chassis|frame/i;
+// Salvage chip filter — matches nouns the engine will actually salvage
+// or break-open for material. Three groups:
+//
+//   1. Constructs / machinery — original OTA 140 list. Routes via
+//      investigate → wreck_construct / fallen_sentinel hooks or
+//      generic salvage narration.
+//   2. Containers — match the keys in app/data/world/container_loot.json
+//      (lockbox / crate / wreckage / tomb / observatory / spire /
+//      relic_console / trap matchers). Player typing "break open
+//      crate" already worked via containerLoot; OTA 019 surfaces
+//      those nouns as chips too so the tap-to-act flow doesn't
+//      miss them. Playtester: "I have interacted in text to break
+//      open crates ... scene items must be real fungable items ...
+//      do not take it so I cannot break open crates ... just
+//      improve it."
+//   3. Bone / wagon / floor furniture that material-classifier
+//      (sceneNounMaterial.ts) handles via break-open. Crate / chest
+//      already covered above; this adds the remaining sturdy nouns.
+const SALVAGE_PATTERN = new RegExp(
+  [
+    // 1. Constructs / machinery
+    'construct', 'automaton', 'drone', 'sentinel', 'wreck', 'husk',
+    'machinery', 'machine', 'scrap', 'circuit', 'gear', 'plating',
+    'core', 'relic', 'robot', 'rust', 'broken', 'fallen', 'toppled',
+    'cog', 'rig', 'engine', 'hull', 'chassis', 'frame',
+    // 2. Container matchers (mirrors container_loot.json keys)
+    'lockbox', 'strongbox', 'coffer', 'safe', 'vault',
+    'crate', 'chest', 'box', 'cache', 'stash', 'barrel',
+    'wreckage', 'wagon', 'axle', 'boat', 'vessel',
+    'sarcophagus', 'tomb', 'crypt', 'grave', 'ossuary', 'burial',
+    'console', 'panel', 'conduit', 'terminal', 'altar',
+    'observatory', 'scope', 'lens', 'telescope', 'array', 'dish', 'antenna',
+    'spire', 'obelisk', 'pylon', 'pillar', 'monolith',
+    'trap', 'snare', 'tripwire', 'deadfall', 'defenses', 'defense',
+    'golem',
+    // 3. Other break-open targets
+    'bench', 'shelf', 'rack', 'table', 'door', 'gate',
+    'skeleton', 'skull', 'rib', 'corpse', 'remains',
+    'banner', 'shroud', 'curtain', 'tarp',
+    'jar', 'bottle', 'jewelry box', 'jewel box', 'lock box', 'casket', 'reliquary',
+  ].join('|'),
+  'i',
+);
+
+// Slice cap for the chip row. Lifted from 5 → 8 since the broader
+// salvage pattern surfaces more legit nouns and the row scrolls
+// horizontally anyway.
+const SALVAGE_CHIP_CAP = 8;
 
 function isSalvageable(noun: string): boolean {
   return SALVAGE_PATTERN.test(noun);
@@ -109,9 +149,9 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel }: Prop
     ? chips
         .filter((c) => !c.consumed) // hide consumed scene nouns entirely
         .filter((c) => isSalvageable(c.noun))
-        .slice(0, 5)
+        .slice(0, SALVAGE_CHIP_CAP)
         .map((c) => c.noun)
-    : (hints ?? []).filter(isSalvageable).slice(0, 5);
+    : (hints ?? []).filter(isSalvageable).slice(0, SALVAGE_CHIP_CAP);
   const commonHints = ['the wreck', 'the construct', 'the drone', 'the machinery', 'the husk'];
 
   return (
