@@ -70,6 +70,19 @@ export function barehandDamageFor(raceId: string | undefined): BarehandSpec {
   return { count, sides, bonus: Number.isNaN(bonus) ? 0 : bonus };
 }
 
+// OTA 041 — Sentinel barehand hit-gate enforcement. Returns true when
+// the natural damage roll doesn't satisfy the spec's even/odd gate,
+// meaning the strike should be converted to a clean miss before any
+// damage applies. Returns false when there's no gate or the gate is
+// satisfied (i.e. the hit lands normally).
+export function barehandGateBlocks(spec: BarehandSpec, naturalRoll: number): boolean {
+  if (!spec.hitGate) return false;
+  if (!Number.isFinite(naturalRoll)) return false;
+  const rolledEven = naturalRoll % 2 === 0;
+  const wantsEven = spec.hitGate === 'even';
+  return rolledEven !== wantsEven;
+}
+
 // ─── Conditional AC bonuses ─────────────────────────────────────────
 // Each race entry has a `racialACBonus` description string AND (after
 // OTA 038) an optional `racialACBonusRules` structured field. The

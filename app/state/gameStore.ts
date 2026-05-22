@@ -112,7 +112,7 @@ import {
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, VENDORS, type VendorInstance } from '../engine/vendors';
-import { effectiveAC } from '../engine/raceMechanics';
+import { effectiveAC, barehandDamageFor, barehandGateBlocks } from '../engine/raceMechanics';
 import { findQuestFactionHint } from '../engine/factionHint';
 import {
   HUB,
@@ -6895,6 +6895,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       const rawDmg = damage?.total ?? rollDie(6);
       const barehand = isBareHandAttack(actionText);
+      // OTA 041 — Architectural Sentinel barehand hit-gate. The lorebook
+      // says a Sentinel's stone fist only lands on an even roll of the
+      // damage die (1d10 even = land, odd = whiff). Pre-OTA-041 the gate
+      // was parsed into BarehandSpec.hitGate but never branched on, so
+      // the CharacterScreen and tutorial promised a mechanic that wasn't
+      // actually firing. Convert a gate-mismatch to a clean miss before
+      // any damage applies — enemy still gets the counter, mirroring the
+      // miss path below.
+      if (barehand) {
+        const spec = barehandDamageFor(player.raceId);
+        const natural = damage?.values?.[0];
+        if (typeof natural === 'number' && barehandGateBlocks(spec, natural)) {
+          get().appendLog(
+            'combat',
+            `Stonework fist rings off ${enemy.name} — d${spec.sides} rolled ${natural}, needed ${spec.hitGate}.`,
+          );
+          runEnemyGroupCounters(get, set, player);
+          const hoursAfterGate = get().player?.hoursElapsed ?? hoursBeforeConclude;
+          const dt = hoursAfterGate - hoursBeforeConclude;
+          if (dt > 0) {
+            const label = dt < 1 ? `${Math.round(dt * 60)} min` : `${Math.round(dt * 10) / 10}h`;
+            get().appendLog('system', `⏳ Time passed: ${label}`);
+          }
+          void get().persist();
+          return;
+        }
+      }
       // If the player invoked the off-hand explicitly (via the OFF
       // quick button or "attack with the off-hand X"), look up the
       // off-hand weapon for damage type / effect / wear so the
@@ -8712,10 +8739,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const repResult = def.factionId && def.rewardRep
         ? applyRepChange(player.factionStanding, def.factionId, def.rewardRep)
         : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
+      // OTA 041 — pre-ship audit caught the UI completion path skipping
+      // the rewardItem grant (6 mysteries lost their reward when
+      // completed via the Contracts screen). Vendor turn-in at
+      // turnInMystery handled this; mirror that here.
+      const newInventory = def.rewardItem
+        ? [...player.inventory, stampDurability({
+            id: `mysteryreward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            name: def.rewardItem,
+            kind: 'misc',
+            rarity: lookupCraftedItem(def.rewardItem).rarity,
+            quantity: 1,
+            tags: lookupCraftedItem(def.rewardItem).tags,
+          })]
+        : player.inventory;
       set((s) => (s.player ? {
         player: {
           ...s.player,
           tc: s.player.tc + def.rewardTc,
+          inventory: newInventory,
           factionStanding: repResult.standing,
           activeMysteries: (s.player.activeMysteries ?? []).filter((m) => m.id !== def.id),
           completedMysteryIds: [...(s.player.completedMysteryIds ?? []), def.id],
@@ -8723,7 +8765,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       } : s));
       get().appendLog(
         'reward',
-        `✦ Mystery resolved — ${def.title}. +${def.rewardTc} TC${def.rewardRep ? `, +${def.rewardRep} rep` : ''}.`,
+        `✦ Mystery resolved — ${def.title}. +${def.rewardTc} TC${def.rewardRep ? `, +${def.rewardRep} rep` : ''}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
       );
       if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
       void get().persist();
@@ -8741,10 +8783,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
       const repResult = applyRepChange(player.factionStanding, def.factionId, def.rewardRep);
+      // OTA 041 — pre-ship audit caught the UI completion path skipping
+      // the rewardItem grant (4 storylines: Red Tower's Mouth → Runic
+      // Mantle, True Tartarian → Tartarian Stoneband, Reclaimer Relic
+      // Run → Echoing Steps Boots, Silence Across the Border → Mud
+      // Monarch Seal). Mirror turnInStoryline.
+      const newInventory = def.rewardItem
+        ? [...player.inventory, stampDurability({
+            id: `story_reward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            name: def.rewardItem,
+            kind: 'misc',
+            rarity: lookupCraftedItem(def.rewardItem).rarity,
+            quantity: 1,
+            tags: lookupCraftedItem(def.rewardItem).tags,
+          })]
+        : player.inventory;
       set((s) => (s.player ? {
         player: {
           ...s.player,
           tc: s.player.tc + def.rewardTc,
+          inventory: newInventory,
           factionStanding: repResult.standing,
           activeStorylines: (s.player.activeStorylines ?? []).filter((q) => q.id !== def.id),
           completedStorylineIds: [...(s.player.completedStorylineIds ?? []), def.id],
@@ -8752,7 +8810,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       } : s));
       get().appendLog(
         'reward',
-        `✦ Storyline complete — ${def.title}. +${def.rewardTc} TC, +${def.rewardRep} rep with ${def.factionId.replace(/_/g, ' ')}.`,
+        `✦ Storyline complete — ${def.title}. +${def.rewardTc} TC, +${def.rewardRep} rep with ${def.factionId.replace(/_/g, ' ')}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
       );
       if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
       void get().persist();

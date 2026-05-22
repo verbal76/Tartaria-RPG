@@ -8099,6 +8099,59 @@
       "baseDurability": 50,
       "tags": ["armor", "chest", "plate", "aether", "boss", "legendary"],
       "description": "Behemoth Plate. Hammered from the fused ribs of an Aetheric Behemoth. Heavy as a door, and shrugs off a falling beam the same way."
+    },
+    {
+      "name": "Sludge-Forged Vest",
+      "slot": "chest",
+      "acBonus": 2,
+      "resistances": ["aetheric", "poison"],
+      "rarity": "Uncommon",
+      "tcBuy": 48,
+      "tcSell": 19,
+      "baseDurability": 28,
+      "tags": ["armor", "chest", "cloth", "aether", "crafted"],
+      "description": "Sludge-Forged Vest. Patched cloth waxed with Aetheric sludge, stiffened to a crust. Brittle to a clean cut but it eats the splash from Aether-tainted weather."
+    },
+    {
+      "name": "Aether-Wing Cloak",
+      "slot": "chest",
+      "acBonus": 1,
+      "resistances": ["aetheric"],
+      "statBonus": { "stat": "dexterity", "amount": 1 },
+      "statBonuses": [{ "stat": "dexterity", "amount": 1 }],
+      "rarity": "Rare",
+      "tcBuy": 110,
+      "tcSell": 44,
+      "baseDurability": 32,
+      "tags": ["armor", "chest", "cloak", "aether", "crafted"],
+      "description": "Aether-Wing Cloak. Spider silk stretched over the membrane of an Aether-Wing moth. Catches gusts that aren't quite there; the wearer moves a half-beat lighter."
+    },
+    {
+      "name": "Mudstone Bulwark",
+      "slot": "chest",
+      "acBonus": 3,
+      "resistances": ["bludgeoning", "piercing"],
+      "rarity": "Rare",
+      "dexReq": 0,
+      "tcBuy": 140,
+      "tcSell": 56,
+      "baseDurability": 50,
+      "tags": ["armor", "chest", "heavy", "stone", "mud", "crafted"],
+      "description": "Mudstone Bulwark. Plates of hardened mudstone bolted to a leather backing. Heavy enough to slow a swing, dense enough to turn a Reclaimer pickaxe."
+    },
+    {
+      "name": "Hollow Crown Circlet",
+      "slot": "head",
+      "acBonus": 1,
+      "resistances": ["aetheric"],
+      "statBonus": { "stat": "intelligence", "amount": 2 },
+      "statBonuses": [{ "stat": "intelligence", "amount": 2 }],
+      "rarity": "Rare",
+      "tcBuy": 180,
+      "tcSell": 72,
+      "baseDurability": 35,
+      "tags": ["armor", "head", "circlet", "throne", "crafted"],
+      "description": "Hollow Crown Circlet. A thin band of mudstone set with a sliver of Throne Shard. The wearer feels watched, but reads the world with uncomfortable clarity."
     }
   ]
 }

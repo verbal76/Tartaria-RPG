@@ -74,6 +74,10 @@
       "effect": { "kind": "consumable", "reduceCorruption": 20 } },
 
     { "name": "Purification Vial", "kind": "consumable", "rarity": "Uncommon", "tags": ["healing", "purification", "monarch"], "description": "Mud Monarch issue. A grey-clear vial that smells of clean stone. Carried by Purifiers; drops corruption by 15.",
-      "effect": { "kind": "consumable", "reduceCorruption": 15 } }
+      "effect": { "kind": "consumable", "reduceCorruption": 15 } },
+    { "name": "Resonant Song Phial", "kind": "consumable", "rarity": "Uncommon", "tags": ["consumable", "aether", "crafted", "healing"], "description": "Resonant Song Phial. A glass phial holding distilled Aetheric Song. Cracking the seal releases a calming chord that knits flesh and quiets the nerves.",
+      "effect": { "kind": "consumable", "healHP": 6, "restoreStamina": 2 } },
+    { "name": "Iron-Worm Engine", "kind": "relic", "rarity": "Rare", "tags": ["relic", "construct", "crafted"], "description": "Iron-Worm Engine. A palm-sized scavenger drone forged around an iron core. Hums and ticks in the pack, marking nearby relics with a quiet click." },
+    { "name": "Voidspawn Bolt", "kind": "relic", "rarity": "Rare", "tags": ["relic", "thrown", "aether", "crafted"], "description": "Voidspawn Bolt. A glass-cased Voidspawn egg primed with an energy fragment. Heavy in the hand. Reclaimer field manuals warn against carrying more than two." }
   ]
 }

@@ -222,9 +222,10 @@ export function buildCombatSteps(
   // Use equipped damage dice if available; parse "2d6" or "1d10+1d6".
   // OTA 038 — barehanded path now reads race.barehandDamage instead of
   // the old hardcoded 1d6. Giants land 1d6+2, Mud Dwellers 1d6-3,
-  // Sentinels 1d10 (the lorebook even/odd hit-gate is captured in the
-  // BarehandSpec but not yet branched on — full Sentinel gate arrives
-  // alongside the per-day power tracker in a follow-up OTA).
+  // Sentinels 1d10. The Sentinel even/odd hit-gate is enforced at the
+  // attack-resolution site in gameStore.ts (OTA 041) after the damage
+  // die is rolled — see the `if (barehand)` guard around the
+  // BarehandSpec.hitGate check there.
   const barehandSpec = !equipped ? barehandDamageFor(player.raceId) : null;
   const dmg = equipped
     ? parseDamageDice(equipped.damageDice)

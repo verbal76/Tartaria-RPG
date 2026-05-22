@@ -1,0 +1,119 @@
+// OTA 041 — Regression for two blockers caught in pre-ship audit:
+// completeContractFromUI dropped rewardItem grants for mysteries and
+// storylines (the vendor turn-in paths handled it; only the UI path
+// was broken). 6 mysteries + 4 storylines lost their reward items
+// before this fix.
+
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+);
+jest.mock('onnxruntime-react-native', () => ({
+  InferenceSession: { create: jest.fn(async () => ({ run: jest.fn(async () => ({})) })) },
+  Tensor: class { constructor(_t: string, _d: any, _s: any[]) {} },
+}));
+jest.mock('llama.rn', () => ({
+  initLlama: jest.fn(async () => ({ completion: jest.fn(async () => ({ text: '' })), release: jest.fn() })),
+  releaseAllLlama: jest.fn(),
+}));
+jest.mock('react-native-executorch', () => ({}));
+jest.mock('expo-file-system', () => ({
+  documentDirectory: '/tmp/', cacheDirectory: '/tmp/',
+  getInfoAsync: jest.fn(async () => ({ exists: false })),
+  makeDirectoryAsync: jest.fn(async () => {}),
+  readAsStringAsync: jest.fn(async () => ''),
+  writeAsStringAsync: jest.fn(async () => {}),
+  deleteAsync: jest.fn(async () => {}),
+  downloadAsync: jest.fn(async () => ({ uri: '' })),
+  EncodingType: { UTF8: 'utf8', Base64: 'base64' },
+}));
+jest.mock('expo-speech', () => ({ speak: jest.fn(), stop: jest.fn(), isSpeakingAsync: jest.fn(async () => false) }));
+jest.mock('expo-av', () => ({
+  Audio: {
+    setAudioModeAsync: jest.fn(),
+    Sound: class {
+      static createAsync: (...args: unknown[]) => Promise<{ sound: { playAsync: () => Promise<void>; unloadAsync: () => Promise<void> } }> = jest.fn(async () => ({ sound: { playAsync: jest.fn(async () => {}), unloadAsync: jest.fn(async () => {}) } }));
+    },
+  },
+}));
+jest.mock('expo-application', () => ({ nativeApplicationVersion: '0', applicationId: 'test' }));
+jest.mock('expo-asset', () => ({ Asset: { fromModule: () => ({ downloadAsync: jest.fn(async () => {}), localUri: '' }) } }));
+jest.mock('expo-clipboard', () => ({ setStringAsync: jest.fn(async () => {}) }));
+jest.mock('expo-constants', () => ({ default: { expoConfig: {} } }));
+jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
+jest.mock('expo-speech-recognition', () => ({}));
+jest.mock('expo-updates', () => ({}));
+
+import { useGameStore } from '../app/state/gameStore';
+import { getRaces, getFactions } from '../app/engine/character';
+import { findMysteryById } from '../app/engine/mysteries';
+import { findStorylineById } from '../app/engine/factionStorylines';
+
+describe('completeContractFromUI grants rewardItem (OTA 041 fix)', () => {
+  beforeAll(() => {
+    console.log = () => {};
+    console.warn = () => {};
+    console.error = () => {};
+  });
+
+  it('mystery: rewardItem lands in inventory when completed via UI', async () => {
+    const mystery = findMysteryById('mystery_red_tower')!;
+    expect(mystery.rewardItem).toBeTruthy();
+
+    const store = useGameStore;
+    await store.getState().hydrate();
+    const race = getRaces()[0]!;
+    const fac = getFactions()[0]!;
+    await store.getState().startNewGame({ name: 'Sleuth', raceId: race.id, factionId: fac.id });
+    store.getState().skipTutorial?.();
+
+    // Inject a fully-progressed mystery on the player's slate.
+    const p0 = store.getState().player!;
+    store.setState({
+      player: {
+        ...p0,
+        activeMysteries: [{ id: mystery.id, stage: mystery.stages.length, postedByFaction: mystery.factionId ?? null, acceptedAt: Date.now() }],
+      },
+    });
+
+    const inventoryNamesBefore = store.getState().player!.inventory.map((i) => i.name);
+    const beforeCount = inventoryNamesBefore.filter((n) => n === mystery.rewardItem).length;
+
+    store.getState().completeContractFromUI('mystery', mystery.id);
+
+    const after = store.getState().player!;
+    const afterCount = after.inventory.filter((i) => i.name === mystery.rewardItem).length;
+    expect(afterCount).toBe(beforeCount + 1);
+    expect(after.activeMysteries?.some((m) => m.id === mystery.id)).toBe(false);
+    expect((after.completedMysteryIds ?? []).includes(mystery.id)).toBe(true);
+  });
+
+  it('storyline: rewardItem lands in inventory when completed via UI', async () => {
+    const story = findStorylineById('story_order_red_tower')!;
+    expect(story.rewardItem).toBeTruthy();
+
+    const store = useGameStore;
+    await store.getState().hydrate();
+    const race = getRaces()[0]!;
+    const fac = getFactions()[0]!;
+    await store.getState().startNewGame({ name: 'Chronicler', raceId: race.id, factionId: fac.id });
+    store.getState().skipTutorial?.();
+
+    const p0 = store.getState().player!;
+    store.setState({
+      player: {
+        ...p0,
+        activeStorylines: [{ id: story.id, stage: story.stages.length, postedByFaction: story.factionId ?? null, acceptedAt: Date.now() }],
+      },
+    });
+
+    const beforeCount = store.getState().player!.inventory.filter((i) => i.name === story.rewardItem).length;
+
+    store.getState().completeContractFromUI('storyline', story.id);
+
+    const after = store.getState().player!;
+    const afterCount = after.inventory.filter((i) => i.name === story.rewardItem).length;
+    expect(afterCount).toBe(beforeCount + 1);
+    expect(after.activeStorylines?.some((s) => s.id === story.id)).toBe(false);
+    expect((after.completedStorylineIds ?? []).includes(story.id)).toBe(true);
+  });
+});
