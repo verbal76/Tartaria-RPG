@@ -2,7 +2,6 @@ import {
   barehandDamageFor,
   effectiveAC,
   racialStatBonusesFor,
-  applyRacialStatBonuses,
   detectACContexts,
 } from '../app/engine/raceMechanics';
 import type { PlayerCharacter, Stats } from '../app/engine/types';
@@ -60,7 +59,7 @@ describe('OTA 038 — race mechanics', () => {
     });
   });
 
-  describe('racialStatBonusesFor + applyRacialStatBonuses', () => {
+  describe('racialStatBonusesFor', () => {
     it('Tartarian Giant gets +2 STR', () => {
       expect(racialStatBonusesFor('tartarian_giant')).toEqual({ strength: 2 });
     });
@@ -72,13 +71,6 @@ describe('OTA 038 — race mechanics', () => {
     });
     it('Unknowing Mass has no always-on bonuses', () => {
       expect(racialStatBonusesFor('unknowing_mass')).toEqual({});
-    });
-    it('applyRacialStatBonuses folds bonuses onto a base block', () => {
-      const base: Stats = { strength: 3, dexterity: 4, intelligence: 2, wisdom: 5, charisma: 3 };
-      const out = applyRacialStatBonuses(base, 'tartarian_giant');
-      expect(out.strength).toBe(5);
-      expect(out.dexterity).toBe(4); // untouched
-      expect(out.charisma).toBe(3);
     });
   });
 

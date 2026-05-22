@@ -197,19 +197,6 @@ export function racialStatBonusesFor(raceId: string | undefined): RacialStatBonu
   return bonuses ?? {};
 }
 
-// Apply racial bonuses on top of a base stat block. Used inside
-// effectiveStats; exported for direct testing.
-export function applyRacialStatBonuses(stats: Stats, raceId: string | undefined): Stats {
-  const bonuses = racialStatBonusesFor(raceId);
-  return {
-    strength: stats.strength + (bonuses.strength ?? 0),
-    dexterity: stats.dexterity + (bonuses.dexterity ?? 0),
-    intelligence: stats.intelligence + (bonuses.intelligence ?? 0),
-    wisdom: stats.wisdom + (bonuses.wisdom ?? 0),
-    charisma: stats.charisma + (bonuses.charisma ?? 0),
-  };
-}
-
 // ─── Aethercraft DC modifier ────────────────────────────────────────
 // OTA 039 — True Tartarians (Mud Dwellers) trained the discipline;
 // they cast at base DC. Aetherborn share Aetheric blood but lack the
