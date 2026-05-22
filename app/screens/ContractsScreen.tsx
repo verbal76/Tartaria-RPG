@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { findHuntById, HUNTS } from '../engine/hunts';
 import { findMysteryById, MYSTERIES } from '../engine/mysteries';
@@ -38,7 +38,18 @@ type Tab = 'contracts' | 'collectables';
 export function ContractsScreen() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
+  const completeContractFromUI = useGameStore((s) => s.completeContractFromUI);
+  const discardLead = useGameStore((s) => s.discardLead);
   const [tab, setTab] = useState<Tab>('contracts');
+  // OTA 020 — tap-to-expand. Each card key (kind:id) maps to true
+  // when expanded. Tap the card head to toggle; expanded view shows
+  // the full step list and the COMPLETE / DISCARD button when
+  // applicable. Playtester: "if you tap on it, it should give you
+  // instructions on what to do with it for the step you are trying
+  // to complete. and you should be able to tap to complete if you
+  // have met all the tasks."
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const toggle = (key: string) => setExpanded((s) => ({ ...s, [key]: !s[key] }));
 
   if (!player) {
     return (
@@ -181,72 +192,176 @@ export function ContractsScreen() {
         {hunts.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>HUNTS</Text>
-              {hunts.map(({ run, def }) =>
-                def ? (
-                  <View key={`h_${run.id}`} style={styles.card}>
+              {hunts.map(({ run, def }) => {
+                if (!def) return null;
+                const key = `h_${run.id}`;
+                const open = !!expanded[key];
+                const ready = run.stage >= def.stages.length;
+                return (
+                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{def.title}</Text>
                       <Text style={styles.stagePill}>
-                        Stage {run.stage + 1}/{def.stages.length}
+                        {ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
-                    {def.stages[run.stage] && (
-                      <Text style={styles.cardBody}>
-                        {def.stages[run.stage]!.narration}
-                      </Text>
+                    {!open && def.stages[run.stage] && !ready && (
+                      <Text style={styles.cardBody}>{def.stages[run.stage]!.narration}</Text>
                     )}
-                  </View>
-                ) : null,
-              )}
+                    {open && (
+                      <View style={styles.expanded}>
+                        <Text style={styles.expandedLabel}>Target</Text>
+                        <Text style={styles.expandedBody}>{def.targetEnemyName}</Text>
+                        <Text style={styles.expandedLabel}>Stages</Text>
+                        {def.stages.map((s, i) => (
+                          <Text
+                            key={i}
+                            style={[
+                              styles.expandedStage,
+                              i < run.stage && styles.expandedStageDone,
+                              i === run.stage && !ready && styles.expandedStageCurrent,
+                            ]}
+                          >
+                            {i < run.stage ? '✓ ' : i === run.stage && !ready ? '→ ' : '  '}
+                            {s.narration}
+                          </Text>
+                        ))}
+                        <Text style={styles.expandedLabel}>Reward</Text>
+                        <Text style={styles.expandedBody}>
+                          {def.rewardTc} TC{def.rewardRep ? ` · +${def.rewardRep} rep` : ''}{def.rewardItem ? ` · ${def.rewardItem}` : ''} · Trophy: {def.trophyName}
+                        </Text>
+                        <Text style={styles.expandedLabel}>How to finish</Text>
+                        <Text style={styles.expandedBody}>
+                          {ready
+                            ? 'Boss slain. Tap COMPLETE to claim the bounty.'
+                            : `Defeat the ${def.targetEnemyName} (hunted). The hunt completes automatically; come back here to claim the reward.`}
+                        </Text>
+                      </View>
+                    )}
+                    {open && ready && (
+                      <Pressable
+                        style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
+                        onPress={() => completeContractFromUI('hunt', def.id)}
+                      >
+                        <Text style={styles.completeBtnText}>COMPLETE — CLAIM REWARD</Text>
+                      </Pressable>
+                    )}
+                  </Pressable>
+                );
+              })}
             </View>
           )}
 
           {mysteries.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>MYSTERIES</Text>
-              {mysteries.map(({ run, def }) =>
-                def ? (
-                  <View key={`m_${run.id}`} style={styles.card}>
+              {mysteries.map(({ run, def }) => {
+                if (!def) return null;
+                const key = `m_${run.id}`;
+                const open = !!expanded[key];
+                const ready = run.stage >= def.stages.length;
+                return (
+                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{def.title}</Text>
                       <Text style={styles.stagePill}>
-                        Stage {run.stage + 1}/{def.stages.length}
+                        {ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
-                    {def.stages[run.stage] && (
-                      <Text style={styles.cardBody}>
-                        {def.stages[run.stage]!.narration}
-                      </Text>
+                    {!open && def.stages[run.stage] && !ready && (
+                      <Text style={styles.cardBody}>{def.stages[run.stage]!.narration}</Text>
                     )}
-                  </View>
-                ) : null,
-              )}
+                    {open && (
+                      <View style={styles.expanded}>
+                        <Text style={styles.expandedLabel}>Stages</Text>
+                        {def.stages.map((s, i) => (
+                          <Text
+                            key={i}
+                            style={[
+                              styles.expandedStage,
+                              i < run.stage && styles.expandedStageDone,
+                              i === run.stage && !ready && styles.expandedStageCurrent,
+                            ]}
+                          >
+                            {i < run.stage ? '✓ ' : i === run.stage && !ready ? '→ ' : '  '}
+                            {s.narration}
+                          </Text>
+                        ))}
+                        <Text style={styles.expandedLabel}>Reward</Text>
+                        <Text style={styles.expandedBody}>
+                          {def.rewardTc} TC{def.rewardRep ? ` · +${def.rewardRep} rep` : ''}
+                        </Text>
+                      </View>
+                    )}
+                    {open && ready && (
+                      <Pressable
+                        style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
+                        onPress={() => completeContractFromUI('mystery', def.id)}
+                      >
+                        <Text style={styles.completeBtnText}>COMPLETE — CLAIM REWARD</Text>
+                      </Pressable>
+                    )}
+                  </Pressable>
+                );
+              })}
             </View>
           )}
 
           {storylines.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>STORYLINES</Text>
-              {storylines.map(({ run, def }) =>
-                def ? (
-                  <View key={`s_${run.id}`} style={styles.card}>
+              {storylines.map(({ run, def }) => {
+                if (!def) return null;
+                const key = `s_${run.id}`;
+                const open = !!expanded[key];
+                const ready = run.stage >= def.stages.length;
+                return (
+                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{def.title}</Text>
                       <Text style={styles.stagePill}>
-                        Stage {run.stage + 1}/{def.stages.length}
+                        {ready ? 'READY' : `Stage ${run.stage + 1}/${def.stages.length}`}
                       </Text>
                     </View>
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
-                    {def.stages[run.stage] && (
-                      <Text style={styles.cardBody}>
-                        {def.stages[run.stage]!.narration}
-                      </Text>
+                    {!open && def.stages[run.stage] && !ready && (
+                      <Text style={styles.cardBody}>{def.stages[run.stage]!.narration}</Text>
                     )}
-                  </View>
-                ) : null,
-              )}
+                    {open && (
+                      <View style={styles.expanded}>
+                        <Text style={styles.expandedLabel}>Chapters</Text>
+                        {def.stages.map((s, i) => (
+                          <Text
+                            key={i}
+                            style={[
+                              styles.expandedStage,
+                              i < run.stage && styles.expandedStageDone,
+                              i === run.stage && !ready && styles.expandedStageCurrent,
+                            ]}
+                          >
+                            {i < run.stage ? '✓ ' : i === run.stage && !ready ? '→ ' : '  '}
+                            {s.narration}
+                          </Text>
+                        ))}
+                        <Text style={styles.expandedLabel}>Reward</Text>
+                        <Text style={styles.expandedBody}>
+                          {def.rewardTc} TC · +{def.rewardRep} rep with {factionLabel(def.factionId)}
+                        </Text>
+                      </View>
+                    )}
+                    {open && ready && (
+                      <Pressable
+                        style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
+                        onPress={() => completeContractFromUI('storyline', def.id)}
+                      >
+                        <Text style={styles.completeBtnText}>COMPLETE — CLAIM REWARD</Text>
+                      </Pressable>
+                    )}
+                  </Pressable>
+                );
+              })}
             </View>
           )}
 
@@ -255,31 +370,27 @@ export function ContractsScreen() {
               <Text style={styles.sectionTitle}>FACTION QUESTS</Text>
               {factionQuests.map(({ rec, def }, i) => {
                 if (!def) return null;
+                const key = `q_${def.id}_${i}`;
+                const open = !!expanded[key];
                 const stageDef = def.stages?.[rec.stage];
                 const readyToTurnIn =
-                  def.stages && def.stages.length > 0 && rec.stage >= def.stages.length;
+                  (def.stages && def.stages.length > 0 && rec.stage >= def.stages.length) ||
+                  !def.stages || def.stages.length === 0;
                 return (
-                  <View key={`q_${def.id}_${i}`} style={styles.card}>
+                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{def.title}</Text>
                       <Text style={styles.stagePill}>
                         {def.stages && def.stages.length > 0
                           ? readyToTurnIn
-                            ? 'ready to turn in'
+                            ? 'READY'
                             : `stage ${rec.stage + 1} / ${def.stages.length}`
-                          : 'open'}
+                          : 'OPEN'}
                       </Text>
                     </View>
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
                     <Text style={styles.cardBody}>{def.objective}</Text>
-                    {/* Current-stage narration — playtest feedback:
-                        "I should be able to tap on the listed quest and
-                        see instructions on my next step". Surface the
-                        stage line directly so the player sees what to
-                        do next without needing to remember the vendor
-                        intro. Hunt / Mystery / Storyline cards already
-                        do this — this brings faction quests to parity. */}
-                    {!readyToTurnIn && stageDef && (
+                    {!readyToTurnIn && stageDef && !open && (
                       <>
                         <Text style={styles.cardStageLabel}>Next step</Text>
                         <Text style={styles.cardStageBody}>{stageDef.narration}</Text>
@@ -292,12 +403,51 @@ export function ContractsScreen() {
                         )}
                       </>
                     )}
-                    {readyToTurnIn && (
-                      <Text style={styles.cardStageHint}>
-                        → Return to any {factionLabel(def.factionId)} agent and turn in.
-                      </Text>
+                    {open && (
+                      <View style={styles.expanded}>
+                        {def.stages && def.stages.length > 0 && (
+                          <>
+                            <Text style={styles.expandedLabel}>Stages</Text>
+                            {def.stages.map((s, ix) => (
+                              <Text
+                                key={ix}
+                                style={[
+                                  styles.expandedStage,
+                                  ix < rec.stage && styles.expandedStageDone,
+                                  ix === rec.stage && !readyToTurnIn && styles.expandedStageCurrent,
+                                ]}
+                              >
+                                {ix < rec.stage ? '✓ ' : ix === rec.stage && !readyToTurnIn ? '→ ' : '  '}
+                                {s.narration}
+                              </Text>
+                            ))}
+                          </>
+                        )}
+                        <Text style={styles.expandedLabel}>Reward</Text>
+                        <Text style={styles.expandedBody}>
+                          {def.reward.tc} TC · +{def.reward.rep} rep with {factionLabel(def.factionId)}
+                        </Text>
+                        <Text style={styles.expandedLabel}>How to finish</Text>
+                        <Text style={styles.expandedBody}>
+                          {readyToTurnIn
+                            ? 'All steps cleared. Tap COMPLETE to claim the reward.'
+                            : stageDef?.advanceOn === 'kill'
+                              ? 'Defeat an enemy to advance the next stage.'
+                              : stageDef?.advanceOn === 'travel'
+                                ? 'Travel to a new location to advance the next stage.'
+                                : 'Continue play — the next stage triggers on the matching event.'}
+                        </Text>
+                      </View>
                     )}
-                  </View>
+                    {open && readyToTurnIn && (
+                      <Pressable
+                        style={({ pressed }) => [styles.completeBtn, pressed && styles.completeBtnPressed]}
+                        onPress={() => completeContractFromUI('faction_quest', def.id)}
+                      >
+                        <Text style={styles.completeBtnText}>COMPLETE — CLAIM REWARD</Text>
+                      </Pressable>
+                    )}
+                  </Pressable>
                 );
               })}
             </View>
@@ -334,26 +484,47 @@ export function ContractsScreen() {
               </Text>
               {leads.map((q) => {
                 const title = `${cap(q.objective.verb)} ${q.objective.target}`;
-                // OTA 011 — `q.reward.amount > 0` instead of truthy
-                // check; was rendering "0 standing" when type was
-                // 'standing'/'knowledge' with amount=0 because 0 is
-                // falsy but the ternary fell into the with-amount
-                // branch via truthy coercion on a falsy 0.
                 const reward = (q.reward.amount != null && q.reward.amount > 0)
                   ? `${q.reward.amount} ${q.reward.type === 'currency' ? 'TC' : q.reward.type}`
                   : q.reward.label;
+                const key = `lead_${q.id}`;
+                const open = !!expanded[key];
                 return (
-                  <View key={`lead_${q.id}`} style={styles.card}>
+                  <Pressable key={key} onPress={() => toggle(key)} style={styles.card}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{title}</Text>
                       <Text style={styles.stagePill}>{q.state}</Text>
                     </View>
                     <Text style={styles.cardFaction}>Lead · {q.location.name}</Text>
-                    <Text style={styles.cardStageLabel}>Complication</Text>
-                    <Text style={styles.cardStageBody}>{q.complication.text}</Text>
-                    <Text style={styles.cardStageLabel}>Reward</Text>
-                    <Text style={styles.cardStageBody}>{reward}</Text>
-                  </View>
+                    {!open && (
+                      <>
+                        <Text style={styles.cardStageLabel}>Complication</Text>
+                        <Text style={styles.cardStageBody}>{q.complication.text}</Text>
+                      </>
+                    )}
+                    {open && (
+                      <View style={styles.expanded}>
+                        <Text style={styles.expandedLabel}>Objective</Text>
+                        <Text style={styles.expandedBody}>{cap(q.objective.verb)} {q.objective.target} at {q.location.name}.</Text>
+                        <Text style={styles.expandedLabel}>Complication</Text>
+                        <Text style={styles.expandedBody}>{q.complication.text}</Text>
+                        <Text style={styles.expandedLabel}>Reward</Text>
+                        <Text style={styles.expandedBody}>{reward}</Text>
+                        <Text style={styles.expandedLabel}>How to finish</Text>
+                        <Text style={styles.expandedBody}>
+                          Leads complete automatically when their target is killed (kill / slay / defeat / hunt / retrieve verbs). No turn-in needed — the reward lands the moment the deed is done. Use DISCARD to drop a lead you don't want to chase.
+                        </Text>
+                      </View>
+                    )}
+                    {open && (
+                      <Pressable
+                        style={({ pressed }) => [styles.discardBtn, pressed && styles.completeBtnPressed]}
+                        onPress={() => discardLead(q.id)}
+                      >
+                        <Text style={styles.discardBtnText}>DISCARD LEAD</Text>
+                      </Pressable>
+                    )}
+                  </Pressable>
                 );
               })}
             </View>
@@ -523,6 +694,32 @@ const styles = StyleSheet.create({
   cardStageBody: { color: '#e6d8b3', fontSize: 12, lineHeight: 17, marginBottom: 4 },
   whispersBlurb: { color: '#7a705c', fontSize: 11, fontStyle: 'italic', lineHeight: 15, marginBottom: 8 },
   cardStageHint: { color: '#9ec96a', fontSize: 11, fontStyle: 'italic', marginTop: 2 },
+  // OTA 020 — expanded contract card styles.
+  expanded: { marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#3a342c' },
+  expandedLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 2, marginTop: 8, marginBottom: 2 },
+  expandedBody: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
+  expandedStage: { color: '#7a705c', fontSize: 11, lineHeight: 16, paddingLeft: 4, marginBottom: 2 },
+  expandedStageDone: { color: '#9ec96a', textDecorationLine: 'line-through' },
+  expandedStageCurrent: { color: '#c9a86a', fontWeight: '700' },
+  completeBtn: {
+    marginTop: 10,
+    backgroundColor: '#9ec96a',
+    borderRadius: 3,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  completeBtnPressed: { opacity: 0.7 },
+  completeBtnText: { color: '#13110f', fontWeight: '800', letterSpacing: 2, fontSize: 12 },
+  discardBtn: {
+    marginTop: 10,
+    backgroundColor: 'transparent',
+    borderColor: '#7a705c',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  discardBtnText: { color: '#7a705c', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
   milestoneRow: { flexDirection: 'row', backgroundColor: '#13110f', borderColor: '#3a342c', borderWidth: 1, borderRadius: 4, padding: 10 },
   tabRow: {
     flexDirection: 'row',

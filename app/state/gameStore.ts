@@ -855,6 +855,21 @@ interface GameStore {
   acceptStoryline: (titleOrId: string) => void;
   advanceStoryline: (storylineId: string) => void;
   turnInStoryline: (titleOrId: string) => void;
+  /** OTA 020 — Contracts-screen one-tap completion. Skips the
+   *  vendor-proximity gate the normal turn-in handlers enforce
+   *  (the player tapped the card on purpose, they don't need to
+   *  walk to a vendor first). Still validates stage / hunt-boss
+   *  criteria and pays out the same TC / rep / trophy / item the
+   *  vendor turn-in would. No-op (with an Arbiter explanation) if
+   *  the contract isn't actually ready. */
+  completeContractFromUI: (
+    kind: 'hunt' | 'mystery' | 'storyline' | 'faction_quest',
+    id: string,
+  ) => void;
+  /** OTA 020 — drop a procedurally-generated lead from the active
+   *  list. Leads auto-complete on kill (OTA 011) but the player
+   *  may want to abandon one that isn't worth chasing. */
+  discardLead: (id: string) => void;
   digHere: () => void;
   stepDirection: (dir: Direction) => void;
   setActiveEnemyIdx: (idx: number) => void;
@@ -8266,6 +8281,177 @@ export const useGameStore = create<GameStore>((set, get) => ({
       `✦ Storyline complete — ${candidate.title}. +${candidate.rewardTc} TC, +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
     );
     if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
+    void get().persist();
+  },
+
+  // OTA 020 — Contracts-screen tap-to-complete. Skips the vendor
+  // proximity requirement the normal turn-in handlers enforce.
+  // Player tapped on purpose; no need to walk to a vendor first.
+  // Still validates stage / boss-kill criteria, still grants the
+  // same reward.
+  completeContractFromUI(kind, id) {
+    const player = get().player;
+    if (!player) return;
+    if (kind === 'hunt') {
+      const def = findHuntById(id);
+      const rec = (player.activeHunts ?? []).find((h) => h.id === id);
+      if (!def || !rec) {
+        get().appendLog('arbiter', `The Arbiter shakes their head. "That hunt isn't on your slate."`);
+        return;
+      }
+      if (rec.stage < def.stages.length) {
+        get().appendLog('arbiter', `The Arbiter eyes the contract. "Not done. The trophy is the proof — you don't have it yet."`);
+        return;
+      }
+      const trophy: InventoryItem = stampDurability({
+        id: `trophy_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        name: def.trophyName,
+        kind: 'relic',
+        rarity: 'Rare',
+        quantity: 1,
+        tags: ['trophy', 'hunt'],
+        description: `Trophy from the hunt for the ${def.targetEnemyName}.`,
+      });
+      const grantResult = grantItem(player.inventory, trophy);
+      const newInventory = def.rewardItem
+        ? grantItem(grantResult.inventory, stampDurability({
+            id: `huntreward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            name: def.rewardItem,
+            kind: lookupCraftedItem(def.rewardItem).kind === 'weapon' ? 'weapon' : 'misc',
+            rarity: lookupCraftedItem(def.rewardItem).rarity,
+            quantity: 1,
+            tags: lookupCraftedItem(def.rewardItem).tags,
+          })).inventory
+        : grantResult.inventory;
+      const repResult = def.factionId && def.rewardRep
+        ? applyRepChange(player.factionStanding, def.factionId, def.rewardRep)
+        : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
+      set((s) => (s.player ? {
+        player: {
+          ...s.player,
+          tc: s.player.tc + def.rewardTc,
+          inventory: newInventory,
+          factionStanding: repResult.standing,
+          activeHunts: (s.player.activeHunts ?? []).filter((h) => h.id !== def.id),
+          completedHuntIds: [...(s.player.completedHuntIds ?? []), def.id],
+        },
+      } : s));
+      get().appendLog(
+        'reward',
+        `✦ Hunt complete — ${def.title}. From your pack: the ${def.trophyName}. +${def.rewardTc} TC${def.rewardRep ? `, +${def.rewardRep} rep` : ''}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
+      );
+      if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
+      void get().persist();
+      return;
+    }
+    if (kind === 'mystery') {
+      const def = findMysteryById(id);
+      const rec = (player.activeMysteries ?? []).find((m) => m.id === id);
+      if (!def || !rec) {
+        get().appendLog('arbiter', `The Arbiter shakes their head. "That mystery isn't on your slate."`);
+        return;
+      }
+      if (rec.stage < def.stages.length) {
+        get().appendLog('arbiter', `The Arbiter studies you. "Not yet. The answer isn't gathered."`);
+        return;
+      }
+      const repResult = def.factionId && def.rewardRep
+        ? applyRepChange(player.factionStanding, def.factionId, def.rewardRep)
+        : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
+      set((s) => (s.player ? {
+        player: {
+          ...s.player,
+          tc: s.player.tc + def.rewardTc,
+          factionStanding: repResult.standing,
+          activeMysteries: (s.player.activeMysteries ?? []).filter((m) => m.id !== def.id),
+          completedMysteryIds: [...(s.player.completedMysteryIds ?? []), def.id],
+        },
+      } : s));
+      get().appendLog(
+        'reward',
+        `✦ Mystery resolved — ${def.title}. +${def.rewardTc} TC${def.rewardRep ? `, +${def.rewardRep} rep` : ''}.`,
+      );
+      if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
+      void get().persist();
+      return;
+    }
+    if (kind === 'storyline') {
+      const def = findStorylineById(id);
+      const rec = (player.activeStorylines ?? []).find((s) => s.id === id);
+      if (!def || !rec) {
+        get().appendLog('arbiter', `The Arbiter shakes their head. "That storyline isn't on your slate."`);
+        return;
+      }
+      if (rec.stage < def.stages.length) {
+        get().appendLog('arbiter', `The Arbiter folds their arms. "Not finished. The chapter isn't closed."`);
+        return;
+      }
+      const repResult = applyRepChange(player.factionStanding, def.factionId, def.rewardRep);
+      set((s) => (s.player ? {
+        player: {
+          ...s.player,
+          tc: s.player.tc + def.rewardTc,
+          factionStanding: repResult.standing,
+          activeStorylines: (s.player.activeStorylines ?? []).filter((q) => q.id !== def.id),
+          completedStorylineIds: [...(s.player.completedStorylineIds ?? []), def.id],
+        },
+      } : s));
+      get().appendLog(
+        'reward',
+        `✦ Storyline complete — ${def.title}. +${def.rewardTc} TC, +${def.rewardRep} rep with ${def.factionId.replace(/_/g, ' ')}.`,
+      );
+      if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
+      void get().persist();
+      return;
+    }
+    if (kind === 'faction_quest') {
+      const def = findFactionQuestById(id);
+      const rec = (player.activeFactionQuests ?? []).find((q) => q.id === id);
+      if (!def) {
+        get().appendLog('arbiter', `The Arbiter shakes their head. "That contract isn't on file."`);
+        return;
+      }
+      // Stage gate matches the vendor turn-in: staged quests require
+      // max stage; legacy single-objective quests pass straight through.
+      if (def.stages && def.stages.length > 0) {
+        const currentStage = rec?.stage ?? 0;
+        if (currentStage < def.stages.length) {
+          get().appendLog('arbiter', `The Arbiter eyes the contract. "Step ${currentStage + 1} of ${def.stages.length}. Finish it first."`);
+          return;
+        }
+      }
+      const repResult = applyRepChange(player.factionStanding, def.factionId, def.reward.rep);
+      set((s) => (s.player ? {
+        player: {
+          ...s.player,
+          tc: s.player.tc + def.reward.tc,
+          factionStanding: repResult.standing,
+          activeFactionQuests: (s.player.activeFactionQuests ?? []).filter((q) => q.id !== def.id),
+          activeFactionQuestIds: (s.player.activeFactionQuestIds ?? []).filter((qid) => qid !== def.id),
+          completedFactionQuestIds: [...(s.player.completedFactionQuestIds ?? []), def.id],
+        },
+      } : s));
+      get().appendLog(
+        'reward',
+        `✦ Quest complete — ${def.title}. +${def.reward.tc} TC, +${def.reward.rep} rep with ${def.factionId.replace(/_/g, ' ')}.`,
+      );
+      if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
+      void get().persist();
+    }
+  },
+
+  discardLead(id) {
+    const player = get().player;
+    if (!player) return;
+    const lead = player.activeQuests.find((q) => q.id === id);
+    if (!lead) return;
+    set((s) => (s.player ? {
+      player: {
+        ...s.player,
+        activeQuests: s.player.activeQuests.filter((q) => q.id !== id),
+      },
+    } : s));
+    get().appendLog('world', `Lead dropped: ${lead.objective.verb} ${lead.objective.target}. The Arbiter doesn't comment.`);
     void get().persist();
   },
 
