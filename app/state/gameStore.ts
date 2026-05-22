@@ -5073,7 +5073,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const rawActionLower = trimmed.toLowerCase();
         const wantsDown = /\b(down|descend)\b/.test(rawActionLower);
         if (wantsDown && currentScene.elevatedOn) {
-          const downFrom = currentScene.elevatedOn.noun;
+          // OTA 033 — tolerate the OTA 031 schema where elevatedOn
+          // was a bare string. Old saves loaded into 032+ would
+          // print "back down the undefined" because .noun on a
+          // string is undefined.
+          const elev = currentScene.elevatedOn as unknown;
+          const downFrom = typeof elev === 'string'
+            ? elev
+            : (elev as { noun?: string }).noun ?? 'the height';
           set((s) => s.currentScene ? { currentScene: { ...s.currentScene, elevatedOn: null } } : s);
           set({ player: advanceTime(spendStamina(player, 1), 0.25) });
           get().appendLog(
@@ -5119,10 +5126,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const climbMarks = (climbRoom?.searchedAmbientNouns ?? []).filter(
           (m) => m.startsWith(`climbed:${tgt.toLowerCase()}:`),
         );
-        // Highest tier index already cleared (0 if none).
+        // Highest tier index already cleared (0 if none). Marker
+        // format is 'climbed:<noun>:t<N>' — the 't' prefix is part
+        // of the third segment so we strip it before parseInt
+        // (OTA 033 — was 'parseInt("t1") → NaN' which left
+        // maxCleared at 0 forever and every tap read as tier 1).
         let maxCleared = 0;
         for (const m of climbMarks) {
-          const t = parseInt(m.split(':')[2] ?? '0', 10);
+          const seg = m.split(':')[2] ?? '';
+          const numStr = seg.startsWith('t') ? seg.slice(1) : seg;
+          const t = parseInt(numStr, 10);
           if (!Number.isNaN(t) && t > maxCleared) maxCleared = t;
         }
         const currentTier = maxCleared + 1;

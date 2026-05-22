@@ -287,11 +287,21 @@ export function ExplorationScreen() {
             onOpenTake={() => setTakeOpen(true)}
             onOpenClimb={() => setClimbOpen(true)}
             onClimbUp={() => {
-              const noun = currentScene?.elevatedOn?.noun;
+              // OTA 033 — tolerate the old OTA 031 string schema for
+              // saves that haven't been re-saved on the new shape.
+              const elev = currentScene?.elevatedOn as unknown;
+              const noun = typeof elev === 'string'
+                ? elev
+                : (elev as { noun?: string } | null | undefined)?.noun;
               if (noun) submit(`climb ${noun}`);
             }}
             onClimbDown={() => submit('climb down')}
-            elevatedOn={currentScene?.elevatedOn ?? null}
+            elevatedOn={(() => {
+              const elev = currentScene?.elevatedOn as unknown;
+              if (!elev) return null;
+              if (typeof elev === 'string') return { noun: elev, tier: 1, totalTiers: 1 };
+              return elev as { noun: string; tier: number; totalTiers: number };
+            })()}
             onOpenFeedback={() => setFeedbackOpen(true)}
             inCombat={inCombat}
             equippedMain={equippedMain}
