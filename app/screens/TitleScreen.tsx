@@ -8,6 +8,7 @@ import {
   FlatList,
   RefreshControl,
   Linking,
+  Share,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import {
@@ -145,15 +146,37 @@ export function TitleScreen() {
   // Per-slot transient "COPIED" flash so the button confirms the action
   // visually for ~1.5s without needing a modal. Keyed by slotId.
   const [copiedSlotId, setCopiedSlotId] = useState<string | null>(null);
+  // OTA 006 — separate latch for the SHARE action so the COPIED
+  // and SHARED flashes don't fight each other on the same row.
+  const [sharedSlotId, setSharedSlotId] = useState<string | null>(null);
   const copyDeadLog = async (slot: SlotSummary) => {
     try {
       const log = await readSlotLog(slot.slotId);
-      await Clipboard.setStringAsync(log || `(no log captured for ${slot.playerName})`);
+      const body = log || `(no log captured for ${slot.playerName})`;
+      await Clipboard.setStringAsync(body);
       setCopiedSlotId(slot.slotId);
       setTimeout(() => setCopiedSlotId((cur) => (cur === slot.slotId ? null : cur)), 1500);
     } catch {
       // Silent — clipboard rarely fails on Android; if it does, the
       // player can still try LogScreen via the active session.
+    }
+  };
+  // OTA 006 — share path mirrors the LogScreen treatment. Routes
+  // through Android's Share intent instead of the clipboard, which
+  // bypasses any silent paste-size cap in the destination app
+  // (some chat clients truncate large pastes). Playtester:
+  // "the log on the dead character tab on the home screen doesn't
+  //  copy the whole log file. use the fix you use in the world
+  //  screen."
+  const shareDeadLog = async (slot: SlotSummary) => {
+    try {
+      const log = await readSlotLog(slot.slotId);
+      const body = log || `(no log captured for ${slot.playerName})`;
+      await Share.share({ message: body, title: `Tartaria-RPG — ${slot.playerName} log` });
+      setSharedSlotId(slot.slotId);
+      setTimeout(() => setSharedSlotId((cur) => (cur === slot.slotId ? null : cur)), 1500);
+    } catch {
+      // User-cancelled or unsupported — no-op.
     }
   };
 
@@ -179,22 +202,36 @@ export function TitleScreen() {
         </Text>
         {item.dead && (
           // Dead characters can't be loaded into a live session, so the
-          // LogScreen path is closed to the player. This row-local button
-          // reads the slot's persisted log straight off disk and drops
-          // the full text on the clipboard so the player can keep the
-          // record of how the run ended.
-          <TouchableOpacity
-            style={styles.copyLogBtn}
-            onPress={(e) => {
-              e.stopPropagation?.();
-              void copyDeadLog(item);
-            }}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.copyLogText}>
-              {copiedSlotId === item.slotId ? '✓ COPIED' : 'COPY LOG'}
-            </Text>
-          </TouchableOpacity>
+          // LogScreen path is closed to the player. Two row-local
+          // buttons: COPY LOG drops the full text on the clipboard;
+          // SHARE routes through Android's Share intent so apps that
+          // truncate large pastes get the full payload anyway.
+          <View style={styles.deadActions}>
+            <TouchableOpacity
+              style={styles.copyLogBtn}
+              onPress={(e) => {
+                e.stopPropagation?.();
+                void copyDeadLog(item);
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.copyLogText}>
+                {copiedSlotId === item.slotId ? '✓ COPIED' : 'COPY LOG'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.shareLogBtn}
+              onPress={(e) => {
+                e.stopPropagation?.();
+                void shareDeadLog(item);
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.shareLogText}>
+                {sharedSlotId === item.slotId ? '✓ SHARED' : 'SHARE'}
+              </Text>
+            </TouchableOpacity>
+          </View>
         )}
       </TouchableOpacity>
     </SwipeableRow>
@@ -458,9 +495,8 @@ const styles = StyleSheet.create({
   },
   slotTime: { color: '#7a705c', fontSize: 11 },
   slotMeta: { color: '#7a705c', fontSize: 12, marginTop: 2 },
+  deadActions: { flexDirection: 'row', gap: 6, marginTop: 8 },
   copyLogBtn: {
-    alignSelf: 'flex-start',
-    marginTop: 8,
     backgroundColor: '#1a1714',
     borderColor: '#5a2a26',
     borderWidth: 1,
@@ -470,6 +506,20 @@ const styles = StyleSheet.create({
   },
   copyLogText: {
     color: '#e07a5f',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 2,
+  },
+  shareLogBtn: {
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  shareLogText: {
+    color: '#c9a86a',
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 2,
