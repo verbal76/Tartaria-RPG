@@ -430,6 +430,12 @@ const STAMINA_COSTS = {
   skillCheck: 1,
 } as const;
 
+// OTA 008 — Arbiter welcome-back debounce. Skip the line when the
+// player navigates away + back faster than this; first cold-load
+// per session always fires (lastWelcomeBackAt is null at boot).
+const WELCOME_BACK_MIN_MS = 60_000;
+let lastWelcomeBackAt: number | null = null;
+
 // OTA 228 — Arbiter low-HP warning latch. Fires the moment HP
 // transitions from ≥5% to <5% of max; clears the latch the moment
 // HP returns to ≥5%. Playtester: "if your health is lower than 5%
@@ -1356,23 +1362,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Drop a small "back to the world" cue so the player can orient
         // without a fresh narration block dominating the feed. Just the
         // location name and a hint that they're resuming.
-        get().appendLog(
-          'world',
-          `You step back into ${restoredScene.location.name}. The world waits for your move.`,
-        );
+        //
+        // OTA 008 — same WELCOME_BACK_MIN_MS debounce as the Arbiter
+        // line below. The world cue duplicates the same way under
+        // rapid screen flips.
+        const nowStep = Date.now();
+        if (!lastWelcomeBackAt || nowStep - lastWelcomeBackAt > WELCOME_BACK_MIN_MS) {
+          get().appendLog(
+            'world',
+            `You step back into ${restoredScene.location.name}. The world waits for your move.`,
+          );
+        }
       }
       // OTA 007 — Welcome-back from the Arbiter on every save load.
       // Playtester: "very simple welcome back from kokoro as soon
       // as you log in. welcome back friend." Lands AFTER the world
       // "you step back into..." line so the Arbiter is responding
       // to the player's return, not pre-announcing the scene.
-      // skipDedup so it always fires on load even if the same line
-      // is in the recent log buffer.
-      get().appendLog(
-        'arbiter',
-        `The Arbiter inclines their head. "Welcome back, friend."`,
-        { skipDedup: true },
-      );
+      //
+      // OTA 008 — debounce. Playtester navigated away + back twice
+      // in 7 seconds and got the welcome line both times, which
+      // reads as the Arbiter cheerfully greeting the player on
+      // every screen flip. Throttle to once per WELCOME_BACK_MIN_MS
+      // (60s). The latch is module-level so it survives across
+      // loadSlotIntoGame calls within the same app session but
+      // resets on JS reload (cold start gets a fresh hello).
+      const now = Date.now();
+      if (!lastWelcomeBackAt || now - lastWelcomeBackAt > WELCOME_BACK_MIN_MS) {
+        get().appendLog(
+          'arbiter',
+          `The Arbiter inclines their head. "Welcome back, friend."`,
+          { skipDedup: true },
+        );
+        lastWelcomeBackAt = now;
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       // Roll the active slot back so we don't leave a half-set state.
