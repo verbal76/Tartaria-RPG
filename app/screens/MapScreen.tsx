@@ -24,7 +24,7 @@
 //   Use rings for distance, named features for direction-of-travel
 //   intuition only.
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -113,13 +113,42 @@ export function MapScreen() {
     translateY.setValue(ty);
   };
 
+  // OTA 056 — fill-height-by-default. The atlas asset is landscape
+  // (1408 × 768) but the available window after header+footer is
+  // portrait on phone screens. resizeMode='contain' alone leaves
+  // half the box empty above/below the image. Instead we compute a
+  // baseline transform.scale that makes the rendered image height
+  // match the box height — image overflows horizontally; user pans
+  // sideways or pinches out to see the rest. Stored in a ref so
+  // resetTransform springs back to this scale rather than 1.0.
+  const baselineScale = useRef(1);
+
+  useEffect(() => {
+    if (!imgBox) return;
+    const imgAspect = ATLAS_W / ATLAS_H;
+    const boxAspect = imgBox.width / imgBox.height;
+    // When box is narrower than image (typical phone portrait), the
+    // image is letterboxed top/bottom at scale=1. Multiply the
+    // scale by (boxAspect-driven factor) so the image fills the
+    // box height.
+    const fill = boxAspect < imgAspect ? imgAspect / boxAspect : 1;
+    baselineScale.current = fill;
+    // Only snap to the baseline on first layout — if the user has
+    // already pinched/panned away, don't yank them back.
+    if (scaleRef.current === 1 && txRef.current === 0 && tyRef.current === 0) {
+      scaleRef.current = fill;
+      scale.setValue(fill);
+    }
+  }, [imgBox, scale]);
+
   const resetTransform = () => {
+    const target = baselineScale.current;
     Animated.parallel([
-      Animated.spring(scale, { toValue: 1, useNativeDriver: true, friction: 7, tension: 80 }),
+      Animated.spring(scale, { toValue: target, useNativeDriver: true, friction: 7, tension: 80 }),
       Animated.spring(translateX, { toValue: 0, useNativeDriver: true, friction: 7, tension: 80 }),
       Animated.spring(translateY, { toValue: 0, useNativeDriver: true, friction: 7, tension: 80 }),
     ]).start(() => {
-      scaleRef.current = 1;
+      scaleRef.current = target;
       txRef.current = 0;
       tyRef.current = 0;
     });
@@ -149,12 +178,34 @@ export function MapScreen() {
       },
       onPanResponderMove: (e, gestureState) => {
         const ts = touchesOf(e);
+        // OTA 056 — handle pinch that started mid-gesture. The
+        // previous build only captured startPinchDist in
+        // onPanResponderGrant (first finger). When the second finger
+        // landed AFTER the first, pinch never initialized and the
+        // player got pan-only behavior. Now we re-capture the
+        // baseline as soon as we see two touches.
+        if (ts.length >= 2 && startPinchDist.current === 0) {
+          startPinchDist.current = distance(ts[0]!, ts[1]!);
+          startScale.current = scaleRef.current;
+          startTx.current = txRef.current;
+          startTy.current = tyRef.current;
+          return;
+        }
+        // Conversely, if we drop from 2 touches back to 1, re-capture
+        // the single-finger pan baseline so the next pan doesn't
+        // teleport based on the old pinch start delta.
+        if (ts.length === 1 && startPinchDist.current > 0) {
+          startPinchDist.current = 0;
+          startScale.current = scaleRef.current;
+          startTx.current = txRef.current;
+          startTy.current = tyRef.current;
+          return;
+        }
         if (ts.length >= 2 && startPinchDist.current > 0) {
-          // Pinch — scale around the gesture midpoint.
+          // Pinch — scale ratio drives zoom, midpoint drives pan.
           const newDist = distance(ts[0]!, ts[1]!);
           const ratio = newDist / startPinchDist.current;
           const nextScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, startScale.current * ratio));
-          // Pan during pinch: midpoint delta from start.
           const tx = startTx.current + gestureState.dx;
           const ty = startTy.current + gestureState.dy;
           const clamped = clampTranslate(tx, ty, nextScale, imgBox);
