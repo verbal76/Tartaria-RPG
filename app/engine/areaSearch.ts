@@ -137,6 +137,21 @@ const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
   // Rare trinkets — "every now and then you'll find a trinket
   // like a locket or ring or something good but rarely."
   { name: 'Aetheric Locket', rarity: 'Common', weight: 1 },
+
+  // OTA 029 — improvised / found weapons. Playtester request: the
+  // wasteland should occasionally cough up a rusted blade-thing the
+  // player can pick up and swing. Low weights so weapons stay a
+  // happy surprise, not a flood. Mix of common improvised
+  // (cudgel/stone spear/pocket knife/bone shiv), faction-flavored
+  // commons (bone knife/rust dagger) and one uncommon aetheric.
+  { name: 'Cudgel', rarity: 'Common', weight: 3 },
+  { name: 'Stone Spear', rarity: 'Common', weight: 3 },
+  { name: 'Pocket Knife', rarity: 'Common', weight: 2 },
+  { name: 'Bone Shiv', rarity: 'Common', weight: 2 },
+  { name: 'Bone Knife', rarity: 'Common', weight: 2 },
+  { name: 'Rust Dagger', rarity: 'Common', weight: 2 },
+  { name: 'Aetherium Spear', rarity: 'Common', weight: 1 },
+  { name: 'Aether-Shard Spear', rarity: 'Uncommon', weight: 1 },
 ];
 
 // Empty-search narration. Per the playtest "Lockbox/Wagon"

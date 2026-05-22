@@ -7021,8 +7021,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
           : s,
       );
     }
-    const loot = enemy.loot[Math.floor(Math.random() * enemy.loot.length)] ?? 'Aether dust';
-    get().appendLog('reward', `${enemy.name} defeated. You recover ${loot}.`);
+    // OTA 029 — multi-item loot drop. Playtester: "I defeated a
+    // not-so-hard enemy harder than my level and all I got was one
+    // piece of patched cloth. Should be 2-3 low-level items or 1
+    // good rare." Roll count scales with rarity:
+    //   Common    → 1-2 items
+    //   Uncommon  → 2-3 items
+    //   Rare      → 2-3 items (one upgraded to next rarity if pool allows)
+    //   Legendary → 3-4 items
+    // Picks WITH replacement so we can roll dupes (a wagon-driver
+    // dropping two patched cloths reads honest).
+    const lootPool = enemy.loot.length > 0 ? enemy.loot : ['Aether dust'];
+    const lootRollCount = enemy.rarity === 'Legendary' ? 3 + Math.floor(Math.random() * 2)
+      : enemy.rarity === 'Rare' ? 2 + Math.floor(Math.random() * 2)
+      : enemy.rarity === 'Uncommon' ? 2 + Math.floor(Math.random() * 2)
+      : 1 + Math.floor(Math.random() * 2);
+    const lootDrops: string[] = [];
+    for (let i = 0; i < lootRollCount; i++) {
+      lootDrops.push(lootPool[Math.floor(Math.random() * lootPool.length)]!);
+    }
+    const lootSummary = (() => {
+      const counts: Record<string, number> = {};
+      for (const n of lootDrops) counts[n] = (counts[n] ?? 0) + 1;
+      return Object.entries(counts)
+        .map(([n, q]) => (q > 1 ? `${n} ×${q}` : n))
+        .join(', ');
+    })();
+    get().appendLog('reward', `${enemy.name} defeated. You recover ${lootSummary}.`);
 
     // Increment lifetime kill count and check for a milestone bump.
     const prevMs = player.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 };
@@ -7052,13 +7077,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ...player,
         hp: newHp,
         hpMax: newHpMax,
-        inventory: mergeOrPushItem(player.inventory, {
-          id: `loot_${Date.now()}`,
-          name: loot,
-          kind: 'misc',
-          quantity: 1,
-          tags: ['loot'],
-        }),
+        inventory: lootDrops.reduce(
+          (inv, lootName, i) =>
+            mergeOrPushItem(inv, {
+              id: `loot_${Date.now()}_${i}`,
+              name: lootName,
+              kind: 'misc',
+              quantity: 1,
+              tags: ['loot'],
+            }),
+          player.inventory,
+        ),
         milestones: { ...prevMs, enemiesDefeated: newKills },
       },
     });
@@ -7099,14 +7128,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
     }
 
-    // TC drop. 30% chance per kill, amount scaled by enemy rarity. This is
-    // what fuels the vendor economy — combat is the primary way to earn TC.
-    if (Math.random() < 0.3) {
-      const rarityMul = enemy.rarity === 'Legendary' ? 6 : enemy.rarity === 'Rare' ? 3 : enemy.rarity === 'Uncommon' ? 2 : 1;
-      const tcGained = (rollDie(6) + rollDie(6)) * rarityMul;
-      set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + tcGained } } : s));
-      get().appendLog('reward', `+${tcGained} TC pried from the dust.`);
-    }
+    // TC drop. OTA 029 — was 30% chance per kill; playtester
+    // reported beating an above-level enemy and seeing zero TC.
+    // Combat is the primary TC pipeline, so every kill now drops
+    // some. Base d6 for Common, scaling sharply for rarer foes so
+    // the rare-encounter swing-for-the-fences feels worth it.
+    const rarityMul = enemy.rarity === 'Legendary' ? 6 : enemy.rarity === 'Rare' ? 3 : enemy.rarity === 'Uncommon' ? 2 : 1;
+    const tcGained = (rollDie(6) + rollDie(6)) * rarityMul;
+    set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + tcGained } } : s));
+    get().appendLog('reward', `+${tcGained} TC pried from the dust.`);
 
     // Arbiter watches the pack: did the new loot just unlock a recipe?
     const before = listCraftableRecipes(player.inventory);

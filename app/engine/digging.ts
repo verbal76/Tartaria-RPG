@@ -166,6 +166,19 @@ const DIG_LOOT: DigEntry[] = [
   { name: 'Mudstone', rarity: 'Rare', baseWeight: 1 },
   { name: 'Aetheric Pelt', rarity: 'Rare', baseWeight: 1 },
   { name: 'Golem Core', rarity: 'Rare', baseWeight: 1 },
+
+  // OTA 029 — improvised / found weapons. Same pool as area-search
+  // SMALL_FINDS so the player who digs with a real tool can also
+  // turn up the occasional cudgel / spear / knife. Weights kept
+  // low — the dig pool already has a strong rocks/sticks majority.
+  { name: 'Cudgel', rarity: 'Common', baseWeight: 3 },
+  { name: 'Stone Spear', rarity: 'Common', baseWeight: 3 },
+  { name: 'Pocket Knife', rarity: 'Common', baseWeight: 2 },
+  { name: 'Bone Shiv', rarity: 'Common', baseWeight: 2 },
+  { name: 'Bone Knife', rarity: 'Common', baseWeight: 2 },
+  { name: 'Rust Dagger', rarity: 'Common', baseWeight: 2 },
+  { name: 'Aetherium Spear', rarity: 'Common', baseWeight: 1 },
+  { name: 'Aether-Shard Spear', rarity: 'Uncommon', baseWeight: 1 },
 ];
 
 // Roll the dig outcome. Returns null when nothing was found (always
