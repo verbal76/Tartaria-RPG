@@ -274,7 +274,17 @@ class ScreenErrorBoundary extends React.Component<
 // not both.
 function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>['currentScreen'] }) {
   const insets = useSafeAreaInsets();
-  const top = Math.max(insets.top, ANDROID_STATUS_PAD);
+  // OTA 023 — playtester caught the bug: we're hiding both bars
+  // (StatusBar `hidden` below, expo-navigation-bar setVisibilityAsync
+  // 'hidden' at boot) but the AppShell still reserved ~24px at the
+  // top via Math.max(insets.top, ANDROID_STATUS_PAD). When the bars
+  // are hidden the insets correctly report 0, but the forced
+  // ANDROID_STATUS_PAD floor overrode that and kept stealing screen
+  // space the player never gets back. Trust the insets — they reflect
+  // the actual unsafe area on this device. If a player swipes the
+  // system UI back via overlay-swipe behavior, the brief overlap is
+  // acceptable; we don't want to permanently reserve space for it.
+  const top = insets.top;
   const bottom = insets.bottom;
   return (
     <View style={[styles.safe, { paddingTop: top, paddingBottom: bottom }]}>
@@ -294,13 +304,17 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
   );
 }
 
-// Floor value used when SafeAreaView's reported top inset is 0 on
-// edge-to-edge Android ROMs (Pixel + some Samsung). AppShell does
-// Math.max(insets.top, ANDROID_STATUS_PAD) so we get the bigger of
-// the two — never both stacked, never the BACK button under the
-// clock.
+// OTA 023 — ANDROID_STATUS_PAD removed. The pad was forcing 24px
+// of top padding even when the status bar was hidden (which is
+// always the case in this app: <StatusBar hidden /> at boot).
+// SafeAreaProvider insets already report the correct value (0
+// when the bar is hidden, the gesture-area height when not), so
+// the forced floor was always wrong when the bar wasn't there.
+// Constant + RNStatusBar import retained as documentation; remove
+// in a future cleanup if no consumer surfaces.
 const ANDROID_STATUS_PAD =
   Platform.OS === 'android' ? RNStatusBar.currentHeight ?? 24 : 0;
+void ANDROID_STATUS_PAD;
 
 const styles = StyleSheet.create({
   safe: {
