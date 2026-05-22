@@ -9,6 +9,8 @@ import {
   RefreshControl,
   Linking,
   Share,
+  Modal,
+  ActivityIndicator,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import {
@@ -149,6 +151,26 @@ export function TitleScreen() {
   // OTA 006 — separate latch for the SHARE action so the COPIED
   // and SHARED flashes don't fight each other on the same row.
   const [sharedSlotId, setSharedSlotId] = useState<string | null>(null);
+  // OTA 007 — OTA-update state. Moved from AboutScreen so the
+  // player can pull updates without diving into settings every
+  // time. checkAndApplyOTA streams status into setUpdateStatus,
+  // the modal overlay shows it while busy.
+  const [updateBusy, setUpdateBusy] = useState(false);
+  const [updateStatus, setUpdateStatus] = useState<string>('Idle');
+  const [updateError, setUpdateError] = useState<string | null>(null);
+  async function checkForUpdate() {
+    if (updateBusy) return;
+    setUpdateBusy(true);
+    setUpdateError(null);
+    try {
+      await checkAndApplyOTA({
+        onStatus: setUpdateStatus,
+        onError: setUpdateError,
+      });
+    } finally {
+      setUpdateBusy(false);
+    }
+  }
   const copyDeadLog = async (slot: SlotSummary) => {
     try {
       const log = await readSlotLog(slot.slotId);
@@ -371,6 +393,19 @@ export function TitleScreen() {
             >
               <Text style={styles.secondaryBtnText}>Lore Codex</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.updateBtn, updateBusy && styles.updateBtnBusy]}
+              onPress={() => { void checkForUpdate(); }}
+              activeOpacity={0.7}
+              disabled={updateBusy}
+            >
+              <Text style={styles.updateBtnText}>
+                {updateBusy ? updateStatus.toUpperCase() : 'CHECK FOR OTA UPDATE'}
+              </Text>
+            </TouchableOpacity>
+            {updateError ? (
+              <Text style={styles.updateError}>{updateError}</Text>
+            ) : null}
           </View>
         }
       />
@@ -456,6 +491,28 @@ export function TitleScreen() {
         ]}
         onRequestClose={clearSlotLoadError}
       />
+
+      {/* OTA 007 — full-screen overlay while an update is in flight.
+          Without it, reloadAsync() blacks the screen mid-tear-down and
+          the player thinks the app crashed. Spinner + status keeps
+          them oriented through the gap. */}
+      <Modal visible={updateBusy} transparent animationType="fade" statusBarTranslucent>
+        <View style={styles.updateScrim}>
+          <View style={styles.updateCard}>
+            <Text style={styles.updateTitle}>UPDATING</Text>
+            <View style={styles.updateRule} />
+            <View style={styles.updateSpinnerRow}>
+              <ActivityIndicator color="#c9a86a" size="large" />
+            </View>
+            <Text style={styles.updateStatusLine}>{updateStatus}</Text>
+            <Text style={styles.updateHint}>
+              Tartaria is replacing its bones. The screen will go dark for ~10 seconds while
+              the new bundle loads. If it stays black past a minute, force-close the app and
+              reopen it — your progress is saved.
+            </Text>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -625,6 +682,40 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   secondaryBtnText: { color: '#cdbf99', fontSize: 12, letterSpacing: 1, fontWeight: '700' },
+  updateBtn: {
+    backgroundColor: '#3a342c',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  updateBtnBusy: { backgroundColor: '#1a1714' },
+  updateBtnText: { color: '#e6d8b3', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
+  updateError: { color: '#e07a5f', fontSize: 11, marginTop: 6, textAlign: 'center', fontStyle: 'italic' },
+  updateScrim: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  updateCard: {
+    width: '100%',
+    maxWidth: 360,
+    backgroundColor: '#13110f',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 4,
+    padding: 18,
+    alignItems: 'center',
+  },
+  updateTitle: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
+  updateRule: { height: 1, alignSelf: 'stretch', backgroundColor: '#3a342c', marginTop: 8, marginBottom: 14 },
+  updateSpinnerRow: { paddingVertical: 6, marginBottom: 8 },
+  updateStatusLine: { color: '#e6d8b3', fontSize: 13, letterSpacing: 1, marginBottom: 10 },
+  updateHint: { color: '#7a705c', fontSize: 11, lineHeight: 16, textAlign: 'center', fontStyle: 'italic' },
   bottomBar: {
     flexDirection: 'row',
     alignItems: 'center',

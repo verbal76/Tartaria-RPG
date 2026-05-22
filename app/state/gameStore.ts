@@ -1361,6 +1361,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
           `You step back into ${restoredScene.location.name}. The world waits for your move.`,
         );
       }
+      // OTA 007 — Welcome-back from the Arbiter on every save load.
+      // Playtester: "very simple welcome back from kokoro as soon
+      // as you log in. welcome back friend." Lands AFTER the world
+      // "you step back into..." line so the Arbiter is responding
+      // to the player's return, not pre-announcing the scene.
+      // skipDedup so it always fires on load even if the same line
+      // is in the recent log buffer.
+      get().appendLog(
+        'arbiter',
+        `The Arbiter inclines their head. "Welcome back, friend."`,
+        { skipDedup: true },
+      );
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       // Roll the active slot back so we don't leave a half-set state.

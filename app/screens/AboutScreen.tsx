@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, Modal, ActivityIndicator, PermissionsAndroid } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, PermissionsAndroid } from 'react-native';
 import Constants from 'expo-constants';
 import * as Clipboard from 'expo-clipboard';
 import * as Updates from 'expo-updates';
@@ -9,7 +9,6 @@ import { OTA_BUILD_ID } from '../buildInfo';
 import { NumberStepper } from '../components/NumberStepper';
 import { getAudioSettings, setAudioSettings, onAudioSettingsChange, type AudioSettings } from '../audio/audioSettings';
 import { forceReapplyAudioFromState } from '../audio/AudioController';
-import { checkAndApplyOTA } from '../updates/checkAndApplyOTA';
 import {
   getVoiceSettings,
   setVoiceSettings,
@@ -47,9 +46,7 @@ export function AboutScreen() {
   const [copied, setCopied] = useState(false);
   const [voiceCopied, setVoiceCopied] = useState(false);
   const [tab, setTab] = useState<'music' | 'voice' | 'about'>('music');
-  const [updateStatus, setUpdateStatus] = useState<string>('Idle');
-  const [updateBusy, setUpdateBusy] = useState(false);
-  const [updateError, setUpdateError] = useState<string | null>(null);
+  // OTA 007 — update button + state moved to TitleScreen.
   const [audio, setAudio] = useState<AudioSettings>(() => getAudioSettings());
   const [voice, setVoice] = useState<VoiceSettings>(() => getVoiceSettings());
   const [voicesList, setVoicesList] = useState<Speech.Voice[]>([]);
@@ -190,19 +187,7 @@ export function AboutScreen() {
     });
   };
 
-  async function checkForUpdate() {
-    if (updateBusy) return;
-    setUpdateBusy(true);
-    setUpdateError(null);
-    try {
-      await checkAndApplyOTA({
-        onStatus: setUpdateStatus,
-        onError: setUpdateError,
-      });
-    } finally {
-      setUpdateBusy(false);
-    }
-  }
+  // OTA 007 — checkForUpdate moved to TitleScreen.
 
   const info = useMemo(() => {
     const expoConfig = Constants.expoConfig;
@@ -248,7 +233,7 @@ export function AboutScreen() {
       `  Last OTA applied: ${otaApplied}`,
       `  OTA published at: ${updCreatedAt || '(none)'}`,
       `  Updates enabled: ${updIsEnabled}`,
-      `  Last check: ${updateStatus}${updateError ? `\n    Error: ${updateError}` : ''}`,
+      `  (Update via TitleScreen → CHECK FOR OTA UPDATE button)`,
       ``,
       `Platform: ${Platform.OS} ${Platform.Version}`,
       `Hermes: ${typeof (globalThis as { HermesInternal?: unknown }).HermesInternal !== 'undefined' ? 'yes' : 'no'}`,
@@ -286,7 +271,7 @@ export function AboutScreen() {
       `  Log entries in memory: ${gameLogLength}`,
     ];
     return lines.join('\n');
-  }, [cognitiveStatus, cognitiveFraction, cognitiveError, cognitiveLastResponse, cognitiveModelInfo, qwenStatus, qwenFraction, qwenError, qwenModelId, player, gameLogLength, updateStatus, updateError]);
+  }, [cognitiveStatus, cognitiveFraction, cognitiveError, cognitiveLastResponse, cognitiveModelInfo, qwenStatus, qwenFraction, qwenError, qwenModelId, player, gameLogLength]);
 
   // Voice tab COPY ALL — same identifier header as About so we can
   // tell which device / build the report came from regardless of
@@ -641,45 +626,14 @@ export function AboutScreen() {
       </ScrollView>
 
       {tab === 'about' && (
-        <>
-          <TouchableOpacity
-            style={[styles.updateBtn, updateBusy && styles.updateBtnBusy]}
-            onPress={() => { void checkForUpdate(); }}
-            activeOpacity={0.7}
-            disabled={updateBusy}
-          >
-            <Text style={styles.updateBtnText}>
-              {updateBusy ? updateStatus.toUpperCase() : 'CHECK FOR OTA UPDATE'}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.copyBtn} onPress={handleCopy} activeOpacity={0.7}>
-            <Text style={styles.copyText}>{copied ? 'COPIED' : 'COPY ALL'}</Text>
-          </TouchableOpacity>
-        </>
+        <TouchableOpacity style={styles.copyBtn} onPress={handleCopy} activeOpacity={0.7}>
+          <Text style={styles.copyText}>{copied ? 'COPIED' : 'COPY ALL'}</Text>
+        </TouchableOpacity>
       )}
 
-      {/* OTA UPDATE OVERLAY — covers the screen while the update is being
-          downloaded / saved / applied. Without it, the screen freezes on
-          reloadAsync() and the player thinks the app crashed. The spinner
-          + status line keeps them informed through the tear-down gap. */}
-      <Modal visible={updateBusy} transparent animationType="fade" statusBarTranslucent>
-        <View style={styles.updateScrim}>
-          <View style={styles.updateCard}>
-            <Text style={styles.updateTitle}>UPDATING</Text>
-            <View style={styles.updateRule} />
-            <View style={styles.updateSpinnerRow}>
-              <ActivityIndicator color="#c9a86a" size="large" />
-            </View>
-            <Text style={styles.updateStatusLine}>{updateStatus}</Text>
-            <Text style={styles.updateHint}>
-              Tartaria is replacing its bones. The screen will go dark for ~10 seconds while
-              the new bundle loads. If it stays black past a minute, force-close the app and
-              reopen it — your progress is saved.
-            </Text>
-          </View>
-        </View>
-      </Modal>
+      {/* OTA 007 — UPDATE button + busy overlay moved to TitleScreen
+          (under Lore Codex) so the player can pull updates from the
+          main screen without opening settings. */}
     </View>
   );
 }
@@ -818,37 +772,4 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   copyText: { color: '#0a0908', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
-  updateScrim: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.85)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  updateCard: {
-    width: '100%',
-    maxWidth: 360,
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 18,
-    alignItems: 'center',
-  },
-  updateTitle: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
-  updateRule: { height: 1, alignSelf: 'stretch', backgroundColor: '#3a342c', marginTop: 8, marginBottom: 14 },
-  updateSpinnerRow: { paddingVertical: 6, marginBottom: 8 },
-  updateStatusLine: { color: '#e6d8b3', fontSize: 13, letterSpacing: 1, marginBottom: 10 },
-  updateHint: { color: '#7a705c', fontSize: 11, lineHeight: 16, textAlign: 'center', fontStyle: 'italic' },
-  updateBtn: {
-    backgroundColor: '#3a342c',
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingVertical: 12,
-    alignItems: 'center',
-    marginTop: 12,
-  },
-  updateBtnBusy: { backgroundColor: '#1a1714' },
-  updateBtnText: { color: '#e6d8b3', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
 });
