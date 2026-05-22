@@ -286,6 +286,10 @@ export function ExplorationScreen() {
             onOpenSalvage={() => setSalvageOpen(true)}
             onOpenTake={() => setTakeOpen(true)}
             onOpenClimb={() => setClimbOpen(true)}
+            onClimbUp={() => {
+              const noun = currentScene?.elevatedOn?.noun;
+              if (noun) submit(`climb ${noun}`);
+            }}
             onClimbDown={() => submit('climb down')}
             elevatedOn={currentScene?.elevatedOn ?? null}
             onOpenFeedback={() => setFeedbackOpen(true)}

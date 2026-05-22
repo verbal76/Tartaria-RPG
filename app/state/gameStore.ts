@@ -299,8 +299,16 @@ interface CurrentScene {
   /** OTA 031 — what the player is currently elevated on (climbed at
    *  least one tier). Set on every successful climb tier, cleared by
    *  climb down or by leaving the scene. Drives the CLIMB / CLIMB
-   *  DOWN button toggle in the exploration HUD. */
-  elevatedOn?: string | null;
+   *  UP / CLIMB DOWN button toggle in the exploration HUD.
+   *  Stored as a tuple so the HUD knows how many tiers are left
+   *  (OTA 032 — was a bare string; led to "stuck at tier 1, can
+   *  only descend" because the UI couldn't tell the player wasn't
+   *  at the top yet). */
+  elevatedOn?: {
+    noun: string;
+    tier: number;
+    totalTiers: number;
+  } | null;
 }
 
 // Helper: which enemy is the player currently targeting? Returns null
@@ -5065,7 +5073,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const rawActionLower = trimmed.toLowerCase();
         const wantsDown = /\b(down|descend)\b/.test(rawActionLower);
         if (wantsDown && currentScene.elevatedOn) {
-          const downFrom = currentScene.elevatedOn;
+          const downFrom = currentScene.elevatedOn.noun;
           set((s) => s.currentScene ? { currentScene: { ...s.currentScene, elevatedOn: null } } : s);
           set({ player: advanceTime(spendStamina(player, 1), 0.25) });
           get().appendLog(
@@ -5220,7 +5228,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   },
                 },
               },
-              currentScene: s.currentScene ? { ...s.currentScene, elevatedOn: tgt } : s.currentScene,
+              currentScene: s.currentScene ? {
+                ...s.currentScene,
+                elevatedOn: { noun: tgt, tier: currentTier, totalTiers },
+              } : s.currentScene,
             };
           });
         }

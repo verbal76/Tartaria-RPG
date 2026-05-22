@@ -55,15 +55,18 @@ interface Props {
    *  climbable noun in the current scene with its tier count.
    *  Tapping one fires `climb <noun>` which resolves one tier. */
   onOpenClimb: () => void;
-  /** OTA 031 — fire the descent path. The button label flips from
-   *  CLIMB to CLIMB DOWN whenever the player is elevated on
-   *  something this scene; tapping it submits `climb down` which
+  /** OTA 031 — fire the next tier on whatever the player is already
+   *  climbing. Submits `climb <noun>` for the noun stamped in
+   *  elevatedOn so the player can ascend without re-opening the
+   *  picker each tap. */
+  onClimbUp: () => void;
+  /** OTA 031 — fire the descent path. Submits `climb down` which
    *  the climb handler routes to a quick descent narration and
    *  clears the elevated flag. */
   onClimbDown: () => void;
-  /** Truthy when the player is currently up on something — drives
-   *  the CLIMB → CLIMB DOWN label flip in peace mode. */
-  elevatedOn?: string | null;
+  /** OTA 032 — full elevation tuple so the HUD knows whether the
+   *  player still has tiers to ascend. Null when on the ground. */
+  elevatedOn?: { noun: string; tier: number; totalTiers: number } | null;
   /** OTA 202 — open the designer-note (FeedbackModal) overlay. The
    *  📝 button next to the text input dispatches this; bypasses the
    *  action parser entirely so playtest notes land cleanly on the
@@ -98,7 +101,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbDown, elevatedOn, onOpenFeedback, inCombat, equippedMain, equippedOff, range }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenFeedback, inCombat, equippedMain, equippedOff, range }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
   // BrandedKeyboard removed 2026-05-21 per playtester: "it is not
@@ -323,13 +326,25 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             <QuickBtn label="approach" onPress={onOpenApproach} />
             <QuickBtn label="take" onPress={onOpenTake} />
             <QuickBtn label="salvage" onPress={onOpenSalvage} />
-            {/* OTA 031 — climb / climb-down. Label and handler flip
-                based on whether the player is elevated on something
-                this scene. CLIMB opens the picker; CLIMB DOWN fires
-                the descent path directly. */}
-            {elevatedOn
-              ? <QuickBtn label="climb down" onPress={onClimbDown} />
-              : <QuickBtn label="climb" onPress={onOpenClimb} />}
+            {/* OTA 031/032 — climb action group. Three states:
+                  - on the ground       → CLIMB (opens noun picker)
+                  - elevated, mid-climb → CLIMB UP + CLIMB DOWN
+                  - elevated, at top    → CLIMB DOWN only
+                CLIMB UP fires the next tier on the same noun
+                without re-opening the picker. */}
+            {!elevatedOn ? (
+              <QuickBtn label="climb" onPress={onOpenClimb} />
+            ) : (
+              <>
+                {elevatedOn.tier < elevatedOn.totalTiers && (
+                  <QuickBtn
+                    label={`climb up (${elevatedOn.tier}/${elevatedOn.totalTiers})`}
+                    onPress={onClimbUp}
+                  />
+                )}
+                <QuickBtn label="climb down" onPress={onClimbDown} />
+              </>
+            )}
             <QuickBtn label="craft" onPress={onOpenCrafting} />
             <QuickBtn label="inventory" onPress={onOpenInventory} />
           </>
