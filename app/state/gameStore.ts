@@ -7334,7 +7334,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     set((s) => {
       if (!s.player || !s.currentScene?.vendor) return s;
-      const newOffers = s.currentScene.vendor.offers.filter((o) => o !== offer);
+      // OTA 036 — filter by (itemName, price) instead of reference
+      // identity. Reference equality is fragile: any intervening set
+      // that rewrites currentScene.vendor.offers (e.g. via a spread)
+      // would silently leave this offer in the list. (itemName, price)
+      // pair is unique within a single vendor's session offers.
+      const newOffers = s.currentScene.vendor.offers.filter(
+        (o) => !(o.itemName === offer.itemName && o.price === offer.price),
+      );
       return {
         player: {
           ...s.player,
@@ -7519,7 +7526,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
       set((s) => {
         if (!s.player || !s.currentScene?.vendor) return s;
-        const newOffers = s.currentScene.vendor.offers.filter((o) => o !== offer);
+        // OTA 036 — see buyFromVendor for rationale; (itemName, price)
+        // pair is the stable id within a single vendor session.
+        const newOffers = s.currentScene.vendor.offers.filter(
+          (o) => !(o.itemName === offer.itemName && o.price === offer.price),
+        );
         return {
           player: { ...s.player, inventory: mergeOrPushItem(s.player.inventory, stolen) },
           currentScene: { ...s.currentScene, vendor: { ...s.currentScene.vendor, offers: newOffers } },

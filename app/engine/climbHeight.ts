@@ -60,6 +60,11 @@ export const CLIMB_TOP_LOOT: { name: string; rarity: Rarity; weight: number }[] 
 export function rollClimbTopLoot(): { name: string; rarity: Rarity } | null {
   if (Math.random() < 0.5) return null;
   const total = CLIMB_TOP_LOOT.reduce((s, x) => s + x.weight, 0);
+  // OTA 036 — guard against an empty/zero-weight pool. Without this,
+  // r = Math.random() * 0 = 0 and the loop's r -= weight never satisfies
+  // r <= 0, falling through to the implicit `return null`. Safer to be
+  // explicit.
+  if (total <= 0) return null;
   let r = Math.random() * total;
   for (const x of CLIMB_TOP_LOOT) {
     r -= x.weight;

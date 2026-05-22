@@ -24,14 +24,14 @@
 // Everything below is mood/quality/temporal flavour that the resolver
 // can safely ignore.
 
-export const DESCRIPTOR_ADJECTIVES = new Set([
+const DESCRIPTOR_ADJECTIVES = new Set([
   // mood + quality + behavior — pure flavour
   'beautiful', 'ugly', 'happy', 'sad', 'angry', 'calm', 'brave',
   'careful', 'smart', 'clever', 'kind', 'rude', 'friendly', 'helpful',
   'honest', 'polite', 'professional', 'messy', 'organized', 'busy',
 ]);
 
-export const DESCRIPTOR_ADVERBS = new Set([
+const DESCRIPTOR_ADVERBS = new Set([
   // frequency
   'really', 'always', 'never', 'often', 'usually', 'sometimes',
   'rarely', 'frequently', 'occasionally',
