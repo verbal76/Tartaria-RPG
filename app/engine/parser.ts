@@ -531,6 +531,7 @@ function buildArgs(
   inventory: InventoryItem[],
   recentNouns: string[],
   enemyNames: string[],
+  equippedOffHand?: string | null,
 ): ParsedArg[] {
   const frame = frameFor(intent);
   const args: ParsedArg[] = [];
@@ -595,7 +596,7 @@ function buildArgs(
     // resolver is simpler (substring item match + recent-noun
     // fallback). The legacy enemy-first logic in parseInput still
     // populates the direct slot via resolvedNoun.
-    const item = resolveItem(seg.tokens, inventory);
+    const item = resolveItem(seg.tokens, inventory, equippedOffHand);
     const noun = item ? undefined : resolveContextNoun(seg.tokens, recentNouns);
     // Enemy hit on segment tokens — only relevant for direct.
     let enemyHit: string | undefined;
@@ -627,17 +628,51 @@ function buildArgs(
   return args;
 }
 
-function resolveItem(targetTokens: string[], inventory: InventoryItem[]): InventoryItem | undefined {
+function resolveItem(
+  targetTokens: string[],
+  inventory: InventoryItem[],
+  equippedOffHand?: string | null,
+): InventoryItem | undefined {
   if (!targetTokens.length || !inventory.length) return undefined;
+  // OTA 027 — off-hand prefer-equipped path. If the player typed
+  // "off-hand X" / "offhand X" / "off hand X", the engine should
+  // resolve to whatever is in the off-hand slot, not fuzzy-match
+  // the residual tokens against main-hand candidates. Without
+  // this, "attack with the off-hand mud-rend blade" mis-resolved
+  // to Rusted Blade in main when both items end in "blade".
+  // After consumed, the off-hand tokens are stripped from
+  // targetTokens so the rest of the function only sees the
+  // weapon-noun phrase (used as a sanity check below).
+  const wantsOffHand = targetTokens.some(
+    (t) => t === 'off-hand' || t === 'offhand' || t === 'off',
+  ) || (
+    // "off hand" as adjacent tokens
+    (() => {
+      for (let i = 0; i < targetTokens.length - 1; i++) {
+        if (targetTokens[i] === 'off' && targetTokens[i + 1] === 'hand') return true;
+      }
+      return false;
+    })()
+  );
+  if (wantsOffHand && equippedOffHand) {
+    const offItem = inventory.find((i) => i.name.toLowerCase() === equippedOffHand.toLowerCase());
+    if (offItem) return offItem;
+  }
+  // Filter out the off-hand qualifier tokens before fuzzy matching
+  // so they don't pollute the candidate scoring.
+  const filtered = targetTokens.filter(
+    (t) => t !== 'off-hand' && t !== 'offhand' && t !== 'off' && t !== 'hand',
+  );
+  const tokens = filtered.length ? filtered : targetTokens;
   // Exact substring match first
   for (const item of inventory) {
     const itemLower = item.name.toLowerCase();
-    if (targetTokens.some((t) => itemLower.includes(t))) return item;
+    if (tokens.some((t) => itemLower.includes(t))) return item;
   }
   // Fuzzy match against each word in item name
   for (const item of inventory) {
     const words = item.name.toLowerCase().split(/\s+/);
-    for (const t of targetTokens) {
+    for (const t of tokens) {
       if (words.some((w) => fuzzyEqual(t, w))) return item;
     }
   }
@@ -681,6 +716,12 @@ export interface ParseContext {
   /** Name of the vendor currently in the scene, if any. Lets the
    *  suggester offer 'trade with X' / 'buy from X' style verbs. */
   vendorName?: string;
+  /** OTA 027 — name of the item currently equipped in the off-hand
+   *  slot, if any. resolveItem prefers this when the target text
+   *  contains "off-hand" / "off hand" so "attack with the off-hand
+   *  X" actually swings the off-hand weapon instead of fuzzy-matching
+   *  to the main-hand by token overlap. */
+  equippedOffHand?: string | null;
 }
 
 /** Classification of a parsed noun against the live scene. Drives the
@@ -795,7 +836,7 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
     // only offer the verb-noun pairs the engine can actually resolve.
     const cleanTokens = tokens.filter((t) => !STOPWORDS.has(t) && !FILLER_DESCRIPTORS.has(t));
     const noun = resolveContextNoun(cleanTokens, recentNouns);
-    const item = resolveItem(cleanTokens, inventory);
+    const item = resolveItem(cleanTokens, inventory, context.equippedOffHand ?? null);
     const nounKind = classifyNoun(noun, context);
     const lowerNoun = noun?.toLowerCase() ?? '';
     const hasTorch = (context.inventory ?? []).some(
@@ -877,7 +918,7 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
       }
     }
   }
-  const item = enemyHit ? undefined : resolveItem(targetTokens, inventory);
+  const item = enemyHit ? undefined : resolveItem(targetTokens, inventory, context.equippedOffHand ?? null);
   const noun = enemyHit ?? (item ? undefined : resolveContextNoun(targetTokens, recentNouns));
 
   // Confidence: 1.0 exact verb, falls off with distance; small boost from resolved target.
@@ -901,6 +942,7 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
     inventory,
     recentNouns,
     context.enemyNames ?? [],
+    context.equippedOffHand ?? null,
   );
 
   // Back-compat for the 25+ gameStore handlers that read

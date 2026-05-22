@@ -416,6 +416,19 @@ export function buildScene(input: SceneInput): string {
 // with short lore-grounded statements about Tartaria as a setting so
 // even the bottom of the fallback chain teaches the player something
 // about the world.
+// OTA 027 — replacement for the bland "The Arbiter notes how you look."
+// fallback. Pool of variants picked via rotatingPick so the same line
+// doesn't fire on every back-to-back look. Matches the established
+// Arbiter voice (Yoda-coded cryptic killer, OTA-200-era direction).
+const ARBITER_LOOK_LINES = [
+  `The Arbiter does not look up. "What you see is more than what is here."`,
+  `The Arbiter's eyes track yours. "Looking is the cheap action. Knowing is the one with teeth."`,
+  `The Arbiter scans the same arc you did, slower. "What you miss is what comes back later."`,
+  `The Arbiter waits a beat. "Tartaria gives a discount to the patient eye."`,
+  `The Arbiter says nothing. The silence is its own commentary.`,
+  `The Arbiter half-smiles. "Twice over makes a thing yours. Once over is a guess."`,
+];
+
 const GENERIC_REMARKS = [
   `"Tartaria was a place of life and power once," the Arbiter says. "Now mostly whispers."`,
   `"The Aetherstone Flood ended a thousand years ago," the Arbiter says, "but at ground level it never quite stopped moving."`,
@@ -526,6 +539,12 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
         !lastAction.includes('?') &&
         !/^\s*(what|how|why|who|when|where|i am|i'm|am i)\b/i.test(lastAction)
       ) {
+        // OTA 027 — bland "notes how you look" filler swapped for
+        // rotating pool when the last action is a plain look. Other
+        // actions still get the generic "notes how you {action}".
+        if (lastAction.trim().toLowerCase() === 'look') {
+          return `${rotatingPick(ARBITER_LOOK_LINES, 'arbiter.look')} ${combatRemark(ctx.enemy!)}`;
+        }
         return `The Arbiter notes how you ${lastAction.trim()}. ${combatRemark(ctx.enemy!)}`;
       }
     }
@@ -673,7 +692,12 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
     if (lastAction && lastAction.trim().length > 0) {
       const moodPool = pickMoodPool(ctx.mood);
       const flavor = moodPool ? pick(moodPool).replace('this place', ctx.location.name) : null;
-      const noted = `The Arbiter notes how you ${lastAction.trim()}.`;
+      // OTA 027 — see combat-context site above. Plain "look" gets
+      // the rotating LOOK pool instead of the generic templated
+      // filler.
+      const noted = lastAction.trim().toLowerCase() === 'look'
+        ? rotatingPick(ARBITER_LOOK_LINES, 'arbiter.look')
+        : `The Arbiter notes how you ${lastAction.trim()}.`;
       return flavor ? `${noted} ${flavor}` : noted;
     }
   }

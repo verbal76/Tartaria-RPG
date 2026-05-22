@@ -32,6 +32,13 @@
     { "name": "Orange Sporecap",     "kind": "consumable", "rarity": "Common",   "tags": ["food","foraged","mushroom","orange"], "description": "Bright orange cap, freckled with darker spots. Don't eat raw unless you know the color. You know the color.",
       "effect": { "kind": "consumable", "healHP": 2, "restoreStamina": 1 } },
 
+    { "name": "Blue Aetheric Fungus", "kind": "consumable", "rarity": "Common",   "tags": ["food","foraged","mushroom","aether","distillable","blue"], "description": "Pale-blue cap with a copper rim — clarity-grade. Halem pays for it by the colour.",
+      "effect": { "kind": "consumable", "healHP": 1, "buffStat": "intelligence", "buffBonus": 1, "buffDuration": 5 } },
+    { "name": "Violet Mushroom",      "kind": "consumable", "rarity": "Uncommon", "tags": ["food","foraged","mushroom","aether","distillable","violet"], "description": "Deep violet, almost black. Old herbalists called it the dreaming road. Halem pays by the colour.",
+      "effect": { "kind": "consumable", "healHP": 1, "restoreStamina": 2, "buffStat": "wisdom", "buffBonus": 1, "buffDuration": 4 } },
+    { "name": "Bioluminescent Fungus", "kind": "consumable", "rarity": "Uncommon", "tags": ["food","foraged","mushroom","light","aether"], "description": "Glows on its own. Eat it and the room legibility rises for a short while — hidden hooks ping back.",
+      "effect": { "kind": "consumable", "healHP": 1, "revealScene": true } },
+
     { "name": "Empty Water Bottle", "kind": "misc",       "rarity": "Common",   "tags": ["container","water"],          "description": "A glass-and-cork bottle, scoured clean. Type 'fill bottle' near a puddle, lake, waterfall, or crevice-pool to draw water." },
     { "name": "Water Bottle",       "kind": "consumable", "rarity": "Common",   "tags": ["drink","water","container"],   "description": "A full bottle of water — clean enough, cold enough. Drink to take the edge off thirst and the day. Leaves an empty bottle behind.",
       "effect": { "kind": "consumable", "healHP": 2, "restoreStamina": 3 } },

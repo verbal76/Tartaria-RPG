@@ -2682,6 +2682,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     const parseCtx: ParseContext = {
       inventory: player.inventory,
+      // OTA 027 — pass the off-hand slot so the parser's resolveItem
+      // prefers the off-hand-equipped weapon when the player typed
+      // "off-hand X" / "off hand X" / "offhand X" in the target.
+      equippedOffHand: player.equipped?.off ?? null,
       recentNouns: collectSceneNouns(currentScene),
       enemyPresent: currentScene.enemies.length > 0,
       currentLocationName: currentScene.location.name,
@@ -2919,9 +2923,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           const range = currentScene.range ?? 'close';
           const barehand = isBareHandAttack(trimmed);
+          // OTA 027 — when the player typed "off-hand" / "off hand"
+          // / "offhand" in the attack target, route the reach lookup
+          // to the off-hand slot so reach.label + bands reflect the
+          // actual weapon being swung. The damage-side handler
+          // already has the same check via usedOffHandForDmg.
+          const offHandSwing = /\boff[- ]?hand\b/i.test(trimmed);
           const reach = barehand
             ? { bands: ['arm'] as CombatRange[], label: 'Bare hands' }
-            : playerWeaponReach(player);
+            : playerWeaponReach(player, offHandSwing ? 'off' : 'main');
           get().appendLog(
             'debug',
             `attack: target=${targetEnemy.name} range=${range} reach.bands=[${reach.bands.join(',')}] reach.label=${reach.label} bareHand=${barehand}`,
@@ -5053,12 +5063,93 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
-        set({ player: advanceTime(spendStamina(player, 2), 0.5) });
+        // OTA 027 — terminal-state climb. Was a no-op opener loop;
+        // player could climb the same arch forever. Now: one DEX vs
+        // DC 12 roll resolves the attempt outright. Climbing Rope
+        // (gate climb_steep) auto-passes. A success marks the noun
+        // in searchedAmbientNouns under a "climbed:" prefix so the
+        // next climb on the same noun in the same room refuses.
         const tgt = climbTarget || 'the surface in front of you';
-        get().appendLog(
-          'world',
-          `You set hands on the ${tgt} and start to climb. Hand over hand, breath measured. (1 sq counts as 2 — Climb spends double movement.)`,
+        const climbRoomKey = makeRoomKey(
+          player.currentLocationId,
+          currentScene.microMicroId,
+          player.mapX,
+          player.mapY,
         );
+        const climbedKey = `climbed:${tgt.toLowerCase()}`;
+        const climbRoom = get().worldMemory.visitedRooms?.[climbRoomKey];
+        const alreadyClimbed = (climbRoom?.searchedAmbientNouns ?? []).includes(climbedKey);
+        if (alreadyClimbed) {
+          get().appendLog(
+            'world',
+            `You've already crested the ${tgt} here. The view from the top hasn't changed since the last time you stood up there.`,
+          );
+          break;
+        }
+        const climbStats = effectiveStats(player, weatherStatModifiers(currentScene.weather));
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { inventoryHasGate: ihg } = require('../engine/itemEffect');
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { findGearByName: fgbnC, findMaterialByName: fmbnC, findExplorationItemByName: feibC } =
+          require('../engine/crafting');
+        const hasRope = ihg(
+          player.inventory.map((i: { name: string }) => i.name),
+          'climb_steep',
+          [fgbnC, fmbnC, feibC],
+        );
+        set({ player: advanceTime(spendStamina(player, 2), 0.5) });
+        let climbCrested = false;
+        if (hasRope) {
+          get().appendLog(
+            'world',
+            `You loop the climbing rope around the ${tgt} and walk up the line. Top reached.`,
+          );
+          climbCrested = true;
+        } else {
+          const climbRoll = rollDie(20);
+          const climbTotal = climbRoll + climbStats.dexterity;
+          const climbSuccess = climbTotal >= 12;
+          get().appendLog(
+            'combat',
+            `Climb the ${tgt} — d20 ${climbRoll} + DEX ${climbStats.dexterity} = ${climbTotal} vs DC 12 — ${climbSuccess ? '✓ HIT' : '✗ MISS'}`,
+          );
+          if (climbSuccess) {
+            get().appendLog(
+              'world',
+              `You crest the ${tgt}. The view changes; the room reads differently from here.`,
+            );
+            climbCrested = true;
+          } else {
+            get().appendLog(
+              'world',
+              `You slip halfway up the ${tgt} and drop back down. Try with a rope, or come back fresher.`,
+            );
+          }
+        }
+        if (climbCrested) {
+          set((s) => {
+            const room = s.worldMemory.visitedRooms?.[climbRoomKey] ?? {
+              firstVisitAt: Date.now(),
+              lastVisitAt: Date.now(),
+              visitCount: 1,
+            };
+            return {
+              worldMemory: {
+                ...s.worldMemory,
+                visitedRooms: {
+                  ...(s.worldMemory.visitedRooms ?? {}),
+                  [climbRoomKey]: {
+                    ...room,
+                    searchedAmbientNouns: [
+                      ...(room.searchedAmbientNouns ?? []),
+                      climbedKey,
+                    ],
+                  },
+                },
+              },
+            };
+          });
+        }
         break;
       }
       case 'swim': {
@@ -10378,12 +10469,19 @@ function enemyBuildScore(enemy: Enemy): number {
   return Math.max(1, Math.min(10, ap + hpTier));
 }
 
-function playerWeaponReach(player: PlayerCharacter): { bands: CombatRange[]; label: string } {
+function playerWeaponReach(
+  player: PlayerCharacter,
+  // OTA 027 — optional slot override. When the player typed
+  // "attack with the off-hand X", the caller passes 'off' so the
+  // reach band + label come from the off-hand weapon, not main.
+  // Default 'main' preserves all existing call sites.
+  slot: 'main' | 'off' = 'main',
+): { bands: CombatRange[]; label: string } {
   const eq = player.equipped ?? {};
-  const main = eq.main ?? eq.weaponName;
-  if (!main) return { bands: ['arm'], label: 'Bare hands' };
-  const w = findWeaponByName(main);
-  if (!w) return { bands: ['arm'], label: main };
+  const wpName = slot === 'off' ? eq.off : (eq.main ?? eq.weaponName);
+  if (!wpName) return { bands: ['arm'], label: 'Bare hands' };
+  const w = findWeaponByName(wpName);
+  if (!w) return { bands: ['arm'], label: wpName };
   switch (w.weaponKind) {
     case 'melee':
       return { bands: ['arm'], label: w.name };
