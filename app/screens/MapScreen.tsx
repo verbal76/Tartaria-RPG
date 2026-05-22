@@ -37,11 +37,18 @@ import {
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from '../engine/worldMap';
+import {
+  atlasCoordForLocation,
+  OUTPOST_ATLAS_COORD,
+  DOT_TILE_FRAC,
+} from '../engine/atlasCoords';
+// OTA 051 — locations.json carries the human-readable name we want
+// to surface in the "You are here: <name>" chip when the player is
+// on a depicted tile.
+import locationsData from '../data/locations/locations.json';
+import type { Location } from '../engine/types';
 
-// Atlas anchor points, as fractions of the rendered image box.
-const OUTPOST_FRAC_X = 0.50;
-const OUTPOST_FRAC_Y = 0.385;
-const DOT_TILE_FRAC = 0.02;
+const LOCATIONS = locationsData as Location[];
 
 // Gesture clamps.
 const MIN_SCALE = 0.8;
@@ -179,22 +186,47 @@ export function MapScreen() {
   const dx = mapX - WORLD_MAP_CENTER_X;
   const dy = mapY - WORLD_MAP_CENTER_Y;
   const tiles = Math.abs(dx) + Math.abs(dy);
-  const cardinal =
-    dx === 0 && dy === 0 ? 'at the Outpost' :
-    Math.abs(dx) >= Math.abs(dy)
-      ? `${Math.abs(dx)} tile${Math.abs(dx) === 1 ? '' : 's'} ${dx >= 0 ? 'east' : 'west'} of the Outpost`
-      : `${Math.abs(dy)} tile${Math.abs(dy) === 1 ? '' : 's'} ${dy >= 0 ? 'south' : 'north'} of the Outpost`;
+
+  // OTA 051 — two-tier dot anchoring.
+  //
+  // 1) If the player is at a depicted-on-atlas location, anchor the
+  //    dot directly to that location's icon (atlas-canonical coord).
+  //    The dot lands ON the Asgardar tower, the Mud Flood Nexus icon,
+  //    the Samarran ziggurat, etc.
+  // 2) Otherwise (the player is on an unnamed wandering tile, or on
+  //    a named location that isn't drawn on the atlas), fall back to
+  //    the grid-offset estimate from the Outpost.
+  const depictedCoord = atlasCoordForLocation(player.currentLocationId);
+  const currentLocation = LOCATIONS.find((l) => l.id === player.currentLocationId) ?? null;
+  const onDepictedTile = !!depictedCoord;
 
   let dotStyle: { left: number; top: number } | null = null;
   if (imgBox) {
-    const cx = imgBox.width * OUTPOST_FRAC_X;
-    const cy = imgBox.height * OUTPOST_FRAC_Y;
-    const tile = imgBox.height * DOT_TILE_FRAC;
-    dotStyle = {
-      left: cx + dx * tile - DOT_SIZE / 2,
-      top: cy + dy * tile - DOT_SIZE / 2,
-    };
+    if (depictedCoord) {
+      dotStyle = {
+        left: imgBox.width * depictedCoord.fx - DOT_SIZE / 2,
+        top: imgBox.height * depictedCoord.fy - DOT_SIZE / 2,
+      };
+    } else {
+      const cx = imgBox.width * OUTPOST_ATLAS_COORD.fx;
+      const cy = imgBox.height * OUTPOST_ATLAS_COORD.fy;
+      const tile = imgBox.height * DOT_TILE_FRAC;
+      dotStyle = {
+        left: cx + dx * tile - DOT_SIZE / 2,
+        top: cy + dy * tile - DOT_SIZE / 2,
+      };
+    }
   }
+
+  // Footer prose — when the player is on a depicted location, name
+  // it; when they're between tiles, give the grid-offset estimate.
+  const whereLine = onDepictedTile && currentLocation
+    ? currentLocation.name
+    : dx === 0 && dy === 0
+      ? 'at the Outpost'
+      : Math.abs(dx) >= Math.abs(dy)
+        ? `${Math.abs(dx)} tile${Math.abs(dx) === 1 ? '' : 's'} ${dx >= 0 ? 'east' : 'west'} of the Outpost`
+        : `${Math.abs(dy)} tile${Math.abs(dy) === 1 ? '' : 's'} ${dy >= 0 ? 'south' : 'north'} of the Outpost`;
 
   return (
     <View style={styles.container}>
@@ -248,13 +280,15 @@ export function MapScreen() {
 
       <View style={styles.footer}>
         <Text style={styles.footerHere}>● YOU ARE HERE</Text>
-        <Text style={styles.footerWhere}>{cardinal}</Text>
+        <Text style={styles.footerWhere}>{whereLine}</Text>
         <Text style={styles.footerDist}>
           {tiles === 0 ? 'At the Outpost.' : `${tiles} day${tiles === 1 ? '' : 's'} of travel from the Outpost.`}
         </Text>
         <Text style={styles.footerCaveat}>
           Drag to pan · pinch to zoom · double-tap to reset.
-          Terrain rotates per character; the dot tracks your true grid offset.
+          {onDepictedTile
+            ? ' Dot anchored to the atlas drawing.'
+            : ' Terrain rotates per character; the dot tracks your grid offset.'}
         </Text>
       </View>
     </View>
