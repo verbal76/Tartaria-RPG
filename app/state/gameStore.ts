@@ -113,6 +113,7 @@ import {
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, VENDORS, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks } from '../engine/raceMechanics';
+import { trainStat, ensureStatProgress, type StatKey } from '../engine/statTraining';
 import { findQuestFactionHint } from '../engine/factionHint';
 import {
   HUB,
@@ -595,6 +596,11 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     staminaMax: stamMax,
     stamina: p.stamina ?? stamMax,
     milestones: p.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 },
+    // OTA 058 — initialize stat progress for legacy saves so the
+    // use-based growth system has a clean baseline.
+    statProgress: p.statProgress ?? {
+      strength: 0, dexterity: 0, intelligence: 0, wisdom: 0, charisma: 0,
+    },
     equipped,
     statusEffects: p.statusEffects ?? [],
     hoursElapsed: p.hoursElapsed ?? 0,
@@ -665,7 +671,9 @@ function recordMemorableEvent(
 // earned, not handed out.
 const MILESTONE_KILL_STEP = 5;     // every 5 enemies defeated → +1 HP max
 const MILESTONE_TRAVEL_STEP = 5;   // every 5 travels → +1 stamina max
-const MILESTONE_CHECK_STEP = 10;   // every 10 successful skill checks → +1 to the relevant stat
+// OTA 058 — MILESTONE_CHECK_STEP retired. Skill-check stat growth is
+// now per-use via engine/statTraining (Skyrim model). HP and stamina
+// growth still use the milestone counters above.
 
 function checkMilestone(
   counter: number,
@@ -5265,6 +5273,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         }
         if (tierCleared) {
+          // OTA 058 — train DEX on a successful climb tier (rope
+          // auto-pass also counts; the climb still happened).
+          const liveClimber = get().player;
+          if (liveClimber) {
+            const tr = trainStat(liveClimber, 'dexterity', true);
+            set((s) => (s.player ? { player: tr.player } : s));
+            if (tr.leveled) {
+              get().appendLog(
+                'reward',
+                `✦ Your grip remembers. +1 DEX (now ${tr.leveled.to}).`,
+              );
+            }
+          }
           const isTop = currentTier === totalTiers;
           const label = climbTierLabel(currentTier, totalTiers);
           if (isTop) {
@@ -6670,28 +6691,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
           void Promise.resolve().then(() => get().advanceStoryline(storyMatch.rec.id));
         }
 
-        // Skill-check milestone: every 10 successful checks → +1 to the stat
-        // the check used. Tracked across the character's lifetime.
+        // OTA 058 — use-based stat progression. Replaces the
+        // OTA 040-era "every 10 successful checks → +1 stat" milestone
+        // with Skyrim-style accumulated progress. Tier-based award:
+        // stat ≤ 10 earns +2 progress per success, 11-14 +1, 15+ +0.5.
+        // Each stat hits +1 at 100 progress (50 / 100 / 200 uses).
+        // Failures don't train. The intent→stat map is unchanged so
+        // diplomacy still grows CHA, investigate INT, etc.
         const prevMs = player.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 };
         const newChecks = prevMs.checksSucceeded + 1;
-        const hitMilestone = checkMilestone(newChecks, MILESTONE_CHECK_STEP);
-        const statKey = INTENT_TO_STAT[intent] ?? 'wisdom';
-        const bumpedStats = hitMilestone
-          ? { ...player.stats, [statKey]: player.stats[statKey] + 1 }
-          : player.stats;
+        const statKey: StatKey = INTENT_TO_STAT[intent] ?? 'wisdom';
+        const trainResult = trainStat(player, statKey, true);
         set((s) => ({
           player: s.player
             ? {
-                ...s.player,
-                stats: bumpedStats,
+                ...trainResult.player,
                 milestones: { ...prevMs, checksSucceeded: newChecks },
               }
             : s.player,
         }));
-        if (hitMilestone) {
+        if (trainResult.leveled) {
           get().appendLog(
             'reward',
-            `✦ Practice sharpens you. +1 ${statKey.toUpperCase().slice(0, 3)} (now ${bumpedStats[statKey]}). [${newChecks} checks succeeded]`,
+            `✦ Practice sharpens you. +1 ${trainResult.leveled.stat.toUpperCase().slice(0, 3)} (now ${trainResult.leveled.to}). [${newChecks} checks succeeded]`,
           );
         }
         switch (intent) {
@@ -7004,6 +7026,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
           : (player.equipped?.main ?? player.equipped?.weaponName ?? player.equipped?.off ?? null);
         if (weaponInUse) {
           set((s) => (s.player ? { player: wearEquippedItem(s.player, weaponInUse, get) } : s));
+        }
+      }
+
+      // OTA 058 — train the attack-stat for the landed hit. Barehand
+      // and most melee weapons train STR; finesse / ranged weapons
+      // that declare stat:'dexterity' in the catalog train DEX. The
+      // training fires after the Sentinel hit-gate AND the dodge
+      // check, so it only triggers when damage actually applied.
+      {
+        const atkStat: StatKey = equipped?.stat === 'dexterity' ? 'dexterity' : 'strength';
+        const liveAfterDmg = get().player;
+        if (liveAfterDmg) {
+          const tr = trainStat(liveAfterDmg, atkStat, true);
+          set((s) => (s.player ? { player: tr.player } : s));
+          if (tr.leveled) {
+            get().appendLog(
+              'reward',
+              `✦ The work hones you. +1 ${tr.leveled.stat.toUpperCase().slice(0, 3)} (now ${tr.leveled.to}).`,
+            );
+          }
         }
       }
 
@@ -7667,6 +7709,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
         };
       });
       get().appendLog('reward', `✦ Successfully stole ${offer.itemName} from ${scene.vendor.name}.`);
+      // OTA 058 — successful steal trains DEX (your fingers got
+      // quicker).
+      const liveThief = get().player;
+      if (liveThief) {
+        const tr = trainStat(liveThief, 'dexterity', true);
+        set((s) => (s.player ? { player: tr.player } : s));
+        if (tr.leveled) {
+          get().appendLog(
+            'reward',
+            `✦ Light hands. +1 DEX (now ${tr.leveled.to}).`,
+          );
+        }
+      }
     } else {
       // OTA 030 — caught. Vendor flips HOSTILE (was: walks away).
       // Spin up an Enemy scaled to the vendor's tier and clear the
@@ -11089,6 +11144,20 @@ function applyEnemyCounter(
         : s,
     );
     if (playerWins) {
+      // OTA 058 — Fight Back is a STR contest; winning trains STR.
+      {
+        const liveFighter = get().player;
+        if (liveFighter) {
+          const tr = trainStat(liveFighter, 'strength', true);
+          set((s) => (s.player ? { player: tr.player } : s));
+          if (tr.leveled) {
+            get().appendLog(
+              'reward',
+              `✦ Strength remembers itself. +1 STR (now ${tr.leveled.to}).`,
+            );
+          }
+        }
+      }
       // Player lands a hit on enemy as part of trading.
       const equipped = player.equipped?.main ? findWeaponByName(player.equipped.main) : null;
       const dmg = equipped ? rollDie(6) + 1 : rollDie(4);
@@ -11250,6 +11319,20 @@ function applyEnemyCounter(
       const mainName = player.equipped?.main ?? player.equipped?.weaponName ?? null;
       const equipped = mainName ? findWeaponByName(mainName) : null;
       if (success) {
+        // OTA 058 — successful parry trains DEX.
+        {
+          const liveParrier = get().player;
+          if (liveParrier) {
+            const tr = trainStat(liveParrier, 'dexterity', true);
+            set((s) => (s.player ? { player: tr.player } : s));
+            if (tr.leveled) {
+              get().appendLog(
+                'reward',
+                `✦ Reflex like water. +1 DEX (now ${tr.leveled.to}).`,
+              );
+            }
+          }
+        }
         const before = dmg;
         dmg = 0;
         if (equipped) {
@@ -12038,6 +12121,24 @@ function runAethercraft(
     );
     set((s) => s.player ? { player: advanceTime(spendStamina(s.player, 2), 0.5) } : s);
     return;
+  }
+
+  // OTA 058 — successful cast trains the channel stat (INT for
+  // shape/summon, WIS for mend).
+  {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { trainStat: trainAetherStat } = require('../engine/statTraining');
+    const liveCaster = get().player;
+    if (liveCaster) {
+      const tr = trainAetherStat(liveCaster, stat, true);
+      set((s) => s.player ? { player: tr.player } : s);
+      if (tr.leveled) {
+        get().appendLog(
+          'reward',
+          `✦ The aether teaches you. +1 ${tr.leveled.stat.toUpperCase().slice(0, 3)} (now ${tr.leveled.to}).`,
+        );
+      }
+    }
   }
 
   // 4. Success path — discipline-specific outcome.

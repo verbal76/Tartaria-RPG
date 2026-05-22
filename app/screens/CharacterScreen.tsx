@@ -11,6 +11,7 @@ import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
 import { effectiveStatsBreakdown, type StatBreakdown } from '../engine/equipment';
+import { displayedProgressBar, displayedProgressPercent } from '../engine/statTraining';
 import { effectiveAC, barehandDamageFor } from '../engine/raceMechanics';
 import { corruptionTierOf, tierLabel, tierDescription } from '../engine/corruption';
 import { getItemPreview } from '../components/itemPreview';
@@ -112,7 +113,13 @@ export function CharacterScreen() {
         <Text style={styles.sectionTitle}>CORE STATS</Text>
         <View style={styles.card}>
           {(Object.keys(STAT_LABEL) as Array<keyof Stats>).map((s) => (
-            <StatRow key={s} label={STAT_LABEL[s]} b={breakdown[s]} />
+            <StatRow
+              key={s}
+              label={STAT_LABEL[s]}
+              b={breakdown[s]}
+              progressBar={displayedProgressBar(player, s)}
+              progressPct={displayedProgressPercent(player, s)}
+            />
           ))}
         </View>
 
@@ -273,7 +280,17 @@ export function CharacterScreen() {
   );
 }
 
-function StatRow({ label, b }: { label: string; b: StatBreakdown }) {
+function StatRow({
+  label,
+  b,
+  progressBar,
+  progressPct,
+}: {
+  label: string;
+  b: StatBreakdown;
+  progressBar: string;
+  progressPct: number;
+}) {
   const hasSources = b.sources.length > 0;
   return (
     <View style={styles.statRow}>
@@ -282,6 +299,12 @@ function StatRow({ label, b }: { label: string; b: StatBreakdown }) {
         <Text style={styles.statTotal}>
           {b.total}
           {hasSources && <Text style={styles.statBase}>  (base {b.base})</Text>}
+        </Text>
+        {/* OTA 058 — use-based growth bar. Quantized to quarters
+            so the player sees changes at 25/50/75/100 — not every
+            single use. The label reads e.g. "▮▮▯▯  50%". */}
+        <Text style={styles.progressBar}>
+          {progressBar}  <Text style={styles.progressPct}>{progressPct}%</Text>
         </Text>
         {hasSources && (
           <View style={styles.chipRow}>
@@ -355,6 +378,8 @@ const styles = StyleSheet.create({
   statBody: { flex: 1 },
   statTotal: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
   statBase: { color: '#5a5246', fontSize: 11, fontWeight: '400' },
+  progressBar: { color: '#9ec96a', fontSize: 10, letterSpacing: 1, marginTop: 3 },
+  progressPct: { color: '#5a5246', fontSize: 9, letterSpacing: 0.5 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
   chip: { backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1, borderRadius: 3, paddingHorizontal: 8, paddingVertical: 3 },
   chipNeg: { borderColor: '#7a4040', backgroundColor: '#221512' },

@@ -521,6 +521,13 @@ export interface PlayerCharacter {
   dead?: boolean;
   /** Lifetime counters; thresholds trigger stat growth. */
   milestones?: PlayerMilestones;
+  /** OTA 058 — Skyrim-style use-based stat progression. Each stat
+   *  accumulates "progress" from every action that uses it (combat
+   *  attack with that stat, skill check, climb, cast, etc.). When
+   *  progress hits 100, the base stat increments by 1 and progress
+   *  rolls over the overshoot. Default threshold 50 per +1 — see
+   *  engine/statTraining.ts STAT_TRAIN_THRESHOLD. */
+  statProgress?: Partial<Record<keyof Stats, number>>;
   /** HANDOFF #13 — first-cut companion system. A single NPC follower
    *  the player recruits from a vendor scene. Persists across scenes.
    *  Currently narrative-only; mechanical effects (advantage dice on
