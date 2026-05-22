@@ -295,8 +295,16 @@ export function ExplorationScreen() {
               try {
                 await flushLogWrites();
                 const fresh = await readFullLog();
-                await Clipboard.setStringAsync(fresh);
-                setLogCharCount(fresh.length);
+                // OTA 018 — wrap the copied log in HEADER / FOOTER
+                // markers so truncation is unambiguous. If the paste
+                // destination shows the HEADER but no FOOTER, the
+                // truncation happened in clipboard / paste. If
+                // neither marker shows, the read itself returned
+                // empty. The reported char count is the wrapped
+                // length so it matches what hits the clipboard.
+                const stamped = `=== TARTARIA LOG · ${fresh.length} CHARS · BEGIN ===\n${fresh}\n=== END LOG · ${fresh.length} CHARS ===\n`;
+                await Clipboard.setStringAsync(stamped);
+                setLogCharCount(stamped.length);
                 setLogCopied(true);
                 // OTA 017 — if the disk log dropped writes (AsyncStorage
                 // cap hit or similar), tell the player explicitly so a

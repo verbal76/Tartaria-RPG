@@ -42,7 +42,12 @@ export function LogScreen() {
   async function handleCopy() {
     await flushLogWrites();
     const fresh = await readFullLog();
-    await Clipboard.setStringAsync(fresh);
+    // OTA 018 — same HEADER / FOOTER envelope as the exploration
+    // screen copy button. Lets us diagnose paste-side truncation
+    // unambiguously (if FOOTER is missing, the buffer was clipped
+    // somewhere between Clipboard.setStringAsync and the paste).
+    const stamped = `=== TARTARIA LOG · ${fresh.length} CHARS · BEGIN ===\n${fresh}\n=== END LOG · ${fresh.length} CHARS ===\n`;
+    await Clipboard.setStringAsync(stamped);
     setDiskLog(fresh || '(no log yet)');
     setCopied(true);
     // OTA 017 — surface persisted write failures so the player knows
@@ -65,8 +70,10 @@ export function LogScreen() {
     await flushLogWrites();
     const fresh = await readFullLog();
     setDiskLog(fresh || '(no log yet)');
+    // OTA 018 — envelope so paste-side truncation is visible.
+    const stamped = `=== TARTARIA LOG · ${fresh.length} CHARS · BEGIN ===\n${fresh}\n=== END LOG · ${fresh.length} CHARS ===\n`;
     try {
-      await Share.share({ message: fresh, title: 'Tartaria-RPG game log' });
+      await Share.share({ message: stamped, title: 'Tartaria-RPG game log' });
       setShared(true);
       setTimeout(() => setShared(false), 1500);
     } catch {
