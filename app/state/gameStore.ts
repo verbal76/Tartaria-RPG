@@ -3285,7 +3285,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } else {
                 get().appendLog(
                   'world',
-                  `Something in the ${rawTarget} catches the eye, but there's already an open thread here that wants finishing first.`,
+                  // OTA 015 — was "Something in the X catches the eye, but
+                  // there's already an open thread..." Players read "catches
+                  // the eye" as a positive find and tried to act on it, but
+                  // the noun stays unconsumed and no hook was planted. Rephrased
+                  // to a clean "nothing this time" outcome so the player knows
+                  // to retry later (or finish the open thread first).
+                  `You comb the ${rawTarget}. Nothing surfaces — the thread you're already on holds your attention.`,
                 );
                 // producedFb stays false — noun NOT consumed.
               }
