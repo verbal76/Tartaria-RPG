@@ -1173,7 +1173,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // item — either way they should be able to take from the scene
     // again. This unsticks corrupted save state without breaking
     // legitimate dedup for normal takes.
-    const alreadyConsumed = (room?.searchedAmbientNouns ?? []).some(
+    const alreadyConsumed = nonClimbMarkers(room?.searchedAmbientNouns).some(
       (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
     );
     if (alreadyConsumed) {
@@ -1253,7 +1253,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const roomKey = makeRoomKey(player.currentLocationId, scene.microMicroId, player.mapX, player.mapY);
     const room = state.worldMemory.visitedRooms?.[roomKey];
     const ambientLower = ambientHit.toLowerCase();
-    const alreadyConsumed = (room?.searchedAmbientNouns ?? []).some(
+    const alreadyConsumed = nonClimbMarkers(room?.searchedAmbientNouns).some(
       (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
     );
     if (alreadyConsumed) {
@@ -3278,7 +3278,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             const fallbackPrior = get().worldMemory.visitedRooms?.[fallbackRoomKey];
             const loweredFallback = rawTarget.toLowerCase().trim();
-            const fallbackAlreadySearched = (fallbackPrior?.searchedAmbientNouns ?? []).some(
+            const fallbackAlreadySearched = nonClimbMarkers(fallbackPrior?.searchedAmbientNouns).some(
               (n) => n === loweredFallback || loweredFallback.includes(n) || n.includes(loweredFallback),
             );
 
@@ -3343,7 +3343,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             const fallbackPrior = get().worldMemory.visitedRooms?.[fallbackRoomKey];
             const loweredFallback = rawTarget.toLowerCase().trim();
-            const fallbackAlreadySearched = (fallbackPrior?.searchedAmbientNouns ?? []).some(
+            const fallbackAlreadySearched = nonClimbMarkers(fallbackPrior?.searchedAmbientNouns).some(
               (n) => n === loweredFallback || loweredFallback.includes(n) || n.includes(loweredFallback),
             );
             if (fallbackAlreadySearched) {
@@ -3502,7 +3502,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             const harvestPrior = get().worldMemory.visitedRooms?.[harvestRoomKey];
             const harvestLowered = harvestAmbient.toLowerCase();
-            const harvestAlreadyDone = (harvestPrior?.searchedAmbientNouns ?? []).some(
+            const harvestAlreadyDone = nonClimbMarkers(harvestPrior?.searchedAmbientNouns).some(
               (n) => n === harvestLowered || harvestLowered.includes(n) || n.includes(harvestLowered),
             );
             if (harvestAlreadyDone) {
@@ -3632,7 +3632,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               player.mapY,
             );
             const searchPrior = get().worldMemory.visitedRooms?.[searchRoomKey];
-            const alreadySearched = (searchPrior?.searchedAmbientNouns ?? []).some(
+            const alreadySearched = nonClimbMarkers(searchPrior?.searchedAmbientNouns).some(
               (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
             );
             if (alreadySearched) {
@@ -3799,7 +3799,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           const priorVisit = get().worldMemory.visitedRooms?.[searchRoomKey];
           const loweredTarget = rawTarget.toLowerCase().trim();
-          const alreadySearched = (priorVisit?.searchedAmbientNouns ?? []).some(
+          const alreadySearched = nonClimbMarkers(priorVisit?.searchedAmbientNouns).some(
             (n) => n === loweredTarget || loweredTarget.includes(n) || n.includes(loweredTarget),
           );
           if (alreadySearched) {
@@ -6034,7 +6034,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // Self-healing dedup — see takeAmbientNoun (~line 960)
               // for full rationale. Treat consumed-but-not-in-pack
               // entries as stale.
-              const alreadyConsumed = (ambientRoom?.searchedAmbientNouns ?? []).some(
+              const alreadyConsumed = nonClimbMarkers(ambientRoom?.searchedAmbientNouns).some(
                 (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
               );
               if (alreadyConsumed && cat) {
@@ -11211,6 +11211,24 @@ function makeRoomKey(
   return `${locationId}@${mm}@${x},${y}`;
 }
 
+// v2.4.1 (OTA 027) — strip per-tier climb markers from a
+// searchedAmbientNouns list before non-climb-verb dedup checks.
+//
+// Climb writes namespaced markers like "climbed:arch:t3" to the
+// SAME store the harvest/investigate/take verbs check; bidirectional
+// substring matching means "climbed:arch:t3".includes("arch") is
+// true, so an arch the player only CLIMBED gets falsely flagged as
+// already-investigated / already-taken / already-salvaged. Playtest:
+// `investigate arch` refused with "you've already worked the arch
+// over" after the player climbed but did not investigate it.
+//
+// Filter out the marker entries so each verb's dedup only sees real
+// consumption history.
+function nonClimbMarkers(searched: readonly string[] | undefined): string[] {
+  if (!searched) return [];
+  return searched.filter((s) => !s.startsWith('climbed:'));
+}
+
 // HANDOFF #15c — has the player already grabbed this loot in this room?
 // Used by dig and area-search to avoid handing out the same scarce drop
 // on re-entry. Item names are compared lowercased; consumables and
@@ -12226,7 +12244,9 @@ function narrateCasualLook(
   //      record it (race, save migration, stale state).
   // Mirrors the chip UI's isAmbientConsumed at ExplorationScreen so
   // the "You see:" list matches the chip dim state visually.
-  const lookSearched = (lookRoom?.searchedAmbientNouns ?? []).map((n) => n.toLowerCase());
+  // Strip climb markers — a noun that's only been CLIMBED shouldn't
+  // get hidden from the "You see:" list.
+  const lookSearched = nonClimbMarkers(lookRoom?.searchedAmbientNouns).map((n) => n.toLowerCase());
   const isConsumedForLook = (displayNoun: string): boolean => {
     const lower = displayNoun.toLowerCase();
     // (1) bidirectional substring against searchedAmbientNouns.
