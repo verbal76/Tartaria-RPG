@@ -37,14 +37,29 @@ export function LoreCodexBody() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
   const setTravelCourse = useGameStore((s) => s.setTravelCourse);
+  const appendLog = useGameStore((s) => s.appendLog);
 
   const canPlanRoute = !!player;
   const here = player?.currentLocationId ?? null;
 
   const confirmRoute = () => {
-    if (!pendingRoute) return;
+    if (!pendingRoute || !player) return;
     const id = pendingRoute.id;
     setPendingRoute(null);
+    // OTA 458 — refuse the route when the player is still inside a hub
+    // room. setTravelCourse reads currentLocationId (the macro tile
+    // under the hub) and would step the player onto a procedural tile
+    // while hubRoomId is still set, leaving the scene in a half-state.
+    // The player has to leave the outpost first — same gate the
+    // cardinal-travel handler applies for outdoor moves from hubs.
+    if (player.hubRoomId) {
+      appendLog(
+        'arbiter',
+        `The Arbiter holds up a hand. "Leave the outpost first — type 'leave outpost' or walk through the gate, then I can chart you to ${pendingRoute.name}."`,
+      );
+      setScreen('exploration');
+      return;
+    }
     setTravelCourse(id);
     setScreen('exploration');
   };

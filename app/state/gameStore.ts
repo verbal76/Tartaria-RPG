@@ -4771,11 +4771,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // OTA 455 — also check `aliases` (already declared in
         // locations.json) so "wastes" matches "Tartarian Outskirts",
         // "cathedral" matches "Sinking Cathedral", etc.
+        // OTA 458 — alias matching is now one-directional + min-length
+        // gated. Earlier `target.includes(alias)` admitted matches like
+        // typed "samar" sweeping every short alias ("sea", "city") for
+        // a substring hit. We now ONLY accept alias.includes(target),
+        // and require target ≥ 3 chars so single-letter typos don't
+        // brute-force a hit either.
         let candidate = target
           ? allLocations.find((l) =>
               l.name.toLowerCase().includes(target)
               || l.id === target
-              || ((l as { aliases?: string[] }).aliases ?? []).some((a) => a.toLowerCase().includes(target) || target.includes(a.toLowerCase()))
+              || (target.length >= 3 && ((l as { aliases?: string[] }).aliases ?? []).some((a) => {
+                const al = a.toLowerCase();
+                return al === target || al.includes(target);
+              }))
             )
           : undefined;
         if (!candidate && target && target.length >= 5) {
