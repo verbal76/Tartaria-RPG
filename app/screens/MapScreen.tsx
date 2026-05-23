@@ -141,17 +141,26 @@ export function MapScreen() {
     : { positions: {} as Record<string, { x: number; y: number }>, tiles: [] };
   const safeAtlasPos = interpolateAtlasPosition(safeMapX, safeMapY, safeWorldMap.positions);
 
+  // Whether we've snapped to the marker at least once on this mount.
+  // Used so subsequent panning by the player isn't yanked back to
+  // center on every state nudge, but the FIRST view of the map is
+  // guaranteed to center on the player.
+  const hasAutoCentered = useRef(false);
+
   useEffect(() => {
     if (!imgBox) return;
     const imgAspect = ATLAS_W / ATLAS_H;
     const boxAspect = imgBox.width / imgBox.height;
     const fill = boxAspect < imgAspect ? imgAspect / boxAspect : 1;
     baselineScale.current = fill;
-    // Only snap to the baseline + center on first layout — if the
-    // user has already pinched/panned away, don't yank them back.
-    if (scaleRef.current === 1 && txRef.current === 0 && tyRef.current === 0) {
-      // Compute marker's layout position inside the box at scale=1
-      // (matches the dot positioning math in the render body).
+    // OTA 23-002 — guarantee the auto-center fires on first layout
+    // regardless of whether scale/tx/ty are still at defaults. The
+    // previous "if (scale===1 && tx===0 && ty===0)" guard would skip
+    // re-centering when imgBox changed for any reason (e.g. orientation
+    // shift or hot reload). Now driven by a dedicated hasAutoCentered
+    // ref so the FIRST run always centers and subsequent imgBox
+    // updates preserve player gestures.
+    if (!hasAutoCentered.current) {
       let renderedW: number;
       let renderedH: number;
       let offsetX: number;
@@ -169,11 +178,6 @@ export function MapScreen() {
       }
       const markerLayoutX = offsetX + renderedW * safeAtlasPos.fx;
       const markerLayoutY = offsetY + renderedH * safeAtlasPos.fy;
-      // To put the marker at the box center after scale=fill, we
-      // counter-translate by -fill × (marker layout offset from
-      // box center). RN's transform [translate, ..., scale] means
-      // scale is applied around the View's center, so we offset
-      // the result with translate.
       const initTX = -fill * (markerLayoutX - imgBox.width / 2);
       const initTY = -fill * (markerLayoutY - imgBox.height / 2);
       scaleRef.current = fill;
@@ -182,21 +186,61 @@ export function MapScreen() {
       scale.setValue(fill);
       translateX.setValue(initTX);
       translateY.setValue(initTY);
+      hasAutoCentered.current = true;
     }
   }, [imgBox, scale, translateX, translateY, safeAtlasPos.fx, safeAtlasPos.fy]);
 
-  const resetTransform = () => {
-    const target = baselineScale.current;
+  // OTA 23-002 — also reset hasAutoCentered when the screen
+  // re-mounts (player navigates away and back). Refs persist
+  // across renders but not unmounts, so a fresh mount has
+  // hasAutoCentered.current === false naturally — this useEffect
+  // is just a safety belt.
+  useEffect(() => {
+    return () => {
+      hasAutoCentered.current = false;
+    };
+  }, []);
+
+  // resetTransform now ALSO re-centers on the player marker, not
+  // just back to translate=0. Double-tap and RESET button both
+  // route through here.
+  const recenterOnMarker = () => {
+    if (!imgBox) return;
+    const imgAspect = ATLAS_W / ATLAS_H;
+    const boxAspect = imgBox.width / imgBox.height;
+    const fill = boxAspect < imgAspect ? imgAspect / boxAspect : 1;
+    let renderedW: number, renderedH: number, offsetX: number, offsetY: number;
+    if (boxAspect > imgAspect) {
+      renderedH = imgBox.height;
+      renderedW = imgBox.height * imgAspect;
+      offsetX = (imgBox.width - renderedW) / 2;
+      offsetY = 0;
+    } else {
+      renderedW = imgBox.width;
+      renderedH = imgBox.width / imgAspect;
+      offsetX = 0;
+      offsetY = (imgBox.height - renderedH) / 2;
+    }
+    const markerLayoutX = offsetX + renderedW * safeAtlasPos.fx;
+    const markerLayoutY = offsetY + renderedH * safeAtlasPos.fy;
+    const initTX = -fill * (markerLayoutX - imgBox.width / 2);
+    const initTY = -fill * (markerLayoutY - imgBox.height / 2);
     Animated.parallel([
-      Animated.spring(scale, { toValue: target, useNativeDriver: true, friction: 7, tension: 80 }),
-      Animated.spring(translateX, { toValue: 0, useNativeDriver: true, friction: 7, tension: 80 }),
-      Animated.spring(translateY, { toValue: 0, useNativeDriver: true, friction: 7, tension: 80 }),
+      Animated.spring(scale, { toValue: fill, useNativeDriver: true, friction: 7, tension: 80 }),
+      Animated.spring(translateX, { toValue: initTX, useNativeDriver: true, friction: 7, tension: 80 }),
+      Animated.spring(translateY, { toValue: initTY, useNativeDriver: true, friction: 7, tension: 80 }),
     ]).start(() => {
-      scaleRef.current = target;
-      txRef.current = 0;
-      tyRef.current = 0;
+      scaleRef.current = fill;
+      txRef.current = initTX;
+      tyRef.current = initTY;
     });
   };
+
+  // OTA 23-002 — resetTransform routes through recenterOnMarker so
+  // RESET / double-tap snap back to "centered on the player," not
+  // to "translate=0 with scale=baseline" (which left the marker
+  // off-screen for any player not at the atlas's geometric center).
+  const resetTransform = recenterOnMarker;
 
   const panResponder = useRef(
     PanResponder.create({
@@ -419,6 +463,10 @@ export function MapScreen() {
               ]}
               pointerEvents="none"
             >
+              {/* Warm gold halo — the silhouette is solid black on
+                  transparent, so against dark atlas regions it would
+                  blend in. The halo gives it constant visibility. */}
+              <View style={styles.markerHalo} pointerEvents="none" />
               <Image
                 source={require('../../assets/player-marker.png')}
                 style={styles.markerImage}
@@ -446,13 +494,14 @@ export function MapScreen() {
   );
 }
 
-// OTA 057 — silhouette marker dimensions in SCREEN pixels (held
-// constant via inverse-scale, see the markerWrapper transform). The
-// asset is 1536 × 1024 (1.5:1 landscape canvas) with the figure
-// centered. At 32 × 22 the marker reads as a small Reclaimer figure
-// without obscuring the map underneath.
-const MARKER_W = 32;
-const MARKER_H = 22;
+// OTA 23-002 — bumped from 32×22 to 56×40 so the silhouette is
+// readable on a phone screen at any zoom. Pair'd with a warm-gold
+// halo backdrop (see markerHalo style) so the figure pops against
+// any region of the atlas — including the dark deep-frontier band
+// where the OTA 057 silhouette could blend into the background.
+const MARKER_W = 56;
+const MARKER_H = 40;
+const HALO_SIZE = 48;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0a0908', padding: 12 },
@@ -523,6 +572,20 @@ const styles = StyleSheet.create({
   markerImage: {
     width: '100%',
     height: '100%',
+  },
+  // OTA 23-002 — circular halo behind the silhouette so it stays
+  // visible against any atlas region. Warm gold with soft alpha
+  // matches the atlas's parchment palette.
+  markerHalo: {
+    position: 'absolute',
+    left: (MARKER_W - HALO_SIZE) / 2,
+    top: (MARKER_H - HALO_SIZE) / 2,
+    width: HALO_SIZE,
+    height: HALO_SIZE,
+    borderRadius: HALO_SIZE / 2,
+    backgroundColor: 'rgba(224, 122, 95, 0.55)', // warm orange-red, 55% opacity
+    borderColor: '#fff7e0',
+    borderWidth: 2,
   },
 
   footer: {
