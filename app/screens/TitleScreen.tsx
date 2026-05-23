@@ -9,8 +9,6 @@ import {
   RefreshControl,
   Linking,
   Share,
-  Modal,
-  ActivityIndicator,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import {
@@ -179,26 +177,25 @@ export function TitleScreen() {
   // OTA 006 — separate latch for the SHARE action so the COPIED
   // and SHARED flashes don't fight each other on the same row.
   const [sharedSlotId, setSharedSlotId] = useState<string | null>(null);
-  // OTA 007 — OTA-update state. Moved from AboutScreen so the
-  // player can pull updates without diving into settings every
-  // time. checkAndApplyOTA streams status into setUpdateStatus,
-  // the modal overlay shows it while busy.
-  const [updateBusy, setUpdateBusy] = useState(false);
-  const [updateStatus, setUpdateStatus] = useState<string>('Idle');
-  const [updateError, setUpdateError] = useState<string | null>(null);
-  async function checkForUpdate() {
-    if (updateBusy) return;
-    setUpdateBusy(true);
-    setUpdateError(null);
-    try {
-      await checkAndApplyOTA({
-        onStatus: setUpdateStatus,
-        onError: setUpdateError,
-      });
-    } finally {
-      setUpdateBusy(false);
-    }
-  }
+  // v2.4.1 (OTA 051) — auto-check for an OTA on every TitleScreen
+  // mount. Replaces the manual CHECK FOR OTA UPDATE button, which
+  // was a dev-only crutch. Same shape as the boot pass in App.tsx:
+  // fetchOnly so we don't reload mid-screen-mount, silent so a
+  // transient network error never surfaces, and pendingOTAUpdate
+  // gets flipped on a real hit so the existing UPDATE READY banner
+  // appears for the player. Save-and-exit drops the player back
+  // here, which re-mounts TitleScreen and re-fires this effect —
+  // no force-close required to pick up a new build.
+  useEffect(() => {
+    let cancelled = false;
+    void checkAndApplyOTA({ silent: true, fetchOnly: true }).then((result) => {
+      if (cancelled) return;
+      if (result === 'pending') {
+        useGameStore.setState({ pendingOTAUpdate: true });
+      }
+    });
+    return () => { cancelled = true; };
+  }, []);
   // v2.4.1 (OTA 023) — chunked copy for dead-character logs. Long
   // sessions easily exceed 25 KB and most chat clients silently
   // truncate larger pastes. Mirror LogScreen's chunking so the
@@ -508,38 +505,30 @@ export function TitleScreen() {
             >
               <Text style={styles.primaryBtnText}>New Tartarian</Text>
             </TouchableOpacity>
-            {/* v2.4.1 (OTA 046) — Lore Codex button removed.
-                Now reachable from the gear icon (bottom-right) as
-                a dedicated tab in the settings screen. The gear is
-                accessible both here AND in-game, so the Codex is
-                always one tap away. */}
-            <TouchableOpacity
-              style={[styles.updateBtn, updateBusy && styles.updateBtnBusy]}
-              onPress={() => { void checkForUpdate(); }}
-              activeOpacity={0.7}
-              disabled={updateBusy}
-            >
-              <Text style={styles.updateBtnText}>
-                {updateBusy ? updateStatus.toUpperCase() : 'CHECK FOR OTA UPDATE'}
-              </Text>
-            </TouchableOpacity>
-            {updateError ? (
-              <Text style={styles.updateError}>{updateError}</Text>
-            ) : null}
+            {/* v2.4.1 (OTA 051) — Lore Codex button removed in OTA 046,
+                CHECK FOR OTA UPDATE button removed here. The auto-check
+                in useEffect above fires on every TitleScreen mount
+                (including post-save-and-exit), so the manual button is
+                no longer needed and won't ship to players. */}
           </View>
         }
       />
 
+      {/* v2.4.1 (OTA 051) — gear icon hoisted to the top-right corner
+          for UI uniformity with the in-game ExplorationScreen, which
+          places its gear in the same spot. The footer text (version
+          + build) stays at the bottom as a quiet diagnostic strip. */}
+      <TouchableOpacity
+        style={styles.cornerGear}
+        onPress={() => setScreen('about')}
+        activeOpacity={0.7}
+        hitSlop={10}
+        accessibilityLabel="Settings"
+      >
+        <Text style={styles.gear}>⚙</Text>
+      </TouchableOpacity>
       <View style={styles.bottomBar}>
         <Text style={styles.footer}>v{APP_VERSION}  /  2148</Text>
-        <TouchableOpacity
-          style={styles.gearBtn}
-          onPress={() => setScreen('about')}
-          activeOpacity={0.7}
-          hitSlop={10}
-        >
-          <Text style={styles.gear}>⚙</Text>
-        </TouchableOpacity>
       </View>
 
       <BrandedModal
@@ -612,27 +601,11 @@ export function TitleScreen() {
         onRequestClose={clearSlotLoadError}
       />
 
-      {/* OTA 007 — full-screen overlay while an update is in flight.
-          Without it, reloadAsync() blacks the screen mid-tear-down and
-          the player thinks the app crashed. Spinner + status keeps
-          them oriented through the gap. */}
-      <Modal visible={updateBusy} transparent animationType="fade" statusBarTranslucent>
-        <View style={styles.updateScrim}>
-          <View style={styles.updateCard}>
-            <Text style={styles.updateTitle}>UPDATING</Text>
-            <View style={styles.updateRule} />
-            <View style={styles.updateSpinnerRow}>
-              <ActivityIndicator color="#c9a86a" size="large" />
-            </View>
-            <Text style={styles.updateStatusLine}>{updateStatus}</Text>
-            <Text style={styles.updateHint}>
-              Tartaria is replacing its bones. The screen will go dark for ~10 seconds while
-              the new bundle loads. If it stays black past a minute, force-close the app and
-              reopen it — your progress is saved.
-            </Text>
-          </View>
-        </View>
-      </Modal>
+      {/* v2.4.1 (OTA 051) — full-screen UPDATING modal removed along
+          with the manual CHECK FOR OTA UPDATE button. The boot-time
+          auto-check is fetchOnly (no reload) and silent, so it has
+          no UI surface. The UPDATE READY banner above handles the
+          live apply path with its own inline status. */}
     </View>
   );
 }
@@ -822,55 +795,29 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   secondaryBtnText: { color: '#cdbf99', fontSize: 12, letterSpacing: 1, fontWeight: '700' },
-  updateBtn: {
-    backgroundColor: '#3a342c',
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingVertical: 12,
-    alignItems: 'center',
-    marginTop: 12,
-  },
-  updateBtnBusy: { backgroundColor: '#1a1714' },
-  updateBtnText: { color: '#e6d8b3', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
-  updateError: { color: '#e07a5f', fontSize: 11, marginTop: 6, textAlign: 'center', fontStyle: 'italic' },
-  updateScrim: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.85)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  updateCard: {
-    width: '100%',
-    maxWidth: 360,
-    backgroundColor: '#13110f',
-    borderColor: '#c9a86a',
-    borderWidth: 1,
-    borderRadius: 4,
-    padding: 18,
-    alignItems: 'center',
-  },
-  updateTitle: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
-  updateRule: { height: 1, alignSelf: 'stretch', backgroundColor: '#3a342c', marginTop: 8, marginBottom: 14 },
-  updateSpinnerRow: { paddingVertical: 6, marginBottom: 8 },
-  updateStatusLine: { color: '#e6d8b3', fontSize: 13, letterSpacing: 1, marginBottom: 10 },
-  updateHint: { color: '#7a705c', fontSize: 11, lineHeight: 16, textAlign: 'center', fontStyle: 'italic' },
   bottomBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     paddingTop: 8,
   },
-  gearBtn: {
-    backgroundColor: '#1a1714',
+  // v2.4.1 (OTA 051) — top-right gear matches ExplorationScreen's
+  // cornerGear placement so the player always finds settings in the
+  // same spot. Absolute over the title section; the crest + headers
+  // are centered + don't reach the right edge.
+  cornerGear: {
+    position: 'absolute',
+    top: 24,
+    right: 12,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(26, 23, 20, 0.85)',
     borderColor: '#3a342c',
     borderWidth: 1,
-    borderRadius: 4,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    minWidth: 44,
     alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
   },
   gear: { color: '#c9a86a', fontSize: 18, lineHeight: 18, textAlign: 'center' },
   footer: { color: '#3a342c', fontSize: 10, marginLeft: 2 },

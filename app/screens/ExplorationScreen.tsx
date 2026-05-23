@@ -618,35 +618,13 @@ const styles = StyleSheet.create({
   streamingPrefix: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginBottom: 2 },
   streamingText: { color: '#cdbf99', fontSize: 13, lineHeight: 18 },
   streamingCursor: { color: '#c9a86a', fontSize: 13 },
+  // v2.4.1 (OTA 048) — the bottom menu row (save & exit, copy/clear
+  // log, gear) was removed; gear is the cornerGear above and the
+  // session controls all live in the gear screen's SESSION tab. The
+  // controls block now wraps just the InputBox / DiceRoller, so the
+  // feed's flex:1 naturally absorbs the reclaimed vertical real
+  // estate.
   controls: { gap: 6 },
-  menuRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 4, gap: 4 },
-  menu: { color: '#7a705c', fontSize: 11, letterSpacing: 1 },
-  // Bordered chips for the bottom menu row so 'save & exit', 'copy
-  // log', and 'clear log' read as proper buttons. OTA 224 trimmed
-  // horizontal padding from 10 → 4 so three labels + the gear fit
-  // comfortably without shrinking text size — playtester wanted
-  // narrower buttons, not smaller letters.
-  menuBtn: {
-    backgroundColor: '#1a1612',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingHorizontal: 4,
-    paddingVertical: 6,
-    flex: 1,
-    alignItems: 'center',
-  },
-  menuBtnText: { color: '#cdbf99', fontSize: 11, fontWeight: '700', letterSpacing: 1 },
-  menuBtnGear: {
-    backgroundColor: '#1a1612',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   gear: { color: '#c9a86a', fontSize: 16, lineHeight: 18 },
   // v2.4.1 (OTA 045) — Main Quest chip + Contracts menu entry.
   // Sits above the vendor banner, below the scene bar. Now the only
