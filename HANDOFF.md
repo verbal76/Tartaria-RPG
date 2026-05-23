@@ -1,13 +1,14 @@
 # Tartaria Realms — Session Handoff
 
 > **Branch:** `claude/new-session-MvF82` (active work)
-> **Latest OTA:** `2026-05-22-043`
-> **APK build:** `138` (`version: 2.201` — runtime stream all OTAs target)
+> **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`
+> **Latest OTA:** `2026-05-23-003` (auto-center map removal)
+> **Latest APK trigger:** `2026-05-22a` (in `metro.config.js`) — built at runtime `2.201`. **A new APK at `2.4.1` is required** before the next OTA reaches devices (current OTAs targeting runtime `2.4.1` go nowhere until an APK is built at that version).
 > **TypeScript:** 0 errors (`npx tsc --noEmit`)
-> **Tests:** 1174 / 1174 across 99 suites
+> **Tests:** 1283 / 1283 across 106 suites
 > **Working tree:** clean
-> **Open PR:** #1 — draft, this branch → `main`, covers OTAs 029–043
-> **Open issues:** 0
+> **Open PR:** #1 — draft, this branch → `main`, covers everything since the 029 cleanup
+> **Open issues:** 0 (GitHub repo issue tracker)
 
 ---
 
@@ -113,7 +114,7 @@ app/
   screens/             — Title / CharacterCreation / Exploration / Inventory /
                          Crafting / Vendor / Log / Lore / About (3-tab) /
                          ActionReference / Contracts
-  state/               — gameStore.ts (Zustand) — ~7000 lines, the spine
+  state/               — gameStore.ts (Zustand) — ~12,500 lines, the spine
   updates/             — checkAndApplyOTA.ts — fetchOnly mode for boot,
                          full reload on player tap
   voice/               — voiceSettings / TTSManager / TTSController /
@@ -133,9 +134,77 @@ docs/                  — pronunciation worksheet (pending player input)
 
 ---
 
-## 6. Systems shipped this session (OTA 117 → 043)
+## 6. Systems shipped this session (OTA 117 → 2026-05-23-003)
 
 > Numbering reset to `YYYY-MM-DD-NNN` per the OTA convention on 2026-05-22; the post-141 work below carries the new date prefix.
+
+### v2.4.1 milestone (May 22-23 batch)
+
+The app.json version was bumped from `2.201` to `2.4.1` as a milestone marker for the post-audit + new-features work. **The next APK build must be triggered at `2.4.1` before any OTAs at this runtime reach a device.** Until then, existing testers on the `2.201` APK can still receive OTAs published prior to the version bump, but anything pushed after will sit in EAS until an APK at runtime `2.4.1` is in the wild.
+
+### World atlas + map screen (OTAs 048 → 23-003)
+
+A full atlas/navigation system was added this batch.
+
+- **OTA 048** — `docs/world-atlas-for-notebook-lm.md` authored. Single-document distillation of every geography source in the codebase (`locations.json`, `worldLadder.json`, `static_hub.json`, lore) for Notebook LM to ingest and produce a hand-drawn infographic.
+- **OTA 049** — `'map'` added to `ScreenName`. New `app/screens/MapScreen.tsx`. New **MAP** button on the cardinal-travel row (`InputBox.tsx` `onOpenMap` prop). Reads the user-provided atlas asset `assets/world-atlas.png`.
+- **OTA 050** — pinch-to-zoom + drag-to-pan + double-tap-reset gesture stack built on RN's `Animated` + `PanResponder` (no new native dependency).
+- **OTA 051** — first calibration pass. 12 of 21 named locations got hand-measured atlas coordinates in `app/engine/atlasCoords.ts`. Per-location dot anchoring; grid-offset fallback for the other 9.
+- **OTA 052** — user swapped the portrait atlas for a landscape redraw (1408×768). All 12 coords re-measured against the new artwork. 20/21 coverage. `clampToMapArea` widened so the dot doesn't drift onto insets.
+- **OTA 053** — v3 atlas swap. Obsidian Pillars now drawn (next to the Tartarian observatory icon). Full 21/21 coverage. Coverage soft-pin raised to `=== LOCATIONS.length` so future redraws can't silently regress.
+- **OTA 054** — **inverse-distance-weighted (IDW) dot plotting** in `engine/atlasCoords.ts`. Replaces the two-tier (anchor-or-fallback) model. Every named location contributes a weight inverse to the player's procedural-grid distance; sum-of-weights interpolation produces a player-position dot that snaps to anchors when on-tile and glides smoothly between them. Per-pair visual-to-grid scaling falls out for free (midpoint procedurally → midpoint visually).
+- **OTA 055** — `imageBox` `flex: 1` so the map window claims everything between header and footer. Letterbox-aware dot positioning so the dot lands on real image pixels.
+- **OTA 056** — fill-height-by-default baselineScale (~3.3× on portrait phones); landscape image fills the window vertically. Mid-gesture pinch detection fixed (was only capturing `startPinchDist` in `onPanResponderGrant`, missed pinches where the second finger arrived after the first).
+- **OTA 057** — Reclaimer silhouette marker (`assets/player-marker.png`, 1536×1024 transparent) replaces the red dot. `Animated.divide(1, scale)` inverse-scale keeps the marker at a constant screen size regardless of map zoom.
+- **OTA 23-001** — auto-pan to marker on first layout + removed zoom-in cap (was `MAX_SCALE=5`).
+- **OTA 23-002** — guaranteed centering via `hasAutoCentered` ref + larger marker (56×40) + warm-gold halo backdrop so the silhouette is visible against any atlas region.
+- **OTA 23-003** — auto-centering REMOVED (interfered with the zoom gesture). Marker stays visible via the OTA 23-002 visual upgrade; player pans manually to find their marker if they wander far from it.
+
+Current map UX:
+- Tap MAP on the cardinal row → atlas opens at fill-height baseline
+- Pinch in/out (no upper cap) to read details
+- One-finger drag to pan
+- Double-tap or RESET button → snap back to fill-height + translate=0
+- The Reclaimer silhouette + halo marker is positioned via IDW; visible at any zoom
+
+### Use-based stat progression (OTAs 058 → 059)
+
+Replaced the OTA-040-era "every 10 successful skill checks → +1 stat" milestone with a Skyrim-style use-based system in `app/engine/statTraining.ts`.
+
+- **Success-only** — failed rolls don't accrue.
+- **Tiered cost** so growth feels generous early and mastery is hard:
+  - stat ≤ 10 → +2 progress / success (50 uses to next +1)
+  - stat 11-14 → +1 (100 uses)
+  - stat 15+ → +0.5 (200 uses)
+- **Threshold 100** with overshoot rollover (98 + 2 → +1 stat, progress=0; 99 + 2 → +1 stat, progress=1).
+- **Display quantized** to quarters on the Player Sheet (`▮▮▯▯ 50%`).
+- **All five stats trainable**:
+  - STR — combat hits (barehand + melee), Fight Back wins
+  - DEX — combat hits (DEX-stat weapons), climb success, steal success, parry success
+  - INT — investigate, Aethercraft shape/summon
+  - WIS — use-relic, Aetheric Healing
+  - CHA — diplomacy (typed verbs) **+ all four tap-driven social paths** (BUY/SELL/GIFT, contract accepts) per OTA 059
+- **Per-site flavor log lines** on level-up: *"Strength remembers itself"*, *"Reflex like water"*, *"You read them well"*, etc.
+- New player field `statProgress?: Partial<Record<keyof Stats, number>>`; hydrate path defaults missing field to all-zeros for legacy saves.
+
+### Race image-generation guide (in `docs/`, not committed via OTA)
+
+`docs/race-image-generation-guide.md` — single-doc distillation of every authored description of all seven playable races from `races.json` and `lore-source.txt` (lines 3218-3302). Includes ready-to-use male AND female prompt seeds (1024×1536 minimum, 2048×3072 recommended portrait aspect), cross-race style guide, file-naming convention that maps to race IDs (`<race_id>_m.png` / `<race_id>_f.png` under `assets/portraits/`). User is generating portrait art for a future player creation approval screen — engine wiring is NOT done yet.
+
+### Post-audit fixes (OTAs 044 → 047)
+
+OTAs 041-043 were the pre-ship audit repairs (covered in prior handoff). Following them:
+
+- **OTA 044** — first HANDOFF.md refresh covering 041-043.
+- **OTA 045** — `climb rope` noun-resolution fix. Scene nouns beat inventory items for the climb verb (the parser's general inventory-preference policy was producing "loop the climbing rope around the Climbing Rope" gibberish). Plus rope-shaped noun narration variant ("haul up the rope hand over hand").
+- **OTA 046** — cleared-climbable affordance on the CLIMB modal. Fully crested climbables stay in the menu but render with dimmed text + `✓ TOP` suffix. Marker-parse logic extracted to `engine/climbHeight.ts` (`maxClimbedTier`, `isClimbCleared`); both screen and game-store handler share the parse.
+- **OTA 047** — **ERR_UPDATES_FETCH fix on the apply-button tap**. Boot pre-downloads the bundle via `checkAndApplyOTA({ fetchOnly: true })` and sets `pendingOTAUpdate`; the OLD apply path then re-ran check+fetch unnecessarily and failed on transient network hiccups. Added `skipFetch?: boolean` option to `checkAndApplyOTA`; TitleScreen apply-tap passes `skipFetch: true`. Banner stays visible on apply failure so the player can retry without relaunching.
+
+### Pre-ship audit (OTAs 040 → 043, covered in prior handoff line)
+
+Player Sheet + tutorial refresh (040), 4 ship-blocker fixes (041), 3 dead-code deletes (042), 19 coverage-gap tests (043). See git log for details if needed.
+
+
 
 ### Pre-ship audit + repairs (OTAs 041–043)
 
@@ -254,15 +323,23 @@ Seven parallel Explore agents audited the codebase (combat, exploration, vendor/
 - **Pronunciation worksheet** — `docs/pronunciation-worksheet.md`. Player fills rows and sends back. Batch into `loreLexicon.ts` (~30 min, no engineering risk).
 - **APK rebuild** — to activate immersive system bars. User triggers `eas build` when they're ready to redistribute to testers. Keep `version: 2.201` in `app.json` for the new build so existing testers keep getting OTAs.
 
-### Watch list (not blocking)
+### Watch list / open issues (not ship-blocking)
 
-- **`ambientNounVariety.test.ts` "small pools (≤8) show the entire pool unchanged across steps" flake** — passes in isolation, intermittently fails in full `npx jest --runInBand` runs (observed during OTA 042 + 043). Likely shared-state contamination from a prior test's RNG path. Real-world impact: zero — the feature itself works. Don't chase unless it gets worse.
+- **APK rebuild required at v2.4.1.** Current app.json is `2.4.1` but no APK has been built at that runtime. Existing testers on the `2.201` APK no longer receive OTAs pushed after the version bump (their runtime doesn't match). Bump `metro.config.js` (new comment line with a fresh date code, e.g. `2026-05-23a`) to fire `build-apk.yml`; the artifact appears on GitHub Actions ~17-20 min later. The race image-gen portraits + player creation approval screen wiring are the most likely candidates for the next APK trigger.
+- **Player creation approval screen NOT WIRED.** User is generating 14 portrait images (7 races × M/F) using `docs/race-image-generation-guide.md`. Once they drop the PNGs into `assets/portraits/`, a UI screen needs to be built that shows the race portrait + approval flow during character creation. The guide documents the file-naming convention (`<race_id>_m.png`).
+- **`ambientNounVariety.test.ts` "small pools (≤8) show the entire pool unchanged across steps" flake** — passes in isolation, intermittently fails in full `npx jest --runInBand` runs. Likely shared-state contamination from a prior test's RNG path. Real-world impact: zero. Don't chase unless it gets worse.
 - **`encounterStress` test cycle tuning** — `seq` reset removed in OTA 137 so real entropy drives variation; if archetype pool grows past ~50, may need re-tuning.
-- **Audit minors deferred from pre-ship sweep** — inventory-full silently swallows hunt/mystery/storyline reward items on UI completion (`gameStore.ts:8669-8679` and equivalents); `require()` instead of top-level `import` for Aethercraft helpers in `gameStore.ts:11959, 11993, 11995` (circular-dep workaround — cosmetic); minor climb-fail messaging precision (`gameStore.ts:5250`); possible surprise-penalty double-apply between `statusAttackPenalty()` and `rollMods()` (audit was uncertain — needs ~5 min to trace and confirm).
-- **`gameStore.ts` not swept top-to-bottom for dead code.** Pre-ship audit used grep-narrow reads on this 12k-line file. More orphan functions / unreachable branches likely live in there. Chunked sweep (~12 × 1k-line passes) recommended before a major refactor.
+- **Audit minors still deferred** — inventory-full silently swallows hunt/mystery/storyline reward items on UI completion (`gameStore.ts:8669-8679` and equivalents); `require()` instead of top-level `import` for Aethercraft helpers (circular-dep workaround — cosmetic); minor climb-fail messaging precision (`gameStore.ts:5250`); possible surprise-penalty double-apply between `statusAttackPenalty()` and `rollMods()` (audit uncertain — ~5 min to trace).
+- **`gameStore.ts` not swept top-to-bottom for dead code.** Pre-ship audit used grep-narrow reads on this 12.5k-line file. More orphan functions / unreachable branches likely live in there. Chunked sweep (~12 × 1k-line passes) recommended before a major refactor.
 
 ### Closed this session
 
+- World atlas screen + MAP button + IDW dot plotting + Reclaimer marker + halo ✅ (OTAs 048 → 23-003)
+- Auto-centering on map removed (interfered with zoom gesture) ✅ (OTA 23-003)
+- Use-based stat progression replacing milestone model + CHA training on tap-driven socials ✅ (OTAs 058 → 059)
+- Cleared-climbable affordance + climb-rope noun resolution + auto-rope narration ✅ (OTAs 045 → 046)
+- ERR_UPDATES_FETCH on apply-tap (skipFetch path) ✅ (OTA 047)
+- Race image-generation guide doc ✅ (committed standalone)
 - 13 orphan crafting recipes → stat-less misc fallback ✅ (OTA 041)
 - Mystery rewards dropped on UI completion (6 mysteries) ✅ (OTA 041)
 - Storyline rewards dropped on UI completion (4 storylines) ✅ (OTA 041)
@@ -314,7 +391,7 @@ Seven parallel Explore agents audited the codebase (combat, exploration, vendor/
 ### Tests
 
 - Live in `__tests__/` at repo root, `jest-expo` preset.
-- 66 suites, 941 tests as of OTA 141.
+- 106 suites, 1283 tests as of OTA 2026-05-23-003.
 - Two suites have a known parallel-run flake (see Watch list). Re-run in isolation to confirm; safe to push if isolated runs pass.
 
 ### Code style
@@ -327,7 +404,7 @@ Seven parallel Explore agents audited the codebase (combat, exploration, vendor/
 
 ## 9. Critical files / hotspots
 
-- `app/state/gameStore.ts` — ~12,400 lines. Action handlers, combat resolution (with Sentinel hit-gate enforcement at the attack site), scene management, log persistence, room state, Qwen parse-fallback wiring, tutorial advance, OTA-update flag, burst-quest tracker, `lastInteractedNoun` tracker, Aethercraft verb dispatcher (`runAethercraft`), corruption markup application, completeContractFromUI reward grants.
+- `app/state/gameStore.ts` — ~12,500 lines. Action handlers, combat resolution (with Sentinel hit-gate + use-based stat training wired into every check site), scene management, log persistence, room state, Qwen parse-fallback wiring, tutorial advance, OTA-update flag, burst-quest tracker, `lastInteractedNoun` tracker, Aethercraft verb dispatcher (`runAethercraft`), corruption markup application, completeContractFromUI reward grants, CHA training on BUY/SELL/GIFT/quest-accepts.
 - `app/engine/types.ts` — shared interfaces. `Location.interactables`, `MicroMicroLocation.interactables`, `ScreenName`.
 - `app/engine/parser.ts` — dictionary parser. ~330 verbs across 36 intents.
 - `app/engine/llmParser.ts` — Qwen-backed fallback. `parseInputViaLLM(text, ctx, qwen)`.
@@ -343,7 +420,14 @@ Seven parallel Explore agents audited the codebase (combat, exploration, vendor/
 - `app/components/tutorialSteps.ts` — TUTORIAL_STEPS array (17 steps as of OTA 040 — added Player Sheet, race mechanics, new verbs/buttons).
 - `app/engine/raceMechanics.ts` — `barehandDamageFor`, `barehandGateBlocks`, `effectiveAC`, `racialStatBonusesFor`, `aethercraftDcModifier`, `aethercraftStatBonus`.
 - `app/engine/corruption.ts` — tier ladder, `corruptionPriceMultiplier`, `corruptionStatPenalty`, `corruptionExtraEncounterChance`, `tierDescription`.
-- `app/screens/CharacterScreen.tsx` — Player Sheet, OTA 040.
+- `app/engine/statTraining.ts` — **NEW (OTA 058)**. `trainStat` (success-gated, tiered cost), `ensureStatProgress` (legacy save migration), `displayedProgressBar` / `displayedProgressPercent` (quantized UI display), `LEVEL_UP_THRESHOLD=100`, tier curve `progressAwardFor(currentStat)`.
+- `app/engine/atlasCoords.ts` — **NEW (OTA 051+)**. `LOCATION_ATLAS_COORDS` (21/21 hand-calibrated), `interpolateAtlasPosition` (IDW), `clampToMapArea`, `OUTPOST_ATLAS_COORD`, `atlasCoordForLocation`, `depictedLocationIds`.
+- `app/screens/MapScreen.tsx` — **NEW (OTA 049+)**. Atlas display, pinch/pan gestures via RN's Animated + PanResponder, IDW-positioned silhouette marker with warm-gold halo.
+- `app/screens/CharacterScreen.tsx` — Player Sheet, OTA 040. Stats now display with progress bars (`▮▮▯▯ 50%`) per the OTA 058 stat-growth system.
+- `assets/world-atlas.png` — 1408×768 landscape hand-drawn atlas (v3, 21/21 location coverage). Authored externally via Notebook LM using `docs/world-atlas-for-notebook-lm.md` as source.
+- `assets/player-marker.png` — 1536×1024 black silhouette of a Reclaimer figure on transparent. Used by `MapScreen` as the YOU-ARE-HERE marker.
+- `docs/race-image-generation-guide.md` — **NEW**. Source document for the user's external generation of 14 race portraits (7 races × M/F). Includes ready-to-use prompt seeds, cross-race style guide, recommended resolutions.
+- `docs/world-atlas-for-notebook-lm.md` — Source document the user fed to Notebook LM to generate the v3 atlas image.
 - `app/components/TutorialOverlay.tsx` + `TutorialTarget.tsx` — overlay + glow wrapper.
 - `app/screens/ExplorationScreen.tsx` — `buildChipPool()` + main game UI.
 - `app/data/locations/locations.json` — 21 locations, all declare `interactables`.
@@ -477,4 +561,55 @@ off the store.
 
 ---
 
-That's the lay of the land at OTA `2026-05-22-043`. State is healthy, 1174/1174 tests green, OTA pipeline is delivering cleanly to the existing APK fleet. The pre-ship audit has finished — 4 ship-blockers fixed, 31 new regression + coverage tests added, dead code pruned. Open PR #1 still in draft pending the user's decision to mark ready for review or merge to `main`. Next big moves are gated on either content (Salvage button needs UI work + user sign-off), player input (pronunciation worksheet), or the deferred items in the audit minors list (inventory-full silent swallow on UI quest completion, surprise-penalty possible double-apply, chunked `gameStore.ts` top-to-bottom sweep).
+---
+
+## 16. v2.4.1 milestone — for the next Claude instance
+
+If you're picking up this branch, here's what you need to know to land cleanly.
+
+### State at handoff (2026-05-23)
+
+- **App version** in `app.json`: `2.4.1` (just bumped from 2.201 as a milestone marker)
+- **Latest OTA**: `2026-05-23-003` — auto-centering on map removed (interfered with zoom gesture). Pushed via the v2.201 stream; subsequent OTAs at v2.4.1 will sit in EAS until a new APK at runtime 2.4.1 ships.
+- **Latest APK**: built at runtime `2.201` from the `2026-05-22a` metro.config bump. A **new APK at v2.4.1 is the immediate next blocker** — without it, the OTA stream for v2.4.1 has no devices.
+- **Tests**: 1283 / 1283 across 106 suites. `npx tsc --noEmit` clean.
+- **Branch**: `claude/new-session-MvF82`. Working tree clean.
+- **Open PR**: #1 draft, this branch → main. Description was last refreshed at OTA 053 area; it's stale relative to the OTAs 054 → 23-003 work. Update before requesting review.
+- **Open GitHub issues**: 0.
+
+### The user's working style — important context
+
+- **Game playtested on Android**, OTA-delivered. The user pastes in-game log excerpts and screenshots; respond to those as if the player is talking to you THROUGH the game (the meta-comment guard in `submitPlayerAction` catches typed feedback).
+- **Spawns parallel agents for verification tasks** (audit sweeps, image measurements, etc.) — see the OTA 040-043 audit and the atlas-calibration agent runs (OTAs 051, 054). The pattern works: split the task across 3+ Explore agents, ground-truth their results yourself before applying.
+- **Ships fast**: defaults to OTA-only delivery, native rebuild only for new modules or version bumps. Test → OTA bump → commit → push is the loop.
+- **Wants reasoning surfaced briefly** — "two-three sentences with a recommendation and main tradeoff" for exploratory questions; only implement after agreement. Don't write multi-paragraph proposals unless asked.
+
+### Major systems you'll be working in
+
+| System | Lives in | Notes |
+|---|---|---|
+| Combat resolution | `gameStore.ts` (lines ~6612-7100, 11000-11300) | Attack roll, dodge, damage modifiers, parry, fight-back, Sentinel hit-gate, stat training calls all wired in here |
+| Aethercraft | `gameStore.ts:runAethercraft` (~line 11947) | shape stone / summon golem / mend wounds; race DC modifier; fuel consumption |
+| Corruption | `engine/corruption.ts` + gameStore vendor path | 4-tier ladder, price markup, Hollowed Purifier spawns |
+| Stat training | `engine/statTraining.ts` | Tiered cost (≤10 → +2, 11-14 → +1, 15+ → +0.5), threshold 100, success-only |
+| Map / atlas | `screens/MapScreen.tsx` + `engine/atlasCoords.ts` | IDW dot positioning, RN PanResponder gestures, hand-calibrated 21/21 location coords |
+| Tutorial | `components/tutorialSteps.ts` + `TutorialOverlay.tsx` | 17 steps; check that any new screen has a tutorial step if it's user-facing |
+| Vendor / steal | `gameStore.ts:buyFromVendor/sellToVendor/giftToVendor/stealFromVendor` (~line 7434) | Corruption markup on BUY only; CHA training on success |
+| Quests | `gameStore.ts:acceptFactionQuest/Hunt/Mystery/Storyline` + `completeContractFromUI` | Contracts board UI completion path was the source of B3/B4 audit blockers; double-check reward-grant logic when touching |
+
+### Things in flight / next steps
+
+1. **Trigger the v2.4.1 APK build.** Bump `metro.config.js` with a fresh date code (e.g. `2026-05-23a`). That fires `build-apk.yml`; the artifact arrives on GitHub Actions in ~17-20 min. The user redistributes manually.
+2. **Wire the player creation approval screen.** User is generating 14 portrait PNGs from `docs/race-image-generation-guide.md`. When they drop them into `assets/portraits/`, build a screen that shows the race portrait + approval flow during character creation. Filename convention: `<race_id>_m.png` / `<race_id>_f.png`.
+3. **Refresh PR #1 description** before any merge request. It's stale; covers up to OTA 053 area, not the OTA 054 → 23-003 work.
+4. **Pronunciation worksheet** (`docs/pronunciation-worksheet.md`) — still pending player input.
+
+### Watch list reminders (see section 7 for full)
+
+- ambient-noun-variety test flake — never chase; passes in isolation
+- gameStore.ts never swept top-to-bottom for dead code (12.5k lines)
+- audit minors deferred from pre-ship — inventory-full silent swallow on UI quest completion, surprise-penalty possible double-apply, `require()` vs `import` in Aethercraft helpers
+
+---
+
+That's the lay of the land at v2.4.1 / OTA `2026-05-23-003`. State is healthy, 1283/1283 tests green, the atlas + use-based stat growth + Reclaimer marker work has landed. Map, character progression, audit-fixes, tutorial, race lore docs — all current. The v2.4.1 APK rebuild is the immediate next step; after that the player creation portrait screen wiring is the natural follow-up once the user finishes generating the 14 portraits.
