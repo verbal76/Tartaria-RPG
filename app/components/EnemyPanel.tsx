@@ -164,9 +164,15 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 8,
   },
+  // v2.4.1 (OTA 048) — paddingRight reserves space for the gear icon
+  // that ExplorationScreen overlays in the top-right corner of the
+  // right column. The range tag and any future top-right chrome
+  // wrap/clip BEFORE the gear's footprint instead of being hidden
+  // by it.
   head: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    paddingRight: 36,
     alignItems: 'baseline',
   },
   headRight: { flexDirection: 'row', alignItems: 'baseline', gap: 6 },

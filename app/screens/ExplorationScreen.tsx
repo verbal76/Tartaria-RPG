@@ -217,6 +217,22 @@ export function ExplorationScreen() {
           ) : (
             <CrestPlaceholder />
           )}
+          {/* v2.4.1 (OTA 048) — gear icon overlaid in the top-right
+              corner of the right column. Replaces the bottom-row
+              gear, which was the only thing left there after the
+              session controls moved into the gear screen. The gear
+              floats over whichever right-col content is showing
+              (EnemyPanel or CrestPlaceholder). EnemyCard's `head`
+              style reserves right-padding so the range tag types
+              AROUND the gear instead of being clipped. */}
+          <TouchableOpacity
+            onPress={() => setScreen('about')}
+            hitSlop={8}
+            style={styles.cornerGear}
+            accessibilityLabel="Settings"
+          >
+            <Text style={styles.gear}>⚙</Text>
+          </TouchableOpacity>
         </TutorialTarget>
       </View>
 
@@ -366,15 +382,10 @@ export function ExplorationScreen() {
             range={currentScene?.range ?? null}
           />
         )}
-        {/* v2.4.1 (OTA 047) — bottom menu collapsed to just the gear
-            icon. save & exit, copy log, and clear log moved into the
-            SESSION tab of the gear screen (first tab open). The gear
-            is the single entry into all run-control and settings. */}
-        <TutorialTarget area="bottom-menu" style={styles.menuRow}>
-          <TouchableOpacity onPress={() => setScreen('about')} hitSlop={8} style={styles.menuBtnGear}>
-            <Text style={styles.gear}>⚙</Text>
-          </TouchableOpacity>
-        </TutorialTarget>
+        {/* v2.4.1 (OTA 048) — bottom menu row removed. Gear icon
+            moved to the top-right corner of the right column
+            (above). All run-control (save & exit, copy/clear log)
+            lives in the gear screen's SESSION tab now. */}
       </View>
 
       <SearchModal
@@ -541,7 +552,27 @@ const styles = StyleSheet.create({
   // to fit content keeps every stat visible.
   topRow: { flexDirection: 'row', gap: 6, minHeight: 165 },
   statsCol: { flex: 1.2 },
-  rightCol: { flex: 1 },
+  rightCol: { flex: 1, position: 'relative' },
+  // v2.4.1 (OTA 048) — gear icon floats over the top-right corner
+  // of the right column (EnemyPanel or CrestPlaceholder). 32×32
+  // hit area, semi-transparent backdrop so it stays legible on top
+  // of either content. EnemyCard's `head` style reserves
+  // paddingRight so the range tag types around the gear instead of
+  // being clipped.
+  cornerGear: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(26, 23, 20, 0.85)',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
   sceneBar: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     paddingHorizontal: 8, paddingVertical: 6, backgroundColor: '#13110f',
