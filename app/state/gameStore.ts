@@ -3007,11 +3007,62 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // player isn't at a Lost Capital, isn't in revelation/cores
     // phase, has already recovered this Capital's Core, or didn't
     // submit an action matching the faction's gate intents.
+    //
+    // OTA 052 — the gate verb now SUMMONS the Core Guardian
+    // instead of immediately granting the Core. The Core is only
+    // granted when the Guardian falls (see resolveEnemyDefeat).
     {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const mqMod = require('../engine/mainQuest');
       if (mqMod.canRecoverCore(player, parsed.intent)) {
-        triggerMainQuest(get, set, { kind: 'core_recovered', locationId: player.currentLocationId });
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const cg = require('../engine/coreGuardians');
+        const capitalId = player.currentLocationId;
+        const alreadyDefeated = (player.mainQuest?.guardiansDefeated ?? []).includes(capitalId);
+        // Guardian already beaten in a prior session (or legacy
+        // save) — fall through to the normal Core grant path.
+        if (alreadyDefeated) {
+          triggerMainQuest(get, set, { kind: 'core_recovered', locationId: capitalId });
+        } else {
+          // No live Guardian in the current scene? Spawn one.
+          // (If the player already triggered a spawn this visit
+          // and the Guardian is still alive in the scene, the
+          // gate verb just doubles as a "re-engage" — the existing
+          // boss simply receives the action.)
+          const livingGuardian = currentScene.enemies.find((e) => cg.isCoreGuardian(e));
+          if (!livingGuardian) {
+            const guardian = cg.spawnGuardianForCapital(player, capitalId);
+            if (guardian) {
+              set((s) => (
+                s.currentScene
+                  ? {
+                      currentScene: {
+                        ...s.currentScene,
+                        enemies: [...s.currentScene.enemies, guardian],
+                        enemyHps: [...s.currentScene.enemyHps, guardian.hp],
+                        activeEnemyIdx: s.currentScene.enemies.length,
+                        range: 'close',
+                      },
+                    }
+                  : s
+              ));
+              get().appendLog('arbiter', cg.GUARDIANS_BY_CAPITAL[capitalId].approachLine);
+              // Record the spawn for the Milestones tab.
+              recordMemorableEvent(get, set, {
+                kind: 'mq_guardian_spawned',
+                text: `summoned ${guardian.name} at ${cg.GUARDIANS_BY_CAPITAL[capitalId].capitalName}`,
+                locationId: capitalId,
+                locationName: cg.GUARDIANS_BY_CAPITAL[capitalId].capitalName,
+                hoursElapsed: player.hoursElapsed ?? 0,
+                enemyName: guardian.name,
+              });
+              // Don't run the normal gate verb's effect this turn —
+              // the Guardian is now the scene's focus. Skip the
+              // rest of the action handler.
+              return;
+            }
+          }
+        }
       } else {
         // v2.4.1 (OTA 050) — nudge when the player targets a "core"
         // ambient noun with the wrong verb for their faction's gate.
@@ -6048,6 +6099,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog('arbiter', `The Arbiter taps your hand. "Unequip the ${item.name} first — you can't drop what you're wielding."`);
           break;
         }
+        // v2.4.1 (OTA 052) — quest items (Tartarian Cores etc.) are
+        // bound to the player until the final act. The Order would
+        // hunt the player to the ends of Tartaria for leaving one
+        // in the silt. Refuse the drop with an in-character line.
+        if ((item.tags ?? []).includes('quest')) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter folds your fingers back over the ${item.name}. "Not this one. It does not leave your pack until the end of the road."`,
+          );
+          break;
+        }
         const dropKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY);
         const dropOne: InventoryItem = { ...item, quantity: 1 };
         // Remove one from player inventory.
@@ -6961,14 +7023,44 @@ export const useGameStore = create<GameStore>((set, get) => ({
             get().appendLog('world', line);
             break;
           }
-          case 'escape':
-            get().appendLog('world', 'You break for the entrance. Behind you the chamber settles back into silence.');
+          case 'escape': {
+            // v2.4.1 (OTA 052) — Core Guardian flee path. If a
+            // Guardian is in the scene the rebuke fires + the
+            // Guardian de-spawns (fully restored on next gate
+            // verb at this Capital — flee can't be used to chip
+            // them down across multiple visits). Player keeps any
+            // damage / durability loss taken in the attempt.
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const cg = require('../engine/coreGuardians');
+            const fleeingGuardian = currentScene.enemies.find((e) => cg.isCoreGuardian(e));
+            if (fleeingGuardian) {
+              const capitalId = cg.capitalIdFromGuardian(fleeingGuardian);
+              const def = capitalId ? cg.GUARDIANS_BY_CAPITAL[capitalId] : null;
+              get().appendLog('arbiter', def?.rebukeLine ?? 'The Guardian watches you go without moving.');
+              const after = cg.fleeAftermathLine(player.factionId);
+              if (after) {
+                get().appendLog('arbiter', after);
+              }
+              if (capitalId && def) {
+                recordMemorableEvent(get, set, {
+                  kind: 'mq_guardian_fled',
+                  text: `fled from ${def.base.name} at ${def.capitalName}`,
+                  locationId: capitalId,
+                  locationName: def.capitalName,
+                  hoursElapsed: player.hoursElapsed ?? 0,
+                  enemyName: def.base.name,
+                });
+              }
+            } else {
+              get().appendLog('world', 'You break for the entrance. Behind you the chamber settles back into silence.');
+            }
             if (currentScene.enemies.length > 0) {
               set((s) => (s.currentScene
                 ? { currentScene: { ...s.currentScene, enemies: [], enemyHps: [], activeEnemyIdx: 0, range: null } }
                 : s));
             }
             break;
+          }
           case 'investigate': {
             // Narrate against the actual thing the player searched, not the whole location.
             const reparsed = parseInput(actionText);
@@ -7668,6 +7760,78 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // most playtests will never see one organically; long campaigns
     // will see a handful. The gem saves to the install-wide stash, not
     // the active character.
+    // v2.4.1 (OTA 052) — Core Guardian defeat. Detect the kill,
+    // grant the Capital's Core, drop the unique Core Guardian
+    // weapon + armor, mark the Guardian as defeated on the
+    // mainQuest state, and surface the defeat narration. The
+    // Res Gem drop below still fires because Guardians are
+    // boss=true.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const cg = require('../engine/coreGuardians');
+      if (cg.isCoreGuardian(enemy)) {
+        const capitalId = cg.capitalIdFromGuardian(enemy);
+        if (capitalId) {
+          const def = cg.GUARDIANS_BY_CAPITAL[capitalId];
+          const drops = cg.dropsForCapital(capitalId);
+          // Log the defeat line + the signature gear drop before
+          // the Core itself lands so the chamber narration reads
+          // in order.
+          get().appendLog('arbiter', def.defeatLine);
+          if (drops) {
+            set((s) => (
+              s.player
+                ? {
+                    player: {
+                      ...s.player,
+                      inventory: [
+                        ...s.player.inventory,
+                        drops.weapon,
+                        drops.armor,
+                      ],
+                    },
+                  }
+                : s
+            ));
+            get().appendLog(
+              'reward',
+              `✦ ${drops.weapon.name} taken from ${enemy.name}. ✦ ${drops.armor.name} taken from ${enemy.name}.`,
+            );
+          }
+          // Mark the Guardian beaten BEFORE the core_recovered
+          // trigger so the spawn-vs-grant logic in submitPlayerAction
+          // sees a defeated guardian if anything re-runs the gate.
+          set((s) => {
+            if (!s.player) return s;
+            const mq = s.player.mainQuest ?? { phase: 'hook' as const, coresRecovered: [] };
+            const guardiansDefeated = Array.from(new Set([...(mq.guardiansDefeated ?? []), capitalId]));
+            return {
+              player: { ...s.player, mainQuest: { ...mq, guardiansDefeated } },
+            };
+          });
+          // Record the milestone event.
+          recordMemorableEvent(get, set, {
+            kind: 'mq_guardian_defeated',
+            text: `defeated ${enemy.name} at ${def.capitalName}`,
+            locationId: capitalId,
+            locationName: def.capitalName,
+            hoursElapsed: get().player?.hoursElapsed ?? 0,
+            enemyName: enemy.name,
+          });
+          // Now grant the Core — this advances the mainQuest phase
+          // and writes the Core item to inventory.
+          triggerMainQuest(get, set, { kind: 'core_recovered', locationId: capitalId });
+          recordMemorableEvent(get, set, {
+            kind: 'mq_core_recovered',
+            text: `recovered the ${def.capitalName} Core`,
+            locationId: capitalId,
+            locationName: def.capitalName,
+            hoursElapsed: get().player?.hoursElapsed ?? 0,
+          });
+        }
+      }
+    }
+
     const gemDropped = enemy.boss || Math.random() < 0.005;
     if (gemDropped) {
       void addResurrectionGems(1).then((total) => {
@@ -11521,6 +11685,10 @@ function triggerMainQuest(
       nimari: 'Nimari Core',
       drakova: 'Drakova Core',
       voronov: 'Voronov Core',
+      karok_sa: 'Karok-Sa Core',
+      yuldra_tul: 'Yuldra-Tul Core',
+      ostragar: 'Ostragar Core',
+      iskan_veil: 'Iskan-Veil Core',
     };
     const coreName = capitalNames[trigger.locationId];
     if (coreName) {

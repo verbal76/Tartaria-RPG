@@ -1587,5 +1587,69 @@
       "shadow stain",
       "whispering vent"
     ]
+  },
+  {
+    "id": "karok_sa",
+    "name": "Karok-Sa",
+    "type": "lost_capital",
+    "description": "A southern Lost Capital. The Forgotten Order's ritual seat — halls of binding-sigils carved into black basalt, the Core kept under a chain of seals only a Sealwarden can read.",
+    "danger": 5,
+    "tags": ["capital", "buried", "lost_capital", "forgotten_order", "ritual_seat"],
+    "discoverable": true,
+    "aliases": ["karok", "karok sa", "sealed capital", "ritual capital"],
+    "interactables": [
+      "seal sigil", "binding chain", "basalt pillar", "ritual seat", "sealed door",
+      "ink basin", "binding cord", "core housing", "seal warden", "sigil floor",
+      "censer", "votive lamp", "stone tablet", "scribe alcove", "vault arch",
+      "rusted incense burner", "broken stylus", "ash heap"
+    ]
+  },
+  {
+    "id": "yuldra_tul",
+    "name": "Yuldra-Tul",
+    "type": "lost_capital",
+    "description": "A northeastern mountain Lost Capital. Frost-wreathed, the gate-city to the Giants' tombs. The Servants of Giants kept the long vigil here before the Flood — the Core sleeps under a cold-stone in the deep keep.",
+    "danger": 5,
+    "tags": ["capital", "buried", "lost_capital", "servants_of_giants", "mountain", "frost"],
+    "discoverable": true,
+    "aliases": ["yuldra", "yuldra tul", "mountain capital", "vigil capital"],
+    "interactables": [
+      "cold-stone", "vigil altar", "tomb gate", "frost rune", "giant tomb-mark",
+      "ice arch", "core housing", "stone bell", "vigil candle", "snow drift",
+      "tomb plinth", "frozen banner", "icebound chain", "mountain shrine",
+      "wind-scoured wall", "old offering", "shattered glacier", "hierophant's stand"
+    ]
+  },
+  {
+    "id": "ostragar",
+    "name": "Ostragar",
+    "type": "lost_capital",
+    "description": "An eastern wetland Lost Capital. The Eternal Dynasty's river city — half-submerged in slow current, the Core seat ringed by a still pool the Riverbinder bound to the housing with a cantor's chord.",
+    "danger": 4,
+    "tags": ["capital", "buried", "lost_capital", "eternal_dynasty", "wetland", "river"],
+    "discoverable": true,
+    "aliases": ["ostragar", "river capital", "dynasty capital", "wet city"],
+    "interactables": [
+      "river-cord", "core housing", "still pool", "current rune", "drowned dais",
+      "stone bridge", "silt floor", "mooring ring", "dynastic seal", "broken rudder",
+      "wet stair", "lily basin", "river bell", "barge wreck", "old lock",
+      "court banner", "carp pool", "binder's stand"
+    ]
+  },
+  {
+    "id": "iskan_veil",
+    "name": "Iskan-Veil",
+    "type": "lost_capital",
+    "description": "A far-northwestern Lost Capital. The Conspiracy Architects' hidden city — a maze of false doors and overlaid corridors. Every map of Iskan-Veil is wrong by design; the true Core seat is behind the door you didn't see.",
+    "danger": 5,
+    "tags": ["capital", "buried", "lost_capital", "conspiracy_architects", "maze", "hidden"],
+    "discoverable": true,
+    "aliases": ["iskan", "iskan veil", "veiled capital", "hidden city"],
+    "interactables": [
+      "false door", "veil step", "scout sigil", "decoy passage", "core housing",
+      "mirror corridor", "loose tile", "concealed grate", "architect's mark",
+      "shadow lamp", "wax-sealed map", "veilkeeper's perch", "trick lever",
+      "wrong door", "right door", "courier's slot", "blind window", "smoke vent"
+    ]
   }
 ]

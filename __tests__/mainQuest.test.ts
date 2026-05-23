@@ -1,7 +1,7 @@
 // v2.4.1 (OTA 033) — Mud Flood Nexus main quest phase-machine tests.
 //
 // Pins the universal spine: hook -> revelation (first Lost Capital)
-// -> cores (subsequent recoveries) -> descent (5/5) -> nexus (arrival
+// -> cores (subsequent recoveries) -> descent (9/9) -> nexus (arrival
 // at mud_flood_nexus) -> choice (UI prompt) -> ended (choice made).
 // Each transition is a no-op when invoked out of order.
 
@@ -85,13 +85,19 @@ describe('mainQuest phase machine', () => {
       expect(next.phase).toBe('cores');
       expect(next.coresRecovered).toEqual(['asgardar']);
     });
-    it('cores -> descent on 5th Core', () => {
+    it('cores -> descent on 9th Core', () => {
       const p = makePlayer({
-        mainQuest: { phase: 'cores', coresRecovered: ['asgardar', 'samarran', 'nimari', 'drakova'] },
+        mainQuest: {
+          phase: 'cores',
+          coresRecovered: [
+            'asgardar', 'samarran', 'nimari', 'drakova', 'voronov',
+            'karok_sa', 'yuldra_tul', 'ostragar',
+          ],
+        },
       });
-      const next = advanceMainQuest(p, { kind: 'core_recovered', locationId: 'voronov' });
+      const next = advanceMainQuest(p, { kind: 'core_recovered', locationId: 'iskan_veil' });
       expect(next.phase).toBe('descent');
-      expect(next.coresRecovered).toHaveLength(5);
+      expect(next.coresRecovered).toHaveLength(9);
     });
     it('duplicate Core recovery is a no-op', () => {
       const p = makePlayer({ mainQuest: { phase: 'cores', coresRecovered: ['asgardar'] } });
@@ -102,13 +108,13 @@ describe('mainQuest phase machine', () => {
   });
 
   describe('reached_nexus + chose_ending', () => {
-    it('descent -> choice when arriving at Nexus with all 5 Cores', () => {
-      const all5 = [...LOST_CAPITAL_LOCATIONS];
-      const p = makePlayer({ mainQuest: { phase: 'descent', coresRecovered: all5 } });
+    it('descent -> choice when arriving at Nexus with all 9 Cores', () => {
+      const all9 = [...LOST_CAPITAL_LOCATIONS];
+      const p = makePlayer({ mainQuest: { phase: 'descent', coresRecovered: all9 } });
       const next = advanceMainQuest(p, { kind: 'reached_nexus' });
       expect(next.phase).toBe('choice');
     });
-    it('reached_nexus is a no-op without 5 Cores', () => {
+    it('reached_nexus is a no-op without all 9 Cores', () => {
       const p = makePlayer({ mainQuest: { phase: 'cores', coresRecovered: ['asgardar'] } });
       const next = advanceMainQuest(p, { kind: 'reached_nexus' });
       expect(next.phase).toBe('cores');
@@ -134,19 +140,23 @@ describe('mainQuest phase machine', () => {
       }
     });
     it('phaseHint includes core count for cores phase', () => {
-      expect(phaseHint('cores', 2)).toMatch(/2\/5/);
+      expect(phaseHint('cores', 2)).toMatch(/2\/9/);
     });
     it('remainingCapitals excludes already-recovered', () => {
       const r = remainingCapitals({ phase: 'cores', coresRecovered: ['asgardar', 'samarran'] });
       expect(r).not.toContain('asgardar');
       expect(r).not.toContain('samarran');
-      expect(r).toHaveLength(3);
+      // OTA 052 — Capitals are now 9 total, so 2 recovered leaves 7.
+      expect(r).toHaveLength(7);
     });
   });
 
   it('NEXUS_LOCATION_ID and LOST_CAPITAL_LOCATIONS match the engine schema', () => {
     expect(NEXUS_LOCATION_ID).toBe('mud_flood_nexus');
-    expect(LOST_CAPITAL_LOCATIONS).toEqual(['asgardar', 'samarran', 'nimari', 'drakova', 'voronov']);
+    expect(LOST_CAPITAL_LOCATIONS).toEqual([
+      'asgardar', 'samarran', 'nimari', 'drakova', 'voronov',
+      'karok_sa', 'yuldra_tul', 'ostragar', 'iskan_veil',
+    ]);
   });
 
   describe('Phase 4b — mid-arc twists', () => {
@@ -259,18 +269,21 @@ describe('mainQuest phase machine', () => {
   });
 
   describe('Phase 5 — Nexus cinematic', () => {
-    it('NEXUS_SLOT_BEATS covers all 5 Cores in canonical order', () => {
+    it('NEXUS_SLOT_BEATS covers all 9 Cores in canonical order', () => {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { NEXUS_SLOT_BEATS, nexusArrivalCinematic } = require('../app/engine/mainQuest');
-      expect(NEXUS_SLOT_BEATS).toHaveLength(5);
+      expect(NEXUS_SLOT_BEATS).toHaveLength(9);
       expect(NEXUS_SLOT_BEATS.map((b: { capitalId: string }) => b.capitalId))
-        .toEqual(['asgardar', 'samarran', 'nimari', 'drakova', 'voronov']);
+        .toEqual([
+          'asgardar', 'samarran', 'nimari', 'drakova', 'voronov',
+          'karok_sa', 'yuldra_tul', 'ostragar', 'iskan_veil',
+        ]);
       // Each beat has a substantial line (not a placeholder).
       for (const b of NEXUS_SLOT_BEATS) {
         expect(b.line.length).toBeGreaterThan(40);
       }
-      // Cinematic returns arrival + 5 slot beats + choice prompt = 7 lines.
-      expect(nexusArrivalCinematic()).toHaveLength(7);
+      // Cinematic returns arrival + 9 slot beats + choice prompt = 11 lines.
+      expect(nexusArrivalCinematic()).toHaveLength(11);
     });
   });
 
@@ -313,7 +326,13 @@ describe('mainQuest phase machine', () => {
       expect(canRecoverCore(p, 'investigate')).toBe(false);
       const p2 = makePlayer({
         currentLocationId: 'asgardar',
-        mainQuest: { phase: 'descent', coresRecovered: ['asgardar', 'samarran', 'nimari', 'drakova', 'voronov'] },
+        mainQuest: {
+          phase: 'descent',
+          coresRecovered: [
+            'asgardar', 'samarran', 'nimari', 'drakova', 'voronov',
+            'karok_sa', 'yuldra_tul', 'ostragar', 'iskan_veil',
+          ],
+        },
       });
       expect(canRecoverCore(p2, 'investigate')).toBe(false);
     });

@@ -544,6 +544,16 @@ export interface MainQuestState {
   ending?: MainQuestEnding;
   /** v2.4.1 (OTA 042) — fired-once flags for mid-arc twist beats. */
   twistsFired?: string[];
+  /** v2.4.1 (OTA 052) — Capitals whose Core Guardian has been
+   *  beaten. Distinct from coresRecovered for one purpose: a
+   *  Guardian can be killed AT the moment the Core is granted in
+   *  the same step, but the spawn-vs-grant decision needs a
+   *  pre-kill flag. Optional — saves predating the Guardian
+   *  system act as if every Capital they've already recovered
+   *  also defeated the (then-nonexistent) Guardian, so legacy
+   *  saves don't see fresh Guardian fights on already-cleared
+   *  Capitals. */
+  guardiansDefeated?: string[];
 }
 
 export interface PlayerCharacter {
@@ -731,11 +741,29 @@ export interface MemorableEvent {
     | 'theft_caught'
     | 'first_travel'
     | 'first_kill'
-    | 'first_quest';
+    | 'first_quest'
+    // v2.4.1 (OTA 052) — main-quest milestones for the Contracts
+    // Milestones tab. Recorded by the gameStore's main-quest
+    // pipeline so the player can review the arc in one place.
+    | 'mq_capital_first_visit'
+    | 'mq_guardian_spawned'
+    | 'mq_guardian_defeated'
+    | 'mq_guardian_fled'
+    | 'mq_core_recovered'
+    | 'mq_descent_unlocked'
+    | 'mq_nexus_reached'
+    | 'mq_ending_chosen';
   text: string;
   timestamp: number;
   factionId?: string;
   enemyName?: string;
+  /** v2.4.1 (OTA 052) — optional structured fields for the
+   *  Milestones tab to render an expanded row. None of the legacy
+   *  kinds populate these; only the new mq_* kinds do. */
+  locationId?: string;
+  locationName?: string;
+  hoursElapsed?: number;
+  detail?: string;
 }
 
 export interface WorldMemory {

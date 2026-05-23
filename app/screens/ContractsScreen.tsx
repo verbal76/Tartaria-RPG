@@ -15,23 +15,47 @@ import {
   LOST_CAPITAL_LOCATIONS,
   coreGateNextAction,
 } from '../engine/mainQuest';
+import { GUARDIANS_BY_CAPITAL } from '../engine/coreGuardians';
 
-function MilestoneStat({ label, value, next, suffix }: { label: string; value: number; next: number; suffix: string }) {
+function MilestoneStat({
+  label,
+  value,
+  next,
+  suffix,
+  onPress,
+  active,
+}: {
+  label: string;
+  value: number;
+  next: number;
+  suffix: string;
+  onPress?: () => void;
+  active?: boolean;
+}) {
   const toNext = next - (value % next);
-  return (
-    <View style={milestoneStyles.cell}>
+  const body = (
+    <View style={[milestoneStyles.cell, active && milestoneStyles.cellActive]}>
       <Text style={milestoneStyles.value}>{value}</Text>
       <Text style={milestoneStyles.label}>{label}</Text>
       <Text style={milestoneStyles.next}>{toNext === next ? `next ${suffix} after ${next}` : `${toNext} → ${suffix}`}</Text>
+      {onPress ? <Text style={milestoneStyles.tapHint}>{active ? '▴ tap to close' : '▾ tap to list'}</Text> : null}
     </View>
+  );
+  if (!onPress) return body;
+  return (
+    <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={{ flex: 1 }}>
+      {body}
+    </TouchableOpacity>
   );
 }
 
 const milestoneStyles = StyleSheet.create({
-  cell: { flex: 1, alignItems: 'center', paddingVertical: 4 },
+  cell: { flex: 1, alignItems: 'center', paddingVertical: 4, borderRadius: 4, borderWidth: 1, borderColor: 'transparent' },
+  cellActive: { borderColor: '#c9a86a', backgroundColor: '#1a1714' },
   value: { color: '#c9a86a', fontSize: 18, fontWeight: '700' },
   label: { color: '#cdbf99', fontSize: 11, letterSpacing: 1 },
   next: { color: '#7a705c', fontSize: 9, marginTop: 2, textAlign: 'center' },
+  tapHint: { color: '#5a5448', fontSize: 8, marginTop: 1, letterSpacing: 1 },
 });
 
 function factionLabel(factionId: string | null | undefined): string {
@@ -57,6 +81,14 @@ export function ContractsScreen() {
   // have met all the tasks."
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const toggle = (key: string) => setExpanded((s) => ({ ...s, [key]: !s[key] }));
+  // v2.4.1 (OTA 052) — per-section tap-expand. The PRIMARY OBJECTIVE
+  // card opens a 9-Capital tracker; each MilestoneStat opens a
+  // detail list (kills by enemy name, locations discovered, etc.).
+  const [mqExpanded, setMqExpanded] = useState(false);
+  const [milestoneExpanded, setMilestoneExpanded] = useState<
+    null | 'enemies' | 'travels' | 'checks'
+  >(null);
+  const worldMemory = useGameStore((s) => s.worldMemory);
 
   if (!player) {
     return (
@@ -151,14 +183,31 @@ export function ContractsScreen() {
         // v2.4.1 (OTA 033) — Primary Objective card. Renders above
         // the existing tabs whenever the player has a mainQuest.
         // Shows current phase, Cores recovered, next-step hint, and
-        // — when the player is at the Mud Flood Nexus with all 5
+        // — when the player is at the Mud Flood Nexus with all 9
         // Cores — the three Ending Choice buttons.
+        //
+        // OTA 052 — tap-to-expand opens a 9-Capital tracker so the
+        // player can see which Cores are recovered, which Guardians
+        // they've attempted, and which Capitals are still untouched.
         if (!player) return null;
         const mq = ensureMainQuest(player.mainQuest);
         const recoveredCount = mq.coresRecovered.length;
+        const fledByCapital = (worldMemory.memorableEvents ?? []).reduce<Record<string, number>>(
+          (acc, e) => {
+            if (e.kind === 'mq_guardian_fled' && e.locationId) {
+              acc[e.locationId] = (acc[e.locationId] ?? 0) + 1;
+            }
+            return acc;
+          },
+          {},
+        );
         return (
-          <View style={styles.mainQuestCard}>
-            <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE</Text>
+          <TouchableOpacity
+            style={styles.mainQuestCard}
+            onPress={() => setMqExpanded((v) => !v)}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE  {mqExpanded ? '▴' : '▾'}</Text>
             <Text style={styles.mainQuestPhase}>{phaseLabel(mq.phase)}</Text>
             <Text style={styles.mainQuestHint}>{phaseHint(mq.phase, recoveredCount)}</Text>
             {(() => {
@@ -172,6 +221,48 @@ export function ContractsScreen() {
               const next = coreGateNextAction(player.factionId);
               return <Text style={styles.mainQuestNextAction}>→ At this Capital: {next}.</Text>;
             })()}
+            {mqExpanded && (
+              <View style={styles.mqTracker}>
+                <Text style={styles.mqTrackerHead}>9 CAPITALS · {recoveredCount}/9 CORES</Text>
+                {LOST_CAPITAL_LOCATIONS.map((capId) => {
+                  const def = GUARDIANS_BY_CAPITAL[capId];
+                  const recovered = mq.coresRecovered.includes(capId);
+                  const guardianDown = (mq.guardiansDefeated ?? []).includes(capId);
+                  const here = player.currentLocationId === capId;
+                  const fleeCount = fledByCapital[capId] ?? 0;
+                  let status: string;
+                  let color: string;
+                  if (recovered) {
+                    status = '✓ Core recovered';
+                    color = '#7a8a5a';
+                  } else if (guardianDown) {
+                    status = '✓ Guardian down — return to claim Core';
+                    color = '#c9a86a';
+                  } else if (fleeCount > 0) {
+                    status = `△ Guardian fought, fled ${fleeCount}× — return to finish`;
+                    color = '#a85a3a';
+                  } else if (here) {
+                    status = '○ At this Capital now';
+                    color = '#c9a86a';
+                  } else {
+                    status = '· not yet visited';
+                    color = '#7a705c';
+                  }
+                  return (
+                    <View key={capId} style={styles.mqTrackerRow}>
+                      <Text style={styles.mqTrackerCap}>{def?.capitalName ?? capId}</Text>
+                      <Text style={[styles.mqTrackerStatus, { color }]}>{status}</Text>
+                      <Text style={styles.mqTrackerGuardian}>
+                        Guardian: {def?.base.name ?? '—'}
+                      </Text>
+                    </View>
+                  );
+                })}
+                <Text style={styles.mqTrackerFoot}>
+                  Tap any Capital noun in chat (or use a compass) to plot a course.
+                </Text>
+              </View>
+            )}
             {mq.phase === 'choice' && (
               <View style={styles.mainQuestChoiceRow}>
                 <TouchableOpacity
@@ -202,7 +293,7 @@ export function ContractsScreen() {
                 Ending recorded: {mq.ending.toUpperCase()}.
               </Text>
             )}
-          </View>
+          </TouchableOpacity>
         );
       })()}
 
@@ -232,12 +323,76 @@ export function ContractsScreen() {
       ) : (
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>MILESTONES</Text>
+          <Text style={styles.sectionTitle}>MILESTONES  ·  tap a cell to expand</Text>
           <View style={styles.milestoneRow}>
-            <MilestoneStat label="Enemies" value={ms.enemiesDefeated} next={5} suffix="+1 HP max" />
-            <MilestoneStat label="Travels" value={ms.travelsCompleted} next={5} suffix="+1 STA max" />
-            <MilestoneStat label="Checks" value={ms.checksSucceeded} next={10} suffix="+1 stat" />
+            <MilestoneStat
+              label="Enemies"
+              value={ms.enemiesDefeated}
+              next={5}
+              suffix="+1 HP max"
+              active={milestoneExpanded === 'enemies'}
+              onPress={() => setMilestoneExpanded(milestoneExpanded === 'enemies' ? null : 'enemies')}
+            />
+            <MilestoneStat
+              label="Travels"
+              value={ms.travelsCompleted}
+              next={5}
+              suffix="+1 STA max"
+              active={milestoneExpanded === 'travels'}
+              onPress={() => setMilestoneExpanded(milestoneExpanded === 'travels' ? null : 'travels')}
+            />
+            <MilestoneStat
+              label="Checks"
+              value={ms.checksSucceeded}
+              next={10}
+              suffix="+1 stat"
+              active={milestoneExpanded === 'checks'}
+              onPress={() => setMilestoneExpanded(milestoneExpanded === 'checks' ? null : 'checks')}
+            />
           </View>
+          {milestoneExpanded === 'enemies' && (
+            <View style={styles.milestoneDetail}>
+              <Text style={styles.milestoneDetailHead}>
+                FIRST KILLS  ·  {(worldMemory.defeatedEnemies ?? []).length} unique
+              </Text>
+              {(worldMemory.defeatedEnemies ?? []).length === 0 ? (
+                <Text style={styles.milestoneDetailEmpty}>No kills yet. The buried world waits.</Text>
+              ) : (
+                (worldMemory.defeatedEnemies ?? []).map((name) => (
+                  <Text key={name} style={styles.milestoneDetailRow}>· {name}</Text>
+                ))
+              )}
+            </View>
+          )}
+          {milestoneExpanded === 'travels' && (
+            <View style={styles.milestoneDetail}>
+              <Text style={styles.milestoneDetailHead}>
+                LOCATIONS DISCOVERED  ·  {(worldMemory.discoveredLocationIds ?? []).length}
+              </Text>
+              {(worldMemory.discoveredLocationIds ?? []).length === 0 ? (
+                <Text style={styles.milestoneDetailEmpty}>No travels yet. The road waits.</Text>
+              ) : (
+                (worldMemory.discoveredLocationIds ?? []).map((id) => (
+                  <Text key={id} style={styles.milestoneDetailRow}>· {id.replace(/_/g, ' ')}</Text>
+                ))
+              )}
+            </View>
+          )}
+          {milestoneExpanded === 'checks' && (
+            <View style={styles.milestoneDetail}>
+              <Text style={styles.milestoneDetailHead}>SKILL CHECKS</Text>
+              <Text style={styles.milestoneDetailRow}>
+                Successful d20-vs-DC rolls across stealth, investigate, persuade,
+                cast, climb, and similar disciplines. Every 10 successes → +1 to
+                a random stat.
+              </Text>
+              <Text style={styles.milestoneDetailRow}>
+                Per-roll log is not retained (the rolls happen mid-action and
+                fold back into the narration). The counter above is your
+                lifetime success total.
+              </Text>
+            </View>
+          )}
         </View>
 
         {totalActive === 0 ? (
@@ -744,6 +899,54 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontStyle: 'italic',
     marginTop: 6,
+  },
+  // v2.4.1 (OTA 052) — 9-Capital tracker rendered when the PRIMARY
+  // OBJECTIVE card is tapped open. One row per Capital with the
+  // Core / Guardian status colored for fast read.
+  mqTracker: {
+    marginTop: 10,
+    paddingTop: 8,
+    borderTopColor: '#3a342c',
+    borderTopWidth: 1,
+  },
+  mqTrackerHead: {
+    color: '#cdbf99',
+    fontSize: 10,
+    letterSpacing: 2,
+    marginBottom: 6,
+  },
+  mqTrackerRow: {
+    paddingVertical: 5,
+    borderBottomColor: '#1a1714',
+    borderBottomWidth: 1,
+  },
+  mqTrackerCap: { color: '#e6d8b3', fontSize: 12, fontWeight: '700' },
+  mqTrackerStatus: { fontSize: 11, marginTop: 1 },
+  mqTrackerGuardian: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginTop: 1 },
+  mqTrackerFoot: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginTop: 8, textAlign: 'center' },
+  // v2.4.1 (OTA 052) — milestone cell tap-expand detail.
+  milestoneDetail: {
+    marginTop: 8,
+    paddingTop: 6,
+    paddingBottom: 4,
+    borderTopColor: '#3a342c',
+    borderTopWidth: 1,
+  },
+  milestoneDetailHead: {
+    color: '#cdbf99',
+    fontSize: 10,
+    letterSpacing: 2,
+    marginBottom: 4,
+  },
+  milestoneDetailRow: {
+    color: '#cdbf99',
+    fontSize: 11,
+    marginVertical: 1,
+  },
+  milestoneDetailEmpty: {
+    color: '#7a705c',
+    fontSize: 11,
+    fontStyle: 'italic',
   },
   header: {
     flexDirection: 'row',

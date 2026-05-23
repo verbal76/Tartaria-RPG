@@ -9,17 +9,17 @@
 //   revelation (first arrival at a Lost Capital)
 //     → Arbiter or a faction-keyed NPC reveals: there are 5 Aetheric
 //       Cores buried inside the 5 Lost Capitals. Reaching the Mud
-//       Flood Nexus requires all 5.
+//       Flood Nexus requires all 9.
 //
 //   cores      (active recovery)
 //     → Player visits each Lost Capital and recovers its Core. Order
-//       is free. UI surfaces progress (3/5, etc.).
+//       is free. UI surfaces progress (3/9, etc.).
 //
-//   descent    (all 5 Cores recovered)
+//   descent    (all 9 Cores recovered)
 //     → Endless Stair becomes passable. Player can descend to the
 //       Aetherstone Deep.
 //
-//   nexus      (player arrives at Mud Flood Nexus with all 5 Cores)
+//   nexus      (player arrives at Mud Flood Nexus with all 9 Cores)
 //     → Terminal scene. The Choice is presented.
 //
 //   choice     (UI prompt — Seal / Unleash / Preserve)
@@ -47,9 +47,19 @@ export const LOST_CAPITAL_LOCATIONS: readonly string[] = [
   'nimari',
   'drakova',
   'voronov',
+  // v2.4.1 (OTA 052) — expanded from 5 to 9 Capitals so the count
+  // matches the 9 playable factions. Each new Capital still uses
+  // the existing FACTION_CORE_GATES (the gate verb is keyed to
+  // your faction, not to the Capital), so the 4 new sites work
+  // for any player. Coordinates + Guardian + gear in
+  // engine/coreGuardians.ts + engine/atlasCoords.ts.
+  'karok_sa',
+  'yuldra_tul',
+  'ostragar',
+  'iskan_veil',
 ] as const;
 
-/** Mud Flood Nexus is the terminal destination — gated on all 5
+/** Mud Flood Nexus is the terminal destination — gated on all 9
  *  Cores being in the player's possession. */
 export const NEXUS_LOCATION_ID = 'mud_flood_nexus';
 
@@ -88,70 +98,70 @@ const HOOK_VARIANTS_BY_FACTION: Record<string, string[]> = {
   reclaimers_guild: [
     'The Arbiter watches you across the firelight. "There is a place under all the others — the Mud Flood Nexus. The Reclaimers have looked for it a long time. None has reached it. The 5 Lost Capitals know the way."',
     'The Arbiter sets the lantern between you. "Every guild veteran retires before they finish the same conversation: the Mud Flood Nexus. Five Lost Capitals stand between it and any tomb-thief alive. Including you, if you want it."',
-    'The Arbiter passes you a worn dig-map. "This was carried by a Reclaimer who never came back. The mark at the bottom is the Mud Flood Nexus. The 5 Capitals are how you get there. Decide whether you want to be the one who finishes the map."',
+    'The Arbiter passes you a worn dig-map. "This was carried by a Reclaimer who never came back. The mark at the bottom is the Mud Flood Nexus. The 9 Capitals are how you get there. Decide whether you want to be the one who finishes the map."',
   ],
   forgotten_order: [
     'The Arbiter sets down a hand-copied page. "Every text the Order has restored points the same direction — the Mud Flood Nexus. The cataclysm did not happen everywhere. It happened HERE. And the 5 Lost Capitals each hold a key."',
-    'The Arbiter turns the lectern toward you. "Read it yourself. Every binding text on the shelf agrees — the Nexus exists, the cataclysm passed through it, the 5 Cores in the 5 Capitals are the regulators. The Order has translated this question. Someone still has to answer it."',
-    'The Arbiter taps a dynastic crest on a margin. "Tartarian scholarship is unanimous on the Mud Flood Nexus. It is in the earth. The 5 Cores open it. The Order has written the question for six generations. You are the only Order brother currently positioned to live the answer."',
+    'The Arbiter turns the lectern toward you. "Read it yourself. Every binding text on the shelf agrees — the Nexus exists, the cataclysm passed through it, the 9 Cores in the 9 Capitals are the regulators. The Order has translated this question. Someone still has to answer it."',
+    'The Arbiter taps a dynastic crest on a margin. "Tartarian scholarship is unanimous on the Mud Flood Nexus. It is in the earth. The 9 Cores open it. The Order has written the question for six generations. You are the only Order brother currently positioned to live the answer."',
   ],
   mud_monarchs: [
-    'The Arbiter speaks low. "Your family has known about the Nexus for three centuries. The 5 Lost Capitals each hold a piece of what bound it. The crown that gathers all five reopens it."',
-    'The Arbiter pours a small Aetheric brandy. "The dynasty has had this conversation many times. The Mud Flood Nexus. The 5 Cores. The choice that comes after. Most of your ancestors chose not to know. You are choosing to know, which is already an act."',
-    'The Arbiter studies your face. "If you are reading the family ledger correctly, the Mud Flood Nexus is where the line was lost. The 5 Cores are where it can be reclaimed. The Monarchs have been preparing you to fail at this. You may succeed."',
+    'The Arbiter speaks low. "Your family has known about the Nexus for three centuries. The 9 Lost Capitals each hold a piece of what bound it. The crown that gathers all nine reopens it."',
+    'The Arbiter pours a small Aetheric brandy. "The dynasty has had this conversation many times. The Mud Flood Nexus. The 9 Cores. The choice that comes after. Most of your ancestors chose not to know. You are choosing to know, which is already an act."',
+    'The Arbiter studies your face. "If you are reading the family ledger correctly, the Mud Flood Nexus is where the line was lost. The 9 Cores are where it can be reclaimed. The Monarchs have been preparing you to fail at this. You may succeed."',
   ],
   true_tartarians: [
     'The Arbiter inclines their head. "The Entombed speak of the Mud Flood Nexus — the wound that made the buried country. The 5 Lost Capitals each guard a piece of its old binding."',
-    'The Arbiter lays a clay seal between you. "The Catacomb keepers have whispered the same name across centuries — Mud Flood Nexus. The 5 Cores in the 5 Capitals are not OURS to take; we ask. The Cores either say yes or they do not."',
-    'The Arbiter sets their hand on the bone-shelf. "The True Tartarian tradition has waited for someone to ask the Mud Flood Nexus the right question. The 5 Cores are how you frame it. The Entombed will guide you to each Capital in turn. They are patient."',
+    'The Arbiter lays a clay seal between you. "The Catacomb keepers have whispered the same name across centuries — Mud Flood Nexus. The 9 Cores in the 9 Capitals are not OURS to take; we ask. The Cores either say yes or they do not."',
+    'The Arbiter sets their hand on the bone-shelf. "The True Tartarian tradition has waited for someone to ask the Mud Flood Nexus the right question. The 9 Cores are how you frame it. The Entombed will guide you to each Capital in turn. They are patient."',
   ],
   eternal_dynasty: [
-    'The Arbiter folds a yellowed parchment. "The Mud Flood Nexus is where the empire ended. To raise the Dynasty again, the 5 Cores from the 5 Lost Capitals must be returned to it."',
-    'The Arbiter shows you the genealogical seal stitched into the parchment. "The Dynasty\'s restoration project has waited for an heir who could carry the 5 Cores from 5 Capitals to the Mud Flood Nexus. You are that heir, or you are not. We will know by your seventh travel."',
-    'The Arbiter sets the coronation page in your hands. "The empire ended at the Mud Flood Nexus. The empire can begin again at the same place, with the same 5 Cores in the same hands. The Dynasty has been waiting for hands. Yours are presented."',
+    'The Arbiter folds a yellowed parchment. "The Mud Flood Nexus is where the empire ended. To raise the Dynasty again, the 9 Cores from the 5 Lost Capitals must be returned to it."',
+    'The Arbiter shows you the genealogical seal stitched into the parchment. "The Dynasty\'s restoration project has waited for an heir who could carry the 9 Cores from 9 Capitals to the Mud Flood Nexus. You are that heir, or you are not. We will know by your seventh travel."',
+    'The Arbiter sets the coronation page in your hands. "The empire ended at the Mud Flood Nexus. The empire can begin again at the same place, with the same 9 Cores in the same hands. The Dynasty has been waiting for hands. Yours are presented."',
   ],
   conspiracy_architects: [
-    'The Arbiter slides a redacted file across the desk. "There is a site we have buried our own warnings about — the Mud Flood Nexus. Whoever reaches it with all 5 Cores writes the next chapter. We would prefer no one did."',
-    'The Arbiter taps a paragraph that has been blacked out. "The Architects suppress what cannot be allowed to surface. The Mud Flood Nexus and its 5 Cores are at the top of the never-list. You are about to be the first Architect in this office to handle them. The institutions will need to be told something afterwards."',
-    'The Arbiter checks the office door is locked. "Three centuries of cover-up rest on the Mud Flood Nexus staying buried. The 5 Cores in the 5 Capitals are the on-switch. The Architects have decided you will be the one to find out whether we are right or wrong to keep the switch off."',
+    'The Arbiter slides a redacted file across the desk. "There is a site we have buried our own warnings about — the Mud Flood Nexus. Whoever reaches it with all 9 Cores writes the next chapter. We would prefer no one did."',
+    'The Arbiter taps a paragraph that has been blacked out. "The Architects suppress what cannot be allowed to surface. The Mud Flood Nexus and its 9 Cores are at the top of the never-list. You are about to be the first Architect in this office to handle them. The institutions will need to be told something afterwards."',
+    'The Arbiter checks the office door is locked. "Three centuries of cover-up rest on the Mud Flood Nexus staying buried. The 9 Cores in the 9 Capitals are the on-switch. The Architects have decided you will be the one to find out whether we are right or wrong to keep the switch off."',
   ],
   servants_of_giants: [
-    'The Arbiter touches the lantern. "The Giants speak in their sleep of the Nexus — the wound that drowned them. To wake them properly, the 5 Cores must be returned, each in turn."',
-    'The Arbiter kneels by the tomb-lantern. "Every Servant has dreamed of the Mud Flood Nexus. The 5 Giants — one per Capital — each guard one Core. Bring all 5 to the Nexus and the Giants are properly waked, or properly let go. The vigil chooses you, not the other way around."',
-    'The Arbiter folds their hands in the old Servant posture. "The Mud Flood Nexus is where the Giants fell silent. The 5 Cores are how their silence is broken — gently, or all at once. You will choose which, when the time comes. Until then, you watch."',
+    'The Arbiter touches the lantern. "The Giants speak in their sleep of the Nexus — the wound that drowned them. To wake them properly, the 9 Cores must be returned, each in turn."',
+    'The Arbiter kneels by the tomb-lantern. "Every Servant has dreamed of the Mud Flood Nexus. The 5 Giants — one per Capital — each guard one Core. Bring all 9 to the Nexus and the Giants are properly waked, or properly let go. The vigil chooses you, not the other way around."',
+    'The Arbiter folds their hands in the old Servant posture. "The Mud Flood Nexus is where the Giants fell silent. The 9 Cores are how their silence is broken — gently, or all at once. You will choose which, when the time comes. Until then, you watch."',
   ],
   stone_builders: [
-    'The Arbiter unrolls a draft. "The Mud Flood Nexus is the original Aethercraft engine — the one that failed. The 5 Cores in the 5 Lost Capitals are its old regulators. Recover them, and the engine can be made to work again."',
-    'The Arbiter taps the schematic at the bottom-right corner. "Every Builder learns the Mud Flood Nexus failure case as their first lesson. The 5 Cores are the regulators that were not where they were supposed to be when the cycle ran. Bring them back to the Nexus and the failure becomes a successful test."',
-    'The Arbiter sets a slide-rule across the plan-table. "The Builders\' founding question: can the Engine that failed at the Mud Flood Nexus be made to succeed? The 5 Cores answer it. You are the apprentice we have been waiting on for two generations."',
+    'The Arbiter unrolls a draft. "The Mud Flood Nexus is the original Aethercraft engine — the one that failed. The 9 Cores in the 5 Lost Capitals are its old regulators. Recover them, and the engine can be made to work again."',
+    'The Arbiter taps the schematic at the bottom-right corner. "Every Builder learns the Mud Flood Nexus failure case as their first lesson. The 9 Cores are the regulators that were not where they were supposed to be when the cycle ran. Bring them back to the Nexus and the failure becomes a successful test."',
+    'The Arbiter sets a slide-rule across the plan-table. "The Builders\' founding question: can the Engine that failed at the Mud Flood Nexus be made to succeed? The 9 Cores answer it. You are the apprentice we have been waiting on for two generations."',
   ],
   tartarian_revivalists: [
-    'The Arbiter looks up from a stack of unpublished photographs. "When the public sees the Mud Flood Nexus, the surface world ends. We need the 5 Cores from the 5 Lost Capitals to open it. Then everyone will know."',
-    'The Arbiter shows you the press kit that has been on hold for forty years. "Every Revivalist generation has tried to publish proof. The 5 Cores are the proof — recoverable, undeniable, photographable. The Mud Flood Nexus is the printing press. The surface world is the readership."',
-    'The Arbiter pulls a manuscript from the locked drawer. "The Revival is not a movement. It is a delivery date. The 5 Cores from the 5 Capitals are the delivery; the Mud Flood Nexus is the address. You are the courier the founder has been waiting on."',
+    'The Arbiter looks up from a stack of unpublished photographs. "When the public sees the Mud Flood Nexus, the surface world ends. We need the 9 Cores from the 5 Lost Capitals to open it. Then everyone will know."',
+    'The Arbiter shows you the press kit that has been on hold for forty years. "Every Revivalist generation has tried to publish proof. The 9 Cores are the proof — recoverable, undeniable, photographable. The Mud Flood Nexus is the printing press. The surface world is the readership."',
+    'The Arbiter pulls a manuscript from the locked drawer. "The Revival is not a movement. It is a delivery date. The 9 Cores from the 9 Capitals are the delivery; the Mud Flood Nexus is the address. You are the courier the founder has been waiting on."',
   ],
 };
 
 const REVELATION_VARIANTS_BY_FACTION: Record<string, string[]> = {
   reclaimers_guild: [
     'A Reclaimer veteran walks you through the standing arches. "Each Capital — Asgardar, Samarran, Nimari, Drakova, Voronov — buries one Aetheric Core. The salvage of a lifetime, if you can pry them loose."',
-    'A Reclaimer field-hand crouches beside you with a chalkboard. "5 Cores. 5 Capitals. Take it slow. Each one comes loose if you know the bedding."',
-    'A Reclaimer foreman taps the open shaft. "Down there is one of 5. Asgardar has its sister, Samarran has its cousin, Nimari has its third. Drakova and Voronov round out the set. Tools first; we\'ll teach you the trick at each site."',
+    'A Reclaimer field-hand crouches beside you with a chalkboard. "9 Cores. 9 Capitals. Take it slow. Each one comes loose if you know the bedding."',
+    'A Reclaimer foreman taps the open shaft. "Down there is one of nine. Asgardar, Samarran, Nimari, Drakova, Voronov — the original five. Karok-Sa, Yuldra-Tul, Ostragar, Iskan-Veil — the four we have only re-confirmed in the last decade. Tools first; we\'ll teach you the trick at each site."',
   ],
   forgotten_order: [
-    'An Order librarian uncovers a sealed map. "The 5 Cores. One per Capital. Each was placed before the flood and sealed by Aetheric protocols the Order has half-translated. The other half waits inside."',
+    'An Order librarian uncovers a sealed map. "The 9 Cores. One per Capital. Each was placed before the flood and sealed by Aetheric protocols the Order has half-translated. The other half waits inside."',
     'An Order brother whispers across the lectern. "Five binding texts. Five Capitals. Each Core is its own argument. You read them in the order Tartaria meant. You finish at the Nexus."',
     'An Order elder shows you the older catalog. "Every Capital was a school. The Cores were their final exams. You take the test in five rooms, you graduate at the Mud Flood Nexus. Bring a clean pen."',
   ],
   mud_monarchs: [
-    'A Monarch agent presents the family ledger. "The 5 Cores by family right belong to you. Drakova, Nimari, Asgardar, Samarran, Voronov. Travel under our standard; the Capitals will recognize your claim — or refuse it, and pay the price."',
-    'A Monarch retainer salutes. "The dynastic right has been recorded in our books since the Flood. 5 Cores. Each Capital owes the family one. We have not collected for three centuries. You may. The keepers will know your standard."',
+    'A Monarch agent presents the family ledger. "The 9 Cores by family right belong to you. Drakova, Nimari, Asgardar, Samarran, Voronov. Travel under our standard; the Capitals will recognize your claim — or refuse it, and pay the price."',
+    'A Monarch retainer salutes. "The dynastic right has been recorded in our books since the Flood. 9 Cores. Each Capital owes the family one. We have not collected for three centuries. You may. The keepers will know your standard."',
     'A Monarch elder lifts the seal-ring to your hand. "Wear this. The Capital keepers will recognize the family. Each one yields one Core. If a Capital refuses, you have authority to take the Core by other means. The family has not lost a Core yet to a refusing keeper."',
   ],
   true_tartarians: [
     'A True Tartarian elder sketches the old map in clay. "Each Capital is a sleeping mouth. You must enter, ask permission of the Core, and carry it out. Asgardar speaks first. Samarran answers. Nimari listens. Drakova waits. Voronov tests."',
-    'A True Tartarian keeper bows you toward the Catacomb mouth. "The 5 Cores are not objects. They are ancestor-aspects, asleep in 5 Capitals. We carry them, we don\'t take them. Ask each one. Listen for the yes."',
-    'A True Tartarian elder washes the clay from their hands. "The Cores rest in the 5 Capitals as the Entombed rest in the Catacombs — present, patient, conditional. You ask. They consent. You carry. They guide. The Mud Flood Nexus is where their work resumes."',
+    'A True Tartarian keeper bows you toward the Catacomb mouth. "The 9 Cores are not objects. They are ancestor-aspects, asleep in 9 Capitals. We carry them, we don\'t take them. Ask each one. Listen for the yes."',
+    'A True Tartarian elder washes the clay from their hands. "The Cores rest in the 9 Capitals as the Entombed rest in the Catacombs — present, patient, conditional. You ask. They consent. You carry. They guide. The Mud Flood Nexus is where their work resumes."',
   ],
   eternal_dynasty: [
     'A dynastic herald confirms the lineage seal on your hand. "Five Capitals. Five Cores. Five proofs of blood. Asgardar your throne, Samarran your school, Nimari your guard, Drakova your reserve, Voronov your treasury. Each will name you."',
@@ -159,72 +169,72 @@ const REVELATION_VARIANTS_BY_FACTION: Record<string, string[]> = {
     'A dynastic herald shows you the five seals stamped in the parchment of your hand. "The Capitals were sworn to the line. The oaths are still in force. Each Core is the keeper\'s proof that they remembered the oath. Five oaths kept. Then the Nexus. Then the throne, if you want it."',
   ],
   conspiracy_architects: [
-    'An Architect senior partner spreads five dossiers across the table. "The 5 Capitals each contain a Core. We have spent generations preventing anyone from connecting the dots. You are the dot-connector now. We have no further plausible deniability."',
-    'An Architect operative pushes a folder of redacted aerial shots toward you. "5 Cores. 5 Capitals. Our standing operation has been to keep them apart. You are the agent who will move them together. The brief is: do not get photographed."',
+    'An Architect senior partner spreads five dossiers across the table. "The 9 Capitals each contain a Core. We have spent generations preventing anyone from connecting the dots. You are the dot-connector now. We have no further plausible deniability."',
+    'An Architect operative pushes a folder of redacted aerial shots toward you. "9 Cores. 9 Capitals. Our standing operation has been to keep them apart. You are the agent who will move them together. The brief is: do not get photographed."',
     'An Architect partner closes the dossier and meets your eye. "We have stopped pretending we can suppress this. Five Cores. Five Capitals. You retrieve them under a clean cover story; we manage the press. The Architects step aside at the Nexus and let you decide."',
   ],
   servants_of_giants: [
     'A Servant of the Giants pours libation. "Five Capitals. Five Giants. Each Capital is the resting-place of one Giant; each Giant guards one Core. The Giants must consent. They will, if you keep the vigil correctly."',
-    'A Servant elder bows toward the eastern wall. "5 Cores rest with 5 Giants in 5 Capitals. We do not take. We sit until the Giant offers. Then we carry. Then we sit again at the next Capital. Five vigils. Then the Nexus."',
+    'A Servant elder bows toward the eastern wall. "9 Cores rest with 5 Giants in 9 Capitals. We do not take. We sit until the Giant offers. Then we carry. Then we sit again at the next Capital. Five vigils. Then the Nexus."',
     'A Servant lights the second tomb-lantern. "Each Capital is a chapel to one of the 5 Giants. Each Giant has slept long enough to be approachable. The Cores will come with you if you ask the Giant\'s permission first and not rush the answer."',
   ],
   stone_builders: [
     'A Stone Builder foreman lays out five blueprints. "Asgardar Core: power. Samarran Core: timing. Nimari Core: shielding. Drakova Core: reserve. Voronov Core: regulator. Assemble them all and the Nexus engine cycles. Miss one, it floods again."',
-    'A Stone Builder draftsman points at the schematic. "5 Cores, 5 different roles. The Nexus Engine doesn\'t care about your loyalty; it cares about the Cores being IN it. We give you the tools to extract each one cleanly. The order is up to you."',
-    'A Stone Builder master mason draws the assembly diagram in chalk. "Power feeds timing. Timing feeds shielding. Shielding feeds reserve. Reserve feeds regulator. Bring the 5 Cores in any order; the Engine accepts them. Build correctly and the Nexus runs."',
+    'A Stone Builder draftsman points at the schematic. "9 Cores, 5 different roles. The Nexus Engine doesn\'t care about your loyalty; it cares about the Cores being IN it. We give you the tools to extract each one cleanly. The order is up to you."',
+    'A Stone Builder master mason draws the assembly diagram in chalk. "Power feeds timing. Timing feeds shielding. Shielding feeds reserve. Reserve feeds regulator. Bring the 9 Cores in any order; the Engine accepts them. Build correctly and the Nexus runs."',
   ],
   tartarian_revivalists: [
-    'A Revivalist cell organizer hands you a press kit. "Five Capitals. Five recoveries. Five publishable artifacts. Each Core you bring out goes on the front page. By the time you have all five, the surface world is asking us for an interview."',
-    'A Revivalist photographer hands you a calibrated lens. "5 Cores. 5 Capitals. Each recovery is one published story. We escalate as you accumulate. By the fifth, the surface world is locked in. By the Nexus, the cell is the world\'s new authority."',
+    'A Revivalist cell organizer hands you a press kit. "Nine Capitals. Nine recoveries. Nine publishable artifacts. Each Core you bring out goes on the front page. By the time you have all nine, the surface world is asking us for an interview."',
+    'A Revivalist photographer hands you a calibrated lens. "9 Cores. 9 Capitals. Each recovery is one published story. We escalate as you accumulate. By the fifth, the surface world is locked in. By the Nexus, the cell is the world\'s new authority."',
     'A Revivalist field organizer gives you the schedule. "Capital one in two weeks. Capital two in a month. The press releases are pre-written; we fill in the Core name as you bring it out. By Capital five, the Revival is the headline. The Nexus is the closer."',
   ],
 };
 
 const DESCENT_VARIANTS_BY_FACTION: Record<string, string[]> = {
   reclaimers_guild: [
-    'You stand at the head of the Endless Stair with all 5 Cores. The Reclaimers have never reached the bottom. You will be the first.',
-    'The Stair has had Reclaimers walk down it before. None walked back up. With the 5 Cores in your pack, the Stair recognizes the cargo and lights the next flight. You may be the first to descend AND return.',
+    'You stand at the head of the Endless Stair with all 9 Cores. The Reclaimers have never reached the bottom. You will be the first.',
+    'The Stair has had Reclaimers walk down it before. None walked back up. With the 9 Cores in your pack, the Stair recognizes the cargo and lights the next flight. You may be the first to descend AND return.',
     'You set boot to the first tread of the Endless Stair carrying the salvage of every Reclaimer who failed to. The guild owes you something it will never be able to pay. The Stair settles under your weight, then welcomes you down.',
   ],
   forgotten_order: [
-    'The 5 Cores hum together for the first time in a thousand years. The Stair recognizes the harmony and shows its lower turns.',
-    'The Stair tests you with a syllabus. Each tread is a passage of pre-flood text; the 5 Cores in your pack translate as you descend. The Order taught you to read; the Stair is the final exam.',
-    'You descend with a research library against your back. The 5 Cores cross-reference every footnote the Order has ever filed. The Stair turns under perfect scholarship and shows the next flight.',
+    'The 9 Cores hum together for the first time in a thousand years. The Stair recognizes the harmony and shows its lower turns.',
+    'The Stair tests you with a syllabus. Each tread is a passage of pre-flood text; the 9 Cores in your pack translate as you descend. The Order taught you to read; the Stair is the final exam.',
+    'You descend with a research library against your back. The 9 Cores cross-reference every footnote the Order has ever filed. The Stair turns under perfect scholarship and shows the next flight.',
   ],
   mud_monarchs: [
-    'You hold the 5 Cores as your ancestors meant to. The Stair opens — the family right finally executed.',
-    'The dynastic seal recognizes the dynastic descent. The Stair, by ancient protocol, opens its full length to a Monarch carrying all 5. You walk down under the family standard, into the foundation the family was supposed to control.',
-    'The Stair has been waiting for a Monarch heir with the will to use the family right. You arrive. The 5 Cores key the descent; the family banner unfurls on every landing as you pass. The empire descends with you in echo.',
+    'You hold the 9 Cores as your ancestors meant to. The Stair opens — the family right finally executed.',
+    'The dynastic seal recognizes the dynastic descent. The Stair, by ancient protocol, opens its full length to a Monarch carrying all 9. You walk down under the family standard, into the foundation the family was supposed to control.',
+    'The Stair has been waiting for a Monarch heir with the will to use the family right. You arrive. The 9 Cores key the descent; the family banner unfurls on every landing as you pass. The empire descends with you in echo.',
   ],
   true_tartarians: [
-    'The 5 Cores ride your pack like sleeping children. The Stair, sensing them, draws breath. The Entombed walk down with you in silence.',
-    'You carry the 5 Cores as gently as the elders carry the urns. The Stair lights its lower flights only as you approach — the True Tartarian way: never see the bottom until you are there.',
-    'The 5 Cores quiet your pack. The Stair quiets the air. The Entombed quiet the procession. You descend in the only manner the tradition recognizes — at the pace of those who have always been carried by it.',
+    'The 9 Cores ride your pack like sleeping children. The Stair, sensing them, draws breath. The Entombed walk down with you in silence.',
+    'You carry the 9 Cores as gently as the elders carry the urns. The Stair lights its lower flights only as you approach — the True Tartarian way: never see the bottom until you are there.',
+    'The 9 Cores quiet your pack. The Stair quiets the air. The Entombed quiet the procession. You descend in the only manner the tradition recognizes — at the pace of those who have always been carried by it.',
   ],
   eternal_dynasty: [
-    'With the 5 Cores returned to your blood, the empire descends with you. The Stair turns under a once-proper authority.',
-    'The Stair has not been walked by an heir of the unbroken line since the Flood. Tonight it is. The 5 Cores key the imperial descent; every landing remembers the protocols and dims the lights at your approach.',
+    'With the 9 Cores returned to your blood, the empire descends with you. The Stair turns under a once-proper authority.',
+    'The Stair has not been walked by an heir of the unbroken line since the Flood. Tonight it is. The 9 Cores key the imperial descent; every landing remembers the protocols and dims the lights at your approach.',
     'You descend in the old coronation style — slow, unattended, with the regalia of the line in your pack. The Stair shows you each lower flight as a herald would: with restraint, with dignity, with knowledge of what comes next.',
   ],
   conspiracy_architects: [
-    'The 5 Cores together represent an evidentiary crisis. You carry them into the Stair anyway. The Architects will have to manage the press later.',
-    'The descent is technically unauthorized. The 5 Cores in your pack are technically state evidence. You make no calls; you take no photographs; you walk down the Stair while the Architects rehearse their morning briefing without you.',
-    'You descend as an off-record operative. The 5 Cores are the most secured items the Architects have ever (knowingly) lost custody of. The Stair lights for you anyway. Institutions are not the only authorities that recognize a holder of the full set.',
+    'The 9 Cores together represent an evidentiary crisis. You carry them into the Stair anyway. The Architects will have to manage the press later.',
+    'The descent is technically unauthorized. The 9 Cores in your pack are technically state evidence. You make no calls; you take no photographs; you walk down the Stair while the Architects rehearse their morning briefing without you.',
+    'You descend as an off-record operative. The 9 Cores are the most secured items the Architects have ever (knowingly) lost custody of. The Stair lights for you anyway. Institutions are not the only authorities that recognize a holder of the full set.',
   ],
   servants_of_giants: [
-    'The 5 Cores wake the 5 Giants in their sleep. The Stair shakes once with their stirring, then steadies. The vigil descends with you in silence.',
+    'The 9 Cores wake the 5 Giants in their sleep. The Stair shakes once with their stirring, then steadies. The vigil descends with you in silence.',
     'You feel the 5 Giants stir, one to one Core, each in their distant tomb. The Stair takes their weight and yours and steadies. You descend with the long vigil pressing on the back of your neck.',
-    'Each step of the Stair is also a step of the vigil. The 5 Cores warm in your pack as the Giants register the procession. You descend with the patience the tradition trained into you. The Giants are watching down the Stair with you.',
+    'Each step of the Stair is also a step of the vigil. The 9 Cores warm in your pack as the Giants register the procession. You descend with the patience the tradition trained into you. The Giants are watching down the Stair with you.',
   ],
   stone_builders: [
-    'The 5 Cores in series. The Stair powers up like a long-disused engine — old Aethercraft warming. Each tread firms under your foot as the system cycles.',
-    'You descend by Aethercraft, not by gravity. The 5 Cores in series provide the lift, the Stair provides the geometry, and you are the operator. Every tread is a sub-system bringing itself online. The Engine is the Stair.',
-    'The 5 Cores in your pack are the regulators the Stair has been missing. As you descend, each Core cycles into provisional series. The Stair, properly regulated, finally feels like the engine the Builders always argued it was.',
+    'The 9 Cores in series. The Stair powers up like a long-disused engine — old Aethercraft warming. Each tread firms under your foot as the system cycles.',
+    'You descend by Aethercraft, not by gravity. The 9 Cores in series provide the lift, the Stair provides the geometry, and you are the operator. Every tread is a sub-system bringing itself online. The Engine is the Stair.',
+    'The 9 Cores in your pack are the regulators the Stair has been missing. As you descend, each Core cycles into provisional series. The Stair, properly regulated, finally feels like the engine the Builders always argued it was.',
   ],
   tartarian_revivalists: [
-    'You have all 5 Cores and a documentary crew waiting at the surface. The Stair opens. The world is about to learn what was buried.',
-    'You descend with the cell\'s cameras tucked safely above. The 5 Cores are the closing footage. The Stair takes you down toward the headline the Revival has been waiting four generations to print.',
-    'The 5 Cores in your pack are the evidence the surface world cannot ignore. The Stair, knowing what you carry, opens the lower flights without delay. The Revival\'s last and longest dispatch begins now.',
+    'You have all 9 Cores and a documentary crew waiting at the surface. The Stair opens. The world is about to learn what was buried.',
+    'You descend with the cell\'s cameras tucked safely above. The 9 Cores are the closing footage. The Stair takes you down toward the headline the Revival has been waiting four generations to print.',
+    'The 9 Cores in your pack are the evidence the surface world cannot ignore. The Stair, knowing what you carry, opens the lower flights without delay. The Revival\'s last and longest dispatch begins now.',
   ],
 };
 
@@ -238,47 +248,47 @@ const HOOK_BY_FACTION: Record<string, string> = {
   forgotten_order:
     'The Arbiter sets down a hand-copied page. "Every text the Order has restored points the same direction — the Mud Flood Nexus. The cataclysm did not happen everywhere. It happened HERE. And the 5 Lost Capitals each hold a key."',
   mud_monarchs:
-    'The Arbiter speaks low. "Your family has known about the Nexus for three centuries. The 5 Lost Capitals each hold a piece of what bound it. The crown that gathers all five reopens it."',
+    'The Arbiter speaks low. "Your family has known about the Nexus for three centuries. The 9 Lost Capitals each hold a piece of what bound it. The crown that gathers all nine reopens it."',
   true_tartarians:
     'The Arbiter inclines their head. "The Entombed speak of the Mud Flood Nexus — the wound that made the buried country. The 5 Lost Capitals each guard a piece of its old binding."',
   eternal_dynasty:
-    'The Arbiter folds a yellowed parchment. "The Mud Flood Nexus is where the empire ended. To raise the Dynasty again, the 5 Cores from the 5 Lost Capitals must be returned to it."',
+    'The Arbiter folds a yellowed parchment. "The Mud Flood Nexus is where the empire ended. To raise the Dynasty again, the 9 Cores from the 5 Lost Capitals must be returned to it."',
   conspiracy_architects:
-    'The Arbiter slides a redacted file across the desk. "There is a site we have buried our own warnings about — the Mud Flood Nexus. Whoever reaches it with all 5 Cores writes the next chapter. We would prefer no one did."',
+    'The Arbiter slides a redacted file across the desk. "There is a site we have buried our own warnings about — the Mud Flood Nexus. Whoever reaches it with all 9 Cores writes the next chapter. We would prefer no one did."',
   servants_of_giants:
-    'The Arbiter touches the lantern. "The Giants speak in their sleep of the Nexus — the wound that drowned them. To wake them properly, the 5 Cores must be returned, each in turn."',
+    'The Arbiter touches the lantern. "The Giants speak in their sleep of the Nexus — the wound that drowned them. To wake them properly, the 9 Cores must be returned, each in turn."',
   stone_builders:
-    'The Arbiter unrolls a draft. "The Mud Flood Nexus is the original Aethercraft engine — the one that failed. The 5 Cores in the 5 Lost Capitals are its old regulators. Recover them, and the engine can be made to work again."',
+    'The Arbiter unrolls a draft. "The Mud Flood Nexus is the original Aethercraft engine — the one that failed. The 9 Cores in the 5 Lost Capitals are its old regulators. Recover them, and the engine can be made to work again."',
   tartarian_revivalists:
-    'The Arbiter looks up from a stack of unpublished photographs. "When the public sees the Mud Flood Nexus, the surface world ends. We need the 5 Cores from the 5 Lost Capitals to open it. Then everyone will know."',
+    'The Arbiter looks up from a stack of unpublished photographs. "When the public sees the Mud Flood Nexus, the surface world ends. We need the 9 Cores from the 5 Lost Capitals to open it. Then everyone will know."',
 };
 
 const REVELATION_BY_FACTION: Record<string, string> = {
   reclaimers_guild:
     'A Reclaimer veteran walks you through the standing arches. "Each Capital — Asgardar, Samarran, Nimari, Drakova, Voronov — buries one Aetheric Core. The salvage of a lifetime, if you can pry them loose."',
   forgotten_order:
-    'An Order librarian uncovers a sealed map. "The 5 Cores. One per Capital. Each was placed before the flood and sealed by Aetheric protocols the Order has half-translated. The other half waits inside."',
+    'An Order librarian uncovers a sealed map. "The 9 Cores. One per Capital. Each was placed before the flood and sealed by Aetheric protocols the Order has half-translated. The other half waits inside."',
   mud_monarchs:
-    'A Monarch agent presents the family ledger. "The 5 Cores by family right belong to you. Drakova, Nimari, Asgardar, Samarran, Voronov. Travel under our standard; the Capitals will recognize your claim — or refuse it, and pay the price."',
+    'A Monarch agent presents the family ledger. "The 9 Cores by family right belong to you. Drakova, Nimari, Asgardar, Samarran, Voronov. Travel under our standard; the Capitals will recognize your claim — or refuse it, and pay the price."',
   true_tartarians:
     'A True Tartarian elder sketches the old map in clay. "Each Capital is a sleeping mouth. You must enter, ask permission of the Core, and carry it out. Asgardar speaks first. Samarran answers. Nimari listens. Drakova waits. Voronov tests."',
   eternal_dynasty:
     'A dynastic herald confirms the lineage seal on your hand. "Five Capitals. Five Cores. Five proofs of blood. Asgardar your throne, Samarran your school, Nimari your guard, Drakova your reserve, Voronov your treasury. Each will name you."',
   conspiracy_architects:
-    'An Architect senior partner spreads five dossiers across the table. "The 5 Capitals each contain a Core. We have spent generations preventing anyone from connecting the dots. You are the dot-connector now. We have no further plausible deniability."',
+    'An Architect senior partner spreads five dossiers across the table. "The 9 Capitals each contain a Core. We have spent generations preventing anyone from connecting the dots. You are the dot-connector now. We have no further plausible deniability."',
   servants_of_giants:
     'A Servant of the Giants pours libation. "Five Capitals. Five Giants. Each Capital is the resting-place of one Giant; each Giant guards one Core. The Giants must consent. They will, if you keep the vigil correctly."',
   stone_builders:
     'A Stone Builder foreman lays out five blueprints. "Asgardar Core: power. Samarran Core: timing. Nimari Core: shielding. Drakova Core: reserve. Voronov Core: regulator. Assemble them all and the Nexus engine cycles. Miss one, it floods again."',
   tartarian_revivalists:
-    'A Revivalist cell organizer hands you a press kit. "Five Capitals. Five recoveries. Five publishable artifacts. Each Core you bring out goes on the front page. By the time you have all five, the surface world is asking us for an interview."',
+    'A Revivalist cell organizer hands you a press kit. "Nine Capitals. Nine recoveries. Nine publishable artifacts. Each Core you bring out goes on the front page. By the time you have all nine, the surface world is asking us for an interview."',
 };
 
 const CORE_RECOVERED_LINE = (factionId: string, capitalId: string, recoveredCount: number): string => {
   const capitalName = LOST_CAPITAL_NAMES[capitalId] ?? capitalId;
   const remaining = 5 - recoveredCount;
   const tail = remaining === 0
-    ? 'All five Cores rest in your pack. The Endless Stair will open to a carrier of the full set.'
+    ? 'All nine Cores rest in your pack. The Endless Stair will open to a carrier of the full set.'
     : `${remaining} Core${remaining === 1 ? '' : 's'} still to recover.`;
   // Faction-flavored opener — kept terse so the cadence doesn't drag
   // when the player is mid-action.
@@ -307,31 +317,31 @@ const LOST_CAPITAL_NAMES: Record<string, string> = {
 
 const DESCENT_LINE_BY_FACTION: Record<string, string> = {
   reclaimers_guild:
-    'You stand at the head of the Endless Stair with all 5 Cores. The Reclaimers have never reached the bottom. You will be the first.',
+    'You stand at the head of the Endless Stair with all 9 Cores. The Reclaimers have never reached the bottom. You will be the first.',
   forgotten_order:
-    'The 5 Cores hum together for the first time in a thousand years. The Stair recognizes the harmony and shows its lower turns.',
+    'The 9 Cores hum together for the first time in a thousand years. The Stair recognizes the harmony and shows its lower turns.',
   mud_monarchs:
-    'You hold the 5 Cores as your ancestors meant to. The Stair opens — the family right finally executed.',
+    'You hold the 9 Cores as your ancestors meant to. The Stair opens — the family right finally executed.',
   true_tartarians:
-    'The 5 Cores ride your pack like sleeping children. The Stair, sensing them, draws breath. The Entombed walk down with you in silence.',
+    'The 9 Cores ride your pack like sleeping children. The Stair, sensing them, draws breath. The Entombed walk down with you in silence.',
   eternal_dynasty:
-    'With the 5 Cores returned to your blood, the empire descends with you. The Stair turns under a once-proper authority.',
+    'With the 9 Cores returned to your blood, the empire descends with you. The Stair turns under a once-proper authority.',
   conspiracy_architects:
-    'The 5 Cores together represent an evidentiary crisis. You carry them into the Stair anyway. The Architects will have to manage the press later.',
+    'The 9 Cores together represent an evidentiary crisis. You carry them into the Stair anyway. The Architects will have to manage the press later.',
   servants_of_giants:
-    'The 5 Cores wake the 5 Giants in their sleep. The Stair shakes once with their stirring, then steadies. The vigil descends with you.',
+    'The 9 Cores wake the 5 Giants in their sleep. The Stair shakes once with their stirring, then steadies. The vigil descends with you.',
   stone_builders:
-    'The 5 Cores in series. The Stair powers up like a long-disused engine — old Aethercraft warming. Each tread firms under your foot as the system cycles.',
+    'The 9 Cores in series. The Stair powers up like a long-disused engine — old Aethercraft warming. Each tread firms under your foot as the system cycles.',
   tartarian_revivalists:
-    'You have all 5 Cores and a documentary crew waiting at the surface. The Stair opens. The world is about to learn what was buried.',
+    'You have all 9 Cores and a documentary crew waiting at the surface. The Stair opens. The world is about to learn what was buried.',
 };
 
 const NEXUS_ARRIVAL_LINE =
-  'You arrive at the Mud Flood Nexus. The chamber is older than every kingdom drawn on every honest map. The 5 Cores in your pack pulse in concord. The control mantle waits — three actions are possible. None is reversible.';
+  'You arrive at the Mud Flood Nexus. The chamber is older than every kingdom drawn on every honest map. The 9 Cores in your pack pulse in concord. The control mantle waits — three actions are possible. None is reversible.';
 
 // v2.4.1 (OTA 038) — Phase 5: Mud Flood Nexus interior scene.
 //
-// When the player arrives with all 5 Cores, the engine plays a
+// When the player arrives with all 9 Cores, the engine plays a
 // multi-paragraph cinematic that walks them up to the control mantle
 // and slots each Core into its named receptacle, in canonical order
 // (Asgardar first, Mud Flood Nexus last). Each slot is a beat of
@@ -339,7 +349,7 @@ const NEXUS_ARRIVAL_LINE =
 // the Choice doesn't land flat.
 //
 // Called from gameStore when the player enters mud_flood_nexus AND
-// mainQuest.phase advances to 'choice' (i.e. all 5 Cores present).
+// mainQuest.phase advances to 'choice' (i.e. all 9 Cores present).
 // Returns the array of narration lines; the caller appends each as
 // its own log entry so AdventureFeed renders them as paragraphs.
 export interface NexusSlotBeat {
@@ -372,19 +382,41 @@ export const NEXUS_SLOT_BEATS: readonly NexusSlotBeat[] = [
   {
     capitalId: 'voronov',
     capitalName: 'Voronov',
-    line: 'The Voronov Core lands in the regulator-seat. The last of the 5 is set. The chamber\'s lights firm to a clean amber, the metronome steadies into a real beat, and the control mantle — for the first time since 1530 — is ready to take direction.',
+    line: 'The Voronov Core lands in the regulator-seat. Five of nine. The chamber\'s lights firm to a clean amber for the first time, the metronome steadies into a real beat, and the control mantle begins to wake.',
+  },
+  // v2.4.1 (OTA 052) — four additional slot beats for the four
+  // Capitals added when the Core count expanded from 5 to 9.
+  {
+    capitalId: 'karok_sa',
+    capitalName: 'Karok-Sa',
+    line: 'The Karok-Sa Core slides into the binding-seat. The sigils Tobiel carved into his own chamber answer here, a thousand miles away — the seal-chain on the mantle\'s flank flares once and locks the Engine\'s frame closed. The Order\'s last work, undone in your favour.',
+  },
+  {
+    capitalId: 'yuldra_tul',
+    capitalName: 'Yuldra-Tul',
+    line: 'The Yuldra-Tul Core takes the vigil-seat. A wash of cold runs once through the chamber and is gone. The Giant beneath the mountain shifts in its sleep, finds nothing to wake for, settles back down. The Engine\'s coolant loop runs for the first time since the Flood.',
+  },
+  {
+    capitalId: 'ostragar',
+    capitalName: 'Ostragar',
+    line: 'The Ostragar Core finds the cadence-seat. Slow water-sound moves through the chamber for one long beat — Ostros\' river answering its bound rune from the other side of the world. The Engine\'s rhythm doubles, then folds in on itself, true.',
+  },
+  {
+    capitalId: 'iskan_veil',
+    capitalName: 'Iskan-Veil',
+    line: 'The Iskan-Veil Core slips into the masking-seat — the last one, the one Inarra hid behind a door no scout-priest ever wrote down. The mantle goes quiet. Every false door in Iskan-Veil, a thousand miles back, opens at once and stays open. The Engine is whole, since 1530.',
   },
 ];
 
 /** The pre-Choice walk-up narration. Called by gameStore when the
- *  player has all 5 Cores and steps into mud_flood_nexus. Returns
+ *  player has all 9 Cores and steps into mud_flood_nexus. Returns
  *  an ordered list of lines: arrival + 5 slot beats + the prompt to
  *  decide. AdventureFeed appends each as a paragraph. */
 export function nexusArrivalCinematic(): string[] {
   const lines: string[] = [NEXUS_ARRIVAL_LINE];
   for (const beat of NEXUS_SLOT_BEATS) lines.push(beat.line);
   lines.push(
-    'Three actions remain. SEAL — collapse the Aether back into stillness, lock Tartaria where it was buried, and walk out under a quiet sky. UNLEASH — open the chamber\'s old throat and let the Aether climb back up into the world; what comes next is not yours to manage. PRESERVE — leave the mantle live but unsigned, walk out with the 5 Cores still in your pack, and carry the keys to a cataclysm only you can choose to use. Decide from the Contracts screen.',
+    'Three actions remain. SEAL — collapse the Aether back into stillness, lock Tartaria where it was buried, and walk out under a quiet sky. UNLEASH — open the chamber\'s old throat and let the Aether climb back up into the world; what comes next is not yours to manage. PRESERVE — leave the mantle live but unsigned, walk out with the 9 Cores still in your pack, and carry the keys to a cataclysm only you can choose to use. Decide from the Contracts screen.',
   );
   return lines;
 }
@@ -440,23 +472,23 @@ const UNLEASH_BY_FACTION: Record<string, string> = {
 
 const PRESERVE_BY_FACTION: Record<string, string> = {
   reclaimers_guild:
-    'You PRESERVE. The 5 Cores stay in your pack; the Nexus mantle stays mute. The Reclaimers carry on as they always have — quiet, careful, salvaging what the buried world surrenders without ever forcing the lock. You are now the only Reclaimer alive who has held all 5 Cores and could end Tartaria with a single decision. You will not. That restraint becomes the guild\'s new motto, even though only you know why.',
+    'You PRESERVE. The 9 Cores stay in your pack; the Nexus mantle stays mute. The Reclaimers carry on as they always have — quiet, careful, salvaging what the buried world surrenders without ever forcing the lock. You are now the only Reclaimer alive who has held all 9 Cores and could end Tartaria with a single decision. You will not. That restraint becomes the guild\'s new motto, even though only you know why.',
   forgotten_order:
-    'You PRESERVE. The Order\'s research continues without a live Nexus to reference; the scholarship now has a purpose it never had — to KEEP Tartaria readable across the centuries you will spend not deciding. You leave the Cloister with the 5 Cores in your pack. The Master Scholar will know what they are by the weight of your bag, and will say nothing.',
+    'You PRESERVE. The Order\'s research continues without a live Nexus to reference; the scholarship now has a purpose it never had — to KEEP Tartaria readable across the centuries you will spend not deciding. You leave the Cloister with the 9 Cores in your pack. The Master Scholar will know what they are by the weight of your bag, and will say nothing.',
   mud_monarchs:
-    'You PRESERVE. The family wins the way the family always wins — by not playing the hand. The 5 Cores in your pack become the dynasty\'s ultimate reserve, a power that exists in potentia and is never burned. You are now the most important Mud Monarch alive. Your descendants will inherit the choice; you trust them to keep deferring it. That trust is the dynasty.',
+    'You PRESERVE. The family wins the way the family always wins — by not playing the hand. The 9 Cores in your pack become the dynasty\'s ultimate reserve, a power that exists in potentia and is never burned. You are now the most important Mud Monarch alive. Your descendants will inherit the choice; you trust them to keep deferring it. That trust is the dynasty.',
   true_tartarians:
-    'You PRESERVE. The Entombed are not woken; the country is not raised; the Catacombs continue. You become the Carrier — a True Tartarian tradition the elders have whispered about since the first generation, prepared for and never until now used. The 5 Cores stay in your pack for the rest of your life. The vigil now includes you. There is no shame in this. There is only the work.',
+    'You PRESERVE. The Entombed are not woken; the country is not raised; the Catacombs continue. You become the Carrier — a True Tartarian tradition the elders have whispered about since the first generation, prepared for and never until now used. The 9 Cores stay in your pack for the rest of your life. The vigil now includes you. There is no shame in this. There is only the work.',
   eternal_dynasty:
-    'You PRESERVE. The empire stays in potentia. The crown stays uncrowned. You walk out of the Nexus carrying the 5 Cores like a sword in its scabbard, drawn only if drawn at all. The dynasty\'s long restoration project continues in private rather than public — every heir to the line will inherit what you have, and the option to act on it. None of them will, you suspect. The dynasty\'s real power was always restraint.',
+    'You PRESERVE. The empire stays in potentia. The crown stays uncrowned. You walk out of the Nexus carrying the 9 Cores like a sword in its scabbard, drawn only if drawn at all. The dynasty\'s long restoration project continues in private rather than public — every heir to the line will inherit what you have, and the option to act on it. None of them will, you suspect. The dynasty\'s real power was always restraint.',
   conspiracy_architects:
-    'You PRESERVE. The Architects\' suppression project continues, but now its strongest evidence — the 5 Cores — is in YOUR pack, not in any of the institutional vaults. You leave the Nexus and report to no one. The institutions you work for will never know how close they came to losing control. You will spend the rest of your career managing a secret only one person on Earth holds. The promotion is unspoken.',
+    'You PRESERVE. The Architects\' suppression project continues, but now its strongest evidence — the 9 Cores — is in YOUR pack, not in any of the institutional vaults. You leave the Nexus and report to no one. The institutions you work for will never know how close they came to losing control. You will spend the rest of your career managing a secret only one person on Earth holds. The promotion is unspoken.',
   servants_of_giants:
-    'You PRESERVE. The Giants sleep on. You sit a longer vigil now — one that goes on for the rest of your life, with the 5 Cores in your pack as the relic of your office. The Servants of every Capital begin treating you as the senior Servant, though no one says so. The lanterns in every Vigil cell across the world burn one shade warmer in your honor, also unspoken. The watch is complete because you keep it.',
+    'You PRESERVE. The Giants sleep on. You sit a longer vigil now — one that goes on for the rest of your life, with the 9 Cores in your pack as the relic of your office. The Servants of every Capital begin treating you as the senior Servant, though no one says so. The lanterns in every Vigil cell across the world burn one shade warmer in your honor, also unspoken. The watch is complete because you keep it.',
   stone_builders:
-    'You PRESERVE. The Engine stays unbooted. The 5 Cores in your pack become the most valuable Aethercraft components ever assembled — and you build nothing from them. The Builders\' real masterwork is not what they raise but what they could raise and choose not to. Your workshop becomes a pilgrimage site within the order. Apprentices learn restraint from your example. The craft sharpens.',
+    'You PRESERVE. The Engine stays unbooted. The 9 Cores in your pack become the most valuable Aethercraft components ever assembled — and you build nothing from them. The Builders\' real masterwork is not what they raise but what they could raise and choose not to. Your workshop becomes a pilgrimage site within the order. Apprentices learn restraint from your example. The craft sharpens.',
   tartarian_revivalists:
-    'You PRESERVE. The story the cell was going to publish is rewritten one more time — not "Tartaria is real and live" or "Tartaria has been responsibly sealed" but "Tartaria endures, the truth is held by those who can be trusted with it, and the world will be told when the world is ready." You become the cell\'s archivist-general. The 5 Cores stay with you. The Revival becomes a Reserve. The work continues, quieter, perhaps forever.',
+    'You PRESERVE. The story the cell was going to publish is rewritten one more time — not "Tartaria is real and live" or "Tartaria has been responsibly sealed" but "Tartaria endures, the truth is held by those who can be trusted with it, and the world will be told when the world is ready." You become the cell\'s archivist-general. The 9 Cores stay with you. The Revival becomes a Reserve. The work continues, quieter, perhaps forever.',
 };
 
 const CHOICE_LINE_BY_ENDING: Record<MainQuestEnding, string> = {
@@ -564,11 +596,11 @@ export function phaseHint(phase: MainQuestPhase, coresRecovered: number): string
     case 'hook':
       return 'Visit a Lost Capital (Asgardar, Samarran, Nimari, Drakova, or Voronov) to learn what the Cores demand.';
     case 'revelation':
-      return `Recover 1 of 5 Cores by visiting a Lost Capital. Each yields its Core to the right approach.`;
+      return `Recover 1 of 9 Cores by visiting a Lost Capital. Each yields its Core to the right approach.`;
     case 'cores':
-      return `${coresRecovered}/5 Cores recovered. Visit the remaining Lost Capitals.`;
+      return `${coresRecovered}/9 Cores recovered. Visit the remaining Lost Capitals.`;
     case 'descent':
-      return 'All 5 Cores in your pack. Travel to the Endless Stair and descend.';
+      return 'All 9 Cores in your pack. Travel to the Endless Stair and descend.';
     case 'nexus':
       return 'You are at the Mud Flood Nexus. Open the Contracts screen to make The Choice.';
     case 'choice':
@@ -674,6 +706,10 @@ const CAPITAL_DISPLAY_NAME: Record<string, string> = {
   nimari: 'Nimari',
   drakova: 'Drakova',
   voronov: 'Voronov',
+  karok_sa: 'Karok-Sa',
+  yuldra_tul: 'Yuldra-Tul',
+  ostragar: 'Ostragar',
+  iskan_veil: 'Iskan-Veil',
 };
 
 export const FACTION_CORE_GATES: Record<string, CoreGate> = {
@@ -776,16 +812,16 @@ export function advanceMainQuest(
       }
       if (state.coresRecovered.includes(trigger.locationId)) return state;
       const coresRecovered = [...state.coresRecovered, trigger.locationId];
-      const allFive = coresRecovered.length >= 5;
+      const allCores = coresRecovered.length >= 9;
       return {
         ...state,
-        phase: allFive ? 'descent' : 'cores',
+        phase: allCores ? 'descent' : 'cores',
         coresRecovered,
       };
     }
     case 'reached_nexus': {
       if (state.phase !== 'descent') return state;
-      if (state.coresRecovered.length < 5) return state;
+      if (state.coresRecovered.length < 9) return state;
       return { ...state, phase: 'choice' };
     }
     case 'chose_ending': {

@@ -23,6 +23,11 @@ export interface ScrapOutput {
  *  durable gear all qualify. Materials (`misc` / `consumable`) are
  *  already stock and refuse scrapping. */
 export function canScrap(item: InventoryItem): boolean {
+  // v2.4.1 (OTA 052) — quest items (Tartarian Cores etc.) are
+  // bound to the character until the final act. Block scrap up
+  // front so the player can't accidentally feed a Core to the
+  // forge.
+  if ((item.tags ?? []).includes('quest')) return false;
   if (item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'relic') return true;
   // Some gear (compass, torch, rope) carries useful base materials —
   // allow scrap as long as the item isn't a raw commodity.

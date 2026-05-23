@@ -89,7 +89,7 @@ export function EndingScreen() {
         </View>
         <View style={styles.summaryRow}>
           <Text style={styles.summaryKey}>Cores recovered</Text>
-          <Text style={styles.summaryVal}>{allCoresInOrder.length}/5</Text>
+          <Text style={styles.summaryVal}>{allCoresInOrder.length}/9</Text>
         </View>
         {coresInOrder.length > 0 && (
           <Text style={styles.coresList}>

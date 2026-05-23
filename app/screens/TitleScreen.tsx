@@ -58,14 +58,14 @@ function timeAgo(ts: number): string {
 }
 
 // v2.4.1 (OTA 036) — RESUME OBJECTIVE line for the slot card.
-// Phase-aware so the player sees real progress (e.g. "3 of 5 Cores
+// Phase-aware so the player sees real progress (e.g. "3 of 9 Cores
 // recovered. Heading to the Endless Stair next.").
 function resumeObjectiveLine(phase: MainQuestPhase, cores: number): string {
   switch (phase) {
     case 'hook':       return '◆ A rumor of the Mud Flood Nexus.';
-    case 'revelation': return '◆ 5 Cores to recover. None yet in pack.';
-    case 'cores':      return `◆ ${cores}/5 Cores recovered.`;
-    case 'descent':    return '◆ All 5 Cores in pack. The Endless Stair waits.';
+    case 'revelation': return '◆ 9 Cores to recover. None yet in pack.';
+    case 'cores':      return `◆ ${cores}/9 Cores recovered.`;
+    case 'descent':    return '◆ All 9 Cores in pack. The Endless Stair waits.';
     case 'nexus':      return '◆ Standing at the Mud Flood Nexus.';
     case 'choice':     return '◆ The Choice waits at the Nexus.';
     case 'ended':      return '◆ The run is closed.';

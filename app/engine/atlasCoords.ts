@@ -87,6 +87,14 @@ export const LOCATION_ATLAS_COORDS: Record<string, AtlasCoord> = {
   varakush: { fx: 0.28, fy: 0.74 },
   endless_stair: { fx: 0.59, fy: 0.76 },
 
+  // v2.4.1 (OTA 052) — four additional Lost Capitals so the count
+  // matches the 9 playable factions. Placed in previously-empty
+  // atlas regions so the player has to actually travel for each.
+  iskan_veil:  { fx: 0.05, fy: 0.32 },  // far northwest — Architect's hidden city
+  yuldra_tul:  { fx: 0.88, fy: 0.18 },  // northeast mountains — Giants' tomb-gate capital
+  ostragar:    { fx: 0.93, fy: 0.42 },  // far east wetlands — river-dynasty city
+  karok_sa:    { fx: 0.42, fy: 0.72 },  // south band — Forgotten Order ritual seat
+
   // The Deep — Aetherstone-tier sites at the map's bottom
   giant_vault: { fx: 0.78, fy: 0.86 },
   etheric_chamber: { fx: 0.88, fy: 0.87 },
