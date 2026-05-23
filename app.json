@@ -15,10 +15,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.hotatticgames.tartariarealms"
+      "bundleIdentifier": "com.hotatticgames.tartariarpg"
     },
     "android": {
-      "package": "com.hotatticgames.tartariarealms",
+      "package": "com.hotatticgames.tartariarpg",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#0a0908"
