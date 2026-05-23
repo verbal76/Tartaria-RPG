@@ -170,6 +170,20 @@ describe('OTA 23-009 — steal overhaul', () => {
   });
 
   describe('scrap launders the stolen flag', () => {
+    // OTA 23-014 made scrap roll for success (70% base + INT/DEX
+    // modifiers). The two laundering tests below need the scrap
+    // to actually produce materials, so force-stub Math.random
+    // to 0 for the duration — guarantees the success branch
+    // every roll. Restored after each test so other tests run
+    // with real entropy.
+    let mathRandomSpy: jest.SpyInstance<number, []> | null = null;
+    beforeEach(() => {
+      mathRandomSpy = jest.spyOn(Math, 'random').mockReturnValue(0);
+    });
+    afterEach(() => {
+      mathRandomSpy?.mockRestore();
+      mathRandomSpy = null;
+    });
     it('scrapping a stolen weapon yields clean (non-stolen) scrap', async () => {
       const store = await setupSketchyVendor();
       // Clear all Rusted Blades + any pre-existing scrap output so we

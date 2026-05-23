@@ -2,12 +2,12 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work)
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`
-> **Latest OTA:** `2026-05-23-003` (auto-center map removal)
-> **Latest APK trigger:** `2026-05-22a` (in `metro.config.js`) — built at runtime `2.201`. **A new APK at `2.4.1` is required** before the next OTA reaches devices (current OTAs targeting runtime `2.4.1` go nowhere until an APK is built at that version).
+> **Latest OTA:** `2026-05-23-018` (Kokoro corrupt-cache recovery)
+> **Latest APK trigger:** `2026-05-23a` (in `metro.config.js`) — APK **#207** built at runtime `2.4.1`. From APK 207 forward, all OTAs target runtime `2.4.1` and reach the device. **Existing v2.201 testers must install APK 207 to receive any OTA published after `2026-05-23-011`.**
 > **TypeScript:** 0 errors (`npx tsc --noEmit`)
-> **Tests:** 1283 / 1283 across 106 suites
+> **Tests:** 1338 / 1338 across 112 suites
 > **Working tree:** clean
-> **Open PR:** #1 — draft, this branch → `main`, covers everything since the 029 cleanup
+> **Open PR:** #1 — draft, this branch → `main`, stale relative to OTAs 054 → 23-018 (description not refreshed since OTA 053 area)
 > **Open issues:** 0 (GitHub repo issue tracker)
 
 ---
@@ -134,13 +134,22 @@ docs/                  — pronunciation worksheet (pending player input)
 
 ---
 
-## 6. Systems shipped this session (OTA 117 → 2026-05-23-003)
+## 6. Systems shipped this session (OTA 117 → 2026-05-23-018)
 
 > Numbering reset to `YYYY-MM-DD-NNN` per the OTA convention on 2026-05-22; the post-141 work below carries the new date prefix.
 
-### v2.4.1 milestone (May 22-23 batch)
+### v2.4.1 baseline shipped (OTAs 23-012 → 23-018)
 
-The app.json version was bumped from `2.201` to `2.4.1` as a milestone marker for the post-audit + new-features work. **The next APK build must be triggered at `2.4.1` before any OTAs at this runtime reach a device.** Until then, existing testers on the `2.201` APK can still receive OTAs published prior to the version bump, but anything pushed after will sit in EAS until an APK at runtime `2.4.1` is in the wild.
+The v2.4.1 milestone is no longer just a marker — it's a **shipped baseline**. `app.json` bumped from `2.201` → `2.4.1`, `metro.config.js` got the `2026-05-23a` bump that fired `build-apk.yml`, and **APK #207 built at runtime `2.4.1`**. From APK 207 forward, every OTA targets runtime `2.4.1`. Existing v2.201 testers need to install APK 207 to receive anything published after `2026-05-23-011`. The user redistributes APK 207 to themselves + the one other tester manually.
+
+#### OTAs 23-013 → 23-018 (post-baseline polish)
+
+- **23-013 — Reclaimer's Rope is obtainable** (`feat(rope)`). Was Reclaimer-race starter only; now also stocked by Tellin Mak (55 TC) and Tarek the Tinkerer (60 TC), both `reclaimers_guild` vendors. Climb-top loot widens on tier ≥ 4 climbs (tower/spire/obelisk/steeple/cliff) to include the rope as a thematic discovery — "anchored to an old piton, someone climbed this before and left their line for the next pair of hands." Weight 2 in a 33-weight pool.
+- **23-014 — Salvage rolls for success** (`feat(salvage)`). Was deterministic; every click produced materials. Now base 70% + `(INT−10)·3% + (DEX−10)·1%`, clamped `[35%, 95%]`. Item is consumed on failure either way (the rule the playtester asked for: "you shouldn't keep being able to salvage the same item until it gives you something"). INT ≥ 14 OR DEX ≥ 16 grants one re-roll. 10 distinct failure-flavor lines in `SCRAP_FAILURE_LINES` ("rust-rotted through… salt-eaten too long… a long-dead Reclaimer beat you to anything worth keeping… puffs out as grey dust…"). Success trains INT.
+- **23-015 — Three log-driven fixes** (`fix`). (a) **Ambient-salvage retry closed:** `salvage <noun>` is one-shot now. On `rollAreaSearch` `kind: 'nothing'` outcomes (40% chance) the noun is marked searched and one of the 10 `SCRAP_FAILURE_LINES` plays instead of the retry-friendly "still here for another pass." Generic SEARCH still uses the retry lines — that path IS meant to be re-tried. (b) **Climb-top rope narration:** rope/line/chain/cable/cord climbed targets get "wedged into the rock face where the rope is tied off" instead of nonsensically referencing a crack in the rope. (c) **Reclaimer's Trowel damage type:** `bludgeoning`/STR → `piercing`/DEX. Reclaimers use it like an archaeologist's blade, not a club. Description updated.
+- **23-016 — `look` filters consumed nouns** (`fix(look)`). The "You see:" list pulled from `displayedAmbientNouns` without consulting `searchedAmbientNouns` — the same store the Search/Approach/Salvage chip UI already reads to dim consumed chips. After salvaging `table` and `gate`, the next look correctly lists `arch, sign, brick, rope, lantern`. When every authored noun is worked over, the line becomes `"You've worked over everything here. Time to move."` instead of an empty `"You see:"`. State resets on room change.
+- **23-017 — Kokoro error diagnostic capture** (`diag(kokoro)`). Wife's install hit `Failed to load model` with no actionable info — `kokoroState.message` was truncated to 240 chars for the title-screen banner. Added `step` tracking inside `loadVoice` (`download` / `load` / `warmup`) so the diagnostic record names WHICH stage failed (warmup is the most likely OOM site on low-RAM devices). New `KokoroErrorRecord` with untruncated message, full stack, voice id, ISO timestamp, and free internal storage in MB (via `expo-file-system.getFreeDiskStorageAsync`). Ring buffer of last 5 failures. `getKokoroErrorHistory()` exported, surfaced in COPY VOICE INFO output on SFX settings so a tester can paste a full diagnostic.
+- **23-018 — Kokoro corrupt-cache recovery** (`fix(kokoro)`). The user's hypothesis was correct: `executorchAdapter.ts` only checked `size > 0` before reusing a cached model file. A prior partial download landing as a truncated 30 MB file was passing that gate and serving "100% downloaded" instantly forever. Three changes: (a) `resolveSource()` now requires ≥ 50 MB before reuse (Kokoro-Medium is ~100 MB); below threshold → delete + re-download. (b) New `clearExecutorchCache()` exported from the adapter, wired to a **CLEAR BUNDLED VOICE CACHE** button on the SFX panel. One-tap nuke for testers whose cache passed the size check but is still bad. (c) `inspectExecutorchCache()` inventories the cache dir (filename, size in MB, mtime) — appended to COPY VOICE INFO so a tester pasting the diagnostic surfaces exactly what's on disk.
 
 ### World atlas + map screen (OTAs 048 → 23-003)
 
@@ -321,19 +330,29 @@ Seven parallel Explore agents audited the codebase (combat, exploration, vendor/
 ### Player action needed
 
 - **Pronunciation worksheet** — `docs/pronunciation-worksheet.md`. Player fills rows and sends back. Batch into `loreLexicon.ts` (~30 min, no engineering risk).
-- **APK rebuild** — to activate immersive system bars. User triggers `eas build` when they're ready to redistribute to testers. Keep `version: 2.201` in `app.json` for the new build so existing testers keep getting OTAs.
+- **APK 207 redistribute** — APK at runtime `2.4.1` is built and published as GitHub release `apk-build-207`. User installs on their own device + the one other tester's device. Once installed, all OTAs from `2026-05-23-012` forward (including 23-013 → 23-018) will reach them on next app launch.
+- **Wife's Kokoro recovery (after APK 207 install)** — she was on v2.0.1 / OTA stream frozen there. Once she installs APK 207, she'll receive OTA 23-018 which adds the **CLEAR BUNDLED VOICE CACHE** button on the SFX panel. Have her tap it then TEST VOICE; the auto-recovery (50 MB min reuse threshold) will trigger a clean re-download. If it still fails, **COPY VOICE INFO** now produces a full diagnostic with the actual error message, stack, free disk, AND the executorch cache inventory — paste-back tells us exactly why it died.
 
 ### Watch list / open issues (not ship-blocking)
 
-- **APK rebuild required at v2.4.1.** Current app.json is `2.4.1` but no APK has been built at that runtime. Existing testers on the `2.201` APK no longer receive OTAs pushed after the version bump (their runtime doesn't match). Bump `metro.config.js` (new comment line with a fresh date code, e.g. `2026-05-23a`) to fire `build-apk.yml`; the artifact appears on GitHub Actions ~17-20 min later. The race image-gen portraits + player creation approval screen wiring are the most likely candidates for the next APK trigger.
 - **Player creation approval screen NOT WIRED.** User is generating 14 portrait images (7 races × M/F) using `docs/race-image-generation-guide.md`. Once they drop the PNGs into `assets/portraits/`, a UI screen needs to be built that shows the race portrait + approval flow during character creation. The guide documents the file-naming convention (`<race_id>_m.png`).
 - **`ambientNounVariety.test.ts` "small pools (≤8) show the entire pool unchanged across steps" flake** — passes in isolation, intermittently fails in full `npx jest --runInBand` runs. Likely shared-state contamination from a prior test's RNG path. Real-world impact: zero. Don't chase unless it gets worse.
+- **`climbRopeMechanics.test.ts` cross-test flake** — `tickWeather()` at the top of `submitPlayerAction` calls `Math.random` and can drain 1 stamina before the climb branch fires. In full-suite runs prior RNG ordering occasionally lands the test on a stamina-drain weather tick. Passes in isolation. Same shape as the ambientNounVariety flake — don't chase.
 - **`encounterStress` test cycle tuning** — `seq` reset removed in OTA 137 so real entropy drives variation; if archetype pool grows past ~50, may need re-tuning.
 - **Audit minors still deferred** — inventory-full silently swallows hunt/mystery/storyline reward items on UI completion (`gameStore.ts:8669-8679` and equivalents); `require()` instead of top-level `import` for Aethercraft helpers (circular-dep workaround — cosmetic); minor climb-fail messaging precision (`gameStore.ts:5250`); possible surprise-penalty double-apply between `statusAttackPenalty()` and `rollMods()` (audit uncertain — ~5 min to trace).
 - **`gameStore.ts` not swept top-to-bottom for dead code.** Pre-ship audit used grep-narrow reads on this 12.5k-line file. More orphan functions / unreachable branches likely live in there. Chunked sweep (~12 × 1k-line passes) recommended before a major refactor.
 
 ### Closed this session
 
+- Kokoro corrupt-cache recovery (50 MB min reuse + CLEAR BUNDLED VOICE CACHE button + cache inventory in diagnostic) ✅ (OTA 23-018)
+- Kokoro error diagnostic capture (step tracking, untruncated message, stack, free disk, ring buffer of last 5 failures) ✅ (OTA 23-017)
+- `look` filters consumed nouns from "You see:" list + "worked over everything here" cue when empty ✅ (OTA 23-016)
+- Ambient-salvage retry closed (`salvage <noun>` is one-shot now, uses scrap failure variants) ✅ (OTA 23-015)
+- Climb-top rope narration (rope/line/chain/cable/cord → "wedged into the rock face where the rope is tied off") ✅ (OTA 23-015)
+- Reclaimer's Trowel re-typed (`bludgeoning`/STR → `piercing`/DEX) to match archaeologist usage ✅ (OTA 23-015)
+- Salvage rolls for success (70% base + INT/DEX, INT≥14 / DEX≥16 second-chance, 10 failure variants, success trains INT) ✅ (OTA 23-014)
+- Reclaimer's Rope obtainable for non-Reclaimer races (vendors + tall-climb loot drop) ✅ (OTA 23-013)
+- v2.4.1 baseline shipped (app.json bump + metro.config bump + APK #207 built at runtime 2.4.1) ✅ (OTA 23-012)
 - World atlas screen + MAP button + IDW dot plotting + Reclaimer marker + halo ✅ (OTAs 048 → 23-003)
 - Auto-centering on map removed (interfered with zoom gesture) ✅ (OTA 23-003)
 - Use-based stat progression replacing milestone model + CHA training on tap-driven socials ✅ (OTAs 058 → 059)
@@ -567,14 +586,14 @@ off the store.
 
 If you're picking up this branch, here's what you need to know to land cleanly.
 
-### State at handoff (2026-05-23)
+### State at handoff (2026-05-23 — end of MvF82 session)
 
-- **App version** in `app.json`: `2.4.1` (just bumped from 2.201 as a milestone marker)
-- **Latest OTA**: `2026-05-23-003` — auto-centering on map removed (interfered with zoom gesture). Pushed via the v2.201 stream; subsequent OTAs at v2.4.1 will sit in EAS until a new APK at runtime 2.4.1 ships.
-- **Latest APK**: built at runtime `2.201` from the `2026-05-22a` metro.config bump. A **new APK at v2.4.1 is the immediate next blocker** — without it, the OTA stream for v2.4.1 has no devices.
-- **Tests**: 1283 / 1283 across 106 suites. `npx tsc --noEmit` clean.
+- **App version** in `app.json`: `2.4.1`. **Shipped**, not just marked. APK at runtime 2.4.1 (build #207) is published as GitHub release `apk-build-207`.
+- **Latest OTA**: `2026-05-23-018` — Kokoro corrupt-cache recovery (50 MB min reuse + CLEAR BUNDLED VOICE CACHE button + cache inventory in diagnostic).
+- **Latest APK**: `apk-build-207` built at runtime `2.4.1` from the `2026-05-23a` metro.config bump. **User redistributes to themselves + 1 other tester manually.** From APK 207 forward, the v2.4.1 OTA stream reaches devices. Existing v2.201 testers must install APK 207 to receive anything published after `2026-05-23-011`.
+- **Tests**: 1338 / 1338 across 112 suites. `npx tsc --noEmit` clean.
 - **Branch**: `claude/new-session-MvF82`. Working tree clean.
-- **Open PR**: #1 draft, this branch → main. Description was last refreshed at OTA 053 area; it's stale relative to the OTAs 054 → 23-003 work. Update before requesting review.
+- **Open PR**: #1 draft, this branch → main. Description was last refreshed at OTA 053 area; **stale by the OTAs 054 → 23-018 work**. Update before requesting review (write a summary covering the v2.4.1 baseline shipment, the salvage/scrap rework, the look-around consumed-noun filter, and the Kokoro recovery work).
 - **Open GitHub issues**: 0.
 
 ### The user's working style — important context
@@ -599,17 +618,22 @@ If you're picking up this branch, here's what you need to know to land cleanly.
 
 ### Things in flight / next steps
 
-1. **Trigger the v2.4.1 APK build.** Bump `metro.config.js` with a fresh date code (e.g. `2026-05-23a`). That fires `build-apk.yml`; the artifact arrives on GitHub Actions in ~17-20 min. The user redistributes manually.
-2. **Wire the player creation approval screen.** User is generating 14 portrait PNGs from `docs/race-image-generation-guide.md`. When they drop them into `assets/portraits/`, build a screen that shows the race portrait + approval flow during character creation. Filename convention: `<race_id>_m.png` / `<race_id>_f.png`.
-3. **Refresh PR #1 description** before any merge request. It's stale; covers up to OTA 053 area, not the OTA 054 → 23-003 work.
+1. **Wife's Kokoro retry after APK 207 install.** She was on v2.0.1, so none of the 23-* OTAs had reached her. Once she installs APK 207, she'll have the **CLEAR BUNDLED VOICE CACHE** button + 50 MB min-reuse auto-recovery. If the BUNDLED voice still fails after a clear → re-download cycle, have her tap **COPY VOICE INFO** and paste the result back. The new diagnostic includes the actual error message, full stack, free disk at attempt time, AND the executorch cache file listing (filename + size in MB + mtime). The right answer falls out of that paste-back: `step=warmup` with healthy disk = native/RAM issue; cache file at 28 MB = truncation; etc.
+2. **Wire the player creation approval screen.** User is generating 14 portrait PNGs from `docs/race-image-generation-guide.md`. When they drop them into `assets/portraits/`, build a screen that shows the race portrait + approval flow during character creation. Filename convention: `<race_id>_m.png` / `<race_id>_f.png`. **Will require an APK rebuild** if the screen needs new native modules (likely not — straight RN Image should work).
+3. **Refresh PR #1 description** before any merge request. It's stale; covers up to OTA 053 area, not the OTA 054 → 23-018 work. New bullets to highlight: v2.4.1 baseline shipment (APK 207), salvage success-roll rework, look-around consumed-noun filter, Kokoro corrupt-cache recovery.
 4. **Pronunciation worksheet** (`docs/pronunciation-worksheet.md`) — still pending player input.
+5. **Optional dead-code sweep on `gameStore.ts`** (~12.5k lines, never swept top-to-bottom). Pre-ship audit only used grep-narrow reads. Chunked sweep recommended before any major refactor.
 
 ### Watch list reminders (see section 7 for full)
 
-- ambient-noun-variety test flake — never chase; passes in isolation
-- gameStore.ts never swept top-to-bottom for dead code (12.5k lines)
-- audit minors deferred from pre-ship — inventory-full silent swallow on UI quest completion, surprise-penalty possible double-apply, `require()` vs `import` in Aethercraft helpers
+- `ambientNounVariety.test.ts` "small pools" flake — never chase; passes in isolation
+- `climbRopeMechanics.test.ts` cross-test flake (weather tick eats stamina) — passes in isolation
+- `gameStore.ts` never swept top-to-bottom for dead code (12.5k lines)
+- Audit minors deferred from pre-ship — inventory-full silent swallow on UI quest completion, surprise-penalty possible double-apply, `require()` vs `import` in Aethercraft helpers
+- `stealOverhaul.test.ts` scrap-launder tests now stub `Math.random` in `beforeEach` because OTA 23-014 made scrap non-deterministic. Pattern to copy if more tests start failing for the same reason — `jest.spyOn(Math, 'random').mockReturnValue(0)` forces the success branch.
 
 ---
 
-That's the lay of the land at v2.4.1 / OTA `2026-05-23-003`. State is healthy, 1283/1283 tests green, the atlas + use-based stat growth + Reclaimer marker work has landed. Map, character progression, audit-fixes, tutorial, race lore docs — all current. The v2.4.1 APK rebuild is the immediate next step; after that the player creation portrait screen wiring is the natural follow-up once the user finishes generating the 14 portraits.
+That's the lay of the land at v2.4.1 / OTA `2026-05-23-018`. v2.4.1 is fully shipped — `app.json` + `metro.config.js` bumped, APK #207 built and released. State is healthy: 1338/1338 tests green, TypeScript clean. The post-baseline OTAs 23-013 → 23-018 polished a stack of playtest-log findings: Reclaimer's Rope availability, salvage success rolls + 10 failure variants, ambient-salvage retry closed, climb-top rope narration, Reclaimer's Trowel damage type, look-around filters consumed nouns, Kokoro corrupt-cache recovery (auto + manual button) with full diagnostic capture.
+
+**Immediate next-session priorities**: (1) wife's Kokoro recovery after she installs APK 207 — paste-back from new diagnostic will tell us the actual failure; (2) player creation approval screen once the 14 race portraits land in `assets/portraits/`; (3) PR #1 description refresh covering the v2.4.1 baseline + salvage rework + Kokoro recovery work before any merge request.
