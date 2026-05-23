@@ -1,5 +1,9 @@
 name: Android Build (Tartaria Realms)
 
+# First signed Play Store AAB: OTA 463 / build aab-build-N.
+# Triggered by commits containing [build-aab] (see meta step below)
+# or by pushing a refs/tags/v* tag.
+
 on:
   push:
     branches:
