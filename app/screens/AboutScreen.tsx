@@ -18,6 +18,7 @@ import {
 import { isTTSAvailable, getTTSVoices, stopAndClear as stopTTS } from '../voice/TTSManager';
 import { isSTTAvailable } from '../voice/STTManager';
 import { isPiperInstalled, downloadPiperVoice, type PiperDownloadStatus } from '../voice/PiperDownloader';
+import { clearExecutorchCache, inspectExecutorchCache, type ExecutorchCacheEntry } from '../voice/executorchAdapter';
 import {
   listKokoroVoices,
   onDownloadProgress as onKokoroProgress,
@@ -46,6 +47,8 @@ export function AboutScreen() {
 
   const [copied, setCopied] = useState(false);
   const [voiceCopied, setVoiceCopied] = useState(false);
+  const [kokoroCacheCleared, setKokoroCacheCleared] = useState(false);
+  const [kokoroCache, setKokoroCache] = useState<ExecutorchCacheEntry[]>([]);
   const [tab, setTab] = useState<'sfx' | 'about'>('sfx');
   // OTA 007 — update button + state moved to TitleScreen.
   const [audio, setAudio] = useState<AudioSettings>(() => getAudioSettings());
@@ -326,8 +329,26 @@ export function AboutScreen() {
         }
       }
     }
+    // OTA 23-018 — what's actually in the executorch cache dir
+    // right now. If the Kokoro Medium model file sits there at a
+    // truncated size (Kokoro-82M is ~100 MB; anything under ~95 MB
+    // is a partial-write smoking gun), this is the diagnostic
+    // that surfaces it. Also confirms the cache exists at all —
+    // if the player tapped CLEAR BUNDLED VOICE CACHE the list
+    // will read empty.
+    lines.push('');
+    if (kokoroCache.length === 0) {
+      lines.push(`Executorch cache: empty (no model files on disk).`);
+    } else {
+      lines.push(`Executorch cache (${kokoroCache.length} file${kokoroCache.length === 1 ? '' : 's'}):`);
+      for (const e of kokoroCache) {
+        const sz = e.sizeMB === -1 ? 'unknown size' : `${e.sizeMB.toFixed(1)} MB`;
+        const mt = e.modificationTimeMs > 0 ? new Date(e.modificationTimeMs).toISOString() : 'unknown mtime';
+        lines.push(`  • ${e.name} · ${sz} · ${mt}`);
+      }
+    }
     return lines.join('\n');
-  }, [voice, ttsAvailable, sttAvailable, voicesList, kokoroState]);
+  }, [voice, ttsAvailable, sttAvailable, voicesList, kokoroState, kokoroCache]);
 
   async function handleCopy() {
     await Clipboard.setStringAsync(info);
@@ -335,10 +356,35 @@ export function AboutScreen() {
     setTimeout(() => setCopied(false), 1500);
   }
   async function handleVoiceCopy() {
+    // OTA 23-018 — refresh the cache inventory immediately before
+    // copy so the pasted diagnostic shows what's actually on disk
+    // RIGHT NOW (size, mtime) rather than what was on disk when the
+    // screen mounted.
+    try {
+      const fresh = await inspectExecutorchCache();
+      setKokoroCache(fresh);
+    } catch { /* ignore */ }
     await Clipboard.setStringAsync(voiceInfo);
     setVoiceCopied(true);
     setTimeout(() => setVoiceCopied(false), 1500);
   }
+
+  // OTA 23-018 — manual recovery for "downloaded but failed to
+  // load" (corrupt cached model). Wipes the executorch cache dir
+  // so the next TEST VOICE tap re-downloads from scratch.
+  async function handleClearKokoroCache() {
+    await clearExecutorchCache();
+    setKokoroCache([]);
+    setKokoroCacheCleared(true);
+    setTimeout(() => setKokoroCacheCleared(false), 3000);
+  }
+
+  // Populate the cache snapshot once on mount so COPY VOICE INFO
+  // has something to include even on the first copy without
+  // waiting for the inspector to roundtrip.
+  useEffect(() => {
+    void inspectExecutorchCache().then(setKokoroCache).catch(() => {});
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -546,6 +592,22 @@ export function AboutScreen() {
                       {kokoroState.phase === 'ready' ? 'TEST VOICE' :
                        kokoroState.phase === 'downloading' || kokoroState.phase === 'loading' ? 'WORKING…' :
                        'TEST VOICE (downloads on first tap)'}
+                    </Text>
+                  </TouchableOpacity>
+                  {/* OTA 23-018 — manual recovery for the "downloaded
+                      but failed to load" case where a prior partial
+                      download cached a corrupt model file. The cache
+                      check only verifies size > 0; a truncated 30 MB
+                      file passes that check and gets re-used forever.
+                      This button nukes the cache dir. Next TEST VOICE
+                      tap re-downloads from scratch. */}
+                  <TouchableOpacity
+                    onPress={handleClearKokoroCache}
+                    style={[styles.applyBtn, { marginTop: 4, backgroundColor: 'transparent', borderColor: '#5a3a2a', borderWidth: 1 }]}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.applyBtnText, { color: '#c9a26a' }]}>
+                      {kokoroCacheCleared ? 'CACHE CLEARED — TAP TEST VOICE' : 'CLEAR BUNDLED VOICE CACHE'}
                     </Text>
                   </TouchableOpacity>
                   <View style={styles.musicRow}>

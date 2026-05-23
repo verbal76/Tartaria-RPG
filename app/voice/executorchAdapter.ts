@@ -26,6 +26,56 @@ async function ensureCacheDir(): Promise<void> {
   }
 }
 
+// OTA 23-018 — nuke the entire bundled-voice cache directory so a
+// corrupt-on-disk model (the most likely root cause behind a
+// "downloaded but failed to load" report — a prior partial write
+// leaves a non-zero-size file that the cache check happily reuses
+// forever) forces a fresh download on next attempt. Wired to a
+// CLEAR BUNDLED VOICE CACHE button in SFX settings.
+export async function clearExecutorchCache(): Promise<void> {
+  try {
+    const info = await FileSystem.getInfoAsync(CACHE_DIR);
+    if (info.exists) {
+      await FileSystem.deleteAsync(CACHE_DIR, { idempotent: true });
+    }
+  } catch {
+    /* swallow — best-effort */
+  }
+}
+
+// OTA 23-018 — inventory of the executorch cache for the
+// diagnostic. Returns each cached file's name + size + last
+// modified so a tester pasting COPY VOICE INFO surfaces whether
+// the model file on disk is truncated (Kokoro-Medium is ~100 MB;
+// anything under ~95 MB is the smoking gun for a partial write).
+export interface ExecutorchCacheEntry {
+  name: string;
+  sizeMB: number;
+  modificationTimeMs: number;
+}
+export async function inspectExecutorchCache(): Promise<ExecutorchCacheEntry[]> {
+  try {
+    const info = await FileSystem.getInfoAsync(CACHE_DIR);
+    if (!info.exists) return [];
+    const names = await FileSystem.readDirectoryAsync(CACHE_DIR);
+    const out: ExecutorchCacheEntry[] = [];
+    for (const n of names) {
+      try {
+        const fi = await FileSystem.getInfoAsync(CACHE_DIR + n);
+        if (!fi.exists) continue;
+        out.push({
+          name: n,
+          sizeMB: typeof fi.size === 'number' ? Math.round((fi.size / (1024 * 1024)) * 10) / 10 : -1,
+          modificationTimeMs: typeof fi.modificationTime === 'number' ? Math.round(fi.modificationTime * 1000) : 0,
+        });
+      } catch { /* skip */ }
+    }
+    return out;
+  } catch {
+    return [];
+  }
+}
+
 /** Produce a stable filename for a given URL or local path. We hash
  *  the source-string to a hex-ish id so two distinct URLs with the
  *  same basename land in different cache files. */
@@ -69,9 +119,22 @@ async function resolveSource(
   await ensureCacheDir();
   const target = CACHE_DIR + cacheNameFor(source);
   const info = await FileSystem.getInfoAsync(target);
-  if (info.exists && info.size && info.size > 0) {
+  // OTA 23-018 — require a "looks plausible" file size before
+  // re-using the cached file. Kokoro-Medium ONNX is ~100 MB; a
+  // partial download landing as a 30 MB file was passing the old
+  // size > 0 check and getting cached forever, producing endless
+  // "Failed to load model" with no recovery path. New threshold:
+  // 50 MB. Below that → treat as corrupt, delete, re-download.
+  // Higher-resolution models will trivially exceed this.
+  const MIN_REUSE_BYTES = 50 * 1024 * 1024;
+  if (info.exists && typeof info.size === 'number' && info.size >= MIN_REUSE_BYTES) {
     onProgress(1);
     return target.replace(/^file:\/\//, '');
+  }
+  if (info.exists) {
+    // Truncated / zero-byte file from a prior failed attempt —
+    // remove it so the downloadResumable below writes a clean copy.
+    try { await FileSystem.deleteAsync(target, { idempotent: true }); } catch { /* ignore */ }
   }
   // Fresh download. Progress maps the resumable callback to the
   // 0–1 range the caller expects.
