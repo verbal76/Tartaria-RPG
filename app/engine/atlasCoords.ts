@@ -52,45 +52,45 @@ export const DOT_TILE_FRAC = STEP_FRAC_Y;
 
 // Locations the new atlas depicts as labeled icons. Coordinates
 // are measured against each icon's visual center.
+//
+// v2.4.1 (OTA 029) — recalibrated against the 140×78 grid overlay
+// (10-px cells on the 1408×768 canvas). Largest shifts: asgardar +
+// drakova + giant_vault + etheric_chamber + mud_flood_nexus all
+// nudged south/east a few percent to match the actual icon centers.
+// Smaller (~1-2%) adjustments to the upper band as well.
 export const LOCATION_ATLAS_COORDS: Record<string, AtlasCoord> = {
   // The Outpost / Outskirts cluster
   tartarian_outskirts: { fx: 0.10, fy: 0.13 },
 
   // Northern band — surface ruins and weather lines
-  // OTA 054 — three coords nudged by agent A's verification sweep:
-  // sinking_cathedral (-2x/+2y), great_tartary_plains (+2x/-2y),
-  // mud_seas (+2x/-2y). All within ~2% of the previous values.
-  sinking_cathedral: { fx: 0.38, fy: 0.12 },
-  cradle_of_dusk: { fx: 0.66, fy: 0.16 },
-  buried_cities: { fx: 0.28, fy: 0.20 },
-  great_tartary_plains: { fx: 0.52, fy: 0.19 },
-  mud_seas: { fx: 0.72, fy: 0.20 },
-  // OTA 053 — Obsidian Pillars is now drawn alongside the
-  // Tartarian observatory in the upper-middle area, between
-  // Buried Cities and Mud Seas.
-  obsidian_pillars: { fx: 0.39, fy: 0.27 },
-  zharaks_teeth: { fx: 0.50, fy: 0.30 },
+  sinking_cathedral: { fx: 0.36, fy: 0.12 },
+  cradle_of_dusk: { fx: 0.62, fy: 0.17 },
+  buried_cities: { fx: 0.31, fy: 0.22 },
+  great_tartary_plains: { fx: 0.48, fy: 0.20 },
+  mud_seas: { fx: 0.71, fy: 0.22 },
+  obsidian_pillars: { fx: 0.38, fy: 0.33 },
+  zharaks_teeth: { fx: 0.53, fy: 0.29 },
 
   // Lost Capitals band — left of compass
-  asgardar: { fx: 0.16, fy: 0.40 },
-  grand_spire_of_etheria: { fx: 0.15, fy: 0.47 },
-  samarran: { fx: 0.27, fy: 0.46 },
-  thametans_tower: { fx: 0.31, fy: 0.54 },
+  asgardar: { fx: 0.16, fy: 0.47 },
+  grand_spire_of_etheria: { fx: 0.16, fy: 0.53 },
+  samarran: { fx: 0.28, fy: 0.48 },
+  thametans_tower: { fx: 0.33, fy: 0.57 },
 
   // Center & east — capitals + buried cities
-  nimari: { fx: 0.52, fy: 0.43 },
-  red_tower_of_nimari: { fx: 0.49, fy: 0.55 },
-  drakova: { fx: 0.78, fy: 0.41 },
-  voronov: { fx: 0.78, fy: 0.48 },
+  nimari: { fx: 0.50, fy: 0.50 },
+  red_tower_of_nimari: { fx: 0.52, fy: 0.60 },
+  drakova: { fx: 0.77, fy: 0.47 },
+  voronov: { fx: 0.78, fy: 0.56 },
 
   // Southern arc — Forgotten Order stronghold + deep frontier
-  varakush: { fx: 0.16, fy: 0.66 },
-  endless_stair: { fx: 0.60, fy: 0.65 },
+  varakush: { fx: 0.28, fy: 0.74 },
+  endless_stair: { fx: 0.59, fy: 0.76 },
 
   // The Deep — Aetherstone-tier sites at the map's bottom
-  giant_vault: { fx: 0.74, fy: 0.76 },
-  etheric_chamber: { fx: 0.83, fy: 0.83 },
-  mud_flood_nexus: { fx: 0.88, fy: 0.93 },
+  giant_vault: { fx: 0.78, fy: 0.86 },
+  etheric_chamber: { fx: 0.88, fy: 0.87 },
+  mud_flood_nexus: { fx: 0.84, fy: 0.94 },
 };
 
 /**
@@ -143,19 +143,72 @@ export function cardinalOffsetFromOutpost(
   return cardinalOffsetFromAnchor(OUTPOST_ATLAS_COORD, mapX, mapY, gridCenter);
 }
 
+// v2.4.1 (OTA 029) — landmass / no-go zones on the atlas.
+//
+// Player request: "you cannot head to the edges of the map you can
+// only travel on the big landmass." The atlas image has three big
+// chrome regions that aren't landmass — the legend boxes top-right,
+// the Outpost interior minimap bottom-left, and the historical
+// timeline ribbon at the very bottom. Plus the corner blanks. The
+// marker should stay on the painted continent.
+//
+// Approach: define the OFF-LIMITS zones as fractional-coord
+// rectangles. After the basic outer clamp, if a point falls inside
+// any of these rects, push it out to the nearest edge of that rect.
+// This keeps the math cheap (no polygon test) while still keeping
+// the marker on real landmass for normal play.
+//
+// Coordinates measured from the 140×78 grid overlay (10-px cells
+// on 1408×768). Slightly generous bounds so the marker doesn't sit
+// right on a legend's edge.
+interface OffLimitsRect {
+  fxMin: number; fyMin: number; fxMax: number; fyMax: number;
+}
+
+const OFF_LIMITS_RECTS: readonly OffLimitsRect[] = [
+  // Top-right legend block (start-icon key + scale ladder)
+  { fxMin: 0.84, fyMin: 0.00, fxMax: 1.00, fyMax: 0.30 },
+  // Bottom-left Reclaimers' Outpost interior minimap
+  { fxMin: 0.00, fyMin: 0.75, fxMax: 0.22, fyMax: 1.00 },
+  // Bottom historical-timeline ribbon (whole bottom strip)
+  { fxMin: 0.00, fyMin: 0.96, fxMax: 1.00, fyMax: 1.00 },
+];
+
+function pushOutOfRect(c: AtlasCoord, r: OffLimitsRect): AtlasCoord {
+  // Only push if the point is actually inside the rect.
+  if (c.fx < r.fxMin || c.fx > r.fxMax || c.fy < r.fyMin || c.fy > r.fyMax) {
+    return c;
+  }
+  // Distance to each of the four rect edges.
+  const dWest = c.fx - r.fxMin;
+  const dEast = r.fxMax - c.fx;
+  const dNorth = c.fy - r.fyMin;
+  const dSouth = r.fyMax - c.fy;
+  const minD = Math.min(dWest, dEast, dNorth, dSouth);
+  // Push out toward the closest edge with a tiny epsilon so we're
+  // outside the rect (not exactly on the boundary).
+  const eps = 0.001;
+  if (minD === dWest)  return { fx: r.fxMin - eps, fy: c.fy };
+  if (minD === dEast)  return { fx: r.fxMax + eps, fy: c.fy };
+  if (minD === dNorth) return { fx: c.fx, fy: r.fyMin - eps };
+  return { fx: c.fx, fy: r.fyMax + eps };
+}
+
 /**
  * Clamp a fractional coordinate to the visible map area, away from
  * the insets at the corners and the timeline ribbon at the bottom.
+ * After the outer rectangle clamp, push the point out of any of
+ * the off-limits rects so the marker stays on real landmass.
  */
 export function clampToMapArea(c: AtlasCoord): AtlasCoord {
-  // OTA 054 — bottom bound raised from 0.85 to 0.95 so the snap to
-  // Mud Flood Nexus (canonically at fy=0.93) isn't clamped off its
-  // own icon. The HISTORICAL TIMELINE ribbon sits below ~0.97, so
-  // 0.95 still keeps the dot inside the painted world.
-  return {
-    fx: Math.max(0.06, Math.min(0.95, c.fx)),
-    fy: Math.max(0.06, Math.min(0.95, c.fy)),
+  let pt: AtlasCoord = {
+    fx: Math.max(0.06, Math.min(0.96, c.fx)),
+    fy: Math.max(0.04, Math.min(0.95, c.fy)),
   };
+  for (const rect of OFF_LIMITS_RECTS) {
+    pt = pushOutOfRect(pt, rect);
+  }
+  return pt;
 }
 
 // ─────────────────────────────────────────────────────────────────

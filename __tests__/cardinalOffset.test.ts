@@ -99,9 +99,12 @@ describe('OTA 23-010 — cardinalOffsetFromOutpost', () => {
       expect(farWest.fx).toBeGreaterThanOrEqual(0.06);
     });
 
-    it('a 20-tile north walk floors fy at ≥0.06', () => {
+    it('a 20-tile north walk floors fy at ≥0.04', () => {
+      // v2.4.1 (OTA 029) — fy floor lowered from 0.06 to 0.04 in
+      // clampToMapArea so upper-band canonical anchors keep their
+      // clearance above the top chrome.
       const farNorth = cardinalOffsetFromOutpost(CENTER.x, CENTER.y - 20, CENTER);
-      expect(farNorth.fy).toBeGreaterThanOrEqual(0.06);
+      expect(farNorth.fy).toBeGreaterThanOrEqual(0.04);
     });
   });
 

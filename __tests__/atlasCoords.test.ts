@@ -179,8 +179,10 @@ describe('OTA 051 — atlas coordinate calibration', () => {
       expect(clampToMapArea({ fx: 0.5, fy: 0.5 })).toEqual({ fx: 0.5, fy: 0.5 });
     });
     it('clamps far-east coords back inside the visible map', () => {
+      // v2.4.1 (OTA 029) — bound bumped to 0.96 to capture
+      // canonically-east anchors right against the right edge.
       const out = clampToMapArea({ fx: 1.5, fy: 0.5 });
-      expect(out.fx).toBeLessThanOrEqual(0.95);
+      expect(out.fx).toBeLessThanOrEqual(0.96);
       expect(out.fx).toBeGreaterThan(0.5);
     });
     it('clamps far-south coords back above the timeline ribbon', () => {
@@ -188,9 +190,13 @@ describe('OTA 051 — atlas coordinate calibration', () => {
       expect(out.fy).toBeLessThanOrEqual(0.95);
     });
     it('clamps negative coords back into the visible map', () => {
+      // v2.4.1 (OTA 029) — fy floor lowered to 0.04 (was 0.06) so
+      // the upper-band locations (Sinking Cathedral fy=0.12,
+      // Outpost fy=0.13) keep clearance above them on the chrome
+      // band at the top.
       const out = clampToMapArea({ fx: -0.3, fy: -0.2 });
       expect(out.fx).toBeGreaterThanOrEqual(0.06);
-      expect(out.fy).toBeGreaterThanOrEqual(0.06);
+      expect(out.fy).toBeGreaterThanOrEqual(0.04);
     });
   });
 });

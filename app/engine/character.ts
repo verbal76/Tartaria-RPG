@@ -163,6 +163,39 @@ export interface CreateCharacterInput {
   startingLocationId?: string;
 }
 
+// v2.4.1 (OTA 029) — canonical per-faction starting location.
+//
+// Each faction has ONE fixed starting tile that never changes for
+// that faction. Derived from the world-atlas doc's "Faction
+// strongholds" section. If the player passes an explicit
+// startingLocationId, it overrides this map; otherwise the
+// factionId is the source of truth.
+//
+// Notes:
+//   - Reclaimers stay at the Outpost (only hub with a full interior).
+//   - Mud Monarchs canonically have "no fixed base" but rule from
+//     Asgardar/Nimari fragments — picked Asgardar as the primary.
+//   - Conspiracy Architects live in the modern surface world (no
+//     Tartaria base); start at the Outskirts as the surface analog.
+//   - Stone Builders + True Tartarians live in the Subterranean
+//     Empire (Aethercraft Workshop / True Tartarian Catacombs);
+//     buried_cities is the closest top-level location entry.
+export const FACTION_STARTING_LOCATION: Record<string, string> = {
+  reclaimers_guild: 'tartarian_outskirts',
+  forgotten_order: 'varakush',
+  mud_monarchs: 'asgardar',
+  true_tartarians: 'buried_cities',
+  eternal_dynasty: 'asgardar',
+  conspiracy_architects: 'tartarian_outskirts',
+  servants_of_giants: 'giant_vault',
+  stone_builders: 'buried_cities',
+  tartarian_revivalists: 'drakova',
+};
+
+export function startingLocationForFaction(factionId: string): string {
+  return FACTION_STARTING_LOCATION[factionId] ?? 'tartarian_outskirts';
+}
+
 export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
   const race = races.find((r) => r.id === input.raceId) ?? races[0]!;
   const faction = factions.find((f) => f.id === input.factionId) ?? factions[0]!;
@@ -193,7 +226,9 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
     corruption: 0,
     inventory: buildStarterInventory(race, faction),
     factionStanding,
-    currentLocationId: input.startingLocationId ?? 'tartarian_outskirts',
+    // v2.4.1 (OTA 029) — explicit startingLocationId wins; otherwise
+    // fall back to the canonical per-faction start tile.
+    currentLocationId: input.startingLocationId ?? startingLocationForFaction(input.factionId),
     activeQuests: [],
     // Procedural map seed — combines name + race + faction + a timestamp
     // so two characters with identical names still get different maps.

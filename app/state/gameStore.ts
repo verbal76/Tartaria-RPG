@@ -593,8 +593,18 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     amuletId: eq.amuletId ?? findFirstId(eq.amulet),
     ringId: eq.ringId ?? findFirstId(eq.ring),
   };
+  // v2.4.1 (OTA 029) — never let currentLocationId be undefined.
+  // The hub system, scene rebuild, mapX/mapY math, atlas marker
+  // positioning, and several quest paths all key off it. A missing
+  // location ID silently breaks every one. Fall back to the faction's
+  // canonical start so a corrupted save still loads to a sensible
+  // tile.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { startingLocationForFaction: stf } = require('../engine/character');
+  const safeLocationId = p.currentLocationId || stf(p.factionId) || 'tartarian_outskirts';
   return {
     ...p,
+    currentLocationId: safeLocationId,
     inventory,
     staminaMax: stamMax,
     stamina: p.stamina ?? stamMax,
