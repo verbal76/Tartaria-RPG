@@ -142,15 +142,25 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
     // any wrapped code property. expo-updates' generic 'Failed to
     // check for update' isn't actionable on its own.
     let detail: string;
+    let errCode: string | undefined;
     if (err instanceof Error) {
-      const code = (err as Error & { code?: string }).code;
-      const parts = [err.name, code ? `[${code}]` : '', err.message]
+      errCode = (err as Error & { code?: string }).code;
+      const parts = [err.name, errCode ? `[${errCode}]` : '', err.message]
         .filter(Boolean)
         .join(' ');
       const stackHead = err.stack ? err.stack.split('\n').slice(0, 2).join(' | ') : '';
       detail = stackHead ? `${parts}\n      ${stackHead}` : parts;
     } else {
       detail = String(err);
+    }
+    // v2.4.1 (OTA 044) — ERR_UPDATES_FETCH is what expo-updates throws
+    // when there is no new update to fetch (the server has nothing
+    // newer to serve). It is NOT a real failure; surfacing it as an
+    // error scared the playtester. Treat it as a clean "noUpdate"
+    // result with a friendly status, no error banner.
+    if (errCode === 'ERR_UPDATES_FETCH' || /Failed to download new update/i.test(detail)) {
+      onStatus?.('Already up to date');
+      return 'noUpdate';
     }
     onStatus?.('Error');
     onError?.(detail);
