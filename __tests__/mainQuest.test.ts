@@ -149,6 +149,53 @@ describe('mainQuest phase machine', () => {
     expect(LOST_CAPITAL_LOCATIONS).toEqual(['asgardar', 'samarran', 'nimari', 'drakova', 'voronov']);
   });
 
+  describe('Phase 4a — variant pools', () => {
+    it('every faction has 3 variants for hook + revelation + descent', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { narrationForPhase } = require('../app/engine/mainQuest');
+      const factions = [
+        'reclaimers_guild', 'forgotten_order', 'mud_monarchs', 'true_tartarians',
+        'eternal_dynasty', 'conspiracy_architects', 'servants_of_giants',
+        'stone_builders', 'tartarian_revivalists',
+      ];
+      const phases = ['hook', 'revelation', 'descent'];
+      for (const f of factions) {
+        for (const ph of phases) {
+          // Use 5 different seeds; expect at least 2 distinct lines back
+          // (proves the variant pool exists and the picker is selecting
+          // different entries for different seeds).
+          const seen = new Set<string>();
+          for (const seed of ['A', 'B', 'C', 'Bob', 'Verbal']) {
+            seen.add(narrationForPhase(ph, f, { seed }));
+          }
+          expect(seen.size).toBeGreaterThanOrEqual(2);
+        }
+      }
+    });
+
+    it('same seed always returns the same variant (deterministic)', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { narrationForPhase } = require('../app/engine/mainQuest');
+      const a1 = narrationForPhase('hook', 'reclaimers_guild', { seed: 'Bob' });
+      const a2 = narrationForPhase('hook', 'reclaimers_guild', { seed: 'Bob' });
+      const a3 = narrationForPhase('hook', 'reclaimers_guild', { seed: 'Bob' });
+      expect(a1).toBe(a2);
+      expect(a2).toBe(a3);
+    });
+
+    it('different phases of the same character yield phase-tagged variant picks', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { narrationForPhase } = require('../app/engine/mainQuest');
+      // The same seed but different phase tags should select
+      // independently (no collision between hook + descent picks).
+      const hook = narrationForPhase('hook', 'reclaimers_guild', { seed: 'Bob' });
+      const desc = narrationForPhase('descent', 'reclaimers_guild', { seed: 'Bob' });
+      expect(hook).toBeTruthy();
+      expect(desc).toBeTruthy();
+      expect(hook).not.toBe(desc);
+    });
+  });
+
   describe('Phase 3 — faction-reactive endings', () => {
     it('endingLine returns faction-specific text for every faction × ending', () => {
       // eslint-disable-next-line @typescript-eslint/no-require-imports

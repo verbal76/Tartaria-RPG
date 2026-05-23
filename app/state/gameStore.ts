@@ -11388,7 +11388,7 @@ function triggerMainQuest(
     player: { ...player, mainQuest: nextState, inventory },
   });
   // Narration log
-  const context: Record<string, unknown> = {};
+  const context: Record<string, unknown> = { seed: player.name };
   if (trigger.kind === 'core_recovered') {
     context.coreRecovered = trigger.locationId;
     context.coresCount = nextState.coresRecovered.length;
@@ -11407,7 +11407,7 @@ function triggerMainQuest(
   // player on phase 'descent' (5th Core) — also log the descent
   // narration so the player gets the "Stair opens" beat.
   if (prevState.phase === 'cores' && nextState.phase === 'descent') {
-    const descentLine = mq.narrationForPhase('descent', player.factionId);
+    const descentLine = mq.narrationForPhase('descent', player.factionId, { seed: player.name });
     if (descentLine) get().appendLog('arbiter', descentLine);
   }
   // v2.4.1 (OTA 038 — Phase 5) — the Nexus interior cinematic.
