@@ -3012,6 +3012,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const mqMod = require('../engine/mainQuest');
       if (mqMod.canRecoverCore(player, parsed.intent)) {
         triggerMainQuest(get, set, { kind: 'core_recovered', locationId: player.currentLocationId });
+      } else {
+        // v2.4.1 (OTA 050) — nudge when the player targets a "core"
+        // ambient noun with the wrong verb for their faction's gate.
+        // Without this, salvaging the room's "core" noun reads as
+        // success ("Automaton Circuit recovered") even though the
+        // Main Quest Core hasn't been touched. Refuse the action and
+        // surface the faction's actual recovery verb so the player
+        // can correct course.
+        const targetText = (parsed.target ?? '').toLowerCase();
+        const wantsCore = /\bcore\b/.test(targetText);
+        const atUnrecoveredCapital =
+          mqMod.LOST_CAPITAL_LOCATIONS.includes(player.currentLocationId)
+          && !(player.mainQuest?.coresRecovered ?? []).includes(player.currentLocationId)
+          && (player.mainQuest?.phase === 'revelation' || player.mainQuest?.phase === 'cores');
+        if (wantsCore && atUnrecoveredCapital) {
+          const nextAction = mqMod.coreGateNextAction(player.factionId);
+          get().appendLog(
+            'arbiter',
+            `The Arbiter holds out a hand. "That is the Tartarian Core. It does not come out with that hand. Your discipline asks you to ${nextAction} — try again with the right approach."`,
+          );
+          return;
+        }
       }
     }
 
