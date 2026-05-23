@@ -366,95 +366,11 @@ export function ExplorationScreen() {
             range={currentScene?.range ?? null}
           />
         )}
+        {/* v2.4.1 (OTA 047) — bottom menu collapsed to just the gear
+            icon. save & exit, copy log, and clear log moved into the
+            SESSION tab of the gear screen (first tab open). The gear
+            is the single entry into all run-control and settings. */}
         <TutorialTarget area="bottom-menu" style={styles.menuRow}>
-          <TouchableOpacity onPress={() => { void saveAndExitToTitle(); }} style={styles.menuBtn}>
-            <Text style={styles.menuBtnText}>save & exit</Text>
-          </TouchableOpacity>
-          {/* OTA 223 — single tap copies the full disk log to the
-              clipboard directly (no intermediate screen). Long press
-              still opens the LogScreen for occasions when the player
-              wants to scroll, share, or visually review. Playtester:
-              "the log is really only for troubleshooting at the
-              moment ... can we just hit the log button and
-              automatically have that copy of the entire log and
-              just skip the whole separate screen and copy process?"
-              */}
-          <Pressable
-            onPress={async () => {
-              try {
-                await flushLogWrites();
-                const fresh = await readFullLog();
-                // OTA 018 — wrap the copied log in HEADER / FOOTER
-                // markers so truncation is unambiguous. If the paste
-                // destination shows the HEADER but no FOOTER, the
-                // truncation happened in clipboard / paste. If
-                // neither marker shows, the read itself returned
-                // empty. The reported char count is the wrapped
-                // length so it matches what hits the clipboard.
-                const stamped = `=== TARTARIA LOG · ${fresh.length} CHARS · BEGIN ===\n${fresh}\n=== END LOG · ${fresh.length} CHARS ===\n`;
-                await Clipboard.setStringAsync(stamped);
-                setLogCharCount(stamped.length);
-                setLogCopied(true);
-                // OTA 017 — if the disk log dropped writes (AsyncStorage
-                // cap hit or similar), tell the player explicitly so a
-                // missing note isn't a silent surprise.
-                const writeErr = getLastLogWriteError();
-                if (writeErr) {
-                  useGameStore.setState((s) => ({
-                    gameLog: [
-                      ...s.gameLog,
-                      {
-                        id: `${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-                        ts: Date.now(),
-                        channel: 'system' as const,
-                        text: `⚠ Log-write failure: ${writeErr}. Some entries may be missing from the copy — use SHARE on the full log screen for a complete export.`,
-                      },
-                    ],
-                  }));
-                  clearLastLogWriteError();
-                }
-                setTimeout(() => setLogCopied(false), 2500);
-              } catch { /* clipboard rarely fails on Android */ }
-            }}
-            onLongPress={() => setScreen('log')}
-            style={styles.menuBtn}
-          >
-            <Text style={styles.menuBtnText}>
-              {logCopied
-                ? `${logCharCount.toLocaleString()} CHARS`
-                : 'copy log'}
-            </Text>
-          </Pressable>
-          {/* OTA 224 — CLEAR LOG wipes the on-disk log + in-memory
-              feed so the next playtest submission contains only
-              the new round of activity. Playtester: "if I keep
-              going eventually there's going to be a $97,000
-              character log and I don't need you to read the same
-              thing on four different submissions." Sits between
-              COPY LOG and the gear so the wipe is one tap from
-              the same hand-zone the player already uses. */}
-          <Pressable
-            onPress={async () => {
-              // Clear in-memory feed FIRST so the visible adventure
-              // log clears immediately, then wipe the disk key. OTA
-              // 224's useGameStore.setState pattern wasn't reliably
-              // triggering the AdventureFeed subscriber on every
-              // device — the dedicated clearGameLog action goes
-              // through the store's own set() so the subscription
-              // path is the same one appendLog uses.
-              useGameStore.getState().clearGameLog();
-              try {
-                await clearActiveSlotLog();
-              } catch { /* tolerated — log will repopulate on next append */ }
-              setLogCleared(true);
-              setTimeout(() => setLogCleared(false), 1500);
-            }}
-            style={styles.menuBtn}
-          >
-            <Text style={styles.menuBtnText}>
-              {logCleared ? 'CLEARED' : 'clear log'}
-            </Text>
-          </Pressable>
           <TouchableOpacity onPress={() => setScreen('about')} hitSlop={8} style={styles.menuBtnGear}>
             <Text style={styles.gear}>⚙</Text>
           </TouchableOpacity>

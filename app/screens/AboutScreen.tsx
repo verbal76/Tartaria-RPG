@@ -8,6 +8,13 @@ import { useGameStore } from '../state/gameStore';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { NumberStepper } from '../components/NumberStepper';
 import { LoreCodexBody } from '../components/LoreCodexBody';
+import {
+  flushLogWrites,
+  readFullLog,
+  getLastLogWriteError,
+  clearLastLogWriteError,
+  clearActiveSlotLog,
+} from '../engine/saveSystem';
 import { getAudioSettings, setAudioSettings, onAudioSettingsChange, type AudioSettings } from '../audio/audioSettings';
 import { forceReapplyAudioFromState } from '../audio/AudioController';
 import {
@@ -50,10 +57,50 @@ export function AboutScreen() {
   const [voiceCopied, setVoiceCopied] = useState(false);
   const [kokoroCacheCleared, setKokoroCacheCleared] = useState(false);
   const [kokoroCache, setKokoroCache] = useState<ExecutorchCacheEntry[]>([]);
-  // v2.4.1 (OTA 046) — added 'lore' tab. Lore Codex was a separate
-  // title-screen button; now it lives here so it's reachable from
-  // the gear icon both on the title screen AND in-game.
-  const [tab, setTab] = useState<'sfx' | 'lore' | 'about'>('sfx');
+  // v2.4.1 (OTA 047) — SESSION tab added and made the first thing
+  // seen when the gear opens. Holds save & exit, copy log, and
+  // clear log — the three actions that previously cluttered the
+  // bottom of the ExplorationScreen menu row. save & exit is the
+  // most-pressed action, so it's the default tab on open.
+  const [tab, setTab] = useState<'session' | 'sfx' | 'lore' | 'about'>('session');
+  const [logCharCount, setLogCharCount] = useState(0);
+  const [logCopied, setLogCopied] = useState(false);
+  const [logCleared, setLogCleared] = useState(false);
+  const saveAndExitToTitle = useGameStore((s) => s.saveAndExitToTitle);
+  async function handleCopyLog() {
+    try {
+      await flushLogWrites();
+      const fresh = await readFullLog();
+      const stamped = `=== TARTARIA LOG · ${fresh.length} CHARS · BEGIN ===\n${fresh}\n=== END LOG · ${fresh.length} CHARS ===\n`;
+      await Clipboard.setStringAsync(stamped);
+      setLogCharCount(stamped.length);
+      setLogCopied(true);
+      const writeErr = getLastLogWriteError();
+      if (writeErr) {
+        useGameStore.setState((s) => ({
+          gameLog: [
+            ...s.gameLog,
+            {
+              id: `${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              ts: Date.now(),
+              channel: 'system' as const,
+              text: `⚠ Log-write failure: ${writeErr}. Some entries may be missing from the copy — use SHARE on the full log screen for a complete export.`,
+            },
+          ],
+        }));
+        clearLastLogWriteError();
+      }
+      setTimeout(() => setLogCopied(false), 2500);
+    } catch { /* clipboard rarely fails on Android */ }
+  }
+  async function handleClearLog() {
+    useGameStore.getState().clearGameLog();
+    try {
+      await clearActiveSlotLog();
+    } catch { /* tolerated */ }
+    setLogCleared(true);
+    setTimeout(() => setLogCleared(false), 1500);
+  }
   // OTA 007 — update button + state moved to TitleScreen.
   const [audio, setAudio] = useState<AudioSettings>(() => getAudioSettings());
   const [voice, setVoice] = useState<VoiceSettings>(() => getVoiceSettings());
@@ -410,7 +457,7 @@ export function AboutScreen() {
           ABOUT / diagnostic block stays its own tab. Music card
           renders first inside SFX (most tweaked), voice card below. */}
       <View style={styles.tabRow}>
-        {(['sfx', 'lore', 'about'] as const).map((id) => (
+        {(['session', 'sfx', 'lore', 'about'] as const).map((id) => (
           <TouchableOpacity
             key={id}
             onPress={() => setTab(id)}
@@ -425,6 +472,58 @@ export function AboutScreen() {
       </View>
 
       <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
+        {/* v2.4.1 (OTA 047) — SESSION tab. The three run-control
+            actions that used to clutter the in-game menu row
+            (save & exit, copy log, clear log) live here as proper
+            buttons. Save & exit is the headline action so it's
+            first; copy + clear are diagnostic tools below. */}
+        {tab === 'session' && (
+        <View style={styles.sessionCard}>
+          <Text style={styles.sessionLabel}>RUN CONTROLS</Text>
+          <Text style={styles.sessionHint}>
+            Save your progress, copy the on-disk log for sharing, or wipe the log
+            so the next paste-back contains only fresh activity.
+          </Text>
+
+          <TouchableOpacity
+            style={[styles.sessionBtn, styles.sessionBtnPrimary]}
+            onPress={() => { void saveAndExitToTitle(); }}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.sessionBtnPrimaryText}>SAVE &amp; EXIT TO TITLE</Text>
+          </TouchableOpacity>
+
+          <View style={styles.sessionBtnRow}>
+            <TouchableOpacity
+              style={[styles.sessionBtn, styles.sessionBtnSecondary, { flex: 1 }]}
+              onPress={() => { void handleCopyLog(); }}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.sessionBtnSecondaryText}>
+                {logCopied
+                  ? `✓ ${logCharCount.toLocaleString()} CHARS`
+                  : 'COPY LOG'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.sessionBtn, styles.sessionBtnSecondary, { flex: 1 }]}
+              onPress={() => { void handleClearLog(); }}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.sessionBtnSecondaryText}>
+                {logCleared ? '✓ CLEARED' : 'CLEAR LOG'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.sessionFootnote}>
+            COPY LOG drops the full disk log on the clipboard. Long-press it in the
+            in-game menu (or use the LOG screen) for the share + chunked-paste view.
+            CLEAR LOG wipes both the on-disk log and the in-memory feed — the next
+            log paste-back will contain only the play that follows.
+          </Text>
+        </View>
+        )}
+
         {tab === 'sfx' && (
         <View style={styles.musicCard}>
           <View style={styles.musicHeader}>
@@ -815,6 +914,70 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 14,
     backgroundColor: '#1a1714',
+  },
+  // v2.4.1 (OTA 047) — SESSION tab styles. Primary button (save &
+  // exit) is warm gold + filled, the two secondaries (copy / clear
+  // log) sit in a row below in outlined neutral tone.
+  sessionCard: {
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 3,
+    padding: 14,
+    marginBottom: 14,
+    backgroundColor: '#13110f',
+  },
+  sessionLabel: {
+    color: '#c9a86a',
+    fontSize: 11,
+    letterSpacing: 3,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  sessionHint: {
+    color: '#cdbf99',
+    fontSize: 12,
+    lineHeight: 18,
+    marginBottom: 14,
+  },
+  sessionBtn: {
+    borderRadius: 4,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+  },
+  sessionBtnPrimary: {
+    backgroundColor: '#c9a86a',
+    borderColor: '#c9a86a',
+    marginBottom: 10,
+  },
+  sessionBtnPrimaryText: {
+    color: '#13110f',
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: 3,
+  },
+  sessionBtnSecondary: {
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+  },
+  sessionBtnSecondaryText: {
+    color: '#c9a86a',
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 2,
+  },
+  sessionBtnRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 10,
+  },
+  sessionFootnote: {
+    color: '#7a705c',
+    fontSize: 10,
+    lineHeight: 14,
+    fontStyle: 'italic',
+    marginTop: 4,
   },
   musicHeader: {
     flexDirection: 'row',
