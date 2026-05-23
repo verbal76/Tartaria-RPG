@@ -124,6 +124,9 @@ describe('OTA 045 — climb noun resolution prefers scene nouns over inventory i
     const logs = store.getState().gameLog.map((e) => e.text).join('\n');
     // Non-rope noun: the original auto-rope template fires —
     // "loop the climbing rope around the wall".
-    expect(logs).toMatch(/loop the climbing rope around the wall/);
+    // OTA 23-007 — narration now reads "loop your <rope> around the
+    // wall" so the plain Climbing Rope and Reclaimer's Rope both
+    // sound natural in the same template.
+    expect(logs).toMatch(/loop your climbing rope around the wall/);
   });
 });

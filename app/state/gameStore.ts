@@ -4203,6 +4203,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
           checkLowHpWarning(prevHpEat, prevHpEat + heal, hpMaxEat, get, set);
           void get().persist();
         } else {
+          // OTA 23-007 — can't sleep mid-climb. If the player is
+          // elevated on a climbable noun, the 8-hour rest is
+          // refused unless they're carrying Reclaimer's Rope —
+          // the upgraded line includes belay loops you can anchor
+          // and doze in. Plain Climbing Rope doesn't let you nap
+          // halfway up a tower; you'd just unwind and fall.
+          // Consumable use mid-climb (eat a ration) is still
+          // allowed via the consumable branch above; only this
+          // long-rest path is gated.
+          if (currentScene?.elevatedOn) {
+            const hasReclaimersRopeForRest = player.inventory.some(
+              (i) => i.name === "Reclaimer's Rope" && i.quantity > 0,
+            );
+            if (!hasReclaimersRopeForRest) {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter looks up. "You can't sleep on a wall. Climb down, or wait until you have a Reclaimer's Rope to anchor a doze."`,
+              );
+              break;
+            }
+          }
           // Deterministic 8-hour rest. The old d4+3 prompt had no
           // gameplay surface — the player couldn't influence or fail the
           // roll, and the only difference between 4h and 7h was time
@@ -5235,42 +5256,75 @@ export const useGameStore = create<GameStore>((set, get) => ({
           'climb_steep',
           [fgbnC, fmbnC, feibC],
         );
-        set({ player: advanceTime(spendStamina(player, 2), 0.5) });
+        // OTA 23-007 — rope is now HARD-REQUIRED for climbing. The
+        // old DEX vs DC 12 fallback branch is gone: no rope = no
+        // climb attempt at all, no stamina spent. The Arbiter
+        // explains why.
+        if (!hasRope) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter eyes the ${tgt}. "Not without rope. Find some, then come back."`,
+          );
+          break;
+        }
+        // OTA 23-007 — Reclaimer's Rope upgrade. Half stamina per
+        // tier (1 instead of 2) and unlocks the mid-climb rest
+        // pathway (handled in the rest case below). Plain Climbing
+        // Rope still works; it just costs full stamina and locks
+        // out rest while elevated.
+        const hasReclaimersRope = player.inventory.some(
+          (i) => i.name === "Reclaimer's Rope" && i.quantity > 0,
+        );
+        const climbStaminaCost = hasReclaimersRope ? 1 : 2;
+        // OTA 23-007 — if the player doesn't have enough stamina to
+        // finish this tier, they fall. Lose 20% of max HP and clear
+        // the elevation flag. This is the only place climbing can
+        // injure you now (the old "fail the DEX roll → 1 HP" branch
+        // is gone since rope is required).
+        if (player.stamina < climbStaminaCost) {
+          const fallDamage = Math.max(1, Math.floor(player.hpMax * 0.2));
+          const newHp = Math.max(0, player.hp - fallDamage);
+          get().appendLog(
+            'combat',
+            `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — stamina ${player.stamina} < ${climbStaminaCost} required. ✗ YOU FALL.`,
+          );
+          get().appendLog(
+            'world',
+            `Your grip gives out on the ${tgt}. You drop hard, taking ${fallDamage} damage (${newHp}/${player.hpMax} HP).`,
+          );
+          set((s) =>
+            s.player
+              ? {
+                  player: { ...s.player, hp: newHp },
+                  currentScene: s.currentScene
+                    ? { ...s.currentScene, elevatedOn: null }
+                    : s.currentScene,
+                }
+              : s,
+          );
+          void get().persist();
+          break;
+        }
+        set({ player: advanceTime(spendStamina(player, climbStaminaCost), 0.5) });
         let tierCleared = false;
-        if (hasRope) {
+        {
           // OTA 045 — when the climbed noun is itself a rope / line /
           // chain (i.e. already a rope-shaped thing), don't narrate
           // "loop the climbing rope around the rope" — read as
           // "haul up the rope hand over hand" instead. Climbing Rope
           // still grants the auto-pass; the prop just changes role.
+          // OTA 23-007 — narration variants now also distinguish
+          // Reclaimer's Rope so the player feels the upgrade.
           const tgtLow = tgt.toLowerCase();
           const tgtIsRope = /\b(rope|line|chain|cable|cord)\b/.test(tgtLow);
+          const rope = hasReclaimersRope ? "Reclaimer's Rope" : 'climbing rope';
           get().appendLog(
             'world',
             tgtIsRope
               ? `You haul up the ${tgt} hand over hand. Tier ${currentTier}/${totalTiers} cleared.`
-              : `You loop the climbing rope around the ${tgt} and walk the line. Tier ${currentTier}/${totalTiers} cleared.`,
+              : `You loop your ${rope} around the ${tgt} and walk the line. Tier ${currentTier}/${totalTiers} cleared.`,
           );
           tierCleared = true;
-        } else {
-          const climbRoll = rollDie(20);
-          const climbTotal = climbRoll + climbStats.dexterity;
-          const climbSuccess = climbTotal >= 12;
-          get().appendLog(
-            'combat',
-            `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — d20 ${climbRoll} + DEX ${climbStats.dexterity} = ${climbTotal} vs DC 12 — ${climbSuccess ? '✓ HIT' : '✗ MISS'}`,
-          );
-          if (climbSuccess) {
-            tierCleared = true;
-          } else {
-            get().appendLog(
-              'world',
-              `You slip on the ${tgt} and drop back to your last hold. Try again — rope auto-passes every tier.`,
-            );
-            set((s) =>
-              s.player ? { player: { ...s.player, hp: Math.max(0, s.player.hp - 1) } } : s,
-            );
-          }
         }
         if (tierCleared) {
           // OTA 058 — train DEX on a successful climb tier (rope
