@@ -12156,13 +12156,32 @@ function narrateCasualLook(
   // see here is exactly what Search/Approach/Salvage chips offer.
   // Fallback to ambientNouns[..8] for legacy saves predating the
   // cache field.
+  // OTA 23-016 — drop nouns already worked over in this room from
+  // the "You see:" list. Playtest feedback: "if you look around and
+  // pick up / salvage everything that destroys them and look around
+  // again those items shouldn't be listed." Same searchedAmbientNouns
+  // store the harvest path writes to (and the chip UI already reads
+  // to dim consumed chips) — look-around just wasn't honoring it.
+  // Resets when the player moves to a new room (new roomKey) so each
+  // fresh instance presents its full noun set on first look.
+  const lookRoomKey = player
+    ? makeRoomKey(player.currentLocationId, scene.microMicroId, player.mapX, player.mapY)
+    : null;
+  const lookRoom = lookRoomKey ? get().worldMemory.visitedRooms?.[lookRoomKey] : null;
+  const lookSearched = new Set((lookRoom?.searchedAmbientNouns ?? []).map((n) => n.toLowerCase()));
   const interactables: string[] = [];
   const source = scene.displayedAmbientNouns ?? (scene.ambientNouns ?? []).slice(0, 8);
   for (const n of source) {
+    if (lookSearched.has(n.toLowerCase())) continue;
     if (!interactables.includes(n)) interactables.push(n);
   }
   if (interactables.length > 0) {
     parts.push(`You see: ${interactables.join(', ')}.`);
+  } else if (source.length > 0) {
+    // Every authored noun in this room has been worked over —
+    // tell the player so they know to move on instead of typing
+    // 'look' a fourth time wondering what they missed.
+    parts.push(`You've worked over everything here. Time to move.`);
   }
 
   // 3. Anything alive nearby — combat-relevant. Vendor, enemies,
