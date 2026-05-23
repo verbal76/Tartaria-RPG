@@ -28,20 +28,23 @@ export interface AtlasCoord {
 export const OUTPOST_ATLAS_COORD: AtlasCoord = { fx: 0.10, fy: 0.13 };
 
 // Per-tile marker drift on the atlas. Atlas is 1408×768 (1.83:1
-// landscape), so a single DOT_TILE_FRAC applied to both axes makes
-// 1 east tile cover 1.83× more pixels than 1 south tile. We split
-// the constants and aspect-correct so 1 east step and 1 south step
-// drift the marker the same pixel distance.
+// landscape), so a single DOT_TILE_FRAC applied to both axes would
+// make 1 east tile cover 1.83× more pixels than 1 south tile. We
+// split the constants and aspect-correct so 1 east step and 1 south
+// step drift the marker the same pixel distance.
 //
-// STEP_FRAC_Y = 0.06 — height fraction. Calibrated 1.5× the prior
-//   0.04 baseline because the world feels bigger now (41×41 grid,
-//   D5 cities up to 28 tiles out — each tile needs a visible nudge
-//   on the marker or the drift is imperceptible).
-// STEP_FRAC_X = STEP_FRAC_Y × (ATLAS_H/ATLAS_W) = 0.06 × 0.5455
-//   ≈ 0.0327 — width fraction picked so 1 east tile = 1 south tile
-//   in pixels (~46 px each).
-export const STEP_FRAC_Y = 0.06;
-export const STEP_FRAC_X = 0.0327;
+// v2.4.1 (OTA 028) — halved from the OTA 019 calibration. The 0.06
+// was too aggressive in play: 17 south tiles crossed the entire
+// atlas height and the marker overshot canonical anchors quickly.
+//
+// STEP_FRAC_Y = 0.03 — height fraction. 28 tiles (max D5 radius)
+//   covers ~84% of atlas height, which feels proportional to "across
+//   2-3 states" without overshooting destinations.
+// STEP_FRAC_X = STEP_FRAC_Y × (ATLAS_H/ATLAS_W) = 0.03 × 0.5455
+//   ≈ 0.0164 — width fraction picked so 1 east tile = 1 south tile
+//   in pixels (~23 px each).
+export const STEP_FRAC_Y = 0.03;
+export const STEP_FRAC_X = 0.0164;
 // Back-compat alias for tests that still reference the old name.
 // Equal to STEP_FRAC_Y because the prior axis-uniform constant was
 // effectively the height fraction.
