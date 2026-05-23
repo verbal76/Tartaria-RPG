@@ -149,6 +149,36 @@ describe('mainQuest phase machine', () => {
     expect(LOST_CAPITAL_LOCATIONS).toEqual(['asgardar', 'samarran', 'nimari', 'drakova', 'voronov']);
   });
 
+  describe('Phase 3 — faction-reactive endings', () => {
+    it('endingLine returns faction-specific text for every faction × ending', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { endingLine } = require('../app/engine/mainQuest');
+      const factions = [
+        'reclaimers_guild', 'forgotten_order', 'mud_monarchs', 'true_tartarians',
+        'eternal_dynasty', 'conspiracy_architects', 'servants_of_giants',
+        'stone_builders', 'tartarian_revivalists',
+      ];
+      const endings = ['seal', 'unleash', 'preserve'] as const;
+      const seen = new Set<string>();
+      for (const f of factions) {
+        for (const e of endings) {
+          const line = endingLine(e, f);
+          expect(line.length).toBeGreaterThan(80);
+          // Distinct lines across the 27 combinations.
+          expect(seen.has(line)).toBe(false);
+          seen.add(line);
+        }
+      }
+      expect(seen.size).toBe(27);
+    });
+    it('endingLine falls back to universal for unknown faction', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { endingLine } = require('../app/engine/mainQuest');
+      const line = endingLine('seal', 'made_up');
+      expect(line).toMatch(/SEAL/);
+    });
+  });
+
   describe('Phase 5 — Nexus cinematic', () => {
     it('NEXUS_SLOT_BEATS covers all 5 Cores in canonical order', () => {
       // eslint-disable-next-line @typescript-eslint/no-require-imports

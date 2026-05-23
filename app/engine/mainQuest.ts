@@ -225,11 +225,92 @@ export function nexusArrivalCinematic(): string[] {
   return lines;
 }
 
+// v2.4.1 (OTA 039-041 — Phase 3) — faction-reactive endings.
+//
+// Each of seal / unleash / preserve plays a faction-specific line
+// when the player makes The Choice. The same act has nine different
+// meanings depending on whose colors you wear at the moment of
+// decision. Fallback to the universal line if a faction isn't mapped
+// (legacy / unknown faction).
+const SEAL_BY_FACTION: Record<string, string> = {
+  reclaimers_guild:
+    'You SEAL the Nexus. The Cores fuse into the mantle and the Aetheric pressure under Tartaria drops to ambient. The Reclaimers will dig forever in a quiet world — every wreck, every relic, every silt-stratum still there, just no longer screaming when you pry it. You walk out and the Outpost lanterns burn a half-shade softer than they did this morning.',
+  forgotten_order:
+    'You SEAL the Nexus. Every Tartarian text the Order has ever restored, and every text it will ever restore, becomes purely historical — the words still speak, but they no longer reach back to a live Aetheric source. Scholarship is now its own end, not a path to power. Jorah will be relieved. The youngest novices will, in a generation, not understand what was lost. That is the price.',
+  mud_monarchs:
+    'You SEAL the Nexus. The family business — three centuries of suppression, indices, redactions, and the occasional discreet killing — concludes with no buried Tartaria left to suppress. The Monarchs will become curators of an emptied secret, then irrelevant, then forgotten. Your bloodline ends quietly in archives, which is the closest thing to mercy your line has ever been offered.',
+  true_tartarians:
+    'You SEAL the Nexus. The Entombed exhale once and then settle — for the first time since the Flood, the old country is at rest instead of waiting. The Catacombs will go on, the rites will continue, but the urgency has left them. You return to a True Tartarian Hall lit only by tomb-lanterns; the elders bow without speaking. The vigil is complete.',
+  eternal_dynasty:
+    'You SEAL the Nexus. The empire will not be raised. The dynasty\'s long restoration project is, at the final hour, set aside — not abandoned in shame but concluded in mercy. The Throne Promenade darkens behind you as you leave. The line ends here, with you, sealing rather than ruling. There are dignities higher than power.',
+  conspiracy_architects:
+    'You SEAL the Nexus. The Architects\' three-hundred-year suppression project ends in vindication — there is now nothing left to hide because there is nothing left to find. The institutions stay institutions. The surface world keeps its innocence. Your career, ironically, never happened officially. There is no commendation. There is no headline. There is only the desk you go back to.',
+  servants_of_giants:
+    'You SEAL the Nexus. The Giants in their five Capital-tombs sleep more deeply than they have since the Flood — no Aether-strain, no half-stirring, no centuries of being almost-awake. The vigil you have kept your whole life finally has a purpose: not to wake them, but to let them rest. The lanterns in every Vigil cell across the world dim to a single warm point and stay there.',
+  stone_builders:
+    'You SEAL the Nexus. The Engine you have studied your entire career powers down cleanly for the first time. Aethercraft becomes a craft, not a power tap — what you build now must stand on its own structural merit, no Aetheric shortcut, no live Nexus to draw from. The workshop will be smaller. The work will be better.',
+  tartarian_revivalists:
+    'You SEAL the Nexus. The story the cell was going to publish is now a different story — not "Tartaria is real and live" but "Tartaria existed and we found it and we put it back to sleep responsibly." It will not headline. It will not win. The movement will fade. But every member of the cell, including you, will know that the Revival\'s final act was the right one. That is enough.',
+};
+
+const UNLEASH_BY_FACTION: Record<string, string> = {
+  reclaimers_guild:
+    'You UNLEASH the Nexus. Aether climbs back up through every silt stratum the Reclaimers have ever dug. The relics you sold last season wake on the buyer\'s shelves. Every wreck in every Outskirts mud-pool starts moving again. The guild is suddenly the most important institution on the surface — every salvage haul is now a live wire. The Outpost lanterns burn three shades brighter and will not stop.',
+  forgotten_order:
+    'You UNLEASH the Nexus. Every Tartarian text the Order has ever restored becomes a live conduit — the words speak themselves aloud in the reading rooms. Jorah faints. The Cloister becomes the most consequential building in the empire overnight. The Order has been preparing to LISTEN to dead languages; it must now decide what to do when those languages issue commands.',
+  mud_monarchs:
+    'You UNLEASH the Nexus. The family\'s ancestral right is reactivated — every dynastic blade hums, every Monarch standard glows faintly Aetheric, the line\'s old machines wake in the cabinet vaults. The Mud Monarchs are an imperial power again, three centuries after they thought that game was lost. The world will react badly. You will rule the reaction.',
+  true_tartarians:
+    'You UNLEASH the Nexus. The Entombed wake. Not all of them — the lucky ones, the recent ones, the ones whose clay seals were still good. They walk out into a Catacomb that has not held living Tartarians since before the Flood. The True Tartarian Hall, long the home of memory, is now the home of return. The elders are weeping. So are you.',
+  eternal_dynasty:
+    'You UNLEASH the Nexus. The empire stirs at every Lost Capital simultaneously. Asgardar\'s Grand Spire lights for the first time in a millennium. Samarran\'s engines rouse. Drakova\'s walls remember they were walls. The Throne Promenade behind you fills with the echo of feet that haven\'t walked it in a thousand years. The Dynasty is restored. You are its emperor. The crown is heavier than you expected.',
+  conspiracy_architects:
+    'You UNLEASH the Nexus. The Architects\' suppression project ends in the most public possible defeat — Tartaria is on every front page within forty-eight hours, and the institutions you spent your career propping up issue contradictory press releases for two weeks. You will be fired. Your superiors will retire. The cover-up is over because the thing being covered is now visible to everyone. There is a strange relief in that.',
+  servants_of_giants:
+    'You UNLEASH the Nexus. The Giants WAKE. Five of them. Each one rises from its Capital-tomb at the same minute, blinks once at a world it does not recognize, and looks for someone to talk to. The Servants have prepared for this moment for centuries; nobody is actually ready for it. The Giants are ten times your size and not in the mood to be lectured. You are the most senior Servant on the field. Speak well.',
+  stone_builders:
+    'You UNLEASH the Nexus. The Engine reaches full output. Every Aethercraft work the Builders have ever raised — every stone, every conduit, every workshop tool — sings on the live Aether for the first time since the Flood. Tarek calls in tears: the prototype cores in the Materials Vault have woken on their own and are asking for direction. The Builders are now custodians of an empire-grade power grid. The work just got real.',
+  tartarian_revivalists:
+    'You UNLEASH the Nexus. The cell\'s long-prepared press kit goes out at sunrise — every photograph, every recovered text, every interview with you about your role in The Recovery. Tartaria is real. Tartaria is live. The surface world has 24 hours to decide what to do with this information. The Revivalists have what they always wanted: a public, undeniable Tartaria. Now they have to lead the world through what comes next, which is harder than the Revival ever was.',
+};
+
+const PRESERVE_BY_FACTION: Record<string, string> = {
+  reclaimers_guild:
+    'You PRESERVE. The 5 Cores stay in your pack; the Nexus mantle stays mute. The Reclaimers carry on as they always have — quiet, careful, salvaging what the buried world surrenders without ever forcing the lock. You are now the only Reclaimer alive who has held all 5 Cores and could end Tartaria with a single decision. You will not. That restraint becomes the guild\'s new motto, even though only you know why.',
+  forgotten_order:
+    'You PRESERVE. The Order\'s research continues without a live Nexus to reference; the scholarship now has a purpose it never had — to KEEP Tartaria readable across the centuries you will spend not deciding. You leave the Cloister with the 5 Cores in your pack. The Master Scholar will know what they are by the weight of your bag, and will say nothing.',
+  mud_monarchs:
+    'You PRESERVE. The family wins the way the family always wins — by not playing the hand. The 5 Cores in your pack become the dynasty\'s ultimate reserve, a power that exists in potentia and is never burned. You are now the most important Mud Monarch alive. Your descendants will inherit the choice; you trust them to keep deferring it. That trust is the dynasty.',
+  true_tartarians:
+    'You PRESERVE. The Entombed are not woken; the country is not raised; the Catacombs continue. You become the Carrier — a True Tartarian tradition the elders have whispered about since the first generation, prepared for and never until now used. The 5 Cores stay in your pack for the rest of your life. The vigil now includes you. There is no shame in this. There is only the work.',
+  eternal_dynasty:
+    'You PRESERVE. The empire stays in potentia. The crown stays uncrowned. You walk out of the Nexus carrying the 5 Cores like a sword in its scabbard, drawn only if drawn at all. The dynasty\'s long restoration project continues in private rather than public — every heir to the line will inherit what you have, and the option to act on it. None of them will, you suspect. The dynasty\'s real power was always restraint.',
+  conspiracy_architects:
+    'You PRESERVE. The Architects\' suppression project continues, but now its strongest evidence — the 5 Cores — is in YOUR pack, not in any of the institutional vaults. You leave the Nexus and report to no one. The institutions you work for will never know how close they came to losing control. You will spend the rest of your career managing a secret only one person on Earth holds. The promotion is unspoken.',
+  servants_of_giants:
+    'You PRESERVE. The Giants sleep on. You sit a longer vigil now — one that goes on for the rest of your life, with the 5 Cores in your pack as the relic of your office. The Servants of every Capital begin treating you as the senior Servant, though no one says so. The lanterns in every Vigil cell across the world burn one shade warmer in your honor, also unspoken. The watch is complete because you keep it.',
+  stone_builders:
+    'You PRESERVE. The Engine stays unbooted. The 5 Cores in your pack become the most valuable Aethercraft components ever assembled — and you build nothing from them. The Builders\' real masterwork is not what they raise but what they could raise and choose not to. Your workshop becomes a pilgrimage site within the order. Apprentices learn restraint from your example. The craft sharpens.',
+  tartarian_revivalists:
+    'You PRESERVE. The story the cell was going to publish is rewritten one more time — not "Tartaria is real and live" or "Tartaria has been responsibly sealed" but "Tartaria endures, the truth is held by those who can be trusted with it, and the world will be told when the world is ready." You become the cell\'s archivist-general. The 5 Cores stay with you. The Revival becomes a Reserve. The work continues, quieter, perhaps forever.',
+};
+
 const CHOICE_LINE_BY_ENDING: Record<MainQuestEnding, string> = {
   seal: 'You SEAL the Nexus. The cataclysm is locked away — Tartaria stays buried, the surface world stays innocent. The Cores fuse into the mantle as you set the last one. The chamber dims. You can walk out, or stay until the dim takes you. Either is a kind of ending.',
   unleash: 'You UNLEASH the Nexus. The cataclysm cycles back — Aetheric pressure rises, the surface tremors, every buried Tartaria stirs at once. What comes next is no longer in any one person\'s hands. Your faction will write the aftermath. You walk out under sky that has changed color.',
   preserve: 'You PRESERVE. The Cores stay in your pack; the Nexus stays mute; the world stays in equilibrium. You leave the chamber unsigned. Tartaria, the buried country, remains buried — but you carry the keys. Each Capital remembers you brought one back. They will remember.',
 };
+
+/** Return the faction-flavored ending line (Phase 3), falling back
+ *  to the universal CHOICE_LINE_BY_ENDING when a faction isn't
+ *  mapped or factionId is missing. */
+export function endingLine(ending: MainQuestEnding, factionId: string | undefined): string {
+  const map = ending === 'seal' ? SEAL_BY_FACTION
+    : ending === 'unleash' ? UNLEASH_BY_FACTION
+    : PRESERVE_BY_FACTION;
+  if (factionId && map[factionId]) return map[factionId]!;
+  return CHOICE_LINE_BY_ENDING[ending];
+}
 
 const FACTION_ROUTE_PLACEHOLDER = (factionId: string): string => {
   const name: Record<string, string> = {
@@ -270,7 +351,7 @@ export function narrationForPhase(
     case 'choice':
       return 'The Nexus offers three paths: SEAL the cataclysm, UNLEASH it, or PRESERVE the balance. Each is final. Choose from the Contracts screen.';
     case 'ended':
-      return context?.ending ? CHOICE_LINE_BY_ENDING[context.ending] : 'The story is closed for this character.';
+      return context?.ending ? endingLine(context.ending, factionId) : 'The story is closed for this character.';
     default:
       return '';
   }
