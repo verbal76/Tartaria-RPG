@@ -239,36 +239,45 @@ export function ExplorationScreen() {
           >
             <Text style={styles.sceneBarBtnText}>ACTIONS</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setScreen('contracts')}
-            hitSlop={8}
-            style={styles.sceneBarBtn}
-          >
-            <Text style={styles.sceneBarBtnText}>QUESTS</Text>
-          </TouchableOpacity>
+          {/* v2.4.1 (OTA 045) — QUESTS button removed per player
+              direction. The main-quest objective chip below the
+              scene bar is now the single entry to Contracts (which
+              holds the main quest + all side quests + collectibles).
+              The chip's relabeling makes that dual role explicit. */}
         </View>
       </TutorialTarget>
 
-      {/* v2.4.1 (OTA 037) — main-quest objective chip. Persistent
-          one-line prompt that surfaces the next main-quest beat
-          without forcing the player into the Contracts screen.
-          Tap to jump to Contracts. Visible whenever the player has
-          a mainQuest, hidden in the 'ended' state. */}
+      {/* v2.4.1 (OTA 045) — Main Quest chip + entry to all Contracts.
+          Replaces the OTA 037 chip and the now-removed QUESTS
+          button in the header. The chip plays two roles:
+            1. Persistent main-quest pointer — shows the next
+               concrete step in prose
+            2. The menu button into the full Contracts screen
+               (side quests, hunts, mysteries, collectibles)
+          The dual role is reflected by the "MAIN QUEST" label on
+          line 1 and a dim "tap for all contracts + collectibles"
+          subtitle on line 2 — explicit without being verbose.
+          Visible whenever the player exists, suppressed only in
+          the 'ended' phase (no live quest to point at). */}
       {(() => {
-        if (!player?.mainQuest) return null;
+        if (!player) return null;
         const mq = player.mainQuest;
-        if (mq.phase === 'ended') return null;
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { phaseHint, LOST_CAPITAL_LOCATIONS: capitals, coreGateNextAction } = require('../engine/mainQuest');
-        const cores = mq.coresRecovered?.length ?? 0;
-        // At an unrecovered Capital, prefer the gate's specific
-        // next-action prompt; otherwise show the generic phase hint.
-        const atUnrecovered = capitals.includes(player.currentLocationId)
-          && !mq.coresRecovered.includes(player.currentLocationId)
-          && (mq.phase === 'revelation' || mq.phase === 'cores');
-        const text: string = atUnrecovered
-          ? `◆ ${coreGateNextAction(player.factionId)}.`
-          : `◆ ${phaseHint(mq.phase, cores)}`;
+        let mainLine: string;
+        if (!mq || mq.phase === 'ended') {
+          // No active main quest — chip still serves as the menu
+          // entry but doesn't pretend to point anywhere.
+          mainLine = 'No active objective.';
+        } else {
+          const cores = mq.coresRecovered?.length ?? 0;
+          const atUnrecovered = capitals.includes(player.currentLocationId)
+            && !mq.coresRecovered.includes(player.currentLocationId)
+            && (mq.phase === 'revelation' || mq.phase === 'cores');
+          mainLine = atUnrecovered
+            ? `${coreGateNextAction(player.factionId)}.`
+            : phaseHint(mq.phase, cores);
+        }
         return (
           <TouchableOpacity
             style={styles.objectiveChip}
@@ -276,7 +285,14 @@ export function ExplorationScreen() {
             activeOpacity={0.7}
             hitSlop={6}
           >
-            <Text style={styles.objectiveChipText} numberOfLines={2}>{text}</Text>
+            <Text style={styles.objectiveChipTitle} numberOfLines={2}>
+              <Text style={styles.objectiveChipStar}>★ </Text>
+              <Text style={styles.objectiveChipLabel}>MAIN QUEST · </Text>
+              {mainLine}
+            </Text>
+            <Text style={styles.objectiveChipSubtitle}>
+              tap for all contracts + collectibles ↗
+            </Text>
           </TouchableOpacity>
         );
       })()}
@@ -676,9 +692,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   gear: { color: '#c9a86a', fontSize: 16, lineHeight: 18 },
-  // v2.4.1 (OTA 037) — persistent main-quest objective chip. Sits
-  // above the vendor banner (and below the scene bar) so it's a
-  // top-of-screen anchor the player can tap-into Contracts.
+  // v2.4.1 (OTA 045) — Main Quest chip + Contracts menu entry.
+  // Sits above the vendor banner, below the scene bar. Now the only
+  // entry to Contracts (QUESTS header button removed). Two-line
+  // layout: title row (★ MAIN QUEST · prose) and a dim subtitle
+  // explaining the chip also opens side quests + collectibles.
   objectiveChip: {
     marginTop: 4,
     marginBottom: 4,
@@ -689,11 +707,29 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 4,
   },
-  objectiveChipText: {
+  objectiveChipTitle: {
     color: '#c9a86a',
     fontSize: 12,
     lineHeight: 16,
     fontStyle: 'italic',
+  },
+  objectiveChipStar: {
+    color: '#c9a86a',
+    fontStyle: 'normal',
+    fontWeight: '700',
+  },
+  objectiveChipLabel: {
+    color: '#c9a86a',
+    fontStyle: 'normal',
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  objectiveChipSubtitle: {
+    color: '#7a705c',
+    fontSize: 10,
+    lineHeight: 14,
+    marginTop: 2,
+    letterSpacing: 0.5,
   },
   vendorBanner: {
     flexDirection: 'row',
