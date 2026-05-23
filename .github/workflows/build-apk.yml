@@ -193,6 +193,118 @@ jobs:
               -dname "CN=Tartaria Realms Debug,O=HotAtticGames,C=US"
           fi
 
+      # Production AAB requires a real release-mode signature — Play Store
+      # rejects anything signed with the debug keystore. This step is a
+      # no-op for the preview/APK profile (APK ships as debug-signed for
+      # sideload testing). For production:
+      #   1. Decode the upload keystore from base64 in GitHub Secrets.
+      #   2. Append signing properties to gradle.properties so Expo's
+      #      generated android/app/build.gradle picks them up via
+      #      project.hasProperty('MYAPP_UPLOAD_STORE_FILE') idiom.
+      #   3. Patch the generated android/app/build.gradle so:
+      #        a. signingConfigs gains a 'release' block reading the
+      #           properties.
+      #        b. buildTypes.release.signingConfig points at the new
+      #           release block instead of the debug fallback.
+      # If ANDROID_KEYSTORE_BASE64 is empty, FAIL the build — the
+      # debug-signed AAB is unusable on Play Store, no point continuing.
+      - name: Configure release signing (production AAB only)
+        if: steps.meta.outputs.profile == 'production'
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -z "${ANDROID_KEYSTORE_BASE64:-}" ]; then
+            echo "::error::ANDROID_KEYSTORE_BASE64 secret is empty. Production AAB cannot ship without a release upload key."
+            echo "::error::Add the four ANDROID_* secrets (see PR description for setup), then re-run."
+            exit 1
+          fi
+
+          KEYSTORE_PATH=android/app/tartaria-upload.keystore
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
+          echo "Keystore decoded: $(stat -c%s "$KEYSTORE_PATH") bytes"
+
+          # Sanity — keystore must be a valid JKS.
+          keytool -list -keystore "$KEYSTORE_PATH" \
+            -storepass "$ANDROID_KEYSTORE_PASSWORD" > /dev/null 2>&1 \
+            || { echo "::error::Keystore did not unlock. ANDROID_KEYSTORE_PASSWORD may be wrong."; exit 1; }
+
+          # Append signing properties to android/gradle.properties so the
+          # generated build.gradle's project.hasProperty(...) checks see them.
+          [ -n "$(tail -c1 android/gradle.properties)" ] && echo "" >> android/gradle.properties
+          {
+            echo "MYAPP_UPLOAD_STORE_FILE=tartaria-upload.keystore"
+            echo "MYAPP_UPLOAD_KEY_ALIAS=$ANDROID_KEY_ALIAS"
+            echo "MYAPP_UPLOAD_STORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD"
+            echo "MYAPP_UPLOAD_KEY_PASSWORD=$ANDROID_KEY_PASSWORD"
+          } >> android/gradle.properties
+
+          # Patch android/app/build.gradle: add a release signing config
+          # block and repoint buildTypes.release.signingConfig at it.
+          # Expo's generated template has:
+          #     signingConfigs {
+          #         debug { ... }
+          #     }
+          #     buildTypes {
+          #         debug { signingConfig signingConfigs.debug }
+          #         release {
+          #             signingConfig signingConfigs.debug   ← we replace this
+          #             ...
+          #         }
+          #     }
+          BG=android/app/build.gradle
+          if ! grep -q "signingConfigs.debug" "$BG"; then
+            echo "::error::Expected 'signingConfigs.debug' in $BG. Expo prebuild template changed; the patch needs updating."
+            exit 1
+          fi
+
+          # Insert release signing config inside signingConfigs { ... } block.
+          # Match the closing } of the debug block by looking for the next }
+          # after 'debug {' inside signingConfigs.
+          python3 <<'PY'
+          import re, pathlib
+          p = pathlib.Path("android/app/build.gradle")
+          src = p.read_text()
+          release_block = """
+              release {
+                  if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
+                      storeFile file(MYAPP_UPLOAD_STORE_FILE)
+                      storePassword MYAPP_UPLOAD_STORE_PASSWORD
+                      keyAlias MYAPP_UPLOAD_KEY_ALIAS
+                      keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+                  }
+              }
+          """.rstrip() + "\n"
+          # Find the signingConfigs block and insert the release sub-block
+          # right before its closing brace.
+          pattern = re.compile(r"(signingConfigs\s*\{[^}]*?debug\s*\{[^}]*?\}\s*)(\})", re.DOTALL)
+          m = pattern.search(src)
+          if not m:
+              raise SystemExit("Could not locate signingConfigs.debug block in build.gradle")
+          src = src[:m.end(1)] + release_block + src[m.start(2):]
+          # Repoint buildTypes.release.signingConfig from debug to release.
+          # The template line is exactly: 'signingConfig signingConfigs.debug'
+          # appearing inside a 'release { ... }' block. We replace ONLY the
+          # one inside buildTypes.release, leaving the debug-build-type one alone.
+          new_src, n = re.subn(
+              r"(buildTypes\s*\{[^}]*?release\s*\{[^}]*?signingConfig\s+)signingConfigs\.debug",
+              r"\1signingConfigs.release",
+              src, count=1, flags=re.DOTALL
+          )
+          if n != 1:
+              raise SystemExit("Could not repoint buildTypes.release.signingConfig")
+          p.write_text(new_src)
+          print("✓ build.gradle patched: signingConfigs.release added, release build-type repointed.")
+          PY
+
+          echo "--- signingConfigs block (post-patch) ---"
+          sed -n '/signingConfigs/,/^    }$/p' "$BG" | head -40
+          echo "--- buildTypes.release (post-patch) ---"
+          sed -n '/buildTypes/,/^    }$/p' "$BG" | head -40
+
       - name: Gradle build (Tartaria Realms)
         working-directory: android
         env:
@@ -211,6 +323,41 @@ jobs:
               -Pandroid.kotlinVersion=1.9.25 \
               -PkotlinVersion=1.9.25
           fi
+
+      # Production AAB MUST be release-signed. We assert here instead of
+      # discovering it at Play Store upload time. jarsigner -verify on the
+      # AAB exits non-zero if signatures are missing; we also grep the
+      # certificate CN to make sure it ISN'T the debug fallback
+      # ("CN=Tartaria Realms Debug" was hardcoded in the debug.keystore
+      # step). Either failure mode is a hard build failure.
+      - name: Verify AAB is release-signed (production only)
+        if: steps.meta.outputs.profile == 'production'
+        run: |
+          set -euo pipefail
+          AAB=$(find android/app/build/outputs/bundle -name "*.aab" | head -1)
+          if [ -z "$AAB" ]; then
+            echo "::error::No .aab found after bundleRelease."
+            exit 1
+          fi
+          echo "Verifying signature on $AAB"
+
+          if ! jarsigner -verify "$AAB" > /dev/null 2>&1; then
+            echo "::error::AAB failed jarsigner verification — Play Store will reject."
+            jarsigner -verify -verbose -certs "$AAB" | tail -40 || true
+            exit 1
+          fi
+
+          # Inspect the signer certificate's CN. If we see the debug CN
+          # we fell back to the debug keystore, which Play Store rejects.
+          CERT_INFO=$(jarsigner -verify -verbose -certs "$AAB" 2>&1 | grep -A1 "X.509" | head -10 || true)
+          echo "--- AAB signer certificate(s) ---"
+          echo "$CERT_INFO"
+          if echo "$CERT_INFO" | grep -q "Tartaria Realms Debug"; then
+            echo "::error::AAB was signed with the DEBUG keystore (CN=Tartaria Realms Debug)."
+            echo "::error::Either the release-signing patch did not fire, or signingConfigs.release fell through to debug."
+            exit 1
+          fi
+          echo "✓ AAB is release-signed (not the debug fallback)."
 
       - name: Stage Tartaria Realms artifact
         id: artifact
