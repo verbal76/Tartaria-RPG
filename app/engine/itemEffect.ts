@@ -67,6 +67,10 @@ export type ItemEffect =
       buffStat?: StatKey;
       buffBonus?: number;
       buffDuration?: number;
+      // v2.4.1 (OTA 021) — strip the bleed status on consumption.
+      // First Aid Kit promises this in its description; opens the
+      // door to other patch/salve items declaring the same flag.
+      cureBleed?: boolean;
     }
   | { kind: 'gate'; unlocks: GateKind }
   | {

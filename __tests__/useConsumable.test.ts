@@ -88,9 +88,10 @@ describe('use <consumable> dispatch', () => {
     const p1 = store.getState().player!;
     const remainingFaks = p1.inventory.find((i) => i.name === 'First Aid Kit')?.quantity ?? 0;
     expect(remainingFaks).toBe(1);
-    // HP should have risen by at least 1, at most 6 (1d6).
-    expect(p1.hp).toBeGreaterThan(5);
-    expect(p1.hp).toBeLessThanOrEqual(11);
+    // v2.4.1 (OTA 021) — First Aid Kit now declares an effect block
+    // (+25 HP, +10 stamina, cureBleed). From 5/30 with 25 room the
+    // heal lands the player at 30 HP (clamped to hpMax).
+    expect(p1.hp).toBe(30);
     // No pending dice roll should have been queued — the consumable
     // path bypasses the skill check.
     expect(store.getState().pendingRolls).toBeNull();

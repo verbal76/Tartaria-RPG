@@ -633,8 +633,26 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     // location there. Legacy saves predating WORLD_MAP_CENTER export
     // used 4 as a placeholder; on rehydrate snap to center so the
     // first step walks from the right tile.
-    mapX: p.mapX ?? WORLD_MAP_CENTER_X,
-    mapY: p.mapY ?? WORLD_MAP_CENTER_Y,
+    //
+    // v2.4.1 (OTA 021) — grid expanded 21×21 → 41×41 (center 10,10 →
+    // 20,20). Existing saves persist mapX/mapY calibrated to the old
+    // (10,10) center; if we leave them, the marker math treats
+    // mapX=10 as "10 tiles NW of the new center" and the marker
+    // jumps off the current location's anchor. Detect saves that
+    // are clearly on the OLD calibration (mapX or mapY <= 14 — the
+    // old grid's max valid index was 20 but the canonical "just
+    // arrived" value was 10) and snap to the new center. Saves
+    // already at the new center pass through untouched.
+    mapX: (() => {
+      if (typeof p.mapX !== 'number') return WORLD_MAP_CENTER_X;
+      if (p.mapX <= 14 && (typeof p.mapY !== 'number' || p.mapY <= 14)) return WORLD_MAP_CENTER_X;
+      return p.mapX;
+    })(),
+    mapY: (() => {
+      if (typeof p.mapY !== 'number') return WORLD_MAP_CENTER_Y;
+      if (p.mapY <= 14 && (typeof p.mapX !== 'number' || p.mapX <= 14)) return WORLD_MAP_CENTER_Y;
+      return p.mapY;
+    })(),
   };
 }
 
@@ -4145,6 +4163,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 buffStat?: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma';
                 buffBonus?: number;
                 buffDuration?: number;
+                cureBleed?: boolean;
               }
             : null;
           const hpRoom = player.hpMax - player.hp;
@@ -4184,6 +4203,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // stat so the "Wild Carrot (+1 WIS) fades." line is readable.
           let newStatusEffects = player.statusEffects ?? [];
           let buffLine = '';
+          // v2.4.1 (OTA 021) — cureBleed strips the bleed status when
+          // a medical consumable promises it (First Aid Kit).
+          let bleedCured = false;
+          if (fx && fx.cureBleed) {
+            const hadBleed = newStatusEffects.some((e) => e.kind === 'bleed');
+            if (hadBleed) {
+              newStatusEffects = newStatusEffects.filter((e) => e.kind !== 'bleed');
+              bleedCured = true;
+            }
+          }
           if (fx && fx.buffStat && fx.buffBonus && fx.buffDuration && fx.buffBonus > 0 && fx.buffDuration > 0) {
             const buff: StatusEffect = {
               kind: 'food_buff',
@@ -4214,8 +4243,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const tailParts: string[] = [];
           if (heal > 0) tailParts.push(`+${heal} HP`);
           if (stamGain > 0) tailParts.push(`+${stamGain} stamina`);
+          if (bleedCured) tailParts.push('bleeding stopped');
           const tail = tailParts.length > 0
-            ? `${tailParts.join(', ')} recovered.`
+            ? `${tailParts.join(', ')}.`
             : (fx ? 'You were already topped up — the bite holds nothing back.' : 'You were already at full strength — the ration steadies you, nothing more.');
           // OTA 23-010 — pick the right verb for the item. You eat
           // food, you apply a first aid kit, you drink a vial. The
