@@ -40,14 +40,40 @@ interface HubData {
   hubId: string;
   hubName: string;
   hubLocationId: string;
+  // v2.4.1 (OTA 030) — same room layout reused across all 9 factions.
+  // hubLocationIds lists every macro-location where the hub interior
+  // should render; factionHubNames maps the player's factionId to the
+  // display title shown on the minimap + opening narrative ("Monarch
+  // Court" for Mud Monarchs, "Order Cloister" for Forgotten Order,
+  // etc.). The room layout itself (rooms[]) is shared.
+  hubLocationIds?: string[];
+  factionHubNames?: Record<string, string>;
   rooms: HubRoom[];
 }
 
 export const HUB: HubData = staticHubData as HubData;
 
-/** True when the given location id is the hub's macro location. */
+const HUB_LOCATION_SET: ReadonlySet<string> = new Set(
+  HUB.hubLocationIds ?? [HUB.hubLocationId],
+);
+
+/** True when the given location id is any faction's hub macro location.
+ *  v2.4.1 (OTA 030) — was single-location (tartarian_outskirts only);
+ *  now any of the 9 faction-start tiles renders the hub interior. */
 export function isHubLocation(locationId: string | null | undefined): boolean {
-  return locationId === HUB.hubLocationId;
+  if (!locationId) return false;
+  return HUB_LOCATION_SET.has(locationId);
+}
+
+/** Display title for the hub minimap + opening narrative, scoped to
+ *  the player's faction. Falls back to "Reclaimers' Outpost" if the
+ *  factionId is missing or unmapped (legacy saves predating per-
+ *  faction hubs). */
+export function hubNameForFaction(factionId: string | null | undefined): string {
+  const fallback = HUB.hubName;
+  if (!factionId) return fallback;
+  const map = HUB.factionHubNames ?? {};
+  return map[factionId] ?? fallback;
 }
 
 export function findHubRoom(roomId: string | null | undefined): HubRoom | null {

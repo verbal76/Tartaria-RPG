@@ -29,8 +29,19 @@ describe('isHubLocation', () => {
   it('matches the configured hub location id', () => {
     expect(isHubLocation('tartarian_outskirts')).toBe(true);
   });
-  it('rejects other ids and falsy values', () => {
-    expect(isHubLocation('drakova')).toBe(false);
+  it('v2.4.1 (OTA 030) — also matches every faction-start tile', () => {
+    // Same interior layout reused across all 9 factions; isHubLocation
+    // returns true for any of the 6 unique macro-locations that serve
+    // as a faction's starting tile (drakova is the Revivalist hub).
+    expect(isHubLocation('drakova')).toBe(true);
+    expect(isHubLocation('varakush')).toBe(true);
+    expect(isHubLocation('asgardar')).toBe(true);
+    expect(isHubLocation('buried_cities')).toBe(true);
+    expect(isHubLocation('giant_vault')).toBe(true);
+  });
+  it('rejects non-hub ids and falsy values', () => {
+    expect(isHubLocation('cradle_of_dusk')).toBe(false);
+    expect(isHubLocation('voronov')).toBe(false);
     expect(isHubLocation(null)).toBe(false);
     expect(isHubLocation(undefined)).toBe(false);
   });

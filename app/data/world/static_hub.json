@@ -1,8 +1,27 @@
 {
-  "description": "HANDOFF #16 — hand-authored starting hub. Lays out 15 rooms with hardcoded directional pointers and fixed NPC anchors so the player has a recognizable home base before they hit the procedural world. Reads into the engine via the same WorldMemory.visitedRooms keys that #15 established; first integration pass surfaces these via the `look` description + a 'return to camp' shortcut. Full state restoration (each room remembers exactly its loot/enemy state) lands when the engine consumes hub.rooms as ground truth for room scenes instead of just metadata.",
+  "description": "HANDOFF #16 — hand-authored starting hub. Lays out 15 rooms with hardcoded directional pointers and fixed NPC anchors so the player has a recognizable home base before they hit the procedural world. v2.4.1 (OTA 030): the same room layout is now reused across all 9 factions; only the displayed minimap title (hubName) varies per faction. factionHubNames + hubLocationIds drive the per-faction skin.",
   "hubId": "reclaimers_outpost",
   "hubName": "Reclaimers' Outpost",
   "hubLocationId": "tartarian_outskirts",
+  "hubLocationIds": [
+    "tartarian_outskirts",
+    "varakush",
+    "asgardar",
+    "buried_cities",
+    "giant_vault",
+    "drakova"
+  ],
+  "factionHubNames": {
+    "reclaimers_guild": "Reclaimers' Outpost",
+    "forgotten_order": "Order Cloister",
+    "mud_monarchs": "Monarch Court",
+    "true_tartarians": "Catacomb Hall",
+    "eternal_dynasty": "Dynasty Spire",
+    "conspiracy_architects": "Architect's Cell",
+    "servants_of_giants": "Tomb Vigil",
+    "stone_builders": "Stone Builders' Workshop",
+    "tartarian_revivalists": "Revivalist Camp"
+  },
   "rooms": [
     {
       "id": "outpost_gate",

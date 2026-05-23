@@ -120,6 +120,7 @@ import {
   isHubLocation,
   findHubRoom,
   hubEntryRoomId,
+  hubNameForFaction,
   resolveHubTravel,
   isLeaveHubCommand,
 } from '../engine/hub';
@@ -2049,7 +2050,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // entirely — its location-pool prose doesn't apply when you're
     // standing inside a hand-authored room.
     const sceneText = hubRoom
-      ? `${HUB.hubName} — ${hubRoom.name}. ${hubRoom.description}`
+      ? `${hubNameForFaction(player.factionId)} — ${hubRoom.name}. ${hubRoom.description}`
       : buildScene({ weather, location, hazard, enemy: sceneEnemy, quest: player.activeQuests[0] });
     // Opening scene — emit a three-paragraph introduction narrative as
     // SEPARATE log entries so AdventureFeed renders real paragraph
@@ -2070,7 +2071,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         location,
         hubRoomName: hubRoom?.name ?? null,
         hubRoomDescription: hubRoom?.description ?? null,
-        hubName: HUB.hubName,
+        hubName: hubNameForFaction(player.factionId),
       });
       get().appendLog('world', p1);
       get().appendLog('world', p2);
