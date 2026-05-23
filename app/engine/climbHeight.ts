@@ -25,10 +25,26 @@ const CLIMB_HEIGHT: Record<string, number> = {
   cliff: 5,
 };
 
+// v2.4.1 (OTA 023) — word-boundary match. `n.includes(k)` was matching
+// `rail` inside `trail`, which made "dust trail" a tier-1 climbable
+// (the player got a free climb-top loot roll on what should have been
+// a non-climbable scene noun). Word boundaries require the pattern to
+// appear as a discrete word.
+const HEIGHT_REGEX_CACHE = new Map<string, RegExp>();
+function heightPatternMatches(noun: string, pattern: string): boolean {
+  let re = HEIGHT_REGEX_CACHE.get(pattern);
+  if (!re) {
+    const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    re = new RegExp(`\\b${escaped}\\b`, 'i');
+    HEIGHT_REGEX_CACHE.set(pattern, re);
+  }
+  return re.test(noun);
+}
+
 export function climbHeightFor(noun: string): number {
   const n = noun.toLowerCase();
   for (const k of Object.keys(CLIMB_HEIGHT)) {
-    if (n.includes(k)) return CLIMB_HEIGHT[k]!;
+    if (heightPatternMatches(n, k)) return CLIMB_HEIGHT[k]!;
   }
   return 2; // sensible default for unfamiliar climbables
 }

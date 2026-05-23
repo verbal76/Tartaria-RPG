@@ -97,6 +97,33 @@ const TAG_RULES: TagRule[] = [
 
 const TAG_CACHE = new Map<string, Set<InteractionTag>>();
 
+// v2.4.1 (OTA 023) — word-boundary match.
+//
+// The prior `lower.includes(pat)` was too greedy: short patterns
+// embedded inside larger nouns triggered false positives. Examples:
+//   "dust trail" → matched "rail" → climbable + tier-1 climb height
+//                  → player could climb a footprint trail (visible
+//                  bug in Bob's session log at 04:47:40)
+//   "rope coil"  → matched "rope" — still correct
+//   "pillar"     → would match "wall" via "wall" being in "pillar"?
+//                  no, "pillar".includes("wall") is false; but
+//                  "wall" appears inside compound nouns elsewhere.
+//
+// Word-boundary regex requires the pattern to appear as a discrete
+// word (surrounded by start-of-string, end-of-string, or a non-word
+// character). Cached per pattern to avoid re-compiling.
+const PATTERN_REGEX_CACHE = new Map<string, RegExp>();
+function patternMatches(noun: string, pattern: string): boolean {
+  let re = PATTERN_REGEX_CACHE.get(pattern);
+  if (!re) {
+    // Escape regex meta-chars in the pattern (none today, but safe).
+    const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    re = new RegExp(`\\b${escaped}\\b`, 'i');
+    PATTERN_REGEX_CACHE.set(pattern, re);
+  }
+  return re.test(noun);
+}
+
 export function getInteractionTags(noun: string): Set<InteractionTag> {
   if (!noun) return new Set();
   const lower = noun.toLowerCase().trim();
@@ -106,7 +133,7 @@ export function getInteractionTags(noun: string): Set<InteractionTag> {
   const tags = new Set<InteractionTag>();
   for (const rule of TAG_RULES) {
     for (const pat of rule.patterns) {
-      if (lower.includes(pat)) {
+      if (patternMatches(lower, pat)) {
         tags.add(rule.tag);
         break;
       }

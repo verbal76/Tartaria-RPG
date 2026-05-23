@@ -12213,11 +12213,52 @@ function narrateCasualLook(
     ? makeRoomKey(player.currentLocationId, scene.microMicroId, player.mapX, player.mapY)
     : null;
   const lookRoom = lookRoomKey ? get().worldMemory.visitedRooms?.[lookRoomKey] : null;
-  const lookSearched = new Set((lookRoom?.searchedAmbientNouns ?? []).map((n) => n.toLowerCase()));
+  // v2.4.1 (OTA 023) — robust consumed-noun detection. The prior
+  // version exact-matched against searchedAmbientNouns, which missed
+  // two real cases from Bob's session log:
+  //   1) Bidirectional substring — the take/salvage path writes the
+  //      FULL-POOL ambient match, which can differ from the DISPLAYED
+  //      noun (e.g. pool has "rope coil", displayed is "rope" — the
+  //      old exact match couldn't see they were the same noun).
+  //   2) Inventory self-heal — if the displayed noun resolves to a
+  //      catalog item the player is already carrying, treat it as
+  //      consumed even if searchedAmbientNouns somehow doesn't
+  //      record it (race, save migration, stale state).
+  // Mirrors the chip UI's isAmbientConsumed at ExplorationScreen so
+  // the "You see:" list matches the chip dim state visually.
+  const lookSearched = (lookRoom?.searchedAmbientNouns ?? []).map((n) => n.toLowerCase());
+  const isConsumedForLook = (displayNoun: string): boolean => {
+    const lower = displayNoun.toLowerCase();
+    // (1) bidirectional substring against searchedAmbientNouns.
+    const recorded = lookSearched.some(
+      (s) => s === lower || s.includes(lower) || lower.includes(s),
+    );
+    if (recorded) {
+      // Honor engine dedup; but if the noun resolves to a real
+      // catalog item AND the player no longer owns it (dropped /
+      // sold), allow the noun back as re-takeable. Mirrors the
+      // self-heal in takeAmbientNoun.
+      const cat = findCatalogItem(displayNoun);
+      if (!cat) return true;
+      const ownsIt = !!player && player.inventory.some(
+        (i) => i.name.toLowerCase() === cat.name.toLowerCase() && i.quantity > 0,
+      );
+      return ownsIt;
+    }
+    // (2) inventory self-heal — searchedAmbientNouns may have missed
+    // a write (pre-fix bundle, race, etc.); if the player is already
+    // carrying the catalog item this noun would grant, treat as
+    // consumed so the "You see:" list stays honest.
+    const cat = findCatalogItem(displayNoun);
+    if (!cat || !player) return false;
+    return player.inventory.some(
+      (i) => i.name.toLowerCase() === cat.name.toLowerCase() && i.quantity > 0,
+    );
+  };
   const interactables: string[] = [];
   const source = scene.displayedAmbientNouns ?? (scene.ambientNouns ?? []).slice(0, 8);
   for (const n of source) {
-    if (lookSearched.has(n.toLowerCase())) continue;
+    if (isConsumedForLook(n)) continue;
     if (!interactables.includes(n)) interactables.push(n);
   }
   if (interactables.length > 0) {
