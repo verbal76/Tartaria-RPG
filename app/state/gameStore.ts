@@ -3497,7 +3497,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // the generic area-search pool when no pool matches.
             const salvage = rollSalvagePool(harvestAmbient);
             const outcome = salvage ?? rollAreaSearch(harvestAmbient);
-            get().appendLog('world', outcome.line);
+            // OTA 23-015 — `kind: 'nothing'` no longer leaves the noun
+            // unconsumed. Playtest log: a player typed `salvage gate`
+            // six times in a row, getting the "still here for another
+            // pass" narration each time until finally rolling a Stick.
+            // Salvage is one shot per noun now — failure consumes the
+            // noun too, with one of 10 flavor lines from scrapEngine.
+            // (The retry-friendly NOTHING_LINES are kept for the
+            // generic SEARCH path, which IS meant to be re-tried.)
+            if (outcome.kind === 'nothing') {
+              get().appendLog('world', pickScrapFailureLine(harvestAmbient));
+            } else {
+              get().appendLog('world', outcome.line);
+            }
             // Dedupe only on outcomes that actually CONSUMED the noun
             // Dispatch first, then dedupe based on whether anything
             // actually produced. Stress-test caught this: hook outcomes
@@ -3505,7 +3517,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // unresolved hook — but the dedupe still fired, consuming
             // the noun for no observable benefit (~50% of salvage
             // attempts in long runs landed here).
-            let produced = false;
+            let produced = outcome.kind === 'nothing';
             if (outcome.kind === 'material') {
               const itemCat = lookupCraftedItem(outcome.itemName!);
               const qty = ('quantity' in outcome && typeof outcome.quantity === 'number')
@@ -5380,10 +5392,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   ? { player: { ...s.player, inventory: mergeOrPushItem(s.player.inventory, grant) } }
                   : s,
               );
+              // OTA 23-015 — when the climbed noun is itself a rope /
+              // line / chain (no crevices on a rope), narrate the
+              // find at the ANCHOR POINT instead of "tucked into a
+              // crack at the top of the rope." Same rope-shaped
+              // detection used in the climb-narration variants above.
+              const tgtIsRope = /\b(rope|line|chain|cable|cord)\b/.test(tgt.toLowerCase());
               const flavor =
                 drop.name === "Reclaimer's Rope"
                   ? `✦ ${drop.name} (${drop.rarity}) — anchored to an old piton at the top of the ${tgt}. Someone climbed this before and left their line for the next pair of hands.`
-                  : `✦ ${drop.name} (${drop.rarity}) — tucked into a crack at the top of the ${tgt}.`;
+                  : tgtIsRope
+                    ? `✦ ${drop.name} (${drop.rarity}) — wedged into the rock face where the ${tgt} is tied off, just within arm's reach of the anchor.`
+                    : `✦ ${drop.name} (${drop.rarity}) — tucked into a crack at the top of the ${tgt}.`;
               get().appendLog('reward', flavor);
             }
           } else {
