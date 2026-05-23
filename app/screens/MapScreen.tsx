@@ -56,7 +56,10 @@ const ATLAS_H = 768;
 
 // Gesture clamps.
 const MIN_SCALE = 0.8;
-const MAX_SCALE = 5;
+// OTA 060 — no zoom-in cap. Player explicitly asked for unrestricted
+// pinch-in so they can read fine atlas details (timeline ribbon
+// labels, outpost interior diagram, etc.). MIN_SCALE remains so the
+// map can't be shrunk to invisibility.
 const DOUBLE_TAP_MS = 280;
 
 function distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
@@ -113,33 +116,74 @@ export function MapScreen() {
     translateY.setValue(ty);
   };
 
-  // OTA 056 — fill-height-by-default. The atlas asset is landscape
-  // (1408 × 768) but the available window after header+footer is
-  // portrait on phone screens. resizeMode='contain' alone leaves
-  // half the box empty above/below the image. Instead we compute a
-  // baseline transform.scale that makes the rendered image height
-  // match the box height — image overflows horizontally; user pans
-  // sideways or pinches out to see the rest. Stored in a ref so
-  // resetTransform springs back to this scale rather than 1.0.
+  // OTA 056/060 — fill-height-by-default + auto-center on the
+  // marker. The atlas asset is landscape (1408 × 768) but the
+  // available window is portrait on phones. resizeMode='contain'
+  // alone leaves half the box empty above/below; the baseline
+  // scale fills the height. Then OTA 060 also auto-pans so the
+  // marker (the player's current location) sits in the box
+  // center on open — without it, a player anywhere except the
+  // image's geometric center would have their marker pushed
+  // off-screen by the baseline scale.
   const baselineScale = useRef(1);
+
+  // Null-safe atlas-position computation. Hoisted above the
+  // useEffect so the auto-center has access to it. The early-return
+  // for missing player happens below the hooks — keeping hook order
+  // stable across renders (Rules of Hooks).
+  const safeMapX = typeof player?.mapX === 'number' ? player.mapX : WORLD_MAP_CENTER_X;
+  const safeMapY = typeof player?.mapY === 'number' ? player.mapY : WORLD_MAP_CENTER_Y;
+  const safeSeed = player
+    ? (player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`)
+    : 'no-player';
+  const safeWorldMap = player
+    ? generateWorldMap(safeSeed, player.currentLocationId)
+    : { positions: {} as Record<string, { x: number; y: number }>, tiles: [] };
+  const safeAtlasPos = interpolateAtlasPosition(safeMapX, safeMapY, safeWorldMap.positions);
 
   useEffect(() => {
     if (!imgBox) return;
     const imgAspect = ATLAS_W / ATLAS_H;
     const boxAspect = imgBox.width / imgBox.height;
-    // When box is narrower than image (typical phone portrait), the
-    // image is letterboxed top/bottom at scale=1. Multiply the
-    // scale by (boxAspect-driven factor) so the image fills the
-    // box height.
     const fill = boxAspect < imgAspect ? imgAspect / boxAspect : 1;
     baselineScale.current = fill;
-    // Only snap to the baseline on first layout — if the user has
-    // already pinched/panned away, don't yank them back.
+    // Only snap to the baseline + center on first layout — if the
+    // user has already pinched/panned away, don't yank them back.
     if (scaleRef.current === 1 && txRef.current === 0 && tyRef.current === 0) {
+      // Compute marker's layout position inside the box at scale=1
+      // (matches the dot positioning math in the render body).
+      let renderedW: number;
+      let renderedH: number;
+      let offsetX: number;
+      let offsetY: number;
+      if (boxAspect > imgAspect) {
+        renderedH = imgBox.height;
+        renderedW = imgBox.height * imgAspect;
+        offsetX = (imgBox.width - renderedW) / 2;
+        offsetY = 0;
+      } else {
+        renderedW = imgBox.width;
+        renderedH = imgBox.width / imgAspect;
+        offsetX = 0;
+        offsetY = (imgBox.height - renderedH) / 2;
+      }
+      const markerLayoutX = offsetX + renderedW * safeAtlasPos.fx;
+      const markerLayoutY = offsetY + renderedH * safeAtlasPos.fy;
+      // To put the marker at the box center after scale=fill, we
+      // counter-translate by -fill × (marker layout offset from
+      // box center). RN's transform [translate, ..., scale] means
+      // scale is applied around the View's center, so we offset
+      // the result with translate.
+      const initTX = -fill * (markerLayoutX - imgBox.width / 2);
+      const initTY = -fill * (markerLayoutY - imgBox.height / 2);
       scaleRef.current = fill;
+      txRef.current = initTX;
+      tyRef.current = initTY;
       scale.setValue(fill);
+      translateX.setValue(initTX);
+      translateY.setValue(initTY);
     }
-  }, [imgBox, scale]);
+  }, [imgBox, scale, translateX, translateY, safeAtlasPos.fx, safeAtlasPos.fy]);
 
   const resetTransform = () => {
     const target = baselineScale.current;
@@ -205,7 +249,9 @@ export function MapScreen() {
           // Pinch — scale ratio drives zoom, midpoint drives pan.
           const newDist = distance(ts[0]!, ts[1]!);
           const ratio = newDist / startPinchDist.current;
-          const nextScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, startScale.current * ratio));
+          // OTA 060 — no upper bound. Pinch in as far as the player
+          // wants. MIN_SCALE preserved so they can't shrink to zero.
+          const nextScale = Math.max(MIN_SCALE, startScale.current * ratio);
           const tx = startTx.current + gestureState.dx;
           const ty = startTy.current + gestureState.dy;
           const clamped = clampTranslate(tx, ty, nextScale, imgBox);
@@ -236,8 +282,11 @@ export function MapScreen() {
     );
   }
 
-  const mapX = typeof player.mapX === 'number' ? player.mapX : WORLD_MAP_CENTER_X;
-  const mapY = typeof player.mapY === 'number' ? player.mapY : WORLD_MAP_CENTER_Y;
+  // Reuse the hoisted safeMapX/safeMapY (computed before the
+  // useEffect for the auto-centering). 'player' is non-null past
+  // the early-return above.
+  const mapX = safeMapX;
+  const mapY = safeMapY;
   const dx = mapX - WORLD_MAP_CENTER_X;
   const dy = mapY - WORLD_MAP_CENTER_Y;
   const tiles = Math.abs(dx) + Math.abs(dy);
@@ -257,10 +306,10 @@ export function MapScreen() {
   //     procedurally lands halfway visually.
   //   - The dot is ALWAYS plotted — there's no "between locations"
   //     fallback branch.
-  const seed = player.mapSeed
-    ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
-  const worldMap = generateWorldMap(seed, player.currentLocationId);
-  const atlasPos = interpolateAtlasPosition(mapX, mapY, worldMap.positions);
+  // Reuse the hoisted safe* values computed before the useEffect.
+  // Both branches arrive at the same numbers since 'player' is non-
+  // null past the early-return guard below.
+  const atlasPos = safeAtlasPos;
 
   const currentLocation = LOCATIONS.find((l) => l.id === player.currentLocationId) ?? null;
   const onDepictedTile = !!atlasCoordForLocation(player.currentLocationId);
