@@ -8,7 +8,13 @@ import { findFactionQuestById, FACTION_QUESTS } from '../engine/factionQuests';
 import { FACTIONS } from '../engine/factions';
 import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS } from '../engine/collectables';
 import { describeWhisperStage, describeWhisperTitle, findChain } from '../engine/whispers';
-import { ensureMainQuest, phaseLabel, phaseHint } from '../engine/mainQuest';
+import {
+  ensureMainQuest,
+  phaseLabel,
+  phaseHint,
+  LOST_CAPITAL_LOCATIONS,
+  coreGateNextAction,
+} from '../engine/mainQuest';
 
 function MilestoneStat({ label, value, next, suffix }: { label: string; value: number; next: number; suffix: string }) {
   const toNext = next - (value % next);
@@ -155,6 +161,17 @@ export function ContractsScreen() {
             <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE</Text>
             <Text style={styles.mainQuestPhase}>{phaseLabel(mq.phase)}</Text>
             <Text style={styles.mainQuestHint}>{phaseHint(mq.phase, recoveredCount)}</Text>
+            {(() => {
+              // v2.4.1 (OTA 035) — when the player is standing at an
+              // unrecovered Lost Capital, surface the faction's
+              // next-action prompt as a second hint line.
+              if (mq.phase !== 'revelation' && mq.phase !== 'cores') return null;
+              const here = player.currentLocationId;
+              if (!LOST_CAPITAL_LOCATIONS.includes(here)) return null;
+              if (mq.coresRecovered.includes(here)) return null;
+              const next = coreGateNextAction(player.factionId);
+              return <Text style={styles.mainQuestNextAction}>→ At this Capital: {next}.</Text>;
+            })()}
             {mq.phase === 'choice' && (
               <View style={styles.mainQuestChoiceRow}>
                 <TouchableOpacity
@@ -694,6 +711,13 @@ const styles = StyleSheet.create({
     color: '#cdbf99',
     fontSize: 12,
     lineHeight: 18,
+  },
+  mainQuestNextAction: {
+    color: '#c9a86a',
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 4,
+    fontWeight: '600',
   },
   mainQuestChoiceRow: {
     flexDirection: 'row',

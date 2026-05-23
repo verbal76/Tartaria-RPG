@@ -37,6 +37,7 @@ import type {
   MainQuestPhase,
   MainQuestEnding,
   PlayerCharacter,
+  Intent,
 } from './types';
 
 /** The 5 Lost Capitals canonically house one Aetheric Core each. */
@@ -252,6 +253,110 @@ export function phaseHint(phase: MainQuestPhase, coresRecovered: number): string
 /** Capital ids the player has NOT yet recovered a Core from. */
 export function remainingCapitals(state: MainQuestState): string[] {
   return LOST_CAPITAL_LOCATIONS.filter((id) => !state.coresRecovered.includes(id));
+}
+
+// v2.4.1 (OTA 035) — Phase 2: per-faction Core-recovery gates.
+//
+// Replaces the OTA 033 auto-grant-on-arrival with intentional play.
+// On arrival at a Lost Capital the engine logs a faction-specific
+// hint telling the player what verb their faction uses to coax the
+// Core out. When the player submits an action whose intent matches
+// the gate, the Core grants and the universal "core_recovered"
+// narration plays.
+//
+// Phase 2 keeps the gate to a simple intent-match check. Phase 3+
+// can layer skill-check DCs / item requirements / multi-step
+// sequences on top without rewiring the call site.
+interface CoreGate {
+  /** Intents that count as the faction's recovery action. */
+  intents: Intent[];
+  /** Hint logged when the player arrives at a Capital. */
+  hint: (capitalName: string) => string;
+  /** Short label for the Contracts UI "next action" prompt. */
+  nextAction: string;
+}
+
+const CAPITAL_DISPLAY_NAME: Record<string, string> = {
+  asgardar: 'Asgardar',
+  samarran: 'Samarran',
+  nimari: 'Nimari',
+  drakova: 'Drakova',
+  voronov: 'Voronov',
+};
+
+export const FACTION_CORE_GATES: Record<string, CoreGate> = {
+  reclaimers_guild: {
+    intents: ['investigate'],
+    hint: (cap) => `(Reclaimer route — to recover the ${cap} Core, SALVAGE something here. The Aetheric housing comes loose under the right trowel.)`,
+    nextAction: 'salvage a feature here',
+  },
+  forgotten_order: {
+    intents: ['ask', 'investigate'],
+    hint: (cap) => `(Order route — to recover the ${cap} Core, READ the binding text. Ask the Capital what it remembers, or examine the scriptorium shelves.)`,
+    nextAction: 'ask or read the binding text',
+  },
+  mud_monarchs: {
+    intents: ['attack', 'diplomacy'],
+    hint: (cap) => `(Monarch route — claim the ${cap} Core by force or by tongue. The keepers will yield to threat or to a Monarch's address.)`,
+    nextAction: 'attack or address the keepers',
+  },
+  true_tartarians: {
+    intents: ['ask', 'rest'],
+    hint: (cap) => `(True Tartarian route — to recover the ${cap} Core, you must ASK the Core's spirit, or REST in vigil at its housing. Neither is hurried.)`,
+    nextAction: 'ask or rest in vigil',
+  },
+  eternal_dynasty: {
+    intents: ['diplomacy', 'ask'],
+    hint: (cap) => `(Dynasty route — speak to the ${cap} keepers in the old voice. Prove the lineage and the Core lifts.)`,
+    nextAction: 'address the keepers',
+  },
+  conspiracy_architects: {
+    intents: ['steal', 'investigate'],
+    hint: (cap) => `(Architect route — the ${cap} Core leaves with you only if it is never seen leaving. STEAL it, or investigate until you find the back-door route out.)`,
+    nextAction: 'steal or scout the egress',
+  },
+  servants_of_giants: {
+    intents: ['rest', 'cast'],
+    hint: (cap) => `(Vigil route — sit the ${cap} watch. REST at the Giant's tomb-mark, or CAST a binding prayer; the Core releases on the silent hour.)`,
+    nextAction: 'rest or cast a binding',
+  },
+  stone_builders: {
+    intents: ['cast', 'investigate'],
+    hint: (cap) => `(Builder route — Aethercraft the ${cap} Core out of its housing. Shape stone around the seat to break the bond, or investigate until the mounting plan is yours.)`,
+    nextAction: 'shape or investigate the seat',
+  },
+  tartarian_revivalists: {
+    intents: ['investigate', 'use_relic'],
+    hint: (cap) => `(Revivalist route — document the ${cap} recovery for the cell's archive. Investigate every face of the Core's housing, or use a relic to record the moment.)`,
+    nextAction: 'document the Core',
+  },
+};
+
+/** True when the player's current state + this action's intent
+ *  satisfies the faction-specific gate for the Capital they're at. */
+export function canRecoverCore(player: PlayerCharacter, parsedIntent: Intent): boolean {
+  const mq = ensureMainQuest(player.mainQuest);
+  if (mq.phase !== 'revelation' && mq.phase !== 'cores') return false;
+  if (!LOST_CAPITAL_LOCATIONS.includes(player.currentLocationId)) return false;
+  if (mq.coresRecovered.includes(player.currentLocationId)) return false;
+  const gate = FACTION_CORE_GATES[player.factionId];
+  if (!gate) return true; // unknown faction — permissive fallback
+  return gate.intents.includes(parsedIntent);
+}
+
+/** The on-arrival hint line for the player's faction at the given
+ *  Capital. Returns null when no faction gate is mapped (legacy /
+ *  unknown faction) — caller can skip the log line. */
+export function coreGateHint(factionId: string, capitalId: string): string | null {
+  const gate = FACTION_CORE_GATES[factionId];
+  if (!gate) return null;
+  const capName = CAPITAL_DISPLAY_NAME[capitalId] ?? capitalId;
+  return gate.hint(capName);
+}
+
+/** Short next-action label for the Contracts UI prompt. */
+export function coreGateNextAction(factionId: string): string {
+  return FACTION_CORE_GATES[factionId]?.nextAction ?? 'recover the Core';
 }
 
 /** Returns the next mainQuest state after a trigger fires. Returns

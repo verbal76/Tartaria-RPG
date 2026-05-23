@@ -2992,6 +2992,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
+    // v2.4.1 (OTA 035 — Phase 2) — Main quest Core-gate check.
+    // Fires BEFORE the action's normal handler runs so the Core
+    // grant + faction-flavored narration lands first; the action
+    // itself (salvage / ask / steal / etc.) then continues normally
+    // through its switch case below. The check is no-op when the
+    // player isn't at a Lost Capital, isn't in revelation/cores
+    // phase, has already recovered this Capital's Core, or didn't
+    // submit an action matching the faction's gate intents.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const mqMod = require('../engine/mainQuest');
+      if (mqMod.canRecoverCore(player, parsed.intent)) {
+        triggerMainQuest(get, set, { kind: 'core_recovered', locationId: player.currentLocationId });
+      }
+    }
+
     switch (parsed.intent) {
       case 'attack': {
         const targetEnemy = activeEnemy(currentScene);
@@ -7329,15 +7345,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     advanceActiveFactionQuests(get, set, 'travel');
     get().beginScene({ arrivalFromName: fromLocationName });
-    // v2.4.1 (OTA 033) — main quest triggers on arrival.
-    // First trigger: 'hook' → 'revelation' on the player's first
-    // Lost Capital visit. Second trigger: 'core_recovered' on any
-    // Lost Capital visit (no-op if already collected this one).
-    // Phase 1 simplification: Cores auto-grant on arrival; the
-    // faction-route flavor authored in later OTAs will add gates
-    // (combat / investigate / dialogue) between visit and grant.
+    // v2.4.1 (OTA 035 — Phase 2) — Lost Capital arrival logs the
+    // faction's recovery hint; the Core itself only grants after the
+    // player performs the faction's gate verb (see canRecoverCore
+    // checked in submitPlayerAction). Auto-grant was Phase 1
+    // shorthand and has been removed.
     triggerMainQuest(get, set, { kind: 'first_capital_visit', locationId });
-    triggerMainQuest(get, set, { kind: 'core_recovered', locationId });
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const mq = require('../engine/mainQuest');
+      if (mq.LOST_CAPITAL_LOCATIONS.includes(locationId)) {
+        const playerNow = get().player;
+        const alreadyRecovered = playerNow?.mainQuest?.coresRecovered?.includes(locationId) ?? false;
+        if (!alreadyRecovered) {
+          const hint = mq.coreGateHint(playerNow?.factionId ?? '', locationId);
+          if (hint) get().appendLog('arbiter', hint);
+        }
+      }
+    }
     if (locationId === 'mud_flood_nexus') {
       triggerMainQuest(get, set, { kind: 'reached_nexus' });
     }

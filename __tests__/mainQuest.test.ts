@@ -14,6 +14,10 @@ import {
   phaseLabel,
   phaseHint,
   remainingCapitals,
+  canRecoverCore,
+  coreGateHint,
+  coreGateNextAction,
+  FACTION_CORE_GATES,
 } from '../app/engine/mainQuest';
 import type { PlayerCharacter } from '../app/engine/types';
 
@@ -143,5 +147,108 @@ describe('mainQuest phase machine', () => {
   it('NEXUS_LOCATION_ID and LOST_CAPITAL_LOCATIONS match the engine schema', () => {
     expect(NEXUS_LOCATION_ID).toBe('mud_flood_nexus');
     expect(LOST_CAPITAL_LOCATIONS).toEqual(['asgardar', 'samarran', 'nimari', 'drakova', 'voronov']);
+  });
+
+  describe('Phase 2 — Core-recovery gates', () => {
+    it('every faction has a CoreGate mapping', () => {
+      const factions = [
+        'reclaimers_guild', 'forgotten_order', 'mud_monarchs', 'true_tartarians',
+        'eternal_dynasty', 'conspiracy_architects', 'servants_of_giants',
+        'stone_builders', 'tartarian_revivalists',
+      ];
+      for (const f of factions) {
+        expect(FACTION_CORE_GATES[f]).toBeDefined();
+        expect(FACTION_CORE_GATES[f]!.intents.length).toBeGreaterThan(0);
+        expect(coreGateNextAction(f)).toBeTruthy();
+        expect(coreGateHint(f, 'asgardar')).toMatch(/Asgardar/);
+      }
+    });
+
+    it('canRecoverCore returns true for Reclaimer + investigate at unrecovered Capital', () => {
+      const p = makePlayer({
+        currentLocationId: 'asgardar',
+        mainQuest: { phase: 'revelation', coresRecovered: [] },
+      });
+      expect(canRecoverCore(p, 'investigate')).toBe(true);
+    });
+
+    it('canRecoverCore returns false when the verb does not match faction gate', () => {
+      const p = makePlayer({
+        currentLocationId: 'asgardar',
+        mainQuest: { phase: 'revelation', coresRecovered: [] },
+      });
+      expect(canRecoverCore(p, 'attack')).toBe(false);
+    });
+
+    it('canRecoverCore returns false outside revelation/cores phase', () => {
+      const p = makePlayer({
+        currentLocationId: 'asgardar',
+        mainQuest: { phase: 'hook', coresRecovered: [] },
+      });
+      expect(canRecoverCore(p, 'investigate')).toBe(false);
+      const p2 = makePlayer({
+        currentLocationId: 'asgardar',
+        mainQuest: { phase: 'descent', coresRecovered: ['asgardar', 'samarran', 'nimari', 'drakova', 'voronov'] },
+      });
+      expect(canRecoverCore(p2, 'investigate')).toBe(false);
+    });
+
+    it('canRecoverCore returns false at non-Capital locations', () => {
+      const p = makePlayer({
+        currentLocationId: 'cradle_of_dusk',
+        mainQuest: { phase: 'revelation', coresRecovered: [] },
+      });
+      expect(canRecoverCore(p, 'investigate')).toBe(false);
+    });
+
+    it('canRecoverCore returns false at already-recovered Capital', () => {
+      const p = makePlayer({
+        currentLocationId: 'asgardar',
+        mainQuest: { phase: 'cores', coresRecovered: ['asgardar'] },
+      });
+      expect(canRecoverCore(p, 'investigate')).toBe(false);
+    });
+
+    it('Mud Monarchs gate accepts attack OR diplomacy', () => {
+      const p = makePlayer({
+        factionId: 'mud_monarchs',
+        currentLocationId: 'asgardar',
+        mainQuest: { phase: 'revelation', coresRecovered: [] },
+      });
+      expect(canRecoverCore(p, 'attack')).toBe(true);
+      expect(canRecoverCore(p, 'diplomacy')).toBe(true);
+      expect(canRecoverCore(p, 'investigate')).toBe(false);
+    });
+
+    it('Conspiracy Architects gate accepts steal', () => {
+      const p = makePlayer({
+        factionId: 'conspiracy_architects',
+        currentLocationId: 'drakova',
+        mainQuest: { phase: 'cores', coresRecovered: ['asgardar'] },
+      });
+      expect(canRecoverCore(p, 'steal')).toBe(true);
+    });
+
+    it('Servants of Giants gate accepts rest (vigil)', () => {
+      const p = makePlayer({
+        factionId: 'servants_of_giants',
+        currentLocationId: 'voronov',
+        mainQuest: { phase: 'revelation', coresRecovered: [] },
+      });
+      expect(canRecoverCore(p, 'rest')).toBe(true);
+    });
+
+    it('coreGateHint produces faction-specific text for each Capital', () => {
+      const reclaimHint = coreGateHint('reclaimers_guild', 'samarran');
+      expect(reclaimHint).toMatch(/Samarran/);
+      expect(reclaimHint).toMatch(/SALVAGE/i);
+      const orderHint = coreGateHint('forgotten_order', 'samarran');
+      expect(orderHint).toMatch(/Samarran/);
+      expect(orderHint).toMatch(/READ/i);
+    });
+
+    it('coreGateHint returns null for unknown faction', () => {
+      expect(coreGateHint('made_up_faction', 'asgardar')).toBeNull();
+    });
   });
 });
