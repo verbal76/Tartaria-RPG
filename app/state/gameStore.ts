@@ -4763,13 +4763,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         // Fuzzy location lookup — playtest typed "Walk to dracova" (one
         // letter off from Drakova) and got narrateWanderingJourney instead
-        // of a real route. Try exact-substring first, then a Levenshtein
-        // fallback. TIGHTENED: target must be ≥5 chars and edit distance
-        // ≤ 1 so "stall" no longer fuzzy-matches "stair" inside Endless
-        // Stair and teleports the player out of a market scene they were
-        // trying to navigate.
+        // of a real route. Try exact-substring first (name + id + any
+        // declared aliases), then a Levenshtein fallback. TIGHTENED:
+        // target must be ≥5 chars and edit distance ≤ 1 so "stall" no
+        // longer fuzzy-matches "stair" inside Endless Stair and teleports
+        // the player out of a market scene they were trying to navigate.
+        // OTA 455 — also check `aliases` (already declared in
+        // locations.json) so "wastes" matches "Tartarian Outskirts",
+        // "cathedral" matches "Sinking Cathedral", etc.
         let candidate = target
-          ? allLocations.find((l) => l.name.toLowerCase().includes(target) || l.id === target)
+          ? allLocations.find((l) =>
+              l.name.toLowerCase().includes(target)
+              || l.id === target
+              || ((l as { aliases?: string[] }).aliases ?? []).some((a) => a.toLowerCase().includes(target) || target.includes(a.toLowerCase()))
+            )
           : undefined;
         if (!candidate && target && target.length >= 5) {
           let bestDist = 2;
@@ -4801,6 +4808,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
           get().setTravelCourse(candidate.id);
+          break;
+        }
+        // OTA 455 — hard-travel verbs ("travel", "journey", "trek",
+        // "march", "voyage", "proceed") explicitly mean map-tier
+        // travel. If we couldn't find a destination, REFUSE with a
+        // helpful list rather than fall through to intra-scene
+        // approach. Playtest: "travel to the hollowed caverns" was
+        // resolving to the ambient noun "Cavern Sound Stones" because
+        // the fall-through tried noun matching after the location
+        // lookup missed. Hollowed Caverns isn't a real place — the
+        // player should see that, not get silently routed to a hook.
+        const HARD_TRAVEL_VERBS = new Set([
+          'travel', 'journey', 'trek', 'march', 'voyage', 'proceed', 'depart',
+        ]);
+        const travelVerb = (parsed.matchedVerb ?? '').toLowerCase();
+        if (HARD_TRAVEL_VERBS.has(travelVerb)) {
+          // Build a short list of known + nearby destinations so the
+          // player can see what IS travelable. Prefer locations the
+          // player has already discovered; pad with a few canonical
+          // ones if their discovered list is empty.
+          const wm = get().worldMemory;
+          const discovered = (wm.discoveredLocationIds ?? [])
+            .map((id) => allLocations.find((l) => l.id === id))
+            .filter((l): l is NonNullable<typeof l> => !!l && l.id !== player.currentLocationId)
+            .slice(0, 6)
+            .map((l) => l.name);
+          const fallback = [
+            'Asgardar', 'Samarran', 'Nimari', 'Drakova', 'Voronov',
+          ];
+          const list = discovered.length >= 3 ? discovered : fallback;
+          get().appendLog(
+            'arbiter',
+            `The Arbiter shakes their head. "I don't know a place called ${target || 'that'}. Try: ${list.join(', ')}. Or open the Lore tab — Places — for the full list."`,
+          );
           break;
         }
         // No external destination matched — but the player named something
