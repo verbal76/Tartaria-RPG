@@ -8188,6 +8188,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     const item = player.inventory[itemIdx]!;
 
+    // OTA 461 — quest-tag refusal. The drop, sell, and scrap paths
+    // already block quest-tagged items (Cores, etc.); gift was the
+    // remaining leak. Without this, a player could gift a Tartarian
+    // Core to a vendor and lose it permanently, soft-locking the
+    // main quest.
+    if ((item.tags ?? []).includes('quest')) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter puts a hand on your wrist. "Not the ${item.name}. The main quest hangs on that piece — it stays with you."`,
+      );
+      return;
+    }
+
     // Decrement quantity (remove row at 0).
     const newInventory = player.inventory
       .map((it, i) =>
