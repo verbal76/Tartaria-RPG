@@ -1,5 +1,13 @@
-import React, { useEffect, useMemo, useRef } from 'react';
-import { ScrollView, View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  ScrollView,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+} from 'react-native';
 import type { GameLogEntry, LogChannel } from '../engine/types';
 
 interface Props {
@@ -102,12 +110,57 @@ export function AdventureFeed({ entries, enemyNames }: Props) {
     [enemyNames],
   );
 
+  // v2.4.1 (OTA 025) — auto-scroll robustness + scroll-to-bottom FAB.
+  //
+  // The prior behavior fired `scrollToEnd` only on visible.length
+  // changes. Two failure modes from playtest:
+  //   1) Initial mount / screen re-entry — useEffect runs before the
+  //      content is laid out, so scrollToEnd is a no-op and the feed
+  //      lands at the top until the player manually scrolls.
+  //   2) User scrolled up to read history — a new entry yanks them
+  //      back to the bottom mid-read.
+  //
+  // Fix: (a) `onContentSizeChange` also fires the auto-scroll, so
+  // content-layout completion catches the initial-mount case;
+  // (b) only auto-scroll when the user is already near the bottom
+  // (within ~120 px); (c) a floating ↓ button appears when the user
+  // has scrolled away from the bottom — tap to jump back.
+  const [isNearBottom, setIsNearBottom] = useState(true);
+  const NEAR_BOTTOM_PX = 120;
+
+  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
+    const distanceFromBottom =
+      contentSize.height - (contentOffset.y + layoutMeasurement.height);
+    setIsNearBottom(distanceFromBottom < NEAR_BOTTOM_PX);
+  };
+
+  const handleAutoScroll = () => {
+    if (isNearBottom) {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    }
+  };
+
   useEffect(() => {
-    scrollRef.current?.scrollToEnd({ animated: true });
+    handleAutoScroll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible.length]);
 
+  const jumpToBottom = () => {
+    scrollRef.current?.scrollToEnd({ animated: true });
+    setIsNearBottom(true);
+  };
+
   return (
-    <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={styles.content}>
+    <View style={styles.container}>
+    <ScrollView
+      ref={scrollRef}
+      style={styles.scroll}
+      contentContainerStyle={styles.content}
+      onScroll={onScroll}
+      scrollEventThrottle={120}
+      onContentSizeChange={handleAutoScroll}
+    >
       {visible.map((entry) => {
         // OTA 221 — combat-outcome color override. Lines tagged with
         // meta.combatOutcome='player_dmg' (player landed damage)
@@ -156,6 +209,17 @@ export function AdventureFeed({ entries, enemyNames }: Props) {
         );
       })}
     </ScrollView>
+    {!isNearBottom && (
+      <TouchableOpacity
+        style={styles.jumpBtn}
+        onPress={jumpToBottom}
+        activeOpacity={0.7}
+        accessibilityLabel="Scroll to latest"
+      >
+        <Text style={styles.jumpBtnText}>↓ LATEST</Text>
+      </TouchableOpacity>
+    )}
+    </View>
   );
 }
 
@@ -179,6 +243,9 @@ function renderEnemyMissLine(text: string): React.ReactNode {
 }
 
 const styles = StyleSheet.create({
+  // v2.4.1 (OTA 025) — container is now the outer wrapper that holds
+  // both the ScrollView and the floating "↓ LATEST" jump button. The
+  // ScrollView itself uses `scroll` (flex: 1) to fill the wrapper.
   container: {
     flex: 1,
     backgroundColor: '#0a0908',
@@ -186,7 +253,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 4,
     padding: 8,
+    position: 'relative',
   },
+  scroll: { flex: 1 },
   // Each entry gets its own "paragraph" — a generous bottom margin
   // plus an explicit empty-line gap above the next entry's body so a
   // sequence of world / arbiter lines reads as paragraphs in prose,
@@ -196,4 +265,25 @@ const styles = StyleSheet.create({
   entry: { marginBottom: 24 },
   tag: { fontSize: 10, fontWeight: '700', letterSpacing: 2, marginBottom: 4 },
   body: { fontSize: 14, lineHeight: 22 },
+  // Floating scroll-to-bottom button. Sits in the lower-right corner
+  // of the feed, semi-translucent so it doesn't dominate the read
+  // area. Only rendered when the user has scrolled away from the
+  // bottom (gated by isNearBottom upstream).
+  jumpBtn: {
+    position: 'absolute',
+    right: 12,
+    bottom: 12,
+    backgroundColor: 'rgba(201, 168, 106, 0.92)',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  jumpBtnText: {
+    color: '#0a0908',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 2,
+  },
 });
