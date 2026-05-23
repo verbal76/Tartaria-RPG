@@ -483,6 +483,9 @@ export type StatusEffectKind =
   | 'surprised'      // -2 on first reaction; consumed once
   | 'fighting_back'  // next enemy counter resolves as opposed Fighting roll
   | 'quick_fire'    // +2 on the next ranged attack THIS turn (initiative bonus surrogate)
+  // v2.4.1 (OTA 034) — successful stealth approach in combat grants
+  // the player advantage on the next attack roll. Consumed on use.
+  | 'stealthed'      // +5 to the next melee or ranged attack; consumed once
   // OTA 003 — timed stat boost from eating a food / drinking a
   // potion. buffStat + buffBonus carry the actual modifier;
   // effectiveStats sums every active food_buff matching the stat.

@@ -99,6 +99,15 @@ export function rollMods(
         sources.push('surprised -2');
         consume.push('surprised');
         break;
+      // v2.4.1 (OTA 034) — Successful stealth approach grants +5 on
+      // the next melee or ranged strike. Consumed on use.
+      case 'stealthed':
+        if (action === 'attack_melee' || action === 'attack_ranged') {
+          bonus += 5;
+          sources.push('stealthed +5');
+          consume.push('stealthed');
+        }
+        break;
     }
   }
   return { bonus, penalty, net: bonus - penalty, sources, consume };

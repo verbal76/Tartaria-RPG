@@ -6860,9 +6860,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
         switch (intent) {
-          case 'stealth':
-            get().appendLog('world', 'You move low and quiet. Whatever watches does not see you.');
+          case 'stealth': {
+            // v2.4.1 (OTA 034) — stealth success in combat grants
+            // `stealthed`, a one-shot +5 on the player's next melee
+            // or ranged attack (rolled in by rollMods). The status
+            // auto-consumes on use. Outside combat, the success is
+            // still narrated but no buff is applied — there's no
+            // target to land it on.
+            if (currentScene.enemies.length > 0) {
+              set((s) => (s.player
+                ? {
+                    player: {
+                      ...s.player,
+                      statusEffects: applyEffect(s.player.statusEffects ?? [], {
+                        kind: 'stealthed',
+                        remainingRounds: 2,
+                        label: 'unseen — next strike at advantage',
+                      }),
+                    },
+                  }
+                : s));
+              get().appendLog(
+                'world',
+                'You move low and quiet, sliding into the angle they cannot watch. Your next strike will land before they know you are there. (+5 next attack)',
+              );
+            } else {
+              get().appendLog(
+                'world',
+                'You move low and quiet. Whatever watches does not see you.',
+              );
+            }
             break;
+          }
           case 'diplomacy': {
             // Gate the "someone heard you" line on someone actually being
             // present. Playtest: player typed "ask the monk if he has food"

@@ -302,9 +302,16 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 attack, full negation + 2× counter-strike on success,
                 2 durability wear either way. */}
             <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} />
-            {range && range !== 'arm' && (
-              <QuickBtn label="advance" onPress={() => onSubmit('advance')} />
-            )}
+            {/* v2.4.1 (OTA 034) — `advance` quick-button removed.
+                Player noted approach already covers the close-range
+                use case AND adds the stealth option (DEX roll →
+                +5 next attack if you slip in unseen). The approach
+                button above is the unified close-range entry for
+                both exploration and combat.
+                Parser synonyms (`advance`, `lunge`, `forward`,
+                `closein`, `charge in`, `near`) still parse to the
+                same intent so typed-input compatibility is intact.
+                Removing only the HUD button. */}
             {range && range !== 'far' && (
               <QuickBtn label="step back" onPress={() => onSubmit('step back')} />
             )}
