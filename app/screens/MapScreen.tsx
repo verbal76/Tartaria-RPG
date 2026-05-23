@@ -141,106 +141,41 @@ export function MapScreen() {
     : { positions: {} as Record<string, { x: number; y: number }>, tiles: [] };
   const safeAtlasPos = interpolateAtlasPosition(safeMapX, safeMapY, safeWorldMap.positions);
 
-  // Whether we've snapped to the marker at least once on this mount.
-  // Used so subsequent panning by the player isn't yanked back to
-  // center on every state nudge, but the FIRST view of the map is
-  // guaranteed to center on the player.
-  const hasAutoCentered = useRef(false);
-
+  // OTA 23-003 — auto-centering on the player marker removed at
+  // playtest request: it interfered with the zoom-in/zoom-out
+  // gesture (the centering useEffect re-fired on imgBox changes
+  // and yanked the user's pinch back). The marker stays visible
+  // wherever the player is via the OTA 23-002 visual upgrade
+  // (warm-gold halo + larger 56x40 silhouette). Player pans
+  // manually to find their marker if they wander far from it.
   useEffect(() => {
     if (!imgBox) return;
     const imgAspect = ATLAS_W / ATLAS_H;
     const boxAspect = imgBox.width / imgBox.height;
     const fill = boxAspect < imgAspect ? imgAspect / boxAspect : 1;
     baselineScale.current = fill;
-    // OTA 23-002 — guarantee the auto-center fires on first layout
-    // regardless of whether scale/tx/ty are still at defaults. The
-    // previous "if (scale===1 && tx===0 && ty===0)" guard would skip
-    // re-centering when imgBox changed for any reason (e.g. orientation
-    // shift or hot reload). Now driven by a dedicated hasAutoCentered
-    // ref so the FIRST run always centers and subsequent imgBox
-    // updates preserve player gestures.
-    if (!hasAutoCentered.current) {
-      let renderedW: number;
-      let renderedH: number;
-      let offsetX: number;
-      let offsetY: number;
-      if (boxAspect > imgAspect) {
-        renderedH = imgBox.height;
-        renderedW = imgBox.height * imgAspect;
-        offsetX = (imgBox.width - renderedW) / 2;
-        offsetY = 0;
-      } else {
-        renderedW = imgBox.width;
-        renderedH = imgBox.width / imgAspect;
-        offsetX = 0;
-        offsetY = (imgBox.height - renderedH) / 2;
-      }
-      const markerLayoutX = offsetX + renderedW * safeAtlasPos.fx;
-      const markerLayoutY = offsetY + renderedH * safeAtlasPos.fy;
-      const initTX = -fill * (markerLayoutX - imgBox.width / 2);
-      const initTY = -fill * (markerLayoutY - imgBox.height / 2);
+    // First-layout: snap to the fill-height baseline so the image
+    // claims the full window instead of letterboxing. Only fires
+    // when transform is still at defaults so user-driven pinch/pan
+    // isn't yanked back.
+    if (scaleRef.current === 1 && txRef.current === 0 && tyRef.current === 0) {
       scaleRef.current = fill;
-      txRef.current = initTX;
-      tyRef.current = initTY;
       scale.setValue(fill);
-      translateX.setValue(initTX);
-      translateY.setValue(initTY);
-      hasAutoCentered.current = true;
     }
-  }, [imgBox, scale, translateX, translateY, safeAtlasPos.fx, safeAtlasPos.fy]);
+  }, [imgBox, scale]);
 
-  // OTA 23-002 — also reset hasAutoCentered when the screen
-  // re-mounts (player navigates away and back). Refs persist
-  // across renders but not unmounts, so a fresh mount has
-  // hasAutoCentered.current === false naturally — this useEffect
-  // is just a safety belt.
-  useEffect(() => {
-    return () => {
-      hasAutoCentered.current = false;
-    };
-  }, []);
-
-  // resetTransform now ALSO re-centers on the player marker, not
-  // just back to translate=0. Double-tap and RESET button both
-  // route through here.
-  const recenterOnMarker = () => {
-    if (!imgBox) return;
-    const imgAspect = ATLAS_W / ATLAS_H;
-    const boxAspect = imgBox.width / imgBox.height;
-    const fill = boxAspect < imgAspect ? imgAspect / boxAspect : 1;
-    let renderedW: number, renderedH: number, offsetX: number, offsetY: number;
-    if (boxAspect > imgAspect) {
-      renderedH = imgBox.height;
-      renderedW = imgBox.height * imgAspect;
-      offsetX = (imgBox.width - renderedW) / 2;
-      offsetY = 0;
-    } else {
-      renderedW = imgBox.width;
-      renderedH = imgBox.width / imgAspect;
-      offsetX = 0;
-      offsetY = (imgBox.height - renderedH) / 2;
-    }
-    const markerLayoutX = offsetX + renderedW * safeAtlasPos.fx;
-    const markerLayoutY = offsetY + renderedH * safeAtlasPos.fy;
-    const initTX = -fill * (markerLayoutX - imgBox.width / 2);
-    const initTY = -fill * (markerLayoutY - imgBox.height / 2);
+  const resetTransform = () => {
+    const target = baselineScale.current;
     Animated.parallel([
-      Animated.spring(scale, { toValue: fill, useNativeDriver: true, friction: 7, tension: 80 }),
-      Animated.spring(translateX, { toValue: initTX, useNativeDriver: true, friction: 7, tension: 80 }),
-      Animated.spring(translateY, { toValue: initTY, useNativeDriver: true, friction: 7, tension: 80 }),
+      Animated.spring(scale, { toValue: target, useNativeDriver: true, friction: 7, tension: 80 }),
+      Animated.spring(translateX, { toValue: 0, useNativeDriver: true, friction: 7, tension: 80 }),
+      Animated.spring(translateY, { toValue: 0, useNativeDriver: true, friction: 7, tension: 80 }),
     ]).start(() => {
-      scaleRef.current = fill;
-      txRef.current = initTX;
-      tyRef.current = initTY;
+      scaleRef.current = target;
+      txRef.current = 0;
+      tyRef.current = 0;
     });
   };
-
-  // OTA 23-002 — resetTransform routes through recenterOnMarker so
-  // RESET / double-tap snap back to "centered on the player," not
-  // to "translate=0 with scale=baseline" (which left the marker
-  // off-screen for any player not at the atlas's geometric center).
-  const resetTransform = recenterOnMarker;
 
   const panResponder = useRef(
     PanResponder.create({
