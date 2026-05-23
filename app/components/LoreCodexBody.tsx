@@ -12,19 +12,42 @@
 // timeline) and the scrollable entry list. No header — each host
 // screen is responsible for its own back button + page chrome so the
 // component can drop into either context cleanly.
+//
+// OTA 456 — Places entries become tap-to-route. Tapping a Place
+// pops a confirmation: "Plan a route to <name>?" — yes calls
+// gameStore.setTravelCourse(id) and switches to the exploration
+// screen, matching the in-game `travel to <name>` flow. Tap-to-route
+// only activates when there's an active player (so the title-screen
+// host still renders the entries as info-only).
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import factionsData from '../data/factions/factions.json';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
 import timelineData from '../data/events/timeline.json';
 import type { Faction, Race, Location, TimelineEvent } from '../engine/types';
+import { useGameStore } from '../state/gameStore';
 
 type Section = 'races' | 'factions' | 'places' | 'timeline';
 
 export function LoreCodexBody() {
   const [section, setSection] = useState<Section>('races');
+  const [pendingRoute, setPendingRoute] = useState<Location | null>(null);
+  const player = useGameStore((s) => s.player);
+  const setScreen = useGameStore((s) => s.setScreen);
+  const setTravelCourse = useGameStore((s) => s.setTravelCourse);
+
+  const canPlanRoute = !!player;
+  const here = player?.currentLocationId ?? null;
+
+  const confirmRoute = () => {
+    if (!pendingRoute) return;
+    const id = pendingRoute.id;
+    setPendingRoute(null);
+    setTravelCourse(id);
+    setScreen('exploration');
+  };
 
   return (
     <View style={styles.bodyWrap}>
@@ -72,14 +95,35 @@ export function LoreCodexBody() {
             <Text style={styles.meta}>Join: {f.joinRequirements}</Text>
           </View>
         ))}
-        {section === 'places' && (locationsData as Location[]).map((l) => (
-          <View key={l.id} style={styles.entry}>
-            <Text style={styles.name}>{l.name}</Text>
-            <Text style={styles.subtitle}>{l.type}</Text>
-            <Text style={styles.desc}>{l.description}</Text>
-            <Text style={styles.meta}>Danger {l.danger}/5</Text>
-          </View>
-        ))}
+        {section === 'places' && (locationsData as Location[]).map((l) => {
+          const atHere = canPlanRoute && l.id === here;
+          const content = (
+            <>
+              <Text style={styles.name}>{l.name}</Text>
+              <Text style={styles.subtitle}>{l.type}</Text>
+              <Text style={styles.desc}>{l.description}</Text>
+              <Text style={styles.meta}>Danger {l.danger}/5</Text>
+              {canPlanRoute ? (
+                <Text style={styles.tapHint}>
+                  {atHere ? '· you are here ·' : '▸ tap to plan a route'}
+                </Text>
+              ) : null}
+            </>
+          );
+          if (!canPlanRoute || atHere) {
+            return <View key={l.id} style={styles.entry}>{content}</View>;
+          }
+          return (
+            <TouchableOpacity
+              key={l.id}
+              style={styles.entry}
+              activeOpacity={0.7}
+              onPress={() => setPendingRoute(l)}
+            >
+              {content}
+            </TouchableOpacity>
+          );
+        })}
         {section === 'timeline' && (timelineData as TimelineEvent[]).map((e) => (
           <View key={`${e.year}_${e.name}`} style={styles.entry}>
             <Text style={styles.name}>{e.year} — {e.name}</Text>
@@ -88,6 +132,40 @@ export function LoreCodexBody() {
           </View>
         ))}
       </ScrollView>
+
+      <Modal
+        visible={!!pendingRoute}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setPendingRoute(null)}
+      >
+        <View style={styles.modalScrim}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>PLAN A ROUTE</Text>
+            <Text style={styles.modalBody}>
+              Set course for {pendingRoute?.name}? The Arbiter will start
+              the walk and the travel row will replace your cardinal
+              controls until you arrive or STOP.
+            </Text>
+            <View style={styles.modalRow}>
+              <TouchableOpacity
+                style={[styles.modalBtn, styles.modalBtnGhost]}
+                onPress={() => setPendingRoute(null)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.modalBtnGhostText}>CANCEL</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalBtn, styles.modalBtnGo]}
+                onPress={confirmRoute}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.modalBtnGoText}>SET COURSE</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -106,4 +184,62 @@ const styles = StyleSheet.create({
   desc: { color: '#cdbf99', fontSize: 12, lineHeight: 18, marginTop: 2 },
   meta: { color: '#7a705c', fontSize: 11, marginTop: 4 },
   trait: { color: '#a89a78', fontSize: 11, marginTop: 2 },
+  tapHint: { color: '#c9a86a', fontSize: 10, marginTop: 6, letterSpacing: 1 },
+  modalScrim: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  modalCard: {
+    backgroundColor: '#1a1714',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 6,
+    padding: 16,
+  },
+  modalTitle: {
+    color: '#c9a86a',
+    fontSize: 13,
+    fontWeight: '700',
+    letterSpacing: 3,
+    marginBottom: 10,
+  },
+  modalBody: {
+    color: '#cdbf99',
+    fontSize: 13,
+    lineHeight: 19,
+    marginBottom: 16,
+  },
+  modalRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  modalBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 4,
+    alignItems: 'center',
+    borderWidth: 1,
+  },
+  modalBtnGhost: {
+    backgroundColor: '#13110f',
+    borderColor: '#3a342c',
+  },
+  modalBtnGhostText: {
+    color: '#cdbf99',
+    fontSize: 12,
+    letterSpacing: 2,
+    fontWeight: '700',
+  },
+  modalBtnGo: {
+    backgroundColor: '#c9a86a',
+    borderColor: '#c9a86a',
+  },
+  modalBtnGoText: {
+    color: '#1a1714',
+    fontSize: 12,
+    letterSpacing: 2,
+    fontWeight: '700',
+  },
 });
