@@ -28,6 +28,7 @@ import { initTTSManager } from './app/voice/TTSManager';
 import { startTTSController, stopTTSController } from './app/voice/TTSController';
 import { createExpoFileSystemAdapter } from './app/voice/executorchAdapter';
 import { checkAndApplyOTA } from './app/updates/checkAndApplyOTA';
+import { useUiScale } from './app/ui/uiScale';
 
 // Lazy-load expo-navigation-bar. The package is a native module bridged
 // only in APKs built AFTER it was added to dependencies — older
@@ -290,34 +291,43 @@ class ScreenErrorBoundary extends React.Component<
 // not both.
 function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>['currentScreen'] }) {
   const insets = useSafeAreaInsets();
-  // OTA 023 — playtester caught the bug: we're hiding both bars
-  // (StatusBar `hidden` below, expo-navigation-bar setVisibilityAsync
-  // 'hidden' at boot) but the AppShell still reserved ~24px at the
-  // top via Math.max(insets.top, ANDROID_STATUS_PAD). When the bars
-  // are hidden the insets correctly report 0, but the forced
-  // ANDROID_STATUS_PAD floor overrode that and kept stealing screen
-  // space the player never gets back. Trust the insets — they reflect
-  // the actual unsafe area on this device. If a player swipes the
-  // system UI back via overlay-swipe behavior, the brief overlap is
-  // acceptable; we don't want to permanently reserve space for it.
+  // OTA 023 — see prior comment for why insets are trusted directly.
   const top = insets.top;
   const bottom = insets.bottom;
+  // OTA 23-005 — global responsive scale. useWindowDimensions inside
+  // useUiScale is reactive: orientation flips, foldable splits, and
+  // any OS-driven dimension change re-renders this AppShell and the
+  // scale recomputes. Every screen rendered below inherits the new
+  // scale via the wrapper transform — no per-screen changes needed.
+  const ui = useUiScale();
+  // Available interior height the wrapper paints into (the safe
+  // outer View handles the status/nav bar insets).
+  const interiorHeight = ui.logicalHeight - (top + bottom) / ui.scale;
   return (
     <View style={[styles.safe, { paddingTop: top, paddingBottom: bottom }]}>
       <StatusBar style="light" hidden />
-      {screen === 'title' && <TitleScreen />}
-      {screen === 'character_creation' && <CharacterCreationScreen />}
-      {screen === 'exploration' && <ExplorationScreen />}
-      {screen === 'log' && <LogScreen />}
-      {screen === 'lore' && <LoreScreen />}
-      {screen === 'about' && <AboutScreen />}
-      {screen === 'inventory' && <InventoryScreen />}
-      {screen === 'character' && <CharacterScreen />}
-      {screen === 'map' && <MapScreen />}
-      {screen === 'crafting' && <CraftingScreen />}
-      {screen === 'vendor' && <VendorScreen />}
-      {screen === 'actions' && <ActionReferenceScreen />}
-      {screen === 'contracts' && <ContractsScreen />}
+      <View
+        style={{
+          width: ui.logicalWidth,
+          height: interiorHeight,
+          transform: [{ scale: ui.scale }],
+          transformOrigin: 'top left',
+        }}
+      >
+        {screen === 'title' && <TitleScreen />}
+        {screen === 'character_creation' && <CharacterCreationScreen />}
+        {screen === 'exploration' && <ExplorationScreen />}
+        {screen === 'log' && <LogScreen />}
+        {screen === 'lore' && <LoreScreen />}
+        {screen === 'about' && <AboutScreen />}
+        {screen === 'inventory' && <InventoryScreen />}
+        {screen === 'character' && <CharacterScreen />}
+        {screen === 'map' && <MapScreen />}
+        {screen === 'crafting' && <CraftingScreen />}
+        {screen === 'vendor' && <VendorScreen />}
+        {screen === 'actions' && <ActionReferenceScreen />}
+        {screen === 'contracts' && <ContractsScreen />}
+      </View>
     </View>
   );
 }
