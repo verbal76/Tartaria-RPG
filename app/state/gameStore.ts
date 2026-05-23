@@ -125,7 +125,14 @@ import {
 } from '../engine/hub';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, resolveEquippedItem, effectiveStats } from '../engine/equipment';
-import { canScrap, scrapOutputFor, repairCostMaterials } from '../engine/scrapEngine';
+import {
+  canScrap,
+  scrapOutputFor,
+  repairCostMaterials,
+  scrapSuccessChance,
+  scrapHasSecondChance,
+  pickScrapFailureLine,
+} from '../engine/scrapEngine';
 import { stampDurability, wearItemByName, wearItemById, repairCost, repairItem } from '../engine/durability';
 import {
   type Hook,
@@ -9952,7 +9959,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The Arbiter taps your hand. "Unequip the ${item.name} first — can't scrap what you're wearing."`);
       return;
     }
-    const output = scrapOutputFor(item);
+    // OTA 23-014 — salvage now rolls for success. Base 70% + INT/DEX
+    // modifiers. The item is CONSUMED on failure either way; the
+    // player can't just keep clicking until they get materials.
+    // High INT/DEX characters get one re-roll per attempt.
+    const scene = get().currentScene;
+    const scrapStats = effectiveStats(
+      get().player!,
+      weatherStatModifiers(scene?.weather ?? null),
+    );
+    const successP = scrapSuccessChance(scrapStats.intelligence, scrapStats.dexterity);
+    let rolled = Math.random() < successP;
+    let usedSecondChance = false;
+    if (!rolled && scrapHasSecondChance(scrapStats.intelligence, scrapStats.dexterity)) {
+      usedSecondChance = true;
+      rolled = Math.random() < successP;
+    }
+    const output = rolled ? scrapOutputFor(item) : null;
     // OTA 012 — route grants through grantItem so ITEM_CAPS apply.
     // Was a manual merge that ignored caps: scrap an item yielding
     // 8 Sticks landed all 8 in pack despite the 6 cap. Now overflow
@@ -9962,33 +9985,58 @@ export const useGameStore = create<GameStore>((set, get) => ({
       let newInventory: InventoryItem[] = s.player.inventory
         .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
         .filter((i) => i.quantity > 0);
-      for (const grant of output.grants) {
-        const stamp: InventoryItem = stampDurability({
-          id: `scrap_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-          name: grant.name,
-          kind: 'misc',
-          rarity: 'Common',
-          quantity: grant.quantity,
-          tags: [],
-        });
-        const result = grantItem(newInventory, stamp);
-        newInventory = result.inventory;
-        if (result.dropped > 0) {
-          // Buffered side-effect: we're still inside the set()
-          // closure, so defer the log so it fires after the state
-          // settles. Use a queue via void Promise.resolve().then.
-          const droppedQty = result.dropped;
-          void Promise.resolve().then(() =>
-            get().appendLog(
-              'world',
-              `${grant.name} x${droppedQty} from the scrap won't fit — your pack is already full of them.`,
-            ),
-          );
+      if (output) {
+        for (const grant of output.grants) {
+          const stamp: InventoryItem = stampDurability({
+            id: `scrap_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            name: grant.name,
+            kind: 'misc',
+            rarity: 'Common',
+            quantity: grant.quantity,
+            tags: [],
+          });
+          const result = grantItem(newInventory, stamp);
+          newInventory = result.inventory;
+          if (result.dropped > 0) {
+            // Buffered side-effect: we're still inside the set()
+            // closure, so defer the log so it fires after the state
+            // settles. Use a queue via void Promise.resolve().then.
+            const droppedQty = result.dropped;
+            void Promise.resolve().then(() =>
+              get().appendLog(
+                'world',
+                `${grant.name} x${droppedQty} from the scrap won't fit — your pack is already full of them.`,
+              ),
+            );
+          }
         }
       }
       return { player: { ...s.player, inventory: newInventory } };
     });
-    get().appendLog('world', `You break the ${item.name} down. ✦ Recovered: ${output.summary}.`);
+    if (output) {
+      if (usedSecondChance) {
+        get().appendLog(
+          'world',
+          `The first pass on the ${item.name} crumbles in your hands — but your training kicks in. You stop, breathe, change angle, and try again.`,
+        );
+      }
+      get().appendLog('world', `You break the ${item.name} down. ✦ Recovered: ${output.summary}.`);
+      // OTA 23-014 — train INT on a successful salvage. Engineering
+      // hands learn from clean disassembly, not from wrecking it.
+      const liveScrapper = get().player;
+      if (liveScrapper) {
+        const tr = trainStat(liveScrapper, 'intelligence', true);
+        set((s) => (s.player ? { player: tr.player } : s));
+        if (tr.leveled) {
+          get().appendLog(
+            'reward',
+            `✦ Your eye for parts sharpens. +1 INT (now ${tr.leveled.to}).`,
+          );
+        }
+      }
+    } else {
+      get().appendLog('world', pickScrapFailureLine(item.name));
+    }
     void get().persist();
   },
 

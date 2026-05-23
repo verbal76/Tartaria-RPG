@@ -99,3 +99,50 @@ export function repairCostMaterials(item: InventoryItem): Array<{ name: string; 
   const out = scrapOutputFor(item);
   return out.grants.map((g) => ({ name: g.name, quantity: g.quantity * 2 }));
 }
+
+// OTA 23-014 — salvage isn't a free repeatable click anymore.
+// Each attempt rolls a success chance driven by the player's INT
+// (engineering) and DEX (fine hands). On failure the item is STILL
+// consumed — that's the rule the playtester asked for: "you
+// shouldn't keep being able to salvage the same item over and
+// over until it gives you something." High-skill characters get
+// one re-roll per attempt, which represents real expertise.
+
+/** Probability that a salvage attempt yields the item's materials.
+ *  Base 70%, +(INT−10) × 3%, +(DEX−10) × 1%, clamped to [35%, 95%].
+ *  Floor at 35% so even a low-stat character isn't soft-locked out
+ *  of salvaging; ceiling at 95% so there's always SOME risk. */
+export function scrapSuccessChance(intStat: number, dexStat: number): number {
+  const base = 0.7;
+  const bonus = (intStat - 10) * 0.03 + (dexStat - 10) * 0.01;
+  return Math.max(0.35, Math.min(0.95, base + bonus));
+}
+
+/** True when the player's INT/DEX qualify for one re-roll on a
+ *  failed salvage attempt. INT ≥ 14 (Reclaimer/engineer threshold)
+ *  OR DEX ≥ 16 (very fine hands) unlocks the second chance. */
+export function scrapHasSecondChance(intStat: number, dexStat: number): boolean {
+  return intStat >= 14 || dexStat >= 16;
+}
+
+/** Narration variants for a failed salvage attempt. Picker is
+ *  random-uniform so a player who fails several times in a row gets
+ *  visibly different lines each time. `{item}` is substituted with
+ *  the item name at pick time. */
+export const SCRAP_FAILURE_LINES: readonly string[] = [
+  "You work the {item} apart, but the pieces crumble in your hands — rust-rotted through. Nothing salvageable.",
+  "Wrong angle, wrong tool, wrong something. The {item} won't yield clean parts. You toss the scraps aside.",
+  "You try your best, but the {item}'s been salt-eaten too long. Anything useful disintegrates on the bench.",
+  "The {item} comes apart, sure — but the bits are warped past use. Pile it on the scrap heap.",
+  "Too far gone. You wrench the {item} open and find only powdered rot inside. Nothing to keep.",
+  "Your hands slip twice on the {item} and the housing splits the wrong way. Whatever was inside crumbles.",
+  "The {item} was already half-eaten by something before you found it. You strip it bare. There's nothing.",
+  "You break the {item} down to its bones and the bones are hollow. A long-dead Reclaimer beat you to anything worth keeping.",
+  "Pry, twist, pry again — the {item} fights you and wins. You force it open and the contents puff out as grey dust.",
+  "You'd swear the {item} was solid. It isn't. The whole thing collapses into a brittle handful of nothing.",
+];
+
+export function pickScrapFailureLine(itemName: string): string {
+  const tpl = SCRAP_FAILURE_LINES[Math.floor(Math.random() * SCRAP_FAILURE_LINES.length)]!;
+  return tpl.replace(/\{item\}/g, itemName);
+}
