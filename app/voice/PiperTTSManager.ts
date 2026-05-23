@@ -138,6 +138,71 @@ function setKokoroState(next: KokoroState): void {
   }
 }
 
+// OTA 23-017 — diagnostic capture for the wife's phone (and any
+// other tester) seeing "Failed to load model" with no actionable
+// info. The state machine's `message` field is truncated to 240
+// chars for UI display; the full diagnostic — untruncated error,
+// stack, which step failed, free disk at the time, voice id, and
+// timestamp — lives here, with a small ring buffer so re-attempts
+// don't overwrite the previous failure. AboutScreen reads this
+// to populate COPY VOICE INFO so the tester can paste it back.
+export interface KokoroErrorRecord {
+  /** ISO timestamp at the moment the error was captured. */
+  at: string;
+  /** Which step failed — narrows the root cause without grepping
+   *  the stack. */
+  step: 'download' | 'load' | 'warmup' | 'unknown';
+  /** Voice id being loaded when it failed. */
+  voiceId: string;
+  /** Full untruncated error message. */
+  message: string;
+  /** JS error stack if available. */
+  stack: string | null;
+  /** Free internal storage at attempt time, in MB. -1 means we
+   *  couldn't read it. The Kokoro model is ~100 MB; anything
+   *  under that is the most likely root cause. */
+  diskFreeMB: number;
+}
+
+const KOKORO_ERROR_HISTORY: KokoroErrorRecord[] = [];
+const KOKORO_ERROR_HISTORY_MAX = 5;
+
+export function getKokoroErrorHistory(): readonly KokoroErrorRecord[] {
+  return KOKORO_ERROR_HISTORY;
+}
+
+async function captureFreeDiskMB(): Promise<number> {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const FS = require('expo-file-system');
+    const bytes = await FS.getFreeDiskStorageAsync();
+    return typeof bytes === 'number' ? Math.round(bytes / (1024 * 1024)) : -1;
+  } catch {
+    return -1;
+  }
+}
+
+function recordKokoroError(
+  step: KokoroErrorRecord['step'],
+  voiceId: string,
+  err: unknown,
+  diskFreeMB: number,
+): void {
+  const message = err instanceof Error ? err.message : String(err);
+  const stack = err instanceof Error && err.stack ? err.stack : null;
+  KOKORO_ERROR_HISTORY.unshift({
+    at: new Date().toISOString(),
+    step,
+    voiceId,
+    message,
+    stack,
+    diskFreeMB,
+  });
+  while (KOKORO_ERROR_HISTORY.length > KOKORO_ERROR_HISTORY_MAX) {
+    KOKORO_ERROR_HISTORY.pop();
+  }
+}
+
 // Voice id → executorch constant lookup. Default AF_HEART (American
 // female, natural-sounding default per the Kokoro docs).
 const VOICES: Record<string, unknown> = {
@@ -274,6 +339,11 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
     evictLRU();
   }
   const promise = (async () => {
+    // OTA 23-017 — track which step we're in so the diagnostic
+    // record tells us whether the download finished and the load
+    // / warmup is what blew up. That's the single most useful
+    // datum for triaging "Failed to load model" reports.
+    let step: KokoroErrorRecord['step'] = 'download';
     try {
       // First-time load on the Arbiter voice drives the public state
       // machine (download progress, ready signal). Vendor voices load
@@ -291,15 +361,33 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
           }
         },
       );
+      step = 'load';
       if (sticky) setKokoroState({ phase: 'loading' });
+      step = 'warmup';
       // Warm-up forward — compiles the graph so the player's first
       // real line doesn't pay cold-start latency. Output discarded.
-      try { const samples: Float32Array = await m.forward('ok.', 1.0); void samples; } catch { /* ignore */ }
+      // Captured here too — the executorch native graph compile is
+      // the single most likely OOM site on low-RAM devices.
+      try { const samples: Float32Array = await m.forward('ok.', 1.0); void samples; }
+      catch (warmupErr) {
+        const diskFreeMB = await captureFreeDiskMB();
+        recordKokoroError('warmup', voiceId, warmupErr, diskFreeMB);
+        // Treat warm-up failure as terminal — the model is loaded
+        // but can't actually run on this device. Re-throw so the
+        // outer catch surfaces it.
+        throw warmupErr;
+      }
       VOICE_POOL.set(voiceId, { module: m, lastUsedAt: Date.now(), sticky });
       if (sticky) setKokoroState({ phase: 'ready' });
       return m;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
+      // Avoid double-recording: warmup catch already wrote a
+      // detailed record. For everything else, capture here.
+      if (step !== 'warmup') {
+        const diskFreeMB = await captureFreeDiskMB();
+        recordKokoroError(step, voiceId, err, diskFreeMB);
+      }
       if (sticky) setKokoroState({ phase: 'error', message: msg.slice(0, 240) });
       return null;
     } finally {
@@ -449,6 +537,11 @@ async function drain(): Promise<void> {
     await playPcm(samples, KOKORO_SAMPLE_RATE);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
+    // OTA 23-017 — runtime-speak failure (model loaded, ready,
+    // but a specific utterance blew up). Record so the diagnostic
+    // captures it instead of just showing the truncated UI msg.
+    const diskFreeMB = await captureFreeDiskMB();
+    recordKokoroError('unknown', currentlySpeaking?.voiceId ?? 'unknown', err, diskFreeMB);
     setKokoroState({ phase: 'error', message: msg.slice(0, 240) });
   } finally {
     currentlySpeaking = null;

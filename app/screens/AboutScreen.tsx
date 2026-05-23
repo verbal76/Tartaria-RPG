@@ -25,6 +25,7 @@ import {
   speak as kokoroSpeak,
   getKokoroState,
   refreshPiperEngine,
+  getKokoroErrorHistory,
   type KokoroState,
 } from '../voice/PiperTTSManager';
 import type * as Speech from 'expo-speech';
@@ -304,6 +305,27 @@ export function AboutScreen() {
         `error: ${kokoroState.message}`
       }`,
     ];
+    // OTA 23-017 — append the Kokoro error history (last 5
+    // attempts) so a tester reporting "Failed to load model"
+    // can copy a paste-back that tells us WHICH step failed
+    // (download / load / warmup), the full error message, the
+    // stack, and free disk at the moment of failure. Without
+    // this we were guessing OOM from a 240-char truncation.
+    const history = getKokoroErrorHistory();
+    if (history.length > 0) {
+      lines.push('');
+      lines.push(`Kokoro error history (most recent first, ${history.length} of last 5):`);
+      for (const rec of history) {
+        lines.push(`  • ${rec.at} · step=${rec.step} · voice=${rec.voiceId} · diskFree=${rec.diskFreeMB === -1 ? 'unknown' : rec.diskFreeMB + ' MB'}`);
+        lines.push(`    msg: ${rec.message}`);
+        if (rec.stack) {
+          // First 3 stack frames are usually enough to locate the
+          // native call; trim deeper noise.
+          const trimmedStack = rec.stack.split('\n').slice(0, 4).join('\n      ');
+          lines.push(`    stack: ${trimmedStack}`);
+        }
+      }
+    }
     return lines.join('\n');
   }, [voice, ttsAvailable, sttAvailable, voicesList, kokoroState]);
 
