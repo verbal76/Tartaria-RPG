@@ -490,11 +490,24 @@ function QuickBtn({
 
 /** Bigger button for the travel row so it's easy to hit without
  *  fat-fingering an adjacent direction. Equal-width flex layout
- *  splits the available horizontal space across all four buttons. */
+ *  splits the available horizontal space across all four buttons.
+ *
+ *  OTA 460 — single-line + ellipsize for long labels. CONTINUE → CITY
+ *  passes the destination name through; long Capital names ("CONTINUE
+ *  → ISKAN-VEIL", "CONTINUE → YULDRA-TUL") were wrapping or clipping
+ *  on narrow phones because the Text had no overflow control. */
 function TravelBtn({ label, onPress }: { label: string; onPress: () => void }) {
   return (
     <TouchableOpacity style={styles.travelBtn} onPress={onPress} activeOpacity={0.7}>
-      <Text style={styles.travelBtnText}>{label}</Text>
+      <Text
+        style={styles.travelBtnText}
+        numberOfLines={1}
+        ellipsizeMode="tail"
+        adjustsFontSizeToFit
+        minimumFontScale={0.7}
+      >
+        {label}
+      </Text>
     </TouchableOpacity>
   );
 }
