@@ -45,7 +45,7 @@ export function AboutScreen() {
 
   const [copied, setCopied] = useState(false);
   const [voiceCopied, setVoiceCopied] = useState(false);
-  const [tab, setTab] = useState<'music' | 'voice' | 'about'>('music');
+  const [tab, setTab] = useState<'sfx' | 'about'>('sfx');
   // OTA 007 — update button + state moved to TitleScreen.
   const [audio, setAudio] = useState<AudioSettings>(() => getAudioSettings());
   const [voice, setVoice] = useState<VoiceSettings>(() => getVoiceSettings());
@@ -124,7 +124,7 @@ export function AboutScreen() {
             title: 'Microphone access',
             message:
               'Tartaria Realms needs the microphone so you can speak commands to the Arbiter. ' +
-              'You can disable speech input any time from Settings → Voice.',
+              'You can disable speech input any time from Settings → SFX.',
             buttonPositive: 'Allow',
             buttonNegative: 'Deny',
           },
@@ -333,11 +333,12 @@ export function AboutScreen() {
         <View style={{ width: 80 }} />
       </View>
 
-      {/* Tab row — three sections in one screen so the player has
-          one stable settings entry point. Music first (most tweaked),
-          then Voice, then the technical About / diagnostic block. */}
+      {/* Tab row — two sections in one screen. OTA 23-006 collapsed
+          'music' + 'voice' into a single SFX tab; the technical
+          ABOUT / diagnostic block stays its own tab. Music card
+          renders first inside SFX (most tweaked), voice card below. */}
       <View style={styles.tabRow}>
-        {(['music', 'voice', 'about'] as const).map((id) => (
+        {(['sfx', 'about'] as const).map((id) => (
           <TouchableOpacity
             key={id}
             onPress={() => setTab(id)}
@@ -352,7 +353,7 @@ export function AboutScreen() {
       </View>
 
       <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
-        {tab === 'music' && (
+        {tab === 'sfx' && (
         <View style={styles.musicCard}>
           <View style={styles.musicHeader}>
             <Text style={styles.musicTitle}>MUSIC</Text>
@@ -398,7 +399,7 @@ export function AboutScreen() {
         </View>
         )}
 
-        {tab === 'voice' && (
+        {tab === 'sfx' && (
         <View style={styles.musicCard}>
           <View style={styles.musicHeader}>
             <Text style={styles.musicTitle}>VOICE</Text>
