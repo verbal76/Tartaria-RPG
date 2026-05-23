@@ -7638,6 +7638,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    // OTA 23-009 — stolen items can't be sold. The flag is per-
+    // item-instance (item.id), so other copies of the same name
+    // in the player's pack are fine — only the specific stolen
+    // instance is refused. Player can still USE it or SCRAP it
+    // (scrap outputs are clean, mintable for resale).
+    if (item.stolen) {
+      get().appendLog(
+        'arbiter',
+        `${scene.vendor.name} looks at the ${item.name} you're holding. "That's mine — or somebody's. I'm not buying it back. Use it, break it down, but don't put it on my table."`,
+      );
+      return;
+    }
     const price = sellPriceFor(item, scene.vendor);
     if (price <= 0) {
       get().appendLog('system', `${scene.vendor.name} won't pay for ${item.name} — no resale value.`);
@@ -7759,10 +7771,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // (DC 11). Honest roadside hawkers watch the stall (DC 14).
     // Established hub merchants are alert and have help nearby
     // (DC 16, and the fight on failure is real).
-    const dc =
+    const baseDc =
       scene.vendor.demeanor === 'sketchy' ? 11
       : scene.vendor.demeanor === 'honest' ? 14
       : 16;
+    // OTA 23-009 — back-to-back steal penalty. Each previous attempt
+    // against THIS vendor (success or caught) raises the DC by 2.
+    // Playtest: a Reclaimer with DEX 9 lifted three items in a row
+    // from a sketchy DC-11 trader because nothing was making the
+    // sequence harder. Now the third attempt is DC 15, the fourth
+    // DC 17, etc. Counter clears when the vendor object resets
+    // (scene transition, hostility flip, roadside despawn).
+    const prevAttempts = scene.vendor.stealAttempts ?? 0;
+    const dc = baseDc + prevAttempts * 2;
     // Use effectiveStats so buffs / equipment / weather count.
     const stats = effectiveStats(player, weatherStatModifiers(scene.weather));
     const roll = rollDie(20);
@@ -7784,17 +7805,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const gear = !weapon && !armor ? GEAR.find((g) => g.name === offer.itemName) : null;
       const material = !weapon && !armor && !gear ? MATERIALS.find((m) => m.name === offer.itemName) : null;
       const cat = weapon ?? armor ?? gear ?? material ?? null;
+      // OTA 23-009 — honest kind assignment. Pre-OTA-23-009 every
+      // stolen item was forced to kind:'misc', which made stolen
+      // weapons / armor un-scrappable (canScrap rejects misc
+      // items whose tags don't match a raw-material regex). Stolen
+      // items now keep their true classification so the player can
+      // USE them (equip a stolen weapon, wear stolen armor) and
+      // SCRAP them per the design.
       const kind: InventoryItem['kind'] =
-        gear?.kind === 'consumable' || gear?.kind === 'relic' || gear?.kind === 'misc'
+        weapon ? 'weapon' :
+        armor ? 'armor' :
+        (gear?.kind === 'consumable' || gear?.kind === 'relic' || gear?.kind === 'misc')
           ? gear.kind
           : 'misc';
       const stolen: InventoryItem = stampDurability({
-        id: `stolen_${Date.now()}`,
+        id: `stolen_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         name: offer.itemName,
         kind,
         rarity: cat?.rarity,
         quantity: 1,
         tags: cat?.tags ?? [],
+        // OTA 23-009 — mark this specific item.id as stolen. The
+        // sellToVendor path refuses this exact instance ('not yours,
+        // and they'd know'). USE / SCRAP still work; scrap outputs
+        // are clean.
+        stolen: true,
       });
       set((s) => {
         if (!s.player || !s.currentScene?.vendor) return s;
@@ -7803,9 +7838,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const newOffers = s.currentScene.vendor.offers.filter(
           (o) => !(o.itemName === offer.itemName && o.price === offer.price),
         );
+        // OTA 23-009 — DO NOT go through mergeOrPushItem here. That
+        // path merges stackable items by name + kind, which would
+        // erase the per-instance stolen flag (a stolen Wild Onion
+        // stacking into the player's existing clean Wild Onion row
+        // would silently launder the theft). Push the stolen item
+        // as its own row so the no-sell rule lives on a specific
+        // item.id, per the design.
         return {
-          player: { ...s.player, inventory: mergeOrPushItem(s.player.inventory, stolen) },
-          currentScene: { ...s.currentScene, vendor: { ...s.currentScene.vendor, offers: newOffers } },
+          player: { ...s.player, inventory: [...s.player.inventory, stolen] },
+          currentScene: {
+            ...s.currentScene,
+            vendor: {
+              ...s.currentScene.vendor,
+              offers: newOffers,
+              // OTA 23-009 — bump the streak so the next steal DC
+              // climbs by 2.
+              stealAttempts: prevAttempts + 1,
+            },
+          },
         };
       });
       get().appendLog('reward', `✦ Successfully stole ${offer.itemName} from ${scene.vendor.name}.`);

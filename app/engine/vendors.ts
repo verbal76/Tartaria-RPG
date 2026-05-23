@@ -61,6 +61,13 @@ export interface VendorInstance {
    *  hostility-flip stats. Undefined on hub vendors → hub default
    *  applies (DC 16 + armored guard). */
   demeanor?: 'honest' | 'sketchy';
+  /** OTA 23-009 — stacking steal-streak counter. Each steal
+   *  attempt (success OR caught) bumps this by 1 for the rest of
+   *  the vendor's session. Each point adds +2 to the next steal
+   *  DC, so back-to-back theft gets steadily harder against the
+   *  same vendor. Resets implicitly when the vendor is cleared
+   *  (scene transition, hostility flip, roadside despawn). */
+  stealAttempts?: number;
 }
 
 export const VENDORS = (vendorsData as { vendors: VendorTemplate[] }).vendors;

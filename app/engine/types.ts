@@ -330,6 +330,11 @@ export interface InventoryItem {
   tags: string[];
   /** Per-instance durability for wear-prone gear. Absent for stackable/consumable items. */
   durability?: { current: number; max: number };
+  /** OTA 23-009 — set on items obtained via stealFromVendor. The
+   *  sellToVendor path refuses to buy this specific instance back
+   *  (it's recognisably the vendor's own). The player can still
+   *  USE the item or SCRAP it; the scrap outputs are clean. */
+  stolen?: boolean;
 }
 
 export type CombatRange = 'arm' | 'close' | 'far';
