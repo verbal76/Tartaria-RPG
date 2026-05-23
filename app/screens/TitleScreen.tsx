@@ -39,6 +39,7 @@ import { OTA_BUILD_ID } from '../buildInfo';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const APP_VERSION: string = (require('../../app.json') as { expo: { version: string } }).expo.version;
 import { getKokoroState, onKokoroStateChange, type KokoroState } from '../voice/PiperTTSManager';
+import type { MainQuestPhase } from '../engine/types';
 import { checkAndApplyOTA } from '../updates/checkAndApplyOTA';
 
 const races = racesData as { id: string; name: string }[];
@@ -56,6 +57,22 @@ function timeAgo(ts: number): string {
   if (delta < 3_600_000) return `${Math.round(delta / 60_000)}m ago`;
   if (delta < 86_400_000) return `${Math.round(delta / 3_600_000)}h ago`;
   return `${Math.round(delta / 86_400_000)}d ago`;
+}
+
+// v2.4.1 (OTA 036) — RESUME OBJECTIVE line for the slot card.
+// Phase-aware so the player sees real progress (e.g. "3 of 5 Cores
+// recovered. Heading to the Endless Stair next.").
+function resumeObjectiveLine(phase: MainQuestPhase, cores: number): string {
+  switch (phase) {
+    case 'hook':       return '◆ A rumor of the Mud Flood Nexus.';
+    case 'revelation': return '◆ 5 Cores to recover. None yet in pack.';
+    case 'cores':      return `◆ ${cores}/5 Cores recovered.`;
+    case 'descent':    return '◆ All 5 Cores in pack. The Endless Stair waits.';
+    case 'nexus':      return '◆ Standing at the Mud Flood Nexus.';
+    case 'choice':     return '◆ The Choice waits at the Nexus.';
+    case 'ended':      return '◆ The run is closed.';
+    default:           return '◆ Mud Flood Nexus quest in progress.';
+  }
 }
 
 export function TitleScreen() {
@@ -285,6 +302,20 @@ export function TitleScreen() {
         <Text style={styles.slotMeta}>
           HP {item.hp}/{item.hpMax}
         </Text>
+        {/* v2.4.1 (OTA 036) — RESUME OBJECTIVE row. Surfaces the
+            character's main-quest progress on the title screen so
+            the player can see where they left off without loading
+            the save. Only renders when the slot summary has the
+            mainQuestPhase field (legacy summaries pass through
+            silently). */}
+        {item.mainQuestPhase && (
+          <Text style={styles.slotObjective}>
+            {resumeObjectiveLine(
+              item.mainQuestPhase as MainQuestPhase,
+              item.mainQuestCoresRecovered ?? 0,
+            )}
+          </Text>
+        )}
         {item.dead && (
           // Dead characters can't be loaded into a live session, so the
           // LogScreen path is closed to the player. Two row-local
@@ -638,6 +669,10 @@ const styles = StyleSheet.create({
   },
   slotTime: { color: '#7a705c', fontSize: 11 },
   slotMeta: { color: '#7a705c', fontSize: 12, marginTop: 2 },
+  // v2.4.1 (OTA 036) — RESUME OBJECTIVE line on each slot card.
+  // Warm-gold to distinguish from the gray meta rows + signal it's
+  // the main-quest beat.
+  slotObjective: { color: '#c9a86a', fontSize: 12, marginTop: 4, fontStyle: 'italic' },
   deadActions: { flexDirection: 'row', gap: 6, marginTop: 8 },
   copyLogBtn: {
     backgroundColor: '#1a1714',

@@ -23,6 +23,12 @@ export interface SlotSummary {
   dead?: boolean;
   savedAt: number;
   createdAt: number;
+  // v2.4.1 (OTA 036) — main-quest snapshot for the TitleScreen
+  // RESUME OBJECTIVE card. All optional; older summaries lack
+  // these fields and the UI falls back to omitting the card.
+  factionId?: string;
+  mainQuestPhase?: string;
+  mainQuestCoresRecovered?: number;
 }
 
 // Install-wide stash (not per-character). Stores resources that persist
@@ -132,6 +138,9 @@ export async function saveSlot(slotId: string, state: SaveState): Promise<void> 
       dead: state.player.dead === true,
       savedAt: toSave.savedAt,
       createdAt: (await readCreatedAt(slotId)) ?? toSave.savedAt,
+      factionId: state.player.factionId,
+      mainQuestPhase: state.player.mainQuest?.phase,
+      mainQuestCoresRecovered: state.player.mainQuest?.coresRecovered?.length ?? 0,
     };
     await upsertIndexEntry(summary);
   }
