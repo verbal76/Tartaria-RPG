@@ -616,6 +616,11 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     statProgress: p.statProgress ?? {
       strength: 0, dexterity: 0, intelligence: 0, wisdom: 0, charisma: 0,
     },
+    // v2.4.1 (OTA 033) — backfill the Mud Flood Nexus main quest for
+    // legacy saves. Starts everyone at the 'hook' phase regardless
+    // of where they were in the game; the first Lost Capital visit
+    // re-triggers the revelation.
+    mainQuest: p.mainQuest ?? { phase: 'hook', coresRecovered: [] },
     equipped,
     statusEffects: p.statusEffects ?? [],
     hoursElapsed: p.hoursElapsed ?? 0,
@@ -976,6 +981,10 @@ interface GameStore {
    *  running but its output will be dropped on the floor instead of appended
    *  to the log. Used when a new player action arrives mid-stream. */
   cancelGeneration: () => void;
+
+  /** v2.4.1 (OTA 033) — make The Choice at the Mud Flood Nexus.
+   *  Only valid when mainQuest.phase === 'choice'. Final. */
+  chooseEndingMainQuest: (ending: 'seal' | 'unleash' | 'preserve') => void;
 
   persist: () => Promise<void>;
 }
@@ -7291,6 +7300,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     advanceActiveFactionQuests(get, set, 'travel');
     get().beginScene({ arrivalFromName: fromLocationName });
+    // v2.4.1 (OTA 033) — main quest triggers on arrival.
+    // First trigger: 'hook' → 'revelation' on the player's first
+    // Lost Capital visit. Second trigger: 'core_recovered' on any
+    // Lost Capital visit (no-op if already collected this one).
+    // Phase 1 simplification: Cores auto-grant on arrival; the
+    // faction-route flavor authored in later OTAs will add gates
+    // (combat / investigate / dialogue) between visit and grant.
+    triggerMainQuest(get, set, { kind: 'first_capital_visit', locationId });
+    triggerMainQuest(get, set, { kind: 'core_recovered', locationId });
+    if (locationId === 'mud_flood_nexus') {
+      triggerMainQuest(get, set, { kind: 'reached_nexus' });
+    }
     void get().persist();
   },
 
@@ -10323,6 +10344,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
 
+  // v2.4.1 (OTA 033) — Mud Flood Nexus main quest action: the player
+  // makes The Choice from the Contracts screen. Ending must be one
+  // of 'seal' | 'unleash' | 'preserve'; the choice is final.
+  chooseEndingMainQuest(ending: 'seal' | 'unleash' | 'preserve') {
+    const player = get().player;
+    if (!player) return;
+    triggerMainQuest(get, set, { kind: 'chose_ending', ending });
+    void get().persist();
+  },
+
   async persist() {
     const { player, worldMemory, gameLog, currentScreen, currentScene, activeSlotId } = get();
     if (!activeSlotId) return; // No active slot — nothing to write to.
@@ -11239,6 +11270,83 @@ function makeRoomKey(
 function nonClimbMarkers(searched: readonly string[] | undefined): string[] {
   if (!searched) return [];
   return searched.filter((s) => !s.startsWith('climbed:'));
+}
+
+// v2.4.1 (OTA 033) — main-quest trigger helper. Calls advanceMainQuest
+// and, if the phase actually moved, updates the player + logs the
+// new phase's narration line. Also grants the Core inventory item
+// when a 'core_recovered' trigger lands.
+type MainQuestTrigger =
+  | { kind: 'first_capital_visit'; locationId: string }
+  | { kind: 'core_recovered'; locationId: string }
+  | { kind: 'reached_nexus' }
+  | { kind: 'chose_ending'; ending: 'seal' | 'unleash' | 'preserve' };
+
+function triggerMainQuest(
+  get: () => GameStore,
+  set: (partial: Partial<GameStore>) => void,
+  trigger: MainQuestTrigger,
+): void {
+  const player = get().player;
+  if (!player) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const mq = require('../engine/mainQuest');
+  const prevState = mq.ensureMainQuest(player.mainQuest);
+  const nextState = mq.advanceMainQuest(player, trigger);
+  if (nextState === prevState) return;
+  if (nextState.phase === prevState.phase
+      && nextState.coresRecovered.length === prevState.coresRecovered.length) {
+    return;
+  }
+  // Grant the Core inventory item when a core_recovered trigger
+  // actually counted (the advance produced a new coresRecovered
+  // entry). Core items are inline-created InventoryItems — Phase 1
+  // doesn't add catalog rows for them since they're quest-bound.
+  let inventory = player.inventory;
+  if (trigger.kind === 'core_recovered'
+      && nextState.coresRecovered.length > prevState.coresRecovered.length) {
+    const capitalNames: Record<string, string> = {
+      asgardar: 'Asgardar Core',
+      samarran: 'Samarran Core',
+      nimari: 'Nimari Core',
+      drakova: 'Drakova Core',
+      voronov: 'Voronov Core',
+    };
+    const coreName = capitalNames[trigger.locationId];
+    if (coreName) {
+      const newCore: InventoryItem = {
+        id: `core_${trigger.locationId}_${Date.now()}`,
+        name: coreName,
+        kind: 'relic',
+        rarity: 'Legendary',
+        quantity: 1,
+        tags: ['quest', 'aetheric_core', 'main_quest'],
+      };
+      inventory = [...inventory, newCore];
+    }
+  }
+  set({
+    player: { ...player, mainQuest: nextState, inventory },
+  });
+  // Narration log
+  const context: Record<string, unknown> = {};
+  if (trigger.kind === 'core_recovered') {
+    context.coreRecovered = trigger.locationId;
+    context.coresCount = nextState.coresRecovered.length;
+  } else if (trigger.kind === 'chose_ending') {
+    context.ending = trigger.ending;
+  }
+  const line = mq.narrationForPhase(nextState.phase, player.factionId, context);
+  if (line) {
+    get().appendLog('arbiter', line);
+  }
+  // For multi-phase triggers — e.g. core_recovered that lands the
+  // player on phase 'descent' (5th Core) — also log the descent
+  // narration so the player gets the "Stair opens" beat.
+  if (prevState.phase === 'cores' && nextState.phase === 'descent') {
+    const descentLine = mq.narrationForPhase('descent', player.factionId);
+    if (descentLine) get().appendLog('arbiter', descentLine);
+  }
 }
 
 // HANDOFF #15c — has the player already grabbed this loot in this room?

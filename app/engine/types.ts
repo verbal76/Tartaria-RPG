@@ -506,6 +506,41 @@ export interface StatusEffect {
   buffBonus?: number;
 }
 
+// v2.4.1 (OTA 033) — Mud Flood Nexus main quest arc.
+//
+// Universal spine: every character eventually pursues the same
+// end-game (recover 5 Aetheric Cores → descend the Endless Stair →
+// reach the Mud Flood Nexus → choose Seal / Unleash / Preserve).
+// The player's faction colors HOW they pursue each Core (route
+// flavor) but the bones are shared.
+//
+// Phase machine:
+//   hook        Arbiter has mentioned the Nexus once; no objective yet
+//   revelation  Player learned about the 5 Cores (triggered on first
+//               Lost Capital visit)
+//   cores       Actively recovering Cores (5 to collect)
+//   descent     All 5 recovered; Endless Stair is now passable
+//   nexus       Player has arrived at the Mud Flood Nexus
+//   choice      Awaiting the ending decision
+//   ended       Player has made The Choice
+export type MainQuestPhase =
+  | 'hook'
+  | 'revelation'
+  | 'cores'
+  | 'descent'
+  | 'nexus'
+  | 'choice'
+  | 'ended';
+
+export type MainQuestEnding = 'seal' | 'unleash' | 'preserve';
+
+export interface MainQuestState {
+  phase: MainQuestPhase;
+  /** Lost Capital location ids of Cores already recovered. */
+  coresRecovered: string[];
+  ending?: MainQuestEnding;
+}
+
 export interface PlayerCharacter {
   name: string;
   raceId: string;
@@ -533,6 +568,9 @@ export interface PlayerCharacter {
    *  rolls over the overshoot. Default threshold 50 per +1 — see
    *  engine/statTraining.ts STAT_TRAIN_THRESHOLD. */
   statProgress?: Partial<Record<keyof Stats, number>>;
+  /** v2.4.1 (OTA 033) — Mud Flood Nexus main quest progress. Optional
+   *  because legacy saves predate the arc; backfilled on hydrate. */
+  mainQuest?: MainQuestState;
   /** HANDOFF #13 — first-cut companion system. A single NPC follower
    *  the player recruits from a vendor scene. Persists across scenes.
    *  Currently narrative-only; mechanical effects (advantage dice on

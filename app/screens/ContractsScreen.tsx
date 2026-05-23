@@ -8,6 +8,7 @@ import { findFactionQuestById, FACTION_QUESTS } from '../engine/factionQuests';
 import { FACTIONS } from '../engine/factions';
 import { computeAllProgress, CHARACTER_STORIES, ALL_FRAGMENTS } from '../engine/collectables';
 import { describeWhisperStage, describeWhisperTitle, findChain } from '../engine/whispers';
+import { ensureMainQuest, phaseLabel, phaseHint } from '../engine/mainQuest';
 
 function MilestoneStat({ label, value, next, suffix }: { label: string; value: number; next: number; suffix: string }) {
   const toNext = next - (value % next);
@@ -139,6 +140,54 @@ export function ContractsScreen() {
         <Text style={styles.title}>CONTRACTS</Text>
         <View style={{ width: 80 }} />
       </View>
+
+      {(() => {
+        // v2.4.1 (OTA 033) — Primary Objective card. Renders above
+        // the existing tabs whenever the player has a mainQuest.
+        // Shows current phase, Cores recovered, next-step hint, and
+        // — when the player is at the Mud Flood Nexus with all 5
+        // Cores — the three Ending Choice buttons.
+        if (!player) return null;
+        const mq = ensureMainQuest(player.mainQuest);
+        const recoveredCount = mq.coresRecovered.length;
+        return (
+          <View style={styles.mainQuestCard}>
+            <Text style={styles.mainQuestTag}>PRIMARY OBJECTIVE</Text>
+            <Text style={styles.mainQuestPhase}>{phaseLabel(mq.phase)}</Text>
+            <Text style={styles.mainQuestHint}>{phaseHint(mq.phase, recoveredCount)}</Text>
+            {mq.phase === 'choice' && (
+              <View style={styles.mainQuestChoiceRow}>
+                <TouchableOpacity
+                  style={[styles.mainQuestChoiceBtn, { borderColor: '#5a6b8a' }]}
+                  onPress={() => useGameStore.getState().chooseEndingMainQuest('seal')}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.mainQuestChoiceText}>SEAL</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.mainQuestChoiceBtn, { borderColor: '#a85a3a' }]}
+                  onPress={() => useGameStore.getState().chooseEndingMainQuest('unleash')}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.mainQuestChoiceText}>UNLEASH</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.mainQuestChoiceBtn, { borderColor: '#7a8a5a' }]}
+                  onPress={() => useGameStore.getState().chooseEndingMainQuest('preserve')}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.mainQuestChoiceText}>PRESERVE</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            {mq.phase === 'ended' && mq.ending && (
+              <Text style={styles.mainQuestEnded}>
+                Ending recorded: {mq.ending.toUpperCase()}.
+              </Text>
+            )}
+          </View>
+        );
+      })()}
 
       <View style={styles.tabRow}>
         <TouchableOpacity
@@ -616,6 +665,62 @@ function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllP
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0a0908', padding: 12 },
+  // v2.4.1 (OTA 033) — Primary Objective card. Sits at the top of
+  // the Contracts screen above the tab row. Warm-gold border to
+  // signal the main quest visually distinct from the per-faction
+  // contracts below.
+  mainQuestCard: {
+    backgroundColor: '#13110f',
+    borderColor: '#c9a86a',
+    borderWidth: 1.5,
+    borderRadius: 4,
+    padding: 12,
+    marginBottom: 8,
+  },
+  mainQuestTag: {
+    color: '#c9a86a',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 2,
+    marginBottom: 4,
+  },
+  mainQuestPhase: {
+    color: '#e6d8b3',
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  mainQuestHint: {
+    color: '#cdbf99',
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  mainQuestChoiceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+    gap: 6,
+  },
+  mainQuestChoiceBtn: {
+    flex: 1,
+    backgroundColor: '#1a1714',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  mainQuestChoiceText: {
+    color: '#e6d8b3',
+    fontSize: 12,
+    letterSpacing: 2,
+    fontWeight: '700',
+  },
+  mainQuestEnded: {
+    color: '#7a705c',
+    fontSize: 11,
+    fontStyle: 'italic',
+    marginTop: 6,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',

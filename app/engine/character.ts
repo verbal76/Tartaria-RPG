@@ -5,6 +5,7 @@ import factionsData from '../data/factions/factions.json';
 import explorationData from '../data/items/exploration.json';
 import { stampDurability } from './durability';
 import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from './worldMap';
+import { initMainQuest } from './mainQuest';
 
 // Race + faction starter weapon kits. Every character begins with:
 //   1) A "primary" — a low-tier weapon they would plausibly carry given
@@ -238,5 +239,9 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
     // makes the first cardinal step walk from the wrong tile.
     mapX: WORLD_MAP_CENTER_X,
     mapY: WORLD_MAP_CENTER_Y,
+    // v2.4.1 (OTA 033) — initialize the Mud Flood Nexus main quest at
+    // the 'hook' phase. The Arbiter's first-scene intro mentions the
+    // Nexus once and seeds the arc.
+    mainQuest: initMainQuest(),
   };
 }
