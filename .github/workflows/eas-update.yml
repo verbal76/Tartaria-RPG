@@ -52,13 +52,14 @@ jobs:
       - name: Setup Expo and EAS CLI
         uses: expo/expo-github-action@v8
         with:
-          # Pinned (was 'latest'). Run #404 picked up eas-cli 19.0.8
-          # which silently failed at 'Validating authenticated account'
-          # — exit 1 with no diagnostic. Pinning to the last verified
-          # stable means CI doesn't break on the next eas-cli release.
-          # Bump deliberately after confirming the new version still
-          # auth-validates against the project token.
-          eas-version: 16.6.1
+          # Pinned. 16.6.1 (late 2024) turned out to be too old for
+          # the current Expo backend's expectations — auth step would
+          # succeed but publish steps could fail with stale-API
+          # errors. Bumped to the last 18.x major (Feb 2025) which is
+          # the most-recent series before the broken 19.0.8 (run #404).
+          # Bump again deliberately after confirming the new version
+          # still auth-validates against the project token.
+          eas-version: 18.1.0
           token: ${{ secrets.TARTARIATWO }}
 
       # Diagnostic step — print env health so the next CI failure has
