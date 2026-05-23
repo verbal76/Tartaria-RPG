@@ -11390,9 +11390,13 @@ function triggerMainQuest(
   } else if (trigger.kind === 'chose_ending') {
     context.ending = trigger.ending;
   }
-  const line = mq.narrationForPhase(nextState.phase, player.factionId, context);
-  if (line) {
-    get().appendLog('arbiter', line);
+  // Suppress the single-line 'choice' phase narration — the Phase 5
+  // Nexus cinematic below replaces it with a 7-paragraph beat.
+  if (nextState.phase !== 'choice') {
+    const line = mq.narrationForPhase(nextState.phase, player.factionId, context);
+    if (line) {
+      get().appendLog('arbiter', line);
+    }
   }
   // For multi-phase triggers — e.g. core_recovered that lands the
   // player on phase 'descent' (5th Core) — also log the descent
@@ -11400,6 +11404,17 @@ function triggerMainQuest(
   if (prevState.phase === 'cores' && nextState.phase === 'descent') {
     const descentLine = mq.narrationForPhase('descent', player.factionId);
     if (descentLine) get().appendLog('arbiter', descentLine);
+  }
+  // v2.4.1 (OTA 038 — Phase 5) — the Nexus interior cinematic.
+  // When reached_nexus advances 'descent' -> 'choice', emit the
+  // arrival + 5 Core-slotting beats + the prompt as separate log
+  // entries so the feed reads as paragraphs. The choice buttons on
+  // ContractsScreen already wire up to chooseEndingMainQuest.
+  if (prevState.phase === 'descent' && nextState.phase === 'choice') {
+    const cine = mq.nexusArrivalCinematic();
+    for (const line of cine) {
+      get().appendLog('arbiter', line);
+    }
   }
 }
 

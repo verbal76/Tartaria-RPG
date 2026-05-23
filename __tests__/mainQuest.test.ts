@@ -149,6 +149,22 @@ describe('mainQuest phase machine', () => {
     expect(LOST_CAPITAL_LOCATIONS).toEqual(['asgardar', 'samarran', 'nimari', 'drakova', 'voronov']);
   });
 
+  describe('Phase 5 — Nexus cinematic', () => {
+    it('NEXUS_SLOT_BEATS covers all 5 Cores in canonical order', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { NEXUS_SLOT_BEATS, nexusArrivalCinematic } = require('../app/engine/mainQuest');
+      expect(NEXUS_SLOT_BEATS).toHaveLength(5);
+      expect(NEXUS_SLOT_BEATS.map((b: { capitalId: string }) => b.capitalId))
+        .toEqual(['asgardar', 'samarran', 'nimari', 'drakova', 'voronov']);
+      // Each beat has a substantial line (not a placeholder).
+      for (const b of NEXUS_SLOT_BEATS) {
+        expect(b.line.length).toBeGreaterThan(40);
+      }
+      // Cinematic returns arrival + 5 slot beats + choice prompt = 7 lines.
+      expect(nexusArrivalCinematic()).toHaveLength(7);
+    });
+  });
+
   describe('Phase 2 — Core-recovery gates', () => {
     it('every faction has a CoreGate mapping', () => {
       const factions = [

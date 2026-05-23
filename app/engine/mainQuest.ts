@@ -165,6 +165,66 @@ const DESCENT_LINE_BY_FACTION: Record<string, string> = {
 const NEXUS_ARRIVAL_LINE =
   'You arrive at the Mud Flood Nexus. The chamber is older than every kingdom drawn on every honest map. The 5 Cores in your pack pulse in concord. The control mantle waits — three actions are possible. None is reversible.';
 
+// v2.4.1 (OTA 038) — Phase 5: Mud Flood Nexus interior scene.
+//
+// When the player arrives with all 5 Cores, the engine plays a
+// multi-paragraph cinematic that walks them up to the control mantle
+// and slots each Core into its named receptacle, in canonical order
+// (Asgardar first, Mud Flood Nexus last). Each slot is a beat of
+// authored narration; collectively they pace the terminal moment so
+// the Choice doesn't land flat.
+//
+// Called from gameStore when the player enters mud_flood_nexus AND
+// mainQuest.phase advances to 'choice' (i.e. all 5 Cores present).
+// Returns the array of narration lines; the caller appends each as
+// its own log entry so AdventureFeed renders them as paragraphs.
+export interface NexusSlotBeat {
+  capitalId: string;
+  capitalName: string;
+  line: string;
+}
+
+export const NEXUS_SLOT_BEATS: readonly NexusSlotBeat[] = [
+  {
+    capitalId: 'asgardar',
+    capitalName: 'Asgardar',
+    line: 'You lift the Asgardar Core from your pack and set it in the first receptacle — the crowned seat at the mantle\'s peak. The Aether in the chamber answers, low and certain. The lights on the wall, dead for a thousand years, take their first breath.',
+  },
+  {
+    capitalId: 'samarran',
+    capitalName: 'Samarran',
+    line: 'The Samarran Core slots into the timing-seat next. The Engine begins keeping time again. A long-stilled metronome in the chamber\'s wall ticks once, twice, holds — a heartbeat returning.',
+  },
+  {
+    capitalId: 'nimari',
+    capitalName: 'Nimari',
+    line: 'The Nimari Core takes the shielding-seat. A field of soft red Aether haloes you and the mantle alike — the chamber is no longer porous to the world above. Whatever you do here is sealed inside these walls.',
+  },
+  {
+    capitalId: 'drakova',
+    capitalName: 'Drakova',
+    line: 'The Drakova Core finds the reserve-seat. The mantle\'s power gauge — a column of mud-glass shot through with Aether — fills from its empty bottom to the second mark. The Engine can run for a long time now.',
+  },
+  {
+    capitalId: 'voronov',
+    capitalName: 'Voronov',
+    line: 'The Voronov Core lands in the regulator-seat. The last of the 5 is set. The chamber\'s lights firm to a clean amber, the metronome steadies into a real beat, and the control mantle — for the first time since 1530 — is ready to take direction.',
+  },
+];
+
+/** The pre-Choice walk-up narration. Called by gameStore when the
+ *  player has all 5 Cores and steps into mud_flood_nexus. Returns
+ *  an ordered list of lines: arrival + 5 slot beats + the prompt to
+ *  decide. AdventureFeed appends each as a paragraph. */
+export function nexusArrivalCinematic(): string[] {
+  const lines: string[] = [NEXUS_ARRIVAL_LINE];
+  for (const beat of NEXUS_SLOT_BEATS) lines.push(beat.line);
+  lines.push(
+    'Three actions remain. SEAL — collapse the Aether back into stillness, lock Tartaria where it was buried, and walk out under a quiet sky. UNLEASH — open the chamber\'s old throat and let the Aether climb back up into the world; what comes next is not yours to manage. PRESERVE — leave the mantle live but unsigned, walk out with the 5 Cores still in your pack, and carry the keys to a cataclysm only you can choose to use. Decide from the Contracts screen.',
+  );
+  return lines;
+}
+
 const CHOICE_LINE_BY_ENDING: Record<MainQuestEnding, string> = {
   seal: 'You SEAL the Nexus. The cataclysm is locked away — Tartaria stays buried, the surface world stays innocent. The Cores fuse into the mantle as you set the last one. The chamber dims. You can walk out, or stay until the dim takes you. Either is a kind of ending.',
   unleash: 'You UNLEASH the Nexus. The cataclysm cycles back — Aetheric pressure rises, the surface tremors, every buried Tartaria stirs at once. What comes next is no longer in any one person\'s hands. Your faction will write the aftermath. You walk out under sky that has changed color.',
