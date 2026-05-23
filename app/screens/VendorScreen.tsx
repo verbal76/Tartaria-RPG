@@ -45,6 +45,14 @@ export function VendorScreen() {
 
   const [mode, setMode] = useState<Mode>('buy');
   const [pending, setPending] = useState<Pending>(null);
+  // v2.4.1 (OTA 022) — sellSort must live ABOVE the early-return guard
+  // below. The prior position (line 104) made hook count depend on
+  // vendor being non-null: when a vendor was dismissed mid-render
+  // (e.g. caught stealing → vendor cleared → combat starts), the
+  // early return fired and React saw 2 hooks instead of 3 — the
+  // "Rendered fewer hooks than expected" crash. All hooks must
+  // unconditionally precede any return statement in this component.
+  const [sellSort, setSellSort] = useState<'name' | 'value' | 'rarity'>('value');
 
   const vendor = scene?.vendor ?? null;
 
@@ -101,7 +109,6 @@ export function VendorScreen() {
   const equippedNames = new Set(
     Object.values(player.equipped ?? {}).filter((n): n is string => !!n),
   );
-  const [sellSort, setSellSort] = useState<'name' | 'value' | 'rarity'>('value');
   // HANDOFF #12 — sell-back UI polish. Sort options so the player can
   // surface the most valuable junk first (default), alphabetize for
   // hunting, or group by rarity for clearing low-tier clutter.
