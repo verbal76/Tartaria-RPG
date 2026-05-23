@@ -194,13 +194,18 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     screen: 'actions',
     area: 'fullscreen',
-    title: 'Action reference',
+    title: 'Actions & Recipes',
     body:
-      'This is the full list of every verb the engine understands, grouped by category — ' +
-      'movement, combat, social, crafting, world. ' +
-      '\n\nTap any card and its first example phrase drops straight into the input box, ' +
-      'ready for you to finish typing. Tap the same card again to cycle through alternate ' +
-      'phrasings. Great when you forget the exact wording for "take cover" or "set a trap".',
+      'Two tabs at the top: ACTIONS and RECIPES. ' +
+      '\n\nACTIONS — every verb the engine understands, grouped by category (movement, ' +
+      'combat, social, skill-based, Aetheric). Tap any card and its first example phrase ' +
+      'drops into the input box; tap again to cycle alternate phrasings. Great for "take ' +
+      'cover", "set a trap", any verb you forget the wording for. ' +
+      '\n\nRECIPES — every craftable item with its ingredient list (weapons, armor, ' +
+      'amulets & rings, utility, food, potions) PLUS the three Aethercraft disciplines: ' +
+      'Aetherstone Manipulation (shape stone), Aether Golem Constructor (summon golem), ' +
+      'Aetheric Healing (mend wounds). Each Aethercraft card shows which Aether fuels it ' +
+      'will burn. Tap a recipe card to drop "craft <name>" into the input box.',
   },
   {
     screen: 'contracts',

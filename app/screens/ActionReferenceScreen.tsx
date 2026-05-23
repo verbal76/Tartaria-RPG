@@ -3,6 +3,23 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import conceptsData from '../data/lore/concepts.json';
+import { RECIPES, WEAPONS, ARMOR, AMULETS, RINGS, GEAR, MATERIALS } from '../engine/crafting';
+
+function recipeDescription(name: string): string | null {
+  const w = WEAPONS.find((x) => x.name === name);
+  if (w) return w.description;
+  const a = ARMOR.find((x) => x.name === name);
+  if (a) return a.description;
+  const g = GEAR.find((x) => x.name === name);
+  if (g) return g.description;
+  const am = AMULETS.find((x) => x.name === name);
+  if (am) return am.description;
+  const r = RINGS.find((x) => x.name === name);
+  if (r) return r.description;
+  const m = MATERIALS.find((x) => x.name === name);
+  if (m) return m.description;
+  return null;
+}
 
 interface Concept {
   id: string;
@@ -12,6 +29,102 @@ interface Concept {
 }
 
 const concepts = (conceptsData.concepts as Concept[]);
+
+// OTA 462 — Recipes tab. Three Aethercraft disciplines (hand-defined
+// because they're not in recipes.json — they're spell-equivalents that
+// burn Aether-tagged fuel) plus every craft recipe grouped by output
+// category. Tapping a recipe card queues "craft <result>" exactly the
+// way the existing action cards queue their example phrase.
+type RecipeMode = 'actions' | 'recipes';
+
+interface AethercraftDiscipline {
+  id: string;
+  title: string;
+  body: string;
+  fuels: string[];
+  examples: string[];
+}
+
+const AETHERCRAFT_DISCIPLINES: AethercraftDiscipline[] = [
+  {
+    id: 'aether_shape',
+    title: 'Aetherstone Manipulation (shape)',
+    body:
+      'INT check, DC 12. In combat: +4 AC for one round (shaped-stone ward). Out of combat: ' +
+      'binds an Aetheric Shard to a Small Rock, producing a throwable Shaped Aetheric Shard. ' +
+      'Mud Dwellers and Aetherborn cast at the base DC; every other race rolls +4 harder.',
+    fuels: ['Aetheric Shard', 'Aether Crystal', 'Aether Mud', 'Aether Residue', 'Golem Core', 'Aetheric Locket'],
+    examples: ['shape stone', 'mold the aetherstone', 'manipulate stone'],
+  },
+  {
+    id: 'aether_summon',
+    title: 'Aether Golem Constructor (summon)',
+    body:
+      'INT check, DC 15 (harder than the other two — golems take stronger anchors). Summons ' +
+      'an Aether Golem ally that fights for you for the rest of the scene. ' +
+      'Mud Dwellers and Aetherborn cast at the base DC; every other race rolls +4 harder.',
+    fuels: ['Aetheric Shard', 'Aether Crystal', 'Golem Core'],
+    examples: ['summon golem', 'summon an aether golem', 'call a golem'],
+  },
+  {
+    id: 'aether_mend',
+    title: 'Aetheric Healing (mend)',
+    body:
+      'WIS check, DC 12. Restores HP to you or an ally. Aetherborn pay HP instead of corruption ' +
+      'when they cast this — racial trait. Mud Dwellers and Aetherborn cast at the base DC; ' +
+      'every other race rolls +4 harder.',
+    fuels: ['Aetheric Shard', 'Aether Crystal'],
+    examples: ['mend wounds', 'heal me', 'mend self', 'aetheric healing'],
+  },
+];
+
+// Hard-grouped recipe partition. We classify by output catalog row;
+// items absent from any catalog fall into MISC. The order is
+// gameplay-priority (weapons first, then armor, then utility, then
+// food/potions at the bottom).
+const RECIPE_GROUPS: { title: string; names: string[] }[] = [
+  {
+    title: 'Weapons',
+    names: [
+      'Club', 'Cudgel', 'Stone Spear', 'Iron Spear', 'Aether-Shard Spear',
+      'Aetheric Crystal Blade', 'Storm Rod',
+      'Sentinel Cleaver', 'Founder\'s Edge',
+      'Wyrm-Fang Blade', 'Mud-Iron Greatblade',
+      'Voidspawn Bolt',
+    ],
+  },
+  {
+    title: 'Armor',
+    names: [
+      'Aetheric Vest', 'Sludge-Forged Vest', 'Aether-Wing Cloak', 'Mudstone Bulwark',
+    ],
+  },
+  {
+    title: 'Amulets & Rings',
+    names: [
+      'Mud Gem Amulet', 'Aether-Shard Ring', 'Lich-Heart Pendant',
+      'Hollow Crown Circlet', 'Behemoth-Heart Talisman',
+    ],
+  },
+  {
+    title: 'Utility & Tools',
+    names: [
+      'Aetheric Torch', 'First Aid Kit', 'Aetheric Compass', 'Resonant Song Phial',
+      'Iron-Worm Engine',
+    ],
+  },
+  {
+    title: 'Food',
+    names: ['Forager\'s Stew', 'Hearty Stew', 'Mushroom Stew'],
+  },
+  {
+    title: 'Potions & Tinctures',
+    names: [
+      'Red Cap Tincture', 'Blue Cap Draught', 'Violet Cap Distillate',
+      'Orange Sporecap Brew', 'Many-Colored Tonic',
+    ],
+  },
+];
 
 // Group concepts by the action card they came from. Each section title
 // matches the card the player was asked about. Concept ids are stable
@@ -233,6 +346,7 @@ function explanationFor(c: Concept): string {
 export function ActionReferenceScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const queueInputDraft = useGameStore((s) => s.queueInputDraft);
+  const [mode, setMode] = useState<RecipeMode>('actions');
 
   // Per-card cycle index. Tapping a card cycles its example list:
   // tap once → example[0] queues to input + clipboard; tap again →
@@ -276,56 +390,170 @@ export function ActionReferenceScreen() {
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>ACTIONS REFERENCE</Text>
+        <Text style={styles.title}>{mode === 'actions' ? 'ACTIONS' : 'RECIPES'}</Text>
         <View style={{ width: 80 }} />
       </View>
+      <View style={styles.modeTabs}>
+        <TouchableOpacity
+          style={[styles.modeTab, mode === 'actions' && styles.modeTabActive]}
+          onPress={() => setMode('actions')}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.modeTabText, mode === 'actions' && styles.modeTabTextActive]}>
+            ACTIONS
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.modeTab, mode === 'recipes' && styles.modeTabActive]}
+          onPress={() => setMode('recipes')}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.modeTabText, mode === 'recipes' && styles.modeTabTextActive]}>
+            RECIPES
+          </Text>
+        </TouchableOpacity>
+      </View>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
-        <Text style={styles.intro}>
-          What every action does, with the exact mechanics. Tap any card to
-          drop its first example into the input box — tap again to cycle
-          through alternate phrasings. Hit BACK and finish the sentence.
-        </Text>
-        {SECTIONS.map((section) => (
-          <View key={section.title} style={styles.section}>
-            <Text style={styles.sectionTitle}>{section.title}</Text>
-            {section.ids.map((id) => {
-              const c = lookup(id);
-              if (!c) return null;
-              const examples = EXAMPLES[id] ?? [];
-              const queuedIdx = cycleIdx[id];
-              const queuedPhrase = queuedIdx !== undefined ? examples[queuedIdx] : null;
-              const queued = isQueued(id);
-              return (
-                <Pressable
-                  key={id}
-                  style={({ pressed }) => [
-                    styles.card,
-                    pressed && styles.cardPressed,
-                    queued && styles.cardQueued,
-                  ]}
-                  onPress={() => handleCardTap(id, examples)}
-                >
-                  <Text style={styles.cardTitle}>{c.title}</Text>
-                  <Text style={styles.cardBody}>{explanationFor(c)}</Text>
-                  {examples.length > 0 && (
+        {mode === 'actions' ? (
+          <>
+            <Text style={styles.intro}>
+              What every action does, with the exact mechanics. Tap any card to
+              drop its first example into the input box — tap again to cycle
+              through alternate phrasings. Hit BACK and finish the sentence.
+            </Text>
+            {SECTIONS.map((section) => (
+              <View key={section.title} style={styles.section}>
+                <Text style={styles.sectionTitle}>{section.title}</Text>
+                {section.ids.map((id) => {
+                  const c = lookup(id);
+                  if (!c) return null;
+                  const examples = EXAMPLES[id] ?? [];
+                  const queuedIdx = cycleIdx[id];
+                  const queuedPhrase = queuedIdx !== undefined ? examples[queuedIdx] : null;
+                  const queued = isQueued(id);
+                  return (
+                    <Pressable
+                      key={id}
+                      style={({ pressed }) => [
+                        styles.card,
+                        pressed && styles.cardPressed,
+                        queued && styles.cardQueued,
+                      ]}
+                      onPress={() => handleCardTap(id, examples)}
+                    >
+                      <Text style={styles.cardTitle}>{c.title}</Text>
+                      <Text style={styles.cardBody}>{explanationFor(c)}</Text>
+                      {examples.length > 0 && (
+                        <Text style={styles.cardExamples}>
+                          <Text style={styles.cardExamplesLabel}>Tap to queue: </Text>
+                          {examples.map((ex, i) =>
+                            i === queuedIdx ? `[${ex}]` : `"${ex}"`,
+                          ).join(' · ')}
+                        </Text>
+                      )}
+                      {queued && queuedPhrase && (
+                        <Text style={styles.queuedHint}>
+                          ✓ &quot;{queuedPhrase}&quot; staged for the input box
+                          {examples.length > 1 ? ` (${(queuedIdx ?? 0) + 1}/${examples.length} — tap again to cycle)` : ''}
+                        </Text>
+                      )}
+                    </Pressable>
+                  );
+                })}
+              </View>
+            ))}
+          </>
+        ) : (
+          <>
+            <Text style={styles.intro}>
+              Every craftable item — weapons, armor, accessories, food, potions —
+              plus the three Aethercraft disciplines (shape stone, summon golem,
+              mend wounds). Tap any card to drop its phrase into the input box.
+            </Text>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Aethercraft Disciplines</Text>
+              {AETHERCRAFT_DISCIPLINES.map((d) => {
+                const queuedIdx = cycleIdx[d.id];
+                const queuedPhrase = queuedIdx !== undefined ? d.examples[queuedIdx] : null;
+                const queued = isQueued(d.id);
+                return (
+                  <Pressable
+                    key={d.id}
+                    style={({ pressed }) => [
+                      styles.card,
+                      pressed && styles.cardPressed,
+                      queued && styles.cardQueued,
+                    ]}
+                    onPress={() => handleCardTap(d.id, d.examples)}
+                  >
+                    <Text style={styles.cardTitle}>{d.title}</Text>
+                    <Text style={styles.cardBody}>{d.body}</Text>
+                    <Text style={styles.recipeIngredients}>
+                      <Text style={styles.recipeIngredientsLabel}>Fuel (any one): </Text>
+                      {d.fuels.join(', ')}
+                    </Text>
                     <Text style={styles.cardExamples}>
                       <Text style={styles.cardExamplesLabel}>Tap to queue: </Text>
-                      {examples.map((ex, i) =>
+                      {d.examples.map((ex, i) =>
                         i === queuedIdx ? `[${ex}]` : `"${ex}"`,
                       ).join(' · ')}
                     </Text>
-                  )}
-                  {queued && queuedPhrase && (
-                    <Text style={styles.queuedHint}>
-                      ✓ &quot;{queuedPhrase}&quot; staged for the input box
-                      {examples.length > 1 ? ` (${(queuedIdx ?? 0) + 1}/${examples.length} — tap again to cycle)` : ''}
-                    </Text>
-                  )}
-                </Pressable>
-              );
-            })}
-          </View>
-        ))}
+                    {queued && queuedPhrase && (
+                      <Text style={styles.queuedHint}>
+                        ✓ &quot;{queuedPhrase}&quot; staged for the input box
+                      </Text>
+                    )}
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            {RECIPE_GROUPS.map((group) => (
+              <View key={group.title} style={styles.section}>
+                <Text style={styles.sectionTitle}>{group.title}</Text>
+                {group.names.map((name) => {
+                  const recipe = RECIPES.find((r) => r.result === name);
+                  if (!recipe) return null;
+                  const description = recipeDescription(name);
+                  const cardId = `recipe:${name}`;
+                  const phrase = `craft ${name}`;
+                  const examples = [phrase];
+                  const queued = isQueued(cardId);
+                  return (
+                    <Pressable
+                      key={cardId}
+                      style={({ pressed }) => [
+                        styles.card,
+                        pressed && styles.cardPressed,
+                        queued && styles.cardQueued,
+                      ]}
+                      onPress={() => handleCardTap(cardId, examples)}
+                    >
+                      <Text style={styles.cardTitle}>{name}</Text>
+                      {description ? (
+                        <Text style={styles.cardBody}>{description}</Text>
+                      ) : null}
+                      <Text style={styles.recipeIngredients}>
+                        <Text style={styles.recipeIngredientsLabel}>Needs: </Text>
+                        {recipe.ingredients.map((i) => `${i.name} ×${i.quantity}`).join(', ')}
+                      </Text>
+                      <Text style={styles.cardExamples}>
+                        <Text style={styles.cardExamplesLabel}>Tap to queue: </Text>
+                        &quot;{phrase}&quot;
+                      </Text>
+                      {queued && (
+                        <Text style={styles.queuedHint}>
+                          ✓ &quot;{phrase}&quot; staged for the input box
+                        </Text>
+                      )}
+                    </Pressable>
+                  );
+                })}
+              </View>
+            ))}
+          </>
+        )}
       </ScrollView>
     </View>
   );
@@ -418,6 +646,47 @@ const styles = StyleSheet.create({
   },
   cardExamplesLabel: {
     color: '#9ec96a',
+    fontWeight: '700',
+    fontStyle: 'normal',
+    letterSpacing: 1,
+  },
+  // OTA 462 — Recipes tab additions.
+  modeTabs: {
+    flexDirection: 'row',
+    gap: 6,
+    marginBottom: 10,
+  },
+  modeTab: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 4,
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    backgroundColor: '#1a1612',
+    alignItems: 'center',
+  },
+  modeTabActive: {
+    backgroundColor: '#c9a86a',
+    borderColor: '#c9a86a',
+  },
+  modeTabText: {
+    color: '#cdbf99',
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 2,
+  },
+  modeTabTextActive: {
+    color: '#13110f',
+  },
+  recipeIngredients: {
+    color: '#a89a78',
+    fontSize: 11,
+    lineHeight: 16,
+    marginTop: 6,
+    fontStyle: 'italic',
+  },
+  recipeIngredientsLabel: {
+    color: '#c9a86a',
     fontWeight: '700',
     fontStyle: 'normal',
     letterSpacing: 1,
