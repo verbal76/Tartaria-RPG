@@ -942,6 +942,13 @@ interface GameStore {
   discardLead: (id: string) => void;
   digHere: () => void;
   stepDirection: (dir: Direction) => void;
+  /** v2.4.1 (OTA 049) — multi-step travel. setTravelCourse begins a
+   *  course to the named location and takes one step. continueTravel
+   *  steps once more toward the active target. stopTravel clears the
+   *  target and returns the player to free cardinal travel. */
+  setTravelCourse: (locationId: string) => void;
+  continueTravel: () => void;
+  stopTravel: () => void;
   setActiveEnemyIdx: (idx: number) => void;
   /** Craft a specific recipe directly (used by the CraftingScreen list). */
   craftRecipe: (recipeName: string) => void;
@@ -4653,8 +4660,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         }
         if (candidate) {
-          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.travel), 2) });
-          get().travelTo(candidate.id);
+          // v2.4.1 (OTA 049) — `travel to <city>` no longer teleports.
+          // Sets a course and takes ONE step toward the target's
+          // procedural position. The player engages with every tile
+          // en route via CONTINUE TRAVEL / STOP TRAVEL buttons. To
+          // arrive, they tap continue until they step onto the
+          // target tile (which fires the normal travelTo on landing).
+          //
+          // Same-location guard: if the player is ALREADY at the
+          // candidate, no-op with a quick line.
+          if (candidate.id === player.currentLocationId) {
+            get().appendLog('arbiter', `The Arbiter raises a brow. "You are at ${candidate.name}. The road from here is the road forward."`);
+            break;
+          }
+          get().setTravelCourse(candidate.id);
           break;
         }
         // No external destination matched — but the player named something
@@ -9314,6 +9333,94 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // Walk one tile on the procedural map. If the tile contains a named
   // location, switch to it; otherwise narrate a wander. A compass in the
   // inventory upgrades the narration with directional hints.
+  // v2.4.1 (OTA 049) — multi-step travel to a named location.
+  // setTravelCourse sets player.travelTarget and takes one step
+  // toward the target's procedural position. continueTravel takes
+  // additional steps. stopTravel clears the target.
+  setTravelCourse(locationId: string) {
+    const player = get().player;
+    const scene = get().currentScene;
+    if (!player || !scene) return;
+    if (locationId === player.currentLocationId) return;
+    const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
+    const map: WorldMap = generateWorldMap(seed, player.currentLocationId);
+    const tgtPos = map.positions[locationId];
+    if (!tgtPos) {
+      get().appendLog('arbiter', `The Arbiter shakes their head. "That destination doesn't sit on any map I can see from here."`);
+      return;
+    }
+    // Locate the destination's friendly name for the announcement line.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const locs = (require('../data/locations/locations.json') as Array<{ id: string; name: string }>);
+    const tgtName = locs.find((l) => l.id === locationId)?.name ?? locationId;
+    const fromX = player.mapX ?? WORLD_MAP_CENTER_X;
+    const fromY = player.mapY ?? WORLD_MAP_CENTER_Y;
+    const tiles = Math.abs(tgtPos.x - fromX) + Math.abs(tgtPos.y - fromY);
+    set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId } } } : s));
+    get().appendLog(
+      'world',
+      `You set course for ${tgtName}. Estimated ${tiles} day${tiles === 1 ? '' : 's'} of travel. CONTINUE / STOP from the travel row.`,
+    );
+    // Take the first step immediately so the player sees motion now.
+    const firstDir = nextCardinalToward(fromX, fromY, tgtPos.x, tgtPos.y);
+    if (firstDir) {
+      get().stepDirection(firstDir);
+      // If the first step IS the arrival, clear travelTarget here
+      // (stepDirection already fired travelTo via its landedOn branch).
+      const after = get().player;
+      if (after && after.currentLocationId === locationId) {
+        set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
+      }
+    }
+  },
+
+  continueTravel() {
+    const player = get().player;
+    const scene = get().currentScene;
+    if (!player || !scene || !player.travelTarget) return;
+    const targetId = player.travelTarget.locationId;
+    if (targetId === player.currentLocationId) {
+      // Arrived — clear the target and announce.
+      set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
+      return;
+    }
+    const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
+    const map: WorldMap = generateWorldMap(seed, player.currentLocationId);
+    const tgtPos = map.positions[targetId];
+    if (!tgtPos) {
+      get().appendLog('arbiter', `The Arbiter looks at the horizon. "I've lost the bearing. Resetting."`);
+      set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
+      return;
+    }
+    const fromX = player.mapX ?? WORLD_MAP_CENTER_X;
+    const fromY = player.mapY ?? WORLD_MAP_CENTER_Y;
+    const dir = nextCardinalToward(fromX, fromY, tgtPos.x, tgtPos.y);
+    if (!dir) {
+      // Player is on the target tile but somehow currentLocationId
+      // didn't update — clear travel and let beginScene catch up.
+      set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
+      return;
+    }
+    get().stepDirection(dir);
+    // If the step landed us on the target, stepDirection's own
+    // travelTo() handler clears mapX/mapY and switches currentLocationId.
+    // Clear travelTarget AFTER the step so the UI swaps back.
+    const after = get().player;
+    if (after && after.currentLocationId === targetId) {
+      set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
+    }
+  },
+
+  stopTravel() {
+    const player = get().player;
+    if (!player || !player.travelTarget) return;
+    set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
+    get().appendLog(
+      'world',
+      'You set the course aside. Cardinal direction is yours again.',
+    );
+  },
+
   stepDirection(dir: Direction) {
     const player = get().player;
     const scene = get().currentScene;
@@ -11334,6 +11441,23 @@ function makeRoomKey(
 function nonClimbMarkers(searched: readonly string[] | undefined): string[] {
   if (!searched) return [];
   return searched.filter((s) => !s.startsWith('climbed:'));
+}
+
+// v2.4.1 (OTA 049) — next cardinal step toward a procedural-grid
+// target. Picks the larger axis first (Manhattan-correct path), so a
+// destination 12 tiles east + 3 south plays as eight east-steps,
+// three south, four more east — feels like a real heading rather
+// than a checkerboard zigzag. Returns null when already on target.
+function nextCardinalToward(
+  fromX: number, fromY: number, toX: number, toY: number,
+): Direction | null {
+  const dx = toX - fromX;
+  const dy = toY - fromY;
+  if (dx === 0 && dy === 0) return null;
+  if (Math.abs(dx) >= Math.abs(dy)) {
+    return dx > 0 ? 'east' : 'west';
+  }
+  return dy > 0 ? 'south' : 'north';
 }
 
 // v2.4.1 (OTA 033) — main-quest trigger helper. Calls advanceMainQuest

@@ -380,6 +380,15 @@ export function ExplorationScreen() {
             equippedMain={equippedMain}
             equippedOff={equippedOff}
             range={currentScene?.range ?? null}
+            travelTargetName={(() => {
+              if (!player?.travelTarget) return null;
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const locs = (require('../data/locations/locations.json') as Array<{ id: string; name: string }>);
+              const id = player.travelTarget.locationId;
+              return locs.find((l) => l.id === id)?.name ?? id;
+            })()}
+            onContinueTravel={() => useGameStore.getState().continueTravel()}
+            onStopTravel={() => useGameStore.getState().stopTravel()}
           />
         )}
         {/* v2.4.1 (OTA 048) — bottom menu row removed. Gear icon

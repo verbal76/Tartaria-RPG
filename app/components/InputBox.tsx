@@ -82,6 +82,12 @@ interface Props {
   equippedOff: string | null;
   /** Current combat range — surfaces advance/retreat buttons when meaningful. */
   range?: 'arm' | 'close' | 'far' | null;
+  /** v2.4.1 (OTA 049) — when set, the cardinal travel row swaps to
+   *  CONTINUE TRAVEL / STOP TRAVEL buttons. Display name of the
+   *  destination is rendered above. */
+  travelTargetName?: string | null;
+  onContinueTravel?: () => void;
+  onStopTravel?: () => void;
 }
 
 // Peace-mode quick buttons. The "look around you" button submits 'look' —
@@ -106,7 +112,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenFeedback, onOpenMap, inCombat, equippedMain, equippedOff, range }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenFeedback, onOpenMap, inCombat, equippedMain, equippedOff, range, travelTargetName, onContinueTravel, onStopTravel }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
   // BrandedKeyboard removed 2026-05-21 per playtester: "it is not
@@ -243,11 +249,26 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           anyway and the slot is needed for combat verbs). */}
       {!inCombat && (
         <TutorialTarget area="travel-row" style={styles.travelRow}>
-          <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} />
-          <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} />
-          <TravelBtn label="EAST" onPress={() => onSubmit('go east')} />
-          <TravelBtn label="WEST" onPress={() => onSubmit('go west')} />
-          <TravelBtn label="MAP" onPress={onOpenMap} />
+          {travelTargetName ? (
+            // v2.4.1 (OTA 049) — multi-step travel mode. Cardinal
+            // buttons swap to CONTINUE / STOP so the player walks
+            // tile-by-tile toward the named destination, engaging
+            // each scene en route. The MAP button stays available
+            // so the player can consult the atlas mid-journey.
+            <>
+              <TravelBtn label={`CONTINUE → ${travelTargetName.toUpperCase()}`} onPress={onContinueTravel ?? (() => {})} />
+              <TravelBtn label="STOP TRAVEL" onPress={onStopTravel ?? (() => {})} />
+              <TravelBtn label="MAP" onPress={onOpenMap} />
+            </>
+          ) : (
+            <>
+              <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} />
+              <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} />
+              <TravelBtn label="EAST" onPress={() => onSubmit('go east')} />
+              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} />
+              <TravelBtn label="MAP" onPress={onOpenMap} />
+            </>
+          )}
         </TutorialTarget>
       )}
       <TutorialTarget area="quick-row" style={styles.quickRow}>

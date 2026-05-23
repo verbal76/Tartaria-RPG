@@ -665,6 +665,14 @@ export interface PlayerCharacter {
    *  destination since the player has explicitly broken the cardinal flow.
    *  String-typed (not Direction) to avoid pulling in worldMap.ts here. */
   lastTravelDirection?: 'north' | 'east' | 'south' | 'west';
+  /** v2.4.1 (OTA 049) — multi-step travel to a named location.
+   *  Set when the player issues `travel to <city>` and replaces the
+   *  cardinal-direction buttons with CONTINUE TRAVEL / STOP TRAVEL.
+   *  Each CONTINUE tap steps ONE tile toward the target on the
+   *  procedural grid. Cleared when the player either arrives (the
+   *  step lands on the target tile and travelTo fires) or taps
+   *  STOP TRAVEL. */
+  travelTarget?: { locationId: string };
 }
 
 export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive' | 'debug' | 'feedback';
