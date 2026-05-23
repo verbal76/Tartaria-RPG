@@ -149,6 +149,38 @@ describe('mainQuest phase machine', () => {
     expect(LOST_CAPITAL_LOCATIONS).toEqual(['asgardar', 'samarran', 'nimari', 'drakova', 'voronov']);
   });
 
+  describe('Phase 4b — mid-arc twists', () => {
+    it('shouldFireThreeCoreTwist returns true at exactly 3 Cores once', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { shouldFireThreeCoreTwist, markTwistFired } = require('../app/engine/mainQuest');
+      const state = { phase: 'cores', coresRecovered: ['asgardar', 'samarran', 'nimari'] };
+      expect(shouldFireThreeCoreTwist(state)).toBe(true);
+      const fired = markTwistFired(state, 'three_core_pressure');
+      expect(shouldFireThreeCoreTwist(fired)).toBe(false);
+    });
+    it('shouldFireThreeCoreTwist returns false at 2 or 4 Cores', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { shouldFireThreeCoreTwist } = require('../app/engine/mainQuest');
+      expect(shouldFireThreeCoreTwist({ phase: 'cores', coresRecovered: ['a', 'b'] })).toBe(false);
+      expect(shouldFireThreeCoreTwist({ phase: 'cores', coresRecovered: ['a', 'b', 'c', 'd'] })).toBe(false);
+    });
+    it('threeCoreTwistLine names the faction-specific rival', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { threeCoreTwistLine } = require('../app/engine/mainQuest');
+      expect(threeCoreTwistLine('reclaimers_guild')).toMatch(/Monarch/);
+      expect(threeCoreTwistLine('forgotten_order')).toMatch(/Monarch/);
+      expect(threeCoreTwistLine('mud_monarchs')).toMatch(/Order/);
+      expect(threeCoreTwistLine('servants_of_giants')).toMatch(/Builder/);
+    });
+    it('markTwistFired is idempotent', () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { markTwistFired } = require('../app/engine/mainQuest');
+      const s = { phase: 'cores', coresRecovered: [], twistsFired: ['three_core_pressure'] };
+      const s2 = markTwistFired(s, 'three_core_pressure');
+      expect(s2).toBe(s);
+    });
+  });
+
   describe('Phase 4a — variant pools', () => {
     it('every faction has 3 variants for hook + revelation + descent', () => {
       // eslint-disable-next-line @typescript-eslint/no-require-imports

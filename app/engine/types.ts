@@ -542,6 +542,8 @@ export interface MainQuestState {
   /** Lost Capital location ids of Cores already recovered. */
   coresRecovered: string[];
   ending?: MainQuestEnding;
+  /** v2.4.1 (OTA 042) — fired-once flags for mid-arc twist beats. */
+  twistsFired?: string[];
 }
 
 export interface PlayerCharacter {

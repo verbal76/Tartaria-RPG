@@ -11410,6 +11410,17 @@ function triggerMainQuest(
     const descentLine = mq.narrationForPhase('descent', player.factionId, { seed: player.name });
     if (descentLine) get().appendLog('arbiter', descentLine);
   }
+  // v2.4.1 (OTA 042 — Phase 4b) — 3-Core rival-pressure twist.
+  // Fires once per character the moment coresRecovered hits 3.
+  // Updates twistsFired so it never repeats. Uses the same player
+  // record we just wrote, then re-set with the new flag.
+  if (mq.shouldFireThreeCoreTwist(nextState)) {
+    const twistLine = mq.threeCoreTwistLine(player.factionId);
+    if (twistLine) get().appendLog('arbiter', twistLine);
+    const flagged = mq.markTwistFired(nextState, 'three_core_pressure');
+    const cur = get().player;
+    if (cur) set({ player: { ...cur, mainQuest: flagged } });
+  }
   // v2.4.1 (OTA 038 — Phase 5) — the Nexus interior cinematic.
   // When reached_nexus advances 'descent' -> 'choice', emit the
   // arrival + 5 Core-slotting beats + the prompt as separate log

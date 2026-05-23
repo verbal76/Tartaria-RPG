@@ -583,6 +583,70 @@ export function remainingCapitals(state: MainQuestState): string[] {
   return LOST_CAPITAL_LOCATIONS.filter((id) => !state.coresRecovered.includes(id));
 }
 
+// v2.4.1 (OTA 042 — Phase 4b) — mid-arc twist: rival faction
+// pressure at the 3-Core mark. Each faction's primary rival shows
+// up at the player's hub and pressures them about the impending
+// Choice. One-shot per character (gated by twistsFired flag).
+//
+// Rival map authored from factions.json — each faction's named
+// rival who'd most plausibly come knocking three-quarters of the
+// way through the Core hunt.
+const RIVAL_BY_FACTION: Record<string, string> = {
+  reclaimers_guild:     'Mud Monarch Inquisitor',
+  forgotten_order:      'Mud Monarch Cipher-Hand',
+  mud_monarchs:         'Forgotten Order Reader',
+  true_tartarians:      'Conspiracy Architects Operative',
+  eternal_dynasty:      'Mud Monarch Spymaster',
+  conspiracy_architects: 'Tartarian Revivalist organizer',
+  servants_of_giants:   'Stone Builder field foreman',
+  stone_builders:       'Servants of the Giants warden',
+  tartarian_revivalists: 'Conspiracy Architects senior partner',
+};
+
+const RIVAL_PRESSURE_LINE_BY_FACTION: Record<string, string> = {
+  reclaimers_guild:
+    'A {rival} corners you at the Outpost. "Three Cores already. We do not interfere with salvage — until salvage gets to four. After that we have to. Be aware that we are aware. Decide accordingly."',
+  forgotten_order:
+    'A {rival} sets a folded note on your reading desk. "Three Cores. The Monarchs read the same indexes you do. Two more recoveries and we are required to act. Consider the note a courtesy."',
+  mud_monarchs:
+    'A {rival} catches you alone in the Court. "We have been counting. Three Cores in dynastic hands. The Order will not let four happen without contesting it. The Reader who is being sent to you is good. Be ready or be diplomatic. Either is acceptable to us."',
+  true_tartarians:
+    'A {rival} appears in the Catacomb threshold without announcement. "Three Cores carried by a True Tartarian is the historical threshold for institutional concern. Our concern is being expressed by my arrival. Carry the next two, please, with the awareness that we are watching."',
+  eternal_dynasty:
+    'A {rival} delivers a sealed letter to your hand. "Three Cores reclaimed by the line. The Monarchs cannot allow four without losing the suppression argument they have ridden for three centuries. Decide whether you would rather be opposed quietly or publicly. Either path remains open."',
+  conspiracy_architects:
+    'A {rival} arrives at the Architect cell without a meeting on the books. "We see what you are doing. Three Cores in custody is a story we cannot let stay quiet. Make peace with the publication or make peace with the Revival being there at the finish line. Pick one."',
+  servants_of_giants:
+    'A {rival} interrupts your vigil with the deference appropriate to the interruption. "The Builders are tracking your Core recoveries. Three is the number at which the Engine becomes plausibly functional without us. We would like to be included. Consider it discussed."',
+  stone_builders:
+    'A {rival} crosses the workshop threshold barefoot, as the tradition requires. "Three Cores assembled by Builder hands. The Servants are concerned about the Giants you are working around. We would prefer the next two recoveries be made with the vigil informed. Treat this as a request, not a demand."',
+  tartarian_revivalists:
+    'A {rival} requests a private meeting at a coffee shop a careful distance from the cell. "Three publishable recoveries in 18 months. The Architects can no longer dismiss your movement as fringe. They are about to start acting. Consider this an offer to coordinate — or, failing that, fair warning."',
+};
+
+/** True when the 3-Core rival-pressure twist should fire for this
+ *  player on the current state transition. */
+export function shouldFireThreeCoreTwist(state: MainQuestState): boolean {
+  if (state.coresRecovered.length !== 3) return false;
+  if ((state.twistsFired ?? []).includes('three_core_pressure')) return false;
+  return true;
+}
+
+/** Return the rival-pressure narration for the player's faction. */
+export function threeCoreTwistLine(factionId: string): string {
+  const rival = RIVAL_BY_FACTION[factionId] ?? 'rival faction agent';
+  const template = RIVAL_PRESSURE_LINE_BY_FACTION[factionId]
+    ?? RIVAL_PRESSURE_LINE_BY_FACTION.reclaimers_guild!;
+  return template.replace('{rival}', rival);
+}
+
+/** Apply the twist-fired flag idempotently. */
+export function markTwistFired(state: MainQuestState, twistId: string): MainQuestState {
+  const fired = state.twistsFired ?? [];
+  if (fired.includes(twistId)) return state;
+  return { ...state, twistsFired: [...fired, twistId] };
+}
+
 // v2.4.1 (OTA 035) — Phase 2: per-faction Core-recovery gates.
 //
 // Replaces the OTA 033 auto-grant-on-arrival with intentional play.
