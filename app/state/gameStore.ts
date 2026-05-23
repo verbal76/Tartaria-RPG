@@ -119,6 +119,7 @@ import {
   HUB,
   isHubLocation,
   findHubRoom,
+  hubRoomFor,
   hubEntryRoomId,
   hubNameForFaction,
   resolveHubTravel,
@@ -1405,7 +1406,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const baseNouns = (loc.interactables && loc.interactables.length > 0)
           ? [...loc.interactables]
           : extractAmbientNouns(loc.description);
-        const hubRoom = findHubRoom(player.hubRoomId);
+        const hubRoom = hubRoomFor(player.hubRoomId, player.factionId);
         const hubNouns = (hubRoom?.interactables ?? []);
         // Micro-Micro nouns: the scene already carries microMicroId; we
         // resolve via the worldLadder lookup so we mirror beginScene
@@ -1741,7 +1742,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       hubRoomId = hubEntryRoomId();
       set((s) => (s.player ? { player: { ...s.player, hubRoomId } } : s));
     }
-    const hubRoom = inHub && hubRoomId ? findHubRoom(hubRoomId) : null;
+    const hubRoom = inHub && hubRoomId ? hubRoomFor(hubRoomId, player.factionId) : null;
     if (!inHub && hubRoomId) {
       // Player left the hub — clear the hubRoomId.
       set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
@@ -2297,7 +2298,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const labels = dirs
         .filter((d) => d.id)
         .map((d) => {
-          const r = findHubRoom(d.id);
+          const r = hubRoomFor(d.id, player.factionId);
           return r ? `${d.dir} to ${r.shortName}` : null;
         })
         .filter(Boolean) as string[];
@@ -4422,7 +4423,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const cost = move.via === 'fast_travel' ? 0.25 : 1;
             const stam = move.via === 'fast_travel' ? 1 : STAMINA_COSTS.travel;
             set({ player: advanceTime(spendStamina(get().player!, stam), cost) });
-            const dest = findHubRoom(move.roomId);
+            const dest = hubRoomFor(move.roomId, player.factionId);
             if (dest) {
               get().appendLog(
                 'world',
@@ -12180,7 +12181,7 @@ function narrateCasualLook(
   // arrival narration; the look button is for re-checking your
   // bearings without re-reading 70 words of mood prose.
   const inHub = isHubLocation(player?.currentLocationId ?? null) && !!player?.hubRoomId;
-  const hubRoom = inHub ? findHubRoom(player!.hubRoomId!) : null;
+  const hubRoom = inHub ? hubRoomFor(player!.hubRoomId!, player!.factionId) : null;
   const ladder = !hubRoom && scene.microMicroId ? findMicroMicroAnywhere(scene.microMicroId) : null;
 
   const parts: string[] = [];
@@ -12364,7 +12365,7 @@ function narrateCasualLook(
     for (const dir of ['north', 'east', 'south', 'west'] as const) {
       const id = hubRoom.exits[dir];
       if (!id) continue;
-      const r = findHubRoom(id);
+      const r = hubRoomFor(id, player?.factionId);
       if (r) labels.push(`${dir} to ${r.shortName}`);
     }
     if (labels.length > 0) parts.push(`Exits: ${labels.join(' · ')}.`);

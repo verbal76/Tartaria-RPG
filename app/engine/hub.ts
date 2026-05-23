@@ -15,6 +15,7 @@
 //     procedural world.
 
 import staticHubData from '../data/world/static_hub.json';
+import variantsData from '../data/world/hub_faction_variants.json';
 
 export interface HubRoom {
   id: string;
@@ -79,6 +80,42 @@ export function hubNameForFaction(factionId: string | null | undefined): string 
 export function findHubRoom(roomId: string | null | undefined): HubRoom | null {
   if (!roomId) return null;
   return HUB.rooms.find((r) => r.id === roomId) ?? null;
+}
+
+// v2.4.1 (OTA 031) — per-faction room name + description overrides.
+// hub_faction_variants.json holds the 8 non-Reclaimer factions' room
+// re-skins (same exits, same anchorNpc, same interactables — only
+// the player-facing strings change). Fall back to the base room
+// when the faction has no override for that room id.
+interface FactionRoomOverride {
+  name?: string;
+  shortName?: string;
+  description?: string;
+}
+interface FactionVariantsFile {
+  factions: Record<string, Record<string, FactionRoomOverride>>;
+}
+const VARIANTS = variantsData as FactionVariantsFile;
+
+export function hubRoomFor(
+  roomId: string | null | undefined,
+  factionId: string | null | undefined,
+): HubRoom | null {
+  const base = findHubRoom(roomId);
+  if (!base || !factionId) return base;
+  const factionRooms = VARIANTS.factions?.[factionId];
+  if (!factionRooms) return base;
+  const override = factionRooms[base.id];
+  if (!override) return base;
+  // Merge: the override wins for the player-facing strings; every
+  // other field (exits, anchorNpc, tags, interactables) stays at
+  // the base.
+  return {
+    ...base,
+    name: override.name ?? base.name,
+    shortName: override.shortName ?? base.shortName,
+    description: override.description ?? base.description,
+  };
 }
 
 /** Default entry-room id for the hub — the first room in the rooms[]
