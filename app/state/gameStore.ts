@@ -459,7 +459,12 @@ const STAMINA_COSTS = {
 // OTA 008 — Arbiter welcome-back debounce. Skip the line when the
 // player navigates away + back faster than this; first cold-load
 // per session always fires (lastWelcomeBackAt is null at boot).
-const WELCOME_BACK_MIN_MS = 60_000;
+// v2.4.1 (OTA 053) — bumped from 60s to 30 min. Playtest log
+// showed "Welcome back, friend" firing 8× in 90 minutes because
+// the debounce window was too short for normal back-and-forth
+// navigation. The Arbiter greeting should feel rare — once per
+// real session start, not every scene re-entry.
+const WELCOME_BACK_MIN_MS = 30 * 60_000;
 let lastWelcomeBackAt: number | null = null;
 
 // OTA 228 — Arbiter low-HP warning latch. Fires the moment HP
@@ -2726,12 +2731,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const wtick = tickWeather(get().currentScene?.weather ?? null, player);
     if (wtick.line) {
       // Rate-limit the weather-tick line: don't print the SAME line if
-      // it already appeared within the last 6 log entries. The numeric
-      // effect (hp/stam/corruption delta) still applies — only the
-      // visible narration is suppressed so the feed doesn't read
+      // it already appeared within the last 30 log entries. The
+      // numeric effect (hp/stam/corruption delta) still applies — only
+      // the visible narration is suppressed so the feed doesn't read
       // "The fog whispers your name… The fog whispers your name…"
-      // four entries in a row.
-      const recent = get().gameLog.slice(-6);
+      // five entries apart over and over. Bumped from 6 → 30 entries
+      // in OTA 053 after a playtest log showed "Iron fog disorients
+      // you" firing six times across an hour because the 6-entry
+      // window was always clearing between actions.
+      const recent = get().gameLog.slice(-30);
       const recentlyShown = recent.some((e) => e.text === wtick.line);
       let weatherKilled = false;
       // OTA 010 — capture prev HP for the low-HP latch check after
@@ -3071,8 +3079,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Main Quest Core hasn't been touched. Refuse the action and
         // surface the faction's actual recovery verb so the player
         // can correct course.
+        // v2.4.1 (OTA 053) — also check resolvedNoun. Some verbs
+        // (salvage) route through investigate intent but the parser
+        // routes the matched ambient noun into `resolvedNoun`, not
+        // `target`. Without checking both, "salvage core" slipped
+        // past the nudge and gave the player an ambient-noun
+        // Automaton Circuit instead of the Tartarian Core gate
+        // refusal (playtest 2026-05-23 at Nimari).
         const targetText = (parsed.target ?? '').toLowerCase();
-        const wantsCore = /\bcore\b/.test(targetText);
+        const resolvedText = (parsed.resolvedNoun ?? '').toLowerCase();
+        const wantsCore = /\bcore\b/.test(targetText) || /\bcore\b/.test(resolvedText);
         const atUnrecoveredCapital =
           mqMod.LOST_CAPITAL_LOCATIONS.includes(player.currentLocationId)
           && !(player.mainQuest?.coresRecovered ?? []).includes(player.currentLocationId)
@@ -9535,6 +9551,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The Arbiter shakes their head. "That destination doesn't sit on any map I can see from here."`);
       return;
     }
+    // v2.4.1 (OTA 053) — block the course when the player is too
+    // depleted to take even the first step. Same gate as the
+    // single-cardinal walk so the multi-step path matches the
+    // cardinal path's stamina rules.
+    if (player.stamina < STAMINA_COSTS.wander) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter holds out a hand. "You don't have the legs in you for this just yet. Rest first; the road keeps."`,
+      );
+      return;
+    }
     // Locate the destination's friendly name for the announcement line.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const locs = (require('../data/locations/locations.json') as Array<{ id: string; name: string }>);
@@ -9548,8 +9575,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       `You set course for ${tgtName}. Estimated ${tiles} day${tiles === 1 ? '' : 's'} of travel. CONTINUE / STOP from the travel row.`,
     );
     // Take the first step immediately so the player sees motion now.
+    // v2.4.1 (OTA 053) — this step now costs stamina + advances time
+    // like the cardinal walks do, so multi-step travel can't be used
+    // to bypass the fatigue economy.
     const firstDir = nextCardinalToward(fromX, fromY, tgtPos.x, tgtPos.y);
     if (firstDir) {
+      set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), 0.25) });
       get().stepDirection(firstDir);
       // If the first step IS the arrival, clear travelTarget here
       // (stepDirection already fired travelTo via its landedOn branch).
@@ -9564,6 +9595,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = get().player;
     const scene = get().currentScene;
     if (!player || !scene || !player.travelTarget) return;
+    // v2.4.1 (OTA 053) — refuse the step when the player is out of
+    // stamina. Cardinal walks already gate on stamina; the
+    // continueTravel path was bypassing it, which let depleted
+    // characters cross the continent for free.
+    if (player.stamina < STAMINA_COSTS.wander) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter steadies you. "Out of legs. Rest, eat, then pick the road back up."`,
+      );
+      return;
+    }
     const targetId = player.travelTarget.locationId;
     if (targetId === player.currentLocationId) {
       // Arrived — clear the target and announce.
@@ -9587,6 +9629,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
       return;
     }
+    // v2.4.1 (OTA 053) — burn stamina + advance time per step. The
+    // cost is wander (1) per tile, matching the cardinal-walk cost.
+    set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.wander), 0.25) });
     get().stepDirection(dir);
     // If the step landed us on the target, stepDirection's own
     // travelTo() handler clears mapX/mapY and switches currentLocationId.

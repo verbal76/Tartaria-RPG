@@ -966,6 +966,79 @@
       "keywords": ["bolt-caster", "bolt caster", "bolt-casters", "tartaria firearm", "tartarian firearm"],
       "title": "Bolt-Caster",
       "answer": "Tartaria's analogue of a firearm. A spring-loaded carbine that fires Aether-tempered bolts, mud-resistant, single-action by default with full-auto variants in Reclaimer / Forgotten Order hands. All firearms-card actions (Fire Weapon, Quick Fire, Aim, Point Blank, Multiple Shot, Fire Automatic, Reload, Dive for Cover) apply to bolt-casters in our engine — they are not muskets, they are not lasers, they are bolt-casters."
+    },
+
+    {
+      "id": "capitals",
+      "keywords": ["capitals", "capital cities", "lost capitals", "lost capital", "9 capitals", "nine capitals", "the capitals", "capitol cities", "capitol coties"],
+      "title": "The Nine Lost Capitals",
+      "answer": "Nine pre-Flood Tartarian seats, each holding one of the nine Cores that powered the empire's grid: Asgardar (spire), Samarran (timing), Nimari (shielding), Drakova (reserve), Voronov (regulation), Karok-Sa (sealing), Yuldra-Tul (vigil), Ostragar (cadence), Iskan-Veil (masking). Visit each, perform your faction's gate verb, defeat the Core Guardian, and carry the Core to the Mud Flood Nexus."
+    },
+    {
+      "id": "cap_asgardar",
+      "keywords": ["asgardar", "asgard", "asgardar core", "spire capital", "grand spire"],
+      "title": "Asgardar",
+      "answer": "Western Lost Capital, ancient seat of Tartarian power. Home of the Grand Spire of Etheria. The Asgardar Core regulates the spire-channel. Guardian: Sentinel-Priest Vaelka."
+    },
+    {
+      "id": "cap_samarran",
+      "keywords": ["samarran", "samarran core"],
+      "title": "Samarran",
+      "answer": "Western-band Lost Capital, the metronome of the empire. The Samarran Core keeps the Engine's time. Guardian: Heir Atalan-Drowned."
+    },
+    {
+      "id": "cap_nimari",
+      "keywords": ["nimari", "nimari core"],
+      "title": "Nimari",
+      "answer": "Central Lost Capital. Half-swallowed by mud. The Nimari Core is the shielding seat. Guardian: Iron Litany Brother Konrad."
+    },
+    {
+      "id": "cap_drakova",
+      "keywords": ["drakova", "drakova core"],
+      "title": "Drakova",
+      "answer": "Eastern Lost Capital, matriarchal seat. The Drakova Core is the Engine's reserve. Guardian: Mother Drakovna."
+    },
+    {
+      "id": "cap_voronov",
+      "keywords": ["voronov", "voronov core"],
+      "title": "Voronov",
+      "answer": "Far-eastern Lost Capital. The Voronov Core is the regulator — the master tuning seat. Guardian: the Voronov-Beneath High Cantor."
+    },
+    {
+      "id": "cap_karok_sa",
+      "keywords": ["karok-sa", "karok sa", "karok-sa core"],
+      "title": "Karok-Sa",
+      "answer": "Southern Lost Capital, the Forgotten Order's ritual seat. Halls of binding-sigils in black basalt. The Karok-Sa Core is the binding seat — locks the Engine's frame closed once it spins up. Guardian: Sealwarden Tobiel."
+    },
+    {
+      "id": "cap_yuldra_tul",
+      "keywords": ["yuldra-tul", "yuldra tul", "yuldra", "yuldra-tul core"],
+      "title": "Yuldra-Tul",
+      "answer": "Northeastern mountain Lost Capital. Frost-wreathed, the gate-city to the Giants' tombs. The Yuldra-Tul Core is the Engine's coolant. Guardian: Hierophant Mara-of-Yuldra."
+    },
+    {
+      "id": "cap_ostragar",
+      "keywords": ["ostragar", "ostragar core"],
+      "title": "Ostragar",
+      "answer": "Eastern wetland Lost Capital, the Eternal Dynasty's river city. Half-submerged in slow current. The Ostragar Core sets the Engine's cadence. Guardian: Riverbinder Ostros."
+    },
+    {
+      "id": "cap_iskan_veil",
+      "keywords": ["iskan-veil", "iskan veil", "iskan", "veiled capital", "iskan-veil core"],
+      "title": "Iskan-Veil",
+      "answer": "Far-northwestern Lost Capital, the Conspiracy Architects' hidden city. A maze of false doors. The Iskan-Veil Core is the masking seat — hides the Engine from scrying. Guardian: Veilkeeper Inarra."
+    },
+    {
+      "id": "core_guardians",
+      "keywords": ["core guardian", "core guardians", "guardian", "guardians", "aether-born order", "aether born order", "aether-born"],
+      "title": "The Aether-Born Order",
+      "answer": "A non-playable sub-faction — a semi-religious order dedicated to guarding the nine Tartarian Cores that keep the buried cities' grid alive. Each Capital has its own Guardian (a former high priest, kept living by the Core they swore to protect). To them, taking a Core is sacrilege. Flee freely and the Guardian fully restores; you have to win the fight in one sitting."
+    },
+    {
+      "id": "mud_flood_nexus",
+      "keywords": ["mud flood nexus", "nexus", "the nexus"],
+      "title": "Mud Flood Nexus",
+      "answer": "The empire-killer site. The original Aethercraft engine that failed and drowned Tartaria when its nine regulator Cores went out of sync. Reachable via the Endless Stair, gated on the player carrying all nine Cores. At the Nexus you make the Choice: SEAL, UNLEASH, or PRESERVE."
     }
   ]
 }

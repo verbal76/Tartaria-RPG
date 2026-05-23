@@ -66,15 +66,48 @@ export function AboutScreen() {
   const [logCharCount, setLogCharCount] = useState(0);
   const [logCopied, setLogCopied] = useState(false);
   const [logCleared, setLogCleared] = useState(false);
+  // v2.4.1 (OTA 053) — chunked-copy cursor for the session log so
+  // long sessions (>~25 KB, the silent paste cap on most chat
+  // clients) can be sent in parts the way the dead-character log
+  // can on the title screen. Each tap copies the NEXT chunk and
+  // wraps to PART 1 after the final part. Mirrors the LogScreen
+  // pattern. Reset whenever the player clears the log.
+  const LOG_CHUNK_SIZE = 25_000;
+  const [logChunk, setLogChunk] = useState<
+    | { lastIndex: number; total: number; copiedAt: number }
+    | null
+  >(null);
   const saveAndExitToTitle = useGameStore((s) => s.saveAndExitToTitle);
   async function handleCopyLog() {
     try {
       await flushLogWrites();
       const fresh = await readFullLog();
-      const stamped = `=== TARTARIA LOG · ${fresh.length} CHARS · BEGIN ===\n${fresh}\n=== END LOG · ${fresh.length} CHARS ===\n`;
-      await Clipboard.setStringAsync(stamped);
-      setLogCharCount(stamped.length);
-      setLogCopied(true);
+      const total = Math.max(1, Math.ceil(fresh.length / LOG_CHUNK_SIZE));
+      // Single-chunk path — old behaviour, single COPIED flash.
+      if (total <= 1) {
+        const stamped = `=== TARTARIA LOG · ${fresh.length} CHARS · BEGIN ===\n${fresh}\n=== END LOG · ${fresh.length} CHARS ===\n`;
+        await Clipboard.setStringAsync(stamped);
+        setLogCharCount(stamped.length);
+        setLogCopied(true);
+        setLogChunk(null);
+        setTimeout(() => setLogCopied(false), 2500);
+      } else {
+        // Multipart path — pick the next chunk based on the cursor.
+        let nextIndex = 1;
+        if (logChunk) {
+          nextIndex = logChunk.lastIndex >= total ? 1 : logChunk.lastIndex + 1;
+        }
+        const start = (nextIndex - 1) * LOG_CHUNK_SIZE;
+        const slice = fresh.slice(start, start + LOG_CHUNK_SIZE);
+        const stamped =
+          `=== TARTARIA LOG · PART ${nextIndex} of ${total} · ${slice.length} CHARS · BEGIN ===\n` +
+          `${slice}\n` +
+          `=== END PART ${nextIndex} of ${total} ===\n`;
+        await Clipboard.setStringAsync(stamped);
+        setLogCharCount(stamped.length);
+        setLogChunk({ lastIndex: nextIndex, total, copiedAt: Date.now() });
+        setLogCopied(false);
+      }
       const writeErr = getLastLogWriteError();
       if (writeErr) {
         useGameStore.setState((s) => ({
@@ -90,7 +123,6 @@ export function AboutScreen() {
         }));
         clearLastLogWriteError();
       }
-      setTimeout(() => setLogCopied(false), 2500);
     } catch { /* clipboard rarely fails on Android */ }
   }
   async function handleClearLog() {
@@ -99,6 +131,10 @@ export function AboutScreen() {
       await clearActiveSlotLog();
     } catch { /* tolerated */ }
     setLogCleared(true);
+    // v2.4.1 (OTA 053) — reset the chunked-copy cursor so the next
+    // tap starts from PART 1 of the fresh log.
+    setLogChunk(null);
+    setLogCopied(false);
     setTimeout(() => setLogCleared(false), 1500);
   }
   // OTA 007 — update button + state moved to TitleScreen.
@@ -500,9 +536,25 @@ export function AboutScreen() {
               activeOpacity={0.7}
             >
               <Text style={styles.sessionBtnSecondaryText}>
-                {logCopied
-                  ? `✓ ${logCharCount.toLocaleString()} CHARS`
-                  : 'COPY LOG'}
+                {(() => {
+                  // Single-chunk legacy flash.
+                  if (logCopied) return `✓ ${logCharCount.toLocaleString()} CHARS`;
+                  // Multipart cursor — shows what gets copied next, and
+                  // a brief "COPIED PART X/Y" flash for 2.5s after a
+                  // copy. Wraps to PART 1 after the final part.
+                  if (logChunk) {
+                    const { lastIndex, total, copiedAt } = logChunk;
+                    const flashing = Date.now() - copiedAt < 2500;
+                    if (flashing) {
+                      return lastIndex >= total
+                        ? `✓ PART ${lastIndex}/${total} — DONE`
+                        : `✓ PART ${lastIndex}/${total} — TAP FOR NEXT`;
+                    }
+                    const next = lastIndex >= total ? 1 : lastIndex + 1;
+                    return `COPY PART ${next}/${total}`;
+                  }
+                  return 'COPY LOG';
+                })()}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
