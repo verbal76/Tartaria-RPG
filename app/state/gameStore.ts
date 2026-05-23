@@ -459,12 +459,13 @@ const STAMINA_COSTS = {
 // OTA 008 — Arbiter welcome-back debounce. Skip the line when the
 // player navigates away + back faster than this; first cold-load
 // per session always fires (lastWelcomeBackAt is null at boot).
-// v2.4.1 (OTA 053) — bumped from 60s to 30 min. Playtest log
-// showed "Welcome back, friend" firing 8× in 90 minutes because
-// the debounce window was too short for normal back-and-forth
-// navigation. The Arbiter greeting should feel rare — once per
-// real session start, not every scene re-entry.
-const WELCOME_BACK_MIN_MS = 30 * 60_000;
+// v2.4.1 (OTA 053) — confirmed by playtester: the "Welcome back,
+// friend" line IS the intended save-file re-entry greeting.
+// loadSlotIntoGame is the only call site, so a fire here means the
+// player deliberately loaded a save. Keep the 60s debounce as the
+// OTA 008 safety against accidental double-loads inside the same
+// app session.
+const WELCOME_BACK_MIN_MS = 60_000;
 let lastWelcomeBackAt: number | null = null;
 
 // OTA 228 — Arbiter low-HP warning latch. Fires the moment HP
