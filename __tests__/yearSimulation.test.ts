@@ -95,7 +95,8 @@ const MECHANISMS = [
 ] as const;
 
 describe('Year-long Tartaria Realms playthrough simulation', () => {
-  jest.setTimeout(300000);
+  // v2.4.1 (OTA 020) — bumped 300s -> 480s for the 41x41 grid.
+  jest.setTimeout(480000);
 
   beforeAll(() => {
     console.log = () => {};

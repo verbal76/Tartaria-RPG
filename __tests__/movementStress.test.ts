@@ -135,7 +135,9 @@ function normalizeVariant(text: string): string {
 }
 
 describe('movementStress — cardinal travel + approach quick-action', () => {
-  jest.setTimeout(180000);
+  // v2.4.1 (OTA 020) — bumped 180s -> 300s for the 41x41 grid (cardinal
+  // travel does more steps per cross-grid trip).
+  jest.setTimeout(300000);
 
   beforeAll(() => {
     console.log = () => {};

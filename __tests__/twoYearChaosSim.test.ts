@@ -144,7 +144,10 @@ const CHAOS_POOL: string[] = [
 ];
 
 describe('Two-year chaos simulation of Tartaria Realms', () => {
-  jest.setTimeout(600000);
+  // v2.4.1 (OTA 020) — bumped 600s -> 900s. Grid 21x21 -> 41x41 means
+  // 2x the wander steps per cross-grid trip; 2 years of sim hits this
+  // proportionally harder.
+  jest.setTimeout(900000);
 
   beforeAll(() => {
     console.log = () => {};
