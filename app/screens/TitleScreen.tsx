@@ -149,6 +149,16 @@ export function TitleScreen() {
   // Per-slot transient "COPIED" flash so the button confirms the action
   // visually for ~1.5s without needing a modal. Keyed by slotId.
   const [copiedSlotId, setCopiedSlotId] = useState<string | null>(null);
+  // v2.4.1 (OTA 023) — chunked-copy cursor for the dead-character log
+  // button. Mirrors LogScreen's CHUNK_SIZE-based "PART X of Y" copy.
+  // Holds the current slot being chunked plus the index of the LAST
+  // copied part; next tap copies index+1, wrapping to 1 after the
+  // final part. Cleared when the player switches to a different slot
+  // so each slot starts at PART 1.
+  const [deadLogChunk, setDeadLogChunk] = useState<
+    | { slotId: string; lastIndex: number; total: number; copiedAt: number }
+    | null
+  >(null);
   // OTA 006 — separate latch for the SHARE action so the COPIED
   // and SHARED flashes don't fight each other on the same row.
   const [sharedSlotId, setSharedSlotId] = useState<string | null>(null);
@@ -172,13 +182,65 @@ export function TitleScreen() {
       setUpdateBusy(false);
     }
   }
+  // v2.4.1 (OTA 023) — chunked copy for dead-character logs. Long
+  // sessions easily exceed 25 KB and most chat clients silently
+  // truncate larger pastes. Mirror LogScreen's chunking so the
+  // player can send the log to me in pieces.
+  const DEAD_LOG_CHUNK_SIZE = 25_000;
   const copyDeadLog = async (slot: SlotSummary) => {
     try {
       const log = await readSlotLog(slot.slotId);
       const body = log || `(no log captured for ${slot.playerName})`;
-      await Clipboard.setStringAsync(body);
-      setCopiedSlotId(slot.slotId);
-      setTimeout(() => setCopiedSlotId((cur) => (cur === slot.slotId ? null : cur)), 1500);
+      const total = Math.max(1, Math.ceil(body.length / DEAD_LOG_CHUNK_SIZE));
+      // If <= one chunk, behave like the original button — single
+      // copy, single ✓ COPIED flash. No part-cursor noise.
+      if (total <= 1) {
+        await Clipboard.setStringAsync(body);
+        setCopiedSlotId(slot.slotId);
+        setDeadLogChunk(null);
+        setTimeout(
+          () => setCopiedSlotId((cur) => (cur === slot.slotId ? null : cur)),
+          1500,
+        );
+        return;
+      }
+      // Determine which part to copy on THIS tap. Switching to a
+      // different slot resets to PART 1; otherwise advance, wrapping
+      // to 1 after the final part.
+      let nextIndex = 1;
+      if (deadLogChunk && deadLogChunk.slotId === slot.slotId) {
+        nextIndex = deadLogChunk.lastIndex >= total
+          ? 1
+          : deadLogChunk.lastIndex + 1;
+      }
+      const start = (nextIndex - 1) * DEAD_LOG_CHUNK_SIZE;
+      const end = start + DEAD_LOG_CHUNK_SIZE;
+      const slice = body.slice(start, end);
+      const stamped =
+        `=== TARTARIA LOG · ${slot.playerName} · PART ${nextIndex} of ${total} · ${slice.length} CHARS · BEGIN ===\n` +
+        `${slice}\n` +
+        `=== END PART ${nextIndex} of ${total} ===\n`;
+      await Clipboard.setStringAsync(stamped);
+      const copiedAt = Date.now();
+      setDeadLogChunk({
+        slotId: slot.slotId,
+        lastIndex: nextIndex,
+        total,
+        copiedAt,
+      });
+      setCopiedSlotId(null);
+      // Clear the COPIED flash after 2.5s so the label switches back
+      // to the "next part" prompt — same cadence as LogScreen. Only
+      // clear if the current state still matches THIS copy (so a
+      // rapid second tap doesn't get its flash cancelled by this
+      // first tap's stale timer).
+      setTimeout(() => {
+        setDeadLogChunk((cur) =>
+          cur && cur.slotId === slot.slotId && cur.copiedAt === copiedAt
+            ? { ...cur, copiedAt: 0 }
+            : cur,
+        );
+      }, 2500);
     } catch {
       // Silent — clipboard rarely fails on Android; if it does, the
       // player can still try LogScreen via the active session.
@@ -239,7 +301,23 @@ export function TitleScreen() {
               activeOpacity={0.7}
             >
               <Text style={styles.copyLogText}>
-                {copiedSlotId === item.slotId ? '✓ COPIED' : 'COPY LOG'}
+                {(() => {
+                  // Single-chunk legacy flash.
+                  if (copiedSlotId === item.slotId) return '✓ COPIED';
+                  // Chunked-copy flash + next-part prompt for THIS row.
+                  if (deadLogChunk && deadLogChunk.slotId === item.slotId) {
+                    const { lastIndex, total, copiedAt } = deadLogChunk;
+                    const flashing = copiedAt > 0 && Date.now() - copiedAt < 2500;
+                    if (flashing) {
+                      return lastIndex >= total
+                        ? `✓ PART ${lastIndex}/${total} — DONE`
+                        : `✓ PART ${lastIndex}/${total} — TAP FOR NEXT`;
+                    }
+                    const next = lastIndex >= total ? 1 : lastIndex + 1;
+                    return `COPY PART ${next}/${total}`;
+                  }
+                  return 'COPY LOG';
+                })()}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
