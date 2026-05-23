@@ -273,14 +273,26 @@ jobs:
             exit 1
           fi
 
-          # Insert release signing config inside signingConfigs { ... } block.
-          # Match the closing } of the debug block by looking for the next }
-          # after 'debug {' inside signingConfigs.
+          # Pre-patch dump so any regex mismatch is diagnosable from the
+          # CI logs alone (instead of needing a second iteration to see
+          # what the template actually looks like).
+          echo "--- android/app/build.gradle (pre-patch, signingConfigs + buildTypes) ---"
+          awk '/signingConfigs\s*\{/,/^\s*\}\s*$/' "$BG" | head -40 || true
+          echo "---"
+          awk '/buildTypes\s*\{/,/^\s*\}\s*$/' "$BG" | head -60 || true
+          echo "---"
+
+          # Insert release signing config inside signingConfigs { ... } block,
+          # then repoint buildTypes.release.signingConfig from debug to
+          # release. Walk braces manually (not regex) so nested blocks
+          # don't trip us up — Expo SDK 52's template has multi-line
+          # config in both debug and release build-type sub-blocks.
           python3 <<'PY'
-          import re, pathlib
+          import pathlib, re
           p = pathlib.Path("android/app/build.gradle")
           src = p.read_text()
-          release_block = """
+
+          release_signing_block = """
               release {
                   if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
                       storeFile file(MYAPP_UPLOAD_STORE_FILE)
@@ -290,32 +302,74 @@ jobs:
                   }
               }
           """.rstrip() + "\n"
-          # Find the signingConfigs block and insert the release sub-block
-          # right before its closing brace.
-          pattern = re.compile(r"(signingConfigs\s*\{[^}]*?debug\s*\{[^}]*?\}\s*)(\})", re.DOTALL)
-          m = pattern.search(src)
-          if not m:
-              raise SystemExit("Could not locate signingConfigs.debug block in build.gradle")
-          src = src[:m.end(1)] + release_block + src[m.start(2):]
-          # Repoint buildTypes.release.signingConfig from debug to release.
-          # The template line is exactly: 'signingConfig signingConfigs.debug'
-          # appearing inside a 'release { ... }' block. We replace ONLY the
-          # one inside buildTypes.release, leaving the debug-build-type one alone.
-          new_src, n = re.subn(
-              r"(buildTypes\s*\{[^}]*?release\s*\{[^}]*?signingConfig\s+)signingConfigs\.debug",
-              r"\1signingConfigs.release",
-              src, count=1, flags=re.DOTALL
+
+          def find_block(text, header_re, after=0):
+              """Find the {...} block whose opening line matches header_re.
+                 Returns (open_brace_idx, close_brace_idx) — indices of '{' and '}'."""
+              m = re.search(header_re, text[after:])
+              if not m:
+                  return None
+              start = after + m.end()  # position right after the opening '{'
+              depth = 1
+              i = start
+              while i < len(text) and depth > 0:
+                  c = text[i]
+                  if c == '{': depth += 1
+                  elif c == '}': depth -= 1
+                  i += 1
+              if depth != 0:
+                  return None
+              # m.end() is the char right AFTER '{'. We want index OF '{' and '}'.
+              open_idx = after + m.end() - 1
+              close_idx = i - 1
+              return open_idx, close_idx
+
+          # 1. Locate signingConfigs { ... } and inject the release sub-block
+          #    right before its closing }.
+          sc = find_block(src, r"signingConfigs\s*\{")
+          if not sc:
+              raise SystemExit("Could not locate signingConfigs { ... } block")
+          sc_open, sc_close = sc
+          src = src[:sc_close] + release_signing_block + src[sc_close:]
+          print(f"✓ injected signingConfigs.release at offset {sc_close}")
+
+          # 2. Locate buildTypes { ... } block.
+          bt = find_block(src, r"buildTypes\s*\{")
+          if not bt:
+              raise SystemExit("Could not locate buildTypes { ... } block")
+          bt_open, bt_close = bt
+
+          # 3. Inside buildTypes, locate release { ... } sub-block.
+          rel = find_block(src, r"\brelease\s*\{", after=bt_open)
+          if not rel or rel[1] > bt_close:
+              raise SystemExit("Could not locate buildTypes.release { ... } sub-block")
+          rel_open, rel_close = rel
+
+          # 4. Inside that sub-block ONLY, replace
+          #    'signingConfig signingConfigs.debug' with the release config.
+          inside = src[rel_open:rel_close]
+          new_inside, n = re.subn(
+              r"signingConfig\s+signingConfigs\.debug",
+              "signingConfig signingConfigs.release",
+              inside, count=1,
           )
           if n != 1:
-              raise SystemExit("Could not repoint buildTypes.release.signingConfig")
-          p.write_text(new_src)
-          print("✓ build.gradle patched: signingConfigs.release added, release build-type repointed.")
+              print("--- buildTypes.release current contents ---")
+              print(inside)
+              print("---")
+              raise SystemExit("buildTypes.release does not contain 'signingConfig signingConfigs.debug' to repoint.")
+          src = src[:rel_open] + new_inside + src[rel_close:]
+          print("✓ buildTypes.release.signingConfig now points at signingConfigs.release")
+
+          p.write_text(src)
+          print("✓ build.gradle patched.")
           PY
 
-          echo "--- signingConfigs block (post-patch) ---"
-          sed -n '/signingConfigs/,/^    }$/p' "$BG" | head -40
-          echo "--- buildTypes.release (post-patch) ---"
-          sed -n '/buildTypes/,/^    }$/p' "$BG" | head -40
+          echo "--- android/app/build.gradle (post-patch, signingConfigs + buildTypes) ---"
+          awk '/signingConfigs\s*\{/,/^\s*\}\s*$/' "$BG" | head -50 || true
+          echo "---"
+          awk '/buildTypes\s*\{/,/^\s*\}\s*$/' "$BG" | head -60 || true
+          echo "---"
 
       - name: Gradle build (Tartaria Realms)
         working-directory: android
