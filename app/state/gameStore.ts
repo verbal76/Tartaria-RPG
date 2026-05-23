@@ -4198,7 +4198,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const tail = tailParts.length > 0
             ? `${tailParts.join(', ')} recovered.`
             : (fx ? 'You were already topped up — the bite holds nothing back.' : 'You were already at full strength — the ration steadies you, nothing more.');
-          get().appendLog('world', `You consume one ${consumable.name}. ${tail}${buffLine}`);
+          // OTA 23-010 — pick the right verb for the item. You eat
+          // food, you apply a first aid kit, you drink a vial. The
+          // 'consume' fallback covered everything blandly which read
+          // weird for non-food items (e.g. "You consume one First
+          // Aid Kit"). Narration only — same mechanical effect.
+          const isMedical = /first aid|bandage|medkit|salve|tonic|poultice|stim/i.test(consumable.name);
+          const isPotion = /vial|potion|flask|elixir|brew/i.test(consumable.name);
+          const verb = isMedical ? 'apply' : isPotion ? 'drink' : 'eat';
+          get().appendLog('world', `You ${verb} the ${consumable.name}. ${tail}${buffLine}`);
           // Heal may push us back over the 5% latch threshold.
           checkLowHpWarning(prevHpEat, prevHpEat + heal, hpMaxEat, get, set);
           void get().persist();

@@ -36,10 +36,10 @@ import {
   type GestureResponderEvent,
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y, generateWorldMap } from '../engine/worldMap';
+import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from '../engine/worldMap';
 import {
   atlasCoordForLocation,
-  interpolateAtlasPosition,
+  cardinalOffsetFromOutpost,
 } from '../engine/atlasCoords';
 // OTA 051 — locations.json carries the human-readable name we want
 // to surface in the "You are here: <name>" chip when the player is
@@ -127,19 +127,36 @@ export function MapScreen() {
   // off-screen by the baseline scale.
   const baselineScale = useRef(1);
 
-  // Null-safe atlas-position computation. Hoisted above the
-  // useEffect so the auto-center has access to it. The early-return
-  // for missing player happens below the hooks — keeping hook order
-  // stable across renders (Rules of Hooks).
+  // OTA 23-010 — cardinal-direction-preserving dot positioning.
+  // Replaces the OTA 054 IDW interpolation. IDW interpolated the
+  // dot via weights inverse to procedural grid distance, but the
+  // engine's procedural grid is RANDOM per character — so a
+  // location placed procedurally east of Outpost might be drawn at
+  // the atlas's LEFT side, which meant walking east in-game pulled
+  // the dot leftward visually. Player intuition is east = right,
+  // so we revert to the simpler pre-054 model:
+  //
+  //   1) If the player is at a named-on-atlas location, snap the
+  //      dot to that location's canonical drawn position.
+  //   2) Otherwise, compute the dot's atlas position by cardinal
+  //      offset from the Outpost anchor:
+  //        fx = outpost.fx + (mapX - center) * tileFrac
+  //        fy = outpost.fy + (mapY - center) * tileFrac
+  //      east increases fx (dot moves right), south increases fy
+  //      (dot moves down). clampToMapArea keeps the dot inside the
+  //      painted world.
+  //
+  // Loss vs IDW: smooth glide between anchors. Gain: every cardinal
+  // step is a predictable visual move in the same direction. The
+  // user explicitly chose direction-preservation over IDW snap.
   const safeMapX = typeof player?.mapX === 'number' ? player.mapX : WORLD_MAP_CENTER_X;
   const safeMapY = typeof player?.mapY === 'number' ? player.mapY : WORLD_MAP_CENTER_Y;
-  const safeSeed = player
-    ? (player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`)
-    : 'no-player';
-  const safeWorldMap = player
-    ? generateWorldMap(safeSeed, player.currentLocationId)
-    : { positions: {} as Record<string, { x: number; y: number }>, tiles: [] };
-  const safeAtlasPos = interpolateAtlasPosition(safeMapX, safeMapY, safeWorldMap.positions);
+  const namedAnchor = atlasCoordForLocation(player?.currentLocationId);
+  const safeAtlasPos = namedAnchor ?? cardinalOffsetFromOutpost(
+    safeMapX,
+    safeMapY,
+    { x: WORLD_MAP_CENTER_X, y: WORLD_MAP_CENTER_Y },
+  );
 
   // OTA 23-003 — auto-centering on the player marker removed at
   // playtest request: it interfered with the zoom-in/zoom-out

@@ -92,6 +92,27 @@ export function depictedLocationIds(): string[] {
   return Object.keys(LOCATION_ATLAS_COORDS);
 }
 
+// OTA 23-010 — cardinal-direction-preserving dot offset. Walks the
+// player from the Outpost anchor by their (mapX - center, mapY -
+// center) grid offset, scaled by DOT_TILE_FRAC, and clamps to the
+// painted map area. East increases fx (dot moves right), south
+// increases fy (down) — matches the keyboard intuition.
+//
+// This is the simple fallback for "you're between named locations."
+// When the player IS at a named location, MapScreen uses
+// atlasCoordForLocation() instead so the dot snaps to the
+// canonical icon.
+export function cardinalOffsetFromOutpost(
+  mapX: number,
+  mapY: number,
+  gridCenter: { x: number; y: number },
+): AtlasCoord {
+  return clampToMapArea({
+    fx: OUTPOST_ATLAS_COORD.fx + (mapX - gridCenter.x) * DOT_TILE_FRAC,
+    fy: OUTPOST_ATLAS_COORD.fy + (mapY - gridCenter.y) * DOT_TILE_FRAC,
+  });
+}
+
 /**
  * Clamp a fractional coordinate to the visible map area, away from
  * the insets at the corners and the timeline ribbon at the bottom.
