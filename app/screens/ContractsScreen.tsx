@@ -86,7 +86,7 @@ export function ContractsScreen() {
   // detail list (kills by enemy name, locations discovered, etc.).
   const [mqExpanded, setMqExpanded] = useState(false);
   const [milestoneExpanded, setMilestoneExpanded] = useState<
-    null | 'enemies' | 'travels' | 'checks'
+    null | 'enemies' | 'travels' | 'checks' | 'npcs'
   >(null);
   const worldMemory = useGameStore((s) => s.worldMemory);
 
@@ -349,6 +349,14 @@ export function ContractsScreen() {
               active={milestoneExpanded === 'checks'}
               onPress={() => setMilestoneExpanded(milestoneExpanded === 'checks' ? null : 'checks')}
             />
+            <MilestoneStat
+              label="NPCs Met"
+              value={(worldMemory.npcsMet ?? []).length}
+              next={1}
+              suffix="story thread"
+              active={milestoneExpanded === 'npcs'}
+              onPress={() => setMilestoneExpanded(milestoneExpanded === 'npcs' ? null : 'npcs')}
+            />
           </View>
           {milestoneExpanded === 'enemies' && (
             <View style={styles.milestoneDetail}>
@@ -391,6 +399,27 @@ export function ContractsScreen() {
                 fold back into the narration). The counter above is your
                 lifetime success total.
               </Text>
+            </View>
+          )}
+          {milestoneExpanded === 'npcs' && (
+            <View style={styles.milestoneDetail}>
+              <Text style={styles.milestoneDetailHead}>
+                NPCs MET  ·  {(worldMemory.npcsMet ?? []).length}
+              </Text>
+              {(worldMemory.npcsMet ?? []).length === 0 ? (
+                <Text style={styles.milestoneDetailEmpty}>
+                  Nobody yet. Vendors, Guardians, and named contacts you meet
+                  along the way show up here.
+                </Text>
+              ) : (
+                (worldMemory.npcsMet ?? []).map((n) => (
+                  <Text key={n.id} style={styles.milestoneDetailRow}>
+                    · {n.name}
+                    {n.role ? ` — ${n.role}` : ''}
+                    {n.locationId ? `  (${n.locationId.replace(/_/g, ' ')})` : ''}
+                  </Text>
+                ))
+              )}
             </View>
           )}
         </View>

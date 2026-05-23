@@ -17,7 +17,7 @@ import type {
   Intent,
   VisitedRoom,
 } from '../engine/types';
-import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat } from '../engine/worldMemory';
+import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet } from '../engine/worldMemory';
 import {
   listSlots,
   loadSlot,
@@ -30,6 +30,7 @@ import {
   getActiveSlotId,
   loadGlobalStash,
   addResurrectionGems,
+  ensureFirstInstallSeed,
   type SlotSummary,
 } from '../engine/saveSystem';
 import { makeEntry, persistEntry } from '../engine/gameLog';
@@ -1066,6 +1067,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     await migrateLegacySlotIfPresent();
     const activeId = await loadActiveSlotId();
     const slots = await listSlots();
+    // OTA 454 — first-install Resurrection Gem seed. Idempotent: only
+    // fires once per install. The seed lands in the global stash
+    // before loadGlobalStash reads it so the resulting count
+    // includes the gem.
+    const seedResult = await ensureFirstInstallSeed();
     const stash = await loadGlobalStash();
     // Wire STT diagnostics into the game log so the next playtest log
     // includes a full trace of what the mic is actually doing — start,
@@ -2057,6 +2063,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ...s.worldMemory,
           pendingChains: (s.worldMemory.pendingChains ?? []).filter((c) => !dropIds.includes(c.chainId)),
         },
+      }));
+    }
+    // OTA 454 — record vendor as a met NPC. Idempotent on vendor.id;
+    // re-entering the same vendor's scene won't double-list them. We
+    // use the vendor's id when present, otherwise a slug of their name
+    // (roadside traders have stable ids; legacy saves may not).
+    if (vendor) {
+      const npcId = vendor.id || `vendor:${vendor.name.toLowerCase().replace(/[^a-z0-9]+/g, '_')}`;
+      set((s) => ({
+        worldMemory: recordNpcMet(s.worldMemory, {
+          id: npcId,
+          name: vendor.name,
+          role: vendor.title || 'vendor',
+          factionId: vendor.faction ?? undefined,
+          locationId: location.id,
+          hoursElapsed: get().player?.hoursElapsed ?? 0,
+          firstMetAt: Date.now(),
+        }),
       }));
     }
     // For narration, use the first enemy as the scene representative.
@@ -3065,6 +3089,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 hoursElapsed: player.hoursElapsed ?? 0,
                 enemyName: guardian.name,
               });
+              // OTA 454 — record the Guardian as a met NPC so they
+              // show up in the NPCs Met milestone list.
+              set((s) => ({
+                worldMemory: recordNpcMet(s.worldMemory, {
+                  id: `guardian:${capitalId}`,
+                  name: guardian.name,
+                  role: 'Core Guardian',
+                  factionId: 'aether_born_order',
+                  locationId: capitalId,
+                  hoursElapsed: player.hoursElapsed ?? 0,
+                  firstMetAt: Date.now(),
+                }),
+              }));
               // Don't run the normal gate verb's effect this turn —
               // the Guardian is now the scene's focus. Skip the
               // rest of the action handler.
@@ -7849,12 +7886,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
-    const gemDropped = enemy.boss || Math.random() < 0.005;
+    // OTA 454 — Resurrection Gem drop sources:
+    //  • boss kill → guaranteed (existing)
+    //  • every 50th non-boss kill → pity timer (so any long campaign
+    //    sees gems even if the 0.5% lottery never rolls)
+    //  • Math.random() < 0.005 → rare organic drop (existing)
+    // First-install seed is granted separately on hydrate (one-shot).
+    const pityHit = !enemy.boss && newKills > 0 && newKills % 50 === 0;
+    const gemDropped = enemy.boss || pityHit || Math.random() < 0.005;
     if (gemDropped) {
       void addResurrectionGems(1).then((total) => {
         set({ resurrectionGems: total });
         const line = enemy.boss
           ? `✦ A Resurrection Gem pulses in the wreckage where ${enemy.name} fell — yours, and the buried world is one boss lighter. (${total} held)`
+          : pityHit
+          ? `✦ The buried world relents — a Resurrection Gem at the ${newKills}-kill mark. (${total} held)`
           : `✦ A Resurrection Gem flickers from the dust — gathered to your stash. (${total} held)`;
         get().appendLog('reward', line);
       });

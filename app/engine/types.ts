@@ -798,6 +798,32 @@ export interface WorldMemory {
    *  visitedRooms because hub rooms have stable string ids, not the
    *  composite map key. */
   hubVisited?: string[];
+  /** OTA 454 — every named NPC the player has met at least once.
+   *  Populated by vendor encounters, Core Guardian first-sight,
+   *  faction-quest givers, and any other named-NPC interaction. The
+   *  Contracts → Milestones tab lists this so the player can see
+   *  who they've actually spoken with. Optional + defaulted so
+   *  legacy saves load cleanly. */
+  npcsMet?: NpcMet[];
+}
+
+/** OTA 454 — record of a single named NPC encounter. */
+export interface NpcMet {
+  /** Stable id when available (vendor id, guardian id, etc.); otherwise
+   *  a lowercase-slug of the name. Used to dedupe re-encounters. */
+  id: string;
+  /** Display name as the player saw it. */
+  name: string;
+  /** Optional short label ("Asgardar vendor", "Core Guardian", "quest-giver"). */
+  role?: string;
+  /** Optional faction id if the NPC is faction-aligned. */
+  factionId?: string;
+  /** Location id where the meeting happened. */
+  locationId?: string;
+  /** hoursElapsed at first meeting. */
+  hoursElapsed?: number;
+  /** Unix ms timestamp of first meeting. */
+  firstMetAt?: number;
 }
 
 export interface VisitedRoom {

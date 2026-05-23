@@ -42,19 +42,24 @@ export interface GlobalStash {
   // characters. Up to 27 unique badges (9 factions × 3 endings).
   // Used by TitleScreen to display the completion grid.
   endingBadges?: string[]; // ids of the form "faction:ending"
+  // OTA 454 — first-install seed marker. Prevents re-seeding the
+  // free starter gem on every hydrate. Set to true the moment we
+  // grant the install gem; never cleared afterwards.
+  installSeeded?: boolean;
 }
 
 export async function loadGlobalStash(): Promise<GlobalStash> {
   try {
     const raw = await AsyncStorage.getItem(GLOBAL_STASH_KEY);
-    if (!raw) return { resurrectionGems: 0, endingBadges: [] };
+    if (!raw) return { resurrectionGems: 0, endingBadges: [], installSeeded: false };
     const parsed = JSON.parse(raw) as Partial<GlobalStash>;
     return {
       resurrectionGems: parsed.resurrectionGems ?? 0,
       endingBadges: parsed.endingBadges ?? [],
+      installSeeded: parsed.installSeeded ?? false,
     };
   } catch {
-    return { resurrectionGems: 0, endingBadges: [] };
+    return { resurrectionGems: 0, endingBadges: [], installSeeded: false };
   }
 }
 
@@ -67,6 +72,22 @@ export async function addResurrectionGems(n: number): Promise<number> {
   stash.resurrectionGems = Math.max(0, stash.resurrectionGems + n);
   await saveGlobalStash(stash);
   return stash.resurrectionGems;
+}
+
+/** OTA 454 — first-install Resurrection Gem seed. Idempotent: if the
+ *  global stash has never been seeded, grants 1 gem and flips the
+ *  installSeeded marker. Returns { seeded: true } only on the
+ *  one-shot grant so the caller can surface a welcome line; on every
+ *  subsequent boot it returns { seeded: false }. */
+export async function ensureFirstInstallSeed(): Promise<{ seeded: boolean; gems: number }> {
+  const stash = await loadGlobalStash();
+  if (stash.installSeeded) {
+    return { seeded: false, gems: stash.resurrectionGems };
+  }
+  stash.installSeeded = true;
+  stash.resurrectionGems = (stash.resurrectionGems ?? 0) + 1;
+  await saveGlobalStash(stash);
+  return { seeded: true, gems: stash.resurrectionGems };
 }
 
 /** v2.4.1 (OTA 043) — record a completed (faction, ending) combo.

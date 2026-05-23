@@ -1,4 +1,4 @@
-import type { WorldMemory } from './types';
+import type { NpcMet, WorldMemory } from './types';
 
 export function emptyMemory(): WorldMemory {
   return {
@@ -26,4 +26,13 @@ export function recordEnemyDefeat(memory: WorldMemory, enemyName: string): World
 
 export function completeQuest(memory: WorldMemory, questId: string): WorldMemory {
   return { ...memory, completedQuestIds: [...memory.completedQuestIds, questId] };
+}
+
+/** OTA 454 — record a named-NPC encounter. Idempotent on `id`: a
+ *  second meeting with the same NPC is a no-op so the milestone list
+ *  doesn't double up. */
+export function recordNpcMet(memory: WorldMemory, npc: NpcMet): WorldMemory {
+  const existing = memory.npcsMet ?? [];
+  if (existing.some((n) => n.id === npc.id)) return memory;
+  return { ...memory, npcsMet: [...existing, npc] };
 }
