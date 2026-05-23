@@ -7,6 +7,7 @@ import * as Application from 'expo-application';
 import { useGameStore } from '../state/gameStore';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { NumberStepper } from '../components/NumberStepper';
+import { LoreCodexBody } from '../components/LoreCodexBody';
 import { getAudioSettings, setAudioSettings, onAudioSettingsChange, type AudioSettings } from '../audio/audioSettings';
 import { forceReapplyAudioFromState } from '../audio/AudioController';
 import {
@@ -49,7 +50,10 @@ export function AboutScreen() {
   const [voiceCopied, setVoiceCopied] = useState(false);
   const [kokoroCacheCleared, setKokoroCacheCleared] = useState(false);
   const [kokoroCache, setKokoroCache] = useState<ExecutorchCacheEntry[]>([]);
-  const [tab, setTab] = useState<'sfx' | 'about'>('sfx');
+  // v2.4.1 (OTA 046) — added 'lore' tab. Lore Codex was a separate
+  // title-screen button; now it lives here so it's reachable from
+  // the gear icon both on the title screen AND in-game.
+  const [tab, setTab] = useState<'sfx' | 'lore' | 'about'>('sfx');
   // OTA 007 — update button + state moved to TitleScreen.
   const [audio, setAudio] = useState<AudioSettings>(() => getAudioSettings());
   const [voice, setVoice] = useState<VoiceSettings>(() => getVoiceSettings());
@@ -406,7 +410,7 @@ export function AboutScreen() {
           ABOUT / diagnostic block stays its own tab. Music card
           renders first inside SFX (most tweaked), voice card below. */}
       <View style={styles.tabRow}>
-        {(['sfx', 'about'] as const).map((id) => (
+        {(['sfx', 'lore', 'about'] as const).map((id) => (
           <TouchableOpacity
             key={id}
             onPress={() => setTab(id)}
@@ -703,6 +707,14 @@ export function AboutScreen() {
             <Text style={styles.applyBtnText}>{voiceCopied ? 'COPIED' : 'COPY VOICE INFO'}</Text>
           </TouchableOpacity>
         </View>
+        )}
+
+        {/* v2.4.1 (OTA 046) — LORE tab. Renders the shared
+            LoreCodexBody (races / factions / places / timeline)
+            inside the gear-screen. Same content as the standalone
+            LoreScreen, no duplicate code. */}
+        {tab === 'lore' && (
+          <LoreCodexBody />
         )}
 
         {tab === 'about' && (

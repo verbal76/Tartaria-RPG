@@ -508,13 +508,11 @@ export function TitleScreen() {
             >
               <Text style={styles.primaryBtnText}>New Tartarian</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.secondaryBtn}
-              onPress={() => setScreen('lore')}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.secondaryBtnText}>Lore Codex</Text>
-            </TouchableOpacity>
+            {/* v2.4.1 (OTA 046) — Lore Codex button removed.
+                Now reachable from the gear icon (bottom-right) as
+                a dedicated tab in the settings screen. The gear is
+                accessible both here AND in-game, so the Codex is
+                always one tap away. */}
             <TouchableOpacity
               style={[styles.updateBtn, updateBusy && styles.updateBtnBusy]}
               onPress={() => { void checkForUpdate(); }}
