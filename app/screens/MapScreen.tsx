@@ -41,8 +41,10 @@ import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from '../engine/worldMap';
 import {
   atlasCoordForLocation,
   cardinalOffsetFromAnchor,
+  hubRoomMinimapCoord,
   OUTPOST_ATLAS_COORD,
 } from '../engine/atlasCoords';
+import { isHubLocation, hubRoomFor, hubNameForFaction } from '../engine/hub';
 // OTA 051 — locations.json carries the human-readable name we want
 // to surface in the "You are here: <name>" chip when the player is
 // on a depicted tile.
@@ -155,16 +157,25 @@ export function MapScreen() {
   // through unlimited cardinal stepping. That was the visible bug.
   const safeMapX = typeof player?.mapX === 'number' ? player.mapX : WORLD_MAP_CENTER_X;
   const safeMapY = typeof player?.mapY === 'number' ? player.mapY : WORLD_MAP_CENTER_Y;
+  // v2.4.1 (OTA 032) — hub-aware marker positioning.
+  // When the player is inside any faction's hub (shared Outpost
+  // layout), the marker renders on the bottom-left minimap inset
+  // at per-room coords from HUB_ROOM_MINIMAP_COORDS — discrete
+  // per-room positions (no cardinal drift inside the hub since
+  // travel is room-graph, not tile-step). Outside the hub, falls
+  // through to the world-map cardinal-offset logic.
+  const inHub = isHubLocation(player?.currentLocationId) && !!player?.hubRoomId;
+  const hubMinimapPos = inHub ? hubRoomMinimapCoord(player?.hubRoomId) : null;
   const currentAnchor =
     atlasCoordForLocation(player?.currentLocationId) ?? OUTPOST_ATLAS_COORD;
   const atCenter =
     safeMapX === WORLD_MAP_CENTER_X && safeMapY === WORLD_MAP_CENTER_Y;
-  const safeAtlasPos = atCenter
+  const safeAtlasPos = hubMinimapPos ?? (atCenter
     ? currentAnchor
     : cardinalOffsetFromAnchor(currentAnchor, safeMapX, safeMapY, {
         x: WORLD_MAP_CENTER_X,
         y: WORLD_MAP_CENTER_Y,
-      });
+      }));
 
   // OTA 23-003 — auto-centering on the player marker removed at
   // playtest request: it interfered with the zoom-in/zoom-out
@@ -345,11 +356,22 @@ export function MapScreen() {
   // Outpost; the prior "of the Outpost" text was incorrect after any
   // travelTo).
   const fromName = currentLocation?.name ?? 'the Outpost';
-  const whereLine = atCenter && currentLocation
-    ? currentLocation.name
-    : Math.abs(dx) >= Math.abs(dy)
-      ? `${Math.abs(dx)} tile${Math.abs(dx) === 1 ? '' : 's'} ${dx >= 0 ? 'east' : 'west'} of ${fromName}`
-      : `${Math.abs(dy)} tile${Math.abs(dy) === 1 ? '' : 's'} ${dy >= 0 ? 'south' : 'north'} of ${fromName}`;
+  // v2.4.1 (OTA 032) — hub-aware footer. When inside the hub, show
+  // the faction's hub title + the current room name from the
+  // variant overlay (so a Forgotten Order character reads
+  // "Order Cloister — The Threshold" instead of "Tartarian Outskirts").
+  const hubRoomDisplay = inHub
+    ? hubRoomFor(player?.hubRoomId, player?.factionId)
+    : null;
+  const hubLabel = inHub
+    ? `${hubNameForFaction(player?.factionId)} — ${hubRoomDisplay?.name ?? 'Hub'}`
+    : null;
+  const whereLine = hubLabel
+    ?? (atCenter && currentLocation
+      ? currentLocation.name
+      : Math.abs(dx) >= Math.abs(dy)
+        ? `${Math.abs(dx)} tile${Math.abs(dx) === 1 ? '' : 's'} ${dx >= 0 ? 'east' : 'west'} of ${fromName}`
+        : `${Math.abs(dy)} tile${Math.abs(dy) === 1 ? '' : 's'} ${dy >= 0 ? 'south' : 'north'} of ${fromName}`);
 
   return (
     <View style={styles.container}>
@@ -426,15 +448,19 @@ export function MapScreen() {
         <Text style={styles.footerHere}>● YOU ARE HERE</Text>
         <Text style={styles.footerWhere}>{whereLine}</Text>
         <Text style={styles.footerDist}>
-          {tiles === 0
-            ? `At ${fromName}.`
-            : `${tiles} day${tiles === 1 ? '' : 's'} of travel from ${fromName}.`}
+          {inHub
+            ? `Inside the ${hubNameForFaction(player?.factionId)}.`
+            : tiles === 0
+              ? `At ${fromName}.`
+              : `${tiles} day${tiles === 1 ? '' : 's'} of travel from ${fromName}.`}
         </Text>
         <Text style={styles.footerCaveat}>
           Drag to pan · pinch to zoom · double-tap to reset.
-          {atCenter
-            ? ' Marker snapped to the atlas drawing.'
-            : ' Marker drifting in your direction of travel.'}
+          {inHub
+            ? ' Marker on the interior minimap, bottom-left.'
+            : atCenter
+              ? ' Marker snapped to the atlas drawing.'
+              : ' Marker drifting in your direction of travel.'}
         </Text>
       </View>
     </View>

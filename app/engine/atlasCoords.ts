@@ -194,6 +194,55 @@ function pushOutOfRect(c: AtlasCoord, r: OffLimitsRect): AtlasCoord {
   return { fx: c.fx, fy: r.fyMax + eps };
 }
 
+// v2.4.1 (OTA 032) — bottom-left Outpost-interior minimap coords.
+//
+// When the player is in the hub (any faction's variant of the shared
+// Outpost layout), the marker renders on the inset minimap in the
+// bottom-left of the atlas rather than on the main landmass. Each
+// of the 15 hub rooms gets a fixed position inside the minimap zone
+// (fx ~0.02-0.22, fy ~0.79-0.98 on the 1408×768 canvas).
+//
+// Discrete per-room positioning — the hub uses room-graph travel,
+// not cardinal stepping, so each room change makes the marker JUMP
+// to its room's position (large, visible movement; satisfies the
+// "4× movement spacing" intent without an actual per-tile drift
+// multiplier). Player enters at outpost_gate which sits roughly
+// dead-center along the bottom of the minimap.
+//
+// Layout follows the world-atlas doc's 3×3+descent diagram:
+//   row 1 (north):  [ . | Quarters | . ]
+//   row 2 (mid):    [ Workshop | Central | Mess ]
+//   row 3 (south):  [ Lab | Gate | Armory ]
+//   row 4 (deeper): [ . | Relic Vault | Chapel ]
+//   row 5 (down):   [ . | Culvert Descent | . ]
+// Below the Culvert: First Landing → Storage / Pumps → Second
+// Landing → Shallow Digs. These deeper rooms get coords too so
+// the marker keeps moving when the player descends.
+export const HUB_ROOM_MINIMAP_COORDS: Record<string, AtlasCoord> = {
+  outpost_quarters:        { fx: 0.10, fy: 0.81 },
+  outpost_workshop:        { fx: 0.04, fy: 0.85 },
+  outpost_central:         { fx: 0.10, fy: 0.85 },
+  outpost_messhall:        { fx: 0.16, fy: 0.85 },
+  outpost_lab:             { fx: 0.04, fy: 0.89 },
+  outpost_gate:            { fx: 0.10, fy: 0.89 },
+  outpost_armory:          { fx: 0.16, fy: 0.89 },
+  outpost_relic_vault:     { fx: 0.10, fy: 0.93 },
+  outpost_chapel:          { fx: 0.16, fy: 0.93 },
+  outpost_culvert_descent: { fx: 0.10, fy: 0.96 },
+  // Buried sub-levels — clustered just below the Outpost minimap
+  // so the marker descends visibly as the player goes deeper.
+  buried_landing_one:      { fx: 0.10, fy: 0.985 },
+  buried_storage:          { fx: 0.16, fy: 0.985 },
+  buried_pumps:            { fx: 0.04, fy: 0.985 },
+  buried_landing_two:      { fx: 0.10, fy: 1.005 },
+  buried_shallow_digs:     { fx: 0.10, fy: 1.025 },
+};
+
+export function hubRoomMinimapCoord(roomId: string | null | undefined): AtlasCoord | null {
+  if (!roomId) return null;
+  return HUB_ROOM_MINIMAP_COORDS[roomId] ?? null;
+}
+
 /**
  * Clamp a fractional coordinate to the visible map area, away from
  * the insets at the corners and the timeline ribbon at the bottom.
