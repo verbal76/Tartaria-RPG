@@ -133,6 +133,15 @@ jobs:
 
       - name: Determine build profile and tag
         id: meta
+        # Pass the commit message via env, not via ${{ ... }} interpolation
+        # inside the script body. github.event.head_commit.message is
+        # multi-line; ${{ }} substitution writes the raw newlines into the
+        # script BEFORE bash parses it, which unclosed the quoted string
+        # and made every line of the body execute as a separate command.
+        # env vars are written through a safe channel — bash sees one
+        # string regardless of newlines.
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
           # Tag pushes (v*) always produce a production AAB.
           # Commits whose message contains [build-aab] also produce a
@@ -140,7 +149,6 @@ jobs:
           # tag-push permission trigger a Play-Store-ready AAB build
           # without needing to dispatch via the GitHub UI.
           # workflow_dispatch input still wins when it's "production".
-          COMMIT_MSG="${{ github.event.head_commit.message }}"
           if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
             PROFILE="production"
             TAG="${GITHUB_REF#refs/tags/}"
