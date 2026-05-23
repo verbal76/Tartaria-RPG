@@ -15,7 +15,9 @@ export type HighlightArea =
   | 'travel-row'
   | 'quick-row'
   | 'input-row'
-  | 'bottom-menu'
+  // OTA 457 — `bottom-menu` retired (the run-control row was removed
+  // in OTA 048; gear icon now sits in the top-right corner of the
+  // right column, which we highlight via `top-right-enemy`).
   // Full-screen — no highlight, just a centered info card.
   | 'fullscreen';
 
@@ -70,7 +72,26 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     body:
       'Out of combat this shows the Tartaria crest. In combat the panel becomes one card per enemy ' +
       '(swipe or tap to cycle targets) with their HP, AC, attack bonus, damage dice, and whether ' +
-      'they\'re in range of your equipped weapon.',
+      'they\'re in range of your equipped weapon. ' +
+      '\n\nThe ⚙ gear in the top-right corner is your settings/lore/session hub — we\'ll see it.',
+  },
+  // OTA 457 — replaces the dead "Save & log" / bottom-menu step.
+  // The gear icon in the top-right is now the single entry point
+  // for settings + Lore Codex + session controls (save & exit,
+  // copy/clear log). Stays anchored to `top-right-enemy` so the
+  // overlay highlights the same column the gear sits inside.
+  {
+    screen: 'exploration',
+    area: 'top-right-enemy',
+    title: 'The gear corner',
+    body:
+      'Tap the ⚙ in the top-right corner — it\'s your one hub for everything outside the world. ' +
+      'Four tabs inside: ' +
+      '\n\n• SESSION — save & exit, copy / clear the log, slot management. ' +
+      '\n• SFX — music + voice toggles. ' +
+      '\n• LORE — the full codex (races, factions, places, timeline). Tap any Place to plan ' +
+      'a travel route straight there. ' +
+      '\n• ABOUT — build info, diagnostics, OTA build ID.',
   },
   {
     screen: 'exploration',
@@ -79,9 +100,11 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     body:
       'Where you are right now: location · weather · hazard. The line below shows in-game time ' +
       '(Day N · morning / afternoon / evening / night). ' +
-      '\n\nACTIONS opens a full reference of every verb the engine understands — we\'ll visit ' +
-      'it in a moment. QUESTS opens your active hunts, mysteries, storylines, and faction ' +
-      'contracts; we\'ll see that one too.',
+      '\n\nACTIONS on the right opens a full reference of every verb the engine understands — ' +
+      'we\'ll visit it in a moment. ' +
+      '\n\nThe MAIN QUEST chip just below the scene bar shows the next concrete step in your ' +
+      'core arc and doubles as the entry to the full Contracts screen (side quests, hunts, ' +
+      'mysteries, collectibles, milestones). Tap it any time.',
   },
   {
     screen: 'exploration',
@@ -97,13 +120,15 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     screen: 'exploration',
     area: 'travel-row',
-    title: 'Cardinal travel',
+    title: 'Travel — cardinal and waypoint',
     body:
       'NORTH / SOUTH / EAST / WEST — one tap = one step in that direction on the world map. ' +
       'These hide during combat (you can\'t walk away from a fight that\'s already on you). ' +
-      '\n\nEvery few cardinal moves can trigger a wasteland encounter — caravans, drifters, ' +
-      'fungal patches, derelict buses, faction patrols. Cardinal travel is also how you reach ' +
-      'cities and hubs; ask the Arbiter "what\'s north of me" any time.',
+      '\n\nFor long hauls: type "travel to <city>" (or tap a Place in the Lore tab) and the row ' +
+      'flips to CONTINUE → <CITY> / STOP TRAVEL. Each CONTINUE tap takes one cardinal step ' +
+      'toward the target — same stamina, same time, same encounter rolls. STOP hands the ' +
+      'cardinals back. ' +
+      '\n\nAsk the Arbiter "what\'s north of me" or "closest hub" any time.',
   },
   {
     screen: 'exploration',
@@ -167,15 +192,6 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'visible on your Player Sheet (above). Tap the top-left stats panel any time to recheck.',
   },
   {
-    screen: 'exploration',
-    area: 'bottom-menu',
-    title: 'Save & log',
-    body:
-      'SAVE & EXIT writes the slot and returns you to the title screen. ' +
-      'FULL LOG shows the entire history of this character\'s play session. ' +
-      'The ⚙ gear on the right opens Settings — we\'ll see that screen in a moment.',
-  },
-  {
     screen: 'actions',
     area: 'fullscreen',
     title: 'Action reference',
@@ -189,13 +205,55 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     screen: 'contracts',
     area: 'fullscreen',
-    title: 'Quests & contracts',
+    title: 'Contracts — quests + milestones',
     body:
-      'Your active work, all in one place: faction quests (with stages and rewards), hunts, ' +
-      'mysteries, and storylines. The board shows objective, progress, and the vendor / NPC ' +
-      'to turn each one in to. ' +
-      '\n\nVendor pitches now point at this screen for the full text instead of reading ' +
-      'every contract aloud. Tap a contract to expand it.',
+      'Your active work, all in one place: faction quests (with stages), hunts, mysteries, ' +
+      'storylines, collectibles. Tap a contract to expand it. ' +
+      '\n\nThe PRIMARY OBJECTIVE card at the top is your main-quest tracker. Tap it to see ' +
+      'all 9 Lost Capitals with Guardian status and Core recovery progress per city. ' +
+      '\n\nThe MILESTONES row at the bottom has four tap-to-expand cells: ' +
+      '\n• Enemies — every unique kill, lifetime ' +
+      '\n• Travels — every location discovered ' +
+      '\n• Checks — lifetime skill-check successes ' +
+      '\n• NPCs Met — vendors, Core Guardians, named contacts you\'ve actually spoken with',
+  },
+  // OTA 457 — Core Guardians are the main-quest gate at every Capital.
+  // Players need to know what to expect before they walk into Asgardar
+  // and get a wall of Vaelka narration with no context.
+  {
+    screen: 'exploration',
+    area: 'fullscreen',
+    title: 'Core Guardians',
+    body:
+      'There are 9 Lost Capitals on the map. Each holds a Core — the prize the main quest is ' +
+      'built around — but every Core is guarded by a Core Guardian: a one-of-nine boss from the ' +
+      'Aether-Born Order, a semi-religious sub-faction that exists only to keep the buried world ' +
+      'from being woken. ' +
+      '\n\nWhen you trigger the recovery action at a Capital, the Guardian appears in the scene. ' +
+      'Defeat them to get the Core PLUS a unique signature weapon + signature armor (the Core ' +
+      'Guardian Set — 18 unique pieces across the 9 Capitals). ' +
+      '\n\nYou can FLEE the fight freely — no further damage — but the Guardian fully heals. ' +
+      'They scale with how many Cores you\'ve already taken: tier 1 at your first Capital, tier ' +
+      '9 by your last. Plan your loadout before each one.',
+  },
+  // OTA 457 — Resurrection Gems are the install-wide save-from-death
+  // economy. New players need to know they exist + that they have one
+  // already.
+  {
+    screen: 'exploration',
+    area: 'fullscreen',
+    title: 'Resurrection Gems',
+    body:
+      'Death isn\'t a hard wipe. Resurrection Gems are stored install-wide — they survive across ' +
+      'characters — and one Gem revives a fallen character from the title screen. ' +
+      '\n\nYou already have 1 (granted on first install). More land from: ' +
+      '\n• Every boss kill — 100% drop ' +
+      '\n• Every Core Guardian — 100% drop ' +
+      '\n• Every 50 non-boss kills — pity timer, guaranteed ' +
+      '\n• A rare 0.5% per non-boss kill — the lucky ones ' +
+      '\n\nThe count is shown on the title screen ("✦ N Resurrection Gems held"). Use them ' +
+      'when you want to keep playing the same character; let them ride if you want to start fresh ' +
+      'with a different faction.',
   },
   {
     screen: 'inventory',
@@ -227,15 +285,18 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     screen: 'about',
     area: 'fullscreen',
-    title: 'Settings — three tabs',
+    title: 'Settings — four tabs',
     body:
-      'The ⚙ gear opens this screen. Three tabs across the top: ' +
-      '\n\nMUSIC — track toggle, volume, per-mood selection. ' +
-      '\n\nVOICE — read-aloud (TTS) and speak-input (STT). Voice is character-specific: the ' +
-      'Arbiter has their own voice (AM_MICHAEL by default), and each vendor — Irma, Halem, ' +
-      'Naha — speaks in their own. Engine choice: BUNDLED downloads ~100 MB of neural voice ' +
-      'once for premium quality; SYSTEM uses Android\'s built-in TTS, lighter. Both default OFF. ' +
-      '\n\nABOUT — build info, diagnostics, OTA build ID, full COPY ALL for bug reports.',
+      'The ⚙ gear (top-right of the world screen, same spot on the title screen) opens this ' +
+      'screen. Four tabs across the top: ' +
+      '\n\nSESSION — save & exit, COPY LOG (chunked for long sessions), CLEAR LOG, slot tools. ' +
+      '\n\nSFX — music track toggle, volume, per-mood selection, plus read-aloud (TTS) and ' +
+      'speak-input (STT). Voice is character-specific: the Arbiter has their own voice ' +
+      '(AM_MICHAEL by default), each vendor speaks in their own. BUNDLED downloads ~100 MB ' +
+      'of neural voice once; SYSTEM uses Android\'s built-in TTS. Both default OFF. ' +
+      '\n\nLORE — the full codex: races, factions, places (tap any Place to plan a travel ' +
+      'route straight there), timeline. ' +
+      '\n\nABOUT — build info, diagnostics, OTA build ID.',
   },
   {
     screen: 'exploration',

@@ -17,7 +17,6 @@ function cardPositionFor(area: HighlightArea): 'top' | 'bottom' {
     case 'travel-row':
     case 'quick-row':
     case 'input-row':
-    case 'bottom-menu':
       return 'top';
     case 'feed':
     case 'fullscreen':
