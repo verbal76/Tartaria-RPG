@@ -97,7 +97,7 @@ function variantIndex(seed: string, length: number): number {
 const HOOK_VARIANTS_BY_FACTION: Record<string, string[]> = {
   reclaimers_guild: [
     'The Arbiter watches you across the firelight. "There is a place under all the others — the Mud Flood Nexus. The Reclaimers have looked for it a long time. None has reached it. The 5 Lost Capitals know the way."',
-    'The Arbiter sets the lantern between you. "Every guild veteran retires before they finish the same conversation: the Mud Flood Nexus. Five Lost Capitals stand between it and any tomb-thief alive. Including you, if you want it."',
+    'The Arbiter sets the lantern between you. "Every guild veteran retires before they finish the same conversation: the Mud Flood Nexus. Nine Lost Capitals stand between it and any tomb-thief alive. Including you, if you want it."',
     'The Arbiter passes you a worn dig-map. "This was carried by a Reclaimer who never came back. The mark at the bottom is the Mud Flood Nexus. The 9 Capitals are how you get there. Decide whether you want to be the one who finishes the map."',
   ],
   forgotten_order: [
@@ -150,8 +150,8 @@ const REVELATION_VARIANTS_BY_FACTION: Record<string, string[]> = {
   ],
   forgotten_order: [
     'An Order librarian uncovers a sealed map. "The 9 Cores. One per Capital. Each was placed before the flood and sealed by Aetheric protocols the Order has half-translated. The other half waits inside."',
-    'An Order brother whispers across the lectern. "Five binding texts. Five Capitals. Each Core is its own argument. You read them in the order Tartaria meant. You finish at the Nexus."',
-    'An Order elder shows you the older catalog. "Every Capital was a school. The Cores were their final exams. You take the test in five rooms, you graduate at the Mud Flood Nexus. Bring a clean pen."',
+    'An Order brother whispers across the lectern. "Nine binding texts. Nine Capitals. Each Core is its own argument. You read them in the order Tartaria meant. You finish at the Nexus."',
+    'An Order elder shows you the older catalog. "Every Capital was a school. The Cores were their final exams. You take the test in nine rooms, you graduate at the Mud Flood Nexus. Bring a clean pen."',
   ],
   mud_monarchs: [
     'A Monarch agent presents the family ledger. "The 9 Cores by family right belong to you. Drakova, Nimari, Asgardar, Samarran, Voronov. Travel under our standard; the Capitals will recognize your claim — or refuse it, and pay the price."',
@@ -164,22 +164,22 @@ const REVELATION_VARIANTS_BY_FACTION: Record<string, string[]> = {
     'A True Tartarian elder washes the clay from their hands. "The Cores rest in the 9 Capitals as the Entombed rest in the Catacombs — present, patient, conditional. You ask. They consent. You carry. They guide. The Mud Flood Nexus is where their work resumes."',
   ],
   eternal_dynasty: [
-    'A dynastic herald confirms the lineage seal on your hand. "Five Capitals. Five Cores. Five proofs of blood. Asgardar your throne, Samarran your school, Nimari your guard, Drakova your reserve, Voronov your treasury. Each will name you."',
-    'A dynastic chancellor presents your line-record. "The Capital keepers are required to recognize the heir. Five recognitions. Five Cores returned to the line. Then the Nexus. Then the empire — or whatever you make of it."',
-    'A dynastic herald shows you the five seals stamped in the parchment of your hand. "The Capitals were sworn to the line. The oaths are still in force. Each Core is the keeper\'s proof that they remembered the oath. Five oaths kept. Then the Nexus. Then the throne, if you want it."',
+    'A dynastic herald confirms the lineage seal on your hand. "Nine Capitals. Nine Cores. Nine proofs of blood. Asgardar your throne, Samarran your school, Nimari your guard, Drakova your reserve, Voronov your treasury. Each will name you."',
+    'A dynastic chancellor presents your line-record. "The Capital keepers are required to recognize the heir. Nine recognitions. Nine Cores returned to the line. Then the Nexus. Then the empire — or whatever you make of it."',
+    'A dynastic herald shows you the nine seals stamped in the parchment of your hand. "The Capitals were sworn to the line. The oaths are still in force. Each Core is the keeper\'s proof that they remembered the oath. Nine oaths kept. Then the Nexus. Then the throne, if you want it."',
   ],
   conspiracy_architects: [
-    'An Architect senior partner spreads five dossiers across the table. "The 9 Capitals each contain a Core. We have spent generations preventing anyone from connecting the dots. You are the dot-connector now. We have no further plausible deniability."',
+    'An Architect senior partner spreads nine dossiers across the table. "The 9 Capitals each contain a Core. We have spent generations preventing anyone from connecting the dots. You are the dot-connector now. We have no further plausible deniability."',
     'An Architect operative pushes a folder of redacted aerial shots toward you. "9 Cores. 9 Capitals. Our standing operation has been to keep them apart. You are the agent who will move them together. The brief is: do not get photographed."',
-    'An Architect partner closes the dossier and meets your eye. "We have stopped pretending we can suppress this. Five Cores. Five Capitals. You retrieve them under a clean cover story; we manage the press. The Architects step aside at the Nexus and let you decide."',
+    'An Architect partner closes the dossier and meets your eye. "We have stopped pretending we can suppress this. Nine Cores. Nine Capitals. You retrieve them under a clean cover story; we manage the press. The Architects step aside at the Nexus and let you decide."',
   ],
   servants_of_giants: [
-    'A Servant of the Giants pours libation. "Five Capitals. Five Giants. Each Capital is the resting-place of one Giant; each Giant guards one Core. The Giants must consent. They will, if you keep the vigil correctly."',
-    'A Servant elder bows toward the eastern wall. "9 Cores rest with 5 Giants in 9 Capitals. We do not take. We sit until the Giant offers. Then we carry. Then we sit again at the next Capital. Five vigils. Then the Nexus."',
+    'A Servant of the Giants pours libation. "Nine Capitals. Nine Giants. Each Capital is the resting-place of one Giant; each Giant guards one Core. The Giants must consent. They will, if you keep the vigil correctly."',
+    'A Servant elder bows toward the eastern wall. "9 Cores rest with 9 Giants in 9 Capitals. We do not take. We sit until the Giant offers. Then we carry. Then we sit again at the next Capital. Nine vigils. Then the Nexus."',
     'A Servant lights the second tomb-lantern. "Each Capital is a chapel to one of the 5 Giants. Each Giant has slept long enough to be approachable. The Cores will come with you if you ask the Giant\'s permission first and not rush the answer."',
   ],
   stone_builders: [
-    'A Stone Builder foreman lays out five blueprints. "Asgardar Core: power. Samarran Core: timing. Nimari Core: shielding. Drakova Core: reserve. Voronov Core: regulator. Assemble them all and the Nexus engine cycles. Miss one, it floods again."',
+    'A Stone Builder foreman lays out nine blueprints. "Asgardar Core: power. Samarran Core: timing. Nimari Core: shielding. Drakova Core: reserve. Voronov Core: regulator. Assemble them all and the Nexus engine cycles. Miss one, it floods again."',
     'A Stone Builder draftsman points at the schematic. "9 Cores, 5 different roles. The Nexus Engine doesn\'t care about your loyalty; it cares about the Cores being IN it. We give you the tools to extract each one cleanly. The order is up to you."',
     'A Stone Builder master mason draws the assembly diagram in chalk. "Power feeds timing. Timing feeds shielding. Shielding feeds reserve. Reserve feeds regulator. Bring the 9 Cores in any order; the Engine accepts them. Build correctly and the Nexus runs."',
   ],
@@ -273,20 +273,20 @@ const REVELATION_BY_FACTION: Record<string, string> = {
   true_tartarians:
     'A True Tartarian elder sketches the old map in clay. "Each Capital is a sleeping mouth. You must enter, ask permission of the Core, and carry it out. Asgardar speaks first. Samarran answers. Nimari listens. Drakova waits. Voronov tests."',
   eternal_dynasty:
-    'A dynastic herald confirms the lineage seal on your hand. "Five Capitals. Five Cores. Five proofs of blood. Asgardar your throne, Samarran your school, Nimari your guard, Drakova your reserve, Voronov your treasury. Each will name you."',
+    'A dynastic herald confirms the lineage seal on your hand. "Nine Capitals. Nine Cores. Nine proofs of blood. Asgardar your throne, Samarran your school, Nimari your guard, Drakova your reserve, Voronov your treasury. Each will name you."',
   conspiracy_architects:
-    'An Architect senior partner spreads five dossiers across the table. "The 9 Capitals each contain a Core. We have spent generations preventing anyone from connecting the dots. You are the dot-connector now. We have no further plausible deniability."',
+    'An Architect senior partner spreads nine dossiers across the table. "The 9 Capitals each contain a Core. We have spent generations preventing anyone from connecting the dots. You are the dot-connector now. We have no further plausible deniability."',
   servants_of_giants:
-    'A Servant of the Giants pours libation. "Five Capitals. Five Giants. Each Capital is the resting-place of one Giant; each Giant guards one Core. The Giants must consent. They will, if you keep the vigil correctly."',
+    'A Servant of the Giants pours libation. "Nine Capitals. Nine Giants. Each Capital is the resting-place of one Giant; each Giant guards one Core. The Giants must consent. They will, if you keep the vigil correctly."',
   stone_builders:
-    'A Stone Builder foreman lays out five blueprints. "Asgardar Core: power. Samarran Core: timing. Nimari Core: shielding. Drakova Core: reserve. Voronov Core: regulator. Assemble them all and the Nexus engine cycles. Miss one, it floods again."',
+    'A Stone Builder foreman lays out nine blueprints. "Asgardar Core: power. Samarran Core: timing. Nimari Core: shielding. Drakova Core: reserve. Voronov Core: regulator. Assemble them all and the Nexus engine cycles. Miss one, it floods again."',
   tartarian_revivalists:
     'A Revivalist cell organizer hands you a press kit. "Nine Capitals. Nine recoveries. Nine publishable artifacts. Each Core you bring out goes on the front page. By the time you have all nine, the surface world is asking us for an interview."',
 };
 
 const CORE_RECOVERED_LINE = (factionId: string, capitalId: string, recoveredCount: number): string => {
   const capitalName = LOST_CAPITAL_NAMES[capitalId] ?? capitalId;
-  const remaining = 5 - recoveredCount;
+  const remaining = 9 - recoveredCount;
   const tail = remaining === 0
     ? 'All nine Cores rest in your pack. The Endless Stair will open to a carrier of the full set.'
     : `${remaining} Core${remaining === 1 ? '' : 's'} still to recover.`;
@@ -313,6 +313,13 @@ const LOST_CAPITAL_NAMES: Record<string, string> = {
   nimari: 'Nimari',
   drakova: 'Drakova',
   voronov: 'Voronov',
+  // OTA 459 — the four Capitals added in OTA 052 were never wired
+  // into LOST_CAPITAL_NAMES; recoveries fell back to the raw id
+  // ("the karok_sa Core") instead of the display name.
+  karok_sa: 'Karok-Sa',
+  yuldra_tul: 'Yuldra-Tul',
+  ostragar: 'Ostragar',
+  iskan_veil: 'Iskan-Veil',
 };
 
 const DESCENT_LINE_BY_FACTION: Record<string, string> = {
@@ -382,7 +389,7 @@ export const NEXUS_SLOT_BEATS: readonly NexusSlotBeat[] = [
   {
     capitalId: 'voronov',
     capitalName: 'Voronov',
-    line: 'The Voronov Core lands in the regulator-seat. Five of nine. The chamber\'s lights firm to a clean amber for the first time, the metronome steadies into a real beat, and the control mantle begins to wake.',
+    line: 'The Voronov Core lands in the regulator-seat. The chamber\'s lights firm to a clean amber for the first time, the metronome steadies into a real beat, and the control mantle begins to wake.',
   },
   // v2.4.1 (OTA 052) — four additional slot beats for the four
   // Capitals added when the Core count expanded from 5 to 9.
@@ -442,7 +449,7 @@ const SEAL_BY_FACTION: Record<string, string> = {
   conspiracy_architects:
     'You SEAL the Nexus. The Architects\' three-hundred-year suppression project ends in vindication — there is now nothing left to hide because there is nothing left to find. The institutions stay institutions. The surface world keeps its innocence. Your career, ironically, never happened officially. There is no commendation. There is no headline. There is only the desk you go back to.',
   servants_of_giants:
-    'You SEAL the Nexus. The Giants in their five Capital-tombs sleep more deeply than they have since the Flood — no Aether-strain, no half-stirring, no centuries of being almost-awake. The vigil you have kept your whole life finally has a purpose: not to wake them, but to let them rest. The lanterns in every Vigil cell across the world dim to a single warm point and stay there.',
+    'You SEAL the Nexus. The Giants in their nine Capital-tombs sleep more deeply than they have since the Flood — no Aether-strain, no half-stirring, no centuries of being almost-awake. The vigil you have kept your whole life finally has a purpose: not to wake them, but to let them rest. The lanterns in every Vigil cell across the world dim to a single warm point and stay there.',
   stone_builders:
     'You SEAL the Nexus. The Engine you have studied your entire career powers down cleanly for the first time. Aethercraft becomes a craft, not a power tap — what you build now must stand on its own structural merit, no Aetheric shortcut, no live Nexus to draw from. The workshop will be smaller. The work will be better.',
   tartarian_revivalists:
@@ -463,7 +470,7 @@ const UNLEASH_BY_FACTION: Record<string, string> = {
   conspiracy_architects:
     'You UNLEASH the Nexus. The Architects\' suppression project ends in the most public possible defeat — Tartaria is on every front page within forty-eight hours, and the institutions you spent your career propping up issue contradictory press releases for two weeks. You will be fired. Your superiors will retire. The cover-up is over because the thing being covered is now visible to everyone. There is a strange relief in that.',
   servants_of_giants:
-    'You UNLEASH the Nexus. The Giants WAKE. Five of them. Each one rises from its Capital-tomb at the same minute, blinks once at a world it does not recognize, and looks for someone to talk to. The Servants have prepared for this moment for centuries; nobody is actually ready for it. The Giants are ten times your size and not in the mood to be lectured. You are the most senior Servant on the field. Speak well.',
+    'You UNLEASH the Nexus. The Giants WAKE. Nine of them. Each one rises from its Capital-tomb at the same minute, blinks once at a world it does not recognize, and looks for someone to talk to. The Servants have prepared for this moment for centuries; nobody is actually ready for it. The Giants are ten times your size and not in the mood to be lectured. You are the most senior Servant on the field. Speak well.',
   stone_builders:
     'You UNLEASH the Nexus. The Engine reaches full output. Every Aethercraft work the Builders have ever raised — every stone, every conduit, every workshop tool — sings on the live Aether for the first time since the Flood. Tarek calls in tears: the prototype cores in the Materials Vault have woken on their own and are asking for direction. The Builders are now custodians of an empire-grade power grid. The work just got real.',
   tartarian_revivalists:
@@ -580,7 +587,7 @@ export function narrationForPhase(
 export function phaseLabel(phase: MainQuestPhase): string {
   switch (phase) {
     case 'hook':       return 'A rumor, nothing more';
-    case 'revelation': return 'Five Cores, five Capitals';
+    case 'revelation': return 'Nine Cores, nine Capitals';
     case 'cores':      return 'Recovering the Cores';
     case 'descent':    return 'The Endless Stair opens';
     case 'nexus':      return 'At the Mud Flood Nexus';
