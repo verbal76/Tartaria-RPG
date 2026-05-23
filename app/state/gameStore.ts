@@ -10405,6 +10405,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = get().player;
     if (!player) return;
     triggerMainQuest(get, set, { kind: 'chose_ending', ending });
+    // v2.4.1 (OTA 040) — navigate to the ending splash so the player
+    // gets the full presentation immediately, not just a Contracts-
+    // screen log line. The splash has BACK TO TITLE and KEEP
+    // EXPLORING options.
+    set({ currentScreen: 'ending' });
     void get().persist();
   },
 

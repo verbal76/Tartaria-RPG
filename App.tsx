@@ -14,6 +14,7 @@ import { ExplorationScreen } from './app/screens/ExplorationScreen';
 import { LogScreen } from './app/screens/LogScreen';
 import { LoreScreen } from './app/screens/LoreScreen';
 import { AboutScreen } from './app/screens/AboutScreen';
+import { EndingScreen } from './app/screens/EndingScreen';
 import { InventoryScreen } from './app/screens/InventoryScreen';
 import { CharacterScreen } from './app/screens/CharacterScreen';
 import { MapScreen } from './app/screens/MapScreen';
@@ -327,6 +328,7 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
         {screen === 'vendor' && <VendorScreen />}
         {screen === 'actions' && <ActionReferenceScreen />}
         {screen === 'contracts' && <ContractsScreen />}
+        {screen === 'ending' && <EndingScreen />}
       </View>
     </View>
   );

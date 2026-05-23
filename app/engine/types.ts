@@ -817,7 +817,8 @@ export type ScreenName =
   | 'crafting'
   | 'vendor'
   | 'actions'
-  | 'contracts';
+  | 'contracts'
+  | 'ending';
 
 export interface SaveState {
   version: 1;
