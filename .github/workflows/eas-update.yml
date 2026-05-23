@@ -59,7 +59,7 @@ jobs:
           # Bump deliberately after confirming the new version still
           # auth-validates against the project token.
           eas-version: 16.6.1
-          token: ${{ secrets.TARTARIA }}
+          token: ${{ secrets.TARTARIATWO }}
 
       # Diagnostic step — print env health so the next CI failure has
       # actionable output instead of a bare exit 1. Token value never
@@ -67,7 +67,7 @@ jobs:
       # right shape.
       - name: EAS auth diagnostic (non-failing)
         env:
-          EXPO_TOKEN: ${{ secrets.TARTARIA }}
+          EXPO_TOKEN: ${{ secrets.TARTARIATWO }}
         run: |
           set +e
           echo "=== EAS auth diagnostic ==="
@@ -75,7 +75,7 @@ jobs:
           echo "Token provided:     $([ -n \"$EXPO_TOKEN\" ] && echo yes || echo NO)"
           echo "Token length:       $(printf %s \"$EXPO_TOKEN\" | wc -c)"
           echo "Whoami:"
-          eas whoami 2>&1 || echo "::warning::eas whoami failed — token may be expired or revoked. Regenerate at https://expo.dev → Account → Access Tokens, then update the TARTARIA GitHub secret."
+          eas whoami 2>&1 || echo "::warning::eas whoami failed — token may be expired or revoked. Regenerate at https://expo.dev → Account → Access Tokens, then update the TARTARIATWO GitHub secret."
           echo "==========================="
           set -e
 
@@ -84,7 +84,7 @@ jobs:
 
       - name: Publish OTA update to Tartaria Realms
         env:
-          EXPO_TOKEN: ${{ secrets.TARTARIA }}
+          EXPO_TOKEN: ${{ secrets.TARTARIATWO }}
         run: |
           set -euo pipefail
 
