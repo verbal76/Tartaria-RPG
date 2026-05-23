@@ -249,6 +249,38 @@ export function ExplorationScreen() {
         </View>
       </TutorialTarget>
 
+      {/* v2.4.1 (OTA 037) — main-quest objective chip. Persistent
+          one-line prompt that surfaces the next main-quest beat
+          without forcing the player into the Contracts screen.
+          Tap to jump to Contracts. Visible whenever the player has
+          a mainQuest, hidden in the 'ended' state. */}
+      {(() => {
+        if (!player?.mainQuest) return null;
+        const mq = player.mainQuest;
+        if (mq.phase === 'ended') return null;
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { phaseHint, LOST_CAPITAL_LOCATIONS: capitals, coreGateNextAction } = require('../engine/mainQuest');
+        const cores = mq.coresRecovered?.length ?? 0;
+        // At an unrecovered Capital, prefer the gate's specific
+        // next-action prompt; otherwise show the generic phase hint.
+        const atUnrecovered = capitals.includes(player.currentLocationId)
+          && !mq.coresRecovered.includes(player.currentLocationId)
+          && (mq.phase === 'revelation' || mq.phase === 'cores');
+        const text: string = atUnrecovered
+          ? `◆ ${coreGateNextAction(player.factionId)}.`
+          : `◆ ${phaseHint(mq.phase, cores)}`;
+        return (
+          <TouchableOpacity
+            style={styles.objectiveChip}
+            onPress={() => setScreen('contracts')}
+            activeOpacity={0.7}
+            hitSlop={6}
+          >
+            <Text style={styles.objectiveChipText} numberOfLines={2}>{text}</Text>
+          </TouchableOpacity>
+        );
+      })()}
+
       {currentScene?.vendor && (
         <TouchableOpacity
           style={styles.vendorBanner}
@@ -644,6 +676,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   gear: { color: '#c9a86a', fontSize: 16, lineHeight: 18 },
+  // v2.4.1 (OTA 037) — persistent main-quest objective chip. Sits
+  // above the vendor banner (and below the scene bar) so it's a
+  // top-of-screen anchor the player can tap-into Contracts.
+  objectiveChip: {
+    marginTop: 4,
+    marginBottom: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: '#13110f',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 4,
+  },
+  objectiveChipText: {
+    color: '#c9a86a',
+    fontSize: 12,
+    lineHeight: 16,
+    fontStyle: 'italic',
+  },
   vendorBanner: {
     flexDirection: 'row',
     alignItems: 'center',
