@@ -37,16 +37,24 @@ const GLOBAL_STASH_KEY = 'tartaria.global.v2';
 
 export interface GlobalStash {
   resurrectionGems: number;
+  // v2.4.1 (OTA 043 — Phase 7) — completion badges. Records every
+  // (faction, ending) combo the player has finished across all
+  // characters. Up to 27 unique badges (9 factions × 3 endings).
+  // Used by TitleScreen to display the completion grid.
+  endingBadges?: string[]; // ids of the form "faction:ending"
 }
 
 export async function loadGlobalStash(): Promise<GlobalStash> {
   try {
     const raw = await AsyncStorage.getItem(GLOBAL_STASH_KEY);
-    if (!raw) return { resurrectionGems: 0 };
+    if (!raw) return { resurrectionGems: 0, endingBadges: [] };
     const parsed = JSON.parse(raw) as Partial<GlobalStash>;
-    return { resurrectionGems: parsed.resurrectionGems ?? 0 };
+    return {
+      resurrectionGems: parsed.resurrectionGems ?? 0,
+      endingBadges: parsed.endingBadges ?? [],
+    };
   } catch {
-    return { resurrectionGems: 0 };
+    return { resurrectionGems: 0, endingBadges: [] };
   }
 }
 
@@ -59,6 +67,20 @@ export async function addResurrectionGems(n: number): Promise<number> {
   stash.resurrectionGems = Math.max(0, stash.resurrectionGems + n);
   await saveGlobalStash(stash);
   return stash.resurrectionGems;
+}
+
+/** v2.4.1 (OTA 043) — record a completed (faction, ending) combo.
+ *  Idempotent: re-recording an existing badge is a no-op. Returns
+ *  the updated badge list. */
+export async function recordEndingBadge(factionId: string, ending: string): Promise<string[]> {
+  const stash = await loadGlobalStash();
+  const id = `${factionId}:${ending}`;
+  const set = new Set(stash.endingBadges ?? []);
+  if (set.has(id)) return Array.from(set);
+  set.add(id);
+  stash.endingBadges = Array.from(set);
+  await saveGlobalStash(stash);
+  return stash.endingBadges;
 }
 
 let activeSlotId: string | null = null;

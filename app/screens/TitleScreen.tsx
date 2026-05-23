@@ -383,6 +383,11 @@ export function TitleScreen() {
         <Text style={styles.gems}>✦ {resurrectionGems} Resurrection Gem{resurrectionGems === 1 ? '' : 's'} held</Text>
       )}
 
+      {/* v2.4.1 (OTA 043) — completion badges. Shows the player's
+          collection of (faction, ending) combos earned across all
+          runs. 9 factions × 3 endings = 27 max badges. */}
+      <EndingBadgesRow />
+
       <KokoroDownloadBanner />
 
       {(() => {
@@ -703,6 +708,22 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   gems: { color: '#c9a86a', fontSize: 12, textAlign: 'center', marginBottom: 8, letterSpacing: 1 },
+  // v2.4.1 (OTA 043) — completion-badges row styles.
+  badgesContainer: { marginBottom: 8, paddingHorizontal: 8 },
+  badgesTag: { color: '#7a705c', fontSize: 10, letterSpacing: 2, textAlign: 'center', marginBottom: 6 },
+  badgesGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 4 },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderWidth: 1,
+    borderRadius: 3,
+    backgroundColor: '#13110f',
+    gap: 4,
+  },
+  badgeGlyph: { fontSize: 12, fontWeight: '700' },
+  badgeText: { color: '#cdbf99', fontSize: 10, letterSpacing: 0.5 },
   updateBanner: {
     backgroundColor: '#2a1f12',
     borderColor: '#c9a86a',
@@ -875,6 +896,60 @@ const styles = StyleSheet.create({
 // the model arrives in the background; "Voice ready" briefly confirms
 // the install before fading. Errors surface so a tester on metered
 // data can see why their voice isn't working.
+// v2.4.1 (OTA 043 — Phase 7) — completion badges row. Loads the
+// global stash on mount + every time the title screen is re-rendered
+// after an ending; shows a compact grid of earned (faction, ending)
+// combos. Hidden when the player has zero badges (avoid clutter
+// for new players).
+const FACTION_NAMES_FOR_BADGES: Record<string, string> = {
+  reclaimers_guild: 'Reclaimers',
+  forgotten_order: 'Order',
+  mud_monarchs: 'Monarchs',
+  true_tartarians: 'True Tart.',
+  eternal_dynasty: 'Dynasty',
+  conspiracy_architects: 'Architects',
+  servants_of_giants: 'Servants',
+  stone_builders: 'Builders',
+  tartarian_revivalists: 'Revivalists',
+};
+const ENDING_GLYPH: Record<string, string> = { seal: '◇', unleash: '◈', preserve: '◉' };
+const ENDING_COLOR: Record<string, string> = { seal: '#5a6b8a', unleash: '#a85a3a', preserve: '#7a8a5a' };
+
+function EndingBadgesRow(): React.ReactElement | null {
+  const [badges, setBadges] = useState<string[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { loadGlobalStash } = require('../engine/saveSystem');
+      const stash = await loadGlobalStash();
+      if (!cancelled) setBadges(stash.endingBadges ?? []);
+    })();
+    return () => { cancelled = true; };
+  }, []);
+  if (badges.length === 0) return null;
+  const total = 27;
+  return (
+    <View style={styles.badgesContainer}>
+      <Text style={styles.badgesTag}>COMPLETED RUNS · {badges.length}/{total}</Text>
+      <View style={styles.badgesGrid}>
+        {badges.map((id) => {
+          const [factionId, ending] = id.split(':');
+          const faction = FACTION_NAMES_FOR_BADGES[factionId ?? ''] ?? factionId;
+          const glyph = ENDING_GLYPH[ending ?? ''] ?? '◯';
+          const color = ENDING_COLOR[ending ?? ''] ?? '#7a705c';
+          return (
+            <View key={id} style={[styles.badge, { borderColor: color }]}>
+              <Text style={[styles.badgeGlyph, { color }]}>{glyph}</Text>
+              <Text style={styles.badgeText} numberOfLines={1}>{faction}</Text>
+            </View>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
 function KokoroDownloadBanner(): React.ReactElement | null {
   const [state, setState] = useState<KokoroState>(() => getKokoroState());
   useEffect(() => onKokoroStateChange(setState), []);

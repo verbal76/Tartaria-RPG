@@ -10405,11 +10405,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = get().player;
     if (!player) return;
     triggerMainQuest(get, set, { kind: 'chose_ending', ending });
-    // v2.4.1 (OTA 040) — navigate to the ending splash so the player
-    // gets the full presentation immediately, not just a Contracts-
-    // screen log line. The splash has BACK TO TITLE and KEEP
-    // EXPLORING options.
+    // v2.4.1 (OTA 040) — navigate to the ending splash.
     set({ currentScreen: 'ending' });
+    // v2.4.1 (OTA 043) — record the completion badge in global
+    // stash so the title screen can surface "faction X seal" /
+    // "faction Y unleash" badges across runs.
+    {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { recordEndingBadge } = require('../engine/saveSystem');
+      void recordEndingBadge(player.factionId, ending);
+    }
     void get().persist();
   },
 
