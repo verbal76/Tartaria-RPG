@@ -16,6 +16,10 @@
           "price": 12
         },
         {
+          "itemName": "Reclaimer's Rope",
+          "price": 55
+        },
+        {
           "itemName": "Aetheric Torch",
           "price": 25
         },
@@ -332,6 +336,10 @@
         {
           "itemName": "Aetheric Compass",
           "price": 70
+        },
+        {
+          "itemName": "Reclaimer's Rope",
+          "price": 60
         },
         {
           "itemName": "Aetheric Torch",

@@ -82,16 +82,29 @@ export const CLIMB_TOP_LOOT: { name: string; rarity: Rarity; weight: number }[] 
   { name: 'Aetheric Cloth',        rarity: 'Rare',     weight: 1 },
 ];
 
-export function rollClimbTopLoot(): { name: string; rarity: Rarity } | null {
+// OTA 23-013 — tall-climb-only additions. On tier ≥ 4 climbs
+// (towers, spires, cliffs) somebody once anchored a piton up there
+// and left their rope behind. Folded into the same chance roll so
+// the overall drop frequency doesn't shift; the rope just edges
+// into the weighted pool on tall targets.
+const TALL_CLIMB_TOP_LOOT: { name: string; rarity: Rarity; weight: number }[] = [
+  { name: "Reclaimer's Rope", rarity: 'Uncommon', weight: 2 },
+];
+
+export function rollClimbTopLoot(totalTiers?: number): { name: string; rarity: Rarity } | null {
   if (Math.random() < 0.5) return null;
-  const total = CLIMB_TOP_LOOT.reduce((s, x) => s + x.weight, 0);
+  const pool =
+    typeof totalTiers === 'number' && totalTiers >= 4
+      ? [...CLIMB_TOP_LOOT, ...TALL_CLIMB_TOP_LOOT]
+      : CLIMB_TOP_LOOT;
+  const total = pool.reduce((s, x) => s + x.weight, 0);
   // OTA 036 — guard against an empty/zero-weight pool. Without this,
   // r = Math.random() * 0 = 0 and the loop's r -= weight never satisfies
   // r <= 0, falling through to the implicit `return null`. Safer to be
   // explicit.
   if (total <= 0) return null;
   let r = Math.random() * total;
-  for (const x of CLIMB_TOP_LOOT) {
+  for (const x of pool) {
     r -= x.weight;
     if (r <= 0) return { name: x.name, rarity: x.rarity };
   }

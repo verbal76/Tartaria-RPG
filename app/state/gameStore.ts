@@ -5355,8 +5355,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
               'world',
               `You reach the top of the ${tgt} (tier ${currentTier}/${totalTiers}). The view changes; the room reads differently from here.`,
             );
-            // Top reached — roll the chance-based loot.
-            const drop = rollClimbTopLoot();
+            // Top reached — roll the chance-based loot. Tall climbs
+            // (tier ≥ 4) widen the pool to include Reclaimer's Rope,
+            // which someone once anchored up here and left.
+            const drop = rollClimbTopLoot(totalTiers);
             if (drop) {
               const grant: InventoryItem = stampDurability({
                 id: `climb_top_${Date.now()}`,
@@ -5371,10 +5373,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   ? { player: { ...s.player, inventory: mergeOrPushItem(s.player.inventory, grant) } }
                   : s,
               );
-              get().appendLog(
-                'reward',
-                `✦ ${drop.name} (${drop.rarity}) — tucked into a crack at the top of the ${tgt}.`,
-              );
+              const flavor =
+                drop.name === "Reclaimer's Rope"
+                  ? `✦ ${drop.name} (${drop.rarity}) — anchored to an old piton at the top of the ${tgt}. Someone climbed this before and left their line for the next pair of hands.`
+                  : `✦ ${drop.name} (${drop.rarity}) — tucked into a crack at the top of the ${tgt}.`;
+              get().appendLog('reward', flavor);
             }
           } else {
             get().appendLog(
