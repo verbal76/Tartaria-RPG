@@ -27,10 +27,25 @@ export interface AtlasCoord {
 // The Outpost icon — also the anchor for the grid-offset fallback.
 export const OUTPOST_ATLAS_COORD: AtlasCoord = { fx: 0.10, fy: 0.13 };
 
-// One grid tile as a fraction of image height. Calibrated against
-// the redrawn atlas so a 10-tile walk lands roughly inside the
-// drawn world (the playable area spans ~0.05 to ~0.85 vertically).
-export const DOT_TILE_FRAC = 0.04;
+// Per-tile marker drift on the atlas. Atlas is 1408×768 (1.83:1
+// landscape), so a single DOT_TILE_FRAC applied to both axes makes
+// 1 east tile cover 1.83× more pixels than 1 south tile. We split
+// the constants and aspect-correct so 1 east step and 1 south step
+// drift the marker the same pixel distance.
+//
+// STEP_FRAC_Y = 0.06 — height fraction. Calibrated 1.5× the prior
+//   0.04 baseline because the world feels bigger now (41×41 grid,
+//   D5 cities up to 28 tiles out — each tile needs a visible nudge
+//   on the marker or the drift is imperceptible).
+// STEP_FRAC_X = STEP_FRAC_Y × (ATLAS_H/ATLAS_W) = 0.06 × 0.5455
+//   ≈ 0.0327 — width fraction picked so 1 east tile = 1 south tile
+//   in pixels (~46 px each).
+export const STEP_FRAC_Y = 0.06;
+export const STEP_FRAC_X = 0.0327;
+// Back-compat alias for tests that still reference the old name.
+// Equal to STEP_FRAC_Y because the prior axis-uniform constant was
+// effectively the height fraction.
+export const DOT_TILE_FRAC = STEP_FRAC_Y;
 
 // Locations the new atlas depicts as labeled icons. Coordinates
 // are measured against each icon's visual center.
@@ -92,25 +107,37 @@ export function depictedLocationIds(): string[] {
   return Object.keys(LOCATION_ATLAS_COORDS);
 }
 
-// OTA 23-010 — cardinal-direction-preserving dot offset. Walks the
-// player from the Outpost anchor by their (mapX - center, mapY -
-// center) grid offset, scaled by DOT_TILE_FRAC, and clamps to the
-// painted map area. East increases fx (dot moves right), south
-// increases fy (down) — matches the keyboard intuition.
+// Cardinal-direction-preserving dot offset from an arbitrary anchor.
+// East increases fx (dot moves right), south increases fy (down) —
+// matches keyboard intuition. Anisotropy fixed: separate X/Y step
+// fractions so 1 east tile and 1 south tile cover the same pixel
+// distance on a 1.83:1 landscape atlas.
 //
-// This is the simple fallback for "you're between named locations."
-// When the player IS at a named location, MapScreen uses
-// atlasCoordForLocation() instead so the dot snaps to the
-// canonical icon.
-export function cardinalOffsetFromOutpost(
+// The earlier `cardinalOffsetFromOutpost` hardcoded the Outpost as
+// the base. With per-character procedural maps that regenerate on
+// every travelTo (worldMap.ts:7221), mapX/mapY is local to the
+// CURRENT location — not the Outpost — so the base anchor must be
+// the current location's canonical atlas position. Pass it in.
+export function cardinalOffsetFromAnchor(
+  anchor: AtlasCoord,
   mapX: number,
   mapY: number,
   gridCenter: { x: number; y: number },
 ): AtlasCoord {
   return clampToMapArea({
-    fx: OUTPOST_ATLAS_COORD.fx + (mapX - gridCenter.x) * DOT_TILE_FRAC,
-    fy: OUTPOST_ATLAS_COORD.fy + (mapY - gridCenter.y) * DOT_TILE_FRAC,
+    fx: anchor.fx + (mapX - gridCenter.x) * STEP_FRAC_X,
+    fy: anchor.fy + (mapY - gridCenter.y) * STEP_FRAC_Y,
   });
+}
+
+// Back-compat shim. Old callers (cardinalOffset.test.ts) anchored at
+// the Outpost; the new helper takes any anchor.
+export function cardinalOffsetFromOutpost(
+  mapX: number,
+  mapY: number,
+  gridCenter: { x: number; y: number },
+): AtlasCoord {
+  return cardinalOffsetFromAnchor(OUTPOST_ATLAS_COORD, mapX, mapY, gridCenter);
 }
 
 /**

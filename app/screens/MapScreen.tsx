@@ -15,14 +15,15 @@
 // image, so it scales + translates with the map — its anchor at
 // the Outpost ring stays correct at any zoom level.
 //
-// Reality check on the dot:
-//   The atlas image depicts a CANONICAL geography (Asgardar east,
-//   Mud Seas south, Varakush southeast). The engine's per-character
-//   procedural grid shuffles individual cardinal positions, so two
-//   characters get two different layouts. The dot represents the
-//   player's true grid offset from the Outpost (mapX-10, mapY-10).
-//   Use rings for distance, named features for direction-of-travel
-//   intuition only.
+// Marker model (v2.4.1 overhaul):
+//   Procedural map regenerates on every travelTo, with the new
+//   location at grid center. So mapX/mapY is local to the current
+//   location, not Outpost-relative. Marker snaps to the current
+//   location's canonical atlas anchor on arrival, then drifts in
+//   the player's direction of travel as they wander. Procedural
+//   placement now respects canonical bearing (see worldMap.ts), so
+//   walking east on the map moves the marker east and you'll
+//   eventually reach the canonically-east named location.
 
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -39,7 +40,8 @@ import { useGameStore } from '../state/gameStore';
 import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from '../engine/worldMap';
 import {
   atlasCoordForLocation,
-  cardinalOffsetFromOutpost,
+  cardinalOffsetFromAnchor,
+  OUTPOST_ATLAS_COORD,
 } from '../engine/atlasCoords';
 // OTA 051 — locations.json carries the human-readable name we want
 // to surface in the "You are here: <name>" chip when the player is
@@ -127,36 +129,42 @@ export function MapScreen() {
   // off-screen by the baseline scale.
   const baselineScale = useRef(1);
 
-  // OTA 23-010 — cardinal-direction-preserving dot positioning.
-  // Replaces the OTA 054 IDW interpolation. IDW interpolated the
-  // dot via weights inverse to procedural grid distance, but the
-  // engine's procedural grid is RANDOM per character — so a
-  // location placed procedurally east of Outpost might be drawn at
-  // the atlas's LEFT side, which meant walking east in-game pulled
-  // the dot leftward visually. Player intuition is east = right,
-  // so we revert to the simpler pre-054 model:
+  // Marker positioning — v2.4.1 overhaul (OTA 2026-05-23-019).
   //
-  //   1) If the player is at a named-on-atlas location, snap the
-  //      dot to that location's canonical drawn position.
-  //   2) Otherwise, compute the dot's atlas position by cardinal
-  //      offset from the Outpost anchor:
-  //        fx = outpost.fx + (mapX - center) * tileFrac
-  //        fy = outpost.fy + (mapY - center) * tileFrac
-  //      east increases fx (dot moves right), south increases fy
-  //      (dot moves down). clampToMapArea keeps the dot inside the
-  //      painted world.
+  // The procedural map regenerates on every travelTo with the
+  // destination at grid center (worldMap.ts:7221). So mapX/mapY is
+  // LOCAL to the current named location, not Outpost-relative.
   //
-  // Loss vs IDW: smooth glide between anchors. Gain: every cardinal
-  // step is a predictable visual move in the same direction. The
-  // user explicitly chose direction-preservation over IDW snap.
+  // Two cases:
+  //   1) Player just arrived (mapX/mapY === center): snap to the
+  //      current location's canonical atlas anchor. No drift yet.
+  //   2) Player has stepped off the named tile (mapX/mapY !== center):
+  //      drift from the current anchor by aspect-corrected per-tile
+  //      fractions. East steps push fx right, south push fy down.
+  //      The marker flows in the direction of travel on the canonical
+  //      atlas — even if the procedural map placed the destination
+  //      elsewhere, walking east on the map still moves the marker
+  //      east. Procedural placement now respects canonical bearing
+  //      (worldMap.ts), so the marker generally heads toward the
+  //      next canonical anchor in the direction of travel.
+  //
+  // The prior code snapped to the named anchor whenever
+  // currentLocationId matched an atlas-depicted location — but
+  // currentLocationId only changes on travelTo (crossing into a NEW
+  // named tile), so the marker stayed glued to the last anchor
+  // through unlimited cardinal stepping. That was the visible bug.
   const safeMapX = typeof player?.mapX === 'number' ? player.mapX : WORLD_MAP_CENTER_X;
   const safeMapY = typeof player?.mapY === 'number' ? player.mapY : WORLD_MAP_CENTER_Y;
-  const namedAnchor = atlasCoordForLocation(player?.currentLocationId);
-  const safeAtlasPos = namedAnchor ?? cardinalOffsetFromOutpost(
-    safeMapX,
-    safeMapY,
-    { x: WORLD_MAP_CENTER_X, y: WORLD_MAP_CENTER_Y },
-  );
+  const currentAnchor =
+    atlasCoordForLocation(player?.currentLocationId) ?? OUTPOST_ATLAS_COORD;
+  const atCenter =
+    safeMapX === WORLD_MAP_CENTER_X && safeMapY === WORLD_MAP_CENTER_Y;
+  const safeAtlasPos = atCenter
+    ? currentAnchor
+    : cardinalOffsetFromAnchor(currentAnchor, safeMapX, safeMapY, {
+        x: WORLD_MAP_CENTER_X,
+        y: WORLD_MAP_CENTER_Y,
+      });
 
   // OTA 23-003 — auto-centering on the player marker removed at
   // playtest request: it interfered with the zoom-in/zoom-out
@@ -287,24 +295,8 @@ export function MapScreen() {
   const dy = mapY - WORLD_MAP_CENTER_Y;
   const tiles = Math.abs(dx) + Math.abs(dy);
 
-  // OTA 054 — inverse-distance-weighted dot plotting.
-  //
-  // Regenerate the player's procedural world map (deterministic per
-  // character seed) so we have the procedural grid positions of
-  // every named location. Then IDW-interpolate the player's atlas
-  // coord using each location's atlas coord weighted by inverse
-  // procedural distance. This gives:
-  //   - Snap-to-anchor when the player is on a named tile (the
-  //     anchor's weight dominates the average).
-  //   - Smooth glide between anchors during cardinal travel.
-  //   - Per-pair scaling for free: if two anchors are 26 tiles apart
-  //     procedurally and 2 inches apart visually, a halfway point
-  //     procedurally lands halfway visually.
-  //   - The dot is ALWAYS plotted — there's no "between locations"
-  //     fallback branch.
-  // Reuse the hoisted safe* values computed before the useEffect.
-  // Both branches arrive at the same numbers since 'player' is non-
-  // null past the early-return guard below.
+  // 'player' is non-null past the early-return guard above, so the
+  // hoisted safe* values are stable.
   const atlasPos = safeAtlasPos;
 
   const currentLocation = LOCATIONS.find((l) => l.id === player.currentLocationId) ?? null;
@@ -347,16 +339,17 @@ export function MapScreen() {
     };
   }
 
-  // Footer prose — when the player is on a depicted location, name
-  // it; otherwise give the cardinal direction + tile count from the
-  // Outpost so the player has both a visual and a textual reference.
-  const whereLine = onDepictedTile && currentLocation
+  // Footer prose — at the named tile, name it. Otherwise report the
+  // cardinal direction + tile count from the CURRENT location (mapX/Y
+  // is local to the current location's procedural map, not the
+  // Outpost; the prior "of the Outpost" text was incorrect after any
+  // travelTo).
+  const fromName = currentLocation?.name ?? 'the Outpost';
+  const whereLine = atCenter && currentLocation
     ? currentLocation.name
-    : dx === 0 && dy === 0
-      ? 'at the Outpost'
-      : Math.abs(dx) >= Math.abs(dy)
-        ? `${Math.abs(dx)} tile${Math.abs(dx) === 1 ? '' : 's'} ${dx >= 0 ? 'east' : 'west'} of the Outpost`
-        : `${Math.abs(dy)} tile${Math.abs(dy) === 1 ? '' : 's'} ${dy >= 0 ? 'south' : 'north'} of the Outpost`;
+    : Math.abs(dx) >= Math.abs(dy)
+      ? `${Math.abs(dx)} tile${Math.abs(dx) === 1 ? '' : 's'} ${dx >= 0 ? 'east' : 'west'} of ${fromName}`
+      : `${Math.abs(dy)} tile${Math.abs(dy) === 1 ? '' : 's'} ${dy >= 0 ? 'south' : 'north'} of ${fromName}`;
 
   return (
     <View style={styles.container}>
@@ -433,13 +426,15 @@ export function MapScreen() {
         <Text style={styles.footerHere}>● YOU ARE HERE</Text>
         <Text style={styles.footerWhere}>{whereLine}</Text>
         <Text style={styles.footerDist}>
-          {tiles === 0 ? 'At the Outpost.' : `${tiles} day${tiles === 1 ? '' : 's'} of travel from the Outpost.`}
+          {tiles === 0
+            ? `At ${fromName}.`
+            : `${tiles} day${tiles === 1 ? '' : 's'} of travel from ${fromName}.`}
         </Text>
         <Text style={styles.footerCaveat}>
           Drag to pan · pinch to zoom · double-tap to reset.
-          {onDepictedTile
-            ? ' Dot snapped to the atlas drawing.'
-            : ' Dot interpolated across the nearest named landmarks.'}
+          {atCenter
+            ? ' Marker snapped to the atlas drawing.'
+            : ' Marker drifting in your direction of travel.'}
         </Text>
       </View>
     </View>

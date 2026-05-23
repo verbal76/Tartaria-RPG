@@ -36,6 +36,8 @@ import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
 import { OTA_BUILD_ID } from '../buildInfo';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const APP_VERSION: string = (require('../../app.json') as { expo: { version: string } }).expo.version;
 import { getKokoroState, onKokoroStateChange, type KokoroState } from '../voice/PiperTTSManager';
 import { checkAndApplyOTA } from '../updates/checkAndApplyOTA';
 
@@ -417,7 +419,7 @@ export function TitleScreen() {
       />
 
       <View style={styles.bottomBar}>
-        <Text style={styles.footer}>v2.0.1  /  2148</Text>
+        <Text style={styles.footer}>v{APP_VERSION}  /  2148</Text>
         <TouchableOpacity
           style={styles.gearBtn}
           onPress={() => setScreen('about')}

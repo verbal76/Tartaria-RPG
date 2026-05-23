@@ -85,7 +85,11 @@ function topN(c: Counter, n: number): Array<[string, number]> {
 }
 
 describe('Thousand-day stress simulation of Tartaria Realms', () => {
-  jest.setTimeout(600000);
+  // v2.4.1 — bumped from 600s to 900s. Grid expanded from 21×21 to
+  // 41×41, so D5 cities are 20-28 tiles out instead of 10-19. 1000
+  // days of sim now involves more wander steps + more encounters
+  // per cross-grid trip.
+  jest.setTimeout(900000);
 
   beforeAll(() => {
     console.log = () => {};

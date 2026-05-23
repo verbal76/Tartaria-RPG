@@ -58,8 +58,16 @@ export class ModelDownloader {
     const modelPath = dir + MODEL_FILE_NAME;
     const vocabPath = dir + VOCAB_FILE_NAME;
 
-    const needModel = !(await this.exists(modelPath));
-    const needVocab = !(await this.exists(vocabPath));
+    // v2.4.1 — size-floor reuse check, parity with the Qwen path
+    // and the executorch Kokoro recovery (OTA 23-018). A truncated
+    // partial download would pass `exists()` but fail at init time.
+    // MiniLM model_quantized.onnx is ~22 MB nominal; require ≥ 15 MB
+    // before reusing. Vocab is ~100 KB; require ≥ 30 KB. Below either
+    // threshold → delete + re-download.
+    const MIN_MODEL_BYTES = 15 * 1024 * 1024;
+    const MIN_VOCAB_BYTES = 30 * 1024;
+    const needModel = !(await this.existsWithMinSize(modelPath, MIN_MODEL_BYTES));
+    const needVocab = !(await this.existsWithMinSize(vocabPath, MIN_VOCAB_BYTES));
 
     if (!needModel && !needVocab) {
       onProgress?.(1);
@@ -95,6 +103,23 @@ export class ModelDownloader {
   private async exists(path: string): Promise<boolean> {
     const info = await FileSystem.getInfoAsync(path);
     return info.exists;
+  }
+
+  /** True if the file exists AND its size is at least `minBytes`. If
+   *  the file exists but is too small (truncated partial download),
+   *  delete it so the caller will re-download cleanly. Parity with
+   *  the Qwen and Kokoro recovery paths. */
+  private async existsWithMinSize(path: string, minBytes: number): Promise<boolean> {
+    const info = await FileSystem.getInfoAsync(path, { size: true });
+    if (!info.exists) return false;
+    const size = (info as { size?: number }).size ?? 0;
+    if (size >= minBytes) return true;
+    try {
+      await FileSystem.deleteAsync(path, { idempotent: true });
+    } catch {
+      // Swallow — re-download will overwrite anyway.
+    }
+    return false;
   }
 
   /**

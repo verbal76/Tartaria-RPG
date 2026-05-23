@@ -10,6 +10,7 @@
 
 import locationsData from '../data/locations/locations.json';
 import type { Location } from './types';
+import { LOCATION_ATLAS_COORDS } from './atlasCoords';
 
 export type Direction = 'north' | 'east' | 'south' | 'west';
 
@@ -56,15 +57,21 @@ export interface MapTile {
   hint: string;
 }
 
-// Big grid: 21×21 = 441 tiles for ~21 named locations means most movement
-// is open ground (wandering). The map's job is structural — give the
-// engine a coordinate space so it knows what direction the Cradle of
-// Dusk is from the Outskirts. Nothing here is shown to the player as a
-// visual.
-const GRID_W = 21;
-const GRID_H = 21;
-const CENTER_X = 10;
-const CENTER_Y = 10;
+// Wide grid: 41×41 = 1681 tiles for ~21 named locations means most
+// movement is open ground (wandering). Sized so the lore-canonical
+// danger bands (D5 = 20-28 days' travel from start) fit without
+// clamping at the grid edge. Most tiles are empty — wasteland
+// encounters and roadside traders fill the wandering ground.
+//
+// Doubled from the original 21×21 in the v2.4.1 map-marker overhaul
+// (OTA 2026-05-23-019). Reason: the world should feel like 2-3
+// states across, not 2-3 city blocks. Players need enough wander
+// tiles between cities to land encounters, collectibles, and
+// travelling NPCs.
+const GRID_W = 41;
+const GRID_H = 41;
+const CENTER_X = 20;
+const CENTER_Y = 20;
 /** Exported so travelTo can reset the player to the new map's center
  *  after a location change — without this, mapX/mapY carry the old
  *  crossing position into a freshly regenerated map and the next
@@ -108,24 +115,71 @@ export function generateWorldMap(characterSeed: string, startingLocationId: stri
   };
   positions[startLoc.id] = { x: CENTER_X, y: CENTER_Y };
 
-  // Sort the rest by danger (low first goes near, high goes to edges).
+  // Sort by danger DESCENDING — place the high-danger (far-edge)
+  // locations first while the outer rings of the grid are still
+  // uncontested. Otherwise D1 locations claim the near-center band
+  // and the D5 locations all crowd the same far arcs, fall back to
+  // jitter, and drift off canonical bearing. Reverse order keeps
+  // the most position-sensitive placements on-canon.
   const others = ALL_LOCATIONS.filter((l) => l.id !== startLoc.id);
-  others.sort((a, b) => a.danger - b.danger);
+  others.sort((a, b) => b.danger - a.danger);
 
-  // Place each location at a random tile within a danger-weighted radius.
-  // We reject collisions and tiles too close to existing placements so the
-  // map stays sparse — most tiles are open wandering ground, locations
-  // are 3-5 tiles apart on average.
+  // Place each location at a random tile within a danger-weighted radius,
+  // along the CANONICAL BEARING from the starting location's atlas
+  // position to this location's atlas position. This means "east in the
+  // engine" matches "east on the canonical atlas" — walking east toward
+  // Asgardar actually walks you toward where Asgardar is drawn on the
+  // map, not toward whatever random procedural tile got picked.
+  //
+  // Radius is still randomized within the danger band so different
+  // characters get different journey lengths (canonical lore says
+  // "a fortnight at most" not "exactly 13 days"). Direction is fixed.
+  //
+  // Bands sized for the 41×41 grid (max usable radius ~28 from center):
+  //   D1: 4-12   (Outpost catchment, ~a week+)
+  //   D2: 8-18   (Borderlands proper)
+  //   D3: 12-22  (outer formations)
+  //   D4: 16-26  (regional capitals)
+  //   D5: 20-28  (deep relic sites — at the corners)
+  const startAtlas = LOCATION_ATLAS_COORDS[startLoc.id] ?? null;
+  // Atlas is 1408 × 768. To compute a direction-preserving bearing in
+  // procedural-tile space, we aspect-correct the X component so equal
+  // visual atlas distances translate to equal procedural-tile distances.
+  const ATLAS_ASPECT = 1408 / 768;
+
   const taken = new Set<string>([`${CENTER_X},${CENTER_Y}`]);
   for (const loc of others) {
-    const minRadius = Math.max(2, loc.danger * 2);
-    const maxRadius = Math.min(Math.max(GRID_W, GRID_H) - 1, loc.danger * 3 + 4);
+    const minRadius = Math.max(4, loc.danger * 4);
+    const maxRadius = Math.min(28, loc.danger * 5 + 8);
+    // Canonical bearing: vector from start anchor to this location's
+    // anchor in aspect-corrected atlas space. If either lacks an atlas
+    // coord (defensive), fall back to a deterministic per-location
+    // pseudo-random angle so placement is still stable across saves.
+    const locAtlas = LOCATION_ATLAS_COORDS[loc.id] ?? null;
+    let bearing: number;
+    if (startAtlas && locAtlas) {
+      const dxAtlas = (locAtlas.fx - startAtlas.fx) * ATLAS_ASPECT;
+      const dyAtlas = locAtlas.fy - startAtlas.fy;
+      bearing = Math.atan2(dyAtlas, dxAtlas);
+    } else {
+      bearing = rng() * Math.PI * 2;
+    }
     let placed = false;
     for (let attempt = 0; attempt < 30 && !placed; attempt++) {
-      const angle = rng() * Math.PI * 2;
+      // First 15 attempts: fixed bearing, jittered radius — keeps
+      // placement perfectly on-canon when there's room.
+      // Next 15 attempts: jitter bearing by up to ±25° so a
+      // collision-heavy quadrant can fan out without crossing the
+      // X/Y axis for locations with near-axial canonical bearings.
+      // ±25° (50° arc) is enough for collision avoidance without
+      // flipping a "barely south" location into "north."
+      const bearingJitter = attempt < 15
+        ? 0
+        : (rng() - 0.5) * (Math.PI * 5 / 18); // ±25°
+      const effectiveBearing = bearing + bearingJitter;
       const r = minRadius + rng() * (maxRadius - minRadius);
-      const x = CENTER_X + Math.round(Math.cos(angle) * r);
-      const y = CENTER_Y + Math.round(Math.sin(angle) * r);
+      const x = CENTER_X + Math.round(Math.cos(effectiveBearing) * r);
+      const y = CENTER_Y + Math.round(Math.sin(effectiveBearing) * r);
       if (x < 0 || x >= GRID_W || y < 0 || y >= GRID_H) continue;
       const key = `${x},${y}`;
       if (taken.has(key)) continue;
@@ -146,19 +200,46 @@ export function generateWorldMap(characterSeed: string, startingLocationId: stri
       taken.add(key);
       placed = true;
     }
-    // If we failed to place after 30 attempts, drop it in any free tile
-    // outside the center area.
+    // Bearing-aware fallback. If 30 jittered attempts all collided,
+    // walk every grid tile and pick the closest free one to the
+    // ideal bearing*radius point — keeps the placement in the
+    // canonical quadrant rather than starting from (0,0).
     if (!placed) {
-      for (let y = 0; y < GRID_H && !placed; y++) {
-        for (let x = 0; x < GRID_W && !placed; x++) {
+      const midRadius = (minRadius + maxRadius) / 2;
+      const idealX = CENTER_X + Math.cos(bearing) * midRadius;
+      const idealY = CENTER_Y + Math.sin(bearing) * midRadius;
+      let bestX = -1;
+      let bestY = -1;
+      let bestD = Infinity;
+      for (let y = 0; y < GRID_H; y++) {
+        for (let x = 0; x < GRID_W; x++) {
           const key = `${x},${y}`;
           if (taken.has(key)) continue;
           if (Math.abs(x - CENTER_X) + Math.abs(y - CENTER_Y) < 2) continue;
-          tiles[y]![x] = { x, y, locationId: loc.id, locationName: loc.name, hint: loc.name };
-          positions[loc.id] = { x, y };
-          taken.add(key);
-          placed = true;
+          // Reject tiles adjacent to existing placements (keep the
+          // world huge — same rule the main loop uses).
+          let tooClose = false;
+          for (const k of taken) {
+            const [tx, ty] = k.split(',').map(Number) as [number, number];
+            if (Math.abs(tx - x) + Math.abs(ty - y) <= 2) {
+              tooClose = true;
+              break;
+            }
+          }
+          if (tooClose) continue;
+          const d = Math.hypot(x - idealX, y - idealY);
+          if (d < bestD) {
+            bestD = d;
+            bestX = x;
+            bestY = y;
+          }
         }
+      }
+      if (bestX >= 0) {
+        tiles[bestY]![bestX] = { x: bestX, y: bestY, locationId: loc.id, locationName: loc.name, hint: loc.name };
+        positions[loc.id] = { x: bestX, y: bestY };
+        taken.add(`${bestX},${bestY}`);
+        placed = true;
       }
     }
   }

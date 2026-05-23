@@ -37,7 +37,7 @@ const INTENT_LIST: Intent[] = [
   'retreat', 'repair', 'accept', 'turn_in', 'dig', 'throw', 'climb',
   'swim', 'jump', 'dash', 'disengage', 'help', 'ready', 'mount',
   'take_cover', 'aim', 'reload', 'maneuver', 'quick_fire', 'multi_fire',
-  'fight_back', 'recruit', 'drop', 'pickup', 'open',
+  'fight_back', 'recruit', 'drop', 'pickup', 'open', 'fill',
 ];
 
 // Canonical verb to rephrase a resolved intent back into. The dictionary

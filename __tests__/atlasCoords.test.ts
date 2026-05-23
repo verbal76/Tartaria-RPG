@@ -58,9 +58,12 @@ describe('OTA 051 — atlas coordinate calibration', () => {
       expect(outskirts.fy).toBe(OUTPOST_ATLAS_COORD.fy);
     });
 
-    it('DOT_TILE_FRAC is positive and small (a tile is ~2% of image height)', () => {
+    it('DOT_TILE_FRAC is positive and modest (a tile is a small but visible fraction of image height)', () => {
+      // v2.4.1 — bumped to 0.06 (was 0.04) for visible per-tile
+      // marker drift on the larger 41×41 grid. Should still be a
+      // small fraction, not a leap.
       expect(DOT_TILE_FRAC).toBeGreaterThan(0);
-      expect(DOT_TILE_FRAC).toBeLessThan(0.05);
+      expect(DOT_TILE_FRAC).toBeLessThan(0.1);
     });
   });
 

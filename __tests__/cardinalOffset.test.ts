@@ -12,11 +12,17 @@
 
 import {
   cardinalOffsetFromOutpost,
+  cardinalOffsetFromAnchor,
   OUTPOST_ATLAS_COORD,
-  DOT_TILE_FRAC,
+  STEP_FRAC_X,
+  STEP_FRAC_Y,
+  LOCATION_ATLAS_COORDS,
 } from '../app/engine/atlasCoords';
 
-const CENTER = { x: 10, y: 10 };
+// v2.4.1 — grid expanded from 21×21 to 41×41 (center 20,20). The
+// helpers don't care what center you pass; tests still use a local
+// center constant so they pin the math, not the grid dimensions.
+const CENTER = { x: 20, y: 20 };
 
 describe('OTA 23-010 — cardinalOffsetFromOutpost', () => {
   it('player at the grid center returns the Outpost coord exactly', () => {
@@ -54,17 +60,26 @@ describe('OTA 23-010 — cardinalOffsetFromOutpost', () => {
     });
   });
 
-  describe('scaling per tile is consistent with DOT_TILE_FRAC', () => {
-    it('one east-step delta equals DOT_TILE_FRAC on fx (when not clamped)', () => {
+  describe('scaling per tile is aspect-corrected', () => {
+    it('one east-step delta equals STEP_FRAC_X on fx (when not clamped)', () => {
       const at0 = cardinalOffsetFromOutpost(CENTER.x, CENTER.y, CENTER);
       const at1 = cardinalOffsetFromOutpost(CENTER.x + 1, CENTER.y, CENTER);
-      expect(at1.fx - at0.fx).toBeCloseTo(DOT_TILE_FRAC, 6);
+      expect(at1.fx - at0.fx).toBeCloseTo(STEP_FRAC_X, 6);
     });
 
-    it('three south-steps accumulate to 3 * DOT_TILE_FRAC on fy', () => {
+    it('three south-steps accumulate to 3 * STEP_FRAC_Y on fy', () => {
       const at0 = cardinalOffsetFromOutpost(CENTER.x, CENTER.y, CENTER);
       const at3 = cardinalOffsetFromOutpost(CENTER.x, CENTER.y + 3, CENTER);
-      expect(at3.fy - at0.fy).toBeCloseTo(3 * DOT_TILE_FRAC, 6);
+      expect(at3.fy - at0.fy).toBeCloseTo(3 * STEP_FRAC_Y, 6);
+    });
+
+    it('one east-tile and one south-tile cover the same atlas pixel distance', () => {
+      // Atlas is 1408 × 768. STEP_FRAC_X × 1408 should equal
+      // STEP_FRAC_Y × 768 (within rounding) — that's the
+      // anisotropy fix.
+      const eastPx = STEP_FRAC_X * 1408;
+      const southPx = STEP_FRAC_Y * 768;
+      expect(Math.abs(eastPx - southPx)).toBeLessThan(1);
     });
   });
 
@@ -87,6 +102,33 @@ describe('OTA 23-010 — cardinalOffsetFromOutpost', () => {
     it('a 20-tile north walk floors fy at ≥0.06', () => {
       const farNorth = cardinalOffsetFromOutpost(CENTER.x, CENTER.y - 20, CENTER);
       expect(farNorth.fy).toBeGreaterThanOrEqual(0.06);
+    });
+  });
+
+  describe('v2.4.1 — cardinalOffsetFromAnchor (anchor-relative drift)', () => {
+    // The marker bug: with cardinalOffsetFromOutpost, the marker was
+    // anchored at the Outpost regardless of where the player was.
+    // After arriving at Asgardar (canonically fx=0.16, fy=0.40) and
+    // walking east, the marker should drift east FROM ASGARDAR, not
+    // from the Outpost.
+    const asgardarAnchor = LOCATION_ATLAS_COORDS.asgardar!;
+
+    it('player at center returns the passed anchor exactly', () => {
+      const pos = cardinalOffsetFromAnchor(asgardarAnchor, CENTER.x, CENTER.y, CENTER);
+      expect(pos.fx).toBe(asgardarAnchor.fx);
+      expect(pos.fy).toBe(asgardarAnchor.fy);
+    });
+
+    it('east step drifts from the passed anchor, not the Outpost', () => {
+      const east = cardinalOffsetFromAnchor(asgardarAnchor, CENTER.x + 1, CENTER.y, CENTER);
+      // Should be ~asgardar.fx + STEP_FRAC_X, NOT outpost.fx + anything.
+      expect(east.fx).toBeCloseTo(asgardarAnchor.fx + STEP_FRAC_X, 6);
+      expect(east.fx).toBeGreaterThan(OUTPOST_ATLAS_COORD.fx + 0.04);
+    });
+
+    it('south step drifts the marker south from the current anchor', () => {
+      const south = cardinalOffsetFromAnchor(asgardarAnchor, CENTER.x, CENTER.y + 2, CENTER);
+      expect(south.fy).toBeCloseTo(asgardarAnchor.fy + 2 * STEP_FRAC_Y, 6);
     });
   });
 

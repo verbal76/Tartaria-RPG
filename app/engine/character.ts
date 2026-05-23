@@ -4,6 +4,7 @@ import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import explorationData from '../data/items/exploration.json';
 import { stampDurability } from './durability';
+import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from './worldMap';
 
 // Race + faction starter weapon kits. Every character begins with:
 //   1) A "primary" — a low-tier weapon they would plausibly carry given
@@ -197,7 +198,10 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
     // Procedural map seed — combines name + race + faction + a timestamp
     // so two characters with identical names still get different maps.
     mapSeed: `${input.name}|${race.id}|${faction.id}|${Date.now()}`,
-    mapX: 4,
-    mapY: 4,
+    // Start at the procedural grid center — generateWorldMap places
+    // the starting location there. Any other default (the old 4,4)
+    // makes the first cardinal step walk from the wrong tile.
+    mapX: WORLD_MAP_CENTER_X,
+    mapY: WORLD_MAP_CENTER_Y,
   };
 }

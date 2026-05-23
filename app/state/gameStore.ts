@@ -149,6 +149,8 @@ import {
   ARMOR,
   GEAR,
   MATERIALS,
+  AMULETS,
+  RINGS,
   findCatalogItem,
 } from '../engine/crafting';
 import {
@@ -331,12 +333,6 @@ function activeEnemy(scene: CurrentScene | null): Enemy | null {
   const idx = Math.max(0, Math.min(scene.activeEnemyIdx, scene.enemies.length - 1));
   return scene.enemies[idx] ?? null;
 }
-function activeEnemyHp(scene: CurrentScene | null): number | null {
-  if (!scene || scene.enemyHps.length === 0) return null;
-  const idx = Math.max(0, Math.min(scene.activeEnemyIdx, scene.enemyHps.length - 1));
-  return scene.enemyHps[idx] ?? null;
-}
-
 function collectSceneNouns(scene: CurrentScene): string[] {
   // Locations are containers, not interactable targets — never include
   // scene.location.name here. The Location name shouldn't surface as
@@ -633,8 +629,12 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     activeStorylines: p.activeStorylines ?? [],
     completedStorylineIds: p.completedStorylineIds ?? [],
     mapSeed: p.mapSeed ?? `${p.name}|${p.raceId}|${p.factionId}|legacy`,
-    mapX: p.mapX ?? 4,
-    mapY: p.mapY ?? 4,
+    // Default to grid center — generateWorldMap places the current
+    // location there. Legacy saves predating WORLD_MAP_CENTER export
+    // used 4 as a placeholder; on rehydrate snap to center so the
+    // first step walks from the right tile.
+    mapX: p.mapX ?? WORLD_MAP_CENTER_X,
+    mapY: p.mapY ?? WORLD_MAP_CENTER_Y,
   };
 }
 
@@ -2296,8 +2296,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       try {
         const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
         const map = generateWorldMap(seed, player.currentLocationId);
-        const fromX = player.mapX ?? 4;
-        const fromY = player.mapY ?? 4;
+        const fromX = player.mapX ?? WORLD_MAP_CENTER_X;
+        const fromY = player.mapY ?? WORLD_MAP_CENTER_Y;
         const radar = describeAllDirections(map, fromX, fromY);
         get().appendLog('world', `[${location.name}] ${radar}`);
       } catch {
@@ -4740,8 +4740,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (dirQ && dirQ.kind !== 'survey') {
           const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
           const map = generateWorldMap(seed, player.currentLocationId);
-          const fromX = player.mapX ?? 4;
-          const fromY = player.mapY ?? 4;
+          const fromX = player.mapX ?? WORLD_MAP_CENTER_X;
+          const fromY = player.mapY ?? WORLD_MAP_CENTER_Y;
           if (dirQ.kind === 'nearest') {
             const near = findNearestNamed(map, fromX, fromY, {
               excludeId: player.currentLocationId,
@@ -4813,8 +4813,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
           const map = generateWorldMap(seed, player.currentLocationId);
-          const fromX = player.mapX ?? 4;
-          const fromY = player.mapY ?? 4;
+          const fromX = player.mapX ?? WORLD_MAP_CENTER_X;
+          const fromY = player.mapY ?? WORLD_MAP_CENTER_Y;
           if (hasCompass) {
             const survey = surveyAll(map, fromX, fromY);
             const fragments: string[] = [];
@@ -7554,11 +7554,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     // Look up the catalog entry to know what kind of inventory item to write.
+    // v2.4.1 — added RINGS and AMULETS lookups. 6 vendor offers across
+    // the game are rings/amulets (Aetheric Locket, Golem Controller
+    // Ring, Minor Aetheric Amulet, Reclaimer's Quick Band, Tartarian
+    // Stoneband, Whisperer's Charm); without these checks they landed
+    // as bare 'misc' with no rarity/tags.
     const weapon = WEAPONS.find((w) => w.name === offer.itemName);
     const armor = !weapon ? ARMOR.find((a) => a.name === offer.itemName) : null;
     const gear = !weapon && !armor ? GEAR.find((g) => g.name === offer.itemName) : null;
     const material = !weapon && !armor && !gear ? MATERIALS.find((m) => m.name === offer.itemName) : null;
-    const cat = weapon ?? armor ?? gear ?? material ?? null;
+    const ring = !weapon && !armor && !gear && !material ? RINGS.find((r) => r.name === offer.itemName) : null;
+    const amulet = !weapon && !armor && !gear && !material && !ring ? AMULETS.find((a) => a.name === offer.itemName) : null;
+    const cat = weapon ?? armor ?? gear ?? material ?? ring ?? amulet ?? null;
     const kind: InventoryItem['kind'] = weapon
       ? 'misc'
       : armor
@@ -7567,7 +7574,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? gear.kind
           : material
             ? 'misc'
-            : 'misc';
+            : ring || amulet
+              ? 'relic'
+              : 'misc';
     const tags = cat?.tags ?? [];
     const newItem: InventoryItem = stampDurability({
       id: `bought_${Date.now()}`,
@@ -7837,12 +7846,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
 
     if (success) {
-      // Catalog lookup to set proper kind/rarity/tags.
+      // Catalog lookup to set proper kind/rarity/tags. v2.4.1 — added
+      // RINGS and AMULETS lookups to mirror buyFromVendor; stealing a
+      // ring or amulet now writes it as a 'relic' with correct rarity
+      // instead of bare misc.
       const weapon = WEAPONS.find((w) => w.name === offer.itemName);
       const armor = !weapon ? ARMOR.find((a) => a.name === offer.itemName) : null;
       const gear = !weapon && !armor ? GEAR.find((g) => g.name === offer.itemName) : null;
       const material = !weapon && !armor && !gear ? MATERIALS.find((m) => m.name === offer.itemName) : null;
-      const cat = weapon ?? armor ?? gear ?? material ?? null;
+      const ring = !weapon && !armor && !gear && !material ? RINGS.find((r) => r.name === offer.itemName) : null;
+      const amulet = !weapon && !armor && !gear && !material && !ring ? AMULETS.find((a) => a.name === offer.itemName) : null;
+      const cat = weapon ?? armor ?? gear ?? material ?? ring ?? amulet ?? null;
       // OTA 23-009 — honest kind assignment. Pre-OTA-23-009 every
       // stolen item was forced to kind:'misc', which made stolen
       // weapons / armor un-scrappable (canScrap rejects misc
@@ -7855,6 +7869,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         armor ? 'armor' :
         (gear?.kind === 'consumable' || gear?.kind === 'relic' || gear?.kind === 'misc')
           ? gear.kind
+          : (ring || amulet) ? 'relic'
           : 'misc';
       const stolen: InventoryItem = stampDurability({
         id: `stolen_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
@@ -9188,8 +9203,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!player || !scene) return;
     const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
     const map: WorldMap = generateWorldMap(seed, player.currentLocationId);
-    const fromX = player.mapX ?? 4;
-    const fromY = player.mapY ?? 4;
+    const fromX = player.mapX ?? WORLD_MAP_CENTER_X;
+    const fromY = player.mapY ?? WORLD_MAP_CENTER_Y;
     const step = stepInDirection(map, fromX, fromY, dir);
     // Record both the new coordinates AND the direction so "continue" can
     // repeat the same step without the player retyping the bearing.

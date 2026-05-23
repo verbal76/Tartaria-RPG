@@ -4631,6 +4631,104 @@
       "description": "Aether-Warden's Cape. Uncommon cloak armor from the Mud Dwellers tradition."
     },
     {
+      "name": "Ceremonial Robes",
+      "slot": "chest",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "charisma",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "charisma",
+          "amount": 1
+        },
+        {
+          "stat": "wisdom",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 2,
+      "tcBuy": 110,
+      "tcSell": 38,
+      "baseDurability": 25,
+      "tags": [
+        "armor",
+        "chest",
+        "robe",
+        "ceremonial",
+        "true_tartarians"
+      ],
+      "description": "Ceremonial Robes. Woven for True Tartarian rites — burial processions, oath-takings, the Mud Monarch Purifier sermons. Soft silk-mud blend; offers little stopping power but speaks the right language to anyone who recognises the cut."
+    },
+    {
+      "name": "Mud-glass Scales",
+      "slot": "chest",
+      "raceAffinity": "Mud Dwellers",
+      "acBonus": 3,
+      "resistances": ["piercing"],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "constitution",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "dexReq": 4,
+      "tcBuy": 130,
+      "tcSell": 45,
+      "baseDurability": 40,
+      "tags": [
+        "armor",
+        "chest",
+        "scale",
+        "mud_glass",
+        "true_tartarians"
+      ],
+      "description": "Mud-glass Scales. Overlapping shards of fired Aetheric silica, lashed onto a leather backing. Deflects an arrow point as readily as a fist — the silica shatters loudly on a real hit, which has saved more True Tartarians than the armour itself."
+    },
+    {
+      "name": "Runic Mantle",
+      "slot": "cloak",
+      "raceAffinity": "Reclaimers",
+      "acBonus": 2,
+      "resistances": [],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 2
+        },
+        {
+          "stat": "wisdom",
+          "amount": 1
+        }
+      ],
+      "rarity": "Rare",
+      "dexReq": 4,
+      "tcBuy": 280,
+      "tcSell": 95,
+      "baseDurability": 50,
+      "tags": [
+        "armor",
+        "cloak",
+        "runic",
+        "forgotten_order",
+        "rare"
+      ],
+      "description": "Runic Mantle. The Forgotten Order's reward for unsealing the Red Tower's first vault. Hand-inked Tartarian glyphs cover the inside lining — they pull warmth from the Aether and turn aside the more obvious wards. The Order's mark is stitched at the collar in iron thread."
+    },
+    {
       "name": "Shaman's Mantle of Secrets",
       "slot": "cloak",
       "raceAffinity": "Mud Dwellers",
