@@ -14,6 +14,7 @@ on:
       - 'assets/**'
       - 'docs/**'
       - 'scripts/**'
+      - '__tests__/**'
       - '**.md'
       - '.github/**'
   workflow_dispatch:
