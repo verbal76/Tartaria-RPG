@@ -3751,7 +3751,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // it. Plainly admit confusion and let them rephrase. The
         // meta-comment guard above is the primary defense; this is
         // belt-and-suspenders for inputs that slip past the regex.
-        if (rawTarget) {
+        //
+        // 2026-05-24 — bypass the guard when the resolved target is
+        // a known scene ambient noun. Curated salvage/climb spawns
+        // ("rusted tartarian power conduit", "shattered engine chamber
+        // scaffolding") can legitimately be 4-5 words after the
+        // adjective prefix, and they're not garbage prose — they
+        // resolved through the noun matcher because they're in the
+        // scene's ambient pool.
+        const resolvedIsKnownAmbient =
+          rawTarget.length > 0 &&
+          (currentScene.ambientNouns ?? []).some(
+            (n) => n.toLowerCase() === rawTarget.toLowerCase(),
+          );
+        if (rawTarget && !resolvedIsKnownAmbient) {
           const wordCount = rawTarget.split(/\s+/).length;
           if (wordCount > 3 || rawTarget.length > 40 || /[?!]/.test(rawTarget)) {
             get().appendLog(
