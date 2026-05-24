@@ -11,9 +11,10 @@ name: Android Build (Tartaria Realms)
 # a non-ignored file (eas.json, this workflow, etc.) in the same
 # commit, or push a refs/tags/v* tag.
 #
-# OTA 470: fresh-start build #4. New keystore (SHA1 617B774B...),
-# all four ANDROID_* secrets updated, user deleting Play Console
-# listing in parallel.
+# OTA 472: build with CI-generated Java-native keystore. PowerShell
+# .NET PFX export didn't serialize the friendly name in a way Java
+# keytool reads. Replaced with a keytool-generated PKCS12 from the
+# generate-keystore.yml workflow run.
 
 on:
   push:
