@@ -1,28 +1,9 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { RECIPES, lookupCraftedItem, type Recipe } from '../engine/crafting';
 import { repairCostMaterials } from '../engine/scrapEngine';
+import { RecipesView } from '../components/RecipesView';
 import type { InventoryItem } from '../engine/types';
-
-interface RecipeStatus {
-  recipe: Recipe;
-  missing: { name: string; needed: number; have: number }[];
-  available: boolean;
-}
-
-function evaluateRecipe(recipe: Recipe, inventory: { name: string; quantity: number }[]): RecipeStatus {
-  const missing: RecipeStatus['missing'] = [];
-  for (const ing of recipe.ingredients) {
-    const have = inventory
-      .filter((i) => i.name.toLowerCase() === ing.name.toLowerCase())
-      .reduce((sum, i) => sum + i.quantity, 0);
-    if (have < ing.quantity) {
-      missing.push({ name: ing.name, needed: ing.quantity, have });
-    }
-  }
-  return { recipe, missing, available: missing.length === 0 };
-}
 
 interface RepairStatus {
   item: InventoryItem;
@@ -43,28 +24,13 @@ function evaluateRepair(item: InventoryItem, inventory: InventoryItem[]): Repair
   return { item, cost, missing, available: cost.length > 0 && missing.length === 0 };
 }
 
-function rarityColor(rarity: string | undefined): string {
-  switch (rarity) {
-    case 'Legendary': return '#e07a5f';
-    case 'Rare': return '#b88ce0';
-    case 'Uncommon': return '#9ec96a';
-    default: return '#c9a86a';
-  }
-}
-
 type Tab = 'craft' | 'repair';
 
 export function CraftingScreen() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
-  const craftRecipe = useGameStore((s) => s.craftRecipe);
   const repairInventoryItem = useGameStore((s) => s.repairInventoryItem);
   const [tab, setTab] = useState<Tab>('craft');
-
-  const evaluated = useMemo(() => {
-    if (!player) return [] as RecipeStatus[];
-    return RECIPES.map((r) => evaluateRecipe(r, player.inventory));
-  }, [player?.inventory]);
 
   // OTA 228 — repair list: every durability-tracked item in the
   // inventory that's not at full HP. Repair cost = 2× scrap output
@@ -75,17 +41,6 @@ export function CraftingScreen() {
       .filter((i) => i.durability && i.durability.current < i.durability.max)
       .map((i) => evaluateRepair(i, [...player.inventory]));
   }, [player?.inventory]);
-
-  const available = evaluated.filter((e) => e.available);
-  const almost = evaluated
-    .filter((e) => !e.available && e.missing.length <= 2)
-    .sort((a, b) => a.missing.length - b.missing.length)
-    .slice(0, 8);
-
-  const handleCraft = (recipe: Recipe) => {
-    craftRecipe(recipe.result);
-    setScreen('exploration');
-  };
 
   if (!player) {
     return (
@@ -130,80 +85,7 @@ export function CraftingScreen() {
       </View>
 
       {tab === 'craft' ? (
-        <>
-          <Text style={styles.arbiterLine}>
-            The Arbiter looks over your pack. "These are the things you can — or nearly can — set together."
-          </Text>
-
-          <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-            {available.length > 0 && (
-              <View style={styles.section}>
-                <View style={[styles.sectionHeader, { borderLeftColor: '#9ec96a' }]}>
-                  <Text style={[styles.sectionLabel, { color: '#9ec96a' }]}>READY TO CRAFT</Text>
-                  <Text style={styles.sectionCount}>{available.length}</Text>
-                </View>
-                {available.map((e) => {
-                  const cat = lookupCraftedItem(e.recipe.result);
-                  return (
-                    <TouchableOpacity
-                      key={e.recipe.result}
-                      style={styles.recipeRow}
-                      activeOpacity={0.7}
-                      onPress={() => handleCraft(e.recipe)}
-                    >
-                      <View style={[styles.recipeStripe, { backgroundColor: '#9ec96a' }]} />
-                      <View style={styles.recipeBody}>
-                        <View style={styles.recipeHead}>
-                          <Text style={styles.recipeName}>{e.recipe.result}</Text>
-                          <Text style={[styles.recipeRarity, { color: rarityColor(cat.rarity) }]}>
-                            {cat.rarity ?? 'Common'}
-                          </Text>
-                        </View>
-                        <Text style={styles.recipeIng}>
-                          Needs: {e.recipe.ingredients.map((i) => `${i.quantity}× ${i.name}`).join(', ')}
-                        </Text>
-                        <Text style={styles.recipeCta}>tap to craft</Text>
-                      </View>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            )}
-
-            {almost.length > 0 && (
-              <View style={styles.section}>
-                <View style={[styles.sectionHeader, { borderLeftColor: '#7a705c' }]}>
-                  <Text style={[styles.sectionLabel, { color: '#7a705c' }]}>ALMOST — MISSING A PIECE OR TWO</Text>
-                </View>
-                {almost.map((e) => {
-                  const cat = lookupCraftedItem(e.recipe.result);
-                  return (
-                    <View key={e.recipe.result} style={[styles.recipeRow, styles.recipeRowMuted]}>
-                      <View style={[styles.recipeStripe, { backgroundColor: '#3a342c' }]} />
-                      <View style={styles.recipeBody}>
-                        <View style={styles.recipeHead}>
-                          <Text style={[styles.recipeName, styles.recipeNameMuted]}>{e.recipe.result}</Text>
-                          <Text style={[styles.recipeRarity, { color: rarityColor(cat.rarity) }]}>
-                            {cat.rarity ?? 'Common'}
-                          </Text>
-                        </View>
-                        <Text style={styles.recipeMissing}>
-                          Missing: {e.missing.map((m) => `${m.needed - m.have}× ${m.name}`).join(', ')}
-                        </Text>
-                      </View>
-                    </View>
-                  );
-                })}
-              </View>
-            )}
-
-            {available.length === 0 && almost.length === 0 && (
-              <Text style={styles.empty}>
-                Nothing fits together yet. Keep hunting and digging — Tartaria gives up its pieces slowly.
-              </Text>
-            )}
-          </ScrollView>
-        </>
+        <RecipesView onAfterCraft={() => setScreen('exploration')} />
       ) : (
         <>
           <Text style={styles.arbiterLine}>

@@ -14,6 +14,13 @@ import { findWeaponByName } from '../engine/crafting';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview } from '../components/itemPreview';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
+import { RecipesView } from '../components/RecipesView';
+
+// 2026-05-24 — Inventory is now a 2-tab page: ITEMS + RECIPES.
+// Recipes tab reuses RecipesView (also used by CraftingScreen) so the
+// two stay in sync. Crafting from the inventory tab stays on inventory
+// (no exploration nav) so the player can keep stacking crafts.
+type Tab = 'items' | 'recipes';
 
 export function InventoryScreen() {
   const player = useGameStore((s) => s.player);
@@ -29,6 +36,7 @@ export function InventoryScreen() {
   // pack" summary with a single CLOSE button. Cleared on next
   // item-tap.
   const [scrapResult, setScrapResult] = useState<InventoryDelta[] | null>(null);
+  const [tab, setTab] = useState<Tab>('items');
 
   if (!player) {
     return (
@@ -243,9 +251,30 @@ export function InventoryScreen() {
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>INVENTORY</Text>
+        <Text style={styles.title}>{tab === 'items' ? 'INVENTORY' : 'RECIPES'}</Text>
       </View>
 
+      <View style={styles.tabRow}>
+        <TouchableOpacity
+          onPress={() => setTab('items')}
+          style={[styles.tabBtn, tab === 'items' && styles.tabBtnActive]}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.tabBtnText, tab === 'items' && styles.tabBtnTextActive]}>ITEMS</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setTab('recipes')}
+          style={[styles.tabBtn, tab === 'recipes' && styles.tabBtnActive]}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.tabBtnText, tab === 'recipes' && styles.tabBtnTextActive]}>RECIPES</Text>
+        </TouchableOpacity>
+      </View>
+
+      {tab === 'recipes' ? (
+        <RecipesView />
+      ) : (
+        <>
       <Text style={styles.tc}>TC: {player.tc}</Text>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
@@ -287,6 +316,8 @@ export function InventoryScreen() {
           </View>
         ))}
       </View>
+        </>
+      )}
 
       <BrandedModal
         visible={pending !== null}
@@ -392,6 +423,21 @@ const styles = StyleSheet.create({
   },
   backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
   title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
+  // 2026-05-24 — tab strip styles, mirror the CraftingScreen tabs so
+  // the two pages feel like one consistent UI.
+  tabRow: { flexDirection: 'row', gap: 6, marginBottom: 10 },
+  tabBtn: {
+    flex: 1,
+    paddingVertical: 8,
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    alignItems: 'center',
+  },
+  tabBtnActive: { borderColor: '#c9a86a' },
+  tabBtnText: { color: '#7a705c', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
+  tabBtnTextActive: { color: '#c9a86a' },
   tc: { color: '#c9a86a', fontSize: 12, letterSpacing: 1, marginBottom: 6, textAlign: 'right' },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 12 },
