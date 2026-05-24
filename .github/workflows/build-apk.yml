@@ -22,6 +22,7 @@ on:
       - main
       - 'release/**'
       - 'claude/**'
+      - 'HaL2001'
     tags:
       - 'v*'
     paths-ignore:
@@ -161,7 +162,15 @@ jobs:
           # tag-push permission trigger a Play-Store-ready AAB build
           # without needing to dispatch via the GitHub UI.
           # workflow_dispatch input still wins when it's "production".
-          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+          # 2026-05-24 — HaL2001 experimental branch: every build is a
+          # sideload-ready APK (preview profile), tagged Hal2001-N. No
+          # AAB path for this branch — it ships only to the user's phone,
+          # never to Play Store.
+          if [[ "${GITHUB_REF_NAME}" == "HaL2001" ]]; then
+            PROFILE="preview"
+            IS_TAG="false"
+            TAG="Hal2001-${{ github.run_number }}"
+          elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
             PROFILE="production"
             TAG="${GITHUB_REF#refs/tags/}"
             IS_TAG="true"

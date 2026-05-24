@@ -6,6 +6,7 @@ on:
       - main
       - 'release/**'
       - 'claude/**'
+      - 'HaL2001'
     paths-ignore:
       - 'package.json'
       - 'package-lock.json'
@@ -89,7 +90,15 @@ jobs:
         run: |
           set -euo pipefail
 
-          CHANNEL="${{ github.event.inputs.branch || 'preview' }}"
+          # 2026-05-24 — HaL2001 experimental branch routes to its own
+          # channel so live `preview` testers never receive HaL2001 OTAs.
+          # Branch HaL2001 → channel hal2001. All other branches keep the
+          # existing default ('preview' or whatever was dispatched).
+          if [[ "${GITHUB_REF_NAME}" == "HaL2001" ]]; then
+            CHANNEL="hal2001"
+          else
+            CHANNEL="${{ github.event.inputs.branch || 'preview' }}"
+          fi
           BRANCH="${GITHUB_REF_NAME}"
           SHORT_SHA="${GITHUB_SHA::7}"
           MSG="Tartaria Realms OTA — ${BRANCH}@${SHORT_SHA} (run #${{ github.run_number }})"

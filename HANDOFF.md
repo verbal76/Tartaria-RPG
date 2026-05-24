@@ -375,6 +375,19 @@ Seven parallel Explore agents audited the codebase (combat, exploration, vendor/
 - **Audit minors still deferred** — inventory-full silently swallows hunt/mystery/storyline reward items on UI completion (`gameStore.ts:8669-8679` and equivalents); `require()` instead of top-level `import` for Aethercraft helpers (circular-dep workaround — cosmetic); minor climb-fail messaging precision (`gameStore.ts:5250`); possible surprise-penalty double-apply between `statusAttackPenalty()` and `rollMods()` (audit uncertain — ~5 min to trace).
 - **`gameStore.ts` not swept top-to-bottom for dead code.** Pre-ship audit used grep-narrow reads on this 12.5k-line file. More orphan functions / unreachable branches likely live in there. Chunked sweep (~12 × 1k-line passes) recommended before a major refactor.
 
+### Open AI/ML utilization items
+
+User asked for a utilization audit on 2026-05-24 ("am I getting the most out of MiniLM, Qwen, and Kokoro"). Kokoro is well-utilized; MiniLM is underused (2 call sites — target match + recipe lookup); Qwen is gated out of most narration. Below are the four planned upgrades, ordered by recommended ship cadence. When user asks "what's open on AI," grep `[AI-OPEN]` and surface this list.
+
+**EXPERIMENTAL BRANCH:** `HaL2001` (forked off `claude/new-session-MvF82` on 2026-05-24). Isolated package id (`com.hotatticgames.tartarprim.hal2001`) + isolated OTA channel (`hal2001`). APK builds tagged `Hal2001-N`. Lives on user's phone as a separate app icon ("Tartaria Realms HAL") alongside the live Tartaria Realms — no risk to live game / OTA stream / other testers. Each AI item ships as its own OTA on this branch's channel. Plan file: `/root/.claude/plans/so-i-believe-the-unified-wigderson.md`.
+
+- **[AI-OPEN-1]** MiniLM lore search — semantic Q&A against `concepts.json` (paraphrase coverage for "what is X" / "who are X" / "tell me about X"). New module: `app/ai/embedding/ConceptIndex.ts`. Tiered lookup at `gameStore.ts:5335`: substring → MiniLM cosine ≥ 0.65 → canned fallback. **HIGH impact / LOW risk / ~1 hr.**
+- **[AI-OPEN-2]** MiniLM parser disambiguation — kill "I'm not sure" refusals by inserting intent classification between dictionary parser and Qwen LLM fallback. New module: `app/ai/IntentClassifier.ts` (36 pre-embedded intent phrases). `CognitiveOrchestrator.inferIntent()` exposed. Wires into `gameStore.ts:3025` parser-low-confidence branch. **HIGH impact / MED risk / ~2 hr.**
+- **[AI-OPEN-3]** Qwen vendor banter — first-contact greetings per vendor, cached per-session. New module: `app/engine/vendorBanter.ts`. Optional `personality` field per vendor in `vendors.json` (27 vendors). Scene-entry wiring + per-session cap (8 banters max) + `arbiterGenerationEpoch` cancellation. **MED impact / MED risk / ~2-3 hr.**
+- **[AI-OPEN-4]** Qwen dynamic Arbiter wellness lines — 30% of wellness fires call Qwen for situational lines instead of canned pick. Extends `narrativeGenerator.ts:567` wellness fork + new `app/engine/arbiterPersona.ts` (system prompt + style). Throttle: max 10 per session + 60s cooldown. Fallback to canned on timeout / error. **MED-LOW impact / LOW impl risk / MED runtime risk / ~1.5 hr.**
+
+Mark items `[AI-DONE-N]` in this list when they pass user playtest on HaL2001. Eventual promotion: cherry-pick each item to `claude/new-session-MvF82` for live OTA release.
+
 ### Closed this session
 
 - **Sim-suite timeout bumps for the 41×41 grid** (`twoYearChaosSim` 600→900 s, `yearSimulation` 300→480 s, `movementStress` 180→300 s) ✅ (OTA 23-020)
