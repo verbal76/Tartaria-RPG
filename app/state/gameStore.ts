@@ -574,7 +574,25 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
   // Stamp durability on any catalog item that doesn't already have it.
   // Older saves predate the durability field. Do this BEFORE id backfill
   // so newly-stamped items show up in the inventory lookup below.
-  const inventory = (p.inventory ?? []).map((i) => stampDurability(i));
+  //
+  // 2026-05-24 — also heal kind drift. Past reward/loot grant sites
+  // hardcoded kind: 'misc' for variable-name items, overriding the
+  // catalog. Consumables (First Aid Kit, Trail Rations, Aetheric Torch,
+  // etc.) landed in saves with kind: 'misc' and the InventoryScreen
+  // 'Use' gate (kind === 'consumable') never lit up. Re-resolve kind
+  // via the catalog on every load — only ever upgrades misc → non-misc,
+  // never downgrades, so trophies and one-off relic items keep their
+  // declared kind even if the catalog doesn't know their name.
+  const inventory = (p.inventory ?? []).map((i) => {
+    const stamped = stampDurability(i);
+    if (stamped.kind === 'misc') {
+      const lookup = lookupCraftedItem(stamped.name);
+      if (lookup.kind !== 'misc') {
+        return { ...stamped, kind: lookup.kind };
+      }
+    }
+    return stamped;
+  });
   // Backfill the per-slot instance ids. A pre-refactor save records only
   // the equipped name; we map each name to the first matching inventory
   // id so later wear / dedupe paths can point at a specific instance.
@@ -5642,13 +5660,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // which someone once anchored up here and left.
             const drop = rollClimbTopLoot(totalTiers);
             if (drop) {
+              const dropLookup = lookupCraftedItem(drop.name);
               const grant: InventoryItem = stampDurability({
                 id: `climb_top_${Date.now()}`,
                 name: drop.name,
-                kind: 'misc',
+                kind: dropLookup.kind,
                 rarity: drop.rarity,
                 quantity: 1,
-                tags: ['climb_top'],
+                tags: [...dropLookup.tags, 'climb_top'],
               });
               set((s) =>
                 s.player
@@ -7786,14 +7805,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         hp: newHp,
         hpMax: newHpMax,
         inventory: lootDrops.reduce(
-          (inv, lootName, i) =>
-            mergeOrPushItem(inv, {
+          (inv, lootName, i) => {
+            const lootLookup = lookupCraftedItem(lootName);
+            return mergeOrPushItem(inv, {
               id: `loot_${Date.now()}_${i}`,
               name: lootName,
-              kind: 'misc',
+              kind: lootLookup.kind,
+              rarity: lootLookup.rarity,
               quantity: 1,
-              tags: ['loot'],
-            }),
+              tags: [...lootLookup.tags, 'loot'],
+            });
+          },
           player.inventory,
         ),
         milestones: { ...prevMs, enemiesDefeated: newKills },
@@ -8961,14 +8983,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       tags: ['trophy', 'hunt'],
       description: `Trophy from the hunt for the ${candidate.targetEnemyName}.`,
     });
-    const newInventory = candidate.rewardItem
+    const huntRewardLookup = candidate.rewardItem ? lookupCraftedItem(candidate.rewardItem) : null;
+    const newInventory = candidate.rewardItem && huntRewardLookup
       ? [...player.inventory, trophy, stampDurability({
           id: `huntreward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
           name: candidate.rewardItem,
-          kind: lookupCraftedItem(candidate.rewardItem).kind === 'weapon' ? 'weapon' : 'misc',
-          rarity: lookupCraftedItem(candidate.rewardItem).rarity,
+          kind: huntRewardLookup.kind,
+          rarity: huntRewardLookup.rarity,
           quantity: 1,
-          tags: lookupCraftedItem(candidate.rewardItem).tags,
+          tags: huntRewardLookup.tags,
         })]
       : [...player.inventory, trophy];
     const repResult = candidate.factionId && candidate.rewardRep
@@ -9205,14 +9228,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       tags: ['trophy', 'mystery'],
       description: `Recovered from the mystery: ${candidate.title}.`,
     });
-    const newInventory = candidate.rewardItem
+    const mysteryRewardLookup = candidate.rewardItem ? lookupCraftedItem(candidate.rewardItem) : null;
+    const newInventory = candidate.rewardItem && mysteryRewardLookup
       ? [...player.inventory, trophy, stampDurability({
           id: `mysteryreward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
           name: candidate.rewardItem,
-          kind: 'misc',
-          rarity: lookupCraftedItem(candidate.rewardItem).rarity,
+          kind: mysteryRewardLookup.kind,
+          rarity: mysteryRewardLookup.rarity,
           quantity: 1,
-          tags: lookupCraftedItem(candidate.rewardItem).tags,
+          tags: mysteryRewardLookup.tags,
         })]
       : [...player.inventory, trophy];
     const repResult = candidate.factionId && candidate.rewardRep
@@ -9407,14 +9431,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    const newInventory = candidate.rewardItem
+    const storyRewardLookup = candidate.rewardItem ? lookupCraftedItem(candidate.rewardItem) : null;
+    const newInventory = candidate.rewardItem && storyRewardLookup
       ? [...player.inventory, stampDurability({
           id: `story_reward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
           name: candidate.rewardItem,
-          kind: 'misc',
-          rarity: lookupCraftedItem(candidate.rewardItem).rarity,
+          kind: storyRewardLookup.kind,
+          rarity: storyRewardLookup.rarity,
           quantity: 1,
-          tags: lookupCraftedItem(candidate.rewardItem).tags,
+          tags: storyRewardLookup.tags,
         })]
       : [...player.inventory];
     const repResult = applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep);
@@ -9469,14 +9494,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         description: `Trophy from the hunt for the ${def.targetEnemyName}.`,
       });
       const grantResult = grantItem(player.inventory, trophy);
-      const newInventory = def.rewardItem
+      const huntUiRewardLookup = def.rewardItem ? lookupCraftedItem(def.rewardItem) : null;
+      const newInventory = def.rewardItem && huntUiRewardLookup
         ? grantItem(grantResult.inventory, stampDurability({
             id: `huntreward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
             name: def.rewardItem,
-            kind: lookupCraftedItem(def.rewardItem).kind === 'weapon' ? 'weapon' : 'misc',
-            rarity: lookupCraftedItem(def.rewardItem).rarity,
+            kind: huntUiRewardLookup.kind,
+            rarity: huntUiRewardLookup.rarity,
             quantity: 1,
-            tags: lookupCraftedItem(def.rewardItem).tags,
+            tags: huntUiRewardLookup.tags,
           })).inventory
         : grantResult.inventory;
       const repResult = def.factionId && def.rewardRep
@@ -9518,14 +9544,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // the rewardItem grant (6 mysteries lost their reward when
       // completed via the Contracts screen). Vendor turn-in at
       // turnInMystery handled this; mirror that here.
-      const newInventory = def.rewardItem
+      const mysteryUiRewardLookup = def.rewardItem ? lookupCraftedItem(def.rewardItem) : null;
+      const newInventory = def.rewardItem && mysteryUiRewardLookup
         ? [...player.inventory, stampDurability({
             id: `mysteryreward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
             name: def.rewardItem,
-            kind: 'misc',
-            rarity: lookupCraftedItem(def.rewardItem).rarity,
+            kind: mysteryUiRewardLookup.kind,
+            rarity: mysteryUiRewardLookup.rarity,
             quantity: 1,
-            tags: lookupCraftedItem(def.rewardItem).tags,
+            tags: mysteryUiRewardLookup.tags,
           })]
         : player.inventory;
       set((s) => (s.player ? {
@@ -9563,14 +9590,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Mantle, True Tartarian → Tartarian Stoneband, Reclaimer Relic
       // Run → Echoing Steps Boots, Silence Across the Border → Mud
       // Monarch Seal). Mirror turnInStoryline.
-      const newInventory = def.rewardItem
+      const storyUiRewardLookup = def.rewardItem ? lookupCraftedItem(def.rewardItem) : null;
+      const newInventory = def.rewardItem && storyUiRewardLookup
         ? [...player.inventory, stampDurability({
             id: `story_reward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
             name: def.rewardItem,
-            kind: 'misc',
-            rarity: lookupCraftedItem(def.rewardItem).rarity,
+            kind: storyUiRewardLookup.kind,
+            rarity: storyUiRewardLookup.rarity,
             quantity: 1,
-            tags: lookupCraftedItem(def.rewardItem).tags,
+            tags: storyUiRewardLookup.tags,
           })]
         : player.inventory;
       set((s) => (s.player ? {
@@ -10587,13 +10615,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         .filter((i) => i.quantity > 0);
       if (output) {
         for (const grant of output.grants) {
+          const scrapLookup = lookupCraftedItem(grant.name);
           const stamp: InventoryItem = stampDurability({
             id: `scrap_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
             name: grant.name,
-            kind: 'misc',
-            rarity: 'Common',
+            kind: scrapLookup.kind,
+            rarity: scrapLookup.rarity,
             quantity: grant.quantity,
-            tags: [],
+            tags: scrapLookup.tags,
           });
           const result = grantItem(newInventory, stamp);
           newInventory = result.inventory;
