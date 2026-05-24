@@ -918,8 +918,36 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
       }
     }
   }
-  const item = enemyHit ? undefined : resolveItem(targetTokens, inventory, context.equippedOffHand ?? null);
-  const noun = enemyHit ?? (item ? undefined : resolveContextNoun(targetTokens, recentNouns));
+  // 2026-05-24 — prefer scene ambient noun over inventory match when
+  // the typed target IS an ambient noun. resolveItem's loose "any
+  // token matches any item word" rule (line ~670) was clobbering
+  // multi-word ambient nouns like "rusted tartarian power conduit"
+  // because the leading "rusted" matched the player's "Rusted Blade"
+  // inventory item — wrong target, broken salvage flow.
+  //
+  // Rule: if the full target phrase (or a strict substring of it)
+  // exactly matches a scene ambient noun, ambient wins. Otherwise
+  // fall back to the existing resolveItem/resolveContextNoun logic.
+  // Sorted by length DESC so the most specific ambient noun wins
+  // when several could match.
+  const targetPhrase = targetTokens.join(' ').toLowerCase().trim();
+  const ambientCandidates = (context.ambientNouns ?? [])
+    .slice()
+    .sort((a, b) => b.length - a.length);
+  let ambientStrongMatch: string | undefined;
+  if (targetPhrase && !enemyHit) {
+    for (const n of ambientCandidates) {
+      const nLower = n.toLowerCase();
+      if (targetPhrase === nLower || targetPhrase.includes(nLower) || nLower.includes(targetPhrase)) {
+        ambientStrongMatch = n;
+        break;
+      }
+    }
+  }
+  const item = enemyHit || ambientStrongMatch
+    ? undefined
+    : resolveItem(targetTokens, inventory, context.equippedOffHand ?? null);
+  const noun = enemyHit ?? ambientStrongMatch ?? (item ? undefined : resolveContextNoun(targetTokens, recentNouns));
 
   // Confidence: 1.0 exact verb, falls off with distance; small boost from resolved target.
   const verbConfidence = Math.max(0.4, 1 - bestMatch.distance * 0.18);
