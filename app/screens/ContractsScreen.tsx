@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { findHuntById, HUNTS } from '../engine/hunts';
 import { findMysteryById, MYSTERIES } from '../engine/mysteries';
@@ -71,6 +71,11 @@ export function ContractsScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const completeContractFromUI = useGameStore((s) => s.completeContractFromUI);
   const discardLead = useGameStore((s) => s.discardLead);
+  // 2026-05-24 — tap-to-travel from the Primary Objective expansion.
+  // Mirrors the Lore→Places confirm modal pattern in LoreCodexBody.
+  const setTravelCourse = useGameStore((s) => s.setTravelCourse);
+  const appendLog = useGameStore((s) => s.appendLog);
+  const [pendingRoute, setPendingRoute] = useState<{ id: string; name: string } | null>(null);
   const [tab, setTab] = useState<Tab>('contracts');
   // OTA 020 — tap-to-expand. Each card key (kind:id) maps to true
   // when expanded. Tap the card head to toggle; expanded view shows
@@ -248,18 +253,41 @@ export function ContractsScreen() {
                     status = '· not yet visited';
                     color = '#7a705c';
                   }
-                  return (
-                    <View key={capId} style={styles.mqTrackerRow}>
-                      <Text style={styles.mqTrackerCap}>{def?.capitalName ?? capId}</Text>
+                  const capName = def?.capitalName ?? capId;
+                  // 2026-05-24 — rows are now tappable to start a
+                  // travel-to course (mirrors Lore→Places). The row
+                  // for the player's current Capital stays a plain
+                  // View since you can't travel to where you are.
+                  const rowContent = (
+                    <>
+                      <Text style={styles.mqTrackerCap}>{capName}</Text>
                       <Text style={[styles.mqTrackerStatus, { color }]}>{status}</Text>
                       <Text style={styles.mqTrackerGuardian}>
                         Guardian: {def?.base.name ?? '—'}
                       </Text>
-                    </View>
+                      {!here && (
+                        <Text style={styles.mqTrackerTap}>▸ tap to travel</Text>
+                      )}
+                    </>
+                  );
+                  if (here) {
+                    return (
+                      <View key={capId} style={styles.mqTrackerRow}>{rowContent}</View>
+                    );
+                  }
+                  return (
+                    <TouchableOpacity
+                      key={capId}
+                      style={styles.mqTrackerRow}
+                      activeOpacity={0.7}
+                      onPress={() => setPendingRoute({ id: capId, name: capName })}
+                    >
+                      {rowContent}
+                    </TouchableOpacity>
                   );
                 })}
                 <Text style={styles.mqTrackerFoot}>
-                  Tap any Capital noun in chat (or use a compass) to plot a course.
+                  Tap any Capital row above to start travel.
                 </Text>
               </View>
             )}
@@ -781,6 +809,59 @@ export function ContractsScreen() {
           )}
       </ScrollView>
       )}
+
+      {/* 2026-05-24 — confirm modal for the new Capital tap-to-travel.
+          Same shape as LoreCodexBody so the two paths feel identical. */}
+      <Modal
+        visible={pendingRoute !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setPendingRoute(null)}
+      >
+        <View style={styles.routeScrim}>
+          <View style={styles.routeCard}>
+            <Text style={styles.routeTitle}>Set Course</Text>
+            <View style={styles.routeRule} />
+            <Text style={styles.routeBody}>
+              Set course for {pendingRoute?.name}? The Arbiter will start
+              charting tile-by-tile travel from your current position.
+            </Text>
+            <View style={styles.routeBtnRow}>
+              <Pressable
+                style={styles.routeBtnNeutral}
+                onPress={() => setPendingRoute(null)}
+              >
+                <Text style={styles.routeBtnTextNeutral}>CANCEL</Text>
+              </Pressable>
+              <Pressable
+                style={styles.routeBtnPrimary}
+                onPress={() => {
+                  if (!pendingRoute || !player) return;
+                  const id = pendingRoute.id;
+                  const name = pendingRoute.name;
+                  setPendingRoute(null);
+                  // Same hub-room refusal Lore→Places applies.
+                  // setTravelCourse reads currentLocationId and would
+                  // step onto a procedural tile while hubRoomId is
+                  // still set, leaving the scene in a half-state.
+                  if (player.hubRoomId) {
+                    appendLog(
+                      'arbiter',
+                      `The Arbiter holds up a hand. "Leave the outpost first — type 'leave outpost' or walk through the gate, then I can chart you to ${name}."`,
+                    );
+                    setScreen('exploration');
+                    return;
+                  }
+                  setTravelCourse(id);
+                  setScreen('exploration');
+                }}
+              >
+                <Text style={styles.routeBtnTextPrimary}>SET COURSE</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -953,6 +1034,19 @@ const styles = StyleSheet.create({
   mqTrackerStatus: { fontSize: 11, marginTop: 1 },
   mqTrackerGuardian: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginTop: 1 },
   mqTrackerFoot: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginTop: 8, textAlign: 'center' },
+  // 2026-05-24 — tap hint + confirm-modal styles for Capital
+  // tap-to-travel. Visual language mirrors LoreCodexBody's modal.
+  mqTrackerTap: { color: '#9ec96a', fontSize: 10, fontStyle: 'italic', letterSpacing: 1, marginTop: 2 },
+  routeScrim: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', alignItems: 'center', justifyContent: 'center', padding: 20 },
+  routeCard: { width: '100%', maxWidth: 380, backgroundColor: '#13110f', borderColor: '#c9a86a', borderWidth: 1, borderRadius: 4, padding: 16 },
+  routeTitle: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
+  routeRule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 12 },
+  routeBody: { color: '#e6d8b3', fontSize: 13, lineHeight: 18, marginBottom: 16 },
+  routeBtnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8 },
+  routeBtnNeutral: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 3, borderWidth: 1, borderColor: '#3a342c', backgroundColor: 'transparent' },
+  routeBtnPrimary: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 3, borderWidth: 1, borderColor: '#c9a86a', backgroundColor: '#1a1714' },
+  routeBtnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  routeBtnTextPrimary: { color: '#c9a86a', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
   // v2.4.1 (OTA 052) — milestone cell tap-expand detail.
   milestoneDetail: {
     marginTop: 8,
