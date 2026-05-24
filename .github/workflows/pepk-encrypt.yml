@@ -1,0 +1,117 @@
+name: PEPK Encrypt Upload Key (Play App Signing)
+
+# Produces the encrypted ZIP that Play Console's
+# "Export and upload a key from Java keystore" flow requires.
+#
+# Inputs (all already in the repo / secrets):
+#   - Keystore           : ANDROID_KEYSTORE_BASE64 secret
+#   - Keystore password  : ANDROID_KEYSTORE_PASSWORD secret
+#   - Key password       : ANDROID_KEY_PASSWORD secret
+#   - Key alias          : ANDROID_KEY_ALIAS secret
+#   - PEPK tool          : ci/play-app-signing/pepk.jar
+#   - Play encryption PK : ci/play-app-signing/encryption_public_key.pem
+#
+# Output: workflow artifact "encrypted-upload-key" containing
+#         encrypted_upload_key.zip — upload this in Play Console
+#         under "Upload generated ZIP" on the app signing preferences
+#         page (Test and release > Setup > App integrity, then change
+#         signing key > Export and upload a key from Java keystore).
+#
+# Trigger: push to this file (edit a comment + commit to re-run) or
+#          manual workflow_dispatch from the Actions tab.
+
+on:
+  push:
+    paths:
+      - '.github/workflows/pepk-encrypt.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  encrypt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Sanity — required files present
+        run: |
+          set -euo pipefail
+          for f in ci/play-app-signing/pepk.jar ci/play-app-signing/encryption_public_key.pem; do
+            if [ ! -f "$f" ]; then
+              echo "::error::Missing $f"
+              exit 1
+            fi
+            echo "ok: $f ($(stat -c%s "$f") bytes)"
+          done
+
+      - name: Decode keystore from secret
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          set -euo pipefail
+          if [ -z "${ANDROID_KEYSTORE_BASE64:-}" ]; then
+            echo "::error::ANDROID_KEYSTORE_BASE64 secret is empty."
+            exit 1
+          fi
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > tartaria-upload.jks
+          echo "Keystore decoded: $(stat -c%s tartaria-upload.jks) bytes"
+
+      - name: Verify keystore unlocks with stored password + alias exists
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          if ! keytool -list -keystore tartaria-upload.jks \
+              -storepass:env ANDROID_KEYSTORE_PASSWORD > /tmp/keylist.txt 2>&1; then
+            echo "::error::Keystore did not unlock. ANDROID_KEYSTORE_PASSWORD may be wrong."
+            cat /tmp/keylist.txt || true
+            exit 1
+          fi
+          if ! grep -q "$ANDROID_KEY_ALIAS" /tmp/keylist.txt; then
+            echo "::error::Alias '$ANDROID_KEY_ALIAS' not found in keystore."
+            echo "--- keystore listing ---"
+            cat /tmp/keylist.txt
+            exit 1
+          fi
+          echo "ok: keystore unlocks, alias '$ANDROID_KEY_ALIAS' present"
+
+      - name: Run PEPK — produce encrypted upload-key ZIP
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+
+          # PEPK reads two passwords interactively from stdin in order:
+          #   1) keystore (store) password
+          #   2) key password
+          # printf both with newlines so PEPK consumes them without a TTY.
+          printf '%s\n%s\n' "$ANDROID_KEYSTORE_PASSWORD" "$ANDROID_KEY_PASSWORD" | \
+            java -jar ci/play-app-signing/pepk.jar \
+              --keystore=tartaria-upload.jks \
+              --alias="$ANDROID_KEY_ALIAS" \
+              --output=encrypted_upload_key.zip \
+              --include-cert \
+              --rsa-aes-encryption \
+              --encryption-key-path=ci/play-app-signing/encryption_public_key.pem
+
+          ls -lh encrypted_upload_key.zip
+          echo "::notice::ZIP produced. Download the 'encrypted-upload-key' artifact from this run, then upload it in Play Console under 'Upload generated ZIP'."
+
+      - name: Upload encrypted ZIP as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: encrypted-upload-key
+          path: encrypted_upload_key.zip
+          retention-days: 30
