@@ -1424,18 +1424,20 @@
   {
     "name": "Reclaimer's Rope",
     "abilityReq": "Dexterity Level 2",
-    "kind": "exploration",
+    "kind": "relic",
     "rarity": "Common",
     "faction": "Reclaimers",
     "tcBuy": 15,
+    "baseDurability": 300,
     "tags": [
       "exploration",
       "tool",
       "common",
       "race_starter",
-      "reclaimer"
+      "reclaimer",
+      "rope"
     ],
-    "description": "Reinforced rope woven with Aetheric fibers. Withstands Aetheric anomalies and high tension.",
+    "description": "Reinforced rope woven with Aetheric fibers. Withstands Aetheric anomalies and high tension. Wears with use; snaps cleanly when overstrained — two snapped ropes can be re-spliced into one good line.",
     "effect": {
       "kind": "gate",
       "unlocks": "climb_steep"

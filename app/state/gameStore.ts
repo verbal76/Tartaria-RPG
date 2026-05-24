@@ -580,18 +580,27 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
   // catalog. Consumables (First Aid Kit, Trail Rations, Aetheric Torch,
   // etc.) landed in saves with kind: 'misc' and the InventoryScreen
   // 'Use' gate (kind === 'consumable') never lit up. Re-resolve kind
-  // via the catalog on every load — only ever upgrades misc → non-misc,
-  // never downgrades, so trophies and one-off relic items keep their
-  // declared kind even if the catalog doesn't know their name.
+  // via the catalog on every load.
+  //
+  // 2026-05-24 (later) — broadened the condition. Reclaimer's Rope was
+  // 'exploration' in saves; now it's 'relic' so the durability system
+  // tracks it. The old `=== 'misc'` guard wouldn't touch exploration
+  // items. New rule: if the catalog has a non-misc kind that disagrees
+  // with the saved kind, upgrade to the catalog kind. Never downgrade
+  // (catalog returning misc leaves the saved kind alone, so trophies /
+  // one-off items unknown to the catalog keep their declared kind).
+  // After upgrade, re-run stampDurability so newly-relic items pick up
+  // baseDurability they didn't qualify for under their old kind.
   const inventory = (p.inventory ?? []).map((i) => {
-    const stamped = stampDurability(i);
-    if (stamped.kind === 'misc') {
-      const lookup = lookupCraftedItem(stamped.name);
-      if (lookup.kind !== 'misc') {
-        return { ...stamped, kind: lookup.kind };
-      }
+    let item = stampDurability(i);
+    const lookup = lookupCraftedItem(item.name);
+    if (lookup.kind !== 'misc' && item.kind !== lookup.kind) {
+      item = { ...item, kind: lookup.kind };
+      // Kind change can unlock durability tracking — re-stamp so the
+      // newly-eligible item picks up its baseDurability on this load.
+      item = stampDurability(item);
     }
-    return stamped;
+    return item;
   });
   // Backfill the per-slot instance ids. A pre-refactor save records only
   // the equipped name; we map each name to the first matching inventory
@@ -5584,21 +5593,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
           (i) => i.name === "Reclaimer's Rope" && i.quantity > 0,
         );
         const climbStaminaCost = hasReclaimersRope ? 1 : 2;
-        // OTA 23-007 — if the player doesn't have enough stamina to
-        // finish this tier, they fall. Lose 20% of max HP and clear
-        // the elevation flag. This is the only place climbing can
-        // injure you now (the old "fail the DEX roll → 1 HP" branch
-        // is gone since rope is required).
-        if (player.stamina < climbStaminaCost) {
+        // Active rope instance for wear/snap tracking. Reclaimer's takes
+        // precedence; falls back to Climbing Rope. We pick the highest-
+        // durability instance among matches so the freshest copy gets used
+        // and worn (wearItemById exists for the deduction; we just need
+        // the id).
+        const pickActiveRope = (): { id: string; name: string; current: number } | null => {
+          const inv = player.inventory;
+          const matches = inv.filter(
+            (i) =>
+              ((hasReclaimersRope && i.name === "Reclaimer's Rope") ||
+                (!hasReclaimersRope && i.name === 'Climbing Rope')) &&
+              i.quantity > 0 &&
+              i.durability != null,
+          );
+          if (matches.length === 0) return null;
+          // Sort by current durability desc — wear the freshest first.
+          matches.sort((a, b) => (b.durability!.current - a.durability!.current));
+          const top = matches[0]!;
+          return { id: top.id, name: top.name, current: top.durability!.current };
+        };
+        const ROPE_WEAR_PER_TIER = 15;
+        // Local fall helper — single source of truth for the climb-fall
+        // narration + HP deduction + elevation reset + death check.
+        // Both the stamina-fall and rope-snap paths call this so the
+        // death-on-fall fix (handlePlayerDeath when newHp <= 0) lands
+        // for both.
+        const climbFall = (
+          combatReason: string,
+          worldReason: string,
+        ): void => {
           const fallDamage = Math.max(1, Math.floor(player.hpMax * 0.2));
           const newHp = Math.max(0, player.hp - fallDamage);
-          get().appendLog(
-            'combat',
-            `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — stamina ${player.stamina} < ${climbStaminaCost} required. ✗ YOU FALL.`,
-          );
+          get().appendLog('combat', combatReason);
           get().appendLog(
             'world',
-            `Your grip gives out on the ${tgt}. You drop hard, taking ${fallDamage} damage (${newHp}/${player.hpMax} HP).`,
+            `${worldReason} You drop hard, taking ${fallDamage} damage (${newHp}/${player.hpMax} HP).`,
           );
           set((s) =>
             s.player
@@ -5611,9 +5641,63 @@ export const useGameStore = create<GameStore>((set, get) => ({
               : s,
           );
           void get().persist();
+          if (newHp <= 0) {
+            handlePlayerDeath(get, set as Parameters<typeof handlePlayerDeath>[1]);
+          }
+        };
+        // OTA 23-007 — if the player doesn't have enough stamina to
+        // finish this tier, they fall. Lose 20% of max HP and clear
+        // the elevation flag. This is the only place climbing can
+        // injure you now (the old "fail the DEX roll → 1 HP" branch
+        // is gone since rope is required).
+        if (player.stamina < climbStaminaCost) {
+          climbFall(
+            `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — stamina ${player.stamina} < ${climbStaminaCost} required. ✗ YOU FALL.`,
+            `Your grip gives out on the ${tgt}.`,
+          );
+          break;
+        }
+        // 2026-05-24 — rope durability + snap. Wear is checked BEFORE the
+        // stamina spend / tier increment so a snap on tier N doesn't
+        // double-charge the player. If current < wear, rope breaks
+        // mid-climb: convert the instance to a Broken Rope in inventory
+        // and trigger the same fall path as the stamina case.
+        const activeRope = pickActiveRope();
+        if (activeRope && activeRope.current < ROPE_WEAR_PER_TIER) {
+          // Convert the rope instance to a Broken Rope artifact. Keep the
+          // same id so any saved equipment refs survive; strip durability
+          // since the broken artifact is misc and inert.
+          set((s) =>
+            s.player
+              ? {
+                  player: {
+                    ...s.player,
+                    inventory: s.player.inventory.map((i) =>
+                      i.id === activeRope.id
+                        ? { ...i, name: 'Broken Rope', kind: 'misc' as const, durability: undefined, tags: ['scrap', 'rope'] }
+                        : i,
+                    ),
+                  },
+                }
+              : s,
+          );
+          climbFall(
+            `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — ${activeRope.name} frayed through (durability ${activeRope.current} < ${ROPE_WEAR_PER_TIER}). ✗ YOU FALL.`,
+            `Your ${activeRope.name.toLowerCase()} snaps under load on the ${tgt}.`,
+          );
           break;
         }
         set({ player: advanceTime(spendStamina(player, climbStaminaCost), 0.5) });
+        // Wear the rope by ROPE_WEAR_PER_TIER per tier cleared. The
+        // wearItemById helper handles clamping; we ignore the broken
+        // flag here because the next tier's snap-check above will fire
+        // if it's wear-broken to 0 (durability < ROPE_WEAR_PER_TIER on
+        // the next attempt).
+        if (activeRope) {
+          const liveInv = get().player?.inventory ?? player.inventory;
+          const wearResult = wearItemById(liveInv, activeRope.id, ROPE_WEAR_PER_TIER);
+          set((s) => (s.player ? { player: { ...s.player, inventory: wearResult.inventory } } : s));
+        }
         let tierCleared = false;
         {
           // OTA 045 — when the climbed noun is itself a rope / line /

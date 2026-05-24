@@ -1,6 +1,12 @@
 {
   "recipes": [
     {
+      "result": "Climbing Rope",
+      "ingredients": [
+        { "name": "Broken Rope", "quantity": 2 }
+      ]
+    },
+    {
       "result": "Club",
       "ingredients": [
         { "name": "Stick", "quantity": 1 }

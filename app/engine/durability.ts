@@ -4,6 +4,7 @@ import {
   findArmorByName,
   findAmuletByName,
   findRingByName,
+  findExplorationItemByName,
   GEAR,
 } from './crafting';
 
@@ -34,6 +35,14 @@ function lookupBaseDurability(name: string): number | null {
     // is open for them to do so. Honor it if present.
     const gAny = g as typeof g & { baseDurability?: number };
     return gAny.baseDurability ?? DEFAULT_DURABILITY;
+  }
+  // Exploration catalog: Reclaimer's Rope (and any future durability-tracked
+  // exploration item) carries baseDurability now that rope is wear-tracked.
+  // Honor it the same way we honor relic-kind GEAR rows.
+  const e = findExplorationItemByName(name);
+  if (e) {
+    const eAny = e as typeof e & { baseDurability?: number };
+    if (eAny.baseDurability != null) return eAny.baseDurability;
   }
   return null;
 }
