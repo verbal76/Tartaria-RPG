@@ -184,8 +184,21 @@ export function extractAmbientNouns(description: string | undefined | null): str
 // Does the player's typed target reference one of the ambient nouns in
 // the scene? Returns the canonical ambient noun on match (so the narrator
 // can name it back the way the description names it), or null.
+// 2026-05-24 — hyphen + whitespace normalization for resolution.
+// Player typing "salt-crusted royal display case" goes through the
+// parser's tokenizer which strips hyphens, producing the phrase
+// "salt crusted royal display case". The ambient noun list still
+// holds the original "salt-crusted..." string. Without normalizing,
+// substring comparisons miss across the hyphen boundary. This helper
+// gives a single canonical form for compare-only use; the original
+// ambient string is still what we return so display + downstream
+// logic stays untouched.
+export function normalizeForCompare(s: string): string {
+  return s.toLowerCase().replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 export function matchAmbientNoun(target: string, ambient: readonly string[]): string | null {
-  const t = target.toLowerCase().trim();
+  const t = normalizeForCompare(target);
   if (!t) return null;
   // OTA 014 — Two-pass match. The previous version was
   // bidirectional substring (t.includes(n) || n.includes(t)) which
@@ -197,14 +210,18 @@ export function matchAmbientNoun(target: string, ambient: readonly string[]): st
   // back to noun-contains-target (typed narrower / abbreviation) —
   // but only when the target is at least 3 chars to avoid "ow"
   // matching "shadow" etc.
+  //
+  // 2026-05-24 — comparisons now run through normalizeForCompare so
+  // hyphenated curated nouns ("dust-buried tartarian power conduit")
+  // resolve correctly when the parser strips the hyphen on the way in.
   const sorted = [...ambient].sort((a, b) => b.length - a.length);
   // Pass 1: exact match.
   for (const noun of sorted) {
-    if (noun.toLowerCase() === t) return noun;
+    if (normalizeForCompare(noun) === t) return noun;
   }
   // Pass 2: target contains the noun ("the wall" → "wall").
   for (const noun of sorted) {
-    const n = noun.toLowerCase();
+    const n = normalizeForCompare(noun);
     if (t.includes(n)) return noun;
   }
   // Pass 3: noun contains the target — only when target is
@@ -212,7 +229,7 @@ export function matchAmbientNoun(target: string, ambient: readonly string[]): st
   // accidentally match longer nouns.
   if (t.length >= 3) {
     for (const noun of sorted) {
-      const n = noun.toLowerCase();
+      const n = normalizeForCompare(noun);
       if (n.includes(t)) return noun;
     }
   }

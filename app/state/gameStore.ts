@@ -3745,35 +3745,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // The target the player named (raw, before resolution).
         const rawTarget = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
 
-        // Sanity gate — if the player's "target" is clearly garbage
-        // prose (4+ words, question mark, oversized) they were typing
-        // a comment / question, not a noun. Don't narrate searching
-        // it. Plainly admit confusion and let them rephrase. The
-        // meta-comment guard above is the primary defense; this is
-        // belt-and-suspenders for inputs that slip past the regex.
-        //
-        // 2026-05-24 — bypass the guard when the resolved target is
-        // a known scene ambient noun. Curated salvage/climb spawns
-        // ("rusted tartarian power conduit", "shattered engine chamber
-        // scaffolding") can legitimately be 4-5 words after the
-        // adjective prefix, and they're not garbage prose — they
-        // resolved through the noun matcher because they're in the
-        // scene's ambient pool.
-        const resolvedIsKnownAmbient =
-          rawTarget.length > 0 &&
-          (currentScene.ambientNouns ?? []).some(
-            (n) => n.toLowerCase() === rawTarget.toLowerCase(),
-          );
-        if (rawTarget && !resolvedIsKnownAmbient) {
-          const wordCount = rawTarget.split(/\s+/).length;
-          if (wordCount > 3 || rawTarget.length > 40 || /[?!]/.test(rawTarget)) {
-            get().appendLog(
-              'arbiter',
-              `The Arbiter studies you, plainly. "I'm not sure what you're trying to tell me. Phrase it as the deed you mean to do — 'investigate the rubble', 'attack the figure', 'go east'."`,
-            );
-            break;
-          }
-        }
+        // 2026-05-24 — the old "4+ words / >40 chars / has ? or !" garbage-
+        // prose guard was deleted here after three salvage bugs in a row.
+        // The earlier META_COMMENT regex (~line 2777) already catches
+        // typed meta-comments / questions; the 4-word numeric heuristic
+        // was fundamentally incompatible with multi-word curated nouns
+        // ("rusted tartarian power conduit", "salt-crusted royal display
+        // case"). If a player types unrouted prose, downstream logic
+        // (matchAmbientNoun → no match → "look at" generic narration)
+        // handles it more gracefully than a hard refusal.
 
         // 1.5) Ground-type search ("search the mud", "search the ground")
         // routes to the dig path before ambient noun match. "ground" is

@@ -3,6 +3,7 @@ import { levenshtein } from './editDistance';
 import { FILLER_DESCRIPTORS } from './fillerWords';
 import { frameFor } from './verbFrames';
 import { validateParse, shouldRejectParse, META_TALK_REGEX } from './parseValidator';
+import { normalizeForCompare } from './ambientNouns';
 
 // Verb pools. Goal of 10 synonyms per intent for natural-language
 // robustness — the player can phrase the same intent ten ways and the
@@ -918,27 +919,39 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
       }
     }
   }
-  // 2026-05-24 — prefer scene ambient noun over inventory match when
-  // the typed target IS an ambient noun. resolveItem's loose "any
-  // token matches any item word" rule (line ~670) was clobbering
-  // multi-word ambient nouns like "rusted tartarian power conduit"
-  // because the leading "rusted" matched the player's "Rusted Blade"
-  // inventory item — wrong target, broken salvage flow.
+  // 2026-05-24 — prefer scene ambient noun over inventory + recentNouns
+  // fuzzy match when the typed target IS an ambient noun. resolveItem
+  // and resolveContextNoun both use loose "any token matches any
+  // candidate word" rules that clobber multi-word ambient nouns
+  // (e.g. "rusted tartarian power conduit" → "Rusted Blade" via the
+  // leading "rusted"; "dust-buried tartarian power conduit" → "buried
+  // capital" via the leading "buried" matching the location type).
   //
   // Rule: if the full target phrase (or a strict substring of it)
-  // exactly matches a scene ambient noun, ambient wins. Otherwise
-  // fall back to the existing resolveItem/resolveContextNoun logic.
-  // Sorted by length DESC so the most specific ambient noun wins
-  // when several could match.
-  const targetPhrase = targetTokens.join(' ').toLowerCase().trim();
+  // matches a scene ambient noun, ambient wins. Otherwise fall back
+  // to the existing resolveItem/resolveContextNoun logic. Sorted by
+  // length DESC so the most specific ambient noun wins when several
+  // could match.
+  //
+  // 2026-05-24 (later) — comparisons run through normalizeForCompare
+  // so hyphen variants ("salt-crusted" vs "salt crusted") and
+  // whitespace differences match. Without this, the parser's
+  // hyphen-stripping tokenizer breaks every curated noun that
+  // includes a hyphen ("dust-buried", "salt-crusted", "half-buried").
+  const targetPhraseRaw = targetTokens.join(' ').toLowerCase().trim();
+  const targetPhraseNorm = normalizeForCompare(targetPhraseRaw);
   const ambientCandidates = (context.ambientNouns ?? [])
     .slice()
     .sort((a, b) => b.length - a.length);
   let ambientStrongMatch: string | undefined;
-  if (targetPhrase && !enemyHit) {
+  if (targetPhraseNorm && !enemyHit) {
     for (const n of ambientCandidates) {
-      const nLower = n.toLowerCase();
-      if (targetPhrase === nLower || targetPhrase.includes(nLower) || nLower.includes(targetPhrase)) {
+      const nNorm = normalizeForCompare(n);
+      if (
+        targetPhraseNorm === nNorm ||
+        targetPhraseNorm.includes(nNorm) ||
+        nNorm.includes(targetPhraseNorm)
+      ) {
         ambientStrongMatch = n;
         break;
       }
