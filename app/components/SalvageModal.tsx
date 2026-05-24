@@ -82,7 +82,31 @@ const SALVAGE_PATTERN = new RegExp(
 const SALVAGE_CHIP_CAP = 8;
 
 function isSalvageable(noun: string): boolean {
-  return SALVAGE_PATTERN.test(noun);
+  // 2026-05-24 — curated salvageable spawns carry nouns like
+  // "rusted exoframe" / "library archive console" that don't all
+  // overlap the substring pattern. Check the curated pool too.
+  if (SALVAGE_PATTERN.test(noun)) return true;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { isCuratedSalvageable } = require('../engine/salvageableSpawns');
+  return isCuratedSalvageable(noun);
+}
+
+// 2026-05-24 — prefer curated salvageables; cap common-stock matches
+// (table/gate/bench/etc.) at 1 per chip row so the new variety actually
+// shows. Same shape as the climbable throttle in scene generation.
+function prioritizeSalvageChips(matches: readonly string[]): string[] {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { isCommonStockSalvageable, isCuratedSalvageable } = require('../engine/salvageableSpawns');
+  const curated: string[] = [];
+  const stock: string[] = [];
+  const other: string[] = [];
+  for (const n of matches) {
+    if (isCuratedSalvageable(n)) curated.push(n);
+    else if (isCommonStockSalvageable(n)) stock.push(n);
+    else other.push(n);
+  }
+  // Keep all curated, at most 1 stock, plus all other matches.
+  return [...curated, ...stock.slice(0, 1), ...other];
 }
 
 export function SalvageModal({ visible, hints, chips, onSubmit, onCancel }: Props) {
@@ -145,13 +169,13 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel }: Prop
   // Prefer the new chips form (with consumed flags) when caller
   // passes it; fall back to the legacy hints list. Either way the
   // result is filtered to salvage-pattern matches and capped at 5.
-  const sceneHints = chips
+  const rawSceneHints = chips
     ? chips
         .filter((c) => !c.consumed) // hide consumed scene nouns entirely
         .filter((c) => isSalvageable(c.noun))
-        .slice(0, SALVAGE_CHIP_CAP)
         .map((c) => c.noun)
-    : (hints ?? []).filter(isSalvageable).slice(0, SALVAGE_CHIP_CAP);
+    : (hints ?? []).filter(isSalvageable);
+  const sceneHints = prioritizeSalvageChips(rawSceneHints).slice(0, SALVAGE_CHIP_CAP);
   const commonHints = ['the wreck', 'the construct', 'the drone', 'the machinery', 'the husk'];
 
   return (

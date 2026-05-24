@@ -2049,6 +2049,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const curatedClimbables: string[] = pickClimbablesForScene(
       hubRoom ?? location,
     );
+    // 2026-05-24 — same shape for salvageables. Playtester noted that
+    // table + gate dominated every scene's salvage chips because the
+    // authored interactables files lean on the same stock nouns. Pull
+    // 2-3 curated salvageables from the indoor/outdoor pool. SalvageModal
+    // also caps common-stock matches (table/gate/etc.) at 1 to make
+    // sure the new variety actually shows.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { pickSalvageablesForScene } = require('../engine/salvageableSpawns');
+    const curatedSalvageables: string[] = pickSalvageablesForScene(
+      hubRoom ?? location,
+    );
     const baseAmbient = (hubRoom && hubNouns.length > 0)
       ? Array.from(new Set([...hubNouns, ...microMicroNouns]))
       : Array.from(new Set([...locNouns, ...hubNouns, ...microMicroNouns]));
@@ -2067,7 +2078,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       filteredBase.push(n);
     }
-    const ambientNouns = Array.from(new Set([...filteredBase, ...curatedClimbables]));
+    const ambientNouns = Array.from(new Set([...filteredBase, ...curatedClimbables, ...curatedSalvageables]));
     // Lock the visible subset for THIS scene visit. Look-around and
     // the chip pool (Search/Approach/Salvage) BOTH read from this
     // same cache — strict match. If a noun isn't in your look-around,
