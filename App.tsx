@@ -305,7 +305,7 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
   // outer View handles the status/nav bar insets).
   const interiorHeight = ui.logicalHeight - (top + bottom) / ui.scale;
   return (
-    <View style={[styles.safe, { paddingTop: top, paddingBottom: bottom }]}>
+    <View style={[styles.safe, { paddingTop: top, paddingBottom: bottom, paddingLeft: insets.left, paddingRight: insets.right }]}>
       <StatusBar style="light" hidden />
       <View
         style={{

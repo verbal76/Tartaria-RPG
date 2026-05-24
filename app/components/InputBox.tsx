@@ -256,7 +256,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             // each scene en route. The MAP button stays available
             // so the player can consult the atlas mid-journey.
             <>
-              <TravelBtn label={`CONTINUE → ${travelTargetName.toUpperCase()}`} onPress={onContinueTravel ?? (() => {})} />
+              <TravelBtn label={`→ ${travelTargetName.toUpperCase()}`} onPress={onContinueTravel ?? (() => {})} />
               <TravelBtn label="STOP TRAVEL" onPress={onStopTravel ?? (() => {})} />
               <TravelBtn label="MAP" onPress={onOpenMap} />
             </>
@@ -492,10 +492,9 @@ function QuickBtn({
  *  fat-fingering an adjacent direction. Equal-width flex layout
  *  splits the available horizontal space across all four buttons.
  *
- *  OTA 460 — single-line + ellipsize for long labels. CONTINUE → CITY
- *  passes the destination name through; long Capital names ("CONTINUE
- *  → ISKAN-VEIL", "CONTINUE → YULDRA-TUL") were wrapping or clipping
- *  on narrow phones because the Text had no overflow control. */
+ *  Single-line + ellipsize for long labels — destination name is
+ *  passed through with the arrow prefix ("→ ISKAN-VEIL"), Text has
+ *  overflow control to keep long Capital names from wrapping. */
 function TravelBtn({ label, onPress }: { label: string; onPress: () => void }) {
   return (
     <TouchableOpacity style={styles.travelBtn} onPress={onPress} activeOpacity={0.7}>

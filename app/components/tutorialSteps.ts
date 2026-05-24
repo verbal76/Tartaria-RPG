@@ -125,7 +125,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'NORTH / SOUTH / EAST / WEST — one tap = one step in that direction on the world map. ' +
       'These hide during combat (you can\'t walk away from a fight that\'s already on you). ' +
       '\n\nFor long hauls: type "travel to <city>" (or tap a Place in the Lore tab) and the row ' +
-      'flips to CONTINUE → <CITY> / STOP TRAVEL. Each CONTINUE tap takes one cardinal step ' +
+      'flips to → <CITY> / STOP TRAVEL. Each → tap takes one cardinal step ' +
       'toward the target — same stamina, same time, same encounter rolls. STOP hands the ' +
       'cardinals back. ' +
       '\n\nAsk the Arbiter "what\'s north of me" or "closest hub" any time.',

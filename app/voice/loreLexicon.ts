@@ -41,15 +41,18 @@ const LEXICON: Array<[RegExp, string]> = [
   [/\bAether\b/gi, 'ay thur'],
 
   // Place names — long-vowel + multi-syllable mishaps.
-  // Playtester spec OTA 217:
-  //   Tartaria   = "tar tair ee uh"  (first "tar" like the substance,
-  //                                   "tair" rhymes with "air")
-  //   Tartarian  = "tar tair ee un"
-  //   Tartarians = "tar tair ee unz"
-  //   Tartary    = "tar tar ee"      (both syllables = "tar")
-  [/\bTartaria\b/gi, 'tar tair ee uh'],
-  [/\bTartarian\b/gi, 'tar tair ee un'],
-  [/\bTartarians\b/gi, 'tar tair ee unz'],
+  // Tartar* family is two beats: "tar" + the rest as one rapid stress
+  // group. Earlier 4-chunk respelling ("tar tair ee uh") read as four
+  // slow emphasized syllables; collapsing the trailing chunks into one
+  // unbroken token lets espeak-ng pronounce tair+ee+uh as a single
+  // beat per the playtester's "tar then everything-else-together" spec.
+  //   Tartaria   = "tar taireeuh"
+  //   Tartarian  = "tar taireeun"
+  //   Tartarians = "tar taireeunz"
+  //   Tartary    = "tar tar ee" (unchanged — different word)
+  [/\bTartaria\b/gi, 'tar taireeuh'],
+  [/\bTartarian\b/gi, 'tar taireeun'],
+  [/\bTartarians\b/gi, 'tar taireeunz'],
   [/\bTartary\b/gi, 'tar tar ee'],
   // Playtester spec OTA 219.
   [/\bDrakova\b/gi, 'dra koh vah'],
