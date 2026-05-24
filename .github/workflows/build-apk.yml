@@ -10,6 +10,10 @@ name: Android Build (Tartaria Realms)
 # because app/** is path-ignored. To force an AAB build, either touch
 # a non-ignored file (eas.json, this workflow, etc.) in the same
 # commit, or push a refs/tags/v* tag.
+#
+# OTA 470: fresh-start build #4. New keystore (SHA1 617B774B...),
+# all four ANDROID_* secrets updated, user deleting Play Console
+# listing in parallel.
 
 on:
   push:
