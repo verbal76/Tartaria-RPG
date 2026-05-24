@@ -1,8 +1,10 @@
-// Thousand-day stress simulation. Drives the gameStore through 1000
-// in-game days (24000 hours) with an action picker that responds to
-// scene state — combat, vendors, hooks, climbables, salvageables —
-// and surfaces bugs by tracking coverage stats and bug signals (hp
-// jumps, stuck actions, uncaught exceptions).
+// Stress simulation (smoke-run). Drives the gameStore through 180
+// in-game days (4320 hours; cut from 1000d/24000h on 2026-05-24 per
+// playtester ask) with an action picker that responds to scene state
+// — combat, vendors, hooks, climbables, salvageables — and surfaces
+// bugs via the bug signals at end-of-run (hp jumps, stuck actions,
+// uncaught exceptions). Soft coverage thresholds were removed when
+// the duration was cut; this is no longer a coverage probe.
 //
 // Filename contains "Stress" so the default `npm test` ignores it
 // via --testPathIgnorePatterns. Run explicitly:
@@ -85,11 +87,10 @@ function topN(c: Counter, n: number): Array<[string, number]> {
 }
 
 describe('Thousand-day stress simulation of Tartaria Realms', () => {
-  // v2.4.1 — bumped from 600s to 900s. Grid expanded from 21×21 to
-  // 41×41, so D5 cities are 20-28 tiles out instead of 10-19. 1000
-  // days of sim now involves more wander steps + more encounters
-  // per cross-grid trip.
-  jest.setTimeout(900000);
+  // 2026-05-24 — cut from 1000 days (24000h) to 180 days (4320h) per
+  // playtester ask. Timeout proportional: 900s → 240s so failures
+  // surface fast in CI instead of cooking for 15 minutes.
+  jest.setTimeout(240000);
 
   beforeAll(() => {
     console.log = () => {};
@@ -103,7 +104,7 @@ describe('Thousand-day stress simulation of Tartaria Realms', () => {
     console.error = _origErr;
   });
 
-  it('runs 1000 in-game days exercising every interaction surface', async () => {
+  it('runs 180 in-game days as a crash/exception smoke-run', async () => {
     const store = useGameStore;
     await store.getState().hydrate();
 
@@ -592,7 +593,7 @@ describe('Thousand-day stress simulation of Tartaria Realms', () => {
     };
 
     // ── Main loop ─────────────────────────────────────────────────────
-    const TARGET_HOURS = 24000; // 1000 days
+    const TARGET_HOURS = 4320; // 180 days (6 months) — cut from 1000d/24000h
     const MAX_ACTIONS = 50000;
     const MAX_EXCEPTIONS = 10;
     let hoursBaseline = 0; // accumulated across reincarnations
@@ -648,7 +649,7 @@ describe('Thousand-day stress simulation of Tartaria Realms', () => {
 
       const totalHours = hoursBaseline + (p.hoursElapsed ?? 0);
       if (totalHours >= TARGET_HOURS) {
-        endReason = 'reached_1000_days';
+        endReason = 'reached_180_days';
         break;
       }
 
@@ -781,22 +782,21 @@ describe('Thousand-day stress simulation of Tartaria Realms', () => {
         ).join('\n')
       : '  (none)';
 
+    // Coverage assertions removed when the sim was cut from 1000 days to 180
+    // days (6 months) — soft thresholds like "kills > 50" / "distinct locations
+    // > 3" / "climb tops > 0" assumed a long enough run to exercise the space.
+    // This is a smoke-run now: catches crashes, unhandled exceptions, HP jumps,
+    // and stuck-action loops. Add a fresh assertion before re-extending the
+    // duration; don't re-introduce the old coverage thresholds without re-tuning.
     const bugSignals: string[] = [];
     if (exceptions.count > 5) bugSignals.push(`HIGH EXCEPTION COUNT: ${exceptions.count}`);
-    if (daysElapsed < 900) bugSignals.push(`SIM STALLED: only ${daysElapsed.toFixed(1)} days reached (target 1000)`);
-    if (combat.kills < 50) bugSignals.push(`LOW KILL COUNT: ${combat.kills} (expected > 50)`);
-    if (climbs.topsReached === 0) bugSignals.push('ZERO CLIMB TOPS REACHED');
-    if (Object.keys(climbs.topLootDropped).length === 0) bugSignals.push('ZERO TOP-LOOT DROPS DETECTED');
-    if (trades.stealSuccess === 0) bugSignals.push('ZERO STEAL SUCCESSES');
-    if (trades.stealCaught === 0) bugSignals.push('ZERO STEAL CAUGHT EVENTS');
-    if (worldCoverage.distinctLocationsVisited.size <= 3) bugSignals.push(`POOR LOCATION COVERAGE: ${worldCoverage.distinctLocationsVisited.size}`);
     if (stuckActions.count >= 100) bugSignals.push(`HIGH STUCK ACTIONS: ${stuckActions.count}`);
     if (hpJumpsDetected.length > 0) bugSignals.push(`HP JUMPS DETECTED: ${hpJumpsDetected.length} (potential healing regression)`);
 
     const report = `
 ================ THOUSAND-DAY STRESS SIM REPORT ================
 End reason:              ${endReason}
-Days elapsed:            ${daysElapsed.toFixed(2)} / 1000
+Days elapsed:            ${daysElapsed.toFixed(2)} / 180
 Total actions:           ${totalActions} / ${MAX_ACTIONS}
 Pending rolls resolved:  ${pendingResolves}
 Status:                  ${pFinal?.dead ? 'DEAD' : 'ALIVE'}

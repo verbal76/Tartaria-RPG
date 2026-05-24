@@ -8,6 +8,7 @@ import {
   TouchableWithoutFeedback,
   Pressable,
 } from 'react-native';
+import { useGameStore } from '../state/gameStore';
 
 interface Props {
   visible: boolean;
@@ -43,6 +44,8 @@ export function ClimbModal({
   onCancel,
 }: Props) {
   const tapTo = (target: string) => onSubmit(target);
+  const stamina = useGameStore((s) => s.player?.stamina ?? 0);
+  const staminaMax = useGameStore((s) => s.player?.staminaMax ?? 0);
 
   return (
     <Modal
@@ -98,6 +101,8 @@ export function ClimbModal({
                 </ScrollView>
               )}
 
+              <Text style={styles.staminaNote}>stamina {stamina} / {staminaMax}</Text>
+
               <View style={styles.btnRow}>
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
@@ -141,6 +146,7 @@ const styles = StyleSheet.create({
   rowNameCleared: { color: '#5a5246', fontStyle: 'italic' },
   rowHeight: { color: '#9ec96a', fontSize: 11, letterSpacing: 1, fontWeight: '700' },
   rowHeightCleared: { color: '#5a5246' },
+  staminaNote: { color: '#8a7a52', fontSize: 12, marginTop: 10, textAlign: 'center', letterSpacing: 1 },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 14 },
   btn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 3, borderWidth: 1, minWidth: 80, alignItems: 'center' },
   btnPressed: { opacity: 0.7 },

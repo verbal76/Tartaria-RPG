@@ -1,8 +1,9 @@
-// Two-year chaos simulation. Drives the gameStore through ~730 in-game
-// days, mixing the coverage-driven action picker with periodic
-// "schizophrenic" inputs (verbose, misspelled, nonsense, empty, emoji,
-// out-of-context) and special phases: vandalization (drop everything,
-// walk away, come back) and forced mapping (cross into new locations).
+// Chaos simulation. Drives the gameStore through 180 in-game days
+// (cut from 730d on 2026-05-24 per playtester ask), mixing the
+// coverage-driven action picker with periodic "schizophrenic" inputs
+// (verbose, misspelled, nonsense, empty, emoji, out-of-context) and
+// special phases: vandalization (drop everything, walk away, come
+// back) and forced mapping (cross into new locations).
 //
 // Goal: surface engine glitches, dead ends, loops, dissonance.
 // Pass criteria (best-effort):
@@ -147,7 +148,8 @@ describe('Two-year chaos simulation of Tartaria Realms', () => {
   // v2.4.1 (OTA 020) — bumped 600s -> 900s. Grid 21x21 -> 41x41 means
   // 2x the wander steps per cross-grid trip; 2 years of sim hits this
   // proportionally harder.
-  jest.setTimeout(900000);
+  // 2026-05-24 — cut 730d → 180d per playtester ask; timeout 900s → 240s.
+  jest.setTimeout(240000);
 
   beforeAll(() => {
     console.log = () => {};
@@ -161,7 +163,7 @@ describe('Two-year chaos simulation of Tartaria Realms', () => {
     console.error = _origErr;
   });
 
-  it('runs 730 in-game days under chaotic input and reports', async () => {
+  it('runs 180 in-game days under chaotic input and reports', async () => {
     const store = useGameStore;
     await store.getState().hydrate();
 
@@ -542,7 +544,7 @@ describe('Two-year chaos simulation of Tartaria Realms', () => {
     };
 
     // Main loop ---------------------------------------------------------
-    const TARGET_DAY = 730;
+    const TARGET_DAY = 180;
     const MAX_ACTIONS = 60000;
     let endReason = 'max_actions';
     let actions = 0;
@@ -589,7 +591,7 @@ describe('Two-year chaos simulation of Tartaria Realms', () => {
       // simulated time, not just the current life.
       const totalHours = hoursElapsedBaseline + hoursElapsed;
       const day = Math.floor(totalHours / 24) + 1;
-      if (day >= TARGET_DAY) { endReason = 'reached_730_days'; break; }
+      if (day >= TARGET_DAY) { endReason = 'reached_180_days'; break; }
 
       if (pBefore.dead) {
         deaths++;

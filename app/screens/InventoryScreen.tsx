@@ -244,24 +244,6 @@ export function InventoryScreen() {
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
         <Text style={styles.title}>INVENTORY</Text>
-        <View style={styles.headerBtnRow}>
-          <TouchableOpacity
-            onPress={() => setScreen('contracts')}
-            style={styles.actionsBtn}
-            hitSlop={8}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.actionsText}>CONTRACTS</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setScreen('actions')}
-            style={styles.actionsBtn}
-            hitSlop={8}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.actionsText}>ACTIONS</Text>
-          </TouchableOpacity>
-        </View>
       </View>
 
       <Text style={styles.tc}>TC: {player.tc}</Text>
@@ -409,18 +391,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
-  headerBtnRow: { flexDirection: 'row', gap: 4 },
-  actionsBtn: {
-    backgroundColor: '#1a1714',
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    borderColor: '#5a4a2e',
-    borderWidth: 1,
-    borderRadius: 4,
-    minWidth: 76,
-    alignItems: 'center',
-  },
-  actionsText: { color: '#c9a86a', fontSize: 11, letterSpacing: 1, fontWeight: '700' },
   title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
   tc: { color: '#c9a86a', fontSize: 12, letterSpacing: 1, marginBottom: 6, textAlign: 'right' },
   scroll: { flex: 1 },

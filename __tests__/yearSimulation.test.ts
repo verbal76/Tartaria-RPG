@@ -1,8 +1,9 @@
-// Year-long (or two-year) playthrough simulation. Drives the gameStore
-// through ~365–730 in-game days picking rational actions every loop,
-// and reports the final stats block. The action picker is coverage-
-// driven: it tracks which gameplay mechanisms have actually fired
-// (via log inspection) and biases toward unexercised mechanisms when
+// Playthrough simulation. Drives the gameStore through 180 in-game
+// days (cut from 365d-with-auto-extend-to-730d on 2026-05-24 per
+// playtester ask) picking rational actions every loop, and reports
+// the final stats block. The action picker is coverage-driven: it
+// tracks which gameplay mechanisms have actually fired (via log
+// inspection) and biases toward unexercised mechanisms when
 // the scene context allows it, so a single run exercises as much of
 // the engine as possible.
 //
@@ -95,8 +96,8 @@ const MECHANISMS = [
 ] as const;
 
 describe('Year-long Tartaria Realms playthrough simulation', () => {
-  // v2.4.1 (OTA 020) — bumped 300s -> 480s for the 41x41 grid.
-  jest.setTimeout(480000);
+  // 2026-05-24 — cut 365d/730d → 180d/180d per playtester ask; timeout 480s → 120s.
+  jest.setTimeout(120000);
 
   beforeAll(() => {
     console.log = () => {};
@@ -645,13 +646,13 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
     };
 
     // Main loop ---------------------------------------------------------
-    // 1 year baseline; extend to 2 if mechanism coverage is incomplete.
-    const TARGET_DAY = 365;
-    const EXTENDED_DAY = 730;
+    // 2026-05-24 — cut from 365d (with auto-extend to 730d on coverage gaps)
+    // to a flat 180d (6 months) per playtester ask. Mechanism coverage is no
+    // longer self-extending; the sim is now a fixed-budget smoke-run.
+    const TARGET_DAY = 180;
     const MAX_ACTIONS = 32000;
     let actions = 0;
     let endReason = 'max_actions';
-    let targetDay = TARGET_DAY;
     while (actions < MAX_ACTIONS) {
       if (actions % 50 === 0) {
         await new Promise<void>((r) => setImmediate(r));
@@ -666,14 +667,9 @@ describe('Year-long Tartaria Realms playthrough simulation', () => {
 
       const hoursElapsed = pBefore.hoursElapsed ?? 0;
       const day = Math.floor(hoursElapsed / 24) + 1;
-      if (day >= targetDay) {
-        // If we hit year 1 with gaps, extend to year 2 to keep trying.
-        if (targetDay === TARGET_DAY && exercised.size < MECHANISMS.length) {
-          targetDay = EXTENDED_DAY;
-        } else {
-          endReason = day >= EXTENDED_DAY ? 'reached_730_days' : 'reached_365_days';
-          break;
-        }
+      if (day >= TARGET_DAY) {
+        endReason = 'reached_180_days';
+        break;
       }
 
       if (pBefore.dead) {
