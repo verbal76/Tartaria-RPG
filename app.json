@@ -15,10 +15,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.hotatticgames.tartariaprima"
+      "bundleIdentifier": "com.hotatticgames.tartarprim"
     },
     "android": {
-      "package": "com.hotatticgames.tartariaprima",
+      "package": "com.hotatticgames.tartarprim",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#0a0908"
