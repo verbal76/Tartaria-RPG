@@ -494,7 +494,18 @@ export type StatusEffectKind =
   // one-round +4 AC; golem_companion fires a free 1d6 bludgeoning
   // hit after each player attack for 3 rounds.
   | 'shaped_stone_ward'
-  | 'golem_companion';
+  | 'golem_companion'
+  // 2026-05-24 — stamina-driven combat statuses. tired and exhausted
+  // are auto-applied/cleared by tickPlayerStaminaStatuses based on
+  // current stamina (no persistence drift). power_attack_pending and
+  // defensive_stance are player-chosen tactical statuses.
+  // well_fed is granted by eating any food consumable; provides +3
+  // temp stamina above max that decays over 5 rounds in combat.
+  | 'tired'                  // stamina < 25% → -1 atk, -1 AC
+  | 'exhausted'              // stamina === 0 → -2 atk, ½ damage, no active dodge/parry
+  | 'power_attack_pending'   // next attack +2 to hit, +1 damage die (consumed)
+  | 'defensive_stance'       // +2 AC per round; 2 stamina per round drain
+  | 'well_fed';              // temp stamina above max from food
 
 export interface StatusEffect {
   kind: StatusEffectKind;
@@ -565,6 +576,11 @@ export interface PlayerCharacter {
   hpMax: number;
   stamina: number;
   staminaMax: number;
+  /** 2026-05-24 — hunger penalty. Increments by 1 every 8 in-game hours
+   *  without eating, capped at 5. effectiveStaminaMax = staminaMax - this.
+   *  Eating any food consumable resets to 0. Absent for legacy saves,
+   *  backfilled to 0 in backfillPlayer. */
+  hungerStaminaPenalty?: number;
   ac: number;
   tc: number;
   corruption: number;

@@ -202,8 +202,11 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
   const faction = factions.find((f) => f.id === input.factionId) ?? factions[0]!;
   const stats = rollStats();
   const hpMax = rollStartingHP(race);
-  // Stamina scales lightly off STR (1d10 stat → +0..+5 bonus over base 8).
-  const staminaMax = 8 + Math.floor(stats.strength / 2);
+  // Stamina scales lightly off STR (1d10 stat → +0..+5 bonus over base 12).
+  // 2026-05-24 — bumped base 8 → 12 so the Tired status (< 25%) triggers
+  // after sustained activity instead of after 3 actions. Tied to the
+  // wider stamina overhaul (rest cost + hunger + combat depth).
+  const staminaMax = 12 + Math.floor(stats.strength / 2);
 
   const factionStanding: FactionStanding[] = factions.map((f) => ({
     factionId: f.id,

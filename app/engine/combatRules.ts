@@ -108,6 +108,42 @@ export function rollMods(
           consume.push('stealthed');
         }
         break;
+      // 2026-05-24 — stamina-driven statuses. tired and exhausted are
+      // auto-applied/cleared from stamina each tick; never consumed
+      // here. power_attack_pending and defensive_stance are tactical.
+      case 'tired':
+        if (action === 'attack_melee' || action === 'attack_ranged') {
+          penalty += 1;
+          sources.push('tired -1');
+        }
+        if (action === 'defense') {
+          penalty += 1;
+          sources.push('tired -1');
+        }
+        break;
+      case 'exhausted':
+        if (action === 'attack_melee' || action === 'attack_ranged') {
+          penalty += 2;
+          sources.push('exhausted -2');
+        }
+        if (action === 'defense') {
+          penalty += 2;
+          sources.push('exhausted -2');
+        }
+        break;
+      case 'power_attack_pending':
+        if (action === 'attack_melee' || action === 'attack_ranged') {
+          bonus += 2;
+          sources.push('power attack +2');
+          consume.push('power_attack_pending');
+        }
+        break;
+      case 'defensive_stance':
+        if (action === 'defense') {
+          bonus += 2;
+          sources.push('defensive +2');
+        }
+        break;
     }
   }
   return { bonus, penalty, net: bonus - penalty, sources, consume };

@@ -566,7 +566,20 @@ function acceptKeyword(title: string): string {
 }
 
 function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
-  const stamMax = p.staminaMax ?? 8 + Math.floor((p.stats?.strength ?? 5) / 2);
+  // 2026-05-24 — staminaMax formula bumped from `8 + floor(STR/2)` to
+  // `12 + floor(STR/2)` so the new Tired status (< 25% max) triggers at
+  // a realistic count instead of after 3 actions. Existing saves with a
+  // baked-in lower staminaMax get upgraded here only if their current
+  // max matches the OLD formula exactly (so manually-tuned characters
+  // aren't overwritten). New characters from CharacterCreation already
+  // get the new formula at creation time.
+  const newMaxFormula = 12 + Math.floor((p.stats?.strength ?? 5) / 2);
+  const oldMaxFormula = 8 + Math.floor((p.stats?.strength ?? 5) / 2);
+  const stamMax = p.staminaMax === undefined
+    ? newMaxFormula
+    : p.staminaMax === oldMaxFormula
+      ? newMaxFormula
+      : p.staminaMax;
   // Migrate legacy single-slot equipped fields to the multi-slot shape.
   // Old saves may have a single `armor` field — promote it to the chest slot.
   const eq = p.equipped ?? {};
@@ -644,6 +657,10 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     inventory,
     staminaMax: stamMax,
     stamina: p.stamina ?? stamMax,
+    // 2026-05-24 — hunger penalty defaults to 0 on legacy saves; ticks
+    // up every 8 in-game hours without eating, capped at 5. Eating any
+    // food consumable resets to 0.
+    hungerStaminaPenalty: p.hungerStaminaPenalty ?? 0,
     milestones: p.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 },
     // OTA 058 — initialize stat progress for legacy saves so the
     // use-based growth system has a clean baseline.
@@ -769,19 +786,68 @@ const INTENT_TO_STAT: Record<string, keyof PlayerCharacter['stats']> = {
   use_relic: 'wisdom',
 };
 
+// 2026-05-24 — effective stamina max accounting for hunger penalty.
+// hungerStaminaPenalty (0-5) shrinks the usable cap; the raw staminaMax
+// field is the unmodified character ceiling. Always use this when
+// capping restoreStamina / showing remaining headroom / computing
+// tired-status thresholds.
+function effectiveStaminaMax(player: PlayerCharacter): number {
+  return Math.max(1, player.staminaMax - (player.hungerStaminaPenalty ?? 0));
+}
+
+// 2026-05-24 — keep tired / exhausted statuses in sync with current
+// stamina. Auto-applies when stamina crosses below the threshold and
+// auto-clears when stamina rises back above. Idempotent: safe to call
+// after every spend/restore. Recomputed-from-stamina shape means no
+// persistence drift; reverting the OTA leaves these inert.
+function tickPlayerStaminaStatuses(player: PlayerCharacter): PlayerCharacter {
+  const effMax = effectiveStaminaMax(player);
+  const tiredThreshold = Math.floor(effMax * 0.25);
+  const shouldBeTired = player.stamina <= tiredThreshold && player.stamina > 0;
+  const shouldBeExhausted = player.stamina <= 0;
+  const fx = (player.statusEffects ?? []).filter(
+    (e) => e.kind !== 'tired' && e.kind !== 'exhausted',
+  );
+  if (shouldBeExhausted) {
+    fx.push({ kind: 'exhausted', remainingRounds: 99, label: 'exhausted' });
+  } else if (shouldBeTired) {
+    fx.push({ kind: 'tired', remainingRounds: 99, label: 'tired' });
+  }
+  return { ...player, statusEffects: fx };
+}
+
 function spendStamina(player: PlayerCharacter, amount: number): PlayerCharacter {
-  return { ...player, stamina: Math.max(0, player.stamina - amount) };
+  return tickPlayerStaminaStatuses({
+    ...player,
+    stamina: Math.max(0, player.stamina - amount),
+  });
 }
 
 // Advance the in-game clock by `hours`. Used by anything that isn't a rest
 // — travel (long), attack (short), skill check (short) — so the day/night
 // cycle progresses naturally even without explicit camping.
+//
+// 2026-05-24 — also ticks hungerStaminaPenalty: every 8 in-game hours
+// crossed increments the penalty by 1 (cap 5). Eating any consumable
+// resets the penalty to 0 elsewhere. Doing the tick here (instead of in
+// rest specifically) means hunger advances regardless of which time-
+// advancing path the player took — rest, travel, combat, climb, all
+// route through advanceTime eventually.
 function advanceTime(player: PlayerCharacter, hours: number): PlayerCharacter {
-  return { ...player, hoursElapsed: (player.hoursElapsed ?? 0) + hours };
+  const oldHours = player.hoursElapsed ?? 0;
+  const newHours = oldHours + hours;
+  const oldBucket = Math.floor(oldHours / 8);
+  const newBucket = Math.floor(newHours / 8);
+  const ticks = Math.max(0, newBucket - oldBucket);
+  const newHunger = Math.min(5, (player.hungerStaminaPenalty ?? 0) + ticks);
+  return { ...player, hoursElapsed: newHours, hungerStaminaPenalty: newHunger };
 }
 
 function restoreStamina(player: PlayerCharacter, amount: number): PlayerCharacter {
-  return { ...player, stamina: Math.min(player.staminaMax, player.stamina + amount) };
+  return tickPlayerStaminaStatuses({
+    ...player,
+    stamina: Math.min(effectiveStaminaMax(player), player.stamina + amount),
+  });
 }
 
 interface GameStore {
@@ -4424,17 +4490,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           // Eating still costs a slice of the day — half an hour to break
           // and chew a ration, so the clock advances too.
+          // 2026-05-24 — eating any consumable resets hungerStaminaPenalty
+          // to 0 (you've fed yourself; the cap shrink heals immediately).
+          // Trail Rations / Speckled Egg / etc. now have a real role.
           const prevHpEat = player.hp;
           const hpMaxEat = player.hpMax;
           set({
             player: advanceTime(
-              {
+              tickPlayerStaminaStatuses({
                 ...player,
                 hp: player.hp + heal,
                 stamina: player.stamina + stamGain,
+                hungerStaminaPenalty: 0,
                 inventory: newInventory,
                 statusEffects: newStatusEffects,
-              },
+              }),
               0.5,
             ),
           });
@@ -4534,15 +4604,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? (curCorr > 30 ? 4 : curCorr > 10 ? 2 : 1)
             : 0;
           const newCorrRest = Math.max(0, curCorr - corrDecay);
-          set({
-            player: {
-              ...player,
-              hp: player.hp + heal,
-              stamina: player.stamina + stamGain,
-              corruption: newCorrRest,
-              hoursElapsed: newHours,
-            },
-          });
+          // 2026-05-24 — route the time advance through advanceTime so
+          // hungerStaminaPenalty ticks consistently across both rest
+          // paths (this one is the parser-routed rest, separate from
+          // the store-method rest() at line ~10880). advanceTime sets
+          // hoursElapsed AND increments hunger; tickPlayerStaminaStatuses
+          // syncs Tired/Exhausted based on the new stamina value.
+          const restedPlayer = tickPlayerStaminaStatuses(
+            advanceTime(
+              { ...player, hp: player.hp + heal, stamina: player.stamina + stamGain, corruption: newCorrRest },
+              hours,
+            ),
+          );
+          set({ player: restedPlayer });
           // OTA 039 — tier-cross line on rest decay.
           if (corrDecay > 0) {
             // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -10821,12 +10895,46 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const player = get().player;
     if (!player) return;
     const hpRoom = player.hpMax - player.hp;
-    const stamRoom = player.staminaMax - player.stamina;
+    const effMax = effectiveStaminaMax(player);
+    const stamRoom = effMax - player.stamina;
     // Rest always advances time, even at full health/stamina — you sat
     // somewhere for a while. 4-7 hours per rest, rolled randomly.
     const hoursSlept = rollDie(4) + 3;
     const newHours = (player.hoursElapsed ?? 0) + hoursSlept;
-    if (hpRoom <= 0 && stamRoom <= 0) {
+    // 2026-05-24 — hunger ticks via advanceTime below. For the
+    // pre-recovery log + arbiter warning we need to know how many
+    // hunger ticks WILL fire, so peek at the bucket boundaries.
+    const oldHungerBucket = Math.floor((player.hoursElapsed ?? 0) / 8);
+    const newHungerBucket = Math.floor(newHours / 8);
+    const hungerTicks = Math.max(0, newHungerBucket - oldHungerBucket);
+    const newHungerPenalty = Math.min(5, (player.hungerStaminaPenalty ?? 0) + hungerTicks);
+    // 2026-05-24 — per-hour weather damage during rest. Re-uses the
+    // existing tickWeather probabilistic per-action damage by calling
+    // it once per hour slept. So sleeping 8 hours in Ash Storm rolls 8
+    // ticks of "stamina -1 with prob 0.4" — roughly 3 stamina lost on
+    // average. Capped so the player never wakes dead (min HP 1 after).
+    const sceneRest = get().currentScene;
+    const weatherForRest = sceneRest?.weather ?? null;
+    let weatherHpDamage = 0;
+    let weatherStamDamage = 0;
+    if (weatherForRest) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { tickWeather } = require('../engine/weatherEffects');
+      for (let h = 0; h < hoursSlept; h++) {
+        const tick = tickWeather(weatherForRest, player);
+        if (tick.hpDelta < 0) weatherHpDamage += -tick.hpDelta;
+        if (tick.staminaDelta < 0) weatherStamDamage += -tick.staminaDelta;
+      }
+    }
+    // 2026-05-24 — ambush-on-rest in dangerous biomes. Hubs / vendor
+    // rooms / Outpost are exempt; everywhere else has a 15% chance per
+    // rest to spawn a wasteland encounter. Rest still completes (HP +
+    // stamina granted) — the encounter fires after the recovery so the
+    // player wakes up at full strength but with a problem.
+    const sceneLoc = sceneRest?.location;
+    const inSafeZone = sceneLoc ? isHubLocation(sceneLoc.id) : false;
+    const ambushTriggered = !inSafeZone && Math.random() < 0.15;
+    if (hpRoom <= 0 && stamRoom <= 0 && hungerTicks === 0 && weatherHpDamage === 0 && weatherStamDamage === 0 && !ambushTriggered) {
       set((s) => (s.player ? { player: { ...s.player, hoursElapsed: newHours } } : s));
       get().appendLog(
         'world',
@@ -10839,23 +10947,66 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const stamGain = Math.min(stamRoom, rollDie(6) + 2);
     const prevHpRest = player.hp;
     const hpMaxRest = player.hpMax;
+    // Apply heal + stamGain first, then weather damage (which is capped
+    // so it never kills outright in your sleep).
+    const afterRecoveryHp = Math.min(player.hpMax, player.hp + heal);
+    const afterWeatherHp = Math.max(1, afterRecoveryHp - weatherHpDamage);
+    const afterRecoveryStam = Math.min(effMax, player.stamina + stamGain);
+    const afterWeatherStam = Math.max(0, afterRecoveryStam - weatherStamDamage);
     set({
-      player: {
-        ...player,
-        hp: player.hp + heal,
-        stamina: player.stamina + stamGain,
-        hoursElapsed: newHours,
-      },
+      player: tickPlayerStaminaStatuses(
+        advanceTime(
+          {
+            ...player,
+            hp: afterWeatherHp,
+            stamina: afterWeatherStam,
+          },
+          hoursSlept,
+        ),
+      ),
     });
     const parts: string[] = [];
     if (heal > 0) parts.push(`2d6 → ${heal} HP`);
     if (stamGain > 0) parts.push(`d6+2 → ${stamGain} stamina`);
+    if (weatherHpDamage > 0 || weatherStamDamage > 0) {
+      const wParts: string[] = [];
+      if (weatherHpDamage > 0) wParts.push(`-${weatherHpDamage} HP`);
+      if (weatherStamDamage > 0) wParts.push(`-${weatherStamDamage} stamina`);
+      parts.push(`weather ${wParts.join(' / ')}`);
+    }
+    if (hungerTicks > 0) {
+      parts.push(`hunger +${hungerTicks} (now -${newHungerPenalty} max)`);
+    }
     get().appendLog(
       'world',
-      `You rest for ${hoursSlept} hours. ${parts.join(', ')} recovered. (${describeTime(newHours)})`,
+      `You rest for ${hoursSlept} hours. ${parts.length ? parts.join(', ') + ' recovered/spent' : 'time passes'}. (${describeTime(newHours)})`,
     );
+    if (newHungerPenalty >= 3 && (player.hungerStaminaPenalty ?? 0) < 3) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter watches you stand. "You're running on empty. Eat something soon."`,
+      );
+    }
+    // Ambush narration + encounter spawn happens AFTER recovery so the
+    // player wakes at full strength but lands in combat / scene.
+    if (ambushTriggered) {
+      // 2026-05-24 — narrative ambush. Wakes the player startled +
+      // shaves recovered stamina (representing disturbed sleep). A
+      // follow-up OTA can wire this to actual combat spawn through
+      // pickWastelandEncounter; for this OTA the narrative beat is
+      // enough to make rest-in-wasteland feel risky vs rest-in-hub.
+      get().appendLog(
+        'world',
+        `Mid-sleep, a noise drags you awake — something circled the camp while you breathed deep. You shoulder your pack one-handed and move on, half-rested.`,
+      );
+      const live = get().player;
+      if (live) {
+        const startleLoss = Math.min(3, live.stamina);
+        set((s) => (s.player ? { player: { ...s.player, stamina: s.player.stamina - startleLoss } } : s));
+      }
+    }
     // OTA 228 — rest may push HP back over the 5% latch threshold.
-    checkLowHpWarning(prevHpRest, prevHpRest + heal, hpMaxRest, get, set);
+    checkLowHpWarning(prevHpRest, afterWeatherHp, hpMaxRest, get, set);
     void get().persist();
   },
 
