@@ -85,6 +85,11 @@ jobs:
           fi
           echo "ok: keystore unlocks, alias '$ANDROID_KEY_ALIAS' present"
 
+      - name: Install expect (drive PEPK's TTY-only password prompts)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq expect
+
       - name: Run PEPK — produce encrypted upload-key ZIP
         env:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -93,18 +98,50 @@ jobs:
         run: |
           set -euo pipefail
 
-          # PEPK reads two passwords interactively from stdin in order:
-          #   1) keystore (store) password
-          #   2) key password
-          # printf both with newlines so PEPK consumes them without a TTY.
-          printf '%s\n%s\n' "$ANDROID_KEYSTORE_PASSWORD" "$ANDROID_KEY_PASSWORD" | \
-            java -jar ci/play-app-signing/pepk.jar \
-              --keystore=tartaria-upload.jks \
-              --alias="$ANDROID_KEY_ALIAS" \
-              --output=encrypted_upload_key.zip \
-              --include-cert \
-              --rsa-aes-encryption \
-              --encryption-key-path=ci/play-app-signing/encryption_public_key.pem
+          # PEPK calls java.io.Console.readPassword() which returns null
+          # without a controlling TTY (CI runner case → NPE). Drive it via
+          # expect so the prompts get a real pseudo-tty.
+          cat > /tmp/run-pepk.expect <<'EXPECT_SCRIPT'
+          #!/usr/bin/expect -f
+          set timeout 120
+          set keystore_pass $env(ANDROID_KEYSTORE_PASSWORD)
+          set key_pass $env(ANDROID_KEY_PASSWORD)
+          set key_alias $env(ANDROID_KEY_ALIAS)
+
+          # Log everything PEPK prints so a prompt-pattern miss is diagnosable.
+          log_user 1
+
+          spawn java -jar ci/play-app-signing/pepk.jar \
+            --keystore=tartaria-upload.jks \
+            --alias=$key_alias \
+            --output=encrypted_upload_key.zip \
+            --include-cert \
+            --rsa-aes-encryption \
+            --encryption-key-path=ci/play-app-signing/encryption_public_key.pem
+
+          # Two password prompts in order: store, then key.
+          # Broad "ass" regex tolerates variants like
+          #   "Password for the store containing private key:"
+          #   "Password for the key:"
+          # without committing to exact wording.
+          expect {
+            -re "(?i)pass" { send -- "$keystore_pass\r" }
+            timeout { puts stderr "::error::Timed out waiting for keystore password prompt."; exit 2 }
+            eof { puts stderr "::error::PEPK exited before keystore password prompt."; exit 3 }
+          }
+          expect {
+            -re "(?i)pass" { send -- "$key_pass\r" }
+            timeout { puts stderr "::error::Timed out waiting for key password prompt."; exit 4 }
+            eof { puts stderr "::error::PEPK exited before key password prompt."; exit 5 }
+          }
+          expect eof
+          catch wait result
+          set status [lindex $result 3]
+          exit $status
+          EXPECT_SCRIPT
+
+          chmod +x /tmp/run-pepk.expect
+          /tmp/run-pepk.expect
 
           ls -lh encrypted_upload_key.zip
           echo "::notice::ZIP produced. Download the 'encrypted-upload-key' artifact from this run, then upload it in Play Console under 'Upload generated ZIP'."
