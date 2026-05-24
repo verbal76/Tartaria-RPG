@@ -199,7 +199,7 @@ import { isAreaSearch, isGroundSearch, rollAreaSearch } from '../engine/areaSear
 import { classifyNoun, rollBreakLoot } from '../engine/sceneNounMaterial';
 import { isClimbable, isSwimmable, isSearchable } from '../engine/interactionTags';
 import { rollSalvagePool } from '../engine/salvagePools';
-import { isOversized, refusalLine } from '../engine/portability';
+import { isOversized, refusalLine, sceneFeatureRefusalLine } from '../engine/portability';
 import { bestDigTool, rollDig } from '../engine/digging';
 import {
   generateWorldMap,
@@ -1293,10 +1293,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!cat) {
       // Scene feature, not a portable item. Same redirect as the
       // verb-routed pickup path uses.
-      get().appendLog(
-        'world',
-        `The ${ambientHit} is part of the scene, not a loose drop. Try the SALVAGE button instead to harvest it for parts.`,
-      );
+      // 2026-05-24 — use the in-character refusal line instead of the
+      // old diagnostic "is part of the scene" string.
+      get().appendLog('world', sceneFeatureRefusalLine(ambientHit));
       return;
     }
     // Self-healing dedup: a noun is "really consumed" only when the
@@ -2035,9 +2034,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // authored interactables, use only the interior pool (hub +
     // microMicro). The wasteland nouns reappear naturally when the
     // player leaves the outpost.
-    const ambientNouns = (hubRoom && hubNouns.length > 0)
+    // 2026-05-24 — inject curated climbables (climbableSpawns.ts).
+    // Hub rooms (indoor) get up to 2; outdoor regions/cities get up
+    // to 3. Filtered by isIndoorLocation per the playtester rule
+    // "don't spawn a stone arch in an observatory." The injection
+    // augments the substring-derived climbables (arch / pillar /
+    // tower / etc.) — to keep total climb noise sane we cap the
+    // pre-curated climbable count at 1 when adding curated ones, so
+    // the climb modal doesn't read as "arch / pillar / column /
+    // 3 new spawns" every visit. Player saw "arch on every move";
+    // this enforces variety.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { pickClimbablesForScene } = require('../engine/climbableSpawns');
+    const curatedClimbables: string[] = pickClimbablesForScene(
+      hubRoom ?? location,
+    );
+    const baseAmbient = (hubRoom && hubNouns.length > 0)
       ? Array.from(new Set([...hubNouns, ...microMicroNouns]))
       : Array.from(new Set([...locNouns, ...hubNouns, ...microMicroNouns]));
+    // Throttle pre-existing climbable nouns to max 1 before appending
+    // curated spawns. Keeps the climb modal showing 2-4 options rather
+    // than 5+ when the location already authors several climbable
+    // interactables (arches, pillars, towers).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isClimbable: isClimbableCheck } = require('../engine/interactionTags');
+    let keptOneClimbable = false;
+    const filteredBase: string[] = [];
+    for (const n of baseAmbient) {
+      if (isClimbableCheck(n)) {
+        if (keptOneClimbable) continue;
+        keptOneClimbable = true;
+      }
+      filteredBase.push(n);
+    }
+    const ambientNouns = Array.from(new Set([...filteredBase, ...curatedClimbables]));
     // Lock the visible subset for THIS scene visit. Look-around and
     // the chip pool (Search/Approach/Salvage) BOTH read from this
     // same cache — strict match. If a noun isn't in your look-around,
@@ -6521,10 +6551,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               }
               // Not in the catalog — it's a scene feature, not a portable
               // item. Redirect to salvage so the player knows what to do.
-              get().appendLog(
-                'world',
-                `The ${ambientHit} is part of the scene, not a loose drop. Try 'salvage ${ambientHit}' to harvest it for parts.`,
-              );
+              // 2026-05-24 — flavored refusal line in place of the old
+              // diagnostic. Salvage hint included in some lines.
+              get().appendLog('world', sceneFeatureRefusalLine(ambientHit));
               break;
             }
           }

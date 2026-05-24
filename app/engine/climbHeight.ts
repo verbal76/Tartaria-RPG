@@ -42,6 +42,14 @@ function heightPatternMatches(noun: string, pattern: string): boolean {
 }
 
 export function climbHeightFor(noun: string): number {
+  // 2026-05-24 — curated spawn pool (climbableSpawns.ts) takes
+  // precedence over the substring matcher. Player-spec heights for
+  // the 15 new props land first; the legacy substring table catches
+  // anything authored as a scene interactable (arch, pillar, etc.).
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { curatedClimbHeight } = require('./climbableSpawns');
+  const curated = curatedClimbHeight(noun);
+  if (curated != null) return curated;
   const n = noun.toLowerCase();
   for (const k of Object.keys(CLIMB_HEIGHT)) {
     if (heightPatternMatches(n, k)) return CLIMB_HEIGHT[k]!;

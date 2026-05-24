@@ -144,7 +144,14 @@ export function getInteractionTags(noun: string): Set<InteractionTag> {
 }
 
 export function isClimbable(noun: string): boolean {
-  return getInteractionTags(noun).has('climbable');
+  if (getInteractionTags(noun).has('climbable')) return true;
+  // 2026-05-24 — curated climbable spawns (climbableSpawns.ts) carry
+  // nouns like "ruined skyscraper" / "petrified mud wave" that don't
+  // overlap the substring matcher above. Check the curated pool too
+  // so the climb verb accepts the new spawns as valid targets.
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { curatedClimbHeight } = require('./climbableSpawns');
+  return curatedClimbHeight(noun) != null;
 }
 export function isSwimmable(noun: string): boolean {
   return getInteractionTags(noun).has('swimmable');

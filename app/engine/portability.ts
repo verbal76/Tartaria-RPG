@@ -166,3 +166,23 @@ export function refusalLine(noun: string): string {
 
 /** Exposed for tests. */
 export const __TEST_ONLY__ = { RULES };
+
+// 2026-05-24 — playtester ask: replace the diagnostic
+// "X is part of the scene, not a loose drop" line with an in-character
+// refusal that reads as world-flavor rather than an engine error.
+// Used at the two pickup paths in gameStore.ts where a noun resolves
+// in the scene but not in the item catalog.
+const SCENE_FEATURE_REFUSALS: string[] = [
+  `You reach for the {target}, but a bolt of Aetheric energy snaps across the ground beside you. You decide that's not the best idea.`,
+  `Your fingers close on the {target} — and pass through where you thought a handhold was. It's part of the world here, not a thing to take.`,
+  `You start to lift the {target} and the silt shifts beneath your boots; you let go. Some things belong to the ground.`,
+  `The {target} is fused to the stone around it. You'd need to break it loose, not just pick it up. (Try SALVAGE.)`,
+  `An Aetheric hum rises from the {target} the moment you touch it. You step back, breathing. The world's keeping that one for itself.`,
+  `The {target} weighs more than you do. The Arbiter watches you try anyway, then mercifully looks away. (Try SALVAGE.)`,
+  `You wrap your hands around the {target} and your shoulders argue. It's part of the bones of this place. Whatever it gives up, it'll give to a pry, not a lift.`,
+  `Dust rises off the {target} when you touch it — and settles right back. Whatever it is, it's been here longer than your race. Leave it. Or salvage it.`,
+];
+
+export function sceneFeatureRefusalLine(noun: string): string {
+  return pickLine(SCENE_FEATURE_REFUSALS).replace(/\{target\}/g, noun);
+}
