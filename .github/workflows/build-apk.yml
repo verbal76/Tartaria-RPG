@@ -3,6 +3,13 @@ name: Android Build (Tartaria Realms)
 # First signed Play Store AAB: OTA 463 / build aab-build-N.
 # Triggered by commits containing [build-aab] (see meta step below)
 # or by pushing a refs/tags/v* tag.
+#
+# IMPORTANT: the [build-aab] commit message marker is only honored
+# when the commit ALSO modifies a file outside paths-ignore. Bumping
+# OTA_BUILD_ID in app/buildInfo.ts alone does NOT fire this workflow,
+# because app/** is path-ignored. To force an AAB build, either touch
+# a non-ignored file (eas.json, this workflow, etc.) in the same
+# commit, or push a refs/tags/v* tag.
 
 on:
   push:
