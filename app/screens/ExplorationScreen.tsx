@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
@@ -11,6 +11,7 @@ import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
 import { SalvageModal, isSalvageable as isSalvageableForModal } from '../components/SalvageModal';
+import { BrandedModal } from '../components/BrandedModal';
 import { TakeModal } from '../components/TakeModal';
 import { ClimbModal } from '../components/ClimbModal';
 import { FeedbackModal } from '../components/FeedbackModal';
@@ -68,6 +69,13 @@ export function ExplorationScreen() {
   // climbable noun in the current scene; tapping one fires `climb
   // <noun>` which resolves one tier in the climb handler.
   const [climbOpen, setClimbOpen] = useState(false);
+  // 2026-05-25 — branded vendor-leave prompt (POLISH-4). Replaces
+  // the native Alert that was breaking the dark+amber palette. Holds
+  // {vendorName, pendingText} so confirmation dispatches the
+  // originally-typed move command.
+  const [vendorLeavePrompt, setVendorLeavePrompt] = useState<
+    { vendorName: string; pendingText: string } | null
+  >(null);
   // OTA 202 — designer-note modal. Wired to the 📝 button in the
   // input row (InputBox.onOpenFeedback prop).
   const [feedbackOpen, setFeedbackOpen] = useState(false);
@@ -418,14 +426,10 @@ export function ExplorationScreen() {
               const vendor = currentScene?.vendor;
               const isMove = /^(go\s+|head\s+|walk\s+|move\s+)?(north|south|east|west|northeast|northwest|southeast|southwest|n|s|e|w|ne|nw|se|sw|continue|continue travel|onward)$/i.test(text.trim());
               if (vendor && isMove) {
-                Alert.alert(
-                  'Vendor present',
-                  `${vendor.name} is still set up here. Leave them behind and move on?`,
-                  [
-                    { text: 'Stay', style: 'cancel' },
-                    { text: 'Move on', onPress: () => submit(text) },
-                  ],
-                );
+                // 2026-05-25 — branded modal (BrandedModal below)
+                // replaces the OS Alert. Same yes/no/dismiss shape;
+                // matches the rest of the game's popup palette.
+                setVendorLeavePrompt({ vendorName: vendor.name, pendingText: text });
                 return;
               }
               submit(text);
@@ -745,6 +749,33 @@ export function ExplorationScreen() {
           />
         );
       })()}
+
+      {/* 2026-05-25 — branded vendor-leave prompt. Replaces the
+          native Alert.alert that broke the dark+amber palette. */}
+      <BrandedModal
+        visible={vendorLeavePrompt !== null}
+        title="Vendor present"
+        body={vendorLeavePrompt
+          ? `${vendorLeavePrompt.vendorName} is still set up here. Leave them behind and move on?`
+          : undefined}
+        buttons={[
+          {
+            label: 'Stay',
+            onPress: () => setVendorLeavePrompt(null),
+            tone: 'neutral',
+          },
+          {
+            label: 'Move on',
+            onPress: () => {
+              const text = vendorLeavePrompt?.pendingText ?? '';
+              setVendorLeavePrompt(null);
+              if (text) submit(text);
+            },
+            tone: 'primary',
+          },
+        ]}
+        onRequestClose={() => setVendorLeavePrompt(null)}
+      />
     </KeyboardAvoidingView>
   );
 }

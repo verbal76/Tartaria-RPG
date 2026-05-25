@@ -21,7 +21,8 @@
 // host still renders the entries as info-only).
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import { BrandedModal } from './BrandedModal';
 import factionsData from '../data/factions/factions.json';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
@@ -34,6 +35,10 @@ type Section = 'races' | 'factions' | 'places' | 'timeline';
 export function LoreCodexBody() {
   const [section, setSection] = useState<Section>('races');
   const [pendingRoute, setPendingRoute] = useState<Location | null>(null);
+  // 2026-05-25 — branded refusal modal for the hub-room gate.
+  // Replaces the native Alert.alert that was breaking the dark
+  // theme on the title-screen path.
+  const [hubRefusalDest, setHubRefusalDest] = useState<string | null>(null);
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
   const setTravelCourse = useGameStore((s) => s.setTravelCourse);
@@ -53,19 +58,10 @@ export function LoreCodexBody() {
     // The player has to leave the outpost first — same gate the
     // cardinal-travel handler applies for outdoor moves from hubs.
     if (player.hubRoomId) {
-      // 2026-05-25 — surface the refusal as a modal Alert instead of
-      // a quiet Arbiter log. User report: "set course button no
-      // longer sets the course on the main screen" — they were
-      // inside an outpost when tapping Set Course, getting the
-      // silent appendLog refusal, and assuming the button was
-      // broken. Alert forces acknowledgement and points at the
-      // exact next step.
-      const destName = pendingRoute.name;
-      Alert.alert(
-        'Leave the outpost first',
-        `The Arbiter can't chart you to ${destName} from inside the outpost. Walk through the gate (or type "leave outpost"), then tap Set Course again.`,
-        [{ text: 'OK', onPress: () => setScreen('exploration') }],
-      );
+      // 2026-05-25 — branded modal replaces the OS Alert. Same copy
+      // / same behavior on dismiss (back to exploration), just in
+      // the dark+amber palette the rest of the game uses.
+      setHubRefusalDest(pendingRoute.name);
       return;
     }
     setTravelCourse(id);
@@ -189,6 +185,30 @@ export function LoreCodexBody() {
           </View>
         </View>
       </Modal>
+
+      {/* 2026-05-25 — branded refusal modal for hub-room gate.
+          Same dark+amber palette as the rest of the game's popups. */}
+      <BrandedModal
+        visible={hubRefusalDest !== null}
+        title="Leave the outpost first"
+        body={hubRefusalDest
+          ? `The Arbiter can't chart you to ${hubRefusalDest} from inside the outpost. Walk through the gate (or type "leave outpost"), then tap Set Course again.`
+          : undefined}
+        buttons={[
+          {
+            label: 'OK',
+            onPress: () => {
+              setHubRefusalDest(null);
+              setScreen('exploration');
+            },
+            tone: 'primary',
+          },
+        ]}
+        onRequestClose={() => {
+          setHubRefusalDest(null);
+          setScreen('exploration');
+        }}
+      />
     </View>
   );
 }

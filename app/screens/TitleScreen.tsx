@@ -10,7 +10,6 @@ import {
   Linking,
   Share,
   BackHandler,
-  Alert,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import {
@@ -95,6 +94,7 @@ export function TitleScreen() {
     | { kind: 'delete'; slot: SlotSummary }
     | { kind: 'resurrect'; slot: SlotSummary }
     | { kind: 'fallen'; slot: SlotSummary }
+    | { kind: 'exit' }
     | null
   >(null);
 
@@ -587,16 +587,7 @@ export function TitleScreen() {
         <TouchableOpacity
           style={styles.exitBtn}
           activeOpacity={0.7}
-          onPress={() => {
-            Alert.alert(
-              'Exit Game',
-              'Close Tartaria Realms? Any unsaved progress will be lost — use SAVE & EXIT from in-game to keep it.',
-              [
-                { text: 'Stay', style: 'cancel' },
-                { text: 'Exit', style: 'destructive', onPress: () => BackHandler.exitApp() },
-              ],
-            );
-          }}
+          onPress={() => setPendingAction({ kind: 'exit' })}
         >
           <Text style={styles.exitBtnText}>EXIT GAME</Text>
         </TouchableOpacity>
@@ -608,6 +599,7 @@ export function TitleScreen() {
           pendingAction?.kind === 'delete' ? 'Delete Tartarian'
           : pendingAction?.kind === 'resurrect' ? 'Resurrect Tartarian'
           : pendingAction?.kind === 'fallen' ? 'Fallen'
+          : pendingAction?.kind === 'exit' ? 'Exit Game'
           : ''
         }
         body={
@@ -617,6 +609,8 @@ export function TitleScreen() {
             ? `${pendingAction.slot.playerName} has fallen. Spend 1 Resurrection Gem (you hold ${resurrectionGems}) to bring them back?`
           : pendingAction?.kind === 'fallen'
             ? `${pendingAction.slot.playerName} has fallen and you hold no Resurrection Gems. The buried world keeps them for now.`
+          : pendingAction?.kind === 'exit'
+            ? 'Close Tartaria Realms? Any unsaved progress will be lost — use SAVE & EXIT from in-game to keep it.'
           : undefined
         }
         buttons={
@@ -629,6 +623,11 @@ export function TitleScreen() {
             ? [
                 { label: 'Cancel', onPress: closeModal, tone: 'neutral' },
                 { label: 'Resurrect', onPress: () => { void resurrectSlot(pendingAction.slot.slotId); closeModal(); }, tone: 'primary' },
+              ]
+          : pendingAction?.kind === 'exit'
+            ? [
+                { label: 'Stay', onPress: closeModal, tone: 'neutral' },
+                { label: 'Exit', onPress: () => { closeModal(); BackHandler.exitApp(); }, tone: 'destructive' },
               ]
           : [{ label: 'OK', onPress: closeModal, tone: 'neutral' }]
         }

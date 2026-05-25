@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal } from 'react-native';
+import { BrandedModal } from '../components/BrandedModal';
 import { useGameStore } from '../state/gameStore';
 import { findHuntById, HUNTS } from '../engine/hunts';
 import { findMysteryById, MYSTERIES } from '../engine/mysteries';
@@ -76,6 +77,9 @@ export function ContractsScreen() {
   const setTravelCourse = useGameStore((s) => s.setTravelCourse);
   const appendLog = useGameStore((s) => s.appendLog);
   const [pendingRoute, setPendingRoute] = useState<{ id: string; name: string } | null>(null);
+  // 2026-05-25 — branded refusal modal for hub-room gate. Same
+  // palette as the rest of the game; replaces native Alert.alert.
+  const [hubRefusalDest, setHubRefusalDest] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>('contracts');
   // OTA 020 — tap-to-expand. Each card key (kind:id) maps to true
   // when expanded. Tap the card head to toggle; expanded view shows
@@ -845,13 +849,10 @@ export function ContractsScreen() {
                   // step onto a procedural tile while hubRoomId is
                   // still set, leaving the scene in a half-state.
                   if (player.hubRoomId) {
-                    // 2026-05-25 — Alert.alert instead of silent log
-                    // (same fix as LoreCodexBody confirmRoute).
-                    Alert.alert(
-                      'Leave the outpost first',
-                      `The Arbiter can't chart you to ${name} from inside the outpost. Walk through the gate (or type "leave outpost"), then tap Set Course again.`,
-                      [{ text: 'OK', onPress: () => setScreen('exploration') }],
-                    );
+                    // 2026-05-25 — branded modal (same palette as
+                    // the rest of the game) replaces the native
+                    // Alert that was breaking the dark theme.
+                    setHubRefusalDest(name);
                     return;
                   }
                   setTravelCourse(id);
@@ -864,6 +865,29 @@ export function ContractsScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* 2026-05-25 — branded refusal modal for hub-room gate. */}
+      <BrandedModal
+        visible={hubRefusalDest !== null}
+        title="Leave the outpost first"
+        body={hubRefusalDest
+          ? `The Arbiter can't chart you to ${hubRefusalDest} from inside the outpost. Walk through the gate (or type "leave outpost"), then tap Set Course again.`
+          : undefined}
+        buttons={[
+          {
+            label: 'OK',
+            onPress: () => {
+              setHubRefusalDest(null);
+              setScreen('exploration');
+            },
+            tone: 'primary',
+          },
+        ]}
+        onRequestClose={() => {
+          setHubRefusalDest(null);
+          setScreen('exploration');
+        }}
+      />
     </View>
   );
 }
