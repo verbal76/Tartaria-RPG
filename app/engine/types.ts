@@ -876,6 +876,17 @@ export interface VisitedRoom {
    *  searched, nothing more to do" line instead of looping the
    *  player on the same prop. */
   searchedAmbientNouns?: string[];
+  /** 2026-05-25 [POLISH-3] — ambient nouns whose investigate
+   *  outcome was pure flavor (no item / no XP / no hook produced).
+   *  Kept SEPARATE from searchedAmbientNouns so other verbs
+   *  (take, salvage, break) can still act on these nouns — only
+   *  the investigate verb consults this list to refuse a repeat
+   *  flavor-only outcome, and the Search modal reads it to render
+   *  the chip greyed + ✓ at the right side of the row. The
+   *  long-standing "investigate the bench → break the bench"
+   *  cross-verb flow is preserved because break never touches
+   *  this list. */
+  flavorExhaustedNouns?: string[];
   /** Audit fix — in-game hours elapsed at the most recent visit.
    *  Used by respawn-quiet calculation so idling for 6 real hours
    *  doesn't accidentally trigger respawn even when no in-game time

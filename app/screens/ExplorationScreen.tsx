@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Alert } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
@@ -115,7 +115,16 @@ export function ExplorationScreen() {
     const y = typeof player.mapY === 'number' ? player.mapY : '_';
     const roomKey = `${player.currentLocationId}@${microMicroId}@${x},${y}`;
     const room = worldMemory.visitedRooms?.[roomKey];
-    return new Set((room?.searchedAmbientNouns ?? []).map((n) => n.toLowerCase()));
+    // 2026-05-25 [POLISH-3] — include flavor-exhausted nouns so the
+    // Search modal chip renders greyed + sorted right after a
+    // nothing-yields-from-investigate outcome too (not only after a
+    // production-yielding investigate). Other verbs (take/salvage/
+    // break) don't read flavorExhaustedNouns so the cross-verb chain
+    // continues to work.
+    return new Set([
+      ...(room?.searchedAmbientNouns ?? []).map((n) => n.toLowerCase()),
+      ...(room?.flavorExhaustedNouns ?? []).map((n) => n.toLowerCase()),
+    ]);
   }, [
     player?.currentLocationId,
     player?.mapX,
@@ -350,7 +359,31 @@ export function ExplorationScreen() {
           />
         ) : (
           <InputBox
-            onSubmit={submit}
+            onSubmit={(text) => {
+              // 2026-05-25 [POLISH-4] — warn before leaving a vendor.
+              // When a cardinal direction or 'continue travel' submit
+              // comes through while a vendor banner is on the scene,
+              // prompt the player "leave [vendor]?" before actually
+              // moving. Yes → submit (stepDirection clears vendor on
+              // next-tile move); No → cancel the move, vendor stays
+              // visible. Typed direction commands ("n", "go north")
+              // are caught by the regex too. Anti-nag toggle is a
+              // follow-up (file as ANTINAG-1).
+              const vendor = currentScene?.vendor;
+              const isMove = /^(go\s+|head\s+|walk\s+|move\s+)?(north|south|east|west|northeast|northwest|southeast|southwest|n|s|e|w|ne|nw|se|sw|continue|continue travel|onward)$/i.test(text.trim());
+              if (vendor && isMove) {
+                Alert.alert(
+                  'Vendor present',
+                  `${vendor.name} is still set up here. Leave them behind and move on?`,
+                  [
+                    { text: 'Stay', style: 'cancel' },
+                    { text: 'Move on', onPress: () => submit(text) },
+                  ],
+                );
+                return;
+              }
+              submit(text);
+            }}
             onOpenInventory={() => setScreen('inventory')}
             onOpenSearch={() => setSearchOpen(true)}
             onOpenCrafting={() => setScreen('crafting')}
@@ -495,6 +528,16 @@ export function ExplorationScreen() {
           // intent picks up 'salvage' as a verb synonym (OTA 140) and
           // routes through the hook system + scene-noun matcher.
           submit(`salvage ${target}`);
+        }}
+        onSalvageAll={(nouns) => {
+          // 2026-05-25 [UI-3] — bulk fire one salvage submission per
+          // visible salvageable scene chip. Mirrors TakeModal's
+          // onTakeAll handler in ExplorationScreen:472. Each submit
+          // runs through the normal salvage path (pool match, RNG
+          // roll, junk-pool fallback per POLISH-2) so partial success
+          // is handled per-item by the engine.
+          setSalvageOpen(false);
+          for (const n of nouns) submit(`salvage ${n}`);
         }}
         onCancel={() => setSalvageOpen(false)}
       />

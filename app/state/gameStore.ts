@@ -3960,9 +3960,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
               player.mapY,
             );
             const searchPrior = get().worldMemory.visitedRooms?.[searchRoomKey];
-            const alreadySearched = nonClimbMarkers(searchPrior?.searchedAmbientNouns).some(
-              (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
-            );
+            // 2026-05-25 [POLISH-3] — also check flavorExhaustedNouns so a
+            // repeat investigate on a known-flavor-only noun short-circuits
+            // to the same "already worked over" line, instead of re-firing
+            // the same nothing narration. Other verbs (take/salvage/break)
+            // never see flavorExhaustedNouns so the inter-verb chain
+            // (investigate then break) is preserved.
+            const alreadySearched =
+              nonClimbMarkers(searchPrior?.searchedAmbientNouns).some(
+                (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
+              ) ||
+              nonClimbMarkers(searchPrior?.flavorExhaustedNouns).some(
+                (n) => n === ambientLower || ambientLower.includes(n) || n.includes(ambientLower),
+              );
             if (alreadySearched) {
               get().appendLog(
                 'world',
@@ -4052,6 +4062,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
                       [searchRoomKey]: {
                         ...room,
                         searchedAmbientNouns: [...(room.searchedAmbientNouns ?? []), ambientLower],
+                      },
+                    },
+                  },
+                };
+              });
+            } else {
+              // 2026-05-25 [POLISH-3] — flavor-only outcome (no item /
+              // no XP / no hook produced). Mark the noun as flavor-
+              // exhausted on a SEPARATE list so the Search modal chip
+              // greys + sorts right + suffixes ✓, but other verbs
+              // (take/salvage/break) keep working on the noun. Repeat
+              // investigates on a flavor-exhausted noun short-circuit
+              // via the alreadySearched check above (which also reads
+              // flavorExhaustedNouns) → "already worked over" line
+              // instead of re-firing the same flavor narration.
+              set((s) => {
+                const room = s.worldMemory.visitedRooms?.[searchRoomKey] ?? {
+                  firstVisitAt: Date.now(),
+                  lastVisitAt: Date.now(),
+                  visitCount: 1,
+                };
+                const existing = room.flavorExhaustedNouns ?? [];
+                if (existing.includes(ambientLower)) return s;
+                return {
+                  worldMemory: {
+                    ...s.worldMemory,
+                    visitedRooms: {
+                      ...(s.worldMemory.visitedRooms ?? {}),
+                      [searchRoomKey]: {
+                        ...room,
+                        flavorExhaustedNouns: [...existing, ambientLower],
                       },
                     },
                   },
@@ -10036,6 +10077,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? { player: { ...s.player, mapX: step.x, mapY: step.y, lastTravelDirection: dir } }
         : s,
     );
+    // 2026-05-25 [POLISH-4] — vendors no longer follow the player.
+    // Previously a roadside vendor stayed on currentScene as the
+    // player paced cardinal steps (vendor "followed for ~10 paces
+    // until you dismiss"). Now the vendor is cleared on every
+    // cardinal step — they remain at the tile where they spawned;
+    // a fresh per-step spawn roll later in this function may
+    // produce a different vendor on the new tile.
+    set((s) => (s.currentScene && s.currentScene.vendor
+      ? { currentScene: { ...s.currentScene, vendor: null } }
+      : s));
     if (step.landedOn && step.landedOn.locationId !== player.currentLocationId) {
       get().appendLog('world', `You walk ${dir}. You arrive at ${step.landedOn.locationName}.`);
       get().travelTo(step.landedOn.locationId);

@@ -82,13 +82,19 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
       savingRef.current = false;
       return;
     }
-    // Modal opening — reset state and kick off voice capture.
+    // 2026-05-25 [INPUT-1] — modal opening no longer auto-arms the
+    // mic. User reported the auto voice capture was unwanted; they'd
+    // open the note modal to type and find the mic already listening,
+    // capturing ambient room noise into the text. Now the modal opens
+    // text-only and the mic is opt-in via the manual TAP-TO-DICTATE
+    // button (visible in the modal UI below). All the continuous-
+    // capture re-arm logic stays intact for when the user explicitly
+    // enables voice; it just doesn't fire at mount time anymore.
     setText('');
     setMicError(null);
-    manualMode.current = false;
+    manualMode.current = true; // Default to text-only mode; user opts into mic.
     committedRef.current = '';
     savingRef.current = false;
-    void armSTT();
     return undefined;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
@@ -236,7 +242,7 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
                   value={text}
                   onChangeText={setText}
                   onFocus={switchToManual}
-                  placeholder='Tap to type, or just speak. e.g. "vendor chips disappeared after I purchased"'
+                  placeholder='Type your note. e.g. "vendor chips disappeared after I purchased"'
                   placeholderTextColor="#5a5246"
                   multiline
                   numberOfLines={4}
