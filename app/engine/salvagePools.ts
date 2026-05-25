@@ -181,10 +181,15 @@ export interface SalvageOutcome {
   quantity?: number;
 }
 
-/** Probability that even a matched pool returns nothing. Tuned so
- *  the player gets a positive outcome on most salvages but the
- *  RNG still feels meaningful — about 1 in 4 attempts come up dry. */
-const NOTHING_CHANCE = 0.25;
+/** Probability that even a matched pool returns nothing.
+ *  2026-05-25 [VERIFY-1] — lowered from 0.25 → 0.05 in response to
+ *  user feedback ("haven't seen scrap awarded in a while" + two
+ *  empty-loot repros in distilled log). 25% dry was too punishing;
+ *  the player perceived the action as broken. 5% keeps occasional
+ *  failures for RNG meaning without making the loop feel dead.
+ *  POLISH-2 (junk-pool fallback so output is NEVER zero) is the
+ *  deeper companion fix tracked separately. */
+const NOTHING_CHANCE = 0.05;
 
 function pickPool(noun: string): SalvagePool | null {
   const lower = noun.toLowerCase();

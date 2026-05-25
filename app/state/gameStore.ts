@@ -2067,18 +2067,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // curated spawns. Keeps the climb modal showing 2-4 options rather
     // than 5+ when the location already authors several climbable
     // interactables (arches, pillars, towers).
+    //
+    // 2026-05-25 [REGRESSION-1] — separately classify base nouns into
+    // take-friendly (not climbable, not salvageable), climbable, and
+    // salvageable buckets so the final 8-noun visible subset reserves
+    // slots for takeables. Previous flat shuffle could exclude every
+    // take noun when curated climbables + salvageables filled the
+    // pool (player reported 15-25 moves with no take options).
+    // Slot budget: up to 5 takes + up to 2 climb + up to 2 salvage =
+    // overflow capped at 8. Take-heavy by design — take is the most
+    // common action and was the visible-loop casualty of the spawn
+    // overhaul.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { isClimbable: isClimbableCheck } = require('../engine/interactionTags');
+    const { isClimbable: isClimbableCheck, isSalvageable: isSalvageableCheck } = require('../engine/interactionTags');
     let keptOneClimbable = false;
-    const filteredBase: string[] = [];
+    const baseTakeable: string[] = [];
+    const baseClimbable: string[] = [];
+    const baseSalvageable: string[] = [];
     for (const n of baseAmbient) {
       if (isClimbableCheck(n)) {
         if (keptOneClimbable) continue;
         keptOneClimbable = true;
+        baseClimbable.push(n);
+      } else if (isSalvageableCheck(n)) {
+        baseSalvageable.push(n);
+      } else {
+        baseTakeable.push(n);
       }
-      filteredBase.push(n);
     }
-    const ambientNouns = Array.from(new Set([...filteredBase, ...curatedClimbables, ...curatedSalvageables]));
+    const allClimbablesPool = Array.from(new Set([...baseClimbable, ...curatedClimbables]));
+    const allSalvageablesPool = Array.from(new Set([...baseSalvageable, ...curatedSalvageables]));
+    const ambientNouns = Array.from(new Set([...baseTakeable, ...allClimbablesPool, ...allSalvageablesPool]));
     // Lock the visible subset for THIS scene visit. Look-around and
     // the chip pool (Search/Approach/Salvage) BOTH read from this
     // same cache — strict match. If a noun isn't in your look-around,
@@ -2086,9 +2105,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // same eight; leave and come back to re-roll. Hook primaries get
     // appended to chips separately because they're active narrative
     // threads, not ambient props.
-    const displayedAmbientNouns = ambientNouns.length <= 8
-      ? [...ambientNouns]
-      : shuffleSlice(ambientNouns, 8);
+    let displayedAmbientNouns: string[];
+    if (ambientNouns.length <= 8) {
+      displayedAmbientNouns = [...ambientNouns];
+    } else {
+      // Reserve slots: 5 take + 2 climb + 2 salvage. Dedup overflow
+      // then top up any unused slot allocation from the remainder.
+      const pickedTakes = shuffleSlice(baseTakeable, 5);
+      const pickedClimb = shuffleSlice(allClimbablesPool, 2);
+      const pickedSalv = shuffleSlice(allSalvageablesPool, 2);
+      const reservedPicks = Array.from(new Set([...pickedTakes, ...pickedClimb, ...pickedSalv]));
+      const remaining = ambientNouns.filter((n) => !reservedPicks.includes(n));
+      const topupCount = Math.max(0, 8 - reservedPicks.length);
+      displayedAmbientNouns = [...reservedPicks, ...shuffleSlice(remaining, topupCount)].slice(0, 8);
+    }
     // microMicroId was resolved at the top of beginScene so the
     // encounter / loot rolls could use the ladder's curated pools.
     const scene: CurrentScene = {
@@ -10216,15 +10246,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set(() => ({ wastelandStepsSinceEncounter: wasteSteps }));
       // Tuning per playtest: a long run with zero combat at all means
       // the gate was too cautious. Tightened from threshold=3 /
-      // chance=0.4 (≈ 7% combat per step after skirmish-weight math)
-      // to threshold=2 / chance=0.55 — combined with the bumped
-      // skirmish weight in container_loot.json, this lands around
-      // 18-22% combat per step. Walking through Tartaria SHOULD feel
-      // dangerous.
+      // chance=0.4 to threshold=2 / chance=0.55, then again to
+      // chance=0.70 (2026-05-25 [BALANCE-2]) after user reported
+      // hours of travel through Outskirts + Buried Cities yielding
+      // only one Aetherkin encounter. Combined with the bumped
+      // skirmish weight in container_loot.json, 0.70 per eligible
+      // roll on a 2-step threshold should land combat ~30-35% per
+      // step in well-tagged biomes. Walking through Tartaria SHOULD
+      // feel dangerous. If still too quiet, the next pass should
+      // audit archetype tag coverage (wasteland_encounters.json
+      // matchers vs the location tags actually in use) — the
+      // archetype filter at wastelandEncounters.ts:131 silently
+      // returns null when no archetype matches.
       const enc = pickWastelandEncounter(scene.location, {
         stepsSinceLastEncounter: wasteSteps,
         threshold: 2,
-        rollChance: 0.55,
+        rollChance: 0.70,
       });
       if (enc) {
         set(() => ({ wastelandStepsSinceEncounter: 0 }));
@@ -10960,13 +10997,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
     // 2026-05-24 — ambush-on-rest in dangerous biomes. Hubs / vendor
-    // rooms / Outpost are exempt; everywhere else has a 15% chance per
+    // rooms / Outpost are exempt; everywhere else has a chance per
     // rest to spawn a wasteland encounter. Rest still completes (HP +
     // stamina granted) — the encounter fires after the recovery so the
     // player wakes up at full strength but with a problem.
+    // 2026-05-25 [BALANCE-1] — bumped from 0.15 → 0.22 (~1 in 4.5
+    // wild rests fires an event) in response to user stress test:
+    // 30 consecutive rests, zero encounters. Wild rest should feel
+    // risky; 15% was too quiet over a real play session.
     const sceneLoc = sceneRest?.location;
     const inSafeZone = sceneLoc ? isHubLocation(sceneLoc.id) : false;
-    const ambushTriggered = !inSafeZone && Math.random() < 0.15;
+    const ambushTriggered = !inSafeZone && Math.random() < 0.22;
     if (hpRoom <= 0 && stamRoom <= 0 && hungerTicks === 0 && weatherHpDamage === 0 && weatherStamDamage === 0 && !ambushTriggered) {
       set((s) => (s.player ? { player: { ...s.player, hoursElapsed: newHours } } : s));
       get().appendLog(

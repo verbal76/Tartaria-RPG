@@ -51,9 +51,10 @@ describe('salvage pool classifier', () => {
     expect(rollSalvagePool('frost lantern', rng)?.poolId).toBe('light');
   });
 
-  it('rolls "nothing" outcome about 25% of the time', () => {
-    // rng() returns < 0.25 → nothing branch
-    const lowRng = () => 0.1;
+  it('rolls "nothing" outcome about 5% of the time', () => {
+    // VERIFY-1 (2026-05-25): NOTHING_CHANCE lowered from 0.25 → 0.05.
+    // rng() returns < 0.05 → nothing branch.
+    const lowRng = () => 0.01;
     expect(rollSalvagePool('wagon', lowRng)?.kind).toBe('nothing');
   });
 
