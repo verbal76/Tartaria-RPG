@@ -1743,6 +1743,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   appendLog(channel, text, meta) {
+    // 2026-05-25 OTA-034 — narration-channel invariant. The authored
+    // vendor caught-stealing line ("Thief! — steel comes out.") is
+    // emitted ONCE in this file inside stealFromVendor. A first-time
+    // playtester paraphrased something that read like that line on a
+    // benign new-game investigate, and although the dev sweep proved
+    // no current path produces it outside steal context, we want a
+    // belt-and-braces guard so a future cognitive-layer leak, hook
+    // misfire, or accidental call site can't surface theft / "answer
+    // for actions" / "caught mid-lift" wording to a player who never
+    // tried to steal. Pass `meta.stealCaught === true` from the only
+    // legitimate emit site; any other call carrying these phrases is
+    // demoted to a debug breadcrumb so we can trace the leak instead
+    // of shipping the surprise.
+    const THEFT_NARRATION_RE = /thief|caught.*mid[- ]?lift|steel comes out|answer for (?:my|your) (?:actions|deeds)/i;
+    if (THEFT_NARRATION_RE.test(text) && !meta?.stealCaught) {
+      void persistEntry(
+        makeEntry(
+          'debug',
+          `blocked theft-channel emission outside steal context — "${text.slice(0, 80)}${text.length > 80 ? '…' : ''}"`,
+        ),
+      );
+      return;
+    }
     const entry = makeEntry(channel, text, meta);
     void persistEntry(entry);
     // Duplicate-chatter suppression. If the Arbiter just spoke the same
@@ -8897,6 +8920,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog(
         'combat',
         `${scene.vendor.name} catches your hand mid-lift. "Thief!" — steel comes out.`,
+        { stealCaught: true },
       );
       logRepChanges(get, repResult.changed);
       recordMemorableEvent(get, set, {
