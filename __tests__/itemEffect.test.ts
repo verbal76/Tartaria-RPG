@@ -62,27 +62,58 @@ describe('itemEffect — gate lookup', () => {
   });
 });
 
-describe('itemEffect — search noun requirements (OTA 195)', () => {
-  // Playtester spec: "certain things can only be searched with a
-  // pulse scanner or other item related. Once you search something
-  // you remove it from the popup. And if you need a certain item
-  // to search it, it is grayed out, and when you hit it, it tells
-  // you what you need to equip."
-  it('a vent fissure requires an Aether scanner', () => {
+describe('itemEffect — search noun requirements (OTA-033, three-way scanner gate)', () => {
+  // OTA-033 split the single Aetheric gate into three scanner
+  // families. Each noun class routes to its own scanner type.
+  it('a vent fissure requires an Aetheric scanner', () => {
     const req = searchRequirementFor('vent fissure');
     expect(req).not.toBeNull();
     expect(req!.scannerBias).toBe('aetheric');
-    expect(req!.hint).toContain('Pulse Scanner');
+    expect(req!.hint).toContain('Aetheric Scanner');
   });
 
-  it('an aether glyph requires an Aether scanner', () => {
+  it('an aether glyph requires an Aetheric scanner', () => {
     const req = searchRequirementFor('aether glyph');
     expect(req?.scannerBias).toBe('aetheric');
   });
 
-  it('a ley line requires an Aether scanner', () => {
+  it('a ley line requires an Aetheric scanner', () => {
     const req = searchRequirementFor('ley line');
     expect(req?.scannerBias).toBe('aetheric');
+  });
+
+  it('an automaton requires a Pulse scanner', () => {
+    const req = searchRequirementFor('automaton');
+    expect(req?.scannerBias).toBe('pulse');
+    expect(req?.hint).toContain('Pulse Scanner');
+  });
+
+  it('a runic emitter requires a Pulse scanner', () => {
+    const req = searchRequirementFor('runic emitter');
+    expect(req?.scannerBias).toBe('pulse');
+  });
+
+  it('a silt mound requires a Mud scanner', () => {
+    const req = searchRequirementFor('silt mound');
+    expect(req?.scannerBias).toBe('mud');
+    expect(req?.hint).toContain('Mud Scanner');
+  });
+
+  it('a sludge pool requires a Mud scanner', () => {
+    const req = searchRequirementFor('sludge pool');
+    expect(req?.scannerBias).toBe('mud');
+  });
+
+  it('a fungal patch requires a Mud scanner', () => {
+    const req = searchRequirementFor('fungal patch');
+    expect(req?.scannerBias).toBe('mud');
+  });
+
+  it('a mud fissure routes to Mud, not Aetheric (mud regex tested first)', () => {
+    // The new routing prioritizes mud over aether so "mud fissure" /
+    // "silt vent" reach the Mud Scanner instead of the Aetheric one.
+    const req = searchRequirementFor('mud fissure');
+    expect(req?.scannerBias).toBe('mud');
   });
 
   it('a plain bench has no requirement (freely searchable)', () => {
@@ -94,15 +125,20 @@ describe('itemEffect — search noun requirements (OTA 195)', () => {
   });
 });
 
-describe('itemEffect — Pulse Scanner: Geiger-counter redesign (OTA 193)', () => {
-  // The user's mental model from the playtest discussion:
-  // "Pulse scanner is like a geiger counter, it's a device to track
-  //  Aetheric energy, it should give you a stat boost to finding
-  //  Aetheric items when using search. If you search a vent fissure
-  //  with it equipped then you might find Aetheric shards or dust or
-  //  Aetheric fungus. You would use it in your off hand."
-  it('catalog row carries a scanner effect with aetheric bias and off slot', () => {
+describe('itemEffect — Scanner catalog rows (OTA-033)', () => {
+  // Three scanner families, each with its own bias and recipe.
+  it('Pulse Scanner — pulse bias (mechanical / Sentinel detection)', () => {
     const fx = resolveItemEffect('Pulse Scanner', [findExplorationItemByName]);
+    expect(fx).toEqual({ kind: 'scanner', bias: 'pulse', slot: 'off' });
+  });
+
+  it('Aetheric Scanner — aetheric bias (rare crystal / glyph detection)', () => {
+    const fx = resolveItemEffect('Aetheric Scanner', [findExplorationItemByName]);
     expect(fx).toEqual({ kind: 'scanner', bias: 'aetheric', slot: 'off' });
+  });
+
+  it('Mud Scanner — mud bias (buried / silt / fungal detection)', () => {
+    const fx = resolveItemEffect('Mud Scanner', [findExplorationItemByName]);
+    expect(fx).toEqual({ kind: 'scanner', bias: 'mud', slot: 'off' });
   });
 });

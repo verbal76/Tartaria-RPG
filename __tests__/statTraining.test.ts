@@ -56,17 +56,31 @@ describe('OTA 058 — trainStat: success gate', () => {
 });
 
 describe('OTA 058 — tiered cost curve', () => {
-  it('stat ≤ 10 awards +2 per use', () => {
-    expect(progressAwardFor(8)).toBe(2);
+  // 2026-05-25 OTA-031 — progressive 6-step ramp so high stats
+  // take real commitment to advance.
+  it('stat 1-5 awards +3 per use', () => {
+    expect(progressAwardFor(1)).toBe(3);
+    expect(progressAwardFor(5)).toBe(3);
+  });
+  it('stat 6-10 awards +2 per use', () => {
+    expect(progressAwardFor(6)).toBe(2);
     expect(progressAwardFor(10)).toBe(2);
   });
   it('stat 11-14 awards +1 per use', () => {
     expect(progressAwardFor(11)).toBe(1);
     expect(progressAwardFor(14)).toBe(1);
   });
-  it('stat 15+ awards +0.5 per use', () => {
+  it('stat 15-18 awards +0.5 per use', () => {
     expect(progressAwardFor(15)).toBe(0.5);
-    expect(progressAwardFor(20)).toBe(0.5);
+    expect(progressAwardFor(18)).toBe(0.5);
+  });
+  it('stat 19-22 awards +0.25 per use', () => {
+    expect(progressAwardFor(19)).toBe(0.25);
+    expect(progressAwardFor(22)).toBe(0.25);
+  });
+  it('stat 23+ awards +0.1 per use', () => {
+    expect(progressAwardFor(23)).toBe(0.1);
+    expect(progressAwardFor(30)).toBe(0.1);
   });
 
   it('low-tier stat trains twice as fast as mid-tier', () => {

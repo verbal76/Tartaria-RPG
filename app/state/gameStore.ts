@@ -2102,11 +2102,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // overhaul.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { isClimbable: isClimbableCheck, isSalvageable: isSalvageableCheck } = require('../engine/interactionTags');
+    // 2026-05-25 OTA-033 — scanner-gated nouns are rare. Each visit
+    // rolls a coin per gated noun to decide if it surfaces in this
+    // scene's chip set. ~30% surface rate by default — when one DOES
+    // appear and the player has the right scanner, the find is the
+    // special reward the player ask was about. Ungated nouns surface
+    // unconditionally. (Implementation: pre-filter baseAmbient.)
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { searchRequirementFor: scannerGateFor } = require('../engine/itemEffect');
+    const GATED_NOUN_SURFACE_RATE = 0.3;
+    const filteredAmbient = baseAmbient.filter((n: string) => {
+      const gated = scannerGateFor(n);
+      if (!gated) return true;
+      return Math.random() < GATED_NOUN_SURFACE_RATE;
+    });
     let keptOneClimbable = false;
     const baseTakeable: string[] = [];
     const baseClimbable: string[] = [];
     const baseSalvageable: string[] = [];
-    for (const n of baseAmbient) {
+    for (const n of filteredAmbient) {
       if (isClimbableCheck(n)) {
         if (keptOneClimbable) continue;
         keptOneClimbable = true;
@@ -4046,42 +4060,102 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
             const narrateResult = narrateAmbientFind(get, set, currentScene, ambient);
             let scannerProduced = false;
-            // OTA 193 — Pulse Scanner pass. If a scanner is equipped
-            // in off-hand (Pulse Scanner today; future Geiger-like
-            // tools tomorrow), roll a d20 for an Aetheric drop on
-            // top of the narration. Surfaces shards / dust / mud
-            // that bare-eye searches miss.
-            const { playerHasScannerEquipped } = require('../engine/equipment');
-            if (playerHasScannerEquipped(player, 'aetheric')) {
-              const roll = rollDie(20);
-              if (roll >= 12) {
-                const aetherFinds: Array<{ name: string; qty: [number, number]; rarity: 'Common' | 'Uncommon' }> = [
-                  { name: 'Aether Mud',     qty: [1, 2], rarity: 'Common' },
-                  { name: 'Aether Residue', qty: [1, 1], rarity: 'Common' },
-                  { name: 'Aetheric Shard', qty: [1, 1], rarity: 'Uncommon' },
-                  { name: 'Aether Dust',    qty: [1, 2], rarity: 'Common' },
-                ];
-                const pick = aetherFinds[Math.floor(Math.random() * aetherFinds.length)]!;
-                const qty = pick.qty[0] === pick.qty[1]
-                  ? pick.qty[0]
-                  : pick.qty[0] + Math.floor(Math.random() * (pick.qty[1] - pick.qty[0] + 1));
-                const itemCat = lookupCraftedItem(pick.name);
-                const newItem: InventoryItem = stampDurability({
-                  id: `scan_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-                  name: pick.name,
-                  kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
-                  rarity: pick.rarity,
-                  quantity: qty,
-                  tags: itemCat.tags,
-                });
-                const granted = grantItem(player.inventory, newItem);
-                set((s) => (s.player ? { player: { ...s.player, inventory: granted.inventory } } : s));
-                get().appendLog('world', `Pulse Scanner ticks — Aether trace in the ${ambient}.`);
-                const qtyLabel = granted.accepted > 1 ? ` x${granted.accepted}` : '';
-                get().appendLog('reward', `✦ ${pick.name}${qtyLabel} (${pick.rarity}).`);
-                scannerProduced = true;
-              } else {
-                get().appendLog('world', `Pulse Scanner reads flat. Nothing Aetheric in the ${ambient}.`);
+            // OTA-033 — Three scanner families (pulse / aetheric / mud),
+            // each with its own loot pool. The scanner roll ONLY fires
+            // when the noun is gated to a scanner AND the player has
+            // that scanner equipped — so finding a gated noun + having
+            // the matching scanner is the "rewarding" path the user
+            // asked for. Bare-eye searches of ungated nouns produce
+            // narration only.
+            //
+            // Roll:
+            //   d20 < 12 → flat read, nothing surfaces
+            //   d20 12–17 → Common drop from the bias pool
+            //   d20 18–19 → Uncommon drop from the bias pool
+            //   d20  = 20 → Rare drop from the bias pool
+            if (req) {
+              const { playerHasScannerEquipped } = require('../engine/equipment');
+              if (playerHasScannerEquipped(player, req.scannerBias)) {
+                const scannerLabel = req.scannerBias === 'pulse' ? 'Pulse Scanner'
+                  : req.scannerBias === 'aetheric' ? 'Aetheric Scanner'
+                  : 'Mud Scanner';
+                const traceLabel = req.scannerBias === 'pulse' ? 'pulse trace'
+                  : req.scannerBias === 'aetheric' ? 'Aether trace'
+                  : 'buried trace';
+                const roll = rollDie(20);
+                if (roll >= 12) {
+                  // Per-bias loot pools, tiered by rarity. The scanner
+                  // roll picks the rarity tier; we then sample uniformly
+                  // from the pool entries at that tier (with a fallback
+                  // down a tier if the tier is empty).
+                  type ScanFind = { name: string; qty: [number, number]; rarity: 'Common' | 'Uncommon' | 'Rare' };
+                  const PULSE_FINDS: ScanFind[] = [
+                    { name: 'Automaton Circuit', qty: [1, 2], rarity: 'Common' },
+                    { name: 'Scrap Metal',       qty: [1, 2], rarity: 'Common' },
+                    { name: 'Bent Nail',         qty: [1, 3], rarity: 'Common' },
+                    { name: 'Sentinel Core Plate', qty: [1, 1], rarity: 'Uncommon' },
+                    { name: 'Drone Core',        qty: [1, 1], rarity: 'Uncommon' },
+                    { name: 'Energy Fragment',   qty: [1, 1], rarity: 'Uncommon' },
+                    { name: 'Iron Core',         qty: [1, 1], rarity: 'Rare' },
+                  ];
+                  const AETHER_FINDS: ScanFind[] = [
+                    { name: 'Aether Crystal',  qty: [1, 2], rarity: 'Common' },
+                    { name: 'Aether Residue',  qty: [1, 2], rarity: 'Common' },
+                    { name: 'Aether Dust',     qty: [1, 2], rarity: 'Common' },
+                    { name: 'Aetheric Shard',  qty: [1, 1], rarity: 'Uncommon' },
+                    { name: 'Aetheric Dust',   qty: [1, 1], rarity: 'Uncommon' },
+                    { name: 'Aether Shard',    qty: [1, 1], rarity: 'Rare' },
+                    { name: 'Aetheric Cloth',  qty: [1, 1], rarity: 'Rare' },
+                    { name: 'Aetheric Song',   qty: [1, 1], rarity: 'Rare' },
+                  ];
+                  const MUD_FINDS: ScanFind[] = [
+                    { name: 'Aether Mud',      qty: [1, 3], rarity: 'Common' },
+                    { name: 'Aetheric Sludge', qty: [1, 2], rarity: 'Common' },
+                    { name: 'Mud Fragment',    qty: [1, 2], rarity: 'Common' },
+                    { name: 'Mud Essence',     qty: [1, 1], rarity: 'Uncommon' },
+                    { name: 'Mudstone',        qty: [1, 1], rarity: 'Rare' },
+                    { name: 'Hardened Mudstone', qty: [1, 1], rarity: 'Rare' },
+                    { name: 'Mud Gem',         qty: [1, 1], rarity: 'Rare' },
+                  ];
+                  const pool = req.scannerBias === 'pulse' ? PULSE_FINDS
+                    : req.scannerBias === 'aetheric' ? AETHER_FINDS
+                    : MUD_FINDS;
+                  const tier: 'Common' | 'Uncommon' | 'Rare' = roll === 20 ? 'Rare'
+                    : roll >= 18 ? 'Uncommon'
+                    : 'Common';
+                  // Pull at the chosen tier; fall back to one tier down
+                  // (then two) if the pool has no entries at that tier.
+                  const tierOrder: Array<'Rare' | 'Uncommon' | 'Common'> =
+                    tier === 'Rare' ? ['Rare', 'Uncommon', 'Common']
+                    : tier === 'Uncommon' ? ['Uncommon', 'Common']
+                    : ['Common'];
+                  let candidates: ScanFind[] = [];
+                  for (const t of tierOrder) {
+                    candidates = pool.filter((f) => f.rarity === t);
+                    if (candidates.length > 0) break;
+                  }
+                  const pick = candidates[Math.floor(Math.random() * candidates.length)]!;
+                  const qty = pick.qty[0] === pick.qty[1]
+                    ? pick.qty[0]
+                    : pick.qty[0] + Math.floor(Math.random() * (pick.qty[1] - pick.qty[0] + 1));
+                  const itemCat = lookupCraftedItem(pick.name);
+                  const newItem: InventoryItem = stampDurability({
+                    id: `scan_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                    name: pick.name,
+                    kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
+                    rarity: pick.rarity,
+                    quantity: qty,
+                    tags: itemCat.tags,
+                  });
+                  const granted = grantItem(player.inventory, newItem);
+                  set((s) => (s.player ? { player: { ...s.player, inventory: granted.inventory } } : s));
+                  get().appendLog('world', `${scannerLabel} ticks — ${traceLabel} in the ${ambient}.`);
+                  const qtyLabel = granted.accepted > 1 ? ` x${granted.accepted}` : '';
+                  get().appendLog('reward', `✦ ${pick.name}${qtyLabel} (${pick.rarity}).`);
+                  scannerProduced = true;
+                } else {
+                  get().appendLog('world', `${scannerLabel} reads flat. Nothing in the ${ambient}.`);
+                }
               }
             }
             // Mark the noun as searched ONLY when investigate

@@ -1,6 +1,6 @@
 import type { InventoryItem, EquipSlot, PlayerCharacter, Stats } from './types';
 import { findWeaponByName, findArmorByName, findAmuletByName, findRingByName, GEAR, findExplorationItemByName, findGearByName, findMaterialByName } from './crafting';
-import { aggregateInventoryPassives, inventoryHasGate, isScanner, type EffectResolver, type GateKind } from './itemEffect';
+import { aggregateInventoryPassives, inventoryHasGate, isScanner, type EffectResolver, type GateKind, type ScannerBias } from './itemEffect';
 import { racialStatBonusesFor } from './raceMechanics';
 import { corruptionTierOf, corruptionStatPenalty } from './corruption';
 
@@ -182,7 +182,7 @@ export function playerHasGate(player: PlayerCharacter, gate: GateKind): boolean 
  *  Fungus). */
 export function playerHasScannerEquipped(
   player: PlayerCharacter,
-  bias: 'aetheric',
+  bias: ScannerBias,
 ): boolean {
   const off = player.equipped?.off;
   if (!off) return false;

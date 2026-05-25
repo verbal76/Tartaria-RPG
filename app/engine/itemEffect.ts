@@ -50,6 +50,12 @@ export type GateKind =
   | 'nightvision'
   | 'detect_aether';
 
+/** Distinct scanner families. Each gates its own noun pool +
+ *  drops from its own loot table. Adding a new bias = adding a
+ *  keyword class to searchRequirementFor and a loot pool to
+ *  the gameStore scanner-roll branch. */
+export type ScannerBias = 'pulse' | 'aetheric' | 'mud';
+
 /** Tag schema attached to catalog rows. Authored as plain JSON
  *  inside the catalog entry under an `effect` key. Read by every
  *  consumer below. */
@@ -76,14 +82,23 @@ export type ItemEffect =
   | {
       /** Off-hand equippable scanner — a Geiger-counter analog
        *  that biases search outcomes toward a tagged loot pool
-       *  when the player is searching physical features. Pulse
-       *  Scanner uses bias='aetheric' to surface Aetheric
-       *  Shards, Aether Dust, Aetheric Fungus, etc. on a
-       *  successful d20 check. The slot is fixed on the item
-       *  side ('off'); validSlotsForItem reads this to make
-       *  the scanner equippable in the off hand. */
+       *  when the player is searching physical features. Three
+       *  bias families today, each gating a distinct noun pool
+       *  and dropping from a distinct loot pool:
+       *    'pulse'    — Pulse Scanner: Sentinel / automaton /
+       *                 mechanical signatures (circuits, drones,
+       *                 emitters, runic gear).
+       *    'aetheric' — Aetheric Scanner: rare aether / crystal /
+       *                 ley-line phenomena (fissures, glyphs,
+       *                 conduits, leystones).
+       *    'mud'      — Mud Scanner: silt / sludge / fungal /
+       *                 buried-in-mud caches (mud pits, silt
+       *                 mounds, peat seams, fungal beds).
+       *  The slot is fixed on the item side ('off');
+       *  validSlotsForItem reads this to make the scanner
+       *  equippable in the off hand. */
       kind: 'scanner';
-      bias: 'aetheric';
+      bias: ScannerBias;
       slot: 'off';
     };
 
@@ -145,10 +160,10 @@ export function inventoryHasGate(
 /** True iff the given item name is a scanner with the given bias.
  *  Used by the equip-slot resolver (scanner items are valid in
  *  off-hand) and by the search action (scanner-equipped player
- *  gets an Aether-find roll on every ambient search). */
+ *  gets a bias-specific find roll on every gated ambient search). */
 export function isScanner(
   name: string,
-  bias: 'aetheric',
+  bias: ScannerBias,
   resolvers: EffectResolver[],
 ): boolean {
   const fx = resolveItemEffect(name, resolvers);
@@ -171,27 +186,52 @@ export function isScanner(
  *  for all the everyday outpost nouns — bench, trap, wall, etc.). */
 export interface NounSearchRequirement {
   /** Human-readable hint shown when the requirement isn't met
-   *  ("Equip Pulse Scanner (or other Aether scanner) in your
-   *  off hand to search this.") */
+   *  ("Equip an Aetheric Scanner in your off hand to search
+   *  the vent fissure."). */
   hint: string;
   /** Scanner bias the equipped item must match. Caller checks
    *  this against playerHasScannerEquipped. */
-  scannerBias: 'aetheric';
+  scannerBias: ScannerBias;
   /** Short label for the gray chip's "requires" tag — kept
    *  brief so the chip stays readable ("requires: scanner"). */
   shortLabel: string;
 }
 
+/** 2026-05-25 OTA-033 — three-way scanner gate. Each noun class
+ *  routes to a distinct scanner type. Tested in declared order
+ *  so more-specific patterns ("mud fissure" → mud) win over
+ *  less-specific ("fissure" → aetheric). */
 export function searchRequirementFor(noun: string): NounSearchRequirement | null {
-  // Aether-coded nouns — anything that reads as a pre-flood
-  // Aetheric artifact or phenomenon. The Pulse Scanner (or any
-  // future scanner with aetheric bias) is the gate.
-  const aether = /\b(vent fissure|fissure|aether|aetheric|etheric|ether|glyph|rune|crystal|conduit|ley[- ]?line|sigil|leystone)\b/i;
+  // Mud-coded nouns — buried-in-mud caches, silt vents, fungal
+  // beds, sludge pools. The Mud Scanner is the gate. Tested
+  // first so "mud fissure" / "silt vent" route to mud, not
+  // aetheric.
+  const mud = /\b(mud|silt|sludge|peat|fungal|fungus|mire|bog|fen|slurry|slime|ooze)\b/i;
+  if (mud.test(noun)) {
+    return {
+      hint: `Equip a Mud Scanner in your off hand to search the ${noun}.`,
+      scannerBias: 'mud',
+      shortLabel: 'requires Mud scanner',
+    };
+  }
+  // Pulse-coded nouns — Sentinel / automaton / mechanical /
+  // circuit signatures. The Pulse Scanner is the gate.
+  const pulse = /\b(automaton|drone|emitter|servo|circuit|pulse|sentinel|machine|gear[s]?|cog|pipe|coil|engine|construct|relic[- ]?core)\b/i;
+  if (pulse.test(noun)) {
+    return {
+      hint: `Equip a Pulse Scanner in your off hand to search the ${noun}.`,
+      scannerBias: 'pulse',
+      shortLabel: 'requires Pulse scanner',
+    };
+  }
+  // Aether-coded nouns — pre-flood Aetheric artifacts and
+  // phenomena. The Aetheric Scanner is the gate.
+  const aether = /\b(vent fissure|fissure|aether|aetheric|etheric|ether|glyph|rune|crystal|conduit|ley[- ]?line|sigil|leystone|aetherstone|obelisk|monolith)\b/i;
   if (aether.test(noun)) {
     return {
-      hint: `Equip a Pulse Scanner (or other Aether scanner) in your off hand to search the ${noun}.`,
+      hint: `Equip an Aetheric Scanner in your off hand to search the ${noun}.`,
       scannerBias: 'aetheric',
-      shortLabel: 'requires Aether scanner',
+      shortLabel: 'requires Aetheric scanner',
     };
   }
   return null;

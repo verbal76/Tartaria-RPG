@@ -1641,10 +1641,50 @@
       "race_starter",
       "architectural_sentinel"
     ],
-    "description": "Aether Geiger-counter. Equip in your off hand; while equipped, searching physical features carries a chance to surface Aetheric finds \u2014 shards, dust, fungus \u2014 that bare-eye searches miss.",
+    "description": "Sentinel-built pulse reader. Equip in your off hand; while equipped, searching mechanical features \u2014 circuits, drones, emitters, runic gear \u2014 carries a chance to surface hidden salvage and Sentinel tech that bare-eye searches miss.",
+    "effect": {
+      "kind": "scanner",
+      "bias": "pulse",
+      "slot": "off"
+    }
+  },
+  {
+    "name": "Aetheric Scanner",
+    "abilityReq": "Intelligence Level 4",
+    "kind": "exploration",
+    "rarity": "Uncommon",
+    "faction": "Architectural Sentinels",
+    "tcBuy": 48,
+    "tags": [
+      "exploration",
+      "relic",
+      "uncommon",
+      "architectural_sentinel"
+    ],
+    "description": "Tuned to the Aether band. Equip in your off hand; while equipped, searching pre-flood Aetheric features \u2014 fissures, glyphs, conduits, ley lines \u2014 surfaces rare crystals, shards, and Aetheric materials the eye cannot find on its own.",
     "effect": {
       "kind": "scanner",
       "bias": "aetheric",
+      "slot": "off"
+    }
+  },
+  {
+    "name": "Mud Scanner",
+    "abilityReq": "Intelligence Level 3",
+    "kind": "exploration",
+    "rarity": "Common",
+    "faction": "Mud Dwellers",
+    "tcBuy": 28,
+    "tags": [
+      "exploration",
+      "relic",
+      "common",
+      "mud_dweller"
+    ],
+    "description": "Reads density anomalies through silt and sludge. Equip in your off hand; while equipped, searching mud-coded features \u2014 silt mounds, sludge pools, fungal beds, peat seams \u2014 surfaces caches and materials buried in the Mud Flood that nothing else will find.",
+    "effect": {
+      "kind": "scanner",
+      "bias": "mud",
       "slot": "off"
     }
   },
