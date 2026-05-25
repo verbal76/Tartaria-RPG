@@ -1017,6 +1017,12 @@ interface GameStore {
    *  may want to abandon one that isn't worth chasing. */
   discardLead: (id: string) => void;
   digHere: () => void;
+  /** 2026-05-25 — bulk salvage. Run rollSalvagePool for each noun
+   *  in sequence but DEFER all logging — emit every narration line
+   *  first, then a single aggregated reward summary. Matches the
+   *  user's expectation that "salvage all" prints the work then
+   *  the haul, not interleaved. */
+  salvageAllAmbient: (nouns: readonly string[]) => void;
   stepDirection: (dir: Direction) => void;
   /** v2.4.1 (OTA 049) — multi-step travel. setTravelCourse begins a
    *  course to the named location and takes one step. continueTravel
@@ -10856,6 +10862,171 @@ export const useGameStore = create<GameStore>((set, get) => ({
       for (let i = 0; i < wearAmount; i++) {
         set((s) => (s.player ? { player: wearEquippedItem(s.player, item.name, get) } : s));
       }
+    }
+    void get().persist();
+  },
+
+  // 2026-05-25 — bulk SALVAGE ALL. Runs the salvage roll for each
+  // noun in sequence but holds back the per-noun reward emission
+  // until the end. Output order is:
+  //   1. one world-channel narration line per noun (success or
+  //      failure flavor) — what you did, in the order you did it
+  //   2. one consolidated reward-channel block — aggregated items
+  //      and TC at the bottom of the log so the player can see the
+  //      total haul without scrolling through interleaved entries
+  // Each noun still costs stamina + advances time + marks the
+  // noun as worked the same way the single-tap salvage does, so
+  // SALVAGE ALL isn't a free pass through the economy.
+  salvageAllAmbient(nouns) {
+    const player = get().player;
+    const scene = get().currentScene;
+    if (!player || !scene) return;
+    const blocker = activeEnemy(scene);
+    if (blocker) {
+      get().appendLog('arbiter', `The Arbiter shakes their head. "Not while ${blocker.name} is on you."`);
+      return;
+    }
+    const harvestRoomKey = makeRoomKey(
+      player.currentLocationId,
+      scene.microMicroId,
+      player.mapX,
+      player.mapY,
+    );
+
+    const narrationLines: string[] = [];
+    /** Aggregated reward totals across the whole bulk. Keyed by
+     *  item name; rarity sticks to the first roll's rarity since
+     *  salvage pools are rarity-stable per item. */
+    const itemTotals = new Map<string, { quantity: number; rarity: string }>();
+    let tcGained = 0;
+    let staminaSpent = 0;
+    let hoursAdded = 0;
+    const consumedNouns: string[] = [];
+    const skippedAlready: string[] = [];
+    let liveInv: InventoryItem[] = player.inventory.map((i) => ({ ...i }));
+
+    for (const noun of nouns) {
+      const harvestLowered = noun.toLowerCase();
+      // Skip nouns already worked over this room visit. Don't even
+      // narrate — the player tapped SALVAGE ALL so a deluge of
+      // "already worked over" lines would just be noise.
+      const harvestPrior = get().worldMemory.visitedRooms?.[harvestRoomKey];
+      const alreadyDoneFromPrior = nonClimbMarkers(harvestPrior?.searchedAmbientNouns).some(
+        (n) => n === harvestLowered || harvestLowered.includes(n) || n.includes(harvestLowered),
+      );
+      const alreadyDoneFromBatch = consumedNouns.some(
+        (n) => n === harvestLowered || harvestLowered.includes(n) || n.includes(harvestLowered),
+      );
+      if (alreadyDoneFromPrior || alreadyDoneFromBatch) {
+        skippedAlready.push(noun);
+        continue;
+      }
+
+      const outcome = rollSalvagePool(noun);
+      if (!outcome) {
+        // No pool matched. Skip silently — the modal shouldn't have
+        // surfaced this noun if it's unmatched, but defensive.
+        continue;
+      }
+
+      // Per-noun stamina + time tick (same as single-tap salvage).
+      staminaSpent += STAMINA_COSTS.skillCheck;
+      hoursAdded += 0.25;
+
+      if (outcome.kind === 'nothing') {
+        narrationLines.push(pickScrapFailureLine(noun));
+        consumedNouns.push(harvestLowered);
+        continue;
+      }
+      if (outcome.kind === 'material' && outcome.itemName) {
+        narrationLines.push(outcome.line);
+        const itemCat = lookupCraftedItem(outcome.itemName);
+        const qty = ('quantity' in outcome && typeof outcome.quantity === 'number')
+          ? outcome.quantity
+          : 1;
+        const newItem: InventoryItem = stampDurability({
+          id: `salvage_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          name: outcome.itemName,
+          kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
+          rarity: outcome.rarity ?? 'Common',
+          quantity: qty,
+          tags: itemCat.tags,
+        });
+        const grantResult = grantItem(liveInv, newItem);
+        liveInv = grantResult.inventory;
+        const accepted = grantResult.accepted;
+        if (accepted > 0) {
+          const prev = itemTotals.get(outcome.itemName);
+          itemTotals.set(outcome.itemName, {
+            quantity: (prev?.quantity ?? 0) + accepted,
+            rarity: prev?.rarity ?? (outcome.rarity ?? 'Common'),
+          });
+        } else {
+          narrationLines.push(`Found a ${outcome.itemName.toLowerCase()}, but your pack is already full of them.`);
+        }
+        consumedNouns.push(harvestLowered);
+        continue;
+      }
+      // rollSalvagePool only produces 'material' or 'nothing' —
+      // no TC, no hooks. Players who want those paths can re-tap
+      // an individual chip which routes through the full salvage
+      // handler (including rollAreaSearch fallback).
+    }
+
+    // Commit aggregated state changes in one set() so the UI
+    // reflects everything in lockstep.
+    set((s) => {
+      if (!s.player) return s;
+      const advanced = advanceTime(spendStamina({ ...s.player, inventory: liveInv, tc: s.player.tc + tcGained }, staminaSpent), hoursAdded);
+      return { player: advanced };
+    });
+    // Mark all consumed nouns as searched.
+    if (consumedNouns.length > 0) {
+      set((s) => {
+        const room = s.worldMemory.visitedRooms?.[harvestRoomKey] ?? {
+          firstVisitAt: Date.now(),
+          lastVisitAt: Date.now(),
+          visitCount: 1,
+        };
+        const prevSearched = room.searchedAmbientNouns ?? [];
+        const merged = Array.from(new Set([...prevSearched, ...consumedNouns]));
+        return {
+          worldMemory: {
+            ...s.worldMemory,
+            visitedRooms: {
+              ...(s.worldMemory.visitedRooms ?? {}),
+              [harvestRoomKey]: { ...room, searchedAmbientNouns: merged },
+            },
+          },
+        };
+      });
+    }
+
+    // Emit the narration block in order.
+    for (const line of narrationLines) {
+      get().appendLog('world', line);
+    }
+    // One "already worked over" summary line for the skipped nouns,
+    // so the player isn't confused about why they didn't fire.
+    if (skippedAlready.length > 0) {
+      const names = skippedAlready.slice(0, 4).join(', ');
+      const overflow = skippedAlready.length > 4 ? ` and ${skippedAlready.length - 4} more` : '';
+      get().appendLog('world', `Already worked over: ${names}${overflow}.`);
+    }
+    // Emit the aggregated reward summary as the last block.
+    if (itemTotals.size > 0 || tcGained > 0) {
+      // One header line so the haul reads as one event, not a
+      // scattering of single rewards.
+      get().appendLog('reward', `✦ Salvage haul:`);
+      for (const [name, total] of itemTotals.entries()) {
+        const qtyLabel = total.quantity > 1 ? ` x${total.quantity}` : '';
+        get().appendLog('reward', `    • ${name}${qtyLabel} (${total.rarity})`);
+      }
+      if (tcGained > 0) {
+        get().appendLog('reward', `    • +${tcGained} TC`);
+      }
+    } else if (consumedNouns.length > 0) {
+      get().appendLog('world', `Nothing carried over from this round of salvage.`);
     }
     void get().persist();
   },

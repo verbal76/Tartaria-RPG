@@ -681,14 +681,19 @@ export function ExplorationScreen() {
           submit(`salvage ${target}`);
         }}
         onSalvageAll={(nouns) => {
-          // 2026-05-25 [UI-3] — bulk fire one salvage submission per
-          // visible salvageable scene chip. Mirrors TakeModal's
-          // onTakeAll handler in ExplorationScreen:472. Each submit
-          // runs through the normal salvage path (pool match, RNG
-          // roll, junk-pool fallback per POLISH-2) so partial success
-          // is handled per-item by the engine.
+          // 2026-05-25 — route through the bulk salvageAllAmbient
+          // action so all narration lines fire FIRST (one per noun
+          // in tap order) and the aggregated haul prints as the
+          // last block. Per playtester: "hit salvage all, it shows
+          // the text for every salvage task and then what was
+          // recovered if anything, and then shows the next ... it
+          // should print all the item.salvage text in a row, and
+          // then everything you found together after all of the
+          // texts print." Previously this loop submit()'d each
+          // noun individually, which interleaved text + reward
+          // pairs.
           setSalvageOpen(false);
-          for (const n of nouns) submit(`salvage ${n}`);
+          useGameStore.getState().salvageAllAmbient(nouns);
         }}
         onCancel={() => setSalvageOpen(false)}
       />
