@@ -3985,6 +3985,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
               break;
             }
             set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+            // 2026-05-25 OTA-040 — collectable substitution. Salvage now
+            // has the same 8% biome-gated chance as container loot and
+            // wasteland encounters to surface a character-story fragment
+            // (note / letter / journal page) IN PLACE of normal loot.
+            // The fragment grant consumes the drop slot, marks the
+            // noun as worked, and emits its own reward line via
+            // grantCollectableFragment.
+            const salvageFragId = pickFragmentForBiome(
+              player.collectables ?? [],
+              currentScene.location.tags ?? [],
+            );
+            if (salvageFragId) {
+              get().appendLog('world', pickFragmentSalvageLine(harvestAmbient));
+              get().grantCollectableFragment(salvageFragId);
+              set((s) => {
+                const room = s.worldMemory.visitedRooms?.[harvestRoomKey] ?? {
+                  firstVisitAt: Date.now(),
+                  lastVisitAt: Date.now(),
+                  visitCount: 1,
+                };
+                return {
+                  worldMemory: {
+                    ...s.worldMemory,
+                    visitedRooms: {
+                      ...(s.worldMemory.visitedRooms ?? {}),
+                      [harvestRoomKey]: {
+                        ...room,
+                        searchedAmbientNouns: [
+                          ...(room.searchedAmbientNouns ?? []),
+                          harvestAmbient.toLowerCase(),
+                        ],
+                      },
+                    },
+                  },
+                };
+              });
+              void get().persist();
+              break;
+            }
             // Try the per-noun salvage pool first (drone → automaton
             // circuit, wagon → rations + rope, etc.). Falls through to
             // the generic area-search pool when no pool matches.
@@ -11302,6 +11341,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // breadcrumb and emit a player-visible fallback so the button
     // never reads as broken.
     const unmatchedNouns: string[] = [];
+    // 2026-05-25 OTA-040 — track collectable fragments granted in this
+    // bulk so the loop's player.collectables snapshot stays accurate
+    // for subsequent fragment substitution rolls. Without it, hitting
+    // 8% twice in one SALVAGE ALL would risk granting the same fragment
+    // twice (grantCollectableFragment is silent-dedup but we'd waste
+    // the roll).
+    const grantedFragmentIds: string[] = [];
     let liveInv: InventoryItem[] = player.inventory.map((i) => ({ ...i }));
 
     for (const noun of nouns) {
@@ -11318,6 +11364,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       if (alreadyDoneFromPrior || alreadyDoneFromBatch) {
         skippedAlready.push(noun);
+        continue;
+      }
+
+      // 2026-05-25 OTA-040 — collectable substitution per noun. Same
+      // 8% biome-gated chance the single-tap salvage path uses. When
+      // hit, replaces the noun's normal pool roll with a fragment
+      // grant; narration is queued into narrationLines so it lands
+      // alongside the other per-noun lines (haul block stays at the
+      // bottom of the log).
+      const liveOwned = [...(player.collectables ?? []), ...grantedFragmentIds];
+      const bulkFragId = pickFragmentForBiome(
+        liveOwned,
+        scene.location.tags ?? [],
+      );
+      if (bulkFragId) {
+        staminaSpent += STAMINA_COSTS.skillCheck;
+        hoursAdded += 0.25;
+        narrationLines.push(pickFragmentSalvageLine(noun));
+        get().grantCollectableFragment(bulkFragId);
+        grantedFragmentIds.push(bulkFragId);
+        consumedNouns.push(harvestLowered);
         continue;
       }
 
@@ -13904,6 +13971,25 @@ const HIDDEN_TEXT_LINES = [
   `You find a hairline crack in the ${`{noun}`} and follow it. A single coin is wedged inside, mud-stuck. You leave it there. Some traditions you do not break.`,
   `You read the ${`{noun}`}: a name list, twenty-three entries. Twenty-two are struck through. The twenty-third has a fresh question mark beside it.`,
 ];
+
+// 2026-05-25 OTA-040 — narration for the salvage → collectable
+// substitution path. When the salvage roll lands a character-story
+// fragment instead of normal loot, one of these lines fires with the
+// noun substituted in. Keeps the in-character framing tight: the
+// player breaks something apart and finds a paper / leather / journal
+// fragment tucked inside it.
+const FRAGMENT_SALVAGE_LINES = [
+  `You work the {noun} apart. Tucked inside, sealed against the silt: a folded note.`,
+  `You crack the {noun} open. A page slides out — paper somehow dry, ink somehow still legible.`,
+  `Something papery rustles as you strip the {noun}. You pull free a journal leaf.`,
+  `Wedged into the {noun}, half-hidden by the dust: a sealed letter. You pocket it carefully.`,
+  `You break the {noun} down. Among the pieces, a fragment of someone's writing — held against the world by stubbornness alone.`,
+  `Behind the {noun}, where the floods didn't reach: a single page, in a hand you haven't read before.`,
+];
+function pickFragmentSalvageLine(noun: string): string {
+  const line = FRAGMENT_SALVAGE_LINES[Math.floor(Math.random() * FRAGMENT_SALVAGE_LINES.length)]!;
+  return line.replace(/\{noun\}/g, noun);
+}
 
 // 2026-05-25 OTA-039 — small-loot drop for investigate. A flavor-only
 // outcome that ALSO turns up a junk-tier item now and then so even
