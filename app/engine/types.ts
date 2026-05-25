@@ -956,4 +956,10 @@ export interface SaveState {
    *  because the CurrentScene shape lives in the game store; the load
    *  flow casts it back at boundary. */
   currentScene?: unknown;
+  /** 2026-05-25 — persisted step counter since the last wasteland
+   *  encounter. Optional for back-compat with older saves (load
+   *  defaults to 0). Persisting prevents a save-load cheese that
+   *  reset the counter and delayed the next encounter by `threshold`
+   *  cardinal steps. */
+  wastelandStepsSinceEncounter?: number;
 }
