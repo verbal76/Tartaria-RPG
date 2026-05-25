@@ -107,4 +107,17 @@ describe('salvage pool classifier', () => {
     expect(__TEST_ONLY__.NOTHING_CHANCE).toBeGreaterThan(0);
     expect(__TEST_ONLY__.NOTHING_CHANCE).toBeLessThan(1);
   });
+
+  // 2026-05-25 OTA-037 — hub-thematic relic-site nouns route to the
+  // new relic_site pool. A playtester hit SALVAGE ALL on these inside
+  // The Crown Gate and got zero output before the pool existed.
+  it('routes pedestal / reliquary / vault / gate / shelf to relic_site pool', () => {
+    const rng = () => 0.5;
+    expect(rollSalvagePool('salt-crusted vault relic pedestal', rng)?.poolId).toBe('relic_site');
+    expect(rollSalvagePool('weathered forgotten order reliquary', rng)?.poolId).toBe('relic_site');
+    expect(rollSalvagePool('gate', rng)?.poolId).toBe('relic_site');
+    expect(rollSalvagePool('jagged submerged library shelf', rng)?.poolId).toBe('relic_site');
+    expect(rollSalvagePool('crown altar', rng)?.poolId).toBe('relic_site');
+    expect(rollSalvagePool('twin standard', rng)?.poolId).toBe('relic_site');
+  });
 });
