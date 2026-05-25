@@ -154,6 +154,30 @@ const POOLS: SalvagePool[] = [
       { name: 'Aether Dust', rarity: 'Common', weight: 10, min: 1, max: 2 },
     ],
   },
+  // 2026-05-25 OTA-037 — relic-site pool for hub-thematic salvageables.
+  // A playtester hit SALVAGE ALL on "salt-crusted vault relic pedestal,
+  // weathered forgotten order reliquary, gate" inside The Crown Gate
+  // and got zero output — pickPool returned null for all three because
+  // no existing pool had patterns for pedestal / reliquary / vault /
+  // gate / shelf / altar / shrine / monolith / obelisk / plinth /
+  // library / doorway. Drops thematic relic stock so the player walks
+  // away with something thematic (coins, lockets, dust, shards).
+  {
+    id: 'relic_site',
+    patterns: [
+      'pedestal', 'reliquary', 'altar', 'shrine', 'vault', 'monolith',
+      'obelisk', 'plinth', 'library', 'doorway', 'gate', 'shelf',
+      'banner', 'standard', 'sigil',
+    ],
+    items: [
+      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 30, min: 2, max: 8 },
+      { name: 'Aetheric Locket', rarity: 'Common', weight: 20, min: 1, max: 1 },
+      { name: 'Aether Dust', rarity: 'Common', weight: 20, min: 1, max: 3 },
+      { name: 'Aether Crystal', rarity: 'Common', weight: 15, min: 1, max: 1 },
+      { name: 'Aetheric Shard', rarity: 'Uncommon', weight: 10, min: 1, max: 1 },
+      { name: 'Sealed Tartarian Letter', rarity: 'Common', weight: 5, min: 1, max: 1 },
+    ],
+  },
 ];
 
 // 2026-05-25 — NOTHING_LINES removed. POLISH-2 (OTA-003) repurposed

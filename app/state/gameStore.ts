@@ -11294,6 +11294,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let hoursAdded = 0;
     const consumedNouns: string[] = [];
     const skippedAlready: string[] = [];
+    // 2026-05-25 OTA-037 — track nouns that the modal surfaced but
+    // rollSalvagePool didn't recognize. Previously these were swallowed
+    // silently, so a SALVAGE ALL where every chip was unmatched
+    // produced ZERO log output (the bug the playtester reported when
+    // the button "didn't do anything"). We now name them in a debug
+    // breadcrumb and emit a player-visible fallback so the button
+    // never reads as broken.
+    const unmatchedNouns: string[] = [];
     let liveInv: InventoryItem[] = player.inventory.map((i) => ({ ...i }));
 
     for (const noun of nouns) {
@@ -11315,8 +11323,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
       const outcome = rollSalvagePool(noun);
       if (!outcome) {
-        // No pool matched. Skip silently — the modal shouldn't have
-        // surfaced this noun if it's unmatched, but defensive.
+        // No pool matched. Track for the fallback emit + breadcrumb
+        // so the player doesn't see a silent no-op.
+        unmatchedNouns.push(noun);
         continue;
       }
 
@@ -11418,6 +11427,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     } else if (consumedNouns.length > 0) {
       get().appendLog('world', `Nothing carried over from this round of salvage.`);
+    }
+    // 2026-05-25 OTA-037 — fallback so SALVAGE ALL never reads as
+    // broken. If nothing was consumed AND nothing was skipped AND
+    // nothing was unmatched, the modal handed us an empty list —
+    // tell the player. If everything was unmatched, surface that
+    // explicitly + persist a breadcrumb naming the nouns so we can
+    // add the missing pools without a repro.
+    if (
+      narrationLines.length === 0
+      && skippedAlready.length === 0
+      && itemTotals.size === 0
+      && tcGained === 0
+    ) {
+      if (unmatchedNouns.length > 0) {
+        get().appendLog(
+          'world',
+          `You look the ${unmatchedNouns.slice(0, 3).join(', ')} over and find nothing your tools can break down here.`,
+        );
+        void persistEntry(
+          makeEntry(
+            'debug',
+            `salvageAllAmbient: no pool matched for ${unmatchedNouns.length} noun(s) — ${unmatchedNouns.join(', ')}. Add pools in app/engine/salvagePool.ts so SALVAGE ALL produces output.`,
+          ),
+        );
+      } else if (nouns.length === 0) {
+        get().appendLog('world', `Nothing here to salvage.`);
+      } else {
+        // Shouldn't reach — every non-matched noun is in unmatchedNouns.
+        // Defensive belt so the player never sees a silent button.
+        get().appendLog('world', `Nothing here to salvage.`);
+      }
     }
     void get().persist();
   },
