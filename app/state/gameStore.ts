@@ -5797,11 +5797,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         // 2026-05-24 — rope durability + snap. Wear is checked BEFORE the
         // stamina spend / tier increment so a snap on tier N doesn't
-        // double-charge the player. If current < wear, rope breaks
+        // double-charge the player. If current <= wear, rope breaks
         // mid-climb: convert the instance to a Broken Rope in inventory
         // and trigger the same fall path as the stamina case.
+        //
+        // 2026-05-25 [INVENTORY-1] — changed `<` to `<=` to catch the
+        // boundary case where current == ROPE_WEAR_PER_TIER. Previously
+        // a rope with current exactly equal to the wear amount would
+        // skip the snap branch, then wearItemById would zero it out and
+        // splice it from inventory entirely — the player's rope just
+        // vanished with no Broken Rope artifact left behind. With `<=`,
+        // the snap path catches the equal case and converts in place
+        // before wear is applied.
         const activeRope = pickActiveRope();
-        if (activeRope && activeRope.current < ROPE_WEAR_PER_TIER) {
+        if (activeRope && activeRope.current <= ROPE_WEAR_PER_TIER) {
           // Convert the rope instance to a Broken Rope artifact. Keep the
           // same id so any saved equipment refs survive; strip durability
           // since the broken artifact is misc and inert.
@@ -5820,7 +5829,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               : s,
           );
           climbFall(
-            `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — ${activeRope.name} frayed through (durability ${activeRope.current} < ${ROPE_WEAR_PER_TIER}). ✗ YOU FALL.`,
+            `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — ${activeRope.name} frayed through (durability ${activeRope.current} ≤ ${ROPE_WEAR_PER_TIER}). ✗ YOU FALL.`,
             `Your ${activeRope.name.toLowerCase()} snaps under load on the ${tgt}.`,
           );
           break;
