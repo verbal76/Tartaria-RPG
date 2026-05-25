@@ -59,13 +59,13 @@ export function VendorScreen() {
   if (!player || !vendor) {
     return (
       <View style={styles.container}>
-        <Text style={styles.placeholder}>No vendor is present.</Text>
+        <Text style={styles.placeholder}>You're not as fast as you think you are.</Text>
         <TouchableOpacity
           style={styles.backBtn}
           onPress={() => setScreen('exploration')}
           activeOpacity={0.7}
         >
-          <Text style={styles.backText}>← BACK</Text>
+          <Text style={styles.backText}>← DEAL WITH YOUR CHOICES</Text>
         </TouchableOpacity>
       </View>
     );
