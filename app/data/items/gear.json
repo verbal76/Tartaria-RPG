@@ -62,7 +62,6 @@
       "effect": { "kind": "consumable", "healHP": 12, "restoreStamina": 8, "buffStat": "intelligence", "buffBonus": 2, "buffDuration": 8 } },
     { "name": "Aetheric Torch", "kind": "relic", "rarity": "Common", "tags": ["light", "relic"], "description": "A hand-held aether-light. Flick it on to reveal hidden hooks in the current room — shadowed corners, half-buried writing, things you'd otherwise walk past. Burns one charge per use; carry several.",
       "effect": { "kind": "consumable", "revealScene": true } },
-    { "name": "Aetheric Locket", "kind": "relic", "rarity": "Common", "tags": ["detection", "relic"], "description": "Hums when held close to a relic." },
     { "name": "First Aid Kit", "kind": "consumable", "rarity": "Uncommon", "tags": ["healing"], "effect": { "kind": "consumable", "healHP": 25, "restoreStamina": 10, "cureBleed": true }, "description": "Sterile bandages, mud-glass needles, a single dose of Aetheric salve. Patches you up: +25 HP, +10 stamina, stops the bleeding." },
     { "name": "Aetheric Compass", "kind": "relic", "rarity": "Uncommon", "tags": ["detection", "navigation", "relic"], "description": "A compass that points at the strongest local Aether source. Rarely north." },
     { "name": "Climbing Rope", "kind": "relic", "rarity": "Common", "tags": ["utility", "gate", "rope"], "baseDurability": 150, "description": "Fifty feet of mud-treated rope. Holds a Giant's weight if you don't push it. Wears with use; snaps cleanly when overstrained — two snapped ropes can be re-spliced into one good line.",

@@ -97,7 +97,10 @@ describe('TAKE modal → takeAmbientNoun → inventory', () => {
     const ropesAfter = player1.inventory.filter((i) => i.name === 'Climbing Rope');
     expect(ropesAfter.length).toBe(ropeCountBefore + 1);
     expect(ropesAfter[ropesAfter.length - 1]!.quantity).toBe(1);
-    expect(ropesAfter[ropesAfter.length - 1]!.kind).toBe('misc');
+    // 2026-05-25 — Climbing Rope migrated to kind:'relic' in
+    // gear.json (for the gate-effect lookup + durability tracking).
+    // Test invariant updated to match the post-migration kind.
+    expect(ropesAfter[ropesAfter.length - 1]!.kind).toBe('relic');
 
     // Second tap — engine dedup should reject; inventory stays put.
     store.getState().takeAmbientNoun('rope');

@@ -143,6 +143,14 @@ export function lookupCraftedItem(resultName: string): {
   if (r) return { kind: 'relic', rarity: r.rarity, tags: r.tags, baseDurability: r.baseDurability ?? DEFAULT_DURABILITY };
   const m = MATERIALS.find((x) => x.name === resultName);
   if (m) return { kind: 'misc', rarity: m.rarity, tags: m.tags };
+  // 2026-05-25 — exploration catalog lookup. Without this branch the
+  // MECHANIC-2 Pulse Scanner recipe (added 2026-05-25, OTA-006)
+  // crafts as a tagless Common misc instead of the catalog's proper
+  // Scanner with its effect/faction/tcBuy. Any future exploration
+  // recipe (compass, lantern variants, scanner variants) would hit
+  // the same fallback.
+  const exp = EXPLORATION.find((x) => x.name === resultName);
+  if (exp) return { kind: 'relic', rarity: exp.rarity, tags: exp.tags };
   return { kind: 'misc', rarity: 'Common', tags: [] };
 }
 
@@ -180,6 +188,12 @@ export function findCatalogItem(name: string): {
   if (r) return { name: r.name, kind: 'relic', rarity: r.rarity, tags: r.tags, baseDurability: r.baseDurability ?? DEFAULT_DURABILITY };
   const m = MATERIALS.find((x) => x.name.toLowerCase() === q);
   if (m) return { name: m.name, kind: 'misc', rarity: m.rarity, tags: m.tags };
+  // 2026-05-25 — exploration catalog also reachable through
+  // findCatalogItem so ambient TAKE of a scanner / compass / etc.
+  // grants the real catalog entry with effect + tags instead of
+  // redirecting through the "scene feature" fallback.
+  const exp = EXPLORATION.find((x) => x.name.toLowerCase() === q);
+  if (exp) return { name: exp.name, kind: 'relic', rarity: exp.rarity, tags: exp.tags };
   return null;
 }
 

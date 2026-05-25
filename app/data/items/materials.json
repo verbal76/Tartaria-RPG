@@ -39,6 +39,10 @@
     { "name": "Cloth Scrap", "rarity": "Common", "tags": ["fiber", "junk", "scrap"], "description": "A torn square of weather-stained cloth. Worthless on its own; bind a few together and you've patched a sleeve." },
     { "name": "Bent Nail", "rarity": "Common", "tags": ["metal", "junk", "scrap"], "description": "A rusted iron nail, hammered crooked in some long-ago floorboard. Straightens out with a hard tap, maybe." },
     { "name": "Smooth Stone", "rarity": "Common", "tags": ["stone", "junk", "scrap"], "description": "A pebble worn round by the floodwater. Heavy in the hand. Skips well off mud-iron." },
-    { "name": "Bone Sliver", "rarity": "Common", "tags": ["bone", "junk", "scrap"], "description": "A finger-length splinter of pre-flood bone. Brittle and dry, but holds a point for a few hours of work." }
+    { "name": "Bone Sliver", "rarity": "Common", "tags": ["bone", "junk", "scrap"], "description": "A finger-length splinter of pre-flood bone. Brittle and dry, but holds a point for a few hours of work." },
+    { "name": "Aether Dust", "rarity": "Common", "tags": ["aether", "dust", "distillable"], "description": "Fine grey-blue dust that lifts off Aetheric machinery as it dies. Distillable into Aether Residue with the right kit." },
+    { "name": "Automaton Circuit", "rarity": "Common", "tags": ["automation", "tech", "scrap"], "description": "A finger-length sliver of pre-flood circuitry — copper traces over ceramic, Aetheric flux still faint along the etched lines." },
+    { "name": "Worn Tartarian Coin", "rarity": "Common", "tags": ["currency", "metal", "pre-flood"], "description": "A coin from before the flood, the edges worn round and the face smoothed to a ghost of a Monarch. Some vendors still accept them at face value." },
+    { "name": "Sentinel Core Plate", "rarity": "Uncommon", "tags": ["automation", "tech", "salvage", "scrap"], "description": "A square of the Aetheric ceramic that armors a Sentinel's central column. Heavy enough to throw, useful enough to sell." }
   ]
 }

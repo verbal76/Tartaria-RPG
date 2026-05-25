@@ -9307,16 +9307,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
       description: `Trophy from the hunt for the ${candidate.targetEnemyName}.`,
     });
     const huntRewardLookup = candidate.rewardItem ? lookupCraftedItem(candidate.rewardItem) : null;
-    const newInventory = candidate.rewardItem && huntRewardLookup
-      ? [...player.inventory, trophy, stampDurability({
-          id: `huntreward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-          name: candidate.rewardItem,
-          kind: huntRewardLookup.kind,
-          rarity: huntRewardLookup.rarity,
-          quantity: 1,
-          tags: huntRewardLookup.tags,
-        })]
-      : [...player.inventory, trophy];
+    // 2026-05-25 — route through grantItem so the inventory cap is
+    // honored. Previously raw spread silently bypassed the cap on
+    // hunt rewards (HANDOFF "silent swallow"). grantItem returns
+    // {inventory, accepted, dropped} per item; we log a refusal
+    // line when something didn't fit.
+    let huntNext = grantItem(player.inventory, trophy);
+    if (candidate.rewardItem && huntRewardLookup) {
+      const reward = stampDurability({
+        id: `huntreward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        name: candidate.rewardItem,
+        kind: huntRewardLookup.kind,
+        rarity: huntRewardLookup.rarity,
+        quantity: 1,
+        tags: huntRewardLookup.tags,
+      });
+      const rewardGrant = grantItem(huntNext.inventory, reward);
+      if (rewardGrant.accepted <= 0) {
+        get().appendLog(
+          'world',
+          `Pack too full — ${candidate.rewardItem} couldn't be carried. Make room and come back to claim it.`,
+        );
+      }
+      huntNext = { ...rewardGrant, inventory: rewardGrant.inventory };
+    }
+    const newInventory = huntNext.inventory;
     const repResult = candidate.factionId && candidate.rewardRep
       ? applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep)
       : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
@@ -9552,16 +9567,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
       description: `Recovered from the mystery: ${candidate.title}.`,
     });
     const mysteryRewardLookup = candidate.rewardItem ? lookupCraftedItem(candidate.rewardItem) : null;
-    const newInventory = candidate.rewardItem && mysteryRewardLookup
-      ? [...player.inventory, trophy, stampDurability({
-          id: `mysteryreward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-          name: candidate.rewardItem,
-          kind: mysteryRewardLookup.kind,
-          rarity: mysteryRewardLookup.rarity,
-          quantity: 1,
-          tags: mysteryRewardLookup.tags,
-        })]
-      : [...player.inventory, trophy];
+    // 2026-05-25 — grantItem honors cap (same fix as hunt path).
+    let mysteryNext = grantItem(player.inventory, trophy);
+    if (candidate.rewardItem && mysteryRewardLookup) {
+      const reward = stampDurability({
+        id: `mysteryreward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        name: candidate.rewardItem,
+        kind: mysteryRewardLookup.kind,
+        rarity: mysteryRewardLookup.rarity,
+        quantity: 1,
+        tags: mysteryRewardLookup.tags,
+      });
+      const rewardGrant = grantItem(mysteryNext.inventory, reward);
+      if (rewardGrant.accepted <= 0) {
+        get().appendLog(
+          'world',
+          `Pack too full — ${candidate.rewardItem} couldn't be carried. Make room and come back to claim it.`,
+        );
+      }
+      mysteryNext = { ...rewardGrant, inventory: rewardGrant.inventory };
+    }
+    const newInventory = mysteryNext.inventory;
     const repResult = candidate.factionId && candidate.rewardRep
       ? applyRepChange(player.factionStanding, candidate.factionId, candidate.rewardRep)
       : { standing: player.factionStanding.map((r) => ({ ...r })), changed: [] };
@@ -9867,17 +9893,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // the rewardItem grant (6 mysteries lost their reward when
       // completed via the Contracts screen). Vendor turn-in at
       // turnInMystery handled this; mirror that here.
+      // 2026-05-25 — grantItem honors cap. Previously raw spread.
       const mysteryUiRewardLookup = def.rewardItem ? lookupCraftedItem(def.rewardItem) : null;
-      const newInventory = def.rewardItem && mysteryUiRewardLookup
-        ? [...player.inventory, stampDurability({
-            id: `mysteryreward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-            name: def.rewardItem,
-            kind: mysteryUiRewardLookup.kind,
-            rarity: mysteryUiRewardLookup.rarity,
-            quantity: 1,
-            tags: mysteryUiRewardLookup.tags,
-          })]
-        : player.inventory;
+      let newInventory = player.inventory.map((i) => ({ ...i }));
+      if (def.rewardItem && mysteryUiRewardLookup) {
+        const reward = stampDurability({
+          id: `mysteryreward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          name: def.rewardItem,
+          kind: mysteryUiRewardLookup.kind,
+          rarity: mysteryUiRewardLookup.rarity,
+          quantity: 1,
+          tags: mysteryUiRewardLookup.tags,
+        });
+        const g = grantItem(newInventory, reward);
+        newInventory = g.inventory;
+        if (g.accepted <= 0) {
+          get().appendLog(
+            'world',
+            `Pack too full — ${def.rewardItem} couldn't be carried. Make room and complete the mystery again to claim.`,
+          );
+        }
+      }
       set((s) => (s.player ? {
         player: {
           ...s.player,
@@ -9913,17 +9949,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // Mantle, True Tartarian → Tartarian Stoneband, Reclaimer Relic
       // Run → Echoing Steps Boots, Silence Across the Border → Mud
       // Monarch Seal). Mirror turnInStoryline.
+      // 2026-05-25 — grantItem honors cap. Previously raw spread.
       const storyUiRewardLookup = def.rewardItem ? lookupCraftedItem(def.rewardItem) : null;
-      const newInventory = def.rewardItem && storyUiRewardLookup
-        ? [...player.inventory, stampDurability({
-            id: `story_reward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-            name: def.rewardItem,
-            kind: storyUiRewardLookup.kind,
-            rarity: storyUiRewardLookup.rarity,
-            quantity: 1,
-            tags: storyUiRewardLookup.tags,
-          })]
-        : player.inventory;
+      let newInventory = player.inventory.map((i) => ({ ...i }));
+      if (def.rewardItem && storyUiRewardLookup) {
+        const reward = stampDurability({
+          id: `story_reward_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          name: def.rewardItem,
+          kind: storyUiRewardLookup.kind,
+          rarity: storyUiRewardLookup.rarity,
+          quantity: 1,
+          tags: storyUiRewardLookup.tags,
+        });
+        const g = grantItem(newInventory, reward);
+        newInventory = g.inventory;
+        if (g.accepted <= 0) {
+          get().appendLog(
+            'world',
+            `Pack too full — ${def.rewardItem} couldn't be carried. Make room and complete the storyline again to claim.`,
+          );
+        }
+      }
       set((s) => (s.player ? {
         player: {
           ...s.player,
