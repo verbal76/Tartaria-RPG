@@ -699,6 +699,35 @@ export interface PlayerCharacter {
    *  step lands on the target tile and travelTo fires) or taps
    *  STOP TRAVEL. */
   travelTarget?: { locationId: string };
+  /** 2026-05-25 [MECHANIC-1b] — active golem sidekick. Persists on
+   *  the player so it survives cardinal moves + scene transitions
+   *  (the "follows until needed again" requirement). null when no
+   *  golem is summoned or after dismissal / death. Named 'golem'
+   *  to avoid colliding with the existing optional 'companion'
+   *  NPC follower field above. */
+  golem?: Companion | null;
+}
+
+/** 2026-05-25 [MECHANIC-1b] — Golem sidekick companion. Summoned
+ *  via the Aethercraft `summon <type> golem` path, commanded via a
+ *  golem QuickBtn in combat. Survives until HP ≤ 0 or until the
+ *  player dismisses. */
+export type GolemKind = 'mud_golem' | 'iron_golem' | 'aether_golem' | 'crystal_golem';
+export interface Companion {
+  kind: GolemKind;
+  /** Display label. "Mud Golem" / "Iron Golem" / etc. */
+  name: string;
+  hp: number;
+  hpMax: number;
+  /** Damage dice — parsed by rollDie / inline. "1d8", "1d6", "1d10". */
+  attackDie: string;
+  /** Flat damage modifier added on top of the die roll. */
+  attackMod: number;
+  damageType: 'bludgeoning' | 'slashing' | 'piercing' | 'aetheric';
+  /** Flat bonus added to the d20 attack roll (Crystal Golem has +2). */
+  hitBonus: number;
+  /** ISO ms — diagnostic only. */
+  summonedAt: number;
 }
 
 export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive' | 'debug' | 'feedback';
