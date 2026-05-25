@@ -2,12 +2,14 @@ import { rollSalvagePool, __TEST_ONLY__ } from '../app/engine/salvagePools';
 
 describe('salvage pool classifier', () => {
   it('returns null for nouns that match no pool', () => {
+    // 2026-05-25 OTA-038 — pillar moved into relic_site, so it now
+    // matches. Updated list to only include nouns still uncovered
+    // by design (terrain-only, non-salvageable scenery).
     expect(rollSalvagePool('mud')).toBeNull();
     expect(rollSalvagePool('silt')).toBeNull();
     expect(rollSalvagePool('skeleton', () => 0)).toMatchObject({ poolId: 'tomb' });
-    // 'pillar' / 'arch' are scene features that don't match any salvage pool
-    expect(rollSalvagePool('pillar')).toBeNull();
     expect(rollSalvagePool('arch')).toBeNull();
+    expect(rollSalvagePool('sky')).toBeNull();
   });
 
   it('routes drone/sentinel/automaton to mechanical pool', () => {
@@ -119,5 +121,63 @@ describe('salvage pool classifier', () => {
     expect(rollSalvagePool('jagged submerged library shelf', rng)?.poolId).toBe('relic_site');
     expect(rollSalvagePool('crown altar', rng)?.poolId).toBe('relic_site');
     expect(rollSalvagePool('twin standard', rng)?.poolId).toBe('relic_site');
+  });
+
+  // 2026-05-25 OTA-038 — full SALVAGE_PATTERN coverage invariant.
+  // Every keyword the SalvageModal's regex surfaces as a chip MUST
+  // route to some salvage pool. Adding a new keyword to SALVAGE_PATTERN
+  // without adding pool coverage is the bug class that produced the
+  // "salvage all did nothing" report. This test scans every pattern
+  // and fails loud on any unmatched entry.
+  it('every SALVAGE_PATTERN keyword has a matching pool', () => {
+    const SALVAGE_PATTERN_KEYWORDS = [
+      // Constructs / machinery
+      'construct', 'automaton', 'drone', 'sentinel', 'wreck', 'husk',
+      'machinery', 'machine', 'scrap', 'circuit', 'gear', 'plating',
+      'core', 'relic', 'robot', 'rust', 'broken', 'fallen', 'toppled',
+      'cog', 'rig', 'engine', 'hull', 'chassis', 'frame',
+      // Containers
+      'lockbox', 'strongbox', 'coffer', 'safe', 'vault',
+      'crate', 'chest', 'box', 'cache', 'stash', 'barrel',
+      'wreckage', 'wagon', 'axle', 'boat', 'vessel',
+      'sarcophagus', 'tomb', 'crypt', 'grave', 'ossuary', 'burial',
+      'console', 'panel', 'conduit', 'terminal', 'altar',
+      'observatory', 'scope', 'lens', 'telescope', 'array', 'dish', 'antenna',
+      'spire', 'obelisk', 'pylon', 'pillar', 'monolith',
+      'trap', 'snare', 'tripwire', 'deadfall', 'defenses', 'defense',
+      'golem',
+      // Other break-open targets
+      'bench', 'shelf', 'rack', 'table', 'door', 'gate',
+      'skeleton', 'skull', 'rib', 'corpse', 'remains',
+      'banner', 'shroud', 'curtain', 'tarp',
+      'jar', 'bottle', 'jewelry box', 'jewel box', 'lock box', 'casket', 'reliquary',
+    ];
+    const unmatched: string[] = [];
+    for (const keyword of SALVAGE_PATTERN_KEYWORDS) {
+      if (rollSalvagePool(keyword) === null) unmatched.push(keyword);
+    }
+    expect(unmatched).toEqual([]);
+  });
+
+  // 2026-05-25 OTA-038 — every CURATED salvage spawn must also route
+  // to a pool. These are the "rusted exoframe", "vault relic pedestal",
+  // "forgotten order reliquary" style chips that the SalvageModal
+  // prefers over common stock. They're real player-facing chips.
+  it('every CURATED salvage spawn has a matching pool', () => {
+    const CURATED_SPAWNS = [
+      'half-buried wagon', 'fallen sentinel husk', 'aetheric drone shell',
+      'cracked supply crate', 'toppled obelisk fragment', 'rusted exoframe',
+      'crashed automaton chassis', 'salt-crusted lockbox',
+      'buried reclaimer cache', 'shattered tartarian relay',
+      'library archive console', 'royal display case', 'vault relic pedestal',
+      'capacitor coil rack', 'engine room toolbench', 'forgotten order reliquary',
+      'tartarian power conduit', 'sentinel diagnostic console',
+      'stripped maintenance panel', 'hidden weapon locker',
+    ];
+    const unmatched: string[] = [];
+    for (const noun of CURATED_SPAWNS) {
+      if (rollSalvagePool(noun) === null) unmatched.push(noun);
+    }
+    expect(unmatched).toEqual([]);
   });
 });
