@@ -1778,6 +1778,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    // 2026-05-25 OTA-036 — when a legitimate theft line DOES fire,
+    // append a debug breadcrumb to the visible log naming what
+    // triggered it. If a future bug ever fires this line in the
+    // wrong context, the log will show the cause beside the line
+    // instead of leaving the dev to guess from a paraphrase. The
+    // crumb is also persisted to disk so it survives session reload.
+    if (THEFT_NARRATION_RE.test(text) && meta?.stealCaught && meta?.triggerSource) {
+      const crumb = makeEntry('debug', `theft-line trigger — ${String(meta.triggerSource)}`);
+      void persistEntry(crumb);
+      // Defer the in-memory append until after the main entry lands
+      // so the debug line sits directly beneath the theft line in
+      // the feed (set() below appends the main entry first).
+      queueMicrotask(() => {
+        set((state) => ({
+          gameLog: [...state.gameLog, crumb].slice(-MAX_LOG_IN_MEMORY),
+        }));
+      });
+    }
     const entry = makeEntry(channel, text, meta);
     void persistEntry(entry);
     // Duplicate-chatter suppression. If the Arbiter just spoke the same
@@ -8971,7 +8989,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog(
         'combat',
         `${scene.vendor.name} catches your hand mid-lift. "Thief!" — steel comes out.`,
-        { stealCaught: true },
+        {
+          stealCaught: true,
+          // 2026-05-25 OTA-036 — full trigger context so any future
+          // appearance of this line is self-explanatory in the log.
+          triggerSource: `stealFromVendor: vendor='${scene.vendor.name}' demeanor=${scene.vendor.demeanor} item='${offer.itemName}' roll=d20(${roll})+DEX(${stats.dexterity})=${total} vs DC${dc} prevAttempts=${prevAttempts} location=${player.currentLocationId}${player.hubRoomId ? `:${player.hubRoomId}` : ''}`,
+        },
       );
       logRepChanges(get, repResult.changed);
       recordMemorableEvent(get, set, {
