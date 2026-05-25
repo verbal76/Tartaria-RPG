@@ -2197,6 +2197,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             'arbiter',
             chain.plantLines[Math.floor(Math.random() * chain.plantLines.length)]!,
           );
+          // 2026-05-25 — hearing a Whisper trains WIS (per skill-growth spec).
+          applyTrainAndLog(get, set, 'wisdom', '✦ A whisper takes root. +1 WIS (now {to}).');
           // One whisper per scene entry — don't pile up tips on the
           // same visit. The next entry can plant another.
           break;
@@ -6024,15 +6026,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (tierCleared) {
           // OTA 058 — train DEX on a successful climb tier (rope
           // auto-pass also counts; the climb still happened).
+          // 2026-05-25 — also train STR per playtester spec: climbing
+          // is a strength-tax too, hauling body weight up the line.
           const liveClimber = get().player;
           if (liveClimber) {
-            const tr = trainStat(liveClimber, 'dexterity', true);
-            set((s) => (s.player ? { player: tr.player } : s));
-            if (tr.leveled) {
+            const trDex = trainStat(liveClimber, 'dexterity', true);
+            set((s) => (s.player ? { player: trDex.player } : s));
+            if (trDex.leveled) {
               get().appendLog(
                 'reward',
-                `✦ Your grip remembers. +1 DEX (now ${tr.leveled.to}).`,
+                `✦ Your grip remembers. +1 DEX (now ${trDex.leveled.to}).`,
               );
+            }
+            const liveClimber2 = get().player;
+            if (liveClimber2) {
+              const trStr = trainStat(liveClimber2, 'strength', true);
+              set((s) => (s.player ? { player: trStr.player } : s));
+              if (trStr.leveled) {
+                get().appendLog(
+                  'reward',
+                  `✦ The haul wears in. +1 STR (now ${trStr.leveled.to}).`,
+                );
+              }
             }
           }
           const isTop = currentTier === totalTiers;
@@ -8485,6 +8500,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
+      // 2026-05-25 — NPC interaction also trains WIS per playtester spec.
+      applyTrainAndLog(get, set, 'wisdom', '✦ The exchange leaves a lesson. +1 WIS (now {to}).');
     }
     void get().persist();
   },
@@ -8569,6 +8586,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
+      applyTrainAndLog(get, set, 'wisdom', '✦ The trade teaches you. +1 WIS (now {to}).');
     }
     void get().persist();
   },
@@ -8639,6 +8657,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
+      applyTrainAndLog(get, set, 'wisdom', '✦ The giving sharpens you. +1 WIS (now {to}).');
     }
     void get().persist();
   },
@@ -9018,6 +9037,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
+      applyTrainAndLog(get, set, 'wisdom', '✦ A new burden teaches. +1 WIS (now {to}).');
     }
     void get().persist();
   },
@@ -9259,6 +9279,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
+      applyTrainAndLog(get, set, 'wisdom', '✦ The hunt asks for forethought. +1 WIS (now {to}).');
     }
     void get().persist();
   },
@@ -9409,6 +9430,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       `✦ Hunt complete — ${candidate.title}. +${candidate.rewardTc} TC${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}. Trophy recovered.`,
     );
+    applyTrainAndLog(get, set, 'wisdom', '✦ A finished hunt seasons you. +1 WIS (now {to}).');
     if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
     recordMemorableEvent(get, set, {
       kind: 'rare_kill',
@@ -9535,6 +9557,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
+      applyTrainAndLog(get, set, 'wisdom', '✦ The mystery seats itself. +1 WIS (now {to}).');
     }
     void get().persist();
   },
@@ -9665,6 +9688,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       `✦ Mystery complete — ${candidate.title}. +${candidate.rewardTc} TC${candidate.rewardRep ? `, +${candidate.rewardRep} rep` : ''}.`,
     );
+    applyTrainAndLog(get, set, 'wisdom', '✦ A mystery resolved sharpens you. +1 WIS (now {to}).');
     if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
     void get().persist();
   },
@@ -9756,6 +9780,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
+      applyTrainAndLog(get, set, 'wisdom', '✦ The thread you took on weighs. +1 WIS (now {to}).');
     }
     void get().persist();
   },
@@ -9866,6 +9891,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       `✦ Storyline complete — ${candidate.title}. +${candidate.rewardTc} TC, +${candidate.rewardRep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
     );
+    applyTrainAndLog(get, set, 'wisdom', '✦ A storyline carried through teaches you. +1 WIS (now {to}).');
+    applyTrainAndLog(get, set, 'charisma', '✦ Word of the chapter spreads. +1 CHA (now {to}).');
     if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
     void get().persist();
   },
@@ -9927,6 +9954,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'reward',
         `✦ Hunt complete — ${def.title}. From your pack: the ${def.trophyName}. +${def.rewardTc} TC${def.rewardRep ? `, +${def.rewardRep} rep` : ''}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
       );
+      applyTrainAndLog(get, set, 'wisdom', '✦ A finished hunt seasons you. +1 WIS (now {to}).');
       if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
       void get().persist();
       return;
@@ -9984,6 +10012,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'reward',
         `✦ Mystery resolved — ${def.title}. +${def.rewardTc} TC${def.rewardRep ? `, +${def.rewardRep} rep` : ''}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
       );
+      applyTrainAndLog(get, set, 'wisdom', '✦ A mystery resolved sharpens you. +1 WIS (now {to}).');
       if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
       void get().persist();
       return;
@@ -10040,6 +10069,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'reward',
         `✦ Storyline complete — ${def.title}. +${def.rewardTc} TC, +${def.rewardRep} rep with ${def.factionId.replace(/_/g, ' ')}${def.rewardItem ? ` + ${def.rewardItem}` : ''}.`,
       );
+      applyTrainAndLog(get, set, 'wisdom', '✦ A storyline carried through teaches you. +1 WIS (now {to}).');
+      applyTrainAndLog(get, set, 'charisma', '✦ Word of the chapter spreads. +1 CHA (now {to}).');
       if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
       void get().persist();
       return;
@@ -10075,6 +10106,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'reward',
         `✦ Quest complete — ${def.title}. +${def.reward.tc} TC, +${def.reward.rep} rep with ${def.factionId.replace(/_/g, ' ')}.`,
       );
+      applyTrainAndLog(get, set, 'wisdom', '✦ Faction work finished, lessons kept. +1 WIS (now {to}).');
       if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
       void get().persist();
     }
@@ -10231,6 +10263,69 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? { player: { ...s.player, mapX: step.x, mapY: step.y, lastTravelDirection: dir } }
         : s,
     );
+    // 2026-05-25 — train WIS on every successful cardinal step.
+    // Walking the buried world earns wisdom (per playtester spec).
+    {
+      const liveStepper = get().player;
+      if (liveStepper) {
+        const trWis = trainStat(liveStepper, 'wisdom', true);
+        set((s) => (s.player ? { player: trWis.player } : s));
+        if (trWis.leveled) {
+          get().appendLog(
+            'reward',
+            `✦ The road teaches you. +1 WIS (now ${trWis.leveled.to}).`,
+          );
+        }
+      }
+    }
+    // 2026-05-25 — passive STR tick when carrying 20+ items: every
+    // cardinal step under load drills the back and shoulders. Tied
+    // to travel so it accrues at a sensible rate (not per-frame).
+    {
+      const liveLoaded = get().player;
+      if (liveLoaded) {
+        const totalItems = (liveLoaded.inventory ?? []).reduce(
+          (n, it) => n + (it.quantity ?? 1),
+          0,
+        );
+        if (totalItems >= 20) {
+          const trStr = trainStat(liveLoaded, 'strength', true);
+          set((s) => (s.player ? { player: trStr.player } : s));
+          if (trStr.leveled) {
+            get().appendLog(
+              'reward',
+              `✦ The pack on your back makes you stronger. +1 STR (now ${trStr.leveled.to}).`,
+            );
+          }
+        }
+      }
+    }
+    // 2026-05-25 — passive CHA tick when bearing named gear: a
+    // recognizable weapon or armor reads on every road you walk.
+    // "Named" = equipped item whose catalog name starts with a
+    // capital letter (proper-noun convention; generic "leather
+    // boots" stays lowercase, unique "Tartarian Greatsword" does
+    // not). Tied to travel so the boost is per-tile.
+    {
+      const liveBearer = get().player;
+      if (liveBearer) {
+        const eq = liveBearer.equipped ?? {};
+        const equippedNames: string[] = [
+          eq.main, eq.off, eq.head, eq.chest, eq.legs, eq.feet, eq.amulet, eq.ring,
+        ].filter((n): n is string => typeof n === 'string' && n.trim().length > 0);
+        const hasNamedGear = equippedNames.some((n) => /^[A-Z]/.test(n.trim()));
+        if (hasNamedGear) {
+          const trCha = trainStat(liveBearer, 'charisma', true);
+          set((s) => (s.player ? { player: trCha.player } : s));
+          if (trCha.leveled) {
+            get().appendLog(
+              'reward',
+              `✦ Your bearing reads. +1 CHA (now ${trCha.leveled.to}).`,
+            );
+          }
+        }
+      }
+    }
     // 2026-05-25 [POLISH-4] — vendors no longer follow the player.
     // Previously a roadside vendor stayed on currentScene as the
     // player paced cardinal steps (vendor "followed for ~10 paces
@@ -12615,6 +12710,31 @@ function makeRoomKey(
  *  attack bonus in the game collapsed to the fallback (5 for thrown
  *  attacks; +3 for counter swings; ~8 for combatRules AC). This
  *  helper extracts the FIRST digit run anywhere in the string. */
+/** 2026-05-25 — helper that runs trainStat against the live store
+ *  player, persists, and logs the reward line on level-up. Used by
+ *  the NPC-interaction + quest-completion + travel-step paths that
+ *  needed to award multiple stats (e.g. CHA + WIS per NPC trade).
+ *  Pass `{to}` placeholder in the line; we substitute the new stat
+ *  value before emit. Safe no-op if no player or trainStat returns
+ *  no leveled record. */
+function applyTrainAndLog(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  stat: StatKey,
+  rewardLineWithPlaceholder: string,
+): void {
+  const p = get().player;
+  if (!p) return;
+  const tr = trainStat(p, stat, true);
+  set((s) => (s.player ? { player: tr.player } : s));
+  if (tr.leveled) {
+    get().appendLog(
+      'reward',
+      rewardLineWithPlaceholder.replace('{to}', String(tr.leveled.to)),
+    );
+  }
+}
+
 function parseEnemyAP(enemy: { abilityPoint?: string } | null | undefined, fallback = 3): number {
   if (!enemy) return fallback;
   const match = String(enemy.abilityPoint ?? '').match(/\d+/);
