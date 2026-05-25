@@ -88,6 +88,14 @@ interface Props {
   travelTargetName?: string | null;
   onContinueTravel?: () => void;
   onStopTravel?: () => void;
+  /** 2026-05-25 [UI-2] — count of takeable / salvageable nouns in
+   *  the current scene. When > 0, the corresponding peace-mode
+   *  quick button renders with 'ready' tone (green) to signal
+   *  there's something actionable behind it. When 0/undefined,
+   *  the button stays neutral. Same affordance pattern as the
+   *  combat APPROACH 'needs-approach' tone. */
+  takeableCount?: number;
+  salvageableCount?: number;
 }
 
 // Peace-mode quick buttons. The "look around you" button submits 'look' —
@@ -112,7 +120,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenFeedback, onOpenMap, inCombat, equippedMain, equippedOff, range, travelTargetName, onContinueTravel, onStopTravel }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenFeedback, onOpenMap, inCombat, equippedMain, equippedOff, range, travelTargetName, onContinueTravel, onStopTravel, takeableCount, salvageableCount }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
   // BrandedKeyboard removed 2026-05-21 per playtester: "it is not
@@ -315,8 +323,15 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 out of a multi-target encounter ("approach the human"
                 while the dragon and hellhound watch) plus optionally
                 slip in via stealth instead of closing the gap in the
-                open. */}
-            <QuickBtn label="approach" onPress={onOpenApproach} />
+                open.
+                2026-05-25 [POLISH-1] — tone='needs-approach' (green
+                glow) when range is 'far' so the player sees at a
+                glance they need to close before attacking. */}
+            <QuickBtn
+              label="approach"
+              onPress={onOpenApproach}
+              tone={range === 'far' ? 'needs-approach' : undefined}
+            />
             {/* `block` quick-action removed 2026-05-21 — folded into
                 dodge. The dodge button now triggers the active-parry
                 mechanic: opposed d20+DEX roll on the next incoming
@@ -358,8 +373,21 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 internally; this aligns the button with the intent. */}
             <QuickBtn label="investigate" onPress={onOpenSearch} />
             <QuickBtn label="approach" onPress={onOpenApproach} />
-            <QuickBtn label="take" onPress={onOpenTake} />
-            <QuickBtn label="salvage" onPress={onOpenSalvage} />
+            {/* 2026-05-25 [UI-2] — take/salvage tone='ready' (green)
+                when there's something actionable in the scene. Players
+                were tapping these and finding empty modals; the green
+                tint at-a-glance signals there's loot worth checking.
+                Gray (no tone) when count is 0/undefined. */}
+            <QuickBtn
+              label="take"
+              onPress={onOpenTake}
+              tone={takeableCount && takeableCount > 0 ? 'ready' : undefined}
+            />
+            <QuickBtn
+              label="salvage"
+              onPress={onOpenSalvage}
+              tone={salvageableCount && salvageableCount > 0 ? 'ready' : undefined}
+            />
             {/* OTA 031/032 — climb action group. Three states:
                   - on the ground       → CLIMB (opens noun picker)
                   - elevated, mid-climb → CLIMB UP + CLIMB DOWN
