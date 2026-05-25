@@ -372,9 +372,10 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     fontSize: 14,
   },
+  // 2026-05-25 — removed dead style keys after the chip layout
+  // migrated to the stacked chipFull pattern: chipRow, chipScrollRow,
+  // chip, chipScene, chipText, chipTextScene — all unreferenced.
   chipLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
-  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  chipScrollRow: { flexDirection: 'row', gap: 6, paddingLeft: 2, paddingRight: 8 },
   // 2026-05-25 — stacked-list styles matching TakeModal so the
   // four ambient-noun modals share one visual pattern.
   chipScroll: { maxHeight: 280 },
@@ -393,17 +394,6 @@ const styles = StyleSheet.create({
   chipFullScene: { borderColor: '#9ec96a' },
   chipFullText: { color: '#e6d8b3', fontSize: 14, fontWeight: '600' },
   chipFullArrow: { color: '#9ec96a', fontSize: 11, letterSpacing: 1 },
-  chip: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    borderRadius: 3,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  chipScene: { borderColor: '#9ec96a' },
-  chipText: { color: '#cdbf99', fontSize: 12 },
-  chipTextScene: { color: '#9ec96a', fontSize: 12 },
   btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 14 },
   btn: {
     paddingHorizontal: 14,

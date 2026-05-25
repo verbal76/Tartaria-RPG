@@ -156,11 +156,13 @@ const POOLS: SalvagePool[] = [
   },
 ];
 
-const NOTHING_LINES = [
-  'You work over {target} but nothing comes loose. It still sits there for another try.',
-  'You strip at {target}, get nothing for it. The work was wasted; the thing is still whole.',
-  'You try to salvage {target}. The bones hold, the joints hold, and your hands come away empty.',
-];
+// 2026-05-25 — NOTHING_LINES removed. POLISH-2 (OTA-003) repurposed
+// the would-be-nothing branch in rollSalvagePool to roll from
+// JUNK_POOL + JUNK_LINES, so this pool's "nothing" narration was
+// orphaned. The kind:'nothing' SalvageOutcome variant is kept in
+// the type because the rollAreaSearch fallback (areaSearch.ts) can
+// still return that kind, and the gameStore salvage handler at
+// :3878 unions both outcomes via the shared kind discriminator.
 
 const MATERIAL_LINES = [
   'You strip {target} carefully. Something usable comes free in your hand.',
