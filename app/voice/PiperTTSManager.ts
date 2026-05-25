@@ -349,22 +349,31 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
       // machine (download progress, ready signal). Vendor voices load
       // silently — players don't need a UI for every vendor swap.
       //
-      // Start in 'loading' rather than 'downloading'. On a cache hit
-      // (the common case for every launch after the first ever) the
-      // progress callback fires once at p=1.0 and we never see a real
-      // download. Leaving the initial phase as 'downloading' caused
-      // the misleading "⬇ Installing premium voice 0%" banner to
-      // flash on every cold start even though nothing was being
-      // fetched. We escalate to 'downloading' inside the progress
-      // callback only when fraction < 1.0 — i.e. a real network
-      // download is actually in flight.
+      // Time-based gate distinguishes cache hits from real downloads:
+      // cache reads fully resolve in <2s; a real 100 MB download takes
+      // 30–60s. Initial phase is 'loading' (banner reads "Waking up
+      // the Arbiter…"). If the load is still in flight 4s in AND the
+      // progress callback is still reporting fraction < 0.99, we
+      // escalate to phase 'downloading' so the player sees the real
+      // percentage during a genuine first-time fetch. Cache hits never
+      // trip the gate and stay on the calmer loading copy throughout.
       if (sticky) setKokoroState({ phase: 'loading' });
+      const loadStartedAt = Date.now();
+      let downloadEscalated = false;
       const m = await exec.TextToSpeechModule.fromModelName(
         { model: exec.KOKORO_MEDIUM, voice: voiceRefFor(voiceId) },
         (p: number) => {
           if (sticky) {
             lastDownloadProgress = p;
-            if (p < 1) setKokoroState({ phase: 'downloading', fraction: p });
+            if (!downloadEscalated) {
+              const elapsed = Date.now() - loadStartedAt;
+              if (elapsed >= 4000 && p < 0.99) {
+                downloadEscalated = true;
+              }
+            }
+            if (downloadEscalated) {
+              setKokoroState({ phase: 'downloading', fraction: p });
+            }
             for (const l of downloadListeners) {
               try { l(p); } catch { /* ignore */ }
             }

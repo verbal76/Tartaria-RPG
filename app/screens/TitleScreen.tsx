@@ -904,19 +904,30 @@ function KokoroDownloadBanner(): React.ReactElement | null {
     // sit on the title screen forever once the voice is installed.
     return <ReadyFlash />;
   }
-  // 'downloading' and 'loading' render the same label — the user
-  // sees "Loading premium voice…" for the whole boot sequence with
-  // no percentage. ExecuTorch's progress callback fires intermediate
-  // values (0.9 → 1.0 over ~2s) even on cache hits, which would
-  // otherwise flash a misleading "downloading" banner on every
-  // cold start. The internal state machine still distinguishes the
-  // two phases for diagnostic capture (KokoroErrorRecord.step).
+  // Time-based gate in PiperTTSManager keeps 'downloading' phase
+  // suppressed for cache hits (resolve in <2s) and only escalates
+  // when a real 100 MB download is in flight (>4s elapsed + progress
+  // still <99%). So this branch only renders on a genuine first-time
+  // fetch or a post-reinstall refetch. Cache hits stay on the calmer
+  // 'loading' copy below.
+  if (state.phase === 'downloading') {
+    return (
+      <View style={styles.kokoroBanner}>
+        <Text style={styles.kokoroBannerText}>
+          ⬇  Installing premium voice (Kokoro)
+        </Text>
+        <Text style={styles.kokoroBannerProgress}>
+          {(state.fraction * 100).toFixed(0)}%  ·  one-time download (~100 MB), runs fully offline after this
+        </Text>
+      </View>
+    );
+  }
   return (
     <View style={styles.kokoroBanner}>
       <Text style={styles.kokoroBannerText}>
         {state.phase === 'error'
           ? `⚠  Voice engine: ${state.message ?? 'error'}`
-          : '⚙  Loading premium voice…'}
+          : '⚙  Waking up the Arbiter — select your character when it turns green'}
       </Text>
       {state.phase === 'error' && (
         <Text style={styles.kokoroBannerProgress}>
