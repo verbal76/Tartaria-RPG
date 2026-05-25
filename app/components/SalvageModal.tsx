@@ -30,6 +30,11 @@ interface Props {
   chips?: InteractableChip[];
   onSubmit: (target: string) => void;
   onCancel: () => void;
+  /** 2026-05-25 [UI-3] — bulk salvage button mirroring TAKE ALL.
+   *  Fires once per visible salvageable scene chip. Parent handler
+   *  iterates and closes the modal. Skipped when only 0-1 salvage
+   *  targets are present (button hidden). */
+  onSalvageAll?: (nouns: string[]) => void;
 }
 
 // Salvage chip filter — matches nouns the engine will actually salvage
@@ -109,7 +114,7 @@ function prioritizeSalvageChips(matches: readonly string[]): string[] {
   return [...curated, ...stock.slice(0, 1), ...other];
 }
 
-export function SalvageModal({ visible, hints, chips, onSubmit, onCancel }: Props) {
+export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalvageAll }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
   // Modal phase. 'select' shows the input + chip row; 'results' shows
@@ -276,6 +281,19 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel }: Prop
                       Players have the scene-hints row above + the
                       text input; the canned "the wreck" / "the drone"
                       hints were redundant and visually noisy. */}
+
+                  {/* 2026-05-25 [UI-3] — SALVAGE ALL button. Surfaces
+                      when 2+ scene chips are visible and the parent
+                      provides an onSalvageAll handler. Mirrors the
+                      TAKE ALL pattern in TakeModal:149. */}
+                  {onSalvageAll && sceneHints.length >= 2 && (
+                    <Pressable
+                      style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed, { marginTop: 8 }]}
+                      onPress={() => onSalvageAll(sceneHints)}
+                    >
+                      <Text style={styles.btnTextPrimary}>SALVAGE ALL ({sceneHints.length})</Text>
+                    </Pressable>
+                  )}
 
                   {/* 2026-05-25 [UI-1] — CANCEL moved to bottom-right
                       per modal-button placement standard. Action

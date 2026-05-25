@@ -67,11 +67,20 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
     Keyboard.dismiss();
     onSubmit(target);
   };
-  // Visible scene chips — drop consumed nouns unless alwaysShow.
-  // OTA 191 spec: 'the ground' is pinned at top with alwaysShow so it
-  // greys out after a dig; every other consumed noun (rusted blade
-  // after take, scrap pile after salvage) disappears from the list.
-  const visibleChips = (chips ?? []).filter((c) => !c.consumed || c.alwaysShow);
+  // 2026-05-25 [POLISH-3] — show consumed chips at the FAR RIGHT
+  // instead of hiding them. User wanted a visible record of what's
+  // already been investigated/taken/salvaged, while keeping the
+  // actionable items on the left so the longer slidable list reads
+  // "things to do" → "things tried" left-to-right. Consumed chips
+  // already render greyed + ✓ via the existing styling below; only
+  // the sort order needed to change. alwaysShow chips (like 'the
+  // ground') keep their inherent ordering — they were never in the
+  // filtered-out bucket anyway.
+  const visibleChips = [...(chips ?? [])].sort((a, b) => {
+    const aDone = a.consumed ? 1 : 0;
+    const bDone = b.consumed ? 1 : 0;
+    return aDone - bDone;
+  });
   // Keep a short Common row for fallback verbs the scene might not
   // explicitly surface. 'the ground' moved out of this row into the
   // pinned scene chips so it lives alongside the visible nouns
