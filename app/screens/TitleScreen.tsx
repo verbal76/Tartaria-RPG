@@ -506,11 +506,49 @@ export function TitleScreen() {
             >
               <Text style={styles.primaryBtnText}>New Tartarian</Text>
             </TouchableOpacity>
-            {/* v2.4.1 (OTA 051) — Lore Codex button removed in OTA 046,
-                CHECK FOR OTA UPDATE button removed here. The auto-check
-                in useEffect above fires on every TitleScreen mount
-                (including post-save-and-exit), so the manual button is
-                no longer needed and won't ship to players. */}
+            {/* 2026-05-25 — manual CHECK FOR OTA UPDATE button restored.
+                Removed in v2.4.1 (OTA 051) on the theory that the auto-
+                check in useEffect was sufficient. Playtester report:
+                "the manual pool OTA button is no longer on the cover
+                screen ... I cold started about 10 times and finally
+                it pulled the OTA." The auto-check uses fetchOnly so a
+                staged OTA needs ANOTHER cold-start to apply (download
+                pass N → apply pass N+1). The manual button fires the
+                full fetch+apply pipeline so a single tap pulls AND
+                applies in one go. Disabled while an apply is already
+                in flight to avoid a double-fetch. */}
+            <TouchableOpacity
+              style={[styles.secondaryBtn, applyingOTA !== null && styles.btnDisabled]}
+              disabled={applyingOTA !== null}
+              onPress={() => {
+                setApplyingOTA('Checking…');
+                void checkAndApplyOTA({
+                  onStatus: (s) => setApplyingOTA(s),
+                  onError: (msg) => {
+                    setApplyingOTA(null);
+                    // eslint-disable-next-line no-alert
+                    alert(`OTA update failed: ${msg.slice(0, 200)}`);
+                  },
+                }).then((result) => {
+                  if (result === 'noUpdate') {
+                    setApplyingOTA(null);
+                    // eslint-disable-next-line no-alert
+                    alert('You\'re on the latest OTA already.');
+                  } else if (result === 'skipped') {
+                    setApplyingOTA(null);
+                    // eslint-disable-next-line no-alert
+                    alert('OTA updates are disabled in this build.');
+                  }
+                  // 'applied' triggers reloadAsync — no further UI.
+                  // 'pending' / 'errored' handled inside checkAndApplyOTA via onStatus/onError.
+                });
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.secondaryBtnText}>
+                {applyingOTA ?? 'CHECK FOR OTA UPDATE'}
+              </Text>
+            </TouchableOpacity>
           </View>
         }
       />
@@ -796,6 +834,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   secondaryBtnText: { color: '#cdbf99', fontSize: 12, letterSpacing: 1, fontWeight: '700' },
+  btnDisabled: { opacity: 0.55 },
   bottomBar: {
     flexDirection: 'row',
     alignItems: 'center',
