@@ -3043,6 +3043,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
     }
+    // 2026-05-25 [MECHANIC-1b] — golem sidekick command shortcut.
+    // Intercept BEFORE the parser so "command golem" / "use golem" /
+    // bare "golem" (when player has an active golem) routes to the
+    // golem combat handler instead of being parsed as a generic
+    // verb. Also catches dismiss-golem and the no-op when no golem
+    // exists. Falls through to normal parser when text doesn't
+    // match the golem intent.
+    {
+      const lower = trimmed.toLowerCase();
+      const isGolemCommand = /^(use|command|order|attack with)?\s*golem(\s+(attack\s+)?(.*))?$/i.test(lower)
+        || /^(use|command)\s+golem\b/i.test(lower);
+      const isGolemDismiss = /^(dismiss|release|unbind)\s+(the\s+)?golem\b/i.test(lower);
+      if (isGolemCommand || isGolemDismiss) {
+        get().appendLog('player', trimmed);
+        if (isGolemDismiss) {
+          handleGolemDismiss(get, set);
+        } else {
+          // Extract optional target name from the input.
+          const match = lower.match(/^(use|command|order|attack with)?\s*golem(\s+(?:attack\s+)?(.*))?$/);
+          const cmdTarget = (match?.[3] ?? '').trim() || null;
+          handleGolemCommand(get, set, cmdTarget);
+        }
+        void get().persist();
+        return;
+      }
+    }
     const parsed = parseInput(trimmed, parseCtx);
     get().appendLog('player', trimmed, {
       intent: parsed.intent,
@@ -4398,7 +4424,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
             || /\baetheric healing\b/.test(verbLow);
           if (wantShape || wantSummon || wantMend) {
             const discipline: 'shape' | 'summon' | 'mend' = wantShape ? 'shape' : wantSummon ? 'summon' : 'mend';
-            runAethercraft(discipline, get, set, player, currentScene);
+            // 2026-05-25 [MECHANIC-1b] — extract golem kind from the
+            // input text when summoning. Defaults to mud_golem if the
+            // player just types `summon golem` (backward-compat).
+            let golemKindHint: import('../engine/types').GolemKind | null = null;
+            if (discipline === 'summon') {
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const { parseGolemKind } = require('../engine/golems');
+              golemKindHint = parseGolemKind(`${verbLow} ${tgtLow}`);
+            }
+            runAethercraft(discipline, get, set, player, currentScene, golemKindHint);
             break;
           }
         }
@@ -12998,8 +13033,10 @@ function handlePlayerDeath(
 
   // Mark the character dead in-place. Persist immediately so the slot
   // summary on the title list reflects the new state.
+  // 2026-05-25 [MECHANIC-1b] — clear golem sidekick on player death.
+  // The Aetheric tether dies with the caster.
   set((s) => ({
-    player: s.player ? { ...s.player, dead: true, hp: 0 } : s.player,
+    player: s.player ? { ...s.player, dead: true, hp: 0, golem: null } : s.player,
     pendingRolls: null,
   }));
   void get().persist();
@@ -13570,35 +13607,58 @@ function runAethercraft(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   player: PlayerCharacter,
   scene: CurrentScene,
+  golemKindHint?: import('../engine/types').GolemKind | null,
 ): void {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { aethercraftDcModifier, aethercraftStatBonus } = require('../engine/raceMechanics');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { corruptionTierOf, tierCrossLine } = require('../engine/corruption');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { getGolemDefinition, makeCompanion, missingFuelFor, consumeFuel } = require('../engine/golems');
 
-  // 1. Locate an Aetherstone-tagged consumable in inventory.
-  const AETHER_FUEL_NAMES = [
-    'Aetheric Shard', 'Aether Crystal', 'Aether Mud', 'Aether Residue',
-    'Golem Core', 'Aetheric Locket',
-  ];
-  // Heal-only disciplines burn the rarer fuels harder; shape can use the
-  // mundane mud / residue.
-  const allowedForDiscipline: Record<typeof discipline, string[]> =
-    discipline === 'shape'
-      ? { shape: AETHER_FUEL_NAMES, summon: [], mend: [] }
-      : discipline === 'summon'
-        ? { shape: [], summon: ['Aetheric Shard', 'Aether Crystal', 'Golem Core'], mend: [] }
-        : { shape: [], mend: ['Aetheric Shard', 'Aether Crystal'], summon: [] };
-  const allowed = (allowedForDiscipline as Record<string, string[]>)[discipline] ?? [];
-  const fuelItem = player.inventory.find(
-    (i) => i.quantity > 0 && allowed.some((name) => name.toLowerCase() === i.name.toLowerCase()),
-  );
-  if (!fuelItem) {
-    get().appendLog(
-      'arbiter',
-      `"The Aether reaches for you," the Arbiter says, "finds nothing to pull on, and returns to itself."`,
-    );
-    return;
+  // 2026-05-25 [MECHANIC-1b] — summon discipline now consumes a
+  // golem-specific RECIPE (multiple items) instead of a single
+  // generic Aetheric fuel. Validate the recipe early so we don't
+  // burn time on a skill check we can't fulfill anyway.
+  let golemDef: ReturnType<typeof getGolemDefinition> | null = null;
+  let fuelItem: InventoryItem | null = null;
+  if (discipline === 'summon') {
+    if (player.golem) {
+      get().appendLog(
+        'arbiter',
+        `"Only one golem can wear the same Aetheric tether," the Arbiter says. "Dismiss the ${player.golem.name} first."`,
+      );
+      return;
+    }
+    const golemKind = golemKindHint ?? 'mud_golem';
+    golemDef = getGolemDefinition(golemKind);
+    const missing = missingFuelFor(golemDef, player.inventory);
+    if (missing.length > 0) {
+      get().appendLog(
+        'arbiter',
+        `"The Aether asks for what you don't carry," the Arbiter says. "Need: ${missing.join(', ')}."`,
+      );
+      return;
+    }
+  } else {
+    // shape / mend — legacy single-item Aether fuel logic.
+    const AETHER_FUEL_NAMES = [
+      'Aetheric Shard', 'Aether Crystal', 'Aether Mud', 'Aether Residue',
+      'Golem Core', 'Aetheric Locket',
+    ];
+    const allowed: string[] = discipline === 'shape'
+      ? AETHER_FUEL_NAMES
+      : ['Aetheric Shard', 'Aether Crystal']; // mend
+    fuelItem = player.inventory.find(
+      (i) => i.quantity > 0 && allowed.some((name) => name.toLowerCase() === i.name.toLowerCase()),
+    ) ?? null;
+    if (!fuelItem) {
+      get().appendLog(
+        'arbiter',
+        `"The Aether reaches for you," the Arbiter says, "finds nothing to pull on, and returns to itself."`,
+      );
+      return;
+    }
   }
 
   // 2. Skill check. Aethercraft uses INT for shape/summon and WIS
@@ -13630,11 +13690,18 @@ function runAethercraft(
   // 3. Consume fuel regardless of success ("the aether takes its
   // due either way" — softens repeat-spam without making failure
   // toothless).
-  const newInventory = player.inventory
-    .map((i) => i.id === fuelItem.id ? { ...i, quantity: i.quantity - 1 } : i)
-    .filter((i) => i.quantity > 0);
-  set((s) => s.player ? { player: { ...s.player, inventory: newInventory } } : s);
-  get().appendLog('world', `(1 ${fuelItem.name} consumed.)`);
+  if (discipline === 'summon' && golemDef) {
+    const newInventory = consumeFuel(golemDef, player.inventory);
+    set((s) => s.player ? { player: { ...s.player, inventory: newInventory } } : s);
+    const fuelSummary = golemDef.fuel.map((f: { name: string; quantity: number }) => `${f.quantity}× ${f.name}`).join(' + ');
+    get().appendLog('world', `(${fuelSummary} consumed.)`);
+  } else if (fuelItem) {
+    const newInventory = player.inventory
+      .map((i) => i.id === fuelItem!.id ? { ...i, quantity: i.quantity - 1 } : i)
+      .filter((i) => i.quantity > 0);
+    set((s) => s.player ? { player: { ...s.player, inventory: newInventory } } : s);
+    get().appendLog('world', `(1 ${fuelItem.name} consumed.)`);
+  }
 
   // Failure path — log + 0.5h time advance, that's it.
   if (!success) {
@@ -13693,12 +13760,17 @@ function runAethercraft(
         get().appendLog('reward', `✦ Shaped Aetheric Shard — pulled from a Small Rock by your own hands.`);
       }
     }
-  } else if (discipline === 'summon') {
-    const companion: StatusEffect = { kind: 'golem_companion', remainingRounds: 3, label: 'golem companion (3 rounds)' };
-    set((s) => s.player ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], companion) } } : s);
+  } else if (discipline === 'summon' && golemDef) {
+    // 2026-05-25 [MECHANIC-1b] — write the new golem sidekick to
+    // player.golem. Persists across cardinal moves + combats
+    // until HP hits 0 or the player dismisses. The "golem"
+    // QuickBtn picks up the existence of this field in combat
+    // and renders a commandable strike button.
+    const golem = makeCompanion(golemDef);
+    set((s) => s.player ? { player: { ...s.player, golem } } : s);
     get().appendLog(
       'world',
-      `Aetherstone lifts out of the ground and folds into a shape that walks. The golem is loyal — for three rounds.`,
+      `Aetherstone lifts out of the ground and folds into a shape that walks. ${golem.name} stands ready beside you. (HP ${golem.hp}/${golem.hpMax}, ${golem.attackDie} ${golem.damageType})`,
     );
   } else if (discipline === 'mend') {
     const livePlayer = get().player ?? player;
@@ -13726,6 +13798,169 @@ function runAethercraft(
     }
   }
   set((s) => s.player ? { player: advanceTime(spendStamina(s.player, 2), 0.5) } : s);
+}
+
+// 2026-05-25 [MECHANIC-1b] — golem sidekick command handler. Fires
+// when player taps the golem QuickBtn or types "command golem [tgt]".
+// Picks a target enemy, rolls the golem's attack, applies damage,
+// then routes the enemy's retaliation onto the golem's HP pool
+// instead of the player's.
+function handleGolemCommand(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  cmdTarget: string | null,
+): void {
+  const player = get().player;
+  const scene = get().currentScene;
+  if (!player || !scene) return;
+  const golem = player.golem;
+  if (!golem || golem.hp <= 0) {
+    get().appendLog(
+      'arbiter',
+      `"You have no golem to send," the Arbiter says. "Summon one first."`,
+    );
+    return;
+  }
+  const enemies = scene.enemies ?? [];
+  if (enemies.length === 0) {
+    get().appendLog(
+      'world',
+      `The ${golem.name} braces, scans the room, finds no enemy. The Aetheric thrum settles.`,
+    );
+    return;
+  }
+  // Pick target. If player named one, match by aliases / name; else
+  // first enemy. Enemies don't carry stable IDs, so we use array
+  // index for the immutable update path.
+  let targetIdx = 0;
+  if (cmdTarget) {
+    const lower = cmdTarget.toLowerCase();
+    const found = enemies.findIndex(
+      (e) => e.name.toLowerCase().includes(lower)
+        || (e.aliases ?? []).some((a) => a.toLowerCase().includes(lower)),
+    );
+    if (found >= 0) targetIdx = found;
+  }
+  const target = enemies[targetIdx]!;
+
+  // Attack roll: d20 + hitBonus vs a flat AC. Enemies don't carry
+  // an explicit AC field; mirror the player-vs-enemy combat path's
+  // default and use 12 as the implied bar.
+  const enemyAc = 12;
+  const atkRoll = rollDie(20);
+  const atkTotal = atkRoll + golem.hitBonus;
+  const hit = atkTotal >= enemyAc;
+  get().appendLog(
+    'combat',
+    `${golem.name} attacks ${target.name} — d20 ${atkRoll}${golem.hitBonus ? ` + ${golem.hitBonus}` : ''} = ${atkTotal} vs AC ${enemyAc} — ${hit ? '✓ HIT' : '✗ MISS'}`,
+  );
+
+  if (hit) {
+    // Roll damage from attackDie like "1d8" + attackMod.
+    const dieMatch = /^(\d+)d(\d+)$/.exec(golem.attackDie);
+    let dmg = 0;
+    if (dieMatch) {
+      const n = parseInt(dieMatch[1]!, 10);
+      const sides = parseInt(dieMatch[2]!, 10);
+      for (let i = 0; i < n; i++) dmg += rollDie(sides);
+    }
+    dmg += golem.attackMod;
+    const newEnemyHp = Math.max(0, target.hp - dmg);
+    get().appendLog(
+      'combat',
+      `${golem.name} lands ${dmg} ${golem.damageType} damage on ${target.name}. (${newEnemyHp} HP left)`,
+    );
+    if (newEnemyHp <= 0) {
+      get().appendLog('world', `${target.name} crumbles under the ${golem.name}'s assault.`);
+      set((s) => s.currentScene
+        ? {
+            currentScene: {
+              ...s.currentScene,
+              enemies: s.currentScene.enemies.filter((_, i) => i !== targetIdx),
+            },
+          }
+        : s);
+      const remaining = get().currentScene?.enemies ?? [];
+      if (remaining.length === 0) {
+        set((s) => s.currentScene ? { currentScene: { ...s.currentScene, range: null } } : s);
+      }
+      set((s) => s.player ? { player: advanceTime(spendStamina(s.player, 1), 0.25) } : s);
+      void get().persist();
+      return;
+    }
+    set((s) => s.currentScene
+      ? {
+          currentScene: {
+            ...s.currentScene,
+            enemies: s.currentScene.enemies.map((e, i) =>
+              i === targetIdx ? { ...e, hp: newEnemyHp } : e,
+            ),
+          },
+        }
+      : s);
+  } else {
+    get().appendLog(
+      'world',
+      `The ${golem.name}'s strike sails wide of ${target.name}.`,
+    );
+  }
+
+  // Retaliation — surviving enemy takes a swing at the golem (not
+  // the player). Damage reduces golem.hp; if it drops to ≤ 0 the
+  // golem crumbles and the field clears.
+  const enemyAtkRoll = rollDie(20);
+  const enemyAtkBonus = (target as { atkBonus?: number }).atkBonus ?? 2;
+  const golemAc = 11; // simple flat AC for golems
+  const enemyHit = (enemyAtkRoll + enemyAtkBonus) >= golemAc;
+  if (enemyHit) {
+    const enemyDmg = rollDie(6) + 1;
+    const newGolemHp = Math.max(0, golem.hp - enemyDmg);
+    get().appendLog(
+      'combat',
+      `${target.name} retaliates — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits ${golem.name} for ${enemyDmg}. (${newGolemHp}/${golem.hpMax})`,
+    );
+    if (newGolemHp <= 0) {
+      get().appendLog(
+        'world',
+        `The ${golem.name} stills, then crumbles back into ${golem.kind === 'mud_golem' ? 'mud' : golem.kind === 'iron_golem' ? 'iron filings' : golem.kind === 'aether_golem' ? 'a fading aetheric afterimage' : 'a scatter of crystal shards'}.`,
+      );
+      set((s) => s.player ? { player: { ...s.player, golem: null } } : s);
+    } else {
+      set((s) => s.player ? { player: { ...s.player, golem: { ...golem, hp: newGolemHp } } } : s);
+    }
+  } else {
+    get().appendLog(
+      'combat',
+      `${target.name} swings at ${golem.name} and misses.`,
+    );
+  }
+  set((s) => s.player ? { player: advanceTime(spendStamina(s.player, 1), 0.25) } : s);
+  void get().persist();
+}
+
+// 2026-05-25 [MECHANIC-1b] — dismiss the active golem on player
+// command. Clears player.golem and logs a flavor line. No-op when
+// no golem is active.
+function handleGolemDismiss(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const player = get().player;
+  if (!player) return;
+  if (!player.golem) {
+    get().appendLog(
+      'arbiter',
+      `"Nothing to dismiss," the Arbiter says. "The Aether is quiet here."`,
+    );
+    return;
+  }
+  const name = player.golem.name;
+  set((s) => s.player ? { player: { ...s.player, golem: null } } : s);
+  get().appendLog(
+    'world',
+    `${name} stills, then dissolves. The Aether returns to itself, indifferent.`,
+  );
+  void get().persist();
 }
 
 function weaponPhrase(weapon: string | null): string {

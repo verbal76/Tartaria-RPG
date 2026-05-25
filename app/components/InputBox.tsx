@@ -102,6 +102,12 @@ interface Props {
   salvageableCount?: number;
   climbableCount?: number;
   investigateCount?: number;
+  /** 2026-05-25 [MECHANIC-1b] — active golem sidekick summary. When
+   *  present + hp > 0 + in combat, a "golem (hp/max)" QuickBtn
+   *  renders in the combat row. Tap fires 'use golem' through
+   *  onSubmit. The button stays 'ready' tone always — its existence
+   *  signals the affordance. */
+  golem?: { name: string; hp: number; hpMax: number } | null;
 }
 
 // Peace-mode quick buttons. The "look around you" button submits 'look' —
@@ -126,7 +132,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenFeedback, onOpenMap, inCombat, equippedMain, equippedOff, range, travelTargetName, onContinueTravel, onStopTravel, takeableCount, salvageableCount, climbableCount, investigateCount }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenFeedback, onOpenMap, inCombat, equippedMain, equippedOff, range, travelTargetName, onContinueTravel, onStopTravel, takeableCount, salvageableCount, climbableCount, investigateCount, golem }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
   // BrandedKeyboard removed 2026-05-21 per playtester: "it is not
@@ -338,6 +344,17 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               onPress={onOpenApproach}
               tone={range === 'far' ? 'needs-approach' : undefined}
             />
+            {/* 2026-05-25 [MECHANIC-1b] — golem sidekick command.
+                Only renders in combat when a golem is summoned and
+                still alive. Tap fires 'use golem' which routes to
+                handleGolemCommand and strikes the primary enemy. */}
+            {golem && golem.hp > 0 ? (
+              <QuickBtn
+                label={`golem (${golem.hp}/${golem.hpMax})`}
+                onPress={() => onSubmit('use golem')}
+                tone="ready"
+              />
+            ) : null}
             {/* `block` quick-action removed 2026-05-21 — folded into
                 dodge. The dodge button now triggers the active-parry
                 mechanic: opposed d20+DEX roll on the next incoming

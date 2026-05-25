@@ -512,6 +512,11 @@ export function ExplorationScreen() {
                   && !flavorExhaustedSet.has(n.toLowerCase()),
               ).length;
             })()}
+            golem={player?.golem ? {
+              name: player.golem.name,
+              hp: player.golem.hp,
+              hpMax: player.golem.hpMax,
+            } : null}
             travelTargetName={(() => {
               if (!player?.travelTarget) return null;
               // eslint-disable-next-line @typescript-eslint/no-require-imports
