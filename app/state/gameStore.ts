@@ -103,8 +103,6 @@ import {
   consumeIngredients,
   lookupCraftedItem,
   RECIPES,
-  fuzzyFindWeapon,
-  fuzzyFindArmor,
   findArmorByName,
   findWeaponByName,
   applyDamageTypeModifier,
@@ -114,12 +112,11 @@ import {
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, VENDORS, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks } from '../engine/raceMechanics';
-import { trainStat, ensureStatProgress, type StatKey } from '../engine/statTraining';
+import { trainStat, type StatKey } from '../engine/statTraining';
 import { findQuestFactionHint } from '../engine/factionHint';
 import {
   HUB,
   isHubLocation,
-  findHubRoom,
   hubRoomFor,
   hubEntryRoomId,
   hubNameForFaction,
@@ -127,7 +124,7 @@ import {
   isLeaveHubCommand,
 } from '../engine/hub';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
-import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, resolveEquippedItem, effectiveStats } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats } from '../engine/equipment';
 import {
   canScrap,
   scrapOutputFor,
@@ -168,7 +165,6 @@ import {
   findFactionQuestById,
   availableFactionQuests,
   fuzzyFindFactionQuest,
-  FACTION_QUESTS,
 } from '../engine/factionQuests';
 import {
   HUNTS,
@@ -189,8 +185,8 @@ import {
   availableStorylines,
   fuzzyFindStoryline,
 } from '../engine/factionStorylines';
-import { tickWeather, weatherBlocksRepositioning, weatherRepositionCost, weatherAttackPenalty, weatherStatModifiers, describeWeatherStatModifiers } from '../engine/weatherEffects';
-import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, traitDodgeChance, describeTraits } from '../engine/enemyTraits';
+import { tickWeather, weatherRepositionCost, weatherAttackPenalty, weatherStatModifiers, describeWeatherStatModifiers } from '../engine/weatherEffects';
+import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, traitDodgeChance } from '../engine/enemyTraits';
 import { parseWeaponEffect, rollEffectBonusDamage } from '../engine/weaponEffects';
 import { rollThrowDamage, weightLabel, itemWeight } from '../engine/itemWeight';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
@@ -215,7 +211,6 @@ import {
   applyEffect,
   tickEffects,
   statusAcAdjustment,
-  statusAttackPenalty,
   isIncapacitated,
   hasFullCover,
   aethericVulnerabilityMultiplier,
@@ -395,22 +390,12 @@ const qwen = new QwenGenerativeEngine();
 // Casual-look narration: the player asked to look around but didn't target
 // anything specific. We narrate the scene without a roll, and occasionally
 // surface a hook the player can follow up on with a targeted action.
-const CASUAL_LOOK_LINES = [
-  'You scan the area. The stones are quiet for now.',
-  'You take in your surroundings. Nothing the Arbiter would call a discovery.',
-  'You let your gaze drift. The dust hangs the way dust does.',
-  'Your eyes track across the ruins. Whatever was here has been here a long time.',
-  'You look around. The hazard remains exactly as it was, no more, no less.',
-];
-const CASUAL_LOOK_HOOKS = [
-  'Something dark, half-swallowed by mud, catches your eye.',
-  'A faint resonance pulses from a collapsed corner.',
-  'Fresh scrape marks across the stone where there should be none.',
-  'A glint of metal — too small to name yet — lies in the rubble.',
-  'A handprint pressed into Aetherstone dust, recent enough to still hold shape.',
-  'The Aetheric haze thickens around one specific spot. You cannot tell why.',
-  'A thread of cold air leaks from somewhere behind the rubble.',
-];
+// 2026-05-25 — removed orphan narration pools:
+//   CASUAL_LOOK_LINES / CASUAL_LOOK_HOOKS — narrateCasualLook now
+//     emits structured bearings text and no longer picks from these.
+//   FEATURE_SIGHTINGS — narrateWanderingJourney now uses
+//     WANDERING_LEADS + plantHookByKind; FEATURE_SIGHTINGS was
+//     orphaned and unreferenced.
 
 // Wandering-journey narration: the player asked to walk / travel without
 // naming a destination. Move the world forward, plant something in the
@@ -420,15 +405,6 @@ const WANDERING_LEADS = [
   'You walk. Tartaria walks beside you.',
   'Your boots find the next stretch of ground.',
   'You set out on foot. The weather closes around you.',
-];
-const FEATURE_SIGHTINGS = [
-  'A low shape resolves on the horizon — too regular to be a hill, too small to be a tower.',
-  'You spot what looks like a stone arch, half-swallowed by old mud.',
-  'A faint resonance pulses from the south. Something there is awake.',
-  'A column of smoke or steam rises in the distance, thin and straight.',
-  'A thread of footprints, not yours, crosses your path and trails off.',
-  'A wagon, abandoned and broken-axled, leans into the mud ahead.',
-  'A toppled obelisk lies on its side, runes faded but not yet silent.',
 ];
 
 // Trigger phrases that switch an "investigate" intent from a generic look
