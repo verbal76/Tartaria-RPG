@@ -271,14 +271,15 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
         <TutorialTarget area="travel-row" style={styles.travelRow}>
           {travelTargetName ? (
             // v2.4.1 (OTA 049) — multi-step travel mode. Cardinal
-            // buttons swap to CONTINUE / STOP so the player walks
-            // tile-by-tile toward the named destination, engaging
-            // each scene en route. The MAP button stays available
-            // so the player can consult the atlas mid-journey.
+            // buttons swap to "→ [DEST]" + STOP TRAVEL so the player
+            // walks tile-by-tile toward the named destination,
+            // engaging each scene en route.
+            // 2026-05-25 — dropped MAP button from this row per
+            // original design (continue + stop only). Map remains
+            // accessible via the gear icon / cardinal row.
             <>
               <TravelBtn label={`→ ${travelTargetName.toUpperCase()}`} onPress={onContinueTravel ?? (() => {})} />
               <TravelBtn label="STOP TRAVEL" onPress={onStopTravel ?? (() => {})} />
-              <TravelBtn label="MAP" onPress={onOpenMap} />
             </>
           ) : (
             <>
