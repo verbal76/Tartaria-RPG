@@ -17,6 +17,25 @@ import { stopTTSController } from '../voice/TTSController';
 import { stopAndClear as stopTTS } from '../voice/TTSManager';
 import { disposePiperEngine } from '../voice/PiperTTSManager';
 
+/** 2026-05-25 — race a promise against a timeout. expo-updates
+ *  doesn't expose any built-in cancel/timeout for checkForUpdateAsync
+ *  or fetchUpdateAsync, so a dropped network can leave the call
+ *  pending indefinitely. This wrapper rejects after `ms` so the
+ *  caller can surface a clean error instead of a forever-spinning
+ *  button. The underlying expo-updates call keeps running (no real
+ *  cancellation API) but its eventual resolution is discarded. */
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(`OTA ${label} timed out after ${Math.round(ms / 1000)}s`));
+    }, ms);
+    promise.then(
+      (value) => { clearTimeout(timer); resolve(value); },
+      (err) => { clearTimeout(timer); reject(err); },
+    );
+  });
+}
+
 export interface CheckAndApplyOptions {
   /** Called as the sequence progresses. The button on AboutScreen
    *  uses this to swap the button label between "Checking…",
@@ -74,13 +93,29 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
     // most recently fetched update on disk.
     if (!skipFetch) {
       onStatus?.('Checking…');
-      const result = await Updates.checkForUpdateAsync();
+      // 2026-05-25 — added timeouts. Playtester reported the check
+      // "runs a prolonged time and doesn't always resolve." expo-
+      // updates' checkForUpdateAsync / fetchUpdateAsync have NO
+      // built-in timeout — on a dropped network the promise can
+      // hang forever, leaving the button stuck on "Checking…".
+      // 10s for the lightweight version check, 60s for the bundle
+      // download. Timeout throws an error which falls through to
+      // the catch below and surfaces as a clean 'errored' return.
+      const result = await withTimeout(
+        Updates.checkForUpdateAsync(),
+        10_000,
+        'check',
+      );
       if (!result.isAvailable) {
         onStatus?.('Already up to date');
         return 'noUpdate';
       }
       onStatus?.('Downloading update…');
-      await Updates.fetchUpdateAsync();
+      await withTimeout(
+        Updates.fetchUpdateAsync(),
+        60_000,
+        'download',
+      );
       // fetchOnly path — silent boot check. Don't reload mid-boot;
       // native modules are still initialising and reloadAsync at
       // this point reliably crashes the process to home screen.

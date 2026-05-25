@@ -527,14 +527,14 @@ export function TitleScreen() {
               disabled={applyingOTA !== null}
               onPress={() => {
                 setApplyingOTA('Checking…');
-                // 2026-05-25 — quiet failure path. Playtester showed
-                // a screenshot of an ERR_UPDATES_CHECK alert and asked
-                // for it to fail quietly. Transient EAS / network
-                // hiccups shouldn't surface a noisy modal that
-                // blocks the title screen. Use a brief inline label
-                // ("Failed — try later") that clears on its own so
-                // the player knows the tap registered but isn't
-                // forced to dismiss anything.
+                // 2026-05-25 — quiet failure + timeout-aware. Playtester
+                // reported the check "runs a prolonged time and doesn't
+                // always resolve." Root cause: expo-updates has no
+                // built-in timeout on checkForUpdateAsync; OTA-025 added
+                // a 10s/60s timeout inside checkAndApplyOTA so the
+                // promise can't hang forever. .catch() handler below is
+                // belt-and-suspenders for any truly unexpected
+                // rejection.
                 void checkAndApplyOTA({
                   onStatus: (s) => setApplyingOTA(s),
                   onError: () => {
@@ -548,9 +548,22 @@ export function TitleScreen() {
                   } else if (result === 'skipped') {
                     setApplyingOTA('Updates disabled');
                     setTimeout(() => setApplyingOTA(null), 2000);
+                  } else if (result === 'errored') {
+                    // onError already fired with the detail. Make sure
+                    // the button label clears even if onError was
+                    // skipped for any reason.
+                    setTimeout(() => setApplyingOTA(null), 2500);
                   }
                   // 'applied' triggers reloadAsync — no further UI.
-                  // 'pending' / 'errored' handled inside checkAndApplyOTA via onStatus/onError.
+                  // 'pending' is only set in fetchOnly mode which the
+                  // manual button doesn't use.
+                }).catch(() => {
+                  // checkAndApplyOTA wraps everything in try/catch so
+                  // this should be unreachable, but if some new code
+                  // path ever rejects directly we still want the
+                  // button to recover.
+                  setApplyingOTA('Failed — try later');
+                  setTimeout(() => setApplyingOTA(null), 2500);
                 });
               }}
               activeOpacity={0.7}
