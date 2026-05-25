@@ -40,7 +40,9 @@ const POOLS: SalvagePool[] = [
     id: 'mechanical',
     patterns: [
       'drone', 'sentinel', 'automaton', 'circuit', 'scrap drone',
-      'clockwork', 'mechanical',
+      'clockwork', 'mechanical', 'machine', 'machinery', 'construct',
+      'robot', 'husk', 'chassis', 'frame', 'exoframe', 'rig',
+      'plating', 'wreck', 'wreckage',
     ],
     items: [
       { name: 'Automaton Circuit', rarity: 'Common', weight: 30, min: 1, max: 2 },
@@ -52,7 +54,7 @@ const POOLS: SalvagePool[] = [
   },
   {
     id: 'wagon',
-    patterns: ['wagon', 'cart', 'sled', 'caravan'],
+    patterns: ['wagon', 'cart', 'sled', 'caravan', 'axle', 'vessel'],
     items: [
       { name: 'Trail Rations', rarity: 'Common', weight: 25, min: 1, max: 2 },
       { name: 'Scrap Metal', rarity: 'Common', weight: 25, min: 1, max: 3 },
@@ -81,7 +83,9 @@ const POOLS: SalvagePool[] = [
     patterns: [
       'engine', 'console', 'conduit', 'capacitor', 'coil', 'panel',
       'battery', 'core', 'pipe', 'valve', 'pump', 'motor', 'cable',
-      'wire', 'relay', 'gear', 'reactor', 'terminal', 'circuit panel',
+      'wire', 'relay', 'gear', 'cog', 'reactor', 'terminal', 'circuit panel',
+      'observatory', 'scope', 'lens', 'telescope', 'array', 'dish',
+      'antenna',
     ],
     items: [
       { name: 'Automaton Circuit', rarity: 'Common', weight: 25, min: 1, max: 2 },
@@ -118,7 +122,8 @@ const POOLS: SalvagePool[] = [
     id: 'tomb',
     patterns: [
       'sarcophagus', 'coffin', 'urn', 'burial', 'skeleton', 'remains',
-      'bone', 'skull', 'corpse', 'cadaver',
+      'bone', 'skull', 'corpse', 'cadaver', 'tomb', 'crypt', 'grave',
+      'ossuary', 'rib',
     ],
     items: [
       { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 35, min: 3, max: 10 },
@@ -167,7 +172,7 @@ const POOLS: SalvagePool[] = [
     patterns: [
       'pedestal', 'reliquary', 'altar', 'shrine', 'vault', 'monolith',
       'obelisk', 'plinth', 'library', 'doorway', 'gate', 'shelf',
-      'banner', 'standard', 'sigil',
+      'banner', 'standard', 'sigil', 'relic', 'spire', 'pylon', 'pillar',
     ],
     items: [
       { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 30, min: 2, max: 8 },
@@ -176,6 +181,95 @@ const POOLS: SalvagePool[] = [
       { name: 'Aether Crystal', rarity: 'Common', weight: 15, min: 1, max: 1 },
       { name: 'Aetheric Shard', rarity: 'Uncommon', weight: 10, min: 1, max: 1 },
       { name: 'Sealed Tartarian Letter', rarity: 'Common', weight: 5, min: 1, max: 1 },
+    ],
+  },
+  // 2026-05-25 OTA-038 — container pool. Lockboxes, crates, jars, etc.
+  // Containers historically routed through container_loot.json on
+  // direct "break open <X>" verbs, but tapping SALVAGE on a container
+  // chip routed nowhere. Now drops standard container-style loot.
+  {
+    id: 'container',
+    patterns: [
+      'lockbox', 'strongbox', 'coffer', 'safe', 'crate', 'chest',
+      'box', 'cache', 'stash', 'barrel', 'locker', 'jar', 'bottle',
+      'casket', 'case', 'urn',
+    ],
+    items: [
+      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 30, min: 3, max: 10 },
+      { name: 'Trail Rations', rarity: 'Common', weight: 20, min: 1, max: 2 },
+      { name: 'Aether Crystal', rarity: 'Common', weight: 15, min: 1, max: 1 },
+      { name: 'Aether Dust', rarity: 'Common', weight: 15, min: 1, max: 2 },
+      { name: 'Scrap Metal', rarity: 'Common', weight: 10, min: 1, max: 2 },
+      { name: 'Aetheric Shard', rarity: 'Uncommon', weight: 10, min: 1, max: 1 },
+    ],
+  },
+  // 2026-05-25 OTA-038 — fabric pool. Cloth-y nouns the player might
+  // strip for material: shrouds, curtains, tarps, etc. Drops cloth
+  // scraps + light Aetheric stock.
+  {
+    id: 'fabric',
+    patterns: [
+      'shroud', 'curtain', 'tarp', 'cloak', 'cloth', 'rag',
+    ],
+    items: [
+      { name: 'Cloth Scrap', rarity: 'Common', weight: 50, min: 1, max: 3 },
+      { name: 'Spider Silk', rarity: 'Common', weight: 20, min: 1, max: 1 },
+      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 15, min: 1, max: 3 },
+      { name: 'Aether Dust', rarity: 'Common', weight: 10, min: 1, max: 2 },
+      { name: 'Aetheric Cloth', rarity: 'Rare', weight: 5, min: 1, max: 1 },
+    ],
+  },
+  // 2026-05-25 OTA-038 — furniture pool. Hub-room benches, tables,
+  // doors, racks: low-value but the player should still get a tick of
+  // wood scrap, nails, sometimes a coin.
+  {
+    id: 'furniture',
+    patterns: [
+      'bench', 'rack', 'table', 'door', 'chair', 'stool', 'cabinet',
+    ],
+    items: [
+      { name: 'Bent Nail', rarity: 'Common', weight: 35, min: 1, max: 3 },
+      { name: 'Stick', rarity: 'Common', weight: 30, min: 1, max: 2 },
+      { name: 'Cloth Scrap', rarity: 'Common', weight: 20, min: 1, max: 2 },
+      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 15, min: 1, max: 3 },
+    ],
+  },
+  // 2026-05-25 OTA-038 — trap-salvage pool. Disarmed traps yield
+  // springs, wire, the occasional Aetheric component.
+  {
+    id: 'trap_salvage',
+    patterns: [
+      'trap', 'snare', 'tripwire', 'deadfall', 'defenses', 'defense',
+      'golem',
+    ],
+    items: [
+      { name: 'Scrap Metal', rarity: 'Common', weight: 30, min: 1, max: 2 },
+      { name: 'Bent Nail', rarity: 'Common', weight: 25, min: 1, max: 2 },
+      { name: 'Spider Silk', rarity: 'Common', weight: 20, min: 1, max: 1 },
+      { name: 'Aether Crystal', rarity: 'Common', weight: 15, min: 1, max: 1 },
+      { name: 'Aether Dust', rarity: 'Common', weight: 10, min: 1, max: 2 },
+    ],
+  },
+  // 2026-05-25 OTA-038 — junk-salvage catch-all for modifier-only nouns
+  // (rust, broken, fallen, toppled, scrap, etc.) and any noun the
+  // other pools missed. ALWAYS matches anything in SALVAGE_PATTERN —
+  // any future pattern added without a more specific pool falls here
+  // by design, so the player never sees a silent SALVAGE ALL again.
+  // Kept LAST in the array so more specific pools win first.
+  {
+    id: 'junk_salvage',
+    patterns: [
+      'rust', 'rusted', 'broken', 'fallen', 'toppled', 'scrap',
+      'cracked', 'shattered', 'stripped', 'weathered', 'tilted',
+      'salt-crusted', 'dust-buried', 'mud-glazed', 'half-buried',
+      'buried', 'hidden', 'crashed',
+    ],
+    items: [
+      { name: 'Bent Nail', rarity: 'Common', weight: 30, min: 1, max: 3 },
+      { name: 'Cloth Scrap', rarity: 'Common', weight: 25, min: 1, max: 2 },
+      { name: 'Stick', rarity: 'Common', weight: 20, min: 1, max: 2 },
+      { name: 'Smooth Stone', rarity: 'Common', weight: 15, min: 1, max: 2 },
+      { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 10, min: 1, max: 2 },
     ],
   },
 ];

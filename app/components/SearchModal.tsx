@@ -195,24 +195,32 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
                   "the floor") is now part of the scene chip row
                   above, set per-location by ExplorationScreen. */}
 
+              {/* 2026-05-25 OTA-038 — button row matches SalvageModal /
+                  BrandedModal convention: primary action on the LEFT,
+                  CANCEL on the right. Was reversed; playtester flagged
+                  the inconsistency. The primary button also flips to
+                  the ghost / neutral style when the text input is
+                  empty so the disabled state doesn't read as a washed-
+                  out tan rectangle — it reads as "not yet ready". */}
               <View style={styles.btnRow}>
-                <Pressable
-                  style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
-                  onPress={onCancel}
-                >
-                  <Text style={styles.btnTextNeutral}>CANCEL</Text>
-                </Pressable>
                 <Pressable
                   style={({ pressed }) => [
                     styles.btn,
-                    styles.btnPrimary,
-                    !text.trim() && styles.btnDisabled,
+                    text.trim() ? styles.btnPrimary : styles.btnNeutral,
                     pressed && styles.btnPressed,
                   ]}
                   onPress={handleSubmit}
                   disabled={!text.trim()}
                 >
-                  <Text style={styles.btnTextPrimary}>INVESTIGATE</Text>
+                  <Text style={text.trim() ? styles.btnTextPrimary : styles.btnTextNeutral}>
+                    INVESTIGATE
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
+                  onPress={onCancel}
+                >
+                  <Text style={styles.btnTextNeutral}>CANCEL</Text>
                 </Pressable>
               </View>
             </View>
