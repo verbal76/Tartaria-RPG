@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal, Alert } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { findHuntById, HUNTS } from '../engine/hunts';
 import { findMysteryById, MYSTERIES } from '../engine/mysteries';
@@ -845,11 +845,13 @@ export function ContractsScreen() {
                   // step onto a procedural tile while hubRoomId is
                   // still set, leaving the scene in a half-state.
                   if (player.hubRoomId) {
-                    appendLog(
-                      'arbiter',
-                      `The Arbiter holds up a hand. "Leave the outpost first — type 'leave outpost' or walk through the gate, then I can chart you to ${name}."`,
+                    // 2026-05-25 — Alert.alert instead of silent log
+                    // (same fix as LoreCodexBody confirmRoute).
+                    Alert.alert(
+                      'Leave the outpost first',
+                      `The Arbiter can't chart you to ${name} from inside the outpost. Walk through the gate (or type "leave outpost"), then tap Set Course again.`,
+                      [{ text: 'OK', onPress: () => setScreen('exploration') }],
                     );
-                    setScreen('exploration');
                     return;
                   }
                   setTravelCourse(id);

@@ -21,7 +21,7 @@
 // host still renders the entries as info-only).
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal, Alert } from 'react-native';
 import factionsData from '../data/factions/factions.json';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
@@ -53,11 +53,19 @@ export function LoreCodexBody() {
     // The player has to leave the outpost first — same gate the
     // cardinal-travel handler applies for outdoor moves from hubs.
     if (player.hubRoomId) {
-      appendLog(
-        'arbiter',
-        `The Arbiter holds up a hand. "Leave the outpost first — type 'leave outpost' or walk through the gate, then I can chart you to ${pendingRoute.name}."`,
+      // 2026-05-25 — surface the refusal as a modal Alert instead of
+      // a quiet Arbiter log. User report: "set course button no
+      // longer sets the course on the main screen" — they were
+      // inside an outpost when tapping Set Course, getting the
+      // silent appendLog refusal, and assuming the button was
+      // broken. Alert forces acknowledgement and points at the
+      // exact next step.
+      const destName = pendingRoute.name;
+      Alert.alert(
+        'Leave the outpost first',
+        `The Arbiter can't chart you to ${destName} from inside the outpost. Walk through the gate (or type "leave outpost"), then tap Set Course again.`,
+        [{ text: 'OK', onPress: () => setScreen('exploration') }],
       );
-      setScreen('exploration');
       return;
     }
     setTravelCourse(id);
