@@ -130,10 +130,15 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
               {visibleChips.length > 0 && (
                 <>
                   <Text style={styles.chipLabel}>In this scene</Text>
+                  {/* 2026-05-25 — stacked vertical layout matching
+                      TakeModal / ClimbModal so all four ambient-noun
+                      modals read the same. Bounded by maxHeight so
+                      a scene with 20 nouns scrolls instead of
+                      blowing past the screen; content shorter than
+                      maxHeight fits naturally. */}
                   <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.chipScrollRow}
+                    style={styles.chipScroll}
+                    contentContainerStyle={styles.chipList}
                   >
                     {visibleChips.map((c) => {
                       // OTA 195 — chip state machine:
@@ -152,9 +157,9 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
                         <Pressable
                           key={`scene-${c.noun}`}
                           style={({ pressed }) => [
-                            styles.chip,
-                            styles.chipScene,
-                            grayed && styles.chipConsumed,
+                            styles.chipFull,
+                            styles.chipFullScene,
+                            grayed && styles.chipFullConsumed,
                             pressed && !c.consumed && styles.btnPressed,
                           ]}
                           disabled={c.consumed}
@@ -162,16 +167,20 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
                         >
                           <Text
                             style={[
-                              styles.chipTextScene,
-                              grayed && styles.chipTextConsumed,
+                              styles.chipFullText,
+                              grayed && styles.chipFullTextConsumed,
                             ]}
                             numberOfLines={1}
                           >
                             {c.noun}{c.consumed ? ' ✓' : c.unmetRequirement ? ' 🔒' : ''}
                           </Text>
-                          {c.unmetRequirement && !c.consumed && (
-                            <Text style={styles.chipRequiresText} numberOfLines={1}>
+                          {c.unmetRequirement && !c.consumed ? (
+                            <Text style={styles.chipFullHint} numberOfLines={1}>
                               {c.unmetRequirement}
+                            </Text>
+                          ) : (
+                            <Text style={[styles.chipFullArrow, grayed && styles.chipFullArrowConsumed]}>
+                              {c.consumed ? '✓ done' : '→ investigate'}
                             </Text>
                           )}
                         </Pressable>
@@ -181,14 +190,19 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
                 </>
               )}
               <Text style={styles.chipLabel}>Common</Text>
-              <View style={styles.chipRow}>
+              {/* 2026-05-25 — Common-hints section stacked (was a
+                  flex-wrap row of compact chips) so the whole modal
+                  reads consistently with the scene chips above and
+                  with TakeModal / ClimbModal. */}
+              <View style={styles.chipList}>
                 {commonHints.map((h) => (
                   <Pressable
                     key={`common-${h}`}
-                    style={({ pressed }) => [styles.chip, pressed && styles.btnPressed]}
+                    style={({ pressed }) => [styles.chipFull, pressed && styles.btnPressed]}
                     onPress={() => tapToSearch(h)}
                   >
-                    <Text style={styles.chipText} numberOfLines={1}>{h}</Text>
+                    <Text style={styles.chipFullText} numberOfLines={1}>{h}</Text>
+                    <Text style={styles.chipFullArrow}>→ investigate</Text>
                   </Pressable>
                 ))}
               </View>
@@ -256,6 +270,34 @@ const styles = StyleSheet.create({
   chipLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chipScrollRow: { flexDirection: 'row', gap: 6, paddingLeft: 2, paddingRight: 8 },
+  // 2026-05-25 — stacked-list styles matching TakeModal so the
+  // four ambient-noun modals share one visual pattern. Bounded
+  // scroll height keeps long lists from blowing past the screen
+  // while short lists collapse to fit.
+  chipScroll: { maxHeight: 280 },
+  chipList: { gap: 6, paddingVertical: 4 },
+  chipFull: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#1a1714',
+    borderColor: '#9ec96a',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  chipFullScene: { borderColor: '#9ec96a' },
+  chipFullText: { color: '#e6d8b3', fontSize: 14, fontWeight: '600' },
+  chipFullArrow: { color: '#9ec96a', fontSize: 11, letterSpacing: 1 },
+  chipFullHint: { color: '#bf9b6a', fontSize: 11, letterSpacing: 0.5 },
+  chipFullConsumed: {
+    backgroundColor: '#13110f',
+    borderColor: '#3a342c',
+    opacity: 0.55,
+  },
+  chipFullTextConsumed: { color: '#7a705c', fontStyle: 'italic' },
+  chipFullArrowConsumed: { color: '#5e5547' },
   chip: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',

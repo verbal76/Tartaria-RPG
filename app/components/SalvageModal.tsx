@@ -258,18 +258,23 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalv
                   {sceneHints.length > 0 && (
                     <>
                       <Text style={styles.chipLabel}>In this scene</Text>
+                      {/* 2026-05-25 — stacked vertical layout matching
+                          TakeModal / ClimbModal / SearchModal so all
+                          four ambient-noun modals read the same.
+                          Bounded by maxHeight so long lists scroll
+                          while short lists collapse to fit. */}
                       <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={styles.chipScrollRow}
+                        style={styles.chipScroll}
+                        contentContainerStyle={styles.chipList}
                       >
                         {sceneHints.map((h) => (
                           <Pressable
                             key={`scene-${h}`}
-                            style={({ pressed }) => [styles.chip, styles.chipScene, pressed && styles.btnPressed]}
+                            style={({ pressed }) => [styles.chipFull, styles.chipFullScene, pressed && styles.btnPressed]}
                             onPress={() => tapToSalvage(h)}
                           >
-                            <Text style={styles.chipTextScene} numberOfLines={1}>{h}</Text>
+                            <Text style={styles.chipFullText} numberOfLines={1}>{h}</Text>
+                            <Text style={styles.chipFullArrow}>→ salvage</Text>
                           </Pressable>
                         ))}
                       </ScrollView>
@@ -364,6 +369,24 @@ const styles = StyleSheet.create({
   chipLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1.5, marginTop: 10, marginBottom: 4 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chipScrollRow: { flexDirection: 'row', gap: 6, paddingLeft: 2, paddingRight: 8 },
+  // 2026-05-25 — stacked-list styles matching TakeModal so the
+  // four ambient-noun modals share one visual pattern.
+  chipScroll: { maxHeight: 280 },
+  chipList: { gap: 6, paddingVertical: 4 },
+  chipFull: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#1a1714',
+    borderColor: '#9ec96a',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  chipFullScene: { borderColor: '#9ec96a' },
+  chipFullText: { color: '#e6d8b3', fontSize: 14, fontWeight: '600' },
+  chipFullArrow: { color: '#9ec96a', fontSize: 11, letterSpacing: 1 },
   chip: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',
