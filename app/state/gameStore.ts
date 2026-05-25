@@ -1547,6 +1547,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
         restoredScene.ambientNouns = hubRoomActive
           ? Array.from(new Set([...hubNouns, ...microMicroNouns]))
           : Array.from(new Set([...baseNouns, ...hubNouns, ...microMicroNouns]));
+        // 2026-05-25 — union with displayedAmbientNouns so every
+        // visible chip stays resolvable after save-restore. The
+        // curated climbables/salvageables injected by beginScene's
+        // REGRESSION-1 bucket allocation aren't in the base/hub/
+        // micro-micro pools we just rebuilt, so without this union
+        // a player who taps "tilted forgotten order reliquary" or
+        // "half-buried engine chamber scaffolding" — chips that are
+        // STILL on screen from the original scene — gets refused by
+        // matchAmbientNoun. The chips were persisted in
+        // displayedAmbientNouns; we just need ambientNouns to
+        // remain a superset of them so the resolver lookup hits.
+        if (restoredScene.displayedAmbientNouns && restoredScene.displayedAmbientNouns.length > 0) {
+          restoredScene.ambientNouns = Array.from(new Set([
+            ...restoredScene.ambientNouns,
+            ...restoredScene.displayedAmbientNouns,
+          ]));
+        }
       }
       set({
         player,
