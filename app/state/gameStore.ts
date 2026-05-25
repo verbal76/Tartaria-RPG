@@ -1862,7 +1862,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // call (the player's currentLocationId is still the hub's macro
     // location). QA sim caught this — `leave outpost` printed the
     // exit narration but the player stayed locked in the hub graph.
-    if (inHub && !hubRoomId && !opts?.skipHubEntry) {
+    //
+    // 2026-05-25 — also skip auto-entry when the player is
+    // PASSING THROUGH this location en route to a different
+    // travelTarget. Playtester report: "if I keep traveling to the
+    // mud Seas why does it keep telling me I am in the reception
+    // of a structure." The auto-enter was dropping them into the
+    // hub's Reception room every time they crossed The Buried
+    // Cities. The player can still explicitly enter the outpost by
+    // typing 'enter outpost' (or whatever the hub-room verb is) once
+    // they actually arrive at their destination.
+    const passingThrough = !!player.travelTarget
+      && player.travelTarget.locationId !== player.currentLocationId;
+    if (inHub && !hubRoomId && !opts?.skipHubEntry && !passingThrough) {
       hubRoomId = hubEntryRoomId();
       set((s) => (s.player ? { player: { ...s.player, hubRoomId } } : s));
     }
@@ -4701,7 +4713,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // heal/stamina ceiling is a separate dial.
           const hpRoom = player.hpMax - player.hp;
           const stamRoom = player.staminaMax - player.stamina;
-          if (hpRoom === 0 && stamRoom === 0) {
+          // 2026-05-25 — roll ambush BEFORE the "you're whole" guard.
+          // Previously the full-HP guard short-circuited every rest at
+          // max HP+stamina, which meant the ambush roll never even
+          // had a chance to fire (BALANCE-1 was effectively dead in
+          // the inline rest path; the store's rest() action at line
+          // ~11360 has ambush logic but is never called). Now the
+          // player who deliberately lies down in a dangerous biome
+          // can get jumped even at full health — the world doesn't
+          // care that you don't need the rest. 22% ambush chance per
+          // BALANCE-1 tuning. Hubs / outposts still safe.
+          const restScene = currentScene;
+          const restLoc = restScene?.location;
+          const restInSafeZone = restLoc ? isHubLocation(restLoc.id) : !!player.hubRoomId;
+          const restAmbush = !restInSafeZone && Math.random() < 0.22;
+          if (hpRoom === 0 && stamRoom === 0 && !restAmbush) {
             get().appendLog(
               'world',
               'You are whole, breath steady, HP and stamina topped. No reason to lie down — the day still has road left.',
@@ -4774,6 +4800,47 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (corrDecay > 0) parts.push(`−${corrDecay} corruption`);
           const tail = parts.length > 0 ? parts.join(', ') + ' recovered.' : 'Whole already — the Aetherstone hums steady.';
           get().appendLog('world', `You rest for ${hours} hours. ${tail} (${describeTime(newHours)})`);
+          // 2026-05-25 — ambush spawn. Rest completes (HP / stamina
+          // granted above), then the encounter fires AFTER recovery
+          // so the player wakes at full strength but with a problem
+          // to handle. Mirrors the store rest() action's spawn logic.
+          if (restAmbush) {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { pickWastelandEncounter } = require('../engine/wastelandEncounters');
+            const enc = pickWastelandEncounter(restScene.location, {
+              stepsSinceLastEncounter: 999,
+              threshold: 0,
+              rollChance: 1.0,
+            });
+            if (enc && enc.enemyName) {
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const { findEnemyByName } = require('../engine/encounter');
+              const enemy = findEnemyByName(enc.enemyName);
+              if (enemy) {
+                set((s) => s.currentScene
+                  ? {
+                      currentScene: {
+                        ...s.currentScene,
+                        enemies: [...s.currentScene.enemies, enemy],
+                        enemyHps: [...s.currentScene.enemyHps, enemy.hp],
+                        enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
+                        range: 'far',
+                      },
+                    }
+                  : s);
+                get().appendLog(
+                  'arbiter',
+                  `The Arbiter goes still. "You weren't alone. Something circled while you were out — and it stopped circling."`,
+                );
+                get().appendLog('world', `A ${enemy.name} closes the distance through the dark. The rest is over.`);
+              }
+            } else {
+              // No archetype matched — emit a flavor line so the
+              // player knows the world stirred even though no fight
+              // landed.
+              get().appendLog('arbiter', `The Arbiter watches the horizon. "Something passed close while you slept. It moved on."`);
+            }
+          }
           void get().persist();
         }
         break;
