@@ -5,19 +5,24 @@
 // etc.) accrues progress on that stat. Failures don't count — the
 // system rewards effective use, not flailing.
 //
-// Tiered cost so early growth feels generous and high stats are
-// hard-won:
-//   stat ≤ 10  → +2 progress per use  (50 uses to next +1)
-//   stat 11-14 → +1 progress per use  (100 uses)
-//   stat 15+   → +0.5 progress per use (200 uses) — caps the
-//                late-game grind
+// 2026-05-25 — finer progressive scaling per playtester:
+//   "as your stats get better the amount needed to grow the skill
+//    should progressively get higher for the individual stat."
+// Replaced the 3-tier coarse award with a 6-step curve so the ramp
+// is continuous up through mid-twenties and high stats take real
+// commitment to advance:
+//   stat  1-5   → +3 per use   (~33 uses to next +1)
+//   stat  6-10  → +2 per use   (~50 uses)
+//   stat 11-14  → +1 per use   (100 uses)
+//   stat 15-18  → +0.5 per use (200 uses)
+//   stat 19-22  → +0.25 per use (400 uses)
+//   stat 23+    → +0.1 per use (1000 uses) — late-game commitment
 //
 // When progress hits 100, the base stat increments by 1 and progress
 // rolls over the overshoot — nothing wasted.
 //
-// Display is quantized into 4 quarters for the Player Sheet
-// (▮▮▯▯ = 50%). The internal value is precise; the UI rounds to
-// 0/25/50/75 so the player doesn't see every 1-2% tick.
+// Display is the 20-segment fineProgressBar (5% per rune) introduced
+// by VIZ-1 (OTA-006). Internal progress is precise.
 
 import type { PlayerCharacter, Stats } from './types';
 
@@ -29,11 +34,16 @@ export const LEVEL_UP_THRESHOLD = 100;
 export type StatKey = keyof Stats;
 
 /** How much progress one successful use awards, given the current
- *  base stat value. */
+ *  base stat value. Smooth descending curve so each new level
+ *  costs more than the last, with a floor at 0.1 so 30 STR is
+ *  still grindable in a long enough session. */
 export function progressAwardFor(currentStat: number): number {
+  if (currentStat <= 5)  return 3;
   if (currentStat <= 10) return 2;
   if (currentStat <= 14) return 1;
-  return 0.5;
+  if (currentStat <= 18) return 0.5;
+  if (currentStat <= 22) return 0.25;
+  return 0.1;
 }
 
 export interface TrainResult {
@@ -148,33 +158,52 @@ export function fineProgressBar(player: PlayerCharacter, stat: StatKey): string 
 /** 2026-05-25 [VIZ-1] — what player activities grow each stat. Surfaced
  *  in the CharacterScreen so the player knows how to train. Order is
  *  rough frequency (most-common first). Every stat has at least one
- *  entry; we add to these lists as new train surfaces land. */
+ *  entry; we add to these lists as new train surfaces land.
+ *
+ *  2026-05-25 expansion (playtester spec):
+ *    STR — kick, punch, climbing, 20+ items in your pouch
+ *    DEX — any stealing, stealth approach, climbing
+ *    INT — salvaging large named items, using Aetheric powers
+ *    WIS — cardinal travel, NPC interaction, hearing a whisper,
+ *          completing a quest
+ *    CHA — NPC interaction, wearing named armor / wielding named
+ *          weapon (passive boost), completing a storyline section
+ */
 export const SKILL_ACTIVITIES: Record<StatKey, string[]> = {
   strength: [
+    'Punch / kick attacks',
     'Landing melee attacks in combat',
     'Two-handed weapon swings',
+    'Climbing (per tier)',
     'Heavy salvage / breaking',
+    'Carrying 20+ items in your pouch (passive)',
   ],
   dexterity: [
-    'Successful climbs (per tier)',
+    'Climbing (per tier)',
     'Parry / dodge in combat',
     'Stealing from vendors',
     'Stealth approaches',
+    'Sleight-of-hand takes',
   ],
   intelligence: [
     'Scrapping items in your pack',
+    'Salvaging large named items',
+    'Using Aetheric powers (shape / summon / mend)',
     'Identifying lore / concepts',
     'Solving investigate puzzles',
   ],
   wisdom: [
+    'Cardinal-direction travel',
+    'Any NPC interaction',
+    'Hearing a whisper',
+    'Completing a hunt or mystery',
     'Resting after combat',
     'Surviving wasteland encounters',
-    'Finishing hunt / mystery contracts',
   ],
   charisma: [
-    'Buying from vendors',
-    'Selling to vendors',
-    'Gifting reputation items',
+    'Any NPC interaction (buy / sell / gift / talk)',
+    'Completing a storyline section',
+    'Wearing named armor / wielding named weapon (passive)',
     'Accepting contracts',
   ],
 };
