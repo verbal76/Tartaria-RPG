@@ -10619,16 +10619,84 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The Arbiter shakes their head. "Not while ${digBlocker.name} is on you."`);
       return;
     }
-    // Hub rooms are hand-authored — mud-bricks, board floors, stone
-    // tile — not silt to scrape. Refuse with a hub-flavored message
-    // so "search the ground" inside the outpost reads as the player
-    // expects (no dig path, no rare loot, no tool wear).
+    // 2026-05-25 — hub rooms (any building floor: wood, board, stone,
+    // mud-brick) get a SMALL-chance pickup roll instead of the old
+    // hard refusal that told the player about the floor material.
+    // Per playtester: "you should be able to roll a chance to pick
+    // something up off of there." No tool wear, low odds (~25%),
+    // small-rock / coin / cloth scrap pool. Mark 'floor' as searched
+    // for this room so the Investigate chip greys out on success.
     if (player.hubRoomId) {
-      get().appendLog(
-        'arbiter',
-        `The Arbiter shakes their head. "The outpost floors are board and brick — no silt to scrape. Type 'leave outpost' to head outside the gate; once on the silt you can dig for rocks, sticks, scraps, and the other stock that builds clubs and spears."`,
-        { skipDedup: true },
-      );
+      const floorRoomKey = makeRoomKey(player.currentLocationId, scene?.microMicroId, player.mapX, player.mapY);
+      const floorRoom = get().worldMemory.visitedRooms?.[floorRoomKey];
+      const alreadyChecked = (floorRoom?.searchedAmbientNouns ?? []).includes('floor');
+      if (alreadyChecked) {
+        get().appendLog(
+          'world',
+          `You've already worked the floor over in this room. Nothing more here.`,
+        );
+        return;
+      }
+      // ~25% chance to find something. The pool is intentionally
+      // sparse — small junk a vendor or scavenger could have dropped
+      // and not noticed. No durability items.
+      const rolled = Math.random() < 0.25;
+      // Mark 'floor' as searched regardless of outcome — one roll
+      // per room visit (re-enterable from a fresh entry).
+      set((s) => {
+        const room = s.worldMemory.visitedRooms?.[floorRoomKey] ?? {
+          firstVisitAt: Date.now(),
+          lastVisitAt: Date.now(),
+          visitCount: 1,
+        };
+        if ((room.searchedAmbientNouns ?? []).includes('floor')) return s;
+        return {
+          worldMemory: {
+            ...s.worldMemory,
+            visitedRooms: {
+              ...(s.worldMemory.visitedRooms ?? {}),
+              [floorRoomKey]: {
+                ...room,
+                searchedAmbientNouns: [...(room.searchedAmbientNouns ?? []), 'floor'],
+              },
+            },
+          },
+        };
+      });
+      if (!rolled) {
+        get().appendLog(
+          'world',
+          pick([
+            'You sweep the floor with your eyes. Boards, dust, nothing on top of it worth pocketing.',
+            'You scan the floor of the room. Whatever was dropped here was swept long ago.',
+            'You give the floor a once-over. Clean enough to fail you.',
+          ]),
+        );
+        return;
+      }
+      const floorPool = [
+        { name: 'Worn Tartarian Coin', kind: 'misc' as const, qty: 1 },
+        { name: 'Cloth Scrap',          kind: 'misc' as const, qty: 1 },
+        { name: 'Bent Nail',            kind: 'misc' as const, qty: 1 },
+        { name: 'Small Rock',           kind: 'misc' as const, qty: 1 },
+        { name: 'Stick',                kind: 'misc' as const, qty: 1 },
+      ];
+      const find = floorPool[Math.floor(Math.random() * floorPool.length)]!;
+      const granted = stampDurability({
+        id: `floor_find_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        name: find.name,
+        kind: find.kind,
+        quantity: find.qty,
+        tags: [],
+      });
+      const g = grantItem(player.inventory, granted);
+      set((s) => s.player ? { player: { ...s.player, inventory: g.inventory } } : s);
+      if (g.accepted > 0) {
+        get().appendLog('world', `You scan the floor. Something small catches the light, half-kicked under the boards.`);
+        get().appendLog('reward', `✦ ${find.name}.`);
+      } else {
+        get().appendLog('world', `You spot a ${find.name} on the floor, but your pack is too full to carry it.`);
+      }
       return;
     }
     // The previous per-spot lockout (`lastDugSpot === spotKey →

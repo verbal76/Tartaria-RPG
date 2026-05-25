@@ -81,11 +81,12 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
     const bDone = b.consumed ? 1 : 0;
     return aDone - bDone;
   });
-  // Keep a short Common row for fallback verbs the scene might not
-  // explicitly surface. 'the ground' moved out of this row into the
-  // pinned scene chips so it lives alongside the visible nouns
-  // instead of buried below.
-  const commonHints = ['the wall', 'the rubble', 'the silt', 'the doorway'];
+  // 2026-05-25 — Common-hints section removed. Per playtester:
+  // the canned chips ("the wall" / "the rubble" / "the silt" /
+  // "the doorway") cluttered the modal without adding value once
+  // scene chips matured. The pinned surface chip (mud / ground /
+  // floor, set by ExplorationScreen) covers the "investigate the
+  // floor of this place" need that Common used to fill.
 
   return (
     <Modal
@@ -189,23 +190,10 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
                   </ScrollView>
                 </>
               )}
-              <Text style={styles.chipLabel}>Common</Text>
-              {/* 2026-05-25 — Common-hints section stacked (was a
-                  flex-wrap row of compact chips) so the whole modal
-                  reads consistently with the scene chips above and
-                  with TakeModal / ClimbModal. */}
-              <View style={styles.chipList}>
-                {commonHints.map((h) => (
-                  <Pressable
-                    key={`common-${h}`}
-                    style={({ pressed }) => [styles.chipFull, pressed && styles.btnPressed]}
-                    onPress={() => tapToSearch(h)}
-                  >
-                    <Text style={styles.chipFullText} numberOfLines={1}>{h}</Text>
-                    <Text style={styles.chipFullArrow}>→ investigate</Text>
-                  </Pressable>
-                ))}
-              </View>
+              {/* 2026-05-25 — Common-hints section removed. The
+                  pinned surface chip ("the mud" / "the ground" /
+                  "the floor") is now part of the scene chip row
+                  above, set per-location by ExplorationScreen. */}
 
               <View style={styles.btnRow}>
                 <Pressable
