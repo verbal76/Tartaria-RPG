@@ -14,7 +14,7 @@ import { SalvageModal } from '../components/SalvageModal';
 import { TakeModal } from '../components/TakeModal';
 import { ClimbModal } from '../components/ClimbModal';
 import { FeedbackModal } from '../components/FeedbackModal';
-import { isClimbable } from '../engine/interactionTags';
+import { isClimbable, isSalvageable } from '../engine/interactionTags';
 import { climbHeightFor, isClimbCleared } from '../engine/climbHeight';
 import { findCatalogItem } from '../engine/crafting';
 import { isOversized } from '../engine/portability';
@@ -380,6 +380,18 @@ export function ExplorationScreen() {
             equippedMain={equippedMain}
             equippedOff={equippedOff}
             range={currentScene?.range ?? null}
+            takeableCount={(() => {
+              // 2026-05-25 [UI-2] — peace-mode take/salvage tone uses
+              // these counts. Takeable = scene noun that is NEITHER
+              // climbable NOR salvageable (matches the gameStore
+              // bucket classification in beginScene at line ~2073).
+              const sceneNouns = currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [];
+              return sceneNouns.filter((n) => !isClimbable(n) && !isSalvageable(n)).length;
+            })()}
+            salvageableCount={(() => {
+              const sceneNouns = currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [];
+              return sceneNouns.filter((n) => isSalvageable(n)).length;
+            })()}
             travelTargetName={(() => {
               if (!player?.travelTarget) return null;
               // eslint-disable-next-line @typescript-eslint/no-require-imports

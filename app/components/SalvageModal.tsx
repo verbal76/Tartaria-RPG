@@ -176,7 +176,9 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel }: Prop
         .map((c) => c.noun)
     : (hints ?? []).filter(isSalvageable);
   const sceneHints = prioritizeSalvageChips(rawSceneHints).slice(0, SALVAGE_CHIP_CAP);
-  const commonHints = ['the wreck', 'the construct', 'the drone', 'the machinery', 'the husk'];
+  // 2026-05-25 [UI-1] — commonHints suggestion array removed (was
+  // rendered as browned-out chips that the user identified as
+  // clutter). Player relies on scene hints + free-text input.
 
   return (
     <Modal
@@ -268,26 +270,20 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel }: Prop
                       </ScrollView>
                     </>
                   )}
-                  <Text style={styles.chipLabel}>Common</Text>
-                  <View style={styles.chipRow}>
-                    {commonHints.map((h) => (
-                      <Pressable
-                        key={`common-${h}`}
-                        style={({ pressed }) => [styles.chip, pressed && styles.btnPressed]}
-                        onPress={() => tapToSalvage(h)}
-                      >
-                        <Text style={styles.chipText} numberOfLines={1}>{h}</Text>
-                      </Pressable>
-                    ))}
-                  </View>
+                  {/* 2026-05-25 [UI-1] — "Common" generic-suggestion
+                      chips removed. They rendered as dimmed/browned-
+                      out boxes that the user identified as clutter.
+                      Players have the scene-hints row above + the
+                      text input; the canned "the wreck" / "the drone"
+                      hints were redundant and visually noisy. */}
 
+                  {/* 2026-05-25 [UI-1] — CANCEL moved to bottom-right
+                      per modal-button placement standard. Action
+                      (SALVAGE) on the left, dismissal (CANCEL) on the
+                      right matches the project-wide convention so the
+                      player's thumb learns one location for "back
+                      out." */}
                   <View style={styles.btnRow}>
-                    <Pressable
-                      style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
-                      onPress={onCancel}
-                    >
-                      <Text style={styles.btnTextNeutral}>CANCEL</Text>
-                    </Pressable>
                     <Pressable
                       style={({ pressed }) => [
                         styles.btn,
@@ -299,6 +295,12 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel }: Prop
                       disabled={!text.trim()}
                     >
                       <Text style={styles.btnTextPrimary}>SALVAGE</Text>
+                    </Pressable>
+                    <Pressable
+                      style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
+                      onPress={onCancel}
+                    >
+                      <Text style={styles.btnTextNeutral}>CANCEL</Text>
                     </Pressable>
                   </View>
                 </>
