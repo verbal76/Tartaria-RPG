@@ -133,6 +133,52 @@ export function ExplorationScreen() {
     worldMemory.visitedRooms,
   ]);
 
+  // 2026-05-25 — split sets for cross-modal removal. The user wants
+  // any noun that was PRODUCTIVELY consumed (take / salvage with
+  // loot / investigate that yielded an item) to disappear from
+  // every modal, including Investigate. Flavor-only investigate
+  // results stay visible in Investigate (grayed + sorted right per
+  // POLISH-3) because the noun is still investigable for narrative
+  // re-color but shouldn't clutter the actionable list.
+  const productivelyConsumedSet = useMemo(() => {
+    if (!player || !currentScene) return new Set<string>();
+    const microMicroId = currentScene.microMicroId ?? '_';
+    const x = typeof player.mapX === 'number' ? player.mapX : '_';
+    const y = typeof player.mapY === 'number' ? player.mapY : '_';
+    const roomKey = `${player.currentLocationId}@${microMicroId}@${x},${y}`;
+    const room = worldMemory.visitedRooms?.[roomKey];
+    // Inline filter — climb-tier markers (climbed:noun:tN) are
+    // separate from productive consumption and don't gate other
+    // verbs. nonClimbMarkers in gameStore.ts uses the same prefix
+    // check.
+    return new Set(
+      (room?.searchedAmbientNouns ?? [])
+        .filter((s) => !s.startsWith('climbed:'))
+        .map((n) => n.toLowerCase()),
+    );
+  }, [
+    player?.currentLocationId,
+    player?.mapX,
+    player?.mapY,
+    currentScene?.microMicroId,
+    worldMemory.visitedRooms,
+  ]);
+  const flavorExhaustedSet = useMemo(() => {
+    if (!player || !currentScene) return new Set<string>();
+    const microMicroId = currentScene.microMicroId ?? '_';
+    const x = typeof player.mapX === 'number' ? player.mapX : '_';
+    const y = typeof player.mapY === 'number' ? player.mapY : '_';
+    const roomKey = `${player.currentLocationId}@${microMicroId}@${x},${y}`;
+    const room = worldMemory.visitedRooms?.[roomKey];
+    return new Set((room?.flavorExhaustedNouns ?? []).map((n) => n.toLowerCase()));
+  }, [
+    player?.currentLocationId,
+    player?.mapX,
+    player?.mapY,
+    currentScene?.microMicroId,
+    worldMemory.visitedRooms,
+  ]);
+
   const isAmbientConsumed = (noun: string): boolean => {
     const lower = noun.toLowerCase();
     if (!consumedAmbientNouns.has(lower)) return false;
@@ -443,6 +489,29 @@ export function ExplorationScreen() {
                 (n) => !isAmbientConsumed(n) && isSalvageable(n),
               ).length;
             })()}
+            climbableCount={(() => {
+              // 2026-05-25 — green tone for CLIMB when the scene has at
+              // least one climbable noun the modal will render. Mirrors
+              // the displayedAmbientNouns filtered through isClimbable.
+              // Top-tier climbed nouns aren't excluded — climb is a
+              // re-doable action and the modal's per-tier state handles
+              // the affordance internally.
+              const sceneNouns = currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [];
+              return sceneNouns.filter((n) => isClimbable(n)).length;
+            })()}
+            investigateCount={(() => {
+              // 2026-05-25 — green tone for INVESTIGATE when the scene
+              // has at least one chip still actionable (not
+              // productively-consumed, not flavor-exhausted). Matches
+              // the SearchModal chips param exactly: productively-
+              // consumed are filtered out entirely; flavor-exhausted
+              // stay visible greyed but don't count as actionable for
+              // the tone purpose.
+              return buildChipPool(currentScene).filter(
+                (n) => !productivelyConsumedSet.has(n.toLowerCase())
+                  && !flavorExhaustedSet.has(n.toLowerCase()),
+              ).length;
+            })()}
             travelTargetName={(() => {
               if (!player?.travelTarget) return null;
               // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -478,21 +547,29 @@ export function ExplorationScreen() {
             ? []
             : [{ noun: 'the ground', consumed: isAmbientConsumed('ground') }]
           ),
-          ...buildChipPool(currentScene).map((n) => {
-            // OTA 195 — compute per-chip requirement. An Aether-coded
-            // noun (vent fissure, ley line, glyph, etc.) requires a
-            // scanner equipped. If the player doesn't have one,
-            // mark unmetRequirement so SearchModal renders the chip
-            // grayed with a "requires Aether scanner" tag.
-            const req = searchRequirementFor(n);
-            const hasScanner = player ? playerHasScannerEquipped(player, 'aetheric') : false;
-            const unmetRequirement = req && !hasScanner ? req.shortLabel : undefined;
-            return {
-              noun: n,
-              consumed: isAmbientConsumed(n),
-              unmetRequirement,
-            };
-          }),
+          // 2026-05-25 — productively-consumed nouns (taken, salvaged
+          // with loot, investigated with substantive result) are
+          // filtered out of Investigate entirely so the modal doesn't
+          // clutter with already-acted-on items. Flavor-only
+          // investigated nouns stay visible greyed + sorted right
+          // per POLISH-3.
+          ...buildChipPool(currentScene)
+            .filter((n) => !productivelyConsumedSet.has(n.toLowerCase()))
+            .map((n) => {
+              // OTA 195 — compute per-chip requirement. An Aether-coded
+              // noun (vent fissure, ley line, glyph, etc.) requires a
+              // scanner equipped. If the player doesn't have one,
+              // mark unmetRequirement so SearchModal renders the chip
+              // grayed with a "requires Aether scanner" tag.
+              const req = searchRequirementFor(n);
+              const hasScanner = player ? playerHasScannerEquipped(player, 'aetheric') : false;
+              const unmetRequirement = req && !hasScanner ? req.shortLabel : undefined;
+              return {
+                noun: n,
+                consumed: flavorExhaustedSet.has(n.toLowerCase()),
+                unmetRequirement,
+              };
+            }),
         ]}
         onSubmit={(target) => {
           setSearchOpen(false);

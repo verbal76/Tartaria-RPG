@@ -13219,7 +13219,23 @@ function repromptUnknownTarget(
   const hookNouns = (scene.hooks ?? [])
     .filter((h) => !h.resolved)
     .flatMap((h) => h.nouns.slice(0, 2));
-  const all = Array.from(new Set([...hookNouns, ...ambient])).slice(0, 6);
+  // 2026-05-25 — strip already-acted-on nouns from the suggestion
+  // list so the Arbiter doesn't recommend "try: gate" right after
+  // the player just salvaged the gate.
+  const playerNow = get().player;
+  const roomKey = playerNow
+    ? makeRoomKey(playerNow.currentLocationId, scene.microMicroId, playerNow.mapX, playerNow.mapY)
+    : null;
+  const roomConsumed = roomKey
+    ? get().worldMemory.visitedRooms?.[roomKey]
+    : null;
+  const consumedLowers = new Set([
+    ...nonClimbMarkers(roomConsumed?.searchedAmbientNouns).map((n) => n.toLowerCase()),
+    ...(roomConsumed?.flavorExhaustedNouns ?? []).map((n) => n.toLowerCase()),
+  ]);
+  const ambientLive = ambient.filter((n) => !consumedLowers.has(n.toLowerCase()));
+  const hookLive = hookNouns.filter((n) => !consumedLowers.has(n.toLowerCase()));
+  const all = Array.from(new Set([...hookLive, ...ambientLive])).slice(0, 6);
   const list = all.length > 0 ? all.join(', ') : 'the mud, the haze, the dust';
   get().appendLog(
     'arbiter',
