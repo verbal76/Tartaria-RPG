@@ -35,6 +35,10 @@
     { "name": "Wyrm Fang", "rarity": "Legendary", "tags": ["organic", "bone", "boss", "legendary"], "description": "Wyrm Fang. A curving tooth from the Bog Wyrm, the root still wet with venom-bog. Cores any blade you care to commit to." },
     { "name": "Voidspawn Egg", "rarity": "Legendary", "tags": ["organic", "aether", "boss", "legendary"], "description": "Voidspawn Egg. A leathery, fist-sized sac drawn from the Matriarch's clutch. Something inside it still shifts when no one is watching." },
     { "name": "Mud-Iron Heart", "rarity": "Legendary", "tags": ["mud", "metal", "boss", "legendary"], "description": "Mud-Iron Heart. A dense knot of slag and mud-iron pulled from the Mud Tyrant's chest cavity. Heavier than it ought to be, the way old crowns are." },
-    { "name": "Behemoth Heart", "rarity": "Legendary", "tags": ["organic", "aether", "boss", "legendary"], "description": "Behemoth Heart. The fist-sized, Aether-veined heart of an Aetheric Behemoth. Beats once an hour, regardless of which body it's in." }
+    { "name": "Behemoth Heart", "rarity": "Legendary", "tags": ["organic", "aether", "boss", "legendary"], "description": "Behemoth Heart. The fist-sized, Aether-veined heart of an Aetheric Behemoth. Beats once an hour, regardless of which body it's in." },
+    { "name": "Cloth Scrap", "rarity": "Common", "tags": ["fiber", "junk", "scrap"], "description": "A torn square of weather-stained cloth. Worthless on its own; bind a few together and you've patched a sleeve." },
+    { "name": "Bent Nail", "rarity": "Common", "tags": ["metal", "junk", "scrap"], "description": "A rusted iron nail, hammered crooked in some long-ago floorboard. Straightens out with a hard tap, maybe." },
+    { "name": "Smooth Stone", "rarity": "Common", "tags": ["stone", "junk", "scrap"], "description": "A pebble worn round by the floodwater. Heavy in the hand. Skips well off mud-iron." },
+    { "name": "Bone Sliver", "rarity": "Common", "tags": ["bone", "junk", "scrap"], "description": "A finger-length splinter of pre-flood bone. Brittle and dry, but holds a point for a few hours of work." }
   ]
 }
