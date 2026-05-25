@@ -533,6 +533,26 @@ export function ExplorationScreen() {
               const id = player.travelTarget.locationId;
               return locs.find((l) => l.id === id)?.name ?? id;
             })()}
+            movesLeft={(() => {
+              // 2026-05-25 — Manhattan distance from player's current
+              // mapX/mapY to the destination's procedural-grid coords.
+              // Matches the math in stepDirection (one step per cardinal
+              // tile crossed), so the badge counts down 1 per
+              // CONTINUE tap. Returns null when no active target or
+              // when the destination's coords aren't placed on the
+              // current map (rare — generateWorldMap re-centers on
+              // currentLocationId per call).
+              if (!player?.travelTarget) return null;
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const { generateWorldMap, WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } = require('../engine/worldMap');
+              const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
+              const map = generateWorldMap(seed, player.currentLocationId);
+              const tgtPos = map.positions[player.travelTarget.locationId];
+              if (!tgtPos) return null;
+              const fromX = typeof player.mapX === 'number' ? player.mapX : WORLD_MAP_CENTER_X;
+              const fromY = typeof player.mapY === 'number' ? player.mapY : WORLD_MAP_CENTER_Y;
+              return Math.abs(tgtPos.x - fromX) + Math.abs(tgtPos.y - fromY);
+            })()}
             onContinueTravel={() => useGameStore.getState().continueTravel()}
             onStopTravel={() => useGameStore.getState().stopTravel()}
           />
