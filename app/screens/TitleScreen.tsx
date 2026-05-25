@@ -37,6 +37,7 @@ import { OTA_BUILD_ID } from '../buildInfo';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const APP_VERSION: string = (require('../../app.json') as { expo: { version: string } }).expo.version;
 import { getKokoroState, onKokoroStateChange, type KokoroState } from '../voice/PiperTTSManager';
+import { speak as ttsSpeak } from '../voice/TTSManager';
 import type { MainQuestPhase } from '../engine/types';
 import { checkAndApplyOTA } from '../updates/checkAndApplyOTA';
 
@@ -941,13 +942,23 @@ function KokoroDownloadBanner(): React.ReactElement | null {
 function ReadyFlash(): React.ReactElement | null {
   const [show, setShow] = useState(true);
   useEffect(() => {
-    const t = setTimeout(() => setShow(false), 4000);
+    // The Arbiter's first words when the voice engine comes online —
+    // Kokoro speaks "Choose your character" through the Arbiter voice.
+    // No-op if TTS is disabled in voice settings. 'system' channel so
+    // it's not subject to per-channel spam-collapse rules.
+    void ttsSpeak('Choose your character.', 'system');
+    // Banner hide timed to comfortably cover the spoken line (~1.5s
+    // for that phrase at default speed) plus a beat for the green
+    // confirmation to register visually before it fades.
+    const t = setTimeout(() => setShow(false), 4500);
     return () => clearTimeout(t);
   }, []);
   if (!show) return null;
   return (
     <View style={[styles.kokoroBanner, { borderColor: '#9ec96a' }]}>
-      <Text style={[styles.kokoroBannerText, { color: '#9ec96a' }]}>✓  Premium voice ready</Text>
+      <Text style={[styles.kokoroBannerText, { color: '#9ec96a' }]}>
+        ✓  The Arbiter wakes — choose your character
+      </Text>
     </View>
   );
 }
