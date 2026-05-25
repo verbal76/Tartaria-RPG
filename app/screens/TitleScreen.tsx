@@ -9,6 +9,8 @@ import {
   RefreshControl,
   Linking,
   Share,
+  BackHandler,
+  Alert,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import {
@@ -179,17 +181,20 @@ export function TitleScreen() {
   // and SHARED flashes don't fight each other on the same row.
   const [sharedSlotId, setSharedSlotId] = useState<string | null>(null);
   // v2.4.1 (OTA 051) — auto-check for an OTA on every TitleScreen
-  // mount. Replaces the manual CHECK FOR OTA UPDATE button, which
-  // was a dev-only crutch. Same shape as the boot pass in App.tsx:
-  // fetchOnly so we don't reload mid-screen-mount, silent so a
-  // transient network error never surfaces, and pendingOTAUpdate
-  // gets flipped on a real hit so the existing UPDATE READY banner
-  // appears for the player. Save-and-exit drops the player back
-  // here, which re-mounts TitleScreen and re-fires this effect —
-  // no force-close required to pick up a new build.
+  // mount. Save-and-exit drops the player back here, which re-mounts
+  // TitleScreen and re-fires this effect — so the player picks up
+  // a new build without force-closing.
+  //
+  // 2026-05-25 — dropped fetchOnly. Previously fetchOnly:true would
+  // download the bundle but defer the apply to the NEXT cold-start,
+  // which meant a player N OTAs behind needed N+1 cold-starts to
+  // catch up. With fetchOnly off, a fresh OTA fetched here triggers
+  // Updates.reloadAsync immediately — the title screen flash-reloads
+  // into the new version. Silent so a transient network error
+  // doesn't dump an alert on every screen mount.
   useEffect(() => {
     let cancelled = false;
-    void checkAndApplyOTA({ silent: true, fetchOnly: true }).then((result) => {
+    void checkAndApplyOTA({ silent: true }).then((result) => {
       if (cancelled) return;
       if (result === 'pending') {
         useGameStore.setState({ pendingOTAUpdate: true });
@@ -568,6 +573,28 @@ export function TitleScreen() {
       </TouchableOpacity>
       <View style={styles.bottomBar}>
         <Text style={styles.footer}>v{APP_VERSION}  /  2148</Text>
+        {/* 2026-05-25 — EXIT GAME button. Per playtester request:
+            full app exit from the title screen (Android only — iOS
+            App Store guidelines forbid programmatic exit, but RN's
+            BackHandler.exitApp() is the standard call and is a
+            no-op safely on iOS). Confirm modal prevents an
+            accidental tap mid-character-creation. */}
+        <TouchableOpacity
+          style={styles.exitBtn}
+          activeOpacity={0.7}
+          onPress={() => {
+            Alert.alert(
+              'Exit Game',
+              'Close Tartaria Realms? Any unsaved progress will be lost — use SAVE & EXIT from in-game to keep it.',
+              [
+                { text: 'Stay', style: 'cancel' },
+                { text: 'Exit', style: 'destructive', onPress: () => BackHandler.exitApp() },
+              ],
+            );
+          }}
+        >
+          <Text style={styles.exitBtnText}>EXIT GAME</Text>
+        </TouchableOpacity>
       </View>
 
       <BrandedModal
@@ -838,9 +865,18 @@ const styles = StyleSheet.create({
   bottomBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     paddingTop: 8,
   },
+  exitBtn: {
+    backgroundColor: '#1a1714',
+    borderColor: '#8a3a3a',
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 4,
+  },
+  exitBtnText: { color: '#c97a7a', fontSize: 10, letterSpacing: 1.5, fontWeight: '700' },
   // v2.4.1 (OTA 051) — top-right gear matches ExplorationScreen's
   // cornerGear placement so the player always finds settings in the
   // same spot. Absolute over the title section; the crest + headers
