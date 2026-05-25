@@ -89,12 +89,47 @@ const LEXICON: Array<[RegExp, string]> = [
 const SORTED_LEXICON: Array<[RegExp, string]> = [...LEXICON]
   .sort((a, b) => b[0].source.length - a[0].source.length);
 
+// 2026-05-25 [TTS-1] — IPA-override channel. The user asked "we
+// should see if kokoro can read ipa text" with /tɑːrˈtɑːriə/ as
+// the example case for "Tartaria." Kokoro's phonemizer is
+// espeak-ng-derived, and espeak-ng accepts inline IPA wrapped in
+// double brackets (e.g. `[[tɑːrˈtɑːriə]]`). Whether the bracket
+// syntax survives the Kokoro tokenizer is verified on-device only
+// — this map is OFF by default. To enable: flip the
+// IPA_OVERRIDES_ENABLED flag at the top of applyLoreLexicon.
+//
+// If on-device test shows Kokoro speaks the IPA correctly, expand
+// this map with the proper-noun set the playtester surfaces and
+// drop the corresponding respelling regex from LEXICON above.
+// If Kokoro speaks the brackets verbatim ("double-bracket open
+// tee a colon r…"), leave disabled and rely on respellings only.
+const IPA_OVERRIDES: Record<string, string> = {
+  Tartaria:   'tɑːrˈtɑːriə',
+  Tartarian:  'tɑːrˈtɑːriən',
+  Tartarians: 'tɑːrˈtɑːriənz',
+  Drakova:    'drəˈkoʊvə',
+  Aether:     'ˈeɪθər',
+};
+function applyIPAOverrides(text: string): string {
+  let out = text;
+  for (const [word, ipa] of Object.entries(IPA_OVERRIDES)) {
+    out = out.replace(new RegExp(`\\b${word}\\b`, 'gi'), `[[${ipa}]]`);
+  }
+  return out;
+}
+
 /**
  * Apply the lore lexicon to a chunk of text before it goes to the
  * Kokoro TTS engine. Pure function; safe to call on every speak().
+ *
+ * 2026-05-25 [TTS-1] — IPA experiment is OFF by default. Flip to
+ * true to ship IPA-wrapped proper-noun output to Kokoro. If on-
+ * device verification shows clean pronunciation, leave on and
+ * remove the respelling regexes that the IPA entries cover.
  */
+const IPA_OVERRIDES_ENABLED = false;
 export function applyLoreLexicon(text: string): string {
-  let out = text;
+  let out = IPA_OVERRIDES_ENABLED ? applyIPAOverrides(text) : text;
   for (const [pattern, replacement] of SORTED_LEXICON) {
     out = out.replace(pattern, replacement);
   }

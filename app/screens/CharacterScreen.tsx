@@ -11,7 +11,7 @@ import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import type { Faction, Race, PlayerCharacter, Stats } from '../engine/types';
 import { effectiveStatsBreakdown, type StatBreakdown } from '../engine/equipment';
-import { displayedProgressBar, displayedProgressPercent } from '../engine/statTraining';
+import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine/statTraining';
 import { effectiveAC, barehandDamageFor } from '../engine/raceMechanics';
 import { corruptionTierOf, tierLabel, tierDescription } from '../engine/corruption';
 import { getItemPreview } from '../components/itemPreview';
@@ -117,8 +117,9 @@ export function CharacterScreen() {
               key={s}
               label={STAT_LABEL[s]}
               b={breakdown[s]}
-              progressBar={displayedProgressBar(player, s)}
-              progressPct={displayedProgressPercent(player, s)}
+              progressBar={fineProgressBar(player, s)}
+              progressPct={rawProgressPercent(player, s)}
+              activities={SKILL_ACTIVITIES[s] ?? []}
             />
           ))}
         </View>
@@ -285,11 +286,13 @@ function StatRow({
   b,
   progressBar,
   progressPct,
+  activities,
 }: {
   label: string;
   b: StatBreakdown;
   progressBar: string;
   progressPct: number;
+  activities: string[];
 }) {
   const hasSources = b.sources.length > 0;
   return (
@@ -300,12 +303,20 @@ function StatRow({
           {b.total}
           {hasSources && <Text style={styles.statBase}>  (base {b.base})</Text>}
         </Text>
-        {/* OTA 058 — use-based growth bar. Quantized to quarters
-            so the player sees changes at 25/50/75/100 — not every
-            single use. The label reads e.g. "▮▮▯▯  50%". */}
+        {/* 2026-05-25 [VIZ-1] — 20-segment fine bar (5% per rune)
+            replaces the legacy 4-segment quartile. Player sees
+            fine-grained progress toward next stat level. */}
         <Text style={styles.progressBar}>
           {progressBar}  <Text style={styles.progressPct}>{progressPct}%</Text>
         </Text>
+        {/* 2026-05-25 [VIZ-1] — activity list per skill. Shows the
+            player which game actions train this stat so they don't
+            have to guess. */}
+        {activities.length > 0 && (
+          <Text style={styles.activityList} numberOfLines={3} ellipsizeMode="tail">
+            Grows from: {activities.join(' · ')}
+          </Text>
+        )}
         {hasSources && (
           <View style={styles.chipRow}>
             {b.sources.map((s, i) => (
@@ -380,6 +391,7 @@ const styles = StyleSheet.create({
   statBase: { color: '#5a5246', fontSize: 11, fontWeight: '400' },
   progressBar: { color: '#9ec96a', fontSize: 10, letterSpacing: 1, marginTop: 3 },
   progressPct: { color: '#5a5246', fontSize: 9, letterSpacing: 0.5 },
+  activityList: { color: '#7a705c', fontSize: 9, marginTop: 2, lineHeight: 13, letterSpacing: 0.3 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
   chip: { backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1, borderRadius: 3, paddingHorizontal: 8, paddingVertical: 3 },
   chipNeg: { borderColor: '#7a4040', backgroundColor: '#221512' },

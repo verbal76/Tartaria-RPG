@@ -106,6 +106,10 @@ export function ensureStatProgress(player: PlayerCharacter): PlayerCharacter {
  * 75, or 99 (never 100; the level-up flushes progress when it lands).
  * The player sees the bar flip at meaningful intervals instead of
  * every 1-2% tick.
+ *
+ * 2026-05-25 [VIZ-1] — kept for backwards compatibility with any
+ * caller that still wants the quartile. New code paths (CharacterScreen
+ * skill rows) now use rawProgressPercent + fineProgressBar.
  */
 export function displayedProgressPercent(player: PlayerCharacter, stat: StatKey): number {
   const prog = player.statProgress?.[stat] ?? 0;
@@ -116,8 +120,61 @@ export function displayedProgressPercent(player: PlayerCharacter, stat: StatKey)
   return 99;
 }
 
-/** Compact 4-segment bar string for the Player Sheet. */
+/** Compact 4-segment bar string for the Player Sheet (legacy
+ *  quartile bar — kept for any non-CharacterScreen caller). */
 export function displayedProgressBar(player: PlayerCharacter, stat: StatKey): string {
   const filled = displayedProgressPercent(player, stat) / 25;
   return '▮▮▮▮'.slice(0, filled) + '▯▯▯▯'.slice(0, 4 - filled);
 }
+
+/** 2026-05-25 [VIZ-1] — raw 0-99 progress without quartile rounding.
+ *  Used by CharacterScreen so the player sees fine-grained progress
+ *  toward the next stat level instead of "still 25%" for ages. */
+export function rawProgressPercent(player: PlayerCharacter, stat: StatKey): number {
+  const prog = player.statProgress?.[stat] ?? 0;
+  return Math.min(prog, 99);
+}
+
+/** 2026-05-25 [VIZ-1] — 20-segment progress bar (each filled rune
+ *  = 5%). Replaces the 4-segment quartile bar on the Player Sheet
+ *  per playtester ask: "make a larger 100 status bar and show your
+ *  current status on it." */
+export function fineProgressBar(player: PlayerCharacter, stat: StatKey): string {
+  const filled = Math.round(rawProgressPercent(player, stat) / 5);
+  const clamp = Math.max(0, Math.min(20, filled));
+  return '▮'.repeat(clamp) + '▯'.repeat(20 - clamp);
+}
+
+/** 2026-05-25 [VIZ-1] — what player activities grow each stat. Surfaced
+ *  in the CharacterScreen so the player knows how to train. Order is
+ *  rough frequency (most-common first). Every stat has at least one
+ *  entry; we add to these lists as new train surfaces land. */
+export const SKILL_ACTIVITIES: Record<StatKey, string[]> = {
+  strength: [
+    'Landing melee attacks in combat',
+    'Two-handed weapon swings',
+    'Heavy salvage / breaking',
+  ],
+  dexterity: [
+    'Successful climbs (per tier)',
+    'Parry / dodge in combat',
+    'Stealing from vendors',
+    'Stealth approaches',
+  ],
+  intelligence: [
+    'Scrapping items in your pack',
+    'Identifying lore / concepts',
+    'Solving investigate puzzles',
+  ],
+  wisdom: [
+    'Resting after combat',
+    'Surviving wasteland encounters',
+    'Finishing hunt / mystery contracts',
+  ],
+  charisma: [
+    'Buying from vendors',
+    'Selling to vendors',
+    'Gifting reputation items',
+    'Accepting contracts',
+  ],
+};

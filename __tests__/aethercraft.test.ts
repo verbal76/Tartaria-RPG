@@ -8,16 +8,16 @@ describe('OTA 039 — Aethercraft race modifiers', () => {
     it('Aetherborn cast at +2 DC (training gap)', () => {
       expect(aethercraftDcModifier('aetherborn')).toBe(2);
     });
-    it('All other races cast at +4 DC (guessing)', () => {
-      expect(aethercraftDcModifier('tartarian_giant')).toBe(4);
-      expect(aethercraftDcModifier('reclaimer')).toBe(4);
-      expect(aethercraftDcModifier('architectural_sentinel')).toBe(4);
-      expect(aethercraftDcModifier('mud_golem')).toBe(4);
-      expect(aethercraftDcModifier('unknowing_mass')).toBe(4);
+    it('All other races cast at +3 DC (guessing — MECHANIC-1 tune, was +4)', () => {
+      expect(aethercraftDcModifier('tartarian_giant')).toBe(3);
+      expect(aethercraftDcModifier('reclaimer')).toBe(3);
+      expect(aethercraftDcModifier('architectural_sentinel')).toBe(3);
+      expect(aethercraftDcModifier('mud_golem')).toBe(3);
+      expect(aethercraftDcModifier('unknowing_mass')).toBe(3);
     });
-    it('unknown raceId falls to +4 (safe default)', () => {
-      expect(aethercraftDcModifier('does_not_exist')).toBe(4);
-      expect(aethercraftDcModifier(undefined)).toBe(4);
+    it('unknown raceId falls to +3 (safe default)', () => {
+      expect(aethercraftDcModifier('does_not_exist')).toBe(3);
+      expect(aethercraftDcModifier(undefined)).toBe(3);
     });
   });
 
