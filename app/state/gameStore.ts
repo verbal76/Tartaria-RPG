@@ -1573,7 +1573,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         activeSlotId: slotId,
         currentScene: restoredScene,
         pendingRolls: null,
-        wastelandStepsSinceEncounter: 0,
+        // 2026-05-25 — preserve wastelandStepsSinceEncounter on
+        // restore so a save-load round-trip can't game the encounter
+        // gate (was: reset to 0, letting a player save-load to delay
+        // a roll by `threshold` steps). The counter is persisted
+        // alongside player + worldMemory in the save payload.
+        wastelandStepsSinceEncounter: saved.wastelandStepsSinceEncounter ?? 0,
         // OTA 014 — transient flags always reset on slot load. A player
         // who saved at 1 HP with the latch set then re-loaded wouldn't
         // get a fresh warning otherwise.
@@ -10178,8 +10183,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // cardinal step — they remain at the tile where they spawned;
     // a fresh per-step spawn roll later in this function may
     // produce a different vendor on the new tile.
-    set((s) => (s.currentScene && s.currentScene.vendor
-      ? { currentScene: { ...s.currentScene, vendor: null } }
+    //
+    // 2026-05-25 — also clear elevatedOn. If the player walks off
+    // without typing 'climb down', the previous tile's elevation
+    // state was persisting into the new tile (referenced a noun
+    // that no longer exists in the scene). Subsequent rest /
+    // narration paths blew up on the stale noun.
+    set((s) => (s.currentScene
+      ? { currentScene: { ...s.currentScene, vendor: null, elevatedOn: null } }
       : s));
     if (step.landedOn && step.landedOn.locationId !== player.currentLocationId) {
       get().appendLog('world', `You walk ${dir}. You arrive at ${step.landedOn.locationName}.`);
@@ -10395,7 +10406,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // 3-step minimum + 40% chance per eligible roll so the world
     // feels populated without becoming a theme park. Skipped during
     // active combat (the scene already has plenty going on).
-    if (scene.enemies.length === 0) {
+    // 2026-05-25 — re-read the LIVE scene; corruption-driven enemy
+    // spawns earlier in this step (Mud Monarch Purifier path at
+    // ~10246 and the corruption decay path at ~10271) may have just
+    // populated currentScene.enemies. The function-start `scene`
+    // snapshot is now stale; using it would let wasteland encounters
+    // stack on top of a fresh corruption spawn.
+    const liveSceneForEncounter = get().currentScene;
+    if (liveSceneForEncounter && liveSceneForEncounter.enemies.length === 0) {
       const wasteSteps = (get().wastelandStepsSinceEncounter ?? 0) + 1;
       set(() => ({ wastelandStepsSinceEncounter: wasteSteps }));
       // Tuning per playtest: a long run with zero combat at all means
@@ -10412,7 +10430,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // matchers vs the location tags actually in use) — the
       // archetype filter at wastelandEncounters.ts:131 silently
       // returns null when no archetype matches.
-      const enc = pickWastelandEncounter(scene.location, {
+      // 2026-05-25 — measured encounter rate per movementStress sim
+      // was ~7% per cardinal step (not the 30-35% the old comment
+      // claimed) because the `scene.enemies.length === 0` gate
+      // suppresses the roll once a skirmish has already spawned.
+      // The intent of bumping rollChance to 0.70 was to feel
+      // dangerous, but the suppression gate caps the practical
+      // rate. Acceptable for now; consider moving the wasteland
+      // roll outside the gate so non-spawning encounters (loot /
+      // NPC / lore) can layer onto active fights.
+      const enc = pickWastelandEncounter(liveSceneForEncounter.location, {
         stepsSinceLastEncounter: wasteSteps,
         threshold: 2,
         rollChance: 0.70,
@@ -10431,7 +10458,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // IS the loot for this encounter.
             const fragId = pickFragmentForBiome(
               livePlayer.collectables ?? [],
-              scene.location.tags ?? [],
+              liveSceneForEncounter.location.tags ?? [],
             );
             if (fragId) {
               get().grantCollectableFragment(fragId);
@@ -11359,7 +11386,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   async persist() {
-    const { player, worldMemory, gameLog, currentScreen, currentScene, activeSlotId } = get();
+    const { player, worldMemory, gameLog, currentScreen, currentScene, activeSlotId, wastelandStepsSinceEncounter } = get();
     if (!activeSlotId) return; // No active slot — nothing to write to.
     // CRITICAL: refuse to overwrite a save with player=null. This guards
     // against transient states (mid-load, mid-death-cleanup, mid-OTA-
@@ -11380,6 +11407,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // not the AI. Skipped only when currentScene is null (player on the
       // title screen, mid-load, etc.).
       currentScene: currentScene ?? undefined,
+      // 2026-05-25 — persist the wasteland encounter step counter so
+      // a save-load round trip can't reset it (cheese).
+      wastelandStepsSinceEncounter,
     });
   },
 }));
