@@ -1031,6 +1031,17 @@ interface GameStore {
   setTravelCourse: (locationId: string) => void;
   continueTravel: () => void;
   stopTravel: () => void;
+  /** 2026-05-25 OTA-035 — when a player issues `travel to <city>` from
+   *  inside an outpost, this field holds the pending destination until
+   *  they confirm or cancel via the BrandedModal. The screen layer
+   *  listens for this and renders a Yes/No prompt. */
+  pendingTravelConfirm: { locationId: string; locationName: string } | null;
+  /** Set the pending destination; the screen renders the modal. */
+  requestTravelConfirm: (locationId: string, locationName: string) => void;
+  /** Yes path: leave outpost, then set course. Clears pending. */
+  confirmLeaveAndTravel: () => void;
+  /** No path: clears pending. Player stays inside the outpost. */
+  cancelTravelConfirm: () => void;
   setActiveEnemyIdx: (idx: number) => void;
   /** Craft a specific recipe directly (used by the CraftingScreen list). */
   craftRecipe: (recipeName: string) => void;
@@ -1109,6 +1120,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   currentScreen: 'title',
   currentScene: null,
   pendingRolls: null,
+  pendingTravelConfirm: null,
   hydrated: false,
   lowHpWarned: false,
   slotLoadError: null,
@@ -2365,6 +2377,36 @@ export const useGameStore = create<GameStore>((set, get) => ({
             milestones: {
               ...(s.player.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 }),
               firstQAHintShown: true,
+            },
+          },
+        } : s));
+      }
+      // 2026-05-25 OTA-035 — outpost-arrival hint. A first-time
+      // playtester didn't realize the opening scene is INSIDE a
+      // building, and that setting a travel waypoint to another
+      // city requires walking out the gate first. Latched once per
+      // character via milestones.firstOutpostHintShown so it only
+      // fires the very first hub entry of a new run.
+      const livePlayerForHubHint = get().player;
+      const inOutpostForHint = !!livePlayerForHubHint?.hubRoomId || !!hubRoom;
+      if (
+        livePlayerForHubHint
+        && inOutpostForHint
+        && !livePlayerForHubHint.milestones?.firstOutpostHintShown
+      ) {
+        const hubLabel = hubNameForFaction(livePlayerForHubHint.factionId)
+          || hubRoom?.name
+          || 'the outpost';
+        get().appendLog(
+          'arbiter',
+          `The Arbiter inclines a hand toward the doorway. "You're inside ${hubLabel}. To travel to another city, walk out the gate first — tap LEAVE OUTPOST, or type 'leave outpost'. Until then the cardinals only move you between the rooms of this place."`,
+        );
+        set((s) => (s.player ? {
+          player: {
+            ...s.player,
+            milestones: {
+              ...(s.player.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 }),
+              firstOutpostHintShown: true,
             },
           },
         } : s));
@@ -5231,6 +5273,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // candidate, no-op with a quick line.
           if (candidate.id === player.currentLocationId) {
             get().appendLog('arbiter', `The Arbiter raises a brow. "You are at ${candidate.name}. The road from here is the road forward."`);
+            break;
+          }
+          // 2026-05-25 OTA-035 — outpost-aware confirmation. If the
+          // player is INSIDE an outpost, route through the modal
+          // prompt instead of starting the course immediately. The
+          // Yes button leaves the outpost + starts the course; the
+          // No button leaves the player exactly where they are.
+          if (player.hubRoomId) {
+            get().requestTravelConfirm(candidate.id, candidate.name);
             break;
           }
           get().setTravelCourse(candidate.id);
@@ -10343,6 +10394,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'world',
       'You set the course aside. Cardinal direction is yours again.',
     );
+  },
+
+  // 2026-05-25 OTA-035 — outpost-aware travel confirmation. When the
+  // player issues `travel to <city>` from inside an outpost, parser
+  // and Set Course paths route here instead of calling setTravelCourse
+  // directly. The screen layer renders a BrandedModal with two
+  // buttons: confirm (leave + travel) or cancel (stay).
+  requestTravelConfirm(locationId, locationName) {
+    set({ pendingTravelConfirm: { locationId, locationName } });
+  },
+  confirmLeaveAndTravel() {
+    const pending = get().pendingTravelConfirm;
+    const player = get().player;
+    if (!pending || !player) {
+      set({ pendingTravelConfirm: null });
+      return;
+    }
+    // Mirror the parser's `leave outpost` path: clear hubRoomId,
+    // spend stamina + advance time, narrate departure, then
+    // beginScene with skipHubEntry so we don't re-enter the gate.
+    if (player.hubRoomId) {
+      set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+      set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.travel), 1) });
+      get().appendLog(
+        'world',
+        `You walk back through the gate and out into the open ground. The outpost falls away behind you.`,
+      );
+      get().beginScene({ skipHubEntry: true });
+    }
+    set({ pendingTravelConfirm: null });
+    get().setTravelCourse(pending.locationId);
+  },
+  cancelTravelConfirm() {
+    set({ pendingTravelConfirm: null });
   },
 
   stepDirection(dir: Direction) {
