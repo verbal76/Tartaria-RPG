@@ -13889,6 +13889,33 @@ const HIDDEN_TEXT_LINES = [
   `You catch a glint on the ${`{noun}`}. A single character pressed deep, then crossed out by a second hand. Someone disagreed with the first one.`,
   `You tilt your head. Light strikes the ${`{noun}`} at an angle the casual pass missed — a map fragment scratched in, four lines, a route to nowhere named.`,
   `You wipe the ${`{noun}`}. Underneath, a child's name written badly, then a second hand has written 'rest now' in old Tartarian beneath it.`,
+  // 2026-05-25 OTA-039 — variety pass so repeat investigates don't
+  // recycle the same six lines. Each line is one beat: a scrap of
+  // history, a glimpse of who passed through, a clue the world
+  // never bothered to clean up.
+  `You brush silt off the ${`{noun}`}. Tally marks — fourteen of them. The fifteenth scratch starts but doesn't finish.`,
+  `You squint at the ${`{noun}`}. Two faction sigils overlap — Reclaimer and Forgotten Order — and someone's hammered a third on top, blunting both.`,
+  `You press your thumb to the ${`{noun}`}. Warm. Aetheric, faint, the way old crystal stays warm long after the field around it dies.`,
+  `You read the ${`{noun}`} slowly. "Buried but listening." The hand that wrote it pressed hard enough to crack the underlay.`,
+  `You find a maker's mark on the ${`{noun}`} — a stylised crown over an open hand. Mud Monarch, but the older kind. Pre-flood, before they fell to the silt.`,
+  `You lift dust off the ${`{noun}`}. Underneath, a price: '3 TC, no haggling.' The shop it belonged to is buried under whatever stands here now.`,
+  `You catch the ${`{noun}`} at the right angle. Aetheric residue clings to it in a pattern — a hand-print, slightly larger than yours, fingers spread.`,
+  `You trace the ${`{noun}`}. Numbers run along its edge: coordinates, in the old Tartarian grid the Reclaimers stopped using two centuries back.`,
+  `You find a hairline crack in the ${`{noun}`} and follow it. A single coin is wedged inside, mud-stuck. You leave it there. Some traditions you do not break.`,
+  `You read the ${`{noun}`}: a name list, twenty-three entries. Twenty-two are struck through. The twenty-third has a fresh question mark beside it.`,
+];
+
+// 2026-05-25 OTA-039 — small-loot drop for investigate. A flavor-only
+// outcome that ALSO turns up a junk-tier item now and then so even
+// the unsubstantive path feels like the world had something for you.
+// Weighted toward coins + dust + Aetheric trace; no tier rolls. Bare
+// catalog names match the materials catalog already used elsewhere.
+const INVESTIGATE_TRINKETS: ReadonlyArray<{ name: string; rarity: 'Common'; qtyMin: number; qtyMax: number; line: string }> = [
+  { name: 'Worn Tartarian Coin', rarity: 'Common', qtyMin: 1, qtyMax: 3, line: `A coin tumbles loose from the {noun}, mud-stuck and warm. You pocket it.` },
+  { name: 'Aether Dust',         rarity: 'Common', qtyMin: 1, qtyMax: 2, line: `Fine grey-blue dust sifts off the {noun} when you handle it. You catch what you can.` },
+  { name: 'Bent Nail',           rarity: 'Common', qtyMin: 1, qtyMax: 2, line: `A bent nail works free of the {noun}. Salvageable, barely.` },
+  { name: 'Cloth Scrap',         rarity: 'Common', qtyMin: 1, qtyMax: 1, line: `A scrap of cloth, wedged into the {noun} long ago. You free it.` },
+  { name: 'Aether Residue',      rarity: 'Common', qtyMin: 1, qtyMax: 1, line: `A thin film of Aether residue clings where your hand brushed the {noun}. You vial it.` },
 ];
 
 // Travel-time lore beats — surfaced on a 5% chance per cardinal step
@@ -13943,13 +13970,6 @@ function narrateAmbientFind(
   const isPlural = /s$/i.test(noun);
   const pronoun = isPlural ? 'them' : 'it';
   const aroundPronoun = isPlural ? 'them' : 'it';
-  // Hub rooms (the outpost gate, square, mess, armory) have authored
-  // floors — boards and brick, not silt. Outdoor wilderness is silt
-  // and mud-glass. Two pools so a Reclaimers' Outpost lever stops
-  // being "half-swallowed by silt" while the dig action refuses with
-  // "the outpost floors are board and brick — no silt to scrape".
-  // Three neutral lines sit in both pools so the rotation overlaps
-  // sensibly when the player searches across both room types.
   const inHub = !!get().player?.hubRoomId;
   const neutral = [
     `You examine the ${noun}. Tartaria has not given up its secrets here.`,
@@ -13964,48 +13984,157 @@ function narrateAmbientFind(
   const indoor = [
     ...neutral,
     `You look closer at the ${noun}. Dust-glazed, undisturbed for a long while.`,
-    // OTA 016 — was "floorboards have warped". Hub rooms have
-    // varied floors (mud-brick in The Gate, boards in The Armory,
-    // workshop deck in Workshop, stone in The Vault). Generalize
-    // so the line doesn't claim floorboards where none exist.
     `You crouch beside the ${noun}. The room's grit has settled around ${pronoun} over the years.`,
   ];
   const lines = inHub ? indoor : wilderness;
   get().appendLog('world', pick(lines));
-  // Ambient-flavor lore reveal — 25% chance on EVERY search. Pulls a
-  // one-line Tartarian factoid from app/data/lore/ambient-flavor.json
-  // and {noun}-substitutes it. Lifted from ~3% pre-OTA-185 (gated by
-  // both narrow isSearchable AND 12% RNG) to ~25% so normal
-  // exploration actually surfaces lore. rotatingPick keeps repeats
-  // from piling up across consecutive searches.
+  // Ambient-flavor lore reveal — 25% chance on EVERY search.
   if (AMBIENT_FLAVOR_LINES.length > 0 && chance(25)) {
     const idx = rotatingPick(AMBIENT_FLAVOR_LINES.map((_, i) => i), 'ambient.flavor');
     const factoid = AMBIENT_FLAVOR_LINES[idx]!.replace(/\{noun\}/g, noun);
     get().appendLog('world', factoid);
   }
-  // Hidden-text reveal — for writing surfaces (walls, tablets, scrolls,
-  // and now broken machinery with maker plates per the widened
-  // isSearchable list in interactionTags.ts). Rare, lore-rich.
-  // Bumped 12 → 25 so when a player DOES land on a searchable noun
-  // the reveal feels rewarding instead of statistically invisible.
-  // OTA 016 — track whether anything material came out so the
-  // caller can decide whether to mark the noun consumed.
-  // Hidden-text reveals and hook plants count as substantive
-  // discoveries; bare flavor lines (haze settles, nothing
-  // turns up) don't.
+  // 2026-05-25 OTA-039 — outcome-ladder rewrite. Goal per playtester:
+  // make investigate feel like it produces things to see and do,
+  // not a flavor button. Three rate bumps + two new branches + a
+  // first-investigate-of-room guarantee:
+  //
+  //   - Hidden-text reveal: 25% → 35%, on a much wider searchable
+  //     pool (hub furniture, relic-site nouns) per OTA-039.
+  //   - Hook plant: 25% → 40%, OR 60% if the noun is a curated
+  //     salvageable (vault relic pedestal, forgotten order
+  //     reliquary, etc. — the "this looks interesting" reads).
+  //   - NEW small-loot drop: 15% chance to find a trinket
+  //     (coin / dust / nail / cloth / residue) when neither hook
+  //     nor hidden text fired. Investigate now occasionally
+  //     produces material the same way salvage does, just smaller.
+  //   - NEW first-investigate-of-room guarantee: if a fresh room
+  //     would otherwise produce a flavor-only outcome on its very
+  //     first investigate, force a substantive result (hook plant >
+  //     hidden text > trinket, in that order). Player walks into
+  //     a new room and learns it HAS something the first time
+  //     they look closely.
+  //
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { isCuratedSalvageable } = require('../engine/salvageableSpawns');
+  const livePlayer = get().player;
+  const roomKey = livePlayer ? makeRoomKey(
+    livePlayer.currentLocationId,
+    scene.microMicroId,
+    livePlayer.mapX,
+    livePlayer.mapY,
+  ) : null;
+  const roomState = roomKey ? get().worldMemory.visitedRooms?.[roomKey] : undefined;
+  const isFirstInvestigate = !roomState?.firstInvestigateDone;
+  const curatedBoost: boolean = isCuratedSalvageable(noun);
   let producedSubstantive = false;
-  if (isSearchable(noun) && chance(25)) {
+
+  // Hidden-text — 35% on any searchable noun (the searchable pool
+  // is much wider after OTA-039).
+  if (isSearchable(noun) && chance(35)) {
     const hiddenLine = pick(HIDDEN_TEXT_LINES).replace('{noun}', noun);
     get().appendLog('world', hiddenLine);
     producedSubstantive = true;
   }
-  // ~25% chance the investigation turns into a real hook in this scene.
+  // Hook plant — 40% baseline, 60% on curated salvageables. Skipped
+  // when a hook is already active in this scene (don't pile up).
   const activeUnresolved = (scene.hooks ?? []).some((h) => !h.resolved);
-  if (!activeUnresolved && chance(25)) {
+  if (!activeUnresolved && chance(curatedBoost ? 60 : 40)) {
     const hook = plantHookByKind(pickRandomHookKind());
     set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } } : s));
     get().appendLog('world', hook.plantedLine);
     producedSubstantive = true;
+  }
+  // Trinket drop — 15% chance, only fires when neither hook nor
+  // hidden text already produced. Picks one of the INVESTIGATE_TRINKETS
+  // and grants it to the player's inventory. Adds a real (if small)
+  // payoff to investigates that would otherwise have read as pure
+  // flavor.
+  if (!producedSubstantive && chance(15)) {
+    const trinket = pick(INVESTIGATE_TRINKETS);
+    const qty = trinket.qtyMin === trinket.qtyMax
+      ? trinket.qtyMin
+      : trinket.qtyMin + Math.floor(Math.random() * (trinket.qtyMax - trinket.qtyMin + 1));
+    const itemCat = lookupCraftedItem(trinket.name);
+    const newItem: InventoryItem = stampDurability({
+      id: `investigate_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      name: trinket.name,
+      kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
+      rarity: trinket.rarity,
+      quantity: qty,
+      tags: itemCat.tags,
+    });
+    if (livePlayer) {
+      const granted = grantItem(livePlayer.inventory, newItem);
+      set((s) => (s.player ? { player: { ...s.player, inventory: granted.inventory } } : s));
+      if (granted.accepted > 0) {
+        get().appendLog('world', trinket.line.replace(/\{noun\}/g, noun));
+        const qtyLabel = granted.accepted > 1 ? ` x${granted.accepted}` : '';
+        get().appendLog('reward', `✦ ${trinket.name}${qtyLabel} (${trinket.rarity}).`);
+        producedSubstantive = true;
+      }
+    }
+  }
+  // First-investigate guarantee — fresh room shouldn't read as
+  // "nothing here" the first time the player looks closely. If
+  // nothing has fired yet, force one of: hook (if free), hidden
+  // text (if searchable), or a guaranteed trinket. Latch the
+  // firstInvestigateDone flag so subsequent investigates fall back
+  // to the normal RNG rates.
+  if (isFirstInvestigate && !producedSubstantive && roomKey) {
+    if (!activeUnresolved) {
+      const hook = plantHookByKind(pickRandomHookKind());
+      set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } } : s));
+      get().appendLog('world', hook.plantedLine);
+      producedSubstantive = true;
+    } else if (isSearchable(noun)) {
+      const hiddenLine = pick(HIDDEN_TEXT_LINES).replace('{noun}', noun);
+      get().appendLog('world', hiddenLine);
+      producedSubstantive = true;
+    } else {
+      const trinket = pick(INVESTIGATE_TRINKETS);
+      const qty = trinket.qtyMin;
+      const itemCat = lookupCraftedItem(trinket.name);
+      const newItem: InventoryItem = stampDurability({
+        id: `investigate_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        name: trinket.name,
+        kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
+        rarity: trinket.rarity,
+        quantity: qty,
+        tags: itemCat.tags,
+      });
+      if (livePlayer) {
+        const granted = grantItem(livePlayer.inventory, newItem);
+        set((s) => (s.player ? { player: { ...s.player, inventory: granted.inventory } } : s));
+        if (granted.accepted > 0) {
+          get().appendLog('world', trinket.line.replace(/\{noun\}/g, noun));
+          get().appendLog('reward', `✦ ${trinket.name} (${trinket.rarity}).`);
+          producedSubstantive = true;
+        }
+      }
+    }
+  }
+  // Latch firstInvestigateDone — fires regardless of outcome so
+  // subsequent investigates of this room use the normal RNG ladder
+  // (no infinite guaranteed-substantive loop).
+  if (roomKey) {
+    set((s) => {
+      const room = s.worldMemory.visitedRooms?.[roomKey] ?? {
+        firstVisitAt: Date.now(),
+        lastVisitAt: Date.now(),
+        visitCount: 1,
+      };
+      if (room.firstInvestigateDone) return s;
+      return {
+        worldMemory: {
+          ...s.worldMemory,
+          visitedRooms: {
+            ...(s.worldMemory.visitedRooms ?? {}),
+            [roomKey]: { ...room, firstInvestigateDone: true },
+          },
+        },
+      };
+    });
   }
   return { producedSubstantive };
 }
