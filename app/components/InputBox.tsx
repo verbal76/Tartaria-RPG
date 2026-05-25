@@ -88,14 +88,20 @@ interface Props {
   travelTargetName?: string | null;
   onContinueTravel?: () => void;
   onStopTravel?: () => void;
-  /** 2026-05-25 [UI-2] — count of takeable / salvageable nouns in
-   *  the current scene. When > 0, the corresponding peace-mode
-   *  quick button renders with 'ready' tone (green) to signal
-   *  there's something actionable behind it. When 0/undefined,
-   *  the button stays neutral. Same affordance pattern as the
-   *  combat APPROACH 'needs-approach' tone. */
+  /** 2026-05-25 [UI-2] — count of nouns that each modal will
+   *  ACTUALLY render. When > 0, the corresponding peace-mode quick
+   *  button renders with 'ready' tone (green) to signal there's
+   *  something actionable behind it. When 0/undefined the button
+   *  stays neutral. Same affordance pattern as the combat APPROACH
+   *  'needs-approach' tone.
+   *
+   *  Expansion 2026-05-25 — now covers all four ambient-noun modals
+   *  (take, salvage, climb, investigate). Empty modal → gray button,
+   *  populated modal → green. */
   takeableCount?: number;
   salvageableCount?: number;
+  climbableCount?: number;
+  investigateCount?: number;
 }
 
 // Peace-mode quick buttons. The "look around you" button submits 'look' —
@@ -120,7 +126,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenFeedback, onOpenMap, inCombat, equippedMain, equippedOff, range, travelTargetName, onContinueTravel, onStopTravel, takeableCount, salvageableCount }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenFeedback, onOpenMap, inCombat, equippedMain, equippedOff, range, travelTargetName, onContinueTravel, onStopTravel, takeableCount, salvageableCount, climbableCount, investigateCount }: Props) {
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
   // BrandedKeyboard removed 2026-05-21 per playtester: "it is not
@@ -371,7 +377,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 noun to learn about it — that's investigation, not
                 search. The parser intent is already 'investigate'
                 internally; this aligns the button with the intent. */}
-            <QuickBtn label="investigate" onPress={onOpenSearch} />
+            <QuickBtn
+              label="investigate"
+              onPress={onOpenSearch}
+              tone={investigateCount && investigateCount > 0 ? 'ready' : undefined}
+            />
             <QuickBtn label="approach" onPress={onOpenApproach} />
             {/* 2026-05-25 [UI-2] — take/salvage tone='ready' (green)
                 when there's something actionable in the scene. Players
@@ -395,7 +405,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 CLIMB UP fires the next tier on the same noun
                 without re-opening the picker. */}
             {!elevatedOn ? (
-              <QuickBtn label="climb" onPress={onOpenClimb} />
+              <QuickBtn
+                label="climb"
+                onPress={onOpenClimb}
+                tone={climbableCount && climbableCount > 0 ? 'ready' : undefined}
+              />
             ) : (
               <>
                 {elevatedOn.tier < elevatedOn.totalTiers && (
