@@ -274,6 +274,15 @@
         { "name": "Violet Cap Mushroom", "quantity": 1 },
         { "name": "Orange Sporecap", "quantity": 1 }
       ]
+    },
+    {
+      "_note": "MECHANIC-2 (2026-05-25) — scanner recipes so the player can craft the off-hand search tools that gate investigate of Aetheric features (vent fissures, glyphs, ley lines). Pulse Scanner is the baseline (Common, INT 3 req). Future scanner variants get their own recipes here.",
+      "result": "Pulse Scanner",
+      "ingredients": [
+        { "name": "Aether Crystal", "quantity": 2 },
+        { "name": "Scrap Metal", "quantity": 1 },
+        { "name": "Aetheric Shard", "quantity": 1 }
+      ]
     }
   ]
 }

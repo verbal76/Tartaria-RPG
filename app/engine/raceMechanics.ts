@@ -202,10 +202,20 @@ export function racialStatBonusesFor(raceId: string | undefined): RacialStatBonu
 // they cast at base DC. Aetherborn share Aetheric blood but lack the
 // True Tartarian training, so they cast at +2 DC. All other races
 // are guessing — +4 DC.
+//
+// 2026-05-25 [MECHANIC-1] — non-Aetheric races dropped from +4 → +3.
+// User reported summon-golem felt unreasonably hard: three attempts
+// (d20 1 → auto-fail, d20 15 vs DC 19 → fail, d20 16 + INT 3 = 19 →
+// pass). The +4 modifier put non-mud-dweller / non-aetherborn casters
+// at ~25% success on early-game INT scores. +3 brings it to ~35%
+// while still preserving the "untrained casters" gap from
+// mud_dweller (0) and aetherborn (+2). Larger redesign — sending
+// the golem to fight + follow until next combat — tracked as
+// MECHANIC-1b follow-up; this OTA is the DC-fairness piece only.
 export function aethercraftDcModifier(raceId: string | undefined): number {
   if (raceId === 'mud_dweller') return 0;
   if (raceId === 'aetherborn') return 2;
-  return 4;
+  return 3;
 }
 
 // ─── Aethercraft context bonus ──────────────────────────────────────

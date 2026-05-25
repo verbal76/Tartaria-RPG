@@ -37,6 +37,12 @@ export const OUTSIDE_CLIMBABLES: ClimbableSpawn[] = [
   { name: 'buried strip mall rooftop',  context: 'outside', height: 2 },
   { name: 'endless stair landing',      context: 'outside', height: 4 },
   { name: "zharak's teeth spire",       context: 'outside', height: 4 },
+  // 2026-05-25 [CONTENT-1] — watchtower as a 4-step outside climbable.
+  // User reported investigating a watchtower scene and the world text
+  // described it as "half-swallowed" by silt without a climb option.
+  // Authored as 4-step (matches the existing ruined-skyscraper /
+  // endless-stair-landing rung-count for visually-tall structures).
+  { name: 'watchtower',                 context: 'outside', height: 4 },
 ];
 
 // Inside-tagged props — for vaults, libraries, engine chambers, etc.

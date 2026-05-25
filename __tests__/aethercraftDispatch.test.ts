@@ -132,11 +132,11 @@ describe('OTA 043 — Aethercraft verb dispatch + fuel burn', () => {
     expect(logs).toMatch(/DC 14/);
   });
 
-  it('Unknowing Mass / Reclaimer casts at +4 DC (16 for shape)', async () => {
+  it('Unknowing Mass / Reclaimer casts at +3 DC (15 for shape) — MECHANIC-1 tune, was +4/16', async () => {
     const store = await bootstrap('unknowing_mass', [stockFuel('Aether Crystal', 2)]);
     store.getState().submitPlayerAction('shape stone');
     const logs = store.getState().gameLog.map((e) => e.text).join('\n');
-    expect(logs).toMatch(/DC 16/);
+    expect(logs).toMatch(/DC 15/);
   });
 
   it('No fuel → cast bails with Arbiter line, inventory unchanged', async () => {
