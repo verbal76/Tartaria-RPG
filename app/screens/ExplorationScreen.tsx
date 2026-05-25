@@ -572,15 +572,27 @@ export function ExplorationScreen() {
           // allows manual typing of "investigate the ground" to
           // gather more stock material.
           //
-          // OTA 014 — hub-room scoping. Player inside the outpost
-          // sees board + brick floors; the dig handler refuses
-          // ("no silt to scrape"). Showing the chip in hub rooms
-          // is a false affordance — drop it. Player outside the
-          // outpost (hubRoomId null) still sees it.
-          ...(player.hubRoomId
-            ? []
-            : [{ noun: 'the ground', consumed: isAmbientConsumed('ground') }]
-          ),
+          // 2026-05-25 — context-aware surface chip. Always pinned at
+          // the top of the Investigate row on every new location:
+          //   - 'the floor' when inside a hub room (any building,
+          //     regardless of material — wooden, board, stone, mud-
+          //     brick). Investigate-the-floor rolls a chance pickup
+          //     via the digHere floor-scavenge path.
+          //   - 'the mud' when standing on a mud-tagged biome
+          //     (Tartarian Outskirts, Buried Cities, etc.). Routes
+          //     through digHere's normal silt-scrape path.
+          //   - 'the ground' otherwise — pickup-if-you-see-it.
+          // The consumed flag is keyed off the surface noun (mud /
+          // ground / floor), so per-room dedup still applies.
+          ...(() => {
+            const noun: string = player.hubRoomId
+              ? 'the floor'
+              : (currentScene?.location.tags ?? []).includes('mud')
+                ? 'the mud'
+                : 'the ground';
+            const key = noun.replace(/^the\s+/i, ''); // 'mud' / 'ground' / 'floor'
+            return [{ noun, consumed: isAmbientConsumed(key), alwaysShow: true }];
+          })(),
           // 2026-05-25 — productively-consumed nouns (taken, salvaged
           // with loot, investigated with substantive result) are
           // filtered out of Investigate entirely so the modal doesn't
