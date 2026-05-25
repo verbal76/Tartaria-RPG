@@ -184,6 +184,16 @@ export function MapScreen() {
   // wherever the player is via the OTA 23-002 visual upgrade
   // (warm-gold halo + larger 56x40 silhouette). Player pans
   // manually to find their marker if they wander far from it.
+  //
+  // 2026-05-25 OTA-035 — exception: when the player is INSIDE an
+  // outpost, the bottom-left minimap inset is far from the screen
+  // center and the marker would otherwise sit off-screen at the
+  // default fill-scale. Auto-focus the outpost section on first
+  // layout so opening the map shows the player's room without
+  // panning. didAutoFocusHub guards against re-firing on subsequent
+  // imgBox layouts so user-driven pinch/pan isn't yanked back —
+  // matches the pattern the original auto-center was missing.
+  const didAutoFocusHub = useRef(false);
   useEffect(() => {
     if (!imgBox) return;
     const imgAspect = ATLAS_W / ATLAS_H;
@@ -199,6 +209,48 @@ export function MapScreen() {
       scale.setValue(fill);
     }
   }, [imgBox, scale]);
+
+  useEffect(() => {
+    if (!imgBox || !inHub || didAutoFocusHub.current) return;
+    if (!hubMinimapPos) return;
+    // Compute the marker's position in unscaled imgBox coordinates
+    // using the same letterbox-aware math as the dotStyle below.
+    const imgAspect = ATLAS_W / ATLAS_H;
+    const boxAspect = imgBox.width / imgBox.height;
+    let renderedW: number;
+    let renderedH: number;
+    let offsetX: number;
+    let offsetY: number;
+    if (boxAspect > imgAspect) {
+      renderedH = imgBox.height;
+      renderedW = imgBox.height * imgAspect;
+      offsetX = (imgBox.width - renderedW) / 2;
+      offsetY = 0;
+    } else {
+      renderedW = imgBox.width;
+      renderedH = imgBox.width / imgAspect;
+      offsetX = 0;
+      offsetY = (imgBox.height - renderedH) / 2;
+    }
+    const markerX = offsetX + renderedW * hubMinimapPos.fx;
+    const markerY = offsetY + renderedH * hubMinimapPos.fy;
+    // Zoom in beyond baseline so the room is readable, then pan
+    // so the marker lands at the center of the visible window.
+    const target = Math.max(baselineScale.current * 2.5, 2.5);
+    const tx = (imgBox.width / 2 - markerX) * target;
+    const ty = (imgBox.height / 2 - markerY) * target;
+    const clamped = clampTranslate(tx, ty, target, imgBox);
+    didAutoFocusHub.current = true;
+    Animated.parallel([
+      Animated.spring(scale, { toValue: target, useNativeDriver: true, friction: 8, tension: 60 }),
+      Animated.spring(translateX, { toValue: clamped.tx, useNativeDriver: true, friction: 8, tension: 60 }),
+      Animated.spring(translateY, { toValue: clamped.ty, useNativeDriver: true, friction: 8, tension: 60 }),
+    ]).start(() => {
+      scaleRef.current = target;
+      txRef.current = clamped.tx;
+      tyRef.current = clamped.ty;
+    });
+  }, [imgBox, inHub, hubMinimapPos, scale, translateX, translateY]);
 
   const resetTransform = () => {
     const target = baselineScale.current;

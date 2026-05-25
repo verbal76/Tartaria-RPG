@@ -404,6 +404,11 @@ export interface PlayerMilestones {
    *  affordance. Opens the door to the 158-entry concepts.json layer
    *  for players who would never otherwise discover the Q&A path. */
   firstQAHintShown?: boolean;
+  /** Latched once when the player sees the "you're inside an outpost,
+   *  leave it before traveling to another city" Arbiter hint. Fires
+   *  on first hub entry so a new player understands the inside-building
+   *  state. */
+  firstOutpostHintShown?: boolean;
 }
 
 export type EquipSlot =

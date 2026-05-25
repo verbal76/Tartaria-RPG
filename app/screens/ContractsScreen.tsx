@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal } from 'react-native';
-import { BrandedModal } from '../components/BrandedModal';
 import { useGameStore } from '../state/gameStore';
 import { findHuntById, HUNTS } from '../engine/hunts';
 import { findMysteryById, MYSTERIES } from '../engine/mysteries';
@@ -75,11 +74,11 @@ export function ContractsScreen() {
   // 2026-05-24 — tap-to-travel from the Primary Objective expansion.
   // Mirrors the Lore→Places confirm modal pattern in LoreCodexBody.
   const setTravelCourse = useGameStore((s) => s.setTravelCourse);
+  const requestTravelConfirm = useGameStore((s) => s.requestTravelConfirm);
   const appendLog = useGameStore((s) => s.appendLog);
   const [pendingRoute, setPendingRoute] = useState<{ id: string; name: string } | null>(null);
   // 2026-05-25 — branded refusal modal for hub-room gate. Same
   // palette as the rest of the game; replaces native Alert.alert.
-  const [hubRefusalDest, setHubRefusalDest] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>('contracts');
   // OTA 020 — tap-to-expand. Each card key (kind:id) maps to true
   // when expanded. Tap the card head to toggle; expanded view shows
@@ -844,15 +843,17 @@ export function ContractsScreen() {
                   const id = pendingRoute.id;
                   const name = pendingRoute.name;
                   setPendingRoute(null);
-                  // Same hub-room refusal Lore→Places applies.
-                  // setTravelCourse reads currentLocationId and would
-                  // step onto a procedural tile while hubRoomId is
-                  // still set, leaving the scene in a half-state.
+                  // 2026-05-25 OTA-035 — outpost-aware confirmation.
+                  // Was a hard refusal ("leave the outpost first, then
+                  // come back"); now a Yes/No prompt: confirm to leave
+                  // the outpost + start the course, cancel to stay
+                  // inside. Routes through the global
+                  // pendingTravelConfirm flow so the typed
+                  // `travel to <X>` parser path and the SET COURSE
+                  // button surface the same modal.
                   if (player.hubRoomId) {
-                    // 2026-05-25 — branded modal (same palette as
-                    // the rest of the game) replaces the native
-                    // Alert that was breaking the dark theme.
-                    setHubRefusalDest(name);
+                    requestTravelConfirm(id, name);
+                    setScreen('exploration');
                     return;
                   }
                   setTravelCourse(id);
@@ -866,28 +867,6 @@ export function ContractsScreen() {
         </View>
       </Modal>
 
-      {/* 2026-05-25 — branded refusal modal for hub-room gate. */}
-      <BrandedModal
-        visible={hubRefusalDest !== null}
-        title="Leave the outpost first"
-        body={hubRefusalDest
-          ? `The Arbiter can't chart you to ${hubRefusalDest} from inside the outpost. Walk through the gate (or type "leave outpost"), then tap Set Course again.`
-          : undefined}
-        buttons={[
-          {
-            label: 'OK',
-            onPress: () => {
-              setHubRefusalDest(null);
-              setScreen('exploration');
-            },
-            tone: 'primary',
-          },
-        ]}
-        onRequestClose={() => {
-          setHubRefusalDest(null);
-          setScreen('exploration');
-        }}
-      />
     </View>
   );
 }

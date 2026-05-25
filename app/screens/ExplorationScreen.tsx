@@ -56,6 +56,9 @@ export function ExplorationScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const currentScene = useGameStore((s) => s.currentScene);
   const pendingRolls = useGameStore((s) => s.pendingRolls);
+  const pendingTravelConfirm = useGameStore((s) => s.pendingTravelConfirm);
+  const confirmLeaveAndTravel = useGameStore((s) => s.confirmLeaveAndTravel);
+  const cancelTravelConfirm = useGameStore((s) => s.cancelTravelConfirm);
   const resolveRollStep = useGameStore((s) => s.resolveRollStep);
   const cancelPendingRolls = useGameStore((s) => s.cancelPendingRolls);
   const saveAndExitToTitle = useGameStore((s) => s.saveAndExitToTitle);
@@ -786,6 +789,32 @@ export function ExplorationScreen() {
           },
         ]}
         onRequestClose={() => setVendorLeavePrompt(null)}
+      />
+
+      {/* 2026-05-25 OTA-035 — outpost-aware travel confirmation. When
+          the player issues `travel to <city>` (typed or via SET COURSE)
+          from inside an outpost, the modal asks if they want to leave
+          first. Yes leaves + starts the course; cancel keeps them
+          inside the outpost with no state change. */}
+      <BrandedModal
+        visible={pendingTravelConfirm !== null}
+        title="Leave the outpost?"
+        body={pendingTravelConfirm
+          ? `To travel to ${pendingTravelConfirm.locationName}, you'll need to walk back through the gate and out into the open ground. Leave the outpost and start the course?`
+          : undefined}
+        buttons={[
+          {
+            label: 'Stay inside',
+            onPress: () => cancelTravelConfirm(),
+            tone: 'neutral',
+          },
+          {
+            label: 'Leave + travel',
+            onPress: () => confirmLeaveAndTravel(),
+            tone: 'primary',
+          },
+        ]}
+        onRequestClose={() => cancelTravelConfirm()}
       />
     </KeyboardAvoidingView>
   );
