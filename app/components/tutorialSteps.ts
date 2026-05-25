@@ -117,6 +117,24 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'wasteland encounter: an abandoned caravan with a note, a wandering drifter with a tip, ' +
       'a fungal patch you can harvest, an old bus with a duffel, etc. Watch the feed.',
   },
+  // 2026-05-25 OTA-030 — day/night cycle now has real mechanical
+  // teeth: stealth ±1, encounter rate 1.3×/0.85×, rest always rolls.
+  {
+    screen: 'exploration',
+    area: 'scene-bar',
+    title: 'Day, night, and risk',
+    body:
+      'The scene bar tells you which part of the day you\'re in (morning / afternoon / evening / ' +
+      'night). That period shapes every roll: ' +
+      '\n\n• Stealth — +1 at night (evening through dawn), -1 during the day. The silt eats ' +
+      'sound after dusk; daytime sneaks read louder. ' +
+      '\n• Wasteland encounters — 1.3× rate at night, 0.85× by day. Things that hunt prefer ' +
+      'the dark; travelers who push after sunset eat the risk. ' +
+      '\n• Rest — every rest rolls for an ambush even at full HP. You\'re vulnerable, watch the ' +
+      'fire. Night rests roll harder than day rests. ' +
+      '\n\nTime is shown on the line under the scene bar as "Day N · period". Plan loadout and ' +
+      'route accordingly.',
+  },
   {
     screen: 'exploration',
     area: 'travel-row',
@@ -124,10 +142,13 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     body:
       'NORTH / SOUTH / EAST / WEST — one tap = one step in that direction on the world map. ' +
       'These hide during combat (you can\'t walk away from a fight that\'s already on you). ' +
+      'MAP sits on the right and stays visible on every screen — tap to see the world layout. ' +
       '\n\nFor long hauls: type "travel to <city>" (or tap a Place in the Lore tab) and the row ' +
-      'flips to → <CITY> / STOP TRAVEL. Each → tap takes one cardinal step ' +
-      'toward the target — same stamina, same time, same encounter rolls. STOP hands the ' +
-      'cardinals back. ' +
+      'flips to → <CITY> [N moves left] / STOP TRAVEL. The badge counts remaining cardinal ' +
+      'steps to the target. Each → tap takes one step — same stamina, same time, same ' +
+      'encounter rolls. STOP hands the cardinals back. ' +
+      '\n\nTravel ignores hubs you\'re passing through (you won\'t get dropped into the reception ' +
+      'of every roadside structure you cross). It only auto-enters when the target IS the hub. ' +
       '\n\nAsk the Arbiter "what\'s north of me" or "closest hub" any time.',
   },
   {
@@ -141,8 +162,13 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'map-stone, wagon, rubble, trap, …) appear as chips at the top — the same nouns you see ' +
       'in the "look around you" bearings line, so it all stays consistent. Approach has a ' +
       'USE STEALTH toggle for sneak-up routing. ' +
+      '\n\nFour affordance buttons — TAKE / SALVAGE / CLIMB / INVESTIGATE — glow green when ' +
+      'their modal has something actionable in the current scene, and grey out when there\'s ' +
+      'nothing left to do. Tap to see the chip list. Salvaging or investigating a chip removes ' +
+      'it from the other modals (no double-acting on the same item). ' +
       '\n\nIn combat: punch, kick, your equipped weapons, dodge, block, advance / step back, ' +
-      'pack (open inventory mid-fight).',
+      'pack (open inventory mid-fight). When a golem is alive, a GOLEM (hp/max) button joins ' +
+      'the row — tap to command it to attack.',
   },
   // OTA 040 — new step: recent additions to the quick row + verbs.
   {
@@ -158,9 +184,10 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'a one-line announcement in the feed and a vendor banner at the top. Vendors also ' +
       'have a STEAL button next to BUY with the DC stamped on it; skip the price by risking ' +
       'a fight. ' +
-      '\n\n• Aethercraft verbs are real now. Type "shape stone", "summon golem", or "mend ' +
-      'wounds" with an Aether-tagged consumable in your pack (Aether Crystal / Mud / Shard / ' +
-      'Locket) to burn as fuel. Mud Dwellers cast at base DC; Aetherborn +2; everyone else +4.',
+      '\n\n• Aethercraft verbs are real now. Type "shape stone", "summon golem" (mud / iron / ' +
+      'aether / crystal — see the Golem Sidekick step), or "mend wounds" with an Aether-tagged ' +
+      'consumable in your pack (Aether Crystal / Mud / Shard / Locket) to burn as fuel. Mud ' +
+      'Dwellers cast at base DC; Aetherborn +2; everyone else +3.',
   },
   {
     screen: 'exploration',
@@ -206,6 +233,45 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'Aetherstone Manipulation (shape stone), Aether Golem Constructor (summon golem), ' +
       'Aetheric Healing (mend wounds). Each Aethercraft card shows which Aether fuels it ' +
       'will burn. Tap a recipe card to drop "craft <name>" into the input box.',
+  },
+  // 2026-05-25 OTA-011 (MECHANIC-1b) — golem sidekick is a real
+  // companion now. Players need to know it persists across tiles
+  // and that the COMMAND GOLEM button appears in combat.
+  {
+    screen: 'exploration',
+    area: 'fullscreen',
+    title: 'Golem sidekicks',
+    body:
+      'Summon a golem with `summon mud golem` / `summon iron golem` / `summon aether golem` / ' +
+      '`summon crystal golem`. Each burns its own Aether fuel and produces a companion with its ' +
+      'own HP, attack die, and damage type: ' +
+      '\n• Mud — slow heavy bruiser (1d8, bludgeoning, 18 HP) ' +
+      '\n• Iron — tank build (1d6, slashing, 24 HP) ' +
+      '\n• Aether — energy striker (1d10, aetheric, 14 HP) ' +
+      '\n• Crystal — precision (1d6, piercing, +2 hit, 12 HP) ' +
+      '\n\nThe golem follows you across cardinal moves and persists until it dies or you dismiss ' +
+      'it. In combat a GOLEM button (with live HP) appears in the quick row — tap to send it at ' +
+      'your current target. Enemy retaliation hits the golem, not you. When it falls it dissolves ' +
+      'back into its fuel material. Type `dismiss golem` any time. One golem at a time.',
+  },
+  // 2026-05-25 OTA-031 — skill growth is now a real player-facing
+  // system (use-based progression, progressively harder), surfaced
+  // on the Character Screen with a 20-segment bar.
+  {
+    screen: 'character',
+    area: 'fullscreen',
+    title: 'Stats grow with use',
+    body:
+      'Every successful action that uses a stat trains it. Failures don\'t count — the system ' +
+      'rewards effective use, not flailing. The bar under each stat is your progress to the ' +
+      'next +1; tap the stat to see what trains it. ' +
+      '\n\nThe ramp gets steeper as stats climb: 1-5 advances fast (~33 uses), 6-10 fast-ish ' +
+      '(~50), 11-14 normal (~100), 15-18 slow (~200), 19-22 grindy (~400), 23+ a real commitment ' +
+      '(~1000). Master a stat and you\'ve earned it. ' +
+      '\n\nSome highlights: STR — punches, kicks, climb tiers, 20+ items in your pouch. ' +
+      'DEX — climbs, parries, stealth, stealing. INT — scrapping, salvaging named gear, every ' +
+      'Aethercraft cast. WIS — cardinal travel, NPC interactions, hearing a whisper, finishing ' +
+      'a quest. CHA — NPC trades, finishing a storyline section, walking with named gear equipped.',
   },
   {
     screen: 'contracts',
@@ -271,7 +337,10 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'Durability shows next to gear that wears. ' +
       '\n\nIf an item is from new content the catalog hasn\'t formally tracked yet, the engine ' +
       'will infer reasonable stats from the name (a blade gets 1d8 slashing, boots get +1 AC ' +
-      'to feet, etc.) so you never see a blank record. Inferred items are flagged in the log.',
+      'to feet, etc.) so you never see a blank record. Inferred items are flagged in the log. ' +
+      '\n\nSALVAGE ALL on a scene\'s chip list runs every breakdown narration first, then prints ' +
+      'the combined haul as a single block at the end — easier to read what you actually got. ' +
+      'Salvage never yields zero materials thanks to a junk-pool fallback.',
   },
   {
     screen: 'vendor',
@@ -285,7 +354,9 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       '\n\nTour mode disables buy / sell / contract-accept so you can poke around without ' +
       'cheesing the game before play starts. In-game, when a vendor is in the scene, an orange ' +
       'banner appears at the top of the world feed on the world screen with the trader\'s name. ' +
-      'Tap that banner to enter the shop. Irma will vanish when this tour ends.',
+      'Tap that banner to enter the shop. Vendors stay at the tile where they spawned — if you ' +
+      'walk away, you\'ll have to walk back to trade with them again. Irma will vanish when this ' +
+      'tour ends.',
   },
   {
     screen: 'about',
@@ -301,7 +372,9 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'of neural voice once; SYSTEM uses Android\'s built-in TTS. Both default OFF. ' +
       '\n\nLORE — the full codex: races, factions, places (tap any Place to plan a travel ' +
       'route straight there), timeline. ' +
-      '\n\nABOUT — build info, diagnostics, OTA build ID.',
+      '\n\nABOUT — build info, diagnostics, OTA build ID, plus a CHECK FOR OTA UPDATE button ' +
+      'that fails quietly if the network is slow (10-second timeout, no hang). The title ' +
+      'screen also carries an EXIT GAME button that saves before quitting.',
   },
   {
     screen: 'exploration',
