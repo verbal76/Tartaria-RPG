@@ -65,6 +65,14 @@ const TAG_RULES: TagRule[] = [
     // reveal. Original pure-writing-surface list (wall, tablet,
     // scroll, etc.) preserved at the top so the rare-relic reveals
     // still trigger on the original nouns.
+    //
+    // 2026-05-25 OTA-039 — widened again so the basic hub-room
+    // furniture (table, brick, gate, door, bench, banner, monolith,
+    // obelisk, pedestal, reliquary, etc.) qualifies for the hidden-
+    // text reveal. Playtester ran 5 investigates on common hub
+    // nouns and saw zero substantive outcomes because only ~15
+    // nouns were eligible. Wider pool + higher rate per OTA-039
+    // brings investigate up from "flavor button" to "find things".
     patterns: [
       // Writing surfaces — original list
       'wall', 'inscription', 'mural', 'archive', 'tablet', 'tome',
@@ -79,6 +87,17 @@ const TAG_RULES: TagRule[] = [
       'gear', 'conduit', 'machinery', 'pipe', 'panel', 'coil',
       'circuit', 'cable', 'console', 'pillar', 'arch', 'beam',
       'fissure', 'pulse emitter', 'broken chain',
+      // 2026-05-25 OTA-039 — hub furniture + relic-site surfaces.
+      // All carry plausible markings (faction sigils carved into a
+      // gate, a coin pressed into a brick, an inscription on a
+      // pedestal, a dedication on an altar).
+      'table', 'brick', 'gate', 'door', 'doorway', 'bench', 'rack',
+      'chair', 'stool', 'frame', 'banner', 'standard', 'sigil',
+      'monolith', 'obelisk', 'pedestal', 'plinth', 'reliquary',
+      'casket', 'altar', 'shrine', 'vault', 'relic', 'statue',
+      'plaque', 'urn', 'crate', 'chest', 'box', 'lockbox',
+      'strongbox', 'coffer', 'safe', 'barrel', 'jar', 'bottle',
+      'stone', 'masonry', 'pylon',
     ],
   },
   {

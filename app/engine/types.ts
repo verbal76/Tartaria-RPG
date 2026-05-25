@@ -922,6 +922,13 @@ export interface VisitedRoom {
    *  cross-verb flow is preserved because break never touches
    *  this list. */
   flavorExhaustedNouns?: string[];
+  /** 2026-05-25 OTA-039 — latched once the player runs their first
+   *  investigate in this room. The investigate handler uses it to
+   *  force a substantive outcome on the very first investigate per
+   *  room visit (hook plant > hidden text > trinket > lore beat),
+   *  so a new room never reads as "nothing here to find". Subsequent
+   *  investigates fall back to the normal RNG rates. */
+  firstInvestigateDone?: boolean;
   /** Audit fix — in-game hours elapsed at the most recent visit.
    *  Used by respawn-quiet calculation so idling for 6 real hours
    *  doesn't accidentally trigger respawn even when no in-game time
