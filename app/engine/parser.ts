@@ -806,6 +806,32 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
     };
   }
 
+  // 2026-05-25 — bare cardinal direction shortcuts. Player types
+  // 'n' / 's' / 'e' / 'w' / 'ne' / 'nw' / 'se' / 'sw' and expects to
+  // travel; without this special-case they fell through bestVerbMatch
+  // as unknown and bounced to the Qwen LLM fallback. Cardinal short-
+  // codes are unambiguous in normal play; only intercept when the
+  // entire input is one of the codes.
+  if (tokens.length === 1) {
+    const tok = tokens[0]!;
+    const cardinalMap: Record<string, string> = {
+      n: 'north', s: 'south', e: 'east', w: 'west',
+      ne: 'northeast', nw: 'northwest', se: 'southeast', sw: 'southwest',
+    };
+    const expanded = cardinalMap[tok];
+    if (expanded) {
+      return {
+        intent: 'travel',
+        raw,
+        normalized,
+        confidence: 0.95,
+        matchedVerb: 'go',
+        target: expanded,
+        suggestions: [],
+      };
+    }
+  }
+
   let bestMatch: { intent: Exclude<Intent, 'unknown'>; verb: string; distance: number; index: number } | null = null;
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i];
@@ -945,15 +971,28 @@ export function parseInput(raw: string, context: ParseContext = {}): ParsedInput
     .sort((a, b) => b.length - a.length);
   let ambientStrongMatch: string | undefined;
   if (targetPhraseNorm && !enemyHit) {
+    // 2026-05-25 — exact-equality pre-pass. Without this, a target
+    // typed as a short noun ('rope') would resolve to a LONGER
+    // ambient that contains it ('rope coil') because the length-DESC
+    // sort hits the long one first and the OR'd `nNorm.includes(target)`
+    // matches before we get a chance to see the exact 'rope'. Pre-pass
+    // ensures the player's literal phrase always wins when present.
     for (const n of ambientCandidates) {
-      const nNorm = normalizeForCompare(n);
-      if (
-        targetPhraseNorm === nNorm ||
-        targetPhraseNorm.includes(nNorm) ||
-        nNorm.includes(targetPhraseNorm)
-      ) {
+      if (normalizeForCompare(n) === targetPhraseNorm) {
         ambientStrongMatch = n;
         break;
+      }
+    }
+    if (!ambientStrongMatch) {
+      for (const n of ambientCandidates) {
+        const nNorm = normalizeForCompare(n);
+        if (
+          targetPhraseNorm.includes(nNorm) ||
+          nNorm.includes(targetPhraseNorm)
+        ) {
+          ambientStrongMatch = n;
+          break;
+        }
       }
     }
   }
