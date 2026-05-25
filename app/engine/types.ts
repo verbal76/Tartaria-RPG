@@ -490,11 +490,12 @@ export type StatusEffectKind =
   // potion. buffStat + buffBonus carry the actual modifier;
   // effectiveStats sums every active food_buff matching the stat.
   | 'food_buff'
-  // OTA 039 — Aethercraft outcomes. shaped_stone_ward grants a
-  // one-round +4 AC; golem_companion fires a free 1d6 bludgeoning
-  // hit after each player attack for 3 rounds.
+  // OTA 039 — Aethercraft shape outcome. shaped_stone_ward grants a
+  // one-round +4 AC. The companion-style 'golem_companion' kind was
+  // retired 2026-05-25 (MECHANIC-1b OTA-011) — replaced by
+  // player.golem + handleGolemCommand. Removed from the union now
+  // that the unreachable handler block was deleted.
   | 'shaped_stone_ward'
-  | 'golem_companion'
   // 2026-05-24 — stamina-driven combat statuses. tired and exhausted
   // are auto-applied/cleared by tickPlayerStaminaStatuses based on
   // current stamina (no persistence drift). power_attack_pending and

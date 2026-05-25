@@ -5639,7 +5639,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather));
           const roll = rollDie(20);
           const total = roll + stats.dexterity - 2;
-          const ac = Math.max(5, Math.min(18, 5 + (parseInt(String(enemyHit.abilityPoint), 10) || 0)));
+          // 2026-05-25 — use parseEnemyAP. parseInt of "Strength 4"
+          // was returning NaN → 0, clamping every throw AC to 5 (~95%
+          // hit rate vs all enemies including bosses).
+          const ac = Math.max(5, Math.min(18, 5 + parseEnemyAP(enemyHit)));
           let hit = total >= ac;
           const projectile = itemUsed ? itemUsed.name.toLowerCase() : 'a stone';
           get().appendLog(
@@ -6406,7 +6409,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const penalty = i * 2;
           const roll = rollDie(20);
           const total = roll + statVal - penalty;
-          const ac = Math.max(5, Math.min(18, 5 + (parseInt(String(targetEnemy.abilityPoint), 10) || 0)));
+          // 2026-05-25 — use parseEnemyAP (same fix as throw path).
+          const ac = Math.max(5, Math.min(18, 5 + parseEnemyAP(targetEnemy)));
           const hit = total >= ac;
           get().appendLog(
             'combat',
@@ -7750,21 +7754,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const prevHp = currentScene.enemyHps[activeIdx] ?? enemy.hp;
       let newEnemyHp = prevHp - dmg;
 
-      // OTA 039 — Aether Golem Constructor follow-up. If the player
-      // has an active golem_companion status, the golem fires a free
-      // 1d6 bludgeoning hit immediately after the player's swing
-      // (before the enemy counter). A lethal golem hit drops into
-      // the kill branch below the same way a lethal player hit would.
-      const livePlayerGolem = get().player ?? player;
-      const golemEff = (livePlayerGolem.statusEffects ?? []).find((e) => e.kind === 'golem_companion' && e.remainingRounds > 0);
-      if (golemEff && newEnemyHp > 0) {
-        const golemDmg = rollDie(6);
-        newEnemyHp -= golemDmg;
-        get().appendLog(
-          'combat',
-          `The golem brings its mud-fist down on ${enemy.name} — ${golemDmg} bludgeoning. (${Math.max(0, newEnemyHp)} HP)`,
-        );
-      }
+      // 2026-05-25 — removed dead OTA-039 'golem_companion' status
+      // follow-up block. The status kind is no longer emitted by any
+      // code path (MECHANIC-1b OTA-011 replaced it with player.golem
+      // + a dedicated golem QuickBtn / handleGolemCommand). The
+      // legacy block was reachable only via the status's old emitter
+      // which itself was removed. Free 1d6 hit per swing was over-
+      // generous and shadowed the deliberate command-golem affordance.
 
       // Narrate the resistance/weakness modifier on its own line so the
       // player can see WHY the damage changed.
@@ -12275,6 +12271,21 @@ function makeRoomKey(
 //
 // Filter out the marker entries so each verb's dedup only sees real
 // consumption history.
+/** 2026-05-25 — proper parser for enemy.abilityPoint strings of the
+ *  form "Strength 4" / "Dexterity 6" / "Tusk Charge" (no digit).
+ *  parseInt fails on the leading word; the long-standing pattern
+ *  `parseInt(String(enemy.abilityPoint), 10) || N` always falls back
+ *  to N because parseInt returns NaN (which is falsy) on a non-
+ *  numeric leading token. Result of the bug: every AC + counter-
+ *  attack bonus in the game collapsed to the fallback (5 for thrown
+ *  attacks; +3 for counter swings; ~8 for combatRules AC). This
+ *  helper extracts the FIRST digit run anywhere in the string. */
+function parseEnemyAP(enemy: { abilityPoint?: string } | null | undefined, fallback = 3): number {
+  if (!enemy) return fallback;
+  const match = String(enemy.abilityPoint ?? '').match(/\d+/);
+  return match ? parseInt(match[0], 10) : fallback;
+}
+
 function nonClimbMarkers(searched: readonly string[] | undefined): string[] {
   if (!searched) return [];
   return searched.filter((s) => !s.startsWith('climbed:'));
@@ -12465,7 +12476,10 @@ function playerBuildScore(player: PlayerCharacter): number {
  *  number plus a small HP-tier bonus. Large legendaries like Mud Titan
  *  end up at 9-10; rats and wasps at 2-3. */
 function enemyBuildScore(enemy: Enemy): number {
-  const ap = parseInt(String(enemy.abilityPoint), 10) || 3;
+  // 2026-05-25 — was `parseInt(String(enemy.abilityPoint), 10) || 3`
+  // which fell back to 3 for every "Strength N" / "Dexterity N"
+  // string because parseInt of a leading word returns NaN.
+  const ap = parseEnemyAP(enemy);
   const hpTier = enemy.hp >= 200 ? 3 : enemy.hp >= 100 ? 2 : enemy.hp >= 40 ? 1 : 0;
   return Math.max(1, Math.min(10, ap + hpTier));
 }
@@ -12656,7 +12670,10 @@ function applyEnemyCounter(
     const playerRoll = rollDie(20);
     const playerTotal = playerRoll + stats.strength;
     const enemyRoll = rollDie(20);
-    const enemyTotal = enemyRoll + (parseInt(String(enemy.attack), 10) || 3) + traitAttackBonus(enemy.traits);
+    // 2026-05-25 — `enemy.attack` is the attack name ("Tusk Charge",
+    // "Pulse Strike") not a number. parseInt always returned NaN → 3
+    // default. Derive the bonus from the abilityPoint string instead.
+    const enemyTotal = enemyRoll + parseEnemyAP(enemy) + traitAttackBonus(enemy.traits);
     const playerWins = playerTotal > enemyTotal;
     const tie = playerTotal === enemyTotal;
     get().appendLog(
@@ -12710,7 +12727,9 @@ function applyEnemyCounter(
     // Tie or enemy-win: fall through and apply enemy damage as normal.
   }
 
-  const baseAtk = parseInt(String(enemy.attack), 10) || 3;
+  // 2026-05-25 — same fix as enemyTotal above. attack is a name, not
+  // a number; derive bonus from abilityPoint.
+  const baseAtk = parseEnemyAP(enemy);
   const traitAtk = traitAttackBonus(enemy.traits);
   // Ambush bonus — one-shot +2 on the FIRST counter this enemy makes
   // in the scene (~16 enemies in data/enemies/enemies.json declare
@@ -13876,9 +13895,10 @@ function handleGolemCommand(
     return;
   }
   // Pick target. If player named one, match by aliases / name; else
-  // first enemy. Enemies don't carry stable IDs, so we use array
-  // index for the immutable update path.
-  let targetIdx = 0;
+  // the currently-active enemy index (matches the player's own
+  // attack target convention so "command golem" without an
+  // explicit target focuses the same enemy the player is fighting).
+  let targetIdx = Math.max(0, Math.min(scene.activeEnemyIdx ?? 0, enemies.length - 1));
   if (cmdTarget) {
     const lower = cmdTarget.toLowerCase();
     const found = enemies.findIndex(
@@ -13889,10 +13909,19 @@ function handleGolemCommand(
   }
   const target = enemies[targetIdx]!;
 
-  // Attack roll: d20 + hitBonus vs a flat AC. Enemies don't carry
-  // an explicit AC field; mirror the player-vs-enemy combat path's
-  // default and use 12 as the implied bar.
-  const enemyAc = 12;
+  // 2026-05-25 — CRITICAL FIX. Source-of-truth for enemy HP is
+  // scene.enemyHps[i], NOT scene.enemies[i].hp. The catalog `enemies`
+  // array carries spawn-time stats; the live HP pool is enemyHps[].
+  // The previous handler read+wrote enemies[i].hp, which meant golem
+  // damage was invisible to every other combat path (player attacks,
+  // group counters, riposte). This is why MECHANIC-1b shipped with
+  // golem strikes that "missed" no matter what.
+  const targetHp = scene.enemyHps[targetIdx] ?? target.hp;
+
+  // Attack roll: d20 + hitBonus vs proper enemy AC (uses
+  // parseEnemyAP so "Strength 4" parses to 4 instead of NaN→0; see
+  // helper definition).
+  const enemyAc = Math.max(5, Math.min(18, 5 + parseEnemyAP(target)));
   const atkRoll = rollDie(20);
   const atkTotal = atkRoll + golem.hitBonus;
   const hit = atkTotal >= enemyAc;
@@ -13911,25 +13940,37 @@ function handleGolemCommand(
       for (let i = 0; i < n; i++) dmg += rollDie(sides);
     }
     dmg += golem.attackMod;
-    const newEnemyHp = Math.max(0, target.hp - dmg);
+    const newEnemyHp = Math.max(0, targetHp - dmg);
     get().appendLog(
       'combat',
       `${golem.name} lands ${dmg} ${golem.damageType} damage on ${target.name}. (${newEnemyHp} HP left)`,
     );
     if (newEnemyHp <= 0) {
+      // 2026-05-25 — splice all parallel arrays in lockstep, mirror
+      // resolveEnemyDefeat (gameStore.ts:8112). Failing to also
+      // splice enemyHps + enemyAmbushUsed + reset activeEnemyIdx
+      // corrupts the next combat round (player attack reads
+      // enemies[1] which is undefined → crash on enemy.name).
       get().appendLog('world', `${target.name} crumbles under the ${golem.name}'s assault.`);
-      set((s) => s.currentScene
-        ? {
-            currentScene: {
-              ...s.currentScene,
-              enemies: s.currentScene.enemies.filter((_, i) => i !== targetIdx),
-            },
-          }
-        : s);
-      const remaining = get().currentScene?.enemies ?? [];
-      if (remaining.length === 0) {
-        set((s) => s.currentScene ? { currentScene: { ...s.currentScene, range: null } } : s);
-      }
+      set((s) => {
+        if (!s.currentScene) return s;
+        const remainingEnemies = s.currentScene.enemies.filter((_, i) => i !== targetIdx);
+        const remainingHps = s.currentScene.enemyHps.filter((_, i) => i !== targetIdx);
+        const remainingAmbush = (s.currentScene.enemyAmbushUsed ?? []).filter((_, i) => i !== targetIdx);
+        const nextActiveIdx = remainingEnemies.length > 0
+          ? Math.min(s.currentScene.activeEnemyIdx, remainingEnemies.length - 1)
+          : 0;
+        return {
+          currentScene: {
+            ...s.currentScene,
+            enemies: remainingEnemies,
+            enemyHps: remainingHps,
+            enemyAmbushUsed: remainingAmbush,
+            activeEnemyIdx: nextActiveIdx,
+            range: remainingEnemies.length > 0 ? s.currentScene.range : null,
+          },
+        };
+      });
       set((s) => s.player ? { player: advanceTime(spendStamina(s.player, 1), 0.25) } : s);
       void get().persist();
       return;
@@ -13938,9 +13979,7 @@ function handleGolemCommand(
       ? {
           currentScene: {
             ...s.currentScene,
-            enemies: s.currentScene.enemies.map((e, i) =>
-              i === targetIdx ? { ...e, hp: newEnemyHp } : e,
-            ),
+            enemyHps: s.currentScene.enemyHps.map((hp, i) => (i === targetIdx ? newEnemyHp : hp)),
           },
         }
       : s);
@@ -13954,8 +13993,13 @@ function handleGolemCommand(
   // Retaliation — surviving enemy takes a swing at the golem (not
   // the player). Damage reduces golem.hp; if it drops to ≤ 0 the
   // golem crumbles and the field clears.
+  // 2026-05-25 — use parseEnemyAP for the enemy's attack bonus
+  // (previous code used a nonexistent `enemy.atkBonus` field which
+  // always read `undefined`, defaulting to +2 for every enemy
+  // regardless of tier). Now scales with the enemy's listed
+  // ability point.
   const enemyAtkRoll = rollDie(20);
-  const enemyAtkBonus = (target as { atkBonus?: number }).atkBonus ?? 2;
+  const enemyAtkBonus = parseEnemyAP(target);
   const golemAc = 11; // simple flat AC for golems
   const enemyHit = (enemyAtkRoll + enemyAtkBonus) >= golemAc;
   if (enemyHit) {

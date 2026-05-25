@@ -94,16 +94,31 @@ describe('OTA 043 — Aethercraft verb dispatch + fuel burn', () => {
     expect(logs).toMatch(/Aetherstone Manipulation/);
   });
 
-  it('"summon golem" routes to Aether Golem Constructor and burns 1 fuel', async () => {
-    const store = await bootstrap('mud_dweller', [stockFuel('Aether Crystal', 2)]);
+  it('"summon golem" routes to Aether Golem Constructor and burns mud-golem recipe fuel', async () => {
+    // 2026-05-25 — MECHANIC-1b changed the summon fuel from a single
+    // "Aether Crystal" to a recipe set (2 Aether Mud + 1 Mudstone
+    // + 1 Aether Crystal for the default mud golem). Test now stocks
+    // the full recipe + extras and asserts the recipe was consumed.
+    const store = await bootstrap('mud_dweller', [
+      stockFuel('Aether Mud', 5),
+      stockFuel('Mudstone', 3),
+      stockFuel('Aether Crystal', 3),
+    ]);
 
     store.getState().submitPlayerAction('summon golem');
 
     const after = store.getState().player!;
-    const fuel = after.inventory.find((i) => i.name === 'Aether Crystal');
-    expect(fuel?.quantity).toBe(1);
     const logs = store.getState().gameLog.map((e) => e.text).join('\n');
     expect(logs).toMatch(/Aether Golem Constructor/);
+    // On success the recipe set was consumed; on failure (RNG-driven)
+    // the recipe is still consumed per the runAethercraft contract.
+    // Assert the deltas match the mud-golem recipe.
+    const aetherMud = after.inventory.find((i) => i.name === 'Aether Mud');
+    const mudstone = after.inventory.find((i) => i.name === 'Mudstone');
+    const aetherCrystal = after.inventory.find((i) => i.name === 'Aether Crystal');
+    expect(aetherMud?.quantity ?? 0).toBe(3); // 5 - 2
+    expect(mudstone?.quantity ?? 0).toBe(2);  // 3 - 1
+    expect(aetherCrystal?.quantity ?? 0).toBe(2); // 3 - 1
   });
 
   it('"mend wounds" routes to Aetheric Healing and burns 1 fuel', async () => {
