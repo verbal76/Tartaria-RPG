@@ -348,13 +348,23 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
       // First-time load on the Arbiter voice drives the public state
       // machine (download progress, ready signal). Vendor voices load
       // silently — players don't need a UI for every vendor swap.
-      if (sticky) setKokoroState({ phase: 'downloading', fraction: 0 });
+      //
+      // Start in 'loading' rather than 'downloading'. On a cache hit
+      // (the common case for every launch after the first ever) the
+      // progress callback fires once at p=1.0 and we never see a real
+      // download. Leaving the initial phase as 'downloading' caused
+      // the misleading "⬇ Installing premium voice 0%" banner to
+      // flash on every cold start even though nothing was being
+      // fetched. We escalate to 'downloading' inside the progress
+      // callback only when fraction < 1.0 — i.e. a real network
+      // download is actually in flight.
+      if (sticky) setKokoroState({ phase: 'loading' });
       const m = await exec.TextToSpeechModule.fromModelName(
         { model: exec.KOKORO_MEDIUM, voice: voiceRefFor(voiceId) },
         (p: number) => {
           if (sticky) {
             lastDownloadProgress = p;
-            setKokoroState({ phase: 'downloading', fraction: p });
+            if (p < 1) setKokoroState({ phase: 'downloading', fraction: p });
             for (const l of downloadListeners) {
               try { l(p); } catch { /* ignore */ }
             }
