@@ -276,12 +276,30 @@
       ]
     },
     {
-      "_note": "MECHANIC-2 (2026-05-25) — scanner recipes so the player can craft the off-hand search tools that gate investigate of Aetheric features (vent fissures, glyphs, ley lines). Pulse Scanner is the baseline (Common, INT 3 req). Future scanner variants get their own recipes here.",
+      "_note": "MECHANIC-2 (2026-05-25) — scanner recipes so the player can craft the off-hand search tools that gate investigate of mechanical / Aetheric / mud features. Pulse Scanner (Common, INT 3, bias=pulse) reads Sentinel and automaton signatures. Aetheric Scanner (Uncommon, INT 4, bias=aetheric) reads pre-flood Aetheric phenomena. Mud Scanner (Common, INT 3, bias=mud) reads buried mud and silt signatures. Each gates its own noun pool and its own loot pool — OTA-033.",
       "result": "Pulse Scanner",
       "ingredients": [
-        { "name": "Aether Crystal", "quantity": 2 },
-        { "name": "Scrap Metal", "quantity": 1 },
-        { "name": "Aetheric Shard", "quantity": 1 }
+        { "name": "Scrap Metal", "quantity": 2 },
+        { "name": "Automaton Circuit", "quantity": 1 },
+        { "name": "Aether Crystal", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Aetheric Scanner",
+      "ingredients": [
+        { "name": "Aether Crystal", "quantity": 3 },
+        { "name": "Aetheric Shard", "quantity": 2 },
+        { "name": "Aether Dust", "quantity": 2 },
+        { "name": "Scrap Metal", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Mud Scanner",
+      "ingredients": [
+        { "name": "Aether Mud", "quantity": 3 },
+        { "name": "Mudstone", "quantity": 1 },
+        { "name": "Aether Crystal", "quantity": 1 },
+        { "name": "Scrap Metal", "quantity": 1 }
       ]
     }
   ]
