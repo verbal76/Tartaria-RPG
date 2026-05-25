@@ -495,13 +495,19 @@ export function ExplorationScreen() {
             })()}
             climbableCount={(() => {
               // 2026-05-25 — green tone for CLIMB when the scene has at
-              // least one climbable noun the modal will render. Mirrors
-              // the displayedAmbientNouns filtered through isClimbable.
-              // Top-tier climbed nouns aren't excluded — climb is a
-              // re-doable action and the modal's per-tier state handles
-              // the affordance internally.
+              // least one climbable noun the modal will render AND it's
+              // not fully cleared (top-tier reached, marked with
+              // 'climbed:noun:t{maxTier}' in searchedAmbientNouns).
+              // Previously we counted every isClimbable noun without
+              // subtracting cleared ones, leaving the button green
+              // after the player had topped everything in the scene.
               const sceneNouns = currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [];
-              return sceneNouns.filter((n) => isClimbable(n)).length;
+              const microMicroId = currentScene?.microMicroId ?? '_';
+              const x = typeof player?.mapX === 'number' ? player.mapX : '_';
+              const y = typeof player?.mapY === 'number' ? player.mapY : '_';
+              const roomKey = `${player?.currentLocationId}@${microMicroId}@${x},${y}`;
+              const marks = worldMemory.visitedRooms?.[roomKey]?.searchedAmbientNouns ?? [];
+              return sceneNouns.filter((n) => isClimbable(n) && !isClimbCleared(n, marks)).length;
             })()}
             investigateCount={(() => {
               // 2026-05-25 — green tone for INVESTIGATE when the scene
