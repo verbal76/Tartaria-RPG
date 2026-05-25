@@ -402,6 +402,15 @@ User flagged these on 2026-05-24 to revisit when they have time. Grep `[POLISH]`
   - **Alt D (hybrid):** corner badge for ambient presence + confirm prompt only on the FIRST move attempt while the badge is active. Subsequent moves silently leave.
   - Decision needed at impl time on which to ship. Touches the vendor scene/bar component + the player-move handler in `gameStore.ts` (or wherever the move command resolves). Also need to remove the existing "vendor follows for N paces" behavior — vendors should be pinned to the location coords where they were spawned.
 
+### Suspected regression — INVESTIGATE FIRST when hours return
+
+- **[REGRESSION-1]** **MOST IMPORTANT.** Take/pickup noun options haven't surfaced for ~15-25 player moves in user's live session (2026-05-24). Either (a) the take-noun picker is broken — recent spawn-system work on climbable / salvageable / rope-durability / kind migration / contracts may have crowded out or filter-shadowed the takeable nouns — or (b) drop rates for take were lowered intentionally and that change was too aggressive. Either way the player perceives "take" as effectively dead, which is a major loop regression. Investigation plan when hours return:
+  1. **Reproduce in tests** — write a movement loop (e.g. 100 moves through D1/D2 mixed terrain) and count how many ticks surface a takeable noun. Compare to a baseline run on `git log --before` from before the spawn-system work landed (probably git bisect against the kind migration + climbable spawn commits).
+  2. **Audit the noun-pool selector** — find where ambient nouns are picked per move tick (likely in `gameStore.ts` movement handler or `narrativeGenerator.ts`). Check if takeable nouns are competing for the same slot as climbables/salvageables and being out-priced.
+  3. **Audit recent drop-rate config** — grep for `take`, `pickup`, `loot`, `drop` in tuning constants. See if any rate was lowered in OTAs 23-015 through 23-020.
+  4. **Verify the noun-tag filter** — takeable nouns are flagged by `kind: 'take'` (post-migration) or similar; confirm the picker isn't filtering them out by stale tag name.
+  5. Likely culprits in order of probability: kind-migration filter shadow > climbable/salvageable spawn priority crowding out take > intentional rate tune > picker selector bug. Fix the highest-probability cause first, re-run the 100-move test, iterate.
+
 ### Closed this session
 
 - **Sim-suite timeout bumps for the 41×41 grid** (`twoYearChaosSim` 600→900 s, `yearSimulation` 300→480 s, `movementStress` 180→300 s) ✅ (OTA 23-020)
