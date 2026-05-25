@@ -87,6 +87,25 @@ describe('OTA-034 — theft-narration guard on appendLog', () => {
     expect(findTheftLine()).toBeDefined();
   });
 
+  it('appends a debug trigger-source crumb when meta.triggerSource is provided', async () => {
+    useGameStore.getState().appendLog(
+      'combat',
+      'Irma catches your hand mid-lift. "Thief!" — steel comes out.',
+      {
+        stealCaught: true,
+        triggerSource: "stealFromVendor: vendor='Irma' item='Iron Mace' roll=d20(4)+DEX(3)=7 vs DC16",
+      },
+    );
+    // Defer is via queueMicrotask in appendLog — flush it.
+    await new Promise((r) => setTimeout(r, 0));
+    const crumb = useGameStore.getState().gameLog.find(
+      (e) => e.channel === 'debug' && /theft-line trigger/i.test(e.text),
+    );
+    expect(crumb).toBeDefined();
+    expect(crumb!.text).toContain("vendor='Irma'");
+    expect(crumb!.text).toContain('DC16');
+  });
+
   it('blocks "answer for your actions" on any channel without the flag', () => {
     useGameStore.getState().appendLog('arbiter', 'You will answer for your actions.');
     expect(findTheftLine()).toBeUndefined();
