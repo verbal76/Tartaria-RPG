@@ -388,6 +388,13 @@ User asked for a utilization audit on 2026-05-24 ("am I getting the most out of 
 
 Mark items `[AI-DONE-N]` in this list when they pass user playtest on HaL2001. Eventual promotion: cherry-pick each item to `claude/new-session-MvF82` for live OTA release.
 
+### Open polish items (deferred until user has hours to work them)
+
+User flagged these on 2026-05-24 to revisit when they have time. Grep `[POLISH]` to surface this list.
+
+- **[POLISH-1]** Combat out-of-range affordance — when the player is in combat and the target is out of weapon range, the **APPROACH** button should glow green to hint that closing distance is the required next action. Today it sits with the same chrome as other combat actions and players don't always notice they need to move first. Likely touches `CombatScreen.tsx` (or wherever the action panel renders) + the range-check that decides whether the chosen attack lands. Add a `needsApproach: boolean` derived flag and conditionally style the APPROACH button with a green border / glow when true.
+- **[POLISH-2]** Scrap/salvage zero-yield floor — when the player scraps an item in their pack, the outcome should NEVER be zero materials. Even on the worst roll, drop something — a stick, a stone, a scrap of cloth, a bent nail — so the action always feels worthwhile. Today certain low-value items can roll an empty salvage and the player just loses the item with no return. Touches the salvage table in `gameStore.ts` (or wherever `scrapItem` is implemented) + the loot-roll fallback. Add a guaranteed minimum drop of a "junk" pool (cheap, evocative, non-stackable-bloat-safe items) when the primary roll yields nothing.
+
 ### Closed this session
 
 - **Sim-suite timeout bumps for the 41×41 grid** (`twoYearChaosSim` 600→900 s, `yearSimulation` 300→480 s, `movementStress` 180→300 s) ✅ (OTA 23-020)
