@@ -1389,14 +1389,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // DEX vs DC 10 sleight-of-hand check, mirroring the existing
     // steal-intent handler so success / failure feels consistent
     // whether the player typed `steal X` or tapped TAKE+stealth.
+    // 2026-05-25 — apply day/night stealth modifier (+1 night, -1
+    // day). Per playtester: night = better cover, daytime = exposed.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { stealthTimeBonus } = require('../engine/timeOfDay');
     const stats = effectiveStats(player, weatherStatModifiers(scene.weather));
+    const timeBonus = stealthTimeBonus(player.hoursElapsed);
     const roll = rollDie(20);
-    const total = roll + stats.dexterity;
+    const total = roll + stats.dexterity + timeBonus;
     const success = total >= 10;
+    const timeNote = timeBonus !== 0 ? ` ${timeBonus > 0 ? '+' : ''}${timeBonus} (${timeBonus > 0 ? 'night' : 'day'})` : '';
     set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
     get().appendLog(
       'combat',
-      `You — sleight of hand on ${ambientHit} → d20 ${roll} + DEX ${stats.dexterity} = ${total} vs DC 10 — ${success ? '✓ HIT' : '✗ MISS'}`,
+      `You — sleight of hand on ${ambientHit} → d20 ${roll} + DEX ${stats.dexterity}${timeNote} = ${total} vs DC 10 — ${success ? '✓ HIT' : '✗ MISS'}`,
     );
     if (!success) {
       // Failure narrates the slip; the noun stays available. Player
@@ -4713,28 +4719,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // heal/stamina ceiling is a separate dial.
           const hpRoom = player.hpMax - player.hp;
           const stamRoom = player.staminaMax - player.stamina;
-          // 2026-05-25 — roll ambush BEFORE the "you're whole" guard.
-          // Previously the full-HP guard short-circuited every rest at
-          // max HP+stamina, which meant the ambush roll never even
-          // had a chance to fire (BALANCE-1 was effectively dead in
-          // the inline rest path; the store's rest() action at line
-          // ~11360 has ambush logic but is never called). Now the
-          // player who deliberately lies down in a dangerous biome
-          // can get jumped even at full health — the world doesn't
-          // care that you don't need the rest. 22% ambush chance per
-          // BALANCE-1 tuning. Hubs / outposts still safe.
+          // 2026-05-25 — striking camp is the dangerous moment, not
+          // the sleeping. Per playtester: "even if you do not need
+          // to rest and you hit the button that should run the
+          // roak of an encounter ... you have weakened your
+          // defensive posture, so you run the risk of an ambush."
+          // The ambush roll fires EVERY rest tap, regardless of HP
+          // / stamina state. Plus a night/day modifier per
+          // encounterRateMultiplier (1.3× night, 0.85× day).
+          //
+          // OTA-029 still gated the rest at full HP unless the
+          // ambush hit. This pass goes further: even at full HP,
+          // the rest STILL takes place (you sit, you watch, you
+          // pull guard); if the ambush rolls high you eat the
+          // attack, if not you simply pass time.
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const { encounterRateMultiplier: rateMultRest } = require('../engine/timeOfDay');
           const restScene = currentScene;
           const restLoc = restScene?.location;
           const restInSafeZone = restLoc ? isHubLocation(restLoc.id) : !!player.hubRoomId;
-          const restAmbush = !restInSafeZone && Math.random() < 0.22;
-          if (hpRoom === 0 && stamRoom === 0 && !restAmbush) {
-            get().appendLog(
-              'world',
-              'You are whole, breath steady, HP and stamina topped. No reason to lie down — the day still has road left.',
-            );
-            void get().persist();
-            break;
-          }
+          const restAmbushBase = 0.22;
+          const restAmbushChance = restAmbushBase * rateMultRest(player.hoursElapsed);
+          const restAmbush = !restInSafeZone && Math.random() < restAmbushChance;
           const hours = 8;
           const heal = Math.min(hpRoom, hours * 2);
           const stamGain = Math.min(stamRoom, hours);
@@ -10488,10 +10494,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // rate. Acceptable for now; consider moving the wasteland
       // roll outside the gate so non-spawning encounters (loot /
       // NPC / lore) can layer onto active fights.
+      //
+      // 2026-05-25 — playtester reports the continue-travel rate
+      // still feels low. Two changes:
+      //   1. When auto-traveling via setTravelCourse / continueTravel
+      //      (player.travelTarget set), bump both threshold (2→1)
+      //      and base rollChance (0.70→0.85). You're in transit,
+      //      exposed; danger ticks faster.
+      //   2. Apply time-of-day multiplier (1.3× at night, 0.85×
+      //      during day) on top. Night travel/rest = more risky.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { encounterRateMultiplier } = require('../engine/timeOfDay');
+      const playerForEnc = get().player;
+      const isAutoTravel = !!playerForEnc?.travelTarget;
+      const baseThreshold = isAutoTravel ? 1 : 2;
+      const baseRollChance = isAutoTravel ? 0.85 : 0.70;
+      const timeMult = encounterRateMultiplier(playerForEnc?.hoursElapsed);
+      const effectiveRollChance = Math.min(0.99, baseRollChance * timeMult);
       const enc = pickWastelandEncounter(liveSceneForEncounter.location, {
         stepsSinceLastEncounter: wasteSteps,
-        threshold: 2,
-        rollChance: 0.70,
+        threshold: baseThreshold,
+        rollChance: effectiveRollChance,
       });
       if (enc) {
         set(() => ({ wastelandStepsSinceEncounter: 0 }));
