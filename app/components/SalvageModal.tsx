@@ -86,7 +86,13 @@ const SALVAGE_PATTERN = new RegExp(
 // horizontally anyway.
 const SALVAGE_CHIP_CAP = 8;
 
-function isSalvageable(noun: string): boolean {
+/** 2026-05-25 — exported so ExplorationScreen's salvageableCount
+ *  predicate can mirror this modal's chip filter exactly. The
+ *  interactionTags.isSalvageable + curated check was diverging
+ *  from this combined predicate in both directions, lighting the
+ *  SALVAGE button green when the modal would open empty and
+ *  graying it when the modal had chips. */
+export function isSalvageable(noun: string): boolean {
   // 2026-05-24 — curated salvageable spawns carry nouns like
   // "rusted exoframe" / "library archive console" that don't all
   // overlap the substring pattern. Check the curated pool too.

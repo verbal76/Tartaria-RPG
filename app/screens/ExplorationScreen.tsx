@@ -10,7 +10,7 @@ import { DiceRoller } from '../components/DiceRoller';
 import { EnemyPanel, type EnemyView } from '../components/EnemyPanel';
 import { CrestPlaceholder } from '../components/CrestPlaceholder';
 import { SearchModal } from '../components/SearchModal';
-import { SalvageModal } from '../components/SalvageModal';
+import { SalvageModal, isSalvageable as isSalvageableForModal } from '../components/SalvageModal';
 import { TakeModal } from '../components/TakeModal';
 import { ClimbModal } from '../components/ClimbModal';
 import { FeedbackModal } from '../components/FeedbackModal';
@@ -479,14 +479,14 @@ export function ExplorationScreen() {
               ).length;
             })()}
             salvageableCount={(() => {
-              // 2026-05-25 [UI-2] — green tone fires only when the
-              // count SalvageModal will render is > 0. Mirror its
-              // filter chain at SalvageModal:177-182:
-              //   1. Not consumed.
-              //   2. isSalvageable(noun).
-              // Uses buildChipPool to match the actual chip source.
+              // 2026-05-25 — count predicate now uses SalvageModal's
+              // exported isSalvageable (= SALVAGE_PATTERN regex OR
+              // isCuratedSalvageable). Previously used
+              // interactionTags.isSalvageable, which diverged in both
+              // directions and lit SALVAGE green when modal was empty
+              // (and vice versa).
               return buildChipPool(currentScene).filter(
-                (n) => !isAmbientConsumed(n) && isSalvageable(n),
+                (n) => !isAmbientConsumed(n) && isSalvageableForModal(n),
               ).length;
             })()}
             climbableCount={(() => {
@@ -507,10 +507,19 @@ export function ExplorationScreen() {
               // consumed are filtered out entirely; flavor-exhausted
               // stay visible greyed but don't count as actionable for
               // the tone purpose.
-              return buildChipPool(currentScene).filter(
+              //
+              // 2026-05-25 — also count the pinned "the ground" chip
+              // when outside a hub room and not yet consumed (the
+              // SearchModal pins this chip regardless of the noun
+              // pool). Without this, a wilderness scene with every
+              // ambient noun consumed would render INVESTIGATE gray
+              // even though tapping 'the ground' is still actionable.
+              const sceneCount = buildChipPool(currentScene).filter(
                 (n) => !productivelyConsumedSet.has(n.toLowerCase())
                   && !flavorExhaustedSet.has(n.toLowerCase()),
               ).length;
+              const groundCount = (!player?.hubRoomId && !isAmbientConsumed('ground')) ? 1 : 0;
+              return sceneCount + groundCount;
             })()}
             golem={player?.golem ? {
               name: player.golem.name,
