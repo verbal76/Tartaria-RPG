@@ -51,11 +51,20 @@ describe('salvage pool classifier', () => {
     expect(rollSalvagePool('frost lantern', rng)?.poolId).toBe('light');
   });
 
-  it('rolls "nothing" outcome about 5% of the time', () => {
+  it('rolls junk-pool fallback (~5% of the time) instead of nothing', () => {
     // VERIFY-1 (2026-05-25): NOTHING_CHANCE lowered from 0.25 → 0.05.
-    // rng() returns < 0.05 → nothing branch.
+    // POLISH-2 (2026-05-25): the would-be-nothing branch now rolls
+    // from a junk fallback pool so the player always walks away with
+    // at least one item. Outcome kind is 'material' with a junk
+    // itemName (Stick / Smooth Stone / Cloth Scrap / Bent Nail /
+    // Bone Sliver) and quantity 1.
     const lowRng = () => 0.01;
-    expect(rollSalvagePool('wagon', lowRng)?.kind).toBe('nothing');
+    const result = rollSalvagePool('wagon', lowRng);
+    expect(result?.kind).toBe('material');
+    if (result?.kind === 'material') {
+      expect(['Stick', 'Smooth Stone', 'Cloth Scrap', 'Bent Nail', 'Bone Sliver']).toContain(result.itemName);
+      expect(result.quantity).toBe(1);
+    }
   });
 
   it('rolls material outcome with itemName + rarity + quantity when chance hits', () => {

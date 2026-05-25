@@ -181,15 +181,41 @@ export interface SalvageOutcome {
   quantity?: number;
 }
 
-/** Probability that even a matched pool returns nothing.
- *  2026-05-25 [VERIFY-1] — lowered from 0.25 → 0.05 in response to
- *  user feedback ("haven't seen scrap awarded in a while" + two
- *  empty-loot repros in distilled log). 25% dry was too punishing;
- *  the player perceived the action as broken. 5% keeps occasional
- *  failures for RNG meaning without making the loop feel dead.
- *  POLISH-2 (junk-pool fallback so output is NEVER zero) is the
- *  deeper companion fix tracked separately. */
+/** Probability that the normal weighted pick would have rolled
+ *  "nothing." 2026-05-25 [VERIFY-1] dropped this from 0.25 → 0.05.
+ *  2026-05-25 [POLISH-2] then repurposed the "nothing" branch
+ *  entirely — instead of returning an empty outcome, the engine
+ *  rolls from JUNK_POOL so the player ALWAYS walks away with
+ *  something. Variable name kept for backwards compatibility with
+ *  test naming + the surrounding probability comment.
+ *  Result: ~5% of matched-pool salvages yield a thematic junk item
+ *  (stick / pebble / nail / cloth scrap) instead of the original
+ *  weighted material. RNG still feels meaningful — junk vs. real
+ *  loot is a perceptible difference — but the action never empties. */
 const NOTHING_CHANCE = 0.05;
+
+/** Fallback pool used when the weighted roll would have produced
+ *  nothing. Tiny set of low-value, evocative materials authored in
+ *  materials.json. Always min=max=1 — you get exactly one piece of
+ *  junk, never a stack. */
+const JUNK_POOL: PoolEntry[] = [
+  { name: 'Stick',        rarity: 'Common', weight: 5, min: 1, max: 1 },
+  { name: 'Smooth Stone', rarity: 'Common', weight: 5, min: 1, max: 1 },
+  { name: 'Cloth Scrap',  rarity: 'Common', weight: 4, min: 1, max: 1 },
+  { name: 'Bent Nail',    rarity: 'Common', weight: 4, min: 1, max: 1 },
+  { name: 'Bone Sliver',  rarity: 'Common', weight: 3, min: 1, max: 1 },
+];
+
+/** Flavor lines for junk-pool drops. Conveys "you searched
+ *  thoroughly but the haul was small" without using the harsher
+ *  "nothing salvageable" wording that misled players into thinking
+ *  the salvage failed. */
+const JUNK_LINES: string[] = [
+  'You strip {target} down. Mostly debris — but a {item} comes loose at the bottom of the pile.',
+  'The {target} yields little of value, though a {item} ends up in your pack.',
+  'Slim pickings on {target}. You pocket a {item} on the way out.',
+  'You scavenge {target} thoroughly. One {item} survives the sorting.',
+];
 
 function pickPool(noun: string): SalvagePool | null {
   const lower = noun.toLowerCase();
@@ -221,12 +247,24 @@ function pickWeighted(items: PoolEntry[], rng: () => number): PoolEntry {
 }
 
 /** Roll a salvage outcome for the named noun. Returns null when no
- *  pool matches — caller should fall through to rollAreaSearch. */
+ *  pool matches — caller should fall through to rollAreaSearch.
+ *  2026-05-25 [POLISH-2] — the "nothing" branch now rolls from
+ *  JUNK_POOL so the player always walks away with at least one
+ *  item; the empty outcome is gone from this path. */
 export function rollSalvagePool(noun: string, rng: () => number = Math.random): SalvageOutcome | null {
   const pool = pickPool(noun);
   if (!pool) return null;
   if (rng() < NOTHING_CHANCE) {
-    return { kind: 'nothing', poolId: pool.id, line: format(NOTHING_LINES, noun, rng) };
+    const junk = pickWeighted(JUNK_POOL, rng);
+    const line = format(JUNK_LINES, noun, rng).replace(/\{item\}/g, junk.name);
+    return {
+      kind: 'material',
+      poolId: pool.id,
+      itemName: junk.name,
+      rarity: junk.rarity,
+      quantity: 1,
+      line,
+    };
   }
   const entry = pickWeighted(pool.items, rng);
   const span = entry.max - entry.min;
