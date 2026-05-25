@@ -414,16 +414,34 @@ export function ExplorationScreen() {
             equippedOff={equippedOff}
             range={currentScene?.range ?? null}
             takeableCount={(() => {
-              // 2026-05-25 [UI-2] — peace-mode take/salvage tone uses
-              // these counts. Takeable = scene noun that is NEITHER
-              // climbable NOR salvageable (matches the gameStore
-              // bucket classification in beginScene at line ~2073).
+              // 2026-05-25 [UI-2] — green tone fires only when the
+              // count of nouns the TakeModal will ACTUALLY render is
+              // > 0. Mirror TakeModal's filter chain exactly:
+              //   1. Scene noun has a catalog item (findCatalogItem
+              //      !== null) — otherwise the take verb refuses.
+              //   2. Not oversized (small enough to carry).
+              //   3. Not already consumed (consumed chips are
+              //      filtered out inside TakeModal:150-152).
+              // First version of this count was too lenient (just
+              // "not climbable AND not salvageable") and lit the
+              // button green when the modal would open empty.
               const sceneNouns = currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [];
-              return sceneNouns.filter((n) => !isClimbable(n) && !isSalvageable(n)).length;
+              return sceneNouns.filter(
+                (n) => findCatalogItem(n) !== null
+                  && !isOversized(n)
+                  && !isAmbientConsumed(n),
+              ).length;
             })()}
             salvageableCount={(() => {
-              const sceneNouns = currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [];
-              return sceneNouns.filter((n) => isSalvageable(n)).length;
+              // 2026-05-25 [UI-2] — green tone fires only when the
+              // count SalvageModal will render is > 0. Mirror its
+              // filter chain at SalvageModal:177-182:
+              //   1. Not consumed.
+              //   2. isSalvageable(noun).
+              // Uses buildChipPool to match the actual chip source.
+              return buildChipPool(currentScene).filter(
+                (n) => !isAmbientConsumed(n) && isSalvageable(n),
+              ).length;
             })()}
             travelTargetName={(() => {
               if (!player?.travelTarget) return null;
