@@ -527,22 +527,27 @@ export function TitleScreen() {
               disabled={applyingOTA !== null}
               onPress={() => {
                 setApplyingOTA('Checking…');
+                // 2026-05-25 — quiet failure path. Playtester showed
+                // a screenshot of an ERR_UPDATES_CHECK alert and asked
+                // for it to fail quietly. Transient EAS / network
+                // hiccups shouldn't surface a noisy modal that
+                // blocks the title screen. Use a brief inline label
+                // ("Failed — try later") that clears on its own so
+                // the player knows the tap registered but isn't
+                // forced to dismiss anything.
                 void checkAndApplyOTA({
                   onStatus: (s) => setApplyingOTA(s),
-                  onError: (msg) => {
-                    setApplyingOTA(null);
-                    // eslint-disable-next-line no-alert
-                    alert(`OTA update failed: ${msg.slice(0, 200)}`);
+                  onError: () => {
+                    setApplyingOTA('Failed — try later');
+                    setTimeout(() => setApplyingOTA(null), 2500);
                   },
                 }).then((result) => {
                   if (result === 'noUpdate') {
-                    setApplyingOTA(null);
-                    // eslint-disable-next-line no-alert
-                    alert('You\'re on the latest OTA already.');
+                    setApplyingOTA('Up to date');
+                    setTimeout(() => setApplyingOTA(null), 2000);
                   } else if (result === 'skipped') {
-                    setApplyingOTA(null);
-                    // eslint-disable-next-line no-alert
-                    alert('OTA updates are disabled in this build.');
+                    setApplyingOTA('Updates disabled');
+                    setTimeout(() => setApplyingOTA(null), 2000);
                   }
                   // 'applied' triggers reloadAsync — no further UI.
                   // 'pending' / 'errored' handled inside checkAndApplyOTA via onStatus/onError.
