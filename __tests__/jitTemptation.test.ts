@@ -13,12 +13,9 @@ const TEST_LOCATION: Location = {
   name: 'Test Mud Flat',
   type: 'wilderness',
   description: 'Test biome.',
-  hazardChance: 0,
+  danger: 1,
   tags: ['mud'],
-  vendorChance: 0,
-  weatherTags: [],
-  enemyPool: [],
-  spawnHomes: {},
+  discoverable: true,
 };
 
 function rollMany(count: number, depleted: boolean): { highValue: number; total: number } {
