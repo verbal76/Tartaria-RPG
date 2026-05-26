@@ -636,6 +636,13 @@ export interface PlayerCharacter {
   statusEffects?: StatusEffect[];
   /** Hours elapsed since the character entered Tartaria. Day = 24 hours. */
   hoursElapsed?: number;
+  /** 2026-05-25 OTA-046 — unix ms when this player's last persist
+   *  fired. Approximates "session ended at" because persist runs on
+   *  every meaningful action. Used on slot-load to compute real-time
+   *  elapsed since last play — if ≥6 hours, the loadSlot path fires
+   *  one "while you were away" beat so the world feels like it has
+   *  breathed without the player. */
+  lastSessionEndedAt?: number;
   /** IDs of faction quests the player has accepted but not finished.
    *  LEGACY: pre-refactor saves used this flat string array. New saves
    *  populate `activeFactionQuests` (with stage tracking) instead.

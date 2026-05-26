@@ -1604,6 +1604,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
+      // 2026-05-25 OTA-046 — "while you were away" beat. If the
+      // player's lastSessionEndedAt is ≥6 hours old (real time),
+      // surface one line from the WHILE_AWAY_LINES pool between the
+      // world cue and the Arbiter welcome. Establishes the rhythm
+      // that the world doesn't pause for the player — it has been
+      // running while they were gone.
+      {
+        const livePlayer = get().player;
+        const lastEnd = livePlayer?.lastSessionEndedAt;
+        const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
+        if (lastEnd && Date.now() - lastEnd >= SIX_HOURS_MS) {
+          const beat = WHILE_AWAY_LINES[Math.floor(Math.random() * WHILE_AWAY_LINES.length)]!;
+          get().appendLog(beat.channel, beat.line, { skipDedup: true });
+        }
+      }
       // OTA 007 — Welcome-back from the Arbiter on every save load.
       // Playtester: "very simple welcome back from kokoro as soon
       // as you log in. welcome back friend." Lands AFTER the world
@@ -12221,10 +12236,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // cleared. Writing player=null silently here was a major source of
     // "save file is missing the character record" errors across updates.
     if (!player) return;
+    // 2026-05-25 OTA-046 — stamp the player's lastSessionEndedAt at
+    // every persist so a slot-load round trip can compute "real-time
+    // since last play" for the while-you-were-away beat. persist
+    // fires on every meaningful action, so this approximates session-
+    // end well enough for the 6-hour bucket the load path tests for.
+    // Update in-memory too so other code paths reading the field see
+    // the fresh value without waiting for a reload.
+    const stampNow = Date.now();
+    const playerForSave: PlayerCharacter = { ...player, lastSessionEndedAt: stampNow };
+    set((s) => (s.player ? { player: { ...s.player, lastSessionEndedAt: stampNow } } : s));
     await saveSlot(activeSlotId, {
       version: 1,
-      savedAt: Date.now(),
-      player,
+      savedAt: stampNow,
+      player: playerForSave,
       worldMemory,
       gameLog: gameLog.slice(-MAX_LOG_IN_MEMORY),
       currentScreen,
@@ -14124,6 +14149,31 @@ const INVESTIGATE_TRINKETS: ReadonlyArray<{ name: string; rarity: 'Common'; qtyM
   { name: 'Bent Nail',           rarity: 'Common', qtyMin: 1, qtyMax: 2, line: `A bent nail works free of the {noun}. Salvageable, barely.` },
   { name: 'Cloth Scrap',         rarity: 'Common', qtyMin: 1, qtyMax: 1, line: `A scrap of cloth, wedged into the {noun} long ago. You free it.` },
   { name: 'Aether Residue',      rarity: 'Common', qtyMin: 1, qtyMax: 1, line: `A thin film of Aether residue clings where your hand brushed the {noun}. You vial it.` },
+];
+
+// 2026-05-25 OTA-046 — "while you were away" pool. On slot-load,
+// if the elapsed real-time since the last persist is ≥6 hours, one
+// of these beats fires between the world / arbiter welcome-back
+// lines. Establishes the rhythm that the world breathes when the
+// player isn't there. Pool mix:
+//   - 4 arbiter recall lines ("I chewed on something...")
+//   - 4 world-evolution lines (vendor word-of-mouth, faction drift,
+//     whisper aging — narration-only for OTA-046)
+//   - 4 vendor-restock teases (generic, since we don't track specific
+//     visited vendors yet — surfaces the rhythm)
+const WHILE_AWAY_LINES: ReadonlyArray<{ channel: 'arbiter' | 'world'; line: string }> = [
+  { channel: 'arbiter', line: `"While you were elsewhere, I kept thinking on something. We'll talk when the road quiets."` },
+  { channel: 'arbiter', line: `"A name came back to me in the night-of-your-absence. I'll know it when we meet whoever wears it."` },
+  { channel: 'arbiter', line: `"I'm glad you're back. The buried country was patient, but it wasn't quiet."` },
+  { channel: 'arbiter', line: `"Word travelled while you were gone. People know you've done what you've done."` },
+  { channel: 'world', line: `The wind has shifted while you were away. The Aetheric haze sits a little thicker on the horizon now.` },
+  { channel: 'world', line: `Reclaimers have passed through this stretch since you last stood here. Their wheel-marks are fresh in the silt.` },
+  { channel: 'world', line: `Mud Monarch heralds left a sigil-mark on a stone you don't remember being marked. The faction is paying attention.` },
+  { channel: 'world', line: `Whispers carried while you slept off the world. Something that was rumour the last time you walked here is closer to fact now.` },
+  { channel: 'world', line: `Word reaches you: a roadside trader changed routes while you were elsewhere. The next time you cross the right tile, look for a stall you didn't see before.` },
+  { channel: 'world', line: `A Forgotten Order pilgrim is said to have asked after you in your absence. They left without saying where they were headed.` },
+  { channel: 'world', line: `The Reclaimers' Guild updated its standing-board while you were gone. Your name is on it.` },
+  { channel: 'world', line: `The Aetheric grid hum is louder than you remember. Something below has woken or shifted while you were elsewhere.` },
 ];
 
 // 2026-05-25 OTA-044 — chained narrative helper. Called at the end of
