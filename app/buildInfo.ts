@@ -101,4 +101,28 @@
 // investigate uses at gameStore.ts:4369. Chip greys after one tap;
 // further taps still produce the same (stable) direction line if
 // the player re-types `investigate path` directly.
-export const OTA_BUILD_ID = '2026-05-26-062';
+//
+// 2026-05-26 OTA-063 — Bug-report flow + enriched About header.
+//   (1) New REPORT BUG button on the TitleScreen bottom bar (next
+//       to EXIT GAME). Opens BugReportModal: pick character (or
+//       "General — no character"), type a description, tap SEND.
+//   (2) Send action builds a full bug report (description + device
+//       summary + character log), stages the entire thing on the
+//       clipboard, and opens
+//         mailto:hotatticgames@gmail.com?subject=Bug%20Report...
+//       The clipboard staging is the workaround for the mailto
+//       body-length cap (~2KB iOS Mail, varies Android Gmail) —
+//       character logs run 50-200KB and would silently truncate
+//       inline. Player pastes the report into the composer
+//       before sending. Same pattern as the existing dead-log
+//       clipboard copy on the title screen.
+//   (3) Enriched About / Voice diagnostic headers via the new
+//       buildBasicDeviceSummary() helper in
+//       app/diagnostics/aboutSummary.ts. Adds device name (where
+//       exposed), locale, timezone, screen dimensions, density,
+//       Hermes flag, and capture timestamp alongside the existing
+//       app version / APK build / OTA build ID. Same string
+//       feeds the bug-report email body so triage from a report
+//       starts with identical identifying info to what the
+//       player sees in About.
+export const OTA_BUILD_ID = '2026-05-26-063';
