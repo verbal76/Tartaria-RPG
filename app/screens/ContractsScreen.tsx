@@ -70,6 +70,7 @@ export function ContractsScreen() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
   const completeContractFromUI = useGameStore((s) => s.completeContractFromUI);
+  const abandonContract = useGameStore((s) => s.abandonContract);
   const discardLead = useGameStore((s) => s.discardLead);
   // 2026-05-24 — tap-to-travel from the Primary Objective expansion.
   // Mirrors the Lore→Places confirm modal pattern in LoreCodexBody.
@@ -562,6 +563,19 @@ export function ContractsScreen() {
                         <Text style={styles.completeBtnText}>COMPLETE — CLAIM REWARD</Text>
                       </Pressable>
                     )}
+                    {/* 2026-05-26 OTA-054 — ABANDON affordance so a
+                        contract that was silently auto-granted (or
+                        the player just no longer wants) can be
+                        dropped from the slate. Always visible when
+                        the card is expanded. */}
+                    {open && (
+                      <Pressable
+                        style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
+                        onPress={() => abandonContract('hunt', def.id)}
+                      >
+                        <Text style={styles.abandonBtnText}>ABANDON</Text>
+                      </Pressable>
+                    )}
                   </Pressable>
                 );
               })}
@@ -618,6 +632,14 @@ export function ContractsScreen() {
                         <Text style={styles.completeBtnText}>COMPLETE — CLAIM REWARD</Text>
                       </Pressable>
                     )}
+                    {open && (
+                      <Pressable
+                        style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
+                        onPress={() => abandonContract('mystery', def.id)}
+                      >
+                        <Text style={styles.abandonBtnText}>ABANDON</Text>
+                      </Pressable>
+                    )}
                   </Pressable>
                 );
               })}
@@ -672,6 +694,14 @@ export function ContractsScreen() {
                         onPress={() => completeContractFromUI('storyline', def.id)}
                       >
                         <Text style={styles.completeBtnText}>COMPLETE — CLAIM REWARD</Text>
+                      </Pressable>
+                    )}
+                    {open && (
+                      <Pressable
+                        style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
+                        onPress={() => abandonContract('storyline', def.id)}
+                      >
+                        <Text style={styles.abandonBtnText}>ABANDON</Text>
                       </Pressable>
                     )}
                   </Pressable>
@@ -760,6 +790,14 @@ export function ContractsScreen() {
                         onPress={() => completeContractFromUI('faction_quest', def.id)}
                       >
                         <Text style={styles.completeBtnText}>COMPLETE — CLAIM REWARD</Text>
+                      </Pressable>
+                    )}
+                    {open && (
+                      <Pressable
+                        style={({ pressed }) => [styles.abandonBtn, pressed && styles.abandonBtnPressed]}
+                        onPress={() => abandonContract('faction_quest', def.id)}
+                      >
+                        <Text style={styles.abandonBtnText}>ABANDON</Text>
                       </Pressable>
                     )}
                   </Pressable>
@@ -1207,6 +1245,19 @@ const styles = StyleSheet.create({
   },
   completeBtnPressed: { opacity: 0.7 },
   completeBtnText: { color: '#13110f', fontWeight: '800', letterSpacing: 2, fontSize: 12 },
+  // 2026-05-26 OTA-054 — ABANDON button. Ghost/outlined style with
+  // a warning border, distinct from the filled-amber COMPLETE.
+  abandonBtn: {
+    marginTop: 6,
+    backgroundColor: 'transparent',
+    borderColor: '#e07a5f',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingVertical: 8,
+    alignItems: 'center',
+  },
+  abandonBtnPressed: { opacity: 0.7 },
+  abandonBtnText: { color: '#e07a5f', fontWeight: '700', letterSpacing: 2, fontSize: 11 },
   discardBtn: {
     marginTop: 10,
     backgroundColor: 'transparent',
