@@ -12205,6 +12205,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   async saveAndExitToTitle() {
+    // 2026-05-26 OTA-052 — silence the Arbiter the instant the player
+    // taps Save & Exit. Was: the world screen exited to the title
+    // while a mid-stream Arbiter line kept reading aloud from the
+    // background. stopAndClear() stops BOTH engines (system TTS via
+    // Speech.stop() AND Kokoro via piperStopAndClear()) and drains
+    // the queue, so any queued sentences also stop instead of
+    // bleeding over onto the title screen. Wrapped in try/catch so a
+    // platform that hasn't loaded the TTS module (tests, server-side)
+    // doesn't crash the exit path.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { stopAndClear } = require('../voice/TTSManager');
+      stopAndClear();
+    } catch { /* TTSManager not loaded (e.g. in tests) — non-fatal */ }
     await get().persist();
     // Keep the active slot pointer set so resume can pick it back up, but
     // refresh the slot index so the title list reflects the latest summary.
