@@ -420,10 +420,21 @@ const DIRECTION_KEYWORDS = /\b(direction|way|paths?|exits?|route|where to go|whi
 // already ACTED on the noun. The post-action Arbiter remark suppresses
 // its "Tell me what you mean to do with it" defer line for these —
 // the player just told the engine what they meant to do.
+// 2026-05-26 OTA-060 — added climb, search, drop, scrap, talk,
+// advance, retreat, unequip. Playtester climbed a "jagged dormant
+// architectural sentinel"; climb wasn't in the set so the post-
+// action Arbiter line ran the on-target defer branch and the
+// garbage-noun heuristic in narrativeGenerator flagged the 4-word
+// noun as junk, emitting "I'm not sure what you're trying to tell
+// me" right after a successful climb. Same shape applies to the
+// other verbs added here — every one of them is an unambiguous
+// action where the player has already declared their intent.
 const ARBITER_ENGAGED_INTENTS: ReadonlySet<string> = new Set([
   'attack', 'investigate', 'open', 'pickup', 'use_relic', 'cast',
   'steal', 'gift', 'craft', 'equip', 'throw', 'dig', 'repair',
   'accept', 'turn_in', 'sell', 'buy',
+  'climb', 'search', 'drop', 'scrap', 'talk', 'advance', 'retreat',
+  'unequip',
 ]);
 
 const STAMINA_COSTS = {
