@@ -796,11 +796,19 @@ export function TitleScreen() {
         <Text style={styles.gear}>⚙</Text>
       </TouchableOpacity>
       <View style={styles.bottomBar}>
-        {/* OTA-065 — action-button row sits ABOVE the footer
-            now that bottomBar stacks vertically. Right-aligned
-            within its row so the buttons hug the screen edge
-            and the row reads naturally left → right (INVITE
-            PLAYTESTER → REPORT BUG → EXIT GAME). */}
+        {/* OTA-068 — playtester thank-you line above the action
+            row. Sized between the action buttons and the
+            version footer in visual weight so it reads as a
+            standalone message, not a button label or a diag
+            string. */}
+        <Text style={styles.thankYou}>
+          Thank you for helping us test our new game, enjoy Tartaria!
+        </Text>
+        {/* OTA-068 — three centered action buttons (INVITE
+            PLAYTESTER, REPORT BUG, EXIT GAME). Was flex-end /
+            right-aligned in OTA-065; centered now so the
+            three-button row reads as a balanced cluster above
+            the centered footer. */}
         <View style={styles.bottomBtnRow}>
           {/* OTA-065 — INVITE PLAYTESTER button. Opens the
               InvitePlaytesterModal which collects a Gmail
@@ -1157,18 +1165,16 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   exitBtnText: { color: '#c97a7a', fontSize: 10, letterSpacing: 1.5, fontWeight: '700' },
-  // OTA-065 — right-aligned row holding INVITE PLAYTESTER,
-  // REPORT BUG, EXIT GAME. `gap` replaces the per-button
-  // marginRight that OTA-063 had on bugReportBtn alone —
-  // cleaner with three buttons and easier to tune spacing in
-  // one place. flex-end so the row hugs the right edge of the
-  // bottomBar's full width (bottomBar is now column / stretch,
-  // so the row's container is full screen width).
+  // OTA-068 — centered three-button row (INVITE PLAYTESTER,
+  // REPORT BUG, EXIT GAME). Was flex-end / right-aligned in
+  // OTA-065; the centered cluster reads better above the
+  // centered footer + thank-you lines and feels less crowded
+  // on the right edge of the screen.
   bottomBtnRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-end',
-    gap: 6,
+    justifyContent: 'center',
+    gap: 8,
   },
   // OTA-063 — REPORT BUG button. Visually equal-weight to EXIT
   // GAME (same paddings + font) but uses the brand amber instead
@@ -1216,7 +1222,22 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   gear: { color: '#c9a86a', fontSize: 18, lineHeight: 18, textAlign: 'center' },
-  footer: { color: '#3a342c', fontSize: 10, marginLeft: 2 },
+  // OTA-068 — footer now centered (was left-aligned with a
+  // small marginLeft) so it sits under the centered action row
+  // and thank-you message as the third centered line.
+  footer: { color: '#3a342c', fontSize: 10, textAlign: 'center' },
+  // OTA-068 — thank-you message above the action row. Color
+  // sits between the action button text (#c9a86a / #6a9ec9 /
+  // #c97a7a — bright accents) and the footer (#3a342c — deep
+  // muted) so the message reads as warm-but-secondary.
+  thankYou: {
+    color: '#8a7d5c',
+    fontSize: 11,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    letterSpacing: 0.3,
+    paddingHorizontal: 8,
+  },
   kokoroBanner: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',

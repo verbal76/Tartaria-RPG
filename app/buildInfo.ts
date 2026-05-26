@@ -187,4 +187,18 @@
 // everyone else dies on the regular drop rules (boss / pity
 // timer / 0.5% rare). Loud reward-channel log line confirms
 // the grant in the session log.
-export const OTA_BUILD_ID = '2026-05-26-067';
+//
+// 2026-05-26 OTA-068 — Title-screen bottom-bar polish.
+//   (1) Three action buttons (INVITE PLAYTESTER, REPORT BUG,
+//       EXIT GAME) are now CENTERED in their row (was flex-end
+//       / right-aligned in OTA-065) with an 8dp gap between
+//       them. Reads as a balanced cluster.
+//   (2) Version footer ("v2.4.1 / 2148") is now CENTERED on
+//       its own line (was left-aligned with a small marginLeft
+//       since OTA-065).
+//   (3) NEW playtester thank-you line above the action row:
+//       "Thank you for helping us test our new game, enjoy
+//       Tartaria!" in italic muted-amber (#8a7d5c). Sized
+//       between the bright action button text and the deep
+//       muted footer so it reads as warm-but-secondary.
+export const OTA_BUILD_ID = '2026-05-26-068';
