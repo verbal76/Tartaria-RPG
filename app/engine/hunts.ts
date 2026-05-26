@@ -30,6 +30,14 @@ export interface HuntDef {
   /** Catalog name of the target — looked up in enemies.json when the boss spawns. */
   targetEnemyName: string;
   biomeTag: string;
+  /** 2026-05-26 OTA-053 — explicit player-facing location name where
+   *  the target hides out. Surfaced on accept ("Travel to X to
+   *  begin.") and in the Contracts expanded view ("Location: X"),
+   *  so the player isn't reduced to scanning posterText for a
+   *  proper noun. Optional for backward compat with older hunt
+   *  authoring; when missing, the engine falls back to the biomeTag
+   *  → friendly-label table in gameStore. */
+  targetLocationName?: string;
   minRep: number;
   factionId: string | null;
   rewardTc: number;
@@ -42,6 +50,43 @@ export interface HuntDef {
 
 interface HuntDataShape {
   hunts: HuntDef[];
+}
+
+/** 2026-05-26 OTA-053 — player-facing label for the per-stage skill
+ *  hint shown in the ContractsScreen. Internal checkKind values are
+ *  systemic (`attack_provoke`, `cast`); these are the imperative
+ *  the player should act on at this stage. Null = pure narration
+ *  stage (auto-advance on any action). */
+export function checkKindLabel(kind: HuntCheckKind): string | null {
+  switch (kind) {
+    case 'investigate': return 'investigate the area';
+    case 'stealth': return 'use stealth';
+    case 'diplomacy': return 'talk it out';
+    case 'escape': return 'escape / disengage';
+    case 'cast': return 'use Aethercraft';
+    case 'attack_provoke': return 'attack to provoke';
+    case 'boss': return 'defeat in combat';
+    default: return null;
+  }
+}
+
+/** 2026-05-26 OTA-053 — friendly label for a biomeTag when a hunt
+ *  doesn't carry an explicit targetLocationName. Falls back to the
+ *  tag itself title-cased if no mapping exists. */
+const BIOME_LABELS: Record<string, string> = {
+  mud_seas: 'the Mud Seas',
+  buried_capital: 'a buried capital',
+  sentinel_ward: 'a Sentinel Ward',
+  outskirts: 'the Tartarian Outskirts',
+  ruin: 'the buried ruins',
+};
+export function biomeLabel(biomeTag: string): string {
+  const mapped = BIOME_LABELS[biomeTag];
+  if (mapped) return mapped;
+  return biomeTag
+    .split(/[_\s]+/)
+    .map((w) => (w ? w[0]!.toUpperCase() + w.slice(1) : ''))
+    .join(' ');
 }
 
 export const HUNTS = (huntsData as HuntDataShape).hunts;
