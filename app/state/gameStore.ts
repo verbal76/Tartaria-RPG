@@ -1016,6 +1016,14 @@ interface GameStore {
    *  list. Leads auto-complete on kill (OTA 011) but the player
    *  may want to abandon one that isn't worth chasing. */
   discardLead: (id: string) => void;
+  /** 2026-05-26 OTA-054 — drop an active contract the player no
+   *  longer wants. Handles all four kinds (hunt / mystery /
+   *  storyline / faction_quest). Removes the contract from the
+   *  matching active list, leaves the completed list untouched
+   *  (it was never completed), emits a one-line confirmation.
+   *  Reputation IS NOT refunded — if abandoning had no cost we'd
+   *  invite the player to accept-everything-then-drop. */
+  abandonContract: (kind: 'hunt' | 'mystery' | 'storyline' | 'faction_quest', id: string) => void;
   digHere: () => void;
   /** 2026-05-25 — bulk salvage. Run rollSalvagePool for each noun
    *  in sequence but DEFER all logging — emit every narration line
@@ -10425,6 +10433,63 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
+  // 2026-05-26 OTA-054 — abandon an active contract. Surfaces as an
+  // ABANDON button per-card in ContractsScreen; also reachable via
+  // typed `abandon hunt <title>` / `drop hunt <title>` if the parser
+  // routes that intent (kept simple for now — UI-only). Reputation
+  // is NOT refunded.
+  abandonContract(kind, id) {
+    const player = get().player;
+    if (!player) return;
+    if (kind === 'hunt') {
+      const def = findHuntById(id);
+      const rec = (player.activeHunts ?? []).find((h) => h.id === id);
+      if (!def || !rec) return;
+      set((s) => (s.player ? {
+        player: {
+          ...s.player,
+          activeHunts: (s.player.activeHunts ?? []).filter((h) => h.id !== id),
+        },
+      } : s));
+      get().appendLog('world', `You set the ${def.title} aside. The poster goes back in the pack, edge-creased.`);
+    } else if (kind === 'mystery') {
+      const def = findMysteryById(id);
+      const rec = (player.activeMysteries ?? []).find((m) => m.id === id);
+      if (!def || !rec) return;
+      set((s) => (s.player ? {
+        player: {
+          ...s.player,
+          activeMysteries: (s.player.activeMysteries ?? []).filter((m) => m.id !== id),
+        },
+      } : s));
+      get().appendLog('world', `You let the ${def.title} go. Some questions Tartaria keeps.`);
+    } else if (kind === 'storyline') {
+      const def = findStorylineById(id);
+      const rec = (player.activeStorylines ?? []).find((s) => s.id === id);
+      if (!def || !rec) return;
+      set((s) => (s.player ? {
+        player: {
+          ...s.player,
+          activeStorylines: (s.player.activeStorylines ?? []).filter((q) => q.id !== id),
+        },
+      } : s));
+      get().appendLog('world', `You step away from the ${def.title} chapter. The Arbiter doesn't argue.`);
+    } else {
+      const def = findFactionQuestById(id);
+      const rec = (player.activeFactionQuests ?? []).find((q) => q.id === id);
+      if (!def || !rec) return;
+      set((s) => (s.player ? {
+        player: {
+          ...s.player,
+          activeFactionQuests: (s.player.activeFactionQuests ?? []).filter((q) => q.id !== id),
+          activeFactionQuestIds: (s.player.activeFactionQuestIds ?? []).filter((qid) => qid !== id),
+        },
+      } : s));
+      get().appendLog('world', `You hand the ${def.title} contract back to the wind. The Arbiter shrugs.`);
+    }
+    void get().persist();
+  },
+
   // Walk one tile on the procedural map. If the tile contains a named
   // location, switch to it; otherwise narrate a wander. A compass in the
   // inventory upgrades the narration with directional hints.
@@ -12738,9 +12803,26 @@ function grantQuestHook(
         : s,
     );
     bumpQuestsAccepted(get, set);
+    // 2026-05-26 OTA-054 — playtester: "I didn't even know I had the
+    // hunt let alone that I had accepted it." Field auto-grants
+    // (mini-dungeon questHook path) previously emitted a single
+    // ✦-reward line that was easy to scroll past. Now the grant
+    // fires three explicit beats so the player can't miss it:
+    //   - reward: hunt added to slate (name + headline)
+    //   - arbiter: where to read it + how to drop it
+    //   - world: explicit confirmation the slate now carries it
+    // Locale + abandonment-affordance language are deliberately
+    // direct — no flowery framing; this is a UX moment.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { biomeLabel: locBiomeLabel } = require('../engine/hunts');
+    const locLabel = def.targetLocationName ?? locBiomeLabel(def.biomeTag);
     get().appendLog(
       'reward',
-      `✦ Hunt found in the field — ${def.title}. ${def.posterText}`,
+      `✦ Hunt added to your slate — ${def.title} (target: ${def.targetEnemyName} at ${locLabel}).`,
+    );
+    get().appendLog(
+      'arbiter',
+      `The Arbiter holds up a hand. "That hunt is on your slate now. Open Contracts → Hunts to read the steps. Tap ABANDON there if you don't want it."`,
     );
     return;
   }
@@ -12764,9 +12846,15 @@ function grantQuestHook(
       : s,
   );
   bumpQuestsAccepted(get, set);
+  // 2026-05-26 OTA-054 — same OTA-054 louder-grant treatment for the
+  // mystery branch.
   get().appendLog(
     'reward',
-    `✦ Mystery found in the field — ${def.title}. ${def.posterText}`,
+    `✦ Mystery added to your slate — ${def.title}.`,
+  );
+  get().appendLog(
+    'arbiter',
+    `The Arbiter watches you read it. "That mystery is on your slate. Open Contracts → Mysteries for the trail. Tap ABANDON there if you'd rather not chase it."`,
   );
 }
 
