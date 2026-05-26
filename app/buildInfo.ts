@@ -13,4 +13,4 @@
 // If this publish succeeds end-to-end (workflow green in GH Actions)
 // and the device still shows 010 after cold-start, it's a fetch-
 // cadence issue, not a publish issue.
-export const OTA_BUILD_ID = '2026-05-25-048';
+export const OTA_BUILD_ID = '2026-05-26-049';
