@@ -13,4 +13,18 @@
 // If this publish succeeds end-to-end (workflow green in GH Actions)
 // and the device still shows 010 after cold-start, it's a fetch-
 // cadence issue, not a publish issue.
-export const OTA_BUILD_ID = '2026-05-26-056';
+//
+// 2026-05-26 OTA-057 — stat-training exploit mitigation.
+//   (1) Tile-novelty gate: cardinal-step WIS / STR-passive / CHA-
+//       passive training only fires when the destination tile is
+//       NOT in player.recentTileHistory (sliding 20-tile window).
+//       Kills pacing-between-two-screens WIS farming; long
+//       exploration still trains.
+//   (2) WIS/CHA conceptual split: removed the WIS double-train on
+//       the 7 active social verbs (buy / sell / gift / accept-
+//       hunt / accept-mystery / accept-storyline / accept-faction-
+//       quest). CHA = active push, WIS = passive perception /
+//       outcome. WIS still trains on completion turn-ins, hearing
+//       whispers, novel travel, resting after combat.
+//   (3) SKILL_ACTIVITIES display map updated to reflect the split.
+export const OTA_BUILD_ID = '2026-05-26-057';

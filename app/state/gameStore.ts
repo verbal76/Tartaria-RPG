@@ -8788,8 +8788,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
-      // 2026-05-25 — NPC interaction also trains WIS per playtester spec.
-      applyTrainAndLog(get, set, 'wisdom', '✦ The exchange leaves a lesson. +1 WIS (now {to}).');
+      // OTA-057 — WIS no longer fires on active social verbs (buying is
+      // a CHA push). Passive perception WIS still trains on outcome paths
+      // (turn-ins, whispers, novel travel, surviving encounters).
     }
     void get().persist();
   },
@@ -8874,7 +8875,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
-      applyTrainAndLog(get, set, 'wisdom', '✦ The trade teaches you. +1 WIS (now {to}).');
+      // OTA-057 — selling is an active CHA push; no WIS train here.
     }
     void get().persist();
   },
@@ -8945,7 +8946,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
-      applyTrainAndLog(get, set, 'wisdom', '✦ The giving sharpens you. +1 WIS (now {to}).');
+      // OTA-057 — gifting is an active CHA push; no WIS train here.
     }
     void get().persist();
   },
@@ -9331,7 +9332,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
-      applyTrainAndLog(get, set, 'wisdom', '✦ A new burden teaches. +1 WIS (now {to}).');
+      // OTA-057 — accepting a contract is an active CHA push; the
+      // matching WIS train fires on the completion path, not on accept.
     }
     void get().persist();
   },
@@ -9614,7 +9616,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
-      applyTrainAndLog(get, set, 'wisdom', '✦ The hunt asks for forethought. +1 WIS (now {to}).');
+      // OTA-057 — accepting a hunt is an active CHA push; the matching
+      // WIS train fires on completion, not on accept.
     }
     void get().persist();
   },
@@ -9893,7 +9896,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
-      applyTrainAndLog(get, set, 'wisdom', '✦ The mystery seats itself. +1 WIS (now {to}).');
+      // OTA-057 — accepting a mystery is an active CHA push; the WIS
+      // train fires on resolution, not on accept.
     }
     void get().persist();
   },
@@ -10117,7 +10121,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
-      applyTrainAndLog(get, set, 'wisdom', '✦ The thread you took on weighs. +1 WIS (now {to}).');
+      // OTA-057 — accepting a storyline is an active CHA push; WIS
+      // fires on chapter completion, not on accept.
     }
     void get().persist();
   },
@@ -10717,65 +10722,94 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? { player: { ...s.player, mapX: step.x, mapY: step.y, lastTravelDirection: dir } }
         : s,
     );
-    // 2026-05-25 — train WIS on every successful cardinal step.
-    // Walking the buried world earns wisdom (per playtester spec).
-    {
-      const liveStepper = get().player;
-      if (liveStepper) {
-        const trWis = trainStat(liveStepper, 'wisdom', true);
-        set((s) => (s.player ? { player: trWis.player } : s));
-        if (trWis.leveled) {
-          get().appendLog(
-            'reward',
-            `✦ The road teaches you. +1 WIS (now ${trWis.leveled.to}).`,
-          );
-        }
-      }
+    // 2026-05-26 OTA-057 — tile-novelty gate for the three 100%-uniform
+    // per-step training sites (WIS, STR-passive when carrying 20+ items,
+    // CHA-passive when wearing named gear). Before this gate, a player
+    // could pace between two screens 500 times and farm Wisdom + Str +
+    // Cha for free. The Phase-1 audit showed WIS 10 → 11 in ~10 real
+    // minutes of pacing.
+    //
+    // Sliding window of 20 recent tile keys lives on player.recentTile-
+    // History. Step is "novel" only when its destination tile key isn't
+    // already in the window. Pacing a 2-tile loop = both tiles always
+    // in the window = no train. Long traverses still train (every new
+    // tile is novel). The other reward paths in stepDirection (10%
+    // step trinket, 15% vendor spawn, 40% wasteland encounter, first-
+    // investigate guarantee) are already self-throttling via RNG or
+    // per-room state, so they roll uniformly regardless of novelty.
+    const liveAfterStep = get().player;
+    const tileKey = liveAfterStep
+      ? `${liveAfterStep.currentLocationId}:${liveAfterStep.mapX}:${liveAfterStep.mapY}`
+      : '';
+    const history = liveAfterStep?.recentTileHistory ?? [];
+    const tileIsNovel = !!liveAfterStep && !history.includes(tileKey);
+    // Always advance the history regardless of train outcome so a
+    // future re-entry counts the most recent visit.
+    if (liveAfterStep && tileKey) {
+      const nextHistory = [...history, tileKey].slice(-20);
+      set((s) => (s.player ? { player: { ...s.player, recentTileHistory: nextHistory } } : s));
     }
-    // 2026-05-25 — passive STR tick when carrying 20+ items: every
-    // cardinal step under load drills the back and shoulders. Tied
-    // to travel so it accrues at a sensible rate (not per-frame).
-    {
-      const liveLoaded = get().player;
-      if (liveLoaded) {
-        const totalItems = (liveLoaded.inventory ?? []).reduce(
-          (n, it) => n + (it.quantity ?? 1),
-          0,
-        );
-        if (totalItems >= 20) {
-          const trStr = trainStat(liveLoaded, 'strength', true);
-          set((s) => (s.player ? { player: trStr.player } : s));
-          if (trStr.leveled) {
+
+    if (tileIsNovel) {
+      // 2026-05-25 — train WIS on every successful NOVEL cardinal step.
+      // Walking the buried world earns wisdom (per playtester spec).
+      // OTA-057 — gated on tile novelty so pacing doesn't farm.
+      {
+        const liveStepper = get().player;
+        if (liveStepper) {
+          const trWis = trainStat(liveStepper, 'wisdom', true);
+          set((s) => (s.player ? { player: trWis.player } : s));
+          if (trWis.leveled) {
             get().appendLog(
               'reward',
-              `✦ The pack on your back makes you stronger. +1 STR (now ${trStr.leveled.to}).`,
+              `✦ The road teaches you. +1 WIS (now ${trWis.leveled.to}).`,
             );
           }
         }
       }
-    }
-    // 2026-05-25 — passive CHA tick when bearing named gear: a
-    // recognizable weapon or armor reads on every road you walk.
-    // "Named" = equipped item whose catalog name starts with a
-    // capital letter (proper-noun convention; generic "leather
-    // boots" stays lowercase, unique "Tartarian Greatsword" does
-    // not). Tied to travel so the boost is per-tile.
-    {
-      const liveBearer = get().player;
-      if (liveBearer) {
-        const eq = liveBearer.equipped ?? {};
-        const equippedNames: string[] = [
-          eq.main, eq.off, eq.head, eq.chest, eq.legs, eq.feet, eq.amulet, eq.ring,
-        ].filter((n): n is string => typeof n === 'string' && n.trim().length > 0);
-        const hasNamedGear = equippedNames.some((n) => /^[A-Z]/.test(n.trim()));
-        if (hasNamedGear) {
-          const trCha = trainStat(liveBearer, 'charisma', true);
-          set((s) => (s.player ? { player: trCha.player } : s));
-          if (trCha.leveled) {
-            get().appendLog(
-              'reward',
-              `✦ Your bearing reads. +1 CHA (now ${trCha.leveled.to}).`,
-            );
+      // 2026-05-25 — passive STR tick when carrying 20+ items: every
+      // NOVEL cardinal step under load drills the back and shoulders.
+      // OTA-057 — gated on tile novelty.
+      {
+        const liveLoaded = get().player;
+        if (liveLoaded) {
+          const totalItems = (liveLoaded.inventory ?? []).reduce(
+            (n, it) => n + (it.quantity ?? 1),
+            0,
+          );
+          if (totalItems >= 20) {
+            const trStr = trainStat(liveLoaded, 'strength', true);
+            set((s) => (s.player ? { player: trStr.player } : s));
+            if (trStr.leveled) {
+              get().appendLog(
+                'reward',
+                `✦ The pack on your back makes you stronger. +1 STR (now ${trStr.leveled.to}).`,
+              );
+            }
+          }
+        }
+      }
+      // 2026-05-25 — passive CHA tick when bearing named gear: a
+      // recognizable weapon or armor reads on every NOVEL road you
+      // walk. "Named" = equipped item whose catalog name starts with
+      // a capital letter. OTA-057 — gated on tile novelty.
+      {
+        const liveBearer = get().player;
+        if (liveBearer) {
+          const eq = liveBearer.equipped ?? {};
+          const equippedNames: string[] = [
+            eq.main, eq.off, eq.head, eq.chest, eq.legs, eq.feet, eq.amulet, eq.ring,
+          ].filter((n): n is string => typeof n === 'string' && n.trim().length > 0);
+          const hasNamedGear = equippedNames.some((n) => /^[A-Z]/.test(n.trim()));
+          if (hasNamedGear) {
+            const trCha = trainStat(liveBearer, 'charisma', true);
+            set((s) => (s.player ? { player: trCha.player } : s));
+            if (trCha.leveled) {
+              get().appendLog(
+                'reward',
+                `✦ Your bearing reads. +1 CHA (now ${trCha.leveled.to}).`,
+              );
+            }
           }
         }
       }
