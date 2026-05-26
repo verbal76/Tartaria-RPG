@@ -167,4 +167,13 @@
 //       tooling, and reply directly to the requester with the
 //       install link. Advertised as up-to-24-hours, usually
 //       within the hour.
-export const OTA_BUILD_ID = '2026-05-26-065';
+//
+// 2026-05-26 OTA-066 — INVITE button label spelled out as
+// "INVITE PLAYTESTER" per playtester request ("have it say
+// both words"). Forced a bottom-bar restructure: the action
+// row + footer no longer fit on a single 360dp row (~388dp
+// content). bottomBar is now flexDirection: column with the
+// action button row on top (right-aligned via flex-end) and
+// the footer text below. Visual hierarchy is the same — three
+// peripheral actions in a row, version diag underneath.
+export const OTA_BUILD_ID = '2026-05-26-066';

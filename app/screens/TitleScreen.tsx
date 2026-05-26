@@ -796,12 +796,11 @@ export function TitleScreen() {
         <Text style={styles.gear}>⚙</Text>
       </TouchableOpacity>
       <View style={styles.bottomBar}>
-        <Text style={styles.footer}>v{APP_VERSION}  /  2148</Text>
-        {/* OTA-065 — three-button right-aligned cluster (INVITE,
-            REPORT BUG, EXIT GAME) to keep the layout coherent
-            after adding the invite button. Bottom bar uses
-            space-between with footer text on the left and this
-            row on the right. */}
+        {/* OTA-065 — action-button row sits ABOVE the footer
+            now that bottomBar stacks vertically. Right-aligned
+            within its row so the buttons hug the screen edge
+            and the row reads naturally left → right (INVITE
+            PLAYTESTER → REPORT BUG → EXIT GAME). */}
         <View style={styles.bottomBtnRow}>
           {/* OTA-065 — INVITE PLAYTESTER button. Opens the
               InvitePlaytesterModal which collects a Gmail
@@ -814,7 +813,7 @@ export function TitleScreen() {
             onPress={() => setInviteOpen(true)}
           >
             <Text style={styles.inviteBtnText}>
-              {inviteSent ? '✓ SENT' : 'INVITE'}
+              {inviteSent ? '✓ SENT' : 'INVITE PLAYTESTER'}
             </Text>
           </TouchableOpacity>
           {/* OTA-063 — REPORT BUG button. Same footer-bar visual
@@ -847,6 +846,7 @@ export function TitleScreen() {
             <Text style={styles.exitBtnText}>EXIT GAME</Text>
           </TouchableOpacity>
         </View>
+        <Text style={styles.footer}>v{APP_VERSION}  /  2148</Text>
       </View>
 
       <BugReportModal
@@ -1135,11 +1135,18 @@ const styles = StyleSheet.create({
   },
   secondaryBtnText: { color: '#cdbf99', fontSize: 12, letterSpacing: 1, fontWeight: '700' },
   btnDisabled: { opacity: 0.55 },
+  // OTA-065 — bottomBar now stacks vertically so the action
+  // button row (INVITE PLAYTESTER + REPORT BUG + EXIT GAME) has
+  // its own full-width row and doesn't compete with the footer
+  // text for horizontal space. On a 360dp Android screen the
+  // three buttons + footer text in one row overflowed once
+  // "INVITE PLAYTESTER" replaced the shorter "INVITE" label
+  // (~388dp content on a 360dp screen).
   bottomBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
+    alignItems: 'stretch',
     paddingTop: 8,
+    gap: 6,
   },
   exitBtn: {
     backgroundColor: '#1a1714',
@@ -1150,13 +1157,17 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   exitBtnText: { color: '#c97a7a', fontSize: 10, letterSpacing: 1.5, fontWeight: '700' },
-  // OTA-065 — right-aligned row holding INVITE, REPORT BUG,
-  // EXIT GAME. `gap` replaces the per-button marginRight that
-  // OTA-063 had on bugReportBtn alone — cleaner with three
-  // buttons and easier to tune spacing in one place.
+  // OTA-065 — right-aligned row holding INVITE PLAYTESTER,
+  // REPORT BUG, EXIT GAME. `gap` replaces the per-button
+  // marginRight that OTA-063 had on bugReportBtn alone —
+  // cleaner with three buttons and easier to tune spacing in
+  // one place. flex-end so the row hugs the right edge of the
+  // bottomBar's full width (bottomBar is now column / stretch,
+  // so the row's container is full screen width).
   bottomBtnRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-end',
     gap: 6,
   },
   // OTA-063 — REPORT BUG button. Visually equal-weight to EXIT
