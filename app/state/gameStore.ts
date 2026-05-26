@@ -4317,6 +4317,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // discoveries (the hide-on-consume rule still fires
             // — just on actual production now).
             if (narrateResult.producedSubstantive || scannerProduced) {
+              // 2026-05-26 OTA-056 — INT trains on every substantive
+              // investigate (matches OTA-031's "successful use" pattern:
+              // failures + pure flavor don't count). Substantive =
+              // hook plant, hidden-text reveal, trinket drop, scanner
+              // find — anything that produced an actual outcome. The
+              // first-investigate guarantee per OTA-039 means most
+              // investigates land here on a fresh noun, so INT grows
+              // at a sensible cadence for a curious player.
+              applyTrainAndLog(get, set, 'intelligence', '✦ Curious eyes sharpen. +1 INT (now {to}).');
               set((s) => {
                 const room = s.worldMemory.visitedRooms?.[searchRoomKey] ?? {
                   firstVisitAt: Date.now(),
@@ -11796,27 +11805,70 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    // HANDOFF followup — style: 'two_handed' integration. Refuse to
-    // equip into the off-hand when a two-handed weapon occupies the
-    // main slot, and refuse to equip a two-handed weapon when the off
-    // slot is already filled. Player has to unequip first.
+    // 2026-05-26 OTA-056 — two-handed weapon auto-displace. Was: refuse
+    // the equip and force the player to unequip the conflicting
+    // weapon manually. Now: drop the conflicting item back to inventory
+    // automatically and proceed with the equip. The displaced weapon
+    // is still in player.inventory (equipped slots are pointers, not
+    // owners), so "drop" just means clearing the equipped pointer +
+    // narrating the swap.
     const incomingCat = findWeaponByName(item.name);
     const mainName = player.equipped?.main;
     const offName = player.equipped?.off;
     const mainCat = mainName ? findWeaponByName(mainName) : null;
+    // Track displacements so a single combined "you set X aside" line
+    // fires before the equip narration.
+    const displaced: string[] = [];
     if (slot === 'off' && mainCat?.style === 'two_handed') {
-      get().appendLog(
-        'arbiter',
-        `The Arbiter eyes your ${mainName}. "Two-handed grip. There's no room in the off hand until you set that down."`,
-      );
-      return;
+      // Equipping anything to off-hand while 2H in main → drop the 2H.
+      displaced.push(mainName!);
+      set((s) => (s.player ? {
+        player: {
+          ...s.player,
+          equipped: { ...(s.player.equipped ?? {}), main: undefined, mainId: undefined },
+        },
+      } : s));
     }
     if (slot === 'main' && incomingCat?.style === 'two_handed' && offName) {
+      // Equipping a 2H to main while off-hand has something → drop off-hand.
+      displaced.push(offName);
+      set((s) => (s.player ? {
+        player: {
+          ...s.player,
+          equipped: { ...(s.player.equipped ?? {}), off: undefined, offId: undefined },
+        },
+      } : s));
+    }
+    if (slot === 'off' && incomingCat?.style === 'two_handed') {
+      // Equipping a 2H weapon to OFF (rare via parser, possible via UI):
+      // route it to MAIN instead so the 2H rendering is consistent
+      // (main is the canonical 2H slot). Treat as "main equip" from
+      // here. Drops anything in either hand.
+      if (mainName) {
+        displaced.push(mainName);
+        set((s) => (s.player ? {
+          player: {
+            ...s.player,
+            equipped: { ...(s.player.equipped ?? {}), main: undefined, mainId: undefined },
+          },
+        } : s));
+      }
+      if (offName) {
+        displaced.push(offName);
+        set((s) => (s.player ? {
+          player: {
+            ...s.player,
+            equipped: { ...(s.player.equipped ?? {}), off: undefined, offId: undefined },
+          },
+        } : s));
+      }
+      slot = 'main' as EquipSlot;
+    }
+    if (displaced.length > 0) {
       get().appendLog(
-        'arbiter',
-        `The Arbiter shakes their head. "The ${item.name} needs both hands. Drop the ${offName} from your off hand first."`,
+        'world',
+        `You set ${displaced.length === 1 ? `the ${displaced[0]}` : `the ${displaced.join(' and ')}`} aside to free your ${displaced.length === 1 && slot === 'off' ? 'off hand' : 'hands'} for the ${item.name}.`,
       );
-      return;
     }
     // Capture what was already in this slot so the swap is visible.
     // Playtest: player equipped a locket, then a compass to the same Amulet

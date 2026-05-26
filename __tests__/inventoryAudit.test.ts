@@ -303,14 +303,20 @@ describe('Inventory state machine audit', () => {
       expect(getPlayer().equipped?.main).toBe('Iron Spear');
       // Verify catalog says it's two-handed.
       expect(findWeaponByName('Iron Spear')?.style).toBe('two_handed');
-      // Attempt to slot Pocket Knife into off — refusal.
+      // 2026-05-26 OTA-056 — equipping to off-hand while a 2H is in
+      // main now AUTO-DISPLACES the 2H back to inventory (clears the
+      // main slot pointer), then proceeds with the off-hand equip.
+      // No more refusal.
       store.getState().equipItem('Pocket Knife', 'off');
       const eq = getPlayer().equipped ?? {};
-      expect(eq.off).toBeUndefined();
-      expect(eq.offId).toBeUndefined();
+      // Off hand now has the knife.
+      expect(eq.off).toBe('Pocket Knife');
+      // Main hand was cleared (2H weapon displaced).
+      expect(eq.main).toBeUndefined();
+      expect(eq.mainId).toBeUndefined();
     });
 
-    it('refuses equipping two-handed to main when off hand is occupied', () => {
+    it('auto-displaces off-hand when equipping a 2H weapon to main', () => {
       const store = useGameStore;
       const player = getPlayer();
       player.equipped = {};
@@ -321,13 +327,15 @@ describe('Inventory state machine audit', () => {
       // Off hand has the knife.
       store.getState().equipItem('Pocket Knife', 'off');
       expect(getPlayer().equipped?.off).toBe('Pocket Knife');
-      // Try the two-handed spear into main — refused.
+      // 2026-05-26 OTA-056 — equipping a 2H to main when off has an
+      // item now AUTO-DISPLACES the off-hand item, then proceeds.
       store.getState().equipItem('Iron Spear', 'main');
       const eq = getPlayer().equipped ?? {};
-      expect(eq.main).toBeUndefined();
-      expect(eq.mainId).toBeUndefined();
-      // Off-hand state untouched.
-      expect(eq.off).toBe('Pocket Knife');
+      // Main has the spear.
+      expect(eq.main).toBe('Iron Spear');
+      // Off-hand was cleared.
+      expect(eq.off).toBeUndefined();
+      expect(eq.offId).toBeUndefined();
     });
   });
 

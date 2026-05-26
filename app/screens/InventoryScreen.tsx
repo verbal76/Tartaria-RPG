@@ -395,7 +395,19 @@ function ItemRow({
           )}
           {canEquip && !isEquipped && <Text style={styles.rowEquippable}>tap to equip</Text>}
           {!canEquip && !isEquipped && <Text style={styles.rowEquippable}>tap for details</Text>}
-          {isEquipped && <Text style={styles.rowEquipped}>EQUIPPED</Text>}
+          {isEquipped && (() => {
+            // 2026-05-26 OTA-056 — when a two-handed weapon is equipped,
+            // show "EQUIPPED (two-handed)" so the player sees in the
+            // inventory list that the weapon is taking BOTH hands.
+            // Matches the off-hand mirror on the Character Screen.
+            const w = findWeaponByName(item.name);
+            const twoHanded = w?.style === 'two_handed';
+            return (
+              <Text style={styles.rowEquipped}>
+                EQUIPPED{twoHanded ? ' (two-handed)' : ''}
+              </Text>
+            );
+          })()}
         </View>
       </View>
     </TouchableOpacity>
