@@ -9362,6 +9362,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       `✦ Faction contract complete — ${candidate.title}. +${candidate.reward.tc} TC, +${candidate.reward.rep} rep with ${candidate.factionId.replace(/_/g, ' ')}.`,
     );
     logRepChanges(get, repResult.changed);
+    plantNextContractHint(get, candidate.factionId, 'faction_quest');
     void get().persist();
   },
 
@@ -9648,6 +9649,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       text: `Completed the hunt for the ${candidate.targetEnemyName}.`,
       enemyName: candidate.targetEnemyName,
     });
+    plantNextContractHint(get, candidate.factionId ?? null, 'hunt');
     void get().persist();
   },
 
@@ -9901,6 +9903,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     );
     applyTrainAndLog(get, set, 'wisdom', '✦ A mystery resolved sharpens you. +1 WIS (now {to}).');
     if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
+    plantNextContractHint(get, candidate.factionId ?? null, 'mystery');
     void get().persist();
   },
 
@@ -10105,6 +10108,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     applyTrainAndLog(get, set, 'wisdom', '✦ A storyline carried through teaches you. +1 WIS (now {to}).');
     applyTrainAndLog(get, set, 'charisma', '✦ Word of the chapter spreads. +1 CHA (now {to}).');
     if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
+    plantNextContractHint(get, candidate.factionId, 'storyline');
     void get().persist();
   },
 
@@ -10167,6 +10171,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       applyTrainAndLog(get, set, 'wisdom', '✦ A finished hunt seasons you. +1 WIS (now {to}).');
       if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
+      plantNextContractHint(get, def.factionId ?? null, 'hunt');
       void get().persist();
       return;
     }
@@ -10225,6 +10230,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       applyTrainAndLog(get, set, 'wisdom', '✦ A mystery resolved sharpens you. +1 WIS (now {to}).');
       if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
+      plantNextContractHint(get, def.factionId ?? null, 'mystery');
       void get().persist();
       return;
     }
@@ -10283,6 +10289,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       applyTrainAndLog(get, set, 'wisdom', '✦ A storyline carried through teaches you. +1 WIS (now {to}).');
       applyTrainAndLog(get, set, 'charisma', '✦ Word of the chapter spreads. +1 CHA (now {to}).');
       if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
+      plantNextContractHint(get, def.factionId, 'storyline');
       void get().persist();
       return;
     }
@@ -10319,6 +10326,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       applyTrainAndLog(get, set, 'wisdom', '✦ Faction work finished, lessons kept. +1 WIS (now {to}).');
       if (repResult.changed.length > 0) logRepChanges(get, repResult.changed);
+      plantNextContractHint(get, def.factionId, 'faction_quest');
       void get().persist();
     }
   },
@@ -14107,6 +14115,75 @@ const INVESTIGATE_TRINKETS: ReadonlyArray<{ name: string; rarity: 'Common'; qtyM
   { name: 'Cloth Scrap',         rarity: 'Common', qtyMin: 1, qtyMax: 1, line: `A scrap of cloth, wedged into the {noun} long ago. You free it.` },
   { name: 'Aether Residue',      rarity: 'Common', qtyMin: 1, qtyMax: 1, line: `A thin film of Aether residue clings where your hand brushed the {noun}. You vial it.` },
 ];
+
+// 2026-05-25 OTA-044 — chained narrative helper. Called at the end of
+// every contract turn-in (hunt / mystery / storyline / faction_quest)
+// to plant a one-line teaser for the NEXT contract from the same
+// faction. If no follow-up is available, falls through to a generic
+// "your reputation precedes you" Arbiter beat. Goal: every finish
+// frays at the edges so the player goes to bed thinking about what
+// they were about to start.
+type ContractKind = 'hunt' | 'mystery' | 'storyline' | 'faction_quest';
+function plantNextContractHint(
+  get: () => GameStore,
+  factionId: string | null,
+  kind: ContractKind,
+): void {
+  const player = get().player;
+  if (!player) return;
+  let nextTitle: string | undefined;
+  if (factionId) {
+    const rep = getStanding(player.factionStanding, factionId);
+    if (kind === 'hunt') {
+      const pool = availableHunts(
+        factionId,
+        rep,
+        (player.activeHunts ?? []).map((h) => h.id),
+        player.completedHuntIds ?? [],
+      );
+      nextTitle = pool[0]?.title;
+    } else if (kind === 'mystery') {
+      const pool = availableMysteries(
+        factionId,
+        rep,
+        (player.activeMysteries ?? []).map((m) => m.id),
+        player.completedMysteryIds ?? [],
+      );
+      nextTitle = pool[0]?.title;
+    } else if (kind === 'storyline') {
+      const pool = availableStorylines(
+        factionId,
+        rep,
+        (player.activeStorylines ?? []).map((s) => s.id),
+        player.completedStorylineIds ?? [],
+      );
+      nextTitle = pool[0]?.title;
+    } else {
+      const pool = availableFactionQuests(
+        factionId,
+        rep,
+        player.activeFactionQuestIds ?? [],
+        player.completedFactionQuestIds ?? [],
+      );
+      nextTitle = pool[0]?.title;
+    }
+  }
+  if (nextTitle) {
+    const kindLabel = kind === 'hunt' ? 'hunt'
+      : kind === 'mystery' ? 'mystery'
+      : kind === 'storyline' ? 'chapter'
+      : 'contract';
+    get().appendLog(
+      'arbiter',
+      `Before you go, the agent slides a second leaf across the table. "Something heavier when you're ready — the ${kindLabel} '${nextTitle}'."`,
+    );
+  } else {
+    get().appendLog(
+      'arbiter',
+      `Word will travel that you finished this clean. The next thread will find you.`,
+    );
+  }
+}
 
 // 2026-05-25 OTA-043 — "tiny find on footfall" narration. Every
 // cardinal step in stepDirection rolls 10%; if it hits AND nothing
