@@ -101,6 +101,12 @@ interface PickOptions {
   rollChance?: number;
   /** Math.random injection for tests. */
   rng?: () => number;
+  /** 2026-05-25 OTA-045 — depleted-player encounter bias. When true,
+   *  archetypes of type 'treasure' or 'mini_dungeon' (the high-value
+   *  options — loot caches, vendor stalls, hooked quests) get their
+   *  selection weight doubled. Player at low HP / low stamina / low
+   *  TC walks into a juicier temptation, not a wandering monster. */
+  depleted?: boolean;
 }
 
 /**
@@ -130,13 +136,25 @@ export function pickWastelandEncounter(
   }
   if (eligible.length === 0) return null;
 
-  // Weighted pick among eligible archetypes.
-  const totalWeight = eligible.reduce((acc, e) => acc + e.archetype.weight, 0);
+  // 2026-05-25 OTA-045 — JIT temptation bias. When the player is
+  // depleted (low HP / stamina / TC), high-value archetypes
+  // (treasure caches, mini-dungeons with loot) get a 2× weight
+  // multiplier. The walking-monster archetypes (skirmish / npc)
+  // stay at baseline. Reads more carrot, less stick.
+  const isHighValue = (t: WastelandEncounterType): boolean =>
+    t === 'treasure' || t === 'mini_dungeon';
+  const biasMultiplier = (a: WastelandArchetype): number =>
+    opts.depleted && isHighValue(a.type) ? 2.0 : 1.0;
+  // Weighted pick among eligible archetypes (bias-adjusted).
+  const totalWeight = eligible.reduce(
+    (acc, e) => acc + e.archetype.weight * biasMultiplier(e.archetype),
+    0,
+  );
   const roll = rng() * totalWeight;
   let cumulative = 0;
   let picked = eligible[0]!;
   for (const e of eligible) {
-    cumulative += e.archetype.weight;
+    cumulative += e.archetype.weight * biasMultiplier(e.archetype);
     if (roll < cumulative) { picked = e; break; }
   }
 
