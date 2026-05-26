@@ -15262,13 +15262,41 @@ function narratePossibleDirections(get: () => GameStore, scene: CurrentScene): v
     get().appendLog('world', 'You scan for a way forward. Tartaria does not advertise its directions.');
     return;
   }
-  const first = pick(others);
-  const second = others.length > 1 && chance(60)
-    ? pick(others.filter((o) => o.id !== first.id))
-    : null;
+  // 2026-05-26 OTA-061 — stable, deterministic destinations per
+  // tile. Pre-OTA every `investigate path` re-pick'd random world
+  // locations, so 7 calls in 16 seconds returned 7 different far-
+  // off cities. Playtester log:
+  //   investigate path → "a tower toward Grand Spire of Etheria"
+  //   investigate path → "a lost_capital toward Drakova"
+  //   investigate path → "a region toward Cradle of Dusk and a
+  //                       tower toward Red Tower of Nimari"
+  // Now the engine seeds the two-location pick by the current
+  // tile's identity (locationId + mapX + mapY) so re-investigating
+  // the same noun on the same tile gives the SAME answer — the
+  // Arbiter remembers what they told you here.
+  //
+  // Also humanizes the `type` token: a "lost_capital" was leaking
+  // straight through .toLowerCase() into player-facing text. Now
+  // underscores collapse to spaces.
+  const player = get().player;
+  const seedKey = `${scene.location.id}:${player?.mapX ?? 0}:${player?.mapY ?? 0}`;
+  // FNV-1a 32-bit hash of the seed key — small, stable, no deps.
+  let h = 0x811c9dc5;
+  for (let i = 0; i < seedKey.length; i++) {
+    h ^= seedKey.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  const firstIdx = h % others.length;
+  const secondIdx = others.length > 1 ? (firstIdx + 1 + (h >>> 8) % (others.length - 1)) % others.length : firstIdx;
+  const first = others[firstIdx]!;
+  const second = others.length > 1 ? others[secondIdx]! : null;
+  const humanizeType = (t: string | undefined): string =>
+    (t ?? 'path').toLowerCase().replace(/_/g, ' ');
   const fragments: string[] = [];
-  fragments.push(`a ${(first.type ?? 'path').toLowerCase()} toward ${first.name}`);
-  if (second) fragments.push(`a ${(second.type ?? 'path').toLowerCase()} toward ${second.name}`);
+  fragments.push(`a ${humanizeType(first.type)} toward ${first.name}`);
+  if (second && second.id !== first.id) {
+    fragments.push(`a ${humanizeType(second.type)} toward ${second.name}`);
+  }
   get().appendLog('world', `You look for a way forward. The Arbiter notes ${fragments.join(' and ')}.`);
 }
 
