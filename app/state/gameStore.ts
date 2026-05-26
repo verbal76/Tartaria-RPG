@@ -9531,6 +9531,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (stage0) {
       get().appendLog('reward', `✦ Hunt accepted — ${hunt.title}. ${hunt.posterText}`);
       get().appendLog('world', stage0.narration);
+      // 2026-05-26 OTA-053 — playtester ask: "I get handed a poster.
+      // It doesn't give me an idea of where I'm supposed to go."
+      // Emit an explicit Arbiter line naming the target location so
+      // the player isn't reduced to scanning posterText for a proper
+      // noun. Uses targetLocationName when authored, falls back to
+      // biomeLabel() for legacy hunts.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { biomeLabel: huntBiomeLabel } = require('../engine/hunts');
+      const locLabel = hunt.targetLocationName ?? huntBiomeLabel(hunt.biomeTag);
+      get().appendLog(
+        'arbiter',
+        `The Arbiter taps the poster. "Travel to ${locLabel} to begin. The ${hunt.targetEnemyName} won't come to you."`,
+      );
     }
     set((s) =>
       s.player

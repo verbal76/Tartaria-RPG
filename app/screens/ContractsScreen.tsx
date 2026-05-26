@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { findHuntById, HUNTS } from '../engine/hunts';
+import { findHuntById, HUNTS, checkKindLabel, biomeLabel } from '../engine/hunts';
 import { findMysteryById, MYSTERIES } from '../engine/mysteries';
 import { findStorylineById, STORYLINES } from '../engine/factionStorylines';
 import { findFactionQuestById, FACTION_QUESTS } from '../engine/factionQuests';
@@ -487,27 +487,61 @@ export function ContractsScreen() {
                       </Text>
                     </View>
                     <Text style={styles.cardFaction}>{factionLabel(def.factionId)}</Text>
+                    {/* 2026-05-26 OTA-053 — playtester ask: hunt card
+                        didn't tell them where to go or what to do.
+                        Three additions:
+                          - Location chip under the title (always
+                            visible, collapsed or expanded)
+                          - Per-stage skill hint ("→ Advance by use
+                            stealth") on every stage in the expanded
+                            list
+                          - Current-stage skill hint on the COLLAPSED
+                            card too, so the player can see the next
+                            step without expanding */}
+                    <Text style={styles.cardLocation}>
+                      📍 {def.targetLocationName ?? biomeLabel(def.biomeTag)}
+                    </Text>
                     {!open && def.stages[run.stage] && !ready && (
-                      <Text style={styles.cardBody}>{def.stages[run.stage]!.narration}</Text>
+                      <>
+                        <Text style={styles.cardBody}>{def.stages[run.stage]!.narration}</Text>
+                        {(() => {
+                          const label = checkKindLabel(def.stages[run.stage]!.checkKind);
+                          if (!label) return null;
+                          return <Text style={styles.cardHint}>→ Advance by {label}</Text>;
+                        })()}
+                      </>
                     )}
                     {open && (
                       <View style={styles.expanded}>
                         <Text style={styles.expandedLabel}>Target</Text>
                         <Text style={styles.expandedBody}>{def.targetEnemyName}</Text>
+                        <Text style={styles.expandedLabel}>Location</Text>
+                        <Text style={styles.expandedBody}>
+                          {def.targetLocationName ?? biomeLabel(def.biomeTag)}
+                        </Text>
                         <Text style={styles.expandedLabel}>Stages</Text>
-                        {def.stages.map((s, i) => (
-                          <Text
-                            key={i}
-                            style={[
-                              styles.expandedStage,
-                              i < run.stage && styles.expandedStageDone,
-                              i === run.stage && !ready && styles.expandedStageCurrent,
-                            ]}
-                          >
-                            {i < run.stage ? '✓ ' : i === run.stage && !ready ? '→ ' : '  '}
-                            {s.narration}
-                          </Text>
-                        ))}
+                        {def.stages.map((s, i) => {
+                          const skillLabel = checkKindLabel(s.checkKind);
+                          return (
+                            <View key={i}>
+                              <Text
+                                style={[
+                                  styles.expandedStage,
+                                  i < run.stage && styles.expandedStageDone,
+                                  i === run.stage && !ready && styles.expandedStageCurrent,
+                                ]}
+                              >
+                                {i < run.stage ? '✓ ' : i === run.stage && !ready ? '→ ' : '  '}
+                                {s.narration}
+                              </Text>
+                              {skillLabel && (
+                                <Text style={styles.expandedStageHint}>
+                                  {'      '}→ {skillLabel}
+                                </Text>
+                              )}
+                            </View>
+                          );
+                        })}
                         <Text style={styles.expandedLabel}>Reward</Text>
                         <Text style={styles.expandedBody}>
                           {def.rewardTc} TC{def.rewardRep ? ` · +${def.rewardRep} rep` : ''}{def.rewardItem ? ` · ${def.rewardItem}` : ''} · Trophy: {def.trophyName}
@@ -516,7 +550,7 @@ export function ContractsScreen() {
                         <Text style={styles.expandedBody}>
                           {ready
                             ? 'Boss slain. Tap COMPLETE to claim the bounty.'
-                            : `Defeat the ${def.targetEnemyName} (hunted). The hunt completes automatically; come back here to claim the reward.`}
+                            : `Travel to ${def.targetLocationName ?? biomeLabel(def.biomeTag)} and defeat the ${def.targetEnemyName}. Each stage above auto-advances when you perform the matching action there.`}
                         </Text>
                       </View>
                     )}
@@ -1149,7 +1183,9 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   cardFaction: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginBottom: 4 },
+  cardLocation: { color: '#9ec96a', fontSize: 11, marginBottom: 6, letterSpacing: 0.5 },
   cardBody: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
+  cardHint: { color: '#c9a86a', fontSize: 11, fontStyle: 'italic', marginTop: 4, letterSpacing: 0.5 },
   cardStageLabel: { color: '#c9a86a', fontSize: 10, letterSpacing: 2, fontWeight: '700', marginTop: 8, marginBottom: 2 },
   cardStageBody: { color: '#e6d8b3', fontSize: 12, lineHeight: 17, marginBottom: 4 },
   whispersBlurb: { color: '#7a705c', fontSize: 11, fontStyle: 'italic', lineHeight: 15, marginBottom: 8 },
@@ -1159,6 +1195,7 @@ const styles = StyleSheet.create({
   expandedLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 2, marginTop: 8, marginBottom: 2 },
   expandedBody: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
   expandedStage: { color: '#7a705c', fontSize: 11, lineHeight: 16, paddingLeft: 4, marginBottom: 2 },
+  expandedStageHint: { color: '#c9a86a', fontSize: 10, fontStyle: 'italic', lineHeight: 14, paddingLeft: 4, marginBottom: 6, letterSpacing: 0.5 },
   expandedStageDone: { color: '#9ec96a', textDecorationLine: 'line-through' },
   expandedStageCurrent: { color: '#c9a86a', fontWeight: '700' },
   completeBtn: {
