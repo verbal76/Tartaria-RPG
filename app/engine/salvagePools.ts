@@ -124,6 +124,10 @@ const POOLS: SalvagePool[] = [
       'sarcophagus', 'coffin', 'urn', 'burial', 'skeleton', 'remains',
       'bone', 'skull', 'corpse', 'cadaver', 'tomb', 'crypt', 'grave',
       'ossuary', 'rib',
+      // 2026-05-25 OTA-041 — hook-revealed corpse nouns (preserved_corpse
+      // hook plants body / satchel / robes as resolvers). Routes the
+      // body chip to tomb-style loot when the player salvages it.
+      'body', 'satchel', 'robes',
     ],
     items: [
       { name: 'Worn Tartarian Coin', rarity: 'Common', weight: 35, min: 3, max: 10 },
