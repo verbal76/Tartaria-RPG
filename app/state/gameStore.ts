@@ -10973,6 +10973,44 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
+    // 2026-05-25 OTA-043 — variable-reward "tiny find on footfall."
+    // Every cardinal step rolls 10% for a free trinket — but only
+    // when nothing else interesting happened this step: no vendor
+    // spawn, no enemy spawn, not in a hub. Skipping those guards
+    // every other reward path through stepDirection (encounter
+    // narration, vendor banner, hub-step) so the player gets one
+    // clean beat per step, not two stacked emits.
+    {
+      const liveScene = get().currentScene;
+      const livePlayer = get().player;
+      const outdoorPeaceful = !!liveScene
+        && (!liveScene.enemies || liveScene.enemies.length === 0)
+        && !liveScene.vendor;
+      const inAnyHubRoom = !!livePlayer?.hubRoomId;
+      if (outdoorPeaceful && !inAnyHubRoom && livePlayer && Math.random() < 0.10) {
+        const trinket = pick(INVESTIGATE_TRINKETS);
+        const qty = trinket.qtyMin === trinket.qtyMax
+          ? trinket.qtyMin
+          : trinket.qtyMin + Math.floor(Math.random() * (trinket.qtyMax - trinket.qtyMin + 1));
+        const itemCat = lookupCraftedItem(trinket.name);
+        const newItem: InventoryItem = stampDurability({
+          id: `step_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          name: trinket.name,
+          kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
+          rarity: trinket.rarity,
+          quantity: qty,
+          tags: itemCat.tags,
+        });
+        const granted = grantItem(livePlayer.inventory, newItem);
+        set((s) => (s.player ? { player: { ...s.player, inventory: granted.inventory } } : s));
+        if (granted.accepted > 0) {
+          get().appendLog('world', pick(STEP_TRINKET_LINES));
+          const qtyLabel = granted.accepted > 1 ? ` x${granted.accepted}` : '';
+          get().appendLog('reward', `✦ ${trinket.name}${qtyLabel} (${trinket.rarity}).`);
+        }
+      }
+    }
+
     // Plant a hook on the wander (same as narrateWanderingJourney does).
     narrateWanderingJourney(get, set, scene);
   },
@@ -11996,6 +12034,43 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // OTA 228 — rest may push HP back over the 5% latch threshold.
     checkLowHpWarning(prevHpRest, afterWeatherHp, hpMaxRest, get, set);
+
+    // 2026-05-25 OTA-043 — "while you slept" variable-reward pull.
+    // 30% per rest that didn't fire an ambush. Surfaces an arbiter
+    // recall / dream beat / overheard voices line, or occasionally
+    // a small material find from the trinket pool. Skipped on
+    // ambush rests (the player has bigger problems).
+    if (!ambushTriggered && Math.random() < 0.30) {
+      const pull = REST_PULL_LINES[Math.floor(Math.random() * REST_PULL_LINES.length)]!;
+      if (pull.kind === 'trinket') {
+        const liveAfterRest = get().player;
+        if (liveAfterRest) {
+          const trinket = pick(INVESTIGATE_TRINKETS);
+          const qty = trinket.qtyMin === trinket.qtyMax
+            ? trinket.qtyMin
+            : trinket.qtyMin + Math.floor(Math.random() * (trinket.qtyMax - trinket.qtyMin + 1));
+          const itemCat = lookupCraftedItem(trinket.name);
+          const newItem: InventoryItem = stampDurability({
+            id: `rest_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            name: trinket.name,
+            kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
+            rarity: trinket.rarity,
+            quantity: qty,
+            tags: itemCat.tags,
+          });
+          const granted = grantItem(liveAfterRest.inventory, newItem);
+          set((s) => (s.player ? { player: { ...s.player, inventory: granted.inventory } } : s));
+          if (granted.accepted > 0) {
+            get().appendLog('world', pull.line);
+            const qtyLabel = granted.accepted > 1 ? ` x${granted.accepted}` : '';
+            get().appendLog('reward', `✦ ${trinket.name}${qtyLabel} (${trinket.rarity}).`);
+          }
+        }
+      } else {
+        get().appendLog(pull.kind, pull.line);
+      }
+    }
+
     void get().persist();
   },
 
@@ -14031,6 +14106,49 @@ const INVESTIGATE_TRINKETS: ReadonlyArray<{ name: string; rarity: 'Common'; qtyM
   { name: 'Bent Nail',           rarity: 'Common', qtyMin: 1, qtyMax: 2, line: `A bent nail works free of the {noun}. Salvageable, barely.` },
   { name: 'Cloth Scrap',         rarity: 'Common', qtyMin: 1, qtyMax: 1, line: `A scrap of cloth, wedged into the {noun} long ago. You free it.` },
   { name: 'Aether Residue',      rarity: 'Common', qtyMin: 1, qtyMax: 1, line: `A thin film of Aether residue clings where your hand brushed the {noun}. You vial it.` },
+];
+
+// 2026-05-25 OTA-043 — "tiny find on footfall" narration. Every
+// cardinal step in stepDirection rolls 10%; if it hits AND nothing
+// else interesting happened that step (no vendor spawn, no encounter,
+// not in a hub), one of these lines fires and the player gains the
+// associated trinket. Variable-reward engine #1 — turns plain
+// cardinal walking into a slot pull.
+const STEP_TRINKET_LINES = [
+  `You catch the glint of something half-buried as your boot lands. You free it.`,
+  `Your foot snags on the silt. You crouch, look — and find something worth keeping.`,
+  `The wind shifts a crust of mud aside ahead of you. Underneath, a small object.`,
+  `Your shadow falls across a glimmer in the ground. You stoop to lift it.`,
+  `Something nudges your boot. The silt grudgingly gives it up.`,
+];
+
+// 2026-05-25 OTA-043 — "while you slept" pull. On every rest that
+// doesn't fire an ambush, a 30% roll surfaces one of these beats.
+// Mix of Arbiter recall, dream/vision fragment, overheard talk, and
+// the occasional small material find from the trinket pool. Reuses
+// INVESTIGATE_TRINKETS for the material variants. Variable-reward
+// engine #2 — turns rest from "advance time" into a slot pull too.
+//
+// Each entry's `kind` controls the emit: 'arbiter' = arbiter-channel
+// line only, 'world' = world-channel line only, 'trinket' = world
+// line + grant a random INVESTIGATE_TRINKETS item.
+type RestPull =
+  | { kind: 'arbiter'; line: string }
+  | { kind: 'world'; line: string }
+  | { kind: 'trinket'; line: string };
+const REST_PULL_LINES: RestPull[] = [
+  { kind: 'arbiter', line: `The Arbiter wakes before you do. "I chewed on something while you slept. Worth telling, when you've shaken the dust."` },
+  { kind: 'arbiter', line: `The Arbiter, near the embers: "I remembered a name in the night. It'll come back to me when the road needs it."` },
+  { kind: 'arbiter', line: `The Arbiter is quiet a long moment after you stir. "I was wrong about something earlier. I'll say so when the moment's right."` },
+  { kind: 'world', line: `You dream the same dream three times in the night — a corridor, a door, your own hand reaching for the handle.` },
+  { kind: 'world', line: `Half-asleep, you hear voices somewhere down the road. By the time you sit up they're gone.` },
+  { kind: 'world', line: `A bird you can't name lands a foot from where you slept, looks at you, takes off again.` },
+  { kind: 'world', line: `You wake briefly. The Aetheric haze has cleared enough that for a heartbeat you can see further than usual.` },
+  { kind: 'world', line: `Wind in the silt overnight. Patterns in the mud around your camp — boot prints not yours, walked around you and away.` },
+  { kind: 'trinket', line: `You shake out your cloak in the morning. Something small falls free that you don't remember picking up.` },
+  { kind: 'trinket', line: `Pre-dawn light catches a glint near your boots. The silt offered you something while you weren't looking.` },
+  { kind: 'trinket', line: `You roll up your bedroll and find a small object beneath it — a gift from the ground, in the buried country's way.` },
+  { kind: 'trinket', line: `Brushing yourself off, you find something tucked into the seam of your pack. Yours now, however it got there.` },
 ];
 
 // Travel-time lore beats — surfaced on a 5% chance per cardinal step
