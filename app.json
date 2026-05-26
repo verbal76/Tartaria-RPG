@@ -15,7 +15,8 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.hotatticgames.tartarprim.hal2001"
+      "bundleIdentifier": "com.hotatticgames.tartarprim.hal2001.ios",
+      "buildNumber": "1"
     },
     "android": {
       "package": "com.hotatticgames.tartarprim.hal2001",
@@ -56,7 +57,7 @@
     "updates": {
       "url": "https://u.expo.dev/af723f5e-e446-4296-aa6e-f1d4a4fbe82a",
       "requestHeaders": {
-        "expo-channel-name": "hal2001"
+        "expo-channel-name": "ios-preview"
       },
       "checkAutomatically": "ON_LOAD"
     },
