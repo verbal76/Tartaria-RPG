@@ -17,11 +17,49 @@ export type HuntCheckKind =
   | 'attack_provoke'
   | 'boss';
 
+/** 2026-05-26 OTA-055 — narrative slot the stage occupies in the
+ *  standardized templates. Two template families:
+ *
+ *  standard_7 (informant-driven, methodical):
+ *    inciting_hook → first_friction → toll → favor → revelation →
+ *    catalyst → apex
+ *
+ *  bait_switch_5 (urgent, subversive, action-heavy):
+ *    urgent_dispatch → false_summit → investigation → gauntlet → apex
+ *
+ *  Optional — null/unset means "legacy stage with no template slot."
+ *  The ContractsScreen renders the label only when stageType is set,
+ *  so older hunts (or non-bounty quests) still display cleanly. */
+export type HuntStageType =
+  | 'inciting_hook'
+  | 'first_friction'
+  | 'toll'
+  | 'favor'
+  | 'revelation'
+  | 'catalyst'
+  | 'apex'
+  | 'urgent_dispatch'
+  | 'false_summit'
+  | 'investigation'
+  | 'gauntlet';
+
 export interface HuntStageDef {
   narration: string;
   arbiter: string | null;
   checkKind: HuntCheckKind;
+  /** 2026-05-26 OTA-055 — narrative slot in the standardized template.
+   *  Surfaced as "Stage 3/7 — The Toll" in the ContractsScreen so the
+   *  player knows what kind of beat they're on. */
+  stageType?: HuntStageType;
 }
+
+/** 2026-05-26 OTA-055 — combined "how dangerous is this" tier surfaced
+ *  to the player so they don't accept a hunt that'll kill them. The
+ *  Arbiter warns on accept if the player is below recommendedHp AND
+ *  wielding a weapon under recommendedWeaponRarity. */
+export type HuntDifficultyTier = 1 | 2 | 3 | 4;
+export type HuntDifficultyLabel = 'Greenhorn' | 'Seasoned' | 'Veteran' | 'Apex';
+export type HuntWeaponRarity = 'Common' | 'Uncommon' | 'Rare' | 'Legendary';
 
 export interface HuntDef {
   id: string;
@@ -38,6 +76,18 @@ export interface HuntDef {
    *  authoring; when missing, the engine falls back to the biomeTag
    *  → friendly-label table in gameStore. */
   targetLocationName?: string;
+  /** 2026-05-26 OTA-055 — which template the hunt follows. Drives
+   *  the "Stage N/M" total and the stageType label rendering.
+   *  Optional for legacy hunts; missing = no template badge. */
+  templateKind?: 'standard_7' | 'bait_switch_5';
+  /** 2026-05-26 OTA-055 — combined difficulty. Optional but every
+   *  authored hunt today carries it. The ContractsScreen renders
+   *  "Tier 3 — Veteran" with color-coded urgency vs the player's
+   *  current HP / weapon rarity. */
+  difficultyTier?: HuntDifficultyTier;
+  difficultyLabel?: HuntDifficultyLabel;
+  recommendedHp?: number;
+  recommendedWeaponRarity?: HuntWeaponRarity;
   minRep: number;
   factionId: string | null;
   rewardTc: number;
@@ -87,6 +137,45 @@ export function biomeLabel(biomeTag: string): string {
     .split(/[_\s]+/)
     .map((w) => (w ? w[0]!.toUpperCase() + w.slice(1) : ''))
     .join(' ');
+}
+
+/** 2026-05-26 OTA-055 — player-facing label for each stage slot in
+ *  the standardized hunt templates. Rendered as "Stage N/M — <label>"
+ *  in the ContractsScreen. */
+const STAGE_TYPE_LABELS: Record<HuntStageType, string> = {
+  // standard_7
+  inciting_hook: 'The Inciting Hook',
+  first_friction: 'The First Friction',
+  toll: 'The Toll',
+  favor: 'The Favor',
+  revelation: 'The Revelation & Approach',
+  catalyst: 'The Catalyst',
+  apex: 'The Apex',
+  // bait_switch_5
+  urgent_dispatch: 'The Urgent Dispatch',
+  false_summit: 'The False Summit',
+  investigation: 'The Investigation',
+  gauntlet: 'The Gauntlet',
+  // (apex reused — same label both templates)
+};
+export function stageTypeLabel(t: HuntStageType | undefined): string | null {
+  if (!t) return null;
+  return STAGE_TYPE_LABELS[t] ?? null;
+}
+
+/** 2026-05-26 OTA-055 — ordinal rank for the weapon rarities so
+ *  recommendedWeaponRarity can be compared against the player's
+ *  currently-equipped weapon. Same Common→Legendary ladder the
+ *  catalog uses. */
+const RARITY_RANK: Record<HuntWeaponRarity, number> = {
+  Common: 1,
+  Uncommon: 2,
+  Rare: 3,
+  Legendary: 4,
+};
+export function weaponRarityMeets(have: string | undefined, need: HuntWeaponRarity): boolean {
+  const haveRank = have && have in RARITY_RANK ? RARITY_RANK[have as HuntWeaponRarity] : 0;
+  return haveRank >= RARITY_RANK[need];
 }
 
 export const HUNTS = (huntsData as HuntDataShape).hunts;

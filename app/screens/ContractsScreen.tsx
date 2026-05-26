@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal } from 'react-native';
 import { useGameStore } from '../state/gameStore';
-import { findHuntById, HUNTS, checkKindLabel, biomeLabel } from '../engine/hunts';
+import { findHuntById, HUNTS, checkKindLabel, biomeLabel, stageTypeLabel, weaponRarityMeets } from '../engine/hunts';
+import { getItemPreview } from '../components/itemPreview';
 import { findMysteryById, MYSTERIES } from '../engine/mysteries';
 import { findStorylineById, STORYLINES } from '../engine/factionStorylines';
 import { findFactionQuestById, FACTION_QUESTS } from '../engine/factionQuests';
@@ -502,6 +503,28 @@ export function ContractsScreen() {
                     <Text style={styles.cardLocation}>
                       📍 {def.targetLocationName ?? biomeLabel(def.biomeTag)}
                     </Text>
+                    {/* 2026-05-26 OTA-055 — difficulty chip with traffic-
+                        light coloring vs the player's current state.
+                        Green when comfortably above both thresholds,
+                        amber when marginal on one, red when below
+                        both. Aim is "don't die accidentally on a
+                        hunt that wasn't right for your level." */}
+                    {def.difficultyTier && def.recommendedHp && def.recommendedWeaponRarity && (() => {
+                      const hpOk = player ? player.hp >= def.recommendedHp : false;
+                      const mainName = player?.equipped?.main;
+                      const mainRarity = mainName ? (getItemPreview(mainName).rarity ?? undefined) : undefined;
+                      const weaponOk = weaponRarityMeets(mainRarity, def.recommendedWeaponRarity);
+                      const tone = hpOk && weaponOk
+                        ? styles.difficultyChipReady
+                        : hpOk || weaponOk
+                          ? styles.difficultyChipMarginal
+                          : styles.difficultyChipDangerous;
+                      return (
+                        <Text style={[styles.difficultyChip, tone]}>
+                          ⚔️ Tier {def.difficultyTier} — {def.difficultyLabel}  ·  rec. {def.recommendedHp} HP · {def.recommendedWeaponRarity} weapon
+                        </Text>
+                      );
+                    })()}
                     {!open && def.stages[run.stage] && !ready && (
                       <>
                         <Text style={styles.cardBody}>{def.stages[run.stage]!.narration}</Text>
@@ -520,9 +543,20 @@ export function ContractsScreen() {
                         <Text style={styles.expandedBody}>
                           {def.targetLocationName ?? biomeLabel(def.biomeTag)}
                         </Text>
+                        {def.templateKind && (
+                          <>
+                            <Text style={styles.expandedLabel}>Hunt template</Text>
+                            <Text style={styles.expandedBody}>
+                              {def.templateKind === 'standard_7'
+                                ? '7-stage Standard (informant-driven, methodical)'
+                                : '5-stage Bait & Switch (urgent, the target moved)'}
+                            </Text>
+                          </>
+                        )}
                         <Text style={styles.expandedLabel}>Stages</Text>
                         {def.stages.map((s, i) => {
                           const skillLabel = checkKindLabel(s.checkKind);
+                          const slot = stageTypeLabel(s.stageType);
                           return (
                             <View key={i}>
                               <Text
@@ -533,7 +567,7 @@ export function ContractsScreen() {
                                 ]}
                               >
                                 {i < run.stage ? '✓ ' : i === run.stage && !ready ? '→ ' : '  '}
-                                {s.narration}
+                                {slot ? `Stage ${i + 1}/${def.stages.length} — ${slot}: ` : ''}{s.narration}
                               </Text>
                               {skillLabel && (
                                 <Text style={styles.expandedStageHint}>
@@ -1221,7 +1255,14 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   cardFaction: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginBottom: 4 },
-  cardLocation: { color: '#9ec96a', fontSize: 11, marginBottom: 6, letterSpacing: 0.5 },
+  cardLocation: { color: '#9ec96a', fontSize: 11, marginBottom: 4, letterSpacing: 0.5 },
+  // 2026-05-26 OTA-055 — difficulty chip below location, color-coded
+  // vs player state. Same green / amber / red traffic light the rest
+  // of the game uses.
+  difficultyChip: { fontSize: 11, marginBottom: 6, letterSpacing: 0.5, fontWeight: '700' },
+  difficultyChipReady: { color: '#9ec96a' },
+  difficultyChipMarginal: { color: '#c9a86a' },
+  difficultyChipDangerous: { color: '#e07a5f' },
   cardBody: { color: '#cdbf99', fontSize: 12, lineHeight: 17 },
   cardHint: { color: '#c9a86a', fontSize: 11, fontStyle: 'italic', marginTop: 4, letterSpacing: 0.5 },
   cardStageLabel: { color: '#c9a86a', fontSize: 10, letterSpacing: 2, fontWeight: '700', marginTop: 8, marginBottom: 2 },

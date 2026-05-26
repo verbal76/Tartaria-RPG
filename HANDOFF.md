@@ -1,14 +1,14 @@
 # Tartaria Realms — Session Handoff
 
-> **Branch:** `claude/new-session-MvF82` (active work)
+> **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync)
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`
-> **Latest OTA:** `2026-05-23-020` (sim-suite timeout bumps for the v2.4.1 41×41 grid)
-> **Last meaningful change:** `2026-05-23-019` (v2.4.1 map marker overhaul + 8 bundled bug fixes)
-> **Latest APK trigger:** `2026-05-23a` (in `metro.config.js`) — APK **#207** built at runtime `2.4.1`. APK #210 was an unintentional side-firing from the OTA 019 push (test changes in `__tests__/**` aren't in `build-apk.yml`'s `paths-ignore`); same JS bundle, no functional difference. From APK 207 forward all OTAs target runtime `2.4.1`. **Existing v2.201 testers must install APK 207 (or later) to receive any OTA published after `2026-05-23-011`.**
+> **Latest OTA:** `2026-05-26-055` (standardized 7+5 hunt templates + difficulty ratings)
+> **Last meaningful change:** OTAs `2026-05-25-020` → `2026-05-26-055` shipped in this session — engagement-engine wave (043–047), thorough-test wave (048), playtester-feedback wave (049–054), and the standardized hunt template + difficulty rating (055). See section 6.X for the full play-by-play.
+> **Latest APK trigger:** `2026-05-23a` (in `metro.config.js`) — APK **#207** built at runtime `2.4.1`. From APK 207 forward all OTAs target runtime `2.4.1`. **Existing v2.201 testers must install APK 207 (or later) to receive any OTA published after `2026-05-23-011`.**
 > **TypeScript:** 0 errors (`npx tsc --noEmit`)
-> **Tests:** 1351 / 1351 expected on CI after OTA 020's timeout bumps. Local pre-push (OTA 019) saw 1347/1351 with 4 sim-suite timeouts (`thousandDayStressSim` + 3 sibling suites) — all caused by the larger grid taking ~2× more wander steps per cross-grid trip, not by real assertion failures. OTA 020 bumps `twoYearChaosSim` 600→900 s, `yearSimulation` 300→480 s, `movementStress` 180→300 s (and OTA 019 already bumped `thousandDayStressSim` to 900 s).
+> **Tests:** Canary five (`salvagePools`, `theftNarrationGuard`, `itemEffect`, `statTraining`, `areaSearch`) + the 9 new test files shipped this session (`variableRewards`, `chainedNarrative`, `jitTemptation`, `sessionResume`, `mysterySeeds`, `parserFuzz`, `craftRepairFuzz`, `engagementSmoke`) — 81/81 pass on every OTA in the 043–055 sequence. Three pre-existing stress files (`combatStress`, `domesticStress`, `metaNavStress`) OOM-abort in the sandbox — infrastructure ceiling, not a regression. `twoYearChaosSim` has a borderline "geographic loops ≤1" assertion that flakes 1 in 3 runs (RNG variance, not regressions).
 > **Working tree:** clean
-> **Open PR:** #1 — draft, this branch → `main`, stale relative to OTAs 054 → 23-020 (description not refreshed since OTA 053 area)
+> **Open PR:** #1 — draft, this branch → `main`, stale relative to OTAs 020 → 055 (description not refreshed since OTA 053 area; refresh recommended before merge)
 > **Open issues:** 0 (GitHub repo issue tracker)
 
 ---
@@ -138,6 +138,35 @@ docs/                  — pronunciation worksheet (pending player input)
 ## 6. Systems shipped this session (OTA 117 → 2026-05-23-018)
 
 > Numbering reset to `YYYY-MM-DD-NNN` per the OTA convention on 2026-05-22; the post-141 work below carries the new date prefix.
+
+### 2026-05-25 → 2026-05-26 wave (OTAs 020 → 055)
+
+A long sustained session driven by playtest logs. Every OTA cherry-picked from `HaL2001` to `claude/new-session-MvF82` (the live preview channel) so both branches stay in sync. The arc, in shipping order:
+
+**020–032 — Quality-of-life + tutorial freshness.** Auto-publish workflow fixes (020), CHECK FOR OTA UPDATE button restoration (021), title-screen auto-apply + EXIT GAME (022), Investigate modal scrub of the Common section + context-surface chip + floor scavenge (023), quiet failure on the OTA check (024), branded modals replacing native Alerts (025), 10-second OTA-check timeout (026), CLIMB-button greying when topped (027), SALVAGE ALL narration-then-haul ordering (028), `set course` pass-through-hub fix + rest-ambush fire (029), rest always rolls ambush + day/night stealth + travel encounter bump (030), skills growth surfaces (031), tutorial refresh covering the whole new system (032).
+
+**033–037 — Scanner system + investigate depth.** Three scanner families (Pulse / Aetheric / Mud) with distinct biases, recipes, gated noun pools, tiered loot tables, and per-bias narration (033). Branded modal pass on Settings (034). Outpost-aware UX — first-arrival Arbiter hint, "Leave the outpost?" travel confirm, map auto-focus when in a hub (035). Theft-line trigger logging (036). SALVAGE ALL never silent + `relic_site` pool for hub nouns the modal could surface but no pool covered (037).
+
+**038–042 — Investigate-feels-good + UI polish.** Full SALVAGE_PATTERN pool coverage with invariant tests so any future keyword without a pool fails CI (038). Investigate: wider searchable noun pool, 35%/40%-60% rates, +trinket drop, +first-investigate guarantee (039). Salvage can drop character-story collectibles (040). Four playtester-feedback fixes: faction standings on Character Screen, vendor materialization on travel-out, hook-revealed nouns surface as salvage chips, hook plant tied to searched noun (041). SALVAGE button neutral-when-empty (042).
+
+**043–047 — Engagement-engines wave** (per `/root/.claude/plans/so-i-believe-the-unified-wigderson.md`). Five distinct mechanics shipped one OTA each, each with its own test + canary regression:
+- **043** — variable-reward lotteries on cardinal step (10%) + rest (30% "while you slept" pull from a 12-line pool).
+- **044** — chained narrative on every contract turn-in (hunt / mystery / storyline / faction_quest) via new `plantNextContractHint()` helper, both vendor-proximity and Contracts-UI paths.
+- **045** — just-in-time temptation when depleted (HP <25% / stam <20% / TC <30): wasteland-encounter picker biases 2× toward treasure / mini_dungeon archetypes.
+- **046** — "while you were away" beat on slot resume (≥6h real-time elapsed since `lastSessionEndedAt`), 12-line pool of faction-drift / vendor-restock / whisper-aging / Arbiter-recall hints.
+- **047** — curiosity-gap mystery seeds: new 50-line `mystery-seeds.json`, 8% per investigate, PURE FLAVOR (does NOT mark `producedSubstantive` so the noun stays repeatable for other verbs).
+
+**048 — Thorough-testing wave.** Parser fuzz (182 misspelled / punctuation-soup / emoji / prompt-injection-style inputs — zero throws), craft / repair / recipe fuzz, engagement-engine cross-interaction smoke. Confirmed OTA-040 collectible substitution fires under sustained salvage; confirmed OTA-043 step-trinket lottery doesn't collide with OTA-045 encounter spawn.
+
+**049–054 — Playtester-feedback rapid-response.** Craft recipe stats visible (049 — playtester: "I have the option to make six different weapons but I don't know which one's the strongest"). OTA-043 pull also fires on the parser-routed rest (050 — playtester's "60 rests, nothing" miss-wire fix; the dead store-method rest() was where I'd added the pull). City rests now roll ambush at 8% with four new urban-themed encounters (alley cutpurse / Order zealot intrusion / drunk Mud Giant / Reclaimer claim dispute) (051 — playtester wanted gangs/cultists in hubs). Save & Exit silences the Arbiter immediately via `TTSManager.stopAndClear()` (052). Hunt target-location chips + per-stage skill hints + accept-time "Travel to X to begin" Arbiter line (053). Field auto-grant narration made loud + 3-beat (no more silent quest accepts) + ABANDON action across all four contract types (054 — playtester: "I didn't even know I had the hunt").
+
+**055 — Standardized 7+5 hunt templates + difficulty rating (this push).** Two templates: `standard_7` (inciting_hook → first_friction → toll → favor → revelation → catalyst → apex) and `bait_switch_5` (urgent_dispatch → false_summit → investigation → gauntlet → apex). All 6 existing hunts refactored: Bog Dragon / Mud Titan / Sludge Behemoth / Iron Titan = standard_7; Mud Siren Queen + Tartarian Reaver = bait_switch_5. Each hunt now carries `difficultyTier` (1-4: Greenhorn / Seasoned / Veteran / Apex), `recommendedHp`, `recommendedWeaponRarity`. ContractsScreen renders a traffic-light-colored difficulty chip (green / amber / red vs player's current HP + equipped-weapon rarity) and stage labels (`Stage 3/7 — The Toll`). On accept, the Arbiter warns when the player is under-equipped: "This one will kill you as you are right now. Train up, gear up, or come back with friends." 38 newly-authored stage entries across the 6 hunts.
+
+**Deferred from this wave (tracked in section 7):**
+- Mechanical informant-NPC + catalyst-item gates (currently narrative only — stages still auto-advance on checkKind match)
+- 7/5 templates not yet extended to mysteries or storylines
+- "Geographic loops ≤1" assertion in `twoYearChaosSim` is RNG-flaky (pre-existing)
+- The OOM-aborting stress trio (`combatStress` / `domesticStress` / `metaNavStress`) needs a periodic-log-trim in the harness to run in this sandbox
 
 ### v2.4.1 baseline shipped (OTAs 23-012 → 23-018)
 
@@ -358,7 +387,9 @@ Seven parallel Explore agents audited the codebase (combat, exploration, vendor/
 
 ### Player-requested features (engineering work to do)
 
-- **Salvage quick-action button** — explicit player request from OTA 141 log. Symmetric with Search/Approach: chip-tap modal listing scene nouns that can be salvaged (constructs, wrecks, automatons, drone husks). Needs new modal component + chip pool source + wiring in `InputBox`. Defer-until-confirmed by player.
+- **[CARRIED FROM OTA-055] Mechanical informant + catalyst gates on hunts.** OTA-055 shipped the standardized 7-stage (informant-driven) and 5-stage (bait-switch) hunt templates as narrative + UI only. Stages still auto-advance on `checkKind` skill match — the informant isn't an actual NPC the player has to find at a specific location, the catalyst isn't an item the engine checks for at the apex, the transit encounters at stage 2/5 aren't forced spawns. The narrative + difficulty warning gives 90% of player-facing value; mechanical gates are the engine plumbing follow-up. ~4-6 hours of work — new `HuntDef` fields (`informantNpc`, `informantLocationId`, `catalystItemName`), advance-gate logic per stageType, scene-injection for forced transit ambushes.
+- **[CARRIED FROM OTA-055] 7/5 templates for mysteries + storylines.** Currently only hunts have the templated arc. Mysteries (6 in catalog) and storylines (4+ per faction) still use freeform stages. Mostly authoring work — engine support is mostly there since stage_type / template_kind types are generic, would just need a parallel set of labels per quest kind. Defer until a playtester surfaces the inconsistency.
+- **Salvage quick-action button** — explicit player request from OTA 141 log. Symmetric with Search/Approach: chip-tap modal listing scene nouns that can be salvaged (constructs, wrecks, automatons, drone husks). Needs new modal component + chip pool source + wiring in `InputBox`. **PARTIALLY SHIPPED** in the 020–055 wave (SALVAGE button on quick row + modal + SALVAGE ALL exist now); the deeper "treat as a first-class chip-tap surface like Approach" is what remains. Probably moot — verify with user.
 
 ### Player action needed
 

@@ -9552,6 +9552,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'arbiter',
         `The Arbiter taps the poster. "Travel to ${locLabel} to begin. The ${hunt.targetEnemyName} won't come to you."`,
       );
+      // 2026-05-26 OTA-055 — difficulty warning. If the player is
+      // both under-HP and under-weapon, the Arbiter calls it out
+      // before they walk into the boss. Doesn't block accept — the
+      // player can still take the contract and try — but they
+      // can't say nobody warned them.
+      if (hunt.recommendedHp && hunt.recommendedWeaponRarity) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { weaponRarityMeets: huntWeaponRarityMeets } = require('../engine/hunts');
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { getItemPreview: huntGetItemPreview } = require('../components/itemPreview');
+        const livePlayerHunt = get().player;
+        const hpOk = !!livePlayerHunt && livePlayerHunt.hp >= hunt.recommendedHp;
+        const mainName = livePlayerHunt?.equipped?.main;
+        const mainRarity = mainName ? (huntGetItemPreview(mainName).rarity ?? undefined) : undefined;
+        const weaponOk = huntWeaponRarityMeets(mainRarity, hunt.recommendedWeaponRarity);
+        if (!hpOk && !weaponOk) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter looks at you straight. "This one will kill you as you are right now. Train up, gear up, or come back with friends. Recommended: ${hunt.recommendedHp} HP and an ${hunt.recommendedWeaponRarity} weapon. You sit at ${livePlayerHunt?.hp ?? '?'} HP."`,
+          );
+        } else if (!hpOk || !weaponOk) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter taps the table. "Going to be tight. Recommended ${hunt.recommendedHp} HP and an ${hunt.recommendedWeaponRarity} weapon. ${!hpOk ? "Your HP is short of that — " : ''}${!weaponOk ? "Your weapon's a tier below — " : ''}take a beat before you commit."`,
+          );
+        }
+      }
     }
     set((s) =>
       s.player
