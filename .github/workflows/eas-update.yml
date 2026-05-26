@@ -6,6 +6,7 @@ on:
       - main
       - 'release/**'
       - 'claude/**'
+      - 'HaL2001'
     paths-ignore:
       - 'package.json'
       - 'package-lock.json'
@@ -23,12 +24,14 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: 'EAS update channel/branch to publish to'
+        description: 'EAS update channel/branch to publish to (ignored — multi-channel publish runs regardless)'
         required: false
         default: 'preview'
         type: choice
         options:
           - preview
+          - hal2001
+          - ios-preview
           - production
           - development
 
@@ -83,98 +86,142 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
-      - name: Publish OTA update to Tartaria Realms
+      - name: Publish OTA update to Tartaria Realms (multi-channel)
         env:
           EXPO_TOKEN: ${{ secrets.TARTARIATWO }}
         run: |
           set -euo pipefail
 
-          CHANNEL="${{ github.event.inputs.branch || 'preview' }}"
+          # 2026-05-26 — multi-channel publish. Per playtester
+          # request: every OTA push should land on hal2001 (Android
+          # experimental), preview (Android live testers), and
+          # ios-preview (queued for the iOS Internal Distribution
+          # build that's still in the Apple Dev enrolment window).
+          # iOS publish is best-effort (continue-on-error) because
+          # no iOS bundle is being consumed yet; a publish-side
+          # iOS issue should warn-not-fail the Android publishes.
           BRANCH="${GITHUB_REF_NAME}"
           SHORT_SHA="${GITHUB_SHA::7}"
           MSG="Tartaria Realms OTA — ${BRANCH}@${SHORT_SHA} (run #${{ github.run_number }})"
-
-          echo "=== OTA publish — pre-flight ==="
-          echo "Channel:      $CHANNEL"
-          echo "Message:      $MSG"
-          echo "Project id:   $(node -p "require('./app.json').expo.extra.eas.projectId")"
           APP_VERSION=$(node -p "require('./app.json').expo.version")
           RT_POLICY=$(node -p "require('./app.json').expo.runtimeVersion.policy || ''")
+          PROJECT_ID=$(node -p "require('./app.json').expo.extra.eas.projectId")
+
+          echo "=== OTA publish — pre-flight ==="
+          echo "Branch:       $BRANCH"
+          echo "Message:      $MSG"
+          echo "Project id:   $PROJECT_ID"
           echo "App version:  $APP_VERSION"
           echo "RT policy:    $RT_POLICY"
-          # With policy 'appVersion' the runtime version resolves to app.json's
-          # version. The APK on device was built with the same value, so this
-          # is what OTAs must publish at to actually land.
+          echo "Channels:     hal2001 (android) + preview (android) + ios-preview (ios, best-effort)"
+          # With policy 'appVersion' the runtime version resolves to
+          # app.json's version. The APK on device was built with the
+          # same value, so this is what OTAs must publish at to
+          # actually land.
           echo "Expected runtimeVersion the APK is asking for: $APP_VERSION"
           echo "================================="
 
-          # Force --platform android — we don't ship iOS yet, and iOS asset
-          # quirks can fail the whole update otherwise.
-          eas update \
-            --branch "$CHANNEL" \
-            --message "$MSG" \
-            --platform android \
-            --non-interactive \
-            --json \
-            > update-result.json
+          # Helper — publish to one (channel, platform) and assert
+          # the runtime version matches app.json. The third arg
+          # marks the publish as best-effort: failures warn and
+          # return 0 instead of failing the job. Used for the
+          # iOS publish until the iOS build lands.
+          publish_channel() {
+            local channel="$1"
+            local platform="$2"
+            local optional="${3:-false}"
+            local result_file="result-${channel}-${platform}.json"
 
-          # CHANNEL → BRANCH MAPPING — the device sends 'expo-channel-name:
-          # preview' and EAS routes that to whichever branch the channel is
-          # mapped to. If no mapping exists (or it points to the wrong
-          # branch), the manifest endpoint returns no compatible update and
-          # expo-updates throws ERR_UPDATES_CHECK on the device — even though
-          # the publish itself succeeded. We ensure the mapping every run.
-          # Idempotent: if it already matches, EAS reports no change.
-          echo "=== Channel mapping check ==="
-          set +e
-          eas channel:view "$CHANNEL" --non-interactive > channel-info.txt 2>&1
-          VIEW_EXIT=$?
-          set -e
-          if [ $VIEW_EXIT -eq 0 ]; then
-            echo "Channel '$CHANNEL' exists:"
-            cat channel-info.txt
-          else
-            echo "Channel '$CHANNEL' does not exist — creating."
-            eas channel:create "$CHANNEL" --non-interactive 2>&1 || echo "::warning::channel:create returned non-zero (channel may already exist)"
-          fi
-          echo "Binding channel '$CHANNEL' → branch '$CHANNEL'..."
-          eas channel:edit "$CHANNEL" --branch "$CHANNEL" --non-interactive 2>&1 \
-            || echo "::warning::channel:edit failed — mapping may need manual fix in the EAS dashboard"
-          echo "============================"
+            echo ""
+            echo "--- Channel '$channel' ($platform) ---"
 
-          echo "=== OTA publish — result ==="
-          cat update-result.json | node -e '
-            const r = JSON.parse(require("fs").readFileSync(0, "utf8"));
-            const arr = Array.isArray(r) ? r : [r];
-            for (const u of arr) {
-              console.log("  id:              " + (u.id || u.updateId || "?"));
-              console.log("  group:           " + (u.group || "?"));
-              console.log("  platform:        " + (u.platform || "?"));
-              console.log("  runtimeVersion:  " + (u.runtimeVersion || "?"));
-              console.log("  branch:          " + (u.branch || (u.branchName) || "?"));
-              console.log("  manifestPermalink: " + (u.manifestPermalink || "?"));
-            }
-          '
-          echo "============================"
+            set +e
+            eas update \
+              --branch "$channel" \
+              --message "$MSG" \
+              --platform "$platform" \
+              --non-interactive \
+              --json \
+              > "$result_file"
+            local update_exit=$?
+            set -e
 
-          # GUARDRAIL — assert the published runtimeVersion matches app.json's
-          # local version. With eas.json appVersionSource=local this is the
-          # contract the APK relies on. If they drift, FAIL the build so we
-          # see it instead of an OTA that publishes silently to a runtime
-          # the installed APK doesn't request.
-          PUBLISHED_RT=$(node -e '
-            const r = JSON.parse(require("fs").readFileSync("update-result.json", "utf8"));
-            const arr = Array.isArray(r) ? r : [r];
-            console.log(arr[0] && arr[0].runtimeVersion || "");
-          ')
-          if [ -z "$PUBLISHED_RT" ]; then
-            echo "::error::OTA publish returned no runtimeVersion. Publish probably did not land."
-            exit 1
-          fi
-          if [ "$PUBLISHED_RT" != "$APP_VERSION" ]; then
-            echo "::error::Published runtimeVersion '$PUBLISHED_RT' does not match app.json version '$APP_VERSION'."
-            echo "::error::The installed APK requests runtimeVersion '$APP_VERSION' and will silently reject this update."
-            echo "::error::Fix: either bump app.json version + rebuild APK, or align eas.json appVersionSource."
-            exit 1
-          fi
-          echo "✓ Runtime version match: APK requests $APP_VERSION, OTA published at $PUBLISHED_RT."
+            if [ $update_exit -ne 0 ]; then
+              if [ "$optional" = "true" ]; then
+                echo "::warning::Optional publish to channel '$channel' ($platform) failed (exit $update_exit). Continuing — Android channels still publish."
+                return 0
+              fi
+              echo "::error::Publish to channel '$channel' ($platform) failed (exit $update_exit)."
+              return $update_exit
+            fi
+
+            # Channel-to-branch mapping. EAS Update routes a device's
+            # 'expo-channel-name: X' header to whichever branch the
+            # channel X is mapped to. We ensure mapping every run —
+            # idempotent if it already matches.
+            set +e
+            eas channel:view "$channel" --non-interactive > /dev/null 2>&1
+            local view_exit=$?
+            set -e
+            if [ $view_exit -ne 0 ]; then
+              echo "Channel '$channel' does not exist — creating."
+              eas channel:create "$channel" --non-interactive 2>&1 \
+                || echo "::warning::channel:create returned non-zero for '$channel' (may already exist)"
+            fi
+            eas channel:edit "$channel" --branch "$channel" --non-interactive 2>&1 \
+              || echo "::warning::channel:edit failed for '$channel' — mapping may need manual fix in the EAS dashboard"
+
+            # Echo per-publish result summary (id, group, runtime).
+            node -e "
+              const r = JSON.parse(require('fs').readFileSync('$result_file', 'utf8'));
+              const arr = Array.isArray(r) ? r : [r];
+              for (const u of arr) {
+                console.log('  id:              ' + (u.id || u.updateId || '?'));
+                console.log('  group:           ' + (u.group || '?'));
+                console.log('  platform:        ' + (u.platform || '?'));
+                console.log('  runtimeVersion:  ' + (u.runtimeVersion || '?'));
+                console.log('  branch:          ' + (u.branch || u.branchName || '?'));
+                console.log('  manifestPermalink: ' + (u.manifestPermalink || '?'));
+              }
+            "
+
+            # Runtime-version guard. If the published rt doesn't match
+            # app.json's version, the installed APK silently rejects
+            # the update — fail loud so we see it.
+            local published_rt
+            published_rt=$(node -e "
+              const r = JSON.parse(require('fs').readFileSync('$result_file', 'utf8'));
+              const arr = Array.isArray(r) ? r : [r];
+              console.log(arr[0] && arr[0].runtimeVersion || '');
+            ")
+            if [ -z "$published_rt" ]; then
+              if [ "$optional" = "true" ]; then
+                echo "::warning::Optional channel '$channel' ($platform): publish returned no runtimeVersion."
+                return 0
+              fi
+              echo "::error::Channel '$channel' ($platform): publish returned no runtimeVersion."
+              return 1
+            fi
+            if [ "$published_rt" != "$APP_VERSION" ]; then
+              if [ "$optional" = "true" ]; then
+                echo "::warning::Optional channel '$channel' ($platform): rt='$published_rt' != app='$APP_VERSION'."
+                return 0
+              fi
+              echo "::error::Channel '$channel' ($platform): published rt='$published_rt' != app='$APP_VERSION'."
+              echo "::error::The installed APK requests runtimeVersion '$APP_VERSION' and will silently reject this update."
+              return 1
+            fi
+            echo "✓ Channel '$channel' ($platform): published at runtimeVersion $published_rt."
+          }
+
+          # Three publishes, sequential. Android channels are
+          # mandatory — preview is the live playtester channel,
+          # hal2001 is the experimental Android track. iOS publish
+          # is best-effort until the iOS build lands and a tester
+          # device exists on the ios-preview channel.
+          publish_channel "preview"     "android" false
+          publish_channel "hal2001"     "android" false
+          publish_channel "ios-preview" "ios"     true
+
+          echo ""
+          echo "=== Multi-channel publish complete ==="
