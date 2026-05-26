@@ -160,14 +160,15 @@ export function fineProgressBar(player: PlayerCharacter, stat: StatKey): string 
  *  rough frequency (most-common first). Every stat has at least one
  *  entry; we add to these lists as new train surfaces land.
  *
- *  2026-05-25 expansion (playtester spec):
- *    STR — kick, punch, climbing, 20+ items in your pouch
- *    DEX — any stealing, stealth approach, climbing
- *    INT — salvaging large named items, using Aetheric powers
- *    WIS — cardinal travel, NPC interaction, hearing a whisper,
- *          completing a quest
- *    CHA — NPC interaction, wearing named armor / wielding named
- *          weapon (passive boost), completing a storyline section
+ *  2026-05-26 OTA-057 — CHA/WIS conceptual split. CHA is the active
+ *  social push (initiating a buy/sell/gift, talking the agent into
+ *  handing you the contract). WIS is the passive perception payoff
+ *  (the lesson you carry away on completion, the whisper you
+ *  overheard, the new ground you covered). Buying/selling/gifting/
+ *  accepting no longer double-train both stats.
+ *  Cardinal-travel WIS is gated on tile novelty (sliding window of
+ *  20 recent tiles) so pacing between two safe screens no longer
+ *  trains it.
  */
 export const SKILL_ACTIVITIES: Record<StatKey, string[]> = {
   strength: [
@@ -176,7 +177,7 @@ export const SKILL_ACTIVITIES: Record<StatKey, string[]> = {
     'Two-handed weapon swings',
     'Climbing (per tier)',
     'Heavy salvage / breaking',
-    'Carrying 20+ items in your pouch (passive)',
+    'Carrying 20+ items in your pouch (passive, on new ground)',
   ],
   dexterity: [
     'Climbing (per tier)',
@@ -193,17 +194,19 @@ export const SKILL_ACTIVITIES: Record<StatKey, string[]> = {
     'Solving investigate puzzles',
   ],
   wisdom: [
-    'Cardinal-direction travel',
-    'Any NPC interaction',
+    'Travelling to NEW ground (cardinal travel onto a fresh tile)',
     'Hearing a whisper',
-    'Completing a hunt or mystery',
+    'Completing a hunt, mystery, or storyline',
+    'Finishing a faction contract',
     'Resting after combat',
     'Surviving wasteland encounters',
   ],
   charisma: [
-    'Any NPC interaction (buy / sell / gift / talk)',
-    'Completing a storyline section',
-    'Wearing named armor / wielding named weapon (passive)',
-    'Accepting contracts',
+    'Buying from a vendor',
+    'Selling to a vendor',
+    'Gifting to a vendor',
+    'Accepting a hunt / mystery / storyline / faction contract',
+    'Wearing named armor / wielding named weapon (passive, on new ground)',
+    'Completing a storyline chapter',
   ],
 };

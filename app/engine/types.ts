@@ -643,6 +643,16 @@ export interface PlayerCharacter {
    *  one "while you were away" beat so the world feels like it has
    *  breathed without the player. */
   lastSessionEndedAt?: number;
+  /** 2026-05-26 OTA-057 — sliding window of recent tile keys
+   *  (`${locationId}:${mapX}:${mapY}`), capped at 20 entries.
+   *  stepDirection gates the WIS train + the STR-passive train on
+   *  tile novelty against this window: a step landing on a tile
+   *  already in history doesn't train. Kills the pacing-between-
+   *  two-screens WIS exploit (both tiles always in the window, no
+   *  train) while leaving genuine long-traverse exploration to
+   *  still train. Optional — older saves default to empty so the
+   *  first 20 steps after load are all novel by construction. */
+  recentTileHistory?: string[];
   /** IDs of faction quests the player has accepted but not finished.
    *  LEGACY: pre-refactor saves used this flat string array. New saves
    *  populate `activeFactionQuests` (with stage tracking) instead.
