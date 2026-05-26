@@ -303,6 +303,20 @@ export function TitleScreen() {
   // (~2KB on iOS Mail, varies on Android Gmail) — character logs
   // run 50-200KB and would silently truncate inline. The player
   // pastes the report into the email composer before sending.
+  //
+  // OTA-064 — playtester report: "it didn't get the whole log, it
+  // was truncated." Gmail compose silently chops a single paste at
+  // ~32-64KB; with the full chronological log inline, the OLDEST
+  // entries land in the email and the NEWEST (= what the player
+  // just hit) get dropped. Fixed by:
+  //   (1) Reversing the log so the newest entry is at the top.
+  //   (2) Capping the log section at LOG_CHARS_CAP chars so the
+  //       whole report fits in one Gmail paste. Bug reports get
+  //       filed seconds after the issue, so the newest tail is
+  //       what matters; older entries are intentionally trimmed.
+  //   (3) Rewriting the mailto body so the paste-instruction is
+  //       unmistakable (previous wording was a parenthetical that
+  //       at least one tester missed entirely).
   const sendBugReport = async (args: {
     slot: SlotSummary | null;
     description: string;
@@ -311,15 +325,49 @@ export function TitleScreen() {
     const charName = slot?.playerName ?? '(general / no character)';
     const subject = `Bug Report${slot ? ` — ${slot.playerName}` : ''}`;
 
+    // ~40KB log target. Empirically Gmail Android compose accepts
+    // a single paste up to ~64KB before silently truncating, and
+    // iOS Mail.app caps lower at ~50KB. 40KB leaves comfortable
+    // headroom for the ~2KB of description + device-summary
+    // wrapper while still being "overkill" for a typical
+    // session-length log (the previous playtester's pasted log
+    // was 6KB; even a long session rarely tops 30KB).
+    const LOG_CHARS_CAP = 40_000;
+
     // Pull device summary synchronously, then the slot log (async).
     const deviceBlock = buildBasicDeviceSummary();
     let logBlock = '(no character selected — no log attached)';
     if (slot) {
       try {
         const raw = await readSlotLog(slot.slotId);
-        logBlock = raw && raw.length > 0
-          ? raw
-          : `(log empty for ${slot.playerName})`;
+        if (raw && raw.length > 0) {
+          // Reverse line order: split on newline, reverse, then
+          // accumulate from the newest end until we'd cross the
+          // cap. The last line of the raw log is sometimes an
+          // empty string (trailing \n) — filter it out so the
+          // first reversed line is a real entry.
+          const lines = raw.split('\n').filter((l) => l.length > 0);
+          const totalLines = lines.length;
+          lines.reverse();
+          const accLines: string[] = [];
+          let accChars = 0;
+          let truncated = false;
+          for (const line of lines) {
+            // +1 accounts for the newline we re-add on join.
+            if (accChars + line.length + 1 > LOG_CHARS_CAP) {
+              truncated = true;
+              break;
+            }
+            accLines.push(line);
+            accChars += line.length + 1;
+          }
+          const header = truncated
+            ? `(Newest entry at top — showing the most recent ${accLines.length} of ${totalLines} entries; older trimmed to fit a single email paste)`
+            : `(Newest entry at top — full log, ${accLines.length} entries)`;
+          logBlock = `${header}\n\n${accLines.join('\n')}`;
+        } else {
+          logBlock = `(log empty for ${slot.playerName})`;
+        }
       } catch {
         logBlock = `(log read failed for ${slot.playerName})`;
       }
@@ -340,7 +388,7 @@ export function TitleScreen() {
       `--- DEVICE / BUILD ---`,
       deviceBlock,
       ``,
-      `--- CHARACTER LOG ---`,
+      `--- CHARACTER LOG (newest first) ---`,
       logBlock,
       ``,
       `=== END REPORT ===`,
@@ -356,13 +404,31 @@ export function TitleScreen() {
       // a manual summary.
     }
 
-    // Mailto body is intentionally tiny — the real report is on
-    // the clipboard. The body just tells the player what to do
-    // next so they don't send an empty email.
+    // Mailto body intentionally explicit: previous wording was a
+    // one-line parenthetical that at least one playtester
+    // (correctly) treated as decoration and sent the email with
+    // no paste. The new body is a structured READ ME FIRST with
+    // a clear paste-below marker, kept under ~1KB so iOS Mail
+    // doesn't truncate the instructions themselves.
     const mailtoBody =
-      `(Bug report copied to clipboard — paste here, then send)\n\n` +
+      `READ ME FIRST\n` +
+      `=============\n` +
+      `Your full bug report (description, device info, and most-\n` +
+      `recent log entries — newest at top) has been COPIED TO\n` +
+      `YOUR CLIPBOARD. Before sending this email:\n` +
+      `\n` +
+      `  1. Long-press anywhere below the "PASTE BELOW" line\n` +
+      `  2. Tap PASTE\n` +
+      `  3. Then tap Send\n` +
+      `\n` +
+      `Without the paste, this email arrives empty and we can't\n` +
+      `track the bug down.\n` +
+      `\n` +
       `Character: ${charName}\n` +
-      `OTA: ${OTA_BUILD_ID}\n`;
+      `OTA build: ${OTA_BUILD_ID}\n` +
+      `\n` +
+      `--- PASTE BELOW THIS LINE ---\n` +
+      `\n`;
     const mailto =
       `mailto:hotatticgames@gmail.com` +
       `?subject=${encodeURIComponent(subject)}` +

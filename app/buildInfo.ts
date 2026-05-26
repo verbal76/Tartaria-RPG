@@ -125,4 +125,25 @@
 //       feeds the bug-report email body so triage from a report
 //       starts with identical identifying info to what the
 //       player sees in About.
-export const OTA_BUILD_ID = '2026-05-26-063';
+//
+// 2026-05-26 OTA-064 — Bug-report log truncation + clearer paste
+// instructions. Playtester filed an OTA-063 bug report and Gmail
+// silently truncated the paste; the entries the player actually
+// wanted to flag (the most recent ones) were the ones dropped.
+//   (1) The log section in the clipboard report is now REVERSED
+//       (newest entry at top) and capped at 40_000 chars so the
+//       whole report fits in a single Gmail compose paste. Older
+//       entries are intentionally trimmed — bug reports get
+//       filed seconds after the issue, so the newest tail is the
+//       relevant evidence. Header line in the report announces
+//       the order ("Newest entry at top — X of Y entries").
+//   (2) Mailto body rewritten as a structured READ ME FIRST with
+//       a numbered paste sequence and an explicit "PASTE BELOW
+//       THIS LINE" marker. Old wording was a one-line
+//       parenthetical that at least one tester missed entirely
+//       and sent the email with no paste.
+//   (3) BugReportModal helper text updated to match: "your
+//       description, device info, and the most recent log
+//       entries (newest first) will be copied" — sets the
+//       expectation that the log is trimmed-newest, not full.
+export const OTA_BUILD_ID = '2026-05-26-064';

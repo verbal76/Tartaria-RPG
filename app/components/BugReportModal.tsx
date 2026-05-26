@@ -76,9 +76,10 @@ export function BugReportModal({ visible, slots, onCancel, onSend }: Props) {
 
                 <Text style={styles.body}>
                   Pick the character the bug happened on, then describe
-                  what went wrong. Your full character log + device info
-                  will be copied to your clipboard for you to paste into
-                  the email.
+                  what went wrong. Your description, device info, and
+                  the most recent log entries (newest first) will be
+                  copied to your clipboard — paste them into the email
+                  body before sending.
                 </Text>
 
                 <Text style={styles.sectionLabel}>CHARACTER</Text>
