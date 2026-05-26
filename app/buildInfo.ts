@@ -146,4 +146,25 @@
 //       description, device info, and the most recent log
 //       entries (newest first) will be copied" — sets the
 //       expectation that the log is trimmed-newest, not full.
-export const OTA_BUILD_ID = '2026-05-26-064';
+//
+// 2026-05-26 OTA-065 — INVITE PLAYTESTER button on the
+// TitleScreen bottom bar, next to REPORT BUG and EXIT GAME.
+//   (1) New InvitePlaytesterModal collects a friend's Gmail
+//       address with @gmail.com validation (allows dots / plus-
+//       tags / digits in the local part per Gmail's own rules).
+//       Submit opens mailto:hotatticgames@gmail.com with
+//       subject "New Playtester" and a body containing the
+//       suggested address + requester's OTA build + ISO
+//       timestamp for whitelisting context.
+//   (2) Bottom bar restructured: footer-text left, action-
+//       button row right (INVITE / REPORT BUG / EXIT GAME).
+//       Three tones — cool-blue INVITE, amber REPORT BUG, red
+//       EXIT GAME — keep the buttons glanceable. Per-button
+//       paddingHorizontal lowered from 12 to 10 so all three
+//       fit on a 360dp Android screen with the footer text.
+//   (3) Owner workflow: read the email at hotatticgames@gmail
+//       .com, whitelist the address in the EAS / playtester
+//       tooling, and reply directly to the requester with the
+//       install link. Advertised as up-to-24-hours, usually
+//       within the hour.
+export const OTA_BUILD_ID = '2026-05-26-065';

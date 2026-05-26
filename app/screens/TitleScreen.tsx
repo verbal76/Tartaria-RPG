@@ -32,6 +32,7 @@ import { useGameStore } from '../state/gameStore';
 import { SwipeableRow } from '../components/SwipeableRow';
 import { BrandedModal } from '../components/BrandedModal';
 import { BugReportModal } from '../components/BugReportModal';
+import { InvitePlaytesterModal } from '../components/InvitePlaytesterModal';
 import { buildBasicDeviceSummary } from '../diagnostics/aboutSummary';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
@@ -190,6 +191,12 @@ export function TitleScreen() {
   // confirms the clipboard was populated.
   const [bugReportOpen, setBugReportOpen] = useState(false);
   const [bugReportSent, setBugReportSent] = useState(false);
+  // OTA-065 — invite-playtester modal state. Same UX pattern as
+  // bug-report: open modal, collect input, open mailto, flash
+  // a "✓ SENT" confirmation on the button so the player has
+  // visual feedback that the draft actually opened.
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteSent, setInviteSent] = useState(false);
   // v2.4.1 (OTA 051) — auto-check for an OTA on every TitleScreen
   // mount. Save-and-exit drops the player back here, which re-mounts
   // TitleScreen and re-fires this effect — so the player picks up
@@ -444,6 +451,44 @@ export function TitleScreen() {
     setBugReportOpen(false);
     setBugReportSent(true);
     setTimeout(() => setBugReportSent(false), 2200);
+  };
+
+  // OTA-065 — invite-playtester send handler. Opens a mailto to
+  // hotatticgames@gmail.com with subject "New Playtester" and a
+  // small body containing the suggested address + the requester's
+  // OTA build so the owner has version context when whitelisting.
+  // No clipboard staging — the body fits comfortably under iOS
+  // Mail's mailto body cap. Owner replies with the install link
+  // (up to 24 hours per the modal copy, usually within the hour).
+  const sendPlaytesterInvite = async (gmail: string): Promise<void> => {
+    const subject = 'New Playtester';
+    const body =
+      `Please add the following Gmail address to the Tartaria\n` +
+      `Realms playtester whitelist:\n` +
+      `\n` +
+      `  ${gmail}\n` +
+      `\n` +
+      `Requested at: ${new Date().toISOString()}\n` +
+      `Requester's OTA build: ${OTA_BUILD_ID}\n` +
+      `\n` +
+      `(Sent from the INVITE PLAYTESTER button on the Tartaria\n` +
+      `title screen.)\n`;
+    const mailto =
+      `mailto:hotatticgames@gmail.com` +
+      `?subject=${encodeURIComponent(subject)}` +
+      `&body=${encodeURIComponent(body)}`;
+
+    try {
+      await Linking.openURL(mailto);
+    } catch {
+      // No mail client installed — silent. The ✓ SENT flash below
+      // still fires; the player will notice their email app didn't
+      // open and can reach out manually.
+    }
+
+    setInviteOpen(false);
+    setInviteSent(true);
+    setTimeout(() => setInviteSent(false), 2200);
   };
 
   const renderItem = ({ item }: { item: SlotSummary }) => (
@@ -752,33 +797,56 @@ export function TitleScreen() {
       </TouchableOpacity>
       <View style={styles.bottomBar}>
         <Text style={styles.footer}>v{APP_VERSION}  /  2148</Text>
-        {/* OTA-063 — REPORT BUG button. Same footer-bar visual
-            weight as EXIT GAME because both are peripheral, not
-            primary, actions. Opens the BugReportModal which
-            collects a character + description and stages the
-            full report on the clipboard before opening mailto. */}
-        <TouchableOpacity
-          style={styles.bugReportBtn}
-          activeOpacity={0.7}
-          onPress={() => setBugReportOpen(true)}
-        >
-          <Text style={styles.bugReportBtnText}>
-            {bugReportSent ? '✓ COPIED' : 'REPORT BUG'}
-          </Text>
-        </TouchableOpacity>
-        {/* 2026-05-25 — EXIT GAME button. Per playtester request:
-            full app exit from the title screen (Android only — iOS
-            App Store guidelines forbid programmatic exit, but RN's
-            BackHandler.exitApp() is the standard call and is a
-            no-op safely on iOS). Confirm modal prevents an
-            accidental tap mid-character-creation. */}
-        <TouchableOpacity
-          style={styles.exitBtn}
-          activeOpacity={0.7}
-          onPress={() => setPendingAction({ kind: 'exit' })}
-        >
-          <Text style={styles.exitBtnText}>EXIT GAME</Text>
-        </TouchableOpacity>
+        {/* OTA-065 — three-button right-aligned cluster (INVITE,
+            REPORT BUG, EXIT GAME) to keep the layout coherent
+            after adding the invite button. Bottom bar uses
+            space-between with footer text on the left and this
+            row on the right. */}
+        <View style={styles.bottomBtnRow}>
+          {/* OTA-065 — INVITE PLAYTESTER button. Opens the
+              InvitePlaytesterModal which collects a Gmail
+              address and opens a mailto draft to
+              hotatticgames@gmail.com with subject "New
+              Playtester" for owner-side whitelisting. */}
+          <TouchableOpacity
+            style={styles.inviteBtn}
+            activeOpacity={0.7}
+            onPress={() => setInviteOpen(true)}
+          >
+            <Text style={styles.inviteBtnText}>
+              {inviteSent ? '✓ SENT' : 'INVITE'}
+            </Text>
+          </TouchableOpacity>
+          {/* OTA-063 — REPORT BUG button. Same footer-bar visual
+              weight as EXIT GAME because both are peripheral,
+              not primary, actions. Opens the BugReportModal
+              which collects a character + description and
+              stages the full report on the clipboard before
+              opening mailto. */}
+          <TouchableOpacity
+            style={styles.bugReportBtn}
+            activeOpacity={0.7}
+            onPress={() => setBugReportOpen(true)}
+          >
+            <Text style={styles.bugReportBtnText}>
+              {bugReportSent ? '✓ COPIED' : 'REPORT BUG'}
+            </Text>
+          </TouchableOpacity>
+          {/* 2026-05-25 — EXIT GAME button. Per playtester
+              request: full app exit from the title screen
+              (Android only — iOS App Store guidelines forbid
+              programmatic exit, but RN's BackHandler.exitApp()
+              is the standard call and is a no-op safely on
+              iOS). Confirm modal prevents an accidental tap
+              mid-character-creation. */}
+          <TouchableOpacity
+            style={styles.exitBtn}
+            activeOpacity={0.7}
+            onPress={() => setPendingAction({ kind: 'exit' })}
+          >
+            <Text style={styles.exitBtnText}>EXIT GAME</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <BugReportModal
@@ -786,6 +854,12 @@ export function TitleScreen() {
         slots={slots}
         onCancel={() => setBugReportOpen(false)}
         onSend={(args) => { void sendBugReport(args); }}
+      />
+
+      <InvitePlaytesterModal
+        visible={inviteOpen}
+        onCancel={() => setInviteOpen(false)}
+        onSend={(gmail) => { void sendPlaytesterInvite(gmail); }}
       />
 
       <BrandedModal
@@ -1071,11 +1145,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#1a1714',
     borderColor: '#8a3a3a',
     borderWidth: 1,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 4,
   },
   exitBtnText: { color: '#c97a7a', fontSize: 10, letterSpacing: 1.5, fontWeight: '700' },
+  // OTA-065 — right-aligned row holding INVITE, REPORT BUG,
+  // EXIT GAME. `gap` replaces the per-button marginRight that
+  // OTA-063 had on bugReportBtn alone — cleaner with three
+  // buttons and easier to tune spacing in one place.
+  bottomBtnRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   // OTA-063 — REPORT BUG button. Visually equal-weight to EXIT
   // GAME (same paddings + font) but uses the brand amber instead
   // of the destructive red so the two are distinguishable at a
@@ -1085,12 +1168,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#1a1714',
     borderColor: '#c9a86a',
     borderWidth: 1,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 4,
-    marginRight: 8,
   },
   bugReportBtnText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1.5, fontWeight: '700' },
+  // OTA-065 — INVITE PLAYTESTER button. Cool-blue accent so it
+  // doesn't compete with REPORT BUG (amber) or EXIT GAME (red).
+  // Three distinct tones in the action row keep the buttons
+  // glanceable.
+  inviteBtn: {
+    backgroundColor: '#1a1714',
+    borderColor: '#6a9ec9',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 4,
+  },
+  inviteBtnText: { color: '#6a9ec9', fontSize: 10, letterSpacing: 1.5, fontWeight: '700' },
   // v2.4.1 (OTA 051) — top-right gear matches ExplorationScreen's
   // cornerGear placement so the player always finds settings in the
   // same spot. Absolute over the title section; the crest + headers
