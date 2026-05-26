@@ -69,4 +69,22 @@
 //       scene nouns routinely run 4-5 words. Bumped to > 6 words
 //       and > 60 chars so flavor-prefixed parser-resolved nouns
 //       survive while actual player rants are still caught.
-export const OTA_BUILD_ID = '2026-05-26-060';
+//
+// 2026-05-26 OTA-061 — `investigate path` path-narration fixes.
+// Playtester ran `investigate path` 7 times in 16 seconds and got
+// 7 different far-off random destinations, plus a leaked raw enum:
+//   "The Arbiter notes a lost_capital toward Drakova"
+// Two bugs in narratePossibleDirections:
+//   (1) `location.type` (an enum like 'lost_capital') went through
+//       .toLowerCase() but underscores stayed. Now humanized:
+//       underscores collapse to spaces.
+//   (2) Each call did `pick(others)` against all world locations,
+//       producing fresh random pairs on every re-investigate. Now
+//       seeded by `${scene.location.id}:${mapX}:${mapY}` via FNV-1a
+//       so re-investigating the same noun on the same tile gives
+//       the SAME answer — the Arbiter "remembers" what they told
+//       you here. Moving to a new tile re-seeds. Dropped the
+//       chance(60) on the second fragment so the output is always
+//       a consistent two-destination read (when ≥2 world tiles
+//       are discoverable).
+export const OTA_BUILD_ID = '2026-05-26-061';
