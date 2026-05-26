@@ -3950,7 +3950,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       case 'investigate': {
         // 1) "find a way / look for a path / which direction" — surface options, no roll.
         if (DIRECTION_KEYWORDS.test(trimmed)) {
-          narratePossibleDirections(get, currentScene);
+          narratePossibleDirections(get, set, currentScene);
           break;
         }
         // The target the player named (raw, before resolution).
@@ -15256,10 +15256,56 @@ function narrateWanderingJourney(
   get().appendLog('world', `${lead}  ${hook.plantedLine}`);
 }
 
-function narratePossibleDirections(get: () => GameStore, scene: CurrentScene): void {
+function narratePossibleDirections(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  scene: CurrentScene,
+): void {
+  // OTA-062 — mark 'path' as flavor-exhausted on this tile after
+  // narrating directions. Pre-fix, narratePossibleDirections wrote
+  // only to the log and never touched room memory, so the 'path'
+  // chip stayed green forever and the Investigate tab would never
+  // cycle back to amber even after every other ambient noun on the
+  // tile had been investigated. Playtester log showed 7 successive
+  // `investigate path` taps on the same tile, all green, all
+  // returning the same OTA-061-stable direction line. Now the chip
+  // greys after the first tap (same room-key + flavorExhaustedNouns
+  // pattern the regular flavor-only investigate path uses at L4369).
+  // Re-typing `investigate path` still works (function is
+  // idempotent), and the destination line is stable per OTA-061.
+  const player = get().player;
+  const microMicroId = scene.microMicroId ?? '_';
+  const x = typeof player?.mapX === 'number' ? player.mapX : '_';
+  const y = typeof player?.mapY === 'number' ? player.mapY : '_';
+  const roomKey = `${player?.currentLocationId}@${microMicroId}@${x},${y}`;
+  const markPathExhausted = (): void => {
+    set((s) => {
+      const room = s.worldMemory.visitedRooms?.[roomKey] ?? {
+        firstVisitAt: Date.now(),
+        lastVisitAt: Date.now(),
+        visitCount: 1,
+      };
+      const existing = room.flavorExhaustedNouns ?? [];
+      if (existing.includes('path')) return s;
+      return {
+        worldMemory: {
+          ...s.worldMemory,
+          visitedRooms: {
+            ...(s.worldMemory.visitedRooms ?? {}),
+            [roomKey]: {
+              ...room,
+              flavorExhaustedNouns: [...existing, 'path'],
+            },
+          },
+        },
+      };
+    });
+  };
+
   const others = allLocations.filter((l) => l.id !== scene.location.id && l.discoverable !== false);
   if (others.length === 0) {
     get().appendLog('world', 'You scan for a way forward. Tartaria does not advertise its directions.');
+    markPathExhausted();
     return;
   }
   // 2026-05-26 OTA-061 — stable, deterministic destinations per
@@ -15278,7 +15324,6 @@ function narratePossibleDirections(get: () => GameStore, scene: CurrentScene): v
   // Also humanizes the `type` token: a "lost_capital" was leaking
   // straight through .toLowerCase() into player-facing text. Now
   // underscores collapse to spaces.
-  const player = get().player;
   const seedKey = `${scene.location.id}:${player?.mapX ?? 0}:${player?.mapY ?? 0}`;
   // FNV-1a 32-bit hash of the seed key — small, stable, no deps.
   let h = 0x811c9dc5;
@@ -15298,6 +15343,7 @@ function narratePossibleDirections(get: () => GameStore, scene: CurrentScene): v
     fragments.push(`a ${humanizeType(second.type)} toward ${second.name}`);
   }
   get().appendLog('world', `You look for a way forward. The Arbiter notes ${fragments.join(' and ')}.`);
+  markPathExhausted();
 }
 
 // ---------------------------------------------------------------------------
