@@ -74,9 +74,15 @@ const SALVAGE_PATTERN = new RegExp(
     'golem',
     // 3. Other break-open targets
     'bench', 'shelf', 'rack', 'table', 'door', 'gate',
-    'skeleton', 'skull', 'rib', 'corpse', 'remains',
+    'skeleton', 'skull', 'rib', 'corpse', 'body', 'remains',
     'banner', 'shroud', 'curtain', 'tarp',
     'jar', 'bottle', 'jewelry box', 'jewel box', 'lock box', 'casket', 'reliquary',
+    // 2026-05-25 OTA-041 — hook-noun additions. preserved_corpse plants
+    // "body" + "satchel" + "robes" as resolvers; a playtester investigated
+    // the sign, a body appeared via hook plant, and they expected to
+    // also salvage it. Adding these to the chip filter so hook-revealed
+    // nouns ALSO surface as salvage chips.
+    'satchel', 'robes', 'pack', 'pouch',
   ].join('|'),
   'i',
 );

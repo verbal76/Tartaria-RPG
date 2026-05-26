@@ -159,6 +159,58 @@ export function CharacterScreen() {
           <Text style={styles.kvSub}>↳ {tierDescription(tier)}</Text>
         </View>
 
+        {/* ── FACTION STANDINGS ─────────────────────────────────── */}
+        {/* 2026-05-25 OTA-041 — full faction standing panel. Playtester
+            saw rep changes log in the world feed and asked "shouldn't
+            I see that on my character page?" Lists every faction the
+            player has any standing in, sorted highest first. The join
+            threshold is +20 (per JOIN_THRESHOLD in engine/factions.ts);
+            shows a checkmark on factions the player qualifies to join.
+            Each faction's standing gates quest / hunt / mystery /
+            storyline visibility via minRep; high standing means more
+            contracts surface from that faction's vendors. */}
+        <Text style={styles.sectionTitle}>FACTION STANDINGS</Text>
+        <View style={styles.card}>
+          {(() => {
+            const factionsList = factionsData as Faction[];
+            const rows = (player.factionStanding ?? [])
+              .map((row) => ({
+                row,
+                meta: factionsList.find((f) => f.id === row.factionId),
+              }))
+              .filter((r) => r.meta)
+              .sort((a, b) => b.row.standing - a.row.standing);
+            if (rows.length === 0) {
+              return <Text style={styles.kvSub}>No standings recorded yet.</Text>;
+            }
+            return rows.map(({ row, meta }) => {
+              const standing = row.standing;
+              const qualifies = standing >= 20;
+              const isOwn = row.factionId === player.factionId;
+              const color = standing >= 20 ? '#9ec96a'
+                : standing >= 0 ? '#cdbf99'
+                : standing >= -10 ? '#c9a86a'
+                : '#e07a5f';
+              return (
+                <View key={row.factionId} style={styles.kvRow}>
+                  <Text style={[styles.kvKey, isOwn && styles.factionOwn]}>
+                    {meta!.name}{isOwn ? ' (sworn)' : ''}
+                  </Text>
+                  <Text style={[styles.kvValue, { color }]}>
+                    {standing >= 0 ? '+' : ''}{standing}{qualifies && !isOwn ? ' ✓' : ''}
+                  </Text>
+                </View>
+              );
+            });
+          })()}
+          <Text style={styles.kvSub}>
+            ↳ Standing rises with trades, gifts, and finished contracts; falls with theft, killing
+            faction members, and rival favors. +20 unlocks joining the faction; high standing
+            with a faction surfaces more of their contracts (hunts, mysteries, storylines) when
+            you meet their vendors.
+          </Text>
+        </View>
+
         {/* ── EQUIPPED ──────────────────────────────────────────── */}
         <Text style={styles.sectionTitle}>EQUIPPED</Text>
         <View style={styles.card}>
@@ -400,6 +452,7 @@ const styles = StyleSheet.create({
 
   kvRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingVertical: 4 },
   kvKey: { color: '#7a705c', fontSize: 12, letterSpacing: 1 },
+  factionOwn: { color: '#cdbf99', fontWeight: '700' },
   kvValue: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
   kvSub: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginTop: -2, marginBottom: 4 },
   warning: { color: '#c9a86a' },

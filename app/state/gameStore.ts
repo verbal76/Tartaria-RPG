@@ -10486,6 +10486,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().beginScene({ skipHubEntry: true });
     }
     set({ pendingTravelConfirm: null });
+    // 2026-05-25 OTA-041 — playtester report: a roadside vendor was
+    // announced ("Road Hawker is already here when you arrive") when
+    // the outpost step landed at the outdoor Asgardar tile, but
+    // setTravelCourse immediately took the first step east — the
+    // vendor banner appeared and disappeared in one frame. If a
+    // vendor spawned on the new scene, set the travel target
+    // WITHOUT taking the first step. The travel row stays primed
+    // ("→ <city>") + a CONTINUE TRAVEL tap moves them. They can
+    // approach the vendor first.
+    const sceneAfterLeave = get().currentScene;
+    if (sceneAfterLeave?.vendor) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const locs = (require('../data/locations/locations.json') as Array<{ id: string; name: string }>);
+      const tgtName = locs.find((l) => l.id === pending.locationId)?.name ?? pending.locationId;
+      set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId: pending.locationId } } } : s));
+      get().appendLog(
+        'world',
+        `Course set for ${tgtName}, but ${sceneAfterLeave.vendor.name} is here on the road. Tap CONTINUE TRAVEL when you're ready to move on.`,
+      );
+      return;
+    }
     get().setTravelCourse(pending.locationId);
   },
   cancelTravelConfirm() {
@@ -13970,6 +13991,14 @@ const HIDDEN_TEXT_LINES = [
   `You trace the ${`{noun}`}. Numbers run along its edge: coordinates, in the old Tartarian grid the Reclaimers stopped using two centuries back.`,
   `You find a hairline crack in the ${`{noun}`} and follow it. A single coin is wedged inside, mud-stuck. You leave it there. Some traditions you do not break.`,
   `You read the ${`{noun}`}: a name list, twenty-three entries. Twenty-two are struck through. The twenty-third has a fresh question mark beside it.`,
+  // 2026-05-25 OTA-041 — indoor-friendly variants. Playtester noted
+  // the brick / hub-furniture lines were thin: "what can a brick ever
+  // tell you?" Three new beats keep the indoor reveals concrete:
+  // hollow walls, hidden seams, mortar marks. Each works on hub
+  // furniture without claiming "mud below" (which only fits outdoors).
+  `You tap the ${`{noun}`}. Hollow. The wall behind it carries a void someone meant to find — they marked the mortar with a single dot.`,
+  `You find a seam in the ${`{noun}`}. A folded slip of paper has been pressed into it, edge-first, where it would survive every flood that came through here.`,
+  `You catch a finger-smear of red mortar on the ${`{noun}`}. The Reclaimers paint this colour on the back of every relic they catalog. Someone tagged this and walked away.`,
 ];
 
 // 2026-05-25 OTA-040 — narration for the salvage → collectable
@@ -14128,7 +14157,15 @@ function narrateAmbientFind(
   if (!activeUnresolved && chance(curatedBoost ? 60 : 40)) {
     const hook = plantHookByKind(pickRandomHookKind());
     set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } } : s));
-    get().appendLog('world', hook.plantedLine);
+    // 2026-05-25 OTA-041 — tie the hook plant to the noun the player
+    // searched. Was bare hook.plantedLine, which read as a non-sequitur
+    // ("study the sign → A Tartarian body lies in the silt"). The
+    // connector line names the noun that drew their attention to the
+    // hook target, so the discovery feels caused, not adjacent.
+    get().appendLog(
+      'world',
+      `Your study of the ${noun} draws your eye to something past it — ${hook.plantedLine}`,
+    );
     producedSubstantive = true;
   }
   // Trinket drop — 15% chance, only fires when neither hook nor
@@ -14171,7 +14208,10 @@ function narrateAmbientFind(
     if (!activeUnresolved) {
       const hook = plantHookByKind(pickRandomHookKind());
       set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } } : s));
-      get().appendLog('world', hook.plantedLine);
+      get().appendLog(
+        'world',
+        `Your study of the ${noun} draws your eye to something past it — ${hook.plantedLine}`,
+      );
       producedSubstantive = true;
     } else if (isSearchable(noun)) {
       const hiddenLine = pick(HIDDEN_TEXT_LINES).replace('{noun}', noun);
