@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { RECIPES, lookupCraftedItem, type Recipe } from '../engine/crafting';
+import { getItemPreview } from './itemPreview';
 
 interface RecipeStatus {
   recipe: Recipe;
@@ -83,6 +84,7 @@ export function RecipesView({ onAfterCraft }: RecipesViewProps) {
             </View>
             {available.map((e) => {
               const cat = lookupCraftedItem(e.recipe.result);
+              const preview = getItemPreview(e.recipe.result);
               return (
                 <TouchableOpacity
                   key={e.recipe.result}
@@ -98,6 +100,18 @@ export function RecipesView({ onAfterCraft }: RecipesViewProps) {
                         {cat.rarity ?? 'Common'}
                       </Text>
                     </View>
+                    {/* 2026-05-26 OTA-049 — playtester ask: show item stats
+                        so the player can compare weapons/armor before
+                        committing material to a craft. getItemPreview
+                        returns the compact "Damage: 2d6 (slashing)" /
+                        "AC +2" / "Effect: +1 INT" lines used elsewhere
+                        in the game (Player Sheet equipped slots, vendor
+                        offers). Single line, dot-separated. */}
+                    {preview.stats.length > 0 && (
+                      <Text style={styles.recipeStats}>
+                        {preview.stats.join(' · ')}
+                      </Text>
+                    )}
                     <Text style={styles.recipeIng}>
                       Needs: {e.recipe.ingredients.map((i) => `${i.quantity}× ${i.name}`).join(', ')}
                     </Text>
@@ -116,6 +130,7 @@ export function RecipesView({ onAfterCraft }: RecipesViewProps) {
             </View>
             {almost.map((e) => {
               const cat = lookupCraftedItem(e.recipe.result);
+              const preview = getItemPreview(e.recipe.result);
               return (
                 <View key={e.recipe.result} style={[styles.recipeRow, styles.recipeRowMuted]}>
                   <View style={[styles.recipeStripe, { backgroundColor: '#3a342c' }]} />
@@ -126,6 +141,11 @@ export function RecipesView({ onAfterCraft }: RecipesViewProps) {
                         {cat.rarity ?? 'Common'}
                       </Text>
                     </View>
+                    {preview.stats.length > 0 && (
+                      <Text style={styles.recipeStats}>
+                        {preview.stats.join(' · ')}
+                      </Text>
+                    )}
                     <Text style={styles.recipeMissing}>
                       Missing: {e.missing.map((m) => `${m.needed - m.have}× ${m.name}`).join(', ')}
                     </Text>
@@ -178,6 +198,11 @@ const styles = StyleSheet.create({
   recipeName: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
   recipeNameMuted: { color: '#a89a7a' },
   recipeRarity: { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  // 2026-05-26 OTA-049 — recipe stats line. Brighter than recipeIng so
+  // the player's eye lands on stats first (the comparison-driver),
+  // ingredients second (the cost). Matches the cdbf99 tone the
+  // CharacterScreen / VendorScreen use for equipped-item readouts.
+  recipeStats: { color: '#cdbf99', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },
   recipeIng: { color: '#7a705c', fontSize: 11, marginTop: 4, lineHeight: 15 },
   recipeMissing: { color: '#e07a5f', fontSize: 11, marginTop: 4, lineHeight: 15 },
   recipeCta: { color: '#9ec96a', fontSize: 10, marginTop: 6, fontStyle: 'italic', letterSpacing: 1 },
