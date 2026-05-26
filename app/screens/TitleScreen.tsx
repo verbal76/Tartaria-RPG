@@ -31,6 +31,8 @@ import {
 import { useGameStore } from '../state/gameStore';
 import { SwipeableRow } from '../components/SwipeableRow';
 import { BrandedModal } from '../components/BrandedModal';
+import { BugReportModal } from '../components/BugReportModal';
+import { buildBasicDeviceSummary } from '../diagnostics/aboutSummary';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
@@ -180,6 +182,14 @@ export function TitleScreen() {
   // OTA 006 — separate latch for the SHARE action so the COPIED
   // and SHARED flashes don't fight each other on the same row.
   const [sharedSlotId, setSharedSlotId] = useState<string | null>(null);
+  // OTA-063 — bug-report modal state. Open via the REPORT BUG button
+  // on the bottom bar. On send, build the full report (description +
+  // device summary + slot log), stage it on the clipboard, then open
+  // mailto so the player's email app composes a new message to
+  // hotatticgames@gmail.com. The brief flash on the bottom bar
+  // confirms the clipboard was populated.
+  const [bugReportOpen, setBugReportOpen] = useState(false);
+  const [bugReportSent, setBugReportSent] = useState(false);
   // v2.4.1 (OTA 051) — auto-check for an OTA on every TitleScreen
   // mount. Save-and-exit drops the player back here, which re-mounts
   // TitleScreen and re-fires this effect — so the player picks up
@@ -283,6 +293,91 @@ export function TitleScreen() {
     } catch {
       // User-cancelled or unsupported — no-op.
     }
+  };
+
+  // OTA-063 — bug report send handler. Builds a full report block
+  // (description + device summary + character log), drops it on
+  // the clipboard, and opens a mailto: link to hotatticgames@gmail
+  // .com with subject "Bug Report — <character>". The clipboard
+  // staging is the workaround for mailto's body-length limit
+  // (~2KB on iOS Mail, varies on Android Gmail) — character logs
+  // run 50-200KB and would silently truncate inline. The player
+  // pastes the report into the email composer before sending.
+  const sendBugReport = async (args: {
+    slot: SlotSummary | null;
+    description: string;
+  }): Promise<void> => {
+    const { slot, description } = args;
+    const charName = slot?.playerName ?? '(general / no character)';
+    const subject = `Bug Report${slot ? ` — ${slot.playerName}` : ''}`;
+
+    // Pull device summary synchronously, then the slot log (async).
+    const deviceBlock = buildBasicDeviceSummary();
+    let logBlock = '(no character selected — no log attached)';
+    if (slot) {
+      try {
+        const raw = await readSlotLog(slot.slotId);
+        logBlock = raw && raw.length > 0
+          ? raw
+          : `(log empty for ${slot.playerName})`;
+      } catch {
+        logBlock = `(log read failed for ${slot.playerName})`;
+      }
+    }
+
+    const report = [
+      `=== TARTARIA BUG REPORT ===`,
+      `Submitted: ${new Date().toISOString()}`,
+      `Character: ${charName}`,
+      slot ? `Slot ID: ${slot.slotId}` : null,
+      slot ? `Race: ${raceLabel(slot.raceId)}` : null,
+      slot ? `Location: ${locationLabel(slot.locationId)}` : null,
+      slot ? `HP: ${slot.hp}/${slot.hpMax}${slot.dead ? ' (FALLEN)' : ''}` : null,
+      ``,
+      `--- DESCRIPTION ---`,
+      description,
+      ``,
+      `--- DEVICE / BUILD ---`,
+      deviceBlock,
+      ``,
+      `--- CHARACTER LOG ---`,
+      logBlock,
+      ``,
+      `=== END REPORT ===`,
+    ]
+      .filter((l) => l !== null)
+      .join('\n');
+
+    try {
+      await Clipboard.setStringAsync(report);
+    } catch {
+      // Clipboard rarely fails — proceed to mailto either way so
+      // the player at least lands in their mail app and can type
+      // a manual summary.
+    }
+
+    // Mailto body is intentionally tiny — the real report is on
+    // the clipboard. The body just tells the player what to do
+    // next so they don't send an empty email.
+    const mailtoBody =
+      `(Bug report copied to clipboard — paste here, then send)\n\n` +
+      `Character: ${charName}\n` +
+      `OTA: ${OTA_BUILD_ID}\n`;
+    const mailto =
+      `mailto:hotatticgames@gmail.com` +
+      `?subject=${encodeURIComponent(subject)}` +
+      `&body=${encodeURIComponent(mailtoBody)}`;
+
+    try {
+      await Linking.openURL(mailto);
+    } catch {
+      // No mail client installed — the report is still on the
+      // clipboard; the COPIED flash below tells the player so.
+    }
+
+    setBugReportOpen(false);
+    setBugReportSent(true);
+    setTimeout(() => setBugReportSent(false), 2200);
   };
 
   const renderItem = ({ item }: { item: SlotSummary }) => (
@@ -591,6 +686,20 @@ export function TitleScreen() {
       </TouchableOpacity>
       <View style={styles.bottomBar}>
         <Text style={styles.footer}>v{APP_VERSION}  /  2148</Text>
+        {/* OTA-063 — REPORT BUG button. Same footer-bar visual
+            weight as EXIT GAME because both are peripheral, not
+            primary, actions. Opens the BugReportModal which
+            collects a character + description and stages the
+            full report on the clipboard before opening mailto. */}
+        <TouchableOpacity
+          style={styles.bugReportBtn}
+          activeOpacity={0.7}
+          onPress={() => setBugReportOpen(true)}
+        >
+          <Text style={styles.bugReportBtnText}>
+            {bugReportSent ? '✓ COPIED' : 'REPORT BUG'}
+          </Text>
+        </TouchableOpacity>
         {/* 2026-05-25 — EXIT GAME button. Per playtester request:
             full app exit from the title screen (Android only — iOS
             App Store guidelines forbid programmatic exit, but RN's
@@ -605,6 +714,13 @@ export function TitleScreen() {
           <Text style={styles.exitBtnText}>EXIT GAME</Text>
         </TouchableOpacity>
       </View>
+
+      <BugReportModal
+        visible={bugReportOpen}
+        slots={slots}
+        onCancel={() => setBugReportOpen(false)}
+        onSend={(args) => { void sendBugReport(args); }}
+      />
 
       <BrandedModal
         visible={pendingAction !== null}
@@ -894,6 +1010,21 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   exitBtnText: { color: '#c97a7a', fontSize: 10, letterSpacing: 1.5, fontWeight: '700' },
+  // OTA-063 — REPORT BUG button. Visually equal-weight to EXIT
+  // GAME (same paddings + font) but uses the brand amber instead
+  // of the destructive red so the two are distinguishable at a
+  // glance. The COPIED-flash state swaps in a green border so
+  // the player sees confirmation.
+  bugReportBtn: {
+    backgroundColor: '#1a1714',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  bugReportBtnText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1.5, fontWeight: '700' },
   // v2.4.1 (OTA 051) — top-right gear matches ExplorationScreen's
   // cornerGear placement so the player always finds settings in the
   // same spot. Absolute over the title section; the crest + headers
