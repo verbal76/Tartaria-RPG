@@ -54,4 +54,19 @@
 //       (stews / tinctures / draughts / brews / tonics). Moved from
 //       InventoryScreen so all crafting lives under one screen.
 //   (4) InventoryScreen → single ITEMS view. RECIPES tab removed.
-export const OTA_BUILD_ID = '2026-05-26-059';
+//
+// 2026-05-26 OTA-060 — Arbiter false-positive on legit scene nouns.
+// Playtester climbed a "jagged dormant architectural sentinel"
+// (4-word flavor-prefixed noun) and got the Arbiter saying "I'm
+// not sure what you're trying to tell me" right after a successful
+// climb. Two compounding bugs:
+//   (1) 'climb' missing from ARBITER_ENGAGED_INTENTS so post-action
+//       the on-target defer branch fired with the climbed noun.
+//       Added climb, search, drop, scrap, talk, advance, retreat,
+//       unequip — every clearly-engaged action verb.
+//   (2) The garbage-noun heuristic in narrativeGenerator flagged
+//       any noun > 3 words as junk, but salvage/climb-eligible
+//       scene nouns routinely run 4-5 words. Bumped to > 6 words
+//       and > 60 chars so flavor-prefixed parser-resolved nouns
+//       survive while actual player rants are still caught.
+export const OTA_BUILD_ID = '2026-05-26-060';

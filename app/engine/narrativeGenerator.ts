@@ -639,14 +639,22 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
   // next move — never both, never neither.
   if (ctx.playerTargetNoun) {
     const n = ctx.playerTargetNoun;
-    // Sanity gate — if the "noun" is clearly garbage prose (4+ words,
-    // contains a question mark, or runs over 40 chars) the player
-    // didn't actually name a thing. Echoing it back as if it were a
-    // noun produces lines like "The should also pop up pull nouns,"
-    // the Arbiter says. Fall through to the confused-Arbiter
-    // response below instead.
+    // Sanity gate — if the "noun" is clearly garbage prose (long
+    // sentence, contains question/exclamation punctuation, or runs
+    // over 60 chars) the player didn't actually name a thing.
+    // Echoing it back as if it were a noun produces lines like
+    // "The should also pop up pull nouns," the Arbiter says.
+    //
+    // 2026-05-26 OTA-060 — bumped wordCount limit from > 3 to > 6
+    // and chars from > 40 to > 60. Playtester reported the Arbiter
+    // saying "I'm not sure what you're trying to tell me" after a
+    // legitimate "climb jagged dormant architectural sentinel"
+    // (4 words, 36 chars) — flavor-prefixed scene nouns routinely
+    // run 4-5 words ("salt-crusted sentinel diagnostic console" is
+    // 5 words, 41 chars) and are real, parser-resolved nouns. Only
+    // truly long player prose should trip this now.
     const wordCount = n.trim().split(/\s+/).length;
-    const isGarbageNoun = wordCount > 3 || n.length > 40 || /[?!]/.test(n);
+    const isGarbageNoun = wordCount > 6 || n.length > 60 || /[?!]/.test(n);
     if (isGarbageNoun) {
       return `The Arbiter studies you, plainly. "I'm not sure what you're trying to tell me. Phrase it as the deed you mean to do — 'search', 'attack', 'go east'."`;
     }
