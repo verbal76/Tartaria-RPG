@@ -5060,6 +5060,44 @@ export const useGameStore = create<GameStore>((set, get) => ({
               get().appendLog('arbiter', `The Arbiter watches the horizon. "Something passed close while you slept. It moved on."`);
             }
           }
+          // 2026-05-26 OTA-050 — fire the OTA-043 "while you slept"
+          // pull on the parser-routed rest path (which is the path
+          // every typed/tapped `rest` actually hits — the dead
+          // store-method rest() at line 11950 is unreachable from
+          // the UI). Without this, a player resting in a hub at
+          // full HP saw 30 in-game days of "Whole already" with no
+          // variation (playtester literal report). Skipped on
+          // ambush — the player has bigger problems.
+          if (!restAmbush && Math.random() < 0.30) {
+            const pull = REST_PULL_LINES[Math.floor(Math.random() * REST_PULL_LINES.length)]!;
+            if (pull.kind === 'trinket') {
+              const liveAfterRest = get().player;
+              if (liveAfterRest) {
+                const trinket = pick(INVESTIGATE_TRINKETS);
+                const qty = trinket.qtyMin === trinket.qtyMax
+                  ? trinket.qtyMin
+                  : trinket.qtyMin + Math.floor(Math.random() * (trinket.qtyMax - trinket.qtyMin + 1));
+                const itemCat = lookupCraftedItem(trinket.name);
+                const newItem: InventoryItem = stampDurability({
+                  id: `rest_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                  name: trinket.name,
+                  kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
+                  rarity: trinket.rarity,
+                  quantity: qty,
+                  tags: itemCat.tags,
+                });
+                const granted = grantItem(liveAfterRest.inventory, newItem);
+                set((s) => (s.player ? { player: { ...s.player, inventory: granted.inventory } } : s));
+                if (granted.accepted > 0) {
+                  get().appendLog('world', pull.line);
+                  const qtyLabel = granted.accepted > 1 ? ` x${granted.accepted}` : '';
+                  get().appendLog('reward', `✦ ${trinket.name}${qtyLabel} (${trinket.rarity}).`);
+                }
+              }
+            } else {
+              get().appendLog(pull.kind, pull.line);
+            }
+          }
           void get().persist();
         }
         break;
@@ -11994,12 +12032,58 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const sceneLoc = sceneRest?.location;
     const inSafeZone = sceneLoc ? isHubLocation(sceneLoc.id) : false;
     const ambushTriggered = !inSafeZone && Math.random() < 0.22;
+    // 2026-05-26 OTA-050 — full-HP rest no-op path now ALSO rolls the
+    // OTA-043 "while you slept" pull. Previously this branch returned
+    // early before the pull ran, so a player resting in a hub at full
+    // HP saw the same "Whole already" line 7+ times across as many
+    // in-game days with no flavor variation (playtester literal report:
+    // "rested through 30 in-game days with no encounters whatsoever").
+    // Also rotates 5 lines of "you sat for a while" narration so the
+    // feed doesn't read identical on repeat rests.
+    const FULL_HP_REST_LINES = [
+      `You sit for ${hoursSlept} hours. Whole already — the Aetherstone hums steady.`,
+      `You sit for ${hoursSlept} hours. Nothing in you wants healing; you watch the light shift instead.`,
+      `You sit for ${hoursSlept} hours. The body is at peace. The mind keeps walking on without you.`,
+      `You sit for ${hoursSlept} hours. You came back to yourself at the same place you set out from.`,
+      `You sit for ${hoursSlept} hours. Tartaria did not change in any of them you can see.`,
+    ];
     if (hpRoom <= 0 && stamRoom <= 0 && hungerTicks === 0 && weatherHpDamage === 0 && weatherStamDamage === 0 && !ambushTriggered) {
       set((s) => (s.player ? { player: { ...s.player, hoursElapsed: newHours } } : s));
-      get().appendLog(
-        'world',
-        `You sit for ${hoursSlept} hours. Whole already — the Aetherstone hums steady. (${describeTime(newHours)})`,
-      );
+      const restLine = FULL_HP_REST_LINES[Math.floor(Math.random() * FULL_HP_REST_LINES.length)]!;
+      get().appendLog('world', `${restLine} (${describeTime(newHours)})`);
+      // OTA-050 — fire the OTA-043 pull on the no-op branch too. Same
+      // 30% rate as the regular rest branch. Skipped on ambush (which
+      // can't fire in this branch anyway).
+      if (Math.random() < 0.30) {
+        const pull = REST_PULL_LINES[Math.floor(Math.random() * REST_PULL_LINES.length)]!;
+        if (pull.kind === 'trinket') {
+          const liveAfterRest = get().player;
+          if (liveAfterRest) {
+            const trinket = pick(INVESTIGATE_TRINKETS);
+            const qty = trinket.qtyMin === trinket.qtyMax
+              ? trinket.qtyMin
+              : trinket.qtyMin + Math.floor(Math.random() * (trinket.qtyMax - trinket.qtyMin + 1));
+            const itemCat = lookupCraftedItem(trinket.name);
+            const newItem: InventoryItem = stampDurability({
+              id: `rest_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              name: trinket.name,
+              kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
+              rarity: trinket.rarity,
+              quantity: qty,
+              tags: itemCat.tags,
+            });
+            const granted = grantItem(liveAfterRest.inventory, newItem);
+            set((s) => (s.player ? { player: { ...s.player, inventory: granted.inventory } } : s));
+            if (granted.accepted > 0) {
+              get().appendLog('world', pull.line);
+              const qtyLabel = granted.accepted > 1 ? ` x${granted.accepted}` : '';
+              get().appendLog('reward', `✦ ${trinket.name}${qtyLabel} (${trinket.rarity}).`);
+            }
+          }
+        } else {
+          get().appendLog(pull.kind, pull.line);
+        }
+      }
       void get().persist();
       return;
     }
