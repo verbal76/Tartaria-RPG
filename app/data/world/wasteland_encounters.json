@@ -645,5 +645,47 @@
       "'If you are going to the Pillars, eat before you arrive. If you are going to the Cathedral, eat after. If you are going to Drakova, do not eat at all. Good road to you.'"
     ],
     "lore_note": "When the pilgrim is past you, you notice the staff has left no mark in the mud."
+  },
+
+  "_OTA-051_urban_hub_encounters": "Hub-themed mid-rest ambushes — cities aren't combat-free anymore (OTA-051). Same skirmish/npc/treasure shape as the wilderness pool. The `capital` and `borderlands` matchers route them into the major buried-capital tiles; the gameStore rest handler picks them at ~8% per hub rest, vs the 22% wilderness rate, so the city still reads as safer.",
+
+  "alley_cutpurse": {
+    "type": "skirmish",
+    "weight": 8,
+    "matchers": ["capital", "buried", "borderlands"],
+    "narration": "Footsteps behind you the wrong way — too close, too fast. A Silt Thief peels out of a side passage, hand already in your line of sight where your coin-pouch hangs. They thought you'd sleep deeper than you did.",
+    "enemyPool": ["Silt Thief"],
+    "loot": []
+  },
+
+  "forgotten_order_zealot_intrusion": {
+    "type": "skirmish",
+    "weight": 6,
+    "matchers": ["capital", "buried"],
+    "narration": "A robed figure stops at the edge of your camp. Order grey, no staff this time — knuckles wrapped in mud-cloth instead. 'You have something the Tower wants. The Order does not bargain at this hour.' Their hands come up.",
+    "enemyPool": ["Reclaimer Ambusher"],
+    "loot": []
+  },
+
+  "mud_giant_drunk_rampage": {
+    "type": "skirmish",
+    "weight": 5,
+    "matchers": ["capital", "buried"],
+    "narration": "Heavy footfalls in the next street, and a wall of muscle and silt comes around the corner — a Mud Giant has had too much fermented Aether and decided to take it out on whatever moves. You move. They notice.",
+    "enemyPool": ["Mud Giant"],
+    "loot": []
+  },
+
+  "reclaimer_claim_dispute": {
+    "type": "npc",
+    "weight": 4,
+    "matchers": ["capital", "buried"],
+    "narration": "A Reclaimer in dust-grey tagging gear plants herself in your path before you've fully stood up. 'That relic at your hip,' she says, pointing without aggression, 'is on the Guild's recovery list. I'll buy it for fair. Or you'll explain to the Asgardar branch why it isn't on the registry.'",
+    "npc_lines": [
+      "'The Guild marks what it finds. Whatever's on your hip — it carries our paint somewhere if you look. I'm not accusing. I'm asking.'",
+      "'Sell it back to me at fair-market and walk. Refuse, and a survey-master will be looking for you at the Crown Gate by sundown.'",
+      "'You can also turn it in to any Guild office for half the TC and full standing credit. Your call — the Aether watches either way.'"
+    ],
+    "lore_note": "She does not raise her voice. She does not move. She just waits. After a beat she steps aside, but her hand has not left her shoulder-bag."
   }
 }

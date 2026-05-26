@@ -4950,10 +4950,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const { encounterRateMultiplier: rateMultRest } = require('../engine/timeOfDay');
           const restScene = currentScene;
           const restLoc = restScene?.location;
+          // 2026-05-26 OTA-051 — hub rests are no longer fully safe.
+          // Playtester report: "rested 60+ times in Asgardar, zero
+          // encounters." The previous safe-zone gate completely shut
+          // off ambushes inside a hub, which meant city rests felt
+          // like nothing was happening for hours of in-game time.
+          // The fix: drop the gate, but use a LOWER ambush rate
+          // inside hubs (8% vs 22%) so cities still read safer than
+          // the wilderness — there's just real risk of a gang move,
+          // a cultist intrusion, or a drunken giant rounding the
+          // corner. Urban-themed encounters were authored alongside
+          // this OTA in wasteland_encounters.json (matchers include
+          // "capital" / "buried") so the picker biases toward city-
+          // flavor archetypes when the player is in a Capital tile.
           const restInSafeZone = restLoc ? isHubLocation(restLoc.id) : !!player.hubRoomId;
-          const restAmbushBase = 0.22;
+          const restAmbushBase = restInSafeZone ? 0.08 : 0.22;
           const restAmbushChance = restAmbushBase * rateMultRest(player.hoursElapsed);
-          const restAmbush = !restInSafeZone && Math.random() < restAmbushChance;
+          const restAmbush = Math.random() < restAmbushChance;
           const hours = 8;
           const heal = Math.min(hpRoom, hours * 2);
           const stamGain = Math.min(stamRoom, hours);
