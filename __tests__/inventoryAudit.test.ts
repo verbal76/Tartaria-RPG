@@ -421,20 +421,28 @@ describe('Inventory state machine audit', () => {
       expect(failures).toEqual([]);
     });
 
-    it('refuses to scrap an equipped weapon (no phantom-slot deletion)', () => {
+    it('auto-unequips and scraps an equipped weapon (OTA-058 — no phantom slot)', () => {
+      // OTA-058 inverted the old refusal: scrapping an equipped item
+      // now auto-unequips the matching slot, then runs the normal
+      // scrap flow. Critically, after the call the slot must NOT
+      // reference the deleted-item's id (no phantom slot).
       const store = useGameStore;
       const player = getPlayer();
       player.equipped = {};
-      pushItem(player, makeItem({ name: 'Rusted Blade', kind: 'weapon', tags: ['weapon', 'blade'] }));
+      // Use a unique name so we can target exactly this instance
+      // (starter inventory contains Rusted Blade by default).
+      pushItem(player, makeItem({ name: 'Audit Scrap Blade', kind: 'weapon', tags: ['weapon', 'blade'] }));
       setPlayer(player);
-      store.getState().equipItem('Rusted Blade', 'main');
-      const before = getPlayer().inventory.find((i) => i.name === 'Rusted Blade')!.quantity;
-      store.getState().scrapInventoryItem('Rusted Blade');
-      const after = getPlayer().inventory.find((i) => i.name === 'Rusted Blade')!.quantity;
-      // Quantity unchanged — the engine refused.
-      expect(after).toBe(before);
-      // Equip slot still references the blade — no phantom slot.
-      expect(getPlayer().equipped?.main).toBe('Rusted Blade');
+      store.getState().equipItem('Audit Scrap Blade', 'main');
+      const equippedBefore = getPlayer().equipped ?? {};
+      const equippedId = equippedBefore.mainId;
+      expect(equippedId).toBeDefined();
+      store.getState().scrapInventoryItem('Audit Scrap Blade');
+      const after = getPlayer();
+      // The scrapped instance is gone from inventory.
+      expect(after.inventory.find((i) => i.id === equippedId)).toBeUndefined();
+      // No phantom slot — main no longer references the deleted id.
+      expect(after.equipped?.mainId).not.toBe(equippedId);
     });
   });
 

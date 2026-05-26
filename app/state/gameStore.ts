@@ -12034,19 +12034,36 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The Arbiter taps the ${item.name}. "Nothing here to break down — it already IS stock material."`);
       return;
     }
-    // Refuse to scrap the item if it's currently equipped — would
-    // leave a phantom slot referencing a deleted item.
+    // OTA-058 — auto-unequip on scrap intent. The pre-OTA refusal
+    // ("Unequip the X first — can't scrap what you're wearing") was
+    // surprising to a playtester who hit it three times on an
+    // Aetheric Locket and reported the item as "stayed in inventory,
+    // yielded nothing." It IS the item refusing because it was
+    // equipped, but from the player's POV the scrap silently didn't
+    // work. Drop the refusal and unequip the relevant slot(s) up
+    // front, then proceed with the normal scrap flow.
+    //
+    // Match slots by ID, not by name — a player can have two Rusted
+    // Blades (one equipped, one in pack) and scrap should only clear
+    // the slot when the SPECIFIC equipped instance is being broken
+    // down. Same name + different id leaves the slot alone.
     const eq = player.equipped ?? {};
     const equippedSlots = ['main', 'off', 'head', 'chest', 'legs', 'feet', 'amulet', 'ring'] as const;
-    const isEquipped = equippedSlots.some((s) => eq[s] === item.name);
-    if (isEquipped) {
-      get().appendLog('arbiter', `The Arbiter taps your hand. "Unequip the ${item.name} first — can't scrap what you're wearing."`);
-      return;
+    const occupiedSlots = equippedSlots.filter((s) => {
+      const idKey = SLOT_ID_KEY[s];
+      return eq[idKey] === item.id;
+    });
+    if (occupiedSlots.length > 0) {
+      for (const slot of occupiedSlots) get().unequipSlot(slot);
     }
     // OTA 23-014 — salvage now rolls for success. Base 70% + INT/DEX
     // modifiers. The item is CONSUMED on failure either way; the
     // player can't just keep clicking until they get materials.
     // High INT/DEX characters get one re-roll per attempt.
+    // OTA-058 — failures now grant the MIN-TIER output (1 of the
+    // first material from scrapOutputFor) instead of nothing. The
+    // anti-spam intent stays — you can't re-roll the same item for
+    // a better yield — but no scrap is ever a wasted click.
     const scene = get().currentScene;
     const scrapStats = effectiveStats(
       get().player!,
@@ -12059,7 +12076,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
       usedSecondChance = true;
       rolled = Math.random() < successP;
     }
-    const output = rolled ? scrapOutputFor(item) : null;
+    const fullOutput = scrapOutputFor(item);
+    let output: typeof fullOutput | null;
+    if (rolled) {
+      output = fullOutput;
+    } else {
+      // Min-tier consolation: one unit of the first material from the
+      // full output. e.g. a metal blade fails → 1 Scrap Metal. A
+      // cloth cape fails → 1 Patched Cloth.
+      const first = fullOutput.grants[0];
+      if (first) {
+        const consolation = { name: first.name, quantity: 1 };
+        output = { grants: [consolation], summary: consolation.name };
+      } else {
+        // scrapOutputFor always returns ≥1 grant via its fallback, so
+        // this branch is unreachable; null-guard for safety.
+        output = null;
+      }
+    }
     // OTA 012 — route grants through grantItem so ITEM_CAPS apply.
     // Was a manual merge that ignored caps: scrap an item yielding
     // 8 Sticks landed all 8 in pack despite the 6 cap. Now overflow
@@ -12098,7 +12132,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       return { player: { ...s.player, inventory: newInventory } };
     });
-    if (output) {
+    if (rolled && output) {
+      // Clean salvage — full output landed.
       if (usedSecondChance) {
         get().appendLog(
           'world',
@@ -12108,6 +12143,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('world', `You break the ${item.name} down. ✦ Recovered: ${output.summary}.`);
       // OTA 23-014 — train INT on a successful salvage. Engineering
       // hands learn from clean disassembly, not from wrecking it.
+      // OTA-058 — only full-success rolls train INT, not the
+      // consolation grant on a failed roll.
       const liveScrapper = get().player;
       if (liveScrapper) {
         const tr = trainStat(liveScrapper, 'intelligence', true);
@@ -12119,7 +12156,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         }
       }
+    } else if (output) {
+      // OTA-058 — failure roll with the min-tier consolation grant.
+      // Narrate the messy break + the salvaged remnant in one beat
+      // so the player sees both the failure flavor AND the small yield.
+      get().appendLog('world', pickScrapFailureLine(item.name));
+      get().appendLog('world', `✦ Salvaged from the wreckage: ${output.summary}.`);
     } else {
+      // Belt-and-suspenders branch — scrapOutputFor always returns
+      // ≥1 grant via fallback, but if a future change ever breaks
+      // that, surface the original failure narration.
       get().appendLog('world', pickScrapFailureLine(item.name));
     }
     void get().persist();

@@ -27,4 +27,17 @@
 //       outcome. WIS still trains on completion turn-ins, hearing
 //       whispers, novel travel, resting after combat.
 //   (3) SKILL_ACTIVITIES display map updated to reflect the split.
-export const OTA_BUILD_ID = '2026-05-26-057';
+//
+// 2026-05-26 OTA-058 — scrap UX repairs (playtester report).
+//   (1) MIN-YIELD on failed scrap. Pre-OTA, a failed scrap roll
+//       consumed the item and yielded nothing — anti-spam by design
+//       but read as "wasted click." Failure now grants 1 unit of
+//       the first material from scrapOutputFor() as consolation.
+//       Anti-spam intent stays (the item is still consumed).
+//   (2) AUTO-UNEQUIP on scrap. Pre-OTA, scrapping an equipped item
+//       refused with "unequip first." A playtester hit this 3× on
+//       an Aetheric Locket and reported it as "stayed in inventory,
+//       yielded nothing." scrapInventoryItem now auto-unequips the
+//       matching slot (by id, so duplicate-name items don't trigger
+//       it) then runs the normal scrap flow.
+export const OTA_BUILD_ID = '2026-05-26-058';
