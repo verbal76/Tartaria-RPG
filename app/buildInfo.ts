@@ -40,4 +40,18 @@
 //       yielded nothing." scrapInventoryItem now auto-unequips the
 //       matching slot (by id, so duplicate-name items don't trigger
 //       it) then runs the normal scrap flow.
-export const OTA_BUILD_ID = '2026-05-26-058';
+//
+// 2026-05-26 OTA-059 — Crafting screen 3-tab restructure.
+//   (1) CRAFT tab now shows EVERY non-consumable blueprint
+//       (weapons / armor / relics / gear). Craftable rows are
+//       highlighted with the green stripe and sorted to the top;
+//       non-craftable rows show what's missing. Pre-OTA only
+//       available + "almost (top 8)" rendered — the rest of the
+//       book was invisible.
+//   (2) REPAIR tab unchanged (already shows everything that needs
+//       mending, highlights when repairable).
+//   (3) NEW RECIPES tab (3rd tab) shows only consumable blueprints
+//       (stews / tinctures / draughts / brews / tonics). Moved from
+//       InventoryScreen so all crafting lives under one screen.
+//   (4) InventoryScreen → single ITEMS view. RECIPES tab removed.
+export const OTA_BUILD_ID = '2026-05-26-059';

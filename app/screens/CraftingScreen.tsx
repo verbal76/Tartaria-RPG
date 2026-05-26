@@ -24,7 +24,12 @@ function evaluateRepair(item: InventoryItem, inventory: InventoryItem[]): Repair
   return { item, cost, missing, available: cost.length > 0 && missing.length === 0 };
 }
 
-type Tab = 'craft' | 'repair';
+// 2026-05-26 OTA-059 — three tabs. CRAFT shows every gear/relic
+// blueprint with craftable ones highlighted; REPAIR shows every
+// inventory item that's wearing down with repairable ones highlighted;
+// RECIPES (formerly an Inventory tab) shows every food / tonic /
+// elixir blueprint with the same craftable-highlight rule.
+type Tab = 'craft' | 'repair' | 'recipes';
 
 export function CraftingScreen() {
   const player = useGameStore((s) => s.player);
@@ -61,7 +66,9 @@ export function CraftingScreen() {
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>{tab === 'craft' ? 'CRAFTING' : 'REPAIR'}</Text>
+        <Text style={styles.title}>
+          {tab === 'craft' ? 'CRAFTING' : tab === 'repair' ? 'REPAIR' : 'RECIPES'}
+        </Text>
         <View style={{ width: 80 }} />
       </View>
 
@@ -82,10 +89,25 @@ export function CraftingScreen() {
             REPAIR {repairable.length > 0 ? `(${repairable.length})` : ''}
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setTab('recipes')}
+          style={[styles.tabBtn, tab === 'recipes' && styles.tabBtnActive]}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.tabBtnText, tab === 'recipes' && styles.tabBtnTextActive]}>RECIPES</Text>
+        </TouchableOpacity>
       </View>
 
       {tab === 'craft' ? (
-        <RecipesView onAfterCraft={() => setScreen('exploration')} />
+        <RecipesView
+          kindFilter="non-consumable"
+          onAfterCraft={() => setScreen('exploration')}
+        />
+      ) : tab === 'recipes' ? (
+        <RecipesView
+          kindFilter="consumable"
+          onAfterCraft={() => setScreen('exploration')}
+        />
       ) : (
         <>
           <Text style={styles.arbiterLine}>
