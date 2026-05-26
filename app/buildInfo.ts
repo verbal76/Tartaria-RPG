@@ -176,4 +176,15 @@
 // action button row on top (right-aligned via flex-end) and
 // the footer text below. Visual hierarchy is the same — three
 // peripheral actions in a row, version diag underneath.
-export const OTA_BUILD_ID = '2026-05-26-066';
+//
+// 2026-05-26 OTA-067 — dev cheat for the project owner. If a
+// fallen character is named "Verbal" (case-insensitive,
+// trimmed), handlePlayerDeath grants a Resurrection Gem on
+// death via the standard addResurrectionGems(+1) path. The
+// player still dies and gets routed back to the title screen
+// as normal — they just immediately have a gem to revive that
+// character with. No effect for any other character name;
+// everyone else dies on the regular drop rules (boss / pity
+// timer / 0.5% rare). Loud reward-channel log line confirms
+// the grant in the session log.
+export const OTA_BUILD_ID = '2026-05-26-067';

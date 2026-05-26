@@ -14385,6 +14385,22 @@ function handlePlayerDeath(
     `${player.name} has fallen. A Resurrection Gem from the title screen can bring them back.`,
   );
 
+  // OTA-067 — dev cheat for the project owner. If the fallen
+  // character is named "Verbal" (case-insensitive, trimmed),
+  // grant a Resurrection Gem on death so they can immediately
+  // revive that same character from the title screen. No effect
+  // for any other name; everyone else dies on the normal rules
+  // (gem comes from boss kills / pity timer / rare drops).
+  if (player.name.trim().toLowerCase() === 'verbal') {
+    void addResurrectionGems(1).then((total) => {
+      set(() => ({ resurrectionGems: total }));
+      get().appendLog(
+        'reward',
+        `✦ A Resurrection Gem pulses in ${player.name}'s pack — the buried world owes you one. (${total} held)`,
+      );
+    });
+  }
+
   // Mark the character dead in-place. Persist immediately so the slot
   // summary on the title list reflects the new state.
   // 2026-05-25 [MECHANIC-1b] — clear golem sidekick on player death.
