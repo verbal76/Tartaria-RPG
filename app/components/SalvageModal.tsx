@@ -317,19 +317,26 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalv
                       (SALVAGE) on the left, dismissal (CANCEL) on the
                       right matches the project-wide convention so the
                       player's thumb learns one location for "back
-                      out." */}
+                      out."
+                      2026-05-25 OTA-042 — disabled state mirrors the
+                      InvestigateModal fix (OTA-038): when text is
+                      empty the SALVAGE button flips to the ghost /
+                      neutral style instead of a washed-out tan
+                      rectangle. Reads as "not yet ready" instead of
+                      "broken button". */}
                   <View style={styles.btnRow}>
                     <Pressable
                       style={({ pressed }) => [
                         styles.btn,
-                        styles.btnPrimary,
-                        !text.trim() && styles.btnDisabled,
+                        text.trim() ? styles.btnPrimary : styles.btnNeutral,
                         pressed && styles.btnPressed,
                       ]}
                       onPress={handleSubmit}
                       disabled={!text.trim()}
                     >
-                      <Text style={styles.btnTextPrimary}>SALVAGE</Text>
+                      <Text style={text.trim() ? styles.btnTextPrimary : styles.btnTextNeutral}>
+                        SALVAGE
+                      </Text>
                     </Pressable>
                     <Pressable
                       style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
