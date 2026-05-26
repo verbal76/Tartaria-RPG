@@ -87,4 +87,18 @@
 //       chance(60) on the second fragment so the output is always
 //       a consistent two-destination read (when ≥2 world tiles
 //       are discoverable).
-export const OTA_BUILD_ID = '2026-05-26-061';
+//
+// 2026-05-26 OTA-062 — `investigate path` now greys its chip + lets
+// the Investigate tab cycle back to amber. OTA-061 stabilized the
+// destination text but `narratePossibleDirections` still wrote only
+// to the log and never touched room memory, so the path chip stayed
+// green forever and the Investigate tab never returned to amber on
+// a tile where every other ambient noun had been investigated.
+// Playtester log: 7 successive `investigate path` taps on the same
+// tile, all green-state, all returning the same stable line.
+// Fix marks 'path' as flavor-exhausted in the current room's
+// flavorExhaustedNouns list — same pattern the generic flavor-only
+// investigate uses at gameStore.ts:4369. Chip greys after one tap;
+// further taps still produce the same (stable) direction line if
+// the player re-types `investigate path` directly.
+export const OTA_BUILD_ID = '2026-05-26-062';
