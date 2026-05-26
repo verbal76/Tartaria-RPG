@@ -14329,6 +14329,22 @@ const AMBIENT_FLAVOR_LINES: string[] = ((): string[] => {
   }
 })();
 
+// 2026-05-25 OTA-047 — mystery-seed pool. Tiny unanswered observations
+// (a coin wedged behind the {noun}, a tally mark, a smell that doesn't
+// fit). Surfaced at ~8% per investigate, PURE FLAVOR — does not mark
+// producedSubstantive so the noun stays repeatable. Authored in
+// app/data/lore/mystery-seeds.json so a writer can extend without
+// touching the engine.
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const MYSTERY_SEED_LINES: string[] = ((): string[] => {
+  try {
+    const data = require('../data/lore/mystery-seeds.json') as { lines?: string[] };
+    return Array.isArray(data.lines) ? data.lines : [];
+  } catch {
+    return [];
+  }
+})();
+
 function narrateAmbientFind(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
@@ -14363,6 +14379,20 @@ function narrateAmbientFind(
     const idx = rotatingPick(AMBIENT_FLAVOR_LINES.map((_, i) => i), 'ambient.flavor');
     const factoid = AMBIENT_FLAVOR_LINES[idx]!.replace(/\{noun\}/g, noun);
     get().appendLog('world', factoid);
+  }
+  // 2026-05-25 OTA-047 — curiosity-gap "mystery seed" reveal. ~8%
+  // chance per investigate of surfacing a tiny unanswered observation
+  // (a coin wedged behind the {noun}, a tally mark, a smell that
+  // doesn't fit the room). These are PURE FLAVOR — they do NOT mark
+  // producedSubstantive, so other verbs (take/salvage/break) keep
+  // working on the noun and the substantive ladder (hook / hidden
+  // text / trinket) still gates the same way. Layered alongside the
+  // ambient-flavor reveal so a single investigate can hit both at
+  // independent probabilities. Pool lives in app/data/lore/mystery-
+  // seeds.json — extend by adding lines, no engine touch.
+  if (MYSTERY_SEED_LINES.length > 0 && chance(8)) {
+    const seed = MYSTERY_SEED_LINES[Math.floor(Math.random() * MYSTERY_SEED_LINES.length)]!;
+    get().appendLog('world', seed.replace(/\{noun\}/g, noun));
   }
   // 2026-05-25 OTA-039 — outcome-ladder rewrite. Goal per playtester:
   // make investigate feel like it produces things to see and do,
