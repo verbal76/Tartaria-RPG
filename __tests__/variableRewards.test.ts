@@ -156,6 +156,41 @@ describe('OTA-043 — variable rewards on cardinal step', () => {
   });
 });
 
+describe('OTA-050 — parser-routed rest also rolls the OTA-043 pull', () => {
+  beforeAll(() => {
+    console.log = () => {};
+    console.warn = () => {};
+    console.error = () => {};
+  });
+
+  it('typed `rest` at full HP still occasionally produces a while-you-slept beat', async () => {
+    const store = await bootstrap();
+    // Reproduces the playtester's session: player at full HP/stamina,
+    // taps rest repeatedly. PARSER-ROUTED rest is what they hit
+    // (intent=rest via submitPlayerAction). Before OTA-050, the
+    // OTA-043 pull only fired on the dead store-method rest() that
+    // the UI doesn't reach. Now it fires on the parser path too.
+    const p0 = store.getState().player!;
+    store.setState({
+      player: { ...p0, hp: p0.hpMax, stamina: p0.staminaMax, hungerStaminaPenalty: 0 },
+      gameLog: [],
+    });
+    let pullHits = 0;
+    const PULL_CUES = /chewed on something|remembered a name|patient.*wasn't quiet|Word travelled|dream the same dream|voices somewhere|bird you can't name|haze has cleared|wind in the silt|shake out your cloak|pre-dawn light|roll up your bedroll|brushing yourself/i;
+    for (let i = 0; i < 100; i++) {
+      const before = useGameStore.getState().gameLog.length;
+      store.getState().submitPlayerAction('rest');
+      const after = useGameStore.getState().gameLog.slice(before);
+      if (after.some((e) => PULL_CUES.test(e.text))) pullHits++;
+      // Re-fill the player so the next iteration is also a full-HP
+      // rest.
+      store.setState((s) => (s.player ? { player: { ...s.player, hp: s.player.hpMax, stamina: s.player.staminaMax } } : s));
+    }
+    // 30% per rest → expected ~30 hits over 100, P(0 hits) negligible.
+    expect(pullHits).toBeGreaterThan(0);
+  });
+});
+
 describe('OTA-043 — variable rewards on rest', () => {
   beforeAll(() => {
     console.log = () => {};
