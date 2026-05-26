@@ -10880,10 +10880,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const baseRollChance = isAutoTravel ? 0.85 : 0.70;
       const timeMult = encounterRateMultiplier(playerForEnc?.hoursElapsed);
       const effectiveRollChance = Math.min(0.99, baseRollChance * timeMult);
+      // 2026-05-25 OTA-045 — JIT-temptation predicate. Depleted on
+      // any of: HP <25%, stamina <20%, TC <30. When true, the
+      // encounter picker biases toward high-value archetypes
+      // (treasure caches, mini-dungeons) at 2× weight.
+      const depleted = !!playerForEnc && (
+        (playerForEnc.hpMax > 0 && playerForEnc.hp / playerForEnc.hpMax < 0.25)
+        || (playerForEnc.staminaMax > 0 && playerForEnc.stamina / playerForEnc.staminaMax < 0.20)
+        || (playerForEnc.tc < 30)
+      );
       const enc = pickWastelandEncounter(liveSceneForEncounter.location, {
         stepsSinceLastEncounter: wasteSteps,
         threshold: baseThreshold,
         rollChance: effectiveRollChance,
+        depleted,
       });
       if (enc) {
         set(() => ({ wastelandStepsSinceEncounter: 0 }));
