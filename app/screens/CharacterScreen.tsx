@@ -214,29 +214,49 @@ export function CharacterScreen() {
         {/* ── EQUIPPED ──────────────────────────────────────────── */}
         <Text style={styles.sectionTitle}>EQUIPPED</Text>
         <View style={styles.card}>
-          {(Object.keys(SLOT_LABEL) as Array<keyof typeof SLOT_LABEL>).map((slot) => {
-            const name = (player.equipped as Record<string, string | undefined> | undefined)?.[slot];
-            if (!name) {
+          {(() => {
+            // 2026-05-26 OTA-056 — two-handed weapon in main hand
+            // also renders in the off-hand slot with a "(two-handed
+            // grip)" badge. Player asked for the visual mirror so
+            // both slots reflect that hands aren't free for a
+            // shield / scanner / second weapon.
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { findWeaponByName } = require('../engine/crafting');
+            const mainName = player.equipped?.main;
+            const mainWeaponCat = mainName ? findWeaponByName(mainName) : null;
+            const mainIsTwoHanded = mainWeaponCat?.style === 'two_handed';
+            return (Object.keys(SLOT_LABEL) as Array<keyof typeof SLOT_LABEL>).map((slot) => {
+              const directName = (player.equipped as Record<string, string | undefined> | undefined)?.[slot];
+              // Visual mirror: off-hand shows the main 2H weapon when
+              // the player is holding one. Real equipped.off stays
+              // undefined (so capability checks like isScanner read
+              // correctly), only the rendering reflects the grip.
+              const isMirrored = slot === 'off' && !directName && mainIsTwoHanded && mainName;
+              const name = directName ?? (isMirrored ? mainName : undefined);
+              if (!name) {
+                return (
+                  <View key={slot} style={styles.slotRow}>
+                    <Text style={styles.slotLabel}>{SLOT_LABEL[slot]}</Text>
+                    <Text style={styles.slotEmpty}>—</Text>
+                  </View>
+                );
+              }
+              const preview = getItemPreview(name);
               return (
                 <View key={slot} style={styles.slotRow}>
                   <Text style={styles.slotLabel}>{SLOT_LABEL[slot]}</Text>
-                  <Text style={styles.slotEmpty}>—</Text>
+                  <View style={styles.slotBody}>
+                    <Text style={styles.slotName}>
+                      {name}{isMirrored ? '  (two-handed grip)' : ''}
+                    </Text>
+                    {preview.stats.length > 0 && (
+                      <Text style={styles.slotMeta}>{preview.stats.join(' · ')}</Text>
+                    )}
+                  </View>
                 </View>
               );
-            }
-            const preview = getItemPreview(name);
-            return (
-              <View key={slot} style={styles.slotRow}>
-                <Text style={styles.slotLabel}>{SLOT_LABEL[slot]}</Text>
-                <View style={styles.slotBody}>
-                  <Text style={styles.slotName}>{name}</Text>
-                  {preview.stats.length > 0 && (
-                    <Text style={styles.slotMeta}>{preview.stats.join(' · ')}</Text>
-                  )}
-                </View>
-              </View>
-            );
-          })}
+            });
+          })()}
         </View>
 
         {/* ── STATUS EFFECTS ────────────────────────────────────── */}
