@@ -156,6 +156,57 @@ describe('OTA-043 — variable rewards on cardinal step', () => {
   });
 });
 
+describe('OTA-051 — hub rests can fire ambushes at a lower rate', () => {
+  beforeAll(() => {
+    console.log = () => {};
+    console.warn = () => {};
+    console.error = () => {};
+  });
+
+  it('60+ rests inside a hub produce at least one encounter (no more "60 days nothing")', async () => {
+    const store = await bootstrap();
+    // Send the player INTO the hub (Asgardar / their faction's starter
+    // hub — startNewGame drops them in a hub by default). Confirm the
+    // hub flag is set so we're actually exercising the new code path.
+    const p0 = store.getState().player!;
+    // Reset to confirm hub state — Reclaimer starter faction lands in
+    // Old Reclaimers' Outpost, which IS a hub location per
+    // isHubLocation. If a future change moves the starting tile out
+    // of a hub this test will gracefully skip.
+    const scene = store.getState().currentScene;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isHubLocation } = require('../app/engine/hub');
+    const inHub = scene && isHubLocation(scene.location.id);
+    if (!inHub) return; // starter location isn't a hub — can't test
+    store.setState({
+      player: { ...p0, hp: p0.hpMax, stamina: p0.staminaMax, hungerStaminaPenalty: 0 },
+      gameLog: [],
+    });
+    let encounters = 0;
+    const ENCOUNTER_CUES = /Silt Thief|Reclaimer Ambusher|Mud Giant|Mud Monarch|closes the distance through the dark|something circled while you were out/i;
+    for (let i = 0; i < 100; i++) {
+      const before = useGameStore.getState().gameLog.length;
+      store.getState().submitPlayerAction('rest');
+      const after = useGameStore.getState().gameLog.slice(before);
+      if (after.some((e) => ENCOUNTER_CUES.test(e.text))) encounters++;
+      // Re-fill and clear enemies for next iteration
+      store.setState((s) => (s.player ? {
+        player: { ...s.player, hp: s.player.hpMax, stamina: s.player.staminaMax },
+      } : s));
+      const liveScene = useGameStore.getState().currentScene;
+      if (liveScene?.enemies && liveScene.enemies.length > 0) {
+        store.setState((s) => (s.currentScene ? {
+          currentScene: { ...s.currentScene, enemies: [], enemyHps: [], activeEnemyIdx: 0, range: 'far' },
+        } : s));
+      }
+    }
+    // 8% hub rate × time-of-day modifier (0.85-1.3) over 100 rests:
+    // expected 6-10 hits. P(0 hits) with p=0.05 lower-bound = 0.95^100
+    // ≈ 0.006. Reliable.
+    expect(encounters).toBeGreaterThan(0);
+  });
+});
+
 describe('OTA-050 — parser-routed rest also rolls the OTA-043 pull', () => {
   beforeAll(() => {
     console.log = () => {};
