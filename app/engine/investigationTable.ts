@@ -137,31 +137,36 @@ const TEMPLATES: Record<NounCategory, Template> = {
   furniture: {
     category: 'furniture',
     fallbackLore: 'You run your hands over the worn surface. Faint indentations — the shape of past use — refuse to tell their story.',
-    yield: { itemName: 'Cushion Scraps', qty: 1, chance: 0.20 },
+    // OTA-078 — yield remapped from "Cushion Scraps" (not in
+    // catalog → silent grantItem failure) to Stick (confirmed
+    // in materials.json). Same fix applied across all five
+    // OTA-071 originals where the named yield item never
+    // existed in app/data/items/*.json.
+    yield: { itemName: 'Stick', qty: 1, chance: 0.20 },
     hookKind: null,
   },
   shelf: {
     category: 'shelf',
     fallbackLore: 'Empty hooks and dust marks where things used to rest. The shelf remembers what was taken; you do not.',
-    yield: { itemName: 'Paper Scraps', qty: 1, chance: 0.25 },
+    yield: { itemName: 'Worn Tartarian Coin', qty: 1, chance: 0.25 },
     hookKind: null,
   },
   machinery: {
     category: 'machinery',
     fallbackLore: 'The metal is cold and unresponsive. A faint Aetheric hum, fading, says the mechanism was alive within the last decade.',
-    yield: { itemName: 'Machine Part', qty: 1, chance: 0.15 },
+    yield: { itemName: 'Bent Nail', qty: 1, chance: 0.15 },
     hookKind: null,
   },
   vessel: {
     category: 'vessel',
     fallbackLore: 'You tilt the rim. A residue of something long-evaporated coats the inside — sour, organic, old.',
-    yield: { itemName: 'Liquid Sample', qty: 1, chance: 0.18 },
+    yield: { itemName: 'Mud Fragment', qty: 1, chance: 0.18 },
     hookKind: null,
   },
   debris: {
     category: 'debris',
     fallbackLore: 'Broken stone and dried mortar. The wreckage gives up no secrets — the secrets fell with the building that owned them.',
-    yield: { itemName: 'Useful Scrap', qty: 1, chance: 0.30 },
+    yield: { itemName: 'Small Rock', qty: 1, chance: 0.30 },
     hookKind: null,
   },
   // OTA-073 expansion. All yield item names are confirmed
@@ -507,7 +512,18 @@ export async function generateLoreAsync(
   locationName: string,
   generator: LoreGenerator | null,
 ): Promise<string> {
-  const fallback = templateFor(entry.category).fallbackLore;
+  // OTA-078 — fallback now substitutes the {noun} placeholder
+  // before returning. Pre-OTA-078 the fallback path returned
+  // the raw template literal "You look the {noun} over..." and
+  // the IIFE's skip check at gameStore.ts compared against
+  // `baseOutcome.line` (which was already substituted via
+  // resolveLore). They were never equal, so the patch IIFE
+  // overwrote the cached lore with the raw {noun} text — which
+  // then rendered LITERALLY in the next callback or echo hook
+  // ("You've already turned the {noun} over here…"). Now the
+  // returned string is always render-ready and the skip-check
+  // works.
+  const fallback = templateFor(entry.category).fallbackLore.replace(/\{noun\}/g, entry.noun);
   if (!generator) return fallback;
   const messages = buildLorePrompt(entry, locationName);
   try {

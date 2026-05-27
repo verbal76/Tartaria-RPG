@@ -502,4 +502,82 @@
 // ASYNC Qwen-patch IIFE), app/engine/investigationTable.ts
 // (KEYWORD_MAP machinery + text expansions, generic template
 // noun-aware, resolveLore performs {noun} substitution).
-export const OTA_BUILD_ID = '2026-05-27-077';
+//
+// 2026-05-27 OTA-078 — Multi-agent audit fix pass 1: silent-
+// fail eradication. Three parallel deep-audit agents found
+// six bugs in the investigate/salvage/take chain. This OTA
+// fixes the most critical four.
+//
+//   BUG 1 (CRITICAL) — Five OTA-071 yields named items not in
+//   the catalog. Cushion Scraps / Paper Scraps / Machine Part
+//   / Liquid Sample / Useful Scrap don't exist in app/data/
+//   items/*.json. findCatalogItem returns null, grant silently
+//   skips, but the curated lore line already printed "Tucked
+//   into the seam: a cushion scraps" AND the entry was marked
+//   consumed. Player saw the line, received nothing, lost the
+//   chip. Worse: the next OTA-074 callback claimed "the cushion
+//   scraps was the only thing of value" for an item that never
+//   landed. Fix: remap to confirmed-in-catalog materials.
+//     furniture  Cushion Scraps → Stick
+//     shelf      Paper Scraps   → Worn Tartarian Coin
+//     machinery  Machine Part   → Bent Nail
+//     vessel     Liquid Sample  → Mud Fragment
+//     debris     Useful Scrap   → Small Rock
+//
+//   BUG 2 — Investigate pack-full silent-fail. The OTA-077 SYNC
+//   block logged baseOutcome.line FIRST (which already
+//   contained "Tucked into the seam: a X") then tried grantItem
+//   — if granted.accepted===0 (cap hit), no reward log fired,
+//   no warning, entry still marked consumed with kind='item'.
+//   Player read "tucked into the seam: a bone sliver", got
+//   nothing, lost the chip, AND the next callback lied about
+//   the take. Fix: attempt grant FIRST, downgrade outcome to
+//   'flavor' on pack-full, log the right line, skip the dedup
+//   write so the chip stays workable for retry.
+//
+//   BUG 3 — Salvage pack-full silent-fail. Same pattern as Bug
+//   2 in the harvest branch at ~line 4181 AND salvageAllAmbient
+//   at ~line 12132. produced=true was set even on pack-full
+//   ("counts as produced" per the old comment), consumeNouns
+//   was pushed, chip locked forever. Fix: don't mark produced/
+//   push to consumed on pack-full; emit arbiter-channel
+//   warning instead of the cryptic flavor "...but your pack is
+//   already full of them" line.
+//
+//   BUG 4 — Take pack-full silent-fail. takeAmbientNoun at
+//   ~line 1357 unconditionally marked consumed even when
+//   accepted===0. Fix: early-return with arbiter warning when
+//   grant fails; consume only on success.
+//
+//   BUG 5 (related, fixed here) — Qwen async patch comparison
+//   was always false. generateLoreAsync returned the raw
+//   template string with the literal '{noun}' placeholder when
+//   Qwen was unavailable / timed out; the IIFE's skip check
+//   compared against baseOutcome.line which was already
+//   substituted. They never matched, the patch always ran, and
+//   the cached loreLine got the raw {noun} text. Next callback
+//   or echo hook rendered "{noun}" verbatim. Fix: substitute
+//   the placeholder in the fallback return path before
+//   returning.
+//
+// Outstanding (next OTAs):
+//   - OTA-079 will sync salvage→table consumed flag so salvage
+//     + investigate on the same noun stop double-dipping, and
+//     move resolved-hook check before the table consult so
+//     spire's 4th tap (post-hook-resolution) doesn't leak to
+//     generic.
+//   - OTA-080 will add hub-room-id to makeRoomKey (chandelier
+//     study + armory share a key right now), expand KEYWORD_
+//     MAP with ~18 missing nouns (spire/tower/dome/chandelier
+//     /pillar/mosaic/etc.), introduce a 'landmark' category,
+//     and add the CREEPY_VARIANTS lore pool from the audit.
+//
+// Files: app/engine/investigationTable.ts (yield remaps in 5
+// TEMPLATES + generateLoreAsync placeholder substitution),
+// app/state/gameStore.ts (investigate case first-time block
+// refactored: grant-first, downgrade-on-fail, skip-consume-on-
+// pack-full; harvest branch pack-full → arbiter warning +
+// produced=false; salvageAllAmbient pack-full → narration +
+// no consume push; takeAmbientNoun pack-full → early return +
+// arbiter warning).
+export const OTA_BUILD_ID = '2026-05-27-078';

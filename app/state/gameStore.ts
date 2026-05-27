@@ -25,6 +25,7 @@ import {
   generateLoreAsync as generateInvestigationLoreAsync,
   findReferenceableInvestigation,
   buildEchoHookLine,
+  resolveLore as resolveInvestigationLore,
   type LoreGenerator,
 } from '../engine/investigationTable';
 import {
@@ -1351,6 +1352,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
     const grantResult = grantItem(player.inventory, newItem);
     set((s) => (s.player ? { player: { ...s.player, inventory: grantResult.inventory } } : s));
+    // OTA-078 — skip the consume-mark when the grant failed
+    // (pack full). Pre-OTA-078 the take action always marked
+    // consumed, so a player with a full pack would tap TAKE on
+    // a chip, get the cryptic "Found a X, but your pack is
+    // already full" line, then LOSE access to the chip with
+    // nothing in their pack. Now: pack-full keeps the chip
+    // workable so the player can drop something and retry.
+    if (grantResult.accepted <= 0) {
+      get().appendLog(
+        'arbiter',
+        `Your pack is too full to take the ${cat.name.toLowerCase()} from the ${ambientHit}. Drop something or upgrade and try again.`,
+      );
+      void get().persist();
+      return;
+    }
     // Mark consumed so re-take AND re-salvage on the same ambient
     // in this room hit the dedupe gate.
     set((s) => {
@@ -1372,12 +1388,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         },
       };
     });
-    if (grantResult.accepted > 0) {
-      get().appendLog('world', `You take the ${cat.name} from where it lay.`);
-      get().appendLog('reward', `✦ ${cat.name} (${cat.rarity}).`);
-    } else {
-      get().appendLog('world', `Found a ${cat.name.toLowerCase()}, but your pack is already full of them.`);
-    }
+    // OTA-078 — pack-full path already returned early above, so
+    // we only reach here when the grant landed.
+    get().appendLog('world', `You take the ${cat.name} from where it lay.`);
+    get().appendLog('reward', `✦ ${cat.name} (${cat.rarity}).`);
     void get().persist();
   },
 
@@ -4178,10 +4192,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 get().appendLog('reward', `✦ ${outcome.itemName}${qtyLabel} (${outcome.rarity}).`);
                 produced = true;
               } else {
-                get().appendLog('world', `Found a ${outcome.itemName!.toLowerCase()}, but your pack is already full of them.`);
-                // Pack-full counts as produced (you've worked over the
-                // noun and the item rolled, you just couldn't carry it).
-                produced = true;
+                // OTA-078 — pack-full no longer counts as
+                // produced. Pre-OTA-078 the comment claimed
+                // "you've worked over the noun" so we still
+                // consumed the chip, but the player walked away
+                // with NOTHING and lost the chip with no clear
+                // explanation. Now: arbiter-channel warning +
+                // produced stays false so the chip remains
+                // workable after the player drops something or
+                // upgrades. Mirrors the same fix in the OTA-077
+                // investigate-table sync-consume path.
+                get().appendLog(
+                  'arbiter',
+                  `Your pack is too full to take the ${outcome.itemName!.toLowerCase()} from the ${harvestAmbient}. Drop something or upgrade and try again.`,
+                );
+                // produced stays false — chip remains workable
               }
             } else if (outcome.kind === 'tc') {
               set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + outcome.amount } } : s));
@@ -4334,14 +4359,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 : null;
               const locationName =
                 currentScene.location.name ?? 'this place';
-              const isItemOutcome = baseOutcome.kind === 'item';
-              // SYNC: log the curated lore (with item suffix
-              // when applicable) immediately. No await on Qwen.
-              get().appendLog('world', baseOutcome.line);
-              // SYNC: grant the item via the standard inventory
-              // pipeline. Player sees the reward line right
-              // after the lore line — single beat, no delay.
-              if (isItemOutcome && get().player) {
+              const wantedItem = baseOutcome.kind === 'item';
+              // OTA-078 — attempt the grant FIRST so we know the
+              // FINAL outcome before logging. Pre-OTA-078 the
+              // sequence was: log baseOutcome.line (which already
+              // contained "Tucked into the seam: a X") → try
+              // grantItem → if accepted===0 (pack full) or cat
+              // missing, silently skip the reward log → mark
+              // consumed regardless. Player saw "Tucked into the
+              // seam: a bone sliver", received nothing, and lost
+              // the chip with no warning. Worse: the next call-
+              // back claimed "the bone sliver was the only thing
+              // of value" for an item that never entered the
+              // pack. Now: we attempt the grant first, downgrade
+              // to flavor if it fails, log the right line, and
+              // SKIP the dedup write on pack-full so the player
+              // can retry after dropping something.
+              let finalOutcome = baseOutcome;
+              let grantedCat: ReturnType<typeof findCatalogItem> | null = null;
+              let grantedQty = 0;
+              let packFullDeflection = false;
+              if (wantedItem && get().player) {
                 const cat = findCatalogItem(baseOutcome.detail);
                 if (cat) {
                   const newItem: InventoryItem = {
@@ -4357,13 +4395,57 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     set((s) =>
                       s.player ? { player: { ...s.player, inventory: granted.inventory } } : s,
                     );
-                    const qtyLabel = granted.accepted > 1 ? ` x${granted.accepted}` : '';
-                    get().appendLog(
-                      'reward',
-                      `✦ ${cat.name}${qtyLabel} from the ${ambient}.`,
-                    );
+                    grantedCat = cat;
+                    grantedQty = granted.accepted;
+                  } else {
+                    // Pack full — downgrade to flavor so the lore
+                    // line doesn't claim a take that never landed.
+                    packFullDeflection = true;
+                    finalOutcome = {
+                      kind: 'flavor',
+                      detail: '',
+                      line: resolveInvestigationLore(tableEntry),
+                    };
                   }
+                } else {
+                  // Catalog miss (template typo / item removed).
+                  // Silently downgrade to flavor so the player
+                  // doesn't see a phantom "Tucked into the seam"
+                  // claim. Still consume the chip — repeated taps
+                  // would just hit the same bug.
+                  finalOutcome = {
+                    kind: 'flavor',
+                    detail: '',
+                    line: resolveInvestigationLore(tableEntry),
+                  };
                 }
+              }
+              // SYNC: log the final-state outcome line.
+              get().appendLog('world', finalOutcome.line);
+              // SYNC: log the reward when the grant actually
+              // landed an item.
+              if (grantedCat && grantedQty > 0) {
+                const qtyLabel = grantedQty > 1 ? ` x${grantedQty}` : '';
+                get().appendLog(
+                  'reward',
+                  `✦ ${grantedCat.name}${qtyLabel} from the ${ambient}.`,
+                );
+              }
+              // SYNC: log the pack-full warning. Arbiter-channel
+              // so it reads as a clear note, not flavor.
+              if (packFullDeflection) {
+                get().appendLog(
+                  'arbiter',
+                  `Your pack is too full to take the ${baseOutcome.detail.toLowerCase()} from the ${ambient}. Drop something or upgrade and try again.`,
+                );
+              }
+              // OTA-078 — SKIP the consume block when pack-full
+              // deflection happened so the player can retry the
+              // SAME chip after making room. The chip stays
+              // green; OTA-070 fuzzy UI is unaffected because we
+              // never wrote to the dedup list.
+              if (packFullDeflection) {
+                break;
               }
               // SYNC: mark consumed + write to dedup list. Chip
               // greys IMMEDIATELY via OTA-070/076 fuzzy UI check
@@ -4375,13 +4457,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   visitCount: 1,
                 };
                 const prevTable = room.roomInvestigationTable ?? {};
+                // OTA-078 — record the FINAL outcome (after
+                // grant attempt + possible downgrade), not the
+                // initial baseOutcome. Pre-OTA-078 a pack-full
+                // deflected outcome would still cache result.
+                // kind='item' and result.detail='Bone Sliver',
+                // so the next callback claimed "the bone sliver
+                // was the only thing of value" for an item that
+                // never entered inventory. Now: if we deflected
+                // to flavor, the callback chain reflects that.
                 const updatedEntry = {
                   ...tableEntry,
-                  loreLine: baseOutcome.line, // curated; Qwen patches async below
+                  loreLine: finalOutcome.line, // Qwen patches async below
                   consumed: true,
                   consumedAt: Date.now(),
-                  result: baseOutcome,
+                  result: finalOutcome,
                 };
+                const isItemOutcome = finalOutcome.kind === 'item';
                 const existingSearched = room.searchedAmbientNouns ?? [];
                 const existingFlavor = room.flavorExhaustedNouns ?? [];
                 const searchedWithNoun = isItemOutcome && !existingSearched.includes(ambientLower)
@@ -4419,15 +4511,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     locationName,
                     qwenGenerator,
                   );
-                  // Skip the patch if Qwen returned the same
-                  // curated fallback (timeout / failure path).
-                  if (!enriched || enriched === baseOutcome.line) return;
+                  // OTA-078 — compare against the FINAL outcome
+                  // line (was baseOutcome.line). When the grant
+                  // failed and we downgraded to flavor, the
+                  // visible/log line was the resolved curated
+                  // lore — that's what we want to compare. Also:
+                  // generateLoreAsync now substitutes the {noun}
+                  // placeholder before returning the fallback, so
+                  // this comparison actually detects "Qwen gave
+                  // us the same curated text" instead of always
+                  // running the patch with raw {noun} in it.
+                  const finalLineForCompare = finalOutcome.line;
+                  if (!enriched || enriched === finalLineForCompare) return;
                   set((s) => {
                     const room = s.worldMemory.visitedRooms?.[tableRoomKey];
                     const existing = room?.roomInvestigationTable?.[ambientLower];
                     if (!room || !existing) return s;
-                    const enrichedLine = isItemOutcome
-                      ? `${enriched} Tucked into the seam: a ${baseOutcome.detail.toLowerCase()}.`
+                    // OTA-078 — only append the item suffix when
+                    // the FINAL outcome was actually an item
+                    // (grant landed). Pre-OTA-078 a pack-full
+                    // deflection still appended "Tucked into the
+                    // seam" to the Qwen-enriched cache because
+                    // we used the pre-deflection isItemOutcome.
+                    const wasItemGrant = finalOutcome.kind === 'item';
+                    const enrichedLine = wasItemGrant
+                      ? `${enriched} Tucked into the seam: a ${finalOutcome.detail.toLowerCase()}.`
                       : enriched;
                     const patched: typeof existing = {
                       ...existing,
@@ -12020,10 +12128,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
             quantity: (prev?.quantity ?? 0) + accepted,
             rarity: prev?.rarity ?? (outcome.rarity ?? 'Common'),
           });
+          // OTA-078 — only consume the noun when the grant
+          // actually landed. Pre-OTA-078 the consume push was
+          // unconditional, so pack-full salvage-all would
+          // narrate "found a X but your pack is full" AND lock
+          // the chip out forever. Now: pack-full keeps the noun
+          // workable so the player can drop something + retry.
+          consumedNouns.push(harvestLowered);
         } else {
-          narrationLines.push(`Found a ${outcome.itemName.toLowerCase()}, but your pack is already full of them.`);
+          narrationLines.push(
+            `Your pack is too full to take the ${outcome.itemName.toLowerCase()} from the ${noun}. Drop something and try again.`,
+          );
+          // Don't push to consumedNouns — chip remains workable.
         }
-        consumedNouns.push(harvestLowered);
         continue;
       }
       // rollSalvagePool only produces 'material' or 'nothing' —
