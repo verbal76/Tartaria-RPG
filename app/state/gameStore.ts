@@ -328,6 +328,23 @@ interface CurrentScene {
     tier: number;
     totalTiers: number;
   } | null;
+  /** 2026-05-27 OTA-089 — elevated overlay state. When the
+   *  player crests a multi-tier climb and the overlay roll
+   *  hits, this scene becomes a mini-area (nook / vantage /
+   *  roost / collector / sealed-door / open-sky). The
+   *  preserved-on-descent reference is the scene the player
+   *  WAS in before climbing — `climb down` restores it.
+   *  elevatedOverlayMeta carries the climbed noun + room key
+   *  + max-tier so the descent can write the cleared marker
+   *  back to the original room's searchedAmbientNouns. Both
+   *  are undefined for normal scenes. */
+  preservedSceneOnDescent?: CurrentScene;
+  elevatedOverlayMeta?: {
+    climbedNoun: string;
+    climbedRoomKey: string;
+    maxTier: number;
+    overlayId: string;
+  };
 }
 
 // Helper: which enemy is the player currently targeting? Returns null
@@ -6680,6 +6697,43 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const downFrom = typeof elev === 'string'
             ? elev
             : (elev as { noun?: string }).noun ?? 'the height';
+          // 2026-05-27 OTA-089 — elevated overlay descent. When
+          // the player is in an overlay scene (mini-area at
+          // the apex), climb-down restores the preserved base
+          // scene directly — no detour back to "the pillar"
+          // first. The climbed marker for tgt was already
+          // written to the base room's searchedAmbientNouns
+          // when the climb-top tier resolved, so the chip
+          // greys correctly via OTA-086's fuzzy match on
+          // restore. Active overlay enemies are abandoned —
+          // intentional design: if you didn't finish the
+          // encounter, you bailed.
+          const overlayMeta = currentScene.elevatedOverlayMeta;
+          const preserved = currentScene.preservedSceneOnDescent;
+          if (overlayMeta && preserved) {
+            const climbedName = overlayMeta.climbedNoun || downFrom;
+            set((s) => {
+              if (!s.currentScene) return s;
+              // Restore the base scene as currentScene. Drop
+              // elevatedOn since we're back on the ground.
+              return {
+                currentScene: {
+                  ...preserved,
+                  elevatedOn: null,
+                  // Don't carry overlay fields back onto the
+                  // base — explicitly clear them.
+                  preservedSceneOnDescent: undefined,
+                  elevatedOverlayMeta: undefined,
+                },
+              };
+            });
+            set({ player: advanceTime(spendStamina(player, 1), 0.25) });
+            get().appendLog(
+              'world',
+              `You climb down from the ${overlayMeta.overlayId === 'open_sky' ? 'lookout' : overlayMeta.overlayId.replace(/_/g, ' ')} and rejoin the ground beside the ${climbedName}. Boots back on the ground.`,
+            );
+            break;
+          }
           set((s) => s.currentScene ? { currentScene: { ...s.currentScene, elevatedOn: null } } : s);
           set({ player: advanceTime(spendStamina(player, 1), 0.25) });
           get().appendLog(
@@ -7016,6 +7070,77 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : s.currentScene,
             };
           });
+          // 2026-05-27 OTA-089 — elevated overlay roll. If the
+          // chance fires AND we're at the top tier, swap the
+          // scene for a mini-area (nook/vantage/roost/etc.)
+          // with its own ambient nouns and (usually) an
+          // encounter. The original scene is preserved on the
+          // overlay's preservedSceneOnDescent; `climb down`
+          // restores it. The player doesn't have to return to
+          // the climbed object first — descent is direct.
+          if (isTop) {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { rollElevatedOverlay, rollOverlayEncounter, buildOverlayOverrides } =
+              require('../engine/elevatedOverlay') as typeof import('../engine/elevatedOverlay');
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { findEnemyByName } = require('../engine/encounter') as typeof import('../engine/encounter');
+            const overlay = rollElevatedOverlay();
+            if (overlay) {
+              const enemyName = rollOverlayEncounter(overlay);
+              const enemy = enemyName ? findEnemyByName(enemyName) : null;
+              const overrides = buildOverlayOverrides(overlay, enemy);
+              set((s) => {
+                if (!s.currentScene) return s;
+                // Build the overlay scene by spreading the base
+                // and overriding ambientNouns / enemies. Hooks
+                // are reset (the overlay is its own narrative
+                // beat; carrying base hooks would route taps
+                // into wrong scenes). Vendor/range/weather/
+                // hazard inherit so the world stays cohesive
+                // (storm on the road is still a storm up
+                // there).
+                const baseScene = s.currentScene;
+                const overlayScene: typeof baseScene = {
+                  ...baseScene,
+                  ambientNouns: overrides.ambientNouns,
+                  displayedAmbientNouns: overrides.displayedAmbientNouns,
+                  enemies: overrides.enemies,
+                  enemyHps: overrides.enemyHps,
+                  enemyAmbushUsed: overrides.enemyAmbushUsed,
+                  activeEnemyIdx: overrides.activeEnemyIdx,
+                  hooks: overrides.hooks,
+                  // OTA-088 chip-rotation does not apply here —
+                  // overlay's nouns are fresh; no triggerNoun
+                  // to rotate.
+                  // OTA-089 — preserve the base scene + metadata
+                  // so climb-down restores it and writes the
+                  // cleared marker for the climbed noun back to
+                  // the base room.
+                  preservedSceneOnDescent: baseScene,
+                  elevatedOverlayMeta: {
+                    climbedNoun: tgt,
+                    climbedRoomKey: climbRoomKey,
+                    maxTier: totalTiers,
+                    overlayId: overlay.id,
+                  },
+                  // The overlay is a fresh scene — drop any
+                  // mid-flight hook state from the base. The
+                  // climbed marker stays on the base's
+                  // searchedAmbientNouns (already written
+                  // above) so when we restore the base scene
+                  // the chip is correctly cleared.
+                };
+                return { currentScene: overlayScene };
+              });
+              get().appendLog('world', overlay.arrivalLine);
+              if (enemy) {
+                get().appendLog(
+                  'combat',
+                  `${enemy.name} is here — and it has seen you.`,
+                );
+              }
+            }
+          }
         }
         break;
       }

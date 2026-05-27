@@ -965,4 +965,66 @@
 // File: app/state/gameStore.ts (resolveHookOneStep param
 // extension + chip-replacement set() block; two call sites
 // updated to thread the trigger).
-export const OTA_BUILD_ID = '2026-05-27-088';
+//
+// 2026-05-27 OTA-089 — Elevated overlay mini-areas. When the
+// player crests a multi-tier climb (spire, tower, statue,
+// etc.) there's now a 30% chance to enter an OVERLAY scene
+// at the apex — a nook, vantage post, Aether collector,
+// sealed door, roost, or open-sky vista. Each overlay has
+// its own ambient nouns and (usually) an encounter. The
+// player resolves whatever's up there and `climb down` from
+// the overlay restores the original base scene DIRECTLY —
+// no detour back to "the pillar" first.
+//
+// Architecture: new app/engine/elevatedOverlay.ts (pure
+// module) holds OVERLAYS pool + rollElevatedOverlay (30%
+// trigger) + rollOverlayEncounter (per-overlay enemy chance)
+// + buildOverlayOverrides (constructs the swap-in scene).
+//
+// CurrentScene gains two new fields:
+//   preservedSceneOnDescent — the scene the player was in
+//     before climbing. climb-down restores this on overlay
+//     exit.
+//   elevatedOverlayMeta — { climbedNoun, climbedRoomKey,
+//     maxTier, overlayId } so descent can write the cleared
+//     marker back to the base room.
+//
+// Engine integration:
+//   - Climb handler: after the top-tier state write, if
+//     isTop, roll rollElevatedOverlay. If non-null: pick
+//     encounter via rollOverlayEncounter + findEnemyByName,
+//     build overlay scene via buildOverlayOverrides, swap
+//     currentScene with preservedSceneOnDescent pointing at
+//     the base. Log the arrival line + an enemy-spotted line
+//     when an encounter spawned.
+//   - Climb-down handler: when wantsDown && currentScene.
+//     elevatedOverlayMeta + preservedSceneOnDescent both
+//     set, restore the base scene (with elevatedOn/overlay
+//     fields cleared). The climbed marker for the climbed
+//     noun was already written to the base room's
+//     searchedAmbientNouns when the climb-top tier resolved,
+//     so OTA-086's fuzzy chip-clear logic greys the climb
+//     chip correctly post-restore. Active overlay enemies
+//     are abandoned by design — if you didn't finish the
+//     encounter you bailed.
+//
+// Overlay templates (6) use existing enemies from app/data/
+// enemies/enemies.json by name — no new enemy authoring:
+//   nook         (65% chance)  Aetheric Bat / Raven / Spider
+//   vantage      (30%)         Aetheric Shrike / Harpy
+//   collector    (50%)         Aetheric Apparition / Ooze
+//   sealed_door  (20%)         Stone Warden / Aetheric Gargoyle
+//   roost        (80%)         Aetheric Raven / Harpy / Shrike
+//   open_sky     (5%)          Aetheric Apparition (rare ghost)
+//
+// Ambient nouns hit the OTA-080 keyword map where possible
+// (vessel for 'copper bowl', vegetation for nest/feathers,
+// etc.) so the investigation table seeds useful entries.
+//
+// Files: NEW app/engine/elevatedOverlay.ts (~150 lines, pure
+// module), app/state/gameStore.ts (CurrentScene interface
+// gains preservedSceneOnDescent + elevatedOverlayMeta;
+// climb-top branch wires rollElevatedOverlay + scene swap;
+// climb-down branch detects overlay state and restores the
+// preserved scene).
+export const OTA_BUILD_ID = '2026-05-27-089';
