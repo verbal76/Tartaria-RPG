@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-105` (Aether-family IPA spec completed — Aetherstone / Aetherbat refined per fresh playtester IPA; all five Aether entries now reflect the user's canonical pronunciation, splitting cleanly into a long-A group "ay" (Aether/Aetheric/Aetherstone) and a short-E group "eth" (Aetherborn/Aetherbat)). See **Section 0** for the live issue tracker covering OTA-070 → OTA-105.
+> **Latest OTA:** `2026-05-27-106` (Aetherstone correction — user clarified via natural-language respelling `AY-thur-stohn`; OTA-105 had parsed the IPA as hard /t/ + "sten" ending, which was wrong. Aetherstone reverts to "ay thur stone" with /θ/ and "stone" ending; still in the long-A group). See **Section 0** for the live issue tracker covering OTA-070 → OTA-106.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -38,6 +38,13 @@
 ### 0.B — Closed Issues (most recent first)
 
 #### Pronunciation lexicon
+
+- **OTA-106 (2026-05-27) · Aetherstone correction — OTA-105 misparsed the IPA.**
+  - **What:** OTA-105 took the user's IPA `/ɛjtɛɹstɛn/` for Aetherstone literally and respelled as `'ay ter sten'` — hard /t/, "sten" rhymes with "ten." Player corrected via natural-language respelling: `AY-thur-stohn = aetherstone`. Translation: long-A start (consistent with the rest of the long-A group), /θ/ "th" sound in the middle (not /t/), and "stone" final (not "sten").
+  - **Fix:** `loreLexicon.ts` Aetherstone entry → `'ay thur stone'` (essentially the pre-OTA-105 respelling, which OTA-103 had left alone for exactly this reason — partial refinement is safer than guessing). Block comment updated to call out the correction.
+  - **Why:** When the user provides both IPA and a natural-language respelling and they disagree, the natural-language respelling wins — it's a clearer signal of the canonical pronunciation than parsing IPA characters that may have been typed loosely. Aetherbat's `'eth er bet'` from OTA-105 stays — user only corrected Aetherstone.
+  - **Lesson logged:** When IPA respelling produces a surprising result (hard /t/ in a word with "th", or a /stɛn/ ending in a word with "stone"), surface it back to the user before shipping rather than committing the literal parse. Going forward: if IPA yields a result that diverges sharply from the word's English orthography, ask before applying.
+  - **Files:** `app/voice/loreLexicon.ts` (Aetherstone entry + Aether block comment).
 
 - **OTA-105 (2026-05-27) · Aether-family IPA spec completed: Aetherstone, Aetherbat.**
   - **What:** OTA-103 refined three Aether entries (aether/aetheric/aetherborn) and left Aetherstone / Aetherbat untouched pending a fresh spec. Player provided IPA for those two: `Aetherstone /ɛjtɛɹstɛn/`, `Aetherbat /ɛθɛɾ bet/`. Both diverge from the prior respellings in surprising ways — Aetherstone uses a hard /t/ instead of /θ/ ("ter" not "ther") and ends in /stɛn/ ("sten" rhymes with "ten") not the obvious "stone"; Aetherbat ends in /bet/ ("bet" rhymes with "set") not the obvious "bat". The Aether family now splits cleanly by initial vowel: long-A "ay" group (Aether, Aetheric, Aetherstone) and short-E "eth" group (Aetherborn, Aetherbat).

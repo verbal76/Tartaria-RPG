@@ -1540,4 +1540,16 @@
 // pronunciation.
 //
 // Files: app/voice/loreLexicon.ts.
-export const OTA_BUILD_ID = '2026-05-27-105';
+//
+// 2026-05-27 OTA-106 — Aetherstone correction. User clarified
+// via natural-language respelling: "AY-thur-stohn = aether
+// stone". OTA-105 parsed the IPA /ɛjtɛɹstɛn/ as hard /t/ +
+// "sten" ending, which was wrong — Aetherstone is "ay thur
+// stone" with the /θ/ sound and the obvious "stone" ending
+// (essentially the pre-OTA-105 respelling). Reverted. The
+// long-A/short-E group split still holds (Aetherstone stays
+// in the long-A group), but the middle and ending now match
+// the corrected pronunciation.
+//
+// Files: app/voice/loreLexicon.ts.
+export const OTA_BUILD_ID = '2026-05-27-106';
