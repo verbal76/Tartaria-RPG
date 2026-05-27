@@ -243,4 +243,43 @@
 // generation time, so investigates never bottom out at
 // "Nothing more to find" — the user's bigger architectural
 // suggestion. This OTA is the immediate UI-engine alignment.
-export const OTA_BUILD_ID = '2026-05-26-070';
+//
+// 2026-05-26 OTA-071 — Per-room investigation table
+// (foundational OTA, 1/5 in the noun-table series). Every
+// ambient noun added to a scene at generation time now seeds
+// an entry in worldMemory.visitedRooms[roomKey].roomInvestiga
+// tionTable. Schema: { noun, category, generatedAt, loreLine,
+// yield, hookKind, consumed, consumedAt, result }. Categorizer
+// keyword-matches the noun against 5 templates (furniture,
+// shelf, machinery, vessel, debris) + a generic fallback.
+// Each template has a curated fallback lore string used as
+// the first-investigate outcome. Yield data is held but NOT
+// rolled this OTA — OTA-073 activates yield mechanics.
+//
+// Engine integration: investigate handler consults the table
+// BEFORE the existing alreadySearched / requirement / catalog
+// branches. First investigate prints the entry's lore line +
+// marks consumed + writes flavorExhausted (so OTA-070's fuzzy
+// UI check greys the chip). Repeat investigate prints the
+// SPECIFIC callback line ("...keeps its lore but offers
+// nothing new") instead of the pre-table generic "Nothing
+// more to find" refusal.
+//
+// Pinned ground/floor/mud nouns are intentionally excluded
+// from the table — the existing dig-here path owns those.
+// Re-entered rooms preserve their table + consumed flags
+// (idempotent seed). Legacy saves without a table fall
+// through to existing logic, no breaks.
+//
+// Files: NEW app/engine/investigationTable.ts (~190 lines —
+// pure module, no React/zustand). app/engine/types.ts —
+// VisitedRoom.roomInvestigationTable field added.
+// app/state/gameStore.ts — beginScene seeds the table after
+// scene commit; investigate case consults it before existing
+// dedup paths.
+//
+// Next: OTA-072 adds lazy Qwen lore generation with curated
+// fallback, OTA-073 activates yield mechanics + hook seeding,
+// OTA-074 polishes callback narration per result.kind,
+// OTA-075 wires hooks to reference past investigations.
+export const OTA_BUILD_ID = '2026-05-26-071';

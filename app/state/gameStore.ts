@@ -19,6 +19,11 @@ import type {
 } from '../engine/types';
 import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet } from '../engine/worldMemory';
 import {
+  seedInvestigationTable,
+  rollOutcome as rollInvestigationOutcome,
+  callbackLine as investigationCallbackLine,
+} from '../engine/investigationTable';
+import {
   listSlots,
   loadSlot,
   saveSlot,
@@ -2345,6 +2350,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     } catch { /* voice modules not present in tests */ }
     set({ currentScene: scene, pendingRolls: null });
+    // 2026-05-26 OTA-071 — seed the per-room investigation
+    // table from the scene's ambientNouns. Idempotent: only
+    // seeds when the room doesn't already have a table (re-
+    // entering a known room preserves prior table state +
+    // consumed flags). Lives inside worldMemory.visitedRooms
+    // [roomKey] so persistence is automatic via the existing
+    // save path.
+    if (player) {
+      const investigateRoomKey = makeRoomKey(
+        player.currentLocationId,
+        scene.microMicroId,
+        player.mapX,
+        player.mapY,
+      );
+      set((s) => {
+        const prev = s.worldMemory.visitedRooms?.[investigateRoomKey];
+        if (prev?.roomInvestigationTable) return s; // already seeded
+        const base: VisitedRoom = prev ?? {
+          firstVisitAt: Date.now(),
+          lastVisitAt: Date.now(),
+          visitCount: 1,
+        };
+        const table = seedInvestigationTable(scene.ambientNouns);
+        return {
+          worldMemory: {
+            ...s.worldMemory,
+            visitedRooms: {
+              ...(s.worldMemory.visitedRooms ?? {}),
+              [investigateRoomKey]: { ...base, roomInvestigationTable: table },
+            },
+          },
+        };
+      });
+    }
     const dropIds = [...consumedChainIds, ...expiredChainIds];
     if (dropIds.length > 0) {
       set((s) => ({
@@ -4173,6 +4212,83 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const ambient = matchAmbientNoun(rawTarget, currentScene.ambientNouns ?? []);
           if (ambient) {
             const ambientLower = ambient.toLowerCase();
+            // 2026-05-26 OTA-071 — per-room investigation table
+            // consult. Runs BEFORE the existing alreadySearched
+            // / requirement / catalog branches so any noun the
+            // table knows about gets a specific outcome on first
+            // tap and a specific callback on repeat. Falls
+            // through to existing logic when the table doesn't
+            // have an entry (pinned ground/floor/mud and any
+            // legacy room saved before OTA-071 generated its
+            // table).
+            const tableRoomKey = makeRoomKey(
+              player.currentLocationId,
+              currentScene.microMicroId,
+              player.mapX,
+              player.mapY,
+            );
+            const tableRoom = get().worldMemory.visitedRooms?.[tableRoomKey];
+            const tableEntry = tableRoom?.roomInvestigationTable?.[ambientLower];
+            if (tableEntry) {
+              if (tableEntry.consumed) {
+                // Specific callback referencing the recorded
+                // first-investigate result — no stamina, no
+                // time, no re-roll.
+                get().appendLog(
+                  'world',
+                  investigationCallbackLine(ambient, tableEntry),
+                );
+                break;
+              }
+              // First investigate — roll the table outcome,
+              // consume the entry, write to flavorExhausted so
+              // the chip greys via the OTA-070 fuzzy UI check
+              // even if the player later re-enters this room.
+              const outcome = rollInvestigationOutcome(tableEntry);
+              get().appendLog('world', outcome.line);
+              set((s) => {
+                const room = s.worldMemory.visitedRooms?.[tableRoomKey] ?? {
+                  firstVisitAt: Date.now(),
+                  lastVisitAt: Date.now(),
+                  visitCount: 1,
+                };
+                const prevTable = room.roomInvestigationTable ?? {};
+                const updatedEntry = {
+                  ...tableEntry,
+                  consumed: true,
+                  consumedAt: Date.now(),
+                  result: outcome,
+                };
+                const existingFlavor = room.flavorExhaustedNouns ?? [];
+                const flavorWithNoun = existingFlavor.includes(ambientLower)
+                  ? existingFlavor
+                  : [...existingFlavor, ambientLower];
+                return {
+                  worldMemory: {
+                    ...s.worldMemory,
+                    visitedRooms: {
+                      ...(s.worldMemory.visitedRooms ?? {}),
+                      [tableRoomKey]: {
+                        ...room,
+                        roomInvestigationTable: {
+                          ...prevTable,
+                          [ambientLower]: updatedEntry,
+                        },
+                        flavorExhaustedNouns: flavorWithNoun,
+                      },
+                    },
+                  },
+                };
+              });
+              // Stamina/time costs intentionally NOT applied
+              // here — table outcomes are quick visual / flavor
+              // beats. The richer skill-check path (catalog
+              // items, scanners) keeps its existing stamina
+              // cost and dice. Persistence flush via the
+              // normal advanceTime/persist cadence on the next
+              // action.
+              break;
+            }
             const searchRoomKey = makeRoomKey(
               player.currentLocationId,
               currentScene.microMicroId,

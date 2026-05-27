@@ -1,3 +1,5 @@
+import type { InvestigationEntry } from './investigationTable';
+
 export type Rarity = 'Common' | 'Uncommon' | 'Rare' | 'Legendary';
 
 export type Intent =
@@ -952,6 +954,18 @@ export interface VisitedRoom {
    *  passed. Wall-clock fallback (lastVisitAt) remains for legacy
    *  saves that don't carry this field. */
   hoursElapsedAtVisit?: number;
+  /** 2026-05-26 OTA-071 — per-room investigation table. Seeded
+   *  on first scene generation from ambientNouns. Each entry
+   *  has a category, curated/Qwen lore, optional yield, hook
+   *  potential, consumed flag, and recorded result. The
+   *  investigate handler consults this BEFORE the existing
+   *  alreadySearched / requirement / catalog paths, so any
+   *  noun in the table gets a specific outcome on first tap
+   *  and a specific callback on repeat. Pinned ground
+   *  surfaces (ground/floor/mud) are intentionally excluded —
+   *  the dig-here path owns those. See
+   *  app/engine/investigationTable.ts. */
+  roomInvestigationTable?: Record<string, InvestigationEntry>;
 }
 
 export type ScreenName =
