@@ -755,4 +755,58 @@
 //
 // File: app/state/gameStore.ts (resolvedHookMatch branch
 // now writes searchedAmbientNouns alongside the appendLog).
-export const OTA_BUILD_ID = '2026-05-27-083';
+//
+// 2026-05-27 OTA-084 — HARDENED REFUSAL HELPER. New store
+// action `refuseAmbient` that atomically logs the refusal +
+// writes the dedup mark. Any engine code path that prints
+// "you've already worked this" / "already taken" / "already
+// followed the thread" / etc. on an ambient noun MUST go
+// through this helper. It is structurally impossible to log
+// the refusal without writing to the dedup list — the helper
+// does both every call.
+//
+// Why: pre-OTA-084 history shows a recurring bug pattern
+// where a new engine branch prints the refusal but forgets
+// the dedup write. The chip stays green. Player taps it 8+
+// times getting the same line. Each time we shipped a one-
+// off fix (OTA-070, OTA-076, OTA-083). The pattern resurfaces
+// because there's nothing structural preventing a future
+// refusal path from making the same mistake. This OTA
+// removes the foot-gun: there's only ONE way to refuse an
+// ambient noun now, and that way always writes the mark.
+//
+// Helper signature:
+//
+//   refuseAmbient({
+//     noun: string,           // canonical ambient noun
+//     line: string,           // the refusal text to log
+//     kind: 'productive'      // chip filters out entirely
+//          | 'flavor',        // chip stays visible, greyed
+//     channel?: 'world'       // defaults to world
+//             | 'arbiter',
+//     skipDedup?: boolean,    // bypass arbiter-channel dedup
+//                             // for player-action refusals
+//   })
+//
+// 'productive' writes to searchedAmbientNouns; 'flavor'
+// writes to flavorExhaustedNouns. Both lists are read by the
+// OTA-070/076 fuzzy UI check so the chip state matches the
+// engine state. Idempotent — skips the write when the noun
+// is already in the target list.
+//
+// Refactored sites (more to follow in OTA-085+ as the
+// pattern is rolled out):
+//   - OTA-079 resolved-hook short-circuit (was already fixed
+//     in OTA-083 with inline writes; now uses the helper for
+//     consistency and to serve as the canonical example).
+//
+// Future-proofing: any new refusal branch added after this
+// OTA is reviewed against the requirement "did you call
+// refuseAmbient?" — the JSDoc on the interface declaration
+// is the documentation, the helper itself is the
+// enforcement.
+//
+// File: app/state/gameStore.ts (refuseAmbient added to the
+// store interface + implementation; OTA-079 resolved-hook
+// branch refactored to use it).
+export const OTA_BUILD_ID = '2026-05-27-084';

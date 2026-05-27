@@ -962,6 +962,47 @@ interface GameStore {
   saveAndExitToTitle: () => Promise<void>;
 
   appendLog: (channel: LogChannel, text: string, meta?: Record<string, unknown>) => void;
+  /**
+   * 2026-05-27 OTA-084 — HARDENED REFUSAL HELPER.
+   *
+   * Any engine code path that prints "you've already
+   * worked this", "you've already taken this", "you've
+   * already followed the thread", or any other "this
+   * ambient noun is no longer actionable" line MUST go
+   * through this helper. The helper atomically:
+   *   1. Appends the refusal line to the world (or
+   *      arbiter) log.
+   *   2. Writes the noun to the appropriate per-room dedup
+   *      list (searchedAmbientNouns for 'productive'
+   *      outcomes that filter the chip out entirely;
+   *      flavorExhaustedNouns for 'flavor' outcomes that
+   *      grey the chip but keep it visible).
+   *
+   * Why: pre-OTA-084 history shows a recurring bug pattern
+   * where a NEW engine branch (legacy alreadySearched
+   * fall-through, OTA-079 resolved-hook short-circuit,
+   * take/salvage gates) prints the refusal but forgets the
+   * dedup write. The UI chip stays green, the player taps
+   * it 8+ times getting the same line. We fixed it three
+   * times (OTA-070, OTA-076, OTA-083); this helper makes it
+   * structurally impossible to forget — there's no way to
+   * print the refusal without the write.
+   *
+   * Idempotent — skips the write when the noun is already
+   * in the target list. Safe to call from any context that
+   * has a player + currentScene (early-returns when not).
+   *
+   * Optional skipDedup forwards to appendLog so player-
+   * action refusals bypass the arbiter dedup that would
+   * otherwise swallow repeat-tap responses.
+   */
+  refuseAmbient: (opts: {
+    noun: string;
+    line: string;
+    kind: 'productive' | 'flavor';
+    channel?: 'world' | 'arbiter';
+    skipDedup?: boolean;
+  }) => void;
   /** OTA 226 — wipe the in-memory game log + re-persist so the next
    *  resume doesn't restore the old entries. Mirrors the disk-side
    *  clearActiveSlotLog call from the CLEAR LOG button. */
@@ -1927,6 +1968,60 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // MicroMicroLocation.interactables (Phase 2) is canonical;
       // extractAmbientNouns() is the fallback only.
       return { gameLog: nextLog };
+    });
+  },
+
+  // 2026-05-27 OTA-084 — hardened refusal helper. See the
+  // interface JSDoc above for the rationale. Two-step
+  // refusal: log the line, then mark the dedup list. No
+  // public escape hatch lets callers do just one or the
+  // other; the helper enforces atomicity by doing both
+  // every time.
+  refuseAmbient({ noun, line, kind, channel = 'world', skipDedup }) {
+    const player = get().player;
+    const scene = get().currentScene;
+    if (!player || !scene) return;
+    const lower = noun.toLowerCase();
+    // STEP 1 — log the refusal line.
+    get().appendLog(channel, line, skipDedup ? { skipDedup: true } : undefined);
+    // STEP 2 — write the dedup mark. Idempotent: skips when
+    // the noun is already in the target list. The OTA-070/
+    // 076 fuzzy UI check then filters or greys the chip
+    // according to which list got the write.
+    const roomKey = makeRoomKey(
+      player.currentLocationId,
+      scene.microMicroId,
+      player.mapX,
+      player.mapY,
+    );
+    set((s) => {
+      const room = s.worldMemory.visitedRooms?.[roomKey];
+      if (!room) return s;
+      if (kind === 'productive') {
+        const existing = room.searchedAmbientNouns ?? [];
+        if (existing.includes(lower)) return s;
+        return {
+          worldMemory: {
+            ...s.worldMemory,
+            visitedRooms: {
+              ...(s.worldMemory.visitedRooms ?? {}),
+              [roomKey]: { ...room, searchedAmbientNouns: [...existing, lower] },
+            },
+          },
+        };
+      }
+      // kind === 'flavor'
+      const existing = room.flavorExhaustedNouns ?? [];
+      if (existing.includes(lower)) return s;
+      return {
+        worldMemory: {
+          ...s.worldMemory,
+          visitedRooms: {
+            ...(s.worldMemory.visitedRooms ?? {}),
+            [roomKey]: { ...room, flavorExhaustedNouns: [...existing, lower] },
+          },
+        },
+      };
     });
   },
 
@@ -4350,49 +4445,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ),
             );
             if (resolvedHookMatch) {
-              get().appendLog(
-                'world',
-                `You\'ve already followed the thread of the ${ambient}. Whatever it had for you is in your pack — or wasn\'t there to begin with.`,
-              );
-              // 2026-05-27 OTA-083 — also write the noun to
-              // searchedAmbientNouns so the chip filters out of
-              // the SearchModal via OTA-070/076 fuzzy UI check.
-              // Pre-OTA-083 the resolved-hook short-circuit
-              // printed the callback but never wrote to either
-              // dedup list, so the chip stayed green and the
-              // player could tap it indefinitely getting the
-              // same refusal. Playtester tapped a moss patch
-              // 8 times in a row before noticing nothing was
-              // changing. Hook resolution counts as a
-              // productive outcome (the player got the
-              // hook's reward), so we use searchedAmbient
-              // Nouns (chip filtered out) rather than
-              // flavorExhausted (chip greyed-but-visible).
-              // Idempotent — skips when the noun is already
-              // in the list.
-              const hookRoomKey = makeRoomKey(
-                player.currentLocationId,
-                currentScene.microMicroId,
-                player.mapX,
-                player.mapY,
-              );
-              set((s) => {
-                const room = s.worldMemory.visitedRooms?.[hookRoomKey];
-                if (!room) return s;
-                const existing = room.searchedAmbientNouns ?? [];
-                if (existing.includes(ambientLower)) return s;
-                return {
-                  worldMemory: {
-                    ...s.worldMemory,
-                    visitedRooms: {
-                      ...(s.worldMemory.visitedRooms ?? {}),
-                      [hookRoomKey]: {
-                        ...room,
-                        searchedAmbientNouns: [...existing, ambientLower],
-                      },
-                    },
-                  },
-                };
+              // 2026-05-27 OTA-084 — routed through the new
+              // refuseAmbient helper. Atomically logs the
+              // callback + writes searchedAmbientNouns so the
+              // chip filters out. The inline implementation
+              // OTA-083 added has been folded into the helper;
+              // any future refusal site MUST use this same
+              // entry point.
+              get().refuseAmbient({
+                noun: ambient,
+                line: `You've already followed the thread of the ${ambient}. Whatever it had for you is in your pack — or wasn't there to begin with.`,
+                kind: 'productive',
               });
               break;
             }
