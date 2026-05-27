@@ -83,10 +83,16 @@ const LEXICON: Array<[RegExp, string]> = [
   [/\bZharak\b/gi, 'zah rak'],
 
   // Faction / role nouns sometimes mangled by stress placement.
+  // Monarch — playtester IPA spec OTA-108: /ˈmɑnɑrk/ = MAH-nark
+  // (both syllables get the /ɑ/ "ah" vowel). Default phonemizers
+  // read "monarch" as MON-ark (short-o); we force MAH-nark across
+  // both the bare noun and the Mud Monarch(s) compound.
   [/\bReclaimer\b/gi, 'ree clay mer'],
   [/\bReclaimers\b/gi, 'ree clay merz'],
-  [/\bMud Monarchs\b/gi, 'mud mon arks'],
-  [/\bMud Monarch\b/gi, 'mud mon ark'],
+  [/\bMud Monarchs\b/gi, 'mud mah narks'],
+  [/\bMud Monarch\b/gi, 'mud mah nark'],
+  [/\bMonarchs\b/gi, 'mah narks'],
+  [/\bMonarch\b/gi, 'mah nark'],
 
   // Lore objects.
   [/\bRunecaster\b/gi, 'rune caster'],

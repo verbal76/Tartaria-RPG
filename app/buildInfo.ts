@@ -1572,4 +1572,21 @@
 // literal parse.
 //
 // Files: app/voice/loreLexicon.ts.
-export const OTA_BUILD_ID = '2026-05-27-107';
+//
+// 2026-05-27 OTA-108 — Monarch pronunciation. User provided
+// IPA /ˈmɑnɑrk/ = MAH-nark (both syllables get the /ɑ/ "ah"
+// vowel; second syllable rhymes with "park"). First IPA pass
+// post-OTA-107 to follow the new rule: surfaced the MAH-nark
+// parse via AskUserQuestion before shipping; user confirmed
+// "Yes, MAH-nark" with apply-across-the-lexicon scope.
+// Updated existing Mud Monarch / Mud Monarchs entries and
+// added new standalone Monarch / Monarchs entries:
+//   'mud mon ark'  → 'mud mah nark'
+//   'mud mon arks' → 'mud mah narks'
+//   (new) Monarch  → 'mah nark'
+//   (new) Monarchs → 'mah narks'
+// SORTED_LEXICON's length-descending sort keeps "Mud Monarchs"
+// matching before "Monarchs" so the compound isn't preempted.
+//
+// Files: app/voice/loreLexicon.ts.
+export const OTA_BUILD_ID = '2026-05-27-108';

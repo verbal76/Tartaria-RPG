@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-107` (Full Aether-family revert to uniform "AY-thur" pattern. OTAs 103/105 over-interpreted IPA character-level detail; user clarified the family is uniform — long-A + "thur" + suffix across all five entries. OTA-218-era spec restored). See **Section 0** for the live issue tracker covering OTA-070 → OTA-107.
+> **Latest OTA:** `2026-05-27-108` (Monarch pronunciation per IPA /ˈmɑnɑrk/ = MAH-nark; updated Mud Monarch / Mud Monarchs and added standalone Monarch / Monarchs entries. First post-OTA-107 IPA change to follow the preview-before-shipping rule). See **Section 0** for the live issue tracker covering OTA-070 → OTA-108.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -38,6 +38,15 @@
 ### 0.B — Closed Issues (most recent first)
 
 #### Pronunciation lexicon
+
+- **OTA-108 (2026-05-27) · Monarch pronunciation = MAH-nark per IPA /ˈmɑnɑrk/.**
+  - **What:** Player provided IPA `monarch = /ˈmɑnɑrk/` — both syllables take the /ɑ/ "ah" vowel: first syllable "mah" (as in "spa"), second syllable "nark" (rhymes with "park"). Default phonemizers read "monarch" as MON-ark with a short-o; the lexicon now forces MAH-nark.
+  - **Fix:** `loreLexicon.ts` Faction / role block:
+    - `'mud mon ark'` → `'mud mah nark'` (Mud Monarch)
+    - `'mud mon arks'` → `'mud mah narks'` (Mud Monarchs)
+    - Added standalone `Monarch` → `'mah nark'` and `Monarchs` → `'mah narks'` for lore lines that name the role without the "Mud" prefix.
+  - **Why:** First IPA-driven change to follow the OTA-107 preview-before-shipping rule — surfaced "MAH-nark? (mah + nark, like spa + park)" via AskUserQuestion before editing; user confirmed apply-across-the-lexicon scope. No revert needed. The SORTED_LEXICON length-descending sort still picks "Mud Monarchs" before "Monarchs", so the compound is matched first and never preempted.
+  - **Files:** `app/voice/loreLexicon.ts` (Faction block comment + 2 entries updated + 2 entries added).
 
 - **OTA-107 (2026-05-27) · Full Aether-family revert to the uniform "AY-thur" pattern.**
   - **What:** OTAs 103 and 105 over-interpreted IPA character-level detail across the Aether family — rhotic schwa "ther" vs "thur" for Aether, long-E "thee" middle for Aetheric, /ɛθ/ short-E start for Aetherborn and Aetherbat. User: *"revert all of the aether nouns with that long a and thur sound in the beginning in caps AY-thur."* The Aether family is uniform across all five entries: long-A "ay" + "thur" + suffix. Caps cue: AY-thur.
