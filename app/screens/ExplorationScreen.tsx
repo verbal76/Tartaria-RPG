@@ -191,13 +191,20 @@ export function ExplorationScreen() {
   ]);
 
   const isAmbientConsumed = (noun: string): boolean => {
-    const lower = noun.toLowerCase();
-    if (!consumedAmbientNouns.has(lower)) return false;
-    // Self-heal: only treat as consumed when the catalog item is
-    // currently in inventory. Without inventory backing, the entry
-    // is either a bug-write (pre-OTA 173 salvage) or the player no
-    // longer owns the item — either way they should be able to try
-    // again. The engine's own dedup will still gate if it disagrees.
+    // 2026-05-26 OTA-076 — fuzzy match (was exact .has).
+    // Mirrors the engine's substring dedup logic so the
+    // salvage/take chip-greying matches the engine's accept/
+    // refuse decision exactly. Pre-OTA the chip used
+    // consumedAmbientNouns.has(lower) which missed variant
+    // phrasings ("wooden bench" in memory vs chip "bench") and
+    // left the salvage chip eternally green; the player tapped
+    // it repeatedly and got "you've already worked over the
+    // bench" forever. Now: any chip the engine would refuse
+    // via fuzzy match is greyed in the salvage / take modals
+    // too. Self-heal logic below stays intact (only treat as
+    // consumed if the catalog item is in inventory, otherwise
+    // ungrey so the player isn't stuck on a sold/lost item).
+    if (!isFuzzyConsumed(noun, consumedAmbientNouns)) return false;
     if (!player) return true;
     const cat = findCatalogItem(noun);
     if (!cat) return true; // not a catalog item; honor engine dedup as-is

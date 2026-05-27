@@ -412,4 +412,45 @@
 // reversible; the player gets a richer, more connected
 // investigation loop than the pre-OTA-071 "Nothing more to
 // find" generic refusal.
-export const OTA_BUILD_ID = '2026-05-26-075';
+//
+// 2026-05-27 OTA-076 — Salvage chip + legacy room self-heal.
+// Playtester report: tapped SALVAGE bench after the OTA-075
+// upgrade, engine refused with the OLD "you've already worked
+// over the bench here. Nothing more to find." line and the
+// chip stayed green forever. Two root causes:
+//
+//   (1) The bench's room was visited BEFORE OTA-071 shipped,
+//       so beginScene's table-seed never fired for it (the
+//       player was still inside the room when the OTA landed
+//       and didn't re-enter). The investigate handler's table
+//       consult found no entry, fell through to the legacy
+//       alreadySearched branch, hit the bench's pre-existing
+//       searched/flavor memory entry, and printed the old
+//       refusal — bypassing every OTA-071→075 improvement.
+//       Fix: opportunistic table seed in the investigate
+//       handler. When tableRoom exists but
+//       roomInvestigationTable is missing, seed it inline
+//       from currentScene.ambientNouns before the entry
+//       lookup. Covers pre-OTA-071 saves and any future
+//       regression that misses a seed call. Idempotent —
+//       won't reseed if a table is already present.
+//
+//   (2) The salvage chip's consumed-flag (in SalvageModal
+//       + salvageableCount) read isAmbientConsumed which
+//       used exact .has on consumedAmbientNouns. Same OTA-070
+//       eternal-green bug as the investigate chip — variant
+//       phrasings in memory ("wooden bench") never matched
+//       the chip noun ("bench") so the chip stayed green
+//       even when the engine refused via fuzzy match.
+//       Fix: isAmbientConsumed now leads with isFuzzyConsumed
+//       (the OTA-070 helper) instead of exact .has. Self-heal
+//       (only treat as consumed when the catalog item is in
+//       inventory) stays intact. Take + ground chip
+//       consultations share the helper and pick up the fix
+//       for free.
+//
+// Files: app/state/gameStore.ts (opportunistic table seed in
+// the investigate case before the table-entry lookup),
+// app/screens/ExplorationScreen.tsx (isAmbientConsumed swap
+// exact .has → isFuzzyConsumed).
+export const OTA_BUILD_ID = '2026-05-27-076';

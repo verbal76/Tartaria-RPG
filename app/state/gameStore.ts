@@ -4262,7 +4262,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
               player.mapX,
               player.mapY,
             );
-            const tableRoom = get().worldMemory.visitedRooms?.[tableRoomKey];
+            let tableRoom = get().worldMemory.visitedRooms?.[tableRoomKey];
+            // 2026-05-26 OTA-076 — self-heal for legacy rooms.
+            // beginScene seeds the table on fresh entry, but
+            // players already INSIDE a room when OTA-071 shipped
+            // never re-entered it, so the table is missing. The
+            // engine falls through to the OLD alreadySearched
+            // branch and prints "you've already worked over the
+            // X" forever even though OTA-071+ would produce a
+            // real outcome. Opportunistically seed the table
+            // when it's missing — covers pre-OTA-071 saves and
+            // any future regression that misses a seed call.
+            if (tableRoom && !tableRoom.roomInvestigationTable) {
+              const seeded = seedInvestigationTable(currentScene.ambientNouns);
+              set((s) => ({
+                worldMemory: {
+                  ...s.worldMemory,
+                  visitedRooms: {
+                    ...(s.worldMemory.visitedRooms ?? {}),
+                    [tableRoomKey]: {
+                      ...(s.worldMemory.visitedRooms?.[tableRoomKey] ?? {
+                        firstVisitAt: Date.now(),
+                        lastVisitAt: Date.now(),
+                        visitCount: 1,
+                      }),
+                      roomInvestigationTable: seeded,
+                    },
+                  },
+                },
+              }));
+              tableRoom = get().worldMemory.visitedRooms?.[tableRoomKey];
+            }
             const tableEntry = tableRoom?.roomInvestigationTable?.[ambientLower];
             if (tableEntry) {
               if (tableEntry.consumed) {
