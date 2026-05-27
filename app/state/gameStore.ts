@@ -11047,10 +11047,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // depleted to take even the first step. Same gate as the
     // single-cardinal walk so the multi-step path matches the
     // cardinal path's stamina rules.
+    //
+    // 2026-05-27 OTA-082 — skipDedup added. Pre-OTA-082 the
+    // arbiter channel's dedup logic (gameStore.ts:1868)
+    // suppressed repeat lines, so a player tapping the travel
+    // button MULTIPLE TIMES on the destination map with 0
+    // stamina saw the refusal once, then nothing — debug log
+    // confirmed "dedup: suppressed arbiter repeat". Felt like
+    // the button was broken ("fails through without
+    // instruction" per the playtester). The refusal also gets
+    // a clearer travel-specific phrasing: it now mentions
+    // travel + rest explicitly so the player knows what action
+    // they tried and what to do about it.
     if (player.stamina < STAMINA_COSTS.wander) {
+      const tgtNameForRefusal = (() => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const locs = (require('../data/locations/locations.json') as Array<{ id: string; name: string }>);
+          return locs.find((l) => l.id === locationId)?.name ?? 'that destination';
+        } catch {
+          return 'that destination';
+        }
+      })();
       get().appendLog(
         'arbiter',
-        `The Arbiter holds out a hand. "You don't have the legs in you for this just yet. Rest first; the road keeps."`,
+        `The Arbiter holds out a hand. "You're too tired to set out for ${tgtNameForRefusal}. Rest before making any plans — the road will hold."`,
+        { skipDedup: true },
       );
       return;
     }

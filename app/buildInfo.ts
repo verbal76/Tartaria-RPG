@@ -705,4 +705,32 @@
 // File: app/components/EnemyPanel.tsx (HP_BAR_WIDTH constant
 // added near CARD_WIDTH, hpBarBg + hpBarFill both gain
 // numeric width props).
-export const OTA_BUILD_ID = '2026-05-27-081';
+//
+// 2026-05-27 OTA-082 — Travel-stamina refusal now persistent +
+// destination-specific. Playtester report: tapping a travel
+// destination (e.g. Voronov) with 0 stamina "just fails
+// through without instruction." The setTravelCourse gate at
+// gameStore.ts:11050 WAS firing the arbiter refusal — but the
+// arbiter channel has dedup logic (gameStore.ts:1868) that
+// suppresses repeat lines. A player tapping the button
+// multiple times saw the refusal once, then nothing. Debug
+// log even confirmed it: `[debug] dedup: suppressed arbiter
+// repeat`.
+//
+// Two fixes in one OTA:
+//   (1) Add { skipDedup: true } to the refusal appendLog so
+//       every tap shows it.
+//   (2) Make the refusal travel-specific. Pre-OTA-082 the line
+//       was "The Arbiter holds out a hand. 'You don't have
+//       the legs in you for this just yet. Rest first; the
+//       road keeps.'" — generic, didn't name what the player
+//       tried. Now: "You're too tired to set out for
+//       [Destination]. Rest before making any plans — the
+//       road will hold." Destination resolved from locations.
+//       json by the same id the setTravelCourse call already
+//       has in scope. Fallback to "that destination" if the
+//       lookup fails.
+//
+// File: app/state/gameStore.ts (setTravelCourse stamina gate
+// gets skipDedup + destination-name interpolation).
+export const OTA_BUILD_ID = '2026-05-27-082';
