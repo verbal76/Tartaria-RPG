@@ -1436,4 +1436,19 @@
 //
 // Files: app/state/gameStore.ts (loadSlotIntoGame + start
 // NewGame).
-export const OTA_BUILD_ID = '2026-05-27-099';
+// 2026-05-27 OTA-100 — OTA-applied debug marker now actually
+// fires. OTA-099 read justUpdatedFromBuild inside loadSlot
+// IntoGame, but the TitleScreen popup dismiss clears that flag
+// BEFORE the player taps LOAD SLOT — so the capture was always
+// null in practice. Playtest log from OTA-099 confirmed the
+// session-start marker works but applied-marker never fired
+// despite a real upgrade.
+//
+// Fix: parallel state field `pendingOtaAppliedFrom` with the
+// same source value (set in hydrate) but a lifecycle that
+// the popup doesn't touch. loadSlotIntoGame reads + clears
+// it exclusively. justUpdatedFromBuild keeps its existing
+// popup-driven lifecycle.
+//
+// Files: app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-05-27-100';

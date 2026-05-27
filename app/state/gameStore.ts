@@ -925,6 +925,16 @@ interface GameStore {
    *  hydrate; cleared by dismissJustUpdated. */
   justUpdatedFromBuild: string | null;
   dismissJustUpdated: () => void;
+  /** 2026-05-27 OTA-100 — separate flag for the OTA-applied
+   *  debug-log marker. justUpdatedFromBuild gets cleared by
+   *  the TitleScreen popup dismiss (correct behavior — popup
+   *  shouldn't refire on next render). But that clear happens
+   *  BEFORE loadSlotIntoGame, so OTA-099's debug-log capture
+   *  saw null. This second flag has the same lifecycle EXCEPT
+   *  it's not touched by the popup; it's consumed exclusively
+   *  by loadSlotIntoGame (and cleared in the same set that
+   *  fires the log entry). */
+  pendingOtaAppliedFrom: string | null;
   /** Set when the silent boot-time OTA check downloaded an update
    *  but did NOT apply it (auto-applying mid-boot crashes the
    *  process — native modules from the old session are still
@@ -1225,6 +1235,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   wastelandStepsSinceEncounter: 0,
   lastInteractedNoun: null,
   justUpdatedFromBuild: null,
+  pendingOtaAppliedFrom: null,
   pendingOTAUpdate: false,
   pendingInputDraft: null,
   cognitiveModelInfo: null,
@@ -1303,6 +1314,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentScreen: 'title',
       hydrated: true,
       justUpdatedFromBuild,
+      // OTA-100 — parallel flag with the same source value but
+      // a different lifecycle. justUpdatedFromBuild gets cleared
+      // on popup dismiss (correct — popup shouldn't refire).
+      // pendingOtaAppliedFrom is consumed exclusively by
+      // loadSlotIntoGame's debug-log path so the OTA-applied
+      // marker survives the popup dismiss.
+      pendingOtaAppliedFrom: justUpdatedFromBuild,
     });
   },
 
@@ -1665,12 +1683,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ]));
         }
       }
-      // 2026-05-27 OTA-099 — capture justUpdatedFromBuild
-      // BEFORE the set() so we can log the OTA-applied marker
-      // below. The set() clears the flag (so the title-screen
-      // popup doesn't fire again on next session); the debug
-      // log entry below uses the captured value.
-      const ota099UpdatedFrom = get().justUpdatedFromBuild;
+      // 2026-05-27 OTA-099 → OTA-100 — capture the OTA-applied
+      // source build BEFORE the set() so we can log the marker
+      // below. OTA-099 read justUpdatedFromBuild but that flag
+      // is cleared by the TitleScreen popup dismiss BEFORE the
+      // player taps LOAD SLOT, so the capture was always null
+      // in practice. OTA-100 added a parallel pendingOtaApplied
+      // From flag that the popup doesn't touch; we read THAT
+      // one here and clear it in the set below.
+      const ota099UpdatedFrom = get().pendingOtaAppliedFrom;
       set({
         player,
         worldMemory: saved.worldMemory,
@@ -1680,6 +1701,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         currentScene: restoredScene,
         pendingRolls: null,
         justUpdatedFromBuild: null,
+        // OTA-100 — clear pendingOtaAppliedFrom in the same set
+        // that fires the debug log below. One marker per
+        // upgrade per resume; never refires within a session.
+        pendingOtaAppliedFrom: null,
         // 2026-05-25 — preserve wastelandStepsSinceEncounter on
         // restore so a save-load round-trip can't game the encounter
         // gate (was: reset to 0, letting a player save-load to delay
