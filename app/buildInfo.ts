@@ -1523,4 +1523,21 @@
 // three the user called out.
 //
 // Files: app/voice/loreLexicon.ts.
-export const OTA_BUILD_ID = '2026-05-27-104';
+//
+// 2026-05-27 OTA-105 — Aether-family IPA spec completed.
+// User provided IPA for the remaining two entries left
+// untouched in OTA-103:
+//   Aetherstone /ɛjtɛɹstɛn/ → 'ay ter sten'
+//   Aetherbat   /ɛθɛɾ bet/  → 'eth er bet'
+// Surprising elements per the IPA — Aetherstone uses a hard
+// /t/ not /θ/ ("ter" not "ther"), and ends in /stɛn/ ("sten"
+// rhymes with "ten") not "stone". Aetherbat ends in /bet/
+// ("bet" rhymes with "set") not "bat". The Aether family now
+// splits cleanly into two groups by initial vowel:
+//   Long-A "ay" — Aether, Aetheric, Aetherstone
+//   Short-E "eth" — Aetherborn, Aetherbat
+// All five entries now reflect the user's canonical Tartaria
+// pronunciation.
+//
+// Files: app/voice/loreLexicon.ts.
+export const OTA_BUILD_ID = '2026-05-27-105';

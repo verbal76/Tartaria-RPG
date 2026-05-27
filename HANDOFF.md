@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-104` (Place-name IPA refresh — Asgardar / Samarran / Nimari updated per fresh playtester IPA; all three open with a leading /ɛ/ schwa "eh" that prior respellings dropped, and Samarran / Nimari restored to 4 syllables). See **Section 0** for the live issue tracker covering OTA-070 → OTA-104.
+> **Latest OTA:** `2026-05-27-105` (Aether-family IPA spec completed — Aetherstone / Aetherbat refined per fresh playtester IPA; all five Aether entries now reflect the user's canonical pronunciation, splitting cleanly into a long-A group "ay" (Aether/Aetheric/Aetherstone) and a short-E group "eth" (Aetherborn/Aetherbat)). See **Section 0** for the live issue tracker covering OTA-070 → OTA-105.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -38,6 +38,15 @@
 ### 0.B — Closed Issues (most recent first)
 
 #### Pronunciation lexicon
+
+- **OTA-105 (2026-05-27) · Aether-family IPA spec completed: Aetherstone, Aetherbat.**
+  - **What:** OTA-103 refined three Aether entries (aether/aetheric/aetherborn) and left Aetherstone / Aetherbat untouched pending a fresh spec. Player provided IPA for those two: `Aetherstone /ɛjtɛɹstɛn/`, `Aetherbat /ɛθɛɾ bet/`. Both diverge from the prior respellings in surprising ways — Aetherstone uses a hard /t/ instead of /θ/ ("ter" not "ther") and ends in /stɛn/ ("sten" rhymes with "ten") not the obvious "stone"; Aetherbat ends in /bet/ ("bet" rhymes with "set") not the obvious "bat". The Aether family now splits cleanly by initial vowel: long-A "ay" group (Aether, Aetheric, Aetherstone) and short-E "eth" group (Aetherborn, Aetherbat).
+  - **Fix:** `loreLexicon.ts` Aether block:
+    - `'ay thur stone'` → `'ay ter sten'` (Aetherstone — hard /t/, "sten" final)
+    - `'ay thur bat'` → `'eth er bet'` (Aetherbat — short-E start matching Aetherborn, "bet" final)
+    - Block comment updated to document the long-A / short-E split.
+  - **Why:** Completes the Aether-family IPA pass started in OTA-103. All five entries now reflect the user's canonical pronunciation rather than the original guess-from-spelling respellings. The /t/-vs-/θ/ choice and the "sten"/"bet" finals are non-obvious — encoding them in the lexicon means TTS doesn't have to back into them from English spelling rules.
+  - **Files:** `app/voice/loreLexicon.ts` (Aether block comment + 2 entries).
 
 - **OTA-104 (2026-05-27) · Place-name IPA refresh: Asgardar, Samarran, Nimari.**
   - **What:** Player provided fresh IPA for three place names: `Asgardar /ɛz gɑdɔɹ/`, `Samarran /ɛsɛmɔːɾɛn/`, `Nimari /ɛnɛmɑɹi/`. Pattern across all three: a leading /ɛ/ schwa ("eh") that the prior respellings dropped entirely — the lexicon was treating them as if they started with the first consonant. Samarran and Nimari are also 4-syllable words per the IPA, but the prior `'sam ah ran'` / `'nih mar ee'` were 3 syllables, collapsing an internal vowel.

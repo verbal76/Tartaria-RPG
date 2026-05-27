@@ -31,22 +31,26 @@
 // how espeak's letter-to-sound rules treat specific letter combos.
 
 const LEXICON: Array<[RegExp, string]> = [
-  // Aether family — playtester IPA spec OTA-103. Not a uniform
-  // pattern: Aether / Aetheric open with /ɛɪ/ (long-A "ay"),
-  // but Aetherborn opens with /ɛ/ (short-e "eth"). Final /ɚ/
-  // rhotic schwa is "er" (rhymes with "father"), not "thur"
-  // (rhymes with "fur"). Aetheric's /θi/ middle is long-e
-  // ("thee"), with the /ɾ/ tap leading into "rik".
-  //   Aether     /ɛɪθɚ/      → "ay ther"
-  //   Aetheric   /ɛɪθiɾɪk/   → "ay thee rik"
-  //   Aetherborn /ɛθɛɾ bɔːn/ → "eth er born"
-  // Aetherstone / Aetherbat keep prior "ay thur" pending a
-  // fresh playtester spec — leaving them alone avoids regressing
-  // pronunciations the user hasn't refined.
-  [/\bAetherstone\b/gi, 'ay thur stone'],
+  // Aether family — playtester IPA spec OTA-103/105. Not a
+  // uniform pattern. Two groups:
+  //   Long-A "ay" start (/ɛɪ/ or /ɛj/):
+  //     Aether     /ɛɪθɚ/      → "ay ther"
+  //     Aetheric   /ɛɪθiɾɪk/   → "ay thee rik"
+  //     Aetherstone /ɛjtɛɹstɛn/→ "ay ter sten" (hard /t/ not
+  //                              /θ/; final /ɛn/ "sten" rhymes
+  //                              with "ten", not "stone")
+  //   Short-E "eth" start (/ɛθ/):
+  //     Aetherborn /ɛθɛɾ bɔːn/ → "eth er born"
+  //     Aetherbat  /ɛθɛɾ bet/  → "eth er bet" (final /bet/
+  //                              rhymes with "set", not "bat")
+  // Surprising elements per the IPA — Aetherstone uses a hard
+  // /t/ instead of /θ/ and ends in "sten" not "stone";
+  // Aetherbat ends in "bet" not "bat". These are the user's
+  // canonical Tartaria pronunciations.
+  [/\bAetherstone\b/gi, 'ay ter sten'],
   [/\bAetheric\b/gi, 'ay thee rik'],
   [/\bAetherborn\b/gi, 'eth er born'],
-  [/\bAetherbat\b/gi, 'ay thur bat'],
+  [/\bAetherbat\b/gi, 'eth er bet'],
   [/\bAether\b/gi, 'ay ther'],
 
   // Place names — long-vowel + multi-syllable mishaps.
