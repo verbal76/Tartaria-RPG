@@ -162,6 +162,91 @@ describe('OTA 204 — validator (Sleator §7 post-processing rules)', () => {
   });
 });
 
+describe('OTA-093 — resolveItem head-noun matching (no adjective false matches)', () => {
+  // Anchoring playtest case: `climb titan's bone marker` (a scene
+  // noun) used to resolve to `Bone Fragment` (inventory item)
+  // because the pre-OTA-093 matcher accepted any input token as a
+  // substring of any item name — so 'bone' alone won. Player got
+  // the wrong refusal ("not something hands take to" — bound to
+  // the inventory item's gear classification) instead of the
+  // scene-noun matcher running.
+  //
+  // OTA-093 tightened to three passes:
+  //   (1) full item name appears in input
+  //   (2) item's HEAD NOUN (last word) is a standalone token
+  //   (3) fuzzy on head noun only (typo tolerance)
+  //
+  // These tests lock the behavior so a future loosening doesn't
+  // resurrect the adjective false-match.
+
+  const BONE_FRAGMENT = {
+    id: 'bf1',
+    name: 'Bone Fragment',
+    kind: 'misc' as const,
+    quantity: 2,
+    tags: ['bone', 'junk', 'scrap'],
+  };
+
+  it("does NOT match 'Bone Fragment' on adjective-only 'bone' in a scene-noun phrase", () => {
+    // The exact playtest case verbatim.
+    const p = parseInput("climb titan's bone marker", {
+      inventory: [BONE_FRAGMENT],
+    });
+    // Resolver should NOT have claimed Bone Fragment for this
+    // input. Either resolvedItemId is undefined OR it's some
+    // other item the test doesn't ship.
+    expect(p.resolvedItemId).toBeUndefined();
+  });
+
+  it("does NOT match 'Bone Fragment' on adjective 'bone' alone in a scene-noun phrase", () => {
+    const p = parseInput('investigate weathered bone marker', {
+      inventory: [BONE_FRAGMENT],
+    });
+    expect(p.resolvedItemId).toBeUndefined();
+  });
+
+  it("DOES match 'Bone Fragment' when the full item name is in the input", () => {
+    const p = parseInput('investigate the bone fragment', {
+      inventory: [BONE_FRAGMENT],
+    });
+    expect(p.resolvedItemId).toBe('bf1');
+  });
+
+  it("DOES match 'Bone Fragment' when the input is just 'fragment' (head noun)", () => {
+    const p = parseInput('investigate the fragment', {
+      inventory: [BONE_FRAGMENT],
+    });
+    expect(p.resolvedItemId).toBe('bf1');
+  });
+
+  it("DOES match 'Rusted Blade' on head-noun 'blade'", () => {
+    const p = parseInput('attack with the blade', {
+      inventory: [BLADE],
+      enemyNames: ['Aetheric Drone'],
+      enemyPresent: true,
+    });
+    const instr = p.args?.find((a) => a.role === 'instrument');
+    expect(instr?.resolvedItemId).toBe('blade1');
+  });
+
+  it("does NOT match 'Aetheric Torch' on adjective 'aetheric' alone", () => {
+    // Two Aetheric-prefixed items in inventory — 'aetheric' alone
+    // is too ambiguous to resolve. Resolver returns undefined; the
+    // engine then falls through to scene-noun / context lookup.
+    const p = parseInput('use aetheric', {
+      inventory: [TORCH, LOCKET],
+    });
+    expect(p.resolvedItemId).toBeUndefined();
+  });
+
+  it("DOES match 'Aetheric Locket' on head-noun 'locket' even with another Aetheric item present", () => {
+    const p = parseInput('use the locket', {
+      inventory: [TORCH, LOCKET],
+    });
+    expect(p.resolvedItemId).toBe('lck1');
+  });
+});
+
 describe('OTA 204 — PP attachment ambiguity (FSNLP slides 6)', () => {
   // The textbook case: "I shot the elephant in my pajamas" — does
   // "in my pajamas" attach to the verb (shot in pajamas) or the

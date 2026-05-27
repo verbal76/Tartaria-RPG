@@ -3,6 +3,16 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useGameStore } from '../state/gameStore';
 import { RECIPES, lookupCraftedItem, type Recipe } from '../engine/crafting';
 import { getItemPreview } from './itemPreview';
+import type { SortDirection } from './SearchSortBar';
+
+// OTA-087 — rarity rank for sorting. Mirrors the table in
+// InventoryScreen. Common = lowest, Legendary = highest.
+const RECIPE_RARITY_RANK: Record<string, number> = {
+  Common: 0,
+  Uncommon: 1,
+  Rare: 2,
+  Legendary: 3,
+};
 
 interface RecipeStatus {
   recipe: Recipe;
@@ -45,6 +55,17 @@ export interface RecipesViewProps {
    *  to show stews / tinctures / draughts. Omitting the prop shows
    *  ALL recipes (legacy callers). */
   kindFilter?: RecipeKindFilter;
+  /** OTA-087 — case-insensitive substring filter on the result
+   *  name. Empty/undefined → no filter. Owned by the parent
+   *  screen so the SearchSortBar above this view drives state. */
+  query?: string;
+  /** OTA-087 — sort axis. 'ready' is the pre-OTA default
+   *  (available recipes float to top, then by missing-count
+   *  ascending, then alphabetic). 'name' is straight
+   *  alphabetic. 'rarity' sorts by output rarity rank. */
+  sortKey?: 'ready' | 'name' | 'rarity' | string;
+  /** OTA-087 — direction for the sort axis. */
+  sortDirection?: SortDirection;
 }
 
 // 2026-05-24 — extracted from CraftingScreen.tsx so both the standalone
@@ -57,28 +78,60 @@ export interface RecipesViewProps {
 // they could plan what to chase. Now the view shows ALL recipes
 // matching the kindFilter, sorts craftable to the top, and displays
 // the missing-piece list for everything else so the goal is legible.
-export function RecipesView({ onAfterCraft, kindFilter }: RecipesViewProps) {
+export function RecipesView({
+  onAfterCraft,
+  kindFilter,
+  query,
+  sortKey = 'ready',
+  sortDirection = 'asc',
+}: RecipesViewProps) {
   const player = useGameStore((s) => s.player);
   const craftRecipe = useGameStore((s) => s.craftRecipe);
 
   const evaluated = useMemo(() => {
     if (!player) return [] as RecipeStatus[];
     const all = RECIPES.map((r) => evaluateRecipe(r, player.inventory));
-    const filtered = kindFilter
+    const kindFiltered = kindFilter
       ? all.filter((e) =>
           kindFilter === 'consumable'
             ? e.kind === 'consumable'
             : e.kind !== 'consumable',
         )
       : all;
-    // Sort: available (craftable) first, then by ascending missing-
-    // count, then alphabetically. Stable + deterministic.
-    return [...filtered].sort((a, b) => {
-      if (a.available !== b.available) return a.available ? -1 : 1;
-      if (a.missing.length !== b.missing.length) return a.missing.length - b.missing.length;
-      return a.recipe.result.localeCompare(b.recipe.result);
+    // OTA-087 — search filter (substring on the result name,
+    // case-insensitive).
+    const q = (query ?? '').trim().toLowerCase();
+    const searched = q.length > 0
+      ? kindFiltered.filter((e) => e.recipe.result.toLowerCase().includes(q))
+      : kindFiltered;
+    // OTA-087 — sort by the parent's chosen axis. The pre-OTA
+    // 'ready' default (available first → missing-count asc →
+    // alphabetic) is preserved as one of the choices and is
+    // still the default when no prop is passed.
+    const dir = sortDirection === 'asc' ? 1 : -1;
+    return [...searched].sort((a, b) => {
+      switch (sortKey) {
+        case 'name':
+          return a.recipe.result.localeCompare(b.recipe.result) * dir;
+        case 'rarity': {
+          const ar = a.kind && lookupCraftedItem(a.recipe.result).rarity;
+          const br = b.kind && lookupCraftedItem(b.recipe.result).rarity;
+          const arr = RECIPE_RARITY_RANK[ar ?? 'Common'] ?? 0;
+          const brr = RECIPE_RARITY_RANK[br ?? 'Common'] ?? 0;
+          if (arr !== brr) return (arr - brr) * dir;
+          return a.recipe.result.localeCompare(b.recipe.result) * dir;
+        }
+        case 'ready':
+        default: {
+          if (a.available !== b.available) return (a.available ? -1 : 1) * dir;
+          if (a.missing.length !== b.missing.length) {
+            return (a.missing.length - b.missing.length) * dir;
+          }
+          return a.recipe.result.localeCompare(b.recipe.result) * dir;
+        }
+      }
     });
-  }, [player?.inventory, kindFilter]);
+  }, [player?.inventory, kindFilter, query, sortKey, sortDirection]);
 
   const availableCount = evaluated.filter((e) => e.available).length;
 

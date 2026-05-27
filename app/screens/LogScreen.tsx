@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform, Share }
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import { readFullLog, flushLogWrites, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
+import { stampLogExport } from '../diagnostics/aboutSummary';
 
 // OTA 024 — chunk size for the chunked-copy path. 25 KB is well
 // under the silent-truncation limit of the strictest common chat
@@ -30,7 +31,10 @@ export function LogScreen() {
     const start = (chunkIndex - 1) * CHUNK_SIZE;
     const end = start + CHUNK_SIZE;
     const slice = diskLog.slice(start, end);
-    const stamped = `=== TARTARIA LOG · PART ${chunkIndex} of ${totalChunks} · ${slice.length} CHARS · BEGIN ===\n${slice}\n=== END PART ${chunkIndex} of ${totalChunks} ===\n`;
+    // OTA-101 — stampLogExport wraps the envelope + appends
+    // the basic device/install summary so playtester reports
+    // always carry build context.
+    const stamped = stampLogExport(slice, { chunk: { index: chunkIndex, total: totalChunks } });
     await Clipboard.setStringAsync(stamped);
     setChunkCopiedAt(Date.now());
     // Advance to next part on the next tap; wrap to 1 after the last.
@@ -70,7 +74,9 @@ export function LogScreen() {
     // screen copy button. Lets us diagnose paste-side truncation
     // unambiguously (if FOOTER is missing, the buffer was clipped
     // somewhere between Clipboard.setStringAsync and the paste).
-    const stamped = `=== TARTARIA LOG · ${fresh.length} CHARS · BEGIN ===\n${fresh}\n=== END LOG · ${fresh.length} CHARS ===\n`;
+    // OTA-101 — also appends buildBasicDeviceSummary so every
+    // capture carries platform + build info.
+    const stamped = stampLogExport(fresh);
     await Clipboard.setStringAsync(stamped);
     setDiskLog(fresh || '(no log yet)');
     setCopied(true);
@@ -95,7 +101,8 @@ export function LogScreen() {
     const fresh = await readFullLog();
     setDiskLog(fresh || '(no log yet)');
     // OTA 018 — envelope so paste-side truncation is visible.
-    const stamped = `=== TARTARIA LOG · ${fresh.length} CHARS · BEGIN ===\n${fresh}\n=== END LOG · ${fresh.length} CHARS ===\n`;
+    // OTA-101 — appends buildBasicDeviceSummary via stampLogExport.
+    const stamped = stampLogExport(fresh);
     try {
       await Share.share({ message: stamped, title: 'Tartaria-RPG game log' });
       setShared(true);

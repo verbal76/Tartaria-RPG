@@ -31,6 +31,15 @@ interface Props {
 const SCREEN_W = Dimensions.get('window').width;
 const HORIZONTAL_PADDING = 8 + 2; // ExplorationScreen padding + 1 card edge
 const CARD_WIDTH = SCREEN_W - HORIZONTAL_PADDING * 2;
+// 2026-05-27 OTA-081 — HP bar inner width in pixels.
+// Pre-OTA-081 the fill width was a percent string ("47%")
+// which React Native's view diff sometimes refused to re-
+// lay-out when only the value changed within the same View
+// instance — playtester saw the HP number tick down ("HP 5/12")
+// while the bar visually stayed full. Numeric pixel widths
+// always trigger a fresh layout. Card padding is 8 each side
+// + 1px border each side = 18 of horizontal chrome.
+const HP_BAR_WIDTH = CARD_WIDTH - 18;
 
 export function EnemyPanel({ enemies, activeIndex, onSelectActive }: Props) {
   const onMomentumEnd = useCallback(
@@ -124,8 +133,21 @@ function EnemyCard({ view }: { view: EnemyView }) {
       <Text style={styles.subline} numberOfLines={1}>
         {view.enemy.type}
       </Text>
-      <View style={styles.hpBarBg}>
-        <View style={[styles.hpBarFill, { width: `${hpPct * 100}%`, backgroundColor: hpColor }]} />
+      <View style={[styles.hpBarBg, { width: HP_BAR_WIDTH }]}>
+        {/* OTA-081 — numeric pixel width (was percent string).
+            RN sometimes skipped the layout pass when only the
+            percent value changed, leaving the bar visually
+            stuck at full while the HP number under it ticked
+            down. Pixel widths always trigger fresh layout. */}
+        <View
+          style={[
+            styles.hpBarFill,
+            {
+              width: Math.max(0, Math.round(HP_BAR_WIDTH * hpPct)),
+              backgroundColor: hpColor,
+            },
+          ]}
+        />
       </View>
       <View style={styles.statRow}>
         <Stat label="HP" value={`${view.currentHp}/${view.enemy.hp}`} />

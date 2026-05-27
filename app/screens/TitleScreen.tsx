@@ -31,6 +31,9 @@ import {
 import { useGameStore } from '../state/gameStore';
 import { SwipeableRow } from '../components/SwipeableRow';
 import { BrandedModal } from '../components/BrandedModal';
+import { BugReportModal } from '../components/BugReportModal';
+import { InvitePlaytesterModal } from '../components/InvitePlaytesterModal';
+import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
@@ -180,6 +183,20 @@ export function TitleScreen() {
   // OTA 006 — separate latch for the SHARE action so the COPIED
   // and SHARED flashes don't fight each other on the same row.
   const [sharedSlotId, setSharedSlotId] = useState<string | null>(null);
+  // OTA-063 — bug-report modal state. Open via the REPORT BUG button
+  // on the bottom bar. On send, build the full report (description +
+  // device summary + slot log), stage it on the clipboard, then open
+  // mailto so the player's email app composes a new message to
+  // hotatticgames@gmail.com. The brief flash on the bottom bar
+  // confirms the clipboard was populated.
+  const [bugReportOpen, setBugReportOpen] = useState(false);
+  const [bugReportSent, setBugReportSent] = useState(false);
+  // OTA-065 — invite-playtester modal state. Same UX pattern as
+  // bug-report: open modal, collect input, open mailto, flash
+  // a "✓ SENT" confirmation on the button so the player has
+  // visual feedback that the draft actually opened.
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteSent, setInviteSent] = useState(false);
   // v2.4.1 (OTA 051) — auto-check for an OTA on every TitleScreen
   // mount. Save-and-exit drops the player back here, which re-mounts
   // TitleScreen and re-fires this effect — so the player picks up
@@ -236,10 +253,13 @@ export function TitleScreen() {
       const start = (nextIndex - 1) * DEAD_LOG_CHUNK_SIZE;
       const end = start + DEAD_LOG_CHUNK_SIZE;
       const slice = body.slice(start, end);
-      const stamped =
-        `=== TARTARIA LOG · ${slot.playerName} · PART ${nextIndex} of ${total} · ${slice.length} CHARS · BEGIN ===\n` +
-        `${slice}\n` +
-        `=== END PART ${nextIndex} of ${total} ===\n`;
+      // OTA-101 — appends buildBasicDeviceSummary via stampLogExport
+      // so dead-character bug reports carry the same build context
+      // as live-character ones. playerName surfaces in the header.
+      const stamped = stampLogExport(slice, {
+        chunk: { index: nextIndex, total },
+        playerName: slot.playerName,
+      });
       await Clipboard.setStringAsync(stamped);
       const copiedAt = Date.now();
       setDeadLogChunk({
@@ -283,6 +303,195 @@ export function TitleScreen() {
     } catch {
       // User-cancelled or unsupported — no-op.
     }
+  };
+
+  // OTA-063 — bug report send handler. Builds a full report block
+  // (description + device summary + character log), drops it on
+  // the clipboard, and opens a mailto: link to hotatticgames@gmail
+  // .com with subject "Bug Report — <character>". The clipboard
+  // staging is the workaround for mailto's body-length limit
+  // (~2KB on iOS Mail, varies on Android Gmail) — character logs
+  // run 50-200KB and would silently truncate inline. The player
+  // pastes the report into the email composer before sending.
+  //
+  // OTA-064 — playtester report: "it didn't get the whole log, it
+  // was truncated." Gmail compose silently chops a single paste at
+  // ~32-64KB; with the full chronological log inline, the OLDEST
+  // entries land in the email and the NEWEST (= what the player
+  // just hit) get dropped. Fixed by:
+  //   (1) Reversing the log so the newest entry is at the top.
+  //   (2) Capping the log section at LOG_CHARS_CAP chars so the
+  //       whole report fits in one Gmail paste. Bug reports get
+  //       filed seconds after the issue, so the newest tail is
+  //       what matters; older entries are intentionally trimmed.
+  //   (3) Rewriting the mailto body so the paste-instruction is
+  //       unmistakable (previous wording was a parenthetical that
+  //       at least one tester missed entirely).
+  const sendBugReport = async (args: {
+    slot: SlotSummary | null;
+    description: string;
+  }): Promise<void> => {
+    const { slot, description } = args;
+    const charName = slot?.playerName ?? '(general / no character)';
+    const subject = `Bug Report${slot ? ` — ${slot.playerName}` : ''}`;
+
+    // ~40KB log target. Empirically Gmail Android compose accepts
+    // a single paste up to ~64KB before silently truncating, and
+    // iOS Mail.app caps lower at ~50KB. 40KB leaves comfortable
+    // headroom for the ~2KB of description + device-summary
+    // wrapper while still being "overkill" for a typical
+    // session-length log (the previous playtester's pasted log
+    // was 6KB; even a long session rarely tops 30KB).
+    const LOG_CHARS_CAP = 40_000;
+
+    // Pull device summary synchronously, then the slot log (async).
+    const deviceBlock = buildBasicDeviceSummary();
+    let logBlock = '(no character selected — no log attached)';
+    if (slot) {
+      try {
+        const raw = await readSlotLog(slot.slotId);
+        if (raw && raw.length > 0) {
+          // Reverse line order: split on newline, reverse, then
+          // accumulate from the newest end until we'd cross the
+          // cap. The last line of the raw log is sometimes an
+          // empty string (trailing \n) — filter it out so the
+          // first reversed line is a real entry.
+          const lines = raw.split('\n').filter((l) => l.length > 0);
+          const totalLines = lines.length;
+          lines.reverse();
+          const accLines: string[] = [];
+          let accChars = 0;
+          let truncated = false;
+          for (const line of lines) {
+            // +1 accounts for the newline we re-add on join.
+            if (accChars + line.length + 1 > LOG_CHARS_CAP) {
+              truncated = true;
+              break;
+            }
+            accLines.push(line);
+            accChars += line.length + 1;
+          }
+          const header = truncated
+            ? `(Newest entry at top — showing the most recent ${accLines.length} of ${totalLines} entries; older trimmed to fit a single email paste)`
+            : `(Newest entry at top — full log, ${accLines.length} entries)`;
+          logBlock = `${header}\n\n${accLines.join('\n')}`;
+        } else {
+          logBlock = `(log empty for ${slot.playerName})`;
+        }
+      } catch {
+        logBlock = `(log read failed for ${slot.playerName})`;
+      }
+    }
+
+    const report = [
+      `=== TARTARIA BUG REPORT ===`,
+      `Submitted: ${new Date().toISOString()}`,
+      `Character: ${charName}`,
+      slot ? `Slot ID: ${slot.slotId}` : null,
+      slot ? `Race: ${raceLabel(slot.raceId)}` : null,
+      slot ? `Location: ${locationLabel(slot.locationId)}` : null,
+      slot ? `HP: ${slot.hp}/${slot.hpMax}${slot.dead ? ' (FALLEN)' : ''}` : null,
+      ``,
+      `--- DESCRIPTION ---`,
+      description,
+      ``,
+      `--- DEVICE / BUILD ---`,
+      deviceBlock,
+      ``,
+      `--- CHARACTER LOG (newest first) ---`,
+      logBlock,
+      ``,
+      `=== END REPORT ===`,
+    ]
+      .filter((l) => l !== null)
+      .join('\n');
+
+    try {
+      await Clipboard.setStringAsync(report);
+    } catch {
+      // Clipboard rarely fails — proceed to mailto either way so
+      // the player at least lands in their mail app and can type
+      // a manual summary.
+    }
+
+    // Mailto body intentionally explicit: previous wording was a
+    // one-line parenthetical that at least one playtester
+    // (correctly) treated as decoration and sent the email with
+    // no paste. The new body is a structured READ ME FIRST with
+    // a clear paste-below marker, kept under ~1KB so iOS Mail
+    // doesn't truncate the instructions themselves.
+    const mailtoBody =
+      `READ ME FIRST\n` +
+      `=============\n` +
+      `Your full bug report (description, device info, and most-\n` +
+      `recent log entries — newest at top) has been COPIED TO\n` +
+      `YOUR CLIPBOARD. Before sending this email:\n` +
+      `\n` +
+      `  1. Long-press anywhere below the "PASTE BELOW" line\n` +
+      `  2. Tap PASTE\n` +
+      `  3. Then tap Send\n` +
+      `\n` +
+      `Without the paste, this email arrives empty and we can't\n` +
+      `track the bug down.\n` +
+      `\n` +
+      `Character: ${charName}\n` +
+      `OTA build: ${OTA_BUILD_ID}\n` +
+      `\n` +
+      `--- PASTE BELOW THIS LINE ---\n` +
+      `\n`;
+    const mailto =
+      `mailto:hotatticgames@gmail.com` +
+      `?subject=${encodeURIComponent(subject)}` +
+      `&body=${encodeURIComponent(mailtoBody)}`;
+
+    try {
+      await Linking.openURL(mailto);
+    } catch {
+      // No mail client installed — the report is still on the
+      // clipboard; the COPIED flash below tells the player so.
+    }
+
+    setBugReportOpen(false);
+    setBugReportSent(true);
+    setTimeout(() => setBugReportSent(false), 2200);
+  };
+
+  // OTA-065 — invite-playtester send handler. Opens a mailto to
+  // hotatticgames@gmail.com with subject "New Playtester" and a
+  // small body containing the suggested address + the requester's
+  // OTA build so the owner has version context when whitelisting.
+  // No clipboard staging — the body fits comfortably under iOS
+  // Mail's mailto body cap. Owner replies with the install link
+  // (up to 24 hours per the modal copy, usually within the hour).
+  const sendPlaytesterInvite = async (gmail: string): Promise<void> => {
+    const subject = 'New Playtester';
+    const body =
+      `Please add the following Gmail address to the Tartaria\n` +
+      `Realms playtester whitelist:\n` +
+      `\n` +
+      `  ${gmail}\n` +
+      `\n` +
+      `Requested at: ${new Date().toISOString()}\n` +
+      `Requester's OTA build: ${OTA_BUILD_ID}\n` +
+      `\n` +
+      `(Sent from the INVITE PLAYTESTER button on the Tartaria\n` +
+      `title screen.)\n`;
+    const mailto =
+      `mailto:hotatticgames@gmail.com` +
+      `?subject=${encodeURIComponent(subject)}` +
+      `&body=${encodeURIComponent(body)}`;
+
+    try {
+      await Linking.openURL(mailto);
+    } catch {
+      // No mail client installed — silent. The ✓ SENT flash below
+      // still fires; the player will notice their email app didn't
+      // open and can reach out manually.
+    }
+
+    setInviteOpen(false);
+    setInviteSent(true);
+    setTimeout(() => setInviteSent(false), 2200);
   };
 
   const renderItem = ({ item }: { item: SlotSummary }) => (
@@ -590,21 +799,79 @@ export function TitleScreen() {
         <Text style={styles.gear}>⚙</Text>
       </TouchableOpacity>
       <View style={styles.bottomBar}>
+        {/* OTA-068 — playtester thank-you line above the action
+            row. Sized between the action buttons and the
+            version footer in visual weight so it reads as a
+            standalone message, not a button label or a diag
+            string. */}
+        <Text style={styles.thankYou}>
+          Thank you for helping us test our new game, enjoy Tartaria!
+        </Text>
+        {/* OTA-068 — three centered action buttons (INVITE
+            PLAYTESTER, REPORT BUG, EXIT GAME). Was flex-end /
+            right-aligned in OTA-065; centered now so the
+            three-button row reads as a balanced cluster above
+            the centered footer. */}
+        <View style={styles.bottomBtnRow}>
+          {/* OTA-065 — INVITE PLAYTESTER button. Opens the
+              InvitePlaytesterModal which collects a Gmail
+              address and opens a mailto draft to
+              hotatticgames@gmail.com with subject "New
+              Playtester" for owner-side whitelisting. */}
+          <TouchableOpacity
+            style={styles.inviteBtn}
+            activeOpacity={0.7}
+            onPress={() => setInviteOpen(true)}
+          >
+            <Text style={styles.inviteBtnText}>
+              {inviteSent ? '✓ SENT' : 'INVITE PLAYTESTER'}
+            </Text>
+          </TouchableOpacity>
+          {/* OTA-063 — REPORT BUG button. Same footer-bar visual
+              weight as EXIT GAME because both are peripheral,
+              not primary, actions. Opens the BugReportModal
+              which collects a character + description and
+              stages the full report on the clipboard before
+              opening mailto. */}
+          <TouchableOpacity
+            style={styles.bugReportBtn}
+            activeOpacity={0.7}
+            onPress={() => setBugReportOpen(true)}
+          >
+            <Text style={styles.bugReportBtnText}>
+              {bugReportSent ? '✓ COPIED' : 'REPORT BUG'}
+            </Text>
+          </TouchableOpacity>
+          {/* 2026-05-25 — EXIT GAME button. Per playtester
+              request: full app exit from the title screen
+              (Android only — iOS App Store guidelines forbid
+              programmatic exit, but RN's BackHandler.exitApp()
+              is the standard call and is a no-op safely on
+              iOS). Confirm modal prevents an accidental tap
+              mid-character-creation. */}
+          <TouchableOpacity
+            style={styles.exitBtn}
+            activeOpacity={0.7}
+            onPress={() => setPendingAction({ kind: 'exit' })}
+          >
+            <Text style={styles.exitBtnText}>EXIT GAME</Text>
+          </TouchableOpacity>
+        </View>
         <Text style={styles.footer}>v{APP_VERSION}  /  2148</Text>
-        {/* 2026-05-25 — EXIT GAME button. Per playtester request:
-            full app exit from the title screen (Android only — iOS
-            App Store guidelines forbid programmatic exit, but RN's
-            BackHandler.exitApp() is the standard call and is a
-            no-op safely on iOS). Confirm modal prevents an
-            accidental tap mid-character-creation. */}
-        <TouchableOpacity
-          style={styles.exitBtn}
-          activeOpacity={0.7}
-          onPress={() => setPendingAction({ kind: 'exit' })}
-        >
-          <Text style={styles.exitBtnText}>EXIT GAME</Text>
-        </TouchableOpacity>
       </View>
+
+      <BugReportModal
+        visible={bugReportOpen}
+        slots={slots}
+        onCancel={() => setBugReportOpen(false)}
+        onSend={(args) => { void sendBugReport(args); }}
+      />
+
+      <InvitePlaytesterModal
+        visible={inviteOpen}
+        onCancel={() => setInviteOpen(false)}
+        onSend={(gmail) => { void sendPlaytesterInvite(gmail); }}
+      />
 
       <BrandedModal
         visible={pendingAction !== null}
@@ -879,21 +1146,66 @@ const styles = StyleSheet.create({
   },
   secondaryBtnText: { color: '#cdbf99', fontSize: 12, letterSpacing: 1, fontWeight: '700' },
   btnDisabled: { opacity: 0.55 },
+  // OTA-065 — bottomBar now stacks vertically so the action
+  // button row (INVITE PLAYTESTER + REPORT BUG + EXIT GAME) has
+  // its own full-width row and doesn't compete with the footer
+  // text for horizontal space. On a 360dp Android screen the
+  // three buttons + footer text in one row overflowed once
+  // "INVITE PLAYTESTER" replaced the shorter "INVITE" label
+  // (~388dp content on a 360dp screen).
   bottomBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
+    alignItems: 'stretch',
     paddingTop: 8,
+    gap: 6,
   },
   exitBtn: {
     backgroundColor: '#1a1714',
     borderColor: '#8a3a3a',
     borderWidth: 1,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 4,
   },
   exitBtnText: { color: '#c97a7a', fontSize: 10, letterSpacing: 1.5, fontWeight: '700' },
+  // OTA-068 — centered three-button row (INVITE PLAYTESTER,
+  // REPORT BUG, EXIT GAME). Was flex-end / right-aligned in
+  // OTA-065; the centered cluster reads better above the
+  // centered footer + thank-you lines and feels less crowded
+  // on the right edge of the screen.
+  bottomBtnRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  // OTA-063 — REPORT BUG button. Visually equal-weight to EXIT
+  // GAME (same paddings + font) but uses the brand amber instead
+  // of the destructive red so the two are distinguishable at a
+  // glance. The COPIED-flash state swaps in a green border so
+  // the player sees confirmation.
+  bugReportBtn: {
+    backgroundColor: '#1a1714',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 4,
+  },
+  bugReportBtnText: { color: '#c9a86a', fontSize: 10, letterSpacing: 1.5, fontWeight: '700' },
+  // OTA-065 — INVITE PLAYTESTER button. Cool-blue accent so it
+  // doesn't compete with REPORT BUG (amber) or EXIT GAME (red).
+  // Three distinct tones in the action row keep the buttons
+  // glanceable.
+  inviteBtn: {
+    backgroundColor: '#1a1714',
+    borderColor: '#6a9ec9',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 4,
+  },
+  inviteBtnText: { color: '#6a9ec9', fontSize: 10, letterSpacing: 1.5, fontWeight: '700' },
   // v2.4.1 (OTA 051) — top-right gear matches ExplorationScreen's
   // cornerGear placement so the player always finds settings in the
   // same spot. Absolute over the title section; the crest + headers
@@ -913,7 +1225,22 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   gear: { color: '#c9a86a', fontSize: 18, lineHeight: 18, textAlign: 'center' },
-  footer: { color: '#3a342c', fontSize: 10, marginLeft: 2 },
+  // OTA-068 — footer now centered (was left-aligned with a
+  // small marginLeft) so it sits under the centered action row
+  // and thank-you message as the third centered line.
+  footer: { color: '#3a342c', fontSize: 10, textAlign: 'center' },
+  // OTA-068 — thank-you message above the action row. Color
+  // sits between the action button text (#c9a86a / #6a9ec9 /
+  // #c97a7a — bright accents) and the footer (#3a342c — deep
+  // muted) so the message reads as warm-but-secondary.
+  thankYou: {
+    color: '#8a7d5c',
+    fontSize: 11,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    letterSpacing: 0.3,
+    paddingHorizontal: 8,
+  },
   kokoroBanner: {
     backgroundColor: '#1a1714',
     borderColor: '#3a342c',

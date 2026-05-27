@@ -19,6 +19,16 @@ import type {
 } from '../engine/types';
 import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet } from '../engine/worldMemory';
 import {
+  seedInvestigationTable,
+  rollOutcome as rollInvestigationOutcome,
+  callbackLine as investigationCallbackLine,
+  generateLoreAsync as generateInvestigationLoreAsync,
+  findReferenceableInvestigation,
+  buildEchoHookLine,
+  resolveLore as resolveInvestigationLore,
+  type LoreGenerator,
+} from '../engine/investigationTable';
+import {
   listSlots,
   loadSlot,
   saveSlot,
@@ -318,6 +328,23 @@ interface CurrentScene {
     tier: number;
     totalTiers: number;
   } | null;
+  /** 2026-05-27 OTA-089 — elevated overlay state. When the
+   *  player crests a multi-tier climb and the overlay roll
+   *  hits, this scene becomes a mini-area (nook / vantage /
+   *  roost / collector / sealed-door / open-sky). The
+   *  preserved-on-descent reference is the scene the player
+   *  WAS in before climbing — `climb down` restores it.
+   *  elevatedOverlayMeta carries the climbed noun + room key
+   *  + max-tier so the descent can write the cleared marker
+   *  back to the original room's searchedAmbientNouns. Both
+   *  are undefined for normal scenes. */
+  preservedSceneOnDescent?: CurrentScene;
+  elevatedOverlayMeta?: {
+    climbedNoun: string;
+    climbedRoomKey: string;
+    maxTier: number;
+    overlayId: string;
+  };
 }
 
 // Helper: which enemy is the player currently targeting? Returns null
@@ -898,6 +925,16 @@ interface GameStore {
    *  hydrate; cleared by dismissJustUpdated. */
   justUpdatedFromBuild: string | null;
   dismissJustUpdated: () => void;
+  /** 2026-05-27 OTA-100 — separate flag for the OTA-applied
+   *  debug-log marker. justUpdatedFromBuild gets cleared by
+   *  the TitleScreen popup dismiss (correct behavior — popup
+   *  shouldn't refire on next render). But that clear happens
+   *  BEFORE loadSlotIntoGame, so OTA-099's debug-log capture
+   *  saw null. This second flag has the same lifecycle EXCEPT
+   *  it's not touched by the popup; it's consumed exclusively
+   *  by loadSlotIntoGame (and cleared in the same set that
+   *  fires the log entry). */
+  pendingOtaAppliedFrom: string | null;
   /** Set when the silent boot-time OTA check downloaded an update
    *  but did NOT apply it (auto-applying mid-boot crashes the
    *  process — native modules from the old session are still
@@ -952,6 +989,47 @@ interface GameStore {
   saveAndExitToTitle: () => Promise<void>;
 
   appendLog: (channel: LogChannel, text: string, meta?: Record<string, unknown>) => void;
+  /**
+   * 2026-05-27 OTA-084 — HARDENED REFUSAL HELPER.
+   *
+   * Any engine code path that prints "you've already
+   * worked this", "you've already taken this", "you've
+   * already followed the thread", or any other "this
+   * ambient noun is no longer actionable" line MUST go
+   * through this helper. The helper atomically:
+   *   1. Appends the refusal line to the world (or
+   *      arbiter) log.
+   *   2. Writes the noun to the appropriate per-room dedup
+   *      list (searchedAmbientNouns for 'productive'
+   *      outcomes that filter the chip out entirely;
+   *      flavorExhaustedNouns for 'flavor' outcomes that
+   *      grey the chip but keep it visible).
+   *
+   * Why: pre-OTA-084 history shows a recurring bug pattern
+   * where a NEW engine branch (legacy alreadySearched
+   * fall-through, OTA-079 resolved-hook short-circuit,
+   * take/salvage gates) prints the refusal but forgets the
+   * dedup write. The UI chip stays green, the player taps
+   * it 8+ times getting the same line. We fixed it three
+   * times (OTA-070, OTA-076, OTA-083); this helper makes it
+   * structurally impossible to forget — there's no way to
+   * print the refusal without the write.
+   *
+   * Idempotent — skips the write when the noun is already
+   * in the target list. Safe to call from any context that
+   * has a player + currentScene (early-returns when not).
+   *
+   * Optional skipDedup forwards to appendLog so player-
+   * action refusals bypass the arbiter dedup that would
+   * otherwise swallow repeat-tap responses.
+   */
+  refuseAmbient: (opts: {
+    noun: string;
+    line: string;
+    kind: 'productive' | 'flavor';
+    channel?: 'world' | 'arbiter';
+    skipDedup?: boolean;
+  }) => void;
   /** OTA 226 — wipe the in-memory game log + re-persist so the next
    *  resume doesn't restore the old entries. Mirrors the disk-side
    *  clearActiveSlotLog call from the CLEAR LOG button. */
@@ -1157,6 +1235,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   wastelandStepsSinceEncounter: 0,
   lastInteractedNoun: null,
   justUpdatedFromBuild: null,
+  pendingOtaAppliedFrom: null,
   pendingOTAUpdate: false,
   pendingInputDraft: null,
   cognitiveModelInfo: null,
@@ -1235,6 +1314,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentScreen: 'title',
       hydrated: true,
       justUpdatedFromBuild,
+      // OTA-100 — parallel flag with the same source value but
+      // a different lifecycle. justUpdatedFromBuild gets cleared
+      // on popup dismiss (correct — popup shouldn't refire).
+      // pendingOtaAppliedFrom is consumed exclusively by
+      // loadSlotIntoGame's debug-log path so the OTA-applied
+      // marker survives the popup dismiss.
+      pendingOtaAppliedFrom: justUpdatedFromBuild,
     });
   },
 
@@ -1342,6 +1428,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
     const grantResult = grantItem(player.inventory, newItem);
     set((s) => (s.player ? { player: { ...s.player, inventory: grantResult.inventory } } : s));
+    // OTA-078 — skip the consume-mark when the grant failed
+    // (pack full). Pre-OTA-078 the take action always marked
+    // consumed, so a player with a full pack would tap TAKE on
+    // a chip, get the cryptic "Found a X, but your pack is
+    // already full" line, then LOSE access to the chip with
+    // nothing in their pack. Now: pack-full keeps the chip
+    // workable so the player can drop something and retry.
+    if (grantResult.accepted <= 0) {
+      get().appendLog(
+        'arbiter',
+        `Your pack is too full to take the ${cat.name.toLowerCase()} from the ${ambientHit}. Drop something or upgrade and try again.`,
+      );
+      void get().persist();
+      return;
+    }
     // Mark consumed so re-take AND re-salvage on the same ambient
     // in this room hit the dedupe gate.
     set((s) => {
@@ -1363,12 +1464,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         },
       };
     });
-    if (grantResult.accepted > 0) {
-      get().appendLog('world', `You take the ${cat.name} from where it lay.`);
-      get().appendLog('reward', `✦ ${cat.name} (${cat.rarity}).`);
-    } else {
-      get().appendLog('world', `Found a ${cat.name.toLowerCase()}, but your pack is already full of them.`);
-    }
+    // OTA-078 — pack-full path already returned early above, so
+    // we only reach here when the grant landed.
+    get().appendLog('world', `You take the ${cat.name} from where it lay.`);
+    get().appendLog('reward', `✦ ${cat.name} (${cat.rarity}).`);
     void get().persist();
   },
 
@@ -1584,6 +1683,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ]));
         }
       }
+      // 2026-05-27 OTA-099 → OTA-100 — capture the OTA-applied
+      // source build BEFORE the set() so we can log the marker
+      // below. OTA-099 read justUpdatedFromBuild but that flag
+      // is cleared by the TitleScreen popup dismiss BEFORE the
+      // player taps LOAD SLOT, so the capture was always null
+      // in practice. OTA-100 added a parallel pendingOtaApplied
+      // From flag that the popup doesn't touch; we read THAT
+      // one here and clear it in the set below.
+      const ota099UpdatedFrom = get().pendingOtaAppliedFrom;
       set({
         player,
         worldMemory: saved.worldMemory,
@@ -1592,6 +1700,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         activeSlotId: slotId,
         currentScene: restoredScene,
         pendingRolls: null,
+        justUpdatedFromBuild: null,
+        // OTA-100 — clear pendingOtaAppliedFrom in the same set
+        // that fires the debug log below. One marker per
+        // upgrade per resume; never refires within a session.
+        pendingOtaAppliedFrom: null,
         // 2026-05-25 — preserve wastelandStepsSinceEncounter on
         // restore so a save-load round-trip can't game the encounter
         // gate (was: reset to 0, letting a player save-load to delay
@@ -1603,6 +1716,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // get a fresh warning otherwise.
         lowHpWarned: false,
       });
+      // 2026-05-27 OTA-099 — OTA-applied + session-start markers
+      // in the log. User asked: "when you update via OTA can a
+      // record of that be in the log, but not visible to the
+      // player, that way you can tell if I am up to date, and
+      // can kind of have a timestamp of the progression."
+      // Done via the debug channel so the entry shows up in
+      // shared log captures but doesn't surface as world /
+      // arbiter narration. Always emit a session-start marker
+      // on load (so any log dump can be traced to a build ID);
+      // additionally emit an "applied from" marker the first
+      // time a slot is loaded after an OTA upgrade.
+      try {
+        if (ota099UpdatedFrom) {
+          get().appendLog(
+            'debug',
+            `OTA applied: ${ota099UpdatedFrom} → ${OTA_BUILD_ID}.`,
+          );
+        }
+        get().appendLog('debug', `OTA session start: ${OTA_BUILD_ID}.`);
+      } catch { /* hardened: never block slot load on a debug log failure */ }
       // Only fall back to beginScene when the save predates scene
       // capture. New saves restore the exact scene above and skip this.
       if (!restoredScene) {
@@ -1752,6 +1885,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       pendingRolls: null,
       activeSlotId: slotId,
     });
+    // OTA-099 — session-start debug marker for new characters
+    // too. Same purpose as in loadSlotIntoGame: any log capture
+    // can be traced to the build ID it was running.
+    try {
+      get().appendLog('debug', `OTA session start: ${OTA_BUILD_ID}.`);
+    } catch { /* never block character creation on a debug log */ }
     // Opening line + player name + weather get woven INTO the scene
     // paragraph rather than printed as their own log entries, so the
     // player sees one flowing intro instead of three stacked statements.
@@ -1904,6 +2043,60 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // MicroMicroLocation.interactables (Phase 2) is canonical;
       // extractAmbientNouns() is the fallback only.
       return { gameLog: nextLog };
+    });
+  },
+
+  // 2026-05-27 OTA-084 — hardened refusal helper. See the
+  // interface JSDoc above for the rationale. Two-step
+  // refusal: log the line, then mark the dedup list. No
+  // public escape hatch lets callers do just one or the
+  // other; the helper enforces atomicity by doing both
+  // every time.
+  refuseAmbient({ noun, line, kind, channel = 'world', skipDedup }) {
+    const player = get().player;
+    const scene = get().currentScene;
+    if (!player || !scene) return;
+    const lower = noun.toLowerCase();
+    // STEP 1 — log the refusal line.
+    get().appendLog(channel, line, skipDedup ? { skipDedup: true } : undefined);
+    // STEP 2 — write the dedup mark. Idempotent: skips when
+    // the noun is already in the target list. The OTA-070/
+    // 076 fuzzy UI check then filters or greys the chip
+    // according to which list got the write.
+    const roomKey = makeRoomKey(
+      player.currentLocationId,
+      scene.microMicroId,
+      player.mapX,
+      player.mapY,
+    );
+    set((s) => {
+      const room = s.worldMemory.visitedRooms?.[roomKey];
+      if (!room) return s;
+      if (kind === 'productive') {
+        const existing = room.searchedAmbientNouns ?? [];
+        if (existing.includes(lower)) return s;
+        return {
+          worldMemory: {
+            ...s.worldMemory,
+            visitedRooms: {
+              ...(s.worldMemory.visitedRooms ?? {}),
+              [roomKey]: { ...room, searchedAmbientNouns: [...existing, lower] },
+            },
+          },
+        };
+      }
+      // kind === 'flavor'
+      const existing = room.flavorExhaustedNouns ?? [];
+      if (existing.includes(lower)) return s;
+      return {
+        worldMemory: {
+          ...s.worldMemory,
+          visitedRooms: {
+            ...(s.worldMemory.visitedRooms ?? {}),
+            [roomKey]: { ...room, flavorExhaustedNouns: [...existing, lower] },
+          },
+        },
+      };
     });
   },
 
@@ -2094,6 +2287,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const h = plantHookByKind(next.kind as Hook['kind'], next.chainId);
       initialHooks.push(h);
       consumedChainIds.push(next.chainId);
+    }
+    // 2026-05-26 OTA-075 — cross-room investigation echo hook.
+    // When no chain hook fired (chain continuation owns the
+    // slot when present) AND the scene is peaceful, occasionally
+    // plant a hook that references a past investigation from a
+    // different room. Makes discoveries feel connected — the
+    // bench you took cushion scraps from three rooms ago echoes
+    // back here as a callback. Bounded probability (15%) keeps
+    // echoes from becoming spammy when many investigations
+    // have been recorded.
+    if (initialHooks.length === 0 && !hasEnemies && player && Math.random() < 0.15) {
+      const echoRoomKey = makeRoomKey(
+        player.currentLocationId,
+        microMicroId,
+        player.mapX,
+        player.mapY,
+      );
+      const ref = findReferenceableInvestigation(
+        (worldMemory.visitedRooms ?? {}) as Record<string, { roomInvestigationTable?: VisitedRoom['roomInvestigationTable'] }>,
+        echoRoomKey,
+      );
+      if (ref) {
+        initialHooks.push({
+          id: `hook_echo_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+          kind: 'thread',
+          nouns: [ref.noun],
+          plantedLine: buildEchoHookLine(ref),
+          stage: 0,
+          resolved: false,
+        });
+      }
     }
     // Source the scene's interactable nouns. Preference order:
     //   1. Hand-authored `interactables` arrays on the location and
@@ -2345,6 +2569,40 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     } catch { /* voice modules not present in tests */ }
     set({ currentScene: scene, pendingRolls: null });
+    // 2026-05-26 OTA-071 — seed the per-room investigation
+    // table from the scene's ambientNouns. Idempotent: only
+    // seeds when the room doesn't already have a table (re-
+    // entering a known room preserves prior table state +
+    // consumed flags). Lives inside worldMemory.visitedRooms
+    // [roomKey] so persistence is automatic via the existing
+    // save path.
+    if (player) {
+      const investigateRoomKey = makeRoomKey(
+        player.currentLocationId,
+        scene.microMicroId,
+        player.mapX,
+        player.mapY,
+      );
+      set((s) => {
+        const prev = s.worldMemory.visitedRooms?.[investigateRoomKey];
+        if (prev?.roomInvestigationTable) return s; // already seeded
+        const base: VisitedRoom = prev ?? {
+          firstVisitAt: Date.now(),
+          lastVisitAt: Date.now(),
+          visitCount: 1,
+        };
+        const table = seedInvestigationTable(scene.ambientNouns);
+        return {
+          worldMemory: {
+            ...s.worldMemory,
+            visitedRooms: {
+              ...(s.worldMemory.visitedRooms ?? {}),
+              [investigateRoomKey]: { ...base, roomInvestigationTable: table },
+            },
+          },
+        };
+      });
+    }
     const dropIds = [...consumedChainIds, ...expiredChainIds];
     if (dropIds.length > 0) {
       set((s) => ({
@@ -3371,7 +3629,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('debug', `route: hook intercept (kind=${hook.kind}, target="${targetText}") — original intent=${parsed.intent}`);
         // Small stamina cost for engaging a hook (same as a skill check).
         set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
-        resolveHookOneStep(hook, get, set);
+        // 2026-05-27 OTA-088 — pass the trigger text so the stage
+        // advance can replace the chip text in scene.ambientNouns
+        // (and displayedAmbientNouns) with the latest revealed
+        // noun. Player asked: "should the chip change from
+        // 'investigate fungus' to 'investigate low chamber' since
+        // the narrative was altered?" — yes, the chip now reflects
+        // the narrative state.
+        resolveHookOneStep(hook, get, set, targetText);
         void get().persist();
         return;
       }
@@ -3950,7 +4215,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       case 'investigate': {
         // 1) "find a way / look for a path / which direction" — surface options, no roll.
         if (DIRECTION_KEYWORDS.test(trimmed)) {
-          narratePossibleDirections(get, currentScene);
+          narratePossibleDirections(get, set, currentScene);
           break;
         }
         // The target the player named (raw, before resolution).
@@ -4104,10 +4369,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 get().appendLog('reward', `✦ ${outcome.itemName}${qtyLabel} (${outcome.rarity}).`);
                 produced = true;
               } else {
-                get().appendLog('world', `Found a ${outcome.itemName!.toLowerCase()}, but your pack is already full of them.`);
-                // Pack-full counts as produced (you've worked over the
-                // noun and the item rolled, you just couldn't carry it).
-                produced = true;
+                // OTA-078 — pack-full no longer counts as
+                // produced. Pre-OTA-078 the comment claimed
+                // "you've worked over the noun" so we still
+                // consumed the chip, but the player walked away
+                // with NOTHING and lost the chip with no clear
+                // explanation. Now: arbiter-channel warning +
+                // produced stays false so the chip remains
+                // workable after the player drops something or
+                // upgrades. Mirrors the same fix in the OTA-077
+                // investigate-table sync-consume path.
+                get().appendLog(
+                  'arbiter',
+                  `Your pack is too full to take the ${outcome.itemName!.toLowerCase()} from the ${harvestAmbient}. Drop something or upgrade and try again.`,
+                );
+                // produced stays false — chip remains workable
               }
             } else if (outcome.kind === 'tc') {
               set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + outcome.amount } } : s));
@@ -4141,6 +4417,48 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 visitCount: 1,
               };
               const prevSearched = room.searchedAmbientNouns ?? [];
+              // 2026-05-27 OTA-079 — salvage now ALSO marks the
+              // OTA-071+ investigation table entry consumed.
+              // Pre-OTA-079 salvage wrote only to searched
+              // AmbientNouns, leaving roomInvestigationTable
+              // [noun].consumed === false. Next `investigate
+              // <same noun>` consulted the table, found it un-
+              // consumed, ran a FRESH outcome (lore + maybe
+              // another item grant), and marked consumed AFTER
+              // the second take — a salvage-then-investigate
+              // double-dip. Now: salvage flips the table flag
+              // alongside searchedAmbientNouns so investigate
+              // is gated by the OTA-074 callback line instead.
+              // Idempotent + safe if the table is missing
+              // (skips the table touch, preserves the searched
+              // write).
+              const prevTable = room.roomInvestigationTable;
+              const existingEntry = prevTable?.[harvestLowered];
+              const updatedTable = (prevTable && existingEntry && !existingEntry.consumed)
+                ? {
+                    ...prevTable,
+                    [harvestLowered]: {
+                      ...existingEntry,
+                      consumed: true,
+                      consumedAt: Date.now(),
+                      // Salvage produces a salvage-narration
+                      // outcome — record kind='item' with a
+                      // generic detail so callbackLine picks an
+                      // item-class line ("the salvage was the
+                      // only thing worth pulling"). This is OK
+                      // even if salvage actually returned 'tc'
+                      // or 'hook'; the callback is a UI nicety,
+                      // not an exact record. OTA-080 can refine
+                      // by passing salvage's outcome.kind into
+                      // the result.
+                      result: existingEntry.result ?? {
+                        kind: 'item',
+                        detail: 'salvage',
+                        line: existingEntry.loreLine ?? '',
+                      },
+                    },
+                  }
+                : prevTable;
               return {
                 worldMemory: {
                   ...s.worldMemory,
@@ -4149,6 +4467,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     [harvestRoomKey]: {
                       ...room,
                       searchedAmbientNouns: [...prevSearched, harvestLowered],
+                      ...(updatedTable !== prevTable
+                        ? { roomInvestigationTable: updatedTable }
+                        : {}),
                     },
                   },
                 },
@@ -4173,6 +4494,352 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const ambient = matchAmbientNoun(rawTarget, currentScene.ambientNouns ?? []);
           if (ambient) {
             const ambientLower = ambient.toLowerCase();
+            // 2026-05-27 OTA-079 — resolved-hook short-circuit.
+            // When a hook's chain fully resolved on an earlier
+            // tap (kind=preserved_corpse / half_buried_spire /
+            // etc. progressed through all its stages), the
+            // hook stays in scene.hooks with resolved=true and
+            // its revealed nouns ('spire', 'reclaimer',
+            // 'figure'...) remain in scene.ambientNouns.
+            // Pre-OTA-079, a re-tap on one of those nouns fell
+            // past the hook intercept (only fires on
+            // !resolved) into the table consult — which had
+            // an entry seeded as 'generic' category (no
+            // keyword match for 'spire') and produced the
+            // catchall lore line "You look the spire over.
+            // Nothing about it sings..." for a noun the
+            // player had just pulled a Rusted Band of
+            // Knowledge from. Off-putting and wrong. Now:
+            // before the table consult, if the noun matches
+            // any resolved-hook nouns array in the current
+            // scene, print a one-line callback referencing
+            // the resolved thread and break. Keeps the
+            // narrative arc closed instead of leaking to a
+            // generic fallback.
+            const resolvedHookMatch = (currentScene.hooks ?? []).find(
+              (h) => h.resolved && h.nouns.some(
+                (n) => {
+                  const nl = n.toLowerCase();
+                  return nl === ambientLower
+                    || ambientLower.includes(nl)
+                    || nl.includes(ambientLower);
+                },
+              ),
+            );
+            if (resolvedHookMatch) {
+              // 2026-05-27 OTA-084 — routed through the new
+              // refuseAmbient helper. Atomically logs the
+              // callback + writes searchedAmbientNouns so the
+              // chip filters out. The inline implementation
+              // OTA-083 added has been folded into the helper;
+              // any future refusal site MUST use this same
+              // entry point.
+              get().refuseAmbient({
+                noun: ambient,
+                line: `You've already followed the thread of the ${ambient}. Whatever it had for you is in your pack — or wasn't there to begin with.`,
+                kind: 'productive',
+              });
+              break;
+            }
+            // 2026-05-26 OTA-071 — per-room investigation table
+            // consult. Runs BEFORE the existing alreadySearched
+            // / requirement / catalog branches so any noun the
+            // table knows about gets a specific outcome on first
+            // tap and a specific callback on repeat. Falls
+            // through to existing logic when the table doesn't
+            // have an entry (pinned ground/floor/mud and any
+            // legacy room saved before OTA-071 generated its
+            // table).
+            const tableRoomKey = makeRoomKey(
+              player.currentLocationId,
+              currentScene.microMicroId,
+              player.mapX,
+              player.mapY,
+            );
+            let tableRoom = get().worldMemory.visitedRooms?.[tableRoomKey];
+            // 2026-05-26 OTA-076 — self-heal for legacy rooms.
+            // beginScene seeds the table on fresh entry, but
+            // players already INSIDE a room when OTA-071 shipped
+            // never re-entered it, so the table is missing. The
+            // engine falls through to the OLD alreadySearched
+            // branch and prints "you've already worked over the
+            // X" forever even though OTA-071+ would produce a
+            // real outcome. Opportunistically seed the table
+            // when it's missing — covers pre-OTA-071 saves and
+            // any future regression that misses a seed call.
+            if (tableRoom && !tableRoom.roomInvestigationTable) {
+              const seeded = seedInvestigationTable(currentScene.ambientNouns);
+              set((s) => ({
+                worldMemory: {
+                  ...s.worldMemory,
+                  visitedRooms: {
+                    ...(s.worldMemory.visitedRooms ?? {}),
+                    [tableRoomKey]: {
+                      ...(s.worldMemory.visitedRooms?.[tableRoomKey] ?? {
+                        firstVisitAt: Date.now(),
+                        lastVisitAt: Date.now(),
+                        visitCount: 1,
+                      }),
+                      roomInvestigationTable: seeded,
+                    },
+                  },
+                },
+              }));
+              tableRoom = get().worldMemory.visitedRooms?.[tableRoomKey];
+            }
+            const tableEntry = tableRoom?.roomInvestigationTable?.[ambientLower];
+            if (tableEntry) {
+              if (tableEntry.consumed) {
+                // Specific callback referencing the recorded
+                // first-investigate result — no stamina, no
+                // time, no re-roll.
+                get().appendLog(
+                  'world',
+                  investigationCallbackLine(ambient, tableEntry),
+                );
+                break;
+              }
+              // First investigate — OTA-077 sync-consume pattern.
+              // Pre-OTA-077 the entire outcome (lore, log, set)
+              // ran INSIDE an async IIFE awaiting Qwen lore.
+              // Chip stayed green for the 50-2500ms Qwen latency
+              // window; players tapped repeatedly trying to "get
+              // rid of" a still-green chip, spawning duplicate
+              // IIFEs that interleaved their log lines.
+              //
+              // OTA-077 splits the work:
+              //   SYNC: roll outcome (kind known immediately
+              //         since rollOutcome is pure), mark consumed
+              //         in the table + dedup list (chip greys
+              //         instantly), grant item if any, log the
+              //         curated lore line as the visible outcome.
+              //   ASYNC: when Qwen is ready, fetch the enriched
+              //          lore and patch the entry.result.line in
+              //          the table so future callback references
+              //          use the Qwen text. The visible log line
+              //          for THIS investigate stays curated —
+              //          replacing log entries after the fact is
+              //          jarring; the upgrade lands on the next
+              //          repeat tap's callback or the next room
+              //          entry's echo hook.
+              const baseOutcome = rollInvestigationOutcome(tableEntry);
+              const qwenGenerator: LoreGenerator | null = qwen.isReady()
+                ? (messages, opts) => qwen.generate(messages, opts)
+                : null;
+              const locationName =
+                currentScene.location.name ?? 'this place';
+              const wantedItem = baseOutcome.kind === 'item';
+              // OTA-078 — attempt the grant FIRST so we know the
+              // FINAL outcome before logging. Pre-OTA-078 the
+              // sequence was: log baseOutcome.line (which already
+              // contained "Tucked into the seam: a X") → try
+              // grantItem → if accepted===0 (pack full) or cat
+              // missing, silently skip the reward log → mark
+              // consumed regardless. Player saw "Tucked into the
+              // seam: a bone sliver", received nothing, and lost
+              // the chip with no warning. Worse: the next call-
+              // back claimed "the bone sliver was the only thing
+              // of value" for an item that never entered the
+              // pack. Now: we attempt the grant first, downgrade
+              // to flavor if it fails, log the right line, and
+              // SKIP the dedup write on pack-full so the player
+              // can retry after dropping something.
+              let finalOutcome = baseOutcome;
+              let grantedCat: ReturnType<typeof findCatalogItem> | null = null;
+              let grantedQty = 0;
+              let packFullDeflection = false;
+              if (wantedItem && get().player) {
+                const cat = findCatalogItem(baseOutcome.detail);
+                if (cat) {
+                  const newItem: InventoryItem = {
+                    id: `${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`,
+                    name: cat.name,
+                    kind: cat.kind === 'weapon' ? 'weapon' : cat.kind === 'armor' ? 'armor' : cat.kind,
+                    rarity: cat.rarity,
+                    quantity: tableEntry.yield?.qty ?? 1,
+                    tags: cat.tags,
+                  };
+                  const granted = grantItem(get().player!.inventory, newItem);
+                  if (granted.accepted > 0) {
+                    set((s) =>
+                      s.player ? { player: { ...s.player, inventory: granted.inventory } } : s,
+                    );
+                    grantedCat = cat;
+                    grantedQty = granted.accepted;
+                  } else {
+                    // Pack full — downgrade to flavor so the lore
+                    // line doesn't claim a take that never landed.
+                    packFullDeflection = true;
+                    finalOutcome = {
+                      kind: 'flavor',
+                      detail: '',
+                      line: resolveInvestigationLore(tableEntry),
+                    };
+                  }
+                } else {
+                  // Catalog miss (template typo / item removed).
+                  // Silently downgrade to flavor so the player
+                  // doesn't see a phantom "Tucked into the seam"
+                  // claim. Still consume the chip — repeated taps
+                  // would just hit the same bug.
+                  finalOutcome = {
+                    kind: 'flavor',
+                    detail: '',
+                    line: resolveInvestigationLore(tableEntry),
+                  };
+                }
+              }
+              // SYNC: log the final-state outcome line.
+              get().appendLog('world', finalOutcome.line);
+              // SYNC: log the reward when the grant actually
+              // landed an item.
+              if (grantedCat && grantedQty > 0) {
+                const qtyLabel = grantedQty > 1 ? ` x${grantedQty}` : '';
+                get().appendLog(
+                  'reward',
+                  `✦ ${grantedCat.name}${qtyLabel} from the ${ambient}.`,
+                );
+              }
+              // SYNC: log the pack-full warning. Arbiter-channel
+              // so it reads as a clear note, not flavor.
+              if (packFullDeflection) {
+                get().appendLog(
+                  'arbiter',
+                  `Your pack is too full to take the ${baseOutcome.detail.toLowerCase()} from the ${ambient}. Drop something or upgrade and try again.`,
+                );
+              }
+              // OTA-078 — SKIP the consume block when pack-full
+              // deflection happened so the player can retry the
+              // SAME chip after making room. The chip stays
+              // green; OTA-070 fuzzy UI is unaffected because we
+              // never wrote to the dedup list.
+              if (packFullDeflection) {
+                break;
+              }
+              // SYNC: mark consumed + write to dedup list. Chip
+              // greys IMMEDIATELY via OTA-070/076 fuzzy UI check
+              // — no more "tap N times until it goes away".
+              set((s) => {
+                const room = s.worldMemory.visitedRooms?.[tableRoomKey] ?? {
+                  firstVisitAt: Date.now(),
+                  lastVisitAt: Date.now(),
+                  visitCount: 1,
+                };
+                const prevTable = room.roomInvestigationTable ?? {};
+                // OTA-078 — record the FINAL outcome (after
+                // grant attempt + possible downgrade), not the
+                // initial baseOutcome. Pre-OTA-078 a pack-full
+                // deflected outcome would still cache result.
+                // kind='item' and result.detail='Bone Sliver',
+                // so the next callback claimed "the bone sliver
+                // was the only thing of value" for an item that
+                // never entered inventory. Now: if we deflected
+                // to flavor, the callback chain reflects that.
+                const updatedEntry = {
+                  ...tableEntry,
+                  loreLine: finalOutcome.line, // Qwen patches async below
+                  consumed: true,
+                  consumedAt: Date.now(),
+                  result: finalOutcome,
+                };
+                const isItemOutcome = finalOutcome.kind === 'item';
+                const existingSearched = room.searchedAmbientNouns ?? [];
+                const existingFlavor = room.flavorExhaustedNouns ?? [];
+                const searchedWithNoun = isItemOutcome && !existingSearched.includes(ambientLower)
+                  ? [...existingSearched, ambientLower]
+                  : existingSearched;
+                const flavorWithNoun = !isItemOutcome && !existingFlavor.includes(ambientLower)
+                  ? [...existingFlavor, ambientLower]
+                  : existingFlavor;
+                return {
+                  worldMemory: {
+                    ...s.worldMemory,
+                    visitedRooms: {
+                      ...(s.worldMemory.visitedRooms ?? {}),
+                      [tableRoomKey]: {
+                        ...room,
+                        roomInvestigationTable: {
+                          ...prevTable,
+                          [ambientLower]: updatedEntry,
+                        },
+                        searchedAmbientNouns: searchedWithNoun,
+                        flavorExhaustedNouns: flavorWithNoun,
+                      },
+                    },
+                  },
+                };
+              });
+              // ASYNC: enrich the cached lore via Qwen so the
+              // NEXT callback / echo references the rich text
+              // instead of the curated fallback. Visible log
+              // line for this investigate is already done.
+              if (qwenGenerator) {
+                void (async () => {
+                  const enriched = await generateInvestigationLoreAsync(
+                    tableEntry,
+                    locationName,
+                    qwenGenerator,
+                  );
+                  // OTA-078 — compare against the FINAL outcome
+                  // line (was baseOutcome.line). When the grant
+                  // failed and we downgraded to flavor, the
+                  // visible/log line was the resolved curated
+                  // lore — that's what we want to compare. Also:
+                  // generateLoreAsync now substitutes the {noun}
+                  // placeholder before returning the fallback, so
+                  // this comparison actually detects "Qwen gave
+                  // us the same curated text" instead of always
+                  // running the patch with raw {noun} in it.
+                  const finalLineForCompare = finalOutcome.line;
+                  if (!enriched || enriched === finalLineForCompare) return;
+                  set((s) => {
+                    const room = s.worldMemory.visitedRooms?.[tableRoomKey];
+                    const existing = room?.roomInvestigationTable?.[ambientLower];
+                    if (!room || !existing) return s;
+                    // OTA-078 — only append the item suffix when
+                    // the FINAL outcome was actually an item
+                    // (grant landed). Pre-OTA-078 a pack-full
+                    // deflection still appended "Tucked into the
+                    // seam" to the Qwen-enriched cache because
+                    // we used the pre-deflection isItemOutcome.
+                    const wasItemGrant = finalOutcome.kind === 'item';
+                    const enrichedLine = wasItemGrant
+                      ? `${enriched} Tucked into the seam: a ${finalOutcome.detail.toLowerCase()}.`
+                      : enriched;
+                    const patched: typeof existing = {
+                      ...existing,
+                      loreLine: enriched,
+                      result: existing.result
+                        ? { ...existing.result, line: enrichedLine }
+                        : existing.result,
+                    };
+                    return {
+                      worldMemory: {
+                        ...s.worldMemory,
+                        visitedRooms: {
+                          ...(s.worldMemory.visitedRooms ?? {}),
+                          [tableRoomKey]: {
+                            ...room,
+                            roomInvestigationTable: {
+                              ...(room.roomInvestigationTable ?? {}),
+                              [ambientLower]: patched,
+                            },
+                          },
+                        },
+                      },
+                    };
+                  });
+                })();
+              }
+              // OTA-077 — stamina/time costs intentionally NOT
+              // applied here. Table outcomes are quick visual
+              // / flavor beats; the richer skill-check path
+              // (catalog items, scanners) keeps its existing
+              // stamina cost and dice. Persistence flush via
+              // the normal advanceTime/persist cadence on the
+              // next action.
+              break;
+            }
             const searchRoomKey = makeRoomKey(
               player.currentLocationId,
               currentScene.microMicroId,
@@ -6045,7 +6712,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ? `You throw the ${itemUsed.name.toLowerCase()} toward ${tgt || 'the noise'}. It thumps into the dust.`
               : `You throw a stone toward ${tgt}. It clatters off something.`,
           );
-          resolveHookOneStep(hookMatch, get, set);
+          // OTA-088 — pass the throw target so chip replacement
+          // also fires when the player advances a hook via throw.
+          resolveHookOneStep(hookMatch, get, set, tgt);
           break;
         }
         if (ambient || tgt) {
@@ -6086,6 +6755,43 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const downFrom = typeof elev === 'string'
             ? elev
             : (elev as { noun?: string }).noun ?? 'the height';
+          // 2026-05-27 OTA-089 — elevated overlay descent. When
+          // the player is in an overlay scene (mini-area at
+          // the apex), climb-down restores the preserved base
+          // scene directly — no detour back to "the pillar"
+          // first. The climbed marker for tgt was already
+          // written to the base room's searchedAmbientNouns
+          // when the climb-top tier resolved, so the chip
+          // greys correctly via OTA-086's fuzzy match on
+          // restore. Active overlay enemies are abandoned —
+          // intentional design: if you didn't finish the
+          // encounter, you bailed.
+          const overlayMeta = currentScene.elevatedOverlayMeta;
+          const preserved = currentScene.preservedSceneOnDescent;
+          if (overlayMeta && preserved) {
+            const climbedName = overlayMeta.climbedNoun || downFrom;
+            set((s) => {
+              if (!s.currentScene) return s;
+              // Restore the base scene as currentScene. Drop
+              // elevatedOn since we're back on the ground.
+              return {
+                currentScene: {
+                  ...preserved,
+                  elevatedOn: null,
+                  // Don't carry overlay fields back onto the
+                  // base — explicitly clear them.
+                  preservedSceneOnDescent: undefined,
+                  elevatedOverlayMeta: undefined,
+                },
+              };
+            });
+            set({ player: advanceTime(spendStamina(player, 1), 0.25) });
+            get().appendLog(
+              'world',
+              `You climb down from the ${overlayMeta.overlayId === 'open_sky' ? 'lookout' : overlayMeta.overlayId.replace(/_/g, ' ')} and rejoin the ground beside the ${climbedName}. Boots back on the ground.`,
+            );
+            break;
+          }
           set((s) => s.currentScene ? { currentScene: { ...s.currentScene, elevatedOn: null } } : s);
           set({ player: advanceTime(spendStamina(player, 1), 0.25) });
           get().appendLog(
@@ -6422,6 +7128,147 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : s.currentScene,
             };
           });
+          // 2026-05-27 OTA-089 — elevated overlay roll. If the
+          // chance fires AND we're at the top tier, swap the
+          // scene for a mini-area (nook/vantage/roost/etc.)
+          // with its own ambient nouns and (usually) an
+          // encounter. The original scene is preserved on the
+          // overlay's preservedSceneOnDescent; `climb down`
+          // restores it. The player doesn't have to return to
+          // the climbed object first — descent is direct.
+          if (isTop) {
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const {
+              rollElevatedOverlay,
+              rollOverlayEncounter,
+              buildOverlayOverrides,
+              buildOverlayTrader,
+              buildOverlayLookoutHook,
+            } = require('../engine/elevatedOverlay') as typeof import('../engine/elevatedOverlay');
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { findEnemyByName } = require('../engine/encounter') as typeof import('../engine/encounter');
+            // 2026-05-27 OTA-090 — pass totalTiers so trader
+            // overlays (minTiers=4) are excluded on short
+            // climbs. Player asked: traders only on "larger
+            // locations" so a 1-tier ledge doesn't surface a
+            // man-with-a-ledger absurdity.
+            const overlay = rollElevatedOverlay(totalTiers);
+            if (overlay) {
+              // Branch on kind. Encounter spawns an enemy.
+              // Trader spawns a VendorInstance on scene.vendor.
+              // Lookout plants a one-stage hook the player can
+              // tap any of the lookout's nouns to engage.
+              // OTA-091 — pass player.hpMax to scale the
+              // encounter band. Early-game (hpMax < 40) only
+              // sees Common-tier enemies in overlay rolls; mid
+              // (< 80) gets Common+Uncommon; late game gets
+              // Uncommon+Rare. Prevents the OTA-089 "32-HP
+              // player rolls a 158-HP Aetheric Harpy" mismatch.
+              const enemy =
+                overlay.kind === 'encounter'
+                  ? (() => {
+                      const name = rollOverlayEncounter(overlay, player.hpMax);
+                      return name ? findEnemyByName(name) : null;
+                    })()
+                  : null;
+              const overlayVendor =
+                overlay.kind === 'trader' ? buildOverlayTrader(overlay) : null;
+              const overlayHook =
+                overlay.kind === 'lookout' ? buildOverlayLookoutHook(overlay) : null;
+              const overrides = buildOverlayOverrides(overlay, enemy);
+              set((s) => {
+                if (!s.currentScene) return s;
+                // Build the overlay scene by spreading the base
+                // and overriding ambientNouns / enemies /
+                // vendor / hooks. Range/weather/hazard inherit
+                // so the world stays cohesive (a storm on the
+                // road is still a storm up there).
+                const baseScene = s.currentScene;
+                const overlayScene: typeof baseScene = {
+                  ...baseScene,
+                  ambientNouns: overrides.ambientNouns,
+                  displayedAmbientNouns: overrides.displayedAmbientNouns,
+                  enemies: overrides.enemies,
+                  enemyHps: overrides.enemyHps,
+                  enemyAmbushUsed: overrides.enemyAmbushUsed,
+                  activeEnemyIdx: overrides.activeEnemyIdx,
+                  // Trader → vendor overrides the base's; null
+                  // for encounter/lookout. Lookout → put the
+                  // planted hook in hooks[]; encounter/trader
+                  // get a fresh empty hooks array.
+                  vendor: overlay.kind === 'trader' ? overlayVendor : null,
+                  hooks: overlayHook ? [overlayHook] : [],
+                  // OTA-089 — preserve the base scene + metadata
+                  // so climb-down restores it and writes the
+                  // cleared marker for the climbed noun back to
+                  // the base room.
+                  preservedSceneOnDescent: baseScene,
+                  elevatedOverlayMeta: {
+                    climbedNoun: tgt,
+                    climbedRoomKey: climbRoomKey,
+                    maxTier: totalTiers,
+                    overlayId: overlay.id,
+                  },
+                };
+                return { currentScene: overlayScene };
+              });
+              // 2026-05-27 OTA-102 — seed the overlay's ambient
+              // nouns into the room's roomInvestigationTable so
+              // investigate produces real outcomes on them.
+              // Pre-OTA-102: 'investigate copper bowl' / 'ozone
+              // tang' / 'bent rivets' (overlay nouns) returned
+              // the OTA-071 generic catchall because the table
+              // was seeded only for the base scene's noun pool.
+              // OTA-076's self-heal didn't fire because the table
+              // already existed (just without these entries). Now
+              // we merge the overlay nouns into the existing
+              // table directly.
+              set((s) => {
+                const room = s.worldMemory.visitedRooms?.[climbRoomKey];
+                if (!room) return s;
+                const prevTable = room.roomInvestigationTable ?? {};
+                const newEntries = seedInvestigationTable(overrides.ambientNouns);
+                let touched = false;
+                const mergedTable = { ...prevTable };
+                for (const [key, entry] of Object.entries(newEntries)) {
+                  if (mergedTable[key]) continue;
+                  mergedTable[key] = entry;
+                  touched = true;
+                }
+                if (!touched) return s;
+                return {
+                  worldMemory: {
+                    ...s.worldMemory,
+                    visitedRooms: {
+                      ...(s.worldMemory.visitedRooms ?? {}),
+                      [climbRoomKey]: {
+                        ...room,
+                        roomInvestigationTable: mergedTable,
+                      },
+                    },
+                  },
+                };
+              });
+              get().appendLog('world', overlay.arrivalLine);
+              if (enemy) {
+                get().appendLog(
+                  'combat',
+                  `${enemy.name} is here — and it has seen you.`,
+                );
+              }
+              if (overlayVendor) {
+                get().appendLog(
+                  'world',
+                  `${overlayVendor.name} (${overlayVendor.title}) lays out wares. Tap the vendor banner to trade.`,
+                );
+              }
+              // Lookout's pitchLine is the hook's plantedLine;
+              // the hook system will emit it on next investigate
+              // of one of the lookout's nouns. No extra log
+              // line needed here — arrivalLine already
+              // introduces the NPC.
+            }
+          }
         }
         break;
       }
@@ -7889,15 +8736,124 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // Narrate against the actual thing the player searched, not the whole location.
             const reparsed = parseInput(actionText);
             const focus = reparsed.resolvedNoun ?? reparsed.target ?? currentScene.location.name;
-            get().appendLog('world', `You examine ${focus}. The Aetherstone hums — something is here, but not in plain sight.`);
+            // 2026-05-27 OTA-096 — per-noun dedup on this quest-
+            // check-success investigate path. Pre-OTA-096 the
+            // line "You examine X. The Aetherstone hums..."
+            // fired on every successful skill check, even when
+            // the same noun had been examined 6 times in a row
+            // — same pattern OTA-084 hardened for other refusal
+            // surfaces, but this one was missed because it's an
+            // active narration (not a refusal). Playtester
+            // tapped 'investigate titan's bone marker' 6 times
+            // and saw the identical line each time with no
+            // signal that the work was diminishing returns.
+            //
+            // Fix: track per-room which nouns have been pulled
+            // through this branch. First tap: original line +
+            // 12% lead chance (preserved). Subsequent taps:
+            // refuseAmbient callback that acknowledges the
+            // previous examination so the player knows to stop
+            // tapping. The first-tap line itself is also
+            // rephrased to be honest about what's happening —
+            // pre-OTA the line promised "something is here, but
+            // not in plain sight" which is misleading when no
+            // lead drops; now it acknowledges the skill-training
+            // and indicates clearly when no thread surfaced.
+            const focusKey = focus.toLowerCase();
+            const investRoomKey = makeRoomKey(
+              player.currentLocationId,
+              currentScene.microMicroId,
+              player.mapX,
+              player.mapY,
+            );
+            const investRoom = get().worldMemory.visitedRooms?.[investRoomKey];
+            const investPrior = investRoom?.flavorExhaustedNouns ?? [];
+            const alreadyExamined = investPrior.some(
+              (n) => n === focusKey || focusKey.includes(n) || n.includes(focusKey),
+            );
+            if (alreadyExamined) {
+              // OTA-084 refuseAmbient pattern — atomic log +
+              // dedup mark, idempotent on the second touch.
+              get().refuseAmbient({
+                noun: focus,
+                line: `You've already turned the ${focus} over here. Whatever it had to give you, you took. Your active leads (if any) live in the Contracts log.`,
+                kind: 'flavor',
+              });
+              break;
+            }
             // Only drop a new lead occasionally, and only if the player isn't already
             // juggling unfinished quests. Was 50%; "search my pockets" should not spawn
             // a quest about brokering relic sales at Thametan's Tower.
             const activeQuests = player.activeQuests.length;
-            if (activeQuests < 2 && Math.random() < 0.12) {
+            const leadFires = activeQuests < 2 && Math.random() < 0.12;
+            if (leadFires) {
               const quest = get().generateNewQuest();
+              get().appendLog(
+                'world',
+                `You examine the ${focus}. A thread surfaces — clear enough to follow.`,
+              );
+              // 2026-05-27 OTA-098 — Arbiter narration on lead-
+              // fired. Playtester asked: "if it's going to do
+              // that then I would imagine that my arbiter would
+              // say something to the effect of 'Ah, I see it
+              // now. we'll put that in your contracts for
+              // later'." Done — fires alongside the New lead
+              // reward line so the player knows the engine
+              // captured the thread and where it landed.
+              get().appendLog(
+                'arbiter',
+                `The Arbiter nods. "Ah, I see it now. We'll put that in your contracts for later."`,
+              );
               get().appendLog('reward', `New lead: ${quest.objective.verb} ${quest.objective.target} at ${quest.location.name}.`);
+            } else {
+              get().appendLog(
+                'world',
+                `You examine the ${focus} carefully. The work sharpens your focus, but no clearer thread surfaces here.`,
+              );
             }
+            // Mark as examined regardless of lead outcome — the
+            // player got the stat training they came for; future
+            // taps should hit the callback path above. Inline
+            // dedup write (not via refuseAmbient since we already
+            // logged the line — the helper would re-log an empty
+            // string).
+            //
+            // 2026-05-27 OTA-098 — write both apostrophe and
+            // apostrophe-stripped variants. Playtest showed the
+            // chip wasn't greying even though the engine refused:
+            // root cause was that the dedup write had the noun in
+            // its apostrophe form ("titan's bone marker") but the
+            // scene chip text might be stored without ("titans
+            // bone marker"), and the OTA-070 substring fuzzy
+            // check can't bridge that gap (neither string contains
+            // the other when the apostrophe differs). Writing both
+            // forms ensures the chip finds a match regardless.
+            const apostropheStripped = focusKey.replace(/['']/g, '');
+            const keysToWrite = apostropheStripped !== focusKey
+              ? [focusKey, apostropheStripped]
+              : [focusKey];
+            set((s) => {
+              const r = s.worldMemory.visitedRooms?.[investRoomKey] ?? {
+                firstVisitAt: Date.now(),
+                lastVisitAt: Date.now(),
+                visitCount: 1,
+              };
+              const existing = r.flavorExhaustedNouns ?? [];
+              const additions = keysToWrite.filter((k) => !existing.includes(k));
+              if (additions.length === 0) return s;
+              return {
+                worldMemory: {
+                  ...s.worldMemory,
+                  visitedRooms: {
+                    ...(s.worldMemory.visitedRooms ?? {}),
+                    [investRoomKey]: {
+                      ...r,
+                      flavorExhaustedNouns: [...existing, ...additions],
+                    },
+                  },
+                },
+              };
+            });
             break;
           }
           case 'cast':
@@ -7975,9 +8931,73 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             break;
           }
-          case 'investigate':
-            get().appendLog('world', `You sweep ${currentScene.location.name} but find only dust and old silence.`);
+          case 'investigate': {
+            // 2026-05-27 OTA-097 — per-noun dedup on the FAIL
+            // arm of the quest-check investigate path, matching
+            // the OTA-096 SUCCESS-arm fix. Pre-OTA-097 a failed
+            // check didn't write anything to flavorExhaustedNouns
+            // — so the player could keep tapping the same noun
+            // until they either passed or gave up. That's the
+            // "kind of like tricking me to keep trying when I
+            // really don't have a chance" frustration the
+            // playtester called out: their stats might never beat
+            // the DC, but the engine kept letting them roll. Now:
+            // one attempt per noun per visit, success OR fail. If
+            // the dice said no on the first roll, the dice said
+            // no. Chip greys via OTA-070/076 fuzzy UI check; next
+            // tap hits the same callback the success path's
+            // dedup gate already produces.
+            //
+            // Narration also rephrased to reference the noun the
+            // player actually examined, not the location. Pre-
+            // OTA-097 the fail line read "You sweep Asgardar but
+            // find only dust and old silence" — confusing,
+            // because the player examined a specific noun, not
+            // the whole capital.
+            const reparsedF = parseInput(actionText);
+            const focusF = reparsedF.resolvedNoun ?? reparsedF.target ?? currentScene.location.name;
+            get().appendLog(
+              'world',
+              `You sift the ${focusF} but it gives up nothing. The Aetherstone keeps its silence here.`,
+            );
+            const focusFKey = focusF.toLowerCase();
+            const investFRoomKey = makeRoomKey(
+              player.currentLocationId,
+              currentScene.microMicroId,
+              player.mapX,
+              player.mapY,
+            );
+            // OTA-098 — same apostrophe-variant write as the
+            // success arm so the chip greys regardless of which
+            // form (with/without apostrophe) the scene stores.
+            const apostropheStrippedF = focusFKey.replace(/['']/g, '');
+            const keysToWriteF = apostropheStrippedF !== focusFKey
+              ? [focusFKey, apostropheStrippedF]
+              : [focusFKey];
+            set((s) => {
+              const r = s.worldMemory.visitedRooms?.[investFRoomKey] ?? {
+                firstVisitAt: Date.now(),
+                lastVisitAt: Date.now(),
+                visitCount: 1,
+              };
+              const existing = r.flavorExhaustedNouns ?? [];
+              const additionsF = keysToWriteF.filter((k) => !existing.includes(k));
+              if (additionsF.length === 0) return s;
+              return {
+                worldMemory: {
+                  ...s.worldMemory,
+                  visitedRooms: {
+                    ...(s.worldMemory.visitedRooms ?? {}),
+                    [investFRoomKey]: {
+                      ...r,
+                      flavorExhaustedNouns: [...existing, ...additionsF],
+                    },
+                  },
+                },
+              };
+            });
             break;
+          }
           case 'cast':
             get().appendLog('world', 'The Aether slips through your focus. The glow flickers and dies.');
             break;
@@ -10565,10 +11585,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // depleted to take even the first step. Same gate as the
     // single-cardinal walk so the multi-step path matches the
     // cardinal path's stamina rules.
+    //
+    // 2026-05-27 OTA-082 — skipDedup added. Pre-OTA-082 the
+    // arbiter channel's dedup logic (gameStore.ts:1868)
+    // suppressed repeat lines, so a player tapping the travel
+    // button MULTIPLE TIMES on the destination map with 0
+    // stamina saw the refusal once, then nothing — debug log
+    // confirmed "dedup: suppressed arbiter repeat". Felt like
+    // the button was broken ("fails through without
+    // instruction" per the playtester). The refusal also gets
+    // a clearer travel-specific phrasing: it now mentions
+    // travel + rest explicitly so the player knows what action
+    // they tried and what to do about it.
     if (player.stamina < STAMINA_COSTS.wander) {
+      const tgtNameForRefusal = (() => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const locs = (require('../data/locations/locations.json') as Array<{ id: string; name: string }>);
+          return locs.find((l) => l.id === locationId)?.name ?? 'that destination';
+        } catch {
+          return 'that destination';
+        }
+      })();
       get().appendLog(
         'arbiter',
-        `The Arbiter holds out a hand. "You don't have the legs in you for this just yet. Rest first; the road keeps."`,
+        `The Arbiter holds out a hand. "You're too tired to set out for ${tgtNameForRefusal}. Rest before making any plans — the road will hold."`,
+        { skipDedup: true },
       );
       return;
     }
@@ -11730,10 +12772,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
             quantity: (prev?.quantity ?? 0) + accepted,
             rarity: prev?.rarity ?? (outcome.rarity ?? 'Common'),
           });
+          // OTA-078 — only consume the noun when the grant
+          // actually landed. Pre-OTA-078 the consume push was
+          // unconditional, so pack-full salvage-all would
+          // narrate "found a X but your pack is full" AND lock
+          // the chip out forever. Now: pack-full keeps the noun
+          // workable so the player can drop something + retry.
+          consumedNouns.push(harvestLowered);
         } else {
-          narrationLines.push(`Found a ${outcome.itemName.toLowerCase()}, but your pack is already full of them.`);
+          narrationLines.push(
+            `Your pack is too full to take the ${outcome.itemName.toLowerCase()} from the ${noun}. Drop something and try again.`,
+          );
+          // Don't push to consumedNouns — chip remains workable.
         }
-        consumedNouns.push(harvestLowered);
         continue;
       }
       // rollSalvagePool only produces 'material' or 'nothing' —
@@ -11759,12 +12810,47 @@ export const useGameStore = create<GameStore>((set, get) => ({
         };
         const prevSearched = room.searchedAmbientNouns ?? [];
         const merged = Array.from(new Set([...prevSearched, ...consumedNouns]));
+        // OTA-079 — also mark each consumed noun's OTA-071+
+        // table entry as consumed, mirroring the single-tap
+        // salvage path. Without this, bulk SALVAGE ALL leaves
+        // the table entries un-consumed and the next per-noun
+        // INVESTIGATE re-rolls a fresh outcome (double-dip).
+        const prevTable = room.roomInvestigationTable;
+        let updatedTable = prevTable;
+        if (prevTable) {
+          let touched = false;
+          for (const noun of consumedNouns) {
+            const entry = prevTable[noun];
+            if (entry && !entry.consumed) {
+              if (!touched) {
+                updatedTable = { ...prevTable };
+                touched = true;
+              }
+              updatedTable![noun] = {
+                ...entry,
+                consumed: true,
+                consumedAt: Date.now(),
+                result: entry.result ?? {
+                  kind: 'item',
+                  detail: 'salvage',
+                  line: entry.loreLine ?? '',
+                },
+              };
+            }
+          }
+        }
         return {
           worldMemory: {
             ...s.worldMemory,
             visitedRooms: {
               ...(s.worldMemory.visitedRooms ?? {}),
-              [harvestRoomKey]: { ...room, searchedAmbientNouns: merged },
+              [harvestRoomKey]: {
+                ...room,
+                searchedAmbientNouns: merged,
+                ...(updatedTable !== prevTable
+                  ? { roomInvestigationTable: updatedTable }
+                  : {}),
+              },
             },
           },
         };
@@ -12747,10 +13833,22 @@ function applyHookEffect(
 
 // Resolve a hook one stage forward. Plays the line, applies effects, marks
 // resolved if done, queues any next-chain plant in worldMemory.
+//
+// 2026-05-27 OTA-088 — optional triggerNoun param. When passed,
+// the function will (after the stage advance) replace the
+// trigger ambient noun in scene.ambientNouns + display
+// AmbientNouns with the FIRST entry in outcome.addNouns,
+// so the chip text reflects the new narrative state. Player
+// asked: "should the chip change from 'investigate fungus'
+// to 'investigate low chamber' since the narrative was
+// altered?" — yes, the chip now follows the camera. When
+// triggerNoun is omitted (no caller threading) or the stage
+// has no addNouns, the existing behavior is preserved.
 function resolveHookOneStep(
   hook: Hook,
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  triggerNoun?: string,
 ): void {
   const outcome = getHookOutcome(hook.kind, hook.stage);
   if (!outcome) return;
@@ -12794,6 +13892,56 @@ function resolveHookOneStep(
     });
     return { currentScene: { ...s.currentScene, hooks: nextHooks } };
   });
+  // OTA-088 — chip-text follow-the-camera. When this stage
+  // advance revealed new nouns AND the caller passed the
+  // trigger ambient that the player tapped, swap the trigger
+  // out of scene.ambientNouns + displayedAmbientNouns for the
+  // first newly-revealed noun. After tap 1 the chip 'fungus'
+  // becomes 'low chamber'; after tap 2 the chip 'low chamber'
+  // becomes the next revealed anchor; etc. Fuzzy match on the
+  // trigger so 'fungus' correctly maps to a scene noun like
+  // 'bioluminescent fungus' (matchAmbientNoun's resolution
+  // upstream may have produced either form). No-op when:
+  // (a) no triggerNoun was threaded; (b) outcome.addNouns is
+  // empty (terminal stage; nothing new to surface); (c) the
+  // trigger wasn't in scene.ambientNouns to begin with
+  // (player typed an inventory item, not a chip).
+  if (triggerNoun && outcome.addNouns && outcome.addNouns.length > 0) {
+    const newChip = outcome.addNouns[0]!;
+    const triggerLower = triggerNoun.toLowerCase();
+    set((s) => {
+      if (!s.currentScene) return {};
+      const replaceIn = (list: readonly string[] | undefined): string[] | null => {
+        if (!list || list.length === 0) return null;
+        let replaced = false;
+        const next: string[] = [];
+        for (const n of list) {
+          const nl = n.toLowerCase();
+          const isTrigger =
+            nl === triggerLower
+            || (triggerLower.length > 0 && triggerLower.includes(nl))
+            || (triggerLower.length > 0 && nl.includes(triggerLower));
+          if (isTrigger && !replaced) {
+            if (!next.includes(newChip)) next.push(newChip);
+            replaced = true;
+          } else if (n !== newChip) {
+            next.push(n);
+          }
+        }
+        return replaced ? next : null;
+      };
+      const newAmbient = replaceIn(s.currentScene.ambientNouns);
+      const newDisplayed = replaceIn(s.currentScene.displayedAmbientNouns);
+      if (!newAmbient && !newDisplayed) return {};
+      return {
+        currentScene: {
+          ...s.currentScene,
+          ...(newAmbient ? { ambientNouns: newAmbient } : {}),
+          ...(newDisplayed ? { displayedAmbientNouns: newDisplayed } : {}),
+        },
+      };
+    });
+  }
   // Queue any next-chain hook to plant on the next scene.
   if (outcome.nextChain) {
     const plantedAtHour = get().player?.hoursElapsed ?? 0;
@@ -14385,6 +15533,22 @@ function handlePlayerDeath(
     `${player.name} has fallen. A Resurrection Gem from the title screen can bring them back.`,
   );
 
+  // OTA-067 — dev cheat for the project owner. If the fallen
+  // character is named "Verbal" (case-insensitive, trimmed),
+  // grant a Resurrection Gem on death so they can immediately
+  // revive that same character from the title screen. No effect
+  // for any other name; everyone else dies on the normal rules
+  // (gem comes from boss kills / pity timer / rare drops).
+  if (player.name.trim().toLowerCase() === 'verbal') {
+    void addResurrectionGems(1).then((total) => {
+      set(() => ({ resurrectionGems: total }));
+      get().appendLog(
+        'reward',
+        `✦ A Resurrection Gem pulses in ${player.name}'s pack — the buried world owes you one. (${total} held)`,
+      );
+    });
+  }
+
   // Mark the character dead in-place. Persist immediately so the slot
   // summary on the title list reflects the new state.
   // 2026-05-25 [MECHANIC-1b] — clear golem sidekick on player death.
@@ -15256,10 +16420,56 @@ function narrateWanderingJourney(
   get().appendLog('world', `${lead}  ${hook.plantedLine}`);
 }
 
-function narratePossibleDirections(get: () => GameStore, scene: CurrentScene): void {
+function narratePossibleDirections(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  scene: CurrentScene,
+): void {
+  // OTA-062 — mark 'path' as flavor-exhausted on this tile after
+  // narrating directions. Pre-fix, narratePossibleDirections wrote
+  // only to the log and never touched room memory, so the 'path'
+  // chip stayed green forever and the Investigate tab would never
+  // cycle back to amber even after every other ambient noun on the
+  // tile had been investigated. Playtester log showed 7 successive
+  // `investigate path` taps on the same tile, all green, all
+  // returning the same OTA-061-stable direction line. Now the chip
+  // greys after the first tap (same room-key + flavorExhaustedNouns
+  // pattern the regular flavor-only investigate path uses at L4369).
+  // Re-typing `investigate path` still works (function is
+  // idempotent), and the destination line is stable per OTA-061.
+  const player = get().player;
+  const microMicroId = scene.microMicroId ?? '_';
+  const x = typeof player?.mapX === 'number' ? player.mapX : '_';
+  const y = typeof player?.mapY === 'number' ? player.mapY : '_';
+  const roomKey = `${player?.currentLocationId}@${microMicroId}@${x},${y}`;
+  const markPathExhausted = (): void => {
+    set((s) => {
+      const room = s.worldMemory.visitedRooms?.[roomKey] ?? {
+        firstVisitAt: Date.now(),
+        lastVisitAt: Date.now(),
+        visitCount: 1,
+      };
+      const existing = room.flavorExhaustedNouns ?? [];
+      if (existing.includes('path')) return s;
+      return {
+        worldMemory: {
+          ...s.worldMemory,
+          visitedRooms: {
+            ...(s.worldMemory.visitedRooms ?? {}),
+            [roomKey]: {
+              ...room,
+              flavorExhaustedNouns: [...existing, 'path'],
+            },
+          },
+        },
+      };
+    });
+  };
+
   const others = allLocations.filter((l) => l.id !== scene.location.id && l.discoverable !== false);
   if (others.length === 0) {
     get().appendLog('world', 'You scan for a way forward. Tartaria does not advertise its directions.');
+    markPathExhausted();
     return;
   }
   // 2026-05-26 OTA-061 — stable, deterministic destinations per
@@ -15278,7 +16488,6 @@ function narratePossibleDirections(get: () => GameStore, scene: CurrentScene): v
   // Also humanizes the `type` token: a "lost_capital" was leaking
   // straight through .toLowerCase() into player-facing text. Now
   // underscores collapse to spaces.
-  const player = get().player;
   const seedKey = `${scene.location.id}:${player?.mapX ?? 0}:${player?.mapY ?? 0}`;
   // FNV-1a 32-bit hash of the seed key — small, stable, no deps.
   let h = 0x811c9dc5;
@@ -15298,6 +16507,7 @@ function narratePossibleDirections(get: () => GameStore, scene: CurrentScene): v
     fragments.push(`a ${humanizeType(second.type)} toward ${second.name}`);
   }
   get().appendLog('world', `You look for a way forward. The Arbiter notes ${fragments.join(' and ')}.`);
+  markPathExhausted();
 }
 
 // ---------------------------------------------------------------------------

@@ -191,13 +191,20 @@ export function ExplorationScreen() {
   ]);
 
   const isAmbientConsumed = (noun: string): boolean => {
-    const lower = noun.toLowerCase();
-    if (!consumedAmbientNouns.has(lower)) return false;
-    // Self-heal: only treat as consumed when the catalog item is
-    // currently in inventory. Without inventory backing, the entry
-    // is either a bug-write (pre-OTA 173 salvage) or the player no
-    // longer owns the item — either way they should be able to try
-    // again. The engine's own dedup will still gate if it disagrees.
+    // 2026-05-26 OTA-076 — fuzzy match (was exact .has).
+    // Mirrors the engine's substring dedup logic so the
+    // salvage/take chip-greying matches the engine's accept/
+    // refuse decision exactly. Pre-OTA the chip used
+    // consumedAmbientNouns.has(lower) which missed variant
+    // phrasings ("wooden bench" in memory vs chip "bench") and
+    // left the salvage chip eternally green; the player tapped
+    // it repeatedly and got "you've already worked over the
+    // bench" forever. Now: any chip the engine would refuse
+    // via fuzzy match is greyed in the salvage / take modals
+    // too. Self-heal logic below stays intact (only treat as
+    // consumed if the catalog item is in inventory, otherwise
+    // ungrey so the player isn't stuck on a sold/lost item).
+    if (!isFuzzyConsumed(noun, consumedAmbientNouns)) return false;
     if (!player) return true;
     const cat = findCatalogItem(noun);
     if (!cat) return true; // not a catalog item; honor engine dedup as-is
@@ -206,6 +213,36 @@ export function ExplorationScreen() {
       (i) => i.name.toLowerCase() === targetName && i.quantity > 0,
     );
     return owns;
+  };
+
+  // 2026-05-26 OTA-070 — substring-fuzzy consumed check. Mirrors
+  // the engine's alreadySearched logic at gameStore.ts:4189 so the
+  // chip's gray-out state matches the engine's accept/refuse
+  // decision exactly. Pre-OTA the chip used exact match
+  // (set.has(chipLower)), but the engine uses
+  //   n === chipLower || chipLower.includes(n) || n.includes(chipLower)
+  // — so if memory held a variant ("wooden bench") and the chip
+  // was the bare form ("bench"), the engine refused 'investigate
+  // bench' with "Nothing more to find" without writing 'bench' to
+  // memory, and the chip stayed green forever. This helper applies
+  // the same fuzzy match the engine uses, so any chip the engine
+  // would refuse is greyed in the modal and not counted toward the
+  // INVESTIGATE tab tone.
+  //
+  // Empty-string entries in the pool are skipped because
+  // "anything".includes('') is trivially true and would mark every
+  // chip consumed; this matches the engine's nonClimbMarkers
+  // filter which strips empty + climbed: markers before the same
+  // .some() check.
+  const isFuzzyConsumed = (chipNoun: string, pool: Set<string>): boolean => {
+    const chipLower = chipNoun.toLowerCase();
+    for (const entry of pool) {
+      if (entry.length === 0) continue;
+      if (entry === chipLower) return true;
+      if (chipLower.includes(entry)) return true;
+      if (entry.includes(chipLower)) return true;
+    }
+    return false;
   };
 
   // Build one view per enemy in the scene. Tap-to-cycle is wired through
@@ -527,9 +564,28 @@ export function ExplorationScreen() {
               // pool). Without this, a wilderness scene with every
               // ambient noun consumed would render INVESTIGATE gray
               // even though tapping 'the ground' is still actionable.
+              //
+              // 2026-05-26 OTA-069 — also exclude chips with an
+              // unmetRequirement (Aether-scanner-gated nouns when the
+              // scanner is not equipped). Playtester: "the only thing
+              // left to investigate is a locked item and I do not have
+              // the piece... why that investigate button shouldn't
+              // turn back to the regular amber". The lock isn't
+              // actionable from this state — the player can't tap the
+              // chip with any productive outcome until they equip the
+              // scanner — so it must not light the tab green.
+              const hasScanner = player ? playerHasScannerEquipped(player, 'aetheric') : false;
               const sceneCount = buildChipPool(currentScene).filter(
-                (n) => !productivelyConsumedSet.has(n.toLowerCase())
-                  && !flavorExhaustedSet.has(n.toLowerCase()),
+                (n) => {
+                  // 2026-05-26 OTA-070 — fuzzy match against both
+                  // pools, mirroring the engine's accept/refuse
+                  // decision. Was exact set.has(n.toLowerCase()).
+                  if (isFuzzyConsumed(n, productivelyConsumedSet)) return false;
+                  if (isFuzzyConsumed(n, flavorExhaustedSet)) return false;
+                  const req = searchRequirementFor(n);
+                  if (req && !hasScanner) return false;
+                  return true;
+                },
               ).length;
               const groundCount = (!player?.hubRoomId && !isAmbientConsumed('ground')) ? 1 : 0;
               return sceneCount + groundCount;
@@ -613,7 +669,14 @@ export function ExplorationScreen() {
           // investigated nouns stay visible greyed + sorted right
           // per POLISH-3.
           ...buildChipPool(currentScene)
-            .filter((n) => !productivelyConsumedSet.has(n.toLowerCase()))
+            // 2026-05-26 OTA-070 — fuzzy match for the
+            // productively-consumed filter (was exact .has).
+            // Mirrors the engine's substring dedup so a chip
+            // whose productive consumption was recorded under a
+            // variant phrasing ("wooden bench" vs chip "bench")
+            // gets filtered out instead of lingering green-and-
+            // dead in the modal.
+            .filter((n) => !isFuzzyConsumed(n, productivelyConsumedSet))
             .map((n) => {
               // OTA 195 — compute per-chip requirement. An Aether-coded
               // noun (vent fissure, ley line, glyph, etc.) requires a
@@ -625,7 +688,10 @@ export function ExplorationScreen() {
               const unmetRequirement = req && !hasScanner ? req.shortLabel : undefined;
               return {
                 noun: n,
-                consumed: flavorExhaustedSet.has(n.toLowerCase()),
+                // 2026-05-26 OTA-070 — fuzzy match for the
+                // greyed-but-visible flavor-exhausted state. Was
+                // exact .has(n.toLowerCase()).
+                consumed: isFuzzyConsumed(n, flavorExhaustedSet),
                 unmetRequirement,
               };
             }),

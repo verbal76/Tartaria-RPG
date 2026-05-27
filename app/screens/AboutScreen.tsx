@@ -1,11 +1,10 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, PermissionsAndroid } from 'react-native';
-import Constants from 'expo-constants';
 import * as Clipboard from 'expo-clipboard';
 import * as Updates from 'expo-updates';
-import * as Application from 'expo-application';
 import { useGameStore } from '../state/gameStore';
 import { OTA_BUILD_ID } from '../buildInfo';
+import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
 import { NumberStepper } from '../components/NumberStepper';
 import { LoreCodexBody } from '../components/LoreCodexBody';
 import {
@@ -84,8 +83,11 @@ export function AboutScreen() {
       const fresh = await readFullLog();
       const total = Math.max(1, Math.ceil(fresh.length / LOG_CHUNK_SIZE));
       // Single-chunk path — old behaviour, single COPIED flash.
+      // OTA-101 — stampLogExport bundles the basic device/
+      // install summary at the end so the report always carries
+      // build context.
       if (total <= 1) {
-        const stamped = `=== TARTARIA LOG · ${fresh.length} CHARS · BEGIN ===\n${fresh}\n=== END LOG · ${fresh.length} CHARS ===\n`;
+        const stamped = stampLogExport(fresh);
         await Clipboard.setStringAsync(stamped);
         setLogCharCount(stamped.length);
         setLogCopied(true);
@@ -99,10 +101,7 @@ export function AboutScreen() {
         }
         const start = (nextIndex - 1) * LOG_CHUNK_SIZE;
         const slice = fresh.slice(start, start + LOG_CHUNK_SIZE);
-        const stamped =
-          `=== TARTARIA LOG · PART ${nextIndex} of ${total} · ${slice.length} CHARS · BEGIN ===\n` +
-          `${slice}\n` +
-          `=== END PART ${nextIndex} of ${total} ===\n`;
+        const stamped = stampLogExport(slice, { chunk: { index: nextIndex, total } });
         await Clipboard.setStringAsync(stamped);
         setLogCharCount(stamped.length);
         setLogChunk({ lastIndex: nextIndex, total, copiedAt: Date.now() });
@@ -281,16 +280,16 @@ export function AboutScreen() {
   // OTA 007 — checkForUpdate moved to TitleScreen.
 
   const info = useMemo(() => {
-    const expoConfig = Constants.expoConfig;
-    const version = expoConfig?.version ?? '0.0.0';
     const mb = (bytes: number | null | undefined) =>
       bytes != null ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : 'unknown';
 
-    // Native APK build number — versionCode baked at gradle build time by
-    // the build-apk.yml workflow. Cannot be overridden by OTA, so this
-    // always tells you which APK is actually installed.
-    const apkBuildNumber = Application.nativeBuildVersion ?? '(unknown)';
-    const apkAppVersion = Application.nativeApplicationVersion ?? version;
+    // OTA-063 — app/APK/OTA build fields now live inside
+    // buildBasicDeviceSummary(); the local apkBuildNumber/
+    // apkAppVersion declarations were removed because they were
+    // only used in the now-replaced lines[] header. The summary
+    // helper pulls Application.nativeBuildVersion +
+    // nativeApplicationVersion the same way and produces the same
+    // identifiers, plus device name / locale / timezone / screen.
 
     // Resolved runtime version from expo-updates. This is what the manifest
     // server uses to decide whether an OTA applies. If this doesn't equal
@@ -312,11 +311,18 @@ export function AboutScreen() {
           ? `Yes — ${updUpdateId}`
           : '(unknown)';
 
+    // OTA-063 — Device + Install summary moved to the shared
+    // buildBasicDeviceSummary() helper so the About screen and the
+    // bug-report email show identical identifying fields. Adds
+    // device name / locale / timezone / screen size / capture-time
+    // alongside the existing app+APK+OTA build IDs. Platform and
+    // Hermes now live inside the Device block (used to be free-
+    // floating lines below the OTA status). The OTA status block
+    // stays here because it pulls live Updates.* state.
     const lines = [
       `Tartaria Realms`,
-      `App version: ${apkAppVersion}`,
-      `APK build: ${apkBuildNumber}`,
-      `OTA build ID: ${OTA_BUILD_ID}`,
+      ``,
+      buildBasicDeviceSummary(),
       ``,
       `OTA status`,
       `  Channel: ${updChannel}`,
@@ -325,9 +331,6 @@ export function AboutScreen() {
       `  OTA published at: ${updCreatedAt || '(none)'}`,
       `  Updates enabled: ${updIsEnabled}`,
       `  (Update via TitleScreen → CHECK FOR OTA UPDATE button)`,
-      ``,
-      `Platform: ${Platform.OS} ${Platform.Version}`,
-      `Hermes: ${typeof (globalThis as { HermesInternal?: unknown }).HermesInternal !== 'undefined' ? 'yes' : 'no'}`,
       ``,
       `Cognitive layer (classifier)`,
       `  Status: ${cognitiveStatus}`,
@@ -366,15 +369,15 @@ export function AboutScreen() {
 
   // Voice tab COPY ALL — same identifier header as About so we can
   // tell which device / build the report came from regardless of
-  // which tab the player copied from.
+  // which tab the player copied from. OTA-063 swaps the inline
+  // app/APK/OTA lines for the shared buildBasicDeviceSummary() so
+  // the Voice diagnostic now also carries device name, locale,
+  // timezone, screen, and Hermes flag.
   const voiceInfo = useMemo(() => {
-    const apkBuildNumber = Application.nativeBuildVersion ?? '(unknown)';
-    const apkAppVersion = Application.nativeApplicationVersion ?? Constants.expoConfig?.version ?? '0.0.0';
     const lines = [
       `Tartaria Realms`,
-      `App version: ${apkAppVersion}`,
-      `APK build: ${apkBuildNumber}`,
-      `OTA build ID: ${OTA_BUILD_ID}`,
+      ``,
+      buildBasicDeviceSummary(),
       ``,
       `Voice`,
       `  TTS enabled: ${voice.ttsEnabled ? 'yes' : 'no'}`,
