@@ -214,4 +214,33 @@
 // the same searchRequirementFor + playerHasScannerEquipped
 // check the SearchModal already uses, so the tab tint matches
 // the modal state.
-export const OTA_BUILD_ID = '2026-05-26-069';
+//
+// 2026-05-26 OTA-070 — chip consumed-check now uses substring-
+// fuzzy matching, mirroring the engine's alreadySearched logic
+// at gameStore.ts:4189. Pre-OTA the chip greyed via exact match
+// (Set.has(chipLower)) but the engine refuses via fuzzy match
+//   n === chipLower || chipLower.includes(n) || n.includes(chipLower)
+// — so any variant phrasing in memory (e.g., 'wooden bench' for
+// a chip 'bench') made the engine refuse 'investigate bench'
+// with "Nothing more to find" WITHOUT writing 'bench' to memory.
+// The chip's exact match then never saw 'bench', stayed green
+// forever, and the player tapped the dead chip indefinitely.
+// Playtester filed it as: "I investigated that item multiple
+// times and it's still there." Now a chip the engine would
+// refuse is greyed in the modal AND excluded from the
+// INVESTIGATE tab tone count, identical to engine state. New
+// helper isFuzzyConsumed encapsulates the fuzzy match and is
+// applied in three places: productively-consumed filter, flavor-
+// exhausted grey flag, and investigateCount predicate. Skips
+// empty-string pool entries (which would otherwise trivially
+// match any chip via "".includes('')) — matches the engine's
+// nonClimbMarkers filter that strips empty + climbed: markers
+// before the same .some() check.
+//
+// Surgical fix only; a follow-on OTA series is planned to
+// introduce a per-room investigation table that gives every
+// scene noun persistent attributes (lore / item / hook) at
+// generation time, so investigates never bottom out at
+// "Nothing more to find" — the user's bigger architectural
+// suggestion. This OTA is the immediate UI-engine alignment.
+export const OTA_BUILD_ID = '2026-05-26-070';

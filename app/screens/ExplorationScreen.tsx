@@ -208,6 +208,36 @@ export function ExplorationScreen() {
     return owns;
   };
 
+  // 2026-05-26 OTA-070 — substring-fuzzy consumed check. Mirrors
+  // the engine's alreadySearched logic at gameStore.ts:4189 so the
+  // chip's gray-out state matches the engine's accept/refuse
+  // decision exactly. Pre-OTA the chip used exact match
+  // (set.has(chipLower)), but the engine uses
+  //   n === chipLower || chipLower.includes(n) || n.includes(chipLower)
+  // — so if memory held a variant ("wooden bench") and the chip
+  // was the bare form ("bench"), the engine refused 'investigate
+  // bench' with "Nothing more to find" without writing 'bench' to
+  // memory, and the chip stayed green forever. This helper applies
+  // the same fuzzy match the engine uses, so any chip the engine
+  // would refuse is greyed in the modal and not counted toward the
+  // INVESTIGATE tab tone.
+  //
+  // Empty-string entries in the pool are skipped because
+  // "anything".includes('') is trivially true and would mark every
+  // chip consumed; this matches the engine's nonClimbMarkers
+  // filter which strips empty + climbed: markers before the same
+  // .some() check.
+  const isFuzzyConsumed = (chipNoun: string, pool: Set<string>): boolean => {
+    const chipLower = chipNoun.toLowerCase();
+    for (const entry of pool) {
+      if (entry.length === 0) continue;
+      if (entry === chipLower) return true;
+      if (chipLower.includes(entry)) return true;
+      if (entry.includes(chipLower)) return true;
+    }
+    return false;
+  };
+
   // Build one view per enemy in the scene. Tap-to-cycle is wired through
   // the store's setActiveEnemyIdx so combat handlers always target the
   // enemy the player is currently looking at.
@@ -540,8 +570,11 @@ export function ExplorationScreen() {
               const hasScanner = player ? playerHasScannerEquipped(player, 'aetheric') : false;
               const sceneCount = buildChipPool(currentScene).filter(
                 (n) => {
-                  if (productivelyConsumedSet.has(n.toLowerCase())) return false;
-                  if (flavorExhaustedSet.has(n.toLowerCase())) return false;
+                  // 2026-05-26 OTA-070 — fuzzy match against both
+                  // pools, mirroring the engine's accept/refuse
+                  // decision. Was exact set.has(n.toLowerCase()).
+                  if (isFuzzyConsumed(n, productivelyConsumedSet)) return false;
+                  if (isFuzzyConsumed(n, flavorExhaustedSet)) return false;
                   const req = searchRequirementFor(n);
                   if (req && !hasScanner) return false;
                   return true;
@@ -629,7 +662,14 @@ export function ExplorationScreen() {
           // investigated nouns stay visible greyed + sorted right
           // per POLISH-3.
           ...buildChipPool(currentScene)
-            .filter((n) => !productivelyConsumedSet.has(n.toLowerCase()))
+            // 2026-05-26 OTA-070 — fuzzy match for the
+            // productively-consumed filter (was exact .has).
+            // Mirrors the engine's substring dedup so a chip
+            // whose productive consumption was recorded under a
+            // variant phrasing ("wooden bench" vs chip "bench")
+            // gets filtered out instead of lingering green-and-
+            // dead in the modal.
+            .filter((n) => !isFuzzyConsumed(n, productivelyConsumedSet))
             .map((n) => {
               // OTA 195 — compute per-chip requirement. An Aether-coded
               // noun (vent fissure, ley line, glyph, etc.) requires a
@@ -641,7 +681,10 @@ export function ExplorationScreen() {
               const unmetRequirement = req && !hasScanner ? req.shortLabel : undefined;
               return {
                 noun: n,
-                consumed: flavorExhaustedSet.has(n.toLowerCase()),
+                // 2026-05-26 OTA-070 — fuzzy match for the
+                // greyed-but-visible flavor-exhausted state. Was
+                // exact .has(n.toLowerCase()).
+                consumed: isFuzzyConsumed(n, flavorExhaustedSet),
                 unmetRequirement,
               };
             }),
