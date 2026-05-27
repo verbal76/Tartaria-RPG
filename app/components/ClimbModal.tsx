@@ -79,10 +79,26 @@ export function ClimbModal({
                     return (
                       <Pressable
                         key={`climb-${noun}-${i}`}
+                        // 2026-05-27 OTA-085 — cleared chips are
+                        // non-tappable. Pre-OTA-085 the chip
+                        // rendered greyed with ✓ TOP but the
+                        // Pressable still responded to taps,
+                        // submitting `climb <noun>` to the engine
+                        // which refused with "You've already
+                        // crested the X here." Playtester tapped
+                        // the cleared spire 5 times in a row
+                        // getting the same refusal — same
+                        // recurring "chip looks dead but isn't"
+                        // pattern that OTA-070/076/083/084 fixed
+                        // for investigate/salvage. Disabling the
+                        // Pressable on isCleared makes the chip
+                        // structurally non-actionable, no engine
+                        // round-trip needed.
+                        disabled={isCleared}
                         style={({ pressed }) => [
                           styles.row,
                           isCleared && styles.rowCleared,
-                          pressed && styles.rowPressed,
+                          pressed && !isCleared && styles.rowPressed,
                         ]}
                         onPress={() => tapTo(noun)}
                       >

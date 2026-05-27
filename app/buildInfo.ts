@@ -809,4 +809,31 @@
 // File: app/state/gameStore.ts (refuseAmbient added to the
 // store interface + implementation; OTA-079 resolved-hook
 // branch refactored to use it).
-export const OTA_BUILD_ID = '2026-05-27-084';
+//
+// 2026-05-27 OTA-085 — Climb modal cleared-chip is now non-
+// tappable. Same recurring "chip looks dead but isn't"
+// pattern from OTA-070/076/083/084, climb-modal edition.
+// Pre-OTA-085 the cleared climb chip rendered greyed with
+// ✓ TOP but the Pressable still responded to taps,
+// submitting `climb <noun>` to the engine which refused with
+// "You've already crested the X here." Playtester tapped a
+// cleared spire 5 times in a row getting the same refusal.
+//
+// Fix: add `disabled={isCleared}` to the Pressable in
+// ClimbModal.tsx, plus a guard on the pressed-style so the
+// press-feedback doesn't fire either. The chip becomes
+// structurally non-actionable — no engine round-trip needed,
+// no refusal line at all. Visual ✓ TOP indicator stays so
+// the player can still see "you've topped this".
+//
+// Note: OTA-084's refuseAmbient helper is for ambient-noun
+// SearchModal chips that share the searchedAmbientNouns /
+// flavorExhaustedNouns dedup lists. Climb chips have their
+// own state model (climbed: namespaced markers + isCleared
+// flag) so they get a parallel UI-side disable rather than
+// routing through refuseAmbient. The pattern is the same
+// even if the implementation differs.
+//
+// File: app/components/ClimbModal.tsx (Pressable gains
+// disabled + pressed-style guard).
+export const OTA_BUILD_ID = '2026-05-27-085';
