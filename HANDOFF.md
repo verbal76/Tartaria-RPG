@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-102` (1-tier climbs no longer surface tall-apex overlays; overlay ambient nouns seeded into the room investigation table for proper investigates). See **Section 0** for the live issue tracker covering OTA-070 → OTA-102.
+> **Latest OTA:** `2026-05-27-103` (Aether-family pronunciation refinement — `aether` / `aetheric` / `aetherborn` updated per fresh playtester IPA; aetherborn now opens with short-E "eth", diverging from the long-A start of the other two). See **Section 0** for the live issue tracker covering OTA-070 → OTA-103.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -36,6 +36,18 @@
 - **TS 0 errors / Test suite green.** Always required pre-push. Tracked here as a passive gate rather than an issue.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Pronunciation lexicon
+
+- **OTA-103 (2026-05-27) · Aether-family pronunciation refinement from fresh playtester IPA.**
+  - **What:** Player provided IPA for three of the five Aether entries — `aether = ɛɪθɚ`, `aetheric = ɛɪθiɾɪk`, `aetherborn = ɛθɛɾ bɔːn`. Key insight from the IPA: aetherborn opens with /ɛ/ (short-e "eth"), NOT /ɛɪ/ (long-A "ay") like aether and aetheric. The prior respellings treated all five entries as the same `'ay thur'` family — wrong starting vowel for aetherborn, plus the final rhotic schwa /ɚ/ reads better as "ther" (rhymes with father) than "thur" (rhymes with fur), and aetheric's middle /θi/ is a long-E ("thee") not a schwa.
+  - **Fix:** `loreLexicon.ts` Aether block:
+    - `'ay thur'` → `'ay ther'` (aether)
+    - `'ay thur ik'` → `'ay thee rik'` (aetheric)
+    - `'ay thur born'` → `'eth er born'` (aetherborn)
+    - Aetherstone / Aetherbat untouched — user only specified the three, no need to guess vowels they haven't called out.
+  - **Why:** Lexicon respellings feed espeak-ng's letter-to-sound rules; matching the IPA's structural cues (vowel quality, syllable count, rhotic schwas) produces TTS output that lines up with the user's intended pronunciation. Partial refinement is fine — Tartaria's pronunciation rules are evolving as the user surfaces them.
+  - **Files:** `app/voice/loreLexicon.ts` (Aether block comment + 3 entries).
 
 #### Climb overlay polish
 

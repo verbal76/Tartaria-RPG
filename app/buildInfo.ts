@@ -1493,4 +1493,20 @@
 //
 // Files: app/engine/elevatedOverlay.ts, app/state/game
 // Store.ts.
-export const OTA_BUILD_ID = '2026-05-27-102';
+//
+// 2026-05-27 OTA-103 — Aether family IPA refinement. User
+// provided fresh IPA for three of the five Aether entries:
+//   aether     = ɛɪθɚ      (long-A "ay" + rhotic schwa "ther")
+//   aetheric   = ɛɪθiɾɪk   (long-A + "thee" + r-tap into "rik")
+//   aetherborn = ɛθɛɾ bɔːn (short-E "eth" — diverges from the
+//                          long-A start of aether/aetheric)
+// Updated respellings in loreLexicon.ts:
+//   'ay thur'     → 'ay ther'
+//   'ay thur ik'  → 'ay thee rik'
+//   'ay thur born'→ 'eth er born'
+// Aetherstone / Aetherbat untouched pending the user's own
+// spec for those two — partial refinement is fine; we don't
+// guess vowels the user hasn't called out.
+//
+// Files: app/voice/loreLexicon.ts.
+export const OTA_BUILD_ID = '2026-05-27-103';

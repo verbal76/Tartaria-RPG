@@ -31,14 +31,23 @@
 // how espeak's letter-to-sound rules treat specific letter combos.
 
 const LEXICON: Array<[RegExp, string]> = [
-  // Aether family — playtester spec OTA 218: "ay thur", long A as
-  // in "say", not "ee". Default phonemizers often read "Ae" as
-  // "aye" or "eh"; we force the long-A + schwa with "ay thur".
+  // Aether family — playtester IPA spec OTA-103. Not a uniform
+  // pattern: Aether / Aetheric open with /ɛɪ/ (long-A "ay"),
+  // but Aetherborn opens with /ɛ/ (short-e "eth"). Final /ɚ/
+  // rhotic schwa is "er" (rhymes with "father"), not "thur"
+  // (rhymes with "fur"). Aetheric's /θi/ middle is long-e
+  // ("thee"), with the /ɾ/ tap leading into "rik".
+  //   Aether     /ɛɪθɚ/      → "ay ther"
+  //   Aetheric   /ɛɪθiɾɪk/   → "ay thee rik"
+  //   Aetherborn /ɛθɛɾ bɔːn/ → "eth er born"
+  // Aetherstone / Aetherbat keep prior "ay thur" pending a
+  // fresh playtester spec — leaving them alone avoids regressing
+  // pronunciations the user hasn't refined.
   [/\bAetherstone\b/gi, 'ay thur stone'],
-  [/\bAetheric\b/gi, 'ay thur ik'],
-  [/\bAetherborn\b/gi, 'ay thur born'],
+  [/\bAetheric\b/gi, 'ay thee rik'],
+  [/\bAetherborn\b/gi, 'eth er born'],
   [/\bAetherbat\b/gi, 'ay thur bat'],
-  [/\bAether\b/gi, 'ay thur'],
+  [/\bAether\b/gi, 'ay ther'],
 
   // Place names — long-vowel + multi-syllable mishaps.
   // Tartar* family is two beats: "tar" + the rest as one rapid stress
