@@ -733,4 +733,26 @@
 //
 // File: app/state/gameStore.ts (setTravelCourse stamina gate
 // gets skipDedup + destination-name interpolation).
-export const OTA_BUILD_ID = '2026-05-27-082';
+//
+// 2026-05-27 OTA-083 — Resolved-hook short-circuit now greys
+// the chip. Same bug pattern as OTA-070/076: a code path
+// refuses the action but never writes to the dedup list, so
+// the UI chip stays green and the player taps it forever
+// getting the same refusal. Playtester tapped a moss patch
+// 8 times in a row before noticing nothing was changing —
+// the moss patch was part of a resolved bioluminescent_path
+// hook, so my OTA-079 resolvedHookMatch branch fired the
+// callback line ("You've already followed the thread of
+// the moss patch...") but never marked the noun in any
+// dedup list. Fix: when the resolved-hook short-circuit
+// fires, write the noun to searchedAmbientNouns so the
+// OTA-070/076 fuzzy UI check filters the chip out of the
+// SearchModal. Hook resolution counts as productive (the
+// player already got the hook's reward), so searched (chip
+// filtered) is the right list, not flavorExhausted (chip
+// greyed visible). Idempotent — skips when the noun is
+// already in the list.
+//
+// File: app/state/gameStore.ts (resolvedHookMatch branch
+// now writes searchedAmbientNouns alongside the appendLog).
+export const OTA_BUILD_ID = '2026-05-27-083';

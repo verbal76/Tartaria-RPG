@@ -4354,6 +4354,46 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 'world',
                 `You\'ve already followed the thread of the ${ambient}. Whatever it had for you is in your pack — or wasn\'t there to begin with.`,
               );
+              // 2026-05-27 OTA-083 — also write the noun to
+              // searchedAmbientNouns so the chip filters out of
+              // the SearchModal via OTA-070/076 fuzzy UI check.
+              // Pre-OTA-083 the resolved-hook short-circuit
+              // printed the callback but never wrote to either
+              // dedup list, so the chip stayed green and the
+              // player could tap it indefinitely getting the
+              // same refusal. Playtester tapped a moss patch
+              // 8 times in a row before noticing nothing was
+              // changing. Hook resolution counts as a
+              // productive outcome (the player got the
+              // hook's reward), so we use searchedAmbient
+              // Nouns (chip filtered out) rather than
+              // flavorExhausted (chip greyed-but-visible).
+              // Idempotent — skips when the noun is already
+              // in the list.
+              const hookRoomKey = makeRoomKey(
+                player.currentLocationId,
+                currentScene.microMicroId,
+                player.mapX,
+                player.mapY,
+              );
+              set((s) => {
+                const room = s.worldMemory.visitedRooms?.[hookRoomKey];
+                if (!room) return s;
+                const existing = room.searchedAmbientNouns ?? [];
+                if (existing.includes(ambientLower)) return s;
+                return {
+                  worldMemory: {
+                    ...s.worldMemory,
+                    visitedRooms: {
+                      ...(s.worldMemory.visitedRooms ?? {}),
+                      [hookRoomKey]: {
+                        ...room,
+                        searchedAmbientNouns: [...existing, ambientLower],
+                      },
+                    },
+                  },
+                };
+              });
               break;
             }
             // 2026-05-26 OTA-071 — per-room investigation table
