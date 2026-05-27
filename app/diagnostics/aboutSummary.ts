@@ -70,3 +70,52 @@ export function buildBasicDeviceSummary(): string {
   ];
   return lines.join('\n');
 }
+
+// 2026-05-27 OTA-101 — stampLogExport. Single source of truth
+// for the envelope-wrapped log + appended device/install
+// summary that ships with every COPY / SHARE / CHUNK button
+// across LogScreen + AboutScreen. Player request: "when a
+// playtester pushes a big report have it also copy and paste
+// the about information." Done — every log export now bundles
+// both, so I don't have to ask the player to send the about
+// info separately + their captures always carry build context.
+//
+// Format mirrors what playtesters were already manually doing
+// (envelope first, blank line, "Tartaria Realms" header, then
+// the buildBasicDeviceSummary block):
+//
+//   === TARTARIA LOG · 9243 CHARS · BEGIN ===
+//   ... log body ...
+//   === END LOG · 9243 CHARS ===
+//
+//   Tartaria Realms
+//
+//   Device
+//     ...
+//   Install
+//     ...
+//
+// Multipart variant uses PART N of M markers but otherwise
+// the same shape. The about block ALWAYS goes after the
+// closing marker so it doesn't interfere with the byte-count
+// envelope check (which compares chars between BEGIN/END to
+// detect paste-side truncation).
+export interface StampLogOptions {
+  chunk?: { index: number; total: number };
+  /** Optional player name to surface alongside Tartaria Realms
+   *  in the header. Used by the TitleScreen export which has
+   *  per-slot context. */
+  playerName?: string;
+}
+
+export function stampLogExport(logBody: string, opts: StampLogOptions = {}): string {
+  const { chunk, playerName } = opts;
+  const begin = chunk
+    ? `=== TARTARIA LOG · PART ${chunk.index} of ${chunk.total} · ${logBody.length} CHARS · BEGIN ===`
+    : `=== TARTARIA LOG · ${logBody.length} CHARS · BEGIN ===`;
+  const end = chunk
+    ? `=== END PART ${chunk.index} of ${chunk.total} ===`
+    : `=== END LOG · ${logBody.length} CHARS ===`;
+  const header = playerName ? `Tartaria Realms · ${playerName}` : 'Tartaria Realms';
+  return `${begin}\n${logBody}\n${end}\n\n${header}\n\n${buildBasicDeviceSummary()}\n`;
+}

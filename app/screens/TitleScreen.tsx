@@ -33,7 +33,7 @@ import { SwipeableRow } from '../components/SwipeableRow';
 import { BrandedModal } from '../components/BrandedModal';
 import { BugReportModal } from '../components/BugReportModal';
 import { InvitePlaytesterModal } from '../components/InvitePlaytesterModal';
-import { buildBasicDeviceSummary } from '../diagnostics/aboutSummary';
+import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
@@ -253,10 +253,13 @@ export function TitleScreen() {
       const start = (nextIndex - 1) * DEAD_LOG_CHUNK_SIZE;
       const end = start + DEAD_LOG_CHUNK_SIZE;
       const slice = body.slice(start, end);
-      const stamped =
-        `=== TARTARIA LOG · ${slot.playerName} · PART ${nextIndex} of ${total} · ${slice.length} CHARS · BEGIN ===\n` +
-        `${slice}\n` +
-        `=== END PART ${nextIndex} of ${total} ===\n`;
+      // OTA-101 — appends buildBasicDeviceSummary via stampLogExport
+      // so dead-character bug reports carry the same build context
+      // as live-character ones. playerName surfaces in the header.
+      const stamped = stampLogExport(slice, {
+        chunk: { index: nextIndex, total },
+        playerName: slot.playerName,
+      });
       await Clipboard.setStringAsync(stamped);
       const copiedAt = Date.now();
       setDeadLogChunk({

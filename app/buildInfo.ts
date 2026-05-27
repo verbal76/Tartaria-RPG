@@ -1451,4 +1451,17 @@
 // popup-driven lifecycle.
 //
 // Files: app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-05-27-100';
+// 2026-05-27 OTA-101 — Log exports now bundle device/install
+// summary. Player asked: "when a playtester pushes a big
+// report have it also copy and paste the about information."
+// Done — new stampLogExport helper in aboutSummary.ts wraps
+// the envelope + appends buildBasicDeviceSummary. Three
+// surfaces converted (LogScreen, AboutScreen, TitleScreen
+// dead-character report). Every COPY / SHARE / CHUNK output
+// now carries platform + build context so I don't have to
+// ask the player to send the about info separately.
+//
+// Files: app/diagnostics/aboutSummary.ts (new helper), app/
+// screens/LogScreen.tsx, app/screens/AboutScreen.tsx, app/
+// screens/TitleScreen.tsx.
+export const OTA_BUILD_ID = '2026-05-27-101';

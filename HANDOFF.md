@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-100` (OTA-applied marker now survives the TitleScreen popup dismiss via a separate state field). See **Section 0** for the live issue tracker covering OTA-070 → OTA-100.
+> **Latest OTA:** `2026-05-27-101` (every log export now bundles the basic device/install summary at the end). See **Section 0** for the live issue tracker covering OTA-070 → OTA-101.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -34,6 +34,12 @@
 ### 0.B — Closed Issues (most recent first)
 
 #### Telemetry / dev visibility
+
+- **OTA-101 (2026-05-27) · Every log export now bundles the basic device/install summary automatically.**
+  - **What:** Player asked: "when a playtester pushes a big report have it also copy and paste the about information." Previously, the COPY/SHARE/CHUNK buttons on LogScreen + AboutScreen + TitleScreen (dead-character report) emitted only the `=== TARTARIA LOG · N CHARS · BEGIN === ... === END LOG ===` envelope. Dev had to ask the player to grab the About info separately. Friction + sometimes the device info was missing entirely from captures.
+  - **Fix:** New `stampLogExport(logBody, opts?)` helper in `aboutSummary.ts`. Wraps the envelope (single or multipart) AND appends `buildBasicDeviceSummary()` after the closing marker. Three call sites converted: `LogScreen.handleChunk` / `handleCopy` / `handleShare`, `AboutScreen.handleCopyLog` (both single-chunk and multipart branches), `TitleScreen` dead-character chunk path (passes `playerName` so header reads `Tartaria Realms · <name>`).
+  - **Format:** envelope first, blank line, `Tartaria Realms` (or `Tartaria Realms · <playerName>`) header, blank line, then the `Device` / `Install` block — same shape the playtester was manually pasting from About, so muscle memory + log captures stay consistent.
+  - **Files:** `app/diagnostics/aboutSummary.ts` (new `stampLogExport` + `StampLogOptions` type), `app/screens/LogScreen.tsx`, `app/screens/AboutScreen.tsx`, `app/screens/TitleScreen.tsx`.
 
 - **OTA-100 (2026-05-27) · OTA-applied debug marker never fired even after a real upgrade.**
   - **What:** OTA-099's playtest log confirmed the session-start marker is working (visible as `[debug] OTA session start: 2026-05-27-099.` at the top of the slot-load session). But the symmetric `OTA applied: <old> → <new>` marker that should fire ONCE per upgrade was missing. Player clearly upgraded between OTA-098 and OTA-099 (the diagnostic envelope showed both `Last OTA applied: Yes — <uuid>` and `OTA build ID: 2026-05-27-099` with a publish time 6 minutes before capture), but no applied-marker landed in the log.

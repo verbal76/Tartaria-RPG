@@ -4,7 +4,7 @@ import * as Clipboard from 'expo-clipboard';
 import * as Updates from 'expo-updates';
 import { useGameStore } from '../state/gameStore';
 import { OTA_BUILD_ID } from '../buildInfo';
-import { buildBasicDeviceSummary } from '../diagnostics/aboutSummary';
+import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
 import { NumberStepper } from '../components/NumberStepper';
 import { LoreCodexBody } from '../components/LoreCodexBody';
 import {
@@ -83,8 +83,11 @@ export function AboutScreen() {
       const fresh = await readFullLog();
       const total = Math.max(1, Math.ceil(fresh.length / LOG_CHUNK_SIZE));
       // Single-chunk path — old behaviour, single COPIED flash.
+      // OTA-101 — stampLogExport bundles the basic device/
+      // install summary at the end so the report always carries
+      // build context.
       if (total <= 1) {
-        const stamped = `=== TARTARIA LOG · ${fresh.length} CHARS · BEGIN ===\n${fresh}\n=== END LOG · ${fresh.length} CHARS ===\n`;
+        const stamped = stampLogExport(fresh);
         await Clipboard.setStringAsync(stamped);
         setLogCharCount(stamped.length);
         setLogCopied(true);
@@ -98,10 +101,7 @@ export function AboutScreen() {
         }
         const start = (nextIndex - 1) * LOG_CHUNK_SIZE;
         const slice = fresh.slice(start, start + LOG_CHUNK_SIZE);
-        const stamped =
-          `=== TARTARIA LOG · PART ${nextIndex} of ${total} · ${slice.length} CHARS · BEGIN ===\n` +
-          `${slice}\n` +
-          `=== END PART ${nextIndex} of ${total} ===\n`;
+        const stamped = stampLogExport(slice, { chunk: { index: nextIndex, total } });
         await Clipboard.setStringAsync(stamped);
         setLogCharCount(stamped.length);
         setLogChunk({ lastIndex: nextIndex, total, copiedAt: Date.now() });
