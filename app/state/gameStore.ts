@@ -4260,15 +4260,60 @@ export const useGameStore = create<GameStore>((set, get) => ({
               const locationName =
                 currentScene.location.name ?? 'this place';
               void (async () => {
-                const loreLine = qwenGenerator
+                // OTA-072: lazy Qwen lore (curated fallback).
+                // OTA-073: if rollOutcome returned an item
+                // result, swap the lore line for the item-
+                // suffixed line so the lore + item discovery
+                // read as one beat. Qwen lore goes BEFORE the
+                // item suffix when both are present, so the
+                // generated atmospheric sentence flows into
+                // "Tucked into the seam: a [item]." If Qwen
+                // is unavailable, the curated lore + item
+                // suffix concatenate directly.
+                const loreFragment = qwenGenerator
                   ? await generateInvestigationLoreAsync(
                       tableEntry,
                       locationName,
                       qwenGenerator,
                     )
-                  : baseOutcome.line;
-                const outcome = { ...baseOutcome, line: loreLine };
+                  : baseOutcome.line.split(' Tucked into the seam:')[0]!;
+                const outcomeLine =
+                  baseOutcome.kind === 'item'
+                    ? `${loreFragment} Tucked into the seam: a ${baseOutcome.detail.toLowerCase()}.`
+                    : loreFragment;
+                const outcome = { ...baseOutcome, line: outcomeLine };
                 get().appendLog('world', outcome.line);
+                // OTA-073: when the outcome is an item, grant
+                // it through the standard inventory pipeline.
+                // findCatalogItem resolves the canonical
+                // entry (kind/rarity/tags/durability); we
+                // skip the grant silently if the named item
+                // isn't in the catalog so a future template
+                // typo doesn't crash the investigate flow.
+                if (outcome.kind === 'item' && get().player) {
+                  const cat = findCatalogItem(outcome.detail);
+                  if (cat) {
+                    const newItem: InventoryItem = {
+                      id: `${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`,
+                      name: cat.name,
+                      kind: cat.kind === 'weapon' ? 'weapon' : cat.kind === 'armor' ? 'armor' : cat.kind,
+                      rarity: cat.rarity,
+                      quantity: tableEntry.yield?.qty ?? 1,
+                      tags: cat.tags,
+                    };
+                    const granted = grantItem(get().player!.inventory, newItem);
+                    if (granted.accepted > 0) {
+                      set((s) =>
+                        s.player ? { player: { ...s.player, inventory: granted.inventory } } : s,
+                      );
+                      const qtyLabel = granted.accepted > 1 ? ` x${granted.accepted}` : '';
+                      get().appendLog(
+                        'reward',
+                        `✦ ${cat.name}${qtyLabel} from the ${ambient}.`,
+                      );
+                    }
+                  }
+                }
                 set((s) => {
                   const room = s.worldMemory.visitedRooms?.[tableRoomKey] ?? {
                     firstVisitAt: Date.now(),
@@ -4278,11 +4323,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   const prevTable = room.roomInvestigationTable ?? {};
                   const updatedEntry = {
                     ...tableEntry,
-                    // Cache the resolved lore on the entry so
-                    // callbackLine + any future read can
-                    // reference the Qwen-enriched line, not
-                    // just the curated fallback.
-                    loreLine: loreLine,
+                    // Cache the resolved lore fragment on the
+                    // entry so callbackLine + any future read
+                    // can reference the Qwen-enriched line
+                    // (without the OTA-073 item suffix — the
+                    // suffix is recomputed from entry.result
+                    // when needed).
+                    loreLine: loreFragment,
                     consumed: true,
                     consumedAt: Date.now(),
                     result: outcome,

@@ -318,4 +318,35 @@
 // app/state/gameStore.ts (investigate case body refactored
 // to await Qwen lore inside an IIFE before logging +
 // committing consumed state).
-export const OTA_BUILD_ID = '2026-05-26-072';
+//
+// 2026-05-26 OTA-073 — Template expansion + yield mechanics
+// (3/5 in the series).
+//   (1) NounCategory grew from 5 to 15: added door, corpse,
+//       statue, altar, vegetation, bone, light, container,
+//       text, stone. Each has a curated fallback lore line +
+//       most have a small-chance item yield from the existing
+//       scrap/material catalog (Bent Nail, Bone Sliver, Stick,
+//       Worn Tartarian Coin, Smooth Stone, Small Rock, Fire-
+//       wood, etc.) so grantItem accepts the yield cleanly.
+//       Text + container yield null intentionally — text is
+//       lore-only; containers go through the existing open
+//       /disarm verb path.
+//   (2) KEYWORD_MAP reordered so more specific categories
+//       fire BEFORE the OTA-071 originals where keywords
+//       overlap (altar before furniture, bone before shelf).
+//   (3) rollOutcome's yield-roll path activated: when
+//       entry.yield exists AND rand() < chance, returns
+//       kind='item' with the item name + a "Tucked into the
+//       seam: a [item]" line that flows naturally after the
+//       lore.
+//   (4) Engine first-investigate IIFE: when outcome.kind ==
+//       'item', looks up catalog via findCatalogItem and
+//       grants through the standard grantItem inventory
+//       pipeline + emits a reward-channel log line. Silent
+//       skip if the named item isn't in the catalog so a
+//       future template typo can't crash the flow.
+//
+// Files: app/engine/investigationTable.ts (NounCategory +
+// KEYWORD_MAP + TEMPLATES expansions, rollOutcome yield path),
+// app/state/gameStore.ts (item-grant branch in the IIFE).
+export const OTA_BUILD_ID = '2026-05-26-073';

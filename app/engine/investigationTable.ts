@@ -22,11 +22,23 @@
 // every investigate intent the table knows about.
 
 export type NounCategory =
+  // OTA-071 seeds
   | 'furniture'
   | 'shelf'
   | 'machinery'
   | 'vessel'
   | 'debris'
+  // OTA-073 expansion
+  | 'door'
+  | 'corpse'
+  | 'statue'
+  | 'altar'
+  | 'vegetation'
+  | 'stone'
+  | 'text'
+  | 'bone'
+  | 'light'
+  | 'container'
   | 'generic';
 
 export interface InvestigationYield {
@@ -88,7 +100,25 @@ interface Template {
 // specificity (machinery before generic-shaped words). Tested
 // against the noun as a whole; word-boundary anchors keep
 // "shelf" from matching "myself" etc.
+// Keyword → category mapping. First match wins. Ordered by
+// specificity (the OTA-073 expansions go BEFORE the original 5
+// where their keywords overlap — e.g., 'shrine altar' should
+// hit altar, not furniture-via-"shrine"; 'bone shelf' should
+// hit bone, not shelf-via-"shelf"). Word-boundary anchors keep
+// substring false positives at bay.
 const KEYWORD_MAP: Array<{ keywords: RegExp; category: NounCategory }> = [
+  // OTA-073 — more specific categories first.
+  { keywords: /\b(door|doorway|gate|portal|archway|arch|entrance|passage|hatch)\b/i, category: 'door' },
+  { keywords: /\b(corpse|body|remains|skeleton|cadaver|carcass|dead)\b/i, category: 'corpse' },
+  { keywords: /\b(statue|sculpture|monument|effigy|idol|bust)\b/i, category: 'statue' },
+  { keywords: /\b(altar|shrine|sigil|reliquary|tabernacle)\b/i, category: 'altar' },
+  { keywords: /\b(root|vine|fungus|mushroom|moss|sprout|growth|fern|weed|bramble)\b/i, category: 'vegetation' },
+  { keywords: /\b(bone|skull|ribcage|ribs|jaw|claw|fang|tusk|vertebra)\b/i, category: 'bone' },
+  { keywords: /\b(torch|lantern|candle|brazier|flame|ember|sconce|glowstone)\b/i, category: 'light' },
+  { keywords: /\b(chest|crate|box|sack|bag|satchel|pouch|coffer|trunk|strongbox)\b/i, category: 'container' },
+  { keywords: /\b(sign|plaque|scroll|tablet|inscription|mural|painting|banner|poster|notice|manuscript|book)\b/i, category: 'text' },
+  { keywords: /\b(stone|boulder|monolith|megalith|slab|brick|cobble|pebble|standing[- ]stone)\b/i, category: 'stone' },
+  // OTA-071 original 5.
   { keywords: /\b(bench|chair|table|stool|cushion|couch|seat|desk|cot|bed|pew)\b/i, category: 'furniture' },
   { keywords: /\b(shelf|shelves|rack|bookcase|cabinet|cupboard|locker)\b/i, category: 'shelf' },
   { keywords: /\b(conduit|console|sentinel|generator|mechanism|machine|device|panel|terminal|engine|motor|pump|valve)\b/i, category: 'machinery' },
@@ -125,6 +155,71 @@ const TEMPLATES: Record<NounCategory, Template> = {
     category: 'debris',
     fallbackLore: 'Broken stone and dried mortar. The wreckage gives up no secrets — the secrets fell with the building that owned them.',
     yield: { itemName: 'Useful Scrap', qty: 1, chance: 0.30 },
+    hookKind: null,
+  },
+  // OTA-073 expansion. All yield item names are confirmed
+  // present in the catalog (app/data/items/scrap*.json or
+  // material*.json) so grantItem accepts them cleanly. Drop
+  // chances range from 0.08 (rare flavor-driven categories like
+  // statues / altars) to 0.30 (debris that's clearly material).
+  door: {
+    category: 'door',
+    fallbackLore: 'The frame is warped where the hinge anchored — long-dried iron, blooming with patient rust.',
+    yield: { itemName: 'Bent Nail', qty: 1, chance: 0.15 },
+    hookKind: null,
+  },
+  corpse: {
+    category: 'corpse',
+    fallbackLore: 'The remains are quiet. Bone-meal mixed with cloth and a faint sour note that\'s long past urgent.',
+    yield: { itemName: 'Bone Sliver', qty: 1, chance: 0.25 },
+    hookKind: null,
+  },
+  statue: {
+    category: 'statue',
+    fallbackLore: 'Carved features blurred by weather, but the posture is still legible — someone took the time to be remembered, even if the world forgot why.',
+    yield: { itemName: 'Smooth Stone', qty: 1, chance: 0.12 },
+    hookKind: null,
+  },
+  altar: {
+    category: 'altar',
+    fallbackLore: 'A residue of old offerings still rings the surface — wax, ash, a single bent coin no one came back for.',
+    yield: { itemName: 'Worn Tartarian Coin', qty: 1, chance: 0.18 },
+    hookKind: null,
+  },
+  vegetation: {
+    category: 'vegetation',
+    fallbackLore: 'It grows where it shouldn\'t — adapted to the bad air and the silence, threading itself through the cracks like it owns the place.',
+    yield: { itemName: 'Stick', qty: 1, chance: 0.20 },
+    hookKind: null,
+  },
+  bone: {
+    category: 'bone',
+    fallbackLore: 'Bleached and porous. Tooth-marks at one end, deliberate cuts at the other — something used it before it was discarded.',
+    yield: { itemName: 'Bone Sliver', qty: 1, chance: 0.35 },
+    hookKind: null,
+  },
+  light: {
+    category: 'light',
+    fallbackLore: 'The flame is long out, but the residue tells you what it burned and roughly when — probably the night the world ended here.',
+    yield: { itemName: 'Firewood', qty: 1, chance: 0.20 },
+    hookKind: null,
+  },
+  container: {
+    category: 'container',
+    fallbackLore: 'The lid is warped, the contents are unknown until you try. The latch held — that\'s either reassuring or sinister, depending on what\'s inside.',
+    yield: null, // Containers are handled by the existing open/disarm verb path; the table only narrates them.
+    hookKind: null,
+  },
+  text: {
+    category: 'text',
+    fallbackLore: 'The script is half-faded. Most of it is a name, or a list of names, or a debt no one paid.',
+    yield: null, // Lore-only — text nouns give story, not material.
+    hookKind: null,
+  },
+  stone: {
+    category: 'stone',
+    fallbackLore: 'Tartarian stone. Granular, slightly warm where the Aether saturated the matrix decades ago — not enough to be useful, just enough to remind you the Aether is everywhere.',
+    yield: { itemName: 'Small Rock', qty: 1, chance: 0.25 },
     hookKind: null,
   },
   generic: {
@@ -235,11 +330,24 @@ export function callbackLine(noun: string, entry: InvestigationEntry): string {
  *  noun can drop the curated item with the template's chance. */
 export function rollOutcome(
   entry: InvestigationEntry,
-  _rand: () => number = Math.random,
+  rand: () => number = Math.random,
 ): InvestigationResult {
   const lore = resolveLore(entry);
-  // OTA-071 — yield mechanics deferred to OTA-073. Always
-  // returns flavor outcome with the lore line.
+  // OTA-073 — yield-roll activated. When the template has a
+  // yield AND the roll lands under the chance, return an item
+  // outcome; the caller is responsible for the grantItem call
+  // + reward log. Otherwise, flavor-only outcome with the
+  // lore line. The yield line appends the item naturally to
+  // the end of the lore so a single log entry conveys both
+  // "what you found out about the noun" and "what you found
+  // hidden in it".
+  if (entry.yield && rand() < entry.yield.chance) {
+    return {
+      kind: 'item',
+      detail: entry.yield.itemName,
+      line: `${lore} Tucked into the seam: a ${entry.yield.itemName.toLowerCase()}.`,
+    };
+  }
   return {
     kind: 'flavor',
     detail: '',
