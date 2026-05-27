@@ -3554,7 +3554,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('debug', `route: hook intercept (kind=${hook.kind}, target="${targetText}") — original intent=${parsed.intent}`);
         // Small stamina cost for engaging a hook (same as a skill check).
         set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
-        resolveHookOneStep(hook, get, set);
+        // 2026-05-27 OTA-088 — pass the trigger text so the stage
+        // advance can replace the chip text in scene.ambientNouns
+        // (and displayedAmbientNouns) with the latest revealed
+        // noun. Player asked: "should the chip change from
+        // 'investigate fungus' to 'investigate low chamber' since
+        // the narrative was altered?" — yes, the chip now reflects
+        // the narrative state.
+        resolveHookOneStep(hook, get, set, targetText);
         void get().persist();
         return;
       }
@@ -6630,7 +6637,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ? `You throw the ${itemUsed.name.toLowerCase()} toward ${tgt || 'the noise'}. It thumps into the dust.`
               : `You throw a stone toward ${tgt}. It clatters off something.`,
           );
-          resolveHookOneStep(hookMatch, get, set);
+          // OTA-088 — pass the throw target so chip replacement
+          // also fires when the player advances a hook via throw.
+          resolveHookOneStep(hookMatch, get, set, tgt);
           break;
         }
         if (ambient || tgt) {
@@ -13398,10 +13407,22 @@ function applyHookEffect(
 
 // Resolve a hook one stage forward. Plays the line, applies effects, marks
 // resolved if done, queues any next-chain plant in worldMemory.
+//
+// 2026-05-27 OTA-088 — optional triggerNoun param. When passed,
+// the function will (after the stage advance) replace the
+// trigger ambient noun in scene.ambientNouns + display
+// AmbientNouns with the FIRST entry in outcome.addNouns,
+// so the chip text reflects the new narrative state. Player
+// asked: "should the chip change from 'investigate fungus'
+// to 'investigate low chamber' since the narrative was
+// altered?" — yes, the chip now follows the camera. When
+// triggerNoun is omitted (no caller threading) or the stage
+// has no addNouns, the existing behavior is preserved.
 function resolveHookOneStep(
   hook: Hook,
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  triggerNoun?: string,
 ): void {
   const outcome = getHookOutcome(hook.kind, hook.stage);
   if (!outcome) return;
@@ -13445,6 +13466,56 @@ function resolveHookOneStep(
     });
     return { currentScene: { ...s.currentScene, hooks: nextHooks } };
   });
+  // OTA-088 — chip-text follow-the-camera. When this stage
+  // advance revealed new nouns AND the caller passed the
+  // trigger ambient that the player tapped, swap the trigger
+  // out of scene.ambientNouns + displayedAmbientNouns for the
+  // first newly-revealed noun. After tap 1 the chip 'fungus'
+  // becomes 'low chamber'; after tap 2 the chip 'low chamber'
+  // becomes the next revealed anchor; etc. Fuzzy match on the
+  // trigger so 'fungus' correctly maps to a scene noun like
+  // 'bioluminescent fungus' (matchAmbientNoun's resolution
+  // upstream may have produced either form). No-op when:
+  // (a) no triggerNoun was threaded; (b) outcome.addNouns is
+  // empty (terminal stage; nothing new to surface); (c) the
+  // trigger wasn't in scene.ambientNouns to begin with
+  // (player typed an inventory item, not a chip).
+  if (triggerNoun && outcome.addNouns && outcome.addNouns.length > 0) {
+    const newChip = outcome.addNouns[0]!;
+    const triggerLower = triggerNoun.toLowerCase();
+    set((s) => {
+      if (!s.currentScene) return {};
+      const replaceIn = (list: readonly string[] | undefined): string[] | null => {
+        if (!list || list.length === 0) return null;
+        let replaced = false;
+        const next: string[] = [];
+        for (const n of list) {
+          const nl = n.toLowerCase();
+          const isTrigger =
+            nl === triggerLower
+            || (triggerLower.length > 0 && triggerLower.includes(nl))
+            || (triggerLower.length > 0 && nl.includes(triggerLower));
+          if (isTrigger && !replaced) {
+            if (!next.includes(newChip)) next.push(newChip);
+            replaced = true;
+          } else if (n !== newChip) {
+            next.push(n);
+          }
+        }
+        return replaced ? next : null;
+      };
+      const newAmbient = replaceIn(s.currentScene.ambientNouns);
+      const newDisplayed = replaceIn(s.currentScene.displayedAmbientNouns);
+      if (!newAmbient && !newDisplayed) return {};
+      return {
+        currentScene: {
+          ...s.currentScene,
+          ...(newAmbient ? { ambientNouns: newAmbient } : {}),
+          ...(newDisplayed ? { displayedAmbientNouns: newDisplayed } : {}),
+        },
+      };
+    });
+  }
   // Queue any next-chain hook to plant on the next scene.
   if (outcome.nextChain) {
     const plantedAtHour = get().player?.hoursElapsed ?? 0;

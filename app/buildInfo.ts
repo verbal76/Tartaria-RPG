@@ -923,4 +923,46 @@
 // View.tsx (props extended with query / sortKey /
 // sortDirection; filter + sort applied inside the
 // evaluated useMemo).
-export const OTA_BUILD_ID = '2026-05-27-087';
+//
+// 2026-05-27 OTA-088 — Hook-progressed chips follow the
+// narrative camera. Playtester noticed: tapped 'investigate
+// fungus' and the bioluminescent_path hook narrated "The
+// trail leads down through a slumped wall into a low chamber
+// — a True Tartarian way-station..." They thought it was
+// the duplication bug, but actually the engine had advanced
+// the hook one stage and was waiting for the next tap to
+// enter the chamber. The chip still read 'fungus' even
+// though the player was now narratively standing in a
+// chamber — the chip didn't follow the camera.
+//
+// Fix: resolveHookOneStep gains an optional triggerNoun
+// param. When the caller threads in the noun the player
+// actually tapped, after the stage advance fires we replace
+// the trigger entry in scene.ambientNouns + display
+// AmbientNouns with the first newly-revealed addNoun. So:
+//   tap 1 on 'fungus' → chip becomes 'low chamber'
+//   tap 2 on 'low chamber' → chip becomes whatever the
+//     next stage reveals (or stays if terminal)
+//
+// Fuzzy match on the trigger so a player input of 'fungus'
+// correctly maps to a scene noun of 'bioluminescent fungus'
+// (same substring approach as OTA-070/086). The hook itself
+// keeps its full noun list — including the original trigger
+// — so any TEXT input on the old word still routes through
+// the hook system. Only the visible chip pool is rotated.
+//
+// Wired into both resolveHookOneStep call sites:
+//   - line 3557 (investigate / examine / look — passes
+//     targetText)
+//   - line 6633 (throw with hook match — passes tgt)
+//
+// No-op safeguards:
+//   - When triggerNoun is omitted (no caller threading)
+//   - When outcome.addNouns is empty (terminal hook stage)
+//   - When the trigger wasn't in scene.ambientNouns
+//     (player typed an inventory item, not a chip)
+//
+// File: app/state/gameStore.ts (resolveHookOneStep param
+// extension + chip-replacement set() block; two call sites
+// updated to thread the trigger).
+export const OTA_BUILD_ID = '2026-05-27-088';
