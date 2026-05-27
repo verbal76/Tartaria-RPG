@@ -1,0 +1,18 @@
+[
+  { "id": "mud_monarch_patrol", "text": "before a Mud Monarch patrol arrives", "severity": 3, "tags": ["faction:mud_monarchs", "time_pressure"] },
+  { "id": "rival_reclaimer", "text": "while a rival Reclaimer crew tries to beat you to it", "severity": 2, "tags": ["faction:reclaimers", "competition"] },
+  { "id": "forgotten_order_observing", "text": "while a Forgotten Order observer takes careful notes", "severity": 2, "tags": ["faction:forgotten_order", "witnessed"] },
+  { "id": "dynasty_assassin", "text": "without alerting the Eternal Dynasty assassin who has been shadowing you", "severity": 4, "tags": ["faction:eternal_dynasty", "stealth"] },
+  { "id": "approaching_storm", "text": "before the Etheric storm rolls in", "severity": 3, "tags": ["weather", "time_pressure"] },
+  { "id": "before_collapse", "text": "before the chamber collapses on itself", "severity": 4, "tags": ["structural", "time_pressure"] },
+  { "id": "alerted_sentinel", "text": "without waking the Sentinel sleeping in the next room", "severity": 4, "tags": ["construct", "stealth"] },
+  { "id": "temporal_loop", "text": "while caught in a recurring temporal loop", "severity": 4, "tags": ["aetheric", "time"] },
+  { "id": "wounded_party", "text": "with a wounded ally slowing you down", "severity": 2, "tags": ["liability", "escort"] },
+  { "id": "tracked", "text": "while something unseen tracks you through the dark", "severity": 3, "tags": ["psychological", "stalker"] },
+  { "id": "low_supplies", "text": "with your supplies already running thin", "severity": 2, "tags": ["resource", "logistics"] },
+  { "id": "compass_lying", "text": "with all your compasses pointing the wrong direction", "severity": 3, "tags": ["magnetic", "navigation"] },
+  { "id": "no_witnesses", "text": "and leave no witnesses", "severity": 3, "tags": ["secrecy", "ethics"] },
+  { "id": "before_aetherkin_wakes", "text": "before the Aetherkin awakens", "severity": 5, "tags": ["aetherkin", "time_pressure"] },
+  { "id": "rust_monk_pilgrimage", "text": "during a Rust Monk pilgrimage that has set up camp at the entrance", "severity": 2, "tags": ["true_tartarians", "crowd"] },
+  { "id": "double_agent", "text": "while at least one member of your party is reporting to someone else", "severity": 4, "tags": ["betrayal", "trust"] }
+]

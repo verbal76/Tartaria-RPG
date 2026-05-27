@@ -1,0 +1,1044 @@
+{
+  "concepts": [
+    {
+      "id": "burn",
+      "keywords": ["burn", "fire", "flame", "burning"],
+      "title": "Burn damage",
+      "answer": "Intense Aetheric heat from overloaded relics or high-energy Aetherstone. Burn leaves Aetheric scars that weaken your resistance to further Aetheric attacks for 1d6 rounds, and halves natural healing until you rest an hour or take Aetheric healing."
+    },
+    {
+      "id": "aetheric",
+      "keywords": ["aetheric", "etheric"],
+      "title": "Aetheric damage",
+      "answer": "Invisible, concussive force from raw Aetheric energy. Knocks creatures back one distance range and, in severe cases, disorients them so they cannot move or act for a round. Disrupts concentration — any ongoing effect must save."
+    },
+    {
+      "id": "electrical",
+      "keywords": ["electrical", "electric", "shock", "lightning"],
+      "title": "Electrical damage",
+      "answer": "Shock from Aetheric storms, relic discharges, or Tartarian grids. Can paralyze muscles for a round — the target cannot move or react, and remains vulnerable for one more turn after unparalyzing."
+    },
+    {
+      "id": "piercing",
+      "keywords": ["piercing", "pierce", "puncture"],
+      "title": "Piercing damage",
+      "answer": "Puncture from shards, crystal weapons, pointed constructs. Aetheric piercing can leave a bleeding wound that ticks 1d6-2 per turn until healed, with disadvantage on attacks while bleeding."
+    },
+    {
+      "id": "slashing",
+      "keywords": ["slashing", "slash", "cut", "cutting"],
+      "title": "Slashing damage",
+      "answer": "Edged cuts from blades or slicing constructs. Aetheric slashing can sever armor straps, lowering AC by 2 until repaired. A creature with slashing injuries takes 1d6 extra on any Dex-check action."
+    },
+    {
+      "id": "bludgeoning",
+      "keywords": ["bludgeoning", "blunt", "crush", "crushing", "impact"],
+      "title": "Bludgeoning damage",
+      "answer": "Blunt impact — falling debris, collapsing tunnels, hammer relics. Can knock a target prone (half movement to stand) and, in severe hits, daze them for a round with disadvantage on Dex attacks and checks."
+    },
+    {
+      "id": "poison",
+      "keywords": ["poison", "toxic", "venom", "gas"],
+      "title": "Poison damage",
+      "answer": "Toxic spread by contact, ingestion, or inhalation. Causes nausea — disadvantage on attacks and checks for 1d6 rounds. Severe poisoning forces a First Aid save each round to avoid incapacitation."
+    },
+    {
+      "id": "radiation",
+      "keywords": ["radiation", "radioactive", "core"],
+      "title": "Radiation damage",
+      "answer": "Aetheric light and cosmic energy from cores or relics. Weakens for 1d6 rounds with disadvantage on Strength and First Aid checks. Prolonged exposure can leave lasting conditions requiring real recovery."
+    },
+    {
+      "id": "stun",
+      "keywords": ["stun", "stunned", "stunning"],
+      "title": "Stun damage",
+      "answer": "Non-lethal Aetheric disruption that incapacitates for a round — no movement, no speech, no runecasting. Stunned creatures auto-fail Dex saves and have disadvantage on every other save until it wears off."
+    },
+    {
+      "id": "degradation",
+      "keywords": ["degradation", "corrode", "corrosive", "decay"],
+      "title": "Degradation damage",
+      "answer": "Corrosive damage from Aetheric mud or sludge. Decays organic matter, armor, and weapons — reduces armor effectiveness or weapon durability by one step per prolonged exposure, until the item is repaired."
+    },
+
+    {
+      "id": "ac",
+      "keywords": ["ac", "armor class", "armor", "defense"],
+      "title": "Armor Class (AC)",
+      "answer": "Your AC is the number an attacker must meet or beat on a d20 + attack mod to hit you. Higher is better. Race gives a baseline; armor and shields add to it; some hazards or slashing damage can lower it temporarily."
+    },
+    {
+      "id": "hp",
+      "keywords": ["hp", "hit points", "health"],
+      "title": "Hit Points",
+      "answer": "Your survival pool. At 0 you fall. Restored by rest (2d6) and food / consumables. Max HP grows every 5 enemies you defeat — Tartaria builds you up if it doesn't kill you first."
+    },
+    {
+      "id": "stamina",
+      "keywords": ["stamina", "tired", "exhaustion"],
+      "title": "Stamina",
+      "answer": "Your effort pool. Travel and combat spend it. Rest restores d6+2. Below 2 you cannot travel — only rest will get you moving again. Max stamina grows every 5 travels you complete."
+    },
+    {
+      "id": "tc",
+      "keywords": ["tc", "tartarian coin", "money", "coin", "currency"],
+      "title": "Tartarian Coin (TC)",
+      "answer": "Tartaria's currency, salvaged or earned. Used to buy from vendors and broker relics. Your race determines your starting TC roll. The Reclaimers Guild deals exclusively in it."
+    },
+    {
+      "id": "corruption",
+      "keywords": ["corruption", "corrupted"],
+      "title": "Corruption",
+      "answer": "Aether's price. Accumulates from exposure to raw Aetheric energy, prolonged hazards, or certain relic abuse. High corruption attracts attention from things you would rather not see. The Forgotten Order calls it a sickness; the True Tartarians call it an inheritance."
+    },
+    {
+      "id": "initiative",
+      "keywords": ["initiative", "first", "act first"],
+      "title": "Initiative",
+      "answer": "A d10 roll at the start of combat. Meet or beat the enemy's roll to act first. Going first means your strike or escape lands before their counter."
+    },
+    {
+      "id": "dc",
+      "keywords": ["dc", "difficulty", "difficulty class", "easy", "moderate", "hard", "very hard"],
+      "title": "Difficulty Ratings",
+      "answer": "Skill checks roll d20 + stat against a DC. Easy is 6, Moderate 9, Hard 12, Very Hard 15. The Arbiter sets it; the dice decide it."
+    },
+    {
+      "id": "resurrection_gem",
+      "keywords": ["resurrection", "gem", "gems", "revive", "resurrect"],
+      "title": "Resurrection Gems",
+      "answer": "Install-wide rare drops (about half a percent per kill). One gem revives a fallen character at full HP and stamina from the title screen. They survive death — the only thing in Tartaria that does."
+    },
+    {
+      "id": "skill_check",
+      "keywords": ["skill check", "check", "roll"],
+      "title": "Skill checks",
+      "answer": "d20 + the relevant stat, against a DC. Stealth uses DEX. Diplomacy uses CHA. Investigate uses INT. Cast uses INT. Use Relic uses WIS. Escape uses DEX."
+    },
+
+    {
+      "id": "aether",
+      "keywords": ["aether", "ether"],
+      "title": "Aether",
+      "answer": "Tartaria's lost elemental power — a living energy field that ran the empire's machines and shaped its mud. After the Flood it sleeps in pockets and pulses. Some draw on it; most are drawn by it."
+    },
+    {
+      "id": "aetherstone",
+      "keywords": ["aetherstone", "etherstone", "stone"],
+      "title": "Aetherstone",
+      "answer": "Crystallized Aether — the buried world's currency, weapon stock, and battery. Hums when something resonates with it. Most relics are built around an Aetherstone core."
+    },
+    {
+      "id": "tartaria",
+      "keywords": ["tartaria", "the world"],
+      "title": "Tartaria",
+      "answer": "The buried empire beneath the Mud Flood. Once vast, now ruins and survivors. The surface forgot it on purpose. Most of the world is still down there — and most of it is still awake."
+    },
+    {
+      "id": "arbiter",
+      "keywords": ["arbiter", "you", "yourself"],
+      "title": "The Arbiter",
+      "answer": "I have walked these places longer than I will tell you. I do not roll your dice and I do not decide your story. I notice. I narrate. I remember more than I let on. Some of it is mine."
+    },
+    {
+      "id": "aetherborn",
+      "keywords": ["aetherborn", "dynasty"],
+      "title": "Aetherborn",
+      "answer": "An ageless cabal — descendants of Tartarians who bound themselves to Aether before the Flood. The Eternal Dynasty rules them. Their patience is older than most empires; their methods are not."
+    },
+    {
+      "id": "runecaster",
+      "keywords": ["runecaster", "rune", "casting", "spell", "spells"],
+      "title": "Runecasters",
+      "answer": "Aether-channeling implements — staves, gauntlets, woven cloaks. Scale with Intelligence. Tiers go Common (1d6) through Legendary (2d10). Switching between a weapon and a runecaster in a turn costs an action."
+    },
+
+    {
+      "id": "forgotten_order",
+      "keywords": ["forgotten order", "order", "varakush"],
+      "title": "Forgotten Order",
+      "answer": "Scholars and engineers descended from Tartaria's makers. Operate out of Varakush. Want to recover Aether and rebuild. Idealistic, careful, and quietly numerous."
+    },
+    {
+      "id": "mud_monarchs",
+      "keywords": ["mud monarchs", "monarchs", "monarch"],
+      "title": "Mud Monarchs",
+      "answer": "The world's surface elite. Want Tartaria forgotten because remembering it ends them. Reach through intelligence networks, assassins, and dying Aetheric machines. Dangerous when threatened, and they always feel threatened."
+    },
+    {
+      "id": "reclaimers_guild",
+      "keywords": ["reclaimers guild", "guild"],
+      "title": "Reclaimers Guild",
+      "answer": "Treasure hunters and mercenaries. Brokers in every major city. Take any contract, deliver any relic. Have no rivals, only invoices."
+    },
+    {
+      "id": "true_tartarians",
+      "keywords": ["true tartarians", "true tartarian"],
+      "title": "True Tartarians",
+      "answer": "Survivors of the buried empire, living in subterranean enclaves. Worship the Tartarian Giants. Want to reclaim the surface. Patient, traditional, and harder than they look."
+    },
+    {
+      "id": "eternal_dynasty",
+      "keywords": ["eternal dynasty"],
+      "title": "Eternal Dynasty",
+      "answer": "The ruling house of the Aetherborn. Pre-Flood lineage that bound itself to Aether for longevity. Counts time in centuries and never forgives a debt."
+    },
+    {
+      "id": "crafting",
+      "keywords": ["craft", "crafting", "recipe", "recipes", "forge", "make"],
+      "title": "Crafting",
+      "answer": "Type 'craft' alone and I will list what your pack can become. Type 'craft' followed by an item name to try it — if you have the pieces, the work is done. Materials come from enemies and ruins. The list will grow as we walk."
+    },
+    {
+      "id": "vendors",
+      "keywords": ["vendor", "vendors", "merchant", "broker", "shop", "buy", "trade"],
+      "title": "Vendors",
+      "answer": "Wandering traders appear in peaceful scenes — Reclaimer brokers, Forgotten Order scholars, True Tartarian quartermasters, the occasional unaffiliated drifter. Each carries a handful of items for TC. Tap an item in their panel to buy. They leave when you do."
+    },
+    {
+      "id": "gifting",
+      "keywords": ["gift", "gifting", "give", "offer"],
+      "title": "Gifting",
+      "answer": "Type 'gift <item>' while a vendor is in the scene. The item leaves your pack and the vendor's faction gains 5 standing — with half that propagating to their allies and the inverse to their rivals. Honest currency for politics."
+    },
+    {
+      "id": "stealing",
+      "keywords": ["steal", "stealing", "thief", "pilfer", "pocket"],
+      "title": "Stealing",
+      "answer": "Type 'steal <item>' to attempt a theft from the current vendor. A d20 + DEX vs DC 12 stealth check resolves immediately. Success: the item is yours, free. Failure: the vendor catches you, faction standing drops 10, and they pack up and leave."
+    },
+    {
+      "id": "factions_join",
+      "keywords": ["join", "joining", "enlist", "pledge"],
+      "title": "Joining a faction",
+      "answer": "Type 'join <faction name>'. Requires at least 20 standing with that faction. Faction standing rises through purchases (+1), gifts (+5), and certain quests; it falls through theft (-10) and aligned actions against them."
+    },
+
+    {
+      "id": "advantage",
+      "keywords": ["advantage", "advantage roll", "bonus die", "extra die"],
+      "title": "Advantage",
+      "answer": "When you have advantage on a roll, you also roll an additional 1d6 alongside your normal die. Keep the better result. Advantage can come from terrain, preparation, faction boons, or specific relics like the Tartarian Obelisk."
+    },
+    {
+      "id": "disadvantage",
+      "keywords": ["disadvantage", "disadvantage roll", "weakened roll", "penalty"],
+      "title": "Disadvantage",
+      "answer": "When you have disadvantage, you roll 1d10 and 1d6 instead of a 1d20. Your ceiling drops from 20 to 16. Disadvantage comes from injury, status effects like bleeding or poisoning, or unfavorable terrain."
+    },
+    {
+      "id": "even_odd_roll",
+      "keywords": ["even odd", "even odd roll", "coin flip", "50/50", "chance roll"],
+      "title": "Even/Odd Roll",
+      "answer": "A 1d6 used as a fate coin. Even is always the positive outcome; odd is always negative. The Arbiter calls for one when neither skill nor strategy fully applies. A coin works just as well — Tartaria likes symmetry."
+    },
+    {
+      "id": "max_roll",
+      "keywords": ["max roll", "maximum roll", "max damage", "rolled max"],
+      "title": "Max Roll",
+      "answer": "When you roll the maximum on your damage die (not your attack roll), that's a Max Roll. In Tartaria Prima there are no critical hits on attack rolls — only the damage dice can peak. A max roll is its own reward."
+    },
+    {
+      "id": "faction_points",
+      "keywords": ["faction points", "fp", "faction standing", "standing", "reputation"],
+      "title": "Faction Points (FP)",
+      "answer": "Represented in-game as faction standing. Earn FP by completing faction tasks, making purchases (+1), gifting items (+5), and turning in quests. Spend it to unlock exclusive gear, restricted areas, and faction abilities. Different factions start at different standings with you."
+    },
+    {
+      "id": "blinded",
+      "keywords": ["blinded", "blind", "cannot see", "blindness"],
+      "title": "Blinded",
+      "answer": "Blinded creatures cannot see for 2 turns — any task requiring eyesight fails outright. At the start of the third turn, roll 1d6: even, you return to normal immediately; odd, you roll at disadvantage for one more turn, then clear."
+    },
+    {
+      "id": "ignite",
+      "keywords": ["ignite", "ignited", "set fire", "engulf", "burning"],
+      "title": "Ignite",
+      "answer": "When ignited, the target is engulfed in flame and continues burning until extinguished. Ignite starts the Burn damage-over-time effect. Each round of burning deals Aetheric heat damage; putting it out requires an action."
+    },
+
+    {
+      "id": "aetherkin",
+      "keywords": ["aetherkin", "etheric undead", "undead tartarian", "buried undead"],
+      "title": "Aetherkin",
+      "answer": "Ether-infused undead buried by the Great Mud Flood, trapped in an ethereal peace. Disturb the Aetherstone encasing them and they reawaken with powerful Etheric abilities — hostile to anything that threatens their rest."
+    },
+    {
+      "id": "ancient_mud_golems",
+      "keywords": ["ancient mud golem", "mud guardian", "ancient golem"],
+      "title": "Ancient Mud Golems",
+      "answer": "Guardians formed when Aether-charged mud encased a Tartarian citizen who couldn't reach safety in the Flood. They protect the ruins and artifacts around them. They blend with the mud almost perfectly — you won't see one until it's too late."
+    },
+    {
+      "id": "architectural_sorcery",
+      "keywords": ["architectural sorcery", "aetheric engineering", "etheric architecture", "tartarian architecture"],
+      "title": "Architectural Sorcery",
+      "answer": "Tartaria's fusion of engineering and Aetheric principles. Buildings that channel Etheric Power, self-repairing walls, defense systems that project illusions or repel intruders. The Stone Builders still study it; no one has replicated it."
+    },
+    {
+      "id": "etheric_anomalies",
+      "keywords": ["etheric anomaly", "aetheric anomaly", "etheric disturbance", "anomaly"],
+      "title": "Etheric Anomalies",
+      "answer": "Residual Aether gone wrong — magnetic fluctuations, disorienting time slips, Etheric lightning, hallucinations. Common in the Mud Seas and near unstable Etheric Ruins. Some are predictable. Most are not."
+    },
+    {
+      "id": "etheric_guardians",
+      "keywords": ["etheric guardian", "aetheric guardian", "tartarian guardian", "automaton", "guardian construct"],
+      "title": "Etheric Guardians",
+      "answer": "Automated constructs ranging from shoulder-height drones to war-scale machines, all programmed with one task: defend the Tartarian sites they were built into. They have been at it since before the Flood."
+    },
+    {
+      "id": "etheric_ruins",
+      "keywords": ["etheric ruin", "aetheric ruin", "ruin", "dense aether location"],
+      "title": "Etheric Ruins",
+      "answer": "Locations where Tartarian structures left so much Aether behind that time and space distort. Ghostly apparitions, unpredictable energy phenomena, and valuable relics co-exist in them. Explore carefully."
+    },
+    {
+      "id": "etheric_titan",
+      "keywords": ["etheric titan", "aetheric titan", "titan construct", "titan guardian"],
+      "title": "Etheric Titan",
+      "answer": "A massive construct built as a final line of defense for Tartarian systems. If you're trying to activate or deactivate something important, an Etheric Titan is probably the last obstacle between you and it."
+    },
+    {
+      "id": "mold_ether",
+      "term": "Mold Ether",
+      "keywords": ["mold ether", "mold the ether", "etheric repair", "etheric manipulation"],
+      "title": "Mold Ether",
+      "answer": "A Tartarian technique — part spell, part engineering — for repairing, redirecting, or manipulating Etheric relics. Requires high Arcana. Misapplied, it can overload a device rather than restore it."
+    },
+    {
+      "id": "mud_flood",
+      "keywords": ["mud flood", "great mud flood", "the flood", "aetherstone flood"],
+      "title": "The Mud Flood",
+      "answer": "The catastrophe that ended Tartaria. Etheric Power experiments at Thametan's Tower in Samarran malfunctioned, releasing Aether-charged mud that encased cities in Aetherstone and buried the empire. The factions that survive today are all, in one way or another, its consequence."
+    },
+    {
+      "id": "mud_golems",
+      "keywords": ["mud golem", "mud construct", "golem"],
+      "title": "Mud Golems",
+      "answer": "Etheric constructs made from Aether-charged mud — born either from Mud Magic or from failed Mud Tech experiments. Immensely strong and highly unpredictable. Known to turn on their own makers without warning."
+    },
+    {
+      "id": "mud_magic",
+      "keywords": ["mud magic", "mud manipulation", "etheric mud"],
+      "title": "Mud Magic",
+      "answer": "Primitive Aether manipulation through prolonged contact with Etheric-charged mud. Practitioners can shape terrain, accelerate healing, and conjure Mud Golems. The Mud Dwellers use it extensively. The cost is physical and mental — the mud takes something back."
+    },
+    {
+      "id": "mud_tech",
+      "keywords": ["mud tech", "etheric technology", "mud technology", "crude aether"],
+      "title": "Mud Tech",
+      "answer": "Tartarian Etheric technology reverse-engineered from the mud. Crude, unreliable, and prone to catastrophic failure. The Reclaimers Guild sells a lot of it. The Mud Monarchs would rather no one had any."
+    },
+    {
+      "id": "relic_trade",
+      "keywords": ["relic trade", "black market", "relic economy", "artifact trade"],
+      "title": "Relic Trade",
+      "answer": "The black-market economy surrounding Tartarian artifacts — from minor relics with mild properties to unstable Aether-cored devices worth fortunes. The Reclaimers Guild dominates it. The Mud Monarchs and Forgotten Order both fight to control it, for opposite reasons."
+    },
+    {
+      "id": "second_mud_flood",
+      "keywords": ["second mud flood", "second flood", "another flood", "new flood"],
+      "title": "The Second Mud Flood",
+      "answer": "The feared second cataclysm. Some factions — particularly the Tartarian Revivalists — believe that reactivating Etheric Power systems could trigger it. Others theorize cosmic disturbances or environmental shifts could do it without any help."
+    },
+    {
+      "id": "tartarian_obelisk",
+      "keywords": ["tartarian obelisk", "obelisk", "etheric obelisk", "aetheric obelisk"],
+      "title": "Tartarian Obelisk",
+      "answer": "An Etheric artifact projecting an energy field within arm's reach. Grants advantage on up to three creatures once per long rest. If damaged, the stored energy releases as a destructive Etheric blast — handle with care."
+    },
+    {
+      "id": "the_entombed",
+      "keywords": ["the entombed", "entombed", "sealed tartarians", "mud-sealed dead"],
+      "title": "The Entombed",
+      "answer": "Tartarians who died sealed inside their homes when the Mud Flood struck. As the True Tartarians reclaim underground space, they uncover the Entombed and reinter them with reverence — bones shelved in thousands of miles of tunnels, their names sometimes carved nearby."
+    },
+    {
+      "id": "unknowing_masses",
+      "keywords": ["unknowing masses", "the masses", "surface people", "general population"],
+      "title": "Unknowing Masses",
+      "answer": "Everyone on the surface who has no idea Tartaria ever existed. Their ignorance is not accidental — the Mud Monarchs and Conspiracy Architects have maintained it for generations. Most players didn't start out in this category."
+    },
+
+    {
+      "id": "conspiracy_architects",
+      "keywords": ["conspiracy architects", "architects", "cabal"],
+      "title": "Conspiracy Architects",
+      "answer": "A covert cabal that suppresses all knowledge of Tartaria and Etheric technology, ostensibly to protect surface society from its dangers. In practice they serve the Mud Monarchs' interests. They work through controlled narratives, media, and the quiet removal of people who talk too much."
+    },
+    {
+      "id": "servants_of_giants",
+      "keywords": ["servants of giants", "servants", "giant worshippers", "giant cult"],
+      "title": "Servants of the Giants",
+      "answer": "A religious faction devoted to the Tartarian Giants, believed to be dormant and waiting in ruins like the Giant Vault. The Servants conduct rituals and pilgrimages hoping to awaken them and restore Tartaria's might. The True Tartarians share the reverence; few share the zeal."
+    },
+    {
+      "id": "stone_builders",
+      "keywords": ["stone builders", "stone builder", "architectural scholars"],
+      "title": "Stone Builders",
+      "answer": "A hybrid religious-scientific order that studies Tartarian architecture as both divine text and engineering manual. They want to understand Architectural Sorcery well enough to build anew. Less radical than the Revivalists, more practical than the Forgotten Order."
+    },
+    {
+      "id": "tartarian_revivalists",
+      "keywords": ["tartarian revivalists", "revivalists", "sasha ironheart", "radical faction"],
+      "title": "Tartarian Revivalists",
+      "answer": "A radical faction willing to risk another Mud Flood to restore Tartaria. Led by Sasha Ironheart. They are dedicated to reactivating Etheric Power systems, and they consider the other factions' caution a form of cowardice. Dangerous allies. Worse enemies."
+    },
+
+    {
+      "id": "elior_zalmar",
+      "keywords": ["elior zalmar", "zalmar", "etheric engine creator", "philosopher scientist"],
+      "title": "Elior Zalmar",
+      "answer": "Tartaria's most consequential engineer. His research on Etheric frequency resonance and the Etheric Engine at Thametan's Tower caused the Great Mud Flood. Whether he died in it, survived it, or stepped sideways through time depends on which account you believe."
+    },
+    {
+      "id": "harlan_moore",
+      "keywords": ["harlan moore", "professor moore", "moore", "tartarian historian"],
+      "title": "Professor Harlan Moore",
+      "answer": "A historian whose obsession with Tartaria's secrets has made him useful and dangerous in equal measure. He'll betray any alliance if it brings him closer to what he wants. Most people underestimate how serious that is until it's too late."
+    },
+    {
+      "id": "sasha_ironheart",
+      "keywords": ["sasha ironheart", "ironheart", "revivalist leader"],
+      "title": "Sasha Ironheart",
+      "answer": "Leader of the Tartarian Revivalists. Believes that awakening the Giants is the only path to humanity's survival. Formidable, certain, and occasionally terrifying. People who dismiss her as a fanatic tend to meet her twice — once dismissively, once not."
+    },
+    {
+      "id": "drake_volkov",
+      "keywords": ["drake volkov", "volkov", "mercenary"],
+      "title": "Drake Volkov",
+      "answer": "A seasoned mercenary who takes contracts on Tartarian expeditions. His past is murky and his loyalties shift with the coin. The factions all use him when they need someone reliable; none of them trust him, which is the only honest position to take."
+    },
+    {
+      "id": "ivy_solis",
+      "keywords": ["ivy solis", "solis", "treasure hunter"],
+      "title": "Ivy Solis",
+      "answer": "A treasure hunter drawn to Tartarian relics like water finds low ground. Her loyalty is proportional to the value of what's on the line. She's excellent in the field and genuinely fun to work with, right up until the moment she isn't."
+    },
+    {
+      "id": "lucius_kincaid",
+      "keywords": ["lucius kincaid", "kincaid", "dr kincaid", "expedition sponsor"],
+      "title": "Dr. Lucius Kincaid",
+      "answer": "A reclusive scholar who funds expeditions into Tartaria, supplying maps and resources that shouldn't exist. His true motives are unknown to everyone, including possibly himself. The resources are real; the help is real; the unanswered questions multiply every time you talk to him."
+    },
+    {
+      "id": "tartarian_giants",
+      "keywords": ["tartarian giants", "the giants", "giant", "giant-kin", "tartarian giant"],
+      "title": "The Tartarian Giants",
+      "answer": "A divine race that walked alongside the Tartarian Empire at its height. The Giants held the deepest knowledge of Aetheric power and refused to share it; in 1280 they retreated to the Ural Mountains in the Lost Covenant schism, leaving the empire to govern itself. The Servants of the Giants believe they are sleeping, not gone."
+    },
+    {
+      "id": "lost_covenant_of_giants",
+      "keywords": ["lost covenant", "the covenant", "giants schism", "1280"],
+      "title": "The Lost Covenant of the Giants",
+      "answer": "In 1280, the Tartarian Giants refused to share their Aetheric secrets with the noble families and withdrew to the Ural Mountains. The schism weakened Tartarian leadership and set the stage for the experiments at Thametan's Tower three centuries later. The Servants of the Giants regard the Covenant as a sacred event; the Mud Monarchs treat it as the first crack in the empire's foundation."
+    },
+    {
+      "id": "etheric_resonance",
+      "keywords": ["etheric resonance", "aetheric resonance", "resonance", "zalmar theory", "aetheron"],
+      "title": "Etheric Resonance",
+      "answer": "Elior Zalmar's theory that Aether is built of particles called Aetherons that vibrate at distinct frequencies. Tuning a device to the right resonance lets you draw on Aether without burning fuel. Pushing the resonance past its envelope is what blew the Etheric Engine apart and triggered the Mud Flood."
+    },
+    {
+      "id": "temporal_loops",
+      "keywords": ["temporal loop", "time loop", "time anomaly", "time distortion"],
+      "title": "Temporal Loops",
+      "answer": "Aetheric anomalies in which the flow of time tangles back on itself. An hour passes inside what feels like a day, or a day vanishes between footsteps. Most common near buried Tartarian cities where the old grids are still leaking. The only reliable escape is to walk back out the way you came in."
+    },
+    {
+      "id": "spatial_distortions",
+      "keywords": ["spatial distortion", "spatial anomaly", "spatial warp", "warp"],
+      "title": "Spatial Distortions",
+      "answer": "Aetheric anomalies that fold distance the wrong way. Doorways open onto rooms that should not connect, corridors stretch into the unreachable, a step forward lands you behind yourself. Explorers who push deeper sometimes don't come back, because the back-door never existed in the first place."
+    },
+    {
+      "id": "etheric_storms",
+      "keywords": ["etheric storm", "aetheric storm", "aether storm", "lightning storm"],
+      "title": "Etheric Storms",
+      "answer": "Charged storms that crack the sky in violet and blue. The lightning warps reality where it touches — metal flows like liquid, time hiccups, ghosts of old Tartaria flash across the eye. Caught out in one, you don't get wet, you get unmade by degrees. The storms tend to peak above buried cities."
+    },
+    {
+      "id": "etheric_cores",
+      "keywords": ["etheric core", "aetheric core", "core", "tartarian core"],
+      "title": "Etheric Cores",
+      "answer": "The power sources that ran Tartaria. A single Core could light a city, hover a citadel, or grind a war machine into a continent. Most are buried with their cities; a working one is the most dangerous treasure a faction can pull out of the mud."
+    },
+    {
+      "id": "conspiracy_architects",
+      "keywords": ["conspiracy architects", "architects", "narrative control"],
+      "title": "The Conspiracy Architects",
+      "answer": "The covert cabal that erases Tartaria from public memory. Embedded in media, academia, and intelligence networks worldwide; aligned with and funded by the Mud Monarchs. Their philosophy is that knowledge of the old empire would destabilize the modern one — silence as a service, the lie as a kindness."
+    },
+    {
+      "id": "stone_builders",
+      "keywords": ["stone builders", "architectural sorcery", "tartarian engineers"],
+      "title": "The Stone Builders",
+      "answer": "A scholarly order studying Architectural Sorcery — the Tartarian fusion of engineering and Aetheric principles. They believe the empire's buildings were scripture in stone. Lodges cluster near major ruins; they cooperate with the Forgotten Order on engineering questions but keep their findings tightly held."
+    },
+    {
+      "id": "servants_of_giants",
+      "keywords": ["servants of the giants", "servants of giants", "giant cult", "giant worshippers"],
+      "title": "The Servants of the Giants",
+      "answer": "A religious faction devoted to the sleeping Tartarian Giants. They conduct rituals and pilgrimages at Tartarian ruins, believing the Giants will wake when the empire is ready to rise again. Loosely allied with the True Tartarians, more fervent and less political."
+    },
+    {
+      "id": "tartarian_revivalists",
+      "keywords": ["tartarian revivalists", "revivalists", "sasha's faction", "ironheart faction"],
+      "title": "The Tartarian Revivalists",
+      "answer": "Sasha Ironheart's faction. They want Tartaria's Etheric Power back online at full strength, and they will gamble a second Mud Flood to get it. Decentralized cells, single goal, no patience for half-measures. Most other factions call them extremists; the Revivalists call back, 'we are the only ones doing the thing.'"
+    },
+    {
+      "id": "architectural_sentinels",
+      "keywords": ["architectural sentinels", "sentinels", "tartarian sentinels", "ancient guardians", "stone guardians"],
+      "title": "The Architectural Sentinels",
+      "answer": "Semi-conscious machines the Tartarian Giants built to guard their cities. Aetheric-powered, self-repairing, capable of learning. Most still patrol the buried ruins five centuries on — eyes flicker with Aether light when they catch a heat signature. Few intruders survive direct contact. Centuries of exposure to Aetherstone have warped some: a few hesitate, a few are curious. The rest just kill."
+    },
+
+    {
+      "id": "aetheric_lich",
+      "keywords": ["aetheric lich", "lich", "the lich", "aetheric_lich"],
+      "title": "Aetheric Lich",
+      "answer": "A scholar of the Forgotten Order — or, by some accounts, a Tartarian-Path zealot — who tried to outlive the Flood by binding their soul into an Aetherstone phylactery. The working held. The man did not. What remains drifts in pale robes, hollow-eyed, drawing the living dry of warmth and will at a touch. Until the phylactery anchoring it is found and shattered, the lich returns to its haunt no matter how many times you put it down."
+    },
+    {
+      "id": "mud_tyrant",
+      "keywords": ["mud tyrant", "tyrant", "the tyrant", "mud king"],
+      "title": "Mud Tyrant",
+      "answer": "Once a Mud Dweller chieftain; now a sovereign of corruption. Centuries of feeding on Aether-saturated mud swelled the body past anything that should still move — slabs of armoured silt over slow, monstrous strength. It rules a stretch of bog or ruin like a feudal lord, and the local Mud Dwellers either serve it or feed it. A single sovereign blow can crush a man into the ground he was standing on."
+    },
+    {
+      "id": "hollow_king",
+      "keywords": ["hollow king", "the king", "hollowed king"],
+      "title": "Hollow King",
+      "answer": "The monarch of a city whose name the surface forgot. When the Mud Flood came, he sealed himself into his own tomb with rite and ration, intending to wait out the catastrophe and return to his throne. Centuries later something walked back out of the tomb wearing his crown — savage, immensely strong, and emptied of whatever made the man a ruler. He still calls the buried hall his court, and he still treats every intruder as a usurper."
+    },
+    {
+      "id": "iron_worm",
+      "keywords": ["iron worm", "worm", "the worm"],
+      "title": "Iron Worm",
+      "answer": "A pre-Flood industrial automaton — built to bore tunnels, lay rail, chew through slag — that the Aether got into and never let go of. Plate-segments the length of a wagon, coiled around a core that should have burned out four centuries ago. It tunnels through ruins and slag-plains by feel, slow until it isn't, and a full coil-crush folds armour and the man inside it together. Heavy weapons mark it; nothing yet has stopped it for long."
+    },
+    {
+      "id": "bog_wyrm",
+      "keywords": ["bog wyrm", "wyrm", "the wyrm", "serpent"],
+      "title": "Bog Wyrm",
+      "answer": "An ordinary swamp viper that found a vein of Aetherstone and never stopped feeding. Two centuries on it is the length of a barge, fast in water, faster in reeds, and — worst of all — smart. It baits, it waits, it picks the smallest in a party. Mud Dwellers leave offerings where the water blackens; Reclaimers who go in for the Aetherstone in its gut rarely come back out."
+    },
+    {
+      "id": "voidspawn_matriarch",
+      "keywords": ["voidspawn matriarch", "matriarch", "voidspawn", "queen"],
+      "title": "Voidspawn Matriarch",
+      "answer": "An Aetheric mutation that crossed a line nothing else has — it learned to breed. Where the lesser voidspawn skitter and tear, the matriarch sits at the back of the brood-chamber and lays. Found in deep tombs and sealed vaults where the Aether has pooled for centuries, surrounded by clutches of eggs at every stage of swelling. Killing her is the work; killing the brood she has already seeded is the rest of the year."
+    },
+    {
+      "id": "tartarian_reaver",
+      "keywords": ["tartarian reaver", "reaver", "the reaver"],
+      "title": "Tartarian Reaver",
+      "answer": "A Mud Monarch elite-strike legionnaire who walked off his post and never reported back. He leads no army — he doesn't need to. The name travels ahead of him through caravan camps and ruin towns, and small crews bend to him without being asked. Heavy plate, a Monarch officer's blade, and the patience of a man who has already decided how the fight ends. The bounty on him has been raised four times and collected none."
+    },
+    {
+      "id": "aetheric_behemoth",
+      "keywords": ["aetheric behemoth", "behemoth", "the behemoth"],
+      "title": "Aetheric Behemoth",
+      "answer": "An apex Aetheric mutation — a beast grown past any natural ceiling on Aetherstone alone. Bone fused with crystal, hide pebbled with raw Aether, every breath a low pressure in the chest of anyone within reach. Behemoths roam the deepest mud-seas and the buried plains, and where one passes it leaves a corridor of stripped ruin and salted earth. The Reclaimers Guild has standing offers for proof of one downed; the offers have stood for a long time."
+    },
+
+    {
+      "id": "aethercraft",
+      "keywords": ["aethercraft", "ether craft", "true tartarian magic", "aetherstone magic", "aetheric craft"],
+      "title": "Aethercraft",
+      "answer": "The Aetheric discipline the True Tartarians developed in their centuries underground. Aethercraft pulls energy from Aetherstone and shapes it — stone bent into walls, mud lifted into golems, wounds knit closed. Each settlement keeps an Aetherforge where the senior practitioners work. Prolonged use scars the body and frays the mind, so the best Aethercrafters are also the most haunted."
+    },
+    {
+      "id": "aether_golem_constructor",
+      "keywords": ["aether golem constructor", "golem constructor", "golem crafting", "build a golem"],
+      "title": "Aether Golem Constructor",
+      "answer": "An Aethercraft discipline — pulling Aetherstone and raw Aetheric energy together into a temporary golem to fight beside you or hold a tunnel mouth. The golem is loyal but unstable; it can collapse mid-swing without warning. Mud Dweller practitioners use them as expendable infantry. Constructing one is a ritual, not a snap of the fingers."
+    },
+    {
+      "id": "aetherstone_manipulation",
+      "keywords": ["aetherstone manipulation", "stone shaping", "earth shaping", "shape the earth"],
+      "title": "Aetherstone Manipulation",
+      "answer": "Aethercraft applied to stone and earth — raise a wall mid-fight, sink a pathway across a flooded chamber, sharpen a chip of Aetherstone into a blade. The effects fade once the practitioner's attention slips, so it's a tool for the moment, not a permanent build. Useful underground, where stone is everything and most fights are short."
+    },
+    {
+      "id": "aetheric_healing",
+      "keywords": ["aetheric healing", "aether healing", "etheric healing", "mend with aether"],
+      "title": "Aetheric Healing",
+      "answer": "The rarest Aethercraft discipline. The practitioner channels Aetherstone energy into a wound and pulls the flesh back together — bone, muscle, skin in whatever order the Aether picks. Costs the healer in mental strain or fresh physical scarring, so most who can do it only do it once or twice a season. Saves lives. Shortens the healer's."
+    },
+
+    {
+      "id": "classic_move",
+      "keywords": ["classic move", "speed", "movement", "move per turn"],
+      "title": "Classic Move",
+      "answer": "Your Speed tells you how many squares you can move in one turn. That total can be split across your actions — walk three, attack, walk the rest, for example."
+    },
+    {
+      "id": "difficult_terrain",
+      "keywords": ["difficult terrain", "rough ground", "broken ground"],
+      "title": "Difficult Terrain",
+      "answer": "Every 1 square of movement costs 2 in difficult terrain — mud-flats after rain, scree, dense rubble. Plan distance accordingly."
+    },
+    {
+      "id": "crawl",
+      "keywords": ["crawl", "prone movement", "low movement"],
+      "title": "Crawl",
+      "answer": "Move while prone. 1 square of movement costs 2. Used to get under things, slip below sight lines, or push on after you've been knocked down."
+    },
+    {
+      "id": "climb",
+      "keywords": ["climb", "climbing", "scaling", "ascending"],
+      "title": "Climb",
+      "answer": "Go up. 1 square of climb costs 2 squares of movement. Surfaces that fight back (smooth Tartarian glass, weeping mud-stone) may also require a STR or DEX check."
+    },
+    {
+      "id": "swim",
+      "keywords": ["swim", "wade", "swimming", "wading"],
+      "title": "Swim",
+      "answer": "Move through water — silt-lakes, flooded culverts, the Mud Seas at the shore. 1 square of swim costs 2 squares of movement. Heavy armor makes it a STR check on top."
+    },
+    {
+      "id": "standing_long_jump",
+      "keywords": ["standing long jump", "long jump", "jump"],
+      "title": "Standing Long Jump",
+      "answer": "Cover 3 squares horizontally from a standing position, no check needed. With a STR check, you can push the distance further — DM picks the DC by gap size."
+    },
+    {
+      "id": "running_long_jump",
+      "keywords": ["running long jump", "running jump"],
+      "title": "Running Long Jump",
+      "answer": "After a run-up of at least 10 ft, you cover a distance equivalent to your STR + a roll. Counts as your total Speed for the turn."
+    },
+    {
+      "id": "attack_action",
+      "keywords": ["attack action", "the attack action", "what is attack"],
+      "title": "Attack (Action)",
+      "answer": "Make a melee or ranged attack using a weapon you are wielding. Roll d20 + the weapon's stat (STR for most melee, DEX for finesse, INT for runecasters) against the target's AC. Hit, then roll damage."
+    },
+    {
+      "id": "dash_action",
+      "keywords": ["dash", "dash action", "sprint action"],
+      "title": "Dash",
+      "answer": "Double your total movement this turn after applying any movement modifiers (difficult terrain, climb, swim still cost double). You can cover a lot of ground but give up the chance to act precisely."
+    },
+    {
+      "id": "disengage_action",
+      "keywords": ["disengage", "disengage action", "withdraw safely"],
+      "title": "Disengage from Combat",
+      "answer": "Actively disengage. You avoid opportunity attacks when moving away from enemies in melee range this turn. Best used when low on HP and you need to reach cover or an ally."
+    },
+    {
+      "id": "dodge_action",
+      "keywords": ["dodge action", "what is dodge", "dodging"],
+      "title": "Dodge",
+      "answer": "You have Advantage on DEX saving throws, and any attack roll made against you has Disadvantage — if you can see the attacker. Defensive action of choice when you cannot kill or escape this turn."
+    },
+    {
+      "id": "help_action",
+      "keywords": ["help action", "help an ally", "assist"],
+      "title": "Help",
+      "answer": "You can help another player or creature with something they are trying to achieve. Award Advantage to either: a) a friendly creature on their next ability check, or b) a friendly creature's attack roll, if their target is within 5 ft of you."
+    },
+    {
+      "id": "use_object_action",
+      "keywords": ["use object", "use an object", "free action"],
+      "title": "Use an Object",
+      "answer": "Use an interactable in the scene — pull a lever, throw a switch, drink a potion already in hand. Generally a Free Action, costs nothing extra. Bigger object interactions (lockpicking, breaking down a door) require a real action and skill check."
+    },
+    {
+      "id": "hide_action",
+      "keywords": ["hide action", "hiding", "stealth roll"],
+      "title": "Hide",
+      "answer": "Attempt to hide from an enemy. Roll DEX (Stealth) to see if you succeed. Failed Hide attempts leave you visible AND committed — the enemy knows you tried."
+    },
+    {
+      "id": "ready_action",
+      "keywords": ["ready action", "get ready", "prepared action", "ready a trigger"],
+      "title": "Get Ready",
+      "answer": "Create a Ready trigger for something you can react to. Name the trigger (\"if the door opens\", \"when the cultist starts to cast\") and the action you'll take. Spends your next reaction when the trigger fires."
+    },
+    {
+      "id": "search_action",
+      "keywords": ["search action", "searching", "perception check"],
+      "title": "Search",
+      "answer": "Devote your attention to finding something. Make a WIS (Perception) check or INT (Investigation) check, depending on whether you are using your senses or your reasoning."
+    },
+    {
+      "id": "mount_action",
+      "keywords": ["mount", "dismount", "ride", "mounting"],
+      "title": "Mount / Dismount",
+      "answer": "Once during your turn, you can mount a creature that is within 5 ft of you, or dismount a creature you are riding. Costs half your total Speed for the turn. Tartaria forgot mounts a long time ago — the frame is here for when a beast worth riding shows up."
+    },
+
+    {
+      "id": "gathering_information",
+      "keywords": ["gathering information", "gather info", "intel gathering"],
+      "title": "Gathering Information",
+      "answer": "Active research: question locals, examine documents, consult experts, analyze cryptic symbols, look under things, reach out to contacts, tail a suspect, search containers, eavesdrop, copy documents. Most of these are CHA-driven (Social) or INT-driven (Library, Archaeology, Cryptography) skill rolls."
+    },
+    {
+      "id": "social_interactions",
+      "keywords": ["social interactions", "social skills", "negotiation"],
+      "title": "Social Interactions",
+      "answer": "Persuasion, building rapport, finding an interpreter, negotiating with someone suspicious, disguise, distraction, gambling, hunting side jobs, palming items (Sleight of Hand), observing others. CHA-driven where you are the actor; WIS-driven where you are reading the room."
+    },
+    {
+      "id": "preparation_and_planning",
+      "keywords": ["preparation and planning", "prep", "planning"],
+      "title": "Preparation and Planning",
+      "answer": "Pre-action work: check and buy supplies, set traps, study maps, draft plans from intel, craft items / weapons / traps / poisons, hide and wait, precast an Aetheric buff, build an Aetheric weapon, hire muscle, find a trainer, seek armor, rally allies. The fight you prepare for is the one you win."
+    },
+    {
+      "id": "psychological_actions",
+      "keywords": ["psychological actions", "mental actions"],
+      "title": "Psychological Actions",
+      "answer": "Read or alter mental state: assess someone's mood, bolster an ally with psychoanalysis or hypnotism, run rituals or meditate, seek counseling, cope with phobia, barter and haggle, detect disguise, discern motive, sniff a lie, see through delusion. WIS / INT for reading, CHA for influence."
+    },
+    {
+      "id": "skill_based_actions",
+      "keywords": ["skill based", "skill actions"],
+      "title": "Skill Based Actions",
+      "answer": "Hand-trained tasks: pick a lock, track an enemy, move undetected, repair damaged items (Craft / Mechanical / Electrical Repair), craft an item, hypnotize an NPC, create medicine / drugs / poisons, forge documents. Each leans on the appropriate Craft / DEX / INT proficiency."
+    },
+    {
+      "id": "aetheric_related_actions",
+      "keywords": ["aetheric related", "aetheric actions", "aether magic", "aether spells"],
+      "title": "Aetheric-Related Actions",
+      "answer": "Aetheric craft is Tartaria's discipline of pulling Aetherstone energy into shape — what the surface world would call magic. Initial read of a tome, cast a working, teach another caster, create a powder or Aetheric drug, translate a tome, study a tome, learn a working from another caster, consult occult sources if you have the contacts. INT-driven, scarring at higher pulls."
+    },
+
+    {
+      "id": "pick_a_lock",
+      "keywords": ["pick a lock", "lockpick", "lockpicking"],
+      "title": "Pick a Lock",
+      "answer": "Defeat a mechanical lock with tools and patience. DEX (Sleight of Hand) check against the lock's DC. Failure usually only costs time; critical failure can jam the lock or break your picks."
+    },
+    {
+      "id": "track_an_enemy",
+      "keywords": ["track an enemy", "track", "follow tracks"],
+      "title": "Track an Enemy",
+      "answer": "Follow signs left by a target — footprints, broken stalks, traces of Aether residue. WIS (Survival) check. The DC rises the older the trail, harsher the terrain, more rain since they passed."
+    },
+    {
+      "id": "set_traps",
+      "keywords": ["set traps", "lay a trap", "trapping"],
+      "title": "Set Traps",
+      "answer": "Place a snare, deadfall, tripwire, or Aetheric charge for someone to walk into. INT (or DEX, depending on the trap) versus the target's awareness when they enter the area. Costs materials and time."
+    },
+    {
+      "id": "translate_tome",
+      "keywords": ["translate a tome", "translate", "decipher tome"],
+      "title": "Translate a Tome",
+      "answer": "Render an unfamiliar script into one you can use. INT (Linguistics) against the tome's DC. Failures don't waste the tome — they just cost the session."
+    },
+    {
+      "id": "learn_spell",
+      "keywords": ["learn a spell", "learn aether working", "study a working"],
+      "title": "Learn an Aetheric Working",
+      "answer": "Acquire a new working from a teacher or a tome. INT check against the working's DC. Costs days of study, scars on heavy pulls. Working scales in cost with rarity — Common, Uncommon, Rare, Legendary."
+    },
+
+    {
+      "id": "move_action",
+      "keywords": ["move", "move action", "basic move"],
+      "title": "Move",
+      "answer": "A simple move action. Players can move equal yards to their MOV stat. Cost: 1 Move Action."
+    },
+    {
+      "id": "sprint_action",
+      "keywords": ["sprint", "running", "push for distance"],
+      "title": "Sprint",
+      "answer": "Travel up to 5x further than a regular move action in a single turn. Any combat actions made this round either before or following the Sprint must incur a penalty die. If you have a MOV of 8 or more, opponents using firearms against you while sprinting will incur +1 penalty die against you. Cost: 1 Move Action, +1 penalty die. Gain: 5x movement distance, opponent penalty +1 if using firearms (MOV 8+ only)."
+    },
+    {
+      "id": "take_cover_action",
+      "keywords": ["take cover", "cover up", "duck behind", "dive to cover"],
+      "title": "Take Cover",
+      "answer": "Position self behind cover, either full or partial. If under partial cover, all ranged firearm attacks made against you will receive a penalty die. If in full cover, ranged attacks will be unable to hit, however you will automatically enter partial cover as exposed if you move (for example, leaning out of cover to take a shot). Cost: 1 Move Action. Gain: +1 Penalty Die on opponent's attack / firearms immunity."
+    },
+    {
+      "id": "perform_action",
+      "keywords": ["perform action", "use skill in combat"],
+      "title": "Perform Action",
+      "answer": "Using your combat action, perform any non-combat action, such as apply first aid, lockpick a door, or climb up to a vantage point. Depending on the action you wish to take, the keeper may ask you to roll a specific skill. Cost: 1 Combat Action."
+    },
+    {
+      "id": "assist_action_combat",
+      "keywords": ["assist action", "assist in combat"],
+      "title": "Assist Action (Combat)",
+      "answer": "Offer another player help during your turn this round so they can perform an action (e.g. handing them their medical equipment to them during first aid, distracting enemies away from them, giving them a lift up during a climb, etc), granting them an additional bonus die for their roll. Cost: 1 Combat Action. Gain: +1 Bonus Die for assisted player."
+    },
+    {
+      "id": "hold_action",
+      "keywords": ["hold action", "delay action", "withhold turn"],
+      "title": "Hold Action",
+      "answer": "Spend both your movement and combat action holding your turn, effectively not acting this round. Depending on your description given to how you're holding your action, you may be granted a bonus die for your next turn (e.g. if you hold your turn to anticipate an attack, you may get a bonus die for your dodge or fight back). May require additional skill rolls if reasoning for holding your action requires verification. Cost: 1 turn. Gain: +1 Bonus Die next turn (if GM agrees upon player's reasoning)."
+    },
+    {
+      "id": "flee_action",
+      "keywords": ["flee action", "flee combat", "run from fight"],
+      "title": "Flee",
+      "answer": "Spend both your movement and combat action disengaging and fleeing the combat area. It will take one full round for you to successfully flee the area; even if you have already announced your intention to flee by disengaging this combat round, enemies may still attempt to attack or stop you until you reach your next turn. If you successfully flee a scene, a chase sequence may follow. Cost: 1 turn."
+    },
+
+    {
+      "id": "brawl_action",
+      "keywords": ["brawl", "fistfight", "unarmed", "knuckles"],
+      "title": "Brawl — Skill: Fighting (Brawl)",
+      "answer": "A simple unarmed attack. All unarmed brawl attacks do 1d3+DB (damage bonus) damage. An extreme success (1/5th of Fighting Brawl skill) does maximum weapon and damage bonus damage. Cost: 1 Combat Action."
+    },
+    {
+      "id": "use_weapon_action",
+      "keywords": ["use weapon", "wield weapon"],
+      "title": "Use Weapon — Skill: Fighting (Brawl) / Fighting (Weapon)",
+      "answer": "Attack using your melee weapon. If using a specialised weapon (axe, sword, spear, garrote, flail, chainsaw, etc.) it will require a specialised weapon skill roll instead of Fighting Brawl. Check weapon description for damage. An extreme success (1/5th of Fighting skill) does maximum weapon and damage bonus damage. If an edged weapon, an extreme success will do an impaling strike. Cost: 1 Combat Action."
+    },
+    {
+      "id": "fighting_maneuver",
+      "keywords": ["fighting maneuver", "disarm", "trip", "grapple", "shove", "maneuver"],
+      "title": "Fighting Maneuver — Skill: Fighting (Brawl)",
+      "answer": "An attack that describes a goal other than simply inflicting physical harm, such as a disarm, hold, push, breaking holds, and knock-out blows. Compare the builds of both attacker and defender; if the defender's build is higher by +1, the attacker receives +1 penalty die. If the defender's build is higher by +2, the attacker receives +2 penalty die. If defender's build is higher by 3+, the maneuver is impossible. Cost: 1 Combat Action, plus up to 2 potential penalty dice."
+    },
+    {
+      "id": "overwhelm_action",
+      "keywords": ["overwhelm", "gang up", "swarm attack"],
+      "title": "Overwhelm — Skill: Fighting (Brawl) / Fighting (Weapon)",
+      "answer": "MELEE ONLY. If multiple attackers are targeting the same opponent AND the opponent has already attempted a number of evasive actions during this round, all further melee attacks this round will receive a Bonus Die. The number of times an opponent may dodge/fight back before being overwhelmed is the same as their number of attacks they can make in a single combat round. Cost: 1 Combat Action."
+    },
+    {
+      "id": "throw_action",
+      "keywords": ["throw action", "throw skill"],
+      "title": "Throw — Skill: Toss",
+      "answer": "A palm sized object can be thrown 1/5th of a character's strength in yards at base range. It can be thrown twice as far with a hard difficulty roll (1/2 of Throw Skill) and up to 4× that amount with an extreme difficulty roll (1/5th of Throw Skill). Thrown melee weapons will still do damage as normal, but any damage bonus (DB) for a thrown weapon is halved. Throw attacks can be dodged but they cannot be fought back unless the opponent is 1/5th of their DEX away from the attacker in feet. Cost: 1 Combat Action."
+    },
+
+    {
+      "id": "fire_weapon_action",
+      "keywords": ["fire weapon", "shoot firearm", "ranged attack", "fire bolt"],
+      "title": "Fire Weapon — Skill: Firearms (Weapon)",
+      "answer": "A single shot attack with your drawn firearm. Success in using the weapon depends on a player's skill in the weapon type (Handgun, Rifle / Shotgun, Bow, Heavy Weapons, Flamethrower, Machine Gun and SMG — in Tartaria, the bolt-caster family). Check weapon description for damage. An extreme success for all firearms except flamethrowers will result in an impaling strike. Cost: 1 Combat Action."
+    },
+    {
+      "id": "quick_fire_action",
+      "keywords": ["quick fire", "snap shot", "rapid shot"],
+      "title": "Quick Fire — Skill: Firearms (Weapon)",
+      "answer": "FIREARMS ONLY. When a combat round starts, state you plan to fire as your first action and add 50 points to your initiative score (DEX). Your only action this round is to fire your weapon. If you move, brawl, take damage or use an evasive action before firing, you lose your Initiative bonus. You may dodge, counter an attack or take damage as normal once you have made your shot. After that round, initiative order returns to normal unless you perform another quick fire action in the following round. Cost: 1 turn. Gain: +50 Initiative (DEX) for one round."
+    },
+    {
+      "id": "aim_action",
+      "keywords": ["aim", "aim weapon", "sight target", "draw bead"],
+      "title": "Aim Weapon — Skill: Firearms (Weapon)",
+      "answer": "Spend an entire turn this round to aim your weapon. Upon your next turn, you may roll an additional Bonus die if you spend your first action firing your weapon. If the shooter takes damage or moves before their next turn, the aim bonus is lost. Cost: 1 turn. Gain: +1 Bonus Die next round."
+    },
+    {
+      "id": "point_blank_range",
+      "keywords": ["point blank", "point-blank", "close shot"],
+      "title": "Point Blank Range — Skill: Firearms (Weapon)",
+      "answer": "If an opponent is within 1/5th of the shooter's DEX in feet, the shooter gets a bonus die to their attack roll. Note that any shooter within point blank range of an opponent may be targeted by melee attacks and could be disarmed, however an opponent will not be able to fight back or dodge against firearm attacks. Cost: 1 Combat Action. Gain: +1 Bonus Die."
+    },
+    {
+      "id": "multiple_shot",
+      "keywords": ["multiple shot", "double tap", "two shots"],
+      "title": "Multiple Shot — Skill: Firearms (Handguns)",
+      "answer": "HANDGUNS OR BURST FIRE WEAPONS ONLY. If your firearm allows multiple shots with a single turn, you may fire up to the max number of bullets listed in the firearm's 'Attacks' box in a single round. However, each shot taken during this attack must take a penalty die. Cost: 1 Combat Action, +1 penalty die for each shot taken."
+    },
+    {
+      "id": "fire_automatic",
+      "keywords": ["fire automatic", "automatic fire", "full auto"],
+      "title": "Fire Automatic — Skill: Firearms (Machine Gun // SMG)",
+      "answer": "AUTOMATIC WEAPONS ONLY. With an automatic weapon, you can fire up to [X] number of bullets in a single volley, [X] being your weapon skill divided by 10 and rounded down (minimum of 3 bullets per volley). Upon a successful hit, half of bullets (rounded down) fired in a volley hit the target. In an extreme success all bullets hit, plus half rounded down are impaling strikes. Successive volleys can be fired in a single turn, however each successive volley increases the difficulty of the skill check. Cost: 1 Combat Action for single volley, 1 Turn for multiple volleys, +1 penalty die / difficulty increase for each successive volley in a single turn."
+    },
+    {
+      "id": "reload_action",
+      "keywords": ["reload", "reload weapon", "reload firearm"],
+      "title": "Reload Weapon",
+      "answer": "Reload your weapon. Each weapon has a different reload speed. It takes one combat action to load 2 shells into any weapon that requires manual loading of individual bullets, such as revolvers and shotguns. Weapons that use magazine clips take 1 combat action to reload a whole clip. It takes two full turns to reload heavy weapon ammunition. You cannot reload during the same action as a sprint. Cost: 1 Combat Action."
+    },
+    {
+      "id": "single_bullet_reload",
+      "keywords": ["single bullet reload", "one shot reload"],
+      "title": "Single Bullet Reload",
+      "answer": "On weapons with manual reloading, you can load a single shell into the weapon and fire in the same combat round, however that combat action will incur a penalty die. Cost: +1 Penalty die for combat roll."
+    },
+
+    {
+      "id": "dodge_melee",
+      "keywords": ["dodge melee", "evade melee", "side-step blade"],
+      "title": "Dodge Melee — Skill: Dodge",
+      "answer": "MELEE ATTACKS ONLY. Dodge an attacker's melee attack or combat maneuver using an opposed dodge skill check. A defender's dodge check is an opposed skill roll to the attacker's fighting skill check, so it may still be possible to fail a successful dodge if the attacker rolls a higher success. In the case of a skill check draw, the success goes to the defender. If both fail their skill checks, no damage is inflicted. Cost: 1 Evasive Action."
+    },
+    {
+      "id": "fight_back",
+      "keywords": ["fight back", "counter strike", "defensive attack"],
+      "title": "Fight Back — Skill: Fighting (Brawl) / Fighting (Weapon)",
+      "answer": "MELEE ATTACKS ONLY. Fight back an attacker's melee attack or combat maneuver using an opposed Fighting skill check. A defender's fighting check is an opposed skill roll to the attacker's fighting skill check, so it may still be possible to fail a successful fight back if the attacker rolls a higher success. In the case of a skill check draw, the success goes to your attacker. If both fail their skill checks, you're both at an impasse. Critical strikes / impaling strikes do not occur on extreme successes during a fight back. Cost: 1 Evasive Action."
+    },
+    {
+      "id": "dive_for_cover",
+      "keywords": ["dive for cover", "dive aside", "drop and roll"],
+      "title": "Dive for Cover — Skill: Dodge",
+      "answer": "FIREARM ATTACKS ONLY. If you are aware they are about to be shot at, you may state before the attacker rolls their firearms check that you wish to dive for cover. Make a dodge check; if your dodge check is successful, your attacker will receive a penalty die during their firearms check to hit you. You may dive for cover in any direction and will dive at a distance equal to 1/5th of your DEX in feet. Diving for cover will automatically lose the defender their next combat round. Cost: 1 Evasive Action, next combat round. Gain: Attacker receives +1 penalty die."
+    },
+
+    {
+      "id": "mod_sprinting",
+      "keywords": ["sprinting modifier", "sprinting attacker"],
+      "title": "Sprinting (Modifier — Firearms Attacks Only)",
+      "answer": "Player is sprinting during combat round. +1 Penalty Die on shots. Trying to aim a bolt-caster while running drops your accuracy by a die — the breath isn't steady, the sight isn't level."
+    },
+    {
+      "id": "mod_player_size",
+      "keywords": ["player size modifier", "target size", "size penalty"],
+      "title": "Target Size (Modifier — Firearms Attacks Only)",
+      "answer": "Target build is -2 → +1 penalty die. Target build is +4 → +1 bonus die. Smaller targets are harder to hit; larger targets are easier. Build is the target's racial baseline plus armor bulk."
+    },
+    {
+      "id": "mod_attacker_range",
+      "keywords": ["attacker range modifier", "target range", "range penalty"],
+      "title": "Target Range (Modifier — Firearms Attacks Only)",
+      "answer": "Target distance is x2 to x4 weapon range: Hard difficulty roll. Beyond x4: Extreme difficulty roll. Bolt-casters drop sharply outside the band they were tuned for."
+    },
+    {
+      "id": "mod_player_armour",
+      "keywords": ["player armour modifier", "target armour", "armour reduction"],
+      "title": "Target Armour (Modifier)",
+      "answer": "Enemy is armoured. Damage taken is reduced by armour. Wired engine-side: aggregateArmor sums every armor piece's AC bonus and resistance list, applied automatically on every incoming hit."
+    },
+    {
+      "id": "mod_fire_into_melee",
+      "keywords": ["fire into melee modifier", "friendly fire"],
+      "title": "Fire Into Melee (Modifier — Firearms Attacks Only)",
+      "answer": "Target is engaged in melee combat with an ally. +1 penalty die, friendly fire on fumble. Putting a bolt through a fight risks hitting the wrong silhouette on a bad roll."
+    },
+    {
+      "id": "mod_overwhelmed",
+      "keywords": ["overwhelmed modifier", "outnumbered penalty"],
+      "title": "Overwhelmed (Modifier — Melee Attacks Only)",
+      "answer": "Attacked more than once in a single round. +1 Penalty Die on evasive actions. Multiple attackers strip your ability to defend cleanly — pick which blow gets your full attention, eat the rest."
+    },
+    {
+      "id": "mod_surprise_attack",
+      "keywords": ["surprise attack modifier", "ambush bonus"],
+      "title": "Surprise Attack (Modifier — Firearms Attacks Only)",
+      "answer": "Target does not anticipate attack. +1 Bonus Die. The 'ambush_strike' enemy trait implements this engine-side — enemies with that trait get +2 on their first attack of an encounter. (The melee/evasive card variant gives Automatic success OR +1 Bonus Die.)"
+    },
+    {
+      "id": "mod_impaling_strike",
+      "keywords": ["impaling strike modifier", "impaling damage"],
+      "title": "Impaling Strike (Modifier)",
+      "answer": "Roll Extreme Success with firearm: Full Damage + Damage Roll. (Melee variant: Opponent rolls Extreme Success with edged weapon. Full Damage + Full DB + Damage Roll.) Bolt-casters and edged melee can both impale; bludgeoning weapons cannot. Engine critical hits deliver max-die + damage roll."
+    },
+    {
+      "id": "mod_action_fumble",
+      "keywords": ["action fumble", "fumble", "critical fail"],
+      "title": "Action Fumble (Modifier)",
+      "answer": "Roll 96+ (if skill below 50) or 100 (if skill above 50). Failure with unintended consequences — your bolt-caster jams, your blade slips through your guard, your maneuver puts you on the ground. Engine equivalent: natural 1 on a d20 attack roll lands the auto-miss path AND can chip durability on the weapon you used."
+    },
+    {
+      "id": "mod_fast_moving_target",
+      "keywords": ["fast moving target", "moving target modifier"],
+      "title": "Fast-Moving Target (Modifier — Firearms Attacks Only)",
+      "answer": "Target is sprinting (MOV 8+). +1 Penalty Die on shots. Putting a bolt into something at a full run is the same problem as shooting from one — extra die against you."
+    },
+    {
+      "id": "mod_target_dive",
+      "keywords": ["target dive modifier", "dive penalty"],
+      "title": "Target Dive (Modifier — Firearms Attacks Only)",
+      "answer": "Target dives for cover and makes a successful dodge roll. +1 Penalty Die on shots. The dive succeeded — your bolt is going wider than the silhouette you aimed at."
+    },
+    {
+      "id": "mod_in_cover",
+      "keywords": ["in cover modifier", "cover penalty"],
+      "title": "In Cover (Modifier — Firearms Attacks Only)",
+      "answer": "Target is in partial / full cover. Partial: +1 Penalty Die on shots. Full: unable to hit. Find an angle, take the Penalty Die, or wait them out — those are your three options."
+    },
+    {
+      "id": "mod_weapon_malfunction",
+      "keywords": ["weapon malfunction", "jam", "fumble firearm"],
+      "title": "Weapon Malfunction (Modifier — Firearms)",
+      "answer": "Roll 96+ (if skill below 50) or 100 (if skill above 50). Weapon malfunction or other consequence. Bolt-caster jam, magazine flips, runecaster overheats — the shot doesn't land and your next action is fixing what just broke."
+    },
+
+    {
+      "id": "bolt_caster",
+      "keywords": ["bolt-caster", "bolt caster", "bolt-casters", "tartaria firearm", "tartarian firearm"],
+      "title": "Bolt-Caster",
+      "answer": "Tartaria's analogue of a firearm. A spring-loaded carbine that fires Aether-tempered bolts, mud-resistant, single-action by default with full-auto variants in Reclaimer / Forgotten Order hands. All firearms-card actions (Fire Weapon, Quick Fire, Aim, Point Blank, Multiple Shot, Fire Automatic, Reload, Dive for Cover) apply to bolt-casters in our engine — they are not muskets, they are not lasers, they are bolt-casters."
+    },
+
+    {
+      "id": "capitals",
+      "keywords": ["capitals", "capital cities", "lost capitals", "lost capital", "9 capitals", "nine capitals", "the capitals", "capitol cities", "capitol coties"],
+      "title": "The Nine Lost Capitals",
+      "answer": "Nine pre-Flood Tartarian seats, each holding one of the nine Cores that powered the empire's grid: Asgardar (spire), Samarran (timing), Nimari (shielding), Drakova (reserve), Voronov (regulation), Karok-Sa (sealing), Yuldra-Tul (vigil), Ostragar (cadence), Iskan-Veil (masking). Visit each, perform your faction's gate verb, defeat the Core Guardian, and carry the Core to the Mud Flood Nexus."
+    },
+    {
+      "id": "cap_asgardar",
+      "keywords": ["asgardar", "asgard", "asgardar core", "spire capital", "grand spire"],
+      "title": "Asgardar",
+      "answer": "Western Lost Capital, ancient seat of Tartarian power. Home of the Grand Spire of Etheria. The Asgardar Core regulates the spire-channel. Guardian: Sentinel-Priest Vaelka."
+    },
+    {
+      "id": "cap_samarran",
+      "keywords": ["samarran", "samarran core"],
+      "title": "Samarran",
+      "answer": "Western-band Lost Capital, the metronome of the empire. The Samarran Core keeps the Engine's time. Guardian: Heir Atalan-Drowned."
+    },
+    {
+      "id": "cap_nimari",
+      "keywords": ["nimari", "nimari core"],
+      "title": "Nimari",
+      "answer": "Central Lost Capital. Half-swallowed by mud. The Nimari Core is the shielding seat. Guardian: Iron Litany Brother Konrad."
+    },
+    {
+      "id": "cap_drakova",
+      "keywords": ["drakova", "drakova core"],
+      "title": "Drakova",
+      "answer": "Eastern Lost Capital, matriarchal seat. The Drakova Core is the Engine's reserve. Guardian: Mother Drakovna."
+    },
+    {
+      "id": "cap_voronov",
+      "keywords": ["voronov", "voronov core"],
+      "title": "Voronov",
+      "answer": "Far-eastern Lost Capital. The Voronov Core is the regulator — the master tuning seat. Guardian: the Voronov-Beneath High Cantor."
+    },
+    {
+      "id": "cap_karok_sa",
+      "keywords": ["karok-sa", "karok sa", "karok-sa core"],
+      "title": "Karok-Sa",
+      "answer": "Southern Lost Capital, the Forgotten Order's ritual seat. Halls of binding-sigils in black basalt. The Karok-Sa Core is the binding seat — locks the Engine's frame closed once it spins up. Guardian: Sealwarden Tobiel."
+    },
+    {
+      "id": "cap_yuldra_tul",
+      "keywords": ["yuldra-tul", "yuldra tul", "yuldra", "yuldra-tul core"],
+      "title": "Yuldra-Tul",
+      "answer": "Northeastern mountain Lost Capital. Frost-wreathed, the gate-city to the Giants' tombs. The Yuldra-Tul Core is the Engine's coolant. Guardian: Hierophant Mara-of-Yuldra."
+    },
+    {
+      "id": "cap_ostragar",
+      "keywords": ["ostragar", "ostragar core"],
+      "title": "Ostragar",
+      "answer": "Eastern wetland Lost Capital, the Eternal Dynasty's river city. Half-submerged in slow current. The Ostragar Core sets the Engine's cadence. Guardian: Riverbinder Ostros."
+    },
+    {
+      "id": "cap_iskan_veil",
+      "keywords": ["iskan-veil", "iskan veil", "iskan", "veiled capital", "iskan-veil core"],
+      "title": "Iskan-Veil",
+      "answer": "Far-northwestern Lost Capital, the Conspiracy Architects' hidden city. A maze of false doors. The Iskan-Veil Core is the masking seat — hides the Engine from scrying. Guardian: Veilkeeper Inarra."
+    },
+    {
+      "id": "core_guardians",
+      "keywords": ["core guardian", "core guardians", "guardian", "guardians", "aether-born order", "aether born order", "aether-born"],
+      "title": "The Aether-Born Order",
+      "answer": "A non-playable sub-faction — a semi-religious order dedicated to guarding the nine Tartarian Cores that keep the buried cities' grid alive. Each Capital has its own Guardian (a former high priest, kept living by the Core they swore to protect). To them, taking a Core is sacrilege. Flee freely and the Guardian fully restores; you have to win the fight in one sitting."
+    },
+    {
+      "id": "mud_flood_nexus",
+      "keywords": ["mud flood nexus", "nexus", "the nexus"],
+      "title": "Mud Flood Nexus",
+      "answer": "The empire-killer site. The original Aethercraft engine that failed and drowned Tartaria when its nine regulator Cores went out of sync. Reachable via the Endless Stair, gated on the player carrying all nine Cores. At the Nexus you make the Choice: SEAL, UNLEASH, or PRESERVE."
+    }
+  ]
+}

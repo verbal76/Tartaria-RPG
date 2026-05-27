@@ -1,0 +1,394 @@
+{
+  "mechanics": [
+    {
+      "id": "advantage",
+      "term": "Advantage",
+      "definition": "A condition where the PC rolling the dice also rolls an additional 1d6. This can be assigned in many ways."
+    },
+    {
+      "id": "disadvantage",
+      "term": "Disadvantage",
+      "definition": "Similar to Advantage, this term applies to dice rolls; this condition means that the PC rolling uses a 1d10 and a 1d6 instead of a 1d20. This effectively downgrades your point count total from a possible 20 to a 16."
+    },
+    {
+      "id": "arbiter_difficulty_roll",
+      "term": "Arbiter difficulty roll",
+      "definition": "The roll to try to beat the difficulty level assigned to a task by the Arbiter based on their chart. They consider your skills, abilities, and the current situation when assigning a difficulty level."
+    },
+    {
+      "id": "even_odd_roll",
+      "term": "Even/Odd Roll",
+      "definition": "A 1d6 roll used as a 50/50 chance roll. Even is always the best or positive outcome; odd is always the worst or negative. The Arbiter can assign these as a chance roll for odd requests or can be applied by items or rules. A coin may be used for this purpose as well."
+    },
+    {
+      "id": "max_roll",
+      "term": "Max Roll",
+      "definition": "When you roll a maximum dice amount on your damage roll (not your attack roll). This is not a critical hit. Tartaria Prima does not have a crit."
+    },
+    {
+      "id": "faction_points",
+      "term": "Faction Points (FP)",
+      "definition": "A game mechanic representing loyalty to specific factions, earned by completing faction-specific tasks. FP can be exchanged for exclusive gear, access to restricted areas, or new abilities within that faction. Tracked in-game as faction standing."
+    },
+    {
+      "id": "blinded",
+      "term": "Blinded",
+      "definition": "Affected players and NPCs cannot see for 2 turns and cannot complete any tasks needing eyesight. At the beginning of the third turn, they roll a 1d6 for an even/odd roll. If odd, they roll for a disadvantage for one turn, then return to normal. If they roll even, they return to normal on that turn."
+    },
+    {
+      "id": "ignite",
+      "term": "Ignite",
+      "definition": "When caused, ignites whatever item it is used on; it is engulfed in flames and continues to burn until extinguished. Ignite causes burn damage to start."
+    }
+  ],
+  "lore_terms": [
+    {
+      "id": "aetherkin",
+      "term": "Aetherkin",
+      "definition": "The Ether-infused undead of Tartaria, buried by the Great Mud Flood and trapped in an ethereal plane of peace. When the Aetherstone mud encasing them is disturbed, they reawaken with powerful Etheric abilities, emerging hostile to all intruders who threaten their longed-for rest."
+    },
+    {
+      "id": "aetherstone",
+      "term": "Aetherstone",
+      "definition": "The hardened, impenetrable form of mud that encased Tartarian cities after the Mud Flood. Aetherstone is extremely durable and resistant to excavation due to its Etheric properties."
+    },
+    {
+      "id": "ancient_mud_golems",
+      "term": "Ancient Mud Golems",
+      "definition": "Guardians formed from Ether-infused mud surrounding a Tartarian citizen unable to make it to safety during the flood, believed to protect Tartarian ruins and artifacts. Their ability to blend with the mud makes them nearly invisible until provoked."
+    },
+    {
+      "id": "architectural_sorcery",
+      "term": "Architectural Sorcery",
+      "definition": "The unique Tartarian practice of blending engineering with Aetheric principles to create structures that channel Etheric Power. Examples include self-repairing buildings and defenses that create illusions or repel intruders."
+    },
+    {
+      "id": "etheric_anomalies",
+      "term": "Etheric Anomalies",
+      "definition": "Disturbances caused by residual Etheric energy in the Mud Seas and other Tartarian ruins, leading to magnetic field fluctuations, disorienting time effects, and phenomena like etheric lightning and hallucinations."
+    },
+    {
+      "id": "etheric_guardians",
+      "term": "Etheric Guardians",
+      "definition": "Powerful automatons of varying sizes that protect Tartarian locations. These machines, from drones to towering war constructs, were programmed to defend important sites with lethal precision."
+    },
+    {
+      "id": "etheric_ruins",
+      "term": "Etheric Ruins",
+      "definition": "Locations with dense Etheric energy from Tartarian structures, where time and space distort. Many Etheric Ruins contain valuable relics, ghostly apparitions, and unpredictable energy phenomena."
+    },
+    {
+      "id": "etheric_titan",
+      "term": "Etheric Titan",
+      "definition": "A massive construct designed to protect Tartarian sites from intruders, considered a final challenge for those who attempt to activate or deactivate key Tartarian systems."
+    },
+    {
+      "id": "mold_ether",
+      "term": "Mold Ether",
+      "definition": "A Tartarian spell used to repair, manipulate, or redirect Etheric relics. Users of this spell need a high Arcana skill to control or restore ancient Tartarian devices safely."
+    },
+    {
+      "id": "mud_flood",
+      "term": "Mud Flood",
+      "definition": "The catastrophic event that buried Tartaria in Ether-charged mud, encasing cities and technology beneath impenetrable Aetherstone. Triggered by a malfunction in Etheric Power experiments, it led to Tartaria's fall and the rise of factions trying to control its legacy."
+    },
+    {
+      "id": "mud_golems",
+      "term": "Mud Golems",
+      "definition": "Etheric constructs made from mud, created either by Mud Magic or failed Mud Tech experiments. These beings are immensely strong but unpredictable, sometimes turning on their creators."
+    },
+    {
+      "id": "mud_magic",
+      "term": "Mud Magic",
+      "definition": "A primitive form of energy manipulation practiced by those in contact with Etheric-charged mud, used to control terrain, heal, or create Mud Golems. It carries physical and mental risks for practitioners."
+    },
+    {
+      "id": "mud_tech",
+      "term": "Mud Tech",
+      "definition": "A crude adaptation of Etheric technology derived from the resources found in Etheric-charged mud. Its use is dangerous, with unstable properties that often backfire or malfunction."
+    },
+    {
+      "id": "relic_trade",
+      "term": "Relic Trade",
+      "definition": "The black-market economy surrounding the sale of Tartarian artifacts, especially those tied to Etheric Power. A high-stakes trade dominated by factions like the Reclaimers Guild and opposed by the Mud Monarchs and Forgotten Order."
+    },
+    {
+      "id": "relic_trade_economy",
+      "term": "Relic Trade Economy",
+      "definition": "A thriving black market for Tartarian relics. Common relics have minor abilities, while rarer artifacts, such as those containing Etheric energy, can command enormous prices due to their power and instability."
+    },
+    {
+      "id": "second_mud_flood",
+      "term": "Second Mud Flood",
+      "definition": "A feared second cataclysm theorized by some factions. Revising or misusing Etheric technology, environmental shifts, or cosmic disturbances could trigger another disaster like the original Mud Flood."
+    },
+    {
+      "id": "tartarian_obelisk",
+      "term": "Tartarian Obelisk",
+      "definition": "An Etheric artifact that emits an Etheric energy field within arm's reach. It can give an advantage on up to three creatures once per long rest, but if damaged, it may release a destructive Etheric blast."
+    },
+    {
+      "id": "the_entombed",
+      "term": "The Entombed",
+      "definition": "Tartarians who died sealed in their homes during the Great Mud Flood, now uncovered by the True Tartarians as they reclaim underground spaces. Treated with reverence, their bones are reburied on shelves lining thousands of miles of tunnels, serving as solemn reminders of Tartaria's lost legacy."
+    },
+    {
+      "id": "unknowing_masses",
+      "term": "Unknowing Masses",
+      "definition": "The general population, unaware of Tartaria's history or the existence of Etheric technology. Their ignorance is maintained by factions like the Mud Monarchs and Conspiracy Architects for social control."
+    },
+    {
+      "id": "architects_key",
+      "term": "Architect's Key",
+      "definition": "A small but powerful Tartarian relic that can unlock ancient Tartarian doors and machines."
+    },
+    {
+      "id": "architectural_sentinels",
+      "term": "Architectural Sentinels",
+      "definition": "Semi-conscious Aetheric-powered machines built by the Tartarian Giants to guard their cities. Many still patrol the buried ruins, learning and adapting across centuries; some have developed quirks from prolonged Aetherstone exposure."
+    },
+    {
+      "id": "aethercraft",
+      "term": "Aethercraft",
+      "definition": "The magic system developed by the True Tartarians during their underground exile. Practitioners draw on Aetherstone to shape earth and stone, construct temporary golems, and mend wounds. Heavy use leaves the caster scarred in body or mind."
+    }
+  ],
+  "factions": [
+    {
+      "id": "conspiracy_architects",
+      "term": "Conspiracy Architects",
+      "definition": "A covert cabal focused on protecting humanity from the dangers of Etheric technology by suppressing knowledge of Tartaria. They control global narratives to keep the Unknowing Masses ignorant of Tartaria's existence. Allied with the Mud Monarchs."
+    },
+    {
+      "id": "forgotten_order",
+      "term": "Forgotten Order",
+      "definition": "A secretive group of Tartarian scholars and engineers seeking to revive Etheric Power for humanity's benefit. Often opposed by the Mud Monarchs, they conduct covert operations to rediscover Tartaria's lost knowledge."
+    },
+    {
+      "id": "mud_monarchs",
+      "term": "Mud Monarchs",
+      "definition": "A global faction of survivors from Tartaria's royal bloodlines who control the few remaining Etheric technologies. They suppress knowledge of Tartaria, fearing the loss of their influence over modern society."
+    },
+    {
+      "id": "reclaimers_guild",
+      "term": "Reclaimers Guild",
+      "definition": "A network of treasure hunters and scavengers who sell Tartarian relics on the black market. Although not aligned with any faction, they clash with the Mud Monarchs and the Forgotten Order over control of valuable artifacts."
+    },
+    {
+      "id": "servants_of_giants",
+      "term": "Servants of the Giants",
+      "definition": "A religious faction that venerates Tartarian Giants, believing in their eventual return to restore Tartaria. They conduct rituals at Tartarian ruins, hoping to awaken the giants and reclaim the lost empire."
+    },
+    {
+      "id": "stone_builders",
+      "term": "Stone Builders",
+      "definition": "A hybrid religious-scientific group that studies Tartarian architecture as a divine and technological achievement, striving to replicate the secrets of Architectural Sorcery for a new era."
+    },
+    {
+      "id": "tartarian_revivalists",
+      "term": "Tartarian Revivalists",
+      "definition": "A radical faction intent on restoring Tartaria at any cost, even if it means triggering another cataclysm like the Mud Flood. They are dedicated to reactivating Etheric Power systems and achieving Tartaria's former glory. Led by Sasha Ironheart."
+    }
+  ],
+  "important_people": [
+    {
+      "id": "elior_zalmar",
+      "term": "Elior Zalmar",
+      "definition": "A Tartarian philosopher-scientist whose pioneering research on Etheric frequency resonance and experiments with the Etheric Engine in Thametan's Tower led to the catastrophic Great Mud Flood, which ultimately buried much of Tartaria."
+    },
+    {
+      "id": "harlan_moore",
+      "term": "Professor Harlan Moore",
+      "definition": "A historian obsessed with uncovering Tartaria's secrets, using any means necessary to further his studies. Known for his willingness to betray allies if it brings him closer to Tartaria's lost knowledge."
+    },
+    {
+      "id": "sasha_ironheart",
+      "term": "Sasha Ironheart",
+      "definition": "Leader of the Tartarian Revivalists, who believes that reviving the Tartarian Giants could be humanity's salvation. Her dedication and fervor make her a formidable and occasionally dangerous figure."
+    },
+    {
+      "id": "drake_volkov",
+      "term": "Drake Volkov",
+      "definition": "A seasoned mercenary hired to protect Tartarian expeditions. Known for a murky past and unpredictable loyalty, Volkov often sways between factions based on the rewards offered."
+    },
+    {
+      "id": "ivy_solis",
+      "term": "Ivy Solis",
+      "definition": "A treasure hunter fascinated by Tartarian relics, whose loyalty is often unpredictable and driven by the value of her discoveries."
+    },
+    {
+      "id": "lucius_kincaid",
+      "term": "Dr. Lucius Kincaid",
+      "definition": "A reclusive and enigmatic sponsor of expeditions who supplies ancient maps and resources to those willing to seek Tartaria's lost secrets. His true motives remain hidden, making him an ambiguous ally."
+    }
+  ],
+  "important_places": [
+    {
+      "id": "asgardar",
+      "term": "Asgardar",
+      "definition": "The ancient capital city of Tartaria, home to the Grand Spire of Etheria, a towering structure that once channeled Etheric Power from cosmic sources into the city's energy grid."
+    },
+    {
+      "id": "grand_spire_of_etheria",
+      "term": "Grand Spire of Etheria",
+      "definition": "A monumental tower in Asgardar, known for drawing Etheric energy from the celestial realms; considered one of Tartaria's most powerful Etheric structures."
+    },
+    {
+      "id": "samarran",
+      "term": "Samarran",
+      "definition": "A prominent Tartarian city and an experimental hub where Thametan's Tower was built to advance research on Aether."
+    },
+    {
+      "id": "thametans_tower",
+      "term": "Thametan's Tower",
+      "definition": "An experimental tower in Samarran containing the Etheric Engine, a device created to push the boundaries of Etheric Power. Its malfunction led to the Great Mud Flood, a disaster that buried Tartaria in Aetherstone mud."
+    },
+    {
+      "id": "voronov",
+      "term": "Voronov",
+      "definition": "A significant Tartarian city deeply affected by the Great Mud Flood, rumored to contain hidden remnants of Tartaria's ancient Etheric technology."
+    },
+    {
+      "id": "nimari",
+      "term": "Nimari",
+      "definition": "A partially buried city in Tartaria, home to the Red Tower, rumored to house one of the last operational Etheric Cores."
+    },
+    {
+      "id": "red_tower_of_nimari",
+      "term": "Red Tower of Nimari",
+      "definition": "A mysterious structure in Nimari, believed to contain a functional Etheric Core, making it a critical location for factions seeking to revive Tartarian technology."
+    },
+    {
+      "id": "varakush",
+      "term": "Varakush",
+      "definition": "A hidden base of the Forgotten Order, located on the edge of the Great Tartary Plains. It is a stronghold for those dedicated to recovering Tartaria's lost Etheric knowledge."
+    },
+    {
+      "id": "great_tartary_plains",
+      "term": "Great Tartary Plains",
+      "definition": "A vast, Etheric-charged expanse covering ancient Tartaria, known for unpredictable phenomena like magnetic anomalies, Etheric storms, and temporal distortions."
+    },
+    {
+      "id": "drakova",
+      "term": "Drakova",
+      "definition": "A legendary Lost Capital of Tartaria, hidden beneath layers of Aetherstone mud and believed to hold a powerful Etheric Core, drawing explorers and factions alike."
+    },
+    {
+      "id": "obsidian_pillars",
+      "term": "Obsidian Pillars",
+      "definition": "A formation of black, magnetically charged spires that rise from the mud near a former Tartarian observatory. The pillars disrupt technology, and their location suggests they may have once been part of a cosmic energy center."
+    },
+    {
+      "id": "endless_stair",
+      "term": "Endless Stair",
+      "definition": "A vast staircase descending into the mud, its endpoint completely submerged. Believed to lead to one of Tartaria's greatest cities, but Etheric disturbances prevent explorers from reaching its depths."
+    },
+    {
+      "id": "zharaks_teeth",
+      "term": "Zharak's Teeth",
+      "definition": "A group of sharp, towering spires jutting from shallow waters, attracting explorers with their architectural mysteries. The area is home to dangerous mud sirens which protect the ruins from intruders."
+    },
+    {
+      "id": "sinking_cathedral",
+      "term": "Sinking Cathedral",
+      "definition": "The partially submerged steeple of a grand Tartarian cathedral. Said to contain a powerful Tartarian artifact, but no explorers who have entered have returned."
+    },
+    {
+      "id": "cradle_of_dusk",
+      "term": "Cradle of Dusk",
+      "definition": "A pocket within the Mud Seas where the sky glows with residual Etheric energy. The area is filled with wrecked ships and frozen statues of former crew members, an eerie reminder of the power of Etheric storms."
+    },
+    {
+      "id": "mud_seas",
+      "term": "Mud Seas",
+      "definition": "Treacherous shallow, murky waters covering Tartarian ruins, formed after the Great Mud Flood. Etheric energy within the mud creates disorienting magnetic distortions and dangerous storms, making navigation treacherous."
+    },
+    {
+      "id": "giant_vault",
+      "term": "The Giant Vault",
+      "definition": "An ancient Tartarian vault believed to hold the last resting place of the Tartarian Giants. Legends claim it contains relics of immense power, but it is unclear if the giants within are protectors or a dormant threat."
+    },
+    {
+      "id": "mud_flood_nexus",
+      "term": "Mud Flood Nexus",
+      "definition": "The subterranean control center believed to have regulated the disastrous Great Mud Flood. Restoring or deactivating this site's systems could influence the stability of Etheric energy, making it a focal point for factional conflicts."
+    },
+    {
+      "id": "etheric_chamber",
+      "term": "Etheric Chamber",
+      "definition": "The primary power source and control hub for Tartarian technology. Hidden deep within Tartarian ruins, the Etheric Chamber contains machinery to control Etheric energy, heavily guarded by ancient automatons and Etheric traps."
+    },
+    {
+      "id": "tartarian_outskirts",
+      "term": "Tartarian Outskirts",
+      "definition": "The regions surrounding Tartarian cities, littered with defenses, dormant traps, and relics of Etheric technology. Explorers often find clues about Tartaria's inner workings here, but must navigate Etheric anomalies and ancient defense systems."
+    },
+    {
+      "id": "buried_cities",
+      "term": "The Buried Cities",
+      "definition": "Formerly vibrant Tartarian cities now sealed beneath Aetherstone mud. These cities hold Tartaria's most powerful secrets, preserved by impenetrable mud that resists excavation, where Etheric energy creates time distortions and magnetic anomalies."
+    }
+  ],
+  "timeline_events": [
+    {
+      "id": "lost_covenant_1280",
+      "year": 1280,
+      "name": "The Lost Covenant of the Giants",
+      "summary": "Tartarian Giants refuse to share Aetheric secrets and retreat to the Ural Mountains. The schism weakens the empire's leadership."
+    },
+    {
+      "id": "etheric_conflux_war_1505",
+      "year": 1505,
+      "name": "The Etheric Conflux War",
+      "summary": "A critical Conflux malfunctions near the Caspian Sea. Rebels and rogue nobles try to seize the surge. Whole regions are cut off from the Etheric grid — the first visible cracks in Tartarian dominance."
+    },
+    {
+      "id": "great_mud_flood_1567",
+      "year": 1567,
+      "name": "Fall of the Tartarian Capital",
+      "summary": "Thametan's Etheric Engine pushes Aetheric resonance past its envelope. Mud charged with Aether rises through the empire and entombs it. Surviving nobles flee to the highest spires and become the Mud Monarchs."
+    },
+    {
+      "id": "aetheric_accords_1603",
+      "year": 1603,
+      "name": "The Aetheric Accords",
+      "summary": "Tartarian noble families sign accords in the Urals to safeguard surviving Etheric technology. The Mud Monarchs consolidate from this treaty."
+    },
+    {
+      "id": "reclaimers_uprising_1645",
+      "year": 1645,
+      "name": "The Reclaimers' Uprising",
+      "summary": "Beneath Paris, Reclaimers strike a violent compromise with the Forgotten Order and Mud Monarchs. The Reclaimers Guild is formalized as the black market in Tartarian relics."
+    },
+    {
+      "id": "northern_plague_1682",
+      "year": 1682,
+      "name": "The Northern Plague (Etheric Rot)",
+      "summary": "A plague linked to malfunctioning relics breaks out in Siberia. The Mud Monarchs attempt containment; entire underground cities are abandoned and lost."
+    },
+    {
+      "id": "munich_coup_1778",
+      "year": 1778,
+      "name": "The Munich Coup",
+      "summary": "The Conspiracy Architects split from the Mud Monarchs, seizing relics and tightening control over what the world is allowed to remember about Tartaria."
+    },
+    {
+      "id": "great_purge_1814",
+      "year": 1814,
+      "name": "The Great Purge of Forgotten Knowledge",
+      "summary": "Conspiracy Architects and allied governments destroy Tartarian archives beneath Istanbul. The historical record of the empire is wiped to near-myth."
+    },
+    {
+      "id": "antarctic_pulse_1973",
+      "year": 1973,
+      "name": "The Antarctic Etheric Pulse",
+      "summary": "An Etheric pulse beneath the Antarctic ice draws a Forgotten Order expedition. Sabotage and discovery both follow; the existence of a global Etheric network beneath Tartaria's outposts is hinted at."
+    },
+    {
+      "id": "singapore_seizure_2023",
+      "year": 2023,
+      "name": "The Singapore Relic Seizure",
+      "summary": "Reclaimers outmaneuver both the Mud Monarchs and the Forgotten Order to capture a major Tartarian relic cache. Relic-hunting interest spikes across Southeast Asia."
+    }
+  ]
+}

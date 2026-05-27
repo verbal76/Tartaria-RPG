@@ -1,0 +1,112 @@
+[
+  {
+    "id": "mold_ether",
+    "name": "Mold Ether",
+    "tier": "Common",
+    "intelligenceRequired": 6,
+    "description": "Repair, manipulate, or redirect Aetheric relics. Requires a steady hand and high Schooling.",
+    "damage": null,
+    "effect": "Repair, recharge, or redirect Aether flow in a relic.",
+    "tags": ["utility", "tartarian", "repair"],
+    "source": "manual"
+  },
+  {
+    "id": "aether_bolt",
+    "name": "Aether Bolt",
+    "tier": "Common",
+    "intelligenceRequired": 6,
+    "description": "A focused lance of Aetheric force. The runecaster grows warm in the hand.",
+    "damage": "1d6 Aetheric",
+    "effect": "Single-target ranged attack.",
+    "tags": ["damage", "ranged", "aetheric"],
+    "source": "manual"
+  },
+  {
+    "id": "aether_shield",
+    "name": "Aether Shield",
+    "tier": "Uncommon",
+    "intelligenceRequired": 9,
+    "description": "Conjure a translucent barrier of Aether that absorbs incoming force.",
+    "damage": null,
+    "effect": "+3 AC for 3 rounds.",
+    "tags": ["defense", "shield", "aetheric"],
+    "source": "manual"
+  },
+  {
+    "id": "aether_lance",
+    "name": "Aether Lance",
+    "tier": "Uncommon",
+    "intelligenceRequired": 9,
+    "description": "A heavier strike than Aether Bolt, capable of cracking Aetherstone.",
+    "damage": "2d6 Aetheric",
+    "effect": "Single-target ranged attack; bonus damage vs Aetherstone constructs.",
+    "tags": ["damage", "ranged", "aetheric"],
+    "source": "manual"
+  },
+  {
+    "id": "shape_aetherstone",
+    "name": "Shape Aetherstone",
+    "tier": "Uncommon",
+    "intelligenceRequired": 9,
+    "description": "Form, slow, or reshape Aetherstone around you. The core Aethercraft of the True Tartarians.",
+    "damage": null,
+    "effect": "Move, mold, or harden Aetherstone in arm's reach.",
+    "tags": ["utility", "aethercraft", "true_tartarian"],
+    "source": "manual"
+  },
+  {
+    "id": "etheric_pulse",
+    "name": "Etheric Pulse",
+    "tier": "Rare",
+    "intelligenceRequired": 12,
+    "description": "Send a shockwave of Aetheric force outward. Friend or foe, it knocks them back.",
+    "damage": "2d10 Aetheric",
+    "effect": "AoE close-range knockback; technology disabled briefly.",
+    "tags": ["damage", "aoe", "aetheric"],
+    "source": "manual"
+  },
+  {
+    "id": "temporal_slip",
+    "name": "Temporal Slip",
+    "tier": "Rare",
+    "intelligenceRequired": 14,
+    "description": "Step a half-second sideways through time. To onlookers, you simply weren't there.",
+    "damage": null,
+    "effect": "Once per encounter, dodge a single incoming attack outright.",
+    "tags": ["temporal", "evasion", "aetheric"],
+    "source": "manual"
+  },
+  {
+    "id": "summon_mud_arm",
+    "name": "Summon Mud Arm",
+    "tier": "Rare",
+    "intelligenceRequired": 12,
+    "description": "A heavy arm of Aetherstone rises from the ground at your command.",
+    "damage": "2d6",
+    "effect": "Conjure a temporary construct limb for grappling, blocking, or smashing.",
+    "tags": ["aethercraft", "construct", "utility"],
+    "source": "manual"
+  },
+  {
+    "id": "veil_of_ether",
+    "name": "Veil of Ether",
+    "tier": "Legendary",
+    "intelligenceRequired": 16,
+    "description": "Wrap yourself in living Aether. You become hard to perceive, harder to harm.",
+    "damage": null,
+    "effect": "+5 AC and disadvantage against you for 1d6 rounds. Costs 1d6 self-damage.",
+    "tags": ["legendary", "stealth", "defense", "aetheric"],
+    "source": "manual"
+  },
+  {
+    "id": "resonance_cascade",
+    "name": "Resonance Cascade",
+    "tier": "Legendary",
+    "intelligenceRequired": 18,
+    "description": "Zalmar's last spell. They tell you not to learn it. They are right.",
+    "damage": "5d10 Aetheric (caster takes 1d10)",
+    "effect": "Massive AoE Aether burst. Risk of permanent Corruption gain.",
+    "tags": ["legendary", "aoe", "self_damage", "forbidden"],
+    "source": "manual"
+  }
+]

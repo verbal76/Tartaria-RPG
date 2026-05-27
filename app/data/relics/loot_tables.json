@@ -1,0 +1,1358 @@
+[
+  {
+    "name": "Rune Caster Shell (Common)",
+    "rarity": "Common",
+    "description": "A basic shell used to cast simple Aetheric powers. Limited range and power.",
+    "tcValue": 50,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Etheric Rope",
+    "rarity": "Common",
+    "description": "A rope infused with Etheric energy, useful for traversing dangerous terrain.",
+    "tcValue": 35,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Aether Goggles",
+    "rarity": "Common",
+    "description": "Basic goggles that protect the wearer from harmful Etheric sparks or dust storms.",
+    "tcValue": 40,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Dust Compass",
+    "rarity": "Common",
+    "description": "Compass resistant to Etheric distortions, ensuring reliable navigation in anomalous regions.",
+    "tcValue": 60,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Rune Engraving Kit",
+    "rarity": "Common",
+    "description": "A basic kit used to inscribe runes onto objects.",
+    "tcValue": 40,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Ancient Fragment",
+    "rarity": "Common",
+    "description": "A broken piece of Tartarian architecture, often collected as a keepsake.",
+    "tcValue": 20,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Bioluminescent Fungus",
+    "rarity": "Common",
+    "description": "A glowing fungus used by True Tartarians to light their underground homes.",
+    "tcValue": 25,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Tarnished Ether Necklace",
+    "rarity": "Common",
+    "description": "A simple necklace that hums faintly with Etheric power.",
+    "tcValue": 60,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Binding Orb",
+    "rarity": "Common",
+    "description": "A small orb used to trap Etheric energy for later use.",
+    "tcValue": 55,
+    "faction": "Eternal Dynasty",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Tartarian Map Fragment",
+    "rarity": "Common",
+    "description": "A fragment of an ancient map depicting unknown regions of Tartaria.",
+    "tcValue": 45,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Etheric Flashlight",
+    "rarity": "Common",
+    "description": "A flashlight powered by Etheric energy, illuminates areas during exploration.",
+    "tcValue": 45,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Scrap Metal",
+    "rarity": "Common",
+    "description": "Salvaged metal, useful for repairing ancient devices.",
+    "tcValue": 15,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Ancient Tools",
+    "rarity": "Common",
+    "description": "Basic tools from Tartarian ruins, still functional for minor repairs.",
+    "tcValue": 50,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Cracked Ether Lens",
+    "rarity": "Common",
+    "description": "A partially functioning Etheric lens, once part of Tartarian technology.",
+    "tcValue": 55,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Glowstone Pendant",
+    "rarity": "Common",
+    "description": "A pendant that glows faintly when near Etheric anomalies.",
+    "tcValue": 30,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Etheric Dagger",
+    "rarity": "Common",
+    "description": "A basic dagger infused with weak Etheric energy.",
+    "tcValue": 60,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Tartarian Writing Tablet",
+    "rarity": "Common",
+    "description": "An ancient slate used by Tartarian scholars for note-taking.",
+    "tcValue": 35,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Broken Sentinel Part",
+    "rarity": "Common",
+    "description": "A piece from a deactivated Sentinel, valuable to certain engineers.",
+    "tcValue": 40,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Worn Tartarian Coin",
+    "rarity": "Common",
+    "description": "A rare coin from ancient Tartaria, now mostly a collectible.",
+    "tcValue": 50,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Leatherbound Tome",
+    "rarity": "Common",
+    "description": "An old book filled with cryptic instructions, likely related to Tartarian magic.",
+    "tcValue": 35,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Ether Lamp",
+    "rarity": "Common",
+    "description": "A small lamp that runs on Etheric energy, commonly used by True Tartarians.",
+    "tcValue": 40,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Etheric Goggles",
+    "rarity": "Common",
+    "description": "Basic goggles that filter Etheric distortions.",
+    "tcValue": 60,
+    "faction": "Eternal Dynasty",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Old Relic Key",
+    "rarity": "Common",
+    "description": "A key once used to open low-level Etheric vaults.",
+    "tcValue": 45,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Cracked Ether Crystal",
+    "rarity": "Common",
+    "description": "A broken Etheric crystal, used in minor spellwork.",
+    "tcValue": 55,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Rusty Ether Lock",
+    "rarity": "Common",
+    "description": "A lock made from Ether-infused materials, resistant to tampering.",
+    "tcValue": 30,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Shattered Ether Compass",
+    "rarity": "Common",
+    "description": "A damaged Etheric compass, sometimes points to forgotten ruins.",
+    "tcValue": 35,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Etheric Chain",
+    "rarity": "Common",
+    "description": "A short chain that reacts to nearby Etheric fields.",
+    "tcValue": 50,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Etheric Gauntlet",
+    "rarity": "Common",
+    "description": "A simple gauntlet that channels low-level Etheric power.",
+    "tcValue": 55,
+    "faction": "Eternal Dynasty",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Aetherstone Dust",
+    "rarity": "Common",
+    "description": "Fine dust collected from Aetherstone, useful in minor alchemical practices.",
+    "tcValue": 25,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Etheric Insignia",
+    "rarity": "Common",
+    "description": "An insignia of an old Tartarian family, faintly resonating with energy.",
+    "tcValue": 60,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Weathered Ether Rod",
+    "rarity": "Common",
+    "description": "A rod used for basic Etheric manipulations, slightly corroded.",
+    "tcValue": 40,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Tartarian Pottery Shard",
+    "rarity": "Common",
+    "description": "A piece of ancient pottery, often found in ruins.",
+    "tcValue": 15,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Etheric Talisman",
+    "rarity": "Common",
+    "description": "A simple talisman that offers mild Etheric protection.",
+    "tcValue": 55,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Cracked Etheric Mirror",
+    "rarity": "Common",
+    "description": "A mirror that once reflected Etheric fields, now mostly shattered.",
+    "tcValue": 50,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Mud Monarch Badge",
+    "rarity": "Common",
+    "description": "An old badge, a relic from the height of the Mud Monarch's rule.",
+    "tcValue": 60,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Etheric Wand",
+    "rarity": "Common",
+    "description": "A simple wand that focuses Etheric energy, often used by apprentice spellcasters.",
+    "tcValue": 35,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Etheric Scrap",
+    "rarity": "Common",
+    "description": "Leftover Etheric material, useful in crafting.",
+    "tcValue": 40,
+    "faction": "Eternal Dynasty",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Aetherstone Pebble",
+    "rarity": "Common",
+    "description": "A small piece of Aetherstone, harmless but valuable to collectors.",
+    "tcValue": 25,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "common"
+    ]
+  },
+  {
+    "name": "Rune Caster Shell (Uncommon)",
+    "rarity": "Uncommon",
+    "description": "A more potent Rune Caster Shell capable of enhanced Etheric spellwork.",
+    "tcValue": 150,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Etheric Stabilizer",
+    "rarity": "Uncommon",
+    "description": "A device used to stabilize Etheric energy fields, preventing dangerous fluctuations.",
+    "tcValue": 240,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Mud Monarch's Pendant",
+    "rarity": "Uncommon",
+    "description": "A pendant worn by the nobility of the Mud Monarchs, which offers minor protection from Etheric harm.",
+    "tcValue": 250,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "True Tartarian Gauntlet",
+    "rarity": "Uncommon",
+    "description": "A gauntlet used by True Tartarians, reinforced with Etheric power to deflect weak magical attacks.",
+    "tcValue": 280,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Cracked Etheric Orb",
+    "rarity": "Uncommon",
+    "description": "A damaged orb that emits unstable Etheric energy, often used in alchemy or low-level spellwork.",
+    "tcValue": 200,
+    "faction": "Eternal Dynasty",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Relic Seeker's Lens",
+    "rarity": "Uncommon",
+    "description": "A lens that helps detect hidden Etheric fields in ruins, used by skilled Reclaimers.",
+    "tcValue": 275,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Tartarian Rune Inscription Kit",
+    "rarity": "Uncommon",
+    "description": "A set of tools used to engrave complex Etheric runes onto weapons or devices.",
+    "tcValue": 260,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Aetherstone Pendant",
+    "rarity": "Uncommon",
+    "description": "A pendant carved from Aetherstone, known to amplify the wearer's connection to Etheric energies.",
+    "tcValue": 290,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Etheric Thread",
+    "rarity": "Uncommon",
+    "description": "A spool of thread infused with Etheric energy, used to repair magical fabrics or enchanted objects.",
+    "tcValue": 215,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Tartarian Navigator's Compass",
+    "rarity": "Uncommon",
+    "description": "A compass that assists in navigating through Etheric storms and finding forgotten ruins.",
+    "tcValue": 300,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Whispering Aether Crystal",
+    "rarity": "Uncommon",
+    "description": "A crystal that emits faint whispers when near ancient Etheric power sources.",
+    "tcValue": 265,
+    "faction": "Eternal Dynasty",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Magnetic Ether Sphere",
+    "rarity": "Uncommon",
+    "description": "A small sphere that disrupts Etheric energy fields, often used in sabotage or defensive magic.",
+    "tcValue": 250,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Etheric Potion Vial",
+    "rarity": "Uncommon",
+    "description": "A vial designed to hold potent Etheric potions, used in alchemy and spellcasting.",
+    "tcValue": 210,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Warden's Etheric Charm",
+    "rarity": "Uncommon",
+    "description": "A charm worn by Mud Wardens to protect against the more dangerous Etheric storms in the Mud Seas.",
+    "tcValue": 225,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Tartarian Battle Horn",
+    "rarity": "Uncommon",
+    "description": "A horn that, when blown, boosts the Etheric powers of nearby allies for a short duration.",
+    "tcValue": 300,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Golem Controller Ring",
+    "rarity": "Uncommon",
+    "description": "A ring used to issue commands to Etheric golems, prized by engineers and artifact collectors alike.",
+    "tcValue": 275,
+    "faction": "Eternal Dynasty",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Aetherstone Fragment",
+    "rarity": "Uncommon",
+    "description": "A fragment of glowing Aetherstone, used in crafting or fueling ancient devices.",
+    "tcValue": 180,
+    "faction": "Eternal Dynasty",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Mud Monarch Seal",
+    "rarity": "Uncommon",
+    "description": "A golden seal once used by the Mud Monarchs to legitimize contracts.",
+    "tcValue": 200,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Etheric Battery",
+    "rarity": "Uncommon",
+    "description": "A small battery that powers Tartarian devices. Highly sought after by engineers.",
+    "tcValue": 220,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Forgotten Scroll",
+    "rarity": "Uncommon",
+    "description": "An old scroll containing diagrams of forgotten Tartarian mechanisms, useful for engineers.",
+    "tcValue": 170,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Arcane Lockbox",
+    "rarity": "Uncommon",
+    "description": "A locked box that can only be opened with knowledge of forgotten Tartarian spellwork.",
+    "tcValue": 250,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Mud Warden Amulet",
+    "rarity": "Uncommon",
+    "description": "A small amulet used by Mud Warden patrols. Grants brief protection from the Mud Seas.",
+    "tcValue": 140,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Etherium Crystal",
+    "rarity": "Uncommon",
+    "description": "A crystal capable of storing vast amounts of Etheric energy. Essential for complex Etheric constructs.",
+    "tcValue": 300,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Obsidian Knife",
+    "rarity": "Uncommon",
+    "description": "A sharp, lightweight knife made from Obsidian Pillar fragments.",
+    "tcValue": 200,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Etheric Lens",
+    "rarity": "Uncommon",
+    "description": "A lens used for Etheric research, essential for focusing on energy fields.",
+    "tcValue": 240,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Tartarian Navigator's Map",
+    "rarity": "Uncommon",
+    "description": "A map used to navigate through Tartarian cities, contains encrypted Etheric pathways.",
+    "tcValue": 280,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Vaultbreaker Staff",
+    "rarity": "Uncommon",
+    "description": "A staff capable of breaching weaker Tartarian vaults.",
+    "tcValue": 230,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Whispering Cipher",
+    "rarity": "Uncommon",
+    "description": "A cryptic device used to decipher Tartarian runes.",
+    "tcValue": 170,
+    "faction": "Eternal Dynasty",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Arcane Cipherstone",
+    "rarity": "Uncommon",
+    "description": "A stone used to protect vaults, confuses Etheric thieves.",
+    "tcValue": 160,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Etheric Cloak",
+    "rarity": "Uncommon",
+    "description": "A cloak that shields the wearer from weak Etheric pulses.",
+    "tcValue": 190,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Etheric Beacon",
+    "rarity": "Uncommon",
+    "description": "A small beacon that tracks Etheric signals over long distances.",
+    "tcValue": 225,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Rune Caster Shell (Rare)",
+    "rarity": "Rare",
+    "description": "A rare and powerful Rune Caster Shell capable of manipulating larger Etheric forces in combat or exploration.",
+    "tcValue": 500,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "True Tartarian Relic",
+    "rarity": "Rare",
+    "description": "A mysterious artifact thought to hold part of the True Tartarians' ancient culture, highly sought by collectors.",
+    "tcValue": 400,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Architectural Sentinel Core",
+    "rarity": "Rare",
+    "description": "A power core from a deactivated Sentinel, can be repurposed or sold for a high price.",
+    "tcValue": 600,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Etheric Compass",
+    "rarity": "Rare",
+    "description": "An advanced version of the Dust Compass, unaffected by even the most severe Etheric distortions.",
+    "tcValue": 700,
+    "faction": "Eternal Dynasty",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Mud Golem Shard",
+    "rarity": "Rare",
+    "description": "A shard taken from a Mud Golem, containing traces of Etheric energy. Useful for crafting or alchemy.",
+    "tcValue": 450,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Obsidian Shard",
+    "rarity": "Rare",
+    "description": "A shard from the Obsidian Pillars, highly magnetic and useful in advanced machinery.",
+    "tcValue": 850,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Fragment of the Red Tower",
+    "rarity": "Rare",
+    "description": "A relic from the infamous Red Tower, believed to house a powerful but cursed Etheric core.",
+    "tcValue": 900,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Etheric Infusion Rod",
+    "rarity": "Rare",
+    "description": "A rod capable of infusing objects with Etheric energy. Often used to recharge ancient devices.",
+    "tcValue": 750,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Tartarian Crown Fragment",
+    "rarity": "Rare",
+    "description": "A piece of an ancient royal crown, believed to have belonged to Tartaria's nobility.",
+    "tcValue": 600,
+    "faction": "Eternal Dynasty",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Automaton Circuit",
+    "rarity": "Rare",
+    "description": "A complex circuit used by Tartarian Automatons, still functional and valuable for research.",
+    "tcValue": 700,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Etheric Circuitry",
+    "rarity": "Rare",
+    "description": "Rare wiring for complex Etheric devices, required to restore advanced Tartarian machines.",
+    "tcValue": 550,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Sentinel's Ether Heart",
+    "rarity": "Rare",
+    "description": "A heart-shaped Etheric device used to power sentient Tartarian Sentinels.",
+    "tcValue": 900,
+    "faction": "Eternal Dynasty",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Aether Core Crystal",
+    "rarity": "Rare",
+    "description": "A pure Aether Core crystal that can be used to restore or activate ancient Tartarian machinery.",
+    "tcValue": 650,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Etheric War Gauntlet",
+    "rarity": "Rare",
+    "description": "A gauntlet imbued with aggressive Etheric energy, used by Tartarian soldiers.",
+    "tcValue": 800,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Whispering Vault Key",
+    "rarity": "Rare",
+    "description": "A rare key used to unlock sealed Tartarian vaults. Can only be used with specialized knowledge.",
+    "tcValue": 750,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Etheric Spyglass",
+    "rarity": "Rare",
+    "description": "A spyglass that enhances Etheric vision, allowing its user to detect hidden energy sources.",
+    "tcValue": 700,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Temporal Distortion Watch",
+    "rarity": "Rare",
+    "description": "A watch that distorts local time, giving its wearer a few extra seconds in dire moments.",
+    "tcValue": 820,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Tartarian Rune Sword",
+    "rarity": "Rare",
+    "description": "A sword engraved with Tartarian runes, which activate when Etheric energy is nearby.",
+    "tcValue": 880,
+    "faction": "Eternal Dynasty",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Leviathan Eye",
+    "rarity": "Rare",
+    "description": "A preserved eye from a Leviathan of the Mud Seas, which is said to see through Etheric storms.",
+    "tcValue": 900,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Ether Trap",
+    "rarity": "Rare",
+    "description": "A device designed to trap and contain Etheric creatures or energy beings for study or use.",
+    "tcValue": 600,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Etheric Engineer's Toolkit",
+    "rarity": "Rare",
+    "description": "A toolkit containing rare Etheric tools for repairing Tartarian machines.",
+    "tcValue": 800,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Aether Cloak of Shadows",
+    "rarity": "Rare",
+    "description": "A cloak that bends light and Etheric energy, making the wearer harder to detect in the shadows.",
+    "tcValue": 900,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Shifting Obsidian Orb",
+    "rarity": "Rare",
+    "description": "An orb that changes form based on Etheric energy fluctuations, used in alchemical research.",
+    "tcValue": 850,
+    "faction": "Eternal Dynasty",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Tartarian Blood Dagger",
+    "rarity": "Rare",
+    "description": "A dagger used in ancient Etheric rituals. It draws out the life force of Etheric entities upon contact.",
+    "tcValue": 950,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Etheric Shock Trap",
+    "rarity": "Rare",
+    "description": "A trap that releases an Etheric shockwave when triggered, designed to disable machinery or creatures.",
+    "tcValue": 800,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "rare"
+    ]
+  },
+  {
+    "name": "Mask of Tartaria's Last King",
+    "rarity": "Legendary",
+    "description": "The mask of the final king of Tartaria, believed to grant visions of the past empire's secrets.",
+    "tcValue": 5500,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Aetheric Phoenix Feather",
+    "rarity": "Legendary",
+    "description": "A mystical feather said to contain the power of rebirth, found deep within a Tartarian temple.",
+    "tcValue": 6000,
+    "faction": "Eternal Dynasty",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Wrath of the Ether Titan",
+    "rarity": "Legendary",
+    "description": "A massive hammer wielded by the Etheric Titans, capable of causing localized Etheric storms upon impact.",
+    "tcValue": 6500,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Timeworn Ether Compass",
+    "rarity": "Legendary",
+    "description": "An ancient compass that always points toward the strongest Etheric energy, said to defy time itself.",
+    "tcValue": 5200,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Heart of the Ether Dragon",
+    "rarity": "Legendary",
+    "description": "The preserved heart of a legendary Etheric dragon, radiating immense power. Can be used to fuel any device.",
+    "tcValue": 7500,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Rune Caster Shell (Legendary)",
+    "rarity": "Legendary",
+    "description": "A masterwork Rune Caster Shell, capable of controlling the most potent Etheric energies ever recorded.",
+    "tcValue": 2000,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Crown of the Last Monarch",
+    "rarity": "Legendary",
+    "description": "A crown once worn by the final ruler of the Mud Monarchs, radiating forgotten power.",
+    "tcValue": 3000,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Etheric Core",
+    "rarity": "Legendary",
+    "description": "A core used to power Tartaria's greatest machines. Its energy potential is unmatched and invaluable.",
+    "tcValue": 5000,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Leviathan Scale",
+    "rarity": "Legendary",
+    "description": "A scale from one of the massive creatures of the Mud Seas, prized for its strength and Etheric properties.",
+    "tcValue": 3500,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Sentinel Activation Code",
+    "rarity": "Legendary",
+    "description": "A rare code used to reactivate ancient Tartarian Sentinels. Extremely dangerous in the wrong hands.",
+    "tcValue": 6000,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Aetherstorm Shard",
+    "rarity": "Legendary",
+    "description": "A shard containing a miniature Etheric storm, very dangerous and highly volatile.",
+    "tcValue": 4000,
+    "faction": "Eternal Dynasty",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Etheric Tome of the Giants",
+    "rarity": "Legendary",
+    "description": "A massive tome detailing the Etheric secrets known only to Tartarian Giants.",
+    "tcValue": 2500,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Royal Etherblade",
+    "rarity": "Legendary",
+    "description": "A sword wielded by Tartarian nobility, empowered by ancient Etheric rituals.",
+    "tcValue": 3300,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Aetherlight Beacon",
+    "rarity": "Legendary",
+    "description": "A powerful beacon that calls upon Etheric forces to heal or destroy.",
+    "tcValue": 4800,
+    "faction": "Eternal Dynasty",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Cradle of Dusk Compass",
+    "rarity": "Legendary",
+    "description": "A compass that always points toward the lost capital of Tartaria.",
+    "tcValue": 5000,
+    "faction": "Reclaimers Guild",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Sentinel Commander Crest",
+    "rarity": "Legendary",
+    "description": "The badge of a Sentinel commander, capable of controlling legions of Etheric Sentinels.",
+    "tcValue": 5200,
+    "faction": "Mud Monarchs",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Primordial Ether Vial",
+    "rarity": "Legendary",
+    "description": "A vial containing raw Etheric energy, distilled from Tartarian machines of old.",
+    "tcValue": 4700,
+    "faction": "Eternal Dynasty",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Void Ether Shard",
+    "rarity": "Legendary",
+    "description": "A shard that contains an unstable pocket of void energy. It can warp reality.",
+    "tcValue": 5300,
+    "faction": "Forgotten Order",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Sovereign Ether Crown",
+    "rarity": "Legendary",
+    "description": "The crown of the first Tartarian king, believed to have ultimate control over Etheric power.",
+    "tcValue": 6000,
+    "faction": "True Tartarians",
+    "tags": [
+      "loot",
+      "relic",
+      "legendary"
+    ]
+  }
+]

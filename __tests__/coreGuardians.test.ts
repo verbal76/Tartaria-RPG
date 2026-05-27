@@ -1,0 +1,214 @@
+// Core Guardians — Aether-Born Order tests.
+//
+// Covers:
+// - Tier resolution from kill count (1..9)
+// - Spawn returns null for non-Capitals
+// - Spawn produces a boss enemy with the core_guardian trait
+// - Tier-driven AC scaling pipes through abilityPoint
+// - HP scales with player HP pool
+// - Each Capital has both a Guardian and a gear pair
+// - Detection helpers (isCoreGuardian, capitalIdFromGuardian)
+// - dropsForCapital returns a fresh weapon + armor each call
+
+import type { PlayerCharacter } from '../app/engine/types';
+import {
+  CORE_GUARDIAN_TRAIT,
+  GUARDIAN_GEAR_BY_CAPITAL,
+  GUARDIANS_BY_CAPITAL,
+  capitalIdFromGuardian,
+  dropsForCapital,
+  fleeAftermathLine,
+  hasUndefeatedGuardian,
+  isCoreGuardian,
+  spawnGuardianForCapital,
+  tierForKills,
+  totalGuardiansCount,
+} from '../app/engine/coreGuardians';
+import { LOST_CAPITAL_LOCATIONS } from '../app/engine/mainQuest';
+
+function makePlayer(overrides: Partial<PlayerCharacter> = {}): PlayerCharacter {
+  return {
+    name: 'Test',
+    raceId: 'human',
+    factionId: 'reclaimers_guild',
+    stats: {
+      strength: 10, dexterity: 10, constitution: 10, intelligence: 10, wisdom: 10, charisma: 10,
+    } as PlayerCharacter['stats'],
+    hp: 30,
+    hpMax: 30,
+    stamina: 10,
+    staminaMax: 10,
+    ac: 12,
+    tc: 0,
+    corruption: 0,
+    inventory: [],
+    factionStanding: [],
+    currentLocationId: 'asgardar',
+    activeQuests: [],
+    mainQuest: { phase: 'revelation', coresRecovered: [] },
+    ...overrides,
+  } as PlayerCharacter;
+}
+
+describe('Core Guardians', () => {
+  describe('tierForKills', () => {
+    it('returns 1 for zero kills', () => {
+      expect(tierForKills(0)).toBe(1);
+    });
+    it('progresses 1→9 with each Core taken', () => {
+      for (let k = 0; k < 9; k++) expect(tierForKills(k)).toBe(k + 1);
+    });
+    it('caps at 9 even with excess kills', () => {
+      expect(tierForKills(20)).toBe(9);
+    });
+  });
+
+  describe('catalog completeness', () => {
+    it('has 9 Guardians', () => {
+      expect(totalGuardiansCount()).toBe(9);
+      expect(Object.keys(GUARDIANS_BY_CAPITAL)).toHaveLength(9);
+    });
+    it('every Lost Capital has a Guardian', () => {
+      for (const cap of LOST_CAPITAL_LOCATIONS) {
+        expect(GUARDIANS_BY_CAPITAL[cap]).toBeDefined();
+        expect(GUARDIANS_BY_CAPITAL[cap]!.base.boss).toBe(true);
+      }
+    });
+    it('every Lost Capital has a gear pair', () => {
+      for (const cap of LOST_CAPITAL_LOCATIONS) {
+        const set = GUARDIAN_GEAR_BY_CAPITAL[cap];
+        expect(set).toBeDefined();
+        expect(set!.weapon.kind).toBe('weapon');
+        expect(set!.armor.kind).toBe('armor');
+        expect(set!.weapon.tags).toContain('core_guardian_set');
+        expect(set!.armor.tags).toContain('core_guardian_set');
+      }
+    });
+  });
+
+  describe('spawnGuardianForCapital', () => {
+    it('returns null for non-Capital locations', () => {
+      const p = makePlayer({ currentLocationId: 'tartarian_outskirts' });
+      expect(spawnGuardianForCapital(p, 'tartarian_outskirts')).toBeNull();
+    });
+    it('returns a boss-tagged enemy with the core_guardian trait', () => {
+      const p = makePlayer();
+      const g = spawnGuardianForCapital(p, 'asgardar');
+      expect(g).not.toBeNull();
+      expect(g!.boss).toBe(true);
+      expect(g!.traits).toContain(CORE_GUARDIAN_TRAIT);
+    });
+    it('tier 1 spawn matches kill count of 0', () => {
+      const p = makePlayer({ mainQuest: { phase: 'revelation', coresRecovered: [] } });
+      const g = spawnGuardianForCapital(p, 'asgardar');
+      expect(g!.traits).toContain('tier:1');
+    });
+    it('tier 9 spawn at 8 prior cores', () => {
+      const p = makePlayer({
+        mainQuest: {
+          phase: 'cores',
+          coresRecovered: [
+            'asgardar', 'samarran', 'nimari', 'drakova', 'voronov',
+            'karok_sa', 'yuldra_tul', 'ostragar',
+          ],
+        },
+      });
+      const g = spawnGuardianForCapital(p, 'iskan_veil');
+      expect(g!.traits).toContain('tier:9');
+    });
+    it('HP scales up with player hpMax', () => {
+      const lowHp = makePlayer({ hpMax: 30 });
+      const highHp = makePlayer({ hpMax: 80 });
+      const a = spawnGuardianForCapital(lowHp, 'asgardar');
+      const b = spawnGuardianForCapital(highHp, 'asgardar');
+      expect(b!.hp).toBeGreaterThan(a!.hp);
+    });
+    it('AC scales via abilityPoint bump from tier acBonus', () => {
+      const t1 = makePlayer({ mainQuest: { phase: 'revelation', coresRecovered: [] } });
+      const t5 = makePlayer({
+        mainQuest: {
+          phase: 'cores',
+          coresRecovered: ['asgardar', 'samarran', 'nimari', 'drakova'],
+        },
+      });
+      const g1 = spawnGuardianForCapital(t1, 'voronov');
+      const g5 = spawnGuardianForCapital(t5, 'voronov');
+      const ap1 = parseInt(String(g1!.abilityPoint).match(/\d+/)?.[0] ?? '0', 10);
+      const ap5 = parseInt(String(g5!.abilityPoint).match(/\d+/)?.[0] ?? '0', 10);
+      expect(ap5).toBeGreaterThan(ap1);
+    });
+  });
+
+  describe('detection helpers', () => {
+    it('isCoreGuardian true for spawned Guardian', () => {
+      const p = makePlayer();
+      const g = spawnGuardianForCapital(p, 'asgardar')!;
+      expect(isCoreGuardian(g)).toBe(true);
+    });
+    it('isCoreGuardian false for vanilla enemy', () => {
+      expect(isCoreGuardian({
+        name: 'Mud Wolf',
+        type: 'mud',
+        abilityPoint: 'Strength 3',
+        attack: 'Bite',
+        damage: '1d6',
+        hp: 10,
+        rarity: 'Common',
+        loot: [],
+      })).toBe(false);
+    });
+    it('capitalIdFromGuardian resolves the live Guardian back to its Capital', () => {
+      const p = makePlayer();
+      const g = spawnGuardianForCapital(p, 'drakova')!;
+      expect(capitalIdFromGuardian(g)).toBe('drakova');
+    });
+  });
+
+  describe('dropsForCapital', () => {
+    it('returns a fresh inventory item pair', () => {
+      const a = dropsForCapital('asgardar')!;
+      const b = dropsForCapital('asgardar')!;
+      // Different unique ids per call (so two kills don't collide).
+      expect(a.weapon.id).not.toBe(b.weapon.id);
+      expect(a.armor.id).not.toBe(b.armor.id);
+      // Both quest-tagged as core_guardian_set (but NOT quest-bound;
+      // gear can be dropped/sold/scrapped — only the Core itself is
+      // protected by the 'quest' tag).
+      expect(a.weapon.tags).toContain('core_guardian_set');
+      expect(a.weapon.tags).not.toContain('quest');
+    });
+    it('returns null for non-Capital', () => {
+      expect(dropsForCapital('tartarian_outskirts')).toBeNull();
+    });
+  });
+
+  describe('flee aftermath', () => {
+    it('returns a faction-flavored line for every playable faction', () => {
+      const factions = [
+        'reclaimers_guild', 'forgotten_order', 'mud_monarchs', 'true_tartarians',
+        'eternal_dynasty', 'conspiracy_architects', 'servants_of_giants',
+        'stone_builders', 'tartarian_revivalists',
+      ];
+      for (const f of factions) {
+        const line = fleeAftermathLine(f);
+        expect(line).not.toBeNull();
+        expect(line!.length).toBeGreaterThan(30);
+      }
+    });
+  });
+
+  describe('hasUndefeatedGuardian', () => {
+    it('true at an unrecovered Capital', () => {
+      const p = makePlayer({ mainQuest: { phase: 'revelation', coresRecovered: [] } });
+      expect(hasUndefeatedGuardian(p, 'asgardar')).toBe(true);
+    });
+    it('false at a recovered Capital', () => {
+      const p = makePlayer({ mainQuest: { phase: 'cores', coresRecovered: ['asgardar'] } });
+      expect(hasUndefeatedGuardian(p, 'asgardar')).toBe(false);
+    });
+    it('false at a non-Capital location', () => {
+      const p = makePlayer();
+      expect(hasUndefeatedGuardian(p, 'tartarian_outskirts')).toBe(false);
+    });
+  });
+});
