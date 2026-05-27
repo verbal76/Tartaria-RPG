@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-096` (per-noun dedup on quest-skill-check investigate path; no more 6-tap repeat loop on titan's bone marker). See **Section 0** for the live issue tracker covering OTA-070 → OTA-096.
+> **Latest OTA:** `2026-05-27-097` (per-noun dedup on the FAIL arm of the quest-skill-check investigate path; one attempt per noun, success or fail). See **Section 0** for the live issue tracker covering OTA-070 → OTA-097.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -34,6 +34,12 @@
 ### 0.B — Closed Issues (most recent first)
 
 #### Quest-check narration polish
+
+- **OTA-097 (2026-05-27) · FAIL arm of the quest-check investigate path didn't lock the noun — player could retry indefinitely without knowing they couldn't win.**
+  - **What:** OTA-096 fixed the SUCCESS arm (per-noun dedup so the chip greys after the first successful tap) but missed the symmetric fail arm at `gameStore.ts:~8730`. A player whose stats couldn't beat the skill check's DC could keep tapping the same noun and never get told "you're not going to pass this." On top of that, the fail line was misleading: "You sweep Asgardar but find only dust" — narrated against the location name, not the noun the player actually examined. Playtester noticed: "it's kind of like tricking me to keep trying when I really don't have a chance."
+  - **Fix:** Mirror the OTA-096 dedup write on the fail path. After a failed check on a focus noun, write the noun to `flavorExhaustedNouns` for the current room (same idempotent set() pattern as the success path). Next tap on the same noun routes through the OTA-096 callback gate at the top of the success arm's investigate branch. Also rephrased the fail line to reference the focus noun: `"You sift the X but it gives up nothing. The Aetherstone keeps its silence here."` Player can tell what they examined.
+  - **Why:** One attempt per noun per visit. The dice told you what they told you. Same design philosophy as the other dedup paths — no grind loops, no false hope. If your stats can't beat the DC, you don't keep tapping; you walk away, level up, come back.
+  - **Files:** `app/state/gameStore.ts` (fail-arm investigate case rewritten with focus-noun narration + inline dedup write).
 
 - **OTA-096 (2026-05-27) · 'investigate titan's bone marker' printed the same line 6 times with no signal that the work was diminishing returns.**
   - **What:** Playtester tapped the same noun 6 times. Each successful skill check fired `"You examine X. The Aetherstone hums — something is here, but not in plain sight."` — the line promises hidden information but the path only sometimes drops a new quest lead (12% chance, gated to <2 active quests). When the lead didn't drop, the player saw 6 identical lines with no clue the engine was silently training their skill. Same pattern as the OTA-070/076/083/084 chip-stays-actionable bugs, different surface: this branch wasn't a refusal at all — it was an ambient narration. The OTA-084 hardening covered refusal paths but missed active-narration paths.

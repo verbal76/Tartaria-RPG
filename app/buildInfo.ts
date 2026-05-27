@@ -1364,4 +1364,36 @@
 // branch refactored — dedup check up front + branched first-
 // tap narration + inline flavorExhaustedNouns write at the
 // end), HANDOFF.md (Section 0.B Closed Issues updated).
-export const OTA_BUILD_ID = '2026-05-27-096';
+// 2026-05-27 OTA-097 — Symmetric per-noun dedup on the FAIL
+// arm of the quest-check investigate path. OTA-096 fixed the
+// SUCCESS arm but the player could still retry indefinitely
+// on failed checks. Playtester pushed back: "if it's something
+// that I don't have a chance to beat because my base roll and
+// other stats wouldn't let me do it then it should be shut
+// off after the first roll because I'll never be able to get
+// it while I'm in that instance ... you're kind of like
+// tricking me to keep trying when I really don't have a
+// chance."
+//
+// Two fixes in the fail arm at gameStore.ts:~8730:
+//   (1) Per-noun dedup write — after a failed check, write
+//       the noun to flavorExhaustedNouns for the current
+//       room. Next tap on the same noun routes through the
+//       OTA-096 callback gate (which sits at the top of the
+//       success arm's investigate branch).
+//   (2) Narration now references the focus noun instead of
+//       the location name. Pre-OTA-097: "You sweep Asgardar
+//       but find only dust." Player examined a specific
+//       noun, not the city. Post-OTA-097: "You sift the X
+//       but it gives up nothing. The Aetherstone keeps its
+//       silence here."
+//
+// Design: one attempt per noun per visit, success OR fail.
+// The dice told you what they told you. No grind loops; no
+// false hope. If your stats can't beat the DC, walk away,
+// level up, come back to a fresh room.
+//
+// Files: app/state/gameStore.ts (fail-arm investigate case
+// rewritten with focus-noun narration + inline dedup write),
+// HANDOFF.md (Closed Issues entry added).
+export const OTA_BUILD_ID = '2026-05-27-097';

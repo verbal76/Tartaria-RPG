@@ -8808,9 +8808,65 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             break;
           }
-          case 'investigate':
-            get().appendLog('world', `You sweep ${currentScene.location.name} but find only dust and old silence.`);
+          case 'investigate': {
+            // 2026-05-27 OTA-097 — per-noun dedup on the FAIL
+            // arm of the quest-check investigate path, matching
+            // the OTA-096 SUCCESS-arm fix. Pre-OTA-097 a failed
+            // check didn't write anything to flavorExhaustedNouns
+            // — so the player could keep tapping the same noun
+            // until they either passed or gave up. That's the
+            // "kind of like tricking me to keep trying when I
+            // really don't have a chance" frustration the
+            // playtester called out: their stats might never beat
+            // the DC, but the engine kept letting them roll. Now:
+            // one attempt per noun per visit, success OR fail. If
+            // the dice said no on the first roll, the dice said
+            // no. Chip greys via OTA-070/076 fuzzy UI check; next
+            // tap hits the same callback the success path's
+            // dedup gate already produces.
+            //
+            // Narration also rephrased to reference the noun the
+            // player actually examined, not the location. Pre-
+            // OTA-097 the fail line read "You sweep Asgardar but
+            // find only dust and old silence" — confusing,
+            // because the player examined a specific noun, not
+            // the whole capital.
+            const reparsedF = parseInput(actionText);
+            const focusF = reparsedF.resolvedNoun ?? reparsedF.target ?? currentScene.location.name;
+            get().appendLog(
+              'world',
+              `You sift the ${focusF} but it gives up nothing. The Aetherstone keeps its silence here.`,
+            );
+            const focusFKey = focusF.toLowerCase();
+            const investFRoomKey = makeRoomKey(
+              player.currentLocationId,
+              currentScene.microMicroId,
+              player.mapX,
+              player.mapY,
+            );
+            set((s) => {
+              const r = s.worldMemory.visitedRooms?.[investFRoomKey] ?? {
+                firstVisitAt: Date.now(),
+                lastVisitAt: Date.now(),
+                visitCount: 1,
+              };
+              const existing = r.flavorExhaustedNouns ?? [];
+              if (existing.includes(focusFKey)) return s;
+              return {
+                worldMemory: {
+                  ...s.worldMemory,
+                  visitedRooms: {
+                    ...(s.worldMemory.visitedRooms ?? {}),
+                    [investFRoomKey]: {
+                      ...r,
+                      flavorExhaustedNouns: [...existing, focusFKey],
+                    },
+                  },
+                },
+              };
+            });
             break;
+          }
           case 'cast':
             get().appendLog('world', 'The Aether slips through your focus. The glow flickers and dies.');
             break;
