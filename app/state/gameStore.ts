@@ -7080,25 +7080,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // the climbed object first — descent is direct.
           if (isTop) {
             // eslint-disable-next-line @typescript-eslint/no-require-imports
-            const { rollElevatedOverlay, rollOverlayEncounter, buildOverlayOverrides } =
-              require('../engine/elevatedOverlay') as typeof import('../engine/elevatedOverlay');
+            const {
+              rollElevatedOverlay,
+              rollOverlayEncounter,
+              buildOverlayOverrides,
+              buildOverlayTrader,
+              buildOverlayLookoutHook,
+            } = require('../engine/elevatedOverlay') as typeof import('../engine/elevatedOverlay');
             // eslint-disable-next-line @typescript-eslint/no-require-imports
             const { findEnemyByName } = require('../engine/encounter') as typeof import('../engine/encounter');
-            const overlay = rollElevatedOverlay();
+            // 2026-05-27 OTA-090 — pass totalTiers so trader
+            // overlays (minTiers=4) are excluded on short
+            // climbs. Player asked: traders only on "larger
+            // locations" so a 1-tier ledge doesn't surface a
+            // man-with-a-ledger absurdity.
+            const overlay = rollElevatedOverlay(totalTiers);
             if (overlay) {
-              const enemyName = rollOverlayEncounter(overlay);
-              const enemy = enemyName ? findEnemyByName(enemyName) : null;
+              // Branch on kind. Encounter spawns an enemy.
+              // Trader spawns a VendorInstance on scene.vendor.
+              // Lookout plants a one-stage hook the player can
+              // tap any of the lookout's nouns to engage.
+              const enemy =
+                overlay.kind === 'encounter'
+                  ? (() => {
+                      const name = rollOverlayEncounter(overlay);
+                      return name ? findEnemyByName(name) : null;
+                    })()
+                  : null;
+              const overlayVendor =
+                overlay.kind === 'trader' ? buildOverlayTrader(overlay) : null;
+              const overlayHook =
+                overlay.kind === 'lookout' ? buildOverlayLookoutHook(overlay) : null;
               const overrides = buildOverlayOverrides(overlay, enemy);
               set((s) => {
                 if (!s.currentScene) return s;
                 // Build the overlay scene by spreading the base
-                // and overriding ambientNouns / enemies. Hooks
-                // are reset (the overlay is its own narrative
-                // beat; carrying base hooks would route taps
-                // into wrong scenes). Vendor/range/weather/
-                // hazard inherit so the world stays cohesive
-                // (storm on the road is still a storm up
-                // there).
+                // and overriding ambientNouns / enemies /
+                // vendor / hooks. Range/weather/hazard inherit
+                // so the world stays cohesive (a storm on the
+                // road is still a storm up there).
                 const baseScene = s.currentScene;
                 const overlayScene: typeof baseScene = {
                   ...baseScene,
@@ -7108,10 +7128,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   enemyHps: overrides.enemyHps,
                   enemyAmbushUsed: overrides.enemyAmbushUsed,
                   activeEnemyIdx: overrides.activeEnemyIdx,
-                  hooks: overrides.hooks,
-                  // OTA-088 chip-rotation does not apply here —
-                  // overlay's nouns are fresh; no triggerNoun
-                  // to rotate.
+                  // Trader → vendor overrides the base's; null
+                  // for encounter/lookout. Lookout → put the
+                  // planted hook in hooks[]; encounter/trader
+                  // get a fresh empty hooks array.
+                  vendor: overlay.kind === 'trader' ? overlayVendor : null,
+                  hooks: overlayHook ? [overlayHook] : [],
                   // OTA-089 — preserve the base scene + metadata
                   // so climb-down restores it and writes the
                   // cleared marker for the climbed noun back to
@@ -7123,12 +7145,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     maxTier: totalTiers,
                     overlayId: overlay.id,
                   },
-                  // The overlay is a fresh scene — drop any
-                  // mid-flight hook state from the base. The
-                  // climbed marker stays on the base's
-                  // searchedAmbientNouns (already written
-                  // above) so when we restore the base scene
-                  // the chip is correctly cleared.
                 };
                 return { currentScene: overlayScene };
               });
@@ -7139,6 +7155,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   `${enemy.name} is here — and it has seen you.`,
                 );
               }
+              if (overlayVendor) {
+                get().appendLog(
+                  'world',
+                  `${overlayVendor.name} (${overlayVendor.title}) lays out wares. Tap the vendor banner to trade.`,
+                );
+              }
+              // Lookout's pitchLine is the hook's plantedLine;
+              // the hook system will emit it on next investigate
+              // of one of the lookout's nouns. No extra log
+              // line needed here — arrivalLine already
+              // introduces the NPC.
             }
           }
         }

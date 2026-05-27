@@ -1027,4 +1027,71 @@
 // climb-top branch wires rollElevatedOverlay + scene swap;
 // climb-down branch detects overlay state and restores the
 // preserved scene).
-export const OTA_BUILD_ID = '2026-05-27-089';
+//
+// 2026-05-27 OTA-090 — Trader + Lookout overlay kinds.
+// Player asked: add NPC encounters in elevated overlays;
+// keep traders on "larger locations" (4+ tier climbs); give
+// each trader a funny reason they're hiding up there.
+// Delivered: 5 hand-authored trader templates + 2 lookout
+// templates layered into the OTA-089 OVERLAYS pool.
+//
+// Overlay kinds:
+//   encounter — hostile spawn (OTA-089 default behavior)
+//   trader    — peaceful vendor, only fires when total
+//               Tiers >= minTiers (4 in practice). Each has
+//               a custom name + title + funny pitch line.
+//   lookout   — peaceful NPC who plants a one-stage rumor
+//               hook on the overlay scene. Player taps any
+//               of the lookout's nouns to engage.
+//
+// Trader templates (4+ tier climbs only):
+//   ledger_keeper    — Olek, ex-Mud Monarch tax collector
+//                      hiding from his own books
+//   wind_priest      — Sister Yelena, Servants acolyte
+//                      "hearing the Giants more clearly"
+//                      for three years now
+//   reclaimer_hiding — Pavel (allegedly), Reclaimer hiding
+//                      from a debt collector named Hass
+//   forgotten_scholar — Adept Ireneus, Forgotten Order
+//                       scholar cataloguing every spire
+//                       in Tartaria from the top (year 3
+//                       of 50)
+//   drunk_drifter    — Mikola, climbed up on a bet, forgot
+//                      which way is down, sells items at
+//                      randomized prices
+//
+// Lookout templates (any tier):
+//   rumor_scout   — scout points east toward a Mud Monarch
+//                   caravan satchel; plants a 'thread' hook
+//   rumor_pilgrim — old pilgrim hears a name in a southern
+//                   crystal hum; plants a 'whisper_crystal'
+//                   hook
+//
+// All traders use existing items from the catalog (Worn
+// Tartarian Coin, Sealed Tartarian Letter, Aether Dust,
+// Aetheric Locket, Aetheric Shard, Mud Essence, etc.) so
+// no new item authoring. Each offer has a min/max price
+// range that randomizes per spawn for "hand-rolled" feel.
+//
+// Demeanor + faction pass through to VendorInstance so the
+// existing steal mechanics fire normally (Pavel + Mikola
+// are 'sketchy' = easier to lift from, bigger fight on
+// miss; Olek + Yelena + Ireneus are 'honest' = harder
+// steal, milder consequences). Sister Yelena gives
+// Servants standing on purchase via faction='servants_of_
+// giants'; same pattern for Pavel (reclaimers_guild) and
+// Ireneus (forgotten_order).
+//
+// Tier gate: rollElevatedOverlay now accepts totalTiers and
+// filters out entries whose minTiers exceeds it. Encounters
+// + lookouts default to minTiers=0 (any tier); traders
+// declare minTiers=4 so a 1-tier ledge doesn't surface "a
+// man with a wagon and three ledgers is up here" absurdity.
+//
+// Files: app/engine/elevatedOverlay.ts (OverlayKind type,
+// trader + lookout template interfaces, OVERLAYS pool
+// expansion, rollElevatedOverlay tier filter, buildOverlay
+// Trader + buildOverlayLookoutHook helpers), app/state/
+// gameStore.ts (climb-top branch now switches on overlay
+// kind to set vendor / hooks / enemies appropriately).
+export const OTA_BUILD_ID = '2026-05-27-090';
