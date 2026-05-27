@@ -1326,4 +1326,42 @@
 // Files: app/screens/CraftingScreen.tsx, app/screens/Action
 // ReferenceScreen.tsx, HANDOFF.md (Closed Issues 0.B + Open
 // Issues 0.A updated per the new workflow).
-export const OTA_BUILD_ID = '2026-05-27-095';
+// 2026-05-27 OTA-096 — Quest-check investigate path gains
+// per-noun dedup. Playtest log on 094 showed: player tapped
+// 'investigate titan's bone marker' six times in a row, each
+// tap printed the same "Aetherstone hums" line, with no
+// signal that the engine was silently training their skill.
+// Same UX pattern as the OTA-070/076/083/084 chip-stays-
+// actionable cycle but on a different branch — the OTA-084
+// refuseAmbient hardening covered REFUSAL paths but missed
+// this ACTIVE-NARRATION path inside the quest-check success
+// switch at gameStore.ts:8640.
+//
+// Two fixes:
+//
+//   (1) First-tap line rewritten. Pre-OTA-096 the line was
+//       "You examine X. The Aetherstone hums — something is
+//       here, but not in plain sight." This promised hidden
+//       info even when the 12% lead-roll didn't fire. Now:
+//         - lead fires: "You examine the X. A thread surfaces
+//           — clear enough to follow." + reward line
+//         - no lead:    "You examine the X carefully. The
+//           work sharpens your focus, but no clearer thread
+//           surfaces here."
+//       Player can tell the difference between productive
+//       and tap-for-stat-training outcomes.
+//
+//   (2) Per-noun dedup. After the first tap, the noun is
+//       written to flavorExhaustedNouns for the current
+//       room. Subsequent taps short-circuit to a callback
+//       via the OTA-084 refuseAmbient helper: "You've
+//       already turned the X over here. Whatever it had to
+//       give you, you took. Your active leads (if any) live
+//       in the Contracts log." Chip greys via OTA-070/076
+//       fuzzy UI check.
+//
+// Files: app/state/gameStore.ts (quest-check investigate
+// branch refactored — dedup check up front + branched first-
+// tap narration + inline flavorExhaustedNouns write at the
+// end), HANDOFF.md (Section 0.B Closed Issues updated).
+export const OTA_BUILD_ID = '2026-05-27-096';

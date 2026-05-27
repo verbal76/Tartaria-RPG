@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-095` (Aetheric tab added to CraftingScreen; Recipes mode stripped from ActionReferenceScreen). See **Section 0** for the live issue tracker covering OTA-070 → OTA-095.
+> **Latest OTA:** `2026-05-27-096` (per-noun dedup on quest-skill-check investigate path; no more 6-tap repeat loop on titan's bone marker). See **Section 0** for the live issue tracker covering OTA-070 → OTA-096.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -32,6 +32,16 @@
 - **TS 0 errors / Test suite green.** Always required pre-push. Tracked here as a passive gate rather than an issue.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Quest-check narration polish
+
+- **OTA-096 (2026-05-27) · 'investigate titan's bone marker' printed the same line 6 times with no signal that the work was diminishing returns.**
+  - **What:** Playtester tapped the same noun 6 times. Each successful skill check fired `"You examine X. The Aetherstone hums — something is here, but not in plain sight."` — the line promises hidden information but the path only sometimes drops a new quest lead (12% chance, gated to <2 active quests). When the lead didn't drop, the player saw 6 identical lines with no clue the engine was silently training their skill. Same pattern as the OTA-070/076/083/084 chip-stays-actionable bugs, different surface: this branch wasn't a refusal at all — it was an ambient narration. The OTA-084 hardening covered refusal paths but missed active-narration paths.
+  - **Fix:** Two changes in the `case 'investigate':` branch at `gameStore.ts:8640` (the quest-skill-check success path):
+    - **First-tap line rewritten** to be honest about the skill-training nature. When a lead fires: `"You examine the X. A thread surfaces — clear enough to follow."` + the existing New lead reward. When no lead: `"You examine the X carefully. The work sharpens your focus, but no clearer thread surfaces here."` Player can tell the difference.
+    - **Per-noun dedup added.** After the first tap, the noun is written to `flavorExhaustedNouns` for the current room. Subsequent taps go through the OTA-084 `refuseAmbient` helper with a callback: `"You've already turned the X over here. Whatever it had to give you, you took. Your active leads (if any) live in the Contracts log."` Chip greys via OTA-070/076 fuzzy UI check.
+  - **Why:** The screen + engine had drifted out of sync on this path. The engine was rewarding the player (stat training + occasional quest leads); the narration was misleading them into thinking nothing was happening. Now they see a clear signal each tap and the chip stops accepting taps after the first productive examination.
+  - **Files:** `app/state/gameStore.ts`.
 
 #### UI structure / screen reorganization
 

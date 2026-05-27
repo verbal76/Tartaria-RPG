@@ -8641,15 +8641,96 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // Narrate against the actual thing the player searched, not the whole location.
             const reparsed = parseInput(actionText);
             const focus = reparsed.resolvedNoun ?? reparsed.target ?? currentScene.location.name;
-            get().appendLog('world', `You examine ${focus}. The Aetherstone hums — something is here, but not in plain sight.`);
+            // 2026-05-27 OTA-096 — per-noun dedup on this quest-
+            // check-success investigate path. Pre-OTA-096 the
+            // line "You examine X. The Aetherstone hums..."
+            // fired on every successful skill check, even when
+            // the same noun had been examined 6 times in a row
+            // — same pattern OTA-084 hardened for other refusal
+            // surfaces, but this one was missed because it's an
+            // active narration (not a refusal). Playtester
+            // tapped 'investigate titan's bone marker' 6 times
+            // and saw the identical line each time with no
+            // signal that the work was diminishing returns.
+            //
+            // Fix: track per-room which nouns have been pulled
+            // through this branch. First tap: original line +
+            // 12% lead chance (preserved). Subsequent taps:
+            // refuseAmbient callback that acknowledges the
+            // previous examination so the player knows to stop
+            // tapping. The first-tap line itself is also
+            // rephrased to be honest about what's happening —
+            // pre-OTA the line promised "something is here, but
+            // not in plain sight" which is misleading when no
+            // lead drops; now it acknowledges the skill-training
+            // and indicates clearly when no thread surfaced.
+            const focusKey = focus.toLowerCase();
+            const investRoomKey = makeRoomKey(
+              player.currentLocationId,
+              currentScene.microMicroId,
+              player.mapX,
+              player.mapY,
+            );
+            const investRoom = get().worldMemory.visitedRooms?.[investRoomKey];
+            const investPrior = investRoom?.flavorExhaustedNouns ?? [];
+            const alreadyExamined = investPrior.some(
+              (n) => n === focusKey || focusKey.includes(n) || n.includes(focusKey),
+            );
+            if (alreadyExamined) {
+              // OTA-084 refuseAmbient pattern — atomic log +
+              // dedup mark, idempotent on the second touch.
+              get().refuseAmbient({
+                noun: focus,
+                line: `You've already turned the ${focus} over here. Whatever it had to give you, you took. Your active leads (if any) live in the Contracts log.`,
+                kind: 'flavor',
+              });
+              break;
+            }
             // Only drop a new lead occasionally, and only if the player isn't already
             // juggling unfinished quests. Was 50%; "search my pockets" should not spawn
             // a quest about brokering relic sales at Thametan's Tower.
             const activeQuests = player.activeQuests.length;
-            if (activeQuests < 2 && Math.random() < 0.12) {
+            const leadFires = activeQuests < 2 && Math.random() < 0.12;
+            if (leadFires) {
               const quest = get().generateNewQuest();
+              get().appendLog(
+                'world',
+                `You examine the ${focus}. A thread surfaces — clear enough to follow.`,
+              );
               get().appendLog('reward', `New lead: ${quest.objective.verb} ${quest.objective.target} at ${quest.location.name}.`);
+            } else {
+              get().appendLog(
+                'world',
+                `You examine the ${focus} carefully. The work sharpens your focus, but no clearer thread surfaces here.`,
+              );
             }
+            // Mark as examined regardless of lead outcome — the
+            // player got the stat training they came for; future
+            // taps should hit the callback path above. Inline
+            // dedup write (not via refuseAmbient since we already
+            // logged the line — the helper would re-log an empty
+            // string).
+            set((s) => {
+              const r = s.worldMemory.visitedRooms?.[investRoomKey] ?? {
+                firstVisitAt: Date.now(),
+                lastVisitAt: Date.now(),
+                visitCount: 1,
+              };
+              const existing = r.flavorExhaustedNouns ?? [];
+              if (existing.includes(focusKey)) return s;
+              return {
+                worldMemory: {
+                  ...s.worldMemory,
+                  visitedRooms: {
+                    ...(s.worldMemory.visitedRooms ?? {}),
+                    [investRoomKey]: {
+                      ...r,
+                      flavorExhaustedNouns: [...existing, focusKey],
+                    },
+                  },
+                },
+              };
+            });
             break;
           }
           case 'cast':
