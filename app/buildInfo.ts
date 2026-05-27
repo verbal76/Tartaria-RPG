@@ -349,4 +349,25 @@
 // Files: app/engine/investigationTable.ts (NounCategory +
 // KEYWORD_MAP + TEMPLATES expansions, rollOutcome yield path),
 // app/state/gameStore.ts (item-grant branch in the IIFE).
-export const OTA_BUILD_ID = '2026-05-26-073';
+//
+// 2026-05-26 OTA-074 — Callback narration polish + chip-state
+// alignment (4/5 in the series).
+//   (1) callbackLine now picks from variant pools per result
+//       kind (item / flavor / hook / default), 3-5 templates
+//       each, via rotatingPick so consecutive callbacks on
+//       different consumed nouns don't read identical. Item
+//       callbacks reference the actual item by name; flavor
+//       callbacks reference the noun naturally; hook callbacks
+//       acknowledge the lead the player already pulled.
+//   (2) Engine first-investigate write site now branches on
+//       outcome.kind: 'item' outcomes write to
+//       searchedAmbientNouns (chip filtered out entirely —
+//       matches the existing "produced an item" convention);
+//       'flavor' outcomes write to flavorExhaustedNouns (chip
+//       stays visible greyed). Both lists honor OTA-070's
+//       fuzzy UI check so engine + UI state stay aligned.
+//
+// Files: app/engine/investigationTable.ts (CALLBACK_*_LINES
+// pools + pickCallback helper + callbackLine refactor),
+// app/state/gameStore.ts (write-site branch on outcome.kind).
+export const OTA_BUILD_ID = '2026-05-26-074';

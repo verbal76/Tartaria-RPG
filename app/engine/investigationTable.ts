@@ -296,25 +296,75 @@ export function resolveLore(entry: InvestigationEntry): string {
   return templateFor(entry.category).fallbackLore;
 }
 
+// OTA-074 — callback variant pools. Per-kind line templates
+// that take the noun and (for item results) the item name.
+// rotatingPick keeps consecutive callbacks varied even when
+// the player chains investigates on multiple consumed nouns
+// in a row. Each pool is keyed on the same 'investigation.
+// callback.{kind}' string so the rotation is global per kind
+// — fine here because the player rarely re-investigates more
+// than a handful of consumed nouns per scene; collision with
+// the variety budget is acceptable.
+
+const CALLBACK_ITEM_LINES: Array<(noun: string, item: string) => string> = [
+  (n, i) => `You've already turned the ${n} over here. The ${i.toLowerCase()} was the only thing of value.`,
+  (n, i) => `The ${n} is empty now — you took the ${i.toLowerCase()} on your first pass.`,
+  (n, i) => `Nothing more in the ${n}. The ${i.toLowerCase()} you found was tucked deep.`,
+  (n, i) => `You've already worked the ${n}. The ${i.toLowerCase()} was the harvest.`,
+  (n, i) => `The ${n} keeps its silence now. The ${i.toLowerCase()} was the prize.`,
+];
+
+const CALLBACK_FLAVOR_LINES: Array<(noun: string) => string> = [
+  (n) => `You've already turned the ${n} over here. It keeps its lore but offers nothing new.`,
+  (n) => `The ${n} has surrendered what it can to your attention. Nothing fresh.`,
+  (n) => `You read the ${n} the same way you did before. Same story, no addendum.`,
+  (n) => `Your hands settle on the ${n} again. It's still telling the same quiet story.`,
+  (n) => `The ${n} is familiar now. Whatever it had to say to a stranger, it already said.`,
+];
+
+const CALLBACK_HOOK_LINES: Array<(noun: string) => string> = [
+  (n) => `You've already studied the ${n} carefully. The thread you pulled is still warm in your mind.`,
+  (n) => `Looking at the ${n} again brings the lead back into focus, but nothing new.`,
+  (n) => `The ${n} suggested its thread on your first pass — it isn't suggesting another.`,
+];
+
+const CALLBACK_DEFAULT_LINES: Array<(noun: string) => string> = [
+  (n) => `You've already turned the ${n} over here. The lore stays put.`,
+  (n) => `Whatever the ${n} held, you've already pulled it loose.`,
+];
+
+// Lazy require to avoid circular import. rotatingPick lives in
+// rng.ts which doesn't import from investigationTable, so the
+// direct import would be fine — but keeping the require here
+// matches the pattern other call sites use and makes the pure
+// module a touch easier to unit test (the require can be
+// stubbed).
+function pickCallback<T>(pool: readonly T[], kind: string): T {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { rotatingPick } = require('./rng') as typeof import('./rng');
+  return rotatingPick(pool, `investigation.callback.${kind}`);
+}
+
 /** Build the callback line printed on repeat investigates. Uses
  *  the result that was recorded on the first investigate so the
  *  callback is SPECIFIC ("the cushion was the only thing of
  *  value") instead of the pre-OTA generic "Nothing more to
- *  find" refusal. Defensive fallback if entry.result is missing
- *  (shouldn't happen on a properly-consumed entry but guarded
- *  anyway). */
+ *  find" refusal. OTA-074 adds variant pools per kind so
+ *  consecutive callbacks don't read identical. Defensive
+ *  fallback if entry.result is missing (shouldn't happen on a
+ *  properly-consumed entry but guarded anyway). */
 export function callbackLine(noun: string, entry: InvestigationEntry): string {
   if (!entry.result) {
-    return `You've already turned the ${noun} over here. The lore stays put.`;
+    return pickCallback(CALLBACK_DEFAULT_LINES, 'default')(noun);
   }
   switch (entry.result.kind) {
     case 'item':
-      return `You've already turned the ${noun} over here. ${entry.result.detail} was the only thing of value.`;
+      return pickCallback(CALLBACK_ITEM_LINES, 'item')(noun, entry.result.detail);
     case 'hook':
-      return `You've already studied the ${noun} carefully. The thread you pulled is still warm in your mind.`;
+      return pickCallback(CALLBACK_HOOK_LINES, 'hook')(noun);
     case 'flavor':
     default:
-      return `You've already turned the ${noun} over here. It keeps its lore but offers nothing new.`;
+      return pickCallback(CALLBACK_FLAVOR_LINES, 'flavor')(noun);
   }
 }
 

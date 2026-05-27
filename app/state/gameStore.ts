@@ -4334,10 +4334,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     consumedAt: Date.now(),
                     result: outcome,
                   };
+                  // OTA-074 — write to the appropriate dedup
+                  // list based on outcome kind. Item outcomes
+                  // go to searchedAmbientNouns (chip filtered
+                  // out entirely — matches the existing
+                  // "produced an item" convention). Flavor
+                  // outcomes go to flavorExhaustedNouns (chip
+                  // stays visible greyed). Both lists honor
+                  // OTA-070's fuzzy UI check.
+                  const isItem = outcome.kind === 'item';
+                  const existingSearched = room.searchedAmbientNouns ?? [];
                   const existingFlavor = room.flavorExhaustedNouns ?? [];
-                  const flavorWithNoun = existingFlavor.includes(ambientLower)
-                    ? existingFlavor
-                    : [...existingFlavor, ambientLower];
+                  const searchedWithNoun = isItem && !existingSearched.includes(ambientLower)
+                    ? [...existingSearched, ambientLower]
+                    : existingSearched;
+                  const flavorWithNoun = !isItem && !existingFlavor.includes(ambientLower)
+                    ? [...existingFlavor, ambientLower]
+                    : existingFlavor;
                   return {
                     worldMemory: {
                       ...s.worldMemory,
@@ -4349,6 +4362,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                             ...prevTable,
                             [ambientLower]: updatedEntry,
                           },
+                          searchedAmbientNouns: searchedWithNoun,
                           flavorExhaustedNouns: flavorWithNoun,
                         },
                       },
