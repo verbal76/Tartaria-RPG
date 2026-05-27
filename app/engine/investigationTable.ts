@@ -39,6 +39,12 @@ export type NounCategory =
   | 'bone'
   | 'light'
   | 'container'
+  // OTA-080 expansion — landmark covers tall standing
+  // architecture (spire, tower, obelisk, pillar...) and
+  // chandelier-class hanging features. Categories that
+  // would otherwise fall through to the generic catchall
+  // even though they're clearly distinct scene anchors.
+  | 'landmark'
   | 'generic';
 
 export interface InvestigationYield {
@@ -114,23 +120,36 @@ const KEYWORD_MAP: Array<{ keywords: RegExp; category: NounCategory }> = [
   { keywords: /\b(altar|shrine|sigil|reliquary|tabernacle)\b/i, category: 'altar' },
   { keywords: /\b(root|vine|fungus|mushroom|moss|sprout|growth|fern|weed|bramble)\b/i, category: 'vegetation' },
   { keywords: /\b(bone|skull|ribcage|ribs|jaw|claw|fang|tusk|vertebra)\b/i, category: 'bone' },
-  { keywords: /\b(torch|lantern|candle|brazier|flame|ember|sconce|glowstone)\b/i, category: 'light' },
+  // OTA-080 — light keywords add chandelier (was falling to
+  // generic in the playtest log).
+  { keywords: /\b(torch|lantern|candle|brazier|flame|ember|sconce|glowstone|chandelier)\b/i, category: 'light' },
   { keywords: /\b(chest|crate|box|sack|bag|satchel|pouch|coffer|trunk|strongbox)\b/i, category: 'container' },
-  // OTA-077 — text keywords expanded with chalkboard / blackboard
-  // / slate / writ / ledger / journal / etc. Playtester log showed
-  // 'chalkboard' falling through to the generic catchall.
-  { keywords: /\b(sign|plaque|scroll|tablet|inscription|mural|painting|banner|poster|notice|manuscript|book|chalkboard|blackboard|slate|ledger|journal|writ|map|note)\b/i, category: 'text' },
-  { keywords: /\b(stone|boulder|monolith|megalith|slab|brick|cobble|pebble|standing[- ]stone)\b/i, category: 'stone' },
+  // OTA-077 + OTA-080 — text keywords add chalkboard /
+  // blackboard / slate / writ / ledger / journal + mosaic /
+  // tapestry / tome / parchment.
+  { keywords: /\b(sign|plaque|scroll|tablet|inscription|mural|painting|banner|poster|notice|manuscript|book|chalkboard|blackboard|slate|ledger|journal|writ|map|note|mosaic|tapestry|tome|parchment|fresco)\b/i, category: 'text' },
+  // OTA-080 — NEW landmark category for tall architecture
+  // that previously fell through to the generic catchall:
+  // spire / tower / dome / cupola / steeple / minaret +
+  // pillar / column / obelisk. These are scene anchors, not
+  // generic objects; they deserve a category with their own
+  // template + yield instead of the catchall flavor line.
+  { keywords: /\b(spire|tower|dome|cupola|steeple|minaret|pillar|column|obelisk|pylon|standing[- ]stone)\b/i, category: 'landmark' },
+  { keywords: /\b(stone|boulder|monolith|megalith|slab|brick|cobble|pebble|plinth|sarcophagus|tile)\b/i, category: 'stone' },
   // OTA-071 original 5.
-  { keywords: /\b(bench|chair|table|stool|cushion|couch|seat|desk|cot|bed|pew)\b/i, category: 'furniture' },
+  { keywords: /\b(bench|chair|table|stool|cushion|couch|seat|desk|cot|bed|pew|throne|counter|lectern)\b/i, category: 'furniture' },
   { keywords: /\b(shelf|shelves|rack|bookcase|cabinet|cupboard|locker)\b/i, category: 'shelf' },
-  // OTA-077 — machinery keywords expanded with spool / reel /
-  // bobbin / coil / gear / cog / sprocket / lever / pipe / cable
-  // / wire / runecaster / capacitor. Playtester log showed 'spool'
-  // and 'runecaster' falling through to the generic catchall.
-  { keywords: /\b(conduit|console|sentinel|generator|mechanism|machine|device|panel|terminal|engine|motor|pump|valve|spool|reel|bobbin|coil|gear|cog|sprocket|lever|pipe|cable|wire|runecaster|capacitor|dial|gauge)\b/i, category: 'machinery' },
-  { keywords: /\b(vat|drum|urn|jar|pot|container|barrel|cask|crucible|basin|trough)\b/i, category: 'vessel' },
-  { keywords: /\b(rubble|scrap|debris|wreckage|fragments?|shards?|pile|heap|husk)\b/i, category: 'debris' },
+  // OTA-077 + OTA-080 — machinery keywords expanded with
+  // spool / reel / bobbin / coil / gear / cog / sprocket /
+  // lever / pipe / cable / wire / runecaster / capacitor /
+  // dial / gauge + anvil / forge / loom / instrument /
+  // fuel cell.
+  { keywords: /\b(conduit|console|sentinel|generator|mechanism|machine|device|panel|terminal|engine|motor|pump|valve|spool|reel|bobbin|coil|gear|cog|sprocket|lever|pipe|cable|wire|runecaster|capacitor|dial|gauge|anvil|forge|loom|instrument|fuel[- ]cell)\b/i, category: 'machinery' },
+  // OTA-080 — vessel keywords add fountain / bottle / glass /
+  // dish (common in interior + ruined-fountain scenes).
+  { keywords: /\b(vat|drum|urn|jar|pot|container|barrel|cask|crucible|basin|trough|fountain|bottle|glass|dish)\b/i, category: 'vessel' },
+  // OTA-080 — debris keywords add plank / board / catwalk.
+  { keywords: /\b(rubble|scrap|debris|wreckage|fragments?|shards?|pile|heap|husk|plank|board|catwalk)\b/i, category: 'debris' },
 ];
 
 const TEMPLATES: Record<NounCategory, Template> = {
@@ -234,6 +253,17 @@ const TEMPLATES: Record<NounCategory, Template> = {
     yield: { itemName: 'Small Rock', qty: 1, chance: 0.25 },
     hookKind: null,
   },
+  // OTA-080 — landmark category. Spires / towers / pillars
+  // are scene anchors. Yield Aether Residue (catalog confirmed
+  // present) at 0.10 — low chance, but possible payoff for
+  // climbing/investigating the most visible feature in a
+  // scene.
+  landmark: {
+    category: 'landmark',
+    fallbackLore: 'The {noun} rises out of the silt like a memory the world refuses to bury. Up close, the surface is scored with old weathering and finer marks — names, prayers, accounts no one closed.',
+    yield: { itemName: 'Aether Residue', qty: 1, chance: 0.10 },
+    hookKind: null,
+  },
   generic: {
     category: 'generic',
     // OTA-077 — noun-aware. Pre-OTA the line read "you look it
@@ -302,24 +332,115 @@ export function seedInvestigationTable(
   return table;
 }
 
+// OTA-080 — Creepy variant pool. Per-category alternate
+// lores that occasionally surface in place of the standard
+// fallbackLore. Player said: "the flavor text we discussed
+// earlier where odd things are found on a object like
+// creepy statements marked on them or something just isnt
+// right about it". Tone is uncanny, not horror — quiet,
+// specific, off-putting. Frequency is bounded (≈17% via the
+// CREEPY_RATE constant) and deterministic per noun (seeded
+// hash on entry.noun) so the same bench in the same room
+// consistently resolves to the same line within a session
+// — not a re-roll each render.
+const CREEPY_VARIANTS: Partial<Record<NounCategory, readonly string[]>> = {
+  furniture: [
+    'The bench has someone\'s last meal still on it — a tin plate, untouched, the food perfectly preserved. The fork is laid down mid-bite.',
+    'The chair faces the wall. Long scratches in the floor show it was dragged there from across the room, by someone who wanted to sit very still.',
+  ],
+  shelf: [
+    'Every jar on the shelf is labeled in the same hand: ANNA, ANNA, ANNA. The dust on them is fresh. The dust on the floor is not.',
+  ],
+  machinery: [
+    'The dial moves a hair while you watch it. Nothing is powering it. When you look away and back, it has moved again — toward you.',
+  ],
+  vessel: [
+    'Inside the jar: a single tooth in clear liquid. The tooth is too large to be a child\'s, and the liquid is faintly warm.',
+    'The pot is full to the rim with something that holds the shape of fingers pressed into it from the inside.',
+  ],
+  debris: [
+    'Among the rubble: a child\'s shoe, still laced. Beside it, a second shoe — the same size, but for the opposite foot of the same child.',
+  ],
+  door: [
+    'The door has been opened from the inside many times. The handle on this side is polished smooth. The handle on the other side is rusted shut.',
+  ],
+  corpse: [
+    'The remains are arranged. Hands folded, ankles crossed, a stone placed gently on the sternum. Whoever did this did it slowly, and afterward.',
+  ],
+  statue: [
+    'The statue\'s eyes have been chiseled out and refilled with wet clay. The clay is still soft. You did not pass anyone on the way in.',
+  ],
+  altar: [
+    'The altar holds a list of names carved in a child\'s hand. The last name on the list is unfinished — the carver stopped partway through a letter you recognize.',
+  ],
+  vegetation: [
+    'The moss grows only where someone has knelt. Five patches, evenly spaced, all facing the same blank wall.',
+  ],
+  bone: [
+    'The bone has teeth-marks at one end and a name scratched at the other — not carved, scratched, by a fingernail, over a long time.',
+  ],
+  light: [
+    'The candle is unlit but the wax is warm. The wick has been pinched between two fingers very recently. Yours are clean.',
+  ],
+  text: [
+    'The chalkboard has a child\'s name carved over and over: ANNA. The chalk dust on the floor is fresh. There is no chalk in the room.',
+    'The ledger\'s final entry, in a different hand: "Whoever finds this, I am sorry. I left the door open."',
+  ],
+  stone: [
+    'The stone is warm on one face — handprint-warm — and cold on the other. The warm face is the one against the wall.',
+  ],
+  landmark: [
+    'The spire leans a fraction more each time you blink. You have not walked any closer to it — but it has walked closer to you.',
+  ],
+};
+
+const CREEPY_RATE = 0.17;
+
+// Deterministic per-noun hash for the creepy roll. Same noun
+// in the same session resolves to the same lore, so the
+// player isn't confused by the bench rotating between normal
+// and creepy text on every render.
+function nounSeed(noun: string): number {
+  let h = 0;
+  for (let i = 0; i < noun.length; i++) {
+    h = (h * 31 + noun.charCodeAt(i)) >>> 0;
+  }
+  return h;
+}
+
+function pickCreepyVariant(pool: readonly string[], category: NounCategory): string {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { rotatingPick } = require('./rng') as typeof import('./rng');
+  return rotatingPick(pool, `investigation.creepy.${category}`);
+}
+
 /** Resolve the lore line for an entry. Returns the cached
- *  loreLine if set; otherwise falls back to the curated template
- *  string with the noun spliced in. OTA-077 makes the curated
- *  fallback noun-aware so interleaved async log lines stay
- *  distinguishable — pre-OTA-077 every generic-category miss
- *  printed the identical "You look it over..." line, and two
- *  investigates in close succession produced two identical log
- *  lines that looked like a duplicate-dispatch bug.
- *
- *  Templates use the literal token '{noun}' as a placeholder
- *  which this resolver substitutes with entry.noun. Templates
- *  without the placeholder render as-is (already noun-specific
- *  via category-specific phrasing like "the metal is cold and
- *  unresponsive..."). */
+ *  loreLine if set; otherwise picks from the category's
+ *  CREEPY_VARIANTS at the OTA-080 creepy rate (deterministic
+ *  per noun) or falls back to the curated template fallback.
+ *  Templates use '{noun}' as a placeholder which this
+ *  resolver substitutes with entry.noun. */
 export function resolveLore(entry: InvestigationEntry): string {
   if (entry.loreLine && entry.loreLine.length > 0) return entry.loreLine;
-  const tmpl = templateFor(entry.category).fallbackLore;
-  return tmpl.replace(/\{noun\}/g, entry.noun);
+  const tmpl = templateFor(entry.category);
+  // OTA-080 — creepy variant roll. Bounded to ≈17% via
+  // CREEPY_RATE, deterministic per noun so the same entry
+  // resolves to the same line each render. Falls back to the
+  // standard fallbackLore when the category has no creepy
+  // pool or the deterministic roll missed.
+  const creepyPool = CREEPY_VARIANTS[entry.category];
+  let line: string;
+  if (creepyPool && creepyPool.length > 0) {
+    const roll = (nounSeed(entry.noun.toLowerCase()) % 1000) / 1000;
+    if (roll < CREEPY_RATE) {
+      line = pickCreepyVariant(creepyPool, entry.category);
+    } else {
+      line = tmpl.fallbackLore;
+    }
+  } else {
+    line = tmpl.fallbackLore;
+  }
+  return line.replace(/\{noun\}/g, entry.noun);
 }
 
 // OTA-074 — callback variant pools. Per-kind line templates

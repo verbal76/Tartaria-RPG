@@ -626,4 +626,57 @@
 // Ambient batched set patches every consumed noun's table
 // entry; investigate case adds resolvedHookMatch check
 // before the table consult).
-export const OTA_BUILD_ID = '2026-05-27-079';
+//
+// 2026-05-27 OTA-080 — Multi-agent audit fix pass 3: keyword
+// coverage expansion + new landmark category + creepy
+// variant pool. Frees the spire / tower / pillar / mosaic /
+// chandelier / etc. nouns from the generic catchall and adds
+// the uncanny lore variants the user asked for.
+//
+//   KEYWORD_MAP expansions (~18 new nouns mapped):
+//     light       += chandelier
+//     text        += mosaic, tapestry, tome, parchment, fresco
+//     stone       += plinth, sarcophagus, tile
+//     furniture   += throne, counter, lectern
+//     machinery   += anvil, forge, loom, instrument, fuel-cell
+//     vessel      += fountain, bottle, glass, dish
+//     debris      += plank, board, catwalk
+//
+//   NEW 'landmark' category — scene anchors that previously
+//   leaked to generic. Keywords: spire, tower, dome, cupola,
+//   steeple, minaret, pillar, column, obelisk, pylon,
+//   standing-stone. Template fallbackLore: "The {noun} rises
+//   out of the silt like a memory the world refuses to bury
+//   ... names, prayers, accounts no one closed." Yield:
+//   Aether Residue (in catalog) at chance 0.10. From the
+//   playtest, this fixes the "tilting obsidian pillar" and
+//   "spire" generic-fallback leaks.
+//
+//   CREEPY_VARIANTS pool — per user: "creepy statements
+//   marked on them or something just isnt right about it".
+//   14 uncanny-tone variants across 13 categories. Quiet,
+//   specific, off-putting (not horror): "ANNA" carved over
+//   and over on a chalkboard with no chalk in the room, a
+//   tooth too large to be a child's in clear warm liquid, a
+//   chair dragged to face a wall by someone who wanted to
+//   sit very still, a statue's eyes refilled with wet clay.
+//   resolveLore now branches on a deterministic per-noun
+//   hash at CREEPY_RATE = 0.17, so the same bench in the
+//   same room resolves to the same line within a session —
+//   not a re-roll each render. Player sees ~1 uncanny line
+//   every 5-6 scenes. Frequent enough to color the world,
+//   rare enough to stay unsettling.
+//
+// Outstanding (deferred):
+//   OTA-081 will add hubRoomId to makeRoomKey so hub-interior
+//   rooms (chandelier study + armory + atlas hall) stop
+//   sharing the same table seed. Touches ~20 call sites and
+//   warrants its own bounded OTA.
+//
+// Files: app/engine/investigationTable.ts (NounCategory +=
+// 'landmark', KEYWORD_MAP gains ~18 nouns + the landmark
+// regex, TEMPLATES gains a landmark entry, CREEPY_VARIANTS
+// pool + nounSeed + pickCreepyVariant helpers, resolveLore
+// now branches on the creepy roll before the standard
+// fallback).
+export const OTA_BUILD_ID = '2026-05-27-080';
