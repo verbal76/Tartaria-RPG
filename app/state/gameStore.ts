@@ -1665,6 +1665,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ]));
         }
       }
+      // 2026-05-27 OTA-099 — capture justUpdatedFromBuild
+      // BEFORE the set() so we can log the OTA-applied marker
+      // below. The set() clears the flag (so the title-screen
+      // popup doesn't fire again on next session); the debug
+      // log entry below uses the captured value.
+      const ota099UpdatedFrom = get().justUpdatedFromBuild;
       set({
         player,
         worldMemory: saved.worldMemory,
@@ -1673,6 +1679,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         activeSlotId: slotId,
         currentScene: restoredScene,
         pendingRolls: null,
+        justUpdatedFromBuild: null,
         // 2026-05-25 — preserve wastelandStepsSinceEncounter on
         // restore so a save-load round-trip can't game the encounter
         // gate (was: reset to 0, letting a player save-load to delay
@@ -1684,6 +1691,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // get a fresh warning otherwise.
         lowHpWarned: false,
       });
+      // 2026-05-27 OTA-099 — OTA-applied + session-start markers
+      // in the log. User asked: "when you update via OTA can a
+      // record of that be in the log, but not visible to the
+      // player, that way you can tell if I am up to date, and
+      // can kind of have a timestamp of the progression."
+      // Done via the debug channel so the entry shows up in
+      // shared log captures but doesn't surface as world /
+      // arbiter narration. Always emit a session-start marker
+      // on load (so any log dump can be traced to a build ID);
+      // additionally emit an "applied from" marker the first
+      // time a slot is loaded after an OTA upgrade.
+      try {
+        if (ota099UpdatedFrom) {
+          get().appendLog(
+            'debug',
+            `OTA applied: ${ota099UpdatedFrom} → ${OTA_BUILD_ID}.`,
+          );
+        }
+        get().appendLog('debug', `OTA session start: ${OTA_BUILD_ID}.`);
+      } catch { /* hardened: never block slot load on a debug log failure */ }
       // Only fall back to beginScene when the save predates scene
       // capture. New saves restore the exact scene above and skip this.
       if (!restoredScene) {
@@ -1833,6 +1860,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       pendingRolls: null,
       activeSlotId: slotId,
     });
+    // OTA-099 — session-start debug marker for new characters
+    // too. Same purpose as in loadSlotIntoGame: any log capture
+    // can be traced to the build ID it was running.
+    try {
+      get().appendLog('debug', `OTA session start: ${OTA_BUILD_ID}.`);
+    } catch { /* never block character creation on a debug log */ }
     // Opening line + player name + weather get woven INTO the scene
     // paragraph rather than printed as their own log entries, so the
     // player sees one flowing intro instead of three stacked statements.

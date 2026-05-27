@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-098` (apostrophe-variant dedup writes so the chip greys; Arbiter narration on lead-fired). See **Section 0** for the live issue tracker covering OTA-070 → OTA-098.
+> **Latest OTA:** `2026-05-27-099` (OTA-apply + session-start debug markers in the log; chip-grey apostrophe variants in OTA-098). See **Section 0** for the live issue tracker covering OTA-070 → OTA-099.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -32,6 +32,16 @@
 - **TS 0 errors / Test suite green.** Always required pre-push. Tracked here as a passive gate rather than an issue.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Telemetry / dev visibility
+
+- **OTA-099 (2026-05-27) · Add debug-log markers on OTA apply + every session start so log captures show which build the player is running and when.**
+  - **What:** Player requested: "when you update via OTA can a record of that be in the log, but not visible to the player, that way you can tell if I am up to date, and can kind of have a timestamp of the progression." The device-info envelope on log captures already lists the OTA build ID, but it's a single static line, not interleaved with the timestamped log entries. No way to tell when within a session an upgrade landed or which build a specific log slice was running.
+  - **Fix:** Two debug-channel log entries:
+    - `[debug] OTA session start: <OTA_BUILD_ID>.` — emitted on every slot load (and on new-game character creation). Any log capture will have this line near the top, timestamped, naming the running build.
+    - `[debug] OTA applied: <oldId> → <newId>.` — emitted ONCE per upgrade, the first time a slot is loaded after the hydrate flow detected a new OTA_BUILD_ID. Mirrors the existing `justUpdatedFromBuild` flag (which drives the TitleScreen update popup) but persists into the log so I can trace upgrade progression across captures.
+    - Both use the existing `appendLog('debug', ...)` channel — invisible to the player in normal play (debug entries are present in log exports but typically don't surface in the world / arbiter / combat narration UI).
+  - **Files:** `app/state/gameStore.ts` (loadSlotIntoGame + startNewGame both append the markers; justUpdatedFromBuild captured before the set() so the OTA-applied marker can fire even though the set clears the flag).
 
 #### Quest-check narration polish
 

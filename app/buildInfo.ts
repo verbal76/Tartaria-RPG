@@ -1414,4 +1414,26 @@
 //       channel log fires alongside the New lead reward.
 //
 // Files: app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-05-27-098';
+// 2026-05-27 OTA-099 — OTA-apply + session-start debug log
+// markers. Player asked: "when you update via OTA can a
+// record of that be in the log, but not visible to the
+// player, that way you can tell if I am up to date, and
+// can kind of have a timestamp of the progression."
+//
+// Two debug-channel entries (invisible to player in normal
+// play, present in shared log captures):
+//   - "OTA session start: <OTA_BUILD_ID>." — every slot load
+//     and new-game character creation. Timestamped marker
+//     of which build is running.
+//   - "OTA applied: <oldId> → <newId>." — once per upgrade,
+//     first slot load after the hydrate-flow update
+//     detection. Captures the transition.
+//
+// justUpdatedFromBuild is captured BEFORE the set() in
+// loadSlotIntoGame so we can log it; the set then clears
+// the flag (so the title-screen popup doesn't refire on
+// next session).
+//
+// Files: app/state/gameStore.ts (loadSlotIntoGame + start
+// NewGame).
+export const OTA_BUILD_ID = '2026-05-27-099';
