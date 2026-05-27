@@ -2,16 +2,167 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-26-056` (INT trains on investigate + two-handed weapon auto-displace + dual-slot visual).
-> **Session arc (2026-05-25 → 2026-05-26):** 37 OTAs from `020` → `056` shipped one continuous session. Driven by playtester logs the entire way. The arc bends through five waves — quality-of-life (020-032), scanner system + investigate depth (033-037), engagement-engines per the *impossible-to-put-down* plan (038-047), thorough stress testing (048), and a sustained playtester-feedback rapid-response loop (049-056). See section 6.A for per-OTA breakdown with the WHY + LOGIC for each one.
+> **Latest OTA:** `2026-05-27-094` (parser regression-lock + hyphen normalization). See **Section 0** for the live issue tracker covering OTA-070 → OTA-094.
+> **Recent session arcs:**
+> - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
+> - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
 > **Latest APK trigger:** `2026-05-23a` (in `metro.config.js`) — APK **#207** built at runtime `2.4.1`. **Existing v2.201 testers must install APK 207 (or later) to receive any OTA published after `2026-05-23-011`.** No native rebuild has been required since.
 > **TypeScript:** 0 errors (`npx tsc --noEmit`) — checked at every OTA bump.
 > **Tests:** 107/107 pass across the canary five (`salvagePools`, `theftNarrationGuard`, `itemEffect`, `statTraining`, `areaSearch`) + the 9 new test files shipped this session (`variableRewards`, `chainedNarrative`, `jitTemptation`, `sessionResume`, `mysterySeeds`, `parserFuzz`, `craftRepairFuzz`, `engagementSmoke`, plus the existing `equipSwap`/`equippedIds`/`inventoryAudit`/`recipeFuzzy` set). The longer sim files (`yearSimulation`, `thousandDayStressSim`, `twoYearChaosSim`) pass too — `twoYearChaosSim` has one borderline "geographic loops ≤1" assertion that flakes 1 in 3 runs (RNG variance against an asymptote-of-threshold metric, pre-existing). Three stress files (`combatStress`, `domesticStress`, `metaNavStress`) OOM-abort in this sandbox at the 700-day sim length — pre-existing infrastructure ceiling, not a regression.
 > **Working tree:** clean.
 > **Open PR:** #1 — draft, this branch → `main`, **stale** relative to OTAs 020 → 056. Description still reflects OTA 053-era state. Refresh before requesting review (the PR summary should walk the five waves below + the deferred items in section 7).
-> **Open issues:** 0 (GitHub repo issue tracker).
+> **Open issues:** 2 (in Section 0.A — Hub-room key collision deferred, ongoing catalog backfill). GitHub repo issue tracker remains at 0.
 
-> **For the next Claude instance:** read section 16 first — it's a snapshot of the player's working style + the major systems + the in-flight context. Then section 6.A for the recent wave's reasoning. Section 7 lists what's still on the table.
+> **For the next Claude instance:** read section 16 first — it's a snapshot of the player's working style + the major systems + the in-flight context. Then **Section 0** for the live issue tracker (the canonical Open / Closed list — read BEFORE planning any fix). Then section 6.A for the recent wave's reasoning. Section 7 lists what's still on the table.
+
+---
+
+## 0. Issue Tracker — Open and Closed
+
+> **The canonical record of issues across the build.** Every OTA / APK push updates this section in the same commit. **Read this section before planning any fix** to (a) check whether the issue is already closed and the fix exists, and (b) make sure your plan won't break a previously-closed fix. The workflow rules live in `CLAUDE.md` → "HANDOFF.md — the build timeline."
+
+### 0.A — Open Issues
+
+- **Hub-room key collision (deferred from OTA-080 plan).** `makeRoomKey(locationId, microMicroId, mapX, mapY)` omits `hubRoomId`, so hub interiors that share `locationId` + `mapX/mapY` (chandelier study + armory + atlas hall in Asgardar) collide on the same per-room state. OTA-076 self-heals via inline table-seeding when a room is missing its investigation table, which masks the symptom for the investigate path, but other per-room data (climb markers, dedup lists) can still cross-pollute between hub interiors. **Fix shape:** add `hubRoomId` to `makeRoomKey` signature, update ~20 call sites, accept that old saves' explored rooms go cold + re-seed on the new key. **Status:** deferred — was planned as "OTA-081 will fix" in OTA-080 notes; OTA-081 shipped as the enemy HP bar fix instead, room-key never landed. Pick up when impact is observed (so far, only theoretical for hub-only data; OTA-076 covers the practical investigation case).
+
+- **Ongoing catalog backfill from `inferred-stats:` debug lines.** Pattern: when an inventory item resolves through `app/engine/itemDefaults.ts` (no authored catalog entry), the engine logs `[debug] inferred-stats: <kind>:<name> — engine guessed stats; add catalog row when convenient.` Backfill these into the relevant `app/data/items/*.json` as logs surface them. **Status:** active. Last batch (OTA-093) added Bone Fragment. Future logs that show new inferred items → batch into the next OTA touching the catalog. No workflow change needed — grep logs for `inferred-stats:` each pass.
+
+- **TS 0 errors / Test suite green.** Always required pre-push. Tracked here as a passive gate rather than an issue.
+
+### 0.B — Closed Issues (most recent first)
+
+#### Parser hardening
+
+- **OTA-094 (2026-05-27) · Parser regression-lock + hyphen normalization.**
+  - **What:** OTA-093 fixed the false-match bug but broke the existing `'attack the drone with the bolt-caster'` test because the parser tokenizes hyphens; my head-noun check looked for `'bolt-caster'` as a single token. Two existing parserArgs tests failed.
+  - **Why:** Without normalization, hyphenated item names like `Bolt-Caster` can't be located via head noun.
+  - **Fix:** Added `normalizeName()` helper (lowercase + replace `-` with space + collapse whitespace) and `flatTokens` (input tokens flattened on hyphens + whitespace). All 3 passes use these. Added 7 regression tests in `__tests__/parserArgs.test.ts` under "OTA-093 — resolveItem head-noun matching" so a future loosening trips the lock. All 196 parser-suite tests pass.
+  - **Files:** `app/engine/parser.ts`, `__tests__/parserArgs.test.ts`.
+
+- **OTA-093 (2026-05-27) · `investigate titan's bone marker` false-matched inventory's `Bone Fragment` → "field-inferred" warning + wrong arbiter refusal.**
+  - **What:** Pre-OTA-093 `resolveItem` accepted any input token as a substring of any item name. `titan's bone marker` (scene noun) tokens matched `Bone Fragment` via `'bone fragment'.includes('bone')` → engine treated it as inventory inspect → fell into `itemDefaults` inference → printed `[debug] inferred-stats: gear:Bone Fragment` + arbiter "not something hands take to." Plus `Bone Fragment` had no catalog entry (legitimate corpse-investigate loot).
+  - **Why:** Adjective-only token substrings shouldn't claim ownership of an inventory item.
+  - **Fix:** Rewrote `resolveItem` with three ordered passes: (1) full item name in input; (2) head noun (last word) as standalone token; (3) fuzzy on head noun only. Added Bone Fragment row to `app/data/items/materials.json`.
+  - **Files:** `app/engine/parser.ts`, `app/data/items/materials.json`.
+
+#### Elevated overlay system (climb-top mini-areas)
+
+- **OTA-092 (2026-05-27) · Overlay encounter scaling refined to HP-ratio bands (no more 5x mismatches).**
+  - **What:** OTA-091's rarity-tier scaling was too coarse — a 32 HP player got only ≤25 HP enemies (under-challenged); a 60 HP player skipped from Common to mixed Common+Uncommon with no scare-tier moments. Player wanted "still a challenge, flee occasionally, 2x ok, 3x scare, never 5x."
+  - **Why:** HP-ratio bands relative to `player.hpMax` scale with the player as they grow.
+  - **Fix:** Refactored `encounterPool` from tiered struct to flat `string[]`. `rollOverlayEncounter` does runtime band selection: easy (0.5x–1.0x), standard (1.0x–2.0x), scare (2.0x–3.0x). >3x never spawns. Weights 60/25/15. Graceful fallback: if no enemy in any in-range band, picks closest-to-1.5x.
+  - **Files:** `app/engine/elevatedOverlay.ts`.
+
+- **OTA-091 (2026-05-27) · OTA-089 surfaced a 158-HP Aetheric Harpy on a 32-HP player → instant death.**
+  - **What:** Encounter pool was a flat list mixing 12-HP Commons with 158-HP Rares; uniform roll one-in-three dropped a Rare on anyone. Plus `Aetheric Bat` typo in the pool (correct catalog name is `Aetherbat`) silently failed to spawn, biasing rolls toward survivors (Harpy, Shrike).
+  - **Fix:** Initially tiered pool by rarity (later refactored to HP-ratio in OTA-092). Fixed Aetheric Bat → Aetherbat typo.
+  - **Files:** `app/engine/elevatedOverlay.ts`, `app/state/gameStore.ts`.
+
+- **OTA-090 (2026-05-27) · Player requested NPC overlays — peaceful traders + lookouts at the top of climbs.**
+  - **What:** Player asked: "add those. keep the traders to locations we describe as larger and have them have a funny reason why they are hiding there." OTA-089 only had hostile encounters.
+  - **Fix:** Added `OverlayKind` union (encounter/trader/lookout). 5 trader templates (Olek the Ledger Keeper, Sister Yelena, Pavel allegedly, Adept Ireneus, Mikola the Lost-On-Purpose) gated to `minTiers >= 4`. 2 lookout templates (rumor scout, rumor pilgrim) plant one-stage hooks. Traders use `pickRoadsideTrader`-style VendorInstance with min/max randomized prices. Faction wiring (Servants/Reclaimers/Forgotten Order) intact.
+  - **Files:** `app/engine/elevatedOverlay.ts`, `app/state/gameStore.ts`.
+
+- **OTA-089 (2026-05-27) · Player asked for "heavier route" — actual mini-area at the top of multi-tier climbs with own encounter, return to ground via `climb down` without detour.**
+  - **What:** Player spec verbatim: "they climb four stages of the pillar at the top of the pillar there's a nook in the wall that's got [enemy]. whatever that we already have, it fights it, they get something and then instead of going back to the pillar they stay in the [nook] and they can just climb down from there."
+  - **Fix:** New `app/engine/elevatedOverlay.ts` (pure module, ~150 LOC). 6 templates (nook/vantage/collector/sealed_door/roost/open_sky). 30% trigger chance on climb-top. `CurrentScene` gains `preservedSceneOnDescent` + `elevatedOverlayMeta` so descent restores the base scene directly. `currentLocationId` never changes → no travel cost.
+  - **Files:** new `app/engine/elevatedOverlay.ts`, `app/state/gameStore.ts` (CurrentScene + climb-top + climb-down branches).
+
+#### Hook narrative / chip rotation
+
+- **OTA-088 (2026-05-27) · Hook-progressed chips didn't follow the narrative camera.**
+  - **What:** Player tapped `investigate fungus` → bioluminescent_path hook fired stage 1: "trail leads down through a slumped wall into a low chamber..." Player tapped fungus AGAIN expecting stage 2 — but the chip text still said "fungus" even though they were narratively in a chamber now. Looked like a duplication bug.
+  - **Fix:** `resolveHookOneStep` gained optional `triggerNoun` param. After stage advance, when `outcome.addNouns` has entries, replace the trigger ambient in `scene.ambientNouns` + `displayedAmbientNouns` with `addNouns[0]`. Fuzzy match on trigger (same OTA-070 substring approach) so 'fungus' maps to 'bioluminescent fungus' if that's the scene form. Hook keeps full noun list so TEXT input on the old word still routes.
+  - **Files:** `app/state/gameStore.ts`.
+
+#### Combat UI / Travel UX / List screens
+
+- **OTA-087 (2026-05-27) · Player asked for search bars + sort on Inventory, Craft, Repair, Recipes.**
+  - **Fix:** New `app/components/SearchSortBar.tsx` (controlled component). Wired into all four surfaces with category-relevant sort axes (Inventory: NAME/RARITY/KIND/QTY; Craft+Recipes: READY/NAME/RARITY; Repair: READY/DURABILITY/NAME/COST). Per-tab state in CraftingScreen so switching tabs preserves filters. RecipesView extended with optional `query`/`sortKey`/`sortDirection` props; legacy callers unchanged. State is ephemeral (resets on remount).
+  - **Files:** new `app/components/SearchSortBar.tsx`, `app/screens/InventoryScreen.tsx`, `app/screens/CraftingScreen.tsx`, `app/components/RecipesView.tsx`.
+
+- **OTA-086 (2026-05-27) · Climb chip stayed actionable after cresting (5+ tap loop).**
+  - **What:** OTA-085 added `disabled={isCleared}` on the climb modal Pressable, but `isCleared` came back false for the actually-cleared spire because of a marker-key mismatch. Engine wrote markers under the resolved short form (`climbed:spire:t4`); modal looked them up under the full chip noun (`zharak's teeth spire`). Exact prefix match missed.
+  - **Fix:** Fuzzy substring match in `maxClimbedTier` — `climbed:X:t<N>` matches the chip noun if X equals/contains/is-contained-by the chip lowercase. Multi-colon noun defensive parse via `slice()`. Added 5 regression tests in `__tests__/climbCleared.test.ts` covering the exact playtest case + symmetric inverse + no-false-positive boundary. All 14 climbCleared tests pass.
+  - **Files:** `app/engine/climbHeight.ts`, `__tests__/climbCleared.test.ts`.
+
+- **OTA-085 (2026-05-27) · Cleared climb chip rendered greyed with ✓ TOP but the Pressable still fired taps.**
+  - **Fix:** `disabled={isCleared}` on the Pressable in `ClimbModal.tsx` + guarded the pressed-style branch so no tap acknowledgement at all on cleared chips. (Note: OTA-086 then found `isCleared` was returning false for actually-cleared chips due to a separate marker-key bug.)
+  - **Files:** `app/components/ClimbModal.tsx`.
+
+- **OTA-084 (2026-05-27) · Hardened the "you've already worked this" refusal pattern — structurally locked.**
+  - **What:** History of OTA-070, OTA-076, OTA-083 all fixed the same bug pattern (refusal printed but no dedup write → chip stays green). User asked to harden.
+  - **Fix:** New store action `refuseAmbient({ noun, line, kind, channel?, skipDedup? })` that atomically appends the refusal log + writes the dedup mark (`searchedAmbientNouns` for `'productive'`, `flavorExhaustedNouns` for `'flavor'`). Refactored the OTA-079 resolved-hook branch to use the helper. JSDoc on the interface declares the contract for future contributors. The pattern is now impossible to forget — there's only one way to refuse, and that way always writes.
+  - **Files:** `app/state/gameStore.ts`.
+
+- **OTA-083 (2026-05-27) · Moss patch chip stayed green after 8 taps — OTA-079 resolved-hook short-circuit didn't write to any dedup list.**
+  - **Fix:** Added a `set()` to write the noun to `searchedAmbientNouns` alongside the callback log. (Later consolidated into the OTA-084 helper.)
+  - **Files:** `app/state/gameStore.ts`.
+
+- **OTA-082 (2026-05-27) · Travel refusal "just failed through without instruction."**
+  - **What:** Tapping a travel destination with 0 stamina fired the arbiter refusal once, then subsequent taps were eaten by arbiter-channel dedup at `gameStore.ts:1868` (visible in log as `[debug] dedup: suppressed arbiter repeat`).
+  - **Fix:** Added `{ skipDedup: true }` so every travel attempt shows the line. Phrasing updated to interpolate the destination name from `locations.json` ("You're too tired to set out for Voronov. Rest before making any plans — the road will hold.").
+  - **Files:** `app/state/gameStore.ts`.
+
+- **OTA-081 (2026-05-27) · Enemy HP number ticked down but HP bar stayed full.**
+  - **What:** RN percent-string width updates inside virtualized FlatList cells sometimes don't trigger a layout pass.
+  - **Fix:** Switched `hpBarFill` to numeric pixel width derived from `CARD_WIDTH - 18` (padding + border). Numeric widths always force layout.
+  - **Files:** `app/components/EnemyPanel.tsx`.
+
+#### Investigation table system (the big arc)
+
+- **OTA-080 (2026-05-27) · Audit pass 3 — keyword coverage + landmark category + creepy variant pool.**
+  - **What:** Audit found ~18 missing keywords from the playtest log + worldLadder data; spire/tower/pillar/obelisk had no category. User also asked for "creepy statements marked on objects" flavor.
+  - **Fix:** Expanded `KEYWORD_MAP` (chandelier→light; mosaic/tapestry/tome/parchment→text; pillar/obelisk/spire/tower/dome/etc.→new `landmark` category with Aether Residue yield @ 0.10). Added `CREEPY_VARIANTS` pool with 14 uncanny-tone variants (ANNA carved over and over, tooth too large for a child in warm liquid, statue eyes refilled with wet clay, etc.). `resolveLore` now branches on a deterministic per-noun hash at CREEPY_RATE=0.17 so the same noun resolves to the same line in a session.
+  - **Files:** `app/engine/investigationTable.ts`.
+
+- **OTA-079 (2026-05-27) · Audit pass 2 — salvage didn't sync with the investigation table (double-dip exploit) + resolved-hook leak to generic.**
+  - **What:** Salvage routes through `intent=investigate` but lands in its own harvest branch BEFORE the OTA-071 table consult. The harvest branch wrote only to `searchedAmbientNouns` and never touched `roomInvestigationTable.consumed`. So `salvage bench` → searched. Then `investigate bench` → table sees un-consumed → runs FRESH outcome with possible second yield. Player double-dipped. Plus resolved-hook noun ('spire' after a 3-stage half_buried_spire hook resolved) leaked to my OTA-071 generic template.
+  - **Fix:** Salvage's produced-set now also patches `roomInvestigationTable[noun]` with `consumed: true` + synthetic kind='item' result. Same in `salvageAllAmbient` batched commit. Resolved-hook short-circuit added in investigate case: `scene.hooks` scanned for resolved hook whose nouns include the matched ambient (fuzzy substring); print "You've already followed the thread of the X" + break.
+  - **Files:** `app/state/gameStore.ts`.
+
+- **OTA-078 (2026-05-27) · Audit pass 1 — five OTA-071 yields named items not in the catalog (silent fail) + pack-full silent fails + Qwen async patch comparison bug.**
+  - **What (1):** Cushion Scraps / Paper Scraps / Machine Part / Liquid Sample / Useful Scrap weren't in `app/data/items/*.json`. `findCatalogItem` returned null, grant silently skipped, but the lore line already said "Tucked into the seam: a cushion scraps" + entry marked consumed. Player saw the line, got nothing, lost the chip. Worse: next callback claimed "the cushion scraps was the only thing of value" for an item that never landed.
+  - **What (2):** Investigate / salvage / take pack-full all silently consumed the chip when `granted.accepted === 0`; player saw cryptic "Found a X but your pack is already full of them" line, took no item, lost the chip.
+  - **What (3):** `generateLoreAsync` returned the raw template with literal `{noun}` placeholder on Qwen miss; the IIFE's skip check compared against the substituted `baseOutcome.line` — never equal — so the patch always ran and overwrote the cached lore with raw `{noun}` text.
+  - **Fix:** Remapped yields to confirmed-in-catalog materials (furniture→Stick, shelf→Worn Tartarian Coin, machinery→Bent Nail, vessel→Mud Fragment, debris→Small Rock). Pack-full now downgrades the outcome to flavor + arbiter warning + skips dedup write (chip workable for retry). Take has its own early-return arbiter warning. `generateLoreAsync` fallback substitutes `{noun}` before returning so the skip-check works.
+  - **Files:** `app/state/gameStore.ts`, `app/engine/investigationTable.ts`.
+
+- **OTA-077 (2026-05-27) · "Multiple taps to get rid of a chip" + generic catchall too broad + identical generic lines hid which noun resolved.**
+  - **What:** OTA-072 ran the full outcome (lore, log, set-consumed) inside an async IIFE awaiting Qwen. Chip stayed green for the 50-2500ms latency window. Players tapped multiple times spawning duplicate IIFEs that interleaved log lines (same generic line appeared twice for spool+runecaster taps).
+  - **Fix:** Split the work. SYNC: roll outcome + log curated lore + grant item + mark consumed (chip greys immediately). ASYNC: fetch Qwen lore + patch `entry.result.line` for future callback/echo reference. Visible log line for this investigate stays curated; Qwen upgrade lands on next callback. Also expanded KEYWORD_MAP (spool/runecaster/chalkboard added). Generic template noun-aware via `{noun}` placeholder.
+  - **Files:** `app/state/gameStore.ts`, `app/engine/investigationTable.ts`.
+
+- **OTA-076 (2026-05-27) · Salvage chip stuck-green on legacy rooms (pre-OTA-071 saves).**
+  - **What:** Bench's room was visited before OTA-071's beginScene table-seed ran, so `roomInvestigationTable` was missing. Investigate handler fell through to the legacy `alreadySearched` branch and printed the old "you've already worked over the bench" refusal — bypassing every OTA-071→075 improvement.
+  - **Fix:** Self-heal table seed in the investigate handler — if `tableRoom` exists but `roomInvestigationTable` is missing, seed it inline from `currentScene.ambientNouns`. Plus extended OTA-070's fuzzy match to `isAmbientConsumed` so salvage / take / pinned-ground chips share the same fuzzy substring dedup.
+  - **Files:** `app/state/gameStore.ts`, `app/screens/ExplorationScreen.tsx`.
+
+- **OTA-075 (2026-05-26) · Investigation series 5/5 — cross-room echo hooks.**
+  - **Fix:** When player enters a new scene with no chain hook + no enemies, 15% chance to plant a hook that references a past investigation from a different room. `findReferenceableInvestigation` scans `worldMemory.visitedRooms` for consumed entries with kind='item'/'hook'. Synthetic Hook with kind='thread' + echo plantedLine.
+  - **Files:** `app/engine/investigationTable.ts`, `app/state/gameStore.ts`.
+
+- **OTA-074 (2026-05-26) · Investigation series 4/5 — callback variant pools + outcome-aware chip filter.**
+  - **Fix:** `callbackLine` picks from per-kind variant pools (5 item variants, 5 flavor, 3 hook, 2 default) via `rotatingPick`. Engine write-site branches on outcome.kind: 'item' → `searchedAmbientNouns` (chip filters out); 'flavor' → `flavorExhaustedNouns` (chip greys visible).
+  - **Files:** `app/engine/investigationTable.ts`, `app/state/gameStore.ts`.
+
+- **OTA-073 (2026-05-26) · Investigation series 3/5 — 15-category coverage + yield-roll mechanics + item grants.**
+  - **Fix:** NounCategory expanded from 5 to 15 (added door/corpse/statue/altar/vegetation/bone/light/container/text/stone). KEYWORD_MAP reordered for specificity. `rollOutcome` yield-roll path activated. Engine first-investigate path grants items via `grantItem` + reward log when outcome.kind === 'item'.
+  - **Files:** `app/engine/investigationTable.ts`, `app/state/gameStore.ts`.
+
+- **OTA-072 (2026-05-26) · Investigation series 2/5 — lazy Qwen lore generation.**
+  - **Fix:** `LoreGenerator` type + `generateLoreAsync` (chat messages → string Promise, 2.5s timeout, curated fallback on miss). Engine wraps `qwen.generate` when `qwen.isReady()`. Investigate first-time path runs the Qwen call inside an async IIFE.
+  - **Files:** `app/engine/investigationTable.ts`, `app/state/gameStore.ts`.
+
+- **OTA-071 (2026-05-26) · Investigation series 1/5 — per-room investigation table foundational layer.**
+  - **Why:** Player suggested architectural shift — every ambient noun in a scene should be a tracked entity with persistent attributes (category, lore, yield, hook potential, consumed flag, recorded result) so investigates never bottom out at "nothing more to find" generic refusals.
+  - **Fix:** New `app/engine/investigationTable.ts` (pure module). `VisitedRoom.roomInvestigationTable?: Record<string, InvestigationEntry>`. Categorizer + 5 curated templates (furniture/shelf/machinery/vessel/debris). Engine consults the table BEFORE the legacy alreadySearched/requirement/catalog branches. Pinned ground/floor/mud excluded.
+  - **Files:** new `app/engine/investigationTable.ts`, `app/engine/types.ts`, `app/state/gameStore.ts`.
+
+- **OTA-070 (2026-05-26) · Investigate chip stayed green forever despite engine's "already worked over" refusal (eternal green chip).**
+  - **What:** Engine used fuzzy substring match against memory (`'wooden bench'.includes('bench')` → true) for the alreadySearched gate, but UI chip's consumed check used exact `.has(chipLower)`. Variant phrasings in memory ('wooden bench') never matched chip noun ('bench') → chip stayed green even when engine refused.
+  - **Fix:** Added `isFuzzyConsumed(chipNoun, pool)` helper in ExplorationScreen with the same fuzzy substring logic the engine uses. Applied to the productively-consumed filter, the flavor-exhausted grey flag, and the INVESTIGATE tab tone counter. Foundation for the OTA-076 cross-modal extension.
+  - **Files:** `app/screens/ExplorationScreen.tsx`.
 
 ---
 
