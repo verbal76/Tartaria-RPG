@@ -1148,4 +1148,58 @@
 // converted to tiered pools), app/state/gameStore.ts
 // (climb-top call site passes player.hpMax into
 // rollOverlayEncounter).
-export const OTA_BUILD_ID = '2026-05-27-091';
+//
+// 2026-05-27 OTA-092 — Overlay encounter scaling refined to
+// HP-ratio bands. OTA-091's rarity-tier bands were too
+// coarse: a 32-HP player got only ≤25 HP enemies (under-
+// challenged, no flee-worthy moments), a 60-HP player skipped
+// straight from Commons to mixed Common+Uncommon with no
+// scare-tier excitement. Player asked: "I still want a
+// challenge they need to flee every now and then but not 5x.
+// 2x is ok, 3x if you want to scare them."
+//
+// Fix: switch from rarity tiers to HP-ratio bands relative
+// to player.hpMax. Encounter pool is a flat string[] again
+// (drops TieredEnemyPool), and rollOverlayEncounter does
+// runtime band selection:
+//
+//   easy band     0.5x - 1.0x player.hpMax  (light)
+//   standard band 1.0x - 2.0x player.hpMax  (normal)
+//   scare band    2.0x - 3.0x player.hpMax  (flee-worthy)
+//
+// Above 3x: never spawned. Below 0.5x: skipped unless
+// nothing else qualifies. Band weights: 60% standard, 25%
+// easy, 15% scare — most encounters are winnable, occasional
+// scare keeps tension, very rare too-easy beat. Falls back
+// to whichever band has entries if the preferred is empty.
+// Graceful degradation: if no enemy is in any in-range band,
+// picks the closest-to-1.5x option (still won't return
+// null).
+//
+// Pool authoring simpler too: each overlay declares a flat
+// list of thematic enemies spanning low-HP to high-HP. The
+// runtime picks what fits the player. Wide pools serve early,
+// mid, and late game with one list per overlay. Example
+// roost pool:
+//   ['Aetherbat' (15), 'Aetheric Raven' (18),
+//    'Aetheric Shrike' (47), 'Mud Harpy' (76),
+//    'Aetheric Harpy' (158)]
+//
+// Playtester case (32 HP, roost):
+//   easy:     Aetheric Raven (0.6x)
+//   standard: Aetheric Shrike (1.5x)
+//   scare:    Mud Harpy (2.4x)
+//   excluded: Aetheric Harpy (4.9x), Aetherbat (0.5x edge)
+// Same pool at 60 HP unlocks Aetheric Harpy as a scare
+// (2.6x). At 100+ HP it's the standard. Wide pools, one
+// definition, every player level.
+//
+// HP looked up at runtime from app/data/enemies/enemies.json
+// via lazy require so the pure module stays import-clean.
+//
+// Files: app/engine/elevatedOverlay.ts (TieredEnemyPool →
+// EncounterPool flat alias, OVERLAYS templates flattened
+// + widened, rollOverlayEncounter rewritten for HP-ratio
+// band selection with weighted band roll + graceful
+// fallback).
+export const OTA_BUILD_ID = '2026-05-27-092';
