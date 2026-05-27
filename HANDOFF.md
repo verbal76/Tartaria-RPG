@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-097` (per-noun dedup on the FAIL arm of the quest-skill-check investigate path; one attempt per noun, success or fail). See **Section 0** for the live issue tracker covering OTA-070 → OTA-097.
+> **Latest OTA:** `2026-05-27-098` (apostrophe-variant dedup writes so the chip greys; Arbiter narration on lead-fired). See **Section 0** for the live issue tracker covering OTA-070 → OTA-098.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -34,6 +34,14 @@
 ### 0.B — Closed Issues (most recent first)
 
 #### Quest-check narration polish
+
+- **OTA-098 (2026-05-27) · Chip didn't grey + Arbiter never acknowledged the captured lead.**
+  - **What:** OTA-096/097 closed the engine-side retry loop, but the chip in the SearchModal still rendered actionable. Plus the player asked for a clearer Arbiter beat when a lead drops: "I would imagine that my arbiter would say something to the effect of 'Ah, I see it now. We'll put that in your contracts for later.'"
+  - **Diagnosis:** the dedup write stored the noun's apostrophe form ("titan's bone marker"), but the scene chip text was stored without ("titans bone marker") — the OTA-070 substring fuzzy check can't bridge that gap because neither string contains the other when the apostrophe differs. So the chip render check missed the dedup mark.
+  - **Fix:** Two changes:
+    - **Apostrophe-variant writes** — when the dedup key has an apostrophe, write BOTH forms (`focusKey` and `focusKey.replace(/['']/g, '')`) to `flavorExhaustedNouns`. The fuzzy check on either chip variant now finds a match. Same fix applied to both the success and fail arms of the quest-check investigate path.
+    - **Arbiter line on lead-fired** — when the 12% lead roll fires, an arbiter-channel log now fires between the world line and the reward line: `The Arbiter nods. "Ah, I see it now. We'll put that in your contracts for later."` Player gets a clear signal that the thread was recorded + where it landed.
+  - **Files:** `app/state/gameStore.ts` (success-arm + fail-arm dedup writes both stripped + apostrophe-form write; arbiter log added to lead-fired branch).
 
 - **OTA-097 (2026-05-27) · FAIL arm of the quest-check investigate path didn't lock the noun — player could retry indefinitely without knowing they couldn't win.**
   - **What:** OTA-096 fixed the SUCCESS arm (per-noun dedup so the chip greys after the first successful tap) but missed the symmetric fail arm at `gameStore.ts:~8730`. A player whose stats couldn't beat the skill check's DC could keep tapping the same noun and never get told "you're not going to pass this." On top of that, the fail line was misleading: "You sweep Asgardar but find only dust" — narrated against the location name, not the noun the player actually examined. Playtester noticed: "it's kind of like tricking me to keep trying when I really don't have a chance."

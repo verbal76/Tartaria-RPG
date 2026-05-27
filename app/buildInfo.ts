@@ -1396,4 +1396,22 @@
 // Files: app/state/gameStore.ts (fail-arm investigate case
 // rewritten with focus-noun narration + inline dedup write),
 // HANDOFF.md (Closed Issues entry added).
-export const OTA_BUILD_ID = '2026-05-27-097';
+// 2026-05-27 OTA-098 — Chip-grey fix (apostrophe-variant
+// dedup writes) + Arbiter narration on lead-fired. Two
+// follow-ups from the OTA-097 playtest log:
+//
+//   (1) Chip didn't grey despite engine refusing. Root cause:
+//       dedup write stored the apostrophe form ("titan's bone
+//       marker") but the scene chip text was the stripped form
+//       ("titans bone marker"). The OTA-070 substring fuzzy
+//       check can't bridge that gap. Fix: write BOTH forms.
+//       Applied to both success and fail arms.
+//
+//   (2) Player wanted Arbiter acknowledgement: "if it's going
+//       to do that then I would imagine that my arbiter would
+//       say something to the effect of 'Ah, I see it now. We'll
+//       put that in your contracts for later.'" Done — arbiter-
+//       channel log fires alongside the New lead reward.
+//
+// Files: app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-05-27-098';

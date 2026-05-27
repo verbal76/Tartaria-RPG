@@ -8697,6 +8697,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 'world',
                 `You examine the ${focus}. A thread surfaces — clear enough to follow.`,
               );
+              // 2026-05-27 OTA-098 — Arbiter narration on lead-
+              // fired. Playtester asked: "if it's going to do
+              // that then I would imagine that my arbiter would
+              // say something to the effect of 'Ah, I see it
+              // now. we'll put that in your contracts for
+              // later'." Done — fires alongside the New lead
+              // reward line so the player knows the engine
+              // captured the thread and where it landed.
+              get().appendLog(
+                'arbiter',
+                `The Arbiter nods. "Ah, I see it now. We'll put that in your contracts for later."`,
+              );
               get().appendLog('reward', `New lead: ${quest.objective.verb} ${quest.objective.target} at ${quest.location.name}.`);
             } else {
               get().appendLog(
@@ -8710,6 +8722,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // dedup write (not via refuseAmbient since we already
             // logged the line — the helper would re-log an empty
             // string).
+            //
+            // 2026-05-27 OTA-098 — write both apostrophe and
+            // apostrophe-stripped variants. Playtest showed the
+            // chip wasn't greying even though the engine refused:
+            // root cause was that the dedup write had the noun in
+            // its apostrophe form ("titan's bone marker") but the
+            // scene chip text might be stored without ("titans
+            // bone marker"), and the OTA-070 substring fuzzy
+            // check can't bridge that gap (neither string contains
+            // the other when the apostrophe differs). Writing both
+            // forms ensures the chip finds a match regardless.
+            const apostropheStripped = focusKey.replace(/['']/g, '');
+            const keysToWrite = apostropheStripped !== focusKey
+              ? [focusKey, apostropheStripped]
+              : [focusKey];
             set((s) => {
               const r = s.worldMemory.visitedRooms?.[investRoomKey] ?? {
                 firstVisitAt: Date.now(),
@@ -8717,7 +8744,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 visitCount: 1,
               };
               const existing = r.flavorExhaustedNouns ?? [];
-              if (existing.includes(focusKey)) return s;
+              const additions = keysToWrite.filter((k) => !existing.includes(k));
+              if (additions.length === 0) return s;
               return {
                 worldMemory: {
                   ...s.worldMemory,
@@ -8725,7 +8753,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     ...(s.worldMemory.visitedRooms ?? {}),
                     [investRoomKey]: {
                       ...r,
-                      flavorExhaustedNouns: [...existing, focusKey],
+                      flavorExhaustedNouns: [...existing, ...additions],
                     },
                   },
                 },
@@ -8844,6 +8872,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
               player.mapX,
               player.mapY,
             );
+            // OTA-098 — same apostrophe-variant write as the
+            // success arm so the chip greys regardless of which
+            // form (with/without apostrophe) the scene stores.
+            const apostropheStrippedF = focusFKey.replace(/['']/g, '');
+            const keysToWriteF = apostropheStrippedF !== focusFKey
+              ? [focusFKey, apostropheStrippedF]
+              : [focusFKey];
             set((s) => {
               const r = s.worldMemory.visitedRooms?.[investFRoomKey] ?? {
                 firstVisitAt: Date.now(),
@@ -8851,7 +8886,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 visitCount: 1,
               };
               const existing = r.flavorExhaustedNouns ?? [];
-              if (existing.includes(focusFKey)) return s;
+              const additionsF = keysToWriteF.filter((k) => !existing.includes(k));
+              if (additionsF.length === 0) return s;
               return {
                 worldMemory: {
                   ...s.worldMemory,
@@ -8859,7 +8895,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     ...(s.worldMemory.visitedRooms ?? {}),
                     [investFRoomKey]: {
                       ...r,
-                      flavorExhaustedNouns: [...existing, focusFKey],
+                      flavorExhaustedNouns: [...existing, ...additionsF],
                     },
                   },
                 },
