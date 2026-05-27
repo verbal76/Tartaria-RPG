@@ -1094,4 +1094,58 @@
 // Trader + buildOverlayLookoutHook helpers), app/state/
 // gameStore.ts (climb-top branch now switches on overlay
 // kind to set vendor / hooks / enemies appropriately).
-export const OTA_BUILD_ID = '2026-05-27-090';
+//
+// 2026-05-27 OTA-091 — Overlay encounter scaling by player
+// HP. Playtester at 32 HP rolled a roost overlay and got an
+// Aetheric Harpy (Rare-tier, 158 HP, 2D6 Psychic damage)
+// who crit them to 5 HP in two rounds then finished them on
+// a step-back. The OTA-089 encounter pool was a flat
+// string[] mixing Common-tier (12-18 HP) with Rare-tier
+// (130-160 HP), so the roll was uniform across catastrophic
+// mismatches.
+//
+// Plus a silent bug: 'Aetheric Bat' didn't exist in the
+// catalog (the entry is 'Aetherbat') — that pool slot
+// silently failed to spawn anything, biasing the roost roll
+// toward the surviving Harpy + Shrike entries.
+//
+// Fix: refactor encounterPool from string[] to Tiered
+// EnemyPool { common, uncommon, rare }. rollOverlayEncounter
+// now takes player.hpMax and picks the band:
+//   hpMax < 40   → common only            (early game)
+//   hpMax < 80   → common + uncommon      (mid game)
+//   hpMax >= 80  → uncommon + rare        (late game)
+// Late-game intentionally drops common-tier so high-level
+// players don't roll trash; early-game caps at common so
+// squishy players don't roll Rares. Empty-band fallback to
+// common guarantees a spawn even on templates without a
+// rare entry.
+//
+// Tiered pools authored per overlay using catalog-verified
+// names from app/data/enemies/enemies.json:
+//   nook        common=Aetherbat/Raven/Spider, unc=Lurker/
+//               Scarab, rare=Apparition
+//   vantage     common=Raven, unc=Shrike/Mud Harpy, rare=
+//               Aetheric Harpy
+//   collector   common=Ooze/Leech, unc=Salamander, rare=
+//               Apparition
+//   sealed_door common=Spider, unc=Iron Spider/Drone/Rust
+//               Lurker, rare=Stone Warden/Aetheric Gargoyle
+//   roost       common=Raven/Aetherbat, unc=Shrike/Mud
+//               Harpy, rare=Aetheric Harpy
+//   open_sky    common=Raven, unc=Shrike, rare=Apparition
+//
+// Net effect on the playtester's case: a 32-HP player
+// climbing a 3-tier marble pillar to a roost overlay now
+// rolls from {Aetheric Raven (18 HP, 1D6), Aetherbat (15 HP,
+// 1D6)} — survivable. At 60 HP they also roll Aetheric
+// Shrike (47 HP, 2D6) / Mud Harpy (76 HP, 2D6). At 80+ HP
+// they finally face the Aetheric Harpy (158 HP, 2D6 Psychic).
+//
+// Files: app/engine/elevatedOverlay.ts (TieredEnemyPool
+// interface; encounterPool field retyped; rollOverlay
+// Encounter takes hpMax + band-selects; OVERLAYS templates
+// converted to tiered pools), app/state/gameStore.ts
+// (climb-top call site passes player.hpMax into
+// rollOverlayEncounter).
+export const OTA_BUILD_ID = '2026-05-27-091';

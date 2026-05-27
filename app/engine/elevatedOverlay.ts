@@ -62,6 +62,28 @@ export interface OverlayLookoutTemplate {
   hookNouns: string[];
 }
 
+/** OTA-091 — tiered encounter pool. Pre-OTA-091 the
+ *  encounterPool was a flat string[] mixing Common-tier
+ *  enemies (~12-18 HP) with Rare-tier enemies (130-160 HP)
+ *  — a roost roll could surface an Aetheric Harpy (158 HP)
+ *  against a 32-HP early-game player and crit them to
+ *  zero. Now each overlay declares per-tier pools (common,
+ *  uncommon, rare); rollOverlayEncounter picks the band
+ *  appropriate to player.hpMax so the encounter scales to
+ *  whatever the player can survive. */
+export interface TieredEnemyPool {
+  /** ≤ 30 HP enemies. Always populated — used as the floor
+   *  when the player is fresh, and as fallback when higher
+   *  tiers are empty for this overlay. */
+  common: string[];
+  /** 30-80 HP enemies. Mid game. May be empty for overlays
+   *  that thematically never produce a mid-tier creature. */
+  uncommon: string[];
+  /** 80+ HP enemies. Late game. May be empty for low-stakes
+   *  overlays. */
+  rare: string[];
+}
+
 export interface ElevatedOverlay {
   id: string;
   kind: OverlayKind;
@@ -82,10 +104,12 @@ export interface ElevatedOverlay {
   /** 0..1. Chance the overlay spawns an encounter on entry.
    *  Only applies when kind === 'encounter'. */
   encounterChance?: number;
-  /** Enemy name pool. Must match entries in app/data/enemies
-   *  /enemies.json by exact .name. One pick if the chance
-   *  rolls in. Only applies when kind === 'encounter'. */
-  encounterPool?: string[];
+  /** Enemy name pool, tiered by enemy rarity. Must match
+   *  entries in app/data/enemies/enemies.json by exact
+   *  .name. rollOverlayEncounter picks the band that fits
+   *  the player's hpMax. Only applies when kind ===
+   *  'encounter'. */
+  encounterPool?: TieredEnemyPool;
   /** Trader template — only applies when kind === 'trader'. */
   trader?: OverlayTraderTemplate;
   /** Lookout template — only applies when kind === 'lookout'. */
@@ -99,14 +123,28 @@ export interface ElevatedOverlay {
 // vegetation for 'roost feathers', etc.) so the
 // investigation table seeds useful entries.
 const OVERLAYS: ElevatedOverlay[] = [
-  // ============ ENCOUNTERS (OTA-089) ============
+  // ============ ENCOUNTERS (OTA-089 + OTA-091 tiering) ============
+  // Each pool is tiered by enemy rarity so rollOverlayEncounter
+  // can pick the band that matches player.hpMax. The pre-OTA-091
+  // pool was a flat string[] mixing 12-HP Common enemies with
+  // 158-HP Rare Harpies — a 32-HP early player could roll the
+  // Harpy and get 5-9 damage per crit. Now: tier-banded pools so
+  // a 32-HP player only sees Common enemies (≤25 HP), a 60-HP
+  // player sees Common+Uncommon, and a 100+ HP player sees the
+  // full ladder. Enemy names verified against app/data/enemies/
+  // enemies.json — pre-OTA-091 'Aetheric Bat' was misspelled
+  // and silently failed to spawn; corrected to 'Aetherbat'.
   {
     id: 'nook',
     kind: 'encounter',
     arrivalLine: 'At the top you find a nook carved into the structure — sheltered, lived-in, currently occupied.',
     ambientNouns: ['nook', 'scratched markings', 'dried bones', 'scraps of cloth'],
     encounterChance: 0.65,
-    encounterPool: ['Aetheric Bat', 'Aetheric Raven', 'Aetheric Spider'],
+    encounterPool: {
+      common: ['Aetherbat', 'Aetheric Raven', 'Aetheric Spider'],
+      uncommon: ['Mud Lurker', 'Aetheric Scarab'],
+      rare: ['Aetheric Apparition'],
+    },
   },
   {
     id: 'vantage',
@@ -114,7 +152,11 @@ const OVERLAYS: ElevatedOverlay[] = [
     arrivalLine: 'A wind-scoured ledge. Someone watched the road from here, and not long ago — the charcoal sketches are barely smudged.',
     ambientNouns: ['ledge', 'scope stand', 'charcoal sketches', 'spent flare'],
     encounterChance: 0.30,
-    encounterPool: ['Aetheric Shrike', 'Aetheric Harpy'],
+    encounterPool: {
+      common: ['Aetheric Raven'],
+      uncommon: ['Aetheric Shrike', 'Mud Harpy'],
+      rare: ['Aetheric Harpy'],
+    },
   },
   {
     id: 'collector',
@@ -122,7 +164,11 @@ const OVERLAYS: ElevatedOverlay[] = [
     arrivalLine: 'A copper bowl is bolted to the apex, half-filled with Aether residue. The air shimmers, like heat over a road.',
     ambientNouns: ['copper bowl', 'aether residue', 'ozone tang', 'bent rivets'],
     encounterChance: 0.50,
-    encounterPool: ['Aetheric Apparition', 'Aetheric Ooze'],
+    encounterPool: {
+      common: ['Aetheric Ooze', 'Aetheric Leech'],
+      uncommon: ['Aetheric Salamander'],
+      rare: ['Aetheric Apparition'],
+    },
   },
   {
     id: 'sealed_door',
@@ -130,7 +176,11 @@ const OVERLAYS: ElevatedOverlay[] = [
     arrivalLine: 'A door at the top of the climb. The hinges are mounted on this side — as if to keep something IN.',
     ambientNouns: ['sealed door', 'rusted hinges', 'pry marks', 'sigil'],
     encounterChance: 0.20,
-    encounterPool: ['Stone Warden', 'Aetheric Gargoyle'],
+    encounterPool: {
+      common: ['Aetheric Spider'],
+      uncommon: ['Iron Spider', 'Aetheric Drone', 'Rust Lurker'],
+      rare: ['Stone Warden', 'Aetheric Gargoyle'],
+    },
   },
   {
     id: 'roost',
@@ -138,7 +188,11 @@ const OVERLAYS: ElevatedOverlay[] = [
     arrivalLine: 'A bowl-shaped roost matted with feathers and bone fragments. The smell is still warm.',
     ambientNouns: ['roost', 'feathers', 'bone fragments', 'matted nest'],
     encounterChance: 0.80,
-    encounterPool: ['Aetheric Raven', 'Aetheric Harpy', 'Aetheric Shrike'],
+    encounterPool: {
+      common: ['Aetheric Raven', 'Aetherbat'],
+      uncommon: ['Aetheric Shrike', 'Mud Harpy'],
+      rare: ['Aetheric Harpy'],
+    },
   },
   {
     id: 'open_sky',
@@ -146,7 +200,11 @@ const OVERLAYS: ElevatedOverlay[] = [
     arrivalLine: 'Just sky. The view, and nothing else but the wind, and what the wind knows.',
     ambientNouns: ['sky', 'wind', 'view', 'distant spires'],
     encounterChance: 0.05,
-    encounterPool: ['Aetheric Apparition'],
+    encounterPool: {
+      common: ['Aetheric Raven'],
+      uncommon: ['Aetheric Shrike'],
+      rare: ['Aetheric Apparition'],
+    },
   },
   // ============ TRADERS (OTA-090, 4+ tier climbs only) ============
   // Player asked: traders only on larger locations + funny
@@ -340,16 +398,48 @@ export function overlayById(id: string): ElevatedOverlay | null {
  *  null when the encounter roll didn't fire. Caller looks up
  *  the actual catalog entry via app/data/enemies/enemies.json
  *  and instantiates the Enemy + hp. */
+/** OTA-091 — tier-band selection. Picks the enemy pool that
+ *  matches the player's hpMax so a 32-HP early player can't
+ *  roll a 158-HP Aetheric Harpy out of a roost.
+ *
+ *  Thresholds:
+ *    hpMax < 40   → common only            (~early game)
+ *    hpMax < 80   → common + uncommon      (~mid game)
+ *    hpMax >= 80  → uncommon + rare        (~late game)
+ *
+ *  The late-game band intentionally drops common-tier so
+ *  high-level players don't roll trash mobs; the early-game
+ *  band intentionally caps at common so squishy players
+ *  don't roll Rares. Mid-game blends. If the chosen band is
+ *  empty for this overlay's template (some overlays don't
+ *  have a rare entry), we fall back to common to guarantee
+ *  a spawn. */
+const COMMON_HP_CEILING = 40;
+const UNCOMMON_HP_CEILING = 80;
+
 export function rollOverlayEncounter(
   overlay: ElevatedOverlay,
+  playerHpMax: number,
   rand: () => number = Math.random,
 ): string | null {
   if (overlay.kind !== 'encounter') return null;
   const chance = overlay.encounterChance ?? 0;
   if (rand() >= chance) return null;
-  const pool = overlay.encounterPool ?? [];
-  if (pool.length === 0) return null;
-  return pool[Math.floor(rand() * pool.length)] ?? null;
+  const pool = overlay.encounterPool;
+  if (!pool) return null;
+  let candidates: string[];
+  if (playerHpMax < COMMON_HP_CEILING) {
+    candidates = pool.common;
+  } else if (playerHpMax < UNCOMMON_HP_CEILING) {
+    candidates = [...pool.common, ...pool.uncommon];
+  } else {
+    candidates = pool.rare.length > 0
+      ? [...pool.uncommon, ...pool.rare]
+      : [...pool.uncommon, ...pool.common];
+  }
+  if (candidates.length === 0) candidates = pool.common;
+  if (candidates.length === 0) return null;
+  return candidates[Math.floor(rand() * candidates.length)] ?? null;
 }
 
 /** Convenience type matching the gameStore's CurrentScene

@@ -7100,10 +7100,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // Trader spawns a VendorInstance on scene.vendor.
               // Lookout plants a one-stage hook the player can
               // tap any of the lookout's nouns to engage.
+              // OTA-091 — pass player.hpMax to scale the
+              // encounter band. Early-game (hpMax < 40) only
+              // sees Common-tier enemies in overlay rolls; mid
+              // (< 80) gets Common+Uncommon; late game gets
+              // Uncommon+Rare. Prevents the OTA-089 "32-HP
+              // player rolls a 158-HP Aetheric Harpy" mismatch.
               const enemy =
                 overlay.kind === 'encounter'
                   ? (() => {
-                      const name = rollOverlayEncounter(overlay);
+                      const name = rollOverlayEncounter(overlay, player.hpMax);
                       return name ? findEnemyByName(name) : null;
                     })()
                   : null;
