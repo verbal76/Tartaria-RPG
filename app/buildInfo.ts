@@ -1252,4 +1252,45 @@
 // Files: app/engine/parser.ts (resolveItem rewritten with
 // 3-pass head-noun matching), app/data/items/materials.json
 // (Bone Fragment catalog row added).
-export const OTA_BUILD_ID = '2026-05-27-093';
+//
+// 2026-05-27 OTA-094 — Lock OTA-093's parser tightening +
+// fix hyphen handling regression. User asked to "fix B" —
+// verify pass B (head-noun) is solid for the bone case.
+//
+// Found a regression in OTA-093 itself: my head-noun check
+// looked for the full hyphenated head as a single token
+// ('bolt-caster' as one string). But the parser tokenizes
+// hyphenated names into ['bolt', 'caster']. Mismatch broke
+// the existing parserArgs test for 'attack the drone with
+// the bolt-caster'.
+//
+// Fix: normalize hyphens to spaces in both the input
+// (joined tokens) and the item name (normalizeName helper).
+// Pass 1 'inputNorm.includes(itemNorm)' handles the full
+// name match cleanly. Pass 2 flattens tokens on hyphens +
+// whitespace into a 'flatTokens' pool, then checks if the
+// item's head noun (last word of normalized name) is in
+// that pool. 'Bolt-Caster' → normalized 'bolt caster' →
+// head 'caster' → matches flatTokens ['the', 'bolt',
+// 'caster']. Working.
+//
+// Regression lock: 7 new tests in __tests__/parserArgs.test.
+// ts under "OTA-093 — resolveItem head-noun matching":
+//   - 'titan's bone marker' does NOT match Bone Fragment
+//   - 'weathered bone marker' does NOT match Bone Fragment
+//   - full name 'bone fragment' DOES match
+//   - head noun 'fragment' alone DOES match
+//   - head noun 'blade' matches Rusted Blade
+//   - 'aetheric' alone does NOT match (ambiguous)
+//   - head noun 'locket' DOES match Aetheric Locket even
+//     when another Aetheric item is in inventory
+//
+// All 22 parserArgs tests pass; all 196 tests in the
+// parser-test suite pass. Adjective-only mismatches are
+// now structurally locked.
+//
+// Files: app/engine/parser.ts (normalizeName helper +
+// flatTokens flattening + hyphen-aware passes), __tests__/
+// parserArgs.test.ts (OTA-093 regression suite added),
+// app/buildInfo.ts → OTA-094.
+export const OTA_BUILD_ID = '2026-05-27-094';

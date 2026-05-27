@@ -686,22 +686,37 @@ function resolveItem(
   //
   // Adjective-only matches ("titan" / "bone" / "aetheric"
   // alone) no longer win. The player needs to name the head
-  // noun, or use the full item name. If the player typed a
-  // single ambiguous adjective, the resolver returns
-  // undefined and the engine falls back to scene-noun /
-  // context resolution.
-  const inputLower = tokens.join(' ');
+  // noun, or use the full item name.
+  //
+  // Hyphen normalization: items like 'Bolt-Caster' tokenize to
+  // ['bolt', 'caster'] in the parser (the tokenizer splits on
+  // hyphens). For comparison we normalize hyphens to spaces in
+  // both sides so 'bolt-caster' and 'bolt caster' are
+  // equivalent. The head-noun pass also flattens any
+  // multi-segment tokens before lookup so 'caster' (head of
+  // 'bolt-caster') matches a flat-token 'caster' from
+  // 'bolt-caster' or 'bolt caster' input.
+  const normalizeName = (s: string): string =>
+    s.toLowerCase().replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+  const inputNorm = normalizeName(tokens.join(' '));
+  // Flatten tokens: split each token on hyphens AND whitespace
+  // so 'bolt-caster' contributes ['bolt', 'caster'] to the
+  // pool. Pre-OTA-093 substring matching tolerated this
+  // implicitly; head-noun matching needs explicit handling.
+  const flatTokens = tokens.flatMap((t) => t.toLowerCase().split(/[-\s]+/).filter(Boolean));
+
   // Pass 1: input contains the full item name.
   for (const item of inventory) {
-    const itemLower = item.name.toLowerCase();
-    if (inputLower === itemLower) return item;
-    if (inputLower.includes(itemLower)) return item;
+    const itemNorm = normalizeName(item.name);
+    if (inputNorm === itemNorm) return item;
+    if (inputNorm.includes(itemNorm)) return item;
   }
-  // Pass 2: item's head noun (last word) appears as a token.
+  // Pass 2: item's head noun (last word of normalized name)
+  // appears as a flat token in the input.
   for (const item of inventory) {
-    const words = item.name.toLowerCase().split(/\s+/);
+    const words = normalizeName(item.name).split(/\s+/);
     const head = words[words.length - 1];
-    if (head && tokens.includes(head)) return item;
+    if (head && flatTokens.includes(head)) return item;
   }
   // Pass 3: fuzzy match against the head noun (typo
   // tolerance). Pre-OTA-093 this loop fuzzy-matched against
@@ -709,10 +724,10 @@ function resolveItem(
   // noun-only keeps typo tolerance ("lockett" → "locket")
   // without re-introducing adjective ambiguity.
   for (const item of inventory) {
-    const words = item.name.toLowerCase().split(/\s+/);
+    const words = normalizeName(item.name).split(/\s+/);
     const head = words[words.length - 1];
     if (!head) continue;
-    for (const t of tokens) {
+    for (const t of flatTokens) {
       if (fuzzyEqual(t, head)) return item;
     }
   }
