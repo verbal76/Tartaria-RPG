@@ -453,4 +453,53 @@
 // the investigate case before the table-entry lookup),
 // app/screens/ExplorationScreen.tsx (isAmbientConsumed swap
 // exact .has → isFuzzyConsumed).
-export const OTA_BUILD_ID = '2026-05-27-076';
+//
+// 2026-05-27 OTA-077 — Sync chip-consume + keyword coverage
+// expansion + noun-aware generic lore. Three bugs from the
+// playtest log all rooted in the OTA-072 async-IIFE pattern
+// and the overly-broad generic category:
+//
+//   (1) "Multiple taps to get rid of a chip." OTA-072 ran the
+//       entire outcome (lore, log, set-consumed) inside an
+//       async IIFE awaiting Qwen lore. Chip stayed green for
+//       the 50-2500ms Qwen latency window; players tapped
+//       repeatedly trying to make the still-green chip
+//       respond, spawning duplicate IIFEs that interleaved
+//       their log lines. Fix: split the work. SYNC =
+//       rollOutcome + log curated lore + grant item + mark
+//       consumed + write dedup list (chip greys IMMEDIATELY).
+//       ASYNC = fetch Qwen lore + patch entry.result.line for
+//       future callback / echo reference. Visible log line for
+//       THIS investigate stays curated — replacing logged
+//       entries after the fact is jarring; the Qwen upgrade
+//       lands on the next repeat tap's callback or the next
+//       room entry's echo hook.
+//
+//   (2) Generic catchall too broad. Playtest log showed spool
+//       / runecaster / chalkboard all falling through to the
+//       generic template ("You look it over. Nothing about it
+//       sings..."). Fix: KEYWORD_MAP expansions — machinery
+//       gets spool / reel / bobbin / coil / gear / cog /
+//       sprocket / lever / pipe / cable / wire / runecaster /
+//       capacitor / dial / gauge; text gets chalkboard /
+//       blackboard / slate / ledger / journal / writ / map /
+//       note. Coverage now catches the playtest's specific
+//       nouns.
+//
+//   (3) Identical generic lines hid which noun was resolving.
+//       Pre-OTA-077, two investigates in quick succession
+//       (spool + runecaster) both fell through to the generic
+//       template and printed identical "You look it over"
+//       lines, indistinguishable in the log when one IIFE
+//       landed late. Fix: noun-aware template substitution.
+//       Templates can include {noun} as a placeholder which
+//       resolveLore substitutes with entry.noun. Generic
+//       template now reads "You look the {noun} over..." so
+//       two investigates produce two readable lines.
+//
+// Files: app/state/gameStore.ts (investigate case first-time
+// path refactored from full-IIFE to SYNC log/grant/consume +
+// ASYNC Qwen-patch IIFE), app/engine/investigationTable.ts
+// (KEYWORD_MAP machinery + text expansions, generic template
+// noun-aware, resolveLore performs {noun} substitution).
+export const OTA_BUILD_ID = '2026-05-27-077';

@@ -116,12 +116,19 @@ const KEYWORD_MAP: Array<{ keywords: RegExp; category: NounCategory }> = [
   { keywords: /\b(bone|skull|ribcage|ribs|jaw|claw|fang|tusk|vertebra)\b/i, category: 'bone' },
   { keywords: /\b(torch|lantern|candle|brazier|flame|ember|sconce|glowstone)\b/i, category: 'light' },
   { keywords: /\b(chest|crate|box|sack|bag|satchel|pouch|coffer|trunk|strongbox)\b/i, category: 'container' },
-  { keywords: /\b(sign|plaque|scroll|tablet|inscription|mural|painting|banner|poster|notice|manuscript|book)\b/i, category: 'text' },
+  // OTA-077 — text keywords expanded with chalkboard / blackboard
+  // / slate / writ / ledger / journal / etc. Playtester log showed
+  // 'chalkboard' falling through to the generic catchall.
+  { keywords: /\b(sign|plaque|scroll|tablet|inscription|mural|painting|banner|poster|notice|manuscript|book|chalkboard|blackboard|slate|ledger|journal|writ|map|note)\b/i, category: 'text' },
   { keywords: /\b(stone|boulder|monolith|megalith|slab|brick|cobble|pebble|standing[- ]stone)\b/i, category: 'stone' },
   // OTA-071 original 5.
   { keywords: /\b(bench|chair|table|stool|cushion|couch|seat|desk|cot|bed|pew)\b/i, category: 'furniture' },
   { keywords: /\b(shelf|shelves|rack|bookcase|cabinet|cupboard|locker)\b/i, category: 'shelf' },
-  { keywords: /\b(conduit|console|sentinel|generator|mechanism|machine|device|panel|terminal|engine|motor|pump|valve)\b/i, category: 'machinery' },
+  // OTA-077 — machinery keywords expanded with spool / reel /
+  // bobbin / coil / gear / cog / sprocket / lever / pipe / cable
+  // / wire / runecaster / capacitor. Playtester log showed 'spool'
+  // and 'runecaster' falling through to the generic catchall.
+  { keywords: /\b(conduit|console|sentinel|generator|mechanism|machine|device|panel|terminal|engine|motor|pump|valve|spool|reel|bobbin|coil|gear|cog|sprocket|lever|pipe|cable|wire|runecaster|capacitor|dial|gauge)\b/i, category: 'machinery' },
   { keywords: /\b(vat|drum|urn|jar|pot|container|barrel|cask|crucible|basin|trough)\b/i, category: 'vessel' },
   { keywords: /\b(rubble|scrap|debris|wreckage|fragments?|shards?|pile|heap|husk)\b/i, category: 'debris' },
 ];
@@ -224,7 +231,11 @@ const TEMPLATES: Record<NounCategory, Template> = {
   },
   generic: {
     category: 'generic',
-    fallbackLore: 'You look it over. Nothing about it sings, nothing about it warns. Tartaria is full of objects waiting to be remembered.',
+    // OTA-077 — noun-aware. Pre-OTA the line read "you look it
+    // over" which made every generic-category investigate
+    // look identical in the log, hiding which noun the IIFE
+    // was actually resolving when async lines interleaved.
+    fallbackLore: 'You look the {noun} over. Nothing about it sings, nothing about it warns — Tartaria is full of objects waiting to be remembered.',
     yield: null,
     hookKind: null,
   },
@@ -288,12 +299,22 @@ export function seedInvestigationTable(
 
 /** Resolve the lore line for an entry. Returns the cached
  *  loreLine if set; otherwise falls back to the curated template
- *  string. OTA-072 will replace the null-branch with an async
- *  Qwen call that caches the generated lore into loreLine for
- *  next time. */
+ *  string with the noun spliced in. OTA-077 makes the curated
+ *  fallback noun-aware so interleaved async log lines stay
+ *  distinguishable — pre-OTA-077 every generic-category miss
+ *  printed the identical "You look it over..." line, and two
+ *  investigates in close succession produced two identical log
+ *  lines that looked like a duplicate-dispatch bug.
+ *
+ *  Templates use the literal token '{noun}' as a placeholder
+ *  which this resolver substitutes with entry.noun. Templates
+ *  without the placeholder render as-is (already noun-specific
+ *  via category-specific phrasing like "the metal is cold and
+ *  unresponsive..."). */
 export function resolveLore(entry: InvestigationEntry): string {
   if (entry.loreLine && entry.loreLine.length > 0) return entry.loreLine;
-  return templateFor(entry.category).fallbackLore;
+  const tmpl = templateFor(entry.category).fallbackLore;
+  return tmpl.replace(/\{noun\}/g, entry.noun);
 }
 
 // OTA-074 — callback variant pools. Per-kind line templates

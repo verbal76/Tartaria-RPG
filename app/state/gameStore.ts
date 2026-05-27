@@ -4305,141 +4305,162 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 );
                 break;
               }
-              // First investigate — roll the table outcome.
-              // OTA-072: lore generation runs through Qwen
-              // when ready, with a 2.5s timeout that falls
-              // back to the curated template lore on miss.
-              // The Qwen call happens inside an async IIFE so
-              // the surrounding switch stays synchronous; the
-              // log line + state mutation happen INSIDE the
-              // IIFE once lore resolves. Player taps INVESTI-
-              // GATE → modal closes → 50-300ms gap (Qwen
-              // latency) → lore line appears. Curated fallback
-              // when Qwen is unavailable / cold / errors.
+              // First investigate — OTA-077 sync-consume pattern.
+              // Pre-OTA-077 the entire outcome (lore, log, set)
+              // ran INSIDE an async IIFE awaiting Qwen lore.
+              // Chip stayed green for the 50-2500ms Qwen latency
+              // window; players tapped repeatedly trying to "get
+              // rid of" a still-green chip, spawning duplicate
+              // IIFEs that interleaved their log lines.
+              //
+              // OTA-077 splits the work:
+              //   SYNC: roll outcome (kind known immediately
+              //         since rollOutcome is pure), mark consumed
+              //         in the table + dedup list (chip greys
+              //         instantly), grant item if any, log the
+              //         curated lore line as the visible outcome.
+              //   ASYNC: when Qwen is ready, fetch the enriched
+              //          lore and patch the entry.result.line in
+              //          the table so future callback references
+              //          use the Qwen text. The visible log line
+              //          for THIS investigate stays curated —
+              //          replacing log entries after the fact is
+              //          jarring; the upgrade lands on the next
+              //          repeat tap's callback or the next room
+              //          entry's echo hook.
               const baseOutcome = rollInvestigationOutcome(tableEntry);
               const qwenGenerator: LoreGenerator | null = qwen.isReady()
                 ? (messages, opts) => qwen.generate(messages, opts)
                 : null;
               const locationName =
                 currentScene.location.name ?? 'this place';
-              void (async () => {
-                // OTA-072: lazy Qwen lore (curated fallback).
-                // OTA-073: if rollOutcome returned an item
-                // result, swap the lore line for the item-
-                // suffixed line so the lore + item discovery
-                // read as one beat. Qwen lore goes BEFORE the
-                // item suffix when both are present, so the
-                // generated atmospheric sentence flows into
-                // "Tucked into the seam: a [item]." If Qwen
-                // is unavailable, the curated lore + item
-                // suffix concatenate directly.
-                const loreFragment = qwenGenerator
-                  ? await generateInvestigationLoreAsync(
-                      tableEntry,
-                      locationName,
-                      qwenGenerator,
-                    )
-                  : baseOutcome.line.split(' Tucked into the seam:')[0]!;
-                const outcomeLine =
-                  baseOutcome.kind === 'item'
-                    ? `${loreFragment} Tucked into the seam: a ${baseOutcome.detail.toLowerCase()}.`
-                    : loreFragment;
-                const outcome = { ...baseOutcome, line: outcomeLine };
-                get().appendLog('world', outcome.line);
-                // OTA-073: when the outcome is an item, grant
-                // it through the standard inventory pipeline.
-                // findCatalogItem resolves the canonical
-                // entry (kind/rarity/tags/durability); we
-                // skip the grant silently if the named item
-                // isn't in the catalog so a future template
-                // typo doesn't crash the investigate flow.
-                if (outcome.kind === 'item' && get().player) {
-                  const cat = findCatalogItem(outcome.detail);
-                  if (cat) {
-                    const newItem: InventoryItem = {
-                      id: `${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`,
-                      name: cat.name,
-                      kind: cat.kind === 'weapon' ? 'weapon' : cat.kind === 'armor' ? 'armor' : cat.kind,
-                      rarity: cat.rarity,
-                      quantity: tableEntry.yield?.qty ?? 1,
-                      tags: cat.tags,
-                    };
-                    const granted = grantItem(get().player!.inventory, newItem);
-                    if (granted.accepted > 0) {
-                      set((s) =>
-                        s.player ? { player: { ...s.player, inventory: granted.inventory } } : s,
-                      );
-                      const qtyLabel = granted.accepted > 1 ? ` x${granted.accepted}` : '';
-                      get().appendLog(
-                        'reward',
-                        `✦ ${cat.name}${qtyLabel} from the ${ambient}.`,
-                      );
-                    }
+              const isItemOutcome = baseOutcome.kind === 'item';
+              // SYNC: log the curated lore (with item suffix
+              // when applicable) immediately. No await on Qwen.
+              get().appendLog('world', baseOutcome.line);
+              // SYNC: grant the item via the standard inventory
+              // pipeline. Player sees the reward line right
+              // after the lore line — single beat, no delay.
+              if (isItemOutcome && get().player) {
+                const cat = findCatalogItem(baseOutcome.detail);
+                if (cat) {
+                  const newItem: InventoryItem = {
+                    id: `${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`,
+                    name: cat.name,
+                    kind: cat.kind === 'weapon' ? 'weapon' : cat.kind === 'armor' ? 'armor' : cat.kind,
+                    rarity: cat.rarity,
+                    quantity: tableEntry.yield?.qty ?? 1,
+                    tags: cat.tags,
+                  };
+                  const granted = grantItem(get().player!.inventory, newItem);
+                  if (granted.accepted > 0) {
+                    set((s) =>
+                      s.player ? { player: { ...s.player, inventory: granted.inventory } } : s,
+                    );
+                    const qtyLabel = granted.accepted > 1 ? ` x${granted.accepted}` : '';
+                    get().appendLog(
+                      'reward',
+                      `✦ ${cat.name}${qtyLabel} from the ${ambient}.`,
+                    );
                   }
                 }
-                set((s) => {
-                  const room = s.worldMemory.visitedRooms?.[tableRoomKey] ?? {
-                    firstVisitAt: Date.now(),
-                    lastVisitAt: Date.now(),
-                    visitCount: 1,
-                  };
-                  const prevTable = room.roomInvestigationTable ?? {};
-                  const updatedEntry = {
-                    ...tableEntry,
-                    // Cache the resolved lore fragment on the
-                    // entry so callbackLine + any future read
-                    // can reference the Qwen-enriched line
-                    // (without the OTA-073 item suffix — the
-                    // suffix is recomputed from entry.result
-                    // when needed).
-                    loreLine: loreFragment,
-                    consumed: true,
-                    consumedAt: Date.now(),
-                    result: outcome,
-                  };
-                  // OTA-074 — write to the appropriate dedup
-                  // list based on outcome kind. Item outcomes
-                  // go to searchedAmbientNouns (chip filtered
-                  // out entirely — matches the existing
-                  // "produced an item" convention). Flavor
-                  // outcomes go to flavorExhaustedNouns (chip
-                  // stays visible greyed). Both lists honor
-                  // OTA-070's fuzzy UI check.
-                  const isItem = outcome.kind === 'item';
-                  const existingSearched = room.searchedAmbientNouns ?? [];
-                  const existingFlavor = room.flavorExhaustedNouns ?? [];
-                  const searchedWithNoun = isItem && !existingSearched.includes(ambientLower)
-                    ? [...existingSearched, ambientLower]
-                    : existingSearched;
-                  const flavorWithNoun = !isItem && !existingFlavor.includes(ambientLower)
-                    ? [...existingFlavor, ambientLower]
-                    : existingFlavor;
-                  return {
-                    worldMemory: {
-                      ...s.worldMemory,
-                      visitedRooms: {
-                        ...(s.worldMemory.visitedRooms ?? {}),
-                        [tableRoomKey]: {
-                          ...room,
-                          roomInvestigationTable: {
-                            ...prevTable,
-                            [ambientLower]: updatedEntry,
-                          },
-                          searchedAmbientNouns: searchedWithNoun,
-                          flavorExhaustedNouns: flavorWithNoun,
+              }
+              // SYNC: mark consumed + write to dedup list. Chip
+              // greys IMMEDIATELY via OTA-070/076 fuzzy UI check
+              // — no more "tap N times until it goes away".
+              set((s) => {
+                const room = s.worldMemory.visitedRooms?.[tableRoomKey] ?? {
+                  firstVisitAt: Date.now(),
+                  lastVisitAt: Date.now(),
+                  visitCount: 1,
+                };
+                const prevTable = room.roomInvestigationTable ?? {};
+                const updatedEntry = {
+                  ...tableEntry,
+                  loreLine: baseOutcome.line, // curated; Qwen patches async below
+                  consumed: true,
+                  consumedAt: Date.now(),
+                  result: baseOutcome,
+                };
+                const existingSearched = room.searchedAmbientNouns ?? [];
+                const existingFlavor = room.flavorExhaustedNouns ?? [];
+                const searchedWithNoun = isItemOutcome && !existingSearched.includes(ambientLower)
+                  ? [...existingSearched, ambientLower]
+                  : existingSearched;
+                const flavorWithNoun = !isItemOutcome && !existingFlavor.includes(ambientLower)
+                  ? [...existingFlavor, ambientLower]
+                  : existingFlavor;
+                return {
+                  worldMemory: {
+                    ...s.worldMemory,
+                    visitedRooms: {
+                      ...(s.worldMemory.visitedRooms ?? {}),
+                      [tableRoomKey]: {
+                        ...room,
+                        roomInvestigationTable: {
+                          ...prevTable,
+                          [ambientLower]: updatedEntry,
                         },
+                        searchedAmbientNouns: searchedWithNoun,
+                        flavorExhaustedNouns: flavorWithNoun,
                       },
                     },
-                  };
-                });
-              })();
-              // Stamina/time costs intentionally NOT applied
-              // here — table outcomes are quick visual / flavor
-              // beats. The richer skill-check path (catalog
-              // items, scanners) keeps its existing stamina
-              // cost and dice. Persistence flush via the
-              // normal advanceTime/persist cadence on the next
-              // action.
+                  },
+                };
+              });
+              // ASYNC: enrich the cached lore via Qwen so the
+              // NEXT callback / echo references the rich text
+              // instead of the curated fallback. Visible log
+              // line for this investigate is already done.
+              if (qwenGenerator) {
+                void (async () => {
+                  const enriched = await generateInvestigationLoreAsync(
+                    tableEntry,
+                    locationName,
+                    qwenGenerator,
+                  );
+                  // Skip the patch if Qwen returned the same
+                  // curated fallback (timeout / failure path).
+                  if (!enriched || enriched === baseOutcome.line) return;
+                  set((s) => {
+                    const room = s.worldMemory.visitedRooms?.[tableRoomKey];
+                    const existing = room?.roomInvestigationTable?.[ambientLower];
+                    if (!room || !existing) return s;
+                    const enrichedLine = isItemOutcome
+                      ? `${enriched} Tucked into the seam: a ${baseOutcome.detail.toLowerCase()}.`
+                      : enriched;
+                    const patched: typeof existing = {
+                      ...existing,
+                      loreLine: enriched,
+                      result: existing.result
+                        ? { ...existing.result, line: enrichedLine }
+                        : existing.result,
+                    };
+                    return {
+                      worldMemory: {
+                        ...s.worldMemory,
+                        visitedRooms: {
+                          ...(s.worldMemory.visitedRooms ?? {}),
+                          [tableRoomKey]: {
+                            ...room,
+                            roomInvestigationTable: {
+                              ...(room.roomInvestigationTable ?? {}),
+                              [ambientLower]: patched,
+                            },
+                          },
+                        },
+                      },
+                    };
+                  });
+                })();
+              }
+              // OTA-077 — stamina/time costs intentionally NOT
+              // applied here. Table outcomes are quick visual
+              // / flavor beats; the richer skill-check path
+              // (catalog items, scanners) keeps its existing
+              // stamina cost and dice. Persistence flush via
+              // the normal advanceTime/persist cadence on the
+              // next action.
               break;
             }
             const searchRoomKey = makeRoomKey(
