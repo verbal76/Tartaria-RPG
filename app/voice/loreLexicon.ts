@@ -31,25 +31,24 @@
 // how espeak's letter-to-sound rules treat specific letter combos.
 
 const LEXICON: Array<[RegExp, string]> = [
-  // Aether family — playtester IPA spec OTA-103/105/106. Not a
-  // uniform pattern. Two groups by initial vowel:
-  //   Long-A "ay" start:
-  //     Aether     /ɛɪθɚ/        → "ay ther"
-  //     Aetheric   /ɛɪθiɾɪk/     → "ay thee rik"
-  //     Aetherstone AY-thur-stohn → "ay thur stone" (user
-  //                                 corrected OTA-105's
-  //                                 'ay ter sten' parse in
-  //                                 OTA-106; /θ/ + "stone"
-  //                                 final, not /t/ + "sten")
-  //   Short-E "eth" start (/ɛθ/):
-  //     Aetherborn /ɛθɛɾ bɔːn/   → "eth er born"
-  //     Aetherbat  /ɛθɛɾ bet/    → "eth er bet" (final /bet/
-  //                                rhymes with "set", not "bat")
+  // Aether family — playtester spec OTA-107 (final, after a
+  // round of IPA-driven detours in OTAs 103/105/106). User's
+  // canonical pattern is UNIFORM across the family: long-A "ay"
+  // + "thur" + suffix. Caps cue: AY-thur. The IPA respellings
+  // shipped in OTAs 103/105 over-interpreted character-level
+  // detail (rhotic schwa "ther" vs "thur"; /ɛθ/ short-E start
+  // for born/bat) and produced TTS output that didn't match
+  // the user's intended pronunciation. Reverted here.
+  //   Aether       → "ay thur"
+  //   Aetheric     → "ay thur ik"
+  //   Aetherstone  → "ay thur stone"
+  //   Aetherborn   → "ay thur born"
+  //   Aetherbat    → "ay thur bat"
   [/\bAetherstone\b/gi, 'ay thur stone'],
-  [/\bAetheric\b/gi, 'ay thee rik'],
-  [/\bAetherborn\b/gi, 'eth er born'],
-  [/\bAetherbat\b/gi, 'eth er bet'],
-  [/\bAether\b/gi, 'ay ther'],
+  [/\bAetheric\b/gi, 'ay thur ik'],
+  [/\bAetherborn\b/gi, 'ay thur born'],
+  [/\bAetherbat\b/gi, 'ay thur bat'],
+  [/\bAether\b/gi, 'ay thur'],
 
   // Place names — long-vowel + multi-syllable mishaps.
   // Tartar* family is two beats: "tar" + the rest as one rapid stress

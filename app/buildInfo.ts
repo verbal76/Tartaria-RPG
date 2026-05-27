@@ -1552,4 +1552,24 @@
 // the corrected pronunciation.
 //
 // Files: app/voice/loreLexicon.ts.
-export const OTA_BUILD_ID = '2026-05-27-106';
+//
+// 2026-05-27 OTA-107 — Full Aether-family revert to uniform
+// "AY-thur" pattern. User: "revert all of the aether nouns
+// with that long a and thur sound in the beginning in caps
+// AY-thur". OTAs 103/105 over-interpreted IPA character-level
+// detail (rhotic schwa "ther" vs "thur"; /ɛθ/ short-E start
+// for born/bat) and produced TTS output that diverged from
+// the user's canonical pronunciation. The Aether family is
+// uniform — long-A start + "thur" middle + suffix:
+//   Aether       → 'ay thur'
+//   Aetheric     → 'ay thur ik'
+//   Aetherstone  → 'ay thur stone'
+//   Aetherborn   → 'ay thur born'
+//   Aetherbat    → 'ay thur bat'
+// This is the OTA-218-era spec restored. Going forward, IPA
+// gets weighed against the word's English orthography before
+// shipping; sharp divergence prompts a clarifying ask, not a
+// literal parse.
+//
+// Files: app/voice/loreLexicon.ts.
+export const OTA_BUILD_ID = '2026-05-27-107';

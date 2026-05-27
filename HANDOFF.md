@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-106` (Aetherstone correction — user clarified via natural-language respelling `AY-thur-stohn`; OTA-105 had parsed the IPA as hard /t/ + "sten" ending, which was wrong. Aetherstone reverts to "ay thur stone" with /θ/ and "stone" ending; still in the long-A group). See **Section 0** for the live issue tracker covering OTA-070 → OTA-106.
+> **Latest OTA:** `2026-05-27-107` (Full Aether-family revert to uniform "AY-thur" pattern. OTAs 103/105 over-interpreted IPA character-level detail; user clarified the family is uniform — long-A + "thur" + suffix across all five entries. OTA-218-era spec restored). See **Section 0** for the live issue tracker covering OTA-070 → OTA-107.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -38,6 +38,19 @@
 ### 0.B — Closed Issues (most recent first)
 
 #### Pronunciation lexicon
+
+- **OTA-107 (2026-05-27) · Full Aether-family revert to the uniform "AY-thur" pattern.**
+  - **What:** OTAs 103 and 105 over-interpreted IPA character-level detail across the Aether family — rhotic schwa "ther" vs "thur" for Aether, long-E "thee" middle for Aetheric, /ɛθ/ short-E start for Aetherborn and Aetherbat. User: *"revert all of the aether nouns with that long a and thur sound in the beginning in caps AY-thur."* The Aether family is uniform across all five entries: long-A "ay" + "thur" + suffix. Caps cue: AY-thur.
+  - **Fix:** `loreLexicon.ts` Aether block reset to the OTA-218-era spec:
+    - `'ay ther'` → `'ay thur'` (Aether)
+    - `'ay thee rik'` → `'ay thur ik'` (Aetheric)
+    - `'eth er born'` → `'ay thur born'` (Aetherborn)
+    - `'eth er bet'` → `'ay thur bat'` (Aetherbat — final reverts to "bat" too)
+    - Aetherstone stays at `'ay thur stone'` (already corrected in OTA-106)
+    - Block comment rewritten to call out the uniform pattern + the lesson from the IPA-driven detours.
+  - **Why:** The TTS output that ships to the player is what matters, and the user's canonical Tartaria pronunciation is "AY-thur" across the family. The IPA the user typed was a finer-grained hint than what should be applied verbatim — I treated character-level detail as authoritative when it wasn't.
+  - **Lesson re-logged (sharper):** When IPA produces a respelling that diverges from the word's English orthography in multiple places (vowel quality + consonant + ending), pause and surface it to the user as *"this would say X, is that right?"* before shipping. Going forward: ANY IPA-driven change to a proper-noun pronunciation gets a one-line natural-language preview ("AY-thur or ETH-er for this start?") so the user can sanity-check before the lexicon entry lands.
+  - **Files:** `app/voice/loreLexicon.ts` (Aether block comment + 4 entries reverted).
 
 - **OTA-106 (2026-05-27) · Aetherstone correction — OTA-105 misparsed the IPA.**
   - **What:** OTA-105 took the user's IPA `/ɛjtɛɹstɛn/` for Aetherstone literally and respelled as `'ay ter sten'` — hard /t/, "sten" rhymes with "ten." Player corrected via natural-language respelling: `AY-thur-stohn = aetherstone`. Translation: long-A start (consistent with the rest of the long-A group), /θ/ "th" sound in the middle (not /t/), and "stone" final (not "sten").
