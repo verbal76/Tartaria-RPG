@@ -1202,4 +1202,54 @@
 // + widened, rollOverlayEncounter rewritten for HP-ratio
 // band selection with weighted band roll + graceful
 // fallback).
-export const OTA_BUILD_ID = '2026-05-27-092';
+//
+// 2026-05-27 OTA-093 — Parser inventory matcher tightened +
+// Bone Fragment catalog backfill. Playtester noticed the
+// "Field-inferred / catalog backfill pending" lines on
+// 'titan's bone marker' resolving to 'Bone Fragment'. Two
+// problems stacked:
+//
+//   (1) The parser's resolveItem (parser.ts:632) used too-
+//       loose matching: `tokens.some(t => itemLower.includes(t))`.
+//       ANY input token as a substring of ANY item name
+//       won. So 'titan bone marker' tokens matched 'bone
+//       fragment' on the bare word 'bone', and the engine
+//       treated the scene noun like an inventory inspect →
+//       fell into itemDefaults inference → printed the
+//       backfill warnings.
+//
+//   (2) Bone Fragment WAS legitimately granted as loot from
+//       the corpse-investigate path but had no catalog
+//       entry, so even legitimate inventory inspects hit
+//       the inference fallback.
+//
+// Fix (1): tightened matcher with three ordered passes:
+//   pass 1 — input contains the FULL item name (multi-word
+//            item names need all their words present)
+//   pass 2 — item's HEAD NOUN (last word) is a standalone
+//            token in the input. "use the locket" matches
+//            "Aetheric Locket"; "use the blade" matches
+//            "Rusted Blade".
+//   pass 3 — fuzzy on the head noun only (typo tolerance
+//            without re-introducing adjective ambiguity).
+// Adjective-only tokens ('titan', 'bone', 'aetheric')
+// alone no longer win. Player needs to name the head noun
+// or the full item name. If they typed something too vague,
+// the resolver returns undefined and the engine falls back
+// to scene-noun / context-noun resolution.
+//
+// Fix (2): Bone Fragment added to materials.json with a
+// canonical description matching the existing Bone Sliver
+// entry's style.
+//
+// Net: 'climb titan's bone marker' no longer mis-resolves
+// to the inventory item; goes to scene-noun matching. The
+// scene noun isn't climbable so the existing arbiter
+// refusal fires correctly. 'investigate bone fragment' on
+// the inventory item now hits the real catalog entry and
+// skips the field-inferred warning.
+//
+// Files: app/engine/parser.ts (resolveItem rewritten with
+// 3-pass head-noun matching), app/data/items/materials.json
+// (Bone Fragment catalog row added).
+export const OTA_BUILD_ID = '2026-05-27-093';

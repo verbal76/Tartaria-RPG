@@ -665,16 +665,55 @@ function resolveItem(
     (t) => t !== 'off-hand' && t !== 'offhand' && t !== 'off' && t !== 'hand',
   );
   const tokens = filtered.length ? filtered : targetTokens;
-  // Exact substring match first
+  // 2026-05-27 OTA-093 — tightened matching. Pre-OTA-093 the
+  // first loop checked `tokens.some(t => itemLower.includes(t))`
+  // — ANY token as a substring of ANY item name won. Result:
+  // `climb titan's bone marker` (a scene noun) resolved to
+  // `Bone Fragment` (inventory item) because 'bone fragment'
+  // includes 'bone'. Engine then refused with "not something
+  // hands take to" (you can't climb a fragment).
+  //
+  // New rules, ordered most-confident to least:
+  //   (1) input contains the FULL item name (multi-word
+  //       item names need ALL their words present in the
+  //       input — fixes the false-match scenario).
+  //   (2) input contains the item's HEAD NOUN (last word) as
+  //       a standalone token. "use the locket" → "locket"
+  //       in tokens → matches "Aetheric Locket". "use the
+  //       blade" → matches "Rusted Blade".
+  //   (3) fuzzy match on the head noun specifically (typo
+  //       tolerance — "use lockett" matches Locket).
+  //
+  // Adjective-only matches ("titan" / "bone" / "aetheric"
+  // alone) no longer win. The player needs to name the head
+  // noun, or use the full item name. If the player typed a
+  // single ambiguous adjective, the resolver returns
+  // undefined and the engine falls back to scene-noun /
+  // context resolution.
+  const inputLower = tokens.join(' ');
+  // Pass 1: input contains the full item name.
   for (const item of inventory) {
     const itemLower = item.name.toLowerCase();
-    if (tokens.some((t) => itemLower.includes(t))) return item;
+    if (inputLower === itemLower) return item;
+    if (inputLower.includes(itemLower)) return item;
   }
-  // Fuzzy match against each word in item name
+  // Pass 2: item's head noun (last word) appears as a token.
   for (const item of inventory) {
     const words = item.name.toLowerCase().split(/\s+/);
+    const head = words[words.length - 1];
+    if (head && tokens.includes(head)) return item;
+  }
+  // Pass 3: fuzzy match against the head noun (typo
+  // tolerance). Pre-OTA-093 this loop fuzzy-matched against
+  // EVERY word in the item name, which was too loose. Head-
+  // noun-only keeps typo tolerance ("lockett" → "locket")
+  // without re-introducing adjective ambiguity.
+  for (const item of inventory) {
+    const words = item.name.toLowerCase().split(/\s+/);
+    const head = words[words.length - 1];
+    if (!head) continue;
     for (const t of tokens) {
-      if (words.some((w) => fuzzyEqual(t, w))) return item;
+      if (fuzzyEqual(t, head)) return item;
     }
   }
   return undefined;
