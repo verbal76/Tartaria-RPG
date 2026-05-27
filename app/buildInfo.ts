@@ -679,4 +679,30 @@
 // pool + nounSeed + pickCreepyVariant helpers, resolveLore
 // now branches on the creepy roll before the standard
 // fallback).
-export const OTA_BUILD_ID = '2026-05-27-080';
+//
+// 2026-05-27 OTA-081 — Enemy HP bar layout fix. Playtester
+// reported the HP NUMBER ticking down correctly during
+// combat ("HP 5/12" updates) while the visual bar stayed
+// stuck at full width. Both values are derived from the same
+// view.currentHp in the same EnemyCard render pass — the
+// data was updating, the layout wasn't.
+//
+// Root cause: React Native's view diff sometimes refuses to
+// emit a layout pass when only the percent string value of a
+// View's `width` prop changes within the same View instance.
+// The OTA 048 FlatList extraData fix correctly triggered
+// re-renders, but the underlying View's width="47%" → "39%"
+// → "31%" updates weren't always producing new layout
+// frames. Numeric pixel widths always trigger fresh layout.
+//
+// Fix: switch hpBarFill from `width: '${hpPct * 100}%'` to a
+// numeric width of `HP_BAR_WIDTH * hpPct` where HP_BAR_WIDTH
+// is computed from CARD_WIDTH minus the card's padding (8 +
+// 8) and border (1 + 1). The hpBarBg parent also gets an
+// explicit numeric width so the child's pixel width has a
+// stable reference frame.
+//
+// File: app/components/EnemyPanel.tsx (HP_BAR_WIDTH constant
+// added near CARD_WIDTH, hpBarBg + hpBarFill both gain
+// numeric width props).
+export const OTA_BUILD_ID = '2026-05-27-081';
