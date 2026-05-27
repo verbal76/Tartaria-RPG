@@ -4240,6 +4240,48 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 visitCount: 1,
               };
               const prevSearched = room.searchedAmbientNouns ?? [];
+              // 2026-05-27 OTA-079 — salvage now ALSO marks the
+              // OTA-071+ investigation table entry consumed.
+              // Pre-OTA-079 salvage wrote only to searched
+              // AmbientNouns, leaving roomInvestigationTable
+              // [noun].consumed === false. Next `investigate
+              // <same noun>` consulted the table, found it un-
+              // consumed, ran a FRESH outcome (lore + maybe
+              // another item grant), and marked consumed AFTER
+              // the second take — a salvage-then-investigate
+              // double-dip. Now: salvage flips the table flag
+              // alongside searchedAmbientNouns so investigate
+              // is gated by the OTA-074 callback line instead.
+              // Idempotent + safe if the table is missing
+              // (skips the table touch, preserves the searched
+              // write).
+              const prevTable = room.roomInvestigationTable;
+              const existingEntry = prevTable?.[harvestLowered];
+              const updatedTable = (prevTable && existingEntry && !existingEntry.consumed)
+                ? {
+                    ...prevTable,
+                    [harvestLowered]: {
+                      ...existingEntry,
+                      consumed: true,
+                      consumedAt: Date.now(),
+                      // Salvage produces a salvage-narration
+                      // outcome — record kind='item' with a
+                      // generic detail so callbackLine picks an
+                      // item-class line ("the salvage was the
+                      // only thing worth pulling"). This is OK
+                      // even if salvage actually returned 'tc'
+                      // or 'hook'; the callback is a UI nicety,
+                      // not an exact record. OTA-080 can refine
+                      // by passing salvage's outcome.kind into
+                      // the result.
+                      result: existingEntry.result ?? {
+                        kind: 'item',
+                        detail: 'salvage',
+                        line: existingEntry.loreLine ?? '',
+                      },
+                    },
+                  }
+                : prevTable;
               return {
                 worldMemory: {
                   ...s.worldMemory,
@@ -4248,6 +4290,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     [harvestRoomKey]: {
                       ...room,
                       searchedAmbientNouns: [...prevSearched, harvestLowered],
+                      ...(updatedTable !== prevTable
+                        ? { roomInvestigationTable: updatedTable }
+                        : {}),
                     },
                   },
                 },
@@ -4272,6 +4317,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const ambient = matchAmbientNoun(rawTarget, currentScene.ambientNouns ?? []);
           if (ambient) {
             const ambientLower = ambient.toLowerCase();
+            // 2026-05-27 OTA-079 — resolved-hook short-circuit.
+            // When a hook's chain fully resolved on an earlier
+            // tap (kind=preserved_corpse / half_buried_spire /
+            // etc. progressed through all its stages), the
+            // hook stays in scene.hooks with resolved=true and
+            // its revealed nouns ('spire', 'reclaimer',
+            // 'figure'...) remain in scene.ambientNouns.
+            // Pre-OTA-079, a re-tap on one of those nouns fell
+            // past the hook intercept (only fires on
+            // !resolved) into the table consult — which had
+            // an entry seeded as 'generic' category (no
+            // keyword match for 'spire') and produced the
+            // catchall lore line "You look the spire over.
+            // Nothing about it sings..." for a noun the
+            // player had just pulled a Rusted Band of
+            // Knowledge from. Off-putting and wrong. Now:
+            // before the table consult, if the noun matches
+            // any resolved-hook nouns array in the current
+            // scene, print a one-line callback referencing
+            // the resolved thread and break. Keeps the
+            // narrative arc closed instead of leaking to a
+            // generic fallback.
+            const resolvedHookMatch = (currentScene.hooks ?? []).find(
+              (h) => h.resolved && h.nouns.some(
+                (n) => {
+                  const nl = n.toLowerCase();
+                  return nl === ambientLower
+                    || ambientLower.includes(nl)
+                    || nl.includes(ambientLower);
+                },
+              ),
+            );
+            if (resolvedHookMatch) {
+              get().appendLog(
+                'world',
+                `You\'ve already followed the thread of the ${ambient}. Whatever it had for you is in your pack — or wasn\'t there to begin with.`,
+              );
+              break;
+            }
             // 2026-05-26 OTA-071 — per-room investigation table
             // consult. Runs BEFORE the existing alreadySearched
             // / requirement / catalog branches so any noun the
@@ -12166,12 +12250,47 @@ export const useGameStore = create<GameStore>((set, get) => ({
         };
         const prevSearched = room.searchedAmbientNouns ?? [];
         const merged = Array.from(new Set([...prevSearched, ...consumedNouns]));
+        // OTA-079 — also mark each consumed noun's OTA-071+
+        // table entry as consumed, mirroring the single-tap
+        // salvage path. Without this, bulk SALVAGE ALL leaves
+        // the table entries un-consumed and the next per-noun
+        // INVESTIGATE re-rolls a fresh outcome (double-dip).
+        const prevTable = room.roomInvestigationTable;
+        let updatedTable = prevTable;
+        if (prevTable) {
+          let touched = false;
+          for (const noun of consumedNouns) {
+            const entry = prevTable[noun];
+            if (entry && !entry.consumed) {
+              if (!touched) {
+                updatedTable = { ...prevTable };
+                touched = true;
+              }
+              updatedTable![noun] = {
+                ...entry,
+                consumed: true,
+                consumedAt: Date.now(),
+                result: entry.result ?? {
+                  kind: 'item',
+                  detail: 'salvage',
+                  line: entry.loreLine ?? '',
+                },
+              };
+            }
+          }
+        }
         return {
           worldMemory: {
             ...s.worldMemory,
             visitedRooms: {
               ...(s.worldMemory.visitedRooms ?? {}),
-              [harvestRoomKey]: { ...room, searchedAmbientNouns: merged },
+              [harvestRoomKey]: {
+                ...room,
+                searchedAmbientNouns: merged,
+                ...(updatedTable !== prevTable
+                  ? { roomInvestigationTable: updatedTable }
+                  : {}),
+              },
             },
           },
         };

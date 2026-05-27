@@ -580,4 +580,50 @@
 // produced=false; salvageAllAmbient pack-full → narration +
 // no consume push; takeAmbientNoun pack-full → early return +
 // arbiter warning).
-export const OTA_BUILD_ID = '2026-05-27-078';
+//
+// 2026-05-27 OTA-079 — Multi-agent audit fix pass 2:
+// salvage↔table sync + resolved-hook short-circuit.
+//
+//   BUG (audit Agent 2 Finding 3, CRITICAL) — Salvage routes
+//   through 'intent=investigate' but lands in its own harvest
+//   branch (~gameStore.ts:4078) BEFORE the OTA-071 table
+//   consult (~4316). The harvest branch wrote ONLY to
+//   searchedAmbientNouns and never touched roomInvestigation
+//   Table[noun].consumed. Result: salvage bench → searched.
+//   Then investigate bench → table consult finds entry un-
+//   consumed → runs FRESH rollOutcome with lore + possible
+//   second item grant → only THEN marks consumed. Player
+//   double-dipped: salvage gave the curated salvage outcome,
+//   investigate then gave a SECOND beat AND possibly a SECOND
+//   yield. Same bug in salvageAllAmbient at ~12206. Fix: when
+//   salvage produces (produced=true), also patch
+//   roomInvestigationTable[noun].consumed=true with a
+//   synthetic kind='item' result so the OTA-074 callbackLine
+//   picks an item-class line on the next investigate tap.
+//   Idempotent if the table is missing or the entry already
+//   consumed. Mirrored in salvageAllAmbient's batched commit.
+//
+//   BUG (audit Agent 1 Bug 4) — Resolved-hook nouns leaked to
+//   the table's generic fallback. Multi-stage hooks (half_
+//   buried_spire / preserved_corpse / etc.) keep
+//   resolved=true after the chain completes, and their
+//   revealed nouns ('spire', 'reclaimer', ...) stay in
+//   scene.ambientNouns. The route-level hook intercept only
+//   fires for !hook.resolved, so a re-tap leaked into the
+//   table consult — which had a 'generic' entry for the
+//   noun and printed "You look the spire over. Nothing about
+//   it sings..." for a noun the player had just pulled a
+//   Rusted Band of Knowledge from. Fix: before the table
+//   consult, scan scene.hooks for a resolved hook whose
+//   nouns include the matched ambient (fuzzy substring,
+//   matching OTA-070's UI dedup); if found, print "You've
+//   already followed the thread of the X" and break. Closes
+//   the narrative arc instead of leaking to a generic
+//   fallback.
+//
+// Files: app/state/gameStore.ts (harvest branch produced-set
+// also patches roomInvestigationTable.consumed; salvageAll
+// Ambient batched set patches every consumed noun's table
+// entry; investigate case adds resolvedHookMatch check
+// before the table consult).
+export const OTA_BUILD_ID = '2026-05-27-079';
