@@ -201,4 +201,17 @@
 //       Tartaria!" in italic muted-amber (#8a7d5c). Sized
 //       between the bright action button text and the deep
 //       muted footer so it reads as warm-but-secondary.
-export const OTA_BUILD_ID = '2026-05-26-068';
+//
+// 2026-05-26 OTA-069 — INVESTIGATE tab tone now excludes
+// Aether-scanner-gated chips from the actionable count.
+// Playtester screenshot: only an Aether-locked "crystal" chip
+// remained in scene (every other ambient noun was investigated
+// /  taken / scrap'd), no scanner equipped, but the INVESTIGATE
+// button was still green-tinted as if there was something to
+// do. A scanner-gated chip with no scanner isn't actionable —
+// the SearchModal greys it and labels it "requires Aetheric
+// scanner". investigateCount in ExplorationScreen now applies
+// the same searchRequirementFor + playerHasScannerEquipped
+// check the SearchModal already uses, so the tab tint matches
+// the modal state.
+export const OTA_BUILD_ID = '2026-05-26-069';

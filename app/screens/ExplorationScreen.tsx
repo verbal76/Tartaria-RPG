@@ -527,9 +527,25 @@ export function ExplorationScreen() {
               // pool). Without this, a wilderness scene with every
               // ambient noun consumed would render INVESTIGATE gray
               // even though tapping 'the ground' is still actionable.
+              //
+              // 2026-05-26 OTA-069 — also exclude chips with an
+              // unmetRequirement (Aether-scanner-gated nouns when the
+              // scanner is not equipped). Playtester: "the only thing
+              // left to investigate is a locked item and I do not have
+              // the piece... why that investigate button shouldn't
+              // turn back to the regular amber". The lock isn't
+              // actionable from this state — the player can't tap the
+              // chip with any productive outcome until they equip the
+              // scanner — so it must not light the tab green.
+              const hasScanner = player ? playerHasScannerEquipped(player, 'aetheric') : false;
               const sceneCount = buildChipPool(currentScene).filter(
-                (n) => !productivelyConsumedSet.has(n.toLowerCase())
-                  && !flavorExhaustedSet.has(n.toLowerCase()),
+                (n) => {
+                  if (productivelyConsumedSet.has(n.toLowerCase())) return false;
+                  if (flavorExhaustedSet.has(n.toLowerCase())) return false;
+                  const req = searchRequirementFor(n);
+                  if (req && !hasScanner) return false;
+                  return true;
+                },
               ).length;
               const groundCount = (!player?.hubRoomId && !isAmbientConsumed('ground')) ? 1 : 0;
               return sceneCount + groundCount;
