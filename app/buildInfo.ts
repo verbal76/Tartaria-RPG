@@ -1464,4 +1464,33 @@
 // Files: app/diagnostics/aboutSummary.ts (new helper), app/
 // screens/LogScreen.tsx, app/screens/AboutScreen.tsx, app/
 // screens/TitleScreen.tsx.
-export const OTA_BUILD_ID = '2026-05-27-101';
+// 2026-05-27 OTA-102 — Elevated overlay polish. Playtest log
+// surfaced two issues: (1) a 1-tier climb of a 'cracked walk
+// way' fired a collector overlay with "apex" flavor that's
+// out of scale for a walkway, and (2) overlay ambient nouns
+// (copper bowl, ozone tang, bent rivets) returned the
+// generic catchall on investigate because they weren't
+// seeded into the room investigation table.
+//
+// Fix (1): rollElevatedOverlay's minTiers default bumped
+// from 0 to 2. Encounter + lookout overlays now require
+// 2+ tier climbs. Traders still gated at 4. 1-tier
+// objects (ledges, walkways, pedestals, low arches) get
+// the standard climb-top loot beat with no overlay
+// surface.
+//
+// Fix (2): overlay scene swap now merges the overlay's
+// ambientNouns into the room's roomInvestigationTable via
+// seedInvestigationTable. Idempotent. Subsequent investi-
+// gates hit real category templates (vessel for 'copper
+// bowl', etc.) with proper lore + yields.
+//
+// Open issues added in this OTA (not fixed):
+//   - 'rotate the ring left' / hook-puzzle parser misses
+//   - 'knock on the steeple' narrative-suggested actions
+//   Both: engine produces hint text that promises actions
+//   it can't honor. Tracked in HANDOFF.md Section 0.A.
+//
+// Files: app/engine/elevatedOverlay.ts, app/state/game
+// Store.ts.
+export const OTA_BUILD_ID = '2026-05-27-102';

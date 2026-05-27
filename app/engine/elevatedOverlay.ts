@@ -393,7 +393,17 @@ export function rollElevatedOverlay(
   rand: () => number = Math.random,
 ): ElevatedOverlay | null {
   if (rand() >= OVERLAY_TRIGGER_CHANCE) return null;
-  const eligible = OVERLAYS.filter((o) => (o.minTiers ?? 0) <= totalTiers);
+  // 2026-05-27 OTA-102 — minTiers default bumped from 0 to 2.
+  // Playtest log showed a 1-tier 'cracked walkway' climb
+  // surfacing a "copper bowl is bolted to the apex" collector
+  // overlay — flavor implies a tall structure but the noun is
+  // a walkway. 1-tier climbs (ledges, walkways, pedestals, low
+  // arches) now get the standard climb-top loot beat but no
+  // overlay surface. 2+ tier climbs still surface overlays as
+  // before. Traders keep their explicit minTiers=4 so the
+  // larger-location gate is unchanged.
+  const OVERLAY_MIN_TIERS_DEFAULT = 2;
+  const eligible = OVERLAYS.filter((o) => (o.minTiers ?? OVERLAY_MIN_TIERS_DEFAULT) <= totalTiers);
   if (eligible.length === 0) return null;
   const pick = eligible[Math.floor(rand() * eligible.length)] ?? null;
   return pick;

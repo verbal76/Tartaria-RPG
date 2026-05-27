@@ -7212,6 +7212,43 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 };
                 return { currentScene: overlayScene };
               });
+              // 2026-05-27 OTA-102 — seed the overlay's ambient
+              // nouns into the room's roomInvestigationTable so
+              // investigate produces real outcomes on them.
+              // Pre-OTA-102: 'investigate copper bowl' / 'ozone
+              // tang' / 'bent rivets' (overlay nouns) returned
+              // the OTA-071 generic catchall because the table
+              // was seeded only for the base scene's noun pool.
+              // OTA-076's self-heal didn't fire because the table
+              // already existed (just without these entries). Now
+              // we merge the overlay nouns into the existing
+              // table directly.
+              set((s) => {
+                const room = s.worldMemory.visitedRooms?.[climbRoomKey];
+                if (!room) return s;
+                const prevTable = room.roomInvestigationTable ?? {};
+                const newEntries = seedInvestigationTable(overrides.ambientNouns);
+                let touched = false;
+                const mergedTable = { ...prevTable };
+                for (const [key, entry] of Object.entries(newEntries)) {
+                  if (mergedTable[key]) continue;
+                  mergedTable[key] = entry;
+                  touched = true;
+                }
+                if (!touched) return s;
+                return {
+                  worldMemory: {
+                    ...s.worldMemory,
+                    visitedRooms: {
+                      ...(s.worldMemory.visitedRooms ?? {}),
+                      [climbRoomKey]: {
+                        ...room,
+                        roomInvestigationTable: mergedTable,
+                      },
+                    },
+                  },
+                };
+              });
               get().appendLog('world', overlay.arrivalLine);
               if (enemy) {
                 get().appendLog(

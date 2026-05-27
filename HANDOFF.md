@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-101` (every log export now bundles the basic device/install summary at the end). See **Section 0** for the live issue tracker covering OTA-070 → OTA-101.
+> **Latest OTA:** `2026-05-27-102` (1-tier climbs no longer surface tall-apex overlays; overlay ambient nouns seeded into the room investigation table for proper investigates). See **Section 0** for the live issue tracker covering OTA-070 → OTA-102.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -11,7 +11,7 @@
 > **Tests:** 107/107 pass across the canary five (`salvagePools`, `theftNarrationGuard`, `itemEffect`, `statTraining`, `areaSearch`) + the 9 new test files shipped this session (`variableRewards`, `chainedNarrative`, `jitTemptation`, `sessionResume`, `mysterySeeds`, `parserFuzz`, `craftRepairFuzz`, `engagementSmoke`, plus the existing `equipSwap`/`equippedIds`/`inventoryAudit`/`recipeFuzzy` set). The longer sim files (`yearSimulation`, `thousandDayStressSim`, `twoYearChaosSim`) pass too — `twoYearChaosSim` has one borderline "geographic loops ≤1" assertion that flakes 1 in 3 runs (RNG variance against an asymptote-of-threshold metric, pre-existing). Three stress files (`combatStress`, `domesticStress`, `metaNavStress`) OOM-abort in this sandbox at the 700-day sim length — pre-existing infrastructure ceiling, not a regression.
 > **Working tree:** clean.
 > **Open PR:** #1 — draft, this branch → `main`, **stale** relative to OTAs 020 → 056. Description still reflects OTA 053-era state. Refresh before requesting review (the PR summary should walk the five waves below + the deferred items in section 7).
-> **Open issues:** 3 (in Section 0.A — Hub-room key collision deferred; ongoing catalog backfill from `inferred-stats:` logs; inference engine doesn't check materials.json). GitHub repo issue tracker remains at 0.
+> **Open issues:** 5 (in Section 0.A — Hub-room key collision deferred; ongoing catalog backfill; inference engine doesn't check materials.json; hook-puzzle parser misses on "rotate the ring"; narrative-suggested actions like "knock on the steeple" parse as unknown). GitHub repo issue tracker remains at 0.
 
 > **For the next Claude instance:** read section 16 first — it's a snapshot of the player's working style + the major systems + the in-flight context. Then **Section 0** for the live issue tracker (the canonical Open / Closed list — read BEFORE planning any fix). Then section 6.A for the recent wave's reasoning. Section 7 lists what's still on the table.
 
@@ -27,11 +27,23 @@
 
 - **Ongoing catalog backfill from `inferred-stats:` debug lines.** Pattern: when an inventory item resolves through `app/engine/itemDefaults.ts` (no authored catalog entry), the engine logs `[debug] inferred-stats: <kind>:<name> — engine guessed stats; add catalog row when convenient.` Backfill these into the relevant `app/data/items/*.json` as logs surface them. **Status:** active. Last batch (OTA-093) added Bone Fragment. Future logs that show new inferred items → batch into the next OTA touching the catalog. No workflow change needed — grep logs for `inferred-stats:` each pass.
 
+- **Parser drops "rotate the ring left / right" + similar hook-puzzle commands.** Surfaced 2026-05-27 in the OTA-101-era playtest. The `sealed_vault_door` hook narration says: *"The glyphs are a Tartarian tumbler — three rotations, in the right order. The faint markings tell you which."* — implying a multi-step puzzle interaction. Player typed `rotate the ring left`, `right`, `right` — all parsed as `intent=unknown conf=0.10`, fell through to the generic inventory-chatter arbiter line ("Your mud essence is still there, if it suits the moment"). The hook still progressed on re-investigating the seal, so it's not actually a puzzle — but the narration promises one. Two ways to close: (a) accept `rotate <noun> <direction>` as a parser intent that maps to the active hook's progression, OR (b) rewrite the narration to drop the puzzle implication. **Status:** open; needs a design call on whether real hook-puzzles get implemented or just better flavor text.
+
+- **`knock on the steeple` + similar parse misses on narrative-suggested actions.** Same pattern — the buried-church scene narration ends with *"someone knock on the steeple if you find us"* — player typed `knock on the steeple`, parser returned `intent=unknown`. The buried-NPCs sub-scene the narration suggests doesn't actually exist as a routable interaction. **Status:** open; cluster with the rotate-the-ring item above. Both come from the engine producing hint text that promises actions the engine can't honor.
+
 - **Inference engine doesn't check `materials.json` before warning.** Surfaced 2026-05-27 when a playtest log showed `[debug] inferred-stats: armor:Sentinel Core Plate — engine guessed stats; add catalog row when convenient.` — but Sentinel Core Plate IS in `materials.json` as an Uncommon misc material. The keyword classifier in `itemDefaults.ts` saw "Plate" → guessed armor → emitted the warning even though the catalog has an authoritative row in a different lookup table. **Fix shape:** extend the fallback chain to consult `MATERIALS` (and similarly `CONSUMABLES`, `EXPLORATION` etc.) before invoking the name-classifier inference. **Status:** open. Not user-facing — just a noisy debug warning. Pick up next time we touch `itemDefaults.ts`.
 
 - **TS 0 errors / Test suite green.** Always required pre-push. Tracked here as a passive gate rather than an issue.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Climb overlay polish
+
+- **OTA-102 (2026-05-27) · 1-tier climbs surfaced full elevated overlays with apex-flavored narration; overlay ambient nouns returned generic catchall on investigate.**
+  - **What:** Playtest log showed a 1-tier `cracked walkway` climb popping a collector overlay ("A copper bowl is bolted to the apex, half-filled with Aether residue. The air shimmers, like heat over a road.") — the flavor implies a tall structure but the noun is a walkway. Out of scale. Then `investigate copper bowl` / `ozone tang` / `bent rivets` (the overlay's own ambient nouns) all returned the OTA-071 generic catchall because the room investigation table was seeded only for the BASE scene's noun pool; OTA-076 self-heal didn't fire because the table existed (just without these entries).
+  - **Fix (1) — minTiers default bumped from 0 to 2.** `rollElevatedOverlay` now requires totalTiers ≥ 2 for overlays without an explicit minTiers (encounter + lookout templates). 1-tier climbs (ledges, walkways, pedestals, low arches) get the standard climb-top loot beat but no overlay surface. Traders keep their explicit minTiers=4 (no change to the larger-location gate).
+  - **Fix (2) — seed overlay nouns.** When an overlay scene swap happens, the climb-top branch now merges the overlay's ambientNouns into `worldMemory.visitedRooms[roomKey].roomInvestigationTable`. Idempotent (skips entries already present). Subsequent investigates of `copper bowl` / `bone fragments` / etc. now hit real category templates (`vessel`, `bone`, etc.) with proper lore + yields.
+  - **Files:** `app/engine/elevatedOverlay.ts` (minTiers default constant), `app/state/gameStore.ts` (overlay-swap branch merges overrides.ambientNouns into the room's table via seedInvestigationTable).
 
 #### Telemetry / dev visibility
 
