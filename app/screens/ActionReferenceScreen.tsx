@@ -1,25 +1,15 @@
+// 2026-05-27 OTA-095 — Recipes mode removed. The Aethercraft
+// disciplines + the recipe groupings (Weapons/Armor/Food/etc.)
+// that lived here all moved to CraftingScreen. Aethercraft
+// disciplines are now the new "AETHERIC" tab; recipe groupings
+// are already covered by the existing CRAFT and RECIPES tabs
+// on that same screen. ActionReferenceScreen is now ACTIONS
+// ONLY — actions reference + concept cards.
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import conceptsData from '../data/lore/concepts.json';
-import { RECIPES, WEAPONS, ARMOR, AMULETS, RINGS, GEAR, MATERIALS } from '../engine/crafting';
-
-function recipeDescription(name: string): string | null {
-  const w = WEAPONS.find((x) => x.name === name);
-  if (w) return w.description;
-  const a = ARMOR.find((x) => x.name === name);
-  if (a) return a.description;
-  const g = GEAR.find((x) => x.name === name);
-  if (g) return g.description;
-  const am = AMULETS.find((x) => x.name === name);
-  if (am) return am.description;
-  const r = RINGS.find((x) => x.name === name);
-  if (r) return r.description;
-  const m = MATERIALS.find((x) => x.name === name);
-  if (m) return m.description;
-  return null;
-}
 
 interface Concept {
   id: string;
@@ -30,101 +20,12 @@ interface Concept {
 
 const concepts = (conceptsData.concepts as Concept[]);
 
-// OTA 462 — Recipes tab. Three Aethercraft disciplines (hand-defined
-// because they're not in recipes.json — they're spell-equivalents that
-// burn Aether-tagged fuel) plus every craft recipe grouped by output
-// category. Tapping a recipe card queues "craft <result>" exactly the
-// way the existing action cards queue their example phrase.
-type RecipeMode = 'actions' | 'recipes';
-
-interface AethercraftDiscipline {
-  id: string;
-  title: string;
-  body: string;
-  fuels: string[];
-  examples: string[];
-}
-
-const AETHERCRAFT_DISCIPLINES: AethercraftDiscipline[] = [
-  {
-    id: 'aether_shape',
-    title: 'Aetherstone Manipulation (shape)',
-    body:
-      'INT check, DC 12. In combat: +4 AC for one round (shaped-stone ward). Out of combat: ' +
-      'binds an Aetheric Shard to a Small Rock, producing a throwable Shaped Aetheric Shard. ' +
-      'Mud Dwellers and Aetherborn cast at the base DC; every other race rolls +4 harder.',
-    fuels: ['Aetheric Shard', 'Aether Crystal', 'Aether Mud', 'Aether Residue', 'Golem Core', 'Aetheric Locket'],
-    examples: ['shape stone', 'mold the aetherstone', 'manipulate stone'],
-  },
-  {
-    id: 'aether_summon',
-    title: 'Aether Golem Constructor (summon)',
-    body:
-      'INT check, DC 15 (harder than the other two — golems take stronger anchors). Summons ' +
-      'an Aether Golem ally that fights for you for the rest of the scene. ' +
-      'Mud Dwellers and Aetherborn cast at the base DC; every other race rolls +4 harder.',
-    fuels: ['Aetheric Shard', 'Aether Crystal', 'Golem Core'],
-    examples: ['summon golem', 'summon an aether golem', 'call a golem'],
-  },
-  {
-    id: 'aether_mend',
-    title: 'Aetheric Healing (mend)',
-    body:
-      'WIS check, DC 12. Restores HP to you or an ally. Aetherborn pay HP instead of corruption ' +
-      'when they cast this — racial trait. Mud Dwellers and Aetherborn cast at the base DC; ' +
-      'every other race rolls +4 harder.',
-    fuels: ['Aetheric Shard', 'Aether Crystal'],
-    examples: ['mend wounds', 'heal me', 'mend self', 'aetheric healing'],
-  },
-];
-
-// Hard-grouped recipe partition. We classify by output catalog row;
-// items absent from any catalog fall into MISC. The order is
-// gameplay-priority (weapons first, then armor, then utility, then
-// food/potions at the bottom).
-const RECIPE_GROUPS: { title: string; names: string[] }[] = [
-  {
-    title: 'Weapons',
-    names: [
-      'Club', 'Cudgel', 'Stone Spear', 'Iron Spear', 'Aether-Shard Spear',
-      'Aetheric Crystal Blade', 'Storm Rod',
-      'Sentinel Cleaver', 'Founder\'s Edge',
-      'Wyrm-Fang Blade', 'Mud-Iron Greatblade',
-      'Voidspawn Bolt',
-    ],
-  },
-  {
-    title: 'Armor',
-    names: [
-      'Aetheric Vest', 'Sludge-Forged Vest', 'Aether-Wing Cloak', 'Mudstone Bulwark',
-    ],
-  },
-  {
-    title: 'Amulets & Rings',
-    names: [
-      'Mud Gem Amulet', 'Aether-Shard Ring', 'Lich-Heart Pendant',
-      'Hollow Crown Circlet', 'Behemoth-Heart Talisman',
-    ],
-  },
-  {
-    title: 'Utility & Tools',
-    names: [
-      'Aetheric Torch', 'First Aid Kit', 'Aetheric Compass', 'Resonant Song Phial',
-      'Iron-Worm Engine',
-    ],
-  },
-  {
-    title: 'Food',
-    names: ['Forager\'s Stew', 'Hearty Stew', 'Mushroom Stew'],
-  },
-  {
-    title: 'Potions & Tinctures',
-    names: [
-      'Red Cap Tincture', 'Blue Cap Draught', 'Violet Cap Distillate',
-      'Orange Sporecap Brew', 'Many-Colored Tonic',
-    ],
-  },
-];
+// OTA 462 → superseded by OTA-095. The Aethercraft disciplines
+// + recipe groupings (Weapons/Armor/Food/Potions/etc.) that
+// lived here moved to CraftingScreen — Aethercraft is now the
+// new "AETHERIC" tab; recipe groupings are covered by the
+// existing CRAFT (non-consumable) + RECIPES (consumable food
+// /tonics) tabs. ActionReferenceScreen is now ACTIONS ONLY.
 
 // Group concepts by the action card they came from. Each section title
 // matches the card the player was asked about. Concept ids are stable
@@ -346,7 +247,7 @@ function explanationFor(c: Concept): string {
 export function ActionReferenceScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const queueInputDraft = useGameStore((s) => s.queueInputDraft);
-  const [mode, setMode] = useState<RecipeMode>('actions');
+  // OTA-095 — mode-toggle removed. Screen is actions-only now.
 
   // Per-card cycle index. Tapping a card cycles its example list:
   // tap once → example[0] queues to input + clipboard; tap again →
@@ -390,32 +291,15 @@ export function ActionReferenceScreen() {
         >
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>{mode === 'actions' ? 'ACTIONS' : 'RECIPES'}</Text>
+        <Text style={styles.title}>ACTIONS</Text>
         <View style={{ width: 80 }} />
       </View>
-      <View style={styles.modeTabs}>
-        <TouchableOpacity
-          style={[styles.modeTab, mode === 'actions' && styles.modeTabActive]}
-          onPress={() => setMode('actions')}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.modeTabText, mode === 'actions' && styles.modeTabTextActive]}>
-            ACTIONS
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.modeTab, mode === 'recipes' && styles.modeTabActive]}
-          onPress={() => setMode('recipes')}
-          activeOpacity={0.7}
-        >
-          <Text style={[styles.modeTabText, mode === 'recipes' && styles.modeTabTextActive]}>
-            RECIPES
-          </Text>
-        </TouchableOpacity>
-      </View>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
-        {mode === 'actions' ? (
-          <>
+        {/* OTA-095 — actions-only render. Recipes mode removed
+            (Aethercraft + recipe groupings moved to Crafting
+            Screen). The {mode === 'actions' ? ... : ...} ternary
+            collapsed; this is just the actions branch now. */}
+        <>
             <Text style={styles.intro}>
               What every action does, with the exact mechanics. Tap any card to
               drop its first example into the input box — tap again to cycle
@@ -463,97 +347,6 @@ export function ActionReferenceScreen() {
               </View>
             ))}
           </>
-        ) : (
-          <>
-            <Text style={styles.intro}>
-              Every craftable item — weapons, armor, accessories, food, potions —
-              plus the three Aethercraft disciplines (shape stone, summon golem,
-              mend wounds). Tap any card to drop its phrase into the input box.
-            </Text>
-
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Aethercraft Disciplines</Text>
-              {AETHERCRAFT_DISCIPLINES.map((d) => {
-                const queuedIdx = cycleIdx[d.id];
-                const queuedPhrase = queuedIdx !== undefined ? d.examples[queuedIdx] : null;
-                const queued = isQueued(d.id);
-                return (
-                  <Pressable
-                    key={d.id}
-                    style={({ pressed }) => [
-                      styles.card,
-                      pressed && styles.cardPressed,
-                      queued && styles.cardQueued,
-                    ]}
-                    onPress={() => handleCardTap(d.id, d.examples)}
-                  >
-                    <Text style={styles.cardTitle}>{d.title}</Text>
-                    <Text style={styles.cardBody}>{d.body}</Text>
-                    <Text style={styles.recipeIngredients}>
-                      <Text style={styles.recipeIngredientsLabel}>Fuel (any one): </Text>
-                      {d.fuels.join(', ')}
-                    </Text>
-                    <Text style={styles.cardExamples}>
-                      <Text style={styles.cardExamplesLabel}>Tap to queue: </Text>
-                      {d.examples.map((ex, i) =>
-                        i === queuedIdx ? `[${ex}]` : `"${ex}"`,
-                      ).join(' · ')}
-                    </Text>
-                    {queued && queuedPhrase && (
-                      <Text style={styles.queuedHint}>
-                        ✓ &quot;{queuedPhrase}&quot; staged for the input box
-                      </Text>
-                    )}
-                  </Pressable>
-                );
-              })}
-            </View>
-
-            {RECIPE_GROUPS.map((group) => (
-              <View key={group.title} style={styles.section}>
-                <Text style={styles.sectionTitle}>{group.title}</Text>
-                {group.names.map((name) => {
-                  const recipe = RECIPES.find((r) => r.result === name);
-                  if (!recipe) return null;
-                  const description = recipeDescription(name);
-                  const cardId = `recipe:${name}`;
-                  const phrase = `craft ${name}`;
-                  const examples = [phrase];
-                  const queued = isQueued(cardId);
-                  return (
-                    <Pressable
-                      key={cardId}
-                      style={({ pressed }) => [
-                        styles.card,
-                        pressed && styles.cardPressed,
-                        queued && styles.cardQueued,
-                      ]}
-                      onPress={() => handleCardTap(cardId, examples)}
-                    >
-                      <Text style={styles.cardTitle}>{name}</Text>
-                      {description ? (
-                        <Text style={styles.cardBody}>{description}</Text>
-                      ) : null}
-                      <Text style={styles.recipeIngredients}>
-                        <Text style={styles.recipeIngredientsLabel}>Needs: </Text>
-                        {recipe.ingredients.map((i) => `${i.name} ×${i.quantity}`).join(', ')}
-                      </Text>
-                      <Text style={styles.cardExamples}>
-                        <Text style={styles.cardExamplesLabel}>Tap to queue: </Text>
-                        &quot;{phrase}&quot;
-                      </Text>
-                      {queued && (
-                        <Text style={styles.queuedHint}>
-                          ✓ &quot;{phrase}&quot; staged for the input box
-                        </Text>
-                      )}
-                    </Pressable>
-                  );
-                })}
-              </View>
-            ))}
-          </>
-        )}
       </ScrollView>
     </View>
   );

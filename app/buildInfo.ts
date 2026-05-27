@@ -1293,4 +1293,37 @@
 // flatTokens flattening + hyphen-aware passes), __tests__/
 // parserArgs.test.ts (OTA-093 regression suite added),
 // app/buildInfo.ts → OTA-094.
-export const OTA_BUILD_ID = '2026-05-27-094';
+// 2026-05-27 OTA-095 — Aetheric tab added to CraftingScreen;
+// Recipes mode stripped from ActionReferenceScreen. Player
+// asked: "we were supposed to move all aetheric recipes as a
+// 4th tab under craft but they are still under actions. also
+// there is food mixed in all food recipes go under the recipes
+// tab, aether recipes are a new 4th tab under craft called
+// Aetheric. actions should only be the actions."
+//
+// Implementation: added 'aetheric' to the Tab type in Crafting
+// Screen, added the 4th tab button, copied the AETHERCRAFT_
+// DISCIPLINES constant + card-tap-queues-phrase behavior
+// (queueInputDraft + Clipboard fallback + cycleIdx rotation)
+// into the new tab body. Stripped the entire Recipes mode
+// from ActionReferenceScreen (RecipeMode type, mode state +
+// tabs, recipes-branch JSX, AETHERCRAFT_DISCIPLINES +
+// RECIPE_GROUPS constants, recipeDescription helper, unused
+// imports from engine/crafting). Screen is now actions-only.
+// Title unconditional 'ACTIONS'.
+//
+// Food recipes were already correctly housed in CraftingScreen's
+// Recipes tab via kindFilter="consumable" — no change needed
+// there. The duplicate listings were in ActionReferenceScreen's
+// Recipes mode, which is now gone.
+//
+// Open issue surfaced this OTA: inference engine in
+// itemDefaults.ts doesn't check materials.json before warning
+// — Sentinel Core Plate (already in materials) keeps logging
+// `inferred-stats: armor:Sentinel Core Plate`. Tracked in
+// HANDOFF.md Section 0.A; not user-facing.
+//
+// Files: app/screens/CraftingScreen.tsx, app/screens/Action
+// ReferenceScreen.tsx, HANDOFF.md (Closed Issues 0.B + Open
+// Issues 0.A updated per the new workflow).
+export const OTA_BUILD_ID = '2026-05-27-095';

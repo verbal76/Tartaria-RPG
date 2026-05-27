@@ -1,10 +1,61 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import { repairCostMaterials } from '../engine/scrapEngine';
 import { RecipesView } from '../components/RecipesView';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import type { InventoryItem } from '../engine/types';
+
+// 2026-05-27 OTA-095 — Aethercraft disciplines moved from
+// ActionReferenceScreen's "Recipes" mode (now deleted) into a
+// new 4th tab on this screen. These aren't normal craft recipes
+// — they're spell-equivalents the player casts by TYPING the
+// phrase ("shape stone", "summon golem", "mend wounds") into
+// the exploration input box. Tapping a card queues the phrase
+// + drops it on the clipboard, matching the ActionReference
+// Screen pattern verbatim. Cycle through example phrasings on
+// repeat taps.
+interface AethercraftDiscipline {
+  id: string;
+  title: string;
+  body: string;
+  fuels: string[];
+  examples: string[];
+}
+
+const AETHERCRAFT_DISCIPLINES: AethercraftDiscipline[] = [
+  {
+    id: 'aether_shape',
+    title: 'Aetherstone Manipulation (shape)',
+    body:
+      'INT check, DC 12. In combat: +4 AC for one round (shaped-stone ward). Out of combat: ' +
+      'binds an Aetheric Shard to a Small Rock, producing a throwable Shaped Aetheric Shard. ' +
+      'Mud Dwellers and Aetherborn cast at the base DC; every other race rolls +4 harder.',
+    fuels: ['Aetheric Shard', 'Aether Crystal', 'Aether Mud', 'Aether Residue', 'Golem Core', 'Aetheric Locket'],
+    examples: ['shape stone', 'mold the aetherstone', 'manipulate stone'],
+  },
+  {
+    id: 'aether_summon',
+    title: 'Aether Golem Constructor (summon)',
+    body:
+      'INT check, DC 15 (harder than the other two — golems take stronger anchors). Summons ' +
+      'an Aether Golem ally that fights for you for the rest of the scene. ' +
+      'Mud Dwellers and Aetherborn cast at the base DC; every other race rolls +4 harder.',
+    fuels: ['Aetheric Shard', 'Aether Crystal', 'Golem Core'],
+    examples: ['summon golem', 'summon an aether golem', 'call a golem'],
+  },
+  {
+    id: 'aether_mend',
+    title: 'Aetheric Healing (mend)',
+    body:
+      'WIS check, DC 12. Restores HP to you or an ally. Aetherborn pay HP instead of corruption ' +
+      'when they cast this — racial trait. Mud Dwellers and Aetherborn cast at the base DC; ' +
+      'every other race rolls +4 harder.',
+    fuels: ['Aetheric Shard', 'Aether Crystal'],
+    examples: ['mend wounds', 'heal me', 'mend self', 'aetheric healing'],
+  },
+];
 
 // OTA-087 — sort axes for the REPAIR tab. 'durability' sorts
 // by current/max ratio so most-damaged-first when desc.
@@ -52,13 +103,24 @@ function evaluateRepair(item: InventoryItem, inventory: InventoryItem[]): Repair
 // inventory item that's wearing down with repairable ones highlighted;
 // RECIPES (formerly an Inventory tab) shows every food / tonic /
 // elixir blueprint with the same craftable-highlight rule.
-type Tab = 'craft' | 'repair' | 'recipes';
+// OTA-095 — added 'aetheric' as the 4th tab. Houses Aethercraft
+// disciplines (shape / summon / mend). Used to live in
+// ActionReferenceScreen's "Recipes" mode, which has been
+// stripped. Player request: actions = actions only; food recipes
+// = Recipes tab; aether disciplines = new Aetheric tab.
+type Tab = 'craft' | 'repair' | 'recipes' | 'aetheric';
 
 export function CraftingScreen() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
   const repairInventoryItem = useGameStore((s) => s.repairInventoryItem);
+  const queueInputDraft = useGameStore((s) => s.queueInputDraft);
   const [tab, setTab] = useState<Tab>('craft');
+  // OTA-095 — Aethercraft tab state. cycleIdx maps a discipline
+  // id → which example phrase to surface next on repeat taps;
+  // pulseAt timestamps a card so its "queued" pulse can fade.
+  const [aetherCycleIdx, setAetherCycleIdx] = useState<Record<string, number>>({});
+  const [aetherPulseAt, setAetherPulseAt] = useState<Record<string, number>>({});
   // OTA-087 — per-tab search + sort state. Each tab keeps its
   // own so switching tabs doesn't clobber the user's filter.
   // Defaults are tuned per category: craft/recipes default to
@@ -145,7 +207,10 @@ export function CraftingScreen() {
           <Text style={styles.backText}>← BACK</Text>
         </TouchableOpacity>
         <Text style={styles.title}>
-          {tab === 'craft' ? 'CRAFTING' : tab === 'repair' ? 'REPAIR' : 'RECIPES'}
+          {tab === 'craft' ? 'CRAFTING'
+            : tab === 'repair' ? 'REPAIR'
+            : tab === 'recipes' ? 'RECIPES'
+            : 'AETHERIC'}
         </Text>
         <View style={{ width: 80 }} />
       </View>
@@ -173,6 +238,13 @@ export function CraftingScreen() {
           activeOpacity={0.7}
         >
           <Text style={[styles.tabBtnText, tab === 'recipes' && styles.tabBtnTextActive]}>RECIPES</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setTab('aetheric')}
+          style={[styles.tabBtn, tab === 'aetheric' && styles.tabBtnActive]}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.tabBtnText, tab === 'aetheric' && styles.tabBtnTextActive]}>AETHERIC</Text>
         </TouchableOpacity>
       </View>
 
@@ -213,6 +285,67 @@ export function CraftingScreen() {
             sortKey={recipesSortKey}
             sortDirection={recipesSortDir}
           />
+        </>
+      ) : tab === 'aetheric' ? (
+        <>
+          {/* 2026-05-27 OTA-095 — Aethercraft disciplines tab.
+              Three spell-equivalents (shape / summon / mend)
+              that burn Aether-tagged fuel. Tapping a card cycles
+              through its example phrasings and queues the
+              picked phrase into the exploration input box +
+              clipboard. Player then hits BACK and the phrase is
+              already staged in the input — they just submit. */}
+          <Text style={styles.arbiterLine}>
+            The Arbiter taps a finger to their temple. "Three disciplines. Aethercraft burns Aether-tagged fuel to bend the rules a little. Tap a card to stage the phrase; hit BACK and the input box has it ready."
+          </Text>
+          <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+            {AETHERCRAFT_DISCIPLINES.map((d) => {
+              const queuedIdx = aetherCycleIdx[d.id];
+              const queuedPhrase = queuedIdx !== undefined ? d.examples[queuedIdx] : null;
+              const pulse = aetherPulseAt[d.id];
+              const queued = !!pulse && Date.now() - pulse < 1400;
+              return (
+                <Pressable
+                  key={d.id}
+                  style={({ pressed }) => [
+                    styles.aetherCard,
+                    pressed && styles.aetherCardPressed,
+                    queued && styles.aetherCardQueued,
+                  ]}
+                  onPress={() => {
+                    if (d.examples.length === 0) return;
+                    const nextIdx = ((aetherCycleIdx[d.id] ?? -1) + 1) % d.examples.length;
+                    setAetherCycleIdx((prev) => ({ ...prev, [d.id]: nextIdx }));
+                    const phrase = d.examples[nextIdx]!;
+                    queueInputDraft(phrase);
+                    // Belt-and-suspenders — drop on the
+                    // clipboard so the player can paste anywhere
+                    // if they prefer. Fire-and-forget.
+                    void Clipboard.setStringAsync(phrase).catch(() => { /* ignore */ });
+                    setAetherPulseAt((prev) => ({ ...prev, [d.id]: Date.now() }));
+                  }}
+                >
+                  <Text style={styles.aetherCardTitle}>{d.title}</Text>
+                  <Text style={styles.aetherCardBody}>{d.body}</Text>
+                  <Text style={styles.aetherCardFuel}>
+                    <Text style={styles.aetherCardFuelLabel}>Fuel (any one): </Text>
+                    {d.fuels.join(', ')}
+                  </Text>
+                  <Text style={styles.aetherCardExamples}>
+                    <Text style={styles.aetherCardExamplesLabel}>Tap to queue: </Text>
+                    {d.examples.map((ex, i) =>
+                      i === queuedIdx ? `[${ex}]` : `"${ex}"`,
+                    ).join(' · ')}
+                  </Text>
+                  {queued && queuedPhrase && (
+                    <Text style={styles.aetherCardQueuedHint}>
+                      ✓ "{queuedPhrase}" staged for the input box
+                    </Text>
+                  )}
+                </Pressable>
+              );
+            })}
+          </ScrollView>
         </>
       ) : (
         <>
@@ -356,4 +489,24 @@ const styles = StyleSheet.create({
   recipeCta: { color: '#9ec96a', fontSize: 10, marginTop: 6, fontStyle: 'italic', letterSpacing: 1 },
   empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 40, lineHeight: 18 },
   placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  // OTA-095 — Aethercraft discipline card styles. Mirrors the
+  // recipe-row look but with a slightly cooler border tint to
+  // visually mark these as not-quite-craft (spells, not items).
+  aetherCard: {
+    backgroundColor: '#13110f',
+    borderColor: '#3a5a6c',
+    borderWidth: 1,
+    borderRadius: 4,
+    marginBottom: 8,
+    padding: 12,
+  },
+  aetherCardPressed: { opacity: 0.7 },
+  aetherCardQueued: { borderColor: '#9ec96a' },
+  aetherCardTitle: { color: '#cdbf99', fontSize: 14, fontWeight: '700', marginBottom: 4 },
+  aetherCardBody: { color: '#a89a7a', fontSize: 12, lineHeight: 17, marginBottom: 6 },
+  aetherCardFuel: { color: '#7a705c', fontSize: 11, lineHeight: 15, marginBottom: 4 },
+  aetherCardFuelLabel: { color: '#9aaab0', fontWeight: '700' },
+  aetherCardExamples: { color: '#7a705c', fontSize: 11, lineHeight: 15 },
+  aetherCardExamplesLabel: { color: '#9aaab0', fontWeight: '700' },
+  aetherCardQueuedHint: { color: '#9ec96a', fontSize: 11, marginTop: 4, fontStyle: 'italic' },
 });

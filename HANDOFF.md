@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-094` (parser regression-lock + hyphen normalization). See **Section 0** for the live issue tracker covering OTA-070 → OTA-094.
+> **Latest OTA:** `2026-05-27-095` (Aetheric tab added to CraftingScreen; Recipes mode stripped from ActionReferenceScreen). See **Section 0** for the live issue tracker covering OTA-070 → OTA-095.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -11,7 +11,7 @@
 > **Tests:** 107/107 pass across the canary five (`salvagePools`, `theftNarrationGuard`, `itemEffect`, `statTraining`, `areaSearch`) + the 9 new test files shipped this session (`variableRewards`, `chainedNarrative`, `jitTemptation`, `sessionResume`, `mysterySeeds`, `parserFuzz`, `craftRepairFuzz`, `engagementSmoke`, plus the existing `equipSwap`/`equippedIds`/`inventoryAudit`/`recipeFuzzy` set). The longer sim files (`yearSimulation`, `thousandDayStressSim`, `twoYearChaosSim`) pass too — `twoYearChaosSim` has one borderline "geographic loops ≤1" assertion that flakes 1 in 3 runs (RNG variance against an asymptote-of-threshold metric, pre-existing). Three stress files (`combatStress`, `domesticStress`, `metaNavStress`) OOM-abort in this sandbox at the 700-day sim length — pre-existing infrastructure ceiling, not a regression.
 > **Working tree:** clean.
 > **Open PR:** #1 — draft, this branch → `main`, **stale** relative to OTAs 020 → 056. Description still reflects OTA 053-era state. Refresh before requesting review (the PR summary should walk the five waves below + the deferred items in section 7).
-> **Open issues:** 2 (in Section 0.A — Hub-room key collision deferred, ongoing catalog backfill). GitHub repo issue tracker remains at 0.
+> **Open issues:** 3 (in Section 0.A — Hub-room key collision deferred; ongoing catalog backfill from `inferred-stats:` logs; inference engine doesn't check materials.json). GitHub repo issue tracker remains at 0.
 
 > **For the next Claude instance:** read section 16 first — it's a snapshot of the player's working style + the major systems + the in-flight context. Then **Section 0** for the live issue tracker (the canonical Open / Closed list — read BEFORE planning any fix). Then section 6.A for the recent wave's reasoning. Section 7 lists what's still on the table.
 
@@ -27,9 +27,19 @@
 
 - **Ongoing catalog backfill from `inferred-stats:` debug lines.** Pattern: when an inventory item resolves through `app/engine/itemDefaults.ts` (no authored catalog entry), the engine logs `[debug] inferred-stats: <kind>:<name> — engine guessed stats; add catalog row when convenient.` Backfill these into the relevant `app/data/items/*.json` as logs surface them. **Status:** active. Last batch (OTA-093) added Bone Fragment. Future logs that show new inferred items → batch into the next OTA touching the catalog. No workflow change needed — grep logs for `inferred-stats:` each pass.
 
+- **Inference engine doesn't check `materials.json` before warning.** Surfaced 2026-05-27 when a playtest log showed `[debug] inferred-stats: armor:Sentinel Core Plate — engine guessed stats; add catalog row when convenient.` — but Sentinel Core Plate IS in `materials.json` as an Uncommon misc material. The keyword classifier in `itemDefaults.ts` saw "Plate" → guessed armor → emitted the warning even though the catalog has an authoritative row in a different lookup table. **Fix shape:** extend the fallback chain to consult `MATERIALS` (and similarly `CONSUMABLES`, `EXPLORATION` etc.) before invoking the name-classifier inference. **Status:** open. Not user-facing — just a noisy debug warning. Pick up next time we touch `itemDefaults.ts`.
+
 - **TS 0 errors / Test suite green.** Always required pre-push. Tracked here as a passive gate rather than an issue.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### UI structure / screen reorganization
+
+- **OTA-095 (2026-05-27) · Aetheric recipes were under Actions; food recipes were duplicated between Actions and Crafting.**
+  - **What:** Player flagged that the Aethercraft disciplines (shape stone / summon golem / mend wounds) lived in `ActionReferenceScreen`'s "Recipes" mode alongside food recipes + every other recipe group. Food recipes were also already in `CraftingScreen`'s Recipes tab via `kindFilter="consumable"` — duplicated. User wanted: Actions = actions only; food = Recipes tab only; Aethercraft = new 4th tab under Crafting called "Aetheric."
+  - **Fix:** Added 4th tab `'aetheric'` to `CraftingScreen` (`type Tab = 'craft' | 'repair' | 'recipes' | 'aetheric'`). `AETHERCRAFT_DISCIPLINES` constant copied over (3 disciplines: shape / summon / mend) with the same card-tap-queues-phrase behavior as `ActionReferenceScreen` (uses `queueInputDraft` + Clipboard fallback + cycleIdx for example rotation). Stripped the entire Recipes mode from `ActionReferenceScreen`: removed `RecipeMode` type, mode state + tab toggle, the recipes-branch JSX, the `AETHERCRAFT_DISCIPLINES` + `RECIPE_GROUPS` constants, the `recipeDescription` helper, and the now-unused imports (`RECIPES`, `WEAPONS`, `ARMOR`, `AMULETS`, `RINGS`, `GEAR`, `MATERIALS`). Screen now renders actions only — title is unconditionally "ACTIONS".
+  - **Why:** Single home per content type. No duplicate food rows; Aethercraft has its own visually-distinct tab.
+  - **Files:** `app/screens/CraftingScreen.tsx` (Tab type + tab button + tab body + Aethercraft card styles), `app/screens/ActionReferenceScreen.tsx` (Recipes mode stripped — ~110 lines removed).
 
 #### Parser hardening
 
