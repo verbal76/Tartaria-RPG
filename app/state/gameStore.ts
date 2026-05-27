@@ -23,6 +23,8 @@ import {
   rollOutcome as rollInvestigationOutcome,
   callbackLine as investigationCallbackLine,
   generateLoreAsync as generateInvestigationLoreAsync,
+  findReferenceableInvestigation,
+  buildEchoHookLine,
   type LoreGenerator,
 } from '../engine/investigationTable';
 import {
@@ -2101,6 +2103,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const h = plantHookByKind(next.kind as Hook['kind'], next.chainId);
       initialHooks.push(h);
       consumedChainIds.push(next.chainId);
+    }
+    // 2026-05-26 OTA-075 — cross-room investigation echo hook.
+    // When no chain hook fired (chain continuation owns the
+    // slot when present) AND the scene is peaceful, occasionally
+    // plant a hook that references a past investigation from a
+    // different room. Makes discoveries feel connected — the
+    // bench you took cushion scraps from three rooms ago echoes
+    // back here as a callback. Bounded probability (15%) keeps
+    // echoes from becoming spammy when many investigations
+    // have been recorded.
+    if (initialHooks.length === 0 && !hasEnemies && player && Math.random() < 0.15) {
+      const echoRoomKey = makeRoomKey(
+        player.currentLocationId,
+        microMicroId,
+        player.mapX,
+        player.mapY,
+      );
+      const ref = findReferenceableInvestigation(
+        (worldMemory.visitedRooms ?? {}) as Record<string, { roomInvestigationTable?: VisitedRoom['roomInvestigationTable'] }>,
+        echoRoomKey,
+      );
+      if (ref) {
+        initialHooks.push({
+          id: `hook_echo_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+          kind: 'thread',
+          nouns: [ref.noun],
+          plantedLine: buildEchoHookLine(ref),
+          stage: 0,
+          resolved: false,
+        });
+      }
     }
     // Source the scene's interactable nouns. Preference order:
     //   1. Hand-authored `interactables` arrays on the location and

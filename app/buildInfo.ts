@@ -370,4 +370,46 @@
 // Files: app/engine/investigationTable.ts (CALLBACK_*_LINES
 // pools + pickCallback helper + callbackLine refactor),
 // app/state/gameStore.ts (write-site branch on outcome.kind).
-export const OTA_BUILD_ID = '2026-05-26-074';
+//
+// 2026-05-26 OTA-075 — Cross-room investigation echo hooks
+// (5/5 — final in the series). When the player enters a new
+// scene with no chain hook pending and no enemies, 15% chance
+// to plant a hook that references a past investigation from a
+// DIFFERENT room — "you think back to the bench from earlier
+// — the cushion scraps you pulled from it. Something here
+// reminds you of it." Makes discoveries feel connected across
+// the world instead of evaporating after the room exits.
+//
+// findReferenceableInvestigation scans worldMemory.visited
+// Rooms, skips the current room, filters to consumed entries
+// with kind='item' or kind='hook' (flavor-only investigates
+// would produce a weak echo, skipped), sorts by consumedAt
+// descending so recent investigations echo first. Returns
+// null when no eligible entry exists, leaving the existing
+// hook-plant logic untouched. buildEchoHookLine generates a
+// kind-specific plantedLine (item-named for kind='item',
+// thread-acknowledging for kind='hook').
+//
+// Integration in beginScene: after the chain-hook check at
+// line ~2104, if initialHooks.length === 0 (no chain owned
+// the slot) AND no enemies AND the probability roll succeeds,
+// plant the echo as a synthetic 'thread'-kind Hook. The
+// existing hook stage/resolve machinery handles it from
+// there — no new pipelines.
+//
+// Files: app/engine/investigationTable.ts (findReferenceable
+// Investigation + buildEchoHookLine + ScanRoomShape duck-
+// typed interface to avoid the circular import with engine
+// /types.ts), app/state/gameStore.ts (echo hook plant block
+// in beginScene right after the chain-hook injection).
+//
+// This concludes the OTA-071→075 investigation-table series.
+// The full architecture: every ambient noun seeded as a
+// persistent entry at scene generation, Qwen-augmented lore
+// on first investigate, curated yields with the existing
+// catalog, per-kind callback variants on repeat, cross-room
+// echoes on new scenes. Five OTAs, each shippable and
+// reversible; the player gets a richer, more connected
+// investigation loop than the pre-OTA-071 "Nothing more to
+// find" generic refusal.
+export const OTA_BUILD_ID = '2026-05-26-075';

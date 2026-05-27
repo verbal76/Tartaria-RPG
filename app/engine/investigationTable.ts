@@ -502,3 +502,69 @@ export async function generateLoreAsync(
     return fallback;
   }
 }
+
+// ===========================================================
+// OTA-075 — Cross-room investigation echo hooks.
+// ===========================================================
+//
+// When the player enters a new scene, occasionally plant a
+// hook that references a past investigation from a different
+// room. Makes discoveries feel connected across the world —
+// the bench you took cushion scraps from three rooms ago
+// echoes back here as a callback hook line ("you think back
+// to the bench from earlier — the cushion scraps you took.
+// Something here reminds you of it.").
+//
+// The scan is bounded: only consumed entries with kind='item'
+// or kind='hook' are eligible (flavor-only investigates would
+// produce a weak callback). Sorted by consumedAt descending
+// so recent investigations echo before stale ones. Returns
+// null when no eligible entry exists, leaving the existing
+// hook-plant logic untouched.
+
+// Minimal room shape we read for the scan — keeps the pure
+// module decoupled from the full VisitedRoom type in
+// engine/types.ts (which already imports InvestigationEntry
+// from here; the duck-typed shape avoids the circular import
+// loop).
+interface ScanRoomShape {
+  roomInvestigationTable?: Record<string, InvestigationEntry>;
+}
+
+export function findReferenceableInvestigation(
+  visitedRooms: Record<string, ScanRoomShape>,
+  excludeRoomKey: string,
+): InvestigationEntry | null {
+  const candidates: InvestigationEntry[] = [];
+  for (const [key, room] of Object.entries(visitedRooms)) {
+    if (key === excludeRoomKey) continue;
+    if (!room.roomInvestigationTable) continue;
+    for (const entry of Object.values(room.roomInvestigationTable)) {
+      if (!entry.consumed) continue;
+      if (!entry.result) continue;
+      // Flavor-only investigates would produce a weak echo;
+      // only items and hooks make for a callback worth
+      // surfacing.
+      if (entry.result.kind === 'flavor') continue;
+      candidates.push(entry);
+    }
+  }
+  if (candidates.length === 0) return null;
+  candidates.sort((a, b) => (b.consumedAt ?? 0) - (a.consumedAt ?? 0));
+  return candidates[0] ?? null;
+}
+
+/** Build the echo hook plantedLine for a referenced past
+ *  investigation entry. Per-kind variants so item echoes name
+ *  the item taken, hook echoes acknowledge the thread. */
+export function buildEchoHookLine(entry: InvestigationEntry): string {
+  const noun = entry.noun;
+  if (entry.result?.kind === 'item') {
+    const item = entry.result.detail.toLowerCase();
+    return `You think back to the ${noun} from earlier — the ${item} you pulled from it. Something here reminds you of it.`;
+  }
+  if (entry.result?.kind === 'hook') {
+    return `The ${noun} from a room back surfaces in memory. The thread you pulled is still warm — and now it's tugging again.`;
+  }
+  return `The ${noun} from earlier comes back to mind. You're not sure why — but the connection is real.`;
+}
