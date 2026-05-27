@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-108` (Monarch pronunciation per IPA /ˈmɑnɑrk/ = MAH-nark; updated Mud Monarch / Mud Monarchs and added standalone Monarch / Monarchs entries. First post-OTA-107 IPA change to follow the preview-before-shipping rule). See **Section 0** for the live issue tracker covering OTA-070 → OTA-108.
+> **Latest OTA:** `2026-05-27-109` (Monarch spell-it-out correction — MAH-nark from OTA-108 was wrong; user's actual ear is MON-NARK. All four Monarch entries updated. The OTA-107 preview-before-shipping rule earned its keep: asked first, got the correction, no revert OTA burned). See **Section 0** for the live issue tracker covering OTA-070 → OTA-109.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -38,6 +38,17 @@
 ### 0.B — Closed Issues (most recent first)
 
 #### Pronunciation lexicon
+
+- **OTA-109 (2026-05-27) · Monarch spell-it-out correction — MAH-nark wrong, MON-NARK right.**
+  - **What:** Player refined IPA to `/ˈmɑːnɑːrk/` and said the long-vowel version was "a better fit for all usage of Monarch." When I asked which encoding to use for the vowel-length cue (double-vowel respelling vs IPA channel vs no-op), the user answered with their actual ear: *"to me it sounds mon-nark."* That's the spell-it-out cue — overrides my OTA-108 IPA parse per the OTA-107 rule. The user hears the standard English MON-NARK pronunciation, with the syllable-boundary N audible, not the MAH-nark I'd derived from `/ɑ/`.
+  - **Fix:** `loreLexicon.ts` Monarch entries:
+    - `'mah nark'` → `'mon nark'`
+    - `'mah narks'` → `'mon narks'`
+    - `'mud mah nark'` → `'mud mon nark'`
+    - `'mud mah narks'` → `'mud mon narks'`
+    - Block comment updated to reflect the spell-it-out cue.
+  - **Why:** The OTA-107 preview-before-shipping rule paid off on first use — I asked before editing, got the course-correction, and shipped a single corrected OTA instead of burning another revert cycle like the Aether family. The deeper lesson: the IPA the user types may represent emphasis or contour cues more than literal phoneme content. `/ɑ/` for them maps to the "on" vowel in "monarch," not the "ah" of "spa." Future IPA-driven changes get the spell-it-out preview without exception.
+  - **Files:** `app/voice/loreLexicon.ts` (Monarch block comment + 4 entries).
 
 - **OTA-108 (2026-05-27) · Monarch pronunciation = MAH-nark per IPA /ˈmɑnɑrk/.**
   - **What:** Player provided IPA `monarch = /ˈmɑnɑrk/` — both syllables take the /ɑ/ "ah" vowel: first syllable "mah" (as in "spa"), second syllable "nark" (rhymes with "park"). Default phonemizers read "monarch" as MON-ark with a short-o; the lexicon now forces MAH-nark.

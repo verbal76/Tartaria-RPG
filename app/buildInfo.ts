@@ -1589,4 +1589,25 @@
 // matching before "Monarchs" so the compound isn't preempted.
 //
 // Files: app/voice/loreLexicon.ts.
-export const OTA_BUILD_ID = '2026-05-27-108';
+//
+// 2026-05-27 OTA-109 — Monarch spell-it-out correction.
+// User refined IPA to /ˈmɑːnɑːrk/ and when asked about the
+// long-vowel encoding answered with their actual ear: "to
+// me it sounds mon-nark." Spell-it-out cue overrides IPA
+// parse per the OTA-107 rule. MAH-nark from OTA-108 was
+// wrong — the user hears the standard English MON-NARK
+// pronunciation with the syllable-boundary N audible.
+// Updated all four entries:
+//   'mah nark'      → 'mon nark'
+//   'mah narks'     → 'mon narks'
+//   'mud mah nark'  → 'mud mon nark'
+//   'mud mah narks' → 'mud mon narks'
+// Outcome of the OTA-107 rule: I asked before shipping,
+// got the course-correction, no revert OTA burned. The IPA
+// the user typed represented something they wanted to
+// CONVEY about emphasis (long vowels) more than the exact
+// phonemes — their ear maps /ɑ/ to the "on" vowel for this
+// word, not the "ah" of "spa."
+//
+// Files: app/voice/loreLexicon.ts.
+export const OTA_BUILD_ID = '2026-05-27-109';

@@ -83,16 +83,20 @@ const LEXICON: Array<[RegExp, string]> = [
   [/\bZharak\b/gi, 'zah rak'],
 
   // Faction / role nouns sometimes mangled by stress placement.
-  // Monarch — playtester IPA spec OTA-108: /ˈmɑnɑrk/ = MAH-nark
-  // (both syllables get the /ɑ/ "ah" vowel). Default phonemizers
-  // read "monarch" as MON-ark (short-o); we force MAH-nark across
-  // both the bare noun and the Mud Monarch(s) compound.
+  // Monarch — playtester spell-it-out spec OTA-109: "mon-nark"
+  // (first syllable "mon" rhymes with "on", second syllable
+  // "nark" rhymes with "park"). User initially gave IPA
+  // /ˈmɑnɑrk/ in OTA-108 which I parsed as MAH-nark; when
+  // refining to /ˈmɑːnɑːrk/ they clarified the ear they hear
+  // is "mon-nark" — the standard English pronunciation with
+  // the syllable-boundary N audible. The spell-it-out cue wins
+  // over the IPA parse per the OTA-107 rule.
   [/\bReclaimer\b/gi, 'ree clay mer'],
   [/\bReclaimers\b/gi, 'ree clay merz'],
-  [/\bMud Monarchs\b/gi, 'mud mah narks'],
-  [/\bMud Monarch\b/gi, 'mud mah nark'],
-  [/\bMonarchs\b/gi, 'mah narks'],
-  [/\bMonarch\b/gi, 'mah nark'],
+  [/\bMud Monarchs\b/gi, 'mud mon narks'],
+  [/\bMud Monarch\b/gi, 'mud mon nark'],
+  [/\bMonarchs\b/gi, 'mon narks'],
+  [/\bMonarch\b/gi, 'mon nark'],
 
   // Lore objects.
   [/\bRunecaster\b/gi, 'rune caster'],
