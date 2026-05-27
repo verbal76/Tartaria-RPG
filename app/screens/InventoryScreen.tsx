@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import {
@@ -14,6 +14,57 @@ import { findWeaponByName } from '../engine/crafting';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview } from '../components/itemPreview';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
+import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
+
+// 2026-05-27 OTA-087 — Sort axes for inventory. Each axis
+// has a default direction baked in (alphabetical asc, rarity
+// asc = Common→Legendary, quantity desc = biggest stacks
+// first, kind asc). Tapping the active axis toggles direction.
+const INV_SORT_OPTIONS = [
+  { key: 'name', label: 'NAME' },
+  { key: 'rarity', label: 'RARITY' },
+  { key: 'kind', label: 'KIND' },
+  { key: 'qty', label: 'QTY' },
+];
+const RARITY_RANK: Record<string, number> = {
+  Common: 0,
+  Uncommon: 1,
+  Rare: 2,
+  Legendary: 3,
+};
+
+function sortInventoryItems(
+  items: InventoryItem[],
+  sortKey: string,
+  direction: SortDirection,
+): InventoryItem[] {
+  const dir = direction === 'asc' ? 1 : -1;
+  const sorted = [...items];
+  sorted.sort((a, b) => {
+    switch (sortKey) {
+      case 'rarity': {
+        const ar = RARITY_RANK[a.rarity ?? 'Common'] ?? 0;
+        const br = RARITY_RANK[b.rarity ?? 'Common'] ?? 0;
+        if (ar !== br) return (ar - br) * dir;
+        return a.name.localeCompare(b.name) * dir;
+      }
+      case 'kind': {
+        const ak = a.kind ?? '';
+        const bk = b.kind ?? '';
+        if (ak !== bk) return ak.localeCompare(bk) * dir;
+        return a.name.localeCompare(b.name) * dir;
+      }
+      case 'qty': {
+        if (a.quantity !== b.quantity) return (a.quantity - b.quantity) * dir;
+        return a.name.localeCompare(b.name) * dir;
+      }
+      case 'name':
+      default:
+        return a.name.localeCompare(b.name) * dir;
+    }
+  });
+  return sorted;
+}
 // 2026-05-26 OTA-059 — RECIPES tab moved to CraftingScreen as its
 // 3rd tab (CRAFT / REPAIR / RECIPES). InventoryScreen is now a
 // single ITEMS view — no tabs needed.
@@ -32,6 +83,14 @@ export function InventoryScreen() {
   // pack" summary with a single CLOSE button. Cleared on next
   // item-tap.
   const [scrapResult, setScrapResult] = useState<InventoryDelta[] | null>(null);
+  // OTA-087 — search query + sort axis state. Ephemeral (not
+  // persisted across sessions); resets to defaults on each
+  // mount. Query is a case-insensitive substring match against
+  // the item NAME only (not tags or kind) — keeps the search
+  // mental-model simple and predictable.
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortKey, setSortKey] = useState('name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   if (!player) {
     return (
@@ -41,7 +100,18 @@ export function InventoryScreen() {
     );
   }
 
-  const grouped = groupInventoryByCategory(player.inventory);
+  // OTA-087 — apply search filter + sort BEFORE grouping by
+  // category. The category sections still render in the same
+  // CATEGORY_ORDER; only the items within each section get
+  // filtered/sorted by the user's choices. Empty sections
+  // collapse automatically via the `items.length === 0` check
+  // further down.
+  const queryLower = searchQuery.trim().toLowerCase();
+  const filtered = queryLower.length > 0
+    ? player.inventory.filter((i) => i.name.toLowerCase().includes(queryLower))
+    : player.inventory;
+  const sorted = sortInventoryItems(filtered, sortKey, sortDirection);
+  const grouped = groupInventoryByCategory(sorted);
   // Map equipped item name → the slot(s) it's currently in. Used so the
   // modal can offer Unequip on items already worn.
   const slotsByEquippedName = new Map<string, EquipSlot[]>();
@@ -250,6 +320,16 @@ export function InventoryScreen() {
       </View>
 
       <Text style={styles.tc}>TC: {player.tc}</Text>
+
+      <SearchSortBar
+        query={searchQuery}
+        onQueryChange={setSearchQuery}
+        placeholder="Search your pack…"
+        sortOptions={INV_SORT_OPTIONS}
+        sortKey={sortKey}
+        sortDirection={sortDirection}
+        onSortChange={(k, d) => { setSortKey(k); setSortDirection(d); }}
+      />
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {CATEGORY_ORDER.map((cat) => {

@@ -883,4 +883,44 @@
 // Files: app/engine/climbHeight.ts (maxClimbedTier rewritten
 // for fuzzy match + multi-colon noun handling),
 // __tests__/climbCleared.test.ts (5 OTA-086 regressions).
-export const OTA_BUILD_ID = '2026-05-27-086';
+//
+// 2026-05-27 OTA-087 — Search + sort bars on every list view.
+// Inventory, Crafting → Craft tab, Crafting → Recipes tab,
+// and Crafting → Repair tab all gain a SearchSortBar at the
+// top with case-insensitive substring search on the item /
+// recipe name plus category-relevant sort axes:
+//
+//   INVENTORY: name / rarity / kind / quantity
+//   CRAFT:     ready (default) / name / rarity
+//   RECIPES:   ready (default) / name / rarity
+//   REPAIR:    available (default) / durability% / name / cost
+//
+// Tapping the active sort toggles direction (asc ↔ desc);
+// tapping a different sort changes the key without resetting
+// direction. Search has an inline × clear button when
+// non-empty.
+//
+// Implementation: new shared SearchSortBar component (~165
+// lines, controlled — parent owns state). InventoryScreen
+// wires query+sort state and feeds the bar above the
+// grouped category scroll. CraftingScreen keeps per-tab
+// state so switching tabs doesn't clobber the user's filter.
+// RecipesView accepts query+sortKey+sortDirection as
+// optional props; pre-OTA-087 'ready' sort preserved as the
+// default when no props are passed (legacy callers stay
+// unchanged).
+//
+// State scope: ephemeral. Resets on screen remount. Future
+// polish OTA could persist to AsyncStorage if requested.
+//
+// Files: app/components/SearchSortBar.tsx (already
+// committed as the WIP in the prior commit; this OTA wires
+// it in), app/screens/InventoryScreen.tsx (state +
+// INV_SORT_OPTIONS + sortInventoryItems helper + bar render),
+// app/screens/CraftingScreen.tsx (per-tab state + REPAIR_
+// SORT_OPTIONS + RECIPE_SORT_OPTIONS + repairableView
+// filter/sort memo + bar per tab), app/components/Recipes
+// View.tsx (props extended with query / sortKey /
+// sortDirection; filter + sort applied inside the
+// evaluated useMemo).
+export const OTA_BUILD_ID = '2026-05-27-087';

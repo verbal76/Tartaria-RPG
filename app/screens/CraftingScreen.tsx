@@ -3,7 +3,30 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useGameStore } from '../state/gameStore';
 import { repairCostMaterials } from '../engine/scrapEngine';
 import { RecipesView } from '../components/RecipesView';
+import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import type { InventoryItem } from '../engine/types';
+
+// OTA-087 — sort axes for the REPAIR tab. 'durability' sorts
+// by current/max ratio so most-damaged-first when desc.
+// 'available' floats items the player can fix RIGHT NOW (all
+// materials in stock) to the top. 'cost' sorts by total
+// material count required.
+const REPAIR_SORT_OPTIONS = [
+  { key: 'available', label: 'READY' },
+  { key: 'durability', label: 'DURABILITY' },
+  { key: 'name', label: 'NAME' },
+  { key: 'cost', label: 'COST' },
+];
+
+// OTA-087 — Craft + Recipes tabs share an axis set. 'ready'
+// is the existing "available first" pre-OTA sort; offered
+// here as the default. 'rarity' floats higher-tier outputs to
+// the top when sorted desc.
+const RECIPE_SORT_OPTIONS = [
+  { key: 'ready', label: 'READY' },
+  { key: 'name', label: 'NAME' },
+  { key: 'rarity', label: 'RARITY' },
+];
 
 interface RepairStatus {
   item: InventoryItem;
@@ -36,6 +59,20 @@ export function CraftingScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const repairInventoryItem = useGameStore((s) => s.repairInventoryItem);
   const [tab, setTab] = useState<Tab>('craft');
+  // OTA-087 — per-tab search + sort state. Each tab keeps its
+  // own so switching tabs doesn't clobber the user's filter.
+  // Defaults are tuned per category: craft/recipes default to
+  // 'ready' (matches pre-OTA RecipesView sort), repair to
+  // 'available' which prioritizes fixable items.
+  const [craftQuery, setCraftQuery] = useState('');
+  const [craftSortKey, setCraftSortKey] = useState('ready');
+  const [craftSortDir, setCraftSortDir] = useState<SortDirection>('asc');
+  const [recipesQuery, setRecipesQuery] = useState('');
+  const [recipesSortKey, setRecipesSortKey] = useState('ready');
+  const [recipesSortDir, setRecipesSortDir] = useState<SortDirection>('asc');
+  const [repairQuery, setRepairQuery] = useState('');
+  const [repairSortKey, setRepairSortKey] = useState('available');
+  const [repairSortDir, setRepairSortDir] = useState<SortDirection>('asc');
 
   // OTA 228 — repair list: every durability-tracked item in the
   // inventory that's not at full HP. Repair cost = 2× scrap output
@@ -46,6 +83,47 @@ export function CraftingScreen() {
       .filter((i) => i.durability && i.durability.current < i.durability.max)
       .map((i) => evaluateRepair(i, [...player.inventory]));
   }, [player?.inventory]);
+
+  // OTA-087 — filter + sort the repair list. Search matches
+  // the item NAME substring; sort axis selectable.
+  const repairableView = useMemo(() => {
+    const q = repairQuery.trim().toLowerCase();
+    const filtered = q.length > 0
+      ? repairable.filter((r) => r.item.name.toLowerCase().includes(q))
+      : repairable;
+    const dir = repairSortDir === 'asc' ? 1 : -1;
+    const sorted = [...filtered];
+    sorted.sort((a, b) => {
+      switch (repairSortKey) {
+        case 'available': {
+          // available=true floats to top when asc (the playtester-
+          // friendly default — what can I fix RIGHT NOW?).
+          if (a.available !== b.available) {
+            return (a.available ? -1 : 1) * dir;
+          }
+          return a.item.name.localeCompare(b.item.name) * dir;
+        }
+        case 'durability': {
+          const ad = a.item.durability!;
+          const bd = b.item.durability!;
+          const ap = ad.current / Math.max(1, ad.max);
+          const bp = bd.current / Math.max(1, bd.max);
+          if (ap !== bp) return (ap - bp) * dir;
+          return a.item.name.localeCompare(b.item.name) * dir;
+        }
+        case 'cost': {
+          const ac = a.cost.reduce((s, c) => s + c.quantity, 0);
+          const bc = b.cost.reduce((s, c) => s + c.quantity, 0);
+          if (ac !== bc) return (ac - bc) * dir;
+          return a.item.name.localeCompare(b.item.name) * dir;
+        }
+        case 'name':
+        default:
+          return a.item.name.localeCompare(b.item.name) * dir;
+      }
+    });
+    return sorted;
+  }, [repairable, repairQuery, repairSortKey, repairSortDir]);
 
   if (!player) {
     return (
@@ -99,28 +177,68 @@ export function CraftingScreen() {
       </View>
 
       {tab === 'craft' ? (
-        <RecipesView
-          kindFilter="non-consumable"
-          onAfterCraft={() => setScreen('exploration')}
-        />
+        <>
+          <SearchSortBar
+            query={craftQuery}
+            onQueryChange={setCraftQuery}
+            placeholder="Search blueprints…"
+            sortOptions={RECIPE_SORT_OPTIONS}
+            sortKey={craftSortKey}
+            sortDirection={craftSortDir}
+            onSortChange={(k, d) => { setCraftSortKey(k); setCraftSortDir(d); }}
+          />
+          <RecipesView
+            kindFilter="non-consumable"
+            onAfterCraft={() => setScreen('exploration')}
+            query={craftQuery}
+            sortKey={craftSortKey}
+            sortDirection={craftSortDir}
+          />
+        </>
       ) : tab === 'recipes' ? (
-        <RecipesView
-          kindFilter="consumable"
-          onAfterCraft={() => setScreen('exploration')}
-        />
+        <>
+          <SearchSortBar
+            query={recipesQuery}
+            onQueryChange={setRecipesQuery}
+            placeholder="Search recipes…"
+            sortOptions={RECIPE_SORT_OPTIONS}
+            sortKey={recipesSortKey}
+            sortDirection={recipesSortDir}
+            onSortChange={(k, d) => { setRecipesSortKey(k); setRecipesSortDir(d); }}
+          />
+          <RecipesView
+            kindFilter="consumable"
+            onAfterCraft={() => setScreen('exploration')}
+            query={recipesQuery}
+            sortKey={recipesSortKey}
+            sortDirection={recipesSortDir}
+          />
+        </>
       ) : (
         <>
           <Text style={styles.arbiterLine}>
             The Arbiter takes the damaged piece. "Material cost is double what it'd give if you scrapped it. That's the trade."
           </Text>
 
+          <SearchSortBar
+            query={repairQuery}
+            onQueryChange={setRepairQuery}
+            placeholder="Search damaged gear…"
+            sortOptions={REPAIR_SORT_OPTIONS}
+            sortKey={repairSortKey}
+            sortDirection={repairSortDir}
+            onSortChange={(k, d) => { setRepairSortKey(k); setRepairSortDir(d); }}
+          />
+
           <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
-            {repairable.length === 0 ? (
+            {repairableView.length === 0 ? (
               <Text style={styles.empty}>
-                Nothing in your pack needs mending. Take a few more hits and check back.
+                {repairable.length === 0
+                  ? 'Nothing in your pack needs mending. Take a few more hits and check back.'
+                  : 'No damaged items match the search.'}
               </Text>
             ) : (
-              repairable.map((r) => {
+              repairableView.map((r) => {
                 const dur = r.item.durability!;
                 const stripeColor = r.available ? '#9ec96a' : '#3a342c';
                 return (
