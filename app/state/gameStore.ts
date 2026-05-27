@@ -22,6 +22,8 @@ import {
   seedInvestigationTable,
   rollOutcome as rollInvestigationOutcome,
   callbackLine as investigationCallbackLine,
+  generateLoreAsync as generateInvestigationLoreAsync,
+  type LoreGenerator,
 } from '../engine/investigationTable';
 import {
   listSlots,
@@ -4240,46 +4242,73 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 );
                 break;
               }
-              // First investigate — roll the table outcome,
-              // consume the entry, write to flavorExhausted so
-              // the chip greys via the OTA-070 fuzzy UI check
-              // even if the player later re-enters this room.
-              const outcome = rollInvestigationOutcome(tableEntry);
-              get().appendLog('world', outcome.line);
-              set((s) => {
-                const room = s.worldMemory.visitedRooms?.[tableRoomKey] ?? {
-                  firstVisitAt: Date.now(),
-                  lastVisitAt: Date.now(),
-                  visitCount: 1,
-                };
-                const prevTable = room.roomInvestigationTable ?? {};
-                const updatedEntry = {
-                  ...tableEntry,
-                  consumed: true,
-                  consumedAt: Date.now(),
-                  result: outcome,
-                };
-                const existingFlavor = room.flavorExhaustedNouns ?? [];
-                const flavorWithNoun = existingFlavor.includes(ambientLower)
-                  ? existingFlavor
-                  : [...existingFlavor, ambientLower];
-                return {
-                  worldMemory: {
-                    ...s.worldMemory,
-                    visitedRooms: {
-                      ...(s.worldMemory.visitedRooms ?? {}),
-                      [tableRoomKey]: {
-                        ...room,
-                        roomInvestigationTable: {
-                          ...prevTable,
-                          [ambientLower]: updatedEntry,
+              // First investigate — roll the table outcome.
+              // OTA-072: lore generation runs through Qwen
+              // when ready, with a 2.5s timeout that falls
+              // back to the curated template lore on miss.
+              // The Qwen call happens inside an async IIFE so
+              // the surrounding switch stays synchronous; the
+              // log line + state mutation happen INSIDE the
+              // IIFE once lore resolves. Player taps INVESTI-
+              // GATE → modal closes → 50-300ms gap (Qwen
+              // latency) → lore line appears. Curated fallback
+              // when Qwen is unavailable / cold / errors.
+              const baseOutcome = rollInvestigationOutcome(tableEntry);
+              const qwenGenerator: LoreGenerator | null = qwen.isReady()
+                ? (messages, opts) => qwen.generate(messages, opts)
+                : null;
+              const locationName =
+                currentScene.location.name ?? 'this place';
+              void (async () => {
+                const loreLine = qwenGenerator
+                  ? await generateInvestigationLoreAsync(
+                      tableEntry,
+                      locationName,
+                      qwenGenerator,
+                    )
+                  : baseOutcome.line;
+                const outcome = { ...baseOutcome, line: loreLine };
+                get().appendLog('world', outcome.line);
+                set((s) => {
+                  const room = s.worldMemory.visitedRooms?.[tableRoomKey] ?? {
+                    firstVisitAt: Date.now(),
+                    lastVisitAt: Date.now(),
+                    visitCount: 1,
+                  };
+                  const prevTable = room.roomInvestigationTable ?? {};
+                  const updatedEntry = {
+                    ...tableEntry,
+                    // Cache the resolved lore on the entry so
+                    // callbackLine + any future read can
+                    // reference the Qwen-enriched line, not
+                    // just the curated fallback.
+                    loreLine: loreLine,
+                    consumed: true,
+                    consumedAt: Date.now(),
+                    result: outcome,
+                  };
+                  const existingFlavor = room.flavorExhaustedNouns ?? [];
+                  const flavorWithNoun = existingFlavor.includes(ambientLower)
+                    ? existingFlavor
+                    : [...existingFlavor, ambientLower];
+                  return {
+                    worldMemory: {
+                      ...s.worldMemory,
+                      visitedRooms: {
+                        ...(s.worldMemory.visitedRooms ?? {}),
+                        [tableRoomKey]: {
+                          ...room,
+                          roomInvestigationTable: {
+                            ...prevTable,
+                            [ambientLower]: updatedEntry,
+                          },
+                          flavorExhaustedNouns: flavorWithNoun,
                         },
-                        flavorExhaustedNouns: flavorWithNoun,
                       },
                     },
-                  },
-                };
-              });
+                  };
+                });
+              })();
               // Stamina/time costs intentionally NOT applied
               // here — table outcomes are quick visual / flavor
               // beats. The richer skill-check path (catalog

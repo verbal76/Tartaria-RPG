@@ -282,4 +282,40 @@
 // fallback, OTA-073 activates yield mechanics + hook seeding,
 // OTA-074 polishes callback narration per result.kind,
 // OTA-075 wires hooks to reference past investigations.
-export const OTA_BUILD_ID = '2026-05-26-071';
+//
+// 2026-05-26 OTA-072 — Lazy Qwen lore generation for the
+// investigation table (2/5 in the series). First investigates
+// of a table noun now route through Qwen2.5-0.5B for a
+// generated atmospheric sentence; falls back to the curated
+// template lore when Qwen isn't ready or times out (2.5s
+// cap). The generated lore is cached into entry.loreLine on
+// the room state so future callbacks reference the Qwen-
+// enriched version.
+//
+// Implementation: new generateLoreAsync helper in investi-
+// gationTable.ts takes a LoreGenerator function (chat
+// messages → string Promise) so the pure module stays decoupled
+// from the QwenGenerativeEngine class. The engine integration
+// in gameStore.ts wraps qwen.generate in a closure when
+// qwen.isReady(), passes null otherwise.
+//
+// Lore prompt: short system message instructs Qwen to act as
+// the Arbiter narrator, produce ONE atmospheric sentence about
+// the scene object, max 30 words, no second-person ("you"),
+// no setup phrases. User message includes the noun, category,
+// and current location name. Output is trimmed (strip quotes,
+// sentence-boundary cut past 60 chars, hard cap at 240 chars)
+// before logging.
+//
+// UX: player taps INVESTIGATE → modal closes → 50-300ms gap
+// (Qwen inference latency) → lore line appears. Without Qwen
+// the curated template fires immediately. The async work runs
+// inside an IIFE so the surrounding switch stays synchronous —
+// no breaking changes to the rest of the intent dispatch.
+//
+// Files: app/engine/investigationTable.ts (LoreGenerator
+// type + generateLoreAsync + buildLorePrompt + trimLore),
+// app/state/gameStore.ts (investigate case body refactored
+// to await Qwen lore inside an IIFE before logging +
+// committing consumed state).
+export const OTA_BUILD_ID = '2026-05-26-072';

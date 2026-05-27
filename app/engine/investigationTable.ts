@@ -246,3 +246,101 @@ export function rollOutcome(
     line: lore,
   };
 }
+
+// ===========================================================
+// OTA-072 — Lazy Qwen lore generation.
+// ===========================================================
+//
+// Signature: a function that takes a chat-style messages array
+// + generation options, returns the generated string. Matches
+// the QwenGenerativeEngine.generate shape but kept narrow
+// so we don't pull the whole engine type into the pure module
+// (avoids circular imports + simplifies the unit-test surface).
+export type LoreGenerator = (
+  messages: ReadonlyArray<{ role: 'system' | 'user' | 'assistant'; content: string }>,
+  opts: { maxNewTokens?: number; temperature?: number },
+) => Promise<string>;
+
+// Default timeout for a single Qwen lore call. Empirically
+// Qwen2.5-0.5B inference for ~50 new tokens takes 50-300ms on
+// a mid-range Android; 2500ms gives plenty of headroom for a
+// slow device or cold context while still keeping the UI
+// responsive (player taps INVESTIGATE → modal closes → at most
+// 2.5s before the line appears). On timeout we fall back to
+// the curated template lore.
+const LORE_TIMEOUT_MS = 2500;
+
+// Hard cap on the generated lore string. Qwen sometimes runs
+// long; we want a 1-2 sentence atmospheric line, not a
+// paragraph. Truncate at the first sentence boundary past 60
+// chars, or hard-cut at 240.
+const LORE_MAX_CHARS = 240;
+
+function buildLorePrompt(
+  entry: InvestigationEntry,
+  locationName: string,
+): ReadonlyArray<{ role: 'system' | 'user' | 'assistant'; content: string }> {
+  return [
+    {
+      role: 'system',
+      content:
+        'You are the Arbiter, a laconic narrator in a post-flood fantasy world called Tartaria. ' +
+        'Produce ONE short atmospheric sentence (max 30 words) describing what the player notices ' +
+        'when investigating a scene object. Sensory and specific. No second-person address ("you"), ' +
+        'just the description. No setup phrases ("you see"). No metaphors about time or memory unless ' +
+        'they ground in a physical detail. Plain prose, no quotation marks, no markdown.',
+    },
+    {
+      role: 'user',
+      content: `Object: ${entry.noun} (category: ${entry.category})\nLocation: ${locationName}\nNarrate one sentence:`,
+    },
+  ];
+}
+
+function trimLore(raw: string): string {
+  let s = raw.trim();
+  // Strip leading/trailing quotation marks Qwen sometimes
+  // wraps the output in.
+  s = s.replace(/^["“'`]+|["”'`]+$/g, '').trim();
+  if (s.length === 0) return '';
+  // Sentence-boundary cut past 60 chars when we're over the
+  // max — keeps the line atmospheric without truncating mid-
+  // word.
+  if (s.length > LORE_MAX_CHARS) {
+    const slice = s.slice(0, LORE_MAX_CHARS);
+    const lastPeriod = slice.lastIndexOf('.');
+    if (lastPeriod >= 60) return slice.slice(0, lastPeriod + 1);
+    return slice + '…';
+  }
+  return s;
+}
+
+/** Generate a Qwen lore line for an investigation entry. Falls
+ *  back to the curated template lore on timeout / error /
+ *  empty output. The returned string is what should be shown
+ *  to the player AND cached into entry.loreLine for callback
+ *  reference.
+ *
+ *  Caller is responsible for actually mutating entry.loreLine
+ *  (this fn stays pure beyond the async Qwen call). */
+export async function generateLoreAsync(
+  entry: InvestigationEntry,
+  locationName: string,
+  generator: LoreGenerator | null,
+): Promise<string> {
+  const fallback = templateFor(entry.category).fallbackLore;
+  if (!generator) return fallback;
+  const messages = buildLorePrompt(entry, locationName);
+  try {
+    const racePromise = generator(messages, { maxNewTokens: 60, temperature: 0.85 });
+    const timeoutPromise = new Promise<string>((_resolve, reject) => {
+      setTimeout(() => reject(new Error('Qwen lore timeout')), LORE_TIMEOUT_MS);
+    });
+    const raw = await Promise.race([racePromise, timeoutPromise]);
+    const trimmed = trimLore(raw);
+    if (trimmed.length === 0) return fallback;
+    return trimmed;
+  } catch {
+    return fallback;
+  }
+}
