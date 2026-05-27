@@ -71,14 +71,43 @@ export function climbTierLabel(tier: number, total: number): string {
 // cleared chips, so the parse logic lives here and gameStore / the
 // modal both call it. Marker format is 'climbed:<noun>:t<N>' written
 // per cleared tier.
+//
+// 2026-05-27 OTA-086 — FUZZY MATCH on the marker noun. Pre-OTA-086
+// this used `prefix = "climbed:" + noun.toLowerCase() + ":"` and
+// matched markers via startsWith — exact equality on the noun
+// segment. But the engine writes the marker under climbTarget,
+// which can resolve to a SHORT form ("spire") via the parser's
+// resolvedNoun fallback when matchAmbientNoun misses, while the
+// modal calls this with the FULL chip text ("zharak's teeth
+// spire"). Net: marker key "climbed:spire:t4" didn't match the
+// modal's prefix "climbed:zharak's teeth spire:" → isClimbCleared
+// returned false → chip stayed actionable → engine refused on tap
+// because the engine resolves the same short "spire" form. The
+// chip and the engine literally disagreed about which key meant
+// "this climb is done."
+//
+// Fuzzy match mirrors OTA-070's substring approach for ambient
+// noun dedup. For each `climbed:X:t<N>` marker we check whether
+// X is a substring of `noun` OR noun is a substring of X — if
+// either holds, the marker is considered to belong to this noun.
+// Same idea as the searchedAmbientNouns / flavorExhaustedNouns
+// fuzzy check; mismatched-resolution forms no longer leak.
 export function maxClimbedTier(noun: string, marks: readonly string[]): number {
-  const prefix = `climbed:${noun.toLowerCase()}:`;
+  const nounLower = noun.toLowerCase();
   let max = 0;
   for (const m of marks) {
-    if (!m.startsWith(prefix)) continue;
+    if (!m.startsWith('climbed:')) continue;
     const parts = m.split(':');
+    // Expected: ['climbed', '<noun>', 't<N>'] (3 parts); but noun
+    // can itself contain colons in pathological cases, so guard.
     if (parts.length < 3) continue;
-    const seg = parts[2] ?? '';
+    const markerNoun = parts.slice(1, parts.length - 1).join(':').toLowerCase();
+    const matches =
+      markerNoun === nounLower
+      || nounLower.includes(markerNoun)
+      || markerNoun.includes(nounLower);
+    if (!matches) continue;
+    const seg = parts[parts.length - 1] ?? '';
     const numStr = seg.startsWith('t') ? seg.slice(1) : seg;
     const t = parseInt(numStr, 10);
     if (!Number.isNaN(t) && t > max) max = t;

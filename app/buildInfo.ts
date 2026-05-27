@@ -836,4 +836,51 @@
 //
 // File: app/components/ClimbModal.tsx (Pressable gains
 // disabled + pressed-style guard).
-export const OTA_BUILD_ID = '2026-05-27-085';
+//
+// 2026-05-27 OTA-086 — Climb cleared-state actual root cause:
+// marker-key mismatch. OTA-085 made the cleared Pressable
+// non-tappable, but the cleared flag itself was wrong because
+// the engine and the modal disagreed about which noun key
+// meant "this is climbed."
+//
+// Root cause: the climb handler at gameStore.ts:6983 writes
+// markers as `climbed:${tgt.toLowerCase()}:t${currentTier}`,
+// where tgt comes from climbTarget — which prefers match
+// AmbientNoun's result but falls back to parsed.resolvedNoun
+// when the matcher misses. The parser's resolver shortens
+// "zharak's teeth spire" to "spire" (alias resolution),
+// so when matchAmbientNoun can't find the FULL noun (apostrophe
+// handling, etc.), the marker gets written under "spire" while
+// the modal's chip text remains "zharak's teeth spire". maxClimbed
+// Tier's exact `startsWith("climbed:" + chip + ":")` check missed
+// the marker → isClimbCleared returned false → cleared boolean
+// was false → OTA-085's `disabled={isCleared}` never engaged → chip
+// stayed tappable → engine refused on tap (engine uses the same
+// "spire" short form so it finds the marker just fine).
+//
+// Fix: fuzzy substring match in maxClimbedTier. For each
+// `climbed:X:t<N>` marker, X matches the noun if X equals noun
+// OR X is a substring of noun OR noun is a substring of X.
+// Mirrors OTA-070's substring approach for the ambient-noun
+// dedup lists. Multi-colon nouns parse defensively via slice.
+//
+// Tests: 5 new regressions added to __tests__/climbCleared.test.
+// ts under "OTA-086 fuzzy marker-noun match" — including the
+// exact playtest case ("zharak's teeth spire" + marker
+// "climbed:spire:t4"). All 14 climbCleared tests pass.
+//
+// Net player experience after OTA-085 + OTA-086 together:
+//   1. Climb the spire to tier 4/4. Markers `climbed:spire:t1
+//      ...t4` written by the engine.
+//   2. ClimbModal re-renders. isClimbCleared("zharak's teeth
+//      spire", marks) now returns true via the fuzzy match.
+//   3. Cleared flag → true → row styled greyed with ✓ TOP →
+//      Pressable disabled (OTA-085) → no tap acknowledgement.
+//   4. climbableCount filter excludes the cleared noun → main
+//      CLIMB button on ExplorationScreen drops its 'ready' tone
+//      → button unlit when no viable climbables remain.
+//
+// Files: app/engine/climbHeight.ts (maxClimbedTier rewritten
+// for fuzzy match + multi-colon noun handling),
+// __tests__/climbCleared.test.ts (5 OTA-086 regressions).
+export const OTA_BUILD_ID = '2026-05-27-086';

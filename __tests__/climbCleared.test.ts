@@ -38,6 +38,65 @@ describe('OTA 046 — climb-cleared marker lookup', () => {
       // Marker "climbed:tower:1" (no 't') should also parse to tier 1.
       expect(maxClimbedTier('tower', ['climbed:tower:1'])).toBe(1);
     });
+
+    // OTA-086 — fuzzy substring match between the chip noun and
+    // the marker noun. The engine's climb handler writes the
+    // marker under climbTarget, which can resolve to a SHORT
+    // form ('spire') via the parser's resolvedNoun fallback,
+    // while the modal calls maxClimbedTier with the FULL chip
+    // text ('zharak\'s teeth spire'). Pre-OTA-086 the exact
+    // prefix check missed the marker and isClimbCleared
+    // returned false — the chip stayed actionable, the player
+    // tapped it, the engine refused, repeat-tap loop.
+    describe('OTA-086 fuzzy marker-noun match', () => {
+      it('chip noun (full) matches marker keyed on short form (substring)', () => {
+        // The playtest case verbatim: marker 'climbed:spire:t4',
+        // chip 'zharak\'s teeth spire'. Marker noun 'spire' is
+        // a substring of the chip noun → match.
+        const marks = [
+          'climbed:spire:t1',
+          'climbed:spire:t2',
+          'climbed:spire:t3',
+          'climbed:spire:t4',
+        ];
+        expect(maxClimbedTier("zharak's teeth spire", marks)).toBe(4);
+        expect(isClimbCleared("zharak's teeth spire", marks)).toBe(true);
+      });
+
+      it('chip noun (short) matches marker keyed on full form (substring reverse)', () => {
+        // Inverse: marker uses the full noun, chip is the short
+        // form. Less likely in practice but symmetric.
+        const marks = ["climbed:zharak's teeth spire:t4"];
+        expect(maxClimbedTier('spire', marks)).toBe(4);
+        expect(isClimbCleared('spire', marks)).toBe(true);
+      });
+
+      it('non-overlapping nouns do NOT match (no false positives)', () => {
+        // 'wall' and 'tower' share no substring relation. Marker
+        // on one must not falsely satisfy the other.
+        expect(maxClimbedTier('wall', ['climbed:tower:t4'])).toBe(0);
+        expect(isClimbCleared('wall', ['climbed:tower:t4'])).toBe(false);
+      });
+
+      it('multi-colon noun (defensive) still parses', () => {
+        // Pathological: noun itself contains a colon. Marker
+        // becomes 'climbed:foo:bar:t2' (4 parts). The slice
+        // logic should still extract 'foo:bar' as the noun and
+        // 't2' as the tier.
+        const marks = ['climbed:foo:bar:t2'];
+        expect(maxClimbedTier('foo:bar', marks)).toBe(2);
+      });
+
+      it('cleared spire (4 tiers) drops climbableCount to 0', () => {
+        // Smoke test of the full chain: a fully-cleared spire
+        // chip should report cleared so the UI's filter
+        // `isClimbable(n) && !isClimbCleared(n, marks)` excludes
+        // it from climbableCount.
+        const marks = ['climbed:spire:t4'];
+        expect(climbHeightFor("zharak's teeth spire")).toBeGreaterThanOrEqual(1);
+        expect(isClimbCleared("zharak's teeth spire", marks)).toBe(true);
+      });
+    });
   });
 
   describe('isClimbCleared', () => {
