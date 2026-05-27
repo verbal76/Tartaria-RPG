@@ -63,14 +63,22 @@ const LEXICON: Array<[RegExp, string]> = [
   [/\bTartarian\b/gi, 'tar taireeun'],
   [/\bTartarians\b/gi, 'tar taireeunz'],
   [/\bTartary\b/gi, 'tar tar ee'],
-  // Playtester spec OTA 219.
+  // Playtester spec OTA 219; place-name IPA refresh OTA-104 for
+  // Asgardar, Samarran, Nimari per fresh playtester IPA:
+  //   Asgardar /ɛz gɑdɔɹ/    → "ez gah dor"    (was "az gar dar")
+  //   Samarran /ɛsɛmɔːɾɛn/   → "eh sem or en"  (was "sam ah ran")
+  //   Nimari   /ɛnɛmɑɹi/     → "eh neh mah ree" (was "nih mar ee")
+  // Common pattern: all three open with a leading /ɛ/ schwa
+  // ("eh") that the prior respellings dropped. Samarran and Nimari
+  // are 4-syllable words, not 3; the prior respellings collapsed
+  // an internal vowel.
   [/\bDrakova\b/gi, 'dra koh vah'],
   [/\bVarakush\b/gi, 'vara koosh'],
-  [/\bAsgardar\b/gi, 'az gar dar'],
+  [/\bAsgardar\b/gi, 'ez gah dor'],
   [/\bVoronov\b/gi, 'voro nov'],
-  [/\bSamarran\b/gi, 'sam ah ran'],
+  [/\bSamarran\b/gi, 'eh sem or en'],
   [/\bThametan\b/gi, 'thuh meh tahn'],
-  [/\bNimari\b/gi, 'nih mar ee'],
+  [/\bNimari\b/gi, 'eh neh mah ree'],
   [/\bZharak\b/gi, 'zah rak'],
 
   // Faction / role nouns sometimes mangled by stress placement.

@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-103` (Aether-family pronunciation refinement — `aether` / `aetheric` / `aetherborn` updated per fresh playtester IPA; aetherborn now opens with short-E "eth", diverging from the long-A start of the other two). See **Section 0** for the live issue tracker covering OTA-070 → OTA-103.
+> **Latest OTA:** `2026-05-27-104` (Place-name IPA refresh — Asgardar / Samarran / Nimari updated per fresh playtester IPA; all three open with a leading /ɛ/ schwa "eh" that prior respellings dropped, and Samarran / Nimari restored to 4 syllables). See **Section 0** for the live issue tracker covering OTA-070 → OTA-104.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -38,6 +38,16 @@
 ### 0.B — Closed Issues (most recent first)
 
 #### Pronunciation lexicon
+
+- **OTA-104 (2026-05-27) · Place-name IPA refresh: Asgardar, Samarran, Nimari.**
+  - **What:** Player provided fresh IPA for three place names: `Asgardar /ɛz gɑdɔɹ/`, `Samarran /ɛsɛmɔːɾɛn/`, `Nimari /ɛnɛmɑɹi/`. Pattern across all three: a leading /ɛ/ schwa ("eh") that the prior respellings dropped entirely — the lexicon was treating them as if they started with the first consonant. Samarran and Nimari are also 4-syllable words per the IPA, but the prior `'sam ah ran'` / `'nih mar ee'` were 3 syllables, collapsing an internal vowel.
+  - **Fix:** `loreLexicon.ts` Place names block:
+    - `'az gar dar'` → `'ez gah dor'` (Asgardar — /ɛz/ leading "ez", /gɑ/ open-back "gah", /dɔɹ/ "dor")
+    - `'sam ah ran'` → `'eh sem or en'` (Samarran — restores the leading /ɛ/ and the 4th syllable from /ɔː/)
+    - `'nih mar ee'` → `'eh neh mah ree'` (Nimari — restores leading /ɛ/ schwa; "ree" for final /i/ long-E)
+    - Drakova / Varakush / Voronov / Thametan / Zharak untouched — user only specified the three.
+  - **Why:** Same rationale as OTA-103 (Aether-family). Lexicon respellings feed espeak-ng's letter-to-sound rules; matching the IPA's vowel inventory and syllable count produces TTS output that lines up with the user's intended pronunciation. The leading schwa is a Tartarian pronunciation tic that's now visible across multiple proper nouns — future place names should be cross-checked with the user for it.
+  - **Files:** `app/voice/loreLexicon.ts` (Place names block comment + 3 entries).
 
 - **OTA-103 (2026-05-27) · Aether-family pronunciation refinement from fresh playtester IPA.**
   - **What:** Player provided IPA for three of the five Aether entries — `aether = ɛɪθɚ`, `aetheric = ɛɪθiɾɪk`, `aetherborn = ɛθɛɾ bɔːn`. Key insight from the IPA: aetherborn opens with /ɛ/ (short-e "eth"), NOT /ɛɪ/ (long-A "ay") like aether and aetheric. The prior respellings treated all five entries as the same `'ay thur'` family — wrong starting vowel for aetherborn, plus the final rhotic schwa /ɚ/ reads better as "ther" (rhymes with father) than "thur" (rhymes with fur), and aetheric's middle /θi/ is a long-E ("thee") not a schwa.

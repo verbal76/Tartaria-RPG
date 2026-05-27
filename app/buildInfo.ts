@@ -1509,4 +1509,18 @@
 // guess vowels the user hasn't called out.
 //
 // Files: app/voice/loreLexicon.ts.
-export const OTA_BUILD_ID = '2026-05-27-103';
+//
+// 2026-05-27 OTA-104 — Place-name IPA refinement: Asgardar,
+// Samarran, Nimari. User provided fresh IPA:
+//   Asgardar /ɛz gɑdɔɹ/    → 'ez gah dor'
+//   Samarran /ɛsɛmɔːɾɛn/   → 'eh sem or en'
+//   Nimari   /ɛnɛmɑɹi/     → 'eh neh mah ree'
+// Common pattern across all three: leading /ɛ/ schwa ("eh")
+// that the prior respellings dropped. Samarran and Nimari are
+// 4-syllable words per the IPA; the prior 3-syllable
+// respellings collapsed one internal vowel. Drakova / Varakush
+// / Voronov / Thametan / Zharak unchanged — only refining the
+// three the user called out.
+//
+// Files: app/voice/loreLexicon.ts.
+export const OTA_BUILD_ID = '2026-05-27-104';
