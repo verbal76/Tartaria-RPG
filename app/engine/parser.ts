@@ -305,6 +305,17 @@ export function normalizeInput(raw: string): string {
   for (const [phrase, collapsed] of MULTI_WORD_COLLAPSES) {
     s = s.replace(phrase, collapsed);
   }
+  // OTA-157 — split no-space travel compounds. Stress sweep
+  // (drunkSpelling) flagged `gowest`, `gonorth`, `goeast`,
+  // `gosouth`, etc. all routing to intent=unknown because the
+  // tokenizer splits on whitespace and the glued form isn't a
+  // verb synonym. Surgical fix: insert a space between known
+  // travel verbs and cardinal/vertical direction words. Conservative
+  // — only the most common stamped pattern (travel verb + direction),
+  // not a general compound-splitter, so we don't risk breaking words
+  // that legitimately start with these prefixes (`goth`, `runic`,
+  // `walking`, `heads`).
+  s = s.replace(/\b(go|walk|run|head|travel)(north|south|east|west|up|down|nw|ne|sw|se)\b/g, '$1 $2');
   // Collapse repeated articles — "search the the hum" → "search the hum",
   // "a a torch" → "a torch". Works whether or not stopword filtering catches
   // them downstream. Runs in a loop so triple-the survives ("the the the" →

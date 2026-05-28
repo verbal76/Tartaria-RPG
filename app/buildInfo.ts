@@ -3625,4 +3625,41 @@
 // Files: app/engine/parser.ts
 // (collapseDrunkRuns + bestVerbMatch
 // retry branch).
-export const OTA_BUILD_ID = '2026-05-28-156';
+//
+// 2026-05-28 OTA-157 — no-space travel-
+// verb splitter in normalizeInput.
+//
+// Stress sweep (drunkSpelling) flagged
+// `gowest`, `gonorth`, `goeast`,
+// `gosouth`, `walknorth`, `runnorth`
+// etc. all routing to intent=unknown
+// because the tokenizer splits on
+// whitespace and the glued form isn't
+// a verb synonym.
+//
+// Fix: surgical regex in normalizeInput
+// that inserts a space between known
+// travel verbs (go / walk / run / head /
+// travel) and cardinal/vertical
+// direction words (n/s/e/w/up/down +
+// diagonals). Conservative — only the
+// specific stamped pattern, not a
+// general compound-splitter, so legit
+// words like `goth`, `runic`,
+// `walking`, `heads` survive
+// unchanged.
+//
+// `runnorth` routes to escape (not
+// travel) because `run` is a flee
+// synonym — still an improvement over
+// the prior `unknown`, and arguably
+// closer to what the player meant
+// when typing "run north."
+//
+// 26/26 OTA-157 regressions pass.
+// Wider parser sweep stays green.
+//
+// Files: app/engine/parser.ts
+// (normalizeInput compound-split
+// regex).
+export const OTA_BUILD_ID = '2026-05-28-157';
