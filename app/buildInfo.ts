@@ -2011,4 +2011,29 @@
 // Files: HANDOFF.md (Golem-coexistence override + rubble-
 // puppy late-game fallback added to the Dog Companion
 // framework in 0.A).
-export const OTA_BUILD_ID = '2026-05-27-120';
+//
+// 2026-05-27 OTA-121 — Dog Companion implementation IN
+// PROGRESS (Phase 1 foundation). Implementation agent is
+// still running in the background; this is an intermediate
+// checkpoint commit forced by the local stop-hook policy
+// (no uncommitted changes allowed at turn end). The agent
+// has so far landed:
+//   - DogCompanion type + dog_armor union + factionNeutral
+//     Fight + worldMemory.puppyVendor* flags +
+//     dogSmelledHere on visited rooms (app/engine/types.ts)
+//   - Central module app/engine/dogCompanion.ts (NEW)
+//   - Parser hooks for the 3-step Arbiter onboarding state
+//     machine (app/engine/parser.ts, llmParser.ts)
+//   - gameStore.ts wiring for player.dog field +
+//     onboarding handler routing
+// TS clean. Working tree compiles. Phases 2-6 are still in
+// flight — agent will continue producing files. Subsequent
+// stop-hook checkpoints will land as OTA-122, 123, etc. as
+// the agent progresses; the final ship-ready OTA at the
+// end of the wave will mark Phase 6 + stress tests
+// complete.
+//
+// Files: app/engine/types.ts, app/engine/dogCompanion.ts
+// (NEW), app/engine/parser.ts, app/engine/llmParser.ts,
+// app/state/gameStore.ts.
+export const OTA_BUILD_ID = '2026-05-27-121';

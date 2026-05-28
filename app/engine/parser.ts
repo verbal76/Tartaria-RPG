@@ -136,6 +136,16 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   // doesn't require a target since it auto-resolves the empty
   // bottle from inventory + the water source from scene ambient.
   fill: ['fill', 'refill', 'top up', 'top off', 'scoop', 'draw'],
+  // OTA-120 — Dog Companion combat verbs. Bite: direct attack via the
+  // dog. Distract: dog applies 'distracted' status to one enemy.
+  dog_bite: [
+    'bite', 'sic',
+    'attack with dog', 'tell dog to attack', 'dog attack', 'dog bite',
+    'sic dog', 'sic the dog',
+  ],
+  dog_distract: [
+    'distract', 'dog distract', 'distract enemy', 'tell dog to distract',
+  ],
   throw: ['throw', 'toss', 'hurl', 'lob', 'chuck', 'fling', 'pitch', 'cast at', 'launch', 'whip'],
   // NEW from action card.
   climb: ['climb', 'scale', 'ascend', 'clamber', 'shimmy', 'scramble', 'vault up', 'hoist', 'ladder', 'rope up'],

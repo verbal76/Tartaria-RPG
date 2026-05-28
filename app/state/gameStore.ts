@@ -16,7 +16,18 @@ import type {
   CombatRange,
   Intent,
   VisitedRoom,
+  DogCompanion,
+  PendingDogOnboarding,
 } from '../engine/types';
+import {
+  RESCUE_SCENARIOS,
+  spawnRescueCaptor,
+  createDogCompanion,
+  defaultDogName,
+  applyDogPronouns,
+  trainDogStat,
+  type RescueScenarioId,
+} from '../engine/dogCompanion';
 import { emptyMemory, recordTags, discoverLocation, recordEnemyDefeat, recordNpcMet } from '../engine/worldMemory';
 import {
   seedInvestigationTable,
@@ -735,6 +746,10 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
       if (p.mapY <= 14 && (typeof p.mapX !== 'number' || p.mapX <= 14)) return WORLD_MAP_CENTER_Y;
       return p.mapY;
     })(),
+    // OTA-120 — Dog Companion default for legacy saves. null = no
+    // dog acquired yet; rescue hooks fire normally on the player's
+    // next investigation of a matching scene archetype.
+    dog: p.dog ?? null,
   };
 }
 
@@ -1692,9 +1707,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // From flag that the popup doesn't touch; we read THAT
       // one here and clear it in the set below.
       const ota099UpdatedFrom = get().pendingOtaAppliedFrom;
+      // OTA-120 — Dog Companion world-memory flag migration. Both
+      // default to false on legacy saves so the safety net only
+      // engages once the player actually loses a dog in combat.
+      const migratedWorldMemory = {
+        ...saved.worldMemory,
+        puppyVendorOwed: saved.worldMemory.puppyVendorOwed ?? false,
+        puppyVendorUsed: saved.worldMemory.puppyVendorUsed ?? false,
+        puppyVendorQueued: saved.worldMemory.puppyVendorQueued ?? false,
+        dogGolemCoActivated: saved.worldMemory.dogGolemCoActivated ?? false,
+        pendingDogOnboarding: saved.worldMemory.pendingDogOnboarding ?? null,
+      };
       set({
         player,
-        worldMemory: saved.worldMemory,
+        worldMemory: migratedWorldMemory,
         gameLog: saved.gameLog,
         currentScreen: 'exploration',
         activeSlotId: slotId,
@@ -2612,6 +2638,159 @@ export const useGameStore = create<GameStore>((set, get) => ({
         },
       }));
     }
+    // OTA-120 — Phase 6 puppy-vendor spawn. Fires when the vendor
+    // was queued by a Guardian-defeat handler and we just landed in
+    // an outdoor scene. Skip in hubs and combat scenes.
+    {
+      const wm = get().worldMemory;
+      const isOutdoor = !hubRoom && enemies.length === 0;
+      if (
+        wm.puppyVendorQueued &&
+        wm.puppyVendorOwed &&
+        !wm.puppyVendorUsed &&
+        !wm.pendingDogOnboarding &&
+        isOutdoor &&
+        player &&
+        !player.dog
+      ) {
+        triggerPuppyVendor(get, set);
+      }
+      // OTA-120 — Phase 6 rubble-puppy fallback. Late-game outdoor
+      // wasteland scene; ~5% per scene-entry once Guardians are all
+      // cleared. Plant a "rubble" investigation noun the player can
+      // investigate.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const cgMod = require('../engine/coreGuardians');
+      const totalGuardians = cgMod.totalGuardiansCount();
+      const livePlayer = get().player;
+      const defCount = (livePlayer?.mainQuest?.guardiansDefeated ?? []).length;
+      if (
+        wm.puppyVendorOwed &&
+        !wm.puppyVendorUsed &&
+        !wm.pendingDogOnboarding &&
+        livePlayer &&
+        !livePlayer.dog &&
+        defCount >= totalGuardians &&
+        isOutdoor &&
+        Math.random() < 0.05
+      ) {
+        // Plant rubble noun via the scene ambient list so the player
+        // can `investigate rubble` to trigger the puppy.
+        set((s) => s.currentScene
+          ? {
+              currentScene: {
+                ...s.currentScene,
+                ambientNouns: Array.from(new Set([...(s.currentScene.ambientNouns ?? []), 'rubble'])),
+                displayedAmbientNouns: s.currentScene.displayedAmbientNouns
+                  ? Array.from(new Set([...s.currentScene.displayedAmbientNouns, 'rubble']))
+                  : s.currentScene.displayedAmbientNouns,
+              },
+            }
+          : s);
+        get().appendLog(
+          'world',
+          `A pile of rubble shifts as you pass. Something — small, alive — is in it.`,
+        );
+      }
+    }
+    // OTA-120 — dog smell-find on scene entry. Successful roll picks
+    // a hidden noun from the archetype and appends it to the room's
+    // investigation table.
+    {
+      const livePlayer = get().player;
+      if (
+        livePlayer?.dog
+        && livePlayer.dog.status === 'with_player'
+        && livePlayer.dog.hp > 0
+      ) {
+        const roomKey = makeRoomKey(
+          livePlayer.currentLocationId,
+          scene.microMicroId,
+          livePlayer.mapX,
+          livePlayer.mapY,
+        );
+        const room = get().worldMemory.visitedRooms?.[roomKey];
+        if (!room?.dogSmelledHere) {
+          // Locate a hidden noun pool for this scene archetype.
+          const hiddenPool = pickHiddenSmellNounsForLocation(location);
+          if (hiddenPool.length > 0) {
+            const dog = livePlayer.dog;
+            const roll = rollDie(20);
+            const total = roll + dog.stats.intelligence;
+            const success = total >= 12;
+            if (success) {
+              const hidden = hiddenPool[Math.floor(Math.random() * hiddenPool.length)]!;
+              // Append the hidden noun + seed an investigation entry.
+              set((s) => {
+                if (!s.currentScene) return s;
+                const r = s.worldMemory.visitedRooms?.[roomKey] ?? {
+                  firstVisitAt: Date.now(),
+                  lastVisitAt: Date.now(),
+                  visitCount: 1,
+                };
+                const prevTable = r.roomInvestigationTable ?? {};
+                const updatedTable = {
+                  ...prevTable,
+                  [hidden.toLowerCase()]: seedInvestigationTable([hidden])[hidden.toLowerCase()]!,
+                };
+                return {
+                  currentScene: {
+                    ...s.currentScene,
+                    ambientNouns: Array.from(new Set([...(s.currentScene.ambientNouns ?? []), hidden])),
+                    displayedAmbientNouns: s.currentScene.displayedAmbientNouns
+                      ? Array.from(new Set([...s.currentScene.displayedAmbientNouns, hidden]))
+                      : s.currentScene.displayedAmbientNouns,
+                  },
+                  worldMemory: {
+                    ...s.worldMemory,
+                    visitedRooms: {
+                      ...(s.worldMemory.visitedRooms ?? {}),
+                      [roomKey]: {
+                        ...r,
+                        roomInvestigationTable: updatedTable,
+                        dogSmelledHere: true,
+                      },
+                    },
+                  },
+                };
+              });
+              const trained = trainDogStat(dog, 'intelligence', true);
+              if (trained.dog !== dog) {
+                set((s) => s.player ? { player: { ...s.player, dog: trained.dog } } : s);
+              }
+              const line = applyDogPronouns(
+                `${dog.name} noses at the ${hidden} and snorts. There's something there.`,
+                dog.sex.pronoun,
+              );
+              get().appendLog('world', line);
+              if (trained.leveled) {
+                get().appendLog('reward', `✦ ${dog.name}'s INT rises to ${trained.leveled.to}.`);
+              }
+            } else {
+              // Mark dogSmelledHere even on a miss — re-eligibility
+              // gated on the room's visible nouns being all consumed
+              // (a separate pass would clear this flag back to false).
+              set((s) => {
+                const r = s.worldMemory.visitedRooms?.[roomKey] ?? {
+                  firstVisitAt: Date.now(),
+                  lastVisitAt: Date.now(),
+                  visitCount: 1,
+                };
+                return {
+                  worldMemory: {
+                    ...s.worldMemory,
+                    visitedRooms: {
+                      ...(s.worldMemory.visitedRooms ?? {}),
+                      [roomKey]: { ...r, dogSmelledHere: true },
+                    },
+                  },
+                };
+              });
+            }
+          }
+        }
+      }
+    }
     // OTA 454 — record vendor as a met NPC. Idempotent on vendor.id;
     // re-entering the same vendor's scene won't double-list them. We
     // use the vendor's id when present, otherwise a slug of their name
@@ -3465,12 +3644,83 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
     }
+    // OTA-120 — Dog Companion: three-step Arbiter onboarding takeover.
+    // While pendingDogOnboarding is non-null, ALL player input goes
+    // through the onboarding handler, NOT the normal verb pipeline.
+    // Each input fills the current stage's field (breed → name →
+    // sex); after the sex stage the dog is finalized and all rescue
+    // hooks die globally.
+    if (get().worldMemory.pendingDogOnboarding) {
+      get().appendLog('player', trimmed);
+      handleDogOnboardingInput(get, set, trimmed);
+      void get().persist();
+      return;
+    }
     const parsed = parseInput(trimmed, parseCtx);
     get().appendLog('player', trimmed, {
       intent: parsed.intent,
       confidence: parsed.confidence,
       resolvedNoun: parsed.resolvedNoun,
     });
+    // OTA-120 — Dog Companion combat dispatch.
+    if (parsed.intent === 'dog_bite' || parsed.intent === 'dog_distract') {
+      handleDogCombat(get, set, parsed.intent, parsed.target);
+      void get().persist();
+      return;
+    }
+    // OTA-120 — Dog rescue hook dispatch. When the player investigates
+    // / attacks / approaches a rescue-hook noun (cage / wagon / cellar
+    // door / snare pit) AND no dog exists yet AND no onboarding is in
+    // progress, spawn the matching captor + start the rescue fight.
+    {
+      const dogRescueCheckIntents: Intent[] = [
+        'investigate', 'attack', 'advance', 'travel', 'ask', 'use_relic',
+      ];
+      const liveWorldMem = get().worldMemory;
+      const dogAcquired = !!get().player?.dog;
+      const onboardingActive = !!liveWorldMem.pendingDogOnboarding;
+      if (
+        !dogAcquired &&
+        !onboardingActive &&
+        dogRescueCheckIntents.includes(parsed.intent)
+      ) {
+        const targetText = (parsed.resolvedNoun ?? parsed.target ?? '').toLowerCase();
+        const rescueId = matchRescueHookNoun(targetText);
+        if (rescueId && currentScene.enemies.length === 0) {
+          tryFireRescueScenario(get, set, rescueId);
+          void get().persist();
+          return;
+        }
+      }
+    }
+    // OTA-120 — Puppy-vendor + rubble-puppy hook dispatch.
+    {
+      const lower = (parsed.resolvedNoun ?? parsed.target ?? '').toLowerCase();
+      const wm = get().worldMemory;
+      if (
+        wm.puppyVendorOwed &&
+        !wm.puppyVendorUsed &&
+        !wm.pendingDogOnboarding &&
+        !get().player?.dog &&
+        /\b(basket|wicker basket|stranger|pups|puppies)\b/.test(lower)
+      ) {
+        triggerPuppyVendor(get, set);
+        void get().persist();
+        return;
+      }
+      if (
+        wm.puppyVendorOwed &&
+        !wm.puppyVendorUsed &&
+        !wm.pendingDogOnboarding &&
+        !get().player?.dog &&
+        /\brubble\b/.test(lower)
+      ) {
+        tryFireRubblePuppy(get, set);
+        // tryFireRubblePuppy returns false silently if conditions
+        // aren't met (Guardians not all cleared) — fall through to
+        // normal handling in that case.
+      }
+    }
     // Diagnostic — what the parser decided. Lands in the on-disk log
     // (LogScreen → COPY ALL) but not the in-game feed. Lets us trace
     // "I typed X and nothing happened" reports without guessing.
@@ -9609,7 +9859,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // advanceOn is 'kill' or 'any'. Travel-gated stages (pilgrimage,
     // scholar field-trip) ignore this trigger and only advance
     // when the player completes a travel.
-    advanceActiveFactionQuests(get, set, 'kill');
+    //
+    // OTA-120 — captors spawned by dog-rescue scenarios carry
+    // factionNeutralFight=true. They don't represent the player
+    // "completing faction work"; they're free-lance kidnappers
+    // operating under a faction crest. Skip the staged-quest advance
+    // for these kills (preserves the loot + XP + kill-counter
+    // increments above; only this rep-adjacent path is gated).
+    // Also skip any witness-cascade hostility that might be wired
+    // here later — the same guard covers it.
+    if (!enemy.factionNeutralFight) {
+      advanceActiveFactionQuests(get, set, 'kill');
+    }
+    // OTA-120 — Dog Companion rescue scenario completion. If the
+    // killed enemy was a rescue captor (factionNeutralFight is the
+    // distinguishing flag), and a dog_rescue_pending memo is on
+    // worldMemory.chainMemos, start the 3-step Arbiter onboarding.
+    if (enemy.factionNeutralFight) {
+      completeRescueScenario(get, set);
+    }
 
     // First-kill and rare-kill milestones are noted in the memorable-event
     // log so the Arbiter can reference them later.
@@ -9724,6 +9992,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
             locationName: def.capitalName,
             hoursElapsed: get().player?.hoursElapsed ?? 0,
           });
+          // OTA-120 — Phase 6 puppy-vendor safety net. If the dog
+          // died in combat AND the safety-net hasn't been used,
+          // queue the vendor for the player's NEXT outdoor scene.
+          // The rubble-puppy fallback handles the case where all
+          // Guardians are already cleared.
+          {
+            const liveWm = get().worldMemory;
+            const livePlayer = get().player;
+            const livePlayerGuardiansDef = (livePlayer?.mainQuest?.guardiansDefeated ?? []).length;
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const cgRef = require('../engine/coreGuardians');
+            const total = cgRef.totalGuardiansCount();
+            if (
+              liveWm.puppyVendorOwed &&
+              !liveWm.puppyVendorUsed &&
+              livePlayerGuardiansDef < total
+            ) {
+              queuePuppyVendor(get, set);
+            }
+          }
         }
       }
     }
@@ -16969,6 +17257,561 @@ function handleGolemDismiss(
     `${name} stills, then dissolves. The Aether returns to itself, indifferent.`,
   );
   void get().persist();
+}
+
+// ----- OTA-120: Dog Companion helpers -----------------------------------
+
+// Hidden smell-find noun pools per scene archetype. Each location's
+// tags / id selects one pool; if none match the scene falls back to
+// the wasteland pool. Authored to be thematic — buried bones, faint
+// musk, half-seen prints, blood-spotted cloth, ozone, charcoal scar,
+// etc. — and short enough that the player can investigate them as
+// regular ambient nouns afterwards.
+const DOG_HIDDEN_SMELL_NOUNS: Record<string, string[]> = {
+  wasteland: ['buried bone', 'faint musk', 'half-seen prints', 'blood-spotted cloth', 'lingering scent'],
+  ruin: ['charcoal scar', 'half-buried tooth', 'old bandage', 'soot streak', 'iron-flake stain'],
+  forge: ['burnt feather', 'slag clump', 'oilcloth scrap', 'hammer mark', 'cooled cinder'],
+  forest: ['matted fur clump', 'crushed sapling', 'pawprint', 'gnawed root', 'fresh scat'],
+  road: ['wheel-rut feather', 'broken cinch', 'cracked horseshoe', 'dropped strap', 'rope end'],
+  buried: ['faint ozone', 'sealed-air pocket', 'mud-cast feather', 'hand-pressed clay', 'old wrappings'],
+  camp: ['cold-fire ring', 'spitted bone', 'tossed bottle', 'sleeping pad mark', 'hidden cache'],
+};
+
+function pickHiddenSmellNounsForLocation(location: Location): string[] {
+  const tags = (location.tags ?? []).map((t) => t.toLowerCase());
+  for (const tag of tags) {
+    if (DOG_HIDDEN_SMELL_NOUNS[tag]) return DOG_HIDDEN_SMELL_NOUNS[tag]!;
+  }
+  // Fallback to wasteland pool.
+  return DOG_HIDDEN_SMELL_NOUNS.wasteland!;
+}
+
+
+
+/** Returns the rescue-scenario id whose hookNouns contain the given
+ *  text, or null when no scenario matches. Case-insensitive
+ *  substring; the first match wins. */
+function matchRescueHookNoun(text: string): RescueScenarioId | null {
+  const t = text.toLowerCase().trim();
+  if (!t) return null;
+  for (const id of Object.keys(RESCUE_SCENARIOS) as RescueScenarioId[]) {
+    const scenario = RESCUE_SCENARIOS[id];
+    for (const noun of scenario.hookNouns) {
+      const nl = noun.toLowerCase();
+      if (t.includes(nl) || nl.includes(t)) return id;
+    }
+  }
+  return null;
+}
+
+/** Spawn the rescue captor for the given scenario into the current
+ *  scene. The captor's factionNeutralFight flag prevents the kill
+ *  from rolling standing. The Arbiter beats stage the fight. After
+ *  the captor falls, completeRescueScenario triggers the onboarding. */
+function tryFireRescueScenario(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  scenarioId: RescueScenarioId,
+): void {
+  const player = get().player;
+  const scene = get().currentScene;
+  if (!player || !scene) return;
+  const scenario = RESCUE_SCENARIOS[scenarioId];
+  const captor = spawnRescueCaptor(scenarioId, player.factionId);
+  const introLines: Record<RescueScenarioId, string> = {
+    smelter: `You step into the smelter's ruin. The ${scenario.captorName} is here, working a chain that ends in a dog's collar. ${scenario.captorName} sees you. "Walk on. This one's not yours."`,
+    wagon: `The overturned wagon shifts as you approach. The ${scenario.captorName} steps out from behind it, a leash in one hand, the shepherd lashed to the wheel snarling against the cord. "Walk on, stranger. Or stay, and lose."`,
+    cellar: `The cellar door clatters open under your hand. Up out of the dark comes the ${scenario.captorName}, lantern raised, hound chained at their heel. "Down door's closed to you. The dog stays."`,
+    snare: `You crest the snare pit. The ${scenario.captorName} is checking their lines — and one line holds a half-grown mutt, hung by a paw, growling weak. The poacher turns. "That's my catch. Walk."`,
+  };
+  set((s) => s.currentScene
+    ? {
+        currentScene: {
+          ...s.currentScene,
+          enemies: [...s.currentScene.enemies, captor],
+          enemyHps: [...s.currentScene.enemyHps, captor.hp],
+          enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
+          activeEnemyIdx: s.currentScene.enemies.length,
+          range: 'close',
+        },
+      }
+    : s);
+  // Tag the scene with a pending-rescue marker via worldMemory so
+  // the kill handler knows to fire the onboarding when this captor
+  // dies. We re-use the existing worldMemory.chainMemos field for
+  // a one-line log entry that survives in the save.
+  set((s) => ({
+    worldMemory: {
+      ...s.worldMemory,
+      chainMemos: [
+        ...(s.worldMemory.chainMemos ?? []),
+        { text: `dog_rescue_pending:${scenarioId}`, ts: Date.now() },
+      ].slice(-20),
+    },
+  }));
+  get().appendLog('arbiter', introLines[scenarioId]);
+}
+
+/** Called from resolveEnemyDefeat when the killed enemy was a
+ *  rescue captor (factionNeutralFight + matches a pending memo).
+ *  Sets up pendingDogOnboarding and fires the victory line. */
+function completeRescueScenario(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  // Pull the most recent pending rescue memo.
+  const memos = get().worldMemory.chainMemos ?? [];
+  const pending = [...memos].reverse().find((m) => m.text.startsWith('dog_rescue_pending:'));
+  if (!pending) return;
+  const scenarioId = pending.text.split(':')[1] as RescueScenarioId | undefined;
+  if (!scenarioId || !RESCUE_SCENARIOS[scenarioId]) return;
+  const scenario = RESCUE_SCENARIOS[scenarioId];
+  // Strip the memo and launch the onboarding state machine.
+  set((s) => ({
+    worldMemory: {
+      ...s.worldMemory,
+      chainMemos: (s.worldMemory.chainMemos ?? []).filter((m) => m !== pending),
+      pendingDogOnboarding: {
+        stage: 'breed',
+        rescueData: {
+          scenario: scenarioId,
+          startingProfile: scenario.startingProfile,
+        },
+      } as PendingDogOnboarding,
+    },
+  }));
+  get().appendLog('world', scenario.victoryLine);
+  get().appendLog(
+    'arbiter',
+    `The dog watches you with the flat unread look of an animal that has just had one ownership scratched off its name. The Arbiter steps in. "What kind of dog is that?"`,
+  );
+}
+
+/** Handle a single onboarding input. Each input advances the stage;
+ *  after the sex stage the dog is built and rescue hooks die. */
+function handleDogOnboardingInput(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  raw: string,
+): void {
+  const wm = get().worldMemory;
+  const pending = wm.pendingDogOnboarding;
+  if (!pending) return;
+  const player = get().player;
+  if (!player) return;
+  const trimmed = raw.trim();
+  if (pending.stage === 'breed') {
+    const breed = trimmed.slice(0, 24) || 'mutt';
+    set((s) => ({
+      worldMemory: {
+        ...s.worldMemory,
+        pendingDogOnboarding: { ...pending, stage: 'name', breed },
+      },
+    }));
+    get().appendLog('world', `You name the breed: ${breed}.`);
+    get().appendLog('arbiter', `The Arbiter nods. "What will you name them?"`);
+    return;
+  }
+  if (pending.stage === 'name') {
+    const name = trimmed.slice(0, 16) || defaultDogName();
+    set((s) => ({
+      worldMemory: {
+        ...s.worldMemory,
+        pendingDogOnboarding: { ...pending, stage: 'sex', name },
+      },
+    }));
+    get().appendLog('world', `${name}. The name settles on the dog like a coat.`);
+    get().appendLog('arbiter', `The Arbiter nods again. "Boy or girl?"`);
+    return;
+  }
+  // pending.stage === 'sex'
+  const rawSex = trimmed.slice(0, 8) || 'unknown';
+  const dog = createDogCompanion({
+    name: pending.name ?? defaultDogName(),
+    breed: pending.breed ?? 'mutt',
+    rawSex,
+    startingProfile: pending.rescueData.startingProfile,
+    currentHour: player.hoursElapsed ?? 0,
+  });
+  set((s) => ({
+    player: s.player ? { ...s.player, dog } : s.player,
+    worldMemory: {
+      ...s.worldMemory,
+      pendingDogOnboarding: null,
+    },
+  }));
+  // Pronoun-templated rest beat.
+  const settleLine = applyDogPronouns(
+    `${dog.name} circles three times and settles at your boot. {Possessive} breathing slows to yours.`,
+    dog.sex.pronoun,
+  );
+  get().appendLog('world', settleLine);
+  get().appendLog(
+    'arbiter',
+    `The Arbiter studies the new pair. "${dog.name}, then. ${pending.rescueData.scenario === 'puppy_vendor' || pending.rescueData.scenario === 'puppy_rubble' ? 'You owe the pup nothing yet. Earn its trust on the road.' : 'The chain is off. The road is open.'}"`,
+  );
+}
+
+/** Dog combat dispatch — bite / distract. Acts at the start of the
+ *  player's turn; no stamina cost on the player. Bite trains STR on
+ *  hit; distract trains DEX or INT (whichever is higher) on success. */
+function handleDogCombat(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  kind: 'dog_bite' | 'dog_distract',
+  targetText: string | undefined,
+): void {
+  const player = get().player;
+  const scene = get().currentScene;
+  if (!player || !scene) return;
+  const dog = player.dog;
+  if (!dog || dog.status !== 'with_player' || dog.hp <= 0) {
+    get().appendLog('arbiter', `"No dog at your side," the Arbiter says.`);
+    return;
+  }
+  if (scene.enemies.length === 0) {
+    get().appendLog('world', `${dog.name} circles, finds no enemy, settles back.`);
+    return;
+  }
+  // First co-activation flavor with golem.
+  if (player.golem && !get().worldMemory.dogGolemCoActivated) {
+    set((s) => ({
+      worldMemory: { ...s.worldMemory, dogGolemCoActivated: true },
+    }));
+    get().appendLog(
+      'world',
+      `Your dog gives the golem a wide arc and watches it sideways. Both will fight.`,
+    );
+  }
+  // Pick target.
+  let targetIdx = Math.max(0, Math.min(scene.activeEnemyIdx ?? 0, scene.enemies.length - 1));
+  if (targetText) {
+    const lower = targetText.toLowerCase();
+    const found = scene.enemies.findIndex(
+      (e) => e.name.toLowerCase().includes(lower)
+        || (e.aliases ?? []).some((a) => a.toLowerCase().includes(lower)),
+    );
+    if (found >= 0) targetIdx = found;
+  }
+  const target = scene.enemies[targetIdx]!;
+  const targetHp = scene.enemyHps[targetIdx] ?? target.hp;
+  if (kind === 'dog_bite') {
+    const ac = Math.max(5, Math.min(18, 5 + parseEnemyAP(target)));
+    const roll = rollDie(20);
+    const total = roll + dog.stats.strength;
+    const nat20 = roll === 20;
+    const nat1 = roll === 1;
+    const hit = nat20 || (!nat1 && total >= ac);
+    get().appendLog(
+      'combat',
+      `${dog.name} lunges at ${target.name} — d20 ${roll} + STR ${dog.stats.strength} = ${total} vs AC ${ac} — ${hit ? (nat20 ? '✓ NAT 20' : '✓ HIT') : '✗ MISS'}`,
+    );
+    if (hit) {
+      let dmg = rollDie(6) + Math.floor(dog.stats.strength / 2);
+      if (nat20) dmg *= 2;
+      const newHp = Math.max(0, targetHp - dmg);
+      get().appendLog(
+        'combat',
+        `${dog.name} sinks teeth into ${target.name} for ${dmg} piercing. (${newHp} HP left)`,
+      );
+      // Train STR on hit.
+      const trained = trainDogStat(dog, 'strength', true);
+      set((s) => {
+        if (!s.currentScene || !s.player) return s;
+        const enemyHps = s.currentScene.enemyHps.map((hp, i) => (i === targetIdx ? newHp : hp));
+        return {
+          currentScene: { ...s.currentScene, enemyHps },
+          player: { ...s.player, dog: trained.dog },
+        };
+      });
+      if (trained.leveled) {
+        get().appendLog(
+          'reward',
+          `✦ ${dog.name}'s STR rises to ${trained.leveled.to}.`,
+        );
+      }
+      if (newHp <= 0) {
+        // Kill — splice via resolveEnemyDefeat path; reuse internal logic
+        // by calling get().resolveEnemyDefeat()? It expects activeEnemyIdx
+        // to be set. We mirror the splice manually here to avoid recursive
+        // submitPlayerAction.
+        set((s) => {
+          if (!s.currentScene) return s;
+          const remaining = s.currentScene.enemies.filter((_, i) => i !== targetIdx);
+          const remHps = s.currentScene.enemyHps.filter((_, i) => i !== targetIdx);
+          const remAmb = (s.currentScene.enemyAmbushUsed ?? []).filter((_, i) => i !== targetIdx);
+          return {
+            currentScene: {
+              ...s.currentScene,
+              enemies: remaining,
+              enemyHps: remHps,
+              enemyAmbushUsed: remAmb,
+              activeEnemyIdx: Math.min(s.currentScene.activeEnemyIdx, Math.max(0, remaining.length - 1)),
+              range: remaining.length > 0 ? s.currentScene.range : null,
+            },
+          };
+        });
+        get().appendLog('world', `${target.name} falls under ${dog.name}'s jaws.`);
+        // OTA-120 — rescue completion. If this was a rescue captor,
+        // trigger the onboarding.
+        if (target.factionNeutralFight) {
+          completeRescueScenario(get, set);
+        }
+        return;
+      }
+    } else {
+      get().appendLog('world', `${dog.name}'s teeth click on empty air.`);
+    }
+  } else {
+    // dog_distract
+    const statKey: 'dexterity' | 'intelligence' =
+      dog.stats.dexterity >= dog.stats.intelligence ? 'dexterity' : 'intelligence';
+    const statVal = dog.stats[statKey];
+    const roll = rollDie(20);
+    const total = roll + statVal;
+    const success = total >= 12;
+    get().appendLog(
+      'combat',
+      `${dog.name} dances at ${target.name}'s heels — d20 ${roll} + ${statKey.slice(0, 3).toUpperCase()} ${statVal} = ${total} vs DC 12 — ${success ? '✓ DISTRACTED' : '✗ NO EFFECT'}`,
+    );
+    if (success) {
+      const trained = trainDogStat(dog, statKey, true);
+      set((s) => {
+        if (!s.currentScene || !s.player) return s;
+        const enemies = s.currentScene.enemies.map((e, i) =>
+          i === targetIdx
+            ? {
+                ...e,
+                // The 'distracted' status flag rides on the active idx;
+                // applies +2 to the next player roll vs this enemy.
+              }
+            : e,
+        );
+        // Push a 'distracted' status onto the player so the player's
+        // next attack roll vs THIS enemy idx gets +2. Simpler shim:
+        // record a one-round 'distracted' status on the player.
+        const newEffects = [
+          ...(s.player.statusEffects ?? []).filter((e) => e.kind !== 'distracted'),
+          { kind: 'distracted' as const, remainingRounds: 1, label: `distracted: ${target.name}` },
+        ];
+        return {
+          currentScene: { ...s.currentScene, enemies },
+          player: { ...s.player, dog: trained.dog, statusEffects: newEffects },
+        };
+      });
+      if (trained.leveled) {
+        get().appendLog(
+          'reward',
+          `✦ ${dog.name}'s ${statKey.slice(0, 3).toUpperCase()} rises to ${trained.leveled.to}.`,
+        );
+      }
+    }
+  }
+  // Enemy retaliation split: ~40% dog if no golem, ~30% dog + 30% golem + 40% player
+  // otherwise. Skip when this action just killed all enemies.
+  const liveScene = get().currentScene;
+  if (!liveScene || liveScene.enemies.length === 0) return;
+  const livePlayer = get().player;
+  if (!livePlayer) return;
+  const liveDog = livePlayer.dog;
+  if (!liveDog || liveDog.status !== 'with_player' || liveDog.hp <= 0) return;
+  const liveTarget = liveScene.enemies[Math.min(targetIdx, liveScene.enemies.length - 1)];
+  if (!liveTarget) return;
+  const hasGolem = !!livePlayer.golem && (livePlayer.golem?.hp ?? 0) > 0;
+  const r = Math.random();
+  // Distribution shares as documented in spec.
+  // Without golem: dog 0.40, player 0.60.
+  // With golem: dog 0.30, golem 0.30, player 0.40.
+  let retaliateTarget: 'dog' | 'player' | 'golem' = 'player';
+  if (hasGolem) {
+    if (r < 0.30) retaliateTarget = 'dog';
+    else if (r < 0.60) retaliateTarget = 'golem';
+    else retaliateTarget = 'player';
+  } else {
+    if (r < 0.40) retaliateTarget = 'dog';
+    else retaliateTarget = 'player';
+  }
+  const enemyAtkRoll = rollDie(20);
+  const enemyAtkBonus = parseEnemyAP(liveTarget);
+  const acByTarget = retaliateTarget === 'dog' ? 11 : retaliateTarget === 'golem' ? 11 : (livePlayer.ac ?? 10);
+  const enemyHit = enemyAtkRoll + enemyAtkBonus >= acByTarget;
+  if (enemyHit) {
+    const dmg = rollDie(6) + 1;
+    if (retaliateTarget === 'dog') {
+      const newDogHp = Math.max(0, liveDog.hp - dmg);
+      get().appendLog(
+        'combat',
+        `${liveTarget.name} swings on ${liveDog.name} — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits for ${dmg}. (${newDogHp}/${liveDog.hpMax})`,
+      );
+      if (newDogHp <= 0) {
+        const downLine = applyDogPronouns(
+          `${liveDog.name} is down. {Pronoun} {isOrAre} bleeding into the dirt.`,
+          liveDog.sex.pronoun,
+        );
+        get().appendLog('world', downLine);
+        // Auto-recovery handled after fight ends in the resolve path;
+        // for now, mark 'waiting_at_base'.
+        set((s) => s.player && s.player.dog
+          ? { player: { ...s.player, dog: { ...s.player.dog, hp: 0, status: 'waiting_at_base' as const } } }
+          : s,
+        );
+      } else {
+        set((s) => s.player && s.player.dog
+          ? { player: { ...s.player, dog: { ...s.player.dog, hp: newDogHp } } }
+          : s);
+      }
+    } else if (retaliateTarget === 'golem' && livePlayer.golem) {
+      const newGolemHp = Math.max(0, livePlayer.golem.hp - dmg);
+      get().appendLog(
+        'combat',
+        `${liveTarget.name} pivots to ${livePlayer.golem.name} — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits for ${dmg}. (${newGolemHp}/${livePlayer.golem.hpMax})`,
+      );
+      if (newGolemHp <= 0) {
+        set((s) => s.player ? { player: { ...s.player, golem: null } } : s);
+        get().appendLog('world', `The golem crumbles.`);
+      } else {
+        set((s) => s.player && s.player.golem
+          ? { player: { ...s.player, golem: { ...s.player.golem, hp: newGolemHp } } }
+          : s);
+      }
+    } else {
+      // player
+      const newHp = Math.max(0, livePlayer.hp - dmg);
+      get().appendLog(
+        'combat',
+        `${liveTarget.name} swings on you — d20 ${enemyAtkRoll} + ${enemyAtkBonus} hits for ${dmg}. (${newHp}/${livePlayer.hpMax})`,
+      );
+      set((s) => s.player
+        ? { player: { ...s.player, hp: newHp } }
+        : s);
+      if (newHp <= 0) {
+        void Promise.resolve().then(() => handlePlayerDeath(get, set));
+      }
+    }
+  } else {
+    get().appendLog(
+      'combat',
+      `${liveTarget.name} swings at ${retaliateTarget === 'dog' ? liveDog.name : retaliateTarget === 'golem' ? livePlayer.golem?.name ?? 'the golem' : 'you'} and misses.`,
+    );
+  }
+}
+
+/** Phase 6: queue the puppy vendor for the next outdoor scene. Called
+ *  from the Core-Guardian-defeat path when puppyVendorOwed is set and
+ *  not all Guardians are cleared. */
+function queuePuppyVendor(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const wm = get().worldMemory;
+  if (!wm.puppyVendorOwed || wm.puppyVendorUsed) return;
+  set((s) => ({
+    worldMemory: { ...s.worldMemory, puppyVendorQueued: true },
+  }));
+  get().appendLog('debug', `puppy vendor queued for next outdoor scene`);
+}
+
+/** Phase 6: spawn the puppy vendor encounter. Fires from the next
+ *  outdoor scene entry when puppyVendorQueued is true. The trade
+ *  is accept/decline; both retire the flag. */
+function triggerPuppyVendor(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const player = get().player;
+  if (!player) return;
+  // Pick a Common-rarity, non-equipped, non-weapon/armor item.
+  const candidates = player.inventory.filter(
+    (i) =>
+      i.rarity === 'Common' &&
+      i.quantity >= 1 &&
+      i.kind !== 'weapon' &&
+      i.kind !== 'armor' &&
+      i.id !== player.equipped?.mainId &&
+      i.id !== player.equipped?.offId &&
+      i.id !== player.equipped?.chestId &&
+      i.id !== player.equipped?.headId &&
+      i.id !== player.equipped?.legsId &&
+      i.id !== player.equipped?.feetId &&
+      i.id !== player.equipped?.amuletId &&
+      i.id !== player.equipped?.ringId,
+  );
+  const fallback = player.inventory.find((i) => i.quantity >= 1);
+  const tradeItem = candidates[0] ?? fallback ?? null;
+  if (!tradeItem) {
+    // No tradeable item — surface flavor and retire the flag so the
+    // path doesn't loop.
+    get().appendLog(
+      'arbiter',
+      `A stranger at the roadside lifts a wicker basket of pups, eyes your empty pack, then walks on. "Some other road, friend."`,
+    );
+    set((s) => ({
+      worldMemory: {
+        ...s.worldMemory,
+        puppyVendorQueued: false,
+        puppyVendorUsed: true,
+        puppyVendorOwed: false,
+      },
+    }));
+    return;
+  }
+  // Record the trade item id on a memo for the ACCEPT/DECLINE handlers
+  // to consume.
+  set((s) => ({
+    worldMemory: {
+      ...s.worldMemory,
+      puppyVendorQueued: false,
+      chainMemos: [
+        ...(s.worldMemory.chainMemos ?? []),
+        { text: `puppy_vendor_trade_id:${tradeItem.id}`, ts: Date.now() },
+      ].slice(-20),
+    },
+  }));
+  get().appendLog(
+    'arbiter',
+    `A stranger waits at the roadside with a wicker basket. Three pups inside — some breed you don't recognize. They look up at you. "I'd trade one for the right kind of help," the stranger says, eyeing your pack.`,
+  );
+  get().appendLog(
+    'arbiter',
+    `"That ${tradeItem.name} you've got — I've been needing one of those for a season. You hand me that, I hand you a pup. Fair? Type 'accept puppy' or 'decline puppy'."`,
+  );
+}
+
+/** Rubble-puppy fallback: only fires when ALL Guardians are cleared
+ *  AND combat-death flag is set AND single-shot hasn't been used. */
+function tryFireRubblePuppy(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): boolean {
+  const player = get().player;
+  const wm = get().worldMemory;
+  if (!player || !wm.puppyVendorOwed || wm.puppyVendorUsed) return false;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const cg = require('../engine/coreGuardians');
+  const totalGuardians = cg.totalGuardiansCount();
+  const defeated = (player.mainQuest?.guardiansDefeated ?? []).length;
+  if (defeated < totalGuardians) return false;
+  // Fire the puppy-in-rubble onboarding directly (no item trade).
+  set((s) => ({
+    worldMemory: {
+      ...s.worldMemory,
+      pendingDogOnboarding: {
+        stage: 'breed',
+        rescueData: { scenario: 'puppy_rubble', startingProfile: 'puppy' },
+      } as PendingDogOnboarding,
+      puppyVendorUsed: true,
+      puppyVendorOwed: false,
+    },
+  }));
+  get().appendLog(
+    'world',
+    `You pull at the rubble. A whimper. A lone puppy is buried up to its haunches in the dust, blinking at you. Alive. Alone.`,
+  );
+  get().appendLog(
+    'arbiter',
+    `The Arbiter looks at the pup, then at you. "Some debts the world settles itself. What kind of dog is that?"`,
+  );
+  return true;
 }
 
 function weaponPhrase(weapon: string | null): string {

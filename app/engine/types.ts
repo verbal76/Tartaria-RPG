@@ -52,6 +52,14 @@ export type Intent =
   // water source in the current scene (puddle / lake / waterfall /
   // crevice / stream / well).
   | 'fill'
+  // OTA-120 — Dog Companion combat verbs. Both intents require an
+  // active dog in combat (player.dog.status === 'with_player' AND
+  // currentScene.enemies.length > 0). Bite is a direct attack;
+  // distract applies a 'distracted' status to one enemy for the
+  // player's next action. See engine/dogCompanion.ts for the
+  // mechanics and handleDogCombat in gameStore.ts for the dispatch.
+  | 'dog_bite'
+  | 'dog_distract'
   | 'unknown';
 
 export interface ParsedInput {
@@ -185,6 +193,15 @@ export interface Enemy {
   hp: number;
   rarity: Rarity;
   loot: string[];
+  /** OTA-120 — set true on captors spawned by a dog-rescue scenario.
+   *  The kill-handling site short-circuits the faction-standing
+   *  delta and the witness-cascade hostility logic when this flag
+   *  is set, so the captor's faction doesn't punish the player for
+   *  freeing a chained dog. Combat XP, loot, kill counters, stat
+   *  training all still fire normally — only the rep + cascade
+   *  paths are skipped. See engine/dogCompanion.ts for the spawn
+   *  site and the framework spec entry in HANDOFF.md §0.A. */
+  factionNeutralFight?: boolean;
   /** Synonyms the parser accepts for this enemy. "Architectural Sentinel"
    *  might list ["sentinel", "guardian", "statue"] so `attack the sentinel`
    *  resolves to the canonical entity. Lowercase, no punctuation. */
@@ -325,7 +342,7 @@ export interface TimelineEvent {
 export interface InventoryItem {
   id: string;
   name: string;
-  kind: 'weapon' | 'armor' | 'relic' | 'consumable' | 'misc' | 'runecaster';
+  kind: 'weapon' | 'armor' | 'relic' | 'consumable' | 'misc' | 'runecaster' | 'dog_armor';
   rarity?: Rarity;
   description?: string;
   quantity: number;
@@ -513,7 +530,11 @@ export type StatusEffectKind =
   | 'exhausted'              // stamina === 0 → -2 atk, ½ damage, no active dodge/parry
   | 'power_attack_pending'   // next attack +2 to hit, +1 damage die (consumed)
   | 'defensive_stance'       // +2 AC per round; 2 stamina per round drain
-  | 'well_fed';              // temp stamina above max from food
+  | 'well_fed'               // temp stamina above max from food
+  // OTA-120 — dog distract success applies this to one enemy for
+  // the player's NEXT action. The next attack hit roll, dodge
+  // parry, or flee from THAT enemy gets +2. Consumed when applied.
+  | 'distracted';
 
 export interface StatusEffect {
   kind: StatusEffectKind;
@@ -731,6 +752,76 @@ export interface PlayerCharacter {
    *  to avoid colliding with the existing optional 'companion'
    *  NPC follower field above. */
   golem?: Companion | null;
+  /** OTA-120 — Dog Companion. One per save, acquired via a rescue
+   *  scenario (or the puppy-vendor / rubble-puppy safety net). null
+   *  on character creation and on legacy saves (backfilled to null
+   *  in loadSlotIntoGame). See DogCompanion interface above and the
+   *  framework spec in HANDOFF.md §0.A. */
+  dog?: DogCompanion | null;
+}
+
+/** OTA-120 — Dog Companion. A one-at-a-time canine sidekick the player
+ *  rescues early-game (one of 4 scenarios: smelter / wagon / cellar /
+ *  snare). Lives on player.dog. Survives across scenes, takes a slice
+ *  of enemy retaliation in combat, follows on cardinal moves + travel,
+ *  decouples on climbs, sniffs out hidden investigation nouns on scene
+ *  entry, eats food (raises loyalty), abandons at loyalty 0, and dies
+ *  in combat if HP hits 0 mid-fight-lost. Coexists with golems
+ *  side-by-side (the earlier mutex rule was overridden). See HANDOFF.md
+ *  §0.A "Dog Companion system" for the full design framework. */
+export type DogStartingProfile = 'mongrel' | 'shepherd' | 'hound' | 'mutt' | 'puppy';
+export type DogStatus = 'with_player' | 'waiting_at_base' | 'abandoned' | 'dead';
+export interface DogCompanion {
+  id: string;
+  /** Player free-text, capped at 16 chars. */
+  name: string;
+  /** Player free-text, capped at 24 chars. Pure flavor — no mechanical effect. */
+  breed: string;
+  /** 3-token answer + derived pronoun. The raw input is preserved for
+   *  any flavor narration that wants to echo what the player typed
+   *  ("whatever Marrow is, he's down"). */
+  sex: {
+    raw: string;
+    pronoun: 'he' | 'she' | 'they';
+  };
+  /** Starting profile from the rescue scenario; drives baseline stats.
+   *  mongrel = balanced (10/10/10), shepherd = +STR, hound = +DEX,
+   *  mutt = +INT, puppy = lower across the board (8/9/9). */
+  startingProfile: DogStartingProfile;
+  hp: number;
+  hpMax: number;
+  stats: { strength: number; dexterity: number; intelligence: number };
+  statProgress: { strength: number; dexterity: number; intelligence: number };
+  /** 0-100; decays without feeding. Thresholds 50/30/15/0 fire
+   *  escalating Arbiter beats; 0 = abandoned permanently. */
+  loyalty: number;
+  /** Game-clock hour of the last feed. lastFedAtHour and the player's
+   *  hoursElapsed drive the -1-per-4-hour decay. */
+  lastFedAtHour: number;
+  equipped: { vest: string | null };
+  /** with_player follows; waiting_at_base = at the climb origin or
+   *  in 24h auto-heal recovery; abandoned = walked off at loyalty 0;
+   *  dead = combat-death (puppyVendorOwed flag flips true). */
+  status: DogStatus;
+  /** Latched true once after the dog co-activates with a golem the
+   *  first time, so the "wide arc" flavor only fires once per save. */
+  coexistedWithGolem?: boolean;
+}
+
+/** OTA-120 — three-step Arbiter onboarding state machine. ALL player
+ *  input routes through the onboarding handler when this is non-null
+ *  (the normal verb parser is skipped). Each stage fills one field,
+ *  advances, and finalizes after the sex stage. Once finalized, ALL
+ *  four rescue hooks die globally — the player can't re-roll. */
+export type DogOnboardingStage = 'breed' | 'name' | 'sex';
+export interface PendingDogOnboarding {
+  stage: DogOnboardingStage;
+  rescueData: {
+    scenario: 'smelter' | 'wagon' | 'cellar' | 'snare' | 'puppy_vendor' | 'puppy_rubble';
+    startingProfile: DogStartingProfile;
+  };
+  breed?: string;
+  name?: string;
 }
 
 /** 2026-05-25 [MECHANIC-1b] — Golem sidekick companion. Summoned
@@ -875,6 +966,29 @@ export interface WorldMemory {
    *  who they've actually spoken with. Optional + defaulted so
    *  legacy saves load cleanly. */
   npcsMet?: NpcMet[];
+  /** OTA-120 — dog acquisition state machine, lives on world memory
+   *  so it survives across screens. ALL player input routes through
+   *  the onboarding handler when this is non-null. Cleared on
+   *  finalize (after the sex stage). */
+  pendingDogOnboarding?: PendingDogOnboarding | null;
+  /** OTA-120 — set true ONLY when player.dog.status transitions to
+   *  'dead' via the combat-death path (HP 0 + fight lost; gem-revive
+   *  skips). Drives the Phase 6 puppy-vendor safety net trigger.
+   *  Hunger-abandonment does NOT set this flag. */
+  puppyVendorOwed?: boolean;
+  /** OTA-120 — set true on EITHER outcome of the puppy-vendor encounter
+   *  (accept OR decline) AND on rubble-puppy resolution. Permanently
+   *  locks the safety-net path so the player can never get a third dog
+   *  via this mechanic. */
+  puppyVendorUsed?: boolean;
+  /** OTA-120 — set true when the puppy vendor has been queued for the
+   *  player's next outdoor scene entry after a Core Guardian victory.
+   *  The next outdoor scene-entry consumes this flag and spawns the
+   *  vendor; clearing prevents double-spawning. */
+  puppyVendorQueued?: boolean;
+  /** OTA-120 — set true on the first co-activation of a dog and a
+   *  golem in combat, so the "wide arc" flavor only fires once. */
+  dogGolemCoActivated?: boolean;
 }
 
 /** OTA 454 — record of a single named NPC encounter. */
@@ -966,6 +1080,13 @@ export interface VisitedRoom {
    *  the dig-here path owns those. See
    *  app/engine/investigationTable.ts. */
   roomInvestigationTable?: Record<string, InvestigationEntry>;
+  /** OTA-120 — true once the dog has run its smell-find roll in this
+   *  room. Prevents the player from farming dog INT by walking in and
+   *  out of the same room. Cleared back to false when all visible
+   *  nouns in the room's investigation table have been consumed
+   *  (a fresh sniff is plausible once the player has cleared the
+   *  room's visible content). */
+  dogSmelledHere?: boolean;
 }
 
 export type ScreenName =
