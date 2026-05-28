@@ -2676,4 +2676,25 @@
 // Files: app/data/items/exploration.json (6 blocks
 // removed), __tests__/catalogIntegrityWithDogGear
 // .test.ts (.failing → it).
-export const OTA_BUILD_ID = '2026-05-28-135';
+//
+// 2026-05-28 OTA-136 — Inference ordering regression
+// lock. The HANDOFF.md entry "Inference engine
+// doesn't check materials.json before warning"
+// actually closed across OTAs 110 (isCataloguedElse
+// where guard) + 124 (catalog-elsewhere extension)
+// + 133 (DOG_GEAR add). Three OTAs of partial fixes
+// — entry was never retired.
+//
+// This OTA locks the closed state with a regression
+// test (__tests__/inferenceOrderingLock.test.ts, 10
+// tests). Walks every MATERIALS, EXPLORATION, GEAR,
+// DOG_GEAR item through all 4 find* paths and
+// asserts ZERO false inferred-stats: fires.
+// Includes the original Sentinel Core Plate repro
+// (from the OTA-110 playtest log) + a control case
+// to verify TRULY uncatalogued names still infer
+// (no false negatives). 10/10 pass. TS clean.
+//
+// Files: __tests__/inferenceOrderingLock.test.ts
+// (NEW).
+export const OTA_BUILD_ID = '2026-05-28-136';
