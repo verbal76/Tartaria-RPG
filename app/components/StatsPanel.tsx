@@ -48,6 +48,11 @@ export function StatsPanel({ player }: Props) {
     && player.dog.status !== 'abandoned'
     && player.dog.status !== 'dead';
 
+  // OTA-145 — golem name displays under the dog name, right-aligned.
+  // Playtester: "the golem.name.shluld be under the dogs in the
+  // character box."
+  const golemShows = !!player.golem && player.golem.hp > 0;
+
   return (
     <View style={styles.container}>
       <View style={styles.nameRow}>
@@ -58,6 +63,13 @@ export function StatsPanel({ player }: Props) {
           </Text>
         ) : null}
       </View>
+      {golemShows && player.golem ? (
+        <View style={styles.golemRow}>
+          <Text style={styles.golemName} numberOfLines={1}>
+            {player.golem.name} ({player.golem.hp}/{player.golem.hpMax})
+          </Text>
+        </View>
+      ) : null}
       <Text style={styles.subline}>{race?.name ?? player.raceId}</Text>
       <View style={styles.row}>
         <Stat label="HP" value={`${player.hp}/${player.hpMax}`} />
@@ -133,6 +145,11 @@ const styles = StyleSheet.create({
   // (right, fixed). flex layout pins the dog to the right edge.
   nameRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 },
   dogName: { color: '#c9a86a', fontSize: 13, fontWeight: '600', flexShrink: 0, maxWidth: 160 },
+  // OTA-145 — golem row sits right-aligned beneath the dog name row.
+  // Slightly muted color (slate-mauve) so it reads as a secondary
+  // companion vs the dog's warm-gold.
+  golemRow: { flexDirection: 'row', justifyContent: 'flex-end' },
+  golemName: { color: '#9888a8', fontSize: 12, fontWeight: '600', maxWidth: 200 },
   subline: { color: '#7a705c', fontSize: 10, marginBottom: 2 },
   equipped: { color: '#c9a86a', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
   effects: { color: '#e07a5f', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },

@@ -2080,7 +2080,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // legitimate emit site; any other call carrying these phrases is
     // demoted to a debug breadcrumb so we can trace the leak instead
     // of shipping the surprise.
-    const THEFT_NARRATION_RE = /thief|caught.*mid[- ]?lift|steel comes out|answer for (?:my|your) (?:actions|deeds)/i;
+    // OTA-145 — was `/thief|...` which matched the substring "thief"
+    // anywhere. Playtest log showed every "Silt Thief" combat line and
+    // every Voronov location-entry beat that pulled lore mentioning
+    // "thief" (concepts.json keywords, arbiter-intent quotes, the
+    // `aliases` enemy lookup) silently blocked → player saw their
+    // Aether Golem die over 6 invisible combat rounds. Original
+    // authored line is `"Thief! — steel comes out."` so the alarm
+    // punctuation IS the distinguishing feature. Tighten to require
+    // the bang. Enemy names, arbiter quotes, lore concepts, NPC
+    // dialogue all read "thief" without it.
+    const THEFT_NARRATION_RE = /\bthief!|caught.*mid[- ]?lift|steel comes out|answer for (?:my|your) (?:actions|deeds)/i;
     if (THEFT_NARRATION_RE.test(text) && !meta?.stealCaught) {
       void persistEntry(
         makeEntry(
@@ -17664,8 +17674,14 @@ function runAethercraft(
     discipline === 'shape' ? 'Aetherstone Manipulation' :
     discipline === 'summon' ? 'Aether Golem Constructor' :
     'Aetheric Healing';
+  // OTA-145 — channel split. Pre-fix, both success and failure rolls
+  // emitted to 'combat' which paints uniformly red (warning color).
+  // Playtester: "Why did a successful golem.summon come up red?"
+  // Successful Aethercraft rolls now route to 'reward' (green ✦),
+  // failures stay on 'combat' (red) where the warning color is
+  // legible. Roll math stays identical; just the channel differs.
   get().appendLog(
-    'combat',
+    success ? 'reward' : 'combat',
     `${disciplineLabel} — d20 ${roll} + ${statLabel} ${statValue}${racialNote} = ${total} vs DC ${dc} — ${success ? '✓ HIT' : '✗ MISS'}`,
   );
 

@@ -3060,4 +3060,71 @@
 // 'distracted' case + buildCombatSteps initiative
 // bonus from distract), app/state/gameStore.ts
 // (pounce/bark narration on distract success).
-export const OTA_BUILD_ID = '2026-05-28-144';
+//
+// 2026-05-28 OTA-145 — Theft-channel false-
+// positive (silent suppression ship-blocker) +
+// summon-roll color + golem name in StatsPanel.
+//
+// Playtest log surfaced THREE issues:
+//
+//   (1) CATASTROPHIC: theft-channel guard was
+//       suppressing every "Silt Thief" combat
+//       line in legit combat. Player typed
+//       `use golem` six times in Voronov, the
+//       Aether Golem did the combat math each
+//       time, but EVERY narration line ("Aether
+//       Golem attacks Silt Thief — d20 N = N
+//       vs AC 10 — ✓ HIT", damage/HP, etc.) got
+//       routed to [debug] as "blocked theft-
+//       channel emission outside steal context."
+//       Player saw NOTHING. Golem died in
+//       silence over 6 invisible rounds.
+//
+//       Same guard also ate the Voronov entry
+//       lore (lore_flavors.json beats mentioning
+//       "thief" anywhere — concepts.json keywords,
+//       arbiter-intent quotes).
+//
+//       Root cause: regex was /thief|.../i which
+//       matched substring "thief" anywhere. The
+//       authored line it was meant to catch is
+//       "Thief! — steel comes out." (alarm cry).
+//       Tightened to /\bthief!|caught.*mid-lift|
+//       steel comes out|answer for...deeds/i —
+//       requires the alarm punctuation. Enemy
+//       names, arbiter quotes, NPC dialogue, lore
+//       all use "thief" WITHOUT the bang.
+//
+//       Regression lock in __tests__/
+//       theftChannelGuard.test.ts (20 tests,
+//       extracts the regex from gameStore.ts at
+//       runtime so a future weakening surfaces).
+//
+//   (2) Successful Aethercraft summon roll
+//       displayed RED. Playtester: "Why did a
+//       successful golem.summon come up red?"
+//       Roll narration was unconditionally
+//       emitted to 'combat' channel which paints
+//       uniformly warning-red regardless of HIT
+//       vs MISS. Now: success → 'reward' channel
+//       (green ✦), failure → 'combat' channel
+//       (red). Roll math identical, just the
+//       channel differs.
+//
+//   (3) Golem name now displays in StatsPanel
+//       beneath the dog name, right-aligned to
+//       the panel edge, with "{name} (hp/max)"
+//       format. Slightly muted color (slate-
+//       mauve) so it reads as secondary companion
+//       vs the dog's warm-gold. Playtester: "the
+//       golem.name.shluld be under the dogs in
+//       the character box."
+//
+// 49/49 + 20/20 = 69 tests pass. TS clean.
+//
+// Files: app/state/gameStore.ts (theft regex
+// tightening + aethercraft channel split), app/
+// components/StatsPanel.tsx (golem row + styles),
+// __tests__/theftChannelGuard.test.ts (NEW
+// regression lock).
+export const OTA_BUILD_ID = '2026-05-28-145';
