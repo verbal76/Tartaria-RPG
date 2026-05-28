@@ -2656,4 +2656,24 @@
 // regular test). TS clean. Files: app/data/items/
 // weapons.json (rename), __tests__/
 // catalogIntegrityWithDogGear.test.ts (failing→it).
-export const OTA_BUILD_ID = '2026-05-28-134';
+//
+// 2026-05-28 OTA-135 — Cross-file catalog dups fix.
+// Six items appeared in both their functional
+// catalog (gear.json / amulets.json / weapons.json)
+// AND exploration.json: Aetheric Torch, Aetheric
+// Compass, Lightstone Amulet, Whisperer's Charm,
+// Minor Aetheric Amulet, Mud-Rend Blade. findCat
+// alogItem first-hit-wins masked the issue at the
+// call site but the exploration.json row's unique
+// fields (abilityReq, faction, tcBuy) silently
+// dropped on resolution. Removed the duplicate
+// rows from exploration.json; functional canonical
+// rows stay. 26/26 catalog integrity tests pass
+// (test.failing for cross-file dups flipped to
+// regular test). The 6th duplicate (Mud-Rend
+// Blade) was caught by the test re-run after the
+// first 5 removals — also fixed. TS clean.
+// Files: app/data/items/exploration.json (6 blocks
+// removed), __tests__/catalogIntegrityWithDogGear
+// .test.ts (.failing → it).
+export const OTA_BUILD_ID = '2026-05-28-135';

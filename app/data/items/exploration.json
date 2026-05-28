@@ -1,23 +1,5 @@
 [
   {
-    "name": "Aetheric Torch",
-    "abilityReq": "Dexterity Level 2",
-    "kind": "exploration",
-    "rarity": "Common",
-    "faction": "Unknowing Masses",
-    "tcBuy": 13,
-    "tags": [
-      "exploration",
-      "gear",
-      "common"
-    ],
-    "description": "Lasts 12 hours.",
-    "effect": {
-      "kind": "consumable",
-      "extendLight": 12
-    }
-  },
-  {
     "name": "Advanced Aetheric Torch",
     "abilityReq": "Dexterity Level 5",
     "kind": "exploration",
@@ -557,25 +539,6 @@
       "common"
     ],
     "description": "Standard paper maps, mechanical compass.",
-    "effect": {
-      "kind": "passive",
-      "stat": "intelligence",
-      "bonus": 1
-    }
-  },
-  {
-    "name": "Aetheric Compass",
-    "abilityReq": "Intelligence Level 5",
-    "kind": "exploration",
-    "rarity": "Uncommon",
-    "faction": "Forgotten Order",
-    "tcBuy": 22,
-    "tags": [
-      "exploration",
-      "gear",
-      "uncommon"
-    ],
-    "description": "Resistant to magnetic interference.",
     "effect": {
       "kind": "passive",
       "stat": "intelligence",
@@ -1156,24 +1119,6 @@
     "effect": {
       "kind": "consumable",
       "restoreStamina": 6
-    }
-  },
-  {
-    "name": "Lightstone Amulet",
-    "abilityReq": "Wisdom Level 9",
-    "kind": "exploration",
-    "rarity": "Rare",
-    "faction": "Forgotten Order",
-    "tcBuy": 60,
-    "tags": [
-      "exploration",
-      "gear",
-      "rare"
-    ],
-    "description": "Emits light and repels shadow creatures.",
-    "effect": {
-      "kind": "consumable",
-      "extendLight": 24
     }
   },
   {
@@ -1772,26 +1717,6 @@
     }
   },
   {
-    "name": "Mud-Rend Blade",
-    "abilityReq": "Dexterity Level 2",
-    "kind": "exploration",
-    "rarity": "Common",
-    "faction": "Mud Golems",
-    "tcBuy": 17,
-    "tags": [
-      "exploration",
-      "weapon",
-      "common",
-      "race_starter",
-      "mud_golem"
-    ],
-    "description": "Basic Aether-infused blade. Cuts through Aetheric clay and soft rock.",
-    "effect": {
-      "kind": "gate",
-      "unlocks": "dig_metal"
-    }
-  },
-  {
     "name": "Lost Echo Compass",
     "abilityReq": "Intelligence Level 2",
     "kind": "exploration",
@@ -1809,47 +1734,6 @@
     "effect": {
       "kind": "gate",
       "unlocks": "detect_aether"
-    }
-  },
-  {
-    "name": "Whisperer's Charm",
-    "abilityReq": "Charisma Level 2",
-    "kind": "exploration",
-    "rarity": "Common",
-    "faction": "Unknowing Masses",
-    "tcBuy": 18,
-    "tags": [
-      "exploration",
-      "relic",
-      "common",
-      "race_starter",
-      "unknowing_mass"
-    ],
-    "description": "A charm for calming animals. Calms animals and encourages basic commands.",
-    "effect": {
-      "kind": "passive",
-      "stat": "charisma",
-      "bonus": 1
-    }
-  },
-  {
-    "name": "Minor Aetheric Amulet",
-    "abilityReq": "Wisdom Level 3",
-    "kind": "exploration",
-    "rarity": "Common",
-    "faction": "Unknowing Masses",
-    "tcBuy": 21,
-    "tags": [
-      "exploration",
-      "relic",
-      "common",
-      "race_starter",
-      "unknowing_mass"
-    ],
-    "description": "Protects against minor Aetheric energy. Reduces minor Aetheric interference.",
-    "effect": {
-      "kind": "consumable",
-      "reduceCorruption": 2
     }
   },
   {

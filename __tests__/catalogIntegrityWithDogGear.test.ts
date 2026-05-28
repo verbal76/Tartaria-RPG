@@ -181,15 +181,12 @@ describe('OTA-124 pre-ship — catalog integrity with dog gear + treats', () => 
       return out;
     }
 
-    // PRE-EXISTING bug (NOT introduced by the dog system) — a handful of
-    // exploration.json items (Aetheric Torch, Aetheric Compass, Minor
-    // Aetheric Amulet, Lightstone Amulet, Whisperer's Charm, plus the
-    // "Aetheric Shield" weapon-vs-runecaster split) appear in two files.
-    // The OTA-110 lookup ordering tolerates this (first hit wins) but it
-    // IS a catalog hygiene issue worth a HANDOFF entry. Marked
-    // `test.failing` so the suite still passes — flipping back to `.it`
-    // when the catalog is deduped will green it.
-    test.failing('no item name appears in more than one catalog file', () => {
+    // OTA-135 — fixed. The five cross-file duplicates (Aetheric Torch,
+    // Aetheric Compass, Minor Aetheric Amulet, Lightstone Amulet,
+    // Whisperer's Charm) were removed from exploration.json; the
+    // functional rows in gear.json / amulets.json remain canonical.
+    // OTA-134 closed the within-file Aetheric Shield duplicate.
+    test('no item name appears in more than one catalog file', () => {
       const all = allNamesWithSource();
       const byName = new Map<string, Set<string>>();
       for (const { name, source } of all) {
