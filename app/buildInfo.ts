@@ -1836,4 +1836,44 @@
 // off on the open design calls in 0.A.
 //
 // Files: HANDOFF.md (Dog Companion planning entry in 0.A).
-export const OTA_BUILD_ID = '2026-05-27-114';
+//
+// 2026-05-27 OTA-115 — Planning entry only (no code changes).
+// User answered most of the Dog Companion open design calls
+// and added a new smell-find mechanic. Updated the OTA-114
+// framework in HANDOFF.md 0.A to lock in:
+//   - Dogs eat ANY player consumable (no separate dog-food
+//     kind); treats are loot-table additions with a
+//     `dogTreat` flag for +40 loyalty (vs +20 for regular
+//     food). Drafted 4 treats: Smoke-Cured Jerky Strip,
+//     Marrow Bone, Honey-Glazed Knuckle, Ash-Cured Tongue.
+//   - Resurrection Gems revive dogs the same as players (no
+//     special dog-revive item, no permadeath).
+//   - Anything that heals the player heals the dog via
+//     `heal dog <item>` / `use <item> on dog` — reuses the
+//     existing itemEffect.ts resolver.
+//   - Arbiter onboarding is conversational: "What kind of
+//     dog is that?" → free-text breed (24 chars, pure
+//     flavor); then "What will you name them?" → free-text
+//     name (16 chars). Both immutable after entry.
+//   - Combat: dog's name appears as a weapon-like row in the
+//     action menu. Two verbs: `bite` (1d6 + STR/2 damage,
+//     trains STR) and `distract` (d20 + DEX-or-INT vs DC 12;
+//     on success applies 'distracted' status that gives +2
+//     to the player's next dodge / flee / attack roll vs
+//     that enemy).
+//   - NEW Smell-find mechanic: on scene entry, dog rolls
+//     d20 + INT vs DC 12; on success the engine adds one
+//     hidden noun to the room investigation table from a
+//     `hiddenSmellNouns` per-archetype pool. Once-per-room
+//     cooldown via worldMemory; re-eligible after the room's
+//     visible nouns are consumed. Trains dog INT on success.
+//
+// Three open design calls remain (stat-train pacing,
+// scenario count, fight-flag implementation) — all
+// recommendation-ready, just need the user's call before
+// Phase 1 starts.
+//
+// JS bundle unchanged.
+//
+// Files: HANDOFF.md (Dog Companion entry refined).
+export const OTA_BUILD_ID = '2026-05-27-115';
