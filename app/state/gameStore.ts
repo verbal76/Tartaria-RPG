@@ -1290,6 +1290,15 @@ interface GameStore {
    *  Only valid when mainQuest.phase === 'choice'. Final. */
   chooseEndingMainQuest: (ending: 'seal' | 'unleash' | 'preserve') => void;
 
+  /** OTA-148 — Contracts-screen SUMMON button handler. When the
+   *  player is standing in a Lost Capital whose Core they haven't
+   *  recovered yet, taps the SUMMON chip on the PRIMARY OBJECTIVE
+   *  card. Spawns the Capital's Core Guardian into the current
+   *  scene (same pipeline the gate-verb path uses) and switches
+   *  to exploration so the fight surfaces. Returns ok / reason so
+   *  the UI can disable / hide the button when preconditions fail. */
+  summonCoreGuardian: () => { ok: boolean; reason?: string };
+
   /** OTA-120 Phase 5 — CallDogModal visibility flag. Set by the parser
    *  intercept for `call dog` / `call <name>`; cleared by the modal's
    *  CLOSE button or after the player picks an option. */
@@ -14695,6 +14704,85 @@ export const useGameStore = create<GameStore>((set, get) => ({
       void recordEndingBadge(player.factionId, ending);
     }
     void get().persist();
+  },
+
+  // OTA-148 — explicit SUMMON entry point for the PRIMARY OBJECTIVE
+  // card on Contracts. Pre-OTA-148, summoning the Guardian required
+  // taking the player's faction-gate verb (attack/diplomacy for the
+  // Monarchs, salvage for the Reclaimers, etc.) at the Capital — a
+  // discoverability black hole, especially after death-revive when
+  // the Guardian was wiped from the scene. The card chip now drives
+  // the same spawn pipeline the gate-verb path uses.
+  summonCoreGuardian() {
+    const player = get().player;
+    const currentScene = get().currentScene;
+    if (!player) return { ok: false, reason: 'no_player' };
+    if (!currentScene) return { ok: false, reason: 'no_scene' };
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const cg = require('../engine/coreGuardians');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mq = require('../engine/mainQuest');
+    const capitalId = player.currentLocationId;
+    if (!mq.LOST_CAPITAL_LOCATIONS.includes(capitalId)) {
+      return { ok: false, reason: 'not_at_capital' };
+    }
+    const mqState = mq.ensureMainQuest(player.mainQuest);
+    if (mqState.phase !== 'revelation' && mqState.phase !== 'cores') {
+      return { ok: false, reason: 'wrong_phase' };
+    }
+    if (mqState.coresRecovered.includes(capitalId)) {
+      return { ok: false, reason: 'already_recovered' };
+    }
+    if (currentScene.enemies.find((e) => cg.isCoreGuardian(e))) {
+      // Already in the scene — just bounce the screen back to
+      // exploration so the player can engage.
+      set({ currentScreen: 'exploration' });
+      return { ok: true, reason: 'already_present' };
+    }
+    const guardian = cg.spawnGuardianForCapital(player, capitalId);
+    if (!guardian) return { ok: false, reason: 'no_guardian_def' };
+    set((s) => (
+      s.currentScene
+        ? {
+            currentScene: {
+              ...s.currentScene,
+              enemies: [...s.currentScene.enemies, guardian],
+              enemyHps: [...s.currentScene.enemyHps, guardian.hp],
+              activeEnemyIdx: s.currentScene.enemies.length,
+              range: 'close',
+            },
+          }
+        : s
+    ));
+    get().appendLog(
+      'combat',
+      `${guardian.name} closes — ${guardian.attack} ready, ${guardian.damage} damage on a hit. (range: close) ★ CORE GUARDIAN`,
+    );
+    get().appendLog('arbiter', cg.GUARDIANS_BY_CAPITAL[capitalId].approachLine);
+    recordMemorableEvent(get, set, {
+      kind: 'mq_guardian_spawned',
+      text: `summoned ${guardian.name} at ${cg.GUARDIANS_BY_CAPITAL[capitalId].capitalName}`,
+      locationId: capitalId,
+      locationName: cg.GUARDIANS_BY_CAPITAL[capitalId].capitalName,
+      hoursElapsed: player.hoursElapsed ?? 0,
+      enemyName: guardian.name,
+    });
+    set((s) => ({
+      worldMemory: recordNpcMet(s.worldMemory, {
+        id: `guardian:${capitalId}`,
+        name: guardian.name,
+        role: 'Core Guardian',
+        factionId: 'aether_born_order',
+        locationId: capitalId,
+        hoursElapsed: player.hoursElapsed ?? 0,
+        firstMetAt: Date.now(),
+      }),
+    }));
+    // Bounce to exploration so the boss card is visible to the
+    // player immediately — no second tap required.
+    set({ currentScreen: 'exploration' });
+    void get().persist();
+    return { ok: true };
   },
 
   async persist() {

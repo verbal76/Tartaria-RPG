@@ -3220,4 +3220,53 @@
 // Files: app/state/gameStore.ts (runAethercraft
 // outcome label), app/components/StatsPanel.tsx
 // (dog name HP suffix).
-export const OTA_BUILD_ID = '2026-05-28-147';
+//
+// 2026-05-28 OTA-148 — SUMMON chip on the
+// PRIMARY OBJECTIVE card.
+//
+// Pre-OTA-148, summoning a Core Guardian
+// required taking the player's faction-gate
+// verb (Reclaimers salvage / Monarchs attack /
+// Order ask / etc.) at the Lost Capital. After
+// death-revive the Guardian was wiped from the
+// scene with no surface affordance to bring
+// them back — the player tried `summon the core
+// guardian` (parses as cast, blocked by gate
+// nudge) and `search for the core` (parses as
+// investigate, also blocked) and saw the same
+// "wrong approach" Arbiter line repeat. Player:
+// "once you reach a city that still has an
+// active core/guardian there should be a summon
+// button on the right edge of the main quest
+// button on the main quest tab."
+//
+// Implementation:
+//
+//   (1) New gameStore action `summonCoreGuardian`
+//       runs the same spawn pipeline the gate-
+//       verb path uses (spawnGuardianForCapital
+//       → scene mutation → CORE GUARDIAN ★ boss
+//       card emit → arbiter approachLine →
+//       mq_guardian_spawned milestone event →
+//       NPC-met record). Idempotent on "already
+//       in scene" (just bounces to exploration).
+//       On success, also switches currentScreen
+//       to 'exploration' so the boss card lands
+//       in view with no extra tap.
+//
+//   (2) ContractsScreen PRIMARY OBJECTIVE card
+//       gains an absolute-positioned `★ SUMMON`
+//       chip in the top-right corner. Renders
+//       only when the player is standing in an
+//       unrecovered Lost Capital with mainQuest
+//       in `revelation` or `cores` phase. Nested
+//       TouchableOpacity — tapping the chip
+//       fires the summon action and doesn't
+//       trigger the card's tap-to-expand.
+//
+// 42/42 regression tests pass. TS clean.
+//
+// Files: app/state/gameStore.ts
+// (summonCoreGuardian + interface decl),
+// app/screens/ContractsScreen.tsx (chip + style).
+export const OTA_BUILD_ID = '2026-05-28-148';

@@ -211,6 +211,18 @@ export function ContractsScreen() {
           },
           {},
         );
+        // OTA-148 — SUMMON chip eligibility. Shows when the player
+        // is standing in an unrecovered Lost Capital with the main
+        // quest active. Pre-OTA-148, summoning the Guardian required
+        // taking the faction-gate verb (attack/diplomacy/salvage/…)
+        // at the Capital, which the player had no way to discover
+        // post-revive when the Guardian had been wiped from the
+        // scene. Tap the chip → store fires the same spawn pipeline
+        // and bounces back to exploration.
+        const atCapitalForSummon =
+          (mq.phase === 'revelation' || mq.phase === 'cores')
+          && LOST_CAPITAL_LOCATIONS.includes(player.currentLocationId)
+          && !mq.coresRecovered.includes(player.currentLocationId);
         return (
           <TouchableOpacity
             style={styles.mainQuestCard}
@@ -231,6 +243,16 @@ export function ContractsScreen() {
               const next = coreGateNextAction(player.factionId);
               return <Text style={styles.mainQuestNextAction}>→ At this Capital: {next}.</Text>;
             })()}
+            {atCapitalForSummon && (
+              <TouchableOpacity
+                style={styles.summonChip}
+                onPress={() => useGameStore.getState().summonCoreGuardian()}
+                activeOpacity={0.7}
+                hitSlop={6}
+              >
+                <Text style={styles.summonChipText}>★ SUMMON</Text>
+              </TouchableOpacity>
+            )}
             {mqExpanded && (
               <View style={styles.mqTracker}>
                 <Text style={styles.mqTrackerHead}>9 CAPITALS · {recoveredCount}/9 CORES</Text>
@@ -1069,6 +1091,28 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 12,
     marginBottom: 8,
+    position: 'relative',
+  },
+  // OTA-148 — SUMMON chip pinned to the top-right edge of the
+  // PRIMARY OBJECTIVE card. Only renders when the player is in an
+  // unrecovered Lost Capital with the main quest active. Tap calls
+  // summonCoreGuardian() and bounces back to exploration.
+  summonChip: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: '#1a1714',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+  },
+  summonChipText: {
+    color: '#c9a86a',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1.5,
   },
   mainQuestTag: {
     color: '#c9a86a',

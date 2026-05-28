@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-28-147` (Aethercraft outcome label + dog HP in StatsPanel — playtester reported "say the summoning was a success" instead of HIT for casts, and "dog's HP is not listed with his name" under the OTA-145 golem HP line. Discipline-aware verbs (SUMMONED / SHAPED / MENDED on success, FAILED on miss) replace the combat-language HIT/MISS, and the dog name row now mirrors the golem's `(hp/hpMax)` rendering.). See **Section 0** for the closed-issue archive.
+> **Latest OTA:** `2026-05-28-148` (SUMMON chip on PRIMARY OBJECTIVE card — playtester died and revived at Voronov with the Cantor wiped from the scene; tried `summon the core guardian` and `search for the core`, both blocked by the gate nudge with no surface affordance to actually bring the Guardian back. Player: "once you reach a city that still has an active core/guardian there should be a summon button on the right edge of the main quest button on the main quest tab." New `★ SUMMON` chip pinned top-right of the Contracts PRIMARY OBJECTIVE card renders when standing in an unrecovered Lost Capital with mainQuest in revelation/cores; tap runs the same spawn pipeline the gate-verb path uses and bounces to exploration so the boss card lands in view.). See **Section 0** for the closed-issue archive.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -244,6 +244,16 @@
 - **TS 0 errors / Test suite green.** Always required pre-push. Tracked here as a passive gate rather than an issue.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### SUMMON chip on PRIMARY OBJECTIVE card
+
+- **OTA-148 (2026-05-28) · Discoverable Core Guardian re-summon from Contracts.**
+  - **What:** Playtester died at Voronov mid-Cantor fight, revived via a Resurrection Gem, and reverted to a freshly-generated scene with the Cantor gone. The main-quest state was correct (`mainQuest.phase = 'cores'`, `guardiansDefeated` did NOT include Voronov, `coresRecovered` did NOT include Voronov, PRIMARY OBJECTIVE tracker still said "in the city") — the Guardian respawn pipeline at `gameStore.ts:4179-4233` requires a player faction-gate verb at the Capital to re-instantiate, but the player tried `summon the core guardian` (parses as `cast` → not in Mud Monarchs' gate intents) and `search for the core` (parses as `investigate` → also not in Mud Monarchs' gate). Both bounced off the same "Your discipline asks you to attack or address the keepers" Arbiter line with no surface affordance to take that action. Player: *"once you reach a city that still has an active core/guardian there should be a summon button on the right edge of the main quest button on the main quest tab."*
+  - **Fix:** Two pieces.
+    1. New gameStore action `summonCoreGuardian()` lifts the spawn pipeline (spawnGuardianForCapital → enemy/HP push to scene → CORE GUARDIAN ★ boss card emit on `[combat]` → arbiter approachLine → `mq_guardian_spawned` milestone event → NPC-met record). Idempotent on "already in scene" — bounces to exploration without a second spawn. Returns `{ ok, reason }` so the UI can react to preflight refusals. On success, switches `currentScreen` to `'exploration'` so the boss card lands in view with no extra tap from the player.
+    2. ContractsScreen PRIMARY OBJECTIVE card gets a `★ SUMMON` chip absolutely positioned top-right of the card. Renders only when `mainQuest.phase` is `revelation` or `cores`, the player is in a `LOST_CAPITAL_LOCATIONS` location, and the Capital's Core isn't recovered yet. Nested TouchableOpacity inside the card's tap-to-expand TouchableOpacity — RN's responder system grants the touch to the inner chip so tapping it doesn't toggle the expansion.
+  - **Why:** The gate-verb path is the engine's intentional friction (each faction has its own way of coaxing the Core out, and the Guardian is the obstacle), but post-revive the player had no way to *discover* what verb their faction used. Contracts already surfaces the "→ At this Capital: attack or address the keepers" hint line; the chip is the actionable companion to that hint. The spawn pipeline is shared with the existing gate-verb path, so both routes converge on the same boss card + arbiter approachLine + milestone trail — no divergence in how the Guardian arrives.
+  - **Files:** `app/state/gameStore.ts` (`summonCoreGuardian` impl + interface decl), `app/screens/ContractsScreen.tsx` (chip + style).
 
 #### Aethercraft cast wording + dog HP surface
 
