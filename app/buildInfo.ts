@@ -2083,4 +2083,51 @@
 // TS clean at this checkpoint.
 //
 // Files: 12 modified + 3 new (full list above).
-export const OTA_BUILD_ID = '2026-05-27-122';
+//
+// 2026-05-27 OTA-123 — Dog Companion implementation
+// COMPLETE. Continuation agent finished all remaining
+// Phase 3-5 work + tests + tutorial. Final tree state
+// captured here:
+//   - Phase 3 polish: climb decoupling wired into the
+//     climb-start path (the spec's stated line 17653 was
+//     actually the combat-down code; agent corrected the
+//     placement). Travel auto-follow verified working
+//     implicitly (no separate position tracking needed).
+//     Hidden noun pools confirmed 7 archetypes × 5 nouns
+//     = 35 nouns (spec asked for 5-6 × 2-3; already
+//     ample).
+//   - Phase 4 closeout: loyalty decay integrated into
+//     advanceTime; threshold beats at 50/30/15; abandon-
+//     ment at 0 (no puppyVendorOwed set per user spec —
+//     hunger is no-bail-out); tryDogApplyVerb intercepts
+//     feed/heal/use-on-dog; tryDogCallVerb intercepts
+//     call/here/come; shared-rest +5 loyalty + dog HP
+//     heal on rest.
+//   - Phase 5 closeout: trainDogStat invoked from existing
+//     bite/distract/smell-find sites; tier costs mirror
+//     statTraining.ts:40-47 exactly; SlotSummary gains
+//     dogName/dogBreed only when dog is active (saveSystem
+//     writes them in saveSlot); CallDogModal globally
+//     mounted in App.tsx; Inventory tags + buttons routed
+//     through dog-equip / feed-dog flows; CharacterScreen
+//     Companion panel with 20-segment stat bars matches
+//     player stat-progress UI.
+//
+//   Spec deviations (user-acceptable):
+//     - Treats authored as Legendary (rarity union has no
+//       'Epic'); spec said Epic.
+//     - Treats live in gear.json (consumables.json doesn't
+//       exist in this repo).
+//
+//   Tests: 5 new dog test files (36 assertions). Combined
+//   with 4 regression suites (43 assertions): 79/79 pass
+//   in ~22s. TS clean.
+//
+// Next: vandalistic full-game stress sweep in parallel
+// before the ship-ready OTA.
+//
+// Files this OTA: __tests__/dogFeedHeal.test.ts (NEW),
+// __tests__/dogTravelClimb.test.ts (NEW),
+// __tests__/dogUiCompanionPanel.test.ts (NEW), and the
+// already-staged __tests__/dogHungerDecay.test.ts polish.
+export const OTA_BUILD_ID = '2026-05-27-123';
