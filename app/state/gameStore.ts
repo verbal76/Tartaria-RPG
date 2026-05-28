@@ -766,6 +766,43 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     // dog acquired yet; rescue hooks fire normally on the player's
     // next investigation of a matching scene archetype.
     dog: p.dog ?? null,
+    // OTA-143 — migrate pre-OTA-126 travelTargets. Older saves stored
+    // travelTarget as { locationId } with no distanceRemaining field.
+    // The ExplorationScreen badge fell to its legacy Manhattan-recompute
+    // fallback which uses the current-location-centered map — and the
+    // world-map regenerates with currentLocationId at center, so the
+    // recompute can return 0 when the player's mapX/mapY coincidentally
+    // matches the destination's coords on the current-centered map.
+    // Playtester repro: badge said 0 while still far from Voronov;
+    // stopping and re-setting course produced the correct 16. Migration:
+    // if the travelTarget exists and lacks distanceRemaining, compute
+    // and seed it once, so the OTA-126 stable-counter path works from
+    // load forward. If the computed value is 0 AND currentLocationId
+    // != target.locationId, drop the travelTarget — the legacy state
+    // is genuinely confused and the player should re-set the course
+    // explicitly.
+    travelTarget: (() => {
+      const t = p.travelTarget;
+      if (!t) return undefined;
+      if (typeof t.distanceRemaining === 'number') return t;
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { generateWorldMap, WORLD_MAP_CENTER_X: cx, WORLD_MAP_CENTER_Y: cy } = require('../engine/worldMap');
+      const seed = p.mapSeed ?? `${p.name}|${p.raceId}|${p.factionId}|legacy`;
+      const map = generateWorldMap(seed, p.currentLocationId);
+      const tgtPos = map.positions[t.locationId];
+      if (!tgtPos) return undefined; // bearing lost — clear cleanly
+      const fromX = typeof p.mapX === 'number' ? p.mapX : cx;
+      const fromY = typeof p.mapY === 'number' ? p.mapY : cy;
+      const tiles = Math.abs(tgtPos.x - fromX) + Math.abs(tgtPos.y - fromY);
+      if (tiles === 0 && p.currentLocationId !== t.locationId) {
+        // Counter would land at 0 but player is NOT actually at the
+        // target — the relative-map coord coincidence the playtester
+        // hit. Clear the travelTarget so the player sees STOPPED and
+        // can re-set explicitly.
+        return undefined;
+      }
+      return { locationId: t.locationId, distanceRemaining: tiles };
+    })(),
   };
 }
 
@@ -12467,6 +12504,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;
     const map: WorldMap = generateWorldMap(seed, player.currentLocationId);
     const tgtPos = map.positions[targetId];
+    // OTA-143 — self-heal a stuck-at-0 counter. If distanceRemaining
+    // reads 0 BUT we're not yet at the target (currentLocationId
+    // mismatch caught above means we get here only when player is
+    // NOT at the destination), refresh from the live map state. This
+    // catches any state where the counter desynced from reality —
+    // including but not limited to the legacy-save scenario the
+    // playtester hit (Voronov badge stuck at 0 while still far away).
+    // The migration in backfillPlayer covers the load-time case; this
+    // covers mid-travel drift.
+    if (
+      tgtPos
+      && (player.travelTarget.distanceRemaining ?? 0) <= 0
+      && player.currentLocationId !== targetId
+    ) {
+      const fxRecover = player.mapX ?? WORLD_MAP_CENTER_X;
+      const fyRecover = player.mapY ?? WORLD_MAP_CENTER_Y;
+      const tilesRecover = Math.abs(tgtPos.x - fxRecover) + Math.abs(tgtPos.y - fyRecover);
+      if (tilesRecover > 0) {
+        set((s) => s.player?.travelTarget ? {
+          player: {
+            ...s.player,
+            travelTarget: { ...s.player.travelTarget, distanceRemaining: tilesRecover },
+          },
+        } : s);
+        get().appendLog('debug', `travel: counter desync — was 0 but not at ${targetId}. Refreshed to ${tilesRecover}.`);
+      }
+    }
     if (!tgtPos) {
       get().appendLog('arbiter', `The Arbiter looks at the horizon. "I've lost the bearing. Resetting."`);
       // OTA-127 — also clear transitArea so the scene bar stops

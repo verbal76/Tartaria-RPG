@@ -2945,4 +2945,52 @@
 // layout + dog name rendering + styles),
 // __tests__/dogBreedParsing.test.ts (NEW, 23
 // tests).
-export const OTA_BUILD_ID = '2026-05-28-142';
+//
+// 2026-05-28 OTA-143 — Legacy travelTarget
+// migration + continueTravel self-heal.
+// Playtester repro: badge said 0 steps to Voronov
+// while still far away. Stopping and re-setting
+// course produced the correct 16.
+//
+// Root cause confirmed: save was started before
+// OTA-126 → travelTarget had no distanceRemaining
+// field → badge fell to its legacy Manhattan-
+// recompute fallback which uses the current-
+// location-centered map. The world map regenerates
+// with currentLocationId at center on every call,
+// so the recompute can coincidentally return 0
+// when the player's mapX/mapY happens to match
+// the destination's coords on the current-
+// centered map. Confirms playtester hypothesis
+// ("legacy glitch from an old file").
+//
+// Two-part fix:
+//
+//   (A) Migration in backfillPlayer. Any save
+//       loaded with a travelTarget lacking
+//       distanceRemaining gets it computed and
+//       seeded once. If the computed value would
+//       be 0 AND currentLocationId !== target.
+//       locationId, drop the travelTarget cleanly
+//       (the legacy state is confused; the player
+//       should re-set the course explicitly,
+//       which the playtester did manually).
+//
+//   (B) Self-heal in continueTravel. If
+//       distanceRemaining reads 0 BUT the player
+//       still isn't at the target, recompute the
+//       Manhattan distance and refresh the
+//       counter. Catches mid-travel desync — not
+//       just legacy saves but any path that could
+//       confuse the counter (e.g., a future
+//       refactor that moves the player without
+//       updating the counter).
+//
+// 28/28 tests pass (3 new travelTargetMigration
+// tests + 25 regression). TS clean.
+//
+// Files: app/state/gameStore.ts (backfillPlayer
+// travelTarget migration + continueTravel self-
+// heal), __tests__/travelTargetMigration.test.ts
+// (NEW).
+export const OTA_BUILD_ID = '2026-05-28-143';
