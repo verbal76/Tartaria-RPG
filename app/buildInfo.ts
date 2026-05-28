@@ -2639,4 +2639,21 @@
 // the OTA-110 guard. One-line add at crafting.ts:329
 // closes the path. 41/41 targeted tests pass. TS
 // clean. Files: app/engine/crafting.ts.
-export const OTA_BUILD_ID = '2026-05-28-133';
+//
+// 2026-05-28 OTA-134 — Aetheric Shield within-file
+// duplicate fix. Pre-fix, weapons.json had TWO
+// "Aetheric Shield" rows: line 95 (melee shield,
+// DEX-based, 2d6) and line 228 (runecaster, INT-
+// based, 1d4 + blocks 2d6). findWeaponByName uses
+// Array.find so only the melee row was reachable;
+// the runecaster row was unreachable lore + waste
+// in the data. Renamed the runecaster row to
+// "Aetheric Ward" (matches its description: "a
+// small disk-runecaster, hovers between caster and
+// harm"). Melee Aetheric Shield keeps its name +
+// existing enemy drop reference. 26/26 catalog
+// integrity tests pass (test.failing flipped to
+// regular test). TS clean. Files: app/data/items/
+// weapons.json (rename), __tests__/
+// catalogIntegrityWithDogGear.test.ts (failing→it).
+export const OTA_BUILD_ID = '2026-05-28-134';

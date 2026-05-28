@@ -227,12 +227,10 @@ describe('OTA-124 pre-ship — catalog integrity with dog gear + treats', () => 
       expect(offenders).toEqual([]);
     });
 
-    // PRE-EXISTING bug — "Aetheric Shield" appears twice in weapons.json
-    // (once as a melee shield, once as a runecaster). Both rows have
-    // different mechanics. The catalog lookup returns whichever Array.find
-    // hits first (the melee one) and silently drops the runecaster.
-    // Marked test.failing; HANDOFF candidate.
-    test.failing('no duplicate names WITHIN any single catalog file', () => {
+    // OTA-134 — fixed. The runecaster "Aetheric Shield" was renamed to
+    // "Aetheric Ward" in weapons.json line 228. The melee shield keeps
+    // its name. findWeaponByName now resolves both rows distinctly.
+    test('no duplicate names WITHIN any single catalog file', () => {
       const buckets: Array<{ source: string; items: { name: string }[] }> = [
         { source: 'weapons', items: WEAPONS },
         { source: 'armor', items: ARMOR },
