@@ -2270,4 +2270,36 @@
 // (WATER_SOURCE_NOUNS extended + case 'drink' +
 // cancelPendingRolls refund + escape pre-charge
 // snapshot).
-export const OTA_BUILD_ID = '2026-05-28-125';
+//
+// 2026-05-28 OTA-126 — Travel waypoint badge fix.
+// Playtester report: "I was going to Varakush, the
+// badge said 23 spaces, counted down to 2, then I
+// crossed into the mud flats and it jumped to 26
+// spaces." Confirmed: the world map regenerates with
+// `currentLocationId` at center on every step. When
+// the player crosses a location boundary, the
+// destination's coords in the new map are different
+// from the old map, so the Manhattan distance jumps.
+//
+// Fix: snapshot the initial tile count at travel-
+// start, decrement once per step. Stable counter, no
+// map dependence after init.
+//   - travelTarget gains optional distanceRemaining
+//     field (types.ts).
+//   - setTravelCourse seeds it at the initial
+//     Manhattan distance, decrements by 1 for the
+//     auto-first-step.
+//   - continueTravel decrements after each
+//     stepDirection call (only when not arriving).
+//   - ExplorationScreen movesLeft prefers the stored
+//     counter when present; legacy Manhattan
+//     recompute stays as a safety net for saves whose
+//     travel started before this OTA.
+//
+// 44/44 regression tests pass. TS clean.
+//
+// Files: app/engine/types.ts (travelTarget shape),
+// app/state/gameStore.ts (setTravelCourse +
+// continueTravel decrement), app/screens/
+// ExplorationScreen.tsx (badge prefers counter).
+export const OTA_BUILD_ID = '2026-05-28-126';

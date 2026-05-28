@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-28-125` (Playtest log fixes from a Day-32 OTA-124 session: investigate catchall now has 8 deterministic-per-noun variants (no more "4 nouns same line in a row"); cancelled flee/cast/stealth rolls refund time + stamina; `drink` is its own intent (no more 8-hour rest on "drink water"); water-source list now includes current/stream/rivulet/brook. Verified dog rescue hooks work for older characters — they fire on hook-noun taps regardless of save age). See **Section 0** for the live issue tracker covering OTA-070 → OTA-125.
+> **Latest OTA:** `2026-05-28-126` (Travel waypoint badge fix — playtester saw "23 spaces → 2 → 26" because the world map regenerates with currentLocationId at center each step; crossing a location boundary shifts the destination's coords in the new map. Fixed by snapshotting the initial tile count at travel-start and decrementing once per step. Stable counter, no map dependence after init). See **Section 0** for the live issue tracker covering OTA-070 → OTA-126.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -248,6 +248,18 @@
 - **TS 0 errors / Test suite green.** Always required pre-push. Tracked here as a passive gate rather than an issue.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Travel waypoint UX
+
+- **OTA-126 (2026-05-28) · Travel badge jumped on location-boundary crossings — fixed via snapshot-and-decrement counter.**
+  - **What:** Playtester report: "I was going to Varakush, the badge said 23 spaces, counted down to 2, then I crossed into the mud flats and it jumped to 26 spaces." Confirmed cause: `generateWorldMap(seed, currentLocationId)` re-centers the world map on the player's current location every step. When the player crosses into a new location, the regenerated map has the destination at different coords, so the Manhattan distance recomputed by the badge changed.
+  - **Fix:** Snapshot the initial tile count at travel-start, decrement once per step.
+    - `travelTarget` gains an optional `distanceRemaining?: number` field (types.ts).
+    - `setTravelCourse` seeds it at the initial Manhattan distance and decrements by 1 for the auto-first-step.
+    - `continueTravel` decrements after each `stepDirection` call (only when not arriving).
+    - `ExplorationScreen` movesLeft prefers the stored counter when present; the legacy Manhattan recompute stays as a safety net for saves whose travel started before this OTA.
+  - **Why:** Stable counter eliminates the dependency on the regenerated map after init. Player gets a monotonic countdown that matches their intuition. Legacy fallback means no behavior break for saves mid-travel when the OTA lands.
+  - **Files:** `app/engine/types.ts` (travelTarget shape), `app/state/gameStore.ts` (setTravelCourse + continueTravel decrement), `app/screens/ExplorationScreen.tsx` (badge prefers counter).
 
 #### Playtest log fixes
 

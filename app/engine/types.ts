@@ -750,7 +750,18 @@ export interface PlayerCharacter {
    *  procedural grid. Cleared when the player either arrives (the
    *  step lands on the target tile and travelTo fires) or taps
    *  STOP TRAVEL. */
-  travelTarget?: { locationId: string };
+  // OTA-126 — `distanceRemaining` snapshots the tile count at
+  // travel-start and decrements once per step (continueTravel and
+  // the first setTravelCourse step). The badge reads this directly
+  // instead of recomputing Manhattan distance from coords — the
+  // worldMap regenerates with `currentLocationId` at center on
+  // every step, so the destination's coords (and therefore the
+  // Manhattan distance) shift when the player crosses a location
+  // boundary. Playtester report: "23 spaces → counted down to 2,
+  // crossed into the mud flats, jumped back to 26 spaces."
+  // Optional so older saves don't crash; missing field falls back
+  // to the legacy Manhattan calc in the ExplorationScreen badge.
+  travelTarget?: { locationId: string; distanceRemaining?: number };
   /** 2026-05-25 [MECHANIC-1b] — active golem sidekick. Persists on
    *  the player so it survives cardinal moves + scene transitions
    *  (the "follows until needed again" requirement). null when no

@@ -603,15 +603,19 @@ export function ExplorationScreen() {
               return locs.find((l) => l.id === id)?.name ?? id;
             })()}
             movesLeft={(() => {
-              // 2026-05-25 — Manhattan distance from player's current
-              // mapX/mapY to the destination's procedural-grid coords.
-              // Matches the math in stepDirection (one step per cardinal
-              // tile crossed), so the badge counts down 1 per
-              // CONTINUE tap. Returns null when no active target or
-              // when the destination's coords aren't placed on the
-              // current map (rare — generateWorldMap re-centers on
-              // currentLocationId per call).
+              // OTA-126 — prefer the stored distanceRemaining counter
+              // (snapshotted at travel-start, decremented per step).
+              // The legacy fallback recomputes Manhattan from the
+              // current-location-centered map, which broke when the
+              // player crossed a location boundary — the destination's
+              // coords shift in the regenerated map, so the badge
+              // jumped (playtester: "23 → 2 → mud flats → 26").
+              // Legacy path stays as a safety net for older saves
+              // that travel started before this OTA landed.
               if (!player?.travelTarget) return null;
+              if (typeof player.travelTarget.distanceRemaining === 'number') {
+                return player.travelTarget.distanceRemaining;
+              }
               // eslint-disable-next-line @typescript-eslint/no-require-imports
               const { generateWorldMap, WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } = require('../engine/worldMap');
               const seed = player.mapSeed ?? `${player.name}|${player.raceId}|${player.factionId}|legacy`;

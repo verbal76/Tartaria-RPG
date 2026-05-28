@@ -12206,7 +12206,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const fromX = player.mapX ?? WORLD_MAP_CENTER_X;
     const fromY = player.mapY ?? WORLD_MAP_CENTER_Y;
     const tiles = Math.abs(tgtPos.x - fromX) + Math.abs(tgtPos.y - fromY);
-    set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId } } } : s));
+    // OTA-126 — snapshot tile count at travel-start so the badge
+    // counts down monotonically regardless of which location is
+    // currently centered on the regenerated world map.
+    set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId, distanceRemaining: tiles } } } : s));
     get().appendLog(
       'world',
       `You set course for ${tgtName}. Estimated ${tiles} day${tiles === 1 ? '' : 's'} of travel. CONTINUE / STOP from the travel row.`,
@@ -12224,6 +12227,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const after = get().player;
       if (after && after.currentLocationId === locationId) {
         set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
+      } else {
+        // OTA-126 — decrement remaining for the auto-taken first step.
+        set((s) => (s.player?.travelTarget ? {
+          player: {
+            ...s.player,
+            travelTarget: {
+              ...s.player.travelTarget,
+              distanceRemaining: Math.max(0, (s.player.travelTarget.distanceRemaining ?? tiles) - 1),
+            },
+          },
+        } : s));
       }
     }
   },
@@ -12276,6 +12290,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const after = get().player;
     if (after && after.currentLocationId === targetId) {
       set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
+    } else {
+      // OTA-126 — decrement the snapshot tile counter so the badge
+      // counts down monotonically. Map regenerates per step centered
+      // on currentLocationId, which shifts the destination's coords
+      // and broke the legacy "recompute Manhattan from current map"
+      // badge when the player crossed a location boundary.
+      set((s) => (s.player?.travelTarget ? {
+        player: {
+          ...s.player,
+          travelTarget: {
+            ...s.player.travelTarget,
+            distanceRemaining: Math.max(0, (s.player.travelTarget.distanceRemaining ?? 0) - 1),
+          },
+        },
+      } : s));
     }
   },
 
