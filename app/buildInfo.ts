@@ -2412,4 +2412,84 @@
 // INTENTS + isDrink detection + silent opt on the
 // 3 [player] + 1 Time-passed log sites + drink-case
 // re-dispatch options).
-export const OTA_BUILD_ID = '2026-05-28-128';
+//
+// 2026-05-28 OTA-129 — Hook-puzzle foundation. The
+// longest-standing open issue in HANDOFF.md 0.A:
+// engine narration tells the player to do something
+// ("three rotations, in the right order" / "knock
+// on the steeple") but the parser had no rotate /
+// knock intents, so the input parsed as
+// intent=unknown and fell to the generic inventory-
+// chatter line. The hook silently progressed on a
+// second tap of the matching noun anyway, which
+// made the puzzle text pure decoration.
+//
+// This OTA installs real puzzles. Three pieces:
+//
+//   (1) New parser intents: rotate, knock, turn,
+//       twist, press, push, pull. Each with verb
+//       synonyms (rotate / spin / revolve; knock /
+//       rap / tap / pound / thump; etc.). All seven
+//       added to llmParser INTENT_LIST + canonical
+//       map.
+//
+//   (2) New module app/engine/hookPuzzles.ts:
+//       - PuzzleProgress type (correctSoFar /
+//         failures / history capped at 6)
+//       - PuzzleDefinition: intentList,
+//         sequenceLength, validateStep, hint copy,
+//         mercyAt, solvedNarration
+//       - extractDirection(target): natural-language
+//         direction parse (left/right/CCW/CW/
+//         widdershins/deosil/etc.)
+//       - applyPuzzleInput(hook, args): pure
+//         resolver, returns {progress, line, hint,
+//         solved}
+//       - Two puzzles wired:
+//         * sealed_vault_door — 3-step rotation
+//           tumbler with canonical sequence
+//           [left, right, right]. Hint at 3
+//           failures, deeper hint at 5, mercy
+//           auto-solve at 7.
+//         * submerged_steeple — 3-knock pattern.
+//           Any non-knock intent resets. Hint at
+//           3 failures, mercy at 6.
+//
+//   (3) gameStore hook routing gates stage advance
+//       on puzzle completion. When an active hook
+//       has a PUZZLE_DEFINITIONS entry AND
+//       hook.stage === 0 AND the player's intent
+//       is in puzzle.intentList, the input flows
+//       through applyPuzzleInput. Successful
+//       attempts narrate progress and persist
+//       puzzleProgress on the hook record; the
+//       mercy or clean-solve path then calls
+//       resolveHookOneStep to fire the stage-1
+//       reward chain. Hooks without a puzzle
+//       fall through unchanged.
+//
+// Hook interface gains optional `puzzleProgress`
+// field so save/load preserves attempt state.
+// Default undefined; populated on first attempt.
+//
+// 22/22 unit tests pass on the resolver module
+// (direction parsing, sequence validation, reset
+// on wrong, mercy threshold, hint surfacing,
+// history truncation). 50/50 regression on the
+// four fast suites still green. TS clean.
+//
+// Files: app/engine/types.ts (7 new Intents),
+// app/engine/parser.ts (7 new VERB_SYNONYMS),
+// app/engine/llmParser.ts (INTENT_LIST + canonical
+// map), app/engine/hookPuzzles.ts (NEW),
+// app/engine/hooks.ts (Hook.puzzleProgress field),
+// app/state/gameStore.ts (hookEligible adds 7
+// intents + puzzle-gate routing before
+// resolveHookOneStep), __tests__/
+// hookPuzzleResolver.test.ts (NEW, 22 tests).
+//
+// OTA-130 next: 2 more puzzles + examine-the-noun
+// peek + save/load round-trip + tutorial step.
+// OTA-131 ships the pressure test with strict
+// OOM/timeout guardrails.
+export const OTA_BUILD_ID = '2026-05-28-129';

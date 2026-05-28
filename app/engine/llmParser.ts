@@ -39,6 +39,7 @@ const INTENT_LIST: Intent[] = [
   'take_cover', 'aim', 'reload', 'maneuver', 'quick_fire', 'multi_fire',
   'fight_back', 'recruit', 'drop', 'pickup', 'open', 'fill',
   'dog_bite', 'dog_distract', 'drink',
+  'rotate', 'knock', 'turn', 'twist', 'press', 'push', 'pull',
 ];
 
 // Canonical verb to rephrase a resolved intent back into. The dictionary
@@ -96,6 +97,13 @@ const CANONICAL_VERB: Record<Intent, string> = {
   dog_bite: 'bite',
   dog_distract: 'distract',
   drink: 'drink',
+  rotate: 'rotate',
+  knock: 'knock',
+  turn: 'turn',
+  twist: 'twist',
+  press: 'press',
+  push: 'push',
+  pull: 'pull',
   unknown: 'look',
 };
 

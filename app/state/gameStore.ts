@@ -3973,6 +3973,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'diplomacy',
       'gift',
       'steal',
+      // OTA-129 — hook-puzzle verbs route through hookEligible too
+      // so the puzzle resolver runs against active hooks. The
+      // resolver itself checks the hook's PUZZLE_DEFINITIONS entry
+      // and gates on intentList — non-puzzle hooks ignore these
+      // intents and fall through to the normal verb dispatch.
+      'rotate', 'knock', 'turn', 'twist', 'press', 'push', 'pull',
     ];
     if (hookEligible.includes(parsed.intent) && currentScene.hooks && currentScene.hooks.length > 0) {
       const targetText = (parsed.resolvedNoun ?? parsed.target ?? trimmed).toLowerCase();
@@ -3981,6 +3987,53 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('debug', `route: hook intercept (kind=${hook.kind}, target="${targetText}") — original intent=${parsed.intent}`);
         // Small stamina cost for engaging a hook (same as a skill check).
         set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+        // OTA-129 — hook puzzle gate. If this hook's kind has a
+        // PUZZLE_DEFINITIONS entry AND the hook is still at stage 0
+        // AND the player's intent matches the puzzle's intentList,
+        // route the input through the puzzle resolver. The puzzle
+        // either makes progress (narrated), resets (narrated), or
+        // solves (narrated, THEN normal chain progression fires).
+        // Non-puzzle hooks fall through to the standard chain
+        // advance unchanged.
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { puzzleFor, applyPuzzleInput, extractDirection } = require('../engine/hookPuzzles') as typeof import('../engine/hookPuzzles');
+        const def = puzzleFor(hook.kind);
+        if (def && hook.stage === 0 && def.intentList.includes(parsed.intent)) {
+          // First-attempt intro line if puzzle hasn't been touched yet.
+          if (!hook.puzzleProgress) {
+            get().appendLog('world', def.intro);
+          }
+          const direction = extractDirection(parsed.target ?? null);
+          const outcome = applyPuzzleInput(hook, {
+            intent: parsed.intent,
+            target: parsed.target ?? null,
+            direction,
+          });
+          // Write the new puzzleProgress back onto the scene's hook
+          // record so a subsequent attempt sees the updated counter.
+          set((s) => s.currentScene
+            ? {
+                currentScene: {
+                  ...s.currentScene,
+                  hooks: s.currentScene.hooks.map((h) =>
+                    h.id === hook.id ? { ...h, puzzleProgress: outcome.progress } : h,
+                  ),
+                },
+              }
+            : s);
+          if (outcome.line) get().appendLog('world', outcome.line);
+          if (outcome.hint) get().appendLog('arbiter', `"${outcome.hint}"`);
+          if (outcome.solved) {
+            // Pass control to the chain to fire the stage-1 reward
+            // narration + effects + memos. The hook record passed in
+            // here is the PRE-puzzle-write copy, but resolveHookOneStep
+            // only reads hook.kind + hook.stage, so the puzzleProgress
+            // write order doesn't matter.
+            resolveHookOneStep(hook, get, set, targetText);
+          }
+          void get().persist();
+          return;
+        }
         // 2026-05-27 OTA-088 — pass the trigger text so the stage
         // advance can replace the chip text in scene.ambientNouns
         // (and displayedAmbientNouns) with the latest revealed

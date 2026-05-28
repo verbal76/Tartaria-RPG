@@ -55,6 +55,18 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   drink: [
     'drink', 'sip', 'gulp', 'quaff', 'slurp', 'guzzle',
   ],
+  // OTA-129 — hook-puzzle verbs. The puzzle resolver in
+  // engine/hookPuzzles.ts owns the per-puzzle validation. The
+  // parser just needs to route the intent + (for rotate/turn/twist)
+  // the direction word. Synonyms cover obvious natural phrasings
+  // so the player doesn't have to guess the exact verb.
+  rotate: ['rotate', 'spin', 'revolve'],
+  knock: ['knock', 'rap', 'tap', 'pound', 'thump'],
+  turn: ['turn', 'crank', 'wind'],
+  twist: ['twist', 'wrench', 'torque'],
+  press: ['press', 'depress', 'mash'],
+  push: ['push', 'shove', 'nudge'],
+  pull: ['pull', 'tug', 'yank'],
   inventory: [
     // 'bag' removed — too greedy: "bag the goblin" / "tea bag" / "sandbag"
     // all routed here. 'pack' kept; players who type just "pack" are

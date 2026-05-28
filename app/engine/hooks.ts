@@ -47,6 +47,11 @@ export interface Hook {
   resolved: boolean;
   /** Cross-scene chain id, set when the hook is part of a multi-scene story. */
   chainId?: string;
+  /** OTA-129 — hook-puzzle progress, set when the hook's HookKind has
+   *  a PUZZLE_DEFINITIONS entry. Survives save/load + scene departure
+   *  so the player can come back to a half-solved tumbler and pick
+   *  up where they left off. Undefined on hooks without a puzzle. */
+  puzzleProgress?: import('./hookPuzzles').PuzzleProgress;
 }
 
 // Plant lines, paired with the nouns that should resolve to that hook kind.

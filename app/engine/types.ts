@@ -58,6 +58,20 @@ export type Intent =
   // <consumable>" through the existing consumable-eat flow, "drink
   // water" with a scene water source to a small stamina restore.
   | 'drink'
+  // OTA-129 — hook-puzzle verbs. These route through the puzzle
+  // resolver in engine/hookPuzzles.ts when an active hook in the
+  // scene has a puzzle definition. The classic case: sealed vault
+  // door narration ("three rotations, in the right order") + player
+  // types "rotate the ring left." Pre-OTA-129 these all parsed as
+  // intent=unknown and fell to the generic inventory-chatter line
+  // even though the narrative had asked for the action.
+  | 'rotate'
+  | 'knock'
+  | 'turn'
+  | 'twist'
+  | 'press'
+  | 'push'
+  | 'pull'
   // OTA-120 — Dog Companion combat verbs. Both intents require an
   // active dog in combat (player.dog.status === 'with_player' AND
   // currentScene.enemies.length > 0). Bite is a direct attack;
