@@ -3190,4 +3190,34 @@
 // reward channel + 5 template-leak callsites),
 // app/engine/dogCompanion.ts ({verbS}/{verbES}
 // tokens + applyDogPronouns).
-export const OTA_BUILD_ID = '2026-05-28-146';
+//
+// 2026-05-28 OTA-147 — Aethercraft outcome wording
+// + dog HP in StatsPanel.
+//
+//   (1) Aethercraft cast-result label was 'HIT' /
+//       'MISS' which reads as combat language for
+//       what's actually a cast. Player: "when I am
+//       successful instead of saying hit, say the
+//       summoning was a success." Discipline-aware
+//       verbs now: ✓ SUMMONED for golem.summon,
+//       ✓ SHAPED for stone manipulation, ✓ MENDED
+//       for aetheric healing; ✗ FAILED across the
+//       board on a miss. Roll math + channel split
+//       (reward/combat) unchanged.
+//
+//   (2) Dog name in StatsPanel was bare — just the
+//       name. OTA-145 added the golem name BELOW
+//       the dog with its (hp/hpMax) but the dog
+//       line itself never had HP. Player: "the
+//       golem showed up under the dog with his HP,
+//       but I saw the dog's HP is not listed with
+//       his name." Now mirrors the golem format:
+//       "Marrow (12/14)" in warm-gold to the right
+//       of the player name.
+//
+// 42/42 regression tests pass. TS clean.
+//
+// Files: app/state/gameStore.ts (runAethercraft
+// outcome label), app/components/StatsPanel.tsx
+// (dog name HP suffix).
+export const OTA_BUILD_ID = '2026-05-28-147';

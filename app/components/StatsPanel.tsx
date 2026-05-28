@@ -59,7 +59,7 @@ export function StatsPanel({ player }: Props) {
         <Text style={styles.name} numberOfLines={1}>{player.name}</Text>
         {dogShows && player.dog ? (
           <Text style={styles.dogName} numberOfLines={1}>
-            {player.dog.name}
+            {player.dog.name} ({player.dog.hp}/{player.dog.hpMax})
           </Text>
         ) : null}
       </View>

@@ -17708,9 +17708,16 @@ function runAethercraft(
   // Successful Aethercraft rolls now route to 'reward' (green ✦),
   // failures stay on 'combat' (red) where the warning color is
   // legible. Roll math stays identical; just the channel differs.
+  // OTA-147 — outcome label was 'HIT'/'MISS' which reads as combat
+  // language for what's actually a cast. Playtester: "instead of
+  // saying hit, say the summoning was a success." Discipline-aware
+  // verbs now: SUMMONED / SHAPED / MENDED on success, FAILED on miss.
+  const outcomeLabel = success
+    ? (discipline === 'summon' ? '✓ SUMMONED' : discipline === 'shape' ? '✓ SHAPED' : '✓ MENDED')
+    : '✗ FAILED';
   get().appendLog(
     success ? 'reward' : 'combat',
-    `${disciplineLabel} — d20 ${roll} + ${statLabel} ${statValue}${racialNote} = ${total} vs DC ${dc} — ${success ? '✓ HIT' : '✗ MISS'}`,
+    `${disciplineLabel} — d20 ${roll} + ${statLabel} ${statValue}${racialNote} = ${total} vs DC ${dc} — ${outcomeLabel}`,
   );
 
   // 3. Consume fuel regardless of success ("the aether takes its

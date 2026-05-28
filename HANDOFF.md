@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-28-141` (Cleanup-wave ship — OTAs 133-140 closed ALL 8 open issues in HANDOFF 0.A (catalog hygiene, inference lock, per-golem DC, WIS anti-loop, rumor hint, hub-room key collision). OTA-141 stress sweep added 42 new tests across 4 files, found 1 ship-blocker (OTA-127 weather-drift `require` MODULE_NOT_FOUND) and fixed it. 168/168 tests pass. Game is in its cleanest state of the session — section 0.A is now empty). See **Section 0** for the closed-issue archive.
+> **Latest OTA:** `2026-05-28-147` (Aethercraft outcome label + dog HP in StatsPanel — playtester reported "say the summoning was a success" instead of HIT for casts, and "dog's HP is not listed with his name" under the OTA-145 golem HP line. Discipline-aware verbs (SUMMONED / SHAPED / MENDED on success, FAILED on miss) replace the combat-language HIT/MISS, and the dog name row now mirrors the golem's `(hp/hpMax)` rendering.). See **Section 0** for the closed-issue archive.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -244,6 +244,14 @@
 - **TS 0 errors / Test suite green.** Always required pre-push. Tracked here as a passive gate rather than an issue.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Aethercraft cast wording + dog HP surface
+
+- **OTA-147 (2026-05-28) · Aethercraft outcome label + dog HP in StatsPanel.**
+  - **What:** Two playtester gripes from a golem-summoning session: (1) the cast-result narration read `Aether Golem Constructor — d20 14 + INT 4 = 18 vs DC 17 — ✓ HIT` which framed a successful summon as a combat hit; player: *"when I am successful instead of saying hit, say the summoning was a success."* (2) OTA-145 introduced the golem-name row with `(hp/hpMax)` BELOW the dog name, but the dog line itself was just the name — no HP. Player: *"the golem showed up under the dog with his HP, but I saw the dog's HP is not listed with his name."*
+  - **Fix:** (1) `runAethercraft` outcome label switched from `'✓ HIT' / '✗ MISS'` to discipline-aware verbs — `'✓ SUMMONED'` for `summon`, `'✓ SHAPED'` for `shape`, `'✓ MENDED'` for `mend`; `'✗ FAILED'` across the board on a miss. Roll math + the OTA-145 reward/combat channel split unchanged. (2) `StatsPanel.tsx` dog name `<Text>` now reads `{player.dog.name} ({player.dog.hp}/{player.dog.hpMax})` matching the golem row format. `DogCompanion` already carried `hp`/`hpMax` — no type changes needed.
+  - **Why:** Both are tiny copy/UI affordance gaps that broke the read of the screen for the player. The HIT/MISS label was a leftover from before Aethercraft had its own narration — the discipline-aware switch is the kind of wording the player can dictate verbatim. The dog HP omission was an oversight at OTA-145 (golem got it; dog didn't) — symmetry restored.
+  - **Files:** `app/state/gameStore.ts` (runAethercraft outcome label), `app/components/StatsPanel.tsx` (dog name HP suffix).
 
 #### Hook puzzles — broken-contract issue closed across 4 OTAs
 
