@@ -2784,4 +2784,50 @@
 // .dogRescueTipFired field), app/state/gameStore
 // .ts (hint check in stepDirection after the
 // travel-lore beat).
-export const OTA_BUILD_ID = '2026-05-28-139';
+//
+// 2026-05-28 OTA-140 — Hub-room key collision fix.
+// Longest-deferred architectural item in HANDOFF
+// 0.A — open since OTA-080 (deferred), 60+ OTAs
+// ago. Pre-fix, makeRoomKey omitted hubRoomId from
+// the key, so hub interiors that shared
+// locationId + microMicroId + mapX/mapY collided.
+// Asgardar's chandelier study, armory, and atlas
+// hall all sit on the same central tile under
+// the same location — a noun consumed in one
+// greyed in the others. OTA-076 self-heal masked
+// the symptom for investigation tables but climb
+// markers, searchedAmbientNouns, flavor
+// ExhaustedNouns, dogSmelledHere, and consumed-
+// list writes all corrupted across rooms.
+//
+// Fix: makeRoomKey gains an optional 5th
+// parameter, hubRoomId. When set, the key gains
+// an "@hubId" suffix that disambiguates hub
+// interiors. When null/undefined (non-hub
+// scenes), the key shape is unchanged from
+// pre-OTA-140 — old saves' per-room state loads
+// through cleanly without migration.
+//
+// Bulk-updated all 31 makeRoomKey callers in
+// gameStore.ts to consistently pass
+// `player.hubRoomId` (or the equivalent in scope:
+// `livePlayer.hubRoomId`). TypeScript backward-
+// compatible — the parameter is optional, so any
+// future caller that forgets it still compiles
+// (and gets the non-hub key shape, which is what
+// you'd want for any scene where you don't have a
+// hubRoomId).
+//
+// New regression test __tests__/hubRoomKey
+// Collision.test.ts (3 tests) locks the behavior:
+// two hub interiors at same coords produce
+// DISTINCT keys; non-hub keys keep their legacy
+// shape; legacy saves load through cleanly.
+//
+// 44/44 chaos-sim regression tests pass + 3
+// hub-room tests. TS clean.
+//
+// Files: app/state/gameStore.ts (makeRoomKey
+// signature + 31 call-site updates), __tests__/
+// hubRoomKeyCollision.test.ts (NEW).
+export const OTA_BUILD_ID = '2026-05-28-140';

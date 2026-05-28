@@ -1468,7 +1468,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    const roomKey = makeRoomKey(player.currentLocationId, scene.microMicroId, player.mapX, player.mapY);
+    const roomKey = makeRoomKey(player.currentLocationId, scene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
     const room = state.worldMemory.visitedRooms?.[roomKey];
     const ambientLower = ambientHit.toLowerCase();
     // Portability gate runs BEFORE the dedup check so the catalog
@@ -1585,7 +1585,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    const roomKey = makeRoomKey(player.currentLocationId, scene.microMicroId, player.mapX, player.mapY);
+    const roomKey = makeRoomKey(player.currentLocationId, scene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
     const room = state.worldMemory.visitedRooms?.[roomKey];
     const ambientLower = ambientHit.toLowerCase();
     const alreadyConsumed = nonClimbMarkers(room?.searchedAmbientNouns).some(
@@ -2170,6 +2170,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       scene.microMicroId,
       player.mapX,
       player.mapY,
+      player.hubRoomId,
     );
     set((s) => {
       const room = s.worldMemory.visitedRooms?.[roomKey];
@@ -2304,7 +2305,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // long ago) repopulate normally — Tartaria doesn't stay quiet
     // forever. Pulls from the visitedRooms MapGraph + player.hoursElapsed.
     const RESPAWN_QUIET_HOURS = 6;
-    const candidateKey = makeRoomKey(player.currentLocationId, microMicroId, player.mapX, player.mapY);
+    const candidateKey = makeRoomKey(player.currentLocationId, microMicroId, player.mapX, player.mapY, player.hubRoomId);
     const priorVisit = worldMemory.visitedRooms?.[candidateKey];
     const hoursElapsed = player.hoursElapsed ?? 0;
     // Prefer the in-game hour delta when available so idling in real
@@ -2405,6 +2406,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         microMicroId,
         player.mapX,
         player.mapY,
+        player.hubRoomId,
       );
       const ref = findReferenceableInvestigation(
         (worldMemory.visitedRooms ?? {}) as Record<string, { roomInvestigationTable?: VisitedRoom['roomInvestigationTable'] }>,
@@ -2684,6 +2686,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         scene.microMicroId,
         player.mapX,
         player.mapY,
+        player.hubRoomId,
       );
       set((s) => {
         const prev = s.worldMemory.visitedRooms?.[investigateRoomKey];
@@ -2784,6 +2787,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           scene.microMicroId,
           livePlayer.mapX,
           livePlayer.mapY,
+          livePlayer.hubRoomId,
         );
         const room = get().worldMemory.visitedRooms?.[roomKey];
         if (!room?.dogSmelledHere) {
@@ -4423,6 +4427,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 currentScene.microMicroId,
                 player.mapX,
                 player.mapY,
+                player.hubRoomId,
               );
               const loweredFallback = rawTarget.toLowerCase().trim();
               set((s) =>
@@ -4509,6 +4514,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               currentScene.microMicroId,
               player.mapX,
               player.mapY,
+              player.hubRoomId,
             );
             const fallbackPrior = get().worldMemory.visitedRooms?.[fallbackRoomKey];
             const loweredFallback = rawTarget.toLowerCase().trim();
@@ -4574,6 +4580,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               currentScene.microMicroId,
               player.mapX,
               player.mapY,
+              player.hubRoomId,
             );
             const fallbackPrior = get().worldMemory.visitedRooms?.[fallbackRoomKey];
             const loweredFallback = rawTarget.toLowerCase().trim();
@@ -4726,6 +4733,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               currentScene.microMicroId,
               player.mapX,
               player.mapY,
+              player.hubRoomId,
             );
             const harvestPrior = get().worldMemory.visitedRooms?.[harvestRoomKey];
             const harvestLowered = harvestAmbient.toLowerCase();
@@ -5008,6 +5016,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               currentScene.microMicroId,
               player.mapX,
               player.mapY,
+              player.hubRoomId,
             );
             let tableRoom = get().worldMemory.visitedRooms?.[tableRoomKey];
             // 2026-05-26 OTA-076 — self-heal for legacy rooms.
@@ -5309,6 +5318,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               currentScene.microMicroId,
               player.mapX,
               player.mapY,
+              player.hubRoomId,
             );
             const searchPrior = get().worldMemory.visitedRooms?.[searchRoomKey];
             // 2026-05-25 [POLISH-3] — also check flavorExhaustedNouns so a
@@ -5585,6 +5595,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             currentScene.microMicroId,
             player.mapX,
             player.mapY,
+            player.hubRoomId,
           );
           const priorVisit = get().worldMemory.visitedRooms?.[searchRoomKey];
           const loweredTarget = rawTarget.toLowerCase().trim();
@@ -5615,6 +5626,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               currentScene.microMicroId,
               player.mapX,
               player.mapY,
+              player.hubRoomId,
             );
             // HANDOFF #15c — same gate as digHere: a bespoke drop from
             // this room doesn't reappear if the player already grabbed it.
@@ -7455,6 +7467,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           currentScene.microMicroId,
           player.mapX,
           player.mapY,
+          player.hubRoomId,
         );
         // OTA 046 — marker-parse logic moved into engine/climbHeight
         // (maxClimbedTier) so the climb modal can read the same
@@ -8452,7 +8465,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
-        const dropKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY);
+        const dropKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
         const dropOne: InventoryItem = { ...item, quantity: 1 };
         // Remove one from player inventory.
         const newInventory = player.inventory
@@ -8487,7 +8500,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       case 'pickup': {
         const target = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
-        const dropKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY);
+        const dropKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
         const room = get().worldMemory.visitedRooms?.[dropKey];
         const dropped = room?.droppedItems ?? [];
         if (dropped.length === 0) {
@@ -8503,7 +8516,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (target) {
             const ambientHit = matchAmbientNoun(target, currentScene.ambientNouns ?? []);
             if (ambientHit) {
-              const ambientRoomKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY);
+              const ambientRoomKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
               const ambientRoom = get().worldMemory.visitedRooms?.[ambientRoomKey];
               const ambientLower = ambientHit.toLowerCase();
               // Portability gate before dedup so the catalog lookup
@@ -8636,7 +8649,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           get().appendLog('arbiter', `The Arbiter raises a brow. "Open what? Name the chest, crate, or door."`);
           break;
         }
-        const dropKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY);
+        const dropKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
         const room = get().worldMemory.visitedRooms?.[dropKey] ?? {
           firstVisitAt: Date.now(),
           lastVisitAt: Date.now(),
@@ -9461,6 +9474,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               currentScene.microMicroId,
               player.mapX,
               player.mapY,
+              player.hubRoomId,
             );
             const investRoom = get().worldMemory.visitedRooms?.[investRoomKey];
             const investPrior = investRoom?.flavorExhaustedNouns ?? [];
@@ -9662,6 +9676,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               currentScene.microMicroId,
               player.mapX,
               player.mapY,
+              player.hubRoomId,
             );
             // OTA-098 — same apostrophe-variant write as the
             // success arm so the chip greys regardless of which
@@ -10077,7 +10092,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // narration can reference it ("you cleared this room before"). Pure
     // bookkeeping; doesn't yet suppress respawns.
     {
-      const roomKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY);
+      const roomKey = makeRoomKey(player.currentLocationId, currentScene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
       const rooms = worldMemory.visitedRooms ?? {};
       const room = rooms[roomKey];
       if (room) {
@@ -12762,7 +12777,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // change. Without this hook, stepping back to a previously-
     // vandalized tile would silently skip the narration even though
     // the engine state is still on disk.
-    const reentryKey = makeRoomKey(player.currentLocationId, scene.microMicroId, step.x, step.y);
+    const reentryKey = makeRoomKey(player.currentLocationId, scene.microMicroId, step.x, step.y, player.hubRoomId);
     const visited = get().worldMemory.visitedRooms?.[reentryKey];
     if (visited && (visited.droppedItems?.length || visited.containersOpened?.length)) {
       if (visited.droppedItems?.length) {
@@ -13285,7 +13300,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // small-rock / coin / cloth scrap pool. Mark 'floor' as searched
     // for this room so the Investigate chip greys out on success.
     if (player.hubRoomId) {
-      const floorRoomKey = makeRoomKey(player.currentLocationId, scene?.microMicroId, player.mapX, player.mapY);
+      const floorRoomKey = makeRoomKey(player.currentLocationId, scene?.microMicroId, player.mapX, player.mapY, player.hubRoomId);
       const floorRoom = get().worldMemory.visitedRooms?.[floorRoomKey];
       const alreadyChecked = (floorRoom?.searchedAmbientNouns ?? []).includes('floor');
       if (alreadyChecked) {
@@ -13382,7 +13397,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // visit. The dig itself is still re-rollable engine-side
     // (stamina-throttled, no per-spot lockout); the chip is just
     // a UI signal that the player has worked the ground here.
-    const groundRoomKey = makeRoomKey(player.currentLocationId, scene?.microMicroId, player.mapX, player.mapY);
+    const groundRoomKey = makeRoomKey(player.currentLocationId, scene?.microMicroId, player.mapX, player.mapY, player.hubRoomId);
     set((s) => {
       const room = s.worldMemory.visitedRooms?.[groundRoomKey] ?? {
         firstVisitAt: Date.now(),
@@ -13448,7 +13463,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // re-found because they're commodities, not bespoke drops.
     const dugCat = lookupCraftedItem(found.name);
     const isStackableCommodity = dugCat.kind === 'consumable' || dugCat.kind === 'misc';
-    const dugRoomKey = makeRoomKey(player.currentLocationId, scene?.microMicroId, player.mapX, player.mapY);
+    const dugRoomKey = makeRoomKey(player.currentLocationId, scene?.microMicroId, player.mapX, player.mapY, player.hubRoomId);
     if (!isStackableCommodity && roomLootAlreadyGrabbed(get().worldMemory, dugRoomKey, found.name)) {
       get().appendLog(
         'world',
@@ -13543,6 +13558,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       scene.microMicroId,
       player.mapX,
       player.mapY,
+      player.hubRoomId,
     );
 
     const narrationLines: string[] = [];
@@ -15541,11 +15557,28 @@ function makeRoomKey(
   microMicroId: string | null | undefined,
   mapX: number | null | undefined,
   mapY: number | null | undefined,
+  hubRoomId?: string | null | undefined,
 ): string {
+  // OTA-140 — hubRoomId added to the key. Pre-OTA-140, hub interiors
+  // that shared locationId + microMicroId + mapX/mapY (chandelier
+  // study + armory + atlas hall in Asgardar all sit on the same
+  // central tile under the same location) collided on the same
+  // per-room state. OTA-076 self-heal masked the symptom for
+  // investigation tables (regenerated on demand if missing), but
+  // climb markers, searchedAmbientNouns, flavorExhaustedNouns,
+  // dogSmelledHere, and roomInvestigationTable.consumed all WROTE
+  // through the colliding key — a noun consumed in the chandelier
+  // study greyed in the armory too. The hubRoomId disambiguates
+  // hub interiors cleanly. Existing non-hub callers pass undefined
+  // / null and get the same key shape they used to ("locId@mm@x,y"
+  // with no trailing @hubId), so old saves' per-room state is
+  // preserved exactly. Hub-interior callers now get the
+  // disambiguated key "locId@mm@x,y@hubId".
   const mm = microMicroId ?? '_';
   const x = typeof mapX === 'number' ? mapX : '_';
   const y = typeof mapY === 'number' ? mapY : '_';
-  return `${locationId}@${mm}@${x},${y}`;
+  const hubSuffix = hubRoomId ? `@${hubRoomId}` : '';
+  return `${locationId}@${mm}@${x},${y}${hubSuffix}`;
 }
 
 // v2.4.1 (OTA 027) — strip per-tier climb markers from a
@@ -16874,6 +16907,7 @@ function narrateAmbientFind(
     scene.microMicroId,
     livePlayer.mapX,
     livePlayer.mapY,
+    livePlayer.hubRoomId,
   ) : null;
   const roomState = roomKey ? get().worldMemory.visitedRooms?.[roomKey] : undefined;
   const isFirstInvestigate = !roomState?.firstInvestigateDone;
@@ -17018,7 +17052,7 @@ function repromptUnknownTarget(
   // the player just salvaged the gate.
   const playerNow = get().player;
   const roomKey = playerNow
-    ? makeRoomKey(playerNow.currentLocationId, scene.microMicroId, playerNow.mapX, playerNow.mapY)
+    ? makeRoomKey(playerNow.currentLocationId, scene.microMicroId, playerNow.mapX, playerNow.mapY, playerNow.hubRoomId)
     : null;
   const roomConsumed = roomKey
     ? get().worldMemory.visitedRooms?.[roomKey]
@@ -17132,7 +17166,7 @@ function narrateCasualLook(
   // Resets when the player moves to a new room (new roomKey) so each
   // fresh instance presents its full noun set on first look.
   const lookRoomKey = player
-    ? makeRoomKey(player.currentLocationId, scene.microMicroId, player.mapX, player.mapY)
+    ? makeRoomKey(player.currentLocationId, scene.microMicroId, player.mapX, player.mapY, player.hubRoomId)
     : null;
   const lookRoom = lookRoomKey ? get().worldMemory.visitedRooms?.[lookRoomKey] : null;
   // v2.4.1 (OTA 023) — robust consumed-noun detection. The prior
