@@ -78,6 +78,15 @@
     { "name": "Resonant Song Phial", "kind": "consumable", "rarity": "Uncommon", "tags": ["consumable", "aether", "crafted", "healing"], "description": "Resonant Song Phial. A glass phial holding distilled Aetheric Song. Cracking the seal releases a calming chord that knits flesh and quiets the nerves.",
       "effect": { "kind": "consumable", "healHP": 6, "restoreStamina": 2 } },
     { "name": "Iron-Worm Engine", "kind": "relic", "rarity": "Rare", "tags": ["relic", "construct", "crafted"], "description": "Iron-Worm Engine. A palm-sized scavenger drone forged around an iron core. Hums and ticks in the pack, marking nearby relics with a quiet click." },
-    { "name": "Voidspawn Bolt", "kind": "relic", "rarity": "Rare", "tags": ["relic", "thrown", "aether", "crafted"], "description": "Voidspawn Bolt. A glass-cased Voidspawn egg primed with an energy fragment. Heavy in the hand. Reclaimer field manuals warn against carrying more than two." }
+    { "name": "Voidspawn Bolt", "kind": "relic", "rarity": "Rare", "tags": ["relic", "thrown", "aether", "crafted"], "description": "Voidspawn Bolt. A glass-cased Voidspawn egg primed with an energy fragment. Heavy in the hand. Reclaimer field manuals warn against carrying more than two." },
+
+    { "name": "Smoke-Cured Jerky Strip", "kind": "consumable", "rarity": "Common", "tags": ["food", "treat", "dog_treat"], "description": "A long ribbon of smoke-cured mud-meat. Tough, salty, keeps for weeks. A favorite of any dog willing to negotiate.",
+      "effect": { "kind": "consumable", "healHP": 2, "restoreStamina": 1, "dogTreat": true } },
+    { "name": "Marrow Bone", "kind": "consumable", "rarity": "Uncommon", "tags": ["food", "treat", "dog_treat"], "description": "A heavy bone, split lengthwise, the marrow still pink and rich. Dogs lose their minds for it.",
+      "effect": { "kind": "consumable", "healHP": 4, "restoreStamina": 2, "dogTreat": true } },
+    { "name": "Honey-Glazed Knuckle", "kind": "consumable", "rarity": "Rare", "tags": ["food", "treat", "dog_treat", "baker"], "description": "A roasted knuckle bone glazed in dark honey by a hub baker who specialises in scraps for the city's strays. Sticky, sweet, deeply unfair to refuse.",
+      "effect": { "kind": "consumable", "healHP": 6, "restoreStamina": 3, "dogTreat": true } },
+    { "name": "Ash-Cured Tongue", "kind": "consumable", "rarity": "Legendary", "tags": ["food", "treat", "dog_treat", "reclaimer"], "description": "A Reclaimer ceremonial cut — beast tongue cured in cold ash and resin. Believed to carry a sliver of the animal's loyalty into whoever eats it. They feed it to their dogs on the night before a hunt.",
+      "effect": { "kind": "consumable", "healHP": 10, "restoreStamina": 4, "dogTreat": true } }
   ]
 }

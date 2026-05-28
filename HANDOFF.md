@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-121` (Dog Companion implementation IN PROGRESS — Phase 1 foundation checkpoint. Agent still running in background; DogCompanion type, central module, parser-state-machine for Arbiter onboarding, and gameStore wiring landed. TS clean, working tree compiles. Phases 2-6 + tutorial + stress tests pending; subsequent stop-hook checkpoints will roll as OTA-122/123/...). See **Section 0** for the live issue tracker covering OTA-070 → OTA-121.
+> **Latest OTA:** `2026-05-27-122` (Dog Companion Phase 4 + Phase 5 mid-flight checkpoint — agent still actively writing. Treats authored in gear.json + scattered into loot tables; feed/heal/use-on-dog verbs wired; tutorial step landed; 4 vests in NEW dogGear.json; CallDogModal.tsx + Character Companion panel + Title slot sub-line + Inventory tagging + dog gear equip flow + dog persistence. TS clean. Final OTA closes the wave on agent completion). See **Section 0** for the live issue tracker covering OTA-070 → OTA-122.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.

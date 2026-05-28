@@ -511,6 +511,15 @@ export function TitleScreen() {
         <Text style={styles.slotMeta}>
           {raceLabel(item.raceId)} · {locationLabel(item.locationId)}
         </Text>
+        {/* OTA-120 Phase 5 — dog sub-line. Shows the active companion's
+            name + breed when the save has one, so the player can pick
+            the right character at a glance. Slots with no dog (or
+            abandoned/dead dogs) render the same as before. */}
+        {item.dogName && (
+          <Text style={styles.slotDogLine}>
+            └─ {item.dogName} ({item.dogBreed ?? 'dog'})
+          </Text>
+        )}
         <Text style={styles.slotMeta}>
           HP {item.hp}/{item.hpMax}
         </Text>
@@ -999,6 +1008,8 @@ const styles = StyleSheet.create({
   // Warm-gold to distinguish from the gray meta rows + signal it's
   // the main-quest beat.
   slotObjective: { color: '#c9a86a', fontSize: 12, marginTop: 4, fontStyle: 'italic' },
+  // OTA-120 Phase 5 — dog sub-line styling.
+  slotDogLine: { color: '#c9a86a', fontSize: 11, marginTop: 2, letterSpacing: 0.5 },
   deadActions: { flexDirection: 'row', gap: 6, marginTop: 8 },
   copyLogBtn: {
     backgroundColor: '#1a1714',

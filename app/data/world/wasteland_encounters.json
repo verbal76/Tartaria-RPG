@@ -10,7 +10,8 @@
       { "name": "Trail Rations", "weight": 40, "min": 1, "max": 2, "kind": "consumable", "tags": ["food"] },
       { "name": "Scrap Metal", "weight": 30, "min": 1, "max": 3, "kind": "misc", "tags": ["metal"] },
       { "name": "Patched Cloth", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["cloth"] },
-      { "name": "Worn Tartarian Coin", "weight": 10, "min": 1, "max": 3, "kind": "misc", "tags": ["currency","ancient"] }
+      { "name": "Worn Tartarian Coin", "weight": 10, "min": 1, "max": 3, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Smoke-Cured Jerky Strip", "weight": 12, "min": 1, "max": 2, "kind": "consumable", "tags": ["food","treat","dog_treat"] }
     ],
     "lore_note": "A note tucked under the bench reads: 'East three days, the Pillars. We didn't make it.'"
   },
@@ -60,7 +61,9 @@
     "loot": [
       { "name": "Scrap Metal", "weight": 40, "min": 1, "max": 2, "kind": "misc", "tags": ["metal"] },
       { "name": "Aether Residue", "weight": 30, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","distillable"] },
-      { "name": "Patched Cloth", "weight": 30, "min": 1, "max": 1, "kind": "misc", "tags": ["cloth"] }
+      { "name": "Patched Cloth", "weight": 30, "min": 1, "max": 1, "kind": "misc", "tags": ["cloth"] },
+      { "name": "Smoke-Cured Jerky Strip", "weight": 10, "min": 1, "max": 1, "kind": "consumable", "tags": ["food","treat","dog_treat"] },
+      { "name": "Marrow Bone", "weight": 6, "min": 1, "max": 1, "kind": "consumable", "tags": ["food","treat","dog_treat"] }
     ]
   },
 
@@ -96,7 +99,8 @@
       { "name": "Trail Rations", "weight": 30, "min": 1, "max": 2, "kind": "consumable", "tags": ["food"] },
       { "name": "Scrap Metal", "weight": 25, "min": 1, "max": 3, "kind": "misc", "tags": ["metal"] },
       { "name": "Worn Tartarian Coin", "weight": 25, "min": 3, "max": 8, "kind": "misc", "tags": ["currency","ancient"] },
-      { "name": "Aether Crystal", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","crystal"] }
+      { "name": "Aether Crystal", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Honey-Glazed Knuckle", "weight": 6, "min": 1, "max": 1, "kind": "consumable", "tags": ["food","treat","dog_treat","baker"] }
     ],
     "lore_note": "Note reads: 'If you find this, keep walking east. Three days, look for the standing stone — the one with the chip on its crown. There's something buried at its base. I never made it back.'"
   },

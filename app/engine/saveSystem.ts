@@ -29,6 +29,13 @@ export interface SlotSummary {
   factionId?: string;
   mainQuestPhase?: string;
   mainQuestCoresRecovered?: number;
+  /** OTA-120 Phase 5 — dog snapshot for the TitleScreen slot tile.
+   *  Lets the player pick the right save at a glance when multiple
+   *  characters carry different companions. Only populated when the
+   *  save has an active dog (status with_player / waiting_at_base);
+   *  abandoned / dead dogs leave these fields undefined. */
+  dogName?: string;
+  dogBreed?: string;
 }
 
 // Install-wide stash (not per-character). Stores resources that persist
@@ -184,6 +191,15 @@ export async function saveSlot(slotId: string, state: SaveState): Promise<void> 
       factionId: state.player.factionId,
       mainQuestPhase: state.player.mainQuest?.phase,
       mainQuestCoresRecovered: state.player.mainQuest?.coresRecovered?.length ?? 0,
+      // OTA-120 Phase 5 — dog snapshot. Only populate when the dog is
+      // actively with the player (not abandoned / dead) so the slot tile
+      // doesn't dangle a name the player has already lost.
+      dogName: state.player.dog && state.player.dog.status !== 'abandoned' && state.player.dog.status !== 'dead'
+        ? state.player.dog.name
+        : undefined,
+      dogBreed: state.player.dog && state.player.dog.status !== 'abandoned' && state.player.dog.status !== 'dead'
+        ? state.player.dog.breed
+        : undefined,
     };
     await upsertIndexEntry(summary);
   }

@@ -290,6 +290,46 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'your current target. Enemy retaliation hits the golem, not you. When it falls it dissolves ' +
       'back into its fuel material. Type `dismiss golem` any time. One golem at a time.',
   },
+  // OTA-120 Phase 4 — Dog Companion walkthrough step.
+  {
+    screen: 'exploration',
+    area: 'fullscreen',
+    title: 'Your dog',
+    body:
+      'Tartaria offers ONE canine companion per save. Find them by investigating a "cage" at a ' +
+      'forge ruin, a "wagon wheel" at a roadside camp, a "cellar door" at a buried structure, or ' +
+      'a "snare pit" in the wilderness — each hooks a captor fight, faction-neutral (no rep ' +
+      'penalty). Defeat the captor and the Arbiter walks you through three questions: what kind ' +
+      'of dog is that (free text — your answer IS the breed), what will you name them (free ' +
+      'text), and boy/girl (free text — drives narration pronouns).' +
+      '\n\nCombat. Your dog occupies a weapon-like row in the action menu, labeled with their ' +
+      'name: tap to BITE (d20 + STR vs AC, 1d6 + ½STR piercing) or DISTRACT (d20 + DEX/INT vs ' +
+      'DC 12 — your next attack on that enemy gets +2). Bite trains STR; distract trains DEX ' +
+      'or INT. Enemy retaliation splits between you, the dog, and any active golem.' +
+      '\n\nDog + golem. They coexist — both fight together. The first co-activation prints a ' +
+      'one-line flavor beat ("wide arc, both will fight") then it\'s mechanical from there.' +
+      '\n\nClimbing. Dogs can\'t climb. The moment you start a climb the dog drops to ' +
+      'waiting_at_base; on `climb down` they rejoin you. No stamina hit, no rep hit.' +
+      '\n\nSmell-find. On scene entry the dog rolls d20 + INT vs DC 12. Success surfaces ONE ' +
+      'hidden investigation noun the visible scene was missing — a buried bone, a faint scent ' +
+      'trail, a tossed bottle. Trains INT. One sniff per room.' +
+      '\n\nHunger. The dog loses 1 loyalty per 4 in-game hours WITHOUT a feed. Threshold beats ' +
+      'fire at 50 / 30 / 15. At 0, the dog ABANDONS — permanent. No safety net for abandonment.' +
+      '\n\nFeeding. `feed dog <item>` consumes 1 of any consumable for +20 loyalty (+40 if the ' +
+      'item is a [treat] — Smoke-Cured Jerky Strip / Marrow Bone / Honey-Glazed Knuckle / Ash-' +
+      'Cured Tongue). `heal dog <item>` and `use <item> on dog` also work — same flow, picks ' +
+      'up healHP from the consumable\'s effect block.' +
+      '\n\nGear. Dog vests live in the [fits dog] inventory tag — Burlap (+1 AC), Riveted ' +
+      'Leather (+2), Aetheric Padded (+3, reflects 1 corruption per hit), Reclaimer Pattern ' +
+      '(+4, +1 STR, faction drop). Equip via the Character screen Companion panel.' +
+      '\n\nDeath. Combat-death is recoverable: Resurrection Gems revive dogs the same as players, ' +
+      'and if you have none, the engine queues a one-shot puppy-vendor encounter that fires after ' +
+      'your next Core Guardian victory. Late-game (all 9 Guardians cleared) the fallback becomes ' +
+      'a "rubble puppy" hook on wasteland scenes. Either path runs the same Arbiter onboarding. ' +
+      'Abandonment via hunger has no bail-out — feed the dog, or lose them for good.' +
+      '\n\nCall. Type `call dog` or `call <name>` to open the Call Modal — scratch their ear ' +
+      '(+2 loyalty), give a treat (opens a picker; +20/+40), or speak softly (+1 loyalty).',
+  },
   // 2026-05-25 OTA-031 — skill growth is now a real player-facing
   // system (use-based progression, progressively harder), surfaced
   // on the Character Screen with a 20-segment bar.

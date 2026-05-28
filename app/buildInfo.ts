@@ -2036,4 +2036,51 @@
 // Files: app/engine/types.ts, app/engine/dogCompanion.ts
 // (NEW), app/engine/parser.ts, app/engine/llmParser.ts,
 // app/state/gameStore.ts.
-export const OTA_BUILD_ID = '2026-05-27-121';
+//
+// 2026-05-27 OTA-122 — Dog Companion Phase 4 + Phase 5 in
+// progress, mid-flight checkpoint. Continuation agent
+// still actively writing (transcript hot, TS clean).
+//
+// What's landed since OTA-121 (per tree state):
+//   Phase 4 — hunger / treats / tutorial:
+//     - app/data/items/gear.json — 4 new treats authored
+//       (Smoke-Cured Jerky Strip / Marrow Bone / Honey-
+//       Glazed Knuckle / Ash-Cured Tongue) with dogTreat
+//       flag
+//     - app/data/world/wasteland_encounters.json — treats
+//       scattered into loot tables
+//     - app/engine/crafting.ts, app/engine/itemEffect.ts —
+//       dogTreat flag plumbed through the catalog +
+//       effect resolver
+//     - app/state/gameStore.ts — feed dog / heal dog / use
+//       on dog verb handlers + hunger decay tick
+//     - app/components/tutorialSteps.ts — new "Your dog"
+//       step (after Golem sidekicks); user/linter touched
+//       this file alongside the agent's edit, preserved
+//     - __tests__/dogHungerDecay.test.ts — NEW
+//
+//   Phase 5 — UI surfaces + vests + stat growth:
+//     - app/data/items/dogGear.json — NEW, 4 vests
+//       (Burlap / Riveted Leather / Aetheric Padded /
+//       Reclaimer Pattern) with kind: dog_armor
+//     - app/components/CallDogModal.tsx — NEW, three-
+//       option call modal (scratch / treat / speak)
+//     - app/screens/TitleScreen.tsx — character slot tile
+//       sub-line for dog name + breed
+//     - app/screens/CharacterScreen.tsx — Companion panel
+//       beneath player stats
+//     - app/screens/InventoryScreen.tsx — [fits dog] and
+//       [treat] tagging
+//     - app/engine/equipment.ts — dog gear equip flow
+//     - app/engine/saveSystem.ts — dog persistence
+//     - App.tsx — tutorial / modal routing
+//     - __tests__/dogStatGrowth.test.ts — NEW
+//
+// Agent is still working — Phase 4/5 completion + any
+// remaining stress tests will land in the next OTA when
+// it reports done. The full-game stress sweep follows.
+//
+// TS clean at this checkpoint.
+//
+// Files: 12 modified + 3 new (full list above).
+export const OTA_BUILD_ID = '2026-05-27-122';

@@ -23,6 +23,7 @@ import { VendorScreen } from './app/screens/VendorScreen';
 import { ActionReferenceScreen } from './app/screens/ActionReferenceScreen';
 import { ContractsScreen } from './app/screens/ContractsScreen';
 import { TutorialOverlay } from './app/components/TutorialOverlay';
+import { CallDogModal } from './app/components/CallDogModal';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
 import { startAudioController, stopAudioController } from './app/audio/AudioController';
 import { initTTSManager } from './app/voice/TTSManager';
@@ -221,6 +222,11 @@ export default function App() {
           positioning matches measureInWindow coords from the targets
           (which report screen-absolute, not safe-area-relative). */}
       <TutorialOverlay />
+      {/* OTA-120 Phase 5 — CallDogModal. Globally mounted so the
+          parser intercept on `call dog` / `call <name>` can open it
+          from any screen the player happens to be on. The modal
+          self-gates on `callDogModalOpen`. */}
+      <CallDogModal />
     </SafeAreaProvider>
   );
 }

@@ -259,6 +259,77 @@ export function CharacterScreen() {
           })()}
         </View>
 
+        {/* ── COMPANION (dog) ───────────────────────────────────── */}
+        {/* OTA-120 Phase 5 — Companion panel. Renders only when an
+            active dog exists (not abandoned, not dead). Tap the row to
+            open the CallDogModal. */}
+        {player.dog && player.dog.status !== 'abandoned' && player.dog.status !== 'dead' && (() => {
+          const dog = player.dog;
+          const sexGlyph = dog.sex.pronoun === 'he' ? '♂' : dog.sex.pronoun === 'she' ? '♀' : '⚥';
+          const hpPctDog = dog.hpMax > 0 ? dog.hp / dog.hpMax : 0;
+          const loyaltyPct = Math.max(0, Math.min(1, dog.loyalty / 100));
+          const hpColorDog = hpPctDog > 0.5 ? '#9ec96a' : hpPctDog > 0.25 ? '#c9a86a' : '#e07a5f';
+          const loyaltyColor = loyaltyPct > 0.5 ? '#9ec96a' : loyaltyPct > 0.3 ? '#c9a86a' : '#e07a5f';
+          const vestName = dog.equipped?.vest;
+          // Render stat progress as a fractional 20-segment bar (mirrors player).
+          const statProgressBar = (stat: 'strength' | 'dexterity' | 'intelligence') => {
+            const pct = Math.max(0, Math.min(1, (dog.statProgress?.[stat] ?? 0) / 100));
+            const filled = Math.round(pct * 20);
+            return '▰'.repeat(filled) + '▱'.repeat(20 - filled);
+          };
+          return (
+            <>
+              <Text style={styles.sectionTitle}>COMPANION</Text>
+              <TouchableOpacity
+                style={styles.card}
+                onPress={() => useGameStore.getState().openCallDogModal()}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.name}>
+                  {dog.name} <Text style={{ color: '#c9a86a' }}>{sexGlyph}</Text>
+                </Text>
+                <Text style={styles.subline}>
+                  {dog.breed} · {dog.status === 'waiting_at_base' ? 'waiting at base' : 'with you'}
+                </Text>
+                <View style={styles.barRow}>
+                  <Text style={styles.barLabel}>HP</Text>
+                  <View style={styles.barBg}>
+                    <View style={[styles.barFill, { width: `${Math.max(0, hpPctDog * 100)}%`, backgroundColor: hpColorDog }]} />
+                  </View>
+                  <Text style={styles.barValue}>{dog.hp}/{dog.hpMax}</Text>
+                </View>
+                <View style={styles.barRow}>
+                  <Text style={styles.barLabel}>LOY</Text>
+                  <View style={styles.barBg}>
+                    <View style={[styles.barFill, { width: `${Math.max(0, loyaltyPct * 100)}%`, backgroundColor: loyaltyColor }]} />
+                  </View>
+                  <Text style={styles.barValue}>{dog.loyalty}/100</Text>
+                </View>
+                {(['strength', 'dexterity', 'intelligence'] as const).map((stat) => (
+                  <View key={stat} style={styles.statRow}>
+                    <Text style={styles.statKey}>{stat.slice(0, 3).toUpperCase()}</Text>
+                    <View style={styles.statBody}>
+                      <Text style={styles.statTotal}>{dog.stats[stat]}</Text>
+                      <Text style={styles.progressBar}>
+                        {statProgressBar(stat)}  <Text style={styles.progressPct}>{Math.round((dog.statProgress?.[stat] ?? 0))}%</Text>
+                      </Text>
+                    </View>
+                  </View>
+                ))}
+                <View style={styles.slotRow}>
+                  <Text style={styles.slotLabel}>Vest</Text>
+                  <View style={styles.slotBody}>
+                    <Text style={vestName ? styles.slotName : styles.slotEmpty}>
+                      {vestName ?? '—'}
+                    </Text>
+                  </View>
+                </View>
+                <Text style={styles.contractTap}>tap to call ›</Text>
+              </TouchableOpacity>
+            </>
+          );
+        })()}
+
         {/* ── STATUS EFFECTS ────────────────────────────────────── */}
         {(player.statusEffects ?? []).length > 0 && (
           <>

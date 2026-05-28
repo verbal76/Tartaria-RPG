@@ -869,7 +869,30 @@ function advanceTime(player: PlayerCharacter, hours: number): PlayerCharacter {
   const newBucket = Math.floor(newHours / 8);
   const ticks = Math.max(0, newBucket - oldBucket);
   const newHunger = Math.min(5, (player.hungerStaminaPenalty ?? 0) + ticks);
-  return { ...player, hoursElapsed: newHours, hungerStaminaPenalty: newHunger };
+  // OTA-120 Phase 4 — dog loyalty decay. Every 4 in-game hours WITHOUT
+  // a feed costs the dog 1 loyalty. Crossing thresholds 50/30/15/0
+  // fires escalating Arbiter beats; 0 = abandonment. Threshold beats
+  // and the abandonment write are emitted by the caller via
+  // tickDogLoyalty (this helper stays pure for the hundreds of
+  // advanceTime call sites). The narration / state mutation pass is
+  // applied immediately after every set({ player: advanceTime(...) })
+  // via a microtask hooked off submitPlayerAction's `_opts`-less
+  // path. To keep this strictly local: we ONLY decay the loyalty
+  // number here; thresholds are surfaced by the gameStore loop.
+  let dog = player.dog;
+  if (dog && (dog.status === 'with_player' || dog.status === 'waiting_at_base')) {
+    const lastFed = dog.lastFedAtHour ?? 0;
+    const oldGap = Math.max(0, oldHours - lastFed);
+    const newGap = Math.max(0, newHours - lastFed);
+    const oldDecayBucket = Math.floor(oldGap / 4);
+    const newDecayBucket = Math.floor(newGap / 4);
+    const decayTicks = Math.max(0, newDecayBucket - oldDecayBucket);
+    if (decayTicks > 0) {
+      const newLoyalty = Math.max(0, dog.loyalty - decayTicks);
+      dog = { ...dog, loyalty: newLoyalty };
+    }
+  }
+  return { ...player, hoursElapsed: newHours, hungerStaminaPenalty: newHunger, dog };
 }
 
 function restoreStamina(player: PlayerCharacter, amount: number): PlayerCharacter {
@@ -1198,6 +1221,17 @@ interface GameStore {
    *  Only valid when mainQuest.phase === 'choice'. Final. */
   chooseEndingMainQuest: (ending: 'seal' | 'unleash' | 'preserve') => void;
 
+  /** OTA-120 Phase 5 — CallDogModal visibility flag. Set by the parser
+   *  intercept for `call dog` / `call <name>`; cleared by the modal's
+   *  CLOSE button or after the player picks an option. */
+  callDogModalOpen: boolean;
+  openCallDogModal: () => void;
+  closeCallDogModal: () => void;
+  /** OTA-120 Phase 5 — apply one CallDogModal option. treatItemName
+   *  is the catalog name of the consumable for the 'treat' option;
+   *  ignored for 'scratch' / 'speak'. */
+  selectCallDogOption: (option: 'scratch' | 'treat' | 'speak', treatItemName?: string) => void;
+
   persist: () => Promise<void>;
 }
 
@@ -1261,6 +1295,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
   qwenModelId: qwen.getModelId(),
   partialArbiterText: null,
   isGenerating: false,
+
+  // OTA-120 Phase 5 — CallDogModal visibility flag.
+  callDogModalOpen: false,
+  openCallDogModal: () => set({ callDogModalOpen: true }),
+  closeCallDogModal: () => set({ callDogModalOpen: false }),
+  selectCallDogOption: (option, treatItemName) => {
+    handleCallDogOption(get, set, option, treatItemName);
+    set({ callDogModalOpen: false });
+    void get().persist();
+  },
 
   async hydrate() {
     // One-shot migration from the v1 single-slot save, if present.
@@ -3452,6 +3496,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // for time tracking ("how long does each encounter take? time is
     // important"). The engine has the data — just wasn't logging it.
     const hoursBefore = player.hoursElapsed ?? 0;
+    // OTA-120 Phase 4 — snapshot dog loyalty so the post-action sweep
+    // can detect threshold crossings (50/30/15/0) the advanceTime call
+    // chain causes. advanceTime itself stays pure (no logging) since it
+    // runs in dozens of code paths; threshold beats fire once here at
+    // the end of submitPlayerAction.
+    const dogLoyaltyBefore = player.dog?.loyalty ?? 0;
 
     // Tick all active status effects one round. Bleed-style DOTs deal
     // damage, expired effects drop off, and incapacitation (stun / paralyze)
@@ -3665,6 +3715,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // OTA-120 — Dog Companion combat dispatch.
     if (parsed.intent === 'dog_bite' || parsed.intent === 'dog_distract') {
       handleDogCombat(get, set, parsed.intent, parsed.target);
+      void get().persist();
+      return;
+    }
+    // OTA-120 Phase 4 — `feed dog <item>` / `heal dog <item>` /
+    // `use <item> on dog` intercepts. These short-circuit the normal
+    // parser dispatch so the rest/eat/use handlers don't try to
+    // apply the consumable to the player.
+    if (tryDogApplyVerb(get, set, trimmed)) {
+      void get().persist();
+      return;
+    }
+    // OTA-120 Phase 5 — `call dog` / `call <name>` opens the
+    // CallDogModal. Intercepted before the diplomacy verb-pool can
+    // swallow `call` as a generic speak verb.
+    if (tryDogCallVerb(get, set, trimmed)) {
       void get().persist();
       return;
     }
@@ -5964,6 +6029,52 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ),
           );
           set({ player: restedPlayer });
+          // OTA-120 Phase 4 — shared rest beat for an active dog: +5
+          // loyalty + HP heal (same 2 HP/h rate as the player) + rest
+          // flavor line. Only fires when the dog is with the player or
+          // waiting at base (not abandoned, not dead). Updates
+          // lastFedAtHour ONLY when the player ate during the rest;
+          // sleeping next to the dog doesn't reset the hunger clock
+          // (the spec is explicit that abandonment risk comes from
+          // missing meals, not from missing pets).
+          {
+            const liveDogPlayer = get().player;
+            const restDog = liveDogPlayer?.dog;
+            if (
+              liveDogPlayer
+              && restDog
+              && (restDog.status === 'with_player' || restDog.status === 'waiting_at_base')
+            ) {
+              const dogHpHeal = Math.min(
+                Math.max(0, restDog.hpMax - restDog.hp),
+                hours * 2,
+              );
+              const newDogLoyalty = Math.min(100, restDog.loyalty + 5);
+              const restoredStatus = restDog.status === 'waiting_at_base'
+                ? 'with_player' as const
+                : restDog.status;
+              set((s) => s.player && s.player.dog
+                ? {
+                    player: {
+                      ...s.player,
+                      dog: {
+                        ...s.player.dog,
+                        hp: s.player.dog.hp + dogHpHeal,
+                        loyalty: newDogLoyalty,
+                        status: restoredStatus,
+                      },
+                    },
+                  }
+                : s);
+              get().appendLog(
+                'world',
+                applyDogPronouns(
+                  `${restDog.name} circles three times and curls beside you. {Possessive} breathing slows to yours.`,
+                  restDog.sex.pronoun,
+                ),
+              );
+            }
+          }
           // OTA 039 — tier-cross line on rest decay.
           if (corrDecay > 0) {
             // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -7062,6 +7173,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
               'world',
               `You climb down from the ${overlayMeta.overlayId === 'open_sky' ? 'lookout' : overlayMeta.overlayId.replace(/_/g, ' ')} and rejoin the ground beside the ${climbedName}. Boots back on the ground.`,
             );
+            // OTA-120 Phase 3 — dog auto-rejoins on climb-down.
+            rejoinDogOnDescent(get, set);
             break;
           }
           set((s) => s.currentScene ? { currentScene: { ...s.currentScene, elevatedOn: null } } : s);
@@ -7070,6 +7183,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             'world',
             `You make your way back down the ${downFrom}. Boots back on the ground.`,
           );
+          // OTA-120 Phase 3 — dog auto-rejoins on climb-down.
+          rejoinDogOnDescent(get, set);
           break;
         }
         // Strip leading prepositions ("climb up the pole" → "pole",
@@ -7400,6 +7515,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : s.currentScene,
             };
           });
+          // OTA-120 Phase 3 — dog can't climb. On the FIRST tier of a
+          // climb (currentTier becomes 1 from 0), drop the dog to
+          // 'waiting_at_base' so it sits at the climb origin and isn't
+          // narrated as carrying up the wall. The dog rejoins on
+          // `climb down` via the descent block (above). Idempotent —
+          // re-entering this branch on tier 2+ doesn't re-mark.
+          {
+            const livePlayer = get().player;
+            if (livePlayer?.dog && livePlayer.dog.status === 'with_player') {
+              const dog = livePlayer.dog;
+              set((s) => s.player && s.player.dog
+                ? { player: { ...s.player, dog: { ...s.player.dog, status: 'waiting_at_base' as const } } }
+                : s);
+              get().appendLog(
+                'world',
+                applyDogPronouns(
+                  `${dog.name} eyes the ${tgt}, then settles at its base. {Pronoun} {isOrAre} not built for the climb.`,
+                  dog.sex.pronoun,
+                ),
+              );
+            }
+          }
           // 2026-05-27 OTA-089 — elevated overlay roll. If the
           // chance fires AND we're at the top tier, swap the
           // scene for a mini-area (nook/vantage/roost/etc.)
@@ -8753,6 +8890,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           : `${Math.floor(dt / 24)}d ${Math.round(dt % 24)}h`;
       get().appendLog('system', `⏳ Time passed: ${label}`);
     }
+    // OTA-120 Phase 4 — dog loyalty threshold check. Fires AFTER all
+    // advanceTime calls in the action have settled, so a single action
+    // that pushes loyalty across multiple thresholds (e.g. an 8h rest
+    // while at 32 loyalty drops to 30 and emits the 30-beat) fires
+    // exactly once.
+    dogThresholdCheck(get, set, dogLoyaltyBefore);
     void get().persist();
   },
 
@@ -17694,6 +17837,320 @@ function handleDogCombat(
       `${liveTarget.name} swings at ${retaliateTarget === 'dog' ? liveDog.name : retaliateTarget === 'golem' ? livePlayer.golem?.name ?? 'the golem' : 'you'} and misses.`,
     );
   }
+}
+
+// ----- OTA-120 Phase 3 / 4 helpers -------------------------------------
+
+/** Bring a dog back from waiting_at_base when the player climbs down.
+ *  No-op when the dog isn't waiting, is dead, or is abandoned. */
+function rejoinDogOnDescent(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+): void {
+  const player = get().player;
+  const dog = player?.dog;
+  if (!dog || dog.status !== 'waiting_at_base' || dog.hp <= 0) return;
+  set((s) => s.player && s.player.dog
+    ? { player: { ...s.player, dog: { ...s.player.dog, status: 'with_player' as const } } }
+    : s);
+  get().appendLog(
+    'world',
+    applyDogPronouns(
+      `${dog.name} stands and stretches as you hit the ground. {Pronoun} {hasOrHave} waited.`,
+      dog.sex.pronoun,
+    ),
+  );
+}
+
+// Loyalty thresholds we narrate when the dog crosses DOWN through them.
+// 50 / 30 / 15 / 0; 0 fires the abandonment flow once.
+const DOG_LOYALTY_THRESHOLDS = [50, 30, 15, 0] as const;
+
+/** Inspect the dog's loyalty after an advanceTime tick. If it has
+ *  crossed one of the threshold values DOWN (oldLoyalty > T && newLoyalty <= T),
+ *  emit the matching beat. At 0, mark the dog 'abandoned' and surface
+ *  the goodbye line. Idempotent on already-abandoned / dead dogs.
+ *  Caller is responsible for snapshotting oldLoyalty before the
+ *  advanceTime call. The store hooks this into every turn via the
+ *  post-action sweep below. */
+function dogThresholdCheck(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  oldLoyalty: number,
+): void {
+  const player = get().player;
+  const dog = player?.dog;
+  if (!dog) return;
+  if (dog.status === 'abandoned' || dog.status === 'dead') return;
+  const newLoyalty = dog.loyalty;
+  if (newLoyalty >= oldLoyalty) return;
+  for (const t of DOG_LOYALTY_THRESHOLDS) {
+    if (oldLoyalty > t && newLoyalty <= t) {
+      if (t === 50) {
+        get().appendLog(
+          'world',
+          applyDogPronouns(
+            `${dog.name} starts ranging wider. {Pronoun} {isOrAre} hungry — the trail bends toward anything that smells like food.`,
+            dog.sex.pronoun,
+          ),
+        );
+      } else if (t === 30) {
+        get().appendLog(
+          'arbiter',
+          applyDogPronouns(
+            `The Arbiter glances at ${dog.name}. "{Pronoun} {hasOrHave} ribs showing. Feed {object}, soon."`,
+            dog.sex.pronoun,
+          ),
+        );
+      } else if (t === 15) {
+        get().appendLog(
+          'world',
+          applyDogPronouns(
+            `${dog.name} won't meet your eye. {Pronoun} {isOrAre} thin as wire and falling behind on the trail.`,
+            dog.sex.pronoun,
+          ),
+        );
+      } else if (t === 0) {
+        // Abandonment — set status, narrate goodbye, do NOT set
+        // puppyVendorOwed (user spec: no-bail-out).
+        set((s) => s.player && s.player.dog
+          ? { player: { ...s.player, dog: { ...s.player.dog, status: 'abandoned' as const } } }
+          : s);
+        get().appendLog(
+          'world',
+          applyDogPronouns(
+            `You wake to find no warm weight at your back. ${dog.name}{contraction} gone.`,
+            dog.sex.pronoun,
+          ),
+        );
+      }
+    }
+  }
+}
+
+/** Apply ONE inventory item to the dog. Consumes 1 of the item; applies
+ *  HP from the consumable effect (if any); bumps loyalty by +20 (regular
+ *  consumable) or +40 (dogTreat: true). Returns true on success, false
+ *  on failure (no dog, dog dead/abandoned, item not found, etc.). Mode
+ *  picks the narration verb ('feed' / 'heal' / 'use'); mechanics are
+ *  identical across modes. */
+function applyItemToDog(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  itemName: string,
+  mode: 'feed' | 'heal' | 'use',
+): boolean {
+  const player = get().player;
+  if (!player) return false;
+  const dog = player.dog;
+  if (!dog) {
+    get().appendLog('arbiter', `"No dog at your side," the Arbiter says.`);
+    return false;
+  }
+  if (dog.status === 'abandoned' || dog.status === 'dead') {
+    get().appendLog('arbiter', `"That dog is gone," the Arbiter says.`);
+    return false;
+  }
+  // Resolve item from inventory by name (case-insensitive substring).
+  const lower = itemName.toLowerCase().trim();
+  const item = player.inventory.find((i) =>
+    i.quantity > 0 && (
+      i.name.toLowerCase() === lower
+      || i.name.toLowerCase().includes(lower)
+    ),
+  );
+  if (!item) {
+    get().appendLog('arbiter', `"No '${itemName}' in your pack to give," the Arbiter says.`);
+    return false;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { resolveItemEffect } = require('../engine/itemEffect');
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { findGearByName, findExplorationItemByName, findMaterialByName } = require('../engine/crafting');
+  const fx = resolveItemEffect(item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
+  // Loyalty delta: +40 if dogTreat, +20 for regular food/consumable,
+  // +5 baseline for anything else routed through 'use on dog'.
+  const isDogTreat = !!(fx && fx.kind === 'consumable' && (fx as { dogTreat?: boolean }).dogTreat === true);
+  const isConsumable = !!(fx && fx.kind === 'consumable') || item.kind === 'consumable';
+  const loyaltyGain = isDogTreat ? 40 : (isConsumable ? 20 : 5);
+  // HP heal: pull healHP from the consumable effect if present.
+  const healAmount = fx && fx.kind === 'consumable' && (fx as { healHP?: number }).healHP
+    ? Math.min(Math.max(0, dog.hpMax - dog.hp), (fx as { healHP: number }).healHP)
+    : 0;
+  // Consume 1 of the item.
+  const newInventory = player.inventory
+    .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))
+    .filter((i) => i.quantity > 0);
+  const newLoyalty = Math.min(100, dog.loyalty + loyaltyGain);
+  const newHp = dog.hp + healAmount;
+  const fedHour = player.hoursElapsed ?? 0;
+  set((s) => s.player && s.player.dog
+    ? {
+        player: {
+          ...s.player,
+          inventory: newInventory,
+          dog: {
+            ...s.player.dog,
+            hp: newHp,
+            loyalty: newLoyalty,
+            lastFedAtHour: isConsumable ? fedHour : (s.player.dog.lastFedAtHour ?? fedHour),
+          },
+        },
+      }
+    : s);
+  const verb = mode === 'heal' ? 'patch up' : mode === 'use' ? 'use the' : 'feed';
+  const tailParts: string[] = [];
+  if (healAmount > 0) tailParts.push(`+${healAmount} HP`);
+  tailParts.push(`+${loyaltyGain} loyalty`);
+  const tail = tailParts.join(', ');
+  get().appendLog(
+    'world',
+    isDogTreat
+      ? `You hand ${dog.name} the ${item.name}. ${applyDogPronouns(`{Pronoun} crunch{contraction === "'s" ? "es" : ""} it down whole, tail thumping. (${tail})`, dog.sex.pronoun)}`
+      : mode === 'heal'
+        ? `You ${verb} ${dog.name} with the ${item.name}. (${tail})`
+        : mode === 'use'
+          ? `You ${verb} ${item.name} on ${dog.name}. (${tail})`
+          : `You ${verb} ${dog.name} the ${item.name}. ${applyDogPronouns(`{Pronoun} eat{contraction === "'s" ? "s" : ""}, slow and serious. (${tail})`, dog.sex.pronoun)}`,
+  );
+  return true;
+}
+
+/** Dispatcher for `feed dog <item>` / `heal dog <item>` / `use <item>
+ *  on dog`. Parses the raw input, extracts the item name, routes to
+ *  applyItemToDog. Returns true when the input matched a dog
+ *  application form (so the caller can short-circuit the normal parser
+ *  dispatch). */
+function tryDogApplyVerb(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  rawInput: string,
+): boolean {
+  const lower = rawInput.toLowerCase().trim();
+  if (!lower) return false;
+  // Pattern 1: "feed dog <item>" / "feed <dog name> <item>"
+  // Pattern 2: "heal dog <item>" / "heal <dog name> <item>"
+  // Pattern 3: "use <item> on dog" / "use <item> on <dog name>"
+  // Pattern 4: bare "feed <item>" / "heal <item>" with dog active and no
+  //            other obvious target — we conservatively decline (the
+  //            existing rest/heal path on the player should win).
+  const dog = get().player?.dog;
+  const dogName = dog?.name.toLowerCase() ?? '';
+  const dogTokens = new Set<string>(['dog']);
+  if (dogName) dogTokens.add(dogName);
+  // "use <item> on (dog|<name>)"
+  const useMatch = /^use\s+(.+?)\s+on\s+(\S+)$/i.exec(lower);
+  if (useMatch) {
+    const item = useMatch[1]!.trim();
+    const target = useMatch[2]!.trim();
+    if (dogTokens.has(target)) {
+      applyItemToDog(get, set, item, 'use');
+      return true;
+    }
+  }
+  // "feed dog <item>" / "feed <name> <item>"
+  const feedMatch = /^feed\s+(\S+)\s+(.+)$/i.exec(lower);
+  if (feedMatch) {
+    const target = feedMatch[1]!.trim();
+    const item = feedMatch[2]!.trim();
+    if (dogTokens.has(target)) {
+      applyItemToDog(get, set, item, 'feed');
+      return true;
+    }
+  }
+  // "heal dog <item>" / "heal <name> <item>"
+  const healMatch = /^heal\s+(\S+)\s+(.+)$/i.exec(lower);
+  if (healMatch) {
+    const target = healMatch[1]!.trim();
+    const item = healMatch[2]!.trim();
+    if (dogTokens.has(target)) {
+      applyItemToDog(get, set, item, 'heal');
+      return true;
+    }
+  }
+  return false;
+}
+
+// CallDogModal options. Triggered by `call dog` / `call <dogname>`.
+// Three options: scratch ear (+2), give treat (opens pack picker UI;
+// engine-side just applies a treat by name), speak softly (+1).
+export type CallDogOption = 'scratch' | 'treat' | 'speak';
+
+/** Handle one CallDogModal selection. Scratch / Speak are pure
+ *  loyalty bumps; Treat takes an itemName and routes through
+ *  applyItemToDog so the +20/+40 loyalty math runs through one
+ *  place. Idempotent on dead / abandoned. */
+function handleCallDogOption(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  option: CallDogOption,
+  treatItemName?: string,
+): void {
+  const player = get().player;
+  if (!player) return;
+  const dog = player.dog;
+  if (!dog) return;
+  if (dog.status === 'abandoned' || dog.status === 'dead') return;
+  if (option === 'scratch') {
+    const newLoyalty = Math.min(100, dog.loyalty + 2);
+    set((s) => s.player && s.player.dog
+      ? { player: { ...s.player, dog: { ...s.player.dog, loyalty: newLoyalty } } }
+      : s);
+    get().appendLog(
+      'world',
+      applyDogPronouns(
+        `You scratch ${dog.name} behind the ear. {Pronoun} lean{contraction === "'s" ? "s" : ""} into your hand and close{contraction === "'s" ? "s" : ""} {possessive} eyes. (+2 loyalty)`,
+        dog.sex.pronoun,
+      ),
+    );
+  } else if (option === 'speak') {
+    const newLoyalty = Math.min(100, dog.loyalty + 1);
+    set((s) => s.player && s.player.dog
+      ? { player: { ...s.player, dog: { ...s.player.dog, loyalty: newLoyalty } } }
+      : s);
+    get().appendLog(
+      'world',
+      applyDogPronouns(
+        `You speak softly to ${dog.name}. {Pronoun} watch{contraction === "'s" ? "es" : ""} your mouth, then {possessive} tail thumps once. (+1 loyalty)`,
+        dog.sex.pronoun,
+      ),
+    );
+  } else if (option === 'treat' && treatItemName) {
+    applyItemToDog(get, set, treatItemName, 'feed');
+  }
+  // 1 minute of game time per spec.
+  set((s) => s.player
+    ? { player: advanceTime(s.player, 1 / 60) }
+    : s);
+}
+
+/** Parser intercept for `call <dogname>` / `call dog`. When matched,
+ *  opens the CallDogModal by setting a UI flag in state. Returns true
+ *  when handled. */
+function tryDogCallVerb(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  rawInput: string,
+): boolean {
+  const lower = rawInput.toLowerCase().trim();
+  const dog = get().player?.dog;
+  if (!dog) return false;
+  if (dog.status === 'abandoned' || dog.status === 'dead') return false;
+  const dogName = dog.name.toLowerCase();
+  // Patterns: "call dog" / "call <name>" / "here dog" / "here <name>"
+  const match = /^(call|here|come)\s+(\S+)$/i.exec(lower);
+  if (!match) return false;
+  const target = match[2]!.trim();
+  if (target !== 'dog' && target !== dogName) return false;
+  set(() => ({ callDogModalOpen: true }));
+  get().appendLog(
+    'world',
+    applyDogPronouns(
+      `You call ${dog.name}. {Pronoun} trot{contraction === "'s" ? "s" : ""} over and waits for what you have in mind.`,
+      dog.sex.pronoun,
+    ),
+  );
+  return true;
 }
 
 /** Phase 6: queue the puppy vendor for the next outdoor scene. Called

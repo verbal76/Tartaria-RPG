@@ -254,6 +254,50 @@ export function InventoryScreen() {
         tone: 'primary',
       });
     }
+    // OTA-120 Phase 5 — dog-targeted actions. Equip vests on the dog
+    // (kind 'dog_armor'); feed consumables to the dog (any consumable
+    // — the treat-vs-regular delta is calculated in the engine). Only
+    // surface when an active dog exists.
+    const dogActive = !!player?.dog
+      && player.dog.status !== 'abandoned'
+      && player.dog.status !== 'dead';
+    if (dogActive && pending.item.kind === 'dog_armor') {
+      buttons.push({
+        label: 'Equip on dog',
+        onPress: () => {
+          // Route via submitPlayerAction so the engine's equip-on-dog
+          // path can grow without UI changes. Falls back to direct
+          // state mutation since no parser intent exists yet for
+          // dog-equip (Phase 5 deferred a dedicated verb).
+          const p = useGameStore.getState().player;
+          if (!p?.dog) { closeModal(); return; }
+          useGameStore.setState((s) => s.player && s.player.dog
+            ? {
+                player: {
+                  ...s.player,
+                  dog: {
+                    ...s.player.dog,
+                    equipped: { vest: pending.item.name },
+                  },
+                },
+              }
+            : s);
+          useGameStore.getState().appendLog('world', `You strap the ${pending.item.name} onto ${p.dog.name}.`);
+          closeModal();
+        },
+        tone: 'primary',
+      });
+    }
+    if (dogActive && isConsumable) {
+      buttons.push({
+        label: 'Feed to dog',
+        onPress: () => {
+          useGameStore.getState().submitPlayerAction(`feed dog ${pending.item.name}`);
+          closeModal();
+        },
+        tone: 'primary',
+      });
+    }
     // SCRAP — only for built items with material content. Hidden for
     // raw stock (already material) and for items currently equipped
     // (would leave a phantom slot).
@@ -404,6 +448,18 @@ function ItemRow({
   onPress: () => void;
 }) {
   const canEquip = validSlotsForItem(item).length > 0;
+  // OTA-120 Phase 5 — dog-related tagging.
+  // [fits dog] for dog_armor items; [treat] for consumables flagged
+  // dogTreat in their catalog effect (or tagged with 'dog_treat' /
+  // 'treat' on the inventory item itself for items dropped before
+  // the catalog row existed).
+  const fitsDog = item.kind === 'dog_armor';
+  const isTreat = (item.tags ?? []).includes('dog_treat') || (() => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { findGearByName } = require('../engine/crafting');
+    const gear = findGearByName(item.name);
+    return gear?.effect?.kind === 'consumable' && gear.effect.dogTreat === true;
+  })();
   return (
     <TouchableOpacity
       style={styles.row}
@@ -420,6 +476,8 @@ function ItemRow({
         </View>
         <View style={styles.rowMetaRow}>
           {item.rarity && <Text style={styles.rowMeta}>{item.rarity}</Text>}
+          {fitsDog && <Text style={[styles.rowMeta, styles.rowDogTag]}>[fits dog]</Text>}
+          {isTreat && <Text style={[styles.rowMeta, styles.rowDogTag]}>[treat]</Text>}
           {/* OTA 028 — surface the weapon's damage dice next to
               durability so the player can compare swords at a
               glance without opening a details modal. Playtester:
@@ -522,6 +580,9 @@ const styles = StyleSheet.create({
   // OTA 028 — damage dice chip in green so it pops as the
   // "how hard does this hit" signal at a glance.
   rowDamage: { color: '#9ec96a' },
+  // OTA-120 Phase 5 — [fits dog] / [treat] tag styling. Amber so they
+  // stand out from the grey rarity / durability metadata.
+  rowDogTag: { color: '#c9a86a', fontWeight: '700' },
   rowEquipped: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   rowEquippable: { color: '#7a705c', fontSize: 10, letterSpacing: 1, fontStyle: 'italic' },
   empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 30 },

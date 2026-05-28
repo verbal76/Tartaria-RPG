@@ -1,0 +1,44 @@
+{
+  "_description": "OTA-120 Phase 5 — Dog Companion armor catalog. All entries are kind: 'dog_armor' so the engine routes them to the dog's vest slot (player.dog.equipped.vest) rather than any player slot. acBonus stacks onto the dog's base AC (11) the same way player armor stacks onto base AC. statBonus on the Reclaimer Pattern Vest grants the dog +1 STR while worn (read by the dog combat path). reflectsCorruption is a future hook (Phase 5 / Phase 6) for the Aetheric Padded Vest's 1-corruption-per-hit reflection.",
+  "dogGear": [
+    {
+      "name": "Burlap Vest",
+      "kind": "dog_armor",
+      "rarity": "Common",
+      "acBonus": 1,
+      "baseDurability": 18,
+      "tags": ["dog_armor", "vest", "burlap"],
+      "description": "A scrap of stitched burlap belted across the dog's chest. Cheap, scratchy, and the closest thing to armor most strays will ever see."
+    },
+    {
+      "name": "Riveted Leather Vest",
+      "kind": "dog_armor",
+      "rarity": "Uncommon",
+      "acBonus": 2,
+      "baseDurability": 24,
+      "tags": ["dog_armor", "vest", "leather"],
+      "description": "Boiled leather panels riveted onto a heavy canvas frame. Smells of tannin and old work. A vendor's craft, not a make-do."
+    },
+    {
+      "name": "Aetheric Padded Vest",
+      "kind": "dog_armor",
+      "rarity": "Rare",
+      "acBonus": 3,
+      "reflectsCorruption": 1,
+      "baseDurability": 28,
+      "tags": ["dog_armor", "vest", "aether", "padded"],
+      "description": "Lined with Aetheric padding that hums faintly under the hand. The fabric drinks one mote of corruption off every hit and returns it to the air."
+    },
+    {
+      "name": "Reclaimer Pattern Vest",
+      "kind": "dog_armor",
+      "rarity": "Legendary",
+      "acBonus": 4,
+      "statBonus": { "stat": "strength", "amount": 1 },
+      "faction": "reclaimers",
+      "baseDurability": 32,
+      "tags": ["dog_armor", "vest", "reclaimer", "faction"],
+      "description": "Standard-issue Reclaimer hound vest — plated leather over an iron-stitched chest piece, the Reclaimer rune burned into the shoulder. Grants +4 AC and +1 STR. Only drops from Reclaimer-aligned encounters."
+    }
+  ]
+}

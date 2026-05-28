@@ -10,6 +10,12 @@ import { corruptionTierOf, corruptionStatPenalty } from './corruption';
  */
 export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   const nameLower = item.name.toLowerCase();
+  // OTA-120 Phase 5 — dog vests have kind 'dog_armor' and never go in
+  // any player slot. The Inventory screen surfaces a [fits dog] tap-to-
+  // equip-on-dog affordance instead. Returning [] here ensures the
+  // generic "vest" regex below (which would otherwise route to
+  // 'chest') doesn't grab them onto the player.
+  if (item.kind === 'dog_armor') return [];
   if (findWeaponByName(item.name)) {
     return ['main', 'off']; // any weapon can go in either hand
   }

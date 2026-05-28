@@ -10,6 +10,7 @@ import recipesData from '../data/items/recipes.json';
 import amuletsData from '../data/items/amulets.json';
 import ringsData from '../data/items/rings.json';
 import explorationData from '../data/items/exploration.json';
+import dogGearData from '../data/items/dogGear.json';
 import { inferWeapon, inferArmor, inferAccessory } from './itemDefaults';
 
 export interface CatalogMaterial {
@@ -73,6 +74,25 @@ export interface CatalogGear {
   effect?: ItemEffect;
 }
 
+/** OTA-120 Phase 5 — Dog armor (vest) catalog row. All entries are
+ *  `kind: 'dog_armor'` so the engine routes them to the dog's vest
+ *  slot rather than the player's chest. acBonus stacks onto the dog's
+ *  base AC; statBonus optionally bumps one of the dog's three stats
+ *  while the vest is worn; reflectsCorruption is the Aetheric Padded
+ *  Vest's hook for the Phase 5 / Phase 6 corruption-reflect mechanic. */
+export interface CatalogDogGear {
+  name: string;
+  kind: 'dog_armor';
+  rarity: Rarity;
+  acBonus: number;
+  baseDurability?: number;
+  statBonus?: { stat: 'strength' | 'dexterity' | 'intelligence'; amount: number };
+  reflectsCorruption?: number;
+  faction?: string;
+  tags: string[];
+  description: string;
+}
+
 /** Exploration items — the catalog the OTA 192 audit identified as
  *  the largest orphan source (78 of 96 had no mechanical hook).
  *  After OTA 192 every row may carry an `effect` field that drives
@@ -118,6 +138,14 @@ export const GEAR = (gearData as { gear: CatalogGear[] }).gear;
 export const RECIPES = (recipesData as { recipes: Recipe[] }).recipes;
 export const AMULETS = (amuletsData as { amulets: CatalogAccessory[] }).amulets;
 export const RINGS = (ringsData as { rings: CatalogAccessory[] }).rings;
+/** OTA-120 Phase 5 — dog vest catalog. 4 entries (Burlap / Riveted /
+ *  Aetheric / Reclaimer). Read by the dog-equip flow on the Character
+ *  screen Companion panel and the Inventory `[fits dog]` tag. */
+export const DOG_GEAR = (dogGearData as { dogGear: CatalogDogGear[] }).dogGear;
+export function findDogGearByName(name: string): CatalogDogGear | undefined {
+  const lower = name.toLowerCase();
+  return DOG_GEAR.find((g) => g.name.toLowerCase() === lower);
+}
 // Note: exploration.json is a bare top-level array, unlike the
 // other catalogs which wrap in { weapons: [...] }, { armor: [...] },
 // etc. Don't try to unwrap.
