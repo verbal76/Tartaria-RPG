@@ -2629,4 +2629,14 @@
 // Files: app/state/gameStore.ts (1-line + comment
 // fix in puzzle-solve branch), __tests__/
 // hookPuzzleE2E.test.ts (2 .failing flipped to it).
-export const OTA_BUILD_ID = '2026-05-28-132';
+//
+// 2026-05-28 OTA-133 — isCataloguedElsewhere guard
+// adds DOG_GEAR. Defensive add: current vest names
+// (Burlap / Riveted Leather / Aetheric Padded /
+// Reclaimer Pattern) don't trip the weapon/armor
+// inference regex today, but future vests with
+// weapon-y or armor-y keyword names would slip past
+// the OTA-110 guard. One-line add at crafting.ts:329
+// closes the path. 41/41 targeted tests pass. TS
+// clean. Files: app/engine/crafting.ts.
+export const OTA_BUILD_ID = '2026-05-28-133';

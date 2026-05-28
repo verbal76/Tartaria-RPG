@@ -327,6 +327,13 @@ function isCataloguedElsewhere(name: string, exclude: 'weapon' | 'armor' | 'amul
   if (MATERIALS.some((m) => m.name.toLowerCase() === t)) return true;
   if (EXPLORATION.some((x) => x.name.toLowerCase() === t)) return true;
   if (GEAR.some((g) => g.name.toLowerCase() === t)) return true;
+  // OTA-133 — defensive add: DOG_GEAR is a separate catalog (4 vests
+  // in OTA-122). Current vest names (Burlap / Riveted Leather /
+  // Aetheric Padded / Reclaimer Pattern) don't trip the weapon/
+  // armor inference regex today, but a future vest named e.g.
+  // "Plated Vest" or "Bladed Harness" would slip past the guard.
+  // Including DOG_GEAR closes that path before authoring opens it.
+  if (DOG_GEAR.some((g) => g.name.toLowerCase() === t)) return true;
   return false;
 }
 
