@@ -8,9 +8,17 @@
 // and the player wants to keep playing under the ending — a deferred
 // option that lets the player continue exploring post-Choice without
 // closing the run yet).
+//
+// OTA-151 — Added the HOMEWARD beat. A new HEAD HOME ▸ button drops
+// the player into a 3-paragraph "heading home" narrative referencing
+// the dog (if alive) + golem (if alive) + the player's faction
+// people — fades in from black, holds ~7s, fades out to title. This
+// is the placeholder bridge into the Buried Skyscraper expansion;
+// once that ships, the fade will land the player at the Outskirts
+// entrance instead of bouncing to title.
 
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { endingLine, LOST_CAPITAL_LOCATIONS } from '../engine/mainQuest';
 import racesData from '../data/races/races.json';
@@ -33,9 +41,48 @@ function capitalLabel(id: string): string {
   return map[id] ?? id;
 }
 
+// OTA-151 — homeward narrative. Faction-neutral wording so it lands
+// the same regardless of which ending the player chose, but it
+// references the dog + golem if they're alive so the beat feels
+// like THIS character's homeward walk, not a generic credits roll.
+function buildHomewardBeats(player: {
+  name: string;
+  factionId: string;
+  dog?: { name: string; status: string } | null;
+  golem?: { name: string; hp: number } | null;
+}): string[] {
+  const peopleByFaction: Record<string, string> = {
+    reclaimers_guild: 'the guild',
+    forgotten_order: 'the Cloister',
+    mud_monarchs: 'the family',
+    true_tartarians: 'the Hall',
+    eternal_dynasty: 'the dynasty',
+    conspiracy_architects: 'the cell',
+    servants_of_giants: 'the vigil',
+    stone_builders: 'the workshop',
+    tartarian_revivalists: 'the cell',
+  };
+  const peopleLabel = peopleByFaction[player.factionId] ?? 'your people';
+  const dogActive = player.dog && player.dog.status !== 'abandoned' && player.dog.status !== 'dead';
+  const golemActive = player.golem && player.golem.hp > 0;
+
+  const companionPhrase: string =
+    dogActive && golemActive ? `${player.dog!.name} at your heel, ${player.golem!.name} a half-step behind`
+    : dogActive ? `${player.dog!.name} at your heel`
+    : golemActive ? `${player.golem!.name} a half-step behind`
+    : 'the road empty beside you';
+
+  return [
+    `You turn your back on the Nexus, and the chamber holds its breath behind you. The Stair lifts you the way it took you down — slower, this time, because you are carrying something heavier than the Cores were.`,
+    `${player.name} walks east toward ${peopleLabel}, ${companionPhrase}. The fog over the Outskirts thins as the light comes up — Tartaria, the buried country, fading at your back the way an old argument fades when you finally stop having it.`,
+    `Somewhere ahead, in the Buried Cities, a doorway you have never noticed waits for you. Not today. Today you are going home.`,
+  ];
+}
+
 export function EndingScreen() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
+  const [stage, setStage] = useState<'splash' | 'homeward'>('splash');
 
   if (!player || !player.mainQuest || player.mainQuest.phase !== 'ended' || !player.mainQuest.ending) {
     // Defensive — somehow on the ending screen without an ending.
@@ -48,6 +95,10 @@ export function EndingScreen() {
         </TouchableOpacity>
       </View>
     );
+  }
+
+  if (stage === 'homeward') {
+    return <HomewardSplash player={player} onDone={() => setScreen('title')} />;
   }
 
   const ending = player.mainQuest.ending;
@@ -110,14 +161,63 @@ export function EndingScreen() {
             <Text style={styles.btnText}>BACK TO TITLE</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.btn}
-            onPress={() => setScreen('exploration')}
+            style={[styles.btn, styles.btnPrimary]}
+            onPress={() => setStage('homeward')}
             activeOpacity={0.7}
           >
-            <Text style={styles.btnText}>KEEP EXPLORING</Text>
+            <Text style={styles.btnText}>HEAD HOME ▸</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
+    </View>
+  );
+}
+
+// OTA-151 — HomewardSplash. Plays the 3-paragraph homeward beat
+// with a slow fade-in from black, holds ~7 seconds, then fades out
+// to the title screen. Placeholder for the Buried Skyscraper
+// expansion entry — once that ships, onDone routes the player to
+// the Outskirts entrance instead of bouncing to title.
+function HomewardSplash({
+  player,
+  onDone,
+}: {
+  player: NonNullable<ReturnType<typeof useGameStore.getState>['player']>;
+  onDone: () => void;
+}) {
+  const opacity = useRef(new Animated.Value(0)).current;
+  const beats = buildHomewardBeats({
+    name: player.name,
+    factionId: player.factionId,
+    dog: player.dog,
+    golem: player.golem,
+  });
+
+  useEffect(() => {
+    // Fade in (2.0s) → hold (7.0s) → fade out (2.0s) → onDone.
+    Animated.sequence([
+      Animated.timing(opacity, { toValue: 1, duration: 2000, useNativeDriver: true }),
+      Animated.delay(7000),
+      Animated.timing(opacity, { toValue: 0, duration: 2000, useNativeDriver: true }),
+    ]).start(({ finished }) => {
+      if (finished) onDone();
+    });
+  }, [opacity, onDone]);
+
+  return (
+    <View style={styles.homewardContainer}>
+      <Animated.View style={[styles.homewardBody, { opacity }]}>
+        {beats.map((line, i) => (
+          <Text key={i} style={styles.homewardLine}>{line}</Text>
+        ))}
+        <Text style={styles.homewardTag}>· · ·</Text>
+      </Animated.View>
+      {/* Tap-anywhere skip — bounces straight to title. */}
+      <TouchableOpacity
+        style={styles.skipOverlay}
+        onPress={onDone}
+        activeOpacity={1}
+      />
     </View>
   );
 }
@@ -150,6 +250,34 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     alignItems: 'center',
   },
+  btnPrimary: { backgroundColor: '#2a1f12' },
   btnText: { color: '#c9a86a', fontSize: 12, letterSpacing: 2, fontWeight: '700' },
   placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80, fontSize: 14 },
+  // OTA-151 — Homeward splash. Full-black backdrop, large prose
+  // centered vertically, slow fade.
+  homewardContainer: {
+    flex: 1,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    paddingHorizontal: 28,
+  },
+  homewardBody: { alignItems: 'stretch' },
+  homewardLine: {
+    color: '#e6d8b3',
+    fontSize: 15,
+    lineHeight: 26,
+    marginBottom: 18,
+    fontStyle: 'italic',
+  },
+  homewardTag: {
+    color: '#7a705c',
+    fontSize: 18,
+    letterSpacing: 8,
+    textAlign: 'center',
+    marginTop: 12,
+  },
+  skipOverlay: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0, bottom: 0,
+  },
 });

@@ -3360,4 +3360,64 @@
 // Files: app/screens/TitleScreen.tsx
 // (EndingBadgesRow Mastery branch +
 // styles).
-export const OTA_BUILD_ID = '2026-05-28-150';
+//
+// 2026-05-28 OTA-151 — Buried Skyscraper
+// expansion framework + Homeward fade.
+//
+// Two pieces, both scaffold-only.
+//
+//   (1) NEW app/engine/buriedSkyscraper.ts —
+//       type definitions + stub data for
+//       the 100-floor descending dungeon:
+//         • 5 FloorArchetype flavors
+//           (service_corridor, market_level,
+//           shrine_level, mechanical_floor,
+//           dig_camp) with display metadata
+//           ready for the user's hand-
+//           authored grid maps to fill in.
+//         • 4 StairwellPosition corners
+//           (NE/NW/SE/SW) per floor.
+//         • 5 StairwellType descent rates
+//           (express_drop_5, express_drop_3,
+//           local_drop_2, local_drop_1,
+//           broken). The "five different
+//           types the system needs to
+//           remember" the user spec'd.
+//         • GridCell / FloorTemplate /
+//           BuildingState types so future
+//           OTAs can drop authored grids
+//           in without touching the model.
+//         • canEnterSkyscraper(player) gate
+//           refuses entry until
+//           mainQuest.phase === 'ended'.
+//           Any of the three Choice endings
+//           qualifies — the post-ending
+//           homeward beat is the route to
+//           the Outskirts entrance.
+//       NO room content, NO encounters, NO
+//       quests in this OTA. Strictly the
+//       data model + gate.
+//
+//   (2) app/screens/EndingScreen.tsx — new
+//       HEAD HOME ▸ button next to the
+//       existing BACK TO TITLE. Tapping it
+//       enters a HomewardSplash that
+//       renders 3 paragraphs of homeward
+//       narration (faction-keyed "people"
+//       label + dog/golem references if
+//       alive) on a black backdrop, fades
+//       in (2s) → holds (7s) → fades out
+//       (2s) → bounces to title. Tap-
+//       anywhere skips to title. Place-
+//       holder bridge for the Skyscraper
+//       entrance — once the expansion
+//       lands, onDone routes to the
+//       Outskirts entry instead of title.
+//
+// 58/58 regression tests pass (mainQuest +
+// coreGuardians). TS clean.
+//
+// Files: app/engine/buriedSkyscraper.ts
+// (NEW), app/screens/EndingScreen.tsx
+// (HomewardSplash + HEAD HOME button).
+export const OTA_BUILD_ID = '2026-05-28-151';
