@@ -1876,4 +1876,20 @@
 // JS bundle unchanged.
 //
 // Files: HANDOFF.md (Dog Companion entry refined).
-export const OTA_BUILD_ID = '2026-05-27-115';
+//
+// 2026-05-27 OTA-116 — Planning entry only (no code changes).
+// User added a UI surface to the Dog Companion framework: the
+// title-screen character slot tiles should show the dog's
+// name + breed as a sub-line under the player name when a
+// save has an active dog. Format: "Marrow (old bloodhound)".
+// Slots without an active dog render the same as today. Lets
+// the player identify the right save when they have multiple
+// characters with different companions. Added to UI surfaces
+// section and Phase 5 phasing in the HANDOFF.md 0.A entry.
+// app/screens/TitleScreen.tsx added to the files-touched
+// preview.
+//
+// JS bundle unchanged.
+//
+// Files: HANDOFF.md (Dog Companion UI surfaces section).
+export const OTA_BUILD_ID = '2026-05-27-116';
