@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-111` (Crafting recipe info surfaces — weapon damage dice already shipping but quiet; consumable restore + buff + cure lines added to food recipes via previewGear; golem stats + summon DC surfaced on the AETHERIC tab with per-kind tappable variant rows. Descriptive stat-growth balance sim landed too — partial finding: DEX is the slowest stat, not INT). See **Section 0** for the live issue tracker covering OTA-070 → OTA-111.
+> **Latest OTA:** `2026-05-27-112` (Stat-growth tuning per OTA-111 audit — DEX bottleneck closed by wiring `jump` and `disengage` to trainStat(DEX); WIS-on-rest mechanic finally wired to match SKILL_ACTIVITIES advertising. User's INT-too-slow hypothesis was wrong by the sim numbers; INT is the second-fastest stat). See **Section 0** for the live issue tracker covering OTA-070 → OTA-112.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -23,6 +23,10 @@
 
 ### 0.A — Open Issues
 
+- **Per-golem summonDC differentiation (OTA-111 design call).** `runAethercraft` at `app/state/gameStore.ts:16592` uses a single hard-coded `dcBase = 15` (INT) for all four golem kinds. Lore-wise, Crystal and Aether golems are stronger anchors than Mud and Iron — they should arguably cost more. The OTA-111 AETHERIC tab footer surfaces the uniform DC-15 line to the player. **Fix shape:** add optional `summonDC?: number` to `GolemDefinition` in `app/engine/golems.ts`; `runAethercraft` reads `def.summonDC ?? 15`. Recommended values for design discussion: Mud 13, Iron 15, Aether 17, Crystal 19. **Status:** open; needs user input.
+
+- **WIS-novel-step rate limit (OTA-112 deferred recommendation).** WIS is the fastest-growing stat at 0.168 XP/turn — every novel cardinal step trains it, and ~40% of turns are moves. After 5000 turns the player sits at WIS 18 while still at DEX 13. The audit recommended raising the novelty window from 20 to 50 tiles so wandering can't farm WIS. **Status:** open; deferred — nerfing the highest-growing stat is a feel call, not a correctness call. Pick up if playtest reports WIS-cap-then-cruise behavior.
+
 - **`turn the locking ring` parses as `intent=turn_in` — mis-routes the sealed_vault_door puzzle action to quest-completion.** Surfaced by the OTA-110 player-input chaos sim. The parser maps the bare verb `turn` to `turn_in` as a synonym (`turn it in`), and the sealed_vault_door hook narration at `app/engine/hooks.ts:605` says *"three rotations, in the right order"* — so a player who types `turn the locking ring` gets routed to quest hand-in instead of the puzzle. Two ways to close: (a) strip `turn` from the turn_in synonym table when the input contains a direct object that isn't a quest item, OR (b) rewrite the narration to drop the rotation/turn hint and pair with whatever real verb the parser supports (e.g., `inspect`, `align`). **Status:** open; new parser bug, design call needed. Cluster with the existing "rotate the ring left / right" + "knock on the steeple" + "tap the steeple" entries below — these are all the same root cause (hook narration promises actions the parser can't honor or routes them wrong).
 
 - **`tap the steeple` parses as `intent=unknown`.** Same buried-church narration (`app/data/world/wasteland_encounters.json:142`) that promises `knock on the steeple` also implicitly invites `tap the steeple` — parser has no `tap`/`press` verb per `app/engine/parser.ts:105` (intentionally removed). **Status:** open; pair with the steeple knock + tumbler-ring entries.
@@ -42,6 +46,20 @@
 - **TS 0 errors / Test suite green.** Always required pre-push. Tracked here as a passive gate rather than an issue.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Stat-growth balance
+
+- **OTA-112 (2026-05-27) · DEX bottleneck closed; WIS-on-rest finally wired (UI/code gap).**
+  - **What:** The OTA-111 stat-growth sim (20 runs × 5000 turns) surfaced three findings: (a) the user's hypothesis "INT is too slow" was wrong by the numbers — INT is the second-fastest stat at 0.155 XP/turn; (b) DEX is the actual slowest stat at 0.067 XP/turn — half of STR, less than half of INT — because it only trained on finesse-weapon hits (minority of weapons), parry success (mid-combat only), and a handful of skill checks; (c) `SKILL_ACTIVITIES` (statTraining.ts:201) advertised "Resting after combat trains WIS" to the player but no `trainStat` call existed for it.
+  - **Fix:** Three trainStat wires in `gameStore.ts`:
+    - `jump` handler (line 7296): +1 DEX on every leap. Naturally rate-limited by 1-stamina cost + low jump frequency.
+    - `disengage` handler (line 7333, in-combat branch only): +1 DEX on successful break-contact. The no-enemies early-return doesn't reach the train, so disengage-spam without combat is uncompensated.
+    - `rest` handler (line ~5808, 8-hour rest success path): +1 WIS on rest. The 8h game-time cost is itself the rate limit — can't farm by spamming rest because each one burns a workday.
+  - **Why:** Cheapest, lowest-risk path to close the DEX gap without altering combat-hit math or weapon-stat designations. Jump and disengage are textbook DEX moments that were silently uncompensated; wiring them adds DEX trickle without changing the action menus or stamina costs. The WIS-on-rest wire is straight bug-fix territory — the UI was lying.
+  - **Skipped from the audit's recommendations (deferred):**
+    - WIS-novel-step rate limit (raise novelty window 20→50 tiles) — left for a future design call; nerfing the highest-growing stat may feel unfair to players who chase WIS.
+    - Per-golem summonDC — open design call (see Section 0.A) on whether Crystal/Aether should cost more INT than Mud.
+  - **Files:** `app/state/gameStore.ts` (3 trainStat wires in jump / disengage / rest cases).
 
 #### Multi-agent stress audit
 

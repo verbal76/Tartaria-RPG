@@ -1716,4 +1716,56 @@
 // + buff + cure lines), app/screens/CraftingScreen.tsx
 // (GOLEM_VARIANTS block + stageDraft helper + nested row
 // styles), __tests__/statGrowthBalanceSim.test.ts (new).
-export const OTA_BUILD_ID = '2026-05-27-111';
+//
+// 2026-05-27 OTA-112 — Stat-growth tuning per OTA-111 audit
+// findings. The 5000-turn × 20-seed sim surfaced three issues:
+//
+//   (1) DEX is the slowest stat at 0.067 XP/turn — half of
+//       STR, less than half of INT. The user's hypothesis
+//       (INT is too slow) was wrong by the numbers: INT is
+//       the second-fastest stat at 0.155 XP/turn. DEX's
+//       problem: it only trained on finesse-weapon hits (a
+//       minority of weapons), parry success (mid-combat
+//       only), climb tier (rare), and a handful of skill
+//       checks.
+//   (2) `jump` and `disengage` are real parser intents with
+//       handlers (gameStore.ts:7296, 7333) but neither
+//       trained DEX. Textbook DEX moments going unrewarded.
+//   (3) SKILL_ACTIVITIES (statTraining.ts:201) advertised
+//       "Resting after combat trains WIS" but no trainStat
+//       call existed for it — UI promised a mechanic that
+//       never fired.
+//
+// Three surgical wires:
+//   - `jump` handler at gameStore.ts:7296: +1 trainStat(DEX)
+//     on every leap. Naturally rate-limited by 1-stamina
+//     cost + low jump frequency.
+//   - `disengage` handler at gameStore.ts:7333 (in-combat
+//     branch only): +1 trainStat(DEX) on successful break-
+//     contact. The no-enemies early-return doesn't reach
+//     the train, so disengage-spam without combat is
+//     uncompensated.
+//   - `rest` handler at gameStore.ts:~5808 (8-hour rest
+//     success path): +1 trainStat(WIS). 8h game-time cost
+//     is itself the rate limit — can't farm by spamming.
+//
+// Skipped from the audit recommendations:
+//   - WIS-novel-step rate limit (raise novelty window 20→50
+//     tiles) — left for a future design call; nerfing a
+//     stat that's already the highest by sim numbers may
+//     feel unfair to players who chase WIS.
+//   - Per-golem summonDC — flagged as an open design call
+//     in HANDOFF.md 0.A; needs the user's input on whether
+//     Crystal/Aether should cost more than Mud.
+//
+// Validation: the OTA-111 stat-growth sim numbers don't
+// change because its fixed action mix (40m/20i/15c/10cr/10s/
+// 5r) doesn't include jump or disengage as discrete actions
+// — the new training paths fire in real gameplay where
+// players actually use those verbs, not in the baseline
+// model. The 43 sim tests continue to pass (no regression
+// to invariant tests). Real-gameplay impact will show in
+// the next playtest log capture.
+//
+// Files: app/state/gameStore.ts (3 trainStat wires).
+export const OTA_BUILD_ID = '2026-05-27-112';

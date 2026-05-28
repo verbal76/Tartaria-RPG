@@ -5806,6 +5806,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
               get().appendLog(pull.kind, pull.line);
             }
           }
+          // OTA-112 — WIS-on-rest wire-up per stat-growth audit.
+          // SKILL_ACTIVITIES (statTraining.ts:201) advertised
+          // "Resting after combat trains WIS" to the player but
+          // no trainStat call existed for it — the UI promised a
+          // mechanic that never fired. Wired here on the 8-hour
+          // rest path (parser-routed; the no-ambush + ambush
+          // branches both reach this point). The 8h game-time
+          // cost is itself the natural rate limit — can't farm WIS
+          // by spamming rest because each one burns a workday.
+          {
+            const liveRester = get().player;
+            if (liveRester) {
+              const trWis = trainStat(liveRester, 'wisdom', true);
+              set((s) => (s.player ? { player: trWis.player } : s));
+              if (trWis.leveled) {
+                get().appendLog(
+                  'reward',
+                  `✦ The watch sharpens your sense of the dark. +1 WIS (now ${trWis.leveled.to}).`,
+                );
+              }
+            }
+          }
           void get().persist();
         }
         break;
@@ -7302,6 +7324,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? `You launch yourself toward ${tgt}. Standing long jump — 3 squares without a STR check, more with one.`
             : `You leap. Standing long jump — 3 squares clean. With a STR check, you could push it further.`,
         );
+        // OTA-112 — DEX bottleneck fix per stat-growth audit. Jump
+        // is a textbook DEX action and was missing from the training
+        // map. Adds ~1 train per jump attempt; rate is naturally
+        // limited by stamina cost + low jump frequency.
+        {
+          const liveJumper = get().player;
+          if (liveJumper) {
+            const tr = trainStat(liveJumper, 'dexterity', true);
+            set((s) => (s.player ? { player: tr.player } : s));
+            if (tr.leveled) {
+              get().appendLog(
+                'reward',
+                `✦ Lighter on your feet. +1 DEX (now ${tr.leveled.to}).`,
+              );
+            }
+          }
+        }
         break;
       }
       case 'dash': {
@@ -7360,6 +7399,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
           'world',
           `You peel off the line, footwork careful. No opportunity attack as you break contact (+4 defense this round).`,
         );
+        // OTA-112 — DEX bottleneck fix per stat-growth audit.
+        // Successful disengage from active combat is a clear DEX
+        // moment (the careful footwork denies the opportunity
+        // attack). Only the in-combat branch trains; the no-enemies
+        // early-return above doesn't reach here.
+        {
+          const liveDisengager = get().player;
+          if (liveDisengager) {
+            const tr = trainStat(liveDisengager, 'dexterity', true);
+            set((s) => (s.player ? { player: tr.player } : s));
+            if (tr.leveled) {
+              get().appendLog(
+                'reward',
+                `✦ Footwork sharper than yesterday. +1 DEX (now ${tr.leveled.to}).`,
+              );
+            }
+          }
+        }
         break;
       }
       case 'help': {
