@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-28-127` (Per-step scene-bar truthfulness during travel — bar now shows "near Mud Flats" while crossing intermediate areas instead of the stale last-hub name; weather drifts ~12% per step for reactive feel; STOP TRAVEL cleanly clears the transit label so the next cardinal step renders the player's actual tile without any jump). See **Section 0** for the live issue tracker covering OTA-070 → OTA-127.
+> **Latest OTA:** `2026-05-28-128` (Drink/eat narration fixes from OTA-126 playtest log: Water Bottle now narrates as "drink" not "eat"; drink-of-consumable re-dispatch no longer double-logs the player input or duplicates the Time passed line; spurious Arbiter "Tell me what you mean to do with it" remark after a successful drink/fill suppressed). See **Section 0** for the live issue tracker covering OTA-070 → OTA-128.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -248,6 +248,21 @@
 - **TS 0 errors / Test suite green.** Always required pre-push. Tracked here as a passive gate rather than an issue.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Drink / consumable narration
+
+- **OTA-128 (2026-05-28) · "You eat the Water Bottle" + drink re-dispatch double-logged + spurious Arbiter line.**
+  - **What:** OTA-126 playtest log surfaced four small issues around the OTA-125 drink-handler re-dispatch path:
+    1. World line read *"You eat the Water Bottle. +3 stamina."* — Water Bottle isn't food; the `isPotion` regex didn't catch it.
+    2. `drink the water bottle` showed BOTH `[player] drink the water bottle` AND `[player] eat Water Bottle` — looked like the player typed twice. Inner submit echoed its own `[player]` line.
+    3. Same re-dispatch double-logged `⏳ Time passed: 30 min` — inner submit logged it at end-of-action, outer submit's `hoursBefore` snapshot saw the same dt and logged again. Two lines 9 ms apart.
+    4. *"The water," the Arbiter says. "Tell me what you mean to do with it."* fired after a successful cup-hands drink — the Arbiter's on-target-noun remark wasn't gated by the `drink` / `fill` intents.
+  - **Fix:**
+    1. Extended consumable-verb detection in the rest case: `isDrink` tests `consumable.tags` for `'drink'` or `'water'`, plus name regex `bottle / canteen / skin / cup / draught / broth / tea / infusion / gourd / jug`. Water Bottle now narrates *"You drink the Water Bottle. +N stamina."*
+    2 + 3. New `_opts.silent` on `submitPlayerAction`. When set, the inner submit skips the `[player]` echo at all 3 input-log sites AND the end-of-action `⏳ Time passed` log. Outer submit owns the bookkeeping. Drink-case re-dispatch now passes `{ skipPreChecks: true, silent: true }`.
+    4. Added `'drink'` and `'fill'` to `ARBITER_ENGAGED_INTENTS` set so the Arbiter remark suppresses on-target-noun follow-up after these verbs (already gated for `attack`/`investigate`/`open`/etc.).
+  - **Why:** Each was a small but visible quality issue in the drink path. Items 2 + 3 came from a structural mistake in OTA-125 (using `submitPlayerAction` for internal re-dispatch instead of inlining the consumable-consumption logic). The `silent` opt is the smallest fix that preserves the re-dispatch architecture while killing both side effects.
+  - **Files:** `app/state/gameStore.ts` (ARBITER_ENGAGED_INTENTS + isDrink detection + silent opt on the 3 [player] + 1 Time-passed log sites + drink-case re-dispatch options).
 
 #### Travel waypoint UX
 

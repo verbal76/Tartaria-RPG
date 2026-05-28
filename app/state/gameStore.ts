@@ -483,6 +483,12 @@ const ARBITER_ENGAGED_INTENTS: ReadonlySet<string> = new Set([
   'accept', 'turn_in', 'sell', 'buy',
   'climb', 'search', 'drop', 'scrap', 'talk', 'advance', 'retreat',
   'unequip',
+  // OTA-128 — drink + fill are post-action engagements; once the
+  // player drank from the current OR poured into the bottle the
+  // Arbiter shouldn't follow up with "Tell me what you mean to do
+  // with it." (Playtest log: "drink water from the jottle" → cup-
+  // hands drink succeeded → arbiter line fired anyway.)
+  'drink', 'fill',
 ]);
 
 const STAMINA_COSTS = {
@@ -1118,8 +1124,19 @@ interface GameStore {
    * status-effect tick so one player input still equals one game beat,
    * even when the dictionary parser only resolves it on the second
    * pass. External callers should never set this.
+   *
+   * OTA-128 — `_opts.silent` suppresses the `[player]` input log and
+   * the end-of-action `[system] ⏳ Time passed` log so internal
+   * re-dispatch (e.g. drink-of-consumable → eat-the-consumable)
+   * doesn't double-narrate. Playtest log: "drink the water bottle"
+   * showed BOTH the original input AND the re-dispatched "eat Water
+   * Bottle" as [player] lines, plus Time passed: 30 min twice
+   * (inner submit logged once at its own end, outer submit's
+   * snapshot computed the same dt and logged again). Silent mode
+   * lets the outer submit own the bookkeeping while the inner
+   * submit performs the actual state change.
    */
-  submitPlayerAction: (text: string, _opts?: { skipPreChecks?: boolean }) => void;
+  submitPlayerAction: (text: string, _opts?: { skipPreChecks?: boolean; silent?: boolean }) => void;
   resolveRollStep: (values: number[]) => void;
   cancelPendingRolls: () => void;
   concludeRolls: (steps: RollStep[], actionText: string) => void;
@@ -3452,7 +3469,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       trimmed.length > 60 &&
       /^(ok\b|btw\b|fyi\b|hey\b|so\b|when (i|the)\b)|(\b(we|i) ((\w+)\s+)?(should|need|could|gotta|gonna|wish|want|really)\b|\byou should\b|\bi think\b|\bi'?d like\b|\bcan we\b|\bcould you\b|\bshould have\b|\bneeds? to be\b|\bit should (have|be|also)\b|\badd a\b|\bplease add\b)/i.test(trimmed)
     ) {
-      get().appendLog('player', trimmed, { meta: true });
+      if (!_opts?.silent) get().appendLog('player', trimmed, { meta: true });
       get().appendLog(
         'arbiter',
         `The Arbiter studies you, plainly. "I'm not sure what you're trying to tell me. I'll keep your note in the log either way. If you mean to act, phrase it as a verb — 'investigate the rubble', 'go east', 'attack the figure'."`,
@@ -3722,11 +3739,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     const parsed = parseInput(trimmed, parseCtx);
-    get().appendLog('player', trimmed, {
-      intent: parsed.intent,
-      confidence: parsed.confidence,
-      resolvedNoun: parsed.resolvedNoun,
-    });
+    // OTA-128 — silent re-dispatch (drink-of-consumable, etc.) skips
+    // the [player] echo so the player doesn't see two input lines
+    // for one typed action.
+    if (!_opts?.silent) {
+      get().appendLog('player', trimmed, {
+        intent: parsed.intent,
+        confidence: parsed.confidence,
+        resolvedNoun: parsed.resolvedNoun,
+      });
+    }
     // OTA-120 — Dog Companion combat dispatch.
     if (parsed.intent === 'dog_bite' || parsed.intent === 'dog_distract') {
       handleDogCombat(get, set, parsed.intent, parsed.target);
@@ -5938,9 +5960,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // 'consume' fallback covered everything blandly which read
           // weird for non-food items (e.g. "You consume one First
           // Aid Kit"). Narration only — same mechanical effect.
+          // OTA-128 — drink detection extended: tags + name regex now
+          // also catch Water Bottle / Bottle / Canteen / Skin / etc.
+          // so the player doesn't see "You eat the Water Bottle" (a
+          // real playtest log line that read like a bug).
           const isMedical = /first aid|bandage|medkit|salve|tonic|poultice|stim/i.test(consumable.name);
           const isPotion = /vial|potion|flask|elixir|brew/i.test(consumable.name);
-          const verb = isMedical ? 'apply' : isPotion ? 'drink' : 'eat';
+          const isDrink = (consumable.tags ?? []).includes('drink')
+            || (consumable.tags ?? []).includes('water')
+            || /\b(bottle|canteen|skin|cup|draught|broth|tea|infusion|gourd|jug)\b/i.test(consumable.name);
+          const verb = isMedical ? 'apply' : (isPotion || isDrink) ? 'drink' : 'eat';
           get().appendLog('world', `You ${verb} the ${consumable.name}. ${tail}${buffLine}`);
           // Heal may push us back over the 5% latch threshold.
           checkLowHpWarning(prevHpEat, prevHpEat + heal, hpMaxEat, get, set);
@@ -7064,7 +7093,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // logic (per-item effect resolution, buff status, empty-bottle
           // pass-through, etc.) runs unchanged. This keeps "drink water
           // bottle" / "drink wild carrot infusion" working off one path.
-          void get().submitPlayerAction(`eat ${resolvedConsumable.name}`);
+          // OTA-128 — silent + skipPreChecks so the inner submit
+          // doesn't double-log [player] or [system] Time passed; the
+          // outer submit's end-of-action bookkeeping owns it. The rest
+          // case's drink-aware verb detection (isDrink) ensures the
+          // world line says "drink the Water Bottle", not "eat it".
+          void get().submitPlayerAction(`eat ${resolvedConsumable.name}`, { skipPreChecks: true, silent: true });
           break;
         }
         const WATER_SOURCE_NOUNS = [
@@ -8971,9 +9005,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Surface the time the action consumed so the player can feel the day
     // shrink. Only logs when the action actually advanced the clock — a
     // pure parser miss doesn't print "0h passed".
+    // OTA-128 — silent re-dispatch skips the Time passed log; the outer
+    // submit's own end-of-submit owns the bookkeeping. Without this
+    // gate the inner submit logged once at its own end AND the outer
+    // submit's snapshot saw the same dt and logged again.
     const hoursAfter = get().player?.hoursElapsed ?? hoursBefore;
     const dt = hoursAfter - hoursBefore;
-    if (dt > 0) {
+    if (dt > 0 && !_opts?.silent) {
       const label = dt < 1
         ? `${Math.round(dt * 60)} min`
         : dt < 24

@@ -2358,4 +2358,58 @@
 // + weather drift + stopTravel clear + continueTravel
 // error-path clears), app/screens/ExplorationScreen
 // .tsx (scene bar prefers transitArea).
-export const OTA_BUILD_ID = '2026-05-28-127';
+//
+// 2026-05-28 OTA-128 — Playtest log surfaced 4 small
+// issues around the OTA-125 drink-handler's internal
+// re-dispatch path. All fixed in one OTA.
+//
+//   (1) "You eat the Water Bottle." Water Bottle isn't
+//       food; the rest-case verb detection (isPotion
+//       regex) didn't catch it, so the world line read
+//       like a bug. Extended detection with isDrink:
+//       (a) check consumable.tags for 'drink' or
+//       'water', (b) extend the name regex with bottle
+//       /canteen/skin/cup/draught/broth/tea/infusion/
+//       gourd/jug. Water Bottle now narrates "You
+//       drink the Water Bottle. +N stamina."
+//
+//   (2) Drink-of-consumable double-logged the player
+//       input. "drink the water bottle" showed BOTH
+//       [player] drink the water bottle AND [player]
+//       eat Water Bottle — looked like the player
+//       typed twice. The OTA-125 re-dispatch via void
+//       submitPlayerAction() caused the inner submit
+//       to emit its own [player] echo.
+//
+//   (3) Same re-dispatch double-logged Time passed.
+//       Inner submit logged "⏳ Time passed: 30 min"
+//       at its own end-of-action; outer submit's
+//       hoursBefore snapshot saw the same dt and
+//       logged again. Both 30-min lines fired
+//       9ms apart.
+//
+//   Fix for (2) + (3): added _opts.silent to
+//   submitPlayerAction. When set, the inner submit
+//   skips the [player] echo AND the end-of-action
+//   Time passed log. The drink case now calls
+//   submitPlayerAction(`eat ${name}`, {
+//   skipPreChecks: true, silent: true }) so the outer
+//   submit owns the bookkeeping.
+//
+//   (4) Spurious "Tell me what you mean to do with
+//       it" Arbiter line fired after a successful
+//       drink-from-source. The remark is gated on
+//       ARBITER_ENGAGED_INTENTS — added 'drink' and
+//       'fill' to the set so both verbs count as
+//       engaged-with-noun. Pre-fix log: "drink water
+//       from the jottle" → cup-hands drink succeeded
+//       → arbiter line fired anyway in the same
+//       millisecond.
+//
+// 64/64 regression tests pass. TS clean.
+//
+// Files: app/state/gameStore.ts (ARBITER_ENGAGED_
+// INTENTS + isDrink detection + silent opt on the
+// 3 [player] + 1 Time-passed log sites + drink-case
+// re-dispatch options).
+export const OTA_BUILD_ID = '2026-05-28-128';
