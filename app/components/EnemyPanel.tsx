@@ -188,13 +188,18 @@ const styles = StyleSheet.create({
   },
   // v2.4.1 (OTA 048) — paddingRight reserves space for the gear icon
   // that ExplorationScreen overlays in the top-right corner of the
-  // right column. The range tag and any future top-right chrome
-  // wrap/clip BEFORE the gear's footprint instead of being hidden
-  // by it.
+  // right column.
+  // OTA-144 — bumped from 36 → 48. The gear is 32px wide + 4px right
+  // margin = 36px footprint. With paddingRight=36 the content's right
+  // edge EXACTLY MET the gear's left edge — zero buffer. Long enemy
+  // names ("Reclaimer Deserter" et al.) visually crowded the semi-
+  // transparent gear background (rgba 0.85). The extra 12px gives
+  // solid clearance. Playtester repro: "The settings button is
+  // covering some of the enemies name."
   head: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingRight: 36,
+    paddingRight: 48,
     alignItems: 'baseline',
   },
   headRight: { flexDirection: 'row', alignItems: 'baseline', gap: 6 },

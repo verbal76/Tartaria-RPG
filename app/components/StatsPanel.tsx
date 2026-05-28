@@ -39,9 +39,25 @@ export function StatsPanel({ player }: Props) {
   if (player.equipped?.ring) slotParts.push(`Rg: ${player.equipped.ring}`);
   const equippedLabel = slotParts.length > 0 ? slotParts.join(' · ') : 'nothing';
 
+  // OTA-145 — dog name displays on the same row as the player name,
+  // right-aligned to the panel edge, when a dog is active. Hidden for
+  // abandoned/dead/waiting dogs so the panel doesn't lie. Playtester:
+  // "The dogs name should go on the same level as yours and aligned
+  // right to the edge of the box."
+  const dogShows = player.dog
+    && player.dog.status !== 'abandoned'
+    && player.dog.status !== 'dead';
+
   return (
     <View style={styles.container}>
-      <Text style={styles.name}>{player.name}</Text>
+      <View style={styles.nameRow}>
+        <Text style={styles.name} numberOfLines={1}>{player.name}</Text>
+        {dogShows && player.dog ? (
+          <Text style={styles.dogName} numberOfLines={1}>
+            {player.dog.name}
+          </Text>
+        ) : null}
+      </View>
       <Text style={styles.subline}>{race?.name ?? player.raceId}</Text>
       <View style={styles.row}>
         <Stat label="HP" value={`${player.hp}/${player.hpMax}`} />
@@ -112,7 +128,11 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 4,
   },
-  name: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
+  name: { color: '#e6d8b3', fontSize: 14, fontWeight: '700', flexShrink: 1 },
+  // OTA-145 — row holds player name (left, growing) + dog name
+  // (right, fixed). flex layout pins the dog to the right edge.
+  nameRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 },
+  dogName: { color: '#c9a86a', fontSize: 13, fontWeight: '600', flexShrink: 0, maxWidth: 160 },
   subline: { color: '#7a705c', fontSize: 10, marginBottom: 2 },
   equipped: { color: '#c9a86a', fontSize: 9, marginTop: 3, letterSpacing: 0.5 },
   effects: { color: '#e07a5f', fontSize: 9, marginTop: 2, letterSpacing: 0.5 },

@@ -4681,6 +4681,43 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // The target the player named (raw, before resolution).
         const rawTarget = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
 
+        // OTA-143 — elevated-investigate gate. Playtester report:
+        // "I investigated the shore from on top of a pillar?"
+        // When the player is up on a climb (elevatedOn set) and the
+        // climb didn't pop an overlay (elevatedOverlayMeta unset),
+        // they should NOT be able to reach ground-level nouns by
+        // typing `investigate shore`. The shore is down there;
+        // they're up here.
+        //
+        // Gate: if elevated AND no overlay AND target is in the
+        // base ambient noun pool AND target is NOT the climbed
+        // noun itself → refuse with an Arbiter hint. Investigates
+        // of the climbed noun ("investigate the pillar") still
+        // work; so does any look-around / scene-bar narration.
+        // When an overlay HAS fired, ambientNouns are the overlay's
+        // nouns (the pre-OTA-102 swap), so the gate's "in ambient"
+        // check naturally allows the overlay's nouns through.
+        if (
+          currentScene.elevatedOn
+          && !currentScene.elevatedOverlayMeta
+          && rawTarget
+        ) {
+          const tgtLower = rawTarget.toLowerCase();
+          const climbedNoun = currentScene.elevatedOn.noun.toLowerCase();
+          const isClimbedNoun = tgtLower.includes(climbedNoun) || climbedNoun.includes(tgtLower);
+          const isGroundNoun = (currentScene.ambientNouns ?? []).some((n) => {
+            const nl = n.toLowerCase();
+            return nl.includes(tgtLower) || tgtLower.includes(nl);
+          });
+          if (isGroundNoun && !isClimbedNoun) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter glances down. "You're up on the ${currentScene.elevatedOn.noun}. The ${rawTarget} is down there. Climb down to reach it."`,
+            );
+            break;
+          }
+        }
+
         // 2026-05-24 — the old "4+ words / >40 chars / has ? or !" garbage-
         // prose guard was deleted here after three salvage bugs in a row.
         // The earlier META_COMMENT regex (~line 2777) already catches
@@ -18011,7 +18048,19 @@ function handleDogOnboardingInput(
   if (!player) return;
   const trimmed = raw.trim();
   if (pending.stage === 'breed') {
-    const breed = trimmed.slice(0, 24) || 'mutt';
+    // OTA-142 — smart breed extraction. Pre-fix, the player who role-
+    // played their answer ("looks like a Pitbull") got the WHOLE
+    // sentence stored as the breed. Playtester flagged: "should be
+    // smarter about parsing the dog breed." Strip common preamble
+    // phrases so the breed reads natural ("Pitbull" instead of
+    // "looks like a Pitbull"). Conservative — when no preamble
+    // matches, the raw input is preserved. Caps at 24 chars after
+    // stripping.
+    const cleaned = trimmed
+      .replace(/^\s*(?:i think (?:it's|its|it is) (?:a |an )?|looks like (?:a |an )?|kind of (?:a |an )?|sort of (?:a |an )?|seems like (?:a |an )?|probably (?:a |an )?|maybe (?:a |an )?|definitely (?:a |an )?|some kind of |its (?:a |an )?|it's (?:a |an )?|it is (?:a |an )?|a |an )/i, '')
+      .replace(/[.!?]+$/, '')
+      .trim();
+    const breed = (cleaned || trimmed).slice(0, 24) || 'mutt';
     set((s) => ({
       worldMemory: {
         ...s.worldMemory,

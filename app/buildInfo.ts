@@ -2880,4 +2880,69 @@
 // fullGameIntegration, catalogConsistencyPost
 // Cleanup, travelSceneBarChaos, edgeCaseSweepPost
 // Cleanup).
-export const OTA_BUILD_ID = '2026-05-28-141';
+//
+// 2026-05-28 OTA-142 — Playtest log fixes from the
+// Rocky-the-Pitbull session (the FIRST real dog
+// rescue in production!). Player reported 4
+// issues, all fixed in this OTA:
+//
+//   (1) Smart breed parsing. Player role-played
+//       "looks like a Pitbull" → engine stored the
+//       whole sentence as the breed. Player
+//       feedback: "should be smarter about parsing
+//       the dog breed." Strip common preambles
+//       (looks like a / I think it's a / kind of
+//       a / sort of / seems like / probably /
+//       maybe / definitely / some kind of / it's
+//       a / a / an) before storing. Trailing
+//       punctuation also stripped. Capitalization
+//       preserved on the breed token (so "German
+//       Shepherd" stays correctly cased). 23/23
+//       tests in __tests__/dogBreedParsing.test.ts
+//       cover the matrix.
+//
+//   (2) Elevated-investigate gate. Player climbed
+//       a 3-tier pillar and then investigated
+//       "shore" — narration said "you crouch beside
+//       the shore" but they're at the top of a
+//       pillar. Player feedback: "I investigated
+//       the shore from on top of a pillar?" Gate
+//       at the top of `case 'investigate':` —
+//       when elevatedOn is set AND no overlay
+//       fired (elevatedOverlayMeta unset) AND the
+//       target is in the base ambient noun pool
+//       AND the target is NOT the climbed noun
+//       itself, refuse with an Arbiter hint:
+//       "You're up on the X. The Y is down there.
+//       Climb down to reach it."
+//
+//   (3) Settings gear overlapping enemy name.
+//       Pre-fix, the EnemyPanel head had
+//       paddingRight: 36 — the gear button is
+//       exactly 36px wide (32 + 4 right margin).
+//       Zero visual buffer; long enemy names
+//       crowded the gear's semi-transparent
+//       background. Bumped to paddingRight: 48 for
+//       12px clearance. Playtester: "The settings
+//       button is covering some of the enemies
+//       name."
+//
+//   (4) Dog name UI placement. StatsPanel now
+//       renders the dog's name on the SAME row as
+//       the player's name, right-aligned to the
+//       panel edge, when player.dog is active
+//       (hidden for abandoned/dead status).
+//       Player feedback: "The dogs name should go
+//       on the same level as yours and aligned
+//       right to the edge of the box."
+//
+// 63/63 regression tests pass. TS clean.
+//
+// Files: app/state/gameStore.ts (breed-strip regex
+// + elevated-investigate gate), app/components/
+// EnemyPanel.tsx (head paddingRight 36→48),
+// app/components/StatsPanel.tsx (nameRow flex
+// layout + dog name rendering + styles),
+// __tests__/dogBreedParsing.test.ts (NEW, 23
+// tests).
+export const OTA_BUILD_ID = '2026-05-28-142';
