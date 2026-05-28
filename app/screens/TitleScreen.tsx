@@ -1056,6 +1056,31 @@ const styles = StyleSheet.create({
   },
   badgeGlyph: { fontSize: 12, fontWeight: '700' },
   badgeText: { color: '#cdbf99', fontSize: 10, letterSpacing: 0.5 },
+  // OTA-150 — Mastery capstone. Centered chip + one-line Arbiter
+  // acknowledgement sit above the regular 27-grid when the player
+  // has every (faction, ending) combo on file.
+  masteryBadgeWrap: { alignItems: 'center', marginBottom: 8 },
+  masteryBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderWidth: 1.5,
+    borderColor: '#c9a86a',
+    borderRadius: 4,
+    backgroundColor: '#1a1408',
+    gap: 6,
+    marginBottom: 4,
+  },
+  masteryGlyph: { color: '#c9a86a', fontSize: 14, fontWeight: '700' },
+  masteryText: { color: '#c9a86a', fontSize: 11, letterSpacing: 3, fontWeight: '700' },
+  masteryLine: {
+    color: '#cdbf99',
+    fontSize: 10,
+    fontStyle: 'italic',
+    letterSpacing: 0.5,
+    textAlign: 'center',
+  },
   updateBanner: {
     backgroundColor: '#2a1f12',
     borderColor: '#c9a86a',
@@ -1305,8 +1330,26 @@ function EndingBadgesRow(): React.ReactElement | null {
   }, []);
   if (badges.length === 0) return null;
   const total = 27;
+  // OTA-150 — Mastery badge. Surfaces when the player has recorded
+  // every (faction, ending) combo. Idempotent + cosmetic — no
+  // mechanical effect, just acknowledgement that the matrix has
+  // been walked end-to-end. Sits centered above the regular grid
+  // so it reads as a capstone rather than a 28th peer.
+  const mastered = badges.length >= total;
   return (
     <View style={styles.badgesContainer}>
+      {mastered && (
+        <View style={styles.masteryBadgeWrap}>
+          <View style={styles.masteryBadge}>
+            <Text style={styles.masteryGlyph}>✦</Text>
+            <Text style={styles.masteryText}>MASTERY</Text>
+            <Text style={styles.masteryGlyph}>✦</Text>
+          </View>
+          <Text style={styles.masteryLine}>
+            You have walked this path under every banner.
+          </Text>
+        </View>
+      )}
       <Text style={styles.badgesTag}>COMPLETED RUNS · {badges.length}/{total}</Text>
       <View style={styles.badgesGrid}>
         {badges.map((id) => {

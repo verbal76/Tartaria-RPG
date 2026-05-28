@@ -3318,4 +3318,46 @@
 // Files: app/state/gameStore.ts
 // (submitPlayerAction guardian-verb
 // intercept).
-export const OTA_BUILD_ID = '2026-05-28-149';
+//
+// 2026-05-28 OTA-150 — Mastery badge
+// capstone (27/27 acknowledgement).
+//
+// Pre-OTA-150, the title screen surfaced
+// the badge counter as `COMPLETED RUNS ·
+// X/27` but did nothing special when X
+// hit 27. A 27-run commitment deserves
+// acknowledgement. Cosmetic-only ship —
+// no mechanical reward, no unlock — just
+// a capstone chip + one-line Arbiter
+// acknowledgement that the matrix has
+// been walked end-to-end.
+//
+//   (1) New centered MASTERY chip with a
+//       gold ✦ glyph on each side, sits
+//       above the regular 27-grid.
+//       Renders when endingBadges.length
+//       >= 27 (the >= guards against
+//       hypothetical future expansion
+//       endings without breaking the
+//       gate).
+//
+//   (2) One-line italic acknowledgement
+//       under the chip: "You have walked
+//       this path under every banner."
+//       Faction-neutral so it lands the
+//       same regardless of which run
+//       finished the matrix.
+//
+// Mechanical rewards (Mastery Token on
+// next character, Expansion 2 opening
+// hook, etc.) are deferred to the
+// expansion plan — this OTA just closes
+// the visible gap where 27/27 felt
+// unrewarded.
+//
+// 104/104 regression tests pass. TS clean.
+//
+// Files: app/screens/TitleScreen.tsx
+// (EndingBadgesRow Mastery branch +
+// styles).
+export const OTA_BUILD_ID = '2026-05-28-150';

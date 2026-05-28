@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-28-149` (`summon guardian` command path — verb-side companion to OTA-148's SUMMON chip. Player: "summon guardian — that way you never miss him, he can come in with the same swagger and the core can be added to the drop when he is defeated. that way you can prep for the fight too." Typing `summon guardian` / `summon the guardian` / `summon core guardian` (or the typo `summon gaurdian`) now routes through the same spawn pipeline instead of the "wrong hand" gate refusal. The Core-on-defeat half was already working — resolveEnemyDefeat at gameStore.ts:10448 grants the signature gear + Capital Core on Guardian kill — so this is purely a second front door for players who'd rather type the verb than tap the chip.). See **Section 0** for the closed-issue archive.
+> **Latest OTA:** `2026-05-28-150` (Mastery badge capstone — pre-OTA, the title screen showed `COMPLETED RUNS · X/27` but did nothing special when X hit 27. Cosmetic-only ship that closes the visible gap: a centered MASTERY chip in warm-gold (✦ glyph on each side) plus a one-line italic Arbiter acknowledgement — "You have walked this path under every banner." — render above the regular badge grid when endingBadges.length >= 27. No mechanical reward, no unlock — those are deferred to the Expansion 2 plan.). See **Section 0** for the closed-issue archive.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -244,6 +244,14 @@
 - **TS 0 errors / Test suite green.** Always required pre-push. Tracked here as a passive gate rather than an issue.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Mastery badge capstone (27/27 acknowledgement)
+
+- **OTA-150 (2026-05-28) · Title-screen Mastery chip when every (faction, ending) combo is recorded.**
+  - **What:** TitleScreen.tsx:1310 surfaced `COMPLETED RUNS · X/27` as a counter from OTA-043 (Phase 7) onward, but there was no special handling when X hit 27 — a 27-run commitment landed with no acknowledgement beyond the counter incrementing. User: *"what do they get if they collect all 27 badges?"* — answer at the time was honestly "nothing yet."
+  - **Fix:** New centered Mastery branch in `EndingBadgesRow`. When `endingBadges.length >= 27` (≥ guards against future expansion endings without breaking the gate), a warm-gold capstone chip renders above the regular 27-grid — `✦ MASTERY ✦` with letterspaced caps, plus a one-line italic Arbiter acknowledgement *"You have walked this path under every banner."* Faction-neutral copy so it lands the same regardless of which run finished the matrix. Pure cosmetic — no save mutation, no mechanical reward, no unlock. Mechanical rewards (Mastery Token on next character, Expansion 2 opening hook, etc.) are deferred to the expansion plan; this OTA just closes the visible "27/27 felt unrewarded" gap.
+  - **Why:** Cosmetic acknowledgement was the cheapest correct move here. The Mastery Token / Expansion 2 fourth-path-unlock options proposed alongside this would have warped balance for first-run players or required Expansion 2 to land first — neither was worth coupling to the badge fix. Capstone visual ships now, mechanical rewards can layer on top later without rework.
+  - **Files:** `app/screens/TitleScreen.tsx` (`EndingBadgesRow` Mastery branch + 5 styles).
 
 #### `summon guardian` verb command
 
