@@ -2302,4 +2302,60 @@
 // app/state/gameStore.ts (setTravelCourse +
 // continueTravel decrement), app/screens/
 // ExplorationScreen.tsx (badge prefers counter).
-export const OTA_BUILD_ID = '2026-05-28-126';
+//
+// 2026-05-28 OTA-127 — Per-step scene-bar truthfulness
+// during travel. Playtester follow-up to OTA-126:
+// "the location bar and weather conditions up top
+// should reflect the different areas they are in at
+// each step. because if they decide to stop travel
+// mid route the next direction they step in needs to
+// be accurately displayed without a massive location
+// jump."
+//
+// Pre-OTA-127: scene bar showed currentScene.location.
+// name the whole walk to a target — currentLocation
+// Id only switches when the player lands on a tile
+// belonging to a named location. Crossing open ground
+// between named places, the bar lied (claimed
+// "Asgardar" 20 tiles east of Asgardar).
+//
+// Three pieces this OTA:
+//
+//   (1) currentScene gains `transitArea: string|null`.
+//       Per-step during travel (player.travelTarget
+//       set), stepDirection finds the nearest named
+//       location to the new mapX/mapY and sets
+//       transitArea = "near <name>". When step.landedOn
+//       is set (player officially enters a named
+//       location), the travelTo path regenerates the
+//       scene from scratch — transitArea defaults to
+//       null on the fresh scene.
+//
+//   (2) Per-step weather drift during travel. ~12%
+//       chance per cardinal step to roll a new
+//       weather state via pickWeather(worldMemory).
+//       Keeps the right side of the scene bar
+//       reactive — drifting fog, sudden static squall
+//       as the player crosses a thermocline.
+//
+//   (3) ExplorationScreen scene bar prefers
+//       transitArea over location.name when set.
+//       Cleared on stopTravel + the two error paths
+//       in continueTravel + the not-in-transit branch
+//       of stepDirection.
+//
+// Result: bar reads "near Mud Flats / Whisper Fog"
+// while crossing the flats; "→ Varakush · 19 left"
+// counter stays accurate (OTA-126); STOP TRAVEL clears
+// the transit label and the next cardinal step
+// renders from the player's actual tile without any
+// jump.
+//
+// 59/59 regression tests pass. TS clean.
+//
+// Files: app/state/gameStore.ts (CurrentScene
+// transitArea field + stepDirection nearest-location
+// + weather drift + stopTravel clear + continueTravel
+// error-path clears), app/screens/ExplorationScreen
+// .tsx (scene bar prefers transitArea).
+export const OTA_BUILD_ID = '2026-05-28-127';

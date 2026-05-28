@@ -321,6 +321,16 @@ interface CurrentScene {
    *  weather. Used to detect direction changes so partial progress
    *  doesn't carry from "advance" into a later "retreat". */
   repositionDir?: 'advance' | 'retreat';
+  /** OTA-127 — per-step intermediate area label when the player is
+   *  in transit (player.travelTarget set, walking between named
+   *  locations). The scene's `location.name` reflects the last
+   *  named location the player officially entered; while crossing
+   *  open ground or unnamed sub-areas, `transitArea` carries the
+   *  nearest-named-location label so the scene bar shows "Mud
+   *  Flats" while crossing them rather than the stale last-hub
+   *  name. Cleared when travel ends or the player officially
+   *  enters a new named location. */
+  transitArea?: string | null;
   /** Whether each enemy in `enemies` has already used its
    *  ambush_strike trait this scene. Parallel to enemyHps. Trait
    *  fires only on the first counter; the +2 bonus is consumed and
@@ -12268,7 +12278,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const tgtPos = map.positions[targetId];
     if (!tgtPos) {
       get().appendLog('arbiter', `The Arbiter looks at the horizon. "I've lost the bearing. Resetting."`);
-      set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
+      // OTA-127 — also clear transitArea so the scene bar stops
+      // claiming "near X" once the bearing is lost.
+      set((s) => (s.player ? {
+        player: { ...s.player, travelTarget: undefined },
+        currentScene: s.currentScene ? { ...s.currentScene, transitArea: null } : s.currentScene,
+      } : s));
       return;
     }
     const fromX = player.mapX ?? WORLD_MAP_CENTER_X;
@@ -12277,7 +12292,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!dir) {
       // Player is on the target tile but somehow currentLocationId
       // didn't update — clear travel and let beginScene catch up.
-      set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
+      set((s) => (s.player ? {
+        player: { ...s.player, travelTarget: undefined },
+        currentScene: s.currentScene ? { ...s.currentScene, transitArea: null } : s.currentScene,
+      } : s));
       return;
     }
     // v2.4.1 (OTA 053) — burn stamina + advance time per step. The
@@ -12311,7 +12329,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
   stopTravel() {
     const player = get().player;
     if (!player || !player.travelTarget) return;
-    set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
+    // OTA-127 — clear transit-area label too so the scene bar snaps
+    // back to currentScene.location.name on the next render. Player
+    // tapped STOP TRAVEL; they're now standing where they stopped,
+    // not "near X."
+    set((s) => (s.player ? {
+      player: { ...s.player, travelTarget: undefined },
+      currentScene: s.currentScene ? { ...s.currentScene, transitArea: null } : s.currentScene,
+    } : s));
     get().appendLog(
       'world',
       'You set the course aside. Cardinal direction is yours again.',
@@ -12389,6 +12414,64 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? { player: { ...s.player, mapX: step.x, mapY: step.y, lastTravelDirection: dir } }
         : s,
     );
+    // OTA-127 — per-step intermediate-area label + weather drift while
+    // the player is in transit. Without this the scene bar would
+    // claim the last named location (e.g. "Asgardar") the whole walk
+    // to Varakush, and weather wouldn't refresh tile-to-tile. Playtester
+    // wanted the bar to reflect the area they're actually crossing so
+    // STOP TRAVEL + next cardinal feels intuitive.
+    const inTransit = !!get().player?.travelTarget;
+    if (inTransit) {
+      // (a) Pick the nearest named location to the new tile and surface
+      //     its name as the transit-area label. Skip when we're landing
+      //     on a named tile (the discrete-location switch below handles
+      //     that). 8-tile-radius search keeps it cheap.
+      if (!step.landedOn) {
+        let bestId: string | null = null;
+        let bestDist = Number.POSITIVE_INFINITY;
+        for (const [locId, pos] of Object.entries(map.positions)) {
+          const d = Math.abs(pos.x - step.x) + Math.abs(pos.y - step.y);
+          if (d < bestDist) { bestDist = d; bestId = locId; }
+        }
+        if (bestId && bestDist > 0) {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const locs = (require('../data/locations/locations.json') as Array<{ id: string; name: string }>);
+          const nearestName = locs.find((l) => l.id === bestId)?.name ?? null;
+          if (nearestName) {
+            // Phrase it as "near X" so the player knows it's a
+            // proximity label, not "you are at X". Same field name
+            // either way.
+            const label = `near ${nearestName}`;
+            set((s) => s.currentScene
+              ? { currentScene: { ...s.currentScene, transitArea: label } }
+              : s);
+          }
+        }
+      }
+      // (b) ~12% chance per cardinal step during travel to roll a
+      //     fresh weather state. Keeps the bar's right-hand half
+      //     reactive — drifting fog, a clear patch, a sudden static
+      //     squall as you cross a thermocline. Cheap; one roll per
+      //     step.
+      if (Math.random() < 0.12) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { pickWeather: pickWeatherFn } = require('../engine/weather');
+        const liveWorldMem = get().worldMemory;
+        const newWeather = pickWeatherFn(liveWorldMem);
+        set((s) => s.currentScene
+          ? { currentScene: { ...s.currentScene, weather: newWeather } }
+          : s);
+      }
+    } else {
+      // Not in transit — clear any lingering transit label so a
+      // manual cardinal step doesn't show "near X" forever.
+      const live = get().currentScene;
+      if (live?.transitArea) {
+        set((s) => s.currentScene
+          ? { currentScene: { ...s.currentScene, transitArea: null } }
+          : s);
+      }
+    }
     // 2026-05-26 OTA-057 — tile-novelty gate for the three 100%-uniform
     // per-step training sites (WIS, STR-passive when carrying 20+ items,
     // CHA-passive when wearing named gear). Before this gate, a player

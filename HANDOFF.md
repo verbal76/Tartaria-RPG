@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-28-126` (Travel waypoint badge fix — playtester saw "23 spaces → 2 → 26" because the world map regenerates with currentLocationId at center each step; crossing a location boundary shifts the destination's coords in the new map. Fixed by snapshotting the initial tile count at travel-start and decrementing once per step. Stable counter, no map dependence after init). See **Section 0** for the live issue tracker covering OTA-070 → OTA-126.
+> **Latest OTA:** `2026-05-28-127` (Per-step scene-bar truthfulness during travel — bar now shows "near Mud Flats" while crossing intermediate areas instead of the stale last-hub name; weather drifts ~12% per step for reactive feel; STOP TRAVEL cleanly clears the transit label so the next cardinal step renders the player's actual tile without any jump). See **Section 0** for the live issue tracker covering OTA-070 → OTA-127.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -250,6 +250,15 @@
 ### 0.B — Closed Issues (most recent first)
 
 #### Travel waypoint UX
+
+- **OTA-127 (2026-05-28) · Per-step scene-bar truthfulness during travel.**
+  - **What:** Playtester follow-up to OTA-126: "the location bar and weather conditions up top should reflect the different areas they are in at each step. because if they decide to stop travel mid route the next direction they step in needs to be accurately displayed without a massive location jump." Pre-OTA-127: scene bar showed `currentScene.location.name` the whole walk because `currentLocationId` only switches on landing at a named-location tile. Crossing open ground between named places, the bar lied.
+  - **Fix:** Three pieces.
+    1. `CurrentScene` gains `transitArea: string | null`. Per-step during travel, `stepDirection` finds the nearest named location to the new mapX/mapY and sets `transitArea = "near <name>"`. When `step.landedOn` is set (player officially enters a named location), `travelTo` regenerates the scene from scratch — `transitArea` defaults to null on the fresh scene.
+    2. Per-step weather drift during travel — ~12% chance per cardinal step to roll a new weather state via `pickWeather(worldMemory)`. Right side of the scene bar stays reactive.
+    3. `ExplorationScreen` scene bar prefers `transitArea` over `location.name` when set. Cleared on `stopTravel` + the two error paths in `continueTravel` + the not-in-transit branch of `stepDirection`.
+  - **Why:** The pre-OTA bar made the player distrust the system — they worried that stopping travel would jump them somewhere unexpected. The actual engine was already correct (cardinal steps move 1 tile from current mapX/mapY), but the bar's misleading label undermined confidence. Now the bar reads truthfully tile-by-tile; STOP TRAVEL clears the transit label and the next cardinal renders from the player's actual tile.
+  - **Files:** `app/state/gameStore.ts` (CurrentScene transitArea field + stepDirection nearest-location + weather drift + stopTravel clear + continueTravel error-path clears), `app/screens/ExplorationScreen.tsx` (scene bar prefers transitArea).
 
 - **OTA-126 (2026-05-28) · Travel badge jumped on location-boundary crossings — fixed via snapshot-and-decrement counter.**
   - **What:** Playtester report: "I was going to Varakush, the badge said 23 spaces, counted down to 2, then I crossed into the mud flats and it jumped to 26 spaces." Confirmed cause: `generateWorldMap(seed, currentLocationId)` re-centers the world map on the player's current location every step. When the player crosses into a new location, the regenerated map has the destination at different coords, so the Manhattan distance recomputed by the badge changed.
