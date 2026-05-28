@@ -75,7 +75,7 @@ function buildHomewardBeats(player: {
   return [
     `You turn your back on the Nexus, and the chamber holds its breath behind you. The Stair lifts you the way it took you down — slower, this time, because you are carrying something heavier than the Cores were.`,
     `${player.name} walks east toward ${peopleLabel}, ${companionPhrase}. The fog over the Outskirts thins as the light comes up — Tartaria, the buried country, fading at your back the way an old argument fades when you finally stop having it.`,
-    `Somewhere ahead, in the Buried Cities, a doorway you have never noticed waits for you. Not today. Today you are going home.`,
+    `Somewhere ahead, in the Buried Cities, a doorway you have never noticed waits for you. Not today, but soon. Today you are going home.`,
   ];
 }
 

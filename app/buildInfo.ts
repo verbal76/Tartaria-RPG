@@ -3487,4 +3487,29 @@
 // ShaftInstance / SHAFT_STATES +
 // FloorTemplate.shafts +
 // BuildingState.shafts).
-export const OTA_BUILD_ID = '2026-05-28-152';
+//
+// 2026-05-28 OTA-153 — "but soon" added
+// to the Homeward beat's expansion seed.
+//
+// Pre-OTA-153 the closing third paragraph
+// of the HEAD HOME ▸ fade read:
+//   "Somewhere ahead, in the Buried
+//    Cities, a doorway you have never
+//    noticed waits for you. Not today.
+//    Today you are going home."
+//
+// User wanted "but soon" appended after
+// "Not today" — a backhanded ad telling
+// players the expansion is on the way
+// without breaking the in-fiction tone.
+// New copy:
+//   "Somewhere ahead, in the Buried
+//    Cities, a doorway you have never
+//    noticed waits for you. Not today,
+//    but soon. Today you are going home."
+//
+// Trivial text edit. TS clean.
+//
+// Files: app/screens/EndingScreen.tsx
+// (third homeward beat paragraph).
+export const OTA_BUILD_ID = '2026-05-28-153';
