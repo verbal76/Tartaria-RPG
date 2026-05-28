@@ -394,6 +394,32 @@ function fuzzyEqual(word: string, candidate: string): boolean {
   return levenshtein(word, candidate) <= allowed;
 }
 
+// OTA-156 — collapse drunk-typing runs of identical characters.
+// Stress sweep found `eatt`, `useee`, `scrappp`, `drinkkk` all
+// routing to `intent=unknown` because fuzzyEqual's 1-edit budget
+// can't cross a 2-char insertion. The fix is upstream of fuzzy
+// matching: collapse runs of 3+ identical chars to 1
+// (`useee` → `use`, `scrappp` → `scrap`), AND collapse a trailing
+// 2-char doubled consonant to 1 (`eatt` → `eat`, `drinkk` → `drink`).
+// Conservative on purpose: it doesn't touch middle-of-word doubles
+// (`look`, `feed`, `book`) and never lengthens, only shortens.
+function collapseDrunkRuns(token: string): string {
+  if (token.length < 3) return token;
+  // First pass: any run of 3+ identical chars collapses to 1.
+  // `scrappp` → `scrap`, `useee` → `use`, `drinkkk` → `drink`.
+  let collapsed = token.replace(/(.)\1{2,}/g, '$1');
+  // Second pass: trailing 2-char doubled consonant (NOT vowel)
+  // collapses to 1. Catches `eatt` → `eat`, `drinkk` → `drink`,
+  // `scrapp` → `scrap`. Skips vowel-doubled endings like `see`,
+  // `too`, `goo` so legitimate English words survive. Also skips
+  // when collapsing would leave fewer than 2 chars.
+  const m = collapsed.match(/^(.+)([bcdfghjklmnpqrstvwxyz])\2$/);
+  if (m && m[1]!.length >= 1) {
+    collapsed = m[1]! + m[2]!;
+  }
+  return collapsed;
+}
+
 function bestVerbMatch(token: string): { intent: Exclude<Intent, 'unknown'>; verb: string; distance: number } | null {
   let best: { intent: Exclude<Intent, 'unknown'>; verb: string; distance: number } | null = null;
   for (const intent of ALL_INTENTS) {
@@ -402,6 +428,24 @@ function bestVerbMatch(token: string): { intent: Exclude<Intent, 'unknown'>; ver
       if (fuzzyEqual(token, verb)) {
         const d = levenshtein(token, verb);
         if (!best || d < best.distance) best = { intent, verb, distance: d };
+      }
+    }
+  }
+  // OTA-156 — if the raw token didn't match anything, retry with the
+  // drunk-run-collapsed form. Catches `eatt` / `useee` / `scrappp` /
+  // `drinkkk` without loosening the fuzzy cutoff (which would risk
+  // OTA-094-style false positives).
+  if (!best) {
+    const collapsed = collapseDrunkRuns(token);
+    if (collapsed !== token && collapsed.length >= 2) {
+      for (const intent of ALL_INTENTS) {
+        for (const verb of VERB_SYNONYMS_LOOKUP[intent]) {
+          if (collapsed === verb) return { intent, verb, distance: 0 };
+          if (fuzzyEqual(collapsed, verb)) {
+            const d = levenshtein(collapsed, verb);
+            if (!best || d < best.distance) best = { intent, verb, distance: d };
+          }
+        }
       }
     }
   }

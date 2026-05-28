@@ -3583,4 +3583,46 @@
 // Files: app/state/gameStore.ts (rest
 // case no-consumable branch + verb
 // check).
-export const OTA_BUILD_ID = '2026-05-28-155';
+//
+// 2026-05-28 OTA-156 — drunk-typing
+// run-collapse in parser.bestVerbMatch.
+//
+// Stress sweep (drunkSpelling) flagged
+// `eatt`, `useee`, `scrappp`, `drinkkk`
+// all routing to intent=unknown — held-
+// the-key-too-long typos that fuzzyEqual's
+// 1-edit budget can't span. Fix is
+// upstream: when raw token doesn't match
+// any synonym, retry with a collapsed
+// form.
+//
+// collapseDrunkRuns(token):
+//   1. Runs of 3+ identical chars
+//      collapse to 1 (`useee` → `use`,
+//      `scrappp` → `scrap`).
+//   2. Trailing 2-char doubled CONSONANT
+//      collapses to 1 (`eatt` → `eat`,
+//      `drinkk` → `drink`). Vowel
+//      doublings preserved so future
+//      `see` / `too` / `goo` verbs are
+//      safe.
+//
+// Conservative on purpose: never
+// lengthens, never touches middle-of-
+// word doubles (`look` / `feed`), and
+// the retry only runs when the raw
+// token returned no match. Doesn't
+// loosen fuzzyEqual cutoffs — those
+// stay tight to avoid OTA-094-style
+// false positives.
+//
+// 19/19 OTA-156 regressions pass.
+// 37/37 across the wider parser sweep
+// (parserFuzz, parserFuzzWithDogVerbs,
+// eatWithoutTargetRefusal,
+// theftChannelGuard). TS clean.
+//
+// Files: app/engine/parser.ts
+// (collapseDrunkRuns + bestVerbMatch
+// retry branch).
+export const OTA_BUILD_ID = '2026-05-28-156';
