@@ -172,14 +172,20 @@ export const __TEST_ONLY__ = { RULES };
 // refusal that reads as world-flavor rather than an engine error.
 // Used at the two pickup paths in gameStore.ts where a noun resolves
 // in the scene but not in the item catalog.
+// OTA-160 — stress sweep (collectAll) flagged: a hoarder who types
+// `take rubble` repeatedly only sees SALVAGE-redirect copy on 3 of
+// 8 refusal lines. Across a long hoarding stretch the player never
+// learns the verb they should be using. All 8 refusals now end with
+// an explicit "(Try SALVAGE.)" or equivalent so any single tap on a
+// scene-feature noun teaches the salvage path.
 const SCENE_FEATURE_REFUSALS: string[] = [
-  `You reach for the {target}, but a bolt of Aetheric energy snaps across the ground beside you. You decide that's not the best idea.`,
-  `Your fingers close on the {target} — and pass through where you thought a handhold was. It's part of the world here, not a thing to take.`,
-  `You start to lift the {target} and the silt shifts beneath your boots; you let go. Some things belong to the ground.`,
+  `You reach for the {target}, but a bolt of Aetheric energy snaps across the ground beside you. You decide that's not the best idea. (Try SALVAGE.)`,
+  `Your fingers close on the {target} — and pass through where you thought a handhold was. It's part of the world here, not a thing to take. (Try SALVAGE.)`,
+  `You start to lift the {target} and the silt shifts beneath your boots; you let go. Some things belong to the ground — but they can be pried loose. (Try SALVAGE.)`,
   `The {target} is fused to the stone around it. You'd need to break it loose, not just pick it up. (Try SALVAGE.)`,
-  `An Aetheric hum rises from the {target} the moment you touch it. You step back, breathing. The world's keeping that one for itself.`,
+  `An Aetheric hum rises from the {target} the moment you touch it. You step back, breathing. The world's keeping that one for itself. (Try SALVAGE.)`,
   `The {target} weighs more than you do. The Arbiter watches you try anyway, then mercifully looks away. (Try SALVAGE.)`,
-  `You wrap your hands around the {target} and your shoulders argue. It's part of the bones of this place. Whatever it gives up, it'll give to a pry, not a lift.`,
+  `You wrap your hands around the {target} and your shoulders argue. It's part of the bones of this place. Whatever it gives up, it'll give to a pry, not a lift. (Try SALVAGE.)`,
   `Dust rises off the {target} when you touch it — and settles right back. Whatever it is, it's been here longer than your race. Leave it. Or salvage it.`,
 ];
 

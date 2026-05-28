@@ -3735,4 +3735,34 @@
 //
 // Files: app/engine/parser.ts
 // (dodge synonyms + help synonyms).
-export const OTA_BUILD_ID = '2026-05-28-159';
+//
+// 2026-05-28 OTA-160 — every scene-
+// feature refusal teaches salvage.
+//
+// Stress sweep (collectAll) flagged:
+// a hoarder typing `take rubble`
+// repeatedly only saw the SALVAGE
+// redirect on 3 of 8 refusal lines.
+// Across a long stretch the player
+// never learned the right verb.
+//
+// Fix: every refusal line in
+// SCENE_FEATURE_REFUSALS now ends
+// with an explicit "(Try SALVAGE.)"
+// or "salvage it." pattern so any
+// single tap on a scene-feature noun
+// teaches the salvage path.
+//
+// Lore-keeping: the flavor variety
+// is preserved — the lines still
+// read differently. Only the salvage
+// redirect was made universal.
+//
+// 1/1 OTA-160 regression passes (200-
+// sample sweep covers all 8 pool
+// lines, every line matches /salvage/).
+//
+// Files: app/engine/portability.ts
+// (5 refusal lines extended with
+// SALVAGE redirect).
+export const OTA_BUILD_ID = '2026-05-28-160';
