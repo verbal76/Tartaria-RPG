@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-119` (Planning-only OTA — Dog Companion framework gains Phase 6: puppy-vendor safety net. One-shot per save, post-combat-death only (NOT abandonment), activates after next Core Guardian victory, vendor trades a puppy for one random Common-tier non-equipped item. Mid-save acquisition confirmed working via one-line migration. Per-phase difficulty estimates added). See **Section 0** for the live issue tracker covering OTA-070 → OTA-119.
+> **Latest OTA:** `2026-05-27-120` (Planning-prep OTA before the big implementation. Two design overrides locked in: (1) dogs + golems coexist in combat — earlier mutex rule overridden, three-way enemy retaliation split; (2) rubble-puppy late-game fallback for when all 9 Guardians are cleared. Implementation agent running in background; the full 6-phase Dog Companion build + tutorial + stress tests will land as OTA-121). See **Section 0** for the live issue tracker covering OTA-070 → OTA-120.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -109,7 +109,7 @@
     - `Give them a treat` — opens pack picker filtered to consumables + treats; loyalty +20 (regular food) / +40 (treat).
     - `Speak softly` — loyalty +1, flavor line.
 
-  **Golem conflict (user: "dogs do not like golems").** Mutually exclusive: dog and golem cannot both be active in the same scene. If the player summons a golem while the dog is with them, the dog sets `status='waiting_at_base'` at the current tile and the arbiter narrates `"Your dog backs up, hackles raised. They won't share a tile with that thing."`. Dismissing the golem restores the dog after one cardinal step.
+  **Golem coexistence (OTA-120 design override — was mutex).** Dogs and golems CAN both be active in combat. Earlier framework rule ("dogs do not like golems → mutual exclusion") is overridden — they now fight side-by-side. Flavor still acknowledges the tension on first co-activation (`"Your dog gives the golem a wide arc and watches it sideways. Both will fight."`) but mechanically both companions act in the same turn order. Both occupy weapon-like rows in the combat action menu; both take enemy retaliation share. Enemy threat distribution becomes three-way (player / dog / golem) instead of two-way. No exclusion check anywhere in the combat path.
 
   **Puppy-vendor safety net (Phase 6 addition).** When the player's dog dies in COMBAT (not abandonment), a single-use replacement path opens. Rules:
 
@@ -129,7 +129,7 @@
 
     8. **Hard cap (user's spec):** ONE puppy vendor per save, full stop. If the puppy also dies in combat later, no second vendor. If the puppy abandons through hunger, no second vendor. `puppyVendorUsed === true` permanently locks the path. The save can never get a third dog from this mechanic.
 
-    9. **Edge case — all Guardians cleared:** if the player has already defeated all 9 Core Guardians and THEN their dog dies in combat, `puppyVendorOwed` is set but never fires (no future Guardian victory to trigger on). Player is out of luck — this is intentional; the late-game player has all the resources to keep a dog alive and shouldn't get a bail-out.
+    9. **Edge case — all Guardians cleared (OTA-120 addition: rubble-puppy fallback).** If the player has already defeated all 9 Core Guardians AND their dog dies in combat, the Guardian-victory trigger can never fire. Late-game fallback: a `puppy_in_rubble` investigation hook becomes available on outdoor wasteland scenes ~5% per scene-entry roll after the flag-set. Player investigates the rubble noun → finds a lone puppy → runs the same three-step Arbiter onboarding (breed → name → sex). Same restrictions: ONLY if `puppyVendorOwed === true` AND `puppyVendorUsed === false` AND all 9 Guardians are clear. Same single-shot enforcement (sets `puppyVendorUsed = true` whether accepted or not). No cost (no item trade — the puppy is just there in the ruins). This is the OTA-120 rubble-puppy late-game safety net the user added on top of the Guardian-gated vendor path.
 
     10. **Save / load:** `puppyVendorOwed` and `puppyVendorUsed` flags live in `worldMemory`, serialize naturally. Migration on existing saves: both default to false.
 

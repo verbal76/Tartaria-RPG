@@ -1984,4 +1984,31 @@
 // Files: HANDOFF.md (Puppy-vendor section, mid-save note,
 // difficulty estimates, Phase 6 in phasing, files-touched
 // updates).
-export const OTA_BUILD_ID = '2026-05-27-119';
+//
+// 2026-05-27 OTA-120 — Planning prep commit (no code
+// changes). User issued the "implement everything" go-ahead
+// with two final design overrides:
+//   1. Dog + golem coexistence: the earlier mutex rule is
+//      overridden. Both fight side-by-side; three-way enemy
+//      retaliation split (~30/30/40). First co-activation
+//      narrates the tension flavor but mechanically allows
+//      both companions.
+//   2. Rubble-puppy late-game fallback: when all 9
+//      Guardians are cleared AND combat-death triggered
+//      puppyVendorOwed, a puppy_in_rubble investigation
+//      hook spawns at ~5% per outdoor wasteland scene
+//      entry. No item trade required. Same single-shot
+//      enforcement.
+//
+// Implementation agent launched in background to ship the
+// full 6-phase Dog Companion build + tutorial. That work
+// lands as OTA-121 when the agent completes; stress-test
+// agents follow to validate the whole game before the user
+// gets the ship-ready OTA.
+//
+// JS bundle unchanged for OTA-120.
+//
+// Files: HANDOFF.md (Golem-coexistence override + rubble-
+// puppy late-game fallback added to the Dog Companion
+// framework in 0.A).
+export const OTA_BUILD_ID = '2026-05-27-120';
