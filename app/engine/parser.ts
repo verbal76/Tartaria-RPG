@@ -45,8 +45,15 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     // make "open the chest" silently route to a generic area search.
   ],
   rest: [
-    'rest', 'sleep', 'recover', 'camp', 'heal', 'eat', 'consume', 'devour', 'drink',
+    // OTA-125 — 'drink' removed from rest synonyms; it has its own
+    // intent now so "drink water" no longer routes to an 8-hour
+    // sleep. 'eat'/'consume'/'devour' stay here for "eat the ration"
+    // → consumable HP flow handled inside the rest case.
+    'rest', 'sleep', 'recover', 'camp', 'heal', 'eat', 'consume', 'devour',
     'nap', 'doze',
+  ],
+  drink: [
+    'drink', 'sip', 'gulp', 'quaff', 'slurp', 'guzzle',
   ],
   inventory: [
     // 'bag' removed — too greedy: "bag the goblin" / "tea bag" / "sandbag"

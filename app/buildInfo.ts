@@ -2204,4 +2204,70 @@
 // across both stress agents, 4 test files updated
 // (test.failing flipped + dogHungerTimingChaos helper
 // + dogSystemPerfSmoke budget).
-export const OTA_BUILD_ID = '2026-05-27-124';
+//
+// 2026-05-28 OTA-125 — Playtest log diagnosis from a
+// 2-day session on an existing Day-30+ character. Four
+// real issues fixed:
+//
+//   (1) Monotonous investigate catchall — 4 different
+//       uncategorized nouns (siren egg, echo chamber,
+//       flood seal, water current) all returned the
+//       SAME generic line in a row because the generic
+//       category's fallbackLore was a single string.
+//       Added GENERIC_VARIANTS pool of 8 distinct lines
+//       in investigationTable.ts, picked deterministi-
+//       cally per noun via nounSeed (same noun stays
+//       consistent across re-reads; different nouns
+//       get different beats).
+//
+//   (2) Flee parsed + 15-min charged + then "Action
+//       cancelled" — player backed out of the flee
+//       roll modal but the time/stamina charge stuck.
+//       Added refundOnCancel snapshot on PendingRoll
+//       State; cancelPendingRolls now restores
+//       hoursElapsed + stamina from the snapshot. Log
+//       line tweaked to "Action cancelled. Time and
+//       stamina refunded." when a refund actually fires.
+//
+//   (3) "drink water" parsed as intent=rest, producing
+//       an 8-hour sleep outcome. Split 'drink' off
+//       from the rest synonym list into its own intent
+//       (Intent union, parser VERB_SYNONYMS, llmParser
+//       INTENT_LIST + canonical map). New case 'drink'
+//       handler: routes "drink <consumable>" through
+//       the eat-the-ration path; "drink water" with a
+//       scene water source to a cup-hands +3-stamina
+//       5-min beat; otherwise arbiter hint.
+//
+//   (4) "fill water bottle" refused at a scene with a
+//       "water current" because the WATER_SOURCE_NOUNS
+//       list lacked current/stream/etc. Extended the
+//       list with current/currents/rivulet/brook/canal/
+//       aqueduct/reservoir + a "any noun including
+//       'water'" fallback so future water-prefixed
+//       nouns just work. Arbiter hint copy updated to
+//       include "stream, current" in the example list.
+//
+// Issue #5 (older characters and dog rescue scenarios):
+// verified the rescue hook intercept at gameStore.ts:
+// 3745-3764 fires for older characters the moment they
+// tap a hook noun (cage / chain / wagon / wheel /
+// cellar / trapdoor / snare / trap / pit / smelter /
+// forge ruin) on investigate / attack / advance /
+// travel / ask / use_relic. No per-room-consumed gate.
+// The Day-32 character in the log just hadn't hit one
+// of those nouns yet. Logged a follow-up open issue
+// in 0.A for "rumor-of-trapped-dog Arbiter hint after
+// N days with no rescue trigger" to help old-save
+// discoverability.
+//
+// Files: app/engine/investigationTable.ts (variant
+// pool + resolveLore branch), app/engine/types.ts
+// ('drink' intent + PendingRollState.refundOnCancel),
+// app/engine/parser.ts ('drink' synonyms + remove
+// from rest pool), app/engine/llmParser.ts
+// (INTENT_LIST + canonical map), app/state/gameStore.ts
+// (WATER_SOURCE_NOUNS extended + case 'drink' +
+// cancelPendingRolls refund + escape pre-charge
+// snapshot).
+export const OTA_BUILD_ID = '2026-05-28-125';

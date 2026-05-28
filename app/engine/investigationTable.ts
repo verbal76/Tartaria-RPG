@@ -414,6 +414,26 @@ function pickCreepyVariant(pool: readonly string[], category: NounCategory): str
   return rotatingPick(pool, `investigation.creepy.${category}`);
 }
 
+// OTA-125 — generic-category variant pool. Playtest log showed 4
+// uncategorized nouns (siren egg, echo chamber, flood seal, water
+// current) all hitting the same fallbackLore line in a row, which
+// reads as broken. KEYWORD_MAP can't realistically cover every
+// noun the world authors throw at it, so the generic catchall
+// gets its own variety: 8 distinct lines, picked deterministically
+// per noun via nounSeed. Same noun always resolves to the same
+// line (player sanity), different nouns get different beats
+// (immersion).
+const GENERIC_VARIANTS: readonly string[] = [
+  'You look the {noun} over. Nothing about it sings, nothing about it warns — Tartaria is full of objects waiting to be remembered.',
+  'You turn the {noun} in your hands and find no answer. The silence here is patient; whatever it knew, it has decided to keep.',
+  'The {noun} reads as ordinary, which in Tartaria is a small kind of relief. You let it go.',
+  'You weigh the {noun} and consider it. The Aetheric haze does not gather; the dust does not stir. Just a thing, in a place.',
+  'You give the {noun} your full attention. It returns the gesture by being exactly what it appears to be.',
+  'The {noun} resists your reading. Not hostile — just closed. Some things in the buried world don\'t open for the curious.',
+  'You study the {noun}. It bears no marks worth naming — no glyph, no fingerprint, no trace the Reclaimers would catalog.',
+  'The {noun} sits the way ordinary things sit. The Arbiter does not lean in. You move on.',
+];
+
 /** Resolve the lore line for an entry. Returns the cached
  *  loreLine if set; otherwise picks from the category's
  *  CREEPY_VARIANTS at the OTA-080 creepy rate (deterministic
@@ -437,6 +457,11 @@ export function resolveLore(entry: InvestigationEntry): string {
     } else {
       line = tmpl.fallbackLore;
     }
+  } else if (entry.category === 'generic') {
+    // OTA-125 — generic-category variant pool. Deterministic per
+    // noun so the same noun stays consistent across re-reads.
+    const idx = nounSeed(entry.noun.toLowerCase()) % GENERIC_VARIANTS.length;
+    line = GENERIC_VARIANTS[idx]!;
   } else {
     line = tmpl.fallbackLore;
   }

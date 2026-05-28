@@ -52,6 +52,12 @@ export type Intent =
   // water source in the current scene (puddle / lake / waterfall /
   // crevice / stream / well).
   | 'fill'
+  // OTA-125 — drink. Was previously a `rest` synonym, which produced
+  // an absurd 8-hour-rest outcome for "drink water" (playtester
+  // surfaced this on Day 32). Now its own intent: routes "drink
+  // <consumable>" through the existing consumable-eat flow, "drink
+  // water" with a scene water source to a small stamina restore.
+  | 'drink'
   // OTA-120 — Dog Companion combat verbs. Both intents require an
   // active dog in combat (player.dog.status === 'with_player' AND
   // currentScene.enemies.length > 0). Bite is a direct attack;
@@ -883,6 +889,12 @@ export interface PendingRollState {
   actionText: string;
   steps: RollStep[];
   currentStep: number;
+  // OTA-125 — snapshot of player.hoursElapsed + stamina BEFORE the
+  // skill-check time/stamina charge was applied. Set when the roll
+  // is created so cancelPendingRolls can refund the cost — players
+  // who back out of a flee / cast / stealth / etc. modal shouldn't
+  // lose 15 minutes and stamina for nothing.
+  refundOnCancel?: { hoursElapsed: number; stamina: number };
 }
 
 export interface GameLogEntry {

@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-124` (SHIP-READY — Dog Companion wave closes. Vandalistic stress sweep added 13 test files; 304/304 tests pass across 22 suites. Four engine ship-blocker bugs surfaced and FIXED before ship: puppyVendorOwed never set (Phase 6 unreachable), dog status never 'dead', dogSmelledHere never cleared, waiting_at_base loyalty decay. Three pre-existing catalog hygiene issues logged as open). See **Section 0** for the live issue tracker covering OTA-070 → OTA-124.
+> **Latest OTA:** `2026-05-28-125` (Playtest log fixes from a Day-32 OTA-124 session: investigate catchall now has 8 deterministic-per-noun variants (no more "4 nouns same line in a row"); cancelled flee/cast/stealth rolls refund time + stamina; `drink` is its own intent (no more 8-hour rest on "drink water"); water-source list now includes current/stream/rivulet/brook. Verified dog rescue hooks work for older characters — they fire on hook-noun taps regardless of save age). See **Section 0** for the live issue tracker covering OTA-070 → OTA-125.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -22,6 +22,8 @@
 > **The canonical record of issues across the build.** Every OTA / APK push updates this section in the same commit. **Read this section before planning any fix** to (a) check whether the issue is already closed and the fix exists, and (b) make sure your plan won't break a previously-closed fix. The workflow rules live in `CLAUDE.md` → "HANDOFF.md — the build timeline."
 
 ### 0.A — Open Issues
+
+- **Rumor-of-trapped-dog Arbiter hint for old-save players (OTA-125 follow-up).** Day-32 character on OTA-124 went 2 days of gameplay without ever encountering a rescue hook noun. The rescue system is wired correctly (fires on any future tap of cage / chain / wagon / wheel / cellar / trapdoor / snare / trap / pit / smelter / forge ruin on investigate / attack / advance / travel / ask / use_relic), but discoverability is RNG-bound — a player who travels through scenes without those noun chips will never know the system exists. **Fix shape:** if `!player.dog && !worldMemory.dogRescueTipFired && day-count > 5`, the Arbiter periodically (~0.5% per scene entry) drops a rumor hint: *"Travelers have been speaking of a dog held at a smelter ruin to the [random cardinal]. The Reclaimers have been quiet about it."* Set the flag so the hint only fires once per save. Low priority — system works, just needs a discovery nudge. **Status:** open.
 
 - **Catalog cross-file duplicates (OTA-124 stress-sweep finding).** Five items appear in BOTH `app/data/items/gear.json`/`amulets.json` AND `app/data/items/exploration.json`: `Aetheric Torch`, `Aetheric Compass`, `Minor Aetheric Amulet`, `Lightstone Amulet`, `Whisperer's Charm`. `findCatalogItem` first-hit-wins masks the issue at the call site, but the second-file row's `effect` / `tcBuy` / `faction` fields silently drop. **Fix shape:** decide canonical home per item and remove the other. **Status:** open; not user-facing today (engine handles), but a real authoring trap. Captured in `__tests__/catalogIntegrityWithDogGear.test.ts:178` as `test.failing`.
 
@@ -246,6 +248,23 @@
 - **TS 0 errors / Test suite green.** Always required pre-push. Tracked here as a passive gate rather than an issue.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Playtest log fixes
+
+- **OTA-125 (2026-05-28) · Day-32 playtest log surfaced 4 real issues — all fixed.**
+  - **What:** Player on existing Day-30+ character ran 2 days of gameplay on OTA-124. Captured log surfaced:
+    1. Four uncategorized nouns (siren egg, echo chamber, flood seal, water current) returning the IDENTICAL generic-catchall line in a row — breaks immersion.
+    2. Flee parsed and 15-min/stamina charged; then 3 seconds later "Action cancelled" appeared — refund missing.
+    3. `drink water` parsed as `intent=rest` → 8-hour sleep outcome.
+    4. `fill water bottle` refused at a scene with a "water current" because WATER_SOURCE_NOUNS lacked current/stream.
+  - **Fix:**
+    1. New `GENERIC_VARIANTS` pool of 8 distinct lines in `investigationTable.ts`. Picked deterministically per noun via `nounSeed` (same noun stays consistent; different nouns get different beats). `resolveLore` branches on `category === 'generic'` to use the pool.
+    2. `PendingRollState` gains `refundOnCancel?: { hoursElapsed; stamina }`. Set at the escape/cast/use_relic site BEFORE the charge. `cancelPendingRolls` restores from the snapshot when present. Log copy: "Action cancelled. Time and stamina refunded."
+    3. New `'drink'` intent (Intent union, parser VERB_SYNONYMS, llmParser map). Handler routes `drink <consumable>` through the eat-the-ration path (preserves all existing effect resolution); `drink water` with a scene water source to a cup-hands +3-stamina 5-min beat; otherwise an Arbiter hint. Removed `'drink'` from the rest synonym pool.
+    4. `WATER_SOURCE_NOUNS` extended with `current/currents/rivulet/brook/canal/aqueduct/reservoir` + a fallback that matches any noun containing the substring "water". Arbiter hint copy updated to include "stream, current" in the example list. Applied to BOTH the `case 'fill'` handler and the new `case 'drink'` handler.
+  - **Why:** Each was a real player-experience regression (or never-worked) that surfaces immediately to anyone who plays. The catchall and drink-as-rest in particular look like bugs at first glance. The flee-without-refund is a fairness issue. All four fixes are localized, well-tested, and shipped together for one OTA.
+  - **Verified for old saves:** Issue #5 (rescue hooks on older characters) — confirmed the intercept at `gameStore.ts:3745-3764` fires for any character without a dog the moment they tap a hook noun on the relevant intents. Day-32 character in the log just hadn't hit a hook noun yet. Logged a follow-up in 0.A for "rumor-of-trapped-dog Arbiter hint" to improve discoverability.
+  - **Files:** `app/engine/investigationTable.ts` (variant pool + resolveLore), `app/engine/types.ts` (Intent + PendingRollState), `app/engine/parser.ts`, `app/engine/llmParser.ts`, `app/state/gameStore.ts` (drink handler + fill list + cancelPendingRolls refund + escape pre-charge snapshot).
 
 #### Dog Companion wave
 

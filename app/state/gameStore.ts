@@ -5790,12 +5790,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
           void get().persist();
           break;
         }
+        // OTA-125 — snapshot pre-charge state so cancelling the roll
+        // modal refunds the 15-min time + skill-check stamina. Player
+        // shouldn't pay for an action they backed out of.
+        const refundOnCancel = {
+          hoursElapsed: player.hoursElapsed ?? 0,
+          stamina: player.stamina,
+        };
         set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
         const steps = buildSkillSteps(parsed.intent, player, {
           weatherMod: weatherStatModifiers(currentScene.weather),
           companionAssist: !!player.companion,
         });
-        set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
+        set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0, refundOnCancel } });
         break;
       }
       case 'rest': {
@@ -6968,17 +6975,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // OTA 004 — Phase 3 water bottles. Requires an Empty Water
         // Bottle in inventory + a water-source noun in the scene
         // ambient list. Consumes one empty, grants one full.
+        // OTA-125 — extended list to include current/currents/rivulet/
+        // brook/canal/aqueduct after a playtest log showed "water
+        // current" in the scene but the fill verb refused with
+        // "no water to draw from here." Also added a "any noun that
+        // includes the word 'water'" fallback so future water-prefixed
+        // nouns (water seam, water basin, watering hole) just work.
         const WATER_SOURCE_NOUNS = [
           'puddle', 'puddles', 'lake', 'pond', 'river', 'stream', 'creek',
           'waterfall', 'spring', 'well', 'crevice', 'fountain', 'pool',
-          'cistern', 'trough',
+          'cistern', 'trough', 'current', 'currents', 'rivulet', 'brook',
+          'canal', 'aqueduct', 'reservoir',
         ];
         const sceneNouns = (currentScene.ambientNouns ?? []).map((n) => n.toLowerCase());
-        const sourceNoun = WATER_SOURCE_NOUNS.find((w) => sceneNouns.some((sn) => sn.includes(w)));
+        const sourceNoun = WATER_SOURCE_NOUNS.find((w) => sceneNouns.some((sn) => sn.includes(w)))
+          ?? (sceneNouns.find((sn) => sn.includes('water')));
         if (!sourceNoun) {
           get().appendLog(
             'arbiter',
-            `The Arbiter glances around. "No water to draw from here. Try a puddle, lake, waterfall, crevice pool, well — anywhere the wet collects."`,
+            `The Arbiter glances around. "No water to draw from here. Try a puddle, lake, waterfall, stream, current, well — anywhere the wet collects."`,
           );
           break;
         }
@@ -7017,6 +7032,56 @@ export const useGameStore = create<GameStore>((set, get) => ({
           return { player: { ...s.player, inventory: newInventory } };
         });
         get().appendLog('world', `You scoop water from the ${sourceNoun} into the bottle. (✦ Water Bottle, ✗ Empty Water Bottle)`);
+        break;
+      }
+      case 'drink': {
+        // OTA-125 — was a rest synonym; "drink water" produced an
+        // 8-hour-rest outcome, surfaced in a playtest log. Now its own
+        // intent. Three paths in priority order:
+        //   1) drink <named consumable> in pack → route through the
+        //      consumable-eat flow in rest (re-dispatch with intent='rest'
+        //      so existing effect resolution + buff registration runs
+        //      unchanged).
+        //   2) drink water with a scene water source → cup-hands drink,
+        //      +3 stamina, costs 5 min. No bottle needed.
+        //   3) Nothing matches → arbiter hint.
+        const drinkTarget = (parsed.target ?? '').toLowerCase().trim();
+        const resolvedConsumable = parsed.resolvedItemId
+          ? player.inventory.find((i) => i.id === parsed.resolvedItemId && i.kind === 'consumable')
+          : undefined;
+        if (resolvedConsumable) {
+          // Re-dispatch through rest so all the existing eat-the-ration
+          // logic (per-item effect resolution, buff status, empty-bottle
+          // pass-through, etc.) runs unchanged. This keeps "drink water
+          // bottle" / "drink wild carrot infusion" working off one path.
+          void get().submitPlayerAction(`eat ${resolvedConsumable.name}`);
+          break;
+        }
+        const WATER_SOURCE_NOUNS = [
+          'puddle', 'puddles', 'lake', 'pond', 'river', 'stream', 'creek',
+          'waterfall', 'spring', 'well', 'crevice', 'fountain', 'pool',
+          'cistern', 'trough', 'current', 'currents', 'rivulet', 'brook',
+          'canal', 'aqueduct', 'reservoir',
+        ];
+        const sceneNouns = (currentScene.ambientNouns ?? []).map((n) => n.toLowerCase());
+        const drinkSource = WATER_SOURCE_NOUNS.find((w) => sceneNouns.some((sn) => sn.includes(w)))
+          ?? (sceneNouns.find((sn) => sn.includes('water')));
+        const wantsWater = !drinkTarget || drinkTarget.includes('water') || WATER_SOURCE_NOUNS.includes(drinkTarget);
+        if (drinkSource && wantsWater) {
+          const stamGained = Math.min(3, effectiveStaminaMax(player) - player.stamina);
+          set({ player: advanceTime(restoreStamina(player, 3), 0.083) }); // 5 min
+          get().appendLog(
+            'world',
+            stamGained > 0
+              ? `You cup the ${drinkSource} in your hands and drink. The wet cuts the dust in your throat. (+${stamGained} stamina, 5 min)`
+              : `You cup the ${drinkSource} in your hands and drink. You weren't tired; mostly you were thirsty. (5 min)`,
+          );
+          break;
+        }
+        get().appendLog(
+          'arbiter',
+          `The Arbiter tilts their head. "Drink what? You'd need a water source nearby, or a Water Bottle in your pack."`,
+        );
         break;
       }
       case 'throw': {
@@ -8968,8 +9033,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   cancelPendingRolls() {
-    set({ pendingRolls: null });
-    get().appendLog('system', 'Action cancelled.');
+    // OTA-125 — refund the pre-roll time + stamina charge if the roll
+    // captured a refund snapshot. Players who back out of a flee /
+    // cast / stealth / etc. modal shouldn't lose 15 minutes and
+    // stamina for nothing — surfaced from a playtest log where a
+    // cancelled flee charged 15 min and didn't refund.
+    const refund = get().pendingRolls?.refundOnCancel;
+    set((s) => {
+      if (!refund || !s.player) return { pendingRolls: null };
+      return {
+        pendingRolls: null,
+        player: {
+          ...s.player,
+          hoursElapsed: refund.hoursElapsed,
+          stamina: refund.stamina,
+        },
+      };
+    });
+    get().appendLog('system', refund ? 'Action cancelled. Time and stamina refunded.' : 'Action cancelled.');
   },
 
   concludeRolls(steps: RollStep[], actionText: string) {
