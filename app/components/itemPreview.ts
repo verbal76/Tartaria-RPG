@@ -138,6 +138,29 @@ function previewGear(g: CatalogGear): ItemPreview {
     const sign = g.effect.bonus > 0 ? '+' : '';
     stats.push(`${sign}${g.effect.bonus} ${g.effect.stat.toUpperCase().slice(0, 3)} (passive)`);
   }
+  // OTA-111 — surface CONSUMABLE restore amounts on the catalog
+  // preview so RECIPES-tab cards show "+5 HP / +2 stamina" inline
+  // instead of just the rarity. Playtester ask: "We should show
+  // what each food recipe gives back in terms of health and/or
+  // stamina, so we know what we need to make to restore health."
+  // Data lives in app/data/items/gear.json under
+  // effect.{healHP,restoreStamina,reduceCorruption,buffStat/Bonus/Duration,cureBleed}.
+  if (g.effect && g.effect.kind === 'consumable') {
+    const restoreParts: string[] = [];
+    if (g.effect.healHP) restoreParts.push(`+${g.effect.healHP} HP`);
+    if (g.effect.restoreStamina) restoreParts.push(`+${g.effect.restoreStamina} stamina`);
+    if (g.effect.reduceCorruption) restoreParts.push(`−${g.effect.reduceCorruption} corruption`);
+    if (g.effect.extendLight) restoreParts.push(`+${g.effect.extendLight} light`);
+    if (restoreParts.length > 0) stats.push(`Restores: ${restoreParts.join(' / ')}`);
+    if (g.effect.buffStat && g.effect.buffBonus && g.effect.buffDuration) {
+      const sign = g.effect.buffBonus > 0 ? '+' : '';
+      stats.push(
+        `Buff: ${sign}${g.effect.buffBonus} ${g.effect.buffStat.toUpperCase().slice(0, 3)} for ${g.effect.buffDuration} turns`,
+      );
+    }
+    if (g.effect.cureBleed) stats.push('Cures: bleed');
+    if (g.effect.revealScene) stats.push('Reveals hidden scene hooks');
+  }
   if (g.tags.length > 0) stats.push(`Tags: ${g.tags.slice(0, 4).join(', ')}`);
   return { name: g.name, kindLabel, rarity: g.rarity, description: g.description, stats };
 }

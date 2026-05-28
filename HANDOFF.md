@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-110` (Multi-agent stress audit shipped — 40 new sim tests across 3 files (engine state chaos, player input chaos, crafting/inventory chaos), 0 invariant failures across 600-iter random walks. One actionable bug closed: catalog inference ordering — 12 false-positive `inferred-stats:` warnings (Aetheric Cloak, Wyrm Fang, Sentinel Core Plate et al) silenced via an `isCataloguedElsewhere` guard in find\*. Three new open issues logged for follow-up). See **Section 0** for the live issue tracker covering OTA-070 → OTA-110.
+> **Latest OTA:** `2026-05-27-111` (Crafting recipe info surfaces — weapon damage dice already shipping but quiet; consumable restore + buff + cure lines added to food recipes via previewGear; golem stats + summon DC surfaced on the AETHERIC tab with per-kind tappable variant rows. Descriptive stat-growth balance sim landed too — partial finding: DEX is the slowest stat, not INT). See **Section 0** for the live issue tracker covering OTA-070 → OTA-111.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.

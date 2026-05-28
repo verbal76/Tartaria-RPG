@@ -1662,4 +1662,58 @@
 // cases), __tests__/craftingInventoryChaosSim.ts (new, 15
 // cases — the test.failing flipped to a real assertion now
 // that the fix lands).
-export const OTA_BUILD_ID = '2026-05-27-110';
+//
+// 2026-05-27 OTA-111 — Crafting screen recipe info surfaces +
+// descriptive stat-growth balance sim. User: "we need to show
+// what the dice rolls are for damage, so we can decide what to
+// build. We should show what each food recipe gives back in
+// terms of health and/or stamina... And for the golems, we
+// need to know their stats so we know what to make, and which
+// stats are needed to make them."
+//
+// Three surfaces:
+//   (1) WEAPON damage dice — already shipping via previewWeapon
+//       in itemPreview.ts:99-110 ("Damage: 2d6 (slashing) ·
+//       Scales with STR · ..."). Verified intact; no code
+//       change. Quiet styling (#cdbf99 italic fontSize 11) is
+//       the likely reason the user missed it on screen — can
+//       bump emphasis in a follow-up if they want it shouting.
+//   (2) FOOD / consumable restore — extended previewGear in
+//       itemPreview.ts:129-167 to emit "Restores: +5 HP /
+//       +2 stamina", buff lines ("Buff: +1 STR for 6 turns"),
+//       cure lines ("Cures: bleed"), and reveal lines.
+//       Renders through the existing
+//       preview.stats.join(' · ') in RecipesView.tsx:197-200
+//       so no consumer code changed.
+//   (3) GOLEM stats + summon DC — new GOLEM_VARIANTS block in
+//       the SUMMON discipline card at
+//       CraftingScreen.tsx:385-418. Each of the 4 kinds
+//       (Mud / Iron / Aether / Crystal) gets a tappable row
+//       with HP, damage dice, blurb, fuel recipe, and a
+//       tap-to-stage hint that drops "summon iron golem" into
+//       the input draft. Footer: "Requires: INT 10+ recommended
+//       (d20 + INT vs DC 15; Mud Dwellers / Aetherborn cast at
+//       base DC, others +4)."
+//
+// Data note (deferred): runAethercraft in gameStore.ts:16592
+// uses a single hard-coded dcBase = 15 (INT) for all four
+// golems. Crystal/Aether (lore-wise stronger anchors) cost
+// the same INT roll as Mud. Adding per-golem `summonDC` to
+// GolemDefinition is a design call — flagged as an open
+// follow-up in HANDOFF.md 0.A.
+//
+// Also lands: __tests__/statGrowthBalanceSim.test.ts — 5000-
+// turn × 20-seed sim measuring per-stat XP/turn rates +
+// turns-to-Guardian-threshold per stat. Descriptive only
+// (no threshold assertions yet) so it's safe to ship before
+// tuning recommendations land. Partial output already
+// surfaced: DEX is the slowest stat (0.067 XP/turn, ~1504
+// turns to Guardian threshold) — NOT INT (0.155 XP/turn,
+// ~643 turns). Full diagnosis + tuning recommendations
+// arrive in OTA-112.
+//
+// Files: app/components/itemPreview.ts (previewGear restore
+// + buff + cure lines), app/screens/CraftingScreen.tsx
+// (GOLEM_VARIANTS block + stageDraft helper + nested row
+// styles), __tests__/statGrowthBalanceSim.test.ts (new).
+export const OTA_BUILD_ID = '2026-05-27-111';

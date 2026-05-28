@@ -6,6 +6,7 @@ import { repairCostMaterials } from '../engine/scrapEngine';
 import { RecipesView } from '../components/RecipesView';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import type { InventoryItem } from '../engine/types';
+import { GOLEM_DEFINITIONS, type GolemDefinition } from '../engine/golems';
 
 // 2026-05-27 OTA-095 — Aethercraft disciplines moved from
 // ActionReferenceScreen's "Recipes" mode (now deleted) into a
@@ -22,6 +23,12 @@ interface AethercraftDiscipline {
   body: string;
   fuels: string[];
   examples: string[];
+  /** OTA-111 — when true, the card renders a per-golem-variant
+   *  block (HP / attack / damage type / fuel cost) under the body
+   *  so the player can decide which golem to summon. Data is
+   *  pulled live from GOLEM_DEFINITIONS so a new golem kind shows
+   *  up automatically. */
+  showGolemVariants?: boolean;
 }
 
 const AETHERCRAFT_DISCIPLINES: AethercraftDiscipline[] = [
@@ -40,10 +47,11 @@ const AETHERCRAFT_DISCIPLINES: AethercraftDiscipline[] = [
     title: 'Aether Golem Constructor (summon)',
     body:
       'INT check, DC 15 (harder than the other two — golems take stronger anchors). Summons ' +
-      'an Aether Golem ally that fights for you for the rest of the scene. ' +
+      'a golem ally that fights for you for the rest of the scene. ' +
       'Mud Dwellers and Aetherborn cast at the base DC; every other race rolls +4 harder.',
     fuels: ['Aetheric Shard', 'Aether Crystal', 'Golem Core'],
     examples: ['summon golem', 'summon an aether golem', 'call a golem'],
+    showGolemVariants: true,
   },
   {
     id: 'aether_mend',
@@ -55,6 +63,26 @@ const AETHERCRAFT_DISCIPLINES: AethercraftDiscipline[] = [
     fuels: ['Aetheric Shard', 'Aether Crystal'],
     examples: ['mend wounds', 'heal me', 'mend self', 'aetheric healing'],
   },
+];
+
+// OTA-111 — phrasing that ROUTES to each golem kind via
+// parseGolemKind in app/engine/golems.ts. The keyword each phrase
+// has to carry (iron / aether / crystal / mud) is what the parser
+// looks at. The order here mirrors GOLEM_DEFINITIONS' insertion
+// order so the cards read mud → iron → aether → crystal (lightest
+// fuel to heaviest, then HP / damage trade-offs).
+const GOLEM_VARIANT_PHRASE: Record<GolemDefinition['kind'], string> = {
+  mud_golem: 'summon mud golem',
+  iron_golem: 'summon iron golem',
+  aether_golem: 'summon aether golem',
+  crystal_golem: 'summon crystal golem',
+};
+
+const GOLEM_VARIANTS: GolemDefinition[] = [
+  GOLEM_DEFINITIONS.mud_golem,
+  GOLEM_DEFINITIONS.iron_golem,
+  GOLEM_DEFINITIONS.aether_golem,
+  GOLEM_DEFINITIONS.crystal_golem,
 ];
 
 // OTA-087 — sort axes for the REPAIR tab. 'durability' sorts
@@ -121,6 +149,13 @@ export function CraftingScreen() {
   // pulseAt timestamps a card so its "queued" pulse can fade.
   const [aetherCycleIdx, setAetherCycleIdx] = useState<Record<string, number>>({});
   const [aetherPulseAt, setAetherPulseAt] = useState<Record<string, number>>({});
+  // OTA-111 — last phrase staged per discipline card. Lets the
+  // summon card's per-golem variants drive the "✓ staged" hint
+  // line with the SPECIFIC summon phrase ("summon iron golem"),
+  // not just whatever generic discipline example was last in
+  // play. Falls back to the cycled example phrase when nothing
+  // variant-specific has been staged yet.
+  const [aetherLastStaged, setAetherLastStaged] = useState<Record<string, string>>({});
   // OTA-087 — per-tab search + sort state. Each tab keeps its
   // own so switching tabs doesn't clobber the user's filter.
   // Defaults are tuned per category: craft/recipes default to
@@ -301,9 +336,24 @@ export function CraftingScreen() {
           <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
             {AETHERCRAFT_DISCIPLINES.map((d) => {
               const queuedIdx = aetherCycleIdx[d.id];
-              const queuedPhrase = queuedIdx !== undefined ? d.examples[queuedIdx] : null;
+              const queuedPhrase = aetherLastStaged[d.id]
+                ?? (queuedIdx !== undefined ? d.examples[queuedIdx] : null);
               const pulse = aetherPulseAt[d.id];
               const queued = !!pulse && Date.now() - pulse < 1400;
+              // OTA-111 — stage a phrase on the input draft +
+              // clipboard, set the pulse, and remember which phrase
+              // is "current" for the queued-hint line. Used by both
+              // the discipline card's example-cycling tap and (when
+              // showGolemVariants is true) by each golem variant row.
+              const stageDraft = (phrase: string, exampleIdx: number | null) => {
+                queueInputDraft(phrase);
+                void Clipboard.setStringAsync(phrase).catch(() => { /* ignore */ });
+                setAetherPulseAt((prev) => ({ ...prev, [d.id]: Date.now() }));
+                setAetherLastStaged((prev) => ({ ...prev, [d.id]: phrase }));
+                if (exampleIdx !== null) {
+                  setAetherCycleIdx((prev) => ({ ...prev, [d.id]: exampleIdx }));
+                }
+              };
               return (
                 <Pressable
                   key={d.id}
@@ -315,14 +365,8 @@ export function CraftingScreen() {
                   onPress={() => {
                     if (d.examples.length === 0) return;
                     const nextIdx = ((aetherCycleIdx[d.id] ?? -1) + 1) % d.examples.length;
-                    setAetherCycleIdx((prev) => ({ ...prev, [d.id]: nextIdx }));
                     const phrase = d.examples[nextIdx]!;
-                    queueInputDraft(phrase);
-                    // Belt-and-suspenders — drop on the
-                    // clipboard so the player can paste anywhere
-                    // if they prefer. Fire-and-forget.
-                    void Clipboard.setStringAsync(phrase).catch(() => { /* ignore */ });
-                    setAetherPulseAt((prev) => ({ ...prev, [d.id]: Date.now() }));
+                    stageDraft(phrase, nextIdx);
                   }}
                 >
                   <Text style={styles.aetherCardTitle}>{d.title}</Text>
@@ -331,8 +375,49 @@ export function CraftingScreen() {
                     <Text style={styles.aetherCardFuelLabel}>Fuel (any one): </Text>
                     {d.fuels.join(', ')}
                   </Text>
+                  {/* OTA-111 — per-golem stats + fuel recipe. Only
+                      the summon card sets showGolemVariants. Each
+                      row is independently tappable: tapping a row
+                      stages the SPECIFIC `summon <kind> golem`
+                      phrase so the player gets the variant they
+                      picked, instead of the parser defaulting to
+                      mud_golem on a bare `summon golem`. */}
+                  {d.showGolemVariants && (
+                    <View style={styles.golemVariants}>
+                      <Text style={styles.golemVariantsHeader}>Golem variants — tap to stage that summon:</Text>
+                      {GOLEM_VARIANTS.map((g) => {
+                        const phrase = GOLEM_VARIANT_PHRASE[g.kind];
+                        const fuel = g.fuel.map((f) => `${f.quantity}× ${f.name}`).join(', ');
+                        const modSign = g.attackMod >= 0 ? '+' : '';
+                        const hitTxt = g.hitBonus !== 0 ? `, +${g.hitBonus} hit` : '';
+                        const stats = `HP ${g.hpMax} · ${g.attackDie}${modSign}${g.attackMod} ${g.damageType}${hitTxt}`;
+                        return (
+                          <Pressable
+                            key={g.kind}
+                            style={({ pressed }) => [
+                              styles.golemVariantRow,
+                              pressed && styles.golemVariantRowPressed,
+                            ]}
+                            onPress={() => stageDraft(phrase, null)}
+                          >
+                            <Text style={styles.golemVariantName}>{g.name}</Text>
+                            <Text style={styles.golemVariantStats}>{stats}</Text>
+                            <Text style={styles.golemVariantBlurb}>{g.blurb}</Text>
+                            <Text style={styles.golemVariantFuel}>
+                              <Text style={styles.golemVariantFuelLabel}>Needs: </Text>
+                              {fuel}
+                            </Text>
+                            <Text style={styles.golemVariantPhrase}>tap → "{phrase}"</Text>
+                          </Pressable>
+                        );
+                      })}
+                      <Text style={styles.golemVariantsRequires}>
+                        Requires: INT 10+ recommended (d20 + INT vs DC 15; Mud Dwellers / Aetherborn cast at base DC, others +4).
+                      </Text>
+                    </View>
+                  )}
                   <Text style={styles.aetherCardExamples}>
-                    <Text style={styles.aetherCardExamplesLabel}>Tap to queue: </Text>
+                    <Text style={styles.aetherCardExamplesLabel}>Tap card to queue: </Text>
                     {d.examples.map((ex, i) =>
                       i === queuedIdx ? `[${ex}]` : `"${ex}"`,
                     ).join(' · ')}
@@ -509,4 +594,29 @@ const styles = StyleSheet.create({
   aetherCardExamples: { color: '#7a705c', fontSize: 11, lineHeight: 15 },
   aetherCardExamplesLabel: { color: '#9aaab0', fontWeight: '700' },
   aetherCardQueuedHint: { color: '#9ec96a', fontSize: 11, marginTop: 4, fontStyle: 'italic' },
+  // OTA-111 — per-golem variant rows under the summon discipline
+  // card. Same dark inset look as the parent card, slightly muted
+  // borders so the variants read as a nested list. Each row is
+  // tappable and stages the specific `summon <kind> golem` phrase
+  // so the player gets the variant they picked (parser otherwise
+  // defaults to mud_golem on a bare `summon golem`).
+  golemVariants: { marginTop: 6, marginBottom: 4 },
+  golemVariantsHeader: { color: '#9aaab0', fontSize: 11, fontWeight: '700', marginBottom: 4 },
+  golemVariantRow: {
+    backgroundColor: '#0e0d0c',
+    borderColor: '#2a2620',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    marginBottom: 4,
+  },
+  golemVariantRowPressed: { opacity: 0.65 },
+  golemVariantName: { color: '#cdbf99', fontSize: 12, fontWeight: '700' },
+  golemVariantStats: { color: '#c9a86a', fontSize: 11, marginTop: 2 },
+  golemVariantBlurb: { color: '#a89a7a', fontSize: 11, fontStyle: 'italic', marginTop: 2 },
+  golemVariantFuel: { color: '#7a705c', fontSize: 11, marginTop: 2, lineHeight: 15 },
+  golemVariantFuelLabel: { color: '#9aaab0', fontWeight: '700' },
+  golemVariantPhrase: { color: '#9ec96a', fontSize: 10, marginTop: 3, fontStyle: 'italic', letterSpacing: 1 },
+  golemVariantsRequires: { color: '#9aaab0', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },
 });
