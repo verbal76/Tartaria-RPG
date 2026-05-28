@@ -71,6 +71,20 @@ export function rollMods(
         // counter-attack handler in gameStore to switch defense to an
         // opposed Fighting roll.
         break;
+      case 'distracted':
+        // OTA-144 — dog distract bonus. OTA-121 set this status on the
+        // player but no consumer ever read it (rollMods missed the
+        // case, so "+2 to next attack" was vapor). Now applies +2 to
+        // the next attack roll AND is consumed; the initiative +1
+        // rides on a separate consumer in buildCombatSteps that
+        // peeks at the status without consuming it (so the same
+        // distract pulse covers BOTH bonuses on the same swing).
+        if (action === 'attack_ranged' || action === 'attack_melee') {
+          bonus += 2;
+          sources.push('distract +2');
+          consume.push('distracted');
+        }
+        break;
       case 'dodging':
         if (action === 'defense') {
           bonus += 4;
@@ -282,14 +296,22 @@ export function buildCombatSteps(
     ? ` (${equipped.damageType})`
     : forcesBarehand ? ' (bludgeoning)' : '';
 
+  // OTA-144 — distract gives +1 to initiative on the next combat
+  // swing per the playtester spec ("+1 for initiative and an
+  // additional +2 to attack power"). Read-only peek; the +2 attack
+  // bonus consumer (rollMods in this same file) is what actually
+  // strips the status. So a single distract pulse covers both
+  // bonuses on the SAME swing — the player's first attack after
+  // the dog distracts gets initiative +1 AND attack +2.
+  const distractBonus = (player.statusEffects ?? []).some((e) => e.kind === 'distracted') ? 1 : 0;
   return [
     {
       id: 'initiative',
       label: 'Roll for INITIATIVE',
       sides: 10,
       count: 1,
-      bonus: 0,
-      bonusLabel: '',
+      bonus: distractBonus,
+      bonusLabel: distractBonus > 0 ? 'distract +1' : '',
       target: enemyInit,
       targetLabel: `Enemy rolled ${enemyInit}`,
       context: `d10 — meet or beat the enemy to act first`,

@@ -2993,4 +2993,71 @@
 // travelTarget migration + continueTravel self-
 // heal), __tests__/travelTargetMigration.test.ts
 // (NEW).
-export const OTA_BUILD_ID = '2026-05-28-143';
+//
+// 2026-05-28 OTA-144 — Dog combat UI surface +
+// distract bonus actually applies. Playtester
+// (Rocky's owner) hunted for the dog in 3 combat
+// rounds, couldn't find a way to engage him: "I'm
+// on combat and I don't see Rocky's name listed as
+// a weapon. How can I use him to attack or
+// distract?" Spec asked for a combat button with
+// his name + popup with BITE and DISTRACT options,
+// distract granting +1 initiative and +2 attack
+// power.
+//
+// Three bugs converging:
+//
+//   (1) OTA-121 wired dog_bite / dog_distract
+//       parser intents + dispatch + resolver but
+//       NEVER landed the UI button. InputBox had
+//       zero references to player.dog. Spec said
+//       "DOG (hp/max) button surfaces in the quick-
+//       row in combat" — implementation gap.
+//
+//   (2) The 'distracted' status was set on the
+//       player at gameStore.ts:18317 but rollMods
+//       in combatRules.ts had no case for it. The
+//       "+2 to next attack" was silently doing
+//       nothing for months.
+//
+//   (3) Player spec asks for distract to also
+//       grant +1 initiative on the next swing.
+//       Initiative step in buildCombatSteps had a
+//       hardcoded bonus: 0.
+//
+// Fixes:
+//
+//   - InputBox gains a `dog` prop (parallel to
+//     `golem`). When dog active + in combat, a
+//     "{name} (hp/max)" QuickBtn renders next to
+//     the golem button. Tap toggles a 2-button
+//     picker below the quick-row: BITE (fires
+//     `bite`) and DISTRACT (fires `distract`),
+//     each with a one-line hint. Picker auto-
+//     closes after a tap.
+//   - ExplorationScreen wires the `dog` prop from
+//     player.dog when status='with_player'.
+//   - rollMods gains a 'distracted' case: +2 to
+//     attack roll, status consumed on use.
+//   - buildCombatSteps peeks at the 'distracted'
+//     status (read-only) to seed initiative
+//     bonus +1. Single distract pulse covers
+//     BOTH bonuses on the same swing — exactly
+//     the spec.
+//   - On successful distract, world line fires:
+//     "{dog} pounces at {target}'s flank, barking
+//     sharp. {target}'s attention splits — your
+//     next swing rides the opening (+1 init, +2
+//     atk)." Matches the playtester's narrative
+//     ask ("pouncing and barking").
+//
+// 48/48 regression tests pass. TS clean.
+//
+// Files: app/components/InputBox.tsx (dog prop +
+// QuickBtn + action picker + Pressable import +
+// styles), app/screens/ExplorationScreen.tsx (dog
+// prop wired), app/engine/combatRules.ts (rollMods
+// 'distracted' case + buildCombatSteps initiative
+// bonus from distract), app/state/gameStore.ts
+// (pounce/bark narration on distract success).
+export const OTA_BUILD_ID = '2026-05-28-144';

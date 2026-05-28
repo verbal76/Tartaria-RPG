@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Pressable } from 'react-native';
 import { TutorialTarget } from './TutorialTarget';
 import { getVoiceSettings, onVoiceSettingsChange } from '../voice/voiceSettings';
 import { isSpeaking as ttsIsSpeaking, stopAndClear as stopTTS } from '../voice/TTSManager';
@@ -113,6 +113,12 @@ interface Props {
    *  onSubmit. The button stays 'ready' tone always — its existence
    *  signals the affordance. */
   golem?: { name: string; hp: number; hpMax: number } | null;
+  /** OTA-144 — active dog companion summary. When present + hp > 0 +
+   *  status='with_player' + in combat, a "{name} (hp/max)" QuickBtn
+   *  renders in the combat row, parallel to the golem button. Tap
+   *  opens a 2-button action picker (BITE / DISTRACT) per the OTA-121
+   *  spec which never wired the UI surface. */
+  dog?: { name: string; hp: number; hpMax: number } | null;
 }
 
 // Peace-mode quick buttons. The "look around you" button submits 'look' —
@@ -137,7 +143,12 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenFeedback, onOpenMap, inCombat, equippedMain, equippedOff, range, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenFeedback, onOpenMap, inCombat, equippedMain, equippedOff, range, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog }: Props) {
+  // OTA-144 — dog combat action picker state. When the player taps
+  // the DOG quick-button in combat, this flips to true and the
+  // BITE / DISTRACT row renders inline. Either tap fires the
+  // corresponding intent and closes the picker.
+  const [dogPickerOpen, setDogPickerOpen] = useState(false);
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
   // BrandedKeyboard removed 2026-05-21 per playtester: "it is not
@@ -372,6 +383,19 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 tone="ready"
               />
             ) : null}
+            {/* OTA-144 — Dog combat button. Mirrors the golem button
+                pattern. Tap toggles a small picker (BITE / DISTRACT)
+                below the quick row. The OTA-121 spec wired the
+                parser intents + dispatch + resolver but never landed
+                the UI surface; playtester (Rocky's owner) reported
+                hunting for it through 3 combat rounds. */}
+            {dog && dog.hp > 0 ? (
+              <QuickBtn
+                label={`${dog.name.toLowerCase()} (${dog.hp}/${dog.hpMax})`}
+                onPress={() => setDogPickerOpen((v) => !v)}
+                tone="ready"
+              />
+            ) : null}
             {/* `block` quick-action removed 2026-05-21 — folded into
                 dodge. The dodge button now triggers the active-parry
                 mechanic: opposed d20+DEX roll on the next incoming
@@ -460,6 +484,34 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           </>
         )}
       </TutorialTarget>
+      {/* OTA-144 — Dog action picker. Renders below the quick-row
+          when the player has tapped the dog button. Two big buttons:
+          BITE fires `dog_bite`, DISTRACT fires `dog_distract`. Either
+          tap closes the picker. */}
+      {dog && dog.hp > 0 && dogPickerOpen ? (
+        <View style={styles.dogPicker}>
+          <Pressable
+            onPress={() => {
+              setDogPickerOpen(false);
+              onSubmit('bite');
+            }}
+            style={styles.dogPickerBtn}
+          >
+            <Text style={styles.dogPickerLabel}>BITE</Text>
+            <Text style={styles.dogPickerHint}>{dog.name} lunges in</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              setDogPickerOpen(false);
+              onSubmit('distract');
+            }}
+            style={styles.dogPickerBtn}
+          >
+            <Text style={styles.dogPickerLabel}>DISTRACT</Text>
+            <Text style={styles.dogPickerHint}>pounces + barks · +1 init, +2 atk next swing</Text>
+          </Pressable>
+        </View>
+      ) : null}
       <TutorialTarget area="input-row" style={styles.inputRow}>
         <TextInput
           ref={inputRef}
@@ -590,6 +642,23 @@ function TravelBtn({ label, onPress }: { label: string; onPress: () => void }) {
 const styles = StyleSheet.create({
   container: { gap: 6 },
   quickRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
+  // OTA-144 — dog action picker. Two big tap targets below the quick
+  // row when the player taps the dog combat button. Sized to match
+  // the QuickBtn visual register but more prominent (vertical-stack
+  // label + hint per option).
+  dogPicker: { flexDirection: 'row', gap: 8, marginTop: 6 },
+  dogPickerBtn: {
+    flex: 1,
+    backgroundColor: '#1a1714',
+    borderColor: '#5a4f3e',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+  },
+  dogPickerLabel: { color: '#e6d8b3', fontSize: 14, fontWeight: '700', letterSpacing: 1 },
+  dogPickerHint: { color: '#8a7e66', fontSize: 10, marginTop: 4, textAlign: 'center' },
   travelRow: { flexDirection: 'row', gap: 6, marginBottom: 6 },
   travelBtn: {
     flex: 1,

@@ -18322,6 +18322,15 @@ function handleDogCombat(
           player: { ...s.player, dog: trained.dog, statusEffects: newEffects },
         };
       });
+      // OTA-144 — pounce + bark narration on a successful distract.
+      // The playtester asked for this beat specifically: "he distract
+      // with pouncing and barking and I can attack with any weapon."
+      // Fires AFTER the success roll so the player sees what just
+      // happened.
+      get().appendLog(
+        'world',
+        `${dog.name} pounces at ${target.name}'s flank, barking sharp. ${target.name}'s attention splits — your next swing rides the opening (+1 init, +2 atk).`,
+      );
       if (trained.leveled) {
         get().appendLog(
           'reward',

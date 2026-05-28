@@ -595,6 +595,11 @@ export function ExplorationScreen() {
               hp: player.golem.hp,
               hpMax: player.golem.hpMax,
             } : null}
+            dog={player?.dog && player.dog.status === 'with_player' ? {
+              name: player.dog.name,
+              hp: player.dog.hp,
+              hpMax: player.dog.hpMax,
+            } : null}
             travelTargetName={(() => {
               if (!player?.travelTarget) return null;
               // eslint-disable-next-line @typescript-eslint/no-require-imports
