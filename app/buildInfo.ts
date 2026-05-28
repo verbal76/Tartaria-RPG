@@ -1817,4 +1817,23 @@
 // Files: app/components/tutorialSteps.ts (6 edits + 1 new
 // step), app/screens/CraftingScreen.tsx (golem footer line
 // 415 correction).
-export const OTA_BUILD_ID = '2026-05-27-113';
+//
+// 2026-05-27 OTA-114 — Planning entry only (no code changes).
+// User asked for a full implementation framework for a Dog
+// Companion system: rescue scenarios tied to investigation
+// hooks, faction-neutral captor fights, dog stats (STR/DEX/INT)
+// on the Character screen, vest armor slot, hunger / loyalty /
+// abandonment, mutual exclusion with golems, no-climb design,
+// stamina mirror, call-modal flavor. Wrote it up as a
+// substantial open issue in HANDOFF.md 0.A — full data model,
+// 4 rescue scenarios, combat integration, travel rules,
+// hunger thresholds, gear roster, UI surfaces, 7 open design
+// calls needing user signoff, 5-phase implementation roadmap.
+// JS bundle unchanged; this OTA exists only to anchor the
+// planning entry in the buildInfo timeline.
+//
+// Status: planning ONLY — no implementation until user signs
+// off on the open design calls in 0.A.
+//
+// Files: HANDOFF.md (Dog Companion planning entry in 0.A).
+export const OTA_BUILD_ID = '2026-05-27-114';

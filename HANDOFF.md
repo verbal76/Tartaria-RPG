@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-113` (Tutorial refresh — 6 step edits + 1 new "Crafting — four tabs" step covering the OTA-091/095/111 UX wave; OTA-111 golem-DC footer corrected from "Aetherborn base, others +4" to the actual numbers from raceMechanics.ts). See **Section 0** for the live issue tracker covering OTA-070 → OTA-113.
+> **Latest OTA:** `2026-05-27-114` (Planning-only OTA — Dog Companion implementation framework added as a substantial open issue in 0.A. JS bundle unchanged. 7 open design calls listed; needs user signoff before any code lands). See **Section 0** for the live issue tracker covering OTA-070 → OTA-114.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -22,6 +22,102 @@
 > **The canonical record of issues across the build.** Every OTA / APK push updates this section in the same commit. **Read this section before planning any fix** to (a) check whether the issue is already closed and the fix exists, and (b) make sure your plan won't break a previously-closed fix. The workflow rules live in `CLAUDE.md` → "HANDOFF.md — the build timeline."
 
 ### 0.A — Open Issues
+
+- **Dog Companion system (OTA-114 planning entry — implementation NOT started).** User spec: a one-at-a-time canine companion the player meets early, names, and travels with. Stats live on the player Stats page; combat reflects the dog's actions like the golem system; dogs need feeding or abandon; dogs and golems are mutually antagonistic; dogs can't climb. Below is the full implementation framework. **Status: planning only — no code lands until user signs off.**
+
+  **Acquisition — rescue scenarios.** Dog acquisition fires as a sub-hook off the existing investigation table. The hook spawns a captor (human, from a faction the player is NOT part of) holding the dog. Combat resolves the rescue. **The captor fight is faction-neutral** — a new `factionNeutralFight: true` flag on the enemy record skips the standing-change pass that normally runs on hostile-NPC kills. Drafted scenarios (3-5 to choose from at world-gen):
+
+    1. **Caged at the smelter** — investigate an abandoned smelter / forge ruin; discover a mongrel chained to an anvil post. Captor archetype: Reclaimer deserter (only spawns if player ≠ Reclaimer).
+    2. **Tied to the wagon** — investigate a roadside camp / overturned wagon; find a stocky shepherd lashed to a wheel. Captor: Mud Monarch enforcer (only if player ≠ Mud Monarchs).
+    3. **Cellar bark** — investigate a cellar / buried structure noun; muffled barking through the floor. Captor: Aether-Born scavenger (only if player ≠ Aetherborn).
+    4. **The trapper's snare** — investigate a wilderness camp / pit; lean hound in a snare-pit, growling. Captor: unaligned poacher (no faction match needed — always available as fallback).
+
+    Each scenario has its own investigation-hook key (`dog_rescue_smelter`, `dog_rescue_wagon`, `dog_rescue_cellar`, `dog_rescue_snare`). On dog acquisition, ALL four hooks die globally (single-shot per save) so the player doesn't get re-offered rescues. Each scenario seeds the dog with breed-flavor and a starting stat baseline (mongrel = balanced, shepherd = +STR, lean hound = +DEX, lazy mutt = +INT) so the player's chosen scenario gives them a slight build steer.
+
+  **Naming flow.** Post-combat: the engine prompts `"Name your dog: ___"` (free-text input, 16-char cap, defaults to a generated name like "Rust" / "Cinder" / "Marrow" if the player skips). Name is immutable after; players who want a different one have to abandon and rescue another (rare event since rescue hooks are dead).
+
+  **Data model — `player.dog: DogCompanion | null`.** Lives on the player record so it serializes with the save. Shape:
+  ```
+  interface DogCompanion {
+    id: string;
+    name: string;           // player-assigned, 16 chars
+    breed: 'mongrel' | 'shepherd' | 'hound' | 'mutt';
+    hp: number; hpMax: number;
+    stats: { strength: number; dexterity: number; intelligence: number };
+    statProgress: { strength: number; dexterity: number; intelligence: number };
+    loyalty: number;        // 0-100; drops without feeding
+    lastFedAtHour: number;  // game-clock timestamp
+    equipped: { vest: string | null };  // armor slot
+    status: 'with_player' | 'waiting_at_base' | 'abandoned' | 'dead';
+  }
+  ```
+  No separate stamina field — **dog stamina mirrors the player's** (consumes from the same pool when the dog acts; the user's spec was explicit on this).
+
+  **Stat growth.** STR / DEX / INT only (no WIS / CHA on a dog). Per-stat training paths:
+    - **STR:** every dog melee bite that lands. Climb does not train (dogs can't climb). Pinning a downed enemy trains STR.
+    - **DEX:** dodging an enemy attack while in combat with player. Successful flee from a fight (player + dog both escape). Auto-pass on rope sections where the dog had to be carried (player STR check, but dog learns the path).
+    - **INT:** scenting a hidden noun on the player's "look around you" (5% chance to surface an ambient noun the player missed). Tracking a quest target the player is asked to find. Successful alert on an ambush roll (dog barks → player gets initiative).
+
+    Mirror the player progression curve from `statTraining.ts:40-47` so familiar pacing applies — dogs grow at the same tier costs.
+
+  **Combat integration.** Mirrors the golem system at `gameStore.ts:6500-7000`:
+    - DOG (hp/max) button appears in the quick-row when (a) dog is alive AND (b) player is in combat AND (c) no golem is active (see "Golem conflict" below).
+    - Dog's attack die: `1d6 + floor(STR/2)`, damage type: piercing (bite). Vest provides AC.
+    - Action economy: dog attacks at the start of the player's turn (free action, no cost to player). Misses on nat-1, crits on nat-20 (2× damage).
+    - Enemy retaliation: split between player and dog based on threat. Dog can be downed; at 0 HP, dog falls and the player gets a `"Your dog is down."` ARBITER beat — dog auto-recovers to 1 HP after the fight ends, but spends 24 in-game hours in `status='waiting_at_base'` to heal. If the fight is lost (player KO'd), dog dies permanently — no Resurrection Gem applies to dogs.
+
+  **Travel & climb.** Dog follows the player automatically on cardinal moves and travel. **Dogs cannot climb** (user spec) — when the player initiates a climb on a 1+ tier noun, the dog drops to `status='waiting_at_base'` at the climb origin tile. On `climb down`, the dog auto-rejoins. Long-travel routes don't strand the dog — when the player exits a hub or warps, the dog comes with them; only the active climb decouples.
+
+  **Hunger & abandonment.** Loyalty starts at 100 on rescue. Decays −1 per 4 in-game hours WITHOUT food. Feeding restores loyalty:
+    - `feed dog` with any consumable in pack: +20 loyalty per use, consumes 1 stack.
+    - `feed dog <treat name>` with an authored "treat" item (new catalog rows — Jerky Strip, Marrow Bone, Smoke-Cured Belly): +40 loyalty per use.
+
+    Thresholds:
+    - 50: arbiter line `"Your dog looks at the pack and looks at you."`
+    - 30: world line `"Your dog whines, low. They haven't eaten."`
+    - 15: arbiter line `"Your dog has been giving you that look for two days. They won't last another."`
+    - 0: `status='abandoned'`, dog leaves over the next cardinal step (`"You wake to find no warm weight at your back. They're gone."`). Dog gone forever — rescue hooks STAY dead, no replacement.
+
+  **Resting & flavor.** On `rest`, world line `"Your dog circles three times and curls beside you. Their breathing slows to yours."`. Dog regains HP at the same rate as player (8h rest → full HP). Loyalty bumps +5 for the shared rest (companionship). `call <dog name>` (or `call dog`) opens a brief modal with three options:
+    - `Scratch their ear` — loyalty +2, flavor line.
+    - `Give them a treat` — opens pack picker filtered to consumables + treats; loyalty +20 (consumable) / +40 (treat).
+    - `Speak softly` — loyalty +1, flavor line.
+
+    Modal is one-tap; doesn't advance combat or time meaningfully (1 minute game time).
+
+  **Golem conflict (user: "dogs do not like golems").** Mutually exclusive: dog and golem cannot both be active in the same scene. If the player summons a golem while the dog is with them, the dog sets `status='waiting_at_base'` at the current tile and the arbiter narrates `"Your dog backs up, hackles raised. They won't share a tile with that thing."`. Dismissing the golem restores the dog after one cardinal step. Reverse: if a golem is active and the player tries to call the dog into combat, refused with the same flavor. Hard exclusivity is the cleanest read — no shared-combat awkwardness.
+
+  **Dog gear — the Vest.** New equipment kind: `kind: 'dog_armor'` in the catalog. Initial roster (4 vests):
+    - Burlap Vest (Common, +1 AC, no req)
+    - Riveted Leather Vest (Uncommon, +2 AC, scrap fee)
+    - Aetheric Padded Vest (Rare, +3 AC, reflects 1 corruption per hit)
+    - Reclaimer Pattern Vest (Epic, +4 AC, +1 dog STR, faction-locked drop)
+
+    Equip via `equip <vest> on dog` or via the Character screen's dog panel. Vests have durability and wear with hits like player armor; repair via the Crafting → REPAIR tab.
+
+  **UI surfaces.**
+    - **Character screen**: new "Companion" panel beneath the player stats card. Shows dog name + breed + HP bar + loyalty bar + stat trio (STR/DEX/INT with progress bars matching the player's) + equipped vest. Tap-to-call shortcut (opens the call modal).
+    - **World screen quick row**: DOG (hp/max) button in combat when dog active; `call <name>` shortcut chip in peace when dog is `waiting_at_base` or out of sight.
+    - **Inventory**: vest items get a `[fits dog]` tag; tapping opens the equip-on-dog flow instead of the player equip flow.
+    - **Tutorial**: NEW step `"Your dog"` covering acquisition, feeding, loyalty, combat, and the no-climb / golem conflict rules. Drops in after the existing "Golem sidekicks" step so the parallel is clear.
+
+  **Open design calls (need user signoff before implementation):**
+    1. **Treat economy.** Should treats be a new catalog kind, or repurpose existing rations? Trade-off: new catalog rows = cleaner UX but more authoring work; reuse = simpler but blurs the line between player food and dog food.
+    2. **Permadeath on combat loss.** Confirm dogs die permanently if the player KO's in a fight with the dog active. Alternative: dog "scared off" → returns 24h later at half loyalty.
+    3. **Dog death revive.** Should a Resurrection Gem revive a dead dog, or are dogs strictly one-life? Current spec: one-life (gems are a player-only mechanic).
+    4. **Stat-train pacing.** Dog stat growth at the same per-tier costs as the player, or accelerated (small body, fewer training paths → faster growth)?
+    5. **Scenario count.** Ship with 3 scenarios at v1 or all 4? Smaller surface = less authoring, faster ship; but the user said "a few different scenarios" — 3-4 feels right.
+    6. **Faction-neutral fight flag.** Confirm the engine should add `enemy.factionNeutralFight: boolean` (cleaner) vs special-casing rescue-scenario enemy IDs (faster to ship). Recommendation: the flag, since other rescue scenarios may want it later (kidnapped NPC, captured trader, etc.).
+    7. **Naming UX.** Free-text 16-char input vs picker-from-list. Free-text gives players ownership; picker prevents nonsense names. Recommendation: free-text with profanity filter pass.
+
+  **Implementation phasing (5 OTAs, ~1 wave):**
+    - Phase 1 (1 OTA): Data model (`DogCompanion` type, `player.dog` field, save/load), naming flow, rescue scenarios 1-2, faction-neutral fight flag.
+    - Phase 2 (1 OTA): Combat integration (DOG button, attack roll, enemy retaliation split, golem conflict).
+    - Phase 3 (1 OTA): Travel + climb behavior (auto-follow, climb decoupling, hub transitions).
+    - Phase 4 (1 OTA): Hunger + abandonment + treats. Tutorial step.
+    - Phase 5 (1 OTA): Stat growth + UI surfaces (Character screen Companion panel, Inventory vest tag, call modal). Dog gear catalog (4 vests).
+
+  **Files this would touch (preview):** `app/engine/types.ts` (DogCompanion type, dog_armor kind), `app/state/gameStore.ts` (rescue spawn / combat / travel / rest / hunger / call handler), `app/engine/dogCompanion.ts` (NEW — central module like `golems.ts`), `app/data/items/dogGear.json` (NEW), `app/data/items/treats.json` or merged into consumables, `app/screens/CharacterScreen.tsx` (Companion panel), `app/screens/InventoryScreen.tsx` (vest tagging), `app/components/CallDogModal.tsx` (NEW), `app/components/tutorialSteps.ts` (new step). Approximate scope: 3-4k lines across 5 OTAs.
 
 - **Per-golem summonDC differentiation (OTA-111 design call).** `runAethercraft` at `app/state/gameStore.ts:16592` uses a single hard-coded `dcBase = 15` (INT) for all four golem kinds. Lore-wise, Crystal and Aether golems are stronger anchors than Mud and Iron — they should arguably cost more. The OTA-111 AETHERIC tab footer surfaces the uniform DC-15 line to the player. **Fix shape:** add optional `summonDC?: number` to `GolemDefinition` in `app/engine/golems.ts`; `runAethercraft` reads `def.summonDC ?? 15`. Recommended values for design discussion: Mud 13, Iron 15, Aether 17, Crystal 19. **Status:** open; needs user input.
 
