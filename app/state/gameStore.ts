@@ -6229,6 +6229,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
           checkLowHpWarning(prevHpEat, prevHpEat + heal, hpMaxEat, get, set);
           void get().persist();
         } else {
+          // OTA-155 — eat-without-target refusal. Stress sweep found:
+          // "eat ratoin" (typo) and bare "eat" both fall through this
+          // else branch and trigger an 8-hour sleep, because the
+          // parser couldn't resolve the consumable target so the
+          // consumable branch above was skipped. Same class of bug
+          // OTA-125 closed for "drink water" → 8h sleep. The fix is
+          // a refusal: when the matched verb was eat/consume/devour
+          // AND no consumable resolved, the Arbiter clarifies
+          // instead of putting the player to sleep.
+          if (parsed.matchedVerb === 'eat' || parsed.matchedVerb === 'consume' || parsed.matchedVerb === 'devour') {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter raises a hand. "Eat what? Name the ration, the bread, the fungus — whatever you mean to put in your mouth. Eating without a target is sleeping, and you didn't ask to sleep."`,
+            );
+            break;
+          }
           // OTA 23-007 — can't sleep mid-climb. If the player is
           // elevated on a climbable noun, the 8-hour rest is
           // refused unless they're carrying Reclaimer's Rope —

@@ -3555,4 +3555,32 @@
 // Files: app/screens/ExplorationScreen.tsx
 // (objectiveChip row layout + SUMMON
 // nested button + 4 styles).
-export const OTA_BUILD_ID = '2026-05-28-154';
+//
+// 2026-05-28 OTA-155 — `eat <foo>` no
+// longer silently sleeps 8 hours.
+//
+// Stress sweep finding: typing `eat
+// ratoin` (typo) or bare `eat` parsed
+// matchedVerb=eat → intent=rest → no
+// consumable resolved → fell through to
+// the 8-hour sleep path. Same class of
+// bug OTA-125 closed for `drink water`.
+//
+// Fix: rest-case no-consumable branch
+// now checks matchedVerb. When it was
+// eat/consume/devour AND no consumable
+// resolved, the Arbiter refuses with
+// "Eat what? Name the ration..." and
+// breaks — no 8h sleep, no clock
+// advance.
+//
+// Bare `rest` is unaffected — still
+// triggers the 8h path as designed.
+//
+// 4/4 regression tests pass
+// (eatWithoutTargetRefusal). TS clean.
+//
+// Files: app/state/gameStore.ts (rest
+// case no-consumable branch + verb
+// check).
+export const OTA_BUILD_ID = '2026-05-28-155';
