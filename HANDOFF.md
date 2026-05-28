@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-28-151` (Buried Skyscraper expansion framework + Homeward fade — scaffold for the 100-floor descending dungeon (5 FloorArchetype flavors, 4 corner StairwellPosition slots, 5 StairwellType descent rates, GridCell / FloorTemplate / BuildingState types, canEnterSkyscraper gate locked behind mainQuest.phase === 'ended'). NO room content / encounters / quests this OTA — strictly data model + gate. EndingScreen gains a HEAD HOME ▸ button that drops the player into a 3-paragraph faction-keyed homeward narrative (dog + golem references if alive) on a black backdrop, fades in 2s → holds 7s → fades out 2s → bounces to title. Placeholder bridge to the Skyscraper entrance until the expansion ships.). See **Section 0** for the closed-issue archive.
+> **Latest OTA:** `2026-05-28-152` (Skyscraper elevator shafts added to the framework — user extended the descent spec: "some descents might be made by climbing up or down the old elevator shaft, there are 2 broken elevators on the center of each floor." Two ShaftPosition center slots (CENTER_NORTH / CENTER_SOUTH) per floor, distinct from the 4 corner stairwell slots. Three ShaftState modes: climbable / blocked_at / sealed. ShaftInstance carries position, state, optional blockedAtFloor jam, cableIntact + repaired hooks. FloorTemplate.shafts + BuildingState.shafts wired with per-(floor,shaft) state persistence. Still scaffold-only — no climb resolver, no fall damage, no rendering. Data shape ready for the map authoring + traversal code to land later.). See **Section 0** for the closed-issue archive.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -244,6 +244,21 @@
 - **TS 0 errors / Test suite green.** Always required pre-push. Tracked here as a passive gate rather than an issue.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Skyscraper elevator shafts (framework extension)
+
+- **OTA-152 (2026-05-28) · Two center elevator shafts per floor added to the buried-skyscraper data model.**
+  - **What:** Continuing the Expansion 2 brainstorm. User: *"some descents might be made by climbing up or down the old elevator shaft, there are 2 broken elevators on the center of each floor."* The OTA-151 framework already had four corner stairwells with five descent-rate types; this extends the per-floor traversal slot count from 4 to 6 with two center elevator shafts in addition to the corner stairs.
+  - **Fix:** Three new types + two field additions, all scaffold-only.
+    1. **ShaftPosition** union: `'CENTER_NORTH' | 'CENTER_SOUTH'`. Distinct from the 4 corner stairwell slots so each floor now exposes 6 vertical traversal points.
+    2. **ShaftState** union: `'climbable'` (open shaft, ascend OR descend with the future climb check), `'blocked_at'` (debris jam or fallen car at `blockedAtFloor` — one-way wall depending on approach), `'sealed'` (welded-shut door, shaft inaccessible from this floor).
+    3. **ShaftInstance** interface: position, state, optional `blockedAtFloor`, `cableIntact` (future fast-descent anchor when the bottom car-wreck is still rigged), `repaired` (Aethercraft-Shape / Reclaimer salvage hook — same pattern stairs use for permanent shortcut unlocks).
+    4. **SHAFT_STATES** metadata map with player-facing flavor lines for each state so the future shaft-traversal code has authored copy ready for `look`.
+    5. **FloorTemplate.shafts: ShaftInstance[]** alongside the existing `stairwells` array. **BuildingState.shafts: Record<\`${floor}:${position}\`, ShaftInstance>** for per-(floor, shaft) state persistence — a shaft is logically continuous across floors but each floor pins its own access state, so the future traversal resolver walks floor-by-floor to figure out where a climb ends.
+    6. **stubFloorTemplate** + **emptyBuildingState** updated to seed the new field with empties.
+  - **Why:** Shafts give the player vertical traversal in BOTH directions, where stairs are predominantly descent — that's the navigation reward that justifies the climb hazard. Two shafts (vs one) means a choice between routes: one might be the cleaner climb but pass through hostile floors, the other dirtier but quieter. Building the data shape ahead of the climb resolver + maps keeps Expansion 2 scope tight and lets the authoring layer drop in without rewriting the model.
+  - **Status:** Still NO gameplay code — no climb resolver, no fall-damage formula, no rendering, no quest hooks. Just the data shape so when the hand-authored maps + the climb resolver land, everything plugs into the same model.
+  - **Files:** `app/engine/buriedSkyscraper.ts` (ShaftPosition + ShaftState + ShaftInstance + SHAFT_STATES + FloorTemplate.shafts + BuildingState.shafts).
 
 #### Buried Skyscraper expansion framework (scaffold only)
 

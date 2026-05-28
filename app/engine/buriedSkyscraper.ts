@@ -155,6 +155,71 @@ export interface StairwellInstance {
 }
 
 // ---------------------------------------------------------------------------
+// Elevator shafts — 2 per floor, center positions. The cars are
+// long dead; the shafts themselves are climbable. Unlike stairs
+// (predominantly descent), shafts let the player CLIMB BACK UP
+// without retracing through floors — but the climb is hazardous
+// (stamina cost + DEX check + fall risk on a fumble). Each shaft
+// also has its own state: `climbable` means clear top-to-bottom;
+// `blocked_at` means a debris jam or fallen car halts traversal
+// at a specific floor; `sealed` means the floor-level door is
+// welded shut (visible on the grid but inaccessible).
+//
+// Two shafts means a choice — one might be the cleaner climb but
+// pass through hostile floors, the other dirtier but quieter. The
+// building generator picks states per shaft per floor stack.
+// ---------------------------------------------------------------------------
+
+export type ShaftPosition = 'CENTER_NORTH' | 'CENTER_SOUTH';
+
+export type ShaftState =
+  | 'climbable'        // open shaft, can ascend or descend with the climb check
+  | 'blocked_at'       // jammed by debris / a fallen car at blockedAtFloor
+  | 'sealed';          // floor-level door welded shut; shaft not accessible from here
+
+export interface ShaftInstance {
+  position: ShaftPosition;
+  state: ShaftState;
+  /** For `blocked_at`: the floor where the jam sits. Player can
+   *  traverse past this floor only if descending FROM above the
+   *  jam stays above and ascending FROM below stays below — the
+   *  jam itself is the wall. */
+  blockedAtFloor?: number;
+  /** When true, the cable car wreckage at the bottom is still
+   *  rigged enough to function as a fast-descent anchor — climb
+   *  checks succeed more often. Skeleton now; effects later. */
+  cableIntact?: boolean;
+  /** Same repair hook as stairs — Aethercraft-Shape / Reclaimer
+   *  salvage can clear a jam by setting this. Skeleton now. */
+  repaired?: boolean;
+}
+
+export interface ShaftTypeMeta {
+  id: ShaftState;
+  label: string;
+  /** Player-facing flavor when they `look` at the shaft door. */
+  flavor: string;
+}
+
+export const SHAFT_STATES: Record<ShaftState, ShaftTypeMeta> = {
+  climbable: {
+    id: 'climbable',
+    label: 'Open Shaft',
+    flavor: 'The elevator door hangs open. Below: dark, cabling, the suggestion of a long fall. The shaft is climbable both ways for someone who trusts their grip.',
+  },
+  blocked_at: {
+    id: 'blocked_at',
+    label: 'Jammed Shaft',
+    flavor: 'The shaft is open here, but somewhere in the dark a car is wedged crosswise — the climb stops there. Fine in one direction; a wall in the other.',
+  },
+  sealed: {
+    id: 'sealed',
+    label: 'Sealed Shaft',
+    flavor: 'Welded plates over the elevator door. Whoever closed this floor off didn\'t want anyone using the shaft from here.',
+  },
+};
+
+// ---------------------------------------------------------------------------
 // Floor template — archetype + grid + four corner stairwell slots.
 // The user's hand-authored maps will arrive as GridCell[][] for one
 // archetype each; the building generator stacks 100 floors by
@@ -167,6 +232,12 @@ export interface FloorTemplate {
   grid: GridCell[][];
   /** Four corner stairwells. position must be unique per floor. */
   stairwells: StairwellInstance[];
+  /** Two center elevator shafts. position must be unique per floor.
+   *  Shafts are vertically continuous structures — the per-floor
+   *  instance captures access state at THIS floor (sealed door,
+   *  open shaft, jammed at this level). The actual climb across
+   *  multiple floors is resolved against the floors above/below. */
+  shafts: ShaftInstance[];
   /** Optional display name (e.g. "Floor 47 — North Market"). */
   displayName?: string;
 }
@@ -176,7 +247,7 @@ export interface FloorTemplate {
 // for testing the stack logic; rendering will show a "stub floor"
 // placeholder until the real map is dropped in.
 export function stubFloorTemplate(archetype: FloorArchetype): FloorTemplate {
-  return { archetype, grid: [], stairwells: [] };
+  return { archetype, grid: [], stairwells: [], shafts: [] };
 }
 
 // ---------------------------------------------------------------------------
@@ -198,6 +269,13 @@ export interface BuildingState {
   floorArchetypes: FloorArchetype[];
   /** Per-(floor,corner) stairwell state. Key: `${floor}:${position}`. */
   stairwells: Record<string, StairwellInstance>;
+  /** Per-(floor,shaft-position) shaft state. Key: `${floor}:${position}`.
+   *  A shaft is logically continuous across floors but each floor
+   *  pins its own access state — sealed at one level, climbable at
+   *  the next, jammed somewhere in between. The traversal resolver
+   *  walks the floor-by-floor state to figure out where a climb
+   *  ends. */
+  shafts: Record<string, ShaftInstance>;
 }
 
 export function emptyBuildingState(seed: string): BuildingState {
@@ -207,6 +285,7 @@ export function emptyBuildingState(seed: string): BuildingState {
     discoveredFloors: [1],
     floorArchetypes: [],
     stairwells: {},
+    shafts: {},
   };
 }
 

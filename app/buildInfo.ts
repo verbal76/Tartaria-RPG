@@ -3420,4 +3420,71 @@
 // Files: app/engine/buriedSkyscraper.ts
 // (NEW), app/screens/EndingScreen.tsx
 // (HomewardSplash + HEAD HOME button).
-export const OTA_BUILD_ID = '2026-05-28-151';
+//
+// 2026-05-28 OTA-152 — Skyscraper elevator
+// shafts added to the framework.
+//
+// User extended the descent spec: two
+// broken elevators in the center of each
+// floor, climbable as vertical shafts.
+// "some descents might be made by
+// climbing up or down the old elevator
+// shaft, there are 2 broken elevators on
+// the center of each floor."
+//
+// Implementation (still scaffold-only):
+//
+//   • New ShaftPosition union:
+//     CENTER_NORTH | CENTER_SOUTH (2 slots
+//     per floor, distinct from the 4
+//     corner stairwell slots).
+//   • New ShaftState union: climbable
+//     (open shaft, ascend or descend with
+//     a climb check), blocked_at (debris
+//     jam at blockedAtFloor — a one-way
+//     wall depending on approach), sealed
+//     (welded-shut door, shaft not
+//     accessible from this floor).
+//   • ShaftInstance carries position,
+//     state, optional blockedAtFloor,
+//     cableIntact (future fast-descent
+//     anchor), repaired (Aethercraft-
+//     Shape / Reclaimer salvage hook —
+//     same pattern stairs use).
+//   • SHAFT_STATES metadata with player-
+//     facing flavor lines for each state
+//     so the `look` resolver in the
+//     future shaft-traversal code has
+//     authored copy ready.
+//   • FloorTemplate.shafts: ShaftInstance[]
+//     (2 entries). BuildingState.shafts:
+//     Record<`${floor}:${position}`,
+//     ShaftInstance> for per-(floor, shaft)
+//     state persistence — a shaft is
+//     logically continuous across floors
+//     but each floor pins its own access
+//     state, so the traversal resolver
+//     walks floor-by-floor to figure out
+//     where the climb ends.
+//   • stubFloorTemplate / emptyBuildingState
+//     updated to seed the new field with
+//     empties.
+//
+// Still NO gameplay code — no climb
+// resolver, no fall-damage formula, no
+// rendering. Just the data shape so when
+// the maps + the climb resolver land,
+// everything plugs into the same model.
+//
+// TS clean. Regression unaffected
+// (framework still gated to
+// mainQuest.phase === 'ended', no
+// existing player can reach the
+// skyscraper code paths yet).
+//
+// Files: app/engine/buriedSkyscraper.ts
+// (ShaftPosition / ShaftState /
+// ShaftInstance / SHAFT_STATES +
+// FloorTemplate.shafts +
+// BuildingState.shafts).
+export const OTA_BUILD_ID = '2026-05-28-152';
