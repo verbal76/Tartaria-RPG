@@ -1917,4 +1917,31 @@
 //
 // Files: HANDOFF.md (Dog Companion open-calls section closed
 // out; faction-neutral fight flag spec'd in full).
-export const OTA_BUILD_ID = '2026-05-27-117';
+//
+// 2026-05-27 OTA-118 — Planning entry only (no code changes).
+// User added a third Arbiter onboarding question: sex. Now
+// the full conversational flow is breed → name → sex, all
+// gathered post-rescue:
+//   1. "What kind of dog is that?" → free-text breed (24c)
+//   2. "What will you name them?" → free-text name (16c)
+//   3. "Boy or girl?" → free-text (8c), engine parses common
+//      tokens to derive a pronoun ('he' / 'she' / 'they')
+//
+// Data model gains `sex: { raw: string; pronoun: 'he'|'she'|
+// 'they' }`. Pronoun drives every "your dog..." narration
+// beat via a {pronoun} / {possessive} / {reflexive} template
+// — rest beat, combat down-beat, abandonment goodbye, etc.
+// All existing beats in the framework will be templated
+// rather than hardcoded with "they/their" before Phase 4
+// ships. Character screen Companion panel gains a small
+// sex glyph (♂ / ♀ / ⚥) next to the name. Mechanically
+// cosmetic — no stat or roll impact.
+//
+// Phase 1 scope updated to include the third question + the
+// pronoun-template helper.
+//
+// JS bundle unchanged.
+//
+// Files: HANDOFF.md (Naming flow, data model, narration,
+// UI surfaces, Phase 1 in 0.A Dog Companion entry).
+export const OTA_BUILD_ID = '2026-05-27-118';

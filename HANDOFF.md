@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-117` (Planning-only OTA — Dog Companion framework FROZEN, all design calls resolved. Stat pacing mirrors player rates; ship all 4 rescue scenarios at v1; `factionNeutralFight?: boolean` flag spec'd in 9-point detail. Ready for Phase 1 implementation on user signoff). See **Section 0** for the live issue tracker covering OTA-070 → OTA-117.
+> **Latest OTA:** `2026-05-27-118` (Planning-only OTA — Dog Companion onboarding gains a third Arbiter question. Full flow: "What kind of dog is that?" → breed; "What will you name them?" → name; "Boy or girl?" → sex with pronoun parse. Pronoun drives all "your dog..." narration via template substitution. Mechanically cosmetic). See **Section 0** for the live issue tracker covering OTA-070 → OTA-118.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -34,11 +34,12 @@
 
     Each scenario has its own investigation-hook key (`dog_rescue_smelter`, `dog_rescue_wagon`, `dog_rescue_cellar`, `dog_rescue_snare`). On dog acquisition, ALL four hooks die globally (single-shot per save) so the player doesn't get re-offered rescues. Each scenario seeds the dog with breed-flavor and a starting stat baseline (mongrel = balanced, shepherd = +STR, lean hound = +DEX, lazy mutt = +INT) so the player's chosen scenario gives them a slight build steer.
 
-  **Naming flow.** Post-combat, the Arbiter runs a two-step conversational onboarding:
+  **Naming flow.** Post-combat, the Arbiter runs a three-step conversational onboarding:
     1. `"What kind of dog is that?"` — **free-text input** (24-char cap). Player's answer IS the breed, full stop. "Old bloodhound," "scruffy white thing," "one-eared mutt," whatever they type. Breed is pure flavor — no mechanical effect; the rescue scenario already determined starting stats (see Acquisition).
     2. `"What will you name them?"` — free-text input (16-char cap). Defaults to a generated name (Rust / Cinder / Marrow) if the player skips.
+    3. `"Boy or girl?"` — free-text input (8-char cap). Engine parses common tokens (`boy / male / he / him` → `'male'`; `girl / female / she / her` → `'female'`; anything else → `'unknown'`). The raw typed answer is preserved for narration flavor; the parsed pronoun drives every "your dog..." beat downstream — "her breathing slows" vs "his breathing slows" vs "their breathing slows" for the rest beat, the call modal, the dog-down combat line, the abandonment goodbye. No mechanical effect; cosmetic only.
 
-    Both fields are immutable after entry. Players who want a different dog have to abandon and rescue another (rare event — rescue hooks die globally on first acquisition).
+    All three fields are immutable after entry. Players who want a different dog have to abandon and rescue another (rare event — rescue hooks die globally on first acquisition).
 
   **Data model — `player.dog: DogCompanion | null`.** Lives on the player record so it serializes with the save. Shape:
   ```
@@ -46,6 +47,10 @@
     id: string;
     name: string;           // player free-text, 16 chars
     breed: string;          // player free-text, 24 chars — pure flavor
+    sex: {                  // 3-token answer + derived pronoun
+      raw: string;          // exactly what the player typed
+      pronoun: 'he' | 'she' | 'they';  // drives narration
+    };
     startingProfile: 'mongrel' | 'shepherd' | 'hound' | 'mutt';  // set by rescue scenario; drives baseline stats
     hp: number; hpMax: number;
     stats: { strength: number; dexterity: number; intelligence: number };
@@ -57,6 +62,13 @@
   }
   ```
   No separate stamina field — **dog stamina mirrors the player's** (consumes from the same pool when the dog acts; the user's spec was explicit on this).
+
+  **Pronoun-driven narration.** Every "your dog..." beat in the framework uses a `{pronoun}` / `{possessive}` / `{reflexive}` template that the engine substitutes from `dog.sex.pronoun` at render time:
+    - `he` → he / his / him / himself
+    - `she` → she / her / her / herself
+    - `they` → they / their / them / themselves
+
+    Examples: rest beat becomes `"Your dog circles three times and curls beside you. ${pronoun.cap}r breathing slows to yours."` Combat down-beat becomes `"${name} is down."` (name carries gender). Abandonment goodbye becomes `"You wake to find no warm weight at your back. ${pronoun.cap}'s gone."` All existing beats in this framework will be templated rather than hardcoded with "they/their" before Phase 4 ships.
 
   **Stat growth.** STR / DEX / INT only (no WIS / CHA on a dog). Use-based progression, same per-tier costs as the player (mirrors `statTraining.ts:40-47`). Per-stat training paths:
     - **STR:** every dog bite that lands in combat. Pinning a downed enemy.
@@ -109,7 +121,7 @@
 
   **UI surfaces.**
     - **Title screen — character slot tiles**: when a save has an active dog (`status !== 'abandoned' | 'dead'`), the slot tile shows a second line under the player name with the dog's name + breed in parentheses. Format: `Marrow (old bloodhound)`. Lets the player pick the right save at a glance when they have multiple characters with different companions. Slots without a dog render the same as today (no extra line).
-    - **Character screen**: new "Companion" panel beneath the player stats card. Shows dog name + breed (the player's typed answer) + HP bar + loyalty bar + STR/DEX/INT trio with progress bars + equipped vest. Tap-to-call shortcut opens the call modal.
+    - **Character screen**: new "Companion" panel beneath the player stats card. Shows dog name + breed (the player's typed answer) + a small sex glyph (♂ / ♀ / ⚥) next to the name + HP bar + loyalty bar + STR/DEX/INT trio with progress bars + equipped vest. Tap-to-call shortcut opens the call modal.
     - **World screen quick row**: DOG (hp/max) button in combat with bite/distract picker; `call <name>` shortcut chip in peace when dog is `waiting_at_base` or out of sight.
     - **Inventory**: vest items get a `[fits dog]` tag; treat consumables get a `[treat]` tag. Tapping either opens the relevant equip-on-dog or feed-dog flow.
     - **Tutorial**: NEW step `"Your dog"` after the existing "Golem sidekicks" step.
@@ -167,7 +179,7 @@
        - Cross-scenario test: every rescue scenario sets the flag correctly; non-rescue enemies never have the flag set.
 
   **Implementation phasing (5 OTAs, ~1 wave):**
-    - Phase 1 (1 OTA): Data model (`DogCompanion` type with free-text breed/name, `player.dog` field, save/load), Arbiter-driven naming flow, rescue scenarios 1-2, faction-neutral fight flag.
+    - Phase 1 (1 OTA): Data model (`DogCompanion` type with free-text breed/name + sex.raw/pronoun, `player.dog` field, save/load), three-step Arbiter onboarding flow (breed → name → sex), pronoun-template helper for narration substitution, rescue scenarios 1-2, faction-neutral fight flag.
     - Phase 2 (1 OTA): Combat integration (DOG button with bite/distract picker, dog-as-weapon-row in action menu, enemy retaliation split, golem conflict, gem-revive path).
     - Phase 3 (1 OTA): Travel + climb behavior (auto-follow, climb decoupling, hub transitions). **Smell-find mechanic** + per-archetype hidden noun authoring.
     - Phase 4 (1 OTA): Hunger + treat-tagged loot table additions (3-4 new treat items) + `heal dog` / `feed dog` / `use <item> on dog` verb routing. Tutorial step.
