@@ -1892,4 +1892,29 @@
 // JS bundle unchanged.
 //
 // Files: HANDOFF.md (Dog Companion UI surfaces section).
-export const OTA_BUILD_ID = '2026-05-27-116';
+//
+// 2026-05-27 OTA-117 — Planning entry only (no code changes).
+// User closed the final three Dog Companion open design calls:
+//   1. Stat pacing → mirror player per-tier costs from
+//      statTraining.ts:40-47 (no accelerated growth).
+//   2. Scenario count → ship all 4 at v1 (smelter / wagon /
+//      cellar / snare).
+//   3. Fight-flag implementation → user asked for it to be
+//      defined in detail. Spec'd in 9 sub-points in
+//      HANDOFF.md 0.A: optional `factionNeutralFight?: boolean`
+//      on the Enemy interface, set by the rescue-scenario
+//      spawner, read at kill-handling to skip standing-change
+//      and witness-cascade paths, preserves loot/XP/quest
+//      progression, save/load handles naturally via
+//      currentScene.enemies, regression test in Phase 1.
+//
+// All design calls now resolved. Framework is FROZEN and ready
+// for Phase 1 implementation when the user gives the go-ahead.
+// The next dog-system OTA will be the first actual code
+// change — data model + acquisition + faction-neutral flag.
+//
+// JS bundle unchanged.
+//
+// Files: HANDOFF.md (Dog Companion open-calls section closed
+// out; faction-neutral fight flag spec'd in full).
+export const OTA_BUILD_ID = '2026-05-27-117';

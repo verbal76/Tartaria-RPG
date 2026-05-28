@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-116` (Planning-only OTA — Dog Companion framework gains a title-screen surface. Character slot tiles will show the dog's name + breed sub-line when the save has an active dog. Three open design calls still pending: stat-train pacing, scenario count, fight-flag implementation). See **Section 0** for the live issue tracker covering OTA-070 → OTA-116.
+> **Latest OTA:** `2026-05-27-117` (Planning-only OTA — Dog Companion framework FROZEN, all design calls resolved. Stat pacing mirrors player rates; ship all 4 rescue scenarios at v1; `factionNeutralFight?: boolean` flag spec'd in 9-point detail. Ready for Phase 1 implementation on user signoff). See **Section 0** for the live issue tracker covering OTA-070 → OTA-117.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -114,18 +114,57 @@
     - **Inventory**: vest items get a `[fits dog]` tag; treat consumables get a `[treat]` tag. Tapping either opens the relevant equip-on-dog or feed-dog flow.
     - **Tutorial**: NEW step `"Your dog"` after the existing "Golem sidekicks" step.
 
-  **Open design calls (remaining — most resolved this round):**
-    1. **Stat-train pacing.** Dog stat growth at the same per-tier costs as the player (`statTraining.ts:40-47`), or accelerated (small body, fewer training paths → faster growth)? Current draft: mirror player rates. Open for the user's call.
-    2. **Scenario count.** Ship with 3 scenarios at v1 or all 4? The smelter / wagon / cellar trio covers Reclaimer / Mud Monarch / Aetherborn — three of the major factions. Adding snare gives an unaligned fallback. Recommendation: ship all 4.
-    3. **Faction-neutral fight flag implementation.** New `enemy.factionNeutralFight: boolean` on the enemy record (cleaner, reusable for future rescue scenarios) vs special-casing rescue-scenario enemy IDs (faster to ship). Recommendation: the flag.
+  **Open design calls — all resolved as of OTA-117. Framework is ready for Phase 1 implementation.**
 
-    **Resolved this round (OTA-115):**
-    - Treat economy → dogs eat ALL player food; treats are loot-table additions with `dogTreat` tag, +40 loyalty (vs +20 for regular food). [user confirmed]
-    - Permadeath → not permadeath; Resurrection Gems revive dogs like players. [user confirmed]
-    - Dog death revive → gems work on dogs. [user confirmed]
-    - Naming UX → Arbiter asks "what kind of dog is that?" → free-text breed input; then "what will you name them?" → free-text name input. Both immutable after entry. [user confirmed]
-    - Combat action layout → dog's name shows in the combat menu like a weapon, with `bite` and `distract` as the two verbs; dog's STR scales bite, DEX or INT scales distract; distract gives +2 to player's next dodge / flee / attack roll vs the distracted enemy. [user confirmed]
-    - Healing → anything that heals the player heals the dog (`heal dog <item>` / `use <item> on dog`). [user confirmed]
+  **Resolved this round (OTA-117):**
+    - Stat-train pacing → mirror the player's per-tier costs from `statTraining.ts:40-47` (1-5 advances fast, 6-10 fast-ish, 11-14 normal, 15-18 slow, 19-22 grindy, 23+ a real commitment). No accelerated growth. [user confirmed]
+    - Scenario count → ship all 4 at v1 (smelter / wagon / cellar / snare). [user confirmed]
+    - Faction-neutral fight flag → implementation spec'd in detail below. [user confirmed: "define fight-flag implementation"]
+
+  **Faction-neutral fight flag — full implementation spec:**
+
+    1. **Type change.** Add optional field to the `Enemy` interface in `app/engine/types.ts`:
+       ```typescript
+       interface Enemy {
+         // ...existing fields
+         factionNeutralFight?: boolean;  // skips faction-standing
+                                         // effects on kill / witness
+       }
+       ```
+       Optional + defaulting to `undefined` so no existing enemy record changes behavior.
+
+    2. **Spawn site.** When a dog-rescue scenario's investigation hook resolves and the engine spawns the captor, set `factionNeutralFight: true` on that enemy record before pushing it into `currentScene.enemies`. Spawning lives in the NEW `app/engine/dogCompanion.ts` module (same shape as `golems.ts`), with one captor factory per scenario:
+       ```typescript
+       function spawnRescueCaptor(scenario: 'smelter' | 'wagon' | 'cellar' | 'snare', playerFaction): Enemy {
+         const captor = pickCaptorTemplate(scenario, playerFaction);
+         return { ...captor, factionNeutralFight: true, ... };
+       }
+       ```
+       `pickCaptorTemplate` chooses a captor whose faction ≠ player's faction. If all captors share the player's faction (e.g., Unknowing Masses player encountering the snare scenario — fallback always available), the scenario uses the unaligned poacher template.
+
+    3. **Kill-handling skip.** Find the post-kill faction-standing update in `gameStore.ts` (grep for `factionStanding`, `standingChange`, `factionDelta` near combat-resolution / enemy-death handlers). Wrap the standing-change block:
+       ```typescript
+       if (!killedEnemy.factionNeutralFight) {
+         applyFactionStandingChange(player, killedEnemy.faction, KILL_PENALTY);
+       }
+       ```
+
+    4. **Hostile-witness cascade skip.** Same flag guards any "nearby faction members turn hostile" logic that fires on faction-coded kills. Same guard pattern; same fallthrough if no flag is present.
+
+    5. **Loot / XP / quest progression preserved.** The flag does NOT gate loot drops, combat XP, stat training, or kill counters. Captor still drops their authored loot table, player still gets the combat XP, the kill still counts toward milestones — only the faction-standing and witness-cascade paths are skipped.
+
+    6. **Flee path.** If the player flees the rescue fight, no standing change fires either way (flee already skips kill-handling). The dog stays trapped, the rescue hook stays available, the captor returns to the scene at full HP next visit. No penalty for backing out.
+
+    7. **Death narration.** Scenario-specific arbiter beat explains the moral framing on captor death so the player understands the lack of consequence — e.g., `"They were keeping the dog illegally. No faction reckoning falls on you for this."` Lives in the scenario data (the `dog_rescue_*` hook narration), not in the engine. Avoids leaking the flag implementation to the player while still grounding the rule in fiction.
+
+    8. **Save / load.** The flag lives on the enemy instance inside `currentScene.enemies`. Serializes naturally with the save state. Once the captor is killed and removed from the scene array, the flag is gone — no orphan-flag state to clean up.
+
+    9. **Testing.** New regression test `__tests__/dogRescueFactionNeutral.test.ts` to ship in Phase 1:
+       - Spawn scenario 1 with a Reclaimer-aligned player and a Reclaimer-deserter captor → assert `factionNeutralFight: true` is set on the enemy.
+       - Resolve combat (player wins).
+       - Assert: player's Reclaimer standing is UNCHANGED post-fight, no witness-cascade hostility flagged on nearby NPCs, loot dropped + XP granted normally.
+       - Control: spawn a regular Reclaimer hostile (no flag) under the same conditions; assert standing DOES change.
+       - Cross-scenario test: every rescue scenario sets the flag correctly; non-rescue enemies never have the flag set.
 
   **Implementation phasing (5 OTAs, ~1 wave):**
     - Phase 1 (1 OTA): Data model (`DogCompanion` type with free-text breed/name, `player.dog` field, save/load), Arbiter-driven naming flow, rescue scenarios 1-2, faction-neutral fight flag.
