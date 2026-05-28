@@ -880,7 +880,12 @@ function advanceTime(player: PlayerCharacter, hours: number): PlayerCharacter {
   // path. To keep this strictly local: we ONLY decay the loyalty
   // number here; thresholds are surfaced by the gameStore loop.
   let dog = player.dog;
-  if (dog && (dog.status === 'with_player' || dog.status === 'waiting_at_base')) {
+  // OTA-124 — only decay loyalty when the dog is actively with the
+  // player. Dogs waiting at the base of a climb (24h recovery from a
+  // combat down OR the climb-decoupling case) shouldn't lose
+  // affection during a window where the player literally can't feed
+  // them. Spec divergence flagged by the OTA-124 stress sweep.
+  if (dog && dog.status === 'with_player') {
     const lastFed = dog.lastFedAtHour ?? 0;
     const oldGap = Math.max(0, oldHours - lastFed);
     const newGap = Math.max(0, newHours - lastFed);
@@ -5079,6 +5084,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
                         },
                         searchedAmbientNouns: searchedWithNoun,
                         flavorExhaustedNouns: flavorWithNoun,
+                        // OTA-124 — clear the smell-find cooldown
+                        // whenever the player engages with a noun in
+                        // the room. The dog's nose is then free to
+                        // re-engage on the next scene re-entry, which
+                        // matches the spec's "re-eligible after the
+                        // room's visible nouns are all consumed."
+                        // Strict "all consumed" would require pool-
+                        // size comparison; resetting on any investigate
+                        // is simpler and gets the spirit (per-room,
+                        // not per-save).
+                        dogSmelledHere: false,
                       },
                     },
                   },
@@ -16041,11 +16057,38 @@ function handlePlayerDeath(
   // summary on the title list reflects the new state.
   // 2026-05-25 [MECHANIC-1b] — clear golem sidekick on player death.
   // The Aetheric tether dies with the caster.
-  set((s) => ({
-    player: s.player ? { ...s.player, dead: true, hp: 0, golem: null } : s.player,
-    pendingRolls: null,
-  }));
+  // OTA-124 — wire combat-death for the dog so the Phase 6 puppy-
+  // vendor / rubble-puppy safety net can actually engage. If the dog
+  // was downed in this fight (hp <= 0 from retaliation), mark them
+  // 'dead' and queue puppyVendorOwed. Sleeping/idle dogs with hp > 0
+  // survive the player's death (they wander off the abandoned save).
+  set((s) => {
+    if (!s.player) return { pendingRolls: null };
+    const dog = s.player.dog;
+    const dogDiedInFight = !!dog && dog.hp <= 0;
+    const wm = s.worldMemory;
+    return {
+      player: {
+        ...s.player,
+        dead: true,
+        hp: 0,
+        golem: null,
+        dog: dogDiedInFight && dog ? { ...dog, status: 'dead' as const } : dog,
+      },
+      worldMemory: dogDiedInFight && !wm.puppyVendorUsed
+        ? { ...wm, puppyVendorOwed: true }
+        : wm,
+      pendingRolls: null,
+    };
+  });
   void get().persist();
+  if (get().player?.dog?.status === 'dead') {
+    const dogName = get().player?.dog?.name ?? 'Your dog';
+    get().appendLog(
+      'combat',
+      `${dogName} falls beside you. The buried world claims them too.`,
+    );
+  }
 
   // Hold on the exploration screen for ~3.5s so the player reads the
   // final messages, then return to title with the refreshed slot list.

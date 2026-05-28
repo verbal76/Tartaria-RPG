@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-123` (Dog Companion implementation COMPLETE — all 6 phases shipped across OTAs 121/122/123 totalling ~3-4k lines. 79/79 tests pass (5 new dog test files + 4 regression suites). TS clean. Two minor spec deviations: treats are Legendary not Epic (rarity union); treats live in gear.json not consumables.json. Vandalistic full-game stress sweep running in parallel before final ship OTA). See **Section 0** for the live issue tracker covering OTA-070 → OTA-123.
+> **Latest OTA:** `2026-05-27-124` (SHIP-READY — Dog Companion wave closes. Vandalistic stress sweep added 13 test files; 304/304 tests pass across 22 suites. Four engine ship-blocker bugs surfaced and FIXED before ship: puppyVendorOwed never set (Phase 6 unreachable), dog status never 'dead', dogSmelledHere never cleared, waiting_at_base loyalty decay. Three pre-existing catalog hygiene issues logged as open). See **Section 0** for the live issue tracker covering OTA-070 → OTA-124.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -22,6 +22,13 @@
 > **The canonical record of issues across the build.** Every OTA / APK push updates this section in the same commit. **Read this section before planning any fix** to (a) check whether the issue is already closed and the fix exists, and (b) make sure your plan won't break a previously-closed fix. The workflow rules live in `CLAUDE.md` → "HANDOFF.md — the build timeline."
 
 ### 0.A — Open Issues
+
+- **Catalog cross-file duplicates (OTA-124 stress-sweep finding).** Five items appear in BOTH `app/data/items/gear.json`/`amulets.json` AND `app/data/items/exploration.json`: `Aetheric Torch`, `Aetheric Compass`, `Minor Aetheric Amulet`, `Lightstone Amulet`, `Whisperer's Charm`. `findCatalogItem` first-hit-wins masks the issue at the call site, but the second-file row's `effect` / `tcBuy` / `faction` fields silently drop. **Fix shape:** decide canonical home per item and remove the other. **Status:** open; not user-facing today (engine handles), but a real authoring trap. Captured in `__tests__/catalogIntegrityWithDogGear.test.ts:178` as `test.failing`.
+
+- **Within-file duplicate: `Aetheric Shield` (OTA-124 stress-sweep finding).** `app/data/items/weapons.json` has TWO `Aetheric Shield` entries — a melee shield at line 95 and a runecaster variant at line 228. Different mechanics; the second row is UNREACHABLE through `findWeaponByName` (`Array.find` returns first). **Fix shape:** rename one or merge. **Status:** open. Captured in `__tests__/catalogIntegrityWithDogGear.test.ts:226` as `test.failing`.
+
+- **`isCataloguedElsewhere` guard missing DOG_GEAR (OTA-124 defensive add).** `app/engine/crafting.ts:320` doesn't include `DOG_GEAR` in the catalog-elsewhere check, so a future dog vest with weapon-y / armor-y keyword names ("Plated Vest", "Bladed Harness") could slip past the guard and trigger false `inferred-stats:` warnings. Current 4 vests are safe (names don't trip the keyword heuristics). **Fix shape:** add `DOG_GEAR` to the guard list. **Status:** open; low priority.
+
 
 - **Dog Companion system (OTA-114 planning entry — implementation NOT started).** User spec: a one-at-a-time canine companion the player meets early, names, and travels with. Stats live on the player Stats page; combat reflects the dog's actions like the golem system; dogs need feeding or abandon; dogs and golems are mutually antagonistic; dogs can't climb. Below is the full implementation framework. **Status: planning only — no code lands until user signs off.**
 
@@ -239,6 +246,19 @@
 - **TS 0 errors / Test suite green.** Always required pre-push. Tracked here as a passive gate rather than an issue.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Dog Companion wave
+
+- **OTA-124 (2026-05-27) · SHIP-READY: Dog Companion wave + vandalistic stress sweep + 4 engine bugs fixed.**
+  - **What:** The OTAs 120-124 wave shipped the full 6-phase Dog Companion system (~3-4k lines). Vandalistic stress sweep at the end of the wave (13 new test files across two parallel agents covering combat companion combos, rescue scenarios × player races, onboarding state-machine fuzz, hunger timing, smell-find cooldown semantics, save/load round-trips, puppy vendor + rubble-puppy edges, catalog integrity with dog gear, parser fuzz with dog verbs, UX rendering sanity, tutorial currency, cross-system regression, performance smoke) surfaced FOUR ship-blocker engine bugs that were fixed before final ship:
+    1. `puppyVendorOwed` was never assigned `true` anywhere in gameStore.ts. The Phase 6 puppy-vendor / rubble-puppy safety net was unreachable in production. Wired into `handlePlayerDeath`: when player KO's with dog at hp<=0, dog flips to status='dead' AND `worldMemory.puppyVendorOwed = true` (gated on `!puppyVendorUsed`).
+    2. Dog status never transitioned to `'dead'` anywhere in gameStore.ts — all four `'dead'` occurrences were comparisons, no assignment. Same fix as #1 closed both. Gem-revive can now engage on dead dogs.
+    3. `dogSmelledHere` cooldown latch never cleared back to `false`. Once set, smell-find fired ONCE per save per room instead of once per investigation-cycle as spec'd. Wired into the investigate handler at `gameStore.ts:5085` — when player engages with any noun in a room, `dogSmelledHere` flips back to `false`.
+    4. `waiting_at_base` dogs continued losing loyalty during the 24h recovery window — players whose dog was knocked down couldn't avoid affection loss they had no way to fix. Decay condition tightened to `with_player` only.
+  - **Wave summary:** OTA-120 (planning prep + design overrides — dog+golem coexistence, rubble-puppy late-game fallback). OTA-121 (Phase 1+2+6+partial Phase 3, ~1328 lines). OTA-122 (Phase 4+5 mid-flight checkpoint, +1185 lines). OTA-123 (Phase 4+5 closeout, +587 lines, 79/79 dog tests pass). OTA-124 (this) — stress sweep + 4 engine fixes + perf-test tolerance bump + 4 `.failing` tests flipped to `it`. Net: **304/304 tests pass across 22 suites in ~31s**, TS clean.
+  - **Spec deviations (user-acceptable):** treats authored as Legendary (rarity union has no Epic); treats live in `gear.json` (`consumables.json` doesn't exist in the repo).
+  - **New open issues logged:** 3 pre-existing catalog hygiene findings unrelated to dogs (cross-file dups, within-file dup, isCataloguedElsewhere guard missing DOG_GEAR — all in 0.A).
+  - **Files:** `app/state/gameStore.ts` (4 engine fixes), `HANDOFF.md` (this entry + 3 new open issues), 13 NEW test files, 4 test files updated (failing flips + helper sync + perf budget).
 
 #### Tutorial currency
 

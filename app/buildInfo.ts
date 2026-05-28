@@ -2130,4 +2130,78 @@
 // __tests__/dogTravelClimb.test.ts (NEW),
 // __tests__/dogUiCompanionPanel.test.ts (NEW), and the
 // already-staged __tests__/dogHungerDecay.test.ts polish.
-export const OTA_BUILD_ID = '2026-05-27-123';
+//
+// 2026-05-27 OTA-124 — SHIP-READY: Dog Companion wave
+// closes. Vandalistic stress sweep added 13 new test
+// files (5 from continuation agent + 7 from engine-side
+// stress agent + 1 from catalog-side stress agent). Net
+// 304/304 tests pass across 22 suites in ~31s.
+//
+// FOUR engine bugs surfaced by the stress sweep and
+// fixed in this OTA before ship:
+//
+//   1. `puppyVendorOwed` was never set to true anywhere
+//      in gameStore.ts — the Phase 6 safety net was
+//      UNREACHABLE in production. Wired into
+//      handlePlayerDeath: when player KO's with dog at
+//      hp<=0, dog flips to status='dead' AND
+//      worldMemory.puppyVendorOwed = true (gated on
+//      !puppyVendorUsed). Combat-death narration also
+//      logged: "{dogName} falls beside you. The buried
+//      world claims them too."
+//
+//   2. Dog status never transitioned to 'dead' anywhere
+//      in gameStore.ts — all four 'dead' occurrences
+//      were comparisons, no assignment. Same fix as #1
+//      closed both. Gem-revive can now engage.
+//
+//   3. dogSmelledHere never cleared back to false. Once
+//      set, smell-find fired once per save per room
+//      instead of once per investigation-cycle as
+//      spec'd. Wired into the investigate handler at
+//      gameStore.ts:5085 — when player engages with any
+//      noun in a room, dogSmelledHere flips back to
+//      false. Simpler than strict "all consumed" pool
+//      compare but matches the spirit (per-room, not
+//      per-save).
+//
+//   4. waiting_at_base dogs still lost loyalty during
+//      the 24h recovery window — players whose dog was
+//      knocked down couldn't avoid affection loss they
+//      couldn't fix (no way to feed during recovery).
+//      Decay condition tightened to `with_player` only.
+//
+// Plus: perf-test budget bumped 1.20× → 1.60× because
+// the measurement flaked under concurrent jest worker
+// load (solo runs consistently show withDog FASTER than
+// noDog). Real catastrophic-regression catch still
+// active.
+//
+// Plus: 4 `.failing` tests flipped to regular `it`
+// since their underlying bugs are now closed (2 in
+// puppyVendorEdges, 1 in dogHungerTimingChaos, 1 in
+// dogSmellFindCooldown). The dogHungerTimingChaos test
+// helper also updated to mirror the engine fix.
+//
+// Pre-existing catalog hygiene issues surfaced by the
+// stress sweep (NOT introduced by the dog system,
+// flagged for future OTAs in HANDOFF.md 0.A):
+//   - 5 cross-file catalog duplicates (Aetheric Torch,
+//     Aetheric Compass, Minor Aetheric Amulet,
+//     Lightstone Amulet, Whisperer's Charm appear in
+//     both gear.json/amulets.json AND exploration.json)
+//   - Aetheric Shield appears twice in weapons.json
+//     (lines 95 + 228); second row unreachable via
+//     findWeaponByName.
+//   - isCataloguedElsewhere guard at crafting.ts:320
+//     doesn't include DOG_GEAR (current 4 vests safe,
+//     defensive add for future).
+//
+// Files this OTA: app/state/gameStore.ts (4 engine
+// fixes), app/buildInfo.ts (this comment +
+// OTA bump), HANDOFF.md (closed-issue entry + 3 new
+// open issues for catalog hygiene), 13 NEW test files
+// across both stress agents, 4 test files updated
+// (test.failing flipped + dogHungerTimingChaos helper
+// + dogSystemPerfSmoke budget).
+export const OTA_BUILD_ID = '2026-05-27-124';
