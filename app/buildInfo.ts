@@ -3662,4 +3662,47 @@
 // Files: app/engine/parser.ts
 // (normalizeInput compound-split
 // regex).
-export const OTA_BUILD_ID = '2026-05-28-157';
+//
+// 2026-05-28 OTA-158 — dog-verb typo
+// tolerance.
+//
+// Stress sweep (drunkSpelling) found:
+// `fed dog ration`, `helll dog ration`,
+// `cll dog`, `feeed dog ration` all
+// reached the dog interceptors with
+// unrecognized leading verbs and
+// returned false silently. The dog
+// interceptors run BEFORE the parser
+// so OTA-156's drunk-run-collapse
+// pass doesn't reach them.
+//
+// Fix: new normalizeDogLeadingVerb()
+// helper at the top of
+// tryDogApplyVerb + tryDogCallVerb.
+// Tries both the raw leading token
+// and a drunk-collapsed form against
+// each canonical verb (feed / heal /
+// call / use) with a Levenshtein-1
+// budget. Either match wins; the
+// token is replaced with the
+// canonical before the regex runs.
+//
+// Conservative — gated to a 4-verb
+// canonical set and the leading
+// token only. Won't touch
+// `feed`-as-noun in another position
+// (e.g. `chicken feed` — there is no
+// such item but the principle
+// holds).
+//
+// 5/5 OTA-158 regressions pass.
+// 62/62 across the wider dog sweep
+// (dogHungerTimingChaos,
+// dogOnboardingFuzz,
+// parserFuzzWithDogVerbs,
+// dogGolemCombatStress).
+//
+// Files: app/state/gameStore.ts
+// (normalizeDogLeadingVerb +
+// tryDogApplyVerb + tryDogCallVerb).
+export const OTA_BUILD_ID = '2026-05-28-158';

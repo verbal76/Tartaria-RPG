@@ -18803,12 +18803,59 @@ function applyItemToDog(
  *  applyItemToDog. Returns true when the input matched a dog
  *  application form (so the caller can short-circuit the normal parser
  *  dispatch). */
+// OTA-158 — normalize a drunk-typed leading verb to its canonical
+// form before the dog interceptor regexes run. Pre-fix, the
+// stress sweep flagged `fed dog ration` / `helll dog ration` /
+// `feeed dog ration` as unknown because tryDogApplyVerb required
+// the exact word `feed` / `heal`. Same class of typo OTA-156
+// fixed in the parser, but the dog interceptors run BEFORE the
+// parser so OTA-156's pass doesn't reach here.
+function normalizeDogLeadingVerb(input: string): string {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { levenshtein } = require('../engine/editDistance');
+  const lower = input.toLowerCase().trim();
+  const spaceIdx = lower.indexOf(' ');
+  if (spaceIdx === -1) return lower;
+  const first = lower.slice(0, spaceIdx);
+  const rest = lower.slice(spaceIdx + 1);
+  // Try BOTH the raw token and a drunk-collapsed form. The collapse
+  // handles extra-letter typos (`feeed` → `feed`); the raw token
+  // handles missing-letter typos (`cll` → `call` via Levenshtein
+  // distance 1). Either match wins.
+  const collapseRuns = (t: string): string => {
+    let c = t.replace(/(.)\1{2,}/g, '$1');
+    const m = c.match(/^(.+)([bcdfghjklmnpqrstvwxyz])\2$/);
+    if (m && m[1]!.length >= 1) c = m[1]! + m[2]!;
+    return c;
+  };
+  const candidates = [first, collapseRuns(first)];
+  for (const canonical of ['feed', 'heal', 'call', 'use']) {
+    for (const cand of candidates) {
+      if (cand === canonical) return `${canonical} ${rest}`;
+      const max = Math.max(cand.length, canonical.length);
+      // Short verbs (max <= 4) get budget 1 instead of 0 here. We're
+      // already gated to a small known-canonical set so the false-
+      // positive risk is tiny — `feed`/`heal`/`call`/`use` are
+      // distinct enough that a 1-edit match doesn't cross between
+      // them.
+      const budget = max <= 3 ? 0 : 1;
+      if (levenshtein(cand, canonical) <= budget) {
+        return `${canonical} ${rest}`;
+      }
+    }
+  }
+  return lower;
+}
+
 function tryDogApplyVerb(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   rawInput: string,
 ): boolean {
-  const lower = rawInput.toLowerCase().trim();
+  // OTA-158 — normalize drunk-typed leading verb so `fed dog ration`
+  // / `helll dog ration` / `feeed dog ration` all reach the same
+  // regexes as the clean `feed dog ration` would.
+  const lower = normalizeDogLeadingVerb(rawInput);
   if (!lower) return false;
   // Pattern 1: "feed dog <item>" / "feed <dog name> <item>"
   // Pattern 2: "heal dog <item>" / "heal <dog name> <item>"
@@ -18914,7 +18961,10 @@ function tryDogCallVerb(
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,
   rawInput: string,
 ): boolean {
-  const lower = rawInput.toLowerCase().trim();
+  // OTA-158 — same drunk-verb normalization as tryDogApplyVerb so
+  // `cll dog` / `calll dog` / `calln dog` route the same as the
+  // clean `call dog`.
+  const lower = normalizeDogLeadingVerb(rawInput);
   const dog = get().player?.dog;
   if (!dog) return false;
   if (dog.status === 'abandoned' || dog.status === 'dead') return false;
