@@ -412,7 +412,7 @@ export function CraftingScreen() {
                         );
                       })}
                       <Text style={styles.golemVariantsRequires}>
-                        Requires: INT 10+ recommended (d20 + INT vs DC 15 for summon, DC 12 for shape/mend; Mud Dwellers cast at base DC and gain +2 INT, Aetherborn +2 DC, other races +3 DC).
+                        Requires: d20 + INT vs per-golem DC — Mud 13, Iron 15, Aether 17, Crystal 19. Shape and mend roll vs DC 12. Mud Dwellers cast at base DC and gain +2 INT, Aetherborn +2 DC, other races +3 DC.
                       </Text>
                     </View>
                   )}

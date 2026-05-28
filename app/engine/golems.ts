@@ -36,6 +36,15 @@ export interface GolemDefinition {
   damageType: 'bludgeoning' | 'slashing' | 'piercing' | 'aetheric';
   /** Short one-line flavor description for the UI / summon log. */
   blurb: string;
+  /** OTA-137 — per-golem summon DC. The Aethercraft cast rolls
+   *  d20 + INT vs this DC. When unset, runAethercraft falls back to
+   *  the historical flat 15 (summon) / 12 (shape/mend). Defaults
+   *  ship: Mud 13 (easiest — abundant Aether Mud, low-power
+   *  binding), Iron 15 (baseline — matches old default), Aether 17
+   *  (volatile mix, the binding fights you), Crystal 19 (lattice-
+   *  structured, the hardest to seat). Per-race modifiers
+   *  (raceMechanics.aethercraftDcModifier) still apply on top. */
+  summonDC?: number;
 }
 
 export const GOLEM_DEFINITIONS: Record<GolemKind, GolemDefinition> = {
@@ -53,6 +62,7 @@ export const GOLEM_DEFINITIONS: Record<GolemKind, GolemDefinition> = {
     hitBonus: 0,
     damageType: 'bludgeoning',
     blurb: 'Slow heavy bruiser. High HP, blunt force.',
+    summonDC: 13, // easiest — abundant Aether Mud, low-power binding
   },
   iron_golem: {
     kind: 'iron_golem',
@@ -67,6 +77,7 @@ export const GOLEM_DEFINITIONS: Record<GolemKind, GolemDefinition> = {
     hitBonus: 0,
     damageType: 'slashing',
     blurb: 'Tank build. Highest HP, slashing strikes, lowest damage.',
+    summonDC: 15, // baseline — matches the pre-OTA-137 flat default
   },
   aether_golem: {
     kind: 'aether_golem',
@@ -81,6 +92,7 @@ export const GOLEM_DEFINITIONS: Record<GolemKind, GolemDefinition> = {
     hitBonus: 0,
     damageType: 'aetheric',
     blurb: 'Energy striker. Aetheric damage pierces armor; lowest HP.',
+    summonDC: 17, // volatile mix, the binding fights you
   },
   crystal_golem: {
     kind: 'crystal_golem',
@@ -96,6 +108,7 @@ export const GOLEM_DEFINITIONS: Record<GolemKind, GolemDefinition> = {
     hitBonus: 2,
     damageType: 'piercing',
     blurb: 'Precision striker. +2 to hit, lightest frame.',
+    summonDC: 19, // lattice-structured, the hardest to seat
   },
 };
 

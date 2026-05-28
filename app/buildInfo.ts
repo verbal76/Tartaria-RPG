@@ -2697,4 +2697,39 @@
 //
 // Files: __tests__/inferenceOrderingLock.test.ts
 // (NEW).
-export const OTA_BUILD_ID = '2026-05-28-136';
+//
+// 2026-05-28 OTA-137 — Per-golem summon DC. The
+// HANDOFF 0.A entry recommended Mud 13 / Iron 15 /
+// Aether 17 / Crystal 19 to reflect that Crystal +
+// Aether are lore-stronger anchors than Mud + Iron.
+// Shipped:
+//   - GolemDefinition gains optional summonDC field
+//     in app/engine/golems.ts.
+//   - All 4 golem records get summonDC values:
+//     mud_golem 13, iron_golem 15, aether_golem 17,
+//     crystal_golem 19.
+//   - runAethercraft in gameStore.ts reads
+//     getGolemDefinition(golemKindHint).summonDC ??
+//     15 when discipline === 'summon'. Falls back
+//     to historical flat 15 / 12 (mend) when
+//     summonDC is unset or discipline is shape /
+//     mend.
+//   - Crafting → AETHERIC tab footer updated:
+//     "Requires: d20 + INT vs per-golem DC — Mud 13,
+//     Iron 15, Aether 17, Crystal 19. Shape and
+//     mend roll vs DC 12. Mud Dwellers cast at
+//     base DC and gain +2 INT, Aetherborn +2 DC,
+//     other races +3 DC."
+//
+// Per-race modifiers (raceMechanics.aethercraftDc
+// Modifier) still apply on top. Mud Dweller now
+// casts Mud Golem at DC 13 effective, Crystal
+// Golem at DC 19 — a real difficulty curve where
+// before all 4 golems were DC 15. 25/25 regression
+// tests pass. TS clean.
+//
+// Files: app/engine/golems.ts (4 summonDC fields +
+// type), app/state/gameStore.ts (runAethercraft DC
+// lookup), app/screens/CraftingScreen.tsx (footer
+// copy).
+export const OTA_BUILD_ID = '2026-05-28-137';

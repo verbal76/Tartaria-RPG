@@ -17452,7 +17452,18 @@ function runAethercraft(
 
   // 2. Skill check. Aethercraft uses INT for shape/summon and WIS
   // for mend (the lorebook frames healing as wisdom-channelled).
-  const dcBase = discipline === 'summon' ? 15 : 12;
+  // OTA-137 — per-golem summonDC. Mud 13, Iron 15, Aether 17,
+  // Crystal 19. Falls back to the historical flat 15 / 12 when the
+  // GolemDefinition omits summonDC (shape / mend still flat 12).
+  let dcBase: number;
+  if (discipline === 'summon' && golemKindHint) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { getGolemDefinition } = require('../engine/golems') as typeof import('../engine/golems');
+    const def = getGolemDefinition(golemKindHint);
+    dcBase = def.summonDC ?? 15;
+  } else {
+    dcBase = discipline === 'summon' ? 15 : 12;
+  }
   const dc = dcBase + aethercraftDcModifier(player.raceId);
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { effectiveStats } = require('../engine/equipment');
