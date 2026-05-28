@@ -2732,4 +2732,22 @@
 // type), app/state/gameStore.ts (runAethercraft DC
 // lookup), app/screens/CraftingScreen.tsx (footer
 // copy).
-export const OTA_BUILD_ID = '2026-05-28-137';
+//
+// 2026-05-28 OTA-138 — WIS-novel-step sliding
+// window 20 → 50. OTA-111 stat-growth audit found
+// WIS as the fastest-growing stat at 0.168 XP/turn
+// (cardinal-step training fires on novel tiles;
+// novel-detection used a 20-tile sliding window of
+// recentTileHistory). At 20, a wanderer who looped
+// through ~25 tiles could farm WIS — the early
+// tiles aged out of the window between revisits.
+// At 50 the loop must traverse genuinely new
+// ground to keep training. Closes the OTA-112
+// deferred-recommendation audit item. The stat-
+// growth sim's fixed action mix doesn't surface
+// the loop case, so its WIS rate is unchanged
+// (0.168) — real-gameplay impact lands on the
+// player who paces back and forth in a small area.
+// Files: app/state/gameStore.ts (one .slice(-20)
+// → .slice(-50) in stepDirection).
+export const OTA_BUILD_ID = '2026-05-28-138';

@@ -12634,8 +12634,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const tileIsNovel = !!liveAfterStep && !history.includes(tileKey);
     // Always advance the history regardless of train outcome so a
     // future re-entry counts the most recent visit.
+    // OTA-138 — sliding window 20 → 50. OTA-111 audit showed WIS is
+    // the fastest-growing stat at 0.168 XP/turn — every novel
+    // cardinal step trains it, and 40% of turns are moves. At the
+    // 20-tile window, a wanderer who looped through ~25 tiles could
+    // farm WIS by chaining the loop, since the early tiles re-aged
+    // out of the window. Widening to 50 means a player has to
+    // genuinely traverse new ground to keep training. The OTA-112
+    // DEX fix landed without a WIS nerf; this OTA closes the audit
+    // recommendation.
     if (liveAfterStep && tileKey) {
-      const nextHistory = [...history, tileKey].slice(-20);
+      const nextHistory = [...history, tileKey].slice(-50);
       set((s) => (s.player ? { player: { ...s.player, recentTileHistory: nextHistory } } : s));
     }
 
