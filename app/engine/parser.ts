@@ -111,9 +111,17 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   // The block intent itself stays in the type signature for any save
   // data that has it cached, but the parser maps every block-flavored
   // verb to dodge so they all reach the new active-parry mechanic.
+  // OTA-159 — `defend` moved here from `help`. Stress sweep found
+  // a player typing `defend` in combat got routed to the help/
+  // call-for-backup intent (which does nothing visible to the
+  // active fight). Defensive stance is the obvious player
+  // intent for `defend` in a combat scene; the help intent still
+  // covers backup-call via help / aid / assist / support /
+  // cover / bolster / reinforce.
   dodge: [
     'dodge', 'evade', 'sidestep', 'duck', 'juke', 'tumble', 'slip', 'twist', 'roll',
     'block', 'parry', 'deflect', 'shield', 'brace', 'guard', 'fend', 'absorb', 'ward',
+    'defend',
   ],
   block: [],
   advance: [
@@ -178,7 +186,12 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'rush', 'rush forward',
   ],
   disengage: ['disengage', 'peel off', 'break off', 'slip away', 'pull away', 'extract', 'fade back', 'detach', 'unstick', 'shake off'],
-  help: ['help', 'assist', 'aid', 'support', 'back up', 'cover', 'bolster', 'defend', 'reinforce', 'abet'],
+  // OTA-159 — `defend` removed; now in dodge (defensive stance) so
+  // a player typing `defend` in combat gets the parry mechanic
+  // instead of a no-visible-effect backup call. Other help
+  // synonyms (assist / aid / support / cover / bolster / reinforce)
+  // still cover the request-for-backup intent.
+  help: ['help', 'assist', 'aid', 'support', 'back up', 'cover', 'bolster', 'reinforce', 'abet'],
   ready: [
     'ready', 'prepare', 'set up', 'focus', 'watch', 'await', 'prep', 'steady', 'anticipate', 'cock',
     // Preparation + planning + psychological cards.

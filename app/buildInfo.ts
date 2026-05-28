@@ -3705,4 +3705,34 @@
 // Files: app/state/gameStore.ts
 // (normalizeDogLeadingVerb +
 // tryDogApplyVerb + tryDogCallVerb).
-export const OTA_BUILD_ID = '2026-05-28-158';
+//
+// 2026-05-28 OTA-159 — `defend` moved
+// from help to dodge intent.
+//
+// Stress sweep flagged: player typing
+// `defend` (or `defendd`) in combat
+// expected a parry/defensive-stance
+// action but got routed to help intent
+// (call for backup) which produced no
+// visible combat effect. Defensive
+// intent is clearly the more natural
+// reading for `defend` in a combat
+// context.
+//
+// Fix: `defend` moved from help's
+// synonym list into dodge's (where
+// parry/block/guard/shield already
+// live). Help's backup-call intent
+// still covers help / aid / assist /
+// support / cover / bolster /
+// reinforce so the calling-for-help
+// path stays intact.
+//
+// 17/17 OTA-159 regressions pass
+// (defend → dodge + help-synonyms-
+// intact + dodge-synonyms-intact).
+// parserFuzz green.
+//
+// Files: app/engine/parser.ts
+// (dodge synonyms + help synonyms).
+export const OTA_BUILD_ID = '2026-05-28-159';
