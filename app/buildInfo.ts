@@ -3797,4 +3797,41 @@
 //
 // Files: app/state/gameStore.ts
 // (handleYulkaBuy disc grant).
-export const OTA_BUILD_ID = '2026-05-28-161';
+//
+// 2026-05-28 OTA-162 — cardinal-step
+// location discovery extension.
+//
+// Stress sweep (cartographer) found
+// 500 cardinal-walk turns produced
+// only 1 discoveredLocationId because
+// discoverLocation only fired at
+// terminal travelTo arrivals. A
+// player who walks past a Capital at
+// 2 tiles away has clearly seen it
+// but worldMemory never noticed.
+//
+// Fix: when stepDirection surfaces a
+// nearest-named-location label (the
+// transitArea "near X" branch) and
+// that location is within 2 tiles
+// (Manhattan), also call
+// discoverLocation. Threshold = 2
+// captures "close enough to count as
+// passing through" without exposing
+// distant landmarks visible from
+// across the map.
+//
+// Player effect: walking past Voronov
+// at 2 tiles now puts it on the
+// Milestones tab + the world-map
+// fog-clear instead of staying
+// invisible until terminal arrival.
+//
+// 3/3 OTA-162 regressions
+// (discoverLocation add + idempotent
+// + accumulation).
+//
+// Files: app/state/gameStore.ts
+// (stepDirection nearest-loc
+// discover branch).
+export const OTA_BUILD_ID = '2026-05-28-162';

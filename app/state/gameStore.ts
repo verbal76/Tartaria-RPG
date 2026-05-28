@@ -12784,6 +12784,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ? { currentScene: { ...s.currentScene, transitArea: label } }
               : s);
           }
+          // OTA-162 — discover named locations the player passes within
+          // sight. Stress sweep (cartographer) found 500 cardinal-walk
+          // turns produced only 1 discoveredLocationId because
+          // discoverLocation only fired at terminal `travelTo` arrivals.
+          // A player who walks past a Capital at 2 tiles away has
+          // CLEARLY seen it. Threshold ≤ 2 tiles = "passed close enough
+          // to count as discovered" without making distant landmarks
+          // visible from across the map.
+          if (bestDist <= 2) {
+            set((s) => ({ worldMemory: discoverLocation(s.worldMemory, bestId!) }));
+          }
         }
       }
       // (b) ~12% chance per cardinal step during travel to roll a
