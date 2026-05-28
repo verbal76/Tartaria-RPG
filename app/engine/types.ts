@@ -1026,6 +1026,14 @@ export interface WorldMemory {
   /** OTA-120 — set true on the first co-activation of a dog and a
    *  golem in combat, so the "wide arc" flavor only fires once. */
   dogGolemCoActivated?: boolean;
+  /** OTA-139 — rumor-of-trapped-dog Arbiter hint. Set true after
+   *  the hint fires once. Discoverability nudge for players who
+   *  pass day 5 without ever tapping a rescue-hook noun (smelter /
+   *  cage / wagon / cellar / snare / trap / pit). The Arbiter
+   *  drops one rumor line pointing the player toward the genre of
+   *  scene where a captor + dog encounter could be found. Single-
+   *  shot per save so the hint doesn't become noise. */
+  dogRescueTipFired?: boolean;
 }
 
 /** OTA 454 — record of a single named NPC encounter. */

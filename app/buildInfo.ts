@@ -2750,4 +2750,38 @@
 // player who paces back and forth in a small area.
 // Files: app/state/gameStore.ts (one .slice(-20)
 // → .slice(-50) in stepDirection).
-export const OTA_BUILD_ID = '2026-05-28-138';
+//
+// 2026-05-28 OTA-139 — Rumor-of-trapped-dog
+// discoverability nudge. Per the OTA-125 follow-up
+// open issue: a Day-32 character could play the
+// game indefinitely without ever encountering a
+// rescue-hook noun, and the dog system would
+// remain invisible. The rescue routing fires the
+// moment the player taps any noun matching the
+// hook list — but the player who wanders without
+// crossing those nouns misses the system entirely.
+//
+// Fix: at ~0.5% per cardinal step, after the
+// player has accumulated 5+ in-game days AND has
+// no dog AND no onboarding in flight AND the hint
+// hasn't fired yet, the Arbiter drops a one-time
+// rumor line pointing the player toward one of
+// the rescue venues at a random cardinal:
+//   "Travelers have been speaking of a dog held at
+//    {a smelter ruin / an overturned wagon at a
+//    roadside camp / a cellar door under a buried
+//    structure / a snare pit at a trapper camp}
+//    to the {north / south / east / west}. ..."
+//
+// Single-shot per save (worldMemory.dogRescueTip
+// Fired). The actual rescue spawning happens via
+// the existing tap-on-hook-noun path; this just
+// surfaces the existence of the system for old-
+// save players. 25/25 regression tests pass. TS
+// clean.
+//
+// Files: app/engine/types.ts (worldMemory
+// .dogRescueTipFired field), app/state/gameStore
+// .ts (hint check in stepDirection after the
+// travel-lore beat).
+export const OTA_BUILD_ID = '2026-05-28-139';

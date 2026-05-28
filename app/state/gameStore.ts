@@ -12886,6 +12886,39 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const idx = rotatingPick(TRAVEL_LORE_BEATS.map((_, i) => i), 'travel.lore.beat');
       get().appendLog('arbiter', TRAVEL_LORE_BEATS[idx]!);
     }
+    // OTA-139 — rumor-of-trapped-dog discoverability nudge. After
+    // ~5 in-game days with no dog, no onboarding in flight, and
+    // the hint hasn't fired yet, drop a one-time Arbiter rumor
+    // line that points the player toward a rescue-hook noun. ~0.5%
+    // per cardinal step. The dog rescue scenarios fire any time
+    // the player taps `cage / chain / wagon / wheel / cellar /
+    // trapdoor / snare / pit / smelter / forge ruin` etc. on a
+    // hookEligible intent — but the player who never crosses one
+    // of those nouns in their wandering misses the system entirely.
+    // Single-shot per save so it doesn't become noise.
+    {
+      const livePlayer = get().player;
+      const liveWm = get().worldMemory;
+      const dayCount = Math.floor((livePlayer?.hoursElapsed ?? 0) / 24);
+      if (
+        livePlayer
+        && !livePlayer.dog
+        && !liveWm.pendingDogOnboarding
+        && !liveWm.dogRescueTipFired
+        && dayCount >= 5
+        && Math.random() < 0.005
+      ) {
+        const dir = pick(['north', 'south', 'east', 'west']);
+        const venue = pick(['a smelter ruin', 'an overturned wagon at a roadside camp', 'a cellar door under a buried structure', 'a snare pit at a trapper camp']);
+        get().appendLog(
+          'arbiter',
+          `The Arbiter, half to themselves: "Travelers have been speaking of a dog held at ${venue} to the ${dir}. Whoever's keeping it isn't doing right by it. If you ever pass one — there are ways to free a thing like that."`,
+        );
+        set((s) => ({
+          worldMemory: { ...s.worldMemory, dogRescueTipFired: true },
+        }));
+      }
+    }
     // Open ground — narrate a wander and plant a hook. Compass in pack
     // adds direction-aware hint of what's ahead.
     const hasCompass = player.inventory.some(
