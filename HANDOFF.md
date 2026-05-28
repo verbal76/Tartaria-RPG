@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-118` (Planning-only OTA — Dog Companion onboarding gains a third Arbiter question. Full flow: "What kind of dog is that?" → breed; "What will you name them?" → name; "Boy or girl?" → sex with pronoun parse. Pronoun drives all "your dog..." narration via template substitution. Mechanically cosmetic). See **Section 0** for the live issue tracker covering OTA-070 → OTA-118.
+> **Latest OTA:** `2026-05-27-119` (Planning-only OTA — Dog Companion framework gains Phase 6: puppy-vendor safety net. One-shot per save, post-combat-death only (NOT abandonment), activates after next Core Guardian victory, vendor trades a puppy for one random Common-tier non-equipped item. Mid-save acquisition confirmed working via one-line migration. Per-phase difficulty estimates added). See **Section 0** for the live issue tracker covering OTA-070 → OTA-119.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -111,6 +111,30 @@
 
   **Golem conflict (user: "dogs do not like golems").** Mutually exclusive: dog and golem cannot both be active in the same scene. If the player summons a golem while the dog is with them, the dog sets `status='waiting_at_base'` at the current tile and the arbiter narrates `"Your dog backs up, hackles raised. They won't share a tile with that thing."`. Dismissing the golem restores the dog after one cardinal step.
 
+  **Puppy-vendor safety net (Phase 6 addition).** When the player's dog dies in COMBAT (not abandonment), a single-use replacement path opens. Rules:
+
+    1. **Trigger flag on save:** `worldMemory.puppyVendorOwed: boolean`. Defaults false. Set true ONLY when `player.dog.status` transitions to `'dead'` via the combat-death path (`hp <= 0` AND fight lost — gem-revive path skips the flag-set).
+
+    2. **Hunger-abandonment does NOT trigger the safety net.** If the dog hits loyalty 0 and abandons, `puppyVendorOwed` stays false. Player neglected their dog; no bail-out.
+
+    3. **Activation window:** the puppy vendor spawns in the player's next outdoor scene AFTER they defeat their NEXT Core Guardian following the flag-set. So the player has to actually push forward in the main quest to earn the chance — it's not handed to them the next time they walk outside.
+
+    4. **Vendor pitch:** A new one-off vendor archetype (NEW `puppyVendor` template). Arbiter beat on spawn: `"A stranger waits at the roadside with a wicker basket. Three pups inside — some breed you don't recognize. They look up at you. 'I'd trade one for the right kind of help,' the stranger says, eyeing your pack."`
+
+    5. **Trade selection:** The engine picks ONE random item from `player.inventory` that meets ALL of: `rarity === 'Common'`, `quantity >= 1`, `kind !== 'weapon'` (don't take their starter weapon), and `kind !== 'armor'` (don't take what they're wearing). If nothing qualifies (vanishingly rare — Common materials, scraps, junk pulls are always around by mid-game), fall back to ANY 1-stack item except equipped gear. The vendor's framing: `"That {item} you've got — I've been needing one of those for a season. You hand me that, I hand you a pup. Fair?"`
+
+    6. **Accept flow:** player taps ACCEPT → engine consumes 1 of the item → spawns the puppy → runs the same three-step Arbiter onboarding (breed → name → sex) → sets `puppyVendorOwed = false` and adds a hidden marker `worldMemory.puppyVendorUsed = true`. New dog's `startingProfile = 'puppy'` (slightly lower baseline stats — STR 8 / DEX 9 / INT 9 vs the rescued-dog 10-baseline; grows normally from there).
+
+    7. **Decline flow:** player taps DECLINE → arbiter beat `"The stranger nods, hoists the basket, and walks on. The pups don't look back."` → `puppyVendorOwed = false`, `puppyVendorUsed = true`. No second chance. Single-shot is single-shot whether they took it or not.
+
+    8. **Hard cap (user's spec):** ONE puppy vendor per save, full stop. If the puppy also dies in combat later, no second vendor. If the puppy abandons through hunger, no second vendor. `puppyVendorUsed === true` permanently locks the path. The save can never get a third dog from this mechanic.
+
+    9. **Edge case — all Guardians cleared:** if the player has already defeated all 9 Core Guardians and THEN their dog dies in combat, `puppyVendorOwed` is set but never fires (no future Guardian victory to trigger on). Player is out of luck — this is intentional; the late-game player has all the resources to keep a dog alive and shouldn't get a bail-out.
+
+    10. **Save / load:** `puppyVendorOwed` and `puppyVendorUsed` flags live in `worldMemory`, serialize naturally. Migration on existing saves: both default to false.
+
+    11. **Phase 6 scope:** ~300-400 lines. Combat-death flag-set in the Phase 2 combat code, Guardian-victory hook in the Core Guardians resolution path, new `puppyVendor` enemy/vendor template, trade interaction reusing the existing vendor screen with a hardcoded one-item trade, onboarding re-run reusing Phase 1's Arbiter state machine. Medium difficulty — depends on Phase 1-5 being complete.
+
   **Dog gear — the Vest.** New equipment kind: `kind: 'dog_armor'` in the catalog. Initial roster (4 vests):
     - Burlap Vest (Common, +1 AC, no req)
     - Riveted Leather Vest (Uncommon, +2 AC)
@@ -178,14 +202,19 @@
        - Control: spawn a regular Reclaimer hostile (no flag) under the same conditions; assert standing DOES change.
        - Cross-scenario test: every rescue scenario sets the flag correctly; non-rescue enemies never have the flag set.
 
-  **Implementation phasing (5 OTAs, ~1 wave):**
-    - Phase 1 (1 OTA): Data model (`DogCompanion` type with free-text breed/name + sex.raw/pronoun, `player.dog` field, save/load), three-step Arbiter onboarding flow (breed → name → sex), pronoun-template helper for narration substitution, rescue scenarios 1-2, faction-neutral fight flag.
-    - Phase 2 (1 OTA): Combat integration (DOG button with bite/distract picker, dog-as-weapon-row in action menu, enemy retaliation split, golem conflict, gem-revive path).
-    - Phase 3 (1 OTA): Travel + climb behavior (auto-follow, climb decoupling, hub transitions). **Smell-find mechanic** + per-archetype hidden noun authoring.
-    - Phase 4 (1 OTA): Hunger + treat-tagged loot table additions (3-4 new treat items) + `heal dog` / `feed dog` / `use <item> on dog` verb routing. Tutorial step.
-    - Phase 5 (1 OTA): Stat growth + UI surfaces (title-screen character slot tile gets a dog name + breed sub-line, Character screen Companion panel, Inventory vest/treat tagging, call modal). Dog gear catalog (4 vests).
+  **Mid-save acquisition.** When Phase 1 lands, existing saves get `player.dog: null` via a one-line migration in `loadSlotIntoGame`. Rescue hooks fire normally on the player's next investigate of a matching scene archetype (smelter / wagon / cellar / snare). No special migration path needed — the system is purely additive, no existing rule changes. Mid-save players have the same chance at the first dog as fresh starts.
 
-  **Files this would touch (preview):** `app/engine/types.ts` (DogCompanion type, dog_armor kind, treat tag), `app/state/gameStore.ts` (rescue spawn / combat / travel / rest / hunger / call / smell-find / heal / feed handlers), `app/engine/dogCompanion.ts` (NEW — central module like `golems.ts`), `app/data/items/dogGear.json` (NEW — 4 vests), `app/data/items/consumables.json` (4 new treats with `dogTreat: true`), `app/data/world/*.json` (hidden smell nouns per scene archetype), `app/screens/TitleScreen.tsx` (character slot tile — dog name + breed sub-line), `app/screens/CharacterScreen.tsx` (Companion panel), `app/screens/InventoryScreen.tsx` (vest + treat tagging), `app/components/CallDogModal.tsx` (NEW), `app/components/tutorialSteps.ts` (new step). Approximate scope: 3-4k lines across 5 OTAs.
+  **Implementation phasing (6 OTAs, ~1 wave):**
+    - Phase 1 (1 OTA, ~600-800 lines): Data model (`DogCompanion` type with free-text breed/name + sex.raw/pronoun, `player.dog` field, save/load + mid-save migration), three-step Arbiter onboarding flow (breed → name → sex), pronoun-template helper for narration substitution, rescue scenarios 1-2 (smelter / wagon), faction-neutral fight flag. **Medium-Hard** — the conversational state machine is the tricky bit.
+    - Phase 2 (1 OTA, ~500-700 lines): Combat integration (DOG button with bite/distract picker, dog-as-weapon-row in action menu, enemy retaliation split, golem conflict, gem-revive path, combat-death detection setting `puppyVendorOwed` flag for Phase 6). **Medium-Hard** — integrates with the existing combat path at gameStore.ts:6500-7000.
+    - Phase 3 (1 OTA, ~400-600 lines + JSON authoring): Travel + climb behavior (auto-follow, climb decoupling, hub transitions). **Smell-find mechanic** + per-archetype hidden noun authoring. Rescue scenarios 3-4 (cellar / snare). **Medium** — straightforward mechanics, repetitive content.
+    - Phase 4 (1 OTA, ~400-600 lines): Hunger + treat-tagged loot table additions (4 new treat items: Smoke-Cured Jerky Strip / Marrow Bone / Honey-Glazed Knuckle / Ash-Cured Tongue) + `heal dog` / `feed dog` / `use <item> on dog` verb routing. Tutorial step. **Medium** — mostly state updates and verb routing.
+    - Phase 5 (1 OTA, ~700-900 lines + new UI components): Stat growth wiring + UI surfaces (title-screen character slot tile gets a dog name + breed sub-line, Character screen Companion panel, Inventory vest/treat tagging, call modal). Dog gear catalog (4 vests). **Medium-Hard** — new React Native components.
+    - Phase 6 (1 OTA, ~300-400 lines): Puppy-vendor safety net (one-shot per save, post-combat-death only, fires after next Core Guardian victory, one-item-from-bag trade, re-runs the Arbiter onboarding). **Medium** — depends on Phases 1-5 being complete.
+
+  **Total scope:** ~3-4k lines across 6 OTAs, ~20-30 hours focused implementation. Every system has an existing precedent in the codebase (golem for combat, vendor for trade, statTraining for growth) so nothing is architecturally novel.
+
+  **Files this would touch (preview):** `app/engine/types.ts` (DogCompanion type, dog_armor kind, treat tag, factionNeutralFight flag, puppyVendor template type), `app/state/gameStore.ts` (rescue spawn / combat / travel / rest / hunger / call / smell-find / heal / feed handlers / puppy-vendor trigger), `app/engine/dogCompanion.ts` (NEW — central module like `golems.ts`), `app/engine/puppyVendor.ts` (NEW — Phase 6 trade interaction), `app/data/items/dogGear.json` (NEW — 4 vests), `app/data/items/consumables.json` (4 new treats with `dogTreat: true`), `app/data/world/*.json` (hidden smell nouns per scene archetype), `app/screens/TitleScreen.tsx` (character slot tile — dog name + breed sub-line), `app/screens/CharacterScreen.tsx` (Companion panel), `app/screens/InventoryScreen.tsx` (vest + treat tagging), `app/screens/VendorScreen.tsx` (puppy-vendor trade rendering), `app/components/CallDogModal.tsx` (NEW), `app/components/tutorialSteps.ts` (new step). Approximate scope: 3-4k lines across 6 OTAs.
 
 - **Per-golem summonDC differentiation (OTA-111 design call).** `runAethercraft` at `app/state/gameStore.ts:16592` uses a single hard-coded `dcBase = 15` (INT) for all four golem kinds. Lore-wise, Crystal and Aether golems are stronger anchors than Mud and Iron — they should arguably cost more. The OTA-111 AETHERIC tab footer surfaces the uniform DC-15 line to the player. **Fix shape:** add optional `summonDC?: number` to `GolemDefinition` in `app/engine/golems.ts`; `runAethercraft` reads `def.summonDC ?? 15`. Recommended values for design discussion: Mud 13, Iron 15, Aether 17, Crystal 19. **Status:** open; needs user input.
 

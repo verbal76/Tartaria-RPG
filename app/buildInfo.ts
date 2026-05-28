@@ -1944,4 +1944,44 @@
 //
 // Files: HANDOFF.md (Naming flow, data model, narration,
 // UI surfaces, Phase 1 in 0.A Dog Companion entry).
-export const OTA_BUILD_ID = '2026-05-27-118';
+//
+// 2026-05-27 OTA-119 — Planning entry only (no code changes).
+// User asked three things: difficulty estimate per phase,
+// mid-save acquisition behavior, and added a new puppy-vendor
+// safety-net mechanic for combat-death recovery.
+//
+// Difficulty estimates added per-phase (Medium / Medium-Hard
+// designations + line counts). Total ~3-4k lines across 6
+// OTAs, ~20-30 hours focused work. No architectural novelty.
+//
+// Mid-save acquisition: works naturally. player.dog defaults
+// to null on existing saves via one-line migration in
+// loadSlotIntoGame. Rescue hooks fire normally on next
+// investigate of matching archetype. System is purely
+// additive — no existing rule changes.
+//
+// NEW Phase 6 — Puppy-vendor safety net:
+//   - One-shot per save, post-combat-death ONLY (hunger-
+//     abandonment does NOT trigger).
+//   - Activates after next Core Guardian victory after the
+//     combat death.
+//   - Vendor (new puppyVendor template) trades a puppy for
+//     ONE random Common-tier non-equipped item in the
+//     player's pack. Flavor: "I've been needing one of those
+//     for a season."
+//   - Accept → onboard a new puppy (lower starting stats,
+//     same growth curve). Decline → vendor walks away. Both
+//     paths set puppyVendorUsed = true, single-shot enforced.
+//   - Saves carry puppyVendorOwed + puppyVendorUsed flags in
+//     worldMemory.
+//   - If all 9 Guardians cleared and dog dies post-completion,
+//     no fire — intentional late-game cap.
+//
+// Phase count grows 5 → 6 (~300-400 lines added for Phase 6).
+//
+// JS bundle unchanged. Framework still ready for Phase 1.
+//
+// Files: HANDOFF.md (Puppy-vendor section, mid-save note,
+// difficulty estimates, Phase 6 in phasing, files-touched
+// updates).
+export const OTA_BUILD_ID = '2026-05-27-119';
