@@ -384,13 +384,21 @@ export function ExplorationScreen() {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { phaseHint, LOST_CAPITAL_LOCATIONS: capitals, coreGateNextAction } = require('../engine/mainQuest');
         let mainLine: string;
+        // OTA-154 — atUnrecovered flag also drives the SUMMON chip on
+        // the right edge of the home-screen MAIN QUEST card. Player
+        // asked to skip the bounce through Contracts: "I want to be
+        // able to get right to the city smack that button and have at
+        // it." Same precondition surface the Contracts SUMMON chip
+        // uses — both stay live so the secondary path remains as a
+        // backup.
+        let atUnrecovered = false;
         if (!mq || mq.phase === 'ended') {
           // No active main quest — chip still serves as the menu
           // entry but doesn't pretend to point anywhere.
           mainLine = 'No active objective.';
         } else {
           const cores = mq.coresRecovered?.length ?? 0;
-          const atUnrecovered = capitals.includes(player.currentLocationId)
+          atUnrecovered = capitals.includes(player.currentLocationId)
             && !mq.coresRecovered.includes(player.currentLocationId)
             && (mq.phase === 'revelation' || mq.phase === 'cores');
           mainLine = atUnrecovered
@@ -404,14 +412,28 @@ export function ExplorationScreen() {
             activeOpacity={0.7}
             hitSlop={6}
           >
-            <Text style={styles.objectiveChipTitle} numberOfLines={2}>
-              <Text style={styles.objectiveChipStar}>★ </Text>
-              <Text style={styles.objectiveChipLabel}>MAIN QUEST · </Text>
-              {mainLine}
-            </Text>
-            <Text style={styles.objectiveChipSubtitle}>
-              tap for all contracts + collectibles ↗
-            </Text>
+            <View style={styles.objectiveChipRow}>
+              <View style={styles.objectiveChipBody}>
+                <Text style={styles.objectiveChipTitle} numberOfLines={2}>
+                  <Text style={styles.objectiveChipStar}>★ </Text>
+                  <Text style={styles.objectiveChipLabel}>MAIN QUEST · </Text>
+                  {mainLine}
+                </Text>
+                <Text style={styles.objectiveChipSubtitle}>
+                  tap for all contracts + collectibles ↗
+                </Text>
+              </View>
+              {atUnrecovered && (
+                <TouchableOpacity
+                  style={styles.objectiveChipSummon}
+                  onPress={() => useGameStore.getState().summonCoreGuardian()}
+                  activeOpacity={0.7}
+                  hitSlop={8}
+                >
+                  <Text style={styles.objectiveChipSummonText}>★ SUMMON</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </TouchableOpacity>
         );
       })()}
@@ -1006,6 +1028,30 @@ const styles = StyleSheet.create({
     lineHeight: 14,
     marginTop: 2,
     letterSpacing: 0.5,
+  },
+  // OTA-154 — row layout for the home-screen MAIN QUEST chip so a
+  // SUMMON button can sit on the right edge alongside the existing
+  // title + subtitle. Nested TouchableOpacity captures the tap so
+  // the chip's tap-to-Contracts handler doesn't also fire.
+  objectiveChipRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  objectiveChipBody: { flex: 1, minWidth: 0 },
+  objectiveChipSummon: {
+    backgroundColor: '#1a1714',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+  },
+  objectiveChipSummonText: {
+    color: '#c9a86a',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1.5,
   },
   vendorBanner: {
     flexDirection: 'row',

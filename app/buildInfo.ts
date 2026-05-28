@@ -3512,4 +3512,47 @@
 //
 // Files: app/screens/EndingScreen.tsx
 // (third homeward beat paragraph).
-export const OTA_BUILD_ID = '2026-05-28-153';
+//
+// 2026-05-28 OTA-154 — SUMMON chip on the
+// home-screen MAIN QUEST card.
+//
+// OTA-148 put the SUMMON chip on the
+// Contracts PRIMARY OBJECTIVE card; OTA-149
+// added the `summon guardian` verb path.
+// Player feedback: the Contracts surface
+// is the SECOND level — too many taps from
+// the home screen. "I want to be able to
+// get right to the city smack that button
+// and have at it."
+//
+// Implementation: MAIN QUEST chip on the
+// ExplorationScreen restructured to a row
+// layout — existing title (★ MAIN QUEST ·
+// hint) + subtitle (tap for all contracts
+// + collectibles ↗) on the left, new
+// ★ SUMMON button on the right when the
+// player is in an unrecovered Lost Capital
+// with mainQuest in revelation/cores. Same
+// `atUnrecovered` precondition the chip's
+// hint line already uses, so the button
+// appears exactly when the hint says
+// "salvage a feature here" / "attack or
+// address the keepers" / etc.
+//
+// Nested TouchableOpacity captures the tap
+// so smacking SUMMON doesn't also fire the
+// chip's tap-to-Contracts navigation — RN
+// responder system grants the touch to the
+// inner button by default.
+//
+// The Contracts SUMMON chip from OTA-148
+// stays in place as a backup path.
+//
+// TS clean. Regression unaffected (same
+// summonCoreGuardian store action both
+// chips call).
+//
+// Files: app/screens/ExplorationScreen.tsx
+// (objectiveChip row layout + SUMMON
+// nested button + 4 styles).
+export const OTA_BUILD_ID = '2026-05-28-154';
