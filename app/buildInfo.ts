@@ -3765,4 +3765,36 @@
 // Files: app/engine/portability.ts
 // (5 refusal lines extended with
 // SALVAGE redirect).
-export const OTA_BUILD_ID = '2026-05-28-160';
+//
+// 2026-05-28 OTA-161 — Yulka disc
+// grant routed through
+// mergeOrPushItem.
+//
+// Stress sweep (craft-a-lot) audit
+// of direct inventory pushes found
+// 3 sites bypassing mergeOrPushItem
+// in gameStore. Two were intentional
+// (stolen-item rows must stay
+// separate so the no-sell rule
+// binds to a specific item.id —
+// merging would silently launder
+// the theft). One was an oversight:
+// handleYulkaBuy pushed a 5-unit
+// Aetheric Disc directly, so two
+// Yulka buys created two parallel
+// disc rows instead of one stacked
+// row of 10.
+//
+// Fix: route the disc grant through
+// mergeOrPushItem. The two theft
+// sites stay direct on purpose per
+// their per-instance theft-flag
+// comments.
+//
+// 2/2 OTA-161 regressions (merge
+// stacks correctly + other rows
+// preserved).
+//
+// Files: app/state/gameStore.ts
+// (handleYulkaBuy disc grant).
+export const OTA_BUILD_ID = '2026-05-28-161';

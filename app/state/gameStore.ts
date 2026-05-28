@@ -15617,18 +15617,25 @@ function handleYulkaBuy(
   }
   set((s) => {
     if (!s.player) return s;
+    // OTA-161 — route the disc grant through mergeOrPushItem so a
+    // second Yulka buy stacks into the existing Aetheric Disc row
+    // instead of creating a parallel row. Audit from the craft-a-lot
+    // stress sweep flagged direct inventory pushes as a class to
+    // tighten — this was the one site doing it for non-theft items
+    // (the two stolen-item sites at 10235/10996 stay direct on
+    // purpose per their per-instance theft-flag comment).
     return {
       player: {
         ...s.player,
         tc: s.player.tc - 50,
-        inventory: [...s.player.inventory, {
+        inventory: mergeOrPushItem(s.player.inventory, {
           id: `disc_buy_${Date.now()}`,
           name: 'Aetheric Disc',
           kind: 'misc' as const,
           rarity: 'Uncommon' as const,
           quantity: 5,
           tags: ['aether', 'currency'],
-        }],
+        }),
         activeWhispers: (s.player.activeWhispers ?? []).filter((w) => w.id !== whisper.id),
         completedWhisperIds: Array.from(new Set([
           ...(s.player.completedWhisperIds ?? []),
