@@ -12608,10 +12608,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       //     squall as you cross a thermocline. Cheap; one roll per
       //     step.
       if (Math.random() < 0.12) {
-        // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { pickWeather: pickWeatherFn } = require('../engine/weather');
+        // OTA-141 — was `require('../engine/weather')` (OTA-127), which
+        // crashes with MODULE_NOT_FOUND because pickWeather actually
+        // lives in '../engine/encounter' (top-of-file import). The
+        // OTA-127 weather-drift branch fires at 12% per in-transit
+        // step; on a long traverse the player would near-certainly
+        // hit the crash. Fix: use the already-imported pickWeather
+        // reference, no require needed.
         const liveWorldMem = get().worldMemory;
-        const newWeather = pickWeatherFn(liveWorldMem);
+        const newWeather = pickWeather(liveWorldMem);
         set((s) => s.currentScene
           ? { currentScene: { ...s.currentScene, weather: newWeather } }
           : s);

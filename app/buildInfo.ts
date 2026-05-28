@@ -2830,4 +2830,54 @@
 // Files: app/state/gameStore.ts (makeRoomKey
 // signature + 31 call-site updates), __tests__/
 // hubRoomKeyCollision.test.ts (NEW).
-export const OTA_BUILD_ID = '2026-05-28-140';
+//
+// 2026-05-28 OTA-141 — Post-cleanup stress test +
+// ship-blocker fix. Vandalistic stress agent shipped
+// 4 new test files (42 tests) covering cross-system
+// integration, catalog consistency under 500
+// random lookups, travel + scene-bar truthfulness
+// chaos, and an adversarial edge-case sweep through
+// all 8 new verbs × 14 hostile inputs (empty, null,
+// unicode, cyrillic, katakana, injection strings).
+//
+// ONE genuine ship-blocker bug surfaced and fixed:
+//   OTA-127 weather-drift on per-step transit
+//   called `require('../engine/weather')` which
+//   crashes with MODULE_NOT_FOUND. pickWeather
+//   actually lives in '../engine/encounter' and
+//   is already imported at the top of gameStore
+//   .ts. The drift branch fires at ~12% per in-
+//   transit cardinal step, so a long traverse
+//   was near-certain to crash. Replaced the
+//   require with the existing import reference.
+//
+// `it.failing` test in fullGameIntegration.test
+// .ts flipped to regular `it` ("weather drift
+// during transit does NOT crash"). All 42 new
+// stress tests + 126 regression tests pass (168
+// total in 31s combined). TS clean.
+//
+// Agent guardrails confirmed honored:
+//   - jest.setTimeout(15000) at top of every new
+//     file
+//   - iteration caps ≤500 per test (documented)
+//   - NEVER ran bare npx jest __tests__/
+//   - banned slow files (twoYearChaosSim /
+//     thousandDayStressSim / combatStress /
+//     domesticStress / metaNavStress /
+//     yearSimulation) never touched
+//   - final regression sweep scoped to 9
+//     designated fast suites
+//
+// All 8 cleanup OTAs (133-140) verified stable
+// under stress. The game is in its cleanest state
+// of the session.
+//
+// Files: app/state/gameStore.ts (weather-drift
+// require → pickWeather reference), __tests__/
+// fullGameIntegration.test.ts (.failing → it,
+// 4 new stress test files added by the agent:
+// fullGameIntegration, catalogConsistencyPost
+// Cleanup, travelSceneBarChaos, edgeCaseSweepPost
+// Cleanup).
+export const OTA_BUILD_ID = '2026-05-28-141';
