@@ -330,6 +330,39 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       '\n\nCall. Type `call dog` or `call <name>` to open the Call Modal — scratch their ear ' +
       '(+2 loyalty), give a treat (opens a picker; +20/+40), or speak softly (+1 loyalty).',
   },
+  // OTA-129/130 — Hook-puzzle walkthrough step. The longest-open
+  // dead-hook issue closed: narration that asks the player to do
+  // something (rotate, knock, etc.) now has a real verb + state
+  // machine behind it. Player needs to know puzzles exist and what
+  // to type.
+  {
+    screen: 'exploration',
+    area: 'fullscreen',
+    title: 'When the narrative gives you a sequence',
+    body:
+      'Some hooks ask you to DO something specific. A sealed vault door narrates: "Three rotations, ' +
+      'in the right order. The faint markings tell you which." A submerged steeple\'s buried child-' +
+      'note reads: "knock on the steeple if you find us." Type the obvious thing and the engine ' +
+      'will honor it.' +
+      '\n\nKnown puzzle verbs: ROTATE, KNOCK, TURN, TWIST, PRESS, PUSH, PULL. Each takes a noun and ' +
+      'optionally a direction. Examples that work:' +
+      '\n  • `rotate the ring left`' +
+      '\n  • `rotate ring counterclockwise`' +
+      '\n  • `turn left` (when only one active puzzle hook accepts it)' +
+      '\n  • `knock on the steeple` × 3' +
+      '\n  • `knock` × 3 (no noun needed if only one knock-puzzle is live)' +
+      '\n\nWrong attempts reset the sequence (you have to start the steps over) but they don\'t ' +
+      'lock you out — three failures surface a softer hint, five surface a stronger one, and at ' +
+      'enough failures (anti-stuck mercy) the engine yields and lets you through. So you can\'t ' +
+      'permanently brick a puzzle.' +
+      '\n\nForgot how many steps you\'ve completed? Type `investigate the ring` (or whatever the ' +
+      'puzzle noun is) and the engine will read out your current attempt state: "2 of 3 steps held. ' +
+      '1 wrong attempt so far." Save/load preserves puzzle progress, so coming back later picks ' +
+      'up where you left off.' +
+      '\n\nThe rest of the world\'s hooks (smoke, footprints, glints, etc.) work the way they ' +
+      'always have — investigate the noun and the hook chain advances. Puzzles only gate the ' +
+      'specific hooks whose narration asks for a specific action.',
+  },
   // 2026-05-25 OTA-031 — skill growth is now a real player-facing
   // system (use-based progression, progressively harder), surfaced
   // on the Character Screen with a 20-segment bar.

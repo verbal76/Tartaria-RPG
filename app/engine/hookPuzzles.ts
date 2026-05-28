@@ -279,3 +279,45 @@ export function applyPuzzleInput(
 export function resetPuzzleProgress(): PuzzleProgress {
   return { correctSoFar: 0, failures: 0, history: [] };
 }
+
+/** OTA-130 — find the first active (unresolved, stage 0) puzzle
+ *  hook in a scene whose puzzle accepts the given intent. Used by
+ *  the parser fallback when the player types a puzzle verb without
+ *  naming the puzzle noun: "rotate left" instead of "rotate the
+ *  ring left." If exactly one puzzle hook is active and accepts
+ *  rotate, route there. Returns null when zero or multiple hooks
+ *  qualify (multiple = ambiguous, refuse the auto-match). */
+export function findActivePuzzleHookForIntent(
+  hooks: readonly Hook[],
+  intent: Intent,
+): Hook | null {
+  const matches = hooks.filter((h) => {
+    if (h.resolved || h.stage !== 0) return false;
+    const def = puzzleFor(h.kind);
+    return def !== null && def.intentList.includes(intent);
+  });
+  return matches.length === 1 ? matches[0]! : null;
+}
+
+/** OTA-130 — examine-peek line for an active puzzle hook. Used by
+ *  the gameStore's investigate / examine handlers when the target
+ *  matches a hook with a puzzle. Returns a one-line summary of the
+ *  current attempt state so the player can see "where am I?" without
+ *  having to count their own taps. Returns null when the hook has
+ *  no puzzle or hasn't been attempted yet (which would expose the
+ *  fresh-intro line via the normal path). */
+export function examinePuzzleLine(hook: Hook): string | null {
+  const def = puzzleFor(hook.kind);
+  if (!def) return null;
+  const progress = hook.puzzleProgress;
+  if (!progress) return null;
+  if (hook.stage !== 0) return null; // already solved past stage 0
+  const sequenceLeft = def.sequenceLength - progress.correctSoFar;
+  if (progress.correctSoFar === 0 && progress.failures > 0) {
+    return `You read the puzzle: nothing held. ${progress.failures} attempt${progress.failures === 1 ? '' : 's'} so far. The mercy threshold sits at ${def.mercyAt - progress.failures} more failure${def.mercyAt - progress.failures === 1 ? '' : 's'}.`;
+  }
+  if (sequenceLeft === 0) {
+    return `You read the puzzle: solved. The next engagement will commit it.`;
+  }
+  return `You read the puzzle: ${progress.correctSoFar} of ${def.sequenceLength} steps held. ${sequenceLeft} more to go. ${progress.failures > 0 ? `(${progress.failures} wrong attempt${progress.failures === 1 ? '' : 's'} so far.)` : ''}`.trim();
+}

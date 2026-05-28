@@ -9,7 +9,9 @@
 import {
   PUZZLE_DEFINITIONS,
   applyPuzzleInput,
+  examinePuzzleLine,
   extractDirection,
+  findActivePuzzleHookForIntent,
   puzzleFor,
 } from '../app/engine/hookPuzzles';
 import type { Hook } from '../app/engine/hooks';
@@ -170,6 +172,117 @@ describe('OTA-129 puzzleFor lookup', () => {
       expect(def.sequenceLength).toBeGreaterThan(0);
       expect(def.mercyAt).toBeGreaterThan(def.sequenceLength);
     }
+  });
+});
+
+describe('OTA-130 examine-peek line', () => {
+  it('returns null for a fresh hook (no progress yet)', () => {
+    const hook = fakeVaultHook();
+    expect(examinePuzzleLine(hook)).toBeNull();
+  });
+
+  it('returns null for a non-puzzle hook', () => {
+    const hook: Hook = {
+      id: 'test_smoke',
+      kind: 'smoke',
+      nouns: ['smoke'],
+      plantedLine: 'smoke rises',
+      stage: 0,
+      resolved: false,
+    };
+    expect(examinePuzzleLine(hook)).toBeNull();
+  });
+
+  it('summarizes mid-attempt state', () => {
+    let hook = fakeVaultHook();
+    const outcome = applyPuzzleInput(hook, { intent: 'rotate', target: 'left', direction: 'left' });
+    hook = { ...hook, puzzleProgress: outcome.progress };
+    const line = examinePuzzleLine(hook);
+    expect(line).toBeTruthy();
+    expect(line).toContain('1 of 3');
+    expect(line).toContain('2 more');
+  });
+
+  it('reports zero-progress + failure count separately', () => {
+    let hook = fakeVaultHook();
+    let outcome = applyPuzzleInput(hook, { intent: 'rotate', target: 'right', direction: 'right' }); // wrong first step
+    hook = { ...hook, puzzleProgress: outcome.progress };
+    outcome = applyPuzzleInput(hook, { intent: 'rotate', target: 'right', direction: 'right' }); // wrong again
+    hook = { ...hook, puzzleProgress: outcome.progress };
+    const line = examinePuzzleLine(hook);
+    expect(line).toContain('nothing held');
+    expect(line).toContain('2 attempts');
+  });
+
+  it('returns null after the puzzle solves (stage > 0)', () => {
+    let hook = fakeVaultHook();
+    const outcome = applyPuzzleInput(hook, { intent: 'rotate', target: 'left', direction: 'left' });
+    hook = { ...hook, puzzleProgress: outcome.progress, stage: 1 };
+    expect(examinePuzzleLine(hook)).toBeNull();
+  });
+});
+
+describe('OTA-130 direction-only fallback (findActivePuzzleHookForIntent)', () => {
+  it('returns the single active puzzle hook for a matching intent', () => {
+    const vault = fakeVaultHook();
+    const steeple = fakeSteepleHook();
+    expect(findActivePuzzleHookForIntent([vault], 'rotate')).toBe(vault);
+    expect(findActivePuzzleHookForIntent([steeple], 'knock')).toBe(steeple);
+  });
+
+  it('returns null when no hook matches the intent', () => {
+    const vault = fakeVaultHook();
+    expect(findActivePuzzleHookForIntent([vault], 'knock')).toBeNull();
+  });
+
+  it('returns null when MULTIPLE active hooks accept the intent (ambiguous)', () => {
+    const vault = fakeVaultHook();
+    const vault2 = { ...vault, id: 'second_vault' };
+    expect(findActivePuzzleHookForIntent([vault, vault2], 'rotate')).toBeNull();
+  });
+
+  it('ignores resolved hooks', () => {
+    const vault = fakeVaultHook();
+    const resolved = { ...vault, id: 'old_vault', resolved: true };
+    expect(findActivePuzzleHookForIntent([resolved], 'rotate')).toBeNull();
+    expect(findActivePuzzleHookForIntent([resolved, vault], 'rotate')).toBe(vault);
+  });
+
+  it('ignores hooks past stage 0', () => {
+    const vault = fakeVaultHook();
+    const advanced = { ...vault, id: 'advanced_vault', stage: 1 };
+    expect(findActivePuzzleHookForIntent([advanced], 'rotate')).toBeNull();
+  });
+});
+
+describe('OTA-130 save/load round-trip (puzzleProgress serializes)', () => {
+  it('JSON round-trip preserves correctSoFar / failures / history exactly', () => {
+    let hook = fakeVaultHook();
+    let outcome = applyPuzzleInput(hook, { intent: 'rotate', target: 'left', direction: 'left' });
+    hook = { ...hook, puzzleProgress: outcome.progress };
+    outcome = applyPuzzleInput(hook, { intent: 'rotate', target: 'wrong', direction: null });
+    hook = { ...hook, puzzleProgress: outcome.progress };
+
+    const json = JSON.stringify(hook);
+    const restored = JSON.parse(json) as Hook;
+    expect(restored.puzzleProgress).toEqual(hook.puzzleProgress);
+    expect(restored.puzzleProgress?.correctSoFar).toBe(0); // reset by wrong
+    expect(restored.puzzleProgress?.failures).toBe(1);
+    expect(restored.puzzleProgress?.history.length).toBe(2);
+  });
+
+  it('continues progress correctly after a round-trip', () => {
+    let hook = fakeVaultHook();
+    const start = applyPuzzleInput(hook, { intent: 'rotate', target: 'left', direction: 'left' });
+    hook = { ...hook, puzzleProgress: start.progress };
+
+    // Save + reload
+    const reloaded = JSON.parse(JSON.stringify(hook)) as Hook;
+
+    // Continue
+    const cont = applyPuzzleInput(reloaded, { intent: 'rotate', target: 'right', direction: 'right' });
+    expect(cont.progress.correctSoFar).toBe(2); // continued from 1 → 2
+    expect(cont.solved).toBe(false);
   });
 });
 

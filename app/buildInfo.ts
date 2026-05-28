@@ -2492,4 +2492,68 @@
 // peek + save/load round-trip + tutorial step.
 // OTA-131 ships the pressure test with strict
 // OOM/timeout guardrails.
-export const OTA_BUILD_ID = '2026-05-28-129';
+//
+// 2026-05-28 OTA-130 — Puzzle UX polish.
+// Pivoted from "more puzzles" after auditing the
+// remaining HookKind plant lines — none of the other
+// hooks (bioluminescent_path, aether_grid_hum, etc.)
+// promise interactive actions in their narration.
+// Adding puzzles to those would CREATE friction
+// where none existed. Better to polish the two
+// puzzles already wired.
+//
+// Four pieces:
+//
+//   (1) examinePuzzleLine(hook) — peek action. When
+//       the player INVESTIGATEs a puzzle hook they've
+//       already started, the engine surfaces a one-
+//       line state summary ("2 of 3 steps held. 1
+//       more to go.") instead of re-narrating the
+//       intro. First-encounter investigate (no
+//       progress) still flows to the normal hook path
+//       which fires the puzzle intro.
+//
+//   (2) findActivePuzzleHookForIntent — direction-
+//       only fallback. Pre-OTA-130 the player had to
+//       type "rotate the ring left"; "rotate left"
+//       alone matched no hook noun ("left") and fell
+//       through. Now if EXACTLY one active puzzle
+//       hook in the scene accepts the player's
+//       intent (rotate/knock/etc.), the engine auto-
+//       routes there. Ambiguous (2+ active puzzle
+//       hooks accepting the same intent) → no match
+//       (refuse the auto-fallback, force the player
+//       to name the noun).
+//
+//   (3) Tutorial step: NEW "When the narrative gives
+//       you a sequence" step after the dog step.
+//       Covers known verbs, direction-tolerance,
+//       failure-hint progression, mercy threshold,
+//       examine-for-peek, save/load preservation,
+//       and the deliberate decision that only the
+//       puzzle-equipped hooks gate this way (other
+//       hooks unchanged).
+//
+//   (4) Save/load round-trip tests. JSON serialize +
+//       restore of a hook with puzzleProgress
+//       preserves correctSoFar / failures / history
+//       exactly. Continuation tests verify the
+//       resolver picks up where it left off after a
+//       round-trip.
+//
+// Test coverage: 34/34 hookPuzzleResolver tests pass
+// (was 22 in OTA-129; 12 new). 90/90 regression on
+// the five fast suites still green. TS clean.
+//
+// Files: app/engine/hookPuzzles.ts (examinePuzzleLine
+// + findActivePuzzleHookForIntent), app/state/
+// gameStore.ts (examine-peek route + direction-only
+// fallback wire), app/components/tutorialSteps.ts
+// (new puzzle step after "Your dog"), __tests__/
+// hookPuzzleResolver.test.ts (12 new tests).
+//
+// OTA-131 ships the pressure test with the OOM /
+// timeout guardrails: jest.setTimeout per file,
+// iteration caps, banned slow test files,
+// file-scoped runs only.
+export const OTA_BUILD_ID = '2026-05-28-130';

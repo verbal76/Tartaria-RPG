@@ -3982,7 +3982,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     ];
     if (hookEligible.includes(parsed.intent) && currentScene.hooks && currentScene.hooks.length > 0) {
       const targetText = (parsed.resolvedNoun ?? parsed.target ?? trimmed).toLowerCase();
-      const hook = matchHookNoun(targetText, currentScene.hooks);
+      let hook = matchHookNoun(targetText, currentScene.hooks);
+      // OTA-130 — direction-only fallback. If the player typed
+      // "rotate left" with no noun, matchHookNoun returns null
+      // because the target is "left" not "ring". Try the puzzle-hook
+      // fallback: if EXACTLY one active puzzle hook in the scene
+      // accepts this intent, route there. Two+ active puzzles =
+      // ambiguous, refuse the auto-match (player must name the
+      // noun).
+      if (!hook) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { findActivePuzzleHookForIntent } = require('../engine/hookPuzzles') as typeof import('../engine/hookPuzzles');
+        hook = findActivePuzzleHookForIntent(currentScene.hooks, parsed.intent);
+      }
       if (hook && !hook.resolved) {
         get().appendLog('debug', `route: hook intercept (kind=${hook.kind}, target="${targetText}") — original intent=${parsed.intent}`);
         // Small stamina cost for engaging a hook (same as a skill check).
@@ -3996,7 +4008,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Non-puzzle hooks fall through to the standard chain
         // advance unchanged.
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { puzzleFor, applyPuzzleInput, extractDirection } = require('../engine/hookPuzzles') as typeof import('../engine/hookPuzzles');
+        const { puzzleFor, applyPuzzleInput, extractDirection, examinePuzzleLine } = require('../engine/hookPuzzles') as typeof import('../engine/hookPuzzles');
+        // OTA-130 — examine-peek path. When the player INVESTIGATES
+        // a puzzle hook that they've already started, surface a
+        // one-line summary of current attempt state instead of re-
+        // narrating the intro. Gives the player a way to check
+        // progress without counting taps. The intent is investigate
+        // specifically; rotate/knock/etc. still flow through the
+        // resolver below. First-encounter investigate (no
+        // puzzleProgress) still falls through to the normal hook
+        // chain path (which already narrates the intro on first
+        // touch via the resolver's intro line).
+        if (parsed.intent === 'investigate' && hook.stage === 0) {
+          const def = puzzleFor(hook.kind);
+          if (def && hook.puzzleProgress) {
+            const examineLine = examinePuzzleLine(hook);
+            if (examineLine) {
+              get().appendLog('world', examineLine);
+              void get().persist();
+              return;
+            }
+          }
+        }
         const def = puzzleFor(hook.kind);
         if (def && hook.stage === 0 && def.intentList.includes(parsed.intent)) {
           // First-attempt intro line if puzzle hasn't been touched yet.
@@ -4011,12 +4044,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           });
           // Write the new puzzleProgress back onto the scene's hook
           // record so a subsequent attempt sees the updated counter.
+          const hookId = hook.id;
           set((s) => s.currentScene
             ? {
                 currentScene: {
                   ...s.currentScene,
                   hooks: s.currentScene.hooks.map((h) =>
-                    h.id === hook.id ? { ...h, puzzleProgress: outcome.progress } : h,
+                    h.id === hookId ? { ...h, puzzleProgress: outcome.progress } : h,
                   ),
                 },
               }
