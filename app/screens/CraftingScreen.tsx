@@ -412,7 +412,7 @@ export function CraftingScreen() {
                         );
                       })}
                       <Text style={styles.golemVariantsRequires}>
-                        Requires: INT 10+ recommended (d20 + INT vs DC 15; Mud Dwellers / Aetherborn cast at base DC, others +4).
+                        Requires: INT 10+ recommended (d20 + INT vs DC 15 for summon, DC 12 for shape/mend; Mud Dwellers cast at base DC and gain +2 INT, Aetherborn +2 DC, other races +3 DC).
                       </Text>
                     </View>
                   )}

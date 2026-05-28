@@ -164,30 +164,40 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'USE STEALTH toggle for sneak-up routing. ' +
       '\n\nFour affordance buttons — TAKE / SALVAGE / CLIMB / INVESTIGATE — glow green when ' +
       'their modal has something actionable in the current scene, and grey out when there\'s ' +
-      'nothing left to do. Tap to see the chip list. Salvaging or investigating a chip removes ' +
-      'it from the other modals (no double-acting on the same item). ' +
-      '\n\nIn combat: punch, kick, your equipped weapons, dodge, block, advance / step back, ' +
-      'pack (open inventory mid-fight). When a golem is alive, a GOLEM (hp/max) button joins ' +
-      'the row — tap to command it to attack.',
+      'nothing left to do. Tap to see the chip list. Each noun is consumed once per room: ' +
+      'salvaging or investigating a chip removes it from every modal in that room (no ' +
+      'double-acting), but the same noun in a different room still shows green. ' +
+      '\n\nIn combat: punch, kick, your equipped weapons, dodge (folds in block / parry / ' +
+      'deflect — one defensive stance), advance / step back, pack (open inventory mid-fight). ' +
+      'When a golem is alive, a GOLEM (hp/max) button joins the row — tap to command it to ' +
+      'attack.',
   },
   // OTA 040 — new step: recent additions to the quick row + verbs.
+  // OTA-113 — refreshed for elevated-overlay system + Aetheric tab
+  // routing through Crafting.
   {
     screen: 'exploration',
     area: 'quick-row',
     title: 'New verbs and buttons',
     body:
-      'Since the early builds, a few things landed here: ' +
+      'A few things have layered onto the quick row since the early builds: ' +
       '\n\n• CLIMB opens a noun picker for every climbable thing in the scene. Once you\'re ' +
-      'partway up, the button flips to CLIMB UP (n/total) + CLIMB DOWN — tier by tier, ' +
-      'with rope auto-passing every tier and chance-based loot at the top. ' +
+      'partway up, the button flips to CLIMB UP (n/total) + CLIMB DOWN — tier by tier, with ' +
+      'rope auto-passing every tier and chance-based loot at the top. Tall objects (2+ tiers) ' +
+      'sometimes open into a mini-area at the top: a roadside-style trader (4+ tiers only, ' +
+      'with a funny reason for hiding up there), a lookout vantage, or a small encounter. ' +
+      'CLIMB DOWN restores the base scene exactly as you left it. ' +
+      '\n\n• 0-stamina climbs are still allowed — you just fall and take damage. The engine ' +
+      'won\'t refuse the attempt; the choice (and the consequence) is yours. ' +
       '\n\n• Roadside trader stalls appear while you walk (~15% per cardinal step outdoors) — ' +
-      'a one-line announcement in the feed and a vendor banner at the top. Vendors also ' +
-      'have a STEAL button next to BUY with the DC stamped on it; skip the price by risking ' +
-      'a fight. ' +
-      '\n\n• Aethercraft verbs are real now. Type "shape stone", "summon golem" (mud / iron / ' +
+      'a one-line announcement in the feed and a vendor banner at the top. Vendors have a ' +
+      'STEAL button next to BUY with the DC stamped on it; skip the price by risking a fight. ' +
+      '\n\n• Aethercraft verbs are real. Type "shape stone", "summon golem" (mud / iron / ' +
       'aether / crystal — see the Golem Sidekick step), or "mend wounds" with an Aether-tagged ' +
-      'consumable in your pack (Aether Crystal / Mud / Shard / Locket) to burn as fuel. Mud ' +
-      'Dwellers cast at base DC; Aetherborn +2; everyone else +3.',
+      'consumable (Aether Crystal / Mud / Shard / Locket) burning as fuel. The Crafting → ' +
+      'AETHERIC tab is the easier way in: every discipline laid out with stats, fuel costs, ' +
+      'and a tap-to-stage hint. Mud Dwellers cast at base DC (+2 INT); Aetherborn +2 DC; ' +
+      'other races +3 DC.',
   },
   {
     screen: 'exploration',
@@ -221,18 +231,44 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     screen: 'actions',
     area: 'fullscreen',
-    title: 'Actions & Recipes',
+    title: 'Actions reference',
     body:
-      'Two tabs at the top: ACTIONS and RECIPES. ' +
-      '\n\nACTIONS — every verb the engine understands, grouped by category (movement, ' +
-      'combat, social, skill-based, Aetheric). Tap any card and its first example phrase ' +
-      'drops into the input box; tap again to cycle alternate phrasings. Great for "take ' +
-      'cover", "set a trap", any verb you forget the wording for. ' +
-      '\n\nRECIPES — every craftable item with its ingredient list (weapons, armor, ' +
-      'amulets & rings, utility, food, potions) PLUS the three Aethercraft disciplines: ' +
-      'Aetherstone Manipulation (shape stone), Aether Golem Constructor (summon golem), ' +
-      'Aetheric Healing (mend wounds). Each Aethercraft card shows which Aether fuels it ' +
-      'will burn. Tap a recipe card to drop "craft <name>" into the input box.',
+      'Every verb the engine understands, grouped by category (movement, combat, social, ' +
+      'skill-based, Aetheric). Tap any card and its first example phrase drops into the ' +
+      'input box; tap again to cycle alternate phrasings. Great for "take cover", "set a ' +
+      'trap", any verb you forget the wording for. ' +
+      '\n\nCrafting recipes used to live on this screen as a second tab; they\'ve moved to ' +
+      'the Crafting screen (which we\'ll see next) so the action reference stays focused on ' +
+      'verbs, and crafting becomes the one place to plan a build.',
+  },
+  // OTA-113 — new step. The Crafting screen has its own dedicated walk-
+  // through now that OTA-091 brought the Aetheric tab in as a 4th tab,
+  // OTA-095 stripped recipes from the Actions screen, and OTA-111
+  // surfaced damage dice / restore numbers / golem stats inline on the
+  // cards so the player can plan a build without leaving the screen.
+  {
+    screen: 'crafting',
+    area: 'fullscreen',
+    title: 'Crafting — four tabs',
+    body:
+      'Everything you can make lives here. Four tabs across the top: ' +
+      '\n\nCRAFT — your fuel-aware crafting bench. Only recipes whose ingredients you can ' +
+      'actually cover show by default; toggle to see locked recipes too. ' +
+      '\n\nREPAIR — patch durability on equipped or stashed gear. Material cost scales with ' +
+      'damage taken. ' +
+      '\n\nRECIPES — full catalog of every craftable item, with ingredient lists. Tap a ' +
+      'recipe to drop "craft <name>" into the world input. Weapon cards show their damage ' +
+      'dice (e.g. "1d8 piercing · Scales with DEX"); consumable cards show their restore ' +
+      'numbers ("Restores: +5 HP / +2 stamina") and any buff or cure they apply. Plan a ' +
+      'build before you spend the mats. ' +
+      '\n\nAETHERIC — the three Aethercraft disciplines (Aetherstone Manipulation / Aether ' +
+      'Golem Constructor / Aetheric Healing) plus per-golem variant cards under the SUMMON ' +
+      'discipline. Each golem (Mud / Iron / Aether / Crystal) shows HP, damage dice, blurb, ' +
+      'fuel cost, and a "tap → summon <kind> golem" hint that stages the correct phrase. ' +
+      'The footer documents the d20 + INT vs DC roll and race modifiers (Mud Dwellers cast ' +
+      'at base DC and gain +2 INT; Aetherborn +2 DC; other races +3 DC). ' +
+      '\n\nThe search bar at the top and the sort buttons match the same component used on ' +
+      'the Inventory screen — same gestures, same filters everywhere.',
   },
   // 2026-05-25 OTA-011 (MECHANIC-1b) — golem sidekick is a real
   // companion now. Players need to know it persists across tiles
@@ -268,10 +304,14 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       '\n\nThe ramp gets steeper as stats climb: 1-5 advances fast (~33 uses), 6-10 fast-ish ' +
       '(~50), 11-14 normal (~100), 15-18 slow (~200), 19-22 grindy (~400), 23+ a real commitment ' +
       '(~1000). Master a stat and you\'ve earned it. ' +
-      '\n\nSome highlights: STR — punches, kicks, climb tiers, 20+ items in your pouch. ' +
-      'DEX — climbs, parries, stealth, stealing. INT — scrapping, salvaging named gear, every ' +
-      'Aethercraft cast. WIS — cardinal travel, NPC interactions, hearing a whisper, finishing ' +
-      'a quest. CHA — NPC trades, finishing a storyline section, walking with named gear equipped.',
+      '\n\nSome highlights: STR — landed melee hits with non-finesse weapons, climb tiers, ' +
+      'opposed strength contests, 20+ items in your pouch. DEX — finesse-weapon hits, ' +
+      'successful parries, climb tiers, jumps, disengaging from combat, stealth checks, ' +
+      'stealing. INT — substantive investigates, scrapping, successful skill checks, every ' +
+      'Aethercraft cast (shape / summon). WIS — cardinal travel into novel tiles, NPC ' +
+      'interactions, hearing a whisper, finishing a quest, the 8-hour rest, mend casts. ' +
+      'CHA — NPC trades, accepting / completing storyline chapters, walking with named gear ' +
+      'equipped, diplomacy skill checks.',
   },
   {
     screen: 'contracts',
@@ -335,12 +375,16 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'description, stats, equip / unequip / use / drop / scrap buttons. Items are grouped by ' +
       'category (weapons, armor, amulets & rings, consumables, relics, materials, loot). ' +
       'Durability shows next to gear that wears. ' +
+      '\n\nThe search bar at the top filters as you type; the sort buttons re-rank by name, ' +
+      'rarity, or kind. Same component shows up on the Crafting screen (CRAFT / REPAIR / ' +
+      'RECIPES / AETHERIC tabs) — same gestures everywhere. ' +
       '\n\nIf an item is from new content the catalog hasn\'t formally tracked yet, the engine ' +
       'will infer reasonable stats from the name (a blade gets 1d8 slashing, boots get +1 AC ' +
       'to feet, etc.) so you never see a blank record. Inferred items are flagged in the log. ' +
       '\n\nSALVAGE ALL on a scene\'s chip list runs every breakdown narration first, then prints ' +
       'the combined haul as a single block at the end — easier to read what you actually got. ' +
-      'Salvage never yields zero materials thanks to a junk-pool fallback.',
+      'Salvage never yields zero materials thanks to a junk-pool fallback, and scrapping or ' +
+      'salvaging an equipped item auto-unequips it first.',
   },
   {
     screen: 'vendor',

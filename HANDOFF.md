@@ -2,7 +2,7 @@
 
 > **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
 > **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-27-112` (Stat-growth tuning per OTA-111 audit — DEX bottleneck closed by wiring `jump` and `disengage` to trainStat(DEX); WIS-on-rest mechanic finally wired to match SKILL_ACTIVITIES advertising. User's INT-too-slow hypothesis was wrong by the sim numbers; INT is the second-fastest stat). See **Section 0** for the live issue tracker covering OTA-070 → OTA-112.
+> **Latest OTA:** `2026-05-27-113` (Tutorial refresh — 6 step edits + 1 new "Crafting — four tabs" step covering the OTA-091/095/111 UX wave; OTA-111 golem-DC footer corrected from "Aetherborn base, others +4" to the actual numbers from raceMechanics.ts). See **Section 0** for the live issue tracker covering OTA-070 → OTA-113.
 > **Recent session arcs:**
 > - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
 > - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
@@ -46,6 +46,21 @@
 - **TS 0 errors / Test suite green.** Always required pre-push. Tracked here as a passive gate rather than an issue.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Tutorial currency
+
+- **OTA-113 (2026-05-27) · Tutorial refreshed to match the OTA-070+ UX wave; OTA-111 golem-DC footer corrected.**
+  - **What:** OTA-110's static-audit agent flagged `tutorialSteps.ts` as referencing the pre-OTA-095 screen layout ("ACTIONS and RECIPES tabs"). Several other steps had drifted past more recent shipping — Aetheric tab now in Crafting (OTA-091), SearchSortBar across screens (OTA-087), elevated overlays at climb-tops (OTA-089/092/102), per-room investigation-table semantics (OTA-070+), DEX-on-jump/disengage + WIS-on-rest (OTA-112), and `block` folded into `dodge` (OTA-021). Separately, OTA-111's golem-variants footer hard-coded the wrong race-DC math ("Aetherborn cast at base DC, others +4") — per `raceMechanics.ts:215`, Mud Dwellers are at base DC + 2 INT, Aetherborn +2 DC, others +3 DC. Summon DC is 15; shape/mend DC is 12.
+  - **Fix:** Six tutorial-step edits + one new step:
+    - `actions` screen step renamed "Actions & Recipes" → "Actions reference"; body rewritten to redirect to the Crafting screen for recipes.
+    - NEW `crafting` screen step ("Crafting — four tabs") covering CRAFT / REPAIR / RECIPES / AETHERIC with the OTA-111 info-surface callouts (weapon damage dice, consumable restore numbers, golem variant rows with stats / fuel / tap-to-stage).
+    - "Quick actions" — dropped `block` from the in-combat list; clarified per-room consume semantics ("same noun in a different room still shows green").
+    - "New verbs and buttons" — added elevated-overlay beat at climb-tops, 0-stamina-climb design preservation, Crafting → AETHERIC as the easier in-route for Aethercraft, corrected race-DC numbers.
+    - "Stats grow with use" — added the OTA-112 training paths (DEX on jump + disengage, WIS on rest); refined the per-stat highlights to match `INTENT_TO_STAT` and the actual `trainStat` call sites.
+    - "Your pack" — added SearchSortBar mention + scrap auto-unequip note.
+    - `CraftingScreen.tsx:415` footer corrected to match `raceMechanics.ts`.
+  - **Why:** The walkthrough is the new player's first impression of the game's surface area. Stale text either tells them tabs that don't exist, omits new affordances they need to know about, or quotes math that contradicts the actual rolls — and the user's "make it current" ask was a specific cleanup pass, not a redesign. Kept the edits surgical: 6 existing steps touched, 1 new step added, no step structure reshuffled, no welcome / closing copy changed.
+  - **Files:** `app/components/tutorialSteps.ts` (6 step edits + 1 new step), `app/screens/CraftingScreen.tsx` (footer line 415).
 
 #### Stat-growth balance
 

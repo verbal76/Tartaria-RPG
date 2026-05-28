@@ -1768,4 +1768,53 @@
 // the next playtest log capture.
 //
 // Files: app/state/gameStore.ts (3 trainStat wires).
-export const OTA_BUILD_ID = '2026-05-27-112';
+//
+// 2026-05-27 OTA-113 — Tutorial refresh + OTA-111 golem-DC
+// footer correction. The walkthrough text had drifted since
+// the OTA-070+ wave of UX changes; brought it current.
+//
+// Six tutorial-step edits + one new step:
+//   - "Actions & Recipes" → "Actions reference" (OTA-095
+//     stripped RECIPES from this screen — used to be a 2-tab
+//     screen; now actions-only). Step body rewritten to
+//     redirect the player to the Crafting screen for recipes.
+//   - NEW "Crafting — four tabs" step on screen='crafting'
+//     introducing CRAFT / REPAIR / RECIPES / AETHERIC. Calls
+//     out the OTA-111 info surfaces: weapon damage dice,
+//     consumable restore numbers, golem variants with stats,
+//     fuel costs, and the d20 + INT vs DC math.
+//   - "Quick actions" — dropped 'block' from the in-combat
+//     verb list (OTA-021 folded it into dodge); clarified the
+//     per-room investigation table semantics ("each noun is
+//     consumed once per room; same noun in a different room
+//     still shows green").
+//   - "New verbs and buttons" — added the elevated-overlay
+//     beat at climb-tops (traders at 4+ tiers, lookouts /
+//     encounters at 2+ tiers, CLIMB DOWN restores the base
+//     scene); added the design preservation that 0-stamina
+//     climbs are allowed (fall + damage); pointed the player
+//     at the Crafting → AETHERIC tab as the easier route in
+//     than typing the verbs; fixed the race-DC numbers (Mud
+//     Dwellers base +2 INT, Aetherborn +2 DC, others +3 DC —
+//     OTA-111's "+4 for others" was wrong per
+//     raceMechanics.ts:215).
+//   - "Stats grow with use" — added the OTA-112 training
+//     paths: DEX on jump + disengage, WIS on rest. Also
+//     refined the existing list: STR on non-finesse melee
+//     hits (not all melee), DEX on finesse-weapon hits,
+//     successful skill checks instead of generic "stealth /
+//     stealing."
+//   - "Your pack" — added a mention of the SearchSortBar
+//     (OTA-087) and noted that auto-unequip on scrap (OTA-058)
+//     is handled for the player.
+//
+// Also one OTA-111 footer correction in CraftingScreen.tsx —
+// the AETHERIC tab golem-variants block claimed "Aetherborn
+// cast at base DC, others +4" which was wrong per
+// raceMechanics.ts (Mud Dweller 0, Aetherborn +2, others +3,
+// summon DC 15, shape/mend DC 12). Corrected.
+//
+// Files: app/components/tutorialSteps.ts (6 edits + 1 new
+// step), app/screens/CraftingScreen.tsx (golem footer line
+// 415 correction).
+export const OTA_BUILD_ID = '2026-05-27-113';
