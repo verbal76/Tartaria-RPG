@@ -1610,4 +1610,56 @@
 // word, not the "ah" of "spa."
 //
 // Files: app/voice/loreLexicon.ts.
-export const OTA_BUILD_ID = '2026-05-27-109';
+//
+// 2026-05-27 OTA-110 — Multi-agent stress audit + catalog
+// inference ordering fix. User asked: "I need a full workout
+// of anything my playtesters can do to break the game...
+// look for loops, dead hooks, errors, bugs and dead code."
+// Spun 4 adversarial agents in parallel (3 Jest sim writers
+// + 1 static read-only auditor). Result: 40 new sim tests
+// across 3 files passing in ~25s, with 0 engine-state
+// invariant failures across 600-iter random walks.
+//
+// One actionable bug shipped fixed in this OTA:
+//   `findWeaponByName` / `findArmorByName` / `findAmuletByName`
+//   / `findRingByName` in app/engine/crafting.ts fell through
+//   to inference even when the name resolved in a DIFFERENT
+//   catalog bucket. 12 confirmed leaks — "Aetheric Cloak",
+//   "Wyrm Fang", "Sentinel Core Plate", etc. — all
+//   catalogued in materials.json or exploration.json but
+//   tripping the armor/weapon keyword regex and firing
+//   `[debug] inferred-stats:` warnings, polluting the
+//   backfill audit signal. Fix: new `isCataloguedElsewhere`
+//   guard short-circuits the inference path when the name
+//   exists in a different bucket. Reference implementation
+//   was already in app/components/itemPreview.ts:60-95 —
+//   the fix brings find* in line.
+//
+// Three findings logged as new open issues in HANDOFF.md 0.A
+// (deferred, not in this OTA):
+//   - "turn the locking ring" parses as intent=turn_in
+//     (mis-routes the sealed_vault_door puzzle action to
+//     quest-completion). New parser bug, design call needed.
+//   - "tap the steeple" parses as intent=unknown (parser has
+//     no tap/press verb; same family as rotate/knock).
+//   - tutorialSteps.ts still references "ACTIONS and RECIPES"
+//     tabs as if both live on ActionReferenceScreen, but
+//     OTA-095 moved Recipes to CraftingScreen.
+//
+// Also verified clean: OTAs 070-109 closed-issue fixes all
+// in place (no silent reverts). All engine-state invariants
+// hold: chip-grey-after-refuse, consumed-table monotonicity,
+// salvage→investigate dedup, pack-full skip, 1-tier overlay
+// gate, trader overlay tier-4 gate, ambient-noun seed
+// idempotence, preservedSceneOnDescent round-trip, 0-stamina
+// climb design preservation, HP-band scaling 97.6% in-band /
+// 2.4% scare / 0% above-3x. All while-loops bounded; no
+// infinite-loop risk.
+//
+// Files: app/engine/crafting.ts (isCataloguedElsewhere guard
+// + 4 find* functions updated), __tests__/engineStateChaosSim.ts
+// (new, 10 cases), __tests__/playerInputChaosSim.ts (new, 15
+// cases), __tests__/craftingInventoryChaosSim.ts (new, 15
+// cases — the test.failing flipped to a real assertion now
+// that the fix lands).
+export const OTA_BUILD_ID = '2026-05-27-110';

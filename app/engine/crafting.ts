@@ -279,11 +279,35 @@ export function consumeIngredients(
 // inference also logs the name once-per-session via setOnInferred so
 // the player can ship a backfill log to the dev and we populate the
 // real catalog row later.
+// Cross-bucket guard — if the name resolves in a different catalog
+// bucket (MATERIALS, EXPLORATION, GEAR, ARMOR, AMULETS, RINGS), this
+// is NOT the bucket the caller asked about and inference must NOT
+// fire. Without this gate, items like "Aetheric Cloak" (in
+// exploration.json) and "Wyrm Fang" (in materials.json) trip the
+// armor/weapon keyword regex and produce false-positive
+// `inferred-stats:` warnings. OTA-110 fix; the reference
+// implementation is in app/components/itemPreview.ts:60-95 which
+// already orders the lookups correctly. Returns true if the name
+// is catalogued in a bucket OTHER than the target bucket.
+function isCataloguedElsewhere(name: string, exclude: 'weapon' | 'armor' | 'amulet' | 'ring'): boolean {
+  const t = name.toLowerCase().trim();
+  if (!t) return false;
+  if (exclude !== 'weapon' && WEAPONS.some((w) => w.name.toLowerCase() === t)) return true;
+  if (exclude !== 'armor' && ARMOR.some((a) => a.name.toLowerCase() === t)) return true;
+  if (exclude !== 'amulet' && AMULETS.some((a) => a.name.toLowerCase() === t)) return true;
+  if (exclude !== 'ring' && RINGS.some((r) => r.name.toLowerCase() === t)) return true;
+  if (MATERIALS.some((m) => m.name.toLowerCase() === t)) return true;
+  if (EXPLORATION.some((x) => x.name.toLowerCase() === t)) return true;
+  if (GEAR.some((g) => g.name.toLowerCase() === t)) return true;
+  return false;
+}
+
 export function findWeaponByName(name: string): CatalogWeapon | null {
   const t = name.toLowerCase().trim();
   if (!t) return null;
   const direct = WEAPONS.find((w) => w.name.toLowerCase() === t);
   if (direct) return direct;
+  if (isCataloguedElsewhere(name, 'weapon')) return null;
   // Inference fallback — only fires for names that READ as a weapon,
   // so plain materials ("Scrap Metal", "Stick") don't get false-
   // promoted into weapons.
@@ -297,6 +321,7 @@ export function findArmorByName(name: string): CatalogArmor | null {
   if (!t) return null;
   const direct = ARMOR.find((a) => a.name.toLowerCase() === t);
   if (direct) return direct;
+  if (isCataloguedElsewhere(name, 'armor')) return null;
   return inferArmor(name);
 }
 
@@ -305,6 +330,7 @@ export function findAmuletByName(name: string): CatalogAccessory | null {
   if (!t) return null;
   const direct = AMULETS.find((a) => a.name.toLowerCase() === t);
   if (direct) return direct;
+  if (isCataloguedElsewhere(name, 'amulet')) return null;
   if (/\b(amulet|locket|necklace|pendant|medallion|charm|talisman|brooch)\b/i.test(name)) {
     return inferAccessory(name);
   }
@@ -316,6 +342,7 @@ export function findRingByName(name: string): CatalogAccessory | null {
   if (!t) return null;
   const direct = RINGS.find((r) => r.name.toLowerCase() === t);
   if (direct) return direct;
+  if (isCataloguedElsewhere(name, 'ring')) return null;
   if (/\b(ring|band|signet)\b/i.test(name)) {
     return inferAccessory(name);
   }
