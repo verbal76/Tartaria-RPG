@@ -4058,12 +4058,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (outcome.line) get().appendLog('world', outcome.line);
           if (outcome.hint) get().appendLog('arbiter', `"${outcome.hint}"`);
           if (outcome.solved) {
-            // Pass control to the chain to fire the stage-1 reward
-            // narration + effects + memos. The hook record passed in
-            // here is the PRE-puzzle-write copy, but resolveHookOneStep
-            // only reads hook.kind + hook.stage, so the puzzleProgress
-            // write order doesn't matter.
-            resolveHookOneStep(hook, get, set, targetText);
+            // OTA-132 — fix the "solved-but-no-reward" bug surfaced
+            // by the OTA-131 pressure sweep. Pre-fix, this call
+            // passed the pre-puzzle hook (stage=0) and
+            // resolveHookOneStep fired the empty stage-0 outcome
+            // (effects: [] — just the puzzle intro narration),
+            // then advanced scene-state stage to 1. The stage-1
+            // rewards (TC + items) only landed on the NEXT player
+            // tap of a hook noun, which read as "I solved it and
+            // got nothing — then I tapped it again and got
+            // everything."
+            //
+            // Fix: pass the hook with stage=1 so getHookOutcome
+            // returns the stage-1 outcome (the rewards). The set()
+            // inside resolveHookOneStep advances scene-state from
+            // its current value (0) by +1 → 1, marks resolved per
+            // outcome.done (true for both vault and steeple stage
+            // 1). Net effect: rewards land inline with the puzzle-
+            // solve narration, hook resolves cleanly.
+            const advancedHook = { ...hook, stage: hook.stage + 1 };
+            resolveHookOneStep(advancedHook, get, set, targetText);
           }
           void get().persist();
           return;

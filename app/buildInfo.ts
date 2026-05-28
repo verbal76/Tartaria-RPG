@@ -2556,4 +2556,77 @@
 // timeout guardrails: jest.setTimeout per file,
 // iteration caps, banned slow test files,
 // file-scoped runs only.
-export const OTA_BUILD_ID = '2026-05-28-130';
+//
+// 2026-05-28 OTA-131 — Hook-puzzle pressure test.
+// Agent shipped 5 new test files with strict OOM/
+// timeout guardrails honored throughout:
+//   - hookPuzzleE2E.test.ts (8 tests) — boots
+//     gameStore, plants hook, drives submitPlayer
+//     Action end-to-end, covers vault + steeple +
+//     direction-only fallback + examine peek.
+//   - hookPuzzleParserVariants.test.ts (6 tests,
+//     1000 input variants) — all 10 direction terms
+//     × every synonym × articled / non-articled ×
+//     casing × unicode/emoji noise. None crashed.
+//   - hookPuzzleSaveLoad.test.ts (5 tests) —
+//     JSON round-trip + full persist()/hydrate()
+//     via the actual store + legacy saves with no
+//     puzzleProgress field.
+//   - hookPuzzleAbandon.test.ts (4 tests) — scene
+//     swap preserves progress, two-scene cross-
+//     contamination check, post-solve no-op.
+//   - hookPuzzleMercyHints.test.ts (12 tests) —
+//     every failure threshold (3/5/7 vault, 3/6
+//     steeple) individually exercised, non-intent
+//     -List inputs don't count as puzzle failures.
+//
+// 35 new tests in OTA-131 + 34 existing in
+// hookPuzzleResolver = 69 puzzle tests total. 53
+// regression tests on the 5 fast suites. All 122
+// pass (~38s combined runtime). TS clean.
+//
+// Guardrails honored: jest.setTimeout(15000) at top
+// of every new file, ≤500 iterations per test,
+// NEVER ran bare `npx jest __tests__/`, banned
+// files (twoYearChaosSim / thousandDayStressSim /
+// combatStress / domesticStress / metaNavStress /
+// yearSimulation) never touched, final sweep
+// scoped only to the 5 designated fast suites.
+//
+// ONE genuine bug found and fixed in OTA-132 (see
+// below):
+//
+// 2026-05-28 OTA-132 — Puzzle-solve reward landing
+// fix. OTA-131's pressure sweep surfaced:
+//
+//   Pre-OTA-132, the puzzle-solve branch called
+//   resolveHookOneStep(hook, ...) with hook.stage=0.
+//   resolveHookOneStep then read CHAINS[kind][0]
+//   which has `effects: []` (the legacy puzzle-
+//   intro narration), logged the intro line,
+//   advanced scene-state stage to 1, and stopped.
+//   The actual reward effects (90 TC + Aetheric
+//   Shard/Cloth/Compass for vault; 60 TC + Golem
+//   Core for steeple) live in CHAINS[kind][1] and
+//   only fired on the NEXT player tap of a hook
+//   noun. Player UX: "I solved it and got nothing
+//   — then I tapped it again and got everything."
+//
+// Fix: pass `{ ...hook, stage: hook.stage + 1 }`
+// to resolveHookOneStep in the solve branch. Now
+// getHookOutcome returns the stage-1 reward
+// outcome inline with the puzzle-solve narration.
+// The set() inside resolveHookOneStep advances
+// scene-state stage from current value (0) by +1
+// → 1, marks resolved per outcome.done (true for
+// both vault and steeple at stage 1).
+//
+// Two `.failing` tests in hookPuzzleE2E.test.ts
+// flipped to regular `it` since the bug they
+// documented is now closed. 69/69 puzzle tests
+// pass post-fix; 53/53 regression still green.
+//
+// Files: app/state/gameStore.ts (1-line + comment
+// fix in puzzle-solve branch), __tests__/
+// hookPuzzleE2E.test.ts (2 .failing flipped to it).
+export const OTA_BUILD_ID = '2026-05-28-132';
