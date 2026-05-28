@@ -163,24 +163,38 @@ const PRONOUN_FORMS: Record<Pronoun, {
   isOrAre: string;
   /** "'s" or "'re" contraction — for "He's gone" / "They're gone". */
   contraction: string;
+  /** OTA-146 — verb suffix: 's' for singular he/she ("eats"), '' for
+   *  plural they ("eat"). Used as `{verbS}` in templates. Pre-fix,
+   *  callsites wrote `eat{contraction === "'s" ? "s" : ""}` and the
+   *  literal ternary leaked into the world feed because applyDog
+   *  Pronouns only does whole-token substitution. */
+  verbS: string;
+  /** OTA-146 — verb suffix variant: 'es' for singular ("crunches",
+   *  "watches"), '' for plural ("crunch", "watch"). Used for verbs
+   *  whose third-person singular needs the 'es' suffix instead of
+   *  just 's'. */
+  verbES: string;
 }> = {
   he: {
     subject: 'he', subjectCap: 'He',
     possessive: 'his', possessiveCap: 'His',
     object: 'him', reflexive: 'himself',
     hasOrHave: 'has', isOrAre: 'is', contraction: "'s",
+    verbS: 's', verbES: 'es',
   },
   she: {
     subject: 'she', subjectCap: 'She',
     possessive: 'her', possessiveCap: 'Her',
     object: 'her', reflexive: 'herself',
     hasOrHave: 'has', isOrAre: 'is', contraction: "'s",
+    verbS: 's', verbES: 'es',
   },
   they: {
     subject: 'they', subjectCap: 'They',
     possessive: 'their', possessiveCap: 'Their',
     object: 'them', reflexive: 'themselves',
     hasOrHave: 'have', isOrAre: 'are', contraction: "'re",
+    verbS: '', verbES: '',
   },
 };
 
@@ -210,7 +224,17 @@ export function applyDogPronouns(
     .replace(/\{reflexive\}/g, f.reflexive)
     .replace(/\{hasOrHave\}/g, f.hasOrHave)
     .replace(/\{isOrAre\}/g, f.isOrAre)
-    .replace(/\{contraction\}/g, f.contraction);
+    .replace(/\{contraction\}/g, f.contraction)
+    // OTA-146 — verb suffix tokens. Replace whole-token first; callers
+    // that wrote the broken `{contraction === "'s" ? "s" : ""}` ternary
+    // (which leaked the literal JS into the world feed) have been
+    // migrated to `{verbS}` / `{verbES}`. The defensive fallback below
+    // strips any remaining ternary leak so a future regression doesn't
+    // surface raw JS to the player.
+    .replace(/\{verbS\}/g, f.verbS)
+    .replace(/\{verbES\}/g, f.verbES)
+    .replace(/\{contraction === "'s" \? "s" : ""\}/g, f.verbS)
+    .replace(/\{contraction === "'s" \? "es" : ""\}/g, f.verbES);
 }
 
 // ----- DogCompanion factory -------------------------------------------

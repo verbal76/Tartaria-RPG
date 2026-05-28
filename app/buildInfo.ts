@@ -3127,4 +3127,67 @@
 // components/StatsPanel.tsx (golem row + styles),
 // __tests__/theftChannelGuard.test.ts (NEW
 // regression lock).
-export const OTA_BUILD_ID = '2026-05-28-145';
+//
+// 2026-05-28 OTA-146 — Voronov Core Guardian
+// invisibility + Rocky bite red + template-
+// literal leak + multi-enemy grammar.
+// Playtest log surfaced FOUR more bugs in the
+// Voronov / Reclaimer Ambusher session:
+//
+//   (1) Core Guardian (Voronov-Beneath High
+//       Cantor) spawned with only an [arbiter]
+//       dialogue line, no [combat] enemy-card
+//       beat. Player: "was that a guardian? he
+//       spawned with another character? I never
+//       even saw his tag." Got crit for 25 next
+//       turn with zero stat warning. Fix: add a
+//       parallel [combat] emit on Guardian spawn
+//       matching the canonical enemy-card line
+//       — "X closes — Attack ready, NdN damage
+//       on a hit. (range: close) ★ CORE GUARDIAN"
+//       — so the boss surfaces with the same
+//       affordance as every other enemy.
+//
+//   (2) Multi-enemy approach grammar lied:
+//       "You close the gap with the 2 Voronov-
+//       Beneath High Cantors" when there was a
+//       Silt Thief + ONE Cantor. groupLabel
+//       blindly pluralized moveEnemy.name. Fix:
+//       check if all enemies share the same
+//       name; if so pluralize; if not, list them
+//       ("the Silt Thief and Voronov-Beneath
+//       High Cantor" for 2 distinct; "the X and
+//       N others" for 3+).
+//
+//   (3) Rocky's bite narration painted red.
+//       Player: "Rockeys hits are red, they
+//       should be green." Same root cause as
+//       OTA-145's summon-roll-red — successful
+//       companion attacks emitted to 'combat'
+//       channel which paints uniformly red. Now
+//       routes to 'reward' (green ✦) on hit,
+//       'combat' on miss.
+//
+//   (4) Template-literal leak: feed/scratch/
+//       call dog narration was showing literal
+//       `{contraction === "'s" ? "s" : ""}` in
+//       the world feed. applyDogPronouns does
+//       whole-token substitution and ignored the
+//       broken ternary expression. Fix: added
+//       {verbS} (resolves to 's' for he/she, '')
+//       for they) and {verbES} ('es' / '')
+//       tokens to PRONOUN_FORMS. Migrated all 5
+//       callsites. Defensive fallback in
+//       applyDogPronouns also strips any
+//       remaining ternary leak so a future
+//       regression can't surface raw JS to the
+//       player.
+//
+// 42/42 regression tests pass. TS clean.
+//
+// Files: app/state/gameStore.ts (Guardian spawn
+// [combat] emit + multi-enemy grammar + Rocky
+// reward channel + 5 template-leak callsites),
+// app/engine/dogCompanion.ts ({verbS}/{verbES}
+// tokens + applyDogPronouns).
+export const OTA_BUILD_ID = '2026-05-28-146';

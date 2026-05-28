@@ -4193,6 +4193,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     }
                   : s
               ));
+              // OTA-146 — parallel enemy-card beat. Pre-fix the
+              // Guardian's approachLine only emitted to 'arbiter' so
+              // the player read it as scene narration, missed the
+              // BOSS arrival entirely, and got crit for 25 with no
+              // warning. Playtester: "was that a guardian? he spawned
+              // with another character? I never even saw his tag."
+              // Now: ALSO emit the canonical `[combat]` enemy-card
+              // line ("X closes — Attack ready, NdN damage on a hit.
+              // (range: close) ★ BOSS") matching what regular
+              // encounters get, so the boss surfaces in the same UI
+              // affordance as every other enemy.
+              get().appendLog(
+                'combat',
+                `${guardian.name} closes — ${guardian.attack} ready, ${guardian.damage} damage on a hit. (range: close) ★ CORE GUARDIAN`,
+              );
               get().appendLog('arbiter', cg.GUARDIANS_BY_CAPITAL[capitalId].approachLine);
               // Record the spawn for the Milestones tab.
               recordMemorableEvent(get, set, {
@@ -14998,9 +15013,22 @@ function runMoveCombatRange(
   const curIdx = order.indexOf(cur);
   const nextIdx = direction === 'advance' ? Math.max(0, curIdx - 1) : Math.min(order.length - 1, curIdx + 1);
   const next = order[nextIdx]!;
-  const groupLabel = scene.enemies.length > 1
-    ? `the ${scene.enemies.length} ${moveEnemy.name}s`
-    : moveEnemy.name;
+  // OTA-146 — pluralization grammar fix. Pre-fix this always did
+  // "the N {moveEnemy.name}s" — when the scene held two DIFFERENT
+  // enemies (e.g. Silt Thief + Voronov-Beneath High Cantor), the
+  // line became "the 2 Voronov-Beneath High Cantors" which is both
+  // a lie and reads broken. Now: check if all enemies share the
+  // same name; if so pluralize; if not, list them.
+  const groupLabel = (() => {
+    if (scene.enemies.length <= 1) return moveEnemy.name;
+    const sameType = scene.enemies.every((e) => e.name === moveEnemy.name);
+    if (sameType) return `the ${scene.enemies.length} ${moveEnemy.name}s`;
+    if (scene.enemies.length === 2) {
+      const other = scene.enemies.find((e) => e.name !== moveEnemy.name);
+      return `the ${moveEnemy.name} and ${other?.name ?? 'the other one'}`;
+    }
+    return `the ${moveEnemy.name} and ${scene.enemies.length - 1} others`;
+  })();
   if (next === cur) {
     get().appendLog(
       'world',
@@ -18241,8 +18269,13 @@ function handleDogCombat(
     const nat20 = roll === 20;
     const nat1 = roll === 1;
     const hit = nat20 || (!nat1 && total >= ac);
+    // OTA-146 — channel split per playtester feedback ("Rockeys hits
+    // are red, they should be green"). Successful bites read as
+    // player WINS, not warnings. Hits route to 'reward' (green ✦),
+    // misses stay on 'combat' (red). Same pattern as OTA-145's
+    // Aethercraft-summon-roll fix.
     get().appendLog(
-      'combat',
+      hit ? 'reward' : 'combat',
       `${dog.name} lunges at ${target.name} — d20 ${roll} + STR ${dog.stats.strength} = ${total} vs AC ${ac} — ${hit ? (nat20 ? '✓ NAT 20' : '✓ HIT') : '✗ MISS'}`,
     );
     if (hit) {
@@ -18250,7 +18283,7 @@ function handleDogCombat(
       if (nat20) dmg *= 2;
       const newHp = Math.max(0, targetHp - dmg);
       get().appendLog(
-        'combat',
+        'reward',
         `${dog.name} sinks teeth into ${target.name} for ${dmg} piercing. (${newHp} HP left)`,
       );
       // Train STR on hit.
@@ -18611,12 +18644,12 @@ function applyItemToDog(
   get().appendLog(
     'world',
     isDogTreat
-      ? `You hand ${dog.name} the ${item.name}. ${applyDogPronouns(`{Pronoun} crunch{contraction === "'s" ? "es" : ""} it down whole, tail thumping. (${tail})`, dog.sex.pronoun)}`
+      ? `You hand ${dog.name} the ${item.name}. ${applyDogPronouns(`{Pronoun} crunch{verbES} it down whole, tail thumping. (${tail})`, dog.sex.pronoun)}`
       : mode === 'heal'
         ? `You ${verb} ${dog.name} with the ${item.name}. (${tail})`
         : mode === 'use'
           ? `You ${verb} ${item.name} on ${dog.name}. (${tail})`
-          : `You ${verb} ${dog.name} the ${item.name}. ${applyDogPronouns(`{Pronoun} eat{contraction === "'s" ? "s" : ""}, slow and serious. (${tail})`, dog.sex.pronoun)}`,
+          : `You ${verb} ${dog.name} the ${item.name}. ${applyDogPronouns(`{Pronoun} eat{verbS}, slow and serious. (${tail})`, dog.sex.pronoun)}`,
   );
   return true;
 }
@@ -18704,7 +18737,7 @@ function handleCallDogOption(
     get().appendLog(
       'world',
       applyDogPronouns(
-        `You scratch ${dog.name} behind the ear. {Pronoun} lean{contraction === "'s" ? "s" : ""} into your hand and close{contraction === "'s" ? "s" : ""} {possessive} eyes. (+2 loyalty)`,
+        `You scratch ${dog.name} behind the ear. {Pronoun} lean{verbS} into your hand and close{verbS} {possessive} eyes. (+2 loyalty)`,
         dog.sex.pronoun,
       ),
     );
@@ -18716,7 +18749,7 @@ function handleCallDogOption(
     get().appendLog(
       'world',
       applyDogPronouns(
-        `You speak softly to ${dog.name}. {Pronoun} watch{contraction === "'s" ? "es" : ""} your mouth, then {possessive} tail thumps once. (+1 loyalty)`,
+        `You speak softly to ${dog.name}. {Pronoun} watch{verbES} your mouth, then {possessive} tail thumps once. (+1 loyalty)`,
         dog.sex.pronoun,
       ),
     );
@@ -18751,7 +18784,7 @@ function tryDogCallVerb(
   get().appendLog(
     'world',
     applyDogPronouns(
-      `You call ${dog.name}. {Pronoun} trot{contraction === "'s" ? "s" : ""} over and waits for what you have in mind.`,
+      `You call ${dog.name}. {Pronoun} trot{verbS} over and wait{verbS} for what you have in mind.`,
       dog.sex.pronoun,
     ),
   );
