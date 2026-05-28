@@ -3269,4 +3269,53 @@
 // Files: app/state/gameStore.ts
 // (summonCoreGuardian + interface decl),
 // app/screens/ContractsScreen.tsx (chip + style).
-export const OTA_BUILD_ID = '2026-05-28-148';
+//
+// 2026-05-28 OTA-149 — `summon guardian`
+// command path.
+//
+// OTA-148 gave players the SUMMON chip on the
+// PRIMARY OBJECTIVE card. OTA-149 adds the
+// verb-side entry point — typing `summon
+// guardian` / `summon the guardian` / `summon
+// core guardian` (or the common typo `summon
+// gaurdian` the playtester used) now routes
+// to the same spawn pipeline instead of the
+// "wrong hand" gate refusal. Player: "summon
+// guardian — that way you never miss him, he
+// can come in with the same swagger and the
+// core can be added to the drop when he is
+// defeated. that way you can prep for the
+// fight too."
+//
+// The Core-on-defeat half already works:
+// resolveEnemyDefeat at gameStore.ts:10448
+// detects isCoreGuardian → grants the
+// signature gear drop → marks the Guardian
+// defeated → triggerMainQuest fires
+// 'core_recovered' which writes the Capital's
+// Core item to inventory. OTA-149 changes
+// nothing on that path; it just opens a
+// second front door so players can prep
+// (full HP, rations eaten, golem standing,
+// dog at heel) and then call the Guardian
+// in deliberately.
+//
+// Implementation: parser intercept in
+// submitPlayerAction, sitting BEFORE the
+// existing canRecoverCore gate check. When
+// matchedVerb is 'summon' AND the target /
+// resolvedNoun text contains 'guardian' (or
+// 'gaurdian'), it calls
+// summonCoreGuardian() and returns. The
+// store action's preflight refusals
+// (not_at_capital, wrong_phase,
+// already_recovered) surface faction-neutral
+// Arbiter lines so the player knows why the
+// verb didn't bite.
+//
+// 104/104 regression tests pass. TS clean.
+//
+// Files: app/state/gameStore.ts
+// (submitPlayerAction guardian-verb
+// intercept).
+export const OTA_BUILD_ID = '2026-05-28-149';

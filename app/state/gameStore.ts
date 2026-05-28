@@ -4155,6 +4155,39 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     }
 
+    // OTA-149 — `summon guardian` command intercept. Mirror of the
+    // OTA-148 SUMMON chip — a player who'd rather type the verb
+    // ("summon guardian", "summon the guardian", "summon core
+    // guardian", common typo "summon gaurdian") gets the same boss
+    // card + arbiter approachLine the chip produces. Lets the player
+    // prep for the fight on their own terms (full HP, rations eaten,
+    // golem standing, dog at heel) and then call the Guardian in
+    // with full swagger. The actual spawn pipeline + Core grant on
+    // defeat reuse the OTA-148 + pre-existing resolveEnemyDefeat
+    // plumbing — this is purely the verb-side entry point.
+    {
+      const targetText = (parsed.target ?? '').toLowerCase();
+      const resolvedText = (parsed.resolvedNoun ?? '').toLowerCase();
+      const wantsGuardian = /(guardian|gaurdian)/.test(targetText)
+        || /(guardian|gaurdian)/.test(resolvedText);
+      if (parsed.matchedVerb === 'summon' && wantsGuardian) {
+        const res = get().summonCoreGuardian();
+        if (res.ok) return;
+        // Preconditions failed — surface a useful Arbiter line so the
+        // player knows why the verb didn't bite.
+        const reasonLine =
+          res.reason === 'not_at_capital'
+            ? 'The Arbiter shakes their head. "A Core Guardian only answers at a Lost Capital. You are not standing in one."'
+          : res.reason === 'wrong_phase'
+            ? 'The Arbiter folds their hands. "The Guardians are not yet your concern. The Cores will reveal themselves first."'
+          : res.reason === 'already_recovered'
+            ? 'The Arbiter inclines their head. "This Capital\'s Core is already yours. The Guardian here is at rest. Travel to a Capital you have not yet broken."'
+          : null;
+        if (reasonLine) get().appendLog('arbiter', reasonLine);
+        return;
+      }
+    }
+
     // v2.4.1 (OTA 035 — Phase 2) — Main quest Core-gate check.
     // Fires BEFORE the action's normal handler runs so the Core
     // grant + faction-flavored narration lands first; the action
