@@ -3878,4 +3878,68 @@
 // Files: app/state/gameStore.ts
 // (3 stamina-refusal paths advance
 // time).
-export const OTA_BUILD_ID = '2026-05-29-163';
+//
+// 2026-05-29 OTA-164 — hub-room
+// roomKey alignment (closes the
+// SALVAGE-ALL spam at Reclaimers'
+// Outpost).
+//
+// Playtest log: Verbal taps SALVAGE
+// ALL at Reclaimers' Outpost The
+// Gate, 4 nouns salvaged
+// successfully. Player taps SALVAGE
+// 5 more times in 14 seconds; each
+// tap emits "Already worked over:
+// shattered library archive
+// console, dust-buried royal
+// display case, table, shattered
+// grand spire capacitor." The
+// nouns were consumed in
+// worldMemory but the modal kept
+// showing them as fresh chips.
+//
+// Root cause:
+// ExplorationScreen.tsx built 5
+// inline roomKeys in the legacy
+// shape "locId@mm@x,y" — missing
+// the @${hubRoomId} suffix that
+// makeRoomKey appends for hub
+// interiors (added OTA-140). The
+// modal read consumed-noun flags
+// from "outpost@_@0,0" while the
+// action handlers wrote them
+// through "outpost@_@0,0@gate". In
+// any hub room, the UI's view of
+// per-room state diverged from the
+// engine's. Climb chip-greying
+// (OTA-085/086) was on the same
+// bug because climb's cleared-marks
+// readback used the same broken
+// key.
+//
+// Fix: makeRoomKey exported from
+// gameStore. All 5
+// ExplorationScreen sites + 1
+// stale inline in gameStore (path-
+// exhausted state at 17699) now
+// call it with player.hubRoomId
+// passed through. The hub suffix
+// lines up across UI reads and
+// action writes — chips grey
+// properly, SALVAGE ALL on a
+// consumed scene no longer
+// re-fires.
+//
+// 6/6 OTA-164 regressions
+// (non-hub key shape, hub key
+// shape, hub-vs-non-hub differ,
+// two hubs differ, microMicroId
+// preserved, null hubRoomId).
+//
+// Files: app/state/gameStore.ts
+// (export makeRoomKey + fix inline
+// at 17699),
+// app/screens/ExplorationScreen.tsx
+// (import makeRoomKey + replace 5
+// inline keys).
+export const OTA_BUILD_ID = '2026-05-29-164';

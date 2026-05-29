@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
-import { useGameStore } from '../state/gameStore';
+import { useGameStore, makeRoomKey } from '../state/gameStore';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
 import { StatsPanel } from '../components/StatsPanel';
 import { AdventureFeed } from '../components/AdventureFeed';
@@ -121,10 +121,24 @@ export function ExplorationScreen() {
   //      re-tappable so the player isn't stuck.
   const consumedAmbientNouns = useMemo(() => {
     if (!player || !currentScene) return new Set<string>();
-    const microMicroId = currentScene.microMicroId ?? '_';
-    const x = typeof player.mapX === 'number' ? player.mapX : '_';
-    const y = typeof player.mapY === 'number' ? player.mapY : '_';
-    const roomKey = `${player.currentLocationId}@${microMicroId}@${x},${y}`;
+    // OTA-164 — use canonical makeRoomKey so hub interiors map to
+    // the same key the action handlers write to. Pre-OTA-164 the
+    // inline key shape ("locId@mm@x,y") was missing the
+    // @${hubRoomId} suffix that makeRoomKey appends for hubs, so
+    // every modal in a hub room read from a stale/different room
+    // record. Playtest: at Reclaimers' Outpost The Gate, SALVAGE
+    // ALL successfully consumed 4 nouns, then 5 more taps each
+    // showed those same 4 nouns as fresh chips → re-fired the
+    // bulk action → engine emitted "Already worked over: ..." each
+    // time because the action's read DID use makeRoomKey and saw
+    // the consumed marks the UI couldn't.
+    const roomKey = makeRoomKey(
+      player.currentLocationId,
+      currentScene.microMicroId,
+      player.mapX,
+      player.mapY,
+      player.hubRoomId,
+    );
     const room = worldMemory.visitedRooms?.[roomKey];
     // 2026-05-25 [POLISH-3] — include flavor-exhausted nouns so the
     // Search modal chip renders greyed + sorted right after a
@@ -153,10 +167,14 @@ export function ExplorationScreen() {
   // re-color but shouldn't clutter the actionable list.
   const productivelyConsumedSet = useMemo(() => {
     if (!player || !currentScene) return new Set<string>();
-    const microMicroId = currentScene.microMicroId ?? '_';
-    const x = typeof player.mapX === 'number' ? player.mapX : '_';
-    const y = typeof player.mapY === 'number' ? player.mapY : '_';
-    const roomKey = `${player.currentLocationId}@${microMicroId}@${x},${y}`;
+    // OTA-164 — see consumedAmbientNouns above. Same hub-key bug.
+    const roomKey = makeRoomKey(
+      player.currentLocationId,
+      currentScene.microMicroId,
+      player.mapX,
+      player.mapY,
+      player.hubRoomId,
+    );
     const room = worldMemory.visitedRooms?.[roomKey];
     // Inline filter — climb-tier markers (climbed:noun:tN) are
     // separate from productive consumption and don't gate other
@@ -176,10 +194,14 @@ export function ExplorationScreen() {
   ]);
   const flavorExhaustedSet = useMemo(() => {
     if (!player || !currentScene) return new Set<string>();
-    const microMicroId = currentScene.microMicroId ?? '_';
-    const x = typeof player.mapX === 'number' ? player.mapX : '_';
-    const y = typeof player.mapY === 'number' ? player.mapY : '_';
-    const roomKey = `${player.currentLocationId}@${microMicroId}@${x},${y}`;
+    // OTA-164 — see consumedAmbientNouns above. Same hub-key bug.
+    const roomKey = makeRoomKey(
+      player.currentLocationId,
+      currentScene.microMicroId,
+      player.mapX,
+      player.mapY,
+      player.hubRoomId,
+    );
     const room = worldMemory.visitedRooms?.[roomKey];
     return new Set((room?.flavorExhaustedNouns ?? []).map((n) => n.toLowerCase()));
   }, [
@@ -564,10 +586,14 @@ export function ExplorationScreen() {
               // subtracting cleared ones, leaving the button green
               // after the player had topped everything in the scene.
               const sceneNouns = currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [];
-              const microMicroId = currentScene?.microMicroId ?? '_';
-              const x = typeof player?.mapX === 'number' ? player.mapX : '_';
-              const y = typeof player?.mapY === 'number' ? player.mapY : '_';
-              const roomKey = `${player?.currentLocationId}@${microMicroId}@${x},${y}`;
+              // OTA-164 — see consumedAmbientNouns above. Same hub-key bug.
+              const roomKey = makeRoomKey(
+                player?.currentLocationId ?? '',
+                currentScene?.microMicroId,
+                player?.mapX,
+                player?.mapY,
+                player?.hubRoomId,
+              );
               const marks = worldMemory.visitedRooms?.[roomKey]?.searchedAmbientNouns ?? [];
               return sceneNouns.filter((n) => isClimbable(n) && !isClimbCleared(n, marks)).length;
             })()}
@@ -840,10 +866,14 @@ export function ExplorationScreen() {
         const sceneNouns = (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? []);
         const climbables = sceneNouns.filter((n) => isClimbable(n));
         const heights = climbables.map((n) => climbHeightFor(n));
-        const microMicroId = currentScene?.microMicroId ?? '_';
-        const x = typeof player?.mapX === 'number' ? player.mapX : '_';
-        const y = typeof player?.mapY === 'number' ? player.mapY : '_';
-        const roomKey = `${player?.currentLocationId}@${microMicroId}@${x},${y}`;
+        // OTA-164 — see consumedAmbientNouns above. Same hub-key bug.
+        const roomKey = makeRoomKey(
+          player?.currentLocationId ?? '',
+          currentScene?.microMicroId,
+          player?.mapX,
+          player?.mapY,
+          player?.hubRoomId,
+        );
         const marks = worldMemory.visitedRooms?.[roomKey]?.searchedAmbientNouns ?? [];
         const cleared = climbables.map((noun) => isClimbCleared(noun, marks));
         return (

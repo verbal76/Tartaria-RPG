@@ -15868,7 +15868,7 @@ function fireYulkaAmbush(
   } : s));
 }
 
-function makeRoomKey(
+export function makeRoomKey(
   locationId: string,
   microMicroId: string | null | undefined,
   mapX: number | null | undefined,
@@ -17693,10 +17693,19 @@ function narratePossibleDirections(
   // Re-typing `investigate path` still works (function is
   // idempotent), and the destination line is stable per OTA-061.
   const player = get().player;
-  const microMicroId = scene.microMicroId ?? '_';
-  const x = typeof player?.mapX === 'number' ? player.mapX : '_';
-  const y = typeof player?.mapY === 'number' ? player.mapY : '_';
-  const roomKey = `${player?.currentLocationId}@${microMicroId}@${x},${y}`;
+  // OTA-164 — use canonical makeRoomKey so hub interiors map to the
+  // same key the action handlers write through. Pre-OTA-164 this
+  // inline key was missing the @${hubRoomId} suffix that makeRoomKey
+  // appends, so flag reads/writes for path-exhausted state didn't
+  // align across hub vs non-hub callers — same class of bug
+  // ExplorationScreen.tsx had at 5 sites.
+  const roomKey = makeRoomKey(
+    player?.currentLocationId ?? '',
+    scene.microMicroId,
+    player?.mapX,
+    player?.mapY,
+    player?.hubRoomId,
+  );
   const markPathExhausted = (): void => {
     set((s) => {
       const room = s.worldMemory.visitedRooms?.[roomKey] ?? {
