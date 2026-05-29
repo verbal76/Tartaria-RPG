@@ -491,33 +491,15 @@ export function MapScreen() {
             style={styles.atlas}
             resizeMode="contain"
           />
-          {dotStyle && (
-            // OTA 057 — player marker. Inverse-scale via Animated.divide
-            // keeps the marker at a constant 32 × 22 px on screen
-            // regardless of the parent Animated.View's zoom (baseline
-            // ~3.3x on portrait phones, up to 5x on pinch). Without
-            // this, the marker would scale with the map and dominate.
-            // The marker silhouette anchors at its center on the
-            // atlas position.
-            <Animated.View
-              style={[
-                styles.markerWrapper,
-                dotStyle,
-                { transform: [{ scale: Animated.divide(1, scale) }] },
-              ]}
-              pointerEvents="none"
-            >
-              {/* Warm gold halo — the silhouette is solid black on
-                  transparent, so against dark atlas regions it would
-                  blend in. The halo gives it constant visibility. */}
-              <View style={styles.markerHalo} pointerEvents="none" />
-              <Image
-                source={require('../../assets/player-marker.png')}
-                style={styles.markerImage}
-                resizeMode="contain"
-              />
-            </Animated.View>
-          )}
+          {/* OTA-182 — player marker (silhouette + halo) removed.
+              Player ask: "let's take the player marker off of the
+              map, we were never able to make it accurate so let's
+              let the map just be a map." Procedural marker
+              placement drifted from the atlas's hand-painted city
+              positions enough that the player wasn't a reliable
+              cue. Map now renders as art-only. The "you are here"
+              text + bearings still live in the footer below for
+              location context. */}
         </Animated.View>
       </View>
 

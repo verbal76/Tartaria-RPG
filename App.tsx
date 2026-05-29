@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, AppState, Platform, StatusBar as RNStatusBar, type AppStateStatus } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, ActivityIndicator, StyleSheet, AppState, Platform, StatusBar as RNStatusBar, Keyboard, type AppStateStatus } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 // expo-navigation-bar is a NATIVE module — only present in APKs built
 // after it was added. Loaded via lazy require() inside the effect
@@ -307,9 +307,35 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
   // scale recomputes. Every screen rendered below inherits the new
   // scale via the wrapper transform — no per-screen changes needed.
   const ui = useUiScale();
+  // OTA-182 — keyboard-aware interior height. The wrapper View has
+  // a FIXED HEIGHT (interiorHeight) inside a `transform: scale`
+  // container. Android's native adjustResize can't shrink a fixed-
+  // height transformed View; KeyboardAvoidingView inside also can't
+  // see the keyboard's footprint because the parent's height stays
+  // constant. Net effect: when the keyboard pops up, the InputBox
+  // text field gets covered.
+  // Fix: subscribe to keyboardDidShow / keyboardDidHide and shrink
+  // interiorHeight by the keyboard's reported height. The wrapping
+  // View shrinks → InputBox at the bottom rises above the keyboard
+  // — same effect adjustResize would have given on a non-scaled
+  // container. Player ask: "whenever I am using the keyboard the
+  // text box I am typing into needs to be pushed above the keyboard
+  // so I am see what I am typing."
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
+  useEffect(() => {
+    const onShow = (e: { endCoordinates: { height: number } }) => {
+      setKeyboardOffset(e.endCoordinates.height);
+    };
+    const onHide = (): void => setKeyboardOffset(0);
+    const showSub = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow', onShow);
+    const hideSub = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide', onHide);
+    return () => { showSub.remove(); hideSub.remove(); };
+  }, []);
   // Available interior height the wrapper paints into (the safe
-  // outer View handles the status/nav bar insets).
-  const interiorHeight = ui.logicalHeight - (top + bottom) / ui.scale;
+  // outer View handles the status/nav bar insets). Subtract the
+  // keyboard's logical-pixel height so the text input rises into
+  // view when typing.
+  const interiorHeight = ui.logicalHeight - (top + bottom + keyboardOffset) / ui.scale;
   return (
     <View style={[styles.safe, { paddingTop: top, paddingBottom: bottom, paddingLeft: insets.left, paddingRight: insets.right }]}>
       <StatusBar style="light" hidden />

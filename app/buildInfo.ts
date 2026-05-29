@@ -4936,4 +4936,80 @@
 // Files: app/components/InputBox
 // .tsx (TravelBtn destination
 // branch + 2 new styles).
-export const OTA_BUILD_ID = '2026-05-29-181';
+//
+// 2026-05-29 OTA-182 — player
+// marker removed from MapScreen
+// + AppShell keyboard-aware
+// interior height (real keyboard
+// fix).
+//
+// Two asks, both UX:
+//
+//   (1) Player marker on MapScreen
+//       removed. Player: "let's
+//       take the player marker off
+//       of the map, we were never
+//       able to make it accurate
+//       so let's let the map just
+//       be a map." The procedural
+//       marker placement drifted
+//       from the atlas's hand-
+//       painted city positions
+//       enough that the player
+//       couldn't trust it. Removed
+//       the silhouette + halo
+//       rendering block in the
+//       Animated.View. Footer
+//       still shows the "you are
+//       here" text + bearings.
+//
+//   (2) Keyboard covering the text
+//       input — real fix. Player:
+//       "whenever I am using the
+//       keyboard the text box I
+//       am typing into needs to
+//       be pushed above the
+//       keyboard so I am see what
+//       I am typing." OTA-176's
+//       KAV behavior split wasn't
+//       enough because the actual
+//       blocker is in AppShell:
+//       the wrapper View has a
+//       FIXED HEIGHT inside a
+//       `transform: scale`
+//       container, which
+//       Android's native
+//       adjustResize cannot
+//       shrink. KAV inside also
+//       can't see the keyboard
+//       because the parent's
+//       height stays constant.
+//
+//       Fix: AppShell subscribes
+//       to keyboardWillShow /
+//       keyboardWillHide (iOS) or
+//       keyboardDidShow /
+//       keyboardDidHide (Android)
+//       and tracks the keyboard's
+//       reported height in
+//       useState. interiorHeight
+//       now subtracts that
+//       offset on top of the
+//       safe-area insets, so the
+//       wrapper actually shrinks
+//       when the keyboard
+//       appears — InputBox at
+//       the bottom of the
+//       wrapper rises above the
+//       keyboard automatically.
+//
+// TS clean.
+//
+// Files: app/screens/MapScreen
+// .tsx (player marker render
+// block removed), App.tsx
+// (Keyboard import + useState
+// keyboardOffset + listener
+// useEffect + interiorHeight
+// subtraction).
+export const OTA_BUILD_ID = '2026-05-29-182';
