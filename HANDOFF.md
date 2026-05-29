@@ -245,6 +245,15 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### COPY INVENTORY snapshot now mirrors UI bucketing + damage dice + ◆ marker
+
+- **OTA-204 (2026-05-29) · Triggered by playtest screenshots showing what the OTA-202 text snapshot was missing.**
+  - **What:** Player paste of OTA-203 COPY INVENTORY + 4 screenshots of the actual InventoryScreen surfaced three gaps. (1) The UI has a LOOT bucket (gear.json `kind:'misc'` items like Shaped Aetheric Shard + uncataloged fallback like Tortoise Shell), but the OTA-202 snapshot collapsed everything under "Materials & Misc" — misled the analysis into bucketing LOOT items as materials. (2) Weapon damage dice (1d10 piercing, 1d4 piercing, 1d6 bludgeoning) were on screen but absent from the snapshot, so OTA-197 resist-nudge analysis couldn't see what alternatives the player carried. (3) The ◆ inferred marker added by OTA-199 was visible in-app but missing from the text export.
+  - **Fix:** `inventorySnapshot.ts` now uses `categorizeItem` + `CATEGORY_ORDER` + `CATEGORY_LABEL` from `InventoryCategorize.ts` so bucketing matches the UI exactly (Weapons / Armor / Amulets & Rings / Consumables / Relics / Materials / Loot). `lineFor` prefixes items with `◆` when `isInferredItem(name)` returns true (mirrors OTA-199's row diamond, colorless in plain text). For `kind:'weapon'` items not carrying `uniqueStats`, `lineFor` pulls `damageDice + damageType` from `findWeaponByName` and surfaces them in the metadata block.
+  - **Diagnostic lock:** New `inferredPredicateLive.test.ts` regression-locks the catalog-vs-inferred predicate against drift — asserts `findCatalogItem` finds Shaped Aetheric Shard (gear.json) and plain Aetheric Shard (materials.json), `isInferredItem` returns false for both, true for Mud Cloth / Tortoise Shell (uncataloged). Catches the case where the in-app screenshot showed ◆ on Shaped Aetheric Shard — the catalog predicate is correct, so the divergence is either a stale install on the device or a different render path; the snapshot exports will be authoritative now.
+  - **Verification:** +3 tests in `inventorySnapshot` (LOOT bucket assignment, weapon damage dice surface, ◆ marker on inferred but not catalog), +5 in `inferredPredicateLive`. Total 14 + 5 = 19 across the two suites. `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/diagnostics/inventorySnapshot.ts` (categorizeItem bucketing + damage dice + ◆ marker), `__tests__/inferredPredicateLive.test.ts` (NEW regression lock).
+
 #### Dedicated COPY INVENTORY button (reverts OTA-202 bundling)
 
 - **OTA-203 (2026-05-29) · Inventory snapshot moves to its own button instead of bundling into COPY LOG.**

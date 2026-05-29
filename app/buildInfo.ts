@@ -6830,4 +6830,86 @@
 // (revert handleCopyLog
 // bundling + add handleCopy
 // Inventory + button render).
-export const OTA_BUILD_ID = '2026-05-29-203';
+// 2026-05-29-204 — COPY
+// INVENTORY snapshot now
+// mirrors the UI bucketing
+// (Weapons / Armor / Amulets
+// & Rings / Consumables /
+// Relics / Materials / LOOT)
+// and surfaces weapon damage
+// dice + ◆ inferred marker.
+// Triggered by playtest
+// screenshots showing what
+// the text snapshot missed:
+//   - LOOT is a real bucket
+//     in the UI (gear.json
+//     kind:misc items +
+//     uncataloged fallback)
+//     and the OTA-202
+//     snapshot was collapsing
+//     it into "Materials &
+//     Misc"
+//   - Weapon damage dice
+//     (1d10 piercing, etc.)
+//     were on screen but not
+//     in the text export, so
+//     resist-nudge analysis
+//     couldn't read what
+//     alternatives the player
+//     had
+//   - The ◆ row marker from
+//     OTA-199 was visible
+//     in-app but absent from
+//     the export
+//
+// Changes:
+//   - inventorySnapshot.ts
+//     now uses categorizeItem
+//     + CATEGORY_ORDER +
+//     CATEGORY_LABEL from
+//     InventoryCategorize.ts
+//     so bucketing matches
+//     the UI exactly.
+//   - lineFor() prefixes
+//     items with ◆ when
+//     isInferredItem returns
+//     true (mirrors OTA-199's
+//     row diamond, colorless
+//     since the export is
+//     plain text).
+//   - For kind:'weapon' items
+//     not carrying uniqueStats,
+//     lineFor() pulls
+//     damageDice + damageType
+//     from findWeaponByName
+//     and surfaces them in
+//     the metadata block.
+//
+// Diagnostic regression test
+// (inferredPredicateLive.
+// test.ts) locks the
+// catalog-vs-inferred
+// predicate against drift —
+// asserts findCatalogItem
+// finds Shaped Aetheric Shard
+// (gear.json) and Aetheric
+// Shard (materials.json) +
+// isInferredItem returns
+// false for both, true for
+// Mud Cloth and Tortoise
+// Shell.
+//
+// Tests: +3 in
+// inventorySnapshot (LOOT
+// bucket assignment, weapon
+// damage dice surface, ◆
+// marker on inferred but
+// not catalog), +5 in
+// inferredPredicateLive.
+// TS clean app-side.
+//
+// Files: app/diagnostics/
+// inventorySnapshot.ts
+// (categorizeItem bucketing
+// + damage dice + ◆ marker).
+export const OTA_BUILD_ID = '2026-05-29-204';

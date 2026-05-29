@@ -50,25 +50,58 @@ describe('OTA-202 — buildInventorySnapshot', () => {
     expect(out).toMatch(/Verbal/);
   });
 
-  it('groups items by kind and sorts inside each bucket', () => {
+  it('groups items by UI category (Weapons / Materials / Loot etc.) and sorts inside each bucket', () => {
     const inv: InventoryItem[] = [
       mkItem({ name: 'Iron Spear', kind: 'weapon', quantity: 1 }),
-      mkItem({ name: 'Aetheric Cleaver', kind: 'weapon', quantity: 1 }),
-      mkItem({ name: 'Trail Rations', kind: 'consumable', quantity: 4 }),
-      mkItem({ name: 'Scrap Metal', kind: 'misc', quantity: 8 }),
-      mkItem({ name: 'Patched Cloth', kind: 'misc', quantity: 3 }),
+      mkItem({ name: 'Trail Rations', kind: 'consumable', quantity: 4, tags: ['food'] }),
+      mkItem({ name: 'Scrap Metal', kind: 'misc', quantity: 8, tags: ['metal'] }),
+      mkItem({ name: 'Patched Cloth', kind: 'misc', quantity: 3, tags: ['cloth'] }),
     ];
     const out = buildInventorySnapshot(mkPlayer({ inventory: inv }));
-    // Weapons bucket present; Aetheric Cleaver comes first alphabetically.
-    expect(out).toMatch(/Weapons \(2\)/);
-    const weaponIdx = out.indexOf('Weapons');
-    const aethericIdx = out.indexOf('Aetheric Cleaver');
-    const ironIdx = out.indexOf('Iron Spear');
-    expect(aethericIdx).toBeGreaterThan(weaponIdx);
-    expect(ironIdx).toBeGreaterThan(aethericIdx);
-    expect(out).toMatch(/Materials & Misc \(2\)/);
+    expect(out).toMatch(/Weapons \(1\)/);
+    expect(out).toMatch(/Iron Spear/);
+    // Trail Rations + Patched Cloth + Scrap Metal are all in MATERIALS
+    // catalog → 'material' bucket → "Materials" label per the UI.
+    expect(out).toMatch(/Materials/);
     expect(out).toMatch(/Trail Rations ×4/);
     expect(out).toMatch(/Scrap Metal ×8/);
+  });
+
+  it('OTA-204 — uses the UI LOOT bucket for gear.json kind:misc items + uncatalogued items', () => {
+    const inv: InventoryItem[] = [
+      // Shaped Aetheric Shard lives in gear.json with kind:'misc'.
+      // The UI categorizer routes it to LOOT, NOT Materials.
+      mkItem({ name: 'Shaped Aetheric Shard', kind: 'misc', tags: ['throwable', 'aether'] }),
+      // Tortoise Shell is NOT in any catalog AND has no material-tag
+      // match (only 'loot', 'improvised') → falls through to LOOT.
+      mkItem({ name: 'Tortoise Shell', kind: 'misc', tags: ['loot', 'improvised'] }),
+    ];
+    const out = buildInventorySnapshot(mkPlayer({ inventory: inv }));
+    expect(out).toMatch(/Loot \(2\)/);
+    expect(out).toMatch(/Shaped Aetheric Shard/);
+    expect(out).toMatch(/Tortoise Shell/);
+  });
+
+  it('OTA-204 — surfaces weapon damage dice + damage type from the catalog', () => {
+    // Iron Spear is in WEAPONS catalog. Snapshot should include
+    // damage dice like "1d6 piercing".
+    const inv: InventoryItem[] = [
+      mkItem({ name: 'Iron Spear', kind: 'weapon' }),
+    ];
+    const out = buildInventorySnapshot(mkPlayer({ inventory: inv }));
+    expect(out).toMatch(/Iron Spear.*\dd\d+ \w+/);
+  });
+
+  it('OTA-204 — prefixes inferred items with ◆ marker but NOT catalog items', () => {
+    const inv: InventoryItem[] = [
+      mkItem({ name: 'Shaped Aetheric Shard', kind: 'misc' }), // catalog
+      mkItem({ name: "Whisper Marrow", kind: 'misc', tags: ['organic'] }), // inferred
+    ];
+    const out = buildInventorySnapshot(mkPlayer({ inventory: inv }));
+    // Inferred gets the ◆.
+    expect(out).toMatch(/◆ Whisper Marrow/);
+    // Catalog does NOT.
+    expect(out).not.toMatch(/◆ Shaped Aetheric Shard/);
   });
 
   it('surfaces per-instance metadata: rarity, durability, equipped slot, stolen, reserved, unique', () => {

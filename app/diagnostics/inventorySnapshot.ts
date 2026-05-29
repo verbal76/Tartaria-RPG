@@ -15,32 +15,33 @@
 // flag, uniqueStats summary).
 
 import type { InventoryItem, PlayerCharacter } from '../engine/types';
-
-const KIND_ORDER: ReadonlyArray<InventoryItem['kind']> = [
-  'weapon', 'armor', 'dog_armor', 'relic', 'runecaster', 'consumable', 'misc',
-];
-
-const KIND_LABEL: Record<InventoryItem['kind'], string> = {
-  weapon: 'Weapons',
-  armor: 'Armor',
-  dog_armor: 'Dog Armor',
-  relic: 'Relics',
-  runecaster: 'Runecasters',
-  consumable: 'Consumables',
-  misc: 'Materials & Misc',
-};
+import { categorizeItem, CATEGORY_ORDER, CATEGORY_LABEL, type InventoryCategory } from '../components/InventoryCategorize';
+import { findWeaponByName, isInferredItem } from '../engine/crafting';
 
 /** Build a one-line summary for a single item — name, qty, rarity,
- *  durability, equipped slot, per-instance flags. */
+ *  durability, equipped slot, per-instance flags. OTA-204 — surfaces
+ *  the catalog damage dice on weapons (mirrors what the screen shows)
+ *  and prefixes inferred items with a ◆ marker so the export reads
+ *  the way the inventory does. */
 function lineFor(item: InventoryItem, equippedSlots: ReadonlyMap<string, string>): string {
   const parts: string[] = [];
-  // Name + optional inferred-tier diamond. Mirrors the OTA-199
-  // inventory-row marker so the export reads the way the screen does.
-  // No actual color — just a marker character so the player can grep.
+  // OTA-204 — inferred-item ◆ marker matches the OTA-199 row diamond,
+  // so the snapshot makes catalog-vs-engine-named obvious at a paste.
+  if (isInferredItem(item.name)) parts.push('◆');
   parts.push(item.name);
   if (item.quantity > 1) parts.push(`×${item.quantity}`);
   const meta: string[] = [];
   if (item.rarity && item.rarity !== 'Common') meta.push(item.rarity);
+  // OTA-204 — weapon damage dice. The screen shows "1d10 piercing"
+  // next to each weapon name and the snapshot was carrying tags but
+  // not damage. Pull from the catalog (uniqueStats path covered
+  // separately below).
+  if (item.kind === 'weapon' && !item.uniqueStats) {
+    try {
+      const w = findWeaponByName(item.name);
+      if (w) meta.push(`${w.damageDice} ${w.damageType}`);
+    } catch { /* tolerate catalog miss */ }
+  }
   if (item.durability) meta.push(`dur ${item.durability.current}/${item.durability.max}`);
   const slot = equippedSlots.get(item.id);
   if (slot) meta.push(`equipped:${slot}`);
@@ -94,11 +95,17 @@ export function buildInventorySnapshot(player: PlayerCharacter | null): string {
     return `Inventory (${player.name})\n  TC: ${player.tc}\n  Pack: empty`;
   }
   const equippedSlots = equippedSlotMap(player);
-  const buckets = new Map<InventoryItem['kind'], InventoryItem[]>();
+  // OTA-204 — bucket by the UI's category logic (categorizeItem in
+  // InventoryCategorize.ts) so the snapshot's WEAPONS / ARMOR /
+  // ACCESSORY / CONSUMABLE / RELIC / MATERIAL / LOOT split mirrors
+  // what the player sees on screen. Pre-OTA the snapshot grouped by
+  // raw InventoryItem.kind which collapsed LOOT into "Materials &
+  // Misc" and misled the analysis.
+  const buckets = new Map<InventoryCategory, InventoryItem[]>();
   for (const it of inv) {
-    const k = it.kind;
-    if (!buckets.has(k)) buckets.set(k, []);
-    buckets.get(k)!.push(it);
+    const cat = categorizeItem(it);
+    if (!buckets.has(cat)) buckets.set(cat, []);
+    buckets.get(cat)!.push(it);
   }
   const lines: string[] = [];
   lines.push(`Inventory (${player.name})`);
@@ -109,12 +116,12 @@ export function buildInventorySnapshot(player: PlayerCharacter | null): string {
     const d = player.dog;
     lines.push(`  Dog: ${d.name} (${d.breed}) loyalty ${d.loyalty} HP ${d.hp}/${d.hpMax}`);
   }
-  for (const kind of KIND_ORDER) {
-    const items = buckets.get(kind);
+  for (const cat of CATEGORY_ORDER) {
+    const items = buckets.get(cat);
     if (!items || items.length === 0) continue;
     items.sort((a, b) => a.name.localeCompare(b.name));
     lines.push('');
-    lines.push(`${KIND_LABEL[kind]} (${items.length})`);
+    lines.push(`${CATEGORY_LABEL[cat]} (${items.length})`);
     for (const it of items) lines.push(lineFor(it, equippedSlots));
   }
   return lines.join('\n');
