@@ -7276,4 +7276,74 @@
 // app/diagnostics/
 // inventorySnapshot.ts
 // (drop throw label).
-export const OTA_BUILD_ID = '2026-05-29-208';
+// 2026-05-29-209 — Sentinel
+// Core Plate becomes a
+// throwable. The one catalog
+// gap the OTA-206 inventory
+// snapshot surfaced: the
+// description literally said
+// "Heavy enough to throw"
+// but the tags didn't carry
+// 'throwable', so OTA-208's
+// equip-throwable path
+// couldn't pick it up.
+//
+// Changes:
+//   - materials.json: added
+//     'throwable' tag to
+//     Sentinel Core Plate
+//     and extended the
+//     description with the
+//     equip+hurl hook ("one-
+//     shot Aetheric crash on
+//     impact").
+//   - itemWeight.ts: 1d10+2
+//     damage override for
+//     Sentinel Core Plate in
+//     both rollThrowDamage
+//     (typed throw verb) and
+//     throwDamageNotation
+//     (equipped-throwable
+//     combat path). Heavier
+//     than a generic weight-5
+//     throw (1d8+1) because
+//     the catalog row IS
+//     Uncommon and the
+//     description sells it
+//     as a deliberate
+//     sacrifice.
+//
+// Decision on the broader
+// Qwen catalog-augmentation
+// ask: NOT BUILT. The OTA-206
+// snapshot pass turned up
+// ONE clean candidate
+// (Sentinel Core Plate),
+// two near-misses that need
+// engine verbs that don't
+// exist yet (distill on
+// Aether Dust, alchemy-sell
+// on Disease Sample), and
+// the rest of the catalog
+// is intentionally inert.
+// One hand-authored line
+// vs. 6-10 hours of
+// infrastructure that would
+// hallucinate effects onto
+// correctly-inert items is
+// a clear call.
+//
+// Tests: existing
+// throwableEquippedWeapon
+// regression (19 tests)
+// still green covering the
+// 2d20 shard path. TS clean
+// app-side.
+//
+// Files: app/data/items/
+// materials.json (Sentinel
+// Core Plate tag + desc),
+// app/engine/itemWeight.ts
+// (1d10+2 override in both
+// roll fns).
+export const OTA_BUILD_ID = '2026-05-29-209';

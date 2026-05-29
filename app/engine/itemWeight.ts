@@ -56,6 +56,8 @@ export function rollThrowDamage(item: InventoryItem | null): number {
   if (lower === 'shaped aetheric shard' || lower === 'aetheric shard') {
     return rollDie(20) + rollDie(20);
   }
+  // OTA-209 — Sentinel Core Plate 1d10+2 (matches throwDamageNotation).
+  if (lower === 'sentinel core plate') return rollDie(10) + 2;
   const w = itemWeight(item);
   switch (w) {
     case 1: return 1;
@@ -75,6 +77,11 @@ export function throwDamageNotation(item: InventoryItem | null): string {
   if (!item) return '1';
   const lower = (item.name ?? '').toLowerCase();
   if (lower === 'shaped aetheric shard' || lower === 'aetheric shard') return '2d20';
+  // OTA-209 — Sentinel Core Plate is the heaviest Aetheric ceramic
+  // chunk on the catalog. Its description literally says "Heavy
+  // enough to throw" — give it a meaningful 1d10+2 so it feels worth
+  // sacrificing instead of selling.
+  if (lower === 'sentinel core plate') return '1d10+2';
   const w = itemWeight(item);
   switch (w) {
     case 1: return '1';

@@ -245,6 +245,15 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Sentinel Core Plate becomes throwable — the one catalog gap surfaced by OTA-206 snapshot analysis
+
+- **OTA-209 (2026-05-29) · Hand-authored fix for the only catalog row in the playtester's pack whose description implied an action the row didn't carry.**
+  - **What:** Player asked whether the OTA-206 inventory snapshot revealed any items that should be usable/equippable but weren't — a theme for Qwen catalog augmentation. The scan turned up ONE clean candidate: **Sentinel Core Plate** description says *"Heavy enough to throw, useful enough to sell"* but the tags (`automation, tech, salvage, scrap`) don't include `throwable`, so OTA-208's equip-throwable path couldn't pick it up. Two near-misses (Aether Dust *"distillable"*, Disease Sample *"alchemists pay for it"*) would require new engine verbs that don't exist, so they're not Qwen-fixable. Rest of the catalog is intentionally inert (raw materials, currency).
+  - **Fix:** Added `throwable` tag to Sentinel Core Plate in `materials.json` and extended the description with the equip+hurl hook (*"one-shot Aetheric crash on impact"*). New 1d10+2 damage override in `itemWeight.ts` for both `rollThrowDamage` (typed throw verb path) and `throwDamageNotation` (equipped-throwable combat path). Heavier than a generic weight-5 throw (1d8+1) because the catalog row IS Uncommon and the description sells it as a deliberate sacrifice.
+  - **Decision on Qwen catalog augmentation:** NOT BUILT. One hand-authored line vs. 6-10 hours of infrastructure that would hallucinate effects onto correctly-inert items is a clear call. If future snapshots surface 5+ similar gaps in a single pack we revisit.
+  - **Verification:** Existing `throwableEquippedWeapon` regression (19 tests) still green covering the 2d20 shard path. `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/data/items/materials.json` (Sentinel Core Plate tag + desc), `app/engine/itemWeight.ts` (1d10+2 override in both roll fns).
+
 #### Throwables are now equippable one-shot weapons (replaces OTA-207's inventory throw button)
 
 - **OTA-208 (2026-05-29) · Equip the shard, attack, it throws and self-destructs.**
