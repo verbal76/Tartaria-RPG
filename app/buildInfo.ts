@@ -6912,4 +6912,96 @@
 // inventorySnapshot.ts
 // (categorizeItem bucketing
 // + damage dice + ◆ marker).
-export const OTA_BUILD_ID = '2026-05-29-204';
+// 2026-05-29-205 — open
+// suggestions push: (a)
+// repair handler now uses
+// OTA-193's tag-substitution
+// path so Cloth Scrap /
+// Spider Silk / Mud Cloth
+// can stand in for Patched
+// Cloth (etc.) when fixing
+// armor + (b) Aetheric
+// Compass gets the passive
+// WIS +1 effect it always
+// implied. Both triggered
+// by the OTA-204 inventory
+// snapshot analysis of the
+// playtester's Chestplate-
+// at-2/20 + Compass-with-
+// no-effect situation.
+//
+// Repair substitution:
+//   - crafting.ts gains three
+//     new list-based exports:
+//     missingIngredientsList,
+//     previewSubstitutionsList,
+//     consumeIngredientsList.
+//     Take a flat ingredient
+//     list instead of a
+//     Recipe so the repair
+//     path can call them
+//     directly.
+//   - missingIngredients,
+//     previewCraftSubstitutions
+//     , and consumeIngredients
+//     now thin-wrap the list-
+//     based helpers (no
+//     duplicated drain logic).
+//   - repairInventoryItem in
+//     gameStore.ts routes
+//     through the new helpers.
+//     Shortage line now reads
+//     "Patched Cloth 2 short,
+//     Scrap Metal 1 short"
+//     accounting for
+//     substitutes. On a
+//     successful repair with
+//     subs, the arbiter
+//     narrates "Patched in:
+//     2× Cloth Scrap →
+//     Patched Cloth" so the
+//     player understands
+//     where the materials
+//     went.
+//
+// Aetheric Compass effect:
+//   - gear.json:66 row gains
+//     effect:{kind:'passive',
+//     stat:'wisdom', bonus:1}.
+//     Description extended
+//     with the rationale ("a
+//     half-beat clearer").
+//   - aggregateInventoryPassives
+//     already picks up
+//     passive effects, so the
+//     +1 WIS flows through
+//     effectiveStats for any
+//     player carrying the
+//     Compass. No engine wire
+//     needed — the OTA-191
+//     passive system handles
+//     it.
+//
+// Tests: +8 in repair
+// Substitution (chestplate
+// repair with cloth subs,
+// preview surface, drain
+// order, reserved + stolen
+// safety rails, Compass
+// passive picked up by
+// aggregateInventoryPassives).
+// craftTagSubstitution +
+// inventorySnapshot regression
+// stays green (42 tests
+// across 3 suites). TS clean
+// app-side.
+//
+// Files: app/data/items/
+// gear.json (Compass
+// effect), app/engine/
+// crafting.ts (list-based
+// helpers + Recipe-wrapper
+// refactor), app/state/
+// gameStore.ts (repair
+// handler wired to subs).
+export const OTA_BUILD_ID = '2026-05-29-205';

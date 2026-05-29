@@ -322,15 +322,17 @@ export function canCraft(recipe: Recipe, inventory: readonly InventoryItem[]): b
   });
 }
 
-/** OTA-193 — list ingredients still short after both name + substitute
- *  drains. Returns the missing-quantity-by-name shape the craft caller
- *  needs to surface a "you still need X" arbiter line. */
-export function missingIngredients(
-  recipe: Recipe,
+/** OTA-205 — substitution-aware shortage check for a flat ingredient
+ *  list (not bound to a Recipe). Used by the repair handler to drain
+ *  Patched Cloth substitutes (Cloth Scrap / Spider Silk / Mud Cloth)
+ *  the same way crafting does. Same canonical-first + substitute-tag
+ *  pass as missingIngredients(). */
+export function missingIngredientsList(
+  ingredients: ReadonlyArray<{ name: string; quantity: number }>,
   inventory: readonly InventoryItem[],
 ): Array<{ name: string; quantity: number }> {
   const out: Array<{ name: string; quantity: number }> = [];
-  for (const ing of recipe.ingredients) {
+  for (const ing of ingredients) {
     const named = totalQuantity(inventory, ing.name);
     const subs = substituteQuantityFor(inventory, ing.name);
     const have = named + subs;
@@ -341,19 +343,27 @@ export function missingIngredients(
   return out;
 }
 
-/** OTA-193 — preview the substitutions a craft would perform without
- *  mutating inventory. Used by the craft caller so the arbiter can
- *  narrate what's being consumed ("You strip the Brass Sextant for the
- *  metal it needs."). Per-substitution stacks are flattened to one
- *  entry per (ingredient, substitute name) pair. */
-export function previewCraftSubstitutions(
+/** OTA-193 — list ingredients still short after both name + substitute
+ *  drains. Returns the missing-quantity-by-name shape the craft caller
+ *  needs to surface a "you still need X" arbiter line. */
+export function missingIngredients(
   recipe: Recipe,
+  inventory: readonly InventoryItem[],
+): Array<{ name: string; quantity: number }> {
+  return missingIngredientsList(recipe.ingredients, inventory);
+}
+
+/** OTA-205 — substitution preview for a flat ingredient list, used by
+ *  the repair handler to narrate "Repaired with 2 Cloth Scrap for the
+ *  Patched Cloth." Same drain order as previewCraftSubstitutions. */
+export function previewSubstitutionsList(
+  ingredients: ReadonlyArray<{ name: string; quantity: number }>,
   inventory: readonly InventoryItem[],
 ): Array<{ ingredient: string; substitute: string; quantity: number }> {
   const out: Array<{ ingredient: string; substitute: string; quantity: number }> = [];
   const consumed = new Map<string, number>(); // id → already-counted
 
-  for (const ing of recipe.ingredients) {
+  for (const ing of ingredients) {
     const namedHave = totalQuantity(inventory, ing.name);
     if (namedHave >= ing.quantity) continue;
     let stillNeed = ing.quantity - namedHave;
@@ -374,6 +384,55 @@ export function previewCraftSubstitutions(
     }
   }
   return out;
+}
+
+/** OTA-193 — preview the substitutions a craft would perform without
+ *  mutating inventory. Used by the craft caller so the arbiter can
+ *  narrate what's being consumed ("You strip the Brass Sextant for the
+ *  metal it needs."). Per-substitution stacks are flattened to one
+ *  entry per (ingredient, substitute name) pair. */
+export function previewCraftSubstitutions(
+  recipe: Recipe,
+  inventory: readonly InventoryItem[],
+): Array<{ ingredient: string; substitute: string; quantity: number }> {
+  return previewSubstitutionsList(recipe.ingredients, inventory);
+}
+
+/** OTA-205 — substitution-aware consume for a flat ingredient list.
+ *  Drains exact-name first, then substitutes; preserves equipped /
+ *  stolen / reserved items. Returns the new inventory. */
+export function consumeIngredientsList(
+  inventory: readonly InventoryItem[],
+  ingredients: ReadonlyArray<{ name: string; quantity: number }>,
+): InventoryItem[] {
+  const next: InventoryItem[] = inventory.map((i) => ({ ...i }));
+  for (const ing of ingredients) {
+    let need = ing.quantity;
+    const target = ing.name.toLowerCase();
+    // Pass 1 — exact-name drain.
+    for (const item of next) {
+      if (need <= 0) break;
+      if (item.name.toLowerCase() !== target) continue;
+      const take = Math.min(item.quantity, need);
+      item.quantity -= take;
+      need -= take;
+    }
+    if (need <= 0) continue;
+    // Pass 2 — tag substitution drain.
+    const tags = MATERIAL_SUBSTITUTE_TAGS[target];
+    if (!tags) continue;
+    const tagSet = new Set(tags);
+    for (const item of next) {
+      if (need <= 0) break;
+      if (item.quantity <= 0) continue;
+      if (!isSubstitutable(item)) continue;
+      if (!(item.tags ?? []).some((t) => tagSet.has(t.toLowerCase()))) continue;
+      const take = Math.min(item.quantity, need);
+      item.quantity -= take;
+      need -= take;
+    }
+  }
+  return next.filter((i) => i.quantity > 0);
 }
 
 export function listCraftableRecipes(inventory: readonly InventoryItem[]): Recipe[] {
@@ -421,39 +480,7 @@ export function consumeIngredients(
   inventory: readonly InventoryItem[],
   recipe: Recipe,
 ): InventoryItem[] {
-  const next: InventoryItem[] = inventory.map((i) => ({ ...i }));
-  for (const ing of recipe.ingredients) {
-    let need = ing.quantity;
-    const target = ing.name.toLowerCase();
-    // Pass 1 — exact-name drain (preserve substitution stock when the
-    // player has the canonical material).
-    for (const item of next) {
-      if (need <= 0) break;
-      if (item.name.toLowerCase() !== target) continue;
-      const take = Math.min(item.quantity, need);
-      item.quantity -= take;
-      need -= take;
-    }
-    if (need <= 0) continue;
-    // Pass 2 — OTA-193 tag-substitution drain. Only misc, non-stolen,
-    // non-equipped items. The misc check rules out weapons / armor /
-    // accessories so the player's equipped sword can't be silently
-    // consumed by a craft. Stolen contraband is preserved for the
-    // fence path.
-    const tags = MATERIAL_SUBSTITUTE_TAGS[target];
-    if (!tags) continue;
-    const tagSet = new Set(tags);
-    for (const item of next) {
-      if (need <= 0) break;
-      if (item.quantity <= 0) continue;
-      if (!isSubstitutable(item)) continue;
-      if (!(item.tags ?? []).some((t) => tagSet.has(t.toLowerCase()))) continue;
-      const take = Math.min(item.quantity, need);
-      item.quantity -= take;
-      need -= take;
-    }
-  }
-  return next.filter((i) => i.quantity > 0);
+  return consumeIngredientsList(inventory, recipe.ingredients);
 }
 
 // Catalog lookup helpers — find an item entry by name across the four

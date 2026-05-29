@@ -245,6 +245,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Repair handler accepts substitute materials + Aetheric Compass gets its passive WIS
+
+- **OTA-205 (2026-05-29) · Two open suggestions from the OTA-204 snapshot analysis shipped together.**
+  - **What (repair):** Playtester's Chestplate at dur 2/20 — they had 11 Scrap Metal but no Patched Cloth, yet carried Cloth Scrap + Spider Silk + Mud Cloth (all fiber-tagged). The repair handler was wired before OTA-193's substitution shipped and only accepted exact name matches, so the chestplate was effectively unrepairable.
+  - **What (Compass):** The only catalog row in the playtester's pack with a rich description but no `effect` field. Description promised passive detection but nothing wired.
+  - **Fix (repair):** `crafting.ts` gains three list-based exports — `missingIngredientsList`, `previewSubstitutionsList`, `consumeIngredientsList` — that take a flat ingredient list instead of a `Recipe`. `missingIngredients` / `previewCraftSubstitutions` / `consumeIngredients` now thin-wrap them (no duplicated drain logic). `repairInventoryItem` in `gameStore.ts` routes through the new helpers. Shortage line now reads "Patched Cloth 2 short, Scrap Metal 1 short" accounting for substitutes. On a successful repair with subs, the arbiter narrates *"Patched in: 2× Cloth Scrap → Patched Cloth"* so the player understands where the materials went.
+  - **Fix (Compass):** `gear.json:66` row gains `effect: { kind: 'passive', stat: 'wisdom', bonus: 1 }`. Description extended with the rationale (*"a half-beat clearer"*). `aggregateInventoryPassives` already routes passive effects through `effectiveStats`, so the +1 WIS flows automatically. No engine wire needed.
+  - **Verification:** +8 tests in `repairSubstitution` (chestplate repair with cloth subs, preview surface, drain order, reserved + stolen safety rails, Compass passive picked up by `aggregateInventoryPassives`). Existing `craftTagSubstitution` + `inventorySnapshot` regression stays green (42 tests across 3 suites). `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/data/items/gear.json` (Compass effect), `app/engine/crafting.ts` (list-based helpers + Recipe-wrapper refactor), `app/state/gameStore.ts` (repair handler wired to subs).
+
 #### COPY INVENTORY snapshot now mirrors UI bucketing + damage dice + ◆ marker
 
 - **OTA-204 (2026-05-29) · Triggered by playtest screenshots showing what the OTA-202 text snapshot was missing.**

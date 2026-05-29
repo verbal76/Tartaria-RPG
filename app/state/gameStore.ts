@@ -14877,38 +14877,43 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The Arbiter taps the ${item.name}. "No recipe to mend this one. Sell it on or scrap for parts."`);
       return;
     }
-    // Verify we have every required material.
-    const shortages: string[] = [];
-    for (const need of cost) {
-      const have = player.inventory
-        .filter((i) => i.name.toLowerCase() === need.name.toLowerCase())
-        .reduce((s, i) => s + i.quantity, 0);
-      if (have < need.quantity) shortages.push(`${need.name} ${have}/${need.quantity}`);
-    }
-    if (shortages.length > 0) {
+    // OTA-205 — substitution-aware shortage check. Previously the
+    // repair handler required exact-name matches on the cost list
+    // (Patched Cloth, Scrap Metal, etc.). Now it routes through
+    // missingIngredientsList / consumeIngredientsList so the player
+    // can spend Cloth Scrap / Spider Silk / Mud Cloth for the
+    // Patched Cloth call, Brass Sextant / Bent Nails for Scrap Metal,
+    // etc. Same canonical-first + substitute-tag pass as crafting.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const craftingMod = require('../engine/crafting');
+    const missing = craftingMod.missingIngredientsList(cost, player.inventory) as Array<{ name: string; quantity: number }>;
+    if (missing.length > 0) {
+      const shortages = missing.map((m) => `${m.name} ${m.quantity} short`);
       get().appendLog(
         'arbiter',
         `The Arbiter eyes the ${item.name}. "Short on stock: ${shortages.join(', ')}. Gather, then return."`,
       );
       return;
     }
+    // Narrate substitutions BEFORE the drain so the player understands
+    // why their Cloth Scrap disappeared in service of the repair.
+    const subs = craftingMod.previewSubstitutionsList(cost, player.inventory) as Array<{ ingredient: string; substitute: string; quantity: number }>;
+    if (subs.length > 0) {
+      const list = subs.map((s) =>
+        s.quantity > 1
+          ? `${s.quantity}× ${s.substitute} → ${s.ingredient}`
+          : `${s.substitute} → ${s.ingredient}`,
+      ).join(', ');
+      get().appendLog(
+        'arbiter',
+        `The Arbiter nods. "Patched in: ${list}."`,
+      );
+    }
     // Consume materials + restore durability.
     set((s) => {
       if (!s.player) return s;
-      let newInventory = [...s.player.inventory];
-      for (const need of cost) {
-        let remaining = need.quantity;
-        newInventory = newInventory
-          .map((i) => {
-            if (remaining <= 0) return i;
-            if (i.name.toLowerCase() !== need.name.toLowerCase()) return i;
-            const take = Math.min(i.quantity, remaining);
-            remaining -= take;
-            return { ...i, quantity: i.quantity - take };
-          })
-          .filter((i) => i.quantity > 0);
-      }
-      newInventory = newInventory.map((i) =>
+      const drained = craftingMod.consumeIngredientsList(s.player.inventory, cost) as InventoryItem[];
+      const newInventory = drained.map((i) =>
         i.id === itemId && i.durability
           ? { ...i, durability: { ...i.durability, current: i.durability.max } }
           : i,
