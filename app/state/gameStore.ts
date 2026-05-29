@@ -531,9 +531,19 @@ function checkLowHpWarning(
   const newBelow = newHp < threshold;
   const wasWarned = get().lowHpWarned;
   if (newBelow && !prevBelow && !wasWarned) {
+    // OTA-184 — low-HP warning line rewritten. "Nearly out of body"
+    // read as a translation glitch to the playtester. New line is
+    // plainer + actionable: "you're badly injured, take some time
+    // to heal." Same skipDedup + same one-shot lowHpWarned gate.
+    // The Arbiter also occasionally drops the player's first name
+    // here (~1/3 of warnings) so the personal moment lands harder.
+    const lowHpAddr = arbiterAddress(get().player, '');
+    const lowHpOpener = lowHpAddr
+      ? `${lowHpAddr}, you're badly injured.`
+      : `You're badly injured.`;
     get().appendLog(
       'arbiter',
-      `The Arbiter holds your gaze. "You are nearly out of body. Eat what you have. Open the first-aid kit. The Outskirts do not return what they take."`,
+      `The Arbiter holds your gaze. "${lowHpOpener} Take a moment — eat what you have, open the first-aid kit, or rest somewhere safe. The Outskirts do not return what they take."`,
       { skipDedup: true },
     );
     set({ lowHpWarned: true });
@@ -915,6 +925,30 @@ function spendStamina(player: PlayerCharacter, amount: number): PlayerCharacter 
 // rest specifically) means hunger advances regardless of which time-
 // advancing path the player took — rest, travel, combat, climb, all
 // route through advanceTime eventually.
+
+// OTA-184 — Arbiter address helper. Returns the player's first name
+// ~1/3 of the time when the Arbiter is delivering a personal beat,
+// or the generic fallback the other 2/3. Used to inject mild
+// immersion without overdoing it ("Welcome back, Verbal" once in a
+// while, "Welcome back, friend" most of the time). Player ask: "can
+// he use our name every now and then to bring on more emersion."
+//
+// Deterministic only at the random-roll level — we call Math.random
+// at emit time so the same line varies across hits. If a future
+// playtest wants the address to be consistent within a session,
+// switch to a hash of (player.name + session-start-ts).
+function arbiterAddress(player: PlayerCharacter | null | undefined, fallback: string): string {
+  if (!player?.name) return fallback;
+  if (Math.random() < 0.34) {
+    // Use the first whitespace-separated token so a long custom
+    // name ("Verbal of the Tartarian Giants") doesn't read awkward
+    // in a one-line address. Players who type a single name see it
+    // verbatim.
+    return player.name.split(/\s+/)[0]!;
+  }
+  return fallback;
+}
+
 function advanceTime(player: PlayerCharacter, hours: number): PlayerCharacter {
   const oldHours = player.hoursElapsed ?? 0;
   const newHours = oldHours + hours;
@@ -1934,9 +1968,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // resets on JS reload (cold start gets a fresh hello).
       const now = Date.now();
       if (!lastWelcomeBackAt || now - lastWelcomeBackAt > WELCOME_BACK_MIN_MS) {
+        // OTA-184 — ~1/3 of welcomes use the player's name instead
+        // of "friend" so the Arbiter occasionally sounds personal.
+        const addr = arbiterAddress(get().player, 'friend');
         get().appendLog(
           'arbiter',
-          `The Arbiter inclines their head. "Welcome back, friend."`,
+          `The Arbiter inclines their head. "Welcome back, ${addr}."`,
           { skipDedup: true },
         );
         lastWelcomeBackAt = now;

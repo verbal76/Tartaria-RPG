@@ -5092,4 +5092,75 @@
 // (investigateCount per-noun
 // scanner check + biome-aware
 // pinned-chip count).
-export const OTA_BUILD_ID = '2026-05-29-183';
+//
+// 2026-05-29 OTA-184 — 3-piece
+// flavor wave: feed-dog button
+// uses the dog's name + low-HP
+// warning rewritten + Arbiter
+// occasionally addresses the
+// player by name.
+//
+//   (1) Inventory consumable
+//       option label was "Feed
+//       to dog" — generic. Now
+//       reads "Feed Rocky" (or
+//       whatever the player
+//       named their companion).
+//       Player: "let's use the
+//       dogs name instead of
+//       just dog."
+//
+//   (2) Low-HP Arbiter warning
+//       was "You are nearly
+//       out of body. Eat what
+//       you have. Open the
+//       first-aid kit." Player:
+//       "I was close to dying
+//       in combat it said I was
+//       almost out of body? whom
+//       says that, how about
+//       your badly injured, take
+//       some time to heal."
+//       Rewritten plainer and
+//       more actionable:
+//       "You're badly injured.
+//       Take a moment — eat
+//       what you have, open the
+//       first-aid kit, or rest
+//       somewhere safe."
+//
+//   (3) New arbiterAddress()
+//       helper returns the
+//       player's first name ~1/3
+//       of the time when a beat
+//       calls for a personal
+//       address, otherwise the
+//       generic fallback. Player:
+//       "can he use our name
+//       every now and then to
+//       bring on more emersion."
+//       Wired into the OTA-046
+//       "Welcome back" session-
+//       resume line ("Welcome
+//       back, Verbal." 1/3, "...
+//       friend." 2/3) AND the
+//       low-HP warning above
+//       (prefixes the line with
+//       "Verbal, " 1/3 of the
+//       time, no prefix
+//       otherwise). Uses the
+//       first whitespace-separated
+//       token of player.name so
+//       a long custom name
+//       ("Verbal of the Tartarian
+//       Giants") doesn't read
+//       awkward.
+//
+// TS clean.
+//
+// Files: app/screens/Inventory
+// Screen.tsx (Feed button label),
+// app/state/gameStore.ts (low-HP
+// line + arbiterAddress helper +
+// welcome-back use + low-HP use).
+export const OTA_BUILD_ID = '2026-05-29-184';

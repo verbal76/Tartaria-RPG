@@ -289,8 +289,13 @@ export function InventoryScreen() {
       });
     }
     if (dogActive && isConsumable) {
+      // OTA-184 — use the dog's actual name in the button label
+      // ("Feed Rocky") instead of the generic "Feed to dog" so the
+      // inventory affordance reads like every other personal beat.
+      // Player ask: "let's use the dogs name instead of just dog."
+      const dogName = player!.dog!.name;
       buttons.push({
-        label: 'Feed to dog',
+        label: `Feed ${dogName}`,
         onPress: () => {
           useGameStore.getState().submitPlayerAction(`feed dog ${pending.item.name}`);
           closeModal();
