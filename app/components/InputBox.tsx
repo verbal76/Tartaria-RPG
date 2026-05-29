@@ -319,107 +319,123 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           )}
         </TutorialTarget>
       )}
-      <TutorialTarget area="quick-row" style={styles.quickRow}>
+      <TutorialTarget area="quick-row" style={inCombat ? styles.quickRowColumn : styles.quickRow}>
         {inCombat ? (
           <>
-            {/* OTA 207 — color-code weapon buttons by reach.
-                GREEN  = can hit at the current combat range
-                YELLOW = equipped but needs an advance to connect
-                BLUE   = defensive alternative (dodge / flee)
-                Bare-hand attacks (punch/kick) are always arm-only,
-                so they tone exactly with the current range. Weapon
-                buttons use weaponTone() which mirrors the same
-                reach rules as gameStore.playerWeaponReach. */}
-            <QuickBtn
-              label="punch"
-              onPress={() => onSubmit('punch')}
-              tone={weaponTone(null, range, playerInt)}
-            />
-            <QuickBtn
-              label="kick"
-              onPress={() => onSubmit('kick')}
-              tone={weaponTone(null, range, playerInt)}
-            />
-            {equippedMain ? (
+            {/* OTA-172 — combat row split into 3 lines per playtest
+                ask: "approach, step back, and inventory should be on
+                the third line, that keeps room for the dog and golem
+                on the second row, and keep dodge and flee next to
+                them on the second row."
+                Row 1: punch / kick / [main weapon] / [off weapon]
+                Row 2: [golem] / [dog] / dodge / flee
+                Row 3: inventory / approach / [step back] */}
+            <View style={styles.quickRowLine}>
+              {/* OTA 207 — color-code weapon buttons by reach.
+                  GREEN  = can hit at the current combat range
+                  YELLOW = equipped but needs an advance to connect
+                  BLUE   = defensive alternative (dodge / flee)
+                  Bare-hand attacks (punch/kick) are always arm-only,
+                  so they tone exactly with the current range. Weapon
+                  buttons use weaponTone() which mirrors the same
+                  reach rules as gameStore.playerWeaponReach. */}
               <QuickBtn
-                label={shortWeaponLabel(equippedMain).toLowerCase()}
-                onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)}
-                tone={weaponTone(equippedMain, range, playerInt)}
+                label="punch"
+                onPress={() => onSubmit('punch')}
+                tone={weaponTone(null, range, playerInt)}
               />
-            ) : null}
-            {equippedOff ? (
               <QuickBtn
-                label={`off: ${shortWeaponLabel(equippedOff).toLowerCase()}`}
-                onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)}
-                tone={weaponTone(equippedOff, range, playerInt)}
+                label="kick"
+                onPress={() => onSubmit('kick')}
+                tone={weaponTone(null, range, playerInt)}
               />
-            ) : null}
-            {/* Inventory access stays prominent in combat — playtest report
-                flagged "pack" at the end of the row as easy to miss. Sits
-                right after the weapons so swap/quaff flows are reachable
-                without scanning past dodge/block/advance. */}
-            <QuickBtn label="inventory" onPress={onOpenInventory} />
-            {/* Approach in combat lets the player pick a SPECIFIC enemy
-                out of a multi-target encounter ("approach the human"
-                while the dragon and hellhound watch) plus optionally
-                slip in via stealth instead of closing the gap in the
-                open.
-                2026-05-25 [POLISH-1] — tone='needs-approach' (green
-                glow) when range is 'far' so the player sees at a
-                glance they need to close before attacking. */}
-            <QuickBtn
-              label="approach"
-              onPress={onOpenApproach}
-              tone={range === 'far' ? 'needs-approach' : undefined}
-            />
-            {/* 2026-05-25 [MECHANIC-1b] — golem sidekick command.
-                Only renders in combat when a golem is summoned and
-                still alive. Tap fires 'use golem' which routes to
-                handleGolemCommand and strikes the primary enemy. */}
-            {golem && golem.hp > 0 ? (
+              {equippedMain ? (
+                <QuickBtn
+                  label={shortWeaponLabel(equippedMain).toLowerCase()}
+                  onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)}
+                  tone={weaponTone(equippedMain, range, playerInt)}
+                />
+              ) : null}
+              {equippedOff ? (
+                <QuickBtn
+                  label={`off: ${shortWeaponLabel(equippedOff).toLowerCase()}`}
+                  onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)}
+                  tone={weaponTone(equippedOff, range, playerInt)}
+                />
+              ) : null}
+            </View>
+
+            <View style={styles.quickRowLine}>
+              {/* 2026-05-25 [MECHANIC-1b] — golem sidekick command.
+                  Only renders in combat when a golem is summoned and
+                  still alive. Tap fires 'use golem' which routes to
+                  handleGolemCommand and strikes the primary enemy. */}
+              {golem && golem.hp > 0 ? (
+                <QuickBtn
+                  label={`golem (${golem.hp}/${golem.hpMax})`}
+                  onPress={() => onSubmit('use golem')}
+                  tone="ready"
+                />
+              ) : null}
+              {/* OTA-144 — Dog combat button. Mirrors the golem button
+                  pattern. Tap toggles a small picker (BITE / DISTRACT)
+                  below the quick row. The OTA-121 spec wired the
+                  parser intents + dispatch + resolver but never landed
+                  the UI surface; playtester (Rocky's owner) reported
+                  hunting for it through 3 combat rounds. */}
+              {dog && dog.hp > 0 ? (
+                <QuickBtn
+                  label={`${dog.name.toLowerCase()} (${dog.hp}/${dog.hpMax})`}
+                  onPress={() => setDogPickerOpen((v) => !v)}
+                  tone="ready"
+                />
+              ) : null}
+              {/* `block` quick-action removed 2026-05-21 — folded into
+                  dodge. The dodge button now triggers the active-parry
+                  mechanic: opposed d20+DEX roll on the next incoming
+                  attack, full negation + 2× counter-strike on success,
+                  2 durability wear either way. */}
+              <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} />
+              {/* Always-available escape. Iron Fog can lock advance/step
+                  back, so the player needs a visible flee button or they'll
+                  think the game is stuck. Routes to escape intent → skill
+                  check → enemies cleared on success. */}
+              <QuickBtn label="flee" defensive onPress={() => onSubmit('flee')} />
+            </View>
+
+            <View style={styles.quickRowLine}>
+              {/* Inventory access stays prominent in combat — playtest report
+                  flagged "pack" at the end of the row as easy to miss. Now
+                  on the third row, alongside approach + step back, so the
+                  weapon row + companion row stay uncluttered. */}
+              <QuickBtn label="inventory" onPress={onOpenInventory} />
+              {/* Approach in combat lets the player pick a SPECIFIC enemy
+                  out of a multi-target encounter ("approach the human"
+                  while the dragon and hellhound watch) plus optionally
+                  slip in via stealth instead of closing the gap in the
+                  open.
+                  2026-05-25 [POLISH-1] — tone='needs-approach' (green
+                  glow) when range is 'far' so the player sees at a
+                  glance they need to close before attacking. */}
               <QuickBtn
-                label={`golem (${golem.hp}/${golem.hpMax})`}
-                onPress={() => onSubmit('use golem')}
-                tone="ready"
+                label="approach"
+                onPress={onOpenApproach}
+                tone={range === 'far' ? 'needs-approach' : undefined}
               />
-            ) : null}
-            {/* OTA-144 — Dog combat button. Mirrors the golem button
-                pattern. Tap toggles a small picker (BITE / DISTRACT)
-                below the quick row. The OTA-121 spec wired the
-                parser intents + dispatch + resolver but never landed
-                the UI surface; playtester (Rocky's owner) reported
-                hunting for it through 3 combat rounds. */}
-            {dog && dog.hp > 0 ? (
-              <QuickBtn
-                label={`${dog.name.toLowerCase()} (${dog.hp}/${dog.hpMax})`}
-                onPress={() => setDogPickerOpen((v) => !v)}
-                tone="ready"
-              />
-            ) : null}
-            {/* `block` quick-action removed 2026-05-21 — folded into
-                dodge. The dodge button now triggers the active-parry
-                mechanic: opposed d20+DEX roll on the next incoming
-                attack, full negation + 2× counter-strike on success,
-                2 durability wear either way. */}
-            <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} />
-            {/* v2.4.1 (OTA 034) — `advance` quick-button removed.
-                Player noted approach already covers the close-range
-                use case AND adds the stealth option (DEX roll →
-                +5 next attack if you slip in unseen). The approach
-                button above is the unified close-range entry for
-                both exploration and combat.
-                Parser synonyms (`advance`, `lunge`, `forward`,
-                `closein`, `charge in`, `near`) still parse to the
-                same intent so typed-input compatibility is intact.
-                Removing only the HUD button. */}
-            {range && range !== 'far' && (
-              <QuickBtn label="step back" onPress={() => onSubmit('step back')} />
-            )}
-            {/* Always-available escape. Iron Fog can lock advance/step
-                back, so the player needs a visible flee button or they'll
-                think the game is stuck. Routes to escape intent → skill
-                check → enemies cleared on success. */}
-            <QuickBtn label="flee" defensive onPress={() => onSubmit('flee')} />
+              {/* v2.4.1 (OTA 034) — `advance` quick-button removed.
+                  Player noted approach already covers the close-range
+                  use case AND adds the stealth option (DEX roll →
+                  +5 next attack if you slip in unseen). The approach
+                  button above is the unified close-range entry for
+                  both exploration and combat.
+                  Parser synonyms (`advance`, `lunge`, `forward`,
+                  `closein`, `charge in`, `near`) still parse to the
+                  same intent so typed-input compatibility is intact.
+                  Removing only the HUD button. */}
+              {range && range !== 'far' && (
+                <QuickBtn label="step back" onPress={() => onSubmit('step back')} />
+              )}
+            </View>
           </>
         ) : (
           <>
@@ -470,13 +486,24 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               />
             ) : (
               <>
+                {/* OTA-172 — climb up + climb down get the blue
+                    `defensive` tone when rendered. They only render
+                    when the player is elevated AND the action is
+                    usable (climb-up only shows mid-climb when more
+                    tiers remain; climb-down only shows when
+                    elevated), so the tone signals "this is the safe
+                    egress from being up high" — same blue cue the
+                    player already reads on dodge / flee. Player ask:
+                    "make the climb 1/3 type buttons blue and the
+                    climb down blue when they are able to be used." */}
                 {elevatedOn.tier < elevatedOn.totalTiers && (
                   <QuickBtn
                     label={`climb up (${elevatedOn.tier}/${elevatedOn.totalTiers})`}
                     onPress={onClimbUp}
+                    defensive
                   />
                 )}
-                <QuickBtn label="climb down" onPress={onClimbDown} />
+                <QuickBtn label="climb down" onPress={onClimbDown} defensive />
               </>
             )}
             <QuickBtn label="craft" onPress={onOpenCrafting} />
@@ -642,6 +669,11 @@ function TravelBtn({ label, onPress }: { label: string; onPress: () => void }) {
 const styles = StyleSheet.create({
   container: { gap: 6 },
   quickRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
+  // OTA-172 — combat-only stacked layout. The wrapper goes column,
+  // and each row inside uses quickRowLine. Peace mode keeps the
+  // single flat quickRow.
+  quickRowColumn: { flexDirection: 'column', gap: 6 },
+  quickRowLine: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
   // OTA-144 — dog action picker. Two big tap targets below the quick
   // row when the player taps the dog combat button. Sized to match
   // the QuickBtn visual register but more prominent (vertical-stack

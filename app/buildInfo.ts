@@ -4336,4 +4336,65 @@
 // Files: app/screens/MapScreen.tsx
 // (new placesView memo + TRAVEL
 // TO panel JSX + 11 styles).
-export const OTA_BUILD_ID = '2026-05-29-171';
+//
+// 2026-05-29 OTA-172 — combat quick-
+// row split into 3 lines + climb
+// up/down buttons go blue.
+//
+// Player asks bundled:
+//   (a) "when in combat the
+//       approach, step back, and
+//       inventory should be on the
+//       third line, that keeps room
+//       for the dog and golem on
+//       the second row, and keep
+//       dodge and flee next to them
+//       on the second row."
+//   (b) "let's make the climb 1/3
+//       type buttons blue and the
+//       climb down blue when they
+//       are able to be used."
+//
+// Combat row was a single
+// flex-wrap line — punch, kick,
+// weapons, inventory, approach,
+// golem, dog, dodge, step back,
+// flee all fighting for space.
+// Fix: wrap combat content in a
+// column container with three
+// flex-row lines inside:
+//   • Row 1: punch, kick, [main
+//     weapon], [off weapon]
+//   • Row 2: [golem], [dog],
+//     dodge, flee
+//   • Row 3: inventory, approach,
+//     [step back if not far]
+// Peace mode unchanged — keeps
+// the single flat quickRow.
+//
+// New styles: `quickRowColumn`
+// (combat wrapper, column) +
+// `quickRowLine` (each row inside,
+// mirrors quickRow's row+wrap+gap
+// shape).
+//
+// Climb buttons: when elevated,
+// the climb-up (tier/totalTiers)
+// button and climb-down button
+// both render only when usable
+// (climb-up requires tier <
+// totalTiers; climb-down requires
+// elevated). Both now carry the
+// `defensive` flag so they tint
+// blue — matches the blue cue
+// the player already reads on
+// dodge / flee for safe-egress
+// actions.
+//
+// TS clean.
+//
+// Files: app/components/InputBox
+// .tsx (combat row restructure +
+// climb-button defensive tone +
+// 2 new styles).
+export const OTA_BUILD_ID = '2026-05-29-172';
