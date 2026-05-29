@@ -5299,4 +5299,85 @@
 // narrativeGenerator.ts
 // (ARBITER_NOTED_LINES pool +
 // two template swaps).
-export const OTA_BUILD_ID = '2026-05-29-186';
+//
+// 2026-05-29 OTA-187 — 3-piece
+// flavor + balance pass.
+//
+//   (1) "Out of legs" / "Your
+//       legs will not" stamina-
+//       refusal lines rewritten
+//       to warmer fatigue reads.
+//       Player: "don't say your
+//       out of legs tell me I
+//       look exhausted and I
+//       should rest the night."
+//       continueTravel refusal:
+//       'The Arbiter studies
+//       you. "You look exhausted.
+//       Rest the night, eat what
+//       you have, and the road
+//       will be there in the
+//       morning."'
+//       case 'travel' refusal:
+//       'You take one step and
+//       stop. You look exhausted
+//       — the buried world will
+//       hold for one night. Type
+//       'rest' to recover (≈4h),
+//       then the road again.'
+//
+//   (2) Rest healing nerfed.
+//       Player: "rest gives back
+//       too much health, I can
+//       fully heal and restore
+//       stamina with almost no
+//       downside." Was 2d6 HP
+//       (2-12) + 1d6+2 stamina
+//       (3-8). Now 1d6 HP (1-6)
+//       + 1d4 stamina (1-4).
+//       Multiple rests needed
+//       for a full top-up;
+//       each rest still rolls
+//       an ambush + advances
+//       the clock 8h.
+//
+//   (3) Combat rate bumped.
+//       Player: "the game is a
+//       little shy on combat."
+//       Two knobs:
+//        • pickEnemyForLocation
+//          base chance 40 → 50
+//          (+10pp). Danger 0
+//          outskirts now 50%
+//          per scene arrival;
+//          danger 3 capitals
+//          74%; danger 5 deep
+//          zones 90%.
+//        • Wasteland encounter
+//          rate: auto-travel
+//          0.85 → 0.92; manual
+//          walking 0.70 → 0.82.
+//          With JSON weight
+//          distribution (~30%
+//          skirmish), per-step
+//          combat rate rises
+//          from ~21-25% to
+//          ~24-28%.
+//       Implicit secondary
+//       buff from the rest
+//       nerf: players need
+//       more rest cycles, each
+//       rest rolls an ambush,
+//       so resting itself adds
+//       combat density.
+//
+// TS clean.
+//
+// Files: app/state/gameStore.ts
+// (two stamina-refusal line
+// rewrites + rest heal nerf +
+// wasteland rollChance bump),
+// app/engine/encounter.ts
+// (pickEnemyForLocation base
+// bump).
+export const OTA_BUILD_ID = '2026-05-29-187';

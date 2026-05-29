@@ -47,7 +47,12 @@ export function pickHazardForLocation(location: Location, dangerBoost = 0): Haza
 }
 
 export function pickEnemyForLocation(location: Location): Enemy | null {
-  if (!chance(40 + location.danger * 8)) return null;
+  // OTA-187 — base scene-arrival enemy chance bumped from 40 to 50
+  // (10pp) per playtester: "the game is a little shy on combat."
+  // At danger 0 outskirts this lifts from 40% → 50% per scene
+  // arrival; danger 3 capitals from 64% → 74%; danger 5 deep zones
+  // already capped at 80% before, now 90%.
+  if (!chance(50 + location.danger * 8)) return null;
   const dangerCap: Rarity = location.danger >= 4 ? 'Legendary' : location.danger >= 3 ? 'Rare' : location.danger >= 2 ? 'Uncommon' : 'Common';
   const allowed = enemies.filter((e) => rarityRank(e.rarity) <= rarityRank(dangerCap));
   if (allowed.length === 0) return null;

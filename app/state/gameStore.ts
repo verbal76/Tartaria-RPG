@@ -6573,9 +6573,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // type `rest` to recover and the clock now keeps moving
           // through the stretch instead of stopping dead.
           set({ player: advanceTime(player, 0.25) });
+          // OTA-187 — companion to the setTravelCourse refusal
+          // rewrite. "Your legs will not" read as a body-part
+          // blocker the same way "out of legs" did. Warmer human
+          // read of fatigue now matches.
           get().appendLog(
             'world',
-            `You take one step and the buried world refuses. Your legs will not. Type 'rest' to recover (≈4h), then the road will hold you again.`,
+            `You take one step and stop. You look exhausted — the buried world will hold for one night. Type 'rest' to recover (≈4h), then the road again.`,
           );
           break;
         }
@@ -12657,9 +12661,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // rationale. Continuing a course while depleted still ticks
       // ~15 minutes of fumbling so the clock doesn't freeze.
       set((s) => (s.player ? { player: advanceTime(s.player, 0.25) } : s));
+      // OTA-187 — line rewritten from "Out of legs" (clinical) to a
+      // warmer human read of fatigue. Player ask: "don't say your
+      // out of legs tell me I look exhausted and I should rest the
+      // night."
       get().appendLog(
         'arbiter',
-        `The Arbiter steadies you. "Out of legs. Rest, eat, then pick the road back up."`,
+        `The Arbiter studies you. "You look exhausted. Rest the night, eat what you have, and the road will be there in the morning."`,
       );
       return;
     }
@@ -13321,8 +13329,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const { encounterRateMultiplier } = require('../engine/timeOfDay');
       const playerForEnc = get().player;
       const isAutoTravel = !!playerForEnc?.travelTarget;
+      // OTA-187 — wasteland encounter rate bumped (auto-travel
+      // 0.85→0.92, walking 0.70→0.82) per playtester: "the game
+      // is a little shy on combat." Threshold unchanged (1 step
+      // for auto-travel, 2 for manual). Net effect with the JSON
+      // weight distribution (~30% skirmish): combat per step rises
+      // from ~21-25% to ~24-28%.
       const baseThreshold = isAutoTravel ? 1 : 2;
-      const baseRollChance = isAutoTravel ? 0.85 : 0.70;
+      const baseRollChance = isAutoTravel ? 0.92 : 0.82;
       const timeMult = encounterRateMultiplier(playerForEnc?.hoursElapsed);
       const effectiveRollChance = Math.min(0.99, baseRollChance * timeMult);
       // 2026-05-25 OTA-045 — JIT-temptation predicate. Depleted on
@@ -14613,8 +14627,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       void get().persist();
       return;
     }
-    const heal = Math.min(hpRoom, rollDie(6) + rollDie(6));
-    const stamGain = Math.min(stamRoom, rollDie(6) + 2);
+    // OTA-187 — rest healing nerfed. Was 2d6 HP (2-12) + 1d6+2
+    // stamina (3-8) per rest, so a single sleep restored ~30-40%
+    // of mid-game HP and most of the stamina bar. Playtester:
+    // "rest gives back too much health, I can fully heal and
+    // restore stamina with almost no downside." Now 1d6 HP (1-6)
+    // + 1d4 stamina (1-4) — multiple rests needed for a full
+    // top-up, and each rest still rolls an ambush + advances
+    // the clock 8 hours, so the recovery has a real cost.
+    const heal = Math.min(hpRoom, rollDie(6));
+    const stamGain = Math.min(stamRoom, rollDie(4));
     const prevHpRest = player.hp;
     const hpMaxRest = player.hpMax;
     // Apply heal + stamGain first, then weather damage (which is capped
