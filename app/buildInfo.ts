@@ -7346,4 +7346,86 @@
 // app/engine/itemWeight.ts
 // (1d10+2 override in both
 // roll fns).
-export const OTA_BUILD_ID = '2026-05-29-209';
+// 2026-05-29-210 — Disease
+// Sample becomes a throwable
+// infection bomb. Player ask:
+//   "make the disease sample
+//   a throw able weapon that
+//   hits for small damage but
+//   adds corruption effect or
+//   something to the enemy
+//   for 10 turns and does a
+//   little damage every turn"
+//
+// Changes:
+//   - materials.json: 'throwable'
+//     tag + extended description
+//     about infection / 10 round
+//     DoT.
+//   - itemWeight.ts: '1d3'
+//     override for Disease
+//     Sample in both
+//     rollThrowDamage and
+//     throwDamageNotation.
+//   - CurrentScene gains
+//     enemyStatuses array
+//     (parallel to enemyHps),
+//     each entry holding the
+//     enemy's active status
+//     effects. Initialized
+//     lazy — missing entries
+//     treated as empty.
+//   - On a Disease Sample hit
+//     in the attack handler's
+//     OTA-208 throwable block,
+//     a { kind: 'infected',
+//     turnsRemaining: 10,
+//     dmgPerTurn: 1,
+//     sourceName: 'Disease
+//     Sample' } status is
+//     appended to enemyStatuses
+//     [activeEnemyIdx].
+//   - At the START of every
+//     player attack round, the
+//     tickEnemyStatuses block
+//     iterates each enemy's
+//     status list, applies the
+//     DoT to enemyHps, narrates
+//     "X convulses — infection
+//     bleeds 1. (Y/Z HP, N
+//     rounds left)", decrements
+//     turnsRemaining, and
+//     removes expired statuses
+//     with a "fever breaks"
+//     line.
+//
+// DoT kills are deliberately
+// LOW-key — they don't
+// trigger resolveEnemyDefeat
+// here; the next swing's
+// natural damage path picks
+// up the dead enemy. Keeps
+// the scene state simple and
+// the kill logging consistent.
+//
+// Tests: +6 in
+// diseaseSampleInfection
+// (throwable tag presence,
+// description language,
+// throwDamageNotation '1d3',
+// rollThrowDamage range,
+// validSlotsForItem routes
+// to main/off via the OTA-208
+// throwable path). TS clean
+// app-side.
+//
+// Files: app/data/items/
+// materials.json (tag +
+// description), app/engine/
+// itemWeight.ts (1d3 damage
+// override), app/state/
+// gameStore.ts (enemyStatuses
+// scene field + infection
+// apply on hit + tick block
+// at start of attack case).
+export const OTA_BUILD_ID = '2026-05-29-210';

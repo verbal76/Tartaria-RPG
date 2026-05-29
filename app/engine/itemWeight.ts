@@ -58,6 +58,9 @@ export function rollThrowDamage(item: InventoryItem | null): number {
   }
   // OTA-209 — Sentinel Core Plate 1d10+2 (matches throwDamageNotation).
   if (lower === 'sentinel core plate') return rollDie(10) + 2;
+  // OTA-210 — Disease Sample 1d3 + infection DoT (DoT applied in
+  // the attack handler post-hit).
+  if (lower === 'disease sample') return rollDie(3);
   const w = itemWeight(item);
   switch (w) {
     case 1: return 1;
@@ -82,6 +85,12 @@ export function throwDamageNotation(item: InventoryItem | null): string {
   // enough to throw" — give it a meaningful 1d10+2 so it feels worth
   // sacrificing instead of selling.
   if (lower === 'sentinel core plate') return '1d10+2';
+  // OTA-210 — Disease Sample is a low-impact throw (1d3) that lands
+  // an infection DoT on hit. The damage looks tiny but the 10-round
+  // DoT is the real cost to the target. Status is applied in the
+  // attack handler when the equipped throwable is named 'Disease
+  // Sample'.
+  if (lower === 'disease sample') return '1d3';
   const w = itemWeight(item);
   switch (w) {
     case 1: return '1';

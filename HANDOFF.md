@@ -245,6 +245,17 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Disease Sample becomes a throwable infection bomb (10-round DoT)
+
+- **OTA-210 (2026-05-29) · Player ask: *"make the disease sample a throw able weapon that hits for small damage but adds corruption effect or something to the enemy for 10 turns and does a little damage every turn."***
+  - **What:** Disease Sample was alchemy-flavored inventory dressing — 'scrap, drop' actions only. Now it's a throwable with low impact damage (1d3) and a 10-round 1HP/turn infection DoT, fitting the catalog description ("Alchemists pay for it; nobody else asks what it's for").
+  - **Fix (catalog):** Added `throwable` tag to Disease Sample in `materials.json` + extended description with the infection / 10-round language. OTA-208's throwable equip path picks it up automatically (validSlotsForItem routes to main/off via the tag).
+  - **Fix (damage):** New `'1d3'` override for Disease Sample in both `rollThrowDamage` and `throwDamageNotation` in `itemWeight.ts`.
+  - **Fix (status):** `CurrentScene` gains `enemyStatuses: Array<Array<{ kind: 'infected', turnsRemaining, dmgPerTurn, sourceName }>>` parallel to `enemyHps` / `enemies`. On a Disease Sample throw-hit in the OTA-208 throwable consume block, a `{ kind: 'infected', turnsRemaining: 10, dmgPerTurn: 1, sourceName: 'Disease Sample' }` status is appended to `enemyStatuses[activeEnemyIdx]`.
+  - **Fix (tick):** New `tickEnemyStatuses` block at the START of every player attack round iterates each enemy's status list, applies the DoT to `enemyHps`, narrates *"X convulses — infection bleeds 1. (Y/Z HP, N rounds left)"*, decrements `turnsRemaining`, and removes expired statuses with a *"fever breaks"* line. DoT kills are deliberately low-key — they don't trigger `resolveEnemyDefeat` here; the next swing's natural damage path picks up the dead enemy.
+  - **Verification:** +6 tests in `diseaseSampleInfection`. `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/data/items/materials.json` (tag + description), `app/engine/itemWeight.ts` (1d3 damage override), `app/state/gameStore.ts` (enemyStatuses scene field + infection apply on hit + tick block at start of attack case).
+
 #### Sentinel Core Plate becomes throwable — the one catalog gap surfaced by OTA-206 snapshot analysis
 
 - **OTA-209 (2026-05-29) · Hand-authored fix for the only catalog row in the playtester's pack whose description implied an action the row didn't carry.**

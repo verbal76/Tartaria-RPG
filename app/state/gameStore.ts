@@ -335,6 +335,16 @@ interface CurrentScene {
    *  name. Cleared when travel ends or the player officially
    *  enters a new named location. */
   transitArea?: string | null;
+  /** OTA-210 — per-enemy status effects (infected, etc.). Parallel
+   *  to enemyHps and enemies arrays. Each enemy carries its own
+   *  status list; ticks each combat round. Empty array when no
+   *  status is active. Initialized empty by beginScene. */
+  enemyStatuses?: Array<Array<{
+    kind: 'infected';
+    turnsRemaining: number;
+    dmgPerTurn: number;
+    sourceName: string;
+  }>>;
   /** Whether each enemy in `enemies` has already used its
    *  ambush_strike trait this scene. Parallel to enemyHps. Trait
    *  fires only on the first counter; the +2 bonus is consumed and
@@ -4495,6 +4505,52 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     switch (parsed.intent) {
       case 'attack': {
+        // OTA-210 — tick enemy statuses at the START of each combat
+        // round. Disease Sample infection deals 1 HP/turn to its
+        // host for 10 turns; without this tick the status would
+        // never resolve. Decrements turnsRemaining + clears empty
+        // entries. Kills via DoT do NOT trigger resolveEnemyDefeat
+        // here (that fires through the natural damage path later
+        // when the player's attack also lands); a DoT-killed enemy
+        // is left at 0 HP and the next attack handler skips them.
+        {
+          const sceneNow = get().currentScene;
+          if (sceneNow && sceneNow.enemyStatuses) {
+            const newHps = [...sceneNow.enemyHps];
+            const newStatuses = sceneNow.enemyStatuses.map((arr) => [...arr]);
+            for (let i = 0; i < sceneNow.enemies.length; i++) {
+              const hp = newHps[i];
+              if (hp === undefined || hp <= 0) continue;
+              const list = newStatuses[i] ?? [];
+              const remaining: typeof list = [];
+              for (const st of list) {
+                if (st.kind === 'infected' && st.turnsRemaining > 0) {
+                  const dmg = st.dmgPerTurn;
+                  const updatedHp = Math.max(0, (newHps[i] ?? 0) - dmg);
+                  newHps[i] = updatedHp;
+                  get().appendLog(
+                    'combat',
+                    `${sceneNow.enemies[i]!.name} convulses — infection bleeds ${dmg}. (${updatedHp}/${sceneNow.enemies[i]!.hp} HP, ${st.turnsRemaining - 1} rounds left)`,
+                  );
+                  if (st.turnsRemaining - 1 > 0) {
+                    remaining.push({ ...st, turnsRemaining: st.turnsRemaining - 1 });
+                  } else {
+                    get().appendLog(
+                      'combat',
+                      `${sceneNow.enemies[i]!.name}'s fever breaks — the ${st.sourceName} has run its course.`,
+                    );
+                  }
+                } else {
+                  remaining.push(st);
+                }
+              }
+              newStatuses[i] = remaining;
+            }
+            set((s) => s.currentScene
+              ? { currentScene: { ...s.currentScene, enemyHps: newHps, enemyStatuses: newStatuses } }
+              : s);
+          }
+        }
         const targetEnemy = activeEnemy(currentScene);
         if (targetEnemy) {
           // OTA 205 — Phase 2 args migration. If the player named an
@@ -10429,6 +10485,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
               get().appendLog(
                 'world',
                 `The ${equippedItem.name} sings through the air — spent. Your hand is empty.`,
+              );
+            }
+            // OTA-210 — Disease Sample on-hit infection. Applies a
+            // 10-round DoT (1 HP/turn) to the enemy that just took
+            // the throw damage. Status lives on
+            // scene.enemyStatuses[activeEnemyIdx]; tickEnemyStatuses
+            // (called at the top of the next player attack) applies
+            // the DoT and decrements turns.
+            if (equippedItem.name.toLowerCase() === 'disease sample') {
+              const idx = currentScene.activeEnemyIdx;
+              set((s) => {
+                if (!s.currentScene) return s;
+                const next = (s.currentScene.enemyStatuses ?? []).map((arr) => [...arr]);
+                while (next.length <= idx) next.push([]);
+                next[idx] = [
+                  ...(next[idx] ?? []),
+                  { kind: 'infected' as const, turnsRemaining: 10, dmgPerTurn: 1, sourceName: equippedItem.name },
+                ];
+                return { currentScene: { ...s.currentScene, enemyStatuses: next } };
+              });
+              get().appendLog(
+                'combat',
+                `The vial bursts. Grey-pink fluid spatters across ${enemy.name}. The infection takes root — 10 rounds of decay.`,
               );
             }
           } else {
