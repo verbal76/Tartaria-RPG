@@ -245,6 +245,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Aetheric Torch refund + frustration-vent meta-comment guard (two OTA-209 log bugs)
+
+- **OTA-212 (2026-05-29) · Two real bugs from the OTA-209 playtest log.**
+  - **What (torch):** Player burned two Aetheric Torch charges in a row to *"no resonance to surface"* — the room had no hidden hooks but the torch was consumed anyway. The torch's catalog promise is hook detection; consuming a charge for a no-op wastes the player's stock.
+  - **What (meta-guard):** *"sorry guys I tried to help you but the games being retarded"* (59 chars) fired the help intent and the noun resolver landed on "games retarded". The Arbiter responded with *"You shoulder in beside games retarded. Their next ability check or attack rolls at Advantage..."* The OTA-141 meta-comment guard required >60 chars.
+  - **Fix (torch):** The `use_relic` revealScene branch now checks `visible.length` BEFORE consuming. When no hooks resolve, the Arbiter narrates *"You hold the Aetheric Torch up. The room takes the light without resonance — nothing here to reveal. The torch goes back in your pack, unspent."* and `break` skips the inventory decrement.
+  - **Fix (meta-guard):** Restructured to two branches — (A) original >60-char polite-suggestion regex (unchanged) plus (B) NEW any-length frustration-vent path matching `\bsorry\s+(guys|y'all|everyone|folks|all|dudes)\b`, `\b(i tried|tried to)\s+.{0,30}\b(game|app|engine|parser|menu|button|inventory)\b`, `\bthis (game|app) (is|keeps|won't|doesn't)\b`, `\bthe game(s)? (being|is|was)\b`, and bare `\b(retarded|buggy|glitched)\b`. "broken" / "stupid" deliberately left OUT to avoid false positives on "broken stones" / in-character usage.
+  - **Verification:** +8 tests in `torchRefundAndMetaGuard` (vent-regex hits exact playtest input + 4 variants; doesn't fire on in-character text with game nouns; pre-existing OTA-141 regex still catches its inputs). `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/state/gameStore.ts` (revealScene no-op refund + two-branch meta-comment guard).
+
 #### Aether Dust food additive — typed `infuse` verb + stat picker + 5-min wall-clock buff
 
 - **OTA-211 (2026-05-29) · Player ask: *"make it a food additive that adds 3 to the perk of your choice for 5 real world minutes and have a small countdown timer somewhere for it."***

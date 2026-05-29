@@ -3738,15 +3738,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // ("ok ", "we should", "you should", "btw", etc.), don't route
     // through the verb parser — log the note so we can review it
     // later, surface a small Arbiter ack, and bail.
+    // OTA-212 — meta-comment guard now has TWO branches.
+    //
+    //   (A) The original ">60 char + polite suggestion" path catches
+    //       feature requests ("ok we should add a button for this...").
+    //       Tuned for length because suggestions tend to be long.
+    //   (B) New ANY-length "frustration vent" path catches apologies
+    //       and complaints aimed at the game itself ("sorry guys I
+    //       tried to help you but the games being retarded" — 59
+    //       chars, slipped past the (A) length gate, fired the help
+    //       intent). These shapes are specific enough that no in-
+    //       character text is likely to match.
+    const longSuggestion = trimmed.length > 60 &&
+      /^(ok\b|btw\b|fyi\b|hey\b|so\b|when (i|the)\b)|(\b(we|i) ((\w+)\s+)?(should|need|could|gotta|gonna|wish|want|really)\b|\byou should\b|\bi think\b|\bi'?d like\b|\bcan we\b|\bcould you\b|\bshould have\b|\bneeds? to be\b|\bit should (have|be|also)\b|\badd a\b|\bplease add\b)/i.test(trimmed);
+    const frustrationVent =
+      /\bsorry\s+(guys|y'?all|everyone|folks|all|dudes)\b/i.test(trimmed) ||
+      /\b(i\s+tried|tried\s+to)\s+.{0,30}\b(game|app|engine|parser|menu|button|inventory)\b/i.test(trimmed) ||
+      /\bthis\s+(game|app)\s+(is|keeps|won'?t|doesn'?t|wont|dont)\b/i.test(trimmed) ||
+      /\bthe\s+game'?s?\s+(being|is|was)\b/i.test(trimmed) ||
+      /\b(retarded|buggy|glitched)\b/i.test(trimmed);
     if (
       !_opts?.skipPreChecks &&
-      // Dropped from >100 to >60 chars — playtest log caught a 95-char
-      // feature request ("we need to add salvage as a button like
-      // search, it should also have a pop-up and pull on nouns.") that
-      // sailed past the old length gate. Also added "we need" /
-      // "could you" / "it should" / "add a" patterns to the regex.
-      trimmed.length > 60 &&
-      /^(ok\b|btw\b|fyi\b|hey\b|so\b|when (i|the)\b)|(\b(we|i) ((\w+)\s+)?(should|need|could|gotta|gonna|wish|want|really)\b|\byou should\b|\bi think\b|\bi'?d like\b|\bcan we\b|\bcould you\b|\bshould have\b|\bneeds? to be\b|\bit should (have|be|also)\b|\badd a\b|\bplease add\b)/i.test(trimmed)
+      (longSuggestion || frustrationVent)
     ) {
       if (!_opts?.silent) get().appendLog('player', trimmed, { meta: true });
       get().appendLog(
@@ -6291,17 +6304,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 }
               }
               if (fx.revealScene) {
-                // Surface up to three hidden hooks the player hasn't
-                // tripped yet — the use of the scanner / detector
-                // makes the room legible. We don't mutate scene
-                // state here (no per-tile "revealed" flag exists);
-                // a quick narration line is the effect.
+                // Surface up to three unresolved hooks the player
+                // hasn't tripped yet — the use of the scanner /
+                // detector makes the room legible.
+                //
+                // OTA-212 — when there's nothing to reveal, REFUND
+                // the charge. The torch description promises hook
+                // detection; consuming a charge to "surface no
+                // resonance" wastes the player's stock. Setting
+                // refundCharge=true skips the inventory decrement
+                // below and the world line narrates the no-op
+                // explicitly.
                 const hooks = currentScene.hooks ?? [];
                 const visible = hooks
                   .filter((h) => !h.resolved)
                   .slice(0, 3)
                   .map((h) => h.nouns[0] ?? h.id);
-                messages.push(visible.length > 0 ? `pings: ${visible.join(', ')}` : 'no resonance to surface');
+                if (visible.length > 0) {
+                  messages.push(`pings: ${visible.join(', ')}`);
+                } else {
+                  // Refund: arbiter line + skip the charge consume.
+                  get().appendLog(
+                    'arbiter',
+                    `You hold the ${used.name} up. The room takes the light without resonance — nothing here to reveal. The torch goes back in your pack, unspent.`,
+                  );
+                  break;
+                }
               }
               if (fx.extendLight) {
                 messages.push(`+${fx.extendLight}h light buff`);

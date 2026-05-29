@@ -7513,4 +7513,85 @@
 // AetherBuffBadge with 1s
 // tick), App.tsx (mount
 // modal).
-export const OTA_BUILD_ID = '2026-05-29-211';
+// 2026-05-29-212 — two
+// playtest-log bugs from the
+// OTA-209 session.
+//
+// (1) Aetheric Torch
+//     consumed a charge in
+//     rooms with no hidden
+//     hooks to reveal. Player
+//     burned two torches in a
+//     row to "no resonance to
+//     surface." The use_relic
+//     revealScene branch now
+//     CHECKS visible.length
+//     before consuming: when
+//     no hooks resolve, the
+//     arbiter narrates a
+//     refund line and the
+//     break skips the
+//     inventory decrement.
+//     Player keeps the
+//     torch.
+//
+// (2) "sorry guys I tried to
+//     help you but the games
+//     being retarded" (59
+//     chars) sailed past the
+//     OTA-141 meta-comment
+//     guard (it required > 60
+//     chars). The parser fired
+//     the help intent and the
+//     noun resolver landed on
+//     "games retarded". The
+//     guard now has TWO
+//     branches:
+//        (A) Original >60-char
+//            polite-suggestion
+//            path (unchanged).
+//        (B) NEW any-length
+//            frustration-vent
+//            path:
+//              - "sorry (guys|
+//                y'all|...)"
+//              - "(i tried|
+//                tried to)
+//                <0-30 chars>
+//                (game|app|
+//                engine|parser|
+//                menu|button|
+//                inventory)"
+//              - "this (game|
+//                app) (is|
+//                keeps|won't|
+//                doesn't)"
+//              - "the game(s)
+//                (being|is|
+//                was)"
+//              - bare
+//                "retarded|
+//                buggy|
+//                glitched"
+//     "broken" / "stupid"
+//     left OUT to avoid
+//     false positives on
+//     "broken stones" /
+//     in-character usage.
+//
+// Tests: +8 in
+// torchRefundAndMetaGuard
+// (vent-regex hits exact
+// playtest input + 4
+// variants; doesn't fire on
+// in-character text with
+// game nouns; pre-existing
+// OTA-141 regex still
+// catches its inputs). TS
+// clean app-side.
+//
+// Files: app/state/
+// gameStore.ts (revealScene
+// no-op refund + two-branch
+// meta-comment guard).
+export const OTA_BUILD_ID = '2026-05-29-212';
