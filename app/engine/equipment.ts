@@ -19,6 +19,14 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   if (findWeaponByName(item.name)) {
     return ['main', 'off']; // any weapon can go in either hand
   }
+  // OTA-208 — throwable tag = one-shot weapon. The Shaped Aetheric
+  // Shard and plain Aetheric Shard (per OTA-198/200) deal 2d20 on
+  // throw; treating them as ranged weapons lets the player equip,
+  // attack, and the engine knows to throw + consume. UX matches the
+  // player's mental model: "equip it, use it from combat, it's gone."
+  if ((item.tags ?? []).some((t) => /throwable/i.test(t))) {
+    return ['main', 'off'];
+  }
   // OTA 193 — exploration items with effect.kind='scanner' (Pulse
   // Scanner today, future Geiger-counter analogs tomorrow) are
   // off-hand equippable so they can sit alongside a one-handed

@@ -335,29 +335,13 @@ export function InventoryScreen() {
         tone: 'destructive',
       });
     }
-    // OTA-207 — THROW button for throwable items. Surfaces when the
-    // item has the 'throwable' tag AND the current scene has at
-    // least one live enemy to aim at. Submits `throw <item> at
-    // <enemy>` so the engine's throw verb resolves the target
-    // through the existing path (consume one quantity + roll dmg).
-    // Without the in-scene enemy guard, the engine would fall
-    // through to "throw what, where?" — a button that bounces is
-    // worse than no button.
-    {
-      const isThrowable = (pending.item.tags ?? []).some((t) => /throwable/i.test(t));
-      const liveScene = useGameStore.getState().currentScene;
-      const aliveEnemy = liveScene?.enemies.find((_, idx) => (liveScene.enemyHps[idx] ?? 0) > 0);
-      if (isThrowable && aliveEnemy && equippedInSlots.length === 0) {
-        buttons.push({
-          label: `Throw at ${aliveEnemy.name}`,
-          onPress: () => {
-            useGameStore.getState().submitPlayerAction(`throw ${pending.item.name} at ${aliveEnemy.name}`);
-            closeModal();
-          },
-          tone: 'destructive',
-        });
-      }
-    }
+    // OTA-208 — the OTA-207 inventory "Throw at X" button was the
+    // wrong abstraction. Throwables are now weapons (validSlotsForItem
+    // routes the 'throwable' tag to main/off slots), so the player
+    // equips them and attacks from the combat screen. The attack
+    // handler consumes one quantity + auto-unequips on the swing.
+    // No throw button in the inventory modal — the equip + attack
+    // flow IS the throw.
     // OTA-194 — RESERVE FOR FUSION. Heart-tap toggle, only on
     // inferred (catalog-absent) items. Filled heart = locked from
     // OTA-193's auto-substitute crafting drain; empty heart = free

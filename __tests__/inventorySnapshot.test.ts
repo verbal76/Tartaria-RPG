@@ -160,7 +160,7 @@ describe('OTA-202 — buildInventorySnapshot', () => {
     expect(acts).not.toMatch(/use/);
   });
 
-  it('OTA-207 — Shaped Aetheric Shard surfaces throw action when carried', () => {
+  it('OTA-208 — Shaped Aetheric Shard surfaces equip:main/equip:off (it IS a weapon now)', () => {
     const shard: InventoryItem = {
       id: 'shard',
       name: 'Shaped Aetheric Shard',
@@ -172,11 +172,14 @@ describe('OTA-202 — buildInventorySnapshot', () => {
     };
     const out = buildInventorySnapshot(mkPlayer({ inventory: [shard] }));
     const acts = out.match(/Shaped Aetheric Shard[^\n]*\n[^\n]*actions:\s*([^\n]+)/)?.[1] ?? '';
-    expect(acts).toMatch(/throw/);
+    expect(acts).toMatch(/equip:main/);
+    expect(acts).toMatch(/equip:off/);
     expect(acts).toMatch(/drop/);
+    // No standalone 'throw' label — the throw is the attack.
+    expect(acts).not.toMatch(/\bthrow\b/);
   });
 
-  it('OTA-207 — non-throwable items do NOT show throw action', () => {
+  it('OTA-208 — non-throwable items still do NOT show weapon-equip actions', () => {
     const cloth: InventoryItem = {
       id: 'cs',
       name: 'Cloth Scrap',
@@ -188,7 +191,7 @@ describe('OTA-202 — buildInventorySnapshot', () => {
     };
     const out = buildInventorySnapshot(mkPlayer({ inventory: [cloth] }));
     const acts = out.match(/Cloth Scrap[^\n]*\n[^\n]*actions:\s*([^\n]+)/)?.[1] ?? '';
-    expect(acts).not.toMatch(/throw/);
+    expect(acts).not.toMatch(/equip:/);
   });
 
   it('OTA-206 — Aetheric Vision Lens (gate effect) surfaces use action', () => {

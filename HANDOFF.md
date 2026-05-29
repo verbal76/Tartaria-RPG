@@ -245,6 +245,15 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Throwables are now equippable one-shot weapons (replaces OTA-207's inventory throw button)
+
+- **OTA-208 (2026-05-29) · Equip the shard, attack, it throws and self-destructs.**
+  - **What:** Player on OTA-207: *"would we really put throw in the inventory though? wouldn't I just equip it and then use it on the weapon screen? like if I equip my shaped etheric shard in my main hand and then I'm in combat and it's in my main hand cuz it's equipped and I use it. it should know that I'm throwing it and that it's going to hit somebody and it's going to be a one-time use and then that weapon's just gone."* The OTA-207 inventory "Throw at X" button was the wrong abstraction. The cleaner UX is: throwables are weapons; equip + attack IS the throw.
+  - **Fix:** `validSlotsForItem` in `equipment.ts` routes items with the 'throwable' tag to `['main', 'off']`. New `throwDamageNotation()` in `itemWeight.ts` returns the dice-string form (`'2d20'` for both Aetheric Shard names, weight-based otherwise). `getEquippedWeapon` in `combatRules.ts` scans inventory for a throwable matching the equipped slot before falling back to `findWeaponByName`, synthesizing a `CatalogWeapon` with `weaponKind:'ranged'`, `damageType:'aetheric'`, `stat:'dexterity'`, and the right damage dice. The attack handler's weapon-wear branch now detects throwables, consumes one quantity instead of dropping durability, and auto-clears the slot (`eq.main` / `eq.off` + `*Id` + legacy `weaponName`) when the stack reaches 0. Logs *"The X sings through the air — spent. Your hand is empty."*
+  - **OTA-207 revert:** The inventory modal's "Throw at <enemy>" button is removed. The snapshot's `throw` action label is dropped (replaced by the natural `equip:main` / `equip:off` actions).
+  - **Verification:** +12 tests in `throwableEquippedWeapon` (validSlotsForItem throwable routing, getEquippedWeapon synth, throwDamageNotation override). Snapshot tests updated to expect `equip:main`/`equip:off` on shards. 35-test sweep across throwable + snapshot + shard suites green; `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/engine/equipment.ts` (throwable → weapon slots), `app/engine/itemWeight.ts` (`throwDamageNotation`), `app/engine/combatRules.ts` (throwable synth in getEquippedWeapon), `app/state/gameStore.ts` (attack handler consume + unequip), `app/screens/InventoryScreen.tsx` (remove OTA-207 button), `app/diagnostics/inventorySnapshot.ts` (drop throw label).
+
 #### Sentinel Core Plate equippable bug + Shaped Aetheric Shard gets a Throw button
 
 - **OTA-207 (2026-05-29) · Two bugs surfaced by the OTA-206 inventory action snapshot.**

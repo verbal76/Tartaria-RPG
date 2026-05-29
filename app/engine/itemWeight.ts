@@ -66,6 +66,25 @@ export function rollThrowDamage(item: InventoryItem | null): number {
   }
 }
 
+/** OTA-208 — dice-notation form of the throw damage for an item.
+ *  Used by combat (getEquippedWeapon) when a throwable is equipped:
+ *  the synthesized CatalogWeapon's damageDice is read by the attack
+ *  roller. Mirrors the same name-override table that rollThrowDamage
+ *  uses, so the two paths stay aligned. */
+export function throwDamageNotation(item: InventoryItem | null): string {
+  if (!item) return '1';
+  const lower = (item.name ?? '').toLowerCase();
+  if (lower === 'shaped aetheric shard' || lower === 'aetheric shard') return '2d20';
+  const w = itemWeight(item);
+  switch (w) {
+    case 1: return '1';
+    case 2: return '1d3';
+    case 3: return '1d4';
+    case 4: return '1d6';
+    case 5: return '1d8+1';
+  }
+}
+
 export function weightLabel(w: ItemWeight): string {
   switch (w) {
     case 1: return 'feather-light';

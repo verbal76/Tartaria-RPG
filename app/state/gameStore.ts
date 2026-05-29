@@ -10386,7 +10386,54 @@ export const useGameStore = create<GameStore>((set, get) => ({
           ? (player.equipped?.off ?? player.equipped?.main ?? null)
           : (player.equipped?.main ?? player.equipped?.weaponName ?? player.equipped?.off ?? null);
         if (weaponInUse) {
-          set((s) => (s.player ? { player: wearEquippedItem(s.player, weaponInUse, get) } : s));
+          // OTA-208 — throwable equipped weapons consume one quantity
+          // instead of taking durability wear, and auto-unequip when
+          // the stack is empty. The synthetic CatalogWeapon synthesized
+          // in combatRules.getEquippedWeapon (with damageDice='2d20'
+          // for Aetheric Shards) handles the damage roll; this block
+          // handles the spent-it-now bookkeeping.
+          const equippedItem = player.inventory.find(
+            (i) => i.name.toLowerCase() === weaponInUse.toLowerCase(),
+          );
+          const isThrowable = (equippedItem?.tags ?? []).some((t) => /throwable/i.test(t));
+          if (isThrowable && equippedItem) {
+            set((s) => {
+              if (!s.player) return s;
+              const newQuantity = Math.max(0, equippedItem.quantity - 1);
+              const newInventory = s.player.inventory
+                .map((i) => i.id === equippedItem.id ? { ...i, quantity: newQuantity } : i)
+                .filter((i) => i.quantity > 0);
+              // Auto-unequip the slot if the stack ran out. We track
+              // both the name field AND the *Id field on the equipped
+              // record, mirroring how unequipSlot clears them.
+              const eq = { ...(s.player.equipped ?? {}) };
+              if (newQuantity === 0) {
+                if (usedOffHand) {
+                  delete eq.off;
+                  delete eq.offId;
+                } else {
+                  delete eq.main;
+                  delete eq.mainId;
+                  // Legacy weaponName field — clear it too if the
+                  // ran-out shard was the legacy main weapon.
+                  if (eq.weaponName?.toLowerCase() === weaponInUse.toLowerCase()) {
+                    delete eq.weaponName;
+                  }
+                }
+              }
+              return {
+                player: { ...s.player, inventory: newInventory, equipped: eq },
+              };
+            });
+            if (equippedItem.quantity - 1 === 0) {
+              get().appendLog(
+                'world',
+                `The ${equippedItem.name} sings through the air — spent. Your hand is empty.`,
+              );
+            }
+          } else {
+            set((s) => (s.player ? { player: wearEquippedItem(s.player, weaponInUse, get) } : s));
+          }
         }
       }
 

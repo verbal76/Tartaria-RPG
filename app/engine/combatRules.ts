@@ -211,6 +211,28 @@ export function getEquippedWeapon(
       description: it.description ?? '',
     };
   }
+  // OTA-208 — throwable inventory items synthesize a one-shot
+  // ranged weapon. Player can equip a Shaped Aetheric Shard /
+  // Aetheric Shard to main or off; the attack handler picks up
+  // the synthesized weapon with the right 2d20 damage. The
+  // consume-on-hit + auto-unequip is handled in gameStore's
+  // attack path (look for the 'throwable' tag branch).
+  for (const it of player.inventory) {
+    if (!(it.tags ?? []).some((t) => /throwable/i.test(t))) continue;
+    if (it.name.toLowerCase() !== name.toLowerCase()) continue;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { throwDamageNotation } = require('./itemWeight');
+    return {
+      name: it.name,
+      weaponKind: 'ranged',
+      damageType: 'aetheric' as CatalogWeapon['damageType'],
+      damageDice: throwDamageNotation(it) as string,
+      stat: 'dexterity',
+      rarity: it.rarity ?? 'Common',
+      tags: it.tags,
+      description: it.description ?? 'A one-shot throwable. One throw, then gone.',
+    };
+  }
   return findWeaponByName(name);
 }
 

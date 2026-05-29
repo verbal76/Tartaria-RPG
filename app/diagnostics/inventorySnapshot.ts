@@ -52,14 +52,11 @@ function actionsFor(item: InventoryItem, equippedSlots: ReadonlyMap<string, stri
   if (isConsumable || fx !== null || (anySlotFree && (offEligible || slots.length > 0))) {
     acts.push(isConsumable ? 'use(eat)' : offEligible ? 'use(off)' : 'use');
   }
-  // OTA-207 — THROW for throwable items. UI gates on a live enemy
-  // in the scene; the snapshot can't see scene state from this layer,
-  // so it surfaces 'throw' unconditionally on the throwable tag. This
-  // is honest: the throw verb is reachable by typing, even if the
-  // button only renders mid-combat.
-  if ((item.tags ?? []).some((t) => /throwable/i.test(t)) && equippedInSlots.length === 0) {
-    acts.push('throw');
-  }
+  // OTA-208 — throwable items are now weapons (equip:main / equip:off
+  // surfaced by validSlotsForItem). The throw IS the attack — no
+  // separate 'throw' action label needed. The OTA-207 'throw' was
+  // removed when we collapsed the throw verb into the normal equip +
+  // attack flow.
   // SCRAP — built items + non-equipped.
   if (canScrap(item) && equippedInSlots.length === 0) acts.push('scrap');
   // REPAIR — durability-tracked + not at max.

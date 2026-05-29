@@ -7162,4 +7162,118 @@
 // (throw action label), app/
 // screens/InventoryScreen.tsx
 // (Throw at <enemy> button).
-export const OTA_BUILD_ID = '2026-05-29-207';
+// 2026-05-29-208 — throwables
+// are now equippable one-shot
+// weapons. OTA-207's inventory
+// "Throw at X" button removed
+// (wrong abstraction). Player
+// ask:
+//   "would we really put throw
+//   in the inventory though?
+//   wouldn't I just equip it
+//   and then use it on the
+//   weapon screen? like if I
+//   equip my shaped etheric
+//   shard in my main hand and
+//   then I'm in combat and
+//   it's in my main hand cuz
+//   it's equipped and I use
+//   it. it should know that
+//   I'm throwing it and that
+//   it's going to hit somebody
+//   and it's going to be a
+//   one-time use and then that
+//   weapon's just gone"
+//
+// Cleaner UX: equip the
+// throwable, attack from
+// combat. The engine knows
+// to roll throw damage, eat
+// one quantity, and clear
+// the slot when the stack
+// runs out.
+//
+// Changes:
+//   - equipment.ts:
+//     validSlotsForItem
+//     routes items with the
+//     'throwable' tag to
+//     ['main', 'off'].
+//   - itemWeight.ts: new
+//     throwDamageNotation()
+//     returns the dice-string
+//     form of the throw damage
+//     ('2d20' for both shard
+//     names; weight-based
+//     otherwise).
+//   - combatRules.ts:
+//     getEquippedWeapon scans
+//     for a 'throwable' tag
+//     before falling back to
+//     findWeaponByName.
+//     Synthesizes a CatalogWeapon
+//     with weaponKind:'ranged',
+//     damageType:'aetheric',
+//     stat:'dexterity',
+//     damageDice from
+//     throwDamageNotation.
+//   - gameStore.ts attack
+//     wear branch: when the
+//     equipped weapon is
+//     throwable, consume one
+//     quantity instead of
+//     dropping durability.
+//     Auto-clears the slot
+//     (eq.main/off + *Id +
+//     legacy weaponName) when
+//     the stack reaches 0.
+//     Logs "The X sings
+//     through the air —
+//     spent. Your hand is
+//     empty."
+//   - InventoryScreen.tsx
+//     loses the OTA-207
+//     "Throw at <enemy>"
+//     button — equip + attack
+//     IS the throw.
+//   - inventorySnapshot.ts
+//     drops the 'throw'
+//     action label (replaced
+//     by the natural equip:
+//     main / equip:off
+//     actions that the new
+//     validSlotsForItem
+//     produces).
+//
+// Tests: +12 in
+// throwableEquippedWeapon
+// (validSlotsForItem
+// throwable routing,
+// getEquippedWeapon synth,
+// throwDamageNotation
+// override). Snapshot tests
+// updated to expect
+// equip:main/off on shards
+// instead of 'throw'.
+// 35-test sweep across the
+// throwable + snapshot +
+// shard suites green. TS
+// clean app-side.
+//
+// Files: app/engine/
+// equipment.ts (throwable
+// → weapon slots), app/
+// engine/itemWeight.ts
+// (throwDamageNotation),
+// app/engine/combatRules.ts
+// (throwable synth in
+// getEquippedWeapon), app/
+// state/gameStore.ts (attack
+// handler consume + unequip),
+// app/screens/
+// InventoryScreen.tsx
+// (remove OTA-207 button),
+// app/diagnostics/
+// inventorySnapshot.ts
+// (drop throw label).
+export const OTA_BUILD_ID = '2026-05-29-208';
