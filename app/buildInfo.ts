@@ -6447,4 +6447,74 @@
 // gameStore.ts (hasAetheric
 // Vision helper + 3 search
 // sites + encounter wire).
-export const OTA_BUILD_ID = '2026-05-29-198';
+// 2026-05-29-199 — small
+// rarity-colored diamond
+// prefix on inferred items
+// in the inventory so the
+// player can tell at a
+// glance which items came
+// from the engine's
+// inference / fusion paths.
+// Player ask:
+//   "Since we don't know
+//   what items were inferred
+//   and now they are useful
+//   let's put a small diamond
+//   before the name to
+//   signify it is, use the
+//   appropriate rarity color."
+//
+// InventoryScreen.tsx now
+// checks the OTA-194
+// isInferredItem(name)
+// predicate on each row. If
+// true, prefixes the item
+// name with "◆ " in the
+// rarity color:
+//   - Common: #c9a86a (warm
+//     tan, matches default
+//     UI accent)
+//   - Uncommon: #9ec96a (green)
+//   - Rare: #b88ce0 (purple)
+//   - Legendary: #e07a5f
+//     (orange — fused items
+//     from the OTA-195
+//     Crucible land here)
+//
+// Palette mirrors Branded
+// Modal's rarityColor so the
+// diamond + the rarity line
+// in the modal match. Kept
+// local to InventoryScreen
+// because the only other
+// consumer (the modal)
+// already has its own
+// version; sharing would be
+// premature.
+//
+// Catalog items get no
+// diamond — their identity
+// is fixed, so the marker
+// would be visual noise. The
+// player can read "diamond +
+// color = engine-named, this
+// is a fusion candidate / a
+// fused result" at a glance.
+//
+// Tests: no new tests (this
+// is rendering-only on a
+// predicate that's already
+// covered by OTA-194's
+// craftTagSubstitution
+// isInferredItem suite).
+// Regression sweep
+// (craftTagSubstitution +
+// itemFusion + aetheric
+// LensAndShard) stays green.
+// TS clean app-side.
+//
+// Files: app/screens/
+// InventoryScreen.tsx (row
+// diamond render + rarity
+// HexColor helper + style).
+export const OTA_BUILD_ID = '2026-05-29-199';

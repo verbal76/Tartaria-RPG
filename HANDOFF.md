@@ -245,6 +245,14 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Inferred-item diamond marker on inventory rows
+
+- **OTA-199 (2026-05-29) · A small rarity-colored ◆ before the name signals "this is engine-named" at a glance.**
+  - **What:** Player: *"Since we don't know what items were inferred and now they are useful let's put a small diamond before the name to signify it is, use the appropriate rarity color."* Inferred items can now be substituted for canonical materials (OTA-193), reserved for fusion (OTA-194), or fused into unique gear (OTA-195) — but until this OTA the only way to know which items WERE inferred was to open the modal and read the description.
+  - **Fix:** `InventoryScreen`'s `ItemRow` now checks the OTA-194 `isInferredItem(name)` predicate. When true, prefixes the item name with `◆ ` colored by the InventoryItem's rarity: Common `#c9a86a` (warm tan), Uncommon `#9ec96a` (green), Rare `#b88ce0` (purple), Legendary `#e07a5f` (orange — where OTA-195 fused items land). Palette mirrors `BrandedModal`'s `rarityColor` so the diamond on the row matches the rarity line the player sees inside the modal. Catalog items get no diamond — their identity is fixed and the marker would be visual noise.
+  - **Verification:** No new tests (rendering-only on a predicate already covered by OTA-194's `craftTagSubstitution.isInferredItem` suite). Regression sweep (`craftTagSubstitution`, `itemFusionEngine`, `aethericLensAndShard`) stays green. `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/screens/InventoryScreen.tsx` (row diamond render + local `rarityHexColor` helper + `rowInferredDiamond` style).
+
 #### Aetheric Vision Lens actually works + Shaped Aetheric Shard is now the 2d20 one-shot the rulebook said
 
 - **OTA-198 (2026-05-29) · Two off-spec items brought into spec.**

@@ -491,6 +491,21 @@ function ItemRow({
       <View style={[styles.rowStripe, { backgroundColor: color }]} />
       <View style={styles.rowBody}>
         <View style={styles.rowHead}>
+          {/* OTA-199 — inferred-item marker. Player asked: "Since we
+              don't know what items were inferred and now they are
+              useful let's put a small diamond before the name to
+              signify it is, use the appropriate rarity color." The
+              isInferredItem predicate (OTA-194) already distinguishes
+              catalog from synthesized; here the diamond is colored
+              by the InventoryItem's rarity so the player can read
+              both at a glance — the diamond signals "engine-named"
+              and its color signals the synthesis tier. Fused items
+              (OTA-195 uniqueStats) are catalog-absent by name AND
+              carry a Rare / Legendary rarity, so they get a purple
+              or orange diamond too. */}
+          {isInferredItem(item.name) && (
+            <Text style={[styles.rowInferredDiamond, { color: rarityHexColor(item.rarity) }]}>◆ </Text>
+          )}
           <Text style={styles.rowName} numberOfLines={1}>
             {item.name}
           </Text>
@@ -551,6 +566,20 @@ function ItemRow({
   );
 }
 
+// OTA-199 — rarity-to-hex palette mirrors BrandedModal.tsx so the
+// inferred-item diamond on the inventory row matches the color the
+// player sees in the item modal's rarity line. Kept local to this
+// file because the only other call site (the modal) imports its own
+// version; centralizing would be premature.
+function rarityHexColor(rarity: string | null | undefined): string {
+  switch (rarity) {
+    case 'Legendary': return '#e07a5f';
+    case 'Rare': return '#b88ce0';
+    case 'Uncommon': return '#9ec96a';
+    default: return '#c9a86a'; // Common / undefined
+  }
+}
+
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0a0908', padding: 12 },
   header: {
@@ -600,6 +629,7 @@ const styles = StyleSheet.create({
   rowBody: { flex: 1, padding: 8 },
   rowHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
   rowName: { color: '#e6d8b3', fontSize: 14, fontWeight: '600', flex: 1 },
+  rowInferredDiamond: { fontSize: 12, fontWeight: '700' },
   rowQty: { color: '#cdbf99', fontSize: 12 },
   rowMetaRow: { flexDirection: 'row', gap: 8, marginTop: 2 },
   rowMeta: { color: '#7a705c', fontSize: 10, letterSpacing: 1 },
