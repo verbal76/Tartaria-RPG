@@ -245,6 +245,15 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Heart-reserve flag: lock inferred items out of the substitute drain
+
+- **OTA-194 (2026-05-29) · Player can tap a heart on inferred items to reserve them for the fusion bench (planned).**
+  - **What:** Setting up the upcoming fusion bench by giving the player explicit control over which inferred items get auto-spent by OTA-193's substitution path. Player ask: *"so there is an empty heart on the item, and it fills when you tap it which locks it. only inferred items have that option."* Inferred items would otherwise be silently consumed for canonical material substitution (Brass Sextant → Scrap Metal) before the player ever had a chance to hoard them for fusion.
+  - **Fix:** Added optional `reservedForFusion?: boolean` to `InventoryItem` (backwards-compat — old saves load fine). New exported predicate `isInferredItem(name)` in `crafting.ts` returns true iff no hand-authored catalog row exists (no `findCatalogItem` hit, no `EXPLORATION`, no `DOG_GEAR`); the UI gates the heart-tap on this predicate. New store action `toggleReserveForFusion(itemId)` flips the flag (by id to disambiguate stacks; refuses to toggle on catalog items). `isSubstitutable` in `crafting.ts` now returns false when `reservedForFusion` is set, so `canCraft` / `consumeIngredients` / `missingIngredients` / `previewCraftSubstitutions` all honor the heart.
+  - **UI:** `InventoryScreen` modal shows a "♡ Save for fusion" / "♥ Reserved for fusion" toggle (only visible when the item is inferred). The row meta gains a small ♥ marker next to rarity / dog tags when reserved so the player sees locked items at a glance.
+  - **Verification:** +9 tests in `craftTagSubstitution` (reserved item not auto-consumed, un-reserved alongside reserved still substitutes, missing/preview ignore reserved, isInferredItem predicate cases). Canary five green, app-side `npx tsc --noEmit` clean.
+  - **Files:** `app/engine/types.ts` (schema), `app/engine/crafting.ts` (isInferredItem + isSubstitutable gate), `app/state/gameStore.ts` (toggle action + import), `app/screens/InventoryScreen.tsx` (modal button + row marker + style).
+
 #### Inferred items finally count toward recipes (material-tag substitution)
 
 - **OTA-193 (2026-05-29) · Inferred misc items now satisfy recipe ingredients directly via material tag.**

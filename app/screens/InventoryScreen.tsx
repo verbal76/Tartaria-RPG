@@ -10,7 +10,7 @@ import {
 import type { InventoryItem, EquipSlot } from '../engine/types';
 import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
 import { canScrap } from '../engine/scrapEngine';
-import { findWeaponByName } from '../engine/crafting';
+import { findWeaponByName, isInferredItem } from '../engine/crafting';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview } from '../components/itemPreview';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
@@ -77,6 +77,7 @@ export function InventoryScreen() {
   const dropInventoryItem = useGameStore((s) => s.dropInventoryItem);
   const useInventoryItem = useGameStore((s) => s.useInventoryItem);
   const scrapInventoryItem = useGameStore((s) => s.scrapInventoryItem);
+  const toggleReserveForFusion = useGameStore((s) => s.toggleReserveForFusion);
   const [pending, setPending] = useState<{ item: InventoryItem; slots: EquipSlot[] } | null>(null);
   // After-scrap result list. When non-null, the action-modal body
   // switches from "Equip / Drop / Scrap" buttons to a "✦ Added to
@@ -313,6 +314,22 @@ export function InventoryScreen() {
         tone: 'destructive',
       });
     }
+    // OTA-194 — RESERVE FOR FUSION. Heart-tap toggle, only on
+    // inferred (catalog-absent) items. Filled heart = locked from
+    // OTA-193's auto-substitute crafting drain; empty heart = free
+    // to be consumed for canonical material substitution. The
+    // fusion bench (planned) will draw from reserved items.
+    if (isInferredItem(pending.item.name)) {
+      const reserved = pending.item.reservedForFusion === true;
+      buttons.push({
+        label: reserved ? '♥ Reserved for fusion' : '♡ Save for fusion',
+        onPress: () => {
+          toggleReserveForFusion(pending.item.id);
+          closeModal();
+        },
+        tone: 'neutral',
+      });
+    }
     // DROP — always available unless the item is currently equipped.
     // Drop handler in the engine also refuses equipped items, but
     // hiding the button cuts down on noise.
@@ -481,6 +498,11 @@ function ItemRow({
         </View>
         <View style={styles.rowMetaRow}>
           {item.rarity && <Text style={styles.rowMeta}>{item.rarity}</Text>}
+          {/* OTA-194 — heart marker on items the player has reserved
+              for the fusion bench. Tiny, fits in the meta row next to
+              rarity / dog tags. No marker when un-reserved so the row
+              isn't noisy for the catalog majority. */}
+          {item.reservedForFusion && <Text style={[styles.rowMeta, styles.rowReserved]}>♥</Text>}
           {fitsDog && <Text style={[styles.rowMeta, styles.rowDogTag]}>[fits dog]</Text>}
           {isTreat && <Text style={[styles.rowMeta, styles.rowDogTag]}>[treat]</Text>}
           {/* OTA 028 — surface the weapon's damage dice next to
@@ -588,6 +610,7 @@ const styles = StyleSheet.create({
   // OTA-120 Phase 5 — [fits dog] / [treat] tag styling. Amber so they
   // stand out from the grey rarity / durability metadata.
   rowDogTag: { color: '#c9a86a', fontWeight: '700' },
+  rowReserved: { color: '#d97a7a', fontWeight: '700' },
   rowEquipped: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   rowEquippable: { color: '#7a705c', fontSize: 10, letterSpacing: 1, fontStyle: 'italic' },
   empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 30 },

@@ -230,6 +230,22 @@ export function findCatalogItem(name: string): {
   return null;
 }
 
+/** OTA-194 — true when no hand-authored catalog row exists for this
+ *  name. Drives the inventory UI's heart-icon gate: only inferred
+ *  items (catalog-absent, OTA-191 synthesized via inferGear / inferred
+ *  weapon / armor / accessory) can be reserved for the fusion bench.
+ *  Cataloged items have a fixed identity and don't fuse. Alias-aware:
+ *  if the name resolves through resolveItemAlias to a catalog row,
+ *  the item is NOT inferred. */
+export function isInferredItem(name: string): boolean {
+  if (!name) return false;
+  if (findCatalogItem(name)) return false;
+  const q = name.toLowerCase().trim();
+  if (EXPLORATION.some((x) => x.name.toLowerCase() === q)) return false;
+  if (DOG_GEAR.some((x) => x.name.toLowerCase() === q)) return false;
+  return true;
+}
+
 function totalQuantity(inventory: readonly InventoryItem[], materialName: string): number {
   const target = materialName.toLowerCase();
   let total = 0;
@@ -264,10 +280,13 @@ const MATERIAL_SUBSTITUTE_TAGS: Record<string, string[]> = {
  *  equipped sword / armor / accessory isn't silently destroyed by a
  *  craft. Stolen items are also off-limits — the player may want to
  *  fence them, and consuming contraband for a craft would feel like a
- *  bug. */
+ *  bug. OTA-194 also respects `reservedForFusion` — the player's
+ *  heart-tapped items are locked out of the substitute drain so they
+ *  survive for the fusion bench. */
 function isSubstitutable(item: InventoryItem): boolean {
   if (item.kind !== 'misc') return false;
-  if ((item as { stolen?: boolean }).stolen) return false;
+  if (item.stolen) return false;
+  if (item.reservedForFusion) return false;
   return true;
 }
 

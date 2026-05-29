@@ -374,6 +374,12 @@ export interface InventoryItem {
    *  (it's recognisably the vendor's own). The player can still
    *  USE the item or SCRAP it; the scrap outputs are clean. */
   stolen?: boolean;
+  /** OTA-194 — player-tapped heart marker that locks an inferred
+   *  item out of OTA-193's auto-substitute crafting drain. Only
+   *  inferred items (no hand-authored catalog row) can carry this
+   *  flag; the inventory UI gates the heart-tap on that predicate.
+   *  Reserved items are saved for the fusion bench (planned). */
+  reservedForFusion?: boolean;
 }
 
 export type CombatRange = 'arm' | 'close' | 'far';

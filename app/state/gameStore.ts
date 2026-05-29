@@ -124,6 +124,7 @@ import {
   consumeIngredients,
   missingIngredients,
   previewCraftSubstitutions,
+  isInferredItem,
   lookupCraftedItem,
   RECIPES,
   findArmorByName,
@@ -1313,6 +1314,13 @@ interface GameStore {
   /** Disassemble a built item (weapon / armor / relic / built gear)
    *  into stock materials via scrapEngine. Refuses raw materials. */
   scrapInventoryItem: (itemName: string) => void;
+  /** OTA-194 — toggle the heart/reserve flag on an inferred item. Only
+   *  inferred items (catalog-absent) can be reserved; the UI gates the
+   *  tap on `isInferredItem`. Reserved items are excluded from the
+   *  OTA-193 auto-substitute drain so they survive for the fusion
+   *  bench (planned). Looked up by InventoryItem.id to disambiguate
+   *  stacks. */
+  toggleReserveForFusion: (itemId: string) => void;
   /** OTA 228 — repair a durable item by consuming materials equal to
    *  2× its scrap output. Looked up by item id so the player can
    *  repair a specific damaged copy without merging the wrong one.
@@ -14426,6 +14434,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     get().appendLog('arbiter', `The Arbiter shrugs. "The ${item.name} doesn't have a single obvious 'use' — keep it, gift it, or scrap it."`);
+  },
+
+  toggleReserveForFusion(itemId) {
+    const player = get().player;
+    if (!player) return;
+    const item = player.inventory.find((i) => i.id === itemId);
+    if (!item) return;
+    // Catalog-bound items can't be reserved — they have a fixed
+    // identity and the fusion bench only operates on inferred items.
+    if (!isInferredItem(item.name)) return;
+    const next = !item.reservedForFusion;
+    set((s) => s.player
+      ? {
+          player: {
+            ...s.player,
+            inventory: s.player.inventory.map((i) =>
+              i.id === itemId ? { ...i, reservedForFusion: next } : i,
+            ),
+          },
+        }
+      : s);
   },
 
   scrapInventoryItem(itemName) {

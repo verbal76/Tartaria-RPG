@@ -23,6 +23,7 @@ import {
   consumeIngredients,
   missingIngredients,
   previewCraftSubstitutions,
+  isInferredItem,
   type Recipe,
 } from '../app/engine/crafting';
 import type { InventoryItem } from '../app/engine/types';
@@ -219,6 +220,68 @@ describe('OTA-193 — substitution safety rails', () => {
       },
     ];
     expect(canCraft(STONE_SPEAR, inv)).toBe(false);
+  });
+});
+
+describe('OTA-194 — heart-reserve protects inferred items from auto-substitute', () => {
+  it('a reserved Brass Sextant is NOT auto-consumed for an Iron Spear', () => {
+    const inv: InventoryItem[] = [
+      material('Stick', 1),
+      { ...inferred('Brass Sextant', 'metal'), reservedForFusion: true },
+    ];
+    expect(canCraft(IRON_SPEAR, inv)).toBe(false);
+    const after = consumeIngredients(inv, IRON_SPEAR);
+    expect(after.find((i) => i.name === 'Brass Sextant')).toBeDefined();
+  });
+
+  it('an UN-reserved sextant alongside a reserved one still substitutes', () => {
+    const inv: InventoryItem[] = [
+      material('Stick', 1),
+      { ...inferred('Brass Sextant', 'metal'), id: 'sextant_a', reservedForFusion: true },
+      { ...inferred('Bronze Coil', 'metal'), id: 'coil_b' },
+    ];
+    expect(canCraft(IRON_SPEAR, inv)).toBe(true);
+    const after = consumeIngredients(inv, IRON_SPEAR);
+    // Reserved sextant survives; un-reserved coil consumed.
+    expect(after.find((i) => i.id === 'sextant_a')).toBeDefined();
+    expect(after.find((i) => i.id === 'coil_b')).toBeUndefined();
+  });
+
+  it('missingIngredients reports the shortfall when only reserved subs exist', () => {
+    const inv: InventoryItem[] = [
+      material('Stick', 1),
+      { ...inferred('Brass Sextant', 'metal'), reservedForFusion: true },
+    ];
+    expect(missingIngredients(IRON_SPEAR, inv)).toEqual([
+      { name: 'Scrap Metal', quantity: 1 },
+    ]);
+  });
+
+  it('previewCraftSubstitutions ignores reserved items', () => {
+    const inv: InventoryItem[] = [
+      material('Stick', 1),
+      { ...inferred('Brass Sextant', 'metal'), reservedForFusion: true },
+    ];
+    expect(previewCraftSubstitutions(IRON_SPEAR, inv)).toHaveLength(0);
+  });
+});
+
+describe('OTA-194 — isInferredItem predicate', () => {
+  it('returns true for a synthesized misc name not in any catalog', () => {
+    expect(isInferredItem("Whisper Marrow")).toBe(true);
+    expect(isInferredItem("Reclaimer's Cord")).toBe(true);
+    expect(isInferredItem('Brass Sextant')).toBe(true);
+  });
+
+  it('returns false for hand-authored catalog items', () => {
+    // Scrap Metal lives in MATERIALS catalog.
+    expect(isInferredItem('Scrap Metal')).toBe(false);
+    // Iron Spear is a RECIPES result and a WEAPONS catalog entry.
+    expect(isInferredItem('Iron Spear')).toBe(false);
+  });
+
+  it('returns false for empty / nonsense input', () => {
+    expect(isInferredItem('')).toBe(false);
   });
 });
 

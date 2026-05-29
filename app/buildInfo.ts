@@ -5918,4 +5918,84 @@
 // app/state/gameStore.ts
 // (craft handler uses new
 // helpers + narrates subs).
-export const OTA_BUILD_ID = '2026-05-29-193';
+// 2026-05-29-194 — heart-
+// reserve flag on inferred
+// items: lock them out of
+// the OTA-193 auto-substitute
+// drain so they survive for
+// the fusion bench (planned).
+// Player ask:
+//   "so there is an empty
+//   heart on the item, and
+//   it fills when you tap it
+//   which locks it. only
+//   inferred items have that
+//   option."
+//
+// Schema: optional
+// `reservedForFusion?:
+// boolean` on InventoryItem
+// (backwards compat — old
+// saves load fine).
+//
+// Predicate: new exported
+// `isInferredItem(name)` in
+// crafting.ts returns true
+// iff the name has no hand-
+// authored catalog row (no
+// findCatalogItem hit, no
+// EXPLORATION row, no
+// DOG_GEAR row). The UI
+// gates the heart-tap on
+// this predicate so catalog
+// items never show the
+// reserve option.
+//
+// Store: new action
+// `toggleReserveForFusion
+// (itemId)` flips the flag.
+// Looked up by id to
+// disambiguate stacks. Refuses
+// to toggle on catalog items.
+//
+// Crafting: isSubstitutable
+// in crafting.ts now also
+// returns false when
+// reservedForFusion is set,
+// so canCraft / consume
+// Ingredients / missing
+// Ingredients / preview
+// CraftSubstitutions all
+// honor the heart.
+//
+// UI: InventoryScreen modal
+// shows a "♡ Save for
+// fusion" / "♥ Reserved for
+// fusion" toggle (only when
+// the item is inferred) and
+// the row meta gains a small
+// ♥ marker when reserved so
+// the player can see locked
+// items at a glance.
+//
+// Tests: +9 in
+// craftTagSubstitution
+// (reserved item not auto-
+// consumed, un-reserved
+// alongside still subs,
+// missing/preview ignore
+// reserved, isInferredItem
+// predicate cases). Canary
+// five green, app-side TS
+// clean.
+//
+// Files: app/engine/types.ts
+// (schema), app/engine/
+// crafting.ts (isInferred
+// Item + isSubstitutable
+// gate), app/state/
+// gameStore.ts (toggle
+// action), app/screens/
+// InventoryScreen.tsx (modal
+// button + row marker).
+export const OTA_BUILD_ID = '2026-05-29-194';
