@@ -4031,4 +4031,54 @@
 // (elevated-aware unmetRequirement
 // branch in SearchModal chip
 // mapper).
-export const OTA_BUILD_ID = '2026-05-29-166';
+//
+// 2026-05-29 OTA-167 — salvage chip
+// trusts engine-consumed state
+// (skips TAKE's catalog-ownership
+// self-heal).
+//
+// Playtest log: player did a
+// flavor-only `salvage scraps of
+// cloth` (engine wrote the noun
+// to flavorExhaustedNouns), then
+// tapped salvage 8 times across
+// 35 seconds, each producing
+// "You've already turned the
+// scraps cloth over here."
+//
+// Root cause: SalvageModal's chip
+// `consumed` flag used
+// isAmbientConsumed which has a
+// self-heal — if the noun fuzzy-
+// matches a catalog item the
+// player doesn't own, it un-greys
+// the chip (so a sold Rusted
+// Blade can be re-taken from the
+// ground). That's correct for
+// TAKE. Wrong for SALVAGE —
+// salvage produces MATERIALS, not
+// the catalog item, so ownership
+// has nothing to do with whether
+// the noun's been salvaged.
+//
+// Fix: SalvageModal chip mapper
+// now reads consumed via
+// `isFuzzyConsumed(n,
+// consumedAmbientNouns)` directly
+// — pure engine state, no
+// ownership branch. The chip
+// greys when the engine considers
+// it salvaged, full stop.
+//
+// TakeModal unchanged — its self-
+// heal is correct (catalog
+// ownership IS the right cue for
+// re-takeability).
+//
+// TS clean.
+//
+// Files:
+// app/screens/ExplorationScreen.tsx
+// (SalvageModal chip consumed-flag
+// bypasses isAmbientConsumed).
+export const OTA_BUILD_ID = '2026-05-29-167';

@@ -813,7 +813,24 @@ export function ExplorationScreen() {
         visible={salvageOpen}
         chips={buildChipPool(currentScene).map((n) => ({
           noun: n,
-          consumed: isAmbientConsumed(n),
+          // OTA-167 — salvage chip greys on raw engine-consumed
+          // state (searched + flavor-exhausted), NOT through
+          // isAmbientConsumed's self-heal. The self-heal was
+          // designed for TAKE: if you sold a Rusted Blade and one
+          // sits on the ground, you should be able to re-take it.
+          // But salvage produces MATERIALS, not the catalog item
+          // itself — owning or not owning anything has nothing to
+          // do with whether a noun's been salvaged. Playtest log:
+          // `scraps of cloth` got a flavor-only investigate, the
+          // engine wrote it to flavorExhaustedNouns, but the
+          // SalvageModal chip stayed bright because findCatalogItem
+          // fuzzy-matched scraps-of-cloth to a catalog item the
+          // player didn't own, so the self-heal flipped the chip
+          // back to ungreyed. Player tapped salvage 8 times across
+          // 35 seconds, each producing "You've already turned the
+          // scraps cloth over here." Now: salvage chip trusts the
+          // engine's per-room consumed state directly.
+          consumed: isFuzzyConsumed(n, consumedAmbientNouns),
         }))}
         onSubmit={(target) => {
           setSalvageOpen(false);
