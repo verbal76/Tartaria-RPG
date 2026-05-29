@@ -16,7 +16,57 @@
 
 import type { InventoryItem, PlayerCharacter } from '../engine/types';
 import { categorizeItem, CATEGORY_ORDER, CATEGORY_LABEL, type InventoryCategory } from '../components/InventoryCategorize';
-import { findWeaponByName, isInferredItem } from '../engine/crafting';
+import {
+  findWeaponByName,
+  isInferredItem,
+  findExplorationItemByName,
+  findGearByName,
+  findMaterialByName,
+} from '../engine/crafting';
+import { canScrap, repairCostMaterials } from '../engine/scrapEngine';
+import { validSlotsForItem } from '../engine/equipment';
+import { resolveItemEffect } from '../engine/itemEffect';
+
+/** OTA-206 — list the action buttons the inventory modal would
+ *  render for this item. Mirrors the gating in InventoryScreen.
+ *  buildModalButtons so the snapshot reads with the same answer
+ *  the player sees on tap. Used by the COPY INVENTORY export so
+ *  recurring-theme analysis can flag items missing actions. */
+function actionsFor(item: InventoryItem, equippedSlots: ReadonlyMap<string, string>): string[] {
+  const acts: string[] = [];
+  const slots = validSlotsForItem(item);
+  const equippedAt = equippedSlots.get(item.id);
+  const equippedInSlots = equippedAt ? [equippedAt] : [];
+  // EQUIP — one per valid slot the item isn't already in.
+  for (const s of slots) {
+    if (!equippedInSlots.includes(s)) acts.push(`equip:${s}`);
+  }
+  // UNEQUIP — one per slot currently holding this specific instance.
+  for (const s of equippedInSlots) acts.push(`unequip:${s}`);
+  // USE — mirrors OTA-201's gate: consumable OR effect-bearing OR
+  // any-slot-free equippable.
+  const isConsumable = item.kind === 'consumable';
+  const fx = resolveItemEffect(item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
+  const offEligible = slots.includes('off') && !equippedInSlots.includes('off');
+  const anySlotFree = slots.some((s) => !equippedInSlots.includes(s));
+  if (isConsumable || fx !== null || (anySlotFree && (offEligible || slots.length > 0))) {
+    acts.push(isConsumable ? 'use(eat)' : offEligible ? 'use(off)' : 'use');
+  }
+  // SCRAP — built items + non-equipped.
+  if (canScrap(item) && equippedInSlots.length === 0) acts.push('scrap');
+  // REPAIR — durability-tracked + not at max.
+  if (item.durability && item.durability.current < item.durability.max) {
+    const cost = repairCostMaterials(item);
+    if (cost.length > 0) acts.push('repair');
+  }
+  // SAVE FOR FUSION — only inferred items, only when not already
+  // reserved. Mirrors the OTA-194 heart-tap gate.
+  if (isInferredItem(item.name) && !item.reservedForFusion) acts.push('save-for-fusion');
+  if (item.reservedForFusion) acts.push('release-from-fusion');
+  // DROP — always available unless equipped.
+  if (equippedInSlots.length === 0) acts.push('drop');
+  return acts;
+}
 
 /** Build a one-line summary for a single item — name, qty, rarity,
  *  durability, equipped slot, per-instance flags. OTA-204 — surfaces
@@ -59,7 +109,14 @@ function lineFor(item: InventoryItem, equippedSlots: ReadonlyMap<string, string>
     meta.push(`[${item.tags.slice(0, 5).join(',')}]`);
   }
   if (meta.length > 0) parts.push(`(${meta.join(', ')})`);
-  return `  ${parts.join(' ')}`;
+  // OTA-206 — actions block on a second line so each item shows
+  // what its modal would offer. "—" when no actions resolve
+  // (catalog item with no slot + no effect + not scrap-able + no
+  // durability + already at full — rare but possible for raw
+  // currency-like stock).
+  const acts = actionsFor(item, equippedSlots);
+  const actsLine = acts.length > 0 ? `    actions: ${acts.join(', ')}` : '    actions: —';
+  return `  ${parts.join(' ')}\n${actsLine}`;
 }
 
 /** Map of InventoryItem.id → equipped slot name for items currently

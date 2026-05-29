@@ -7004,4 +7004,88 @@
 // refactor), app/state/
 // gameStore.ts (repair
 // handler wired to subs).
-export const OTA_BUILD_ID = '2026-05-29-205';
+// 2026-05-29-206 — COPY
+// INVENTORY snapshot now
+// surfaces the modal actions
+// per item (use / equip /
+// unequip / scrap / repair /
+// drop / save-for-fusion /
+// release-from-fusion).
+// Player ask:
+//   "that list doesn't tell
+//   you what options show up
+//   if you tap on them like
+//   use, drop, sell and so
+//   on. so you have no idea
+//   if the item listed is
+//   able to be used or not.
+//   you just know that they
+//   exist in my inventory
+//   and what categories they
+//   fall in not whether I can
+//   use them or not or equip
+//   them or not"
+//
+// Fix:
+// inventorySnapshot.ts now
+// has an actionsFor(item,
+// equippedSlots) helper that
+// mirrors the gating in
+// InventoryScreen's
+// buildModalButtons:
+//   - equip:<slot> for each
+//     valid slot the item
+//     isn't already in
+//   - unequip:<slot> for each
+//     slot holding this
+//     specific instance
+//   - use / use(eat) / use
+//     (off) per OTA-201's
+//     consumable-OR-effect
+//     gate
+//   - scrap per scrapEngine.
+//     canScrap
+//   - repair when durability
+//     < max AND repair cost
+//     resolves
+//   - save-for-fusion /
+//     release-from-fusion per
+//     OTA-194's heart-tap
+//     gate
+//   - drop unless equipped
+//
+// Each item now renders on
+// two lines:
+//   - line 1: name + meta
+//     (rarity / damage dice /
+//     dur / equipped / tags
+//     / ♥)
+//   - line 2: "    actions:
+//     equip:main, repair,
+//     save-for-fusion, drop"
+//
+// Items with no resolvable
+// action show "actions: —"
+// (currency-like raw stock).
+// The actions surface lets
+// recurring-theme analysis
+// spot items that LOOK
+// useful but offer no modal
+// action (OTA-201's USE-
+// button bug would have
+// been visible at a glance).
+//
+// Tests: +2 in
+// inventorySnapshot
+// (actions block for sword
+// + reserved misc +
+// equipped weapon; Vision
+// Lens uses gate effect).
+// 13-test suite green. TS
+// clean app-side.
+//
+// Files: app/diagnostics/
+// inventorySnapshot.ts
+// (actionsFor helper + per-
+// item actions line render).
+export const OTA_BUILD_ID = '2026-05-29-206';

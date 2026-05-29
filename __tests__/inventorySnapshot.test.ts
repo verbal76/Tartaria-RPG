@@ -92,6 +92,74 @@ describe('OTA-202 — buildInventorySnapshot', () => {
     expect(out).toMatch(/Iron Spear.*\dd\d+ \w+/);
   });
 
+  it('OTA-206 — actions line surfaces use/equip/scrap/drop/repair/save-for-fusion gates', () => {
+    const sword: InventoryItem = {
+      id: 'w_iron',
+      name: 'Iron Spear',
+      kind: 'weapon',
+      quantity: 1,
+      tags: ['weapon', 'melee', 'piercing'],
+      rarity: 'Common',
+      description: 'A spear.',
+      durability: { current: 6, max: 20 },
+    };
+    const reservedJunk: InventoryItem = {
+      id: 'j_widget',
+      name: 'Brass Widget',
+      kind: 'misc',
+      quantity: 1,
+      tags: ['metal', 'improvised'],
+      rarity: 'Common',
+      description: 'A widget.',
+      reservedForFusion: true,
+    };
+    const equipped: InventoryItem = {
+      id: 'w_equipped',
+      name: 'Bolt-Caster',
+      kind: 'weapon',
+      quantity: 1,
+      tags: ['weapon', 'ranged'],
+      rarity: 'Uncommon',
+      description: 'X',
+      durability: { current: 25, max: 25 },
+    };
+    const p = mkPlayer({
+      inventory: [sword, reservedJunk, equipped],
+      equipped: { main: 'Bolt-Caster' },
+    });
+    const out = buildInventorySnapshot(p);
+    // Constrain regex to the same item block: name line + actions
+    // line on the next line. [^\n] keeps us inside one item.
+    const ironSpearActs = out.match(/Iron Spear[^\n]*\n[^\n]*actions:\s*([^\n]+)/)?.[1] ?? '';
+    expect(ironSpearActs).toMatch(/equip:/);
+    expect(ironSpearActs).toMatch(/repair/);
+    expect(ironSpearActs).toMatch(/drop/);
+    const brassActs = out.match(/Brass Widget[^\n]*\n[^\n]*actions:\s*([^\n]+)/)?.[1] ?? '';
+    expect(brassActs).toMatch(/release-from-fusion/);
+    expect(brassActs).toMatch(/drop/);
+    expect(brassActs).toMatch(/scrap/);
+    const boltActs = out.match(/Bolt-Caster[^\n]*\n[^\n]*actions:\s*([^\n]+)/)?.[1] ?? '';
+    expect(boltActs).toMatch(/unequip:main/);
+    // Bolt-Caster is equipped → no drop offered.
+    expect(boltActs).not.toMatch(/drop/);
+  });
+
+  it('OTA-206 — Aetheric Vision Lens (gate effect) surfaces use action', () => {
+    const lens: InventoryItem = {
+      id: 'lens',
+      name: 'Aetheric Vision Lens',
+      kind: 'relic',
+      quantity: 1,
+      tags: ['exploration', 'relic'],
+      rarity: 'Common',
+      description: 'X',
+    };
+    const p = mkPlayer({ inventory: [lens] });
+    const out = buildInventorySnapshot(p);
+    const acts = out.match(/Aetheric Vision Lens[^\n]*\n[^\n]*actions:\s*([^\n]+)/)?.[1] ?? '';
+    expect(acts).toMatch(/use/);
+  });
+
   it('OTA-204 — prefixes inferred items with ◆ marker but NOT catalog items', () => {
     const inv: InventoryItem[] = [
       mkItem({ name: 'Shaped Aetheric Shard', kind: 'misc' }), // catalog

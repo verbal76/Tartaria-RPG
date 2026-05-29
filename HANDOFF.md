@@ -245,6 +245,15 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### COPY INVENTORY snapshot surfaces per-item modal actions
+
+- **OTA-206 (2026-05-29) · Each item in the snapshot now carries an `actions:` line listing what its inventory modal would offer.**
+  - **What:** Player ask: *"that list doesn't tell you what options show up if you tap on them like use, drop, sell and so on. so you have no idea if the item listed is able to be used or not."* OTA-204's snapshot enriched bucketing + damage dice + ◆ marker but said nothing about modal action coverage. Recurring-theme analysis couldn't catch items that LOOK useful but offer no use button (the OTA-201 USE-button bug would have been invisible from the export).
+  - **Fix:** New `actionsFor(item, equippedSlots)` helper in `inventorySnapshot.ts` mirrors the gating in InventoryScreen's `buildModalButtons` — `equip:<slot>` for each valid slot the item isn't in, `unequip:<slot>` for each slot holding this specific instance, `use` / `use(eat)` / `use(off)` per OTA-201's consumable-OR-effect gate, `scrap` via `canScrap`, `repair` when durability < max AND repair cost resolves, `save-for-fusion` / `release-from-fusion` per OTA-194's heart-tap gate, `drop` unless equipped.
+  - **Rendering:** Each item now renders on two lines — line 1 carries name + meta (rarity / damage dice / dur / equipped / tags / ♥), line 2 reads `    actions: equip:main, repair, save-for-fusion, drop`. Items with no resolvable action show `actions: —` (currency-like raw stock).
+  - **Verification:** +2 tests in `inventorySnapshot` (actions block for sword + reserved misc + equipped weapon; Vision Lens uses gate effect). 13-test suite green; `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/diagnostics/inventorySnapshot.ts` (actionsFor helper + per-item actions line render).
+
 #### Repair handler accepts substitute materials + Aetheric Compass gets its passive WIS
 
 - **OTA-205 (2026-05-29) · Two open suggestions from the OTA-204 snapshot analysis shipped together.**
