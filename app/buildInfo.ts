@@ -4081,4 +4081,59 @@
 // app/screens/ExplorationScreen.tsx
 // (SalvageModal chip consumed-flag
 // bypasses isAmbientConsumed).
-export const OTA_BUILD_ID = '2026-05-29-167';
+//
+// 2026-05-29 OTA-168 — flavor-only
+// investigate wording clarified
+// (no-loot is explicit).
+//
+// Playtester: "scraps of cloth
+// doesn't gray out when being
+// either salvaged or investigated,
+// not sure if it resolved to loot
+// either way."
+//
+// The chip-greying half is fixed
+// by OTA-167 (SalvageModal trusts
+// engine consumed state). This
+// OTA addresses the wording half
+// — two lines were ambiguous:
+//
+//   (a) First flavor outcome read
+//       "no clearer thread
+//       surfaces here" — vague,
+//       player couldn't tell if
+//       loot landed in their
+//       pack. Now: "Nothing of
+//       use comes loose — the
+//       work itself is the only
+//       thing you take from
+//       this." Names the empty
+//       outcome explicitly.
+//
+//   (b) Refusal on second tap
+//       said "Whatever it had to
+//       give you, you took" —
+//       which reads as "you got
+//       loot last time" even
+//       though the original
+//       outcome was flavor-only.
+//       Now: "You've already
+//       checked the X here.
+//       There was nothing of use
+//       in it — turning it over
+//       again won't change
+//       that." Anchored to the
+//       fact that there was
+//       never loot to begin
+//       with.
+//
+// Both lines fire from the
+// investigate-flavor path
+// (gameStore.ts:9650 + 9684).
+//
+// TS clean.
+//
+// Files: app/state/gameStore.ts
+// (two flavor-outcome lines
+// rewritten).
+export const OTA_BUILD_ID = '2026-05-29-168';

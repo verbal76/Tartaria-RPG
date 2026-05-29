@@ -9650,9 +9650,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (alreadyExamined) {
               // OTA-084 refuseAmbient pattern — atomic log +
               // dedup mark, idempotent on the second touch.
+              // OTA-168 — line wording fixed. Pre-OTA-168 the line
+              // said "Whatever it had to give you, you took" even
+              // when the original outcome was flavor-only — which
+              // a player can confuse for "I got loot last time."
+              // Playtester: "not sure if it resolved to loot
+              // either way." We're here because the noun is in
+              // flavorExhaustedNouns specifically, so the first
+              // pass was a flavor / no-loot outcome. Tell the
+              // player there was nothing to take, not "whatever it
+              // had you took."
               get().refuseAmbient({
                 noun: focus,
-                line: `You've already turned the ${focus} over here. Whatever it had to give you, you took. Your active leads (if any) live in the Contracts log.`,
+                line: `You've already checked the ${focus} here. There was nothing of use in it — turning it over again won't change that.`,
                 kind: 'flavor',
               });
               break;
@@ -9682,9 +9692,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
               );
               get().appendLog('reward', `New lead: ${quest.objective.verb} ${quest.objective.target} at ${quest.location.name}.`);
             } else {
+              // OTA-168 — explicit "nothing found" wording. Pre-fix
+              // the line was vague ("no clearer thread surfaces")
+              // and a playtester wasn't sure whether loot landed.
+              // Now the line names the empty outcome directly so
+              // the player can stop checking inventory.
               get().appendLog(
                 'world',
-                `You examine the ${focus} carefully. The work sharpens your focus, but no clearer thread surfaces here.`,
+                `You examine the ${focus} carefully. Nothing of use comes loose — the work itself is the only thing you take from this.`,
               );
             }
             // Mark as examined regardless of lead outcome — the
