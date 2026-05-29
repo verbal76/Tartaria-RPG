@@ -245,6 +245,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Investigate becomes the story-seeking verb + ★ STORY THREAD prefix on hook narration
+
+- **OTA-213 (2026-05-29) · Player ask: *"let's have investigate be more inclined to have you find story hooks than anything else. ... I never realized there was a story playing out. ... I don't want this shit to be a clicking simulator."***
+  - **What:** Playtesters had trained themselves to click SEARCH / SALVAGE / INVESTIGATE fast for loot and scroll past the narrative beats. The OTA-209 log showed the player advance a 2-step hook (crawl closer to something, then find a body) without realizing they were inside a story chain — and they explicitly said they love the 2-3 step hooks but kept missing them.
+  - **Fix (bias):** `rollAreaSearch` in `areaSearch.ts` gains an `opts.intent` param. When `intent === 'investigate'`, the distribution flips from the default `40 nothing / 25 mat / 20 TC / 15 hook` to `10 nothing / 15 mat / 15 TC / 60 hook`. Search / harvest stay loot-heavy so the click-grind loop is unchanged. `hookBonus` (Aetheric Vision Lens) is still honored on top with the same 0.4 clamp.
+  - **Fix (visual emphasis):** All three `rollAreaSearch` callsites (investigate case, attack-fallback area search, harvest verb) now wrap hook outcomes in `★ STORY THREAD — <line>` so the world line stands out in the feed instead of blending with routine flavor.
+  - **Fix (chain legibility):** `resolveHookOneStep` prepends a stage label to every hook narration: `★ STORY THREAD (step N) — <line>` mid-chain and `★★ STORY THREAD COMPLETE — <line>` when `outcome.done` fires. Players can now see where they are in the chain instead of treating each step as one-off flavor.
+  - **Verification:** +5 tests in `investigateHookBias` (default ~15% hook, investigate ~60%, lens bonus clamps, investigate nothing-bucket shrinks, search/harvest distribution unchanged). `aethericLensAndShard` regression stays green. `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/engine/areaSearch.ts` (intent param + distribution switch), `app/state/gameStore.ts` (investigate case wires intent + STORY THREAD prefix; attack-fallback + harvest also prefix hook outcomes; resolveHookOneStep adds stage labels).
+
 #### Aetheric Torch refund + frustration-vent meta-comment guard (two OTA-209 log bugs)
 
 - **OTA-212 (2026-05-29) · Two real bugs from the OTA-209 playtest log.**

@@ -7594,4 +7594,95 @@
 // gameStore.ts (revealScene
 // no-op refund + two-branch
 // meta-comment guard).
-export const OTA_BUILD_ID = '2026-05-29-212';
+// 2026-05-29-213 — investigate
+// becomes the story-seeking
+// verb + STORY THREAD prefix
+// on hook narration so players
+// can't scroll past plot beats.
+// Player ask:
+//   "let's have investigate
+//   be more inclined to have
+//   you find story hooks than
+//   anything else. ... I
+//   never realized there was
+//   a story playing out. we
+//   have to find a way that
+//   we get them interested in
+//   that story so they have
+//   to stop and read or
+//   something. ... I don't
+//   want this shit to be a
+//   clicking simulator"
+//
+// Changes:
+//   - areaSearch.ts:
+//     rollAreaSearch gains an
+//     opts.intent param.
+//     intent === 'investigate'
+//     flips the distribution
+//     from the default 40
+//     nothing / 25 mat / 20
+//     TC / 15 hook to 10
+//     nothing / 15 mat / 15
+//     TC / 60 hook. Search /
+//     harvest stay loot-heavy
+//     so the click-grind
+//     loop is unchanged.
+//     hookBonus is still
+//     honored on top, same
+//     0.4 clamp.
+//   - gameStore.ts investigate
+//     case passes
+//     intent: 'investigate' to
+//     rollAreaSearch + applies
+//     the same Aetheric Vision
+//     Lens cue (lens still
+//     adds value at the new
+//     baseline).
+//   - All three rollAreaSearch
+//     callsites (investigate,
+//     attack-fallback area
+//     search, harvest) now
+//     wrap hook outcomes in
+//     "★ STORY THREAD — " so
+//     the line stands out
+//     visually in the feed.
+//   - resolveHookOneStep
+//     prepends a stage label
+//     to every hook narration:
+//     "★ STORY THREAD (step
+//     N) — ..." for stages and
+//     "★★ STORY THREAD
+//     COMPLETE — ..." when
+//     the chain finishes. The
+//     playtester ran a 2-step
+//     hook (crawl closer, find
+//     the body) and didn't
+//     realize they were in a
+//     chain — the stage label
+//     makes the chain legible.
+//
+// Tests: +5 in
+// investigateHookBias
+// (default ~15% hook,
+// investigate ~60%, lens
+// boost clamps, investigate
+// nothing-bucket shrinks,
+// search/harvest unchanged).
+// aethericLensAndShard
+// regression stays green
+// (15 tests across the two
+// suites). TS clean app-side.
+//
+// Files: app/engine/
+// areaSearch.ts (intent
+// param + distribution
+// switch), app/state/
+// gameStore.ts (investigate
+// case wires intent + STORY
+// THREAD prefix; attack-
+// fallback + harvest also
+// prefix hook outcomes;
+// resolveHookOneStep adds
+// stage labels).
+export const OTA_BUILD_ID = '2026-05-29-213';

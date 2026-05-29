@@ -4987,7 +4987,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 `The Aetheric Vision Lens hums against your temple — a thread you weren't looking for catches the light.`,
               );
             }
-            get().appendLog('world', outcome.line);
+            // OTA-213 — STORY THREAD prefix on hook outcomes so the
+            // player can't scroll past them in the click-grind loop.
+            if (outcome.kind === 'hook') {
+              get().appendLog('world', `★ STORY THREAD — ${outcome.line}`);
+            } else {
+              get().appendLog('world', outcome.line);
+            }
             // Dispatch outcome first, then dedupe based on whether
             // anything actually produced — mirrors the harvest-verb
             // path so attack-fallback also stops consuming nouns on
@@ -5230,6 +5236,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // generic SEARCH path, which IS meant to be re-tried.)
             if (outcome.kind === 'nothing') {
               get().appendLog('world', pickScrapFailureLine(harvestAmbient));
+            } else if (outcome.kind === 'hook') {
+              // OTA-213 — STORY THREAD prefix on hook outcomes so
+              // the player can't scroll past them.
+              get().appendLog('world', `★ STORY THREAD — ${outcome.line}`);
             } else {
               get().appendLog('world', outcome.line);
             }
@@ -6041,8 +6051,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
-          const outcome = rollAreaSearch(rawTarget);
-          get().appendLog('world', outcome.line);
+          // OTA-213 — investigate gets a hook-heavy distribution
+          // (10% nothing / 15% mat / 15% TC / 60% hook) so the
+          // verb actually rewards story-seeking. Playtester:
+          //   "let's have investigate be more inclined to have you
+          //   find story hooks than anything else. ... I don't
+          //   want this shit to be a clicking simulator."
+          // Search / harvest still loot-heavy so the click-for-stuff
+          // grind path is unchanged.
+          const investigateLensActive = hasAethericVision(player);
+          const outcome = rollAreaSearch(rawTarget, {
+            intent: 'investigate',
+            hookBonus: investigateLensActive ? 0.15 : 0,
+          });
+          if (investigateLensActive && outcome.kind === 'hook') {
+            get().appendLog(
+              'world',
+              `The Aetheric Vision Lens hums against your temple — a thread you weren't looking for catches the light.`,
+            );
+          }
+          // OTA-213 — hook outcomes get a distinct "★ STORY THREAD"
+          // prefix on the world line so the player can't scroll past
+          // them. Adds reading friction in the visual feed without
+          // forcing a modal.
+          if (outcome.kind === 'hook') {
+            get().appendLog('world', `★ STORY THREAD — ${outcome.line}`);
+          } else {
+            get().appendLog('world', outcome.line);
+          }
           // Dispatch outcome first, then dedupe based on whether
           // anything actually produced — mirrors the harvest-verb +
           // attack-fallback paths. Hook outcomes that can't plant
@@ -15833,7 +15869,17 @@ function resolveHookOneStep(
   // Split them again: world line for narration (no tail), reward line
   // for the ✦ callout. The 500ms debounce will keep them visually tight
   // but the two channels paint distinct colors.
-  get().appendLog('world', outcome.line);
+  // OTA-213 — STORY THREAD prefix on every hook stage so the player
+  // can't mistake the narrative beat for routine flavor. The previous
+  // playtest log had the player advance a 2-step hook (crawl closer,
+  // find the body) and not realize they'd been reading a story chain.
+  // Stage numbers surface so the player knows where they are in the
+  // chain: "★ STORY THREAD (step 2) — ..." If `outcome.done` is set,
+  // we mark the line as a finale: "★★ STORY THREAD COMPLETE — ..."
+  const stageLabel = outcome.done
+    ? '★★ STORY THREAD COMPLETE'
+    : `★ STORY THREAD (step ${hook.stage + 1})`;
+  get().appendLog('world', `${stageLabel} — ${outcome.line}`);
   if (inlineSummaries.length > 0) {
     get().appendLog('reward', `✦ ${inlineSummaries.join(', ')}.`);
   }

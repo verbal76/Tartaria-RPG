@@ -222,15 +222,37 @@ function format(line: string, target: string): string {
  *  to surface a mission hook fires. A bonus of 0.15 converts
  *  ~15 percentage points away from "nothing" into hook outcomes,
  *  leaving material + TC weights untouched. Clamped to [0, 0.4]
- *  so the lens can't turn every search into a hook. */
+ *  so the lens can't turn every search into a hook.
+ *
+ *  OTA-213 — new `intent` option flips the entire distribution for
+ *  the `investigate` verb. Playtester:
+ *    "let's have investigate be more inclined to have you find
+ *    story hooks than anything else. ... I don't want this shit to
+ *    be a clicking simulator."
+ *  Search / harvest stay loot-heavy; investigate becomes hook-heavy
+ *  so the player who CHOOSES to investigate is rewarded with story
+ *  threads, not loot they could grind from search. */
 export function rollAreaSearch(
   target: string,
-  opts?: { hookBonus?: number },
+  opts?: { hookBonus?: number; intent?: 'search' | 'investigate' | 'harvest' },
 ): AreaSearchOutcome {
   const bonus = Math.max(0, Math.min(0.4, opts?.hookBonus ?? 0));
-  const nothingCutoff = 0.40 - bonus;
-  const materialCutoff = nothingCutoff + 0.25;
-  const tcCutoff = materialCutoff + 0.20;
+  // OTA-213 — investigate flips the curve. Default search remains
+  // 40% nothing / 25% material / 20% tc / 15% hook. Investigate is
+  // 10% nothing / 15% material / 15% tc / 60% hook. hookBonus is
+  // still honored on top (with the same 0.4 clamp) for the Vision
+  // Lens carry case but matters less here since hook is already the
+  // primary outcome.
+  const isInvestigate = opts?.intent === 'investigate';
+  const nothingCutoff = isInvestigate
+    ? Math.max(0, 0.10 - bonus)
+    : 0.40 - bonus;
+  const materialCutoff = isInvestigate
+    ? nothingCutoff + 0.15
+    : nothingCutoff + 0.25;
+  const tcCutoff = isInvestigate
+    ? materialCutoff + 0.15
+    : materialCutoff + 0.20;
   const r = Math.random();
   if (r < nothingCutoff) {
     return { kind: 'nothing', line: format(pick(NOTHING_LINES), target) };
