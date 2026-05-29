@@ -144,6 +144,53 @@ describe('OTA-202 — buildInventorySnapshot', () => {
     expect(boltActs).not.toMatch(/drop/);
   });
 
+  it('OTA-207 — Sentinel Core Plate (crafting material) does NOT get equip:chest', () => {
+    const plate: InventoryItem = {
+      id: 'scp',
+      name: 'Sentinel Core Plate',
+      kind: 'misc',
+      quantity: 1,
+      tags: ['automation', 'tech', 'salvage', 'scrap'],
+      rarity: 'Uncommon',
+      description: 'X',
+    };
+    const out = buildInventorySnapshot(mkPlayer({ inventory: [plate] }));
+    const acts = out.match(/Sentinel Core Plate[^\n]*\n[^\n]*actions:\s*([^\n]+)/)?.[1] ?? '';
+    expect(acts).not.toMatch(/equip:/);
+    expect(acts).not.toMatch(/use/);
+  });
+
+  it('OTA-207 — Shaped Aetheric Shard surfaces throw action when carried', () => {
+    const shard: InventoryItem = {
+      id: 'shard',
+      name: 'Shaped Aetheric Shard',
+      kind: 'misc',
+      quantity: 1,
+      tags: ['throwable', 'aether', 'shaped'],
+      rarity: 'Rare',
+      description: 'X',
+    };
+    const out = buildInventorySnapshot(mkPlayer({ inventory: [shard] }));
+    const acts = out.match(/Shaped Aetheric Shard[^\n]*\n[^\n]*actions:\s*([^\n]+)/)?.[1] ?? '';
+    expect(acts).toMatch(/throw/);
+    expect(acts).toMatch(/drop/);
+  });
+
+  it('OTA-207 — non-throwable items do NOT show throw action', () => {
+    const cloth: InventoryItem = {
+      id: 'cs',
+      name: 'Cloth Scrap',
+      kind: 'misc',
+      quantity: 1,
+      tags: ['fiber', 'junk', 'scrap'],
+      rarity: 'Common',
+      description: 'X',
+    };
+    const out = buildInventorySnapshot(mkPlayer({ inventory: [cloth] }));
+    const acts = out.match(/Cloth Scrap[^\n]*\n[^\n]*actions:\s*([^\n]+)/)?.[1] ?? '';
+    expect(acts).not.toMatch(/throw/);
+  });
+
   it('OTA-206 — Aetheric Vision Lens (gate effect) surfaces use action', () => {
     const lens: InventoryItem = {
       id: 'lens',

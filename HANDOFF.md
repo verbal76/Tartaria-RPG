@@ -245,6 +245,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Sentinel Core Plate equippable bug + Shaped Aetheric Shard gets a Throw button
+
+- **OTA-207 (2026-05-29) · Two bugs surfaced by the OTA-206 inventory action snapshot.**
+  - **What (Sentinel Core Plate):** Snapshot showed `actions: equip:chest, use, drop` on a crafting material. The item is in materials.json with `kind: 'misc'` + tags `[automation, tech, salvage, scrap]`. `validSlotsForItem`'s name-regex (equipment.ts:67) matched 'plate' → routed to `['chest']`. Same trap waiting for any future material whose name happens to contain 'helm' / 'boot' / 'blade' / etc.
+  - **What (Shaped Aetheric Shard):** Snapshot showed `actions: scrap, drop` on a 2d20 one-throw weapon (per OTA-198). The modal had no throw button so the player would have to type the verb manually mid-combat.
+  - **Fix (Sentinel):** `validSlotsForItem` gains an early guard: if `findMaterialByName(item.name)` resolves, return `[]` immediately. Items in MATERIALS get NO equip slot, full stop.
+  - **Fix (throwable):** Added a THROW button to the InventoryScreen modal that surfaces when the item has the 'throwable' tag AND the current scene has a live enemy. Button submits `throw <item> at <enemy>` so the existing throw verb resolves the target + consumes one quantity. Without the live-enemy guard the engine would fall through to "throw what, where?" — a button that bounces is worse than no button. Player can still type `throw <item> at <noun>` outside combat. The snapshot's `actionsFor` surfaces `throw` unconditionally on the throwable tag (the verb is typeable even when the button isn't rendered).
+  - **Verification:** +3 tests in `inventorySnapshot` (Sentinel Core Plate no equip, Shaped Aetheric Shard throw surface, non-throwable Cloth Scrap doesn't show throw). 16-test suite green; `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/engine/equipment.ts` (MATERIALS guard), `app/diagnostics/inventorySnapshot.ts` (throw action label), `app/screens/InventoryScreen.tsx` (Throw at <enemy> button).
+
 #### COPY INVENTORY snapshot surfaces per-item modal actions
 
 - **OTA-206 (2026-05-29) · Each item in the snapshot now carries an `actions:` line listing what its inventory modal would offer.**

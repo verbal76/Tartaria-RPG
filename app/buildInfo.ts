@@ -7088,4 +7088,78 @@
 // inventorySnapshot.ts
 // (actionsFor helper + per-
 // item actions line render).
-export const OTA_BUILD_ID = '2026-05-29-206';
+// 2026-05-29-207 — two bugs
+// surfaced by the OTA-206
+// inventory action snapshot:
+//
+// (1) Sentinel Core Plate
+//     showed actions
+//     "equip:chest, use".
+//     It's a crafting material
+//     in materials.json but
+//     validSlotsForItem's
+//     name-regex (line 67
+//     equipment.ts) matched
+//     'plate' and routed to
+//     chest. Same trap
+//     waiting for any future
+//     material whose name
+//     contains 'helm', 'boot',
+//     'blade' etc. — they
+//     would all incorrectly
+//     route to player armor
+//     slots. Added an early
+//     guard: items in
+//     MATERIALS get NO equip
+//     slot, full stop.
+//
+// (2) Shaped Aetheric Shard
+//     showed only "scrap,
+//     drop" actions despite
+//     being a 2d20 one-throw
+//     weapon per OTA-198.
+//     Added a THROW button to
+//     the InventoryScreen
+//     modal that surfaces
+//     when the item has the
+//     'throwable' tag AND the
+//     current scene has a
+//     live enemy. Button
+//     submits "throw <item>
+//     at <enemy>" so the
+//     existing throw verb
+//     resolves the target +
+//     consumes one quantity.
+//     Without the live-enemy
+//     guard, the engine would
+//     fall through to "throw
+//     what, where?" — a button
+//     that bounces is worse
+//     than no button. Player
+//     can still type the verb
+//     directly outside combat.
+//     The snapshot's
+//     actionsFor surfaces
+//     'throw' unconditionally
+//     on the throwable tag
+//     (the verb is typeable
+//     even when the button
+//     isn't rendered).
+//
+// Tests: +3 in
+// inventorySnapshot
+// (Sentinel Core Plate no
+// equip; Shaped Aetheric
+// Shard throw; non-throwable
+// Cloth Scrap doesn't show
+// throw). 16-test suite
+// green. TS clean app-side.
+//
+// Files: app/engine/
+// equipment.ts (MATERIALS
+// guard), app/diagnostics/
+// inventorySnapshot.ts
+// (throw action label), app/
+// screens/InventoryScreen.tsx
+// (Throw at <enemy> button).
+export const OTA_BUILD_ID = '2026-05-29-207';

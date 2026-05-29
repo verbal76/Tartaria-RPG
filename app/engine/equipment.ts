@@ -36,6 +36,15 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   }
   if (findAmuletByName(item.name)) return ['amulet'];
   if (findRingByName(item.name)) return ['ring'];
+  // OTA-207 — crafting materials (MATERIALS catalog) should NEVER
+  // fall through to the name-regex equip routing. The Sentinel Core
+  // Plate is in materials.json with kind=misc tags=[automation,tech,
+  // salvage,scrap]; the existing armor name-regex (line ~67) caught
+  // 'plate' and routed it to ['chest']. Same trap for any future
+  // material whose name happens to contain helm / boot / blade
+  // tokens. Guard early — if the item lives in MATERIALS, it has
+  // no equip slot, full stop.
+  if (findMaterialByName(item.name)) return [];
   // Gear-side: relics with detection / locket-ish tags can be amulets.
   const gear = GEAR.find((g) => g.name.toLowerCase() === nameLower);
   if (gear) {
