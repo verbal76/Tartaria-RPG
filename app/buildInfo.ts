@@ -6517,4 +6517,105 @@
 // InventoryScreen.tsx (row
 // diamond render + rarity
 // HexColor helper + style).
-export const OTA_BUILD_ID = '2026-05-29-199';
+// 2026-05-29-200 — OTA-198
+// follow-ups: plain Aetheric
+// Shard now throws for 2d20
+// (was 1; my override only
+// caught "Shaped Aetheric
+// Shard"), Aetheric Vision
+// Lens now NARRATES when it
+// triggers a hook outcome
+// (was silent / statistical),
+// and `use Aetheric Vision
+// Lens` no longer falls
+// through to silence —
+// arbiter explains gate items
+// are passive-while-carried.
+// Player report on OTA-199
+// install:
+//   "it doesn't look like
+//   OTA 198 took, I still
+//   can't use my vision lens
+//   or throw my aetheric
+//   shard"
+//
+// Diagnosis:
+//   - The shard override in
+//     itemWeight.ts only
+//     matched 'shaped aetheric
+//     shard'. The player had
+//     looted plain 'Aetheric
+//     Shard' from container
+//     drops + Sketchy Stall;
+//     the LIGHT_NAME_PATTERNS
+//     regex matched 'shard',
+//     weight=1, throw damage
+//     = 1.
+//   - The lens hookBonus is
+//     statistical (15%→30%
+//     hook rate). With no
+//     visible cue, the player
+//     can't distinguish "lens
+//     is working" from "lucky
+//     roll". Felt like the
+//     lens did nothing.
+//   - `use Aetheric Vision
+//     Lens` fell through to
+//     silence: the use_relic
+//     handler routes
+//     consumable-effect items
+//     but gate-effect items
+//     (the lens is kind=
+//     'exploration' with
+//     effect.kind='gate') hit
+//     no branch.
+//
+// Fixes:
+//   - rollThrowDamage now
+//     matches BOTH 'aetheric
+//     shard' and 'shaped
+//     aetheric shard' (case-
+//     insensitive). Aetheric
+//     Shard is also a crafting
+//     material — the player
+//     can choose to spend it
+//     as a one-shot weapon or
+//     hoard it for recipes.
+//     Single-use enforced by
+//     the existing throw-
+//     consume path.
+//   - On every search where
+//     the lens is in pack AND
+//     the outcome is 'hook',
+//     prepend a world-channel
+//     line: "The Aetheric
+//     Vision Lens hums against
+//     your temple — a thread
+//     you weren't looking for
+//     catches the light."
+//     Cues the player to the
+//     bonus actually firing.
+//   - In the use_relic case,
+//     after the consumable
+//     branches fail, check for
+//     fx.kind === 'gate' and
+//     surface an Arbiter line:
+//     "Already at work — keep
+//     it on your person, and
+//     it will do its part.
+//     Nothing more to 'use'."
+//
+// Tests: +1 in
+// aethericLensAndShard for
+// the plain shard 2d20 case;
+// existing 9 + this 1 = 10
+// suite total. TS clean app-
+// side.
+//
+// Files: app/engine/
+// itemWeight.ts (extend
+// override), app/state/
+// gameStore.ts (lens hook
+// narration + gate-item
+// 'use' explanation).
+export const OTA_BUILD_ID = '2026-05-29-200';

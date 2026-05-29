@@ -4875,8 +4875,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
               get().appendLog('world', `You've already worked over the ${rawTarget} here. Nothing more to find.`);
               break;
             }
-            const outcome = rollAreaSearch(rawTarget, { hookBonus: hasAethericVision(player) ? 0.15 : 0 });
+            const lensActive = hasAethericVision(player);
+            const outcome = rollAreaSearch(rawTarget, { hookBonus: lensActive ? 0.15 : 0 });
             set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+            // OTA-200 — visible lens cue. When the player carries the
+            // Aetheric Vision Lens AND the outcome is a hook, narrate
+            // the lens picking up the trace. Players couldn't tell the
+            // lens was doing anything without this — the +15pp hook
+            // bonus is statistical, not per-roll observable.
+            if (lensActive && outcome.kind === 'hook') {
+              get().appendLog(
+                'world',
+                `The Aetheric Vision Lens hums against your temple — a thread you weren't looking for catches the light.`,
+              );
+            }
             get().appendLog('world', outcome.line);
             // Dispatch outcome first, then dedupe based on whether
             // anything actually produced — mirrors the harvest-verb
@@ -6220,6 +6232,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
               set({ player: advanceTime(p, 0.25) });
               get().appendLog('world', `You use one ${used.name}. ${messages.join(', ')}.`);
               void get().persist();
+              break;
+            }
+            // OTA-200 — explain gate items when the player tries to
+            // 'use' them. Without this, `use Aetheric Vision Lens`
+            // fell through silently because the lens carries effect.
+            // kind === 'gate', not 'consumable'. The lens (and any
+            // gate item) is passive-while-carried — narrate that so
+            // the player knows it's working and doesn't keep trying
+            // to consume it.
+            if (fx?.kind === 'gate') {
+              get().appendLog(
+                'arbiter',
+                `The Arbiter's eyes flick to the ${used.name} in your hand. "Already at work — keep it on your person, and it will do its part. Nothing more to 'use'."`,
+              );
               break;
             }
           }

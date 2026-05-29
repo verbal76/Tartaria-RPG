@@ -245,6 +245,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-198 follow-ups: plain shard throws, lens narrates, gate-item use explains itself
+
+- **OTA-200 (2026-05-29) · Player report on OTA-199 install: *"it doesn't look like OTA 198 took, I still can't use my vision lens or throw my aetheric shard"*.**
+  - **What:** OTA-198 shipped, but three things made it feel like nothing changed. (1) The throw-damage override only matched `'shaped aetheric shard'`; the player had looted plain `'Aetheric Shard'` from container drops + Sketchy Stall, and that name fell through to the LIGHT_NAME_PATTERNS regex match on "shard" → weight 1 → 1 damage. (2) The Lens hookBonus is statistical (15%→30%); without a visible cue, the player can't distinguish "lens working" from "lucky roll." (3) `use Aetheric Vision Lens` fell through silently because the use_relic handler routes consumable-effect items but the lens is `kind: 'exploration'` with `effect.kind: 'gate'` — no branch handled it.
+  - **Fix (shard):** `rollThrowDamage` in `itemWeight.ts` now matches BOTH `'aetheric shard'` and `'shaped aetheric shard'`. The plain shard is also a crafting material — the player can choose to spend one as a one-shot 2d20 weapon or hoard for recipes. Single-use is enforced by the existing throw-consume path.
+  - **Fix (lens cue):** On every area-search where the lens is in pack AND `outcome.kind === 'hook'`, prepend a world-channel line — *"The Aetheric Vision Lens hums against your temple — a thread you weren't looking for catches the light."* Lands ~30% of searches with the lens equipped vs. ~15% without, so the player sees the lens earning its slot.
+  - **Fix (gate-item use):** In the `use_relic` case, after the consumable branches finish, check for `fx.kind === 'gate'` and surface an Arbiter line: *"Already at work — keep it on your person, and it will do its part. Nothing more to 'use'."* Catches the lens, Climbing Rope, and any future gate item from falling through silently.
+  - **Verification:** +1 test in `aethericLensAndShard` for the plain shard 2d20 case (10 tests total in the suite). `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/engine/itemWeight.ts` (extend override to plain shard), `app/state/gameStore.ts` (lens hook narration + gate-item `use` explanation).
+
 #### Inferred-item diamond marker on inventory rows
 
 - **OTA-199 (2026-05-29) · A small rarity-colored ◆ before the name signals "this is engine-named" at a glance.**

@@ -43,16 +43,17 @@ export function itemWeight(item: InventoryItem): ItemWeight {
 /** Roll the damage die a thrown item of this weight produces, plus a
  *  small flat bonus for the heaviest tier. Minimum 1.
  *
- *  OTA-198 — name-based overrides for hand-shaped throwables. A
- *  Shaped Aetheric Shard is a one-use, 2d20 aetheric throwing knife
- *  meant for end-game targets — the player crafts one out of a Small
- *  Rock + Aether-shaping and gets ONE devastating throw out of it.
- *  Catalog desc previously said "1d6 piercing"; this override is the
- *  source of truth now and the JSON / state stamps line up. */
+ *  OTA-198 / OTA-200 — name-based overrides for hand-shaped throwables.
+ *  Both "Aetheric Shard" (looted crystal) and "Shaped Aetheric Shard"
+ *  (Aethercrafted refinement) deal 2d20 on throw. Author intent: the
+ *  raw shard already has the resonant edge; shaping just makes it
+ *  fly cleaner (no flavor difference today; same dice). The player
+ *  can throw either, trading a crafting material for one big hit.
+ *  Single-use is enforced by the throw-consume path. */
 export function rollThrowDamage(item: InventoryItem | null): number {
   if (!item) return 1; // bare rock
   const lower = (item.name ?? '').toLowerCase();
-  if (lower === 'shaped aetheric shard') {
+  if (lower === 'shaped aetheric shard' || lower === 'aetheric shard') {
     return rollDie(20) + rollDie(20);
   }
   const w = itemWeight(item);

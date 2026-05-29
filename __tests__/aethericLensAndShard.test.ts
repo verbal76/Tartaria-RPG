@@ -102,6 +102,26 @@ describe('OTA-198 — Shaped Aetheric Shard throw damage', () => {
     expect(max).toBeGreaterThanOrEqual(20);
   });
 
+  it('OTA-200 — plain "Aetheric Shard" (looted crystal) also rolls 2d20 on throw', () => {
+    const plain: InventoryItem = {
+      id: 'p1',
+      name: 'Aetheric Shard',
+      kind: 'misc',
+      quantity: 1,
+      tags: ['aether', 'crystal'],
+      rarity: 'Common',
+      description: 'A shard of Aetheric crystal.',
+    };
+    const samples = new Set<number>();
+    for (let i = 0; i < 300; i++) {
+      const d = rollThrowDamage(plain);
+      expect(d).toBeGreaterThanOrEqual(2);
+      expect(d).toBeLessThanOrEqual(40);
+      samples.add(d);
+    }
+    expect(samples.size).toBeGreaterThanOrEqual(10);
+  });
+
   it('a regular rock still rolls the small-weight die (not 2d20)', () => {
     const rock: InventoryItem = {
       id: 'r1',
