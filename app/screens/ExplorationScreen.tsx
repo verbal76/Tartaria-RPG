@@ -731,7 +731,20 @@ export function ExplorationScreen() {
                 ? 'the mud'
                 : 'the ground';
             const key = noun.replace(/^the\s+/i, ''); // 'mud' / 'ground' / 'floor'
-            return [{ noun, consumed: isAmbientConsumed(key), alwaysShow: true }];
+            // OTA-179 — pin chip now respects scanner gating. Pre-fix
+            // the 'the mud' chip rendered as a bright-active green
+            // chip even when the player had no Mud Scanner equipped —
+            // tapping it produced the same Arbiter refusal every
+            // time. Playtester typed `investigate the mud` 5+ times
+            // in 25 seconds. Now: if searchRequirementFor matches
+            // the chip's key AND the player lacks the right scanner
+            // bias, the chip greys with the requirement label.
+            const req = searchRequirementFor(key);
+            const hasScannerForReq = req && player
+              ? playerHasScannerEquipped(player, req.scannerBias)
+              : false;
+            const unmetRequirement = req && !hasScannerForReq ? req.shortLabel : undefined;
+            return [{ noun, consumed: isAmbientConsumed(key), alwaysShow: true, unmetRequirement }];
           })(),
           // 2026-05-25 — productively-consumed nouns (taken, salvaged
           // with loot, investigated with substantive result) are
@@ -749,13 +762,19 @@ export function ExplorationScreen() {
             // dead in the modal.
             .filter((n) => !isFuzzyConsumed(n, productivelyConsumedSet))
             .map((n) => {
-              // OTA 195 — compute per-chip requirement. An Aether-coded
-              // noun (vent fissure, ley line, glyph, etc.) requires a
-              // scanner equipped. If the player doesn't have one,
-              // mark unmetRequirement so SearchModal renders the chip
-              // grayed with a "requires Aether scanner" tag.
+              // OTA 195 — compute per-chip requirement. Aether / pulse /
+              // mud-coded nouns require the matching scanner equipped.
+              // OTA-179 — was hard-coded to 'aetheric' bias, so mud and
+              // pulse nouns never greyed even when the player lacked
+              // the right scanner (chip stayed bright-active while the
+              // engine kept refusing). Now passes req.scannerBias —
+              // the same bias the engine checks at search-time — so
+              // the chip-grey decision matches the engine's accept/
+              // refuse decision for every scanner family.
               const req = searchRequirementFor(n);
-              const hasScanner = player ? playerHasScannerEquipped(player, 'aetheric') : false;
+              const hasScanner = req && player
+                ? playerHasScannerEquipped(player, req.scannerBias)
+                : false;
               let unmetRequirement = req && !hasScanner ? req.shortLabel : undefined;
               // OTA-166 — elevated-noun gate. Playtest log showed the
               // player climbed onto `weathered submerged library shelf`

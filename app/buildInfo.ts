@@ -4771,4 +4771,75 @@
 // destructive button on warning),
 // __tests__/sellGateLossDetection
 // .test.ts (NEW).
-export const OTA_BUILD_ID = '2026-05-29-178';
+//
+// 2026-05-29 OTA-179 — investigate
+// chip-greying matches engine
+// scanner-gate decision for mud
+// + pulse + aetheric (was aether-
+// only).
+//
+// Playtest log: player typed
+// `investigate the mud` 5+ times
+// in 25 seconds at a mud biome
+// without a Mud Scanner. Each
+// attempt produced the same
+// Arbiter refusal "Equip a Mud
+// Scanner...". The dedup caught
+// some repeats but the player
+// kept trying because the chip
+// looked tappable.
+//
+// Two bugs found in
+// ExplorationScreen's
+// SearchModal chip mapping:
+//
+//   (a) The pinned `the mud /
+//       ground / floor` chip
+//       (always-show, top of
+//       SearchModal) never
+//       computed unmetRequirement
+//       at all — even when the
+//       biome's pin was 'the
+//       mud' AND the player had
+//       no Mud Scanner, the chip
+//       rendered as bright-
+//       active green.
+//
+//   (b) The broader chip mapping
+//       at line 770ish hard-
+//       coded the scanner bias
+//       check to 'aetheric', so
+//       mud-coded nouns (silt
+//       vent, fungal bed, sludge
+//       pool, etc.) and pulse-
+//       coded nouns (automaton,
+//       circuit, sentinel, etc.)
+//       checked the WRONG
+//       scanner type. Player
+//       with no aetheric scanner
+//       sees mud chips greyed
+//       correctly, but a player
+//       with an aetheric scanner
+//       equipped sees mud chips
+//       wrongly ungreyed.
+//
+// Fix: both chip-build sites
+// now use req.scannerBias when
+// the noun matches
+// searchRequirementFor — the
+// same bias the engine checks
+// at search-time
+// (gameStore.ts:5495). Chip-
+// grey decision now matches
+// engine accept/refuse for
+// every scanner family.
+//
+// TS clean. No engine code
+// touched — UI-only fix.
+//
+// Files: app/screens/
+// ExplorationScreen.tsx (pinned-
+// chip unmetRequirement +
+// scanner-bias fix in chip
+// mapper).
+export const OTA_BUILD_ID = '2026-05-29-179';
