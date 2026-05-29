@@ -6304,4 +6304,147 @@
 // branch in combat + pet/
 // scratch reroute to
 // openCallDogModal).
-export const OTA_BUILD_ID = '2026-05-29-197';
+// 2026-05-29-198 — Aetheric
+// Vision Lens actually does
+// something + Shaped Aetheric
+// Shard is the 2d20 one-shot
+// throwing knife the rulebook
+// said it was. Player asks:
+//   "atheric vision lenses
+//   are supposed to be able
+//   to be equipped to have a
+//   better way to find
+//   etheric items, if wearing
+//   them when you investigate
+//   items you get a higher
+//   chance to find an etheric
+//   mission hook or the
+//   fusion forge. the shapes
+//   Aetheric shard is supposed
+//   to be a 2d20, 1 use
+//   throwing knife for high
+//   level enemies"
+//
+// (1) Aetheric Vision Lens.
+//     Pre-OTA, the lens was
+//     an exploration item
+//     with effect.kind='gate'
+//     unlocking 'detect_aether'
+//     — but `detect_aether`
+//     wasn't checked by any
+//     gameplay path. Pure
+//     flavor. Now:
+//
+//     - rollAreaSearch in
+//       areaSearch.ts takes
+//       an optional opts.hook
+//       Bonus that shifts the
+//       distribution toward
+//       'hook' outcomes
+//       (clamped 0..0.4 so
+//       the lens can't make
+//       every search a hook).
+//     - pickWastelandEncounter
+//       in wastelandEncounters
+//       .ts takes opts.
+//       aethericVision; when
+//       true, fusion_bench
+//       archetype weights are
+//       2× (the lens "sees"
+//       Aetheric resonance,
+//       Crucibles ARE Aetheric
+//       resonance).
+//     - New aethericVision
+//       Active() helper in
+//       itemEffect.ts wraps
+//       inventoryHasGate
+//       ('detect_aether').
+//     - gameStore.ts gains
+//       a local hasAetheric
+//       Vision(player) and
+//       wires it into the 3
+//       rollAreaSearch sites
+//       (search, harvest, AI
+//       search) with hookBonus
+//       =0.15, and into
+//       stepDirection's
+//       pickWastelandEncounter
+//       call.
+//
+// (2) Shaped Aetheric Shard.
+//     Pre-OTA, the catalog
+//     description said "Single
+//     use; 1d6 piercing" but
+//     the throw path used
+//     rollThrowDamage's
+//     weight heuristic, which
+//     gave 1 damage (LIGHT_
+//     NAME_PATTERNS match
+//     'shard'). End-game item
+//     dealing single-digit
+//     damage was off-spec.
+//     Now:
+//
+//     - rollThrowDamage in
+//       itemWeight.ts has a
+//       name-based override
+//       for "Shaped Aetheric
+//       Shard" returning
+//       rollDie(20) +
+//       rollDie(20).
+//     - gear.json description
+//       updated to "ONE THROW
+//       only — 2d20 aetheric
+//       damage. Carry it for
+//       the worst thing the
+//       road shows you."
+//       Rarity bumped Common
+//       → Rare to match the
+//       payload.
+//     - The throw consume
+//       path in submitPlayer
+//       Action already drains
+//       quantity on throw, so
+//       single-use is enforced
+//       by the existing
+//       inventory math.
+//
+// Tests: +9 in
+// aethericLensAndShard
+// (hook bonus baseline +
+// boost + clamp, 2d20 range
+// + case insensitivity +
+// rock-still-light, lens
+// detection true/false,
+// fusion bench bias).
+// Regression sweep (areaSearch
+// / itemFusion / craftTag
+// Substitution / petScratch
+// VerbRouting / weaponResist
+// Nudge / itemEffect /
+// salvagePools / theft
+// NarrationGuard / stat
+// Training / itemBackfill /
+// itemSynthesisQwen / item
+// DefaultsBalancedSynth) all
+// stay green; TS clean app-
+// side.
+//
+// Files: app/engine/
+// areaSearch.ts (hookBonus
+// param + distribution shift),
+// app/engine/itemEffect.ts
+// (aethericVisionActive
+// wrapper), app/engine/
+// itemWeight.ts (shard
+// override), app/engine/
+// wastelandEncounters.ts
+// (aethericVision flag +
+// bias multiplier), app/
+// data/items/gear.json
+// (shard description +
+// rarity bump), app/state/
+// gameStore.ts (hasAetheric
+// Vision helper + 3 search
+// sites + encounter wire).
+export const OTA_BUILD_ID = '2026-05-29-198';

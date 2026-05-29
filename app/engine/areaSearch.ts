@@ -216,12 +216,26 @@ function format(line: string, target: string): string {
 //
 // The caller already knows the target string the player used; we pass it
 // back into the line so narration uses the player's own phrasing.
-export function rollAreaSearch(target: string): AreaSearchOutcome {
+/** OTA-198 — optional hookBonus shifts the distribution toward
+ *  `hook` outcomes. Used by the Aetheric Vision Lens path in
+ *  gameStore: when the player carries the lens, the wider chance
+ *  to surface a mission hook fires. A bonus of 0.15 converts
+ *  ~15 percentage points away from "nothing" into hook outcomes,
+ *  leaving material + TC weights untouched. Clamped to [0, 0.4]
+ *  so the lens can't turn every search into a hook. */
+export function rollAreaSearch(
+  target: string,
+  opts?: { hookBonus?: number },
+): AreaSearchOutcome {
+  const bonus = Math.max(0, Math.min(0.4, opts?.hookBonus ?? 0));
+  const nothingCutoff = 0.40 - bonus;
+  const materialCutoff = nothingCutoff + 0.25;
+  const tcCutoff = materialCutoff + 0.20;
   const r = Math.random();
-  if (r < 0.40) {
+  if (r < nothingCutoff) {
     return { kind: 'nothing', line: format(pick(NOTHING_LINES), target) };
   }
-  if (r < 0.65) {
+  if (r < materialCutoff) {
     const found = pickWeighted(SMALL_FINDS);
     return {
       kind: 'material',
@@ -230,7 +244,7 @@ export function rollAreaSearch(target: string): AreaSearchOutcome {
       line: format(pick(MATERIAL_LINES), target),
     };
   }
-  if (r < 0.85) {
+  if (r < tcCutoff) {
     const amount = 5 + Math.floor(Math.random() * 12);
     return { kind: 'tc', amount, line: format(pick(TC_LINES), target) };
   }

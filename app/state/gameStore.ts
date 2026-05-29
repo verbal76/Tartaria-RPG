@@ -4875,7 +4875,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               get().appendLog('world', `You've already worked over the ${rawTarget} here. Nothing more to find.`);
               break;
             }
-            const outcome = rollAreaSearch(rawTarget);
+            const outcome = rollAreaSearch(rawTarget, { hookBonus: hasAethericVision(player) ? 0.15 : 0 });
             set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
             get().appendLog('world', outcome.line);
             // Dispatch outcome first, then dedupe based on whether
@@ -5109,7 +5109,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // circuit, wagon → rations + rope, etc.). Falls through to
             // the generic area-search pool when no pool matches.
             const salvage = rollSalvagePool(harvestAmbient);
-            const outcome = salvage ?? rollAreaSearch(harvestAmbient);
+            const outcome = salvage ?? rollAreaSearch(harvestAmbient, { hookBonus: hasAethericVision(player) ? 0.15 : 0 });
             // OTA 23-015 — `kind: 'nothing'` no longer leaves the noun
             // unconsumed. Playtest log: a player typed `salvage gate`
             // six times in a row, getting the "still here for another
@@ -13582,6 +13582,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         threshold: baseThreshold,
         rollChance: effectiveRollChance,
         depleted,
+        // OTA-198 — Aetheric Vision Lens doubles the chance the
+        // selected encounter is a fusion bench.
+        aethericVision: hasAethericVision(player),
       });
       if (enc) {
         set(() => ({ wastelandStepsSinceEncounter: 0 }));
@@ -16734,6 +16737,25 @@ function wearEquippedItem(
 // Sum AC bonus and gather resistances from every equipped armor piece
 // (head/chest/legs/feet). Used by combat to compute effective AC and to
 // halve damage of types the armor resists.
+// OTA-198 — true when the player is carrying an Aetheric Vision Lens
+// (or any item granting the `detect_aether` gate). Used by the three
+// rollAreaSearch sites to apply a hookBonus and by the wasteland
+// encounter picker to bias toward the fusion bench archetype. Cheap
+// — iterates inventory once and short-circuits on first match.
+function hasAethericVision(player: PlayerCharacter | null): boolean {
+  if (!player) return false;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { aethericVisionActive } = require('../engine/itemEffect');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { findExplorationItemByName, findGearByName, findMaterialByName } = require('../engine/crafting');
+    return !!aethericVisionActive(
+      player.inventory.map((i) => i.name),
+      [findExplorationItemByName, findGearByName, findMaterialByName],
+    );
+  } catch { return false; }
+}
+
 function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances: string[] } {
   let acBonus = 0;
   const resistances: string[] = [];

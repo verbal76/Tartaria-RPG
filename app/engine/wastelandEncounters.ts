@@ -107,6 +107,11 @@ interface PickOptions {
    *  selection weight doubled. Player at low HP / low stamina / low
    *  TC walks into a juicier temptation, not a wandering monster. */
   depleted?: boolean;
+  /** OTA-198 — Aetheric Vision Lens bias. When true, `fusion_bench`
+   *  archetypes get a 2× weight multiplier so a player who's chosen
+   *  to carry the lens trips over Crucibles roughly twice as often.
+   *  Other archetypes unaffected. */
+  aethericVision?: boolean;
 }
 
 /**
@@ -143,8 +148,15 @@ export function pickWastelandEncounter(
   // stay at baseline. Reads more carrot, less stick.
   const isHighValue = (t: WastelandEncounterType): boolean =>
     t === 'treasure' || t === 'mini_dungeon';
-  const biasMultiplier = (a: WastelandArchetype): number =>
-    opts.depleted && isHighValue(a.type) ? 2.0 : 1.0;
+  const biasMultiplier = (a: WastelandArchetype): number => {
+    let mult = 1.0;
+    if (opts.depleted && isHighValue(a.type)) mult *= 2.0;
+    // OTA-198 — Aetheric Vision Lens biases fusion_bench archetypes.
+    // The lens "sees" Aetheric disturbances; Crucibles ARE Aetheric
+    // resonance. Carrying it makes you twice as likely to find one.
+    if (opts.aethericVision && a.type === 'fusion_bench') mult *= 2.0;
+    return mult;
+  };
   // Weighted pick among eligible archetypes (bias-adjusted).
   const totalWeight = eligible.reduce(
     (acc, e) => acc + e.archetype.weight * biasMultiplier(e.archetype),

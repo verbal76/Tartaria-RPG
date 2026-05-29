@@ -147,6 +147,20 @@ export function aggregateInventoryPassives(
   return out;
 }
 
+/** OTA-198 — wrapper that asks "is the Aetheric Vision Lens active
+ *  in the player's pack?" by checking for the `detect_aether` gate.
+ *  Used by area-search rolls (raises the chance of a mission hook
+ *  outcome) and the wasteland encounter picker (biases toward the
+ *  fusion bench archetype). Exploration items don't equip — they
+ *  "activate" by being carried, mirroring how Climbing Rope works
+ *  for `climb_steep`. */
+export function aethericVisionActive(
+  itemNames: string[],
+  resolvers: EffectResolver[],
+): boolean {
+  return inventoryHasGate(itemNames, 'detect_aether', resolvers);
+}
+
 /** True iff the player has at least one inventory item granting
  *  the given gate. Used by scene/travel code to gate
  *  toxic-air / steep-climb / metal-dig / flight / nightvision

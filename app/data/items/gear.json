@@ -68,7 +68,7 @@
       "effect": { "kind": "gate", "unlocks": "climb_steep" } },
     { "name": "Broken Rope", "kind": "misc", "rarity": "Common", "tags": ["scrap", "rope"], "description": "A snapped length of rope, fibers frayed where it failed. Useless on its own — combine two to splice a fresh Climbing Rope." },
 
-    { "name": "Shaped Aetheric Shard", "kind": "misc", "rarity": "Common", "tags": ["throwable", "aether", "shaped"], "description": "A Small Rock pulled apart and reformed by Aethercraft into a sharp throwing edge. Single use; 1d6 piercing on impact." },
+    { "name": "Shaped Aetheric Shard", "kind": "misc", "rarity": "Rare", "tags": ["throwable", "aether", "shaped"], "description": "A Small Rock pulled apart and reformed by Aethercraft into a singing edge of crystal and metal. ONE THROW only — 2d20 aetheric damage. Carry it for the worst thing the road shows you." },
 
     { "name": "Cleansing Tonic", "kind": "consumable", "rarity": "Uncommon", "tags": ["healing", "purification"], "description": "Bitter green draught brewed by Servants of the Giants. Drinks the aether back out of your blood. Drops corruption by 20.",
       "effect": { "kind": "consumable", "reduceCorruption": 20 } },
