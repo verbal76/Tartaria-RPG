@@ -155,6 +155,7 @@ import {
   pickScrapFailureLine,
 } from '../engine/scrapEngine';
 import { stampDurability, wearItemByName, wearItemById, repairCost, repairItem } from '../engine/durability';
+import { restampInventoryItem } from '../engine/itemBackfill';
 import {
   type Hook,
   type HookEffect,
@@ -664,6 +665,15 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
       // newly-eligible item picks up its baseDurability on this load.
       item = stampDurability(item);
     }
+    // OTA-191 — re-stamp synthesized fields (tags, description, scrap
+    // routing) onto every item. Items that were dropped / scavenged /
+    // bought BEFORE the upgraded itemDefaults.ts shipped carry empty
+    // tag lists and the bare "Field-inferred ... pending catalog
+    // backfill" description. Restamp pulls the now-richer synthesized
+    // row (or any cached Qwen overlay) and merges its tags + fresh
+    // description onto the saved instance in place. Idempotent on
+    // already-restamped items (the merge only fills gaps).
+    item = restampInventoryItem(item);
     return item;
   });
   // Backfill the per-slot instance ids. A pre-refactor save records only
@@ -1447,6 +1457,54 @@ export const useGameStore = create<GameStore>((set, get) => ({
         });
       }
     } catch { /* ignore — module is small + always present */ }
+
+    // OTA-191 — load the Qwen-synthesis cache so inferred-gear lookups
+    // can pick up previously-balanced overlays without firing the
+    // LLM again. The cache survives app restarts (AsyncStorage) so a
+    // tester who synthesized 30 unique item names on day 1 doesn't
+    // re-spend the model on day 2.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const synthCache = require('../engine/itemSynthesisCache');
+      if (typeof synthCache.loadSynthCache === 'function') {
+        await synthCache.loadSynthCache();
+      }
+    } catch { /* ignore — cache stays empty + the LLM path no-ops */ }
+
+    // OTA-191 — wire the fire-and-forget Qwen synth requester. When
+    // inferGear sees an item it can't classify confidently (no
+    // food/drink/light/rope/etc. keyword) AND no cache entry exists,
+    // it calls this with (name, hintTags). We dispatch a Qwen call
+    // in the background — the result lands in the cache for the NEXT
+    // lookup. The player's immediate use of the item still gets the
+    // static-inference row; the enrichment shows up on the next
+    // inventory open. Throttled per-name so a 30-item drop doesn't
+    // spam the LLM with duplicates.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const itemDefaults = require('../engine/itemDefaults');
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const synth = require('../engine/itemSynthesisQwen');
+      if (typeof itemDefaults.setQwenSynthRequester === 'function') {
+        const pending = new Set<string>();
+        itemDefaults.setQwenSynthRequester((name: string, hintTags: readonly string[]) => {
+          const key = name.toLowerCase();
+          if (pending.has(key)) return;
+          // Status gate — don't bother spawning the call if Qwen isn't
+          // ready. The static row is already in the player's hands.
+          if (!qwen.isReady()) return;
+          pending.add(key);
+          // Defer to the next microtask so the synchronous caller
+          // (a stat resolution inside inventory render) returns first.
+          void Promise.resolve().then(async () => {
+            try {
+              await synth.synthesizeItemViaQwen(name, hintTags, qwen);
+            } catch { /* ignore — fail closed, static row stays */ }
+            pending.delete(key);
+          });
+        });
+      }
+    } catch { /* ignore — synth opt-in */ }
     // Just-updated detection. checkAndApplyOTA → Updates.reloadAsync
     // can yank the app to a new bundle mid-stride and reading the
     // result feels like a crash. Compare current OTA_BUILD_ID against

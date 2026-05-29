@@ -31,8 +31,13 @@ export function canScrap(item: InventoryItem): boolean {
   if (item.kind === 'weapon' || item.kind === 'armor' || item.kind === 'relic') return true;
   // Some gear (compass, torch, rope) carries useful base materials —
   // allow scrap as long as the item isn't a raw commodity.
+  // OTA-191 — 'improvised' added to the gate so misc items the
+  // OTA-191 inferGear default-tags as improvised (no specific material
+  // keyword in the name) still pass the scrap predicate. scrapOutputFor
+  // already routes 'improvised' to Small Rock; this just keeps the
+  // gate consistent with the output table.
   if (item.kind === 'misc' && (item.tags ?? []).some((t) =>
-    /metal|wood|stone|aether|crystal|fiber|cloth|plate|scaled/i.test(t),
+    /metal|wood|stone|aether|crystal|fiber|cloth|plate|scaled|improvised|organic/i.test(t),
   )) {
     // Materials with these tags already ARE the scrap output — refuse
     // to scrap them into themselves.

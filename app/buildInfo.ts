@@ -5625,4 +5625,127 @@
 // KeyboardInputBar mount),
 // app/components/Keyboard
 // InputBar.tsx (NEW).
-export const OTA_BUILD_ID = '2026-05-29-190';
+//
+// 2026-05-29-191 — inferred
+// items: balanced stats +
+// USE / EAT / SCRAP coverage
+// (hybrid static + Qwen).
+// Player: "how can we make
+// it so something actually
+// populates that field and
+// figures balanced stats for
+// the item and gives it the
+// full use option if it's
+// usable and eat if it's
+// edible, and scrap. I have
+// a ton in my inventory that
+// are useless. is this
+// something we can also use
+// qwen for?"
+//
+// Three phases:
+//   (1) Static heuristic
+//       upgrade in itemDefaults
+//       .ts. inferGear now
+//       emits a typed effect
+//       for food / drink /
+//       fungus / light /
+//       compass / rope (heal/
+//       restore/buff/extend
+//       light/passive wisdom/
+//       climb_steep gate)
+//       plus material tags
+//       (fiber / metal /
+//       organic / crystal /
+//       wood / cloth / stone)
+//       so canScrap routes the
+//       item to the right
+//       output. inferWeapon
+//       emits a flavor effect
+//       string for sharp/
+//       electric/fire/poison
+//       names. inferArmor
+//       emits keyword-based
+//       resistances (burn /
+//       cold / poison /
+//       degradation /
+//       electrical / aetheric).
+//   (2) Qwen-backed deep
+//       synthesis. New
+//       itemSynthesisQwen
+//       module calls Qwen with
+//       a tightly-scoped JSON
+//       prompt for items the
+//       static path can't
+//       classify confidently;
+//       output is validated +
+//       clamped (healHP ≤ 10,
+//       restoreStamina ≤ 8,
+//       any bonus ≤ 2, buff
+//       duration ≤ 6, ≤ 8
+//       extra tags). Cached
+//       to AsyncStorage via
+//       itemSynthesisCache;
+//       fire-and-forget on
+//       first encounter so
+//       the synchronous lookup
+//       returns immediately
+//       with the static row
+//       and the cache lights
+//       up for the next view.
+//   (3) Backfill existing
+//       inventory. backfillPlayer
+//       (the existing save-load
+//       migration shim) now
+//       calls
+//       restampInventoryItem
+//       on every item — pulls
+//       the now-richer
+//       synthesized row (or
+//       any cached Qwen
+//       overlay) and merges
+//       its tags + fresh
+//       description onto saved
+//       instances in place.
+//       Idempotent — only
+//       fills fields that are
+//       MISSING.
+//
+// Also: canScrap now accepts
+// 'improvised' + 'organic'
+// tags so misc items the
+// upgraded inferGear default-
+// tags pass the predicate
+// (scrapOutputFor already
+// recognized them; the gate
+// was the only thing out of
+// sync).
+//
+// 33 new tests across 3
+// files: itemDefaults
+// BalancedSynth (19),
+// itemSynthesisQwenContract
+// (8), itemBackfillIdempotent
+// (6). Canary five
+// (salvagePools / theft
+// NarrationGuard / itemEffect
+// / statTraining / areaSearch)
+// stays green. TS clean.
+//
+// Files: app/engine/
+// itemDefaults.ts (Phase 1
+// static upgrades + Qwen
+// requester hook + cache
+// merge), app/engine/
+// itemSynthesisQwen.ts (NEW),
+// app/engine/
+// itemSynthesisCache.ts
+// (NEW), app/engine/
+// itemBackfill.ts (NEW),
+// app/engine/scrapEngine.ts
+// (canScrap gate widened),
+// app/state/gameStore.ts
+// (cache load + Qwen
+// requester wire-up +
+// backfillPlayer restamp).
+export const OTA_BUILD_ID = '2026-05-29-191';
