@@ -239,8 +239,122 @@ function totalQuantity(inventory: readonly InventoryItem[], materialName: string
   return total;
 }
 
+// OTA-193 — material-tag substitution. Lets a miscellaneous item the
+// catalog DOESN'T name explicitly (a synthesized "Brass Sextant", a
+// scavenged "Reclaimer's Cord", a Qwen-named "Whisper Marrow") stand in
+// for one of the canonical scrap materials when the recipe calls for
+// it. Without this, the static + Qwen inference path generates "useless
+// pile" items the player can only sell or scrap manually — they can't
+// participate directly in any recipe.
+//
+// Map shape: ingredient name (lowercased) → tag set that satisfies it.
+// Mirrors scrapEngine.scrapOutputFor's tag rules so "if you'd get a
+// Scrap Metal from scrapping it, you can spend it as a Scrap Metal."
+const MATERIAL_SUBSTITUTE_TAGS: Record<string, string[]> = {
+  'scrap metal': ['metal', 'plate', 'iron', 'blade'],
+  'patched cloth': ['cloth', 'fiber', 'organic'],
+  'stick': ['wood', 'haft'],
+  'small rock': ['stone', 'mudstone', 'improvised'],
+  'aetheric shard': ['aether', 'crystal'],
+  'bone shard': ['organic', 'bone'],
+};
+
+/** Is this inventory item eligible to be auto-consumed as a substitute
+ *  for a canonical material? Restricted to MISC kind so the player's
+ *  equipped sword / armor / accessory isn't silently destroyed by a
+ *  craft. Stolen items are also off-limits — the player may want to
+ *  fence them, and consuming contraband for a craft would feel like a
+ *  bug. */
+function isSubstitutable(item: InventoryItem): boolean {
+  if (item.kind !== 'misc') return false;
+  if ((item as { stolen?: boolean }).stolen) return false;
+  return true;
+}
+
+/** Count substitute material an ingredient could draw from the
+ *  inventory. Each substitutable item contributes 1 unit per stack
+ *  count toward the ingredient — a 1-for-1 trade so the player doesn't
+ *  get more value out of substitution than scrap-then-craft would
+ *  yield. Inferred items mostly stack at 1, which keeps this honest. */
+function substituteQuantityFor(
+  inventory: readonly InventoryItem[],
+  ingredientName: string,
+): number {
+  const tags = MATERIAL_SUBSTITUTE_TAGS[ingredientName.toLowerCase()];
+  if (!tags) return 0;
+  const tagSet = new Set(tags);
+  const targetName = ingredientName.toLowerCase();
+  let total = 0;
+  for (const item of inventory) {
+    if (item.name.toLowerCase() === targetName) continue; // counted by name path
+    if (!isSubstitutable(item)) continue;
+    const has = (item.tags ?? []).some((t) => tagSet.has(t.toLowerCase()));
+    if (has) total += item.quantity;
+  }
+  return total;
+}
+
 export function canCraft(recipe: Recipe, inventory: readonly InventoryItem[]): boolean {
-  return recipe.ingredients.every((ing) => totalQuantity(inventory, ing.name) >= ing.quantity);
+  return recipe.ingredients.every((ing) => {
+    const named = totalQuantity(inventory, ing.name);
+    if (named >= ing.quantity) return true;
+    const subs = substituteQuantityFor(inventory, ing.name);
+    return named + subs >= ing.quantity;
+  });
+}
+
+/** OTA-193 — list ingredients still short after both name + substitute
+ *  drains. Returns the missing-quantity-by-name shape the craft caller
+ *  needs to surface a "you still need X" arbiter line. */
+export function missingIngredients(
+  recipe: Recipe,
+  inventory: readonly InventoryItem[],
+): Array<{ name: string; quantity: number }> {
+  const out: Array<{ name: string; quantity: number }> = [];
+  for (const ing of recipe.ingredients) {
+    const named = totalQuantity(inventory, ing.name);
+    const subs = substituteQuantityFor(inventory, ing.name);
+    const have = named + subs;
+    if (have < ing.quantity) {
+      out.push({ name: ing.name, quantity: ing.quantity - have });
+    }
+  }
+  return out;
+}
+
+/** OTA-193 — preview the substitutions a craft would perform without
+ *  mutating inventory. Used by the craft caller so the arbiter can
+ *  narrate what's being consumed ("You strip the Brass Sextant for the
+ *  metal it needs."). Per-substitution stacks are flattened to one
+ *  entry per (ingredient, substitute name) pair. */
+export function previewCraftSubstitutions(
+  recipe: Recipe,
+  inventory: readonly InventoryItem[],
+): Array<{ ingredient: string; substitute: string; quantity: number }> {
+  const out: Array<{ ingredient: string; substitute: string; quantity: number }> = [];
+  const consumed = new Map<string, number>(); // id → already-counted
+
+  for (const ing of recipe.ingredients) {
+    const namedHave = totalQuantity(inventory, ing.name);
+    if (namedHave >= ing.quantity) continue;
+    let stillNeed = ing.quantity - namedHave;
+    const tags = MATERIAL_SUBSTITUTE_TAGS[ing.name.toLowerCase()];
+    if (!tags) continue;
+    const tagSet = new Set(tags);
+    for (const item of inventory) {
+      if (stillNeed <= 0) break;
+      if (!isSubstitutable(item)) continue;
+      if (!(item.tags ?? []).some((t) => tagSet.has(t.toLowerCase()))) continue;
+      const alreadyTaken = consumed.get(item.id) ?? 0;
+      const available = item.quantity - alreadyTaken;
+      if (available <= 0) continue;
+      const take = Math.min(available, stillNeed);
+      out.push({ ingredient: ing.name, substitute: item.name, quantity: take });
+      consumed.set(item.id, alreadyTaken + take);
+      stillNeed -= take;
+    }
+  }
+  return out;
 }
 
 export function listCraftableRecipes(inventory: readonly InventoryItem[]): Recipe[] {
@@ -292,9 +406,29 @@ export function consumeIngredients(
   for (const ing of recipe.ingredients) {
     let need = ing.quantity;
     const target = ing.name.toLowerCase();
+    // Pass 1 — exact-name drain (preserve substitution stock when the
+    // player has the canonical material).
     for (const item of next) {
       if (need <= 0) break;
       if (item.name.toLowerCase() !== target) continue;
+      const take = Math.min(item.quantity, need);
+      item.quantity -= take;
+      need -= take;
+    }
+    if (need <= 0) continue;
+    // Pass 2 — OTA-193 tag-substitution drain. Only misc, non-stolen,
+    // non-equipped items. The misc check rules out weapons / armor /
+    // accessories so the player's equipped sword can't be silently
+    // consumed by a craft. Stolen contraband is preserved for the
+    // fence path.
+    const tags = MATERIAL_SUBSTITUTE_TAGS[target];
+    if (!tags) continue;
+    const tagSet = new Set(tags);
+    for (const item of next) {
+      if (need <= 0) break;
+      if (item.quantity <= 0) continue;
+      if (!isSubstitutable(item)) continue;
+      if (!(item.tags ?? []).some((t) => tagSet.has(t.toLowerCase()))) continue;
       const take = Math.min(item.quantity, need);
       item.quantity -= take;
       need -= take;

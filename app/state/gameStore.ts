@@ -122,6 +122,8 @@ import {
   listCraftableRecipes,
   findRecipeByResult,
   consumeIngredients,
+  missingIngredients,
+  previewCraftSubstitutions,
   lookupCraftedItem,
   RECIPES,
   findArmorByName,
@@ -9288,12 +9290,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
         }
-        const missing = recipe.ingredients.filter(
-          (ing) =>
-            player.inventory
-              .filter((i) => i.name.toLowerCase() === ing.name.toLowerCase())
-              .reduce((sum, i) => sum + i.quantity, 0) < ing.quantity,
-        );
+        // OTA-193 — check shortfall AFTER tag-substitution. Misc items
+        // with the right material tag (a synthesized "Brass Sextant"
+        // carrying ['metal'], say) count toward "Scrap Metal" cost so
+        // inferred-pile items can participate in recipes directly
+        // instead of forcing the player to scrap-then-craft.
+        const missing = missingIngredients(recipe, player.inventory);
         if (missing.length > 0) {
           const list = missing.map((m) => `${m.quantity}× ${m.name}`).join(', ');
           get().appendLog(
@@ -9301,6 +9303,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
             `"Not yet." the Arbiter says. "${recipe.result} needs ${list}."`,
           );
           break;
+        }
+        // OTA-193 — narrate any substitutions so the player understands
+        // why their "Brass Sextant" disappeared in service of a craft.
+        const subs = previewCraftSubstitutions(recipe, player.inventory);
+        if (subs.length > 0) {
+          const list = subs.map((s) =>
+            s.quantity > 1
+              ? `${s.quantity}× ${s.substitute} → ${s.ingredient}`
+              : `${s.substitute} → ${s.ingredient}`,
+          ).join(', ');
+          get().appendLog(
+            'arbiter',
+            `The Arbiter nods. "Stripped for parts: ${list}."`,
+          );
         }
         const remaining = consumeIngredients(player.inventory, recipe);
         const catEntry = lookupCraftedItem(recipe.result);

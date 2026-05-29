@@ -5831,4 +5831,91 @@
 // app/state/gameStore.ts
 // (onSynthLanded listener
 // registration).
-export const OTA_BUILD_ID = '2026-05-29-192';
+// 2026-05-29-193 — inferred
+// items now satisfy recipes
+// directly via material-tag
+// substitution. Player ask:
+//   "why do I have the feeling
+//   that we are generating an
+//   endless stream of items
+//   that will never have a
+//   real use and will just add
+//   to our package inventory
+//   but never get figured into
+//   a recipe, or repair, or
+//   crafting use? it's just
+//   weight, gold from sales,
+//   and scrap generation.
+//   prove orherwise?"
+//
+// Honest answer: largely
+// correct, before this fix.
+// Recipes matched by EXACT
+// name only (canCraft at
+// crafting.ts:243), so an
+// inferred "Brass Sextant"
+// or "Reclaimer's Cord" could
+// only feed crafting by
+// scrapping-then-crafting,
+// never directly.
+//
+// Fix: canCraft + consume
+// Ingredients now accept
+// material-tag substitutes
+// for the canonical scrap
+// ingredients (Scrap Metal,
+// Patched Cloth, Stick,
+// Small Rock, Aetheric
+// Shard, Bone Shard). A
+// MATERIAL_SUBSTITUTE_TAGS
+// map mirrors scrapEngine's
+// tag→material rules: any
+// misc item carrying 'metal'
+// counts as Scrap Metal,
+// 'fiber' or 'organic' or
+// 'cloth' counts as Patched
+// Cloth, etc. Substitutes are
+// only consumed AFTER the
+// canonical material runs
+// out (preserve stock when
+// available); restricted to
+// MISC kind (weapons, armor,
+// accessories are never
+// silently consumed); stolen
+// items are protected (player
+// may want to fence).
+//
+// Two new exports:
+//   - missingIngredients()
+//     replaces the duplicated
+//     shortfall calc inline
+//     in gameStore's craft
+//     handler; now sub-aware.
+//   - previewCraftSubstitutions()
+//     surfaces what's being
+//     consumed BEFORE the
+//     craft fires. The craft
+//     handler narrates "The
+//     Arbiter nods. 'Stripped
+//     for parts: Brass Sextant
+//     → Scrap Metal.'" so the
+//     player understands why
+//     their item disappeared.
+//
+// 16 new tests in
+// craftTagSubstitution; 9
+// craft/recipe/repair suites
+// stay green (68 tests),
+// canary five stays green,
+// app-side TS clean.
+//
+// Files: app/engine/
+// crafting.ts (substitution
+// map + canCraft +
+// consumeIngredients +
+// missingIngredients +
+// previewCraftSubstitutions),
+// app/state/gameStore.ts
+// (craft handler uses new
+// helpers + narrates subs).
+export const OTA_BUILD_ID = '2026-05-29-193';
