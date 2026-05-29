@@ -4842,4 +4842,47 @@
 // chip unmetRequirement +
 // scanner-bias fix in chip
 // mapper).
-export const OTA_BUILD_ID = '2026-05-29-179';
+//
+// 2026-05-29 OTA-180 — designer-
+// note (📝) button removed from
+// the input row.
+//
+// Player: "let's remove the add
+// note function for the log, I
+// am past that portion of request
+// adding."
+//
+// Removed:
+//   • 📝 button JSX from the
+//     InputBox composer row.
+//   • onOpenFeedback prop
+//     contract.
+//   • feedbackBtn + feedbackBtnText
+//     styles.
+//   • FeedbackModal render +
+//     import in ExplorationScreen.
+//   • feedbackOpen useState +
+//     appendFeedback selector.
+//
+// Kept (intentionally, for any
+// re-add later or programmatic
+// emit):
+//   • FeedbackModal component
+//     file on disk.
+//   • appendFeedback store
+//     action.
+//   • `feedback` LogChannel +
+//     #c97aa8 color + NOTE chip-
+//     tag in AdventureFeed (other
+//     channels may still emit
+//     here in the future).
+//
+// TS clean.
+//
+// Files: app/components/InputBox
+// .tsx (button + prop + 2 styles),
+// app/screens/ExplorationScreen
+// .tsx (modal render + import +
+// state + selector + onOpenFeedback
+// wiring).
+export const OTA_BUILD_ID = '2026-05-29-180';

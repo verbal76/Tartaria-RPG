@@ -71,11 +71,10 @@ interface Props {
   /** OTA 032 — full elevation tuple so the HUD knows whether the
    *  player still has tiers to ascend. Null when on the ground. */
   elevatedOn?: { noun: string; tier: number; totalTiers: number } | null;
-  /** OTA 202 — open the designer-note (FeedbackModal) overlay. The
-   *  📝 button next to the text input dispatches this; bypasses the
-   *  action parser entirely so playtest notes land cleanly on the
-   *  `feedback` log channel. */
-  onOpenFeedback: () => void;
+  /** OTA-180 — onOpenFeedback prop dropped alongside the 📝
+   *  designer-note button removal. The appendFeedback store action
+   *  is still exported for any future re-introduction or for
+   *  programmatic feedback emits. */
   /** OTA 049 — open the world Atlas (MapScreen). Sits on the same row
    *  as the cardinal direction buttons so the player can step out of
    *  travel to consult the map without changing modes. Hidden in
@@ -147,7 +146,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenFeedback, onOpenMap, inCombat, equippedMain, equippedOff, range, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, range, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog }: Props) {
   // OTA-144 — dog combat action picker state. When the player taps
   // the DOG quick-button in combat, this flips to true and the
   // BITE / DISTRACT row renders inline. Either tap fires the
@@ -570,18 +569,13 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             <Text style={styles.micBtnText}>🎙</Text>
           </TouchableOpacity>
         )}
-        {/* OTA 202 — designer-note button. Tap opens the
-            FeedbackModal which writes straight to the log on the
-            `feedback` channel, bypassing the action parser entirely.
-            Sits between mic and Act so the touch target lives in the
-            same gesture zone as the other input-row controls. */}
-        <TouchableOpacity
-          style={styles.feedbackBtn}
-          onPress={onOpenFeedback}
-          hitSlop={6}
-        >
-          <Text style={styles.feedbackBtnText}>📝</Text>
-        </TouchableOpacity>
+        {/* OTA-180 — designer-note (📝) button removed. Player:
+            "let's remove the add note function for the log, I am
+            past that portion of request adding." The feedback
+            channel + appendFeedback action stay in place (they're
+            referenced by the in-game tutorial copy and a few
+            engine breadcrumbs); only the UI affordance to
+            invoke them is gone. */}
         <TouchableOpacity style={styles.send} onPress={handleSubmit}>
           <Text style={styles.sendText}>Act</Text>
         </TouchableOpacity>
@@ -763,21 +757,8 @@ const styles = StyleSheet.create({
     borderColor: '#6a9bbf',
   },
   micBtnText: { color: '#cdbf99', fontSize: 18 },
-  // OTA 202 — designer-note button (📝). Same footprint as the mic
-  // so the input row stays balanced; lower-key border because it's
-  // a tool button, not a primary action.
-  feedbackBtn: {
-    marginLeft: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    borderRadius: 3,
-    borderWidth: 1,
-    borderColor: '#3a342c',
-    backgroundColor: '#1a1714',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  feedbackBtnText: { fontSize: 16 },
+  // OTA-180 — feedbackBtn + feedbackBtnText styles removed alongside
+  // the 📝 designer-note button removal.
   // OTA-176 — silenceBtn / silenceBtnText styles removed alongside
   // the silence-Arbiter button. TTS itself still plays; only the
   // manual interrupt UI is gone.

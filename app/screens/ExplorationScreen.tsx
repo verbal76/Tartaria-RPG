@@ -14,7 +14,8 @@ import { SalvageModal, isSalvageable as isSalvageableForModal } from '../compone
 import { BrandedModal } from '../components/BrandedModal';
 import { TakeModal } from '../components/TakeModal';
 import { ClimbModal } from '../components/ClimbModal';
-import { FeedbackModal } from '../components/FeedbackModal';
+// OTA-180 — FeedbackModal import dropped along with the 📝 button.
+// The component file stays on disk for potential re-introduction.
 import { isClimbable, isSalvageable } from '../engine/interactionTags';
 import { climbHeightFor, isClimbCleared } from '../engine/climbHeight';
 import { findCatalogItem } from '../engine/crafting';
@@ -79,9 +80,7 @@ export function ExplorationScreen() {
   const [vendorLeavePrompt, setVendorLeavePrompt] = useState<
     { vendorName: string; pendingText: string } | null
   >(null);
-  // OTA 202 — designer-note modal. Wired to the 📝 button in the
-  // input row (InputBox.onOpenFeedback prop).
-  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  // OTA-180 — feedbackOpen state dropped alongside the 📝 button.
   // OTA 223 — transient "COPIED" flash on the FULL LOG button so
   // the tap-to-copy shortcut gives visible confirmation without a
   // separate screen.
@@ -96,7 +95,8 @@ export function ExplorationScreen() {
   // OTA 224 — transient "CLEARED" flash on the CLEAR LOG button so
   // the wipe is acknowledged in the same chip-flash pattern as COPIED.
   const [logCleared, setLogCleared] = useState(false);
-  const appendFeedback = useGameStore((s) => s.appendFeedback);
+  // OTA-180 — appendFeedback selector dropped; store action still
+  // exists for any non-UI emit site.
   const takeAmbientNoun = useGameStore((s) => s.takeAmbientNoun);
   const stealthTakeAmbientNoun = useGameStore((s) => s.stealthTakeAmbientNoun);
   const worldMemory = useGameStore((s) => s.worldMemory);
@@ -555,7 +555,6 @@ export function ExplorationScreen() {
               if (typeof elev === 'string') return { noun: elev, tier: 1, totalTiers: 1 };
               return elev as { noun: string; tier: number; totalTiers: number };
             })()}
-            onOpenFeedback={() => setFeedbackOpen(true)}
             onOpenMap={() => setScreen('map')}
             inCombat={inCombat}
             equippedMain={equippedMain}
@@ -892,14 +891,8 @@ export function ExplorationScreen() {
         onCancel={() => setSalvageOpen(false)}
       />
 
-      <FeedbackModal
-        visible={feedbackOpen}
-        onSubmit={(text) => {
-          setFeedbackOpen(false);
-          appendFeedback(text);
-        }}
-        onCancel={() => setFeedbackOpen(false)}
-      />
+      {/* OTA-180 — FeedbackModal render removed alongside the 📝
+          button. Component file kept for any future re-add. */}
 
       <ApproachModal
         visible={approachOpen}
