@@ -5012,4 +5012,84 @@
 // keyboardOffset + listener
 // useEffect + interiorHeight
 // subtraction).
-export const OTA_BUILD_ID = '2026-05-29-182';
+//
+// 2026-05-29 OTA-183 — INVESTIGATE
+// button counts the same chips the
+// modal will actually offer
+// (scanner-gate aware, biome-pin
+// aware).
+//
+// Player: "investigate button on
+// the exploration button does not
+// go amber it stays green when
+// all items are investigated. is
+// it still reading locked items as
+// readable?" — YES, that was the
+// bug.
+//
+// Two cooperating bugs in
+// investigateCount (same class as
+// OTA-179 chip-greying):
+//
+//   (a) hasScanner was hard-coded
+//       to 'aetheric' bias, so
+//       mud-coded chips (silt
+//       vent, sludge pool, fungal
+//       bed, etc.) and pulse-
+//       coded chips (automaton,
+//       circuit, sentinel) were
+//       NOT filtered when the
+//       player lacked their
+//       matching scanner — they
+//       still counted toward the
+//       "green" trigger.
+//
+//   (b) groundCount always
+//       checked the 'ground' key
+//       and ignored scanner
+//       requirements. On a mud
+//       biome the pinned chip is
+//       'the mud' (which needs
+//       the Mud Scanner to
+//       actually pay out), but
+//       the count added 1 anyway
+//       — INVESTIGATE stayed
+//       green even when every
+//       reachable chip was
+//       exhausted, because the
+//       count saw the mud-pin as
+//       an unconsumed actionable.
+//
+// Fix:
+//   • sceneCount filter now uses
+//     req.scannerBias per noun
+//     (same fix OTA-179 made to
+//     the chip-grey path), so the
+//     filter only excludes nouns
+//     whose required scanner is
+//     missing.
+//   • groundCount computes the
+//     right surface key (mud /
+//     ground based on biome —
+//     floor never counts, hub
+//     branches skip) AND honors
+//     the surface's own scanner
+//     requirement before adding
+//     to the count.
+//
+// Result: INVESTIGATE tints green
+// only when at least one chip is
+// genuinely actionable from the
+// player's current loadout +
+// biome. Locked-and-unequipped
+// chips don't keep the button
+// green anymore.
+//
+// TS clean.
+//
+// Files: app/screens/
+// ExplorationScreen.tsx
+// (investigateCount per-noun
+// scanner check + biome-aware
+// pinned-chip count).
+export const OTA_BUILD_ID = '2026-05-29-183';

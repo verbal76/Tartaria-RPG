@@ -627,15 +627,27 @@ export function ExplorationScreen() {
               // even though tapping 'the ground' is still actionable.
               //
               // 2026-05-26 OTA-069 — also exclude chips with an
-              // unmetRequirement (Aether-scanner-gated nouns when the
-              // scanner is not equipped). Playtester: "the only thing
-              // left to investigate is a locked item and I do not have
-              // the piece... why that investigate button shouldn't
-              // turn back to the regular amber". The lock isn't
-              // actionable from this state — the player can't tap the
-              // chip with any productive outcome until they equip the
-              // scanner — so it must not light the tab green.
-              const hasScanner = player ? playerHasScannerEquipped(player, 'aetheric') : false;
+              // unmetRequirement (scanner-gated nouns when the
+              // matching scanner is not equipped). Playtester: "the
+              // only thing left to investigate is a locked item and I
+              // do not have the piece... why that investigate button
+              // shouldn't turn back to the regular amber". The lock
+              // isn't actionable from this state — the player can't
+              // tap the chip with any productive outcome until they
+              // equip the scanner — so it must not light the tab
+              // green.
+              //
+              // OTA-183 — was hard-coded to 'aetheric' scanner check
+              // (and to 'ground' for the pinned chip), so a player on
+              // a mud biome with no Mud Scanner had INVESTIGATE
+              // staying green because a) the mud-gated chips weren't
+              // being filtered (wrong scanner bias check), and b) the
+              // pinned 'the mud' chip wasn't being checked against
+              // its mud-scanner requirement. Now per-noun: each
+              // chip's req.scannerBias drives the check (same fix
+              // OTA-179 made to chip-greying), and the pinned chip
+              // computes the right key (mud / floor / ground) +
+              // honors its own scanner gate.
               const sceneCount = buildChipPool(currentScene).filter(
                 (n) => {
                   // 2026-05-26 OTA-070 — fuzzy match against both
@@ -644,11 +656,27 @@ export function ExplorationScreen() {
                   if (isFuzzyConsumed(n, productivelyConsumedSet)) return false;
                   if (isFuzzyConsumed(n, flavorExhaustedSet)) return false;
                   const req = searchRequirementFor(n);
-                  if (req && !hasScanner) return false;
+                  if (req && player && !playerHasScannerEquipped(player, req.scannerBias)) {
+                    return false;
+                  }
                   return true;
                 },
               ).length;
-              const groundCount = (!player?.hubRoomId && !isAmbientConsumed('ground')) ? 1 : 0;
+              // Pinned-chip key matches the SearchModal pin: mud
+              // biome → 'the mud', hub → 'the floor', otherwise →
+              // 'the ground'. Hub case never counts (no surface
+              // dig); the other two count only when the chip is
+              // unconsumed AND any scanner requirement is met.
+              let groundCount = 0;
+              if (!player?.hubRoomId) {
+                const surfaceNoun = (currentScene?.location.tags ?? []).includes('mud') ? 'mud' : 'ground';
+                if (!isAmbientConsumed(surfaceNoun)) {
+                  const surfaceReq = searchRequirementFor(surfaceNoun);
+                  const surfaceUnlocked = !surfaceReq
+                    || (player && playerHasScannerEquipped(player, surfaceReq.scannerBias));
+                  if (surfaceUnlocked) groundCount = 1;
+                }
+              }
               return sceneCount + groundCount;
             })()}
             golem={player?.golem ? {
