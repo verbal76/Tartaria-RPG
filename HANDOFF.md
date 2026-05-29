@@ -245,6 +245,19 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### STT removal (mic button + voice settings toggle)
+
+- **OTA-189 (2026-05-29) · Speech-to-text removed entirely from the game.**
+  - **What:** Player: *"remove the stt button, the code for it from the game, and the button for activation from the voice tab in settings."* The 🎙 mic button on the input row, the Speak input (STT) toggle on the gear screen's SFX tab, the Auto-submit speech row, the STT availability hint, the STT diagnostic wiring in `gameStore.hydrate`, and every code path that called into `STTManager` are all gone.
+  - **Fix:** Five files touched, JS-side only.
+    1. **`app/components/InputBox.tsx`** — dropped `import { startListening, stopListening, isListening } from '../voice/STTManager'`, the `voice` + `listening` useState pair, the polling useEffect that watched `isListening()`, the `handleMic` async handler, the `voice.sttEnabled`-gated 🎙 TouchableOpacity, the `listening ? '🎙 LISTENING — speak now'` placeholder branch (input simplified to the in-combat / not-in-combat dichotomy), and the `micBtn` / `micBtnActive` / `micBtnText` styles. The `getVoiceSettings` / `onVoiceSettingsChange` imports are gone — no voice consumer is left in this file.
+    2. **`app/screens/AboutScreen.tsx`** — dropped `PermissionsAndroid` from the react-native imports (no other consumer), the `isSTTAvailable` import, the `sttAvailable` state, the `isSTTAvailable()` call inside the Promise.all probe, the `toggleSTT` handler (including the RECORD_AUDIO Android permission flow), the `toggleAutoSubmit` handler, the "Speak input (STT)" toggle row, the `!sttAvailable` voice-note hint, the "Auto-submit speech" row, and the `STT enabled` / `Auto-submit STT` / `STT availability` lines from the COPY VOICE INFO diagnostic.
+    3. **`app/state/gameStore.ts`** — dropped the lazy `require('../voice/STTManager')` + `setSTTDiag` callback wiring in `hydrate`. No consumer is left for the diag stream.
+    4. **`app/voice/voiceSettings.ts`** — left untouched. The `sttEnabled` + `autoSubmit` fields remain in the schema + defaults so any AsyncStorage row from a pre-OTA-189 install loads without error; they're inert.
+    5. **`app/voice/STTManager.ts` + `app/components/FeedbackModal.tsx`** — left in place. No JS-side caller imports them anymore, so they're dead but harmless. Keeping them avoids any chance of an unused-import surprise from `eas-update.yml` or a parallel branch; future native rebuild can drop the `expo-speech-recognition` plugin + package.
+  - **Why:** The mic button has been a recurring source of "tapped it and got kicked to the home screen" crash reports (see the OTA-176 silence-button removal for the parallel pattern); the player has decided STT isn't worth maintaining. Pulling the JS surface entirely is OTA-safe and lets the next native rebuild trim the plugin + package without breaking anything OTA-published in the meantime. The `voiceSettings.sttEnabled` field is left so existing stored settings rows don't fail to parse and force a `cache = { ...DEFAULTS }` fallback that would silently flip TTS-related fields too.
+  - **Files:** `app/components/InputBox.tsx`, `app/screens/AboutScreen.tsx`, `app/state/gameStore.ts`, `app/buildInfo.ts` (OTA bump + change note).
+
 #### Stress-sweep fix wave (OTAs 155-162)
 
 - **OTAs 155-162 (2026-05-28) · 8 player-side + engine-side bugs fixed off a 5-agent parallel stress sweep.**

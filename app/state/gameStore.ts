@@ -1429,21 +1429,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // includes the gem.
     const seedResult = await ensureFirstInstallSeed();
     const stash = await loadGlobalStash();
-    // Wire STT diagnostics into the game log so the next playtest log
-    // includes a full trace of what the mic is actually doing — start,
-    // speechstart, audiostart, result, error code, end. Without this,
-    // STT can fail silently in half a dozen ways and the player sees
-    // nothing on screen.
-    try {
-      // Lazy require so a build without the STT module never trips here.
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const stt = require('../voice/STTManager');
-      if (typeof stt.setSTTDiag === 'function') {
-        stt.setSTTDiag((channel: 'system' | 'debug', line: string) => {
-          try { get().appendLog(channel, line); } catch { /* ignore */ }
-        });
-      }
-    } catch { /* STT module not present — fine. */ }
+    // OTA-189 — STT diagnostic wiring dropped along with the rest of
+    // the STT surface (mic button, toggle, handler). No consumer is
+    // left for the diag callback, so the lazy require + setSTTDiag
+    // hookup have nothing to do.
     // Item-defaults inference flag. The engine falls back to
     // synthesized stats whenever an inventory item has no catalog
     // row (Mud-Rend Blade, Aetheric Locket, Golemstone Stabilizer,

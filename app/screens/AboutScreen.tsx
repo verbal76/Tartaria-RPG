@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, PermissionsAndroid } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as Updates from 'expo-updates';
 import { useGameStore } from '../state/gameStore';
@@ -23,7 +23,9 @@ import {
   type VoiceSettings,
 } from '../voice/voiceSettings';
 import { isTTSAvailable, getTTSVoices, stopAndClear as stopTTS } from '../voice/TTSManager';
-import { isSTTAvailable } from '../voice/STTManager';
+// OTA-189 — isSTTAvailable import dropped along with the STT toggle
+// + mic affordance. The Voice tab no longer surfaces any STT row, so
+// the availability probe is no longer needed.
 import { isPiperInstalled, downloadPiperVoice, type PiperDownloadStatus } from '../voice/PiperDownloader';
 import { clearExecutorchCache, inspectExecutorchCache, type ExecutorchCacheEntry } from '../voice/executorchAdapter';
 import {
@@ -141,7 +143,7 @@ export function AboutScreen() {
   const [voice, setVoice] = useState<VoiceSettings>(() => getVoiceSettings());
   const [voicesList, setVoicesList] = useState<Speech.Voice[]>([]);
   const [ttsAvailable, setTtsAvailable] = useState<boolean>(true);
-  const [sttAvailable, setSttAvailable] = useState<boolean>(true);
+  // OTA-189 — sttAvailable state dropped along with the STT toggle.
   const [piperInstalled, setPiperInstalled] = useState<boolean>(false);
   const [piperStatus, setPiperStatus] = useState<PiperDownloadStatus | null>(null);
   const [kokoroProgress, setKokoroProgress] = useState<number>(0);
@@ -155,11 +157,13 @@ export function AboutScreen() {
   useEffect(() => {
     setVoice(getVoiceSettings());
     const unsub = onVoiceSettingsChange(setVoice);
-    void Promise.all([isTTSAvailable(), getTTSVoices(), isSTTAvailable(), isPiperInstalled()]).then(
-      ([ttsOk, voices, sttOk, piperOk]) => {
+    // OTA-189 — isSTTAvailable probe dropped along with the STT
+    // toggle + mic button. Only TTS availability + voice catalog +
+    // Kokoro install state are still surfaced.
+    void Promise.all([isTTSAvailable(), getTTSVoices(), isPiperInstalled()]).then(
+      ([ttsOk, voices, piperOk]) => {
         setTtsAvailable(ttsOk);
         setVoicesList(voices);
-        setSttAvailable(sttOk);
         setPiperInstalled(piperOk);
       },
     );
@@ -197,45 +201,14 @@ export function AboutScreen() {
     if (!next) stopTTS();
     void setVoiceSettings({ ttsEnabled: next });
   };
-  const toggleSTT = async () => {
-    const next = !voice.sttEnabled;
-    if (next && Platform.OS === 'android') {
-      // Request RECORD_AUDIO up-front when the player enables STT —
-      // surfaces the Android permission prompt right at the moment of
-      // intent rather than waiting until they tap the mic button mid-
-      // game. If they deny, leave the toggle OFF + show a one-time
-      // hint via the voice note below.
-      try {
-        const perm = PermissionsAndroid.PERMISSIONS.RECORD_AUDIO;
-        if (!perm) return;
-        const granted = await PermissionsAndroid.request(
-          perm,
-          {
-            title: 'Microphone access',
-            message:
-              'Tartaria Realms needs the microphone so you can speak commands to the Arbiter. ' +
-              'You can disable speech input any time from Settings → SFX.',
-            buttonPositive: 'Allow',
-            buttonNegative: 'Deny',
-          },
-        );
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          // Permission denied — leave the toggle OFF.
-          return;
-        }
-      } catch {
-        // Best-effort; if the prompt errors we still toggle so the
-        // user can try via the mic button anyway.
-      }
-    }
-    void setVoiceSettings({ sttEnabled: next });
-  };
+  // OTA-189 — toggleSTT + toggleAutoSubmit removed alongside the STT
+  // toggle row and the Auto-submit speech row. STT is gone from the
+  // game entirely; only TTS-side voice settings still render.
   // Direct setters — the NumberStepper passes the actual rate / pitch
   // value (not a 0..1 normalized fraction the old slider used), so no
   // remapping needed. Clamp guards against any future range drift.
   const setRate = (v: number) => { void setVoiceSettings({ rate: v }); };
   const setPitch = (v: number) => { void setVoiceSettings({ pitch: v }); };
-  const toggleAutoSubmit = () => { void setVoiceSettings({ autoSubmit: !voice.autoSubmit }); };
   const switchEngine = (next: 'system' | 'bundled') => {
     stopTTS();
     void setVoiceSettings({ engine: next });
@@ -381,14 +354,13 @@ export function AboutScreen() {
       ``,
       `Voice`,
       `  TTS enabled: ${voice.ttsEnabled ? 'yes' : 'no'}`,
-      `  STT enabled: ${voice.sttEnabled ? 'yes' : 'no'}`,
       `  Engine: ${voice.engine}`,
       `  Rate: ${voice.rate.toFixed(2)} · Pitch: ${voice.pitch.toFixed(2)}`,
       `  System voice id: ${voice.voiceId ?? '(default)'}`,
       `  Kokoro voice: ${voice.kokoroVoice}`,
-      `  Auto-submit STT: ${voice.autoSubmit ? 'yes' : 'no'}`,
       `  TTS availability: ${ttsAvailable ? 'yes' : 'no'}`,
-      `  STT availability: ${sttAvailable ? 'yes' : 'no'}`,
+      // OTA-189 — STT-related diagnostic lines (enabled, availability,
+      // auto-submit) dropped along with the STT toggle + mic button.
       `  Installed voices: ${voicesList.length}`,
       `  Kokoro state: ${
         kokoroState.phase === 'idle' ? 'idle (not loaded yet)' :
@@ -438,7 +410,7 @@ export function AboutScreen() {
       }
     }
     return lines.join('\n');
-  }, [voice, ttsAvailable, sttAvailable, voicesList, kokoroState, kokoroCache]);
+  }, [voice, ttsAvailable, voicesList, kokoroState, kokoroCache]);
 
   async function handleCopy() {
     await Clipboard.setStringAsync(info);
@@ -649,19 +621,10 @@ export function AboutScreen() {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.musicRow}>
-            <Text style={styles.musicLabel}>Speak input (STT)</Text>
-            <View style={{ flex: 1 }} />
-            <TouchableOpacity
-              onPress={toggleSTT}
-              style={[styles.musicToggle, voice.sttEnabled && styles.musicToggleOn]}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.musicToggleText, voice.sttEnabled && styles.musicToggleTextOn]}>
-                {voice.sttEnabled ? 'ON' : 'OFF'}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          {/* OTA-189 — Speak input (STT) toggle row + !sttAvailable
+              hint removed per player ask: "remove the stt button, the
+              code for it from the game, and the button for activation
+              from the voice tab in settings." */}
 
           {!ttsAvailable && (
             <Text style={styles.voiceNote}>
@@ -669,14 +632,6 @@ export function AboutScreen() {
               line of narration. If nothing plays, check Android Settings → Accessibility →
               Text-to-speech output, and confirm an engine (Google TTS, Samsung TTS, etc.) is
               installed and selected.
-            </Text>
-          )}
-          {!sttAvailable && (
-            <Text style={styles.voiceNote}>
-              Speech recognition reports as unavailable on this device — many Android devices
-              gate availability on the first mic request. Toggle on and tap the 🎙 button in
-              the input box; the OS will prompt for microphone permission. Grant it and
-              speech recognition should start working.
             </Text>
           )}
 
@@ -833,21 +788,10 @@ export function AboutScreen() {
             </>
           )}
 
-          {voice.sttEnabled && (
-            <View style={styles.musicRow}>
-              <Text style={styles.musicLabel}>Auto-submit speech</Text>
-              <View style={{ flex: 1 }} />
-              <TouchableOpacity
-                onPress={toggleAutoSubmit}
-                style={[styles.musicToggle, voice.autoSubmit && styles.musicToggleOn]}
-                activeOpacity={0.7}
-              >
-                <Text style={[styles.musicToggleText, voice.autoSubmit && styles.musicToggleTextOn]}>
-                  {voice.autoSubmit ? 'ON' : 'OFF'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          {/* OTA-189 — Auto-submit speech row removed alongside the
+              STT toggle. The autoSubmit flag is still persisted in
+              voiceSettings for any future restoration, but with STT
+              gone there's nothing to auto-submit. */}
 
           {/* Voice tab has its own COPY ALL — copies just the
               Voice diagnostic block (plus the identifier header) so

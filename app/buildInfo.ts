@@ -5514,4 +5514,44 @@
 // ExplorationScreen.tsx
 // (inventoryHasGate import +
 // playerHasRope wiring).
-export const OTA_BUILD_ID = '2026-05-29-188';
+//
+// 2026-05-29-189 — STT removed
+// entirely. Player: "remove
+// the stt button, the code for
+// it from the game, and the
+// button for activation from
+// the voice tab in settings."
+// InputBox drops the mic
+// button + handleMic + STT
+// import + listening poll;
+// AboutScreen drops the STT
+// toggle, the Auto-submit row,
+// the !sttAvailable hint, the
+// toggleSTT handler (including
+// the RECORD_AUDIO Android
+// permission flow), and the
+// STT-related diagnostic
+// lines; gameStore.hydrate
+// drops the lazy STTManager
+// require + setSTTDiag wiring.
+// voiceSettings.sttEnabled +
+// autoSubmit stay on the
+// schema as inert keys so
+// existing AsyncStorage rows
+// parse without falling back
+// to defaults (which would
+// silently flip TTS-side
+// settings). STTManager.ts +
+// FeedbackModal.tsx left in
+// place as dead JS; native
+// rebuild can drop the
+// expo-speech-recognition
+// package + plugin without
+// breaking any OTA published
+// since.
+//
+// Files: app/components/
+// InputBox.tsx, app/screens/
+// AboutScreen.tsx, app/state/
+// gameStore.ts.
+export const OTA_BUILD_ID = '2026-05-29-189';
