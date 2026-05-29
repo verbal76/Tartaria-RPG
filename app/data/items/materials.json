@@ -44,6 +44,10 @@
     { "name": "Aether Dust", "rarity": "Common", "tags": ["aether", "dust", "distillable"], "description": "Fine grey-blue dust that lifts off Aetheric machinery as it dies. Distillable into Aether Residue with the right kit." },
     { "name": "Automaton Circuit", "rarity": "Common", "tags": ["automation", "tech", "scrap"], "description": "A finger-length sliver of pre-flood circuitry — copper traces over ceramic, Aetheric flux still faint along the etched lines." },
     { "name": "Worn Tartarian Coin", "rarity": "Common", "tags": ["currency", "metal", "pre-flood"], "description": "A coin from before the flood, the edges worn round and the face smoothed to a ghost of a Monarch. Some vendors still accept them at face value." },
-    { "name": "Sentinel Core Plate", "rarity": "Uncommon", "tags": ["automation", "tech", "salvage", "scrap"], "description": "A square of the Aetheric ceramic that armors a Sentinel's central column. Heavy enough to throw, useful enough to sell." }
+    { "name": "Sentinel Core Plate", "rarity": "Uncommon", "tags": ["automation", "tech", "salvage", "scrap"], "description": "A square of the Aetheric ceramic that armors a Sentinel's central column. Heavy enough to throw, useful enough to sell." },
+    { "name": "Blank Runecaster Casing (Common)", "rarity": "Common", "tags": ["runecaster", "casing", "blank"], "description": "An empty Aetheric housing — wood-and-mudstone shell wired with a single inscription channel. Wait for a recipe; the casing tells you what it wants." },
+    { "name": "Blank Runecaster Casing (Uncommon)", "rarity": "Uncommon", "tags": ["runecaster", "casing", "blank"], "description": "A bronze-banded runecaster housing with a twin inscription channel. Holds heat better; carries a stronger binding cleanly." },
+    { "name": "Blank Runecaster Casing (Rare)", "rarity": "Rare", "tags": ["runecaster", "casing", "blank"], "description": "Mud-iron casing with four inscription channels and a stabilizer ring. Ancient Tartarian work; almost no flex when a rare binding pulses through." },
+    { "name": "Blank Runecaster Casing (Legendary)", "rarity": "Legendary", "tags": ["runecaster", "casing", "blank"], "description": "Throne-grade casing of fused Aetherstone and Mud-Iron, eight channels in a crown pattern. The kind of housing the Mud Emperors had buried with them." }
   ]
 }

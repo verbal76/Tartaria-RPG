@@ -4136,4 +4136,96 @@
 // Files: app/state/gameStore.ts
 // (two flavor-outcome lines
 // rewritten).
-export const OTA_BUILD_ID = '2026-05-29-168';
+//
+// 2026-05-29 OTA-169 — runecaster
+// crafting chart added (15 recipes
+// + 15 runecaster weapons + 4
+// Blank Runecaster Casing
+// materials).
+//
+// Player provided a full
+// Common→Legendary recipe chart
+// for runecaster crafting and
+// asked for it added directly
+// under the CRAFT tab next to
+// weapons. The 4-tier Blank
+// Runecaster Casing the spec calls
+// for didn't exist; I added the
+// four casing materials and
+// substituted other spec-named
+// ingredients with the closest
+// existing catalog materials so
+// the recipes are actually
+// craftable on day one.
+//
+// Material substitutions (spec
+// name → catalog match):
+//   Aetheric Mud → Aether Mud
+//   Etheric Rope → Spider Silk
+//   Binding Orb → Mud Gem
+//   Etheric Thread → Aetheric Cloth
+//   Aetherstone Pebble → Smooth Stone
+//   Rusty Ether Lock → Bent Nail
+//   Aetherstone Dust → Aether Dust
+//   Tartarian Pottery Shard → Mud Fragment
+//   Etheric Scrap → Scrap Metal
+//   Old Relic Key → Worn Tartarian Coin
+//   Whispering Aether Crystal → Aether Crystal
+//   Aetherstone Fragment → Aetheric Shard
+//   Rune Inscription Kit → Aetheric Dust
+//   Etheric Stabilizer → Hardened Mudstone
+//   Cracked Etheric Orb → Aether Shard
+//   Aetheric Matter → Aether Mud
+//   Etheric Spyglass → Automaton Circuit
+//   Aether Cloak of Shadows → Aetheric Pelt
+//   Aetherstone Core → Aetherstone Heart
+//   Shifting Obsidian Orb → Energy Fragment
+//   Sentinel's Ether Heart → Sentinel Core Plate
+//   Aetheric Core → Golem Core
+//   Aetheric Phoenix Feather → Aether Wing
+//   Wrath of the Ether Titan → Behemoth Heart
+//   Etheric Core → Iron Core
+//   Void Ether Shard → Voidspawn Egg
+//
+// New runecaster weapons (all
+// stat='intelligence',
+// weaponKind='runecaster'):
+//   Common: Flame of Aether,
+//     Gale Binder, Sparkstrike,
+//     Earthshaker, Force Wave
+//   Uncommon: Dark Blight, Stone
+//     Fist, Ether Bolt, Void Pulse
+//   Rare: Shadow Caller, Ember
+//     Storm, Stormcaller
+//   Legendary: Wrath of Titans,
+//     Phoenix Rebirth, Void Edge
+//
+// Each carries statRequirement
+// matching the spec's INT-tier
+// table (Common 1-2, Uncommon
+// 5-6, Rare 9-10, Legendary
+// 11-12) so the use-in-combat
+// stat gate works as authored.
+//
+// NOT included this OTA: the INT
+// 11+ craft-time requirement
+// (Recipe type doesn't carry a
+// stat gate today; adding one
+// touches the craftRecipe engine
+// path — deferred to a follow-up
+// when the user confirms the
+// recipe-stat-gate shape they
+// want).
+//
+// 9/9 regression (recipeFuzzy +
+// craftRepairFuzz). TS clean.
+// All 3 JSON files validated.
+//
+// Files:
+// app/data/items/materials.json
+// (+4 casings),
+// app/data/items/weapons.json
+// (+15 runecasters),
+// app/data/items/recipes.json
+// (+15 recipes).
+export const OTA_BUILD_ID = '2026-05-29-169';

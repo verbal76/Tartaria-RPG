@@ -301,6 +301,85 @@
         { "name": "Aether Crystal", "quantity": 1 },
         { "name": "Scrap Metal", "quantity": 1 }
       ]
-    }
+    },
+
+    { "result": "Flame of Aether", "ingredients": [
+      { "name": "Blank Runecaster Casing (Common)", "quantity": 1 },
+      { "name": "Aether Mud", "quantity": 1 },
+      { "name": "Spider Silk", "quantity": 1 }
+    ] },
+    { "result": "Gale Binder", "ingredients": [
+      { "name": "Blank Runecaster Casing (Common)", "quantity": 1 },
+      { "name": "Mud Gem", "quantity": 1 },
+      { "name": "Aetheric Cloth", "quantity": 1 }
+    ] },
+    { "result": "Sparkstrike", "ingredients": [
+      { "name": "Blank Runecaster Casing (Common)", "quantity": 1 },
+      { "name": "Smooth Stone", "quantity": 1 },
+      { "name": "Bent Nail", "quantity": 1 }
+    ] },
+    { "result": "Earthshaker", "ingredients": [
+      { "name": "Blank Runecaster Casing (Common)", "quantity": 1 },
+      { "name": "Aether Dust", "quantity": 1 },
+      { "name": "Mud Fragment", "quantity": 1 }
+    ] },
+    { "result": "Force Wave", "ingredients": [
+      { "name": "Blank Runecaster Casing (Common)", "quantity": 1 },
+      { "name": "Scrap Metal", "quantity": 1 },
+      { "name": "Worn Tartarian Coin", "quantity": 1 }
+    ] },
+
+    { "result": "Dark Blight", "ingredients": [
+      { "name": "Blank Runecaster Casing (Uncommon)", "quantity": 1 },
+      { "name": "Mud Gem", "quantity": 1 },
+      { "name": "Aether Crystal", "quantity": 1 }
+    ] },
+    { "result": "Stone Fist", "ingredients": [
+      { "name": "Blank Runecaster Casing (Uncommon)", "quantity": 1 },
+      { "name": "Aetheric Shard", "quantity": 1 },
+      { "name": "Aetheric Dust", "quantity": 1 }
+    ] },
+    { "result": "Ether Bolt", "ingredients": [
+      { "name": "Blank Runecaster Casing (Uncommon)", "quantity": 1 },
+      { "name": "Hardened Mudstone", "quantity": 1 },
+      { "name": "Aether Shard", "quantity": 1 }
+    ] },
+    { "result": "Void Pulse", "ingredients": [
+      { "name": "Blank Runecaster Casing (Uncommon)", "quantity": 1 },
+      { "name": "Aether Mud", "quantity": 1 },
+      { "name": "Automaton Circuit", "quantity": 1 }
+    ] },
+
+    { "result": "Shadow Caller", "ingredients": [
+      { "name": "Blank Runecaster Casing (Rare)", "quantity": 1 },
+      { "name": "Mud Gem", "quantity": 1 },
+      { "name": "Aetheric Pelt", "quantity": 1 }
+    ] },
+    { "result": "Ember Storm", "ingredients": [
+      { "name": "Blank Runecaster Casing (Rare)", "quantity": 1 },
+      { "name": "Aetherstone Heart", "quantity": 1 },
+      { "name": "Energy Fragment", "quantity": 1 }
+    ] },
+    { "result": "Stormcaller", "ingredients": [
+      { "name": "Blank Runecaster Casing (Rare)", "quantity": 1 },
+      { "name": "Mud Gem", "quantity": 1 },
+      { "name": "Sentinel Core Plate", "quantity": 1 }
+    ] },
+
+    { "result": "Wrath of Titans", "ingredients": [
+      { "name": "Blank Runecaster Casing (Legendary)", "quantity": 1 },
+      { "name": "Aether Mud", "quantity": 2 },
+      { "name": "Behemoth Heart", "quantity": 1 }
+    ] },
+    { "result": "Phoenix Rebirth", "ingredients": [
+      { "name": "Blank Runecaster Casing (Legendary)", "quantity": 1 },
+      { "name": "Golem Core", "quantity": 1 },
+      { "name": "Aether Wing", "quantity": 1 }
+    ] },
+    { "result": "Void Edge", "ingredients": [
+      { "name": "Blank Runecaster Casing (Legendary)", "quantity": 1 },
+      { "name": "Iron Core", "quantity": 1 },
+      { "name": "Voidspawn Egg", "quantity": 1 }
+    ] }
   ]
 }
