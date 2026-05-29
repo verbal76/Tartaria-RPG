@@ -4491,4 +4491,29 @@
 // OTA-173 revert),
 // app/components/InputBox.tsx
 // (OTA-173 revert).
-export const OTA_BUILD_ID = '2026-05-29-174';
+//
+// 2026-05-29 OTA-175 — combat row
+// 3 button order corrected.
+//
+// OTA-172 shipped row 3 as
+// inventory → approach → step
+// back. Player flagged the
+// screenshot: "look at the bottom
+// row" — the literal order they
+// asked for was "approach, step
+// back, and inventory should be
+// on the third line." Reorder
+// matches the spec exactly:
+// APPROACH · STEP BACK ·
+// INVENTORY.
+//
+// No layout change otherwise —
+// same row, same styling, same
+// 3-button maximum (step back
+// hides when range='far').
+//
+// TS clean.
+//
+// Files: app/components/InputBox
+// .tsx (row 3 button order).
+export const OTA_BUILD_ID = '2026-05-29-175';

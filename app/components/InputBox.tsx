@@ -404,16 +404,16 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             </View>
 
             <View style={styles.quickRowLine}>
-              {/* Inventory access stays prominent in combat — playtest report
-                  flagged "pack" at the end of the row as easy to miss. Now
-                  on the third row, alongside approach + step back, so the
-                  weapon row + companion row stay uncluttered. */}
-              <QuickBtn label="inventory" onPress={onOpenInventory} />
-              {/* Approach in combat lets the player pick a SPECIFIC enemy
-                  out of a multi-target encounter ("approach the human"
-                  while the dragon and hellhound watch) plus optionally
-                  slip in via stealth instead of closing the gap in the
-                  open.
+              {/* OTA-175 — row 3 order corrected to match the playtest
+                  spec: "approach, step back, and inventory should be on
+                  the third line." OTA-172 shipped these in
+                  inventory→approach→step-back order; reading the screen
+                  back, the player meant the literal order they listed.
+                  Now: APPROACH · STEP BACK · INVENTORY.
+                  Approach in combat lets the player pick a SPECIFIC
+                  enemy out of a multi-target encounter ("approach the
+                  human" while the dragon and hellhound watch) plus
+                  optionally slip in via stealth.
                   2026-05-25 [POLISH-1] — tone='needs-approach' (green
                   glow) when range is 'far' so the player sees at a
                   glance they need to close before attacking. */}
@@ -422,19 +422,21 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 onPress={onOpenApproach}
                 tone={range === 'far' ? 'needs-approach' : undefined}
               />
-              {/* v2.4.1 (OTA 034) — `advance` quick-button removed.
-                  Player noted approach already covers the close-range
-                  use case AND adds the stealth option (DEX roll →
-                  +5 next attack if you slip in unseen). The approach
-                  button above is the unified close-range entry for
-                  both exploration and combat.
-                  Parser synonyms (`advance`, `lunge`, `forward`,
-                  `closein`, `charge in`, `near`) still parse to the
-                  same intent so typed-input compatibility is intact.
-                  Removing only the HUD button. */}
+              {/* v2.4.1 (OTA 034) — `advance` quick-button removed; the
+                  approach button above unifies the close-range entry
+                  for both exploration and combat. Parser synonyms
+                  (`advance`, `lunge`, `forward`, `closein`, `charge
+                  in`, `near`) still parse to the same intent for
+                  typed-input compatibility. */}
               {range && range !== 'far' && (
                 <QuickBtn label="step back" onPress={() => onSubmit('step back')} />
               )}
+              {/* Inventory access stays prominent in combat — playtest
+                  report flagged "pack" at the end of the row as easy
+                  to miss. Now on the third row at the end of the
+                  approach / step-back / inventory sequence per the
+                  player's stated order. */}
+              <QuickBtn label="inventory" onPress={onOpenInventory} />
             </View>
           </>
         ) : (
