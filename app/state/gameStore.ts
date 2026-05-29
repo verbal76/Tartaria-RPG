@@ -6527,6 +6527,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
       case 'travel': {
         if (player.stamina < TRAVEL_MIN_STAMINA) {
+          // OTA-163 — refused-travel time tick. Stress sweep
+          // (cartographer) found a 387-turn stuck-state where every
+          // attempted cardinal step was refused for stamina AND time
+          // never advanced — the player was frozen in a single
+          // minute. Real-world fix: even a failed attempt costs you
+          // ~15 minutes of fumbling. Time passes; the player can
+          // type `rest` to recover and the clock now keeps moving
+          // through the stretch instead of stopping dead.
+          set({ player: advanceTime(player, 0.25) });
           get().appendLog(
             'world',
             `You take one step and the buried world refuses. Your legs will not. Type 'rest' to recover (≈4h), then the road will hold you again.`,
@@ -12513,6 +12522,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           return 'that destination';
         }
       })();
+      // OTA-163 — refused-travel time tick. See `case 'travel':` for
+      // rationale. Setting a course while depleted still costs the
+      // player ~15 minutes of fumbling with the map.
+      set((s) => (s.player ? { player: advanceTime(s.player, 0.25) } : s));
       get().appendLog(
         'arbiter',
         `The Arbiter holds out a hand. "You're too tired to set out for ${tgtNameForRefusal}. Rest before making any plans — the road will hold."`,
@@ -12572,6 +12585,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // continueTravel path was bypassing it, which let depleted
     // characters cross the continent for free.
     if (player.stamina < STAMINA_COSTS.wander) {
+      // OTA-163 — refused-travel time tick. See `case 'travel':` for
+      // rationale. Continuing a course while depleted still ticks
+      // ~15 minutes of fumbling so the clock doesn't freeze.
+      set((s) => (s.player ? { player: advanceTime(s.player, 0.25) } : s));
       get().appendLog(
         'arbiter',
         `The Arbiter steadies you. "Out of legs. Rest, eat, then pick the road back up."`,

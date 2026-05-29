@@ -3834,4 +3834,48 @@
 // Files: app/state/gameStore.ts
 // (stepDirection nearest-loc
 // discover branch).
-export const OTA_BUILD_ID = '2026-05-28-162';
+//
+// 2026-05-29 OTA-163 — refused-travel
+// time tick (closes cartographer's
+// 387-turn stuck-state).
+//
+// Stress sweep (cartographer)
+// surfaced a 387-turn stuck-state
+// where every attempted cardinal step
+// was refused for stamina AND time
+// never advanced — the player was
+// frozen in a single minute. Pre-fix
+// the 3 refusal paths (case 'travel',
+// setTravelCourse, continueTravel)
+// emitted the Arbiter line and
+// returned without advancing the
+// clock.
+//
+// Fix: each path now ticks
+// hoursElapsed by 0.25 (~15 minutes
+// of fumbling) before emitting the
+// refusal. Time keeps moving through
+// a depleted stretch even when the
+// player can't take steps. Player
+// types `rest` to recover; the clock
+// passes through the rest as before.
+//
+// Also confirmed the chaos agent's
+// "currentScene = null" finding was
+// a false positive — scene IS seeded
+// by startNewGame's beginScene call.
+// The agent probed `currentScene.id`
+// which doesn't exist on the type;
+// `undefined` looked like null in the
+// sampling array. Bootstrap is fine.
+//
+// 3/3 OTA-163 regressions (single
+// travel refusal ticks ~15min,
+// setTravelCourse refusal ticks
+// ~15min, 100 consecutive refusals
+// advance clock by ≥20 hours).
+//
+// Files: app/state/gameStore.ts
+// (3 stamina-refusal paths advance
+// time).
+export const OTA_BUILD_ID = '2026-05-29-163';
