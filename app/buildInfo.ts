@@ -5238,4 +5238,65 @@
 // app/state/gameStore.ts
 // (applyHookEffect spawn_vendor
 // dispatch).
-export const OTA_BUILD_ID = '2026-05-29-185';
+//
+// 2026-05-29 OTA-186 — Arbiter
+// drops the third-person "notes
+// how you ${verb}" template for
+// a first-person rotating pool.
+//
+// Player: "the arbiter said 'the
+// arbiter notes how you
+// investigate stall' I don't want
+// him calling himself arbiter, say
+// something like 'I saw how you
+// were looking at that stall'."
+//
+// Two emit sites in
+// narrativeGenerator (combat-
+// context line 548 + peace-
+// context line 708) both used the
+// template
+// `The Arbiter notes how you
+// ${lastAction.trim()}.` which:
+//   (a) Refers to the Arbiter in
+//       third person (clinical /
+//       broken-immersion).
+//   (b) Echoes the raw verb-
+//       target string verbatim,
+//       producing ungrammatical
+//       lines like "...notes how
+//       you investigate stall."
+//
+// Fix: new ARBITER_NOTED_LINES
+// rotating pool of 7 first-person
+// reactions ("I saw the way you
+// came at that.", "I noticed how
+// you handled that.", "I marked
+// the choice.", etc.). Both emit
+// sites now pull from it via
+// rotatingPick. The original
+// ARBITER_LOOK_LINES pool stays
+// in place for the bare `look`
+// case (already first-person
+// flavored from OTA 027). Combat
+// site appends combatRemark()
+// as before; peace site appends
+// the mood-flavor.
+//
+// Lines are generic enough to
+// land after any player action
+// (investigate / attack /
+// salvage / climb / eat / etc.)
+// without per-verb grammar
+// mapping. The "I" voice carries
+// the Arbiter dialogue cadence
+// established elsewhere in the
+// codebase.
+//
+// TS clean.
+//
+// Files: app/engine/
+// narrativeGenerator.ts
+// (ARBITER_NOTED_LINES pool +
+// two template swaps).
+export const OTA_BUILD_ID = '2026-05-29-186';

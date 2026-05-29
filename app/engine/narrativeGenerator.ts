@@ -429,6 +429,29 @@ const ARBITER_LOOK_LINES = [
   `The Arbiter half-smiles. "Twice over makes a thing yours. Once over is a guess."`,
 ];
 
+// OTA-186 — first-person reaction lines that replace the awkward
+// third-person "The Arbiter notes how you ${verb}." template. The
+// old template echoed the raw verb-target string verbatim, which
+// produced lines like "The Arbiter notes how you investigate stall."
+// — clinical, third-person, ungrammatical. Player ask: "I don't
+// want him calling himself arbiter, say something like 'I saw how
+// you were looking at that stall'."
+//
+// New pool is generic enough to read after any player action
+// (investigate, attack, salvage, climb, eat, etc.) without needing
+// per-verb grammar mapping. The Arbiter speaks as "I" — the prefix
+// "The Arbiter says, " or "The Arbiter watches. " carries the
+// dialogue-tag so it stays in the existing arbiter-voice cadence.
+const ARBITER_NOTED_LINES = [
+  `The Arbiter watches. "I saw the way you came at that."`,
+  `The Arbiter speaks low. "I noticed how you handled that."`,
+  `The Arbiter half-nods. "I marked the choice."`,
+  `The Arbiter follows your eyes. "I see what you saw."`,
+  `The Arbiter says, "I caught the read. Good or bad — that was yours."`,
+  `The Arbiter watches you finish. "I noted the move."`,
+  `The Arbiter says quietly. "I saw it. The world saw it too."`,
+];
+
 const GENERIC_REMARKS = [
   `"Tartaria was a place of life and power once," the Arbiter says. "Now mostly whispers."`,
   `"The Aetherstone Flood ended a thousand years ago," the Arbiter says, "but at ground level it never quite stopped moving."`,
@@ -542,10 +565,13 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
         // OTA 027 — bland "notes how you look" filler swapped for
         // rotating pool when the last action is a plain look. Other
         // actions still get the generic "notes how you {action}".
+        // OTA-186 — non-look actions ALSO use a rotating pool now,
+        // first-person voice instead of the third-person template
+        // that echoed the raw verb verbatim.
         if (lastAction.trim().toLowerCase() === 'look') {
           return `${rotatingPick(ARBITER_LOOK_LINES, 'arbiter.look')} ${combatRemark(ctx.enemy!)}`;
         }
-        return `The Arbiter notes how you ${lastAction.trim()}. ${combatRemark(ctx.enemy!)}`;
+        return `${rotatingPick(ARBITER_NOTED_LINES, 'arbiter.noted.combat')} ${combatRemark(ctx.enemy!)}`;
       }
     }
     // Combat color rotates between enemy-aware remarks and the attack
@@ -702,10 +728,13 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
       const flavor = moodPool ? pick(moodPool).replace('this place', ctx.location.name) : null;
       // OTA 027 — see combat-context site above. Plain "look" gets
       // the rotating LOOK pool instead of the generic templated
-      // filler.
+      // filler. OTA-186 — non-look actions ALSO use a rotating
+      // first-person pool; the third-person "Arbiter notes how
+      // you ${verb}" template that echoed the raw verb verbatim
+      // is gone.
       const noted = lastAction.trim().toLowerCase() === 'look'
         ? rotatingPick(ARBITER_LOOK_LINES, 'arbiter.look')
-        : `The Arbiter notes how you ${lastAction.trim()}.`;
+        : rotatingPick(ARBITER_NOTED_LINES, 'arbiter.noted.peace');
       return flavor ? `${noted} ${flavor}` : noted;
     }
   }
