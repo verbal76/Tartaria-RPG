@@ -5554,4 +5554,75 @@
 // InputBox.tsx, app/screens/
 // AboutScreen.tsx, app/state/
 // gameStore.ts.
-export const OTA_BUILD_ID = '2026-05-29-189';
+//
+// 2026-05-29-190 — bottom-row
+// breathing-room floor + new
+// floating input popup above
+// the soft keyboard. Player:
+// "the bottom row is still
+// mashed all the way into the
+// corners of the bottom, but
+// when I go to type the
+// keyboard only pushes up half
+// of the orientation line. I
+// need the main screen to
+// always auto adjust to not
+// be mushed into the very
+// bottom on all devices, and
+// when the keyboard opens up
+// it puts a text box popup
+// above it so you always see
+// what your typing and can
+// send it from there using
+// the keyboard send button.
+// the act button is still
+// needed for text copy/paste
+// from other sections so do
+// not get rid of that."
+//
+// Two fixes:
+//   (1) AppShell's
+//       paddingBottom now
+//       Math.max(insets.
+//       bottom, 12) so the
+//       bottom row gets at
+//       least 12dp breathing
+//       room even on Android
+//       devices where
+//       immersive-mode hides
+//       the nav bar and the
+//       safe-area inset
+//       reports 0. iOS
+//       home-indicator
+//       devices keep their
+//       larger inset
+//       unchanged.
+//   (2) New
+//       KeyboardInputBar
+//       component mounted at
+//       App.tsx root (outside
+//       the scaled wrapper)
+//       renders an
+//       absolutely-positioned
+//       popup at bottom:
+//       keyboardOffset
+//       whenever the
+//       keyboard opens on
+//       the Exploration
+//       screen. Own TextInput
+//       with autoFocus +
+//       returnKeyType="send"
+//       + inline Act button.
+//       Original InputBox +
+//       Act button left
+//       untouched so paste-
+//       from-other-sections
+//       flows still work
+//       through it.
+//
+// Files: App.tsx
+// (paddingBottom floor +
+// KeyboardInputBar mount),
+// app/components/Keyboard
+// InputBar.tsx (NEW).
+export const OTA_BUILD_ID = '2026-05-29-190';

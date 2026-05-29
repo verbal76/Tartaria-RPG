@@ -245,6 +245,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Bottom-row breathing room + floating keyboard input popup
+
+- **OTA-190 (2026-05-29) · Bottom-row padding floor + new floating input popup above the keyboard.**
+  - **What:** Player: *"the bottom row is still mashed all the way into the corners of the bottom, but when I go to type the keyboard only pushes up half of the orientation line. I need the main screen to always auto adjust to not be mushed into the very bottom on all devices, and when the keyboard opens up it puts a text box popup above it so you always see what your typing and can send it from there using the keyboard send button. the act button is still needed for text copy/paste from other sections so do not get rid of that."* Two issues, two surgical fixes.
+  - **Fix (Issue 1 — bottom-row mash):** `AppShell` in `App.tsx` now applies `paddingBottom: Math.max(insets.bottom, 12)` so even on Android devices where immersive-mode hides the nav bar (`expo-navigation-bar.setVisibilityAsync('hidden')`) and `insets.bottom` reports 0, the bottom row gets at least 12dp of breathing room. iOS home-indicator devices keep their larger inset unchanged via the Math.max. The `interiorHeight` math also uses the floored value so the scaled wrapper sizes correctly.
+  - **Fix (Issue 2 — keyboard covers input):** New `KeyboardInputBar` component (`app/components/KeyboardInputBar.tsx`) mounted at the App.tsx root level (OUTSIDE the AppShell scaled wrapper so its positioning math stays in real device-pixel space). Self-gates on `screen === 'exploration' && keyboardOffset > 0`; renders null otherwise. When mounted: own TextInput with `autoFocus` (focus moves from the underlying InputBox TextInput to the floating one so the player's typing lands above the keyboard) + `returnKeyType="send"` + `onSubmitEditing` that fires `submitPlayerAction` and dismisses the keyboard. Inline ACT button next to the input mirrors the existing layout pattern.
+  - **Why a popup vs lifting the in-flow InputBox:** ExplorationScreen's column has minHeight floors (StatsPanel ≥ 165 + sceneBar + objective chip + vendor banner + feed minimum) that push the in-flow InputBox below the visible bottom edge when the keyboard claims its share of the viewport — the existing `interiorHeight` shrinking only buys back the keyboard's footprint, not the overflow caused by the minHeights stacking taller than the remaining height. A floating popup in absolute coords sidesteps the flex-overflow problem entirely. The original InputBox + Act button stay completely as-is so paste-from-other-sections (long-press → Paste → tap Act) continues to work through them — and the popup's own TextInput supports the same long-press → Paste flow for players who'd rather paste into the floating field.
+  - **Vendor-leave warning:** intentionally NOT replicated in the floating bar. Typing "go north" in the popup is a deliberate verb+direction command; the warning was designed to catch fat-fingered taps on the cardinal quick buttons + the in-flow input. Players typing in the popup are making a conscious move command.
+  - **Files:** `App.tsx` (paddingBottom floor + KeyboardInputBar mount + import), `app/components/KeyboardInputBar.tsx` (NEW).
+
 #### STT removal (mic button + voice settings toggle)
 
 - **OTA-189 (2026-05-29) · Speech-to-text removed entirely from the game.**

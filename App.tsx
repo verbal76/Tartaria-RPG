@@ -24,6 +24,7 @@ import { ActionReferenceScreen } from './app/screens/ActionReferenceScreen';
 import { ContractsScreen } from './app/screens/ContractsScreen';
 import { TutorialOverlay } from './app/components/TutorialOverlay';
 import { CallDogModal } from './app/components/CallDogModal';
+import { KeyboardInputBar } from './app/components/KeyboardInputBar';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
 import { startAudioController, stopAudioController } from './app/audio/AudioController';
 import { initTTSManager } from './app/voice/TTSManager';
@@ -227,6 +228,13 @@ export default function App() {
           from any screen the player happens to be on. The modal
           self-gates on `callDogModalOpen`. */}
       <CallDogModal />
+      {/* OTA-190 — floating input popup that appears above the soft
+          keyboard on the Exploration screen so the player always
+          sees what they're typing. Mounts OUTSIDE the scaled wrapper
+          so its bottom: keyboardOffset positioning stays in real
+          device-pixel space. Self-gates on screen === 'exploration'
+          + keyboardOffset > 0; renders null otherwise. */}
+      <KeyboardInputBar />
     </SafeAreaProvider>
   );
 }
@@ -331,13 +339,22 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
     const hideSub = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide', onHide);
     return () => { showSub.remove(); hideSub.remove(); };
   }, []);
+  // OTA-190 — minimum bottom-padding floor so the bottom row of the
+  // ExplorationScreen (quick action chips + input + Act) isn't
+  // mashed flush against the screen edge on Android devices where
+  // immersive mode hides the nav bar and the safe-area inset reports
+  // 0. Player ask: "I need the main screen to always auto adjust to
+  // not be mushed into the very bottom on all devices." Math.max
+  // keeps the bigger value when the device DOES report an inset
+  // (gesture-area phones, iOS home-indicator devices).
+  const bottomPad = Math.max(bottom, 12);
   // Available interior height the wrapper paints into (the safe
   // outer View handles the status/nav bar insets). Subtract the
   // keyboard's logical-pixel height so the text input rises into
   // view when typing.
-  const interiorHeight = ui.logicalHeight - (top + bottom + keyboardOffset) / ui.scale;
+  const interiorHeight = ui.logicalHeight - (top + bottomPad + keyboardOffset) / ui.scale;
   return (
-    <View style={[styles.safe, { paddingTop: top, paddingBottom: bottom, paddingLeft: insets.left, paddingRight: insets.right }]}>
+    <View style={[styles.safe, { paddingTop: top, paddingBottom: bottomPad, paddingLeft: insets.left, paddingRight: insets.right }]}>
       <StatusBar style="light" hidden />
       <View
         style={{
