@@ -12,7 +12,7 @@ import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
 import { canScrap } from '../engine/scrapEngine';
 import { findWeaponByName, isInferredItem } from '../engine/crafting';
 import { BrandedModal } from '../components/BrandedModal';
-import { getItemPreview } from '../components/itemPreview';
+import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 
@@ -349,9 +349,9 @@ export function InventoryScreen() {
 
   // Wrap preview lookup too — getItemPreview reads multiple catalog
   // tables and could throw if an item name isn't in any of them.
-  let modalPreview: ReturnType<typeof getItemPreview> | null = null;
+  let modalPreview: ReturnType<typeof getItemPreview> | null = null; // OTA-195 may also read uniqueStats
   if (pending) {
-    try { modalPreview = getItemPreview(pending.item.name); }
+    try { modalPreview = getItemPreviewForInstance(pending.item); }
     catch { modalPreview = null; }
   }
   const modalBody = pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0

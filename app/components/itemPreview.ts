@@ -31,6 +31,40 @@ export type ItemPreview = {
   stats: string[];
 };
 
+// OTA-195 — uniqueStats-aware preview. When the caller has the
+// InventoryItem (most call sites do), prefer this entry point so a
+// fused item renders its unique stats instead of falling through to
+// inferGear (which would only see the name keywords).
+export function getItemPreviewForInstance(item: {
+  name: string;
+  uniqueStats?: import('../engine/types').UniqueItemStats;
+  description?: string;
+  rarity?: string;
+}): ItemPreview {
+  if (item.uniqueStats) {
+    const u = item.uniqueStats;
+    const kindLabel =
+      u.kind === 'weapon' ? 'Unique Weapon'
+      : u.kind === 'dog_armor' ? 'Unique Dog Vest'
+      : `Unique ${u.armorSlot ? u.armorSlot.charAt(0).toUpperCase() + u.armorSlot.slice(1) + ' ' : ''}Armor`;
+    const stats: string[] = [];
+    if (u.damageDice && u.damageType) stats.push(`Damage: ${u.damageDice} (${u.damageType})`);
+    if (u.scalesWith) stats.push(`Scales with ${u.scalesWith.toUpperCase().slice(0, 3)}`);
+    if (u.acBonus !== undefined) stats.push(`AC +${u.acBonus}`);
+    if (u.resistance) stats.push(`Resists: ${u.resistance}`);
+    if (u.special) stats.push(`Special: ${u.special}`);
+    stats.push(`Durability: ${u.durability.current}/${u.durability.max}`);
+    return {
+      name: item.name,
+      kindLabel,
+      rarity: u.rarity,
+      description: item.description ?? '',
+      stats,
+    };
+  }
+  return getItemPreview(item.name);
+}
+
 // Resolve an item name to a previewable summary. Used by the buy / equip /
 // trade modals so the player can read what they're about to commit to.
 export function getItemPreview(itemName: string): ItemPreview {

@@ -31,7 +31,7 @@ export interface WastelandLootEntry {
   tags: string[];
 }
 
-export type WastelandEncounterType = 'treasure' | 'npc' | 'skirmish' | 'mini_dungeon';
+export type WastelandEncounterType = 'treasure' | 'npc' | 'skirmish' | 'mini_dungeon' | 'fusion_bench';
 
 export interface WastelandArchetype {
   type: WastelandEncounterType;

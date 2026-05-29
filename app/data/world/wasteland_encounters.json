@@ -1,6 +1,14 @@
 {
   "_description": "Wasteland encounters surfaced during long-distance cardinal travel. After every N steps within the same macro location, the engine rolls against this pool. Each archetype declares: matchers (biome / location tags it fires in), narration template ({biome}, {direction} substituted), optional loot drop with material kinds, optional NPC dialogue, optional follow-up hook the player can chase. Adding a new encounter type is a JSON edit, no engine code. Drives the 'walking is enjoyable' goal — player feedback: 'walking into the desert and finding an old bus with a note in it that tells you a direction to travel and to look for a rock... a body with a sad story and a small keepsake. Layer those up every 2 or 3 movements and you can make the world massive.'",
 
+  "fusion_crucible": {
+    "type": "fusion_bench",
+    "weight": 4,
+    "matchers": ["mud", "outskirts", "ruin", "buried", "etheric_anomaly", "aether", "tech", "surface"],
+    "narration": "A Reclaimer's Fusing Crucible rests half-buried in the silt — a pitted iron bowl ringed with three pedestals, the inner rim glassy with old Aether resonance. The pedestals are empty, but the metal still hums when you set your reserved items down beside it. The Arbiter murmurs: 'Fuse.'",
+    "lore_note": "Crucibles were how the old Reclaimers turned scavenged scraps into singular tools. Each was used once, then walked away from. This one waited for you."
+  },
+
   "abandoned_caravan": {
     "type": "treasure",
     "weight": 12,

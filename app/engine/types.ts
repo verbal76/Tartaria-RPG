@@ -378,8 +378,48 @@ export interface InventoryItem {
    *  item out of OTA-193's auto-substitute crafting drain. Only
    *  inferred items (no hand-authored catalog row) can carry this
    *  flag; the inventory UI gates the heart-tap on that predicate.
-   *  Reserved items are saved for the fusion bench (planned). */
+   *  Reserved items are saved for the fusion bench. */
   reservedForFusion?: boolean;
+  /** OTA-195 — per-instance unique stats stamped on a fused item.
+   *  When present, combat / preview / equip resolvers read these
+   *  BEFORE falling back to catalog or inference. A fused item is
+   *  one-of-a-kind for this save and will not appear in any vendor /
+   *  loot / catalog lookup elsewhere. */
+  uniqueStats?: UniqueItemStats;
+}
+
+/** OTA-195 — fused item identity. Stamped on the InventoryItem
+ *  rather than tracked in a global catalog because each fusion
+ *  result is one-of-a-kind for the save that produced it. The
+ *  fields mirror the relevant subset of CatalogWeapon /
+ *  CatalogArmor / CatalogDogGear so combat and preview can read
+ *  them with the same shape. */
+export interface UniqueItemStats {
+  /** What this fused item IS. Drives equip slot routing and which
+   *  combat resolver reads it. */
+  kind: 'weapon' | 'armor' | 'dog_armor';
+  /** Rarity floor — fusion never produces Common items. */
+  rarity: 'Rare' | 'Legendary';
+  /** Per-instance durability. Always present on fused items so
+   *  scrap / repair routing works the same way as authored gear. */
+  durability: { current: number; max: number };
+  /** Weapon damage dice ("2d6", "1d8"). Set when kind === 'weapon'. */
+  damageDice?: string;
+  /** Weapon damage type ("slashing", "piercing", "aether", etc.). */
+  damageType?: string;
+  /** Weapon scaling stat. */
+  scalesWith?: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma';
+  /** Armor / dog_armor AC bonus. Set when kind === 'armor' or
+   *  kind === 'dog_armor'. */
+  acBonus?: number;
+  /** Armor slot for kind === 'armor'. */
+  armorSlot?: 'head' | 'chest' | 'legs' | 'feet';
+  /** Up to ONE resistance type (burn / cold / poison / aetheric /
+   *  electrical / degradation). */
+  resistance?: string;
+  /** Short flavor describing the unique effect. Narrative today;
+   *  hook into mechanics in a future OTA. */
+  special?: string;
 }
 
 export type CombatRange = 'arm' | 'close' | 'far';
@@ -645,6 +685,11 @@ export interface PlayerCharacter {
   activeQuests: Quest[];
   /** Set when HP hits 0; the character is barred from play until a Resurrection Gem revives them. */
   dead?: boolean;
+  /** OTA-195 — one-shot fusion permit granted by a Fusing Crucible
+   *  travel encounter. Cleared when the player runs the fuse action.
+   *  Without this gate, the fuse verb would be usable anywhere; the
+   *  encounter is the discovery moment that earns the right. */
+  fusionPending?: boolean;
   /** Lifetime counters; thresholds trigger stat growth. */
   milestones?: PlayerMilestones;
   /** OTA 058 — Skyrim-style use-based stat progression. Each stat

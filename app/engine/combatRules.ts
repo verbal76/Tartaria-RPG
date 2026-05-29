@@ -175,6 +175,11 @@ export function isBareHandAttack(actionText: string): boolean {
 // Resolve the player's currently-equipped weapon to a catalog entry, if any.
 // `prefer` lets the caller bias toward an off-hand strike when the player
 // explicitly chooses it; defaults to the main-hand weapon.
+//
+// OTA-195 — checks the inventory for a fused weapon with `uniqueStats`
+// BEFORE falling back to the catalog so combat reads the unique stats
+// when the equipped item is one-of-a-kind. Fused weapons never appear
+// in WEAPONS so the catalog lookup would otherwise miss them.
 export function getEquippedWeapon(
   player: PlayerCharacter,
   prefer: 'main' | 'off' = 'main',
@@ -185,7 +190,28 @@ export function getEquippedWeapon(
     prefer === 'off'
       ? eq.off ?? eq.main ?? eq.weaponName
       : eq.main ?? eq.weaponName ?? eq.off;
-  return name ? findWeaponByName(name) : null;
+  if (!name) return null;
+  // Unique-fused first: scan player.inventory for an instance with
+  // uniqueStats matching this name + weapon kind.
+  for (const it of player.inventory) {
+    if (!it.uniqueStats) continue;
+    if (it.uniqueStats.kind !== 'weapon') continue;
+    if (it.name.toLowerCase() !== name.toLowerCase()) continue;
+    const u = it.uniqueStats;
+    if (!u.damageDice || !u.damageType || !u.scalesWith) continue;
+    return {
+      name: it.name,
+      weaponKind: 'melee',
+      damageType: u.damageType as CatalogWeapon['damageType'],
+      damageDice: u.damageDice,
+      stat: u.scalesWith,
+      rarity: u.rarity,
+      baseDurability: u.durability.max,
+      tags: it.tags,
+      description: it.description ?? '',
+    };
+  }
+  return findWeaponByName(name);
 }
 
 function detectWeaponClass(text: string): WeaponClass {

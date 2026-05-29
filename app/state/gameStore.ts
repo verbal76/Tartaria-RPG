@@ -1318,9 +1318,15 @@ interface GameStore {
    *  inferred items (catalog-absent) can be reserved; the UI gates the
    *  tap on `isInferredItem`. Reserved items are excluded from the
    *  OTA-193 auto-substitute drain so they survive for the fusion
-   *  bench (planned). Looked up by InventoryItem.id to disambiguate
-   *  stacks. */
+   *  bench. Looked up by InventoryItem.id to disambiguate stacks. */
   toggleReserveForFusion: (itemId: string) => void;
+  /** OTA-195 — fuse reserved inferred items at a Crucible (one-shot
+   *  flag set by the fusion_bench travel encounter). Gates on the
+   *  pending flag + gateFusion rules (≥3 reserved inferred items,
+   *  ≥3 distinct material tags). Calls Qwen for a balanced unique
+   *  weapon / armor / dog vest, clamps the response, mints the fused
+   *  InventoryItem in place. */
+  fuseAtCrucible: () => Promise<void>;
   /** OTA 228 — repair a durable item by consuming materials equal to
    *  2× its scrap output. Looked up by item id so the player can
    *  repair a specific damaged copy without merging the wrong one.
@@ -3629,6 +3635,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
   submitPlayerAction(text, _opts) {
     const trimmed = text.trim();
     if (!trimmed || get().pendingRolls) return;
+
+    // OTA-195 — fuse verb. Short-circuit before the parser since
+    // 'fuse' isn't in any verb alias and the player typed it directly
+    // after a Fusing Crucible encounter. Routes through fuseAtCrucible
+    // which handles all the gating + Qwen + arbiter narration.
+    if (/^fuse(\s|$)/i.test(trimmed)) {
+      if (!_opts?.silent) get().appendLog('player', trimmed);
+      void get().fuseAtCrucible();
+      return;
+    }
 
     // Meta-comment guard. Playtest log: the player typed a long
     // feedback note — "ok it doesn't realize I left the outpost.
@@ -13572,6 +13588,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (enc.type === 'mini_dungeon' && enc.questHook) {
           grantQuestHook(get, set, enc.questHook);
         }
+        // OTA-195 — fusion bench encounter. Sets a one-shot permit on
+        // the player; the `fuse` action verb consumes it. Without the
+        // permit, the verb refuses with an arbiter line. The permit
+        // survives saves so the player can walk into safety before
+        // committing reserved items.
+        if (enc.type === 'fusion_bench') {
+          set((s) => s.player
+            ? { player: { ...s.player, fusionPending: true } }
+            : s);
+          get().appendLog(
+            'arbiter',
+            `"You have a Crucible debt now," the Arbiter says. "When you're ready — say 'fuse' — set your reserved pieces in the bowl."`,
+          );
+        }
         void get().persist();
       }
     }
@@ -14455,6 +14485,99 @@ export const useGameStore = create<GameStore>((set, get) => ({
           },
         }
       : s);
+  },
+
+  async fuseAtCrucible() {
+    const player = get().player;
+    if (!player) return;
+    // Gate 1 — permit. The fusion_bench encounter sets fusionPending;
+    // without that flag, the verb refuses (the bench is not at your
+    // feet). Keeps fusion from being usable anywhere.
+    if (!player.fusionPending) {
+      get().appendLog(
+        'arbiter',
+        `"There's no Crucible here," the Arbiter says. "Find one — they wait in the silt and the ruins. Reserve your pieces, then bring them to the bowl."`,
+      );
+      return;
+    }
+    // Gate 2 — input rules. Need ≥3 reserved inferred items spanning
+    // ≥3 distinct material tags. gateFusion returns the eligible
+    // inputs + a refusal reason if not.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const fusion = require('../engine/itemFusion');
+    const gate = fusion.gateFusion(player.inventory) as ReturnType<typeof import('../engine/itemFusion').gateFusion>;
+    if (!gate.ok) {
+      get().appendLog(
+        'arbiter',
+        `The Crucible hums, then cools. "${gate.reason ?? 'Not yet.'}"`,
+      );
+      return;
+    }
+    // Gate 3 — Qwen readiness. The static-inference path can't design
+    // a unique item, so fusion REQUIRES Qwen. If the model isn't
+    // loaded, refuse — but keep the permit so the player can try
+    // again once the engine warms up.
+    if (!qwen.isReady()) {
+      get().appendLog(
+        'arbiter',
+        `The Crucible's resonance is faint right now — the Aether-engine in your pack isn't ready to listen. Try again in a moment.`,
+      );
+      return;
+    }
+    get().appendLog(
+      'world',
+      `You set your reserved pieces on the three pedestals. The Crucible takes a long breath in.`,
+    );
+    let result;
+    try {
+      result = await fusion.synthesizeFusionViaQwen(gate.inputs, gate.tagProfile, qwen);
+    } catch (err) {
+      get().appendLog('debug', `fuseAtCrucible threw: ${String(err)}`);
+      result = null;
+    }
+    if (!result) {
+      // Fail-closed — the permit IS spent. Don't let the player keep
+      // re-rolling until they get a result they like.
+      set((s) => s.player
+        ? { player: { ...s.player, fusionPending: false } }
+        : s);
+      get().appendLog(
+        'arbiter',
+        `The Crucible's resonance scatters mid-pull. Whatever was forming falls apart. "Crucibles," the Arbiter says quietly, "are not patient."`,
+      );
+      void get().persist();
+      return;
+    }
+    const livePlayer = get().player;
+    if (!livePlayer) return;
+    const seed = `${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    const { inventory: newInv, fused } = fusion.applyFusion(
+      livePlayer.inventory,
+      gate.inputs,
+      result,
+      seed,
+    );
+    set((s) => s.player
+      ? {
+          player: {
+            ...s.player,
+            inventory: newInv,
+            fusionPending: false,
+          },
+        }
+      : s);
+    get().appendLog(
+      'reward',
+      `✦ Forged at the Crucible: ${fused.name} (${fused.rarity ?? 'Rare'}).`,
+    );
+    get().appendLog(
+      'world',
+      `The Crucible exhales. ${result.description}`,
+    );
+    if (result.stats.special) {
+      get().appendLog('arbiter', `The Arbiter studies it. "${result.stats.special}"`);
+    }
+    void get().persist();
   },
 
   scrapInventoryItem(itemName) {
@@ -16531,6 +16654,21 @@ function aggregateArmor(player: PlayerCharacter): { acBonus: number; resistances
   for (const slot of ARMOR_SLOTS) {
     const name = eq[slot];
     if (!name) continue;
+    // OTA-195 — check player inventory for a fused armor piece with
+    // uniqueStats matching this slot+name BEFORE falling back to the
+    // catalog. Fused items are unique to the save and never appear in
+    // ARMOR / EXPLORATION; without this check their AC would be lost.
+    const unique = player.inventory.find((it) =>
+      it.uniqueStats
+      && it.uniqueStats.kind === 'armor'
+      && it.uniqueStats.armorSlot === slot
+      && it.name.toLowerCase() === name.toLowerCase(),
+    );
+    if (unique?.uniqueStats) {
+      acBonus += unique.uniqueStats.acBonus ?? 0;
+      if (unique.uniqueStats.resistance) resistances.push(unique.uniqueStats.resistance);
+      continue;
+    }
     const piece = findArmorByName(name);
     if (!piece) continue;
     acBonus += piece.acBonus;

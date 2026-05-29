@@ -5998,4 +5998,144 @@
 // action), app/screens/
 // InventoryScreen.tsx (modal
 // button + row marker).
-export const OTA_BUILD_ID = '2026-05-29-194';
+// 2026-05-29-195 — fusion
+// bench: random travel
+// encounter that lets the
+// player combine reserved
+// inferred items into a
+// one-of-a-kind weapon /
+// armor / dog vest via Qwen.
+// Player ask:
+//   "have at it claudemus
+//   maximus. let's put the
+//   fusion benches as random
+//   travel encounters"
+//
+// New schema: UniqueItemStats
+// on InventoryItem.uniqueStats
+// (kind / rarity / durability
+// + weapon-or-armor specifics)
+// — per-instance because each
+// fused item is one-of-a-kind
+// for the save that produced
+// it. Combat (getEquippedWeapon
+// in combatRules.ts) and AC
+// (aggregateArmor in gameStore.ts)
+// now check uniqueStats BEFORE
+// the catalog so fused items
+// route correctly.
+//
+// New engine: app/engine/
+// itemFusion.ts
+//   - gateFusion(inventory):
+//     ≥3 reserved inferred misc
+//     items spanning ≥3 distinct
+//     material tags. Refusal
+//     reason returned for the
+//     arbiter line.
+//   - synthesizeFusionViaQwen:
+//     Tartaria-tone system
+//     prompt asks for {name,
+//     kind, dmg/AC/slot,
+//     resistance?, special?}.
+//     Validator clamps damage
+//     to 1–2d4/6/8/10, AC 1–6,
+//     resistance whitelist,
+//     name ≤40 chars,
+//     description ≤200 chars.
+//   - applyFusion: drains the
+//     inputs from inventory by
+//     id, mints the fused item
+//     with uniqueStats stamped,
+//     tags ['fused', 'unique',
+//     resistance].
+//   - fusionInputHash: stable
+//     hash for future cache
+//     keying.
+//
+// Encounter: new "fusion_
+// crucible" archetype in
+// wasteland_encounters.json,
+// type 'fusion_bench', weight
+// 4 (rare ~4% of an encounter
+// fire). Matchers cover the
+// usual wasteland tags + aether
+// / tech / surface for thematic
+// flavor. stepDirection in
+// gameStore handles type ===
+// 'fusion_bench' by setting
+// player.fusionPending=true
+// and narrating an arbiter
+// line. The permit survives
+// saves so the player can
+// walk to safety before
+// fusing.
+//
+// New verb: typing "fuse"
+// short-circuits the parser
+// at the top of submit
+// PlayerAction and calls the
+// new fuseAtCrucible store
+// action. Three-gate path:
+//   1. fusionPending or refuse
+//   2. gateFusion or refuse
+//      with the reason
+//   3. qwen.isReady() or refuse
+//      WITHOUT consuming the
+//      permit (so the player
+//      can wait for the model)
+//
+// On Qwen failure / parse
+// failure / validation
+// failure, the permit IS
+// consumed — fail-closed so
+// the player can't re-roll
+// for a better unique item.
+//
+// itemPreview gains
+// getItemPreviewForInstance
+// which prefers uniqueStats.
+// InventoryScreen modal uses
+// this so fused items render
+// their unique damage / AC /
+// resistance / special lines
+// in the preview block.
+//
+// 22 new tests in
+// itemFusionEngine (gate
+// rules, validator clamps,
+// Qwen mock, applyFusion,
+// determinism). 203-test
+// regression sweep across
+// craft / recipe / repair /
+// itemEffect / salvage /
+// theft / area / stat / item
+// Defaults / itemSynthesis /
+// itemBackfill / itemFusion /
+// combatRules all green;
+// canary five green; TS
+// clean app-side.
+//
+// Files: app/engine/types.ts
+// (UniqueItemStats +
+// fusionPending), app/engine/
+// itemFusion.ts (NEW),
+// app/engine/combatRules.ts
+// (uniqueStats-first weapon
+// resolve), app/engine/
+// wastelandEncounters.ts
+// (fusion_bench type), app/
+// data/world/wasteland_
+// encounters.json (crucible
+// archetype), app/state/
+// gameStore.ts (encounter
+// hook + fuse verb + fuseAt
+// Crucible action +
+// aggregateArmor uniqueStats
+// branch), app/components/
+// itemPreview.ts (uniqueStats
+// preview shape), app/
+// screens/InventoryScreen.tsx
+// (uses getItemPreviewFor
+// Instance).
+export const OTA_BUILD_ID = '2026-05-29-195';
