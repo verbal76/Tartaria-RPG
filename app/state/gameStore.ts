@@ -9129,6 +9129,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           break;
         }
+        // OTA-170 — INT-to-craft gate. Runecaster recipes (OTA-169)
+        // are scientifically intensive per the Tartaria Prima spec —
+        // only INT 11+ can assemble one. Engine reads
+        // recipe.intRequirement and compares against effective INT
+        // (so accessory bonuses count). Other recipes omit the field
+        // and pass through with no gate.
+        if (typeof recipe.intRequirement === 'number') {
+          const eff = effectiveStats(player);
+          if (eff.intelligence < recipe.intRequirement) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter studies the schematic. "${recipe.result} is delicate work — INT ${recipe.intRequirement} or better to assemble cleanly. You're at ${eff.intelligence}. Read, study, train — then try again."`,
+            );
+            break;
+          }
+        }
         const missing = recipe.ingredients.filter(
           (ing) =>
             player.inventory

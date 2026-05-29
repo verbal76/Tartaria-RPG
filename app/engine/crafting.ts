@@ -129,6 +129,11 @@ export interface RecipeIngredient {
 export interface Recipe {
   result: string;
   ingredients: RecipeIngredient[];
+  /** OTA-170 — INT requirement to craft. Runecaster recipes set this
+   *  to 11 (per the Tartaria Prima spec). When set, the craft handler
+   *  refuses with an Arbiter line if the player's effective INT is
+   *  below the threshold. Omitted recipes have no INT gate. */
+  intRequirement?: number;
 }
 
 export const MATERIALS = (materialsData as { materials: CatalogMaterial[] }).materials;

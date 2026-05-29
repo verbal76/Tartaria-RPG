@@ -4228,4 +4228,52 @@
 // (+15 runecasters),
 // app/data/items/recipes.json
 // (+15 recipes).
-export const OTA_BUILD_ID = '2026-05-29-169';
+//
+// 2026-05-29 OTA-170 — INT-to-craft
+// gate on runecaster recipes
+// (closes OTA-169 deferral).
+//
+// Recipe type gains optional
+// intRequirement field. craftRecipe
+// handler reads it and refuses
+// (Arbiter line, no ingredient
+// consumption) when the player's
+// effective INT is below the
+// threshold. Other recipes (no
+// intRequirement) pass through
+// unchanged.
+//
+// All 15 runecaster recipes
+// stamped intRequirement: 11 per
+// the Tartaria Prima spec.
+//
+// Effective INT (effectiveStats)
+// is used, so accessory bonuses
+// count — a player with base INT
+// 10 wearing a +1 INT amulet can
+// craft.
+//
+// 5/5 OTA-170 regressions:
+//   • all 15 runecaster recipes
+//     stamped intRequirement 11
+//   • INT 10 CANNOT craft Flame
+//     of Aether (refusal, no item)
+//   • INT 11 CAN craft (succeeds)
+//   • INT 15 CAN craft (no false
+//     refusal)
+//   • non-runecaster (Club) has
+//     no gate (INT 1 succeeds)
+//
+// 9/9 wider craft regression
+// (recipeFuzzy + craftRepairFuzz)
+// stays green.
+//
+// Files: app/engine/crafting.ts
+// (Recipe.intRequirement field),
+// app/state/gameStore.ts (craft
+// handler INT gate check),
+// app/data/items/recipes.json
+// (15 runecaster recipes stamped),
+// __tests__/runecasterIntGate
+// .test.ts (NEW).
+export const OTA_BUILD_ID = '2026-05-29-170';

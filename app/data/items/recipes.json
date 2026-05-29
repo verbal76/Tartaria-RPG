@@ -3,383 +3,931 @@
     {
       "result": "Climbing Rope",
       "ingredients": [
-        { "name": "Broken Rope", "quantity": 2 }
+        {
+          "name": "Broken Rope",
+          "quantity": 2
+        }
       ]
     },
     {
       "result": "Club",
       "ingredients": [
-        { "name": "Stick", "quantity": 1 }
+        {
+          "name": "Stick",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Cudgel",
       "ingredients": [
-        { "name": "Stick", "quantity": 1 },
-        { "name": "Big Rock", "quantity": 1 },
-        { "name": "Patched Cloth", "quantity": 1 }
+        {
+          "name": "Stick",
+          "quantity": 1
+        },
+        {
+          "name": "Big Rock",
+          "quantity": 1
+        },
+        {
+          "name": "Patched Cloth",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Stone Spear",
       "ingredients": [
-        { "name": "Stick", "quantity": 1 },
-        { "name": "Small Rock", "quantity": 1 },
-        { "name": "Patched Cloth", "quantity": 1 }
+        {
+          "name": "Stick",
+          "quantity": 1
+        },
+        {
+          "name": "Small Rock",
+          "quantity": 1
+        },
+        {
+          "name": "Patched Cloth",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Iron Spear",
       "ingredients": [
-        { "name": "Stick", "quantity": 1 },
-        { "name": "Scrap Metal", "quantity": 1 },
-        { "name": "Patched Cloth", "quantity": 1 }
+        {
+          "name": "Stick",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        },
+        {
+          "name": "Patched Cloth",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Aether-Shard Spear",
       "ingredients": [
-        { "name": "Stick", "quantity": 1 },
-        { "name": "Aetheric Shard", "quantity": 1 },
-        { "name": "Spider Silk", "quantity": 1 }
+        {
+          "name": "Stick",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Aetheric Torch",
       "ingredients": [
-        { "name": "Aether Crystal", "quantity": 1 },
-        { "name": "Mud Fragment", "quantity": 1 },
-        { "name": "Aether Residue", "quantity": 1 }
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        },
+        {
+          "name": "Mud Fragment",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Residue",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "First Aid Kit",
       "ingredients": [
-        { "name": "Spider Silk", "quantity": 2 },
-        { "name": "Aether Residue", "quantity": 1 }
+        {
+          "name": "Spider Silk",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Residue",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Aetheric Crystal Blade",
       "ingredients": [
-        { "name": "Aetheric Shard", "quantity": 1 },
-        { "name": "Spider Silk", "quantity": 1 },
-        { "name": "Aether Crystal", "quantity": 1 }
+        {
+          "name": "Aetheric Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Storm Rod",
       "ingredients": [
-        { "name": "Energy Fragment", "quantity": 1 },
-        { "name": "Aetheric Dust", "quantity": 1 },
-        { "name": "Aetheric Cloth", "quantity": 1 }
+        {
+          "name": "Energy Fragment",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Dust",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Aetheric Compass",
       "ingredients": [
-        { "name": "Aether Crystal", "quantity": 1 },
-        { "name": "Mudstone", "quantity": 1 },
-        { "name": "Aetheric Shard", "quantity": 1 }
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        },
+        {
+          "name": "Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Aetheric Vest",
       "ingredients": [
-        { "name": "Aetheric Shard", "quantity": 3 },
-        { "name": "Aetheric Cloth", "quantity": 1 }
+        {
+          "name": "Aetheric Shard",
+          "quantity": 3
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Sentinel Cleaver",
       "ingredients": [
-        { "name": "Scrap Metal", "quantity": 1 },
-        { "name": "Drone Core", "quantity": 1 },
-        { "name": "Aetheric Shard", "quantity": 1 }
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        },
+        {
+          "name": "Drone Core",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Founder's Edge",
       "ingredients": [
-        { "name": "Golem Core", "quantity": 1 },
-        { "name": "Aetheric Pelt", "quantity": 1 },
-        { "name": "Aetheric Shard", "quantity": 2 }
+        {
+          "name": "Golem Core",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Pelt",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 2
+        }
       ]
     },
     {
       "result": "Sludge-Forged Vest",
       "ingredients": [
-        { "name": "Aetheric Sludge", "quantity": 2 },
-        { "name": "Patched Cloth", "quantity": 1 },
-        { "name": "Spider Silk", "quantity": 1 }
+        {
+          "name": "Aetheric Sludge",
+          "quantity": 2
+        },
+        {
+          "name": "Patched Cloth",
+          "quantity": 1
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Aether-Wing Cloak",
       "ingredients": [
-        { "name": "Aether Wing", "quantity": 2 },
-        { "name": "Aetheric Cloth", "quantity": 1 },
-        { "name": "Spider Silk", "quantity": 1 }
+        {
+          "name": "Aether Wing",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Mudstone Bulwark",
       "ingredients": [
-        { "name": "Hardened Mudstone", "quantity": 2 },
-        { "name": "Scrap Metal", "quantity": 2 },
-        { "name": "Patched Cloth", "quantity": 1 }
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Patched Cloth",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Mud Gem Amulet",
       "ingredients": [
-        { "name": "Mud Gem", "quantity": 1 },
-        { "name": "Aetheric Shard", "quantity": 1 },
-        { "name": "Spider Silk", "quantity": 1 }
+        {
+          "name": "Mud Gem",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Aether-Shard Ring",
       "ingredients": [
-        { "name": "Aether Shard", "quantity": 1 },
-        { "name": "Scrap Metal", "quantity": 1 },
-        { "name": "Aether Residue", "quantity": 1 }
+        {
+          "name": "Aether Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Residue",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Resonant Song Phial",
       "ingredients": [
-        { "name": "Aetheric Song", "quantity": 1 },
-        { "name": "Aether Crystal", "quantity": 1 },
-        { "name": "Aetheric Dust", "quantity": 1 }
+        {
+          "name": "Aetheric Song",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Dust",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Lich-Heart Pendant",
       "ingredients": [
-        { "name": "Aetherstone Heart", "quantity": 1 },
-        { "name": "Aetheric Shard", "quantity": 2 },
-        { "name": "Aetheric Cloth", "quantity": 1 }
+        {
+          "name": "Aetherstone Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Hollow Crown Circlet",
       "ingredients": [
-        { "name": "Throne Shard", "quantity": 1 },
-        { "name": "Mudstone", "quantity": 1 },
-        { "name": "Aetheric Shard", "quantity": 2 }
+        {
+          "name": "Throne Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 2
+        }
       ]
     },
     {
       "result": "Iron-Worm Engine",
       "ingredients": [
-        { "name": "Iron Core", "quantity": 1 },
-        { "name": "Scrap Metal", "quantity": 3 },
-        { "name": "Drone Core", "quantity": 1 }
+        {
+          "name": "Iron Core",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 3
+        },
+        {
+          "name": "Drone Core",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Wyrm-Fang Blade",
       "ingredients": [
-        { "name": "Wyrm Fang", "quantity": 1 },
-        { "name": "Scrap Metal", "quantity": 2 },
-        { "name": "Spider Silk", "quantity": 1 }
+        {
+          "name": "Wyrm Fang",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Voidspawn Bolt",
       "ingredients": [
-        { "name": "Voidspawn Egg", "quantity": 1 },
-        { "name": "Energy Fragment", "quantity": 1 },
-        { "name": "Aetheric Dust", "quantity": 1 }
+        {
+          "name": "Voidspawn Egg",
+          "quantity": 1
+        },
+        {
+          "name": "Energy Fragment",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Dust",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Mud-Iron Greatblade",
       "ingredients": [
-        { "name": "Mud-Iron Heart", "quantity": 1 },
-        { "name": "Hardened Mudstone", "quantity": 1 },
-        { "name": "Scrap Metal", "quantity": 2 }
+        {
+          "name": "Mud-Iron Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        }
       ]
     },
     {
       "result": "Behemoth-Heart Talisman",
       "ingredients": [
-        { "name": "Behemoth Heart", "quantity": 1 },
-        { "name": "Aetheric Pelt", "quantity": 1 },
-        { "name": "Aetheric Shard", "quantity": 2 }
-      ]
-    },
-
-    { "result": "Forager's Stew",
-      "ingredients": [
-        { "name": "Firewood", "quantity": 1 },
-        { "name": "Water Bottle", "quantity": 1 },
-        { "name": "Wild Onion", "quantity": 1 },
-        { "name": "Wild Carrot", "quantity": 1 }
-      ]
-    },
-    { "result": "Hearty Stew",
-      "ingredients": [
-        { "name": "Firewood", "quantity": 2 },
-        { "name": "Water Bottle", "quantity": 1 },
-        { "name": "Wild Chicken", "quantity": 1 },
-        { "name": "Wild Onion", "quantity": 1 },
-        { "name": "Wild Carrot", "quantity": 1 }
-      ]
-    },
-    { "result": "Mushroom Stew",
-      "ingredients": [
-        { "name": "Firewood", "quantity": 1 },
-        { "name": "Water Bottle", "quantity": 1 },
-        { "name": "Red Cap Mushroom", "quantity": 1 },
-        { "name": "Blue Cap Mushroom", "quantity": 1 }
-      ]
-    },
-
-    { "result": "Red Cap Tincture",
-      "ingredients": [
-        { "name": "Firewood", "quantity": 1 },
-        { "name": "Water Bottle", "quantity": 1 },
-        { "name": "Red Cap Mushroom", "quantity": 2 }
-      ]
-    },
-    { "result": "Blue Cap Draught",
-      "ingredients": [
-        { "name": "Firewood", "quantity": 1 },
-        { "name": "Water Bottle", "quantity": 1 },
-        { "name": "Blue Cap Mushroom", "quantity": 2 }
-      ]
-    },
-    { "result": "Violet Cap Distillate",
-      "ingredients": [
-        { "name": "Firewood", "quantity": 1 },
-        { "name": "Water Bottle", "quantity": 1 },
-        { "name": "Violet Cap Mushroom", "quantity": 2 }
-      ]
-    },
-    { "result": "Orange Sporecap Brew",
-      "ingredients": [
-        { "name": "Firewood", "quantity": 1 },
-        { "name": "Water Bottle", "quantity": 1 },
-        { "name": "Orange Sporecap", "quantity": 2 }
-      ]
-    },
-    { "result": "Many-Colored Tonic",
-      "ingredients": [
-        { "name": "Firewood", "quantity": 2 },
-        { "name": "Water Bottle", "quantity": 1 },
-        { "name": "Red Cap Mushroom", "quantity": 1 },
-        { "name": "Blue Cap Mushroom", "quantity": 1 },
-        { "name": "Violet Cap Mushroom", "quantity": 1 },
-        { "name": "Orange Sporecap", "quantity": 1 }
+        {
+          "name": "Behemoth Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Pelt",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 2
+        }
       ]
     },
     {
-      "_note": "MECHANIC-2 (2026-05-25) — scanner recipes so the player can craft the off-hand search tools that gate investigate of mechanical / Aetheric / mud features. Pulse Scanner (Common, INT 3, bias=pulse) reads Sentinel and automaton signatures. Aetheric Scanner (Uncommon, INT 4, bias=aetheric) reads pre-flood Aetheric phenomena. Mud Scanner (Common, INT 3, bias=mud) reads buried mud and silt signatures. Each gates its own noun pool and its own loot pool — OTA-033.",
+      "result": "Forager's Stew",
+      "ingredients": [
+        {
+          "name": "Firewood",
+          "quantity": 1
+        },
+        {
+          "name": "Water Bottle",
+          "quantity": 1
+        },
+        {
+          "name": "Wild Onion",
+          "quantity": 1
+        },
+        {
+          "name": "Wild Carrot",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Hearty Stew",
+      "ingredients": [
+        {
+          "name": "Firewood",
+          "quantity": 2
+        },
+        {
+          "name": "Water Bottle",
+          "quantity": 1
+        },
+        {
+          "name": "Wild Chicken",
+          "quantity": 1
+        },
+        {
+          "name": "Wild Onion",
+          "quantity": 1
+        },
+        {
+          "name": "Wild Carrot",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Mushroom Stew",
+      "ingredients": [
+        {
+          "name": "Firewood",
+          "quantity": 1
+        },
+        {
+          "name": "Water Bottle",
+          "quantity": 1
+        },
+        {
+          "name": "Red Cap Mushroom",
+          "quantity": 1
+        },
+        {
+          "name": "Blue Cap Mushroom",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Red Cap Tincture",
+      "ingredients": [
+        {
+          "name": "Firewood",
+          "quantity": 1
+        },
+        {
+          "name": "Water Bottle",
+          "quantity": 1
+        },
+        {
+          "name": "Red Cap Mushroom",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Blue Cap Draught",
+      "ingredients": [
+        {
+          "name": "Firewood",
+          "quantity": 1
+        },
+        {
+          "name": "Water Bottle",
+          "quantity": 1
+        },
+        {
+          "name": "Blue Cap Mushroom",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Violet Cap Distillate",
+      "ingredients": [
+        {
+          "name": "Firewood",
+          "quantity": 1
+        },
+        {
+          "name": "Water Bottle",
+          "quantity": 1
+        },
+        {
+          "name": "Violet Cap Mushroom",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Orange Sporecap Brew",
+      "ingredients": [
+        {
+          "name": "Firewood",
+          "quantity": 1
+        },
+        {
+          "name": "Water Bottle",
+          "quantity": 1
+        },
+        {
+          "name": "Orange Sporecap",
+          "quantity": 2
+        }
+      ]
+    },
+    {
+      "result": "Many-Colored Tonic",
+      "ingredients": [
+        {
+          "name": "Firewood",
+          "quantity": 2
+        },
+        {
+          "name": "Water Bottle",
+          "quantity": 1
+        },
+        {
+          "name": "Red Cap Mushroom",
+          "quantity": 1
+        },
+        {
+          "name": "Blue Cap Mushroom",
+          "quantity": 1
+        },
+        {
+          "name": "Violet Cap Mushroom",
+          "quantity": 1
+        },
+        {
+          "name": "Orange Sporecap",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "_note": "MECHANIC-2 (2026-05-25) \u2014 scanner recipes so the player can craft the off-hand search tools that gate investigate of mechanical / Aetheric / mud features. Pulse Scanner (Common, INT 3, bias=pulse) reads Sentinel and automaton signatures. Aetheric Scanner (Uncommon, INT 4, bias=aetheric) reads pre-flood Aetheric phenomena. Mud Scanner (Common, INT 3, bias=mud) reads buried mud and silt signatures. Each gates its own noun pool and its own loot pool \u2014 OTA-033.",
       "result": "Pulse Scanner",
       "ingredients": [
-        { "name": "Scrap Metal", "quantity": 2 },
-        { "name": "Automaton Circuit", "quantity": 1 },
-        { "name": "Aether Crystal", "quantity": 1 }
+        {
+          "name": "Scrap Metal",
+          "quantity": 2
+        },
+        {
+          "name": "Automaton Circuit",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Aetheric Scanner",
       "ingredients": [
-        { "name": "Aether Crystal", "quantity": 3 },
-        { "name": "Aetheric Shard", "quantity": 2 },
-        { "name": "Aether Dust", "quantity": 2 },
-        { "name": "Scrap Metal", "quantity": 1 }
+        {
+          "name": "Aether Crystal",
+          "quantity": 3
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 2
+        },
+        {
+          "name": "Aether Dust",
+          "quantity": 2
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        }
       ]
     },
     {
       "result": "Mud Scanner",
       "ingredients": [
-        { "name": "Aether Mud", "quantity": 3 },
-        { "name": "Mudstone", "quantity": 1 },
-        { "name": "Aether Crystal", "quantity": 1 },
-        { "name": "Scrap Metal", "quantity": 1 }
+        {
+          "name": "Aether Mud",
+          "quantity": 3
+        },
+        {
+          "name": "Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        }
       ]
     },
-
-    { "result": "Flame of Aether", "ingredients": [
-      { "name": "Blank Runecaster Casing (Common)", "quantity": 1 },
-      { "name": "Aether Mud", "quantity": 1 },
-      { "name": "Spider Silk", "quantity": 1 }
-    ] },
-    { "result": "Gale Binder", "ingredients": [
-      { "name": "Blank Runecaster Casing (Common)", "quantity": 1 },
-      { "name": "Mud Gem", "quantity": 1 },
-      { "name": "Aetheric Cloth", "quantity": 1 }
-    ] },
-    { "result": "Sparkstrike", "ingredients": [
-      { "name": "Blank Runecaster Casing (Common)", "quantity": 1 },
-      { "name": "Smooth Stone", "quantity": 1 },
-      { "name": "Bent Nail", "quantity": 1 }
-    ] },
-    { "result": "Earthshaker", "ingredients": [
-      { "name": "Blank Runecaster Casing (Common)", "quantity": 1 },
-      { "name": "Aether Dust", "quantity": 1 },
-      { "name": "Mud Fragment", "quantity": 1 }
-    ] },
-    { "result": "Force Wave", "ingredients": [
-      { "name": "Blank Runecaster Casing (Common)", "quantity": 1 },
-      { "name": "Scrap Metal", "quantity": 1 },
-      { "name": "Worn Tartarian Coin", "quantity": 1 }
-    ] },
-
-    { "result": "Dark Blight", "ingredients": [
-      { "name": "Blank Runecaster Casing (Uncommon)", "quantity": 1 },
-      { "name": "Mud Gem", "quantity": 1 },
-      { "name": "Aether Crystal", "quantity": 1 }
-    ] },
-    { "result": "Stone Fist", "ingredients": [
-      { "name": "Blank Runecaster Casing (Uncommon)", "quantity": 1 },
-      { "name": "Aetheric Shard", "quantity": 1 },
-      { "name": "Aetheric Dust", "quantity": 1 }
-    ] },
-    { "result": "Ether Bolt", "ingredients": [
-      { "name": "Blank Runecaster Casing (Uncommon)", "quantity": 1 },
-      { "name": "Hardened Mudstone", "quantity": 1 },
-      { "name": "Aether Shard", "quantity": 1 }
-    ] },
-    { "result": "Void Pulse", "ingredients": [
-      { "name": "Blank Runecaster Casing (Uncommon)", "quantity": 1 },
-      { "name": "Aether Mud", "quantity": 1 },
-      { "name": "Automaton Circuit", "quantity": 1 }
-    ] },
-
-    { "result": "Shadow Caller", "ingredients": [
-      { "name": "Blank Runecaster Casing (Rare)", "quantity": 1 },
-      { "name": "Mud Gem", "quantity": 1 },
-      { "name": "Aetheric Pelt", "quantity": 1 }
-    ] },
-    { "result": "Ember Storm", "ingredients": [
-      { "name": "Blank Runecaster Casing (Rare)", "quantity": 1 },
-      { "name": "Aetherstone Heart", "quantity": 1 },
-      { "name": "Energy Fragment", "quantity": 1 }
-    ] },
-    { "result": "Stormcaller", "ingredients": [
-      { "name": "Blank Runecaster Casing (Rare)", "quantity": 1 },
-      { "name": "Mud Gem", "quantity": 1 },
-      { "name": "Sentinel Core Plate", "quantity": 1 }
-    ] },
-
-    { "result": "Wrath of Titans", "ingredients": [
-      { "name": "Blank Runecaster Casing (Legendary)", "quantity": 1 },
-      { "name": "Aether Mud", "quantity": 2 },
-      { "name": "Behemoth Heart", "quantity": 1 }
-    ] },
-    { "result": "Phoenix Rebirth", "ingredients": [
-      { "name": "Blank Runecaster Casing (Legendary)", "quantity": 1 },
-      { "name": "Golem Core", "quantity": 1 },
-      { "name": "Aether Wing", "quantity": 1 }
-    ] },
-    { "result": "Void Edge", "ingredients": [
-      { "name": "Blank Runecaster Casing (Legendary)", "quantity": 1 },
-      { "name": "Iron Core", "quantity": 1 },
-      { "name": "Voidspawn Egg", "quantity": 1 }
-    ] }
+    {
+      "result": "Flame of Aether",
+      "intRequirement": 11,
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Common)",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Mud",
+          "quantity": 1
+        },
+        {
+          "name": "Spider Silk",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "result": "Gale Binder",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Common)",
+          "quantity": 1
+        },
+        {
+          "name": "Mud Gem",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Cloth",
+          "quantity": 1
+        }
+      ],
+      "intRequirement": 11
+    },
+    {
+      "result": "Sparkstrike",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Common)",
+          "quantity": 1
+        },
+        {
+          "name": "Smooth Stone",
+          "quantity": 1
+        },
+        {
+          "name": "Bent Nail",
+          "quantity": 1
+        }
+      ],
+      "intRequirement": 11
+    },
+    {
+      "result": "Earthshaker",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Common)",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Dust",
+          "quantity": 1
+        },
+        {
+          "name": "Mud Fragment",
+          "quantity": 1
+        }
+      ],
+      "intRequirement": 11
+    },
+    {
+      "result": "Force Wave",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Common)",
+          "quantity": 1
+        },
+        {
+          "name": "Scrap Metal",
+          "quantity": 1
+        },
+        {
+          "name": "Worn Tartarian Coin",
+          "quantity": 1
+        }
+      ],
+      "intRequirement": 11
+    },
+    {
+      "result": "Dark Blight",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Uncommon)",
+          "quantity": 1
+        },
+        {
+          "name": "Mud Gem",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Crystal",
+          "quantity": 1
+        }
+      ],
+      "intRequirement": 11
+    },
+    {
+      "result": "Stone Fist",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Uncommon)",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Shard",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Dust",
+          "quantity": 1
+        }
+      ],
+      "intRequirement": 11
+    },
+    {
+      "result": "Ether Bolt",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Uncommon)",
+          "quantity": 1
+        },
+        {
+          "name": "Hardened Mudstone",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Shard",
+          "quantity": 1
+        }
+      ],
+      "intRequirement": 11
+    },
+    {
+      "result": "Void Pulse",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Uncommon)",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Mud",
+          "quantity": 1
+        },
+        {
+          "name": "Automaton Circuit",
+          "quantity": 1
+        }
+      ],
+      "intRequirement": 11
+    },
+    {
+      "result": "Shadow Caller",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Rare)",
+          "quantity": 1
+        },
+        {
+          "name": "Mud Gem",
+          "quantity": 1
+        },
+        {
+          "name": "Aetheric Pelt",
+          "quantity": 1
+        }
+      ],
+      "intRequirement": 11
+    },
+    {
+      "result": "Ember Storm",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Rare)",
+          "quantity": 1
+        },
+        {
+          "name": "Aetherstone Heart",
+          "quantity": 1
+        },
+        {
+          "name": "Energy Fragment",
+          "quantity": 1
+        }
+      ],
+      "intRequirement": 11
+    },
+    {
+      "result": "Stormcaller",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Rare)",
+          "quantity": 1
+        },
+        {
+          "name": "Mud Gem",
+          "quantity": 1
+        },
+        {
+          "name": "Sentinel Core Plate",
+          "quantity": 1
+        }
+      ],
+      "intRequirement": 11
+    },
+    {
+      "result": "Wrath of Titans",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Legendary)",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Mud",
+          "quantity": 2
+        },
+        {
+          "name": "Behemoth Heart",
+          "quantity": 1
+        }
+      ],
+      "intRequirement": 11
+    },
+    {
+      "result": "Phoenix Rebirth",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Legendary)",
+          "quantity": 1
+        },
+        {
+          "name": "Golem Core",
+          "quantity": 1
+        },
+        {
+          "name": "Aether Wing",
+          "quantity": 1
+        }
+      ],
+      "intRequirement": 11
+    },
+    {
+      "result": "Void Edge",
+      "ingredients": [
+        {
+          "name": "Blank Runecaster Casing (Legendary)",
+          "quantity": 1
+        },
+        {
+          "name": "Iron Core",
+          "quantity": 1
+        },
+        {
+          "name": "Voidspawn Egg",
+          "quantity": 1
+        }
+      ],
+      "intRequirement": 11
+    }
   ]
 }
