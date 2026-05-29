@@ -742,7 +742,25 @@ export function ExplorationScreen() {
               // grayed with a "requires Aether scanner" tag.
               const req = searchRequirementFor(n);
               const hasScanner = player ? playerHasScannerEquipped(player, 'aetheric') : false;
-              const unmetRequirement = req && !hasScanner ? req.shortLabel : undefined;
+              let unmetRequirement = req && !hasScanner ? req.shortLabel : undefined;
+              // OTA-166 — elevated-noun gate. Playtest log showed the
+              // player climbed onto `weathered submerged library shelf`
+              // and then tapped `investigate sign` / `investigate brick`
+              // 9 times in 27 seconds, each producing the same "Climb
+              // down to reach it" Arbiter refusal. The chips stayed
+              // bright-active in the modal because the modal didn't
+              // know about the elevation. Same engine gate that fires
+              // the refusal (gameStore.ts:4804) — if elevated AND no
+              // overlay AND the noun isn't the climbed noun itself,
+              // mark it unmet so SearchModal greys it with "climb down
+              // to reach" and the player learns by sight.
+              const elev = currentScene?.elevatedOn;
+              if (elev && !currentScene?.elevatedOverlayMeta && !unmetRequirement) {
+                const climbedNoun = elev.noun.toLowerCase();
+                const nLower = n.toLowerCase();
+                const isClimbedNoun = nLower.includes(climbedNoun) || climbedNoun.includes(nLower);
+                if (!isClimbedNoun) unmetRequirement = 'climb down to reach';
+              }
               return {
                 noun: n,
                 // 2026-05-26 OTA-070 — fuzzy match for the

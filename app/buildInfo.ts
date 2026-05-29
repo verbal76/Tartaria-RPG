@@ -3984,4 +3984,51 @@
 // (getItemPreview import + stats
 // line on REPAIR row + recipeStats
 // style).
-export const OTA_BUILD_ID = '2026-05-29-165';
+//
+// 2026-05-29 OTA-166 — elevated-state
+// chip filter on SearchModal.
+//
+// Playtest log: player climbed onto
+// `weathered submerged library
+// shelf`, then tapped `investigate
+// sign` and `investigate brick` 9
+// times in 27 seconds. Each tap
+// produced the same Arbiter refusal
+// — "You're up on the weathered
+// submerged library shelf. The sign
+// is down there. Climb down to
+// reach it." The engine gate at
+// gameStore.ts:4804 was working
+// correctly; the SearchModal chips
+// stayed bright-active because the
+// chip-pool builder didn't know
+// about the elevation.
+//
+// Fix: SearchModal chip mapper in
+// ExplorationScreen now checks
+// currentScene.elevatedOn. When
+// elevated (and no overlay
+// firing — overlay nouns are
+// reachable from elevated), every
+// non-climbed-noun ambient chip is
+// marked unmetRequirement="climb
+// down to reach". SearchModal
+// already renders unmet chips
+// greyed with the label so the
+// player sees by sight that the
+// chip won't fire.
+//
+// Climbed noun itself stays
+// tappable (you can still
+// investigate the thing you're on
+// top of — that's where loot
+// caches sit).
+//
+// TS clean.
+//
+// Files:
+// app/screens/ExplorationScreen.tsx
+// (elevated-aware unmetRequirement
+// branch in SearchModal chip
+// mapper).
+export const OTA_BUILD_ID = '2026-05-29-166';
