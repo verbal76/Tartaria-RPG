@@ -633,17 +633,26 @@ function QuickBtn({
  *  fat-fingering an adjacent direction. Equal-width flex layout
  *  splits the available horizontal space across all four buttons.
  *
- *  Single-line + ellipsize for long labels — destination name is
- *  passed through with the arrow prefix ("→ ISKAN-VEIL"), Text has
- *  overflow control to keep long Capital names from wrapping. */
+ *  OTA-181 — destination button (label starts with "→") now
+ *  renders 2 lines tall with the full-size font instead of the
+ *  shrunk-to-70% single-line that was hard to read on long Capital
+ *  names. Player ask: "the arrow to mud flood nexus in the route
+ *  box is way too small, make it two line tall." Non-destination
+ *  buttons (NORTH / STOP TRAVEL / MAP) stay single-line + auto-
+ *  shrink because their labels fit cleanly at full size. */
 function TravelBtn({ label, onPress }: { label: string; onPress: () => void }) {
+  const isDestination = label.startsWith('→');
   return (
-    <TouchableOpacity style={styles.travelBtn} onPress={onPress} activeOpacity={0.7}>
+    <TouchableOpacity
+      style={[styles.travelBtn, isDestination && styles.travelBtnDest]}
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
       <Text
-        style={styles.travelBtnText}
-        numberOfLines={1}
+        style={[styles.travelBtnText, isDestination && styles.travelBtnTextDest]}
+        numberOfLines={isDestination ? 2 : 1}
         ellipsizeMode="tail"
-        adjustsFontSizeToFit
+        adjustsFontSizeToFit={!isDestination}
         minimumFontScale={0.7}
       >
         {label}
@@ -688,6 +697,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   travelBtnText: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
+  // OTA-181 — destination travel button (label starts with "→").
+  // Taller box + larger center-wrapped text so a long Capital name
+  // ("→ MUD FLOOD NEXUS", "→ ISKAN-VEIL") reads at a glance instead
+  // of shrinking to a 70% single-line blur. Two lines plus a touch
+  // more vertical padding gives the destination its own visual
+  // weight — it's the most important button in the row while travel
+  // is active.
+  travelBtnDest: { paddingVertical: 8 },
+  travelBtnTextDest: { fontSize: 14, lineHeight: 17, letterSpacing: 1.5, textAlign: 'center' },
   /** 2026-05-25 — moves-left badge sits between STOP TRAVEL and MAP
    *  in the travel row, sized to the digit + sub-label only so it
    *  doesn't crowd the action buttons. Non-interactive. */

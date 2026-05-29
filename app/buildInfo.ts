@@ -4885,4 +4885,55 @@
 // .tsx (modal render + import +
 // state + selector + onOpenFeedback
 // wiring).
-export const OTA_BUILD_ID = '2026-05-29-180';
+//
+// 2026-05-29 OTA-181 — travel-row
+// destination button gets 2 lines
+// + larger text.
+//
+// Player ask: "the arrow to mud
+// flood nexus in the route box is
+// way too small, make it two line
+// tall."
+//
+// TravelBtn previously rendered
+// every label single-line with
+// adjustsFontSizeToFit +
+// minimumFontScale 0.7 — long
+// Capital names ("→ MUD FLOOD
+// NEXUS", "→ ISKAN-VEIL") shrank
+// to ~70% of the 12pt base and
+// became a blur on small screens.
+//
+// Fix: TravelBtn detects the "→"
+// prefix on destination labels
+// and switches to:
+//   • numberOfLines = 2 (wrap
+//     the name across two lines
+//     instead of shrinking)
+//   • fontSize 14 / lineHeight
+//     17 / letterSpacing 1.5
+//     (was 12 / default / 2)
+//   • textAlign center so two-
+//     line wraps balance
+//   • paddingVertical 8 (was 10
+//     — gives wrap room without
+//     ballooning the row)
+//   • adjustsFontSizeToFit OFF
+//     for destinations (with
+//     two lines available there's
+//     no need to shrink)
+//
+// Other travel buttons (NORTH /
+// SOUTH / EAST / WEST / MAP /
+// STOP TRAVEL) keep the old
+// single-line + auto-shrink
+// behavior — their labels fit
+// at full size, no change
+// needed.
+//
+// TS clean.
+//
+// Files: app/components/InputBox
+// .tsx (TravelBtn destination
+// branch + 2 new styles).
+export const OTA_BUILD_ID = '2026-05-29-181';
