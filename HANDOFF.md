@@ -245,6 +245,19 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Aether Dust food additive — typed `infuse` verb + stat picker + 5-min wall-clock buff
+
+- **OTA-211 (2026-05-29) · Player ask: *"make it a food additive that adds 3 to the perk of your choice for 5 real world minutes and have a small countdown timer somewhere for it."***
+  - **What:** Aether Dust was a crafting reagent with no in-game use beyond recipes. Now it laces any food: player types `infuse <food>` → AetherStatPickerModal opens → player picks STR / DEX / INT / WIS / CHA → 1 Aether Dust + 1 food consumed, +3 to chosen stat for 5 real-world minutes.
+  - **Schema:** `PlayerCharacter.aetherBuff: { stat, bonus, expiresAtMs }` — wall-clock expiry so it survives save/load + scene transitions without needing in-game-hour conversion.
+  - **Engine wiring:** `effectiveStats` in `equipment.ts` reads `aetherBuff` and applies the bonus IF `Date.now() < expiresAtMs`. Stacks with existing `food_buff` status effects.
+  - **Verb:** Top-of-`submitPlayerAction` short-circuit matches `^infuse (.+?)(?:\s+with\s+aether\s+dust)?$`, routes to `infuseAetherDust(foodName)`. The handler verifies the food + Aether Dust are in pack, then opens the picker.
+  - **Modal:** New `AetherStatPickerModal` (mirrors CallDogModal pattern) with five stat buttons + cancel. `selectAetherStat(stat)` consumes 1 Aether Dust + 1 food, applies a 1d6 HP heal alongside the buff, and sets `aetherBuff` with `Date.now() + 5*60*1000` expiry.
+  - **Timer UI:** New `AetherBuffBadge` in `StatsPanel.tsx` ticks once a second and renders `"♦ +3 STR · 04:23"` while the buff is active. Hidden when no buff.
+  - **Deferred:** Recipe-time prompt (*"ask if you want it added when you click on a food recipe"*) deferred to a follow-up OTA. The typed-verb path is more flexible — it works on any food you already have, not just newly crafted — and covers the additive intent for now.
+  - **Verification:** +5 tests in `aetherDustBuff` (delta across all 5 stats, expired-not-applied, stacks with food_buff, untargeted stats unchanged). `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/engine/types.ts` (aetherBuff schema), `app/engine/equipment.ts` (effectiveStats integration), `app/state/gameStore.ts` (infuse verb + actions + modal flags), `app/components/AetherStatPickerModal.tsx` (NEW), `app/components/StatsPanel.tsx` (NEW AetherBuffBadge with 1s tick), `App.tsx` (mount modal).
+
 #### Disease Sample becomes a throwable infection bomb (10-round DoT)
 
 - **OTA-210 (2026-05-29) · Player ask: *"make the disease sample a throw able weapon that hits for small damage but adds corruption effect or something to the enemy for 10 turns and does a little damage every turn."***

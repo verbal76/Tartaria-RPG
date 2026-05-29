@@ -7428,4 +7428,89 @@
 // scene field + infection
 // apply on hit + tick block
 // at start of attack case).
-export const OTA_BUILD_ID = '2026-05-29-210';
+// 2026-05-29-211 — Aether
+// Dust food additive. Player
+// ask:
+//   "make it a food additive
+//   that adds 3 to the perk
+//   of your choice for 5 real
+//   world minutes and have a
+//   small countdown timer
+//   somewhere for it. it can
+//   be added to any food
+//   recipes."
+//
+// MVP path (typed verb +
+// stat picker modal):
+//   1. Player types
+//      "infuse <food>"
+//      → infuseAetherDust
+//      action verifies food
+//      + Aether Dust in pack,
+//      opens stat picker.
+//   2. AetherStatPickerModal
+//      lists STR / DEX / INT
+//      / WIS / CHA.
+//   3. selectAetherStat
+//      consumes 1 Aether
+//      Dust + 1 food, applies
+//      a partial heal (1d6
+//      HP), and sets
+//      player.aetherBuff = {
+//      stat, bonus: 3,
+//      expiresAtMs:
+//      Date.now() + 5*60*1000
+//      } — wall-clock so it
+//      survives save/load.
+//   4. effectiveStats reads
+//      aetherBuff IF
+//      Date.now() <
+//      expiresAtMs.
+//   5. AetherBuffBadge in
+//      StatsPanel ticks once
+//      a second and shows
+//      "♦ +3 STR · 04:23"
+//      while the buff is
+//      active.
+//
+// Recipe-time prompt
+// ("ask if you want it added
+// when you click on a food
+// recipe") deferred to a
+// follow-up OTA — the
+// typed-verb path is more
+// flexible (works on any
+// food you already have, not
+// just newly crafted) and
+// covers the user's
+// "additive for any food
+// recipe" intent for now.
+//
+// Tests: +5 in
+// aetherDustBuff (delta
+// across all 5 stats,
+// expired-not-applied,
+// stacks with food_buff,
+// untargeted stats
+// unchanged). TS clean
+// app-side.
+//
+// Files: app/engine/types.ts
+// (aetherBuff schema on
+// PlayerCharacter), app/
+// engine/equipment.ts
+// (effectiveStats reads
+// aetherBuff), app/state/
+// gameStore.ts (infuse verb
+// + infuseAetherDust +
+// selectAetherStat +
+// closeAetherStatPicker
+// actions + modal flags),
+// app/components/
+// AetherStatPickerModal.tsx
+// (NEW), app/components/
+// StatsPanel.tsx (NEW
+// AetherBuffBadge with 1s
+// tick), App.tsx (mount
+// modal).
+export const OTA_BUILD_ID = '2026-05-29-211';

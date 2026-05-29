@@ -7,6 +7,33 @@ import { ARMOR_SLOTS, effectiveStats } from '../engine/equipment';
 import { formatEffectSummary } from '../engine/statusEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
 
+// OTA-211 — Aether Dust buff countdown. Reads player.aetherBuff;
+// re-renders every second while active so the player sees the
+// timer ticking down. Hidden when no buff is active. Format:
+// "♦ +3 STR · 04:23"
+function AetherBuffBadge({ player }: Props) {
+  const [now, setNow] = React.useState(Date.now());
+  React.useEffect(() => {
+    if (!player.aetherBuff) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [player.aetherBuff]);
+  if (!player.aetherBuff) return null;
+  const remainingMs = player.aetherBuff.expiresAtMs - now;
+  if (remainingMs <= 0) return null;
+  const totalSec = Math.ceil(remainingMs / 1000);
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return (
+    <Text style={aetherBadgeStyle.badge}>
+      ♦ +{player.aetherBuff.bonus} {player.aetherBuff.stat.toUpperCase().slice(0, 3)} · {String(m).padStart(2, '0')}:{String(s).padStart(2, '0')}
+    </Text>
+  );
+}
+const aetherBadgeStyle = StyleSheet.create({
+  badge: { color: '#b88ce0', fontSize: 10, fontWeight: '700', letterSpacing: 0.5, marginTop: 3 },
+});
+
 interface Props { player: PlayerCharacter; }
 
 export function StatsPanel({ player }: Props) {
@@ -78,6 +105,7 @@ export function StatsPanel({ player }: Props) {
         <Stat label="TC" value={`${player.tc}`} />
         <Stat label="Corr" value={`${player.corruption}`} />
       </View>
+      <AetherBuffBadge player={player} />
       <View style={styles.row}>
         <Stat label="STR" value={formatStat(player.stats.strength, eff.strength)} />
         <Stat label="DEX" value={formatStat(player.stats.dexterity, eff.dexterity)} />

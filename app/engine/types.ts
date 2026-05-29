@@ -690,6 +690,14 @@ export interface PlayerCharacter {
    *  Without this gate, the fuse verb would be usable anywhere; the
    *  encounter is the discovery moment that earns the right. */
   fusionPending?: boolean;
+  /** OTA-211 — Aether Dust food additive. Eating a food laced with
+   *  Aether Dust grants a +3 buff to the player's chosen stat for
+   *  5 real-world minutes. Stored as a wall-clock expiry (Date.now()
+   *  ms) so it survives save/load + scene transitions without
+   *  needing to convert in-game hours back to wall time.
+   *  effectiveStats reads the buff and applies the bonus IF
+   *  Date.now() < expiresAtMs. */
+  aetherBuff?: { stat: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma'; bonus: number; expiresAtMs: number };
   /** Lifetime counters; thresholds trigger stat growth. */
   milestones?: PlayerMilestones;
   /** OTA 058 — Skyrim-style use-based stat progression. Each stat

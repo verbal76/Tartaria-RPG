@@ -268,6 +268,13 @@ export function effectiveStats(
     if (eff.kind !== 'food_buff' || !eff.buffStat || !eff.buffBonus) continue;
     food[eff.buffStat] = (food[eff.buffStat] ?? 0) + eff.buffBonus;
   }
+  // OTA-211 — Aether Dust food additive grants +3 to a player-chosen
+  // stat for 5 real-world minutes. Stored on player.aetherBuff with a
+  // wall-clock expiresAtMs; we apply IF still active. Stacks on top
+  // of food_buff (the additive is supposed to feel meaningful).
+  if (player.aetherBuff && Date.now() < player.aetherBuff.expiresAtMs) {
+    food[player.aetherBuff.stat] = (food[player.aetherBuff.stat] ?? 0) + player.aetherBuff.bonus;
+  }
   const w = weatherMod ?? {};
   // OTA 038 — race-derived always-on stat bonuses.
   const racial = racialStatBonusesFor(player.raceId);

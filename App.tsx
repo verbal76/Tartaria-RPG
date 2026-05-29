@@ -24,6 +24,7 @@ import { ActionReferenceScreen } from './app/screens/ActionReferenceScreen';
 import { ContractsScreen } from './app/screens/ContractsScreen';
 import { TutorialOverlay } from './app/components/TutorialOverlay';
 import { CallDogModal } from './app/components/CallDogModal';
+import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
 import { KeyboardInputBar } from './app/components/KeyboardInputBar';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
 import { startAudioController, stopAudioController } from './app/audio/AudioController';
@@ -228,6 +229,10 @@ export default function App() {
           from any screen the player happens to be on. The modal
           self-gates on `callDogModalOpen`. */}
       <CallDogModal />
+      {/* OTA-211 — Aether Stat Picker. Opens when the player runs
+          `infuse <food>` so they can choose which stat the +3 buff
+          enhances for the next 5 real-world minutes. */}
+      <AetherStatPickerModal />
       {/* OTA-190 — floating input popup that appears above the soft
           keyboard on the Exploration screen so the player always
           sees what they're typing. Mounts OUTSIDE the scaled wrapper

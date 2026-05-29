@@ -1344,6 +1344,21 @@ interface GameStore {
    *  weapon / armor / dog vest, clamps the response, mints the fused
    *  InventoryItem in place. */
   fuseAtCrucible: () => Promise<void>;
+  /** OTA-211 — infuse Aether Dust into a food and eat it. Opens the
+   *  AetherStatPickerModal so the player chooses which stat gets the
+   *  +3 buff for 5 real-world minutes. Consumes 1 Aether Dust and 1
+   *  food on completion. Refuses if no Aether Dust, no food, or no
+   *  matching name. */
+  infuseAetherDust: (foodName: string) => void;
+  /** OTA-211 — modal flag for the Aether stat picker. Set true by
+   *  infuseAetherDust; the modal reads pendingAetherFoodId to know
+   *  which food to eat after the stat is picked. */
+  aetherStatPickerOpen: boolean;
+  pendingAetherFoodId: string | null;
+  /** OTA-211 — pick a stat for the Aether Dust +3 buff, apply it,
+   *  consume the pending food + 1 Aether Dust, close the picker. */
+  selectAetherStat: (stat: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma') => void;
+  closeAetherStatPicker: () => void;
   /** OTA 228 — repair a durable item by consuming materials equal to
    *  2× its scrap output. Looked up by item id so the player can
    *  repair a specific damaged copy without merging the wrong one.
@@ -1425,6 +1440,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   hydrated: false,
   lowHpWarned: false,
   weaponResistStreak: null,
+  aetherStatPickerOpen: false,
+  pendingAetherFoodId: null,
   slotLoadError: null,
   tutorialStep: null,
   tutorialDemoVendor: null,
@@ -3667,6 +3684,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (/^fuse(\s|$)/i.test(trimmed)) {
       if (!_opts?.silent) get().appendLog('player', trimmed);
       void get().fuseAtCrucible();
+      return;
+    }
+
+    // OTA-211 — infuse <food> with aether dust. Routes to
+    // infuseAetherDust which opens the AetherStatPickerModal. The
+    // food name is whatever follows the verb (with optional " with
+    // aether dust" trailing phrase stripped). Player picks the stat
+    // in the modal; the buff applies for 5 real-world minutes.
+    const infuseMatch = trimmed.match(/^infuse\s+(.+?)(?:\s+with\s+aether\s+dust)?$/i);
+    if (infuseMatch && infuseMatch[1]) {
+      if (!_opts?.silent) get().appendLog('player', trimmed);
+      get().infuseAetherDust(infuseMatch[1].trim());
       return;
     }
 
@@ -14829,6 +14858,79 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The Arbiter studies it. "${result.stats.special}"`);
     }
     void get().persist();
+  },
+
+  infuseAetherDust(foodName) {
+    const player = get().player;
+    if (!player) return;
+    const food = player.inventory.find(
+      (i) => i.kind === 'consumable' && i.name.toLowerCase() === foodName.toLowerCase() && i.quantity > 0,
+    );
+    if (!food) {
+      get().appendLog('arbiter', `The Arbiter looks at your pack. "No ${foodName} on you."`);
+      return;
+    }
+    const dust = player.inventory.find(
+      (i) => i.name.toLowerCase() === 'aether dust' && i.quantity > 0,
+    );
+    if (!dust) {
+      get().appendLog('arbiter', `The Arbiter raises a brow. "You'd need Aether Dust to lace it. Find some first."`);
+      return;
+    }
+    // Open the picker — the actual consume + buff happens when
+    // selectAetherStat fires. Stash the food id so the modal knows
+    // which food to eat.
+    set({ aetherStatPickerOpen: true, pendingAetherFoodId: food.id });
+  },
+
+  selectAetherStat(stat) {
+    const state = get();
+    const player = state.player;
+    const foodId = state.pendingAetherFoodId;
+    if (!player || !foodId) {
+      set({ aetherStatPickerOpen: false, pendingAetherFoodId: null });
+      return;
+    }
+    const food = player.inventory.find((i) => i.id === foodId);
+    const dust = player.inventory.find((i) => i.name.toLowerCase() === 'aether dust' && i.quantity > 0);
+    if (!food || !dust) {
+      set({ aetherStatPickerOpen: false, pendingAetherFoodId: null });
+      get().appendLog('arbiter', `The Arbiter shrugs. "Lost the moment. Try again."`);
+      return;
+    }
+    // Drain 1 Aether Dust + 1 food + apply the +3 buff for 5 real-world
+    // minutes (wall-clock, not in-game hours, so it survives save/load).
+    const FIVE_MIN_MS = 5 * 60 * 1000;
+    const newInventory = player.inventory
+      .map((i) => {
+        if (i.id === food.id) return { ...i, quantity: i.quantity - 1 };
+        if (i.id === dust.id) return { ...i, quantity: i.quantity - 1 };
+        return i;
+      })
+      .filter((i) => i.quantity > 0);
+    // Also apply the base food healing — the player IS eating it.
+    const heal = Math.min(player.hpMax - player.hp, 1 + Math.floor(Math.random() * 6));
+    set((s) => s.player
+      ? {
+          player: {
+            ...s.player,
+            inventory: newInventory,
+            hp: s.player.hp + heal,
+            aetherBuff: { stat, bonus: 3, expiresAtMs: Date.now() + FIVE_MIN_MS },
+          },
+          aetherStatPickerOpen: false,
+          pendingAetherFoodId: null,
+        }
+      : { aetherStatPickerOpen: false, pendingAetherFoodId: null });
+    get().appendLog(
+      'world',
+      `You crush the Aether Dust into the ${food.name} and eat. The dust catches behind your eyes. +${heal} HP. +3 ${stat.toUpperCase().slice(0, 3)} for the next 5 minutes.`,
+    );
+    void get().persist();
+  },
+
+  closeAetherStatPicker() {
+    set({ aetherStatPickerOpen: false, pendingAetherFoodId: null });
   },
 
   scrapInventoryItem(itemName) {
