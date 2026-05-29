@@ -7839,7 +7839,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (activeRope) {
           const liveInv = get().player?.inventory ?? player.inventory;
           const wearResult = wearItemById(liveInv, activeRope.id, ROPE_WEAR_PER_TIER);
-          set((s) => (s.player ? { player: { ...s.player, inventory: wearResult.inventory } } : s));
+          // OTA-188 — when the rope finally breaks, the salvage drop
+          // (Broken Rope) gets pushed into inventory so the player
+          // can craft a fresh Climbing Rope (2× Broken Rope per
+          // the standing recipe). Pre-fix the rope just vanished
+          // silently and the player had to find or buy another.
+          let postWearInv = wearResult.inventory;
+          if (wearResult.broken && wearResult.salvageDrop) {
+            const dropItem: InventoryItem = {
+              id: `broken_${(wearResult.brokenName ?? 'rope').replace(/\s+/g, '_')}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+              name: wearResult.salvageDrop.name,
+              kind: 'misc',
+              rarity: 'Common',
+              quantity: wearResult.salvageDrop.quantity,
+              tags: ['salvage', 'broken_item'],
+            };
+            postWearInv = mergeOrPushItem(postWearInv, dropItem);
+          }
+          set((s) => (s.player ? { player: { ...s.player, inventory: postWearInv } } : s));
+          if (wearResult.broken && wearResult.brokenName) {
+            get().appendLog(
+              'combat',
+              `Your ${wearResult.brokenName} snaps under the strain. The line coils dead at your feet.`,
+            );
+            if (wearResult.salvageDrop) {
+              get().appendLog('reward', `✦ ${wearResult.salvageDrop.name} (Common).`);
+            }
+          }
         }
         let tierCleared = false;
         {
@@ -16324,6 +16350,7 @@ function wearEquippedItem(
     ? wearItemById(player.inventory, boundId)
     : wearItemByName(player.inventory, itemName);
   let equipped = player.equipped ?? {};
+  let finalInventory = result.inventory;
   if (result.broken && result.brokenName) {
     const next: PlayerCharacter['equipped'] = { ...equipped };
     // Clear both the name AND the bound id for any slot referencing
@@ -16344,12 +16371,33 @@ function wearEquippedItem(
     if (next.armor === result.brokenName) next.armor = undefined;
     if (next.armorName === result.brokenName) next.armorName = undefined;
     equipped = next;
+    // OTA-188 — push the salvage drop into inventory before
+    // logging. wearItemByName/wearItemById return the drop
+    // computed by brokenSalvageFor (rope → Broken Rope; weapon/
+    // armor/relic → first scrap material). mergeOrPushItem
+    // handles stacking with any existing copies of that material.
+    let dropMsg = '';
+    if (result.salvageDrop) {
+      const dropItem: InventoryItem = {
+        id: `broken_${result.brokenName.replace(/\s+/g, '_')}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        name: result.salvageDrop.name,
+        kind: 'misc',
+        rarity: 'Common',
+        quantity: result.salvageDrop.quantity,
+        tags: ['salvage', 'broken_item'],
+      };
+      finalInventory = mergeOrPushItem(finalInventory, dropItem);
+      dropMsg = ` A length of ${result.salvageDrop.name} comes free in your hand.`;
+    }
     // Defer the log so the caller's main set() lands first.
-    void Promise.resolve().then(() =>
-      get().appendLog('combat', `Your ${result.brokenName} shatters from wear. It is gone.`),
-    );
+    void Promise.resolve().then(() => {
+      get().appendLog('combat', `Your ${result.brokenName} shatters from wear. It is gone.${dropMsg}`);
+      if (result.salvageDrop) {
+        get().appendLog('reward', `✦ ${result.salvageDrop.name} (Common).`);
+      }
+    });
   }
-  return { ...player, inventory: result.inventory, equipped };
+  return { ...player, inventory: finalInventory, equipped };
 }
 
 // Sum AC bonus and gather resistances from every equipped armor piece

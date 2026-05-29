@@ -7,6 +7,31 @@ import {
   findExplorationItemByName,
   GEAR,
 } from './crafting';
+import { scrapOutputFor } from './scrapEngine';
+
+// OTA-188 — when a durability-tracked item breaks, drop ONE low-tier
+// material so the player has a foothold to repair / re-craft. Ropes
+// drop "Broken Rope" (which is the recipe ingredient for crafting a
+// new Climbing Rope). Other items drop the first material from
+// their scrap output — the base component for the equivalent
+// repair recipe. Player ask: "when the rope finally breaks I have
+// never seen it turn into the broken rope item and populate my
+// inventory. also when weapons break from durability what happens
+// to them? so they have a chance to drop 1 single low level
+// material that would be needed to repair that item?"
+function brokenSalvageFor(item: InventoryItem): { name: string; quantity: number } | null {
+  const nameLower = item.name.toLowerCase();
+  // Ropes always salvage to Broken Rope (which 2× of crafts a new
+  // Climbing Rope via the OTA-008 recipe).
+  if (/\b(rope|line|cord|cable)\b/.test(nameLower)) {
+    return { name: 'Broken Rope', quantity: 1 };
+  }
+  // Everything else: first scrap output. scrapOutputFor returns 1+
+  // material grants tagged off the item's catalog tags + kind.
+  const out = scrapOutputFor(item);
+  if (out.grants.length === 0) return null;
+  return { name: out.grants[0]!.name, quantity: 1 };
+}
 
 // Default durability for catalog entries that don't declare one. Materials,
 // consumables, and generic loot are NOT durability-tracked.
@@ -64,13 +89,13 @@ export function wearItemByName(
   inventory: readonly InventoryItem[],
   itemName: string,
   amount = 1,
-): { inventory: InventoryItem[]; broken: boolean; brokenName: string | null } {
+): { inventory: InventoryItem[]; broken: boolean; brokenName: string | null; salvageDrop: { name: string; quantity: number } | null } {
   const target = itemName.toLowerCase();
   // Pick the candidate by name, preferring an instance that already has a
   // durability record. (Stackable items without durability never wear.)
   const idx = inventory.findIndex((i) => i.name.toLowerCase() === target && i.durability);
   if (idx < 0) {
-    return { inventory: inventory.map((i) => ({ ...i })), broken: false, brokenName: null };
+    return { inventory: inventory.map((i) => ({ ...i })), broken: false, brokenName: null, salvageDrop: null };
   }
   const next = inventory.map((i) => ({ ...i }));
   const item = next[idx]!;
@@ -78,10 +103,10 @@ export function wearItemByName(
   if (cur <= 0) {
     // Item destroyed — remove from inventory.
     next.splice(idx, 1);
-    return { inventory: next, broken: true, brokenName: item.name };
+    return { inventory: next, broken: true, brokenName: item.name, salvageDrop: brokenSalvageFor(item) };
   }
   item.durability = { ...item.durability!, current: cur };
-  return { inventory: next, broken: false, brokenName: null };
+  return { inventory: next, broken: false, brokenName: null, salvageDrop: null };
 }
 
 /** Wear a specific item instance by id. Preferred over wearItemByName
@@ -94,20 +119,20 @@ export function wearItemById(
   inventory: readonly InventoryItem[],
   itemId: string,
   amount = 1,
-): { inventory: InventoryItem[]; broken: boolean; brokenName: string | null } {
+): { inventory: InventoryItem[]; broken: boolean; brokenName: string | null; salvageDrop: { name: string; quantity: number } | null } {
   const idx = inventory.findIndex((i) => i.id === itemId && i.durability);
   if (idx < 0) {
-    return { inventory: inventory.map((i) => ({ ...i })), broken: false, brokenName: null };
+    return { inventory: inventory.map((i) => ({ ...i })), broken: false, brokenName: null, salvageDrop: null };
   }
   const next = inventory.map((i) => ({ ...i }));
   const item = next[idx]!;
   const cur = item.durability!.current - amount;
   if (cur <= 0) {
     next.splice(idx, 1);
-    return { inventory: next, broken: true, brokenName: item.name };
+    return { inventory: next, broken: true, brokenName: item.name, salvageDrop: brokenSalvageFor(item) };
   }
   item.durability = { ...item.durability!, current: cur };
-  return { inventory: next, broken: false, brokenName: null };
+  return { inventory: next, broken: false, brokenName: null, salvageDrop: null };
 }
 
 // Compute the TC cost to fully restore an item's durability. Convention:

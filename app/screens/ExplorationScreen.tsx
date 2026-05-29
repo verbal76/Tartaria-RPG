@@ -21,7 +21,8 @@ import { climbHeightFor, isClimbCleared } from '../engine/climbHeight';
 import { findCatalogItem } from '../engine/crafting';
 import { isOversized } from '../engine/portability';
 import { playerHasScannerEquipped } from '../engine/equipment';
-import { searchRequirementFor } from '../engine/itemEffect';
+import { searchRequirementFor, inventoryHasGate } from '../engine/itemEffect';
+import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
 import { ApproachModal } from '../components/ApproachModal';
 import { TutorialTarget } from '../components/TutorialTarget';
 import { findWeaponByName } from '../engine/crafting';
@@ -679,6 +680,24 @@ export function ExplorationScreen() {
               }
               return sceneCount + groundCount;
             })()}
+            // OTA-188 — drives the CLIMB button's red/amber/green
+            // ladder. inventoryHasGate checks every inventory item's
+            // resolved effect for a 'gate' kind that unlocks
+            // 'climb_steep' — covers Climbing Rope, Reclaimer's
+            // Rope, Hardened Climbing Strap, Mudwalker's Treads,
+            // Aetheric Treads, Aether Grip Pads, Climbing Gear,
+            // Alloy Grappler, Mag-Climb Kit. Same gate the engine
+            // checks at climb-time (gameStore.ts:7673), so the
+            // button color matches the engine's accept/refuse.
+            playerHasRope={
+              player
+                ? inventoryHasGate(
+                    player.inventory.map((i) => i.name),
+                    'climb_steep',
+                    [findGearByName, findMaterialByName, findExplorationItemByName],
+                  )
+                : false
+            }
             golem={player?.golem ? {
               name: player.golem.name,
               hp: player.golem.hp,

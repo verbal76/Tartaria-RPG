@@ -109,6 +109,15 @@ interface Props {
   takeableCount?: number;
   salvageableCount?: number;
   climbableCount?: number;
+  /** OTA-188 — true when the player has any item in inventory that
+   *  satisfies the climb_steep gate (Climbing Rope, Reclaimer's Rope,
+   *  Mudwalker's Treads, etc.). Drives the CLIMB button's red-amber-
+   *  green ladder: no rope → red, rope + nothing to climb → amber,
+   *  rope + climbable in scene → green. Player ask: "this button
+   *  should remain red until you have a usable rope in your
+   *  inventory. and then turn amber until there are things to climb
+   *  them turn green." */
+  playerHasRope?: boolean;
   investigateCount?: number;
   /** 2026-05-25 [MECHANIC-1b] — active golem sidekick summary. When
    *  present + hp > 0 + in combat, a "golem (hp/max)" QuickBtn
@@ -146,7 +155,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, range, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, range, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, playerHasRope }: Props) {
   // OTA-144 — dog combat action picker state. When the player taps
   // the DOG quick-button in combat, this flips to true and the
   // BITE / DISTRACT row renders inline. Either tap fires the
@@ -478,7 +487,17 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               <QuickBtn
                 label="climb"
                 onPress={onOpenClimb}
-                tone={climbableCount && climbableCount > 0 ? 'ready' : undefined}
+                // OTA-188 — three-state tone ladder per player ask:
+                //   no rope        → red (can't climb at all)
+                //   rope + nothing → amber (ready when you find one)
+                //   rope + things  → green (go).
+                tone={
+                  !playerHasRope
+                    ? 'unavailable'
+                    : climbableCount && climbableCount > 0
+                      ? 'ready'
+                      : 'needs-approach'
+                }
               />
             ) : (
               <>
@@ -592,7 +611,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
  *                             legacy `defensive` boolean which is
  *                             treated as tone='defensive'
  *  undefined       (grey)   — neutral (inventory, search, etc.) */
-type QuickBtnTone = 'ready' | 'needs-approach' | 'defensive';
+// OTA-188 — added 'unavailable' (red) for action buttons whose
+// requirement isn't met at all (e.g., CLIMB with no rope in
+// inventory). Greys are already taken by "nothing to act on";
+// red signals "can't do this from your current loadout."
+type QuickBtnTone = 'ready' | 'needs-approach' | 'defensive' | 'unavailable';
 
 function QuickBtn({
   label,
@@ -611,12 +634,14 @@ function QuickBtn({
     resolvedTone === 'defensive' && styles.quickDefensive,
     resolvedTone === 'ready' && styles.quickReady,
     resolvedTone === 'needs-approach' && styles.quickNeedsApproach,
+    resolvedTone === 'unavailable' && styles.quickUnavailable,
   ];
   const textStyle = [
     styles.quickText,
     resolvedTone === 'defensive' && styles.quickDefensiveText,
     resolvedTone === 'ready' && styles.quickReadyText,
     resolvedTone === 'needs-approach' && styles.quickNeedsApproachText,
+    resolvedTone === 'unavailable' && styles.quickUnavailableText,
   ];
   return (
     <TouchableOpacity style={containerStyle} onPress={onPress}>
@@ -737,10 +762,15 @@ const styles = StyleSheet.create({
   // here). Blue/defensive is the existing dodge / flee treatment.
   quickReady: { borderColor: '#9ec96a', backgroundColor: '#1a201410' },
   quickNeedsApproach: { borderColor: '#c9a86a' },
+  // OTA-188 — red tone for actions with an unmet hard requirement
+  // (no rope → CLIMB red). Combat color #e07a5f matches the
+  // existing low-HP / damage warning palette.
+  quickUnavailable: { borderColor: '#e07a5f' },
   quickText: { color: '#cdbf99', fontSize: 12 },
   quickDefensiveText: { color: '#6a9bbf' },
   quickReadyText: { color: '#9ec96a' },
   quickNeedsApproachText: { color: '#c9a86a' },
+  quickUnavailableText: { color: '#e07a5f' },
   inputRow: { flexDirection: 'row', gap: 6, alignItems: 'center' },
   input: {
     flex: 1,

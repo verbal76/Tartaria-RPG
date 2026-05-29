@@ -5380,4 +5380,138 @@
 // app/engine/encounter.ts
 // (pickEnemyForLocation base
 // bump).
-export const OTA_BUILD_ID = '2026-05-29-187';
+//
+// 2026-05-29 OTA-188 — CLIMB
+// button gets a 3-state ladder +
+// broken gear drops salvage.
+//
+// Three asks bundled:
+//
+//   (1) CLIMB button color: red
+//       when no rope in pack,
+//       amber when rope but
+//       nothing to climb, green
+//       when rope + climbable in
+//       scene. Player ask: "this
+//       button should remain red
+//       until you have a usable
+//       rope in your inventory.
+//       and then turn amber
+//       until there are things
+//       to climb them turn
+//       green." Implementation:
+//        • New 'unavailable'
+//          QuickBtnTone with
+//          red border + text
+//          (#e07a5f, matches
+//          the combat / damage
+//          warning palette).
+//        • InputBox accepts new
+//          playerHasRope prop.
+//        • ExplorationScreen
+//          passes
+//          inventoryHasGate(
+//          'climb_steep', ...)
+//          — covers Climbing
+//          Rope, Reclaimer's
+//          Rope, Hardened
+//          Climbing Strap,
+//          Mudwalker Boots /
+//          Treads, Aetheric
+//          Treads, Aether Grip
+//          Pads, Climbing
+//          Gear, Alloy
+//          Grappler, Mag-
+//          Climb Kit.
+//        • CLIMB tone now
+//          resolves: !rope →
+//          'unavailable', rope
+//          + climbableCount > 0
+//          → 'ready', rope +
+//          0 climbables →
+//          'needs-approach'.
+//
+//   (2) Broken rope finally
+//       drops Broken Rope.
+//       Player: "when the
+//       rope finally breaks I
+//       have never seen it
+//       turn into the broken
+//       rope item and populate
+//       my inventory."
+//       Pre-fix the rope
+//       silently vanished
+//       when durability hit 0.
+//       Fix: wearItemByName /
+//       wearItemById now also
+//       return a `salvageDrop`
+//       computed by new
+//       `brokenSalvageFor`
+//       helper. Ropes
+//       (/rope|line|cord|
+//       cable/) always drop
+//       Broken Rope. The climb
+//       site (gameStore.ts
+//       ~7841) pushes the
+//       drop into inventory
+//       via mergeOrPushItem +
+//       logs both a combat
+//       "snaps" line and a
+//       reward "✦ Broken
+//       Rope" pickup.
+//
+//   (3) Weapon (and any other
+//       durability-tracked
+//       item) break also
+//       drops a low-level
+//       repair material.
+//       Player: "when weapons
+//       break from durability
+//       what happens to them?
+//       so they have a chance
+//       to drop 1 single low
+//       level material that
+//       would be needed to
+//       repair that item?"
+//       brokenSalvageFor
+//       returns the first
+//       material from
+//       scrapOutputFor(item)
+//       for non-rope items —
+//       Scrap Metal for
+//       weapons, Patched
+//       Cloth for armor,
+//       Aetheric Shard for
+//       relics, etc. The
+//       centralized broken-
+//       item handler at
+//       gameStore.ts ~16327
+//       inserts the drop +
+//       logs "Your X shatters
+//       from wear. It is
+//       gone. A length of
+//       <material> comes free
+//       in your hand." +
+//       reward chip.
+//
+// 3/3 craftRepairFuzz
+// regressions stay green. TS
+// clean.
+//
+// Files: app/engine/durability
+// .ts (brokenSalvageFor +
+// salvageDrop in wear return
+// types), app/state/gameStore
+// .ts (broken-item handler
+// inserts drop + logs; rope
+// wear site at climb path
+// inserts drop + logs),
+// app/components/InputBox.tsx
+// (unavailable QuickBtnTone +
+// 2 styles + playerHasRope
+// prop + 3-state CLIMB tone
+// ladder), app/screens/
+// ExplorationScreen.tsx
+// (inventoryHasGate import +
+// playerHasRope wiring).
+export const OTA_BUILD_ID = '2026-05-29-188';
