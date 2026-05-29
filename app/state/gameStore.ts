@@ -14556,6 +14556,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().submitPlayerAction(`use ${item.name}`);
       return;
     }
+    // OTA-201 — gate items (Aetheric Vision Lens, Climbing Rope, etc.)
+    // also route through use_relic so the OTA-200 "Already at work —
+    // keep it on your person" arbiter explanation fires. Without this,
+    // pressing USE on the Lens silently fell into the equip branch and
+    // tried to equip a non-equippable item.
+    if (fxLookup && fxLookup.kind === 'gate') {
+      get().submitPlayerAction(`use ${item.name}`);
+      return;
+    }
     // Consumables → eat (HP recovery + time advance + quantity
     // decrement). Routed through submitPlayerAction so the existing
     // rest-with-resolvedItemId path handles all the state mutations.

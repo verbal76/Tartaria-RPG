@@ -245,10 +245,31 @@ export function InventoryScreen() {
     // USE — consumables eat, off-hand-eligible items equip to off,
     // others fall back to their canonical slot. Hide when the
     // item's already equipped everywhere it could go.
+    //
+    // OTA-201 — Player report on Aetheric Torch + Vision Lens
+    // modals: both have rich catalog descriptions and authored
+    // effects ("Reveals hidden scene hooks", "Vision aid for
+    // Aetheric anomalies"), the modal body string even claims
+    // "you can still keep, gift, sell, or use it" — but no USE
+    // button was rendered because the Torch is kind:'relic' (not
+    // consumable) and the Lens is kind:'exploration'. The use_relic
+    // engine handler already routes by effect.kind for revealScene
+    // / healHP / gate / etc.; we just weren't surfacing the action.
+    // Broadened the gate to "has any effect" so items with authored
+    // effects light up the USE button regardless of `kind`.
     const isConsumable = pending.item.kind === 'consumable';
+    const hasEffect = (() => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { resolveItemEffect } = require('../engine/itemEffect');
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { findExplorationItemByName, findGearByName, findMaterialByName } = require('../engine/crafting');
+        return !!resolveItemEffect(pending.item.name, [findGearByName, findExplorationItemByName, findMaterialByName]);
+      } catch { return false; }
+    })();
     const offEligible = pending.slots.includes('off') && !equippedInSlots.includes('off');
     const anySlotFree = pending.slots.some((s) => !equippedInSlots.includes(s));
-    if (isConsumable || (anySlotFree && (offEligible || pending.slots.length > 0))) {
+    if (isConsumable || hasEffect || (anySlotFree && (offEligible || pending.slots.length > 0))) {
       buttons.push({
         label: isConsumable ? 'Use (eat)' : (offEligible ? 'Use (off hand)' : 'Use'),
         onPress: doUse,

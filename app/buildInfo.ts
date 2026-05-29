@@ -6618,4 +6618,76 @@
 // gameStore.ts (lens hook
 // narration + gate-item
 // 'use' explanation).
-export const OTA_BUILD_ID = '2026-05-29-200';
+// 2026-05-29-201 — USE button
+// now appears on items with
+// authored effects regardless
+// of kind. Player screenshots
+// of the Aetheric Torch and
+// Aetheric Vision Lens
+// inventory modals showed:
+//   - Rich description
+//   - The modal body literally
+//     says "you can still keep,
+//     gift, sell, or use it"
+//   - But NO USE button —
+//     only SCRAP / DROP /
+//     CLOSE
+//
+// Diagnosis: InventoryScreen
+// gated the USE button on
+// item.kind === 'consumable'
+// OR an equippable slot.
+// Aetheric Torch is kind:
+// 'relic' (carries effect.kind
+// :'consumable' with reveal
+// Scene); Aetheric Vision
+// Lens is kind:'exploration'
+// (carries effect.kind:
+// 'gate'). Neither matched
+// the gate so the button was
+// hidden — even though the
+// use_relic engine handler
+// ALREADY routes both effects
+// to revealScene / gate
+// narration. Pure UI bug.
+//
+// Fix: InventoryScreen now
+// also checks resolveItem
+// Effect(item.name) — when
+// any effect is present, the
+// USE button appears. Label
+// stays "Use" (not "Use
+// (eat)") for non-consumable
+// effect items.
+//
+// useInventoryItem in
+// gameStore also gained a
+// gate-effect branch that
+// routes the USE click to
+// submitPlayerAction("use
+// X") so the OTA-200 gate
+// explanation fires.
+// Previously gate items fell
+// through to the equip
+// branch and tried to equip
+// a non-equippable item.
+//
+// Player's bigger question
+// — auto-detect catalog items
+// with descriptions but no
+// effects and have Qwen
+// synthesize them — addressed
+// in chat as a follow-up
+// design ask. The OTA-201 fix
+// closes the immediate
+// complaint (both items HAD
+// authored effects; the UI
+// just wasn't surfacing them).
+//
+// Files: app/screens/
+// InventoryScreen.tsx (USE
+// button gate broadened),
+// app/state/gameStore.ts
+// (useInventoryItem gate-
+// effect routing).
+export const OTA_BUILD_ID = '2026-05-29-201';

@@ -245,6 +245,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Aetheric Torch + Vision Lens USE button finally appears
+
+- **OTA-201 (2026-05-29) · USE button shows for items with authored effects regardless of inventory kind.**
+  - **What:** Two playtest screenshots: the Aetheric Torch and Aetheric Vision Lens inventory modals both showed rich description, full stats, the body text "you can still keep, gift, sell, or use it" — but only SCRAP / DROP / CLOSE buttons. The USE button was missing despite both items having authored effects (`{ kind: 'consumable', revealScene: true }` for the Torch, `{ kind: 'gate', unlocks: 'detect_aether' }` for the Lens).
+  - **Diagnosis:** `InventoryScreen.buildModalButtons` gated USE on `item.kind === 'consumable'` OR an equippable slot. Torch is `kind: 'relic'`, Lens is `kind: 'exploration'` — neither matched, so the button was hidden. Pure UI bug — the engine's `use_relic` handler ALREADY routes both effects (revealScene for Torch, gate narration for Lens via OTA-200's fallback).
+  - **Fix (UI):** USE button now also appears when `resolveItemEffect(item.name)` returns any effect, not just when `item.kind === 'consumable'`. Label stays "Use" for non-consumable effect items so the player isn't told to "eat" their Torch.
+  - **Fix (routing):** `useInventoryItem` in gameStore gained a gate-effect branch that routes the USE click to `submitPlayerAction('use X')` so the OTA-200 gate explanation fires. Previously gate items fell through to the equip branch and tried to equip a non-equippable item.
+  - **Verification:** `npx tsc --noEmit` clean app-side. The fix is rendering-only on a predicate (`resolveItemEffect`) that's exercised by the OTA-191 `itemEffect.test.ts` suite.
+  - **Files:** `app/screens/InventoryScreen.tsx` (USE button gate broadened with `hasEffect` predicate), `app/state/gameStore.ts` (useInventoryItem gate-effect routing branch).
+
 #### OTA-198 follow-ups: plain shard throws, lens narrates, gate-item use explains itself
 
 - **OTA-200 (2026-05-29) · Player report on OTA-199 install: *"it doesn't look like OTA 198 took, I still can't use my vision lens or throw my aetheric shard"*.**
