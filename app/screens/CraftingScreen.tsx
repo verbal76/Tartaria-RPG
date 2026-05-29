@@ -6,6 +6,7 @@ import { repairCostMaterials } from '../engine/scrapEngine';
 import { RecipesView } from '../components/RecipesView';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import type { InventoryItem } from '../engine/types';
+import { getItemPreview } from '../components/itemPreview';
 import { GOLEM_DEFINITIONS, type GolemDefinition } from '../engine/golems';
 
 // 2026-05-27 OTA-095 — Aethercraft disciplines moved from
@@ -459,6 +460,17 @@ export function CraftingScreen() {
               repairableView.map((r) => {
                 const dur = r.item.durability!;
                 const stripeColor = r.available ? '#9ec96a' : '#3a342c';
+                // OTA-165 — stats line on the REPAIR row. Pre-OTA the
+                // repair tab showed only name + durability + cost so a
+                // player with three damaged blades couldn't tell which
+                // one was which from this screen. getItemPreview surfaces
+                // damage / AC / scales-with-STR / passive bonuses / etc.
+                // — same data the CRAFT and RECIPES tabs already show
+                // via RecipesView. Player ask: "any of the tabs that are
+                // in there all of the items that you're crafting. it
+                // should show the stats for them. that way you know what
+                // you're crafting so you know which one to pick."
+                const preview = getItemPreview(r.item.name);
                 return (
                   <TouchableOpacity
                     key={r.item.id}
@@ -477,6 +489,11 @@ export function CraftingScreen() {
                           {dur.current}/{dur.max}
                         </Text>
                       </View>
+                      {preview.stats.length > 0 && (
+                        <Text style={styles.recipeStats}>
+                          {preview.stats.join(' · ')}
+                        </Text>
+                      )}
                       {r.cost.length === 0 ? (
                         <Text style={styles.recipeMissing}>No repair recipe — sell or scrap instead.</Text>
                       ) : r.available ? (
@@ -569,6 +586,9 @@ const styles = StyleSheet.create({
   recipeNameMuted: { color: '#a89a7a' },
   recipeRarity: { fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   durabilityChip: { color: '#c9a86a', fontSize: 11, fontWeight: '700' },
+  // OTA-165 — stats line on REPAIR rows. Same style as RecipesView's
+  // recipeStats so the REPAIR tab matches CRAFT / RECIPES visually.
+  recipeStats: { color: '#cdbf99', fontSize: 11, marginTop: 4, lineHeight: 15, fontStyle: 'italic' },
   recipeIng: { color: '#7a705c', fontSize: 11, marginTop: 4, lineHeight: 15 },
   recipeMissing: { color: '#e07a5f', fontSize: 11, marginTop: 4, lineHeight: 15 },
   recipeCta: { color: '#9ec96a', fontSize: 10, marginTop: 6, fontStyle: 'italic', letterSpacing: 1 },

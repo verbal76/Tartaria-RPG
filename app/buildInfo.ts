@@ -3942,4 +3942,46 @@
 // app/screens/ExplorationScreen.tsx
 // (import makeRoomKey + replace 5
 // inline keys).
-export const OTA_BUILD_ID = '2026-05-29-164';
+//
+// 2026-05-29 OTA-165 — stats on
+// REPAIR tab rows.
+//
+// Player ask: "any of the tabs that
+// are in there all of the items
+// that you're crafting. it should
+// show the stats for them. that way
+// you know what you're crafting so
+// you know which one to pick."
+//
+// The CRAFT + RECIPES tabs render
+// stats via RecipesView (uses
+// getItemPreview) — every recipe
+// shows damage / AC / scales-with /
+// passives / restore amounts / etc.
+// The AETHERIC tab shows golem
+// HP/attack/damage type inline.
+// The REPAIR tab was the gap: it
+// showed only name + durability +
+// repair cost, so a player with
+// three damaged weapons couldn't
+// tell which one was which from
+// the screen.
+//
+// Fix: import getItemPreview in
+// CraftingScreen, call it per
+// repair row, render
+// preview.stats.join(' · ') beneath
+// the name line. Style matches
+// RecipesView's recipeStats
+// (italic, #cdbf99) so the REPAIR
+// tab reads consistently with
+// CRAFT / RECIPES.
+//
+// TS clean.
+//
+// Files:
+// app/screens/CraftingScreen.tsx
+// (getItemPreview import + stats
+// line on REPAIR row + recipeStats
+// style).
+export const OTA_BUILD_ID = '2026-05-29-165';
