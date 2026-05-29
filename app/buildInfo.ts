@@ -4636,4 +4636,76 @@
 //   (LogChannel dog_quest),
 //   app/state/gameStore.ts
 //   (7 dog-quest emit sites).
-export const OTA_BUILD_ID = '2026-05-29-176';
+//
+// 2026-05-29 OTA-177 — tutorial
+// wall split + currency pass.
+//
+// Player ask: "split this giant
+// wall of tutorial into 2 screens.
+// while we are at it, let's make
+// sure the tutorial is up to date."
+//
+// Dog tutorial was one massive
+// fullscreen step (10 sections:
+// rescue / onboarding / combat /
+// dog+golem / climbing / smell-
+// find / hunger / feeding / gear /
+// death / call). Screenshot showed
+// it overflowing the panel —
+// player couldn't scan it.
+//
+// Split into 2 steps:
+//   (A) "Your dog — the rescue
+//       and the fight" — rescue
+//       hooks, purple DOG QUEST
+//       channel call-out, three
+//       onboarding questions,
+//       combat row (now ROW 2),
+//       dog+golem coexistence,
+//       death recovery (gem /
+//       puppy-vendor / rubble-
+//       puppy).
+//   (B) "Your dog — living with
+//       them" — smell-find,
+//       climbing, hunger,
+//       feeding (with the
+//       OTA-158 typo tolerance
+//       call-out), call modal,
+//       gear, StatsPanel
+//       display.
+//
+// Currency pass on the wider
+// tutorial:
+//   • Two gear-corner references
+//     updated top-right → bottom-
+//     right (OTA-174 moved the
+//     gear).
+//   • Quick actions step rewritten
+//     to describe the OTA-172
+//     3-row combat layout: row 1
+//     weapons (color-coded by
+//     reach), row 2 companions
+//     + dodge + flee, row 3
+//     approach + step back +
+//     inventory.
+//   • Core Guardians step adds
+//     the OTA-148/149 SUMMON chip
+//     + `summon guardian` verb as
+//     deliberate-call paths.
+//   • Travel step adds the
+//     OTA-171 MAP→TRAVEL TO panel
+//     one-tap routing path
+//     alongside the typed
+//     "travel to <city>" + Lore
+//     Places tab routes.
+//
+// No engine code touched —
+// authored copy only.
+//
+// TS clean.
+//
+// Files: app/components/tutorial
+// Steps.ts (dog step split + 4
+// currency edits across other
+// steps).
+export const OTA_BUILD_ID = '2026-05-29-177';

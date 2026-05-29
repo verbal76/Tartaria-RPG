@@ -73,19 +73,23 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'Out of combat this shows the Tartaria crest. In combat the panel becomes one card per enemy ' +
       '(swipe or tap to cycle targets) with their HP, AC, attack bonus, damage dice, and whether ' +
       'they\'re in range of your equipped weapon. ' +
-      '\n\nThe ⚙ gear in the top-right corner is your settings/lore/session hub — we\'ll see it.',
+      '\n\nThe ⚙ gear in the bottom-right corner is your settings/lore/session hub — we\'ll see it.',
   },
   // OTA 457 — replaces the dead "Save & log" / bottom-menu step.
-  // The gear icon in the top-right is now the single entry point
-  // for settings + Lore Codex + session controls (save & exit,
-  // copy/clear log). Stays anchored to `top-right-enemy` so the
-  // overlay highlights the same column the gear sits inside.
+  // The gear icon is the single entry point for settings + Lore
+  // Codex + session controls (save & exit, copy/clear log). Stays
+  // anchored to `top-right-enemy` so the overlay highlights the
+  // same column the gear sits inside.
+  // OTA-174 — gear moved from top-right to bottom-right corner;
+  // tutorial copy updated to match. Overlay area name kept as
+  // `top-right-enemy` since it highlights the whole right column,
+  // not specifically the top edge.
   {
     screen: 'exploration',
     area: 'top-right-enemy',
     title: 'The gear corner',
     body:
-      'Tap the ⚙ in the top-right corner — it\'s your one hub for everything outside the world. ' +
+      'Tap the ⚙ in the bottom-right corner — it\'s your one hub for everything outside the world. ' +
       'Four tabs inside: ' +
       '\n\n• SESSION — save & exit, copy / clear the log, slot management. ' +
       '\n• SFX — music + voice toggles. ' +
@@ -143,10 +147,11 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'NORTH / SOUTH / EAST / WEST — one tap = one step in that direction on the world map. ' +
       'These hide during combat (you can\'t walk away from a fight that\'s already on you). ' +
       'MAP sits on the right and stays visible on every screen — tap to see the world layout. ' +
-      '\n\nFor long hauls: type "travel to <city>" (or tap a Place in the Lore tab) and the row ' +
-      'flips to → <CITY> [N moves left] / STOP TRAVEL. The badge counts remaining cardinal ' +
-      'steps to the target. Each → tap takes one step — same stamina, same time, same ' +
-      'encounter rolls. STOP hands the cardinals back. ' +
+      '\n\nFor long hauls: type "travel to <city>" OR tap MAP and pick a row from the TRAVEL TO ' +
+      'panel below the atlas (one-tap routing, no confirm). Either way the row flips to → ' +
+      '<CITY> [N moves left] / STOP TRAVEL. The badge counts remaining cardinal steps to the ' +
+      'target. Each → tap takes one step — same stamina, same time, same encounter rolls. ' +
+      'STOP hands the cardinals back. ' +
       '\n\nTravel ignores hubs you\'re passing through (you won\'t get dropped into the reception ' +
       'of every roadside structure you cross). It only auto-enters when the target IS the hub. ' +
       '\n\nAsk the Arbiter "what\'s north of me" or "closest hub" any time.',
@@ -167,10 +172,16 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'nothing left to do. Tap to see the chip list. Each noun is consumed once per room: ' +
       'salvaging or investigating a chip removes it from every modal in that room (no ' +
       'double-acting), but the same noun in a different room still shows green. ' +
-      '\n\nIn combat: punch, kick, your equipped weapons, dodge (folds in block / parry / ' +
-      'deflect — one defensive stance), advance / step back, pack (open inventory mid-fight). ' +
-      'When a golem is alive, a GOLEM (hp/max) button joins the row — tap to command it to ' +
-      'attack.',
+      '\n\nIn combat the quick actions split into THREE rows so nothing crowds:' +
+      '\n  • Row 1 — punch, kick, your equipped weapons (color-coded by reach: green = can ' +
+      'hit at current range, yellow = need to approach, blue = defensive).' +
+      '\n  • Row 2 — companions + safe options: GOLEM (hp/max) when one is summoned, your ' +
+      'dog by name (hp/max) when alive, then DODGE (folds in block / parry / deflect — one ' +
+      'defensive stance) and FLEE.' +
+      '\n  • Row 3 — APPROACH (picks a specific enemy or routes via stealth), STEP BACK ' +
+      '(when not at far range), INVENTORY (swap weapons / use a kit mid-fight).' +
+      '\n\nThe ⚙ gear stays in the bottom-right of the enemy panel during combat too — one ' +
+      'tap out to settings without leaving the fight.',
   },
   // OTA 040 — new step: recent additions to the quick row + verbs.
   // OTA-113 — refreshed for elevated-overlay system + Aetheric tab
@@ -291,44 +302,65 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'back into its fuel material. Type `dismiss golem` any time. One golem at a time.',
   },
   // OTA-120 Phase 4 — Dog Companion walkthrough step.
+  // OTA-176 — split into TWO screens (rescue/combat vs living-with-
+  // the-dog) per player ask: "split this giant wall of tutorial
+  // into 2 screens. while we are at it, let's make sure the
+  // tutorial is up to date." Currency updates: dog combat buttons
+  // now sit on row 2 of the action menu (OTA-172); typo tolerance
+  // for fed/cll/helll/feeed lands the right intent (OTA-158); dog
+  // rescue + onboarding narration prints in PURPLE on the DOG QUEST
+  // channel (OTA-176) so the player can spot the arc at a glance.
   {
     screen: 'exploration',
     area: 'fullscreen',
-    title: 'Your dog',
+    title: 'Your dog — the rescue and the fight',
     body:
       'Tartaria offers ONE canine companion per save. Find them by investigating a "cage" at a ' +
       'forge ruin, a "wagon wheel" at a roadside camp, a "cellar door" at a buried structure, or ' +
       'a "snare pit" in the wilderness — each hooks a captor fight, faction-neutral (no rep ' +
-      'penalty). Defeat the captor and the Arbiter walks you through three questions: what kind ' +
-      'of dog is that (free text — your answer IS the breed), what will you name them (free ' +
-      'text), and boy/girl (free text — drives narration pronouns).' +
-      '\n\nCombat. Your dog occupies a weapon-like row in the action menu, labeled with their ' +
-      'name: tap to BITE (d20 + STR vs AC, 1d6 + ½STR piercing) or DISTRACT (d20 + DEX/INT vs ' +
-      'DC 12 — your next attack on that enemy gets +2). Bite trains STR; distract trains DEX ' +
-      'or INT. Enemy retaliation splits between you, the dog, and any active golem.' +
+      'penalty). The rescue arc (captor confrontation through naming) prints in PURPLE on the ' +
+      'DOG QUEST channel so it stands apart from the regular Arbiter beats.' +
+      '\n\nDefeat the captor and the Arbiter walks you through three questions: what kind of ' +
+      'dog is that (free text — your answer IS the breed), what will you name them (free text), ' +
+      'and boy/girl (free text — drives narration pronouns).' +
+      '\n\nCombat. Your dog sits on ROW 2 of the action menu (next to golem / dodge / flee), ' +
+      'labeled with their name. Tap to BITE (d20 + STR vs AC, 1d6 + ½STR piercing) or DISTRACT ' +
+      '(d20 + DEX/INT vs DC 12 — your next attack on that enemy gets +2). Bite trains STR; ' +
+      'distract trains DEX or INT. Enemy retaliation splits between you, the dog, and any ' +
+      'active golem.' +
       '\n\nDog + golem. They coexist — both fight together. The first co-activation prints a ' +
-      'one-line flavor beat ("wide arc, both will fight") then it\'s mechanical from there.' +
-      '\n\nClimbing. Dogs can\'t climb. The moment you start a climb the dog drops to ' +
-      'waiting_at_base; on `climb down` they rejoin you. No stamina hit, no rep hit.' +
-      '\n\nSmell-find. On scene entry the dog rolls d20 + INT vs DC 12. Success surfaces ONE ' +
+      'one-line flavor beat then it\'s mechanical from there.' +
+      '\n\nDeath. Combat-death is recoverable: Resurrection Gems revive dogs the same as ' +
+      'players. If you have none, the engine queues a one-shot puppy-vendor encounter that ' +
+      'fires after your next Core Guardian victory. Late-game (all 9 Guardians cleared) the ' +
+      'fallback becomes a "rubble puppy" hook on wasteland scenes. Either path runs the same ' +
+      'Arbiter onboarding.',
+  },
+  {
+    screen: 'exploration',
+    area: 'fullscreen',
+    title: 'Your dog — living with them',
+    body:
+      'Smell-find. On scene entry the dog rolls d20 + INT vs DC 12. Success surfaces ONE ' +
       'hidden investigation noun the visible scene was missing — a buried bone, a faint scent ' +
       'trail, a tossed bottle. Trains INT. One sniff per room.' +
+      '\n\nClimbing. Dogs can\'t climb. The moment you start a climb the dog drops to ' +
+      'waiting_at_base; on `climb down` they rejoin you. No stamina hit, no rep hit.' +
       '\n\nHunger. The dog loses 1 loyalty per 4 in-game hours WITHOUT a feed. Threshold beats ' +
       'fire at 50 / 30 / 15. At 0, the dog ABANDONS — permanent. No safety net for abandonment.' +
       '\n\nFeeding. `feed dog <item>` consumes 1 of any consumable for +20 loyalty (+40 if the ' +
       'item is a [treat] — Smoke-Cured Jerky Strip / Marrow Bone / Honey-Glazed Knuckle / Ash-' +
       'Cured Tongue). `heal dog <item>` and `use <item> on dog` also work — same flow, picks ' +
-      'up healHP from the consumable\'s effect block.' +
+      'up healHP from the consumable\'s effect block. Typos forgiven: `fed dog`, `feeed dog`, ' +
+      '`helll dog`, `cll dog` all route correctly.' +
+      '\n\nCall. Type `call dog` or `call <name>` to open the Call Modal — scratch their ear ' +
+      '(+2 loyalty), give a treat (opens a picker; +20/+40), or speak softly (+1 loyalty).' +
       '\n\nGear. Dog vests live in the [fits dog] inventory tag — Burlap (+1 AC), Riveted ' +
       'Leather (+2), Aetheric Padded (+3, reflects 1 corruption per hit), Reclaimer Pattern ' +
       '(+4, +1 STR, faction drop). Equip via the Character screen Companion panel.' +
-      '\n\nDeath. Combat-death is recoverable: Resurrection Gems revive dogs the same as players, ' +
-      'and if you have none, the engine queues a one-shot puppy-vendor encounter that fires after ' +
-      'your next Core Guardian victory. Late-game (all 9 Guardians cleared) the fallback becomes ' +
-      'a "rubble puppy" hook on wasteland scenes. Either path runs the same Arbiter onboarding. ' +
-      'Abandonment via hunger has no bail-out — feed the dog, or lose them for good.' +
-      '\n\nCall. Type `call dog` or `call <name>` to open the Call Modal — scratch their ear ' +
-      '(+2 loyalty), give a treat (opens a picker; +20/+40), or speak softly (+1 loyalty).',
+      '\n\nThe dog\'s name + HP shows on your StatsPanel under your own name (warm-gold, right- ' +
+      'aligned). Abandoned / dead dogs hide from the panel so it doesn\'t lie about who\'s ' +
+      'still with you.',
   },
   // OTA-129/130 — Hook-puzzle walkthrough step. The longest-open
   // dead-hook issue closed: narration that asks the player to do
@@ -414,7 +446,13 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       'Aether-Born Order, a semi-religious sub-faction that exists only to keep the buried world ' +
       'from being woken. ' +
       '\n\nWhen you trigger the recovery action at a Capital, the Guardian appears in the scene. ' +
-      'Defeat them to get the Core PLUS a unique signature weapon + signature armor (the Core ' +
+      'Two ways to summon them deliberately: tap the ★ SUMMON chip that lights up on the MAIN ' +
+      'QUEST row (and inside Contracts) when you reach an unrecovered Capital, OR type `summon ' +
+      'guardian` (typos forgiven — `summon the guardian`, `summon core guardian` all work). The ' +
+      'old way (take your faction\'s recovery verb — salvage for Reclaimers, attack for Monarchs, ' +
+      'etc.) still works as a third path. Pick the moment YOU\'RE ready: full HP, golem standing, ' +
+      'dog at heel. ' +
+      '\n\nDefeat them to get the Core PLUS a unique signature weapon + signature armor (the Core ' +
       'Guardian Set — 18 unique pieces across the 9 Capitals). ' +
       '\n\nYou can FLEE the fight freely — no further damage — but the Guardian fully heals. ' +
       'They scale with how many Cores you\'ve already taken: tier 1 at your first Capital, tier ' +
