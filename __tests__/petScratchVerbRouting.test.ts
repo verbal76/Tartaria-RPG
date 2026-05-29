@@ -93,36 +93,46 @@ describe('OTA-196 — pet / scratch / pat / nuzzle route to the dog', () => {
     console.error = () => {};
   });
 
-  it("`pet Rocky` raises the dog's loyalty by +2", async () => {
+  beforeEach(() => {
+    // State from a previous test in this file can leak the modal flag —
+    // bootstrap doesn't reset it. Clear it explicitly so each test
+    // starts from the closed state.
+    useGameStore.setState({ callDogModalOpen: false } as Partial<ReturnType<typeof useGameStore.getState>>);
+  });
+
+  it('`pet Rocky` opens the CallDogModal', async () => {
     await bootstrapWithDog(50);
-    const loyaltyBefore = useGameStore.getState().player?.dog?.loyalty ?? 0;
+    expect(useGameStore.getState().callDogModalOpen).toBe(false);
     useGameStore.getState().submitPlayerAction('pet Rocky');
-    const loyaltyAfter = useGameStore.getState().player?.dog?.loyalty ?? 0;
-    expect(loyaltyAfter - loyaltyBefore).toBe(2);
+    expect(useGameStore.getState().callDogModalOpen).toBe(true);
   });
 
-  it('`scratch Rocky` triggers the same scratch flow', async () => {
+  it('`scratch Rocky` opens the same modal (player picks scratch from there)', async () => {
     await bootstrapWithDog(50);
-    const loyaltyBefore = useGameStore.getState().player?.dog?.loyalty ?? 0;
+    expect(useGameStore.getState().callDogModalOpen).toBe(false);
     useGameStore.getState().submitPlayerAction('scratch Rocky');
+    expect(useGameStore.getState().callDogModalOpen).toBe(true);
+  });
+
+  it('`pat the dog` opens the modal', async () => {
+    await bootstrapWithDog(50);
+    useGameStore.getState().submitPlayerAction('pat the dog');
+    expect(useGameStore.getState().callDogModalOpen).toBe(true);
+  });
+
+  it('`nuzzle Rocky` opens the modal', async () => {
+    await bootstrapWithDog(50);
+    useGameStore.getState().submitPlayerAction('nuzzle Rocky');
+    expect(useGameStore.getState().callDogModalOpen).toBe(true);
+  });
+
+  it('the modal scratch option still applies +2 loyalty', async () => {
+    await bootstrapWithDog(50);
+    useGameStore.getState().submitPlayerAction('pet Rocky');
+    const loyaltyBefore = useGameStore.getState().player?.dog?.loyalty ?? 0;
+    useGameStore.getState().selectCallDogOption('scratch');
     const loyaltyAfter = useGameStore.getState().player?.dog?.loyalty ?? 0;
     expect(loyaltyAfter - loyaltyBefore).toBe(2);
-  });
-
-  it('`pat the dog` works as a synonym', async () => {
-    await bootstrapWithDog(50);
-    const before = useGameStore.getState().player?.dog?.loyalty ?? 0;
-    useGameStore.getState().submitPlayerAction('pat the dog');
-    const after = useGameStore.getState().player?.dog?.loyalty ?? 0;
-    expect(after - before).toBe(2);
-  });
-
-  it('`nuzzle Rocky` works', async () => {
-    await bootstrapWithDog(50);
-    const before = useGameStore.getState().player?.dog?.loyalty ?? 0;
-    useGameStore.getState().submitPlayerAction('nuzzle Rocky');
-    const after = useGameStore.getState().player?.dog?.loyalty ?? 0;
-    expect(after - before).toBe(2);
   });
 
   it('refuses with an arbiter line when no dog is present', async () => {
@@ -135,9 +145,9 @@ describe('OTA-196 — pet / scratch / pat / nuzzle route to the dog', () => {
 
   it('does NOT match `petrify` or `petrified` — the leading "pet" must be a standalone token', async () => {
     await bootstrapWithDog(50);
-    const loyaltyBefore = useGameStore.getState().player?.dog?.loyalty ?? 0;
+    expect(useGameStore.getState().callDogModalOpen).toBe(false);
     useGameStore.getState().submitPlayerAction('petrify the wall');
-    const loyaltyAfter = useGameStore.getState().player?.dog?.loyalty ?? 0;
-    expect(loyaltyAfter).toBe(loyaltyBefore);
+    // Modal should stay closed — the short-circuit should not have fired.
+    expect(useGameStore.getState().callDogModalOpen).toBe(false);
   });
 });

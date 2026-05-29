@@ -1022,6 +1022,13 @@ interface GameStore {
    *  on every combat round. Transient — not persisted across save / load
    *  (player who reloads at 1 HP gets one fresh nudge, which is fine). */
   lowHpWarned: boolean;
+  /** OTA-197 — transient streak tracker for the "this weapon isn't
+   *  working on this enemy" arbiter nudge. Counts consecutive resisted
+   *  hits with the same weapon type against the same enemy. On the 2nd
+   *  consecutive resist, the arbiter chimes in suggesting a swap.
+   *  Resets on: scene change, weapon change, non-resisted hit, miss, or
+   *  attack against a different enemy. Not persisted. */
+  weaponResistStreak: { enemyName: string; damageType: string; count: number } | null;
   /** Set when a slot load fails — UI surfaces this and offers recovery. */
   slotLoadError: string | null;
   /** Current tutorial step index, or null when no tutorial is active. */
@@ -1407,6 +1414,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   pendingTravelConfirm: null,
   hydrated: false,
   lowHpWarned: false,
+  weaponResistStreak: null,
   slotLoadError: null,
   tutorialStep: null,
   tutorialDemoVendor: null,
@@ -3652,14 +3660,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // OTA-196 — pet / scratch / pat <dog>. Playtest log:
-    //   [player] pet Rocky → parser: intent=unknown
-    //   [player] scratch Rocky → parser: intent=unknown (totally
-    //   irrelevant arbiter fallback about a "disease sample")
-    // 'pet' / 'scratch' / 'pat' / 'nuzzle' route directly to the
-    // existing selectCallDogOption('scratch') flow when a dog is
-    // present. Short-circuited to avoid the parser substring-matching
-    // 'pet' against 'petrified' on the scene's feature list.
+    // OTA-196 / OTA-197 — pet / scratch / pat / nuzzle <dog>. Playtest
+    // caught these verbs falling through to intent=unknown with
+    // irrelevant arbiter babble. OTA-196 routed straight to the
+    // scratch action; OTA-197 opens the full CallDogModal instead so
+    // the player sees every option (scratch / treat / speak) and can
+    // hand a treat from their inventory picker — the user's ask:
+    //   "have a good interaction popup show all the things you can
+    //    do, if you pick treat it opens your inventory to pick an
+    //    item."
+    // Short-circuited to avoid the parser substring-matching 'pet'
+    // against 'petrified' on the scene's feature list.
     if (/^(pet|scratch|pat|nuzzle)(\s|$)/i.test(trimmed)) {
       const p = get().player;
       const dog = p?.dog;
@@ -3672,7 +3683,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return;
       }
       if (!_opts?.silent) get().appendLog('player', trimmed);
-      get().selectCallDogOption('scratch');
+      get().openCallDogModal();
       return;
     }
 
@@ -10288,6 +10299,52 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('combat', `${enemy.name} is vulnerable to ${weaponType}. (trait ×1.5)`);
       } else if (traitMod.match === 'resist') {
         get().appendLog('combat', `${enemy.name}'s perks resist ${weaponType}. (trait ×0.5)`);
+      }
+      // OTA-197 — consecutive-resist nudge. Playtester swung a piercing
+      // bolt-caster at a piercing-resistant Silt Serpent + Mud Lurker
+      // back-to-back and lost the fight largely because they didn't
+      // know to swap weapons. When the same enemy resists the same
+      // damage type a second time in a row, the Arbiter pipes up
+      // suggesting a swap. Resets after firing (so it's a single
+      // nudge, not a per-turn lecture).
+      if (weaponType !== null) {
+        const isResist = mod.match === 'resist' || traitMod.match === 'resist';
+        const prev = get().weaponResistStreak;
+        if (isResist) {
+          if (prev && prev.enemyName === enemy.name && prev.damageType === weaponType) {
+            const nextCount = prev.count + 1;
+            if (nextCount >= 2) {
+              // Build a swap hint — surface the available alternative
+              // damage types in the player's pack so the Arbiter's
+              // suggestion is grounded. Bare-bones: just list non-
+              // matching weapon types the player carries.
+              const altTypes = new Set<string>();
+              try {
+                for (const it of player.inventory) {
+                  if (it.kind !== 'weapon') continue;
+                  if (it.name === equipped?.name) continue;
+                  const w = findWeaponByName(it.name);
+                  if (w && w.damageType !== weaponType) altTypes.add(w.damageType);
+                }
+              } catch { /* ignore — hint stays generic */ }
+              const hint = altTypes.size > 0
+                ? `Try something ${Array.from(altTypes).slice(0, 2).join(' or ')} — you have it in your pack.`
+                : `Find another weapon — ${weaponType} isn't biting.`;
+              get().appendLog(
+                'arbiter',
+                `The Arbiter watches the ${weaponType} skid off again. "Twice now. ${hint}"`,
+              );
+              set({ weaponResistStreak: null });
+            } else {
+              set({ weaponResistStreak: { enemyName: enemy.name, damageType: weaponType, count: nextCount } });
+            }
+          } else {
+            set({ weaponResistStreak: { enemyName: enemy.name, damageType: weaponType, count: 1 } });
+          }
+        } else {
+          // Non-resisted hit on ANY target breaks the streak.
+          if (prev) set({ weaponResistStreak: null });
+        }
       }
       if (effectBonus > 0) {
         get().appendLog('combat', `${equipped?.name ?? 'Your weapon'}'s effect triggers — +${effectBonus} bonus damage.`);

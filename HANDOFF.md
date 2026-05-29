@@ -245,6 +245,15 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Combat resist nudge + dog interaction popup
+
+- **OTA-197 (2026-05-29) · Arbiter calls out a second consecutive resist; pet/scratch opens the full CallDog modal.**
+  - **What:** Two playtest follow-ups on OTA-196. (1) Player: *"this one shrugs off the bolts — try something blunt?"* — bug-the-Arbiter when the player's damage type isn't working. The 2026-05-29 log showed the player swinging a piercing bolt-caster twice in a row at piercing-resistant Silt Serpent and Mud Lurker and losing the fight largely because there was no nudge. (2) Player: *"for the dog interactions have them slowly build loyalty and have a good interaction popup show all the things you can do, if you pick treat it opens your inventory to pick an item."* OTA-196 short-circuited pet/scratch directly to the scratch action, skipping the existing CallDogModal that already had the full picker.
+  - **Fix (1):** New transient `weaponResistStreak: { enemyName, damageType, count } | null` on GameStore (not save-persisted). On a resisted hit, the path checks the previous streak: same enemy + same damage type → increment; new enemy OR new damage type → reset to count=1; non-resisted hit on any enemy → null. On `count >= 2`, the Arbiter chimes in with a grounded swap hint — scans `player.inventory` for weapons of OTHER damage types and surfaces up to two ("Try something bludgeoning or aetheric — you have it in your pack."). If no alternative is in the pack, falls back to a generic line. Streak resets after firing so it's one nudge per swap-window, not a per-turn lecture.
+  - **Fix (2):** Changed the pet/scratch/pat/nuzzle short-circuit at the top of `submitPlayerAction` from `selectCallDogOption('scratch')` to `openCallDogModal()`. The existing modal already surfaces scratch (+2), treat (+20 / +40 dog-treat), speak (+1), with the treat option opening an inventory picker filtered to consumables. Loyalty stays at the existing slow-build values per the "slowly build loyalty" ask.
+  - **Verification:** +4 tests in `weaponResistNudge` (initial null, shape, reset, per-enemy isolation). `petScratchVerbRouting` reframed to assert `callDogModalOpen` flips true (loyalty boost still tested via `selectCallDogOption('scratch')` post-modal). Canary five + OTA-191/192/193/194/195/196 suites all stay green. `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/state/gameStore.ts` (weaponResistStreak schema + initialization + combat reset branch + pet/scratch reroute to openCallDogModal).
+
 #### Playtest log cleanup: inferred-stats spam silenced + pet/scratch verbs routed
 
 - **OTA-196 (2026-05-29) · Two playtest-log bugs fixed in one push.**

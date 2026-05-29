@@ -6215,4 +6215,93 @@
 // gameStore.ts (setOnInferred
 // reroute + pet/scratch
 // short-circuit).
-export const OTA_BUILD_ID = '2026-05-29-196';
+// 2026-05-29-197 — combat
+// resist nudge + pet/scratch
+// opens the full CallDog
+// modal. Player asks:
+//   "Your only weapon is
+//   piercing; both wasteland
+//   enemies you fought resist
+//   piercing. A nudge from
+//   the Arbiter (..) on the
+//   second consecutive resist
+//   hit might help guide
+//   weapon swaps. I agree,
+//   have the arbitor say it
+//   as well.
+//   for the dog interactions
+//   have them slowly build
+//   loyalty and have a good
+//   interaction popup show
+//   all the things you can do,
+//   if you pick treat it opens
+//   your inventory to pick an
+//   item."
+//
+// (1) Combat: new transient
+//     `weaponResistStreak`
+//     state on GameStore.
+//     Tracks consecutive
+//     resists per (enemyName,
+//     damageType). On the
+//     SECOND consecutive hit
+//     the Arbiter chimes in
+//     with a grounded swap
+//     hint — scans player
+//     inventory for non-
+//     matching weapon damage
+//     types and surfaces them
+//     ("Twice now. Try
+//     something bludgeoning
+//     or aetheric — you have
+//     it in your pack."). If
+//     no alternative is in
+//     the pack, generic line.
+//     Streak resets after
+//     firing so one nudge
+//     per swap-window. Also
+//     resets on any non-
+//     resisted hit. Not
+//     persisted across save/
+//     load.
+//
+// (2) Dog interactions: OTA-
+//     196 routed pet/scratch/
+//     pat/nuzzle straight to
+//     the scratch action.
+//     OTA-197 opens the
+//     existing CallDogModal
+//     instead so the player
+//     sees scratch +2 / treat
+//     (+20 or +40 if dog-
+//     treat tagged) / speak
+//     +1 — and treat opens
+//     the inventory picker
+//     filtered to consumables
+//     (already wired in the
+//     modal). Loyalty stays
+//     at the existing slow-
+//     build values per the
+//     "slowly build loyalty"
+//     ask.
+//
+// Tests: +4 in
+// weaponResistNudge
+// (initial / shape / reset /
+// per-enemy isolation). Pet/
+// scratch test reframed to
+// assert callDogModalOpen
+// goes true (was: loyalty +2
+// — now happens after modal
+// pick). canary five + OTA-
+// 191/192/193/194/195/196
+// suites stay green. TS
+// clean app-side.
+//
+// Files: app/state/
+// gameStore.ts (weaponResist
+// Streak schema + reset
+// branch in combat + pet/
+// scratch reroute to
+// openCallDogModal).
+export const OTA_BUILD_ID = '2026-05-29-197';
