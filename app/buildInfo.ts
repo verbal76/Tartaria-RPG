@@ -4276,4 +4276,64 @@
 // (15 runecaster recipes stamped),
 // __tests__/runecasterIntGate
 // .test.ts (NEW).
-export const OTA_BUILD_ID = '2026-05-29-170';
+//
+// 2026-05-29 OTA-171 — Places list
+// promoted to MapScreen with one-
+// tap routing (no confirm modal).
+//
+// Player ask: "move the locations
+// tab from the lore to somewhere
+// useful for push to set travel
+// but without digging in the
+// settings menu. and I don't want
+// to copy the text I want to be
+// able to push to route
+// automatically."
+//
+// MapScreen is already one tap
+// from the home screen (the MAP
+// chip in the InputBox). Adding
+// the Places list there means the
+// player gets to TRAVEL in TWO
+// taps total: MAP → place row.
+// No Lore-tab dig, no confirm
+// modal step, no text to copy.
+//
+// Implementation: new TRAVEL TO
+// panel sits below the existing
+// footer on MapScreen. Scrollable
+// (capped 280px max-height so the
+// atlas image stays visible).
+// Rows sort with the player's
+// current location pinned at the
+// top, then by danger ascending
+// (safer trips visible first),
+// then alphabetic.
+//
+// Each row: name + type subtitle,
+// danger pip + arrow on the
+// right. Tap = setTravelCourse
+// + setScreen('exploration'). No
+// confirm modal.
+//
+// Hub gate handled inline: if
+// player.hubRoomId is set, the
+// engine's setTravelCourse
+// would refuse mid-stride, so
+// we surface a brief Arbiter
+// hint ("leave the outpost
+// first") and skip the screen
+// swap instead of cooking up a
+// half-state.
+//
+// Lore→Places tab unchanged —
+// keeps the info / confirm
+// path for players who want
+// the lore beat first.
+//
+// TS clean.
+//
+// Files: app/screens/MapScreen.tsx
+// (new placesView memo + TRAVEL
+// TO panel JSX + 11 styles).
+export const OTA_BUILD_ID = '2026-05-29-171';

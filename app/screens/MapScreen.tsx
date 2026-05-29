@@ -25,7 +25,7 @@
 //   walking east on the map moves the marker east and you'll
 //   eventually reach the canonically-east named location.
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -34,9 +34,14 @@ import {
   Image,
   Animated,
   PanResponder,
+  ScrollView,
   type GestureResponderEvent,
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+// OTA-171 — Location + locationsData are already imported below for
+// the existing LOCATIONS const; reused here for the Places list
+// panel so a player can tap any known location and start travel
+// without digging through Lore.
 import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from '../engine/worldMap';
 import {
   atlasCoordForLocation,
@@ -78,6 +83,26 @@ function touchesOf(e: GestureResponderEvent): Array<{ x: number; y: number }> {
 export function MapScreen() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
+  // OTA-171 — direct push-to-route from the MapScreen places list.
+  // No confirm modal (player ask: "I don't want to copy the text I
+  // want to be able to push to route automatically"). Tapping a
+  // place row calls setTravelCourse + bounces to exploration.
+  const setTravelCourse = useGameStore((s) => s.setTravelCourse);
+  const appendLog = useGameStore((s) => s.appendLog);
+  // OTA-171 — Places list sorted with the current location pinned at
+  // the top so the player can see where they are at a glance, then
+  // by danger ascending (safer trips first) so the easiest
+  // destinations are visible without scrolling.
+  const placesView = useMemo(() => {
+    const all = LOCATIONS;
+    const here = player?.currentLocationId;
+    return [...all].sort((a, b) => {
+      if (a.id === here && b.id !== here) return -1;
+      if (b.id === here && a.id !== here) return 1;
+      if (a.danger !== b.danger) return a.danger - b.danger;
+      return a.name.localeCompare(b.name);
+    });
+  }, [player?.currentLocationId]);
 
   // Rendered image-box layout, captured via onLayout.
   const [imgBox, setImgBox] = useState<{ width: number; height: number } | null>(null);
@@ -515,6 +540,68 @@ export function MapScreen() {
               : ' Marker drifting in your direction of travel.'}
         </Text>
       </View>
+
+      {/* OTA-171 — TRAVEL TO panel. One-tap routing from the MAP
+          screen: tap any place row → setTravelCourse fires + screen
+          flips to exploration + travel starts. No confirm modal
+          (player explicitly asked: "I don't want to copy the text
+          I want to be able to push to route automatically"). Hub
+          gate handled inline — if the player is inside an outpost
+          room (player.hubRoomId set), setTravelCourse would refuse
+          mid-stride, so we surface a brief Arbiter hint and skip
+          the screen swap. The Lore→Places tab still works as the
+          info / confirm path; this just gives a fast alternative
+          one tap from the home screen's MAP button. */}
+      <View style={styles.placesPanel}>
+        <Text style={styles.placesPanelTitle}>TRAVEL TO ▸ tap a place</Text>
+        <ScrollView
+          style={styles.placesScroll}
+          contentContainerStyle={styles.placesContent}
+        >
+          {placesView.map((p) => {
+            const isHere = player?.currentLocationId === p.id;
+            return (
+              <TouchableOpacity
+                key={p.id}
+                style={[styles.placeRow, isHere && styles.placeRowHere]}
+                activeOpacity={isHere ? 1 : 0.7}
+                disabled={isHere}
+                onPress={() => {
+                  if (!player) return;
+                  if (player.hubRoomId) {
+                    appendLog(
+                      'arbiter',
+                      `The Arbiter steadies you. "Leave the outpost first — tap LEAVE OUTPOST or type 'leave outpost'. Then we can set course for ${p.name}."`,
+                    );
+                    return;
+                  }
+                  setTravelCourse(p.id);
+                  setScreen('exploration');
+                }}
+              >
+                <View style={styles.placeRowLeft}>
+                  <Text style={[styles.placeName, isHere && styles.placeNameHere]}>
+                    {p.name}
+                  </Text>
+                  <Text style={styles.placeType}>{p.type}</Text>
+                </View>
+                <View style={styles.placeRowRight}>
+                  {isHere ? (
+                    <Text style={styles.placeHereTag}>YOU ARE HERE</Text>
+                  ) : (
+                    <Text style={styles.placeDanger}>
+                      Danger {p.danger}/5
+                    </Text>
+                  )}
+                  {!isHere && (
+                    <Text style={styles.placeArrow}>▸</Text>
+                  )}
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
     </View>
   );
 }
@@ -626,4 +713,48 @@ const styles = StyleSheet.create({
   footerWhere: { color: '#e6d8b3', fontSize: 13, marginTop: 2 },
   footerDist: { color: '#cdbf99', fontSize: 11, marginTop: 4 },
   footerCaveat: { color: '#5a5246', fontSize: 9, fontStyle: 'italic', marginTop: 8, lineHeight: 13 },
+  // OTA-171 — Places panel at the bottom of MapScreen. Scrollable
+  // capped height so the panel doesn't push the atlas image off-
+  // screen on smaller phones.
+  placesPanel: {
+    marginTop: 8,
+    backgroundColor: '#13110f',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingTop: 8,
+    paddingBottom: 4,
+    maxHeight: 280,
+  },
+  placesPanelTitle: {
+    color: '#c9a86a',
+    fontSize: 10,
+    letterSpacing: 2,
+    fontWeight: '700',
+    paddingHorizontal: 10,
+    marginBottom: 6,
+  },
+  placesScroll: { flexGrow: 0 },
+  placesContent: { paddingHorizontal: 6, paddingBottom: 6 },
+  placeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginBottom: 4,
+  },
+  placeRowHere: { borderColor: '#e07a5f', backgroundColor: '#241612' },
+  placeRowLeft: { flex: 1, minWidth: 0 },
+  placeRowRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  placeName: { color: '#e6d8b3', fontSize: 13, fontWeight: '600' },
+  placeNameHere: { color: '#e07a5f' },
+  placeType: { color: '#7a705c', fontSize: 10, marginTop: 1 },
+  placeDanger: { color: '#cdbf99', fontSize: 10, letterSpacing: 0.5 },
+  placeHereTag: { color: '#e07a5f', fontSize: 9, letterSpacing: 1.5, fontWeight: '700' },
+  placeArrow: { color: '#c9a86a', fontSize: 16, fontWeight: '700' },
 });
