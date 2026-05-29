@@ -318,7 +318,18 @@ export function ExplorationScreen() {
       // "main screen smaller than available" was the visible result.
       // 'padding' adds bottom padding (visual) without touching the
       // container height — it doesn't compound with adjustResize.
-      behavior="padding"
+      //
+      // OTA-178 — behavior split by platform. iOS keeps 'padding'
+      // (iOS doesn't auto-resize the window on keyboard show — the
+      // padding does the lift). Android sets behavior={undefined}
+      // so the native adjustResize (Expo default for managed apps)
+      // is the ONLY thing pulling the window up. Pre-fix the
+      // 'padding' branch was firing on Android too, adding padding
+      // on top of adjustResize — net effect was the input getting
+      // shoved off the visible area when the keyboard appeared.
+      // Playtester: "can we keep the keyboard from covering the
+      // text line we are typing into?"
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <View style={styles.topRow}>
         <TutorialTarget area="top-left-stats" style={styles.statsCol}>
@@ -1040,7 +1051,16 @@ const styles = StyleSheet.create({
     paddingVertical: 3,
   },
   sceneBarBtnText: { color: '#c9a86a', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
-  feed: { flex: 1 },
+  // OTA-179 — flex:1 alone wasn't shrinking the feed enough when
+  // the OTA-172 combat row went 3 lines tall, so the bottom action
+  // button row clipped below the safe-area bottom edge. Adding
+  // flexShrink:1 + minHeight:0 is the canonical RN fix for "let
+  // this flex child shrink below its content's measured size" — it
+  // lets the feed compress to whatever space is left after the
+  // InputBox claims its natural (taller) height. Player ask: "can
+  // we have the rows put up and shrink the exploration box a touch
+  // and not push the action buttons down?"
+  feed: { flex: 1, flexShrink: 1, minHeight: 0 },
   streamingTail: {
     paddingHorizontal: 10,
     paddingVertical: 8,

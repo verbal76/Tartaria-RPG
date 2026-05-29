@@ -18323,7 +18323,10 @@ function tryFireRescueScenario(
       ].slice(-20),
     },
   }));
-  get().appendLog('arbiter', introLines[scenarioId]);
+  // OTA-177 — rescue intro now routes to the dog_quest channel
+  // (purple) so the player visually flags the quest beat instead
+  // of mistaking it for a generic Arbiter remark.
+  get().appendLog('dog_quest', introLines[scenarioId]);
 }
 
 /** Called from resolveEnemyDefeat when the killed enemy was a
@@ -18354,9 +18357,12 @@ function completeRescueScenario(
       } as PendingDogOnboarding,
     },
   }));
-  get().appendLog('world', scenario.victoryLine);
+  // OTA-177 — victory + onboarding-intro Arbiter beat on the
+  // dog_quest channel (purple) so the rescue arc reads as one
+  // visually-grouped sequence.
+  get().appendLog('dog_quest', scenario.victoryLine);
   get().appendLog(
-    'arbiter',
+    'dog_quest',
     `The dog watches you with the flat unread look of an animal that has just had one ownership scratched off its name. The Arbiter steps in. "What kind of dog is that?"`,
   );
 }
@@ -18395,7 +18401,10 @@ function handleDogOnboardingInput(
       },
     }));
     get().appendLog('world', `You name the breed: ${breed}.`);
-    get().appendLog('arbiter', `The Arbiter nods. "What will you name them?"`);
+    // OTA-177 — Arbiter prompts during dog onboarding go on the
+    // dog_quest channel (purple) so each step of the rescue
+    // sequence stays visually grouped.
+    get().appendLog('dog_quest', `The Arbiter nods. "What will you name them?"`);
     return;
   }
   if (pending.stage === 'name') {
@@ -18407,7 +18416,7 @@ function handleDogOnboardingInput(
       },
     }));
     get().appendLog('world', `${name}. The name settles on the dog like a coat.`);
-    get().appendLog('arbiter', `The Arbiter nods again. "Boy or girl?"`);
+    get().appendLog('dog_quest', `The Arbiter nods again. "Boy or girl?"`);
     return;
   }
   // pending.stage === 'sex'
@@ -18432,8 +18441,11 @@ function handleDogOnboardingInput(
     dog.sex.pronoun,
   );
   get().appendLog('world', settleLine);
+  // OTA-177 — final onboarding beat closes on the dog_quest channel
+  // so the whole rescue arc reads as one purple-tinted sequence
+  // from confrontation through naming.
   get().appendLog(
-    'arbiter',
+    'dog_quest',
     `The Arbiter studies the new pair. "${dog.name}, then. ${pending.rescueData.scenario === 'puppy_vendor' || pending.rescueData.scenario === 'puppy_rubble' ? 'You owe the pup nothing yet. Earn its trust on the road.' : 'The chain is off. The road is open.'}"`,
   );
 }
@@ -19167,12 +19179,15 @@ function tryFireRubblePuppy(
       puppyVendorOwed: false,
     },
   }));
+  // OTA-177 — rubble-puppy intro routes to dog_quest (purple) so
+  // this rescue variant stays visually consistent with the other
+  // four dog-acquisition scenarios.
   get().appendLog(
-    'world',
+    'dog_quest',
     `You pull at the rubble. A whimper. A lone puppy is buried up to its haunches in the dust, blinking at you. Alive. Alone.`,
   );
   get().appendLog(
-    'arbiter',
+    'dog_quest',
     `The Arbiter looks at the pup, then at you. "Some debts the world settles itself. What kind of dog is that?"`,
   );
   return true;

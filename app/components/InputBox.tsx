@@ -2,7 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, Pressable } from 'react-native';
 import { TutorialTarget } from './TutorialTarget';
 import { getVoiceSettings, onVoiceSettingsChange } from '../voice/voiceSettings';
-import { isSpeaking as ttsIsSpeaking, stopAndClear as stopTTS } from '../voice/TTSManager';
+// OTA-176 — TTS imports dropped along with the silence-Arbiter
+// button. TTS itself still plays through TTSManager via the
+// streaming path in gameStore; only the manual-stop affordance is
+// removed per player ask: "let's remove the stop arbitor talking
+// button and code from the game."
 import { startListening, stopListening, isListening } from '../voice/STTManager';
 import { useGameStore } from '../state/gameStore';
 import { findWeaponByName } from '../engine/crafting';
@@ -158,12 +162,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // raised; if that becomes a problem again, KeyboardAvoidingView
   // around the parent screen is the React Native idiomatic fix.
 
-  // Voice state — both flags drive a tiny render loop so the MIC /
-  // SILENCE ARBITER button swaps live when TTS starts / stops or the
-  // mic begins recording. Polling once per ~250ms is cheaper than
-  // wiring observers on the TTS / STT singletons.
+  // OTA-176 — speaking state + ttsIsSpeaking poll dropped. Was used
+  // to swap the MIC button for a SILENCE ARBITER button when TTS
+  // started speaking. Silence button removed entirely; mic stays
+  // always-visible when sttEnabled.
   const [voice, setVoice] = useState(() => getVoiceSettings());
-  const [speaking, setSpeaking] = useState(false);
   const [listening, setListening] = useState(false);
 
   useEffect(() => onVoiceSettingsChange(setVoice), []);
@@ -191,13 +194,15 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     }
   }, [pendingDraft, consumeDraft]);
   useEffect(() => {
-    if (!voice.ttsEnabled && !voice.sttEnabled) return;
+    // OTA-176 — only listening state needs the poll now (mic
+    // active/idle drives the button visual). TTS speaking poll
+    // dropped alongside the silence button.
+    if (!voice.sttEnabled) return;
     const t = setInterval(() => {
-      setSpeaking(ttsIsSpeaking());
       setListening(isListening());
     }, 250);
     return () => clearInterval(t);
-  }, [voice.ttsEnabled, voice.sttEnabled]);
+  }, [voice.sttEnabled]);
 
   const handleSubmit = () => {
     const trimmed = text.trim();
@@ -261,19 +266,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     }
   };
 
-  const handleSilenceArbiter = async () => {
-    // Same defensive shell — stopTTS hits two native engines
-    // (expo-speech + executorch) and any unhandled rejection can
-    // kill the bridge.
-    try { stopTTS(); } catch { /* ignore */ }
-    try { setSpeaking(false); } catch { /* ignore */ }
-    // After silencing, the player almost always wants to respond —
-    // open the mic if STT is enabled. If not, just leave them at
-    // text input.
-    if (voice.sttEnabled) {
-      try { await handleMic(); } catch { /* handleMic has its own catch */ }
-    }
-  };
+  // OTA-176 — handleSilenceArbiter removed alongside the silence
+  // button. TTS itself still runs; players who want it quieter use
+  // the voice settings on the gear screen to toggle TTS off.
 
   return (
     <View style={styles.container}>
@@ -563,22 +558,17 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           textContentType="none"
         />
         {/* Voice controls — only render when the player opted in via
-            Settings. SILENCE ARBITER takes the slot whenever TTS is
-            actively speaking (always-visible interrupt); otherwise the
-            MIC button is the always-visible push-to-talk. */}
-        {(voice.ttsEnabled || voice.sttEnabled) && (
-          speaking && voice.ttsEnabled ? (
-            <TouchableOpacity style={styles.silenceBtn} onPress={handleSilenceArbiter}>
-              <Text style={styles.silenceBtnText}>🛑</Text>
-            </TouchableOpacity>
-          ) : voice.sttEnabled ? (
-            <TouchableOpacity
-              style={[styles.micBtn, listening && styles.micBtnActive]}
-              onPress={handleMic}
-            >
-              <Text style={styles.micBtnText}>🎙</Text>
-            </TouchableOpacity>
-          ) : null
+            Settings. OTA-176 — silence-Arbiter button removed
+            entirely; the MIC button is now the only voice-controls
+            slot. TTS toggle still lives on the gear screen for
+            players who want it off. */}
+        {voice.sttEnabled && (
+          <TouchableOpacity
+            style={[styles.micBtn, listening && styles.micBtnActive]}
+            onPress={handleMic}
+          >
+            <Text style={styles.micBtnText}>🎙</Text>
+          </TouchableOpacity>
         )}
         {/* OTA 202 — designer-note button. Tap opens the
             FeedbackModal which writes straight to the log on the
@@ -788,16 +778,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   feedbackBtnText: { fontSize: 16 },
-  // SILENCE ARBITER button — replaces the mic while TTS is active.
-  // Red tint so the player knows it's an interrupt, not a regular tap.
-  silenceBtn: {
-    backgroundColor: '#3a201c',
-    borderColor: '#e07a5f',
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    borderRadius: 4,
-    marginRight: 6,
-  },
-  silenceBtnText: { color: '#e07a5f', fontSize: 18 },
+  // OTA-176 — silenceBtn / silenceBtnText styles removed alongside
+  // the silence-Arbiter button. TTS itself still plays; only the
+  // manual interrupt UI is gone.
 });

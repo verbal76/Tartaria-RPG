@@ -36,6 +36,15 @@ const channelColors: Record<LogChannel, string> = {
   // a glance distinguishes them from world prose during a long
   // copy-paste / scroll-back review.
   feedback: '#c97aa8',
+  // OTA-177 — dog rescue + onboarding narration in a clear purple
+  // so the quest beats stand out from amber (Arbiter) / yellow /
+  // green (reward) / red (combat) / blue (player). Same hue family
+  // as the Rare-rarity color the player already reads as "this is
+  // important to my run." Player ask: "make the text that is part
+  // of the initial dog getting quest and any other dog getting
+  // quests in a color that is noticably different... let's use
+  // purple like the notes."
+  dog_quest: '#b88ce0',
 };
 
 // `cognitive` (MiniLM emotion/intent) and `debug` (parser, combat range
@@ -51,6 +60,9 @@ const HIDDEN_CHANNELS: ReadonlySet<LogChannel> = new Set(['cognitive', 'debug'])
 function tagForChannel(channel: LogChannel): string | null {
   if (channel === 'arbiter') return 'ARBITER';
   if (channel === 'feedback') return 'NOTE';
+  // OTA-177 — DOG QUEST tag so the purple beats also carry a
+  // chip-label header, matching how ARBITER / NOTE lines render.
+  if (channel === 'dog_quest') return 'DOG QUEST';
   return null;
 }
 

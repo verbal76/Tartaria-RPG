@@ -877,7 +877,7 @@ export interface Companion {
   summonedAt: number;
 }
 
-export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive' | 'debug' | 'feedback';
+export type LogChannel = 'player' | 'arbiter' | 'system' | 'world' | 'combat' | 'reward' | 'cognitive' | 'debug' | 'feedback' | 'dog_quest';
 
 export interface RollStep {
   id: string;

@@ -4516,4 +4516,124 @@
 //
 // Files: app/components/InputBox
 // .tsx (row 3 button order).
-export const OTA_BUILD_ID = '2026-05-29-175';
+//
+// 2026-05-29 OTA-176 — 4-piece UI
+// wave: feed shrinks under 3-row
+// combat / dog-quest narration in
+// purple / silence-Arbiter button
+// removed / keyboard no longer
+// covers the input line.
+//
+// All four asks came in one
+// message; bundled as one OTA.
+//
+//   (1) Combat row 3 was pushing
+//       the bottom buttons off
+//       screen. Player: "can we
+//       have the rows put up and
+//       shrink the exploration
+//       box a touch and not push
+//       the action buttons down?"
+//       Fix: feed style gains
+//       flexShrink:1 + minHeight:0
+//       — the canonical RN pattern
+//       for "let this flex child
+//       shrink below its measured
+//       content size." Feed
+//       compresses to whatever
+//       space is left after the
+//       (now 3-row) InputBox
+//       claims its natural height.
+//
+//   (2) Dog rescue + onboarding
+//       narration now routes to a
+//       new `dog_quest` log
+//       channel (purple #b88ce0).
+//       Player: "make the text
+//       that is part of the
+//       initial dog getting quest
+//       and any other dog getting
+//       quests in a color that is
+//       noticably different ...
+//       let's use purple like
+//       the notes." Sites updated:
+//       4 captor confrontation
+//       intros, scenario victory
+//       line, "what kind of dog
+//       is that?" onboarding
+//       prompt, "what will you
+//       name them?", "boy or
+//       girl?", final settle
+//       beat, rubble-puppy
+//       variant intro. World-
+//       channel descriptive prose
+//       (e.g. "you name the
+//       breed") stays world so
+//       the player still gets the
+//       cream-color narrative
+//       voice between the purple
+//       quest beats. DOG QUEST
+//       chip tag added to
+//       tagForChannel mirroring
+//       ARBITER / NOTE.
+//
+//   (3) Silence-Arbiter (🛑)
+//       button removed entirely.
+//       Player: "let's remove the
+//       stop arbitor talking
+//       button and code from the
+//       game." Dropped: button
+//       JSX, handleSilenceArbiter
+//       function, speaking state,
+//       ttsIsSpeaking poll, two
+//       styles (silenceBtn /
+//       silenceBtnText), import
+//       of stopTTS+ttsIsSpeaking.
+//       TTS itself still plays
+//       through TTSManager — the
+//       manual-interrupt UI is
+//       the only thing that goes.
+//       Players who want it
+//       quieter use the TTS
+//       toggle on the gear
+//       screen.
+//
+//   (4) Keyboard no longer
+//       covers the typed line.
+//       Player: "can we keep the
+//       keyboard from covering
+//       the text line we are
+//       typing into?"
+//       KeyboardAvoidingView
+//       behavior split by
+//       platform: iOS keeps
+//       'padding' (iOS needs the
+//       lift); Android sets
+//       behavior={undefined} so
+//       only the native
+//       adjustResize (Expo
+//       managed default) pulls
+//       the window up. Pre-fix
+//       padding fired on Android
+//       on top of adjustResize,
+//       overshooting and shoving
+//       the input off the visible
+//       area.
+//
+// TS clean.
+//
+// Files:
+//   app/screens/ExplorationScreen
+//   .tsx (feed flex shrink +
+//   KAV behavior split),
+//   app/components/AdventureFeed
+//   .tsx (channelColors +
+//   tagForChannel),
+//   app/components/InputBox.tsx
+//   (silence button removal +
+//   speaking poll removal),
+//   app/engine/types.ts
+//   (LogChannel dog_quest),
+//   app/state/gameStore.ts
+//   (7 dog-quest emit sites).
+export const OTA_BUILD_ID = '2026-05-29-176';
