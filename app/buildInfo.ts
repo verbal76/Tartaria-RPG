@@ -4397,4 +4397,49 @@
 // .tsx (combat row restructure +
 // climb-button defensive tone +
 // 2 new styles).
-export const OTA_BUILD_ID = '2026-05-29-172';
+//
+// 2026-05-29 OTA-173 — silence-
+// Arbiter button moved to bottom-
+// right of the enemy panel.
+//
+// Player ask: "moving the pause
+// button to the bottom right of
+// the enemy box so it doesn't
+// block text, let's get it done."
+//
+// The silence (pause-TTS) button
+// used to live in the InputBox
+// composer row beside the text
+// input. In combat-heavy stretches
+// it crowded the input field +
+// streaming Arbiter text.
+//
+// Fix: render the silence button
+// as an absolute-positioned bottom-
+// right overlay on the EnemyPanel.
+// Renders only when TTS is actively
+// speaking. 36×36 circular tap
+// target with a warm-red border so
+// it reads as "interrupt" against
+// the panel chrome. Polls
+// ttsIsSpeaking() at 250ms (same
+// cadence InputBox already uses).
+//
+// InputBox silence button HIDES
+// during combat (the EnemyPanel
+// overlay covers it). In peace
+// mode the InputBox silence
+// button stays as the always-
+// visible interrupt — no enemy
+// panel to anchor an overlay
+// against.
+//
+// TS clean.
+//
+// Files: app/components/EnemyPanel
+// .tsx (speaking poll + silence
+// overlay + 2 styles),
+// app/components/InputBox.tsx
+// (silence button hides when
+// inCombat).
+export const OTA_BUILD_ID = '2026-05-29-173';
