@@ -4442,4 +4442,53 @@
 // app/components/InputBox.tsx
 // (silence button hides when
 // inCombat).
-export const OTA_BUILD_ID = '2026-05-29-173';
+//
+// 2026-05-29 OTA-174 — settings
+// gear moved to bottom-right of
+// the enemy panel + OTA-173
+// reverted (wrong button moved).
+//
+// Player correction: "I think you
+// got that wrong, I wanted the
+// settings gear moved from the
+// top right of the enemy box to
+// the bottom right of the enemy
+// box."
+//
+// OTA-173 misread the ask and
+// moved the TTS-silence (pause)
+// button instead. Both halves of
+// OTA-173 reverted in this OTA —
+// EnemyPanel back to no overlay,
+// InputBox silence button back
+// to always-visible (regardless
+// of combat).
+//
+// Correct fix: cornerGear style
+// in ExplorationScreen moved from
+// `top: 4` → `bottom: 4`. The
+// EnemyCard head's reserved
+// paddingRight: 48 (added OTA-048
+// + bumped OTA-144 to keep the
+// gear off the enemy name) is
+// also dropped — gear no longer
+// overlaps the top of the card,
+// so the enemy name + range tag
+// can use the full row width.
+//
+// Gear stays on the right column
+// either way — overlays
+// EnemyPanel during combat, the
+// CrestPlaceholder in peace.
+//
+// TS clean.
+//
+// Files: app/screens/Exploration
+// Screen.tsx (cornerGear top→
+// bottom + comment),
+// app/components/EnemyPanel.tsx
+// (head paddingRight dropped +
+// OTA-173 revert),
+// app/components/InputBox.tsx
+// (OTA-173 revert).
+export const OTA_BUILD_ID = '2026-05-29-174';

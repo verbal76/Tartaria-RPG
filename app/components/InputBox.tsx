@@ -563,14 +563,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
         {/* Voice controls — only render when the player opted in via
             Settings. SILENCE ARBITER takes the slot whenever TTS is
             actively speaking (always-visible interrupt); otherwise the
-            MIC button is the always-visible push-to-talk.
-            OTA-173 — silence button hides here when inCombat. The
-            EnemyPanel renders its own bottom-right silence overlay
-            during combat so the composer row stays clear of text-
-            blocking icons. In peace mode the silence button stays
-            here as the always-visible interrupt. */}
+            MIC button is the always-visible push-to-talk. */}
         {(voice.ttsEnabled || voice.sttEnabled) && (
-          speaking && voice.ttsEnabled && !inCombat ? (
+          speaking && voice.ttsEnabled ? (
             <TouchableOpacity style={styles.silenceBtn} onPress={handleSilenceArbiter}>
               <Text style={styles.silenceBtnText}>🛑</Text>
             </TouchableOpacity>

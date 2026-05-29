@@ -342,14 +342,17 @@ export function ExplorationScreen() {
           ) : (
             <CrestPlaceholder />
           )}
-          {/* v2.4.1 (OTA 048) — gear icon overlaid in the top-right
-              corner of the right column. Replaces the bottom-row
-              gear, which was the only thing left there after the
-              session controls moved into the gear screen. The gear
-              floats over whichever right-col content is showing
-              (EnemyPanel or CrestPlaceholder). EnemyCard's `head`
-              style reserves right-padding so the range tag types
-              AROUND the gear instead of being clipped. */}
+          {/* v2.4.1 (OTA 048) — gear icon overlaid in the right column.
+              Replaces the bottom-row gear, which was the only thing
+              left there after the session controls moved into the gear
+              screen. The gear floats over whichever right-col content
+              is showing (EnemyPanel or CrestPlaceholder).
+              OTA-174 — moved from top-right to BOTTOM-right per
+              playtest ask: "I wanted the settings gear moved from the
+              top right of the enemy box to the bottom right of the
+              enemy box." Bottom-right keeps the enemy name + range tag
+              at top fully visible (no more truncation around the gear)
+              and groups the secondary navigation in one corner. */}
           <TouchableOpacity
             onPress={() => setScreen('about')}
             hitSlop={8}
@@ -991,15 +994,17 @@ const styles = StyleSheet.create({
   topRow: { flexDirection: 'row', gap: 6, minHeight: 165 },
   statsCol: { flex: 1.2 },
   rightCol: { flex: 1, position: 'relative' },
-  // v2.4.1 (OTA 048) — gear icon floats over the top-right corner
-  // of the right column (EnemyPanel or CrestPlaceholder). 32×32
-  // hit area, semi-transparent backdrop so it stays legible on top
-  // of either content. EnemyCard's `head` style reserves
-  // paddingRight so the range tag types around the gear instead of
-  // being clipped.
+  // v2.4.1 (OTA 048) — gear icon floats over the right column
+  // (EnemyPanel or CrestPlaceholder). 32×32 hit area, semi-
+  // transparent backdrop so it stays legible on top of either
+  // content.
+  // OTA-174 — moved from top-right to bottom-right per playtest
+  // ask. EnemyCard's `head` style no longer needs paddingRight
+  // reservation since the gear no longer overlaps the enemy name
+  // / range tag area.
   cornerGear: {
     position: 'absolute',
-    top: 4,
+    bottom: 4,
     right: 4,
     width: 32,
     height: 32,

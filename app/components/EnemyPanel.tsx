@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
@@ -12,14 +12,6 @@ import {
 } from 'react-native';
 import type { Enemy } from '../engine/types';
 import { describeTrait, traitACBonus } from '../engine/enemyTraits';
-// OTA-173 — silence-Arbiter button moved into the enemy panel (bottom-
-// right corner) per playtest ask: "moving the pause button to the
-// bottom right of the enemy box so it doesn't block text." The
-// pause button used to live in the InputBox composer row, where it
-// crowded the text input on combat-heavy screens. EnemyPanel polls
-// TTS speaking state directly so it can render the overlay without
-// prop-coupling to InputBox.
-import { isSpeaking as ttsIsSpeaking, stopAndClear as stopTTS } from '../voice/TTSManager';
 
 export interface EnemyView {
   enemy: Enemy;
@@ -60,21 +52,6 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive }: Props) {
     },
     [activeIndex, enemies.length, onSelectActive],
   );
-
-  // OTA-173 — TTS speaking state for the bottom-right silence overlay.
-  // 250ms poll matches the cadence InputBox uses. Cleanup on unmount
-  // (the panel re-mounts on every combat end, so no leak across
-  // peaceful stretches).
-  const [speaking, setSpeaking] = useState(false);
-  useEffect(() => {
-    const t = setInterval(() => setSpeaking(ttsIsSpeaking()), 250);
-    return () => clearInterval(t);
-  }, []);
-
-  const handleSilence = (): void => {
-    try { stopTTS(); } catch { /* ignore */ }
-    setSpeaking(false);
-  };
 
   if (enemies.length === 0) return null;
 
@@ -120,21 +97,6 @@ export function EnemyPanel({ enemies, activeIndex, onSelectActive }: Props) {
           ))}
           <Text style={styles.hint}>swipe to target</Text>
         </View>
-      )}
-      {/* OTA-173 — silence-Arbiter button, bottom-right of the enemy
-          panel. Renders only while TTS is actively speaking. Tap stops
-          the speech and dismisses itself until the next narration
-          starts. Sits absolute so it overlays the panel's bottom edge
-          without pushing the dots row out of place. */}
-      {speaking && (
-        <TouchableOpacity
-          style={styles.silenceOverlay}
-          onPress={handleSilence}
-          activeOpacity={0.7}
-          hitSlop={6}
-        >
-          <Text style={styles.silenceOverlayText}>🛑</Text>
-        </TouchableOpacity>
       )}
     </View>
   );
@@ -224,20 +186,16 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 8,
   },
-  // v2.4.1 (OTA 048) — paddingRight reserves space for the gear icon
-  // that ExplorationScreen overlays in the top-right corner of the
-  // right column.
-  // OTA-144 — bumped from 36 → 48. The gear is 32px wide + 4px right
-  // margin = 36px footprint. With paddingRight=36 the content's right
-  // edge EXACTLY MET the gear's left edge — zero buffer. Long enemy
-  // names ("Reclaimer Deserter" et al.) visually crowded the semi-
-  // transparent gear background (rgba 0.85). The extra 12px gives
-  // solid clearance. Playtester repro: "The settings button is
-  // covering some of the enemies name."
+  // v2.4.1 (OTA 048) — paddingRight reserved space for the gear icon
+  // that ExplorationScreen overlaid in the top-right corner.
+  // OTA-174 — gear icon moved to bottom-right; top-right is now free
+  // so the enemy name + range tag can use the full row width. Reserve
+  // is gone. Playtester repro for the original crowding ("The
+  // settings button is covering some of the enemies name.") no longer
+  // applies once the gear is at the bottom.
   head: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingRight: 48,
     alignItems: 'baseline',
   },
   headRight: { flexDirection: 'row', alignItems: 'baseline', gap: 6 },
@@ -281,21 +239,4 @@ const styles = StyleSheet.create({
   dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#3a342c' },
   dotActive: { backgroundColor: '#c9a86a' },
   hint: { color: '#7a705c', fontSize: 9, letterSpacing: 1, marginLeft: 8 },
-  // OTA-173 — silence-Arbiter overlay. Absolute-positioned bottom-
-  // right of the panel wrap. Sized to be a comfortable tap target
-  // (36×36) without dominating the enemy card visually.
-  silenceOverlay: {
-    position: 'absolute',
-    bottom: 4,
-    right: 4,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(26, 23, 20, 0.92)',
-    borderColor: '#e07a5f',
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  silenceOverlayText: { fontSize: 18 },
 });
