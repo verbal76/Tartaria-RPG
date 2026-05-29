@@ -4,6 +4,8 @@ import { useGameStore } from '../state/gameStore';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview } from '../components/itemPreview';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
+import { resolveItemEffect, type GateKind } from '../engine/itemEffect';
+import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
 import { availableFactionQuests, FACTION_QUESTS } from '../engine/factionQuests';
 import { availableHunts, HUNTS } from '../engine/hunts';
 import { availableMysteries, MYSTERIES } from '../engine/mysteries';
@@ -73,6 +75,51 @@ export function VendorScreen() {
 
   const openBuy = (itemName: string, price: number) => setPending({ mode: 'buy', itemName, price });
   const openSell = (itemName: string, price: number) => setPending({ mode: 'sell', itemName, price });
+
+  // OTA-178 — gate-loss warning helper. Returns the GateKind label
+  // when selling THIS item would leave the player with no other
+  // item in their pack that unlocks the same gate (climb_steep is
+  // the canonical example: a player sells their only Hardened
+  // Climbing Strap → next `climb X` refuses with "not without rope"
+  // until they find another climb tool).
+  //
+  // Returns null when:
+  //   • the item doesn't have a gate effect at all
+  //   • the player has another stack of the same gate item
+  //   • another OTHER item in the pack also unlocks the same gate
+  //     (so they keep the capability)
+  //
+  // Player ask: "enact that gate" — i.e., wire the sell-confirm
+  // warning we discussed when only one climb tool remained.
+  const GATE_LABELS: Record<GateKind, string> = {
+    breathe_toxic: 'breathe in toxic zones',
+    climb_steep: 'climb steep terrain',
+    dig_metal: 'dig through hardened metal',
+    fly: 'fly across gaps',
+    nightvision: 'see in pitch dark',
+    detect_aether: 'detect hidden Aether',
+  };
+  const resolvers = [findGearByName, findMaterialByName, findExplorationItemByName];
+  const gateLossFor = (itemName: string): { gate: GateKind; label: string } | null => {
+    if (!player) return null;
+    const item = player.inventory.find((i) => i.name.toLowerCase() === itemName.toLowerCase());
+    if (!item || item.quantity <= 0) return null;
+    const fx = resolveItemEffect(item.name, resolvers);
+    if (fx?.kind !== 'gate') return null;
+    const gate = fx.unlocks;
+    // Selling reduces this stack by 1 — if quantity > 1, the player
+    // keeps a copy and the warning is moot.
+    if (item.quantity > 1) return null;
+    // Check every OTHER inventory item for the same gate.
+    for (const other of player.inventory) {
+      if (other.id === item.id) continue;
+      if (other.quantity <= 0) continue;
+      const otherFx = resolveItemEffect(other.name, resolvers);
+      if (otherFx?.kind === 'gate' && otherFx.unlocks === gate) return null;
+    }
+    return { gate, label: GATE_LABELS[gate] ?? gate };
+  };
+  const pendingGateLoss = pending?.mode === 'sell' ? gateLossFor(pending.itemName) : null;
   // OTA 030 — steal DC is tiered by vendor source. Hub vendors have no
   // demeanor and default to DC 16 (alert, help nearby). Roadside
   // sketchy = DC 11, honest = DC 14. Pre-compute here so the
@@ -494,7 +541,9 @@ export function VendorScreen() {
           pending?.mode === 'dismiss'
             ? 'They leave the scene. New offers will come from the next vendor who shows up.'
             : pending?.mode === 'sell'
-              ? `Price: +${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.price} TC`
+              ? (pendingGateLoss
+                  ? `Price: +${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.price} TC\n\n⚠ This is your ONLY way to ${pendingGateLoss.label}. Selling it leaves you with no other tool that satisfies the gate — actions that need it will refuse until you find or craft a replacement.`
+                  : `Price: +${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.price} TC`)
               : pending?.mode === 'steal'
                 ? `DEX ${player.stats.dexterity} vs DC ${pending.dc}. On a miss, ${vendor.name} draws steel and the deal becomes a fight.${vendor.faction ? ` Caught theft tanks rep with ${vendor.faction.replace(/_/g, ' ')}.` : ''}`
                 : pending?.mode === 'accept'
@@ -514,7 +563,14 @@ export function VendorScreen() {
             : pending?.mode === 'sell'
               ? [
                   { label: 'Cancel', onPress: cancel, tone: 'neutral' },
-                  { label: 'Sell', onPress: confirmAction, tone: 'primary' },
+                  // OTA-178 — gate-loss sells get the destructive (red)
+                  // button tone + label change so the second tap reads
+                  // as "yes I really mean to lose this capability."
+                  // Normal sells stay primary tone with the plain
+                  // "Sell" label.
+                  pendingGateLoss
+                    ? { label: 'Sell anyway', onPress: confirmAction, tone: 'destructive' as const }
+                    : { label: 'Sell', onPress: confirmAction, tone: 'primary' as const },
                 ]
               : pending?.mode === 'steal'
                 ? [

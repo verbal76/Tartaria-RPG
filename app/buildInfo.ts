@@ -4708,4 +4708,67 @@
 // Steps.ts (dog step split + 4
 // currency edits across other
 // steps).
-export const OTA_BUILD_ID = '2026-05-29-177';
+//
+// 2026-05-29 OTA-178 — sell-gate
+// warning (you can't sell your
+// only rope by accident anymore).
+//
+// Playtester sold their Hardened
+// Climbing Strap to Irma for 5 TC
+// without realizing it was the
+// only item in their pack
+// satisfying the engine's
+// climb_steep gate (added OTA
+// 23-007 — rope is hard-required
+// to climb, no DEX-fallback).
+// Next climb attempt: "Not
+// without rope." Player: "enact
+// that gate."
+//
+// Fix: VendorScreen's sell-confirm
+// modal now computes a
+// `pendingGateLoss` for the
+// pending item. When the item
+// being sold has effect.kind ===
+// 'gate' AND the player has
+// quantity 1 AND no OTHER
+// inventory item also unlocks
+// that gate → the modal:
+//
+//   • Appends a "⚠ This is your
+//     ONLY way to <gate label>"
+//     warning to the body copy.
+//   • Replaces the primary "Sell"
+//     button with a destructive
+//     "Sell anyway" button (red
+//     tone) so the second tap
+//     reads as deliberate.
+//
+// Gate labels covered:
+//   breathe_toxic, climb_steep,
+//   dig_metal, fly, nightvision,
+//   detect_aether.
+//
+// Cancel button unchanged. Normal
+// non-gate sells keep the
+// primary-tone "Sell" button +
+// plain confirmation copy. Sells
+// of one stack when a 2nd copy
+// exists, or when another item
+// also unlocks the same gate, do
+// not trip the warning.
+//
+// 5/5 OTA-178 regressions
+// (gateLossFor helper: only copy
+// flags / extra copies pass / dual
+// items pass / non-gate items
+// pass / non-existent items
+// return null). TS clean.
+//
+// Files: app/screens/VendorScreen
+// .tsx (gateLossFor helper +
+// modal body augmentation +
+// destructive button on warning),
+// __tests__/sellGateLossDetection
+// .test.ts (NEW).
+export const OTA_BUILD_ID = '2026-05-29-178';
