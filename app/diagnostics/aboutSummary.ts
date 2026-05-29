@@ -106,17 +106,10 @@ export interface StampLogOptions {
    *  in the header. Used by the TitleScreen export which has
    *  per-slot context. */
   playerName?: string;
-  /** OTA-202 — pre-built inventory snapshot block (from
-   *  diagnostics/inventorySnapshot.ts). When provided, appended
-   *  after the device/install header so the export carries the
-   *  player's full pack contents for recurring-theme analysis.
-   *  Caller builds the block to avoid importing engine types
-   *  into the diagnostics layer. */
-  inventorySnapshot?: string;
 }
 
 export function stampLogExport(logBody: string, opts: StampLogOptions = {}): string {
-  const { chunk, playerName, inventorySnapshot } = opts;
+  const { chunk, playerName } = opts;
   const begin = chunk
     ? `=== TARTARIA LOG · PART ${chunk.index} of ${chunk.total} · ${logBody.length} CHARS · BEGIN ===`
     : `=== TARTARIA LOG · ${logBody.length} CHARS · BEGIN ===`;
@@ -124,6 +117,5 @@ export function stampLogExport(logBody: string, opts: StampLogOptions = {}): str
     ? `=== END PART ${chunk.index} of ${chunk.total} ===`
     : `=== END LOG · ${logBody.length} CHARS ===`;
   const header = playerName ? `Tartaria Realms · ${playerName}` : 'Tartaria Realms';
-  const inv = inventorySnapshot ? `\n\n${inventorySnapshot}` : '';
-  return `${begin}\n${logBody}\n${end}\n\n${header}\n\n${buildBasicDeviceSummary()}${inv}\n`;
+  return `${begin}\n${logBody}\n${end}\n\n${header}\n\n${buildBasicDeviceSummary()}\n`;
 }

@@ -245,6 +245,15 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Dedicated COPY INVENTORY button (reverts OTA-202 bundling)
+
+- **OTA-203 (2026-05-29) · Inventory snapshot moves to its own button instead of bundling into COPY LOG.**
+  - **What:** Player feedback on OTA-202: *"inwanted a separate copy inventory log"*. OTA-202 appended the pack snapshot to the COPY LOG export so every log paste also carried inventory. The player wanted to choose which one to share, not have them bundled.
+  - **Fix:** Reverted the inventory bundling in `handleCopyLog` (and removed the `inventorySnapshot` option from `stampLogExport` since the bundling is gone). Added new `handleCopyInventory` handler + `COPY INVENTORY` button below the existing COPY LOG / CLEAR LOG row in `AboutScreen`'s SESSION card. Drops just the pack snapshot wrapped in a BEGIN/END envelope (mirrors COPY LOG's envelope shape for grep-ability) plus the device/install block. Brief "✓ N CHARS" flash on copy matches the COPY LOG pattern.
+  - **Fix (envelope helper):** New `stampInventoryExport(snapshot, deviceSummary, playerName?)` in `inventorySnapshot.ts` wraps the snapshot in `=== TARTARIA INVENTORY · N CHARS · BEGIN ===` / `=== END INVENTORY · N CHARS ===` markers so the paste-back is greppable separately from log exports.
+  - **Verification:** +2 tests in `inventorySnapshot` (envelope shape, missing player name). 8-test suite green; `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/diagnostics/inventorySnapshot.ts` (NEW `stampInventoryExport` helper), `app/diagnostics/aboutSummary.ts` (revert `inventorySnapshot` opt), `app/screens/AboutScreen.tsx` (revert handleCopyLog bundling + add handleCopyInventory + button render).
+
 #### COPY LOG now bundles an inventory snapshot
 
 - **OTA-202 (2026-05-29) · SESSION tab's COPY LOG export carries a full pack dump for recurring-theme analysis.**

@@ -4,7 +4,7 @@
 // cleanly when pasted into chat AND survive light reshuffling
 // (the player might re-equip / drop / pick up between log copies).
 
-import { buildInventorySnapshot } from '../app/diagnostics/inventorySnapshot';
+import { buildInventorySnapshot, stampInventoryExport } from '../app/diagnostics/inventorySnapshot';
 import type { InventoryItem, PlayerCharacter } from '../app/engine/types';
 
 function mkItem(over: Partial<InventoryItem>): InventoryItem {
@@ -135,6 +135,24 @@ describe('OTA-202 — buildInventorySnapshot', () => {
     expect(out).toMatch(/Stamina: 7\/20/);
     expect(out).toMatch(/TC: 124/);
     expect(out).toMatch(/Corruption: 8/);
+  });
+
+  it('OTA-203 — stampInventoryExport wraps the snapshot in a greppable BEGIN/END envelope', () => {
+    const out = stampInventoryExport(
+      'Inventory (Verbal)\n  Pack: empty',
+      'Device\n  Platform: android\n',
+      'Verbal',
+    );
+    expect(out).toMatch(/=== TARTARIA INVENTORY · \d+ CHARS · BEGIN ===/);
+    expect(out).toMatch(/=== END INVENTORY · \d+ CHARS ===/);
+    expect(out).toMatch(/Tartaria Realms · Verbal/);
+    expect(out).toMatch(/Pack: empty/);
+    expect(out).toMatch(/Platform: android/);
+  });
+
+  it('OTA-203 — envelope tolerates a missing player name', () => {
+    const out = stampInventoryExport('snap', 'dev');
+    expect(out).toMatch(/Tartaria Realms\n\ndev/);
   });
 
   it('includes the dog line when a dog is with the player', () => {

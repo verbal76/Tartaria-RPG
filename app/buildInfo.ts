@@ -6767,4 +6767,67 @@
 // app/screens/AboutScreen.tsx
 // (passes the snapshot to
 // stampLogExport on PART 1).
-export const OTA_BUILD_ID = '2026-05-29-202';
+// 2026-05-29-203 — dedicated
+// COPY INVENTORY button.
+// Player ask:
+//   "inwanted a separate
+//   copy inventory log"
+// Reverting the OTA-202
+// bundling: COPY LOG goes
+// back to log-only;
+// inventory exports via its
+// own button in the SESSION
+// tab.
+//
+// New button "COPY INVENTORY"
+// appears below the COPY
+// LOG / CLEAR LOG row in
+// AboutScreen's SESSION
+// card. Drops just the pack
+// snapshot (built by OTA-202's
+// inventorySnapshot.ts)
+// wrapped in a BEGIN/END
+// envelope + the device/
+// install block. Brief
+// "✓ N CHARS" flash on copy
+// matches the COPY LOG
+// pattern.
+//
+// New helper:
+// stampInventoryExport in
+// inventorySnapshot.ts wraps
+// the snapshot in
+//   === TARTARIA INVENTORY
+//   · N CHARS · BEGIN ===
+//   ...snapshot...
+//   === END INVENTORY ·
+//   N CHARS ===
+// matching the COPY LOG
+// envelope shape so paste-
+// back analysis can grep
+// either greppably.
+//
+// stampLogExport's
+// inventorySnapshot option
+// is removed (OTA-202
+// addition) since the two
+// exports are now physically
+// separate.
+//
+// Tests: +2 in
+// inventorySnapshot
+// (envelope shape, missing
+// player name). Suite total
+// 8 green. TS clean.
+//
+// Files: app/diagnostics/
+// inventorySnapshot.ts (NEW
+// stampInventoryExport
+// helper), app/diagnostics/
+// aboutSummary.ts (revert
+// inventorySnapshot opt),
+// app/screens/AboutScreen.tsx
+// (revert handleCopyLog
+// bundling + add handleCopy
+// Inventory + button render).
+export const OTA_BUILD_ID = '2026-05-29-203';

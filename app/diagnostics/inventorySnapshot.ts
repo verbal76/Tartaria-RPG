@@ -119,3 +119,21 @@ export function buildInventorySnapshot(player: PlayerCharacter | null): string {
   }
   return lines.join('\n');
 }
+
+/** OTA-203 — envelope the inventory snapshot for a standalone Copy
+ *  Inventory export. Same BEGIN/END framing as `stampLogExport` so
+ *  the paste back into chat is greppable, plus the device/install
+ *  block so the analysis can pair the pack against the OTA build
+ *  the player was running. The device/install block is built by
+ *  `aboutSummary.ts`; we ask the caller to pass it in so this
+ *  module stays free of the env-import dependency. */
+export function stampInventoryExport(
+  snapshot: string,
+  deviceSummary: string,
+  playerName?: string,
+): string {
+  const begin = `=== TARTARIA INVENTORY · ${snapshot.length} CHARS · BEGIN ===`;
+  const end = `=== END INVENTORY · ${snapshot.length} CHARS ===`;
+  const header = playerName ? `Tartaria Realms · ${playerName}` : 'Tartaria Realms';
+  return `${begin}\n${snapshot}\n${end}\n\n${header}\n\n${deviceSummary}\n`;
+}

@@ -5,7 +5,7 @@ import * as Updates from 'expo-updates';
 import { useGameStore } from '../state/gameStore';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
-import { buildInventorySnapshot } from '../diagnostics/inventorySnapshot';
+import { buildInventorySnapshot, stampInventoryExport } from '../diagnostics/inventorySnapshot';
 import { NumberStepper } from '../components/NumberStepper';
 import { LoreCodexBody } from '../components/LoreCodexBody';
 import {
@@ -68,6 +68,10 @@ export function AboutScreen() {
   const [logCharCount, setLogCharCount] = useState(0);
   const [logCopied, setLogCopied] = useState(false);
   const [logCleared, setLogCleared] = useState(false);
+  // OTA-203 — dedicated COPY INVENTORY button. Separate from the log
+  // export so the player can choose which one to paste back.
+  const [invCopied, setInvCopied] = useState(false);
+  const [invCharCount, setInvCharCount] = useState(0);
   // v2.4.1 (OTA 053) — chunked-copy cursor for the session log so
   // long sessions (>~25 KB, the silent paste cap on most chat
   // clients) can be sent in parts the way the dead-character log
@@ -88,17 +92,12 @@ export function AboutScreen() {
       // Single-chunk path — old behaviour, single COPIED flash.
       // OTA-101 — stampLogExport bundles the basic device/
       // install summary at the end so the report always carries
-      // build context.
-      // OTA-202 — also bundles the player inventory snapshot so
-      // recurring-theme analysis ("which items hoard", "how much
-      // of the pack is inferred", etc.) has the data inline. Only
-      // for chunk 1 OR single-chunk exports so the snapshot doesn't
-      // duplicate across every chunk of a long log.
-      const player = useGameStore.getState().player;
+      // build context. OTA-203 reverted the OTA-202 inventory
+      // bundling — the inventory snapshot is now exported via a
+      // dedicated COPY INVENTORY button so the log export stays
+      // log-only and the player can choose which one to share.
       if (total <= 1) {
-        const stamped = stampLogExport(fresh, {
-          inventorySnapshot: buildInventorySnapshot(player),
-        });
+        const stamped = stampLogExport(fresh);
         await Clipboard.setStringAsync(stamped);
         setLogCharCount(stamped.length);
         setLogCopied(true);
@@ -112,14 +111,7 @@ export function AboutScreen() {
         }
         const start = (nextIndex - 1) * LOG_CHUNK_SIZE;
         const slice = fresh.slice(start, start + LOG_CHUNK_SIZE);
-        const stamped = stampLogExport(slice, {
-          chunk: { index: nextIndex, total },
-          // Only attach the inventory snapshot to PART 1 of a multi-
-          // chunk export — repeating it across every chunk would
-          // bloat the upload and force the player to re-copy the
-          // same block.
-          inventorySnapshot: nextIndex === 1 ? buildInventorySnapshot(player) : undefined,
-        });
+        const stamped = stampLogExport(slice, { chunk: { index: nextIndex, total } });
         await Clipboard.setStringAsync(stamped);
         setLogCharCount(stamped.length);
         setLogChunk({ lastIndex: nextIndex, total, copiedAt: Date.now() });
@@ -140,6 +132,27 @@ export function AboutScreen() {
         }));
         clearLastLogWriteError();
       }
+    } catch { /* clipboard rarely fails on Android */ }
+  }
+  // OTA-203 — dedicated COPY INVENTORY button. Builds the snapshot
+  // from the live player state, wraps it in the BEGIN/END envelope +
+  // device summary (so the paste is greppable and pairs the pack
+  // against the OTA build), and drops it on the clipboard. Separate
+  // from COPY LOG so the player can share just the pack contents
+  // without a giant log appended.
+  async function handleCopyInventory() {
+    try {
+      const player = useGameStore.getState().player;
+      const snapshot = buildInventorySnapshot(player);
+      const stamped = stampInventoryExport(
+        snapshot,
+        buildBasicDeviceSummary(),
+        player?.name,
+      );
+      await Clipboard.setStringAsync(stamped);
+      setInvCharCount(stamped.length);
+      setInvCopied(true);
+      setTimeout(() => setInvCopied(false), 2500);
     } catch { /* clipboard rarely fails on Android */ }
   }
   async function handleClearLog() {
@@ -558,11 +571,28 @@ export function AboutScreen() {
               </Text>
             </TouchableOpacity>
           </View>
+          {/* OTA-203 — dedicated COPY INVENTORY button. Drops just
+              the player's pack snapshot on the clipboard (rarity,
+              durability, equipped slot, ♥reserved flag, unique stats,
+              tags) so recurring-theme analysis can read the pack
+              without scrolling through a giant log. */}
+          <TouchableOpacity
+            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+            onPress={() => { void handleCopyInventory(); }}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.sessionBtnSecondaryText}>
+              {invCopied ? `✓ ${invCharCount.toLocaleString()} CHARS` : 'COPY INVENTORY'}
+            </Text>
+          </TouchableOpacity>
           <Text style={styles.sessionFootnote}>
             COPY LOG drops the full disk log on the clipboard. Long-press it in the
             in-game menu (or use the LOG screen) for the share + chunked-paste view.
             CLEAR LOG wipes both the on-disk log and the in-memory feed — the next
             log paste-back will contain only the play that follows.
+            COPY INVENTORY drops just your pack contents (one line per item,
+            grouped by kind) so recurring-theme analysis doesn't have to scroll a
+            log.
           </Text>
         </View>
         )}
