@@ -245,6 +245,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Inferred items: stop advertising the synthesizer + live in-session restamp
+
+- **OTA-192 (2026-05-29) · Inferred-item descriptions read like normal flavor; Qwen landings restamp the live inventory.**
+  - **What:** After OTA-191 shipped, the player flagged two things: *"I don't want to advertise field inferred, I want it to just happen. and are you saying if we find an item we have to restart the game to see it's stats?"* Both were real. OTA-191's synthesized descriptions started with "Field-inferred ..." which broke immersion; and a Qwen landing only enriched the in-pack InventoryItem at the next save-load (so SCRAP-button gating, which reads `InventoryItem.tags` via `canScrap`, didn't pick up Qwen-added material tags until restart).
+  - **Fix (no advertising):** All seven "Field-inferred ..." / "pending catalog backfill" description stamps in `itemDefaults.ts` (weapon / armor / accessory / gear default + four classified branches) replaced with neutral catalog-style flavor text — "Edible. Restores a measure of strength when eaten.", "A drink. Restores stamina; some carry a brief buff.", etc. The legacy placeholder regex in `itemBackfill.ts` still recognizes the OLD strings on save-load so pre-OTA-191 entries get swapped on first hydrate.
+  - **Fix (live restamp):** `itemSynthesisCache.ts` gains an `onSynthLanded` listener bus. `setCachedSynth` fires the listeners synchronously after writing. `gameStore.hydrate` registers a listener that walks the live player inventory and calls the new `restampInventoryForName` helper — matching entries get fresh tags + description in place, so a Qwen-added material tag lights up SCRAP the same render the result lands. No reload, no restart.
+  - **Also:** Backfill description policy tightened — catalog hits preserve hand-authored descriptions; inferred items always take the freshest `shape.description` (which already picks up the cache overlay). This closes the loop on Qwen description updates reaching the in-pack item.
+  - **Verification:** +3 tests in `itemBackfillIdempotent` (restampInventoryForName match-and-skip + onSynthLanded listener subscribe/unsubscribe semantics); 36 OTA-191/192 tests green; canary five stays green; `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/engine/itemDefaults.ts` (description strings), `app/engine/itemSynthesisCache.ts` (listener bus), `app/engine/itemBackfill.ts` (source-aware description merge + `restampInventoryForName`), `app/state/gameStore.ts` (onSynthLanded listener registration).
+
 #### Inferred items: balanced stats + USE / EAT / SCRAP coverage (hybrid static + Qwen)
 
 - **OTA-191 (2026-05-29) · Inferred items now ship with effects, scrap tags, and Qwen-backed enrichment.**

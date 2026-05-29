@@ -167,7 +167,7 @@ export function inferWeapon(name: string): CatalogWeapon {
     baseDurability: h.baseDurability,
     defense: h.defense,
     tags: h.tags,
-    description: `Field-inferred from the name. ${h.kind === 'ranged' ? 'A ranged weapon' : h.kind === 'runecaster' ? 'An Aether-channeling focus' : 'A melee weapon'} the catalog doesn't formally track yet — stats are an educated guess from its name.`,
+    description: `${h.kind === 'ranged' ? 'A ranged weapon' : h.kind === 'runecaster' ? 'An Aether-channeling focus' : 'A melee weapon'}, sized for a reclaimer's hand.`,
     ...(effect ? { effect } : {}),
   };
 }
@@ -232,7 +232,7 @@ export function inferArmor(name: string): CatalogArmor | null {
     rarity,
     baseDurability: h.baseDurability,
     tags,
-    description: `Field-inferred from the name. AC and resistances are an educated guess; full properties pending catalog backfill.`,
+    description: `Worn armor, sized for a reclaimer's frame.`,
   };
 }
 
@@ -260,7 +260,7 @@ export function inferAccessory(name: string): CatalogAccessory | null {
     resistances: aether ? ['aetheric'] : [],
     baseDurability: 8,
     tags: [isAmulet ? 'amulet' : 'ring', ...(aether ? ['aether'] : [])],
-    description: `Field-inferred from the name. Effects are a best guess; full stats pending catalog backfill.`,
+    description: `${isAmulet ? 'An amulet' : 'A ring'} carried close to the skin.`,
   };
 }
 
@@ -341,21 +341,21 @@ export function inferGear(name: string, tags: readonly string[] = []): CatalogGe
   const isFungus = /\b(fungus|mushroom|sporecap|shroom|lichen|moss)\b/i.test(name);
   const aether = /\b(aether|aetheric|aetherstone|etheric|ether)\b/i.test(name);
   let kind: CatalogGear['kind'] = 'misc';
-  let description = `Field-inferred from the name. Catalog backfill pending.`;
+  let description = `A reclaimer's find. Useful in the right hands.`;
   let effect: ItemEffect | undefined;
   const rarity: Rarity = aether ? 'Uncommon' : 'Common';
 
   if (isFood) {
     kind = 'consumable';
-    description = 'A field-inferred consumable. The engine balanced its restore values against its rarity tier.';
+    description = 'Edible. Restores a measure of strength when eaten.';
     effect = consumableEffectFor('food', rarity, name);
   } else if (isDrink) {
     kind = 'consumable';
-    description = 'A field-inferred drink. The engine balanced its restore values and any buff against its rarity tier.';
+    description = 'A drink. Restores stamina; some carry a brief buff.';
     effect = consumableEffectFor('drink', rarity, name);
   } else if (isFungus) {
     kind = 'consumable';
-    description = 'A field-inferred fungus. Stamina-leaning; rare specimens may carry a brief insight buff.';
+    description = 'A wild fungus. Restores stamina; rare specimens sharpen the mind for a stretch.';
     effect = consumableEffectFor('fungus', rarity, name);
   } else if (isLight) {
     // Torches are 'relic' kind in the authored catalog (Aetheric Torch).

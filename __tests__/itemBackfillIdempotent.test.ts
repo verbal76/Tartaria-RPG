@@ -22,7 +22,8 @@ jest.mock('@react-native-async-storage/async-storage', () => {
   };
 });
 
-import { restampInventory, restampInventoryItem } from '../app/engine/itemBackfill';
+import { restampInventory, restampInventoryItem, restampInventoryForName } from '../app/engine/itemBackfill';
+import { setCachedSynth, onSynthLanded, _resetCacheForTests } from '../app/engine/itemSynthesisCache';
 import type { InventoryItem } from '../app/engine/types';
 
 function preOtaItem(name: string, kind: InventoryItem['kind']): InventoryItem {
@@ -89,6 +90,48 @@ describe('OTA-191 itemBackfill — restamps pre-OTA inventory items', () => {
     expect(after.durability).toEqual({ current: 5, max: 10 });
     // Tags from inference STILL merge in.
     expect(after.tags).toContain('metal');
+  });
+
+  it('OTA-192 — restampInventoryForName updates only matching entries', () => {
+    const inv: InventoryItem[] = [
+      preOtaItem("Reclaimer's Cord", 'misc'),
+      preOtaItem('Bone Torch', 'misc'),
+    ];
+    const { inventory, changed } = restampInventoryForName(inv, "RECLAIMER'S CORD");
+    expect(changed).toBe(true);
+    expect(inventory[0]?.tags).toContain('fiber');
+    // The unrelated entry is untouched (same reference).
+    expect(inventory[1]).toBe(inv[1]);
+  });
+
+  it('OTA-192 — restampInventoryForName signals no-change for absent names', () => {
+    const inv: InventoryItem[] = [preOtaItem('Wooden Spoon', 'misc')];
+    const { changed } = restampInventoryForName(inv, 'Aetheric Plate');
+    expect(changed).toBe(false);
+  });
+
+  it('OTA-192 — Qwen cache landing fires onSynthLanded with the new entry', () => {
+    _resetCacheForTests();
+    const calls: Array<{ name: string; description?: string }> = [];
+    const unsub = onSynthLanded((name, entry) => {
+      calls.push({ name, description: entry.description });
+    });
+    setCachedSynth('Whisper Marrow', {
+      name: 'whisper marrow',
+      synthesizedAt: Date.now(),
+      description: 'A pale length of sinew.',
+    });
+    expect(calls).toHaveLength(1);
+    expect(calls[0]?.name).toBe('whisper marrow');
+    expect(calls[0]?.description).toBe('A pale length of sinew.');
+    unsub();
+    // After unsubscribe, the listener is silent.
+    setCachedSynth('Whisper Marrow', {
+      name: 'whisper marrow',
+      synthesizedAt: Date.now(),
+      description: 'Updated.',
+    });
+    expect(calls).toHaveLength(1);
   });
 
   it('restampInventory walks the full array', () => {

@@ -1505,6 +1505,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
         });
       }
     } catch { /* ignore — synth opt-in */ }
+
+    // OTA-192 — live in-session restamp. When a Qwen synthesis lands
+    // for an item the player already holds, the cache-merge in
+    // inferGear updates future lookups, but the InventoryItem stored
+    // on the player keeps its old tags + description until the next
+    // save-load. That meant a Qwen correction (e.g., extra material
+    // tag that lights up SCRAP) only took effect after restart. We
+    // listen for cache writes and re-stamp the matching entries in
+    // place so the inventory screen reflects the upgrade immediately.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const synthCache = require('../engine/itemSynthesisCache');
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const backfill = require('../engine/itemBackfill');
+      if (typeof synthCache.onSynthLanded === 'function'
+        && typeof backfill.restampInventoryForName === 'function') {
+        synthCache.onSynthLanded((name: string) => {
+          const p = get().player;
+          if (!p) return;
+          const { inventory, changed } = backfill.restampInventoryForName(
+            p.inventory,
+            name,
+          );
+          if (!changed) return;
+          set((s) => s.player ? { player: { ...s.player, inventory } } : s);
+        });
+      }
+    } catch { /* ignore — listener wire-up is opt-in */ }
+
     // Just-updated detection. checkAndApplyOTA → Updates.reloadAsync
     // can yank the app to a new bundle mid-stride and reading the
     // result feels like a crash. Compare current OTA_BUILD_ID against

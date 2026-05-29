@@ -5748,4 +5748,87 @@
 // (cache load + Qwen
 // requester wire-up +
 // backfillPlayer restamp).
-export const OTA_BUILD_ID = '2026-05-29-191';
+// 2026-05-29-192 — inferred
+// items: stop advertising
+// "field-inferred" + live
+// in-session restamp on Qwen
+// landings. Player asks:
+//   "I don't want to advertise
+//   field inferred, I want
+//   it to just happen. and
+//   are you saying if we
+//   find an item we have to
+//   restart the game to see
+//   it's stats?"
+//
+// Two surgical fixes:
+//
+// (1) All seven "Field-
+//     inferred" / "pending
+//     catalog backfill"
+//     description stamps in
+//     itemDefaults.ts replaced
+//     with neutral catalog-
+//     style flavor text
+//     ("Edible. Restores a
+//     measure of strength
+//     when eaten.", etc.).
+//     The legacy placeholder
+//     regex in itemBackfill.ts
+//     still recognizes the OLD
+//     strings on save-load so
+//     pre-OTA-191 entries get
+//     swapped on first hydrate.
+//
+// (2) itemSynthesisCache
+//     gains an onSynthLanded
+//     listener bus. When Qwen
+//     finishes a synthesis,
+//     setCachedSynth fires the
+//     listeners synchronously.
+//     gameStore.hydrate
+//     registers a listener
+//     that walks the live
+//     player inventory and
+//     calls the new
+//     restampInventoryForName
+//     helper — any matching
+//     entries get fresh tags
+//     + description IN
+//     PLACE, so the SCRAP
+//     button (gated on
+//     InventoryItem.tags via
+//     canScrap) lights up the
+//     same render as the
+//     Qwen result lands. No
+//     reload, no restart.
+//
+// Backfill description policy
+// tightened: catalog hits
+// preserve hand-authored
+// descriptions; inferred
+// items always take the
+// freshest shape.description
+// (which picks up the cache
+// overlay).
+//
+// Tests: +3 in
+// itemBackfillIdempotent
+// (restampInventoryForName
+// match-and-skip + onSynth
+// Landed listener semantics).
+// Canary five stays green,
+// app-side TS clean.
+//
+// Files: app/engine/
+// itemDefaults.ts (description
+// strings), app/engine/
+// itemSynthesisCache.ts
+// (listener bus), app/engine/
+// itemBackfill.ts (source-
+// aware description merge +
+// restampInventoryForName),
+// app/state/gameStore.ts
+// (onSynthLanded listener
+// registration).
+export const OTA_BUILD_ID = '2026-05-29-192';

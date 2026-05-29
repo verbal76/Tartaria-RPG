@@ -107,13 +107,27 @@ export function getCachedSynth(name: string): SynthesizedItem | null {
   return STATE.entries.get(k) ?? null;
 }
 
+// OTA-192 — listener registry so callers (gameStore) can react when a
+// Qwen synthesis lands and live-restamp matching inventory entries.
+// Without this, a player who picks up an unrecognized item has to
+// reload the save to see Qwen's enriched tags + description take
+// effect. The listener fires synchronously after setCachedSynth
+// writes; persistence to AsyncStorage stays fire-and-forget.
+type SynthListener = (name: string, entry: SynthesizedItem) => void;
+const LISTENERS = new Set<SynthListener>();
+export function onSynthLanded(fn: SynthListener): () => void {
+  LISTENERS.add(fn);
+  return () => LISTENERS.delete(fn);
+}
+
 /** Insert / update a synthesized stat row + persist. LRU eviction
  *  drops the oldest entry by `synthesizedAt` when the cache exceeds
  *  MAX_ENTRIES. Persistence is fire-and-forget — we don't await the
  *  AsyncStorage write so synthesis can return immediately. */
 export function setCachedSynth(name: string, stats: SynthesizedItem): void {
   const k = name.toLowerCase();
-  STATE.entries.set(k, { ...stats, name: k });
+  const entry = { ...stats, name: k };
+  STATE.entries.set(k, entry);
   if (STATE.entries.size > MAX_ENTRIES) {
     // LRU eviction by synthesizedAt — oldest goes first.
     let oldestKey: string | null = null;
@@ -127,6 +141,11 @@ export function setCachedSynth(name: string, stats: SynthesizedItem): void {
     if (oldestKey) STATE.entries.delete(oldestKey);
   }
   void persistCache();
+  // Notify listeners last so they see the canonical entry from the
+  // cache. Failures in one listener don't block the others.
+  for (const fn of LISTENERS) {
+    try { fn(k, entry); } catch { /* swallow */ }
+  }
 }
 
 async function persistCache(): Promise<void> {
