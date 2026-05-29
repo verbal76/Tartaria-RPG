@@ -245,6 +245,15 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Playtest log cleanup: inferred-stats spam silenced + pet/scratch verbs routed
+
+- **OTA-196 (2026-05-29) · Two playtest-log bugs fixed in one push.**
+  - **What:** Player's 2026-05-29 session log surfaced two issues. (1) The `[debug] inferred-stats: gear:Mud Cloth — engine guessed stats; add catalog row when convenient.` line was still firing in the player's log feed every session-start — a leftover from before OTA-192's "stop advertising field-inferred" rule, just routed through `setOnInferred → appendLog('debug', ...)` instead of the description path. (2) `pet Rocky` and `scratch Rocky` both returned `parser: intent=unknown`; the parser had no entries for those verbs, and the noun resolver substring-matched `pet` against `petrified` on the scene's feature list ("shattered petrified mud wave"), producing the irrelevant arbiter line *"Your disease sample is still there, if it suits the moment."*
+  - **Fix (1):** Re-routed the `setOnInferred` hook in `gameStore.hydrate` from `appendLog('debug', ...)` to `console.log('[Tartaria][inferred-stats] ${label}')`. The information is still useful for catalog backfill (visible via `adb logcat` / dev tools), just no longer in the player's in-game feed.
+  - **Fix (2):** Added a top-of-`submitPlayerAction` short-circuit alongside the OTA-195 `fuse` handler. `^(pet|scratch|pat|nuzzle)(\s|$)/i` matches the leading token (so `petrify` / `petrified` can't trigger) and routes to the existing `selectCallDogOption('scratch')` flow when the player has a live dog (+2 loyalty + a warm world-channel line). If no dog is present the arbiter answers *"No dog at your side, friend."*
+  - **Verification:** +6 tests in `petScratchVerbRouting` (loyalty boost for all 4 synonyms, no-dog refusal, `petrify` non-trigger). The OTA-158 `dogVerbTypoTolerance` + `parserFuzzWithDogVerbs` + OTA-195 `itemFusionEngine` + OTA-193 `craftTagSubstitution` suites stay green. `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/state/gameStore.ts` (setOnInferred reroute + pet/scratch short-circuit).
+
 #### Fusion bench: random travel encounter that mints unique items from reserved inferred pile
 
 - **OTA-195 (2026-05-29) · Reclaimer's Fusing Crucible — a rare travel encounter that fuses reserved inferred items into a one-of-a-kind weapon, armor piece, or dog vest via Qwen.**

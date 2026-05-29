@@ -1462,14 +1462,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Item-defaults inference flag. The engine falls back to
     // synthesized stats whenever an inventory item has no catalog
     // row (Mud-Rend Blade, Aetheric Locket, Golemstone Stabilizer,
-    // etc.). Each unique inferred item name fires ONE debug-channel
-    // log line so a future log capture can drive catalog backfill.
+    // OTA-196 — silence the inferred-stats debug spam. OTA-192 stopped
+    // advertising "field-inferred" in user-facing descriptions, but the
+    // setOnInferred hook was still pushing a debug-channel log line
+    // every time an unknown name was synthesized. The player saw
+    // `[debug] inferred-stats: gear:Mud Cloth — engine guessed stats`
+    // in their feed on every render of those items. The information
+    // is still useful for backfill, so we route it to console.log
+    // (visible in dev tools / `adb logcat`) instead of appendLog.
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const itemDefaults = require('../engine/itemDefaults');
       if (typeof itemDefaults.setOnInferred === 'function') {
         itemDefaults.setOnInferred((label: string) => {
-          try { get().appendLog('debug', `inferred-stats: ${label} — engine guessed stats; add catalog row when convenient.`); } catch { /* ignore */ }
+          try { console.log(`[Tartaria][inferred-stats] ${label}`); } catch { /* ignore */ }
         });
       }
     } catch { /* ignore — module is small + always present */ }
@@ -3643,6 +3649,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (/^fuse(\s|$)/i.test(trimmed)) {
       if (!_opts?.silent) get().appendLog('player', trimmed);
       void get().fuseAtCrucible();
+      return;
+    }
+
+    // OTA-196 — pet / scratch / pat <dog>. Playtest log:
+    //   [player] pet Rocky → parser: intent=unknown
+    //   [player] scratch Rocky → parser: intent=unknown (totally
+    //   irrelevant arbiter fallback about a "disease sample")
+    // 'pet' / 'scratch' / 'pat' / 'nuzzle' route directly to the
+    // existing selectCallDogOption('scratch') flow when a dog is
+    // present. Short-circuited to avoid the parser substring-matching
+    // 'pet' against 'petrified' on the scene's feature list.
+    if (/^(pet|scratch|pat|nuzzle)(\s|$)/i.test(trimmed)) {
+      const p = get().player;
+      const dog = p?.dog;
+      if (!dog || dog.status === 'abandoned' || dog.status === 'dead') {
+        if (!_opts?.silent) get().appendLog('player', trimmed);
+        get().appendLog(
+          'arbiter',
+          `The Arbiter glances at the empty space at your knee. "No dog at your side, friend."`,
+        );
+        return;
+      }
+      if (!_opts?.silent) get().appendLog('player', trimmed);
+      get().selectCallDogOption('scratch');
       return;
     }
 

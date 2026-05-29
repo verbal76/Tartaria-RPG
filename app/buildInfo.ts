@@ -6138,4 +6138,81 @@
 // screens/InventoryScreen.tsx
 // (uses getItemPreviewFor
 // Instance).
-export const OTA_BUILD_ID = '2026-05-29-195';
+// 2026-05-29-196 — playtest
+// log cleanup: silence the
+// inferred-stats debug spam +
+// route pet/scratch/pat/
+// nuzzle to the dog. Two
+// bugs surfaced from the
+// 2026-05-29 playtest log:
+//
+// (1) inferred-stats noise.
+//     OTA-192 stopped using
+//     "Field-inferred" in
+//     user-facing descriptions
+//     but the setOnInferred
+//     hook in gameStore.hydrate
+//     still pushed a debug-
+//     channel log line every
+//     time an unknown name was
+//     synthesized. Playtester
+//     saw
+//       [debug] inferred-stats:
+//       gear:Mud Cloth — engine
+//       guessed stats; add
+//       catalog row when
+//       convenient.
+//     in their feed every
+//     session-start. Re-routed
+//     the hook to console.log
+//     (visible via adb logcat
+//     / dev tools, hidden from
+//     the in-game log).
+//
+// (2) pet/scratch Rocky
+//     parser fail. Same log:
+//       [player] pet Rocky →
+//       parser: intent=unknown
+//       conf=0.10 resolved=
+//       shattered petrified
+//       mud wave
+//       [player] scratch Rocky →
+//       intent=unknown +
+//       arbiter babbling about
+//       a "disease sample"
+//     Neither verb existed in
+//     parser.ts; 'pet' even
+//     substring-matched
+//     'petrified' on the
+//     scene's feature list.
+//     Added a top-of-
+//     submitPlayerAction
+//     short-circuit (alongside
+//     'fuse'): /^(pet|scratch|
+//     pat|nuzzle)(\s|$)/i
+//     routes to
+//     selectCallDogOption
+//     ('scratch') when a live
+//     dog is present, otherwise
+//     refuses with "No dog at
+//     your side, friend." The
+//     leading-token regex
+//     guarantees 'petrify' /
+//     'petrified' don't
+//     trigger the path.
+//
+// Tests: +6 in petScratchVerb
+// Routing covering loyalty
+// boost, all four synonyms,
+// no-dog refusal, and the
+// petrify/petrified
+// non-trigger. dogVerb /
+// parserFuzz / itemFusion /
+// craftTagSubstitution stay
+// green. App-side TS clean.
+//
+// Files: app/state/
+// gameStore.ts (setOnInferred
+// reroute + pet/scratch
+// short-circuit).
+export const OTA_BUILD_ID = '2026-05-29-196';
