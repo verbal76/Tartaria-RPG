@@ -5,6 +5,7 @@ import * as Updates from 'expo-updates';
 import { useGameStore } from '../state/gameStore';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
+import { buildInventorySnapshot } from '../diagnostics/inventorySnapshot';
 import { NumberStepper } from '../components/NumberStepper';
 import { LoreCodexBody } from '../components/LoreCodexBody';
 import {
@@ -88,8 +89,16 @@ export function AboutScreen() {
       // OTA-101 — stampLogExport bundles the basic device/
       // install summary at the end so the report always carries
       // build context.
+      // OTA-202 — also bundles the player inventory snapshot so
+      // recurring-theme analysis ("which items hoard", "how much
+      // of the pack is inferred", etc.) has the data inline. Only
+      // for chunk 1 OR single-chunk exports so the snapshot doesn't
+      // duplicate across every chunk of a long log.
+      const player = useGameStore.getState().player;
       if (total <= 1) {
-        const stamped = stampLogExport(fresh);
+        const stamped = stampLogExport(fresh, {
+          inventorySnapshot: buildInventorySnapshot(player),
+        });
         await Clipboard.setStringAsync(stamped);
         setLogCharCount(stamped.length);
         setLogCopied(true);
@@ -103,7 +112,14 @@ export function AboutScreen() {
         }
         const start = (nextIndex - 1) * LOG_CHUNK_SIZE;
         const slice = fresh.slice(start, start + LOG_CHUNK_SIZE);
-        const stamped = stampLogExport(slice, { chunk: { index: nextIndex, total } });
+        const stamped = stampLogExport(slice, {
+          chunk: { index: nextIndex, total },
+          // Only attach the inventory snapshot to PART 1 of a multi-
+          // chunk export — repeating it across every chunk would
+          // bloat the upload and force the player to re-copy the
+          // same block.
+          inventorySnapshot: nextIndex === 1 ? buildInventorySnapshot(player) : undefined,
+        });
         await Clipboard.setStringAsync(stamped);
         setLogCharCount(stamped.length);
         setLogChunk({ lastIndex: nextIndex, total, copiedAt: Date.now() });

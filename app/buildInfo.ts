@@ -6690,4 +6690,81 @@
 // app/state/gameStore.ts
 // (useInventoryItem gate-
 // effect routing).
-export const OTA_BUILD_ID = '2026-05-29-201';
+// 2026-05-29-202 — COPY LOG
+// in the SESSION tab now
+// bundles a full inventory
+// snapshot at the bottom of
+// the export. Player ask:
+//   "is there a way to copy
+//   an inventory log showing
+//   all items on my inventory
+//   from the log copy screen
+//   in the session tab so
+//   you can check for
+//   recurring themes"
+//
+// New module:
+// app/diagnostics/inventory
+// Snapshot.ts builds a
+// compact line-oriented dump
+// grouped by InventoryItem
+// kind (Weapons / Armor /
+// Dog Armor / Relics /
+// Runecasters / Consumables
+// / Materials & Misc), each
+// bucket alphabetically
+// sorted. Per-instance
+// metadata surfaced inline:
+//   - quantity, rarity (when
+//     not Common)
+//   - durability (current/max)
+//   - equipped slot
+//   - stolen / ♥reserved
+//     flags
+//   - uniqueStats (dmg dice,
+//     damage type, AC, resist,
+//     'unique' marker)
+//   - top 5 tags per item
+//
+// Header line surfaces HP /
+// stamina / TC / corruption +
+// dog status when one is
+// with the player.
+//
+// stampLogExport in
+// aboutSummary.ts gains an
+// optional inventorySnapshot
+// field on StampLogOptions;
+// when set, appended after
+// the device/install header.
+// AboutScreen's handleCopy
+// Log builds the snapshot via
+// useGameStore.getState().
+// player and passes it in.
+// For multipart exports the
+// snapshot ONLY rides PART 1
+// (chunks 2+ exclude it to
+// avoid bloating the upload
+// + forcing the player to
+// re-copy the same block).
+//
+// Tests: +6 in
+// inventorySnapshot
+// (null player, empty pack,
+// grouping + alphabetical
+// sort, per-instance
+// metadata surface, header
+// stats, dog line).
+// Regression sweep stays
+// green; TS clean.
+//
+// Files: app/diagnostics/
+// inventorySnapshot.ts (NEW),
+// app/diagnostics/
+// aboutSummary.ts (stampLog
+// Export gains
+// inventorySnapshot opt),
+// app/screens/AboutScreen.tsx
+// (passes the snapshot to
+// stampLogExport on PART 1).
+export const OTA_BUILD_ID = '2026-05-29-202';

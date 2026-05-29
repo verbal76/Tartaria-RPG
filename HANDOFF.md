@@ -245,6 +245,14 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### COPY LOG now bundles an inventory snapshot
+
+- **OTA-202 (2026-05-29) · SESSION tab's COPY LOG export carries a full pack dump for recurring-theme analysis.**
+  - **What:** Player ask: *"is there a way to copy an inventory log showing all items on my inventory from the log copy screen in the session tab so you can check for recurring themes."* Pre-OTA the export carried log entries + the device/install header but no inventory; pattern analysis ("which materials accumulate, which items stay reserved, what the inferred-item population looks like") had to be reconstructed from log lines.
+  - **Fix:** New `app/diagnostics/inventorySnapshot.ts` builds a compact line-oriented dump grouped by InventoryItem kind (Weapons / Armor / Dog Armor / Relics / Runecasters / Consumables / Materials & Misc), each bucket alphabetically sorted. Per-instance metadata inline: quantity, rarity (when not Common), durability, equipped slot, stolen + ♥reserved flags, uniqueStats (damage dice + type + AC + resistance + 'unique' marker), top 5 tags. Header line surfaces HP / stamina / TC / corruption + dog status. `stampLogExport` in `aboutSummary.ts` gains an `inventorySnapshot` option appended after the device/install block. AboutScreen's `handleCopyLog` builds the snapshot via `useGameStore.getState().player` and passes it in. For multipart exports the snapshot only rides PART 1 to avoid bloating chunks 2+.
+  - **Verification:** +6 tests in `inventorySnapshot` (null player, empty pack, grouping + alphabetical sort, per-instance metadata surface, header stats, dog line). Regression sweep stays green; `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/diagnostics/inventorySnapshot.ts` (NEW), `app/diagnostics/aboutSummary.ts` (stampLogExport gains inventorySnapshot opt), `app/screens/AboutScreen.tsx` (passes the snapshot to stampLogExport on PART 1).
+
 #### Aetheric Torch + Vision Lens USE button finally appears
 
 - **OTA-201 (2026-05-29) · USE button shows for items with authored effects regardless of inventory kind.**
