@@ -5163,4 +5163,79 @@
 // app/state/gameStore.ts (low-HP
 // line + arbiterAddress helper +
 // welcome-back use + low-HP use).
-export const OTA_BUILD_ID = '2026-05-29-184';
+//
+// 2026-05-29 OTA-185 — Roadfire
+// Reclaimer is a real vendor now
+// (broken-promise hook fixed).
+//
+// Playtest log: player followed
+// the smoke hook to stage 1, got
+// the "Sit. Trade if you want. I
+// have heard of a hollow..." line.
+// Tried `sit with the reclaimer`
+// (intent=unknown) → Arbiter
+// fallback. Next `investigate
+// smoke` advanced to stage 2 ("you
+// and the Reclaimer part ways,
+// +25 TC"). Player: "thought I was
+// going to hang out with a
+// reclaimer. guess I can't have
+// friends..."
+//
+// Hook narration promised trade,
+// engine had no path to it. Same
+// broken-promise class as the
+// "rotate the ring" / "knock on
+// the steeple" puzzles OTA-129
+// closed for sequence hooks.
+//
+// Fix:
+//   • New HookEffect type
+//     `spawn_vendor` with a
+//     HookVendorSpec payload
+//     (id / name / title /
+//     faction / description /
+//     offers / demeanor).
+//   • applyHookEffect dispatch
+//     attaches the vendor to
+//     currentScene.vendor when
+//     no vendor is already
+//     present. ExplorationScreen
+//     already renders the vendor
+//     banner from
+//     currentScene.vendor, so
+//     this surfaces immediately
+//     — tap → normal vendor
+//     flow.
+//   • smoke chain stage 1 now
+//     emits a spawn_vendor effect
+//     alongside the existing
+//     memo. Vendor is "Roadfire
+//     Reclaimer" with 6 offers:
+//     Climbing Rope (30 TC —
+//     OTA-178's canonical climb-
+//     gate item), Trail Rations
+//     (12 TC), Aetheric Torch
+//     (35 TC), Aether Dust (10
+//     TC), Bone Sliver (6 TC),
+//     Worn Tartarian Coin (4
+//     TC). Demeanor honest so
+//     the steal DC isn't
+//     overtuned.
+//
+// Stage 2 "part ways" beat
+// unchanged — fires on the next
+// `investigate smoke` after
+// trading, with the same +25 TC
+// payout for the directions.
+//
+// TS clean.
+//
+// Files: app/engine/hooks.ts
+// (HookEffect spawn_vendor +
+// HookVendorSpec interface +
+// smoke chain stage 1 effects),
+// app/state/gameStore.ts
+// (applyHookEffect spawn_vendor
+// dispatch).
+export const OTA_BUILD_ID = '2026-05-29-185';

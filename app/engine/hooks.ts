@@ -175,7 +175,27 @@ export type HookEffect =
   | { type: 'unlock_location'; locationId: string }
   | { type: 'rep_change'; factionId: string; amount: number }
   | { type: 'advance_time'; hours: number }
-  | { type: 'memo'; text: string };
+  | { type: 'memo'; text: string }
+  // OTA-185 — spawn a temporary vendor into the current scene.
+  // Used by friendly-encounter hooks (campfire Reclaimer, road
+  // priest, etc.) so the narration's "trade if you want" promise
+  // is actually backed by an interaction. Vendor lives until the
+  // scene refreshes or the hook advances.
+  | { type: 'spawn_vendor'; vendor: HookVendorSpec };
+
+// OTA-185 — minimal vendor-spec for hook-spawned traders. Mirrors
+// the VendorInstance fields the engine needs to render + serve a
+// vendor banner without round-tripping through the data/vendors
+// JSON catalog.
+export interface HookVendorSpec {
+  id: string;
+  name: string;
+  title: string;
+  faction: string | null;
+  description: string;
+  offers: { itemName: string; price: number }[];
+  demeanor?: 'honest' | 'sketchy';
+}
 
 const CHAINS: Record<HookKind, HookOutcome[]> = {
   smoke: [
@@ -188,7 +208,37 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
     },
     {
       line: 'The figure looks up. A Reclaimer, mud to the knees, pack half-emptied. They wave you in. "Sit. Trade if you want. I have heard of a hollow two ridges over — old Tartarian work, no Sentinels."',
-      effects: [{ type: 'memo', text: 'A Reclaimer at a roadside fire spoke of an unmapped hollow two ridges over.' }],
+      // OTA-185 — Reclaimer now spawns as a real roadside vendor so
+      // the "Sit. Trade if you want." line isn't a broken promise.
+      // Player ask after a playtest of this beat: "thought I was
+      // going to hang out with a reclaimer. guess I can't have
+      // friends..." Fixed. Tap the vendor banner that appears on
+      // the scene → normal vendor flow (buy / sell / dismiss). The
+      // 6 items skew Reclaimer-flavored utility — Climbing Rope is
+      // here on purpose since OTA-178 made it the canonical climb-
+      // gate item to keep stocked.
+      effects: [
+        { type: 'memo', text: 'A Reclaimer at a roadside fire spoke of an unmapped hollow two ridges over.' },
+        {
+          type: 'spawn_vendor',
+          vendor: {
+            id: 'roadfire_reclaimer',
+            name: 'Roadfire Reclaimer',
+            title: 'Trader on the road',
+            faction: 'reclaimers_guild',
+            description: 'Sits the fire low, doesn\'t look up much. Holds out what they have one item at a time.',
+            demeanor: 'honest',
+            offers: [
+              { itemName: 'Climbing Rope', price: 30 },
+              { itemName: 'Trail Rations', price: 12 },
+              { itemName: 'Aetheric Torch', price: 35 },
+              { itemName: 'Aether Dust', price: 10 },
+              { itemName: 'Bone Sliver', price: 6 },
+              { itemName: 'Worn Tartarian Coin', price: 4 },
+            ],
+          },
+        },
+      ],
       done: false,
       addNouns: ['reclaimer', 'figure', 'stranger', 'them', 'they'],
       nextChain: { kind: 'arch', chainId: 'reclaimer_hollow' },

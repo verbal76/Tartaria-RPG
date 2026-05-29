@@ -15086,6 +15086,35 @@ function applyHookEffect(
       }));
       return { inlineSummary: null, fatal: false };
     }
+    // OTA-185 — attach a hook-spawned vendor to the current scene.
+    // Friendly-encounter hooks (campfire Reclaimer is the first
+    // user) emit this so the narration's "trade if you want"
+    // promise actually has a UI surface — vendor banner appears,
+    // tap to enter normal vendor flow. Skipped when no scene
+    // exists or a vendor's already in place (no double-spawn). The
+    // ExplorationScreen vendor banner picks it up by reading
+    // currentScene.vendor.
+    case 'spawn_vendor': {
+      set((s) => {
+        if (!s.currentScene) return s;
+        if (s.currentScene.vendor) return s;
+        return {
+          currentScene: {
+            ...s.currentScene,
+            vendor: {
+              id: effect.vendor.id,
+              name: effect.vendor.name,
+              title: effect.vendor.title,
+              faction: effect.vendor.faction,
+              description: effect.vendor.description,
+              offers: [...effect.vendor.offers],
+              demeanor: effect.vendor.demeanor,
+            },
+          },
+        };
+      });
+      return { inlineSummary: `${effect.vendor.name} sits by the fire — tap to trade.`, fatal: false };
+    }
   }
 }
 
