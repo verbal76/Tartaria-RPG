@@ -91,3 +91,40 @@ log`. That works but it's slow and error-prone — agents
 will sometimes propose fixes that resurrect old bugs because
 they didn't grep deep enough. The Open/Closed structure makes
 the state of the world legible at a glance.
+
+## Inventory snapshot triage
+
+Whenever the user pastes a COPY INVENTORY export — recognizable
+by the `=== TARTARIA INVENTORY · N CHARS · BEGIN ===` envelope
+from `app/diagnostics/inventorySnapshot.ts` — automatically run
+a triage pass before any other reply:
+
+1. **Scan each `actions:` line for gaps.** Flag items that
+   should be usable/equippable but show `drop` only (or `scrap,
+   drop` for items whose descriptions imply more).
+2. **Cross-reference catalog rows.** For any flagged item, grep
+   `app/data/items/*.json` and check whether the description
+   implies a mechanic the catalog row doesn't carry — missing
+   `effect`, missing `throwable` tag, missing slot routing,
+   etc. (See OTA-209's Sentinel Core Plate fix as the model.)
+3. **Check the ◆ markers.** Inferred items in the snapshot are
+   prefixed with ◆ (per OTA-204). Note which ones are reserved
+   for fusion (`♥reserved`) and whether the player is close to
+   the fusion gate (≥3 reserved spanning ≥3 distinct material
+   tags per OTA-195).
+4. **Equipment durability.** Surface anything below 25% with a
+   repair cost calculation, accounting for OTA-205's substitute
+   materials.
+5. **Recurring themes.** Group findings by category — catalog
+   gaps, balance flags, UX opportunities — and prioritize:
+   ship the small hand-authored fixes; flag engine-verb gaps
+   without building speculative infrastructure.
+6. **Report findings before asking what to do.** Give a
+   concrete list ("Item X has gap Y → OTA-NNN candidate"),
+   then ask which to ship. Don't wait for the user to ask the
+   triage question.
+
+The snapshot was built specifically so this triage is mechanical
+(OTA-202 → 203 → 204 → 206 → 208 progression). Treat every paste
+as a request for it, even when the user just says "here's a fresh
+one." If they don't want triage, they'll say so.
