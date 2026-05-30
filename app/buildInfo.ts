@@ -202,4 +202,18 @@
 // 067 as the floor and re-picked 068 → collision. Synced those four
 // refs to the true floor and clarified that 067 was the last feature
 // OTA while 068/069 are docs-only. No behavior change.
-export const OTA_BUILD_ID = '2026-05-30-069';
+//
+// 2026-05-30 OTA-070 — two surgical regression fixes on the dev branch.
+//   (1) ExplorationScreen settings gear moved back to the BOTTOM-right
+//       of the enemy block (it had drifted to top-right in OTA-048).
+//       Single style flip top:4 → bottom:4 on `cornerGear`; bottom-
+//       right keeps the enemy name + range tag readable.
+//   (2) TitleScreen footer restored to the centered layout: a thank-you
+//       line, a centered three-button action row (INVITE PLAYTESTER /
+//       REPORT BUG / EXIT GAME), then the build line on its own centered
+//       row below — was a left-text + two-right-buttons row mushed into
+//       the bottom corners. INVITE PLAYTESTER is a new button (new file
+//       InvitePlaytesterModal.tsx) that collects a friend's Gmail and
+//       opens a mailto to hotatticgames@gmail.com for whitelisting.
+//       OTA-safe: mailto via the already-imported Linking, no native.
+export const OTA_BUILD_ID = '2026-05-30-070';

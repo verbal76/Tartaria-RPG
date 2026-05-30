@@ -292,14 +292,11 @@ export function ExplorationScreen() {
           ) : (
             <CrestPlaceholder />
           )}
-          {/* v2.4.1 (OTA 048) — gear icon overlaid in the top-right
-              corner of the right column. Replaces the bottom-row
-              gear, which was the only thing left there after the
-              session controls moved into the gear screen. The gear
-              floats over whichever right-col content is showing
-              (EnemyPanel or CrestPlaceholder). EnemyCard's `head`
-              style reserves right-padding so the range tag types
-              AROUND the gear instead of being clipped. */}
+          {/* OTA-070 — gear icon overlaid in the bottom-right corner
+              of the right column (regression fix: it had drifted to
+              the top-right). The gear floats over whichever right-col
+              content is showing (EnemyPanel or CrestPlaceholder);
+              bottom-right keeps the enemy name + range tag readable. */}
           <TouchableOpacity
             onPress={() => setScreen('about')}
             hitSlop={8}
@@ -838,15 +835,16 @@ const styles = StyleSheet.create({
   topRow: { flexDirection: 'row', gap: 6, minHeight: 165 },
   statsCol: { flex: 1.2 },
   rightCol: { flex: 1, position: 'relative' },
-  // v2.4.1 (OTA 048) — gear icon floats over the top-right corner
-  // of the right column (EnemyPanel or CrestPlaceholder). 32×32
-  // hit area, semi-transparent backdrop so it stays legible on top
-  // of either content. EnemyCard's `head` style reserves
-  // paddingRight so the range tag types around the gear instead of
-  // being clipped.
+  // OTA-070 — gear icon floats over the bottom-right corner of the
+  // right column (EnemyPanel or CrestPlaceholder), restoring the
+  // playtester-requested placement: "move the settings gear from the
+  // top right of the enemy box to the bottom right of the enemy box."
+  // Bottom-right keeps the enemy name + range tag (top of the card)
+  // clear. 32×32 hit area, semi-transparent backdrop so it stays
+  // legible on top of either content.
   cornerGear: {
     position: 'absolute',
-    top: 4,
+    bottom: 4,
     right: 4,
     width: 32,
     height: 32,
