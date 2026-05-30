@@ -2993,6 +2993,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     } catch { /* voice modules not present in tests */ }
     set({ currentScene: scene, pendingRolls: null });
+    // OTA-244 — danger-vs-tier warning. Player playtest: ate a
+    // Mud Giant (Legendary, 360 HP) rest-ambush in Asgardar
+    // (danger 5) at 48 HP. OTA-243 capped the ambush picker by
+    // hpMax. This OTA adds the Arbiter warning so the player
+    // KNOWS they're in too-dangerous territory before resting
+    // again, and gets a concrete pointer toward safer ground.
+    // Fires once per location per character (tracked in
+    // worldMemory.dangerWarnedLocations). Threshold maps player
+    // hpMax to safe danger ceiling — same brackets as the
+    // pickEnemyForLocationGuaranteed cap.
+    if (player) {
+      const loc = scene.location;
+      const danger = loc?.danger ?? 0;
+      const hpMax = player.hpMax ?? 0;
+      const playerCap = hpMax < 60 ? 1 : hpMax < 100 ? 2 : hpMax < 140 ? 3 : 5;
+      if (loc && danger >= 4 && playerCap < danger) {
+        const warned = get().worldMemory.dangerWarnedLocations ?? [];
+        if (!warned.includes(loc.id)) {
+          set((s) => ({
+            worldMemory: {
+              ...s.worldMemory,
+              dangerWarnedLocations: [...warned, loc.id],
+            },
+          }));
+          const tierLabel = ['', 'unsafe', 'edgy', 'dangerous', 'lethal', 'lethal'][danger] ?? 'lethal';
+          get().appendLog(
+            'arbiter',
+            `The Arbiter takes you in. "${loc.name} is ${tierLabel} country — the things that wake here pull above your weight. ${hpMax} HP carries you through the Outskirts (danger 2) or the Mud Seas (danger 2). Start the main quest before you camp here again, or move on until you've got your legs under you."`,
+          );
+        }
+      }
+    }
     // 2026-05-26 OTA-071 — seed the per-room investigation
     // table from the scene's ambientNouns. Idempotent: only
     // seeds when the room doesn't already have a table (re-

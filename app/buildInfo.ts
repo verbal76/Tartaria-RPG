@@ -10136,4 +10136,67 @@
 // Back-compat: callers that
 // don't pass playerHpMax
 // keep legacy behavior.
-export const OTA_BUILD_ID = '2026-05-30-243';
+// 2026-05-30-244 — danger-
+// vs-tier warning. Player:
+// "I had better get an
+// arbiter warning saying
+// that you're in a
+// dangerous area to move on
+// to another part of the
+// land until you get your
+// legs under you and
+// suggest starting the main
+// quest line."
+//
+// On scene begin (after the
+// scene is set), if the
+// player has entered a
+// location whose danger
+// exceeds their hpMax-derived
+// tier cap, the Arbiter
+// surfaces a one-time
+// warning that names the
+// location, the tier, the
+// safer alternatives, and
+// nudges toward the main
+// quest. Fires once per
+// location per character
+// (tracked in worldMemory.
+// dangerWarnedLocations).
+// HP brackets match the
+// OTA-243 picker:
+//   <60 HP  → safe up to 1
+//   <100 HP → safe up to 2
+//   <140 HP → safe up to 3
+//   ≥140 HP → all
+//
+// Warning text: "X is
+// [unsafe/edgy/dangerous/
+// lethal] country — the
+// things that wake here
+// pull above your weight.
+// N HP carries you through
+// the Outskirts (danger 2)
+// or the Mud Seas (danger
+// 2). Start the main quest
+// before you camp here
+// again, or move on until
+// you've got your legs
+// under you."
+//
+// New WorldMemory field:
+// dangerWarnedLocations?:
+// string[]. Optional so
+// legacy saves load
+// cleanly; populated as
+// the player enters
+// warned tiles.
+//
+// Files: app/engine/types.
+// ts (WorldMemory adds
+// dangerWarnedLocations),
+// app/state/gameStore.ts
+// (beginScene adds tier
+// warning after set
+// {currentScene:scene}).
+export const OTA_BUILD_ID = '2026-05-30-244';

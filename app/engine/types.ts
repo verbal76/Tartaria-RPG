@@ -1066,6 +1066,11 @@ export interface WorldMemory {
   discoveredLocationIds: string[];
   defeatedEnemies: string[];
   completedQuestIds: string[];
+  /** OTA-244 — location ids for which the danger-vs-tier warning has
+   *  fired. Prevents the Arbiter from repeating the "you're light
+   *  for this place" line on every scene entry. One fire per
+   *  location per character. */
+  dangerWarnedLocations?: string[];
   memorableEvents?: MemorableEvent[];
   /** Active multi-scene hook chains — a hook resolution may queue a follow-up
    *  hook kind to plant in a future wander. plantedAtHour lets beginScene

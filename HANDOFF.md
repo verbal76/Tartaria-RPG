@@ -245,6 +245,20 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Danger-vs-tier Arbiter warning — "you're in dangerous country; start the main quest or move on"
+
+- **OTA-244 (2026-05-30) · Player after OTA-243's ambush tier-cap fix: *"I had better get an arbiter warning saying that you're in a dangerous area to move on to another part of the land until you get your legs under you and suggest starting the main quest line."***
+  - **What:** on scene begin, if the player has entered a location whose `danger` exceeds their `hpMax`-derived tier cap, the Arbiter fires a one-time warning naming the location + tier + safer alternatives + main-quest nudge. Fires once per location per character (tracked in `worldMemory.dangerWarnedLocations`).
+  - **HP brackets** (match OTA-243's picker):
+    - `< 60 HP` → safe up to danger 1
+    - `< 100 HP` → safe up to danger 2
+    - `< 140 HP` → safe up to danger 3
+    - `≥ 140 HP` → all danger tiers (no warning)
+  - **Warning text:** *"X is [unsafe/edgy/dangerous/lethal] country — the things that wake here pull above your weight. N HP carries you through the Outskirts (danger 2) or the Mud Seas (danger 2). Start the main quest before you camp here again, or move on until you've got your legs under you."*
+  - **New `WorldMemory` field:** `dangerWarnedLocations?: string[]`. Optional so legacy saves load cleanly.
+  - **Verification:** TS clean app-side. Manual: a Day-1 character (48 HP) entering Asgardar (danger 5) gets the warning; entering the Outskirts (danger 2) doesn't.
+  - **Files:** `app/engine/types.ts` (`WorldMemory.dangerWarnedLocations`), `app/state/gameStore.ts` (`beginScene` adds the tier warning after `set({ currentScene: scene })`).
+
 #### OTA apply hang + Mud Giant rest-ambush on a starter
 
 - **OTA-243 (2026-05-30) · Two playtest reports:**
