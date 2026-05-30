@@ -214,14 +214,25 @@ jobs:
             echo "✓ Channel '$channel' ($platform): published at runtimeVersion $published_rt."
           }
 
-          # Three publishes, sequential. Android channels are
-          # mandatory — preview is the live playtester channel,
-          # hal2001 is the experimental Android track. iOS publish
-          # is best-effort until the iOS build lands and a tester
-          # device exists on the ios-preview channel.
-          publish_channel "preview"     "android" false
-          publish_channel "hal2001"     "android" false
-          publish_channel "ios-preview" "ios"     true
+          # 2026-05-30 — branch-isolated publish. Each source branch
+          # publishes ONLY to its own channel, so no branch's OTA can
+          # ever reach another branch's testers. hal2001 is fully
+          # isolated: nothing from dev (or any other branch) publishes
+          # to it, and HaL2001 never publishes to preview / ios-preview.
+          case "$BRANCH" in
+            claude/new-session-MvF82)
+              publish_channel "preview" "android" false
+              ;;
+            HaL2001)
+              publish_channel "hal2001" "android" false
+              ;;
+            iOS-initial)
+              publish_channel "ios-preview" "ios" true
+              ;;
+            *)
+              echo "::notice::Branch '$BRANCH' is not mapped to an OTA channel — skipping publish (no cross-branch broadcast)."
+              ;;
+          esac
 
           echo ""
-          echo "=== Multi-channel publish complete ==="
+          echo "=== Branch-isolated publish complete ==="

@@ -32,9 +32,14 @@ on:
       - 'scripts/**'
       - '__tests__/**'
       - '**.md'
-      # Note: '.github/**' intentionally NOT ignored. Workflow edits
-      # (including commit-message-driven AAB builds) need to trigger
-      # this workflow themselves.
+      # 2026-05-30 — '.github/**' now IGNORED on this branch. During the
+      # Google Play internal-test build HOLD, workflow-file edits (e.g.
+      # isolating the OTA channels in eas-update.yml) must NOT trigger an
+      # APK build. To force a build use workflow_dispatch, a refs/tags/v*
+      # tag, or touch a non-ignored file in the same commit. Revert this
+      # when the hold lifts if commit-message-driven AAB builds on
+      # workflow edits are wanted again.
+      - '.github/**'
   workflow_dispatch:
     inputs:
       profile:
