@@ -14,6 +14,7 @@ import { effectiveStatsBreakdown, type StatBreakdown } from '../engine/equipment
 import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine/statTraining';
 import { effectiveAC, barehandDamageFor } from '../engine/raceMechanics';
 import { corruptionTierOf, tierLabel, tierDescription } from '../engine/corruption';
+import arbiterTitlesData from '../data/lore/arbiter-titles.json';
 import { getItemPreview } from '../components/itemPreview';
 import { weatherStatModifiers } from '../engine/weatherEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
@@ -418,6 +419,51 @@ export function CharacterScreen() {
           </View>
         </View>
 
+        {/* ── ARBITER TITLES ───────────────────────────────────── */}
+        {/* OTA-236 — surfaces the 20 Arbiter-assigned titles. Earned
+            titles render with their perk in gold; unearned titles
+            render dimmed with the requirement so the player can see
+            what's possible. Phase 1: display-only — no auto-unlock
+            triggers yet. Future OTAs wire the requirement strings to
+            runtime trackers (relic counts, sentinel kills, etc.) and
+            populate player.earnedTitles. */}
+        <Text style={styles.sectionTitle}>ARBITER ASSIGNED TITLES</Text>
+        <View style={styles.card}>
+          {(() => {
+            const allTitles = (arbiterTitlesData as { titles: Array<{ id: string; title: string; requirement: string; perk: string }> }).titles;
+            const earned = new Set(player.earnedTitles ?? []);
+            const sorted = [...allTitles].sort((a, b) => {
+              const ea = earned.has(a.id) ? 0 : 1;
+              const eb = earned.has(b.id) ? 0 : 1;
+              if (ea !== eb) return ea - eb;
+              return a.title.localeCompare(b.title);
+            });
+            const earnedCount = earned.size;
+            return (
+              <>
+                <Text style={styles.titlesSummary}>
+                  {earnedCount === 0
+                    ? 'No titles earned yet. The Arbiter watches your deeds.'
+                    : `${earnedCount} of ${allTitles.length} titles earned.`}
+                </Text>
+                {sorted.map((t) => {
+                  const isEarned = earned.has(t.id);
+                  return (
+                    <View key={t.id} style={styles.titleRow}>
+                      <Text style={[styles.titleName, isEarned ? styles.titleNameEarned : styles.titleNameLocked]}>
+                        {isEarned ? '◆ ' : '◇ '}{t.title}
+                      </Text>
+                      <Text style={isEarned ? styles.titlePerk : styles.titleRequirement}>
+                        {isEarned ? t.perk : t.requirement}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </>
+            );
+          })()}
+        </View>
+
         <Text style={styles.footerHint}>Tap the top-left stats panel any time to return here.</Text>
       </ScrollView>
     </View>
@@ -566,4 +612,12 @@ const styles = StyleSheet.create({
   contractTap: { color: '#c9a86a', fontSize: 10, letterSpacing: 1, marginTop: 6, fontStyle: 'italic', textAlign: 'right' },
 
   footerHint: { color: '#5a5246', fontSize: 10, fontStyle: 'italic', textAlign: 'center', marginTop: 18 },
+  // OTA-236 — Arbiter Titles section.
+  titlesSummary: { color: '#9b8e74', fontSize: 11, fontStyle: 'italic', marginBottom: 8 },
+  titleRow: { marginBottom: 8 },
+  titleName: { fontSize: 12, fontWeight: '700', letterSpacing: 0.3, marginBottom: 2 },
+  titleNameEarned: { color: '#c9a86a' },
+  titleNameLocked: { color: '#5a5246' },
+  titlePerk: { color: '#cdbf99', fontSize: 11, lineHeight: 15, marginLeft: 14 },
+  titleRequirement: { color: '#5a5246', fontSize: 11, lineHeight: 15, marginLeft: 14, fontStyle: 'italic' },
 });

@@ -9434,4 +9434,61 @@
 // header note), CLAUDE.md
 // (new Canon precedence
 // section at top).
-export const OTA_BUILD_ID = '2026-05-30-235';
+// 2026-05-30-236 — Arbiter
+// Titles section on
+// Character Screen. Player
+// way back: "the assigned
+// titles will need a new
+// section in the character
+// screen."
+//
+// Adds an ARBITER ASSIGNED
+// TITLES section at the
+// bottom of CharacterScreen
+// (just above the footer
+// hint). Renders all 20
+// titles from arbiter-titles.
+// json — earned ones in gold
+// with their perk, locked
+// ones dimmed with the
+// requirement so the player
+// sees what's possible.
+// Earned titles sort first
+// then alphabetical. Empty
+// state line: "No titles
+// earned yet. The Arbiter
+// watches your deeds."
+//
+// Phase 1 is display-only.
+// Future OTAs wire the
+// requirement strings to
+// runtime trackers (relic
+// counts, sentinel kills,
+// faction defense events,
+// etc.) and populate player.
+// earnedTitles.
+//
+// Type addition: PlayerChar-
+// acter.earnedTitles?:
+// string[]. Optional so
+// legacy saves load without
+// migration.
+//
+// Tests: +6 in arbiterTitles
+// Screen (20 titles loaded,
+// field shape, unique ids,
+// safe default on undefined,
+// earned-count split,
+// earned-first then
+// alphabetical sort).
+// TS clean app-side.
+//
+// Files: app/engine/types.
+// ts (PlayerCharacter.
+// earnedTitles?: string[]),
+// app/screens/CharacterScreen
+// .tsx (ARBITER ASSIGNED
+// TITLES section + styles).
+// NEW __tests__/arbiterTitles
+// Screen.test.ts.
+export const OTA_BUILD_ID = '2026-05-30-236';

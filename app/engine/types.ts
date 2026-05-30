@@ -685,6 +685,13 @@ export interface PlayerCharacter {
   activeQuests: Quest[];
   /** Set when HP hits 0; the character is barred from play until a Resurrection Gem revives them. */
   dead?: boolean;
+  /** OTA-236 — Arbiter-assigned titles the player has earned. Each
+   *  entry is an `id` from `app/data/lore/arbiter-titles.json`.
+   *  Surfaced on the Character Screen's TITLES section. Phase 1 is
+   *  display-only with no auto-unlock triggers; future OTAs wire
+   *  the titles' requirement strings (e.g. "Discover three Tartarian
+   *  relics") to runtime trackers. */
+  earnedTitles?: string[];
   /** OTA-195 — one-shot fusion permit granted by a Fusing Crucible
    *  travel encounter. Cleared when the player runs the fuse action.
    *  Without this gate, the fuse verb would be usable anywhere; the

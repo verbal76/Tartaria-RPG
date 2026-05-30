@@ -245,6 +245,25 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### APK 2026-05-30b — UNBRICK: bakes OTA-234 crash fix natively so testers can launch
+
+- **APK 2026-05-30b (next build) · Player: *"I think it is crashing too fast to catch the OTA, this might need an apk."***
+  - **Cause:** OTA-234 fixed the mid-boot reload crash, but the existing installed bundle crashes within ~1 second of title screen mount — before the OTA check can fetch + apply OTA-234. Testers can't escape via OTA.
+  - **Fix:** APK rebuild that bakes OTA-234 + OTA-235 + OTA-236 into the native binary. Testers sideload the new APK; title screen renders without the mid-boot reload race because the bundled JS already has `fetchOnly: true`. From there OTAs deliver normally.
+  - **What's in the APK:** OTA-234 (TitleScreen fetchOnly + FirstTimeHint Modal→overlay + footer color + bulk 8-table canon ingestion), OTA-235 (hack v2.5 docs reconciliation), OTA-236 (Arbiter Titles section on Character Screen).
+  - **Shipping:** bumped `metro.config.js` to `2026-05-30b` to fire the android-build workflow.
+  - **Files:** `metro.config.js` (APK trigger bump).
+
+#### Arbiter Titles section on Character Screen (display-only phase 1)
+
+- **OTA-236 (2026-05-30) · Player way back in the doc-drop reply: *"The assigned titles will need a new section in the character screen."***
+  - **What:** new ARBITER ASSIGNED TITLES section at the bottom of `CharacterScreen` (just above the footer hint). Renders all 20 titles from `arbiter-titles.json` — earned ones in gold (◆) with their perk; locked ones dimmed (◇) with the requirement so the player sees what's possible to earn. Earned sort first then alphabetical.
+  - **Empty state:** "No titles earned yet. The Arbiter watches your deeds."
+  - **Phase 1 is display-only.** Future OTAs wire the requirement strings to runtime trackers (relic counts, sentinel kills, faction defense events, etc.) and populate `player.earnedTitles`.
+  - **Type addition:** `PlayerCharacter.earnedTitles?: string[]`. Optional so legacy saves load without migration.
+  - **Verification:** +6 tests in `arbiterTitlesScreen` (20 titles loaded, field shape, unique ids, safe default on undefined, earned/locked split, earned-first-then-alphabetical sort). `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/engine/types.ts` (`PlayerCharacter.earnedTitles?: string[]`), `app/screens/CharacterScreen.tsx` (TITLES section + styles), NEW `__tests__/arbiterTitlesScreen.test.ts`.
+
 #### Hack v2.5 reconciliation — canonical gameplay doc realignment
 
 - **OTA-235 (2026-05-30) · Player: *"the tartaria_ttrpg was what the tartaria hack 2.5 was built off of. The original file had turned from a gameplay book into a DM guide, so the hack file was made to explain gameplay. ... When in doubt, the lore gameplay mechanics lose to the app's mechanics."***
