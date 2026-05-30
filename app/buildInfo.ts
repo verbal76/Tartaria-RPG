@@ -9491,4 +9491,97 @@
 // TITLES section + styles).
 // NEW __tests__/arbiterTitles
 // Screen.test.ts.
-export const OTA_BUILD_ID = '2026-05-30-236';
+// 2026-05-30-237 — crash
+// diagnostic + defensive
+// boundaries. Player after
+// installing APK 239 with
+// OTA-234 baked: "iust
+// updated to [APK 239] and
+// we still crash" + "roll
+// out some agents and do a
+// deep dive."
+//
+// 4 parallel agents audited
+// the boot path. Top
+// findings:
+// - Global crash handler at
+//   App.tsx:91 was IGNORING
+//   all errors during the
+//   first 5 seconds (a
+//   reload-loop guard from
+//   earlier), which exactly
+//   coincides with the
+//   player's crash window.
+//   The safety net was
+//   masking the recovery.
+// - Global modals (Tutorial
+//   Overlay, CallDogModal,
+//   AetherStatPickerModal,
+//   KeyboardInputBar)
+//   rendered OUTSIDE Screen
+//   ErrorBoundary, so any
+//   render error in them
+//   became a process crash
+//   instead of being caught.
+// - hydrate() promise
+//   rejection had no .catch
+//   — silent failure mode.
+//
+// This OTA addresses all
+// three:
+// 1. Crash handler 5s window
+//    → 800ms. Reload latch
+//    stays one-per-cold-
+//    start so we don't loop.
+//    Records the crash to
+//    @tartaria/lastCrash for
+//    diagnostic surfacing.
+// 2. New SilentBoundary in
+//    App.tsx wraps all 4
+//    global modals. Render
+//    errors → log to crash
+//    trail, render null,
+//    keep the rest of the
+//    app alive.
+// 3. hydrate().catch handles
+//    rejection, stages the
+//    error to lastCrash so
+//    the next launch shows
+//    what failed.
+// 4. Boot-stage checkpoints
+//    via global.__TARTARIA_
+//    BOOT_STAGE so the crash
+//    handler can name which
+//    boot step died (e.g.
+//    "cognitive:start" or
+//    "audio:done").
+// 5. NEW LastCrashLine
+//    component on Title
+//    Screen surfaces the
+//    @tartaria/lastCrash
+//    record as a red-bordered
+//    pill above the version
+//    footer. Tap to dismiss.
+//    Invisible when no crash
+//    record exists.
+//
+// APK rebuild fires via
+// metro.config.js bump
+// (2026-05-30c). Sideload
+// the new APK; if the crash
+// repros, the LastCrashLine
+// surfaces the stage +
+// message so we can name
+// the real culprit instead
+// of guessing.
+//
+// Files: App.tsx (crash
+// handler diagnostics +
+// reduced window + boot
+// stage checkpoints + per-
+// modal SilentBoundary +
+// hydrate.catch path), app/
+// screens/TitleScreen.tsx
+// (LastCrashLine component +
+// integration above footer).
+export const OTA_BUILD_ID = '2026-05-30-237';

@@ -883,6 +883,13 @@ export function TitleScreen() {
             <Text style={styles.exitBtnText}>EXIT GAME</Text>
           </TouchableOpacity>
         </View>
+        {/* OTA-237 — surface last crash diagnostic if a previous launch
+            died. App.tsx's global error handler writes to
+            @tartaria/lastCrash on any fatal error or hydrate failure.
+            Showing it here gives the player (and the bug report path)
+            a concrete signal instead of "nothing happened". Tap to
+            clear. */}
+        <LastCrashLine />
         <Text style={styles.footer}>v{APP_VERSION}  /  2148</Text>
       </View>
 
@@ -1388,6 +1395,69 @@ function EndingBadgesRow(): React.ReactElement | null {
     </View>
   );
 }
+
+// OTA-237 — crash diagnostic surface. App.tsx's global error handler
+// and hydrate failure path write to @tartaria/lastCrash on any boot-
+// time failure. This component reads it on mount and shows a one-line
+// pill: "Last crash @ <stage>: <message>". Tap to clear so a stale
+// diagnostic doesn't haunt every launch. If no crash record exists,
+// renders null — invisible to most players.
+function LastCrashLine(): React.ReactElement | null {
+  const [crash, setCrash] = useState<{ stage: string; message: string; timestamp: number } | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const AS = require('@react-native-async-storage/async-storage').default;
+        const raw = await AS.getItem('@tartaria/lastCrash');
+        if (cancelled || !raw) return;
+        const parsed = JSON.parse(raw) as { stage?: string; message?: string; timestamp?: number };
+        if (!parsed?.message) return;
+        setCrash({
+          stage: parsed.stage ?? 'unknown',
+          message: parsed.message,
+          timestamp: parsed.timestamp ?? Date.now(),
+        });
+      } catch { /* ignore */ }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+  if (!crash) return null;
+  const ageMin = Math.max(1, Math.floor((Date.now() - crash.timestamp) / 60000));
+  return (
+    <TouchableOpacity
+      onPress={() => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          const AS = require('@react-native-async-storage/async-storage').default;
+          void AS.removeItem('@tartaria/lastCrash');
+        } catch { /* ignore */ }
+        setCrash(null);
+      }}
+      activeOpacity={0.7}
+      style={lastCrashStyles.pill}
+    >
+      <Text style={lastCrashStyles.title}>LAST CRASH · {crash.stage} · {ageMin}m ago (tap to dismiss)</Text>
+      <Text style={lastCrashStyles.message}>{crash.message}</Text>
+    </TouchableOpacity>
+  );
+}
+
+const lastCrashStyles = StyleSheet.create({
+  pill: {
+    borderColor: '#c97a7a',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginTop: 6,
+    marginHorizontal: 12,
+    backgroundColor: 'rgba(80,20,20,0.25)',
+  },
+  title: { color: '#c97a7a', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+  message: { color: '#e6d8b3', fontSize: 11, marginTop: 2 },
+});
 
 function KokoroDownloadBanner(): React.ReactElement | null {
   const [state, setState] = useState<KokoroState>(() => getKokoroState());

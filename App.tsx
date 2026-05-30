@@ -87,8 +87,38 @@ try {
     const prev = errorUtils.getGlobalHandler();
     errorUtils.setGlobalHandler((err, isFatal) => {
       try { prev?.(err, isFatal); } catch { /* ignore */ }
+      // OTA-237 — crash diagnostics. Stash the last error message +
+      // stage to AsyncStorage so the NEXT launch's title screen can
+      // surface "last crash: <stage>: <message>" instead of the player
+      // staring at a blank home screen with no clue why. Best-effort —
+      // AsyncStorage may not be ready yet, in which case the catch
+      // swallows and we lose this one but won't double-crash trying
+      // to report.
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const AS = require('@react-native-async-storage/async-storage').default;
+        const stage = (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE ?? 'unknown';
+        void AS.setItem(
+          '@tartaria/lastCrash',
+          JSON.stringify({
+            stage,
+            message: (err?.message ?? String(err)).slice(0, 500),
+            stack: (err?.stack ?? '').slice(0, 2000),
+            isFatal: !!isFatal,
+            sinceBoot: Date.now() - bootTime,
+            timestamp: Date.now(),
+          }),
+        ).catch(() => { /* ignore */ });
+      } catch { /* ignore — AS not ready */ }
       const sinceBoot = Date.now() - bootTime;
-      if (isFatal && !reloaded && sinceBoot > 5000 && Updates?.isEnabled) {
+      // OTA-237 — was sinceBoot > 5000. Cut to 800ms because the
+      // current player crash repros within 1 second of title screen
+      // mount and the 5s window was suppressing the reload-recovery.
+      // Reload loop is mitigated by the `reloaded` latch (one reload
+      // per cold-start session) — if the crash repros on the reload,
+      // the next launch falls through without another reload and the
+      // user sees the actual crash diagnostic on the title screen.
+      if (isFatal && !reloaded && sinceBoot > 800 && Updates?.isEnabled) {
         reloaded = true;
         // Brief delay so any pending React render / log flush completes
         // before the bridge swap. reloadAsync is async; we don't await
@@ -144,23 +174,55 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    void hydrate().then(() => {
-      // Boot order: classifier (small, fast) first so target resolution is
-      // available as soon as the player starts a game. Generative model
-      // (large, slow) kicks off afterward without blocking — templates carry
-      // the Arbiter until it's ready.
-      void bootCognitive().then(() => {
-        void bootQwen();
-      });
-      void bootAudio().then(() => startAudioController());
-      // Voice (TTS + STT) — opt-in via settings; init is cheap so
-      // the controller can subscribe immediately. If TTS is disabled
-      // the controller short-circuits inside onState. initTTSManager
-      // ALSO prewarms Kokoro in the background when bundled engine is
-      // enabled — model download / load / graph-compile all happen
-      // while the player is on the title screen, so the first spoken
-      // line plays without cold-start lag.
-      void initTTSManager().then(() => startTTSController());
+    // OTA-237 — tag each boot stage on a global so the crash handler
+    // can name the offender in the diagnostic. Cheap; only writes a
+    // string. The crash handler reads __TARTARIA_BOOT_STAGE if the
+    // process dies.
+    const setStage = (s: string) => {
+      (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE = s;
+    };
+    setStage('hydrate:start');
+    void hydrate()
+      .then(() => {
+        setStage('hydrate:done');
+        // Boot order: classifier (small, fast) first so target resolution is
+        // available as soon as the player starts a game. Generative model
+        // (large, slow) kicks off afterward without blocking — templates carry
+        // the Arbiter until it's ready.
+        setStage('cognitive:start');
+        void bootCognitive().then(() => {
+          setStage('cognitive:done');
+          void bootQwen().catch((e) => {
+            // eslint-disable-next-line no-console
+            console.warn('bootQwen failed:', e);
+          });
+        }).catch((e) => {
+          // eslint-disable-next-line no-console
+          console.warn('bootCognitive failed:', e);
+        });
+        setStage('audio:start');
+        void bootAudio().then(() => {
+          setStage('audio:done');
+          startAudioController();
+        }).catch((e) => {
+          // eslint-disable-next-line no-console
+          console.warn('bootAudio failed:', e);
+        });
+        // Voice (TTS + STT) — opt-in via settings; init is cheap so
+        // the controller can subscribe immediately. If TTS is disabled
+        // the controller short-circuits inside onState. initTTSManager
+        // ALSO prewarms Kokoro in the background when bundled engine is
+        // enabled — model download / load / graph-compile all happen
+        // while the player is on the title screen, so the first spoken
+        // line plays without cold-start lag.
+        setStage('tts:start');
+        void initTTSManager().then(() => {
+          setStage('tts:done');
+          startTTSController();
+        }).catch((e) => {
+          // eslint-disable-next-line no-console
+          console.warn('initTTSManager failed:', e);
+        });
       // Boot-time OTA check. fetchOnly: download the update in the
       // background but DO NOT reload here — auto-reload mid-boot
       // crashes the process to home because native modules
@@ -175,8 +237,32 @@ export default function App() {
             useGameStore.setState({ pendingOTAUpdate: true });
           }
         });
-      }, 1500);
-    });
+        }, 1500);
+        setStage('boot:complete');
+      })
+      .catch((e) => {
+        // OTA-237 — hydrate failure path was previously unhandled,
+        // letting the rejection surface to the ErrorUtils handler
+        // which would suppress it during the (previous) 5-second
+        // window and leave the player with a black screen. Catch +
+        // log so the next launch's TitleScreen can show the message.
+        setStage('hydrate:failed');
+        // eslint-disable-next-line no-console
+        console.error('hydrate failed:', e);
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          const AS = require('@react-native-async-storage/async-storage').default;
+          void AS.setItem(
+            '@tartaria/lastCrash',
+            JSON.stringify({
+              stage: 'hydrate:failed',
+              message: ((e as Error)?.message ?? String(e)).slice(0, 500),
+              stack: ((e as Error)?.stack ?? '').slice(0, 2000),
+              timestamp: Date.now(),
+            }),
+          ).catch(() => { /* ignore */ });
+        } catch { /* ignore */ }
+      });
     return () => {
       stopAudioController();
       stopTTSController();
@@ -220,28 +306,69 @@ export default function App() {
       <ScreenErrorBoundary>
         <AppShell screen={screen} />
       </ScreenErrorBoundary>
-      {/* TutorialOverlay sits OUTSIDE SafeAreaView so its absolute
-          positioning matches measureInWindow coords from the targets
-          (which report screen-absolute, not safe-area-relative). */}
-      <TutorialOverlay />
-      {/* OTA-120 Phase 5 — CallDogModal. Globally mounted so the
-          parser intercept on `call dog` / `call <name>` can open it
-          from any screen the player happens to be on. The modal
-          self-gates on `callDogModalOpen`. */}
-      <CallDogModal />
-      {/* OTA-211 — Aether Stat Picker. Opens when the player runs
-          `infuse <food>` so they can choose which stat the +3 buff
-          enhances for the next 5 real-world minutes. */}
-      <AetherStatPickerModal />
-      {/* OTA-190 — floating input popup that appears above the soft
-          keyboard on the Exploration screen so the player always
-          sees what they're typing. Mounts OUTSIDE the scaled wrapper
-          so its bottom: keyboardOffset positioning stays in real
-          device-pixel space. Self-gates on screen === 'exploration'
-          + keyboardOffset > 0; renders null otherwise. */}
-      <KeyboardInputBar />
+      {/* OTA-237 — global modals wrapped in their own SilentBoundary.
+          Previously these mounted OUTSIDE any error boundary; a render
+          error in TutorialOverlay / CallDogModal / etc became a
+          process crash because React doesn't catch unhandled child
+          errors at the SafeAreaProvider level. SilentBoundary catches
+          + returns null so the rest of the UI keeps rendering. */}
+      <SilentBoundary tag="TutorialOverlay">
+        {/* TutorialOverlay sits OUTSIDE SafeAreaView so its absolute
+            positioning matches measureInWindow coords from the targets
+            (which report screen-absolute, not safe-area-relative). */}
+        <TutorialOverlay />
+      </SilentBoundary>
+      <SilentBoundary tag="CallDogModal">
+        <CallDogModal />
+      </SilentBoundary>
+      <SilentBoundary tag="AetherStatPickerModal">
+        <AetherStatPickerModal />
+      </SilentBoundary>
+      <SilentBoundary tag="KeyboardInputBar">
+        <KeyboardInputBar />
+      </SilentBoundary>
     </SafeAreaProvider>
   );
+}
+
+// OTA-237 — lightweight error boundary for globally-rendered overlays.
+// Catches render errors, logs the tag + error to the boot-stage trail
+// (so the next launch's diagnostic can name the offender), and renders
+// null so the rest of the app keeps working. Unlike ScreenErrorBoundary
+// (which shows a recovery card), these overlays disappearing silently
+// is the right UX — they're not the primary screen.
+class SilentBoundary extends React.Component<
+  { tag: string; children: React.ReactNode },
+  { failed: boolean }
+> {
+  constructor(props: { tag: string; children: React.ReactNode }) {
+    super(props);
+    this.state = { failed: false };
+  }
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  componentDidCatch(error: Error) {
+    // eslint-disable-next-line no-console
+    console.warn(`SilentBoundary[${this.props.tag}] caught:`, error?.message, error?.stack);
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const AS = require('@react-native-async-storage/async-storage').default;
+      void AS.setItem(
+        `@tartaria/lastCrash`,
+        JSON.stringify({
+          stage: `overlay:${this.props.tag}`,
+          message: (error?.message ?? String(error)).slice(0, 500),
+          stack: (error?.stack ?? '').slice(0, 2000),
+          timestamp: Date.now(),
+        }),
+      ).catch(() => { /* ignore */ });
+    } catch { /* ignore */ }
+  }
+  render() {
+    if (this.state.failed) return null;
+    return this.props.children;
+  }
 }
 
 // Per-screen render guard. Wraps the screen switch in a React error

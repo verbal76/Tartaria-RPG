@@ -245,6 +245,23 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Crash diagnostics + defensive boundaries — second-pass when OTA-234's fix didn't fully unbrick
+
+- **OTA-237 + APK 2026-05-30c (next build) · Player after installing APK 239 with OTA-234 baked in: *"iust updated to [APK 239] and we still crash"* + *"roll out some agents and do a deep dive for all crash scenarios within seconds of opening."***
+  - Four parallel exploration agents audited the boot path. Consensus on three structural gaps that let the crash slip past every safety net:
+    1. **Global crash handler's 5-second-ignore window** (`App.tsx:91`) was suppressing ALL recovery during exactly when the player's crash fires. The window was added to prevent reload loops, but it also blocked any chance of self-recovery — the player just saw the title screen flash then home.
+    2. **4 global modals rendered outside ScreenErrorBoundary** — `TutorialOverlay`, `CallDogModal`, `AetherStatPickerModal`, `KeyboardInputBar` — so any render error in them became a process crash instead of being caught.
+    3. **`hydrate()` promise had no `.catch`** in App.tsx mount effect — a rejection went unhandled and either masked by ErrorUtils or escalated.
+  - **Fixes:**
+    - Crash handler 5s window → 800ms; reload latch stays one-per-cold-start. Errors are recorded to `@tartaria/lastCrash` (stage + message + stack) before reload.
+    - New `SilentBoundary` wraps each of the 4 global modals in App.tsx. Render errors → log to crash trail, return null, keep the rest of the app alive.
+    - `hydrate().catch` path stages the rejection to `@tartaria/lastCrash`.
+    - Boot-stage checkpoints via `globalThis.__TARTARIA_BOOT_STAGE` — `hydrate:start`, `hydrate:done`, `cognitive:start`, `cognitive:done`, `audio:start/done`, `tts:start/done`, `boot:complete`. The crash handler reads this to name which boot step died.
+  - **NEW `LastCrashLine` component on TitleScreen** — reads `@tartaria/lastCrash` on mount and surfaces it as a red-bordered pill above the version footer with the stage + message. Tap to dismiss. Invisible when no crash record exists. Gives the player (and the next bug report) a concrete signal.
+  - **APK 2026-05-30c bump in `metro.config.js`** — fires the android-build workflow so these defenses ship natively. After sideload, if the crash still repros, `LastCrashLine` surfaces the actual culprit so the next iteration is informed instead of guessing.
+  - **TS clean app-side.**
+  - **Files:** `App.tsx` (crash handler diagnostics + reduced window + boot-stage checkpoints + per-modal SilentBoundary + hydrate.catch path), `app/screens/TitleScreen.tsx` (LastCrashLine component + integration above footer), `app/buildInfo.ts` (OTA-237), `metro.config.js` (APK trigger 2026-05-30c).
+
 #### APK 2026-05-30b — UNBRICK: bakes OTA-234 crash fix natively so testers can launch
 
 - **APK 2026-05-30b (next build) · Player: *"I think it is crashing too fast to catch the OTA, this might need an apk."***
