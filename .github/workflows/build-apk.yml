@@ -241,8 +241,19 @@ jobs:
       #           release block instead of the debug fallback.
       # If ANDROID_KEYSTORE_BASE64 is empty, FAIL the build — the
       # debug-signed AAB is unusable on Play Store, no point continuing.
-      - name: Configure release signing (production AAB only)
-        if: steps.meta.outputs.profile == 'production'
+      #
+      # 2026-05-30 — also run for the HaL2001 sideload APK. Signing the
+      # HaL preview APK with the stable tartaria-upload key (instead of a
+      # fresh per-build debug key) means successive Hal2001-N builds
+      # UPGRADE IN PLACE on the phone instead of forcing an uninstall.
+      # The patch repoints buildTypes.release.signingConfig, which the
+      # preview profile's assembleRelease honors just like bundleRelease.
+      # NOTE: HaL's package is still com.hotatticgames.tartarprim.hal2001,
+      # so this remains a SEPARATE app from the internal-test build — the
+      # shared key does NOT let HaL update the internal-test app until the
+      # package is flipped back and shipped as an AAB to the Play track.
+      - name: Configure release signing (production AAB + HaL2001 APK)
+        if: steps.meta.outputs.profile == 'production' || github.ref_name == 'HaL2001'
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
