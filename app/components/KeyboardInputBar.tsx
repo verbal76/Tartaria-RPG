@@ -60,13 +60,46 @@ export function KeyboardInputBar() {
   const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
+    // OTA-215 — robustness fixes for intermittent "bar doesn't push
+    // above the keyboard" reports. Three changes:
+    //
+    // (a) Listen to keyboardDidChangeFrame in addition to show/hide.
+    //     New Architecture (Fabric) on Android sometimes drops the
+    //     show event but always fires change-frame. We use the most
+    //     recent positive height we see from any listener.
+    //
+    // (b) Defer the hide-zero-out by 200ms so a quick refocus
+    //     (player taps a different TextInput; Android briefly fires
+    //     keyboardDidHide → keyboardDidShow during the focus swap)
+    //     doesn't cause the bar to flicker out and back in.
+    //
+    // (c) Initial sync from Keyboard.metrics() if available. Catches
+    //     the case where the keyboard is already up when we mount
+    //     (came from another screen with keyboard open).
+    let hideTimer: ReturnType<typeof setTimeout> | null = null;
+    const applyHeight = (height: number) => {
+      if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+      if (height > 0) setKeyboardOffset(height);
+    };
     const onShow = (e: { endCoordinates: { height: number } }) => {
-      setKeyboardOffset(e.endCoordinates.height);
+      applyHeight(e.endCoordinates?.height ?? 0);
+    };
+    const onChangeFrame = (e: { endCoordinates: { height: number; screenY?: number } }) => {
+      // On iOS the keyboard can change height mid-flight (predictive
+      // suggestions, language bar). On Android Fabric this is often
+      // the only event we get. Use it as a secondary trigger.
+      const h = e.endCoordinates?.height ?? 0;
+      if (h > 0) applyHeight(h);
     };
     const onHide = () => {
-      setKeyboardOffset(0);
-      // Clear stale text so re-opening the keyboard starts fresh.
-      setText('');
+      // Defer the zero-out so quick refocus events don't flicker.
+      // If a show event arrives within 200ms, applyHeight cancels
+      // this timer.
+      if (hideTimer) clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => {
+        setKeyboardOffset(0);
+        setText('');
+      }, 200);
     };
     const showSub = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
@@ -76,9 +109,30 @@ export function KeyboardInputBar() {
       Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
       onHide,
     );
+    // keyboardDidChangeFrame is available on both platforms; it's
+    // the most reliable cross-platform "keyboard moved" signal under
+    // the New Architecture.
+    let changeFrameSub: ReturnType<typeof Keyboard.addListener> | null = null;
+    try {
+      changeFrameSub = Keyboard.addListener('keyboardDidChangeFrame' as Parameters<typeof Keyboard.addListener>[0], onChangeFrame);
+    } catch { /* older RN doesn't support this event — fine */ }
+
+    // Initial sync — if keyboard is already up, grab metrics.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const k = Keyboard as any;
+      const visible = typeof k.isVisible === 'function' ? k.isVisible() : false;
+      if (visible && typeof k.metrics === 'function') {
+        const m = k.metrics();
+        if (m?.height) applyHeight(m.height);
+      }
+    } catch { /* metrics API not available on this RN — fine */ }
+
     return () => {
+      if (hideTimer) clearTimeout(hideTimer);
       showSub.remove();
       hideSub.remove();
+      changeFrameSub?.remove();
     };
   }, []);
 

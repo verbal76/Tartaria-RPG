@@ -7793,4 +7793,73 @@
 // state/gameStore.ts
 // (grant_random_quest_hook
 // handler).
-export const OTA_BUILD_ID = '2026-05-30-214';
+// 2026-05-30-215 — Keyboard
+// InputBar robustness. Player:
+//   "Sometimes when I open
+//   up the keyboard to type
+//   by pushing in the text
+//   box. it doesn't always
+//   push the text box above
+//   it. can you test to see
+//   what is causing that to
+//   happen intermittently
+//   and fix it?"
+//
+// Three layered fixes for
+// the intermittent failure:
+//
+// (a) Also listen to
+//     keyboardDidChangeFrame.
+//     Under the New
+//     Architecture (Fabric on
+//     Android, newArchEnabled
+//     in app.json), the show
+//     event sometimes drops
+//     but change-frame
+//     always fires. Use the
+//     most recent positive
+//     height we see from any
+//     listener.
+//
+// (b) Defer the hide-zero-out
+//     by 200ms. Quick refocus
+//     events (player taps a
+//     different TextInput;
+//     Android briefly fires
+//     keyboardDidHide →
+//     keyboardDidShow during
+//     the focus swap)
+//     previously caused the
+//     bar to flicker out and
+//     back in. The defer
+//     gives the new show
+//     event a window to cancel
+//     the hide.
+//
+// (c) Initial sync from
+//     Keyboard.metrics() +
+//     Keyboard.isVisible() if
+//     available (RN 0.66+).
+//     Catches the case where
+//     the keyboard is already
+//     up when KeyboardInputBar
+//     mounts (came from
+//     another screen with
+//     keyboard open).
+//
+// Hardened against missing
+// APIs — try/catch wraps
+// both the change-frame
+// subscription and the
+// metrics call, so older RN
+// versions fall back to the
+// pre-OTA behavior without
+// crashing.
+//
+// Files: app/components/
+// KeyboardInputBar.tsx
+// (defensive listener set
+// + 200ms hide defer +
+// metrics-based initial
+// sync).
+export const OTA_BUILD_ID = '2026-05-30-215';

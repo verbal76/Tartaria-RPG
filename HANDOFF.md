@@ -245,6 +245,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### KeyboardInputBar robustness — intermittent "bar doesn't push above the keyboard" bug
+
+- **OTA-215 (2026-05-30) · Player: *"Sometimes when I open up the keyboard to type by pushing in the text box. it doesn't always push the text box above it. can you test to see what is causing that to happen intermittently and fix it?"***
+  - **What:** The OTA-190 floating KeyboardInputBar relied on a single `keyboardDidShow` listener (Android) / `keyboardWillShow` listener (iOS). Under the New Architecture (`newArchEnabled: true` in app.json, Fabric on Android) those events drop intermittently, especially during focus swaps between the underlying InputBox and the floating bar's autoFocus. Result: keyboard opens, bar doesn't render.
+  - **Fix (a) — three-listener stack:** Added a `keyboardDidChangeFrame` listener alongside the existing show/hide. On Android Fabric `change-frame` is often the only event that fires; on iOS it catches mid-flight height changes (predictive suggestions, language bar). All three feed `applyHeight(positive)` which updates the offset.
+  - **Fix (b) — defer the hide-zero-out by 200ms.** Quick refocus events fire `keyboardDidHide → keyboardDidShow` during focus swaps. The defer gives the new show event a window to cancel the hide via the cleared timer, so the bar doesn't flicker out and back in.
+  - **Fix (c) — initial sync via `Keyboard.metrics()`.** On mount, if `Keyboard.isVisible()` returns true and `Keyboard.metrics()` is available (RN 0.66+), grab the current height. Catches the case where the keyboard is already up when entering the exploration screen from another screen.
+  - **Hardening:** Both the change-frame subscription and the metrics call are wrapped in try/catch so older RN versions fall back to the pre-OTA behavior without crashing.
+  - **Files:** `app/components/KeyboardInputBar.tsx` (defensive listener set + 200ms hide defer + metrics-based initial sync).
+
 #### USE-on-armor cleanup + visible Aetheric Vision Lens badge + eddy grants a real quest
 
 - **OTA-214 (2026-05-30) · Three playtest follow-ups from the OTA-212 log.**
