@@ -245,6 +245,15 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Background Qwen dormancy watchdog — keeps the runtime warm without waiting on player actions
+
+- **OTA-223 (2026-05-30) · Player on OTA-222: *"should we add a qwen check and bump it as needed in the background?"***
+  - **What:** OTA-222's fuse-time bump fixes the specific blocked-fusion case but doesn't help with Arbiter narration or any other Qwen-using path. A polling watchdog keeps Qwen warm throughout the session — the player never has to trigger anything to wake it.
+  - **Fix:** Module-level `qwenWatchdogTimer` + `startQwenWatchdog(get)` in `gameStore.ts`. 60-second polling interval (cheap; the check is two boolean reads). Each tick: if `qwen.isDormant()` returns true, kicks `qwen.forceReinitialize()` in the background. Errors swallowed (watchdog must never crash the host). `bootQwen()` starts the watchdog after the first successful init attempt. Idempotent — repeat starts clear the existing timer first.
+  - **Layered defense:** The OTA-222 per-tap kick stays in place for the "player is about to fuse RIGHT NOW" case; the watchdog covers the "player is just exploring and the next narration should be Qwen-quality" case.
+  - **Verification:** +3 tests in `qwenWatchdog` (healthy tick = no-op, dormant tick triggers recovery, 5-cycle endurance test for multi-recovery without state leaks). `qwenForceReinit` regression stays green (7 total). `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/state/gameStore.ts` (module-level qwenWatchdogTimer + startQwenWatchdog() + bootQwen() starts it after init).
+
 #### Qwen dormant-detection + forceReinitialize: bump on fuse wakes a killed runtime
 
 - **OTA-222 (2026-05-30) · Player on the OTA-221 ship: *"are you saying qwen shut down? can't we trigger a bump when we hit fuse?"***

@@ -449,6 +449,38 @@ const cognitive = new CognitiveOrchestrator();
 // pools — there is no degraded mode.
 const qwen = new QwenGenerativeEngine();
 
+// OTA-223 — background dormancy watchdog. Polls every 60s; if Qwen
+// reports isDormant() (the OOM-killed state where status==='ready'
+// but the native runtime is gone), kicks forceReinitialize() in the
+// background. Player never has to wait for the deterministic fallback
+// or notice anything — Qwen stays warm.
+//
+// Held at module scope so startQwenWatchdog() can replace it on
+// re-entry without leaking handles.
+let qwenWatchdogTimer: ReturnType<typeof setInterval> | null = null;
+const QWEN_WATCHDOG_INTERVAL_MS = 60_000;
+function startQwenWatchdog(get: () => GameStore): void {
+  if (qwenWatchdogTimer !== null) {
+    clearInterval(qwenWatchdogTimer);
+    qwenWatchdogTimer = null;
+  }
+  qwenWatchdogTimer = setInterval(() => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const q = qwen as any;
+      if (typeof q.isDormant !== 'function' || typeof q.forceReinitialize !== 'function') return;
+      if (!q.isDormant()) return;
+      get().appendLog(
+        'debug',
+        `qwen-watchdog: detected dormant runtime — kicking forceReinitialize() in background.`,
+      );
+      void q.forceReinitialize().catch((err: unknown) => {
+        get().appendLog('debug', `qwen-watchdog: reinit threw: ${String(err)}`);
+      });
+    } catch { /* watchdog should never crash the host */ }
+  }, QWEN_WATCHDOG_INTERVAL_MS);
+}
+
 // Casual-look narration: the player asked to look around but didn't target
 // anything specific. We narrate the scene without a roll, and occasionally
 // surface a hook the player can follow up on with a targeted action.
@@ -15693,6 +15725,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const message = err instanceof Error ? err.message : String(err);
       set({ qwenStatus: 'failed', qwenError: message });
     }
+    // OTA-223 — start the background dormancy watchdog after the
+    // first successful boot. The watchdog polls every 60s; if Qwen
+    // is dormant (status==='ready' but the native runtime is gone,
+    // typically because Android OOM-killed it), it kicks
+    // forceReinitialize() in the background so Qwen is warm by the
+    // next time the player triggers narration or fusion. Idempotent —
+    // starting twice replaces the timer cleanly.
+    startQwenWatchdog(get);
   },
 
   async shutdownQwen() {

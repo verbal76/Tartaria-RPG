@@ -8476,4 +8476,72 @@
 // state/gameStore.ts
 // (fuseAtCrucible kicks
 // reinit when isDormant).
-export const OTA_BUILD_ID = '2026-05-30-222';
+// 2026-05-30-223 — background
+// Qwen dormancy watchdog.
+// Player on OTA-222 ship:
+//   "should we add a qwen
+//   check and bump it as
+//   needed in the background"
+//
+// Yes — instead of waiting
+// for the player to trigger
+// fuse (or any specific
+// action) and discover Qwen
+// is dormant, a polling
+// watchdog keeps Qwen warm
+// through the entire session.
+//
+// Implementation:
+//   - Module-level
+//     qwenWatchdogTimer +
+//     startQwenWatchdog() in
+//     gameStore.ts.
+//   - 60-second polling
+//     interval (cheap; the
+//     check is two boolean
+//     reads).
+//   - Each tick: if qwen.
+//     isDormant() returns
+//     true, kick qwen.
+//     forceReinitialize()
+//     in the background.
+//     Errors swallowed
+//     (watchdog must never
+//     crash the host).
+//   - bootQwen() starts the
+//     watchdog after the
+//     first successful init
+//     attempt. Idempotent —
+//     repeat starts clear
+//     the existing timer
+//     first so we don't
+//     stack handles.
+//
+// The fuse path's OTA-222
+// per-tap kick stays in
+// place as a fast path for
+// the "player is about to
+// fuse RIGHT NOW" case;
+// the watchdog covers the
+// "player is just exploring
+// and the next narration
+// should be Qwen-quality"
+// case.
+//
+// Tests: +3 in qwenWatchdog
+// (healthy tick = no-op,
+// dormant tick triggers
+// recovery, 5-cycle endurance
+// test for multi-recovery
+// without state leaks).
+// qwenForceReinit regression
+// stays green (7 total).
+// TS clean app-side.
+//
+// Files: app/state/
+// gameStore.ts (module-level
+// qwenWatchdogTimer +
+// startQwenWatchdog() +
+// bootQwen() starts it
+// after init).
+export const OTA_BUILD_ID = '2026-05-30-223';
