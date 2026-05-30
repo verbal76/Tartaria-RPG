@@ -3681,7 +3681,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // 'fuse' isn't in any verb alias and the player typed it directly
     // after a Fusing Crucible encounter. Routes through fuseAtCrucible
     // which handles all the gating + Qwen + arbiter narration.
-    if (/^fuse(\s|$)/i.test(trimmed)) {
+    //
+    // OTA-217 — also accept natural alternative phrasings the
+    // playtester actually typed: "use crucible", "use the crucible",
+    // "use the fuse crucible", "use the fusing crucible". Without
+    // this, the use_relic intent grabbed the verb and produced a
+    // generic "the relic responds" line with no actual fusion.
+    if (
+      /^fuse(\s|$)/i.test(trimmed) ||
+      /^use\s+(the\s+)?(fuse\s+|fusing\s+)?crucible\b/i.test(trimmed)
+    ) {
       if (!_opts?.silent) get().appendLog('player', trimmed);
       void get().fuseAtCrucible();
       return;
@@ -13889,7 +13898,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
       if (enc) {
         set(() => ({ wastelandStepsSinceEncounter: 0 }));
-        get().appendLog('world', enc.narration);
+        // OTA-217 — visually elevate fusion_bench encounters so the
+        // player can't scroll past them. Playtest log: player almost
+        // missed the Crucible because the narration was buried
+        // between a vendor banner and a travel line. The ★★ prefix
+        // matches the OTA-213 STORY THREAD convention so the row
+        // sticks out.
+        if (enc.type === 'fusion_bench') {
+          get().appendLog('world', `★★ FUSING CRUCIBLE — ${enc.narration}`);
+        } else {
+          get().appendLog('world', enc.narration);
+        }
         if (enc.npcLine) get().appendLog('arbiter', enc.npcLine);
         if (enc.loreNote) get().appendLog('world', enc.loreNote);
         if (enc.loot) {

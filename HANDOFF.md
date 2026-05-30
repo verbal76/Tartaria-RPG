@@ -245,6 +245,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Fusing Crucible discoverability — visible prefix + verb routing + persistent banner
+
+- **OTA-217 (2026-05-30) · Player: *"I almost didn't even noticed the fuse crucible until I read back to find the flavor text... I still couldn't use the damn thing."***
+  - **What:** The OTA-195 Crucible encounter was firing correctly but landing in the player's log between a vendor banner and a travel line; player missed it. They then typed `use the fuse crucible` and got the generic `use_relic` line (*"The the relic responds to the fuse crucible. A pitch, a hum, a recognition"*) with no actual fusion. Even after the encounter, no on-screen reminder that fusion was available.
+  - **Fix (1) — spawn prefix:** `fusion_bench` encounters now log as `★★ FUSING CRUCIBLE — <narration>`. Matches the OTA-213 ★ STORY THREAD convention so the row stands out instead of blending in.
+  - **Fix (2) — natural verb routing:** Extended the OTA-195 fuse short-circuit to also match `^use\s+(the\s+)?(fuse\s+|fusing\s+)?crucible\b/i`. Routes to `fuseAtCrucible` alongside the bare `fuse` verb. Covers "use the fuse crucible", "use crucible", "use the crucible", "use the fusing crucible".
+  - **Fix (3) — persistent banner:** New `★★ Fusing Crucible ready` banner in `ExplorationScreen` above the feed, rendered whenever `player.fusionPending` is true. Purple stripe (`#b88ce0`, matching the OTA-199 Rare diamond color) to differentiate from the amber vendor banner. Tap submits `fuse` so the same `fuseAtCrucible` gates fire (Qwen ready, gate check, etc.) with full arbiter narration.
+  - **Verification:** +9 tests in `crucibleUseRouting` covering bare fuse, four "use [the] [fuse|fusing] crucible" variants, case-insensitive matching, rejected non-crucible verbs. `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/state/gameStore.ts` (spawn prefix + verb routing extension), `app/screens/ExplorationScreen.tsx` (new fusionBanner + styles).
+
 #### Investigate gets directional finds + standalone cool-story flavor
 
 - **OTA-216 (2026-05-30) · Player: *"Go on directional finds and stand-alone cool story. I would like to see more of the directional finds."***

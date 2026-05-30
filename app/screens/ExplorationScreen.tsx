@@ -490,6 +490,29 @@ export function ExplorationScreen() {
         </TouchableOpacity>
       )}
 
+      {/* OTA-217 — visible permit indicator for the OTA-195 Fusing
+          Crucible. Playtest log: player almost missed the Crucible
+          encounter; even after spawning, they had no on-screen
+          reminder that they could fuse. This banner is the
+          equivalent of the vendor banner — persistent until used,
+          tap to act. Submits "fuse" through submitPlayerAction so
+          the fuseAtCrucible gates fire (Qwen ready, gate check, etc.)
+          with all the same arbiter narration. */}
+      {player?.fusionPending && (
+        <TouchableOpacity
+          style={styles.fusionBanner}
+          onPress={() => useGameStore.getState().submitPlayerAction('fuse')}
+          activeOpacity={0.7}
+        >
+          <View style={styles.fusionBannerStripe} />
+          <View style={styles.vendorBannerBody}>
+            <Text style={styles.fusionBannerName}>★★ Fusing Crucible ready</Text>
+            <Text style={styles.vendorBannerHint}>tap to fuse · spends your ♥ reserved items</Text>
+          </View>
+          <Text style={styles.vendorBannerArrow}>›</Text>
+        </TouchableOpacity>
+      )}
+
       <TutorialTarget area="feed" style={styles.feed}>
         <AdventureFeed entries={gameLog} enemyNames={currentScene?.enemies.map((e) => e.name)} />
         {isGenerating && (partialArbiterText || partialArbiterText === '') && (
@@ -1217,6 +1240,23 @@ const styles = StyleSheet.create({
   vendorBannerName: { color: '#c9a86a', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
   vendorBannerHint: { color: '#7a705c', fontSize: 10, letterSpacing: 1, marginTop: 1 },
   vendorBannerArrow: { color: '#c9a86a', fontSize: 22, paddingHorizontal: 12 },
+  // OTA-217 — Crucible permit banner. Purple stripe to differentiate
+  // from the vendor banner's amber, matching the OTA-199 Rare rarity
+  // color so the visual signal reads "rare event, act now."
+  fusionBanner: {
+    marginHorizontal: 12,
+    marginTop: 6,
+    backgroundColor: '#13110f',
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderColor: '#b88ce0',
+    borderWidth: 1,
+    borderRadius: 4,
+    overflow: 'hidden',
+    minHeight: 44,
+  },
+  fusionBannerStripe: { width: 4, backgroundColor: '#b88ce0', alignSelf: 'stretch' },
+  fusionBannerName: { color: '#b88ce0', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
   placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
 });
 

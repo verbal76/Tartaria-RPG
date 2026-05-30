@@ -7976,4 +7976,94 @@
 // __tests__/investigateHook
 // Bias.test.ts (updated for
 // new split).
-export const OTA_BUILD_ID = '2026-05-30-216';
+// 2026-05-30-217 — three
+// Fusing Crucible
+// discoverability fixes from
+// the OTA-214 log. Player:
+//   "I almost didn't even
+//   noticed the fuse crucible
+//   until I read back to
+//   find the flavor text to
+//   find out why I was in a
+//   room all of a sudden. I
+//   don't even know why I
+//   was in a room or why
+//   that text came up. it
+//   didn't mention it before
+//   but it did mention the
+//   fuse crucible and the
+//   silt and I still couldn't
+//   use the damn thing"
+//
+// Fixes:
+//
+// (1) Visual emphasis on the
+//     spawn narration —
+//     fusion_bench encounters
+//     get a "★★ FUSING
+//     CRUCIBLE — " prefix on
+//     the world line so the
+//     row stands out instead
+//     of getting buried
+//     between vendor banner +
+//     travel lines. Matches
+//     the OTA-213 ★ STORY
+//     THREAD convention.
+//
+// (2) Natural verb routing
+//     — "use the fuse
+//     crucible", "use
+//     crucible", "use the
+//     crucible", "use the
+//     fusing crucible" all
+//     now route to fuseAt
+//     Crucible alongside the
+//     bare "fuse" verb. Pre-
+//     OTA the player typed
+//     "use the fuse crucible"
+//     and got the use_relic
+//     generic line ("The the
+//     relic responds to the
+//     fuse crucible. A pitch,
+//     a hum, a recognition")
+//     with no actual fusion.
+//
+// (3) Persistent banner
+//     indicator — new
+//     "★★ Fusing Crucible
+//     ready" banner appears
+//     in the ExplorationScreen
+//     above the feed
+//     whenever player.
+//     fusionPending is true.
+//     Purple stripe (#b88ce0,
+//     matching the OTA-199
+//     Rare diamond color) to
+//     differentiate from the
+//     amber vendor banner.
+//     Tap to fuse — submits
+//     "fuse" through submit
+//     PlayerAction so all the
+//     fuseAtCrucible gates
+//     fire normally (Qwen
+//     ready, gate check, etc.)
+//     with the same arbiter
+//     narration.
+//
+// Tests: +9 in
+// crucibleUseRouting (bare
+// fuse, four "use [the]
+// [fuse|fusing] crucible"
+// variants, case-insensitive,
+// rejected non-crucible
+// verbs, document boundary
+// edge cases). TS clean
+// app-side.
+//
+// Files: app/state/
+// gameStore.ts (spawn prefix
+// + verb routing extension),
+// app/screens/
+// ExplorationScreen.tsx (new
+// fusionBanner + styles).
+export const OTA_BUILD_ID = '2026-05-30-217';
