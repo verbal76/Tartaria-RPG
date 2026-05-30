@@ -7,6 +7,34 @@ import { ARMOR_SLOTS, effectiveStats } from '../engine/equipment';
 import { formatEffectSummary } from '../engine/statusEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
 
+// OTA-214 — Aetheric Vision Lens active indicator. Pure presence
+// readout: when the player has any item granting the detect_aether
+// gate (the Lens is the canonical source), shows a small badge so
+// they KNOW the OTA-198 +15pp hookBonus is firing on their searches.
+// Without this the lens worked silently and the player had no way
+// to verify it was active beyond the rare OTA-200 hook narration.
+function AethericVisionBadge({ player }: Props) {
+  const active = React.useMemo(() => {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { aethericVisionActive } = require('../engine/itemEffect');
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { findExplorationItemByName, findGearByName, findMaterialByName } = require('../engine/crafting');
+      return !!aethericVisionActive(
+        player.inventory.map((i) => i.name),
+        [findExplorationItemByName, findGearByName, findMaterialByName],
+      );
+    } catch { return false; }
+  }, [player.inventory]);
+  if (!active) return null;
+  return (
+    <Text style={lensBadgeStyle.badge}>◉ AETHERIC LENS · scanning</Text>
+  );
+}
+const lensBadgeStyle = StyleSheet.create({
+  badge: { color: '#6a9bbf', fontSize: 10, fontWeight: '700', letterSpacing: 0.5, marginTop: 3 },
+});
+
 // OTA-211 — Aether Dust buff countdown. Reads player.aetherBuff;
 // re-renders every second while active so the player sees the
 // timer ticking down. Hidden when no buff is active. Format:
@@ -105,6 +133,7 @@ export function StatsPanel({ player }: Props) {
         <Stat label="TC" value={`${player.tc}`} />
         <Stat label="Corr" value={`${player.corruption}`} />
       </View>
+      <AethericVisionBadge player={player} />
       <AetherBuffBadge player={player} />
       <View style={styles.row}>
         <Stat label="STR" value={formatStat(player.stats.strength, eff.strength)} />

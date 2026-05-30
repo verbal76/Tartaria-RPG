@@ -181,7 +181,16 @@ export type HookEffect =
   // priest, etc.) so the narration's "trade if you want" promise
   // is actually backed by an interaction. Vendor lives until the
   // scene refreshes or the hook advances.
-  | { type: 'spawn_vendor'; vendor: HookVendorSpec };
+  | { type: 'spawn_vendor'; vendor: HookVendorSpec }
+  // OTA-214 — grant a real quest hook (hunt / mystery) from the
+  // wasteland_encounters.json quest_hook pool. Replaces the OTA-???
+  // "memo" approach (player ran a temporal eddy and got vague
+  // "you learned a name" narration with no actual payload; the
+  // playtester explicitly asked: "I'd rather have a quest hook
+  // happen"). The handler picks a random unfired hook from the
+  // pool and routes through grantQuestHook so the entry lands in
+  // player.activeQuests with the canonical arbiter narration.
+  | { type: 'grant_random_quest_hook'; pool: 'hunt' | 'mystery' | 'any' };
 
 // OTA-185 — minimal vendor-spec for hook-spawned traders. Mirrors
 // the VendorInstance fields the engine needs to render + serve a
@@ -485,11 +494,22 @@ const CHAINS: Record<HookKind, HookOutcome[]> = {
       done: false,
     },
     {
-      line: 'Hours pass in what felt like a step — and a single clear thought lands in your head that wasn\'t there before. A name. A direction. Something you didn\'t know you needed to know.',
-      arbiterLine: '"The Aetheric eddies sometimes pay in knowledge instead of coin," the Arbiter says.',
+      // OTA-214 — eddy stage 2 now grants a REAL quest hook from
+      // the wasteland_encounters.json pool instead of a vague
+      // "knowledge of a place" memo. Player explicitly asked:
+      //   "I'd rather have a quest hook happen. ... if you say go
+      //   to East and find the [hickey dealer] that you could
+      //   actually go to East and there would be a [hickey dealer]
+      //   there."
+      // The grant_random_quest_hook effect picks a random unfired
+      // mystery/hunt and adds it to player.activeQuests with the
+      // canonical arbiter narration, so the player has a concrete
+      // name + objective to chase rather than poetic placeholder.
+      line: 'Hours pass in what felt like a step — and a single clear thought lands in your head that wasn\'t there before. A name and a place. The eddy paid in directions.',
+      arbiterLine: '"The Aetheric eddies sometimes pay in knowledge instead of coin," the Arbiter says. "Check your contracts board — the eddy added one."',
       effects: [
         { type: 'advance_time', hours: 6 },
-        { type: 'memo', text: 'A temporal eddy gave you knowledge of a place you have never been.' },
+        { type: 'grant_random_quest_hook', pool: 'any' },
       ],
       done: true,
     },

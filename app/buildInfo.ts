@@ -7685,4 +7685,112 @@
 // prefix hook outcomes;
 // resolveHookOneStep adds
 // stage labels).
-export const OTA_BUILD_ID = '2026-05-29-213';
+// 2026-05-30-214 — three
+// playtest follow-ups:
+//
+// (1) USE button no longer
+//     shows on equip-only
+//     items (armor without
+//     an authored effect).
+//     Player:
+//       "I don't think you
+//       can have both equip
+//       and use on things
+//       like armor cuz to
+//       use it. you have to
+//       equip it."
+//     Pre-OTA the gate was
+//     isConsumable || hasEffect
+//     || (anySlotFree &&
+//     (offEligible ||
+//     slots.length > 0)) —
+//     the third branch fired
+//     for any equippable item.
+//     Now it's isConsumable ||
+//     hasEffect || offEligible.
+//     Armor and other pure-
+//     equip items show ONLY
+//     the Equip button.
+//
+// (2) New AethericVisionBadge
+//     in StatsPanel.tsx
+//     surfaces when the
+//     player carries any
+//     item granting the
+//     detect_aether gate.
+//     Renders "◉ AETHERIC
+//     LENS · scanning" in
+//     the same panel area
+//     as the OTA-211
+//     AetherBuffBadge so the
+//     player KNOWS the
+//     OTA-198 +15pp hookBonus
+//     is firing. Player:
+//       "the etheric lens I
+//       hit use and the
+//       arbiter said just
+//       keep it on you. it's
+//       already being used
+//       so how do I know
+//       that it's active?"
+//
+// (3) Temporal eddy now
+//     grants a REAL quest
+//     hook from the existing
+//     wasteland_encounters
+//     pool instead of vague
+//     "you learned a name"
+//     narration. Player:
+//       "I've gone to where
+//       whispers were supposed
+//       to happen and nothing
+//       really happened. ...
+//       I'd rather have a
+//       quest hook happen."
+//     New HookEffect type
+//     `grant_random_quest_hook`
+//     ({ pool: 'hunt' |
+//     'mystery' | 'any' }).
+//     applyHookEffect handler
+//     scans wasteland_
+//     encounters.json for
+//     quest_hook entries
+//     matching the pool,
+//     filters out hooks
+//     already in player.
+//     activeQuests, picks one
+//     at random, routes
+//     through grantQuestHook.
+//     Arbiter narration:
+//       "The Aetheric eddies
+//       sometimes pay in
+//       knowledge instead of
+//       coin. Check your
+//       contracts board —
+//       the eddy added one."
+//
+// Tests: +9 in
+// lensBadgeAndEddyQuest
+// (lens active predicate,
+// USE button gate truth
+// table, grant_random_
+// quest_hook type literal).
+// aethericLensAndShard +
+// investigateHookBias
+// regression stays green
+// (23 tests across the three
+// suites). TS clean app-side.
+//
+// Files: app/screens/
+// InventoryScreen.tsx (USE
+// button gate tightened),
+// app/components/
+// StatsPanel.tsx (NEW
+// AethericVisionBadge),
+// app/engine/hooks.ts (new
+// HookEffect type + eddy
+// stage 2 outcome), app/
+// state/gameStore.ts
+// (grant_random_quest_hook
+// handler).
+export const OTA_BUILD_ID = '2026-05-30-214';

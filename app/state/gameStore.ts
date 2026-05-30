@@ -15829,6 +15829,44 @@ function applyHookEffect(
       });
       return { inlineSummary: `${effect.vendor.name} sits by the fire — tap to trade.`, fatal: false };
     }
+    case 'grant_random_quest_hook': {
+      // OTA-214 — pick a random unfired quest_hook from the
+      // wasteland encounter pool and grant it via the existing
+      // grantQuestHook path. The eddy / chain that triggered this
+      // effect gets a CONCRETE payload (a quest in activeQuests
+      // with a real name + objective the player can chase) instead
+      // of vague "you learned something" narration.
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const data = require('../data/world/wasteland_encounters.json') as Record<string, { quest_hook?: { kind: 'hunt' | 'mystery'; id: string } }>;
+        const allHooks: Array<{ kind: 'hunt' | 'mystery'; id: string }> = [];
+        for (const arch of Object.values(data)) {
+          const qh = arch?.quest_hook;
+          if (!qh) continue;
+          if (effect.pool !== 'any' && qh.kind !== effect.pool) continue;
+          allHooks.push(qh);
+        }
+        const livePlayer = get().player;
+        if (!livePlayer || allHooks.length === 0) {
+          return { inlineSummary: 'a quiet knowing the world forgot to name', fatal: false };
+        }
+        const activeIds = new Set((livePlayer.activeQuests ?? []).map((q) => q.id));
+        const eligible = allHooks.filter((h) => !activeIds.has(h.id));
+        if (eligible.length === 0) {
+          // All quest hooks already known — fall back to flavor.
+          return { inlineSummary: 'a confirmation of something you already half-knew', fatal: false };
+        }
+        const picked = eligible[Math.floor(Math.random() * eligible.length)]!;
+        grantQuestHook(get, set, picked);
+        // Build a readable name for the inline summary.
+        const readable = picked.id
+          .replace(/^(hunt|mystery)_/, '')
+          .replace(/_/g, ' ');
+        return { inlineSummary: `a name and a place: ${readable}`, fatal: false };
+      } catch {
+        return { inlineSummary: 'a quiet knowing', fatal: false };
+      }
+    }
   }
 }
 

@@ -245,6 +245,15 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### USE-on-armor cleanup + visible Aetheric Vision Lens badge + eddy grants a real quest
+
+- **OTA-214 (2026-05-30) · Three playtest follow-ups from the OTA-212 log.**
+  - **(1) USE button hidden on equip-only items.** Player: *"I don't think you can have both equip and use on things like armor cuz to use it. you have to equip it."* Pre-fix the modal showed both Equip and Use on armor — the USE button just re-routed to the equip handler. Now the gate is `isConsumable || hasEffect || offEligible`. Armor and other pure-equip items show only the dedicated Equip button. Consumables, effect-bearing relics (Torch, Lens, Scanner), and off-hand-eligible items still get USE.
+  - **(2) AethericVisionBadge in StatsPanel.** Player: *"the etheric lens I hit use and the arbiter said just keep it on you. it's already being used so how do I know that it's active?"* New badge renders `◉ AETHERIC LENS · scanning` whenever the player carries any item granting the `detect_aether` gate. Mounts alongside the OTA-211 AetherBuffBadge so the player has a one-glance readout of which passive effects are firing.
+  - **(3) Temporal eddy grants a real quest hook.** Player: *"I've gone to where whispers were supposed to happen and nothing really happened. ... I'd rather have a quest hook happen."* The eddy's stage 2 outcome used to fire a vague `memo` ("you learned a name"); now it grants a real `quest_hook` from `wasteland_encounters.json`. New HookEffect type `grant_random_quest_hook` ({ pool: 'hunt' | 'mystery' | 'any' }); the handler scans for matching hooks, filters out already-active ones, picks one at random, routes through `grantQuestHook`. Arbiter narration: *"The Aetheric eddies sometimes pay in knowledge instead of coin. Check your contracts board — the eddy added one."* The player now has a concrete objective they can chase.
+  - **Verification:** +9 tests in `lensBadgeAndEddyQuest` (lens active predicate, USE button gate truth table, grant_random_quest_hook type literal). `aethericLensAndShard` + `investigateHookBias` regression stays green (23 tests). `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/screens/InventoryScreen.tsx` (USE gate tightened), `app/components/StatsPanel.tsx` (NEW AethericVisionBadge), `app/engine/hooks.ts` (new HookEffect type + eddy stage 2 outcome), `app/state/gameStore.ts` (grant_random_quest_hook handler).
+
 #### Investigate becomes the story-seeking verb + ★ STORY THREAD prefix on hook narration
 
 - **OTA-213 (2026-05-29) · Player ask: *"let's have investigate be more inclined to have you find story hooks than anything else. ... I never realized there was a story playing out. ... I don't want this shit to be a clicking simulator."***

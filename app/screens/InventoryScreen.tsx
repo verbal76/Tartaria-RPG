@@ -269,7 +269,19 @@ export function InventoryScreen() {
     })();
     const offEligible = pending.slots.includes('off') && !equippedInSlots.includes('off');
     const anySlotFree = pending.slots.some((s) => !equippedInSlots.includes(s));
-    if (isConsumable || hasEffect || (anySlotFree && (offEligible || pending.slots.length > 0))) {
+    // OTA-214 — fix the redundant USE button on equip-only items.
+    // Player ask: "I don't think you can have both equip and use on
+    // things like armor cuz to use it. you have to equip it." Pre-OTA
+    // the modal showed BOTH "Equip (Chest)" and "Use" on armor — the
+    // Use button just re-routed through the equip handler, no
+    // different from tapping Equip. Now USE is only surfaced when
+    // there's a REAL action behind it: consumable (eat), an authored
+    // effect (Torch's revealScene, Lens's gate, Scanner's bias), or
+    // an off-hand-eligible item that takes a use-style off-hand
+    // equip. Pure-armor / pure-weapon (no effect, equippable) gets
+    // the dedicated Equip button only.
+    const useIsRealAction = isConsumable || hasEffect || offEligible;
+    if (useIsRealAction) {
       buttons.push({
         label: isConsumable ? 'Use (eat)' : (offEligible ? 'Use (off hand)' : 'Use'),
         onPress: doUse,
