@@ -1001,6 +1001,8 @@ interface GameStore {
   giftToVendor: (itemName: string) => void;
   stealFromVendor: (itemName: string) => void;
   repairWithVendor: (itemName: string) => void;
+  /** Flip the one-time "items outlined in red need repair" tutorial nudge. */
+  markRepairNudgeShown: () => void;
   acceptFactionQuest: (titleOrId: string) => void;
   turnInFactionQuest: (titleOrId: string) => void;
   acceptHunt: (titleOrId: string) => void;
@@ -9228,6 +9230,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       `${scene.vendor.name} mends your ${item.name}. ${cost} TC. (durability restored)`,
     );
+    void get().persist();
+  },
+
+  markRepairNudgeShown() {
+    set((s) => ({ worldMemory: { ...s.worldMemory, repairNudgeShown: true } }));
     void get().persist();
   },
 

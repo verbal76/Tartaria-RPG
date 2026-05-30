@@ -125,4 +125,14 @@
 //       feeds the bug-report email body so triage from a report
 //       starts with identical identifying info to what the
 //       player sees in About.
-export const OTA_BUILD_ID = '2026-05-26-063';
+//
+// 2026-05-30 OTA-064 — pack repair UX: red row outline on worn items,
+// Repair button in the existing item modal, second modal that shows
+// the material checklist with green-if-have / red-if-not lines, and
+// a one-time "items outlined in red need repair" nudge the first
+// time the player opens the pack with a worn item. Uses the existing
+// repairInventoryItem action + repairCostMaterials so the cost rule
+// (2× scrap output) stays consistent with the Crafting → REPAIR tab.
+// The Crafting REPAIR tab is removed in this same OTA — pack repair
+// is the only field-repair surface now (vendor TC repair coexists).
+export const OTA_BUILD_ID = '2026-05-30-064';

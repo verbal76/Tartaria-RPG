@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import {
@@ -14,9 +14,12 @@ import { findWeaponByName } from '../engine/crafting';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview } from '../components/itemPreview';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
-// 2026-05-26 OTA-059 — RECIPES tab moved to CraftingScreen as its
-// 3rd tab (CRAFT / REPAIR / RECIPES). InventoryScreen is now a
-// single ITEMS view — no tabs needed.
+import { needsRepair } from '../engine/durability';
+import { repairCostMaterials } from '../engine/scrapEngine';
+// 2026-05-30 OTA-064 — RECIPES tab moved to CraftingScreen as its
+// 3rd tab (CRAFT / REPAIR / RECIPES) in OTA-059. OTA-064 then drops
+// the Crafting REPAIR tab — field-repair now lives entirely in the
+// pack item modal here.
 
 export function InventoryScreen() {
   const player = useGameStore((s) => s.player);
@@ -26,12 +29,33 @@ export function InventoryScreen() {
   const dropInventoryItem = useGameStore((s) => s.dropInventoryItem);
   const useInventoryItem = useGameStore((s) => s.useInventoryItem);
   const scrapInventoryItem = useGameStore((s) => s.scrapInventoryItem);
+  const repairInventoryItem = useGameStore((s) => s.repairInventoryItem);
+  const repairNudgeShown = useGameStore((s) => s.worldMemory.repairNudgeShown ?? false);
+  const markRepairNudgeShown = useGameStore((s) => s.markRepairNudgeShown);
   const [pending, setPending] = useState<{ item: InventoryItem; slots: EquipSlot[] } | null>(null);
   // After-scrap result list. When non-null, the action-modal body
   // switches from "Equip / Drop / Scrap" buttons to a "✦ Added to
   // pack" summary with a single CLOSE button. Cleared on next
   // item-tap.
   const [scrapResult, setScrapResult] = useState<InventoryDelta[] | null>(null);
+  // Sub-modal: when set, replaces the equip modal with the repair material
+  // checklist for the same item.
+  const [repairFor, setRepairFor] = useState<InventoryItem | null>(null);
+  const [showNudge, setShowNudge] = useState(false);
+
+  // Fire the one-time nudge the first time the player opens the pack with
+  // any worn-but-not-broken item. We mark it shown immediately so the
+  // modal doesn't reopen if they tap dismiss and reopen the screen.
+  const hasWornItem = useMemo(
+    () => !!player?.inventory.some(needsRepair),
+    [player?.inventory],
+  );
+  useEffect(() => {
+    if (!repairNudgeShown && hasWornItem) {
+      setShowNudge(true);
+      markRepairNudgeShown();
+    }
+  }, [repairNudgeShown, hasWornItem, markRepairNudgeShown]);
 
   if (!player) {
     return (
@@ -184,6 +208,18 @@ export function InventoryScreen() {
         tone: 'primary',
       });
     }
+    // REPAIR — only when the item is worn. Opens the material modal.
+    if (needsRepair(pending.item)) {
+      buttons.push({
+        label: 'Repair',
+        onPress: () => {
+          const item = pending.item;
+          setPending(null);
+          setRepairFor(item);
+        },
+        tone: 'primary',
+      });
+    }
     // SCRAP — only for built items with material content. Hidden for
     // raw stock (already material) and for items currently equipped
     // (would leave a phantom slot).
@@ -218,6 +254,21 @@ export function InventoryScreen() {
     try { modalPreview = getItemPreview(pending.item.name); }
     catch { modalPreview = null; }
   }
+
+  // Build the repair sub-modal's checklist. Re-reads inventory off the
+  // live player so material counts stay accurate after consumption.
+  const repairChecklistData = repairFor
+    ? (() => {
+        const cost = repairCostMaterials(repairFor);
+        const lines = cost.map((c) => {
+          const have = player.inventory
+            .filter((i) => i.name.toLowerCase() === c.name.toLowerCase())
+            .reduce((s, i) => s + i.quantity, 0);
+          return { name: c.name, need: c.quantity, have, ok: have >= c.quantity };
+        });
+        return { lines, canRepair: lines.length > 0 && lines.every((l) => l.ok) };
+      })()
+    : null;
   const modalBody = pending && pending.slots.length === 0 && (slotsByEquippedName.get(pending.item.name)?.length ?? 0) === 0
     ? 'This item cannot be equipped, but you can still keep, gift, sell, or use it.'
     : undefined;
@@ -308,6 +359,51 @@ export function InventoryScreen() {
         buttons={scrapResultButtons ?? buildModalButtons()}
         onRequestClose={closeModal}
       />
+
+      <BrandedModal
+        visible={repairFor !== null}
+        title={repairFor ? `Repair ${repairFor.name}` : ''}
+        bodyNode={
+          repairChecklistData ? (
+            <View style={styles.repairList}>
+              <Text style={styles.repairIntro}>Requires:</Text>
+              {repairChecklistData.lines.map((l) => (
+                <Text
+                  key={l.name}
+                  style={[styles.repairLine, l.ok ? styles.repairOk : styles.repairMissing]}
+                >
+                  · {l.name} {l.have}/{l.need}
+                </Text>
+              ))}
+            </View>
+          ) : null
+        }
+        buttons={[
+          {
+            label: 'Repair',
+            tone: 'primary',
+            onPress: () => {
+              if (!repairFor) return;
+              if (repairChecklistData?.canRepair) {
+                repairInventoryItem(repairFor.id);
+              }
+              setRepairFor(null);
+            },
+          },
+          { label: 'Close', tone: 'neutral', onPress: () => setRepairFor(null) },
+        ]}
+        onRequestClose={() => setRepairFor(null)}
+      />
+
+      <BrandedModal
+        visible={showNudge}
+        title="Wear & Repair"
+        body={
+          "Items in your pack outlined in red are worn and need repair. Tap the item, then choose Repair — the modal will show what materials are required."
+        }
+        buttons={[{ label: 'Got it', tone: 'primary', onPress: () => setShowNudge(false) }]}
+        onRequestClose={() => setShowNudge(false)}
+      />
     </View>
   );
 }
@@ -324,9 +420,10 @@ function ItemRow({
   onPress: () => void;
 }) {
   const canEquip = validSlotsForItem(item).length > 0;
+  const worn = needsRepair(item);
   return (
     <TouchableOpacity
-      style={styles.row}
+      style={[styles.row, worn && styles.rowNeedsRepair]}
       onPress={onPress}
       activeOpacity={0.7}
     >
@@ -442,6 +539,12 @@ const styles = StyleSheet.create({
   // OTA 028 — damage dice chip in green so it pops as the
   // "how hard does this hit" signal at a glance.
   rowDamage: { color: '#9ec96a' },
+  rowNeedsRepair: { borderColor: '#e07a5f', borderWidth: 1 },
+  repairList: { marginBottom: 4, gap: 4 },
+  repairIntro: { color: '#cdbf99', fontSize: 12, letterSpacing: 1, marginBottom: 4 },
+  repairLine: { fontSize: 13, letterSpacing: 1 },
+  repairOk: { color: '#9ec96a' },
+  repairMissing: { color: '#e07a5f' },
   rowEquipped: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   rowEquippable: { color: '#7a705c', fontSize: 10, letterSpacing: 1, fontStyle: 'italic' },
   empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 30 },

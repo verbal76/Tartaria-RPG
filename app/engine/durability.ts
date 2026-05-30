@@ -127,3 +127,11 @@ export function repairItem(
     i.id === itemId && i.durability ? { ...i, durability: { ...i.durability, current: i.durability.max } } : i,
   );
 }
+
+// Whether an item is "worn" enough to surface a Repair option / red row.
+// Anything below max counts so the player can mend at any point. The 25%
+// threshold is reserved for the urgency tint (already applied in the row).
+export function needsRepair(item: InventoryItem): boolean {
+  if (!item.durability) return false;
+  return item.durability.current < item.durability.max;
+}

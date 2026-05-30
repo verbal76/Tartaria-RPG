@@ -22,6 +22,9 @@ interface Props {
   title: string;
   /** Main body text (used when there's no item preview). */
   body?: string;
+  /** Custom body content. Rendered in place of `body` when set, so callers
+   *  can include colored lines or other structured content. */
+  bodyNode?: React.ReactNode;
   /** When set, renders a structured item card under the title. */
   itemPreview?: ItemPreview | null;
   /** Optional extra context line shown beneath the preview. */
@@ -37,6 +40,7 @@ export function BrandedModal({
   visible,
   title,
   body,
+  bodyNode,
   itemPreview,
   contextLine,
   buttons,
@@ -85,7 +89,7 @@ export function BrandedModal({
                 </View>
               ) : null}
 
-              {body ? <Text style={styles.body}>{body}</Text> : null}
+              {bodyNode ? bodyNode : body ? <Text style={styles.body}>{body}</Text> : null}
               {contextLine ? <Text style={styles.context}>{contextLine}</Text> : null}
 
               <View style={styles.buttonRow}>

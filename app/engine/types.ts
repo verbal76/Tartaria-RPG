@@ -853,6 +853,10 @@ export interface WorldMemory {
    *  after combat — gives the player room to wander, dig, search, inspect
    *  without immediately rolling another encounter. */
   scenesSinceCombat?: number;
+  /** One-shot flag: have we shown the player the "red-outlined items need
+   *  repair" nudge yet? Fires the first time they open the pack with any
+   *  worn item present. */
+  repairNudgeShown?: boolean;
   /** HANDOFF #15 — first cut MapGraph. Tracks every room the player has
    *  set foot in, keyed by `locationId@microMicroId@mapX,mapY`. First
    *  use is "you've been here before" narration on look + scene entry.
