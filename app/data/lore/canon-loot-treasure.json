@@ -1,0 +1,437 @@
+{
+  "_comment": "OTA-234 — ingested from loot_and_treasure_table.docx. 47 canonical loot / treasure / artifact entries (Ancient Tartarian Crown, Aetherstone Pendant, Royal Tartarian Jewelry Set, etc.). Lore-only; promotion to authored loot tables is per-OTA.",
+  "items": [
+    {
+      "id": "ancient_tartarian_crown",
+      "name": "Ancient Tartarian Crown",
+      "category": "Treasure",
+      "rarity": "Legendary",
+      "source": "Found in royal Tartarian tombs",
+      "tcValue": 500,
+      "notes": "Symbol of ancient royalty, priceless to collectors"
+    },
+    {
+      "id": "old_world_jewelry_box",
+      "name": "Old World Jewelry Box",
+      "category": "Treasure",
+      "rarity": "Uncommon",
+      "source": "Found in Unknowing Masses ruins",
+      "tcValue": 120,
+      "notes": "Contains antique jewelry, valuable to traders"
+    },
+    {
+      "id": "aetherstone_pendant",
+      "name": "Aetherstone Pendant",
+      "category": "Artifact",
+      "rarity": "Rare",
+      "source": "Found in ancient vaults",
+      "tcValue": 250,
+      "notes": "Boosts Etheric energy, valuable to Etheric factions"
+    },
+    {
+      "id": "encrypted_data_chip",
+      "name": "Encrypted Data Chip",
+      "category": "Trade Good",
+      "rarity": "Uncommon",
+      "source": "Found in high-tech labs",
+      "tcValue": 80,
+      "notes": "Contains valuable data, sellable to hackers or corporations"
+    },
+    {
+      "id": "forgotten_order_medallion",
+      "name": "Forgotten Order Medallion",
+      "category": "Treasure",
+      "rarity": "Rare",
+      "source": "Found in Forgotten Order ruins",
+      "tcValue": 180,
+      "notes": "Symbol of membership, prized by collectors"
+    },
+    {
+      "id": "crystalline_goblet",
+      "name": "Crystalline Goblet",
+      "category": "Treasure",
+      "rarity": "Epic",
+      "source": "Found in Tartarian ruins",
+      "tcValue": 350,
+      "notes": "Made of Etheric crystals, highly valuable"
+    },
+    {
+      "id": "gold_plated_watch",
+      "name": "Gold-Plated Watch",
+      "category": "Treasure",
+      "rarity": "Common",
+      "source": "Found in Unknowing Masses vaults",
+      "tcValue": 40,
+      "notes": "Functional, but mostly valuable as a trade item"
+    },
+    {
+      "id": "ceremonial_tartarian_sword",
+      "name": "Ceremonial Tartarian Sword",
+      "category": "Artifact",
+      "rarity": "Rare",
+      "source": "Found in a royal Tartarian vault",
+      "tcValue": 200,
+      "notes": "Valued as a historical relic, not usable in combat"
+    },
+    {
+      "id": "etheric_painting",
+      "name": "Etheric Painting",
+      "category": "Treasure",
+      "rarity": "Rare",
+      "source": "Found in Tartarian palace",
+      "tcValue": 220,
+      "notes": "Etheric-infused art piece, valuable to collectors"
+    },
+    {
+      "id": "relic_collector_s_stash",
+      "name": "Relic Collector's Stash",
+      "category": "Treasure",
+      "rarity": "Uncommon",
+      "source": "Found in an NPC stash",
+      "tcValue": 150,
+      "notes": "Contains several minor relics, valuable as a lot"
+    },
+    {
+      "id": "royal_signet_ring",
+      "name": "Royal Signet Ring",
+      "category": "Treasure",
+      "rarity": "Rare",
+      "source": "Found in a monarch's crypt",
+      "tcValue": 200,
+      "notes": "Grants access to hidden vaults, collectible item"
+    },
+    {
+      "id": "gem_encrusted_chalice",
+      "name": "Gem-Encrusted Chalice",
+      "category": "Treasure",
+      "rarity": "Rare",
+      "source": "Found in Tartarian noble ruins",
+      "tcValue": 180,
+      "notes": "Valuable for its gems and craftsmanship"
+    },
+    {
+      "id": "old_world_antiques",
+      "name": "Old World Antiques",
+      "category": "Trade Good",
+      "rarity": "Common",
+      "source": "Found in abandoned homes",
+      "tcValue": 100,
+      "notes": "Set of antique furniture and decor, valuable to collectors"
+    },
+    {
+      "id": "tartarian_coin_pouch",
+      "name": "Tartarian Coin Pouch",
+      "category": "Currency",
+      "rarity": "Rare",
+      "source": "Found in royal Tartarian vaults",
+      "tcValue": 150,
+      "notes": "Contains ancient coins, valuable for trade"
+    },
+    {
+      "id": "etheric_crystal_cluster",
+      "name": "Etheric Crystal Cluster",
+      "category": "Resource",
+      "rarity": "Epic",
+      "source": "Found in deep Tartarian ruins",
+      "tcValue": 300,
+      "notes": "Usable in high-tier crafting and relics"
+    },
+    {
+      "id": "old_world_gold_bars",
+      "name": "Old World Gold Bars",
+      "category": "Currency",
+      "rarity": "Uncommon",
+      "source": "Found in Unknowing Masses vaults",
+      "tcValue": 200,
+      "notes": "Valuable for its gold content, tradable"
+    },
+    {
+      "id": "tartarian_war_relics",
+      "name": "Tartarian War Relics",
+      "category": "Treasure",
+      "rarity": "Uncommon",
+      "source": "Found in ancient battlefields",
+      "tcValue": 120,
+      "notes": "Relics from a long-forgotten war, valuable to historians"
+    },
+    {
+      "id": "titan_s_heirloom_amulet",
+      "name": "Titan's Heirloom Amulet",
+      "category": "Treasure",
+      "rarity": "Epic",
+      "source": "Found in royal Tartarian vault",
+      "tcValue": 450,
+      "notes": "Grants Etheric power, extremely valuable"
+    },
+    {
+      "id": "lost_reclaimer_tech_cache",
+      "name": "Lost Reclaimer Tech Cache",
+      "category": "Treasure",
+      "rarity": "Rare",
+      "source": "Found in a hidden bunker",
+      "tcValue": 250,
+      "notes": "Contains advanced tech parts, valuable for repair or sale"
+    },
+    {
+      "id": "old_world_vinyl_records",
+      "name": "Old World Vinyl Records",
+      "category": "Trade Good",
+      "rarity": "Common",
+      "source": "Found in Unknowing Masses homes",
+      "tcValue": 50,
+      "notes": "Collector's items, valuable for trade. 5 in a set"
+    },
+    {
+      "id": "etheric_artifact_damaged",
+      "name": "Etheric Artifact (Damaged)",
+      "category": "Artifact",
+      "rarity": "Uncommon",
+      "source": "Found in Tartarian ruins",
+      "tcValue": 120,
+      "notes": "Can be repaired for full use or sold as-is"
+    },
+    {
+      "id": "mud_monarch_s_tribal_crown",
+      "name": "Mud Monarch's Tribal Crown",
+      "category": "Treasure",
+      "rarity": "Rare",
+      "source": "Found in Mud Monarch tomb",
+      "tcValue": 200,
+      "notes": "Symbol of leadership, valuable to traders or historians"
+    },
+    {
+      "id": "crystal_embedded_statue",
+      "name": "Crystal-Embedded Statue",
+      "category": "Treasure",
+      "rarity": "Epic",
+      "source": "Found in ancient Tartarian temples",
+      "tcValue": 400,
+      "notes": "Prized for its intricate Etheric crystal design"
+    },
+    {
+      "id": "old_world_diamond_necklace",
+      "name": "Old World Diamond Necklace",
+      "category": "Treasure",
+      "rarity": "Rare",
+      "source": "Found in a vault in Unknowing Masses",
+      "tcValue": 250,
+      "notes": "Highly valuable due to the diamonds and craftsmanship"
+    },
+    {
+      "id": "tartarian_noble_s_headdress",
+      "name": "Tartarian Noble's Headdress",
+      "category": "Treasure",
+      "rarity": "Rare",
+      "source": "Found in noble crypts",
+      "tcValue": 180,
+      "notes": "Valuable cultural relic, prized by collectors"
+    },
+    {
+      "id": "fusion_reactor_blueprint",
+      "name": "Fusion Reactor Blueprint",
+      "category": "Trade Good",
+      "rarity": "Epic",
+      "source": "Found in a secret Unknowing Masses lab",
+      "tcValue": 350,
+      "notes": "Rare blueprint, valuable to corporations and factions"
+    },
+    {
+      "id": "etheric_relic_minor",
+      "name": "Etheric Relic (Minor)",
+      "category": "Artifact",
+      "rarity": "Rare",
+      "source": "Found in Tartarian ruins",
+      "tcValue": 180,
+      "notes": "Small Etheric artifact, usable in crafting or trade"
+    },
+    {
+      "id": "obsidian_tablet_fragment",
+      "name": "Obsidian Tablet (Fragment)",
+      "category": "Artifact",
+      "rarity": "Rare",
+      "source": "Found in ancient ruins",
+      "tcValue": 220,
+      "notes": "Holds partial knowledge of Tartarian history, valuable to scholars"
+    },
+    {
+      "id": "old_world_cash_bundle",
+      "name": "Old World Cash Bundle",
+      "category": "Currency",
+      "rarity": "Common",
+      "source": "Found in abandoned buildings",
+      "tcValue": 50,
+      "notes": "Currency from the pre-collapse era, still usable in trade"
+    },
+    {
+      "id": "aether_crafted_ring",
+      "name": "Aether-Crafted Ring",
+      "category": "Artifact",
+      "rarity": "Epic",
+      "source": "Found in a royal Tartarian vault",
+      "tcValue": 300,
+      "notes": "Grants minor Etheric power, highly valuable"
+    },
+    {
+      "id": "royal_tartarian_jewelry_set",
+      "name": "Royal Tartarian Jewelry Set",
+      "category": "Treasure",
+      "rarity": "Legendary",
+      "source": "Found in the tomb of a Tartarian queen",
+      "tcValue": 500,
+      "notes": "Complete set of crown, rings, and necklace, extremely valuable"
+    },
+    {
+      "id": "ancient_armor_plate",
+      "name": "Ancient Armor Plate",
+      "category": "Artifact",
+      "rarity": "Rare",
+      "source": "Found in Tartarian battlefields",
+      "tcValue": 150,
+      "notes": "Historical relic, not usable as armor but valuable to collectors"
+    },
+    {
+      "id": "precious_stones_raw",
+      "name": "Precious Stones (Raw)",
+      "category": "Resource",
+      "rarity": "Common",
+      "source": "Found in Tartarian ruins",
+      "tcValue": 40,
+      "notes": "Used for crafting jewelry or for trade"
+    },
+    {
+      "id": "damaged_etheric_core",
+      "name": "Damaged Etheric Core",
+      "category": "Resource",
+      "rarity": "Uncommon",
+      "source": "Found in a destroyed Etheric machine",
+      "tcValue": 120,
+      "notes": "Can be repaired or sold as salvageable tech"
+    },
+    {
+      "id": "old_world_weapons_cache",
+      "name": "Old World Weapons Cache",
+      "category": "Treasure",
+      "rarity": "Rare",
+      "source": "Found in a hidden military bunker",
+      "tcValue": 300,
+      "notes": "Contains multiple pre-collapse weapons, valuable to collectors"
+    },
+    {
+      "id": "gold_plated_etheric_chalice",
+      "name": "Gold-Plated Etheric Chalice",
+      "category": "Treasure",
+      "rarity": "Epic",
+      "source": "Found in a royal Tartarian vault",
+      "tcValue": 400,
+      "notes": "Infused with Etheric energy, valuable and powerful artifact"
+    },
+    {
+      "id": "cybernetic_implant_damaged",
+      "name": "Cybernetic Implant (Damaged)",
+      "category": "Trade Good",
+      "rarity": "Uncommon",
+      "source": "Found in abandoned lab",
+      "tcValue": 100,
+      "notes": "Usable for repair or research, valuable to tech factions"
+    },
+    {
+      "id": "old_world_medicine_stash",
+      "name": "Old World Medicine Stash",
+      "category": "Trade Good",
+      "rarity": "Uncommon",
+      "source": "Found in Unknowing Masses ruins",
+      "tcValue": 120,
+      "notes": "Includes valuable pre-collapse medical supplies"
+    },
+    {
+      "id": "etheric_lantern_antique",
+      "name": "Etheric Lantern (Antique)",
+      "category": "Artifact",
+      "rarity": "Rare",
+      "source": "Found in deep Tartarian vaults",
+      "tcValue": 180,
+      "notes": "Usable for Etheric light, prized for its historical value"
+    },
+    {
+      "id": "mud_monarch_s_scepter",
+      "name": "Mud Monarch's Scepter",
+      "category": "Treasure",
+      "rarity": "Rare",
+      "source": "Found in a Mud Monarch tomb",
+      "tcValue": 220,
+      "notes": "Symbol of power, valuable to collectors and traders"
+    },
+    {
+      "id": "damaged_etheric_staff",
+      "name": "Damaged Etheric Staff",
+      "category": "Artifact",
+      "rarity": "Uncommon",
+      "source": "Found in Tartarian ruins",
+      "tcValue": 130,
+      "notes": "Can be repaired or sold as a minor relic"
+    },
+    {
+      "id": "old_world_artifacts_common",
+      "name": "Old World Artifacts (Common)",
+      "category": "Treasure",
+      "rarity": "Common",
+      "source": "Found in Unknowing Masses vaults",
+      "tcValue": 80,
+      "notes": "Various antique tools and relics, valuable in bulk"
+    },
+    {
+      "id": "royal_tartarian_shield",
+      "name": "Royal Tartarian Shield",
+      "category": "Artifact",
+      "rarity": "Rare",
+      "source": "Found in a royal crypt",
+      "tcValue": 250,
+      "notes": "Not usable in combat, but highly prized as a historical relic"
+    },
+    {
+      "id": "etheric_spellbook_damaged",
+      "name": "Etheric Spellbook (Damaged)",
+      "category": "Artifact",
+      "rarity": "Rare",
+      "source": "Found in ancient Tartarian libraries",
+      "tcValue": 300,
+      "notes": "Contains Etheric spells, valuable for scholars or mages"
+    },
+    {
+      "id": "aether_engraved_vase",
+      "name": "Aether-Engraved Vase",
+      "category": "Treasure",
+      "rarity": "Rare",
+      "source": "Found in Tartarian palace",
+      "tcValue": 150,
+      "notes": "Prized for its craftsmanship and Etheric infusion"
+    },
+    {
+      "id": "reclaimed_fusion_core",
+      "name": "Reclaimed Fusion Core",
+      "category": "Resource",
+      "rarity": "Epic",
+      "source": "Found in a destroyed facility",
+      "tcValue": 350,
+      "notes": "Usable for powering advanced technology"
+    },
+    {
+      "id": "obsidian_crown_shattered",
+      "name": "Obsidian Crown (Shattered)",
+      "category": "Artifact",
+      "rarity": "Rare",
+      "source": "Found in Tartarian ruins",
+      "tcValue": 200,
+      "notes": "Still valuable as a relic despite its damage"
+    },
+    {
+      "id": "tartarian_scholar_s_tome",
+      "name": "Tartarian Scholar's Tome",
+      "category": "Artifact",
+      "rarity": "Rare",
+      "source": "Found in a scholar's vault",
+      "tcValue": 250,
+      "notes": "Holds vast knowledge prized by historians and scholars"
+    }
+  ]
+}

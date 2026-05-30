@@ -245,6 +245,24 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### CRASH FIX: title-screen reload mid-boot + Modal-on-Modal + faded footer + bulk canon ingestion
+
+- **OTA-234 (2026-05-30) · CRITICAL. Player playtest after the recent OTA series: *"i hit the game icon, title screen visible for 1 second then drops to the phone's homescreen."* Plus *"Make the version number under the three buttons on the home screen match the color of the report bug button. I can barely see it; it is very faded."***
+  - **Crash root cause (instant reproducer):** `TitleScreen` `useEffect` was firing `checkAndApplyOTA({ silent: true })` WITHOUT `fetchOnly`. Any discovered OTA triggered `Updates.reloadAsync` immediately. Concurrently, `App.tsx`'s mount effect was booting MiniLM (ONNX) + Qwen (llama.rn) + Kokoro (executorch) + expo-av — all native modules still spinning up. `reloadAsync` swapped the JS bundle mid-native-init → process crashed to home. `App.tsx:171` already gates its own check with `fetchOnly: true` exactly because of this; `TitleScreen` had drifted off the same rule (the OTA-051-era comment explicitly noted dropping `fetchOnly` to fix a catch-up issue, but mid-boot crash > catch-up friction). **Fix:** revert `TitleScreen` to `fetchOnly: true`; pending OTAs surface via the existing `pendingOTAUpdate` banner so the player applies them from a clean state.
+  - **Second crash (Modal-on-Modal):** `FirstTimeHint` (OTA-229) used RN `Modal`. `InventoryScreen` + `CraftingScreen` also render `BrandedModal`. When a hint Modal was up and the player tapped an item that opened the equip Modal, stacked Modals crashed on Android. **Fix:** rewrote `FirstTimeHint` as an absolute-positioned `Pressable` overlay (zIndex 1000 + elevation 1000). Same scrim + card + dismiss UX, no Modal stacking. Tests stay green.
+  - **Faded footer:** `TitleScreen` footer (version + `2148` line) used `#3a342c` — too faded against the dark background. Bumped to `#c9a86a` matching the REPORT BUG button text so it reads at a glance.
+  - **Bulk canon ingestion (the 8 remaining tables from the recent doc drops):** NEW JSON files in `app/data/lore/`:
+    - `canon-skills.json` (19 skills mapped to 5 abilities)
+    - `canon-weapons.json` (60 weapons)
+    - `canon-armor.json` (59 pieces)
+    - `canon-currency-goods.json` (50 entries)
+    - `canon-loot-treasure.json` (48 entries)
+    - `canon-task-difficulty.json` (8 NPC + 8 faction payout tiers)
+    - `canon-action-difficulty.json` (10 difficulty tiers, DC = level × 3)
+  - `loreConceptBank.ts` extended to load all 8. Bank grows from ~132 to ~408 concepts. First Ask-the-Arbiter query embedding warmup bumps to ~4s; subsequent queries cached. `formatArbiterAnswer` routes the new categories. **Per user directive: app catalog wins on conflicts; these are LORE ONLY for Arbiter narration today.** Future OTAs can promote individual entries to authored catalog rows when balance dictates.
+  - **Verification:** `npx tsc --noEmit` clean app-side. 29 tests across `askArbiter` + `firstTimeHint`.
+  - **Files:** `app/screens/TitleScreen.tsx` (fetchOnly + footer color), `app/components/FirstTimeHint.tsx` (Modal → overlay), NEW 7 `app/data/lore/canon-*.json` files, `app/engine/loreConceptBank.ts` (8 new bucket loaders + format categories).
+
 #### Ask the Arbiter scheme — MiniLM lore lookup + Buried Skyscraper campaign hook
 
 - **OTA-233 (2026-05-30) · Player after the second wave of doc drops: *"I like the ask arbiter scheme, let's wire that in."* And on the Shattered Empire campaign module: *"We did the building as an expansion for part 2. Can this quest live inside that?"***

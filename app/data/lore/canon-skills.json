@@ -1,0 +1,24 @@
+{
+  "_comment": "OTA-234 — ingested from Player_skills_and_abilities_table.docx. The 19 canonical TTRPG skills mapped to 5 ability scores. SHIPPED APP USES ITS OWN STAT SYSTEM (5 abilities, no skill subsystem) so these are LORE ONLY — the Arbiter knows about them, can describe what they affect, but the app's effectiveStats / dice math do not consume them. Per the user's directive: app > lore on shipped mechanics. Phase 2 may attach skill flavor to existing checks (e.g., a stealth check narrates as 'Stealth check'), but no balance change.",
+  "skills": [
+    { "id": "prowess", "name": "Prowess", "ability": "strength", "affects": "Physical tasks like swimming, lifting, hitting." },
+    { "id": "grip", "name": "Grip", "ability": "strength", "affects": "Physical tasks like grappling, climbing, holding onto something." },
+    { "id": "acrobatics", "name": "Acrobatics", "ability": "dexterity", "affects": "Balance, agility, and performing flips or dodges." },
+    { "id": "chicanery", "name": "Chicanery", "ability": "dexterity", "affects": "Manual dexterity for tasks like picking pockets or lockpicking." },
+    { "id": "stealth", "name": "Stealth", "ability": "dexterity", "affects": "Remaining unseen or moving silently." },
+    { "id": "etheria", "name": "Etheria", "ability": "intelligence", "affects": "Understanding etheric theory and knowledge of ethereal power and usage." },
+    { "id": "schooling", "name": "Schooling", "ability": "intelligence", "affects": "Knowledge of historical events, cultures, science and legends." },
+    { "id": "investigation", "name": "Investigation", "ability": "intelligence", "affects": "Finding clues or hidden objects." },
+    { "id": "woodsman", "name": "Woodsman", "ability": "intelligence", "affects": "Knowledge of the natural world and its creatures." },
+    { "id": "religion", "name": "Religion", "ability": "intelligence", "affects": "Understanding religious lore and deities." },
+    { "id": "whisperer", "name": "Whisperer", "ability": "wisdom", "affects": "Handling animals and calming them down." },
+    { "id": "insight", "name": "Insight", "ability": "wisdom", "affects": "Reading people's emotions and intentions." },
+    { "id": "first_aid", "name": "First Aid", "ability": "wisdom", "affects": "Treating wounds and stabilizing the injured." },
+    { "id": "observation", "name": "Observation", "ability": "wisdom", "affects": "Noticing hidden things, danger, or creatures." },
+    { "id": "instincts", "name": "Instincts", "ability": "wisdom", "affects": "Surviving in the wilderness, tracking, and foraging." },
+    { "id": "deception", "name": "Deception", "ability": "charisma", "affects": "Lying or misleading others convincingly." },
+    { "id": "coercion", "name": "Coercion", "ability": "charisma", "affects": "Coercing others through threats or force." },
+    { "id": "performance", "name": "Performance", "ability": "charisma", "affects": "Entertaining others with music, acting, or storytelling." },
+    { "id": "persuasion", "name": "Persuasion", "ability": "charisma", "affects": "Convincing others through charm or debate." }
+  ]
+}

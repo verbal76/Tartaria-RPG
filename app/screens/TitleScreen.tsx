@@ -209,9 +209,26 @@ export function TitleScreen() {
   // Updates.reloadAsync immediately — the title screen flash-reloads
   // into the new version. Silent so a transient network error
   // doesn't dump an alert on every screen mount.
+  //
+  // OTA-234 — CRITICAL CRASH FIX. Reverted to fetchOnly:true. Player
+  // playtest: "i hit the game icon, title screen visible for 1
+  // second then drops to the phone's homescreen." Reproducer: on
+  // launch, AppShell's useEffect kicks bootCognitive (MiniLM) +
+  // bootQwen (llama.rn) + bootAudio (expo-av) + initTTSManager
+  // (executorch Kokoro) — all four native modules are still
+  // spinning up when this TitleScreen useEffect fires
+  // checkAndApplyOTA. With fetchOnly OFF, a discovered OTA triggers
+  // Updates.reloadAsync mid-boot → reloadAsync swaps the JS bundle
+  // while native modules are mid-initialization → process crash to
+  // home. The dropped-fetchOnly comment above acknowledges the
+  // catch-up tradeoff, but mid-boot crash > catch-up friction.
+  // App.tsx:171 already uses fetchOnly:true for exactly this
+  // reason. Aligning the two paths. PendingOTAUpdate banner +
+  // one-tap apply (from a clean state, after native modules are
+  // ready) is the surfaced apply path now.
   useEffect(() => {
     let cancelled = false;
-    void checkAndApplyOTA({ silent: true }).then((result) => {
+    void checkAndApplyOTA({ silent: true, fetchOnly: true }).then((result) => {
       if (cancelled) return;
       if (result === 'pending') {
         useGameStore.setState({ pendingOTAUpdate: true });
@@ -1264,7 +1281,10 @@ const styles = StyleSheet.create({
   // OTA-068 — footer now centered (was left-aligned with a
   // small marginLeft) so it sits under the centered action row
   // and thank-you message as the third centered line.
-  footer: { color: '#3a342c', fontSize: 10, textAlign: 'center' },
+  // OTA-234 — was #3a342c (too faded; playtest: "I can barely see
+  // it"). Bumped to #c9a86a to match REPORT BUG (bugReportBtnText)
+  // so the version line reads at a glance.
+  footer: { color: '#c9a86a', fontSize: 10, textAlign: 'center' },
   // OTA-068 — thank-you message above the action row. Color
   // sits between the action button text (#c9a86a / #6a9ec9 /
   // #c97a7a — bright accents) and the footer (#3a342c — deep

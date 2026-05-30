@@ -1,0 +1,23 @@
+{
+  "_comment": "OTA-234 — ingested from NPC_Task_Difficulty_and_TC_Payout_Table.docx + Faction_Task_Difficulty_Table_and_Payout_Table.docx. 8-tier difficulty / payout ladders the Arbiter uses to size out quest rewards. SHIPPED APP ALREADY HAS A REWARD SYSTEM (factionQuests, hunts, mysteries, storylines have authored TC + FP grants) so this is LORE ONLY — the Arbiter narrates payouts in these terms, but new authored quests can use the table as a balancing reference.",
+  "npcTaskTiers": [
+    { "tier": "trivial",         "description": "Very easy tasks requiring little effort or skill.",                          "examples": "Running errands, delivering a message, scouting a location, retrieving basic supplies.",                "tcMin": 1,   "tcMax": 10 },
+    { "tier": "simple",          "description": "Straightforward tasks with minimal risk.",                                   "examples": "Escorting a person through safe areas, gathering materials, negotiating a minor deal.",                "tcMin": 11,  "tcMax": 30 },
+    { "tier": "moderate",        "description": "Tasks involving mild danger or a bit of complexity.",                        "examples": "Guarding a small caravan, collecting relics from ruins, persuading an NPC for information.",            "tcMin": 31,  "tcMax": 60 },
+    { "tier": "challenging",     "description": "Tasks requiring skill and posing some risk.",                                "examples": "Investigating ruins, finding lost technology, confronting low-level enemies, protecting a target.",     "tcMin": 61,  "tcMax": 100 },
+    { "tier": "difficult",       "description": "Dangerous tasks requiring coordination and planning.",                       "examples": "Infiltrating a guarded facility, stealing important data, sabotaging a rival's equipment.",             "tcMin": 101, "tcMax": 150 },
+    { "tier": "very_difficult",  "description": "Highly risky tasks with a chance of serious failure or danger.",             "examples": "Tracking down powerful enemies, recovering rare artifacts from dangerous zones, negotiating under threat.", "tcMin": 151, "tcMax": 200 },
+    { "tier": "extreme",         "description": "Extremely dangerous tasks with high risk of injury or death.",               "examples": "Assassinating a powerful NPC, battling Etheric creatures, infiltrating a hostile faction.",             "tcMin": 201, "tcMax": 300 },
+    { "tier": "legendary",       "description": "Nearly impossible tasks with great danger and reward.",                      "examples": "Securing powerful Tartarian relics, taking down a faction leader, restoring an ancient machine.",        "tcMin": 301, "tcMax": 500 }
+  ],
+  "factionTaskTiers": [
+    { "tier": "trivial",         "description": "Very easy tasks requiring little effort or risk.",                  "examples": "Delivering a message between faction leaders, collecting a common relic.",            "fpMin": 1,  "fpMax": 3 },
+    { "tier": "simple",          "description": "Straightforward tasks with minimal danger.",                        "examples": "Exploring the outskirts of ruins, negotiating trade for minor relics.",               "fpMin": 4,  "fpMax": 6 },
+    { "tier": "moderate",        "description": "Tasks involving mild danger or challenge.",                         "examples": "Investigating minor Etheric disturbances, retrieving a relic guarded by automated defenses.", "fpMin": 7,  "fpMax": 10 },
+    { "tier": "challenging",     "description": "Tasks requiring skill and posing some risk to the players.",        "examples": "Scouting deep within Tartarian ruins, disabling mechanical sentinels.",                "fpMin": 11, "fpMax": 15 },
+    { "tier": "difficult",       "description": "Dangerous tasks requiring coordinated effort and planning.",        "examples": "Rescuing an agent from hostile factions, retrieving a relic from a heavily-guarded location.", "fpMin": 16, "fpMax": 20 },
+    { "tier": "very_difficult",  "description": "Highly risky tasks with a chance of failure or serious danger.",    "examples": "Infiltrating a stronghold to steal powerful technology, repairing an ancient machine.", "fpMin": 21, "fpMax": 25 },
+    { "tier": "extreme",         "description": "Extremely dangerous tasks with high risk of death or failure.",     "examples": "Battling powerful Etheric constructs, negotiating with an elite faction under hostile conditions.", "fpMin": 26, "fpMax": 30 },
+    { "tier": "legendary",       "description": "Nearly impossible tasks with immense danger or difficulty.",        "examples": "Taking control of a dormant Tartarian city, retrieving the most powerful relics.",    "fpMin": 31, "fpMax": 40 }
+  ]
+}

@@ -9253,4 +9253,131 @@
 // shattered-empire.md + .txt
 // (Buried Skyscraper
 // expansion reference).
-export const OTA_BUILD_ID = '2026-05-30-233';
+// 2026-05-30-234 — CRITICAL
+// crash fix + Modal-on-Modal
+// fix + footer color + bulk
+// canon ingestion (8 tables).
+//
+// Player playtest: "i hit the
+// game icon, title screen
+// visible for 1 second then
+// drops to the phone's home-
+// screen." Crash reproduced
+// every launch since the
+// recent OTA series.
+//
+// Root cause: TitleScreen
+// useEffect fired checkAnd
+// ApplyOTA without fetchOnly,
+// so a discovered OTA
+// triggered Updates.reload
+// Async immediately. AppShell
+// is concurrently booting
+// MiniLM + Qwen + Kokoro +
+// expo-av — reloadAsync
+// swapped the JS bundle
+// mid-native-init and the
+// process crashed. App.tsx
+// already uses fetchOnly for
+// this reason; TitleScreen
+// had drifted. Reverted to
+// fetchOnly. Pending OTAs
+// surface via the existing
+// pendingOTAUpdate banner.
+//
+// Second crash: FirstTime
+// Hint used react-native
+// Modal. InventoryScreen and
+// CraftingScreen also render
+// BrandedModal — when the
+// hint Modal was up and the
+// player tapped an item that
+// opened the equip Modal,
+// stacked Modals crashed on
+// Android. Rewrote First
+// TimeHint as an absolute-
+// positioned Pressable
+// overlay (zIndex 1000 +
+// elevation 1000). Same
+// scrim + card + dismiss UX,
+// no Modal stacking. Tests
+// stay green.
+//
+// Third issue: TitleScreen
+// footer (version + 2148
+// line) used color #3a342c
+// — barely visible against
+// the dark background.
+// Player: "I can barely see
+// it; very faded." Bumped to
+// #c9a86a matching REPORT
+// BUG button text so it
+// reads at a glance.
+//
+// Bulk canon ingestion (8
+// remaining tables from the
+// recent doc drops):
+// - canon-skills.json (19
+//   skills tied to 5
+//   abilities, lore-only)
+// - canon-weapons.json (60
+//   weapons, lore-only)
+// - canon-armor.json (59
+//   pieces, lore-only)
+// - canon-currency-goods.
+//   json (50 entries)
+// - canon-loot-treasure.json
+//   (48 entries)
+// - canon-task-difficulty.
+//   json (8 NPC + 8 faction
+//   tiers with payouts)
+// - canon-action-difficulty.
+//   json (10 difficulty
+//   tiers, DC = level × 3)
+//
+// loreConceptBank.ts extended
+// to load all 8; concept
+// bank grows from ~132 to
+// ~408. Embedding warmup
+// bumps to ~4s first query
+// (still acceptable; cached
+// after). formatArbiter
+// Answer routes new
+// categories (weapon, armor,
+// skill, currency_good,
+// loot, task_tier,
+// action_tier). Per user
+// directive: app catalog
+// wins on conflicts; these
+// are LORE ONLY for Ask the
+// Arbiter narration today.
+//
+// TS clean app-side. Tests
+// green (29 across
+// askArbiter + firstTime
+// Hint suites; the ~132 to
+// ~408 bank growth shifts
+// the baseline but the
+// shape contract test still
+// passes).
+//
+// Files: app/screens/Title
+// Screen.tsx (fetchOnly +
+// footer color), app/
+// components/FirstTimeHint.
+// tsx (Modal → absolute
+// overlay), NEW app/data/
+// lore/canon-skills.json,
+// NEW canon-weapons.json,
+// NEW canon-armor.json,
+// NEW canon-currency-goods.
+// json, NEW canon-loot-
+// treasure.json, NEW canon-
+// task-difficulty.json, NEW
+// canon-action-difficulty.
+// json, app/engine/lore
+// ConceptBank.ts (8 new
+// bucket loaders +
+// formatArbiterAnswer
+// categories).
+export const OTA_BUILD_ID = '2026-05-30-234';

@@ -6,9 +6,19 @@
 // Authoring rule (OTA-229): keep body to ~25 words, 2 sentences max.
 // If a system needs more, the Tutorial Replay screen (Phase 2)
 // carries the long version.
+//
+// OTA-234 — rewritten WITHOUT react-native Modal. Playtest crash on
+// Android: when InventoryScreen or CraftingScreen rendered a hint
+// (Modal) and the player then tapped an item that opened
+// BrandedModal (another Modal), the stacked-Modals path crashed the
+// JS thread on Android. RN Modal-on-Modal is a known Android
+// crasher. Replaced with an absolute-positioned overlay View that
+// renders inline above its parent screen — no Modal, no stacking,
+// no crash. Scrim + card + dismiss button identical to the prior
+// behavior; player-facing UX unchanged.
 
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
 import { useFirstTimeHint } from './useFirstTimeHint';
 
 interface Props {
@@ -25,27 +35,34 @@ export function FirstTimeHint({ id, title, body }: Props) {
   const { shouldShow, dismiss } = useFirstTimeHint(id);
   if (shouldShow !== true) return null;
   return (
-    <Modal transparent animationType="fade" onRequestClose={dismiss}>
-      <View style={styles.scrim}>
-        <View style={styles.card}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.body}>{body}</Text>
-          <TouchableOpacity onPress={dismiss} style={styles.btn} activeOpacity={0.7}>
-            <Text style={styles.btnText}>Got it</Text>
-          </TouchableOpacity>
-        </View>
+    // Absolute overlay anchored to the screen, not a Modal. zIndex
+    // 1000 puts it above scene content but BELOW any concurrent
+    // BrandedModal (which RN Modal renders as a separate native
+    // window above all React content). That ordering is intentional:
+    // if the player triggers a real modal while the hint is up, the
+    // modal wins focus and the hint waits underneath, then becomes
+    // dismissable again when the modal closes.
+    <Pressable style={styles.scrim} onPress={dismiss}>
+      <View style={styles.card} onStartShouldSetResponder={() => true}>
+        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.body}>{body}</Text>
+        <TouchableOpacity onPress={dismiss} style={styles.btn} activeOpacity={0.7}>
+          <Text style={styles.btnText}>Got it</Text>
+        </TouchableOpacity>
       </View>
-    </Modal>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   scrim: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.55)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
+    zIndex: 1000,
+    elevation: 1000,
   },
   card: {
     backgroundColor: '#1a1612',
