@@ -8,6 +8,11 @@ import { buildBasicDeviceSummary } from '../diagnostics/aboutSummary';
 import { NumberStepper } from '../components/NumberStepper';
 import { LoreCodexBody } from '../components/LoreCodexBody';
 import {
+  THIRD_PARTY_NOTICES,
+  NOTICES_PREAMBLE,
+  NOTICES_VERIFIED_AT,
+} from '../data/thirdPartyNotices';
+import {
   flushLogWrites,
   readFullLog,
   getLastLogWriteError,
@@ -61,7 +66,10 @@ export function AboutScreen() {
   // clear log — the three actions that previously cluttered the
   // bottom of the ExplorationScreen menu row. save & exit is the
   // most-pressed action, so it's the default tab on open.
-  const [tab, setTab] = useState<'session' | 'sfx' | 'lore' | 'about'>('session');
+  const [tab, setTab] = useState<'session' | 'sfx' | 'lore' | 'about' | 'notices'>('session');
+  // OTA-065 — which third-party notice card has its full license text
+  // expanded. Null = all collapsed (just the header rows visible).
+  const [expandedNoticeId, setExpandedNoticeId] = useState<string | null>(null);
   const [logCharCount, setLogCharCount] = useState(0);
   const [logCopied, setLogCopied] = useState(false);
   const [logCleared, setLogCleared] = useState(false);
@@ -496,7 +504,7 @@ export function AboutScreen() {
           ABOUT / diagnostic block stays its own tab. Music card
           renders first inside SFX (most tweaked), voice card below. */}
       <View style={styles.tabRow}>
-        {(['session', 'sfx', 'lore', 'about'] as const).map((id) => (
+        {(['session', 'sfx', 'lore', 'about', 'notices'] as const).map((id) => (
           <TouchableOpacity
             key={id}
             onPress={() => setTab(id)}
@@ -874,6 +882,45 @@ export function AboutScreen() {
         {tab === 'about' && (
         <Text style={styles.mono}>{info}</Text>
         )}
+
+        {tab === 'notices' && (
+        <View>
+          <Text style={styles.noticesPreamble}>{NOTICES_PREAMBLE}</Text>
+          <Text style={styles.noticesVerified}>
+            Last verified: {NOTICES_VERIFIED_AT}
+          </Text>
+          {THIRD_PARTY_NOTICES.map((n) => {
+            const expanded = expandedNoticeId === n.id;
+            return (
+              <View key={n.id} style={styles.noticeCard}>
+                <TouchableOpacity
+                  onPress={() => setExpandedNoticeId(expanded ? null : n.id)}
+                  activeOpacity={0.7}
+                  style={styles.noticeHeaderRow}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.noticeName}>{n.name}</Text>
+                    <Text style={styles.noticeLicense}>{n.license}</Text>
+                  </View>
+                  <Text style={styles.noticeChevron}>{expanded ? '▾' : '▸'}</Text>
+                </TouchableOpacity>
+                <Text style={styles.noticeRole}>{n.role}</Text>
+                <Text style={styles.noticeCopyright}>{n.copyright}</Text>
+                <Text style={styles.noticeUrl} selectable>
+                  {n.url}
+                </Text>
+                {expanded && (
+                  <View style={styles.noticeLicenseBlock}>
+                    <Text style={styles.noticeLicenseText} selectable>
+                      {n.text}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            );
+          })}
+        </View>
+        )}
       </ScrollView>
 
       {tab === 'about' && (
@@ -1087,4 +1134,77 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   copyText: { color: '#0a0908', fontSize: 13, fontWeight: '700', letterSpacing: 2 },
+  noticesPreamble: {
+    color: '#cdbf99',
+    fontSize: 12,
+    lineHeight: 18,
+    marginBottom: 6,
+  },
+  noticesVerified: {
+    color: '#7a705c',
+    fontSize: 10,
+    letterSpacing: 1,
+    fontStyle: 'italic',
+    marginBottom: 14,
+  },
+  noticeCard: {
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 3,
+    padding: 10,
+    marginBottom: 10,
+  },
+  noticeHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  noticeName: {
+    color: '#e6d8b3',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  noticeLicense: {
+    color: '#c9a86a',
+    fontSize: 11,
+    letterSpacing: 2,
+    fontWeight: '700',
+    marginTop: 2,
+  },
+  noticeChevron: {
+    color: '#c9a86a',
+    fontSize: 16,
+    paddingLeft: 8,
+    paddingRight: 4,
+  },
+  noticeRole: {
+    color: '#cdbf99',
+    fontSize: 11,
+    lineHeight: 16,
+    marginTop: 6,
+  },
+  noticeCopyright: {
+    color: '#7a705c',
+    fontSize: 11,
+    lineHeight: 15,
+    marginTop: 4,
+  },
+  noticeUrl: {
+    color: '#9ec96a',
+    fontSize: 11,
+    marginTop: 4,
+  },
+  noticeLicenseBlock: {
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopColor: '#3a342c',
+    borderTopWidth: 1,
+  },
+  noticeLicenseText: {
+    color: '#cdbf99',
+    fontSize: 10,
+    lineHeight: 15,
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+  },
 });

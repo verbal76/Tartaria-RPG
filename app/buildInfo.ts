@@ -135,4 +135,13 @@
 // (2× scrap output) stays consistent with the Crafting → REPAIR tab.
 // The Crafting REPAIR tab is removed in this same OTA — pack repair
 // is the only field-repair surface now (vendor TC repair coexists).
-export const OTA_BUILD_ID = '2026-05-30-064';
+//
+// 2026-05-30 OTA-065 — third-party notices screen. New NOTICES tab in
+// Settings carries the full Apache-2.0 / MIT / BSD-3-Clause license
+// text for every shipped model (MiniLM, Qwen2.5-0.5B, Kokoro-82M)
+// and native runtime (react-native-executorch, ExecuTorch, llama.rn,
+// llama.cpp, onnxruntime-react-native). Each card lists role,
+// copyright holder, source URL, and an expandable full-text license
+// block. Required for commercial release — every shipped open-source
+// component must surface its license to the user.
+export const OTA_BUILD_ID = '2026-05-30-065';
