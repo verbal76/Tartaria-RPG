@@ -245,6 +245,20 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Ask the Arbiter — self-introspection ("who am I", "how am I", "why am I here")
+
+- **OTA-240 (2026-05-30) · Player after OTA-239 shipped the Ask Arbiter button: *"the button will be functional correct? and it will be able to answer basic interaction questions as well about his character who he is how he is doing, why he is there.."***
+  - **Gap:** OTA-239 wired the button to the parser → MiniLM lore-bank lookup. The bank is world lore (events, places, factions, items). Personal questions ("who am I", "how am I doing", "why am I here") didn't resolve usefully — best case the cosine sim found a tangentially-related faction line; worst case the Arbiter went silent.
+  - **Fix:** pre-MiniLM check in `gameStore` `case 'ask'` with five regex buckets that route to deterministic Arbiter answers from `player` state:
+    - **identity**: "who am I" / "what's my name" / "tell me about myself" → `name + race + faction` line.
+    - **health**: "how am I" / "am I hurt" / "what's my hp" → HP/stamina/AC summary + condition tier ("whole and steady", "cut but standing", "hurt and the hurt shows", "bleeding the day away") + corruption call-out.
+    - **purpose**: "why am I here" / "what am I doing" / "what's my mission" → faction-anchored purpose line + contract count.
+    - **race**: "what's my race" / "what am I" → race name + description + traits.
+    - **faction**: "what's my faction" / "who do I serve" → faction name + description.
+  - **Order:** (1) directional ("where is X") → (2) self-introspection → (3) inventory ("do I have X") → (4) keyword `findConcept` → (5) MiniLM lore lookup → (6) miss reply. Each introspection branch short-circuits with `break` so the lore lookup doesn't double-fire.
+  - **Verification:** +24 tests in `askSelfIntrospection` (pattern extraction across the 5 categories; negative tests confirming lore + inventory questions don't match). TS clean app-side.
+  - **Files:** `app/state/gameStore.ts` (5 new self-intro branches in case 'ask'), NEW `__tests__/askSelfIntrospection.test.ts`.
+
 #### Tool Pouch + 3 ring slots + Ask the Arbiter button
 
 - **OTA-239 (2026-05-30) · Player: *"let's have a tool pouch. it's separate from their backpack so they can have things like their etheric torch in there. so it's already ready their etheric lens in there ... tools that I click on and say use can go in that pouch and are ready to go"* + *"And you can equip up to three rings"* + *"where is the ask arbiter button?"***

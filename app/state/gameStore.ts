@@ -7699,6 +7699,93 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           break;
         }
+        // OTA-240 — self-introspection branch. Player taps the Ask
+        // Arbiter button and types "who am I", "how am I doing",
+        // "why am I here", "what's my faction", etc. These don't
+        // route well through the lore bank (the concepts there are
+        // world facts, not player state). Handle them deterministically
+        // from `player` state before the lore lookup so the answers
+        // are always grounded in actual character data.
+        const introQ = trimmed.toLowerCase();
+        // "who am i" / "what's my name" / "who is <name>"
+        if (/\bwho\s+(am\s+i|is\s+(this\s+character|i)|i)\b/.test(introQ)
+            || /\bwhat(?:'s|\s+is)\s+my\s+name\b/.test(introQ)
+            || /\btell\s+me\s+about\s+(me|myself|my\s+character)\b/.test(introQ)
+            || /\bdescribe\s+(me|myself|my\s+character)\b/.test(introQ)) {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const racesData = require('../data/races/races.json') as { races: Array<{ id: string; name: string }> };
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const factionsData = require('../data/factions/factions.json') as { factions: Array<{ id: string; name: string }> };
+          const race = racesData.races.find((r) => r.id === player.raceId)?.name ?? player.raceId;
+          const fac = factionsData.factions.find((f) => f.id === player.factionId)?.name ?? player.factionId;
+          get().appendLog(
+            'arbiter',
+            `The Arbiter studies you. "You are ${player.name}. Your blood is ${race}. Your work belongs to the ${fac}. The buried country knows you well enough to start speaking your name."`,
+          );
+          break;
+        }
+        // "how am i" / "how am i doing" / "am i healthy" / "what's my health"
+        if (/\bhow\s+(am\s+i|are\s+you|am\s+i\s+doing)\b/.test(introQ)
+            || /\bam\s+i\s+(ok|okay|healthy|hurt|alive|dying)\b/.test(introQ)
+            || /\bwhat(?:'s|\s+is)\s+my\s+(hp|health|stamina|condition|state)\b/.test(introQ)) {
+          const hpPct = Math.round((player.hp / Math.max(1, player.hpMax)) * 100);
+          const condition = hpPct >= 90 ? 'whole and steady'
+            : hpPct >= 60 ? 'cut but standing'
+            : hpPct >= 30 ? 'hurt, and the hurt shows'
+            : 'bleeding the day away — find shelter';
+          const corrLine = (player.corruption ?? 0) > 0
+            ? ` The Aether sits ${player.corruption} deep in you.`
+            : '';
+          get().appendLog(
+            'arbiter',
+            `The Arbiter looks you over. "${condition}. ${player.hp}/${player.hpMax} HP, ${player.stamina}/${player.staminaMax} stamina, AC ${player.ac}.${corrLine}"`,
+          );
+          break;
+        }
+        // "why am i here" / "what am i doing" / "what's my purpose / mission / goal"
+        if (/\bwhy\s+am\s+i\s+here\b/.test(introQ)
+            || /\bwhat\s+am\s+i\s+(doing|here\s+for|supposed\s+to\s+do)\b/.test(introQ)
+            || /\bwhat(?:'s|\s+is)\s+my\s+(purpose|mission|goal|task)\b/.test(introQ)) {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const factionsData = require('../data/factions/factions.json') as { factions: Array<{ id: string; name: string; description?: string }> };
+          const fac = factionsData.factions.find((f) => f.id === player.factionId);
+          const qCount = (player.activeFactionQuestIds?.length ?? 0)
+            + (player.activeHunts?.length ?? 0)
+            + (player.activeMysteries?.length ?? 0);
+          const contractLine = qCount > 0
+            ? ` ${qCount} contract${qCount === 1 ? '' : 's'} on your slate — open Contracts to see them.`
+            : ' No contracts on your slate yet; the world will offer some when you let it.';
+          get().appendLog(
+            'arbiter',
+            `The Arbiter speaks slowly. "Tartaria buried itself before you were born; you walk it because the ${fac?.name ?? player.factionId} asked, and because you said yes. The work is to dig, to remember, to decide what stays.${contractLine}"`,
+          );
+          break;
+        }
+        // "what's my race" / "what am i" / "what's my faction" / "who do i serve"
+        if (/\bwhat(?:'s|\s+is)\s+my\s+race\b/.test(introQ)
+            || /\bwhat\s+(am\s+i|race\s+am\s+i)\b/.test(introQ)) {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const racesData = require('../data/races/races.json') as { races: Array<{ id: string; name: string; description?: string; traits?: string[] }> };
+          const race = racesData.races.find((r) => r.id === player.raceId);
+          const traits = race?.traits?.length ? ` Traits: ${race.traits.join(' · ')}.` : '';
+          get().appendLog(
+            'arbiter',
+            `The Arbiter touches the air near you. "You are ${race?.name ?? player.raceId}. ${race?.description ?? ''}${traits}"`,
+          );
+          break;
+        }
+        if (/\bwhat(?:'s|\s+is)\s+my\s+faction\b/.test(introQ)
+            || /\bwho\s+do\s+i\s+(serve|work\s+for)\b/.test(introQ)
+            || /\bwhich\s+faction\b/.test(introQ)) {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const factionsData = require('../data/factions/factions.json') as { factions: Array<{ id: string; name: string; description?: string }> };
+          const fac = factionsData.factions.find((f) => f.id === player.factionId);
+          get().appendLog(
+            'arbiter',
+            `The Arbiter glances toward the horizon. "You serve the ${fac?.name ?? player.factionId}. ${fac?.description ?? ''}"`,
+          );
+          break;
+        }
         // Inventory question — "is the fungus in my pack", "do i have a
         // locket", "got any bandages". Matched before the concept lookup so
         // a real inventory check beats a no-match Aether trivia answer.

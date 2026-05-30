@@ -9792,4 +9792,86 @@
 // app/components/Branded
 // Modal.tsx (textInput
 // prop support).
-export const OTA_BUILD_ID = '2026-05-30-239';
+// 2026-05-30-240 — Ask
+// Arbiter self-introspection.
+// Player: "the button will
+// be functional correct?
+// and it will be able to
+// answer basic interaction
+// questions as well about
+// his character who he is
+// how he is doing, why he
+// is there.."
+//
+// OTA-239 wired the Ask
+// Arbiter button to the
+// parser → MiniLM lore bank
+// lookup. The bank is world
+// lore — events, places,
+// factions, items — so
+// personal questions ("who
+// am I", "how am I doing",
+// "why am I here") didn't
+// resolve to anything useful.
+//
+// Fix: pre-MiniLM check in
+// gameStore case 'ask'.
+// Five buckets of regex
+// patterns route to
+// deterministic Arbiter
+// answers from player state
+// before any lookup:
+// - identity: "who am I" /
+//   "what's my name" /
+//   "tell me about myself"
+//   → name + race + faction
+//   line.
+// - health: "how am I" /
+//   "am I hurt" / "what's
+//   my hp" → HP/stamina/AC
+//   summary + tier line +
+//   corruption call-out.
+// - purpose: "why am I
+//   here" / "what am I
+//   doing" / "what's my
+//   mission" → faction-
+//   anchored purpose +
+//   contract count.
+// - race: "what's my race"
+//   / "what am I" → race
+//   name + description +
+//   traits.
+// - faction: "what's my
+//   faction" / "who do I
+//   serve" → faction name +
+//   description.
+//
+// Order in case 'ask': (1)
+// directional questions →
+// (2) self-introspection →
+// (3) inventory questions →
+// (4) keyword findConcept →
+// (5) MiniLM lore lookup →
+// (6) miss reply. The
+// introspection branch
+// short-circuits with a
+// break so the lore lookup
+// doesn't fire on "who am
+// I" queries.
+//
+// Tests: +24 in askSelf
+// Introspection (pattern
+// extraction; each of the 5
+// categories tested against
+// representative queries;
+// negative tests that lore
+// and inventory questions
+// don't match). TS clean
+// app-side.
+//
+// Files: app/state/gameStore
+// .ts (5 new self-intro
+// branches in case 'ask'),
+// NEW __tests__/askSelf
+// Introspection.test.ts.
+export const OTA_BUILD_ID = '2026-05-30-240';
