@@ -101,6 +101,10 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'set a trap', 'set the trap', 'set trap',
   ],
   equip: ['equip', 'wear', 'wield', 'don', 'unequip', 'remove', 'sheathe', 'strap', 'fit', 'fasten'],
+  // OTA-239 — Tool Pouch verbs. `stow <item>` puts an item in the
+  // pouch; `unpouch <item>` / `unstow <item>` takes it out.
+  stow_pouch: ['stow', 'pouch', 'belt'],
+  unpouch: ['unpouch', 'unstow', 'unbelt'],
   gift: ['gift', 'give', 'offer', 'hand', 'bestow', 'donate', 'tender', 'grant', 'pass'],
   // 'pocket' removed — clashes with the noun "pockets" / "in his pocket"
   // and the inventory channel. 'grab' kept (genuine steal verb).

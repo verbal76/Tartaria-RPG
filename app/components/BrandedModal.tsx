@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Pressable,
+  TextInput,
 } from 'react-native';
 import type { ItemPreview } from './itemPreview';
 
@@ -26,6 +27,15 @@ interface Props {
   itemPreview?: ItemPreview | null;
   /** Optional extra context line shown beneath the preview. */
   contextLine?: string;
+  /** OTA-239 — Optional text input rendered between the body and the
+   *  buttons. Used by Ask the Arbiter (and other future query-style
+   *  modals). When omitted, the modal stays a confirmation card. */
+  textInput?: {
+    value: string;
+    onChangeText: (s: string) => void;
+    placeholder?: string;
+    autoFocus?: boolean;
+  };
   buttons: BrandedModalButton[];
   onRequestClose: () => void;
 }
@@ -39,6 +49,7 @@ export function BrandedModal({
   body,
   itemPreview,
   contextLine,
+  textInput,
   buttons,
   onRequestClose,
 }: Props) {
@@ -87,6 +98,17 @@ export function BrandedModal({
 
               {body ? <Text style={styles.body}>{body}</Text> : null}
               {contextLine ? <Text style={styles.context}>{contextLine}</Text> : null}
+              {textInput ? (
+                <TextInput
+                  style={styles.input}
+                  value={textInput.value}
+                  onChangeText={textInput.onChangeText}
+                  placeholder={textInput.placeholder}
+                  placeholderTextColor="#5a5246"
+                  autoFocus={textInput.autoFocus}
+                  selectionColor="#c9a86a"
+                />
+              ) : null}
 
               <View style={styles.buttonRow}>
                 {buttons.map((b) => (
@@ -214,6 +236,17 @@ const styles = StyleSheet.create({
   btnTextPrimary: { color: '#13110f' },
   btnTextDestructive: { color: '#e07a5f' },
   btnTextNeutral: { color: '#cdbf99' },
+  input: {
+    color: '#e6d8b3',
+    backgroundColor: '#1a1714',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginTop: 10,
+    fontSize: 13,
+  },
 });
 
 // Compatibility helper that turns a TouchableOpacity prop-less call site

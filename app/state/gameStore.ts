@@ -168,7 +168,7 @@ import {
   pickRandomHookKind,
   plantHookByKind,
 } from '../engine/hooks';
-import type { EquipSlot } from '../engine/types';
+import type { EquipSlot, PlayerEquipped } from '../engine/types';
 import {
   WEAPONS,
   ARMOR,
@@ -762,6 +762,10 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     feet: eq.feet,
     amulet: eq.amulet,
     ring: eq.ring,
+    // OTA-239 — three concurrent ring slots. Legacy saves with only
+    // `ring` keep it; ring2/ring3 default to undefined.
+    ring2: eq.ring2,
+    ring3: eq.ring3,
     mainId: eq.mainId ?? findFirstId(eq.main ?? eq.weaponName),
     offId: eq.offId ?? findFirstId(eq.off),
     headId: eq.headId ?? findFirstId(eq.head),
@@ -770,6 +774,12 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     feetId: eq.feetId ?? findFirstId(eq.feet),
     amuletId: eq.amuletId ?? findFirstId(eq.amulet),
     ringId: eq.ringId ?? findFirstId(eq.ring),
+    ring2Id: eq.ring2Id ?? findFirstId(eq.ring2),
+    ring3Id: eq.ring3Id ?? findFirstId(eq.ring3),
+    // OTA-239 — Tool Pouch. Empty array on legacy saves; the player
+    // explicitly stows items into it via the `stow <item>` verb or
+    // the InventoryScreen TOOL POUCH section.
+    toolPouchIds: Array.isArray(eq.toolPouchIds) ? eq.toolPouchIds : [],
   };
   // v2.4.1 (OTA 029) — never let currentLocationId be undefined.
   // The hub system, scene rebuild, mapX/mapY math, atlas marker
@@ -1379,6 +1389,12 @@ interface GameStore {
   joinFaction: (factionId: string) => void;
   equipItem: (itemName: string, slot: EquipSlot) => void;
   unequipSlot: (slot: EquipSlot) => void;
+  /** OTA-239 — Tool Pouch. Stow an inventory item by name into the
+   *  pouch (max 3). Pouched items stay in player.inventory but
+   *  surface in the InventoryScreen TOOL POUCH section + give the
+   *  `use <item>` verb a faster resolution path. */
+  stowInPouch: (itemName: string) => void;
+  unpouchItem: (itemName: string) => void;
   /** Drop one of the named item from the player's inventory onto the
    *  ground of the current room (worldMemory.visitedRooms[key].droppedItems).
    *  Mirrors the typed 'drop X' verb so InventoryScreen taps can
@@ -7881,6 +7897,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         get().repairWithVendor(target);
+        break;
+      }
+      // OTA-239 — Tool Pouch verbs.
+      case 'stow_pouch': {
+        const target = parsed.resolvedNoun ?? parsed.target ?? '';
+        if (!target.trim()) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter looks at your pack. "Stow what? Name the tool — a torch, a lens, whatever you want ready on the belt."`,
+          );
+          break;
+        }
+        get().stowInPouch(target);
+        break;
+      }
+      case 'unpouch': {
+        const target = parsed.resolvedNoun ?? parsed.target ?? '';
+        if (!target.trim()) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter looks at the pouch. "Unstow what? Name what comes off the belt."`,
+          );
+          break;
+        }
+        get().unpouchItem(target);
         break;
       }
       case 'dig': {
@@ -14963,16 +15004,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
         `You set ${displaced.length === 1 ? `the ${displaced[0]}` : `the ${displaced.join(' and ')}`} aside to free your ${displaced.length === 1 && slot === 'off' ? 'off hand' : 'hands'} for the ${item.name}.`,
       );
     }
+    // OTA-239 — three ring slots. When caller asks for 'ring' and the
+    // primary ring slot is taken, route to ring2 / ring3 if empty.
+    // Falls back to ring (overwrite) if all three are full so the
+    // equip still succeeds — playtest: "you can equip up to three
+    // rings." validSlotsForItem returns 'ring' for any ring-shaped
+    // item; equip flow chooses the actual slot internally so the
+    // UI / parser doesn't need to know.
+    let writeSlot: string = slot;
+    let writeIdKey: string = SLOT_ID_KEY[slot];
+    if (slot === 'ring') {
+      const eq = player.equipped ?? {};
+      if (!eq.ring) { writeSlot = 'ring'; writeIdKey = 'ringId'; }
+      else if (!eq.ring2) { writeSlot = 'ring2'; writeIdKey = 'ring2Id'; }
+      else if (!eq.ring3) { writeSlot = 'ring3'; writeIdKey = 'ring3Id'; }
+      else { writeSlot = 'ring'; writeIdKey = 'ringId'; } // all full → overwrite first
+    }
     // Capture what was already in this slot so the swap is visible.
     // Playtest: player equipped a locket, then a compass to the same Amulet
     // slot and got two "You equip ..." lines with no signal that the locket
     // was actually displaced.
-    const previousInSlot = player.equipped?.[slot];
+    const previousInSlot = (player.equipped ?? {})[writeSlot as keyof PlayerEquipped] as string | undefined;
     // Store both the catalog name (for display + catalog lookup) AND the
     // specific InventoryItem.id so durability wear, the InventoryScreen
     // "EQUIPPED" badge, and any other instance-sensitive code knows
     // EXACTLY which copy is in the slot.
-    const slotIdKey = SLOT_ID_KEY[slot];
     set((s) =>
       s.player
         ? {
@@ -14980,8 +15036,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ...s.player,
               equipped: {
                 ...(s.player.equipped ?? {}),
-                [slot]: item.name,
-                [slotIdKey]: item.id,
+                [writeSlot]: item.name,
+                [writeIdKey]: item.id,
               },
             },
           }
@@ -15014,6 +15070,77 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : s,
     );
     get().appendLog('world', `You set aside what was in your ${SLOT_LABEL[slot]} slot.`);
+    void get().persist();
+  },
+
+  // OTA-239 — Tool Pouch. The pouch holds up to 3 items (ids matching
+  // entries in player.inventory). Pouched items remain in inventory;
+  // pouchIds is the index. Players stow Aetheric Torches, Vision
+  // Lenses, etc. so `use <item>` resolves faster and the InventoryScreen
+  // surfaces them in a dedicated section.
+  stowInPouch(itemName) {
+    const POUCH_MAX = 3;
+    const state = get();
+    const player = state.player;
+    if (!player) return;
+    const item = player.inventory.find(
+      (i) => i.name.toLowerCase() === itemName.toLowerCase() && i.quantity > 0,
+    );
+    if (!item) {
+      get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
+      return;
+    }
+    const current = player.equipped?.toolPouchIds ?? [];
+    if (current.includes(item.id)) {
+      get().appendLog('arbiter', `The Arbiter eyes the pouch. "Already on your belt."`);
+      return;
+    }
+    if (current.length >= POUCH_MAX) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter looks at the pouch. "Three is the limit. Take one out before another goes in."`,
+      );
+      return;
+    }
+    set((s) => s.player
+      ? {
+          player: {
+            ...s.player,
+            equipped: {
+              ...(s.player.equipped ?? {}),
+              toolPouchIds: [...current, item.id],
+            },
+          },
+        }
+      : s);
+    get().appendLog('world', `You stow ${item.name} on your tool belt. Ready to use.`);
+    void get().persist();
+  },
+
+  unpouchItem(itemName) {
+    const state = get();
+    const player = state.player;
+    if (!player) return;
+    const current = player.equipped?.toolPouchIds ?? [];
+    const item = player.inventory.find(
+      (i) => i.name.toLowerCase() === itemName.toLowerCase() && current.includes(i.id),
+    );
+    if (!item) {
+      get().appendLog('arbiter', `The Arbiter looks at the pouch. "${itemName} isn't on your belt."`);
+      return;
+    }
+    set((s) => s.player
+      ? {
+          player: {
+            ...s.player,
+            equipped: {
+              ...(s.player.equipped ?? {}),
+              toolPouchIds: current.filter((id) => id !== item.id),
+            },
+          },
+        }
+      : s);
+    get().appendLog('world', `You move ${item.name} back into your pack.`);
     void get().persist();
   },
 

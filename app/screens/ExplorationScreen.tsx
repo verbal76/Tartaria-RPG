@@ -68,6 +68,11 @@ export function ExplorationScreen() {
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [approachOpen, setApproachOpen] = useState(false);
+  // OTA-239 — Ask the Arbiter modal. Opens via the new ASK ARBITER
+  // quick-row button; submits `ask the arbiter about <input>` so
+  // OTA-233's parser fallback fires the MiniLM lore lookup.
+  const [askArbiterOpen, setAskArbiterOpen] = useState(false);
+  const [askArbiterInput, setAskArbiterInput] = useState('');
   const [salvageOpen, setSalvageOpen] = useState(false);
   const [takeOpen, setTakeOpen] = useState(false);
   // OTA 031 — climb-target picker. Opens to a chip list of every
@@ -596,6 +601,7 @@ export function ExplorationScreen() {
               }
               setApproachOpen(true);
             }}
+            onOpenAskArbiter={() => setAskArbiterOpen(true)}
             onOpenSalvage={() => setSalvageOpen(true)}
             onOpenTake={() => setTakeOpen(true)}
             onOpenClimb={() => setClimbOpen(true)}
@@ -1061,6 +1067,40 @@ export function ExplorationScreen() {
 
       {/* 2026-05-25 — branded vendor-leave prompt. Replaces the
           native Alert.alert that broke the dark+amber palette. */}
+      {/* OTA-239 — Ask the Arbiter modal. Player types a lore query;
+          submit fires `ask the arbiter about <input>` through the
+          parser → MiniLM cosine match against the ~408-concept lore
+          bank → Arbiter dialogue line lands in the feed. */}
+      <BrandedModal
+        visible={askArbiterOpen}
+        title="ASK THE ARBITER"
+        body="What is the Aether? Who are the Reclaimers? Tell me about the Berlin Betrayal. The Arbiter keeps what they remember of the buried world."
+        textInput={{
+          value: askArbiterInput,
+          onChangeText: setAskArbiterInput,
+          placeholder: 'topic — event, place, faction, item, title…',
+          autoFocus: true,
+        }}
+        buttons={[
+          {
+            label: 'Cancel',
+            onPress: () => { setAskArbiterOpen(false); setAskArbiterInput(''); },
+            tone: 'neutral',
+          },
+          {
+            label: 'Ask',
+            onPress: () => {
+              const q = askArbiterInput.trim();
+              setAskArbiterOpen(false);
+              setAskArbiterInput('');
+              if (q) submit(`ask the arbiter about ${q}`);
+            },
+            tone: 'primary',
+          },
+        ]}
+        onRequestClose={() => { setAskArbiterOpen(false); setAskArbiterInput(''); }}
+      />
+
       <BrandedModal
         visible={vendorLeavePrompt !== null}
         title="Vendor present"

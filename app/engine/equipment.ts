@@ -247,8 +247,11 @@ export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<S
     const a = findAmuletByName(eq.amulet);
     if (a?.statBonus) add(a.statBonus.stat, a.statBonus.amount);
   }
-  if (eq.ring) {
-    const r = findRingByName(eq.ring);
+  // OTA-239 — three concurrent ring slots. Each ring's statBonus
+  // stacks; future ring catalog can author per-slot synergies later.
+  for (const ringName of [eq.ring, eq.ring2, eq.ring3]) {
+    if (!ringName) continue;
+    const r = findRingByName(ringName);
     if (r?.statBonus) add(r.statBonus.stat, r.statBonus.amount);
   }
   return bonus;

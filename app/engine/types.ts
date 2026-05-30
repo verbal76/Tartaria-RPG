@@ -48,6 +48,11 @@ export type Intent =
   | 'drop'
   | 'pickup'
   | 'open'
+  /** OTA-239 — Tool Pouch. `stow <item>` adds an inventory item to
+   *  the 3-slot tool pouch; `unpouch <item>` (parsed via the same
+   *  intent + an `unpouch` flag in the verb resolution) removes. */
+  | 'stow_pouch'
+  | 'unpouch'
   // OTA 004 — Phase 3 water bottles. Fill an empty bottle from a
   // water source in the current scene (puddle / lake / waterfall /
   // crevice / stream / well).
@@ -517,7 +522,13 @@ export interface PlayerEquipped {
   legs?: string;
   feet?: string;
   amulet?: string;
+  /** OTA-239 — three concurrent ring slots. `ring` is the legacy first
+   *  slot (kept for back-compat); `ring2` and `ring3` are the new
+   *  additions. effectiveStatsBreakdown sums all three. Equip flow
+   *  fills the first empty slot in order. */
   ring?: string;
+  ring2?: string;
+  ring3?: string;
 
   /** Per-slot instance id (matches InventoryItem.id). When set, the
    *  durability-wear path and InventoryScreen dedupe shim use this
@@ -532,6 +543,17 @@ export interface PlayerEquipped {
   feetId?: string;
   amuletId?: string;
   ringId?: string;
+  ring2Id?: string;
+  ring3Id?: string;
+
+  /** OTA-239 — Tool Pouch. Carries up to 3 ready-to-use tool items
+   *  (Aetheric Torch, Aetheric Vision Lens, etc.) outside the
+   *  backpack. Pouched items are still in player.inventory; this
+   *  array tracks WHICH inventory items are pouched (by instance
+   *  id). The `use <item>` verb resolves from pouch first so a
+   *  pouched torch fires faster than digging through the pack.
+   *  Cap enforced in stowItem (gameStore action). */
+  toolPouchIds?: string[];
 
   // Legacy fields kept on the type so existing saves still deserialize
   // cleanly. backfillPlayer migrates them to the new slot shape.

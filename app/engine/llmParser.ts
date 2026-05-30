@@ -104,6 +104,9 @@ const CANONICAL_VERB: Record<Intent, string> = {
   press: 'press',
   push: 'push',
   pull: 'pull',
+  // OTA-239 — Tool Pouch verbs.
+  stow_pouch: 'stow',
+  unpouch: 'unpouch',
   unknown: 'look',
 };
 

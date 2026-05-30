@@ -245,6 +245,26 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Tool Pouch + 3 ring slots + Ask the Arbiter button
+
+- **OTA-239 (2026-05-30) · Player: *"let's have a tool pouch. it's separate from their backpack so they can have things like their etheric torch in there. so it's already ready their etheric lens in there ... tools that I click on and say use can go in that pouch and are ready to go"* + *"And you can equip up to three rings"* + *"where is the ask arbiter button?"***
+  - **Tool Pouch (3 slots):**
+    - `PlayerEquipped.toolPouchIds?: string[]` — pouched items stay in `player.inventory`; the array tracks WHICH inventory items are pouched by instance id. Cap of 3 enforced in `stowInPouch`.
+    - New parser verbs: `stow <item>` / `pouch <item>` / `belt <item>` (intent `stow_pouch`) → add to pouch. `unpouch <item>` / `unstow <item>` / `unbelt <item>` (intent `unpouch`) → take off.
+    - `InventoryScreen` gains a compact TOOL POUCH banner above the inventory list — 3 slots, each shows pouched item name with "tap to unstow", or `— empty —`.
+    - `use <item>` already resolves any inventory item, so pouched items work via use without special routing. The pouch is the player's "ready-to-fire" UX; the resolution stays the same.
+  - **Three ring slots:**
+    - `PlayerEquipped` gains `ring2/ring3` + `ring2Id/ring3Id`.
+    - `aggregateEquippedStatBonuses` sums all three rings; `effectiveStatsBreakdown` rolls them into the `equipped` source line.
+    - `equipItem(name, 'ring')` routes to the first empty ring slot (ring → ring2 → ring3); falls back to overwriting `ring` when all three are full. UI / parser don't need to know about per-slot routing.
+    - `backfillPlayer` initializes `ring2/ring3` to `undefined` and `toolPouchIds` to `[]` on legacy saves.
+    - `InventoryScreen` `slotsByEquippedName` + `equippedItemIds` dedupe sets include `ring2/ring3` so the EQUIPPED badge lands on the correct instance.
+  - **Ask the Arbiter button:**
+    - New `ask arbiter` quick-row button on `ExplorationScreen` InputBox. Previously OTA-233 shipped only the parser path; now a one-tap modal opens a text input. Submit fires `ask the arbiter about <input>` → MiniLM cosine match against the ~408-concept lore bank → Arbiter dialogue line lands in the feed.
+    - `BrandedModal` extended with an optional `textInput` prop (non-breaking; existing call sites unaffected).
+  - **Verification:** TS clean app-side. Existing tests stay green.
+  - **Files:** `app/engine/types.ts`, `app/engine/equipment.ts`, `app/engine/parser.ts`, `app/engine/llmParser.ts`, `app/state/gameStore.ts`, `app/screens/InventoryScreen.tsx`, `app/components/InputBox.tsx`, `app/screens/ExplorationScreen.tsx`, `app/components/BrandedModal.tsx`.
+
 #### Approach auto-target + rest-when-whole block
 
 - **OTA-238 (2026-05-30) · Playtester:**

@@ -9655,4 +9655,141 @@
 // app/screens/Exploration
 // Screen.tsx (onOpenApproach
 // single-enemy auto-target).
-export const OTA_BUILD_ID = '2026-05-30-238';
+// 2026-05-30-239 — Tool
+// Pouch + 3 rings + Ask the
+// Arbiter button. Player:
+// "let's have a tool pouch.
+// it's separate from their
+// backpack so they can have
+// things like their etheric
+// torch in there. ... And
+// you can equip up to three
+// rings" then later: "where
+// is the ask arbiter button?"
+//
+// Tool Pouch (3 slots):
+// - PlayerEquipped gains
+//   toolPouchIds?: string[].
+//   Pouched items stay in
+//   player.inventory; the
+//   array tracks WHICH
+//   inventory items are
+//   pouched (by instance id).
+// - New `stow <item>` /
+//   `pouch <item>` parser
+//   verbs add to pouch
+//   (capped at 3, refuses
+//   when full). `unpouch
+//   <item>` / `unstow <item>`
+//   takes off. New Intent
+//   union members 'stow_
+//   pouch' and 'unpouch'.
+// - InventoryScreen gains a
+//   compact TOOL POUCH
+//   banner above the
+//   inventory list — 3
+//   slots, each shows the
+//   pouched item name with
+//   a "tap to unstow"
+//   action, or "— empty —".
+// - `use <item>` already
+//   resolves any inventory
+//   item, so pouched items
+//   work via use without
+//   special routing.
+//
+// Three ring slots:
+// - PlayerEquipped gains
+//   ring2/ring3 (+ matching
+//   ring2Id/ring3Id) on
+//   top of the legacy ring
+//   slot.
+// - aggregateEquipped
+//   StatBonuses sums all
+//   three rings; effective
+//   StatsBreakdown shows
+//   total contribution in
+//   the 'equipped' source
+//   line.
+// - equipItem(name, 'ring')
+//   routes to the first
+//   empty ring slot (ring →
+//   ring2 → ring3); falls
+//   back to overwriting ring
+//   when all three are full.
+//   UI and parser don't
+//   need to know about the
+//   per-slot routing.
+// - backfillPlayer
+//   initializes ring2/ring3
+//   to undefined and
+//   toolPouchIds to [] on
+//   legacy saves.
+// - InventoryScreen
+//   slotsByEquippedName +
+//   equippedItemIds dedupe
+//   sets include ring2/
+//   ring3 so the EQUIPPED
+//   badge lands on the
+//   correct instance.
+//
+// Ask the Arbiter button:
+// - New `ask arbiter` quick-
+//   row button on the
+//   ExplorationScreen
+//   InputBox. Player
+//   request: "where is the
+//   ask arbiter button?"
+//   Previously OTA-233
+//   shipped only the parser
+//   path (`ask the arbiter
+//   about <X>`). Now a one-
+//   tap modal opens a text
+//   input; submit fires
+//   the parser query →
+//   MiniLM cosine match
+//   against the ~408-
+//   concept lore bank.
+// - BrandedModal extended
+//   to accept an optional
+//   textInput prop (non-
+//   breaking; existing call
+//   sites unaffected).
+//
+// Tests stay green for
+// existing canonFacts +
+// askArbiter + arbiter
+// TitlesScreen suites. TS
+// clean app-side.
+//
+// Files: app/engine/types.ts
+// (PlayerEquipped ring2/
+// ring3 + toolPouchIds +
+// Intent 'stow_pouch' /
+// 'unpouch'), app/engine/
+// equipment.ts (3-ring
+// stat aggregation), app/
+// engine/parser.ts (stow/
+// unpouch verb maps), app/
+// engine/llmParser.ts
+// (intent strings), app/
+// state/gameStore.ts
+// (equipItem auto-ring-
+// slot routing + stowIn
+// Pouch / unpouchItem
+// actions + case handlers
+// + backfill), app/screens/
+// InventoryScreen.tsx
+// (ToolPouchBanner + ring2/
+// ring3 dedupe), app/
+// components/InputBox.tsx
+// (`ask arbiter` quick-row
+// button + onOpenAskArbiter
+// prop), app/screens/
+// ExplorationScreen.tsx
+// (askArbiterOpen state +
+// BrandedModal wiring),
+// app/components/Branded
+// Modal.tsx (textInput
+// prop support).
+export const OTA_BUILD_ID = '2026-05-30-239';

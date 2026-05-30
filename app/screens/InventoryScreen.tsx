@@ -7,7 +7,7 @@ import {
   CATEGORY_ORDER,
   groupInventoryByCategory,
 } from '../components/InventoryCategorize';
-import type { InventoryItem, EquipSlot } from '../engine/types';
+import type { InventoryItem, EquipSlot, PlayerCharacter } from '../engine/types';
 import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
 import { canScrap } from '../engine/scrapEngine';
 import { findWeaponByName, isInferredItem, isInferredInventoryItem } from '../engine/crafting';
@@ -127,6 +127,12 @@ export function InventoryScreen() {
     ['feet', player.equipped?.feet],
     ['amulet', player.equipped?.amulet],
     ['ring', player.equipped?.ring],
+    // OTA-239 — three concurrent ring slots. ring2/ring3 share the
+    // 'ring' EquipSlot identifier in the type union but write to
+    // different equipped.* fields; for display dedupe purposes any
+    // ring slot counts as 'ring'.
+    ['ring', player.equipped?.ring2],
+    ['ring', player.equipped?.ring3],
   ];
   for (const [slot, name] of allSlotPairs) {
     if (!name) continue;
@@ -144,6 +150,9 @@ export function InventoryScreen() {
   const idSlots: (string | undefined)[] = [
     eq.mainId, eq.offId, eq.headId, eq.chestId,
     eq.legsId, eq.feetId, eq.amuletId, eq.ringId,
+    // OTA-239 — ring2 / ring3 instance ids participate in the
+    // EQUIPPED badge dedupe.
+    eq.ring2Id, eq.ring3Id,
   ];
   for (const id of idSlots) {
     if (id) equippedItemIds.add(id);
@@ -448,6 +457,13 @@ export function InventoryScreen() {
       />
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
+        {/* OTA-239 — Tool Pouch banner. 3 slots above the inventory list
+            showing what's stowed (Aetheric Torch, Vision Lens, etc.).
+            Pouched items are ready-to-use; the `use <item>` verb
+            resolves them faster. Tap a slot to unpouch. Tap an inventory
+            item below to stow via the existing equip dialog (the dialog
+            now offers "stow in pouch" alongside the equip slots). */}
+        <ToolPouchBanner player={player} />
         {CATEGORY_ORDER.map((cat) => {
           const items = grouped[cat];
           if (items.length === 0) return null;
@@ -507,6 +523,86 @@ export function InventoryScreen() {
     </View>
   );
 }
+
+// OTA-239 — Tool Pouch banner. 3 slots showing what's stowed.
+// Empty slots render as dashes; pouched slots show the item name +
+// an UNPOUCH button. Player stows via the existing equip flow
+// (ItemRow's modal gains a "STOW IN POUCH" option for tool-eligible
+// items) or via `stow <item>` in the input box.
+function ToolPouchBanner({ player }: { player: PlayerCharacter }) {
+  const POUCH_MAX = 3;
+  const pouchIds = player.equipped?.toolPouchIds ?? [];
+  const unpouchItem = useGameStore((s) => s.unpouchItem);
+  const slots: Array<{ name: string | null; id: string | null }> = [];
+  for (let i = 0; i < POUCH_MAX; i++) {
+    const id = pouchIds[i];
+    const item = id ? player.inventory.find((it) => it.id === id) : undefined;
+    slots.push({ name: item?.name ?? null, id: id ?? null });
+  }
+  return (
+    <View style={pouchStyles.banner}>
+      <Text style={pouchStyles.title}>TOOL POUCH</Text>
+      <Text style={pouchStyles.hint}>Ready-to-use tools (3 slots). Use `stow &lt;item&gt;` to add.</Text>
+      <View style={pouchStyles.row}>
+        {slots.map((slot, idx) => (
+          <View key={idx} style={pouchStyles.slot}>
+            {slot.name ? (
+              <TouchableOpacity
+                style={pouchStyles.slotFilled}
+                activeOpacity={0.7}
+                onPress={() => unpouchItem(slot.name!)}
+              >
+                <Text style={pouchStyles.slotName} numberOfLines={1}>{slot.name}</Text>
+                <Text style={pouchStyles.slotAction}>tap to unstow</Text>
+              </TouchableOpacity>
+            ) : (
+              <View style={pouchStyles.slotEmpty}>
+                <Text style={pouchStyles.slotEmptyText}>— empty —</Text>
+              </View>
+            )}
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+const pouchStyles = StyleSheet.create({
+  banner: {
+    marginBottom: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    backgroundColor: '#1a1612',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+  },
+  title: { color: '#c9a86a', fontSize: 11, fontWeight: '800', letterSpacing: 2, marginBottom: 2 },
+  hint: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginBottom: 6 },
+  row: { flexDirection: 'row', gap: 6 },
+  slot: { flex: 1 },
+  slotFilled: {
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 3,
+    backgroundColor: '#26201a',
+  },
+  slotEmpty: {
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 3,
+    borderStyle: 'dashed',
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+  },
+  slotName: { color: '#e6d8b3', fontSize: 11, fontWeight: '700' },
+  slotAction: { color: '#7a705c', fontSize: 9, marginTop: 2 },
+  slotEmptyText: { color: '#5a5246', fontSize: 10, fontStyle: 'italic' },
+});
 
 function ItemRow({
   item,

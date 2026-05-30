@@ -57,6 +57,8 @@ interface Props {
   onOpenSearch: () => void;
   onOpenCrafting: () => void;
   onOpenApproach: () => void;
+  /** OTA-239 — opens the Ask the Arbiter modal (lore lookup). */
+  onOpenAskArbiter: () => void;
   onOpenSalvage: () => void;
   onOpenTake: () => void;
   /** OTA 031 — open the climb-target picker (ClimbModal). Lists every
@@ -163,7 +165,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, inventory, range, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, playerHasRope }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenAskArbiter, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, inventory, range, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, playerHasRope }: Props) {
   // OTA-144 — dog combat action picker state. When the player taps
   // the DOG quick-button in combat, this flips to true and the
   // BITE / DISTRACT row renders inline. Either tap fires the
@@ -468,6 +470,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             )}
             <QuickBtn label="craft" onPress={onOpenCrafting} />
             <QuickBtn label="inventory" onPress={onOpenInventory} />
+            {/* OTA-239 — Ask the Arbiter button. Surfaces OTA-233's
+                lore-lookup scheme as a one-tap action: opens a small
+                modal with a text input; submit fires `ask the arbiter
+                about <X>` through the parser → MiniLM cosine match
+                against the ~408-concept lore bank. */}
+            <QuickBtn label="ask arbiter" onPress={onOpenAskArbiter} />
           </>
         )}
       </TutorialTarget>
