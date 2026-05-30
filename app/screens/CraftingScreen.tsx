@@ -5,6 +5,7 @@ import { useGameStore } from '../state/gameStore';
 import { repairCostMaterials } from '../engine/scrapEngine';
 import { RecipesView } from '../components/RecipesView';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
+import { FirstTimeHint } from '../components/FirstTimeHint';
 import type { InventoryItem } from '../engine/types';
 import { getItemPreview } from '../components/itemPreview';
 import { GOLEM_DEFINITIONS, type GolemDefinition } from '../engine/golems';
@@ -139,6 +140,29 @@ function evaluateRepair(item: InventoryItem, inventory: InventoryItem[]): Repair
 // = Recipes tab; aether disciplines = new Aetheric tab.
 type Tab = 'craft' | 'repair' | 'recipes' | 'aetheric';
 
+// OTA-230 — per-tab first-time hints. Each entry pops once per
+// install when the player first lands on that tab. Authoring rule:
+// ~25 words / 2 sentences max — longer copy goes in the future
+// Tutorial Replay docs (TUTORIAL_DOCS_FULL).
+const TAB_HINTS: Record<Tab, { title: string; body: string }> = {
+  craft: {
+    title: 'Craft tab',
+    body: 'Every gear / relic blueprint. Ready-to-craft ones are highlighted; the rest list what you\'re missing.',
+  },
+  repair: {
+    title: 'Repair tab',
+    body: 'Damaged weapons, armor, and relics. Tap one to spend TC and restore durability — cost scales with missing points.',
+  },
+  recipes: {
+    title: 'Recipes tab',
+    body: 'Food, tonics, elixirs. Tap a recipe with materials in hand to fire it. Same craftable-highlight rule as Craft.',
+  },
+  aetheric: {
+    title: 'Aetheric tab',
+    body: 'Aethercraft disciplines — shape stone, summon golem, mend wounds. Per-race DC + stat bonuses apply.',
+  },
+};
+
 export function CraftingScreen() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
@@ -231,8 +255,19 @@ export function CraftingScreen() {
     );
   }
 
+  // OTA-230 — per-tab first-time hint. Each tab has its own
+  // dismissable popup that fires the first time the player lands on
+  // it. The hook re-reads AsyncStorage when `id` changes so switching
+  // tabs surfaces the next hint correctly.
+  const hint = TAB_HINTS[tab];
+
   return (
     <View style={styles.container}>
+      <FirstTimeHint
+        id={`crafting_tab_${tab}`}
+        title={hint.title}
+        body={hint.body}
+      />
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen('exploration')}

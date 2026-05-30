@@ -245,6 +245,18 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Tutorial overhaul Phase 2a — FirstTimeHint wired into Inventory + Crafting tabs
+
+- **OTA-230 (2026-05-30) · Player after rolling new character on OTA-229: *"when I hit inventory in craft in those little subtabs for the first time after this, they don't give you any information as they're supposed to be a tab on those when you hit them for the first time to tell you something."***
+  - **Cause:** OTA-229 shipped the hint infrastructure (`useFirstTimeHint` + `FirstTimeHint`) but didn't wire it into any screen — Phase 1 was infra-only. The user landed on inventory + crafting tabs and saw nothing because nothing was instrumented.
+  - **Fix (Phase 2 starts here):** Drop `FirstTimeHint` into the real trigger sites.
+    - `InventoryScreen` — one hint at top of render (`id: 'inventory_first_open'`): *"Tap any item to equip, use, scrap, or drop. The green line shows damage; the diamond means engine-named."*
+    - `CraftingScreen` — per-tab hint (`crafting_tab_craft` / `_repair` / `_recipes` / `_aetheric`). Each pops the first time the player lands on that tab. New `TAB_HINTS` constant centralizes copy. Hook re-reads AsyncStorage when `id` changes so switching tabs surfaces the next unseen hint correctly.
+  - **Authoring rule honored:** every hint ~25 words / 2 sentences max. Longer copy still lives in `TUTORIAL_DOCS_FULL` for the future Tutorial Replay.
+  - **Phase 2 remaining (future OTAs):** combat first-round, Fusing Crucible (ready + needs-prep), dog rescue + naming, fused-item first-equip, climb tiers, scrap, Aether Dust buff, vendor first-buy. One system per OTA going forward; copy gets tuned in playtest.
+  - **Verification:** `npx tsc --noEmit` clean app-side. No new tests — the storage contract is already pinned by the OTA-229 `firstTimeHint` suite.
+  - **Files:** `app/screens/InventoryScreen.tsx` (one `FirstTimeHint` at top of render), `app/screens/CraftingScreen.tsx` (per-tab `FirstTimeHint` + `TAB_HINTS` constant).
+
 #### Tutorial overhaul Phase 1 — slim 3-step upfront + just-in-time hint infrastructure
 
 - **OTA-229 (2026-05-30) · Player rolling a new character: *"we have a lot of segments now, I don't want people reading a dictionary before they get a chance to play. maybe break it up so the first time they hit something the hint comes up."***

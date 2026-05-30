@@ -8933,4 +8933,72 @@
 // TUTORIAL_STEPS + preserve
 // long form). NEW __tests__/
 // firstTimeHint.test.ts.
-export const OTA_BUILD_ID = '2026-05-30-229';
+// 2026-05-30-230 — tutorial
+// overhaul phase 2a — wire
+// FirstTimeHint into the
+// inventory screen + the 4
+// crafting sub-tabs. Player
+// after rolling new
+// character on OTA-229:
+//   "when I hit inventory in
+//   craft in those little
+//   subtabs for the first
+//   time after this, they
+//   don't give you any
+//   information."
+//
+// OTA-229 shipped the hint
+// infrastructure but didn't
+// wire it into any screen
+// (Phase 1 was infra-only).
+// Phase 2 starts here: drop
+// FirstTimeHint into the
+// real trigger sites.
+//
+// Inventory: one hint on
+// first open
+// (inventory_first_open) —
+// "Tap any item to equip /
+// use / scrap / drop. Green
+// line = damage, diamond =
+// engine-named."
+//
+// Crafting: per-tab hint
+// (crafting_tab_craft /
+// _repair / _recipes /
+// _aetheric). Each pops
+// once when the player
+// first lands on that tab;
+// switching tabs surfaces
+// the next unseen hint
+// because useFirstTimeHint
+// re-reads AsyncStorage when
+// id changes. New TAB_HINTS
+// constant centralizes the
+// copy.
+//
+// Authoring rule preserved:
+// ~25 words / 2 sentences
+// max per hint.
+//
+// TS clean app-side. No new
+// tests — the hook's storage
+// contract is already pinned
+// by the OTA-229 first
+// TimeHint suite.
+//
+// Files: app/screens/
+// InventoryScreen.tsx (one
+// FirstTimeHint at top of
+// render), app/screens/
+// CraftingScreen.tsx (per-
+// tab FirstTimeHint + TAB
+// _HINTS constant).
+//
+// Phase 2 remaining: combat,
+// crucible, dog rescue,
+// fused items, climb, scrap,
+// aether buff. To migrate
+// one system per OTA going
+// forward.
+export const OTA_BUILD_ID = '2026-05-30-230';

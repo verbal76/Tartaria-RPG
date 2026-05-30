@@ -16,6 +16,7 @@ import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
+import { FirstTimeHint } from '../components/FirstTimeHint';
 
 // 2026-05-27 OTA-087 — Sort axes for inventory. Each axis
 // has a default direction baked in (alphabetical asc, rarity
@@ -414,6 +415,14 @@ export function InventoryScreen() {
 
   return (
     <View style={styles.container}>
+      {/* OTA-230 — first-time inventory hint. Pops once per install
+          when the player first opens the pack; dismissable.
+          Authoring rule: ~25 words, 2 sentences max. */}
+      <FirstTimeHint
+        id="inventory_first_open"
+        title="Your pack"
+        body="Tap any item to equip, use, scrap, or drop. The green line shows damage; the diamond means engine-named."
+      />
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setScreen('exploration')}
