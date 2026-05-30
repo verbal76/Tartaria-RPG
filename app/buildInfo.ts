@@ -8755,4 +8755,64 @@
 // tsx (row damage IIFE
 // branches on uniqueStats
 // first).
-export const OTA_BUILD_ID = '2026-05-30-226';
+// 2026-05-30-227 — unified
+// resolveDisplayWeapon /
+// resolveDisplayArmor
+// helpers + sweep across
+// the UI display sites that
+// fell into the OTA-224 /
+// OTA-226 bug class. Player
+// on OTA-226: "is it a
+// regression that we have
+// fixed and we have a
+// safeguard in place to
+// double check before they
+// post into the inventory
+// that this shouldn't
+// happen again?"
+//
+// Audit found 4 UI display
+// sites doing findWeaponBy
+// Name(item.name) /
+// findArmorByName(name)
+// that silently return null
+// for fused items (catalog-
+// absent by design). Combat
+// already handles fused
+// items via aggregateArmor
+// + resolveActiveWeapon so
+// the bug class is purely
+// display-side.
+//
+// New app/engine/item
+// Resolution.ts module —
+// single source of truth
+// that branches on unique
+// Stats first, falls back
+// to catalog. Migrated 4
+// sites: InventoryScreen
+// (green damage line),
+// StatsPanel (displayed AC
+// no longer desyncs from
+// combat AC for fused
+// armor), ExplorationScreen
+// (range/inRange respects
+// fused weaponKind),
+// InputBox (weapon-button
+// tone respects fused
+// weaponKind).
+//
+// Tests: +13 in fusedItem
+// DisplayCoverage. 28/28
+// across all fused-item
+// tests. TS clean app-
+// side.
+//
+// Files: NEW app/engine/
+// itemResolution.ts,
+// InventoryScreen / Stats
+// Panel / ExplorationScreen
+// / InputBox (use helper).
+// NEW __tests__/fusedItem
+// DisplayCoverage.test.ts.
+export const OTA_BUILD_ID = '2026-05-30-227';

@@ -25,7 +25,7 @@ import { searchRequirementFor, inventoryHasGate } from '../engine/itemEffect';
 import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
 import { ApproachModal } from '../components/ApproachModal';
 import { TutorialTarget } from '../components/TutorialTarget';
-import { findWeaponByName } from '../engine/crafting';
+import { resolveDisplayWeaponByName } from '../engine/itemResolution';
 
 function describeTime(hours: number): string {
   const day = Math.floor(hours / 24) + 1;
@@ -276,7 +276,11 @@ export function ExplorationScreen() {
     const range = currentScene.range ?? 'close';
     const rangeLabel = range === 'arm' ? "arm's reach" : range === 'far' ? 'far' : 'close';
     const mainName = player?.equipped?.main ?? player?.equipped?.weaponName;
-    const w = mainName ? findWeaponByName(mainName) : null;
+    // OTA-227 — resolveDisplayWeaponByName so fused weapons (catalog-
+    // absent, uniqueStats-bearing) get their actual weaponKind instead
+    // of barehand-only fallback. Resonant Edge (aetheric → runecaster)
+    // now reports in-range at close, not just arm's reach.
+    const w = mainName ? resolveDisplayWeaponByName(mainName, player?.inventory ?? []) : null;
     let canHit = false;
     if (!w) canHit = range === 'arm';
     else if (w.weaponKind === 'melee') canHit = range === 'arm';
@@ -291,6 +295,7 @@ export function ExplorationScreen() {
   }, [
     currentScene?.enemies, currentScene?.enemyHps, currentScene?.range,
     player?.equipped?.main, player?.equipped?.weaponName, player?.stats?.intelligence,
+    player?.inventory,
   ]);
   const activeIdx = Math.min(currentScene?.activeEnemyIdx ?? 0, Math.max(0, enemyViews.length - 1));
 
@@ -598,6 +603,7 @@ export function ExplorationScreen() {
             inCombat={inCombat}
             equippedMain={equippedMain}
             equippedOff={equippedOff}
+            inventory={player?.inventory ?? []}
             range={currentScene?.range ?? null}
             takeableCount={(() => {
               // 2026-05-25 [UI-2] — green tone fires only when the

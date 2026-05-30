@@ -245,6 +245,18 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Safeguard: unified `resolveDisplay*` helpers + sweep test prevent the fused-item display bug class
+
+- **OTA-227 (2026-05-30) · Player on OTA-226: *"is it a regression that we have fixed and we have a safeguard in place to double check before they post into the inventory that this shouldn't happen again?"***
+  - **Honest framing:** not a strict regression — the row damage line was added pre-fused-items (OTA-028). When fused items shipped (OTA-191/195) no one walked the UI render path to wire them in. Same coverage gap was OTA-224's three bugs + OTA-226's one. Each instance was patched individually; nothing in the codebase prevented the next one.
+  - **Audit (grep step):** searched every `findWeaponByName(item.name)` / `findArmorByName(name)` call. 4 UI display sites had the silent-fail pattern (InventoryScreen row, StatsPanel armor AC, ExplorationScreen range/inRange, InputBox weapon-button tone). Combat already handled fused items inline (combatRules.ts:194 + gameStore.ts:17372) so the bug class was purely display-side.
+  - **Fix (helper step):** new `app/engine/itemResolution.ts` exports `resolveDisplayWeapon(item)` / `resolveDisplayArmor(item)` (item-shaped, uniqueStats first → catalog fallback) and `resolveDisplayWeaponByName(name, inventory)` / `resolveDisplayArmorByName(name, inventory)` (name-only sites that scan inventory for the uniqueStats-bearing instance). Synthesizes a CatalogWeapon-shaped row from uniqueStats: aetheric damageType → runecaster weaponKind, others → melee; stat from `scalesWith`; baseDurability from `durability.max`. Armor synthesizes from `armorSlot` + `acBonus` + optional `resistance`.
+  - **Migrated sites:** all 4 UI sites now share the helper. InventoryScreen row green damage line (was inline-fixed in OTA-226). StatsPanel displayed AC (was desynced from combat AC for fused armor — combat showed +2, panel showed 0). ExplorationScreen range/inRange (Resonant Edge now reports in-range at close, not just arm). InputBox weapon-button tone (fused weapons no longer fall back to barehand-only reach).
+  - **Safeguard (test step):** new `fusedItemDisplayCoverage.test.ts` (+13 tests) asserts the helper contract: every required field a UI site reads is non-empty on a fused weapon and a fused armor fixture. Adding a new fused-aware field to a UI site means adding it to the contract test — the next gap fails the suite instead of waiting for a playtester.
+  - **Why this prevents recurrence:** UI code now has one API to call. New display sites import the helper. The catalog-only lookup pattern is gone from the UI layer entirely; the silent-fail can't return via UI additions because there's no other API to forget.
+  - **Verification:** 28/28 across `fusedItemEquip` + `fusedItemNameMigration` + `fusedItemDisplayCoverage`. `npx tsc --noEmit` clean app-side.
+  - **Files:** NEW `app/engine/itemResolution.ts`, NEW `__tests__/fusedItemDisplayCoverage.test.ts`, migrated `app/screens/InventoryScreen.tsx` + `app/components/StatsPanel.tsx` + `app/screens/ExplorationScreen.tsx` + `app/components/InputBox.tsx` (new `inventory` prop threaded from ExplorationScreen).
+
 #### Inventory row green damage line now shows on fused weapons
 
 - **OTA-226 (2026-05-30) · Player: *"every weapon in my inventory has in green writing the dice roll for damage and the damage type. if I click on the new weapon the Resonant Edge, it shows me that I have a 1d8 and aetheric damage. but on the description like every other weapon... it doesn't have that in green."***

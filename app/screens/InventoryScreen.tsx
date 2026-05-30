@@ -11,6 +11,7 @@ import type { InventoryItem, EquipSlot } from '../engine/types';
 import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
 import { canScrap } from '../engine/scrapEngine';
 import { findWeaponByName, isInferredItem, isInferredInventoryItem } from '../engine/crafting';
+import { resolveDisplayWeapon } from '../engine/itemResolution';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
@@ -567,19 +568,10 @@ function ItemRow({
               to see the attack dice roll like a 1d10 or a 1d20.
               That's how I know which weapon is the strongest." */}
           {(() => {
-            // OTA-226 — fused weapons (uniqueStats present) aren't in
-            // the WEAPONS catalog by name, so findWeaponByName returns
-            // null and the green damage line was missing from the row.
-            // Read uniqueStats first; fall back to the catalog lookup
-            // for hand-authored weapons.
-            if (item.uniqueStats?.kind === 'weapon' && item.uniqueStats.damageDice) {
-              return (
-                <Text style={[styles.rowMeta, styles.rowDamage]}>
-                  {item.uniqueStats.damageDice} {item.uniqueStats.damageType ?? ''}
-                </Text>
-              );
-            }
-            const w = findWeaponByName(item.name);
+            // OTA-227 — uses resolveDisplayWeapon so fused weapons
+            // (uniqueStats, catalog-absent) AND hand-authored ones
+            // resolve through one API. See app/engine/itemResolution.ts.
+            const w = resolveDisplayWeapon(item);
             if (!w) return null;
             return (
               <Text style={[styles.rowMeta, styles.rowDamage]}>

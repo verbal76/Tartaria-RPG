@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import type { PlayerCharacter } from '../engine/types';
 import racesData from '../data/races/races.json';
-import { findArmorByName } from '../engine/crafting';
+import { resolveDisplayArmorByName } from '../engine/itemResolution';
 import { ARMOR_SLOTS, effectiveStats } from '../engine/equipment';
 import { formatEffectSummary } from '../engine/statusEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
@@ -69,11 +69,15 @@ export function StatsPanel({ player }: Props) {
   const factionStanding = player.factionStanding.find((f) => f.factionId === player.factionId)?.standing ?? 0;
 
   // Effective AC = race base + summed armor bonus across head/chest/legs/feet.
+  // OTA-227 — uses resolveDisplayArmorByName so fused armor (uniqueStats,
+  // catalog-absent) contributes its acBonus to the displayed AC. Without
+  // this the StatsPanel desyncs from aggregateArmor (gameStore.ts:17372)
+  // which already handles uniqueStats — combat saw +2 AC, display showed 0.
   let armorAc = 0;
   for (const slot of ARMOR_SLOTS) {
     const name = player.equipped?.[slot];
     if (!name) continue;
-    armorAc += findArmorByName(name)?.acBonus ?? 0;
+    armorAc += resolveDisplayArmorByName(name, player.inventory)?.acBonus ?? 0;
   }
   const effectiveAc = player.ac + armorAc;
 

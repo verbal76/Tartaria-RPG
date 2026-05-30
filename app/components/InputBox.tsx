@@ -8,7 +8,8 @@ import { TutorialTarget } from './TutorialTarget';
 // unaffected — read-aloud still routes through TTSManager via
 // gameStore, controlled by the gear screen's TTS toggle.
 import { useGameStore } from '../state/gameStore';
-import { findWeaponByName } from '../engine/crafting';
+import { resolveDisplayWeaponByName } from '../engine/itemResolution';
+import type { InventoryItem } from '../engine/types';
 
 /** OTA 207 — does the equipped weapon reach the current combat range?
  *  Mirrors playerWeaponReach() in gameStore but takes weapon name +
@@ -16,16 +17,20 @@ import { findWeaponByName } from '../engine/crafting';
  *  the tone the QuickBtn should render: 'ready' when the weapon can
  *  hit at this range, 'needs-approach' when it can't. Returns
  *  undefined when there's no combat in progress so neutral grey
- *  rendering applies (we don't tone weapons out-of-combat). */
+ *  rendering applies (we don't tone weapons out-of-combat).
+ *  OTA-227 — takes inventory so fused weapons (catalog-absent,
+ *  uniqueStats-bearing) resolve their weaponKind correctly instead
+ *  of falling back to barehand. */
 function weaponTone(
   weaponName: string | null | undefined,
   range: 'arm' | 'close' | 'far' | null | undefined,
   intelligence: number,
+  inventory: ReadonlyArray<InventoryItem>,
 ): 'ready' | 'needs-approach' | undefined {
   if (!range) return undefined;
   // Bare hands — arm reach only.
   if (!weaponName) return range === 'arm' ? 'ready' : 'needs-approach';
-  const w = findWeaponByName(weaponName);
+  const w = resolveDisplayWeaponByName(weaponName, inventory);
   if (!w) return range === 'arm' ? 'ready' : 'needs-approach';
   // Reach bands per kind. Runecasters: 'arm'+'close' baseline,
   // Int >= 9 extends to 'far' (matches the gameStore rule).
@@ -82,6 +87,10 @@ interface Props {
   inCombat: boolean;
   equippedMain: string | null;
   equippedOff: string | null;
+  /** OTA-227 — passed through to weaponTone so fused weapons
+   *  (uniqueStats-bearing, catalog-absent) resolve their weaponKind
+   *  for the in-range tone instead of falling back to barehand. */
+  inventory: ReadonlyArray<InventoryItem>;
   /** Current combat range — surfaces advance/retreat buttons when meaningful. */
   range?: 'arm' | 'close' | 'far' | null;
   /** v2.4.1 (OTA 049) — when set, the cardinal travel row swaps to
@@ -154,7 +163,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, range, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, playerHasRope }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, inventory, range, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, playerHasRope }: Props) {
   // OTA-144 — dog combat action picker state. When the player taps
   // the DOG quick-button in combat, this flips to true and the
   // BITE / DISTRACT row renders inline. Either tap fires the
@@ -281,25 +290,25 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               <QuickBtn
                 label="punch"
                 onPress={() => onSubmit('punch')}
-                tone={weaponTone(null, range, playerInt)}
+                tone={weaponTone(null, range, playerInt, inventory)}
               />
               <QuickBtn
                 label="kick"
                 onPress={() => onSubmit('kick')}
-                tone={weaponTone(null, range, playerInt)}
+                tone={weaponTone(null, range, playerInt, inventory)}
               />
               {equippedMain ? (
                 <QuickBtn
                   label={shortWeaponLabel(equippedMain).toLowerCase()}
                   onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)}
-                  tone={weaponTone(equippedMain, range, playerInt)}
+                  tone={weaponTone(equippedMain, range, playerInt, inventory)}
                 />
               ) : null}
               {equippedOff ? (
                 <QuickBtn
                   label={`off: ${shortWeaponLabel(equippedOff).toLowerCase()}`}
                   onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)}
-                  tone={weaponTone(equippedOff, range, playerInt)}
+                  tone={weaponTone(equippedOff, range, playerInt, inventory)}
                 />
               ) : null}
             </View>
