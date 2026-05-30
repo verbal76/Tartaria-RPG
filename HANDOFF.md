@@ -245,6 +245,18 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-246 — fix AAB build crash; EXIT GAME plugin now REPLACES the existing override
+
+- **OTA-246 + AAB retry (2026-05-30) · Build failure on the OTA-245 AAB attempt:**
+  ```
+  MainActivity.kt:36:3 Conflicting overloads: invokeDefaultOnBackPressed
+  MainActivity.kt:58:3 Conflicting overloads: invokeDefaultOnBackPressed
+  ```
+  - **Root cause:** Expo SDK 52's MainActivity template ALREADY has an `override fun invokeDefaultOnBackPressed` that calls `moveTaskToBack(false)`. OTA-245's plugin ADDED a second override → Kotlin rejected the duplicate. Worse: the template's existing body IS the bug — `moveTaskToBack(false)` is exactly why EXIT GAME just backgrounds instead of finishing.
+  - **Fix:** plugin now REPLACES the existing override's body using a nested-brace regex that captures the full method (outer `{ ... { moveTaskToBack if-block ... } ... }`). Replacement calls `finishAndRemoveTask()` + `super.invokeDefaultOnBackPressed()`. Idempotent via the marker comment. Java fallback path matches the same nested-brace pattern.
+  - **Verification:** smoke-tested the regex against the SDK 52 template form (manual Node simulation) — one method definition after replacement, no conflicting overloads. Commit carries `[build-aab]` to re-trigger the workflow.
+  - **Files:** `plugins/withAutoRemoveRecents.js` (regex replace existing override instead of adding a duplicate).
+
 #### OTA-245 — revert ambush cap, real EXIT GAME fix, AAB build for Play Console
 
 - **OTA-245 + AAB 2026-05-30 · Three player directives:**

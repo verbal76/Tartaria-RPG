@@ -10304,4 +10304,64 @@
 // apk.yml (resolution order:
 // tag > [build-aab] > HaL
 // 2001 > default).
-export const OTA_BUILD_ID = '2026-05-30-245';
+// 2026-05-30-246 — fix the
+// AAB build failure from
+// OTA-245. Build log:
+// "MainActivity.kt:36:3
+// Conflicting overloads:
+// invokeDefaultOnBackPressed
+// ... MainActivity.kt:58:3
+// Conflicting overloads..."
+//
+// Root cause: Expo SDK 52's
+// MainActivity template
+// ALREADY has an override
+// fun invokeDefaultOnBack
+// Pressed that calls move
+// TaskToBack(false). My
+// OTA-245 plugin added a
+// SECOND override — Kotlin
+// rejected the duplicate.
+//
+// Worse: the existing
+// template body IS the bug.
+// moveTaskToBack(false)
+// just backgrounds the
+// activity instead of
+// finishing it. That's
+// exactly why EXIT GAME
+// doesn't fully exit.
+//
+// Fix: REPLACE the existing
+// override's body instead of
+// adding a second one. New
+// body calls finishAndRemove
+// Task() + super.invoke
+// DefaultOnBackPressed().
+// Nested-brace regex
+// captures the outer block
+// including the moveTask
+// ToBack `if {}` so the
+// whole method body gets
+// swapped in one pass.
+// Idempotent via the marker
+// comment.
+//
+// Smoke-tested the regex
+// against the SDK 52
+// template form — one
+// method definition after
+// replacement, no
+// conflicting overloads.
+//
+// Carries [build-aab] to
+// re-trigger the workflow.
+//
+// Files: plugins/withAuto
+// RemoveRecents.js (regex
+// replace existing override
+// instead of adding a
+// duplicate; nested-brace
+// pattern captures full
+// method body).
+export const OTA_BUILD_ID = '2026-05-30-246';

@@ -56,19 +56,34 @@ function withAutoRemoveRecents(config) {
     return cfg;
   });
 
-  // Layer 2 — patch MainActivity.kt to override onBackPressed and
-  // call finishAndRemoveTask before the super.onBackPressed() chain.
-  // Done via withDangerousMod so we can reach into the generated
-  // native source. Idempotent: skips if the marker is already there.
+  // Layer 2 — patch MainActivity.kt so EXIT GAME actually exits.
+  //
+  // The Expo SDK 52 template already provides an
+  // `invokeDefaultOnBackPressed` override on MainActivity that calls
+  // `moveTaskToBack(false)` and only falls through to
+  // `super.invokeDefaultOnBackPressed()` when moveTaskToBack returns
+  // false. That's why EXIT GAME backgrounds the activity instead of
+  // finishing it — the task lingers in Recents and the process
+  // stays alive.
+  //
+  // We REPLACE that existing override's body (don't add a new method
+  // — Kotlin rejects duplicate overrides as "Conflicting overloads"
+  // at compile time, which was the OTA-245-first-AAB build failure).
+  // The new body calls `finishAndRemoveTask()` AND `super.invokeDefault
+  // OnBackPressed()`, which terminates the activity AND clears it from
+  // Recents. Combined with the manifest flag, EXIT GAME fully exits.
+  //
+  // Idempotent via the marker comment. If the template ever changes
+  // and the existing override anchor isn't found, we fall back to
+  // adding a new override before `createReactActivityDelegate`.
   config = withDangerousMod(config, [
     'android',
     async (cfg) => {
-      const projectRoot = cfg.modRequest.projectRoot;
       const platformProjectRoot = cfg.modRequest.platformProjectRoot;
       const candidates = [
         // SDK 52 default Kotlin path
         path.join(platformProjectRoot, 'app', 'src', 'main', 'java', ...cfg.android.package.split('.'), 'MainActivity.kt'),
-        // legacy java fallback (no longer used by Expo 52+, kept for safety)
+        // legacy java fallback (Expo 52+ uses Kotlin; kept for safety)
         path.join(platformProjectRoot, 'app', 'src', 'main', 'java', ...cfg.android.package.split('.'), 'MainActivity.java'),
       ];
       const file = candidates.find((p) => {
@@ -83,34 +98,63 @@ function withAutoRemoveRecents(config) {
       const MARKER = '// withAutoRemoveRecents:onBackPressed';
       if (src.includes(MARKER)) return cfg;
 
+      // Kotlin path — Expo SDK 52 default. Match the existing
+      // override block tolerantly (any whitespace, any indent). The
+      // canonical template form is:
+      //   override fun invokeDefaultOnBackPressed() {
+      //     if (!moveTaskToBack(false)) {
+      //       super.invokeDefaultOnBackPressed()
+      //     }
+      //   }
       if (file.endsWith('.kt')) {
-        // Inject override of invokeDefaultOnBackPressed (the method
-        // BackHandler.exitApp ultimately calls). Calling
-        // finishAndRemoveTask BEFORE super.invokeDefaultOnBackPressed
-        // means the task is cleared from Recents and the activity
-        // finishes in one shot — no lingering task entry, no
-        // backgrounded JS process.
-        const injectBefore = '  override fun createReactActivityDelegate()';
-        const block = `  override fun invokeDefaultOnBackPressed() {\n    ${MARKER}\n    finishAndRemoveTask()\n    super.invokeDefaultOnBackPressed()\n  }\n\n`;
-        if (!src.includes(injectBefore)) {
-          // eslint-disable-next-line no-console
-          console.warn(`[withAutoRemoveRecents] createReactActivityDelegate anchor missing in MainActivity.kt; appending at class close instead.`);
-          // Fallback: insert before the LAST '}' which closes the class.
-          const lastBrace = src.lastIndexOf('}');
-          src = src.slice(0, lastBrace) + '\n' + block + src.slice(lastBrace);
+        // Match the entire override block, including the inner
+        // moveTaskToBack `if {}` brace nesting. The `[^{}]*\{[^{}]*\}`
+        // pattern eats one level of nested braces, which is the
+        // template form. Greedy `[^{}]` segments stay inside the
+        // current brace level — anchors are the two outer braces.
+        const existingOverride = /override\s+fun\s+invokeDefaultOnBackPressed\s*\(\)\s*\{[^{}]*\{[^{}]*\}[^{}]*\}/m;
+        const replacementBody = `override fun invokeDefaultOnBackPressed() {
+    ${MARKER}
+    // Player ask: EXIT GAME should actually exit. Expo SDK 52's
+    // template called moveTaskToBack(false) here, which just
+    // backgrounded the activity — task stayed in Recents.
+    // finishAndRemoveTask() destroys the activity AND clears the
+    // task entry, which is what the launcher uses to fully exit
+    // an app. Combined with autoRemoveFromRecents="true" on the
+    // manifest, EXIT GAME now drops the player to the home
+    // screen with no Tartaria entry in Recents.
+    finishAndRemoveTask()
+    super.invokeDefaultOnBackPressed()
+  }`;
+        if (existingOverride.test(src)) {
+          src = src.replace(existingOverride, replacementBody);
         } else {
-          src = src.replace(injectBefore, block + injectBefore);
+          // Fallback: no existing override — add a fresh one before
+          // createReactActivityDelegate or, failing that, before the
+          // last brace of the class. Same as the original plan.
+          const block = `  ${replacementBody}\n\n`;
+          const anchor = '  override fun createReactActivityDelegate()';
+          if (src.includes(anchor)) {
+            src = src.replace(anchor, block + anchor);
+          } else {
+            const lastBrace = src.lastIndexOf('}');
+            src = src.slice(0, lastBrace) + '\n' + block + src.slice(lastBrace);
+          }
         }
       } else {
-        // Java fallback — Expo SDK 52+ uses Kotlin but keep this path
-        // so older templates don't crash the build.
-        const injectBefore = '  @Override\n  protected ReactActivityDelegate createReactActivityDelegate()';
-        const block = `  @Override\n  public void invokeDefaultOnBackPressed() {\n    ${MARKER}\n    finishAndRemoveTask();\n    super.invokeDefaultOnBackPressed();\n  }\n\n`;
-        if (!src.includes(injectBefore)) {
-          const lastBrace = src.lastIndexOf('}');
-          src = src.slice(0, lastBrace) + '\n' + block + src.slice(lastBrace);
+        // Java fallback — same nested-brace pattern.
+        const existingOverrideJava = /@Override\s*\n\s*public\s+void\s+invokeDefaultOnBackPressed\s*\(\)\s*\{[^{}]*\{[^{}]*\}[^{}]*\}/m;
+        const javaReplacement = `@Override
+  public void invokeDefaultOnBackPressed() {
+    ${MARKER}
+    finishAndRemoveTask();
+    super.invokeDefaultOnBackPressed();
+  }`;
+        if (existingOverrideJava.test(src)) {
+          src = src.replace(existingOverrideJava, javaReplacement);
         } else {
-          src = src.replace(injectBefore, block + injectBefore);
+          const lastBrace = src.lastIndexOf('}');
+          src = src.slice(0, lastBrace) + '\n  ' + javaReplacement + '\n' + src.slice(lastBrace);
         }
       }
       fs.writeFileSync(file, src, 'utf8');
