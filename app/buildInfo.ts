@@ -194,4 +194,12 @@
 // for license verification with cite-the-source format, git rebase
 // discipline) including the mistakes I made this session so the next
 // chat doesn't repeat them.
-export const OTA_BUILD_ID = '2026-05-30-068';
+//
+// 2026-05-30 OTA-069 — HANDOFF.md discrepancy fix. The OTA-068 rewrite
+// bumped this file to 068 but left the handoff body reading "latest OTA
+// 067" in four current-state spots (masthead, §4 floor note, §16 state,
+// closing line). A next session reading only the doc would have treated
+// 067 as the floor and re-picked 068 → collision. Synced those four
+// refs to the true floor and clarified that 067 was the last feature
+// OTA while 068/069 are docs-only. No behavior change.
+export const OTA_BUILD_ID = '2026-05-30-069';

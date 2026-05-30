@@ -4,7 +4,7 @@
 > **OTA channel:** `preview` (EAS). Every push to this dev branch auto-publishes an OTA via `.github/workflows/eas-update.yml`. Players on APK 207+ pull on next launch.
 > **🚫 APK BUILD HOLD — Google internal test in progress.** Do NOT trigger `build-apk.yml`. Do NOT bump `version` in `app.json`. Do NOT add native modules. All ship-able work is OTA-only. See §3 for the full rule set.
 > **App version (in `app.json`):** `2.4.1` — frozen for the duration of the internal test. APK at runtime 2.4.1 is published as `apk-build-207` (+ test-only auto-rebuilds at the same runtime).
-> **Latest OTA:** `2026-05-30-067` (rest-spam ambush no-op fix — every successful ambush roll now materialises a real enemy).
+> **Latest OTA:** `2026-05-30-069` (HANDOFF.md discrepancy fix — synced the doc's "latest OTA" references to `buildInfo.ts`. The OTA-068 rewrite bumped `buildInfo.ts` to 068 but left this doc reading 067; the last *feature* OTA was 067, the rest-spam ambush fix).
 > **Working tree:** clean. **Origin: in sync.**
 > **TypeScript:** clean (`npx tsc --noEmit` reports only pre-existing `expo-navigation-bar` / `expo-speech` / `TTSManager` errors unrelated to recent work).
 > **Tests:** `__tests__/durability` and the rest of the canary set pass. Many large suites OOM-fail in the sandbox on the missing `llama.rn` module mock — pre-existing environmental issue, not from recent work.
@@ -189,7 +189,7 @@ Format: `YYYY-MM-DD-NNN`.
 - **`NNN` is a global monotonic counter, NOT a per-day counter.** The date prefix is informational only — the counter must always be `(last shipped NNN) + 1` regardless of date.
 - The last shipped NNN is the **highest** value mentioned in `app/buildInfo.ts` (it has a running comment block of every OTA's notes).
 - When the remote moves ahead of you mid-work, fetch + grep the new buildInfo.ts to find the new floor, then bump again.
-- 2026-05-30 example: I picked `2026-05-30-054` for in-pack repair, rebased to find remote at `2026-05-26-063`, had to bump to `2026-05-30-064`. Now we're at `2026-05-30-067`.
+- 2026-05-30 example: I picked `2026-05-30-054` for in-pack repair, rebased to find remote at `2026-05-26-063`, had to bump to `2026-05-30-064`. Now we're at `2026-05-30-069`.
 
 ---
 
@@ -588,8 +588,8 @@ Symmetric — applies to both sides. Combat log surfaces `✓ CRITICAL HIT` / `�
 
 **State at handoff (2026-05-30, end of the in-pack repair + notices + tutorial trim + rest-fix mini-wave):**
 
-- App version: `2.4.1`. Latest OTA: `2026-05-30-067`. Working tree clean. Origin in sync.
-- This session shipped 4 OTAs in this branch: OTA-064 (in-pack repair UX + drop Crafting REPAIR tab), OTA-065 (third-party notices screen — required for commercial release), OTA-066 (tutorial 23 → 9 + first-use nudges for the rest), OTA-067 (rest-spam ambush no-op fix).
+- App version: `2.4.1`. Latest OTA: `2026-05-30-069`. Working tree clean. Origin in sync.
+- This session shipped 4 *feature* OTAs in this branch: OTA-064 (in-pack repair UX + drop Crafting REPAIR tab), OTA-065 (third-party notices screen — required for commercial release), OTA-066 (tutorial 23 → 9 + first-use nudges for the rest), OTA-067 (rest-spam ambush no-op fix). OTA-068 was the HANDOFF.md rewrite and OTA-069 this doc-sync fix (both docs-only, no behavior change).
 - Parallel sessions are pushing aggressively. The remote moved 20+ commits ahead during a single in-session edit on 2026-05-30. **Always fetch + rebase before starting work.**
 
 **Things in flight / immediate next steps:**
@@ -619,4 +619,4 @@ Symmetric — applies to both sides. Combat log surfaces `✓ CRITICAL HIT` / `�
 
 ---
 
-That's the lay of the land at OTA `2026-05-30-067`. The four OTAs from this session went fast because each one was small and well-scoped, but the rebase cost on OTA-064 was real (~20 minutes wasted building duplicate work). The §0 checklist is the antidote — follow it.
+That's the lay of the land at OTA `2026-05-30-069`. The four feature OTAs from this session went fast because each one was small and well-scoped, but the rebase cost on OTA-064 was real (~20 minutes wasted building duplicate work). The §0 checklist is the antidote — follow it.
