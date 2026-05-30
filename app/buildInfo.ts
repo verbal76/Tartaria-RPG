@@ -8249,4 +8249,61 @@
 // ambush roll +
 // INVESTIGATE_TRINKETS
 // food/first aid additions).
-export const OTA_BUILD_ID = '2026-05-30-219';
+// 2026-05-30-220 — Fusing
+// Crucible banner shows
+// readiness state. Player on
+// the OTA-219 install:
+//   [player] fuse
+//   [arbiter] Need at least
+//   3 inferred items reserved
+//   for fusion (♥ in
+//   inventory). You have 1.
+//   [player] fuse
+//   [debug] dedup: suppressed
+//   [player] fuse
+//   [debug] dedup: suppressed
+//   ...
+// Player tapped 'fuse' 5
+// times in a row not
+// realizing they only had 1
+// of the required 3 reserved
+// items. The OTA-217 banner
+// said "tap to fuse · spends
+// your ♥ reserved items"
+// which sold them on tap-to-
+// fuse without saying tap is
+// gated.
+//
+// Fix: ExplorationScreen now
+// computes gateFusion on the
+// player.inventory and shows
+// readiness explicitly:
+//   READY: "★★ Fusing
+//   Crucible ready" /
+//   "tap to fuse · spends
+//   your ♥ reserved items"
+//   NOT READY: "★★ Fusing
+//   Crucible · needs prep" /
+//   gate.reason (e.g. "Need
+//   at least 3 inferred
+//   items reserved for fusion
+//   (♥ in inventory). You
+//   have 1.")
+// The reason is the same
+// string fuseAtCrucible's
+// arbiter line uses, so the
+// player sees the EXACT gate
+// they're failing without
+// having to tap and read the
+// log.
+//
+// Tap still submits 'fuse'
+// so the engine's own gates
+// fire for narration parity.
+//
+// Files: app/screens/
+// ExplorationScreen.tsx
+// (banner consults gateFusion;
+// readiness branches the
+// label + hint).
+export const OTA_BUILD_ID = '2026-05-30-220';

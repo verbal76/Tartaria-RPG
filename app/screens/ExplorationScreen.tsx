@@ -490,15 +490,23 @@ export function ExplorationScreen() {
         </TouchableOpacity>
       )}
 
-      {/* OTA-217 — visible permit indicator for the OTA-195 Fusing
-          Crucible. Playtest log: player almost missed the Crucible
-          encounter; even after spawning, they had no on-screen
-          reminder that they could fuse. This banner is the
-          equivalent of the vendor banner — persistent until used,
-          tap to act. Submits "fuse" through submitPlayerAction so
-          the fuseAtCrucible gates fire (Qwen ready, gate check, etc.)
-          with all the same arbiter narration. */}
-      {player?.fusionPending && (
+      {/* OTA-217 / OTA-220 — visible permit indicator for the OTA-195
+          Fusing Crucible. Playtest log: after OTA-217's banner shipped,
+          player tapped 'fuse' 5 times in a row not realizing they
+          only had 1 of the 3 required reserved items. OTA-220 now
+          computes gateFusion state on the player inventory and shows
+          the readiness explicitly:
+            - READY: "★★ Fusing Crucible ready · tap to fuse"
+            - NEEDS PREP: "★★ Fusing Crucible · need N more ♥ items"
+                  with the gateFusion reason as the hint line so the
+                  player knows exactly what's missing.
+          Tapping still submits "fuse" so the engine's own gates fire
+          for narration parity. */}
+      {player?.fusionPending && (() => {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { gateFusion } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
+        const gate = gateFusion(player.inventory ?? []);
+        return (
         <TouchableOpacity
           style={styles.fusionBanner}
           onPress={() => useGameStore.getState().submitPlayerAction('fuse')}
@@ -506,12 +514,19 @@ export function ExplorationScreen() {
         >
           <View style={styles.fusionBannerStripe} />
           <View style={styles.vendorBannerBody}>
-            <Text style={styles.fusionBannerName}>★★ Fusing Crucible ready</Text>
-            <Text style={styles.vendorBannerHint}>tap to fuse · spends your ♥ reserved items</Text>
+            <Text style={styles.fusionBannerName}>
+              {gate.ok ? '★★ Fusing Crucible ready' : '★★ Fusing Crucible · needs prep'}
+            </Text>
+            <Text style={styles.vendorBannerHint}>
+              {gate.ok
+                ? 'tap to fuse · spends your ♥ reserved items'
+                : (gate.reason ?? 'tap for details')}
+            </Text>
           </View>
           <Text style={styles.vendorBannerArrow}>›</Text>
         </TouchableOpacity>
-      )}
+        );
+      })()}
 
       <TutorialTarget area="feed" style={styles.feed}>
         <AdventureFeed entries={gameLog} enemyNames={currentScene?.enemies.map((e) => e.name)} />

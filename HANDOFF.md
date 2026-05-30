@@ -245,6 +245,17 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Fusing Crucible banner shows readiness state instead of bare "tap to fuse"
+
+- **OTA-220 (2026-05-30) · Playtest log on OTA-219 install showed the player tapping `fuse` 5 times in a row, getting refused each time because they only had 1 of the 3 required reserved items.**
+  - **What:** The OTA-217 banner said *"tap to fuse · spends your ♥ reserved items"* — sold the player on tap-to-fuse without saying tap was gated. Player tapped repeatedly; each tap got dedup-suppressed; they never saw a clear "you need more reserved items" hint on the banner itself.
+  - **Fix:** `ExplorationScreen` now computes `gateFusion(player.inventory)` and branches the banner copy based on readiness:
+    - **READY:** `★★ Fusing Crucible ready` / `tap to fuse · spends your ♥ reserved items`
+    - **NEEDS PREP:** `★★ Fusing Crucible · needs prep` / `gate.reason` (e.g. *"Need at least 3 inferred items reserved for fusion (♥ in inventory). You have 1."*)
+  - The reason string is the same one `fuseAtCrucible`'s arbiter line uses, so the player sees the exact gate they're failing without having to tap and read the log. Tap still submits `fuse` so the engine's own gates fire for narration parity.
+  - **Verification:** `gateFusion` predicate already covered by the OTA-195 `itemFusionEngine` regression. `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/screens/ExplorationScreen.tsx` (banner consults gateFusion; readiness branches the label + hint).
+
 #### Combat + food rebalance — skirmish weights bumped, sporadic investigate ambush, food in trinket + vendor pools
 
 - **OTA-219 (2026-05-30) · Player: *"change the base weight in the wastelands from 35% to 40%. and we should have a sporadic combat event from investigate. ... we need some more food drops. food isn't scarce lately in the game."***
