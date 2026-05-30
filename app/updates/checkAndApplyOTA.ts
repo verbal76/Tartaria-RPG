@@ -145,17 +145,43 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
     // reloadAsync was hanging on a black screen forever. Releasing
     // these explicitly lets the bridge finish reload. iOS is
     // especially sensitive to lingering native modules.
+    //
+    // OTA-243 — each dispose await now has a 3-second timeout race.
+    // Playtest: "it has been on this screen for 10 minutes." One of
+    // the disposes (Qwen / Cognitive / Piper most likely) was
+    // hanging without resolving, the try/catch did nothing because
+    // no error fired — the await just never returned. Better to
+    // hand-wave the cleanup at 3s and let reloadAsync deal with the
+    // half-released native handle than to hang the player forever.
     onStatus?.('Releasing resources…');
-    try { await disposeAudio(); } catch { /* ignore */ }
-    try { await useGameStore.getState().shutdownCognitive(); } catch { /* ignore */ }
-    try { await useGameStore.getState().shutdownQwen(); } catch { /* ignore */ }
+    // Each dispose await is given 3 seconds. The existing module-
+    // level `withTimeout` rejects on timeout; we want to RESOLVE
+    // (move on, never hang the player) so we use a local helper
+    // that resolves with null on the deadline.
+    const disposeWithDeadline = <T,>(label: string, p: Promise<T> | T, ms = 3000): Promise<T | null> => {
+      return Promise.race([
+        Promise.resolve(p).catch((e) => {
+          // eslint-disable-next-line no-console
+          console.warn(`OTA dispose failed: ${label}:`, e);
+          return null as unknown as T;
+        }),
+        new Promise<null>((resolve) => setTimeout(() => {
+          // eslint-disable-next-line no-console
+          console.warn(`OTA dispose timed out after ${ms}ms: ${label}`);
+          resolve(null);
+        }, ms)),
+      ]);
+    };
+    await disposeWithDeadline('disposeAudio', disposeAudio());
+    await disposeWithDeadline('shutdownCognitive', useGameStore.getState().shutdownCognitive());
+    await disposeWithDeadline('shutdownQwen', useGameStore.getState().shutdownQwen());
     // Voice native handles — both engines AND the controller's store
     // subscription. Without these, the executorch (Kokoro) module's
     // PyTorch handle and the expo-av Sound created by playPcm can
     // keep the bridge from cleanly tearing down on reloadAsync.
     try { stopTTSController(); } catch { /* ignore */ }
     try { stopTTS(); } catch { /* ignore */ }
-    try { await disposePiperEngine(); } catch { /* ignore */ }
+    await disposeWithDeadline('disposePiperEngine', disposePiperEngine());
     if (Platform.OS === 'ios') {
       // iOS belt-and-suspenders: give the native side an extra
       // event-loop tick to fully release.

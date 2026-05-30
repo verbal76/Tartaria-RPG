@@ -10035,4 +10035,105 @@
 // (18 new test cases +
 // reordered category()
 // to match game order).
-export const OTA_BUILD_ID = '2026-05-30-242';
+// 2026-05-30-243 — OTA
+// apply hang fix. Player
+// screenshot stuck on
+// "APPLYING UPDATE —
+// RELEASING RESOURCES…
+// Tearing down audio + AI
+// handles before the reload.
+// One moment." for 10
+// minutes.
+//
+// Root cause: checkAndApply
+// OTA's pre-reload teardown
+// awaits four native dispose
+// promises (disposeAudio,
+// shutdownCognitive,
+// shutdownQwen, dispose
+// PiperEngine). Each was
+// wrapped in try/catch but
+// NOT in a timeout — if any
+// of them never resolved
+// (e.g. llama.rn / ONNX /
+// executorch held a native
+// handle in an unfinished
+// state), the await would
+// hang forever. No error,
+// no resolution, no
+// reloadAsync, no progress.
+//
+// Fix: new local
+// disposeWithDeadline
+// helper races each dispose
+// against a 3-second
+// timeout. On timeout it
+// resolves with null + logs
+// to console.warn (so the
+// next bug-report capture
+// names the offender).
+// reloadAsync proceeds
+// even if a dispose stalled
+// — half-released native
+// handle is better than
+// hanging the player
+// forever; the bridge swap
+// will tear them down
+// anyway.
+//
+// Player escape from the
+// current stuck state: this
+// fix is IN OTA-243, which
+// they can't reach until
+// they apply an OTA, but
+// the OTA-242/243 bundles
+// were already DOWNLOADED
+// by App.tsx's boot-time
+// fetchOnly check before
+// they tapped UPDATE READY.
+// Force-close the app (swipe
+// from recents), re-launch.
+// Expo auto-applies staged
+// bundles on cold start, so
+// the OTA-243 fix lands
+// without needing
+// reloadAsync.
+//
+// Files: app/updates/check
+// AndApplyOTA.ts (4 dispose
+// awaits wrapped in
+// disposeWithDeadline 3s
+// race). Also app/engine/
+// encounter.ts (pickEnemy
+// ForLocationGuaranteed
+// gains optional playerHpMax
+// param that tier-caps the
+// pick) + app/state/game
+// Store.ts (rest-ambush
+// passes player.hpMax to
+// the picker).
+//
+// Player playtest second
+// finding in same OTA:
+// "pretty early for this
+// guy isn't it?" — Day 16
+// character with 48 HP ate
+// a Mud Giant ambush (360
+// HP, 4d6 damage, Legendary
+// rarity) on a rest in
+// Asgardar. Cause:
+// pickEnemyForLocation
+// Guaranteed gates ONLY on
+// location.danger; Asgardar
+// is danger 5 (capital), so
+// Legendary enemies were
+// eligible. Fix: optional
+// playerHpMax tier cap.
+//   hpMax < 60   → Common
+//   hpMax < 100  → +Uncommon
+//   hpMax < 140  → +Rare
+//   hpMax ≥ 140  → all (loc)
+// Back-compat: callers that
+// don't pass playerHpMax
+// keep legacy behavior.
+export const OTA_BUILD_ID = '2026-05-30-243';

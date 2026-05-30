@@ -245,6 +245,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA apply hang + Mud Giant rest-ambush on a starter
+
+- **OTA-243 (2026-05-30) · Two playtest reports:**
+  - *"it has been on this screen for 10 minutes."* Screenshot: title screen banner stuck on `APPLYING UPDATE — RELEASING RESOURCES… Tearing down audio + AI handles before the reload.`
+  - *"pretty early for this guy isn't it?"* — log captured a Day-16 character (48 HP, Aetheric Crystal Blade) eating a **Mud Giant** rest-ambush in Asgardar — Legendary, 360 HP, 4d6 damage, took 17 damage on a single crit hit.
+  - **OTA apply hang:** `checkAndApplyOTA` awaited four native dispose promises (`disposeAudio`, `shutdownCognitive`, `shutdownQwen`, `disposePiperEngine`). Each was try/catch wrapped but NOT timeout-bounded — when one of them held a native handle in an un-finishable state, the await hung forever. No error, no progress, no reload. **Fix:** new local `disposeWithDeadline` helper races each dispose against a 3-second timeout. On timeout it resolves with null + logs `console.warn(`OTA dispose timed out after Nms: <label>`)` so the next bug-report capture names the offender. `reloadAsync` proceeds even if a dispose stalled — the bridge swap will tear them down anyway.
+  - **Mud Giant rest-ambush:** `pickEnemyForLocationGuaranteed` gates ONLY on `location.danger`. Asgardar is danger 5 (buried capital), so Legendary enemies were eligible. **Fix:** function gains an optional `playerHpMax` param that tier-caps the pick: hpMax < 60 → Common only; < 100 → +Uncommon; < 140 → +Rare; ≥ 140 → location-cap rules. Rest-ambush call site now passes `player.hpMax`. Other callers (none currently) keep legacy behavior by omitting the param.
+  - **Escape from the stuck-applying state:** the user got out (force-close + relaunch). The OTA-243 fix can't reach them until they apply an OTA, but the prior OTAs (241/242) are downloaded by the boot-time `fetchOnly` check. Force-closing the app (swipe from recents), re-launching, Expo auto-applies staged bundles on cold start — they'll arrive on OTA-242 without needing `reloadAsync`. Then a normal OTA check picks up OTA-243.
+  - **Files:** `app/updates/checkAndApplyOTA.ts` (4 dispose awaits wrapped in 3s timeout race), `app/engine/encounter.ts` (`pickEnemyForLocationGuaranteed` optional `playerHpMax` tier cap), `app/state/gameStore.ts` (rest-ambush passes `player.hpMax`).
+
 #### Arbiter introspection — "who are you", "why are you here", "are you a ghost"
 
 - **OTA-242 (2026-05-30) · Player: *"the arbiter doesn't seem to answer any questions about himself still and I really got to roll against a 15 to ask the arbiter a question. ... a general question should not have to have a persuasion role."***

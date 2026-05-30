@@ -59,9 +59,28 @@ export function pickEnemyForLocation(location: Location): Enemy | null {
   return pickWeighted(allowed, (e) => rarityWeights[e.rarity]);
 }
 
-export function pickEnemyForLocationGuaranteed(location: Location): Enemy | null {
+export function pickEnemyForLocationGuaranteed(location: Location, playerHpMax?: number): Enemy | null {
   const dangerCap: Rarity = location.danger >= 4 ? 'Legendary' : location.danger >= 3 ? 'Rare' : location.danger >= 2 ? 'Uncommon' : 'Common';
-  const allowed = enemies.filter((e) => rarityRank(e.rarity) <= rarityRank(dangerCap));
+  // OTA-243 — player-tier cap. Playtest report: Day 16 player with
+  // 48 HP got a Mud Giant (Legendary, 360 HP, 4d6 damage) rest-
+  // ambush in Asgardar (danger 5). The legendary roll was correct
+  // for the location but disastrous for the player. Cap the picker
+  // by player.hpMax so a starter never eats a legendary on a rest:
+  //   hpMax < 60   → Common only
+  //   hpMax < 100  → Common + Uncommon
+  //   hpMax < 140  → + Rare
+  //   hpMax ≥ 140  → all rarities (location-cap rules)
+  // When playerHpMax is undefined the caller didn't opt in — keep
+  // the legacy location-only behavior for back-compat.
+  let effectiveCap: Rarity = dangerCap;
+  if (typeof playerHpMax === 'number') {
+    const playerCap: Rarity = playerHpMax < 60 ? 'Common'
+      : playerHpMax < 100 ? 'Uncommon'
+      : playerHpMax < 140 ? 'Rare'
+      : 'Legendary';
+    effectiveCap = rarityRank(playerCap) < rarityRank(dangerCap) ? playerCap : dangerCap;
+  }
+  const allowed = enemies.filter((e) => rarityRank(e.rarity) <= rarityRank(effectiveCap));
   if (allowed.length === 0) return null;
   return pickWeighted(allowed, (e) => rarityWeights[e.rarity]);
 }

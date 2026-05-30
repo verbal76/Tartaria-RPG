@@ -7033,7 +7033,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // eslint-disable-next-line @typescript-eslint/no-require-imports
             const { findEnemyByName, pickEnemyForLocationGuaranteed } = require('../engine/encounter');
             const enemyFromArchetype = enc && enc.enemyName ? findEnemyByName(enc.enemyName) : null;
-            const enemy = enemyFromArchetype ?? pickEnemyForLocationGuaranteed(restScene.location);
+            // OTA-243 — pass player.hpMax so the picker tier-caps the
+            // ambush enemy. Asgardar (danger 5) was legendary-eligible
+            // and a Day-16 character ate a Mud Giant (360 HP).
+            const enemy = enemyFromArchetype ?? pickEnemyForLocationGuaranteed(restScene.location, player.hpMax);
             if (enemy) {
               set((s) => s.currentScene
                 ? {
