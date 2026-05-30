@@ -7065,10 +7065,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // eslint-disable-next-line @typescript-eslint/no-require-imports
             const { findEnemyByName, pickEnemyForLocationGuaranteed } = require('../engine/encounter');
             const enemyFromArchetype = enc && enc.enemyName ? findEnemyByName(enc.enemyName) : null;
-            // OTA-243 — pass player.hpMax so the picker tier-caps the
-            // ambush enemy. Asgardar (danger 5) was legendary-eligible
-            // and a Day-16 character ate a Mud Giant (360 HP).
-            const enemy = enemyFromArchetype ?? pickEnemyForLocationGuaranteed(restScene.location, player.hpMax);
+            // OTA-245 — reverted OTA-243's player.hpMax tier cap.
+            // Player: "if they ignore the arbiter, then let the rng
+            // gods give them who they were programmed to pick. don't
+            // dumb down the danger, let's try to convince the
+            // character to develop. we have them a resurrection
+            // stone, let them die if they are dumb." The Arbiter
+            // warning (OTA-244) gives the heads-up; if the player
+            // rests anyway, RNG runs free. Stays a design dial we
+            // can re-enable later if playtest insists.
+            const enemy = enemyFromArchetype ?? pickEnemyForLocationGuaranteed(restScene.location);
             if (enemy) {
               set((s) => s.currentScene
                 ? {

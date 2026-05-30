@@ -162,15 +162,18 @@ jobs:
           # tag-push permission trigger a Play-Store-ready AAB build
           # without needing to dispatch via the GitHub UI.
           # workflow_dispatch input still wins when it's "production".
-          # 2026-05-24 — HaL2001 experimental branch: every build is a
-          # sideload-ready APK (preview profile), tagged Hal2001-N. No
-          # AAB path for this branch — it ships only to the user's phone,
-          # never to Play Store.
-          if [[ "${GITHUB_REF_NAME}" == "HaL2001" ]]; then
-            PROFILE="preview"
-            IS_TAG="false"
-            TAG="Hal2001-${{ github.run_number }}"
-          elif [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+          # Resolution order:
+          #   1. refs/tags/v* → production AAB (Play Store tag push)
+          #   2. commit message contains [build-aab] → production AAB.
+          #      OTA-245: this now wins OVER the HaL2001 default, so
+          #      the user can stamp an AAB from HaL2001 when they need
+          #      to push to the Play Console for playtesters. Previously
+          #      the HaL2001 check fired first and forced preview/APK,
+          #      so [build-aab] had no effect on this branch.
+          #   3. HaL2001 branch (no AAB marker) → sideload APK
+          #      (Hal2001-N tag).
+          #   4. workflow_dispatch input or default → preview APK.
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
             PROFILE="production"
             TAG="${GITHUB_REF#refs/tags/}"
             IS_TAG="true"
@@ -178,6 +181,10 @@ jobs:
             PROFILE="production"
             IS_TAG="false"
             TAG="aab-build-${{ github.run_number }}"
+          elif [[ "${GITHUB_REF_NAME}" == "HaL2001" ]]; then
+            PROFILE="preview"
+            IS_TAG="false"
+            TAG="Hal2001-${{ github.run_number }}"
           else
             PROFILE="${{ github.event.inputs.profile || 'preview' }}"
             IS_TAG="false"

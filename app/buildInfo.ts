@@ -10199,4 +10199,109 @@
 // (beginScene adds tier
 // warning after set
 // {currentScene:scene}).
-export const OTA_BUILD_ID = '2026-05-30-244';
+// 2026-05-30-245 — three
+// fixes + AAB build for
+// Play Console.
+//
+// 1. Revert ambush tier
+// cap. Player: "if they
+// ignore the arbiter, then
+// let the rng gods give
+// them who they were
+// programmed to pick. don't
+// dumb down the danger,
+// let's try to convince the
+// character to develop. we
+// have them a resurrection
+// stone, let them die if
+// they are dumb." Rest-
+// ambush call site stops
+// passing player.hpMax to
+// pickEnemyForLocation
+// Guaranteed. The picker's
+// optional parameter stays
+// in place as a dial; just
+// not used. Arbiter warning
+// (OTA-244) does the
+// teaching; the RNG does
+// the consequence.
+//
+// 2. EXIT GAME actually
+// exits. Player: "let's
+// make sure we did the edit
+// that actually makes exit
+// the game fully exit the
+// game, because as of now
+// that is still not
+// happening." Rewrote the
+// withAutoRemoveRecents
+// plugin (2026-05-30a APK
+// originally) to add a
+// second layer: it now ALSO
+// injects an `invokeDefault
+// OnBackPressed` override
+// into MainActivity.kt via
+// withDangerousMod. The
+// override calls finishAnd
+// RemoveTask() BEFORE super.
+// invokeDefault — that's
+// the API the launcher uses
+// to clear a task from
+// Recents AND signal the OS
+// to reclaim the process.
+// Combined with the existing
+// android:autoRemoveFrom
+// Recents="true" manifest
+// flag, both layers fire on
+// EXIT GAME. The manifest
+// flag matching also got
+// defensive (matches any
+// activity name ending in
+// .MainActivity, not just
+// the bare ".MainActivity"
+// shorthand — guards
+// against Expo SDK changes).
+//
+// 3. AAB build for Google
+// Play Console. Player:
+// "push an .aab build so I
+// can update the Google
+// console for the play
+// testers." Build workflow
+// (build-apk.yml) had the
+// HaL2001 branch hard-coded
+// to always emit a preview
+// APK; [build-aab] marker
+// in commit messages never
+// fired on this branch.
+// Reordered resolution so
+// [build-aab] wins over the
+// HaL2001 default. This
+// commit message carries
+// the marker so the
+// workflow produces an AAB
+// signed with the tartaria-
+// upload keystore (same
+// release-signing path the
+// production profile uses).
+// Note: HaL package is
+// still com.hotatticgames.
+// tartarprim.hal2001, so
+// the AAB targets a
+// separate Play Console
+// listing from the main
+// production track.
+//
+// Files: app/state/gameStore
+// .ts (rest-ambush no longer
+// passes player.hpMax),
+// plugins/withAutoRemove
+// Recents.js (Kotlin
+// MainActivity onBackPressed
+// override + defensive
+// manifest name matching),
+// .github/workflows/build-
+// apk.yml (resolution order:
+// tag > [build-aab] > HaL
+// 2001 > default).
+export const OTA_BUILD_ID = '2026-05-30-245';

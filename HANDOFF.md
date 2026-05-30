@@ -245,6 +245,20 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-245 — revert ambush cap, real EXIT GAME fix, AAB build for Play Console
+
+- **OTA-245 + AAB 2026-05-30 · Three player directives:**
+  - *"if they ignore the arbiter, then let the rng gods give them who they were programmed to pick. don't dumb down the danger, let's try to convince the character to develop. we have them a resurrection stone, let them die if they are dumb."*
+  - *"let's make sure we did the edit that actually makes exit the game fully exit the game, because as of now that is still not happening."*
+  - *"push an .aab build so I can update the Google console for the play testers."*
+  - **Ambush cap reverted:** rest-ambush call site stops passing `player.hpMax` to `pickEnemyForLocationGuaranteed`. The picker's optional `playerHpMax` param stays as a future dial but isn't used. Arbiter warning (OTA-244) does the teaching; RNG does the consequence. Resurrection Gem is the safety net.
+  - **EXIT GAME — real fix:** rewrote `withAutoRemoveRecents` plugin with two layers of defense:
+    1. **Manifest:** `android:autoRemoveFromRecents="true"` on any activity name ending in `.MainActivity` (was matching only the exact bare form — defensive against Expo SDK changes).
+    2. **MainActivity.kt:** injected via `withDangerousMod` — overrides `invokeDefaultOnBackPressed` to call `finishAndRemoveTask()` BEFORE `super.invokeDefaultOnBackPressed()`. That's the API the launcher uses to clear a task from Recents AND signal the OS to reclaim the process. RN's stock path calls plain `Activity.finish()` which leaves the task entry sitting in Recents — that was the bug.
+  - **AAB build for Play Console:** `build-apk.yml` had HaL2001 branch hard-coded to always emit a preview APK; the `[build-aab]` commit-message marker never fired on this branch. Reordered the resolution chain so the marker wins over the HaL2001 default. This commit carries `[build-aab]` so the workflow produces an AAB signed with the tartaria-upload keystore. **Note:** HaL package is still `com.hotatticgames.tartarprim.hal2001`, so the AAB targets a separate Play Console listing from the main production track.
+  - **Verification:** TS clean app-side. AAB build is verified by the workflow's jarsigner check + CN inspection.
+  - **Files:** `app/state/gameStore.ts` (drop player.hpMax from rest-ambush call), `plugins/withAutoRemoveRecents.js` (Kotlin override + defensive manifest), `.github/workflows/build-apk.yml` (resolution order tag → [build-aab] → HaL2001 → default).
+
 #### Danger-vs-tier Arbiter warning — "you're in dangerous country; start the main quest or move on"
 
 - **OTA-244 (2026-05-30) · Player after OTA-243's ambush tier-cap fix: *"I had better get an arbiter warning saying that you're in a dangerous area to move on to another part of the land until you get your legs under you and suggest starting the main quest line."***
