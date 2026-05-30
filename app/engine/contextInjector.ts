@@ -12,6 +12,7 @@ import type {
 import type { ChatMessage } from '../ai/generation/QwenGenerativeEngine';
 import type { MacroLocation, MicroLocation, MicroMicroLocation } from './worldLadder';
 import { describeTraits } from './enemyTraits';
+import { buildCanonFactsParagraph } from './canonFacts';
 
 /**
  * The strict, comma-light fact sheet that gets injected into the Qwen
@@ -38,6 +39,10 @@ export interface LlmContext {
    *  mid-fight and write atmospheric tour-guide prose instead of
    *  narrating the action. */
   in_combat: boolean;
+  /** OTA-232 — player's current faction id (e.g. 'reclaimers',
+   *  'forgotten_order'). Surfaces into the canon-fact picker so the
+   *  Arbiter prefers events that involve the player's faction. */
+  player_faction_id?: string;
 }
 
 /** What buildLlmContext needs from the store. Explicit deps, no store import. */
@@ -93,6 +98,7 @@ export function buildLlmContext(input: ContextInputs): LlmContext {
     full_inventory: stringifyInventory(player?.inventory ?? [], player?.equipped, player?.tc ?? 0),
     recent_history: formatRecentHistory(gameLog),
     in_combat: (scene?.enemies?.length ?? 0) > 0,
+    player_faction_id: player?.factionId,
   };
 }
 
@@ -177,7 +183,17 @@ export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
   // Outskirts. The model needs an explicit "this is the only place that
   // exists" instruction or it pulls names from training data.
   const locationName = ctx.room_name;
-  const system = [
+  // OTA-232 — canon facts injection. The Arbiter knows the world bible
+  // now: a single compact line surfaces a relevant canonical event or
+  // canon item when the scene's location / tags match. Token-budget
+  // tight (~50 words max) so it doesn't eat the narration cap. Null
+  // when nothing matches — the section is omitted entirely.
+  const canonLine = buildCanonFactsParagraph({
+    sceneKeywords: deriveCanonKeywords(ctx),
+    hasVendor: /vendor/i.test(ctx.active_entities ?? ''),
+    playerFactionId: ctx.player_faction_id,
+  });
+  const parts = [
     'You are the Arbiter, the ancient narrator of Tartaria.',
     `[SYSTEM FACTS - DO NOT INVENT EXITS, ENEMIES, OR PLACE NAMES]`,
     `Location: ${ctx.current_biome} - ${ctx.room_name}`,
@@ -185,6 +201,11 @@ export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
     `Environment: ${ctx.environmental_description}`,
     `Exits: ${ctx.available_exits}`,
     `Entities Present: ${ctx.active_entities}`,
+  ];
+  if (canonLine) {
+    parts.push('', '[CANON LORE - true facts; may color narration, never contradict]', canonLine);
+  }
+  parts.push(
     '',
     '[PLAYER STATE]',
     `Stats: ${ctx.player_stats}`,
@@ -192,11 +213,27 @@ export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
     `Player's Last Action: ${ctx.recent_history}`,
     '',
     instruction,
-  ].join('\n');
+  );
+  const system = parts.join('\n');
   return [
     { role: 'system', content: system },
     { role: 'user', content: 'Continue.' },
   ];
+}
+
+// OTA-232 — flatten the scene context into a lowercase keyword bag
+// for canon-event tag matching. Pulls from biome, room name,
+// environment description so the matcher catches "Berlin" in the
+// room name AND "buried capital" in the biome.
+function deriveCanonKeywords(ctx: LlmContext): string[] {
+  const bag: string[] = [];
+  for (const field of [ctx.current_biome, ctx.room_name, ctx.environmental_description]) {
+    if (!field) continue;
+    for (const tok of field.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)) {
+      if (tok.length >= 4) bag.push(tok);
+    }
+  }
+  return bag;
 }
 
 // ---------------------------------------------------------------------------

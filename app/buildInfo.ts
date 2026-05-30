@@ -9017,4 +9017,119 @@
 // always spawns a real enemy.
 // Kept HaL's AI stack
 // untouched.
-export const OTA_BUILD_ID = '2026-05-30-231';
+// 2026-05-30-232 — canon
+// lore ingestion phase 1.
+// Player handed me 4 docs
+// (Canon_Event_Log,
+// Arbiter_Assigned_Titles,
+// food_and_drink_table,
+// Tartaria_TTRPG bible) and
+// asked: "ingest and parse
+// sectionally for lore to
+// feed qwen and minilm. Use
+// TTRPG bible as reference
+// only."
+//
+// This OTA does the
+// ingestion + minimal Qwen
+// hookup. The TTRPG bible
+// goes to docs/tartaria-
+// ttrpg-bible.txt as
+// Claude's reference (NOT
+// bundled into runtime). The
+// 3 mechanical docs are
+// structured JSON in
+// app/data/lore/:
+// - canon-events.json
+//   (18 timeline events
+//   1280-2023 with year,
+//   title, factions,
+//   location, outcome,
+//   summary, tags)
+// - canon-food-drink.json
+//   (20 canonical food /
+//   drink items with rarity,
+//   source, effect, TC value)
+// - arbiter-titles.json
+//   (20 player titles with
+//   requirement + perk +
+//   tags)
+//
+// New app/engine/canonFacts.
+// ts loads all 3 + exposes
+// buildCanonFactsParagraph
+// (q) which surfaces a
+// compact (~50 word) lore
+// line into the Qwen
+// system prompt based on
+// the scene. Tag-bag
+// matching: scene location +
+// biome + environment-desc
+// tokens vs event tags;
+// vendor presence unlocks a
+// canon food/drink mention;
+// player faction id biases
+// event pick toward events
+// involving that faction.
+// Deterministic by keyword
+// hash so the same scene
+// surfaces the same fact
+// across re-renders.
+//
+// Wired into contextInjector
+// .buildSystemPrompt as a
+// new [CANON LORE] section
+// between Entities Present
+// and PLAYER STATE — null
+// when nothing matches so
+// the section is omitted
+// entirely (no token waste).
+// player_faction_id added
+// to LlmContext.
+//
+// findArbiterTitle(query)
+// exported for the future
+// Tutorial Replay / "ask
+// the arbiter about <title>"
+// path.
+//
+// Tests: +15 in canonFacts
+// (shape checks for all 3
+// files, contextual event
+// pick by location keywords,
+// faction bias, vendor +
+// food/drink line, null on
+// unmatched scene, word-cap
+// under 80, deterministic
+// per scene, findArbiter
+// Title by name / tag /
+// substring / no-match).
+// TS clean app-side.
+//
+// MiniLM hookup deferred to
+// phase 2 — needs an "ask
+// the arbiter about" UI
+// surface to pay off
+// concept-bank wiring.
+//
+// Files: NEW docs/tartaria-
+// ttrpg-bible.txt (2189
+// lines, Claude reference
+// only, not in runtime),
+// NEW app/data/lore/canon-
+// events.json (18 events),
+// NEW app/data/lore/canon-
+// food-drink.json (20 items),
+// NEW app/data/lore/arbiter-
+// titles.json (20 titles),
+// NEW app/engine/canonFacts.
+// ts (picker + buildCanon
+// FactsParagraph + find
+// ArbiterTitle), app/
+// engine/contextInjector.ts
+// (CANON LORE section in
+// system prompt + player
+// _faction_id field). NEW
+// __tests__/canonFacts.test
+// .ts.
+export const OTA_BUILD_ID = '2026-05-30-232';

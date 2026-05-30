@@ -1,0 +1,185 @@
+{
+  "_comment": "OTA-232 — ingested verbatim from Canon_Event_Log.docx. The canonical timeline of Tartaria's collapse and aftermath. Surfaced into Qwen system prompts when the player's current location or scene tags match an event's keywords. Phase 2 will add MiniLM-backed 'ask the arbiter about X' lookup against this set.",
+  "events": [
+    {
+      "id": "lost_covenant_giants_1280",
+      "year": 1280,
+      "title": "The Lost Covenant of the Giants",
+      "factions": ["Tartarian Giants", "Tartarian Nobles"],
+      "location": "Tartaria's High Council, Ural Mountains",
+      "outcome": "Schism between the Giants and Nobles",
+      "summary": "Tartarian Giants refused to share Etheric secrets with the noble families. The Giants retreated into the Urals, weakening Tartaria's leadership and seeding centuries of fragility.",
+      "tags": ["giants", "urals", "nobles", "schism", "etheric secrets"]
+    },
+    {
+      "id": "etheric_conflux_war_1505",
+      "year": 1505,
+      "title": "The Etheric Conflux War",
+      "factions": ["Tartarian Nobles", "Reclaimers", "Local Rebels"],
+      "location": "Caspian Sea",
+      "outcome": "Partial collapse of the Etheric network",
+      "summary": "A critical Etheric Conflux near the Caspian malfunctioned, sending devastating surges across the empire. Rebels backed by rogue nobles tried to harness it; the network broke and regions went dark.",
+      "tags": ["caspian", "etheric conflux", "rebels", "network collapse", "decline"]
+    },
+    {
+      "id": "fall_of_tartaria_1567",
+      "year": 1567,
+      "title": "The Fall of the Tartarian Capital (The Great Exodus)",
+      "factions": ["Mud Monarchs", "Tartarian Survivors"],
+      "location": "Tartaria's Capital, now buried in the Great Tartary Plains",
+      "outcome": "Establishment of the Mud Monarchs",
+      "summary": "After the Great Mud Flood, the royal bloodline and key engineers fled the capital. The survivors became the Mud Monarchs, hoarding Tartaria's knowledge and ruling from the shadows.",
+      "tags": ["mud monarchs", "great tartary plains", "exodus", "royal bloodline", "buried capital"]
+    },
+    {
+      "id": "etheric_accords_1603",
+      "year": 1603,
+      "title": "The Etheric Accords",
+      "factions": ["Tartarian Nobles", "Emerging Monarchs"],
+      "location": "Urals",
+      "outcome": "Formation of the Etheric Elite",
+      "summary": "Surviving noble families signed an alliance to safeguard remaining Etheric technology. The accord laid the groundwork for the Mud Monarchs proper — power consolidated in the families that held working relics.",
+      "tags": ["urals", "etheric elite", "accords", "nobles", "treaty"]
+    },
+    {
+      "id": "reclaimers_uprising_1645",
+      "year": 1645,
+      "title": "The Reclaimers' Uprising",
+      "factions": ["Reclaimers", "Forgotten Order", "Mud Monarchs"],
+      "location": "Paris, France",
+      "outcome": "Formation of the Reclaimers Guild",
+      "summary": "An underground skirmish broke out beneath Paris when Reclaimers uncovered Tartarian relics. The Forgotten Order and Mud Monarchs both moved to seize them; the Reclaimers formalized into a Guild and ran an underground black market.",
+      "tags": ["paris", "reclaimers guild", "black market", "relics", "underground"]
+    },
+    {
+      "id": "northern_plague_1682",
+      "year": 1682,
+      "title": "The Northern Plague (The Etheric Rot)",
+      "factions": ["Mud Monarchs", "Tartarian Revivalists"],
+      "location": "Siberia",
+      "outcome": "Widespread loss of Tartarian relics",
+      "summary": "The Etheric Rot first appeared in Siberia — a disease tied to malfunctioning relics. The Mud Monarchs tried to quarantine; Revivalists exploited the chaos. Entire underground cities were abandoned and relics lost.",
+      "tags": ["siberia", "etheric rot", "plague", "lost relics", "quarantine"]
+    },
+    {
+      "id": "munich_coup_1778",
+      "year": 1778,
+      "title": "The Munich Coup (Ascension of the Conspiracy Architects)",
+      "factions": ["Conspiracy Architects", "Mud Monarchs"],
+      "location": "Munich, Germany",
+      "outcome": "Conspiracy Architects break away",
+      "summary": "A coup led by what would become the Conspiracy Architects, originally part of the Mud Monarchs, seized Etheric relics and broke away. They blamed the Monarchs for reckless misuse and built a shadow apparatus to control global knowledge.",
+      "tags": ["munich", "conspiracy architects", "coup", "germany", "shadow"]
+    },
+    {
+      "id": "great_purge_1814",
+      "year": 1814,
+      "title": "The Great Purge of Forgotten Knowledge",
+      "factions": ["Conspiracy Architects", "Global Governments"],
+      "location": "Istanbul, Turkey",
+      "outcome": "Destruction of Tartarian archives",
+      "summary": "The Architects, with world governments, systematically destroyed Tartarian archives beneath Istanbul. The purge erased most historical records of the empire, cementing Architect control over public knowledge.",
+      "tags": ["istanbul", "purge", "archives", "conspiracy architects", "knowledge control"]
+    },
+    {
+      "id": "vatican_relic_containment_1822",
+      "year": 1822,
+      "title": "The Vatican Relic Containment",
+      "factions": ["Conspiracy Architects", "Catholic Church"],
+      "location": "Vatican City, Rome",
+      "outcome": "Secrecy surrounding Tartarian relics tightened",
+      "summary": "The Architects, working with the Catholic Church, contained Etheric relics found in the Vatican archives. The collaboration with religious institutions began here — keeping relics hidden beneath the Vatican for centuries.",
+      "tags": ["vatican", "rome", "catholic church", "conspiracy architects", "relic containment"]
+    },
+    {
+      "id": "shanghai_insurrection_1863",
+      "year": 1863,
+      "title": "The Shanghai Insurrection",
+      "factions": ["Reclaimers", "Tartarian Revivalists", "Mud Monarchs"],
+      "location": "Shanghai, China",
+      "outcome": "Mud Monarchs' defeat, rise of the Revivalists",
+      "summary": "During the Taiping Rebellion, Revivalists seized relics hidden beneath Shanghai. Rogue Reclaimers aided them in exposing Tartaria's history — a wave of public interest in Tartarian myths followed before the Architects quashed it.",
+      "tags": ["shanghai", "taiping", "revivalists", "insurrection", "china"]
+    },
+    {
+      "id": "siege_st_petersburg_1915",
+      "year": 1915,
+      "title": "The Siege of St. Petersburg",
+      "factions": ["Forgotten Order", "Russian Government", "Mud Monarchs"],
+      "location": "St. Petersburg, Russia",
+      "outcome": "Forgotten Order gains critical Tartarian relics",
+      "summary": "During WWI, the Forgotten Order ran a three-day covert siege beneath St. Petersburg and emerged with key Etheric devices. The win bolstered their long-term work and deepened the rivalry with the Mud Monarchs.",
+      "tags": ["st petersburg", "russia", "wwi", "forgotten order", "siege"]
+    },
+    {
+      "id": "manhattan_relic_scandal_1945",
+      "year": 1945,
+      "title": "The Manhattan Relic Scandal",
+      "factions": ["Reclaimers Guild", "Conspiracy Architects", "U.S. Government"],
+      "location": "Manhattan, New York",
+      "outcome": "Conspiracy Architects suppress Etheric technologies",
+      "summary": "Reclaimers found an Etheric relic beneath Manhattan during WWII. The Architects intervened, destroyed it before study, and cemented their dominance in suppressing Tartarian tech.",
+      "tags": ["manhattan", "new york", "wwii", "scandal", "suppression"]
+    },
+    {
+      "id": "arizona_desert_conflict_1962",
+      "year": 1962,
+      "title": "The Arizona Desert Conflict (Lost Capital Struggle)",
+      "factions": ["Tartarian Revivalists", "U.S. Government", "Conspiracy Architects"],
+      "location": "Grand Canyon, Arizona",
+      "outcome": "Revivalist defeat, global awareness of Tartarian myths grows",
+      "summary": "Revivalists found a lost Tartarian city in the Grand Canyon. The U.S. government, steered by the Architects, suppressed the operation in a week-long skirmish. The Revivalists lost, but rumors of Tartaria began to spread.",
+      "tags": ["arizona", "grand canyon", "lost capital", "revivalists", "desert"]
+    },
+    {
+      "id": "antarctic_expedition_1973",
+      "year": 1973,
+      "title": "The Antarctic Expedition (Etheric Pulse Awakening)",
+      "factions": ["Forgotten Order", "Conspiracy Architects", "Mud Monarchs"],
+      "location": "Antarctic Ice Shelf",
+      "outcome": "Discovery of an Etheric pulse",
+      "summary": "An Etheric pulse beneath the Antarctic ice triggered a covert expedition by the Forgotten Order. Mud Monarch agents sabotaged it; the Order still recovered ancient machines hinting at a global Etheric network.",
+      "tags": ["antarctic", "ice shelf", "etheric pulse", "global network", "expedition"]
+    },
+    {
+      "id": "tartarian_heirs_rebellion_1989",
+      "year": 1989,
+      "title": "The Tartarian Heir's Rebellion",
+      "factions": ["Tartarian Revivalists", "Mud Monarchs"],
+      "location": "Warsaw, Poland",
+      "outcome": "Collapse of a Revivalist uprising",
+      "summary": "A group claiming descent from the original Tartarian rulers launched a rebellion in Warsaw, armed with newly-found Etheric devices. The Mud Monarchs crushed it in secret; rumors of the 'Tartarian Heir' still circulate.",
+      "tags": ["warsaw", "poland", "heir", "revivalists", "rebellion"]
+    },
+    {
+      "id": "berlin_betrayal_1998",
+      "year": 1998,
+      "title": "The Berlin Betrayal",
+      "factions": ["Reclaimers Guild", "Forgotten Order", "Mud Monarchs"],
+      "location": "Berlin, Germany",
+      "outcome": "Reclaimers collapse in Europe",
+      "summary": "A joint Reclaimer / Forgotten Order op beneath Berlin was sabotaged by the Mud Monarchs. Key Reclaimer operations across Europe were dismantled; the Monarchs consolidated their hold on the continent.",
+      "tags": ["berlin", "germany", "betrayal", "europe", "reclaimers"]
+    },
+    {
+      "id": "prague_summit_betrayal_2020",
+      "year": 2020,
+      "title": "The Prague Summit Betrayal",
+      "factions": ["Forgotten Order", "Conspiracy Architects", "Mud Monarchs"],
+      "location": "Prague, Czech Republic",
+      "outcome": "Breakdown in negotiations between factions",
+      "summary": "A secret summit meant to negotiate the controlled release of Tartarian tech was sabotaged by rogue Architects. Street clashes erupted in Prague; any chance of cooperation between the factions ended there.",
+      "tags": ["prague", "czech", "summit", "betrayal", "negotiation collapse"]
+    },
+    {
+      "id": "singapore_relic_seizure_2023",
+      "year": 2023,
+      "title": "The Singapore Relic Seizure",
+      "factions": ["Reclaimers Guild", "Mud Monarchs", "Forgotten Order"],
+      "location": "Singapore",
+      "outcome": "Reclaimers' surprise victory",
+      "summary": "The Reclaimers Guild seized a major cache of Tartarian relics in Singapore, outmaneuvering both the Monarchs and the Order. Renewed interest in relic-hunting triggered underground skirmishes across Southeast Asia.",
+      "tags": ["singapore", "southeast asia", "reclaimers", "seizure", "victory"]
+    }
+  ]
+}

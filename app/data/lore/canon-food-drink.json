@@ -1,0 +1,25 @@
+{
+  "_comment": "OTA-232 — ingested from food_and_drink_table.docx (20 items). The canonical food + drink list from the TTRPG handout. Stored as lore today (Qwen-visible; the Arbiter knows these items exist and can mention them in narration). A future OTA can promote any of these to authored consumables.json catalog rows when the player needs to encounter / craft / vendor them.",
+  "items": [
+    { "id": "ether_brew_tea", "name": "Ether-Brew Tea", "type": "drink", "rarity": "Rare", "source": "Found in Tartarian ruins", "effect": "Restores 1d4 Etheric energy", "tcValue": 50 },
+    { "id": "tartarian_ration_pack", "name": "Tartarian Ration Pack", "type": "food", "rarity": "Common", "source": "Vendor in Tartarian market", "effect": "Provides enough food for 1 day, +1 to Survival", "tcValue": 20 },
+    { "id": "mud_dweller_jerky", "name": "Mud-Dweller Jerky", "type": "food", "rarity": "Common", "source": "Bartered from Mud Dwellers", "effect": "Provides sustenance for 1 day, +1 to Survival in arid areas", "tcValue": 25 },
+    { "id": "reclaimers_trail_mix", "name": "Reclaimer's Trail Mix", "type": "food", "rarity": "Common", "source": "Vendor in Unknowing Masses", "effect": "Boosts stamina, +1 to Prowess for 1 hour", "tcValue": 30 },
+    { "id": "etheric_infused_water", "name": "Etheric-Infused Water", "type": "drink", "rarity": "Rare", "source": "Bartered from Tartarian vendor", "effect": "Restores 1d6 Etheric energy, +1 to Etheria for 1 hour", "tcValue": 80 },
+    { "id": "synthetic_protein_bar", "name": "Synthetic Protein Bar", "type": "food", "rarity": "Common", "source": "Vendor in Unknowing Masses", "effect": "Provides 1 day's worth of sustenance, quick energy", "tcValue": 15 },
+    { "id": "mud_monarchs_mead", "name": "Mud Monarch's Mead", "type": "drink", "rarity": "Uncommon", "source": "Found in Mud Dweller camp", "effect": "Restores 1d4 HP, increases Charisma for 1 hour", "tcValue": 50 },
+    { "id": "crystalline_ale", "name": "Crystalline Ale", "type": "drink", "rarity": "Rare", "source": "Vendor in Tartarian market", "effect": "Boosts morale, +1 to Persuasion for 2 hours", "tcValue": 60 },
+    { "id": "nano_boost_energy_drink", "name": "Nano-Boost Energy Drink", "type": "drink", "rarity": "Common", "source": "Vendor in Unknowing Masses", "effect": "Reduces fatigue, +1 to Dexterity for 1 hour", "tcValue": 40 },
+    { "id": "ether_baked_bread", "name": "Ether-Baked Bread", "type": "food", "rarity": "Uncommon", "source": "Vendor in Tartarian market", "effect": "Restores 1d4 HP, boosts recovery rate by 50% for 1 day", "tcValue": 50 },
+    { "id": "mudborn_stew", "name": "Mudborn Stew", "type": "food", "rarity": "Common", "source": "Bartered from Mud Dwellers", "effect": "Provides warmth and sustenance, +1 to Survival rolls in cold environments", "tcValue": 35 },
+    { "id": "reclaimers_survival_rations", "name": "Reclaimer's Survival Rations", "type": "food", "rarity": "Common", "source": "Vendor in Unknowing Masses", "effect": "Sustains for 2 days, +1 to Endurance rolls", "tcValue": 30 },
+    { "id": "etheric_honeycomb", "name": "Etheric Honeycomb", "type": "food", "rarity": "Rare", "source": "Found in Tartarian ruin", "effect": "Restores 1d6 HP, provides temporary resistance to Etheric energy", "tcValue": 100 },
+    { "id": "canned_nutrient_paste", "name": "Canned Nutrient Paste", "type": "food", "rarity": "Common", "source": "Vendor in Unknowing Masses", "effect": "Basic sustenance, enough for 3 days", "tcValue": 20 },
+    { "id": "purified_water_flask", "name": "Purified Water Flask", "type": "drink", "rarity": "Common", "source": "Vendor in Unknowing Masses", "effect": "Clean water for 1 day's worth of hydration", "tcValue": 10 },
+    { "id": "aetherstone_wine", "name": "Aetherstone Wine", "type": "drink", "rarity": "Rare", "source": "Found in Tartarian ruin", "effect": "Boosts Etheric energy, +1 to Etheria for 2 hours", "tcValue": 80 },
+    { "id": "mud_monarchs_feast", "name": "Mud Monarch's Feast", "type": "food", "rarity": "Uncommon", "source": "Found in Mud Monarch village", "effect": "Heals 1d6 HP, +2 to Charisma for 1 day", "tcValue": 90 },
+    { "id": "energy_gel_pack", "name": "Energy Gel Pack", "type": "food", "rarity": "Common", "source": "Vendor in Unknowing Masses", "effect": "Quick energy boost, +1 to Dexterity for 30 minutes", "tcValue": 20 },
+    { "id": "tartarian_spice_pouch", "name": "Tartarian Spice Pouch", "type": "food", "rarity": "Rare", "source": "Found in Tartarian ruins", "effect": "Used to enhance food, grants +1 to all rolls for 1 hour after consuming", "tcValue": 70 },
+    { "id": "fusion_cooked_meal_kit", "name": "Fusion-Cooked Meal Kit", "type": "food", "rarity": "Uncommon", "source": "Vendor in Unknowing Masses", "effect": "Heats and prepares a full meal in seconds, sustains for 2 days", "tcValue": 50 }
+  ]
+}

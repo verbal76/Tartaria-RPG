@@ -245,6 +245,23 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Canon lore ingestion phase 1 — 3 docs as structured JSON + minimal Qwen feed
+
+- **OTA-232 (2026-05-30) · Player handed me 4 docs (`Canon_Event_Log`, `Arbiter_Assigned_Titles_for_Players`, `food_and_drink_table`, `Tartaria_TTRPG` bible) and asked: *"ingest and parse sectionally for lore to feed qwen and minilm. Use TTRPG bible as reference only."***
+  - **TTRPG bible (2,189 lines):** extracted to `docs/tartaria-ttrpg-bible.txt`. Claude reference only — NOT bundled into runtime, NOT loaded by any module. Used for future "audit X against the world bible" prompts.
+  - **3 mechanical docs → structured JSON in `app/data/lore/`:**
+    - `canon-events.json` — 18 timeline events 1280-2023 (Lost Covenant of the Giants → Singapore Relic Seizure). Each entry: `year`, `title`, `factions[]`, `location`, `outcome`, `summary`, `tags[]`.
+    - `canon-food-drink.json` — 20 canonical food / drink items (Ether-Brew Tea, Tartarian Ration Pack, Etheric Honeycomb, Fusion-Cooked Meal Kit, etc.). Each entry: `name`, `type`, `rarity`, `source`, `effect`, `tcValue`.
+    - `arbiter-titles.json` — 20 player titles (Seeker of Lost Relics, Aetheric Attuned, etc.). Each entry: `id`, `title`, `requirement`, `perk`, `tags[]`.
+  - **New `app/engine/canonFacts.ts`** loads all three + exposes:
+    - `buildCanonFactsParagraph(q)` — picks 0-2 lore facts based on scene keyword bag. Tag-bag matching: scene location + biome + environment-description tokens vs event `tags[]`; vendor presence unlocks a canon food/drink mention; player faction id biases event pick toward events involving that faction. Deterministic by keyword-hash so the same scene surfaces the same fact.
+    - `findArbiterTitle(query)` — by-name / by-tag lookup for the future "ask the arbiter about X" surface.
+    - Plus `CANON_EVENTS`, `CANON_FOOD_DRINK`, `ARBITER_TITLES` as direct exports for future consumers.
+  - **Qwen system prompt hookup:** `contextInjector.buildSystemPrompt` now injects a `[CANON LORE - true facts; may color narration, never contradict]` section between `Entities Present` and `PLAYER STATE` when the picker returns content. Null result → section omitted entirely (no token waste). Cap: ~50 words per turn. New `player_faction_id` field added to `LlmContext`.
+  - **MiniLM hookup deferred to Phase 2:** the `MiniLM` semantic engine is currently only wired to target resolution (`CognitiveOrchestrator.inferTarget`). Adding a concept bank for "ask the arbiter about <X>" needs both (a) a UI surface for the player to ask, and (b) a vector cache for the lore entries. Without (a) it's wiring with no payoff; both land together in Phase 2.
+  - **Verification:** +15 tests in `canonFacts` (shape checks for all 3 files, contextual event pick by location keywords, faction bias, vendor + food/drink line, null on unmatched scene, word-cap under 80, deterministic-per-scene, `findArbiterTitle` by name / tag / substring / no-match). `npx tsc --noEmit` clean app-side.
+  - **Files:** NEW `docs/tartaria-ttrpg-bible.txt` (Claude reference, 2,189 lines, NOT in runtime), NEW `app/data/lore/canon-events.json` (18), NEW `app/data/lore/canon-food-drink.json` (20), NEW `app/data/lore/arbiter-titles.json` (20), NEW `app/engine/canonFacts.ts` (picker + lookups), `app/engine/contextInjector.ts` (CANON LORE section + `player_faction_id`), NEW `__tests__/canonFacts.test.ts`.
+
 #### Tutorial overhaul Phase 2a — FirstTimeHint wired into Inventory + Crafting tabs
 
 - **OTA-230 (2026-05-30) · Player after rolling new character on OTA-229: *"when I hit inventory in craft in those little subtabs for the first time after this, they don't give you any information as they're supposed to be a tab on those when you hit them for the first time to tell you something."***
