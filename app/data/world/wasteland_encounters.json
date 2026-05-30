@@ -77,7 +77,7 @@
 
   "skirmish_pack": {
     "type": "skirmish",
-    "weight": 35,
+    "weight": 40,
     "matchers": ["mud", "outskirts", "open", "ruin", "borderlands"],
     "narration": "Movement low and fast — a {enemy} cuts across your path. You're closer than either of you wanted to be.",
     "enemyPool": ["Gutter Rat", "Aetheric Slug", "Mud Lurker", "Aetherbat", "Bog Hound", "Mud Spider", "Silt Serpent", "Aetheric Worm", "Rust Lurker", "Scrap Drone"],
@@ -249,7 +249,7 @@
 
   "black_cloak_tail": {
     "type": "skirmish",
-    "weight": 4,
+    "weight": 5,
     "matchers": ["outskirts", "ruin", "borderlands"],
     "narration": "You catch the same grey cloak in the corner of your eye for the third time today. The figure does not pretend not to be following. They want you to know they are there. When they finally close the distance their hand is already inside their coat. A Mud Monarch agent — Black Cloak division, the kind that does not arrest people because the Monarchs do not arrest people.",
     "enemyPool": ["Mud Monarch"],
@@ -272,7 +272,7 @@
 
   "failing_automaton": {
     "type": "skirmish",
-    "weight": 3,
+    "weight": 4,
     "matchers": ["ruin", "buried", "etheric_anomaly"],
     "narration": "A pre-flood Scrap Drone runs the same thirty-second patrol it was running the day the mud arrived. Six steps forward, scan, turn, six steps back, scan, turn. It has not been relieved. When its scanner cone passes over you it stutters — recognises a citizen-class signature that should not be here, then forgets it, then notices you again. The next pass it will not forget.",
     "enemyPool": ["Scrap Drone"],
@@ -307,7 +307,7 @@
 
   "mud_boar_stampede": {
     "type": "skirmish",
-    "weight": 6,
+    "weight": 7,
     "matchers": ["mud", "outskirts", "open"],
     "narration": "The ground rolls before you hear them. A herd of Mud Boars breaks the rise at full panic — something behind them, probably an Aether-storm cell, has driven them past the threshold a Boar usually keeps. They do not see you. They do not need to.",
     "enemyPool": ["Mud Boar"],
@@ -343,7 +343,7 @@
 
   "scrap_drone_swarm": {
     "type": "skirmish",
-    "weight": 5,
+    "weight": 6,
     "matchers": ["ruin", "outskirts", "buried"],
     "narration": "A bridge of fused mud-glass, and at the centre of it a small cache: three sealed crates, an old uniform folded on top. The instant your foot lands on the bridge, four drill-armed Scrap Drones unspool from the rust-shadow at the underside of the arch. They are not negotiating. The crates are theirs now and have been theirs for a long time.",
     "enemyPool": ["Scrap Drone"],
@@ -624,7 +624,7 @@
 
   "black_cloak_shakedown": {
     "type": "skirmish",
-    "weight": 4,
+    "weight": 5,
     "matchers": ["outskirts", "open", "borderlands"],
     "narration": "Two figures step out from behind a marker stone, grey hoods, hands in coat pockets. 'Inspection,' one says. 'Routine. The Monarchs have flagged this stretch for unlicensed Tartarian relics.' The way they say 'inspection' tells you what is in the coat pockets. The other one is already circling.",
     "enemyPool": ["Mud Monarch"],
@@ -663,7 +663,7 @@
 
   "alley_cutpurse": {
     "type": "skirmish",
-    "weight": 8,
+    "weight": 9,
     "matchers": ["capital", "buried", "borderlands"],
     "narration": "Footsteps behind you the wrong way — too close, too fast. A Silt Thief peels out of a side passage, hand already in your line of sight where your coin-pouch hangs. They thought you'd sleep deeper than you did.",
     "enemyPool": ["Silt Thief"],
@@ -672,7 +672,7 @@
 
   "forgotten_order_zealot_intrusion": {
     "type": "skirmish",
-    "weight": 6,
+    "weight": 7,
     "matchers": ["capital", "buried"],
     "narration": "A robed figure stops at the edge of your camp. Order grey, no staff this time — knuckles wrapped in mud-cloth instead. 'You have something the Tower wants. The Order does not bargain at this hour.' Their hands come up.",
     "enemyPool": ["Reclaimer Ambusher"],
@@ -681,7 +681,7 @@
 
   "mud_giant_drunk_rampage": {
     "type": "skirmish",
-    "weight": 5,
+    "weight": 6,
     "matchers": ["capital", "buried"],
     "narration": "Heavy footfalls in the next street, and a wall of muscle and silt comes around the corner — a Mud Giant has had too much fermented Aether and decided to take it out on whatever moves. You move. They notice.",
     "enemyPool": ["Mud Giant"],

@@ -245,6 +245,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Combat + food rebalance — skirmish weights bumped, sporadic investigate ambush, food in trinket + vendor pools
+
+- **OTA-219 (2026-05-30) · Player: *"change the base weight in the wastelands from 35% to 40%. and we should have a sporadic combat event from investigate. ... we need some more food drops. food isn't scarce lately in the game."***
+  - **Fix (1) — wasteland skirmish weights:** Each skirmish archetype in `wasteland_encounters.json` got +1 to +5. Totals before: 76. After: 89. (skirmish_pack 35→40, black_cloak_tail 4→5, failing_automaton 3→4, mud_boar_stampede 6→7, scrap_drone_swarm 5→6, black_cloak_shakedown 4→5, alley_cutpurse 8→9, forgotten_order_zealot_intrusion 6→7, mud_giant_drunk_rampage 5→6).
+  - **Fix (2) — sporadic investigate ambush:** 6% chance per investigate to spawn a low-tier enemy (Gutter Rat, Mudling, Aetheric Leech, Mud Wasp) when scene has no live enemies and no pending rolls. Spawns at close range with the standard enemy-spawn `set()` shape (`enemies`, `enemyHps`, `activeEnemyIdx`, `enemyAmbushUsed`). World line: *"Something shifted while you were turned away — a Gutter Rat breaks cover, fast and low. (range: close)"* Resets OTA-218 `stepsSinceCombat` to 0.
+  - **Fix (3) — food in investigate trinket pool:** `INVESTIGATE_TRINKETS` gains 6 new entries: Trail Rations, Wild Carrot, Wild Onion, Wild Oats, Smoke-Cured Jerky Strip, First Aid Kit (Uncommon). Surfaces on the existing OTA-043 footfall roll + investigate paths.
+  - **Fix (4) — Road Hawker food expansion:** Pool gains 5 new food items (Smoke-Cured Jerky Strip, Wild Lettuce, Wild Oats, Blueberries, Forager's Stew). Trail Rations weight bumped 10→14; First Aid Kit 4→6; Speckled Egg 3→5; Wild Carrot/Onion 8→10. Food share of pool now ≥70%.
+  - **Verification:** +12 tests in `skirmishWeightAndFoodBalance` (skirmish weight bumps verified, total ≥89, Road Hawker pool checks, weight bumps, food share). `combatStarvationBias` regression green. `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/data/world/wasteland_encounters.json` (skirmish weight bumps), `app/data/npcs/roadside_traders.json` (Road Hawker pool expansion + weight bumps), `app/state/gameStore.ts` (investigate ambush roll + INVESTIGATE_TRINKETS food/first-aid additions).
+
 #### Combat-starvation bias — long peaceful stretches now pull combat back into the rotation
 
 - **OTA-218 (2026-05-30) · Player: *"so many encounters. so many actions. so many things that I've done but I had one combat that's it. so many movements. I have one combat. we got to work on that."***

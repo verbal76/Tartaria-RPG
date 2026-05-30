@@ -8139,4 +8139,114 @@
 // (stepsSinceCombat field +
 // init + increment +
 // reset-on-spawn + wire).
-export const OTA_BUILD_ID = '2026-05-30-218';
+// 2026-05-30-219 — combat
+// and food rebalance per
+// player ask:
+//   "change the base weight
+//   in the wastelands from
+//   35% to 40%. and we should
+//   have a sporadic combat
+//   event from investigate.
+//   if we're going to have
+//   story hooks and everything
+//   else maybe some low-level
+//   stuff and we need some
+//   more food drops. food
+//   isn't scarce lately in
+//   the game."
+//
+// Four changes:
+//
+// (1) Skirmish weights
+//     bumped in
+//     wasteland_encounters.
+//     json — each skirmish
+//     archetype +1 to +5 to
+//     lift the combat share
+//     of the eligible pool.
+//     Totals before: 76.
+//     After: 89.
+//     (skirmish_pack 35→40,
+//     black_cloak_tail 4→5,
+//     failing_automaton 3→4,
+//     mud_boar_stampede 6→7,
+//     scrap_drone_swarm 5→6,
+//     black_cloak_shakedown
+//     4→5, alley_cutpurse
+//     8→9, forgotten_order_
+//     zealot_intrusion 6→7,
+//     mud_giant_drunk_rampage
+//     5→6)
+//
+// (2) Sporadic investigate
+//     ambush. 6% chance per
+//     investigate to spawn a
+//     low-tier enemy (Gutter
+//     Rat, Mudling, Aetheric
+//     Leech, Mud Wasp) when
+//     the scene has no live
+//     enemies and no pending
+//     rolls. Spawns at close
+//     range with the standard
+//     enemy-spawn set() shape
+//     (enemies, enemyHps,
+//     activeEnemyIdx,
+//     enemyAmbushUsed). Logs
+//     a world-channel ambush
+//     line + combat readout.
+//     Resets OTA-218
+//     stepsSinceCombat to 0.
+//
+// (3) Investigate trinket
+//     pool expanded with food
+//     + first aid kit. Six new
+//     entries: Trail Rations,
+//     Wild Carrot, Wild
+//     Onion, Wild Oats,
+//     Smoke-Cured Jerky
+//     Strip, First Aid Kit
+//     (Uncommon). Surfaces
+//     on the existing
+//     INVESTIGATE_TRINKETS
+//     pool used by the
+//     OTA-043 footfall roll
+//     + several investigate
+//     paths.
+//
+// (4) Road Hawker pool
+//     expanded with 5 new
+//     food items: Smoke-Cured
+//     Jerky Strip, Wild
+//     Lettuce, Wild Oats,
+//     Blueberries, Forager's
+//     Stew. Trail Rations
+//     weight bumped 10→14;
+//     First Aid Kit 4→6;
+//     Speckled Egg 3→5;
+//     Wild Carrot/Onion
+//     8→10. Food share of
+//     pool now ≥70%.
+//
+// Tests: +12 in
+// skirmishWeightAndFood
+// Balance (skirmish weights
+// confirmed, total ≥89,
+// Road Hawker has 5 new
+// food items, weight bumps,
+// food share check).
+// combatStarvationBias
+// regression green. TS clean
+// app-side.
+//
+// Files: app/data/world/
+// wasteland_encounters.json
+// (skirmish weight bumps),
+// app/data/npcs/roadside_
+// traders.json (Road Hawker
+// pool expansion + weight
+// bumps), app/state/
+// gameStore.ts (investigate
+// ambush roll +
+// INVESTIGATE_TRINKETS
+// food/first aid additions).
+export const OTA_BUILD_ID = '2026-05-30-219';

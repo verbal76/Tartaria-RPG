@@ -5096,6 +5096,50 @@ export const useGameStore = create<GameStore>((set, get) => ({
           narratePossibleDirections(get, set, currentScene);
           break;
         }
+        // OTA-219 — sporadic investigate ambush. Player ask:
+        //   "we should have a sporadic combat event from investigate.
+        //   if we're going to have story hooks and everything else
+        //   maybe some low-level stuff"
+        // 6% chance per investigate to spawn a low-tier enemy as an
+        // ambient ambush. Gated on no live enemies + no pending rolls
+        // so it doesn't pile onto an active combat. Resets the
+        // OTA-218 stepsSinceCombat counter so the wasteland encounter
+        // bias drops back to baseline once the player engages.
+        if (
+          currentScene.enemies.length === 0
+          && !get().pendingRolls
+          && Math.random() < 0.06
+        ) {
+          const LOW_TIER = ['Gutter Rat', 'Mudling', 'Aetheric Leech', 'Mud Wasp'];
+          const pickName = LOW_TIER[Math.floor(Math.random() * LOW_TIER.length)]!;
+          const spawned = findEnemyByName(pickName);
+          if (spawned) {
+            const finalSpawn = JSON.parse(JSON.stringify(spawned)) as typeof spawned;
+            set((s) => {
+              if (!s.currentScene) return s;
+              return {
+                currentScene: {
+                  ...s.currentScene,
+                  enemies: [...s.currentScene.enemies, finalSpawn],
+                  enemyHps: [...s.currentScene.enemyHps, finalSpawn.hp],
+                  activeEnemyIdx: s.currentScene.enemies.length,
+                  range: 'close',
+                  enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
+                },
+                stepsSinceCombat: 0,
+              };
+            });
+            get().appendLog(
+              'world',
+              `Something shifted while you were turned away — a ${finalSpawn.name} breaks cover, fast and low. (range: close)`,
+            );
+            get().appendLog(
+              'combat',
+              `${finalSpawn.name} — ${finalSpawn.attack} ready, ${finalSpawn.damage} damage on a hit.`,
+            );
+            break;
+          }
+        }
         // The target the player named (raw, before resolution).
         const rawTarget = (parsed.target ?? parsed.resolvedNoun ?? '').trim();
 
@@ -17951,12 +17995,22 @@ function pickFragmentSalvageLine(noun: string): string {
 // the unsubstantive path feels like the world had something for you.
 // Weighted toward coins + dust + Aetheric trace; no tier rolls. Bare
 // catalog names match the materials catalog already used elsewhere.
-const INVESTIGATE_TRINKETS: ReadonlyArray<{ name: string; rarity: 'Common'; qtyMin: number; qtyMax: number; line: string }> = [
+const INVESTIGATE_TRINKETS: ReadonlyArray<{ name: string; rarity: 'Common' | 'Uncommon'; qtyMin: number; qtyMax: number; line: string }> = [
   { name: 'Worn Tartarian Coin', rarity: 'Common', qtyMin: 1, qtyMax: 3, line: `A coin tumbles loose from the {noun}, mud-stuck and warm. You pocket it.` },
   { name: 'Aether Dust',         rarity: 'Common', qtyMin: 1, qtyMax: 2, line: `Fine grey-blue dust sifts off the {noun} when you handle it. You catch what you can.` },
   { name: 'Bent Nail',           rarity: 'Common', qtyMin: 1, qtyMax: 2, line: `A bent nail works free of the {noun}. Salvageable, barely.` },
   { name: 'Cloth Scrap',         rarity: 'Common', qtyMin: 1, qtyMax: 1, line: `A scrap of cloth, wedged into the {noun} long ago. You free it.` },
   { name: 'Aether Residue',      rarity: 'Common', qtyMin: 1, qtyMax: 1, line: `A thin film of Aether residue clings where your hand brushed the {noun}. You vial it.` },
+  // OTA-219 — added food + healing to the trinket pool. Player ask:
+  // "we need some more food drops. food isn't scarce lately in the
+  // game." Periodically the tiny-find on footfall / investigate now
+  // pulls a Trail Rations or a Wild Carrot — small but real meals.
+  { name: 'Trail Rations',        rarity: 'Common', qtyMin: 1, qtyMax: 1, line: `Wedged into the {noun}: a sealed packet of trail rations, half-pressed flat but edible.` },
+  { name: 'Wild Carrot',          rarity: 'Common', qtyMin: 1, qtyMax: 2, line: `A pair of wild carrots, earth-streaked, half-buried beside the {noun}.` },
+  { name: 'Wild Onion',           rarity: 'Common', qtyMin: 1, qtyMax: 1, line: `A wild onion grows beside the {noun}, papery skin and all.` },
+  { name: 'Wild Oats',            rarity: 'Common', qtyMin: 1, qtyMax: 2, line: `A handful of wild grass-seed grain pulled from beside the {noun}. Chewable.` },
+  { name: 'Smoke-Cured Jerky Strip', rarity: 'Common', qtyMin: 1, qtyMax: 1, line: `A strip of dried meat falls free of the {noun}. Smoke-cured, still good.` },
+  { name: 'First Aid Kit',        rarity: 'Uncommon', qtyMin: 1, qtyMax: 1, line: `A sealed first aid kit, slipped behind the {noun} and forgotten. Bandages, salve, a single dose.` },
 ];
 
 // 2026-05-25 OTA-046 — "while you were away" pool. On slot-load,

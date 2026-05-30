@@ -7,16 +7,21 @@
       "demeanor": "honest",
       "description": "A stall thrown together from cart-boards and tarpaulin. Smells of stew and damp wool. The hawker watches the road with one eye and the merchandise with the other.",
       "pool": [
-        { "itemName": "Trail Rations",      "priceMin": 4,  "priceMax": 7,  "weight": 10 },
-        { "itemName": "Wild Carrot",        "priceMin": 2,  "priceMax": 4,  "weight": 8 },
-        { "itemName": "Wild Onion",         "priceMin": 2,  "priceMax": 4,  "weight": 8 },
+        { "itemName": "Trail Rations",      "priceMin": 4,  "priceMax": 7,  "weight": 14 },
+        { "itemName": "Wild Carrot",        "priceMin": 2,  "priceMax": 4,  "weight": 10 },
+        { "itemName": "Wild Onion",         "priceMin": 2,  "priceMax": 4,  "weight": 10 },
         { "itemName": "Water Bottle",       "priceMin": 3,  "priceMax": 6,  "weight": 6 },
-        { "itemName": "First Aid Kit",      "priceMin": 12, "priceMax": 18, "weight": 4 },
+        { "itemName": "First Aid Kit",      "priceMin": 12, "priceMax": 18, "weight": 6 },
         { "itemName": "Firewood",           "priceMin": 1,  "priceMax": 3,  "weight": 8 },
         { "itemName": "Patched Cloth",      "priceMin": 2,  "priceMax": 5,  "weight": 6 },
         { "itemName": "Stick",              "priceMin": 1,  "priceMax": 2,  "weight": 4 },
         { "itemName": "Empty Water Bottle", "priceMin": 2,  "priceMax": 4,  "weight": 4 },
-        { "itemName": "Speckled Egg",       "priceMin": 5,  "priceMax": 8,  "weight": 3 }
+        { "itemName": "Speckled Egg",       "priceMin": 5,  "priceMax": 8,  "weight": 5 },
+        { "itemName": "Smoke-Cured Jerky Strip", "priceMin": 5,  "priceMax": 8,  "weight": 7 },
+        { "itemName": "Wild Lettuce",       "priceMin": 2,  "priceMax": 3,  "weight": 6 },
+        { "itemName": "Wild Oats",          "priceMin": 2,  "priceMax": 4,  "weight": 6 },
+        { "itemName": "Blueberries",        "priceMin": 4,  "priceMax": 7,  "weight": 4 },
+        { "itemName": "Forager's Stew",     "priceMin": 8,  "priceMax": 12, "weight": 4 }
       ]
     },
     {
