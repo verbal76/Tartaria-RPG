@@ -245,6 +245,15 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### EXIT GAME now actually removes Tartaria from Recents (APK-only fix)
+
+- **APK 2026-05-30a (next build) · Player: *"I hit the red exit box, say yes, see my desktop, then hit the square Android button and the game's still there — it doesn't actually close the game."***
+  - **Cause:** `TitleScreen`'s EXIT GAME button calls `BackHandler.exitApp()`, which on Android calls `Activity.finish()`. That ends the foreground activity (player sees their home screen) but Android keeps the task entry in Recents and the JS process backgrounded — standard Android behavior. Tapping the task in Recents resumes the same backgrounded process.
+  - **Fix:** New Expo config plugin `plugins/withAutoRemoveRecents.js` adds `android:autoRemoveFromRecents="true"` to `MainActivity` in the generated `AndroidManifest.xml`. When MainActivity finishes, Android also removes its task from Recents and reclaims the process on the next memory pass.
+  - **Scope:** Only kicks in when the activity is finished — i.e., the EXIT GAME path. Pressing HOME or the Recents square button still backgrounds-without-finishing as before, so the normal "leave Tartaria and come back later" UX is unchanged. Only EXIT GAME does a full task removal.
+  - **Shipping:** NOT an OTA — manifest changes can only land via a native APK build. Bumped `metro.config.js` to `2026-05-30a` to fire the android-build workflow; the next APK ships the manifest tweak. Existing testers won't see the change until they install the new APK.
+  - **Files:** `plugins/withAutoRemoveRecents.js` (NEW config plugin), `app.json` (register plugin in `expo.plugins`), `metro.config.js` (APK trigger bump).
+
 #### Save-load migration: rewrite "<Theme> undefined" fused-item names from the OTA-221 bug
 
 - **OTA-225 (2026-05-30) · Player: *"can you just push a small OTA and rename my item?"***

@@ -29,6 +29,7 @@
     },
     "plugins": [
       "./plugins/withJetifier",
+      "./plugins/withAutoRemoveRecents",
       [
         "expo-build-properties",
         {
