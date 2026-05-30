@@ -15021,6 +15021,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'debug',
         `fuseAtCrucible: Qwen not ready (status=${qwen.getStatus?.() ?? 'unknown'}); falling back to deterministic synth.`,
       );
+      // OTA-222 — kick a re-init when Qwen is dormant (Android killed
+      // the LlamaContext, status still says 'ready' but the runtime
+      // is gone). Fire-and-forget; the deterministic synth covers
+      // THIS fuse, and the kick warms Qwen back up for the next
+      // interaction so the player gets LLM-quality narration on the
+      // next Arbiter beat / fusion / etc.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const q = qwen as any;
+      if (typeof q.isDormant === 'function' && q.isDormant() && typeof q.forceReinitialize === 'function') {
+        get().appendLog(
+          'debug',
+          `fuseAtCrucible: Qwen runtime is dormant — kicking forceReinitialize() in background.`,
+        );
+        void q.forceReinitialize().catch((err: unknown) => {
+          get().appendLog('debug', `Qwen reinit threw: ${String(err)}`);
+        });
+      }
     }
     if (!result) {
       // Qwen unavailable or rejected — fall back to the deterministic

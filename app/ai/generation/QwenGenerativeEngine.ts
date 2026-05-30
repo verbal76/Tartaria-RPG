@@ -80,6 +80,36 @@ export class QwenGenerativeEngine {
     return this.status === 'ready' && this.runtime !== null && this.runtime.isReady();
   }
 
+  /** OTA-222 — true when the engine THINKS it's ready (status==='ready')
+   *  but the underlying runtime is gone. This happens when Android
+   *  kills the LlamaContext to reclaim memory: the JS status field
+   *  doesn't get notified. `isReady()` returns false, but
+   *  `initialize()` short-circuits because status is still 'ready'.
+   *  Callers use this to detect the case and trigger
+   *  `forceReinitialize()`. */
+  isDormant(): boolean {
+    if (this.status !== 'ready') return false;
+    if (this.runtime === null) return true;
+    return !this.runtime.isReady();
+  }
+
+  /** OTA-222 — force a re-init when the runtime has been killed by
+   *  the OS. Resets status to 'idle' so `initialize()` will actually
+   *  re-run instead of short-circuiting on the "already ready" guard.
+   *  Fire-and-forget from the caller's perspective; the engine warms
+   *  back up in the background. Logs a debug line if we can find a
+   *  logger; otherwise silent.
+   *
+   *  Usage: `void qwen.forceReinitialize();` — don't await unless you
+   *  WANT to block on a 5-30s context reload. The player-facing
+   *  fallback path (e.g., deterministic fusion) covers the current
+   *  interaction; the warm-up is for the NEXT one. */
+  async forceReinitialize(opts: QwenInitOptions = {}): Promise<void> {
+    this.status = 'idle';
+    this.runtime = null;
+    return this.initialize(opts);
+  }
+
   getDownloadFraction(): number {
     return this.downloadFraction;
   }

@@ -245,6 +245,17 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Qwen dormant-detection + forceReinitialize: bump on fuse wakes a killed runtime
+
+- **OTA-222 (2026-05-30) · Player on the OTA-221 ship: *"are you saying qwen shut down? can't we trigger a bump when we hit fuse?"***
+  - **What:** Yes — Android killed the LlamaContext to reclaim memory. The JS-side `QwenGenerativeEngine.status` stays `'ready'` but the underlying runtime is gone. `isReady()` returns false (correctly), but `initialize()` short-circuits because status is still `'ready'`, leaving the engine permanently dormant.
+  - **Fix:** Two new methods on `QwenGenerativeEngine`:
+    - `isDormant()` — true when `status === 'ready'` AND runtime is gone or `runtime.isReady()` returns false. Detects the OOM-killed state.
+    - `forceReinitialize()` — resets status to `'idle'` and runs `initialize()`. Bypasses the idempotent guard so dormant engines actually wake back up.
+  - **Wiring:** `fuseAtCrucible` now kicks `forceReinitialize()` in the background whenever it detects `isDormant()` at fuse time. Fire-and-forget — the OTA-221 deterministic fallback covers the current fuse, and the kick warms Qwen back up for the next interaction (next Arbiter beat, next fusion, etc.).
+  - **Verification:** +4 tests in `qwenForceReinit` (fresh engine not dormant, post-init not dormant, post-kill dormant, forceReinitialize wakes it back up). `fusionDeterministicFallback` regression green. `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/ai/generation/QwenGenerativeEngine.ts` (NEW `isDormant()` + `forceReinitialize()`), `app/state/gameStore.ts` (fuseAtCrucible kicks reinit when isDormant).
+
 #### Fusion deterministic fallback — Qwen-unready never permanently blocks the player
 
 - **OTA-221 (2026-05-30) · Critical bug from the OTA-219 playtest log: player tapped `fuse` 20+ times after meeting every input gate; Qwen returned `isReady()===false` every time and the engine refused. They had earned the fusion (3 reserved items, 3 distinct material tags) but were permanently blocked.**

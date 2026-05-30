@@ -8406,4 +8406,74 @@
 // (fuseAtCrucible falls back
 // when Qwen unavailable
 // instead of refusing).
-export const OTA_BUILD_ID = '2026-05-30-221';
+// 2026-05-30-222 — Qwen
+// bump on fuse when dormant.
+// Player on the OTA-221
+// ship:
+//   "are you saying qwen
+//   shut down? can't we
+//   trigger a bump when we
+//   hit fuse?"
+//
+// Yes — Android killed the
+// LlamaContext to reclaim
+// memory. The JS-side
+// QwenGenerativeEngine.status
+// stays 'ready' but the
+// underlying runtime is
+// gone. isReady() returns
+// false (correctly), but
+// initialize() short-circuits
+// because status is still
+// 'ready', leaving the
+// engine permanently
+// dormant.
+//
+// Two new methods on
+// QwenGenerativeEngine:
+//   - isDormant() — true
+//     when status==='ready'
+//     AND runtime is gone
+//     or runtime.isReady()
+//     returns false. Detects
+//     the OOM-killed state.
+//   - forceReinitialize() —
+//     resets status to 'idle'
+//     and runs initialize().
+//     Bypasses the idempotent
+//     guard so dormant
+//     engines actually wake
+//     back up.
+//
+// fuseAtCrucible now kicks
+// forceReinitialize() in the
+// background whenever it
+// detects isDormant() at
+// fuse time. Fire-and-forget
+// — the OTA-221 deterministic
+// fallback covers the
+// current fuse, and the
+// kick warms Qwen back up
+// for the NEXT interaction
+// (next Arbiter beat, next
+// fusion, etc.).
+//
+// Tests: +4 in
+// qwenForceReinit (fresh
+// engine not dormant,
+// post-init not dormant,
+// post-kill dormant,
+// forceReinitialize wakes
+// it back up).
+// fusionDeterministicFallback
+// regression green. TS clean
+// app-side.
+//
+// Files: app/ai/generation/
+// QwenGenerativeEngine.ts
+// (NEW isDormant() +
+// forceReinitialize()), app/
+// state/gameStore.ts
+// (fuseAtCrucible kicks
+// reinit when isDormant).
+export const OTA_BUILD_ID = '2026-05-30-222';
