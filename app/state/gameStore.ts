@@ -7760,18 +7760,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const concept = findConcept(lookup);
         if (concept) {
           get().appendLog('arbiter', `"${concept.title}." the Arbiter says. "${concept.answer}"`);
-        } else {
-          // Rotating concept-miss replies — playtest log showed the same
-          // "I do not have a clean answer" line firing twice ~5 minutes
-          // apart. Variety prevents the "broken record" feeling.
-          const missReplies = [
-            `The Arbiter considers. "I do not have a clean answer for that yet. Try a damage type, a faction, or one of the basic systems — HP, stamina, AC, corruption, the Aether."`,
-            `The Arbiter tilts their head. "Not a thing I have words for. Try a faction name, a damage type, or a system like HP or AC."`,
-            `The Arbiter exhales. "That sits outside what I know. Ask about HP, stamina, AC, corruption, the Aether — or a faction."`,
-            `The Arbiter shrugs. "I cannot place that. The basic systems — HP, stamina, AC, corruption, the Aether — those I can answer."`,
-          ];
-          get().appendLog('arbiter', rotatingPick(missReplies, 'arbiter.concept-miss'));
+          break;
         }
+        // OTA-233 — MiniLM lore lookup. The keyword findConcept covers
+        // ~30 broad systems; the lore concept bank (loreConceptBank.ts)
+        // adds ~132 specific entries (canon events, Arbiter titles,
+        // canon food/drink, glossary mechanics / lore terms / factions
+        // / people / places). When cognitive is ready, we cosine-match
+        // the query against the bank and surface the closest concept.
+        // Fire-and-forget — the lookup is async; result lands a moment
+        // after the player sees a "considers" placeholder.
+        if (cognitive.isReady()) {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const aa = require('../engine/askArbiter');
+          const loreQuery = aa.extractLoreQuery(trimmed) || lookup;
+          void aa.findClosestLoreConcept(loreQuery, cognitive).then((hit: { concept: { id: string }; score: number } | null) => {
+            if (hit) {
+              get().appendLog('arbiter', aa.formatArbiterAnswer(hit.concept));
+            } else {
+              get().appendLog('arbiter', aa.ARBITER_SILENT_LINE);
+            }
+          }).catch(() => {
+            // Lookup failure → fall back to a rotating miss reply so the
+            // player isn't left wondering whether the ask landed.
+            const missReplies = [
+              `The Arbiter considers. "I do not have a clean answer for that yet. Try a damage type, a faction, or one of the basic systems — HP, stamina, AC, corruption, the Aether."`,
+              `The Arbiter tilts their head. "Not a thing I have words for. Try a faction name, a damage type, or a system like HP or AC."`,
+            ];
+            get().appendLog('arbiter', rotatingPick(missReplies, 'arbiter.concept-miss'));
+          });
+          break;
+        }
+        // Cognitive not ready — keep the original keyword miss replies.
+        const missReplies = [
+          `The Arbiter considers. "I do not have a clean answer for that yet. Try a damage type, a faction, or one of the basic systems — HP, stamina, AC, corruption, the Aether."`,
+          `The Arbiter tilts their head. "Not a thing I have words for. Try a faction name, a damage type, or a system like HP or AC."`,
+          `The Arbiter exhales. "That sits outside what I know. Ask about HP, stamina, AC, corruption, the Aether — or a faction."`,
+          `The Arbiter shrugs. "I cannot place that. The basic systems — HP, stamina, AC, corruption, the Aether — those I can answer."`,
+        ];
+        get().appendLog('arbiter', rotatingPick(missReplies, 'arbiter.concept-miss'));
         break;
       }
       case 'equip': {

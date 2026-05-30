@@ -9132,4 +9132,125 @@
 // _faction_id field). NEW
 // __tests__/canonFacts.test
 // .ts.
-export const OTA_BUILD_ID = '2026-05-30-232';
+// 2026-05-30-233 — Ask the
+// Arbiter scheme + Shattered
+// Empire campaign filed for
+// Buried Skyscraper expansion.
+//
+// Player: "I like the ask
+// arbiter scheme, let's wire
+// that in. ... the building
+// expansion (part 2) — can
+// the Shattered Empire quest
+// live inside that?"
+//
+// New surface: any 'ask'
+// intent the existing keyword
+// findConcept doesn't catch
+// now routes through MiniLM
+// cosine match against a
+// ~132-concept lore bank
+// (canon events + Arbiter
+// titles + canon food/drink
+// + glossary mechanics +
+// lore terms + factions +
+// people + places + timeline).
+// Player types "ask the
+// arbiter about the great
+// mud flood" / "what is
+// aetherstone" / "tell me
+// about the reclaimers";
+// engine strips prefixes,
+// embeds the topic, returns
+// the closest concept above
+// 0.45 cosine. Arbiter
+// response routes per
+// category (event → "recalls
+// the X"; title → "speaks of
+// the title"; place/faction
+// /person → quoted
+// definition).
+//
+// Lazy embedding cache:
+// first query pays N×10ms
+// (~1.3s for 132 concepts);
+// subsequent queries are
+// one-embed sub-50ms cosine
+// sweep. Cache resets per
+// session.
+//
+// Fire-and-forget wiring in
+// the case 'ask' fallback so
+// the player UI thread never
+// blocks. Cognitive-not-
+// ready path keeps the
+// original rotating keyword
+// miss replies.
+//
+// Buried Skyscraper hook
+// for the Shattered Empire
+// campaign: saved to docs/
+// campaigns/shattered-empire.
+// md with explicit floor-
+// archetype mapping (Act 1
+// → service_corridor entry
+// floors, Act 3 boss →
+// mechanical_floor, Act 4
+// Heart → dig_camp deep
+// floors). NOT auto-ingested
+// as procedural quest chain
+// — campaign modules clash
+// with shipped procedural
+// generation; content lands
+// when the user's hand-
+// authored floor maps absorb
+// it. Verbatim source kept
+// at shattered-empire-source
+// .txt for reference.
+//
+// Public embed() method
+// added to CognitiveOrch-
+// estrator (passthrough to
+// MiniLM). Decouples the
+// lore lookup from the
+// internal emotion/intent
+// engines.
+//
+// Tests: +23 in askArbiter
+// (bank shape + category
+// coverage + unique ids +
+// cache memoization; prefix
+// stripping for 9 question
+// forms; cosine routing
+// pinned via 4-d mock
+// embedder; threshold cutoff;
+// concept-vector cache hit;
+// category-specific Arbiter
+// response framing).
+//
+// Phase 2 of this surface:
+// optional 📜 ASK button on
+// the action shelf (parser
+// path lands first to
+// validate UX). Phase 3:
+// title screen wiring for
+// the Arbiter Titles list —
+// the docs ingestion the
+// user flagged FIRST (OTA-
+// 234 candidate).
+//
+// Files: NEW app/engine/
+// loreConceptBank.ts, NEW
+// app/engine/askArbiter.ts,
+// app/ai/CognitiveOrch-
+// estrator.ts (public
+// embed()), app/state/
+// gameStore.ts (case 'ask'
+// fallback through findConcept
+// → MiniLM lookup). NEW
+// __tests__/askArbiter.test.
+// ts. NEW docs/campaigns/
+// shattered-empire.md + .txt
+// (Buried Skyscraper
+// expansion reference).
+export const OTA_BUILD_ID = '2026-05-30-233';

@@ -79,6 +79,14 @@ export class CognitiveOrchestrator {
     return this.ready && this.embeddingService.isReady();
   }
 
+  /** OTA-233 — public passthrough to the underlying MiniLM embedder.
+   *  Exposed for askArbiter's lore concept lookup; not used by the
+   *  CognitiveOrchestrator's own emotion / intent passes. Throws when
+   *  the embedder isn't ready — caller should gate on isReady() first. */
+  async embed(text: string): Promise<Float32Array> {
+    return this.embeddingService.embed(text);
+  }
+
   async getModelInfo(): Promise<ModelInfo> {
     return this.embeddingService.getModelInfo(ORT_RUNTIME_VERSION);
   }

@@ -245,6 +245,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Ask the Arbiter scheme — MiniLM lore lookup + Buried Skyscraper campaign hook
+
+- **OTA-233 (2026-05-30) · Player after the second wave of doc drops: *"I like the ask arbiter scheme, let's wire that in."* And on the Shattered Empire campaign module: *"We did the building as an expansion for part 2. Can this quest live inside that?"***
+  - **Ask the Arbiter (MiniLM lookup):** any `ask` intent the existing keyword `findConcept` doesn't catch now routes through MiniLM cosine match against a ~132-concept lore bank (18 canon events + 20 Arbiter titles + 20 canon food/drink + 74 glossary entries spanning mechanics / lore terms / factions / people / places / timeline). Player types `ask the arbiter about <X>` / `what is <X>` / `tell me about <X>` / `arbiter, who is <X>` — engine strips the conversational prefix, embeds the topic, cosine-matches above threshold 0.45, surfaces the closest concept. Response routes by category — events get "The Arbiter recalls the X", titles get "speaks of the title", lore terms / factions / people / places get a quoted definition. Lazy concept-vector cache: first query pays ~1.3s (132 × ~10ms), subsequent queries are sub-50ms. Fire-and-forget so the UI thread doesn't block. Cognitive-not-ready path keeps the original rotating keyword miss replies.
+  - **Shattered Empire campaign → Buried Skyscraper expansion:** filed at `docs/campaigns/shattered-empire.md` with explicit floor-archetype mapping (Act 1 entry → `service_corridor` floors; Act 3 Vorgor siege → `mechanical_floor` cluster; Act 4 Heart of Tartaria → `dig_camp` deep floors). NOT auto-ingested as a procedural quest chain — campaign modules clash with shipped procedural generation. Content lands when the user's hand-authored floor maps absorb the campaign's NPCs / locations / encounters. Verbatim source kept at `shattered-empire-source.txt`.
+  - **New `embed()` on CognitiveOrchestrator** (public passthrough to the MiniLM service). Decouples the lore lookup from the internal emotion / intent engines.
+  - **Verification:** +23 tests in `askArbiter` (bank shape, category coverage, unique ids, cache memoization, prefix stripping for 9 question forms, cosine routing pinned via 4-d mock embedder, threshold cutoff, concept-vector cache hit, category-specific Arbiter response framing). `npx tsc --noEmit` clean app-side.
+  - **Phase 2 of this surface (later):** optional `📜 ASK` button on the action shelf — parser path lands first to validate UX before adding UI.
+  - **Files:** NEW `app/engine/loreConceptBank.ts`, NEW `app/engine/askArbiter.ts`, `app/ai/CognitiveOrchestrator.ts` (public `embed()`), `app/state/gameStore.ts` (`case 'ask'` fallback through `findConcept` → MiniLM lookup), NEW `__tests__/askArbiter.test.ts`. NEW `docs/campaigns/shattered-empire.md` + `shattered-empire-source.txt`.
+
 #### Canon lore ingestion phase 1 — 3 docs as structured JSON + minimal Qwen feed
 
 - **OTA-232 (2026-05-30) · Player handed me 4 docs (`Canon_Event_Log`, `Arbiter_Assigned_Titles_for_Players`, `food_and_drink_table`, `Tartaria_TTRPG` bible) and asked: *"ingest and parse sectionally for lore to feed qwen and minilm. Use TTRPG bible as reference only."***
