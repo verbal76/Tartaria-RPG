@@ -245,6 +245,14 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Fusion deterministic fallback — Qwen-unready never permanently blocks the player
+
+- **OTA-221 (2026-05-30) · Critical bug from the OTA-219 playtest log: player tapped `fuse` 20+ times after meeting every input gate; Qwen returned `isReady()===false` every time and the engine refused. They had earned the fusion (3 reserved items, 3 distinct material tags) but were permanently blocked.**
+  - **Fix:** New `synthesizeFusionDeterministic(inputs, tagProfile)` in `itemFusion.ts`. Produces a clamped valid `UniqueItemStats` from the input tag profile when Qwen isn't ready or fails. Less varied than Qwen-synthesized but always serviceable. Pipeline: dominant tag chosen by priority (aether > metal > cloth > organic > wood > stone > improvised) drives kind (weapon / armor / dog_armor), name picked from theme + suffix pools indexed by `fusionInputHash` (deterministic — identical inputs produce identical names), rarity is Legendary at 5+ tags else Rare (matches Qwen path), weapon dice 1d8 (Rare) / 2d6 (Legendary), armor AC+2 / AC+4, resistance from dominant tag (aether → aetheric, organic → poison, metal → degradation), special line: *"Field-forged from N reclaimer scraps. The Crucible answered."*
+  - **Wiring:** `fuseAtCrucible` reorders the gates. (1) Try Qwen path if `isReady()`. (2) Fall back to deterministic synth if Qwen unavailable or returned null. Either way the player gets a fused result the moment they tap.
+  - **Verification:** +9 tests in `fusionDeterministicFallback` (shape, determinism, weapon stats, armor stats, rarity gates, durability, description, special). `itemFusionEngine` regression stays green (31 total). `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/engine/itemFusion.ts` (NEW `synthesizeFusionDeterministic`), `app/state/gameStore.ts` (fuseAtCrucible falls back instead of refusing).
+
 #### Fusing Crucible banner shows readiness state instead of bare "tap to fuse"
 
 - **OTA-220 (2026-05-30) · Playtest log on OTA-219 install showed the player tapping `fuse` 5 times in a row, getting refused each time because they only had 1 of the 3 required reserved items.**

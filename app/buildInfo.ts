@@ -8306,4 +8306,104 @@
 // (banner consults gateFusion;
 // readiness branches the
 // label + hint).
-export const OTA_BUILD_ID = '2026-05-30-220';
+// 2026-05-30-221 — fusion
+// deterministic fallback.
+// Critical playtest bug on
+// OTA-219:
+//   [player] fuse (×9)
+//   [arbiter] Need 3 reserved
+//   ... You have 1.
+//   (player reserves 2 more
+//   inferred items)
+//   [player] fuse (×20+)
+//   [arbiter] The Crucible's
+//   resonance is faint right
+//   now — the Aether-engine
+//   in your pack isn't ready
+//   to listen.
+// Player earned the fusion
+// (3 reserved items, 3
+// distinct material tags)
+// but qwen.isReady()
+// returned false every single
+// time. They were
+// permanently blocked.
+//
+// Fix: new
+// synthesizeFusionDeterministic
+// in itemFusion.ts produces
+// a clamped valid Unique
+// ItemStats from the input
+// tag profile when Qwen
+// isn't ready or fails.
+// Less varied than Qwen-
+// synthesized but always
+// serviceable.
+//
+// Pipeline:
+//   - Dominant tag picked
+//     from priority order
+//     (aether > metal > cloth
+//     > organic > wood >
+//     stone > improvised).
+//   - kind from dominant tag
+//     (aether/metal → weapon;
+//     cloth+aether → armor;
+//     cloth alone → dog_armor;
+//     organic/wood/stone →
+//     armor).
+//   - rarity: Legendary at 5+
+//     distinct tags, Rare
+//     otherwise (matches Qwen
+//     path).
+//   - name from theme + suffix
+//     pools, indexed by the
+//     OTA-195 fusionInputHash
+//     so identical inputs
+//     produce identical names
+//     (mirrors the cache-key
+//     determinism).
+//   - weapon: 1d8 (Rare) or
+//     2d6 (Legendary), damage
+//     type + scaling stat
+//     from dominant tag.
+//   - armor: AC+2 (Rare) or
+//     AC+4 (Legendary); slot
+//     from material.
+//   - resistance from dominant
+//     tag (aether/organic/
+//     metal map to
+//     aetheric/poison/
+//     degradation).
+//   - special line:
+//     "Field-forged from N
+//     reclaimer scraps. The
+//     Crucible answered."
+//
+// fuseAtCrucible reorders:
+// (1) try Qwen path if
+// isReady(); (2) deterministic
+// fallback if Qwen unavailable
+// or returned null. Either
+// way the player gets a
+// fused result the moment
+// they tap.
+//
+// Tests: +9 in
+// fusionDeterministicFallback
+// (shape, determinism,
+// weapon stats, armor stats,
+// rarity gates, durability,
+// description, special).
+// itemFusionEngine regression
+// stays green (31 total).
+// TS clean app-side.
+//
+// Files: app/engine/
+// itemFusion.ts (NEW
+// synthesizeFusionDeterministic),
+// app/state/gameStore.ts
+// (fuseAtCrucible falls back
+// when Qwen unavailable
+// instead of refusing).
+export const OTA_BUILD_ID = '2026-05-30-221';

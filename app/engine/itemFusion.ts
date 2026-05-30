@@ -318,6 +318,105 @@ export async function synthesizeFusionViaQwen(
  *  and mint the fused InventoryItem. Returns the new inventory array
  *  and the fused item that was added. Pure — caller wires into the
  *  store. */
+/** OTA-221 — deterministic fusion fallback. Playtest log showed the
+ *  player tapping fuse 20+ times after meeting every gate; Qwen
+ *  returned `isReady() === false` every time and refused. The player
+ *  earned the fusion (3 reserved items, 3 distinct material tags) and
+ *  must never be permanently blocked by Qwen state. This function
+ *  synthesizes a valid UniqueItemStats deterministically from the
+ *  input profile — same clamp ranges as the Qwen path. Name + kind
+ *  are picked from the dominant material tag; stats scale with input
+ *  count and rarity. The result has less narrative variety than
+ *  Qwen-generated but is always serviceable. */
+export function synthesizeFusionDeterministic(
+  inputs: readonly InventoryItem[],
+  tagProfile: string[],
+): { name: string; description: string; stats: UniqueItemStats } {
+  const tagSet = new Set(tagProfile);
+  // Dominant material — first match wins. Drives kind + theme.
+  const dominantTag =
+    tagSet.has('aether') ? 'aether'
+    : tagSet.has('crystal') ? 'aether'
+    : tagSet.has('blade') ? 'metal'
+    : tagSet.has('metal') ? 'metal'
+    : tagSet.has('iron') ? 'metal'
+    : tagSet.has('plate') ? 'metal'
+    : tagSet.has('cloth') ? 'cloth'
+    : tagSet.has('fiber') ? 'cloth'
+    : tagSet.has('organic') ? 'organic'
+    : tagSet.has('bone') ? 'organic'
+    : tagSet.has('wood') ? 'wood'
+    : tagSet.has('stone') ? 'stone'
+    : 'improvised';
+  // Kind from the dominant tag.
+  const kind: 'weapon' | 'armor' | 'dog_armor' =
+    dominantTag === 'metal' || dominantTag === 'wood' || dominantTag === 'stone'
+      ? 'weapon'
+      : dominantTag === 'cloth'
+        ? (tagSet.has('aether') ? 'armor' : 'dog_armor')
+        : dominantTag === 'aether'
+          ? 'weapon'
+          : 'armor';
+  // Rarity scales with diversity. ≥5 tags = Legendary, else Rare.
+  const rarity: 'Rare' | 'Legendary' = tagProfile.length >= 5 ? 'Legendary' : 'Rare';
+  // Name from a theme word + suffix. Deterministic via the input hash
+  // so the same input set always produces the same name.
+  const themePool: Record<string, string[]> = {
+    aether: ['Resonant', 'Humming', 'Singing', 'Aether-Veined'],
+    metal: ['Iron-Bound', 'Salvaged', 'Tempered', 'Brass-Edged'],
+    cloth: ['Patched', 'Woven', 'Mud-Worn', 'Veil-Stitched'],
+    organic: ['Marrow-Etched', 'Bone-Stitched', 'Sinew-Wrapped', 'Carapace'],
+    wood: ['Hardwood', 'Burl', 'Rooted', 'Splint'],
+    stone: ['Mudstone', 'Cairn', 'Slate', 'Pillar'],
+    improvised: ['Field-Forged', 'Reclaimed', 'Salt-Worn', 'Veteran'],
+  };
+  const suffixPool: Record<string, string[]> = {
+    weapon: ['Cleaver', 'Edge', 'Spike', 'Lash', 'Maul'],
+    armor: ['Brace', 'Vigil', 'Mantle', 'Shroud', 'Bulwark'],
+    dog_armor: ['Vigil', 'Wrap', 'Pattern', 'Stride'],
+  };
+  const hash = parseInt(fusionInputHash(inputs).substring(0, 8), 16);
+  const theme = themePool[dominantTag] ?? themePool.improvised!;
+  const suffix = suffixPool[kind] ?? suffixPool.weapon!;
+  const name = `${theme[hash % theme.length]!} ${suffix[(hash >> 4) % suffix.length]!}`;
+  // Stats — deterministic, clamped.
+  const baseStats: UniqueItemStats = {
+    kind,
+    rarity,
+    durability: { current: 30, max: 30 },
+  };
+  if (kind === 'weapon') {
+    // 1d6 / 1d8 / 2d6 by rarity. damageType + scaling stat by dominant tag.
+    const dice = rarity === 'Legendary' ? '2d6' : '1d8';
+    const dmgType: UniqueItemStats['damageType'] =
+      dominantTag === 'aether' ? 'aetheric'
+      : dominantTag === 'metal' ? 'slashing'
+      : 'bludgeoning';
+    const scale: UniqueItemStats['scalesWith'] =
+      dominantTag === 'aether' ? 'intelligence'
+      : dominantTag === 'metal' ? 'strength'
+      : 'dexterity';
+    baseStats.damageDice = dice;
+    baseStats.damageType = dmgType;
+    baseStats.scalesWith = scale;
+  } else {
+    baseStats.acBonus = rarity === 'Legendary' ? 4 : 2;
+    if (kind === 'armor') {
+      baseStats.armorSlot = dominantTag === 'cloth' ? 'chest' : 'head';
+    }
+  }
+  // Resistance from dominant tag.
+  const resistance =
+    dominantTag === 'aether' ? 'aetheric'
+    : dominantTag === 'organic' ? 'poison'
+    : dominantTag === 'metal' ? 'degradation'
+    : undefined;
+  if (resistance) baseStats.resistance = resistance;
+  baseStats.special = `Field-forged from ${inputs.length} reclaimer scraps. The Crucible answered.`;
+  const description = `A ${rarity.toLowerCase()} ${kind === 'dog_armor' ? 'dog vest' : kind} hammered together from your reserved pieces. The seams still hum with the Crucible's last breath.`;
+  return { name, description, stats: baseStats };
+}
+
 export function applyFusion(
   inventory: readonly InventoryItem[],
   inputs: readonly InventoryItem[],

@@ -14995,26 +14995,42 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     // Gate 3 — Qwen readiness. The static-inference path can't design
-    // a unique item, so fusion REQUIRES Qwen. If the model isn't
-    // loaded, refuse — but keep the permit so the player can try
-    // again once the engine warms up.
-    if (!qwen.isReady()) {
-      get().appendLog(
-        'arbiter',
-        `The Crucible's resonance is faint right now — the Aether-engine in your pack isn't ready to listen. Try again in a moment.`,
-      );
-      return;
-    }
+    // OTA-195 → OTA-221 — Qwen path PREFERRED but no longer required.
+    // Playtest log: player tapped fuse 20+ times after meeting every
+    // input gate, got "Aether-engine in your pack isn't ready"
+    // forever. They earned the fusion (3 reserved items, 3 tags) and
+    // must not be permanently blocked by Qwen state. When Qwen isn't
+    // ready (or throws / returns null), the engine falls back to
+    // synthesizeFusionDeterministic which produces a clamped valid
+    // result from the input tag profile. Less varied than Qwen-
+    // synthesized but always serviceable.
     get().appendLog(
       'world',
       `You set your reserved pieces on the three pedestals. The Crucible takes a long breath in.`,
     );
     let result;
-    try {
-      result = await fusion.synthesizeFusionViaQwen(gate.inputs, gate.tagProfile, qwen);
-    } catch (err) {
-      get().appendLog('debug', `fuseAtCrucible threw: ${String(err)}`);
-      result = null;
+    if (qwen.isReady()) {
+      try {
+        result = await fusion.synthesizeFusionViaQwen(gate.inputs, gate.tagProfile, qwen);
+      } catch (err) {
+        get().appendLog('debug', `fuseAtCrucible Qwen path threw: ${String(err)}`);
+        result = null;
+      }
+    } else {
+      get().appendLog(
+        'debug',
+        `fuseAtCrucible: Qwen not ready (status=${qwen.getStatus?.() ?? 'unknown'}); falling back to deterministic synth.`,
+      );
+    }
+    if (!result) {
+      // Qwen unavailable or rejected — fall back to the deterministic
+      // synthesizer. Always returns a valid clamped row from the
+      // input tag profile.
+      result = fusion.synthesizeFusionDeterministic(gate.inputs, gate.tagProfile);
+      get().appendLog(
+        'debug',
+        `fuseAtCrucible: deterministic synth produced ${result.name}.`,
+      );
     }
     if (!result) {
       // Fail-closed — the permit IS spent. Don't let the player keep
