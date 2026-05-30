@@ -1,0 +1,73 @@
+{
+  "atmospheric": [
+    "A low wind moves through the ruins like a sentence trying to finish itself.",
+    "The light is older than the hour. Tartaria keeps its own clock.",
+    "Somewhere, a stone settles. The settling sounds deliberate.",
+    "The air carries the faint metal of Aether and the older taste of mud.",
+    "Shadows lean further than the things that cast them.",
+    "A bird, or something that learned to sound like one, calls once and does not call again.",
+    "The silence here is not empty. It is held.",
+    "Footprints from no recent traveller cross the path ahead, leading neither in nor out.",
+    "Dust drifts upward at the edges of the room, as if mistaking the ceiling for the floor.",
+    "There is a smell of cold paper, though no books remain.",
+    "The horizon shimmers, settles, shimmers again.",
+    "A single shaft of sun finds the floor through a crack centuries old."
+  ],
+  "aether": [
+    "The Aether tightens. Skin notices before the mind does.",
+    "Violet threads briefly knit the air, then forget the pattern.",
+    "Aetherstone hums beneath the boots, just below the threshold of hearing.",
+    "A small static lifts the hairs on the arm. Then a smaller one.",
+    "Light bends slightly around nothing in particular.",
+    "The Aether moves the way deep water moves: invisibly, then all at once.",
+    "Aetherons gather thick near the standing stones. Breath comes thicker with them.",
+    "A taste of copper. A taste of ozone. A taste of something not in the body's vocabulary.",
+    "Compass needles drift, settle on a north of their own choosing.",
+    "Time slips by half a heartbeat, then catches up apologetically.",
+    "A faint glow lives inside the mud here, like a banked coal.",
+    "The Aether listens. Whether it understands is a separate question.",
+    "Somewhere underfoot, a Core or its echo keeps a slow rhythm."
+  ],
+  "ruins": [
+    "Stone here remembers being shaped. The shape has weathered. The memory has not.",
+    "A doorway leans without a wall to lean against.",
+    "Runes run along the lintel, half-buried in mud, still legible to the patient eye.",
+    "The Giants built this. The proportions argue for them more than the records do.",
+    "A staircase ends in mud, or begins from it, depending on the direction one is travelling.",
+    "Frescoes survive in patches. Faces look out from the patches without judgment.",
+    "An Aetheric conduit lies broken across the floor, its purpose still humming softly.",
+    "The walls have not stopped being walls. They have only stopped being inside something.",
+    "Pillars stand at angles the architects did not intend. The mud has its own opinions.",
+    "A fountain remains, dry, its basin holding a fine grit of centuries.",
+    "The floor here is tiled in a pattern that resolves only from above.",
+    "Something was inscribed here in haste, after the flood arrived. It does not improve with reading."
+  ],
+  "danger": [
+    "Something has been here recently. Recently, in Tartaria, can mean many things.",
+    "The mud holds a print too large for a single footprint and too regular for an accident.",
+    "A trap is set, somewhere within a few careful paces.",
+    "An Aetheric anomaly tightens the air to a held note.",
+    "The buried city above stirs, or below, depending on how one orients.",
+    "A Sentinel's footstep, or its memory, lands in the next chamber.",
+    "Mud sirens have sung here within the last day. The air still carries the shape.",
+    "Aetherkin lie nearby, in their sleep. Whether they remain in it is currently undecided.",
+    "The dust moves against the draft. Something else is moving the air.",
+    "Eyes meet at the edge of the lamplight, briefly, and then move on. Briefly is the word to mark.",
+    "A Mud Golem's posture sets these acoustics. The room is wrong in that specific way.",
+    "Old defenses still know their job. Newer arrivals are less informed."
+  ],
+  "mystery": [
+    "Something here was meant to be found. By someone. Not necessarily by you.",
+    "A symbol repeats along the wall, growing fainter, then bolder, then absent.",
+    "A door without hinges. A hinge without a door. Decide which is the question.",
+    "The Forgotten Order would have spent a season on this passage. There is not a season to spend.",
+    "Names have been carved into the stone, all in the same hand, all from different centuries.",
+    "Aetherstone shifts colour near truth. The colour is shifting now.",
+    "Whatever happened here is still happening, very slowly.",
+    "A relic waits without obviously waiting.",
+    "The runes form a question. The question forms a deeper one.",
+    "Tartaria left no manuals. Only invitations. This is one of them.",
+    "Someone arranged these objects. The arrangement is not accidental, and it is not finished.",
+    "There is a pattern in the dust on the floor. It rewards the kind of attention that does not blink."
+  ]
+}

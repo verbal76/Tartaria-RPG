@@ -1,0 +1,193 @@
+// OTA 23-007 — Regression tests for the climb mechanics overhaul:
+//   - Rope is HARD-REQUIRED to climb. No rope -> refuse, no
+//     stamina spent, no HP lost.
+//   - Reclaimer's Rope costs 1 stamina/tier (vs 2 for plain Climbing
+//     Rope) and unlocks mid-climb rest.
+//   - If stamina < required cost, the player falls and loses 20%
+//     of max HP. The elevatedOn flag is cleared.
+
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+);
+jest.mock('onnxruntime-react-native', () => ({
+  InferenceSession: { create: jest.fn(async () => ({ run: jest.fn(async () => ({})) })) },
+  Tensor: class { constructor(_t: string, _d: any, _s: any[]) {} },
+}));
+jest.mock('llama.rn', () => ({
+  initLlama: jest.fn(async () => ({ completion: jest.fn(async () => ({ text: '' })), release: jest.fn() })),
+  releaseAllLlama: jest.fn(),
+}));
+jest.mock('react-native-executorch', () => ({}));
+jest.mock('expo-file-system', () => ({
+  documentDirectory: '/tmp/', cacheDirectory: '/tmp/',
+  getInfoAsync: jest.fn(async () => ({ exists: false })),
+  makeDirectoryAsync: jest.fn(async () => {}),
+  readAsStringAsync: jest.fn(async () => ''),
+  writeAsStringAsync: jest.fn(async () => {}),
+  deleteAsync: jest.fn(async () => {}),
+  downloadAsync: jest.fn(async () => ({ uri: '' })),
+  EncodingType: { UTF8: 'utf8', Base64: 'base64' },
+}));
+jest.mock('expo-speech', () => ({ speak: jest.fn(), stop: jest.fn(), isSpeakingAsync: jest.fn(async () => false) }));
+jest.mock('expo-av', () => ({
+  Audio: {
+    setAudioModeAsync: jest.fn(),
+    Sound: class {
+      static createAsync: (...args: unknown[]) => Promise<{ sound: { playAsync: () => Promise<void>; unloadAsync: () => Promise<void> } }> = jest.fn(async () => ({ sound: { playAsync: jest.fn(async () => {}), unloadAsync: jest.fn(async () => {}) } }));
+    },
+  },
+}));
+jest.mock('expo-application', () => ({ nativeApplicationVersion: '0', applicationId: 'test' }));
+jest.mock('expo-asset', () => ({ Asset: { fromModule: () => ({ downloadAsync: jest.fn(async () => {}), localUri: '' }) } }));
+jest.mock('expo-clipboard', () => ({ setStringAsync: jest.fn(async () => {}) }));
+jest.mock('expo-constants', () => ({ default: { expoConfig: {} } }));
+jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
+jest.mock('expo-speech-recognition', () => ({}));
+jest.mock('expo-updates', () => ({}));
+
+import { useGameStore } from '../app/state/gameStore';
+import type { InventoryItem } from '../app/engine/types';
+
+async function setupClimber(
+  ropeName: 'Climbing Rope' | "Reclaimer's Rope" | null,
+  overrides: { hp?: number; hpMax?: number; stamina?: number; staminaMax?: number } = {},
+) {
+  const store = useGameStore;
+  await store.getState().hydrate();
+  await store.getState().startNewGame({ name: 'Climber', raceId: 'unknowing_mass', factionId: 'reclaimers_guild' });
+  store.getState().skipTutorial?.();
+  const p0 = store.getState().player!;
+  const rope: InventoryItem | null = ropeName
+    ? { id: `rope_${ropeName}`, name: ropeName, kind: 'misc', quantity: 1, tags: ['utility', 'gate'] }
+    : null;
+  const inv = [
+    ...p0.inventory.filter((i) => i.name !== 'Climbing Rope' && i.name !== "Reclaimer's Rope"),
+    ...(rope ? [rope] : []),
+  ];
+  store.setState({
+    currentScene: {
+      ...store.getState().currentScene!,
+      ambientNouns: ['wall', 'tower'],
+      elevatedOn: null,
+    },
+    player: {
+      ...p0,
+      hp: overrides.hp ?? 30,
+      hpMax: overrides.hpMax ?? 30,
+      stamina: overrides.stamina ?? 10,
+      staminaMax: overrides.staminaMax ?? 10,
+      inventory: inv,
+    },
+  });
+  return store;
+}
+
+describe('OTA 23-007 — climb mechanics', () => {
+  beforeAll(() => {
+    console.log = () => {};
+    console.warn = () => {};
+    console.error = () => {};
+  });
+
+  describe('rope hard-requirement', () => {
+    it('without any rope: climb is refused, no stamina spent, no HP lost', async () => {
+      const store = await setupClimber(null);
+      const before = store.getState().player!;
+      store.getState().submitPlayerAction('climb wall');
+      const after = store.getState().player!;
+      expect(after.stamina).toBe(before.stamina);
+      expect(after.hp).toBe(before.hp);
+      const logs = store.getState().gameLog.map((e) => e.text).join('\n');
+      expect(logs).toMatch(/Not without rope/);
+    });
+
+    it('with plain Climbing Rope: climb succeeds, 2 stamina spent', async () => {
+      const store = await setupClimber('Climbing Rope');
+      const before = store.getState().player!.stamina;
+      store.getState().submitPlayerAction('climb wall');
+      const after = store.getState().player!.stamina;
+      expect(after).toBe(before - 2);
+    });
+
+    it("with Reclaimer's Rope: climb succeeds, 1 stamina spent (half cost)", async () => {
+      const store = await setupClimber("Reclaimer's Rope");
+      const before = store.getState().player!.stamina;
+      store.getState().submitPlayerAction('climb wall');
+      const after = store.getState().player!.stamina;
+      expect(after).toBe(before - 1);
+    });
+  });
+
+  describe('stamina-depletion fall', () => {
+    it('plain rope, stamina < 2: player falls, loses 20% max HP, elevation cleared', async () => {
+      const store = await setupClimber('Climbing Rope', {
+        hp: 30, hpMax: 30, stamina: 1, staminaMax: 10,
+      });
+      // Pre-set elevatedOn so we can verify it clears on fall.
+      store.setState({
+        currentScene: { ...store.getState().currentScene!, elevatedOn: { noun: 'wall', tier: 1, totalTiers: 2 } },
+      });
+      store.getState().submitPlayerAction('climb wall');
+      const after = store.getState().player!;
+      // 20% of 30 HP = 6 damage
+      expect(after.hp).toBe(30 - 6);
+      expect(store.getState().currentScene?.elevatedOn).toBeNull();
+      const logs = store.getState().gameLog.map((e) => e.text).join('\n');
+      expect(logs).toMatch(/YOU FALL/);
+    });
+
+    it("Reclaimer's Rope, stamina < 1: still falls (no rope removes physics)", async () => {
+      const store = await setupClimber("Reclaimer's Rope", {
+        hp: 50, hpMax: 50, stamina: 0, staminaMax: 10,
+      });
+      store.getState().submitPlayerAction('climb wall');
+      const after = store.getState().player!;
+      // 20% of 50 HP = 10 damage
+      expect(after.hp).toBe(50 - 10);
+    });
+
+    it('fall damage floors at 1 even on a low-HP-max character', async () => {
+      const store = await setupClimber('Climbing Rope', {
+        hp: 3, hpMax: 3, stamina: 0, staminaMax: 10,
+      });
+      store.getState().submitPlayerAction('climb wall');
+      const after = store.getState().player!;
+      // 20% of 3 = 0.6 -> floor at 1, so HP = 3 - 1 = 2
+      expect(after.hp).toBe(2);
+    });
+  });
+
+  describe('rest gating while elevated', () => {
+    it('plain Climbing Rope: rest is refused while elevated', async () => {
+      const store = await setupClimber('Climbing Rope', {
+        hp: 10, hpMax: 30, stamina: 0, staminaMax: 10,
+      });
+      // Make the player elevated.
+      store.setState({
+        currentScene: { ...store.getState().currentScene!, elevatedOn: { noun: 'wall', tier: 1, totalTiers: 2 } },
+      });
+      const before = store.getState().player!;
+      store.getState().submitPlayerAction('rest');
+      const after = store.getState().player!;
+      // Rest should have been refused — no HP/stamina change.
+      expect(after.hp).toBe(before.hp);
+      expect(after.stamina).toBe(before.stamina);
+      const logs = store.getState().gameLog.map((e) => e.text).join('\n');
+      expect(logs).toMatch(/can't sleep on a wall/i);
+    });
+
+    it("Reclaimer's Rope: rest works while elevated", async () => {
+      const store = await setupClimber("Reclaimer's Rope", {
+        hp: 10, hpMax: 30, stamina: 0, staminaMax: 10,
+      });
+      store.setState({
+        currentScene: { ...store.getState().currentScene!, elevatedOn: { noun: 'wall', tier: 1, totalTiers: 2 } },
+      });
+      store.getState().submitPlayerAction('rest');
+      const after = store.getState().player!;
+      // 8h rest: heal min(20, 16) = 16 HP, gain min(10, 8) = 8 stamina
+      expect(after.hp).toBeGreaterThan(10);
+      expect(after.stamina).toBeGreaterThan(0);
+    });
+  });
+});

@@ -1,0 +1,421 @@
+{
+  "description": "v2.4.1 (OTA 031) — per-faction overrides for the shared hub-room layout in static_hub.json. Same room ids, same exits, same anchorNpcs (faction-neutral characters who serve all comers); only `name`, `shortName`, and `description` vary per faction. Lookup via hubRoomFor(roomId, factionId) in hub.ts — falls back to the base static_hub.json entry when a faction has no override for the given room. Only the 10 outpost rooms are covered; the 5 buried-level rooms (Landings, Storage, Pumps, Shallow Digs) stay generic.",
+  "factions": {
+    "forgotten_order": {
+      "outpost_gate": {
+        "name": "The Threshold",
+        "shortName": "Threshold",
+        "description": "A vestibule of vault-stone and silent bookshelves. The Order brother at the desk marks your name in a ledger he will not show you."
+      },
+      "outpost_central": {
+        "name": "The Sanctum Hall",
+        "shortName": "Sanctum",
+        "description": "A vaulted study under a single hanging Aetheric chandelier. A reading lectern at the center holds an open atlas, the Cradle of Dusk marked in three competing scholars' hands."
+      },
+      "outpost_armory": {
+        "name": "The Reliquary Armory",
+        "shortName": "Armory",
+        "description": "A locked vault of restored pre-flood weapons, each tagged with provenance. Irma keeps the older steel oiled and the Aether-touched blades behind silk drape."
+      },
+      "outpost_messhall": {
+        "name": "The Refectory",
+        "shortName": "Refectory",
+        "description": "Stone benches under reading-lamps. The kitchen serves whatever the Cloister's gardens grew that week; Halem keeps the table conversation thin and the bread thick."
+      },
+      "outpost_workshop": {
+        "name": "The Vellum Workshop",
+        "shortName": "Workshop",
+        "description": "Lecterns and copying-desks where the Order's scribes restore pre-flood texts. Tarek doubles as the binder; his hands are stained with ink and Aether-resin."
+      },
+      "outpost_quarters": {
+        "name": "The Scriptorium Dormitory",
+        "shortName": "Cells",
+        "description": "Narrow cells off a shared corridor, each with a desk and a candle. The Order sleeps in shifts so the reading-rooms are never empty."
+      },
+      "outpost_lab": {
+        "name": "The High Reading Room",
+        "shortName": "Reading",
+        "description": "Where the Order's senior scholars work. Glass cabinets of pre-flood manuscripts, an Aether-stabilized desk, and Jorah at the heart of it with a footnote in hand."
+      },
+      "outpost_relic_vault": {
+        "name": "The Sealed Archive",
+        "shortName": "Archive",
+        "description": "Mechanical locks behind a sigil-marked door. The Order's most sensitive recovered texts wait inside, untranslated by deliberate policy."
+      },
+      "outpost_chapel": {
+        "name": "The Reading Cell",
+        "shortName": "Cell",
+        "description": "A small room with a single bench, a single book, and a single Aether-lamp. The Order's scholars come here when a passage needs to be argued with in silence."
+      },
+      "outpost_culvert_descent": {
+        "name": "The Archive Descent",
+        "shortName": "Descent",
+        "description": "Stone stairs to the deeper archive levels. The Order's oldest texts live below; the air is dry by Aetheric design and the light is rationed."
+      }
+    },
+    "mud_monarchs": {
+      "outpost_gate": {
+        "name": "The Antechamber",
+        "shortName": "Antechamber",
+        "description": "Polished mud-glass tiles and a carved Monarch sigil over the doorway. The seneschal nods you through without speaking — your business has already been logged elsewhere."
+      },
+      "outpost_central": {
+        "name": "The Court of Standards",
+        "shortName": "Court",
+        "description": "A flagstone court ringed with the standards of every Lost Capital. A Monarch banner hangs over the central plinth where a cracked map-stone has been re-carved twice."
+      },
+      "outpost_armory": {
+        "name": "The Court Arsenal",
+        "shortName": "Arsenal",
+        "description": "Display racks of dress-blades over working weapons of dynastic make. Irma serves the Monarchs in steel as much as in silver; she does not ask what's about to be used."
+      },
+      "outpost_messhall": {
+        "name": "The Banquet Floor",
+        "shortName": "Banquet",
+        "description": "A long table laid with mismatched silver — half pre-flood, half common. Halem serves what the Monarchs allow themselves; the kitchen is always five courses behind the proper ones."
+      },
+      "outpost_workshop": {
+        "name": "The Cabinet Workshop",
+        "shortName": "Workshop",
+        "description": "An immaculate room of polished tools and dynastic technicians. Tarek serves the Monarchs as their relic-repairer — the older the artifact, the higher up the request came from."
+      },
+      "outpost_quarters": {
+        "name": "The Retainers' Quarters",
+        "shortName": "Retainers",
+        "description": "Curtained alcoves with dynastic seals over each cot. A spare bunk in the corner is set aside for any Monarch agent who needs ground for the night."
+      },
+      "outpost_lab": {
+        "name": "The Cabinet of Curiosities",
+        "shortName": "Cabinet",
+        "description": "The Monarchs' private collection of suppressed Tartarian artifacts. Jorah catalogs each piece for the family that owns it; nothing leaves these shelves."
+      },
+      "outpost_relic_vault": {
+        "name": "The Royal Strongroom",
+        "shortName": "Strongroom",
+        "description": "A vault behind two heavy doors, both keyed to the Monarchs' inner circle. The shelves hold what the family wants the world to never see again."
+      },
+      "outpost_chapel": {
+        "name": "The Family Chapel",
+        "shortName": "Chapel",
+        "description": "A small room with portraits of dead Monarchs and a single lit candle. Family business is conducted here when nothing else is appropriate."
+      },
+      "outpost_culvert_descent": {
+        "name": "The Sub-Court Descent",
+        "shortName": "Descent",
+        "description": "Polished mud-glass stairs to the family's private levels. Only Monarchs and their named retainers descend; the door at the bottom is keyed to dynastic blood."
+      }
+    },
+    "true_tartarians": {
+      "outpost_gate": {
+        "name": "The Threshold Stair",
+        "shortName": "Threshold",
+        "description": "A stair carved from a single block of Aether-bonded mud-stone, worn smooth by generations of bare feet. The Catacomb keeper bows you in without a word."
+      },
+      "outpost_central": {
+        "name": "The Memorial Hall",
+        "shortName": "Memorial",
+        "description": "An echoing chamber of bone-shelf alcoves and quiet Aether-lamps. A map-stone of the True Tartarian tunnels sits at the center, etched by hands the keepers still remember by name."
+      },
+      "outpost_armory": {
+        "name": "The Forge Shrine",
+        "shortName": "Forge",
+        "description": "An anvil shaped like a kneeling Tartarian. Irma works only with traditional methods — no Aether-shortcuts, every blade smelted from temple-stone ore."
+      },
+      "outpost_messhall": {
+        "name": "The Common Hearth",
+        "shortName": "Hearth",
+        "description": "A low circle of mud-stone benches around a central firepit. Halem stews bog-fish and root-mash the way True Tartarians have for centuries — no metal pots, only fired clay."
+      },
+      "outpost_workshop": {
+        "name": "The Ancestor Workshop",
+        "shortName": "Workshop",
+        "description": "Where True Tartarians coax old Aether-glyphs back to wakefulness. Tarek hums to each piece as he works; the hum, he insists, is half the calibration."
+      },
+      "outpost_quarters": {
+        "name": "The Ancestor Bunks",
+        "shortName": "Bunks",
+        "description": "Stone shelf-bunks cut into the wall — the same kind the Entombed once slept in. A clay basin of water sits by every bunk for ritual washing."
+      },
+      "outpost_lab": {
+        "name": "The Glyph Chamber",
+        "shortName": "Glyphs",
+        "description": "A room of Aetheric mud-glass tablets propped on stone easels. Jorah translates the older glyphs in candlelight — the Aether is what reads the text, not her eyes."
+      },
+      "outpost_relic_vault": {
+        "name": "The Ancestor Crypt",
+        "shortName": "Crypt",
+        "description": "A reverent chamber of relics in clay seals, each tagged with the name of the Tartarian who first carried it. Entry requires a True Tartarian's blessing."
+      },
+      "outpost_chapel": {
+        "name": "The Ancestor Chapel",
+        "shortName": "Chapel",
+        "description": "A room of clay urns and quiet Aether-light. Tartarians come here to speak with their Entombed; nobody asks what answers come back."
+      },
+      "outpost_culvert_descent": {
+        "name": "The Catacomb Descent",
+        "shortName": "Descent",
+        "description": "Worn stone stairs into the True Tartarian Catacombs themselves. Each step has been touched by a thousand bare feet; the air below smells of mud-glass and ancestor."
+      }
+    },
+    "eternal_dynasty": {
+      "outpost_gate": {
+        "name": "The Crown Gate",
+        "shortName": "Crown Gate",
+        "description": "Twin standards of the lost line flank the doorway, banners dust-grayed but unbroken. The herald nods to your bloodline before your face."
+      },
+      "outpost_central": {
+        "name": "The Throne Promenade",
+        "shortName": "Promenade",
+        "description": "A long colonnaded hall under a vaulted Aetheric ceiling. The map-stone at its heart shows the empire as it WAS — every district, every spire, every capital still standing."
+      },
+      "outpost_armory": {
+        "name": "The Heir's Armory",
+        "shortName": "Armory",
+        "description": "Standards lean against racks of family blades. Irma's hammer is older than the dynasty itself; she sharpens what no merchant would dare offer to royal hands."
+      },
+      "outpost_messhall": {
+        "name": "The Imperial Hall",
+        "shortName": "Imperial",
+        "description": "A long table laid with twelve covers for one diner. Halem still serves to dynastic protocol; the empty chairs are a discipline, not a sadness."
+      },
+      "outpost_workshop": {
+        "name": "The Heir's Workshop",
+        "shortName": "Workshop",
+        "description": "Restoration benches under crystal lamps. Tarek is a third-generation court tinkerer; he rebuilds dynasty-marked weapons to original tolerance."
+      },
+      "outpost_quarters": {
+        "name": "The Royal Quarters",
+        "shortName": "Royal",
+        "description": "Curtained beds with embroidered dynastic standards. Even the empty bunks are made up; the Dynasty maintains the appearance of fullness as a discipline."
+      },
+      "outpost_lab": {
+        "name": "The Library of the Line",
+        "shortName": "Library",
+        "description": "Dynasty genealogies on Aether-preserved scrolls, lineage walls, restored coronation records. Jorah trace-checks every claim of blood that walks through the door."
+      },
+      "outpost_relic_vault": {
+        "name": "The Imperial Vault",
+        "shortName": "Vault",
+        "description": "The dynasty's confiscated treasures, returned to their proper case. The lock is mechanical and the key is hereditary."
+      },
+      "outpost_chapel": {
+        "name": "The Coronation Chamber",
+        "shortName": "Chamber",
+        "description": "A small room reserved for the dynasty's private rites. The throne in the corner is a working chair, not a relic; it is sat in only by those of the line."
+      },
+      "outpost_culvert_descent": {
+        "name": "The Crypt Stair",
+        "shortName": "Crypt Stair",
+        "description": "Carved stairs to the dynasty's lower chambers — burial vaults, archive crypts, the council room of the empty thrones."
+      }
+    },
+    "conspiracy_architects": {
+      "outpost_gate": {
+        "name": "The Reception",
+        "shortName": "Reception",
+        "description": "A clerical office with filing cabinets and a coffee maker. The man at the desk doesn't look up from his paper — your visit is not officially happening."
+      },
+      "outpost_central": {
+        "name": "The Operations Room",
+        "shortName": "Operations",
+        "description": "A windowless conference room with whiteboards along every wall. The wall map shows every Tartarian site flagged with a colored pin and a status code only the senior partners read."
+      },
+      "outpost_armory": {
+        "name": "The Secured Storage",
+        "shortName": "Storage",
+        "description": "Concealed-carry holsters, suppressed bolt-casters, and a small but immaculate Tartarian relic in a glass case 'for reference.' Irma signs each piece out as 'recovered property.'"
+      },
+      "outpost_messhall": {
+        "name": "The Break Room",
+        "shortName": "Break",
+        "description": "A drop-ceiling room with a microwave, a coffee maker, and a kettle. Halem keeps the small talk small; the gossip that matters happens elsewhere."
+      },
+      "outpost_workshop": {
+        "name": "The Lab",
+        "shortName": "Lab",
+        "description": "A clean-room behind a key-card door. Tarek tunes surveillance Aether-relays and the occasional 'recovery-aid' device that the surface press will never see."
+      },
+      "outpost_quarters": {
+        "name": "The Safehouse Bunks",
+        "shortName": "Safehouse",
+        "description": "A row of identical bunks under fluorescent strip-lights. Each has a small lockbox bolted to the wall. Names are not used here."
+      },
+      "outpost_lab": {
+        "name": "The Document Room",
+        "shortName": "Documents",
+        "description": "A windowless office of filing cabinets and one terminal. Jorah maintains the Architects' counter-narrative: which Tartaria evidence to suppress, which to discredit, which to ignore."
+      },
+      "outpost_relic_vault": {
+        "name": "The Evidence Vault",
+        "shortName": "Evidence",
+        "description": "A secure room of catalogued Tartarian artifacts the Architects will spend a generation explaining away. The inventory is on paper; nothing about this room is digital."
+      },
+      "outpost_chapel": {
+        "name": "The Quiet Office",
+        "shortName": "Office",
+        "description": "A small office with a single chair and a single window with the blinds drawn. The Architects come here when a decision is too messy to make in committee."
+      },
+      "outpost_culvert_descent": {
+        "name": "The Sublevel Access",
+        "shortName": "Sublevel",
+        "description": "An unmarked stairwell behind a key-card door. The lower floors hold the Architects' operational records — anything sensitive enough to never be filed by name."
+      }
+    },
+    "servants_of_giants": {
+      "outpost_gate": {
+        "name": "The Vigil Door",
+        "shortName": "Vigil",
+        "description": "A stone arch wreathed in chains and lit by a single Giant-burnished lantern. The keeper inclines their head as you pass; speech is for the inner halls."
+      },
+      "outpost_central": {
+        "name": "The Tomb-Lit Court",
+        "shortName": "Court",
+        "description": "A round chamber lit only by tomb-lanterns, each named after a sleeping Giant. The map-stone in the middle marks where the Giants lie."
+      },
+      "outpost_armory": {
+        "name": "The Vigil Forge",
+        "shortName": "Forge",
+        "description": "Hammers and blades sized for a Giant's grip, smaller pieces for the rest of us. Irma sharpens what the Giants once carried; her own grandfather served them in the same forge."
+      },
+      "outpost_messhall": {
+        "name": "The Vigil Refectory",
+        "shortName": "Refectory",
+        "description": "Twelve narrow tables, twelve narrow benches. Halem cooks plain because the Servants eat plain; the meal is the prayer."
+      },
+      "outpost_workshop": {
+        "name": "The Vigil Workshop",
+        "shortName": "Workshop",
+        "description": "Tarek keeps the Giant-tomb torches lit and the Aether-pumps inside them serviced. Most of what he repairs has been working for a thousand years already."
+      },
+      "outpost_quarters": {
+        "name": "The Vigil Cells",
+        "shortName": "Cells",
+        "description": "Narrow cells lit by single tomb-lanterns. The Servants sleep facing east, toward the Vault, even in death."
+      },
+      "outpost_lab": {
+        "name": "The Tomb Records",
+        "shortName": "Records",
+        "description": "Giant-burial registers on stone tablets. Jorah keeps the count of which Giants sleep where, which have been desecrated, and which yet might be woken — the last list is in code."
+      },
+      "outpost_relic_vault": {
+        "name": "The Reliquary of the Sleepers",
+        "shortName": "Reliquary",
+        "description": "Smaller artifacts from the Giants' burial — a ring, a tooth-pendant, the spike of a broken Giant-blade. Each is wrapped in lichen-silk and named by its keeper."
+      },
+      "outpost_chapel": {
+        "name": "The Vigil Chamber",
+        "shortName": "Vigil",
+        "description": "A meditation room facing the Vault. The Servants come here to keep the silent watch — eight hours, no speaking, no light but the tomb-lantern."
+      },
+      "outpost_culvert_descent": {
+        "name": "The Vault Descent",
+        "shortName": "Descent",
+        "description": "Stairs to the lower vigil-cells. The Servants who sit the deepest watch live below; you do not interrupt their silence without permission."
+      }
+    },
+    "stone_builders": {
+      "outpost_gate": {
+        "name": "The Tool Threshold",
+        "shortName": "Threshold",
+        "description": "An open shop entry with a chalkboard for jobs taken and a rack of clean Aethercraft instruments. The foreman waves you to the slate without looking up."
+      },
+      "outpost_central": {
+        "name": "The Plan Floor",
+        "shortName": "Plans",
+        "description": "A workshop floor of laid blueprints and stacked stone. The center stone has the Buried Cities' load-bearing tunnels chalked across it in three layers."
+      },
+      "outpost_armory": {
+        "name": "The Aethercraft Smithy",
+        "shortName": "Smithy",
+        "description": "Anvils on Aetheric isolators. Irma builds — she does not break. Each weapon she sets out is also a tool: a chisel that cuts mud-glass, a maul that lifts stone."
+      },
+      "outpost_messhall": {
+        "name": "The Mess Bench",
+        "shortName": "Bench",
+        "description": "A workshop break-room with iron-leg tables and tin plates. Halem feeds whoever can hold a tool; the food is hot, plenty, and gone in an hour."
+      },
+      "outpost_workshop": {
+        "name": "The Construction Hall",
+        "shortName": "Hall",
+        "description": "Tarek's home turf. Half-assembled Aethercraft engines, drone chassis, mud-glass casting molds — the Builders' real art happens at this bench."
+      },
+      "outpost_quarters": {
+        "name": "The Crew Bunks",
+        "shortName": "Crew",
+        "description": "Sturdy bunks with tool-racks at the foot of each. Sawdust on the floor. The Builders sleep when the day's set work is mortared."
+      },
+      "outpost_lab": {
+        "name": "The Drafting Office",
+        "shortName": "Drafting",
+        "description": "Plan-tables, slide-rules, and an Aethercraft compendium that fills two walls. Jorah is the senior planner; everything the Builders raise begins on her board."
+      },
+      "outpost_relic_vault": {
+        "name": "The Materials Vault",
+        "shortName": "Materials",
+        "description": "Aether-shielded shelves of un-cast components, rare alloys, and a few prototype Aethercraft cores. Tagged by project, ready for assembly."
+      },
+      "outpost_chapel": {
+        "name": "The Plan Room",
+        "shortName": "Plans",
+        "description": "A room with one drafting table and a single Aether-lamp. The Builders sit here when a structural problem refuses to yield on the workshop floor."
+      },
+      "outpost_culvert_descent": {
+        "name": "The Foundation Descent",
+        "shortName": "Foundation",
+        "description": "Stairs to the structural cellars — load-bearing test pieces, the older Aethercraft cores still in service, the foundry pits."
+      }
+    },
+    "tartarian_revivalists": {
+      "outpost_gate": {
+        "name": "The Stand-Down",
+        "shortName": "Stand-Down",
+        "description": "A wooden door under a hand-painted Tartarian flag, the symbol still wet. The cell coordinator marks your face against a photograph and lets you in."
+      },
+      "outpost_central": {
+        "name": "The Rally Hall",
+        "shortName": "Rally",
+        "description": "A makeshift assembly room hung with mismatched Tartarian banners. The map at the center has every dig site marked with a date the Revivalists hope to publicize."
+      },
+      "outpost_armory": {
+        "name": "The Cell Cache",
+        "shortName": "Cache",
+        "description": "Wrapped weapons in oil-cloth ready for the next field dig. Irma asks no questions; if you're in this room, you're already on the list."
+      },
+      "outpost_messhall": {
+        "name": "The Cell Mess",
+        "shortName": "Mess",
+        "description": "A folding-table common room hung with hand-printed flyers. Halem serves coffee in mismatched mugs and stew from a campaign pot — the food of a movement that hasn't won yet."
+      },
+      "outpost_workshop": {
+        "name": "The Field Shop",
+        "shortName": "Field Shop",
+        "description": "Tools laid out for the next public dig. Tarek rebuilds donated equipment overnight so the cells can hand a working drone to a documentary crew at dawn."
+      },
+      "outpost_quarters": {
+        "name": "The Crash Room",
+        "shortName": "Crash",
+        "description": "Mismatched mattresses on the floor, a curtain for privacy that nobody really uses. Cells sleep where they can; the work doesn't wait."
+      },
+      "outpost_lab": {
+        "name": "The Evidence Room",
+        "shortName": "Evidence",
+        "description": "Stacked field-journals, photographs, recovered Tartarian fragments under glass. Jorah maintains the case files the Cell will publish when the world is ready to listen."
+      },
+      "outpost_relic_vault": {
+        "name": "The Field Vault",
+        "shortName": "Vault",
+        "description": "Recovered artifacts waiting to be exhibited. Each crate is dated and stamped with a publication target — when the Cell believes the public is ready to see the contents."
+      },
+      "outpost_chapel": {
+        "name": "The Cell Sanctum",
+        "shortName": "Sanctum",
+        "description": "A small room with a few folding chairs and a portrait of the founder. The Revivalists come here when the doubt is heavy and the cause is far."
+      },
+      "outpost_culvert_descent": {
+        "name": "The Storage Descent",
+        "shortName": "Descent",
+        "description": "Stairs to the cell's storage levels — film archives, banner stocks, the equipment the Revivalists keep ready for the next public action."
+      }
+    }
+  }
+}

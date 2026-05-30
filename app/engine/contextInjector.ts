@@ -1,0 +1,371 @@
+import type {
+  PlayerCharacter,
+  PlayerEquipped,
+  InventoryItem,
+  GameLogEntry,
+  Location,
+  Enemy,
+  Hazard,
+  WeatherEntry,
+  StatusEffect,
+} from './types';
+import type { ChatMessage } from '../ai/generation/QwenGenerativeEngine';
+import type { MacroLocation, MicroLocation, MicroMicroLocation } from './worldLadder';
+import { describeTraits } from './enemyTraits';
+
+/**
+ * The strict, comma-light fact sheet that gets injected into the Qwen
+ * system prompt every turn. The TDD §3.2 protocol: the engine declares the
+ * world's physical facts, the model only narrates them.
+ *
+ * Every field is a flat string so the prompt template can interpolate
+ * deterministically. Anything not represented here is invisible to the LLM —
+ * including the lore book, faction politics, and quest state. Those are the
+ * narrator's job to remember, not the model's.
+ */
+export interface LlmContext {
+  current_biome: string;
+  room_name: string;
+  environmental_description: string;
+  available_exits: string;
+  active_entities: string;
+  player_stats: string;
+  full_inventory: string;
+  recent_history: string;
+  /** True when at least one hostile entity is present. Drives a tighter
+   *  combat-focused instruction in buildSystemPrompt — the small Qwen
+   *  model has been observed to take "describe the room" too literally
+   *  mid-fight and write atmospheric tour-guide prose instead of
+   *  narrating the action. */
+  in_combat: boolean;
+}
+
+/** What buildLlmContext needs from the store. Explicit deps, no store import. */
+export interface ContextInputs {
+  player: PlayerCharacter | null;
+  scene: SceneSlice | null;
+  gameLog: readonly GameLogEntry[];
+  /** Optional world-ladder chunk the player is currently in. When supplied,
+   *  room_name / environmental_description / available_exits come from the
+   *  Micro-Micro node instead of the top-level Location. The biome name
+   *  comes from the Macro. */
+  ladder?: { macro: MacroLocation; micro: MicroLocation; microMicro: MicroMicroLocation } | null;
+}
+
+export interface SceneSlice {
+  location: Location;
+  weather: WeatherEntry;
+  hazard: Hazard | null;
+  enemies: readonly Enemy[];
+  enemyHps: readonly number[];
+  vendor?: { name?: string; affiliation?: string } | null;
+}
+
+// ---------------------------------------------------------------------------
+// Top-level builder
+// ---------------------------------------------------------------------------
+
+const UNKNOWN_BIOME = 'The Wastes';
+const UNKNOWN_ROOM = 'an unmarked stretch of ground';
+const NO_ENTITIES = 'None.';
+
+export function buildLlmContext(input: ContextInputs): LlmContext {
+  const { player, scene, gameLog, ladder } = input;
+  const room_name = ladder
+    ? ladder.microMicro.name
+    : scene?.location?.name ?? UNKNOWN_ROOM;
+  const current_biome = ladder
+    ? ladder.macro.name
+    : deriveBiome(scene?.location);
+  const environmental_description = ladder
+    ? buildLadderEnvironment(ladder, scene)
+    : deriveEnvironment(scene);
+  const available_exits = ladder && ladder.microMicro.exits.length > 0
+    ? ladder.microMicro.exits.join(', ')
+    : deriveExits(scene);
+  return {
+    current_biome,
+    room_name,
+    environmental_description,
+    available_exits,
+    active_entities: formatActiveEntities(scene),
+    player_stats: formatPlayerStats(player),
+    full_inventory: stringifyInventory(player?.inventory ?? [], player?.equipped, player?.tc ?? 0),
+    recent_history: formatRecentHistory(gameLog),
+    in_combat: (scene?.enemies?.length ?? 0) > 0,
+  };
+}
+
+function buildLadderEnvironment(
+  ladder: NonNullable<ContextInputs['ladder']>,
+  scene: SceneSlice | null,
+): string {
+  const parts: string[] = [ladder.microMicro.environmental_description.trim()];
+  if (scene?.weather?.name) {
+    parts.push(`Weather: ${scene.weather.name}${scene.weather.description ? ' — ' + scene.weather.description : ''}`);
+  }
+  if (scene?.hazard) {
+    parts.push(`Hazard: ${scene.hazard.name} — ${scene.hazard.description}`);
+  }
+  return parts.join(' ').trim();
+}
+
+/**
+ * Renders the TDD §3.3 system+user pair as a Qwen-friendly chat message
+ * array. The model gets a stable system role with all facts, then a tiny
+ * user role that just says "narrate" — most chat-tuned models behave better
+ * with a non-empty user turn than with a system-only prompt.
+ */
+// Two final instructions — one for peaceful turns ("describe the room") and
+// one for active combat ("DO NOT describe the room"). Qwen 0.5B is small
+// enough that whichever instruction is loudest is what it follows; observed
+// behavior was atmospheric tour-guide prose mid-knife-fight when the peaceful
+// instruction fired during combat (the player took a bite of trail rations
+// while a Scrap Drone was attacking, the chatter check fired, and Qwen wrote
+// a sky description). The combat variant is shorter, more verb-heavy, and
+// explicitly forbids room description so the model lands on the action.
+// Hard rules every instruction shares. Voice + anti-hallucination guardrails
+// pulled out so the combat and peaceful prompts can't diverge on them.
+// Specifically reacting to Qwen 0.5B's observed failure modes:
+//   - "The player, driven by rage..." → third person + invented emotion
+//   - "triggered the Tartarian Trap, energy lance strikes began..." →
+//     hallucinated events that never happened
+//   - Mid-sentence trailing cutoffs
+const VOICE_RULES =
+  "**SECOND PERSON ONLY.** Every sentence MUST address the player as " +
+  "'you' / 'your'. NEVER write 'The player', NEVER write 'they', " +
+  "NEVER write 'the adventurer', 'the figure', 'the explorer', or any " +
+  'third-person stand-in for the player. Sentences must START with ' +
+  '"You" or "Your" or with a direct action verb in second person. ' +
+  'If a draft sentence begins with "The player" or "They", rewrite it. ' +
+  'Do not invent emotions, motivations, traps, mechanics, events, or ' +
+  'outcomes that are not listed in the SYSTEM FACTS above. Only narrate ' +
+  "the player's last action and the static facts already present. " +
+  'DO NOT name any location, room, weather, or NPC that is not in the ' +
+  'SYSTEM FACTS — no "Aetherstone Deep", no "Grand Hall", no "Ash Storm", ' +
+  'no sarcophagi or vaulted ceilings unless they appear in Environment. ' +
+  'If you would have to invent scenery to fill a sentence, end early. ' +
+  'AVAILABLE PLAYER ACTIONS the engine resolves mechanically: attack, ' +
+  'brawl, throw, dodge, block, advance, retreat / step back, flee / escape, ' +
+  'aim, fire, reload, take cover, dash / sprint, disengage, help, ready, ' +
+  'climb, swim, jump, hide / sneak, search / look, equip / unequip, use ' +
+  '(relic / item / torch / locket), dig, craft, steal, gift, ask, rest. ' +
+  'Aetheric verbs: cast, channel, weave, incant. Use these vocabulary ' +
+  'choices in narration so the player learns the system. ' +
+  'End on a complete sentence.';
+
+const PEACEFUL_INSTRUCTION =
+  'Narrate the situation in a grim, atmospheric tone. Acknowledge the ' +
+  'last action and weave the AVAILABLE EXITS naturally into your ' +
+  'description so the player learns the map as they move. You may ' +
+  'subtly reference equipped or carried items if they fit the moment. ' +
+  'Keep it to TWO short sentences — about 35 words. ' +
+  VOICE_RULES;
+
+const COMBAT_INSTRUCTION =
+  'The player is in ACTIVE COMBAT. Narrate the tension of the last ' +
+  'action against the entities listed above. Brief, violent, grim — ' +
+  'ONE short sentence, no more than 20 words. DO NOT describe the room ' +
+  'or its scenery; the player has no time for atmosphere. Reference ' +
+  'inventory items only if they are the weapon being used. ' +
+  VOICE_RULES;
+
+export function buildSystemPrompt(ctx: LlmContext): ChatMessage[] {
+  const instruction = ctx.in_combat ? COMBAT_INSTRUCTION : PEACEFUL_INSTRUCTION;
+  // Strict location anchor — playtest log: Qwen narrated "The Borderlands,
+  // a twisted shadowy landscape..." while the player was in Tartarian
+  // Outskirts. The model needs an explicit "this is the only place that
+  // exists" instruction or it pulls names from training data.
+  const locationName = ctx.room_name;
+  const system = [
+    'You are the Arbiter, the ancient narrator of Tartaria.',
+    `[SYSTEM FACTS - DO NOT INVENT EXITS, ENEMIES, OR PLACE NAMES]`,
+    `Location: ${ctx.current_biome} - ${ctx.room_name}`,
+    `**The player is at "${locationName}". If you name any place, it MUST be "${locationName}". NEVER name "Borderlands", "Aetheric Deep", "Grand Hall", or any other location not listed.**`,
+    `Environment: ${ctx.environmental_description}`,
+    `Exits: ${ctx.available_exits}`,
+    `Entities Present: ${ctx.active_entities}`,
+    '',
+    '[PLAYER STATE]',
+    `Stats: ${ctx.player_stats}`,
+    `Inventory & Equipment: ${ctx.full_inventory}`,
+    `Player's Last Action: ${ctx.recent_history}`,
+    '',
+    instruction,
+  ].join('\n');
+  return [
+    { role: 'system', content: system },
+    { role: 'user', content: 'Continue.' },
+  ];
+}
+
+// ---------------------------------------------------------------------------
+// Field extractors
+// ---------------------------------------------------------------------------
+
+function deriveBiome(location: Location | undefined): string {
+  if (!location) return UNKNOWN_BIOME;
+  // First lore-canonical tag wins; falls back to the location type.
+  const biomeTag = location.tags?.find((t) =>
+    /buried|mud|aether|tartary|underground|surface|ruin|spire|tower/i.test(t),
+  );
+  if (biomeTag) return capitalizeWords(biomeTag.replace(/_/g, ' '));
+  return capitalizeWords(location.type?.replace(/_/g, ' ') ?? UNKNOWN_BIOME);
+}
+
+function deriveEnvironment(scene: SceneSlice | null): string {
+  if (!scene) return 'A featureless waste, dim and still.';
+  const parts: string[] = [];
+  if (scene.location?.description) parts.push(scene.location.description.trim());
+  if (scene.weather?.name) {
+    const w = scene.weather;
+    parts.push(`Weather: ${w.name}${w.description ? ' — ' + w.description : ''}`);
+  }
+  if (scene.hazard) {
+    parts.push(`Hazard: ${scene.hazard.name} — ${scene.hazard.description}`);
+  }
+  return parts.join(' ').trim() || 'A featureless waste, dim and still.';
+}
+
+function deriveExits(scene: SceneSlice | null): string {
+  // For now the engine guarantees cardinal traversal everywhere; named exits
+  // come in Phase 4 when the world ladder lands. We always advertise the four
+  // cardinals so the LLM can mention them.
+  if (!scene) return 'none — you are stranded';
+  return 'north, east, south, west';
+}
+
+export function formatActiveEntities(scene: SceneSlice | null): string {
+  if (!scene) return NO_ENTITIES;
+  const parts: string[] = [];
+  if (scene.enemies && scene.enemies.length > 0) {
+    const entries = scene.enemies.map((enemy, idx) => {
+      const hp = scene.enemyHps?.[idx];
+      const hpFrag = typeof hp === 'number' && hp < enemy.hp ? ` (${hp}/${enemy.hp} HP)` : '';
+      // Surface enemy perks to the LLM so narration can reference them
+      // accurately ("the armored Mud Tortoise shrugs off your strike").
+      // Bracket-delimited so Qwen treats them as metadata, not flowing prose.
+      const traitsFrag = enemy.traits && enemy.traits.length > 0
+        ? ` [${describeTraits(enemy.traits)}]`
+        : '';
+      return `${enemy.name}${hpFrag}${traitsFrag}`;
+    });
+    parts.push(entries.join(', '));
+  }
+  if (scene.vendor?.name) {
+    const aff = scene.vendor.affiliation ? ` of the ${scene.vendor.affiliation}` : '';
+    parts.push(`${scene.vendor.name}${aff} (vendor)`);
+  }
+  return parts.length === 0 ? NO_ENTITIES : parts.join('; ');
+}
+
+export function formatPlayerStats(player: PlayerCharacter | null): string {
+  if (!player) return 'Unknown.';
+  const parts: string[] = [];
+  parts.push(`HP ${player.hp}/${player.hpMax}`);
+  parts.push(`Stamina ${player.stamina}/${player.staminaMax}`);
+  parts.push(`AC ${player.ac}`);
+  if (typeof player.corruption === 'number' && player.corruption > 0) {
+    parts.push(`Corruption ${player.corruption}`);
+  }
+  const effects = formatStatusEffects(player.statusEffects);
+  if (effects) parts.push(effects);
+  return parts.join(', ');
+}
+
+function formatStatusEffects(effects: StatusEffect[] | undefined): string {
+  if (!effects || effects.length === 0) return '';
+  const labels = effects.map((e) => e.label ?? prettyEffect(e.kind));
+  return labels.join(' & ') + ' active';
+}
+
+function prettyEffect(kind: string): string {
+  switch (kind) {
+    case 'bleed': return 'Bleeding';
+    case 'stun': return 'Stunned';
+    case 'burn_scar': return 'Burn-scarred';
+    case 'armor_severed': return 'Armor-severed';
+    case 'paralyzed': return 'Paralyzed';
+    case 'poisoned': return 'Poisoned';
+    case 'dodging': return 'Dodging';
+    case 'blocking': return 'Blocking';
+    default: return capitalizeWords(kind.replace(/_/g, ' '));
+  }
+}
+
+/**
+ * Compact inventory string. Items with quantity > 1 get "(xN)" suffixes;
+ * equipped gear lands in a separate "Wearing: ..." trailer so the model can
+ * tell stowed loot from worn gear at a glance. Wallet (TC) included.
+ *
+ * Token economy rule (TDD §3.3): comma-separated, never JSON.
+ */
+export function stringifyInventory(
+  inventory: readonly InventoryItem[],
+  equipped: PlayerEquipped | undefined,
+  tc: number,
+): string {
+  const items: string[] = [];
+  const equippedNames = collectEquippedNames(equipped);
+
+  for (const item of inventory) {
+    if (!item.name) continue;
+    const qtyTag = item.quantity > 1 ? ` (x${item.quantity})` : '';
+    items.push(`${item.name}${qtyTag}`);
+  }
+  if (tc > 0) items.push(`${tc} TC`);
+
+  const wornParts = describeEquipped(equipped, equippedNames);
+
+  const stowed = items.length === 0 ? 'Empty pack' : items.join(', ');
+  return wornParts ? `${stowed} | Wearing: ${wornParts}` : stowed;
+}
+
+function collectEquippedNames(equipped: PlayerEquipped | undefined): Set<string> {
+  const out = new Set<string>();
+  if (!equipped) return out;
+  const slots: (keyof PlayerEquipped)[] = ['main', 'off', 'head', 'chest', 'legs', 'feet', 'amulet', 'ring'];
+  for (const slot of slots) {
+    const name = equipped[slot];
+    if (typeof name === 'string' && name) out.add(name);
+  }
+  return out;
+}
+
+function describeEquipped(equipped: PlayerEquipped | undefined, _names: Set<string>): string {
+  if (!equipped) return '';
+  const parts: string[] = [];
+  if (equipped.main) parts.push(`main hand ${equipped.main}`);
+  if (equipped.off) parts.push(`off hand ${equipped.off}`);
+  if (equipped.head) parts.push(`head ${equipped.head}`);
+  if (equipped.chest) parts.push(`chest ${equipped.chest}`);
+  if (equipped.legs) parts.push(`legs ${equipped.legs}`);
+  if (equipped.feet) parts.push(`feet ${equipped.feet}`);
+  if (equipped.amulet) parts.push(`amulet ${equipped.amulet}`);
+  if (equipped.ring) parts.push(`ring ${equipped.ring}`);
+  return parts.join(', ');
+}
+
+/**
+ * Last 2–3 player actions, newest first. Per the TDD token-economy rule, we
+ * never dump the full game log — only the player-typed lines, which are the
+ * only thing the model needs to "acknowledge their last action."
+ */
+export function formatRecentHistory(log: readonly GameLogEntry[]): string {
+  const playerLines: string[] = [];
+  for (let i = log.length - 1; i >= 0 && playerLines.length < 3; i--) {
+    const entry = log[i];
+    if (entry?.channel === 'player' && entry.text) {
+      playerLines.push(entry.text.trim());
+    }
+  }
+  if (playerLines.length === 0) return 'None — just arrived.';
+  return playerLines.join(' ← ');
+}
+
+function capitalizeWords(s: string): string {
+  return s
+    .split(/\s+/)
+    .map((w) => (w ? w[0]!.toUpperCase() + w.slice(1) : w))
+    .join(' ');
+}

@@ -1,0 +1,42 @@
+{
+  "archetypes": [
+    {
+      "id": "road_hawker",
+      "name": "Road Hawker",
+      "title": "wandering trader",
+      "demeanor": "honest",
+      "description": "A stall thrown together from cart-boards and tarpaulin. Smells of stew and damp wool. The hawker watches the road with one eye and the merchandise with the other.",
+      "pool": [
+        { "itemName": "Trail Rations",      "priceMin": 4,  "priceMax": 7,  "weight": 10 },
+        { "itemName": "Wild Carrot",        "priceMin": 2,  "priceMax": 4,  "weight": 8 },
+        { "itemName": "Wild Onion",         "priceMin": 2,  "priceMax": 4,  "weight": 8 },
+        { "itemName": "Water Bottle",       "priceMin": 3,  "priceMax": 6,  "weight": 6 },
+        { "itemName": "First Aid Kit",      "priceMin": 12, "priceMax": 18, "weight": 4 },
+        { "itemName": "Firewood",           "priceMin": 1,  "priceMax": 3,  "weight": 8 },
+        { "itemName": "Patched Cloth",      "priceMin": 2,  "priceMax": 5,  "weight": 6 },
+        { "itemName": "Stick",              "priceMin": 1,  "priceMax": 2,  "weight": 4 },
+        { "itemName": "Empty Water Bottle", "priceMin": 2,  "priceMax": 4,  "weight": 4 },
+        { "itemName": "Speckled Egg",       "priceMin": 5,  "priceMax": 8,  "weight": 3 }
+      ]
+    },
+    {
+      "id": "sketchy_stall",
+      "name": "Sketchy Stall",
+      "title": "fence",
+      "demeanor": "sketchy",
+      "description": "A figure under a hood, leaned against a half-broken cart. Doesn't make eye contact. The merchandise is suspiciously cheap. The hand under the cloak doesn't move.",
+      "pool": [
+        { "itemName": "Pocket Knife",       "priceMin": 5,  "priceMax": 9,  "weight": 6 },
+        { "itemName": "Bone Shiv",          "priceMin": 4,  "priceMax": 7,  "weight": 6 },
+        { "itemName": "Rust Dagger",        "priceMin": 6,  "priceMax": 10, "weight": 4 },
+        { "itemName": "Cudgel",             "priceMin": 5,  "priceMax": 9,  "weight": 5 },
+        { "itemName": "Red Cap Mushroom",   "priceMin": 3,  "priceMax": 6,  "weight": 5 },
+        { "itemName": "Blue Cap Mushroom",  "priceMin": 3,  "priceMax": 6,  "weight": 5 },
+        { "itemName": "Aetheric Locket",    "priceMin": 14, "priceMax": 22, "weight": 2 },
+        { "itemName": "Aether Crystal",     "priceMin": 8,  "priceMax": 14, "weight": 4 },
+        { "itemName": "Trail Rations",      "priceMin": 3,  "priceMax": 5,  "weight": 5 },
+        { "itemName": "Aetheric Shard",     "priceMin": 16, "priceMax": 26, "weight": 2 }
+      ]
+    }
+  ]
+}

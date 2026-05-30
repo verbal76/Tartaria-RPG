@@ -1,0 +1,72 @@
+[
+  {
+    "id": "elior_zalmar",
+    "name": "Elior Zalmar",
+    "title": "Philosopher-Scientist (Deceased / Disputed)",
+    "affiliation": "Tartarian Scholar Class",
+    "status": "presumed_dead",
+    "role": "historical",
+    "summary": "The architect of the Etheric Engine at Thametan's Tower. His resonance cascade caused the Great Mud Flood. Whether he died in it or stepped sideways through time is still debated.",
+    "tags": ["historical", "scientist", "cataclysm", "etheric_resonance"]
+  },
+  {
+    "id": "professor_harlan_moore",
+    "name": "Professor Harlan Moore",
+    "title": "Historian",
+    "affiliation": "Independent / Forgotten Order sympathizer",
+    "status": "active",
+    "role": "questgiver",
+    "summary": "Obsessed with uncovering Tartaria's secrets. Will use any means and burn any ally to get closer to lost knowledge.",
+    "tags": ["scholar", "obsessive", "untrustworthy", "questgiver"]
+  },
+  {
+    "id": "sasha_ironheart",
+    "name": "Sasha Ironheart",
+    "title": "Leader of the Tartarian Revivalists",
+    "affiliation": "Tartarian Revivalists",
+    "status": "active",
+    "role": "faction_leader",
+    "summary": "Believes reviving the Tartarian Giants is humanity's salvation. Charismatic, dangerous, willing to risk a second flood.",
+    "tags": ["faction_leader", "revivalist", "zealot"]
+  },
+  {
+    "id": "drake_volkov",
+    "name": "Drake Volkov",
+    "title": "Mercenary",
+    "affiliation": "Hired Gun",
+    "status": "active",
+    "role": "ally_for_hire",
+    "summary": "Seasoned expedition guard with a murky past. Loyalty follows the coin. Has worked for every faction at least once.",
+    "tags": ["mercenary", "veteran", "shifting_loyalty"]
+  },
+  {
+    "id": "ivy_solis",
+    "name": "Ivy Solis",
+    "title": "Treasure Hunter",
+    "affiliation": "Reclaimers Guild (loose)",
+    "status": "active",
+    "role": "rival_or_ally",
+    "summary": "Driven entirely by the value of the next find. Charming until you're competition.",
+    "tags": ["reclaimer", "opportunist", "rival"]
+  },
+  {
+    "id": "dr_lucius_kincaid",
+    "name": "Dr. Lucius Kincaid",
+    "title": "Expedition Sponsor",
+    "affiliation": "Unknown",
+    "status": "active",
+    "role": "patron",
+    "summary": "A reclusive financier who supplies ancient maps, gear, and TC to those willing to dig where he points. Motives unknown.",
+    "tags": ["patron", "questgiver", "shadowy", "wealthy"]
+  },
+  {
+    "id": "old_john_begotsnit",
+    "name": "Old John Begotsnit",
+    "title": "Merchant",
+    "affiliation": "Independent",
+    "status": "active",
+    "role": "vendor",
+    "summary": "An old road merchant the Arbiter remembers. Keeps a fine collection of rare relics for the right buyer.",
+    "tags": ["vendor", "relic_dealer", "merchant"]
+  }
+]

@@ -1,0 +1,20 @@
+[
+  { "id": "recover_aether_core", "verb": "Recover", "target": "an Aetheric Core", "tags": ["relic", "high_value", "core"] },
+  { "id": "extract_archivist", "verb": "Extract", "target": "a Hollow Archivist's tome", "tags": ["relic", "knowledge", "undead"] },
+  { "id": "map_chamber", "verb": "Map", "target": "the unexplored chamber beneath", "tags": ["exploration", "map"] },
+  { "id": "silence_witness", "verb": "Silence", "target": "an inconvenient witness", "tags": ["assassination", "mud_monarchs"] },
+  { "id": "deliver_message", "verb": "Deliver", "target": "a sealed message", "tags": ["courier", "low_risk"] },
+  { "id": "escort_scholar", "verb": "Escort", "target": "a Forgotten Order scholar", "tags": ["escort", "forgotten_order"] },
+  { "id": "raid_vault", "verb": "Raid", "target": "a Mud Monarch supply vault", "tags": ["theft", "mud_monarchs"] },
+  { "id": "disable_sentinel", "verb": "Disable", "target": "a still-active Architectural Sentinel", "tags": ["construct", "high_risk"] },
+  { "id": "rescue_expedition", "verb": "Rescue", "target": "what's left of an overdue expedition", "tags": ["rescue", "exploration"] },
+  { "id": "broker_relic", "verb": "Broker", "target": "a relic sale to the highest bidder", "tags": ["reclaimers_guild", "commerce"] },
+  { "id": "investigate_anomaly", "verb": "Investigate", "target": "a new Aetheric anomaly", "tags": ["exploration", "aetheric"] },
+  { "id": "retrieve_aetherkin", "verb": "Retrieve", "target": "a confused Aetherkin before it rampages", "tags": ["aetherkin", "psychic"] },
+  { "id": "seal_breach", "verb": "Seal", "target": "a breach in the Aetherstone crust", "tags": ["containment", "engineering"] },
+  { "id": "collect_relic_set", "verb": "Collect", "target": "three matching relic fragments", "tags": ["relic", "fetch"] },
+  { "id": "interrogate_revivalist", "verb": "Interrogate", "target": "a captured Tartarian Revivalist", "tags": ["interrogation", "revivalist"] },
+  { "id": "destroy_machine", "verb": "Destroy", "target": "a malfunctioning Tartarian device", "tags": ["sabotage", "tartarian_tech"] },
+  { "id": "smuggle_aetherborn", "verb": "Smuggle", "target": "an awakening Aetherborn child past Dynasty agents", "tags": ["eternal_dynasty", "rescue"] },
+  { "id": "trace_signal", "verb": "Trace", "target": "the source of a recurring Etheric pulse", "tags": ["investigation", "aetheric"] }
+]

@@ -1,0 +1,1227 @@
+[
+  {
+    "name": "Flame of Aether",
+    "rarity": "Common",
+    "shellLevel": "Common",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Common)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetheric Mud",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Rope",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d6 fire damage, chance to ignite target",
+    "tags": [
+      "runecaster",
+      "spell",
+      "common"
+    ]
+  },
+  {
+    "name": "Gale Binder",
+    "rarity": "Common",
+    "shellLevel": "Common",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Common)",
+        "quantity": 1
+      },
+      {
+        "name": "Binding Orb",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Thread",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d6 wind damage, pushes enemy back 5 feet",
+    "tags": [
+      "runecaster",
+      "spell",
+      "common"
+    ]
+  },
+  {
+    "name": "Sparkstrike",
+    "rarity": "Common",
+    "shellLevel": "Common",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Common)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetherstone Pebble",
+        "quantity": 1
+      },
+      {
+        "name": "Rusty Ether Lock",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d6 lightning damage, stuns target for 1 round",
+    "tags": [
+      "runecaster",
+      "spell",
+      "common"
+    ]
+  },
+  {
+    "name": "Earthshaker",
+    "rarity": "Common",
+    "shellLevel": "Common",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Common)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetherstone Dust",
+        "quantity": 1
+      },
+      {
+        "name": "Tartarian Pottery Shard",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d6 earth damage, minor ground tremor, knocks down enemies in close range",
+    "tags": [
+      "runecaster",
+      "spell",
+      "common"
+    ]
+  },
+  {
+    "name": "Whispering Flame",
+    "rarity": "Common",
+    "shellLevel": "Common",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Common)",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Chain",
+        "quantity": 1
+      },
+      {
+        "name": "Glowstone Pendant",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d6, chance to blind enemies for 1 round",
+    "tags": [
+      "runecaster",
+      "spell",
+      "common"
+    ]
+  },
+  {
+    "name": "Tempest Call",
+    "rarity": "Common",
+    "shellLevel": "Common",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Common)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetheric Mud",
+        "quantity": 1
+      },
+      {
+        "name": "Cracked Ether Compass",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d6, generates a small wind vortex, disorients enemies",
+    "tags": [
+      "runecaster",
+      "spell",
+      "common"
+    ]
+  },
+  {
+    "name": "Shockwave",
+    "rarity": "Common",
+    "shellLevel": "Common",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Common)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetherstone Dust",
+        "quantity": 1
+      },
+      {
+        "name": "Broken Sentinel Part",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d6, stuns nearby enemies, knockback 5 feet",
+    "tags": [
+      "runecaster",
+      "spell",
+      "common"
+    ]
+  },
+  {
+    "name": "Ice Vein",
+    "rarity": "Common",
+    "shellLevel": "Common",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Common)",
+        "quantity": 1
+      },
+      {
+        "name": "Binding Orb",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Insignia",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d6 cold damage, reduces target speed for 1 round",
+    "tags": [
+      "runecaster",
+      "spell",
+      "common"
+    ]
+  },
+  {
+    "name": "Emberstrike",
+    "rarity": "Common",
+    "shellLevel": "Common",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Common)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetheric Mud",
+        "quantity": 1
+      },
+      {
+        "name": "Weathered Ether Rod",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d6 fire damage, spreads fire to nearby enemies",
+    "tags": [
+      "runecaster",
+      "spell",
+      "common"
+    ]
+  },
+  {
+    "name": "Force Wave",
+    "rarity": "Common",
+    "shellLevel": "Common",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Common)",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Scrap",
+        "quantity": 1
+      },
+      {
+        "name": "Old Relic Key",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d6, knocks enemies 10 feet back",
+    "tags": [
+      "runecaster",
+      "spell",
+      "common"
+    ]
+  },
+  {
+    "name": "Dark Blight",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Binding Orb",
+        "quantity": 1
+      },
+      {
+        "name": "Whispering Aether Crystal",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10 necrotic damage, 50% chance to apply poison",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Stone Fist",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetherstone Fragment",
+        "quantity": 1
+      },
+      {
+        "name": "Tartarian Rune Inscription Kit",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10 earth damage, knocks enemies prone",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Frostbound",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Binding Orb",
+        "quantity": 1
+      },
+      {
+        "name": "Etherium Crystal",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10 cold damage, freezes ground, makes enemies slip",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Ether Bolt",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Stabilizer",
+        "quantity": 1
+      },
+      {
+        "name": "Cracked Etheric Orb",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10 lightning damage, disables enemy tech for 1 round",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Blood Rend",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Binding Orb",
+        "quantity": 1
+      },
+      {
+        "name": "Tartarian Blood Dagger",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10, drains health from the target",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Frost Shock",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetherstone Fragment",
+        "quantity": 1
+      },
+      {
+        "name": "Cracked Etheric Mirror",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10, deals both frost and lightning damage, stuns target for 1 round",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Venom Strike",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Binding Orb",
+        "quantity": 1
+      },
+      {
+        "name": "Warden's Etheric Charm",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10, poisons target for 2 rounds, slows movement",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Chain of Binding",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Matter",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Chain",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10, binds enemies in place for 1 round, preventing movement",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Inferno Pulse",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetherstone Fragment",
+        "quantity": 1
+      },
+      {
+        "name": "Emberstone Shard",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10, fire damage, ignites the ground, dealing additional burn damage for 1 round",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Stormbreaker",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Stabilizer",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Lens",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10, lightning damage, disables enemy's Etheric-powered devices",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Void Pulse",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetheric Matter",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Spyglass",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10, void damage, creates a small energy vortex that pulls enemies closer",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Shadow Fang",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Binding Orb",
+        "quantity": 1
+      },
+      {
+        "name": "Tartarian Battle Horn",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10, slashes through shadows, strikes multiple enemies at once",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Arcane Shockwave",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Potion Vial",
+        "quantity": 1
+      },
+      {
+        "name": "Whispering Vault Key",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10, deals arcane damage, knocks enemies back 10 feet",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Etheric Beacon",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Binding Orb",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Beacon",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10, marks enemies, increasing the next attack roll against them by +2",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Thunder Lash",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetherstone Fragment",
+        "quantity": 1
+      },
+      {
+        "name": "Whispering Cipher",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10 lightning, pulls enemies 1 range closer if not in arm's reach",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Bloodstorm",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetherstone Fragment",
+        "quantity": 1
+      },
+      {
+        "name": "Tartarian Blood Dagger",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10, deals necrotic damage, drains health from the enemy and heals the user",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Gale Scythe",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Matter",
+        "quantity": 1
+      },
+      {
+        "name": "True Tartarian Gauntlet",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10, wind damage, slices through multiple enemies",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Void Caller",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Binding Orb",
+        "quantity": 1
+      },
+      {
+        "name": "Magnetic Ether Sphere",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10, distorts time for 1 round, causing delays in enemy actions",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Flame Lash",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Potion Vial",
+        "quantity": 1
+      },
+      {
+        "name": "Shattered Ether Compass",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10 fire damage, spreads to adjacent enemies",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Ironbreaker",
+    "rarity": "Uncommon",
+    "shellLevel": "Uncommon",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Uncommon)",
+        "quantity": 1
+      },
+      {
+        "name": "Binding Orb",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Battery",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d10, crushes armor, lowers enemy defense",
+    "tags": [
+      "runecaster",
+      "spell",
+      "uncommon"
+    ]
+  },
+  {
+    "name": "Shadow Caller",
+    "rarity": "Rare",
+    "shellLevel": "Rare",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Rare)",
+        "quantity": 1
+      },
+      {
+        "name": "Binding Orb",
+        "quantity": 1
+      },
+      {
+        "name": "Aether Cloak of Shadows",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d20, turns invisible for 1 round after attack",
+    "tags": [
+      "runecaster",
+      "spell",
+      "rare"
+    ]
+  },
+  {
+    "name": "Ember Storm",
+    "rarity": "Rare",
+    "shellLevel": "Rare",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Rare)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetherstone Core",
+        "quantity": 1
+      },
+      {
+        "name": "Shifting Obsidian Orb",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d20 fire damage, burns all enemies in a 15 ft radius",
+    "tags": [
+      "runecaster",
+      "spell",
+      "rare"
+    ]
+  },
+  {
+    "name": "Leviathan Strike",
+    "rarity": "Rare",
+    "shellLevel": "Rare",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Rare)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetheric Mud",
+        "quantity": 1
+      },
+      {
+        "name": "Leviathan Eye",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d20, deals massive single-target damage, knocks target down",
+    "tags": [
+      "runecaster",
+      "spell",
+      "rare"
+    ]
+  },
+  {
+    "name": "Earthrend",
+    "rarity": "Rare",
+    "shellLevel": "Rare",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Rare)",
+        "quantity": 1
+      },
+      {
+        "name": "Binding Orb",
+        "quantity": 1
+      },
+      {
+        "name": "True Tartarian Relic",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d20 earth damage, causes a fissure that traps enemies",
+    "tags": [
+      "runecaster",
+      "spell",
+      "rare"
+    ]
+  },
+  {
+    "name": "Frostbite",
+    "rarity": "Rare",
+    "shellLevel": "Rare",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Rare)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetherstone Fragment",
+        "quantity": 1
+      },
+      {
+        "name": "Frozen Obsidian Shard",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d20 cold damage, freezes all targets in a 20 ft radius for 1 round",
+    "tags": [
+      "runecaster",
+      "spell",
+      "rare"
+    ]
+  },
+  {
+    "name": "Stormcaller",
+    "rarity": "Rare",
+    "shellLevel": "Rare",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Rare)",
+        "quantity": 1
+      },
+      {
+        "name": "Binding Orb",
+        "quantity": 1
+      },
+      {
+        "name": "Sentinel's Ether Heart",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d20 lightning damage, calls down lightning strikes on multiple enemies",
+    "tags": [
+      "runecaster",
+      "spell",
+      "rare"
+    ]
+  },
+  {
+    "name": "Flamewrath",
+    "rarity": "Rare",
+    "shellLevel": "Rare",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Rare)",
+        "quantity": 1
+      },
+      {
+        "name": "Binding Orb",
+        "quantity": 1
+      },
+      {
+        "name": "Tartarian Rune Sword",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d20, deals massive fire damage, burns ground in target area",
+    "tags": [
+      "runecaster",
+      "spell",
+      "rare"
+    ]
+  },
+  {
+    "name": "Ether Blade",
+    "rarity": "Rare",
+    "shellLevel": "Rare",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Rare)",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Circuitry",
+        "quantity": 1
+      },
+      {
+        "name": "Automaton Circuit",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d20, slashes with Etheric energy, reduces enemy Etheric power",
+    "tags": [
+      "runecaster",
+      "spell",
+      "rare"
+    ]
+  },
+  {
+    "name": "Void Shatter",
+    "rarity": "Rare",
+    "shellLevel": "Rare",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Rare)",
+        "quantity": 1
+      },
+      {
+        "name": "Binding Orb",
+        "quantity": 1
+      },
+      {
+        "name": "Temporal Distortion Watch",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d20, creates a time distortion that stops enemies for 1 round",
+    "tags": [
+      "runecaster",
+      "spell",
+      "rare"
+    ]
+  },
+  {
+    "name": "Inferno Core",
+    "rarity": "Rare",
+    "shellLevel": "Rare",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Rare)",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Matter",
+        "quantity": 1
+      },
+      {
+        "name": "Fragment of the Red Tower",
+        "quantity": 1
+      }
+    ],
+    "effect": "1d20, burns all nearby enemies, deals high fire damage",
+    "tags": [
+      "runecaster",
+      "spell",
+      "rare"
+    ]
+  },
+  {
+    "name": "Wrath of Titans",
+    "rarity": "Legendary",
+    "shellLevel": "Legendary",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Legendary)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetheric Mud",
+        "quantity": 1
+      },
+      {
+        "name": "Wrath of the Ether Titan",
+        "quantity": 1
+      }
+    ],
+    "effect": "2d20, massive AoE knockback, damages and stuns all enemies",
+    "tags": [
+      "runecaster",
+      "spell",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Phoenix Rebirth",
+    "rarity": "Legendary",
+    "shellLevel": "Legendary",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Legendary)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetheric Core",
+        "quantity": 1
+      },
+      {
+        "name": "Aetheric Phoenix Feather",
+        "quantity": 1
+      }
+    ],
+    "effect": "2d20, deals fire damage to all enemies, resurrects one ally",
+    "tags": [
+      "runecaster",
+      "spell",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Ether Storm",
+    "rarity": "Legendary",
+    "shellLevel": "Legendary",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Legendary)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetherstorm Shard",
+        "quantity": 1
+      },
+      {
+        "name": "Timeworn Ether Compass",
+        "quantity": 1
+      }
+    ],
+    "effect": "2d20, summons a storm that damages and slows all enemies for 2 rounds giving all PCs advantage",
+    "tags": [
+      "runecaster",
+      "spell",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Dragonheart",
+    "rarity": "Legendary",
+    "shellLevel": "Legendary",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Legendary)",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Core",
+        "quantity": 1
+      },
+      {
+        "name": "Heart of the Ether Dragon",
+        "quantity": 1
+      }
+    ],
+    "effect": "2d20, burns a single target for massive damage, burns spread over time",
+    "tags": [
+      "runecaster",
+      "spell",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Eternal Flame",
+    "rarity": "Legendary",
+    "shellLevel": "Legendary",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Legendary)",
+        "quantity": 1
+      },
+      {
+        "name": "Binding Orb",
+        "quantity": 1
+      },
+      {
+        "name": "Mask of Tartaria's Last King",
+        "quantity": 1
+      }
+    ],
+    "effect": "2d20, deals fire damage, and the enemy is blinded for 2 rounds",
+    "tags": [
+      "runecaster",
+      "spell",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Titan's Will",
+    "rarity": "Legendary",
+    "shellLevel": "Legendary",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Legendary)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetheric Matter",
+        "quantity": 1
+      },
+      {
+        "name": "Leviathan Scale",
+        "quantity": 1
+      }
+    ],
+    "effect": "2d20, causes the ground to shake, knocking enemies prone, and deals damage",
+    "tags": [
+      "runecaster",
+      "spell",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Thunder King's Rage",
+    "rarity": "Legendary",
+    "shellLevel": "Legendary",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Legendary)",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Stabilizer",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Tome of the Giants",
+        "quantity": 1
+      }
+    ],
+    "effect": "2d20, calls down chain lightning, stuns enemies for 1 round",
+    "tags": [
+      "runecaster",
+      "spell",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Solar Flare",
+    "rarity": "Legendary",
+    "shellLevel": "Legendary",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Legendary)",
+        "quantity": 1
+      },
+      {
+        "name": "Aetherlight Beacon",
+        "quantity": 1
+      },
+      {
+        "name": "Crown of the Last Monarch",
+        "quantity": 1
+      }
+    ],
+    "effect": "2d20, summons a solar flare that blinds and burns all enemies in a 20 ft radius",
+    "tags": [
+      "runecaster",
+      "spell",
+      "legendary"
+    ]
+  },
+  {
+    "name": "Void Edge",
+    "rarity": "Legendary",
+    "shellLevel": "Legendary",
+    "ingredients": [
+      {
+        "name": "Rune Caster Shell (Legendary)",
+        "quantity": 1
+      },
+      {
+        "name": "Etheric Core",
+        "quantity": 1
+      },
+      {
+        "name": "Void Ether Shard",
+        "quantity": 1
+      }
+    ],
+    "effect": "2d20, cuts through reality, causing a rift that damages all nearby enemies",
+    "tags": [
+      "runecaster",
+      "spell",
+      "legendary"
+    ]
+  }
+]

@@ -1,0 +1,118 @@
+[
+  {
+    "id": "aetheric_core",
+    "name": "Aetheric Core",
+    "rarity": "Legendary",
+    "description": "A pulsing Aether-cell that once powered an entire city. Mishandled, it could power your funeral instead.",
+    "effect": "Powers Tartarian devices; potential mass-energy source; volatile.",
+    "tags": ["core", "power_source", "volatile"]
+  },
+  {
+    "id": "architects_key",
+    "name": "Architect's Key",
+    "rarity": "Rare",
+    "description": "A small Tartarian relic that recognizes ancient locks. Doors that haven't opened in centuries swing for it.",
+    "effect": "Unlocks Tartarian doors and dormant machines.",
+    "tags": ["key", "tartarian", "lock"],
+    "source": "manual"
+  },
+  {
+    "id": "tartarian_obelisk",
+    "name": "Tartarian Obelisk",
+    "rarity": "Rare",
+    "description": "A small Aether-emitting pillar that grants its bearer advantage on three uses per long rest. If damaged, it answers with a destructive Aether blast.",
+    "effect": "Advantage on 3 actions per long rest; destruction = AoE Aether burst.",
+    "tags": ["obelisk", "buff", "explosive_on_break"],
+    "source": "manual"
+  },
+  {
+    "id": "void_compass",
+    "name": "Void Compass",
+    "rarity": "Rare",
+    "description": "A compass that ignores magnetic north and points to whatever you most need to find. Or whatever most needs to find you.",
+    "effect": "Reveals nearest objective; sometimes lies.",
+    "tags": ["compass", "navigation"],
+    "source": "bible"
+  },
+  {
+    "id": "memory_prism",
+    "name": "Memory Prism",
+    "rarity": "Uncommon",
+    "description": "A crystal that holds the last few seconds of whatever last died near it. Hold it up to your eye.",
+    "effect": "Replay psychic echo of a recent death; gain clue or lose Wisdom temporarily.",
+    "tags": ["psychic", "memory", "investigation"],
+    "source": "bible"
+  },
+  {
+    "id": "resonance_lantern",
+    "name": "Resonance Lantern",
+    "rarity": "Uncommon",
+    "description": "A lamp that glows brighter in proximity to Aetherstone. Useless above ground.",
+    "effect": "Reveals hidden Aetherstone caches within close range.",
+    "tags": ["lantern", "detection"],
+    "source": "bible"
+  },
+  {
+    "id": "temporal_lens",
+    "name": "Temporal Lens",
+    "rarity": "Rare",
+    "description": "Look through it and see the city as it was in 1566 — for as long as your nerves hold.",
+    "effect": "Shows pre-flood state of a location; sustained use causes 1d6 Corruption.",
+    "tags": ["temporal", "vision", "corrupting"],
+    "source": "bible"
+  },
+  {
+    "id": "aetheric_torch",
+    "name": "Aetheric Torch",
+    "rarity": "Common",
+    "description": "An Aether-fueled light source. Will not extinguish in wind, rain, or fog.",
+    "effect": "Reliable light; faintly attracts Aether-drawn creatures.",
+    "tags": ["light", "common"],
+    "source": "manual"
+  },
+  {
+    "id": "aether_binder_tool",
+    "name": "Aether-Binder Tool",
+    "rarity": "Uncommon",
+    "description": "A hand-tool used to shape Aetherstone, weld relic parts, or steady a malfunctioning core.",
+    "effect": "Required for Mold Ether spell; +1 to crafting checks.",
+    "tags": ["tool", "crafting"],
+    "source": "manual"
+  },
+  {
+    "id": "aether_breath_mask",
+    "name": "Aether-Breath Mask",
+    "rarity": "Uncommon",
+    "description": "A leather and brass mask with a small Aetherstone filter. Lets you breathe in storms and spore-clouds.",
+    "effect": "Immunity to airborne corruption hazards.",
+    "tags": ["mask", "respiratory", "protection"],
+    "source": "manual"
+  },
+  {
+    "id": "aether_grip_pads",
+    "name": "Aether Grip Pads",
+    "rarity": "Uncommon",
+    "description": "Palm-pads that grip Aetherstone and slick mud equally well.",
+    "effect": "+2 to climbing and grip checks on slick surfaces.",
+    "tags": ["climbing", "utility"],
+    "source": "manual"
+  },
+  {
+    "id": "aetheric_vision_lens",
+    "name": "Aetheric Vision Lens",
+    "rarity": "Rare",
+    "description": "A goggle-lens that reveals Aether currents and hidden Aetherstone signatures.",
+    "effect": "Reveals hidden Aetheric phenomena, Aetherborn auras, dormant relics in line of sight.",
+    "tags": ["vision", "detection"],
+    "source": "manual"
+  },
+  {
+    "id": "aetheric_locket",
+    "name": "Aetheric Locket",
+    "rarity": "Common",
+    "description": "A small locket that hums when held close to a relic. Standard kit for Aetherborn children.",
+    "effect": "Faint indicator of relic proximity.",
+    "tags": ["jewelry", "detection"],
+    "source": "manual"
+  }
+]
