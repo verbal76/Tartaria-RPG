@@ -5151,6 +5151,45 @@ export const useGameStore = create<GameStore>((set, get) => ({
           narratePossibleDirections(get, set, currentScene);
           break;
         }
+        // OTA-228 — gate everything that follows (ambush + skill check
+        // roll) behind the OTA-096 noun-already-exhausted dedup. Pre-
+        // fix, the OTA-219 sporadic ambush rolled BEFORE the dedup
+        // check (which lives in the post-skill-check handler at
+        // ~line 10215), so re-tapping a cleared noun could spawn a
+        // Mud Wasp instead of the "already checked" line. Playtest:
+        //   Run 1: investigate titan's bone marker → lead surfaces
+        //   Run 2: investigate titan's bone marker → AMBUSH (no
+        //     "already checked")
+        //   Run 3: investigate titan's bone marker → "already
+        //     checked" (normal post-OTA-096 path)
+        // Re-tapping a cleared noun is a no-op the engine already
+        // knows about; the ambush surprise was a bug, not signal.
+        const investAmbushTarget = (parsed.target ?? parsed.resolvedNoun ?? '').trim().toLowerCase();
+        if (investAmbushTarget) {
+          const ambushRoomKey = makeRoomKey(
+            player.currentLocationId,
+            currentScene.microMicroId,
+            player.mapX,
+            player.mapY,
+            player.hubRoomId,
+          );
+          const ambushRoom = get().worldMemory.visitedRooms?.[ambushRoomKey];
+          const ambushPrior = ambushRoom?.flavorExhaustedNouns ?? [];
+          const alreadyClearedNoun = ambushPrior.some(
+            (n) =>
+              n === investAmbushTarget
+              || investAmbushTarget.includes(n)
+              || n.includes(investAmbushTarget),
+          );
+          if (alreadyClearedNoun) {
+            get().refuseAmbient({
+              noun: investAmbushTarget,
+              line: `You've already checked the ${investAmbushTarget} here. There was nothing of use in it — turning it over again won't change that.`,
+              kind: 'flavor',
+            });
+            break;
+          }
+        }
         // OTA-219 — sporadic investigate ambush. Player ask:
         //   "we should have a sporadic combat event from investigate.
         //   if we're going to have story hooks and everything else

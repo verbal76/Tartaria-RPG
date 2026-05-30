@@ -8815,4 +8815,52 @@
 // / InputBox (use helper).
 // NEW __tests__/fusedItem
 // DisplayCoverage.test.ts.
-export const OTA_BUILD_ID = '2026-05-30-227';
+// 2026-05-30-228 — gate the
+// OTA-219 sporadic invest-
+// igate ambush behind the
+// OTA-096 noun-already-
+// exhausted dedup. Playtest
+// log: run 1 investigate
+// titan's bone marker → lead
+// surfaces + noun stamped
+// flavorExhaustedNouns. Run
+// 2 same noun → AMBUSH spawn
+// (Mud Wasp) instead of
+// "already checked" — the
+// OTA-219 6% roll fired
+// BEFORE the dedup, which
+// lives in the post-skill-
+// check handler. Run 3 same
+// noun → "already checked"
+// (normal path). Re-tapping
+// a cleared noun is a no-op
+// the engine already knows;
+// the ambush surprise was a
+// bug, not signal. Fix:
+// short-circuit at the top
+// of case 'investigate' if
+// the target noun is already
+// in the room's flavor
+// ExhaustedNouns set —
+// mirrors the line 10215
+// dedup pattern at the
+// pre-roll layer so the
+// ambush never rolls and
+// the player gets the
+// "already checked" line
+// directly. Tests: +6 in
+// investigateAmbushDedup
+// (first-tap no-skip,
+// cleared-noun skip,
+// apostrophe variants,
+// case-insensitive, empty
+// target no-skip,
+// unrelated-noun no-skip).
+// TS clean app-side. Files:
+// app/state/gameStore.ts
+// (case 'investigate' adds
+// dedup before OTA-219
+// ambush roll). NEW
+// __tests__/investigate
+// AmbushDedup.test.ts.
+export const OTA_BUILD_ID = '2026-05-30-228';

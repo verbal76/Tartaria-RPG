@@ -245,6 +245,18 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Investigate ambush no longer fires on already-cleared nouns
+
+- **OTA-228 (2026-05-30) · Player playtest log: re-tapping an already-investigated noun spawned a Mud Wasp ambush instead of the "already checked" line.**
+  - **Repro from the log:**
+    - Run 1: `investigate titan's bone marker` → lead surfaces, noun stamped in `flavorExhaustedNouns`.
+    - Run 2: `investigate titan's bone marker` → AMBUSH (`Something shifted while you were turned away — a Mud Wasp breaks cover...`) instead of "already checked".
+    - Run 3: `investigate titan's bone marker` → "already checked" (normal path).
+  - **Cause:** The OTA-219 6% sporadic ambush rolls at the TOP of `case 'investigate'` in `gameStore.ts`. The OTA-096 noun-already-exhausted dedup lives in the POST-skill-check handler (~line 10215), which only runs after the ambush gate. So a cleared noun could trip the 6% ambush before the dedup got a chance to short-circuit.
+  - **Fix:** Mirror the OTA-096 dedup at the TOP of `case 'investigate'`, before the OTA-219 ambush roll. If the target noun is already in `flavorExhaustedNouns` for the current room, fire `refuseAmbient` with the "already checked" line and break — ambush never rolls. Substring + case-insensitive match mirrors the post-skill-check dedup exactly; OTA-098's both-variants storage (apostrophe + stripped) bridges the apostrophe gap.
+  - **Verification:** +6 tests in `investigateAmbushDedup` (first-tap no-skip, cleared-noun skip, both-variant storage matches either query, unrelated noun no-skip, empty target no-skip, case-insensitive). `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/state/gameStore.ts` (`case 'investigate'` — dedup gate before OTA-219 ambush roll), NEW `__tests__/investigateAmbushDedup.test.ts`.
+
 #### Safeguard: unified `resolveDisplay*` helpers + sweep test prevent the fused-item display bug class
 
 - **OTA-227 (2026-05-30) · Player on OTA-226: *"is it a regression that we have fixed and we have a safeguard in place to double check before they post into the inventory that this shouldn't happen again?"***
