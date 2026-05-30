@@ -9380,4 +9380,58 @@
 // bucket loaders +
 // formatArbiterAnswer
 // categories).
-export const OTA_BUILD_ID = '2026-05-30-234';
+// 2026-05-30-235 — hack v2.5
+// reconciliation. Player:
+// "the tartaria_ttrpg was
+// what the tartaria hack 2.5
+// was built off of. The
+// original file had turned
+// from a gameplay book into
+// a DM guide, so the hack
+// file was made to explain
+// gameplay. ... When in
+// doubt, the lore gameplay
+// mechanics lose to the
+// app's mechanics."
+//
+// Reference-doc move (no
+// code change):
+// - NEW docs/tartaria-hack-
+//   v2.5.txt (7427 lines,
+//   the canonical gameplay
+//   doc going forward).
+// - RENAME docs/tartaria-
+//   ttrpg-bible.txt → -LEGACY
+//   with a header that
+//   states the precedence
+//   rule: shipped code wins,
+//   then hack v2.5, then
+//   legacy bible for world
+//   flavor only.
+// - CLAUDE.md gains a new
+//   "Canon precedence"
+//   section at the top
+//   stating the same rule
+//   in three tiers so every
+//   future Claude session
+//   reconciles content the
+//   same way.
+//
+// No engine / data changes.
+// The Ask the Arbiter bank
+// stays at ~408 concepts;
+// canonFacts injection logic
+// untouched. This OTA only
+// realigns the reference
+// shelf so future audits
+// know which doc is the
+// canonical gameplay source.
+//
+// Files: NEW docs/tartaria-
+// hack-v2.5.txt, RENAME
+// docs/tartaria-ttrpg-bible.
+// txt → -LEGACY.txt (with
+// header note), CLAUDE.md
+// (new Canon precedence
+// section at top).
+export const OTA_BUILD_ID = '2026-05-30-235';

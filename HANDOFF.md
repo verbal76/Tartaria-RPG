@@ -245,6 +245,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Hack v2.5 reconciliation — canonical gameplay doc realignment
+
+- **OTA-235 (2026-05-30) · Player: *"the tartaria_ttrpg was what the tartaria hack 2.5 was built off of. The original file had turned from a gameplay book into a DM guide, so the hack file was made to explain gameplay. ... When in doubt, the lore gameplay mechanics lose to the app's mechanics."***
+  - **What:** reference-doc move only — no engine / data changes.
+  - **NEW `docs/tartaria-hack-v2.5.txt`** (7,427 lines) is the canonical gameplay doc going forward.
+  - **RENAMED `docs/tartaria-ttrpg-bible.txt` → `docs/tartaria-ttrpg-bible-LEGACY.txt`** with a header stating the precedence rule. Original prose retained for world flavor that the hack doesn't restate.
+  - **CLAUDE.md** gains a new "Canon precedence" section at the top with a 3-tier rule: (1) shipped app code wins, (2) hack v2.5 wins over the legacy bible for any gameplay rule, (3) legacy bible is reference-only for world flavor. Every future Claude session reconciles content the same way.
+  - **No code, no test, no data change.** Ask the Arbiter bank stays at ~408 concepts; `canonFacts` injection untouched. This OTA only realigns the reference shelf so future audits know which doc is the canonical gameplay source.
+  - **Files:** NEW `docs/tartaria-hack-v2.5.txt`, RENAME `docs/tartaria-ttrpg-bible.txt → -LEGACY.txt` (with header), `CLAUDE.md` (Canon precedence section at top).
+
 #### CRASH FIX: title-screen reload mid-boot + Modal-on-Modal + faded footer + bulk canon ingestion
 
 - **OTA-234 (2026-05-30) · CRITICAL. Player playtest after the recent OTA series: *"i hit the game icon, title screen visible for 1 second then drops to the phone's homescreen."* Plus *"Make the version number under the three buttons on the home screen match the color of the report bug button. I can barely see it; it is very faded."***

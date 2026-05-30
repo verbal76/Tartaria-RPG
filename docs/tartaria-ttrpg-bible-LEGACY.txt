@@ -1,3 +1,25 @@
+============================================================================
+DEPRECATED — Tartaria Prima TTRPG bible (legacy DM-guide-era ruleset)
+============================================================================
+This file was the original world bible / DM guide. As of OTA-235 (2026-05-30)
+it is SUPERSEDED by docs/tartaria-hack-v2.5.txt — the canonical gameplay-
+focused rewrite.
+
+Precedence rule for Claude when reconciling lore vs. gameplay:
+  1. SHIPPED APP CODE wins (always). If the engine implements something,
+     the engine is the source of truth.
+  2. tartaria-hack-v2.5.txt wins over this legacy bible for gameplay rules
+     (mechanics, dice, DCs, combat order, character creation).
+  3. THIS LEGACY BIBLE is retained for world flavor / lore that the hack
+     doesn't restate. Original prose for Mud Monarchs, Forgotten Order,
+     Etheric anomalies, Mud Seas, geography is still good.
+
+Don't delete this file — the lore prose is still consulted. Just don't
+treat its mechanical bits as canonical.
+
+Original content follows below.
+----------------------------------------------------------------------------
+
 Tartaria Prima
 Life After The Flood
 Tartaria PrimaHot Attic Games     Tartaria PrimaHot Attic Games     

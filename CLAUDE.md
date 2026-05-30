@@ -1,5 +1,35 @@
 # Tartaria-RPG — Working Notes
 
+## Canon precedence (lore vs. gameplay vs. shipped code)
+
+When reconciling content from the design docs against shipped game
+mechanics, this is the precedence order — ALWAYS:
+
+1. **Shipped app code wins.** If the engine implements something, the
+   engine is the source of truth. Don't refactor away balanced shipped
+   mechanics to match a doc.
+2. **`docs/tartaria-hack-v2.5.txt` wins over the legacy bible** for any
+   gameplay rule (mechanics, DCs, dice, combat order, character
+   creation, balance tables). The hack file IS the canonical gameplay
+   doc as of OTA-235.
+3. **`docs/tartaria-ttrpg-bible-LEGACY.txt` is reference-only** for
+   world flavor / lore that the hack doesn't restate. Original prose
+   for factions, geography, Etheric anomalies is still good — but
+   don't treat its mechanical bits as canonical.
+
+When the app is missing a mechanic the hack specifies, pull the spec
+from the hack and **balance it against shipped code during dev** —
+don't blind-ingest the hack's numbers. The user has said this
+explicitly: "we have done mountains of balancing during this app's
+development. When in doubt, the lore gameplay mechanics lose to the
+app's mechanics."
+
+The `app/data/lore/canon-*.json` files (events, titles, food/drink,
+skills, weapons, armor, currency, loot, task tiers, action tiers)
+are LORE COPIES of the doc tables — they feed Qwen narration and the
+Ask the Arbiter MiniLM lookup. Treat them as authoritative for what
+the ARBITER knows, not for what the engine does.
+
 ## Shipping rule: OTA-only
 
 Every change is shipped as an **OTA update** unless a native build
