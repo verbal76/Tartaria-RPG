@@ -8653,4 +8653,66 @@
 // new helper x2), app/
 // screens/InventoryScreen.tsx
 // (use new helper x2).
-export const OTA_BUILD_ID = '2026-05-30-224';
+// 2026-05-30-225 — save-load
+// migration for the OTA-221
+// fused-name bug. Player:
+//   "can you just push a
+//   small OTA and rename my
+//   item?"
+//
+// The OTA-224 fix stopped
+// future fused items from
+// being named "<Theme>
+// undefined" but didn't
+// touch existing instances
+// already saved in player
+// inventories. This OTA adds
+// a migration pass in
+// backfillPlayer's inventory
+// loop:
+//   - For each item with
+//     uniqueStats AND name
+//     matching /\s
+//     undefined\b/i:
+//   - Pick a suffix from
+//     the OTA-221 pool
+//     matching uniqueStats.
+//     kind (weapon /
+//     armor / dog_armor).
+//   - Use a djb2 hash of
+//     the item's id as the
+//     pool index so the
+//     rewrite is
+//     deterministic — same
+//     item id always lands
+//     on the same suffix
+//     every load. No save
+//     thrash.
+//   - Replace " undefined"
+//     with " <Suffix>" in
+//     the name.
+//
+// Idempotent: items already
+// fixed (no " undefined" in
+// the name) pass through
+// unchanged. Items without
+// uniqueStats pass through
+// unchanged.
+//
+// Tests: +7 in
+// fusedItemNameMigration
+// (weapon rewrite, determ
+// inism, varied across ids,
+// armor pool, dog_armor
+// pool, no uniqueStats
+// passthrough, no "undefined"
+// passthrough). fusedItem
+// Equip regression green
+// (15 total). TS clean app-
+// side.
+//
+// Files: app/state/
+// gameStore.ts (migration
+// block inside backfill
+// Player's inventory map).
+export const OTA_BUILD_ID = '2026-05-30-225';

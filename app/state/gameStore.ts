@@ -719,6 +719,29 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     // description onto the saved instance in place. Idempotent on
     // already-restamped items (the merge only fills gaps).
     item = restampInventoryItem(item);
+    // OTA-225 — repair the OTA-221 deterministic-synth name bug. A
+    // signed-shift bug produced fused items named "Resonant
+    // undefined" / "<Theme> undefined" before OTA-224 fixed the
+    // shift. Saves loaded post-OTA-224 still carry the broken name
+    // on the instance. Detect any uniqueStats-bearing item with a
+    // trailing "undefined" and rewrite the suffix from the item's
+    // id + uniqueStats.kind — same suffix pools as the synth.
+    if (item.uniqueStats && / undefined\b/i.test(item.name)) {
+      const suffixPool: Record<string, string[]> = {
+        weapon: ['Cleaver', 'Edge', 'Spike', 'Lash', 'Maul'],
+        armor: ['Brace', 'Vigil', 'Mantle', 'Shroud', 'Bulwark'],
+        dog_armor: ['Vigil', 'Wrap', 'Pattern', 'Stride'],
+      };
+      const pool = suffixPool[item.uniqueStats.kind] ?? suffixPool.weapon!;
+      // Deterministic pick from the item's id so the same item
+      // always gets the same suffix on every load.
+      let hash = 5381;
+      for (let i = 0; i < item.id.length; i++) {
+        hash = ((hash << 5) + hash + item.id.charCodeAt(i)) >>> 0;
+      }
+      const suffix = pool[hash % pool.length]!;
+      item = { ...item, name: item.name.replace(/\s*undefined\b/gi, ` ${suffix}`).trim() };
+    }
     return item;
   });
   // Backfill the per-slot instance ids. A pre-refactor save records only

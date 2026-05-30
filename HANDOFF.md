@@ -245,6 +245,18 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Save-load migration: rewrite "<Theme> undefined" fused-item names from the OTA-221 bug
+
+- **OTA-225 (2026-05-30) · Player: *"can you just push a small OTA and rename my item?"***
+  - **What:** OTA-224 fixed the deterministic-synth name picker so future fused items never come out "<Theme> undefined" — but instances already saved in player inventories still carry the broken name. The player's "Resonant undefined" wasn't going to fix itself on load without a migration pass.
+  - **Fix:** Migration block inside `backfillPlayer`'s inventory map (next to `restampInventoryItem`). For each item with `uniqueStats` AND name matching `/\s undefined\b/i`:
+    - Pick a suffix from the OTA-221 pool matching `uniqueStats.kind` (weapon → Cleaver / Edge / Spike / Lash / Maul; armor → Brace / Vigil / Mantle / Shroud / Bulwark; dog_armor → Vigil / Wrap / Pattern / Stride).
+    - Use a djb2 hash of the item's `id` as the pool index — same item id always lands on the same suffix every load. No save thrash if the migration runs twice.
+    - Replace `" undefined"` with `" <Suffix>"` in the name.
+  - **Idempotent:** items already fixed (no `" undefined"` in the name) pass through unchanged. Items without `uniqueStats` pass through unchanged. Re-runs are no-ops.
+  - **Verification:** +7 tests in `fusedItemNameMigration` (weapon rewrite produces a real suffix, determinism, varied across ids, armor pool, dog_armor pool, no-uniqueStats passthrough, no-"undefined" passthrough). `fusedItemEquip` regression green (15 total). `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/state/gameStore.ts` (migration block inside `backfillPlayer`'s inventory map).
+
 #### Fused weapon equippable + name no longer "undefined" + diamond/save-for-fusion suppressed on fused items
 
 - **OTA-224 (2026-05-30) · Player: *"I made a weapon with the fuse crucible yay, can't use it boo."* Inventory paste showed `◆ Resonant undefined (Rare, ..., 1d8 aetheric, ...) actions: scrap, save-for-fusion, drop` — name broken, no equip action.**
