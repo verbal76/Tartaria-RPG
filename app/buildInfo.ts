@@ -9950,4 +9950,89 @@
 // .ts (beginScene anchor
 // vendor skip when name in
 // defeatedEnemies).
-export const OTA_BUILD_ID = '2026-05-30-241';
+// 2026-05-30-242 — Arbiter
+// introspection ("who are
+// you", "why are you here",
+// etc.). Player: "the
+// arbiter doesn't seem to
+// answer any questions
+// about himself still." +
+// "general question should
+// not have to have a
+// persuasion role that's a
+// bit harsh for an in-game
+// functionality."
+//
+// The persuasion-roll
+// complaint is fixed by
+// OTA-241 (which moved
+// 'ask' from diplomacy to
+// the `ask` intent verb
+// list). Once OTA-241
+// propagates the roll
+// won't fire. This OTA
+// patches the GAP that
+// OTA-240 left — OTA-240's
+// introspection only
+// matched PLAYER questions
+// ("who am I", "how am I").
+// Questions ABOUT the
+// Arbiter ("who are you",
+// "why are you here", "are
+// you a ghost") fell through
+// to the lore bank, which
+// has no Arbiter entry.
+//
+// Five new Arbiter-intro
+// branches in case 'ask',
+// hand-authored in canon
+// voice:
+// - identity: "who are you"
+//   / "what are you" / "tell
+//   me about yourself" →
+//   "I am the Arbiter. I
+//   walk Tartaria..."
+// - purpose: "why are you
+//   here" / "what are you
+//   doing here" / "what's
+//   your role" → "I was
+//   here when the flood
+//   came..."
+// - origin: "where are you
+//   from" → "From here.
+//   From under it..."
+// - nature: "are you alive
+//   / a ghost / human" →
+//   "Not a god. Not a
+//   ghost. Not a relic..."
+// - name: "what's your
+//   name" → "The Arbiter.
+//   I had a name before the
+//   flood..."
+//
+// Order: specific
+// (purpose/origin/nature/
+// name) BEFORE the broad
+// identity catch-all, so
+// "what are you doing here"
+// routes to purpose
+// instead of being
+// swallowed by "what are
+// you" → identity.
+//
+// Tests: extended askSelf
+// Introspection from 24 →
+// 42 (18 Arbiter intro
+// cases across all 5
+// buckets). TS clean.
+//
+// Files: app/state/gameStore
+// .ts (5 Arbiter intro
+// branches added to case
+// 'ask' before player
+// intro), __tests__/askSelf
+// Introspection.test.ts
+// (18 new test cases +
+// reordered category()
+// to match game order).
+export const OTA_BUILD_ID = '2026-05-30-242';

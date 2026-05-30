@@ -245,6 +245,20 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Arbiter introspection — "who are you", "why are you here", "are you a ghost"
+
+- **OTA-242 (2026-05-30) · Player: *"the arbiter doesn't seem to answer any questions about himself still and I really got to roll against a 15 to ask the arbiter a question. ... a general question should not have to have a persuasion role."***
+  - **Persuasion roll fix:** that's OTA-241's domain. The user was still on OTA-240 (verified by their diag dump — `OTA build ID: 2026-05-30-240`). Once OTA-241 propagates, `ask` no longer routes to diplomacy and the persuasion check disappears.
+  - **Arbiter introspection gap:** OTA-240's introspection only matched **player** questions ("who am I", "how am I"). Questions about the Arbiter ("who are you", "why are you here", "are you a ghost") fell through to the lore bank, which has no Arbiter entry. **Fix:** 5 new Arbiter-intro branches in `case 'ask'`, hand-authored in canon voice:
+    - **identity**: "who are you" / "what are you" / "tell me about yourself" → "I am the Arbiter. I walk Tartaria with whoever the buried country lets through next..."
+    - **purpose**: "why are you here" / "what are you doing here" / "what's your role" → "I was here when the flood came. I am here while you dig..."
+    - **origin**: "where are you from" → "From here. From under it. From whatever was above before the mud came..."
+    - **nature**: "are you alive / dead / a ghost / human / real" → "Not a god. Not a ghost. Not a relic, though I am old enough to be all three..."
+    - **name**: "what's your name" / "do you have a name" → "The Arbiter. I had a name before the flood. It is buried with the city that used it..."
+  - **Order:** specific (purpose / origin / nature / name) BEFORE the broad identity catch-all, so "what are you doing here" routes to purpose instead of being swallowed by the broader "what are you" identity pattern.
+  - **Verification:** `askSelfIntrospection.test.ts` extended from 24 → 42 cases (18 Arbiter-intro tests across all 5 buckets). TS clean.
+  - **Files:** `app/state/gameStore.ts` (5 Arbiter-intro branches in case 'ask' before player intro), `__tests__/askSelfIntrospection.test.ts` (18 new cases + reordered `category()` to match game order).
+
 #### Ask Arbiter parser routing fix + dead vendor stays dead across resurrection
 
 - **OTA-241 (2026-05-30) · Player: *"I fought and killed a vendor and died a few minutes later, when I resurrected my character, the vendor was alive and selling me stuff again. it was jorah. also the ask arbiter is broken."***

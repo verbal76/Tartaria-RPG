@@ -7721,6 +7721,61 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // from `player` state before the lore lookup so the answers
         // are always grounded in actual character data.
         const introQ = trimmed.toLowerCase();
+        // OTA-242 — Arbiter introspection (about the Arbiter, not the
+        // player). Order matters: specific purpose / origin / nature
+        // / name patterns fire BEFORE the broader "who/what are you"
+        // identity catch-all, so "what are you doing here" routes to
+        // purpose instead of being swallowed by identity.
+
+        // "why are you here" / "what are you doing here" — Arbiter's purpose
+        if (/\bwhy\s+are\s+you\s+(here|with\s+me)\b/.test(introQ)
+            || /\bwhat\s+are\s+you\s+doing\s+(here|with\s+me)\b/.test(introQ)
+            || /\bwhat(?:'s|\s+is)\s+your\s+(purpose|mission|role|job|task)\b/.test(introQ)) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter inclines their head. "I was here when the flood came. I am here while you dig. Some agreement between the Aether and the silt put me in this work — I do not remember who signed it, only that the work continues, and that I am the one who watches."`,
+          );
+          break;
+        }
+        // "where are you from" / "where did you come from"
+        if (/\bwhere\s+(are|were)\s+you\s+from\b/.test(introQ)
+            || /\bwhere\s+did\s+you\s+come\s+from\b/.test(introQ)) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter looks toward the buried country. "From here. From under it. From whatever was above before the mud came. I have not been somewhere else long enough for it to feel like a place I am from."`,
+          );
+          break;
+        }
+        // "are you alive" / "are you a ghost" / "are you human" / "are you real"
+        if (/\bare\s+you\s+(alive|dead|real|human|a\s+(ghost|spirit|god|relic|machine|person|man|woman))\b/.test(introQ)) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter answers without inflection. "Not a god. Not a ghost. Not a relic, though I am old enough to be all three. The buried world appoints witnesses. I am one of them."`,
+          );
+          break;
+        }
+        // "what's your name" — anchor on the title; the Arbiter has no other.
+        if (/\bwhat(?:'s|\s+is)\s+your\s+name\b/.test(introQ)
+            || /\bdo\s+you\s+have\s+a\s+name\b/.test(introQ)) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter shrugs slightly. "The Arbiter. I had a name before the flood. It is buried with the city that used it. The title stays. The work stays."`,
+          );
+          break;
+        }
+        // "who are you" / "what is the arbiter" / "tell me about yourself"
+        // Broader identity catch-all — last so specific patterns above win.
+        if (/\bwho\s+are\s+you\b/.test(introQ)
+            || /\bwhat\s+(are|is)\s+(you|the\s+arbiter)\b/.test(introQ)
+            || /\bwho\s+is\s+the\s+arbiter\b/.test(introQ)
+            || /\btell\s+me\s+about\s+(you|the\s+arbiter|yourself)\b/.test(introQ)
+            || /\bdescribe\s+(you|yourself|the\s+arbiter)\b/.test(introQ)) {
+          get().appendLog(
+            'arbiter',
+            `The Arbiter watches you for a moment. "I am the Arbiter. I walk Tartaria with whoever the buried country lets through next. I do not bleed. I do not sleep. I remember the world above and the world below — and what the silt did to the seam between them."`,
+          );
+          break;
+        }
         // "who am i" / "what's my name" / "who is <name>"
         if (/\bwho\s+(am\s+i|is\s+(this\s+character|i)|i)\b/.test(introQ)
             || /\bwhat(?:'s|\s+is)\s+my\s+name\b/.test(introQ)
