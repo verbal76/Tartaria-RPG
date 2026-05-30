@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
@@ -346,7 +346,13 @@ function explanationFor(c: Concept): string {
 export function ActionReferenceScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const queueInputDraft = useGameStore((s) => s.queueInputDraft);
+  const triggerFirstUseNudge = useGameStore((s) => s.triggerFirstUseNudge);
   const [mode, setMode] = useState<RecipeMode>('actions');
+
+  // OTA-066 — first-time visitors get the Actions & Recipes intro.
+  useEffect(() => {
+    triggerFirstUseNudge('actions_intro');
+  }, [triggerFirstUseNudge]);
 
   // Per-card cycle index. Tapping a card cycles its example list:
   // tap once → example[0] queues to input + clipboard; tap again →

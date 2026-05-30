@@ -857,6 +857,13 @@ export interface WorldMemory {
    *  repair" nudge yet? Fires the first time they open the pack with any
    *  worn item present. */
   repairNudgeShown?: boolean;
+  /** OTA-066 — one-time first-use nudge IDs the player has already seen.
+   *  Each id maps to an entry in app/data/firstUseNudges.ts. When the
+   *  engine wants to surface a feature intro (first inventory open, first
+   *  vendor encounter, first golem summon, etc.) it calls
+   *  triggerFirstUseNudge(id); the overlay only shows if the id isn't
+   *  in this list. Persists with the save. */
+  seenFirstUseNudges?: string[];
   /** HANDOFF #15 — first cut MapGraph. Tracks every room the player has
    *  set foot in, keyed by `locationId@microMicroId@mapX,mapY`. First
    *  use is "you've been here before" narration on look + scene entry.

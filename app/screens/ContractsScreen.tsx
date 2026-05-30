@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, Modal } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { findHuntById, HUNTS, checkKindLabel, biomeLabel, stageTypeLabel, weaponRarityMeets } from '../engine/hunts';
@@ -73,6 +73,12 @@ export function ContractsScreen() {
   const completeContractFromUI = useGameStore((s) => s.completeContractFromUI);
   const abandonContract = useGameStore((s) => s.abandonContract);
   const discardLead = useGameStore((s) => s.discardLead);
+  const triggerFirstUseNudge = useGameStore((s) => s.triggerFirstUseNudge);
+
+  // OTA-066 — first-time visitors get the Contracts intro popup.
+  useEffect(() => {
+    triggerFirstUseNudge('contracts_intro');
+  }, [triggerFirstUseNudge]);
   // 2026-05-24 — tap-to-travel from the Primary Objective expansion.
   // Mirrors the Lore→Places confirm modal pattern in LoreCodexBody.
   const setTravelCourse = useGameStore((s) => s.setTravelCourse);

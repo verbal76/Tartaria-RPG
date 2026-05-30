@@ -4,7 +4,7 @@
 // show *what you are right now*, with every number broken down into
 // its sources so the player can audit any surprising value.
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import racesData from '../data/races/races.json';
@@ -44,6 +44,13 @@ export function CharacterScreen() {
   const scene = useGameStore((s) => s.currentScene);
   const worldMemory = useGameStore((s) => s.worldMemory);
   const setScreen = useGameStore((s) => s.setScreen);
+  const triggerFirstUseNudge = useGameStore((s) => s.triggerFirstUseNudge);
+
+  // OTA-066 — first-time visitors to the Player Sheet get the
+  // combined race/stats-growth intro popup.
+  useEffect(() => {
+    triggerFirstUseNudge('character_sheet_intro');
+  }, [triggerFirstUseNudge]);
 
   if (!player) {
     return (

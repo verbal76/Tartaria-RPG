@@ -144,4 +144,22 @@
 // copyright holder, source URL, and an expandable full-text license
 // block. Required for commercial release — every shipped open-source
 // component must surface its license to the user.
-export const OTA_BUILD_ID = '2026-05-30-065';
+//
+// 2026-05-30 OTA-066 — tutorial trim + first-use nudges. The
+// sequential tutorial regressed from the slim 11-step screen tour
+// to 23 popups when parallel work piled on race / golem / contracts
+// / guardians / gems / settings / etc. concept steps. OTA-066 cuts
+// the tutorial to 9 steps that only highlight regions of the main
+// exploration screen, and converts the 12 dropped concept steps to
+// one-time first-use popups fired by the screen / event that
+// actually introduces the feature: character_sheet_intro on first
+// CharacterScreen mount, inventory_intro on first InventoryScreen
+// mount, vendor_intro on first real (non-tutorial-demo) vendor,
+// contracts_intro on first ContractsScreen mount, actions_intro on
+// first ActionReferenceScreen mount, settings_intro on first
+// AboutScreen mount, golem_intro on first successful summon,
+// core_guardians_intro on first Lost Capital entry, and
+// resurrection_gems_intro on first ExplorationScreen mount with a
+// player. State lives on worldMemory.seenFirstUseNudges; rendered by
+// FirstUseNudgeOverlay mounted at App.tsx root.
+export const OTA_BUILD_ID = '2026-05-30-066';

@@ -23,6 +23,7 @@ import { VendorScreen } from './app/screens/VendorScreen';
 import { ActionReferenceScreen } from './app/screens/ActionReferenceScreen';
 import { ContractsScreen } from './app/screens/ContractsScreen';
 import { TutorialOverlay } from './app/components/TutorialOverlay';
+import { FirstUseNudgeOverlay } from './app/components/FirstUseNudgeOverlay';
 import { bootAudio, disposeAudio } from './app/audio/AudioManager';
 import { startAudioController, stopAudioController } from './app/audio/AudioController';
 import { initTTSManager } from './app/voice/TTSManager';
@@ -221,6 +222,7 @@ export default function App() {
           positioning matches measureInWindow coords from the targets
           (which report screen-absolute, not safe-area-relative). */}
       <TutorialOverlay />
+      <FirstUseNudgeOverlay />
     </SafeAreaProvider>
   );
 }

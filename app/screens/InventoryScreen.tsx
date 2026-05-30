@@ -32,6 +32,12 @@ export function InventoryScreen() {
   const repairInventoryItem = useGameStore((s) => s.repairInventoryItem);
   const repairNudgeShown = useGameStore((s) => s.worldMemory.repairNudgeShown ?? false);
   const markRepairNudgeShown = useGameStore((s) => s.markRepairNudgeShown);
+  const triggerFirstUseNudge = useGameStore((s) => s.triggerFirstUseNudge);
+
+  // OTA-066 — first inventory open gets the pack intro popup.
+  useEffect(() => {
+    triggerFirstUseNudge('inventory_intro');
+  }, [triggerFirstUseNudge]);
   const [pending, setPending] = useState<{ item: InventoryItem; slots: EquipSlot[] } | null>(null);
   // After-scrap result list. When non-null, the action-modal body
   // switches from "Equip / Drop / Scrap" buttons to a "✦ Added to

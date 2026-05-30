@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
@@ -63,6 +63,15 @@ export function ExplorationScreen() {
   const cancelPendingRolls = useGameStore((s) => s.cancelPendingRolls);
   const saveAndExitToTitle = useGameStore((s) => s.saveAndExitToTitle);
   const setActiveEnemyIdx = useGameStore((s) => s.setActiveEnemyIdx);
+  const triggerFirstUseNudge = useGameStore((s) => s.triggerFirstUseNudge);
+
+  // OTA-066 — first time landing on exploration with a player loaded,
+  // surface the Resurrection Gems intro (the player already has 1 from
+  // first install, so this is the natural moment to tell them about it).
+  useEffect(() => {
+    if (!player) return;
+    triggerFirstUseNudge('resurrection_gems_intro');
+  }, [player, triggerFirstUseNudge]);
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [approachOpen, setApproachOpen] = useState(false);

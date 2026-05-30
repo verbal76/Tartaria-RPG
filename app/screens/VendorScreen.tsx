@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { BrandedModal } from '../components/BrandedModal';
@@ -42,6 +42,15 @@ export function VendorScreen() {
   const acceptMystery = useGameStore((s) => s.acceptMystery);
   const acceptStoryline = useGameStore((s) => s.acceptStoryline);
   const tutorialDemoVendor = useGameStore((s) => s.tutorialDemoVendor);
+  const triggerFirstUseNudge = useGameStore((s) => s.triggerFirstUseNudge);
+
+  // OTA-066 — first vendor encounter gets the Trading intro. Skip
+  // when the tutorial-demo vendor (Irma) is up; that's a synthetic
+  // mount, not a real first trade.
+  useEffect(() => {
+    if (tutorialDemoVendor) return;
+    triggerFirstUseNudge('vendor_intro');
+  }, [tutorialDemoVendor, triggerFirstUseNudge]);
 
   const [mode, setMode] = useState<Mode>('buy');
   const [pending, setPending] = useState<Pending>(null);

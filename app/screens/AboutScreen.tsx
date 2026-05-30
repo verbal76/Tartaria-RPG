@@ -56,6 +56,15 @@ export function AboutScreen() {
   const qwenModelId = useGameStore((s) => s.qwenModelId);
   const gameLogLength = useGameStore((s) => s.gameLog.length);
   const player = useGameStore((s) => s.player);
+  const triggerFirstUseNudge = useGameStore((s) => s.triggerFirstUseNudge);
+
+  // OTA-066 — first settings open (only when a player is loaded so
+  // we don't fire on the title-screen settings sneak-peek) gets the
+  // four-tabs intro popup.
+  useEffect(() => {
+    if (!player) return;
+    triggerFirstUseNudge('settings_intro');
+  }, [player, triggerFirstUseNudge]);
 
   const [copied, setCopied] = useState(false);
   const [voiceCopied, setVoiceCopied] = useState(false);

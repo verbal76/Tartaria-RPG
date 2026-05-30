@@ -1003,6 +1003,18 @@ interface GameStore {
   repairWithVendor: (itemName: string) => void;
   /** Flip the one-time "items outlined in red need repair" tutorial nudge. */
   markRepairNudgeShown: () => void;
+  /** OTA-066 — pending first-use nudge id. Set by triggerFirstUseNudge
+   *  when the player first touches a feature that has a one-time intro.
+   *  Cleared by dismissFirstUseNudge. Read by FirstUseNudgeOverlay. */
+  pendingFirstUseNudge: string | null;
+  /** Surface a one-time feature-intro nudge. No-ops if the id is
+   *  already in worldMemory.seenFirstUseNudges OR if a nudge is
+   *  already pending (queueing is overkill — the player can only read
+   *  one popup at a time). */
+  triggerFirstUseNudge: (id: string) => void;
+  /** Dismiss the active first-use nudge: add the id to seen list and
+   *  clear pendingFirstUseNudge. */
+  dismissFirstUseNudge: () => void;
   acceptFactionQuest: (titleOrId: string) => void;
   turnInFactionQuest: (titleOrId: string) => void;
   acceptHunt: (titleOrId: string) => void;
@@ -1147,6 +1159,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   slotLoadError: null,
   tutorialStep: null,
   tutorialDemoVendor: null,
+  pendingFirstUseNudge: null,
 
   slots: [],
   activeSlotId: null,
@@ -8312,6 +8325,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const hint = mq.coreGateHint(playerNow?.factionId ?? '', locationId);
           if (hint) get().appendLog('arbiter', hint);
         }
+        // OTA-066 — first Capital entry surfaces the Core Guardians intro.
+        get().triggerFirstUseNudge('core_guardians_intro');
       }
     }
     if (locationId === 'mud_flood_nexus') {
@@ -9235,6 +9250,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   markRepairNudgeShown() {
     set((s) => ({ worldMemory: { ...s.worldMemory, repairNudgeShown: true } }));
+    void get().persist();
+  },
+
+  triggerFirstUseNudge(id) {
+    const seen = get().worldMemory.seenFirstUseNudges ?? [];
+    if (seen.includes(id)) return;
+    if (get().pendingFirstUseNudge) return;
+    set({ pendingFirstUseNudge: id });
+  },
+
+  dismissFirstUseNudge() {
+    const id = get().pendingFirstUseNudge;
+    if (!id) return;
+    set((s) => ({
+      pendingFirstUseNudge: null,
+      worldMemory: {
+        ...s.worldMemory,
+        seenFirstUseNudges: Array.from(
+          new Set([...(s.worldMemory.seenFirstUseNudges ?? []), id]),
+        ),
+      },
+    }));
     void get().persist();
   },
 
@@ -15541,6 +15578,8 @@ function runAethercraft(
       'world',
       `Aetherstone lifts out of the ground and folds into a shape that walks. ${golem.name} stands ready beside you. (HP ${golem.hp}/${golem.hpMax}, ${golem.attackDie} ${golem.damageType})`,
     );
+    // OTA-066 — first summon fires the Golem sidekick intro.
+    get().triggerFirstUseNudge('golem_intro');
   } else if (discipline === 'mend') {
     const livePlayer = get().player ?? player;
     const heal = Math.min(livePlayer.hpMax - livePlayer.hp, rollDie(6) + rollDie(6));
