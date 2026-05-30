@@ -178,4 +178,20 @@
 // successful rest-ambush roll materializes a fight. With the fix,
 // 25 back-to-back rests in wilderness is ~99.8% certain to roll
 // at least one ambush, and on average ~5–7 of them.
-export const OTA_BUILD_ID = '2026-05-30-067';
+//
+// 2026-05-30 OTA-068 — HANDOFF.md full rewrite. New top section (§0)
+// is a hard regression-prevention checklist: ALWAYS git fetch before
+// starting + before pushing, search for existing systems before
+// building, pick the next OTA NNN from the remote's highest not from
+// memory. §3 is a 100% walkthrough of branches + the OTA pipeline:
+// claude/new-session-MvF82 is THE main dev branch, every push auto-
+// publishes to EAS channel `preview`, and the APK is on HOLD because
+// of a Google Play internal test (do not bump metro.config.js, do not
+// add native modules, do not bump app.json version). §7 is the per-
+// OTA log for 064-067 (in-pack repair, notices screen, tutorial trim
+// + first-use nudges, rest-spam fix). §9 documents the workflows
+// actually used (Explore subagent for code discovery, general-purpose
+// for license verification with cite-the-source format, git rebase
+// discipline) including the mistakes I made this session so the next
+// chat doesn't repeat them.
+export const OTA_BUILD_ID = '2026-05-30-068';
