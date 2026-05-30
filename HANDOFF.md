@@ -245,6 +245,19 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Tutorial overhaul Phase 1 — slim 3-step upfront + just-in-time hint infrastructure
+
+- **OTA-229 (2026-05-30) · Player rolling a new character: *"we have a lot of segments now, I don't want people reading a dictionary before they get a chance to play. maybe break it up so the first time they hit something the hint comes up."***
+  - **Pre-fix state:** 28-step upfront tutorial in `tutorialSteps.ts` (~1,700 words). Coverage was also behind — no steps for the Fusing Crucible (OTA-191/195/220), Aether Dust buff, scrap, climb tiers, or the rewritten dog mechanics.
+  - **Phase 1 scope (this OTA — infrastructure + cut):**
+    1. NEW `app/components/useFirstTimeHint.ts` — AsyncStorage-gated per-id visibility hook. Storage key `tartaria.hint.v1.<id>` persists per-install; dismiss flips `shouldShow` false and writes the flag in the background. Includes `resetFirstTimeHint(id)` and `resetAllFirstTimeHints()` for future Tutorial Replay / "reset tutorial" settings.
+    2. NEW `app/components/FirstTimeHint.tsx` — small dismissable popup component. Drop it anywhere; nulls itself once dismissed; pairs with the hook.
+    3. `tutorialSteps.ts` — `TUTORIAL_STEPS` slimmed from 28 → 3 (welcome / movement, quick-row, gear icon). Original 28 preserved verbatim as the new `TUTORIAL_DOCS_FULL` export so the copy isn't lost and Phase 2 has the canonical source.
+  - **Phase 2+ (future OTAs, NOT in this OTA):** migrate each `TUTORIAL_DOCS_FULL` entry into a contextual `FirstTimeHint` at the trigger site (first tap of inventory → inventory hint; first tap of crafting → crafting hint; first time the Crucible is ready → Crucible hint; etc.). Add a Tutorial Replay screen behind the gear icon listing every hint as a flat scrollable doc for players who want the full read.
+  - **Authoring rule (committed in code comments):** hint body capped at ~25 words / 2 sentences max. Anything longer belongs in the Tutorial Replay docs, not the contextual popup.
+  - **Verification:** +6 tests in `firstTimeHint` (fresh shows, dismissed hides, ids independent, `resetFirstTimeHint` surfaces hint again, `resetAllFirstTimeHints` clears every flag without wiping other `tartaria.*` keys, storage key prefix is greppable). `npx tsc --noEmit` clean app-side. The existing `TutorialOverlay` machine still works against the slim `TUTORIAL_STEPS` — no other code touched.
+  - **Files:** NEW `app/components/useFirstTimeHint.ts`, NEW `app/components/FirstTimeHint.tsx`, `app/components/tutorialSteps.ts` (slim `TUTORIAL_STEPS` + preserved `TUTORIAL_DOCS_FULL`), NEW `__tests__/firstTimeHint.test.ts`.
+
 #### Investigate ambush no longer fires on already-cleared nouns
 
 - **OTA-228 (2026-05-30) · Player playtest log: re-tapping an already-investigated noun spawned a Mud Wasp ambush instead of the "already checked" line.**

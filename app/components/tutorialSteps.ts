@@ -2,6 +2,17 @@
 // walkthrough: which screen to be on, which area of that screen the
 // overlay should highlight, and the explanatory text shown in the
 // info card. Steps run in order; "skip" exits at any time.
+//
+// OTA-229 — tutorial overhaul phase 1. The upfront walkthrough used
+// to be 28 steps / ~1,700 words; players read a dictionary before
+// playing. New shape: 3 essential steps at character creation
+// (movement, quick actions, the gear icon) then just-in-time hints
+// (via FirstTimeHint / useFirstTimeHint) pop up the first time the
+// player taps a system. The TUTORIAL_DOCS_FULL export below preserves
+// the original 28 steps verbatim for a future Tutorial Replay screen
+// (Phase 2) — they're the canonical long-form copy for any player
+// who wants the full reference. Phase 2+ migrates each entry into a
+// contextual FirstTimeHint at the corresponding trigger site.
 
 import type { ScreenName } from '../engine/types';
 
@@ -33,7 +44,43 @@ export interface TutorialStep {
   welcome?: boolean;
 }
 
+// OTA-229 — slim 3-step upfront tutorial. Anything not here lives as
+// a FirstTimeHint at the trigger site, or in TUTORIAL_DOCS_FULL for
+// a player who wants the full read via Tutorial Replay.
 export const TUTORIAL_STEPS: TutorialStep[] = [
+  {
+    screen: 'exploration',
+    area: 'fullscreen',
+    title: 'Welcome to Tartaria',
+    body:
+      'Tap a cardinal direction to travel, or type what you want to do. ' +
+      'Most things take 30 seconds to learn — hints will pop up the first time you tap a new system.',
+    welcome: true,
+  },
+  {
+    screen: 'exploration',
+    area: 'quick-row',
+    title: 'Quick actions',
+    body:
+      'LOOK / SEARCH / INVENTORY are below the log. ' +
+      'Combat and craft buttons appear when they\'re relevant. That\'s the main loop.',
+  },
+  {
+    screen: 'exploration',
+    area: 'top-right-enemy',
+    title: 'The gear icon',
+    body:
+      'Settings, Lore Codex, and the full system reference live behind the ⚙ in the bottom-right. Come back any time.',
+  },
+];
+
+// OTA-229 — preserved long-form tutorial for the future Tutorial
+// Replay screen (Phase 2). Originally the 28-step upfront wall;
+// kept here verbatim so the copy isn't lost and so a player who
+// wants the full reference can read every system in one place. Do
+// NOT add new steps here — new systems get a FirstTimeHint at the
+// trigger site instead.
+export const TUTORIAL_DOCS_FULL: TutorialStep[] = [
   {
     screen: 'exploration',
     area: 'fullscreen',

@@ -8863,4 +8863,74 @@
 // ambush roll). NEW
 // __tests__/investigate
 // AmbushDedup.test.ts.
-export const OTA_BUILD_ID = '2026-05-30-228';
+// 2026-05-30-229 — tutorial
+// overhaul phase 1. Player
+// rolling a new character:
+// "we have a lot of segments
+// now. I don't want people
+// reading a dictionary
+// before they get a chance
+// to play. maybe break it
+// up so the first time they
+// hit something the hint
+// comes up."
+//
+// Pre-fix: 28-step upfront
+// tutorial = ~1,700 words
+// before the player swings
+// a sword. Coverage also
+// behind (no Fusing
+// Crucible, Aether buff,
+// scrap, climb tiers, new
+// dog mechanics).
+//
+// Phase 1 (this OTA):
+// NEW useFirstTimeHint hook
+// (AsyncStorage-gated per-
+// id hint visibility,
+// tartaria.hint.v1.<id>),
+// NEW FirstTimeHint
+// component (small
+// dismissable popup), and
+// tutorialSteps.ts slimmed
+// to 3 essentials (welcome,
+// quick-row, gear icon).
+// Original 28 preserved
+// verbatim as TUTORIAL_
+// DOCS_FULL for the future
+// Tutorial Replay screen.
+//
+// Phase 2+ (future OTAs)
+// migrate each TUTORIAL_
+// DOCS_FULL entry into a
+// contextual FirstTimeHint
+// at the trigger site
+// (inventory, crafting, the
+// Crucible, etc.) and add
+// Tutorial Replay behind
+// the gear icon.
+//
+// Authoring rule: hint body
+// ~25 words / 2 sentences
+// max. Longer copy belongs
+// in Tutorial Replay docs.
+//
+// Tests: +6 in firstTimeHint
+// (fresh shows, dismissed
+// hides, ids independent,
+// resetFirstTimeHint
+// surfaces again, resetAll
+// FirstTimeHints clears
+// every flag without
+// wiping other tartaria.*
+// keys). TS clean app-side.
+//
+// Files: NEW app/components/
+// useFirstTimeHint.ts, NEW
+// app/components/FirstTime
+// Hint.tsx, app/components/
+// tutorialSteps.ts (slim
+// TUTORIAL_STEPS + preserve
+// long form). NEW __tests__/
+// firstTimeHint.test.ts.
+export const OTA_BUILD_ID = '2026-05-30-229';
