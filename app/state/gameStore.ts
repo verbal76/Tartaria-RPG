@@ -1032,6 +1032,13 @@ interface GameStore {
    *  on every combat round. Transient — not persisted across save / load
    *  (player who reloads at 1 HP gets one fresh nudge, which is fine). */
   lowHpWarned: boolean;
+  /** OTA-218 — travel steps since the player last entered combat.
+   *  Increments on every cardinal travel step that doesn't spawn an
+   *  enemy; resets to 0 when an enemy spawns. Drives the wasteland
+   *  encounter picker's combat-starvation bias so a long peaceful
+   *  stretch pulls combat back into the rotation. Persisted alongside
+   *  wastelandStepsSinceEncounter for consistency. */
+  stepsSinceCombat: number;
   /** OTA-197 — transient streak tracker for the "this weapon isn't
    *  working on this enemy" arbiter nudge. Counts consecutive resisted
    *  hits with the same weapon type against the same enemy. On the 2nd
@@ -1455,6 +1462,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   cognitiveError: null,
   cognitiveLastResponse: null,
   wastelandStepsSinceEncounter: 0,
+  stepsSinceCombat: 0,
   lastInteractedNoun: null,
   justUpdatedFromBuild: null,
   pendingOtaAppliedFrom: null,
@@ -2154,6 +2162,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentScene: null,
       pendingRolls: null,
       wastelandStepsSinceEncounter: 0,
+      stepsSinceCombat: 0,
     });
     get().beginScene();
     get().appendLog(
@@ -13812,6 +13821,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (liveSceneForEncounter && liveSceneForEncounter.enemies.length === 0) {
       const wasteSteps = (get().wastelandStepsSinceEncounter ?? 0) + 1;
       set(() => ({ wastelandStepsSinceEncounter: wasteSteps }));
+      // OTA-218 — also track peaceful travel for the combat-starvation
+      // bias. Incremented here per cardinal step; reset to 0 below
+      // when an enemy actually spawns.
+      set(() => ({ stepsSinceCombat: (get().stepsSinceCombat ?? 0) + 1 }));
       // Tuning per playtest: a long run with zero combat at all means
       // the gate was too cautious. Tightened from threshold=3 /
       // chance=0.4 to threshold=2 / chance=0.55, then again to
@@ -13895,6 +13908,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // selected encounter is a fusion bench.
         aethericVision: hasAethericVision(player),
         forceArchetype,
+        // OTA-218 — combat-starvation bias. 3+ peaceful steps → 2×
+        // skirmish/mini_dungeon weight. 5+ → 4×.
+        stepsSinceCombat: get().stepsSinceCombat,
       });
       if (enc) {
         set(() => ({ wastelandStepsSinceEncounter: 0 }));
@@ -13981,6 +13997,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 },
               };
             });
+            // OTA-218 — combat started: reset the starvation counter.
+            set(() => ({ stepsSinceCombat: 0 }));
             const flavour = finalSpawn.boss
               ? `${finalSpawn.name} unfolds into the world — ${finalSpawn.attack}, ${finalSpawn.damage} per swing, and the air itself goes thin around it. This is not a fight you can win head-on. Find another way, or run. (range: close)`
               : enc.type === 'mini_dungeon'

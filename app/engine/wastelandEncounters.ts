@@ -119,6 +119,15 @@ interface PickOptions {
    *  rollChance gates, and returns the named archetype with its
    *  loot / npc lines / lore note resolved as normal. */
   forceArchetype?: string;
+  /** OTA-218 — combat-starvation bias. Travel steps since the
+   *  player last entered combat. The picker multiplies skirmish +
+   *  mini_dungeon weights based on this value so a long peaceful
+   *  stretch pulls combat back into the rotation. Playtester:
+   *    "so many encounters. so many actions. so many things that
+   *    I've done but I had one combat... we got to work on that"
+   *  Curve: 1.0× at 0–2 steps, 2.0× at 3–4, 4.0× at 5+. Reset
+   *  to 0 in stepDirection when an enemy actually spawns. */
+  stepsSinceCombat?: number;
 }
 
 /**
@@ -192,6 +201,19 @@ export function pickWastelandEncounter(
   // stay at baseline. Reads more carrot, less stick.
   const isHighValue = (t: WastelandEncounterType): boolean =>
     t === 'treasure' || t === 'mini_dungeon';
+  const isCombat = (t: WastelandEncounterType): boolean =>
+    t === 'skirmish' || t === 'mini_dungeon';
+  // OTA-218 — combat-starvation curve. After 3+ peaceful steps the
+  // skirmish + mini_dungeon weights start ramping. The thresholds
+  // keep the system invisible during normal play (combat happens
+  // organically in the 0–2 step window) but reliably correct a
+  // long dry spell.
+  const stepsSinceCombat = opts.stepsSinceCombat ?? 0;
+  const combatStarvationMult = stepsSinceCombat >= 5
+    ? 4.0
+    : stepsSinceCombat >= 3
+      ? 2.0
+      : 1.0;
   const biasMultiplier = (a: WastelandArchetype): number => {
     let mult = 1.0;
     if (opts.depleted && isHighValue(a.type)) mult *= 2.0;
@@ -199,6 +221,8 @@ export function pickWastelandEncounter(
     // The lens "sees" Aetheric disturbances; Crucibles ARE Aetheric
     // resonance. Carrying it makes you twice as likely to find one.
     if (opts.aethericVision && a.type === 'fusion_bench') mult *= 2.0;
+    // OTA-218 — combat-starvation bias.
+    if (isCombat(a.type)) mult *= combatStarvationMult;
     return mult;
   };
   // Weighted pick among eligible archetypes (bias-adjusted).

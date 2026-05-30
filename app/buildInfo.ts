@@ -8066,4 +8066,77 @@
 // app/screens/
 // ExplorationScreen.tsx (new
 // fusionBanner + styles).
-export const OTA_BUILD_ID = '2026-05-30-217';
+// 2026-05-30-218 — combat
+// starvation bias. Player on
+// the OTA-214 session log:
+//   "so many encounters. so
+//   many actions. so many
+//   things that I've done
+//   but I had one combat
+//   that's it. so many
+//   movements. I have one
+//   combat. we got to work
+//   on that"
+//
+// The encounter weights in
+// wasteland_encounters.json
+// give combat (skirmish +
+// mini_dungeon) about 35-40%
+// of selections, but a heavy
+// in-scene investigate /
+// salvage / climb loop +
+// short combats meant the
+// player perceived "one
+// combat in a long stretch."
+//
+// Fix: pickWastelandEncounter
+// gains a stepsSinceCombat
+// option. The picker
+// multiplies skirmish +
+// mini_dungeon weights based
+// on this value:
+//   0–2 steps → 1.0× (no bias)
+//   3–4 steps → 2.0×
+//   5+ steps → 4.0×
+// A long peaceful stretch
+// pulls combat back into the
+// rotation. The 0–2 floor
+// keeps the bias invisible
+// during normal play —
+// combat happens organically.
+//
+// Wiring: new
+// stepsSinceCombat field on
+// GameStore (transient,
+// starts at 0). stepDirection
+// increments it on every
+// cardinal travel step that
+// doesn't spawn an enemy;
+// resets to 0 when an enemy
+// actually spawns. Passed
+// through to
+// pickWastelandEncounter
+// alongside the other bias
+// options (depleted,
+// aethericVision, force
+// Archetype).
+//
+// Tests: +4 in
+// combatStarvationBias
+// (baseline rate at
+// stepsSinceCombat=0,
+// starved rate at 5+ ≥10pp
+// higher, mid-curve at 3
+// between, treasure share
+// reduces under starvation).
+// TS clean app-side.
+//
+// Files: app/engine/
+// wastelandEncounters.ts
+// (stepsSinceCombat option
+// + isCombat bias multiplier),
+// app/state/gameStore.ts
+// (stepsSinceCombat field +
+// init + increment +
+// reset-on-spawn + wire).
+export const OTA_BUILD_ID = '2026-05-30-218';
