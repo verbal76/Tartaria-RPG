@@ -59,6 +59,13 @@ export function pickEnemyForLocation(location: Location): Enemy | null {
   return pickWeighted(allowed, (e) => rarityWeights[e.rarity]);
 }
 
+export function pickEnemyForLocationGuaranteed(location: Location): Enemy | null {
+  const dangerCap: Rarity = location.danger >= 4 ? 'Legendary' : location.danger >= 3 ? 'Rare' : location.danger >= 2 ? 'Uncommon' : 'Common';
+  const allowed = enemies.filter((e) => rarityRank(e.rarity) <= rarityRank(dangerCap));
+  if (allowed.length === 0) return null;
+  return pickWeighted(allowed, (e) => rarityWeights[e.rarity]);
+}
+
 // Group encounter templates. Each entry produces a list of enemies — the
 // engine spawns copies of the named enemy with a per-instance HP roll so a
 // pack of three Bog Hounds aren't identical. Filtered by danger so a

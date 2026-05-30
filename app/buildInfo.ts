@@ -9001,4 +9001,20 @@
 // aether buff. To migrate
 // one system per OTA going
 // forward.
-export const OTA_BUILD_ID = '2026-05-30-230';
+//
+// 2026-05-30 OTA-231 —
+// ported two dev-branch
+// features missing from HaL:
+// (1) third-party NOTICES/
+// licenses screen (5th About
+// tab + thirdPartyNotices.ts),
+// required for commercial
+// release; (2) rest-spam
+// ambush guaranteed-spawn fix
+// (pickEnemyForLocation
+// Guaranteed fallback) so a
+// successful rest-ambush roll
+// always spawns a real enemy.
+// Kept HaL's AI stack
+// untouched.
+export const OTA_BUILD_ID = '2026-05-30-231';

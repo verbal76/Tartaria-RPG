@@ -6979,30 +6979,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
               threshold: 0,
               rollChance: 1.0,
             });
-            if (enc && enc.enemyName) {
-              // eslint-disable-next-line @typescript-eslint/no-require-imports
-              const { findEnemyByName } = require('../engine/encounter');
-              const enemy = findEnemyByName(enc.enemyName);
-              if (enemy) {
-                set((s) => s.currentScene
-                  ? {
-                      currentScene: {
-                        ...s.currentScene,
-                        enemies: [...s.currentScene.enemies, enemy],
-                        enemyHps: [...s.currentScene.enemyHps, enemy.hp],
-                        enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
-                        range: 'far',
-                      },
-                    }
-                  : s);
-                get().appendLog(
-                  'arbiter',
-                  `The Arbiter goes still. "You weren't alone. Something circled while you were out — and it stopped circling."`,
-                );
-                get().appendLog('world', `A ${enemy.name} closes the distance through the dark. The rest is over.`);
-              }
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { findEnemyByName, pickEnemyForLocationGuaranteed } = require('../engine/encounter');
+            const enemyFromArchetype = enc && enc.enemyName ? findEnemyByName(enc.enemyName) : null;
+            const enemy = enemyFromArchetype ?? pickEnemyForLocationGuaranteed(restScene.location);
+            if (enemy) {
+              set((s) => s.currentScene
+                ? {
+                    currentScene: {
+                      ...s.currentScene,
+                      enemies: [...s.currentScene.enemies, enemy],
+                      enemyHps: [...s.currentScene.enemyHps, enemy.hp],
+                      enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
+                      range: 'far',
+                    },
+                  }
+                : s);
+              get().appendLog(
+                'arbiter',
+                `The Arbiter goes still. "You weren't alone. Something circled while you were out — and it stopped circling."`,
+              );
+              get().appendLog('world', `A ${enemy.name} closes the distance through the dark. The rest is over.`);
             } else {
-              // No archetype matched — emit a flavor line so the
+              // No enemy could be spawned — emit a flavor line so the
               // player knows the world stirred even though no fight
               // landed.
               get().appendLog('arbiter', `The Arbiter watches the horizon. "Something passed close while you slept. It moved on."`);
