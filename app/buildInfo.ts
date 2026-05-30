@@ -7862,4 +7862,118 @@
 // + 200ms hide defer +
 // metrics-based initial
 // sync).
-export const OTA_BUILD_ID = '2026-05-30-215';
+// 2026-05-30-216 — investigate
+// gets two new outcome kinds:
+// directional finds and
+// cool-story flavor. Player:
+//   "Go on directional finds
+//   and stand-alone cool
+//   story. I would like to
+//   see more of the directional
+//   finds."
+//
+// rollAreaSearch's investigate
+// 60% story bucket now splits
+// three ways:
+//   - 50% scene-hook (existing
+//     multi-step chain)
+//   - 30% directional_find
+//     (NEW — schedules a real
+//     encounter)
+//   - 20% cool_story (NEW —
+//     standalone atmospheric
+//     one-liner)
+//
+// Directional find:
+//   - DIRECTIONAL_FINDS pool
+//     in areaSearch.ts holds 5
+//     seeded promises (caravan
+//     east, frozen traveller
+//     north, drifter west,
+//     Crucible south, bus
+//     east). When this kind
+//     fires, the investigate
+//     handler stamps player.
+//     pendingDirectionalFind
+//     with { direction,
+//     archetype, hintNoun }.
+//   - stepDirection checks for
+//     a matching direction.
+//     Match → forces the
+//     promised archetype via
+//     new pickWastelandEncounter
+//     option forceArchetype.
+//     Mismatch → clears the
+//     pending (player chose a
+//     different path, hint
+//     expires).
+//   - pickWastelandEncounter
+//     forceArchetype bypasses
+//     the rollChance + step
+//     threshold gates entirely
+//     — the player was
+//     PROMISED this; we
+//     deliver on the first
+//     travel step.
+//   - World line:
+//     "★ ON THE HORIZON —
+//     <hint line>"
+//     Arbiter line:
+//     "Travel <dir>, when
+//     you're ready. The
+//     <noun> will still be
+//     there."
+//
+// Cool story:
+//   - COOL_STORIES pool holds
+//     23 atmospheric one-liners
+//     ("Initials carved in a
+//     stone wall: 'TM was here.
+//     2019? 2059? The dust
+//     does not say.'", etc.).
+//     No mechanical payload —
+//     these exist so the
+//     player can FIND stories
+//     that aren't quests.
+//   - World line:
+//     "★ A QUIET MOMENT —
+//     <story line>"
+//
+// Schema: PlayerCharacter
+// .pendingDirectionalFind?
+// (transient, persists across
+// save/load via standard
+// player serialization).
+//
+// Tests: +9 in
+// directionalFindAndCoolStory
+// (distribution shares match
+// 30/20/30/etc., directional
+// payload shape, cool_story
+// shape, forceArchetype
+// bypasses thresholds + falls
+// through gracefully on
+// unknown id). investigateHook
+// Bias updated to test the
+// COMBINED story-bucket
+// (hook + directional + story)
+// since the 60% now splits
+// three ways. aetheric
+// LensAndShard regression
+// green. TS clean app-side.
+//
+// Files: app/engine/
+// areaSearch.ts (new outcome
+// kinds + pools + dispatch),
+// app/engine/types.ts
+// (pendingDirectionalFind on
+// PlayerCharacter), app/
+// engine/wastelandEncounters.
+// ts (forceArchetype option),
+// app/state/gameStore.ts
+// (investigate dispatch +
+// stepDirection cash-in),
+// __tests__/investigateHook
+// Bias.test.ts (updated for
+// new split).
+export const OTA_BUILD_ID = '2026-05-30-216';

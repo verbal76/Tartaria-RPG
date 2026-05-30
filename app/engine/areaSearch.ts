@@ -63,7 +63,18 @@ export type AreaSearchOutcome =
   | { kind: 'nothing'; line: string }
   | { kind: 'material'; itemName: string; rarity: Rarity; line: string }
   | { kind: 'tc'; amount: number; line: string }
-  | { kind: 'hook'; line: string };
+  | { kind: 'hook'; line: string }
+  // OTA-216 — directional find. Player investigates and the engine
+  // hints at something in a cardinal direction. When the player
+  // travels that way, stepDirection consumes a `pendingDirectionalFind`
+  // on the player and spawns the named encounter archetype with the
+  // promised hint noun. Investigate sets it; travel cashes it in.
+  | { kind: 'directional_find'; direction: 'N' | 'E' | 'S' | 'W'; archetype: string; hintNoun: string; line: string }
+  // OTA-216 — standalone story flavor. Single-line atmospheric beat,
+  // no mechanical payload. Surfaces with "★ A QUIET MOMENT —" prefix
+  // in the world feed so the player can see story is firing even
+  // when there's nothing to chase.
+  | { kind: 'cool_story'; line: string };
 
 // Small loot pool for generic area searches. Common only — chunky relic
 // finds come from typed hooks, not from poking the mud.
@@ -192,6 +203,59 @@ function pickWeighted<T extends { weight: number }>(arr: T[]): T {
   return arr[arr.length - 1]!;
 }
 
+// OTA-216 — directional-find pool. Each entry describes a specific
+// "go [dir] and find a [thing]" promise. The investigate handler
+// picks one at random when this outcome fires; the player gets the
+// hint line in the feed and a pendingDirectionalFind is stamped on
+// the player. When they step in that direction, stepDirection in
+// gameStore consumes the pending and spawns the matching archetype.
+// Archetype names must match entries in wasteland_encounters.json
+// so the encounter resolver can pull the narration + loot.
+export interface DirectionalFindSeed {
+  direction: 'N' | 'E' | 'S' | 'W';
+  archetype: string;
+  hintNoun: string;
+  lineTemplate: string;
+}
+const DIRECTIONAL_FINDS: DirectionalFindSeed[] = [
+  { direction: 'E', archetype: 'abandoned_caravan', hintNoun: 'Reclaimer caravan', lineTemplate: 'You catch a glint to the east — wagon spokes and a half-buried banner. A caravan, slumped in the silt. Two stretches that way.' },
+  { direction: 'N', archetype: 'frozen_traveller', hintNoun: 'mud-glassed body', lineTemplate: 'A shape sits north of here, too still to be alive. A body, mud-glassed in the cross-legged pose Reclaimers use when they choose where to die.' },
+  { direction: 'W', archetype: 'wandering_drifter', hintNoun: 'drifter', lineTemplate: 'Far west, a thin line of smoke. Someone built a small fire. Whoever they are is alone, and they\'ll talk if you walk up slowly.' },
+  { direction: 'S', archetype: 'fusion_crucible', hintNoun: 'Crucible', lineTemplate: 'A faint hum, south. The kind of resonance only Aetheric ironwork gives off. A Crucible, maybe — the old Reclaimers made them, then walked away.' },
+  { direction: 'E', archetype: 'old_bus_with_note', hintNoun: 'pre-flood bus', lineTemplate: 'Past the next rise east, a long shape — pre-flood transport, tipped onto its side. You can read the wreckage from here. Notes survive longer than people.' },
+];
+
+// OTA-216 — cool-story pool. Single-line atmospheric beats that
+// surface in the world feed with a "★ A QUIET MOMENT —" prefix.
+// No mechanical payload — these exist to make investigate feel
+// like a verb that finds stories, not just loot or hooks. The
+// player can ignore them safely but they're meant to be read.
+const COOL_STORIES: string[] = [
+  'Initials carved in a stone wall: "TM was here. 2019? 2059? The dust does not say."',
+  'A tiny shrine, hand-built. Three pebbles stacked, a frayed red ribbon, a coin face-down. Someone took the time.',
+  'The bone-white silhouette of a long-dead Aetheric coil, threaded with creeping ivy. The coil is older than the ivy. The ivy is older than you.',
+  'A child\'s shoe, no mate, dry as paper. The lacing was tied twice. They were taught well.',
+  'An empty oil drum, rust-bitten through. Pressed into the rim, almost gentle: "I forgive you."',
+  'A drift of glass, the kind that only forms in Aetheric heat. Whoever was here didn\'t want to be remembered. The glass remembers anyway.',
+  'A circle of fourteen footprints in the mud. The center is bare. Whatever stood there left without disturbing the ring.',
+  'A copper pocket-watch, hands stopped at 4:14. Pre-flood manufacture. The crystal is whole. Someone wound it.',
+  'Three sentences scratched into a board: "We waited. He never came. We walked." The board is half-buried; the sentences face up.',
+  'A small cairn of stones in the shape of an animal — a fox, maybe. Crude, but whoever made it loved the fox.',
+  'A drowned book, its pages fused. The visible spine letter is "K." The rest is mud and time.',
+  'A faded chalk mark on the rock, the kind Reclaimers use for "safe water nearby." The chalk is twenty years old. The water is not.',
+  'A broken Aetheric lantern, the kind that needed two people to carry. Whatever it lit, the people stopped lighting it.',
+  'A row of seven shell casings, lined up neat as you\'d expect. Someone wanted the count remembered.',
+  'A piece of mirror, no bigger than your palm. You catch your own reflection. Tartaria gives you that back, sometimes.',
+  'A hand-stitched cloth doll, its eyes embroidered crossed-shut. A Mud Dweller would have called it a sleeping doll. They\'re for children who can\'t sleep.',
+  'Three iron nails driven into a tree at exact head-height. Either a warning or a hex; the language depends on the faction.',
+  'A pre-flood photograph, the surface bubbled by water. You can almost make out a wedding. The bride\'s veil is still visible.',
+  'A small wooden box, no lid, no nails. Inside: a single dry rose, brown to black. Someone meant to come back for it.',
+  'A patch of grass that should not be growing here, formed in the perfect shape of a person lying down. Whatever fertilized it, you don\'t need to know.',
+  'A spiral of small stones, twelve in each arm. The arms point north. The center is empty. Whoever drew it knew exactly where they were.',
+  'A leather strap, knotted at intervals — a counting cord, one knot per day. You count seventy-three knots before the strap breaks.',
+  'A child\'s drawing nailed to a post: a stick figure family, the sun in the corner. The smallest figure has been blacked out with charcoal.',
+];
+
 function format(line: string, target: string): string {
   // Auto-prepend "the " when the target reads as a bare noun phrase.
   // Playtest log caught "You search rusted blade. It is completely
@@ -269,6 +333,32 @@ export function rollAreaSearch(
   if (r < tcCutoff) {
     const amount = 5 + Math.floor(Math.random() * 12);
     return { kind: 'tc', amount, line: format(pick(TC_LINES), target) };
+  }
+  // OTA-216 — when investigate fires a hook outcome, split the
+  // 60% hook share three ways:
+  //   - 50% → scene hook chain (the existing 2-3 step narrative
+  //           that lives on currentScene.hooks)
+  //   - 30% → directional find (schedules a real encounter the
+  //           player can travel toward)
+  //   - 20% → cool story flavor (atmospheric one-liner, no payload)
+  // search / harvest stay 100% scene-hook for the rare hook
+  // outcomes they roll.
+  if (isInvestigate) {
+    const subRoll = Math.random();
+    if (subRoll < 0.50) {
+      return { kind: 'hook', line: format(pick(HOOK_LINES), target) };
+    } else if (subRoll < 0.80) {
+      const seed = pick(DIRECTIONAL_FINDS);
+      return {
+        kind: 'directional_find',
+        direction: seed.direction,
+        archetype: seed.archetype,
+        hintNoun: seed.hintNoun,
+        line: seed.lineTemplate,
+      };
+    } else {
+      return { kind: 'cool_story', line: pick(COOL_STORIES) };
+    }
   }
   return { kind: 'hook', line: format(pick(HOOK_LINES), target) };
 }

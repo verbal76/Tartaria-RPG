@@ -6070,12 +6070,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
               `The Aetheric Vision Lens hums against your temple — a thread you weren't looking for catches the light.`,
             );
           }
-          // OTA-213 — hook outcomes get a distinct "★ STORY THREAD"
-          // prefix on the world line so the player can't scroll past
-          // them. Adds reading friction in the visual feed without
-          // forcing a modal.
+          // OTA-213 + OTA-216 — distinct prefixes for the three story
+          // outcome kinds so the player can scan the feed and see
+          // what kind of beat just landed:
+          //   ★ STORY THREAD       — scene hook chain (multi-step)
+          //   ★ ON THE HORIZON     — directional find (travel-cashable)
+          //   ★ A QUIET MOMENT     — cool-story flavor (read it, move on)
           if (outcome.kind === 'hook') {
             get().appendLog('world', `★ STORY THREAD — ${outcome.line}`);
+          } else if (outcome.kind === 'directional_find') {
+            // OTA-216 — stamp the pending find so stepDirection
+            // can cash it in on the next matching travel step.
+            const dirWord = { N: 'north', E: 'east', S: 'south', W: 'west' }[outcome.direction];
+            get().appendLog(
+              'world',
+              `★ ON THE HORIZON — ${outcome.line}`,
+            );
+            get().appendLog(
+              'arbiter',
+              `The Arbiter nods slowly. "Travel ${dirWord}, when you're ready. The ${outcome.hintNoun} will still be there."`,
+            );
+            set((s) => s.player
+              ? { player: {
+                  ...s.player,
+                  pendingDirectionalFind: {
+                    direction: outcome.direction,
+                    archetype: outcome.archetype,
+                    hintNoun: outcome.hintNoun,
+                  },
+                } }
+              : s);
+          } else if (outcome.kind === 'cool_story') {
+            get().appendLog('world', `★ A QUIET MOMENT — ${outcome.line}`);
           } else {
             get().appendLog('world', outcome.line);
           }
@@ -6133,6 +6159,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
           } else if (outcome.kind === 'tc') {
             set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc + outcome.amount } } : s));
             get().appendLog('reward', `+${outcome.amount} TC.`);
+            producedInv = true;
+          } else if (outcome.kind === 'directional_find') {
+            // OTA-216 — the noun IS consumed (you've investigated
+            // it; the hint is the find). Cashing in the encounter
+            // happens via stepDirection when the player travels.
+            producedInv = true;
+          } else if (outcome.kind === 'cool_story') {
+            // OTA-216 — quiet-moment flavor consumes the noun (the
+            // story IS the find; investigating the same noun again
+            // shouldn't re-roll a fresh one-liner).
             producedInv = true;
           } else if (outcome.kind === 'hook') {
             const activeUnresolved = (currentScene.hooks ?? []).some((h) => !h.resolved);
@@ -13822,6 +13858,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
         || (playerForEnc.staminaMax > 0 && playerForEnc.stamina / playerForEnc.staminaMax < 0.20)
         || (playerForEnc.tc < 30)
       );
+      // OTA-216 — directional-find cash-in. If the player has a
+      // pendingDirectionalFind matching THIS travel direction, force
+      // the picker to spawn the promised archetype. Cleared either
+      // way (firing OR a mismatched direction step) — the hint
+      // expires either by paying out or by being abandoned.
+      let forceArchetype: string | undefined;
+      const pending = player.pendingDirectionalFind;
+      if (pending) {
+        const dirLetter = dir.charAt(0).toUpperCase() as 'N' | 'E' | 'S' | 'W';
+        if (pending.direction === dirLetter) {
+          forceArchetype = pending.archetype;
+        }
+        // Clear the pending field whether the direction matched or not
+        // (matching → spent; not matching → abandoned by the player's
+        // choice of path). Investigate again to get a new hint.
+        set((s) => s.player
+          ? { player: { ...s.player, pendingDirectionalFind: undefined } }
+          : s);
+      }
       const enc = pickWastelandEncounter(liveSceneForEncounter.location, {
         stepsSinceLastEncounter: wasteSteps,
         threshold: baseThreshold,
@@ -13830,6 +13885,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // OTA-198 — Aetheric Vision Lens doubles the chance the
         // selected encounter is a fusion bench.
         aethericVision: hasAethericVision(player),
+        forceArchetype,
       });
       if (enc) {
         set(() => ({ wastelandStepsSinceEncounter: 0 }));

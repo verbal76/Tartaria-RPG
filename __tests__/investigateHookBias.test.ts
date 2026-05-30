@@ -22,16 +22,31 @@ describe('OTA-213 — investigate intent biases rollAreaSearch toward hooks', ()
     expect(rate).toBeLessThanOrEqual(0.22);
   });
 
-  it('investigate intent lifts hook rate to roughly 60%', () => {
-    const rate = countHooks(2000, { intent: 'investigate' }) / 2000;
+  it('investigate intent lifts story-bucket rate to roughly 60% (OTA-216: split across hook + directional + cool_story)', () => {
+    // OTA-213 made the "story" bucket ~60% of investigates. OTA-216
+    // then split that 60% three ways (50% hook / 30% directional_find
+    // / 20% cool_story). Asserting on the TOTAL of all three is the
+    // stable invariant; individual sub-rates have their own tests in
+    // directionalFindAndCoolStory.
+    let storyCount = 0;
+    for (let i = 0; i < 2000; i++) {
+      const o = rollAreaSearch('rubble', { intent: 'investigate' });
+      if (o.kind === 'hook' || o.kind === 'directional_find' || o.kind === 'cool_story') storyCount++;
+    }
+    const rate = storyCount / 2000;
     expect(rate).toBeGreaterThanOrEqual(0.50);
     expect(rate).toBeLessThanOrEqual(0.70);
   });
 
   it('investigate + Vision Lens hookBonus stays under the 0.4 clamp', () => {
     // baseline 60% + bonus capped at 40pp → ~max 100% but bonus only
-    // converts nothing-share, so practical ceiling is 70-75%.
-    const rate = countHooks(2000, { intent: 'investigate', hookBonus: 99 }) / 2000;
+    // converts nothing-share. Asserting on the story bucket total.
+    let storyCount = 0;
+    for (let i = 0; i < 2000; i++) {
+      const o = rollAreaSearch('rubble', { intent: 'investigate', hookBonus: 99 });
+      if (o.kind === 'hook' || o.kind === 'directional_find' || o.kind === 'cool_story') storyCount++;
+    }
+    const rate = storyCount / 2000;
     expect(rate).toBeLessThanOrEqual(0.95); // hard upper sanity bound
   });
 

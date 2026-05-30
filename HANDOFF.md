@@ -245,6 +245,17 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Investigate gets directional finds + standalone cool-story flavor
+
+- **OTA-216 (2026-05-30) · Player: *"Go on directional finds and stand-alone cool story. I would like to see more of the directional finds."***
+  - **What:** OTA-213 made investigate hook-heavy (60%). Now the hook share splits three ways: 50% scene-hook (existing chain) / 30% directional_find (NEW) / 20% cool_story (NEW). Directional finds promise a thing in a cardinal direction and DELIVER it when the player travels that way. Cool stories are atmospheric one-liners with no payload — they exist so investigate finds stories that aren't quests.
+  - **Fix (engine):** `rollAreaSearch` returns two new outcome kinds — `directional_find` (with direction, archetype, hintNoun, line) and `cool_story` (just a line). `DIRECTIONAL_FINDS` pool in `areaSearch.ts` holds 5 seeded promises (caravan east, frozen traveller north, drifter west, Crucible south, bus east). `COOL_STORIES` pool holds 23 hand-authored atmospheric one-liners.
+  - **Fix (cash-in):** `pickWastelandEncounter` gains a `forceArchetype` option that bypasses the rollChance + step threshold gates entirely and returns the named archetype with its loot / npc lines / lore note resolved as normal. `stepDirection` checks `player.pendingDirectionalFind`; match → passes `forceArchetype`; mismatch → clears the pending (player chose a different path).
+  - **Schema:** `PlayerCharacter.pendingDirectionalFind?: { direction: 'N' | 'E' | 'S' | 'W'; archetype: string; hintNoun: string }`. Cleared on cash-in or on a mismatched travel step.
+  - **UI:** Distinct prefixes by outcome kind — `★ STORY THREAD` (scene hook chain), `★ ON THE HORIZON` (directional find with arbiter follow-up: *"Travel east, when you're ready. The Reclaimer caravan will still be there."*), `★ A QUIET MOMENT` (cool story flavor).
+  - **Verification:** +9 tests in `directionalFindAndCoolStory` (distribution shares, payload shape, forceArchetype bypasses thresholds + falls through gracefully on unknown id). `investigateHookBias` updated to assert on the combined story bucket (hook + directional + cool_story) since 60% now splits three ways. `aethericLensAndShard` regression green. `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/engine/areaSearch.ts` (new outcome kinds + pools + dispatch), `app/engine/types.ts` (pendingDirectionalFind), `app/engine/wastelandEncounters.ts` (forceArchetype option), `app/state/gameStore.ts` (investigate dispatch + stepDirection cash-in), `__tests__/investigateHookBias.test.ts` (updated for new split).
+
 #### KeyboardInputBar robustness — intermittent "bar doesn't push above the keyboard" bug
 
 - **OTA-215 (2026-05-30) · Player: *"Sometimes when I open up the keyboard to type by pushing in the text box. it doesn't always push the text box above it. can you test to see what is causing that to happen intermittently and fix it?"***

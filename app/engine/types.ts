@@ -698,6 +698,15 @@ export interface PlayerCharacter {
    *  effectiveStats reads the buff and applies the bonus IF
    *  Date.now() < expiresAtMs. */
   aetherBuff?: { stat: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma'; bonus: number; expiresAtMs: number };
+  /** OTA-216 — directional-find promise. Investigate occasionally
+   *  hints at a specific thing in a cardinal direction ("two
+   *  stretches east, a Reclaimer caravan in the silt"). The
+   *  stepDirection handler watches for the matching direction and
+   *  spawns the named archetype + hint noun the next time the
+   *  player travels that way. Cleared after firing or if the
+   *  player travels in a non-matching direction first (the hint
+   *  expires — investigate something new). */
+  pendingDirectionalFind?: { direction: 'N' | 'E' | 'S' | 'W'; archetype: string; hintNoun: string };
   /** Lifetime counters; thresholds trigger stat growth. */
   milestones?: PlayerMilestones;
   /** OTA 058 — Skyrim-style use-based stat progression. Each stat

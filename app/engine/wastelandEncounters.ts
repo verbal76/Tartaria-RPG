@@ -112,6 +112,13 @@ interface PickOptions {
    *  to carry the lens trips over Crucibles roughly twice as often.
    *  Other archetypes unaffected. */
   aethericVision?: boolean;
+  /** OTA-216 — directional-find cash-in. When the player has a
+   *  `pendingDirectionalFind` matching the travel direction, this
+   *  carries the promised archetype id ('abandoned_caravan', etc.).
+   *  The picker SKIPS the random weighted roll, bypasses the step/
+   *  rollChance gates, and returns the named archetype with its
+   *  loot / npc lines / lore note resolved as normal. */
+  forceArchetype?: string;
 }
 
 /**
@@ -127,6 +134,43 @@ export function pickWastelandEncounter(
   const threshold = opts.threshold ?? 3;
   const rollChance = opts.rollChance ?? 0.4;
   const rng = opts.rng ?? Math.random;
+
+  // OTA-216 — forceArchetype cash-in for directional finds. When the
+  // caller (stepDirection) has a pending find matching the travel
+  // direction, we skip the rollChance + step threshold gates entirely
+  // and resolve the named archetype's loot / npc lines / lore note.
+  // The player was PROMISED this; we deliver it on the first travel
+  // step, not the next eligible roll.
+  if (opts.forceArchetype) {
+    const archetype = ARCHETYPES[opts.forceArchetype];
+    if (archetype) {
+      const enemyName = archetype.type === 'skirmish' && archetype.enemyPool && archetype.enemyPool.length > 0
+        ? archetype.enemyPool[Math.floor(rng() * archetype.enemyPool.length)] ?? null
+        : archetype.type === 'mini_dungeon' && archetype.bandit_pool && archetype.bandit_pool.length > 0
+          ? archetype.bandit_pool[Math.floor(rng() * archetype.bandit_pool.length)] ?? null
+          : null;
+      let narration = archetype.narration;
+      if (enemyName) narration = narration.replace(/\{enemy\}/g, enemyName);
+      const npcLine = (archetype.npc_lines && archetype.npc_lines.length > 0)
+        ? archetype.npc_lines[Math.floor(rng() * archetype.npc_lines.length)] ?? null
+        : null;
+      const loot = archetype.loot && archetype.loot.length > 0
+        ? rollLoot(archetype.loot, rng)
+        : null;
+      return {
+        archetypeId: opts.forceArchetype,
+        type: archetype.type,
+        narration,
+        loot,
+        npcLine,
+        loreNote: archetype.lore_note ?? null,
+        enemyName,
+        questHook: archetype.quest_hook ?? null,
+      };
+    }
+    // If the archetype id is unknown (stale save / archetype removed),
+    // fall through to the normal pick rather than returning null.
+  }
 
   if (opts.stepsSinceLastEncounter < threshold) return null;
   if (rng() >= rollChance) return null;
