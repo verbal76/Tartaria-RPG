@@ -162,4 +162,20 @@
 // resurrection_gems_intro on first ExplorationScreen mount with a
 // player. State lives on worldMemory.seenFirstUseNudges; rendered by
 // FirstUseNudgeOverlay mounted at App.tsx root.
-export const OTA_BUILD_ID = '2026-05-30-066';
+//
+// 2026-05-30 OTA-067 — rest-spam ambush bug. Playtester spammed
+// `rest` 25 times in 30 seconds and only triggered one fight. Root
+// cause: the rest-ambush roll DID fire (~22% × time-of-day mult)
+// but the fallback called pickWastelandEncounter which returns
+// non-combat archetypes (NPCs, treasure caches) ~38% of the time.
+// Those silently failed the `if (enc.enemyName)` check, so the
+// ambush rolled but no enemy spawned — the player only saw the
+// "Something passed close while you slept" flavor line. Fix:
+// pickWastelandEncounter still runs first to preserve mini-dungeon
+// variety when it lands a combat archetype, but the path now falls
+// back to a new pickEnemyForLocationGuaranteed helper (same logic
+// as pickEnemyForLocation but no upfront chance gate) so every
+// successful rest-ambush roll materializes a fight. With the fix,
+// 25 back-to-back rests in wilderness is ~99.8% certain to roll
+// at least one ambush, and on average ~5–7 of them.
+export const OTA_BUILD_ID = '2026-05-30-067';

@@ -5080,39 +5080,48 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // so the player wakes at full strength but with a problem
           // to handle. Mirrors the store rest() action's spawn logic.
           if (restAmbush) {
+            // OTA-067 — once restAmbush rolls true, spawn a real fight.
+            // Pre-fix: pickWastelandEncounter could return non-combat
+            // archetypes (NPCs, treasure caches) that silently fell
+            // through the `enc.enemyName` check, so the "ambush" was
+            // a no-op ~38% of the time it rolled — a playtester
+            // spammed 25 rests, got 1 actual fight, several "passed
+            // close while you slept" flavor lines. Now: try the
+            // wasteland picker first (preserves the variety / mini-
+            // dungeon flavor when it lands a combat archetype), then
+            // fall back to a guaranteed enemy pick from the location's
+            // pool so the ambush always materializes.
             // eslint-disable-next-line @typescript-eslint/no-require-imports
             const { pickWastelandEncounter } = require('../engine/wastelandEncounters');
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const { findEnemyByName, pickEnemyForLocationGuaranteed } = require('../engine/encounter');
             const enc = pickWastelandEncounter(restScene.location, {
               stepsSinceLastEncounter: 999,
               threshold: 0,
               rollChance: 1.0,
             });
-            if (enc && enc.enemyName) {
-              // eslint-disable-next-line @typescript-eslint/no-require-imports
-              const { findEnemyByName } = require('../engine/encounter');
-              const enemy = findEnemyByName(enc.enemyName);
-              if (enemy) {
-                set((s) => s.currentScene
-                  ? {
-                      currentScene: {
-                        ...s.currentScene,
-                        enemies: [...s.currentScene.enemies, enemy],
-                        enemyHps: [...s.currentScene.enemyHps, enemy.hp],
-                        enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
-                        range: 'far',
-                      },
-                    }
-                  : s);
-                get().appendLog(
-                  'arbiter',
-                  `The Arbiter goes still. "You weren't alone. Something circled while you were out — and it stopped circling."`,
-                );
-                get().appendLog('world', `A ${enemy.name} closes the distance through the dark. The rest is over.`);
-              }
+            const enemyFromArchetype = enc && enc.enemyName ? findEnemyByName(enc.enemyName) : null;
+            const enemy = enemyFromArchetype ?? pickEnemyForLocationGuaranteed(restScene.location);
+            if (enemy) {
+              set((s) => s.currentScene
+                ? {
+                    currentScene: {
+                      ...s.currentScene,
+                      enemies: [...s.currentScene.enemies, enemy],
+                      enemyHps: [...s.currentScene.enemyHps, enemy.hp],
+                      enemyAmbushUsed: [...(s.currentScene.enemyAmbushUsed ?? []), false],
+                      range: 'far',
+                    },
+                  }
+                : s);
+              get().appendLog(
+                'arbiter',
+                `The Arbiter goes still. "You weren't alone. Something circled while you were out — and it stopped circling."`,
+              );
+              get().appendLog('world', `A ${enemy.name} closes the distance through the dark. The rest is over.`);
             } else {
-              // No archetype matched — emit a flavor line so the
-              // player knows the world stirred even though no fight
-              // landed.
+              // Truly impossible — the catalog has no Common-tier enemy
+              // for this location. Log the flavor as a graceful fallback.
               get().appendLog('arbiter', `The Arbiter watches the horizon. "Something passed close while you slept. It moved on."`);
             }
           }
