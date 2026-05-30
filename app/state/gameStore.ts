@@ -6821,6 +6821,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // heal/stamina ceiling is a separate dial.
           const hpRoom = player.hpMax - player.hp;
           const stamRoom = player.staminaMax - player.stamina;
+          // OTA-238 — block rest when already fully whole. Playtester:
+          // "there should be a block on resting if you're already
+          // fully rested, that way I don't just spam that button to
+          // collect items and fight low-level enemies." Prior OTA-029
+          // intentionally let full-HP rests through so the strike-
+          // camp ambush could fire as a risk dial; user reverted —
+          // the spam loop (15+ rests in a row picking up freebies
+          // and rolling for low-level enemies, captured in the bug
+          // report log) is a bigger UX problem than the missed-
+          // ambush dial. Block when HP + stamina are both capped
+          // AND there's no corruption to decay (corruption decay
+          // is the other useful rest outcome).
+          const fullyRested =
+            hpRoom === 0 && stamRoom === 0 && (player.corruption ?? 0) === 0;
+          if (fullyRested) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter shakes their head. "You're whole, your wind is full, and the Aether carries no shadow on you. Save the hours for when you'll need them."`,
+            );
+            break;
+          }
           // 2026-05-25 — striking camp is the dangerous moment, not
           // the sleeping. Per playtester: "even if you do not need
           // to rest and you hit the button that should run the

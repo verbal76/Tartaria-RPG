@@ -245,6 +245,18 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Approach auto-target + rest-when-whole block
+
+- **OTA-238 (2026-05-30) · Playtester:**
+  - *"when you were in combat and hit approach, there shouldn't be a pop-up asking you what you want to approach unless there's multiple enemies. if there's only one enemy, it should automatically approach one distance count towards that enemy. that way, if you're as far away as possible and you hit approach, you might get into the long range area so your bolt-caster works ... if I hit approach it shows me that enemy and I got to click on it and then it shows me all the 50 other things that I can't do at the moment."*
+  - *"there should be a block on resting if you're already fully rested, that way I don't just spam that button to collect items and fight low-level enemies."*
+  - Bug-report log captured the rest-spam loop: 15+ consecutive `rest` taps each producing "Whole already — the Aetherstone hums steady" but still passing 8 in-game hours, rolling for ambush, and dropping random freebies (Smoke-Cured Jerky Strip, Aether Residue, Wild Carrot). Two ambush spawns landed in that 80-hour window — exactly the "spam that button to fight low-level enemies" loop the user called out.
+  - **Fixes:**
+    - `ExplorationScreen.onOpenApproach` — when `currentScene.enemies.length === 1`, skips the `ApproachModal` and submits `approach <enemy.name>` directly. Each tap costs one range step (far → close → arm's reach) toward the only enemy in scene. Multi-enemy scenes still open the picker (it's necessary then). Player mental model matches: one tap = one step closer.
+    - `gameStore.ts` `case 'rest'` bare-rest branch — early break when `hpRoom === 0 && stamRoom === 0 && player.corruption === 0`. All three useful rest outcomes are at cap, so the rest produces nothing. Arbiter refuses ("You're whole, your wind is full, and the Aether carries no shadow on you. Save the hours for when you'll need them.") No time pass, no ambush roll, no freebie drop. Reverts OTA-029's "always allow rest so strike-camp ambush can fire" — the spam loop is a bigger UX failure than the missed-ambush dial.
+  - **Verification:** TS clean app-side.
+  - **Files:** `app/state/gameStore.ts` (case 'rest' early break on fully-rested), `app/screens/ExplorationScreen.tsx` (onOpenApproach single-enemy auto-target).
+
 #### Crash diagnostics + defensive boundaries — second-pass when OTA-234's fix didn't fully unbrick
 
 - **OTA-237 + APK 2026-05-30c (next build) · Player after installing APK 239 with OTA-234 baked in: *"iust updated to [APK 239] and we still crash"* + *"roll out some agents and do a deep dive for all crash scenarios within seconds of opening."***

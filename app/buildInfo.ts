@@ -9584,4 +9584,75 @@
 // screens/TitleScreen.tsx
 // (LastCrashLine component +
 // integration above footer).
-export const OTA_BUILD_ID = '2026-05-30-237';
+// 2026-05-30-238 — approach
+// auto-target + rest-when-
+// whole block. Playtester:
+// "when you were in combat
+// and hit approach, there
+// shouldn't be a pop-up
+// asking you what you want
+// to approach unless there's
+// multiple enemies. ...
+// there should be a block on
+// resting if you're already
+// fully rested, that way I
+// don't just spam that
+// button to collect items
+// and fight low-level
+// enemies."
+//
+// 1. ExplorationScreen
+//    onOpenApproach now
+//    checks enemies.length —
+//    if exactly one enemy in
+//    scene, skips the modal
+//    and submits `approach
+//    <enemy.name>` directly.
+//    Each tap costs one
+//    range step toward that
+//    enemy (far → close →
+//    arm), matching the
+//    player's mental model:
+//    one tap = one step
+//    closer. Multi-enemy
+//    scenes still open the
+//    picker (the picker IS
+//    necessary then).
+//
+// 2. gameStore case 'rest'
+//    bare-rest branch gains
+//    an early break when
+//    hpRoom === 0 AND
+//    stamRoom === 0 AND
+//    player.corruption ===
+//    0 — the three useful
+//    outcomes of rest are
+//    all already at cap so
+//    nothing the rest could
+//    do is useful. Arbiter
+//    line refuses ("You're
+//    whole, your wind is
+//    full ... save the hours
+//    for when you'll need
+//    them"). No time pass,
+//    no ambush roll, no
+//    freebie drop. Reverts
+//    OTA-029's "always allow
+//    rest so strike-camp
+//    ambush can fire" — bug
+//    report log captured 15+
+//    consecutive rests in a
+//    row spawning freebies
+//    and rolling low-level
+//    encounters, which the
+//    user called a worse
+//    failure mode than the
+//    missed-ambush dial.
+//
+// Files: app/state/gameStore.
+// ts (case 'rest' early
+// break on fully-rested),
+// app/screens/Exploration
+// Screen.tsx (onOpenApproach
+// single-enemy auto-target).
+export const OTA_BUILD_ID = '2026-05-30-238';

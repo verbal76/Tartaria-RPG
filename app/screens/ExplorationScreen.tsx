@@ -579,7 +579,23 @@ export function ExplorationScreen() {
             onOpenInventory={() => setScreen('inventory')}
             onOpenSearch={() => setSearchOpen(true)}
             onOpenCrafting={() => setScreen('crafting')}
-            onOpenApproach={() => setApproachOpen(true)}
+            onOpenApproach={() => {
+              // OTA-238 — auto-target when there's exactly one enemy.
+              // Playtester: "if there's only one enemy, it should
+              // automatically approach one distance count towards
+              // that enemy. ... If I hit approach it shows me that
+              // enemy and I got to click on it and then it shows me
+              // all the 50 other things that I can't do." Skip the
+              // picker entirely and dispatch `approach <enemy>` so
+              // each tap costs one range step (far → close → arm)
+              // toward the only enemy in the scene.
+              const enemies = currentScene?.enemies ?? [];
+              if (enemies.length === 1 && enemies[0]) {
+                submit(`approach ${enemies[0].name}`);
+                return;
+              }
+              setApproachOpen(true);
+            }}
             onOpenSalvage={() => setSalvageOpen(true)}
             onOpenTake={() => setTakeOpen(true)}
             onOpenClimb={() => setClimbOpen(true)}
