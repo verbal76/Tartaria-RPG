@@ -9874,4 +9874,80 @@
 // branches in case 'ask'),
 // NEW __tests__/askSelf
 // Introspection.test.ts.
-export const OTA_BUILD_ID = '2026-05-30-240';
+// 2026-05-30-241 — Ask
+// Arbiter parser fix + dead
+// vendor resurrection fix.
+// Two player bugs:
+//
+// "the ask arbiter is broken"
+// — log showed every `ask
+// the arbiter about X` query
+// parsing as intent=diplomacy
+// (the parser had 'ask' in
+// the diplomacy verb list,
+// so the game tried to find
+// an NPC named "the arbiter"
+// to negotiate with — none
+// exists, so the player got
+// "No one is here to
+// negotiate with. The wind
+// takes the words." for
+// every lore + introspection
+// query. Moved 'ask' from
+// diplomacy to the `ask`
+// intent verb list (where
+// 'what' / 'who' / 'why'
+// already live). The case
+// 'ask' handler in
+// gameStore (which OTA-233
+// + 240 wired with intro-
+// spection + lore lookup)
+// now fires correctly.
+// Also removed 'call' from
+// diplomacy since it
+// collides with the call-
+// dog parser intercept.
+//
+// "I fought and killed a
+// vendor and died a few
+// minutes later, when I
+// resurrected my character,
+// the vendor was alive and
+// selling me stuff again. it
+// was jorah." — vendor
+// resurrection bug. The
+// anchor-NPC vendor was
+// re-placed by beginScene
+// on every scene rebuild,
+// including the post-
+// resurrection rebuild that
+// fires from resurrectSlot.
+// worldMemory.defeatedEnemies
+// was already tracking the
+// kill (recordEnemyDefeat
+// fires on every enemy
+// down, including vendor-
+// turned-enemy), so the
+// fix is to skip the anchor
+// vendor placement when
+// hubRoom.anchorNpc is in
+// the defeated set. Roadside
+// traders unaffected (random,
+// unnamed). Result: Jorah,
+// Tarek, Irma, Halem each
+// stay dead permanently per
+// save once felled.
+//
+// TS clean app-side. The
+// existing askArbiter +
+// askSelfIntrospection test
+// suites stay green (47/47).
+//
+// Files: app/engine/parser.
+// ts ('ask' verb routing
+// fix; comment note removing
+// 'call'), app/state/gameStore
+// .ts (beginScene anchor
+// vendor skip when name in
+// defeatedEnemies).
+export const OTA_BUILD_ID = '2026-05-30-241';

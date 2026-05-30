@@ -21,7 +21,16 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
   ],
   diplomacy: [
     'convince', 'persuade', 'negotiate', 'parley', 'bargain', 'plead', 'speak', 'talk',
-    'ask', 'greet', 'address', 'hail', 'call', 'beseech', 'entreat',
+    'greet', 'address', 'hail', 'beseech', 'entreat',
+    // OTA-241 — moved 'ask' from diplomacy to the `ask` intent below.
+    // Playtester: "the ask arbiter is broken." Parser was matching
+    // 'ask the arbiter about X' on the diplomacy verb 'ask' and
+    // looking for an NPC named "the arbiter" to negotiate with (no
+    // such NPC exists → "No one is here to negotiate with."). 'ask'
+    // is informational, not negotiation; the case 'ask' handler in
+    // gameStore already routes through self-introspection +
+    // findConcept + MiniLM lore lookup. Removed 'call' too — it
+    // collides with the 'call dog' parser intercept.
     // Social + performance card verbs.
     'intimidate', 'perform', 'sing', 'play',
   ],
@@ -87,7 +96,9 @@ const VERB_SYNONYMS: Record<Exclude<Intent, 'unknown'>, string[]> = {
     'conjure', 'mend', 'manipulate',
   ],
   wait: ['wait', 'stay', 'hold', 'pause', 'still', 'linger', 'tarry', 'idle', 'bide', 'remain'],
-  ask: ['what', 'explain', 'define', 'who', 'how', 'why', 'tell', 'describe', 'clarify', 'mean'],
+  // OTA-241 — 'ask' moved here from diplomacy. The verb is
+  // informational ("ask about X", "ask the arbiter") not negotiation.
+  ask: ['ask', 'what', 'explain', 'define', 'who', 'how', 'why', 'tell', 'describe', 'clarify', 'mean'],
   craft: [
     // 'construct' removed — playtest caught "salvage the construct"
     // routing to craft because 'construct' matched as a verb here,

@@ -245,6 +245,14 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Ask Arbiter parser routing fix + dead vendor stays dead across resurrection
+
+- **OTA-241 (2026-05-30) · Player: *"I fought and killed a vendor and died a few minutes later, when I resurrected my character, the vendor was alive and selling me stuff again. it was jorah. also the ask arbiter is broken."***
+  - **Ask Arbiter broken (parser routing):** Log captured `ask the arbiter about Why are you here` → `intent=diplomacy` → `"No one is here to negotiate with. The wind takes the words."` The parser had `'ask'` in the `diplomacy` verb list (alongside `convince` / `persuade` / `talk` / etc.), so every `ask the arbiter about <X>` matched diplomacy first and tried to find an NPC named "the arbiter" to negotiate with. None exists. The case 'ask' handler in gameStore (which OTAs 233 + 240 wired with introspection + lore lookup) never fired. **Fix:** moved `'ask'` from diplomacy to the `ask` intent verb list (alongside `'what'` / `'who'` / `'why'` / `'tell'` / etc.). Also removed `'call'` from diplomacy because it collides with the call-dog parser intercept.
+  - **Dead vendor resurrection:** `beginScene` re-placed the hub anchor NPC on every scene rebuild — including the post-resurrection rebuild that fires from `resurrectSlot`. `worldMemory.defeatedEnemies` was already tracking the kill (`recordEnemyDefeat` fires on every enemy down, including vendor-turned-enemy via the attack-vendor → enemy flow). **Fix:** beginScene now skips the anchor vendor placement when `hubRoom.anchorNpc` is in `defeatedEnemies`. Jorah, Tarek, Irma, Halem each stay dead permanently per save once felled. Roadside traders unaffected (random + unnamed).
+  - **Verification:** TS clean. Existing 47 tests (askArbiter + askSelfIntrospection) still pass.
+  - **Files:** `app/engine/parser.ts` (`ask` verb routing + comment removing `call`), `app/state/gameStore.ts` (`beginScene` anchor vendor skip on defeated set).
+
 #### Ask the Arbiter — self-introspection ("who am I", "how am I", "why am I here")
 
 - **OTA-240 (2026-05-30) · Player after OTA-239 shipped the Ask Arbiter button: *"the button will be functional correct? and it will be able to answer basic interaction questions as well about his character who he is how he is doing, why he is there.."***

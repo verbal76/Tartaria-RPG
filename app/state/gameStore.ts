@@ -2660,10 +2660,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Opening scene (brand-new character): no vendor. The first roll is
     // for the player to land in the world cleanly — vendors arrive on
     // the next scene or on travel.
+    // OTA-241 — vendor death persists across resurrection. Player bug
+    // report: "I fought and killed a vendor and died a few minutes
+    // later, when I resurrected my character, the vendor was alive
+    // and selling me stuff again. it was jorah." Cause: anchorNpc
+    // re-spawned from the hub room template on every scene rebuild;
+    // resurrection clears currentScene and calls beginScene which
+    // re-placed the vendor. Fix: skip the anchor vendor when their
+    // name is in worldMemory.defeatedEnemies (already populated by
+    // recordEnemyDefeat at line ~11305 when any enemy — including
+    // vendor-turned-enemy — falls). Roadside traders are unaffected
+    // (random + unnamed; can't be in defeatedEnemies meaningfully).
+    const defeatedSet = new Set(get().worldMemory.defeatedEnemies ?? []);
     const vendor: VendorInstance | null = opts?.isOpening
       ? null
       : hubRoom && hubRoom.anchorNpc
-        ? (findVendorByName(hubRoom.anchorNpc) ?? null)
+        ? (defeatedSet.has(hubRoom.anchorNpc)
+            ? null
+            : (findVendorByName(hubRoom.anchorNpc) ?? null))
         : (!hasEnemies && !hubRoom && Math.random() < 0.25 ? pickRoadsideTrader() : null);
     // Enemies start at 'close' range — close enough to be a problem but not
     // already swinging. Players have to advance (or be charged) to land
