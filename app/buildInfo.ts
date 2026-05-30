@@ -8715,4 +8715,44 @@
 // gameStore.ts (migration
 // block inside backfill
 // Player's inventory map).
-export const OTA_BUILD_ID = '2026-05-30-225';
+// 2026-05-30-226 — green
+// damage-dice line on
+// inventory rows now reads
+// from uniqueStats for fused
+// weapons. Player: "every
+// weapon in my inventory has
+// in green writing the dice
+// roll for damage and the
+// damage type. if I click
+// on the new weapon the
+// resident edge, it shows me
+// that I have a 1d8 and
+// aetheric damage. but on
+// the description like every
+// other weapon ... it
+// doesn't have that in
+// green." Cause: the row's
+// green damage line is
+// computed by findWeapon
+// ByName(item.name); fused
+// items aren't in the
+// WEAPONS catalog by name,
+// so the lookup returns null
+// and the row skips the
+// line. The detail modal
+// works because it reads
+// uniqueStats directly. Fix:
+// new early branch in the
+// row IIFE — if item.unique
+// Stats.kind === 'weapon'
+// and damageDice present,
+// render uniqueStats.
+// damageDice + damageType.
+// Falls back to the catalog
+// lookup otherwise. TS clean
+// app-side. Files: app/
+// screens/InventoryScreen.
+// tsx (row damage IIFE
+// branches on uniqueStats
+// first).
+export const OTA_BUILD_ID = '2026-05-30-226';

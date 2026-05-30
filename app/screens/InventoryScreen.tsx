@@ -567,6 +567,18 @@ function ItemRow({
               to see the attack dice roll like a 1d10 or a 1d20.
               That's how I know which weapon is the strongest." */}
           {(() => {
+            // OTA-226 — fused weapons (uniqueStats present) aren't in
+            // the WEAPONS catalog by name, so findWeaponByName returns
+            // null and the green damage line was missing from the row.
+            // Read uniqueStats first; fall back to the catalog lookup
+            // for hand-authored weapons.
+            if (item.uniqueStats?.kind === 'weapon' && item.uniqueStats.damageDice) {
+              return (
+                <Text style={[styles.rowMeta, styles.rowDamage]}>
+                  {item.uniqueStats.damageDice} {item.uniqueStats.damageType ?? ''}
+                </Text>
+              );
+            }
             const w = findWeaponByName(item.name);
             if (!w) return null;
             return (

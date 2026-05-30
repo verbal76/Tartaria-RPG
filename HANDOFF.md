@@ -245,6 +245,15 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Inventory row green damage line now shows on fused weapons
+
+- **OTA-226 (2026-05-30) · Player: *"every weapon in my inventory has in green writing the dice roll for damage and the damage type. if I click on the new weapon the Resonant Edge, it shows me that I have a 1d8 and aetheric damage. but on the description like every other weapon... it doesn't have that in green."***
+  - **Cause:** The green damage line on inventory rows is computed by `findWeaponByName(item.name)` (`InventoryScreen.tsx:569`). Fused items (`Resonant Edge`, `Resonant Cleaver`, etc.) aren't in the WEAPONS catalog by name, so the lookup returns null and the row skips the damage line. The detail modal works because it reads `item.uniqueStats` directly.
+  - **Fix:** New early branch in the row IIFE — if `item.uniqueStats?.kind === 'weapon'` and `damageDice` is present, render the dice + type from `uniqueStats`. Falls back to the catalog lookup for hand-authored weapons. Same green `rowDamage` style, so the visual matches every other weapon at a glance.
+  - **Same root cause family as OTA-224:** fused items are catalog-absent by design; every place that does `findWeaponByName(item.name)` needs a `uniqueStats` early branch. OTA-224 fixed `validSlotsForItem`; this OTA fixes the row damage display.
+  - **Verification:** `npx tsc --noEmit` clean app-side. No new tests — the change is a UI fallback wired into existing inventory render path, covered by the OTA-224 `fusedItemEquip` shape contract.
+  - **Files:** `app/screens/InventoryScreen.tsx` (row damage IIFE branches on `uniqueStats` first, falls back to catalog).
+
 #### EXIT GAME now actually removes Tartaria from Recents (APK-only fix)
 
 - **APK 2026-05-30a (next build) · Player: *"I hit the red exit box, say yes, see my desktop, then hit the square Android button and the game's still there — it doesn't actually close the game."***
