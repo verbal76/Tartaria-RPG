@@ -19,6 +19,7 @@ import { categorizeItem, CATEGORY_ORDER, CATEGORY_LABEL, type InventoryCategory 
 import {
   findWeaponByName,
   isInferredItem,
+  isInferredInventoryItem,
   findExplorationItemByName,
   findGearByName,
   findMaterialByName,
@@ -66,7 +67,7 @@ function actionsFor(item: InventoryItem, equippedSlots: ReadonlyMap<string, stri
   }
   // SAVE FOR FUSION — only inferred items, only when not already
   // reserved. Mirrors the OTA-194 heart-tap gate.
-  if (isInferredItem(item.name) && !item.reservedForFusion) acts.push('save-for-fusion');
+  if (isInferredInventoryItem(item) && !item.reservedForFusion) acts.push('save-for-fusion');
   if (item.reservedForFusion) acts.push('release-from-fusion');
   // DROP — always available unless equipped.
   if (equippedInSlots.length === 0) acts.push('drop');
@@ -82,7 +83,7 @@ function lineFor(item: InventoryItem, equippedSlots: ReadonlyMap<string, string>
   const parts: string[] = [];
   // OTA-204 — inferred-item ◆ marker matches the OTA-199 row diamond,
   // so the snapshot makes catalog-vs-engine-named obvious at a paste.
-  if (isInferredItem(item.name)) parts.push('◆');
+  if (isInferredInventoryItem(item)) parts.push('◆');
   parts.push(item.name);
   if (item.quantity > 1) parts.push(`×${item.quantity}`);
   const meta: string[] = [];

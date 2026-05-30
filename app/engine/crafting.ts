@@ -246,6 +246,19 @@ export function isInferredItem(name: string): boolean {
   return true;
 }
 
+/** OTA-224 — instance-aware version of isInferredItem that also
+ *  guards against fused items (which carry `uniqueStats`) being
+ *  treated as inferred. A fused item is catalog-absent by design
+ *  (synthesized at the Crucible, one-of-a-kind for the save) but it
+ *  isn't "inferred" in the OTA-191 sense — it shouldn't show the ◆
+ *  diamond, shouldn't offer save-for-fusion, shouldn't be tagged for
+ *  the OTA-193 substitute drain. Three call sites use this:
+ *  InventoryScreen row + modal, inventorySnapshot actions. */
+export function isInferredInventoryItem(item: { name: string; uniqueStats?: unknown }): boolean {
+  if (item.uniqueStats) return false;
+  return isInferredItem(item.name);
+}
+
 function totalQuantity(inventory: readonly InventoryItem[], materialName: string): number {
   const target = materialName.toLowerCase();
   let total = 0;

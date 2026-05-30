@@ -378,7 +378,15 @@ export function synthesizeFusionDeterministic(
   const hash = parseInt(fusionInputHash(inputs).substring(0, 8), 16);
   const theme = themePool[dominantTag] ?? themePool.improvised!;
   const suffix = suffixPool[kind] ?? suffixPool.weapon!;
-  const name = `${theme[hash % theme.length]!} ${suffix[(hash >> 4) % suffix.length]!}`;
+  // OTA-224 — playtest fix: a previous synth named the result
+  // "Resonant undefined" because `hash >> 4` is a SIGNED 32-bit
+  // right shift in JavaScript. For hashes ≥ 2^31, the shift returns
+  // a negative integer; `negative % length` returns negative;
+  // `array[-3]` is undefined. Use the unsigned shift `>>>` so the
+  // index stays non-negative for any input.
+  const themeIdx = Math.abs(hash) % theme.length;
+  const suffixIdx = (hash >>> 4) % suffix.length;
+  const name = `${theme[themeIdx]!} ${suffix[suffixIdx]!}`;
   // Stats — deterministic, clamped.
   const baseStats: UniqueItemStats = {
     kind,

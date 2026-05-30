@@ -16,6 +16,19 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   // generic "vest" regex below (which would otherwise route to
   // 'chest') doesn't grab them onto the player.
   if (item.kind === 'dog_armor') return [];
+  // OTA-224 — fused items carry uniqueStats but their names are
+  // synthesized (e.g. "Resonant Cleaver") and won't appear in any
+  // catalog. validSlotsForItem used to short-circuit to [] for them
+  // because findWeaponByName / findArmorByName / etc. all missed.
+  // Now we route directly off the uniqueStats.kind. Fused dog vests
+  // also route correctly via the armorSlot:undefined → dog_armor
+  // check at the top.
+  if (item.uniqueStats) {
+    const u = item.uniqueStats;
+    if (u.kind === 'weapon') return ['main', 'off'];
+    if (u.kind === 'armor' && u.armorSlot) return [u.armorSlot];
+    if (u.kind === 'dog_armor') return [];
+  }
   if (findWeaponByName(item.name)) {
     return ['main', 'off']; // any weapon can go in either hand
   }

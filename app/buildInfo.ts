@@ -8544,4 +8544,113 @@
 // startQwenWatchdog() +
 // bootQwen() starts it
 // after init).
-export const OTA_BUILD_ID = '2026-05-30-223';
+// 2026-05-30-224 — three
+// bugs in the fused-item
+// pipeline that all
+// surfaced together. Player:
+//   "I made a weapon with
+//   the fuse crucible yay,
+//   can't use it boo"
+// Inventory paste showed:
+//   ◆ Resonant undefined
+//   (Rare, dur 30/30, 1d8
+//   aetheric, ...)
+//     actions: scrap,
+//     save-for-fusion, drop
+//
+// (1) "Resonant undefined"
+//     name — deterministic
+//     synth's suffix index
+//     came out NEGATIVE
+//     because JS's `>>` is
+//     a signed 32-bit right
+//     shift. For input
+//     hashes ≥ 2^31, hash
+//     >> 4 returns a
+//     negative integer;
+//     negative % length
+//     returns negative;
+//     array[-3] is undefined.
+//     Switched to `>>>`
+//     (unsigned shift) for
+//     suffix and Math.abs()
+//     for theme.
+//
+// (2) Fused weapon has no
+//     equip:main/off action
+//     — validSlotsForItem
+//     looks the name up in
+//     the WEAPONS catalog
+//     and "Resonant Cleaver"
+//     isn't there; falls
+//     through to regex
+//     fallback which also
+//     misses. Added an
+//     early branch that
+//     reads item.uniqueStats.
+//     kind:
+//       weapon → [main, off]
+//       armor + armorSlot →
+//       [armorSlot]
+//       dog_armor → [] (dog
+//       routing via [fits
+//       dog] tap)
+//     Fixes ALL fused items
+//     past, present, future
+//     — Qwen-synth weapons
+//     had the same blocker.
+//
+// (3) Fused item shows ◆ +
+//     save-for-fusion —
+//     fused items are
+//     catalog-absent BY
+//     DESIGN but they aren't
+//     "inferred" in the
+//     OTA-191 sense (they
+//     shouldn't show the
+//     diamond, shouldn't
+//     offer save-for-fusion,
+//     shouldn't be drained
+//     by OTA-193's
+//     substitution). New
+//     isInferredInventoryItem
+//     helper in crafting.ts
+//     guards against
+//     uniqueStats-bearing
+//     items being treated as
+//     inferred. Wired into 3
+//     UI call sites:
+//     InventoryScreen row
+//     diamond, modal save-
+//     for-fusion button,
+//     inventorySnapshot
+//     actions.
+//
+// Tests: +12 in
+// fusedItemEquip (synth
+// name across 8 input sets,
+// playtest verbatim input,
+// validSlotsForItem honors
+// uniqueStats for weapon /
+// armor / dog_armor, is
+// InferredInventoryItem
+// guards fused items).
+// fusionDeterministicFallback
+// + itemFusionEngine
+// regression green (39
+// total). TS clean app-side.
+//
+// Files: app/engine/
+// itemFusion.ts (>>> +
+// Math.abs in synth name
+// index), app/engine/
+// equipment.ts (uniqueStats
+// early branch), app/engine/
+// crafting.ts (NEW
+// isInferredInventoryItem),
+// app/diagnostics/
+// inventorySnapshot.ts (use
+// new helper x2), app/
+// screens/InventoryScreen.tsx
+// (use new helper x2).
+export const OTA_BUILD_ID = '2026-05-30-224';

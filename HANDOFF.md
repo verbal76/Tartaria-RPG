@@ -245,6 +245,15 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Fused weapon equippable + name no longer "undefined" + diamond/save-for-fusion suppressed on fused items
+
+- **OTA-224 (2026-05-30) · Player: *"I made a weapon with the fuse crucible yay, can't use it boo."* Inventory paste showed `◆ Resonant undefined (Rare, ..., 1d8 aetheric, ...) actions: scrap, save-for-fusion, drop` — name broken, no equip action.**
+  - **Fix (1) — name `undefined`:** Deterministic synth's suffix index came out NEGATIVE because JS's `>>` is a signed 32-bit right shift. For input hashes ≥ 2^31, `hash >> 4` returns negative; `negative % length` returns negative; `array[-3]` is undefined. Switched to `>>>` (unsigned shift) for the suffix index + `Math.abs()` for the theme index.
+  - **Fix (2) — fused weapon can't be equipped:** `validSlotsForItem` looks the name up in WEAPONS and "Resonant Cleaver" isn't there; falls through to regex fallback which also misses. New early branch reads `item.uniqueStats.kind`: `weapon` → `[main, off]`, `armor + armorSlot` → `[armorSlot]`, `dog_armor` → `[]` (handled by [fits dog] tap). Fixes ALL fused items past, present, future — Qwen-synth weapons had the same blocker.
+  - **Fix (3) — fused items shouldn't show ◆ / save-for-fusion:** Fused items are catalog-absent BY DESIGN but they aren't "inferred" in the OTA-191 sense. New `isInferredInventoryItem(item)` helper in `crafting.ts` guards against uniqueStats-bearing items being treated as inferred. Wired into 3 UI call sites: InventoryScreen row diamond, modal save-for-fusion button, inventorySnapshot actions.
+  - **Verification:** +12 tests in `fusedItemEquip` (synth name across 8 input sets, playtest verbatim input, validSlotsForItem for weapon/armor/dog_armor, isInferredInventoryItem guards fused items). `fusionDeterministicFallback` + `itemFusionEngine` regression green (39 total). `npx tsc --noEmit` clean app-side.
+  - **Files:** `app/engine/itemFusion.ts` (`>>>` + `Math.abs` in synth name index), `app/engine/equipment.ts` (uniqueStats early branch), `app/engine/crafting.ts` (NEW `isInferredInventoryItem`), `app/diagnostics/inventorySnapshot.ts` (use new helper x2), `app/screens/InventoryScreen.tsx` (use new helper x2).
+
 #### Background Qwen dormancy watchdog — keeps the runtime warm without waiting on player actions
 
 - **OTA-223 (2026-05-30) · Player on OTA-222: *"should we add a qwen check and bump it as needed in the background?"***

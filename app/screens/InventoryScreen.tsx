@@ -10,7 +10,7 @@ import {
 import type { InventoryItem, EquipSlot } from '../engine/types';
 import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
 import { canScrap } from '../engine/scrapEngine';
-import { findWeaponByName, isInferredItem } from '../engine/crafting';
+import { findWeaponByName, isInferredItem, isInferredInventoryItem } from '../engine/crafting';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
@@ -359,7 +359,7 @@ export function InventoryScreen() {
     // OTA-193's auto-substitute crafting drain; empty heart = free
     // to be consumed for canonical material substitution. The
     // fusion bench (planned) will draw from reserved items.
-    if (isInferredItem(pending.item.name)) {
+    if (isInferredInventoryItem(pending.item)) {
       const reserved = pending.item.reservedForFusion === true;
       buttons.push({
         label: reserved ? '♥ Reserved for fusion' : '♡ Save for fusion',
@@ -543,7 +543,7 @@ function ItemRow({
               (OTA-195 uniqueStats) are catalog-absent by name AND
               carry a Rare / Legendary rarity, so they get a purple
               or orange diamond too. */}
-          {isInferredItem(item.name) && (
+          {isInferredInventoryItem(item) && (
             <Text style={[styles.rowInferredDiamond, { color: rarityHexColor(item.rarity) }]}>◆ </Text>
           )}
           <Text style={styles.rowName} numberOfLines={1}>
