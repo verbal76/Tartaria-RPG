@@ -412,13 +412,22 @@ export function VendorScreen() {
                 .filter((inv) => inv.name.toLowerCase() === o.itemName.toLowerCase())
                 .reduce((sum, inv) => sum + inv.quantity, 0);
               return (
+                // OTA-258 — broke-dim is now scoped to the BUY body only,
+                // NOT the parent row. Previously the `offerRowBroke` opacity
+                // was applied here, which dimmed everything inside the row
+                // including the STEAL button on the right — backwards
+                // affordance, since stealing is what a broke player would
+                // want to reach for. Steal has its own gates (DC roll, faction
+                // standing, witness checks in `stealFromVendor`) and never
+                // touched TC affordability anyway. Now: BUY body dims when
+                // unaffordable, STEAL stays full bright.
                 <View
                   key={`buy_${o.itemName}_${i}`}
-                  style={[styles.offerRow, !canAfford && styles.offerRowBroke]}
+                  style={styles.offerRow}
                 >
                   <View style={[styles.offerStripe, { backgroundColor: rarityColor(itemPreview.rarity) }]} />
                   <TouchableOpacity
-                    style={styles.offerBody}
+                    style={[styles.offerBody, !canAfford && styles.offerRowBroke]}
                     onPress={() => openBuy(o.itemName, effPrice)}
                     activeOpacity={0.7}
                   >

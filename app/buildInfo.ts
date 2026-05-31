@@ -10726,4 +10726,23 @@ export const DISPLAY_VERSION = '3.0.0';
 //   investigate something arbitrary mid-modal.
 //   Files: app/screens/ExplorationScreen.tsx (line 875 area),
 //          app/components/SearchModal.tsx (new useEffect).
-export const OTA_BUILD_ID = '2026-05-31-257';
+//
+// OTA-258 — Vendor: STEAL stays bright when you can't afford BUY.
+//   Player ask: "when you are out of money at a vendor even if you
+//   com what cannot be afforded, do not dim the steal option keep
+//   that well lit." Backwards affordance pre-OTA-258 — `offerRowBroke`
+//   (opacity 0.45) was applied to the PARENT row, dimming everything
+//   inside it including the STEAL button on the right. But stealing
+//   is precisely the action a broke player would want to reach for;
+//   it has its own gates (DC roll vs DEX, faction standing, witness
+//   checks in stealFromVendor at gameStore.ts:11937), never touched
+//   TC affordability. Fix: scope the dim to the BUY body
+//   TouchableOpacity only — STEAL is a sibling outside the body, so
+//   it stays full bright when broke. Affordability still reads
+//   clearly: BUY area dims, price gets its own strikethrough via
+//   offerPriceBroke, STEAL stays as the prominent affordance for the
+//   poor.
+//   Files: app/screens/VendorScreen.tsx (lines 414-424 — moved the
+//          conditional offerRowBroke from parent View to offerBody
+//          TouchableOpacity).
+export const OTA_BUILD_ID = '2026-05-31-258';

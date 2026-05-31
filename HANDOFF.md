@@ -324,6 +324,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-258 — Vendor: STEAL button stays bright when player can't afford BUY (backwards affordance)
+
+- **OTA-258 · Player: *"when you are out of money at a vendor even if you com what cannot be afforded, do not dim the steal option keep that well lit"***
+  - **What broke (UX):** at the vendor BUY screen, when `!canAfford` (`player.tc < effPrice`), the engine applied `styles.offerRowBroke` (`opacity: 0.45`) to the PARENT `<View>` of each offer row. That dimmed everything in the row, including the STEAL button on the right. Backwards — stealing is precisely the affordance a broke player would want to reach for. Real-world equivalent: greying out the "pick the lock" button on a vending machine *because* you don't have a dollar.
+  - **Fix:** scope the conditional dim to the BUY body only. `VendorScreen.tsx:414-424` — the `offerRowBroke` conditional moved from the parent `<View>` to the `offerBody` `TouchableOpacity` (the BUY-clickable area). STEAL is a sibling `TouchableOpacity` outside the body, so it now stays at full brightness regardless of TC balance.
+  - **Why this works correctness-wise:** `stealFromVendor` (`gameStore.ts:11937`) never read TC at all — it has its own gates (DEX roll vs DC, faction standing, witness/detection rolls). The TC-affordability dim was purely a visual side effect of the row-level opacity, not a logical gate. Removing it from the row doesn't change any engine behavior; only the visual prominence of the STEAL chip when broke.
+  - **Other affordances unaffected:** the price strikethrough (`offerPriceBroke` at the price `<Text>`) still applies; the BUY-body's dim still communicates "you can't afford this." STEAL just no longer falsely advertises "this is also blocked."
+  - **OTA-only:** JS-side render change, ships through OTA channel.
+  - **Files:** `app/screens/VendorScreen.tsx` (line 414-424 — moved conditional from parent View to offerBody TouchableOpacity).
+
 #### OTA-257 — Investigate menu: keep done-chips visible greyed + auto-close when nothing left
 
 - **OTA-257 · Player: *"it needs to deactivate it in the investigation menu as well and if it is the last thing in it, deactivate the investigate window as well"***
