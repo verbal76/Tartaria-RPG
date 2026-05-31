@@ -324,6 +324,17 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-255 — Auto-resolve dice rolls (remove RESOLVE / NEXT ROLL gate)
+
+- **OTA-255 · Player: *"why do we have to hit resolve after all of the dice rolls, aren't we already committed at that point?"***
+  - **What broke:** every dice roll (combat attack/damage, skill check, maneuver) required a manual tap on RESOLVE / NEXT ROLL to apply the outcome. Friction without function — once the dice landed and the bonus + verdict line rendered, the result was already determined; the tap was a confirmation of an inevitability. Across a session: ~half a second per tap × dozens of rolls = real death by a thousand papercuts.
+  - **Fix:** in `app/components/DiceRoller.tsx`, a `useEffect` watches `rolledValues`. After dice are set (post-animation), a 1500ms hold lets the player register the dice + total + verdict, then the same code path the button used to trigger (kept-die for advantage/disadvantage, raw values otherwise) fires automatically and clears the rolled state. Multi-step rolls auto-chain via the existing `currentStep` logic in `resolveRollStep`/`concludeRolls`. Cancel button stays visible during the hold window, so skill-check refunds (via `refundOnCancel` snapshot in `gameStore.ts:6691`) still work.
+  - **Button replaced with subtle tag:** "next roll…" or "resolving…" in italic-lowercase, color-matched to the cancel link. Takes the same vertical footprint as the prior button so the card doesn't jump between roll states.
+  - **Why this approach:** single point of change since ALL dice contexts route through `DiceRoller` → `onRoll` (combat at `gameStore.ts:4853`, skill checks at `6700`, maneuvers at `9264`). No need to touch combat / skill / maneuver code paths individually. All narration is downstream in `concludeRolls` — fires identically whether triggered by button or auto-resolve.
+  - **1500ms timing:** long enough to clearly read the dice + adv/dis flag + total + verdict line; short enough that a multi-step combat attack (attack + damage) lands in ~3.5s total — comparable to a player who taps fast. Single tunable (`AUTO_RESOLVE_HOLD_MS`) if it ever feels off.
+  - **OTA-only:** no native rebuild needed. JS-side component change ships through the existing OTA channel.
+  - **Files:** `app/components/DiceRoller.tsx`.
+
 #### OTA-254 — iOS Info.plist photo-library purpose string (Apple ITMS-90683 fix)
 
 - **OTA-254 · Apple Mail: *"ITMS-90683: Missing purpose string in Info.plist — NSPhotoLibraryUsageDescription"***

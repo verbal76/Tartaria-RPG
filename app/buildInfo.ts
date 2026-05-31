@@ -10677,4 +10677,18 @@ export const DISPLAY_VERSION = '3.0.0';
 //   Connect API Key generated in this session (key ID WJ44NUUU49) is
 //   stored on EAS now.
 //   Files: app.json (ios.infoPlist).
-export const OTA_BUILD_ID = '2026-05-31-254';
+//
+// OTA-255 — Auto-resolve dice rolls (remove RESOLVE / NEXT ROLL gate).
+//   Player feedback: "why do we have to hit resolve after all of the
+//   dice rolls, aren't we already committed at that point?" Right —
+//   once the dice are visible the outcome is locked, so the button
+//   was friction without function. After dice land, a 1500ms hold
+//   lets the player register the result + verdict, then the flow
+//   auto-advances (or auto-chains to the next roll for multi-step
+//   sequences). Cancel remains live during the hold for skill-check
+//   refunds. Subtle "resolving…" / "next roll…" tag replaces the
+//   button so the layout doesn't jump. Closes the per-roll tap tax
+//   across combat, skill checks, and maneuvers — single point of
+//   change since all dice contexts route through DiceRoller.tsx.
+//   Files: app/components/DiceRoller.tsx.
+export const OTA_BUILD_ID = '2026-05-31-255';

@@ -1,7 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import type { RollStep, PendingRollState } from '../engine/types';
 import { rollDie } from '../engine/rng';
+
+// OTA-255 — Auto-resolve dice rolls instead of gating on a RESOLVE /
+// NEXT ROLL button tap. Once the dice land and the post-roll values
+// are rendered, the result is committed after a short hold so the
+// player has time to register the dice + total + verdict, then the
+// flow advances on its own. Player can still bail via the cancel
+// button during the hold. Closes the "why do I have to tap Resolve
+// after the dice are already cast" friction.
+//
+// Hold duration: 1500ms — long enough to clearly read the dice +
+// any advantage/disadvantage flag + the total/verdict line; short
+// enough not to feel like a delay across a multi-step roll (attack
+// + damage), where the cumulative wait stays under 3.5s.
+const AUTO_RESOLVE_HOLD_MS = 1500;
 
 interface Props {
   state: PendingRollState;
@@ -53,19 +67,26 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
     setRolledValues(values);
   }
 
-  function handleNext() {
-    if (!rolledValues) return;
-    // Hand back the KEPT die in single-element form for advantage /
-    // disadvantage steps so the caller's bonus math is unchanged. The
-    // shadow die is purely UI.
-    if (isAdv || isDis) {
-      const kept = isAdv ? Math.max(...rolledValues) : Math.min(...rolledValues);
-      onRoll([kept]);
-    } else {
-      onRoll(rolledValues);
-    }
-    setRolledValues(null);
-  }
+  // OTA-255 — auto-resolve after the dice land. Replaces the prior
+  // RESOLVE / NEXT ROLL button tap that gated every roll's outcome.
+  // Player can still cancel during the hold window (cancel button
+  // below); a fresh roll cycle clears the timer via the cleanup.
+  useEffect(() => {
+    if (rolledValues === null) return;
+    const timer = setTimeout(() => {
+      // Match the prior handleNext() shape: kept-die for adv/dis,
+      // raw values otherwise. The caller's bonus math expects a
+      // single-element array on adv/dis steps.
+      if (isAdv || isDis) {
+        const kept = isAdv ? Math.max(...rolledValues) : Math.min(...rolledValues);
+        onRoll([kept]);
+      } else {
+        onRoll(rolledValues);
+      }
+      setRolledValues(null);
+    }, AUTO_RESOLVE_HOLD_MS);
+    return () => clearTimeout(timer);
+  }, [rolledValues, isAdv, isDis, onRoll]);
 
   const diceLabel = isAdv || isDis
     ? `2d${step.sides}`
@@ -140,7 +161,7 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
         )}
       </View>
 
-      {/* Action buttons */}
+      {/* Action button (pre-roll only — post-roll auto-resolves) */}
       {rolledValues === null ? (
         <Animated.View style={{ transform: [{ scale }] }}>
           <TouchableOpacity style={styles.rollBtn} onPress={handleRoll} activeOpacity={0.7}>
@@ -148,11 +169,15 @@ export function DiceRoller({ state, onRoll, onCancel }: Props) {
           </TouchableOpacity>
         </Animated.View>
       ) : (
-        <TouchableOpacity style={styles.nextBtn} onPress={handleNext} activeOpacity={0.7}>
-          <Text style={styles.nextBtnText}>
-            {state.currentStep + 1 < state.steps.length ? 'NEXT ROLL →' : 'RESOLVE →'}
+        // OTA-255 — RESOLVE / NEXT ROLL button removed; the post-roll
+        // hold above auto-advances the flow. Subtle "advancing…" tag
+        // takes the button's footprint so the layout doesn't jump
+        // between roll states.
+        <View style={styles.advancingHint}>
+          <Text style={styles.advancingHintText}>
+            {state.currentStep + 1 < state.steps.length ? 'next roll…' : 'resolving…'}
           </Text>
-        </TouchableOpacity>
+        </View>
       )}
 
       <TouchableOpacity onPress={onCancel} style={styles.cancelBtn}>
@@ -317,6 +342,20 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     letterSpacing: 2,
+  },
+  // OTA-255 — takes the prior RESOLVE / NEXT ROLL button's vertical
+  // footprint so the layout doesn't shift between pre-roll and post-
+  // roll states. Subtle italic-lowercase tag (color-matched to the
+  // cancel link below) signals "no input needed, advancing on its own."
+  advancingHint: {
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  advancingHintText: {
+    color: '#7a705c',
+    fontSize: 12,
+    fontStyle: 'italic',
+    letterSpacing: 1,
   },
   cancelBtn: {
     alignItems: 'center',
