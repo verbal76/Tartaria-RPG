@@ -10664,4 +10664,17 @@ export const DISPLAY_VERSION = '3.0.0';
 //        eas.json (ios sections in 4 profiles + submit.production.ios),
 //        .github/workflows/build-ios.yml (NEW — EAS Build
 //        for iOS, optional TestFlight submit).
-export const OTA_BUILD_ID = '2026-05-31-253';
+// OTA-254 — iOS Info.plist NSPhotoLibraryUsageDescription added.
+//   Apple's automated review (ITMS-90683) rejected the inaugural
+//   TestFlight binary 2.4.1 (2) for a missing photo-library purpose
+//   string. We don't actually access the photo library — but a
+//   transitive native dependency references the photos API, and
+//   Apple's scanner requires the string regardless. Honest, benign
+//   string: "Tartaria Realms does not access your photo library."
+//   This is a NATIVE rebuild (Info.plist is baked at compile time);
+//   triggers via [build-ios] [submit-ios] commit title. Auto-submit
+//   should land this build directly in TestFlight since the App Store
+//   Connect API Key generated in this session (key ID WJ44NUUU49) is
+//   stored on EAS now.
+//   Files: app.json (ios.infoPlist).
+export const OTA_BUILD_ID = '2026-05-31-254';

@@ -17,7 +17,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.hotatticgames.tartarprim.hal2001",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPhotoLibraryUsageDescription": "Tartaria Realms does not access your photo library."
       }
     },
     "android": {

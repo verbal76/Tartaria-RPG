@@ -25,14 +25,16 @@
 
 > **⚡ ACTIVE TASK (2026-05-31) — iOS build → TestFlight External Testing. READ THIS FIRST.**
 >
-> **✅ CERT DONE — BUILD FIRED. The blocker is cleared.** The iOS **Distribution
-> Certificate + Provisioning Profile now exist** on EAS for bundle
-> `com.hotatticgames.tartarprim` (cert serial `23E4172940150DFB4525AF86DA2CD0BF`,
-> profile Developer Portal ID `PQ4YD8C5WZ`, team `7Z67WUB9FA` Kevin Ernst (Individual),
-> both valid until 2027-05-31). Generated via interactive `eas credentials --platform ios`
-> on the user's Windows laptop (after cloning the repo + `npm install` + `eas login` +
-> swapping app.json's bundle id to the bare one for the duration). This is the ONLY step
-> that ever needed a machine — everything from here is CI-driven.
+> **✅ CERT, BUILD, SUBMIT INFRA ALL WORKING. Iterating on Apple's binary-rejection
+> feedback now.** The cert blocker, the Xcode 26 blocker, the EAS API-key auth blocker
+> — all dead. iOS Distribution Certificate (serial `23E4172940150DFB4525AF86DA2CD0BF`,
+> profile `PQ4YD8C5WZ`, team `7Z67WUB9FA`) is on EAS forever; ASC API Key
+> `WJ44NUUU49` is stored on EAS so future submits are zero-prompt. The first signed
+> .ipa successfully uploaded to App Store Connect — but Apple's automated pre-review
+> bounced it for `ITMS-90683: Missing NSPhotoLibraryUsageDescription`. Fix in flight
+> (OTA-254): added the Info.plist key with the string "Tartaria Realms does not access
+> your photo library."; triggering a new build via `[build-ios] [submit-ios]` commit
+> title; auto-submit will land the new binary directly in TestFlight.
 >
 > **What was fired:** a commit titled `[build-ios] [submit-ios]` on `HaL2001` triggers
 > `build-ios.yml` → production iOS build on EAS macOS infra, reusing the new cert, with
@@ -321,6 +323,32 @@
 - **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### OTA-254 — iOS Info.plist photo-library purpose string (Apple ITMS-90683 fix)
+
+- **OTA-254 · Apple Mail: *"ITMS-90683: Missing purpose string in Info.plist — NSPhotoLibraryUsageDescription"***
+  - **What broke:** the inaugural TestFlight binary 2.4.1 (2), submitted via `eas submit --platform ios --latest` after generating the App Store Connect API Key (key ID `WJ44NUUU49`, role APP_MANAGER, scoped to bundle `com.hotatticgames.tartarprim.hal2001`). Upload to App Store Connect succeeded; Apple's automated pre-review scanner detected one of our native deps references the photos API and bounced the binary for not declaring the user-facing purpose string. We don't actually access the photo library — but the declaration is required regardless because of the transitive native reference.
+  - **Fix:** added `NSPhotoLibraryUsageDescription` to `app.json`'s `ios.infoPlist` with the honest string *"Tartaria Realms does not access your photo library."* — clear, complete, satisfies Apple's "user-facing purpose string" rule. User will never see it (we don't call the API), but the scanner just checks the key exists.
+  - **Why this approach:** the safer alternative (chasing down which dep references photos and stripping it) is overkill — adding the string is one-line, doesn't lie to the user (the string is honest), and won't break in App Review.
+  - **Native rebuild:** required because Info.plist values are baked into the .ipa at native compile time, not OTA-able. Triggered via `[build-ios] [submit-ios]` commit title. Auto-submit will land the new build directly in TestFlight since the ASC API Key (generated this session) is now stored on EAS — future submit prompts skip entirely.
+  - **iOS submit pipeline learnings (captured here so the next session doesn't redo them):**
+    1. EAS's web UI "Submit" button just shows a copy-the-command modal; submission still requires CLI invocation. Two clean paths: (a) `eas submit --platform ios --latest` in PowerShell with the project locally cloned, or (b) GitHub Actions / EAS Workflows.
+    2. `eas.json submit.production.ios` uses `$APPLE_ID` / `$ASC_APP_ID` / `$APPLE_TEAM_ID` placeholders — these substitute correctly in CI (env vars set), but in local CLI use EAS reads them as literal strings and validation fails. Workaround: temp-patch eas.json with real values for local submit, then `git checkout eas.json` to revert (placeholders preserved for CI).
+    3. First-time submit triggers a prompt to generate an App Store Connect API Key (Y → APP_MANAGER role). Once generated, the key is stored on EAS servers and reused for all future submissions; subsequent submits are zero-prompt.
+    4. `eas submit` filters builds by the project (EAS project ID), not by app.json's local bundle id — so even though the local app.json shows `.hal2001`, `--latest` correctly picked the bare-bundle production build.
+    5. Existing GitHub Actions workflow `build-ios.yml` does `--auto-submit` inline with the build when commit title starts with `[build-ios]` and contains `[submit-ios]` — which is the trigger for this OTA-254 commit.
+  - **Files:** `app.json` (ios.infoPlist), `app/buildInfo.ts` (OTA bump + change note), `HANDOFF.md` (this entry).
+
+#### OTA-253 — iOS TestFlight pipeline: cert generated, Xcode 26 image pinned, App Store Connect setup
+
+- **OTA-253 (session 2026-05-31) · Player goal: *"set up everything for iOS and I will try to do the secret thing on my phone in a few minutes"***
+  - **Distribution Certificate + Provisioning Profile generated** for bundle `com.hotatticgames.tartarprim` via interactive `eas credentials --platform ios` on the user's Windows laptop (the user is otherwise cloud-only — the cert flow is the ONLY step that needed a real machine, and even that can be future-replaced with API-key auth). Cert serial `23E4172940150DFB4525AF86DA2CD0BF`, profile Developer Portal ID `PQ4YD8C5WZ`, team `7Z67WUB9FA` Kevin Ernst (Individual), both valid until 2027-05-31.
+  - **Xcode 26 image pinned in eas.json** (`production.ios.image: macos-sequoia-15.6-xcode-26.2`) to satisfy Apple's 2026-04-28 requirement that App Store Connect uploads be built with Xcode 26 / iOS 26 SDK. SDK 52 doesn't auto-pick this image; explicit pin required. The first iOS build (4b59247, no pin) used Xcode 16 and was rejected at submit time with "This build can no longer be submitted to the App Store"; second build (7b5db38, pinned) used iPhoneOS26.2.sdk and submitted successfully.
+  - **Build workflow improvements:** `build-ios.yml` switched the post-build submit logic from a separate `eas submit --latest` step to `--auto-submit` inline on the build command (the separate step would race the `--no-wait` build and find no finished build to submit, fatal for the very first build). New manual-trigger workflow `.github/workflows/submit-ios.yml` added as a one-click resubmit path from the GitHub Actions UI (workflow_dispatch). Pre-packaged `.eas/workflows/build-submit-ios.yml` added for the EAS-native CI/CD path going forward (uses the `build` + `testflight` job types per Expo's recommended pattern; manually triggered from EAS dashboard).
+  - **App Store Connect setup completed during this session:** App ID `com.hotatticgames.tartarprim` registered; ASC listing live with `ASC_APP_ID = 6775124980`; categories Games → Role Playing; License Agreement = Apple Standard; Content Rights = No (original lore); Age Rating questionnaire walked through and landed at **13+** (Cartoon/Fantasy Violence Frequent + Realistic Violence Infrequent + Horror Themes Infrequent + Alcohol Refs Infrequent + everything else None; "Prolonged Graphic or Sadistic" critical-must-be-None — picking Infrequent there triggers Apple's hard "can't be on App Store" rejection); Privacy Policy hosted publicly on Notion (`https://available-stew-676.notion.site/Tartaria-Realms-Privacy-Policy-47d505d1f7ed4fd69c08df36d268d537`) since the GitHub repo will go private after the build cycle. EXIT GAME button is `Platform.OS === 'android'` gated so iOS reviewers don't see it (Apple rejects any UI that programmatically exits).
+  - **GitHub Secrets added/confirmed this session:** `ASC_APP_ID = 6775124980`, `APPLE_TEAM_ID = 7Z67WUB9FA`. `EXPO_TOKEN`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD` were already in place from prior session.
+  - **Pointer doc added to main branch** (`HANDOFF.md`) so a fresh session cloning `main` doesn't land blind — points to `HaL2001` for the live state.
+  - **Files:** `eas.json` (Xcode 26 image pin, submit profile updates), `app.json` (no change to iOS bundle), `.github/workflows/build-ios.yml` (auto-submit + Xcode 26 + workflow ergonomics), NEW `.github/workflows/submit-ios.yml`, NEW `.eas/workflows/build-submit-ios.yml`, `HANDOFF.md` (this entry + ACTIVE TASK block at top of Open Issues), `main:HANDOFF.md` (pointer doc).
 
 #### OTA-251 — runtimeVersion gate fix (DISPLAY_VERSION constant) + iOS build pipeline
 
