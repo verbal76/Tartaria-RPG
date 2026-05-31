@@ -45,10 +45,9 @@
   "submit": {
     "production": {
       "ios": {
+        "appleId": "$APPLE_ID",
         "ascAppId": "$ASC_APP_ID",
-        "ascApiKeyPath": "$ASC_API_KEY_PATH",
-        "ascApiKeyId": "$ASC_KEY_ID",
-        "ascApiKeyIssuerId": "$ASC_ISSUER_ID"
+        "appleTeamId": "$APPLE_TEAM_ID"
       }
     }
   }
