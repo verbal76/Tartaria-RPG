@@ -4,6 +4,15 @@ name: iOS Build (Tartaria Realms)
 # the cert/provisioning/Xcode work. We just hand it the project,
 # auth, and Apple credentials; it returns a signed .ipa.
 #
+# Retry note (2026-05-31): EAS occasionally errors at the "Prepare
+# project" phase with a network timeout downloading the project archive
+# from its own CDN — transient infra hiccup, not a config issue. To
+# retry, push a commit whose first line starts with [build-ios] AND
+# touches a non-paths-ignored file (an empty commit will NOT trigger
+# because GitHub Actions' paths-ignore skips workflows when zero files
+# changed). This file (build-ios.yml) is itself not in the ignore list,
+# so touching its header is the canonical retry mechanism.
+#
 # Required GitHub Secrets (configure once at repo settings):
 #   EXPO_TOKEN          — from expo.dev → Account → Access Tokens
 #   APPLE_ID            — your Apple Developer email
