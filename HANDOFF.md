@@ -318,6 +318,8 @@
 
 - **TS 0 errors / Test suite green.** Always required pre-push. Tracked here as a passive gate rather than an issue.
 
+- **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
+
 ### 0.B — Closed Issues (most recent first)
 
 #### OTA-251 — runtimeVersion gate fix (DISPLAY_VERSION constant) + iOS build pipeline
