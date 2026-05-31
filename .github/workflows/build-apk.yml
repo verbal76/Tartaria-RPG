@@ -505,17 +505,38 @@ jobs:
           KOTLIN_VERSION: "1.9.25"
         run: |
           chmod +x gradlew
+          # OTA-252 — retry wrapper. Build 251 failed at the gradle
+          # wrapper bootstrap with "Server returned HTTP response
+          # code: 502 for URL: https://github.com/gradle/gradle-
+          # distributions/releases/download/v8.10.2/gradle-8.10.2-
+          # all.zip". GitHub's release CDN flaked. Retry up to 3
+          # times with exponential backoff before failing the build.
+          # Retries don't cost anything when the first attempt
+          # succeeds; just guards against transient infra hiccups.
           if [ "${{ steps.meta.outputs.profile }}" = "production" ]; then
+            GRADLE_TASK="bundleRelease"
             echo "Building Tartaria Realms AAB (production)"
-            ./gradlew bundleRelease --no-daemon --stacktrace \
-              -Pandroid.kotlinVersion=1.9.25 \
-              -PkotlinVersion=1.9.25
           else
+            GRADLE_TASK="assembleRelease"
             echo "Building Tartaria Realms APK (preview)"
-            ./gradlew assembleRelease --no-daemon --stacktrace \
-              -Pandroid.kotlinVersion=1.9.25 \
-              -PkotlinVersion=1.9.25
           fi
+          for attempt in 1 2 3; do
+            echo "--- Gradle attempt $attempt of 3 ---"
+            if ./gradlew $GRADLE_TASK --no-daemon --stacktrace \
+                -Pandroid.kotlinVersion=1.9.25 \
+                -PkotlinVersion=1.9.25; then
+              echo "✓ Gradle build succeeded on attempt $attempt"
+              break
+            fi
+            if [ $attempt -lt 3 ]; then
+              wait_seconds=$((10 * attempt))
+              echo "::warning::Gradle attempt $attempt failed. Sleeping ${wait_seconds}s before retry."
+              sleep $wait_seconds
+            else
+              echo "::error::Gradle build failed after 3 attempts."
+              exit 1
+            fi
+          done
 
       # Production AAB MUST be release-signed. We assert here instead of
       # discovering it at Play Store upload time. jarsigner -verify on the
