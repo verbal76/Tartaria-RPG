@@ -324,6 +324,15 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-256 — Investigate dedup wording: stop saying "nothing of use" when reward WAS found
+
+- **OTA-256 · Player: *"still an issue with any version of the titan bone"* + *"I thought qwen was resolving those issues"***
+  - **What broke:** the "already checked" dedup line on `investigate` claimed *"there was nothing of use in it — turning it over again won't change that"* — but `alreadyClearedNoun` fires for nouns whose first investigation produced a reward too. Player's log showed `investigate titan's bone marker` yielding a contract lead (*"New lead: Disable a still-active Architectural Sentinel at Ostragar"*), then the next tap on the same noun saying nothing of use was there. Both can't be true.
+  - **Fix:** replaced the wording in both `gameStore.ts:5249` (investigate-ambush path) and `gameStore.ts:10557` (general investigate path) with neutral text: *"You've already examined the {noun}. There's nothing more to find here."* Accurate whether the first check yielded a reward or nothing — claims no further content remains, not that the noun was fruitless.
+  - **Why hardcoded instead of Qwen:** the player asked "I thought qwen was resolving those issues." These dedup messages are intentionally hardcoded as **fast-path UX guardrails** — they need to fire instantly when a player taps a noun they already checked, without waiting on Qwen's 200-800ms inference + warmup latency. Bringing Qwen into this path would introduce visible lag on a no-op gesture. Better to make the hardcoded string honest in both cases.
+  - **OTA-only:** JS-side string change, ships through OTA channel.
+  - **Files:** `app/state/gameStore.ts` (lines 5249 + 10557).
+
 #### OTA-255 — Auto-resolve dice rolls (remove RESOLVE / NEXT ROLL gate)
 
 - **OTA-255 · Player: *"why do we have to hit resolve after all of the dice rolls, aren't we already committed at that point?"***

@@ -10691,4 +10691,20 @@ export const DISPLAY_VERSION = '3.0.0';
 //   across combat, skill checks, and maneuvers — single point of
 //   change since all dice contexts route through DiceRoller.tsx.
 //   Files: app/components/DiceRoller.tsx.
-export const OTA_BUILD_ID = '2026-05-31-255';
+//
+// OTA-256 — Investigate dedup wording: drop the self-contradiction.
+//   Player log showed the titan's bone marker yielding a contract
+//   lead on first investigate ("New lead: Disable a still-active
+//   Architectural Sentinel at Ostragar"), then the second tap
+//   claiming "There was nothing of use in it." Both can't be true.
+//   The `alreadyClearedNoun` flag in the investigate path is set
+//   for BOTH "found a reward" and "found nothing" cases, so the
+//   dedup line has to be accurate in both. Replaced with neutral
+//   wording: "You've already examined the {noun}. There's nothing
+//   more to find here." — accurate either way; claims no further
+//   content remains, not that the noun was ever fruitless. (User
+//   asked "I thought qwen was resolving those issues" — these
+//   dedup messages are hardcoded by design, fast-path UX guardrails
+//   that need to fire without Qwen warmup latency.)
+//   Files: app/state/gameStore.ts (line 5249 + 10557).
+export const OTA_BUILD_ID = '2026-05-31-256';

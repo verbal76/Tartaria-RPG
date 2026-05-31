@@ -5244,9 +5244,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
               || n.includes(investAmbushTarget),
           );
           if (alreadyClearedNoun) {
+            // OTA-256 — neutral wording. The prior line "there was
+            // nothing of use in it" contradicted itself on nouns
+            // whose FIRST investigation produced a reward (e.g., the
+            // titan's bone marker → contract lead). `alreadyClearedNoun`
+            // is set in BOTH "found a reward" and "found nothing" cases,
+            // so the dedup line has to be accurate in both. "Nothing
+            // more to find" works either way — it claims no further
+            // content remains, not that the noun was ever fruitless.
             get().refuseAmbient({
               noun: investAmbushTarget,
-              line: `You've already checked the ${investAmbushTarget} here. There was nothing of use in it — turning it over again won't change that.`,
+              line: `You've already examined the ${investAmbushTarget}. There's nothing more to find here.`,
               kind: 'flavor',
             });
             break;
@@ -10550,11 +10558,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
               // either way." We're here because the noun is in
               // flavorExhaustedNouns specifically, so the first
               // pass was a flavor / no-loot outcome. Tell the
-              // player there was nothing to take, not "whatever it
-              // had you took."
+              // OTA-256 — neutral wording. The prior line "there was
+              // nothing of use in it" contradicted itself on nouns
+              // whose FIRST investigation produced a reward (titan's
+              // bone marker → contract lead, etc.). `alreadyClearedNoun`
+              // is set in BOTH "found reward" and "found nothing" cases,
+              // so the dedup line has to be accurate in both. "Nothing
+              // more to find" works either way — claims no further
+              // content remains, not that the noun was ever fruitless.
               get().refuseAmbient({
                 noun: focus,
-                line: `You've already checked the ${focus} here. There was nothing of use in it — turning it over again won't change that.`,
+                line: `You've already examined the ${focus}. There's nothing more to find here.`,
                 kind: 'flavor',
               });
               break;
