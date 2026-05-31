@@ -52,6 +52,15 @@ const POOLS: Record<Context, TrackEntry[]> = {
     { id: 'explore-map-of-the-wild-2', source: require('../../assets/audio/explore-map-of-the-wild-2.mp3'), baseVolume: 0.4 },
     { id: 'explore-dusty-threshold', source: require('../../assets/audio/explore-dusty-threshold.mp3'), baseVolume: 0.4 },
     { id: 'explore-map-of-ashes', source: require('../../assets/audio/explore-map-of-ashes.mp3'), baseVolume: 0.4 },
+    // OTA-252 — three new atmospheric tracks added to the explore
+    // rotation. All authored at the same 0.4 base mix as the rest of
+    // explore so the player doesn't get a volume spike on transitions.
+    // Filenames preserve the "explore-" prefix convention. Routing
+    // can be reshuffled later (e.g. move Vault of Ash to boss) once
+    // the user has heard them in context.
+    { id: 'explore-tartar-steppe-adagio', source: require('../../assets/audio/explore-tartar-steppe-adagio.mp3'), baseVolume: 0.4 },
+    { id: 'explore-catacomb-overture', source: require('../../assets/audio/explore-catacomb-overture.mp3'), baseVolume: 0.4 },
+    { id: 'explore-vault-of-ash', source: require('../../assets/audio/explore-vault-of-ash.mp3'), baseVolume: 0.4 },
   ],
 };
 

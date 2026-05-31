@@ -10664,4 +10664,4 @@ export const DISPLAY_VERSION = '3.0.0';
 //        eas.json (ios sections in 4 profiles + submit.production.ios),
 //        .github/workflows/build-ios.yml (NEW — EAS Build
 //        for iOS, optional TestFlight submit).
-export const OTA_BUILD_ID = '2026-05-31-251';
+export const OTA_BUILD_ID = '2026-05-31-252';
