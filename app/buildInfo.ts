@@ -10596,4 +10596,72 @@
 // Config?.version; adds
 // "APK build version" line
 // when native ≠ ota).
-export const OTA_BUILD_ID = '2026-05-31-250';
+// OTA-251 — DISPLAY_VERSION. Cosmetic version string the player sees
+// (title screen footer + About screen). Decoupled from app.json's
+// expo.version because that field is locked to the runtimeVersion
+// the installed APK accepts — bumping it orphans OTAs (the APK
+// silently rejects them). This constant is JS-only so it can bump
+// freely with each OTA without breaking the runtimeVersion gate.
+//
+// The flow:
+//   - app.json expo.version + runtimeVersion stay at 2.4.1 (the rt
+//     baked into APK 246; OTAs require an exact match).
+//   - DISPLAY_VERSION bumps freely. Title screen + About screen
+//     read THIS, not expo.version.
+//   - When the next AAB ships, app.json expo.version flips up to
+//     DISPLAY_VERSION and the two are synced again.
+//
+// Bump this for marketing-visible version changes.
+export const DISPLAY_VERSION = '3.0.0';
+
+// 2026-05-31-251 — OTA-251.
+// Three things in one push:
+//
+// 1. RUNTIME VERSION FIX. Player: "I am on OTA 249, it won't
+//    pull 250 in." Cause: OTA-250 bumped app.json's expo.version
+//    to 3.0.0, which also bumped runtimeVersion (policy: appVersion)
+//    to 3.0.0. The installed APK 246 has rt=2.4.1 baked in;
+//    it silently rejects any OTA with rt≠2.4.1. So OTA-250
+//    published to hal2001 channel correctly but the device's
+//    OTA check found "no compatible update available."
+//    Reverted app.json's version to 2.4.1 so rt stays 2.4.1
+//    and OTAs flow. New DISPLAY_VERSION constant in this file
+//    is the JS-only cosmetic version the player sees (3.0.0);
+//    TitleScreen + aboutSummary now read this instead of
+//    app.json's expo.version.
+//
+// 2. iOS BUILD PIPELINE. Player: "set up everything for iOS
+//    and I will try to do the secret thing on my phone in a
+//    few minutes." Added:
+//    - eas.json: development gets ios.simulator=true; preview
+//      gets ios.simulator=false; production gets
+//      ios.autoIncrement=buildNumber; submit.production.ios
+//      reads $APPLE_ID / $ASC_APP_ID / $APPLE_TEAM_ID env vars
+//    - .github/workflows/build-ios.yml: new workflow that
+//      triggers EAS Build for iOS via Expo's hosted macOS
+//      infra. Strips .hal2001 from ios.bundleIdentifier when
+//      profile==production (mirrors the Android strip).
+//      Optional [submit-ios] gate auto-ships to TestFlight.
+//    - TitleScreen: EXIT GAME button now wrapped in
+//      Platform.OS === 'android' (App Store reviewers reject
+//      any UI that programmatically exits the app).
+//    - Required GitHub Secrets (user adds these):
+//      EXPO_TOKEN, APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD,
+//      ASC_APP_ID (after creating App Store Connect listing),
+//      APPLE_TEAM_ID.
+//
+// 3. The DISPLAY_VERSION constant introduced for #1 doubles
+//    as the marketing-version dial going forward. Bump it
+//    freely per OTA. app.json's expo.version stays pinned to
+//    whichever AAB's runtimeVersion is currently the floor.
+//
+// Files: app.json (expo.version reverted 3.0.0 → 2.4.1),
+//        app/buildInfo.ts (DISPLAY_VERSION constant),
+//        app/screens/TitleScreen.tsx (APP_VERSION import +
+//        Platform.OS gate on EXIT GAME),
+//        app/diagnostics/aboutSummary.ts (otaVersion reads
+//        DISPLAY_VERSION),
+//        eas.json (ios sections in 4 profiles + submit.production.ios),
+//        .github/workflows/build-ios.yml (NEW — EAS Build
+//        for iOS, optional TestFlight submit).
+export const OTA_BUILD_ID = '2026-05-31-251';

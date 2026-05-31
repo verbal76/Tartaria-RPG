@@ -15,21 +15,20 @@
 import Constants from 'expo-constants';
 import * as Application from 'expo-application';
 import { Platform, Dimensions, PixelRatio } from 'react-native';
-import { OTA_BUILD_ID } from '../buildInfo';
+import { OTA_BUILD_ID, DISPLAY_VERSION } from '../buildInfo';
 
 export function buildBasicDeviceSummary(): string {
   const apkBuild = Application.nativeBuildVersion ?? '(unknown)';
-  // OTA-250 — App version now prefers Constants.expoConfig?.version
-  // (OTA-deliverable, refreshed on every bundle apply) over
-  // Application.nativeApplicationVersion (baked into the AAB at
-  // build time). Reason: when we bump app.json's expo.version from
-  // 2.4.1 → 3.0.0 and push as OTA, the player should see "3.0.0"
-  // on the About screen immediately, not have to wait for the next
-  // AAB rebuild. The native version is preserved on its own line
-  // ("APK build version") for diagnostic clarity — useful when the
-  // two diverge (e.g. installed APK 232 still says 2.4.1 natively
-  // but the OTA bundle is on 3.0.0).
-  const otaVersion = Constants.expoConfig?.version ?? '0.0.0';
+  // OTA-251 — App version now reads DISPLAY_VERSION from buildInfo.ts.
+  // Background: OTA-250 tried to pull the version from Constants.
+  // expoConfig?.version (i.e. app.json's expo.version). But Expo binds
+  // app.json's version to the runtimeVersion gate — bumping it
+  // orphans OTAs (the APK silently rejects them). So app.json must
+  // stay pinned to the rt baked into the installed APK. DISPLAY_VERSION
+  // is a separate JS-only constant that bumps freely per OTA and is
+  // what the player sees. Native version is still preserved on its
+  // own line for diagnostic clarity (the APK's nativeVersionName).
+  const otaVersion = DISPLAY_VERSION;
   const nativeVersion = Application.nativeApplicationVersion ?? otaVersion;
   const appId = Application.applicationId ?? '(unknown)';
   // Constants.deviceName is iOS-set (user's chosen device name in

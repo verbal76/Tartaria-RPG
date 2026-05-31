@@ -245,6 +245,18 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-251 — runtimeVersion gate fix (DISPLAY_VERSION constant) + iOS build pipeline
+
+- **OTA-251 · Player: *"I am on OTA 249, it won't pull 250 in"* + *"set up everything for iOS and I will try to do the secret thing on my phone in a few minutes"***
+  - **runtimeVersion bug from OTA-250:** bumping `app.json`'s `expo.version` 2.4.1 → 3.0.0 also bumped `runtimeVersion` (policy: appVersion) to 3.0.0. APK 246's baked rt is 2.4.1; it silently rejects any OTA with rt≠2.4.1. OTA-250 published to channel `hal2001` correctly (verified workflow) but device's OTA check found "no compatible update available." Stuck on OTA-249.
+  - **Fix:** reverted `app.json` to 2.4.1 (rt stays 2.4.1, OTAs flow). New `DISPLAY_VERSION` constant in `buildInfo.ts` is the JS-only cosmetic version (3.0.0). TitleScreen footer + aboutSummary read this instead of `expo.version`. Going forward: bump `DISPLAY_VERSION` per OTA freely; bump `app.json` version only when a new AAB is shipping (the rt floor moves with the AAB).
+  - **iOS pipeline (ready when secrets land):**
+    - `eas.json`: added `ios` sections to development (simulator: true), preview (simulator: false), production (autoIncrement: buildNumber), plus `submit.production.ios` block with `$APPLE_ID` / `$ASC_APP_ID` / `$APPLE_TEAM_ID` env-substitution.
+    - NEW `.github/workflows/build-ios.yml`: triggers EAS Build for iOS via Expo's hosted macOS infra. `[build-ios]` commit-message marker = production build. Optional `[submit-ios]` also-flag = auto-ship to TestFlight after build. Strips `.hal2001` from `ios.bundleIdentifier` when profile==production (mirrors Android strip).
+    - **EXIT GAME hidden on iOS** (`Platform.OS === 'android'` gate) — App Store reviewers reject any UI that programmatically exits.
+    - **Required GitHub Secrets:** `EXPO_TOKEN` (expo.dev access token), `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD` (appleid.apple.com → Sign-In and Security → App-Specific Passwords). For TestFlight submit: also `ASC_APP_ID` (after creating App Store Connect listing) + `APPLE_TEAM_ID` (10-char developer team ID).
+  - **Files:** `app.json` (expo.version reverted 3.0.0 → 2.4.1), `app/buildInfo.ts` (`DISPLAY_VERSION` constant), `app/screens/TitleScreen.tsx` (APP_VERSION import + Platform.OS gate on EXIT GAME), `app/diagnostics/aboutSummary.ts` (otaVersion reads `DISPLAY_VERSION`), `eas.json` (iOS sections + submit.production.ios), NEW `.github/workflows/build-ios.yml`.
+
 #### OTA-250 — visible version bump 2.4.1 → 3.0.0 (OTA-deliverable)
 
 - **OTA-250 · Player: *"still, let's push an OTA to the HAL AAB to update the visible versions to 3.0.0 so you can see it on the front screen under the add play tester and then you can see it on the about."***

@@ -10,6 +10,7 @@ import {
   Linking,
   Share,
   BackHandler,
+  Platform,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import {
@@ -39,7 +40,11 @@ import locationsData from '../data/locations/locations.json';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
 import { OTA_BUILD_ID } from '../buildInfo';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const APP_VERSION: string = (require('../../app.json') as { expo: { version: string } }).expo.version;
+// OTA-251 — was reading app.json's expo.version. That field is now
+// pinned to the runtimeVersion of the installed APK (2.4.1) so OTAs
+// can flow without orphaning. The player-facing display string lives
+// in DISPLAY_VERSION (app/buildInfo.ts) and bumps freely per OTA.
+import { DISPLAY_VERSION as APP_VERSION } from '../buildInfo';
 import { getKokoroState, onKokoroStateChange, type KokoroState } from '../voice/PiperTTSManager';
 import { speak as ttsSpeak } from '../voice/TTSManager';
 import type { MainQuestPhase } from '../engine/types';
@@ -874,14 +879,20 @@ export function TitleScreen() {
               programmatic exit, but RN's BackHandler.exitApp()
               is the standard call and is a no-op safely on
               iOS). Confirm modal prevents an accidental tap
-              mid-character-creation. */}
-          <TouchableOpacity
-            style={styles.exitBtn}
-            activeOpacity={0.7}
-            onPress={() => setPendingAction({ kind: 'exit' })}
-          >
-            <Text style={styles.exitBtnText}>EXIT GAME</Text>
-          </TouchableOpacity>
+              mid-character-creation.
+              OTA-251 — iOS now HIDES the button entirely. App
+              Store review will reject any UI that programmatically
+              terminates the app, even if the underlying call is a
+              no-op. Wrapped the button in Platform.OS === 'android'. */}
+          {Platform.OS === 'android' && (
+            <TouchableOpacity
+              style={styles.exitBtn}
+              activeOpacity={0.7}
+              onPress={() => setPendingAction({ kind: 'exit' })}
+            >
+              <Text style={styles.exitBtnText}>EXIT GAME</Text>
+            </TouchableOpacity>
+          )}
         </View>
         {/* OTA-237 — surface last crash diagnostic if a previous launch
             died. App.tsx's global error handler writes to
