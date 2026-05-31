@@ -1,0 +1,78 @@
+name: Submit iOS to TestFlight (manual)
+
+# Manually trigger a TestFlight submission of an EXISTING EAS iOS build.
+# Use this when:
+#   - A build is already finished on EAS (green ✅) but didn't auto-submit
+#     (e.g., the build was triggered without [submit-ios] in the commit,
+#     or --auto-submit silently no-op'd)
+#   - You want to re-submit the latest production build to TestFlight
+#     without re-running the 20-30 min build
+#
+# How to trigger:
+#   GitHub repo → Actions tab → "Submit iOS to TestFlight (manual)" →
+#   "Run workflow" button (top-right) → Run.
+#
+# What it does:
+#   `eas submit --platform ios --latest --non-interactive` — grabs the
+#   most recent successful EAS iOS production build and submits its .ipa
+#   to App Store Connect. Reads submit.production.ios from eas.json,
+#   which is set up to read Apple credentials from env vars (APPLE_ID /
+#   ASC_APP_ID / APPLE_TEAM_ID, with APPLE_APP_SPECIFIC_PASSWORD for auth).
+#
+# Required GitHub Secrets (same as build-ios.yml):
+#   EXPO_TOKEN, APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD,
+#   ASC_APP_ID, APPLE_TEAM_ID
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    name: Submit latest iOS build to App Store Connect
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Verify EXPO_TOKEN secret is set
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "${EXPO_TOKEN:-}" ]; then
+            echo "::error::EXPO_TOKEN secret is missing."
+            exit 1
+          fi
+          echo "✓ EXPO_TOKEN is set."
+
+      - name: EAS Submit (iOS, latest build, non-interactive)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          # Apple auth — submit step uses the app-specific password,
+          # NOT the regular Apple password. Generated at
+          # appleid.apple.com → Sign-In and Security → App-Specific
+          # Passwords.
+          EXPO_APPLE_ID: ${{ secrets.APPLE_ID }}
+          EXPO_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          # eas.json submit.production.ios reads these via $VAR substitution.
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          ASC_APP_ID: ${{ secrets.ASC_APP_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          npx eas-cli submit \
+            --platform ios \
+            --profile production \
+            --latest \
+            --non-interactive
