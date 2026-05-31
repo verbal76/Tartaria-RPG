@@ -324,6 +324,17 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-262 — SalvageModal: SALVAGE ALL processes everything + height-aware chip list
+
+- **OTA-262 · Player: *"when I hit salvage all, it should salvage everything even what is off screen, I shouldn't have to salvage again for the one item or didn't show. the salvage pop up should be height aware and show all salvagable items at once"***
+  - **Two coupled bugs:** (1) `SALVAGE_CHIP_CAP = 8` at `SalvageModal.tsx:93` truncated the chip list before SALVAGE ALL ever saw it. A scene with 12 salvageable nouns built `sceneHints` from only the first 8, so SALVAGE ALL fired on 8 — the player had to re-open the modal and tap again to handle the remaining 4. (2) The chip ScrollView had a hard `maxHeight: 280`, showing only ~5 chips on screen at a time even on tall phones. Both bugs feel like the same UX problem to the player ("salvage all didn't get everything"), and they were.
+  - **Fix:** (a) `SALVAGE_CHIP_CAP` retired (set to `Number.POSITIVE_INFINITY`; the `.slice()` is kept as a no-op guard against a future regression that re-adds a finite cap upstream). Full filtered list now passes through `sceneHints`, so SALVAGE ALL operates on every salvageable noun in the scene and the count label `SALVAGE ALL (N)` reflects the real total. (b) New `CHIP_SCROLL_MAX_HEIGHT = Math.max(280, Math.floor(Dimensions.get('window').height - 380))` captured at module-load time — 280 floor for tiny screens (same as before), grows to use available vertical space on normal phones. Tall phone with 8 salvageables now shows all 8 without scrolling; lists longer than the screen room still scroll, but SALVAGE ALL processes the complete list either way.
+  - **Why module-load Dimensions (not per-render):** the modal isn't a long-lived screen; orientation flips mid-render aren't a real concern, and re-reading `Dimensions.get('window')` on every render would be noise. If we ever support landscape/orientation toggles for this modal we'd switch to `useWindowDimensions()`.
+  - **What this DOESN'T touch:** the salvage engine itself, the chip filter (`SALVAGE_PATTERN` + curated pool), or the salvage outcome resolution. The bug was purely at the UI-layer slice — engine has always been ready to process arbitrary noun lists.
+  - **Why a similar fix doesn't ship for SearchModal / TakeModal / ClimbModal yet:** none of those modals had a hard chip cap as of this OTA — they already pass the full list. SalvageModal's `SALVAGE_CHIP_CAP` was a one-off truncation. The chipScroll maxHeight tightness DOES apply to the other modals (also 280px), but those don't have a SALVAGE ALL equivalent, so the truncation is just a visual scroll cue rather than a missed-action bug. Flagged as a follow-up if the user reports the same height feeling in those modals.
+  - **OTA-only:** JS-side component change; ships through OTA channel.
+  - **Files:** `app/components/SalvageModal.tsx` (Dimensions import, `SALVAGE_CHIP_CAP` retired, new `CHIP_SCROLL_MAX_HEIGHT` const, inline maxHeight style on the chipScroll ScrollView).
+
 #### OTA-261 — Dice auto-resolve hold tuned 1500ms → 800ms (snappier)
 
 - **OTA-261 · Player feedback after OTA-255 shipped: *"the next roll and resolving are just a touch too long it feels like it hanging just a bit, it makes it feel like the math is slowing the game"***

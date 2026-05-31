@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
   Pressable,
   Keyboard,
+  Dimensions,
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import type { InventoryItem } from '../engine/types';
@@ -87,10 +88,34 @@ const SALVAGE_PATTERN = new RegExp(
   'i',
 );
 
-// Slice cap for the chip row. Lifted from 5 → 8 since the broader
-// salvage pattern surfaces more legit nouns and the row scrolls
-// horizontally anyway.
-const SALVAGE_CHIP_CAP = 8;
+// OTA-262 — SALVAGE_CHIP_CAP retired. Pre-OTA-262 the chip row was
+// hard-capped at 8 items, so a scene with 9+ salvageables had the
+// excess dropped before the chip row was built — and worse, SALVAGE
+// ALL only saw those 8 (the player had to re-open the modal to deal
+// with the rest, which is the exact symptom the player flagged:
+// "salvage all should salvage everything even what is off screen,
+// I shouldn't have to salvage again for the one item or didn't show").
+// The chip list now stays uncapped; the ScrollView's height-aware
+// maxHeight (see CHIP_SCROLL_MAX_HEIGHT below) lets the modal expand
+// to fit as many items as the device screen permits, and SALVAGE ALL
+// operates on the full filtered list, not a slice. Constant retained
+// for legacy reference / search hits.
+const SALVAGE_CHIP_CAP = Number.POSITIVE_INFINITY;
+
+// OTA-262 — height-aware chip scroll. Computed from the current
+// window height minus the modal chrome (title + body text + input +
+// label + buttons + padding ≈ 380px). Floors at 280px (the prior
+// hard maxHeight) so tiny screens don't shrink the list below
+// what they already showed; otherwise grows to use the available
+// vertical space, so a scene with many salvageables shows all of
+// them at once on phones with the room. Captured once at module-
+// load time — the modal isn't a long-lived screen where orientation
+// changes mid-render are common, and re-reading Dimensions on every
+// render would be needless overhead.
+const CHIP_SCROLL_MAX_HEIGHT = Math.max(
+  280,
+  Math.floor(Dimensions.get('window').height - 380),
+);
 
 /** 2026-05-25 — exported so ExplorationScreen's salvageableCount
  *  predicate can mirror this modal's chip filter exactly. The
@@ -192,6 +217,14 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalv
         .filter((c) => isSalvageable(c.noun))
         .map((c) => c.noun)
     : (hints ?? []).filter(isSalvageable);
+  // OTA-262 — no slice. The full list passes through, so SALVAGE ALL
+  // operates on every salvageable noun in the scene (not just the
+  // first 8) and the modal's chip row shows everything up to the
+  // screen-aware ScrollView maxHeight, after which the list scrolls
+  // but the SALVAGE ALL count still reflects every item.
+  // SALVAGE_CHIP_CAP is now POSITIVE_INFINITY; the .slice() here is
+  // kept as a no-op guard against a future regression that re-adds
+  // a finite cap somewhere upstream.
   const sceneHints = prioritizeSalvageChips(rawSceneHints).slice(0, SALVAGE_CHIP_CAP);
   // 2026-05-25 [UI-1] — commonHints suggestion array removed (was
   // rendered as browned-out chips that the user identified as
@@ -276,7 +309,7 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalv
                           Bounded by maxHeight so long lists scroll
                           while short lists collapse to fit. */}
                       <ScrollView
-                        style={styles.chipScroll}
+                        style={[styles.chipScroll, { maxHeight: CHIP_SCROLL_MAX_HEIGHT }]}
                         contentContainerStyle={styles.chipList}
                       >
                         {sceneHints.map((h) => (

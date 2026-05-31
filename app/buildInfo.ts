@@ -10804,4 +10804,31 @@ export const DISPLAY_VERSION = '3.0.0';
 //   (AUTO_RESOLVE_HOLD_MS in DiceRoller.tsx); easy to nudge again
 //   if it ever feels off.
 //   Files: app/components/DiceRoller.tsx (constant + comment).
-export const OTA_BUILD_ID = '2026-05-31-261';
+//
+// OTA-262 — SalvageModal: SALVAGE ALL processes every salvageable +
+//   chip list grows to fit the screen. Player feedback: "when I hit
+//   salvage all, it should salvage everything even what is off
+//   screen, I shouldn't have to salvage again for the one item or
+//   didn't show. the salvage pop up should be height aware and show
+//   all salvagable items at once." Two coupled fixes:
+//   (1) `SALVAGE_CHIP_CAP` was 8, so any scene with more than 8
+//       salvageables had the excess dropped before the chip list was
+//       even built, and SALVAGE ALL only saw the visible 8 — player
+//       had to re-open and tap again to deal with the rest. Cap
+//       retired (set to POSITIVE_INFINITY for legacy reference); the
+//       full filtered list passes through and SALVAGE ALL now reflects
+//       every salvageable in the scene.
+//   (2) The chip ScrollView's hard `maxHeight: 280` meant ~5 chips
+//       were visible at a time even on tall phones. New
+//       `CHIP_SCROLL_MAX_HEIGHT = Math.max(280, windowHeight - 380)`
+//       lets the modal expand to use the available vertical space —
+//       a tall phone with 8 salvageables shows all 8 without scroll;
+//       very long lists still scroll but the SALVAGE ALL count + the
+//       action both reflect the full list.
+//   Captured Dimensions at module-load time (no per-render overhead;
+//   modal isn't a long-lived screen).
+//   Files: app/components/SalvageModal.tsx (Dimensions import,
+//          SALVAGE_CHIP_CAP → POSITIVE_INFINITY,
+//          CHIP_SCROLL_MAX_HEIGHT const, inline style on
+//          ScrollView's chipScroll).
+export const OTA_BUILD_ID = '2026-05-31-262';
