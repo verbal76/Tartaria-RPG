@@ -36,6 +36,10 @@ on:
       # Note: '.github/**' intentionally NOT ignored. Workflow edits
       # (including commit-message-driven AAB builds) need to trigger
       # this workflow themselves.
+      # ...EXCEPT the iOS-only workflow. Touching build-ios.yml or
+      # any iOS-specific trigger file should NOT fire an Android
+      # build (burns 30 min for nothing). Same in reverse.
+      - '.github/workflows/build-ios.yml'
   workflow_dispatch:
     inputs:
       profile:

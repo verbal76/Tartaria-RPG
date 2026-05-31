@@ -51,6 +51,8 @@ on:
       - 'scripts/**'
       - '__tests__/**'
       - '**.md'
+      # Don't fire iOS build for Android-only workflow changes.
+      - '.github/workflows/build-apk.yml'
   workflow_dispatch:
     inputs:
       profile:
