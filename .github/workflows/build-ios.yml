@@ -158,32 +158,15 @@ jobs:
           fi
           echo "✓ EXPO_TOKEN is set."
 
-      - name: EAS Build (iOS, non-interactive)
+      - name: EAS Build (iOS, non-interactive) — with optional auto-submit
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          # Apple credentials — required if EAS hasn't already saved
-          # certs for this project. Non-interactive needs at least one
-          # of these auth modes. App-specific password is the simpler
-          # setup; API key (ASC_API_KEY_*) scales better long-term.
-          EXPO_APPLE_ID: ${{ secrets.APPLE_ID }}
-          EXPO_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-        run: |
-          set -euo pipefail
-          echo "Profile: ${{ steps.meta.outputs.profile }}"
-          # --no-wait returns the moment the build is queued on Expo's
-          # macOS workers (no idle GitHub minutes burning during the
-          # 20-30 min Xcode work). Build status is visible at
-          # https://expo.dev/accounts/hot-attic-games/projects/tartaria-/builds
-          npx eas-cli build \
-            --platform ios \
-            --profile "${{ steps.meta.outputs.profile }}" \
-            --non-interactive \
-            --no-wait
-
-      - name: EAS Submit to TestFlight (production only, gated)
-        if: steps.meta.outputs.profile == 'production' && steps.meta.outputs.submit == 'true'
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          # The Distribution Certificate + Provisioning Profile are
+          # already stored on EAS (generated once via `eas credentials`),
+          # so the build reuses them. EXPO_APPLE_* is kept as a fallback
+          # auth mode. APPLE_ID / ASC_APP_ID / APPLE_TEAM_ID authorize
+          # the --auto-submit upload to App Store Connect (eas.json
+          # submit.production.ios reads them via $VAR substitution).
           EXPO_APPLE_ID: ${{ secrets.APPLE_ID }}
           EXPO_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -191,16 +174,27 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           set -euo pipefail
-          if [ -z "${ASC_APP_ID:-}" ] || [ -z "${APPLE_TEAM_ID:-}" ]; then
-            echo "::warning::ASC_APP_ID or APPLE_TEAM_ID secret missing — skipping submit."
-            echo "::warning::Build still produced the .ipa on Expo CDN; submit manually from expo.dev or App Store Connect."
-            exit 0
+          echo "Profile: ${{ steps.meta.outputs.profile }}, submit: ${{ steps.meta.outputs.submit }}"
+          # --no-wait returns the moment the build is queued on Expo's
+          # macOS workers (no idle GitHub minutes burning during the
+          # 20-30 min Xcode work). Build status:
+          # https://expo.dev/accounts/hot-attic-games/projects/tartaria-/builds
+          #
+          # --auto-submit (added when [submit-ios] was in the commit, or
+          # for tag/dispatch submits) tells EAS to submit the .ipa to
+          # TestFlight automatically AFTER the build finishes, server-side.
+          # This is the reliable path: a separate `eas submit --latest`
+          # step would race the --no-wait build and find no finished
+          # build to submit (fatal for the very first build, where no
+          # prior successful build exists).
+          AUTOSUBMIT=""
+          if [ "${{ steps.meta.outputs.submit }}" = "true" ]; then
+            AUTOSUBMIT="--auto-submit"
+            echo "Auto-submit ENABLED — EAS will push to TestFlight after the build completes."
           fi
-          # Wait for the latest production build to finish before submit.
-          # --latest auto-picks the most recent successful build for the
-          # production profile.
-          npx eas-cli submit \
+          npx eas-cli build \
             --platform ios \
-            --profile production \
-            --latest \
-            --non-interactive
+            --profile "${{ steps.meta.outputs.profile }}" \
+            --non-interactive \
+            --no-wait \
+            $AUTOSUBMIT

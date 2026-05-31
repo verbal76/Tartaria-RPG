@@ -25,38 +25,35 @@
 
 > **⚡ ACTIVE TASK (2026-05-31) — iOS build → TestFlight External Testing. READ THIS FIRST.**
 >
-> **YOU ARE PICKING UP MID-TERMINAL-SESSION on the user's Windows laptop** (PowerShell,
-> `D:\App Dev\Tartaria\Tartaria-RPG`). The user HAS the project locally now — cloned the
-> repo, `git checkout HaL2001`, `npm install` all completed successfully, `eas login`
-> succeeded. They are one step away from generating the iOS **Distribution Certificate**
-> via the interactive `eas credentials` CLI. That cert is the ONE blocker for every iOS
-> build; once it exists server-side on EAS, the existing app-specific-password CI
-> workflow builds + submits fine.
+> **✅ CERT DONE — BUILD FIRED. The blocker is cleared.** The iOS **Distribution
+> Certificate + Provisioning Profile now exist** on EAS for bundle
+> `com.hotatticgames.tartarprim` (cert serial `23E4172940150DFB4525AF86DA2CD0BF`,
+> profile Developer Portal ID `PQ4YD8C5WZ`, team `7Z67WUB9FA` Kevin Ernst (Individual),
+> both valid until 2027-05-31). Generated via interactive `eas credentials --platform ios`
+> on the user's Windows laptop (after cloning the repo + `npm install` + `eas login` +
+> swapping app.json's bundle id to the bare one for the duration). This is the ONLY step
+> that ever needed a machine — everything from here is CI-driven.
 >
-> **IMMEDIATE NEXT COMMANDS for the user (in the repo dir):**
-> 1. Swap the bundle id to the bare one the cert must match (app.json carries the
->    `.hal2001` sideload suffix; the ASC listing is the bare `com.hotatticgames.tartarprim`):
->    `node -e "const fs=require('fs');const a=JSON.parse(fs.readFileSync('app.json','utf8'));a.expo.ios.bundleIdentifier='com.hotatticgames.tartarprim';fs.writeFileSync('app.json',JSON.stringify(a,null,2));console.log(a.expo.ios.bundleIdentifier);"`
-> 2. `eas credentials --platform ios` → **production** → (Apple login: Apple ID +
->    app-specific password, team `7Z67WUB9FA`) → **Build Credentials** → **All: Set up
->    all required credentials** → **Generate new Distribution Certificate (Yes)** →
->    **Generate new Provisioning Profile (Yes)**.
-> 3. After "Created certificate / profile": `git checkout app.json` to drop the local
->    bundle-id edit (do NOT commit it).
+> **What was fired:** a commit titled `[build-ios] [submit-ios]` on `HaL2001` triggers
+> `build-ios.yml` → production iOS build on EAS macOS infra, reusing the new cert, with
+> **`--auto-submit`** so EAS pushes the `.ipa` to TestFlight automatically after the
+> build completes (server-side — no race). Build status:
+> https://expo.dev/accounts/hot-attic-games/projects/tartaria-/builds
 >
-> **DEAD ENDS (do not re-attempt):** the expo.dev WEB wizard cannot generate the cert
-> (step-4-of-8 only "Upload"/"Choose", no Generate button). Codespaces failed (localhost
-> OAuth callback couldn't reach the phone). NOTE: earlier this session there was a brief
-> over-correction where the workflow was rewired for App Store Connect API-key auth after
-> the user made an "I'm an AI in the cloud" JOKE that was misread as a requirements
-> change — **that was reverted**; `build-ios.yml` + `eas.json` are back on the
-> app-specific-password path. (The API-key approach IS a valid future enhancement for
-> fully-autonomous CI cert generation if the user ever wants zero-touch, but it's not the
-> current plan.)
+> **NEXT (once the build lands in TestFlight):** first external build sits in Apple's
+> **~24h beta review**, then TestFlight External Testing setup in App Store Connect:
+> privacy policy URL (offered to draft — local-only single-player game, no
+> analytics/accounts), age rating (~12+), External group + tester emails, Beta App
+> Review info. Then the user's Apple playtesters can install.
 >
-> The whole job is getting a signed `.ipa` to the user's Apple playtesters via
-> **TestFlight External Testing** (explicitly NOT Internal Testing — the user does not
-> want playtesters to have Developer modify-access).
+> **DEAD ENDS (do not re-attempt if this ever needs redoing):** the expo.dev WEB wizard
+> cannot generate the cert (step-4-of-8 only "Upload"/"Choose", no Generate button);
+> Codespaces failed (localhost OAuth callback couldn't reach the phone). The CLI
+> `eas credentials` on a machine with the repo cloned is the path that works. NOTE: a
+> brief mid-session over-correction rewired the workflow for App Store Connect API-key
+> auth after an "I'm an AI in the cloud" JOKE was misread as a requirements change —
+> that was REVERTED; the workflow uses app-specific-password auth + the now-stored cert.
+> (API-key auth remains a valid future enhancement for zero-touch CI cert generation.)
 >
 > **GOAL:** Apple playtesters install the game through TestFlight, current with HaL
 > (same JS bundle, OTA channel `hal2001`, rt 2.4.1). Build on Expo's hosted macOS infra
