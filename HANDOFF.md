@@ -245,6 +245,19 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-249 — production AAB can use a separate upload keystore from HaL sideloads
+
+- **OTA-249 + [build-aab] retry · Player reminder:** *"don't forget to match keys as well."*
+  - **Why this matters:** Play Console pins the signing key per package. If the main `com.hotatticgames.tartarprim` listing was created with a different upload key than the HaL sideload keystore (`ANDROID_KEYSTORE_BASE64`), an AAB signed with the HaL key gets rejected as "wrong signing certificate" even after the package name matches.
+  - **Fix:** workflow now reads optional `ANDROID_PROD_*` secrets and uses them when building production:
+    - `profile == 'production'` AND `ANDROID_PROD_KEYSTORE_BASE64` set → use the prod keystore (`tartaria-prod-upload.keystore`).
+    - Else → fall back to the shared HaL keystore (`tartaria-upload.keystore`).
+  - `MYAPP_UPLOAD_STORE_FILE` in `gradle.properties` now uses the chosen filename dynamically.
+  - **Diagnostic:** step dumps the cert's SHA-256 fingerprint to the build log so you can cross-check against the Play Console "App signing certificate" fingerprint before upload. Mismatch = guaranteed rejection.
+  - **Backward-compatible:** if `ANDROID_PROD_*` secrets aren't set, falls back to the HaL key (with a warning when building production).
+  - **Setup if you need a separate prod keystore:** add four GitHub Secrets — `ANDROID_PROD_KEYSTORE_BASE64` (base64-encoded JKS/PKCS12), `ANDROID_PROD_KEYSTORE_PASSWORD`, `ANDROID_PROD_KEY_ALIAS`, `ANDROID_PROD_KEY_PASSWORD`. The decoded file should be the original upload key registered with the production Play Console listing.
+  - **Files:** `.github/workflows/build-apk.yml` ("Configure release signing" step gains keystore selection + fingerprint dump).
+
 #### OTA-248 — Play Console package flip for production AAB
 
 - **OTA-248 + [build-aab] retry · Play Console screenshot rejected the OTA-247 AAB:** *"Your APK or Android App Bundle needs to have the package name com.hotatticgames.tartarprim."*

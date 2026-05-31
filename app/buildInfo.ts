@@ -10470,4 +10470,69 @@
 // "Strip .hal2001 suffix"
 // step gated on production
 // profile).
-export const OTA_BUILD_ID = '2026-05-30-248';
+// 2026-05-30-249 — match
+// the production keystore.
+// Player reminder: "don't
+// forget to match keys as
+// well."
+//
+// Play Console pins the
+// signing key per package.
+// If the main com.hotattic
+// games.tartarprim listing
+// was created with a
+// DIFFERENT upload key
+// than the HaL sideload
+// keystore, an AAB signed
+// with the HaL key gets
+// rejected as "wrong
+// signing certificate."
+//
+// Fix: workflow now reads
+// optional ANDROID_PROD_*
+// secrets when building
+// production. Priority:
+// - profile=='production'
+//   AND ANDROID_PROD_KEY-
+//   STORE_BASE64 set → use
+//   the PROD keystore
+//   (tartaria-prod-upload.
+//   keystore).
+// - else → fall back to
+//   the shared HaL
+//   keystore (tartaria-
+//   upload.keystore).
+//
+// MYAPP_UPLOAD_STORE_FILE
+// in gradle.properties now
+// uses the chosen filename
+// dynamically.
+//
+// Diagnostic: the step now
+// dumps the cert's SHA-256
+// fingerprint to the build
+// log so the user can
+// cross-check against the
+// Play Console "App signing
+// certificate" fingerprint
+// before upload. Mismatch
+// = guaranteed Play Console
+// rejection.
+//
+// Backward-compatible: if
+// ANDROID_PROD_* secrets
+// aren't set, the workflow
+// uses the HaL key as
+// before (with a warning
+// in the log if building
+// production).
+//
+// Carries [build-aab].
+//
+// Files: .github/workflows/
+// build-apk.yml ("Configure
+// release signing" step
+// gains keystore-selection
+// logic + SHA-256
+// fingerprint dump).
+export const OTA_BUILD_ID = '2026-05-30-249';

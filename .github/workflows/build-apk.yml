@@ -291,6 +291,16 @@ jobs:
       # so this remains a SEPARATE app from the internal-test build — the
       # shared key does NOT let HaL update the internal-test app until the
       # package is flipped back and shipped as an AAB to the Play track.
+      # OTA-249 — production AAB can use a DIFFERENT upload key than the
+      # HaL sideload APK. If ANDROID_PROD_KEYSTORE_BASE64 (and its
+      # companion *_PASSWORD / *_KEY_ALIAS / *_KEY_PASSWORD) secrets are
+      # set AND profile == 'production', use those. Otherwise fall back
+      # to the shared ANDROID_KEYSTORE_BASE64 (the HaL upload key).
+      # Reason: Play Console pins the signing key per package. If the
+      # main com.hotatticgames.tartarprim listing was created with a key
+      # that differs from the HaL sideload key, this lets the production
+      # AAB use the right one without rotating the HaL keystore.
+      # Player reminder: "don't forget to match keys as well."
       - name: Configure release signing (production AAB + HaL2001 APK)
         if: steps.meta.outputs.profile == 'production' || github.ref_name == 'HaL2001'
         env:
@@ -298,28 +308,74 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_PROD_KEYSTORE_BASE64: ${{ secrets.ANDROID_PROD_KEYSTORE_BASE64 }}
+          ANDROID_PROD_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_PROD_KEYSTORE_PASSWORD }}
+          ANDROID_PROD_KEY_ALIAS: ${{ secrets.ANDROID_PROD_KEY_ALIAS }}
+          ANDROID_PROD_KEY_PASSWORD: ${{ secrets.ANDROID_PROD_KEY_PASSWORD }}
+          IS_PROD: ${{ steps.meta.outputs.profile == 'production' }}
         run: |
           set -euo pipefail
-          if [ -z "${ANDROID_KEYSTORE_BASE64:-}" ]; then
-            echo "::error::ANDROID_KEYSTORE_BASE64 secret is empty. Production AAB cannot ship without a release upload key."
-            echo "::error::Add the four ANDROID_* secrets (see PR description for setup), then re-run."
+
+          # OTA-249 — choose production-specific keystore if available
+          # AND we're building production. Else use the shared HaL key.
+          if [ "$IS_PROD" = "true" ] && [ -n "${ANDROID_PROD_KEYSTORE_BASE64:-}" ]; then
+            echo "Using ANDROID_PROD_* keystore (production-specific upload key)."
+            KS_BASE64="$ANDROID_PROD_KEYSTORE_BASE64"
+            KS_PASSWORD="$ANDROID_PROD_KEYSTORE_PASSWORD"
+            KS_ALIAS="$ANDROID_PROD_KEY_ALIAS"
+            KS_KEY_PASSWORD="$ANDROID_PROD_KEY_PASSWORD"
+            KS_NAME="tartaria-prod-upload.keystore"
+          else
+            if [ "$IS_PROD" = "true" ]; then
+              echo "ANDROID_PROD_KEYSTORE_BASE64 not set; falling back to shared ANDROID_KEYSTORE_BASE64."
+              echo "If the main com.hotatticgames.tartarprim listing was created with a DIFFERENT upload key,"
+              echo "Play Console will reject this AAB with a 'wrong signing certificate' error. Add the ANDROID_PROD_*"
+              echo "secrets (decoded from the original prod keystore) to fix."
+            fi
+            KS_BASE64="$ANDROID_KEYSTORE_BASE64"
+            KS_PASSWORD="$ANDROID_KEYSTORE_PASSWORD"
+            KS_ALIAS="$ANDROID_KEY_ALIAS"
+            KS_KEY_PASSWORD="$ANDROID_KEY_PASSWORD"
+            KS_NAME="tartaria-upload.keystore"
+          fi
+
+          if [ -z "${KS_BASE64:-}" ]; then
+            echo "::error::No keystore secret available. Production AAB cannot ship without a release upload key."
+            echo "::error::Add the four ANDROID_* (HaL) or ANDROID_PROD_* secrets, then re-run."
             exit 1
           fi
 
-          KEYSTORE_PATH=android/app/tartaria-upload.keystore
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$KEYSTORE_PATH"
-          echo "Keystore decoded: $(stat -c%s "$KEYSTORE_PATH") bytes"
+          KEYSTORE_PATH=android/app/$KS_NAME
+          echo "$KS_BASE64" | base64 -d > "$KEYSTORE_PATH"
+          echo "Keystore decoded: $(stat -c%s "$KEYSTORE_PATH") bytes ($KS_NAME)"
 
-          # Sanity — keystore must be a valid JKS.
+          # Sanity — keystore must be a valid JKS that unlocks with the password.
           keytool -list -keystore "$KEYSTORE_PATH" \
-            -storepass "$ANDROID_KEYSTORE_PASSWORD" > /dev/null 2>&1 \
-            || { echo "::error::Keystore did not unlock. ANDROID_KEYSTORE_PASSWORD may be wrong."; exit 1; }
+            -storepass "$KS_PASSWORD" > /dev/null 2>&1 \
+            || { echo "::error::Keystore did not unlock. Password may be wrong for $KS_NAME."; exit 1; }
+
+          # Surface the cert's SHA-256 fingerprint so the build log lets you
+          # cross-check against the Play Console "App signing certificate"
+          # SHA-256 fingerprint. Mismatch = Play Console rejection on upload.
+          echo "--- Cert fingerprint(s) for $KS_NAME (compare against Play Console) ---"
+          keytool -list -v -keystore "$KEYSTORE_PATH" -storepass "$KS_PASSWORD" 2>/dev/null \
+            | grep -E "Alias|SHA256" | head -20 || true
+          echo "---"
+
+          # Remap to the names the rest of the step expects so I don't
+          # have to rewrite the gradle.properties / build.gradle patching
+          # below.
+          ANDROID_KEYSTORE_PASSWORD="$KS_PASSWORD"
+          ANDROID_KEY_ALIAS="$KS_ALIAS"
+          ANDROID_KEY_PASSWORD="$KS_KEY_PASSWORD"
 
           # Append signing properties to android/gradle.properties so the
           # generated build.gradle's project.hasProperty(...) checks see them.
+          # MYAPP_UPLOAD_STORE_FILE uses the keystore file name we just
+          # picked (OTA-249: may be tartaria-prod-upload.keystore for prod).
           [ -n "$(tail -c1 android/gradle.properties)" ] && echo "" >> android/gradle.properties
           {
-            echo "MYAPP_UPLOAD_STORE_FILE=tartaria-upload.keystore"
+            echo "MYAPP_UPLOAD_STORE_FILE=$KS_NAME"
             echo "MYAPP_UPLOAD_KEY_ALIAS=$ANDROID_KEY_ALIAS"
             echo "MYAPP_UPLOAD_STORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD"
             echo "MYAPP_UPLOAD_KEY_PASSWORD=$ANDROID_KEY_PASSWORD"
