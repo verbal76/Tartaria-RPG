@@ -324,6 +324,18 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-259 — CONTINUE popup between multi-stage investigation hook steps
+
+- **OTA-259 · Player: *"when you are investigating and there is a multipart story thread, instead of going back into investigate, you should get a continue button popup in between stages"***
+  - **What broke (UX):** multi-stage hooks (the `smoke` chain at `app/engine/hooks.ts:210` is the canonical 3-stager) required the player to tap **investigate → scroll menu → tap the still-active noun chip** between every stage. Three gestures to advance one narrative beat. Friction multiplied across a thread.
+  - **Fix:** new state field `pendingHookContinue: { hookId, noun } | null` on `GameStore`. `resolveHookOneStep` (gameStore.ts:16543) sets it after every stage advance, with the value depending on `outcome.done`: `null` if the thread terminated, the active hook id + the noun the player tapped if more stages remain. A new modal `HookContinueModal.tsx` renders when the state is non-null, prompting *"There's more at {noun}. Follow the thread?"* with CONTINUE / LATER buttons.
+  - **CONTINUE wires:** new `continueHook()` action — looks up the live hook by id in `currentScene.hooks`, clears `pendingHookContinue` so the modal hides immediately, then calls `resolveHookOneStep` on the hook with the original triggerNoun. If that next stage is ALSO non-terminal, `resolveHookOneStep` sets `pendingHookContinue` again → modal reopens for the stage after. Recursive chain until the thread terminates.
+  - **LATER wires:** new `dismissHookContinue()` action — just clears `pendingHookContinue`. The hook itself stays mid-thread in `currentScene.hooks`; the player can re-investigate the noun later to resume from the same stage (the pre-OTA-259 path — `matchHookNoun` + `!hook.resolved` still match). Same affordance as before, just no longer the only path.
+  - **Cleanup paths:** `pendingHookContinue: null` mirrors every existing `pendingRolls: null` reset site — initial state, scene change, cancel/reset paths, error recovery. Transient state, not persisted across save/load (a player who reloads mid-thread resumes via re-investigation, same as pre-OTA-259).
+  - **Why a popup rather than an inline button or auto-advance:** popup is the same shape as the dice-roll modal (`pendingRolls → DiceRoller`), which the user is already conditioned to. Auto-advance would skip past narration the player hasn't read yet — the stage line is in the world feed BEFORE the modal pops, and the modal is intentionally a lighter-dim overlay (0.55 vs the dice modal's 0.7) so the feed stays partly visible behind it for re-read.
+  - **OTA-only:** all JS-side, ships through OTA channel.
+  - **Files:** `app/state/gameStore.ts` (state field, 5 reset sites updated, trigger inside `resolveHookOneStep`, two new actions `continueHook` / `dismissHookContinue`), `app/components/HookContinueModal.tsx` (NEW — ~110 lines), `app/screens/ExplorationScreen.tsx` (import + 3 selectors + modal render block).
+
 #### OTA-258 — Vendor: STEAL button stays bright when player can't afford BUY (backwards affordance)
 
 - **OTA-258 · Player: *"when you are out of money at a vendor even if you com what cannot be afforded, do not dim the steal option keep that well lit"***

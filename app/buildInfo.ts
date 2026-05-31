@@ -10745,4 +10745,26 @@ export const DISPLAY_VERSION = '3.0.0';
 //   Files: app/screens/VendorScreen.tsx (lines 414-424 — moved the
 //          conditional offerRowBroke from parent View to offerBody
 //          TouchableOpacity).
-export const OTA_BUILD_ID = '2026-05-31-258';
+//
+// OTA-259 — CONTINUE popup between multi-stage hook investigation
+//   steps. Player ask: "when you are investigating and there is a
+//   multipart story thread, instead of going back into investigate,
+//   you should get a continue button popup in between stages."
+//   Pre-OTA-259 each stage of a multi-step hook required the player
+//   to re-open the investigate menu, find the (still-active) noun
+//   chip again, tap it. Three taps to advance one beat. New behavior:
+//   resolveHookOneStep sets pendingHookContinue = { hookId, noun }
+//   whenever a stage finishes with outcome.done === false. A new
+//   HookContinueModal renders when that state is non-null, with
+//   CONTINUE (calls continueHook → resolves next stage in-place;
+//   re-sets pendingHookContinue if THAT stage is also non-terminal)
+//   and LATER (calls dismissHookContinue → clears the popup; player
+//   can resume via the old re-investigate path). Cleared on every
+//   reset / scene-change site that already clears pendingRolls.
+//   Files: app/state/gameStore.ts (state field + 5 reset sites +
+//          trigger inside resolveHookOneStep + continueHook /
+//          dismissHookContinue actions), app/components/
+//          HookContinueModal.tsx (NEW), app/screens/
+//          ExplorationScreen.tsx (import + state selectors +
+//          modal render).
+export const OTA_BUILD_ID = '2026-05-31-259';

@@ -1089,6 +1089,18 @@ interface GameStore {
   currentScreen: ScreenName;
   currentScene: CurrentScene | null;
   pendingRolls: PendingRollState | null;
+  /** OTA-259 — When a multi-stage investigation hook fires a non-
+   *  terminal stage (outcome.done === false), this state captures
+   *  enough info to surface a CONTINUE popup so the player can
+   *  advance to the next stage without re-opening the investigate
+   *  menu. `noun` is the chip / target text the player tapped; used
+   *  for the modal's "more to follow at the {noun}" line. Cleared
+   *  whenever a hook stage's outcome.done is true, the player
+   *  dismisses (LATER), the player travels (currentScene replaced),
+   *  or any reset path. Transient — not persisted across save / load
+   *  (player who reloads mid-thread can re-investigate the hook noun
+   *  to resume; same affordance pre-OTA-259). */
+  pendingHookContinue: { hookId: string; noun: string } | null;
   hydrated: boolean;
   /** OTA 228 — latch for the Arbiter's "you're badly hurt" warning.
    *  Goes true the first time HP crosses below 5% of max in a session,
@@ -1313,6 +1325,18 @@ interface GameStore {
   resolveRollStep: (values: number[]) => void;
   cancelPendingRolls: () => void;
   concludeRolls: (steps: RollStep[], actionText: string) => void;
+  /** OTA-259 — advance a multi-stage investigation hook to its next
+   *  step without re-opening the investigate menu. Called by the
+   *  HookContinueModal's CONTINUE button. Resolves the next stage
+   *  immediately and, if THAT stage is also non-terminal, the modal
+   *  re-shows for the stage after (resolveHookOneStep sets
+   *  pendingHookContinue on every non-terminal stage). */
+  continueHook: () => void;
+  /** OTA-259 — close the HookContinueModal without advancing. The
+   *  hook stays mid-thread in currentScene.hooks; player can re-
+   *  investigate the same noun later to resume — same affordance
+   *  that existed pre-OTA-259. */
+  dismissHookContinue: () => void;
   travelTo: (locationId: string) => void;
   generateNewQuest: () => Quest;
   resolveEnemyDefeat: () => void;
@@ -1514,6 +1538,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   currentScreen: 'title',
   currentScene: null,
   pendingRolls: null,
+  pendingHookContinue: null,
   pendingTravelConfirm: null,
   hydrated: false,
   lowHpWarned: false,
@@ -2094,6 +2119,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         activeSlotId: slotId,
         currentScene: restoredScene,
         pendingRolls: null,
+  pendingHookContinue: null,
         justUpdatedFromBuild: null,
         // OTA-100 — clear pendingOtaAppliedFrom in the same set
         // that fires the debug log below. One marker per
@@ -2232,6 +2258,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       resurrectionGems: remainingGems,
       currentScene: null,
       pendingRolls: null,
+  pendingHookContinue: null,
       wastelandStepsSinceEncounter: 0,
       stepsSinceCombat: 0,
     });
@@ -2257,7 +2284,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       activeSlotId: activeId,
       // If we just deleted the currently-loaded character, drop player state too.
       ...(get().activeSlotId === slotId
-        ? { player: null, gameLog: [], currentScene: null, pendingRolls: null }
+        ? { player: null, gameLog: [], currentScene: null, pendingRolls: null, pendingHookContinue: null }
         : {}),
     });
   },
@@ -2281,6 +2308,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentScreen: 'exploration',
       currentScene: null,
       pendingRolls: null,
+  pendingHookContinue: null,
       activeSlotId: slotId,
     });
     // OTA-099 — session-start debug marker for new characters
@@ -2319,6 +2347,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       gameLog: [],
       currentScene: null,
       pendingRolls: null,
+  pendingHookContinue: null,
       currentScreen: 'title',
       activeSlotId: null,
       slots,
@@ -2992,7 +3021,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
       }
     } catch { /* voice modules not present in tests */ }
-    set({ currentScene: scene, pendingRolls: null });
+    set({ currentScene: scene, pendingRolls: null, pendingHookContinue: null });
     // OTA-244 — danger-vs-tier warning. Player playtest: ate a
     // Mud Giant (Legendary, 360 HP) rest-ambush in Asgardar
     // (danger 5) at 48 HP. OTA-243 capped the ambush picker by
@@ -10255,9 +10284,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (nextIdx < updatedSteps.length) {
       set({ pendingRolls: { ...state, steps: updatedSteps, currentStep: nextIdx } });
     } else {
-      set({ pendingRolls: null });
+      set({ pendingRolls: null, pendingHookContinue: null });
       get().concludeRolls(updatedSteps, state.actionText);
     }
+  },
+
+  // OTA-259 — advance a multi-stage investigation hook from its
+  // CONTINUE popup. Looks up the live hook in currentScene by id,
+  // clears pendingHookContinue (so the modal hides immediately —
+  // resolveHookOneStep will re-set it if the next stage is also
+  // non-terminal), then resolves the next stage with the same
+  // triggerNoun the modal was associated with. No-op if the hook
+  // vanished (scene changed, hook resolved elsewhere) — defensive.
+  continueHook() {
+    const state = get();
+    const pending = state.pendingHookContinue;
+    if (!pending || !state.currentScene) return;
+    const hook = state.currentScene.hooks?.find((h) => h.id === pending.hookId);
+    if (!hook || hook.resolved) {
+      set({ pendingHookContinue: null });
+      return;
+    }
+    set({ pendingHookContinue: null });
+    resolveHookOneStep(hook, get, set, pending.noun);
+  },
+
+  // OTA-259 — LATER button on the hook-continue modal. Leaves the
+  // hook in currentScene.hooks mid-thread; the player can re-
+  // investigate the same noun later to resume from the same stage
+  // (matchHookNoun + !hook.resolved still match).
+  dismissHookContinue() {
+    set({ pendingHookContinue: null });
   },
 
   cancelPendingRolls() {
@@ -10268,9 +10325,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // cancelled flee charged 15 min and didn't refund.
     const refund = get().pendingRolls?.refundOnCancel;
     set((s) => {
-      if (!refund || !s.player) return { pendingRolls: null };
+      if (!refund || !s.player) return { pendingRolls: null, pendingHookContinue: null };
       return {
         pendingRolls: null,
+  pendingHookContinue: null,
         player: {
           ...s.player,
           hoursElapsed: refund.hoursElapsed,
@@ -16598,6 +16656,18 @@ function resolveHookOneStep(
     });
     return { currentScene: { ...s.currentScene, hooks: nextHooks } };
   });
+  // OTA-259 — surface a CONTINUE popup between stages so the player
+  // doesn't have to re-open the investigate menu and re-pick the chip
+  // just to advance the same thread. Set only when more stages remain
+  // (outcome.done === false); cleared when the thread terminates so
+  // the modal doesn't linger after the finale. The actual modal lives
+  // in app/components/HookContinueModal.tsx and is rendered by
+  // ExplorationScreen when pendingHookContinue !== null.
+  set(() => ({
+    pendingHookContinue: outcome.done
+      ? null
+      : { hookId: hook.id, noun: triggerNoun ?? hook.nouns[0] ?? 'this' },
+  }));
   // OTA-088 — chip-text follow-the-camera. When this stage
   // advance revealed new nouns AND the caller passed the
   // trigger ambient that the player tapped, swap the trigger
@@ -18358,7 +18428,7 @@ function handlePlayerDeath(
   // 'dead' and queue puppyVendorOwed. Sleeping/idle dogs with hp > 0
   // survive the player's death (they wander off the abandoned save).
   set((s) => {
-    if (!s.player) return { pendingRolls: null };
+    if (!s.player) return { pendingRolls: null, pendingHookContinue: null };
     const dog = s.player.dog;
     const dogDiedInFight = !!dog && dog.hp <= 0;
     const wm = s.worldMemory;
@@ -18374,6 +18444,7 @@ function handlePlayerDeath(
         ? { ...wm, puppyVendorOwed: true }
         : wm,
       pendingRolls: null,
+  pendingHookContinue: null,
     };
   });
   void get().persist();
@@ -18396,6 +18467,7 @@ function handlePlayerDeath(
       player: null,
       currentScene: null,
       pendingRolls: null,
+  pendingHookContinue: null,
       activeSlotId: null,
     }));
   }, 3500);

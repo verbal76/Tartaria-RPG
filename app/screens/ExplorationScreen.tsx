@@ -14,6 +14,7 @@ import { SalvageModal, isSalvageable as isSalvageableForModal } from '../compone
 import { BrandedModal } from '../components/BrandedModal';
 import { TakeModal } from '../components/TakeModal';
 import { ClimbModal } from '../components/ClimbModal';
+import { HookContinueModal } from '../components/HookContinueModal';
 // OTA-180 — FeedbackModal import dropped along with the 📝 button.
 // The component file stays on disk for potential re-introduction.
 import { isClimbable, isSalvageable } from '../engine/interactionTags';
@@ -58,6 +59,9 @@ export function ExplorationScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const currentScene = useGameStore((s) => s.currentScene);
   const pendingRolls = useGameStore((s) => s.pendingRolls);
+  const pendingHookContinue = useGameStore((s) => s.pendingHookContinue);
+  const continueHook = useGameStore((s) => s.continueHook);
+  const dismissHookContinue = useGameStore((s) => s.dismissHookContinue);
   const pendingTravelConfirm = useGameStore((s) => s.pendingTravelConfirm);
   const confirmLeaveAndTravel = useGameStore((s) => s.confirmLeaveAndTravel);
   const cancelTravelConfirm = useGameStore((s) => s.cancelTravelConfirm);
@@ -814,6 +818,21 @@ export function ExplorationScreen() {
             (above). All run-control (save & exit, copy/clear log)
             lives in the gear screen's SESSION tab now. */}
       </View>
+
+      {/* OTA-259 — CONTINUE popup between multi-stage hook steps so the
+          player doesn't have to re-open the investigate menu to advance
+          the same thread. pendingHookContinue is set by resolveHookOneStep
+          whenever an investigated hook stage finishes with outcome.done
+          === false; it's cleared by the modal's CONTINUE (chains into
+          the next stage, which re-sets if THAT stage is also non-
+          terminal) or LATER (player resumes by re-investigating the
+          noun later — same affordance as pre-OTA-259). */}
+      <HookContinueModal
+        visible={pendingHookContinue !== null}
+        noun={pendingHookContinue?.noun ?? ''}
+        onContinue={continueHook}
+        onLater={dismissHookContinue}
+      />
 
       <SearchModal
         visible={searchOpen}
