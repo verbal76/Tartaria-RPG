@@ -12,6 +12,7 @@ import type {
   LogChannel,
   RollStep,
   PendingRollState,
+  HookContinueStage,
   InventoryItem,
   CombatRange,
   Intent,
@@ -1093,14 +1094,29 @@ interface GameStore {
    *  terminal stage (outcome.done === false), this state captures
    *  enough info to surface a CONTINUE popup so the player can
    *  advance to the next stage without re-opening the investigate
-   *  menu. `noun` is the chip / target text the player tapped; used
-   *  for the modal's "more to follow at the {noun}" line. Cleared
-   *  whenever a hook stage's outcome.done is true, the player
-   *  dismisses (LATER), the player travels (currentScene replaced),
-   *  or any reset path. Transient — not persisted across save / load
-   *  (player who reloads mid-thread can re-investigate the hook noun
-   *  to resume; same affordance pre-OTA-259). */
-  pendingHookContinue: { hookId: string; noun: string } | null;
+   *  menu.
+   *
+   *  OTA-263 update — `stageHistory` now accumulates each stage's
+   *  narration as the player taps CONTINUE, so the modal shows the
+   *  full thread arc in-place (player feedback: the background
+   *  scrim dimmed the prior stage's text in the world feed, hard
+   *  to read; bringing the text INSIDE the modal makes the popup
+   *  self-contained). `completed` flips true on the terminal stage
+   *  (outcome.done) — modal then shows the full history with a
+   *  single CLOSE button instead of CONTINUE / ABANDON.
+   *
+   *  Transient — not persisted across save / load. A player who
+   *  reloads mid-thread can re-investigate the hook noun to resume
+   *  from the same stage; the modal will rebuild its history from
+   *  the new tap onward (it doesn't reconstitute prior stages from
+   *  the world log).
+   */
+  pendingHookContinue: {
+    hookId: string;
+    noun: string;
+    stageHistory: HookContinueStage[];
+    completed: boolean;
+  } | null;
   hydrated: boolean;
   /** OTA 228 — latch for the Arbiter's "you're badly hurt" warning.
    *  Goes true the first time HP crosses below 5% of max in a session,
@@ -1328,15 +1344,25 @@ interface GameStore {
   /** OTA-259 — advance a multi-stage investigation hook to its next
    *  step without re-opening the investigate menu. Called by the
    *  HookContinueModal's CONTINUE button. Resolves the next stage
-   *  immediately and, if THAT stage is also non-terminal, the modal
-   *  re-shows for the stage after (resolveHookOneStep sets
-   *  pendingHookContinue on every non-terminal stage). */
+   *  immediately and the modal updates with the appended stage text
+   *  (OTA-263 — was a re-pop, now an in-place accumulation). On the
+   *  terminal stage the modal's CONTINUE swaps to CLOSE; tapping
+   *  CLOSE calls dismissHookContinue to clear the popup. */
   continueHook: () => void;
-  /** OTA-259 — close the HookContinueModal without advancing. The
-   *  hook stays mid-thread in currentScene.hooks; player can re-
-   *  investigate the same noun later to resume — same affordance
-   *  that existed pre-OTA-259. */
+  /** OTA-259 / OTA-263 — close the HookContinueModal. Used for the
+   *  CLOSE button shown after the terminal stage fires. Clears
+   *  pendingHookContinue; does NOT touch the hook itself (which is
+   *  already resolved at this point). Distinct from abandonHook,
+   *  which is the explicit "I'm walking away mid-thread" choice
+   *  that ALSO marks the hook resolved so it can't be re-opened. */
   dismissHookContinue: () => void;
+  /** OTA-263 — explicit walk-away from a mid-thread hook. Player
+   *  feedback: "take away the later button, there is no later.
+   *  either you continue or abandon it." ABANDON marks the active
+   *  hook resolved (so the noun chip greys out per OTA-257 and the
+   *  thread can't be re-opened) AND clears pendingHookContinue.
+   *  Player chooses to forgo any remaining stage rewards. */
+  abandonHook: () => void;
   travelTo: (locationId: string) => void;
   generateNewQuest: () => Quest;
   resolveEnemyDefeat: () => void;
@@ -10289,32 +10315,65 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
   },
 
-  // OTA-259 — advance a multi-stage investigation hook from its
-  // CONTINUE popup. Looks up the live hook in currentScene by id,
-  // clears pendingHookContinue (so the modal hides immediately —
-  // resolveHookOneStep will re-set it if the next stage is also
-  // non-terminal), then resolves the next stage with the same
-  // triggerNoun the modal was associated with. No-op if the hook
-  // vanished (scene changed, hook resolved elsewhere) — defensive.
+  // OTA-259 / OTA-263 — advance a multi-stage investigation hook
+  // from its CONTINUE popup. Looks up the live hook in currentScene
+  // by id, then resolves the next stage WITHOUT clearing
+  // pendingHookContinue beforehand — resolveHookOneStep will append
+  // the new stage to the existing stageHistory (it preserves any
+  // existing history matching the same hookId). The modal updates
+  // in place. No-op if the hook vanished (scene changed) or already
+  // resolved — defensive.
   continueHook() {
     const state = get();
     const pending = state.pendingHookContinue;
     if (!pending || !state.currentScene) return;
     const hook = state.currentScene.hooks?.find((h) => h.id === pending.hookId);
     if (!hook || hook.resolved) {
+      // Hook already terminated (e.g., player tapped CONTINUE on a
+      // popup whose final-stage flag was already true); just close.
       set({ pendingHookContinue: null });
       return;
     }
-    set({ pendingHookContinue: null });
+    // Do NOT clear pendingHookContinue here — resolveHookOneStep
+    // reads it to know whether to append to existing stageHistory
+    // or start fresh.
     resolveHookOneStep(hook, get, set, pending.noun);
   },
 
-  // OTA-259 — LATER button on the hook-continue modal. Leaves the
-  // hook in currentScene.hooks mid-thread; the player can re-
-  // investigate the same noun later to resume from the same stage
-  // (matchHookNoun + !hook.resolved still match).
+  // OTA-259 / OTA-263 — CLOSE button on the hook-continue modal.
+  // Used after the terminal stage fires (modal in `completed: true`
+  // state). Just clears the popup state; the hook is already
+  // resolved at this point.
   dismissHookContinue() {
     set({ pendingHookContinue: null });
+  },
+
+  // OTA-263 — ABANDON button on the hook-continue modal. Player
+  // explicitly chooses to walk away from a mid-thread hook. Marks
+  // the hook resolved in currentScene.hooks (so the noun chip greys
+  // out per OTA-257 and matchHookNoun no longer intercepts taps on
+  // those nouns) AND clears pendingHookContinue. Forfeits any
+  // remaining stage rewards. Pre-OTA-263 this slot was LATER, which
+  // soft-closed the modal but kept the hook active; player feedback
+  // ("there is no later, either you continue or abandon it") said
+  // that was wishy-washy framing — abandon is a real commitment.
+  abandonHook() {
+    const state = get();
+    const pending = state.pendingHookContinue;
+    if (!pending || !state.currentScene) {
+      set({ pendingHookContinue: null });
+      return;
+    }
+    set((s) => {
+      if (!s.currentScene) return { pendingHookContinue: null };
+      const nextHooks = (s.currentScene.hooks ?? []).map((h) =>
+        h.id === pending.hookId ? { ...h, resolved: true } : h,
+      );
+      return {
+        currentScene: { ...s.currentScene, hooks: nextHooks },
+        pendingHookContinue: null,
+      };
+    });
   },
 
   cancelPendingRolls() {
@@ -16656,18 +16715,40 @@ function resolveHookOneStep(
     });
     return { currentScene: { ...s.currentScene, hooks: nextHooks } };
   });
-  // OTA-259 — surface a CONTINUE popup between stages so the player
-  // doesn't have to re-open the investigate menu and re-pick the chip
-  // just to advance the same thread. Set only when more stages remain
-  // (outcome.done === false); cleared when the thread terminates so
-  // the modal doesn't linger after the finale. The actual modal lives
-  // in app/components/HookContinueModal.tsx and is rendered by
-  // ExplorationScreen when pendingHookContinue !== null.
-  set(() => ({
-    pendingHookContinue: outcome.done
-      ? null
-      : { hookId: hook.id, noun: triggerNoun ?? hook.nouns[0] ?? 'this' },
-  }));
+  // OTA-259 / OTA-263 — surface a CONTINUE popup between stages so
+  // the player doesn't have to re-open the investigate menu and re-
+  // pick the chip just to advance the same thread. The popup now
+  // ACCUMULATES the stage texts in-place (OTA-263 update) so the
+  // player has the full thread arc in the modal — was leaving the
+  // prior stage's text in the dimmed-out world feed behind the
+  // popup, which felt like fighting the scrim to read it.
+  //
+  // The modal stays open even on the terminal stage (outcome.done)
+  // with the `completed` flag set to true — modal then renders a
+  // single CLOSE button instead of CONTINUE / ABANDON, and the
+  // player closes when they're done re-reading the arc.
+  const stageEntry: HookContinueStage = {
+    label: stageLabel,
+    line: outcome.line,
+    arbiterLine: outcome.arbiterLine,
+    reward: inlineSummaries.length > 0
+      ? `✦ ${inlineSummaries.join(', ')}.`
+      : undefined,
+  };
+  set((s) => {
+    const existing =
+      s.pendingHookContinue?.hookId === hook.id
+        ? s.pendingHookContinue.stageHistory
+        : [];
+    return {
+      pendingHookContinue: {
+        hookId: hook.id,
+        noun: triggerNoun ?? hook.nouns[0] ?? 'this',
+        stageHistory: [...existing, stageEntry],
+        completed: outcome.done,
+      },
+    };
+  });
   // OTA-088 — chip-text follow-the-camera. When this stage
   // advance revealed new nouns AND the caller passed the
   // trigger ambient that the player tapped, swap the trigger

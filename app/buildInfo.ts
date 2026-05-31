@@ -10831,4 +10831,46 @@ export const DISPLAY_VERSION = '3.0.0';
 //          SALVAGE_CHIP_CAP → POSITIVE_INFINITY,
 //          CHIP_SCROLL_MAX_HEIGHT const, inline style on
 //          ScrollView's chipScroll).
-export const OTA_BUILD_ID = '2026-05-31-262';
+//
+// OTA-263 — HookContinueModal: stage history in popup + LATER →
+//   ABANDON + CONTINUE/ABANDON only (no separate CLOSE). Player
+//   feedback in two refinement passes:
+//   (1) "the continue on the popup from investigations, but it grays
+//       out the background that has the text for the first part. can
+//       we put the previous text in the series in the popup? and if
+//       it's 4 parts have the first three keep adding to the popup
+//       as you hit continue. also take away the later button, there
+//       is no later. either you continue or abandon it."
+//   (2) "both close it out, you either continue to the end of it,
+//       or abandon it."
+//   Changes:
+//   - pendingHookContinue now carries `stageHistory: HookContinueStage[]`
+//     (new type in app/engine/types.ts) and a `completed: boolean`
+//     flag. resolveHookOneStep appends a new stage entry on every
+//     fire and keeps the popup OPEN even on the terminal stage so
+//     the player sees the full arc in-place.
+//   - LATER button retired. New `abandonHook` action (called by
+//     ABANDON) marks the active hook resolved (`hooks.resolved = true`,
+//     so the noun chip greys out via OTA-257) AND clears the popup.
+//     Explicit walk-away.
+//   - CONTINUE / ABANDON are the only buttons, shown on every stage
+//     including the terminal. On terminal, CONTINUE dismisses via
+//     continueHook's already-resolved-hook branch; ABANDON dismisses
+//     via abandonHook (the hook is already resolved at that point,
+//     so the mark-resolved step is a no-op). Title changes to
+//     "★★ STORY THREAD COMPLETE" on the terminal stage so the
+//     player knows tapping CONTINUE just closes the popup.
+//   - Modal scrim restored to 0.7 opacity (was 0.55) since the
+//     popup now contains the full thread text — no reason to keep
+//     the world feed behind it readable.
+//   - Auto-scroll-to-end on stageHistory length change so the newest
+//     stage is visible after the CONTINUE tap.
+//   Files: app/engine/types.ts (new HookContinueStage type),
+//          app/state/gameStore.ts (state shape updated, resolveHookOneStep
+//          accumulates, continueHook unchanged, dismissHookContinue
+//          still exists for internal use, new abandonHook action),
+//          app/components/HookContinueModal.tsx (rewritten — accumulated
+//          stage list with ScrollView, button row swap removed,
+//          height-aware via Dimensions like SalvageModal OTA-262),
+//          app/screens/ExplorationScreen.tsx (selectors + modal props).
+export const OTA_BUILD_ID = '2026-05-31-263';

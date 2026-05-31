@@ -61,7 +61,7 @@ export function ExplorationScreen() {
   const pendingRolls = useGameStore((s) => s.pendingRolls);
   const pendingHookContinue = useGameStore((s) => s.pendingHookContinue);
   const continueHook = useGameStore((s) => s.continueHook);
-  const dismissHookContinue = useGameStore((s) => s.dismissHookContinue);
+  const abandonHook = useGameStore((s) => s.abandonHook);
   const pendingTravelConfirm = useGameStore((s) => s.pendingTravelConfirm);
   const confirmLeaveAndTravel = useGameStore((s) => s.confirmLeaveAndTravel);
   const cancelTravelConfirm = useGameStore((s) => s.cancelTravelConfirm);
@@ -819,19 +819,20 @@ export function ExplorationScreen() {
             lives in the gear screen's SESSION tab now. */}
       </View>
 
-      {/* OTA-259 — CONTINUE popup between multi-stage hook steps so the
-          player doesn't have to re-open the investigate menu to advance
-          the same thread. pendingHookContinue is set by resolveHookOneStep
-          whenever an investigated hook stage finishes with outcome.done
-          === false; it's cleared by the modal's CONTINUE (chains into
-          the next stage, which re-sets if THAT stage is also non-
-          terminal) or LATER (player resumes by re-investigating the
-          noun later — same affordance as pre-OTA-259). */}
+      {/* OTA-259 / OTA-263 — CONTINUE popup between multi-stage hook
+          steps. OTA-263 update: the modal now accumulates each
+          stage's text in-place (stageHistory) so the player sees the
+          full thread arc without fighting the scrim; LATER replaced
+          with ABANDON (which marks the hook resolved — explicit
+          walk-away); CLOSE shown when the terminal stage fires
+          (completed: true). */}
       <HookContinueModal
         visible={pendingHookContinue !== null}
         noun={pendingHookContinue?.noun ?? ''}
+        stageHistory={pendingHookContinue?.stageHistory ?? []}
+        completed={pendingHookContinue?.completed ?? false}
         onContinue={continueHook}
-        onLater={dismissHookContinue}
+        onAbandon={abandonHook}
       />
 
       <SearchModal

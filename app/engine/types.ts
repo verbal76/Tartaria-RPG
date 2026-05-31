@@ -1019,6 +1019,25 @@ export interface PendingRollState {
   refundOnCancel?: { hoursElapsed: number; stamina: number };
 }
 
+/**
+ * OTA-263 — One stage's worth of in-modal narration for the
+ * HookContinueModal. Mirrors the same content the world feed gets
+ * (label + narration line + optional arbiter quote + optional ✦
+ * reward summary), so the player has the full thread arc in the
+ * popup without having to read past the dimmed scrim behind it.
+ */
+export interface HookContinueStage {
+  /** "★ STORY THREAD (step 2)" or "★★ STORY THREAD COMPLETE" */
+  label: string;
+  /** The stage's narration text (outcome.line). */
+  line: string;
+  /** Optional Arbiter quote attached to this stage. */
+  arbiterLine?: string;
+  /** Optional "✦ <summary>." string for inline reward effects fired
+   *  this stage (item grant, faction shift, etc). */
+  reward?: string;
+}
+
 export interface GameLogEntry {
   id: string;
   ts: number;

@@ -1,54 +1,137 @@
-import React from 'react';
-import { Modal, View, Text, Pressable, StyleSheet, TouchableWithoutFeedback } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import {
+  Modal,
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  ScrollView,
+  Dimensions,
+} from 'react-native';
+import type { HookContinueStage } from '../engine/types';
 
-// OTA-259 — CONTINUE popup for multi-stage investigation hooks.
+// OTA-259 / OTA-263 — CONTINUE popup for multi-stage investigation
+// hooks.
 //
-// Player feedback: *"when you are investigating and there is a
-// multipart story thread, instead of going back into investigate,
-// you should get a continue button popup in between stages."*
+// OTA-259 introduced the popup to remove the "re-open investigate
+// menu between stages" friction. OTA-263 refines it per player
+// feedback (two refinement rounds):
+//   - The popup ACCUMULATES each stage's text in-place as the
+//     player taps CONTINUE, so the whole thread arc is in the modal
+//     and the player doesn't have to read past the dimmed scrim to
+//     re-check the prior stage.
+//   - LATER → ABANDON. Player said "there is no later, either you
+//     continue or abandon it." ABANDON marks the hook resolved so
+//     it can't be re-opened (the player committed to walking away).
+//   - CONTINUE and ABANDON are the ONLY buttons — no separate CLOSE
+//     state. Player clarified: "both close it out, you either
+//     continue to the end of it, or abandon it." On the terminal
+//     stage, CONTINUE just dismisses (continueHook's defensive
+//     branch handles the no-more-stages case by clearing pending
+//     state); ABANDON dismisses + marks the (already-resolved) hook
+//     resolved. The title flips to "★★ STORY THREAD COMPLETE" so
+//     the player knows tapping CONTINUE means "I'm done reading."
 //
-// Triggered by `pendingHookContinue !== null` in gameStore (set inside
-// resolveHookOneStep whenever a non-terminal hook stage fires). The
-// CONTINUE button calls `continueHook()` which resolves the next
-// stage in-place — if that stage is ALSO non-terminal, the modal
-// re-opens for the stage after. The LATER button calls
-// `dismissHookContinue()` which clears the pending state; the hook
-// itself stays mid-thread in currentScene.hooks so the player can
-// resume by re-investigating the noun later.
-//
-// The previous stage's narration appears in the world feed BEFORE
-// this modal pops, so the player reads the beat first (via the log)
-// then chooses to advance. Modal is transparent + dim-overlay so the
-// world feed stays partly visible behind it.
+// The previous stage's narration also goes to the world feed (log)
+// via resolveHookOneStep's existing appendLog calls, so the player
+// has a permanent record. The popup is the in-flight experience.
 
 interface Props {
   visible: boolean;
-  /** Noun the player tapped to start the thread — used for the
-   *  "more to follow at the {noun}" line so the player knows
-   *  which thread is asking for a continuation. */
+  /** Noun the player tapped to start the thread — title decoration
+   *  ("at the {noun}") so the player knows which thread they're
+   *  in if a scene has multiple hooks. */
   noun: string;
+  /** Every stage that's fired in this thread session, in order. */
+  stageHistory: HookContinueStage[];
+  /** True when the terminal stage (outcome.done) has fired. Drives
+   *  the title swap ("STORY THREAD COMPLETE") so the player knows
+   *  CONTINUE just dismisses; no separate button affordance. */
+  completed: boolean;
   onContinue: () => void;
-  onLater: () => void;
+  onAbandon: () => void;
 }
 
-export function HookContinueModal({ visible, noun, onContinue, onLater }: Props) {
+// Cap the scroll height so the popup doesn't push off-screen on a
+// very long thread (e.g., 6-stage hooks). Same height-aware pattern
+// as OTA-262 in SalvageModal.
+const STAGE_SCROLL_MAX_HEIGHT = Math.max(
+  240,
+  Math.floor(Dimensions.get('window').height - 320),
+);
+
+export function HookContinueModal({
+  visible,
+  noun,
+  stageHistory,
+  completed,
+  onContinue,
+  onAbandon,
+}: Props) {
+  const scrollRef = useRef<ScrollView>(null);
+
+  // Auto-scroll to the newest stage as it's appended so the player
+  // sees the freshly-fired beat without having to scroll manually.
+  // Triggered on history length change (a new stage was added).
+  useEffect(() => {
+    if (!visible) return;
+    // Small delay so the layout reflows with the new content before
+    // we scroll — otherwise scrollToEnd targets the old bottom.
+    const t = setTimeout(() => {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    }, 50);
+    return () => clearTimeout(t);
+  }, [visible, stageHistory.length]);
+
   return (
     <Modal
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={onLater}
+      onRequestClose={onAbandon}
       statusBarTranslucent
     >
-      <TouchableWithoutFeedback onPress={onLater}>
+      {/* OTA-263 — scrim restored to normal opacity (0.7) since the
+          modal now contains the full thread text and the world feed
+          behind it doesn't need to stay readable. Bigger card so
+          long stages have room to breathe. */}
+      <TouchableWithoutFeedback onPress={onAbandon}>
         <View style={styles.scrim}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <Text style={styles.title}>★ STORY THREAD</Text>
-              <View style={styles.rule} />
-              <Text style={styles.body}>
-                There's more at <Text style={styles.bodyAccent}>{noun}</Text>. Follow the thread?
+              <Text style={styles.title}>
+                {completed ? '★★ STORY THREAD COMPLETE' : '★ STORY THREAD'}
               </Text>
+              <Text style={styles.subtitle}>at the {noun}</Text>
+              <View style={styles.rule} />
+
+              <ScrollView
+                ref={scrollRef}
+                style={[styles.stageScroll, { maxHeight: STAGE_SCROLL_MAX_HEIGHT }]}
+                contentContainerStyle={styles.stageList}
+              >
+                {stageHistory.map((stage, i) => (
+                  <View key={`stage-${i}`} style={styles.stageBlock}>
+                    <Text style={styles.stageLabel}>{stage.label}</Text>
+                    <Text style={styles.stageLine}>{stage.line}</Text>
+                    {stage.reward ? (
+                      <Text style={styles.stageReward}>{stage.reward}</Text>
+                    ) : null}
+                    {stage.arbiterLine ? (
+                      <Text style={styles.stageArbiter}>"{stage.arbiterLine}"</Text>
+                    ) : null}
+                  </View>
+                ))}
+              </ScrollView>
+
+              {/* CONTINUE / ABANDON shown for every stage including
+                  the terminal. On terminal CONTINUE just dismisses
+                  (continueHook's resolved-hook branch clears the
+                  popup state); ABANDON dismisses + marks the
+                  already-resolved hook resolved (no-op on already-
+                  resolved hooks). Both buttons close the modal —
+                  player picks "see it through" vs "give up now." */}
               <View style={styles.btnRow}>
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}
@@ -58,9 +141,9 @@ export function HookContinueModal({ visible, noun, onContinue, onLater }: Props)
                 </Pressable>
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
-                  onPress={onLater}
+                  onPress={onAbandon}
                 >
-                  <Text style={styles.btnTextNeutral}>LATER</Text>
+                  <Text style={styles.btnTextNeutral}>ABANDON</Text>
                 </Pressable>
               </View>
             </View>
@@ -74,28 +157,38 @@ export function HookContinueModal({ visible, noun, onContinue, onLater }: Props)
 const styles = StyleSheet.create({
   scrim: {
     flex: 1,
-    // Lighter dim than other modals — the player wants to glance at
-    // the world feed behind the popup to re-read the stage line if
-    // needed before tapping continue.
-    backgroundColor: 'rgba(0,0,0,0.55)',
+    backgroundColor: 'rgba(0,0,0,0.7)',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
   },
   card: {
     width: '100%',
-    maxWidth: 380,
+    maxWidth: 420,
     backgroundColor: '#13110f',
     borderColor: '#c9a86a',
     borderWidth: 1,
     borderRadius: 4,
     padding: 14,
   },
-  title: { color: '#c9a86a', fontSize: 14, fontWeight: '800', letterSpacing: 4 },
-  rule: { height: 1, backgroundColor: '#3a342c', marginTop: 6, marginBottom: 10 },
-  body: { color: '#e6d8b3', fontSize: 14, lineHeight: 20, marginBottom: 14 },
-  bodyAccent: { color: '#c9a86a', fontWeight: '700' },
-  btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8 },
+  title: { color: '#c9a86a', fontSize: 13, fontWeight: '800', letterSpacing: 3 },
+  subtitle: { color: '#7a705c', fontSize: 11, marginTop: 2, fontStyle: 'italic', letterSpacing: 1 },
+  rule: { height: 1, backgroundColor: '#3a342c', marginTop: 8, marginBottom: 8 },
+  stageScroll: { },
+  stageList: { gap: 12, paddingVertical: 4 },
+  stageBlock: {
+    backgroundColor: '#1a1714',
+    borderLeftColor: '#c9a86a',
+    borderLeftWidth: 2,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    gap: 6,
+  },
+  stageLabel: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1.5 },
+  stageLine: { color: '#e6d8b3', fontSize: 13, lineHeight: 19 },
+  stageReward: { color: '#9ec96a', fontSize: 12, lineHeight: 17 },
+  stageArbiter: { color: '#bf9b6a', fontSize: 12, fontStyle: 'italic', lineHeight: 17 },
+  btnRow: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 12 },
   btn: {
     paddingHorizontal: 14,
     paddingVertical: 8,
