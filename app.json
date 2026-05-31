@@ -15,7 +15,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.hotatticgames.tartarprim.hal2001"
+      "bundleIdentifier": "com.hotatticgames.tartarprim.hal2001",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.hotatticgames.tartarprim.hal2001",
