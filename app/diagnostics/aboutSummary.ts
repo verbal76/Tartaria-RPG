@@ -19,8 +19,18 @@ import { OTA_BUILD_ID } from '../buildInfo';
 
 export function buildBasicDeviceSummary(): string {
   const apkBuild = Application.nativeBuildVersion ?? '(unknown)';
-  const apkVersion =
-    Application.nativeApplicationVersion ?? Constants.expoConfig?.version ?? '0.0.0';
+  // OTA-250 — App version now prefers Constants.expoConfig?.version
+  // (OTA-deliverable, refreshed on every bundle apply) over
+  // Application.nativeApplicationVersion (baked into the AAB at
+  // build time). Reason: when we bump app.json's expo.version from
+  // 2.4.1 → 3.0.0 and push as OTA, the player should see "3.0.0"
+  // on the About screen immediately, not have to wait for the next
+  // AAB rebuild. The native version is preserved on its own line
+  // ("APK build version") for diagnostic clarity — useful when the
+  // two diverge (e.g. installed APK 232 still says 2.4.1 natively
+  // but the OTA bundle is on 3.0.0).
+  const otaVersion = Constants.expoConfig?.version ?? '0.0.0';
+  const nativeVersion = Application.nativeApplicationVersion ?? otaVersion;
   const appId = Application.applicationId ?? '(unknown)';
   // Constants.deviceName is iOS-set (user's chosen device name in
   // Settings → General → About → Name); on Android it's null in
@@ -64,7 +74,10 @@ export function buildBasicDeviceSummary(): string {
     ``,
     `Install`,
     `  App ID: ${appId}`,
-    `  App version: ${apkVersion}`,
+    `  App version: ${otaVersion}`,
+    ...(nativeVersion !== otaVersion
+      ? [`  APK build version: ${nativeVersion}`]
+      : []),
     `  APK build: ${apkBuild}`,
     `  OTA build ID: ${OTA_BUILD_ID}`,
   ];

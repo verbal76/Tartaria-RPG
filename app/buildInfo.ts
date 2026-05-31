@@ -10535,4 +10535,65 @@
 // gains keystore-selection
 // logic + SHA-256
 // fingerprint dump).
-export const OTA_BUILD_ID = '2026-05-30-249';
+// 2026-05-31-250 — bump
+// visible version to 3.0.0
+// via OTA. Player: "still,
+// let's push an OTA to the
+// HAL AAB to update the
+// visible versions to 3.0.0
+// so you can see it on the
+// front screen under the
+// add play tester and then
+// you can see it on the
+// about."
+//
+// Two pieces:
+// 1. app.json's expo.version
+//    bumped 2.4.1 → 3.0.0.
+//    The TitleScreen footer
+//    imports this via
+//    require('../../app.json
+//    ').expo.version, so the
+//    footer string updates
+//    immediately on OTA
+//    apply — "v3.0.0 / 2148"
+//    instead of "v2.4.1 /
+//    2148".
+// 2. aboutSummary.ts's
+//    apkVersion was reading
+//    Application.native
+//    ApplicationVersion
+//    (baked into the AAB
+//    manifest at build
+//    time, NOT OTA-able).
+//    Switched to prefer
+//    Constants.expoConfig?.
+//    version (OTA-refreshed
+//    on every bundle apply)
+//    so the About screen
+//    also displays 3.0.0
+//    immediately. Native
+//    version preserved on
+//    its own line "APK build
+//    version: 2.4.1" when
+//    the two differ — useful
+//    diag context (the APK
+//    natively says 2.4.1
+//    but the OTA bundle
+//    is on 3.0.0).
+//
+// First major-version bump
+// of the session. Marks the
+// Ask the Arbiter / Tool
+// Pouch / 3-ring / canon
+// ingestion era.
+//
+// Files: app.json (expo.
+// version 2.4.1 → 3.0.0),
+// app/diagnostics/about
+// Summary.ts (apkVersion
+// prefers Constants.expo
+// Config?.version; adds
+// "APK build version" line
+// when native ≠ ota).
+export const OTA_BUILD_ID = '2026-05-31-250';

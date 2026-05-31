@@ -245,6 +245,14 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-250 — visible version bump 2.4.1 → 3.0.0 (OTA-deliverable)
+
+- **OTA-250 · Player: *"still, let's push an OTA to the HAL AAB to update the visible versions to 3.0.0 so you can see it on the front screen under the add play tester and then you can see it on the about."***
+  - **Title screen footer fix (OTA-able):** `TitleScreen.tsx` reads `APP_VERSION` from `app.json`'s `expo.version` via require — bundled into the JS, so an OTA refresh updates it. Bumped `app.json` version `2.4.1` → `3.0.0`. Footer now reads `v3.0.0 / 2148`.
+  - **About screen fix (was native-baked):** `aboutSummary.ts`'s `apkVersion` was reading `Application.nativeApplicationVersion`, which is set at AAB build time and can't change via OTA. Switched to prefer `Constants.expoConfig?.version` (which IS OTA-refreshed). About screen now displays 3.0.0 immediately. Native version preserved on its own line `APK build version: 2.4.1` when the two differ — useful diagnostic context (APK natively says 2.4.1, OTA bundle says 3.0.0).
+  - **First major-version bump of the session.** Marks the Ask the Arbiter / Tool Pouch / 3 rings / canon ingestion era.
+  - **Files:** `app.json` (`expo.version` 2.4.1 → 3.0.0), `app/diagnostics/aboutSummary.ts` (`otaVersion` from `Constants.expoConfig?.version`; conditional "APK build version" line).
+
 #### OTA-249 — production AAB can use a separate upload keystore from HaL sideloads
 
 - **OTA-249 + [build-aab] retry · Player reminder:** *"don't forget to match keys as well."*
