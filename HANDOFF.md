@@ -324,6 +324,28 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-265 — iOS Build (native, GitHub Actions macOS fallback)
+
+- **OTA-265 · 2026-05-31 EAS outage triggered this:**
+  - **The forcing function:** Expo's macOS data center provider had a multi-hour networking outage (status.expo.dev incidents at 13:38 PDT and 16:43 PDT). All iOS builds queued + stalled + errored at "Failed to download project archive". Our primary `build-ios.yml` wraps `eas-cli build` which queues work on EAS's macOS workers — when those are unreachable, our entire iOS pipeline is dead even though GitHub Actions itself is up. User asked for a fallback; this is it.
+  - **What this is:** `.github/workflows/build-ios-native.yml` — a complete iOS build path that runs on GitHub's `macos-14` runner via `xcodebuild` directly. Zero EAS dependency. Signed with the same Distribution Certificate we generated this morning, just exported from EAS into GitHub Secrets so the new workflow can codesign locally.
+  - **How it works:** checkout → setup Node 20 → Xcode 26 selection → npm ci → strip `.hal2001` bundle suffix (production-only) → secret presence check → import .p12 into transient keychain (`security create-keychain` + `security import` + `security set-key-partition-list`) → install .mobileprovision into `~/Library/MobileDevice/Provisioning Profiles/` and parse its UUID + Name → `npx expo prebuild --platform ios --clean --no-install` → `pod install` → write `ExportOptions.plist` inline (method: app-store-connect, manual signing, explicit profile dict) → `xcodebuild archive` → `xcodebuild -exportArchive` → upload .ipa as artifact (always, 7-day retention) → optional `xcrun altool --upload-app` to TestFlight (gated by submit flag) → defensive keychain cleanup.
+  - **Triggers:** workflow_dispatch (Actions UI → Run workflow, submit checkbox optional) OR a commit whose first line starts with `[build-ios-native]`. Does NOT auto-fire on regular pushes (paths-ignore: `['**']`) — macos-14 runner minutes count 10× against the GitHub quota, so we don't burn them on every commit.
+  - **Cost:** ~25 actual minutes per run = ~250 billed minutes. Free tier 2000 min/mo = ~8 fallback builds/month, Pro 3000 = ~12. Reserved for "EAS is down" scenarios, not daily.
+  - **Required GitHub Secrets (one-time setup):**
+    - `IOS_DIST_CERT_P12_BASE64` — .p12 export of Distribution Certificate, base64-encoded
+    - `IOS_DIST_CERT_P12_PASSWORD` — password set during the .p12 export
+    - `IOS_PROVISIONING_PROFILE_BASE64` — .mobileprovision, base64-encoded
+    - `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `ASC_APP_ID`, `APPLE_TEAM_ID`, `EXPO_TOKEN` — already in place
+  - **One-time export walkthrough (user task, ~5-10 min):**
+    1. Go to https://expo.dev/accounts/hot-attic-games/projects/tartaria-/credentials → iOS → bundle `com.hotatticgames.tartarprim`.
+    2. Distribution Certificate row → ⋮ → Download .p12. Set a password during the download (remember it — that's `IOS_DIST_CERT_P12_PASSWORD`).
+    3. Provisioning Profile row → ⋮ → Download .mobileprovision.
+    4. Base64-encode each file. On Windows PowerShell: `[Convert]::ToBase64String([IO.File]::ReadAllBytes("cert.p12")) | Set-Content cert.p12.b64`. On Mac/Linux: `base64 -i cert.p12 -o cert.p12.b64`. On a phone: use any "file to base64" web tool (paste contents back into GitHub Secrets text field).
+    5. GitHub repo → Settings → Secrets and variables → Actions → New repository secret. Add the three secrets above.
+  - **Endgame trajectory:** the user's stated goal is a refurbished Mac mini for home-office builds. This workflow is a stepping stone — same `xcodebuild` + `ExportOptions.plist` + `xcrun altool` commands work on a local Mac, just without the secret-import keychain dance. Once the mini lands, those commands wrap into a local script and we drop the GitHub Actions macos quota cost.
+  - **Files:** `.github/workflows/build-ios-native.yml` (NEW), `app/buildInfo.ts` (OTA-265 bump + change note), `HANDOFF.md` (this entry).
+
 #### OTA-264 — Crafting: post-craft confirmation popup + menu stays open
 
 - **OTA-264 · Player: *"every time I craft something, a popup should show up saying that I crafted whatever it was and that it is in my inventory, but the crafting menu shouldn't close it should stay open for me to craft something else. the popup should ask if I want to continue crafting or close the menu"***

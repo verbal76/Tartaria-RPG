@@ -10909,4 +10909,31 @@ export const DISPLAY_VERSION = '3.0.0';
 //          CraftingScreen.tsx (CraftResultModal import, new
 //          craftResult state, two onAfterCraft callbacks updated,
 //          modal render at bottom of the screen body).
-export const OTA_BUILD_ID = '2026-05-31-264';
+//
+// OTA-265 — iOS Build (native, GitHub Actions macOS fallback).
+//   Surfaced by the 2026-05-31 EAS outage (their macOS data center
+//   provider's networking went down for hours, blocking every iOS
+//   build/submit). The primary path (build-ios.yml) wraps
+//   eas-cli build, which depends on EAS's macOS workers — when
+//   those are unreachable, our pipeline is dead. New
+//   build-ios-native.yml runs the entire build on GitHub's macos-14
+//   runner via xcodebuild directly, zero EAS dependency. Signed
+//   with the same Distribution Certificate (exported once from EAS
+//   into GitHub Secrets — IOS_DIST_CERT_P12_BASE64 +
+//   IOS_DIST_CERT_P12_PASSWORD + IOS_PROVISIONING_PROFILE_BASE64).
+//   Manually triggered via workflow_dispatch (Actions UI) or by a
+//   commit whose first line starts with [build-ios-native]; does
+//   NOT auto-fire on regular pushes (paths-ignore: ['**']) because
+//   macos-14 runner minutes count 10× against the GitHub quota.
+//   Build cost: ~25 actual minutes = ~250 billed minutes per run.
+//   Free tier (2000 min/mo) = ~8 fallback builds/month, more than
+//   enough for the "EAS just went down" use case. Also uploads .ipa
+//   as a GitHub artifact (7-day retention) regardless of submit
+//   flag, so the .ipa exists for manual Transporter submission if
+//   the auto-submit step ever fails.
+//   This is also the foundation for the user's home-office Mac
+//   mini endgame — same xcodebuild + ExportOptions.plist + altool
+//   commands run on a local Mac, just without the secret-import
+//   keychain dance.
+//   Files: .github/workflows/build-ios-native.yml (NEW).
+export const OTA_BUILD_ID = '2026-05-31-265';
