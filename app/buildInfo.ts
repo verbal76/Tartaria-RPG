@@ -10707,4 +10707,23 @@ export const DISPLAY_VERSION = '3.0.0';
 //   dedup messages are hardcoded by design, fast-path UX guardrails
 //   that need to fire without Qwen warmup latency.)
 //   Files: app/state/gameStore.ts (line 5249 + 10557).
-export const OTA_BUILD_ID = '2026-05-31-256';
+//
+// OTA-257 — Investigate menu: keep done-chips visible greyed +
+//   auto-close when nothing left. Follow-up to OTA-256. Player ask:
+//   "it needs to deactivate it in the investigation menu as well
+//   and if it is the last thing in it, deactivate the investigate
+//   window as well." Pre-OTA-257 the productively-consumed chips
+//   were filtered OUT of SearchModal entirely (taken / salvaged /
+//   investigated-with-reward all vanished), so the player got no
+//   visual record of completion and could still type the noun by
+//   hand to trigger the (now corrected, OTA-256) dedup line. Two
+//   changes here: (1) ExplorationScreen — productively-consumed
+//   chips now stay as greyed ✓ chips just like flavor-exhausted
+//   ones, same OTA-070 fuzzy-match pattern; (2) SearchModal —
+//   useEffect watches `chips`; when every chip is consumed, holds
+//   800ms so the player sees the final flip, then auto-closes.
+//   Type-it-yourself field is still there if the player wants to
+//   investigate something arbitrary mid-modal.
+//   Files: app/screens/ExplorationScreen.tsx (line 875 area),
+//          app/components/SearchModal.tsx (new useEffect).
+export const OTA_BUILD_ID = '2026-05-31-257';

@@ -858,21 +858,22 @@ export function ExplorationScreen() {
             const unmetRequirement = req && !hasScannerForReq ? req.shortLabel : undefined;
             return [{ noun, consumed: isAmbientConsumed(key), alwaysShow: true, unmetRequirement }];
           })(),
-          // 2026-05-25 — productively-consumed nouns (taken, salvaged
-          // with loot, investigated with substantive result) are
-          // filtered out of Investigate entirely so the modal doesn't
-          // clutter with already-acted-on items. Flavor-only
-          // investigated nouns stay visible greyed + sorted right
-          // per POLISH-3.
+          // OTA-257 — productively-consumed nouns now STAY VISIBLE as
+          // greyed chips instead of being filtered out. Player feedback:
+          // typing "investigate titan's bone marker" after the first
+          // tap had already produced a contract lead, with no chip in
+          // the menu to remind them they'd done it. The chip-vanish
+          // pattern (here pre-OTA-257) was technically correct — the
+          // engine fires a dedup refusal on the manual re-tap — but
+          // gave the player no visual record of completion and let
+          // them keep typing the noun by hand. New behavior:
+          //   - productively-consumed → chip stays, greyed + ✓ (same
+          //     visual treatment as flavor-exhausted chips since
+          //     OTA-070).
+          //   - flavor-exhausted → unchanged (already greyed).
+          //   - when ALL chips in the modal are consumed, SearchModal
+          //     auto-closes after a brief hold (see SearchModal.tsx).
           ...buildChipPool(currentScene)
-            // 2026-05-26 OTA-070 — fuzzy match for the
-            // productively-consumed filter (was exact .has).
-            // Mirrors the engine's substring dedup so a chip
-            // whose productive consumption was recorded under a
-            // variant phrasing ("wooden bench" vs chip "bench")
-            // gets filtered out instead of lingering green-and-
-            // dead in the modal.
-            .filter((n) => !isFuzzyConsumed(n, productivelyConsumedSet))
             .map((n) => {
               // OTA 195 — compute per-chip requirement. Aether / pulse /
               // mud-coded nouns require the matching scanner equipped.
@@ -908,10 +909,17 @@ export function ExplorationScreen() {
               }
               return {
                 noun: n,
-                // 2026-05-26 OTA-070 — fuzzy match for the
-                // greyed-but-visible flavor-exhausted state. Was
-                // exact .has(n.toLowerCase()).
-                consumed: isFuzzyConsumed(n, flavorExhaustedSet),
+                // OTA-257 — chip is "consumed" (greyed) if EITHER it
+                // was productively consumed (taken / salvaged with
+                // loot / investigated with substantive result) OR
+                // flavor-exhausted. Was just flavor-exhausted prior
+                // to OTA-257; productively-consumed chips were
+                // filtered out entirely (see comment above the map).
+                // Fuzzy match handles substring variants ("wooden
+                // bench" vs chip "bench") per OTA-070's pattern.
+                consumed:
+                  isFuzzyConsumed(n, productivelyConsumedSet) ||
+                  isFuzzyConsumed(n, flavorExhaustedSet),
                 unmetRequirement,
               };
             }),

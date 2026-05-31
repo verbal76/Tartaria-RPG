@@ -50,6 +50,25 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
   // tap the input field if they want to type. Chip-tap is the
   // primary interaction.
 
+  // OTA-257 — auto-close when there's nothing left to investigate.
+  // Once every chip is consumed (productive or flavor-exhausted),
+  // the modal holds 800ms so the player can see the final chip flip
+  // to its ✓ done state, then closes itself. Avoids the empty-window
+  // limbo where the player taps the last active chip, the result
+  // lands, and the modal still sits there showing only greyed chips
+  // and the type-it-yourself field. The hold gives clean closure;
+  // the player can also reopen the modal manually if they want to
+  // see the history of what they've worked.
+  useEffect(() => {
+    if (!visible) return undefined;
+    const list = chips ?? [];
+    if (list.length === 0) return undefined;
+    const allConsumed = list.every((c) => c.consumed);
+    if (!allConsumed) return undefined;
+    const timer = setTimeout(onCancel, 800);
+    return () => clearTimeout(timer);
+  }, [visible, chips, onCancel]);
+
   const handleSubmit = () => {
     const trimmed = text.trim();
     if (!trimmed) return;

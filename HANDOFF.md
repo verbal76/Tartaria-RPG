@@ -324,6 +324,17 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-257 — Investigate menu: keep done-chips visible greyed + auto-close when nothing left
+
+- **OTA-257 · Player: *"it needs to deactivate it in the investigation menu as well and if it is the last thing in it, deactivate the investigate window as well"***
+  - **What broke (UX):** pre-OTA-257, productively-consumed nouns (taken / salvaged / investigated-with-substantive-result) were FILTERED OUT of `SearchModal`'s chip list entirely (`ExplorationScreen.tsx:875` had a `.filter(n => !isFuzzyConsumed(n, productivelyConsumedSet))`). Player got no visual record of completion, and could still type the noun by hand in the modal's text field → engine fires the dedup refusal (now corrected wording per OTA-256). The chip-vanish pattern dated to OTA-070's chip-greying era; the original logic was "remove the clutter," but it created the "wait, was I supposed to do that?" gap.
+  - **Fix (chip stays, greyed):** in `ExplorationScreen.tsx` the `.filter(...)` line is gone. The chip-builder's `consumed` flag now ORs `isFuzzyConsumed(n, productivelyConsumedSet)` with `isFuzzyConsumed(n, flavorExhaustedSet)` — so productively-consumed and flavor-exhausted both render the same greyed-✓ chip via the existing `chipFullConsumed` styles. Same fuzzy-match guard so substring variants ("wooden bench" vs chip "bench") still grey correctly.
+  - **Fix (modal auto-closes when empty):** in `SearchModal.tsx` a new `useEffect` watches the `chips` prop. When `chips.every(c => c.consumed)` (and the modal is visible), it holds 800ms so the player can see the final chip flip to its ✓ done state, then calls `onCancel()` to close. Avoids the empty-window limbo where the player taps the last active chip, the result lands, and the modal still sits there with greyed chips and a type-it-yourself field. Type-it-yourself field is still there for the small fraction of opens where the player explicitly wants to investigate something arbitrary mid-state.
+  - **Why this design (not other patterns):** considered (a) closing modal immediately on the last tap (rejected — no flip-to-done feedback), (b) showing an "all investigated" interstitial (rejected — extra UI element for a 800ms beat), (c) leaving the modal open with disabled chips forever (the pre-OTA-257 status quo, what the player explicitly asked to fix). The 800ms hold is the same pattern as OTA-255's dice auto-resolve hold — consistent feel.
+  - **Scope (intentionally Investigate-only):** the user's ask was specifically the investigate menu. SalvageModal / TakeModal / ClimbModal share the same `InteractableChip` type and could get the same treatment; flagging for follow-up rather than scope-creep this OTA. If those modals also feel half-finished in playtest, easy follow-up.
+  - **OTA-only:** all JS-side; ships through OTA channel.
+  - **Files:** `app/screens/ExplorationScreen.tsx` (line 875 area — remove filter, OR the consumed flag), `app/components/SearchModal.tsx` (new useEffect after the visible-reset useEffect).
+
 #### OTA-256 — Investigate dedup wording: stop saying "nothing of use" when reward WAS found
 
 - **OTA-256 · Player: *"still an issue with any version of the titan bone"* + *"I thought qwen was resolving those issues"***
