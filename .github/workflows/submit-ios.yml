@@ -59,16 +59,19 @@ jobs:
       - name: EAS Submit (iOS, latest build, non-interactive)
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          # Apple auth — submit step uses the app-specific password,
-          # NOT the regular Apple password. Generated at
-          # appleid.apple.com → Sign-In and Security → App-Specific
-          # Passwords.
+          # Apple auth state (as of 2026-05-31):
+          # - eas.json submit.production.ios hardcodes appleId /
+          #   ascAppId / appleTeamId directly. EAS does NOT substitute
+          #   $VAR placeholders into those fields — that assumption
+          #   caused the inaugural --auto-submit failures until the
+          #   placeholders were replaced with literal values.
+          # - The App Store Connect API Key (WJ44NUUU49, APP_MANAGER)
+          #   is stored on EAS servers and used automatically for
+          #   submission auth. No password / 2FA needed.
+          # - EXPO_APPLE_* below is a fallback auth mode in case EAS
+          #   ever falls back off the stored API key. Safe to keep.
           EXPO_APPLE_ID: ${{ secrets.APPLE_ID }}
           EXPO_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          # eas.json submit.production.ios reads these via $VAR substitution.
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          ASC_APP_ID: ${{ secrets.ASC_APP_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           set -euo pipefail
           npx eas-cli submit \

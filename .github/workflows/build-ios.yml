@@ -170,17 +170,25 @@ jobs:
       - name: EAS Build (iOS, non-interactive) — with optional auto-submit
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          # The Distribution Certificate + Provisioning Profile are
-          # already stored on EAS (generated once via `eas credentials`),
-          # so the build reuses them. EXPO_APPLE_* is kept as a fallback
-          # auth mode. APPLE_ID / ASC_APP_ID / APPLE_TEAM_ID authorize
-          # the --auto-submit upload to App Store Connect (eas.json
-          # submit.production.ios reads them via $VAR substitution).
+          # Auth + credentials state (as of 2026-05-31):
+          # - Distribution Certificate + Provisioning Profile live on
+          #   EAS (created via `eas credentials --platform ios`), so
+          #   the build reuses them automatically.
+          # - eas.json submit.production.ios hardcodes appleId /
+          #   ascAppId / appleTeamId directly (NOT $VAR placeholders —
+          #   EAS does NOT substitute env vars into those fields, that
+          #   was a wrong assumption that broke --auto-submit until the
+          #   placeholders were replaced with literal values).
+          # - The App Store Connect API Key (ID WJ44NUUU49, APP_MANAGER
+          #   role) is stored on EAS servers from the first manual
+          #   submission, so the post-build --auto-submit task uses
+          #   that key for App Store Connect authentication — no
+          #   password / 2FA needed.
+          # - EXPO_APPLE_* env vars below are a fallback auth mode in
+          #   case EAS ever falls back off the stored API key. Safe to
+          #   keep; ignored when the API key is available.
           EXPO_APPLE_ID: ${{ secrets.APPLE_ID }}
           EXPO_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          ASC_APP_ID: ${{ secrets.ASC_APP_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           set -euo pipefail
           echo "Profile: ${{ steps.meta.outputs.profile }}, submit: ${{ steps.meta.outputs.submit }}"
