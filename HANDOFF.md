@@ -13,7 +13,7 @@
 > **Open PR:** #1 — draft, this branch → `main`, **stale** relative to OTAs 020 → 056. Description still reflects OTA 053-era state. Refresh before requesting review (the PR summary should walk the five waves below + the deferred items in section 7).
 > **Open issues:** 5 (in Section 0.A — Hub-room key collision deferred; ongoing catalog backfill; inference engine doesn't check materials.json; hook-puzzle parser misses on "rotate the ring"; narrative-suggested actions like "knock on the steeple" parse as unknown). GitHub repo issue tracker remains at 0.
 
-> **For the next Claude instance:** read section 16 first — it's a snapshot of the player's working style + the major systems + the in-flight context. Then **Section 0** for the live issue tracker (the canonical Open / Closed list — read BEFORE planning any fix). Then section 6.A for the recent wave's reasoning. Section 7 lists what's still on the table.
+> **For the next Claude instance:** the live work is the **⚡ ACTIVE TASK block at the top of Section 0.A** — iOS Distribution Certificate creation, mid-PowerShell-session on the user's Windows laptop. Read that FIRST; it tells you exactly where the cursor is and what's left. Then read section 16 for the player's working style + major systems, and the rest of Section 0 for the canonical Open / Closed tracker (read BEFORE planning any fix). Section 6.A has the recent wave's reasoning; section 7 lists what's still on the table.
 
 ---
 
@@ -22,6 +22,84 @@
 > **The canonical record of issues across the build.** Every OTA / APK push updates this section in the same commit. **Read this section before planning any fix** to (a) check whether the issue is already closed and the fix exists, and (b) make sure your plan won't break a previously-closed fix. The workflow rules live in `CLAUDE.md` → "HANDOFF.md — the build timeline."
 
 ### 0.A — Open Issues
+
+> **⚡ ACTIVE TASK (2026-05-31) — iOS build → TestFlight External Testing. READ THIS FIRST.**
+>
+> **YOU ARE PICKING UP MID-TERMINAL-SESSION.** The user is at a live **PowerShell prompt
+> on their Windows laptop** (`D:\App Dev\Tartaria`) and has just run
+> **`eas credentials --platform ios`**. Do NOT restart the flow or re-explain from
+> scratch — they are inside the interactive wizard. Your immediate job is to read whatever
+> the wizard prints next and keep them on the path to **Generate new Distribution
+> Certificate → Generate new Provisioning Profile** (menu route below). The moment it
+> prints "Created distribution certificate / provisioning profile," the blocker is gone
+> and you move to firing the build.
+>
+> This is the live thread the current session is on. It is a hands-on-the-user's-machine
+> task, not a code task — there is nothing to edit in the repo right now. The whole job
+> is getting Apple to issue an iOS **Distribution Certificate** so EAS can build a signed
+> `.ipa` and ship it to the user's Apple playtesters via **TestFlight External Testing**
+> (explicitly NOT Internal Testing — the user does not want playtesters to have Developer
+> modify-access).
+>
+> **GOAL:** Apple playtesters install the game through TestFlight, current with HaL
+> (same JS bundle, OTA channel `hal2001`, rt 2.4.1). Build on Expo's hosted macOS infra
+> via `.github/workflows/build-ios.yml`, auto-submit to TestFlight.
+>
+> **DONE (verified with the user):**
+> - Apple Developer account active ($99 paid, agreement signed).
+> - App ID **`com.hotatticgames.tartarprim`** (bare, no `.hal2001`) registered at
+>   developer.apple.com → Identifiers. ✅
+> - App Store Connect listing exists. **`ASC_APP_ID = 6775124980`** (numeric ID from the
+>   ASC app URL `/apps/6775124980/...`; a version is already in-flight / "Prepare for
+>   Submission"). Added as a GitHub secret. ✅
+> - **`APPLE_TEAM_ID = 7Z67WUB9FA`** — already a GitHub secret. ✅
+> - GitHub secrets `EXPO_TOKEN`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD` set (prior
+>   session). ✅
+> - `eas.json` ios profiles + `submit.production.ios` block, and `build-ios.yml`
+>   (`[build-ios]` = production build, `[submit-ios]` = auto-submit to TestFlight,
+>   strips `.hal2001` for production) — all shipped in OTA-251. EXIT GAME is gated to
+>   Android-only so reviewers don't reject it. ✅
+>
+> **THE BLOCKER — where we are RIGHT NOW:** the iOS **Distribution Certificate +
+> Provisioning Profile do NOT exist yet** for the bare bundle. Without them every EAS
+> iOS build fails non-interactively ("Distribution Certificate is not validated for
+> non-interactive builds"). **Critical gotcha already learned the hard way: the expo.dev
+> WEB wizard CANNOT generate the cert** — its step-4-of-8 only offers "Upload new" /
+> "Choose saved" with no Generate button. **Only the CLI `eas credentials --platform ios`
+> can generate it** (it talks to Apple's API directly). Earlier the Codespaces browser
+> login failed too (localhost OAuth callback couldn't reach the phone) — so the user
+> moved to a **Windows laptop** (`D:\App Dev\Tartaria`, PowerShell).
+>
+> **Laptop progress this session:**
+> - Hit PowerShell `npm.ps1 cannot be loaded` (script execution disabled). Fixed with
+>   `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` (applied clean).
+> - `npm install -g eas-cli` → `eas login` → browser login **succeeded** ("You have
+>   successfully logged in").
+> - Currently running **`eas credentials --platform ios`** and being walked through the
+>   menu: select **production** profile → (Apple login w/ app-specific password, team
+>   `7Z67WUB9FA`) → **Build Credentials** → **All: Set up all required credentials** →
+>   **Generate new Apple Distribution Certificate (Yes)** → **Generate new Provisioning
+>   Profile (Yes)**.
+>
+> **NEXT STEPS once the cert prints "Created distribution certificate / provisioning
+> profile":**
+> 1. Verify both show at https://expo.dev/accounts/hot-attic-games/projects/tartaria-/credentials
+>    (iOS → bundle `com.hotatticgames.tartarprim`).
+> 2. Fire the build: commit titled **`[build-ios] [submit-ios]`** on the current feature
+>    branch → workflow builds on EAS macOS infra (~20-30 min) AND auto-submits to TestFlight.
+> 3. First external TestFlight build needs **~24h Apple beta review** before it reaches the
+>    external group.
+> 4. TestFlight External Testing setup (App Store Connect): privacy policy URL (offered to
+>    draft — local-only single-player game, no analytics/accounts), age rating (~12+),
+>    External group + tester emails, Beta App Review info.
+>
+> **Standing user directive:** "I don't ever do anything in EAS. you should be able to
+> push everything through EAS on your own." The ONLY thing requiring the user's hands is
+> this one-time interactive cert creation; everything after is CI-driven.
+>
+> **Note:** the designated feature branch per task instructions is
+> `claude/google-signing-code-app-WsOrj`, but the live OTA branch is `HaL2001`. Confirm
+> with the user which branch the `[build-ios]` commit should land on before firing.
 
 - **Rumor-of-trapped-dog Arbiter hint for old-save players (OTA-125 follow-up).** Day-32 character on OTA-124 went 2 days of gameplay without ever encountering a rescue hook noun. The rescue system is wired correctly (fires on any future tap of cage / chain / wagon / wheel / cellar / trapdoor / snare / trap / pit / smelter / forge ruin on investigate / attack / advance / travel / ask / use_relic), but discoverability is RNG-bound — a player who travels through scenes without those noun chips will never know the system exists. **Fix shape:** if `!player.dog && !worldMemory.dogRescueTipFired && day-count > 5`, the Arbiter periodically (~0.5% per scene entry) drops a rumor hint: *"Travelers have been speaking of a dog held at a smelter ruin to the [random cardinal]. The Reclaimers have been quiet about it."* Set the flag so the hint only fires once per save. Low priority — system works, just needs a discovery nudge. **Status:** open.
 
