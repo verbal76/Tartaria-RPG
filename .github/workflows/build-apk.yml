@@ -197,6 +197,38 @@ jobs:
           echo "is_tag=$IS_TAG" >> "$GITHUB_OUTPUT"
           echo "Building Tartaria Realms — profile: $PROFILE, tag: $TAG, version: $VERSION"
 
+      # Strip the .hal2001 suffix from android.package + ios.bundleIdentifier
+      # when building a production AAB. Reason: Play Console screenshot
+      # (OTA-247-era retry) rejected the AAB with "Your APK or Android App
+      # Bundle needs to have the package name com.hotatticgames.tartarprim."
+      # The HaL2001 branch suffixes the package to keep its sideload APKs
+      # as a separate app from the main production track; AABs heading to
+      # Play Store need the bare package to match the existing listing.
+      # Preview / APK builds keep the .hal2001 suffix untouched so HaL
+      # sideloads stay separate from the production install.
+      - name: Strip .hal2001 suffix for production AAB
+        if: steps.meta.outputs.profile == 'production'
+        run: |
+          node -e "
+            const fs = require('fs');
+            const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));
+            const before = {
+              package: app.expo?.android?.package,
+              bundle: app.expo?.ios?.bundleIdentifier,
+            };
+            if (app.expo?.android?.package?.endsWith('.hal2001')) {
+              app.expo.android.package = app.expo.android.package.slice(0, -'.hal2001'.length);
+            }
+            if (app.expo?.ios?.bundleIdentifier?.endsWith('.hal2001')) {
+              app.expo.ios.bundleIdentifier = app.expo.ios.bundleIdentifier.slice(0, -'.hal2001'.length);
+            }
+            fs.writeFileSync('app.json', JSON.stringify(app, null, 2));
+            console.log('Production package flip:');
+            console.log('  android.package:', before.package, '→', app.expo.android.package);
+            console.log('  ios.bundleIdentifier:', before.bundle, '→', app.expo.ios.bundleIdentifier);
+          "
+          grep -E '"package"|"bundleIdentifier"' app.json | head -5
+
       - name: Generate native Android project
         run: npx expo prebuild --platform android --no-install
 

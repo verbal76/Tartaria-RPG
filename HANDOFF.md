@@ -245,6 +245,14 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-248 — Play Console package flip for production AAB
+
+- **OTA-248 + [build-aab] retry · Play Console screenshot rejected the OTA-247 AAB:** *"Your APK or Android App Bundle needs to have the package name com.hotatticgames.tartarprim."*
+  - **Cause:** the HaL2001 branch carries `android.package = "com.hotatticgames.tartarprim.hal2001"` to keep its sideload APKs separate from the main production install. The AAB upload was heading to the Play Console listing for the main `com.hotatticgames.tartarprim` package — Play Console rejected the mismatch.
+  - **Fix:** new workflow step "Strip .hal2001 suffix for production AAB" gated on `steps.meta.outputs.profile == 'production'`. Rewrites `app.json`'s `android.package` and `ios.bundleIdentifier` to remove the trailing `.hal2001` before prebuild generates the native project. Preview / APK builds (HaL sideloads) keep the suffix untouched.
+  - **Step ordering:** runs AFTER "Determine build profile" (so `profile` output is available) but BEFORE "Generate native Android project" (so the new package lands in the generated manifest + MainActivity directory).
+  - **Files:** `.github/workflows/build-apk.yml` (new package-strip step).
+
 #### OTA-247 — third attempt at EXIT GAME fix; literal substring + brace walk
 
 - **OTA-247 + [build-aab] retry · OTA-246's second AAB build still failed Kotlin compile:**

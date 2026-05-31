@@ -10423,4 +10423,51 @@
 // substring find + brace
 // walk + slice replace
 // instead of regex).
-export const OTA_BUILD_ID = '2026-05-30-247';
+// 2026-05-30-248 — package
+// flip for Play Console.
+// Screenshot: "Your APK or
+// Android App Bundle needs
+// to have the package name
+// com.hotatticgames.tartar-
+// prim." The OTA-247 AAB
+// built successfully but
+// carried package com.hot-
+// atticgames.tartarprim.
+// hal2001 (HaL branch's
+// suffix to keep its
+// sideload app separate),
+// which the Play Console
+// listing for the main
+// production track rejects.
+//
+// Fix: workflow now strips
+// the .hal2001 suffix from
+// android.package AND
+// ios.bundleIdentifier when
+// profile == 'production'.
+// Preview / APK builds keep
+// the suffix untouched so
+// HaL sideloads continue to
+// be a separate install
+// from the production app.
+//
+// Step runs AFTER 'Determine
+// build profile' (so we
+// have steps.meta.outputs.
+// profile) but BEFORE
+// 'Generate native Android
+// project' (so prebuild
+// emits the new package).
+// Logs before/after values
+// so the build log
+// confirms the flip.
+//
+// Carries [build-aab] to
+// re-trigger the workflow.
+//
+// Files: .github/workflows/
+// build-apk.yml (new
+// "Strip .hal2001 suffix"
+// step gated on production
+// profile).
+export const OTA_BUILD_ID = '2026-05-30-248';
