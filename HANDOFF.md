@@ -324,6 +324,17 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-264 — Crafting: post-craft confirmation popup + menu stays open
+
+- **OTA-264 · Player: *"every time I craft something, a popup should show up saying that I crafted whatever it was and that it is in my inventory, but the crafting menu shouldn't close it should stay open for me to craft something else. the popup should ask if I want to continue crafting or close the menu"***
+  - **What broke (UX):** the Crafting screen's Craft and Recipes tabs both auto-closed to exploration after every craft (`CraftingScreen.tsx:335,354` passed `onAfterCraft={() => setScreen('exploration')}` to RecipesView). Two pain points: friction for any player chaining multiple crafts in a single visit, AND no in-the-moment confirmation that the craft actually landed — the player had to scroll back through the world feed to verify.
+  - **Fix:** new `CraftResultModal.tsx` (~150 lines) mirrors SalvageModal's results-phase pattern with rarity-coded ✦ rows. `RecipesView.handleCraft` now snapshots inventory before `craftRecipe()`, diffs after via the existing `computeInventoryDelta` helper, and passes the resulting `InventoryDelta[]` to `onAfterCraft`. `CraftingScreen` routes non-empty deltas into a new `craftResult` state field; the modal renders when that's set with **CONTINUE CRAFTING** (clears state, screen stays on the active tab) and **CLOSE MENU** (clears state + `setScreen('exploration')`) buttons.
+  - **Failure handling:** empty delta = craft no-op'd (engine refused, missing material the UI didn't catch, etc.). In that case the modal stays closed and the player relies on the world feed's failure narration. Screen stays on the active tab regardless, so they can re-attempt.
+  - **Scope (intentional):** Craft and Recipes tabs only. The Repair tab already had stay-open behavior pre-OTA-264 (no `onAfterRepair` callback ever wired); the Aetheric tab has no craft-equivalent action (it stages clipboard text). So all three tabs that need stay-open behavior now have it consistently.
+  - **Why the inventory-diff approach instead of a craft-success event:** `craftRecipe` (`gameStore.ts:14638`) routes through `submitPlayerAction` → engine parser → craft logic, with no return value or emitted event the UI can intercept. The inventory diff is the simplest reliable signal that something actually entered the player's pack. Same pattern SalvageModal uses (`SalvageModal.tsx:158-174` — snapshot, run, diff).
+  - **OTA-only:** all JS-side; ships through OTA channel. No engine changes, no save shape changes.
+  - **Files:** `app/components/CraftResultModal.tsx` (NEW), `app/components/RecipesView.tsx` (`onAfterCraft` signature changed from `() => void` to `(delta: InventoryDelta[]) => void`; `handleCraft` snapshots/diffs inventory), `app/screens/CraftingScreen.tsx` (imports + `craftResult` state + two `onAfterCraft` callbacks updated + modal render at bottom of screen body).
+
 #### OTA-263 — HookContinueModal: stage history accumulates in popup + LATER → ABANDON + CONTINUE/ABANDON only
 
 - **OTA-263 · Player feedback (two passes refining OTA-259):**

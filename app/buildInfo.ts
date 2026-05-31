@@ -10873,4 +10873,40 @@ export const DISPLAY_VERSION = '3.0.0';
 //          stage list with ScrollView, button row swap removed,
 //          height-aware via Dimensions like SalvageModal OTA-262),
 //          app/screens/ExplorationScreen.tsx (selectors + modal props).
-export const OTA_BUILD_ID = '2026-05-31-263';
+//
+// OTA-264 — Crafting: post-craft confirmation popup + menu stays open.
+//   Player ask: "every time I craft something, a popup should show
+//   up saying that I crafted whatever it was and that it is in my
+//   inventory, but the crafting menu shouldn't close it should stay
+//   open for me to craft something else. the popup should ask if I
+//   want to continue crafting or close the menu."
+//   Pre-OTA-264 the Crafting screen's Craft + Recipes tabs both
+//   passed onAfterCraft={() => setScreen('exploration')} to
+//   RecipesView, so every craft yanked the player back to
+//   exploration. Friction for anyone making multiple items in one
+//   session, and no in-the-moment confirmation that the craft
+//   actually landed (the player had to scroll back through the
+//   world feed to verify).
+//   New behavior: RecipesView snapshots inventory before craftRecipe(),
+//   diffs after, and hands the delta to the parent's onAfterCraft.
+//   CraftingScreen routes the non-empty delta into a craftResult
+//   state field; a new CraftResultModal renders when that's set,
+//   listing the added items with rarity badges. CONTINUE CRAFTING
+//   clears the modal (screen stays on the active tab); CLOSE MENU
+//   clears modal + setScreen('exploration'). Empty delta (craft
+//   failed validation or no-op'd) bypasses the modal — the world
+//   feed's error line is the player's signal, screen stays on tab.
+//   Scope: Craft + Recipes tabs only. Repair tab was already
+//   stay-open (no onAfterRepair callback); Aetheric tab has no
+//   craft-equivalent action. Unified behavior across the three
+//   relevant tabs is now consistent.
+//   Files: app/components/CraftResultModal.tsx (NEW — ~150 lines,
+//          mirrors SalvageModal's results-phase pattern + reuses
+//          the InventoryDelta type), app/components/RecipesView.tsx
+//          (handleCraft now diffs inventory + passes delta to
+//          onAfterCraft; prop signature changed from () => void to
+//          (delta: InventoryDelta[]) => void), app/screens/
+//          CraftingScreen.tsx (CraftResultModal import, new
+//          craftResult state, two onAfterCraft callbacks updated,
+//          modal render at bottom of the screen body).
+export const OTA_BUILD_ID = '2026-05-31-264';

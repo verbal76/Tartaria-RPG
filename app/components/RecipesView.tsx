@@ -4,6 +4,7 @@ import { useGameStore } from '../state/gameStore';
 import { RECIPES, lookupCraftedItem, type Recipe } from '../engine/crafting';
 import { getItemPreview } from './itemPreview';
 import type { SortDirection } from './SearchSortBar';
+import { computeInventoryDelta, type InventoryDelta } from './inventoryDelta';
 
 // OTA-087 — rarity rank for sorting. Mirrors the table in
 // InventoryScreen. Common = lowest, Legendary = highest.
@@ -47,9 +48,19 @@ function rarityColor(rarity: string | undefined): string {
 export type RecipeKindFilter = 'consumable' | 'non-consumable';
 
 export interface RecipesViewProps {
-  /** Called after a successful craft. Use to navigate away (Crafting
-   *  screen goes back to exploration) or stay. */
-  onAfterCraft?: () => void;
+  /** OTA-264 — called AFTER a successful craft attempt. Receives the
+   *  inventory delta produced by the craft (snapshot of before-state
+   *  diffed against after-state). Use it to drive a post-craft
+   *  confirmation modal AND decide whether to keep the crafting menu
+   *  open or navigate away. Empty delta = craft no-op'd (engine
+   *  refused / failed validation) — caller should keep the menu open
+   *  and rely on the world feed for the failure narration.
+   *
+   *  Pre-OTA-264 this was a parameterless `() => void` that the
+   *  CraftingScreen used to `setScreen('exploration')` immediately
+   *  on every craft. Player feedback: "the crafting menu shouldn't
+   *  close it should stay open for me to craft something else." */
+  onAfterCraft?: (delta: InventoryDelta[]) => void;
   /** OTA-059 — kind filter. CRAFT tab passes 'non-consumable' to
    *  show weapons/armor/relics/gear; RECIPES tab passes 'consumable'
    *  to show stews / tinctures / draughts. Omitting the prop shows
@@ -135,9 +146,19 @@ export function RecipesView({
 
   const availableCount = evaluated.filter((e) => e.available).length;
 
+  // OTA-264 — snapshot inventory before craft, diff after, pass
+  // the delta to the parent. craftRecipe() routes through the
+  // engine synchronously (gameStore.ts:14638 → submitPlayerAction),
+  // so by the time getState() runs the inventory reflects the
+  // craft's outcome. Empty delta means the engine refused / no-op'd
+  // — caller keeps the menu open and lets the world feed surface
+  // the failure narration.
   const handleCraft = (recipe: Recipe) => {
+    const preInv = (useGameStore.getState().player?.inventory ?? []).map((i) => ({ ...i }));
     craftRecipe(recipe.result);
-    onAfterCraft?.();
+    const postInv = useGameStore.getState().player?.inventory ?? [];
+    const delta = computeInventoryDelta(preInv, postInv);
+    onAfterCraft?.(delta);
   };
 
   if (!player) {

@@ -4,6 +4,8 @@ import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import { repairCostMaterials } from '../engine/scrapEngine';
 import { RecipesView } from '../components/RecipesView';
+import { CraftResultModal } from '../components/CraftResultModal';
+import type { InventoryDelta } from '../components/inventoryDelta';
 import { SearchSortBar, type SortDirection } from '../components/SearchSortBar';
 import { FirstTimeHint } from '../components/FirstTimeHint';
 import type { InventoryItem } from '../engine/types';
@@ -169,6 +171,14 @@ export function CraftingScreen() {
   const repairInventoryItem = useGameStore((s) => s.repairInventoryItem);
   const queueInputDraft = useGameStore((s) => s.queueInputDraft);
   const [tab, setTab] = useState<Tab>('craft');
+  // OTA-264 — post-craft confirmation modal state. Non-null after a
+  // successful craft (RecipesView's inventory diff produced items);
+  // CONTINUE CRAFTING clears it to null (popup closes, screen stays
+  // on the active tab so the player can chain another craft); CLOSE
+  // MENU clears it AND calls setScreen('exploration') so both close.
+  // Empty / null delta = craft failed or no-op'd — the world feed
+  // narrates the failure; no popup, screen stays on tab.
+  const [craftResult, setCraftResult] = useState<InventoryDelta[] | null>(null);
   // OTA-095 — Aethercraft tab state. cycleIdx maps a discipline
   // id → which example phrase to surface next on repeat taps;
   // pulseAt timestamps a card so its "queued" pulse can fade.
@@ -332,7 +342,11 @@ export function CraftingScreen() {
           />
           <RecipesView
             kindFilter="non-consumable"
-            onAfterCraft={() => setScreen('exploration')}
+            onAfterCraft={(delta) => {
+              if (delta.length > 0) setCraftResult(delta);
+              // Empty delta = craft failed; world feed shows the
+              // error and the screen stays on the active tab.
+            }}
             query={craftQuery}
             sortKey={craftSortKey}
             sortDirection={craftSortDir}
@@ -351,7 +365,11 @@ export function CraftingScreen() {
           />
           <RecipesView
             kindFilter="consumable"
-            onAfterCraft={() => setScreen('exploration')}
+            onAfterCraft={(delta) => {
+              if (delta.length > 0) setCraftResult(delta);
+              // Empty delta = craft failed; world feed shows the
+              // error and the screen stays on the active tab.
+            }}
             query={recipesQuery}
             sortKey={recipesSortKey}
             sortDirection={recipesSortDir}
@@ -551,6 +569,21 @@ export function CraftingScreen() {
           </ScrollView>
         </>
       )}
+
+      {/* OTA-264 — post-craft confirmation popup. Renders whenever
+          craftResult is non-null (set by RecipesView's onAfterCraft
+          for both Craft and Recipes tabs). CONTINUE CRAFTING clears
+          the state and keeps the screen on the active tab; CLOSE
+          MENU clears state AND navigates back to exploration. */}
+      <CraftResultModal
+        visible={craftResult !== null}
+        items={craftResult ?? []}
+        onContinue={() => setCraftResult(null)}
+        onClose={() => {
+          setCraftResult(null);
+          setScreen('exploration');
+        }}
+      />
     </View>
   );
 }
