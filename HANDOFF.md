@@ -324,6 +324,15 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-261 — Dice auto-resolve hold tuned 1500ms → 800ms (snappier)
+
+- **OTA-261 · Player feedback after OTA-255 shipped: *"the next roll and resolving are just a touch too long it feels like it hanging just a bit, it makes it feel like the math is slowing the game"***
+  - **What was off:** OTA-255 shipped the dice auto-resolve at 1500ms hold post-dice-land. Long enough to read a complex result, but registered as a deliberate pause rather than a read window — across a multi-step roll (attack + damage), the cumulative 3s+ felt like the engine was thinking. Wrong texture: the dice were already cast, the player wanted to see the outcome and move.
+  - **Fix:** single constant `AUTO_RESOLVE_HOLD_MS` in `DiceRoller.tsx` tuned from 1500ms → 800ms. Now matches OTA-257's hook-continue modal hold for a consistent feel. Multi-step rolls cumulate under 2s. The dice values + bonus + total + verdict line are short and scannable; 800ms is enough to read them without registering as a wait.
+  - **Why 800 and not faster (e.g., 500):** crit/fumble narration sometimes adds an extra line the player wants to register before the resolve fires; below ~700ms the verdict starts feeling like it flashes by. 800ms is the sweet spot — visibly clear, not a wait. Single tunable if it feels too quick on actual play.
+  - **OTA-only:** literal constant change; ships through OTA channel.
+  - **Files:** `app/components/DiceRoller.tsx` (constant + comment).
+
 #### OTA-260 — Boxing/karate exception: punch / kick still graze you on a successful dodge
 
 - **OTA-260 · Player: *"punch and kick should still land damage on Dodge — think boxing and karate"***

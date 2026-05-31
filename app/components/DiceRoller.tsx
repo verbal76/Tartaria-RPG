@@ -11,11 +11,14 @@ import { rollDie } from '../engine/rng';
 // button during the hold. Closes the "why do I have to tap Resolve
 // after the dice are already cast" friction.
 //
-// Hold duration: 1500ms — long enough to clearly read the dice +
-// any advantage/disadvantage flag + the total/verdict line; short
-// enough not to feel like a delay across a multi-step roll (attack
-// + damage), where the cumulative wait stays under 3.5s.
-const AUTO_RESOLVE_HOLD_MS = 1500;
+// Hold duration: 800ms (tuned down from 1500ms in OTA-261 after
+// playtest feedback — "feels like it's hanging just a bit, makes it
+// feel like the math is slowing the game"). Long enough to clearly
+// read the dice + adv/dis flag + total + verdict; short enough not
+// to register as a wait. Multi-step rolls (attack + damage) now
+// cumulate under 2s. Matches the OTA-257 hook-continue modal's hold
+// for a consistent feel across the codebase.
+const AUTO_RESOLVE_HOLD_MS = 800;
 
 interface Props {
   state: PendingRollState;

@@ -10790,4 +10790,18 @@ export const DISPLAY_VERSION = '3.0.0';
 //   Files: app/state/gameStore.ts (success branch of the dodge code
 //          in applyEnemyCounter + bare-handed branch + new
 //          isUnarmedStrike helper near parseIncomingDamageType).
-export const OTA_BUILD_ID = '2026-05-31-260';
+//
+// OTA-261 — Dice auto-resolve hold: 1500ms → 800ms (snappier feel).
+//   Player feedback after OTA-255 shipped: "the next roll and
+//   resolving are just a touch too long, it feels like it's hanging
+//   just a bit, it makes it feel like the math is slowing the game."
+//   1500ms was over-cautious — the dice values + bonus + total +
+//   verdict line are short and scannable, and the hold registered
+//   as a deliberate pause rather than a read window. 800ms is the
+//   same hold the OTA-257 hook-continue modal uses, so the feel is
+//   consistent across the codebase. Multi-step rolls (attack +
+//   damage) now cumulate under 2s. Single tuning constant
+//   (AUTO_RESOLVE_HOLD_MS in DiceRoller.tsx); easy to nudge again
+//   if it ever feels off.
+//   Files: app/components/DiceRoller.tsx (constant + comment).
+export const OTA_BUILD_ID = '2026-05-31-261';
