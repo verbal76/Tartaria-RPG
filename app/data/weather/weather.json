@@ -1,0 +1,92 @@
+[
+  {
+    "id": "etheric_storm",
+    "name": "Etheric Storm",
+    "description": "Blue and violet lightning crackles across the horizon, flashing through the sky in unnatural colors. Electronics fail. The air tastes like copper.",
+    "visibility": -3,
+    "travelPenalty": 4,
+    "corruptionChance": 3,
+    "tags": ["aetheric", "lightning", "tech_disruption"],
+    "source": "manual"
+  },
+  {
+    "id": "aether_lightning",
+    "name": "Aether Lightning",
+    "description": "Bolts of blue-purple energy strike without thunder. Each flash leaves an afterimage burned onto the eye.",
+    "visibility": -2,
+    "travelPenalty": 2,
+    "corruptionChance": 2,
+    "tags": ["aetheric", "lightning"],
+    "source": "manual"
+  },
+  {
+    "id": "ash_storm",
+    "name": "Ash Storm",
+    "description": "A wall of grey ash rolls across the plain. Breathing burns. Skin gathers a film of dead world.",
+    "visibility": -3,
+    "travelPenalty": 4,
+    "corruptionChance": 2,
+    "tags": ["ash", "respiratory"],
+    "source": "bible"
+  },
+  {
+    "id": "black_rain",
+    "name": "Black Rain",
+    "description": "Rain the color of old oil. It pools on Aetherstone and refuses to soak in.",
+    "visibility": -1,
+    "travelPenalty": 2,
+    "corruptionChance": 1,
+    "tags": ["rain", "tainted"],
+    "source": "bible"
+  },
+  {
+    "id": "iron_fog",
+    "name": "Iron Fog",
+    "description": "A dense rust-colored fog that smells of forge and old blood. Compasses spin.",
+    "visibility": -4,
+    "travelPenalty": 3,
+    "corruptionChance": 1,
+    "tags": ["fog", "magnetic"],
+    "source": "bible"
+  },
+  {
+    "id": "glass_hail",
+    "name": "Glass Hail",
+    "description": "Crystalline shards rain down like a windowpane shattering in slow motion. Aetherstone hums where they strike.",
+    "visibility": -2,
+    "travelPenalty": 3,
+    "corruptionChance": 0,
+    "tags": ["hail", "physical_damage"],
+    "source": "bible"
+  },
+  {
+    "id": "whisper_fog",
+    "name": "Whisper Fog",
+    "description": "A low-hanging mist that murmurs in old Tartarian. Step too far in and you forget which century you came from.",
+    "visibility": -3,
+    "travelPenalty": 2,
+    "corruptionChance": 3,
+    "tags": ["fog", "psychic", "memory_loss"],
+    "source": "bible"
+  },
+  {
+    "id": "silent_blizzard",
+    "name": "Silent Blizzard",
+    "description": "Snow that absorbs all sound. Your footsteps make no noise. Your screams make less.",
+    "visibility": -4,
+    "travelPenalty": 4,
+    "corruptionChance": 2,
+    "tags": ["cold", "silence", "psychic"],
+    "source": "bible"
+  },
+  {
+    "id": "calm",
+    "name": "Eerie Calm",
+    "description": "Not even wind. The kind of stillness that means something is watching.",
+    "visibility": 0,
+    "travelPenalty": 0,
+    "corruptionChance": 0,
+    "tags": ["calm", "ominous"],
+    "source": "bible"
+  }
+]

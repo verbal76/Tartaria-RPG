@@ -1,0 +1,703 @@
+{
+  "_description": "Wasteland encounters surfaced during long-distance cardinal travel. After every N steps within the same macro location, the engine rolls against this pool. Each archetype declares: matchers (biome / location tags it fires in), narration template ({biome}, {direction} substituted), optional loot drop with material kinds, optional NPC dialogue, optional follow-up hook the player can chase. Adding a new encounter type is a JSON edit, no engine code. Drives the 'walking is enjoyable' goal — player feedback: 'walking into the desert and finding an old bus with a note in it that tells you a direction to travel and to look for a rock... a body with a sad story and a small keepsake. Layer those up every 2 or 3 movements and you can make the world massive.'",
+
+  "fusion_crucible": {
+    "type": "fusion_bench",
+    "weight": 4,
+    "matchers": ["mud", "outskirts", "ruin", "buried", "etheric_anomaly", "aether", "tech", "surface"],
+    "narration": "A Reclaimer's Fusing Crucible rests half-buried in the silt — a pitted iron bowl ringed with three pedestals, the inner rim glassy with old Aether resonance. The pedestals are empty, but the metal still hums when you set your reserved items down beside it. The Arbiter murmurs: 'Fuse.'",
+    "lore_note": "Crucibles were how the old Reclaimers turned scavenged scraps into singular tools. Each was used once, then walked away from. This one waited for you."
+  },
+
+  "abandoned_caravan": {
+    "type": "treasure",
+    "weight": 12,
+    "matchers": ["mud", "outskirts", "open", "borderlands", "surface", "buried"],
+    "narration": "You crest a low rise and a Reclaimer caravan slumps in the silt — axle snapped, banner half-buried. Whoever drove it left in a hurry, or didn't leave at all.",
+    "loot": [
+      { "name": "Trail Rations", "weight": 40, "min": 1, "max": 2, "kind": "consumable", "tags": ["food"] },
+      { "name": "Scrap Metal", "weight": 30, "min": 1, "max": 3, "kind": "misc", "tags": ["metal"] },
+      { "name": "Patched Cloth", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["cloth"] },
+      { "name": "Worn Tartarian Coin", "weight": 10, "min": 1, "max": 3, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Smoke-Cured Jerky Strip", "weight": 12, "min": 1, "max": 2, "kind": "consumable", "tags": ["food","treat","dog_treat"] }
+    ],
+    "lore_note": "A note tucked under the bench reads: 'East three days, the Pillars. We didn't make it.'"
+  },
+
+  "frozen_traveller": {
+    "type": "treasure",
+    "weight": 8,
+    "matchers": ["mud", "outskirts", "ruin", "buried", "etheric_anomaly"],
+    "narration": "A body sits cross-legged in the silt, mud-glassed in place. The pose is patient. Whatever they were waiting for never arrived.",
+    "loot": [
+      { "name": "Worn Tartarian Coin", "weight": 25, "min": 2, "max": 5, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Aether Crystal", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Spider Silk", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["fiber"] },
+      { "name": "Aether Dust", "weight": 30, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","dust","distillable"] },
+      { "name": "Bone Fragment", "weight": 20, "min": 1, "max": 3, "kind": "misc", "tags": ["bone"] }
+    ],
+    "lore_note": "A locket on their chest holds a pre-flood photograph — a face you don't recognise, smiling at a sky that doesn't exist anymore."
+  },
+
+  "wandering_drifter": {
+    "type": "npc",
+    "weight": 14,
+    "matchers": ["mud", "outskirts", "open", "ruin", "borderlands"],
+    "narration": "A figure trudges toward you across the silt — staff, mud-cloak, eyes that have been further than yours.",
+    "npc_lines": [
+      "\"There's a buried gate two days east,\" the drifter says, not stopping. \"I wouldn't open it.\"",
+      "\"You're newer than the last one I passed. They didn't make it either.\"",
+      "\"The Aether's loud tonight. I'd rest if I were you.\"",
+      "\"Mud Monarchs running patrols north of here. Step careful or step around.\"",
+      "\"The flats remember every step. Walk like you mean it.\""
+    ],
+    "loot": [
+      { "name": "Trail Rations", "weight": 30, "min": 1, "max": 1, "kind": "consumable", "tags": ["food","gift"] }
+    ]
+  },
+
+  "scavenger_camp": {
+    "type": "npc",
+    "weight": 10,
+    "matchers": ["mud", "outskirts", "ruin"],
+    "narration": "Smoke first, then voices. Two scavengers crouched around a hooded brazier, sorting what looked like brass fittings and pre-flood wire.",
+    "npc_lines": [
+      "\"You want a fitting? Two coin. You want both? Three coin and don't look at the third pile.\"",
+      "\"Heard there's a body in a wagon south of here. We don't go south.\"",
+      "\"Aether's been thick all week. Anything mechanical is half-junk by morning.\""
+    ],
+    "loot": [
+      { "name": "Scrap Metal", "weight": 40, "min": 1, "max": 2, "kind": "misc", "tags": ["metal"] },
+      { "name": "Aether Residue", "weight": 30, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","distillable"] },
+      { "name": "Patched Cloth", "weight": 30, "min": 1, "max": 1, "kind": "misc", "tags": ["cloth"] },
+      { "name": "Smoke-Cured Jerky Strip", "weight": 10, "min": 1, "max": 1, "kind": "consumable", "tags": ["food","treat","dog_treat"] },
+      { "name": "Marrow Bone", "weight": 6, "min": 1, "max": 1, "kind": "consumable", "tags": ["food","treat","dog_treat"] }
+    ]
+  },
+
+  "skirmish_pack": {
+    "type": "skirmish",
+    "weight": 40,
+    "matchers": ["mud", "outskirts", "open", "ruin", "borderlands"],
+    "narration": "Movement low and fast — a {enemy} cuts across your path. You're closer than either of you wanted to be.",
+    "enemyPool": ["Gutter Rat", "Aetheric Slug", "Mud Lurker", "Aetherbat", "Bog Hound", "Mud Spider", "Silt Serpent", "Aetheric Worm", "Rust Lurker", "Scrap Drone"],
+    "loot": []
+  },
+
+  "fungal_patch": {
+    "type": "treasure",
+    "weight": 9,
+    "matchers": ["mud", "buried", "fungal", "ruin"],
+    "narration": "A patch of luminous fungus grows in a low pocket of mud. Three colours: pale blue at the centre, copper-orange at the rim, deep violet under the wettest spots.",
+    "loot": [
+      { "name": "Blue Aetheric Fungus", "weight": 35, "min": 1, "max": 3, "kind": "misc", "tags": ["fungus","blue","distillable"] },
+      { "name": "Orange Sporecap", "weight": 30, "min": 1, "max": 2, "kind": "misc", "tags": ["fungus","orange","distillable"] },
+      { "name": "Violet Mushroom", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["fungus","violet","distillable"] },
+      { "name": "Bioluminescent Fungus", "weight": 10, "min": 1, "max": 1, "kind": "misc", "tags": ["fungus","light","gear"] }
+    ],
+    "lore_note": "Halem the Trader pays for fungi by the colour. Blue for clarity. Orange for fire. Violet for the dreaming road."
+  },
+
+  "old_bus_with_note": {
+    "type": "mini_dungeon",
+    "weight": 5,
+    "matchers": ["mud", "outskirts", "open", "buried"],
+    "narration": "Pre-flood transport, gutted and tipped onto its side. The destination scroll above the driver's seat still reads 'OUTER LINE — DRAKOVA.' Inside, a duffel bag sits propped against the back wheel-well. A note pinned to the bag.",
+    "loot": [
+      { "name": "Trail Rations", "weight": 30, "min": 1, "max": 2, "kind": "consumable", "tags": ["food"] },
+      { "name": "Scrap Metal", "weight": 25, "min": 1, "max": 3, "kind": "misc", "tags": ["metal"] },
+      { "name": "Worn Tartarian Coin", "weight": 25, "min": 3, "max": 8, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Aether Crystal", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Honey-Glazed Knuckle", "weight": 6, "min": 1, "max": 1, "kind": "consumable", "tags": ["food","treat","dog_treat","baker"] }
+    ],
+    "lore_note": "Note reads: 'If you find this, keep walking east. Three days, look for the standing stone — the one with the chip on its crown. There's something buried at its base. I never made it back.'"
+  },
+
+  "still_with_alcohol": {
+    "type": "treasure",
+    "weight": 7,
+    "matchers": ["mud", "outskirts", "ruin", "buried"],
+    "narration": "A makeshift still — copper coil, clay vessel, charred wood. Whoever ran it abandoned the rig but left two sealed jugs in the shade.",
+    "loot": [
+      { "name": "Reclaimer's Mud-Beer", "weight": 40, "min": 1, "max": 2, "kind": "consumable", "tags": ["alcohol","drink"] },
+      { "name": "Aether-Distilled Spirit", "weight": 25, "min": 1, "max": 1, "kind": "consumable", "tags": ["alcohol","aether","drink"] },
+      { "name": "Scrap Metal", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["metal","copper"] },
+      { "name": "Aether Dust", "weight": 10, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","dust","distillable"] }
+    ],
+    "lore_note": "A tin cup hangs from a nail. The owner's name is scratched into the bottom: 'YORK — DON'T DRINK THE VIOLET.'"
+  },
+
+  "etheric_storm_debris": {
+    "type": "treasure",
+    "weight": 6,
+    "matchers": ["etheric_anomaly", "open", "mud"],
+    "narration": "An Aetheric storm passed through here recently. The ground is scattered with small fused chunks of mud-glass and the still-warm remains of something pre-flood that the storm pulled out of the earth.",
+    "loot": [
+      { "name": "Aether Crystal", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Aetheric Shard", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","shard"] },
+      { "name": "Mud Fragment", "weight": 30, "min": 1, "max": 3, "kind": "misc", "tags": ["mud","glass"] },
+      { "name": "Aether Dust", "weight": 20, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","dust","distillable"] }
+    ]
+  },
+
+  "sunken_chapel": {
+    "type": "mini_dungeon",
+    "weight": 4,
+    "matchers": ["mud", "buried", "ruin"],
+    "narration": "A church steeple breaks the mud at a sideways angle — the rest of the building swallowed whole. The steeple's broken door yawns open and lets you down into what used to be the choir balcony. Inside the air is dry, dimmer than outside, and the pews below the mudline are still arranged for a service that never ended. A pre-flood reliquary lies overturned on the altar. You pick through what the flood spared.",
+    "loot": [
+      { "name": "Aetheric Locket", "weight": 30, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] },
+      { "name": "Worn Tartarian Coin", "weight": 35, "min": 4, "max": 10, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "First Aid Kit", "weight": 20, "min": 1, "max": 1, "kind": "consumable", "tags": ["medical"] },
+      { "name": "Aether Crystal", "weight": 15, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] }
+    ],
+    "lore_note": "A burned ledger names every Tartarian who took shelter here when the flood came. The last entry is in a child's handwriting: 'we are still inside. someone knock on the steeple if you find us.'"
+  },
+
+  "bandit_cave": {
+    "type": "mini_dungeon",
+    "weight": 5,
+    "matchers": ["mud", "outskirts", "open", "ruin", "borderlands"],
+    "narration": "A natural cave mouth, low, half-curtained by a tarp pulled aside. Inside: a cold cookfire, three bedrolls, a strongbox kicked open in haste. Someone left in a hurry — but someone else is on their way back, and you can hear footsteps in the throat of the cave behind you.",
+    "loot": [
+      { "name": "Throwing Knife", "weight": 30, "min": 2, "max": 4, "kind": "misc", "tags": ["weapon","throwable"] },
+      { "name": "Worn Tartarian Coin", "weight": 30, "min": 6, "max": 14, "kind": "misc", "tags": ["currency"] },
+      { "name": "Rusted Blade", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["weapon","melee"] },
+      { "name": "Trail Rations", "weight": 15, "min": 1, "max": 3, "kind": "consumable", "tags": ["food"] }
+    ],
+    "bandit_pool": ["Reclaimer Ambusher", "Mud Monarch"],
+    "lore_note": "Scratched on the cave wall: a tally of marks in three colours. Whatever they were counting, the count was high."
+  },
+
+  "drowned_bunker": {
+    "type": "mini_dungeon",
+    "weight": 3,
+    "matchers": ["mud", "buried", "open"],
+    "narration": "A blast door, half-buried, the steel still warm to the touch even in the cold. It opens with effort. Inside: a sealed pre-flood bunker. Emergency lights still throb on a slow pulse. Cots, sealed crates, a wall map with cities still labeled by their original names. Whoever lived down here did not run out of supplies. They ran out of reasons.",
+    "loot": [
+      { "name": "First Aid Kit", "weight": 30, "min": 1, "max": 2, "kind": "consumable", "tags": ["medical"] },
+      { "name": "Aetheric Compass", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["relic","navigation"] },
+      { "name": "Trail Rations", "weight": 25, "min": 2, "max": 4, "kind": "consumable", "tags": ["food"] },
+      { "name": "Climbing Rope", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["tool"] },
+      { "name": "Aether Crystal", "weight": 10, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] }
+    ],
+    "lore_note": "On the central desk: a logbook in three different hands. The final entry, written calmly: 'The Compass keeps pointing at the Cradle. None of us have argued with it for weeks. Tomorrow we walk.' The compass on the desk is the one in your pack now.",
+    "quest_hook": { "kind": "mystery", "id": "mystery_cradle_compass" }
+  },
+
+  "monarch_cache": {
+    "type": "mini_dungeon",
+    "weight": 3,
+    "matchers": ["mud", "outskirts", "ruin", "borderlands"],
+    "narration": "A grey stone, no carving, no name. You almost walk past it. The mud at its base has been disturbed recently in a pattern too regular for weather. Underneath: a flat tin box. Inside the box: a coded note, a small purse, an obsidian token cut to the shape of an open eye. You have just walked into one end of a Mud Monarch dead-drop.",
+    "loot": [
+      { "name": "Worn Tartarian Coin", "weight": 35, "min": 10, "max": 20, "kind": "misc", "tags": ["currency"] },
+      { "name": "Aether Crystal", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Aetheric Shard", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","shard"] },
+      { "name": "Obsidian Eye Token", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["faction","mud_monarchs","token"] }
+    ],
+    "bandit_pool": ["Mud Monarch"],
+    "lore_note": "The coded note is short. The plaintext underneath is just a name and a road. The road is one you've been on."
+  },
+
+  "drowned_library": {
+    "type": "mini_dungeon",
+    "weight": 2,
+    "matchers": ["mud", "buried", "ruin"],
+    "narration": "A reading room — small, panelled in waterlogged wood, the shelves bowing under the weight of books the mud forgot to destroy. A single oil lantern, dry, still has fuel. You touch a book on the nearest shelf and the binding holds. The titles are in old Tartarian; the most recent stamp on every cover is older than every kingdom on every honest map.",
+    "loot": [
+      { "name": "Aether Crystal", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Worn Tartarian Coin", "weight": 25, "min": 6, "max": 12, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Aetheric Locket", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] },
+      { "name": "Aetheric Compass", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["relic","navigation"] },
+      { "name": "Aether Dust", "weight": 15, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","dust","distillable"] }
+    ],
+    "lore_note": "A single book is laid open on the reading desk. The marginalia, in two different hands, runs the length of the page. The conclusion both hands reach is: the Red Tower's Core is not what we were taught. Someone went there to confirm it. They never came back.",
+    "quest_hook": { "kind": "mystery", "id": "mystery_red_tower" }
+  },
+
+  "buried_caravan": {
+    "type": "mini_dungeon",
+    "weight": 4,
+    "matchers": ["mud", "outskirts", "open"],
+    "narration": "A line of three wagons, their axles buried, their canvas tops cracked open by the mud. The horses are gone — pulled free in a panic or eaten in one. The wagons themselves are intact. Whoever drove them packed for a long trip and made it nowhere.",
+    "loot": [
+      { "name": "Trail Rations", "weight": 30, "min": 2, "max": 5, "kind": "consumable", "tags": ["food"] },
+      { "name": "Worn Tartarian Coin", "weight": 25, "min": 5, "max": 12, "kind": "misc", "tags": ["currency"] },
+      { "name": "Climbing Rope", "weight": 20, "min": 1, "max": 2, "kind": "misc", "tags": ["tool"] },
+      { "name": "Aetheric Torch", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["tool","aether"] },
+      { "name": "Aether Crystal", "weight": 10, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","crystal"] }
+    ],
+    "lore_note": "Pinned inside the lead wagon, a hand-drawn map. The destination is circled in red ink: Old Drakova. In the margin, in a different hand: 'the dragon is real. they were not exaggerating. turn back.'",
+    "quest_hook": { "kind": "hunt", "id": "hunt_bog_dragon" }
+  },
+
+  "_v2_description": "Mini-dungeon + encounter batch 2 — authored from the lore-book content drop. Mechanics-heavy beats translated to narrative-only (no skill-check minigames yet); custom enemies remapped to the existing catalog. Quest hooks distributed across the unclaimed hunts and mysteries.",
+
+  "disturbed_rest": {
+    "type": "npc",
+    "weight": 5,
+    "matchers": ["mud", "buried", "ruin"],
+    "narration": "Your boot sinks past the silt into something softer. The Aetherstone underneath cracks with a tone that does not belong to stone. A figure rises out of the mud at your feet — outline of a person, edges of light, eyes that have not closed for a long time. An Aetherkin. Torn from a sleep you did not mean to disturb.",
+    "npc_lines": [
+      "The Aetherkin's voice arrives without sound. 'I was at rest. I was at rest. I was at rest.'",
+      "The Aetherkin turns its head a quarter inch and you feel it across your sternum. 'Why,' it asks. The question is not for you specifically.",
+      "The Aetherkin stares at the place its body would have been. 'The mud agreed with me,' it says. 'Until you.'"
+    ],
+    "lore_note": "When you back away, the Aetherkin sinks back into the silt without resistance. The mud closes over it the way water closes over a thrown stone. The pulse it leaves behind in the ground takes a slow minute to fade."
+  },
+
+  "black_cloak_tail": {
+    "type": "skirmish",
+    "weight": 5,
+    "matchers": ["outskirts", "ruin", "borderlands"],
+    "narration": "You catch the same grey cloak in the corner of your eye for the third time today. The figure does not pretend not to be following. They want you to know they are there. When they finally close the distance their hand is already inside their coat. A Mud Monarch agent — Black Cloak division, the kind that does not arrest people because the Monarchs do not arrest people.",
+    "enemyPool": ["Mud Monarch"],
+    "loot": []
+  },
+
+  "etheric_storm_surge": {
+    "type": "treasure",
+    "weight": 4,
+    "matchers": ["etheric_anomaly", "open", "mud"],
+    "narration": "The sky tightens. Violet thread above, blue thread below, both pulled taut by a hand you cannot see. An Aether-storm cell, small but dense, has crystallised right on top of you. For one long minute you taste an hour of your own life out of sequence — a morning that has not arrived, a meal you have not eaten — and when the storm releases you the ground at your feet is scattered with what it forgot to keep.",
+    "loot": [
+      { "name": "Aether Crystal", "weight": 30, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Aetheric Shard", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","shard"] },
+      { "name": "Aether Dust", "weight": 25, "min": 1, "max": 4, "kind": "misc", "tags": ["aether","dust","distillable"] },
+      { "name": "Tartarian Map Fragment", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["ancient","map","fragment"] }
+    ],
+    "lore_note": "The map fragment is in old Tartarian and shows a stretch of coastline that does not exist on any current map. The cartographer's mark in the corner is a single Aetheric eye, open."
+  },
+
+  "failing_automaton": {
+    "type": "skirmish",
+    "weight": 4,
+    "matchers": ["ruin", "buried", "etheric_anomaly"],
+    "narration": "A pre-flood Scrap Drone runs the same thirty-second patrol it was running the day the mud arrived. Six steps forward, scan, turn, six steps back, scan, turn. It has not been relieved. When its scanner cone passes over you it stutters — recognises a citizen-class signature that should not be here, then forgets it, then notices you again. The next pass it will not forget.",
+    "enemyPool": ["Scrap Drone"],
+    "loot": []
+  },
+
+  "aetherborn_awakening": {
+    "type": "npc",
+    "weight": 4,
+    "matchers": ["outskirts", "open", "etheric_anomaly"],
+    "narration": "A young Reclaimer kneels at the edge of the road, hands cupped around something that is not in their hands. Their breath comes in counted intervals — they are trying not to be a problem. Around them the air is striped with thin sparks that connect nothing to nothing. Latent Power, breaking through. The Eternal Dynasty would call this a recruitment. The Mud Monarchs would call it a problem to be erased.",
+    "npc_lines": [
+      "The Reclaimer does not look up. 'Don't touch me. I don't know what happens if you touch me. I don't know what happens if I touch me.'",
+      "The Reclaimer's mouth moves out of sync with their voice. 'It's like a name I almost remember. It hurts to almost remember.'",
+      "The Reclaimer steadies. 'If you see anyone in grey, do not point them this way. Please.'"
+    ],
+    "lore_note": "By the time you have decided whether to help, the sparks have closed back into the Reclaimer's chest and left them shaking. They will be different by morning. They do not yet know in what direction."
+  },
+
+  "reclaimers_gamble": {
+    "type": "npc",
+    "weight": 5,
+    "matchers": ["outskirts", "open", "borderlands", "ruin"],
+    "narration": "A Reclaimer waves you down from a folding stool. Their wares are spread on a square of oilcloth — three lenses, a coil of copper wire, a small object wrapped in red silk. They unwrap the silk slowly. 'Whispering Vault Key,' they say. 'Pre-flood. Real one. I'll take eighty TC. You'll thank me at the first vault.' The thing in the silk is a cracked Ether Lens with the engraving filed off.",
+    "npc_lines": [
+      "'You drive a hard bargain. Sixty TC. I will weep. I will eat dust. I will be honest.'",
+      "'Fine. Fifty. But you are robbing me. Tell my mother — if you find her — that I died honest.'",
+      "'If you do not buy this, the next walker will. The vault waits for no one.'"
+    ],
+    "lore_note": "If you walk away the Reclaimer is gone in two minutes. The stool, the oilcloth, the lenses, the lie. All of it, as if it had been a story you almost remembered telling someone else."
+  },
+
+  "mud_boar_stampede": {
+    "type": "skirmish",
+    "weight": 7,
+    "matchers": ["mud", "outskirts", "open"],
+    "narration": "The ground rolls before you hear them. A herd of Mud Boars breaks the rise at full panic — something behind them, probably an Aether-storm cell, has driven them past the threshold a Boar usually keeps. They do not see you. They do not need to.",
+    "enemyPool": ["Mud Boar"],
+    "loot": []
+  },
+
+  "ghostly_asgardar": {
+    "type": "treasure",
+    "weight": 3,
+    "matchers": ["mud", "open", "buried"],
+    "narration": "The plain in front of you folds, very slightly, the way fabric folds when something is laid on it from the other side. For a long blink the city of Asgardar stands in front of you — the capital at its height, lanterns burning at every level of every tower, traffic in the streets, breath in the air. You step forward; the fold lets go. The city is not there. What it left at your feet is real.",
+    "loot": [
+      { "name": "Worn Tartarian Coin", "weight": 35, "min": 8, "max": 15, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Aetheric Locket", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] },
+      { "name": "Aether Crystal", "weight": 20, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Aetheric Shard", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","shard"] }
+    ],
+    "lore_note": "The locket is warm and engraved on the back with a name in old Tartarian. You will not know what it says, but you will not be able to forget that you cannot read it."
+  },
+
+  "aetherkin_mourner": {
+    "type": "npc",
+    "weight": 4,
+    "matchers": ["buried", "ruin", "mud"],
+    "narration": "An Aetherkin stands with its back to you, very still, facing a section of buried wall where the silhouettes of the Entombed are pressed into the Aetherstone like coins into wax. Twelve of them. Maybe fourteen. The Aetherkin does not turn when you approach. The pressure in the air says it is aware of you and does not yet care.",
+    "npc_lines": [
+      "The Aetherkin speaks without turning. 'This one. This one. This one. This one. This one.' It is naming the silhouettes. It does not skip any.",
+      "The Aetherkin's voice fits between the breaths you would take. 'Leave them their coin. The mud takes payment in patience.'",
+      "The Aetherkin tilts its head a quarter inch and the air pulls toward it. 'You will not need what is in their pockets. They needed it more.'"
+    ],
+    "lore_note": "If you pass by without disturbing the Entombed the Aetherkin lets you go. If you reach for a coin, you will not reach it twice."
+  },
+
+  "scrap_drone_swarm": {
+    "type": "skirmish",
+    "weight": 6,
+    "matchers": ["ruin", "outskirts", "buried"],
+    "narration": "A bridge of fused mud-glass, and at the centre of it a small cache: three sealed crates, an old uniform folded on top. The instant your foot lands on the bridge, four drill-armed Scrap Drones unspool from the rust-shadow at the underside of the arch. They are not negotiating. The crates are theirs now and have been theirs for a long time.",
+    "enemyPool": ["Scrap Drone"],
+    "loot": []
+  },
+
+  "obsidian_observatory": {
+    "type": "mini_dungeon",
+    "weight": 3,
+    "matchers": ["etheric_anomaly", "open", "ruin"],
+    "narration": "A small low door at the base of one of the Obsidian Pillars, polished smooth by centuries of magnetic wind. Inside, the observatory's main chamber: a great brass armillary the size of a wagon, still turning slowly under its own weight, charting skies that no longer exist as charted. The air bends compass needles and turns pocket watches into ornaments. A pre-flood Sentinel-class drone still patrols the inner ring, its servos starved but functional.",
+    "loot": [
+      { "name": "Aetheric Compass", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["relic","navigation"] },
+      { "name": "Aether Crystal", "weight": 25, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Obsidian Shard", "weight": 25, "min": 2, "max": 4, "kind": "misc", "tags": ["obsidian","crystal"] },
+      { "name": "Automaton Circuit", "weight": 15, "min": 1, "max": 2, "kind": "misc", "tags": ["automaton","circuit","tech"] },
+      { "name": "Worn Tartarian Coin", "weight": 10, "min": 4, "max": 10, "kind": "misc", "tags": ["currency","ancient"] }
+    ],
+    "bandit_pool": ["Scrap Drone"],
+    "lore_note": "A logbook on the central desk records, in careful hand: 'Day 1,847 since the surface stopped answering. The sky charts still match. We have stopped checking.'",
+    "quest_hook": { "kind": "mystery", "id": "mystery_obsidian_orb" }
+  },
+
+  "thametan_engine_room": {
+    "type": "mini_dungeon",
+    "weight": 3,
+    "matchers": ["ruin", "buried", "etheric_anomaly"],
+    "narration": "A side chamber off Thametan's Tower, accessible only because the mud broke a wall it should not have broken. The Etheric Engine itself is two floors above; this is one of the auxiliary chambers, where the Engine's overflow used to be bled into reservoir tanks. The tanks are still here. So is the overflow. A patch of intelligent Aetheric Ooze patrols the chamber the way a guard would, in patterns that suggest someone trained it to.",
+    "loot": [
+      { "name": "Aether Crystal", "weight": 25, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Aetheric Shard", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","shard"] },
+      { "name": "Rune Engraving Kit", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["tool","rune","crafting"] },
+      { "name": "Aether Dust", "weight": 20, "min": 2, "max": 5, "kind": "misc", "tags": ["aether","dust","distillable"] },
+      { "name": "Aetheric Locket", "weight": 10, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] }
+    ],
+    "bandit_pool": ["Aetheric Ooze"],
+    "lore_note": "On the wall, scratched in a hand made unsteady by too much Aether: 'the Engine is awake. it has always been awake. we were the ones asleep.'"
+  },
+
+  "zharaks_grotto": {
+    "type": "mini_dungeon",
+    "weight": 3,
+    "matchers": ["mud", "buried", "ruin"],
+    "narration": "A spur of one of Zharak's Teeth bends low enough to enter at the waterline. Inside: a grotto carved by mud and patience. A True Tartarian shrine occupies the back wall — three standing stones, an iron bowl, an offering of coins that no living hand has touched in centuries. Silt Serpents nest in the warm hollows under the shrine. They do not share.",
+    "loot": [
+      { "name": "Worn Tartarian Coin", "weight": 35, "min": 10, "max": 20, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Aetheric Locket", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] },
+      { "name": "Aether Crystal", "weight": 20, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Mud Fragment", "weight": 20, "min": 2, "max": 4, "kind": "misc", "tags": ["mud","glass"] }
+    ],
+    "bandit_pool": ["Silt Serpent"],
+    "lore_note": "An offering tablet in the iron bowl, in old Tartarian: 'For the Siren-Queen of the Teeth. Sing softly. We are listening.' The script is fresh. The iron is not.",
+    "quest_hook": { "kind": "hunt", "id": "hunt_mud_siren_queen" }
+  },
+
+  "varakush_vault": {
+    "type": "mini_dungeon",
+    "weight": 2,
+    "matchers": ["buried", "ruin"],
+    "narration": "A side door from one of the lesser-used Varakush corridors, sealed by the Forgotten Order behind a knot of rune-glass the Order's apprentices use as a final exam. The knot loosens for a careful hand. Inside: a training vault, a row of practice runecasters, a wall of tools meant for a class that will not be taught again. The Order has not catalogued this room in a long time. They will not catalogue it tomorrow either.",
+    "loot": [
+      { "name": "Rune Engraving Kit", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["tool","rune","crafting"] },
+      { "name": "Aetheric Shard", "weight": 25, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","shard"] },
+      { "name": "First Aid Kit", "weight": 20, "min": 1, "max": 2, "kind": "consumable", "tags": ["medical"] },
+      { "name": "Aetheric Torch", "weight": 15, "min": 1, "max": 2, "kind": "misc", "tags": ["tool","aether"] },
+      { "name": "Aether Crystal", "weight": 15, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","crystal"] }
+    ],
+    "lore_note": "An exam paper still pinned to the practice rack, in a young Tartarian's hand: 'Question 7 — Define the failure mode of an unmoored Aether reservoir. Show your work.' The answer underneath is one word: 'mud.'"
+  },
+
+  "cradle_shipwreck": {
+    "type": "mini_dungeon",
+    "weight": 3,
+    "matchers": ["etheric_anomaly", "mud", "open"],
+    "narration": "A graveyard of pre-flood ships, their hulls petrified mid-storm, their crews still standing on deck where the Aether took them. The sky overhead is bruised in the Cradle's colours — old purple, older blue. You climb the lowest deck. The cargo holds are intact. The crew, frozen mid-gesture, do not seem to mind. One of the lockboxes in the captain's quarters is half-open. Something inside is humming.",
+    "loot": [
+      { "name": "Aether Crystal", "weight": 25, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Void Ether Shard", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","shard","void"] },
+      { "name": "Aetheric Compass", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["relic","navigation"] },
+      { "name": "Worn Tartarian Coin", "weight": 20, "min": 10, "max": 20, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Aether Dust", "weight": 10, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","dust","distillable"] }
+    ],
+    "bandit_pool": ["Aetheric Slug"],
+    "lore_note": "The captain's log is open to the last entry. A single sentence: 'It is not a storm. It is a hand.'",
+    "quest_hook": { "kind": "mystery", "id": "mystery_leviathan_eye" }
+  },
+
+  "_v3_description": "Batch 3 — finishing off the lore-book wishlist (Aetherforge, Drakova plaza, Giant's vault, Endless Stair landing, Red Tower basement) plus original Tartaria-grounded fills. Distributes the remaining four unused quest hooks across the new dungeons.",
+
+  "forgotten_aetherforge": {
+    "type": "mini_dungeon",
+    "weight": 3,
+    "matchers": ["mud", "buried", "open", "ruin"],
+    "narration": "A crack in the plain you would have walked past — except the air coming out of it smells of hot iron and not mud. You climb down. Below: a pre-flood Forgotten Order workshop, the forge bed still warm, the anvil cold but unmarked. Half-finished runecasters lie in a neat row on the workbench. Whoever was here heard the flood coming and went up the ladder.",
+    "loot": [
+      { "name": "Rune Engraving Kit", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["tool","rune","crafting"] },
+      { "name": "Aether Crystal", "weight": 25, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Aether Dust", "weight": 25, "min": 2, "max": 5, "kind": "misc", "tags": ["aether","dust","distillable"] },
+      { "name": "Aetheric Shard", "weight": 15, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","shard"] },
+      { "name": "Rusted Blade", "weight": 10, "min": 1, "max": 1, "kind": "misc", "tags": ["weapon","melee"] }
+    ],
+    "bandit_pool": ["Mud Lurker"],
+    "lore_note": "A draft on the bench, in a careful Order hand: 'Wrath of Titans — for the Iron one in the Sentinel Ward. Do not finish without the third rune.' The third rune is not engraved.",
+    "quest_hook": { "kind": "hunt", "id": "hunt_iron_titan" }
+  },
+
+  "drakova_ghostly_plaza": {
+    "type": "mini_dungeon",
+    "weight": 2,
+    "matchers": ["buried", "ruin", "etheric_anomaly"],
+    "narration": "The seal over Drakova thins here. You walk into a Lost Capital plaza the mud has not been allowed to enter. The crowd that was crossing it the day the flood came is still crossing — gestures held mid-stride, a cart in the act of turning, a child paused on the lip of a fountain. They are not aware of you. The air around them does not move.",
+    "loot": [
+      { "name": "Worn Tartarian Coin", "weight": 30, "min": 12, "max": 22, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Aetheric Locket", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] },
+      { "name": "Aether Crystal", "weight": 20, "min": 2, "max": 3, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Aetheric Compass", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["relic","navigation"] },
+      { "name": "Tartarian Map Fragment", "weight": 10, "min": 1, "max": 1, "kind": "misc", "tags": ["ancient","map","fragment"] }
+    ],
+    "bandit_pool": ["Aetheric Ooze"],
+    "lore_note": "A pocket watch in the gutter, the second hand still ticking. The face reads the hour the flood came. Each tick advances the second hand by a second, but the hour does not change.",
+    "quest_hook": { "kind": "mystery", "id": "mystery_temporal_watch" }
+  },
+
+  "giant_vault_door": {
+    "type": "mini_dungeon",
+    "weight": 2,
+    "matchers": ["buried", "ruin", "open"],
+    "narration": "A vault door the size of a small house, set into a hillside that is not a hillside. The stone is unweathered. The lock has no keyhole. Around the perimeter, the bones of expeditions that knocked and were not let in. A pre-flood Sentinel-class drone, half-buried, scans the area in slow sweeps. It has not been ordered to stand down.",
+    "loot": [
+      { "name": "Aether Crystal", "weight": 25, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Aetheric Shard", "weight": 25, "min": 2, "max": 3, "kind": "misc", "tags": ["aether","shard"] },
+      { "name": "Automaton Circuit", "weight": 20, "min": 1, "max": 2, "kind": "misc", "tags": ["automaton","circuit","tech"] },
+      { "name": "Worn Tartarian Coin", "weight": 15, "min": 10, "max": 18, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Architect's Key Fragment", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["key","architect","fragment","rare"] }
+    ],
+    "bandit_pool": ["Scrap Drone"],
+    "lore_note": "A name carved into the stone at the base of the door, recently and by hand: 'I will come back with the key. — M.' The carving is not finished.",
+    "quest_hook": { "kind": "hunt", "id": "hunt_mud_titan" }
+  },
+
+  "endless_stair_landing": {
+    "type": "mini_dungeon",
+    "weight": 2,
+    "matchers": ["buried", "ruin", "mud"],
+    "narration": "A landing on the Endless Stair, the kind they used to put a guard post on. The stair below this point is mud-locked — a wall of solidified silt, dense as iron. The landing itself is dry. Sealed crates line the back wall, stamped with a date older than every kingdom on every honest map. Something coils in the dark between you and the crates.",
+    "loot": [
+      { "name": "Aether-Breath Mask", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["mask","aether","tool"] },
+      { "name": "Aetheric Torch", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["tool","aether"] },
+      { "name": "Climbing Rope", "weight": 20, "min": 1, "max": 2, "kind": "misc", "tags": ["tool"] },
+      { "name": "Trail Rations", "weight": 15, "min": 2, "max": 4, "kind": "consumable", "tags": ["food"] },
+      { "name": "Aether Crystal", "weight": 15, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","crystal"] }
+    ],
+    "bandit_pool": ["Silt Serpent"],
+    "lore_note": "Pinned to the inside of the largest crate, a survey order: 'Descend to the next dry landing. Map. Return. Do not break the seal at the bottom.' The order is countersigned by the Reclaimers Guild and dated three hundred years ago."
+  },
+
+  "red_tower_basement": {
+    "type": "mini_dungeon",
+    "weight": 3,
+    "matchers": ["buried", "ruin", "etheric_anomaly"],
+    "narration": "A service door at the base of the Red Tower, the kind that does not appear on any of the published floor plans. It opens. Inside: a stairwell descending into red light that has weight. You go down a flight and stop counting. The walls hum at the same frequency as the Tower's Core, but quieter, the way a child hums a song they overheard.",
+    "loot": [
+      { "name": "Aether Crystal", "weight": 25, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Aetheric Shard", "weight": 25, "min": 2, "max": 3, "kind": "misc", "tags": ["aether","shard"] },
+      { "name": "Aetheric Locket", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] },
+      { "name": "Aether Dust", "weight": 15, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","dust","distillable"] },
+      { "name": "Crimson Core Fragment", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["core","aether","red_tower","rare"] }
+    ],
+    "bandit_pool": ["Mud Spider"],
+    "lore_note": "On a service desk near the bottom, a notebook of Order observations of the Core. The last entry, written in the same hand but more loosely: 'It is not powering the Tower. The Tower is what stops it. We were the wrong builders.'"
+  },
+
+  "nimari_cathedral_crypt": {
+    "type": "mini_dungeon",
+    "weight": 3,
+    "matchers": ["mud", "buried", "ruin"],
+    "narration": "Below the Nimari cathedral steeple, the crypt level still holds. You drop through a broken floor pane and land on a stone walkway that the mud has not yet reached. Sarcophagi line both walls. One at the far end is open, the lid leaned against the wall as if whoever was inside walked out. The air smells of old incense and warm copper.",
+    "loot": [
+      { "name": "Aetheric Locket", "weight": 25, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] },
+      { "name": "Worn Tartarian Coin", "weight": 30, "min": 8, "max": 16, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Phoenix Feather Quill", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["relic","quill","rare"] },
+      { "name": "Aether Crystal", "weight": 15, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "First Aid Kit", "weight": 10, "min": 1, "max": 1, "kind": "consumable", "tags": ["medical"] }
+    ],
+    "bandit_pool": ["Aetheric Leech"],
+    "lore_note": "The empty sarcophagus has fresh scratch marks on the inside of the lid. They were made very recently, in a hand that did not get to finish what it was writing."
+  },
+
+  "postal_waystation": {
+    "type": "mini_dungeon",
+    "weight": 4,
+    "matchers": ["outskirts", "open", "ruin"],
+    "narration": "A pre-flood postal way-station, the kind the Empire put at every crossroads to receive letters and rotate couriers. The hitching posts are still here. So are the letters — five canvas sacks of undelivered mail, sealed and stacked behind the counter the day the flood came. The seals are still intact. The names on the envelopes are still legible.",
+    "loot": [
+      { "name": "Worn Tartarian Coin", "weight": 35, "min": 6, "max": 12, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Trail Rations", "weight": 20, "min": 1, "max": 3, "kind": "consumable", "tags": ["food"] },
+      { "name": "Tartarian Map Fragment", "weight": 20, "min": 1, "max": 1, "kind": "misc", "tags": ["ancient","map","fragment"] },
+      { "name": "Aether Dust", "weight": 15, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","dust","distillable"] },
+      { "name": "Sealed Tartarian Letter", "weight": 10, "min": 1, "max": 2, "kind": "misc", "tags": ["letter","ancient","story"] }
+    ],
+    "lore_note": "One letter on top of the pile is addressed to a name you have heard on a quest poster: a Reclaimer who is alive today, more or less. The seal is one you do not recognise. You can deliver it. You can keep it. You can leave it."
+  },
+
+  "fallen_sentinel_husk": {
+    "type": "mini_dungeon",
+    "weight": 4,
+    "matchers": ["ruin", "outskirts", "buried"],
+    "narration": "An Architectural Sentinel, eight feet tall, brass-and-iron, lying on its back in the silt with its chest plating half-open. Something inside it is still ticking. The ground around it is cratered — it did not fall, it landed. Pre-flood civic markings on its shoulder say it was assigned to defend a city that nobody remembers having had a name.",
+    "loot": [
+      { "name": "Automaton Circuit", "weight": 30, "min": 2, "max": 4, "kind": "misc", "tags": ["automaton","circuit","tech"] },
+      { "name": "Aether Crystal", "weight": 25, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Scrap Metal", "weight": 20, "min": 3, "max": 6, "kind": "misc", "tags": ["metal"] },
+      { "name": "Aetheric Shard", "weight": 15, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","shard"] },
+      { "name": "Sentinel Core Plate", "weight": 10, "min": 1, "max": 1, "kind": "misc", "tags": ["automaton","plate","rare"] }
+    ],
+    "lore_note": "Engraved on the inside of the chest plate, in the original Tartarian: 'If you find me intact, I will defend you. If you find me broken, I am sorry. I served as long as I could.'"
+  },
+
+  "reclaimer_excavation_pit": {
+    "type": "mini_dungeon",
+    "weight": 4,
+    "matchers": ["mud", "outskirts", "open", "buried"],
+    "narration": "A Reclaimer dig site, abandoned mid-excavation. The shoring is still up. The ladder still works. A cot at the rim has a half-eaten meal on it. The hole goes down twenty feet and ends in a stone floor that was not supposed to be there. The Reclaimers found something. They did not come back up to write the report.",
+    "loot": [
+      { "name": "Climbing Rope", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["tool"] },
+      { "name": "Aetheric Torch", "weight": 20, "min": 1, "max": 2, "kind": "misc", "tags": ["tool","aether"] },
+      { "name": "Trail Rations", "weight": 20, "min": 2, "max": 4, "kind": "consumable", "tags": ["food"] },
+      { "name": "Aether Crystal", "weight": 20, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Reclaimer Survey Journal", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["journal","story","reclaimers"] }
+    ],
+    "lore_note": "The last journal entry, in a Reclaimer's careful hand: 'The stone is warm. The stone is breathing. We are going back down. If we do not return, please tell the Guild that we found it, and that it is awake.'"
+  },
+
+  "tartarian_mausoleum": {
+    "type": "mini_dungeon",
+    "weight": 3,
+    "matchers": ["buried", "ruin", "mud"],
+    "narration": "A noble's mausoleum, sealed before the flood and intact under the silt. The seal yields to a careful hand. Inside: a single sarcophagus, draped, the cloth still bright. Offerings around the base — a cup, a folded letter, a child's wooden horse. Whoever was loved in here was loved by people who had time to plan the leaving.",
+    "loot": [
+      { "name": "Aetheric Locket", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["amulet","relic"] },
+      { "name": "Worn Tartarian Coin", "weight": 30, "min": 12, "max": 20, "kind": "misc", "tags": ["currency","ancient"] },
+      { "name": "Phoenix Feather Quill", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["relic","quill","rare"] },
+      { "name": "Aether Crystal", "weight": 15, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Noble's Signet Ring", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["ring","relic","tartarian"] }
+    ],
+    "bandit_pool": ["Mud Spider"],
+    "lore_note": "The folded letter is in three hands — three generations writing to the same noble, decades apart. The last hand is the youngest. It ends: 'We finally found you. We will be back when the sky lets us walk.'",
+    "quest_hook": { "kind": "hunt", "id": "hunt_sludge_behemoth" }
+  },
+
+  "cursed_relic_trade": {
+    "type": "npc",
+    "weight": 4,
+    "matchers": ["outskirts", "open", "borderlands", "ruin"],
+    "narration": "A vendor in a dust-yellow coat sits on a folding chair, a velvet cloth across his knees. On the cloth: a single feather, gold at the spine, deeper gold at the edge. 'Aetheric Phoenix Feather,' he says when he sees you looking. 'Family heirloom. Forty TC and it's yours. I'll be honest with you — I need to eat tonight.' The feather hums. Faintly. In a tone you do not quite trust.",
+    "npc_lines": [
+      "'You smell the wrongness on it? Of course you do. That's how you know it's real. Real things have edges.'",
+      "'I won't insult you with stories. I will tell you the price came down because of how I came by it. Thirty TC. Final.'",
+      "'You walk away, the next walker pays full. The feather does not care which of you it goes home with.'"
+    ],
+    "lore_note": "If you buy the feather, your gear will start showing wear faster than the road accounts for. A Forgotten Order scholar in the next town might explain why, for a fee. The Reclaimers in every town will buy it back at a loss."
+  },
+
+  "aetheric_rot_zone": {
+    "type": "treasure",
+    "weight": 3,
+    "matchers": ["etheric_anomaly", "mud", "ruin"],
+    "narration": "The mud here is wrong. Not the colour. The shape. It curves where mud does not curve, and a hand pressed into it leaves a print that resists filling back in. A pre-flood relic at the centre of the zone is leaking — slowly, steadily — the kind of leak that explains why this stretch of ground does not grow anything anymore. You can collect what the rot has not eaten yet, if you are quick.",
+    "loot": [
+      { "name": "Aether Dust", "weight": 30, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","dust","distillable"] },
+      { "name": "Aetheric Shard", "weight": 25, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","shard"] },
+      { "name": "Aether Crystal", "weight": 20, "min": 1, "max": 2, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Mud Fragment", "weight": 15, "min": 2, "max": 4, "kind": "misc", "tags": ["mud","glass"] },
+      { "name": "Tainted Aetheric Core", "weight": 10, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","core","tainted","rare"] }
+    ],
+    "lore_note": "A weather-bleached sign at the edge of the zone, in the Order's hand: 'Etheric Rot. Do not eat what grew here. Do not drink what pooled here. Do not stay longer than it took to read this sign.'"
+  },
+
+  "black_cloak_shakedown": {
+    "type": "skirmish",
+    "weight": 5,
+    "matchers": ["outskirts", "open", "borderlands"],
+    "narration": "Two figures step out from behind a marker stone, grey hoods, hands in coat pockets. 'Inspection,' one says. 'Routine. The Monarchs have flagged this stretch for unlicensed Tartarian relics.' The way they say 'inspection' tells you what is in the coat pockets. The other one is already circling.",
+    "enemyPool": ["Mud Monarch"],
+    "loot": []
+  },
+
+  "aetheric_mirror_pool": {
+    "type": "treasure",
+    "weight": 4,
+    "matchers": ["etheric_anomaly", "mud", "buried", "open"],
+    "narration": "A pool of standing water, perfectly circular, in a depression that has no inlet and no outlet. The water is the colour of Aether at dusk and the surface does not move. Looking down into it, you see yourself — but not the version of you standing on this bank. The version you are looking at is older. They look up. You back away. They do not.",
+    "loot": [
+      { "name": "Aether Crystal", "weight": 30, "min": 2, "max": 4, "kind": "misc", "tags": ["aether","crystal"] },
+      { "name": "Aetheric Shard", "weight": 25, "min": 1, "max": 3, "kind": "misc", "tags": ["aether","shard"] },
+      { "name": "Aether Dust", "weight": 20, "min": 2, "max": 5, "kind": "misc", "tags": ["aether","dust","distillable"] },
+      { "name": "Aetheric Locket", "weight": 15, "min": 1, "max": 1, "kind": "misc", "tags": ["amulet","relic"] },
+      { "name": "Mirror-Pool Shard", "weight": 10, "min": 1, "max": 1, "kind": "misc", "tags": ["aether","mirror","shard","rare"] }
+    ],
+    "lore_note": "When you turn to leave, the surface of the pool ripples once. Not from a stone. From the inside."
+  },
+
+  "forgotten_order_pilgrim": {
+    "type": "npc",
+    "weight": 5,
+    "matchers": ["outskirts", "open", "ruin", "borderlands"],
+    "narration": "A robed walker, alone, slow, head down. Order grey, deeper at the cuffs. Their staff is plain but the rune-glass at its tip is not. They stop at a polite distance and wait to be acknowledged. They are willing to talk if you want to talk. They are also willing to keep walking.",
+    "npc_lines": [
+      "'The Order does not own the roads. The roads own us. I am walking from Varakush to the Cradle. If you have a question for the Order, ask it before I turn the next bend.'",
+      "'A man asked me at the last crossroads if the Aether listens. I said: the Aether listens. He did not ask the question he meant to ask. Do not be that man.'",
+      "'If you are going to the Pillars, eat before you arrive. If you are going to the Cathedral, eat after. If you are going to Drakova, do not eat at all. Good road to you.'"
+    ],
+    "lore_note": "When the pilgrim is past you, you notice the staff has left no mark in the mud."
+  },
+
+  "_OTA-051_urban_hub_encounters": "Hub-themed mid-rest ambushes — cities aren't combat-free anymore (OTA-051). Same skirmish/npc/treasure shape as the wilderness pool. The `capital` and `borderlands` matchers route them into the major buried-capital tiles; the gameStore rest handler picks them at ~8% per hub rest, vs the 22% wilderness rate, so the city still reads as safer.",
+
+  "alley_cutpurse": {
+    "type": "skirmish",
+    "weight": 9,
+    "matchers": ["capital", "buried", "borderlands"],
+    "narration": "Footsteps behind you the wrong way — too close, too fast. A Silt Thief peels out of a side passage, hand already in your line of sight where your coin-pouch hangs. They thought you'd sleep deeper than you did.",
+    "enemyPool": ["Silt Thief"],
+    "loot": []
+  },
+
+  "forgotten_order_zealot_intrusion": {
+    "type": "skirmish",
+    "weight": 7,
+    "matchers": ["capital", "buried"],
+    "narration": "A robed figure stops at the edge of your camp. Order grey, no staff this time — knuckles wrapped in mud-cloth instead. 'You have something the Tower wants. The Order does not bargain at this hour.' Their hands come up.",
+    "enemyPool": ["Reclaimer Ambusher"],
+    "loot": []
+  },
+
+  "mud_giant_drunk_rampage": {
+    "type": "skirmish",
+    "weight": 6,
+    "matchers": ["capital", "buried"],
+    "narration": "Heavy footfalls in the next street, and a wall of muscle and silt comes around the corner — a Mud Giant has had too much fermented Aether and decided to take it out on whatever moves. You move. They notice.",
+    "enemyPool": ["Mud Giant"],
+    "loot": []
+  },
+
+  "reclaimer_claim_dispute": {
+    "type": "npc",
+    "weight": 4,
+    "matchers": ["capital", "buried"],
+    "narration": "A Reclaimer in dust-grey tagging gear plants herself in your path before you've fully stood up. 'That relic at your hip,' she says, pointing without aggression, 'is on the Guild's recovery list. I'll buy it for fair. Or you'll explain to the Asgardar branch why it isn't on the registry.'",
+    "npc_lines": [
+      "'The Guild marks what it finds. Whatever's on your hip — it carries our paint somewhere if you look. I'm not accusing. I'm asking.'",
+      "'Sell it back to me at fair-market and walk. Refuse, and a survey-master will be looking for you at the Crown Gate by sundown.'",
+      "'You can also turn it in to any Guild office for half the TC and full standing credit. Your call — the Aether watches either way.'"
+    ],
+    "lore_note": "She does not raise her voice. She does not move. She just waits. After a beat she steps aside, but her hand has not left her shoulder-bag."
+  }
+}

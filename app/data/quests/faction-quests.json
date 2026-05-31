@@ -1,0 +1,190 @@
+{
+  "quests": [
+    {
+      "id": "fq_order_relic",
+      "factionId": "forgotten_order",
+      "title": "Salvage the buried lens",
+      "description": "Varakush has heard of a Relic Seeker's Lens half-buried in the Outskirts. Recover it.",
+      "objective": "Defeat any Aetheric creature and return.",
+      "requirement": { "rep": 5 },
+      "reward": { "tc": 80, "rep": 10 },
+      "stages": [
+        {
+          "narration": "Varakush slips a folded map into your hand — silt-stained at the corners. 'The lens is buried somewhere out there. Aetheric creatures guard the dig sites; cut your way through and bring back what you find.'",
+          "arbiter": "The Arbiter watches the map fold close. \"The Order pays in books. Useful books.\"",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "A hum from somewhere south — the lens reading the air around you, even buried. Aetheric resistance grows the closer you draw to the dig site.",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "You unearth a crystalline disc the size of a saucer. Faint geometry visible through the silt — the Relic Seeker's Lens. Bring it back to a Forgotten Order agent.",
+          "advanceOn": "kill"
+        }
+      ]
+    },
+    {
+      "id": "fq_order_field",
+      "factionId": "forgotten_order",
+      "title": "Field a scholar",
+      "description": "Travel to two new locations and bring back what you saw.",
+      "objective": "Discover 2 locations.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 60, "rep": 8 },
+      "stages": [
+        {
+          "narration": "The scholar hands you a slim travel ledger and three sharpened pencils. 'Walk. Note. Return. The Order remembers what walkers tell us.'",
+          "advanceOn": "travel"
+        },
+        {
+          "narration": "You note the first place — wind direction, sky color, what you heard. The page fills more than you expected.",
+          "advanceOn": "travel"
+        },
+        {
+          "narration": "Second location, second entry. The ledger is starting to feel like something the Order will actually read.",
+          "advanceOn": "travel"
+        }
+      ]
+    },
+    {
+      "id": "fq_reclaimers_haul",
+      "factionId": "reclaimers_guild",
+      "title": "Run the haul",
+      "description": "The Guild needs 100 TC worth of relic salvage. Deliver, no questions asked.",
+      "objective": "Reach 100 TC, then complete the quest.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 40, "rep": 8 },
+      "stages": [
+        {
+          "narration": "The Reclaimer hands you a delivery slip — blank line for what you bring, signed by the Guild's broker. 'Anything sellable. Don't ask. We don't.'",
+          "arbiter": "The Arbiter says nothing. The Guild prefers it that way.",
+          "advanceOn": "any"
+        },
+        {
+          "narration": "Coin gathers in your pack faster than you expected. The broker's slip is half-filled.",
+          "advanceOn": "any"
+        }
+      ]
+    },
+    {
+      "id": "fq_reclaimers_pinch",
+      "factionId": "reclaimers_guild",
+      "title": "Pinch from the Monarchs",
+      "description": "Steal something from a Mud Monarchs vendor without being caught.",
+      "objective": "Steal successfully from any vendor.",
+      "requirement": { "rep": 5 },
+      "reward": { "tc": 70, "rep": 12 },
+      "stages": [
+        {
+          "narration": "The Reclaimer's voice drops. 'A Mud Monarchs vendor. Anything they're not watching. Bring it back.'",
+          "arbiter": "The Arbiter's gaze sharpens. \"The Monarchs remember faces. Cover yours.\"",
+          "advanceOn": "any"
+        },
+        {
+          "narration": "You feel eyes on you wherever Monarch silver shows. The opportunity will come once.",
+          "advanceOn": "any"
+        }
+      ]
+    },
+    {
+      "id": "fq_tartarians_pilgrimage",
+      "factionId": "true_tartarians",
+      "title": "Walk the buried road",
+      "description": "Make a pilgrimage to a buried capital — every True Tartarian who matters has done it.",
+      "objective": "Travel 5 times.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 60, "rep": 10 },
+      "stages": [
+        {
+          "narration": "The elder traces a finger across an old map. 'The road goes where the ground forgets it. Walk it. We will know.'",
+          "advanceOn": "travel"
+        },
+        {
+          "narration": "Your boots find the first stretch of buried road — the silt is firmer here, packed by the dead before you.",
+          "advanceOn": "travel"
+        },
+        {
+          "narration": "Half-way. The wind off the buried capital smells like rust and old incense.",
+          "advanceOn": "travel"
+        },
+        {
+          "narration": "The towers rise out of the mud-flats — not all the way, but enough to call it a city. You have walked the road. Return to any True Tartarian agent.",
+          "advanceOn": "travel"
+        }
+      ]
+    },
+    {
+      "id": "fq_tartarians_giant",
+      "factionId": "true_tartarians",
+      "title": "Cut down a rare beast",
+      "description": "The enclave hears you. Prove you fight like one of them.",
+      "objective": "Defeat a Rare or Legendary enemy.",
+      "requirement": { "rep": 10 },
+      "reward": { "tc": 120, "rep": 15 },
+      "stages": [
+        {
+          "narration": "The Giant elder hands you a stone token. 'When you take down something Rare or worse, bring the token back. We will know what to do with it.'",
+          "arbiter": "The Arbiter notes the weight of the token. \"A small thing the Giants take seriously.\"",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "The token warms in your pack — the elder's mark hums when there's a Rare creature in range. Hunt accordingly.",
+          "advanceOn": "kill"
+        }
+      ]
+    },
+    {
+      "id": "fq_monarchs_silence",
+      "factionId": "mud_monarchs",
+      "title": "Silence a rediscoverer",
+      "description": "Someone has been talking about Tartaria where they should not. End the conversation.",
+      "objective": "Defeat 3 enemies.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 80, "rep": 12 },
+      "stages": [
+        {
+          "narration": "The Monarch agent's voice is flat. 'Three names. Three silences. You don't have to know why. We do.'",
+          "arbiter": "The Arbiter's eyes go cold. \"The Monarchs name the silenced. We do not.\"",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "One down. The agent's network confirms — a name struck from somewhere you'll never see.",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "Two. The work goes faster than feels comfortable.",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "Three. Return to any Monarch agent for the seal.",
+          "advanceOn": "kill"
+        }
+      ]
+    },
+    {
+      "id": "fq_servants_tribute",
+      "factionId": "servants_of_giants",
+      "title": "Tribute at the Vault",
+      "description": "Walk the road to the Giant Vault and leave an offering at its threshold. The Giants are sleeping — the Servants ask only that we keep the path warm.",
+      "objective": "Travel to the Giant Vault and leave tribute.",
+      "requirement": { "rep": 0 },
+      "reward": { "tc": 50, "rep": 8 },
+      "stages": [
+        {
+          "narration": "The Servant presses a small carved stone into your palm. 'This is the tribute. Carry it to the Vault. Set it on the threshold. Do not enter. We will know.'",
+          "arbiter": "The Arbiter watches the stone. \"What sleeps is not asleep because nothing is happening. It is asleep because we agreed not to wake it.\"",
+          "advanceOn": "travel"
+        },
+        {
+          "narration": "The road has narrowed. You can feel the weight of the carved stone in your hand — heavier than it has any right to be. The path forward feels older than the maps say it should.",
+          "advanceOn": "travel"
+        },
+        {
+          "narration": "The Vault rises ahead. Stone fitted by no living mason. You set the tribute on the threshold and step back. The hum that meets your palm is not a sound.",
+          "advanceOn": "travel"
+        }
+      ]
+    }
+  ]
+}

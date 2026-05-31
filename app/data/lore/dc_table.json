@@ -1,0 +1,65 @@
+{
+  "lootRule": "When an enemy is defeated the Arbiter rolls 1d6: if odd the first loot item drops; if even the second loot item drops.",
+  "difficultyTable": [
+    {
+      "level": 1,
+      "label": "Very Easy",
+      "rollNeeded": 3,
+      "example": "Picking up a dropped item in an open space, walking across a solid bridge without distractions."
+    },
+    {
+      "level": 2,
+      "label": "Easy",
+      "rollNeeded": 6,
+      "example": "Retrieving a dropped item near a ledge, recalling basic information from a scroll."
+    },
+    {
+      "level": 3,
+      "label": "Moderate",
+      "rollNeeded": 9,
+      "example": "Climbing a tree for a better view, calming an irritated NPC, picking a simple lock."
+    },
+    {
+      "level": 4,
+      "label": "Hard",
+      "rollNeeded": 12,
+      "example": "Grabbing a dangling rope from a ledge, sneaking past a guard, disarming a basic trap."
+    },
+    {
+      "level": 5,
+      "label": "Very Hard",
+      "rollNeeded": 15,
+      "example": "Scaling a sheer wall in the rain, hacking into a basic security system under time pressure."
+    },
+    {
+      "level": 6,
+      "label": "Difficult",
+      "rollNeeded": 18,
+      "example": "Running across a slick slope, navigating a maze of collapsing ruins, retrieving a relic from ruins."
+    },
+    {
+      "level": 7,
+      "label": "Very Difficult",
+      "rollNeeded": 21,
+      "example": "Battling a powerful Aetheric creature, convincing a faction leader to give away key information."
+    },
+    {
+      "level": 8,
+      "label": "Nearly Impossible",
+      "rollNeeded": 24,
+      "example": "Defeating a heavily armored foe with a dagger, swimming through raging currents."
+    },
+    {
+      "level": 9,
+      "label": "Impossible",
+      "rollNeeded": 27,
+      "example": "Running through a barrage of attacks unscathed, lifting a huge boulder in an adrenaline rush."
+    },
+    {
+      "level": 10,
+      "label": "Legendary",
+      "rollNeeded": 30,
+      "example": "Surviving a fall from a great height with last-second intervention, battling an ancient Aetheric entity."
+    }
+  ]
+}

@@ -1,0 +1,642 @@
+name: Android Build (Tartaria Realms)
+
+# First signed Play Store AAB: OTA 463 / build aab-build-N.
+# Triggered by commits containing [build-aab] (see meta step below)
+# or by pushing a refs/tags/v* tag.
+#
+# IMPORTANT: the [build-aab] commit message marker is only honored
+# when the commit ALSO modifies a file outside paths-ignore. Bumping
+# OTA_BUILD_ID in app/buildInfo.ts alone does NOT fire this workflow,
+# because app/** is path-ignored. To force an AAB build, either touch
+# a non-ignored file (eas.json, this workflow, etc.) in the same
+# commit, or push a refs/tags/v* tag.
+#
+# OTA 472: build with CI-generated Java-native keystore. PowerShell
+# .NET PFX export didn't serialize the friendly name in a way Java
+# keytool reads. Replaced with a keytool-generated PKCS12 from the
+# generate-keystore.yml workflow run.
+
+on:
+  push:
+    branches:
+      - main
+      - 'release/**'
+      - 'claude/**'
+      - 'HaL2001'
+    tags:
+      - 'v*'
+    paths-ignore:
+      - 'app/**'
+      - 'App.tsx'
+      - 'assets/**'
+      - 'docs/**'
+      - 'scripts/**'
+      - '__tests__/**'
+      - '**.md'
+      # Note: '.github/**' intentionally NOT ignored. Workflow edits
+      # (including commit-message-driven AAB builds) need to trigger
+      # this workflow themselves.
+      # ...EXCEPT the iOS-only workflow. Touching build-ios.yml or
+      # any iOS-specific trigger file should NOT fire an Android
+      # build (burns 30 min for nothing). Same in reverse.
+      - '.github/workflows/build-ios.yml'
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'Build profile (preview = APK, production = AAB)'
+        required: false
+        default: 'preview'
+        type: choice
+        options:
+          - preview
+          - production
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build & Release Tartaria Realms APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Inject Android versionCode = GitHub run_number
+        run: |
+          # Stamp the GitHub Actions run_number into app.json's android.versionCode
+          # so it lands in the native Android manifest at prebuild time. This is
+          # what Application.nativeBuildVersion reads at runtime, and what the
+          # About screen displays as "APK build: N". Cannot be overridden by OTA.
+          node -e "
+            const fs = require('fs');
+            const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));
+            app.expo.android = app.expo.android || {};
+            app.expo.android.versionCode = ${{ github.run_number }};
+            fs.writeFileSync('app.json', JSON.stringify(app, null, 2));
+          "
+          echo "android.versionCode = ${{ github.run_number }} — baked into APK"
+          grep -A2 '"android"' app.json | head -10
+
+      - name: Pin Kotlin 1.9.25 in RN/Expo version catalogs (Compose compiler compat)
+        run: |
+          # The real Kotlin version source is libs.versions.toml in two node_modules
+          # locations — NOT android/build.gradle (its classpath line has no version).
+          # @react-native/gradle-plugin compiles itself against the version in
+          # its own libs.versions.toml, and the app pulls in kotlin-gradle-plugin
+          # transitively from that artifact. So patch both catalogs before prebuild.
+
+          RN_CATALOG=node_modules/react-native/gradle/libs.versions.toml
+          GP_CATALOG=node_modules/@react-native/gradle-plugin/gradle/libs.versions.toml
+
+          for f in "$RN_CATALOG" "$GP_CATALOG"; do
+            if [ ! -f "$f" ]; then
+              echo "::error::Expected catalog $f not found"
+              exit 1
+            fi
+            echo "--- before: $f ---"
+            grep '^kotlin' "$f" || true
+            sed -i 's/^kotlin = "1\.9\.24"$/kotlin = "1.9.25"/' "$f"
+            echo "--- after: $f ---"
+            grep '^kotlin' "$f" || true
+            if ! grep -q '^kotlin = "1.9.25"$' "$f"; then
+              echo "::error::Patch did not apply to $f"
+              exit 1
+            fi
+          done
+
+      - name: Pin onnxruntime-android version (avoid latest.integration XML parser bug)
+        run: |
+          # onnxruntime-react-native ships with three "latest.integration" dynamic
+          # version refs in its android/build.gradle. Resolving them forces Gradle
+          # to list all versions from Maven Central, which trips a known
+          # SAXNotRecognizedException on accessExternalSchema in the bundled
+          # Apache Ivy XML parser. Pinning a specific version skips the listing
+          # path entirely.
+          #
+          # The C++ bindings in cpp/InferenceSessionHostObject.cpp use APIs added
+          # in ORT 1.21+ (default Ort::Value() ctor, zero-arg GetSymbolicDimensions).
+          # 1.22.0 is the stable release matching the JS bindings 1.24.3 timeframe.
+          ORT_VERSION=1.22.0
+          ORT_GRADLE=node_modules/onnxruntime-react-native/android/build.gradle
+          if [ ! -f "$ORT_GRADLE" ]; then
+            echo "::error::Expected $ORT_GRADLE not found"
+            exit 1
+          fi
+          echo "--- before ---"
+          grep -n "latest.integration" "$ORT_GRADLE" || true
+          sed -i "s/latest\.integration/${ORT_VERSION}/g" "$ORT_GRADLE"
+          echo "--- after ---"
+          grep -n "$ORT_VERSION" "$ORT_GRADLE" || true
+          if grep -q "latest.integration" "$ORT_GRADLE"; then
+            echo "::error::latest.integration still present in $ORT_GRADLE"
+            exit 1
+          fi
+
+      - name: Determine build profile and tag
+        id: meta
+        # Pass the commit message via env, not via ${{ ... }} interpolation
+        # inside the script body. github.event.head_commit.message is
+        # multi-line; ${{ }} substitution writes the raw newlines into the
+        # script BEFORE bash parses it, which unclosed the quoted string
+        # and made every line of the body execute as a separate command.
+        # env vars are written through a safe channel — bash sees one
+        # string regardless of newlines.
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          # Tag pushes (v*) always produce a production AAB.
+          # Commits whose message contains [build-aab] also produce a
+          # production AAB — lets a sandboxed agent or anyone without
+          # tag-push permission trigger a Play-Store-ready AAB build
+          # without needing to dispatch via the GitHub UI.
+          # workflow_dispatch input still wins when it's "production".
+          # Resolution order:
+          #   1. refs/tags/v* → production AAB (Play Store tag push)
+          #   2. commit message contains [build-aab] → production AAB.
+          #      OTA-245: this now wins OVER the HaL2001 default, so
+          #      the user can stamp an AAB from HaL2001 when they need
+          #      to push to the Play Console for playtesters. Previously
+          #      the HaL2001 check fired first and forced preview/APK,
+          #      so [build-aab] had no effect on this branch.
+          #   3. HaL2001 branch (no AAB marker) → sideload APK
+          #      (Hal2001-N tag).
+          #   4. workflow_dispatch input or default → preview APK.
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            PROFILE="production"
+            TAG="${GITHUB_REF#refs/tags/}"
+            IS_TAG="true"
+          elif [[ "$COMMIT_MSG" == *"[build-aab]"* ]]; then
+            PROFILE="production"
+            IS_TAG="false"
+            TAG="aab-build-${{ github.run_number }}"
+          elif [[ "${GITHUB_REF_NAME}" == "HaL2001" ]]; then
+            PROFILE="preview"
+            IS_TAG="false"
+            TAG="Hal2001-${{ github.run_number }}"
+          else
+            PROFILE="${{ github.event.inputs.profile || 'preview' }}"
+            IS_TAG="false"
+            TAG="apk-build-${{ github.run_number }}"
+          fi
+          VERSION=$(node -p "require('./package.json').version")
+          echo "profile=$PROFILE" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "is_tag=$IS_TAG" >> "$GITHUB_OUTPUT"
+          echo "Building Tartaria Realms — profile: $PROFILE, tag: $TAG, version: $VERSION"
+
+      # Strip the .hal2001 suffix from android.package + ios.bundleIdentifier
+      # when building a production AAB. Reason: Play Console screenshot
+      # (OTA-247-era retry) rejected the AAB with "Your APK or Android App
+      # Bundle needs to have the package name com.hotatticgames.tartarprim."
+      # The HaL2001 branch suffixes the package to keep its sideload APKs
+      # as a separate app from the main production track; AABs heading to
+      # Play Store need the bare package to match the existing listing.
+      # Preview / APK builds keep the .hal2001 suffix untouched so HaL
+      # sideloads stay separate from the production install.
+      - name: Strip .hal2001 suffix for production AAB
+        if: steps.meta.outputs.profile == 'production'
+        run: |
+          node -e "
+            const fs = require('fs');
+            const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));
+            const before = {
+              package: app.expo?.android?.package,
+              bundle: app.expo?.ios?.bundleIdentifier,
+            };
+            if (app.expo?.android?.package?.endsWith('.hal2001')) {
+              app.expo.android.package = app.expo.android.package.slice(0, -'.hal2001'.length);
+            }
+            if (app.expo?.ios?.bundleIdentifier?.endsWith('.hal2001')) {
+              app.expo.ios.bundleIdentifier = app.expo.ios.bundleIdentifier.slice(0, -'.hal2001'.length);
+            }
+            fs.writeFileSync('app.json', JSON.stringify(app, null, 2));
+            console.log('Production package flip:');
+            console.log('  android.package:', before.package, '→', app.expo.android.package);
+            console.log('  ios.bundleIdentifier:', before.bundle, '→', app.expo.ios.bundleIdentifier);
+          "
+          grep -E '"package"|"bundleIdentifier"' app.json | head -5
+
+      - name: Generate native Android project
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Verify Kotlin 1.9.25 propagated through prebuild
+        run: |
+          echo "--- node_modules catalog (source of truth) ---"
+          grep '^kotlin' node_modules/react-native/gradle/libs.versions.toml
+          grep '^kotlin' node_modules/@react-native/gradle-plugin/gradle/libs.versions.toml
+
+          echo "--- android/build.gradle kotlinVersion ext ---"
+          grep -n kotlinVersion android/build.gradle || true
+
+          echo "--- android/gradle.properties kotlin lines ---"
+          grep -i kotlin android/gradle.properties || true
+
+          # Final guard: a no-op when versions match, but if anything upstream
+          # still mismatches at compile time, suppress the Compose-compiler check.
+          # Ensure the file ends with a newline before appending — Expo's
+          # propertiesListToString writes the last entry without a trailing \n,
+          # and a bare `echo >>` would concatenate onto that last line.
+          # (Caused a build break when withJetifier landed its entries last.)
+          [ -n "$(tail -c1 android/gradle.properties)" ] && echo "" >> android/gradle.properties
+          echo "kotlin.suppressKotlinVersionCompatibilityCheck=1.9.25" >> android/gradle.properties
+
+      - name: Ensure debug keystore exists (for release signing fallback)
+        run: |
+          if [ ! -f android/app/debug.keystore ]; then
+            keytool -genkey -v \
+              -keystore android/app/debug.keystore \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=Tartaria Realms Debug,O=HotAtticGames,C=US"
+          fi
+
+      # Production AAB requires a real release-mode signature — Play Store
+      # rejects anything signed with the debug keystore. This step is a
+      # no-op for the preview/APK profile (APK ships as debug-signed for
+      # sideload testing). For production:
+      #   1. Decode the upload keystore from base64 in GitHub Secrets.
+      #   2. Append signing properties to gradle.properties so Expo's
+      #      generated android/app/build.gradle picks them up via
+      #      project.hasProperty('MYAPP_UPLOAD_STORE_FILE') idiom.
+      #   3. Patch the generated android/app/build.gradle so:
+      #        a. signingConfigs gains a 'release' block reading the
+      #           properties.
+      #        b. buildTypes.release.signingConfig points at the new
+      #           release block instead of the debug fallback.
+      # If ANDROID_KEYSTORE_BASE64 is empty, FAIL the build — the
+      # debug-signed AAB is unusable on Play Store, no point continuing.
+      #
+      # 2026-05-30 — also run for the HaL2001 sideload APK. Signing the
+      # HaL preview APK with the stable tartaria-upload key (instead of a
+      # fresh per-build debug key) means successive Hal2001-N builds
+      # UPGRADE IN PLACE on the phone instead of forcing an uninstall.
+      # The patch repoints buildTypes.release.signingConfig, which the
+      # preview profile's assembleRelease honors just like bundleRelease.
+      # NOTE: HaL's package is still com.hotatticgames.tartarprim.hal2001,
+      # so this remains a SEPARATE app from the internal-test build — the
+      # shared key does NOT let HaL update the internal-test app until the
+      # package is flipped back and shipped as an AAB to the Play track.
+      # OTA-249 — production AAB can use a DIFFERENT upload key than the
+      # HaL sideload APK. If ANDROID_PROD_KEYSTORE_BASE64 (and its
+      # companion *_PASSWORD / *_KEY_ALIAS / *_KEY_PASSWORD) secrets are
+      # set AND profile == 'production', use those. Otherwise fall back
+      # to the shared ANDROID_KEYSTORE_BASE64 (the HaL upload key).
+      # Reason: Play Console pins the signing key per package. If the
+      # main com.hotatticgames.tartarprim listing was created with a key
+      # that differs from the HaL sideload key, this lets the production
+      # AAB use the right one without rotating the HaL keystore.
+      # Player reminder: "don't forget to match keys as well."
+      - name: Configure release signing (production AAB + HaL2001 APK)
+        if: steps.meta.outputs.profile == 'production' || github.ref_name == 'HaL2001'
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_PROD_KEYSTORE_BASE64: ${{ secrets.ANDROID_PROD_KEYSTORE_BASE64 }}
+          ANDROID_PROD_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_PROD_KEYSTORE_PASSWORD }}
+          ANDROID_PROD_KEY_ALIAS: ${{ secrets.ANDROID_PROD_KEY_ALIAS }}
+          ANDROID_PROD_KEY_PASSWORD: ${{ secrets.ANDROID_PROD_KEY_PASSWORD }}
+          IS_PROD: ${{ steps.meta.outputs.profile == 'production' }}
+        run: |
+          set -euo pipefail
+
+          # OTA-249 — choose production-specific keystore if available
+          # AND we're building production. Else use the shared HaL key.
+          if [ "$IS_PROD" = "true" ] && [ -n "${ANDROID_PROD_KEYSTORE_BASE64:-}" ]; then
+            echo "Using ANDROID_PROD_* keystore (production-specific upload key)."
+            KS_BASE64="$ANDROID_PROD_KEYSTORE_BASE64"
+            KS_PASSWORD="$ANDROID_PROD_KEYSTORE_PASSWORD"
+            KS_ALIAS="$ANDROID_PROD_KEY_ALIAS"
+            KS_KEY_PASSWORD="$ANDROID_PROD_KEY_PASSWORD"
+            KS_NAME="tartaria-prod-upload.keystore"
+          else
+            if [ "$IS_PROD" = "true" ]; then
+              echo "ANDROID_PROD_KEYSTORE_BASE64 not set; falling back to shared ANDROID_KEYSTORE_BASE64."
+              echo "If the main com.hotatticgames.tartarprim listing was created with a DIFFERENT upload key,"
+              echo "Play Console will reject this AAB with a 'wrong signing certificate' error. Add the ANDROID_PROD_*"
+              echo "secrets (decoded from the original prod keystore) to fix."
+            fi
+            KS_BASE64="$ANDROID_KEYSTORE_BASE64"
+            KS_PASSWORD="$ANDROID_KEYSTORE_PASSWORD"
+            KS_ALIAS="$ANDROID_KEY_ALIAS"
+            KS_KEY_PASSWORD="$ANDROID_KEY_PASSWORD"
+            KS_NAME="tartaria-upload.keystore"
+          fi
+
+          if [ -z "${KS_BASE64:-}" ]; then
+            echo "::error::No keystore secret available. Production AAB cannot ship without a release upload key."
+            echo "::error::Add the four ANDROID_* (HaL) or ANDROID_PROD_* secrets, then re-run."
+            exit 1
+          fi
+
+          KEYSTORE_PATH=android/app/$KS_NAME
+          echo "$KS_BASE64" | base64 -d > "$KEYSTORE_PATH"
+          echo "Keystore decoded: $(stat -c%s "$KEYSTORE_PATH") bytes ($KS_NAME)"
+
+          # Sanity — keystore must be a valid JKS that unlocks with the password.
+          keytool -list -keystore "$KEYSTORE_PATH" \
+            -storepass "$KS_PASSWORD" > /dev/null 2>&1 \
+            || { echo "::error::Keystore did not unlock. Password may be wrong for $KS_NAME."; exit 1; }
+
+          # Surface the cert's SHA-256 fingerprint so the build log lets you
+          # cross-check against the Play Console "App signing certificate"
+          # SHA-256 fingerprint. Mismatch = Play Console rejection on upload.
+          echo "--- Cert fingerprint(s) for $KS_NAME (compare against Play Console) ---"
+          keytool -list -v -keystore "$KEYSTORE_PATH" -storepass "$KS_PASSWORD" 2>/dev/null \
+            | grep -E "Alias|SHA256" | head -20 || true
+          echo "---"
+
+          # Remap to the names the rest of the step expects so I don't
+          # have to rewrite the gradle.properties / build.gradle patching
+          # below.
+          ANDROID_KEYSTORE_PASSWORD="$KS_PASSWORD"
+          ANDROID_KEY_ALIAS="$KS_ALIAS"
+          ANDROID_KEY_PASSWORD="$KS_KEY_PASSWORD"
+
+          # Append signing properties to android/gradle.properties so the
+          # generated build.gradle's project.hasProperty(...) checks see them.
+          # MYAPP_UPLOAD_STORE_FILE uses the keystore file name we just
+          # picked (OTA-249: may be tartaria-prod-upload.keystore for prod).
+          [ -n "$(tail -c1 android/gradle.properties)" ] && echo "" >> android/gradle.properties
+          {
+            echo "MYAPP_UPLOAD_STORE_FILE=$KS_NAME"
+            echo "MYAPP_UPLOAD_KEY_ALIAS=$ANDROID_KEY_ALIAS"
+            echo "MYAPP_UPLOAD_STORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD"
+            echo "MYAPP_UPLOAD_KEY_PASSWORD=$ANDROID_KEY_PASSWORD"
+          } >> android/gradle.properties
+
+          # Patch android/app/build.gradle: add a release signing config
+          # block and repoint buildTypes.release.signingConfig at it.
+          # Expo's generated template has:
+          #     signingConfigs {
+          #         debug { ... }
+          #     }
+          #     buildTypes {
+          #         debug { signingConfig signingConfigs.debug }
+          #         release {
+          #             signingConfig signingConfigs.debug   ← we replace this
+          #             ...
+          #         }
+          #     }
+          BG=android/app/build.gradle
+          if ! grep -q "signingConfigs.debug" "$BG"; then
+            echo "::error::Expected 'signingConfigs.debug' in $BG. Expo prebuild template changed; the patch needs updating."
+            exit 1
+          fi
+
+          # Pre-patch dump so any regex mismatch is diagnosable from the
+          # CI logs alone (instead of needing a second iteration to see
+          # what the template actually looks like).
+          echo "--- android/app/build.gradle (pre-patch, signingConfigs + buildTypes) ---"
+          awk '/signingConfigs\s*\{/,/^\s*\}\s*$/' "$BG" | head -40 || true
+          echo "---"
+          awk '/buildTypes\s*\{/,/^\s*\}\s*$/' "$BG" | head -60 || true
+          echo "---"
+
+          # Insert release signing config inside signingConfigs { ... } block,
+          # then repoint buildTypes.release.signingConfig from debug to
+          # release. Walk braces manually (not regex) so nested blocks
+          # don't trip us up — Expo SDK 52's template has multi-line
+          # config in both debug and release build-type sub-blocks.
+          python3 <<'PY'
+          import pathlib, re
+          p = pathlib.Path("android/app/build.gradle")
+          src = p.read_text()
+
+          release_signing_block = """
+              release {
+                  if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
+                      storeFile file(MYAPP_UPLOAD_STORE_FILE)
+                      storePassword MYAPP_UPLOAD_STORE_PASSWORD
+                      keyAlias MYAPP_UPLOAD_KEY_ALIAS
+                      keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+                  }
+              }
+          """.rstrip() + "\n"
+
+          def find_block(text, header_re, after=0):
+              """Find the {...} block whose opening line matches header_re.
+                 Returns (open_brace_idx, close_brace_idx) — indices of '{' and '}'."""
+              m = re.search(header_re, text[after:])
+              if not m:
+                  return None
+              start = after + m.end()  # position right after the opening '{'
+              depth = 1
+              i = start
+              while i < len(text) and depth > 0:
+                  c = text[i]
+                  if c == '{': depth += 1
+                  elif c == '}': depth -= 1
+                  i += 1
+              if depth != 0:
+                  return None
+              # m.end() is the char right AFTER '{'. We want index OF '{' and '}'.
+              open_idx = after + m.end() - 1
+              close_idx = i - 1
+              return open_idx, close_idx
+
+          # 1. Locate signingConfigs { ... } and inject the release sub-block
+          #    right before its closing }.
+          sc = find_block(src, r"signingConfigs\s*\{")
+          if not sc:
+              raise SystemExit("Could not locate signingConfigs { ... } block")
+          sc_open, sc_close = sc
+          src = src[:sc_close] + release_signing_block + src[sc_close:]
+          print(f"✓ injected signingConfigs.release at offset {sc_close}")
+
+          # 2. Locate buildTypes { ... } block.
+          bt = find_block(src, r"buildTypes\s*\{")
+          if not bt:
+              raise SystemExit("Could not locate buildTypes { ... } block")
+          bt_open, bt_close = bt
+
+          # 3. Inside buildTypes, locate release { ... } sub-block.
+          rel = find_block(src, r"\brelease\s*\{", after=bt_open)
+          if not rel or rel[1] > bt_close:
+              raise SystemExit("Could not locate buildTypes.release { ... } sub-block")
+          rel_open, rel_close = rel
+
+          # 4. Inside that sub-block ONLY, replace
+          #    'signingConfig signingConfigs.debug' with the release config.
+          inside = src[rel_open:rel_close]
+          new_inside, n = re.subn(
+              r"signingConfig\s+signingConfigs\.debug",
+              "signingConfig signingConfigs.release",
+              inside, count=1,
+          )
+          if n != 1:
+              print("--- buildTypes.release current contents ---")
+              print(inside)
+              print("---")
+              raise SystemExit("buildTypes.release does not contain 'signingConfig signingConfigs.debug' to repoint.")
+          src = src[:rel_open] + new_inside + src[rel_close:]
+          print("✓ buildTypes.release.signingConfig now points at signingConfigs.release")
+
+          p.write_text(src)
+          print("✓ build.gradle patched.")
+          PY
+
+          echo "--- android/app/build.gradle (post-patch, signingConfigs + buildTypes) ---"
+          awk '/signingConfigs\s*\{/,/^\s*\}\s*$/' "$BG" | head -50 || true
+          echo "---"
+          awk '/buildTypes\s*\{/,/^\s*\}\s*$/' "$BG" | head -60 || true
+          echo "---"
+
+      - name: Gradle build (Tartaria Realms)
+        working-directory: android
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false"
+          KOTLIN_VERSION: "1.9.25"
+        run: |
+          chmod +x gradlew
+          # OTA-252 — retry wrapper. Build 251 failed at the gradle
+          # wrapper bootstrap with "Server returned HTTP response
+          # code: 502 for URL: https://github.com/gradle/gradle-
+          # distributions/releases/download/v8.10.2/gradle-8.10.2-
+          # all.zip". GitHub's release CDN flaked. Retry up to 3
+          # times with exponential backoff before failing the build.
+          # Retries don't cost anything when the first attempt
+          # succeeds; just guards against transient infra hiccups.
+          if [ "${{ steps.meta.outputs.profile }}" = "production" ]; then
+            GRADLE_TASK="bundleRelease"
+            echo "Building Tartaria Realms AAB (production)"
+          else
+            GRADLE_TASK="assembleRelease"
+            echo "Building Tartaria Realms APK (preview)"
+          fi
+          for attempt in 1 2 3; do
+            echo "--- Gradle attempt $attempt of 3 ---"
+            if ./gradlew $GRADLE_TASK --no-daemon --stacktrace \
+                -Pandroid.kotlinVersion=1.9.25 \
+                -PkotlinVersion=1.9.25; then
+              echo "✓ Gradle build succeeded on attempt $attempt"
+              break
+            fi
+            if [ $attempt -lt 3 ]; then
+              wait_seconds=$((10 * attempt))
+              echo "::warning::Gradle attempt $attempt failed. Sleeping ${wait_seconds}s before retry."
+              sleep $wait_seconds
+            else
+              echo "::error::Gradle build failed after 3 attempts."
+              exit 1
+            fi
+          done
+
+      # Production AAB MUST be release-signed. We assert here instead of
+      # discovering it at Play Store upload time. jarsigner -verify on the
+      # AAB exits non-zero if signatures are missing; we also grep the
+      # certificate CN to make sure it ISN'T the debug fallback
+      # ("CN=Tartaria Realms Debug" was hardcoded in the debug.keystore
+      # step). Either failure mode is a hard build failure.
+      - name: Verify AAB is release-signed (production only)
+        if: steps.meta.outputs.profile == 'production'
+        run: |
+          set -euo pipefail
+          AAB=$(find android/app/build/outputs/bundle -name "*.aab" | head -1)
+          if [ -z "$AAB" ]; then
+            echo "::error::No .aab found after bundleRelease."
+            exit 1
+          fi
+          echo "Verifying signature on $AAB"
+
+          if ! jarsigner -verify "$AAB" > /dev/null 2>&1; then
+            echo "::error::AAB failed jarsigner verification — Play Store will reject."
+            jarsigner -verify -verbose -certs "$AAB" | tail -40 || true
+            exit 1
+          fi
+
+          # Inspect the signer certificate's CN. If we see the debug CN
+          # we fell back to the debug keystore, which Play Store rejects.
+          CERT_INFO=$(jarsigner -verify -verbose -certs "$AAB" 2>&1 | grep -A1 "X.509" | head -10 || true)
+          echo "--- AAB signer certificate(s) ---"
+          echo "$CERT_INFO"
+          if echo "$CERT_INFO" | grep -q "Tartaria Realms Debug"; then
+            echo "::error::AAB was signed with the DEBUG keystore (CN=Tartaria Realms Debug)."
+            echo "::error::Either the release-signing patch did not fire, or signingConfigs.release fell through to debug."
+            exit 1
+          fi
+          echo "✓ AAB is release-signed (not the debug fallback)."
+
+      - name: Stage Tartaria Realms artifact
+        id: artifact
+        run: |
+          mkdir -p artifacts
+          if [ "${{ steps.meta.outputs.profile }}" = "production" ]; then
+            SRC=android/app/build/outputs/bundle/release/app-release.aab
+            [ -f "$SRC" ] || SRC=$(find android/app/build/outputs/bundle -name "*.aab" | head -1)
+            OUT="artifacts/tartaria-realms-${{ steps.meta.outputs.tag }}.aab"
+          else
+            SRC=android/app/build/outputs/apk/release/app-release.apk
+            [ -f "$SRC" ] || SRC=$(find android/app/build/outputs/apk -name "*.apk" | head -1)
+            OUT="artifacts/tartaria-realms-${{ steps.meta.outputs.tag }}.apk"
+          fi
+          cp "$SRC" "$OUT"
+          echo "path=$OUT" >> "$GITHUB_OUTPUT"
+          echo "filename=$(basename "$OUT")" >> "$GITHUB_OUTPUT"
+          ls -lh "$OUT"
+
+      - name: Upload Tartaria Realms artifact (GitHub Actions, 90d retention)
+        uses: actions/upload-artifact@v4
+        with:
+          name: tartaria-realms-${{ steps.meta.outputs.profile }}-${{ github.run_number }}
+          path: ${{ steps.artifact.outputs.path }}
+          retention-days: 90
+
+      - name: Create Tartaria Realms GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.meta.outputs.tag }}"
+          PROFILE="${{ steps.meta.outputs.profile }}"
+          VERSION="${{ steps.meta.outputs.version }}"
+          BRANCH="${GITHUB_REF_NAME}"
+          SHORT_SHA="${GITHUB_SHA::7}"
+
+          if [ "$PROFILE" = "production" ]; then
+            TITLE="Tartaria Realms ${TAG}"
+            KIND="Production AAB (Play Store)"
+            INSTALL_NOTE="Play Store AAB bundle — upload to Google Play Console. For sideloadable APKs, use a non-tagged build."
+          else
+            TITLE="Tartaria Realms v${VERSION}-build.${{ github.run_number }}"
+            KIND="Playtest APK"
+            INSTALL_NOTE="1. Download the .apk attached below on your Android device.
+          2. Open it. If prompted, enable Install unknown apps for your browser or file manager.
+          3. Tap Install. Launch Tartaria Realms.
+
+          Release-optimized APK, debug-signed for sideloaded playtesting. Each build uses a fresh debug key, so uninstall the previous version first if Android refuses the upgrade. OTA updates ship continuously to channel preview while this APK is installed."
+          fi
+
+          gh release create "$TAG" \
+            "${{ steps.artifact.outputs.path }}" \
+            --repo "${{ github.repository }}" \
+            --title "$TITLE" \
+            --latest \
+            --notes "## Tartaria Realms — $KIND
+
+          Version: ${VERSION}
+          Branch: ${BRANCH}
+          Commit: ${SHORT_SHA}
+          Build #: ${{ github.run_number }}
+
+          ### Install
+          ${INSTALL_NOTE}"

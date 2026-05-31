@@ -1,0 +1,206 @@
+name: iOS Build (Tartaria Realms)
+
+# Triggers EAS Build for iOS — Expo's hosted macOS infrastructure does
+# the cert/provisioning/Xcode work. We just hand it the project,
+# auth, and Apple credentials; it returns a signed .ipa.
+#
+# Required GitHub Secrets (configure once at repo settings):
+#   EXPO_TOKEN          — from expo.dev → Account → Access Tokens
+#   APPLE_ID            — your Apple Developer email
+#   APPLE_APP_SPECIFIC_PASSWORD — appleid.apple.com → Sign-In and Security
+#                         → App-Specific Passwords → generate one
+#                         (or use APPLE_TEAM_ID + ASC_API_KEY for
+#                         long-term automation)
+#   ASC_APP_ID          — App Store Connect app's numeric ID (after
+#                         you create the listing; needed for submit)
+#   APPLE_TEAM_ID       — your 10-char developer team ID
+#
+# Trigger paths:
+#   - commit message contains [build-ios] → production iOS build
+#   - tag v*-ios → production iOS build
+#   - workflow_dispatch with profile=production → production
+#   - workflow_dispatch with profile=preview → unsigned-distribution
+#     internal build for sideload testing
+#
+# What it does:
+#   1. Strip the .hal2001 suffix from ios.bundleIdentifier when
+#      building production (same Play-Console-vs-HaL logic as the
+#      Android workflow). Preview builds keep the suffix.
+#   2. Run `eas-cli build --platform ios --profile <profile>
+#      --non-interactive` — EAS handles cert + provisioning,
+#      builds on its macOS infra, uploads to Expo's CDN.
+#   3. Optionally `eas-cli submit --platform ios --latest
+#      --non-interactive` to ship the latest production build
+#      to TestFlight (skipped for preview builds and unless
+#      [submit-ios] is also in the commit message).
+
+on:
+  push:
+    branches:
+      - main
+      - 'release/**'
+      - 'claude/**'
+      - 'HaL2001'
+    tags:
+      - 'v*-ios'
+    paths-ignore:
+      - 'app/**'
+      - 'App.tsx'
+      - 'assets/**'
+      - 'docs/**'
+      - 'scripts/**'
+      - '__tests__/**'
+      - '**.md'
+      # Don't fire iOS build for Android-only workflow changes.
+      - '.github/workflows/build-apk.yml'
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: 'Build profile (preview = sideload, production = TestFlight-ready)'
+        required: false
+        default: 'preview'
+        type: choice
+        options:
+          - preview
+          - production
+      submit:
+        description: 'Submit to TestFlight after build (production only)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Tartaria Realms iOS via EAS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Determine build profile
+        id: meta
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          # Resolution chain:
+          #   1. tag v*-ios → production (TestFlight-ready)
+          #   2. commit message FIRST LINE STARTS WITH [build-ios] →
+          #      production. Strict prefix match so commits like
+          #      "Fix iOS workflow false-positive on [build-ios] in
+          #      body" don't false-positive production. To intentionally
+          #      fire production iOS, title the commit:
+          #        [build-ios] OTA-XXX — description
+          #        or to also auto-submit to TestFlight:
+          #        [build-ios] [submit-ios] OTA-XXX — description
+          #   3. workflow_dispatch input → as chosen
+          #   4. default → preview (sideload internal build)
+          FIRST_LINE=$(echo "$COMMIT_MSG" | head -1)
+          if [[ "${GITHUB_REF}" == refs/tags/v*-ios ]]; then
+            PROFILE="production"
+            SHOULD_SUBMIT="true"
+          elif [[ "$FIRST_LINE" =~ ^\[build-ios\] ]]; then
+            PROFILE="production"
+            # [submit-ios] gates the auto-submit step. Must also be
+            # in the first line (anywhere after [build-ios]).
+            if [[ "$FIRST_LINE" =~ \[submit-ios\] ]]; then
+              SHOULD_SUBMIT="true"
+            else
+              SHOULD_SUBMIT="false"
+            fi
+          else
+            PROFILE="${{ github.event.inputs.profile || 'preview' }}"
+            SHOULD_SUBMIT="${{ github.event.inputs.submit || 'false' }}"
+          fi
+          echo "profile=$PROFILE" >> "$GITHUB_OUTPUT"
+          echo "submit=$SHOULD_SUBMIT" >> "$GITHUB_OUTPUT"
+          echo "Building Tartaria Realms iOS — profile: $PROFILE, submit: $SHOULD_SUBMIT"
+
+      - name: Strip .hal2001 suffix for production iOS build
+        if: steps.meta.outputs.profile == 'production'
+        run: |
+          # Mirror the Android workflow's package strip. Production iOS
+          # builds use the bare bundle identifier to match the App Store
+          # Connect listing; preview/sideload builds keep .hal2001 so
+          # HaL test installs stay separate.
+          node -e "
+            const fs = require('fs');
+            const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));
+            const before = app.expo?.ios?.bundleIdentifier;
+            if (app.expo?.ios?.bundleIdentifier?.endsWith('.hal2001')) {
+              app.expo.ios.bundleIdentifier = app.expo.ios.bundleIdentifier.slice(0, -'.hal2001'.length);
+            }
+            fs.writeFileSync('app.json', JSON.stringify(app, null, 2));
+            console.log('Production iOS bundle id:', before, '->', app.expo.ios.bundleIdentifier);
+          "
+          grep '"bundleIdentifier"' app.json | head -3
+
+      - name: Verify EXPO_TOKEN secret is set
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "${EXPO_TOKEN:-}" ]; then
+            echo "::error::EXPO_TOKEN secret is missing."
+            echo "::error::Add it at GitHub repo Settings → Secrets and variables → Actions."
+            echo "::error::Generate the token at https://expo.dev/accounts/<account>/settings/access-tokens"
+            exit 1
+          fi
+          echo "✓ EXPO_TOKEN is set."
+
+      - name: EAS Build (iOS, non-interactive)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          # Apple credentials — required if EAS hasn't already saved
+          # certs for this project. Non-interactive needs at least one
+          # of these auth modes. App-specific password is the simpler
+          # setup; API key (ASC_API_KEY_*) scales better long-term.
+          EXPO_APPLE_ID: ${{ secrets.APPLE_ID }}
+          EXPO_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        run: |
+          set -euo pipefail
+          echo "Profile: ${{ steps.meta.outputs.profile }}"
+          # --no-wait returns the moment the build is queued on Expo's
+          # macOS workers (no idle GitHub minutes burning during the
+          # 20-30 min Xcode work). Build status is visible at
+          # https://expo.dev/accounts/hot-attic-games/projects/tartaria-/builds
+          npx eas-cli build \
+            --platform ios \
+            --profile "${{ steps.meta.outputs.profile }}" \
+            --non-interactive \
+            --no-wait
+
+      - name: EAS Submit to TestFlight (production only, gated)
+        if: steps.meta.outputs.profile == 'production' && steps.meta.outputs.submit == 'true'
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_APPLE_ID: ${{ secrets.APPLE_ID }}
+          EXPO_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          ASC_APP_ID: ${{ secrets.ASC_APP_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          if [ -z "${ASC_APP_ID:-}" ] || [ -z "${APPLE_TEAM_ID:-}" ]; then
+            echo "::warning::ASC_APP_ID or APPLE_TEAM_ID secret missing — skipping submit."
+            echo "::warning::Build still produced the .ipa on Expo CDN; submit manually from expo.dev or App Store Connect."
+            exit 0
+          fi
+          # Wait for the latest production build to finish before submit.
+          # --latest auto-picks the most recent successful build for the
+          # production profile.
+          npx eas-cli submit \
+            --platform ios \
+            --profile production \
+            --latest \
+            --non-interactive

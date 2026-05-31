@@ -1,0 +1,550 @@
+import React, { useEffect, useState } from 'react';
+import { View, Text, ActivityIndicator, StyleSheet, AppState, Platform, StatusBar as RNStatusBar, Keyboard, type AppStateStatus } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+// expo-navigation-bar is a NATIVE module — only present in APKs built
+// after it was added. Loaded via lazy require() inside the effect
+// below so older APKs (testers on builds before the native module
+// shipped) don't fail to load the JS bundle at import time. The
+// require returns null on those builds; the effect no-ops.
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useGameStore } from './app/state/gameStore';
+import { TitleScreen } from './app/screens/TitleScreen';
+import { CharacterCreationScreen } from './app/screens/CharacterCreationScreen';
+import { ExplorationScreen } from './app/screens/ExplorationScreen';
+import { LogScreen } from './app/screens/LogScreen';
+import { LoreScreen } from './app/screens/LoreScreen';
+import { AboutScreen } from './app/screens/AboutScreen';
+import { EndingScreen } from './app/screens/EndingScreen';
+import { InventoryScreen } from './app/screens/InventoryScreen';
+import { CharacterScreen } from './app/screens/CharacterScreen';
+import { MapScreen } from './app/screens/MapScreen';
+import { CraftingScreen } from './app/screens/CraftingScreen';
+import { VendorScreen } from './app/screens/VendorScreen';
+import { ActionReferenceScreen } from './app/screens/ActionReferenceScreen';
+import { ContractsScreen } from './app/screens/ContractsScreen';
+import { TutorialOverlay } from './app/components/TutorialOverlay';
+import { CallDogModal } from './app/components/CallDogModal';
+import { AetherStatPickerModal } from './app/components/AetherStatPickerModal';
+import { KeyboardInputBar } from './app/components/KeyboardInputBar';
+import { bootAudio, disposeAudio } from './app/audio/AudioManager';
+import { startAudioController, stopAudioController } from './app/audio/AudioController';
+import { initTTSManager } from './app/voice/TTSManager';
+import { startTTSController, stopTTSController } from './app/voice/TTSController';
+import { createExpoFileSystemAdapter } from './app/voice/executorchAdapter';
+import { checkAndApplyOTA } from './app/updates/checkAndApplyOTA';
+import { useUiScale } from './app/ui/uiScale';
+
+// Lazy-load expo-navigation-bar. The package is a native module bridged
+// only in APKs built AFTER it was added to dependencies — older
+// installed APKs (existing testers) don't have the bridge. A static
+// import at the top of App.tsx could blow up at JS-bundle-load time on
+// those builds and leave testers stuck. require() inside a try/catch
+// resolves the JS shim if present and returns null otherwise; callers
+// no-op on null. Cached after first successful load.
+let _navigationBarCache: typeof import('expo-navigation-bar') | null | undefined;
+function loadNavigationBar(): typeof import('expo-navigation-bar') | null {
+  if (_navigationBarCache !== undefined) return _navigationBarCache;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    _navigationBarCache = require('expo-navigation-bar');
+  } catch {
+    _navigationBarCache = null;
+  }
+  return _navigationBarCache ?? null;
+}
+
+// Wire react-native-executorch's resource fetcher at module load (before
+// React renders) so any later TextToSpeechModule.fromModelName call has
+// the adapter already registered. The official Expo adapter requires
+// SDK 54; we're on 52 so we ship our own expo-file-system shim.
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const exec = require('react-native-executorch');
+  if (typeof exec.initExecutorch === 'function') {
+    exec.initExecutorch({ resourceFetcher: createExpoFileSystemAdapter() });
+  }
+} catch {
+  // Native module not present (e.g. dev web build) — voice falls back to
+  // system TTS automatically through TTSManager's engine routing.
+}
+
+// Global crash safety net. If anything during boot or runtime throws
+// uncaught, the default React Native red-box on a release build is a
+// black screen → home screen kick-out. Installing a handler that logs
+// the error and triggers Updates.reloadAsync() instead lets the player
+// see one black flash and come back into a clean process — far better
+// than dropping them to the launcher with no signal anything happened.
+// Errors during the FIRST 5 seconds after boot are ignored for reload
+// purposes (the player's about to relaunch anyway and a reload loop
+// would hide the real bug); after that, one reload per crash window.
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const Updates = require('expo-updates') as typeof import('expo-updates');
+  const bootTime = Date.now();
+  let reloaded = false;
+  const errorUtils = (globalThis as unknown as { ErrorUtils?: { getGlobalHandler: () => (err: Error, isFatal?: boolean) => void; setGlobalHandler: (h: (err: Error, isFatal?: boolean) => void) => void } }).ErrorUtils;
+  if (errorUtils?.setGlobalHandler) {
+    const prev = errorUtils.getGlobalHandler();
+    errorUtils.setGlobalHandler((err, isFatal) => {
+      try { prev?.(err, isFatal); } catch { /* ignore */ }
+      // OTA-237 — crash diagnostics. Stash the last error message +
+      // stage to AsyncStorage so the NEXT launch's title screen can
+      // surface "last crash: <stage>: <message>" instead of the player
+      // staring at a blank home screen with no clue why. Best-effort —
+      // AsyncStorage may not be ready yet, in which case the catch
+      // swallows and we lose this one but won't double-crash trying
+      // to report.
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const AS = require('@react-native-async-storage/async-storage').default;
+        const stage = (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE ?? 'unknown';
+        void AS.setItem(
+          '@tartaria/lastCrash',
+          JSON.stringify({
+            stage,
+            message: (err?.message ?? String(err)).slice(0, 500),
+            stack: (err?.stack ?? '').slice(0, 2000),
+            isFatal: !!isFatal,
+            sinceBoot: Date.now() - bootTime,
+            timestamp: Date.now(),
+          }),
+        ).catch(() => { /* ignore */ });
+      } catch { /* ignore — AS not ready */ }
+      const sinceBoot = Date.now() - bootTime;
+      // OTA-237 — was sinceBoot > 5000. Cut to 800ms because the
+      // current player crash repros within 1 second of title screen
+      // mount and the 5s window was suppressing the reload-recovery.
+      // Reload loop is mitigated by the `reloaded` latch (one reload
+      // per cold-start session) — if the crash repros on the reload,
+      // the next launch falls through without another reload and the
+      // user sees the actual crash diagnostic on the title screen.
+      if (isFatal && !reloaded && sinceBoot > 800 && Updates?.isEnabled) {
+        reloaded = true;
+        // Brief delay so any pending React render / log flush completes
+        // before the bridge swap. reloadAsync is async; we don't await
+        // because the handler can't return a promise.
+        setTimeout(() => { void Updates.reloadAsync().catch(() => { /* native side will surface */ }); }, 800);
+      }
+    });
+  }
+} catch {
+  // expo-updates missing (dev build / Expo Go) — no safety net, but
+  // the dev environment surfaces errors well enough on its own.
+}
+
+export default function App() {
+  const screen = useGameStore((s) => s.currentScreen);
+  const hydrated = useGameStore((s) => s.hydrated);
+  const hydrate = useGameStore((s) => s.hydrate);
+  const bootCognitive = useGameStore((s) => s.bootCognitive);
+  const shutdownCognitive = useGameStore((s) => s.shutdownCognitive);
+  const resumeCognitive = useGameStore((s) => s.resumeCognitive);
+  const bootQwen = useGameStore((s) => s.bootQwen);
+  const shutdownQwen = useGameStore((s) => s.shutdownQwen);
+
+  // Android immersive mode — hide the navigation bar (3-button bar at
+  // the bottom) and let the status bar overlay-swipe back. Same UX as
+  // Wordscapes / most full-screen games: gain the system bar real
+  // estate, swipe up from the bottom (or down from the top) to peek
+  // them back when needed. No-op on iOS.
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    const NB = loadNavigationBar();
+    if (!NB) return;
+    void NB.setBehaviorAsync('overlay-swipe').catch(() => { /* ignore */ });
+    void NB.setVisibilityAsync('hidden').catch(() => { /* ignore */ });
+    // OTA 026 — re-hide the navigation bar EVERY time the keyboard
+    // shows or hides. Android often re-shows the system nav bar
+    // when a TextInput gains focus (FeedbackModal, exploration
+    // input bar, etc.). Playtester: "every time I go to use the
+    // take notes option ... all of the Android buttons come back
+    // on the screen." Keyboard.addListener fires on every show /
+    // hide; we re-assert hidden on both events so a brief flash
+    // is the worst the player sees.
+    const { Keyboard } = require('react-native');
+    const reHide = () => {
+      void NB.setVisibilityAsync('hidden').catch(() => { /* ignore */ });
+    };
+    const showSub = Keyboard.addListener('keyboardDidShow', reHide);
+    const hideSub = Keyboard.addListener('keyboardDidHide', reHide);
+    return () => {
+      try { showSub.remove(); } catch { /* ignore */ }
+      try { hideSub.remove(); } catch { /* ignore */ }
+    };
+  }, []);
+
+  useEffect(() => {
+    // OTA-237 — tag each boot stage on a global so the crash handler
+    // can name the offender in the diagnostic. Cheap; only writes a
+    // string. The crash handler reads __TARTARIA_BOOT_STAGE if the
+    // process dies.
+    const setStage = (s: string) => {
+      (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE = s;
+    };
+    setStage('hydrate:start');
+    void hydrate()
+      .then(() => {
+        setStage('hydrate:done');
+        // Boot order: classifier (small, fast) first so target resolution is
+        // available as soon as the player starts a game. Generative model
+        // (large, slow) kicks off afterward without blocking — templates carry
+        // the Arbiter until it's ready.
+        setStage('cognitive:start');
+        void bootCognitive().then(() => {
+          setStage('cognitive:done');
+          void bootQwen().catch((e) => {
+            // eslint-disable-next-line no-console
+            console.warn('bootQwen failed:', e);
+          });
+        }).catch((e) => {
+          // eslint-disable-next-line no-console
+          console.warn('bootCognitive failed:', e);
+        });
+        setStage('audio:start');
+        void bootAudio().then(() => {
+          setStage('audio:done');
+          startAudioController();
+        }).catch((e) => {
+          // eslint-disable-next-line no-console
+          console.warn('bootAudio failed:', e);
+        });
+        // Voice (TTS + STT) — opt-in via settings; init is cheap so
+        // the controller can subscribe immediately. If TTS is disabled
+        // the controller short-circuits inside onState. initTTSManager
+        // ALSO prewarms Kokoro in the background when bundled engine is
+        // enabled — model download / load / graph-compile all happen
+        // while the player is on the title screen, so the first spoken
+        // line plays without cold-start lag.
+        setStage('tts:start');
+        void initTTSManager().then(() => {
+          setStage('tts:done');
+          startTTSController();
+        }).catch((e) => {
+          // eslint-disable-next-line no-console
+          console.warn('initTTSManager failed:', e);
+        });
+      // Boot-time OTA check. fetchOnly: download the update in the
+      // background but DO NOT reload here — auto-reload mid-boot
+      // crashes the process to home because native modules
+      // (executorch Kokoro, llama.rn Qwen, ONNX MiniLM, expo-av Sound)
+      // are still spinning up while reloadAsync swaps the JS bundle.
+      // The pendingOTAUpdate flag drives a TitleScreen banner that
+      // offers the player a one-tap apply from a clean state.
+      setTimeout(() => {
+        if (useGameStore.getState().currentScreen !== 'title') return;
+        void checkAndApplyOTA({ silent: true, fetchOnly: true }).then((result) => {
+          if (result === 'pending') {
+            useGameStore.setState({ pendingOTAUpdate: true });
+          }
+        });
+        }, 1500);
+        setStage('boot:complete');
+      })
+      .catch((e) => {
+        // OTA-237 — hydrate failure path was previously unhandled,
+        // letting the rejection surface to the ErrorUtils handler
+        // which would suppress it during the (previous) 5-second
+        // window and leave the player with a black screen. Catch +
+        // log so the next launch's TitleScreen can show the message.
+        setStage('hydrate:failed');
+        // eslint-disable-next-line no-console
+        console.error('hydrate failed:', e);
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          const AS = require('@react-native-async-storage/async-storage').default;
+          void AS.setItem(
+            '@tartaria/lastCrash',
+            JSON.stringify({
+              stage: 'hydrate:failed',
+              message: ((e as Error)?.message ?? String(e)).slice(0, 500),
+              stack: ((e as Error)?.stack ?? '').slice(0, 2000),
+              timestamp: Date.now(),
+            }),
+          ).catch(() => { /* ignore */ });
+        } catch { /* ignore */ }
+      });
+    return () => {
+      stopAudioController();
+      stopTTSController();
+      void disposeAudio();
+    };
+  }, [hydrate, bootCognitive, bootQwen]);
+
+  useEffect(() => {
+    const onChange = (status: AppStateStatus) => {
+      if (status === 'background' || status === 'inactive') {
+        void shutdownCognitive();
+        void shutdownQwen();
+      } else if (status === 'active') {
+        void resumeCognitive();
+        // Re-hide the navigation bar — Android sometimes restores it
+        // after the app comes back from background (system dialogs,
+        // keyboard close events). Idempotent and cheap.
+        if (Platform.OS === 'android') {
+          const NB = loadNavigationBar();
+          if (NB) void NB.setVisibilityAsync('hidden').catch(() => { /* ignore */ });
+        }
+        // Qwen does not auto-resume — re-bootQwen would re-trigger the
+        // download UI; we leave it dormant and let the user restart it
+        // manually from the About screen if they want it back.
+      }
+    };
+    const sub = AppState.addEventListener('change', onChange);
+    return () => sub.remove();
+  }, [shutdownCognitive, resumeCognitive, shutdownQwen]);
+
+  if (!hydrated) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator color="#c9a86a" />
+      </View>
+    );
+  }
+
+  return (
+    <SafeAreaProvider>
+      <ScreenErrorBoundary>
+        <AppShell screen={screen} />
+      </ScreenErrorBoundary>
+      {/* OTA-237 — global modals wrapped in their own SilentBoundary.
+          Previously these mounted OUTSIDE any error boundary; a render
+          error in TutorialOverlay / CallDogModal / etc became a
+          process crash because React doesn't catch unhandled child
+          errors at the SafeAreaProvider level. SilentBoundary catches
+          + returns null so the rest of the UI keeps rendering. */}
+      <SilentBoundary tag="TutorialOverlay">
+        {/* TutorialOverlay sits OUTSIDE SafeAreaView so its absolute
+            positioning matches measureInWindow coords from the targets
+            (which report screen-absolute, not safe-area-relative). */}
+        <TutorialOverlay />
+      </SilentBoundary>
+      <SilentBoundary tag="CallDogModal">
+        <CallDogModal />
+      </SilentBoundary>
+      <SilentBoundary tag="AetherStatPickerModal">
+        <AetherStatPickerModal />
+      </SilentBoundary>
+      <SilentBoundary tag="KeyboardInputBar">
+        <KeyboardInputBar />
+      </SilentBoundary>
+    </SafeAreaProvider>
+  );
+}
+
+// OTA-237 — lightweight error boundary for globally-rendered overlays.
+// Catches render errors, logs the tag + error to the boot-stage trail
+// (so the next launch's diagnostic can name the offender), and renders
+// null so the rest of the app keeps working. Unlike ScreenErrorBoundary
+// (which shows a recovery card), these overlays disappearing silently
+// is the right UX — they're not the primary screen.
+class SilentBoundary extends React.Component<
+  { tag: string; children: React.ReactNode },
+  { failed: boolean }
+> {
+  constructor(props: { tag: string; children: React.ReactNode }) {
+    super(props);
+    this.state = { failed: false };
+  }
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  componentDidCatch(error: Error) {
+    // eslint-disable-next-line no-console
+    console.warn(`SilentBoundary[${this.props.tag}] caught:`, error?.message, error?.stack);
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const AS = require('@react-native-async-storage/async-storage').default;
+      void AS.setItem(
+        `@tartaria/lastCrash`,
+        JSON.stringify({
+          stage: `overlay:${this.props.tag}`,
+          message: (error?.message ?? String(error)).slice(0, 500),
+          stack: (error?.stack ?? '').slice(0, 2000),
+          timestamp: Date.now(),
+        }),
+      ).catch(() => { /* ignore */ });
+    } catch { /* ignore */ }
+  }
+  render() {
+    if (this.state.failed) return null;
+    return this.props.children;
+  }
+}
+
+// Per-screen render guard. Wraps the screen switch in a React error
+// boundary so a single screen crash falls back to a recovery card
+// instead of leaving the app on a frozen gray background (which is
+// what JS render errors do when no boundary catches them — Android
+// renders the View container and nothing inside it). The recovery
+// card dumps the error message + offers "RESTART" (reloadAsync) and
+// "BACK TO TITLE" (setScreen('title')) so the player has a path out
+// without killing the process.
+class ScreenErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { error: null };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+  componentDidCatch(error: Error) {
+    // Surface to the JS log so the next bug report COPY ALL captures it.
+    // eslint-disable-next-line no-console
+    console.warn('ScreenErrorBoundary caught:', error?.message, error?.stack);
+  }
+  reset = () => this.setState({ error: null });
+  render() {
+    if (!this.state.error) return this.props.children;
+    return (
+      <View style={styles.errorRoot}>
+        <Text style={styles.errorTitle}>SOMETHING BROKE</Text>
+        <Text style={styles.errorBody}>{this.state.error.message || 'Unknown render error.'}</Text>
+        <Text style={styles.errorHint}>
+          Your progress is saved. Tap RESTART for a fresh process, or BACK TO TITLE to keep playing
+          without a restart.
+        </Text>
+        <View style={styles.errorBtnRow}>
+          <View style={styles.errorBtn} onTouchEnd={() => {
+            this.reset();
+            useGameStore.setState({ currentScreen: 'title', tutorialStep: null });
+          }}>
+            <Text style={styles.errorBtnText}>BACK TO TITLE</Text>
+          </View>
+          <View style={styles.errorBtn} onTouchEnd={() => {
+            try {
+              // eslint-disable-next-line @typescript-eslint/no-var-requires
+              const Updates = require('expo-updates') as typeof import('expo-updates');
+              if (Updates?.isEnabled) void Updates.reloadAsync().catch(() => { /* ignore */ });
+            } catch { /* ignore */ }
+          }}>
+            <Text style={styles.errorBtnText}>RESTART</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+}
+
+// Inner shell — needs useSafeAreaInsets which only resolves inside a
+// SafeAreaProvider. We compute one paddingTop = max(insets.top,
+// android-status-bar-height) so the top row clears the system bar on
+// every device without DOUBLING the inset (the previous SafeAreaView
+// edges='top' + my custom paddingTop stacked on devices where the
+// OEM does report a top inset — the player called this out as
+// over-padded). Math.max is the right merge: take whichever is bigger,
+// not both.
+function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>['currentScreen'] }) {
+  const insets = useSafeAreaInsets();
+  // OTA 023 — see prior comment for why insets are trusted directly.
+  const top = insets.top;
+  const bottom = insets.bottom;
+  // OTA 23-005 — global responsive scale. useWindowDimensions inside
+  // useUiScale is reactive: orientation flips, foldable splits, and
+  // any OS-driven dimension change re-renders this AppShell and the
+  // scale recomputes. Every screen rendered below inherits the new
+  // scale via the wrapper transform — no per-screen changes needed.
+  const ui = useUiScale();
+  // OTA-182 — keyboard-aware interior height. The wrapper View has
+  // a FIXED HEIGHT (interiorHeight) inside a `transform: scale`
+  // container. Android's native adjustResize can't shrink a fixed-
+  // height transformed View; KeyboardAvoidingView inside also can't
+  // see the keyboard's footprint because the parent's height stays
+  // constant. Net effect: when the keyboard pops up, the InputBox
+  // text field gets covered.
+  // Fix: subscribe to keyboardDidShow / keyboardDidHide and shrink
+  // interiorHeight by the keyboard's reported height. The wrapping
+  // View shrinks → InputBox at the bottom rises above the keyboard
+  // — same effect adjustResize would have given on a non-scaled
+  // container. Player ask: "whenever I am using the keyboard the
+  // text box I am typing into needs to be pushed above the keyboard
+  // so I am see what I am typing."
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
+  useEffect(() => {
+    const onShow = (e: { endCoordinates: { height: number } }) => {
+      setKeyboardOffset(e.endCoordinates.height);
+    };
+    const onHide = (): void => setKeyboardOffset(0);
+    const showSub = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow', onShow);
+    const hideSub = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide', onHide);
+    return () => { showSub.remove(); hideSub.remove(); };
+  }, []);
+  // OTA-190 — minimum bottom-padding floor so the bottom row of the
+  // ExplorationScreen (quick action chips + input + Act) isn't
+  // mashed flush against the screen edge on Android devices where
+  // immersive mode hides the nav bar and the safe-area inset reports
+  // 0. Player ask: "I need the main screen to always auto adjust to
+  // not be mushed into the very bottom on all devices." Math.max
+  // keeps the bigger value when the device DOES report an inset
+  // (gesture-area phones, iOS home-indicator devices).
+  const bottomPad = Math.max(bottom, 12);
+  // Available interior height the wrapper paints into (the safe
+  // outer View handles the status/nav bar insets). Subtract the
+  // keyboard's logical-pixel height so the text input rises into
+  // view when typing.
+  const interiorHeight = ui.logicalHeight - (top + bottomPad + keyboardOffset) / ui.scale;
+  return (
+    <View style={[styles.safe, { paddingTop: top, paddingBottom: bottomPad, paddingLeft: insets.left, paddingRight: insets.right }]}>
+      <StatusBar style="light" hidden />
+      <View
+        style={{
+          width: ui.logicalWidth,
+          height: interiorHeight,
+          transform: [{ scale: ui.scale }],
+          transformOrigin: 'top left',
+        }}
+      >
+        {screen === 'title' && <TitleScreen />}
+        {screen === 'character_creation' && <CharacterCreationScreen />}
+        {screen === 'exploration' && <ExplorationScreen />}
+        {screen === 'log' && <LogScreen />}
+        {screen === 'lore' && <LoreScreen />}
+        {screen === 'about' && <AboutScreen />}
+        {screen === 'inventory' && <InventoryScreen />}
+        {screen === 'character' && <CharacterScreen />}
+        {screen === 'map' && <MapScreen />}
+        {screen === 'crafting' && <CraftingScreen />}
+        {screen === 'vendor' && <VendorScreen />}
+        {screen === 'actions' && <ActionReferenceScreen />}
+        {screen === 'contracts' && <ContractsScreen />}
+        {screen === 'ending' && <EndingScreen />}
+      </View>
+    </View>
+  );
+}
+
+// OTA 023 — ANDROID_STATUS_PAD removed. The pad was forcing 24px
+// of top padding even when the status bar was hidden (which is
+// always the case in this app: <StatusBar hidden /> at boot).
+// SafeAreaProvider insets already report the correct value (0
+// when the bar is hidden, the gesture-area height when not), so
+// the forced floor was always wrong when the bar wasn't there.
+// Constant + RNStatusBar import retained as documentation; remove
+// in a future cleanup if no consumer surfaces.
+const ANDROID_STATUS_PAD =
+  Platform.OS === 'android' ? RNStatusBar.currentHeight ?? 24 : 0;
+void ANDROID_STATUS_PAD;
+
+const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: '#0a0908',
+  },
+  loading: { flex: 1, backgroundColor: '#0a0908', alignItems: 'center', justifyContent: 'center' },
+  errorRoot: { flex: 1, backgroundColor: '#0a0908', padding: 24, justifyContent: 'center' },
+  errorTitle: { color: '#c9a86a', fontSize: 16, fontWeight: '800', letterSpacing: 3, textAlign: 'center', marginBottom: 10 },
+  errorBody: { color: '#e07a5f', fontSize: 12, textAlign: 'center', marginBottom: 12, fontFamily: Platform.OS === 'android' ? 'monospace' : undefined },
+  errorHint: { color: '#cdbf99', fontSize: 12, textAlign: 'center', lineHeight: 18, marginBottom: 18 },
+  errorBtnRow: { flexDirection: 'row', justifyContent: 'center', gap: 12 },
+  errorBtn: {
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 3,
+    backgroundColor: '#2a1f12',
+  },
+  errorBtnText: { color: '#c9a86a', fontSize: 11, fontWeight: '800', letterSpacing: 2 },
+});

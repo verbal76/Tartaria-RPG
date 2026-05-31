@@ -1,0 +1,55 @@
+name: Export Upload Cert PEM
+
+# Decodes ANDROID_KEYSTORE_BASE64, exports the public cert as PEM,
+# uploads it as a workflow artifact for download. The PEM is what
+# Play Console wants when you "Request upload key reset" under
+# App integrity > App signing.
+#
+# Trigger: push to this file. Edit a comment + commit to re-run.
+
+on:
+  push:
+    paths:
+      - '.github/workflows/export-cert-pem.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Decode keystore + export PEM
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > keystore.jks
+          keytool -export -rfc \
+            -keystore keystore.jks \
+            -storepass:env ANDROID_KEYSTORE_PASSWORD \
+            -alias "$ANDROID_KEY_ALIAS" \
+            -file upload_cert.pem
+
+          echo ""
+          echo "=== PEM content (for reference) ==="
+          cat upload_cert.pem
+          echo ""
+          echo "SHA1 fingerprint:"
+          keytool -printcert -file upload_cert.pem | grep -E "SHA1:|SHA-1:"
+
+      - name: Upload PEM as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: upload-cert-pem
+          path: upload_cert.pem
+          retention-days: 30
