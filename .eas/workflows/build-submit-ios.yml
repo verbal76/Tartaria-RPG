@@ -1,0 +1,44 @@
+name: Build and Submit iOS to TestFlight
+
+# EAS-native workflow (not GitHub Actions). Builds a production iOS app
+# on EAS macOS infra and submits it to TestFlight via the pre-packaged
+# `testflight` job — which reuses the App Store Connect credentials EAS
+# already manages for this project (no need to plumb Apple ID + app
+# specific password through GitHub Secrets).
+#
+# Trigger paths:
+#   - manually from the EAS dashboard:
+#     https://expo.dev/accounts/hot-attic-games/projects/tartaria-/workflows
+#   - or via `eas workflow:run .eas/workflows/build-submit-ios.yml` from
+#     a terminal anywhere with `eas login` completed
+#
+# Why this exists (vs. the GitHub Actions build-ios.yml path):
+#   - The GitHub workflow can build but its submit step is locked behind
+#     `eas submit` (CLI) which EAS's web UI surfaces as a copy-the-
+#     command modal — useless when the user is cloud-only.
+#   - The pre-packaged `testflight` job handles submission entirely on
+#     EAS, no terminal needed, no Apple credentials in env vars.
+#   - For ONE-OFF submission of an already-finished build (no rebuild
+#     needed), see `.eas/workflows/submit-ios.yml` instead.
+#
+# Notes:
+#   - Production profile in eas.json pins the EAS Build image to
+#     `macos-sequoia-15.6-xcode-26.2` per Apple's 2026-04-28 Xcode-26
+#     requirement — this workflow inherits that pin.
+#   - This file lives on the active branch. EAS Workflows reads from
+#     whichever branch is checked out when the workflow runs.
+
+jobs:
+  build_ios:
+    name: Build iOS app (production)
+    type: build
+    params:
+      platform: ios
+      profile: production
+
+  submit_ios:
+    name: Submit to TestFlight
+    needs: [build_ios]
+    type: testflight
+    params:
+      build_id: ${{ needs.build_ios.outputs.build_id }}
