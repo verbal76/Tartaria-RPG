@@ -6,14 +6,20 @@ name: iOS Build (Tartaria Realms)
 #
 # Required GitHub Secrets (configure once at repo settings):
 #   EXPO_TOKEN          — from expo.dev → Account → Access Tokens
-#   APPLE_ID            — your Apple Developer email
-#   APPLE_APP_SPECIFIC_PASSWORD — appleid.apple.com → Sign-In and Security
-#                         → App-Specific Passwords → generate one
-#                         (or use APPLE_TEAM_ID + ASC_API_KEY for
-#                         long-term automation)
-#   ASC_APP_ID          — App Store Connect app's numeric ID (after
-#                         you create the listing; needed for submit)
+#   ASC_API_KEY_P8      — the full CONTENTS of the .p8 App Store Connect
+#                         API key (App Store Connect → Users and Access
+#                         → Integrations → App Store Connect API → +).
+#                         This is the cloud-only auth that lets EAS
+#                         GENERATE the Distribution Certificate +
+#                         Provisioning Profile non-interactively — no
+#                         laptop / interactive `eas credentials` needed.
+#   ASC_KEY_ID          — the Key ID shown next to the key (10 chars)
+#   ASC_ISSUER_ID       — the Issuer ID at the top of the Keys page (UUID)
+#   ASC_APP_ID          — App Store Connect app's numeric ID (in the app
+#                         URL: /apps/<ASC_APP_ID>/...; needed for submit)
 #   APPLE_TEAM_ID       — your 10-char developer team ID
+#   APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD — optional fallback auth mode
+#                         (appleid.apple.com → App-Specific Passwords)
 #
 # Trigger paths:
 #   - commit message contains [build-ios] → production iOS build
@@ -158,13 +164,44 @@ jobs:
           fi
           echo "✓ EXPO_TOKEN is set."
 
+      - name: Write App Store Connect API key (production)
+        if: steps.meta.outputs.profile == 'production'
+        env:
+          ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
+        run: |
+          set -euo pipefail
+          # The App Store Connect API key is what lets EAS authenticate
+          # to Apple WITHOUT interactive 2FA — so it can GENERATE the
+          # Distribution Certificate + Provisioning Profile on its own
+          # during a non-interactive CI build. This is the cloud-only
+          # path that removes the need for a one-time local
+          # `eas credentials` run on a laptop.
+          if [ -z "${ASC_API_KEY_P8:-}" ]; then
+            echo "::error::ASC_API_KEY_P8 secret missing — EAS cannot generate iOS credentials non-interactively."
+            echo "::error::Create a key at App Store Connect → Users and Access → Integrations → App Store Connect API."
+            echo "::error::Add the .p8 file CONTENTS as secret ASC_API_KEY_P8, the Key ID as ASC_KEY_ID, and the Issuer ID as ASC_ISSUER_ID."
+            exit 1
+          fi
+          KEY_DIR="$HOME/.app-store-connect/private_keys"
+          mkdir -p "$KEY_DIR"
+          KEY_PATH="$KEY_DIR/AuthKey.p8"
+          printf '%s\n' "$ASC_API_KEY_P8" > "$KEY_PATH"
+          # Exported to GITHUB_ENV so the build + submit steps (and
+          # eas.json's $ASC_API_KEY_PATH substitution) can read it.
+          echo "ASC_API_KEY_PATH=$KEY_PATH" >> "$GITHUB_ENV"
+          echo "✓ ASC API key written."
+
       - name: EAS Build (iOS, non-interactive)
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          # Apple credentials — required if EAS hasn't already saved
-          # certs for this project. Non-interactive needs at least one
-          # of these auth modes. App-specific password is the simpler
-          # setup; API key (ASC_API_KEY_*) scales better long-term.
+          # App Store Connect API key auth — lets EAS GENERATE the
+          # Distribution Certificate + Provisioning Profile itself,
+          # non-interactively, in CI. This is the cloud-only path: no
+          # laptop / interactive `eas credentials` run needed. The
+          # app-specific password is kept as a fallback auth mode.
+          EXPO_ASC_API_KEY_PATH: ${{ env.ASC_API_KEY_PATH }}
+          EXPO_ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          EXPO_ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
           EXPO_APPLE_ID: ${{ secrets.APPLE_ID }}
           EXPO_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
         run: |
@@ -184,15 +221,18 @@ jobs:
         if: steps.meta.outputs.profile == 'production' && steps.meta.outputs.submit == 'true'
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          EXPO_APPLE_ID: ${{ secrets.APPLE_ID }}
-          EXPO_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
+          # Submit auth via the same App Store Connect API key used for
+          # the build. eas.json submit.production.ios reads these through
+          # $VAR substitution (ascAppId / ascApiKeyPath / ascApiKeyId /
+          # ascApiKeyIssuerId). ASC_API_KEY_PATH comes from GITHUB_ENV
+          # (written by the "Write App Store Connect API key" step).
           ASC_APP_ID: ${{ secrets.ASC_APP_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
           set -euo pipefail
-          if [ -z "${ASC_APP_ID:-}" ] || [ -z "${APPLE_TEAM_ID:-}" ]; then
-            echo "::warning::ASC_APP_ID or APPLE_TEAM_ID secret missing — skipping submit."
+          if [ -z "${ASC_APP_ID:-}" ] || [ -z "${ASC_API_KEY_PATH:-}" ]; then
+            echo "::warning::ASC_APP_ID or ASC_API_KEY_PATH missing — skipping submit."
             echo "::warning::Build still produced the .ipa on Expo CDN; submit manually from expo.dev or App Store Connect."
             exit 0
           fi

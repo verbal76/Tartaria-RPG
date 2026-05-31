@@ -25,21 +25,33 @@
 
 > **⚡ ACTIVE TASK (2026-05-31) — iOS build → TestFlight External Testing. READ THIS FIRST.**
 >
-> **YOU ARE PICKING UP MID-TERMINAL-SESSION.** The user is at a live **PowerShell prompt
-> on their Windows laptop** (`D:\App Dev\Tartaria`) and has just run
-> **`eas credentials --platform ios`**. Do NOT restart the flow or re-explain from
-> scratch — they are inside the interactive wizard. Your immediate job is to read whatever
-> the wizard prints next and keep them on the path to **Generate new Distribution
-> Certificate → Generate new Provisioning Profile** (menu route below). The moment it
-> prints "Created distribution certificate / provisioning profile," the blocker is gone
-> and you move to firing the build.
+> **APPROACH PIVOTED TO CLOUD-ONLY (App Store Connect API key).** The user does
+> everything from their phone / web — no local machine, no terminal. So the original
+> plan (interactive `eas credentials` on a laptop) is DEAD. We dead-ended on it: the
+> laptop had no repo (`eas credentials` errored "Run this command inside a project
+> directory"), and cloning was a non-starter because the user is cloud-only. The NEW
+> path: authenticate EAS to Apple with an **App Store Connect API key (.p8)** so EAS
+> **generates the Distribution Certificate + Provisioning Profile ITSELF, non-interactively,
+> during the CI build** — zero human, zero laptop. The API key is created entirely in the
+> App Store Connect web UI (phone-friendly).
 >
-> This is the live thread the current session is on. It is a hands-on-the-user's-machine
-> task, not a code task — there is nothing to edit in the repo right now. The whole job
-> is getting Apple to issue an iOS **Distribution Certificate** so EAS can build a signed
-> `.ipa` and ship it to the user's Apple playtesters via **TestFlight External Testing**
-> (explicitly NOT Internal Testing — the user does not want playtesters to have Developer
-> modify-access).
+> **WORKFLOW IS ALREADY WIRED FOR THIS (committed this session):** `build-ios.yml` now has
+> a "Write App Store Connect API key" step that materializes the `.p8` from a secret and
+> exports `ASC_API_KEY_PATH`; the build step passes `EXPO_ASC_API_KEY_PATH` /
+> `EXPO_ASC_KEY_ID` / `EXPO_ASC_ISSUER_ID`; the submit step + `eas.json`
+> `submit.production.ios` use the same key (`ascApiKeyPath` / `ascApiKeyId` /
+> `ascApiKeyIssuerId` / `ascAppId`).
+>
+> **WHAT THE NEXT INSTANCE IS WAITING ON:** the user to create the ASC API key in the web
+> UI and add **three GitHub secrets**: `ASC_API_KEY_P8` (full .p8 file contents),
+> `ASC_KEY_ID` (10-char Key ID), `ASC_ISSUER_ID` (UUID at top of the Keys page). The key
+> needs **App Manager** (or Admin) role. Once those three secrets exist, fire the build
+> with a commit titled **`[build-ios] [submit-ios]`** — EAS generates the cert and ships
+> to TestFlight in one CI run (~20-30 min build + first-time ~24h Apple beta review).
+>
+> The whole job is getting a signed `.ipa` to the user's Apple playtesters via
+> **TestFlight External Testing** (explicitly NOT Internal Testing — the user does not
+> want playtesters to have Developer modify-access).
 >
 > **GOAL:** Apple playtesters install the game through TestFlight, current with HaL
 > (same JS bundle, OTA channel `hal2001`, rt 2.4.1). Build on Expo's hosted macOS infra
@@ -63,39 +75,41 @@
 > **THE BLOCKER — where we are RIGHT NOW:** the iOS **Distribution Certificate +
 > Provisioning Profile do NOT exist yet** for the bare bundle. Without them every EAS
 > iOS build fails non-interactively ("Distribution Certificate is not validated for
-> non-interactive builds"). **Critical gotcha already learned the hard way: the expo.dev
-> WEB wizard CANNOT generate the cert** — its step-4-of-8 only offers "Upload new" /
-> "Choose saved" with no Generate button. **Only the CLI `eas credentials --platform ios`
-> can generate it** (it talks to Apple's API directly). Earlier the Codespaces browser
-> login failed too (localhost OAuth callback couldn't reach the phone) — so the user
-> moved to a **Windows laptop** (`D:\App Dev\Tartaria`, PowerShell).
+> non-interactive builds"). **Gotchas learned the hard way (do NOT re-attempt these):**
+> (1) the expo.dev WEB wizard CANNOT generate the cert — step-4-of-8 only offers "Upload
+> new" / "Choose saved", no Generate button. (2) The interactive `eas credentials` CLI
+> CAN generate it, but it needs the project files on a real machine — the user is
+> cloud-only (does everything from the phone), has no repo locally, and won't clone.
+> Codespaces also failed (localhost OAuth callback couldn't reach the phone). **So the
+> CLI path is abandoned.** The cure is the App Store Connect API key (above): EAS uses it
+> to generate the cert itself inside the CI build, no machine required.
 >
-> **Laptop progress this session:**
-> - Hit PowerShell `npm.ps1 cannot be loaded` (script execution disabled). Fixed with
->   `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned` (applied clean).
-> - `npm install -g eas-cli` → `eas login` → browser login **succeeded** ("You have
->   successfully logged in").
-> - Currently running **`eas credentials --platform ios`** and being walked through the
->   menu: select **production** profile → (Apple login w/ app-specific password, team
->   `7Z67WUB9FA`) → **Build Credentials** → **All: Set up all required credentials** →
->   **Generate new Apple Distribution Certificate (Yes)** → **Generate new Provisioning
->   Profile (Yes)**.
+> **DONE THIS SESSION (workflow wiring — committed):** `build-ios.yml` + `eas.json`
+> rewired for API-key auth. New "Write App Store Connect API key" step writes the `.p8`
+> from `secrets.ASC_API_KEY_P8` and exports `ASC_API_KEY_PATH`; build step gets
+> `EXPO_ASC_API_KEY_PATH` / `EXPO_ASC_KEY_ID` / `EXPO_ASC_ISSUER_ID`; submit step +
+> `eas.json submit.production.ios` use `ascApiKeyPath` / `ascApiKeyId` /
+> `ascApiKeyIssuerId` / `ascAppId`.
 >
-> **NEXT STEPS once the cert prints "Created distribution certificate / provisioning
-> profile":**
-> 1. Verify both show at https://expo.dev/accounts/hot-attic-games/projects/tartaria-/credentials
->    (iOS → bundle `com.hotatticgames.tartarprim`).
-> 2. Fire the build: commit titled **`[build-ios] [submit-ios]`** on the current feature
->    branch → workflow builds on EAS macOS infra (~20-30 min) AND auto-submits to TestFlight.
-> 3. First external TestFlight build needs **~24h Apple beta review** before it reaches the
+> **NEXT STEPS (in order):**
+> 1. **User creates the ASC API key** (App Store Connect → Users and Access →
+>    Integrations → App Store Connect API → generate, role **App Manager**), downloads
+>    the `.p8`, and adds three GitHub secrets: `ASC_API_KEY_P8` (full file contents),
+>    `ASC_KEY_ID`, `ASC_ISSUER_ID`. ← **this is what we're waiting on**
+> 2. Fire the build: commit titled **`[build-ios] [submit-ios]`** on `HaL2001` → workflow
+>    writes the key, EAS generates the cert + profile and builds on macOS infra
+>    (~20-30 min), then auto-submits to TestFlight.
+> 3. Verify the generated cert at
+>    https://expo.dev/accounts/hot-attic-games/projects/tartaria-/credentials.
+> 4. First external TestFlight build needs **~24h Apple beta review** before it reaches the
 >    external group.
-> 4. TestFlight External Testing setup (App Store Connect): privacy policy URL (offered to
+> 5. TestFlight External Testing setup (App Store Connect): privacy policy URL (offered to
 >    draft — local-only single-player game, no analytics/accounts), age rating (~12+),
 >    External group + tester emails, Beta App Review info.
 >
 > **Standing user directive:** "I don't ever do anything in EAS. you should be able to
-> push everything through EAS on your own." The ONLY thing requiring the user's hands is
-> this one-time interactive cert creation; everything after is CI-driven.
+> push everything through EAS on your own." With API-key auth, this is now fully true —
+> ZERO hands-on steps for the user beyond pasting the three secrets once.
 >
 > **Note:** the designated feature branch per task instructions is
 > `claude/google-signing-code-app-WsOrj`, but the live OTA branch is `HaL2001`. Confirm
