@@ -96,25 +96,25 @@ jobs:
         run: |
           # Resolution chain:
           #   1. tag v*-ios → production (TestFlight-ready)
-          #   2. commit message FIRST LINE contains [build-ios] → production
+          #   2. commit message FIRST LINE STARTS WITH [build-ios] →
+          #      production. Strict prefix match so commits like
+          #      "Fix iOS workflow false-positive on [build-ios] in
+          #      body" don't false-positive production. To intentionally
+          #      fire production iOS, title the commit:
+          #        [build-ios] OTA-XXX — description
+          #        or to also auto-submit to TestFlight:
+          #        [build-ios] [submit-ios] OTA-XXX — description
           #   3. workflow_dispatch input → as chosen
           #   4. default → preview (sideload internal build)
-          #
-          # OTA-254 — match the FIRST LINE only, not the whole body.
-          # Previous matcher checked the whole commit message which
-          # false-positive'd on documentation text mentioning the
-          # marker (e.g. "push [build-ios] to fire production" in a
-          # body description triggered production). First-line match
-          # keeps the marker semantically tied to the commit title
-          # while still being easy to type.
           FIRST_LINE=$(echo "$COMMIT_MSG" | head -1)
           if [[ "${GITHUB_REF}" == refs/tags/v*-ios ]]; then
             PROFILE="production"
             SHOULD_SUBMIT="true"
-          elif [[ "$FIRST_LINE" == *"[build-ios]"* ]]; then
+          elif [[ "$FIRST_LINE" =~ ^\[build-ios\] ]]; then
             PROFILE="production"
-            # Submit only if [submit-ios] ALSO present in first line.
-            if [[ "$FIRST_LINE" == *"[submit-ios]"* ]]; then
+            # [submit-ios] gates the auto-submit step. Must also be
+            # in the first line (anywhere after [build-ios]).
+            if [[ "$FIRST_LINE" =~ \[submit-ios\] ]]; then
               SHOULD_SUBMIT="true"
             else
               SHOULD_SUBMIT="false"
