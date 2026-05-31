@@ -324,6 +324,18 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-260 — Boxing/karate exception: punch / kick still graze you on a successful dodge
+
+- **OTA-260 · Player: *"punch and kick should still land damage on Dodge — think boxing and karate"***
+  - **What was off:** the parry mechanic (player taps dodge → d20 + DEX vs enemy ATK → success negates ALL damage + counter-strikes at 2× weapon dice) treated every incoming attack the same. A successful parry against a sword swing felt right (you knock the line aside, the blade misses you cleanly); a successful parry against a Reclaimer's punch shouldn't. Boxing/karate framing: you can READ a hook and counter for damage, but the wide arc of a body strike still grazes you on the way past. Weapons have a definite edge and a definite arc; fists do not.
+  - **Fix (game-side):** in the parry success branch of `applyEnemyCounter` (gameStore.ts ~18187), detect whether the incoming attack is an unarmed body strike via `isUnarmedStrike(String(enemy.damage))`. Helper added near `parseIncomingDamageType` — looks for keywords `punch / kick / fist / knuckle / headbutt / elbow / knee / stomp / slam / shove / tackle / jab / hook / uppercut / cross` in the enemy's authored damage string. On a successful parry of an unarmed strike, `dmg = Math.max(1, Math.floor(rawDmg * 0.5))` instead of `dmg = 0` — you eat half the rolled damage, floor 1. Counter-strike still fires at 2× weapon dice (you DID open a window).
+  - **Narration:** new line distinguishes the cases: weapons read *"✓ Caught the blade. Counter-strike for N (2× XdY)."*, unarmed reads *"✓ Read the strike, but you can't parry a fist clean — N grazes you. Counter-strike for N (2× XdY)."* Bare-handed (no weapon) line also reflects the unarmed exception: *"✓ Read it, but you can't parry a fist clean barehanded — N grazes you."* Failed parries unchanged (full damage, no counter, same line).
+  - **What's NOT unarmed (continues to parry clean):** natural weapons — `bite`, `claw`, `talon`, `horn`, `tail`, `sting` — are NOT in the unarmed list. They're edged weapons mounted on a creature; the dodge handles them the same way it handles a sword swing. Weapons by name (the enemy's authored damage string is `1d8 sword` or `claw 1d4` not `punch 1d6`) also stay outside the unarmed branch.
+  - **Why 50% and not 25% or 75%:** 50% reads as "clipped on the way past" intuitively, and roughly matches the rebalance feel that boxing/MMA fans have for "took the glancing edge of a hook." 25% would be too generous; 75% would obviate the parry. Single tuning constant if it ever feels off.
+  - **Combat balance impact:** humanoid enemies whose authored damage string includes body-strike verbs (Reclaimers with `punch`, brawlers with `headbutt`, etc.) become slightly more dangerous against a parry-stance player. Net positive — the parry is still very good against weapon-wielding enemies (which is most of them) and still trains DEX on success and still counters; the unarmed exception just removes the "I just walk up to a boxer and parry forever" loop.
+  - **OTA-only:** all JS-side; no native rebuild.
+  - **Files:** `app/state/gameStore.ts` (success branch of parry in `applyEnemyCounter` + bare-handed branch narration + new `isUnarmedStrike` helper + UNARMED_STRIKE_KEYWORDS const).
+
 #### OTA-259 — CONTINUE popup between multi-stage investigation hook steps
 
 - **OTA-259 · Player: *"when you are investigating and there is a multipart story thread, instead of going back into investigate, you should get a continue button popup in between stages"***

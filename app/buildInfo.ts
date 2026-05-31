@@ -10767,4 +10767,27 @@ export const DISPLAY_VERSION = '3.0.0';
 //          HookContinueModal.tsx (NEW), app/screens/
 //          ExplorationScreen.tsx (import + state selectors +
 //          modal render).
-export const OTA_BUILD_ID = '2026-05-31-259';
+//
+// OTA-260 — Boxing/karate exception: punch / kick still graze you
+//   on a successful dodge. Player call: "punch and kick should still
+//   land damage on Dodge — think boxing and karate." Pre-OTA-260 a
+//   successful parry roll (d20 + DEX vs enemy ATK) negated ALL
+//   damage regardless of attack type — including punches and kicks,
+//   which felt off (you can read a boxer's hook but you still eat
+//   the glance of it). Now: weapons still parry clean (dmg = 0);
+//   unarmed strikes — classified by keywords in enemy.damage like
+//   'punch' / 'kick' / 'fist' / 'knuckle' / 'headbutt' / 'elbow' /
+//   'knee' / 'stomp' / 'slam' / 'shove' / 'tackle' / 'jab' / 'hook' /
+//   'uppercut' / 'cross' — still deal 50% of the rolled damage
+//   (floor 1) on a successful parry. Counter-strike (2× weapon dice
+//   if armed; 0 if barehanded) still fires either way — you DID open
+//   a window — but you eat the body shot to get it. Narration line
+//   updated to reflect "Read the strike, but you can't parry a fist
+//   clean — N grazes you" so the reduced-but-real damage doesn't
+//   confuse. Natural weapons (bite / claw / talon / horn / sting)
+//   are NOT in the unarmed list and continue to parry clean — those
+//   are edged weapons mounted on a creature.
+//   Files: app/state/gameStore.ts (success branch of the dodge code
+//          in applyEnemyCounter + bare-handed branch + new
+//          isUnarmedStrike helper near parseIncomingDamageType).
+export const OTA_BUILD_ID = '2026-05-31-260';

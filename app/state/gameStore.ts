@@ -18185,7 +18185,25 @@ function applyEnemyCounter(
           }
         }
         const before = dmg;
-        dmg = 0;
+        // OTA-260 — boxing/karate exception. Weapon strikes can be
+        // parried clean — steel has a definite arc and a definite
+        // edge, you knock the line aside and you take nothing. A
+        // PUNCH or KICK is different: it's a body part with momentum
+        // behind it, the swing arc is wide, and "dodge" against a
+        // boxer means absorbing the glancing edge of a hook even when
+        // your read was right. Player call: "punch and kick should
+        // still land damage on Dodge — think boxing and karate."
+        // Detect unarmed strike via keywords in the enemy.damage
+        // string; on a successful parry of an unarmed strike, the
+        // counter still fires at 2× weapon dice (you opened a window),
+        // but the player eats 50% of the rolled damage (floor 1) for
+        // getting clipped on the way through.
+        const isUnarmedIncoming = isUnarmedStrike(String(enemy.damage));
+        if (isUnarmedIncoming) {
+          dmg = Math.max(1, Math.floor(before * 0.5));
+        } else {
+          dmg = 0;
+        }
         if (equipped) {
           // Counter-strike at 2× the weapon's damage notation.
           const parsed = parseDamageDice(equipped.damageDice);
@@ -18196,9 +18214,17 @@ function applyEnemyCounter(
           const fx = parseWeaponEffect(equipped.effect);
           if (fx) counterDmg += rollEffectBonusDamage(fx, enemy);
           riposteDamage = Math.max(1, counterDmg);
-          parryNarration = `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✓ Caught the blade. Counter-strike for ${riposteDamage} (2× ${equipped.damageDice}).`;
+          parryNarration = isUnarmedIncoming
+            ? `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✓ Read the strike, but you can't parry a fist clean — ${dmg} grazes you. Counter-strike for ${riposteDamage} (2× ${equipped.damageDice}).`
+            : `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✓ Caught the blade. Counter-strike for ${riposteDamage} (2× ${equipped.damageDice}).`;
         } else {
-          parryNarration = `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✓ Slipped clean (no weapon to counter).`;
+          // Bare-handed parry. Same OTA-260 boxing exception applies:
+          // a punch / kick still grazes even when you read the swing.
+          // No counter possible without a weapon, so the only outcome
+          // mod is the partial-damage on unarmed incoming.
+          parryNarration = isUnarmedIncoming
+            ? `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✓ Read it, but you can't parry a fist clean barehanded — ${dmg} grazes you.`
+            : `Parry — d20 → ${parryRoll} + DEX ${stats.dexterity} = ${parryTotal} vs ATK ${atkTotal}. ✓ Slipped clean (no weapon to counter).`;
         }
         void before;
       } else {
@@ -18375,6 +18401,25 @@ function parseIncomingDamageType(damageString: string): string | null {
     if (lower.includes(t)) return t === 'psychic' ? 'aetheric' : t;
   }
   return null;
+}
+
+// OTA-260 — boxing/karate-style body strikes that should still graze
+// the player on a successful dodge/parry. Keyed on humanoid-fighter
+// verbs (the user's framing was explicit: "think boxing and karate").
+// Natural weapons (bite / claw / talon / horn / sting) are NOT in
+// this list — those are real edged weapons mounted on a creature,
+// and the dodge handles them clean like a sword. The current incoming
+// attack is classified by string-match against enemy.damage, which
+// is where authored monster damage notation lives ("punch 1d6+1",
+// "claw 1d4", "1d8 sword", etc).
+const UNARMED_STRIKE_KEYWORDS = [
+  'punch', 'kick', 'fist', 'knuckle', 'headbutt', 'head-butt',
+  'elbow', 'knee', 'stomp', 'slam', 'shove', 'tackle', 'jab',
+  'hook', 'uppercut', 'cross',
+];
+function isUnarmedStrike(damageString: string): boolean {
+  const lower = damageString.toLowerCase();
+  return UNARMED_STRIKE_KEYWORDS.some((k) => lower.includes(k));
 }
 
 // Death is no longer permanent erasure. The character is marked dead and
