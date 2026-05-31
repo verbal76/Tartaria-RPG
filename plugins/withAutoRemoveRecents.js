@@ -1,37 +1,40 @@
 // withAutoRemoveRecents — Expo config plugin that makes the
-// EXIT GAME path actually remove Tartaria from the Recents list
-// AND fully terminate the process.
+// EXIT GAME path actually remove Tartaria from the Recents list.
 //
-// Why we need this:
-//   TitleScreen's EXIT GAME button calls BackHandler.exitApp(),
-//   which on Android (RN 0.76) ends up calling
-//   ReactActivity.invokeDefaultOnBackPressed() → super.onBackPressed()
-//   → Activity.finish(). That ends the activity, but the task entry
-//   stays in Recents and the JS process backgrounded — so when the
-//   player hits the square Recents button they see Tartaria still
-//   sitting there.
+// Two layers (OTA-247):
 //
-// Two layers of defense (OTA-245 rewrite):
+//   1. Manifest: `android:autoRemoveFromRecents="true"` on any
+//      activity whose name resolves to MainActivity.
 //
-//   1. Manifest: add `android:autoRemoveFromRecents="true"` to ANY
-//      activity whose name resolves to MainActivity (defensive vs.
-//      Expo SDK changes — earlier versions of this plugin matched
-//      only the exact `.MainActivity` string and could silently miss
-//      a fully-qualified name).
+//   2. MainActivity.kt: replace ONLY the `if (!moveTaskToBack(false))`
+//      block inside the existing `invokeDefaultOnBackPressed`
+//      override. Expo SDK 52's template emits:
 //
-//   2. MainActivity.kt: inject an `onBackPressed` override that
-//      calls `finishAndRemoveTask()` and then `super.onBackPressed()`.
-//      finishAndRemoveTask is the guaranteed way to clear the task
-//      from Recents — it's the same API the launcher uses.
+//        override fun invokeDefaultOnBackPressed() {
+//            if (!moveTaskToBack(false)) {
+//                super.invokeDefaultOnBackPressed()
+//            }
+//        }
 //
-//   The combination handles both the "Recents lingering" case
-//   (manifest flag) and the "JS process won't die" case
-//   (finishAndRemoveTask which signals the OS to reclaim).
+//      The moveTaskToBack(false) call is what backgrounds the
+//      activity instead of finishing it — that's the bug. We
+//      replace that single if-block with:
 //
-//   Only kicks in on the EXIT GAME path; pressing HOME or the
-//   Recents button itself just backgrounds the activity (doesn't
-//   call invokeDefaultOnBackPressed) so the normal "leave Tartaria
-//   and come back later" UX is unchanged.
+//        finishAndRemoveTask()
+//        super.invokeDefaultOnBackPressed()
+//
+//      Surgical: we don't add a new method (no risk of duplicate
+//      override), we don't replace the method signature (no regex
+//      brittleness around outer brace matching). We just patch
+//      ONE inner block that we can find by literal substring.
+//
+//      If the substring isn't in MainActivity.kt (Expo SDK changes
+//      the template, the build's a bare-workflow project, etc.),
+//      the layer-1 manifest flag still ships and the patch is a
+//      no-op. Logged so the next AAB build's log names the gap.
+//
+//   Idempotent: the `moveTaskToBack` literal is gone after a
+//   successful patch, so a re-run finds nothing and skips.
 
 const { withAndroidManifest, withDangerousMod } = require('expo/config-plugins');
 const fs = require('fs');
@@ -56,34 +59,13 @@ function withAutoRemoveRecents(config) {
     return cfg;
   });
 
-  // Layer 2 — patch MainActivity.kt so EXIT GAME actually exits.
-  //
-  // The Expo SDK 52 template already provides an
-  // `invokeDefaultOnBackPressed` override on MainActivity that calls
-  // `moveTaskToBack(false)` and only falls through to
-  // `super.invokeDefaultOnBackPressed()` when moveTaskToBack returns
-  // false. That's why EXIT GAME backgrounds the activity instead of
-  // finishing it — the task lingers in Recents and the process
-  // stays alive.
-  //
-  // We REPLACE that existing override's body (don't add a new method
-  // — Kotlin rejects duplicate overrides as "Conflicting overloads"
-  // at compile time, which was the OTA-245-first-AAB build failure).
-  // The new body calls `finishAndRemoveTask()` AND `super.invokeDefault
-  // OnBackPressed()`, which terminates the activity AND clears it from
-  // Recents. Combined with the manifest flag, EXIT GAME fully exits.
-  //
-  // Idempotent via the marker comment. If the template ever changes
-  // and the existing override anchor isn't found, we fall back to
-  // adding a new override before `createReactActivityDelegate`.
+  // Layer 2 — patch the moveTaskToBack block in MainActivity.
   config = withDangerousMod(config, [
     'android',
     async (cfg) => {
       const platformProjectRoot = cfg.modRequest.platformProjectRoot;
       const candidates = [
-        // SDK 52 default Kotlin path
         path.join(platformProjectRoot, 'app', 'src', 'main', 'java', ...cfg.android.package.split('.'), 'MainActivity.kt'),
-        // legacy java fallback (Expo 52+ uses Kotlin; kept for safety)
         path.join(platformProjectRoot, 'app', 'src', 'main', 'java', ...cfg.android.package.split('.'), 'MainActivity.java'),
       ];
       const file = candidates.find((p) => {
@@ -91,73 +73,52 @@ function withAutoRemoveRecents(config) {
       });
       if (!file) {
         // eslint-disable-next-line no-console
-        console.warn(`[withAutoRemoveRecents] MainActivity source not found under ${platformProjectRoot}; skipping onBackPressed patch.`);
+        console.warn(`[withAutoRemoveRecents] MainActivity source not found under ${platformProjectRoot}; skipping moveTaskToBack patch.`);
         return cfg;
       }
-      let src = fs.readFileSync(file, 'utf8');
-      const MARKER = '// withAutoRemoveRecents:onBackPressed';
-      if (src.includes(MARKER)) return cfg;
-
-      // Kotlin path — Expo SDK 52 default. Match the existing
-      // override block tolerantly (any whitespace, any indent). The
-      // canonical template form is:
-      //   override fun invokeDefaultOnBackPressed() {
-      //     if (!moveTaskToBack(false)) {
-      //       super.invokeDefaultOnBackPressed()
-      //     }
-      //   }
-      if (file.endsWith('.kt')) {
-        // Match the entire override block, including the inner
-        // moveTaskToBack `if {}` brace nesting. The `[^{}]*\{[^{}]*\}`
-        // pattern eats one level of nested braces, which is the
-        // template form. Greedy `[^{}]` segments stay inside the
-        // current brace level — anchors are the two outer braces.
-        const existingOverride = /override\s+fun\s+invokeDefaultOnBackPressed\s*\(\)\s*\{[^{}]*\{[^{}]*\}[^{}]*\}/m;
-        const replacementBody = `override fun invokeDefaultOnBackPressed() {
-    ${MARKER}
-    // Player ask: EXIT GAME should actually exit. Expo SDK 52's
-    // template called moveTaskToBack(false) here, which just
-    // backgrounded the activity — task stayed in Recents.
-    // finishAndRemoveTask() destroys the activity AND clears the
-    // task entry, which is what the launcher uses to fully exit
-    // an app. Combined with autoRemoveFromRecents="true" on the
-    // manifest, EXIT GAME now drops the player to the home
-    // screen with no Tartaria entry in Recents.
-    finishAndRemoveTask()
-    super.invokeDefaultOnBackPressed()
-  }`;
-        if (existingOverride.test(src)) {
-          src = src.replace(existingOverride, replacementBody);
-        } else {
-          // Fallback: no existing override — add a fresh one before
-          // createReactActivityDelegate or, failing that, before the
-          // last brace of the class. Same as the original plan.
-          const block = `  ${replacementBody}\n\n`;
-          const anchor = '  override fun createReactActivityDelegate()';
-          if (src.includes(anchor)) {
-            src = src.replace(anchor, block + anchor);
-          } else {
-            const lastBrace = src.lastIndexOf('}');
-            src = src.slice(0, lastBrace) + '\n' + block + src.slice(lastBrace);
-          }
-        }
-      } else {
-        // Java fallback — same nested-brace pattern.
-        const existingOverrideJava = /@Override\s*\n\s*public\s+void\s+invokeDefaultOnBackPressed\s*\(\)\s*\{[^{}]*\{[^{}]*\}[^{}]*\}/m;
-        const javaReplacement = `@Override
-  public void invokeDefaultOnBackPressed() {
-    ${MARKER}
-    finishAndRemoveTask();
-    super.invokeDefaultOnBackPressed();
-  }`;
-        if (existingOverrideJava.test(src)) {
-          src = src.replace(existingOverrideJava, javaReplacement);
-        } else {
-          const lastBrace = src.lastIndexOf('}');
-          src = src.slice(0, lastBrace) + '\n  ' + javaReplacement + '\n' + src.slice(lastBrace);
-        }
+      const src0 = fs.readFileSync(file, 'utf8');
+      if (!src0.includes('moveTaskToBack')) {
+        // eslint-disable-next-line no-console
+        console.warn(`[withAutoRemoveRecents] moveTaskToBack not in ${file}; manifest flag is the only EXIT GAME path on this build.`);
+        return cfg;
       }
+
+      // Find `if (!moveTaskToBack(...))` and the brace block right
+      // after it. Walk braces to find the closing brace of that
+      // if-block. Replace the whole `if (...) { ... }` with our
+      // finishAndRemoveTask + super call.
+      const ifIdx = src0.indexOf('if (!moveTaskToBack');
+      if (ifIdx < 0) {
+        // eslint-disable-next-line no-console
+        console.warn(`[withAutoRemoveRecents] expected pattern 'if (!moveTaskToBack' missing in ${file}; manifest flag only.`);
+        return cfg;
+      }
+      // Find the '{' that opens the if-block.
+      const openIdx = src0.indexOf('{', ifIdx);
+      if (openIdx < 0) return cfg;
+      // Walk forward, counting braces, to find the matching '}'.
+      let depth = 1;
+      let closeIdx = openIdx + 1;
+      while (closeIdx < src0.length && depth > 0) {
+        const c = src0[closeIdx];
+        if (c === '{') depth++;
+        else if (c === '}') depth--;
+        closeIdx++;
+      }
+      if (depth !== 0) {
+        // eslint-disable-next-line no-console
+        console.warn(`[withAutoRemoveRecents] could not find matching close brace for moveTaskToBack if-block; manifest flag only.`);
+        return cfg;
+      }
+      // closeIdx points one past the matching '}'.
+      const isKotlin = file.endsWith('.kt');
+      const replacement = isKotlin
+        ? '// withAutoRemoveRecents:onBackPressed\n      finishAndRemoveTask()\n      super.invokeDefaultOnBackPressed()'
+        : '// withAutoRemoveRecents:onBackPressed\n      finishAndRemoveTask();\n      super.invokeDefaultOnBackPressed();';
+      const src = src0.slice(0, ifIdx) + replacement + src0.slice(closeIdx);
       fs.writeFileSync(file, src, 'utf8');
+      // eslint-disable-next-line no-console
+      console.log(`[withAutoRemoveRecents] patched moveTaskToBack block in ${file} → finishAndRemoveTask.`);
       return cfg;
     },
   ]);

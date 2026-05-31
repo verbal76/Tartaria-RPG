@@ -10364,4 +10364,63 @@
 // duplicate; nested-brace
 // pattern captures full
 // method body).
-export const OTA_BUILD_ID = '2026-05-30-246';
+// 2026-05-30-247 — third
+// attempt at EXIT GAME fix.
+// OTA-246's nested-brace
+// regex didn't match Expo
+// SDK 52's actual generated
+// MainActivity.kt form, so
+// the fallback fired and
+// injected a DUPLICATE
+// invokeDefaultOnBackPressed
+// — same Kotlin conflicting-
+// overloads error as OTA-
+// 245.
+//
+// Surgical rewrite: don't
+// try to match the whole
+// method or its outer braces.
+// Just find the literal
+// `if (!moveTaskToBack`
+// substring, walk forward
+// counting braces to find
+// the matching close, and
+// replace ONLY that inner
+// if-block with finishAnd
+// RemoveTask() + super.
+// invokeDefaultOnBackPressed
+// ().
+//
+// Benefits:
+// - No regex brittleness
+//   around indentation /
+//   newlines / outer braces.
+// - No risk of duplicate
+//   method (we don't touch
+//   the method signature).
+// - Idempotent — moveTask
+//   ToBack is gone after a
+//   successful patch.
+// - If the substring isn't
+//   present (template
+//   changed), patch no-ops
+//   and the layer-1 manifest
+//   flag still ships. Logged
+//   so the next build's log
+//   names the gap.
+//
+// Smoke-tested the brace
+// walk against the canonical
+// SDK 52 template form:
+// 1 method def, 0
+// moveTaskToBack, 1
+// finishAndRemoveTask.
+//
+// Carries [build-aab].
+//
+// Files: plugins/withAuto
+// RemoveRecents.js (literal
+// substring find + brace
+// walk + slice replace
+// instead of regex).
+export const OTA_BUILD_ID = '2026-05-30-247';

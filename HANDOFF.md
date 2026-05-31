@@ -245,6 +245,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-247 — third attempt at EXIT GAME fix; literal substring + brace walk
+
+- **OTA-247 + [build-aab] retry · OTA-246's second AAB build still failed Kotlin compile:**
+  - **Diagnosis:** OTA-246's nested-brace regex `[^{}]*\{[^{}]*\}[^{}]*\}` didn't match Expo SDK 52's actual generated MainActivity.kt form (template differs from the canonical example I smoke-tested). The fallback path fired → injected a duplicate `invokeDefaultOnBackPressed` → same "Conflicting overloads" error.
+  - **Fix (surgical, no regex):** find the literal substring `if (!moveTaskToBack`, walk forward counting braces to find the matching `}`, replace ONLY that inner if-block with `finishAndRemoveTask() + super.invokeDefaultOnBackPressed()`. We never touch the method signature, so no risk of duplicate overrides.
+  - **Idempotent:** the `moveTaskToBack` literal is gone after a successful patch.
+  - **Fallback:** if the substring isn't present (template changed), patch no-ops, log a console warning, and the layer-1 manifest flag still ships.
+  - **Smoke-tested** the brace walk against the canonical SDK 52 template — 1 method definition, 0 moveTaskToBack, 1 finishAndRemoveTask after replacement.
+  - **Files:** `plugins/withAutoRemoveRecents.js` (literal substring find + brace walk + slice replace, no regex).
+
 #### OTA-246 — fix AAB build crash; EXIT GAME plugin now REPLACES the existing override
 
 - **OTA-246 + AAB retry (2026-05-30) · Build failure on the OTA-245 AAB attempt:**
