@@ -17,6 +17,7 @@ import * as Application from 'expo-application';
 import { Platform, Dimensions, PixelRatio } from 'react-native';
 import { OTA_BUILD_ID, DISPLAY_VERSION } from '../buildInfo';
 import { getBuildCodename } from '../buildCodename';
+import { mlHealthSummary } from './mlHealth';
 
 export function buildBasicDeviceSummary(): string {
   const apkBuild = Application.nativeBuildVersion ?? '(unknown)';
@@ -86,6 +87,14 @@ export function buildBasicDeviceSummary(): string {
     // the GitHub repo. The codename map lives in
     // app/buildCodename.ts and docs/build-codenames.md.
     `  Build: ${getBuildCodename(OTA_BUILD_ID)}`,
+    ``,
+    // OTA-272 — ML runtime health block. Tells the dev at triage
+    // time whether this tester has hit native ML crashes and
+    // self-disabled. Crash count + timestamps surface here so a
+    // bug report containing "everything feels less interesting"
+    // can be diagnosed as "Qwen is auto-disabled, they're on
+    // template narration only" instead of guessing.
+    mlHealthSummary(),
   ];
   return lines.join('\n');
 }

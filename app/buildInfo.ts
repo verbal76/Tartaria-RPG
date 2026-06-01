@@ -11103,4 +11103,45 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 246;
 //          constant), app/screens/TitleScreen.tsx (banner render +
 //          openPlayStore handler + dismiss state + styles + guard on
 //          existing GitHub APK banner so it only fires for .hal2001).
-export const OTA_BUILD_ID = '2026-06-01-271';
+// OTA-272 — ML runtime crash gate + deferred init + health summary.
+//   Player ask: Slate Spire mitigation. Multiple testers (Galaxy
+//   S20+ and likely other Snapdragon-865-era ARMv8.2 devices) are
+//   crashing on launch with native SIGSEGV / SIGILL / SIGABRT in
+//   libllama (Qwen), libexecutorch_jni (Kokoro), and libjsi
+//   (downstream cleanup). Root cause is an upstream CPU-variant-
+//   selection bug in llama.rn / react-native-executorch — they load
+//   binaries that assume ARMv8.6 features (i8mm, SVE) that the older
+//   chips don't have. We can't patch the native libs in an OTA.
+//   What we CAN do: gate the ML inits behind a crash counter so
+//   that after 2 detected crashes the install permanently falls
+//   back to template narration, never crashes again.
+//   Three coupled changes:
+//   (1) NEW `app/diagnostics/mlHealth.ts` — AsyncStorage-backed
+//       crash detection. Writes a breadcrumb before each ML init
+//       attempt and another after success; on next launch detects
+//       "attempted but never succeeded" pattern and increments a
+//       crashCount. At ≥2 crashes, sets `disabledByCrash = true`
+//       and `shouldAttemptMLInit()` returns false thereafter.
+//   (2) App.tsx boot sequence wraps bootCognitive + bootQwen with
+//       markMLInitAttempted/markMLInitSucceeded, gates the entire
+//       block on `shouldAttemptMLInit()`, and defers `bootQwen` by
+//       3 seconds via setTimeout so even if Qwen crashes, the
+//       title screen has rendered first and the player isn't stuck
+//       in a launch-crash loop.
+//   (3) `app/diagnostics/aboutSummary.ts` appends `mlHealthSummary()`
+//       to every COPY/SHARE log export. When a tester sends a bug
+//       report from an auto-disabled install, the report carries
+//       "ML runtime health: auto-disabled after 2 crashes" with
+//       timestamps so the dev sees it at triage instead of guessing.
+//   Player-facing effect for affected devices: app boots cleanly,
+//   no more launch-crash loop, falls back to template narration
+//   silently. Player-facing effect for unaffected devices: identical
+//   to before — same Qwen narration, no change.
+//   Files: NEW app/diagnostics/mlHealth.ts (~170 lines), App.tsx
+//          (boot sequence wrapped + gated + deferred), app/
+//          diagnostics/aboutSummary.ts (mlHealthSummary appended to
+//          buildBasicDeviceSummary), app/buildCodename.ts (Slate
+//          Spire added), app/buildInfo.ts (OTA-272 bump + change
+//          note), docs/build-codenames.md (Slate Spire moved to
+//          current; pool renumbered).
+export const OTA_BUILD_ID = '2026-06-01-272';

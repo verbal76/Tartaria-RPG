@@ -42,6 +42,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-01-269': 'Brass Coil',
   '2026-06-01-270': 'Lead Helm',
   '2026-06-01-271': 'Copper Fence',
+  '2026-06-01-272': 'Slate Spire',
 };
 
 /**

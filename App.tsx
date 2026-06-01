@@ -8,6 +8,12 @@ import { StatusBar } from 'expo-status-bar';
 // require returns null on those builds; the effect no-ops.
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useGameStore } from './app/state/gameStore';
+import {
+  loadMLHealth,
+  shouldAttemptMLInit,
+  markMLInitAttempted,
+  markMLInitSucceeded,
+} from './app/diagnostics/mlHealth';
 import { TitleScreen } from './app/screens/TitleScreen';
 import { CharacterCreationScreen } from './app/screens/CharacterCreationScreen';
 import { ExplorationScreen } from './app/screens/ExplorationScreen';
@@ -185,20 +191,83 @@ export default function App() {
     void hydrate()
       .then(() => {
         setStage('hydrate:done');
-        // Boot order: classifier (small, fast) first so target resolution is
-        // available as soon as the player starts a game. Generative model
-        // (large, slow) kicks off afterward without blocking — templates carry
-        // the Arbiter until it's ready.
-        setStage('cognitive:start');
-        void bootCognitive().then(() => {
-          setStage('cognitive:done');
-          void bootQwen().catch((e) => {
+        // OTA-272 — ML init now gated by mlHealth crash counter. On
+        // certain ARMv8.2 Android devices (Snapdragon 865 family —
+        // Galaxy S20, Pixel 5, OnePlus 8) the native ML libs crash
+        // with SIGSEGV/SIGILL during init (upstream CPU-variant
+        // bug we can't patch in an OTA). The mlHealth module
+        // detects "previous launch attempted init but never
+        // succeeded" (the native crash aborts the process before
+        // JS can mark success) and increments a counter; ≥2 crashes
+        // and it auto-disables ML for that install. The app stays
+        // playable on template narration; the player never sees
+        // the "app keeps stopping" loop.
+        setStage('mlhealth:load');
+        void loadMLHealth().then((health) => {
+          setStage('mlhealth:done');
+          if (!shouldAttemptMLInit()) {
             // eslint-disable-next-line no-console
-            console.warn('bootQwen failed:', e);
+            console.warn(
+              `mlHealth: ML init disabled (${health.crashCount} crashes detected). Template fallback only this session.`,
+            );
+            setStage('cognitive:skipped');
+            setStage('qwen:skipped');
+            return;
+          }
+          if (health.detectedCrashThisBoot) {
+            // eslint-disable-next-line no-console
+            console.warn(
+              `mlHealth: detected previous-launch crash; this is attempt ${health.crashCount}/${'2'} before auto-disable.`,
+            );
+          }
+          // Boot order: classifier (small, fast) first so target
+          // resolution is available as soon as the player starts a
+          // game. Generative model (large, slow) kicks off afterward
+          // without blocking — templates carry the Arbiter until
+          // it's ready. Qwen init is deferred by 3 seconds (post
+          // OTA-272) so even if the bootQwen path crashes natively,
+          // the title screen has already painted and the player can
+          // close cleanly.
+          setStage('cognitive:start');
+          void markMLInitAttempted();
+          void bootCognitive().then(() => {
+            setStage('cognitive:done');
+            void markMLInitSucceeded();
+            // Defer Qwen init 3s — see comment above.
+            setTimeout(() => {
+              setStage('qwen:start');
+              void markMLInitAttempted();
+              void bootQwen()
+                .then(() => {
+                  setStage('qwen:done');
+                  void markMLInitSucceeded();
+                })
+                .catch((e) => {
+                  // eslint-disable-next-line no-console
+                  console.warn('bootQwen failed:', e);
+                });
+            }, 3000);
+          }).catch((e) => {
+            // eslint-disable-next-line no-console
+            console.warn('bootCognitive failed:', e);
           });
         }).catch((e) => {
           // eslint-disable-next-line no-console
-          console.warn('bootCognitive failed:', e);
+          console.warn('mlHealth load failed (proceeding without gate):', e);
+          // Defensive fallback: if the health module itself errors
+          // out, run the original boot path. ML libs may still crash
+          // but we won't have made things worse.
+          setStage('cognitive:start');
+          void bootCognitive().then(() => {
+            setStage('cognitive:done');
+            void bootQwen().catch((err) => {
+              // eslint-disable-next-line no-console
+              console.warn('bootQwen failed:', err);
+            });
+          }).catch((err) => {
+            // eslint-disable-next-line no-console
+            console.warn('bootCognitive failed:', err);
+          });
         });
         setStage('audio:start');
         void bootAudio().then(() => {
