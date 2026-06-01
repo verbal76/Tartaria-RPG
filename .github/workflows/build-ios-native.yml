@@ -76,7 +76,7 @@ permissions:
 jobs:
   build:
     name: Build iOS .ipa on GitHub macOS runner
-    runs-on: macos-14
+    runs-on: macos-15
     timeout-minutes: 60
     steps:
       - name: Checkout
@@ -122,15 +122,61 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Setup Xcode 26
+      - name: Setup Xcode 26 (latest available)
         if: steps.meta.outputs.should_run == 'true'
         run: |
           # Apple's 2026-04-28 deadline requires Xcode 26 / iOS 26 SDK
-          # for all App Store Connect uploads. macos-14 runners have
-          # Xcode 26.x preinstalled; pick the latest 26 version.
-          sudo xcode-select -s "/Applications/Xcode_26.app/Contents/Developer" 2>/dev/null \
-            || sudo xcode-select -s "/Applications/Xcode.app/Contents/Developer"
+          # for all App Store Connect uploads. macos-15 runners have
+          # Xcode 26.x preinstalled; macos-14 only had up to 15.4 which
+          # also caused a downstream C++20 compile error in
+          # react-native-executorch (VoiceActivityDetection.cpp:145
+          # uses aggregate-emplace which clang 15 + C++17 rejects).
+          #
+          # The first attempt (build #1) silently fell back to the
+          # default `Xcode.app` symlink (15.4) because Xcode_26.app
+          # wasn't installed on macos-14. To avoid that silent fall-
+          # back, list every Xcode under /Applications and PICK THE
+          # HIGHEST. Fail loudly if none of them is >= Xcode 26.
+          echo "==== Available Xcode installs ===="
+          ls -d /Applications/Xcode*.app 2>/dev/null || echo "(none found at /Applications/Xcode*.app)"
+          # Pick the highest-versioned Xcode in /Applications. Sort
+          # version-aware so "26.2" > "16.x" > "15.x". Bash's `sort
+          # -V` is version-sort.
+          PICK=$(ls -d /Applications/Xcode_*.app /Applications/Xcode.app 2>/dev/null \
+            | awk -F'/Applications/Xcode_?' '{print $NF}' \
+            | sed 's/\.app$//' \
+            | sort -V \
+            | tail -1)
+          if [ -z "$PICK" ]; then
+            echo "::error::No Xcode found under /Applications. Runner image may be broken."
+            exit 1
+          fi
+          # Reconstruct the .app path. PICK is either "" (means the
+          # bare Xcode.app symlink), or a version string like "26.2".
+          if [ "$PICK" = "Xcode" ]; then
+            APP_PATH="/Applications/Xcode.app"
+          else
+            APP_PATH="/Applications/Xcode_${PICK}.app"
+            # Fall back to the plain Xcode.app if our version-suffixed
+            # guess doesn't exist (the directory naming convention can
+            # surprise us).
+            [ -d "$APP_PATH" ] || APP_PATH="/Applications/Xcode.app"
+          fi
+          echo "Selected: $APP_PATH"
+          sudo xcode-select -s "$APP_PATH/Contents/Developer"
           xcodebuild -version
+          # Hard-gate on Xcode 26.x — if the runner only has 15/16
+          # we'll silently produce an .ipa Apple will reject at the
+          # submit step, OR fail noisily in the C++20 compile step.
+          # Fail here instead so the failure is one step earlier and
+          # legible.
+          XCODE_MAJOR=$(xcodebuild -version | head -1 | sed 's/^Xcode //' | cut -d. -f1)
+          if [ "$XCODE_MAJOR" -lt 26 ]; then
+            echo "::error::Selected Xcode is $XCODE_MAJOR.x; need >= 26 for Apple submission AND for react-native-executorch's C++20 reqs."
+            echo "::error::macos-15 runner should have Xcode 26 preinstalled. If GitHub hasn't shipped it yet, switch runs-on to macos-latest or a newer label."
+            exit 1
+          fi
+          echo "✓ Xcode $XCODE_MAJOR.x selected."
 
       - name: Install dependencies
         if: steps.meta.outputs.should_run == 'true'
