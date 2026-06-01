@@ -324,6 +324,27 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-267 — Build codename obfuscation layer (player-facing About + bug reports)
+
+- **OTA-267 · Player: *"I want to obfuscate the about information to ensure they can't travel back to my GitHub by any means... can you maybe give them all weird code names and then put a code name list as a markup file inside of it or something like that?"***
+  - **Context:** user is opening the Android playtest to ~100 testers off a Facebook Gaming Dads group. The repo flips back to private after the build cycle, but historical commit messages indexed by Google during the public window are still findable. The About screen + bug report email both showed `OTA build: 2026-05-31-266` — a string that pattern-matches commit messages like `OTA-266 — Info.plist...` exactly. A curious tester googling "Tartaria Realms 2026-05-31-266" or "Tartaria Realms OTA-266" hits the GitHub repo.
+  - **Fix:** new `app/buildCodename.ts` module exports `getBuildCodename(otaId)` which maps each `OTA_BUILD_ID` to a curated noun-noun codename (e.g., `Iron Drift`, `Mud Mantle`, `Cinder Drift`, `Smoke Anvil`). Codenames are Tartaria-flavor but generic enough that no search pattern leads back to the repo. Map currently covers OTA-255 through OTA-267; a reserved pool of 30+ codenames sits in `docs/build-codenames.md` for future use.
+  - **What changed in the surfaces:** `app/diagnostics/aboutSummary.ts:81` — the `OTA build ID: ${OTA_BUILD_ID}` line is now `Build: ${getBuildCodename(OTA_BUILD_ID)}` ("Build: Smoke Anvil"). `app/screens/TitleScreen.tsx` — the bug-report email, the invite-playtester email, and the OTA-applied dialog all use the codename. OTA-applied dialog has a fallback ("an older build") for builds before this codename layer existed.
+  - **What stays internal:** `OTA_BUILD_ID` is still used by save migrations (gameStore.hydrate's last-build comparison), buildInfo.ts change-note history, commit messages, HANDOFF.md. The codename is purely a presentation layer.
+  - **Dev cross-reference:** new `docs/build-codenames.md` is the lookup table. When a bug report arrives mentioning "Cinder Drift", grep that file for the corresponding `OTA_BUILD_ID`.
+  - **What's still unavoidably visible:** `App ID`, game name "Tartaria Realms", `App version` (3.0.0), `APK build version` (2.4.1). None match a GitHub commit pattern.
+  - **Per-OTA maintenance:** when bumping `OTA_BUILD_ID`, add an entry to `CODENAMES` in `app/buildCodename.ts` from the next unused codename in `docs/build-codenames.md`. One extra line per OTA.
+  - **OTA-only:** all JS-side; ships through OTA channel.
+  - **Files:** NEW `app/buildCodename.ts`, NEW `docs/build-codenames.md`, `app/diagnostics/aboutSummary.ts`, `app/screens/TitleScreen.tsx`, `app/buildInfo.ts`.
+
+#### OTA-266 — Defensive shotgun pass on iOS Info.plist purpose strings
+
+- **OTA-266 · Apple repeat ITMS-90683 after EAS outage cleared:** the d6c3e1f build (OTA-254 retry after the EAS macOS data center outage) finally cleared the queue and auto-submitted to App Store Connect. Apple rejected with ITMS-90683 missing `NSPhotoLibraryUsageDescription` — even though OTA-254 in commit `76d4b01` had added that key (and is included in d6c3e1f's snapshot). Two plausible causes: (a) the .ipa Apple actually saw was an OLDER build that survived the EAS queue during the outage and auto-submitted on recovery; (b) Expo's prebuild lost the `ios.infoPlist` key for some reason. Either way, re-asserting the keys + adding defensive ones blanket-fixes both.
+- **Fix (defensive shotgun):** added every common purpose string to `app.json`'s `ios.infoPlist`: `NSPhotoLibraryUsageDescription` (re-asserted from OTA-254), `NSPhotoLibraryAddUsageDescription`, `NSCameraUsageDescription` (likely the next miss because `react-native-executorch` ships `VisionModel.cpp`), `NSLocationWhenInUseUsageDescription`, `NSContactsUsageDescription`, `NSBluetoothAlwaysUsageDescription`, `NSMotionUsageDescription`, `NSFaceIDUsageDescription`. All strings honestly state we don't access the resource — the user will never see them (we never request the permission), but Apple's scanner needs them present.
+- **Why blanket:** Apple's scanner reports one missing key at a time, so the alternative is a multi-build whack-a-mole loop. Better to declare every plausible key once.
+- **Native rebuild + auto-submit:** committed with `[build-ios] [submit-ios]` to fire the EAS production iOS build.
+- **Files:** `app.json` (ios.infoPlist), `app/buildInfo.ts`.
+
 #### OTA-265 — iOS Build (native, GitHub Actions macOS fallback)
 
 - **OTA-265 · 2026-05-31 EAS outage triggered this:**

@@ -10966,4 +10966,24 @@ export const DISPLAY_VERSION = '3.0.0';
 //   This is a NATIVE rebuild (Info.plist baked at compile time);
 //   triggers via [build-ios] [submit-ios] commit title.
 //   Files: app.json (ios.infoPlist).
-export const OTA_BUILD_ID = '2026-05-31-266';
+//
+// OTA-267 — Build codename obfuscation layer (player-facing).
+//   User context: opening Android playtest to a hundred+ testers
+//   from Facebook Gaming Dads; repo will flip back to private but
+//   commit history is still search-engine-indexed for now. The raw
+//   `OTA_BUILD_ID` string on the About screen + bug reports
+//   ("2026-05-31-266") matches the `OTA-NNN` pattern in commit
+//   messages — a curious tester could Google their way back to the
+//   GitHub repo. New `app/buildCodename.ts` maps each OTA to a
+//   curated codename ("Iron Drift", "Mud Mantle", etc.); user-
+//   facing surfaces show the codename instead. `OTA_BUILD_ID`
+//   stays for internal use (save migrations, this file, commit
+//   messages). Dev cross-reference at `docs/build-codenames.md`
+//   (keep that file inside the private repo or local notes).
+//   Files: NEW app/buildCodename.ts (codename map + getter),
+//          NEW docs/build-codenames.md (dev mapping reference),
+//          app/diagnostics/aboutSummary.ts (About screen line
+//          uses getBuildCodename), app/screens/TitleScreen.tsx
+//          (bug report email, invite-playtester email, OTA-applied
+//          dialog all use getBuildCodename).
+export const OTA_BUILD_ID = '2026-05-31-267';

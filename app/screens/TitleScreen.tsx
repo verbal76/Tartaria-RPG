@@ -39,6 +39,7 @@ import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
 import { OTA_BUILD_ID } from '../buildInfo';
+import { getBuildCodename, getBuildCodenameOrNull } from '../buildCodename';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 // OTA-251 — was reading app.json's expo.version. That field is now
 // pinned to the runtimeVersion of the installed APK (2.4.1) so OTAs
@@ -457,7 +458,12 @@ export function TitleScreen() {
       `track the bug down.\n` +
       `\n` +
       `Character: ${charName}\n` +
-      `OTA build: ${OTA_BUILD_ID}\n` +
+      // OTA-267 — codename obfuscation. Was `OTA build: ${OTA_BUILD_ID}`
+      // (e.g., "2026-05-31-266") which matched commit message patterns
+      // and let a curious tester trace bugs back to GitHub. Codename is
+      // mapped via app/buildCodename.ts; dev cross-references via
+      // docs/build-codenames.md when triaging.
+      `Build: ${getBuildCodename(OTA_BUILD_ID)}\n` +
       `\n` +
       `--- PASTE BELOW THIS LINE ---\n` +
       `\n`;
@@ -494,7 +500,9 @@ export function TitleScreen() {
       `  ${gmail}\n` +
       `\n` +
       `Requested at: ${new Date().toISOString()}\n` +
-      `Requester's OTA build: ${OTA_BUILD_ID}\n` +
+      // OTA-267 — codename instead of raw OTA id. Same obfuscation
+      // reason as the bug-report email above.
+      `Requester's build: ${getBuildCodename(OTA_BUILD_ID)}\n` +
       `\n` +
       `(Sent from the INVITE PLAYTESTER button on the Tartaria\n` +
       `title screen.)\n`;
@@ -970,7 +978,10 @@ export function TitleScreen() {
         title="Just updated"
         body={
           justUpdatedFromBuild
-            ? `Tartaria Realms refreshed itself in the background.\n\nPrevious build: ${justUpdatedFromBuild}\nNow running: ${OTA_BUILD_ID}\n\nYour characters and saves are untouched — the sudden reload was the new bundle taking over.`
+            // OTA-267 — codename instead of raw OTA id, plus a fallback
+            // ("an older build") for builds before this codename
+            // layer existed.
+            ? `Tartaria Realms refreshed itself in the background.\n\nPrevious build: ${getBuildCodenameOrNull(justUpdatedFromBuild) ?? 'an older build'}\nNow running: ${getBuildCodename(OTA_BUILD_ID)}\n\nYour characters and saves are untouched — the sudden reload was the new bundle taking over.`
             : undefined
         }
         buttons={[

@@ -16,6 +16,7 @@ import Constants from 'expo-constants';
 import * as Application from 'expo-application';
 import { Platform, Dimensions, PixelRatio } from 'react-native';
 import { OTA_BUILD_ID, DISPLAY_VERSION } from '../buildInfo';
+import { getBuildCodename } from '../buildCodename';
 
 export function buildBasicDeviceSummary(): string {
   const apkBuild = Application.nativeBuildVersion ?? '(unknown)';
@@ -78,7 +79,13 @@ export function buildBasicDeviceSummary(): string {
       ? [`  APK build version: ${nativeVersion}`]
       : []),
     `  APK build: ${apkBuild}`,
-    `  OTA build ID: ${OTA_BUILD_ID}`,
+    // OTA-267 — user-visible build label is now the codename
+    // (e.g., "Cinder Drift") instead of the raw OTA_BUILD_ID
+    // ("2026-05-31-266"), which matched the OTA-NNN pattern in
+    // commit messages and was a search-engine breadcrumb back to
+    // the GitHub repo. The codename map lives in
+    // app/buildCodename.ts and docs/build-codenames.md.
+    `  Build: ${getBuildCodename(OTA_BUILD_ID)}`,
   ];
   return lines.join('\n');
 }
