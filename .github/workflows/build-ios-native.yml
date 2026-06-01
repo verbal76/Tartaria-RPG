@@ -1,0 +1,269 @@
+name: iOS Build (native, GitHub Actions macOS fallback)
+
+# Backup iOS build path for when EAS Build is down. Runs the entire
+# build on GitHub's `macos-14` runner using xcodebuild directly —
+# zero dependency on Expo's infrastructure. Same .ipa output as the
+# EAS path; signed with the same Distribution Certificate (exported
+# from EAS once, stored in GitHub Secrets).
+#
+# This file is MIRRORED to main so the Actions UI's "Run workflow"
+# dropdown can find it (workflow_dispatch only surfaces workflows on
+# the default branch). The canonical copy lives on HaL2001. When you
+# fire it via Actions UI, choose `HaL2001` as the branch to build
+# against — the workflow file content is identical either way.
+#
+# REQUIRED GITHUB SECRETS (one-time setup):
+#   IOS_DIST_CERT_P12_BASE64        — .p12 export, base64-encoded.
+#   IOS_PROVISIONING_PROFILE_BASE64 — .mobileprovision, base64-encoded.
+#   APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD, ASC_APP_ID, APPLE_TEAM_ID — already set.
+#
+# OPTIONAL: IOS_DIST_CERT_P12_PASSWORD — only if the .p12 has one.
+#
+# TRIGGERS:
+#   - workflow_dispatch (Actions UI → Run workflow); the primary path
+#     for firing this when EAS is down.
+#   - commit FIRST LINE starts with [build-ios-native] — useful for
+#     scripted recovery during long outages.
+
+on:
+  push:
+    branches:
+      - main
+      - 'release/**'
+      - 'claude/**'
+      - 'HaL2001'
+    paths-ignore:
+      - '**'
+  workflow_dispatch:
+    inputs:
+      submit:
+        description: 'Submit .ipa to TestFlight after build (requires APPLE_APP_SPECIFIC_PASSWORD secret)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build iOS .ipa on GitHub macOS runner
+    runs-on: macos-14
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Determine run + submit flags
+        id: meta
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          FIRST_LINE=$(echo "$COMMIT_MSG" | head -1)
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            SHOULD_RUN="true"
+            SHOULD_SUBMIT="${{ github.event.inputs.submit || 'false' }}"
+          elif [[ "$FIRST_LINE" =~ ^\[build-ios-native\] ]]; then
+            SHOULD_RUN="true"
+            if [[ "$FIRST_LINE" =~ \[submit-ios\] ]]; then
+              SHOULD_SUBMIT="true"
+            else
+              SHOULD_SUBMIT="false"
+            fi
+          else
+            SHOULD_RUN="false"
+            SHOULD_SUBMIT="false"
+          fi
+          echo "should_run=$SHOULD_RUN" >> "$GITHUB_OUTPUT"
+          echo "submit=$SHOULD_SUBMIT" >> "$GITHUB_OUTPUT"
+          echo "Will run: $SHOULD_RUN, Will submit: $SHOULD_SUBMIT"
+
+      - name: Exit if not triggered
+        if: steps.meta.outputs.should_run != 'true'
+        run: |
+          echo "Commit lacks [build-ios-native] marker and this isn't a workflow_dispatch — exiting cleanly."
+          exit 0
+
+      - name: Setup Node
+        if: steps.meta.outputs.should_run == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Xcode 26
+        if: steps.meta.outputs.should_run == 'true'
+        run: |
+          sudo xcode-select -s "/Applications/Xcode_26.app/Contents/Developer" 2>/dev/null \
+            || sudo xcode-select -s "/Applications/Xcode.app/Contents/Developer"
+          xcodebuild -version
+
+      - name: Install dependencies
+        if: steps.meta.outputs.should_run == 'true'
+        run: npm ci --no-audit --no-fund
+
+      - name: Strip .hal2001 suffix from bundle id (production-only build)
+        if: steps.meta.outputs.should_run == 'true'
+        run: |
+          node -e "
+            const fs = require('fs');
+            const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));
+            const before = app.expo?.ios?.bundleIdentifier;
+            if (app.expo?.ios?.bundleIdentifier?.endsWith('.hal2001')) {
+              app.expo.ios.bundleIdentifier = app.expo.ios.bundleIdentifier.slice(0, -'.hal2001'.length);
+            }
+            fs.writeFileSync('app.json', JSON.stringify(app, null, 2));
+            console.log('iOS bundle id:', before, '->', app.expo.ios.bundleIdentifier);
+          "
+
+      - name: Verify required GitHub Secrets are present
+        if: steps.meta.outputs.should_run == 'true'
+        env:
+          IOS_DIST_CERT_P12_BASE64: ${{ secrets.IOS_DIST_CERT_P12_BASE64 }}
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          MISSING=""
+          [ -z "${IOS_DIST_CERT_P12_BASE64:-}" ] && MISSING="$MISSING IOS_DIST_CERT_P12_BASE64"
+          [ -z "${IOS_PROVISIONING_PROFILE_BASE64:-}" ] && MISSING="$MISSING IOS_PROVISIONING_PROFILE_BASE64"
+          if [ -n "$MISSING" ]; then
+            echo "::error::Missing required GitHub Secret(s):$MISSING"
+            exit 1
+          fi
+          echo "✓ Required secrets present."
+
+      - name: Import signing certificate into temporary keychain
+        if: steps.meta.outputs.should_run == 'true'
+        env:
+          IOS_DIST_CERT_P12_BASE64: ${{ secrets.IOS_DIST_CERT_P12_BASE64 }}
+          IOS_DIST_CERT_P12_PASSWORD: ${{ secrets.IOS_DIST_CERT_P12_PASSWORD }}
+        run: |
+          set -euo pipefail
+          echo "$IOS_DIST_CERT_P12_BASE64" | base64 --decode > "$RUNNER_TEMP/cert.p12"
+          KEYCHAIN_PATH="$RUNNER_TEMP/build.keychain-db"
+          KEYCHAIN_PASSWORD="$(openssl rand -hex 16)"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | tr -d '"')
+          security default-keychain -s "$KEYCHAIN_PATH"
+          security import "$RUNNER_TEMP/cert.p12" -k "$KEYCHAIN_PATH" -P "$IOS_DIST_CERT_P12_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH" >/dev/null
+          security find-identity -v -p codesigning "$KEYCHAIN_PATH"
+
+      - name: Install provisioning profile
+        if: steps.meta.outputs.should_run == 'true'
+        env:
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          set -euo pipefail
+          PROFILE_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$PROFILE_DIR"
+          echo "$IOS_PROVISIONING_PROFILE_BASE64" | base64 --decode > "$PROFILE_DIR/app.mobileprovision"
+          PROFILE_UUID=$(security cms -D -i "$PROFILE_DIR/app.mobileprovision" | plutil -extract UUID raw -)
+          PROFILE_NAME=$(security cms -D -i "$PROFILE_DIR/app.mobileprovision" | plutil -extract Name raw -)
+          echo "PROFILE_UUID=$PROFILE_UUID" >> "$GITHUB_ENV"
+          echo "PROFILE_NAME=$PROFILE_NAME" >> "$GITHUB_ENV"
+          echo "Provisioning profile installed: $PROFILE_NAME ($PROFILE_UUID)"
+
+      - name: Generate native iOS project (expo prebuild)
+        if: steps.meta.outputs.should_run == 'true'
+        run: |
+          set -euo pipefail
+          npx expo prebuild --platform ios --clean --no-install
+
+      - name: Install CocoaPods
+        if: steps.meta.outputs.should_run == 'true'
+        run: |
+          cd ios
+          pod install --repo-update
+
+      - name: Write ExportOptions.plist
+        if: steps.meta.outputs.should_run == 'true'
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store-connect</string>
+            <key>teamID</key>
+            <string>${APPLE_TEAM_ID}</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>com.hotatticgames.tartarprim</key>
+              <string>${PROFILE_NAME}</string>
+            </dict>
+            <key>stripSwiftSymbols</key>
+            <true/>
+            <key>uploadSymbols</key>
+            <true/>
+          </dict>
+          </plist>
+          EOF
+          cat "$RUNNER_TEMP/ExportOptions.plist"
+
+      - name: Archive (xcodebuild)
+        if: steps.meta.outputs.should_run == 'true'
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -workspace ios/TartariaRealmsHAL.xcworkspace \
+            -scheme TartariaRealmsHAL \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/TartariaRealmsHAL.xcarchive" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" \
+            PROVISIONING_PROFILE_SPECIFIER="${PROFILE_UUID}" \
+            archive
+
+      - name: Export .ipa
+        if: steps.meta.outputs.should_run == 'true'
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -exportArchive \
+            -archivePath "$RUNNER_TEMP/TartariaRealmsHAL.xcarchive" \
+            -exportPath "$RUNNER_TEMP/ipa" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist"
+          ls -lh "$RUNNER_TEMP/ipa"
+
+      - name: Upload .ipa as artifact (backup, always)
+        if: steps.meta.outputs.should_run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: TartariaRealmsHAL-ipa
+          path: ${{ runner.temp }}/ipa/*.ipa
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Upload to App Store Connect / TestFlight (gated)
+        if: steps.meta.outputs.should_run == 'true' && steps.meta.outputs.submit == 'true'
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -z "${APPLE_APP_SPECIFIC_PASSWORD:-}" ]; then
+            echo "::warning::APPLE_APP_SPECIFIC_PASSWORD not set — .ipa is in the artifact above; submit manually via Transporter or eas submit."
+            exit 0
+          fi
+          IPA_FILE=$(ls "$RUNNER_TEMP/ipa/"*.ipa | head -1)
+          echo "Uploading $IPA_FILE to App Store Connect..."
+          xcrun altool --upload-app \
+            --type ios \
+            --file "$IPA_FILE" \
+            --username "$APPLE_ID" \
+            --password "$APPLE_APP_SPECIFIC_PASSWORD"
+          echo "✓ Upload complete — watch App Store Connect for processing."
+
+      - name: Clean up keychain
+        if: always() && steps.meta.outputs.should_run == 'true'
+        run: |
+          security delete-keychain "$RUNNER_TEMP/build.keychain-db" 2>/dev/null || true
