@@ -4,6 +4,7 @@ import * as Clipboard from 'expo-clipboard';
 import * as Updates from 'expo-updates';
 import { useGameStore } from '../state/gameStore';
 import { OTA_BUILD_ID } from '../buildInfo';
+import { getBuildCodename } from '../buildCodename';
 import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
 import { buildInventorySnapshot, stampInventoryExport } from '../diagnostics/inventorySnapshot';
 import { NumberStepper } from '../components/NumberStepper';
@@ -312,7 +313,15 @@ export function AboutScreen() {
       updIsEmbedded === 'true'
         ? 'No (running the APK\'s embedded bundle)'
         : updUpdateId && updUpdateId !== '(unset)'
-          ? `Yes — ${updUpdateId}`
+          // OTA-268 — show the build codename instead of Expo's
+          // raw updateId UUID (e.g., "019e836b-cd5f-70fc-..."). The
+          // UUID is an Expo-server identifier that wasn't really
+          // useful to the player anyway, and reading "Yes — Smoke
+          // Anvil" reads like "I know which build I'm on" rather
+          // than "I'm staring at a hash." The codename reflects
+          // the currently-running OTA bundle, which is the same
+          // bundle the updateId points to.
+          ? `Yes — ${getBuildCodename(OTA_BUILD_ID)}`
           : '(unknown)';
 
     // OTA-063 — Device + Install summary moved to the shared

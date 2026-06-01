@@ -10986,4 +10986,18 @@ export const DISPLAY_VERSION = '3.0.0';
 //          uses getBuildCodename), app/screens/TitleScreen.tsx
 //          (bug report email, invite-playtester email, OTA-applied
 //          dialog all use getBuildCodename).
-export const OTA_BUILD_ID = '2026-05-31-267';
+// OTA-268 — Replace Expo updateId UUID with codename in the
+//   About screen's "Last OTA applied" line. Pre-OTA-268 the line
+//   read "Yes — 019e836b-cd5f-70fc-991f-ae152b69433d" — a raw
+//   Expo-server UUID that wasn't useful to the player and looked
+//   like a leak even though it's actually generic. The Expo
+//   updateId reflects whichever OTA bundle is currently active,
+//   so substituting `getBuildCodename(OTA_BUILD_ID)` for the UUID
+//   is functionally equivalent and reads as "Yes — Tin Tine"
+//   instead of an opaque hash.
+//   Files: app/screens/AboutScreen.tsx (otaApplied string +
+//          getBuildCodename import), app/buildCodename.ts
+//          (Tin Tine added to CODENAMES map),
+//          docs/build-codenames.md (Tin Tine moved from reserved
+//          pool into current mapping).
+export const OTA_BUILD_ID = '2026-06-01-268';

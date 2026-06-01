@@ -324,6 +324,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-268 — About: replace Expo updateId UUID with build codename
+
+- **OTA-268 · Player: *"ota doesn't have a cool name, looks like a hash number"***
+  - **What looked off:** the About screen's `OTA status` section had a line `Last OTA applied: Yes — 019e836b-cd5f-70fc-991f-ae152b69433d` — the raw Expo Updates `updateId` UUID. It's an Expo-server identifier (not a GitHub-traceable hash), but it READS like a leak even though it's actually generic — and it lacked the codename polish that OTA-267 introduced for the `Install` block's Build line.
+  - **Fix:** in `AboutScreen.tsx`'s `otaApplied` string builder, swap `Yes — ${updUpdateId}` → `Yes — ${getBuildCodename(OTA_BUILD_ID)}`. The Expo updateId reflects whichever OTA bundle is currently active, which is exactly what `OTA_BUILD_ID` represents, so the substitution is functionally equivalent. Reads as "Yes — Tin Tine" now instead of a UUID.
+  - **What stays:** the `OTA published at: <timestamp>` line is generic and untraceable; left alone. `Channel: hal2001` and `Runtime version: 2.4.1` were already audited as low-risk; left alone.
+  - **OTA-only:** all JS-side; ships through OTA channel.
+  - **First commit using the new title convention** (OTA-267 codified): `Tin Tine — OTA-268 — About: replace Expo updateId UUID with codename`. Codename leads the truncated title on phone.
+  - **Files:** `app/screens/AboutScreen.tsx` (otaApplied substitution + getBuildCodename import), `app/buildCodename.ts` (Tin Tine added to CODENAMES), `app/buildInfo.ts` (OTA-268 bump + change note), `docs/build-codenames.md` (Tin Tine moved from reserved pool to current mapping, pool renumbered).
+
 #### OTA-267 — Build codename obfuscation layer (player-facing About + bug reports)
 
 - **OTA-267 · Player: *"I want to obfuscate the about information to ensure they can't travel back to my GitHub by any means... can you maybe give them all weird code names and then put a code name list as a markup file inside of it or something like that?"***
