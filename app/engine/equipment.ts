@@ -221,8 +221,20 @@ export function playerHasScannerEquipped(
   bias: ScannerBias,
 ): boolean {
   const off = player.equipped?.off;
-  if (!off) return false;
-  return isScanner(off, bias, EFFECT_RESOLVERS);
+  if (off && isScanner(off, bias, EFFECT_RESOLVERS)) return true;
+  // OTA-269 — pouched scanners count too. The tool pouch is an
+  // alternate "equipped" surface for tools; a Pulse Scanner stowed
+  // on the belt is just as accessible as one in the off-hand for
+  // search-feature gating. Player ask: "in the pouch is technically
+  // equipped. so you 'grab the item from your pouch' scan and then
+  // a swap back." Loop over pouch ids → look up item name in
+  // inventory → run the same isScanner check.
+  const pouchIds = player.equipped?.toolPouchIds ?? [];
+  for (const id of pouchIds) {
+    const item = player.inventory.find((i) => i.id === id);
+    if (item && isScanner(item.name, bias, EFFECT_RESOLVERS)) return true;
+  }
+  return false;
 }
 
 // Sum stat bonuses from every equipped piece (armor pieces with statBonus,

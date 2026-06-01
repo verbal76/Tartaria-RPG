@@ -11000,4 +11000,46 @@ export const DISPLAY_VERSION = '3.0.0';
 //          (Tin Tine added to CODENAMES map),
 //          docs/build-codenames.md (Tin Tine moved from reserved
 //          pool into current mapping).
-export const OTA_BUILD_ID = '2026-06-01-268';
+// OTA-269 — Tool pouch: tappable empty slots + auto-filter inventory
+//   to pouch-eligible tools + pouched scanners count as "equipped"
+//   for scanner-gated chip checks. Player ask: "the empty tool pouch
+//   slots should be highlighted so the player can easily see them,
+//   and when you tap the empty slot your inventory should sort to
+//   only the items available to be used there. it serves the same
+//   purpose as equipping them. so say you are holding two weapons,
+//   when you have an investigation that needs the pulse scanner it
+//   should be highlighted because in the pouch is technically
+//   equipped... anything that is a tool that isn't worn should be
+//   able to go there in those three slots. it keeps you from
+//   swapping items all the time."
+//   Three coupled changes:
+//   (1) New `app/engine/pouchEligibility.ts` exports `isPouchEligible`
+//       — the single source of truth for "can this be stowed in the
+//       pouch?" — based on kind (`exploration` / `relic`) or tags
+//       (`tool` / `light` / `detection` / `utility` / `rope` /
+//       `scanner` / `gate` / `aetheric`). Refuses consumables /
+//       weapons / armor / jewelry / already-pouched / currently-
+//       in-off-hand items with Arbiter-friendly reasons.
+//   (2) `app/engine/equipment.ts:playerHasScannerEquipped` now loops
+//       over `equipped.toolPouchIds` after checking off-hand, so a
+//       scanner stowed on the belt unlocks the same investigate-
+//       chip greening as one held in off-hand. Player can hold two
+//       weapons AND still have a Pulse Scanner active via pouch.
+//   (3) `app/screens/InventoryScreen.tsx` — empty pouch slots are
+//       now green-bordered tappable affordances ("+ stow tool") and
+//       the active variant ("pick a tool ↓") is highlighted with
+//       tan accent. Tap toggles `pouchFilterActive`; when active,
+//       the inventory list below filters to only eligible items,
+//       and tapping one stows it directly (bypasses the equip
+//       modal). A callout banner above the list tells the player
+//       what mode they're in, with a CANCEL chip for clear escape.
+//   (4) `gameStore.ts:stowInPouch` now checks eligibility before
+//       the slot-count cap so refusals come with specific reasons
+//       ("that's lunch, not a tool") instead of generic "no."
+//   Files: NEW app/engine/pouchEligibility.ts (predicate + types),
+//          app/engine/equipment.ts (playerHasScannerEquipped now
+//          checks pouch), app/state/gameStore.ts (stowInPouch
+//          eligibility gate + isPouchEligible import), app/screens/
+//          InventoryScreen.tsx (state + filter + tappable empty
+//          slots + callout banner + styles).
+export const OTA_BUILD_ID = '2026-06-01-269';

@@ -150,6 +150,7 @@ import {
 } from '../engine/hub';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats } from '../engine/equipment';
+import { isPouchEligible } from '../engine/pouchEligibility';
 import {
   canScrap,
   scrapOutputFor,
@@ -15418,11 +15419,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The Arbiter glances at your pack. "I don't see a ${itemName} on you."`);
       return;
     }
-    const current = player.equipped?.toolPouchIds ?? [];
-    if (current.includes(item.id)) {
-      get().appendLog('arbiter', `The Arbiter eyes the pouch. "Already on your belt."`);
+    // OTA-269 — eligibility check before slot-count check. Lets us
+    // refuse weapons / food / armor with a specific Arbiter line
+    // instead of a generic "no" once they hit the cap.
+    const eligibility = isPouchEligible(item, player);
+    if (!eligibility.eligible) {
+      get().appendLog(
+        'arbiter',
+        `The Arbiter looks at the ${item.name}. "${eligibility.reason}."`,
+      );
       return;
     }
+    const current = player.equipped?.toolPouchIds ?? [];
     if (current.length >= POUCH_MAX) {
       get().appendLog(
         'arbiter',

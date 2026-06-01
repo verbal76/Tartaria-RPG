@@ -12,6 +12,7 @@ import { validSlotsForItem, SLOT_LABEL } from '../engine/equipment';
 import { canScrap } from '../engine/scrapEngine';
 import { findWeaponByName, isInferredItem, isInferredInventoryItem } from '../engine/crafting';
 import { resolveDisplayWeapon } from '../engine/itemResolution';
+import { isPouchEligible } from '../engine/pouchEligibility';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
@@ -80,6 +81,10 @@ export function InventoryScreen() {
   const useInventoryItem = useGameStore((s) => s.useInventoryItem);
   const scrapInventoryItem = useGameStore((s) => s.scrapInventoryItem);
   const toggleReserveForFusion = useGameStore((s) => s.toggleReserveForFusion);
+  // OTA-269 — pulled in for the pouch-filter-tap stow path. Bypasses
+  // the equip modal entirely when pouchFilterActive — a single tap
+  // on the eligible item stows it and clears the filter.
+  const stowInPouch = useGameStore((s) => s.stowInPouch);
   const [pending, setPending] = useState<{ item: InventoryItem; slots: EquipSlot[] } | null>(null);
   // After-scrap result list. When non-null, the action-modal body
   // switches from "Equip / Drop / Scrap" buttons to a "✦ Added to
@@ -94,6 +99,12 @@ export function InventoryScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortKey, setSortKey] = useState('name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  // OTA-269 — when the player taps an empty tool pouch slot, the
+  // inventory list below filters to ONLY pouch-eligible items so they
+  // can grab the tool without scrolling past 40 entries. Tapping an
+  // eligible item stows it and clears the filter. Cancel button or
+  // toggling the slot off also clears.
+  const [pouchFilterActive, setPouchFilterActive] = useState(false);
 
   if (!player) {
     return (
@@ -110,9 +121,16 @@ export function InventoryScreen() {
   // collapse automatically via the `items.length === 0` check
   // further down.
   const queryLower = searchQuery.trim().toLowerCase();
-  const filtered = queryLower.length > 0
+  // OTA-269 — pouch filter narrows the list to pouch-eligible items
+  // when the player has tapped an empty slot above. Layered AFTER
+  // the text-search filter so both can coexist (rare but cleanly
+  // composable).
+  const queryFiltered = queryLower.length > 0
     ? player.inventory.filter((i) => i.name.toLowerCase().includes(queryLower))
     : player.inventory;
+  const filtered = pouchFilterActive
+    ? queryFiltered.filter((i) => isPouchEligible(i, player).eligible)
+    : queryFiltered;
   const sorted = sortInventoryItems(filtered, sortKey, sortDirection);
   const grouped = groupInventoryByCategory(sorted);
   // Map equipped item name → the slot(s) it's currently in. Used so the
@@ -175,6 +193,18 @@ export function InventoryScreen() {
   // and left no path to unequip. Modal always opens; player picks Equip
   // (specific slot) or Unequip (if currently worn) or Close.
   const handleItemTap = (item: InventoryItem) => {
+    // OTA-269 — pouch-filter tap path. The player tapped an empty
+    // pouch slot above, narrowing the inventory below to eligible
+    // tools. Tapping one of those tools stows it directly and
+    // clears the filter — no equip modal, no double-tap. If the
+    // engine refuses (e.g., pouch already full), it logs to the
+    // Arbiter; we close the filter either way so the player can
+    // see the world feed without re-tapping the slot.
+    if (pouchFilterActive) {
+      stowInPouch(item.name);
+      setPouchFilterActive(false);
+      return;
+    }
     setScrapResult(null); // fresh modal — clear any prior result
     setPending({ item, slots: validSlotsForItem(item) });
   };
@@ -463,7 +493,25 @@ export function InventoryScreen() {
             resolves them faster. Tap a slot to unpouch. Tap an inventory
             item below to stow via the existing equip dialog (the dialog
             now offers "stow in pouch" alongside the equip slots). */}
-        <ToolPouchBanner player={player} />
+        <ToolPouchBanner
+          player={player}
+          pouchFilterActive={pouchFilterActive}
+          onTapEmptySlot={() => setPouchFilterActive((v) => !v)}
+        />
+        {/* OTA-269 — filter active callout. Shows when the player
+            has tapped an empty pouch slot above; the inventory below
+            is now narrowed to pouch-eligible tools. CANCEL clears
+            the filter. */}
+        {pouchFilterActive && (
+          <View style={styles.pouchFilterBanner}>
+            <Text style={styles.pouchFilterText}>
+              Tap a tool below to stow it on your belt.
+            </Text>
+            <TouchableOpacity onPress={() => setPouchFilterActive(false)} style={styles.pouchFilterCancel}>
+              <Text style={styles.pouchFilterCancelText}>CANCEL</Text>
+            </TouchableOpacity>
+          </View>
+        )}
         {CATEGORY_ORDER.map((cat) => {
           const items = grouped[cat];
           if (items.length === 0) return null;
@@ -529,7 +577,23 @@ export function InventoryScreen() {
 // an UNPOUCH button. Player stows via the existing equip flow
 // (ItemRow's modal gains a "STOW IN POUCH" option for tool-eligible
 // items) or via `stow <item>` in the input box.
-function ToolPouchBanner({ player }: { player: PlayerCharacter }) {
+// OTA-269 — empty slots are now tappable + green-bordered (chip-like)
+// so they read as actionable affordances instead of dead "— empty —"
+// labels. Tapping an empty slot toggles `pouchFilterActive` in the
+// parent, which narrows the inventory list below to pouch-eligible
+// tools. Player ask: "the empty tool pouch slots should be highlighted
+// so the player can easily see them, and when you tap the empty slot
+// your inventory should sort to only the items available to be used
+// there."
+function ToolPouchBanner({
+  player,
+  pouchFilterActive,
+  onTapEmptySlot,
+}: {
+  player: PlayerCharacter;
+  pouchFilterActive: boolean;
+  onTapEmptySlot: () => void;
+}) {
   const POUCH_MAX = 3;
   const pouchIds = player.equipped?.toolPouchIds ?? [];
   const unpouchItem = useGameStore((s) => s.unpouchItem);
@@ -542,7 +606,7 @@ function ToolPouchBanner({ player }: { player: PlayerCharacter }) {
   return (
     <View style={pouchStyles.banner}>
       <Text style={pouchStyles.title}>TOOL POUCH</Text>
-      <Text style={pouchStyles.hint}>Ready-to-use tools (3 slots). Use `stow &lt;item&gt;` to add.</Text>
+      <Text style={pouchStyles.hint}>Ready-to-use tools (3 slots). Tap an empty slot to stow from your pack.</Text>
       <View style={pouchStyles.row}>
         {slots.map((slot, idx) => (
           <View key={idx} style={pouchStyles.slot}>
@@ -556,9 +620,21 @@ function ToolPouchBanner({ player }: { player: PlayerCharacter }) {
                 <Text style={pouchStyles.slotAction}>tap to unstow</Text>
               </TouchableOpacity>
             ) : (
-              <View style={pouchStyles.slotEmpty}>
-                <Text style={pouchStyles.slotEmptyText}>— empty —</Text>
-              </View>
+              <TouchableOpacity
+                style={[
+                  pouchStyles.slotEmpty,
+                  pouchFilterActive && pouchStyles.slotEmptyActive,
+                ]}
+                activeOpacity={0.7}
+                onPress={onTapEmptySlot}
+              >
+                <Text style={[
+                  pouchStyles.slotEmptyText,
+                  pouchFilterActive && pouchStyles.slotEmptyTextActive,
+                ]}>
+                  {pouchFilterActive ? 'pick a tool ↓' : '+ stow tool'}
+                </Text>
+              </TouchableOpacity>
             )}
           </View>
         ))}
@@ -589,19 +665,29 @@ const pouchStyles = StyleSheet.create({
     borderRadius: 3,
     backgroundColor: '#26201a',
   },
+  // OTA-269 — empty slots now use the same green chip border as the
+  // SearchModal scene chips so they read "this is a real button you
+  // can tap." Dashed border + dim text was too easy to miss. When
+  // `pouchFilterActive` is true the parent's tap is "armed" — the
+  // empty-active variant brightens the fill so the player sees which
+  // mode they're in.
   slotEmpty: {
     paddingVertical: 6,
     paddingHorizontal: 8,
-    borderColor: '#3a342c',
+    borderColor: '#9ec96a',
     borderWidth: 1,
     borderRadius: 3,
-    borderStyle: 'dashed',
-    backgroundColor: 'transparent',
+    backgroundColor: '#13110f',
     alignItems: 'center',
+  },
+  slotEmptyActive: {
+    backgroundColor: '#1a2614',
+    borderColor: '#c9a86a',
   },
   slotName: { color: '#e6d8b3', fontSize: 11, fontWeight: '700' },
   slotAction: { color: '#7a705c', fontSize: 9, marginTop: 2 },
-  slotEmptyText: { color: '#5a5246', fontSize: 10, fontStyle: 'italic' },
+  slotEmptyText: { color: '#9ec96a', fontSize: 10, fontWeight: '600', letterSpacing: 0.5 },
+  slotEmptyTextActive: { color: '#c9a86a' },
 });
 
 function ItemRow({
@@ -793,6 +879,30 @@ const styles = StyleSheet.create({
   rowEquipped: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   rowEquippable: { color: '#7a705c', fontSize: 10, letterSpacing: 1, fontStyle: 'italic' },
   empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 30 },
+  // OTA-269 — callout shown above the inventory list when the player
+  // has tapped an empty pouch slot. Tan accent bar + CANCEL chip so
+  // the player always has a clear exit from the filter mode.
+  pouchFilterBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#1a2614',
+    borderColor: '#c9a86a',
+    borderLeftWidth: 3,
+    borderRadius: 3,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  pouchFilterText: { color: '#cdbf99', fontSize: 12, flexShrink: 1, flexGrow: 1 },
+  pouchFilterCancel: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 3,
+  },
+  pouchFilterCancelText: { color: '#cdbf99', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   legend: {
     flexDirection: 'row',
     flexWrap: 'wrap',
