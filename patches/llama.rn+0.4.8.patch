@@ -1,0 +1,114 @@
+diff --git a/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java b/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
+index 91b2397..d41dd54 100644
+--- a/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
++++ b/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
+@@ -333,13 +333,34 @@ public class LlamaContext {
+     boolean hasSve = cpuFeatures.contains("sve");
+     boolean hasI8mm = cpuFeatures.contains("i8mm");
+     boolean isAtLeastArmV82 = cpuFeatures.contains("asimd") && cpuFeatures.contains("crc32") && cpuFeatures.contains("aes");
+-    boolean isAtLeastArmV84 = cpuFeatures.contains("dcpop") && cpuFeatures.contains("uscat");
++    boolean isAtLeastArmV84Raw = cpuFeatures.contains("dcpop") && cpuFeatures.contains("uscat");
++
++    // Tartaria Realms patch (OTA-273 / Pewter Vault).
++    // Upstream substring detection misclassifies certain ARMv8.2-A chips
++    // (Snapdragon 865, 7xx-series, Exynos 990) as v8.4-a because they
++    // cherry-pick features (dotprod, dcpop, ldapr) from higher ISA
++    // revisions but lack v8.4 baseline instructions (LSE2, i8mm, sve).
++    // Loading the v8.4-compiled .so SIGILLs at runtime when JNI code
++    // executes a v8.4-mandatory instruction. Force-clear v8.4 for known
++    // affected chips so they fall through to v8_2_fp16_dotprod, which
++    // is compiled with -march=armv8.2-a+fp16+dotprod (every instruction
++    // present on the affected chips).
++    boolean isBlocklistedChip = LlamaContext.isKnownMisclassifiedChip();
++    boolean isAtLeastArmV84 = isAtLeastArmV84Raw && !isBlocklistedChip;
+     Log.d(NAME, "- hasFp16: " + hasFp16);
+     Log.d(NAME, "- hasDotProd: " + hasDotProd);
+     Log.d(NAME, "- hasSve: " + hasSve);
+     Log.d(NAME, "- hasI8mm: " + hasI8mm);
+     Log.d(NAME, "- isAtLeastArmV82: " + isAtLeastArmV82);
+-    Log.d(NAME, "- isAtLeastArmV84: " + isAtLeastArmV84);
++    Log.d(NAME, "- isAtLeastArmV84 (raw): " + isAtLeastArmV84Raw);
++    Log.d(NAME, "- isAtLeastArmV84 (post-Tartaria-blocklist): " + isAtLeastArmV84);
++    Log.d(NAME, "- isBlocklistedChip: " + isBlocklistedChip);
++    Log.d(NAME, "- Build.MODEL: " + Build.MODEL);
++    Log.d(NAME, "- Build.HARDWARE: " + Build.HARDWARE);
++    Log.d(NAME, "- Build.BOARD: " + Build.BOARD);
++    if (Build.VERSION.SDK_INT >= 31) {
++      Log.d(NAME, "- Build.SOC_MODEL: " + Build.SOC_MODEL);
++    }
+ 
+     // TODO: Add runtime check for cpu features
+     if (LlamaContext.isArm64V8a()) {
+@@ -404,6 +425,72 @@ public class LlamaContext {
+     }
+   }
+ 
++  /**
++   * Tartaria Realms patch (OTA-273 / Pewter Vault).
++   *
++   * Returns true for SoCs/devices known to crash with SIGILL when the
++   * v8.4-compiled variants of librnllama are loaded. These are ARMv8.2-A
++   * chips that report enough v8.3+/v8.5+ cherry-picked features in
++   * /proc/cpuinfo to fool the upstream substring heuristic into
++   * thinking they're v8.4-a, but they lack v8.4 baseline instructions.
++   *
++   * For blocklisted chips, the static initializer forces
++   * isAtLeastArmV84 = false, so selection falls through to
++   * rnllama_v8_2_fp16_dotprod (compiled -march=armv8.2-a+fp16+dotprod).
++   * Every instruction in that set is present on Snapdragon 865 / Exynos
++   * 990 / SD7xx-class chips.
++   *
++   * Detection priority:
++   *   1. Build.SOC_MODEL (API 31+, exact SoC identifier from kernel).
++   *   2. Build.HARDWARE board codename (covers older API levels).
++   *   3. Build.MODEL prefix match (specific Samsung Galaxy S20/Note20).
++   */
++  private static boolean isKnownMisclassifiedChip() {
++    // 1. SoC model match (API 31+ only).
++    if (Build.VERSION.SDK_INT >= 31 && Build.SOC_MODEL != null) {
++      String soc = Build.SOC_MODEL.toUpperCase();
++      if (soc.startsWith("SM8250")        // Snapdragon 865 / 865+
++          || soc.startsWith("SM7250")      // Snapdragon 765G / 768G (Pixel 5)
++          || soc.startsWith("SM7350")      // Snapdragon 780G
++          || soc.startsWith("SM7450")      // Snapdragon 7 Gen 1 (llama.rn #279)
++          || soc.startsWith("SDM865")
++          || soc.startsWith("SDM765")
++          || soc.startsWith("SDM730")
++          || soc.startsWith("EXYNOS990")
++          || soc.startsWith("EXYNOS9820")
++          || soc.startsWith("EXYNOS9825")) {
++        Log.d(NAME, "Tartaria blocklist hit via Build.SOC_MODEL: " + soc);
++        return true;
++      }
++    }
++
++    // 2. Board / hardware codename match.
++    String hardware = Build.HARDWARE == null ? "" : Build.HARDWARE.toLowerCase();
++    if (hardware.equals("kona")           // SD865 reference platform
++        || hardware.equals("lito")        // SD765G / SD7xx 5G
++        || hardware.equals("bengal")) {   // SD662/680/685 budget class
++      Log.d(NAME, "Tartaria blocklist hit via Build.HARDWARE: " + hardware);
++      return true;
++    }
++
++    // 3. Device model prefix match (Samsung Galaxy S20 + Note 20).
++    String model = Build.MODEL == null ? "" : Build.MODEL.toUpperCase();
++    if (model.startsWith("SM-G980")       // S20 (Exynos 990)
++        || model.startsWith("SM-G981")    // S20 5G (SD865)
++        || model.startsWith("SM-G985")    // S20+ (Exynos 990)
++        || model.startsWith("SM-G986")    // S20+ 5G (SD865)
++        || model.startsWith("SM-G988")    // S20 Ultra (SD865 / Exynos 990)
++        || model.startsWith("SM-N980")    // Note 20 (Exynos 990 / SD865+)
++        || model.startsWith("SM-N981")    // Note 20 5G (SD865+)
++        || model.startsWith("SM-N985")    // Note 20 Ultra (Exynos 990)
++        || model.startsWith("SM-N986")) { // Note 20 Ultra 5G (SD865+)
++      Log.d(NAME, "Tartaria blocklist hit via Build.MODEL: " + model);
++      return true;
++    }
++
++    return false;
++  }
++
+   protected static native WritableMap modelInfo(
+     String model,
+     String[] skip

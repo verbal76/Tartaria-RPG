@@ -10632,7 +10632,7 @@ export const DISPLAY_VERSION = '3.0.0';
 // Bump this whenever a new AAB lands in Play Console internal
 // testing — the value should match the latest AAB build number, so
 // anyone older gets the nudge.
-export const MINIMUM_RECOMMENDED_APK_BUILD = 246;
+export const MINIMUM_RECOMMENDED_APK_BUILD = 247;
 
 // 2026-05-31-251 — OTA-251.
 // Three things in one push:
@@ -11144,4 +11144,53 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 246;
 //          Spire added), app/buildInfo.ts (OTA-272 bump + change
 //          note), docs/build-codenames.md (Slate Spire moved to
 //          current; pool renumbered).
-export const OTA_BUILD_ID = '2026-06-01-272';
+// OTA-273 (Pewter Vault) — NATIVE BUILD, not a JS-only OTA.
+//   The actual fix is a Java-source patch to llama.rn's static
+//   variant selector that lives in node_modules. patch-package
+//   (new dev-dep) re-applies the diff at every `npm install` via
+//   a postinstall hook. The CI Android build runs `npm ci` first,
+//   so the patched LlamaContext.java compiles into the AAB.
+//
+//   Why a native build was unavoidable: the variant-selection
+//   runs in a Java static initializer BEFORE any JS executes.
+//   No OTA can change it. The .so libraries are pre-built by
+//   CMake at native-build time; we only change the SELECTOR, not
+//   the variant compilations themselves.
+//
+//   The patch (patches/llama.rn+0.4.8.patch):
+//     1. Adds a device blocklist (Build.SOC_MODEL / Build.HARDWARE
+//        / Build.MODEL) for known-bad ARMv8.2-A chips that
+//        upstream's substring detection misclassifies as v8.4-a:
+//        SD865 (SM8250 / "kona" / Samsung S20+ "SM-G986x"),
+//        SD7xx 5G class (SM7250 / SM7350 / SM7450 / "lito"),
+//        Exynos 990, Exynos 9820/9825.
+//     2. For blocklisted chips, forces isAtLeastArmV84 = false so
+//        selection falls through to rnllama_v8_2_fp16_dotprod
+//        (compiled -march=armv8.2-a+fp16+dotprod). Every
+//        instruction in that set is present on the affected chips.
+//     3. Modern chips (Pixel 8/9, S24, anything ARMv8.6+) are
+//        UNCHANGED — they still load the top-tier
+//        v8_4_fp16_dotprod_i8mm_sve variant.
+//
+//   Player-facing effect:
+//     - Affected devices (S20+, etc.): Qwen narration now WORKS
+//       instead of crashing on launch + auto-disabling via Slate
+//       Spire. Variant is one rung lower (~1.5-2s vs ~1s narration).
+//     - Unaffected devices: identical to OTA-272.
+//
+//   Slate Spire (OTA-272) stays as belt-and-suspenders: if a chip
+//   we didn't blocklist still crashes, the AsyncStorage breadcrumb
+//   counter auto-disables after 2 crashes, same as before.
+//
+//   MINIMUM_RECOMMENDED_APK_BUILD bumped 246 → 247 so the
+//   TitleScreen stale-APK nag banner fires for anyone still on
+//   the broken build 246 once this AAB lands in Play Console.
+//
+//   Files: patches/llama.rn+0.4.8.patch (NEW),
+//          package.json (postinstall = patch-package +
+//          patch-package devDep),
+//          app/buildCodename.ts (Pewter Vault added),
+//          docs/build-codenames.md (Pewter Vault moved into
+//          current; pool renumbered),
+//          app/buildInfo.ts (OTA bump + MIN APK 246 → 247).
+export const OTA_BUILD_ID = '2026-06-01-273';

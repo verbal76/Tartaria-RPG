@@ -35,6 +35,7 @@ bug reports.
 | `2026-06-01-270`        | Lead Helm      | Tool pouch capacity 3 → 4 (3 scanners + 1 tool)            |
 | `2026-06-01-271`        | Copper Fence   | TitleScreen Play Store stale-APK nag banner                |
 | `2026-06-01-272`        | Slate Spire    | ML crash gate + deferred init + health summary             |
+| `2026-06-01-273`        | Pewter Vault   | llama.rn v8.4 misclassification patch (SD865/Exynos990 AAB)|
 
 ## Reserved pool (assign next 30+ OTAs from this list)
 
@@ -42,31 +43,30 @@ To keep codenames consistent and Tartaria-flavor without burning
 fresh creativity per OTA, the next codenames in order will be
 drawn from:
 
-1. Pewter Vault
-2. Bronze Mantle
-3. Granite Drift
-4. Marble Anvil
-5. Chalk Tine
-6. Soot Helm
-7. Ember Coil
-8. Ash Fence
-9. Pitch Spire
-10. Tar Vault
-11. Wax Mantle
-12. Resin Drift
-13. Lacquer Anvil
-14. Gilt Tine
-15. Brass Helm
-16. Mire Coil
-17. Bog Fence
-18. Reed Spire
-19. Thorn Vault
-20. Briar Mantle
-21. Husk Drift
-22. Lichen Anvil
-23. Moss Tine
-24. Loam Helm
-25. Quartz Coil
+1. Bronze Mantle
+2. Granite Drift
+3. Marble Anvil
+4. Chalk Tine
+5. Soot Helm
+6. Ember Coil
+7. Ash Fence
+8. Pitch Spire
+9. Tar Vault
+10. Wax Mantle
+11. Resin Drift
+12. Lacquer Anvil
+13. Gilt Tine
+14. Brass Helm
+15. Mire Coil
+16. Bog Fence
+17. Reed Spire
+18. Thorn Vault
+19. Briar Mantle
+20. Husk Drift
+21. Lichen Anvil
+22. Moss Tine
+23. Loam Helm
+24. Quartz Coil
 
 When bumping `OTA_BUILD_ID` in `app/buildInfo.ts`, also add an entry
 to `app/buildCodename.ts`'s `CODENAMES` map drawing from the next
