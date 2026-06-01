@@ -59,6 +59,40 @@ If unsure whether a change requires a build, default to OTA and
 let the harness reject if it can't be applied — it's faster than
 the round trip of a native rebuild.
 
+## OTA commit title convention — codename FIRST
+
+Every OTA commit's first-line title MUST start with the build
+codename (from `app/buildCodename.ts` / `docs/build-codenames.md`),
+followed by an em-dash, then the `OTA-NNN` identifier, then the
+description. Format:
+
+```
+<Codename> — OTA-NNN — <short description>
+```
+
+Examples:
+
+- `Smoke Anvil — OTA-267 — Build codename obfuscation layer`
+- `Tin Tine — OTA-268 — Vendor: gift verb routing fix`
+- `[build-ios] [submit-ios] Cinder Drift — OTA-266 — Info.plist...`
+  (build/submit markers stay as the absolute first tokens; the
+  codename slots in right after them)
+
+**Why:** the user views commits on a phone where titles truncate at
+~30-40 characters. With the codename leading, a truncated title
+("Smoke Anvil — OTA-267 — Build cod...") still tells them which
+build the commit corresponds to at a glance. The codename-only
+prefix means they don't have to expand each title to figure out
+which OTA they're looking at when triaging or referencing builds
+later.
+
+**Codename selection:** when bumping `OTA_BUILD_ID` in
+`app/buildInfo.ts`, also add a new entry to the `CODENAMES` map in
+`app/buildCodename.ts` drawing from the next unused name in
+`docs/build-codenames.md`'s reserved pool. Move that name from the
+reserved pool up into the current-mapping table in the doc. The
+commit then uses that fresh codename as its title prefix.
+
 ## HANDOFF.md — the build timeline
 
 `HANDOFF.md` is the canonical record of every issue tracked

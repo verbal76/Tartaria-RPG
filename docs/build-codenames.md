@@ -73,6 +73,28 @@ to `app/buildCodename.ts`'s `CODENAMES` map drawing from the next
 unused codename in this list. Move the codename here from the
 reserved pool up into the current-mapping table above.
 
+## Commit title format — codename FIRST
+
+When committing an OTA, the commit's **first-line title MUST start
+with the codename**, followed by an em-dash, then the OTA-NNN id,
+then the description:
+
+```
+<Codename> — OTA-NNN — <description>
+```
+
+E.g.:
+
+- `Smoke Anvil — OTA-267 — Build codename obfuscation layer`
+- `Tin Tine — OTA-268 — Vendor: gift verb routing fix`
+- `[build-ios] [submit-ios] Cinder Drift — OTA-266 — Info.plist...`
+  (build/submit markers stay first; codename slots in right after)
+
+**Why:** the user reads commits on a phone where titles truncate
+around 30-40 chars. Codename-first means a truncated title is still
+useful as a build-identity glance. Convention is also documented
+in CLAUDE.md so it's enforced across sessions.
+
 ## How the obfuscation actually works
 
 1. About screen + bug report email + OTA-applied dialog all show
