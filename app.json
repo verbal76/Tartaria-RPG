@@ -18,7 +18,14 @@
       "bundleIdentifier": "com.hotatticgames.tartarprim.hal2001",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSPhotoLibraryUsageDescription": "Tartaria Realms does not access your photo library."
+        "NSPhotoLibraryUsageDescription": "Tartaria Realms does not access your photo library.",
+        "NSPhotoLibraryAddUsageDescription": "Tartaria Realms does not save photos to your photo library.",
+        "NSCameraUsageDescription": "Tartaria Realms does not access your camera.",
+        "NSLocationWhenInUseUsageDescription": "Tartaria Realms does not access your location.",
+        "NSContactsUsageDescription": "Tartaria Realms does not access your contacts.",
+        "NSBluetoothAlwaysUsageDescription": "Tartaria Realms does not access Bluetooth.",
+        "NSMotionUsageDescription": "Tartaria Realms does not access motion sensors.",
+        "NSFaceIDUsageDescription": "Tartaria Realms does not use Face ID."
       }
     },
     "android": {

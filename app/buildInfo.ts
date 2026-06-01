@@ -10936,4 +10936,34 @@ export const DISPLAY_VERSION = '3.0.0';
 //   commands run on a local Mac, just without the secret-import
 //   keychain dance.
 //   Files: .github/workflows/build-ios-native.yml (NEW).
-export const OTA_BUILD_ID = '2026-05-31-265';
+// OTA-266 — iOS Info.plist: defensive shotgun pass on purpose strings.
+//   Build d6c3e1f (the OTA-254 retry after the EAS outage) finally
+//   completed and auto-submitted to App Store Connect. Apple rejected
+//   with ITMS-90683 missing NSPhotoLibraryUsageDescription — even
+//   though OTA-254 had already added that key in commit 76d4b01,
+//   which is in d6c3e1f's snapshot. Two possibilities (both fixed by
+//   this OTA): (a) the actually-submitted .ipa was from an OLDER
+//   build (7b5db38 or 4b59247 in the screenshot history, neither
+//   of which had OTA-254's fix), in which case firing a fresh build
+//   now picks up the latest app.json; (b) Expo's prebuild lost the
+//   ios.infoPlist key for some reason, in which case re-asserting
+//   it here (with a fresh build commit) re-tries.
+//   Also adding defensive purpose strings for the other system APIs
+//   Apple's scanner is likely to flag NEXT (one-at-a-time reporting
+//   means we'd play ITMS-90683 whack-a-mole otherwise). Added:
+//   NSPhotoLibraryAddUsageDescription (Photo library WRITE),
+//   NSCameraUsageDescription (likely to flag because
+//   react-native-executorch ships VisionModel.cpp),
+//   NSLocationWhenInUseUsageDescription, NSContactsUsageDescription,
+//   NSBluetoothAlwaysUsageDescription, NSMotionUsageDescription,
+//   NSFaceIDUsageDescription. All strings honestly state we don't
+//   access the resource — the user will never see them (we never
+//   actually request the permission), but Apple's scanner needs
+//   them to be present in Info.plist.
+//   (Mic + speech recognition are still handled by the
+//   expo-speech-recognition plugin config, which authors its own
+//   strings via app.json's plugins[].config.)
+//   This is a NATIVE rebuild (Info.plist baked at compile time);
+//   triggers via [build-ios] [submit-ios] commit title.
+//   Files: app.json (ios.infoPlist).
+export const OTA_BUILD_ID = '2026-05-31-266';
