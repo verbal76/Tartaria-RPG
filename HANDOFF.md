@@ -324,6 +324,18 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-271 — Play Store stale-APK nag banner on TitleScreen
+
+- **OTA-271 · Player: *"can we push an OTA to the old build so on the main screen it tells them to update the build in the Google Play store? that way they are aware?"***
+  - **The triggering case:** an Android internal tester opened the app for the first time today on a build so old it still has the OTA-080-era "Stop Arbiter Talking" button. They tapped CHECK FOR OTA UPDATE and the app said "up to date" — because no OTA at their `rt` matched, not because they were current. The user (dev) had AAB 246 fully rolled out in Play Console internal testing, but the tester had never updated through Play Store. Result: silent isolation on a half-year-old build.
+  - **What this OTA does:** new green-bordered nag banner on TitleScreen reading *"UPDATE AVAILABLE — build 246. You're on build X. Open Google Play Store to install the latest Tartaria Realms — newer features, bug fixes, and OTA-update compatibility."* Two buttons: **OPEN PLAY STORE** (tries `market://details?id=com.hotatticgames.tartarprim` first via `Linking.canOpenURL`, falls back to the HTTPS Play Store URL if the Play Store app isn't installed) and **later** (per-session dismiss; reappears next launch so the player doesn't tune it out forever).
+  - **Render gate (four conditions):** (a) `Platform.OS === 'android'` — Play Store doesn't exist on iOS; (b) `Application.applicationId === 'com.hotatticgames.tartarprim'` — sideload testers on `.hal2001` get the GitHub-pointer banner below, not this one; (c) `nativeBuildVersion < MINIMUM_RECOMMENDED_APK_BUILD` (new constant in buildInfo.ts, set to 246); (d) not session-dismissed.
+  - **Also:** the existing HaL sideload APK banner (`isApkOutdated()` + GitHub release pointer) now has its own bundle-id guard — only fires when App ID ends with `.hal2001`. Pre-OTA-271 it would have fired for production-bundle testers too, pointing them at GitHub when they should go to Play Store. Two banners, two install paths, no collision.
+  - **Per-OTA maintenance:** when a new AAB lands in Play Console internal testing, bump `MINIMUM_RECOMMENDED_APK_BUILD` in `buildInfo.ts` to match. Anyone below gets the nag.
+  - **What this CAN'T do — important limit:** the OTA only reaches testers whose APK rt matches our current OTA rt (2.4.1). Testers on truly ancient APKs with a different rt (the OTA-080-era "Stop Arbiter Talking" case, if it predates the 2.4.1 rt floor) won't receive this OTA at all and won't see the banner. Those testers need out-of-band contact (DM, email) OR a one-shot legacy OTA published at their specific old rt — both require us to know what rt they're on, which means getting the APK build number off them first.
+  - **OTA-only:** all JS-side; no native rebuild. Ships through OTA channel for all rt-2.4.1 APKs.
+  - **Files:** `app/buildInfo.ts` (new `MINIMUM_RECOMMENDED_APK_BUILD` const), `app/screens/TitleScreen.tsx` (banner render block + openPlayStore handler + `playStoreNagDismissed` state + styles + bundle-id guard on existing GitHub APK banner), `app/buildCodename.ts` (Copper Fence added), `docs/build-codenames.md` (Copper Fence moved to current; pool renumbered).
+
 #### OTA-270 — Tool pouch capacity raised 3 → 4 (3 scanners + 1 tool)
 
 - **OTA-270 · Player: *"if we have 3 scanners and 3 slots then they just become 3 scanner slots, so let's make it 4 slots that way they can assign all 3 scanners and a 4th tool"***

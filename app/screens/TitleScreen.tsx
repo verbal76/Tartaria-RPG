@@ -13,6 +13,7 @@ import {
   Platform,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
+import * as Application from 'expo-application';
 import {
   isApkOutdated,
   getLatestApkUrl,
@@ -38,7 +39,7 @@ import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSum
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
-import { OTA_BUILD_ID } from '../buildInfo';
+import { OTA_BUILD_ID, MINIMUM_RECOMMENDED_APK_BUILD } from '../buildInfo';
 import { getBuildCodename, getBuildCodenameOrNull } from '../buildCodename';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 // OTA-251 — was reading app.json's expo.version. That field is now
@@ -123,6 +124,12 @@ export function TitleScreen() {
   // last-known build), then fire network fetch, then bump the tick.
   const [apkPointerTick, setApkPointerTick] = useState(0);
   const [apkUrlCopied, setApkUrlCopied] = useState(false);
+  // OTA-271 — Play Store stale-APK banner. Dismiss is per-session
+  // (re-appears on next app launch so the player doesn't ignore it
+  // forever). Different from the apkBanner system above, which
+  // points sideload (HaL) testers at the GitHub release APK; this
+  // one points production-bundle testers at the Play Store listing.
+  const [playStoreNagDismissed, setPlayStoreNagDismissed] = useState(false);
   useEffect(() => {
     let cancelled = false;
     void (async () => {
@@ -641,10 +648,84 @@ export function TitleScreen() {
 
       <KokoroDownloadBanner />
 
+      {/* OTA-271 — Play Store stale-APK nag. Render conditions:
+          (1) Android only — Play Store doesn't exist on iOS;
+          (2) production bundle id (com.hotatticgames.tartarprim,
+              no .hal2001 suffix) — sideload testers get the
+              GitHub-pointer banner below, not this one;
+          (3) installed APK build < MINIMUM_RECOMMENDED_APK_BUILD —
+              the threshold bumps in buildInfo.ts each time a new
+              AAB lands in Play Console internal testing;
+          (4) player hasn't dismissed this session (re-fires next
+              launch so it doesn't get tuned out forever).
+          NOTE: only reaches testers whose APK rt matches our
+          current OTA rt (2.4.1). Testers on ancient APKs with a
+          different rt don't receive this OTA at all and need
+          out-of-band contact OR a one-shot OTA published at their
+          specific rt. */}
+      {(() => {
+        if (playStoreNagDismissed) return null;
+        if (Platform.OS !== 'android') return null;
+        const appId = Application.applicationId ?? '';
+        if (appId.endsWith('.hal2001')) return null; // sideload path
+        if (appId !== 'com.hotatticgames.tartarprim') return null;
+        const apkBuild = Number.parseInt(
+          String(Application.nativeBuildVersion ?? '0'),
+          10,
+        );
+        if (!Number.isFinite(apkBuild) || apkBuild <= 0) return null;
+        if (apkBuild >= MINIMUM_RECOMMENDED_APK_BUILD) return null;
+        const openPlayStore = () => {
+          const marketUrl = `market://details?id=${appId}`;
+          const httpsFallback = `https://play.google.com/store/apps/details?id=${appId}`;
+          Linking.canOpenURL(marketUrl)
+            .then((supported) =>
+              Linking.openURL(supported ? marketUrl : httpsFallback),
+            )
+            .catch(() => {
+              void Linking.openURL(httpsFallback).catch(() => {});
+            });
+        };
+        return (
+          <View style={styles.playStoreNag}>
+            <Text style={styles.playStoreNagTitle}>
+              UPDATE AVAILABLE — build {MINIMUM_RECOMMENDED_APK_BUILD}
+            </Text>
+            <Text style={styles.playStoreNagBody}>
+              You're on build {apkBuild}. Open Google Play Store to install
+              the latest Tartaria Realms — newer features, bug fixes, and
+              OTA-update compatibility.
+            </Text>
+            <View style={styles.playStoreNagButtons}>
+              <TouchableOpacity
+                style={styles.playStoreNagPrimary}
+                onPress={openPlayStore}
+              >
+                <Text style={styles.playStoreNagPrimaryText}>OPEN PLAY STORE</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.playStoreNagDismiss}
+                onPress={() => setPlayStoreNagDismissed(true)}
+              >
+                <Text style={styles.playStoreNagDismissText}>later</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+      })()}
+
       {(() => {
         // apkPointerTick is read here so the gate re-evaluates after
         // hydrateApkPointer + refreshFromGitHub flip the live pointer.
         void apkPointerTick;
+        // OTA-271 — this banner is the HaL sideload (.hal2001 bundle)
+        // path that points at a GitHub release APK. Hide for the bare
+        // production bundle — those testers belong to Play Store and
+        // get the playStoreNag above. The HaL sideload check uses the
+        // App ID rather than channel so it works regardless of OTA
+        // channel state.
+        const appId = Application.applicationId ?? '';
+        if (!appId.endsWith('.hal2001')) return null;
         const url = getLatestApkUrl();
         if (!isApkOutdated() || url.length === 0) return null;
         const copied = apkUrlCopied;
@@ -1157,6 +1238,60 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 10,
     marginBottom: 8,
+  },
+  // OTA-271 — Play Store stale-APK nag. Tan accent (different from
+  // the green sideload banner above) so the two never read as the
+  // same affordance — different install paths, different visual.
+  playStoreNag: {
+    backgroundColor: '#1a1612',
+    borderColor: '#c9a86a',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    marginBottom: 8,
+  },
+  playStoreNagTitle: {
+    color: '#c9a86a',
+    fontSize: 11,
+    letterSpacing: 2,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  playStoreNagBody: {
+    color: '#cdbf99',
+    fontSize: 12,
+    lineHeight: 16,
+    marginBottom: 8,
+  },
+  playStoreNagButtons: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+  },
+  playStoreNagPrimary: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 3,
+    backgroundColor: '#c9a86a',
+  },
+  playStoreNagPrimaryText: {
+    color: '#13110f',
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1.5,
+  },
+  playStoreNagDismiss: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 3,
+    borderColor: '#3a342c',
+    borderWidth: 1,
+  },
+  playStoreNagDismissText: {
+    color: '#7a705c',
+    fontSize: 11,
+    fontStyle: 'italic',
   },
   apkBannerTitle: {
     color: '#9ec96a',

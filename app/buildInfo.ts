@@ -10614,6 +10614,26 @@
 // Bump this for marketing-visible version changes.
 export const DISPLAY_VERSION = '3.0.0';
 
+// OTA-271 — Minimum-recommended APK build number. TitleScreen reads
+// Application.nativeBuildVersion and compares it against this; if
+// the tester's APK build < this, a "your APK is out of date — update
+// from the Play Store" banner appears on the main screen with a
+// PLAY STORE button (deep-link to Tartaria's Play Store page).
+// Player ask: "can we push an OTA to the old build so on the main
+// screen it tells them to update the build in the Google Play store?
+// that way they are aware."
+//
+// IMPORTANT: this only reaches testers whose APK rt matches our
+// current rt (2.4.1). Testers on truly ancient APKs with a different
+// rt won't receive this OTA at all (the manifest server rejects
+// rt mismatches). Those testers need out-of-band contact OR a
+// separate one-shot OTA published at their specific old rt.
+//
+// Bump this whenever a new AAB lands in Play Console internal
+// testing — the value should match the latest AAB build number, so
+// anyone older gets the nudge.
+export const MINIMUM_RECOMMENDED_APK_BUILD = 246;
+
 // 2026-05-31-251 — OTA-251.
 // Three things in one push:
 //
@@ -11061,4 +11081,26 @@ export const DISPLAY_VERSION = '3.0.0';
 //   Files: app/state/gameStore.ts (POUCH_MAX + comment + refusal
 //          line), app/screens/InventoryScreen.tsx (POUCH_MAX +
 //          hint text).
-export const OTA_BUILD_ID = '2026-06-01-270';
+// OTA-271 — Play Store stale-APK banner on TitleScreen. Player ask:
+//   "can we push an OTA to the old build so on the main screen it
+//   tells them to update the build in the Google Play store? that
+//   way they are aware." A tester on an older APK (build < 246) got
+//   the "up to date" reply when tapping CHECK FOR OTA UPDATE because
+//   no OTA at their rt matched — but they're stuck on an old binary
+//   with the "Stop Arbiter Talking" button etc.
+//   New TitleScreen banner — green-bordered nag with PLAY STORE
+//   button (market:// deep link, http fallback) and LATER dismiss.
+//   Render conditions: (a) Platform.OS === 'android', (b) App ID is
+//   the production bare bundle (NOT .hal2001 sideload), (c) APK
+//   build < MINIMUM_RECOMMENDED_APK_BUILD, (d) not session-dismissed.
+//   The HaL sideload banner now hides for the production bundle so
+//   the two never collide.
+//   Important limit: only reaches testers whose APK rt matches our
+//   current OTA rt (2.4.1). Testers on ancient APKs with a different
+//   rt never receive this OTA and need either out-of-band contact OR
+//   a one-shot legacy OTA published at their specific old rt.
+//   Files: app/buildInfo.ts (new MINIMUM_RECOMMENDED_APK_BUILD = 246
+//          constant), app/screens/TitleScreen.tsx (banner render +
+//          openPlayStore handler + dismiss state + styles + guard on
+//          existing GitHub APK banner so it only fires for .hal2001).
+export const OTA_BUILD_ID = '2026-06-01-271';
