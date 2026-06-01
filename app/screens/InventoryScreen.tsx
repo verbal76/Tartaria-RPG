@@ -594,7 +594,7 @@ function ToolPouchBanner({
   pouchFilterActive: boolean;
   onTapEmptySlot: () => void;
 }) {
-  const POUCH_MAX = 3;
+  const POUCH_MAX = 4;
   const pouchIds = player.equipped?.toolPouchIds ?? [];
   const unpouchItem = useGameStore((s) => s.unpouchItem);
   const slots: Array<{ name: string | null; id: string | null }> = [];
@@ -606,7 +606,7 @@ function ToolPouchBanner({
   return (
     <View style={pouchStyles.banner}>
       <Text style={pouchStyles.title}>TOOL POUCH</Text>
-      <Text style={pouchStyles.hint}>Ready-to-use tools (3 slots). Tap an empty slot to stow from your pack.</Text>
+      <Text style={pouchStyles.hint}>Ready-to-use tools (4 slots). Tap an empty slot to stow from your pack.</Text>
       <View style={pouchStyles.row}>
         {slots.map((slot, idx) => (
           <View key={idx} style={pouchStyles.slot}>

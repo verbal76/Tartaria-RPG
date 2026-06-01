@@ -11042,4 +11042,23 @@ export const DISPLAY_VERSION = '3.0.0';
 //          eligibility gate + isPouchEligible import), app/screens/
 //          InventoryScreen.tsx (state + filter + tappable empty
 //          slots + callout banner + styles).
-export const OTA_BUILD_ID = '2026-06-01-269';
+// OTA-270 — Tool pouch capacity raised 3 → 4.
+//   Player ask: "if we have 3 scanners and 3 slots then they just
+//   become 3 scanner slots, so let's make it 4 slots that way they
+//   can assign all 3 scanners and a 4th tool." Three scanner
+//   families exist (Pulse / Aetheric / Mud); each gates a different
+//   class of investigate-feature drop, and a player who wants
+//   coverage across all biomes needs all three. With OTA-269's
+//   change making pouched scanners count as "equipped" for chip
+//   greening, the practical move is to give the player room to
+//   carry all three families + one other tool. POUCH_MAX bumped
+//   from 3 to 4 in gameStore (stowInPouch cap) and InventoryScreen
+//   (ToolPouchBanner slot rendering loop). Banner hint text and
+//   Arbiter's at-cap refusal line updated to match.
+//   The row layout already uses flex:1 per slot inside a flexDirection:
+//   row container, so the four slots auto-distribute width — no
+//   style changes needed.
+//   Files: app/state/gameStore.ts (POUCH_MAX + comment + refusal
+//          line), app/screens/InventoryScreen.tsx (POUCH_MAX +
+//          hint text).
+export const OTA_BUILD_ID = '2026-06-01-270';

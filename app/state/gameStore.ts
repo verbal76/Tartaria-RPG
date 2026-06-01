@@ -15402,13 +15402,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  // OTA-239 — Tool Pouch. The pouch holds up to 3 items (ids matching
-  // entries in player.inventory). Pouched items remain in inventory;
-  // pouchIds is the index. Players stow Aetheric Torches, Vision
-  // Lenses, etc. so `use <item>` resolves faster and the InventoryScreen
-  // surfaces them in a dedicated section.
+  // OTA-239 — Tool Pouch. OTA-270 — capacity raised 3 → 4 so a player
+  // with all three scanner families (Pulse / Aetheric / Mud) can pouch
+  // every one AND still keep a fourth general tool on the belt. Pouched
+  // items remain in inventory; pouchIds is the index. Players stow
+  // Aetheric Torches, Vision Lenses, scanners, etc. so `use <item>`
+  // resolves faster and the InventoryScreen surfaces them in a
+  // dedicated section.
   stowInPouch(itemName) {
-    const POUCH_MAX = 3;
+    const POUCH_MAX = 4;
     const state = get();
     const player = state.player;
     if (!player) return;
@@ -15434,7 +15436,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (current.length >= POUCH_MAX) {
       get().appendLog(
         'arbiter',
-        `The Arbiter looks at the pouch. "Three is the limit. Take one out before another goes in."`,
+        `The Arbiter looks at the pouch. "Four is the limit. Take one out before another goes in."`,
       );
       return;
     }

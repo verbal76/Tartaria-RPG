@@ -324,6 +324,15 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-270 — Tool pouch capacity raised 3 → 4 (3 scanners + 1 tool)
+
+- **OTA-270 · Player: *"if we have 3 scanners and 3 slots then they just become 3 scanner slots, so let's make it 4 slots that way they can assign all 3 scanners and a 4th tool"***
+  - **The reasoning is sound:** three scanner families exist (Pulse, Aetheric, Mud), each gating a different class of investigate-feature drop. With OTA-269 making pouched scanners count as "equipped" for chip greening, a player who wants biome coverage needs all three pouched simultaneously. At 3 slots that left zero room for a torch / lens / rope. 4 slots is the right cap.
+  - **Fix:** `POUCH_MAX` bumped from `3` to `4` in two places — `app/state/gameStore.ts:stowInPouch` (the engine cap) and `app/screens/InventoryScreen.tsx:ToolPouchBanner` (the UI render loop). Banner hint text updated `(3 slots)` → `(4 slots)`. The Arbiter's at-cap refusal line updated from "Three is the limit" to "Four is the limit." Engine comment updated to explain the 4-slot reasoning.
+  - **Layout:** the row uses `flex: 1` per slot inside a `flexDirection: 'row'` container, so the four slots auto-distribute width. No style changes needed; the slots just compress slightly to fit.
+  - **OTA-only:** JS-side; no native rebuild.
+  - **Files:** `app/state/gameStore.ts` (POUCH_MAX const + Arbiter refusal line + comment), `app/screens/InventoryScreen.tsx` (POUCH_MAX const + banner hint text), `app/buildCodename.ts` (Lead Helm added), `app/buildInfo.ts` (OTA-270 bump + change note), `docs/build-codenames.md` (Lead Helm moved to current mapping, pool renumbered).
+
 #### OTA-269 — Tool pouch: tappable empty slots + auto-filter inventory + pouched scanners count as equipped
 
 - **OTA-269 · Player: *"the empty tool pouch slots should be highlighted so the player can easily see them, and when you tap the empty slot your inventory should sort to only the items available to be used there. it serves the same purpose as equipping them. so say you are holding two weapons, when you have an investigation that needs the pulse scanner it should be highlighted because in the pouch is technically equipped... anything that is a tool that isn't worn should be able to go there in those three slots. it keeps you from swapping items all the time."***

@@ -40,6 +40,7 @@ const CODENAMES: Record<string, string> = {
   '2026-05-31-267': 'Smoke Anvil',
   '2026-06-01-268': 'Tin Tine',
   '2026-06-01-269': 'Brass Coil',
+  '2026-06-01-270': 'Lead Helm',
 };
 
 /**
