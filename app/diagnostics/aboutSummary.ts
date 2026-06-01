@@ -16,7 +16,7 @@ import Constants from 'expo-constants';
 import * as Application from 'expo-application';
 import { Platform, Dimensions, PixelRatio } from 'react-native';
 import { OTA_BUILD_ID, DISPLAY_VERSION } from '../buildInfo';
-import { getBuildCodename } from '../buildCodename';
+import { getBuildCodename, getApkCodename } from '../buildCodename';
 import { mlHealthSummary } from './mlHealth';
 
 export function buildBasicDeviceSummary(): string {
@@ -86,7 +86,13 @@ export function buildBasicDeviceSummary(): string {
     // commit messages and was a search-engine breadcrumb back to
     // the GitHub repo. The codename map lives in
     // app/buildCodename.ts and docs/build-codenames.md.
-    `  Build: ${getBuildCodename(OTA_BUILD_ID)}`,
+    // OTA-274 — surface BOTH the AAB codename (binary identity,
+    // from versionCode) and the OTA codename (JS bundle identity,
+    // from OTA_BUILD_ID). They drift naturally; testers on the
+    // same APK running different OTA bundles share the AAB name
+    // but differ on OTA name. Dev pairs the two when triaging.
+    `  AAB: ${getApkCodename(apkBuild)}`,
+    `  OTA: ${getBuildCodename(OTA_BUILD_ID)}`,
     ``,
     // OTA-272 — ML runtime health block. Tells the dev at triage
     // time whether this tester has hit native ML crashes and

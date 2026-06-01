@@ -40,7 +40,7 @@ import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
 import { OTA_BUILD_ID, MINIMUM_RECOMMENDED_APK_BUILD } from '../buildInfo';
-import { getBuildCodename, getBuildCodenameOrNull } from '../buildCodename';
+import { getBuildCodename, getBuildCodenameOrNull, getApkCodename } from '../buildCodename';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 // OTA-251 — was reading app.json's expo.version. That field is now
 // pinned to the runtimeVersion of the installed APK (2.4.1) so OTAs
@@ -689,12 +689,13 @@ export function TitleScreen() {
         return (
           <View style={styles.playStoreNag}>
             <Text style={styles.playStoreNagTitle}>
-              UPDATE AVAILABLE — build {MINIMUM_RECOMMENDED_APK_BUILD}
+              UPDATE AVAILABLE — {getApkCodename(MINIMUM_RECOMMENDED_APK_BUILD)}
             </Text>
             <Text style={styles.playStoreNagBody}>
               You're on build {apkBuild}. Open Google Play Store to install
-              the latest Tartaria Realms — newer features, bug fixes, and
-              OTA-update compatibility.
+              the latest Tartaria Realms ({getApkCodename(MINIMUM_RECOMMENDED_APK_BUILD)},
+              build {MINIMUM_RECOMMENDED_APK_BUILD}) — newer features, bug
+              fixes, and OTA-update compatibility.
             </Text>
             <View style={styles.playStoreNagButtons}>
               <TouchableOpacity

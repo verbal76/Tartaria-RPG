@@ -10632,7 +10632,7 @@ export const DISPLAY_VERSION = '3.0.0';
 // Bump this whenever a new AAB lands in Play Console internal
 // testing — the value should match the latest AAB build number, so
 // anyone older gets the nudge.
-export const MINIMUM_RECOMMENDED_APK_BUILD = 247;
+export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 
 // 2026-05-31-251 — OTA-251.
 // Three things in one push:
@@ -11193,4 +11193,49 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 247;
 //          docs/build-codenames.md (Pewter Vault moved into
 //          current; pool renumbered),
 //          app/buildInfo.ts (OTA bump + MIN APK 246 → 247).
-export const OTA_BUILD_ID = '2026-06-01-273';
+// OTA-274 (Bronze Mantle) — AAB codename split + MIN_APK retarget +
+//   Slate Keep banner copy.
+//
+//   Three coupled fixes for the Pewter Vault Play Console push:
+//
+//   1. SEPARATE CODENAME POOLS. Previously every build (OTA or AAB)
+//      drew from the same pool; an AAB and its OTAs would share a
+//      single name that drifted out of meaning by the time the AAB
+//      shipped to Play Console. New `APK_CODENAMES` map in
+//      `app/buildCodename.ts` is keyed by `versionCode` and names
+//      the binary independently. Build 263 (the Pewter Vault AAB
+//      now in Play Console internal testing) is "Slate Keep". OTAs
+//      continue from their existing pool (Bronze Mantle = OTA-274).
+//      About screen + bug-report Build line now shows both:
+//      "AAB Slate Keep build 263 · OTA Bronze Mantle".
+//
+//   2. MIN_APK retargeted to the real build number. OTA-273 set
+//      MIN_APK = 247 anticipating that the new AAB would be build
+//      247. But the workflow stamps versionCode = run_number, which
+//      was 263 for the Pewter Vault build (many APK/iOS runs
+//      happened between AAB 246 and AAB 263). The OTA-271 (Copper
+//      Fence) nag banner fired on testers on AAB 246 telling them
+//      to "install build 247" — but 247 didn't exist, so tapping
+//      OPEN PLAY STORE went to a listing with no update available
+//      and the banner stayed up. MIN_APK is now 263 — the actual
+//      Slate Keep AAB number — so testers on build 246 see the
+//      banner, tap OPEN PLAY STORE, and Play Store offers them the
+//      real update (build 263).
+//
+//   3. BANNER COPY now references the AAB codename. "UPDATE
+//      AVAILABLE — Slate Keep (build 263)" instead of just
+//      "UPDATE AVAILABLE — build 263". Reads as a release name
+//      the tester can reference in a bug report, not just a number.
+//
+//   Files: app/buildCodename.ts (new APK_CODENAMES map +
+//          getApkCodename/getApkCodenameOrNull; Bronze Mantle added),
+//          app/buildInfo.ts (OTA bump + MIN_APK 247 → 263 + change
+//          note),
+//          app/diagnostics/aboutSummary.ts (Build line shows AAB +
+//          OTA codenames side by side),
+//          app/screens/TitleScreen.tsx (banner copy uses
+//          getApkCodename),
+//          docs/build-codenames.md (Bronze Mantle moved to current;
+//          new AAB codenames section with Slate Keep = 263),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-01-274';

@@ -44,6 +44,24 @@ const CODENAMES: Record<string, string> = {
   '2026-06-01-271': 'Copper Fence',
   '2026-06-01-272': 'Slate Spire',
   '2026-06-01-273': 'Pewter Vault',
+  '2026-06-01-274': 'Bronze Mantle',
+};
+
+// OTA-274 — separate codename pool for native AAB builds. The OTA
+// codename above tells the dev which JS bundle is running; this map
+// tells the dev which native APK binary is installed. They drift
+// out of sync naturally — an OTA bundle is one beat (Pewter Vault,
+// Bronze Mantle, etc.), an AAB is a bigger event that may persist
+// across dozens of OTAs.
+//
+// Keyed by Android `versionCode`, which the workflow stamps from
+// GitHub Actions `run_number` at build time. Add a new entry here
+// every time an AAB is uploaded to Play Console internal testing
+// AND `MINIMUM_RECOMMENDED_APK_BUILD` is bumped to match. The
+// banner + About screen pull the codename for the build number
+// they see in `Application.nativeBuildVersion`.
+const APK_CODENAMES: Record<number, string> = {
+  263: 'Slate Keep',
 };
 
 /**
@@ -65,4 +83,24 @@ export function getBuildCodename(otaId: string = OTA_BUILD_ID): string {
  */
 export function getBuildCodenameOrNull(otaId: string = OTA_BUILD_ID): string | null {
   return CODENAMES[otaId] ?? null;
+}
+
+/**
+ * Codename for the given AAB versionCode. Returns "(build N)" wrapped
+ * in parens if the build number isn't in the map — pre-Slate-Keep
+ * AABs that predate this codename layer fall back to the raw number.
+ */
+export function getApkCodename(versionCode: number | string | null | undefined): string {
+  const n = typeof versionCode === 'string' ? parseInt(versionCode, 10) : versionCode;
+  if (n == null || Number.isNaN(n)) return '(unknown build)';
+  return APK_CODENAMES[n] ?? `(build ${n})`;
+}
+
+/**
+ * Same as getApkCodename but returns null if the build is unmapped.
+ */
+export function getApkCodenameOrNull(versionCode: number | string | null | undefined): string | null {
+  const n = typeof versionCode === 'string' ? parseInt(versionCode, 10) : versionCode;
+  if (n == null || Number.isNaN(n)) return null;
+  return APK_CODENAMES[n] ?? null;
 }

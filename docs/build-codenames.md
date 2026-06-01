@@ -36,6 +36,37 @@ bug reports.
 | `2026-06-01-271`        | Copper Fence   | TitleScreen Play Store stale-APK nag banner                |
 | `2026-06-01-272`        | Slate Spire    | ML crash gate + deferred init + health summary             |
 | `2026-06-01-273`        | Pewter Vault   | llama.rn v8.4 misclassification patch (SD865/Exynos990 AAB)|
+| `2026-06-01-274`        | Bronze Mantle  | AAB codename split (Slate Keep = 263) + MIN_APK 247 → 263  |
+
+## AAB codenames (separate pool, keyed by versionCode)
+
+OTA-274 introduced a parallel codename scheme for native AAB
+builds. The OTA codename names the JS bundle; the AAB codename
+names the binary in Play Console. They drift naturally and the
+About screen surfaces both.
+
+| versionCode | AAB codename | Notes                                        |
+|-------------|--------------|----------------------------------------------|
+| `246`       | (unnamed)    | Predates the AAB codename layer; was running with OTA-265 (Stone Mantle) at upload time. |
+| `263`       | Slate Keep   | Pewter Vault (OTA-273) AAB. llama.rn SD865-class crash fix. |
+
+### AAB reserved pool
+
+Stone / fortress / Tartaria-landmark style. AABs ship less often
+than OTAs and should feel bigger than the metallic-noun OTA pool.
+
+1. Stone Castle
+2. Granite Hold
+3. Marble Spire
+4. Onyx Tower
+5. Basalt Bulwark
+6. Obsidian Gate
+7. Skyhold
+8. Ironwall
+9. Worldgate
+10. Sunspire
+11. Hearthstone
+12. Deepforge
 
 ## Reserved pool (assign next 30+ OTAs from this list)
 
@@ -43,30 +74,29 @@ To keep codenames consistent and Tartaria-flavor without burning
 fresh creativity per OTA, the next codenames in order will be
 drawn from:
 
-1. Bronze Mantle
-2. Granite Drift
-3. Marble Anvil
-4. Chalk Tine
-5. Soot Helm
-6. Ember Coil
-7. Ash Fence
-8. Pitch Spire
-9. Tar Vault
-10. Wax Mantle
-11. Resin Drift
-12. Lacquer Anvil
-13. Gilt Tine
-14. Brass Helm
-15. Mire Coil
-16. Bog Fence
-17. Reed Spire
-18. Thorn Vault
-19. Briar Mantle
-20. Husk Drift
-21. Lichen Anvil
-22. Moss Tine
-23. Loam Helm
-24. Quartz Coil
+1. Granite Drift
+2. Marble Anvil
+3. Chalk Tine
+4. Soot Helm
+5. Ember Coil
+6. Ash Fence
+7. Pitch Spire
+8. Tar Vault
+9. Wax Mantle
+10. Resin Drift
+11. Lacquer Anvil
+12. Gilt Tine
+13. Brass Helm
+14. Mire Coil
+15. Bog Fence
+16. Reed Spire
+17. Thorn Vault
+18. Briar Mantle
+19. Husk Drift
+20. Lichen Anvil
+21. Moss Tine
+22. Loam Helm
+23. Quartz Coil
 
 When bumping `OTA_BUILD_ID` in `app/buildInfo.ts`, also add an entry
 to `app/buildCodename.ts`'s `CODENAMES` map drawing from the next
