@@ -56,11 +56,6 @@ import {
   type SlotSummary,
 } from '../engine/saveSystem';
 import { makeEntry, persistEntry } from '../engine/gameLog';
-// OTA-287 — wrap Qwen generate/stream calls with mid-use crash
-// breadcrumbs. Detects post-init crashes (Pixel 10 Pro XL / Android
-// 16 Beta SIGSEGV in lm_ggml_graph_compute_thread) which the init
-// counter doesn't catch.
-import { markMLGenerateAttempted, markMLGenerateSucceeded } from '../diagnostics/mlHealth';
 import { createCharacter, getRaces, getFactions, type CreateCharacterInput } from '../engine/character';
 import { generateQuest } from '../engine/questGenerator';
 import {
@@ -21169,13 +21164,6 @@ async function narrateViaArbiter(
   const messages = buildSystemPrompt(ctx);
   const myEpoch = ++arbiterGenerationEpoch;
   set({ isGenerating: true, partialArbiterText: '' });
-  // OTA-287 — write the "generate attempted" breadcrumb BEFORE the
-  // qwen.stream call. If the call SIGSEGVs (Pixel 10 Pro XL / Android
-  // 16 Beta signature), the process dies and markMLGenerateSucceeded
-  // never fires. Next launch's loadMLHealth detects the gap and
-  // increments midUseCrashCount. Two of these and Qwen auto-disables
-  // for the install — template narration takes over silently.
-  void markMLGenerateAttempted();
   try {
     // Token budgets matched to the prompts:
     //   combat instruction:  1 short sentence  ≈  35 tokens → cap 55
@@ -21193,10 +21181,6 @@ async function narrateViaArbiter(
       },
       { maxNewTokens: maxTokens },
     );
-    // OTA-287 — mark success only after the stream completes cleanly.
-    // Cancellation (epoch mismatch) is treated as success because the
-    // engine returned normally without crashing.
-    void markMLGenerateSucceeded();
     if (myEpoch !== arbiterGenerationEpoch) return; // cancelled mid-flight
     // Trim to the last complete sentence so we never display a partial
     // ending like "...each stroke echoing in the". Falls back to the raw
