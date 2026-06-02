@@ -324,6 +324,21 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-282 (Tar Vault) — Final ▼ state: in-row on iOS, nothing on Android (drops Accessory)
+
+- **OTA-282 · Player corrected my Pitch Spire interpretation with a Pixel screenshot circling the in-row position between input and Act:** *"its supposed to be here for ios and nowhere for android."* I had read their earlier "the down arrow is still in the wrong place" as pointing at the in-row ▼; they actually meant the InputAccessoryView bar above the keyboard was in the wrong place. The in-row position IS the correct iOS placement (the iOS keyboard pushes the row up so ▼ stays visible above it).
+- **Fix:** restored the in-row `▼` TouchableOpacity with `Platform.OS === 'ios'` gate. Removed the InputAccessoryView entirely (its component import, the `inputAccessoryViewID` prop on TextInput, the `KEYBOARD_ACCESSORY_ID` constant, and the `kbAccessoryBar/kbAccessoryBtn/kbAccessoryText` styles). `kbDismiss/kbDismissText` styles stay — they wire up the restored in-row ▼ and use the OTA-279 brightened accent-gold color so it actually contrasts against the dark background.
+- **Final design across both platforms:**
+  - **iOS:** in-row ▼ between input and Act (bright accent gold). Always visible while keyboard is up — the keyboard pushes the input row up so the ▼ stays accessible.
+  - **Android:** nothing in-row. System back button dismisses the keyboard natively.
+- **Five-OTA saga to land here:**
+  - 277 Chalk Tine — added in-row ▼ both platforms (color too dim)
+  - 279 Ember Coil — added InputAccessoryView + brightened ▼
+  - 280 Ash Fence — hid in-row ▼ on Android only
+  - 281 Pitch Spire — wrongly removed in-row ▼ on iOS too (misread player intent)
+  - **282 Tar Vault — restored in-row ▼ on iOS, removed Accessory (this OTA)**
+- **Files:** `app/components/InputBox.tsx` (removed InputAccessoryView import + render + KEYBOARD_ACCESSORY_ID + accessory styles; restored in-row ▼ with iOS Platform gate), `app/buildCodename.ts` (Tar Vault added), `app/buildInfo.ts` (OTA-282 bump + change note), `docs/build-codenames.md` (Tar Vault moved to current; pool renumbered), HANDOFF.md (this entry).
+
 #### OTA-281 (Pitch Spire) — Remove in-row ▼ on iOS too (InputAccessoryView is the right place)
 
 - **OTA-281 · Player: *"if that was your final ember coil update, the down arrow is still in the wrong place."*** Right — the in-row ▼ next to Act got covered by the iOS keyboard when up (useless then) and served no purpose when keyboard was down (nothing to dismiss). Ember Coil's InputAccessoryView bar above the keyboard is the correct iOS dismiss path; the in-row ▼ was vestigial.

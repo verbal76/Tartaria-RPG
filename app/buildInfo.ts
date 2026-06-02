@@ -11489,4 +11489,43 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          docs/build-codenames.md (Pitch Spire moved to current; pool
 //          renumbered),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-281';
+// OTA-282 (Tar Vault) — final keyboard-dismiss state. Player
+//   corrected my Pitch Spire reading with a Pixel screenshot:
+//   "its supposed to be here for ios and nowhere for android."
+//   They circled the in-row position between input and Act —
+//   meaning the in-row ▼ IS the correct iOS placement; my Ember
+//   Coil InputAccessoryView bar above the keyboard was the wrong
+//   placement.
+//
+//   Final design:
+//     - iOS:     in-row ▼ between input and Act (bright accent gold).
+//                Keyboard pushes the row up so ▼ stays visible.
+//     - Android: nothing (system back button dismisses natively).
+//
+//   Removed:
+//     - InputAccessoryView component + render (Ember Coil added)
+//     - inputAccessoryViewID prop on TextInput
+//     - KEYBOARD_ACCESSORY_ID constant
+//     - kbAccessoryBar/kbAccessoryBtn/kbAccessoryText styles
+//
+//   Restored: in-row ▼ TouchableOpacity with `Platform.OS === 'ios'`
+//   gate. kbDismiss/kbDismissText styles (kept since Chalk Tine)
+//   wire it up. Uses the OTA-279 brightened accent-gold color so
+//   it actually contrasts against the dark background.
+//
+//   Lineage of this saga (5 OTAs to land):
+//     277 Chalk Tine  — added in-row ▼ both platforms (too dim)
+//     279 Ember Coil  — added InputAccessoryView + brightened ▼
+//     280 Ash Fence   — hid in-row ▼ on Android only
+//     281 Pitch Spire — wrongly removed in-row ▼ on iOS too
+//     282 Tar Vault   — restored in-row ▼ on iOS, removed Accessory
+//
+//   Files: app/components/InputBox.tsx (removed InputAccessoryView
+//          import + render + KEYBOARD_ACCESSORY_ID + accessory
+//          styles; restored in-row ▼ with iOS Platform gate),
+//          app/buildCodename.ts (Tar Vault added),
+//          app/buildInfo.ts (OTA-282 bump + change note),
+//          docs/build-codenames.md (Tar Vault moved to current; pool
+//          renumbered),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-282';
