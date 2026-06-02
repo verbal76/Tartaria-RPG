@@ -11447,4 +11447,21 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          docs/build-codenames.md (Ember Coil moved to current; pool
 //          renumbered),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-279';
+// OTA-280 (Ash Fence) — Hide in-row ▼ keyboard-dismiss button on
+//   Android. Android playtester (user, on Pixel): "I don't want that
+//   down arrow on android devices, it didn't have that issue."
+//
+//   Right — Android's system back button dismisses the keyboard
+//   natively, so the in-row ▼ was redundant clutter on Android.
+//   iOS keeps it as a fallback to the OTA-279 InputAccessoryView bar
+//   above the keyboard (the actual iPhone fix). One-line Platform.OS
+//   gate around the TouchableOpacity.
+//
+//   Files: app/components/InputBox.tsx (in-row ▼ wrapped in
+//          `{Platform.OS === 'ios' ? <btn /> : null}`),
+//          app/buildCodename.ts (Ash Fence added),
+//          app/buildInfo.ts (OTA-280 bump + change note),
+//          docs/build-codenames.md (Ash Fence moved to current; pool
+//          renumbered),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-280';

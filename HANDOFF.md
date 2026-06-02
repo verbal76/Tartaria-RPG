@@ -324,6 +324,12 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-280 (Ash Fence) — Hide in-row ▼ keyboard-dismiss on Android
+
+- **OTA-280 · Android playtester (user, on Pixel): *"I don't want that down arrow on android devices, it didn't have that issue."*** Right — Android's system back button dismisses the keyboard natively, so the in-row ▼ chevron we added in Chalk Tine (OTA-277) was redundant clutter on Android. The whole reason the chevron existed was the iOS-specific keyboard-stuck issue, which Android doesn't have.
+- **Fix:** wrap the in-row ▼ `TouchableOpacity` in `{Platform.OS === 'ios' ? <btn /> : null}`. iOS keeps it as a fallback to the OTA-279 InputAccessoryView bar above the keyboard (the actual iPhone-specific fix). Android sees nothing — same as before Chalk Tine landed.
+- **Files:** `app/components/InputBox.tsx` (Platform.OS gate around in-row chevron), `app/buildCodename.ts` (Ash Fence added), `app/buildInfo.ts` (OTA-280 bump + change note), `docs/build-codenames.md` (Ash Fence moved to current; pool renumbered), HANDOFF.md (this entry).
+
 #### OTA-279 (Ember Coil) — Real iOS keyboard-dismiss via InputAccessoryView (Chalk Tine's ▼ button was covered by the keyboard)
 
 - **OTA-279 · iPhone playtester: *"that button isn't there when the keyboard is up"*** with screenshots — the Chalk Tine (OTA-277) ▼ button was in the input row itself, which the iOS keyboard COVERS when up, so the button was only visible when not needed. The screenshots also showed the ▼ was using a muted color (#7a705c on #1a1714) that was essentially invisible against the dark background even when the keyboard was down.

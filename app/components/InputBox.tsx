@@ -555,13 +555,21 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             outside the TextInput doesn't reliably dismiss in some
             screens. This chevron is a guaranteed manual escape. Calls
             Keyboard.dismiss() — works on both iOS and Android. */}
-        <TouchableOpacity
-          style={styles.kbDismiss}
-          onPress={() => Keyboard.dismiss()}
-          accessibilityLabel="Hide keyboard"
-        >
-          <Text style={styles.kbDismissText}>▼</Text>
-        </TouchableOpacity>
+        {/* OTA-280 — gated to iOS-only. Android playtester: "I don't
+            want that down arrow on android devices, it didn't have
+            that issue." Android's system back button already dismisses
+            the keyboard natively, so the in-row ▼ was redundant +
+            clutter. iOS keeps it as a fallback to the OTA-279
+            InputAccessoryView bar above the keyboard. */}
+        {Platform.OS === 'ios' ? (
+          <TouchableOpacity
+            style={styles.kbDismiss}
+            onPress={() => Keyboard.dismiss()}
+            accessibilityLabel="Hide keyboard"
+          >
+            <Text style={styles.kbDismissText}>▼</Text>
+          </TouchableOpacity>
+        ) : null}
         <TouchableOpacity style={styles.send} onPress={handleSubmit}>
           <Text style={styles.sendText}>Act</Text>
         </TouchableOpacity>
