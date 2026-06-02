@@ -11357,4 +11357,46 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          docs/build-codenames.md (Chalk Tine moved to current; pool
 //          renumbered),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-277';
+// OTA-278 (Soot Helm) — surface boot-stage telemetry in About export
+//   for iOS Qwen-stuck-at-idle investigation.
+//
+//   Diagnosis state: across THREE iOS bundles (Stone Mantle OTA-265,
+//   Marble Anvil OTA-276, Chalk Tine OTA-277) the iPhone playtester's
+//   About export shows the same impossible state for Qwen:
+//     Status: idle
+//     Progress: 0%
+//     Error: none
+//   That's the pristine initial state. If bootQwen() had been called,
+//   status would be 'downloading' / 'loading' / 'ready' / 'failed' —
+//   never 'idle'. So either (a) the bootQwen setTimeout never fired,
+//   (b) bootQwen returned early before its first set(), or (c) qwen
+//   was somehow shutdown after init. mlHealth shows cognitive booted
+//   fine (Last init attempt + success timestamps for cognitive only).
+//
+//   Fix this OTA: surface the global __TARTARIA_BOOT_STAGE string in
+//   the About export's Install block. App.tsx already writes to that
+//   global at every boot step (hydrate:start → hydrate:done →
+//   mlhealth:load → mlhealth:done → cognitive:start → cognitive:done
+//   → qwen:start → qwen:done). Whichever stage shows in the bug
+//   report identifies exactly where the iOS boot path stalls.
+//
+//   Expected reads after this OTA on her phone:
+//     - "qwen:done" → bootQwen completed but qwen.initialize swallowed
+//       errors and reset to idle (impossible per code, but covers bases)
+//     - "qwen:start" → setTimeout fired, bootQwen was called, then
+//       something prevented status update — likely a synchronous throw
+//     - "cognitive:done" → setTimeout never fired (JS thread blocked
+//       or app backgrounded across the 3s window)
+//     - "mlhealth:done" or earlier → ML init was gated off before
+//       cognitive even ran (shouldn't happen with crashCount=0)
+//
+//   Pure JS-only diagnostic OTA; no behavior change. Once we know the
+//   stall stage we can target the real fix.
+//
+//   Files: app/diagnostics/aboutSummary.ts (Boot stage line added),
+//          app/buildCodename.ts (Soot Helm added),
+//          app/buildInfo.ts (OTA-278 bump + change note),
+//          docs/build-codenames.md (Soot Helm moved to current; pool
+//          renumbered),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-278';

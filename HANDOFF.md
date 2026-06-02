@@ -324,6 +324,18 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-278 (Soot Helm) — Boot-stage telemetry in About (iOS Qwen-stuck-at-idle diagnostic)
+
+- **OTA-278 · Diagnostic for the persistent iOS Qwen issue.** Across THREE bundles (Stone Mantle OTA-265, Marble Anvil OTA-276, Chalk Tine OTA-277) the iPhone playtester's About export shows the same impossible state for Qwen: `Status: idle / Progress: 0% / Error: none`. That's the pristine initial state — if `bootQwen()` had been called, status would be `downloading` / `loading` / `ready` / `failed`, never `idle`. mlHealth on her install shows cognitive booted fine (`Last init attempt: 00:56:29 / Last init success: 00:56:32`) but no Qwen attempt timestamp at all, meaning `markMLInitAttempted` (which fires right before `bootQwen`) never ran.
+- **What this OTA adds:** the global `__TARTARIA_BOOT_STAGE` string (written by `App.tsx`'s `setStage(s)` helper at every boot step — `hydrate:start` → `hydrate:done` → `mlhealth:load` → `mlhealth:done` → `cognitive:start` → `cognitive:done` → `qwen:start` → `qwen:done`) is now surfaced in `aboutSummary.ts`'s Install block as a `Boot stage:` line. Her next bug report tells us exactly where the iOS boot path stalls.
+- **Expected reads on her next export:**
+  - **`qwen:done`** → bootQwen ran to completion but qwen.initialize swallowed errors and reset state (impossible per code but worth ruling out)
+  - **`qwen:start`** → setTimeout fired, bootQwen was reached, then something prevented the status update — likely a synchronous throw in `qwen.initialize`
+  - **`cognitive:done`** → setTimeout for Qwen never fired. Possible causes: JS thread blocked across the 3s window, app backgrounded during the 3s, setTimeout cancelled somewhere
+  - **`mlhealth:done` or earlier** → ML init gated off before cognitive even ran (shouldn't happen with crashCount=0, but rules it out)
+- **Why this approach:** debugging iOS-specific JS issues without a device is hard. Stage telemetry per boot phase tells us exactly which step doesn't complete, narrowing the fix surface dramatically. Pure JS-only OTA, no behavior change — just exposes existing instrumentation that's been writing to a global since OTA-237.
+- **Files:** `app/diagnostics/aboutSummary.ts` (Boot stage line added in Install block), `app/buildCodename.ts` (Soot Helm added), `app/buildInfo.ts` (OTA-278 bump + change note), `docs/build-codenames.md` (Soot Helm moved to current; pool renumbered), HANDOFF.md (this entry).
+
 #### OTA-277 (Chalk Tine) — Manual keyboard-dismiss ▼ button on input row
 
 - **OTA-277 · iPhone playtester (after Marble Anvil pull): *"still cannot collapse keyboard, can we add a manual down arrow button to collapse it as a work around kind of like the iPad has"*** — Granite Drift's `keyboardShouldPersistTaps="handled"` fixed the chip-tap path inside SearchModal, but the main exploration input bar's TextInput still has no explicit dismiss affordance on iPhone. iPad's iOS keyboard ships with a built-in hide-keyboard key in the bottom-right corner; iPhone's does not. Once the keyboard is up on iPhone, only typing-and-submitting or backgrounding the app dismisses it. The iOS Safari swipe-down trick doesn't apply to native RN TextInputs.

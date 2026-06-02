@@ -93,6 +93,17 @@ export function buildBasicDeviceSummary(): string {
     // but differ on OTA name. Dev pairs the two when triaging.
     `  AAB: ${getApkCodename(apkBuild)}`,
     `  OTA: ${getBuildCodename(OTA_BUILD_ID)}`,
+    // OTA-278 — surface the boot-stage telemetry that App.tsx writes
+    // into a global at each step. Lets us diagnose "which stage did
+    // the boot path stall on?" from a single bug report. The global
+    // is set by App.tsx's `setStage(s)` helper at hydrate / mlhealth
+    // / cognitive / qwen / etc. If the boot completed cleanly we'll
+    // see "qwen:done" — anything else identifies the stall point.
+    // First needed for the iOS Qwen-stuck-at-idle investigation:
+    // Cognitive boots fine but Qwen stays at idle/0%/no-error, which
+    // is impossible if bootQwen was called. Seeing the final stage
+    // tells us if setTimeout fired, if bootQwen was reached, etc.
+    `  Boot stage: ${(globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE ?? '(not set)'}`,
     ``,
     // OTA-272 — ML runtime health block. Tells the dev at triage
     // time whether this tester has hit native ML crashes and
