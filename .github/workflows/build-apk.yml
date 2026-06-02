@@ -34,6 +34,10 @@ name: Android Build (Tartaria Realms)
 # touch. Granite Hold layers the JSON lazy-load pass on top of
 # Stone Castle (yesterday's AAB) — same baseline, ~220 KB of
 # JSON deferred out of cold-start for title-screen relief.
+#
+# Cobalt Drift APK pair — companion sideload APK for Granite Hold.
+# No marker → HaL2001 default preview profile → assembleRelease.
+# Same JS as Granite Hold, .hal2001 package suffix + HaL keystore.
 
 on:
   push:
