@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Keyboard } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { getRaces, getFactions } from '../engine/character';
 
@@ -47,6 +47,15 @@ export function CharacterCreationScreen() {
     else if (step === 'faction') setStep('name');
     else if (step === 'name') {
       if (canStart) {
+        // OTA-300 — dismiss the keyboard + blur the name input BEFORE
+        // the screen transition. Without this, the soft keyboard from
+        // the name field stays up when ExplorationScreen mounts, which
+        // hides the tutorial welcome card's SKIP / CONTINUE buttons.
+        // Nickel Tine's InputBox.dismiss() useEffect was racing Android
+        // focus restoration and losing. Dismissing here, before
+        // navigation, eliminates the race entirely.
+        nameInputRef.current?.blur();
+        Keyboard.dismiss();
         void startNewGame({ name: trimmedName, raceId, factionId });
       } else {
         // Name missing — pop the input back into focus so the keyboard
@@ -163,7 +172,16 @@ export function CharacterCreationScreen() {
               autoCapitalize="words"
               autoCorrect={false}
               returnKeyType="done"
-              onSubmitEditing={() => { if (canStart) void startNewGame({ name: trimmedName, raceId, factionId }); }}
+              onSubmitEditing={() => {
+                if (!canStart) return;
+                // OTA-300 — same dismiss as the BEGIN button path. Done-key
+                // on the keyboard also triggers startNewGame; without these
+                // calls the keyboard from the name input persists into the
+                // ExplorationScreen and covers the tutorial buttons.
+                nameInputRef.current?.blur();
+                Keyboard.dismiss();
+                void startNewGame({ name: trimmedName, raceId, factionId });
+              }}
             />
             <Text style={styles.nameHint}>At least 2 letters. Tap BEGIN when ready.</Text>
           </View>

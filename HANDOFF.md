@@ -324,6 +324,19 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-300 (Zinc Anvil) — Tutorial keyboard gate, pre-transition fix (name-input → BEGIN → tutorial)
+
+- **OTA-300 · Player tested Nickel Tine on Hal2001-273 APK and reported: *"it is still starting with the keyboard open. it seems to stem from typing your name."*** The Nickel Tine InputBox useEffect dismiss fired AFTER ExplorationScreen mounted, by which point Android had already restored the soft keyboard from CharacterCreationScreen's unmounting name TextInput. Race condition — Nickel Tine's dismiss lost.
+- **Root cause:** the name TextInput holds focus when the player taps BEGIN. `startNewGame()` fires, navigation runs, and Android's IME rides along into the new screen because the system doesn't auto-dismiss the keyboard on screen change. When ExplorationScreen mounts and the InputBox's dismiss effect fires, Android's focus-restoration heuristics have already brought the keyboard back up.
+- **Fix in CharacterCreationScreen.tsx** — dismiss the keyboard + blur the name input **before** calling `startNewGame()`. Two call sites updated:
+  1. **BEGIN button (goNext when step === 'name')** — adds `nameInputRef.current?.blur()` + `Keyboard.dismiss()` before `startNewGame()`.
+  2. **Done-key on the TextInput (onSubmitEditing)** — same blur + dismiss + startNewGame sequence.
+- **Why this works:** killing the IME and clearing focus before navigation means there's no keyboard state for Android to "restore" when ExplorationScreen mounts. The new screen starts in a clean state.
+- **Nickel Tine's InputBox useEffect dismiss stays** as defense-in-depth — covers edge cases like Tutorial Replay from settings while typing, or any other navigation path that lands on the welcome step with the keyboard up.
+- **OTA-only.** Pure JS, single screen. The Granite Hold AAB + Hal2001-273 APK pick this up via EAS Update on next launch.
+- **Cross-platform** — iOS doesn't have this Android-specific focus-restoration behavior, but the dismiss is harmless there.
+- **Files:** `app/screens/CharacterCreationScreen.tsx` (Keyboard import; blur + dismiss before startNewGame in BEGIN button and Done-key paths), `app/buildCodename.ts` (Zinc Anvil added), `app/buildInfo.ts` (OTA-300 bump + change note), `docs/build-codenames.md` (Zinc Anvil moved to current), `HANDOFF.md` (this entry).
+
 #### OTA-299 (Nickel Tine) — Android tutorial keyboard gate (input blocked until SKIP/CONTINUE)
 
 - **OTA-299 · Player (Pixel 10 Pro XL): *"also make it so the keyboard cannot be used until the player either hits the skip or first continue in the tutorial. it pops up as soon as you open on Android and then you cannot see skip and it's confusing, because you. ant hot the.rignt buttons."*** On Android, the soft keyboard rises any time a focused TextInput is on screen at cold start. At first-launch, ExplorationScreen mounts with the welcome step of the tutorial (fullscreen-area, card pinned to the bottom) — and the InputBox's TextInput sits in the same vertical band. The keyboard covers the welcome card's SKIP / CONTINUE buttons; the player can't see what to tap and the typing they're doing to "escape" the keyboard hits the wrong elements ("you. ant hot the.rignt buttons" = "you can't hit the right buttons", typed through a stuck keyboard).

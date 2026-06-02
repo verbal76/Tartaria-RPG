@@ -11998,4 +11998,40 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          (OTA-299 bump + this change note), docs/build-codenames.md
 //          (Nickel Tine moved to current), HANDOFF.md (closed issue
 //          entry).
-export const OTA_BUILD_ID = '2026-06-02-299';
+// OTA-300 (Zinc Anvil) — Tutorial keyboard gate, pre-transition fix.
+//   Player tested Nickel Tine and reported: "it is still starting
+//   with the keyboard open. it seems to stem from typing your name."
+//   Right — the Nickel Tine fix dismissed the keyboard inside
+//   InputBox via a useEffect, but that fires AFTER ExplorationScreen
+//   mounts, AFTER Android has already restored the keyboard from
+//   the unmounting CharacterCreationScreen's name TextInput. The
+//   race was real and the dismiss lost.
+//
+//   Root cause: CharacterCreationScreen's name TextInput holds
+//   focus when the player taps BEGIN. `startNewGame()` fires,
+//   navigation runs, and the soft keyboard rides along because
+//   Android doesn't auto-dismiss the IME on screen change.
+//
+//   Fix in CharacterCreationScreen.tsx — dismiss the keyboard +
+//   blur the name input BEFORE calling `startNewGame()`. Two
+//   call sites: the BEGIN button (goNext when step==='name'),
+//   and the Done-key path (onSubmitEditing on the name TextInput).
+//   Both now do `nameInputRef.current?.blur()` then
+//   `Keyboard.dismiss()` before `startNewGame()`. This kills the
+//   IME before ExplorationScreen mounts, eliminating the race.
+//
+//   Nickel Tine's InputBox useEffect Keyboard.dismiss() stays in
+//   place as defense-in-depth — covers edge cases where some other
+//   navigation path lands on the tutorial with the keyboard up
+//   (e.g. tutorial replay from settings while typing).
+//
+//   OTA-only. Pure JS, single screen. Granite Hold AAB / Hal2001-273
+//   APK pick this up via EAS Update on next launch.
+//
+//   Files: app/screens/CharacterCreationScreen.tsx (Keyboard import
+//          + blur+dismiss before startNewGame in BEGIN button and
+//          Done-key paths), app/buildCodename.ts (Zinc Anvil added),
+//          app/buildInfo.ts (OTA-300 bump + this change note), docs/
+//          build-codenames.md (Zinc Anvil moved to current),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-300';
