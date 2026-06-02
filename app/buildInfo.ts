@@ -11808,4 +11808,31 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          docs/build-codenames.md (Mire Coil moved to current;
 //          pool renumbered),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-288';
+// OTA-289 (Bog Fence) — diagnostic-only OTA. Player on Pixel 10 Pro
+//   XL: "still didn't work" — couldn't pull Brass Helm (OTA-287) or
+//   Mire Coil (OTA-288) even after cache clear + cold boot. Both
+//   bundles confirmed published to hal2001 channel on Expo
+//   (workflow logs show `✓ Channel 'hal2001' (android): published
+//   at runtimeVersion 2.4.1` for both). JSON validates clean,
+//   TypeScript clean, app.json untouched.
+//
+//   This OTA is a near-no-op bump (codename + change note + version
+//   string) to test whether the device picks up ANY newer bundle.
+//     - If Bog Fence DOES land → Brass Helm or Mire Coil had a
+//       device-specific apply failure (e.g., a JSON or import that
+//       silently fails at expo-updates apply time, marking those
+//       updates as "bad" and rolling back to Gilt Tine).
+//     - If Bog Fence DOESN'T land → device's expo-updates state is
+//       stuck. Reinstall from Play Store becomes the next move.
+//
+//   No mechanical changes shipped here — same engine + same UI as
+//   Mire Coil. Test bench only.
+//
+//   Cross-platform, no marker.
+//
+//   Files: app/buildCodename.ts (Bog Fence added),
+//          app/buildInfo.ts (OTA-289 bump + this change note),
+//          docs/build-codenames.md (Bog Fence moved to current; pool
+//          renumbered),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-289';
