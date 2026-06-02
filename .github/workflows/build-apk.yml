@@ -640,8 +640,3 @@ jobs:
 
           ### Install
           ${INSTALL_NOTE}"
-
-# OTA-291 — second-push touchpoint to trigger APK build alongside the
-# AAB. The same Thorn Vault source code is built into both artifacts;
-# the APK is the player's sideload-test, the AAB is the Play Console
-# upload after the APK passes.
