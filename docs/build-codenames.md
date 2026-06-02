@@ -37,6 +37,7 @@ bug reports.
 | `2026-06-01-272`        | Slate Spire    | ML crash gate + deferred init + health summary             |
 | `2026-06-01-273`        | Pewter Vault   | llama.rn v8.4 misclassification patch (SD865/Exynos990 AAB)|
 | `2026-06-01-274`        | Bronze Mantle  | AAB codename split (Slate Keep = 263) + MIN_APK 247 → 263  |
+| `2026-06-01-275`        | Granite Drift  | iOS chip overflow + iPad width cap + keyboard auto-dismiss |
 
 ## AAB codenames (separate pool, keyed by versionCode)
 
@@ -74,29 +75,28 @@ To keep codenames consistent and Tartaria-flavor without burning
 fresh creativity per OTA, the next codenames in order will be
 drawn from:
 
-1. Granite Drift
-2. Marble Anvil
-3. Chalk Tine
-4. Soot Helm
-5. Ember Coil
-6. Ash Fence
-7. Pitch Spire
-8. Tar Vault
-9. Wax Mantle
-10. Resin Drift
-11. Lacquer Anvil
-12. Gilt Tine
-13. Brass Helm
-14. Mire Coil
-15. Bog Fence
-16. Reed Spire
-17. Thorn Vault
-18. Briar Mantle
-19. Husk Drift
-20. Lichen Anvil
-21. Moss Tine
-22. Loam Helm
-23. Quartz Coil
+1. Marble Anvil
+2. Chalk Tine
+3. Soot Helm
+4. Ember Coil
+5. Ash Fence
+6. Pitch Spire
+7. Tar Vault
+8. Wax Mantle
+9. Resin Drift
+10. Lacquer Anvil
+11. Gilt Tine
+12. Brass Helm
+13. Mire Coil
+14. Bog Fence
+15. Reed Spire
+16. Thorn Vault
+17. Briar Mantle
+18. Husk Drift
+19. Lichen Anvil
+20. Moss Tine
+21. Loam Helm
+22. Quartz Coil
 
 When bumping `OTA_BUILD_ID` in `app/buildInfo.ts`, also add an entry
 to `app/buildCodename.ts`'s `CODENAMES` map drawing from the next

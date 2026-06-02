@@ -11238,4 +11238,49 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          docs/build-codenames.md (Bronze Mantle moved to current;
 //          new AAB codenames section with Slate Keep = 263),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-01-274';
+// OTA-275 (Granite Drift) — iOS / iPad UX polish from first TestFlight
+//   playthrough. Three coupled style fixes, all JS-only (no rebuild).
+//
+//   1. SEARCHMODAL CHIP OVERFLOW. iPhone screenshot showed long noun
+//      names ("half-buried royal vault pedestal") rendering with their
+//      action suffix cut off: "→ inv" / "→ ir" instead of "→ investigate".
+//      The Pressable used justifyContent:'space-between' but neither
+//      Text element constrained its flex sizing. iOS measures text
+//      slightly wider than Android with the same font, so what fit on
+//      Android overflowed on iOS. Fix: noun Text gets `flex: 1` +
+//      `flexShrink: 1` so long nouns ellipsize at the right margin;
+//      arrow suffix gets `flexShrink: 0` + `marginLeft: 8` so it always
+//      renders in full at its natural width. Same treatment for the
+//      requirement-hint Text used for locked chips.
+//
+//   2. IPAD WIDTH CAP. iPad screenshot showed the TitleScreen with all
+//      buttons (PLAY STORE, New Tartarian, CHECK FOR OTA UPDATE, INVITE
+//      PLAYTESTER / REPORT BUG / EXIT GAME) stretched edge-to-edge
+//      across the tablet's ~1000pt width. The 5 root screen containers
+//      (TitleScreen, ExplorationScreen, InventoryScreen, AboutScreen,
+//      VendorScreen) all used `flex: 1` with no width constraint, so
+//      they filled whatever the parent gave them. Fix: each container
+//      now also sets `width: '100%'`, `maxWidth: 600`, and
+//      `alignSelf: 'center'`. Phones (<600pt wide) render identically
+//      to before — maxWidth doesn't kick in. iPads center the layout
+//      at 600pt with whitespace to either side. Buttons stay phone-sized.
+//
+//   3. IOS KEYBOARD AUTO-DISMISS. iOS default ScrollView behavior is
+//      that the first tap on a ScrollView child while the keyboard is
+//      up dismisses the keyboard but DOES NOT fire onPress — the player
+//      has to tap a second time. Symptom was "keyboard doesn't close,
+//      buttons don't respond." Fix: SearchModal's chip ScrollView gets
+//      `keyboardShouldPersistTaps="handled"` so taps go through
+//      immediately AND the existing `Keyboard.dismiss()` in tapToSearch
+//      still hides the keyboard. One-tap chip selection on iOS again.
+//
+//   Files: app/components/SearchModal.tsx (chip flex sizing + keyboard
+//          tap behavior), app/screens/TitleScreen.tsx +
+//          ExplorationScreen.tsx + InventoryScreen.tsx + AboutScreen.tsx
+//          + VendorScreen.tsx (container maxWidth + alignSelf),
+//          app/buildCodename.ts (Granite Drift added),
+//          app/buildInfo.ts (OTA-275 bump + change note),
+//          docs/build-codenames.md (Granite Drift moved to current;
+//          pool renumbered),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-01-275';

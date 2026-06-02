@@ -605,7 +605,8 @@ export function VendorScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0a0908', padding: 12 },
+  // OTA-275 — tablet width cap. Phones unchanged; iPad centers at 600pt.
+  container: { flex: 1, backgroundColor: '#0a0908', padding: 12, width: '100%', maxWidth: 600, alignSelf: 'center' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

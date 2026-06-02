@@ -159,6 +159,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
                   <ScrollView
                     style={styles.chipScroll}
                     contentContainerStyle={styles.chipList}
+                    keyboardShouldPersistTaps="handled"
                   >
                     {visibleChips.map((c) => {
                       // OTA 195 — chip state machine:
@@ -304,9 +305,16 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   chipFullScene: { borderColor: '#9ec96a' },
-  chipFullText: { color: '#e6d8b3', fontSize: 14, fontWeight: '600' },
-  chipFullArrow: { color: '#9ec96a', fontSize: 11, letterSpacing: 1 },
-  chipFullHint: { color: '#bf9b6a', fontSize: 11, letterSpacing: 0.5 },
+  // OTA-275 — flex:1 + flexShrink:1 lets long nouns ellipsize at the
+  // right edge instead of pushing the action suffix off-screen. iOS
+  // measures text wider than Android with the same font, so the same
+  // chip row that fit on Android was overflowing on iPhone (long names
+  // like "half-buried royal vault pedestal" got "→ investigate" cut to
+  // "→ inv"). The suffix Text gets flexShrink:0 + marginLeft:8 so it
+  // always renders in full at its natural width.
+  chipFullText: { color: '#e6d8b3', fontSize: 14, fontWeight: '600', flex: 1, flexShrink: 1 },
+  chipFullArrow: { color: '#9ec96a', fontSize: 11, letterSpacing: 1, flexShrink: 0, marginLeft: 8 },
+  chipFullHint: { color: '#bf9b6a', fontSize: 11, letterSpacing: 0.5, flexShrink: 0, marginLeft: 8 },
   chipFullConsumed: {
     backgroundColor: '#13110f',
     borderColor: '#3a342c',

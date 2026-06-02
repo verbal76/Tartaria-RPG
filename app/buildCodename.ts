@@ -45,6 +45,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-01-272': 'Slate Spire',
   '2026-06-01-273': 'Pewter Vault',
   '2026-06-01-274': 'Bronze Mantle',
+  '2026-06-01-275': 'Granite Drift',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

@@ -1098,7 +1098,10 @@ export function TitleScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0a0908', padding: 16, paddingTop: 24 },
+  // OTA-275 — width cap for tablets. Phones (<600pt wide) render
+  // unchanged. iPad portrait (744-1024pt) + landscape (1024-1366pt)
+  // get the layout centered at 600pt instead of edge-to-edge buttons.
+  container: { flex: 1, backgroundColor: '#0a0908', padding: 16, paddingTop: 24, width: '100%', maxWidth: 600, alignSelf: 'center' },
   crest: { width: 180, height: 180, alignSelf: 'center', marginBottom: 8 },
   title: { fontSize: 36, color: '#e6d8b3', letterSpacing: 8, fontWeight: '800', textAlign: 'center' },
   subtitle: { fontSize: 14, color: '#c9a86a', letterSpacing: 14, marginTop: -4, textAlign: 'center' },
