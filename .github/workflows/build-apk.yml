@@ -38,6 +38,16 @@ name: Android Build (Tartaria Realms)
 # Cobalt Drift APK pair — companion sideload APK for Granite Hold.
 # No marker → HaL2001 default preview profile → assembleRelease.
 # Same JS as Granite Hold, .hal2001 package suffix + HaL keystore.
+#
+# Nickel Tine APK pair retry — the previous two APK-pair commits
+# (Quartz Coil + Cobalt Drift) accidentally triggered the production
+# profile because their commit message bodies contained the literal
+# substring the workflow uses to detect production builds. The meta
+# step does a naive substring match and doesn't understand the
+# negated wording I used in the body. This trigger-touch commit
+# uses a clean message that doesn't contain that substring anywhere,
+# so the meta step falls through to the HaL2001 default preview
+# profile (assembleRelease → sideload APK).
 
 on:
   push:
