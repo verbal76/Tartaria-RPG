@@ -324,6 +324,24 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-287 (Brass Helm) — Slate Spire mid-use crash detector + tripled Arbiter quote library
+
+- **OTA-287 · Two coupled fixes for the Pixel 10 Pro XL / Android 16 Beta Qwen crash class** + the natural consequence player ask: *"if we're going to be using pre-written prose for all those that hit the block list, then we need to at least triple the library of phrases that the arbiter uses."*
+- **Part 1 — Slate Spire mid-use crash detector.** The original Slate Spire (OTA-272) breadcrumb only catches init-time crashes. The Pixel 10 Pro XL crash signature (`SIGSEGV in __memcpy_aarch64_simd → lm_ggml_graph_compute_thread` in `librnllama_v8_4_fp16_dotprod_i8mm_sve.so` on Android 16 Beta / SDK 36) fires AFTER init succeeded — Qwen comes up clean, then crashes inside a generate() call. The init-only counter never ticks.
+  - New AsyncStorage keys: `tartaria.ml.lastGenerateAttempt`, `tartaria.ml.lastGenerateSuccess`, `tartaria.ml.midUseCrashCount`.
+  - New exports: `markMLGenerateAttempted()` / `markMLGenerateSucceeded()`.
+  - `narrateViaArbiter` in `gameStore.ts:21167` writes the attempt breadcrumb before `qwen.stream(...)` and the success breadcrumb after a clean return. If the stream SIGSEGVs, the success write never fires → next launch's `loadMLHealth` detects the gap and increments `midUseCrashCount`.
+  - Combined disable threshold: `crashCount + midUseCrashCount >= MAX_CRASHES_BEFORE_DISABLE (2)` → `disabledByCrash = true` → Qwen permanently off for the install, template narration takes over. Same end state as Slate Spire's init-only path; just catches a wider failure mode.
+  - `mlHealthSummary` now surfaces init + mid-use crash counts separately, plus last-generate-attempt/success timestamps, so the next bug report tells us which kind of crash occurred.
+- **Part 2 — Tripled Arbiter template library** because (per the player's logic) wider template fallback = less repetition when Qwen is auto-disabled.
+  - `arbiter-intent-quotes.json`: 10 categories (attack / stealth / diplomacy / escape / investigate / rest / travel / cast / use_relic / wait), each tripled from ~7-8 lines to 24 lines (~160 new lines).
+  - `arbiter-mood-quotes.json`: 6 categories (FEAR / CURIOSITY / AGGRESSION / CAUTIOUSNESS / RESOLVE / DESPAIR), each tripled from ~11-12 lines to ~35 lines (~144 new lines).
+  - All original lines kept verbatim (random selection from combined pool, order irrelevant).
+  - Voice matched on every new line: terse, lore-touched (Giants / Mud Monarchs / Aetherborn / Forgotten Order / Sentinels / Reclaimers / Aetherstone / Aether), fatalistic-but-knowing, often ending on small ironic punctuation. Same register that survived 287 OTAs.
+- **Cross-platform OTA**, no marker. Pixel 10 Pro XL on Android benefits from Part 1. Sister's iPhone (Qwen never initialized) benefits from Part 2 since she's been on templates-only since first install.
+- **What this OTA does NOT do:** doesn't FIX the upstream Pixel 10 Pro XL crash. The real fix would be a new AAB build that extends Pewter Vault's patch-package blocklist to include Tensor G4 / Android 16 Beta. Deferred per player ask: "just OTA for now."
+- **Files:** `app/diagnostics/mlHealth.ts` (KEY_GEN_*  + KEY_MIDUSE_CRASH_COUNT constants + new MLHealthState fields + mid-use detection block in loadMLHealth + markMLGenerateAttempted/Succeeded exports + resetMLHealth clears new key + mlHealthSummary surfaces new fields), `app/state/gameStore.ts` (mlHealth markGenerate imports + qwen.stream call wrapped with attempt/success markers in narrateViaArbiter at line 21167), `app/data/lore/arbiter-intent-quotes.json` (~160 new lines), `app/data/lore/arbiter-mood-quotes.json` (~144 new lines), `app/buildCodename.ts` (Brass Helm added), `app/buildInfo.ts` (OTA-287 bump + change note), `docs/build-codenames.md` (Brass Helm moved to current; pool renumbered), HANDOFF.md (this entry).
+
 #### OTA-286 (Gilt Tine) — Quantity stepper in SCRAP action modal (batch-scrap stacks)
 
 - **OTA-286 · Pixel 10 Pro XL player log on Slate Keep showed 5 Aetheric Locket + 5 Worn Tartarian Coin scrapped in ~30 seconds, one tap at a time. Player ask: *"The same up and down numerical box that you're using for the volume sliders and to the scrap pop-up. so when you scrap something you can choose the amount instead of doing the same scrapping maneuver over and over and over."*** Same NumberStepper component used in About → Voice / Music for Volume / Rate / Pitch.

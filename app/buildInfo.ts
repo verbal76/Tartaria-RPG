@@ -11692,4 +11692,63 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          docs/build-codenames.md (Gilt Tine moved to current; pool
 //          renumbered),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-286';
+// OTA-287 (Brass Helm) — TWO coupled changes for the Qwen-crashes-
+//   mid-use case (Pixel 10 Pro XL on Android 16 Beta, but design is
+//   generic — catches any device crashing in generate after init):
+//
+//   1. Slate Spire mid-use crash detector. New AsyncStorage keys
+//      (lastGenerateAttempt / lastGenerateSuccess / midUseCrashCount).
+//      Qwen stream call in narrateViaArbiter writes the attempt
+//      breadcrumb before; success breadcrumb after. If a generate
+//      SIGSEGVs (the Pixel 10 ggml_graph_compute_thread signature),
+//      the success never fires. Next launch detects the gap and
+//      increments midUseCrashCount. Combined disable threshold:
+//      init + mid-use crashes >= 2 → auto-disable Qwen for the
+//      install. Player falls back to template narration silently
+//      (same behavior as Slate Spire's init-only path).
+//
+//   2. Tripled Arbiter template library. Player ask: "if we're going
+//      to be using pre-written prose for all those that hit the
+//      block list, then we need to at least triple the library of
+//      phrases that the arbiter uses." Done by hand:
+//        - arbiter-intent-quotes.json: 10 categories × ~8 lines →
+//          24 lines each (~160 new quotes)
+//        - arbiter-mood-quotes.json: 6 categories × ~12 lines →
+//          ~35 lines each (~144 new quotes)
+//      All original lines kept verbatim. Voice matched: terse,
+//      lore-touched (Giants / Mud Monarchs / Aetherborn / Forgotten
+//      Order / Sentinels / Reclaimers / Aetherstone / Aether),
+//      fatalistic-but-knowing, often ending on small ironic
+//      punctuation. Pool grows organically with the BASE_*_REMARKS
+//      in narrativeGenerator.ts — random selection from combined
+//      ~3x-larger pool, so players on auto-disabled Qwen see far
+//      less repetition.
+//
+//   About-screen mlHealthSummary now surfaces init crash count + mid-
+//   use crash count separately + last generate timestamps, so the
+//   next bug report tells the dev which kind of crash occurred.
+//
+//   Cross-platform OTA. No platform marker — both iOS and Android
+//   players benefit (Pixel 10 Pro XL hits the mid-use path,
+//   sister's iPhone hits the template-fallback path now that her
+//   Qwen never initialized — wider quote pool is upside for her).
+//
+//   Files: app/diagnostics/mlHealth.ts (KEY_GEN_ATTEMPTED /
+//          KEY_GEN_SUCCEEDED / KEY_MIDUSE_CRASH_COUNT constants;
+//          new fields on MLHealthState; mid-use detection in
+//          loadMLHealth; new markMLGenerateAttempted /
+//          markMLGenerateSucceeded exports; resetMLHealth clears
+//          new key; mlHealthSummary surfaces new fields),
+//          app/state/gameStore.ts (mlHealth markGenerate imports;
+//          qwen.stream call wrapped with attempt/success markers in
+//          narrateViaArbiter),
+//          app/data/lore/arbiter-intent-quotes.json (~160 new lines
+//          across 10 categories),
+//          app/data/lore/arbiter-mood-quotes.json (~144 new lines
+//          across 6 categories),
+//          app/buildCodename.ts (Brass Helm added),
+//          app/buildInfo.ts (OTA-287 bump + this change note),
+//          docs/build-codenames.md (Brass Helm moved to current;
+//          pool renumbered),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-287';

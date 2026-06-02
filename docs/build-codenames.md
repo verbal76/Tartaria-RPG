@@ -49,6 +49,7 @@ bug reports.
 | `2026-06-02-284`        | Resin Drift    | TRADE NOW button in HookContinueModal when vendor spawned in scene |
 | `2026-06-02-285`        | Lacquer Anvil  | Master TTS volume slider (system + Kokoro engines)         |
 | `2026-06-02-286`        | Gilt Tine      | Quantity stepper in SCRAP action modal (batch-scrap stacks) |
+| `2026-06-02-287`        | Brass Helm     | Slate Spire mid-use crash detector + tripled Arbiter quote library |
 
 ## AAB codenames (separate pool, keyed by versionCode)
 
@@ -86,17 +87,16 @@ To keep codenames consistent and Tartaria-flavor without burning
 fresh creativity per OTA, the next codenames in order will be
 drawn from:
 
-1. Brass Helm
-2. Mire Coil
-3. Bog Fence
-4. Reed Spire
-5. Thorn Vault
-6. Briar Mantle
-7. Husk Drift
-8. Lichen Anvil
-9. Moss Tine
-10. Loam Helm
-11. Quartz Coil
+1. Mire Coil
+2. Bog Fence
+3. Reed Spire
+4. Thorn Vault
+5. Briar Mantle
+6. Husk Drift
+7. Lichen Anvil
+8. Moss Tine
+9. Loam Helm
+10. Quartz Coil
 
 When bumping `OTA_BUILD_ID` in `app/buildInfo.ts`, also add an entry
 to `app/buildCodename.ts`'s `CODENAMES` map drawing from the next
