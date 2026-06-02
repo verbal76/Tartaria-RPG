@@ -12,10 +12,13 @@ import type {
 } from './types';
 import { pick, chance, rotatingPick } from './rng';
 import openings from '../data/events/openings.json';
-import moodQuotes from '../data/lore/arbiter-mood-quotes.json';
-import intentQuotes from '../data/lore/arbiter-intent-quotes.json';
-import locationFlavors from '../data/lore/location-flavors.json';
-import sceneFlavors from '../data/lore/scene-flavors.json';
+// OTA-298 — mood, intent, location, and scene flavor JSON files are
+// lazy-loaded via require() inside getter functions below. Combined
+// these are ~25 KB of Hermes parse weight that previously fired at
+// narrativeGenerator module-load (which is at app boot, since
+// gameStore imports from this module). Deferring them to first scene
+// narration (always mid-session) gives Hermes a warm-engine moment
+// for the parse and shrinks the title-screen cold-start cost.
 
 const openingsList = openings as string[];
 
@@ -329,20 +332,45 @@ function mergePools<K extends string>(
   return out as Record<K, string[]>;
 }
 
-const MOOD_REMARKS: Record<string, string[]> = mergePools(
-  BASE_MOOD_REMARKS,
-  moodQuotes as Record<string, string[]>,
-);
+// OTA-298 — lazy getter pattern. Each pool merges its BASE_* table
+// (defined in this file at module load) with the JSON file's
+// contents at first call, then caches the result. First scene
+// narration pays the parse cost; every later narration is O(1).
 
-const INTENT_REMARKS: Partial<Record<Intent, string[]>> = mergePools<Intent>(
-  BASE_INTENT_REMARKS,
-  intentQuotes as Partial<Record<Intent, string[]>>,
-);
+let _moodRemarks: Record<string, string[]> | null = null;
+function getMoodRemarks(): Record<string, string[]> {
+  if (_moodRemarks) return _moodRemarks;
+  const moodQuotes = require('../data/lore/arbiter-mood-quotes.json');
+  _moodRemarks = mergePools(BASE_MOOD_REMARKS, moodQuotes as Record<string, string[]>);
+  return _moodRemarks!;
+}
+
+let _intentRemarks: Partial<Record<Intent, string[]>> | null = null;
+function getIntentRemarks(): Partial<Record<Intent, string[]>> {
+  if (_intentRemarks) return _intentRemarks;
+  const intentQuotes = require('../data/lore/arbiter-intent-quotes.json');
+  _intentRemarks = mergePools<Intent>(
+    BASE_INTENT_REMARKS,
+    intentQuotes as Partial<Record<Intent, string[]>>,
+  );
+  return _intentRemarks!;
+}
 
 // Exported so gameStore's arrival-flavor composer can pull a lore beat
 // from the same canonical pool without duplicating the JSON import.
-export const LOCATION_FLAVORS = locationFlavors as Record<string, string[]>;
-const SCENE_FLAVORS = sceneFlavors as Record<string, string[]>;
+let _locationFlavors: Record<string, string[]> | null = null;
+export function getLocationFlavors(): Record<string, string[]> {
+  if (_locationFlavors) return _locationFlavors;
+  _locationFlavors = require('../data/lore/location-flavors.json') as Record<string, string[]>;
+  return _locationFlavors!;
+}
+
+let _sceneFlavors: Record<string, string[]> | null = null;
+function getSceneFlavors(): Record<string, string[]> {
+  if (_sceneFlavors) return _sceneFlavors;
+  _sceneFlavors = require('../data/lore/scene-flavors.json') as Record<string, string[]>;
+  return _sceneFlavors!;
+}
 
 // Pick the best-matching scene flavor category for the current scene.
 // Returns null if nothing applies. Categories are scored by tag overlap with
@@ -362,18 +390,18 @@ function pickSceneFlavorCategory(input: SceneInput): string | null {
 
   // Danger wins when an enemy is staged or hazard severity is implied.
   if (input.enemy || has('damage', 'trap', 'corruption', 'hazard', 'encounter')) {
-    if (SCENE_FLAVORS.danger?.length) return 'danger';
+    if (getSceneFlavors().danger?.length) return 'danger';
   }
   if (has('aetheric', 'aether', 'aetherstone', 'aetheric_core', 'aetheric_node', 'etheric_engine')) {
-    if (SCENE_FLAVORS.aether?.length) return 'aether';
+    if (getSceneFlavors().aether?.length) return 'aether';
   }
   if (has('ruin', 'buried', 'tomb', 'spire', 'tower', 'capital', 'lost_capital', 'stronghold')) {
-    if (SCENE_FLAVORS.ruins?.length) return 'ruins';
+    if (getSceneFlavors().ruins?.length) return 'ruins';
   }
   if (has('mystery', 'unknown', 'forgotten_order', 'objective')) {
-    if (SCENE_FLAVORS.mystery?.length) return 'mystery';
+    if (getSceneFlavors().mystery?.length) return 'mystery';
   }
-  if (SCENE_FLAVORS.atmospheric?.length) return 'atmospheric';
+  if (getSceneFlavors().atmospheric?.length) return 'atmospheric';
   return null;
 }
 
@@ -399,7 +427,7 @@ export function buildScene(input: SceneInput): string {
   // category. Falls back gracefully if no category resolves.
   if (Math.random() < 0.25) {
     const cat = pickSceneFlavorCategory(input);
-    const pool = cat ? SCENE_FLAVORS[cat] : undefined;
+    const pool = cat ? getSceneFlavors()[cat] : undefined;
     if (pool && pool.length > 0) {
       parts.push(pick(pool));
     }
@@ -504,7 +532,7 @@ export interface ArbiterContext {
 
 function pickMoodPool(mood: string | undefined): string[] | undefined {
   if (!mood) return undefined;
-  const pool = MOOD_REMARKS[mood];
+  const pool = getMoodRemarks()[mood];
   return pool && pool.length > 0 ? pool : undefined;
 }
 
@@ -577,7 +605,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
     // Combat color rotates between enemy-aware remarks and the attack
     // intent pool. Mood-pool lines (Mud Monarchs etc.) used to fire here
     // and read as off-topic mid-knife-fight; cut that branch entirely.
-    const intentAttack = INTENT_REMARKS.attack;
+    const intentAttack = getIntentRemarks().attack;
     const r = Math.random();
     if (r < 0.65) return combatRemark(ctx.enemy!);
     if (intentAttack && intentAttack.length > 0) return rotatingPick(intentAttack, 'arbiter.combat.attack');
@@ -688,7 +716,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
     // lore pool — "the spire" + "The Spire still drinks. From what
     // celestial well, no one will answer." reads as the Arbiter
     // actually KNOWING what they're at.
-    const locPool = LOCATION_FLAVORS[ctx.location.id];
+    const locPool = getLocationFlavors()[ctx.location.id];
     if (locPool && locPool.length > 0 && Math.random() < 0.6) {
       return `The Arbiter glances at the ${n}. "${pick(locPool)}"`;
     }
@@ -748,7 +776,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
   // Pillars, at Voronov they talk about Voronov, at the Cathedral
   // about the Cathedral. Wrapped with rotatingPick so the same scene
   // doesn't repeat the same lore line two replies in a row.
-  const locPool = LOCATION_FLAVORS[ctx.location.id];
+  const locPool = getLocationFlavors()[ctx.location.id];
   if (locPool && locPool.length > 0) {
     return `The Arbiter looks around. "${rotatingPick(locPool, `arbiter.loc.${ctx.location.id}`)}"`;
   }
@@ -761,7 +789,7 @@ export function buildArbiterRemark(ctx: ArbiterContext): string {
     return pick(moodPool).replace('this place', ctx.location.name);
   }
   // Intent-specific — same constraint, only when no location flavor.
-  const intentPool = ctx.intent ? INTENT_REMARKS[ctx.intent] : undefined;
+  const intentPool = ctx.intent ? getIntentRemarks()[ctx.intent] : undefined;
   if (intentPool && intentPool.length > 0) {
     return pick(intentPool);
   }

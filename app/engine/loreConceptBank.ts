@@ -19,17 +19,16 @@
 // nothing persists to disk because the embedding model can change
 // across builds.
 
-import canonEventsData from '../data/lore/canon-events.json';
-import canonFoodDrinkData from '../data/lore/canon-food-drink.json';
-import arbiterTitlesData from '../data/lore/arbiter-titles.json';
-import glossaryData from '../data/lore/glossary.json';
-import canonSkillsData from '../data/lore/canon-skills.json';
-import canonWeaponsData from '../data/lore/canon-weapons.json';
-import canonArmorData from '../data/lore/canon-armor.json';
-import canonCurrencyData from '../data/lore/canon-currency-goods.json';
-import canonLootData from '../data/lore/canon-loot-treasure.json';
-import canonTaskData from '../data/lore/canon-task-difficulty.json';
-import canonActionData from '../data/lore/canon-action-difficulty.json';
+// OTA-298 (Cobalt Drift) — canon-*.json imports lazy-loaded via
+// `require()` inside `loadLoreConceptBank()` instead of top-level
+// `import`. The Arbiter lookup is rare (player has to type "ask
+// the arbiter X"), and parsing ~120 KB of JSON on every cold start
+// to support an action that may never happen in a session is the
+// kind of bundle-load weight Hermes on Tensor G4 chokes on. Lazy-
+// loading moves that parse to first-Arbiter-query time, which is
+// always mid-session when Hermes is warm. The bank still caches
+// across queries via `cachedBank`, so the parse runs at most once
+// per app session, same as today.
 
 export type LoreCategory =
   | 'event'
@@ -83,6 +82,20 @@ let cachedBank: LoreConcept[] | null = null;
 
 export function loadLoreConceptBank(): LoreConcept[] {
   if (cachedBank) return cachedBank;
+  // OTA-298 — lazy require() so the ~120 KB of canon-*.json + glossary
+  // is parsed on first Arbiter query rather than at cold-start.
+  const canonEventsData = require('../data/lore/canon-events.json');
+  const canonFoodDrinkData = require('../data/lore/canon-food-drink.json');
+  const arbiterTitlesData = require('../data/lore/arbiter-titles.json');
+  const glossaryData = require('../data/lore/glossary.json');
+  const canonSkillsData = require('../data/lore/canon-skills.json');
+  const canonWeaponsData = require('../data/lore/canon-weapons.json');
+  const canonArmorData = require('../data/lore/canon-armor.json');
+  const canonCurrencyData = require('../data/lore/canon-currency-goods.json');
+  const canonLootData = require('../data/lore/canon-loot-treasure.json');
+  const canonTaskData = require('../data/lore/canon-task-difficulty.json');
+  const canonActionData = require('../data/lore/canon-action-difficulty.json');
+
   const concepts: LoreConcept[] = [];
 
   // Canon events (OTA-232)

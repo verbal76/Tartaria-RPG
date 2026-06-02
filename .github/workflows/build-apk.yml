@@ -26,6 +26,14 @@ name: Android Build (Tartaria Realms)
 # companion to the Stone Castle AAB. Same JS, but signed against
 # the HaL keystore + .hal2001 package suffix, so HaL playtesters can
 # sideload-test the build before it ships through Play Console.
+#
+# OTA-298 (Cobalt Drift) — Granite Hold AAB trigger-touch. Same
+# non-app-paths-required reason as the Quartz Coil pair: the
+# workflow's paths-ignore skips app/** + docs/**, so an OTA bump
+# alone doesn't fire the [build-aab] job. This comment is the
+# touch. Granite Hold layers the JSON lazy-load pass on top of
+# Stone Castle (yesterday's AAB) — same baseline, ~220 KB of
+# JSON deferred out of cold-start for title-screen relief.
 
 on:
   push:

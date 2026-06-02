@@ -77,7 +77,7 @@ import {
   buildArbiterSceneIntro,
   USE_RELIC_FAILURE_LINES,
   QWEN_ALLOWED_INTENTS,
-  LOCATION_FLAVORS,
+  getLocationFlavors,
 } from '../engine/narrativeGenerator';
 import { parseInput, splitClauses, type ParseContext } from '../engine/parser';
 import { parseInputViaLLM } from '../engine/llmParser';
@@ -118,7 +118,12 @@ import {
 } from '../engine/worldDirections';
 import locationsData from '../data/locations/locations.json';
 import enemiesData from '../data/enemies/enemies.json';
-import conceptsData from '../data/lore/concepts.json';
+// OTA-298 — concepts.json (~73 KB) lazy-loaded via require() in
+// findConcept() instead of top-level import. Only used when the
+// player types "what is X / explain X / tell me about X" — a rare
+// mid-session action that doesn't justify parsing the file at cold
+// start. Defers ~73 KB of Hermes parse out of the title-screen
+// load path.
 import {
   listCraftableRecipes,
   findRecipeByResult,
@@ -262,7 +267,18 @@ interface Concept {
   title: string;
   answer: string;
 }
-const ALL_CONCEPTS = (conceptsData as { concepts: Concept[] }).concepts;
+// OTA-298 — lazy-evaluated. The 73 KB concepts.json parses on first
+// findConcept() call (typically when a player types "what is X")
+// instead of at module load. `_allConcepts` caches the result; the
+// sort below remains per-call so the keyword-length ordering is
+// always correct for the current corpus.
+let _allConcepts: Concept[] | null = null;
+function getAllConcepts(): Concept[] {
+  if (_allConcepts) return _allConcepts;
+  const conceptsData = require('../data/lore/concepts.json');
+  _allConcepts = (conceptsData as { concepts: Concept[] }).concepts;
+  return _allConcepts!;
+}
 
 // Match a player's "what is X / explain X / tell me about X" target text
 // against the concepts knowledge base. First substring hit on any keyword
@@ -272,7 +288,7 @@ function findConcept(targetText: string | undefined): Concept | null {
   const t = targetText.toLowerCase();
   if (!t.trim()) return null;
   // Prefer longer keyword matches (so "burn damage" matches before "burn").
-  const sorted = [...ALL_CONCEPTS].sort(
+  const sorted = [...getAllConcepts()].sort(
     (a, b) => Math.max(...b.keywords.map((k) => k.length)) - Math.max(...a.keywords.map((k) => k.length)),
   );
   for (const c of sorted) {
@@ -3411,7 +3427,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'night';
       // One lore beat from the location pool. rotatingPick so two
       // arrivals at the same place don't repeat.
-      const locPool = (LOCATION_FLAVORS as Record<string, string[]>)[location.id];
+      const locPool = getLocationFlavors()[location.id];
       const loreBeat = (locPool && locPool.length > 0)
         ? rotatingPick(locPool, `arrival.lore.${location.id}`)
         : null;

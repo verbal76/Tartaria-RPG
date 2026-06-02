@@ -11901,4 +11901,60 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          build-apk.yml (workflow trigger touch — non-app-paths file
 //          required to fire the [build-aab] build), HANDOFF.md
 //          (closed issue entry consolidating the Pixel 10 saga).
-export const OTA_BUILD_ID = '2026-06-02-297';
+// OTA-298 (Cobalt Drift) — JSON lazy-load pass for title-screen
+//   relief. Three high-impact JSON imports flipped from top-level
+//   `import` (parsed at app boot) to function-scope `require()`
+//   (parsed on first use, mid-session):
+//     1. `loreConceptBank.ts` — 11 canon-*.json + glossary (~120 KB).
+//        Only used when the player asks the Arbiter. Lazy-loaded
+//        inside `loadLoreConceptBank()` which already caches its
+//        result, so the parse cost is paid at most once per session.
+//     2. `gameStore.ts` `concepts.json` (~73 KB). Only used when the
+//        player types "what is X / explain X / tell me about X".
+//        Wrapped in a `getAllConcepts()` getter with module-scope
+//        cache; `findConcept()` calls the getter.
+//     3. `narrativeGenerator.ts` mood, intent, location-flavor, and
+//        scene-flavor JSONs (~25 KB combined). Used at scene render
+//        time, not boot. Each pool now has a `get*()` getter that
+//        merges with its BASE_* table on first call and caches.
+//        The exported `LOCATION_FLAVORS` constant becomes
+//        `getLocationFlavors()`; gameStore and the uniquenessAudit
+//        test updated to call the getter.
+//
+//   Total parse-weight deferred out of cold-start: ~220 KB of
+//   JSON literal materialization. Same content reaches the player —
+//   it's just deferred to the first time a feature actually uses
+//   it (which is always after the title screen has rendered).
+//
+//   No semantic change. Pools still merge with BASE_* tables, the
+//   Arbiter bank still embeds the same 11 sources, findConcept
+//   still resolves the same keywords. The change is purely WHEN
+//   the parse fires.
+//
+//   Why this matters beyond title-screen feel: it also gives Hermes
+//   on Tensor G4 a warm-engine moment to chew big JSON. The
+//   moss-tine-style cold-start choke on tripled inline literals is
+//   the same class of issue — Hermes struggles with one large
+//   literal at boot. Lazy require() is the standard escape hatch.
+//
+//   Ships with [build-aab] for a new production AAB (codename
+//   Granite Hold — next in the fortress reserved pool) layered on
+//   top of yesterday's Stone Castle baseline. Stone Castle remains
+//   the safe rollback rev if Cobalt Drift ever regresses.
+//
+//   Files: app/engine/loreConceptBank.ts (top-level imports →
+//          require() inside loadLoreConceptBank()), app/state/
+//          gameStore.ts (conceptsData import comment + getAllConcepts
+//          getter; LOCATION_FLAVORS import → getLocationFlavors),
+//          app/engine/narrativeGenerator.ts (top-level imports →
+//          getter functions with module cache; export shape changed
+//          for LOCATION_FLAVORS), __tests__/uniquenessAudit.test.ts
+//          (test consumer updated to call getLocationFlavors()),
+//          app/buildCodename.ts (Cobalt Drift in CODENAMES; Granite
+//          Hold reserved for next AAB), app/buildInfo.ts (OTA-298
+//          bump + this change note), docs/build-codenames.md (Cobalt
+//          Drift moved to current; Granite Hold reserved under
+//          AAB section), .github/workflows/build-apk.yml (trigger
+//          touch — non-app-paths file required to fire [build-aab]),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-298';

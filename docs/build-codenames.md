@@ -56,6 +56,7 @@ bug reports.
 | `2026-06-02-295`        | Moss Tine      | Recontextualization — threads 1→2 + tripled templates restored |
 | `2026-06-02-296`        | Loam Helm      | JSON tripling reverted again (confirmed Hermes choke on Tensor G4) |
 | `2026-06-02-297`        | Quartz Coil    | Final stable wave-cap — JS companion to next AAB ([build-aab])    |
+| `2026-06-02-298`        | Cobalt Drift   | JSON lazy-load pass — ~220 KB deferred out of cold-start          |
 
 ## AAB codenames (separate pool, keyed by versionCode)
 
@@ -69,23 +70,23 @@ About screen surfaces both.
 | `246`       | (unnamed)    | Predates the AAB codename layer; was running with OTA-265 (Stone Mantle) at upload time. |
 | `263`       | Slate Keep   | Pewter Vault (OTA-273) AAB. llama.rn SD865-class crash fix. |
 | `?` (TBD)   | Stone Castle | Quartz Coil (OTA-297) AAB. Final stable wave-cap. versionCode = GitHub run_number at build time; APK_CODENAMES entry follows once the run_number is known. |
+| `?` (TBD)   | Granite Hold | Cobalt Drift (OTA-298) AAB. JSON lazy-load pass on top of Stone Castle. Same baseline + ~220 KB of JSON deferred out of cold-start for title-screen relief. |
 
 ### AAB reserved pool
 
 Stone / fortress / Tartaria-landmark style. AABs ship less often
 than OTAs and should feel bigger than the metallic-noun OTA pool.
 
-1. Granite Hold
-2. Marble Spire
-3. Onyx Tower
-4. Basalt Bulwark
-5. Obsidian Gate
-6. Skyhold
-7. Ironwall
-8. Worldgate
-9. Sunspire
-10. Hearthstone
-11. Deepforge
+1. Marble Spire
+2. Onyx Tower
+3. Basalt Bulwark
+4. Obsidian Gate
+5. Skyhold
+6. Ironwall
+7. Worldgate
+8. Sunspire
+9. Hearthstone
+10. Deepforge
 
 ## Reserved pool (assign next 30+ OTAs from this list)
 

@@ -75,7 +75,8 @@ const _origLog = console.log;
 const _origWarn = console.warn;
 const _origErr = console.error;
 
-import { buildArbiterRemark, LOCATION_FLAVORS } from '../app/engine/narrativeGenerator';
+import { buildArbiterRemark, getLocationFlavors } from '../app/engine/narrativeGenerator';
+const LOCATION_FLAVORS = getLocationFlavors();
 import {
   pickWastelandEncounter,
   __TEST_ONLY__ as WASTE_TEST,
