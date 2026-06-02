@@ -324,6 +324,20 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-299 (Nickel Tine) — Android tutorial keyboard gate (input blocked until SKIP/CONTINUE)
+
+- **OTA-299 · Player (Pixel 10 Pro XL): *"also make it so the keyboard cannot be used until the player either hits the skip or first continue in the tutorial. it pops up as soon as you open on Android and then you cannot see skip and it's confusing, because you. ant hot the.rignt buttons."*** On Android, the soft keyboard rises any time a focused TextInput is on screen at cold start. At first-launch, ExplorationScreen mounts with the welcome step of the tutorial (fullscreen-area, card pinned to the bottom) — and the InputBox's TextInput sits in the same vertical band. The keyboard covers the welcome card's SKIP / CONTINUE buttons; the player can't see what to tap and the typing they're doing to "escape" the keyboard hits the wrong elements ("you. ant hot the.rignt buttons" = "you can't hit the right buttons", typed through a stuck keyboard).
+- **Fix in InputBox.tsx** — read `tutorialStep` from gameStore; derive `tutorialBlocksInput = tutorialStep === 0`. Three changes wired off that flag:
+  1. **TextInput `editable={!tutorialBlocksInput}`** — input rejects taps + typing during the welcome step.
+  2. **TextInput `showSoftInputOnFocus={!tutorialBlocksInput}`** — even if Android's focus-restoration somehow drives focus to the field, the soft keyboard stays down.
+  3. **`useEffect` calls `Keyboard.dismiss()` when `tutorialBlocksInput` flips true** — handles the case where the keyboard was already up (stale draft autofocus, Android session restore) when the welcome step appears.
+  4. **Pending-draft focus gate** — the existing `pendingDraft` effect that auto-focuses the input after consuming a draft now skips the `inputRef.current?.focus()` call when the welcome step is on screen. The welcome card takes priority over any stale draft.
+  5. **Placeholder text** flips to `"Tap SKIP or CONTINUE above to begin"` during the welcome step so a player who taps the input gets an explicit redirect instead of an unresponsive field.
+- **Unlock conditions match the player's exact wording.** SKIP sets `tutorialStep` to null → `tutorialBlocksInput` flips false → input becomes editable, keyboard works. First CONTINUE advances `tutorialStep` to 1 → same unlock. Either path matches "either hits the skip or first continue."
+- **OTA-only.** Pure JS change in one component. No native rebuild needed; the Granite Hold AAB + Cobalt Drift APK pair shipped earlier this session pick this up via EAS Update on next launch.
+- **Cross-platform** — no platform marker (the gate is harmless on iOS too; iOS doesn't have the cold-start auto-keyboard issue, but the gate keeps behavior consistent in case Apple changes focus heuristics later).
+- **Files:** `app/components/InputBox.tsx` (tutorialStep selector + tutorialBlocksInput flag + Keyboard.dismiss effect + pending-draft focus gate + TextInput editable / showSoftInputOnFocus / placeholder), `app/buildCodename.ts` (Nickel Tine added), `app/buildInfo.ts` (OTA-299 bump + change note), `docs/build-codenames.md` (Nickel Tine moved to current), `HANDOFF.md` (this entry).
+
 #### OTA-298 (Cobalt Drift) + Granite Hold AAB — JSON lazy-load pass (title-screen relief)
 
 - **OTA-298 / AAB Granite Hold · Player ask after the Stone Castle build went out: *"so then what benefit does the lazy load have?"* → *"yeah I like the lazy load idea. can we implement that in the APK and aab builds [and] we're starting to get top heavy at that title screen load."*** Stone Castle had everything we'd deduced about the Pixel 10 saga, but it still parsed the same ~220 KB of cold-start JSON literals the original Loam Helm did. The user's intuition: title-screen is feeling heavy, and the Tensor G4 cold-start choke is fundamentally about big JSON literals at boot, so moving them out of boot helps both at once.

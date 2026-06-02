@@ -57,6 +57,7 @@ bug reports.
 | `2026-06-02-296`        | Loam Helm      | JSON tripling reverted again (confirmed Hermes choke on Tensor G4) |
 | `2026-06-02-297`        | Quartz Coil    | Final stable wave-cap — JS companion to next AAB ([build-aab])    |
 | `2026-06-02-298`        | Cobalt Drift   | JSON lazy-load pass — ~220 KB deferred out of cold-start          |
+| `2026-06-02-299`        | Nickel Tine    | Android tutorial keyboard gate (input blocked until SKIP/CONTINUE) |
 
 ## AAB codenames (separate pool, keyed by versionCode)
 

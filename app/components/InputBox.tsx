@@ -195,17 +195,48 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // extends to 'far'). Read it from the store so the weapon tone
   // updates whenever the player's effective stats change.
   const playerInt = useGameStore((s) => s.player?.stats.intelligence ?? 0);
+
+  // OTA-298 — Tutorial keyboard gate. Player ask: "make it so the
+  // keyboard cannot be used until the player either hits the skip
+  // or first continue in the tutorial. it pops up as soon as you
+  // open on Android and then you cannot see skip and it's
+  // confusing." On Android the system likes to bring the soft
+  // keyboard up the moment a focused TextInput is on screen, which
+  // hides the welcome step's SKIP / CONTINUE buttons (positioned at
+  // the top of the screen — see TutorialOverlay's cardPositionFor:
+  // 'fullscreen' → bottom card, but the buttons sit on the keyboard
+  // edge). Solution: while the tutorial is on the welcome step
+  // (tutorialStep === 0), make the input non-editable + suppress
+  // the soft keyboard on focus. Hitting SKIP clears tutorialStep
+  // to null; hitting CONTINUE advances it to 1. Either action
+  // unlocks the input — exactly the "skip or first continue"
+  // gate the player asked for.
+  const tutorialStep = useGameStore((s) => s.tutorialStep);
+  const tutorialBlocksInput = tutorialStep === 0;
+  useEffect(() => {
+    // If the keyboard happened to be up when the welcome step
+    // appeared (e.g. autoFocus from a stale draft, Android focus
+    // restoration), dismiss it so the tutorial buttons are visible.
+    if (tutorialBlocksInput) {
+      Keyboard.dismiss();
+    }
+  }, [tutorialBlocksInput]);
+
   useEffect(() => {
     if (pendingDraft !== null) {
       const draft = consumeDraft();
       if (draft) {
         setText(draft);
         // Defer focus by one tick so the TextInput is mounted +
-        // ready to receive the cursor.
-        setTimeout(() => inputRef.current?.focus(), 50);
+        // ready to receive the cursor. Skip the focus call while the
+        // tutorial is blocking input — the welcome step takes
+        // priority over any pending draft.
+        if (!tutorialBlocksInput) {
+          setTimeout(() => inputRef.current?.focus(), 50);
+        }
       }
     }
-  }, [pendingDraft, consumeDraft]);
+  }, [pendingDraft, consumeDraft, tutorialBlocksInput]);
 
   const handleSubmit = () => {
     const trimmed = text.trim();
@@ -513,7 +544,13 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           style={styles.input}
           value={text}
           onChangeText={setText}
-          placeholder={inCombat ? 'What do you do? (or use quick buttons)' : 'What do you do?'}
+          placeholder={
+            tutorialBlocksInput
+              ? 'Tap SKIP or CONTINUE above to begin'
+              : inCombat
+              ? 'What do you do? (or use quick buttons)'
+              : 'What do you do?'
+          }
           placeholderTextColor="#5a5246"
           onSubmitEditing={handleSubmit}
           returnKeyType="send"
@@ -521,6 +558,15 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           autoCapitalize="none"
           autoComplete="off"
           textContentType="none"
+          // OTA-298 — Tutorial keyboard gate. While the welcome step
+          // is on screen, the input is non-editable and the soft
+          // keyboard is suppressed even if the field somehow gets
+          // focus (Android focus-restoration on cold start). Both
+          // props are toggled together so the gate is consistent
+          // across platforms — iOS honors editable; Android honors
+          // showSoftInputOnFocus.
+          editable={!tutorialBlocksInput}
+          showSoftInputOnFocus={!tutorialBlocksInput}
         />
         {/* OTA-189 — mic button removed entirely along with all STT
             wiring. TTS toggle still lives on the gear screen for

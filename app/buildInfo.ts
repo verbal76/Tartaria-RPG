@@ -11957,4 +11957,45 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          AAB section), .github/workflows/build-apk.yml (trigger
 //          touch — non-app-paths file required to fire [build-aab]),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-298';
+// OTA-299 (Nickel Tine) — Android tutorial keyboard gate. Player ask:
+//   "make it so the keyboard cannot be used until the player either
+//   hits the skip or first continue in the tutorial. it pops up as
+//   soon as you open on Android and then you cannot see skip and
+//   it's confusing." On Android the soft keyboard tends to rise the
+//   moment a focused TextInput is on screen — at cold start the
+//   InputBox's TextInput is the candidate, and the tutorial welcome
+//   card's SKIP / CONTINUE buttons (positioned at the bottom of the
+//   screen for fullscreen-area steps) sit right where the keyboard
+//   covers them. Result: player sees the keyboard, can't find the
+//   tutorial buttons, can't dismiss either.
+//
+//   Fix in InputBox.tsx — read `tutorialStep` from gameStore. When
+//   it's 0 (welcome step), the TextInput becomes non-editable and
+//   `showSoftInputOnFocus={false}` so even Android focus-restoration
+//   can't bring the keyboard up. The placeholder text changes to
+//   "Tap SKIP or CONTINUE above to begin" so a player who taps the
+//   input gets a clear redirect. An effect calls `Keyboard.dismiss()`
+//   the moment the welcome step appears, in case the keyboard was
+//   already up. A second effect skips the pending-draft focus call
+//   while the welcome step is on screen (the welcome card takes
+//   priority over any stale draft).
+//
+//   Unlock conditions match the player's exact wording: SKIP clears
+//   tutorialStep to null (input editable), first CONTINUE advances
+//   it to 1 (input editable). Either way, after the first
+//   interaction the welcome card's gone and the keyboard works
+//   normally.
+//
+//   OTA-only — pure JS change. No native rebuild needed; the
+//   Granite Hold AAB + APK pair we just shipped pick this up via
+//   their JS bundle when EAS Update fires.
+//
+//   Files: app/components/InputBox.tsx (tutorialStep selector +
+//          tutorialBlocksInput derived flag + Keyboard.dismiss
+//          effect + pending-draft focus gate + TextInput editable
+//          / showSoftInputOnFocus / placeholder), app/
+//          buildCodename.ts (Nickel Tine added), app/buildInfo.ts
+//          (OTA-299 bump + this change note), docs/build-codenames.md
+//          (Nickel Tine moved to current), HANDOFF.md (closed issue
+//          entry).
+export const OTA_BUILD_ID = '2026-06-02-299';
