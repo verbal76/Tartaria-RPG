@@ -29,7 +29,15 @@ export interface QwenInitOptions {
   onProgress?: (status: QwenStatus, fraction: number) => void;
   /** Context window in tokens. Default 2048 (plenty for Arbiter prompts). */
   contextSize?: number;
-  /** Inference threads. Default 4 (sane for mid-tier mobile CPU). */
+  /** Inference threads. OTA-291 — default DROPPED from 4 → 1. Per
+   *  upstream llama.cpp investigation, multi-threaded ggml worker
+   *  pool is implicated in SIGSEGV crashes during SIMD memcpy on
+   *  affected chips (Tensor G3/G4/G5, Snapdragon 865-class). Single-
+   *  threaded inference eliminates worker-pool races entirely.
+   *  Perf cost is real (~3x slower on mid-range, ~2x slower on
+   *  flagships) but eliminates the only failure-mode we don't have
+   *  a code-level patch for. Pairs with the patch-package blocklist
+   *  extension that forces non-SVE .so on the same chips. */
   threads?: number;
 }
 
@@ -170,7 +178,7 @@ export class QwenGenerativeEngine {
       await runtime.initialize({
         modelPath,
         contextSize: opts.contextSize ?? 2048,
-        threads: opts.threads ?? 4,
+        threads: opts.threads ?? 1,
       });
       this.runtime = runtime;
       this.status = 'ready';

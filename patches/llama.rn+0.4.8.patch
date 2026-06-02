@@ -1,5 +1,5 @@
 diff --git a/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java b/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
-index 91b2397..d41dd54 100644
+index 91b2397..f25c711 100644
 --- a/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
 +++ b/node_modules/llama.rn/android/src/main/java/com/rnllama/LlamaContext.java
 @@ -333,13 +333,34 @@ public class LlamaContext {
@@ -39,7 +39,7 @@ index 91b2397..d41dd54 100644
  
      // TODO: Add runtime check for cpu features
      if (LlamaContext.isArm64V8a()) {
-@@ -404,6 +425,72 @@ public class LlamaContext {
+@@ -404,6 +425,109 @@ public class LlamaContext {
      }
    }
  
@@ -103,6 +103,43 @@ index 91b2397..d41dd54 100644
 +        || model.startsWith("SM-N985")    // Note 20 Ultra (Exynos 990)
 +        || model.startsWith("SM-N986")) { // Note 20 Ultra 5G (SD865+)
 +      Log.d(NAME, "Tartaria blocklist hit via Build.MODEL: " + model);
++      return true;
++    }
++
++    // OTA-291 — Google Pixel Tensor chips (G3 / G4 / G5). Per upstream
++    // llama.cpp issues #6995 + #8109, the SVE compile flags emit
++    // instructions that SIGSEGV inside __memcpy_aarch64_simd during
++    // ggml_graph_compute_thread on Tensor chips. The fix upstream is
++    // -DGGML_SVE=OFF at compile time; we achieve the equivalent by
++    // forcing the v8_4_fp16_dotprod variant (compiled WITHOUT +sve)
++    // via this blocklist. Catches Pixel 8 series (Tensor G3), Pixel 9
++    // series (Tensor G4), Pixel 10 series (Tensor G5).
++    // 4. Build.SOC_MODEL prefix for any Tensor chip.
++    if (Build.VERSION.SDK_INT >= 31 && Build.SOC_MODEL != null) {
++      String tensorSoc = Build.SOC_MODEL.toUpperCase();
++      if (tensorSoc.startsWith("TENSOR")) {
++        Log.d(NAME, "Tartaria blocklist hit via Build.SOC_MODEL Tensor: " + tensorSoc);
++        return true;
++      }
++    }
++    // 5. Build.HARDWARE board codenames for Pixel Tensor boards.
++    if (hardware.equals("zumapro")       // Pixel 9 Pro / Pro XL
++        || hardware.equals("zuma")       // Pixel 8 / 8 Pro
++        || hardware.equals("ripcurrent") // Pixel 10 board codename (preliminary)
++        || hardware.equals("husky")      // Pixel 8 Pro alias
++        || hardware.equals("shiba")      // Pixel 8
++        || hardware.equals("komodo")     // Pixel 9 Pro XL
++        || hardware.equals("caiman")     // Pixel 9 Pro
++        || hardware.equals("tokay")) {   // Pixel 9
++      Log.d(NAME, "Tartaria blocklist hit via Build.HARDWARE Tensor: " + hardware);
++      return true;
++    }
++    // 6. Build.MODEL prefix for Pixel Tensor series (covers any chip /
++    // board codename change in future Pixel models).
++    if (model.startsWith("PIXEL 8")
++        || model.startsWith("PIXEL 9")
++        || model.startsWith("PIXEL 10")) {
++      Log.d(NAME, "Tartaria blocklist hit via Build.MODEL Pixel Tensor: " + model);
 +      return true;
 +    }
 +
