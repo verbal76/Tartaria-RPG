@@ -11742,4 +11742,50 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //   AAB build (already triggered) is still valuable — patch-package
 //   blocklist is the real architectural fix; if it boots clean on
 //   the Pixel without OTA pulling the bad JSON, the blocklist wins.
-export const OTA_BUILD_ID = '2026-06-02-293';
+// OTA-294 (Lichen Anvil) — partial-model-load corruption defense.
+//   Player on Pixel 10 Pro XL identified the real root cause of the
+//   cascading freezes / crashes: killing the app mid-Qwen-download
+//   or mid-Kokoro-load leaves a partial cache file on disk. The next
+//   launch's isQwenCached() check (which only validated size > 200 MB)
+//   accepted the partial file and llama.cpp crashed parsing the
+//   truncated GGUF. The OTA apply path then tore down models mid-init
+//   in the same state, compounding the issue.
+//
+//   Three coupled fixes:
+//
+//   1. Qwen GGUF completion sentinel. ModelDownloader now writes a
+//      `.complete` sentinel file alongside the GGUF after the download
+//      promise resolves. isQwenCached() requires BOTH the GGUF AND the
+//      sentinel to be present — missing sentinel = partial download,
+//      delete the GGUF and re-fetch. Cost: existing players re-download
+//      the model once after this OTA (sentinel doesn't exist on their
+//      install yet); subsequent launches reuse the sentinel-validated
+//      cache.
+//
+//   2. CHECK FOR OTA UPDATE button gated on model readiness. New
+//      `modelsReady` + `modelsLoading` checks in TitleScreen — button
+//      is disabled and label flips to "Models loading — please wait"
+//      while Qwen or Kokoro are in downloading/loading state. Removes
+//      the foot-gun where tapping the button mid-load tore down
+//      half-initialized models.
+//
+//   3. "⚠ MODELS LOADING — DON'T CLOSE THE APP" banner. Red-accent
+//      banner on TitleScreen, renders when Qwen or Kokoro is
+//      downloading/loading. Tells testers explicitly not to close
+//      the app during initial setup. Disappears when both reach
+//      ready state.
+//
+//   Cross-platform OTA, no marker. JS-only — no AAB rebuild needed.
+//   The Pewter Vault Java blocklist is unchanged; this fix is at the
+//   model-cache layer where the corruption actually happens.
+//
+//   Files: app/ai/ota/ModelDownloader.ts (sentinel write in
+//          ensureQwenGguf + sentinel validation in isQwenCached;
+//          partial-file cleanup), app/screens/TitleScreen.tsx
+//          (qwenStatus + kokoroPhase imports + modelsLoading/Ready
+//          derived state + OTA button gating + don't-close banner +
+//          banner styles), app/buildCodename.ts (Lichen Anvil added),
+//          app/buildInfo.ts (OTA-294 bump + this change note),
+//          docs/build-codenames.md (Lichen Anvil moved to current;
+//          pool renumbered), HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-294';

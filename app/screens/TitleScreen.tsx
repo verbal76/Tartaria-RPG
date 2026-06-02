@@ -130,6 +130,20 @@ export function TitleScreen() {
   // points sideload (HaL) testers at the GitHub release APK; this
   // one points production-bundle testers at the Play Store listing.
   const [playStoreNagDismissed, setPlayStoreNagDismissed] = useState(false);
+  // OTA-294 — gate the CHECK FOR OTA UPDATE button on model readiness.
+  // Player insight: killing the app mid-Qwen-load or mid-Kokoro-load
+  // leaves partial cache files on disk, which the next launch tries to
+  // use and crashes on. The OTA apply path's teardown also tears down
+  // models mid-init, leaving the same corrupt state. Lock the button
+  // until both are 'ready' so the player physically can't trigger
+  // OTA-apply during the danger window.
+  const qwenStatus = useGameStore((s) => s.qwenStatus);
+  const [kokoroPhase, setKokoroPhase] = useState<KokoroState>(() => getKokoroState());
+  useEffect(() => onKokoroStateChange(setKokoroPhase), []);
+  const modelsLoading =
+    qwenStatus === 'downloading' || qwenStatus === 'loading'
+    || kokoroPhase.phase === 'downloading' || kokoroPhase.phase === 'loading';
+  const modelsReady = qwenStatus === 'ready' && kokoroPhase.phase === 'ready';
   useEffect(() => {
     let cancelled = false;
     void (async () => {
@@ -648,6 +662,26 @@ export function TitleScreen() {
 
       <KokoroDownloadBanner />
 
+      {/* OTA-294 — DON'T CLOSE THE APP warning during initial model
+          loads. Renders when Qwen OR Kokoro is downloading/loading.
+          Player insight: killing the app mid-load corrupts cached
+          model files, breaking subsequent launches until uninstall+
+          reinstall. This banner makes the danger explicit so testers
+          don't accidentally interrupt the setup. */}
+      {modelsLoading && (
+        <View style={styles.modelLoadingBanner}>
+          <Text style={styles.modelLoadingBannerTitle}>
+            ⚠ MODELS LOADING — DON'T CLOSE THE APP
+          </Text>
+          <Text style={styles.modelLoadingBannerBody}>
+            Voice + narration are downloading + warming up. Closing the
+            app now leaves partial files on disk that will crash the
+            next launch. Wait for the "voice ready" confirmation before
+            backgrounding or killing Tartaria Realms.
+          </Text>
+        </View>
+      )}
+
       {/* OTA-271 — Play Store stale-APK nag. Render conditions:
           (1) Android only — Play Store doesn't exist on iOS;
           (2) production bundle id (com.hotatticgames.tartarprim,
@@ -853,9 +887,18 @@ export function TitleScreen() {
                 applies in one go. Disabled while an apply is already
                 in flight to avoid a double-fetch. */}
             <TouchableOpacity
-              style={[styles.secondaryBtn, applyingOTA !== null && styles.btnDisabled]}
-              disabled={applyingOTA !== null}
+              style={[styles.secondaryBtn, (applyingOTA !== null || modelsLoading) && styles.btnDisabled]}
+              disabled={applyingOTA !== null || modelsLoading}
               onPress={() => {
+                // OTA-294 — should be unreachable because disabled=true
+                // when modelsLoading, but guard defensively. Killing
+                // OTA apply mid-model-load corrupts the cached GGUF
+                // and Kokoro state, requiring uninstall+reinstall.
+                if (modelsLoading) {
+                  setApplyingOTA('Wait for models to finish loading');
+                  setTimeout(() => setApplyingOTA(null), 2500);
+                  return;
+                }
                 setApplyingOTA('Checking…');
                 // 2026-05-25 — quiet failure + timeout-aware. Playtester
                 // reported the check "runs a prolonged time and doesn't
@@ -899,7 +942,8 @@ export function TitleScreen() {
               activeOpacity={0.7}
             >
               <Text style={styles.secondaryBtnText}>
-                {applyingOTA ?? 'CHECK FOR OTA UPDATE'}
+                {applyingOTA
+                  ?? (modelsLoading ? 'Models loading — please wait' : 'CHECK FOR OTA UPDATE')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -1233,6 +1277,33 @@ const styles = StyleSheet.create({
     fontSize: 10,
     textAlign: 'center',
     marginTop: 3,
+  },
+  // OTA-294 — "DON'T CLOSE THE APP" loading banner. Red-ish accent
+  // ramp (#bf5a3a outline, #2a1410 fill) so it reads as warning, not
+  // neutral. Sized like the updateBanner so it sits flush with the
+  // rest of the title-screen banner stack.
+  modelLoadingBanner: {
+    backgroundColor: '#2a1410',
+    borderColor: '#bf5a3a',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginBottom: 10,
+  },
+  modelLoadingBannerTitle: {
+    color: '#e07a5f',
+    fontSize: 12,
+    letterSpacing: 2,
+    fontWeight: '800',
+    textAlign: 'center',
+  },
+  modelLoadingBannerBody: {
+    color: '#cdbf99',
+    fontSize: 11,
+    textAlign: 'center',
+    marginTop: 4,
+    lineHeight: 15,
   },
   apkBanner: {
     backgroundColor: '#1a2a14',

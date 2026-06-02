@@ -127,19 +127,44 @@ export class ModelDownloader {
    * Used by boot UI to decide whether to show a "first-run download" message
    * (the file is large — ~398 MB) or a faster "loading model" message. Best
    * effort; the authoritative readiness check belongs to LlamaRuntime.
+   *
+   * OTA-294 — integrity gate. Size > 200 MB alone wasn't enough: if the
+   * player swiped the app away mid-download (file is 398 MB nominal but
+   * a 250 MB partial would still pass the size check), the partial file
+   * got reused on next launch and crashed llama.cpp trying to parse a
+   * truncated GGUF. We now also require a sentinel file alongside the
+   * GGUF — only written after the download completes cleanly. Missing
+   * sentinel + present GGUF = partial download → delete and re-fetch.
    */
   async isQwenCached(): Promise<boolean> {
     const root = FileSystem.documentDirectory;
     if (!root) return false;
     const ggufPath = root + QWEN_CACHE_SUBDIR + QWEN_GGUF_FILE_NAME;
+    const sentinelPath = ggufPath + '.complete';
     try {
-      const info = await FileSystem.getInfoAsync(ggufPath);
-      // 'size' only exists on the file flavor of getInfoAsync; guard before
-      // using it. Anything smaller than 200 MB is a truncated download we
-      // should redo (the file is 398 MB nominal).
-      if (!info.exists) return false;
-      const size = 'size' in info && typeof info.size === 'number' ? info.size : 0;
-      return size > 200 * 1024 * 1024;
+      const [ggufInfo, sentinelInfo] = await Promise.all([
+        FileSystem.getInfoAsync(ggufPath),
+        FileSystem.getInfoAsync(sentinelPath),
+      ]);
+      if (!ggufInfo.exists) return false;
+      const size = 'size' in ggufInfo && typeof ggufInfo.size === 'number' ? ggufInfo.size : 0;
+      // Size floor still applies — a 0-byte file with the sentinel is
+      // obviously broken too.
+      if (size <= 200 * 1024 * 1024) return false;
+      // No sentinel = partial download (or pre-OTA-294 install that
+      // doesn't have the sentinel yet). Force a re-download to be safe.
+      // The cost is one ~398 MB download per existing player; subsequent
+      // launches reuse the sentinel-validated cache.
+      if (!sentinelInfo.exists) {
+        try {
+          await FileSystem.deleteAsync(ggufPath, { idempotent: true });
+        } catch {
+          // ignore — even if delete fails, ensureQwenGguf will
+          // overwrite on next download.
+        }
+        return false;
+      }
+      return true;
     } catch {
       return false;
     }
@@ -175,6 +200,22 @@ export class ModelDownloader {
     const url = opts.url ?? DEFAULT_QWEN_GGUF_URL;
     opts.onProgress?.(0);
     await this.downloadWithProgress(url, ggufPath, (frac) => opts.onProgress?.(frac));
+    // OTA-294 — write the completion sentinel ONLY after the download
+    // promise resolved. If the download was interrupted (process killed
+    // mid-fetch), this line never runs, the sentinel never appears, and
+    // the next isQwenCached() call detects the partial state and
+    // re-downloads. Sentinel content is just a JSON record of the
+    // completion event for debugging; presence is what matters.
+    try {
+      await FileSystem.writeAsStringAsync(
+        ggufPath + '.complete',
+        JSON.stringify({ completed: new Date().toISOString(), url }),
+      );
+    } catch {
+      // If sentinel write fails the next launch will re-download — not
+      // ideal but safe. Log nothing to avoid noisy logs on storage
+      // pressure devices.
+    }
     opts.onProgress?.(1);
     return ggufPath;
   }
