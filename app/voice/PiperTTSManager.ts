@@ -641,9 +641,14 @@ async function playPcm(samples: Float32Array, sampleRate: number): Promise<void>
   // actually ends — that latency is the bulk of the inter-sentence
   // gap players described as too long. Drop to 50ms so the queue
   // advances within one frame of playback finishing.
+  // OTA-285 — apply master TTS volume from voiceSettings. Read fresh
+  // per playback so a slider change between utterances takes effect
+  // on the next sentence (no need to rebuild the queue). Clamp 0..1
+  // defensively even though setVoiceSettings clamps on write.
+  const ttsVolume = Math.max(0, Math.min(1, getVoiceSettings().volume ?? 1));
   const { sound } = await Audio.Sound.createAsync(
     { uri: `data:audio/wav;base64,${wavBase64}` },
-    { shouldPlay: true, progressUpdateIntervalMillis: 50 },
+    { shouldPlay: true, progressUpdateIntervalMillis: 50, volume: ttsVolume },
   );
   currentSound = sound;
   await new Promise<void>((resolve) => {

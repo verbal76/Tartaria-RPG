@@ -49,6 +49,16 @@ export interface VoiceSettings {
    *  box and the player taps Act to submit (lets them correct
    *  misrecognition before committing). */
   autoSubmit: boolean;
+  /** OTA-285 — master TTS playback volume, 0.0..1.0. Applied per
+   *  utterance:
+   *    - System engine: passed to Speech.speak's `volume` option
+   *      (iOS honors it; Android system TTS uses device media volume,
+   *      so the slider has no effect there — note in the UI).
+   *    - Bundled (Kokoro): applied via expo-av's
+   *      Audio.Sound.createAsync({ volume }) on both platforms.
+   *  Default 1.0 — same as pre-OTA-285 behavior so existing installs
+   *  hear no change unless they touch the slider. */
+  volume: number;
 }
 
 const DEFAULTS: VoiceSettings = {
@@ -60,6 +70,7 @@ const DEFAULTS: VoiceSettings = {
   voiceId: null,
   kokoroVoice: 'am_michael',
   autoSubmit: false,
+  volume: 1.0,
 };
 
 let cache: VoiceSettings | null = null;
@@ -80,6 +91,7 @@ export async function loadVoiceSettings(): Promise<VoiceSettings> {
         voiceId: typeof parsed.voiceId === 'string' ? parsed.voiceId : DEFAULTS.voiceId,
         kokoroVoice: typeof parsed.kokoroVoice === 'string' ? parsed.kokoroVoice : DEFAULTS.kokoroVoice,
         autoSubmit: typeof parsed.autoSubmit === 'boolean' ? parsed.autoSubmit : DEFAULTS.autoSubmit,
+        volume: typeof parsed.volume === 'number' ? clamp01(parsed.volume) : DEFAULTS.volume,
       };
     } else {
       cache = { ...DEFAULTS };
@@ -105,6 +117,7 @@ export async function setVoiceSettings(patch: Partial<VoiceSettings>): Promise<V
     voiceId: patch.voiceId !== undefined ? patch.voiceId : current.voiceId,
     kokoroVoice: patch.kokoroVoice !== undefined ? patch.kokoroVoice : current.kokoroVoice,
     autoSubmit: patch.autoSubmit !== undefined ? patch.autoSubmit : current.autoSubmit,
+    volume: patch.volume !== undefined ? clamp01(patch.volume) : current.volume,
   };
   cache = next;
   try {
@@ -131,4 +144,9 @@ function clampRate(v: number): number {
 function clampPitch(v: number): number {
   if (!Number.isFinite(v)) return DEFAULTS.pitch;
   return Math.max(0.5, Math.min(2.0, v));
+}
+
+function clamp01(v: number): number {
+  if (!Number.isFinite(v)) return DEFAULTS.volume;
+  return Math.max(0, Math.min(1, v));
 }

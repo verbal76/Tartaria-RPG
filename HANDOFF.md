@@ -324,6 +324,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-285 (Lacquer Anvil) — Master TTS volume slider (system + Kokoro engines)
+
+- **OTA-285 · Player: *"I just noticed there is no volume control for the voice like there is for the music, we need that."*** Right — the Voice settings card had Rate / Pitch / engine picker / voice picker but no Volume. Voice playback rode at 100% with no user-facing dial. The Music settings card had Enabled + Volume; voice was missing the Volume parallel.
+- **Fix:** new `volume` field on `VoiceSettings` (0..1, default 1.0 — existing installs hear no change unless they touch the slider). Wired into both TTS playback paths:
+  - **System engine** (`TTSManager.ts` → expo-speech): passed to `Speech.speak(text, { ..., volume })`. iOS honors it. **Android system TTS ignores `volume`** and uses the device media stream volume — settings UI surfaces a one-line note in that exact case (SYSTEM engine + Android) so testers know to use hardware volume keys for system TTS.
+  - **Bundled Kokoro** (`PiperTTSManager.ts` → expo-av): read fresh per playback in `playWavBase64`, passed to `Audio.Sound.createAsync({ ..., volume })`. Slider changes between utterances take effect on the next sentence; no need to rebuild the queue.
+- **UI:** NumberStepper 0..100% step 5, mirroring the Music card's Volume row exactly. Placed at the top of the voice knobs block (above Rate / Pitch) since Volume is the most-touched adjustment.
+- **Cross-platform UX feature** (both iOS and Android players want this — voice was 100% with no dial regardless of platform). No platform marker — publishes to both hal2001-android and hal2001-ios.
+- **Files:** `app/voice/voiceSettings.ts` (volume field on VoiceSettings interface + DEFAULTS + load/set patch handling + clamp01 helper), `app/voice/TTSManager.ts` (volume passed to Speech.speak), `app/voice/PiperTTSManager.ts` (volume read in playWavBase64 + passed to Audio.Sound.createAsync), `app/screens/AboutScreen.tsx` (setVoiceVolume handler + Volume row + Android-system-engine note), `app/buildCodename.ts` (Lacquer Anvil added), `app/buildInfo.ts` (OTA-285 bump + change note), `docs/build-codenames.md` (Lacquer Anvil moved to current; pool renumbered), HANDOFF.md (this entry).
+
 #### OTA-284 (Resin Drift) — TRADE NOW button in HookContinueModal when vendor spawned in scene
 
 - **OTA-284 · Player (Pixel 10 Pro XL) on the Roadfire Reclaimer thread: *"the tap to trade, what am I supposed to do with that"*** — the step-2 narration in HookContinueModal said *"Roadfire Reclaimer sits by the fire — tap to trade"* but the modal only offered CONTINUE / ABANDON. Player tapped CONTINUE, the hook auto-advanced to the terminal step (+25 TC, threads ways), the trade opportunity vanished.

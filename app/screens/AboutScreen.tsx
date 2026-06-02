@@ -241,6 +241,7 @@ export function AboutScreen() {
   // remapping needed. Clamp guards against any future range drift.
   const setRate = (v: number) => { void setVoiceSettings({ rate: v }); };
   const setPitch = (v: number) => { void setVoiceSettings({ pitch: v }); };
+  const setVoiceVolume = (v: number) => { void setVoiceSettings({ volume: v }); };
   const switchEngine = (next: 'system' | 'bundled') => {
     stopTTS();
     void setVoiceSettings({ engine: next });
@@ -795,6 +796,35 @@ export function AboutScreen() {
                     </TouchableOpacity>
                   </View>
                 </>
+              )}
+              {/* OTA-285 — master TTS volume slider. Parallel to the
+                  Music card's Volume row above. Bundled engine: takes
+                  effect on the next utterance (expo-av Sound created
+                  with this volume). System engine on iOS: passed to
+                  Speech.speak's volume option. System engine on
+                  Android: ignored — Android's system TTS uses the
+                  device media stream volume. Surfaced via a one-line
+                  note below the slider so testers know. */}
+              <View style={styles.musicRow}>
+                <Text style={styles.musicLabel}>Volume</Text>
+                <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                  <NumberStepper
+                    value={Math.round((voice.volume ?? 1) * 100)}
+                    min={0}
+                    max={100}
+                    step={5}
+                    decimals={0}
+                    suffix="%"
+                    onChange={(v) => setVoiceVolume(v / 100)}
+                  />
+                </View>
+              </View>
+              {voice.engine === 'system' && Platform.OS === 'android' && (
+                <Text style={styles.voiceNote}>
+                  System engine on Android uses the device media volume — use the hardware
+                  volume keys to adjust. Switch to BUNDLED to control voice volume from this
+                  slider.
+                </Text>
               )}
               <View style={styles.musicRow}>
                 <Text style={styles.musicLabel}>Rate</Text>

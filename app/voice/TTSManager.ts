@@ -225,6 +225,12 @@ function drain(): void {
     Speech.speak(next.text, {
       rate: settings.rate,
       pitch: settings.pitch,
+      // OTA-285 — master TTS volume. expo-speech honors `volume` on
+      // iOS (0..1). Android's system TTS ignores it and uses the
+      // device's media stream volume instead — settings UI surfaces
+      // that with a one-liner note so Android testers know to use
+      // hardware volume keys for system-engine playback.
+      volume: settings.volume,
       voice: utteranceVoice,
       onDone: () => {
         currentlySpeaking = null;

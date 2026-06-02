@@ -47,6 +47,7 @@ bug reports.
 | `2026-06-02-282`        | Tar Vault      | Final ▼ state: in-row on iOS, nothing on Android (drops Accessory) |
 | `2026-06-02-283`        | Wax Mantle     | Platform-specific OTA publish markers ([ota-ios-only] / [ota-android-only]) |
 | `2026-06-02-284`        | Resin Drift    | TRADE NOW button in HookContinueModal when vendor spawned in scene |
+| `2026-06-02-285`        | Lacquer Anvil  | Master TTS volume slider (system + Kokoro engines)         |
 
 ## AAB codenames (separate pool, keyed by versionCode)
 
@@ -84,19 +85,18 @@ To keep codenames consistent and Tartaria-flavor without burning
 fresh creativity per OTA, the next codenames in order will be
 drawn from:
 
-1. Lacquer Anvil
-2. Gilt Tine
-3. Brass Helm
-4. Mire Coil
-5. Bog Fence
-6. Reed Spire
-7. Thorn Vault
-8. Briar Mantle
-9. Husk Drift
-10. Lichen Anvil
-11. Moss Tine
-12. Loam Helm
-13. Quartz Coil
+1. Gilt Tine
+2. Brass Helm
+3. Mire Coil
+4. Bog Fence
+5. Reed Spire
+6. Thorn Vault
+7. Briar Mantle
+8. Husk Drift
+9. Lichen Anvil
+10. Moss Tine
+11. Loam Helm
+12. Quartz Coil
 
 When bumping `OTA_BUILD_ID` in `app/buildInfo.ts`, also add an entry
 to `app/buildCodename.ts`'s `CODENAMES` map drawing from the next

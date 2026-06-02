@@ -11612,4 +11612,43 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          docs/build-codenames.md (Resin Drift moved to current; pool
 //          renumbered),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-284';
+// OTA-285 (Lacquer Anvil) — master TTS volume slider. Player: "I just
+//   noticed there is no volume control for the voice like there is
+//   for the music, we need that." Right — settings had Rate / Pitch
+//   for voice but no volume; the music card had Enabled + Volume.
+//   Voice playback rode at 100% with no user-facing dial.
+//
+//   New `volume` field on VoiceSettings (0..1, default 1.0 — existing
+//   installs hear no change). Wired into both TTS playback paths:
+//     - System engine (TTSManager.ts → expo-speech): passed to
+//       `Speech.speak(text, { ..., volume })`. iOS honors it. Android
+//       system TTS ignores it (uses the device media stream volume).
+//       Settings UI surfaces a one-line note in that exact case so
+//       Android testers on the SYSTEM engine know to use hardware
+//       volume keys.
+//     - Bundled Kokoro (PiperTTSManager.ts → expo-av): read fresh per
+//       playback in `playWavBase64`, passed to
+//       `Audio.Sound.createAsync({ ..., volume })`. Slider changes
+//       between utterances take effect on the next sentence.
+//
+//   UI: NumberStepper 0..100% step 5, mirroring the Music card's
+//   Volume row exactly. Placed at the top of the voice knobs block
+//   (above Rate / Pitch) since Volume is the most common adjustment.
+//
+//   Cross-platform UX feature (both iOS and Android players want
+//   this). No platform marker — publishes to both.
+//
+//   Files: app/voice/voiceSettings.ts (volume field on VoiceSettings
+//          interface + DEFAULTS + load/set patch handling +
+//          clamp01 helper),
+//          app/voice/TTSManager.ts (volume passed to Speech.speak),
+//          app/voice/PiperTTSManager.ts (volume read in
+//          playWavBase64 + passed to Audio.Sound.createAsync),
+//          app/screens/AboutScreen.tsx (setVoiceVolume handler +
+//          Volume row + Android-system-engine note),
+//          app/buildCodename.ts (Lacquer Anvil added),
+//          app/buildInfo.ts (OTA-285 bump + change note),
+//          docs/build-codenames.md (Lacquer Anvil moved to current;
+//          pool renumbered),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-285';
