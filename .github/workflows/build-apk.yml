@@ -21,6 +21,11 @@ name: Android Build (Tartaria Realms)
 # `app/**` and `docs/**`, so an OTA bump alone won't fire the job; a
 # non-ignored file in the same commit is required. This comment is
 # the touch. See HANDOFF.md → OTA-297 entry for the AAB contents.
+#
+# Quartz Coil APK pair — second trigger-touch for the sideload APK
+# companion to the Stone Castle AAB. Same JS, but signed against
+# the HaL keystore + .hal2001 package suffix, so HaL playtesters can
+# sideload-test the build before it ships through Play Console.
 
 on:
   push:
