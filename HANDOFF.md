@@ -324,6 +324,21 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-276 (Marble Anvil) — iOS OTA publish gap fix (HaL2001 now publishes iOS)
+
+- **OTA-276 · iOS TestFlight tester (player's sister): *"I checked for updates. It said it was updated"*** — but her About export showed `OTA build ID: 2026-05-31-265` (Stone Mantle, the bundle baked into the first iOS TestFlight build) and `Last OTA applied: No (running the APK's embedded bundle)`. She was stuck on the iOS bundle from week-old build 1 and had never received any of the OTAs 266 → 275. Granite Drift's keyboard fix never reached her.
+- **Root cause:** `.github/workflows/eas-update.yml` had a branch-isolated publish — the `HaL2001` case ran `publish_channel "hal2001" "android" false` with NO iOS publish line. iOS publishes were limited to the `iOS-initial` branch → `ios-preview` channel mapping. But the iOS TestFlight build was *made from HaL2001* with `expo-channel-name: hal2001` baked into app.json, so the iPhone was correctly asking the Expo server for `hal2001`-iOS bundles — and the server correctly answered "none exist for that channel + platform." Working as configured on both sides; the bridge between HaL2001 and iOS just didn't exist in the publish workflow.
+- **Fix:** HaL2001 case now also calls `publish_channel "hal2001" "ios" true`. The `true` is `optional=true` so iOS publish failure stays best-effort — a transient EAS iOS issue can't break the long-stable Android publish that's been working for months. Marked best-effort rather than required because the iOS publish surface has never been exercised at scale before.
+- **What the iOS tester sees after OTA-276:**
+  1. Tap CHECK FOR OTA UPDATE
+  2. Expo server NOW has an iOS bundle for `hal2001`
+  3. App downloads + applies → "Update applied: Marble Anvil"
+  4. Bundle contains ALL changes through OTA-276, including Granite Drift's (OTA-275) keyboard auto-dismiss + iPad width cap + chip-overflow fixes. Single OTA pull = caught up.
+- **Why this didn't surface for Android:** Android testers never noticed because they were on `hal2001` Android, which has been publishing on every push since OTA-255+. The iOS publish gap was invisible until the first iOS playtester installed and her About export didn't match expectations.
+- **Workflow-side, JS-side, no native rebuild.** Ships through the OTA channel; the workflow change is what unblocks iOS, the JS bundle delivery itself is the same shape as every prior OTA.
+- **Future-proofing:** iOS publishes are now part of every HaL2001 push by default. No special handling required when shipping the next OTA — Marble Anvil onward, every codename auto-publishes for iPhone + iPad too.
+- **Files:** `.github/workflows/eas-update.yml` (HaL2001 case adds `publish_channel "hal2001" "ios" true`), `app/buildCodename.ts` (Marble Anvil added), `app/buildInfo.ts` (OTA-276 bump + change note), `docs/build-codenames.md` (Marble Anvil moved to current; pool renumbered), HANDOFF.md (this entry).
+
 #### OTA-275 (Granite Drift) — iOS chip overflow + iPad width cap + iOS keyboard auto-dismiss
 
 - **OTA-275 · Player: *"The Apple build seems to have issues with keyboard closing and weird formatting. Really wide formatting on iPad as well"*** with two screenshots — an iPhone SearchModal showing long noun names ("half-buried royal vault pedestal", "broken forgotten order reliquary") with their action suffix truncated as "→ inv" / "→ ir", and an iPad showing the TitleScreen with all buttons stretched edge-to-edge across the tablet's ~1000pt width. Three coupled style fixes, all JS-only:

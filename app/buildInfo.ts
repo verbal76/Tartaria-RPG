@@ -11283,4 +11283,45 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          docs/build-codenames.md (Granite Drift moved to current;
 //          pool renumbered),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-01-275';
+// OTA-276 (Marble Anvil) — iOS OTA publish gap fix. Critical bug:
+//   iOS TestFlight testers have been silently stuck on OTA-265
+//   (Stone Mantle, the bundle baked into the first iOS TestFlight
+//   build) since the build shipped. Tester report: "I checked for
+//   updates. It said it was updated" but About showed OTA-265.
+//
+//   Root cause: `.github/workflows/eas-update.yml` had a
+//   branch-isolated publish — the HaL2001 branch case only ran
+//   `publish_channel "hal2001" "android" false`. No iOS publish
+//   line existed for HaL2001 at all; iOS publishes were limited to
+//   the `iOS-initial` branch → `ios-preview` channel mapping.
+//
+//   But the iOS TestFlight build was made from HaL2001 with
+//   app.json's `expo-channel-name: hal2001` baked in, so the iPhone
+//   was correctly asking the Expo server for hal2001-iOS bundles —
+//   and the server correctly answered "none exist for that channel
+//   + platform." From the Expo server's perspective: working as
+//   configured. From the iOS tester's perspective: every "check for
+//   updates" tap was a no-op. OTAs 266 through 275 all landed for
+//   Android only.
+//
+//   Fix: HaL2001 case now publishes hal2001 to BOTH android AND ios
+//   per push. iOS publish is marked best-effort (optional=true) so a
+//   transient EAS iOS issue can't block the long-stable Android
+//   publish, but barring infra problems the iPhone will pull every
+//   future OTA bundle correctly.
+//
+//   What happens for the iOS tester after this OTA:
+//     - Tester taps CHECK FOR OTA UPDATE
+//     - Expo server NOW has the iOS bundle for hal2001
+//     - App downloads + applies → "Update applied: Marble Anvil"
+//     - Bundle contains ALL changes through OTA-276, including the
+//       Granite Drift (OTA-275) keyboard + iPad + chip-overflow
+//       fixes. Single OTA pull = caught up to current.
+//
+//   Files: .github/workflows/eas-update.yml (HaL2001 case adds iOS
+//          publish line), app/buildCodename.ts (Marble Anvil added),
+//          app/buildInfo.ts (OTA-276 bump + change note),
+//          docs/build-codenames.md (Marble Anvil moved to current;
+//          pool renumbered),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-276';

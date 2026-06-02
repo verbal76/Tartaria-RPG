@@ -225,7 +225,20 @@ jobs:
               publish_channel "preview" "android" false
               ;;
             HaL2001)
+              # OTA-276 — also publish iOS to hal2001. The first iOS
+              # TestFlight build (OTA-265 / Stone Mantle) was baked
+              # with `expo-channel-name: hal2001` in app.json, so the
+              # iOS install asks the Expo server for hal2001-iOS
+              # bundles. Without this iOS publish line, every HaL2001
+              # OTA was Android-only and iOS testers were silently
+              # stuck on whatever bundle their TestFlight build was
+              # compiled with (no error — Expo server correctly
+              # returns "no update available" for iOS hal2001).
+              # Best-effort (optional=true) so iOS publish failure
+              # never blocks the Android publish that's been the
+              # workhorse for months.
               publish_channel "hal2001" "android" false
+              publish_channel "hal2001" "ios" true
               ;;
             iOS-initial)
               publish_channel "ios-preview" "ios" true
