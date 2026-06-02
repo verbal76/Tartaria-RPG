@@ -50,7 +50,6 @@ bug reports.
 | `2026-06-02-285`        | Lacquer Anvil  | Master TTS volume slider (system + Kokoro engines)         |
 | `2026-06-02-286`        | Gilt Tine      | Quantity stepper in SCRAP action modal (batch-scrap stacks) |
 | `2026-06-02-290`        | Reed Spire     | Emergency rollback — reverts OTAs 287-289 (Pixel 10 boot freeze) |
-| `2026-06-02-291`        | Thorn Vault    | Tensor G3/G4/G5 blocklist + threads 4→1 + tripled templates (AAB + APK) |
 
 ## AAB codenames (separate pool, keyed by versionCode)
 
@@ -88,12 +87,13 @@ To keep codenames consistent and Tartaria-flavor without burning
 fresh creativity per OTA, the next codenames in order will be
 drawn from:
 
-1. Briar Mantle
-2. Husk Drift
-3. Lichen Anvil
-4. Moss Tine
-5. Loam Helm
-6. Quartz Coil
+1. Thorn Vault
+2. Briar Mantle
+3. Husk Drift
+4. Lichen Anvil
+5. Moss Tine
+6. Loam Helm
+7. Quartz Coil
 
 When bumping `OTA_BUILD_ID` in `app/buildInfo.ts`, also add an entry
 to `app/buildCodename.ts`'s `CODENAMES` map drawing from the next

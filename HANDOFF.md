@@ -324,18 +324,6 @@
 
 ### 0.B — Closed Issues (most recent first)
 
-#### OTA-291 (Thorn Vault) — Tensor G3/G4/G5 blocklist + threads 4→1 + tripled templates (NATIVE BUILD)
-
-- **OTA-291 · Player on Pixel 10 Pro XL: *"push all of that into an apk and an aab, I will test it on my phone, if it works with no errors I will push the aab. also push it as an ota."*** The real fix for the Pixel 10 Qwen crash class, plus the safe portions of the rolled-back Brass Helm + Mire Coil changes. AAB built for Play Console upload, APK for sideload testing.
-- **Three coupled changes:**
-  1. **Patch-package blocklist extension** (`patches/llama.rn+0.4.8.patch` regenerated): extends `isKnownMisclassifiedChip()` in `LlamaContext.java` to catch any Pixel Tensor chip via three layers — `Build.SOC_MODEL.startsWith("TENSOR")`, `Build.HARDWARE` codenames (zuma, zumapro, ripcurrent, husky, shiba, komodo, caiman, tokay), `Build.MODEL` prefix (PIXEL 8/9/10). Blocklist hits force the `v8_4_fp16_dotprod` variant (compiled without `+sve`), the equivalent of upstream's `-DGGML_SVE=OFF` per llama.cpp issues #6995 + #8109. Pewter Vault (OTA-273) already covered SD865/SD7xx/Exynos 990; this adds Tensor G3/G4/G5.
-  2. **Qwen threads default 4 → 1** in `QwenGenerativeEngine.ts`. Per upstream: "Llama.cpp sometimes crashes if you assign more physical cores than you have." Single-threaded inference eliminates ggml worker-pool races entirely. ~2-3x slower narration cost but eliminates the only Qwen failure mode we don't have a code-level patch for.
-  3. **Arbiter template library re-tripled.** `arbiter-intent-quotes.json` 10 categories × 7-8 lines → 24 lines (~160 new). `arbiter-mood-quotes.json` 6 categories × 11-12 lines → ~35 lines (~144 new). All original lines kept verbatim; new lines appended. Templates were the valuable half of the reverted Brass Helm — pure additive JSON data, NOT in the boot path.
-- **Explicitly OUT** (the suspected boot-freezer from Brass Helm): mid-use crash detector (mlHealth Promise.all 4 → 7 keys + midUseCrashCount path), gameStore.ts wrap of qwen.stream with markMLGenerate breadcrumbs, Mire Coil's RE-DOWNLOAD QWEN MODEL button.
-- **Pixel 10 Pro XL test plan:** player sideloads APK → verifies Qwen narration runs without crashes → if clean, uploads AAB to Play Console internal testing. If v8.4-without-SVE still crashes, we step Pixel down to `v8_2_fp16_dotprod` next.
-- **OTA delivery:** publishes alongside the AAB build per the standard HaL2001 flow. Players already on Slate Keep (AAB 263) get the OTA-291 bundle immediately; the new AAB ships the patched native binary when they update through Play Store.
-- **Files:** regenerated `patches/llama.rn+0.4.8.patch` (Tensor G3/G4/G5 blocklist layer added to existing Pewter Vault patch), `app/ai/generation/QwenGenerativeEngine.ts` (threads default 4 → 1; comment updated), `app/data/lore/arbiter-intent-quotes.json` (re-tripled), `app/data/lore/arbiter-mood-quotes.json` (re-tripled), `app/buildCodename.ts` (Thorn Vault added), `app/buildInfo.ts` (OTA-291 bump + change note), `docs/build-codenames.md` (Thorn Vault moved to current; pool renumbered), HANDOFF.md (this entry).
-
 #### OTA-286 (Gilt Tine) — Quantity stepper in SCRAP action modal (batch-scrap stacks)
 
 - **OTA-286 · Pixel 10 Pro XL player log on Slate Keep showed 5 Aetheric Locket + 5 Worn Tartarian Coin scrapped in ~30 seconds, one tap at a time. Player ask: *"The same up and down numerical box that you're using for the volume sliders and to the scrap pop-up. so when you scrap something you can choose the amount instead of doing the same scrapping maneuver over and over and over."*** Same NumberStepper component used in About → Voice / Music for Volume / Rate / Pitch.
