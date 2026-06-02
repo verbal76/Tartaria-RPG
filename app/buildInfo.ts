@@ -11528,4 +11528,45 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          docs/build-codenames.md (Tar Vault moved to current; pool
 //          renumbered),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-282';
+// OTA-283 (Wax Mantle) — platform-specific OTA publish markers.
+//   Player: "When we are working on glitches for iOS that need iOS
+//   only, as in there are no issues on Android, only push it to iOS."
+//
+//   Pre-OTA-283: every HaL2001 push published BOTH iOS and Android
+//   bundles to the `hal2001` channel. Android testers (including the
+//   user's Pixel) got a new bundle for every iOS-only fix, which
+//   triggered an "Update applied: …" reload they didn't need.
+//
+//   Fix: new commit-message markers parsed in `.github/workflows/
+//   eas-update.yml`. Place either marker anywhere in the commit
+//   title or body:
+//     [ota-ios-only]     → skip Android publish (iOS-only OTA)
+//     [ota-android-only] → skip iOS publish (Android-only OTA)
+//     (no marker)        → publish to both (default, unchanged)
+//
+//   Markers parsed via grep against `${{ github.event.head_commit.
+//   message }}` (passed as COMMIT_MSG env to avoid the multi-line-
+//   interpolation footgun documented in build-apk.yml). Defensive:
+//   both markers in the same commit cancel out (warning logged,
+//   defaults to publish-both).
+//
+//   Going forward: keyboard/InputAccessoryView/iOS-only style work
+//   uses [ota-ios-only]. Android-only quick fixes use
+//   [ota-android-only]. Most OTAs (engine logic, content, JSON,
+//   shared UI) stay marker-free and publish to both as before.
+//
+//   This OTA itself publishes to both (no marker on this commit) so
+//   both platforms pick up the new buildInfo + codename. Future
+//   iOS-only or Android-only pushes will skip the unaffected
+//   platform.
+//
+//   Files: .github/workflows/eas-update.yml (COMMIT_MSG env added to
+//          publish step; IOS_ONLY/ANDROID_ONLY booleans parsed
+//          before the case statement; HaL2001 case branches on
+//          markers to call publish_channel selectively),
+//          app/buildCodename.ts (Wax Mantle added),
+//          app/buildInfo.ts (OTA-283 bump + change note),
+//          docs/build-codenames.md (Wax Mantle moved to current; pool
+//          renumbered),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-283';

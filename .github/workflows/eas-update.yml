@@ -89,6 +89,13 @@ jobs:
       - name: Publish OTA update to Tartaria Realms (multi-channel)
         env:
           EXPO_TOKEN: ${{ secrets.TARTARIATWO }}
+          # OTA-283 — commit-message platform gates. Read the head
+          # commit message through env (NOT ${{ }} interpolation —
+          # multi-line messages with quotes/newlines blow up the
+          # script otherwise). Used by the HaL2001 case below to
+          # skip one platform when [ota-ios-only] or [ota-android-only]
+          # is in the commit title or body.
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
           set -euo pipefail
 
@@ -214,6 +221,28 @@ jobs:
             echo "✓ Channel '$channel' ($platform): published at runtimeVersion $published_rt."
           }
 
+          # OTA-283 — parse platform-specific publish markers from the
+          # commit message. [ota-ios-only] in the title or body skips
+          # the Android publish; [ota-android-only] skips the iOS
+          # publish. Default: neither, both publish. Used by the
+          # HaL2001 case below to avoid pushing a bundle to a platform
+          # the fix doesn't apply to (player feedback: don't churn
+          # OTA bundles on devices that don't need them).
+          IOS_ONLY=false
+          ANDROID_ONLY=false
+          if echo "$COMMIT_MSG" | grep -q '\[ota-ios-only\]'; then
+            IOS_ONLY=true
+          fi
+          if echo "$COMMIT_MSG" | grep -q '\[ota-android-only\]'; then
+            ANDROID_ONLY=true
+          fi
+          if [ "$IOS_ONLY" = "true" ] && [ "$ANDROID_ONLY" = "true" ]; then
+            echo "::warning::Both [ota-ios-only] AND [ota-android-only] markers found — ignoring both, publishing to both platforms."
+            IOS_ONLY=false
+            ANDROID_ONLY=false
+          fi
+          echo "Platform-marker state:  IOS_ONLY=$IOS_ONLY  ANDROID_ONLY=$ANDROID_ONLY"
+
           # 2026-05-30 — branch-isolated publish. Each source branch
           # publishes ONLY to its own channel, so no branch's OTA can
           # ever reach another branch's testers. On HaL2001 this means
@@ -237,8 +266,22 @@ jobs:
               # Best-effort (optional=true) so iOS publish failure
               # never blocks the Android publish that's been the
               # workhorse for months.
-              publish_channel "hal2001" "android" false
-              publish_channel "hal2001" "ios" true
+              # OTA-283 — platform-specific publish markers. Commit
+              # message can include [ota-ios-only] (skip Android
+              # publish) or [ota-android-only] (skip iOS publish) for
+              # platform-targeted fixes. Markers parsed above into
+              # IOS_ONLY / ANDROID_ONLY booleans. Default behavior
+              # (both platforms) when neither marker present.
+              if [ "${ANDROID_ONLY:-false}" = "true" ]; then
+                echo "::notice::[ota-android-only] marker found — skipping iOS publish for hal2001 channel."
+                publish_channel "hal2001" "android" false
+              elif [ "${IOS_ONLY:-false}" = "true" ]; then
+                echo "::notice::[ota-ios-only] marker found — skipping Android publish for hal2001 channel."
+                publish_channel "hal2001" "ios" true
+              else
+                publish_channel "hal2001" "android" false
+                publish_channel "hal2001" "ios" true
+              fi
               ;;
             iOS-initial)
               publish_channel "ios-preview" "ios" true

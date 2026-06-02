@@ -324,6 +324,21 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-283 (Wax Mantle) — Platform-specific OTA publish markers ([ota-ios-only] / [ota-android-only])
+
+- **OTA-283 · Player: *"When we are working on glitches for iOS that need iOS only, as in there are no issues on Android, only push it to iOS."*** Pre-OTA-283, every HaL2001 push published BOTH iOS and Android bundles to the `hal2001` channel (since Marble Anvil OTA-276 added iOS publishing). Result: Android testers got a new bundle for every iOS-only fix and saw an "Update applied: …" reload they didn't need.
+- **Fix:** new commit-message markers parsed in `.github/workflows/eas-update.yml`. Place either anywhere in the commit title or body:
+  - **`[ota-ios-only]`** → skips Android publish; only iOS hal2001 bundle ships
+  - **`[ota-android-only]`** → skips iOS publish; only Android hal2001 bundle ships
+  - **(no marker)** → publishes to both (default, unchanged)
+- **Implementation:**
+  - Added `COMMIT_MSG: ${{ github.event.head_commit.message }}` env to the publish step (NOT `${{ }}` interpolation inside the script — multi-line messages with quotes/newlines blow up the inline bash).
+  - Pre-case-statement parsing block sets `IOS_ONLY=true` / `ANDROID_ONLY=true` booleans via grep against `$COMMIT_MSG`. Both markers in the same commit cancel out (warning logged, defaults to publish-both — defensive against accidental mis-tagging).
+  - HaL2001 case branches on the booleans to call `publish_channel "hal2001" "ios" true` or `publish_channel "hal2001" "android" false` selectively. Default (no marker): both publish, same as before.
+- **Going forward:** keyboard / InputAccessoryView / iOS-only style work uses `[ota-ios-only]`. Android-only quick fixes use `[ota-android-only]`. Most OTAs (engine logic, content, JSON, shared UI) stay marker-free and publish to both as before.
+- **This OTA itself publishes to both** (no marker on this commit) so both platforms pick up the new buildInfo + codename + Wax Mantle. Future iOS-only or Android-only pushes will skip the unaffected platform.
+- **Files:** `.github/workflows/eas-update.yml` (COMMIT_MSG env added; IOS_ONLY/ANDROID_ONLY parsing block before case statement; HaL2001 case branches on markers), `app/buildCodename.ts` (Wax Mantle added), `app/buildInfo.ts` (OTA-283 bump + change note), `docs/build-codenames.md` (Wax Mantle moved to current; pool renumbered), HANDOFF.md (this entry).
+
 #### OTA-282 (Tar Vault) — Final ▼ state: in-row on iOS, nothing on Android (drops Accessory)
 
 - **OTA-282 · Player corrected my Pitch Spire interpretation with a Pixel screenshot circling the in-row position between input and Act:** *"its supposed to be here for ios and nowhere for android."* I had read their earlier "the down arrow is still in the wrong place" as pointing at the in-row ▼; they actually meant the InputAccessoryView bar above the keyboard was in the wrong place. The in-row position IS the correct iOS placement (the iOS keyboard pushes the row up so ▼ stays visible above it).
