@@ -43,6 +43,7 @@ bug reports.
 | `2026-06-02-278`        | Soot Helm      | Boot-stage telemetry in About (iOS Qwen-stuck-at-idle diagnostic) |
 | `2026-06-02-279`        | Ember Coil     | iOS InputAccessoryView Hide-Keyboard bar + brighter in-row ▼ |
 | `2026-06-02-280`        | Ash Fence      | Hide in-row ▼ on Android (system back already dismisses) |
+| `2026-06-02-281`        | Pitch Spire    | Remove in-row ▼ on iOS too (InputAccessoryView is the right place) |
 
 ## AAB codenames (separate pool, keyed by versionCode)
 
@@ -80,23 +81,22 @@ To keep codenames consistent and Tartaria-flavor without burning
 fresh creativity per OTA, the next codenames in order will be
 drawn from:
 
-1. Pitch Spire
-2. Tar Vault
-3. Wax Mantle
-4. Resin Drift
-5. Lacquer Anvil
-6. Gilt Tine
-7. Brass Helm
-8. Mire Coil
-9. Bog Fence
-10. Reed Spire
-11. Thorn Vault
-12. Briar Mantle
-13. Husk Drift
-14. Lichen Anvil
-15. Moss Tine
-16. Loam Helm
-17. Quartz Coil
+1. Tar Vault
+2. Wax Mantle
+3. Resin Drift
+4. Lacquer Anvil
+5. Gilt Tine
+6. Brass Helm
+7. Mire Coil
+8. Bog Fence
+9. Reed Spire
+10. Thorn Vault
+11. Briar Mantle
+12. Husk Drift
+13. Lichen Anvil
+14. Moss Tine
+15. Loam Helm
+16. Quartz Coil
 
 When bumping `OTA_BUILD_ID` in `app/buildInfo.ts`, also add an entry
 to `app/buildCodename.ts`'s `CODENAMES` map drawing from the next

@@ -547,29 +547,16 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             referenced by the in-game tutorial copy and a few
             engine breadcrumbs); only the UI affordance to
             invoke them is gone. */}
-        {/* OTA-277 — manual keyboard-dismiss chevron. iOS playtester:
-            "still cannot collapse keyboard, can we add a manual down
-            arrow button to collapse it as a work around kind of like
-            the iPad has." iOS iPhone keyboards don't include the
-            built-in hide-keyboard key that iPad keyboards do; tapping
-            outside the TextInput doesn't reliably dismiss in some
-            screens. This chevron is a guaranteed manual escape. Calls
-            Keyboard.dismiss() — works on both iOS and Android. */}
-        {/* OTA-280 — gated to iOS-only. Android playtester: "I don't
-            want that down arrow on android devices, it didn't have
-            that issue." Android's system back button already dismisses
-            the keyboard natively, so the in-row ▼ was redundant +
-            clutter. iOS keeps it as a fallback to the OTA-279
-            InputAccessoryView bar above the keyboard. */}
-        {Platform.OS === 'ios' ? (
-          <TouchableOpacity
-            style={styles.kbDismiss}
-            onPress={() => Keyboard.dismiss()}
-            accessibilityLabel="Hide keyboard"
-          >
-            <Text style={styles.kbDismissText}>▼</Text>
-          </TouchableOpacity>
-        ) : null}
+        {/* OTA-277 → OTA-281 history. Chalk Tine (277) added an in-row
+            ▼ next to Act. Ember Coil (279) added an iOS
+            InputAccessoryView bar above the keyboard. Ash Fence (280)
+            hid the in-row ▼ on Android. Pitch Spire (281) removes the
+            in-row ▼ on iOS too — it sits between input and Act where
+            the keyboard COVERS it when up (useless), and serves no
+            purpose when keyboard is down (nothing to dismiss). All
+            iOS keyboard-dismiss now flows through the
+            InputAccessoryView bar below — correct iOS pattern,
+            always visible when keyboard is up, vanishes with it. */}
         <TouchableOpacity style={styles.send} onPress={handleSubmit}>
           <Text style={styles.sendText}>Act</Text>
         </TouchableOpacity>

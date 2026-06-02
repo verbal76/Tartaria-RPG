@@ -11464,4 +11464,29 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          docs/build-codenames.md (Ash Fence moved to current; pool
 //          renumbered),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-280';
+// OTA-281 (Pitch Spire) — Remove in-row ▼ on iOS too. Player:
+//   "if that was your final ember coil update, the down arrow is
+//   still in the wrong place." Right — the in-row ▼ sits between
+//   input and Act where the iOS keyboard COVERS it when up. The
+//   correct iOS dismiss path is the InputAccessoryView bar that
+//   Ember Coil (OTA-279) added above the keyboard. The in-row ▼
+//   was always vestigial after Ember Coil — only iOS-gated for
+//   "fallback" but it never actually fell back to anything because
+//   the InputAccessoryView is the proper placement.
+//
+//   Final state across both platforms:
+//     - iOS:     no in-row ▼. InputAccessoryView "▼ Hide Keyboard"
+//                bar appears above the keyboard when typing.
+//     - Android: no in-row ▼ (since Ash Fence OTA-280). System back
+//                button dismisses the keyboard natively.
+//   Input row is now identical on both: [What do you do?] [Act].
+//
+//   Files: app/components/InputBox.tsx (in-row ▼ TouchableOpacity
+//          removed entirely; kbDismiss/kbDismissText styles left in
+//          place — unused but cheap, removable in a future cleanup),
+//          app/buildCodename.ts (Pitch Spire added),
+//          app/buildInfo.ts (OTA-281 bump + change note),
+//          docs/build-codenames.md (Pitch Spire moved to current; pool
+//          renumbered),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-281';

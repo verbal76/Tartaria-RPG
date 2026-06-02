@@ -324,6 +324,12 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-281 (Pitch Spire) — Remove in-row ▼ on iOS too (InputAccessoryView is the right place)
+
+- **OTA-281 · Player: *"if that was your final ember coil update, the down arrow is still in the wrong place."*** Right — the in-row ▼ next to Act got covered by the iOS keyboard when up (useless then) and served no purpose when keyboard was down (nothing to dismiss). Ember Coil's InputAccessoryView bar above the keyboard is the correct iOS dismiss path; the in-row ▼ was vestigial.
+- **Fix:** removed the in-row `TouchableOpacity` (and its iOS Platform.OS gate from Ash Fence) entirely. Input row is now identical on both platforms: `[What do you do?] [Act]`. iOS keyboard dismiss flows exclusively through the InputAccessoryView bar (OTA-279). Android keyboard dismiss flows through the system back button. `kbDismiss/kbDismissText` styles left in place — unused but cheap, removable in a future cleanup.
+- **Files:** `app/components/InputBox.tsx` (in-row ▼ JSX removed; replaced with a comment block tracing the OTA-277 → 279 → 280 → 281 evolution), `app/buildCodename.ts` (Pitch Spire added), `app/buildInfo.ts` (OTA-281 bump + change note), `docs/build-codenames.md` (Pitch Spire moved to current; pool renumbered), HANDOFF.md (this entry).
+
 #### OTA-280 (Ash Fence) — Hide in-row ▼ keyboard-dismiss on Android
 
 - **OTA-280 · Android playtester (user, on Pixel): *"I don't want that down arrow on android devices, it didn't have that issue."*** Right — Android's system back button dismisses the keyboard natively, so the in-row ▼ chevron we added in Chalk Tine (OTA-277) was redundant clutter on Android. The whole reason the chevron existed was the iOS-specific keyboard-stuck issue, which Android doesn't have.
