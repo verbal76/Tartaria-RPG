@@ -11324,4 +11324,37 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          docs/build-codenames.md (Marble Anvil moved to current;
 //          pool renumbered),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-276';
+// OTA-277 (Chalk Tine) — manual keyboard-dismiss chevron on the input
+//   row. iPhone playtester after Marble Anvil pull: "still cannot
+//   collapse keyboard, can we add a manual down arrow button to
+//   collapse it as a work around kind of like the iPad has."
+//
+//   iPad's iOS keyboard ships with a built-in hide-keyboard key in the
+//   bottom-right corner. iPhone's keyboard does NOT. Granite Drift's
+//   `keyboardShouldPersistTaps="handled"` fixed the chip-tap path
+//   inside SearchModal, but the main exploration TextInput on the
+//   ExplorationScreen has no equivalent escape — once the keyboard is
+//   up, only typing-and-submitting or backgrounding the app dismisses
+//   it. iOS Safari trick of swiping down on the keyboard doesn't apply
+//   to native RN TextInputs.
+//
+//   Fix: add a small ▼ button between the input field and the Act
+//   button. Calls `Keyboard.dismiss()` directly. Muted tone (darker
+//   than Act) so the player's eye still goes to the primary action.
+//   Works on both iOS (where it's actually needed) and Android (where
+//   it's a redundant affordance alongside the system back button).
+//
+//   This is a workaround, not a fix for the underlying iOS keyboard
+//   behavior — but the player asked for a workaround and it's a clean
+//   one. Future investigation: why is iOS not dismissing on outside-
+//   tap automatically? May need a global TouchableWithoutFeedback
+//   wrapper at the screen level. Deferred.
+//
+//   Files: app/components/InputBox.tsx (Keyboard import + chevron
+//          button + kbDismiss/kbDismissText styles),
+//          app/buildCodename.ts (Chalk Tine added),
+//          app/buildInfo.ts (OTA-277 bump + change note),
+//          docs/build-codenames.md (Chalk Tine moved to current; pool
+//          renumbered),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-277';

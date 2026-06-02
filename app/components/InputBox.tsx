@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Pressable } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Pressable, Keyboard } from 'react-native';
 import { TutorialTarget } from './TutorialTarget';
 // OTA-189 — speech-to-text removed entirely per player ask: "remove
 // the stt button, the code for it from the game, and the button for
@@ -532,6 +532,21 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             referenced by the in-game tutorial copy and a few
             engine breadcrumbs); only the UI affordance to
             invoke them is gone. */}
+        {/* OTA-277 — manual keyboard-dismiss chevron. iOS playtester:
+            "still cannot collapse keyboard, can we add a manual down
+            arrow button to collapse it as a work around kind of like
+            the iPad has." iOS iPhone keyboards don't include the
+            built-in hide-keyboard key that iPad keyboards do; tapping
+            outside the TextInput doesn't reliably dismiss in some
+            screens. This chevron is a guaranteed manual escape. Calls
+            Keyboard.dismiss() — works on both iOS and Android. */}
+        <TouchableOpacity
+          style={styles.kbDismiss}
+          onPress={() => Keyboard.dismiss()}
+          accessibilityLabel="Hide keyboard"
+        >
+          <Text style={styles.kbDismissText}>▼</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.send} onPress={handleSubmit}>
           <Text style={styles.sendText}>Act</Text>
         </TouchableOpacity>
@@ -727,6 +742,19 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   sendText: { color: '#e6d8b3', fontWeight: '700' },
+  // OTA-277 — manual keyboard-dismiss chevron. Sized to sit between
+  // input field and Act button without dominating the row. Muted tone
+  // (darker than Act) so the player's eye still goes to the primary
+  // action — this is a utility, not a verb.
+  kbDismiss: {
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 4,
+  },
+  kbDismissText: { color: '#7a705c', fontSize: 14, fontWeight: '700' },
   // OTA-189 — micBtn / micBtnActive / micBtnText styles removed
   // alongside the mic button. STT is gone from the game entirely;
   // only the TTS read-aloud path is still wired (and toggled from

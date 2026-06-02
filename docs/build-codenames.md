@@ -39,6 +39,7 @@ bug reports.
 | `2026-06-01-274`        | Bronze Mantle  | AAB codename split (Slate Keep = 263) + MIN_APK 247 → 263  |
 | `2026-06-01-275`        | Granite Drift  | iOS chip overflow + iPad width cap + keyboard auto-dismiss |
 | `2026-06-02-276`        | Marble Anvil   | iOS OTA publish gap fix (HaL2001 now publishes iOS to hal2001) |
+| `2026-06-02-277`        | Chalk Tine     | Manual keyboard-dismiss ▼ button on input row (iPhone workaround) |
 
 ## AAB codenames (separate pool, keyed by versionCode)
 
@@ -76,27 +77,26 @@ To keep codenames consistent and Tartaria-flavor without burning
 fresh creativity per OTA, the next codenames in order will be
 drawn from:
 
-1. Chalk Tine
-2. Soot Helm
-3. Ember Coil
-4. Ash Fence
-5. Pitch Spire
-6. Tar Vault
-7. Wax Mantle
-8. Resin Drift
-9. Lacquer Anvil
-10. Gilt Tine
-11. Brass Helm
-12. Mire Coil
-13. Bog Fence
-14. Reed Spire
-15. Thorn Vault
-16. Briar Mantle
-17. Husk Drift
-18. Lichen Anvil
-19. Moss Tine
-20. Loam Helm
-21. Quartz Coil
+1. Soot Helm
+2. Ember Coil
+3. Ash Fence
+4. Pitch Spire
+5. Tar Vault
+6. Wax Mantle
+7. Resin Drift
+8. Lacquer Anvil
+9. Gilt Tine
+10. Brass Helm
+11. Mire Coil
+12. Bog Fence
+13. Reed Spire
+14. Thorn Vault
+15. Briar Mantle
+16. Husk Drift
+17. Lichen Anvil
+18. Moss Tine
+19. Loam Helm
+20. Quartz Coil
 
 When bumping `OTA_BUILD_ID` in `app/buildInfo.ts`, also add an entry
 to `app/buildCodename.ts`'s `CODENAMES` map drawing from the next

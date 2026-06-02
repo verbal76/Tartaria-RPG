@@ -324,6 +324,14 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-277 (Chalk Tine) — Manual keyboard-dismiss ▼ button on input row
+
+- **OTA-277 · iPhone playtester (after Marble Anvil pull): *"still cannot collapse keyboard, can we add a manual down arrow button to collapse it as a work around kind of like the iPad has"*** — Granite Drift's `keyboardShouldPersistTaps="handled"` fixed the chip-tap path inside SearchModal, but the main exploration input bar's TextInput still has no explicit dismiss affordance on iPhone. iPad's iOS keyboard ships with a built-in hide-keyboard key in the bottom-right corner; iPhone's does not. Once the keyboard is up on iPhone, only typing-and-submitting or backgrounding the app dismisses it. The iOS Safari swipe-down trick doesn't apply to native RN TextInputs.
+- **Fix:** added a small ▼ button between the input field and the Act button in `app/components/InputBox.tsx:510-538`. Calls `Keyboard.dismiss()` directly via the standard react-native API. Muted tone (darker than Act) so the player's eye still goes to the primary action — it's a utility, not a verb. Works on both iOS (where it's actually needed) and Android (where it's a redundant affordance alongside the system back button — no harm).
+- **This is a workaround, not a fix for the underlying iOS keyboard behavior.** The player asked for a workaround and it's a clean one. Future investigation: why is iOS not dismissing on outside-tap automatically? May need a global `TouchableWithoutFeedback` wrapper at the screen level so any tap outside the TextInput dismisses. Deferred — the manual button covers the player's immediate need.
+- **OTA-only:** JS-side, ships through the OTA channel (now publishing to iOS hal2001 since Marble Anvil OTA-276). iPhone tester's next launch pulls Chalk Tine, sees the new ▼ button immediately.
+- **Files:** `app/components/InputBox.tsx` (Keyboard import + chevron button + kbDismiss/kbDismissText styles), `app/buildCodename.ts` (Chalk Tine added), `app/buildInfo.ts` (OTA-277 bump + change note), `docs/build-codenames.md` (Chalk Tine moved to current; pool renumbered), HANDOFF.md (this entry).
+
 #### OTA-276 (Marble Anvil) — iOS OTA publish gap fix (HaL2001 now publishes iOS)
 
 - **OTA-276 · iOS TestFlight tester (player's sister): *"I checked for updates. It said it was updated"*** — but her About export showed `OTA build ID: 2026-05-31-265` (Stone Mantle, the bundle baked into the first iOS TestFlight build) and `Last OTA applied: No (running the APK's embedded bundle)`. She was stuck on the iOS bundle from week-old build 1 and had never received any of the OTAs 266 → 275. Granite Drift's keyboard fix never reached her.
