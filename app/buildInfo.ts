@@ -11742,4 +11742,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //   AAB build (already triggered) is still valuable — patch-package
 //   blocklist is the real architectural fix; if it boots clean on
 //   the Pixel without OTA pulling the bad JSON, the blocklist wins.
-export const OTA_BUILD_ID = '2026-06-02-292';
+export const OTA_BUILD_ID = '2026-06-02-293';

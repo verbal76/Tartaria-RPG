@@ -59,6 +59,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-02-286': 'Gilt Tine',
   '2026-06-02-290': 'Reed Spire',
   '2026-06-02-292': 'Briar Mantle',
+  '2026-06-02-293': 'Husk Drift',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

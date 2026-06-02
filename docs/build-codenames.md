@@ -51,6 +51,7 @@ bug reports.
 | `2026-06-02-286`        | Gilt Tine      | Quantity stepper in SCRAP action modal (batch-scrap stacks) |
 | `2026-06-02-290`        | Reed Spire     | Emergency rollback — reverts OTAs 287-289 (Pixel 10 boot freeze) |
 | `2026-06-02-292`        | Briar Mantle   | Second emergency rollback — Thorn Vault (291) also froze Pixel 10 |
+| `2026-06-02-293`        | Husk Drift     | Isolation test — threads 4 → 1 only (no JSON tripling)     |
 
 ## AAB codenames (separate pool, keyed by versionCode)
 
@@ -89,12 +90,10 @@ fresh creativity per OTA, the next codenames in order will be
 drawn from:
 
 1. Thorn Vault
-2. Briar Mantle
-3. Husk Drift
-4. Lichen Anvil
-5. Moss Tine
-6. Loam Helm
-7. Quartz Coil
+2. Lichen Anvil
+3. Moss Tine
+4. Loam Helm
+5. Quartz Coil
 
 When bumping `OTA_BUILD_ID` in `app/buildInfo.ts`, also add an entry
 to `app/buildCodename.ts`'s `CODENAMES` map drawing from the next

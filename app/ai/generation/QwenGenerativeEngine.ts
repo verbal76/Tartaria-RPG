@@ -29,7 +29,12 @@ export interface QwenInitOptions {
   onProgress?: (status: QwenStatus, fraction: number) => void;
   /** Context window in tokens. Default 2048 (plenty for Arbiter prompts). */
   contextSize?: number;
-  /** Inference threads. Default 4 (sane for mid-tier mobile CPU). */
+  /** Inference threads. OTA-293 — default 4 → 1. Single-thread
+   *  inference eliminates ggml worker-pool races (suspected
+   *  contributor to Pixel 10 Pro XL / Tensor G4 SVE memcpy crashes).
+   *  ~2-3x slower narration cost but removes the only Qwen failure
+   *  mode without a code-level patch. Pairs with the AAB-level
+   *  patch-package blocklist for chips that hit the SVE bug. */
   threads?: number;
 }
 
@@ -170,7 +175,7 @@ export class QwenGenerativeEngine {
       await runtime.initialize({
         modelPath,
         contextSize: opts.contextSize ?? 2048,
-        threads: opts.threads ?? 4,
+        threads: opts.threads ?? 1,
       });
       this.runtime = runtime;
       this.status = 'ready';
