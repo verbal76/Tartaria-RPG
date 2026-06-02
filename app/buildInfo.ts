@@ -11827,4 +11827,40 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          app/buildInfo.ts (OTA-295 bump + this change note),
 //          docs/build-codenames.md (Moss Tine moved to current; pool
 //          renumbered), HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-295';
+// OTA-296 (Loam Helm) — JSON tripling reverted again. Definitive
+//   test of the red-herring theory: NEGATIVE. Player's Pixel 10 Pro
+//   XL could not apply Moss Tine (OTA-295) — CHECK FOR OTA UPDATE
+//   kept returning "up to date" across multiple cold-starts even
+//   after clearing Kokoro cache and confirming Lichen Anvil's
+//   defenses (Qwen sentinel, OTA gate, banner) were stable.
+//
+//   Reading: expo-updates pulled Moss Tine, attempted apply,
+//   bundle silently failed to load (Hermes choking on the tripled
+//   JSON object literals on Tensor G4 / Android 16 Beta), rolled
+//   back to Lichen Anvil without surfacing an error. Server then
+//   reported "up to date" because Moss Tine WAS technically the
+//   newest, just unusable.
+//
+//   So: JSON tripling is NOT a red herring. The earlier Brass Helm
+//   freezes had two compounding root causes: (a) mid-load corruption
+//   (fixed by Lichen Anvil), (b) JSON tripling specifically
+//   breaks Hermes bundle-load on Pixel 10. We need both fixes; this
+//   OTA backs out the JSON tripling permanently.
+//
+//   Loam Helm == Husk Drift content (threads 1) + Lichen Anvil
+//   defenses (sentinel + OTA gate + banner) + threads 1 → 2 (kept
+//   from Moss Tine) + small templates. Total set:
+//     ✅ Sentinel-based Qwen cache validation
+//     ✅ OTA button gate (modelsLoading)
+//     ✅ "Don't close" banner
+//     ✅ Qwen threads default 2 (not 4, not 1)
+//     ❌ JSON tripling (reverted again — confirmed Hermes incompat)
+//
+//   Files: app/data/lore/arbiter-intent-quotes.json (re-restored to
+//          pre-tripling small version), app/data/lore/arbiter-mood-
+//          quotes.json (same), app/buildCodename.ts (Loam Helm
+//          added), app/buildInfo.ts (OTA-296 bump + this change
+//          note), docs/build-codenames.md (Loam Helm moved to
+//          current; pool renumbered), HANDOFF.md (closed issue
+//          entry).
+export const OTA_BUILD_ID = '2026-06-02-296';
