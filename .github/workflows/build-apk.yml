@@ -15,6 +15,12 @@ name: Android Build (Tartaria Realms)
 # .NET PFX export didn't serialize the friendly name in a way Java
 # keytool reads. Replaced with a keytool-generated PKCS12 from the
 # generate-keystore.yml workflow run.
+#
+# OTA-297 (Quartz Coil) — trigger-touch comment for the Stone Castle
+# AAB build. The build-apk workflow's paths-ignore filter skips
+# `app/**` and `docs/**`, so an OTA bump alone won't fire the job; a
+# non-ignored file in the same commit is required. This comment is
+# the touch. See HANDOFF.md → OTA-297 entry for the AAB contents.
 
 on:
   push:

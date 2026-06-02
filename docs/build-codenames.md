@@ -55,6 +55,7 @@ bug reports.
 | `2026-06-02-294`        | Lichen Anvil   | Partial-model-load defense (Qwen sentinel + OTA gate + don't-close banner) |
 | `2026-06-02-295`        | Moss Tine      | Recontextualization — threads 1→2 + tripled templates restored |
 | `2026-06-02-296`        | Loam Helm      | JSON tripling reverted again (confirmed Hermes choke on Tensor G4) |
+| `2026-06-02-297`        | Quartz Coil    | Final stable wave-cap — JS companion to next AAB ([build-aab])    |
 
 ## AAB codenames (separate pool, keyed by versionCode)
 
@@ -67,24 +68,24 @@ About screen surfaces both.
 |-------------|--------------|----------------------------------------------|
 | `246`       | (unnamed)    | Predates the AAB codename layer; was running with OTA-265 (Stone Mantle) at upload time. |
 | `263`       | Slate Keep   | Pewter Vault (OTA-273) AAB. llama.rn SD865-class crash fix. |
+| `?` (TBD)   | Stone Castle | Quartz Coil (OTA-297) AAB. Final stable wave-cap. versionCode = GitHub run_number at build time; APK_CODENAMES entry follows once the run_number is known. |
 
 ### AAB reserved pool
 
 Stone / fortress / Tartaria-landmark style. AABs ship less often
 than OTAs and should feel bigger than the metallic-noun OTA pool.
 
-1. Stone Castle
-2. Granite Hold
-3. Marble Spire
-4. Onyx Tower
-5. Basalt Bulwark
-6. Obsidian Gate
-7. Skyhold
-8. Ironwall
-9. Worldgate
-10. Sunspire
-11. Hearthstone
-12. Deepforge
+1. Granite Hold
+2. Marble Spire
+3. Onyx Tower
+4. Basalt Bulwark
+5. Obsidian Gate
+6. Skyhold
+7. Ironwall
+8. Worldgate
+9. Sunspire
+10. Hearthstone
+11. Deepforge
 
 ## Reserved pool (assign next 30+ OTAs from this list)
 
@@ -92,8 +93,9 @@ To keep codenames consistent and Tartaria-flavor without burning
 fresh creativity per OTA, the next codenames in order will be
 drawn from:
 
-1. Thorn Vault
-2. Quartz Coil
+1. *(reserved pool exhausted — next codename should be drawn fresh
+   from a new metallic-noun pair. Thorn Vault was burned by the
+   reverted OTA-291 attempt; Quartz Coil shipped as OTA-297.)*
 
 When bumping `OTA_BUILD_ID` in `app/buildInfo.ts`, also add an entry
 to `app/buildCodename.ts`'s `CODENAMES` map drawing from the next

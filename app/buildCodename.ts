@@ -63,6 +63,7 @@ const CODENAMES: Record<string, string> = {
   '2026-06-02-294': 'Lichen Anvil',
   '2026-06-02-295': 'Moss Tine',
   '2026-06-02-296': 'Loam Helm',
+  '2026-06-02-297': 'Quartz Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA
@@ -80,6 +81,12 @@ const CODENAMES: Record<string, string> = {
 // they see in `Application.nativeBuildVersion`.
 const APK_CODENAMES: Record<number, string> = {
   263: 'Slate Keep',
+  // OTA-297 — next AAB codename is 'Stone Castle' (first in the
+  // fortress reserved pool). The versionCode key is stamped by the
+  // GitHub Actions run_number at build time, so it can't be filled
+  // in here pre-build. A small follow-up OTA after the [build-aab]
+  // commit lands will add the `<run_number>: 'Stone Castle'` entry
+  // once the AAB versionCode is known.
 };
 
 /**

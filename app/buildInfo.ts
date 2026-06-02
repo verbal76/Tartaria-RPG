@@ -11863,4 +11863,42 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          note), docs/build-codenames.md (Loam Helm moved to
 //          current; pool renumbered), HANDOFF.md (closed issue
 //          entry).
-export const OTA_BUILD_ID = '2026-06-02-296';
+// OTA-297 (Quartz Coil) — Final stable wave-cap. JS-side companion
+//   to the AAB that ships with the same commit ([build-aab]). No
+//   new code, no new defenses — this OTA exists so the EAS Update
+//   channel carries the same stable JS bundle that the Play Console
+//   AAB carries natively, so a tester opening the AAB on day one or
+//   a HaL sideload user pulling the OTA both land on the exact same
+//   confirmed-good state:
+//     ✅ Pewter Vault llama.rn patch (SD865 family blocklist; Tensor
+//        family NOT blocklisted — Pixel 10 self-inflicted freezes
+//        proved the user's hypothesis that the original SVE crash
+//        sig was a different-user issue and our crashes were
+//        mid-load corruption).
+//     ✅ Qwen threads default 2 (stable on Tensor G4; up from
+//        Husk Drift's diagnostic 1).
+//     ✅ Lichen Anvil defenses: Qwen GGUF .complete sentinel,
+//        TitleScreen OTA-button gate while models load, red
+//        "MODELS LOADING — DON'T CLOSE THE APP" banner.
+//     ✅ Small per-mood / per-intent template files (no tripling —
+//        confirmed Hermes-on-Tensor-G4 bundle-load choke; reverting
+//        was non-negotiable per Moss Tine post-mortem).
+//     ✅ All UX polish through OTA-296: iOS InputAccessoryView,
+//        scrap quantity stepper, voice volume slider, vendor
+//        TRADE NOW shortcut, platform-specific OTA publish markers.
+//
+//   Native AAB shipped from this commit gets the next fortress
+//   codename (Stone Castle). versionCode is stamped by the GitHub
+//   Actions run_number; an entry in `APK_CODENAMES` will follow in
+//   a small OTA after the AAB upload completes and the run_number
+//   is known.
+//
+//   Files: app/buildCodename.ts (Quartz Coil added; Stone Castle
+//          placeholder note), app/buildInfo.ts (OTA-297 bump + this
+//          change note), docs/build-codenames.md (Quartz Coil moved
+//          to current; Stone Castle reserved → assigned next AAB;
+//          Thorn Vault marked as burned/reverted), .github/workflows/
+//          build-apk.yml (workflow trigger touch — non-app-paths file
+//          required to fire the [build-aab] build), HANDOFF.md
+//          (closed issue entry consolidating the Pixel 10 saga).
+export const OTA_BUILD_ID = '2026-06-02-297';
