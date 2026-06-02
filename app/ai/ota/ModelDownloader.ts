@@ -146,31 +146,6 @@ export class ModelDownloader {
   }
 
   /**
-   * OTA-288 — manual cache-clear for the Qwen GGUF. Used by the
-   * About → Voice → Bundled "RE-DOWNLOAD QWEN MODEL" button. If a
-   * cached file is partially corrupt (transient network truncation
-   * that passed the >200MB size check but has byte errors), every
-   * generate call faults on the same bad region. Nuking the file +
-   * re-running ensureQwenGguf forces a clean download.
-   *
-   * Returns true if a file existed and was deleted, false if nothing
-   * was there. Doesn't throw — best-effort.
-   */
-  async clearQwenCache(): Promise<boolean> {
-    const root = FileSystem.documentDirectory;
-    if (!root) return false;
-    const ggufPath = root + QWEN_CACHE_SUBDIR + QWEN_GGUF_FILE_NAME;
-    try {
-      const info = await FileSystem.getInfoAsync(ggufPath);
-      if (!info.exists) return false;
-      await FileSystem.deleteAsync(ggufPath, { idempotent: true });
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  /**
    * Ensures the Qwen GGUF is present on the device. Downloads from
    * HuggingFace on first run, caches under
    *   documentDirectory/tartaria-models/qwen/qwen2.5-0.5b-instruct-q4_k_m.gguf

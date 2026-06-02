@@ -50,7 +50,6 @@ bug reports.
 | `2026-06-02-285`        | Lacquer Anvil  | Master TTS volume slider (system + Kokoro engines)         |
 | `2026-06-02-286`        | Gilt Tine      | Quantity stepper in SCRAP action modal (batch-scrap stacks) |
 | `2026-06-02-287`        | Brass Helm     | Slate Spire mid-use crash detector + tripled Arbiter quote library |
-| `2026-06-02-288`        | Mire Coil      | Qwen threads 4→2 + RE-DOWNLOAD QWEN MODEL button (Pixel 10 testbed) |
 
 ## AAB codenames (separate pool, keyed by versionCode)
 
@@ -88,15 +87,16 @@ To keep codenames consistent and Tartaria-flavor without burning
 fresh creativity per OTA, the next codenames in order will be
 drawn from:
 
-1. Bog Fence
-2. Reed Spire
-3. Thorn Vault
-4. Briar Mantle
-5. Husk Drift
-6. Lichen Anvil
-7. Moss Tine
-8. Loam Helm
-9. Quartz Coil
+1. Mire Coil
+2. Bog Fence
+3. Reed Spire
+4. Thorn Vault
+5. Briar Mantle
+6. Husk Drift
+7. Lichen Anvil
+8. Moss Tine
+9. Loam Helm
+10. Quartz Coil
 
 When bumping `OTA_BUILD_ID` in `app/buildInfo.ts`, also add an entry
 to `app/buildCodename.ts`'s `CODENAMES` map drawing from the next
