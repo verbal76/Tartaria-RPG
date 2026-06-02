@@ -11651,4 +11651,45 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          docs/build-codenames.md (Lacquer Anvil moved to current;
 //          pool renumbered),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-285';
+// OTA-286 (Gilt Tine) — quantity stepper in the inventory SCRAP
+//   action modal. Player log on Slate Keep showed 5 Aetheric Locket
+//   + 5 Worn Tartarian Coin scrapped in ~30 seconds, one tap at a
+//   time. Player ask: "The same up and down numerical box that
+//   you're using for the volume sliders and to the scrap pop-up. so
+//   when you scrap something you can choose the amount instead of
+//   doing the same scrapping maneuver over and over and over."
+//
+//   Fix in three pieces:
+//     1. `BrandedModal` gains an optional `quantityStepper` prop
+//        ({ label, value, min, max, onChange }) — sits between the
+//        body text and the buttons. Reuses the existing
+//        NumberStepper component (same look/feel as the Volume /
+//        Rate / Pitch steppers in About → Voice / Music).
+//     2. `InventoryScreen` adds a `scrapQty` state (resets to 1 when
+//        the pending item changes) and renders the stepper ONLY when
+//        the pending item is a 2+ stack AND scrap-able AND not the
+//        equipped instance. Stack of 1 / non-scrap items / equipped
+//        items → no stepper (modal identical to pre-OTA-286).
+//     3. `doScrap` loops `scrapInventoryItem(name)` for N=scrapQty
+//        iterations. Each iteration runs its own RNG roll + grant +
+//        log entry (so the world feed shows each yield separately —
+//        useful for debugging odd results). The combined delta from
+//        before-N to after-N is shown in the modal's result body.
+//        Clamped to current stack size in case it shifted while the
+//        modal was open.
+//
+//   Cross-platform UX feature. No platform marker — both iOS and
+//   Android scrap stacks the same way.
+//
+//   Files: app/components/BrandedModal.tsx (quantityStepper prop +
+//          render block + stepperRow/stepperLabel styles +
+//          NumberStepper import),
+//          app/screens/InventoryScreen.tsx (scrapQty state + reset
+//          effect + batch loop in doScrap + quantityStepper wired
+//          to the modal),
+//          app/buildCodename.ts (Gilt Tine added),
+//          app/buildInfo.ts (OTA-286 bump + change note),
+//          docs/build-codenames.md (Gilt Tine moved to current; pool
+//          renumbered),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-286';

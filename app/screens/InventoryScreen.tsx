@@ -91,6 +91,17 @@ export function InventoryScreen() {
   // pack" summary with a single CLOSE button. Cleared on next
   // item-tap.
   const [scrapResult, setScrapResult] = useState<InventoryDelta[] | null>(null);
+  // OTA-286 — quantity selector for batch scrap. Player log showed
+  // 5 Aetheric Locket + 5 Worn Tartarian Coin scrapped in rapid
+  // succession one tap at a time. Stepper lets them pick the count
+  // up front; doScrap loops scrapInventoryItem that many times.
+  // Reset to 1 whenever the pending item changes (different items
+  // start fresh; same item lets the player re-tap with a remembered
+  // qty if they want).
+  const [scrapQty, setScrapQty] = useState(1);
+  useEffect(() => {
+    setScrapQty(1);
+  }, [pending?.item.id]);
   // OTA-087 — search query + sort axis state. Ephemeral (not
   // persisted across sessions); resets to defaults on each
   // mount. Query is a case-insensitive substring match against
@@ -235,11 +246,22 @@ export function InventoryScreen() {
   };
   const doScrap = () => {
     if (!pending) return;
-    // Snapshot inventory BEFORE scrap so we can diff what landed.
-    // scrapInventoryItem is synchronous, so by the time we re-read
-    // useGameStore.getState() the mutation has already happened.
+    // Snapshot inventory BEFORE the whole batch so we can diff the
+    // combined output across all N iterations. scrapInventoryItem
+    // is synchronous, so each iteration's mutation is settled before
+    // the next call runs.
     const before = (useGameStore.getState().player?.inventory ?? []).map((i) => ({ ...i }));
-    scrapInventoryItem(pending.item.name);
+    // OTA-286 — loop scrap N times based on stepper value. Each call
+    // does its own RNG roll + grant + log entry (so the player sees
+    // each yield individually in the world feed), and the modal's
+    // result body shows the combined delta. Clamp to the current
+    // stack size in case the inventory shifted while the modal was
+    // open (e.g., an autosave dock event).
+    const stack = pending.item.quantity ?? 1;
+    const reps = Math.max(1, Math.min(scrapQty, stack));
+    for (let i = 0; i < reps; i++) {
+      scrapInventoryItem(pending.item.name);
+    }
     const after = useGameStore.getState().player?.inventory ?? [];
     const delta = computeInventoryDelta(before, after);
     setScrapResult(delta);
@@ -565,6 +587,29 @@ export function InventoryScreen() {
               : undefined
         }
         body={scrapResultBody ?? modalBody}
+        // OTA-286 — quantity stepper appears when the player is
+        // looking at a stack of 2+ scrap-able items AND we're still
+        // in the action phase (not the post-salvage result view) AND
+        // the specific stack the player tapped isn't an equipped
+        // instance (id match via equippedItemIds). Lets them batch-
+        // scrap N at once instead of tapping Scrap back-to-back.
+        // Stack of 1, non-scrap-able items, equipped instance → no
+        // stepper; modal looks identical to before.
+        quantityStepper={
+          scrapResult === null
+          && pending
+          && pending.item.quantity > 1
+          && canScrap(pending.item)
+          && !equippedItemIds.has(pending.item.id)
+            ? {
+                label: 'Scrap how many?',
+                value: Math.max(1, Math.min(scrapQty, pending.item.quantity)),
+                min: 1,
+                max: pending.item.quantity,
+                onChange: setScrapQty,
+              }
+            : undefined
+        }
         buttons={scrapResultButtons ?? buildModalButtons()}
         onRequestClose={closeModal}
       />

@@ -324,6 +324,16 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-286 (Gilt Tine) — Quantity stepper in SCRAP action modal (batch-scrap stacks)
+
+- **OTA-286 · Pixel 10 Pro XL player log on Slate Keep showed 5 Aetheric Locket + 5 Worn Tartarian Coin scrapped in ~30 seconds, one tap at a time. Player ask: *"The same up and down numerical box that you're using for the volume sliders and to the scrap pop-up. so when you scrap something you can choose the amount instead of doing the same scrapping maneuver over and over and over."*** Same NumberStepper component used in About → Voice / Music for Volume / Rate / Pitch.
+- **Fix in three pieces:**
+  1. **`BrandedModal` gains a `quantityStepper` prop** (`{ label, value, min, max, onChange }`) — sits between body text and buttons. Reuses NumberStepper; same look/feel as the About steppers so players recognize the control on sight.
+  2. **`InventoryScreen` adds `scrapQty` state** (resets to 1 when pending item changes via `useEffect` on `pending?.item.id`) and renders the stepper ONLY when the pending item is a 2+ stack AND scrap-able AND not the equipped instance (id-match via `equippedItemIds`). Stack of 1 / non-scrap-able / equipped → no stepper, modal looks identical to pre-OTA-286.
+  3. **`doScrap` loops `scrapInventoryItem(name)` for N=scrapQty iterations.** Each iteration runs its own RNG roll + grant + log entry (world feed shows each yield separately — useful for debugging odd results). The combined delta from before-N to after-N is shown in the modal's result body. Clamped to current stack size in case it shifted while the modal was open.
+- **Cross-platform UX feature.** No platform marker — both iOS and Android players scrap stacks the same way. Publishes to both.
+- **Files:** `app/components/BrandedModal.tsx` (quantityStepper prop + render block between body and buttons + stepperRow/stepperLabel styles + NumberStepper import), `app/screens/InventoryScreen.tsx` (scrapQty state + reset effect + batch loop in doScrap + quantityStepper wired to the modal), `app/buildCodename.ts` (Gilt Tine added), `app/buildInfo.ts` (OTA-286 bump + change note), `docs/build-codenames.md` (Gilt Tine moved to current; pool renumbered), HANDOFF.md (this entry).
+
 #### OTA-285 (Lacquer Anvil) — Master TTS volume slider (system + Kokoro engines)
 
 - **OTA-285 · Player: *"I just noticed there is no volume control for the voice like there is for the music, we need that."*** Right — the Voice settings card had Rate / Pitch / engine picker / voice picker but no Volume. Voice playback rode at 100% with no user-facing dial. The Music settings card had Enabled + Volume; voice was missing the Volume parallel.

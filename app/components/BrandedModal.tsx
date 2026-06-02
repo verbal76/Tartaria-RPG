@@ -10,6 +10,7 @@ import {
   TextInput,
 } from 'react-native';
 import type { ItemPreview } from './itemPreview';
+import { NumberStepper } from './NumberStepper';
 
 export interface BrandedModalButton {
   label: string;
@@ -36,6 +37,19 @@ interface Props {
     placeholder?: string;
     autoFocus?: boolean;
   };
+  /** OTA-286 — Optional quantity stepper rendered between the body
+   *  and the buttons. Reuses the same NumberStepper component used
+   *  in About settings (Volume / Rate / Pitch). Used by the inventory
+   *  Scrap path so the player can choose how many to scrap at once
+   *  instead of tapping Scrap N times. `label` shows above the
+   *  stepper ("Scrap how many?"). */
+  quantityStepper?: {
+    label: string;
+    value: number;
+    min: number;
+    max: number;
+    onChange: (v: number) => void;
+  };
   buttons: BrandedModalButton[];
   onRequestClose: () => void;
 }
@@ -50,6 +64,7 @@ export function BrandedModal({
   itemPreview,
   contextLine,
   textInput,
+  quantityStepper,
   buttons,
   onRequestClose,
 }: Props) {
@@ -108,6 +123,21 @@ export function BrandedModal({
                   autoFocus={textInput.autoFocus}
                   selectionColor="#c9a86a"
                 />
+              ) : null}
+              {quantityStepper ? (
+                <View style={styles.stepperRow}>
+                  <Text style={styles.stepperLabel}>{quantityStepper.label}</Text>
+                  <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                    <NumberStepper
+                      value={quantityStepper.value}
+                      min={quantityStepper.min}
+                      max={quantityStepper.max}
+                      step={1}
+                      decimals={0}
+                      onChange={quantityStepper.onChange}
+                    />
+                  </View>
+                </View>
               ) : null}
 
               <View style={styles.buttonRow}>
@@ -208,6 +238,11 @@ const styles = StyleSheet.create({
   statLine: { color: '#cdbf99', fontSize: 12 },
   itemDesc: { color: '#7a705c', fontSize: 11, marginTop: 8, fontStyle: 'italic' },
   body: { color: '#e6d8b3', fontSize: 13, lineHeight: 18, marginBottom: 4 },
+  // OTA-286 — quantity stepper row inside the action modal. Mirrors
+  // the About screen's volume / rate / pitch row layout exactly so
+  // the player recognizes the control on sight.
+  stepperRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8, marginBottom: 4, gap: 8 },
+  stepperLabel: { color: '#cdbf99', fontSize: 12, letterSpacing: 1 },
   context: { color: '#9ec96a', fontSize: 12, marginTop: 8, letterSpacing: 1 },
   buttonRow: {
     // Buttons stack vertically so three-action modals (Equip Main Hand /
