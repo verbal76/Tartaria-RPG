@@ -29,7 +29,13 @@ export interface QwenInitOptions {
   onProgress?: (status: QwenStatus, fraction: number) => void;
   /** Context window in tokens. Default 2048 (plenty for Arbiter prompts). */
   contextSize?: number;
-  /** Inference threads. Default 4 (sane for mid-tier mobile CPU). */
+  /** Inference threads. OTA-288 — default dropped from 4 → 2.
+   *  Pixel 10 Pro XL / Tensor G4 / Android 16 Beta hit SIGSEGV in
+   *  lm_ggml_graph_compute_thread (worker thread). Fewer workers
+   *  reduce concurrent SIMD-memcpy pressure. Modest perf cost
+   *  (~10-20%), large reliability win on affected devices.
+   *  Modern CPUs (Pixel 8+, S24+) still benefit from the remaining
+   *  concurrency. */
   threads?: number;
 }
 
@@ -170,7 +176,7 @@ export class QwenGenerativeEngine {
       await runtime.initialize({
         modelPath,
         contextSize: opts.contextSize ?? 2048,
-        threads: opts.threads ?? 4,
+        threads: opts.threads ?? 2,
       });
       this.runtime = runtime;
       this.status = 'ready';

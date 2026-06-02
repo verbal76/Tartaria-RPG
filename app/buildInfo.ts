@@ -11751,4 +11751,61 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          docs/build-codenames.md (Brass Helm moved to current;
 //          pool renumbered),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-287';
+// OTA-288 (Mire Coil) — defensive Qwen-crash mitigations. Player on
+//   Pixel 10 Pro XL (Tensor G4 / Android 16 Beta — at 1/2 mid-use
+//   crashes): "ship A and B. take my phone off of the block list and
+//   will use mine as the tests run."
+//
+//   Two cheap shots before committing to the AAB rebuild path:
+//
+//   1. Thread count default dropped from 4 → 2 in
+//      QwenGenerativeEngine.initialize. Per the upstream-fix
+//      discussion (Termux / NDK crash threads), fewer concurrent
+//      ggml workers reduce simultaneous SIMD-memcpy pressure on
+//      affected devices. Modest perf cost (~10-20% on mid-range
+//      mobile CPUs). Probably WON'T fix the SVE-on-Tensor-G4
+//      signature (the crash is at instruction execution, not race
+//      condition) — but it's free to try, and may help if it's a
+//      latent race we don't have a signature for.
+//
+//   2. NEW "RE-DOWNLOAD QWEN MODEL" button in About → Voice →
+//      Bundled. Nukes the cached GGUF via new
+//      ModelDownloader.clearQwenCache(), then shutdownQwen +
+//      bootQwen to force a fresh download. Same rationale as the
+//      existing CLEAR BUNDLED VOICE CACHE pattern but for the
+//      generator file. If a transient network truncation passed
+//      the >200 MB size check but left byte errors, every generate
+//      call faults the same way — re-download fixes that case
+//      (but won't fix SVE compilation issues).
+//
+//   The user's Pixel 10 Pro XL STAYS off any block list (current
+//   patch-package blocklist doesn't include Tensor G4, and we're
+//   NOT adding it here). Their phone is the production test bench
+//   for whether A + B help. If their Pixel keeps crashing after
+//   Mire Coil, the AAB rebuild with blocklist extension becomes
+//   the next move. The data answers the question cleanly.
+//
+//   Honest disclosure: per the SVE-compilation-flag discussion in
+//   upstream, the real fix is -DGGML_SVE=OFF at compile time
+//   (which is what the AAB rebuild blocklist achieves by forcing
+//   the v8_4_fp16_dotprod variant compiled without +sve). Thread
+//   reduction + cache clear are stopgaps that test cheaper
+//   hypotheses first. Documented in HANDOFF.
+//
+//   Cross-platform OTA, no marker. iPhone testers also benefit
+//   from the thread reduction (less battery drain on background
+//   narration generation) — small win.
+//
+//   Files: app/ai/generation/QwenGenerativeEngine.ts (threads
+//          default 4 → 2; doc updated),
+//          app/ai/ota/ModelDownloader.ts (clearQwenCache method
+//          + JSDoc),
+//          app/screens/AboutScreen.tsx (ModelDownloader import +
+//          handleClearQwenCache handler + qwenCacheCleared state +
+//          RE-DOWNLOAD QWEN MODEL button),
+//          app/buildCodename.ts (Mire Coil added),
+//          app/buildInfo.ts (OTA-288 bump + change note),
+//          docs/build-codenames.md (Mire Coil moved to current;
+//          pool renumbered),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-288';

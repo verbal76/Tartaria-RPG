@@ -6,6 +6,9 @@ import { useGameStore } from '../state/gameStore';
 import { OTA_BUILD_ID } from '../buildInfo';
 import { getBuildCodename } from '../buildCodename';
 import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
+// OTA-288 — Qwen GGUF cache clear (manual re-download). Used by the
+// "RE-DOWNLOAD QWEN MODEL" button below the bundled-voice section.
+import { ModelDownloader } from '../ai/ota/ModelDownloader';
 import { buildInventorySnapshot, stampInventoryExport } from '../diagnostics/inventorySnapshot';
 import { NumberStepper } from '../components/NumberStepper';
 import { LoreCodexBody } from '../components/LoreCodexBody';
@@ -482,6 +485,26 @@ export function AboutScreen() {
     setTimeout(() => setKokoroCacheCleared(false), 3000);
   }
 
+  // OTA-288 — manual Qwen GGUF cache clear + reinit. For players
+  // whose Qwen is crashing during generate() (Pixel 10 Pro XL on
+  // Android 16 Beta SVE-memcpy signature is the suspected cause but
+  // a corrupt cached GGUF is the other suspect). Nuking the file
+  // and forcing a re-download tests the corrupt-file hypothesis
+  // cheaply. forceReinitialize on Qwen makes it download + re-load.
+  const [qwenCacheCleared, setQwenCacheCleared] = useState(false);
+  async function handleClearQwenCache() {
+    await new ModelDownloader().clearQwenCache();
+    // Kick a re-init in the background — non-blocking. forceReinit
+    // bypasses the "already ready" short-circuit and re-runs the
+    // download + load path. The Qwen status banner on About will
+    // reflect "downloading…" as the new file pulls in.
+    void useGameStore.getState().shutdownQwen().then(() => {
+      void useGameStore.getState().bootQwen();
+    });
+    setQwenCacheCleared(true);
+    setTimeout(() => setQwenCacheCleared(false), 3000);
+  }
+
   // Populate the cache snapshot once on mount so COPY VOICE INFO
   // has something to include even on the first copy without
   // waiting for the inspector to roundtrip.
@@ -779,6 +802,22 @@ export function AboutScreen() {
                   >
                     <Text style={[styles.applyBtnText, { color: '#c9a26a' }]}>
                       {kokoroCacheCleared ? 'CACHE CLEARED — TAP TEST VOICE' : 'CLEAR BUNDLED VOICE CACHE'}
+                    </Text>
+                  </TouchableOpacity>
+                  {/* OTA-288 — Qwen GGUF re-download button. Separate
+                      action from the Kokoro voice cache above (Qwen
+                      generates the Arbiter's text; Kokoro is the
+                      voice that reads it). For players whose Qwen is
+                      crashing during narration, a corrupt cached
+                      GGUF is one possible cause — this button nukes
+                      the file and forces a clean re-download. */}
+                  <TouchableOpacity
+                    onPress={handleClearQwenCache}
+                    style={[styles.applyBtn, { marginTop: 4, backgroundColor: 'transparent', borderColor: '#5a3a2a', borderWidth: 1 }]}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.applyBtnText, { color: '#c9a26a' }]}>
+                      {qwenCacheCleared ? 'QWEN MODEL CLEARED — RE-DOWNLOADING…' : 'RE-DOWNLOAD QWEN MODEL'}
                     </Text>
                   </TouchableOpacity>
                   <View style={styles.musicRow}>
