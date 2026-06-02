@@ -11731,4 +11731,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          docs/build-codenames.md (Reed Spire moved to current;
 //          pool renumbered),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-290';
+// OTA-292 (Briar Mantle) — second emergency rollback. Thorn Vault
+//   (OTA-291) ALSO froze the Pixel 10 Pro XL on apply (~5 minutes
+//   stuck on the white intro screen). Reverted three Thorn Vault
+//   changes: patch-package blocklist extension, Qwen threads
+//   default 4 → 1, tripled Arbiter template library.
+//   Briar Mantle == Reed Spire == Gilt Tine content. Version-string
+//   bump only. Strongest suspect remaining: large JSON additions
+//   interacting badly with Hermes on Tensor G4 / Android 16 Beta.
+//   AAB build (already triggered) is still valuable — patch-package
+//   blocklist is the real architectural fix; if it boots clean on
+//   the Pixel without OTA pulling the bad JSON, the blocklist wins.
+export const OTA_BUILD_ID = '2026-06-02-292';

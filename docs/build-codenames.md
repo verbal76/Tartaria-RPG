@@ -50,6 +50,7 @@ bug reports.
 | `2026-06-02-285`        | Lacquer Anvil  | Master TTS volume slider (system + Kokoro engines)         |
 | `2026-06-02-286`        | Gilt Tine      | Quantity stepper in SCRAP action modal (batch-scrap stacks) |
 | `2026-06-02-290`        | Reed Spire     | Emergency rollback — reverts OTAs 287-289 (Pixel 10 boot freeze) |
+| `2026-06-02-292`        | Briar Mantle   | Second emergency rollback — Thorn Vault (291) also froze Pixel 10 |
 
 ## AAB codenames (separate pool, keyed by versionCode)
 
