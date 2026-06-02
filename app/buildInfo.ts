@@ -11692,4 +11692,43 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          docs/build-codenames.md (Gilt Tine moved to current; pool
 //          renumbered),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-286';
+// OTA-290 (Reed Spire) — emergency rollback. Player on Pixel 10 Pro
+//   XL: "big fence update froze on black screen and did not complete,
+//   and one of the previous installs froze on the white intro
+//   screen." OTAs 287 (Brass Helm) → 288 (Mire Coil) → 289 (Bog
+//   Fence) all broke the boot path on Pixel 10 Pro XL / Android 16
+//   Beta. Reverts via git of all three landed; this OTA bump
+//   re-publishes Gilt Tine's contents under a NEW OTA_BUILD_ID +
+//   codename so the user's device picks it up cleanly.
+//
+//   Effectively: Reed Spire == Gilt Tine functionally. Same engine,
+//   same UI, same templates, same threads (4). The version string
+//   bump is the only mechanical change — it forces expo-updates to
+//   see this as a "new" update worth pulling (in case Bog Fence's
+//   bundle is being silently rejected from the device's "bad
+//   bundle" list).
+//
+//   Diagnosis still pending: WHAT in Brass Helm broke boot on the
+//   Pixel? Top suspects (none confirmed yet):
+//     - markMLGenerateAttempted / Succeeded wrap around qwen.stream
+//       in narrateViaArbiter — could be triggering an import-time or
+//       first-call side effect on Pixel 10
+//     - Big JSON additions to arbiter-intent-quotes.json /
+//       arbiter-mood-quotes.json — possible bundle-size or parse
+//       interaction
+//     - Some Mire Coil change (threads 4→2, ModelDownloader.
+//       clearQwenCache, AboutScreen RE-DOWNLOAD button) — less
+//       likely but Mire Coil layered on top of Brass Helm so
+//       hard to isolate without bisecting
+//   Bisecting investigation deferred until user is stable on Reed
+//   Spire and we can hand-pick changes carefully.
+//
+//   Cross-platform, no marker.
+//
+//   Files: 3 git-reverts (Bog Fence, Mire Coil, Brass Helm),
+//          app/buildCodename.ts (Reed Spire added),
+//          app/buildInfo.ts (OTA-290 bump + this change note),
+//          docs/build-codenames.md (Reed Spire moved to current;
+//          pool renumbered),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-290';
