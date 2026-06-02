@@ -11788,4 +11788,43 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          app/buildInfo.ts (OTA-294 bump + this change note),
 //          docs/build-codenames.md (Lichen Anvil moved to current;
 //          pool renumbered), HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-294';
+// OTA-295 (Moss Tine) — recontextualization push. Player insight
+//   recast the entire day's diagnosis: the freezes weren't bundle
+//   parsing failures, they were mid-load cache corruption caused by
+//   the player killing the app before Qwen+Kokoro finished loading.
+//   Lichen Anvil (OTA-294) shipped the corruption defenses (Qwen
+//   GGUF sentinel, OTA button gate, don't-close banner). With those
+//   in place, the changes we previously blamed for freezes can be
+//   safely retested:
+//
+//   1. Qwen threads default 1 → 2. Husk Drift dropped to 1 on the
+//      assumption that worker-pool races caused crashes; mid-load
+//      corruption was the real cause. 2 is the middle ground —
+//      half the perf cost of single-thread, still drops concurrent
+//      SIMD pressure significantly vs 4.
+//
+//   2. Arbiter template library tripled (again). Re-applies the
+//      ~300 new lines across arbiter-intent-quotes.json (~160 new)
+//      and arbiter-mood-quotes.json (~144 new) that we'd reverted
+//      twice as suspected freeze culprits. If the freezes were
+//      actually mid-load corruption misattributed to JSON size,
+//      this OTA ships clean.
+//
+//   The Pewter Vault Java blocklist (SD865 family) stays as-is.
+//   Tensor G4 / Pixel 10 NOT added to blocklist — the player's
+//   reasoning: their own crashes today were self-inflicted via
+//   kill-mid-load, not real SVE inference failures. (Caveat: the
+//   original Play Console crash signature from a different Pixel
+//   10 user is still on the table; if it recurs after Moss Tine
+//   ships to Slate Keep testers, we revisit the blocklist.)
+//
+//   Cross-platform OTA, no marker. JS-only.
+//
+//   Files: app/ai/generation/QwenGenerativeEngine.ts (threads 1 → 2;
+//          comment updated), app/data/lore/arbiter-intent-quotes.json
+//          (re-tripled), app/data/lore/arbiter-mood-quotes.json
+//          (re-tripled), app/buildCodename.ts (Moss Tine added),
+//          app/buildInfo.ts (OTA-295 bump + this change note),
+//          docs/build-codenames.md (Moss Tine moved to current; pool
+//          renumbered), HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-295';

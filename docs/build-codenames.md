@@ -53,6 +53,7 @@ bug reports.
 | `2026-06-02-292`        | Briar Mantle   | Second emergency rollback — Thorn Vault (291) also froze Pixel 10 |
 | `2026-06-02-293`        | Husk Drift     | Isolation test — threads 4 → 1 only (no JSON tripling)     |
 | `2026-06-02-294`        | Lichen Anvil   | Partial-model-load defense (Qwen sentinel + OTA gate + don't-close banner) |
+| `2026-06-02-295`        | Moss Tine      | Recontextualization — threads 1→2 + tripled templates restored |
 
 ## AAB codenames (separate pool, keyed by versionCode)
 
@@ -91,9 +92,8 @@ fresh creativity per OTA, the next codenames in order will be
 drawn from:
 
 1. Thorn Vault
-2. Moss Tine
-3. Loam Helm
-4. Quartz Coil
+2. Loam Helm
+3. Quartz Coil
 
 When bumping `OTA_BUILD_ID` in `app/buildInfo.ts`, also add an entry
 to `app/buildCodename.ts`'s `CODENAMES` map drawing from the next

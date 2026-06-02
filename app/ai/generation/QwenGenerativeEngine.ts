@@ -29,12 +29,14 @@ export interface QwenInitOptions {
   onProgress?: (status: QwenStatus, fraction: number) => void;
   /** Context window in tokens. Default 2048 (plenty for Arbiter prompts). */
   contextSize?: number;
-  /** Inference threads. OTA-293 — default 4 → 1. Single-thread
-   *  inference eliminates ggml worker-pool races (suspected
-   *  contributor to Pixel 10 Pro XL / Tensor G4 SVE memcpy crashes).
-   *  ~2-3x slower narration cost but removes the only Qwen failure
-   *  mode without a code-level patch. Pairs with the AAB-level
-   *  patch-package blocklist for chips that hit the SVE bug. */
+  /** Inference threads. OTA-295 — default 1 → 2. We dropped to 1 in
+   *  OTA-293 to eliminate suspected worker-pool races; OTA-294 then
+   *  identified the real freeze cause as mid-load cache corruption,
+   *  not worker contention. With Lichen Anvil's sentinel-based cache
+   *  validation + OTA gating preventing the mid-load kill scenario,
+   *  we can move back up. 2 is the middle ground — half the perf
+   *  cost of single-thread, still drops concurrent SIMD pressure
+   *  significantly vs 4. */
   threads?: number;
 }
 
@@ -175,7 +177,7 @@ export class QwenGenerativeEngine {
       await runtime.initialize({
         modelPath,
         contextSize: opts.contextSize ?? 2048,
-        threads: opts.threads ?? 1,
+        threads: opts.threads ?? 2,
       });
       this.runtime = runtime;
       this.status = 'ready';
