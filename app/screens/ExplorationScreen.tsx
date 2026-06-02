@@ -62,6 +62,7 @@ export function ExplorationScreen() {
   const pendingHookContinue = useGameStore((s) => s.pendingHookContinue);
   const continueHook = useGameStore((s) => s.continueHook);
   const abandonHook = useGameStore((s) => s.abandonHook);
+  const dismissHookContinue = useGameStore((s) => s.dismissHookContinue);
   const pendingTravelConfirm = useGameStore((s) => s.pendingTravelConfirm);
   const confirmLeaveAndTravel = useGameStore((s) => s.confirmLeaveAndTravel);
   const cancelTravelConfirm = useGameStore((s) => s.cancelTravelConfirm);
@@ -833,6 +834,22 @@ export function ExplorationScreen() {
         completed={pendingHookContinue?.completed ?? false}
         onContinue={continueHook}
         onAbandon={abandonHook}
+        // OTA-284 — when a vendor is in the scene (typically spawned
+        // by the hook itself via spawn_vendor effect — Roadfire
+        // Reclaimer is the canonical case), show the TRADE NOW button
+        // so the player can act on the "tap to trade" narration.
+        // Tapping it dismisses the modal (hook stays unresolved —
+        // player can re-investigate the noun to resume the thread)
+        // and navigates to the vendor screen.
+        vendorName={currentScene?.vendor?.name}
+        onTrade={
+          currentScene?.vendor
+            ? () => {
+                dismissHookContinue();
+                setScreen('vendor');
+              }
+            : undefined
+        }
       />
 
       <SearchModal

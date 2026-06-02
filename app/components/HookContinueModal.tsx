@@ -51,6 +51,19 @@ interface Props {
   completed: boolean;
   onContinue: () => void;
   onAbandon: () => void;
+  /** OTA-284 — vendor name when the current scene has a spawned
+   *  vendor (typically from a spawn_vendor effect fired by THIS
+   *  thread, e.g. the Roadfire Reclaimer campfire). When set, a
+   *  TRADE NOW button renders between CONTINUE and ABANDON so the
+   *  player can act on the "tap to trade" narration instead of
+   *  CONTINUE-ing past the trade opportunity. Undefined → no
+   *  TRADE button rendered, modal looks the same as pre-OTA-284. */
+  vendorName?: string;
+  /** OTA-284 — handler for TRADE NOW. Should dismiss the modal
+   *  (typically via dismissHookContinue — leaves the hook unresolved
+   *  so the player can re-investigate the noun later to continue the
+   *  thread) AND navigate to the vendor screen. */
+  onTrade?: () => void;
 }
 
 // Cap the scroll height so the popup doesn't push off-screen on a
@@ -68,6 +81,8 @@ export function HookContinueModal({
   completed,
   onContinue,
   onAbandon,
+  vendorName,
+  onTrade,
 }: Props) {
   const scrollRef = useRef<ScrollView>(null);
 
@@ -125,13 +140,16 @@ export function HookContinueModal({
                 ))}
               </ScrollView>
 
-              {/* CONTINUE / ABANDON shown for every stage including
-                  the terminal. On terminal CONTINUE just dismisses
-                  (continueHook's resolved-hook branch clears the
-                  popup state); ABANDON dismisses + marks the
-                  already-resolved hook resolved (no-op on already-
-                  resolved hooks). Both buttons close the modal —
-                  player picks "see it through" vs "give up now." */}
+              {/* CONTINUE / [TRADE NOW] / ABANDON. TRADE NOW only
+                  appears when a vendor has been spawned in the
+                  current scene (typically by the hook itself via
+                  spawn_vendor effect). Player feedback (Pixel 10
+                  Pro XL): the narration says "Roadfire Reclaimer
+                  sits by the fire — tap to trade" but CONTINUE moved
+                  past it without ever giving access to the vendor.
+                  TRADE NOW closes the modal (without resolving the
+                  hook — player can re-investigate the noun to
+                  resume) and navigates to the vendor screen. */}
               <View style={styles.btnRow}>
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnPrimary, pressed && styles.btnPressed]}
@@ -139,6 +157,14 @@ export function HookContinueModal({
                 >
                   <Text style={styles.btnTextPrimary}>CONTINUE →</Text>
                 </Pressable>
+                {vendorName && onTrade ? (
+                  <Pressable
+                    style={({ pressed }) => [styles.btn, styles.btnTrade, pressed && styles.btnPressed]}
+                    onPress={onTrade}
+                  >
+                    <Text style={styles.btnTextTrade}>TRADE NOW</Text>
+                  </Pressable>
+                ) : null}
                 <Pressable
                   style={({ pressed }) => [styles.btn, styles.btnNeutral, pressed && styles.btnPressed]}
                   onPress={onAbandon}
@@ -200,6 +226,12 @@ const styles = StyleSheet.create({
   btnPressed: { opacity: 0.7 },
   btnPrimary: { backgroundColor: '#c9a86a', borderColor: '#c9a86a' },
   btnNeutral: { backgroundColor: 'transparent', borderColor: '#3a342c' },
+  // OTA-284 — TRADE NOW button. Distinct treatment so it reads as
+  // "alternative path" not "primary action" (CONTINUE is primary).
+  // Olive/sage outline matches the existing vendor-banner accent on
+  // ExplorationScreen so the visual link is implicit.
+  btnTrade: { backgroundColor: '#1a1714', borderColor: '#9ec96a' },
   btnTextPrimary: { color: '#13110f', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
   btnTextNeutral: { color: '#cdbf99', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
+  btnTextTrade: { color: '#9ec96a', fontWeight: '700', letterSpacing: 2, fontSize: 12 },
 });

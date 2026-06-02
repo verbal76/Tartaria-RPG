@@ -11569,4 +11569,47 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          docs/build-codenames.md (Wax Mantle moved to current; pool
 //          renumbered),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-283';
+// OTA-284 (Resin Drift) — TRADE NOW button in HookContinueModal when
+//   a vendor is spawned in the scene. Player (Pixel 10 Pro XL) on the
+//   Roadfire Reclaimer thread: *"the tap to trade, what am I supposed
+//   to do with that"* — the step-2 narration says "Roadfire Reclaimer
+//   sits by the fire — tap to trade" but the modal only offered
+//   CONTINUE / ABANDON. Player tapped CONTINUE, hook auto-advanced
+//   to terminal step (+25 TC, threads ways), trade opportunity gone.
+//
+//   The vendor IS spawned correctly via the OTA-185 `spawn_vendor`
+//   effect (attaches to currentScene.vendor; ExplorationScreen renders
+//   a gold-bordered "tap to approach" banner for it). The bug is that
+//   HookContinueModal is rendered ON TOP of the banner while the
+//   thread is mid-progression, so the banner is invisible until the
+//   modal closes — and the only way to close the modal is CONTINUE
+//   (advances past trade) or ABANDON (forfeits the thread).
+//
+//   Fix: HookContinueModal accepts new `vendorName?` + `onTrade?`
+//   props. When set, renders a third button — TRADE NOW (sage/olive
+//   color, distinct from CONTINUE's gold and ABANDON's outline) —
+//   between CONTINUE and ABANDON. ExplorationScreen wires it to
+//   `dismissHookContinue()` (closes modal without resolving the hook,
+//   so the player can re-investigate the noun to resume the thread
+//   after trading) + `setScreen('vendor')`. Player trades, returns,
+//   re-taps the noun chip → thread resumes from the next stage.
+//
+//   For threads without a spawned vendor, the modal looks identical
+//   to before — no behavior change. Resin Drift is opt-in based on
+//   `currentScene.vendor` presence.
+//
+//   Cross-platform UX fix (both iOS and Android players hit the
+//   issue). NO platform marker — publishes to both hal2001-android
+//   and hal2001-ios. Wax Mantle (OTA-283) markers used as intended:
+//   absent = both.
+//
+//   Files: app/components/HookContinueModal.tsx (vendorName + onTrade
+//          props + TRADE NOW button + btnTrade/btnTextTrade styles),
+//          app/screens/ExplorationScreen.tsx (dismissHookContinue
+//          import + vendorName/onTrade wiring on the modal),
+//          app/buildCodename.ts (Resin Drift added),
+//          app/buildInfo.ts (OTA-284 bump + change note),
+//          docs/build-codenames.md (Resin Drift moved to current; pool
+//          renumbered),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-284';

@@ -324,6 +324,15 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-284 (Resin Drift) — TRADE NOW button in HookContinueModal when vendor spawned in scene
+
+- **OTA-284 · Player (Pixel 10 Pro XL) on the Roadfire Reclaimer thread: *"the tap to trade, what am I supposed to do with that"*** — the step-2 narration in HookContinueModal said *"Roadfire Reclaimer sits by the fire — tap to trade"* but the modal only offered CONTINUE / ABANDON. Player tapped CONTINUE, the hook auto-advanced to the terminal step (+25 TC, threads ways), the trade opportunity vanished.
+- **Root cause:** the vendor IS spawned correctly via the OTA-185 `spawn_vendor` effect (attaches to `currentScene.vendor`; ExplorationScreen renders a gold-bordered "tap to approach" banner for it at line 492). But HookContinueModal is rendered ON TOP of the banner while the thread is mid-progression, so the banner is invisible until the modal closes — and the only ways to close the modal were CONTINUE (advances past trade) or ABANDON (forfeits the thread). The "tap to trade" prompt in narration pointed at a UI element the player physically couldn't reach.
+- **Fix:** HookContinueModal accepts new `vendorName?` and `onTrade?` props. When both are set (`currentScene.vendor` exists), renders a third button — **TRADE NOW** (sage/olive `#9ec96a` color, distinct from CONTINUE's gold and ABANDON's outline) — between CONTINUE and ABANDON. ExplorationScreen wires it to `dismissHookContinue()` (closes modal without resolving the hook — player can re-investigate the noun to resume the thread after trading) + `setScreen('vendor')`. Player trades, returns, re-taps the noun chip → thread resumes from the next stage.
+- **For threads without a spawned vendor**, the modal looks identical to before — `vendorName === undefined` short-circuits the button render. Opt-in based on scene state; no regression for existing hook flows.
+- **Cross-platform UX fix** (both iOS and Android players hit the same modal). No platform marker — publishes to both `hal2001-android` and `hal2001-ios`. Wax Mantle (OTA-283) markers used as designed: absent = both.
+- **Files:** `app/components/HookContinueModal.tsx` (vendorName + onTrade props + TRADE NOW button + btnTrade/btnTextTrade styles), `app/screens/ExplorationScreen.tsx` (dismissHookContinue import + vendorName/onTrade wiring on the modal), `app/buildCodename.ts` (Resin Drift added), `app/buildInfo.ts` (OTA-284 bump + change note), `docs/build-codenames.md` (Resin Drift moved to current; pool renumbered), HANDOFF.md (this entry).
+
 #### OTA-283 (Wax Mantle) — Platform-specific OTA publish markers ([ota-ios-only] / [ota-android-only])
 
 - **OTA-283 · Player: *"When we are working on glitches for iOS that need iOS only, as in there are no issues on Android, only push it to iOS."*** Pre-OTA-283, every HaL2001 push published BOTH iOS and Android bundles to the `hal2001` channel (since Marble Anvil OTA-276 added iOS publishing). Result: Android testers got a new bundle for every iOS-only fix and saw an "Update applied: …" reload they didn't need.
