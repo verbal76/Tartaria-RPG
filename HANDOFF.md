@@ -324,6 +324,19 @@
 
 ### 0.B — Closed Issues (most recent first)
 
+#### OTA-279 (Ember Coil) — Real iOS keyboard-dismiss via InputAccessoryView (Chalk Tine's ▼ button was covered by the keyboard)
+
+- **OTA-279 · iPhone playtester: *"that button isn't there when the keyboard is up"*** with screenshots — the Chalk Tine (OTA-277) ▼ button was in the input row itself, which the iOS keyboard COVERS when up, so the button was only visible when not needed. The screenshots also showed the ▼ was using a muted color (#7a705c on #1a1714) that was essentially invisible against the dark background even when the keyboard was down.
+- **Root fix:** the correct iOS pattern for this exact problem is `InputAccessoryView` — a native RN component that renders a custom bar ABOVE the keyboard, attached via `nativeID` matching the TextInput's `inputAccessoryViewID`. Always visible when keyboard is up; vanishes with it. iPad's keyboard has the dismiss key built in; iPhone's doesn't, so InputAccessoryView is the platform-correct iPhone equivalent.
+- **Three changes in `app/components/InputBox.tsx`:**
+  1. New `KEYBOARD_ACCESSORY_ID` constant (`'tartariaKbDismissBar'`) wired into the `TextInput`'s `inputAccessoryViewID` on iOS only. Android keeps its system back button as the dismiss path (passing `inputAccessoryViewID={undefined}` on Android avoids the prop entirely).
+  2. New `<InputAccessoryView>` block rendered at the end of the component, gated on `Platform.OS === 'ios'`. Renders a dark bar with a `[▼  Hide Keyboard]` button on the right (`backgroundColor: '#1a1714'` matching the app palette, accent-gold `#e6d8b3` text, `#3a342c` button bg for visibility).
+  3. Brightened the in-row ▼ chevron from muted (`#7a705c`) to accent gold (`#c9a86a`). Stays as a redundant affordance for Android (where InputAccessoryView is ignored) and for when the keyboard is down on iOS (rare but possible — e.g., the player typed earlier, dismissed, and wants to tap-to-dismiss again).
+- **What the iPhone tester sees after this OTA:** tap the input field → keyboard appears with a dark bar above it containing a [▼ Hide Keyboard] button on the right → tap → keyboard collapses, bar disappears. Mirrors the iPad iOS keyboard's built-in dismiss key.
+- **What Android testers see:** in-row ▼ now brighter and easier to spot; same dismiss behavior. InputAccessoryView is a no-op on Android (RN documents this).
+- **OTA-only:** JS-side; no native rebuild. Ships through the OTA channel for both platforms.
+- **Files:** `app/components/InputBox.tsx` (Platform + InputAccessoryView import + KEYBOARD_ACCESSORY_ID const + TextInput inputAccessoryViewID prop + InputAccessoryView JSX + kbAccessoryBar/kbAccessoryBtn/kbAccessoryText styles + kbDismiss color brighten), `app/buildCodename.ts` (Ember Coil added), `app/buildInfo.ts` (OTA-279 bump + change note), `docs/build-codenames.md` (Ember Coil moved to current; pool renumbered), HANDOFF.md (this entry).
+
 #### OTA-278 (Soot Helm) — Boot-stage telemetry in About (iOS Qwen-stuck-at-idle diagnostic)
 
 - **OTA-278 · Diagnostic for the persistent iOS Qwen issue.** Across THREE bundles (Stone Mantle OTA-265, Marble Anvil OTA-276, Chalk Tine OTA-277) the iPhone playtester's About export shows the same impossible state for Qwen: `Status: idle / Progress: 0% / Error: none`. That's the pristine initial state — if `bootQwen()` had been called, status would be `downloading` / `loading` / `ready` / `failed`, never `idle`. mlHealth on her install shows cognitive booted fine (`Last init attempt: 00:56:29 / Last init success: 00:56:32`) but no Qwen attempt timestamp at all, meaning `markMLInitAttempted` (which fires right before `bootQwen`) never ran.

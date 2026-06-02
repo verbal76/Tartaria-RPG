@@ -11399,4 +11399,52 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          docs/build-codenames.md (Soot Helm moved to current; pool
 //          renumbered),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-278';
+// OTA-279 (Ember Coil) — Real iOS keyboard-dismiss: InputAccessoryView
+//   bar above the keyboard. Also brightens the input-row ▼ chevron
+//   that was invisible on her phone.
+//
+//   Chalk Tine (OTA-277) added a ▼ button to the input row itself.
+//   Playtester confirmed: "that button isn't there when the keyboard
+//   is up." Two problems:
+//     1. The keyboard COVERS the input row when up — so the in-row
+//        ▼ only helps when the keyboard is already down (useless).
+//     2. Even when not covered, the ▼ used a muted color (#7a705c
+//        on #1a1714) that was essentially invisible on her iPhone's
+//        screen — first screenshot shows the ▼ just barely visible.
+//
+//   The correct iOS pattern for this exact problem is
+//   `InputAccessoryView` — a native RN component that renders a
+//   custom bar ABOVE the keyboard, attached via `nativeID` matching
+//   the TextInput's `inputAccessoryViewID`. Always visible when
+//   keyboard is up; vanishes with it. iPad's keyboard has the dismiss
+//   key built in; iPhone's doesn't, so InputAccessoryView is the
+//   platform-correct iPhone equivalent.
+//
+//   Two changes in app/components/InputBox.tsx:
+//     1. New `KEYBOARD_ACCESSORY_ID` constant, wired into the
+//        TextInput's `inputAccessoryViewID` on iOS only. Android
+//        keeps its system back button as the dismiss path.
+//     2. New `<InputAccessoryView>` block rendering a "▼ Hide
+//        Keyboard" button on a dark bar with accent-gold text and
+//        a tan-bordered button — high contrast, easy to find.
+//     3. Brightened the in-row ▼ chevron from muted (#7a705c) to
+//        accent gold (#c9a86a). Stays as a redundant affordance for
+//        Android and for when keyboard is down.
+//
+//   What the iPhone tester sees after this OTA:
+//     - Tap the input field → keyboard appears with a dark bar above
+//       it containing a [▼ Hide Keyboard] button on the right.
+//     - Tap the button → keyboard collapses, bar disappears.
+//   What Android testers see: in-row ▼ now brighter, same dismiss.
+//
+//   Files: app/components/InputBox.tsx (Platform + InputAccessoryView
+//          import + KEYBOARD_ACCESSORY_ID const + TextInput
+//          inputAccessoryViewID prop + InputAccessoryView JSX +
+//          kbAccessoryBar/kbAccessoryBtn/kbAccessoryText styles +
+//          kbDismiss color brighten),
+//          app/buildCodename.ts (Ember Coil added),
+//          app/buildInfo.ts (OTA-279 bump + change note),
+//          docs/build-codenames.md (Ember Coil moved to current; pool
+//          renumbered),
+//          HANDOFF.md (closed issue entry).
+export const OTA_BUILD_ID = '2026-06-02-279';

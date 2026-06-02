@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Pressable, Keyboard } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Pressable, Keyboard, InputAccessoryView, Platform } from 'react-native';
 import { TutorialTarget } from './TutorialTarget';
+
+// OTA-279 — InputAccessoryView nativeID. Must match the value passed
+// to TextInput's inputAccessoryViewID prop. iOS-only; Android ignores.
+const KEYBOARD_ACCESSORY_ID = 'tartariaKbDismissBar';
 // OTA-189 — speech-to-text removed entirely per player ask: "remove
 // the stt button, the code for it from the game, and the button for
 // activation from the voice tab in settings." Mic button, handleMic,
@@ -521,6 +525,17 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           autoCapitalize="none"
           autoComplete="off"
           textContentType="none"
+          // OTA-279 — iOS accessory view above the keyboard with a
+          // Hide Keyboard button. iPad's iOS keyboard has a built-in
+          // hide-keyboard key in the bottom-right corner; iPhone's
+          // does not. Chalk Tine (OTA-277) put a ▼ in the input row
+          // itself, but the keyboard covers the input row when up,
+          // so the button was only visible when not needed. iOS
+          // `InputAccessoryView` renders a bar ABOVE the keyboard,
+          // always reachable while typing. Android ignores
+          // inputAccessoryViewID — system back button is the
+          // platform-native dismiss there.
+          inputAccessoryViewID={Platform.OS === 'ios' ? KEYBOARD_ACCESSORY_ID : undefined}
         />
         {/* OTA-189 — mic button removed entirely along with all STT
             wiring. TTS toggle still lives on the gear screen for
@@ -551,6 +566,24 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
           <Text style={styles.sendText}>Act</Text>
         </TouchableOpacity>
       </TutorialTarget>
+      {/* OTA-279 — iOS InputAccessoryView. Renders a bar above the
+          keyboard with a Hide Keyboard button. Always visible when
+          the keyboard is up; vanishes with the keyboard. nativeID
+          matches the TextInput's inputAccessoryViewID. Android
+          ignores this component (system back handles dismiss). */}
+      {Platform.OS === 'ios' ? (
+        <InputAccessoryView nativeID={KEYBOARD_ACCESSORY_ID} backgroundColor="#1a1714">
+          <View style={styles.kbAccessoryBar}>
+            <TouchableOpacity
+              style={styles.kbAccessoryBtn}
+              onPress={() => Keyboard.dismiss()}
+              accessibilityLabel="Hide keyboard"
+            >
+              <Text style={styles.kbAccessoryText}>▼  Hide Keyboard</Text>
+            </TouchableOpacity>
+          </View>
+        </InputAccessoryView>
+      ) : null}
     </View>
   );
 }
@@ -743,18 +776,42 @@ const styles = StyleSheet.create({
   },
   sendText: { color: '#e6d8b3', fontWeight: '700' },
   // OTA-277 — manual keyboard-dismiss chevron. Sized to sit between
-  // input field and Act button without dominating the row. Muted tone
-  // (darker than Act) so the player's eye still goes to the primary
-  // action — this is a utility, not a verb.
+  // input field and Act button without dominating the row.
+  // OTA-279 — brightened from muted (#7a705c) to accent gold (#c9a86a)
+  // because the original render was nearly invisible against the dark
+  // background; iPhone playtester couldn't see the ▼ at all. Real iOS
+  // dismiss path is now the InputAccessoryView bar above the keyboard
+  // (kbAccessoryBar), but this in-row chevron stays as a redundant
+  // affordance for Android + for when the keyboard isn't yet up.
   kbDismiss: {
     backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
+    borderColor: '#5a5246',
     borderWidth: 1,
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 4,
   },
-  kbDismissText: { color: '#7a705c', fontSize: 14, fontWeight: '700' },
+  kbDismissText: { color: '#c9a86a', fontSize: 14, fontWeight: '700' },
+  // OTA-279 — InputAccessoryView bar above the iOS keyboard. iOS-only.
+  // Renders the moment the keyboard appears; vanishes with it.
+  // Centered horizontally so the Hide Keyboard button is easy to reach
+  // with either thumb.
+  kbAccessoryBar: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderTopColor: '#3a342c',
+    borderTopWidth: 1,
+  },
+  kbAccessoryBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#3a342c',
+    borderRadius: 4,
+  },
+  kbAccessoryText: { color: '#e6d8b3', fontSize: 14, fontWeight: '700', letterSpacing: 0.5 },
   // OTA-189 — micBtn / micBtnActive / micBtnText styles removed
   // alongside the mic button. STT is gone from the game entirely;
   // only the TTS read-aloud path is still wired (and toggled from
