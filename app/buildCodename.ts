@@ -141,6 +141,9 @@ const CODENAMES: Record<string, string> = {
   // Indoors: drop the world MAP button (meaningless by room), rename OUT to
   // EXIT — travel row is now up to 4 room buttons + EXIT.
   '2026-06-03-arb22': 'Gate Coil',
+  // Nav-row fit for long room names: lower letterSpacing + minimumFontScale
+  // so "GRAND HALL"/"LIVING ROOM" stay readable in the equal-width slots.
+  '2026-06-03-arb23': 'Span Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

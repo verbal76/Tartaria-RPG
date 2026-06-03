@@ -475,7 +475,7 @@ function TravelBtn({ label, onPress }: { label: string; onPress: () => void }) {
         numberOfLines={isDestination ? 2 : 1}
         ellipsizeMode="tail"
         adjustsFontSizeToFit={!isDestination}
-        minimumFontScale={0.7}
+        minimumFontScale={0.55}
       >
         {label}
       </Text>
@@ -511,7 +511,10 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     alignItems: 'center',
   },
-  travelBtnText: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
+  // letterSpacing kept low (1) so longer room names ("GRAND HALL",
+  // "LIVING ROOM") fit the equal-width slots without shrinking/ellipsizing
+  // as hard. Short labels (NORTH / EXIT) still read fine with it.
+  travelBtnText: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 1, paddingHorizontal: 2 },
   travelBtnDest: { paddingVertical: 8 },
   travelBtnTextDest: { fontSize: 14, lineHeight: 17, letterSpacing: 1.5, textAlign: 'center' },
   movesBadge: {
