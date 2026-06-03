@@ -144,7 +144,6 @@ export function TitleScreen() {
   const modelsLoading =
     qwenStatus === 'downloading' || qwenStatus === 'loading'
     || kokoroPhase.phase === 'downloading' || kokoroPhase.phase === 'loading';
-  const modelsReady = qwenStatus === 'ready' && kokoroPhase.phase === 'ready';
   // Live per-engine readiness for the loading banner. Both percentages are
   // the REAL native download fractions (Qwen GGUF + Kokoro model), not a
   // timer. The compile/warm-up step has no native progress, so it honestly
@@ -158,6 +157,10 @@ export function TitleScreen() {
     kokoroPhase.phase === 'downloading' ? `${Math.round(kokoroPhase.fraction * 100)}%`
     : kokoroPhase.phase === 'loading' ? 'finishing…'
     : kokoroPhase.phase === 'ready' ? 'ready ✓'
+    // Voice failed → the Arbiter still narrates; the system voice speaks.
+    // Read it honestly here so the NARRATION row can keep loading without
+    // the VOICE row falsely showing "starting…" forever.
+    : kokoroPhase.phase === 'error' ? 'system voice'
     : 'starting…';
   const qwenDone = qwenStatus === 'ready';
   const kokoroDone = kokoroPhase.phase === 'ready';
@@ -688,16 +691,16 @@ export function TitleScreen() {
       {modelsLoading && (
         <View style={styles.modelLoadingBanner}>
           <Text style={styles.modelLoadingBannerTitle}>
-            ⏳ GETTING THINGS READY — THIS IS NORMAL
+            ⚙  WAKING THE ARBITER — THIS IS NORMAL
           </Text>
           <Text style={styles.modelLoadingBannerBody}>
-            The first install is the longest part — these download once, then
-            Tartaria Realms runs fully offline. It's a normal one-time setup,
-            not an error.
+            The Arbiter's mind and voice are loading for the first time — the
+            longest part. They download once, then Tartaria Realms runs fully
+            offline. A normal one-time setup, not an error.
           </Text>
           <View style={styles.modelLoadingRows}>
             <View style={styles.modelLoadingRow}>
-              <Text style={styles.modelLoadingRowLabel}>NARRATION</Text>
+              <Text style={styles.modelLoadingRowLabel}>MIND</Text>
               <Text style={[styles.modelLoadingRowValue, qwenDone && styles.modelLoadingRowValueDone]}>
                 {qwenLabel}
               </Text>
@@ -1756,44 +1759,32 @@ const lastCrashStyles = StyleSheet.create({
 function KokoroDownloadBanner(): React.ReactElement | null {
   const [state, setState] = useState<KokoroState>(() => getKokoroState());
   useEffect(() => onKokoroStateChange(setState), []);
-  if (state.phase === 'idle') return null;
+  // VOICE-only banner. The "WAKING THE ARBITER" status box above owns the
+  // overall boot narrative and shows the VOICE download % in its own row, so
+  // this component no longer renders the 'downloading' / 'loading' phases
+  // (that was a misnamed duplicate — it said "Waking up the Arbiter" but was
+  // driven solely by the voice engine). It now only handles the two things
+  // the status box can't: the spoken ready-flash, and the voice-failed
+  // fallback notice.
   if (state.phase === 'ready') {
-    // Auto-hide the ready confirmation after 4 seconds so it doesn't
-    // sit on the title screen forever once the voice is installed.
+    // The voice just came online — announce it (and auto-hide after a beat).
     return <ReadyFlash />;
   }
-  // Time-based gate in PiperTTSManager keeps 'downloading' phase
-  // suppressed for cache hits (resolve in <2s) and only escalates
-  // when a real 100 MB download is in flight (>4s elapsed + progress
-  // still <99%). So this branch only renders on a genuine first-time
-  // fetch or a post-reinstall refetch. Cache hits stay on the calmer
-  // 'loading' copy below.
-  if (state.phase === 'downloading') {
+  if (state.phase === 'error') {
     return (
       <View style={styles.kokoroBanner}>
         <Text style={styles.kokoroBannerText}>
-          ⬇  Installing premium voice (Kokoro)
+          ⚠  The Arbiter's voice couldn't load
         </Text>
         <Text style={styles.kokoroBannerProgress}>
-          {(state.fraction * 100).toFixed(0)}%  ·  one-time download (~100 MB), runs fully offline after this
+          The Arbiter still narrates — the system voice will speak instead.
+          Pull-to-refresh from Settings to retry.
         </Text>
       </View>
     );
   }
-  return (
-    <View style={styles.kokoroBanner}>
-      <Text style={styles.kokoroBannerText}>
-        {state.phase === 'error'
-          ? `⚠  Voice engine: ${state.message ?? 'error'}`
-          : '⚙  Waking up the Arbiter — select your character when it turns green'}
-      </Text>
-      {state.phase === 'error' && (
-        <Text style={styles.kokoroBannerProgress}>
-          The system voice will be used instead. Pull-to-refresh from Settings to retry.
-        </Text>
-      )}
-    </View>
-  );
+  // idle / downloading / loading — covered by the WAKING THE ARBITER box.
+  return null;
 }
 
 function ReadyFlash(): React.ReactElement | null {
@@ -1814,7 +1805,7 @@ function ReadyFlash(): React.ReactElement | null {
   return (
     <View style={[styles.kokoroBanner, { borderColor: '#9ec96a' }]}>
       <Text style={[styles.kokoroBannerText, { color: '#9ec96a' }]}>
-        ✓  The Arbiter wakes — choose your character
+        ✓  The Arbiter finds their voice — choose your character
       </Text>
     </View>
   );

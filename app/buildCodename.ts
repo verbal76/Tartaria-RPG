@@ -179,6 +179,13 @@ const CODENAMES: Record<string, string> = {
   // instead of on every single attack — it doesn't change round-to-round,
   // so the repeat was just log clutter. Re-fires only if the weather shifts.
   '2026-06-03-arb32': 'Ash Gulley',
+  // Boot-banner cleanup. "Waking up the Arbiter" was wired to the VOICE
+  // (Kokoro) engine, not the narration brain, and duplicated the dual-engine
+  // status box. Now the orange box IS the single "WAKING THE ARBITER" status
+  // (rows: MIND = narration, VOICE = Kokoro); the voice banner is demoted to
+  // the ready-flash + a clear voice-failed fallback notice. Dead modelsReady
+  // removed; VOICE row reads "system voice" on error instead of stalling.
+  '2026-06-03-arb33': 'Bone Ladder',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA
