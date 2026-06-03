@@ -3,10 +3,14 @@ name: Android Build (Tartaria Realms)
 # arb36 (Drift Maw) — trigger-touch for a fresh isolated 'arbiters-line'
 # preview APK so a second phone can be provisioned for co-op playtesting.
 # app/** is paths-ignored, so the OTA bumps through arb36 never fired an
-# APK build; this non-ignored edit does. Plain commit message (no
-# [build-aab]) on the arbiters-line branch → profile resolver's else
-# branch → preview/APK on the dedicated arbiters-line OTA channel. Both
-# phones install this APK; every OTA pushed to arbiters-line reaches both.
+# APK build; this non-ignored edit does. A plain commit message (without
+# the production AAB marker) on the arbiters-line branch falls through the
+# profile resolver's else branch to preview/APK on the dedicated
+# arbiters-line OTA channel. Both phones install this APK; every OTA
+# pushed to arbiters-line reaches both.
+# NOTE: the resolver matches the AAB marker substring ANYWHERE in the
+# commit message — keep that token out of trigger-touch commit messages
+# or the build resolves to a production AAB instead of the sideload APK.
 #
 # First signed Play Store AAB: OTA 463 / build aab-build-N.
 # Triggered by commits containing [build-aab] (see meta step below)
