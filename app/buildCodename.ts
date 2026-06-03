@@ -68,6 +68,10 @@ const CODENAMES: Record<string, string> = {
   '2026-06-02-299': 'Nickel Tine',
   '2026-06-02-300': 'Zinc Anvil',
   '2026-06-03-301': 'Tungsten Spire',
+  // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted
+  // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).
+  // Sits on the dead 'arbiters-line' channel; never published OTA-side.
+  '2026-06-03-arb1': 'Flint Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

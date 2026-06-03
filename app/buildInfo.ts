@@ -12095,4 +12095,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //   directly; the player exercises the new tutorial flow end-to-end
 //   on device before deciding what (if anything) to fold back into
 //   the OTA channel.
-export const OTA_BUILD_ID = '2026-06-03-301';
+//   Codename: this isolated arbiters-line test build gets its OWN id +
+//   codename (Flint Coil) so the About screen / bug report shows a handle
+//   distinct from the Tungsten Spire (301) bundle it branched from — the
+//   bundle now also carries the uncapped pack, the 25-adjective default
+//   names, and the land-in-exploration tutorial-end fix. The non-numeric
+//   '-arb1' suffix keeps it OUT of the production OTA-30x sequence so it
+//   can never collide with a real OTA id, and nothing parses the suffix
+//   as a number (it's an opaque map key + display string).
+export const OTA_BUILD_ID = '2026-06-03-arb1';

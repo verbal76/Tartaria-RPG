@@ -60,6 +60,7 @@ bug reports.
 | `2026-06-02-299`        | Nickel Tine    | Android tutorial keyboard gate (input blocked until SKIP/CONTINUE) |
 | `2026-06-02-300`        | Zinc Anvil     | Pre-transition keyboard dismiss (name input → BEGIN → tutorial)    |
 | `2026-06-03-301`        | Tungsten Spire | Outpost tutorial redesign (APK-only): in-feed Arbiter, name in-game, hub-named exits, pulsing chips, 10 beats from name to first travel course |
+| `2026-06-03-arb1`       | Flint Coil     | **Isolated `arbiters-line` test build — NOT a production OTA.** Tungsten Spire tutorial + uncapped pack + 25-adjective default names + land-in-exploration tutorial-end fix. Sideload-only on the dead `arbiters-line` channel; never published OTA-side. Non-numeric `-arb1` id keeps it out of the OTA-30x sequence. Fresh-minted pair (reserved pool was exhausted). |
 
 ## AAB codenames (separate pool, keyed by versionCode)
 
