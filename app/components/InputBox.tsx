@@ -12,6 +12,7 @@ import {
   Vibration,
 } from 'react-native';
 import { TutorialTarget } from './TutorialTarget';
+import { visibleBuildingRooms } from '../engine/buildings';
 import { TUTORIAL_STEPS } from './tutorialSteps';
 import { useGameStore } from '../state/gameStore';
 import { hubRoomFor, isLeaveHubCommand } from '../engine/hub';
@@ -101,6 +102,19 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const awaitingTutorialName = useGameStore((s) => s.awaitingTutorialName);
   const hubRoomId = useGameStore((s) => s.player?.hubRoomId ?? null);
   const factionId = useGameStore((s) => s.player?.factionId ?? null);
+  // arb25 — enterable buildings: when inside one, the travel row shows the
+  // building's rooms + EXIT instead of cardinals / faction-hub exits.
+  const activeBuildingId = useGameStore((s) => s.activeBuildingId);
+  const activeBuildingRoomId = useGameStore((s) => s.activeBuildingRoomId);
+  const buildingRevealed = useGameStore((s) => s.buildingRevealed);
+  const goBuildingRoom = useGameStore((s) => s.goBuildingRoom);
+  const exitBuilding = useGameStore((s) => s.exitBuilding);
+  const buildingRooms = useMemo(
+    () => (activeBuildingId
+      ? visibleBuildingRooms(activeBuildingId, new Set(buildingRevealed))
+      : []),
+    [activeBuildingId, buildingRevealed],
+  );
 
   const currentTutStep = tutorialStep !== null ? TUTORIAL_STEPS[tutorialStep] ?? null : null;
   const currentBeatId = currentTutStep?.id ?? null;
@@ -238,7 +252,19 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     <View style={styles.container}>
       {!inCombat && (
         <TutorialTarget area="travel-row" style={styles.travelRow}>
-          {travelTargetName ? (
+          {activeBuildingId ? (
+            // Inside a building: up to 4 room buttons + EXIT (no MAP).
+            <>
+              {buildingRooms.slice(0, 4).map((r) => (
+                <TravelBtn
+                  key={r.id}
+                  label={r.shortName}
+                  onPress={() => goBuildingRoom(r.id)}
+                />
+              ))}
+              <TravelBtn label="EXIT" onPress={() => exitBuilding()} />
+            </>
+          ) : travelTargetName ? (
             <>
               <TravelBtn label={`→ ${travelTargetName.toUpperCase()}`} onPress={onContinueTravel ?? (() => {})} />
               <TravelBtn label="STOP TRAVEL" onPress={onStopTravel ?? (() => {})} />

@@ -148,6 +148,9 @@ const CODENAMES: Record<string, string> = {
   // outpost, shack, shed (+secret cellar), market (4 stalls). Foundation only
   // — entry/exit + scene wiring is the next step.
   '2026-06-03-arb24': 'Hearth Coil',
+  // Enterable buildings WIRED: enter/exit + room nav row + secret-room
+  // reveal. Dev trigger "enter <building>" to walk them on-device.
+  '2026-06-03-arb25': 'Door Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

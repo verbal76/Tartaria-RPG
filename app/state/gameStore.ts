@@ -153,6 +153,14 @@ import {
   resolveHubTravel,
   isLeaveHubCommand,
 } from '../engine/hub';
+import {
+  getBuilding,
+  getBuildingRoom,
+  buildingEntryRoom,
+  buildingIds,
+  resolveBuildingRoom,
+  secretRoomRevealedBy,
+} from '../engine/buildings';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
@@ -1185,6 +1193,36 @@ function grantTutorialItem(
   });
 }
 
+// arb25 — patch the live scene to reflect a building room: its interactables
+// become the scene's ambient nouns (so LOOK / take / search / investigate
+// operate on the room), the scene-bar label shows "Building · Room", and any
+// wilderness vendor / hooks are cleared (you're indoors). Combat fields are
+// left untouched — buildings are entered from peaceful scenes.
+function patchSceneForBuildingRoom(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  buildingId: string,
+  roomId: string,
+): void {
+  const b = getBuilding(buildingId);
+  const room = getBuildingRoom(buildingId, roomId);
+  if (!b || !room) return;
+  set((s) => {
+    if (!s.currentScene) return {};
+    const nouns = [...room.interactables];
+    return {
+      currentScene: {
+        ...s.currentScene,
+        ambientNouns: nouns,
+        displayedAmbientNouns: nouns,
+        transitArea: `${b.name} · ${room.shortName}`,
+        vendor: null,
+        hooks: [],
+      },
+    };
+  });
+}
+
 // Tungsten Spire — default-name generator for a player who skips the
 // tutorial before the Arbiter's name beat. Pairs a random flavor
 // adjective with the singular form of their race (e.g. "Dusty Reclaimer",
@@ -1294,6 +1332,18 @@ interface GameStore {
    *  point finishOutpostTutorial advances to the main_quest beat. Cleared
    *  when the beat advances or the tutorial ends. */
   tutorialExploreChosen: boolean;
+  /** arb25 — enterable-building state (flooded house / shack / shed /
+   *  market / outpost templates). activeBuildingId = which template you're
+   *  inside (null = out in the world); activeBuildingRoomId = current room;
+   *  buildingRevealed = secret room ids unlocked this visit. Transient (not
+   *  persisted) — saving inside a building reloads you outside. */
+  activeBuildingId: string | null;
+  activeBuildingRoomId: string | null;
+  buildingRevealed: string[];
+  enterBuilding: (buildingId: string) => void;
+  goBuildingRoom: (roomId: string) => void;
+  exitBuilding: () => void;
+  revealBuildingRoom: (roomId: string) => void;
   /** Tungsten Spire — has the player taken the tutorial cudgel /
    *  rope / chest plate / note yet? Gates per-prop narration so the
    *  Arbiter doesn't repeat the same line after the player walks back
@@ -1754,6 +1804,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   tutorialDemoVendor: null,
   awaitingTutorialName: false,
   tutorialExploreChosen: false,
+  activeBuildingId: null,
+  activeBuildingRoomId: null,
+  buildingRevealed: [],
   tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false },
 
   slots: [],
@@ -2205,6 +2258,52 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (get().inputModalOpen !== open) set({ inputModalOpen: open });
   },
 
+  // ── Enterable buildings (arb25) ──────────────────────────────────────
+  enterBuilding(buildingId) {
+    const b = getBuilding(buildingId);
+    const entry = buildingEntryRoom(buildingId);
+    if (!b || !entry) return;
+    set({ activeBuildingId: buildingId, activeBuildingRoomId: entry.id, buildingRevealed: [] });
+    get().appendLog('world', `You step inside ${b.name.toLowerCase()}.`);
+    get().appendLog('world', entry.description);
+    patchSceneForBuildingRoom(get, set, buildingId, entry.id);
+  },
+  goBuildingRoom(roomId) {
+    const id = get().activeBuildingId;
+    if (!id) return;
+    const room = getBuildingRoom(id, roomId);
+    if (!room) return;
+    if (roomId === get().activeBuildingRoomId) return;
+    // Hidden rooms can't be walked into until revealed.
+    if (room.secret && !get().buildingRevealed.includes(roomId)) return;
+    const p = get().player;
+    if (p) set({ player: advanceTime(spendStamina(p, 1), 0.25) });
+    set({ activeBuildingRoomId: roomId });
+    get().appendLog('world', room.description);
+    patchSceneForBuildingRoom(get, set, id, roomId);
+  },
+  exitBuilding() {
+    const id = get().activeBuildingId;
+    if (!id) return;
+    const b = getBuilding(id);
+    set({ activeBuildingId: null, activeBuildingRoomId: null, buildingRevealed: [] });
+    get().appendLog('world', `You step back outside${b ? `, leaving ${b.name.toLowerCase()} behind` : ''}.`);
+    // Rebuild the open-ground scene at the current tile.
+    get().beginScene({ skipHubEntry: true });
+  },
+  revealBuildingRoom(roomId) {
+    const id = get().activeBuildingId;
+    if (!id || get().buildingRevealed.includes(roomId)) return;
+    const room = getBuildingRoom(id, roomId);
+    set({ buildingRevealed: [...get().buildingRevealed, roomId] });
+    get().appendLog(
+      'world',
+      room
+        ? `Hidden until now: ${room.name} opens up. It joins the rooms you can reach.`
+        : 'A hidden way opens up.',
+    );
+  },
+
   consumeInputDraft() {
     const draft = get().pendingInputDraft;
     if (draft !== null) set({ pendingInputDraft: null });
@@ -2337,6 +2436,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         gameLog: saved.gameLog,
         currentScreen: 'exploration',
         activeSlotId: slotId,
+        // arb25 — never resume "inside a building" (building state is transient).
+        activeBuildingId: null,
+        activeBuildingRoomId: null,
+        buildingRevealed: [],
         currentScene: restoredScene,
         pendingRolls: null,
   pendingHookContinue: null,
@@ -2548,6 +2651,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false },
       awaitingTutorialName: false,
       tutorialExploreChosen: false,
+      activeBuildingId: null,
+      activeBuildingRoomId: null,
+      buildingRevealed: [],
     });
     try {
       get().appendLog('debug', `APK session start: ${OTA_BUILD_ID}.`);
@@ -4166,6 +4272,65 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('reward', '✦ Folded Note (Common).');
         get().maybeAdvanceTutorial('read_note');
         return;
+      }
+    }
+
+    // arb25 — enterable buildings. When inside a building, room navigation /
+    // EXIT / secret-room reveal are handled here BEFORE the world parser so a
+    // room name doesn't fall through to overworld travel. "enter <building>"
+    // is a temporary dev trigger to walk the templates on-device.
+    {
+      const inBuilding = get().activeBuildingId;
+      if (inBuilding) {
+        // EXIT back to the open world.
+        if (isLeaveHubCommand(trimmed) || /^\s*(exit|outside|step\s+out|get\s+out)\s*$/i.test(trimmed)) {
+          if (!_opts?.silent) get().appendLog('player', trimmed);
+          get().exitBuilding();
+          return;
+        }
+        // Secret-room reveal: investigating the trigger noun opens a hidden room.
+        if (/\b(investigate|search|examine|pry|lift|check|open)\b/i.test(trimmed)) {
+          const reveal = secretRoomRevealedBy(inBuilding, trimmed);
+          if (reveal && !get().buildingRevealed.includes(reveal)) {
+            if (!_opts?.silent) get().appendLog('player', trimmed);
+            get().revealBuildingRoom(reveal);
+            return;
+          }
+        }
+        // Room navigation (tap a room button or type its name).
+        const roomId = resolveBuildingRoom(inBuilding, new Set(get().buildingRevealed), trimmed);
+        if (roomId && roomId !== get().activeBuildingRoomId) {
+          if (!_opts?.silent) get().appendLog('player', trimmed);
+          get().goBuildingRoom(roomId);
+          return;
+        }
+        // Swallow overworld-travel commands while indoors so a typed cardinal
+        // can't strand the player out on the map without EXITing. Movement
+        // inside is by room button only.
+        if (/\b(north|south|east|west)\b/i.test(trimmed) || /^(go|walk|head|travel|continue|onward|keep going)\b/i.test(trimmed)) {
+          if (!_opts?.silent) get().appendLog('player', trimmed);
+          get().appendLog('world', 'Inside, you move room to room. Tap a room, or EXIT to step back outside.');
+          return;
+        }
+        // Otherwise fall through — take / search / look operate on the room's
+        // interactables via the normal parser (which logs the player line).
+      } else {
+        // Dev entry trigger: "enter shed", "go into the market", etc.
+        const enterMatch = /^(?:enter|go\s+in(?:to)?|step\s+in(?:to)?)\b\s*(?:the\s+|a\s+|an\s+)?(.*)$/i.exec(trimmed);
+        const want = (enterMatch?.[1] ?? '').trim().toLowerCase();
+        if (want) {
+          const id = buildingIds().find((bid) => {
+            const name = (getBuilding(bid)?.name ?? '').toLowerCase();
+            const idWords = bid.replace(/_/g, ' ');
+            return want.includes(idWords) || idWords.includes(want)
+                || (name && (want.includes(name) || name.includes(want)));
+          });
+          if (id) {
+            if (!_opts?.silent) get().appendLog('player', trimmed);
+            get().enterBuilding(id);
+            return;
+          }
+        }
       }
     }
 
