@@ -14876,9 +14876,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // player performs the specific action the Arbiter just asked for.
   // The OLD welcome-card overlay is gone; the OLD demo-vendor beat is
   // gone; the OLD per-screen tour is reduced to the dialogue inside
-  // the outpost. Anything the old tour covered that isn't in the new
-  // sequence still lives in TUTORIAL_DOCS_FULL for the Tutorial Replay
-  // panel.
+  // the outpost. A trimmed screen-orientation reference survives in
+  // TUTORIAL_DOCS_FULL for the future Tutorial Replay panel; the old
+  // per-system pages (crafting, golems, dogs, trading, contracts,
+  // inventory) were intentionally dropped — those systems teach
+  // themselves at their trigger sites via FirstTimeHint.
   startTutorial() {
     // Open the first beat — speak the Arbiter's name prompt and arm
     // the awaitingTutorialName latch so the next text input becomes

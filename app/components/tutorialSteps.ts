@@ -16,8 +16,13 @@
 //   - screen    — for legacy compatibility; defaults to 'exploration'
 //
 // TUTORIAL_DOCS_FULL stays in place as read-only copy for the future
-// Settings → Tutorial Replay panel — that long-form 28-step reference
-// is not the play loop, just a doc.
+// Settings → Tutorial Replay panel — a trimmed screen-orientation
+// reference (stats, panels, scene bar, feed, travel, quick actions,
+// typed input, Core Guardians, Resurrection Gems). It is intentionally
+// NOT a full systems manual: the old per-system pages (crafting, golems,
+// dogs, trading, contracts, inventory) were dropped in the Tungsten Spire
+// rewrite — those systems teach themselves at their trigger sites via
+// FirstTimeHint. This is just a doc, not the play loop.
 
 import type { ScreenName } from '../engine/types';
 
