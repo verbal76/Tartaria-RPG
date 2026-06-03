@@ -445,7 +445,11 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
         const diskFreeMB = await captureFreeDiskMB();
         recordKokoroError(step, voiceId, err, diskFreeMB);
       }
-      if (sticky) setKokoroState({ phase: 'error', message: msg.slice(0, 240) });
+      // Prefix the step so the status line / COPY VOICE INFO says WHERE it
+      // failed: '[warmup] undefined is not a function' points at the native
+      // generate() call (APK/native mismatch — needs a rebuild), whereas a
+      // '[speak]' failure (drain catch) points at the JS post-processing.
+      if (sticky) setKokoroState({ phase: 'error', message: `[${step}] ${msg}`.slice(0, 240) });
       return null;
     } finally {
       LOADING.delete(voiceId);
@@ -583,9 +587,9 @@ async function drain(): Promise<void> {
     // re-infer with the current model.
     const prefetchStillValid = !!next.prefetch
       && (next.prefetchVoiceId === undefined || next.prefetchVoiceId === targetVoice);
-    const firstSamples: Float32Array | null = prefetchStillValid
-      ? await next.prefetch!
-      : await model.forward(next.text, settings.rate);
+    const firstSamples: Float32Array = asFloat32(
+      prefetchStillValid ? await next.prefetch! : await model.forward(next.text, settings.rate),
+    );
     if (!firstSamples || firstSamples.length === 0) {
       currentlySpeaking = null;
       void drain();
@@ -618,9 +622,14 @@ async function drain(): Promise<void> {
       combined = firstSamples;
     } else {
       // Trim each member's pad-silence first so the crossfade overlaps
-      // real audio, then join with an equal-power crossfade.
-      const trimmedBufs = batch.map((b) => trimSilenceLeadTrail(b, KOKORO_SAMPLE_RATE));
-      combined = concatWithCrossfade(trimmedBufs, KOKORO_SAMPLE_RATE);
+      // real audio, then join with an equal-power crossfade. Never let the
+      // post-processing break playback — fall back to the first chunk.
+      try {
+        const trimmedBufs = batch.map((b) => trimSilenceLeadTrail(b, KOKORO_SAMPLE_RATE));
+        combined = concatWithCrossfade(trimmedBufs, KOKORO_SAMPLE_RATE);
+      } catch {
+        combined = firstSamples;
+      }
     }
     await playPcm(combined, KOKORO_SAMPLE_RATE);
   } catch (err) {
@@ -630,7 +639,7 @@ async function drain(): Promise<void> {
     // captures it instead of just showing the truncated UI msg.
     const diskFreeMB = await captureFreeDiskMB();
     recordKokoroError('unknown', currentlySpeaking?.voiceId ?? 'unknown', err, diskFreeMB);
-    setKokoroState({ phase: 'error', message: msg.slice(0, 240) });
+    setKokoroState({ phase: 'error', message: `[speak] ${msg}`.slice(0, 240) });
   } finally {
     currentlySpeaking = null;
     void drain();
@@ -708,9 +717,18 @@ async function playPcm(samples: Float32Array, sampleRate: number): Promise<void>
   // queue these dead spans stack into the stuttering inter-sentence gap;
   // trimming them (with a guard pad so soft attacks survive) tightens the
   // join so consecutive chunks read as continuous speech.
-  const trimmed = trimSilenceLeadTrail(samples, sampleRate);
-  applyFadeEnvelope(trimmed, sampleRate, 3);
-  const wavBase64 = encodeWav(trimmed, sampleRate);
+  // Normalize first (native bridges sometimes return a non-Float32Array),
+  // then trim + fade — but never let post-processing throw and silence the
+  // voice: on any failure, play the raw samples.
+  const src = asFloat32(samples);
+  let buf = src;
+  try {
+    buf = trimSilenceLeadTrail(src, sampleRate);
+    applyFadeEnvelope(buf, sampleRate, 3);
+  } catch {
+    buf = src;
+  }
+  const wavBase64 = encodeWav(buf, sampleRate);
   // progressUpdateIntervalMillis defaults to 500ms in expo-av, which
   // means didJustFinish fires up to half a second AFTER the audio
   // actually ends — that latency is the bulk of the inter-sentence
@@ -736,6 +754,26 @@ async function playPcm(samples: Float32Array, sampleRate: number): Promise<void>
       }
     });
   });
+}
+
+/** Normalize whatever the native `generate()` bridge returns into a real
+ *  Float32Array. Some bridges hand back an array-like or ArrayBuffer that
+ *  lacks the TypedArray methods (.subarray/.set) the trim + crossfade
+ *  post-processing relies on; calling them would throw "undefined is not a
+ *  function" and drop the whole bundled voice to system TTS. Never throws;
+ *  returns an empty buffer on anything unusable. */
+function asFloat32(x: unknown): Float32Array {
+  if (x instanceof Float32Array) return x;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const v = x as any;
+  try {
+    if (v instanceof ArrayBuffer) return new Float32Array(v);
+    if (v && v.buffer instanceof ArrayBuffer && typeof v.byteOffset === 'number' && typeof v.length === 'number') {
+      return new Float32Array(v.buffer, v.byteOffset, v.length);
+    }
+    if (v && typeof v.length === 'number') return Float32Array.from(v as ArrayLike<number>);
+  } catch { /* fall through to empty */ }
+  return new Float32Array(0);
 }
 
 /** Trim leading/trailing near-silence from a Kokoro waveform. Scans in
@@ -778,7 +816,7 @@ function primePrefetch(model: any, voice: string, rate: number): void {
       item.prefetchVoiceId = voice;
       item.prefetch = model
         .forward(item.text, rate)
-        .then((s: Float32Array | null) => { item.resolvedSamples = s; return s; })
+        .then((s: unknown) => { const f = asFloat32(s); item.resolvedSamples = f; return f; })
         .catch(() => { item.resolvedSamples = null; return null; });
     }
     ahead++;

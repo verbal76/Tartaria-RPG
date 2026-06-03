@@ -101,6 +101,10 @@ const CODENAMES: Record<string, string> = {
   // "finishing…" for the no-progress compile step, "initial install is
   // longest" copy; Kokoro %-gate lowered 4s→2s for a truer ramp.
   '2026-06-03-arb10': 'Glow Coil',
+  // Kokoro robustness: normalize native audio to a real Float32Array so the
+  // trim/crossfade post-processing can't throw "undefined is not a function";
+  // error status now names the failing step ([warmup]/[speak]).
+  '2026-06-03-arb11': 'Spark Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA
