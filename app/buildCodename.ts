@@ -175,6 +175,10 @@ const CODENAMES: Record<string, string> = {
   // out-of-range combat weapons (punch/kick/equipped) now BUZZ "can't do it"
   // instead of auto-approaching — APPROACH is the player's job again.
   '2026-06-03-arb31': 'Rust Hollow',
+  // Weather swing-penalty ("−1 to the swing") now narrates ONCE per fight
+  // instead of on every single attack — it doesn't change round-to-round,
+  // so the repeat was just log clutter. Re-fires only if the weather shifts.
+  '2026-06-03-arb32': 'Ash Gulley',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

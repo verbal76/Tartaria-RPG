@@ -342,6 +342,13 @@ interface CurrentScene {
    *  visit reads as one consistent room. Null for legacy/unmapped
    *  locations — the LLM context falls back to flat Location text. */
   microMicroId: string | null;
+  /** Weather changes rarely mid-fight, so the Arbiter announces the
+   *  visibility swing-penalty ("−1 to the swing") ONCE per combat instead
+   *  of on every attack. Holds the weather name we last announced for; the
+   *  arbiter line is suppressed while it matches the current weather, and
+   *  re-fires if the weather actually shifts. Cleared when a fresh combat
+   *  begins (so each new fight gets one reminder). */
+  weatherSwingAnnounced?: string | null;
   /** Slow-weather repositioning progress (Iron Fog etc.). Counts player
    *  advance/retreat actions toward the next range change. Reset to 0
    *  whenever range actually changes, the player switches direction, or
@@ -5368,12 +5375,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.attack), 0.1) });
           const visPenalty = weatherAttackPenalty(currentScene.weather);
           if (visPenalty > 0) {
-            get().appendLog(
-              'arbiter',
-              `${currentScene.weather!.name} hangs between you. "−${visPenalty} to the swing — see what you can," the Arbiter says.`,
-              { skipDedup: true },
-            );
-            get().appendLog('debug', `attack: visibility penalty −${visPenalty} (${currentScene.weather!.name})`);
+            // Announce the swing penalty only the FIRST time this weather
+            // bites in the current fight. It doesn't change round-to-round,
+            // so repeating it on every swing just clutters the log. Re-fires
+            // if the weather actually shifts to a different system.
+            const weatherName = currentScene.weather!.name;
+            if (currentScene.weatherSwingAnnounced !== weatherName) {
+              get().appendLog(
+                'arbiter',
+                `${weatherName} hangs between you. "−${visPenalty} to the swing — see what you can," the Arbiter says.`,
+                { skipDedup: true },
+              );
+              set((s) => (s.currentScene
+                ? { currentScene: { ...s.currentScene, weatherSwingAnnounced: weatherName } }
+                : {}));
+            }
+            get().appendLog('debug', `attack: visibility penalty −${visPenalty} (${weatherName})`);
           }
           // Aggregate the player's status-effect modifiers (aim, sprint,
           // surprise, etc.) so the dice prompt and the final attack
