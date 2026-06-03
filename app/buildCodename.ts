@@ -132,6 +132,9 @@ const CODENAMES: Record<string, string> = {
   // Climb beat advances only at the top (full climb taught); terser Arbiter
   // lines; only the instructed quick-action works per beat, wrong taps buzz.
   '2026-06-03-arb19': 'Buzz Coil',
+  // Climb beat now completes on the way DOWN (back at ground level), not at
+  // the top; line points at the full up-and-down loop.
+  '2026-06-03-arb20': 'Tide Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

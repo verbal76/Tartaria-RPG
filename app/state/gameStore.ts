@@ -8790,6 +8790,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             // OTA-120 Phase 3 — dog auto-rejoins on climb-down.
             rejoinDogOnDescent(get, set);
+            // Tutorial climb beat completes on the way DOWN — the player has
+            // climbed up and is back on the ground, ready for the door.
+            get().maybeAdvanceTutorial('climb');
             break;
           }
           set((s) => s.currentScene ? { currentScene: { ...s.currentScene, elevatedOn: null } } : s);
@@ -8800,6 +8803,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           // OTA-120 Phase 3 — dog auto-rejoins on climb-down.
           rejoinDogOnDescent(get, set);
+          // Tutorial climb beat completes once the player is back on the
+          // ground after a climb (see the matching call in the overlay path).
+          get().maybeAdvanceTutorial('climb');
           break;
         }
         // Strip leading prepositions ("climb up the pole" → "pole",
@@ -9157,11 +9163,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : s.currentScene,
             };
           });
-          // Tutorial climb beat — only advance once the player reaches the
-          // TOP, so they experience the full multi-tier climb (stamina cost,
-          // fall risk, loot at the crest) instead of the beat snapping away
-          // after a single pull. No-op outside the beat.
-          if (isTop) get().maybeAdvanceTutorial('climb');
+          // Tutorial climb beat does NOT advance on the way up — it ends
+          // when the player has climbed back DOWN to ground level (see the
+          // climb-down handler), so they finish the full climb first.
           // OTA-120 Phase 3 — dog can't climb. On the FIRST tier of a
           // climb (currentTier becomes 1 from 0), drop the dog to
           // 'waiting_at_base' so it sits at the climb origin and isn't
