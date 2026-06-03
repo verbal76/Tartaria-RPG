@@ -154,6 +154,10 @@ const CODENAMES: Record<string, string> = {
   // Market stalls spawn a fresh category trader (random stock) on entry;
   // building entry blocked during combat (fixes the "cycling rooms" weirdness).
   '2026-06-03-arb26': 'Stall Coil',
+  // Buildings are a side-pocket off the tile: snapshot the wild scene on
+  // enter, restore it on EXIT — same spot, weather, and plotted distance
+  // (entering a building is never a travel step).
+  '2026-06-03-arb27': 'Pocket Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

@@ -1349,6 +1349,11 @@ interface GameStore {
   activeBuildingId: string | null;
   activeBuildingRoomId: string | null;
   buildingRevealed: string[];
+  /** The exact wild scene the player entered the building FROM. Restored
+   *  on EXIT so they come back out at the same spot, same weather, and
+   *  (critically) the same plotted course / distance — entering a building
+   *  is never a travel step. */
+  preBuildingScene: CurrentScene | null;
   enterBuilding: (buildingId: string) => void;
   goBuildingRoom: (roomId: string) => void;
   exitBuilding: () => void;
@@ -1816,6 +1821,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   activeBuildingId: null,
   activeBuildingRoomId: null,
   buildingRevealed: [],
+  preBuildingScene: null,
   tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false },
 
   slots: [],
@@ -2279,7 +2285,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('world', 'Not while something has its eyes on you. Deal with the threat first.');
       return;
     }
-    set({ activeBuildingId: buildingId, activeBuildingRoomId: entry.id, buildingRevealed: [] });
+    set({
+      activeBuildingId: buildingId,
+      activeBuildingRoomId: entry.id,
+      buildingRevealed: [],
+      // Snapshot the wild tile so EXIT returns here unchanged (no re-roll,
+      // no travel step, same plotted distance to the city).
+      preBuildingScene: scene ?? null,
+    });
     get().appendLog('world', `You step inside ${b.name.toLowerCase()}, into ${entry.name.toLowerCase()}.`);
     get().appendLog('world', entry.description);
     patchSceneForBuildingRoom(get, set, buildingId, entry.id);
@@ -2303,10 +2316,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const id = get().activeBuildingId;
     if (!id) return;
     const b = getBuilding(id);
-    set({ activeBuildingId: null, activeBuildingRoomId: null, buildingRevealed: [] });
+    const snap = get().preBuildingScene;
+    set({ activeBuildingId: null, activeBuildingRoomId: null, buildingRevealed: [], preBuildingScene: null });
     get().appendLog('world', `You step back outside${b ? `, leaving ${b.name.toLowerCase()} behind` : ''}.`);
-    // Rebuild the open-ground scene at the current tile.
-    get().beginScene({ skipHubEntry: true });
+    if (snap) {
+      // Restore the exact tile you entered from — same weather + spot, and
+      // the plotted course / distance untouched (a building is not a step).
+      set({ currentScene: snap });
+    } else {
+      // No snapshot (e.g. entered via a code path that didn't save one) —
+      // fall back to a fresh scene at the current position.
+      get().beginScene({ skipHubEntry: true });
+    }
   },
   revealBuildingRoom(roomId) {
     const id = get().activeBuildingId;
