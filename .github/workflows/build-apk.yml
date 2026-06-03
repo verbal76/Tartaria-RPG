@@ -56,6 +56,13 @@ on:
       - 'release/**'
       - 'claude/**'
       - 'HaL2001'
+      # Isolated personal-testing branch. Builds a preview APK on the
+      # dedicated 'arbiters-line' OTA channel (see app.json / eas.json on
+      # this branch). It is NOT in eas-update.yml's branch list, so a push
+      # here builds a sideload APK without publishing any OTA. Falls
+      # through the profile resolver to preview/APK (not HaL2001, no tag,
+      # no [build-aab]).
+      - 'arbiters-line'
     tags:
       - 'v*'
     paths-ignore:
