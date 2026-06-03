@@ -14975,6 +14975,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         tutorialDemoVendor: null,
         awaitingTutorialName: false,
         tutorialPropsConsumed: { cudgel: true, rope: true, chestPlate: true, note: true },
+        // Land back in the world when the tutorial ends. The final beat
+        // (pick_city) runs on the 'contracts' / MAIN QUEST screen, and the
+        // skip button can fire from any beat — without this, finishing or
+        // skipping could strand the player on whatever screen the last beat
+        // used (e.g. contracts) instead of dropping them into exploration.
+        currentScreen: 'exploration',
       };
       if (s.currentScene && s.tutorialDemoVendor && s.currentScene.vendor === s.tutorialDemoVendor) {
         patch.currentScene = { ...s.currentScene, vendor: null };

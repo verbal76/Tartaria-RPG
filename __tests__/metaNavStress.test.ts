@@ -450,11 +450,18 @@ describe('Meta navigation stress', () => {
           const stripBackfills = (snap: string): string => {
             const o = JSON.parse(snap);
             if (Array.isArray(o.inventory)) {
-              o.inventory = o.inventory.map((it: any) => {
-                const c = { ...it };
-                delete c.durability;
-                return c;
-              });
+              o.inventory = o.inventory
+                .map((it: any) => {
+                  const c = { ...it };
+                  delete c.durability;
+                  return c;
+                })
+                // Save/load may reconstruct the inventory in a different
+                // ORDER (it's a multiset, not an ordered list) — that's not
+                // corruption. Sort by id so a pure reorder doesn't read as a
+                // state leak; any field/quantity/membership change still
+                // diffs because the per-item objects are compared in place.
+                .sort((a: any, b: any) => String(a.id).localeCompare(String(b.id)));
             }
             return JSON.stringify(o);
           };

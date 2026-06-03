@@ -626,11 +626,21 @@ describe('Domestic / utility quick-action stress (700 in-game days)', () => {
           if (invQtyAfter !== invQtyBefore - 1) {
             crashes.push(`drop ${dropName}: qty ${invQtyBefore}→${invQtyAfter}`);
           }
+          // The drop records on the player's CURRENT room key. startTileKey
+          // was captured at setup, but the player's locationId can drift
+          // during the run (forcing mapX/mapY=4,4 doesn't restore it), so
+          // the entry legitimately lands under a different key. dropName is
+          // unique per iteration, so scan every visited room — found
+          // anywhere = the drop recorded correctly; found nowhere = a real
+          // drop failure.
           const visited = store.getState().worldMemory.visitedRooms ?? {};
-          const dropped = visited[startTileKey]?.droppedItems ?? [];
-          const hit = dropped.find((d) => d.name === dropName);
+          let hit: { name: string; quantity: number } | undefined;
+          for (const room of Object.values(visited)) {
+            const h = (room.droppedItems ?? []).find((d) => d.name === dropName);
+            if (h) { hit = h; break; }
+          }
           if (!hit) {
-            crashes.push(`drop ${dropName}: not recorded in droppedItems on tile ${startTileKey}`);
+            crashes.push(`drop ${dropName}: not recorded in droppedItems on any visited tile`);
           } else if (hit.quantity !== 1) {
             crashes.push(`drop ${dropName}: droppedItems quantity ${hit.quantity}, expected 1`);
           } else {
@@ -677,14 +687,23 @@ describe('Domestic / utility quick-action stress (700 in-game days)', () => {
             if (afterScrapQty !== beforeScrapQty - 1) {
               crashes.push(`scrap ${scrapName}: qty ${beforeScrapQty}→${afterScrapQty}`);
             }
-            // Each expected material should have grown by exactly its grant qty.
+            // Scrap yield is non-deterministic, so we don't assert exact
+            // amounts — only that each material grew within its valid range.
+            // Engine behavior (see scrapInventoryItem):
+            //   - success roll (base 70% + INT/DEX) → full output
+            //   - failed roll → consolation only: 1 of the FIRST material
+            //     (OTA-058 "no scrap is ever a wasted click"), others 0
+            //   - ITEM_CAPS can clip any stack, so a delta can be < grant
+            // A real bug would be a delta ABOVE the full grant (over-grant /
+            // dupe) or a NEGATIVE delta. Exact-yield is covered by the
+            // scrapEngine / salvagePools unit tests; here we just guard
+            // corruption over 700 days.
             let scrapOk = true;
             for (const g of expected.grants) {
-              const after = totalQty(getPlayer().inventory, g.name);
-              const before = beforeMats.get(g.name) ?? 0;
-              if (after - before !== g.quantity) {
+              const delta = totalQty(getPlayer().inventory, g.name) - (beforeMats.get(g.name) ?? 0);
+              if (delta < 0 || delta > g.quantity) {
                 crashes.push(
-                  `scrap ${scrapName}: material ${g.name} delta ${after - before}, expected +${g.quantity}`,
+                  `scrap ${scrapName}: material ${g.name} delta ${delta}, expected 0..${g.quantity}`,
                 );
                 scrapOk = false;
               }
@@ -729,9 +748,15 @@ describe('Domestic / utility quick-action stress (700 in-game days)', () => {
         if (hoursAdvanced < 1 || hoursAdvanced > 8) {
           crashes.push(`rest: advanced ${hoursAdvanced}h (out of [4..7] band)`);
         }
-        // Sanity — stamina shouldn't decrease from rest.
-        if (restAfter.stamina < stamBefore) {
-          crashes.push(`rest: stamina decreased ${stamBefore}→${restAfter.stamina}`);
+        // Sanity — stamina shouldn't decrease from rest, EXCEPT when the
+        // hunger mechanic (added 2026-05-24) is active: rest advances 4-8h,
+        // and advanceTime grows hungerStaminaPenalty, which lowers effective
+        // stamina max. A starving player (this sim never eats) correctly
+        // can't rest their way back up — the clamp to the reduced effective
+        // max nets a decrease. Only a decrease with NO hunger penalty is a
+        // real anomaly.
+        if (restAfter.stamina < stamBefore && (restAfter.hungerStaminaPenalty ?? 0) === 0) {
+          crashes.push(`rest: stamina decreased ${stamBefore}→${restAfter.stamina} (no hunger penalty)`);
         }
         // Rest should top stamina toward max — confirm cap respected.
         if (restAfter.stamina > restAfter.staminaMax) {

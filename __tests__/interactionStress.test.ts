@@ -655,6 +655,10 @@ Top items granted:      ${[...distinctItemsGranted].slice(0, 8).join(', ') || '(
     // Salvage "nothing" must NOT consume the noun for a follow-up take.
     expect(nothingThenDedupe).toEqual([]);
     // At least 12 distinct ambient nouns picked up across the run.
+    // NOTE: flaky — the sim is unseeded (Math.random throughout) and this
+    // count swings widely run-to-run (observed 5-9). Reliably greening it
+    // needs the sim seeded (deterministic RNG), not just a lower floor.
+    // Flagged for the stress-suite modernization pass.
     expect(distinctNounsTaken.size).toBeGreaterThanOrEqual(12);
     // Look-around subset rotation is real — across 700 days the sim
     // should see plenty of different noun subsets. A weak floor of 8
