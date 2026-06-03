@@ -309,6 +309,14 @@ function findConcept(targetText: string | undefined): Concept | null {
 
 const allLocations = locationsData as Location[];
 
+/** How many ambient props a single scene/tile surfaces as Search /
+ *  Approach / Salvage / INVESTIGATE chips (and in look-around). Was 8;
+ *  dropped to 5 because a room full of 8-10 pokeable nouns turned
+ *  INVESTIGATE into a tap-grind with no "investigate all" escape hatch.
+ *  Fewer props = fewer taps to clear; the per-noun find chance is
+ *  unchanged, so the odds a room shows the player something still hold. */
+const AMBIENT_DISPLAY_CAP = 5;
+
 interface CurrentScene {
   weather: WeatherEntry;
   location: Location;
@@ -328,13 +336,20 @@ interface CurrentScene {
    *  scene paragraph mentioned that the player can ask / investigate /
    *  search against. */
   ambientNouns: string[];
-  /** A shuffled 8-noun subset of ambientNouns, fixed for this scene
+  /** A shuffled 5-noun subset of ambientNouns, fixed for this scene
    *  visit. Both look-around AND the chip pool (Search / Approach /
    *  Salvage) read from this exact list — STRICT MATCH: if a noun
    *  isn't in your look, it isn't in your chips either. Hook
    *  primaries are appended on top of chips because they're separate
    *  narrative threads, not ambient props. Set once during
-   *  beginScene; leave and come back to re-roll. */
+   *  beginScene; leave and come back to re-roll.
+   *
+   *  Capped at 5 (was 8): a room shouldn't surface 8-10 things to poke
+   *  at — that turned INVESTIGATE into a tap-grind (open modal → tap
+   *  chip → repeat ~8×) with no "investigate all" to short-circuit it.
+   *  Fewer props means fewer taps to clear the green, and since each
+   *  investigate keeps the same per-noun find chance, the odds of a
+   *  given room showing the player SOMETHING actually hold up. */
   displayedAmbientNouns?: string[];
   /** When this Location maps to a Macro biome in worldLadder.json, the
    *  scene picks a specific Micro-Micro room to flavor the Arbiter's
@@ -3287,23 +3302,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Lock the visible subset for THIS scene visit. Look-around and
     // the chip pool (Search/Approach/Salvage) BOTH read from this
     // same cache — strict match. If a noun isn't in your look-around,
-    // it isn't in your chips either. Five consecutive looks show the
-    // same eight; leave and come back to re-roll. Hook primaries get
+    // it isn't in your chips either. Consecutive looks show the same
+    // five; leave and come back to re-roll. Hook primaries get
     // appended to chips separately because they're active narrative
     // threads, not ambient props.
     let displayedAmbientNouns: string[];
-    if (ambientNouns.length <= 8) {
+    if (ambientNouns.length <= AMBIENT_DISPLAY_CAP) {
       displayedAmbientNouns = [...ambientNouns];
     } else {
-      // Reserve slots: 5 take + 2 climb + 2 salvage. Dedup overflow
-      // then top up any unused slot allocation from the remainder.
-      const pickedTakes = shuffleSlice(baseTakeable, 5);
-      const pickedClimb = shuffleSlice(allClimbablesPool, 2);
-      const pickedSalv = shuffleSlice(allSalvageablesPool, 2);
+      // Reserve slots so each verb still gets a look-in: 3 take + 1
+      // climb + 1 salvage. Dedup overflow, then top up any unused slot
+      // allocation from the remainder to fill the cap.
+      const pickedTakes = shuffleSlice(baseTakeable, 3);
+      const pickedClimb = shuffleSlice(allClimbablesPool, 1);
+      const pickedSalv = shuffleSlice(allSalvageablesPool, 1);
       const reservedPicks = Array.from(new Set([...pickedTakes, ...pickedClimb, ...pickedSalv]));
       const remaining = ambientNouns.filter((n) => !reservedPicks.includes(n));
-      const topupCount = Math.max(0, 8 - reservedPicks.length);
-      displayedAmbientNouns = [...reservedPicks, ...shuffleSlice(remaining, topupCount)].slice(0, 8);
+      const topupCount = Math.max(0, AMBIENT_DISPLAY_CAP - reservedPicks.length);
+      displayedAmbientNouns = [...reservedPicks, ...shuffleSlice(remaining, topupCount)].slice(0, AMBIENT_DISPLAY_CAP);
     }
     // microMicroId was resolved at the top of beginScene so the
     // encounter / loot rolls could use the ladder's curated pools.
@@ -14704,22 +14720,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // coordinates. The macro location's full ambientNouns pool can be
     // 30-100+ entries (e.g. Tartarian Outskirts has 36, Buried Cities
     // has 90+), but displayedAmbientNouns gets locked at scene
-    // creation to one 8-noun strict subset. Without this re-shuffle,
-    // every cardinal step within the same location replays the same
-    // 8, so the player sees "lantern, arch, watchtower, scrap pile…"
+    // creation to one strict subset (DISPLAY_CAP = 5). Without this
+    // re-shuffle, every cardinal step within the same location replays
+    // the same five, so the player sees "lantern, arch, watchtower…"
     // tile after tile. The seed is (mapX, mapY) so re-entering the
     // same tile shows the same nouns (consistency) while neighbouring
     // tiles get different picks (variety). Only re-rolls when the
-    // pool is bigger than the display window — small pools (≤8) show
+    // pool is bigger than the display window — small pools (≤5) show
     // everything either way.
     set((s) => {
       if (!s.currentScene) return s;
       const pool = s.currentScene.ambientNouns ?? [];
-      if (pool.length <= 8) return s;
+      if (pool.length <= AMBIENT_DISPLAY_CAP) return s;
       // Cantor-pairing-style mix: hashes (x, y) → a single 32-bit
       // seed that distinguishes (-3, 5) from (5, -3) and from (3, 5).
       const seed = (((step.x + 1000) & 0xffff) * 65537) ^ ((step.y + 1000) & 0xffff);
-      const next = shuffleSliceSeeded(pool, 8, seed);
+      const next = shuffleSliceSeeded(pool, AMBIENT_DISPLAY_CAP, seed);
       return { currentScene: { ...s.currentScene, displayedAmbientNouns: next } };
     });
     // Re-entry narration — when a cardinal step lands on a tile the

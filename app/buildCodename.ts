@@ -186,6 +186,12 @@ const CODENAMES: Record<string, string> = {
   // the ready-flash + a clear voice-failed fallback notice. Dead modelsReady
   // removed; VOICE row reads "system voice" on error instead of stalling.
   '2026-06-03-arb33': 'Bone Ladder',
+  // INVESTIGATE de-grind. The per-scene ambient prop pool (Search /
+  // Approach / Salvage / Investigate chips + look-around) is capped at 5
+  // instead of 8 — a room shouldn't surface 8-10 pokeable nouns when there's
+  // no "investigate all" to clear them. Per-noun find chance is unchanged,
+  // so the odds a room shows the player something hold up with fewer taps.
+  '2026-06-03-arb34': 'Salt Wake',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA
