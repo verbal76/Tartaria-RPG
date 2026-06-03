@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, type ViewProps, type ViewStyle, type StyleProp } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, type ViewProps } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { TUTORIAL_STEPS, type HighlightArea } from './tutorialSteps';
 
@@ -9,36 +9,67 @@ interface Props extends ViewProps {
 }
 
 // Wraps a screen region. When the tutorial's current step targets this
-// area, the wrapper applies an amber-glow style directly to the rendered
+// area, the wrapper applies an amber glow directly to the rendered
 // component — no overlay coordinate math, no measurement, no drift.
-// Glow comes off the moment the step advances.
+// Tungsten Spire — when the current step has `pulse: true` the glow
+// animates between dim and bright to draw the eye. Animation runs on
+// the JS driver because borderColor isn't native-animatable; pulse is
+// short and cheap enough that off-native is fine.
 export function TutorialTarget({ area, children, style, ...rest }: Props) {
   const tutorialStep = useGameStore((s) => s.tutorialStep);
-  const isActive =
-    tutorialStep !== null && TUTORIAL_STEPS[tutorialStep]?.area === area;
+  const step = tutorialStep !== null ? TUTORIAL_STEPS[tutorialStep] ?? null : null;
+  const isActive = !!step && step.area === area;
+  const shouldPulse = isActive && step?.pulse === true;
 
-  const composed: StyleProp<ViewStyle> = isActive
-    ? [style, glowStyles.glow]
-    : style;
+  const pulse = useRef(new Animated.Value(0)).current;
 
-  return (
-    <View style={composed} {...rest}>
-      {children}
-    </View>
-  );
-}
+  useEffect(() => {
+    if (!shouldPulse) {
+      pulse.stopAnimation();
+      pulse.setValue(0);
+      return;
+    }
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, { toValue: 1, duration: 700, useNativeDriver: false }),
+        Animated.timing(pulse, { toValue: 0, duration: 700, useNativeDriver: false }),
+      ]),
+    );
+    loop.start();
+    return () => {
+      loop.stop();
+    };
+  }, [shouldPulse, pulse]);
 
-const glowStyles = {
-  glow: {
-    borderColor: '#c9a86a',
+  if (!isActive) {
+    return <Animated.View style={style} {...rest}>{children}</Animated.View>;
+  }
+
+  // Static glow for non-pulse beats; pulse-interpolated glow for the
+  // ones the player should act on right now.
+  const borderColor = shouldPulse
+    ? pulse.interpolate({ inputRange: [0, 1], outputRange: ['#c9a86a', '#ffe28a'] })
+    : '#c9a86a';
+  const shadowOpacity = shouldPulse
+    ? pulse.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.95] })
+    : 0.95;
+
+  const animatedStyle = {
+    borderColor,
     borderWidth: 2,
     borderRadius: 6,
     backgroundColor: 'rgba(201, 168, 106, 0.08)',
     shadowColor: '#c9a86a',
-    shadowOpacity: 0.95,
+    shadowOpacity,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 0 },
-    // Android requires elevation for shadows. Bumped high so the glow reads.
     elevation: 16,
-  } satisfies ViewStyle,
-};
+  };
+
+  return (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    <Animated.View style={[style as any, animatedStyle as any]} {...rest}>
+      {children}
+    </Animated.View>
+  );
+}

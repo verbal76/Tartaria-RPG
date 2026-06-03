@@ -1,15 +1,20 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Keyboard } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 import { getRaces, getFactions } from '../engine/character';
 
-type Step = 'race' | 'faction' | 'name';
+// Tungsten Spire — the 'name' step is gone. New flow: race → faction →
+// BEGIN. The player gives their name in-game when the Arbiter prompts
+// inside the outpost (handled by the tutorial state machine). This
+// removes the in-screen TextInput that was driving the Android soft-
+// keyboard race the Nickel Tine + Zinc Anvil OTAs were chasing.
 
-const STEP_ORDER: Step[] = ['race', 'faction', 'name'];
+type Step = 'race' | 'faction';
+
+const STEP_ORDER: Step[] = ['race', 'faction'];
 const STEP_TITLE: Record<Step, string> = {
   race: 'CHOOSE YOUR RACE',
   faction: 'CHOOSE YOUR FACTION',
-  name: 'NAME YOUR TARTARIAN',
 };
 
 export function CharacterCreationScreen() {
@@ -20,13 +25,8 @@ export function CharacterCreationScreen() {
   const factions = getFactions();
 
   const [step, setStep] = useState<Step>('race');
-  const [name, setName] = useState('');
   const [raceId, setRaceId] = useState(races[0]!.id);
   const [factionId, setFactionId] = useState(factions[0]!.id);
-  const nameInputRef = useRef<TextInput>(null);
-
-  const trimmedName = name.trim();
-  const canStart = trimmedName.length >= 2;
 
   const stepIndex = STEP_ORDER.indexOf(step);
   const selectedRace = races.find((r) => r.id === raceId) ?? races[0]!;
@@ -35,39 +35,24 @@ export function CharacterCreationScreen() {
   const goBack = () => {
     if (step === 'race') {
       setScreen('title');
-    } else if (step === 'faction') {
-      setStep('race');
     } else {
-      setStep('faction');
+      setStep('race');
     }
   };
 
   const goNext = () => {
-    if (step === 'race') setStep('faction');
-    else if (step === 'faction') setStep('name');
-    else if (step === 'name') {
-      if (canStart) {
-        // OTA-300 — dismiss the keyboard + blur the name input BEFORE
-        // the screen transition. Without this, the soft keyboard from
-        // the name field stays up when ExplorationScreen mounts, which
-        // hides the tutorial welcome card's SKIP / CONTINUE buttons.
-        // Nickel Tine's InputBox.dismiss() useEffect was racing Android
-        // focus restoration and losing. Dismissing here, before
-        // navigation, eliminates the race entirely.
-        nameInputRef.current?.blur();
-        Keyboard.dismiss();
-        void startNewGame({ name: trimmedName, raceId, factionId });
-      } else {
-        // Name missing — pop the input back into focus so the keyboard
-        // appears immediately and the player can type.
-        nameInputRef.current?.focus();
-      }
+    if (step === 'race') {
+      setStep('faction');
+      return;
     }
+    // Faction step → straight into the game with an empty name; the
+    // Arbiter prompts for it in the outpost. tutorialStep starts at 0
+    // (the name beat) and the InputBox routes the next submission as
+    // the player's name.
+    void startNewGame({ name: '', raceId, factionId });
   };
 
-  const nextLabel = step === 'name'
-    ? (canStart ? 'BEGIN' : 'NAME REQUIRED')
-    : 'NEXT →';
+  const nextLabel = step === 'faction' ? 'BEGIN' : 'NEXT →';
 
   return (
     <View style={styles.container}>
@@ -79,10 +64,6 @@ export function CharacterCreationScreen() {
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         {step === 'race' && races.map((r) => {
-          // OTA 038 — surface full race mechanics on creation. Was
-          // showing only Base AC / TC / HP bonus; player had no way
-          // to see they were getting +2 STR (Giants) or +1 CHA
-          // (Aetherborn) or the barehand damage profile.
           const statBumps = r.racialStatBonuses ?? {};
           const statBumpStrs = Object.entries(statBumps)
             .filter(([, v]) => (v ?? 0) !== 0)
@@ -96,20 +77,17 @@ export function CharacterCreationScreen() {
             >
               <Text style={styles.optionName}>{r.name}</Text>
               <Text style={styles.optionDesc}>{r.description}</Text>
-              {/* Combat row — what your AC and unarmed attacks look like */}
               <Text style={styles.optionMeta}>
                 COMBAT · AC {r.baseAC} · barehand {r.barehandDamage}
               </Text>
               {r.racialACBonus && r.racialACBonus !== 'No inherent AC bonus' && (
                 <Text style={styles.optionMetaSub}>↳ {r.racialACBonus}</Text>
               )}
-              {/* Stat traits — always-on bumps + trait blurbs */}
               {statBumpStrs.length > 0 && (
                 <Text style={styles.optionMeta}>
                   STATS · {statBumpStrs.join(', ')} (always on)
                 </Text>
               )}
-              {/* Per-trait list (some are conditional / per-day) */}
               {raceId === r.id && r.traits && r.traits.length > 0 && (
                 <View style={styles.optionTraits}>
                   {r.traits.map((t, i) => (
@@ -120,7 +98,6 @@ export function CharacterCreationScreen() {
                   </Text>
                 </View>
               )}
-              {/* Starting kit */}
               <Text style={styles.optionMeta}>
                 KIT · {r.startingTCFormula} TC · HP bonus +{r.startingHPBonus}
               </Text>
@@ -149,42 +126,15 @@ export function CharacterCreationScreen() {
                 )}
               </TouchableOpacity>
             ))}
+            <View style={styles.beginBlock}>
+              <Text style={styles.contextLine}>
+                {selectedRace.name} · {selectedFaction.name}
+              </Text>
+              <Text style={styles.beginHint}>
+                Tap BEGIN below. The Arbiter will greet you in the outpost and ask your name.
+              </Text>
+            </View>
           </>
-        )}
-
-        {step === 'name' && (
-          <View style={styles.nameBlock}>
-            <Text style={styles.contextLine}>{selectedRace.name} · {selectedFaction.name}</Text>
-            {selectedRace.flavor && (
-              <Text style={styles.optionFlavor}>{selectedRace.flavor}</Text>
-            )}
-            {selectedFaction.flavor && (
-              <Text style={styles.optionFlavor}>{selectedFaction.flavor}</Text>
-            )}
-            <Text style={styles.label}>Name</Text>
-            <TextInput
-              ref={nameInputRef}
-              style={styles.input}
-              value={name}
-              onChangeText={setName}
-              placeholder="A name to be remembered or forgotten"
-              placeholderTextColor="#5a5246"
-              autoCapitalize="words"
-              autoCorrect={false}
-              returnKeyType="done"
-              onSubmitEditing={() => {
-                if (!canStart) return;
-                // OTA-300 — same dismiss as the BEGIN button path. Done-key
-                // on the keyboard also triggers startNewGame; without these
-                // calls the keyboard from the name input persists into the
-                // ExplorationScreen and covers the tutorial buttons.
-                nameInputRef.current?.blur();
-                Keyboard.dismiss();
-                void startNewGame({ name: trimmedName, raceId, factionId });
-              }}
-            />
-            <Text style={styles.nameHint}>At least 2 letters. Tap BEGIN when ready.</Text>
-          </View>
         )}
       </ScrollView>
 
@@ -198,7 +148,7 @@ export function CharacterCreationScreen() {
           <Text style={styles.backBtnText}>← BACK</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.nextBtn, step === 'name' && !canStart && styles.nextBtnDisabled]}
+          style={styles.nextBtn}
           onPress={goNext}
           activeOpacity={0.7}
           hitSlop={8}
@@ -231,19 +181,6 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 12 },
   contextLine: { color: '#9ec96a', fontSize: 11, letterSpacing: 1, marginBottom: 8, fontStyle: 'italic' },
-  label: { color: '#c9a86a', fontSize: 12, letterSpacing: 2, marginTop: 8, marginBottom: 6 },
-  input: {
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
-    borderWidth: 1,
-    color: '#e6d8b3',
-    paddingHorizontal: 10,
-    paddingVertical: 12,
-    borderRadius: 4,
-    fontSize: 14,
-  },
-  nameBlock: {},
-  nameHint: { color: '#7a705c', fontSize: 11, marginTop: 8, fontStyle: 'italic' },
   option: {
     backgroundColor: '#13110f',
     borderColor: '#3a342c',
@@ -270,6 +207,15 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     lineHeight: 17,
   },
+  beginBlock: {
+    marginTop: 12,
+    padding: 10,
+    backgroundColor: '#13110f',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+  },
+  beginHint: { color: '#cdbf99', fontSize: 12, lineHeight: 17, fontStyle: 'italic' },
   footer: { flexDirection: 'row', gap: 8, paddingTop: 8 },
   backBtn: {
     backgroundColor: '#1a1714',
@@ -289,6 +235,5 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: 'center',
   },
-  nextBtnDisabled: { backgroundColor: '#3a342c' },
   nextBtnText: { color: '#13110f', fontSize: 13, fontWeight: '800', letterSpacing: 2 },
 });

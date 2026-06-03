@@ -258,7 +258,7 @@ import {
   spawnChainEnemy,
   makeStolenDiscs,
 } from '../engine/whispers';
-import { TUTORIAL_STEPS } from '../components/tutorialSteps';
+import { TUTORIAL_STEPS, type TutorialStep } from '../components/tutorialSteps';
 import { findFragmentById, findStoryByFragmentId, pickFragmentForBiome } from '../engine/collectables';
 
 interface Concept {
@@ -1100,6 +1100,91 @@ function restoreStamina(player: PlayerCharacter, amount: number): PlayerCharacte
   });
 }
 
+// Tungsten Spire — tutorial prop catalog. The Arbiter walks the
+// player through TAKE (cudgel), typed-input TAKE (rope), SCRAP
+// (broken chest plate), and the eventual note that points at the
+// Aetheric Cores. Each entry resolves to a pre-stamped InventoryItem
+// when the tutorial state machine grants it.
+type TutorialPropId = 'cudgel' | 'rope' | 'chestPlate' | 'note';
+
+function makeTutorialItem(id: TutorialPropId): InventoryItem | null {
+  switch (id) {
+    case 'cudgel':
+      // Catalog row already exists in weapons.json — stampDurability
+      // pulls the right baseDurability from there. The auto-equip
+      // happens at grant time in tutorialPath below.
+      return stampDurability({
+        id: `tutorial_cudgel_${Date.now()}`,
+        name: 'Cudgel',
+        kind: 'weapon',
+        rarity: 'Common',
+        quantity: 1,
+        tags: ['weapon', 'club', 'melee', 'improvised', 'weighted', 'emergency'],
+        description: 'A stick with a fat stone lashed to its head with rag. Slow swing, heavy landing. The lashing loosens.',
+      });
+    case 'rope':
+      return {
+        id: `tutorial_rope_${Date.now()}`,
+        name: "Reclaimer's Rope",
+        kind: 'misc',
+        rarity: 'Common',
+        quantity: 1,
+        tags: ['climb', 'rope', 'fiber'],
+        description: 'Reinforced rope woven with Aetheric fibers. Withstands Aetheric anomalies and high tension.',
+      };
+    case 'chestPlate':
+      // Pure prop — only ever shows up in the outpost during the
+      // scrap beat; grants nothing useful, exists only so the
+      // SCRAP flow has a target.
+      return stampDurability({
+        id: `tutorial_chest_plate_${Date.now()}`,
+        name: 'Broken Chest Plate',
+        kind: 'armor',
+        rarity: 'Common',
+        quantity: 1,
+        tags: ['armor', 'broken', 'plate', 'metal', 'fiber'],
+        description: 'A rusted breastplate, snapped across the shoulder strap. The plate itself is salvageable for the metal.',
+      });
+    case 'note':
+      return {
+        id: `tutorial_note_${Date.now()}`,
+        name: 'Folded Note',
+        kind: 'misc',
+        rarity: 'Common',
+        quantity: 1,
+        tags: ['note', 'quest', 'lore'],
+        description: 'A torn page. Hand-inked: "Find your way to the cores. The Guardians keep them. Walk the road to any Capital and the Aether will lead you the rest of the way."',
+      };
+  }
+}
+
+function grantTutorialItem(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  id: TutorialPropId,
+): void {
+  const player = get().player;
+  if (!player) return;
+  if (get().tutorialPropsConsumed[id]) return;
+  const item = makeTutorialItem(id);
+  if (!item) return;
+  set((s) => {
+    if (!s.player) return {};
+    // Add to inventory + mark consumed.
+    const inventory = [...s.player.inventory, item];
+    let equipped = s.player.equipped;
+    // Auto-equip the cudgel to weapon slot if the player has nothing
+    // better there. Keeps the post-tutorial player combat-ready.
+    if (id === 'cudgel' && (!equipped?.main || equipped.main.includes('barehand'))) {
+      equipped = { ...(equipped ?? {}), main: 'Cudgel' };
+    }
+    return {
+      player: { ...s.player, inventory, equipped },
+      tutorialPropsConsumed: { ...s.tutorialPropsConsumed, [id]: true },
+    };
+  });
+}
+
 interface GameStore {
   player: PlayerCharacter | null;
   worldMemory: WorldMemory;
@@ -1163,6 +1248,27 @@ interface GameStore {
   /** When set, the vendor screen displays this stub vendor for the
    *  tutorial's trading-screen step. Cleared on tutorial end. */
   tutorialDemoVendor: VendorInstance | null;
+  /** Tungsten Spire — when true, the next submitted text input is
+   *  treated as the player's name (instead of going through the verb
+   *  parser). Set by startNewGame when the name beat is active;
+   *  cleared the moment the player provides a name or skips the
+   *  tutorial. Drives the in-feed Arbiter name prompt. */
+  awaitingTutorialName: boolean;
+  /** Tungsten Spire — has the player taken the tutorial cudgel /
+   *  rope / chest plate / note yet? Gates per-prop narration so the
+   *  Arbiter doesn't repeat the same line after the player walks back
+   *  into the outpost. Resets only on skipTutorial (consumed). */
+  tutorialPropsConsumed: {
+    cudgel: boolean;
+    rope: boolean;
+    chestPlate: boolean;
+    note: boolean;
+  };
+  /** Tungsten Spire — `maybeAdvanceTutorial(beatId)` advances the
+   *  tutorial only if the current beat matches. Used by action
+   *  handlers to advance after a verb resolves without coupling them
+   *  to step index numbers. */
+  maybeAdvanceTutorial: (beatId: string) => void;
 
   slots: SlotSummary[];
   activeSlotId: string | null;
@@ -1591,6 +1697,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   slotLoadError: null,
   tutorialStep: null,
   tutorialDemoVendor: null,
+  awaitingTutorialName: false,
+  tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false },
 
   slots: [],
   activeSlotId: null,
@@ -2338,10 +2446,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   async startNewGame(input) {
-    const player = createCharacter(input);
+    // Tungsten Spire — accept an empty name. The Arbiter asks the
+    // player for their name in the outpost (tutorial beat 0). For
+    // the brief window between createCharacter and the player's
+    // first input, player.name is an empty string; opening narration
+    // weaves around it via buildOpening. Character creation itself
+    // doesn't care — createCharacter writes player.name = '' and
+    // the tutorial overrides it on the first input.
+    const player = createCharacter({ ...input, name: input.name ?? '' });
     const memory = discoverLocation(emptyMemory(), player.currentLocationId);
-    // Each new character gets its own save slot; switch the active slot
-    // pointer so subsequent persist() writes go to it.
     const slotId = newSlotId();
     await setActiveSlot(slotId);
     set({
@@ -2351,26 +2464,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentScreen: 'exploration',
       currentScene: null,
       pendingRolls: null,
-  pendingHookContinue: null,
+      pendingHookContinue: null,
       activeSlotId: slotId,
+      // Tungsten Spire — reset tutorial-props ledger for the new
+      // character. Old characters loaded via loadSlotIntoGame don't
+      // hit this path; their hasSeenIntro stays true and the tutorial
+      // never fires.
+      tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false },
+      awaitingTutorialName: false,
     });
-    // OTA-099 — session-start debug marker for new characters
-    // too. Same purpose as in loadSlotIntoGame: any log capture
-    // can be traced to the build ID it was running.
     try {
-      get().appendLog('debug', `OTA session start: ${OTA_BUILD_ID}.`);
+      get().appendLog('debug', `APK session start: ${OTA_BUILD_ID}.`);
     } catch { /* never block character creation on a debug log */ }
-    // Opening line + player name + weather get woven INTO the scene
-    // paragraph rather than printed as their own log entries, so the
-    // player sees one flowing intro instead of three stacked statements.
-    // The isOpening flag also suppresses vendor spawn, the macro radar,
-    // the system Weather effect line, and the random Arbiter intros.
+    // beginScene paints the opening narration (location + weather +
+    // hub-room description). The Arbiter name prompt lands AFTER
+    // those via startTutorial below.
     get().beginScene({ openingPrefix: buildOpening(), isOpening: true });
     await get().persist();
     const slots = await listSlots();
     set({ slots });
-    // First-time tutorial — only on brand-new characters. Persists once
-    // (hasSeenIntro) so it never reruns on load.
+    // First-time tutorial — only on brand-new characters. The
+    // tutorial's beat-0 Arbiter line arms awaitingTutorialName so
+    // the next text input becomes the player's name.
     if (!player.hasSeenIntro) {
       get().startTutorial();
     }
@@ -3874,6 +3989,89 @@ export const useGameStore = create<GameStore>((set, get) => ({
   submitPlayerAction(text, _opts) {
     const trimmed = text.trim();
     if (!trimmed || get().pendingRolls) return;
+
+    // Tungsten Spire — TUTORIAL PRE-CHECK. Runs before the verb
+    // parser so the in-feed tutorial can intercept name input + the
+    // outpost prop verbs (take cudgel / take rope / take note,
+    // scrap broken chest plate, investigate door). Each branch
+    // appends the player's input as a log line, runs its side-
+    // effect, advances the tutorial, and returns — bypassing the
+    // normal parser for tutorial verbs.
+    {
+      const tState = get();
+      const tStepIdx = tState.tutorialStep;
+      const tStep = tStepIdx !== null ? TUTORIAL_STEPS[tStepIdx] : null;
+
+      // (a) Name capture. The Arbiter's first beat asks for a name;
+      //     awaitingTutorialName is true. Treat the input as the
+      //     name (2+ trimmed chars, no profanity check — players
+      //     can call themselves whatever).
+      if (tState.awaitingTutorialName && tStep?.id === 'name' && trimmed.length >= 2) {
+        if (!_opts?.silent) get().appendLog('player', trimmed);
+        set((s) => (s.player ? {
+          player: { ...s.player, name: trimmed },
+          awaitingTutorialName: false,
+        } : { awaitingTutorialName: false }));
+        get().appendLog('arbiter', `"Well met, ${trimmed}. Now — to business."`);
+        get().maybeAdvanceTutorial('name');
+        return;
+      }
+
+      // (b) Tutorial-prop TAKES. Cudgel, rope, note. The parser
+      //     won't find these because they aren't scene nouns; we
+      //     handle them directly so the tutorial works end-to-end
+      //     from a single typed verb OR a chip tap that submits the
+      //     same verb under the hood.
+      if (tStep?.id === 'cudgel' && /\btake\s+.*cudgel\b/i.test(trimmed)) {
+        if (!_opts?.silent) get().appendLog('player', trimmed);
+        grantTutorialItem(get, set, 'cudgel');
+        get().appendLog('world', 'You stoop and lift the cudgel. The lashing is loose but the head is solid. You equip it without thinking.');
+        get().appendLog('reward', '✦ Cudgel (Common). [equipped]');
+        get().maybeAdvanceTutorial('cudgel');
+        return;
+      }
+      if (tStep?.id === 'rope' && /\btake\s+.*rope\b/i.test(trimmed)) {
+        if (!_opts?.silent) get().appendLog('player', trimmed);
+        grantTutorialItem(get, set, 'rope');
+        get().appendLog('world', "You uncoil the rope from the shelf. Aetheric fibers, woven tight. It goes into your pack.");
+        get().appendLog('reward', "✦ Reclaimer's Rope (Common).");
+        get().maybeAdvanceTutorial('rope');
+        return;
+      }
+      // (c) Tutorial scrap of the chest plate. Mirrors the salvage
+      //     path's reward structure without running scrapEngine —
+      //     we don't need the random roll, just the verb teach. The
+      //     player learns the SCRAP/SALVAGE chip lights up at the
+      //     end of each scene; the broken plate is the demonstrator.
+      if (tStep?.id === 'scrap' && /\b(scrap|salvage|break)\s+.*(chest\s+plate|plate|breastplate)\b/i.test(trimmed)) {
+        if (!_opts?.silent) get().appendLog('player', trimmed);
+        set((s) => ({
+          tutorialPropsConsumed: { ...s.tutorialPropsConsumed, chestPlate: true },
+        }));
+        get().appendLog('world', 'You wedge the cudgel against the rim and pop the rusted plate off its strap. The metal comes apart along old hammer-marks.');
+        get().appendLog('reward', '✦ Plate Fragment x2 (Common). [scrapped]');
+        get().maybeAdvanceTutorial('scrap');
+        return;
+      }
+      // (d) Tutorial investigate of the locked door.
+      if (tStep?.id === 'investigate' && /\binvestigate\s+.*door\b/i.test(trimmed)) {
+        if (!_opts?.silent) get().appendLog('player', trimmed);
+        get().appendLog('world', 'You crouch by the door. The latch is set into a frame that\'s seen worse — a single shove on the right bracket lifts it. The door is unlocked.');
+        get().appendLog('arbiter', '"There. Now the way is open."');
+        get().maybeAdvanceTutorial('investigate');
+        return;
+      }
+      // (e) Tutorial NOTE pickup (after move_north). Same intercept
+      //     pattern as cudgel/rope.
+      if (tStep?.id === 'read_note' && /\b(take|read|pick\s+up)\s+.*note\b/i.test(trimmed)) {
+        if (!_opts?.silent) get().appendLog('player', trimmed);
+        grantTutorialItem(get, set, 'note');
+        get().appendLog('world', 'You unfold the note. Hand-inked, fresh ink: "Find your way to the cores. The Guardians keep them. Walk the road to any Capital and the Aether will lead you the rest of the way."');
+        get().appendLog('reward', '✦ Folded Note (Common).');
+        get().maybeAdvanceTutorial('read_note');
+        return;
+      }
+    }
 
     // OTA-195 — fuse verb. Short-circuit before the parser since
     // 'fuse' isn't in any verb alias and the player typed it directly
@@ -7315,6 +7513,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
               );
             }
             get().beginScene();
+            // Tungsten Spire — tutorial move-north beat. Advances when
+            // the player walks ANY hub-internal cardinal direction
+            // during the move_north beat (the outpost gate's only
+            // intended forward exit is north, but any room jump
+            // honors the beat — players who poke around find their
+            // way regardless).
+            get().maybeAdvanceTutorial('move_north');
             break;
           }
           // No hub-exit matched — fall through. This lets 'go to drakova'
@@ -13745,6 +13950,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         } : s));
       }
     }
+    // Tungsten Spire — pick_city beat: the tutorial completes when
+    // the player sets a travel course from the MAIN QUEST/MapScreen
+    // flow. Advancing from pick_city is the final step → tutorial
+    // collapses to null.
+    get().maybeAdvanceTutorial('pick_city');
   },
 
   continueTravel() {
@@ -14660,71 +14870,102 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ slotLoadError: null });
   },
 
-  // Tutorial — runs once after first character creation. Players can skip
-  // at the welcome modal or any subsequent step. End of tutorial (skip or
-  // completion) marks player.hasSeenIntro=true so it never re-runs.
+  // Tutorial — Tungsten Spire APK rewrite. The tutorial is a 10-beat
+  // in-feed sequence driven by the Arbiter from the outpost (the
+  // player's faction-starting hub room). Each beat advances when the
+  // player performs the specific action the Arbiter just asked for.
+  // The OLD welcome-card overlay is gone; the OLD demo-vendor beat is
+  // gone; the OLD per-screen tour is reduced to the dialogue inside
+  // the outpost. Anything the old tour covered that isn't in the new
+  // sequence still lives in TUTORIAL_DOCS_FULL for the Tutorial Replay
+  // panel.
   startTutorial() {
-    set({ tutorialStep: 0 });
+    // Open the first beat — speak the Arbiter's name prompt and arm
+    // the awaitingTutorialName latch so the next text input becomes
+    // the player's name.
+    set({ tutorialStep: 0, awaitingTutorialName: true });
+    const firstStep = TUTORIAL_STEPS[0];
+    if (firstStep?.arbiter) {
+      get().appendLog('arbiter', firstStep.arbiter);
+    }
   },
   advanceTutorial() {
     const current = get().tutorialStep ?? 0;
     const next = current + 1;
-    // Total count comes from the step array — no more magic numbers
-    // drifting out of sync when steps are added or reordered.
     if (next >= TUTORIAL_STEPS.length) {
       get().skipTutorial();
       return;
     }
-    const currentStep = TUTORIAL_STEPS[current];
-    const nextStep = TUTORIAL_STEPS[next];
-    const enteringVendor = nextStep?.screen === 'vendor';
-    const leavingVendor = currentStep?.screen === 'vendor' && nextStep?.screen !== 'vendor';
-    // Drive the screen swap atomically with the step change. Previously
-    // we relied on TutorialOverlay's useEffect to dispatch setScreen
-    // after a re-render — that opened a one-frame window where the
-    // old screen rendered against new tutorial state (e.g. vendor
-    // screen with vendor=null after leaving the demo). Putting
-    // currentScreen in the same set() removes the in-between frame
-    // and the freeze it occasionally triggered.
-    const nextScreen = nextStep?.screen ?? 'exploration';
-    if (enteringVendor) {
-      const vendor = findVendorByName('Irma Ironhand') ?? pickRandomVendor();
-      set((s) => ({
-        currentScene: s.currentScene
-          ? { ...s.currentScene, vendor }
-          : s.currentScene,
-        tutorialDemoVendor: vendor,
-        tutorialStep: next,
-        currentScreen: nextScreen,
-      }));
+    const nextStep: TutorialStep | undefined = TUTORIAL_STEPS[next];
+    if (!nextStep) {
+      get().skipTutorial();
       return;
     }
-    if (leavingVendor) {
-      set((s) => ({
-        currentScene: s.currentScene
-          ? { ...s.currentScene, vendor: null }
-          : s.currentScene,
-        tutorialDemoVendor: null,
-        tutorialStep: next,
-        currentScreen: nextScreen,
-      }));
-      return;
+    // Screen swap only when the next beat explicitly lives on a
+    // different screen (pick_city → contracts). Most beats stay on
+    // exploration.
+    const nextScreen = nextStep.screen ?? 'exploration';
+    set({
+      tutorialStep: next,
+      awaitingTutorialName: nextStep.id === 'name',
+      currentScreen: nextScreen,
+    });
+    // Speak the next Arbiter line in the feed.
+    if (nextStep.arbiter) {
+      get().appendLog('arbiter', nextStep.arbiter);
     }
-    set({ tutorialStep: next, currentScreen: nextScreen });
+    // Pre-fill the input with the draft text (the rope beat uses
+    // this to demo typed input).
+    if (nextStep.draftText) {
+      get().queueInputDraft(nextStep.draftText);
+    }
+  },
+  maybeAdvanceTutorial(beatId) {
+    const state = get();
+    if (state.tutorialStep === null) return;
+    const step = TUTORIAL_STEPS[state.tutorialStep];
+    if (step?.id === beatId) {
+      get().advanceTutorial();
+    }
   },
   skipTutorial() {
-    // Clear any tutorial-injected vendor from the scene.
+    // Skip path — grant the starter loot the tutorial would have
+    // walked the player through (cudgel + rope + note), mark
+    // tutorialPropsConsumed so the outpost doesn't keep narrating
+    // the props, and end the tutorial. If the player skipped at
+    // the name beat, assign a faction-themed default name.
+    const state = get();
+    const player = state.player;
     set((s) => {
-      const patch: Partial<GameStore> = { tutorialStep: null, tutorialDemoVendor: null };
+      const patch: Partial<GameStore> = {
+        tutorialStep: null,
+        tutorialDemoVendor: null,
+        awaitingTutorialName: false,
+        tutorialPropsConsumed: { cudgel: true, rope: true, chestPlate: true, note: true },
+      };
       if (s.currentScene && s.tutorialDemoVendor && s.currentScene.vendor === s.tutorialDemoVendor) {
         patch.currentScene = { ...s.currentScene, vendor: null };
       }
-      // Persist hasSeenIntro=true so the tutorial never re-runs for this character.
       if (s.player) {
-        patch.player = { ...s.player, hasSeenIntro: true };
+        const nextName = s.player.name && s.player.name.trim().length > 0
+          ? s.player.name
+          : 'Traveler';
+        patch.player = { ...s.player, name: nextName, hasSeenIntro: true };
       }
       return patch;
     });
+    // Grant starter loot if the player skipped before they collected
+    // any of it. Idempotent — grantTutorialItem refuses duplicate
+    // stacks of unique items.
+    if (player && !state.tutorialPropsConsumed.cudgel) {
+      grantTutorialItem(get, set, 'cudgel');
+    }
+    if (player && !state.tutorialPropsConsumed.rope) {
+      grantTutorialItem(get, set, 'rope');
+    }
+    if (player && !state.tutorialPropsConsumed.note) {
+      grantTutorialItem(get, set, 'note');
+    }
     void get().persist();
   },
 
@@ -19437,6 +19678,10 @@ function narrateCasualLook(
     set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } } : s));
     get().appendLog('world', hook.plantedLine);
   }
+
+  // Tungsten Spire — tutorial look-beat advancement. Fires only when
+  // the current tutorial beat is 'look'; no-op otherwise.
+  get().maybeAdvanceTutorial('look');
 }
 
 // Variant pool for the intra-scene approach line. Six rotations so a
