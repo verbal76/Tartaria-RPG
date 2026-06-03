@@ -97,6 +97,10 @@ const CODENAMES: Record<string, string> = {
   // Model-loading banner reworded + recolored amber/orange so it reads as
   // a calm "this is normal" notice rather than a red error alert.
   '2026-06-03-arb9': 'Kindle Coil',
+  // Loading banner shows real per-engine download % (Qwen + Kokoro),
+  // "finishing…" for the no-progress compile step, "initial install is
+  // longest" copy; Kokoro %-gate lowered 4s→2s for a truer ramp.
+  '2026-06-03-arb10': 'Glow Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

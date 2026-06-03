@@ -399,7 +399,13 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
             lastDownloadProgress = p;
             if (!downloadEscalated) {
               const elapsed = Date.now() - loadStartedAt;
-              if (elapsed >= 4000 && p < 0.99) {
+              // 2000ms gate: cache hits report p≈1 well before this (and
+              // the p<0.99 guard skips them anyway), so only a genuine
+              // first-time download trips it. Lowered from 4000ms so the
+              // percentage surfaces nearer the true start of the ramp —
+              // at 4s a fast download was already ~37% in, which read as
+              // "the bar starts at 37% then jumps to done".
+              if (elapsed >= 2000 && p < 0.99) {
                 downloadEscalated = true;
               }
             }

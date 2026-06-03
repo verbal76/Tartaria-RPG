@@ -138,12 +138,29 @@ export function TitleScreen() {
   // until both are 'ready' so the player physically can't trigger
   // OTA-apply during the danger window.
   const qwenStatus = useGameStore((s) => s.qwenStatus);
+  const qwenFraction = useGameStore((s) => s.qwenFraction);
   const [kokoroPhase, setKokoroPhase] = useState<KokoroState>(() => getKokoroState());
   useEffect(() => onKokoroStateChange(setKokoroPhase), []);
   const modelsLoading =
     qwenStatus === 'downloading' || qwenStatus === 'loading'
     || kokoroPhase.phase === 'downloading' || kokoroPhase.phase === 'loading';
   const modelsReady = qwenStatus === 'ready' && kokoroPhase.phase === 'ready';
+  // Live per-engine readiness for the loading banner. Both percentages are
+  // the REAL native download fractions (Qwen GGUF + Kokoro model), not a
+  // timer. The compile/warm-up step has no native progress, so it honestly
+  // reads "finishing…" instead of freezing a stale % or snapping to green.
+  const qwenLabel =
+    qwenStatus === 'downloading' ? `${Math.round(qwenFraction * 100)}%`
+    : qwenStatus === 'loading' ? 'finishing…'
+    : qwenStatus === 'ready' ? 'ready ✓'
+    : 'starting…';
+  const kokoroLabel =
+    kokoroPhase.phase === 'downloading' ? `${Math.round(kokoroPhase.fraction * 100)}%`
+    : kokoroPhase.phase === 'loading' ? 'finishing…'
+    : kokoroPhase.phase === 'ready' ? 'ready ✓'
+    : 'starting…';
+  const qwenDone = qwenStatus === 'ready';
+  const kokoroDone = kokoroPhase.phase === 'ready';
   useEffect(() => {
     let cancelled = false;
     void (async () => {
@@ -674,11 +691,26 @@ export function TitleScreen() {
             ⏳ GETTING THINGS READY — THIS IS NORMAL
           </Text>
           <Text style={styles.modelLoadingBannerBody}>
-            Hang tight, this shouldn't take long. The voice and narration
-            engines are downloading and warming up — totally normal on a
-            fresh install, and not an error. Just keep Tartaria Realms open
-            until you see "voice ready"; closing it mid-setup can interrupt
-            the install and you'd have to start over.
+            The first install is the longest part — these download once, then
+            Tartaria Realms runs fully offline. It's a normal one-time setup,
+            not an error.
+          </Text>
+          <View style={styles.modelLoadingRows}>
+            <View style={styles.modelLoadingRow}>
+              <Text style={styles.modelLoadingRowLabel}>NARRATION</Text>
+              <Text style={[styles.modelLoadingRowValue, qwenDone && styles.modelLoadingRowValueDone]}>
+                {qwenLabel}
+              </Text>
+            </View>
+            <View style={styles.modelLoadingRow}>
+              <Text style={styles.modelLoadingRowLabel}>VOICE</Text>
+              <Text style={[styles.modelLoadingRowValue, kokoroDone && styles.modelLoadingRowValueDone]}>
+                {kokoroLabel}
+              </Text>
+            </View>
+          </View>
+          <Text style={styles.modelLoadingBannerBody}>
+            Please keep the app open until both read “ready”.
           </Text>
         </View>
       )}
@@ -1306,6 +1338,34 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 4,
     lineHeight: 15,
+  },
+  // Live per-engine progress rows (real download %, "finishing…" during
+  // the no-progress compile step, "ready ✓" when done).
+  modelLoadingRows: {
+    marginTop: 8,
+    marginBottom: 2,
+    paddingHorizontal: 28,
+    gap: 3,
+  },
+  modelLoadingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  modelLoadingRowLabel: {
+    color: '#cdbf99',
+    fontSize: 11,
+    letterSpacing: 1.5,
+    fontWeight: '700',
+  },
+  modelLoadingRowValue: {
+    color: '#f0a740',
+    fontSize: 11,
+    fontWeight: '800',
+    fontVariant: ['tabular-nums'],
+  },
+  modelLoadingRowValueDone: {
+    color: '#9ec96a',
   },
   apkBanner: {
     backgroundColor: '#1a2a14',
