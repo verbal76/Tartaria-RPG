@@ -1185,6 +1185,36 @@ function grantTutorialItem(
   });
 }
 
+// Tungsten Spire — default-name generator for a player who skips the
+// tutorial before the Arbiter's name beat. Pairs a random flavor
+// adjective with the singular form of their race (e.g. "Dusty Reclaimer",
+// "Confused Aetherborn"). raceId is already a singular snake_case noun,
+// so title-casing it yields the race name; unknown/empty race falls back
+// to "Wanderer".
+const DEFAULT_NAME_ADJECTIVES = [
+  'Dusty', 'Confused', 'Weary', 'Ashen', 'Rusted', 'Grim', 'Wary',
+  'Hollow', 'Wandering', 'Nameless', 'Cracked', 'Sullen', 'Ragged',
+  'Bleary', 'Scarred', 'Muddy', 'Restless', 'Quiet', 'Forsaken',
+  'Lost', 'Cinderbound', 'Half-Awake', 'Stubborn', 'Brooding',
+] as const;
+
+export function raceSingular(raceId: string | null | undefined): string {
+  if (!raceId) return 'Wanderer';
+  return raceId
+    .split('_')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+export const DEFAULT_NAME_ADJECTIVE_POOL = DEFAULT_NAME_ADJECTIVES;
+
+export function generateDefaultName(raceId: string | null | undefined): string {
+  const adj = DEFAULT_NAME_ADJECTIVES[
+    Math.floor(Math.random() * DEFAULT_NAME_ADJECTIVES.length)
+  ]!;
+  return `${adj} ${raceSingular(raceId)}`;
+}
+
 interface GameStore {
   player: PlayerCharacter | null;
   worldMemory: WorldMemory;
@@ -14935,7 +14965,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // walked the player through (cudgel + rope + note), mark
     // tutorialPropsConsumed so the outpost doesn't keep narrating
     // the props, and end the tutorial. If the player skipped at
-    // the name beat, assign a faction-themed default name.
+    // the name beat, assign a race-themed default name
+    // (random adjective + singular race, e.g. "Dusty Reclaimer").
     const state = get();
     const player = state.player;
     set((s) => {
@@ -14951,7 +14982,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       if (s.player) {
         const nextName = s.player.name && s.player.name.trim().length > 0
           ? s.player.name
-          : 'Traveler';
+          : generateDefaultName(s.player.raceId);
         patch.player = { ...s.player, name: nextName, hasSeenIntro: true };
       }
       return patch;
