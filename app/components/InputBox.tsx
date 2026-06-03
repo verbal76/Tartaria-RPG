@@ -234,9 +234,16 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // tutorial meant it glowed through every beat. Gate it to the climb beat
   // so green points only at the current action; normal count/rope logic
   // applies outside the tutorial.
+  // CLIMB only carries a colour when there's actually something to climb:
+  //   • has rope + climbable here  → 'ready'   (green)
+  //   • no rope + climbable here   → 'unavailable' (red — go find a rope)
+  //   • nothing climbable here     → undefined (neutral, same as the rest)
+  // The old code left a 'needs-approach' (amber) fallback for the
+  // nothing-climbable case, so the button stayed amber after you'd climbed
+  // everything / when there was nothing to climb at all.
   const climbTone: 'ready' | 'needs-approach' | 'unavailable' | undefined = tutActionBeat
     ? (tutActionBeat === 'climb' ? 'ready' : undefined)
-    : (!playerHasRope ? 'unavailable' : climbableCount && climbableCount > 0 ? 'ready' : 'needs-approach');
+    : (climbableCount && climbableCount > 0 ? (playerHasRope ? 'ready' : 'unavailable') : undefined);
   // During a guided action beat, every quick-action EXCEPT the instructed
   // one is blocked (dimmed + buzzes on tap). The rope beat blocks TAKE too,
   // since its lesson is typed input (pre-fill + ACT). Approach is never a
@@ -303,14 +310,22 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
         {inCombat ? (
           <>
             <View style={styles.quickRowLine}>
-              <QuickBtn label="punch" onPress={() => onSubmit('punch')} tone={weaponTone(null, range, playerInt, inventory)} />
-              <QuickBtn label="kick" onPress={() => onSubmit('kick')} tone={weaponTone(null, range, playerInt, inventory)} />
-              {equippedMain ? (
-                <QuickBtn label={shortWeaponLabel(equippedMain).toLowerCase()} onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={weaponTone(equippedMain, range, playerInt, inventory)} />
-              ) : null}
-              {equippedOff ? (
-                <QuickBtn label={`off: ${shortWeaponLabel(equippedOff).toLowerCase()}`} onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={weaponTone(equippedOff, range, playerInt, inventory)} />
-              ) : null}
+              {(() => {
+                const punchT = weaponTone(null, range, playerInt, inventory);
+                return <QuickBtn label="punch" onPress={() => onSubmit('punch')} tone={punchT} outOfRange={punchT === 'needs-approach'} />;
+              })()}
+              {(() => {
+                const kickT = weaponTone(null, range, playerInt, inventory);
+                return <QuickBtn label="kick" onPress={() => onSubmit('kick')} tone={kickT} outOfRange={kickT === 'needs-approach'} />;
+              })()}
+              {equippedMain ? (() => {
+                const mainT = weaponTone(equippedMain, range, playerInt, inventory);
+                return <QuickBtn label={shortWeaponLabel(equippedMain).toLowerCase()} onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={mainT} outOfRange={mainT === 'needs-approach'} />;
+              })() : null}
+              {equippedOff ? (() => {
+                const offT = weaponTone(equippedOff, range, playerInt, inventory);
+                return <QuickBtn label={`off: ${shortWeaponLabel(equippedOff).toLowerCase()}`} onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
+              })() : null}
             </View>
 
             <View style={styles.quickRowLine}>
@@ -445,6 +460,7 @@ function QuickBtn({
   defensive,
   tone,
   blocked,
+  outOfRange,
 }: {
   label: string;
   onPress: () => void;
@@ -454,6 +470,12 @@ function QuickBtn({
    *  instead of firing the action — so only the beat's instructed button
    *  actually does anything. */
   blocked?: boolean;
+  /** Combat range gating: the weapon can't reach the target from here.
+   *  KEEP the amber 'needs-approach' tone (so the player sees WHY), but a
+   *  tap buzzes ("can't do it") instead of firing the attack — the engine
+   *  used to treat an out-of-range attack as a free approach, which let
+   *  PUNCH double as APPROACH. Now you must hit APPROACH yourself. */
+  outOfRange?: boolean;
 }) {
   const resolvedTone: QuickBtnTone | undefined = blocked
     ? undefined
@@ -474,8 +496,9 @@ function QuickBtn({
     resolvedTone === 'unavailable' && styles.quickUnavailableText,
   ];
   const handlePress = () => {
-    if (blocked) {
-      // Wrong action for this tutorial beat — buzz instead of acting.
+    if (blocked || outOfRange) {
+      // Wrong action for this tutorial beat, or weapon out of range — buzz
+      // ("can't do it") instead of acting. APPROACH is the player's job.
       try { Vibration.vibrate(30); } catch { /* ignore */ }
       return;
     }

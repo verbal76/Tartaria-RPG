@@ -167,6 +167,14 @@ const CODENAMES: Record<string, string> = {
   // Travel pacing rolled back to theme-park: wasteland-encounter chance
   // 0.82/0.92 → 0.45/0.55, vendor 15%→8%, step trinket 10%→7%.
   '2026-06-03-arb30': 'Tempo Coil',
+  // Codename theme shift — the '<noun> Coil' run was reading EDM/dancehall;
+  // switching to gritty two-word survival handles (Rust Hollow, Ash Gulley,
+  // Bone Ladder, ...) for all FUTURE OTAs. Shipped ids are NEVER renamed —
+  // bug reports map to whatever handle was live, so the Coil run stays as-is.
+  // CLIMB button drops to neutral when nothing's climbable (was stuck amber);
+  // out-of-range combat weapons (punch/kick/equipped) now BUZZ "can't do it"
+  // instead of auto-approaching — APPROACH is the player's job again.
+  '2026-06-03-arb31': 'Rust Hollow',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA
