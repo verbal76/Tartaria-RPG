@@ -113,6 +113,9 @@ const CODENAMES: Record<string, string> = {
   // crossfade only within a line; tutorial action buttons go amber once
   // their item is taken (green only for the current beat's action).
   '2026-06-03-arb13': 'Surge Coil',
+  // Actually suppress the pre-name Arbiter hints: arm the tutorial BEFORE
+  // beginScene so the tutorialStep===null guards take effect on a new game.
+  '2026-06-03-arb14': 'Volt Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

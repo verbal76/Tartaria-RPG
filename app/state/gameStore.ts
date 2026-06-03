@@ -2538,6 +2538,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     try {
       get().appendLog('debug', `APK session start: ${OTA_BUILD_ID}.`);
     } catch { /* never block character creation on a debug log */ }
+    // Arm the tutorial BEFORE beginScene so its scene-entry Arbiter hints
+    // (danger assessment, ask-the-Arbiter, hub-travel — each gated on
+    // tutorialStep === null) stay suppressed during the opening. They were
+    // firing ahead of the name prompt because, on a brand-new game, the
+    // tutorial wasn't "started" yet when beginScene ran, so tutorialStep was
+    // still null and the guards let them through.
+    if (!player.hasSeenIntro) {
+      set({ tutorialStep: 0, awaitingTutorialName: true });
+    }
     // beginScene paints the opening narration (location + weather +
     // hub-room description). The Arbiter name prompt lands AFTER
     // those via startTutorial below.
