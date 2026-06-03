@@ -14751,7 +14751,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         && (!liveScene.enemies || liveScene.enemies.length === 0)
         && !liveScene.vendor;
       const inAnyHubRoom = !!livePlayer?.hubRoomId;
-      if (outdoorPeaceful && !inAnyHubRoom && Math.random() < 0.15) {
+      if (outdoorPeaceful && !inAnyHubRoom && Math.random() < 0.08) {
         const stall = pickRoadsideTrader();
         set((s) => s.currentScene ? { currentScene: { ...s.currentScene, vendor: stall } } : s);
         get().appendLog(
@@ -14975,14 +14975,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const { encounterRateMultiplier } = require('../engine/timeOfDay');
       const playerForEnc = get().player;
       const isAutoTravel = !!playerForEnc?.travelTarget;
-      // OTA-187 — wasteland encounter rate bumped (auto-travel
-      // 0.85→0.92, walking 0.70→0.82) per playtester: "the game
-      // is a little shy on combat." Threshold unchanged (1 step
-      // for auto-travel, 2 for manual). Net effect with the JSON
-      // weight distribution (~30% skirmish): combat per step rises
-      // from ~21-25% to ~24-28%.
+      // arb30 — rolled back toward "theme-park" pacing. Was 0.82 / 0.92
+      // (~24-28% combat per step), which on the new 82-wide map = a meat
+      // grinder over a long journey. 0.45 / 0.55 lands combat ~12-16% per
+      // step: lively action, not constant. Tune down toward "desolate"
+      // (~4-8%) from here once the feel is dialed in.
       const baseThreshold = isAutoTravel ? 1 : 2;
-      const baseRollChance = isAutoTravel ? 0.92 : 0.82;
+      const baseRollChance = isAutoTravel ? 0.55 : 0.45;
       const timeMult = encounterRateMultiplier(playerForEnc?.hoursElapsed);
       const effectiveRollChance = Math.min(0.99, baseRollChance * timeMult);
       // 2026-05-25 OTA-045 — JIT-temptation predicate. Depleted on
@@ -15162,7 +15161,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         && (!liveScene.enemies || liveScene.enemies.length === 0)
         && !liveScene.vendor;
       const inAnyHubRoom = !!livePlayer?.hubRoomId;
-      if (outdoorPeaceful && !inAnyHubRoom && livePlayer && Math.random() < 0.10) {
+      if (outdoorPeaceful && !inAnyHubRoom && livePlayer && Math.random() < 0.07) {
         const trinket = pick(INVESTIGATE_TRINKETS);
         const qty = trinket.qtyMin === trinket.qtyMax
           ? trinket.qtyMin

@@ -164,6 +164,9 @@ const CODENAMES: Record<string, string> = {
   // Canonical world: 82x41 grid, every named location at a FIXED atlas-derived
   // position (seed-independent, same for everyone). Saves snap to new center.
   '2026-06-03-arb29': 'Atlas Coil',
+  // Travel pacing rolled back to theme-park: wasteland-encounter chance
+  // 0.82/0.92 → 0.45/0.55, vendor 15%→8%, step trinket 10%→7%.
+  '2026-06-03-arb30': 'Tempo Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA
