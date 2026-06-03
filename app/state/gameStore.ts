@@ -140,7 +140,7 @@ import {
   type Recipe,
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
-import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, VENDORS, type VendorInstance } from '../engine/vendors';
+import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, VENDORS, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks } from '../engine/raceMechanics';
 import { trainStat, type StatKey } from '../engine/statTraining';
 import { findQuestFactionHint } from '../engine/factionHint';
@@ -1207,6 +1207,10 @@ function patchSceneForBuildingRoom(
   const b = getBuilding(buildingId);
   const room = getBuildingRoom(buildingId, roomId);
   if (!b || !room) return;
+  // Market stalls mint a fresh trader (random stock) each time you step up.
+  const stallVendor = room.stallCategory
+    ? buildStallVendor(room.stallCategory, room.shortName)
+    : null;
   set((s) => {
     if (!s.currentScene) return {};
     const nouns = [...room.interactables];
@@ -1216,7 +1220,12 @@ function patchSceneForBuildingRoom(
         ambientNouns: nouns,
         displayedAmbientNouns: nouns,
         transitArea: `${b.name} · ${room.shortName}`,
-        vendor: null,
+        // Indoors is peaceful — clear any wilderness combat / hooks.
+        enemies: [],
+        enemyHps: [],
+        activeEnemyIdx: 0,
+        range: null,
+        vendor: stallVendor,
         hooks: [],
       },
     };
@@ -2263,8 +2272,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const b = getBuilding(buildingId);
     const entry = buildingEntryRoom(buildingId);
     if (!b || !entry) return;
+    // Can't duck indoors mid-fight — that left combat running inside the
+    // building and read as the rooms "cycling" with the enemy still active.
+    const scene = get().currentScene;
+    if (scene && scene.enemies && scene.enemies.length > 0) {
+      get().appendLog('world', 'Not while something has its eyes on you. Deal with the threat first.');
+      return;
+    }
     set({ activeBuildingId: buildingId, activeBuildingRoomId: entry.id, buildingRevealed: [] });
-    get().appendLog('world', `You step inside ${b.name.toLowerCase()}.`);
+    get().appendLog('world', `You step inside ${b.name.toLowerCase()}, into ${entry.name.toLowerCase()}.`);
     get().appendLog('world', entry.description);
     patchSceneForBuildingRoom(get, set, buildingId, entry.id);
   },
@@ -2279,6 +2295,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const p = get().player;
     if (p) set({ player: advanceTime(spendStamina(p, 1), 0.25) });
     set({ activeBuildingRoomId: roomId });
+    get().appendLog('world', `You step into ${room.name.toLowerCase()}.`);
     get().appendLog('world', room.description);
     patchSceneForBuildingRoom(get, set, id, roomId);
   },

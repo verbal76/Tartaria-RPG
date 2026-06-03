@@ -151,6 +151,9 @@ const CODENAMES: Record<string, string> = {
   // Enterable buildings WIRED: enter/exit + room nav row + secret-room
   // reveal. Dev trigger "enter <building>" to walk them on-device.
   '2026-06-03-arb25': 'Door Coil',
+  // Market stalls spawn a fresh category trader (random stock) on entry;
+  // building entry blocked during combat (fixes the "cycling rooms" weirdness).
+  '2026-06-03-arb26': 'Stall Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA
