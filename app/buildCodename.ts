@@ -109,6 +109,10 @@ const CODENAMES: Record<string, string> = {
   // suppressed during tutorial); em-dashes removed from spoken tutorial +
   // entry lines; cleanForSpeech also converts spaced hyphens to commas.
   '2026-06-03-arb12': 'Flare Coil',
+  // Voice latency: ship first sentence as a small chunk (fast start),
+  // crossfade only within a line; tutorial action buttons go amber once
+  // their item is taken (green only for the current beat's action).
+  '2026-06-03-arb13': 'Surge Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

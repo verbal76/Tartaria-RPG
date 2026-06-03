@@ -195,6 +195,26 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const salvageOverride: (() => void) | null = null;
   const investigateOverride: (() => void) | null = null;
 
+  // During the guided action beats (cudgel / rope / scrap / investigate),
+  // drive the TAKE / SALVAGE / INVESTIGATE green "ready" glow off the CURRENT
+  // BEAT rather than the room's real interactable counts. Otherwise TAKE
+  // stayed green after the tutorial items were already taken (the room still
+  // had real nouns), and SALVAGE stayed green into the investigate beat.
+  // green = the one thing to do now; the completed buttons drop to amber.
+  const tutActionBeat =
+    currentBeatId === 'cudgel' || currentBeatId === 'rope'
+      || currentBeatId === 'scrap' || currentBeatId === 'investigate'
+      ? currentBeatId : null;
+  const takeTone: 'ready' | undefined = tutActionBeat
+    ? (tutActionBeat === 'cudgel' || tutActionBeat === 'rope' ? 'ready' : undefined)
+    : (takeOverride || (takeableCount && takeableCount > 0) ? 'ready' : undefined);
+  const salvageTone: 'ready' | undefined = tutActionBeat
+    ? (tutActionBeat === 'scrap' ? 'ready' : undefined)
+    : (salvageOverride || (salvageableCount && salvageableCount > 0) ? 'ready' : undefined);
+  const investigateTone: 'ready' | undefined = tutActionBeat
+    ? (tutActionBeat === 'investigate' ? 'ready' : undefined)
+    : (investigateOverride || (investigateCount && investigateCount > 0) ? 'ready' : undefined);
+
   return (
     <View style={styles.container}>
       {!inCombat && (
@@ -281,18 +301,18 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             <QuickBtn
               label="investigate"
               onPress={investigateOverride ?? onOpenSearch}
-              tone={investigateOverride ? 'ready' : investigateCount && investigateCount > 0 ? 'ready' : undefined}
+              tone={investigateTone}
             />
             <QuickBtn label="approach" onPress={onOpenApproach} />
             <QuickBtn
               label="take"
               onPress={takeOverride ?? onOpenTake}
-              tone={takeOverride ? 'ready' : takeableCount && takeableCount > 0 ? 'ready' : undefined}
+              tone={takeTone}
             />
             <QuickBtn
               label="salvage"
               onPress={salvageOverride ?? onOpenSalvage}
-              tone={salvageOverride ? 'ready' : salvageableCount && salvageableCount > 0 ? 'ready' : undefined}
+              tone={salvageTone}
             />
             {!elevatedOn ? (
               <QuickBtn

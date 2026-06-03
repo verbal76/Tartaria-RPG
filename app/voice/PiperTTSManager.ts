@@ -47,7 +47,7 @@ const KOKORO_SAMPLE_RATE = 22050;
 // gap per chunk; merging gives sentence-to-sentence context and one
 // continuous waveform. Well under Kokoro's ~510-token cap (≈ 260 chars is
 // ~200 phonemes, leaving generous headroom).
-const MERGE_TARGET_CHARS = 260;
+const MERGE_TARGET_CHARS = 200;
 
 // arb8 crossfade — adjacent same-voice chunks whose audio is already
 // inferred are concatenated into ONE waveform with a short equal-power
@@ -57,7 +57,7 @@ const MERGE_TARGET_CHARS = 260;
 // CROSSFADE_MAX_BATCH caps one playback buffer's size; CROSSFADE_MS is the
 // overlap length. First-audio stays fast because a batch only forms from
 // chunks that prefetch already finished during the prior chunk's playback.
-const CROSSFADE_LOOKAHEAD = 3;
+const CROSSFADE_LOOKAHEAD = 2;
 const CROSSFADE_MAX_BATCH = 4;
 const CROSSFADE_MS = 12;
 
@@ -549,12 +549,18 @@ export function speak(text: string, voiceId?: string | null, channel?: string): 
   // narration is pre-bundled upstream in TTSController; this also catches
   // the many pre-written multi-sentence lines delivered in one speak().)
   const chunks: string[] = [];
-  for (const piece of rawChunks) {
+  for (let i = 0; i < rawChunks.length; i++) {
+    const piece = rawChunks[i]!;
     const last = chunks.length > 0 ? chunks[chunks.length - 1]! : null;
-    if (last !== null && last.length + 1 + piece.length <= MERGE_TARGET_CHARS) {
-      chunks[chunks.length - 1] = `${last} ${piece}`;
-    } else {
+    // Keep the FIRST sentence as its own small chunk so audio starts fast
+    // (bundling the whole line meant Kokoro inferred a big block before any
+    // sound — the "heavy ramp-up delay" report). Bundle from the 2nd
+    // sentence onward, up to MERGE_TARGET_CHARS, for smoothness.
+    if (i === 0 || chunks.length < 2 || last === null
+        || last.length + 1 + piece.length > MERGE_TARGET_CHARS) {
       chunks.push(piece);
+    } else {
+      chunks[chunks.length - 1] = `${last} ${piece}`;
     }
   }
   const resolvedVoice = voiceId ?? arbiterVoiceId();
@@ -604,6 +610,12 @@ async function drain(): Promise<void> {
     while (batch.length < CROSSFADE_MAX_BATCH) {
       const peek = queue[0];
       if (!peek) break;
+      // Only crossfade chunks of the SAME line. Merging across separate
+      // lines made discrete beats (e.g. tutorial acks) run together and
+      // feel laggy; intra-line bundling keeps long narration smooth while
+      // distinct lines stay responsive. (Prefetch still pipelines across
+      // lines below, so the inter-line gap stays small.)
+      if (peek.lineId !== next.lineId) break;
       const peekVoice = peek.voiceId ?? arbiterVoiceId();
       if (peekVoice !== targetVoice) break;                 // stop at a voice change
       if (peek.resolvedSamples === undefined) break;        // not inferred yet → don't block
