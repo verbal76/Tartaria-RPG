@@ -286,6 +286,25 @@ describe('Domestic / utility quick-action stress (700 in-game days)', () => {
           store.setState({ gameLog: curLog.slice(-40) });
         }
 
+        // Keep the pack lean. Over 700 days the crafted results + scrap
+        // output pile up unbounded (the sim crafts/injects far faster than
+        // it consumes), eventually filling the pack — at which point craft
+        // correctly REFUSES (no room for the result) and ITEM_CAPS block
+        // re-provisioning ingredients, which the per-op checks below then
+        // mis-read as failures. A real player never carries 600+ items;
+        // reset to just the currently-equipped gear each turn so every op
+        // runs against a realistic, roomy pack and provisions what it needs.
+        {
+          const p = getPlayer();
+          if (p.inventory.length > 24) {
+            const equippedIds = new Set(
+              Object.values(p.equipped ?? {}).filter((v): v is string => typeof v === 'string'),
+            );
+            p.inventory = p.inventory.filter((i) => equippedIds.has(i.id));
+            setPlayer(p);
+          }
+        }
+
         // ─── 1. PROVISION (stand-in for digging) ─────────────────────
         // Drop materials directly so the test stays deterministic.
         const recipe = ROTATION[cycleRecipeIdx % ROTATION.length]!;
