@@ -85,9 +85,9 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     area: 'input-row',
     inputPulse: true,
     title: 'Your Name',
-    body: 'Speak your name. Type it below and tap Act.',
+    body: 'Speak your name. Type it below, then tap ACT — or hit Enter on the keyboard.',
     arbiter:
-      'The Arbiter regards you from across the floor. "Before we go any further — your name, traveler. Type it below and tap Act."',
+      'The Arbiter regards you from across the floor. "Before we go any further — your name, traveler. Type it below and tap ACT, or just hit Enter."',
   },
   {
     id: 'cudgel',

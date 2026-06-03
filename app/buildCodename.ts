@@ -72,6 +72,11 @@ const CODENAMES: Record<string, string> = {
   // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).
   // Sits on the dead 'arbiters-line' channel; never published OTA-side.
   '2026-06-03-arb1': 'Flint Coil',
+  // First real OTA on the arbiters-line channel (tutorial keyboard +
+  // name-prompt copy). The test line keeps the '<noun> Coil' suffix so
+  // these read as the arbiters-line lineage at a glance: Flint Coil →
+  // Cinder Coil → …
+  '2026-06-03-arb2': 'Cinder Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

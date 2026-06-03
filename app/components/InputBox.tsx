@@ -146,6 +146,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     onSubmit(trimmed);
     setText('');
     inputRef.current?.clear();
+    // The name beat is the one place the keyboard must not linger. After
+    // the player types their name and submits, the input would otherwise
+    // stay focused and the keyboard would reappear over the next beats
+    // (the cudgel TAKE button, etc.) — the long-standing "keyboard pops
+    // up again" report. Dismiss it at the source, right after the name.
+    if (awaitingTutorialName) Keyboard.dismiss();
   };
 
   // Tungsten Spire — hub-room named exits. When the player is inside
