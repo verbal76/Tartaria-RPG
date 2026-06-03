@@ -274,6 +274,18 @@ describe('Domestic / utility quick-action stress (700 in-game days)', () => {
         if (dayNow >= TARGET_DAYS) return;
         iter++;
 
+        // Same OOM guard as thousandDayStressSim: trim the in-memory gameLog
+        // every turn. The store keeps every entry (MAX_LOG_IN_MEMORY =
+        // Infinity) and persist() JSON.stringify-s the whole array into the
+        // AsyncStorage mock after almost every action; without trimming, 700
+        // days of crafting OOMs V8 (>8 GB strings). slice() drops the old
+        // entries' references so V8 can reclaim them even in this sync loop.
+        // This sim asserts on crash counters / inventory, never on gameLog.
+        const curLog = store.getState().gameLog;
+        if (curLog.length > 80) {
+          store.setState({ gameLog: curLog.slice(-40) });
+        }
+
         // ─── 1. PROVISION (stand-in for digging) ─────────────────────
         // Drop materials directly so the test stays deterministic.
         const recipe = ROTATION[cycleRecipeIdx % ROTATION.length]!;

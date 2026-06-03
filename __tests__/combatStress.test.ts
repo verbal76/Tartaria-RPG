@@ -304,6 +304,16 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
           staminaSamples.push(p.stamina);
         }
       }
+      // Trim gameLog every turn — same guard as thousandDayStressSim. The
+      // store keeps every entry (MAX_LOG_IN_MEMORY = Infinity) and persist()
+      // JSON.stringify-s the full array into the AsyncStorage mock after
+      // almost every action; without trimming, 700 days of combat OOMs V8
+      // (>8 GB strings). combatStress asserts on its own counters, never on
+      // gameLog, so dropping old entries is safe.
+      const curLog = store.getState().gameLog;
+      if (curLog.length > 80) {
+        store.setState({ gameLog: curLog.slice(-40) });
+      }
       actions++;
 
       const sBefore = store.getState();
@@ -658,9 +668,13 @@ First 5 crashes:      ${crashes.slice(0, 5).join(' | ') || '(none)'}
     expect(totalEncounters).toBeGreaterThan(10);
     expect(winRate).toBeGreaterThanOrEqual(0.6);
 
-    // 3. Every defensive verb fires its +AC status at least once.
+    // 3. Defensive verbs fire their +AC status at least once. NOTE: the
+    //    'block' verb was folded into dodge (see gameStore `case 'block'`:
+    //    "block folded into dodge"), so it intentionally no longer applies
+    //    a standalone 'blocking' status — only dodge and take_cover grant
+    //    their own +AC effect now. Asserting block here tested removed
+    //    behavior; the verb is still exercised above and must not crash.
     expect(defensiveAcApplied.dodge ?? 0).toBeGreaterThan(0);
-    expect(defensiveAcApplied.block ?? 0).toBeGreaterThan(0);
     expect(defensiveAcApplied.take_cover ?? 0).toBeGreaterThan(0);
 
     // 4. No infinite combat loops — assertion target is "every
