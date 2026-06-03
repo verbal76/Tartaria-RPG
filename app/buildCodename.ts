@@ -126,6 +126,9 @@ const CODENAMES: Record<string, string> = {
   // Ducking amount is now a player setting (Settings → SFX → Music → "Duck
   // under voice", 0–50%, default 15%).
   '2026-06-03-arb17': 'Chord Coil',
+  // Rope beat: disable the TAKE shortcut so the typed-input lesson (pre-fill
+  // + ACT) can't be bypassed; re-enables once ACT advances the beat.
+  '2026-06-03-arb18': 'Latch Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

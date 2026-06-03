@@ -316,6 +316,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               label="take"
               onPress={takeOverride ?? onOpenTake}
               tone={takeTone}
+              // Rope beat teaches TYPED input — the command is pre-filled and
+              // the player should hit ACT. Disable the TAKE shortcut so it
+              // can't bypass the lesson; it re-enables once ACT advances the
+              // beat.
+              disabled={currentBeatId === 'rope'}
             />
             <QuickBtn
               label="salvage"
@@ -401,19 +406,25 @@ function QuickBtn({
   onPress,
   defensive,
   tone,
+  disabled,
 }: {
   label: string;
   onPress: () => void;
   defensive?: boolean;
   tone?: QuickBtnTone;
+  disabled?: boolean;
 }) {
-  const resolvedTone: QuickBtnTone | undefined = tone ?? (defensive ? 'defensive' : undefined);
+  // Disabled renders neutral + dimmed (not the red 'unavailable' look).
+  const resolvedTone: QuickBtnTone | undefined = disabled
+    ? undefined
+    : tone ?? (defensive ? 'defensive' : undefined);
   const containerStyle = [
     styles.quick,
     resolvedTone === 'defensive' && styles.quickDefensive,
     resolvedTone === 'ready' && styles.quickReady,
     resolvedTone === 'needs-approach' && styles.quickNeedsApproach,
     resolvedTone === 'unavailable' && styles.quickUnavailable,
+    disabled && styles.quickDisabled,
   ];
   const textStyle = [
     styles.quickText,
@@ -423,7 +434,7 @@ function QuickBtn({
     resolvedTone === 'unavailable' && styles.quickUnavailableText,
   ];
   return (
-    <TouchableOpacity style={containerStyle} onPress={onPress}>
+    <TouchableOpacity style={containerStyle} onPress={onPress} disabled={disabled}>
       <Text style={textStyle}>{label.toUpperCase()}</Text>
     </TouchableOpacity>
   );
@@ -506,6 +517,9 @@ const styles = StyleSheet.create({
   quickReady: { borderColor: '#9ec96a', backgroundColor: '#1a201410' },
   quickNeedsApproach: { borderColor: '#c9a86a' },
   quickUnavailable: { borderColor: '#e07a5f' },
+  // Disabled (e.g. TAKE during the typed-input rope beat) — muted + dimmed
+  // so it reads as "not now" without the red 'unavailable' alarm color.
+  quickDisabled: { borderColor: '#3a342c', opacity: 0.4 },
   quickText: { color: '#cdbf99', fontSize: 12 },
   quickDefensiveText: { color: '#6a9bbf' },
   quickReadyText: { color: '#9ec96a' },
