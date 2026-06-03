@@ -138,6 +138,9 @@ const CODENAMES: Record<string, string> = {
   // Stop the title "Choose your character" line on character-select/new-game
   // so the welcome-back / name prompt isn't queued behind it (the ~4s delay).
   '2026-06-03-arb21': 'Cue Coil',
+  // Indoors: drop the world MAP button (meaningless by room), rename OUT to
+  // EXIT — travel row is now up to 4 room buttons + EXIT.
+  '2026-06-03-arb22': 'Gate Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

@@ -251,14 +251,16 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               <TravelBtn label="MAP" onPress={onOpenMap} />
             </>
           ) : hubRoom ? (
-            // Tungsten Spire — hub-named exits. ROOM SHORT-NAMES
-            // instead of N/S/E/W when the player is inside a building.
+            // Tungsten Spire — hub-named exits. ROOM SHORT-NAMES instead of
+            // N/S/E/W when the player is inside a building. arb22 — the world
+            // MAP is meaningless indoors (you navigate by room, not tile), so
+            // it's dropped here; the freed slot keeps the row at "up to 4
+            // rooms + EXIT". EXIT (was OUT) leaves the building to the wilds.
             <>
-              {hubExitChips.map((c) => (
+              {hubExitChips.slice(0, 4).map((c) => (
                 <TravelBtn key={c.submit} label={c.label} onPress={() => onSubmit(c.submit)} />
               ))}
-              <TravelBtn label="OUT" onPress={() => onSubmit('leave outpost')} />
-              <TravelBtn label="MAP" onPress={onOpenMap} />
+              <TravelBtn label="EXIT" onPress={() => onSubmit('leave outpost')} />
             </>
           ) : (
             <>

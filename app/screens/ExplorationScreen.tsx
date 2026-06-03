@@ -1200,7 +1200,7 @@ export function ExplorationScreen() {
       <BrandedModal
         visible={tutBeat === 'explore_or_leave' && !tutorialExploreChosen}
         title="The Door Is Open"
-        body="The outpost door stands open. Pick through what's left of this place, or step out and begin your journey. You can always leave later — just type 'leave outpost' or tap OUT."
+        body="The outpost door stands open. Pick through what's left of this place, or step out and begin your journey. You can always leave later — just type 'leave outpost' or tap EXIT."
         buttons={[
           {
             label: 'Explore the Outpost',

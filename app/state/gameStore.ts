@@ -3597,7 +3597,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           || 'the outpost';
         get().appendLog(
           'arbiter',
-          `The Arbiter inclines a hand toward the doorway. "You're inside ${hubLabel}. To travel to another city, walk out the gate first. Tap LEAVE OUTPOST, or type 'leave outpost'. Until then the cardinals only move you between the rooms of this place."`,
+          `The Arbiter inclines a hand toward the doorway. "You're inside ${hubLabel}. To travel to another city, step outside first. Tap EXIT, or type 'leave outpost'. Until then the room buttons only move you between the rooms of this place."`,
         );
         set((s) => (s.player ? {
           player: {
@@ -15067,7 +15067,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ tutorialExploreChosen: true });
     get().appendLog(
       'arbiter',
-      `"Take your time, then. Pick this place clean if you like. When you're ready to begin, tap OUT or type 'leave outpost', and I'll set you on the road."`,
+      `"Take your time, then. Pick this place clean if you like. When you're ready to begin, tap EXIT or type 'leave outpost', and I'll set you on the road."`,
     );
   },
   chooseTutorialLeave() {
