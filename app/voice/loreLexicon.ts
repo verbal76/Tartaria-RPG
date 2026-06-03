@@ -197,6 +197,11 @@ export function cleanForSpeech(text: string): string {
   // keeps the typographic dash — this only touches the spoken copy.
   // Surrounding spaces are collapsed so we don't leave a double space.
   out = out.replace(/\s*[—–]\s*/g, ', ');
+  // Spaced ASCII hyphen used as a dash ("a cudgel - on the floor"). Same
+  // problem as the em-dash: the engine reads it as a dead gap that eats
+  // the next word. Only a hyphen with whitespace on BOTH sides matches, so
+  // compound words ("well-known") and "-2" negatives are left untouched.
+  out = out.replace(/\s+-\s+/g, ', ');
   // Unicode "minus sign" (U+2212) shows up in combat lines emitted by
   // the dice/roll formatter and weapon-effect narration. Normalize it
   // to the ASCII "-" so the negative-number rule below catches it.

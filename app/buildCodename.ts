@@ -105,6 +105,10 @@ const CODENAMES: Record<string, string> = {
   // trim/crossfade post-processing can't throw "undefined is not a function";
   // error status now names the failing step ([warmup]/[speak]).
   '2026-06-03-arb11': 'Spark Coil',
+  // Tutorial: name prompt is the first Arbiter line (danger/ask/hub hints
+  // suppressed during tutorial); em-dashes removed from spoken tutorial +
+  // entry lines; cleanForSpeech also converts spaced hyphens to commas.
+  '2026-06-03-arb12': 'Flare Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

@@ -87,7 +87,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'Your Name',
     body: 'Speak your name. Type it below, then tap ACT — or hit Enter on the keyboard.',
     arbiter:
-      'The Arbiter regards you from across the floor. "Before we go any further — your name, traveler. Type it below and tap ACT, or just hit Enter."',
+      'The Arbiter regards you from across the floor. "First things first, traveler. What is your name? Type it below and tap ACT, or just hit Enter."',
   },
   {
     id: 'cudgel',
@@ -97,7 +97,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'Take the Cudgel',
     body: 'Tap TAKE in the quick-action row to pick up the cudgel at your feet.',
     arbiter:
-      '"There — a cudgel on the floor by your boots. Tap the TAKE button below to claim it. You\'ll want a weapon."',
+      '"There is a cudgel on the floor by your boots. Tap the TAKE button below to claim it. You\'ll want a weapon."',
   },
   {
     id: 'rope',
@@ -108,7 +108,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'Take the Rope',
     body: 'Tartaria takes typed input too. The input below is pre-filled with "take rope". Tap Act to grab it.',
     arbiter:
-      '"And a length of rope, coiled on the shelf. You can also type what you want to do — I\'ve written it for you. Tap Act."',
+      '"And a length of rope, coiled on the shelf. You can also type what you want to do. I\'ve written it for you. Tap Act."',
   },
   {
     id: 'scrap',
@@ -118,7 +118,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'Salvage the Broken Plate',
     body: 'That broken chest plate has nothing left in it. Tap SALVAGE to break it down for parts.',
     arbiter:
-      '"That chest plate by the door is broken through. Tap SALVAGE — break it down. The metal\'s worth more than a busted plate."',
+      '"That chest plate by the door is broken through. Tap SALVAGE to break it down. The metal\'s worth more than a busted plate."',
   },
   {
     id: 'investigate',
@@ -128,7 +128,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'Investigate the Door',
     body: 'The door north is locked. Tap INVESTIGATE to look it over.',
     arbiter:
-      '"The door north is locked. INVESTIGATE it — see what you\'re dealing with."',
+      '"The door north is locked. INVESTIGATE it to see what you\'re dealing with."',
   },
   {
     // Door-open branch. Replaces the old look → move_north → read_note
@@ -145,7 +145,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'The Door Is Open',
     body: 'The outpost door stands open. Explore what remains, or head out and begin your journey.',
     arbiter:
-      '"There it is — the way\'s open. You can pick through what\'s left of this outpost, or step out and begin the road. Your call."',
+      '"There it is. The way\'s open. You can pick through what\'s left of this outpost, or step out and begin the road. Your call."',
   },
   {
     id: 'main_quest',
@@ -155,7 +155,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'Your Main Quest',
     body: 'The road leads to the Aetheric Cores the Guardians protect. Tap the MAIN QUEST objective chip to open your contracts.',
     arbiter:
-      '"Cores. Nine of them, kept by their Guardians in the Lost Capitals — that\'s the road. Tap the MAIN QUEST chip below the scene bar to choose where you start."',
+      '"Cores. Nine of them, kept by their Guardians in the Lost Capitals. That\'s the road. Tap the MAIN QUEST chip below the scene bar to choose where you start."',
   },
   {
     id: 'pick_city',
@@ -164,7 +164,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'Choose a Capital',
     body: 'Tap the primary objective box at the top to open the list of nine Capitals, then choose one. Any works — distance varies, but the Aether marks the road.',
     arbiter:
-      '"Tap the objective box up top — it opens the nine Lost Capitals. Pick any one; the Aether will mark the road from there."',
+      '"Tap the objective box up top. It opens the nine Lost Capitals. Pick any one, and the Aether will mark the road from there."',
   },
 ];
 

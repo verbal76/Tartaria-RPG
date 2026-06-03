@@ -3257,7 +3257,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const danger = loc?.danger ?? 0;
       const hpMax = player.hpMax ?? 0;
       const playerCap = hpMax < 60 ? 1 : hpMax < 100 ? 2 : hpMax < 140 ? 3 : 5;
-      if (loc && danger >= 4 && playerCap < danger) {
+      // Suppressed during the tutorial — the only Arbiter voice before the
+      // name prompt should be the name prompt. The warning still fires the
+      // first time the player re-enters this danger tile after the tutorial
+      // (the flag below isn't set while suppressed).
+      if (loc && danger >= 4 && playerCap < danger && get().tutorialStep === null) {
         const warned = get().worldMemory.dangerWarnedLocations ?? [];
         if (!warned.includes(loc.id)) {
           set((s) => ({
@@ -3269,7 +3273,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const tierLabel = ['', 'unsafe', 'edgy', 'dangerous', 'lethal', 'lethal'][danger] ?? 'lethal';
           get().appendLog(
             'arbiter',
-            `The Arbiter takes you in. "${loc.name} is ${tierLabel} country — the things that wake here pull above your weight. ${hpMax} HP carries you through the Outskirts (danger 2) or the Mud Seas (danger 2). Start the main quest before you camp here again, or move on until you've got your legs under you."`,
+            `The Arbiter takes you in. "${loc.name} is ${tierLabel} country. The things that wake here pull above your weight. ${hpMax} HP carries you through the Outskirts (danger 2) or the Mud Seas (danger 2). Start the main quest before you camp here again, or move on until you've got your legs under you."`,
           );
         }
       }
@@ -3536,10 +3540,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // never discover the path. Latched once per character via
       // milestones.firstQAHintShown.
       const msNow = get().player?.milestones;
-      if (!msNow?.firstQAHintShown) {
+      if (!msNow?.firstQAHintShown && get().tutorialStep === null) {
         get().appendLog(
           'arbiter',
-          `The Arbiter watches you settle. "If you want to know what something is — the Aether, a faction, a place — ask. 'What is the Aether.' 'Who are the Reclaimers.' 'What is Drakova.' I keep what I remember of the buried world."`,
+          `The Arbiter watches you settle. "If you want to know what something is, the Aether, a faction, a place, just ask. 'What is the Aether.' 'Who are the Reclaimers.' 'What is Drakova.' I keep what I remember of the buried world."`,
         );
         set((s) => (s.player ? {
           player: {
@@ -3563,13 +3567,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         livePlayerForHubHint
         && inOutpostForHint
         && !livePlayerForHubHint.milestones?.firstOutpostHintShown
+        && get().tutorialStep === null
       ) {
         const hubLabel = hubNameForFaction(livePlayerForHubHint.factionId)
           || hubRoom?.name
           || 'the outpost';
         get().appendLog(
           'arbiter',
-          `The Arbiter inclines a hand toward the doorway. "You're inside ${hubLabel}. To travel to another city, walk out the gate first — tap LEAVE OUTPOST, or type 'leave outpost'. Until then the cardinals only move you between the rooms of this place."`,
+          `The Arbiter inclines a hand toward the doorway. "You're inside ${hubLabel}. To travel to another city, walk out the gate first. Tap LEAVE OUTPOST, or type 'leave outpost'. Until then the cardinals only move you between the rooms of this place."`,
         );
         set((s) => (s.player ? {
           player: {
@@ -4091,7 +4096,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('reward', '✦ Cudgel (Common). [equipped]');
         // Acknowledge the pickup before the next instruction — a beat of
         // pacing so the Arbiter doesn't snap straight into "now salvage".
-        get().appendLog('arbiter', '"A fine weapon to start with — plain, honest, and it won\'t run dry on you. Keep it close."');
+        get().appendLog('arbiter', '"A fine weapon to start with. Plain, honest, and it won\'t run dry on you. Keep it close."');
         get().maybeAdvanceTutorial('cudgel');
         return;
       }
@@ -4116,7 +4121,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }));
         get().appendLog('world', 'You wedge the cudgel against the rim and pop the rusted plate off its strap. The metal comes apart along old hammer-marks.');
         get().appendLog('reward', '✦ Plate Fragment x2 (Common). [scrapped]');
-        get().appendLog('arbiter', '"That\'s the way of it — a ruin always pays out, if you know where to break it."');
+        get().appendLog('arbiter', '"That\'s the way of it. A ruin always pays out, if you know where to break it."');
         get().maybeAdvanceTutorial('scrap');
         return;
       }
@@ -15030,7 +15035,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ tutorialExploreChosen: true });
     get().appendLog(
       'arbiter',
-      `"Take your time, then — pick this place clean if you like. When you're ready to begin, tap OUT or type 'leave outpost', and I'll set you on the road."`,
+      `"Take your time, then. Pick this place clean if you like. When you're ready to begin, tap OUT or type 'leave outpost', and I'll set you on the road."`,
     );
   },
   chooseTutorialLeave() {
