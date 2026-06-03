@@ -94,6 +94,9 @@ const CODENAMES: Record<string, string> = {
   // Kokoro crossfade: adjacent ready chunks concatenated into one
   // waveform with an equal-power crossfade at each join.
   '2026-06-03-arb8': 'Temper Coil',
+  // Model-loading banner reworded + recolored amber/orange so it reads as
+  // a calm "this is normal" notice rather than a red error alert.
+  '2026-06-03-arb9': 'Kindle Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

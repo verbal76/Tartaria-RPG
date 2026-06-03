@@ -671,13 +671,14 @@ export function TitleScreen() {
       {modelsLoading && (
         <View style={styles.modelLoadingBanner}>
           <Text style={styles.modelLoadingBannerTitle}>
-            ⚠ MODELS LOADING — DON'T CLOSE THE APP
+            ⏳ GETTING THINGS READY — THIS IS NORMAL
           </Text>
           <Text style={styles.modelLoadingBannerBody}>
-            Voice + narration are downloading + warming up. Closing the
-            app now leaves partial files on disk that will crash the
-            next launch. Wait for the "voice ready" confirmation before
-            backgrounding or killing Tartaria Realms.
+            Hang tight, this shouldn't take long. The voice and narration
+            engines are downloading and warming up — totally normal on a
+            fresh install, and not an error. Just keep Tartaria Realms open
+            until you see "voice ready"; closing it mid-setup can interrupt
+            the install and you'd have to start over.
           </Text>
         </View>
       )}
@@ -1278,13 +1279,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 3,
   },
-  // OTA-294 — "DON'T CLOSE THE APP" loading banner. Red-ish accent
-  // ramp (#bf5a3a outline, #2a1410 fill) so it reads as warning, not
-  // neutral. Sized like the updateBanner so it sits flush with the
-  // rest of the title-screen banner stack.
+  // OTA-294 — "getting things ready" loading banner. Amber/orange accent
+  // (#c9892f outline, #2a1e0c fill, #f0a740 title) so it reads as a calm
+  // "heads up, this is normal" notice rather than a red error/danger
+  // alert. Sized like the updateBanner so it sits flush with the rest of
+  // the title-screen banner stack.
   modelLoadingBanner: {
-    backgroundColor: '#2a1410',
-    borderColor: '#bf5a3a',
+    backgroundColor: '#2a1e0c',
+    borderColor: '#c9892f',
     borderWidth: 1,
     borderRadius: 4,
     paddingVertical: 10,
@@ -1292,7 +1294,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   modelLoadingBannerTitle: {
-    color: '#e07a5f',
+    color: '#f0a740',
     fontSize: 12,
     letterSpacing: 2,
     fontWeight: '800',
