@@ -144,6 +144,10 @@ const CODENAMES: Record<string, string> = {
   // Nav-row fit for long room names: lower letterSpacing + minimumFontScale
   // so "GRAND HALL"/"LIVING ROOM" stay readable in the equal-width slots.
   '2026-06-03-arb23': 'Span Coil',
+  // Enterable-building template pool (data + module): flooded house, generic
+  // outpost, shack, shed (+secret cellar), market (4 stalls). Foundation only
+  // — entry/exit + scene wiring is the next step.
+  '2026-06-03-arb24': 'Hearth Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA
