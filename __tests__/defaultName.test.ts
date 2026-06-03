@@ -44,6 +44,11 @@ describe('raceSingular — title-cases the snake_case raceId', () => {
 });
 
 describe('generateDefaultName — "<Adjective> <Race>"', () => {
+  it('draws from a 25-adjective pool with no duplicates', () => {
+    expect(DEFAULT_NAME_ADJECTIVE_POOL.length).toBe(25);
+    expect(new Set(DEFAULT_NAME_ADJECTIVE_POOL).size).toBe(25);
+  });
+
   it('is an adjective from the pool followed by the singular race', () => {
     // Sample heavily so the random adjective pick is well covered.
     for (let i = 0; i < 500; i++) {

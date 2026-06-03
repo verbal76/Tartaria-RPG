@@ -1191,11 +1191,14 @@ function grantTutorialItem(
 // "Confused Aetherborn"). raceId is already a singular snake_case noun,
 // so title-casing it yields the race name; unknown/empty race falls back
 // to "Wanderer".
+// 25 flavor adjectives, paired with the singular race noun for a
+// Reddit-style generic handle ("Dusty Reclaimer", "Confused Aetherborn").
 const DEFAULT_NAME_ADJECTIVES = [
-  'Dusty', 'Confused', 'Weary', 'Ashen', 'Rusted', 'Grim', 'Wary',
-  'Hollow', 'Wandering', 'Nameless', 'Cracked', 'Sullen', 'Ragged',
-  'Bleary', 'Scarred', 'Muddy', 'Restless', 'Quiet', 'Forsaken',
-  'Lost', 'Cinderbound', 'Half-Awake', 'Stubborn', 'Brooding',
+  'Dusty', 'Confused', 'Weary', 'Ashen', 'Rusted',
+  'Grim', 'Wary', 'Hollow', 'Wandering', 'Nameless',
+  'Cracked', 'Sullen', 'Ragged', 'Bleary', 'Scarred',
+  'Muddy', 'Restless', 'Quiet', 'Forsaken', 'Lost',
+  'Cinderbound', 'Half-Awake', 'Stubborn', 'Brooding', 'Wayward',
 ] as const;
 
 export function raceSingular(raceId: string | null | undefined): string {

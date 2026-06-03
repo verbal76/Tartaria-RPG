@@ -65,6 +65,20 @@ function bump(c: Counter, key: string, n = 1) {
 const _origLog = console.log;
 const _origWarn = console.warn;
 const _origErr = console.error;
+const _origRandom = Math.random;
+
+// Seeded RNG — the sim AND the engine pull from Math.random (enemy picks,
+// dice, loot), so unseeded runs were flaky. Seed the global in beforeAll so
+// the whole 700-day playthrough is reproducible.
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a |= 0; a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
 describe('combatStress — quick-action combat verbs across 700 in-game days', () => {
   jest.setTimeout(170000);
@@ -73,11 +87,13 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
     console.log = () => {};
     console.warn = () => {};
     console.error = () => {};
+    Math.random = mulberry32(0xc0bba1);
   });
   afterAll(() => {
     console.log = _origLog;
     console.warn = _origWarn;
     console.error = _origErr;
+    Math.random = _origRandom;
   });
 
   it('drives 700 days of forced encounters through every combat verb', async () => {

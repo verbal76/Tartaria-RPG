@@ -1,17 +1,16 @@
 import type { InventoryItem } from './types';
 
-// Per-item-name maximum quantity. Most loot stacks freely, but a few
-// improvised items have hard caps so the pack doesn't fill with rocks:
-//   - Small Rock: 10. Throwable; you can stack a pocket's worth.
-//   - Big Rock:   1. Two-handed; only one fits.
-//   - Stick:      6. Bundles, not forests.
-// Look-up is case-insensitive against InventoryItem.name. Returns
-// Infinity when no cap is configured.
-const ITEM_CAPS: Record<string, number> = {
-  'small rock': 10,
-  'big rock': 1,
-  'stick': 6,
-};
+// The pack has NO carrying limit — every item stacks without bound, and
+// there is no total weight / slot / encumbrance system anywhere.
+//
+// A few improvised items (Small Rock, Big Rock, Stick) used to have small
+// per-name caps, but since nothing else was ever capped the pack had no
+// real limit anyway, and the "pack too full / upgrade" messaging promised a
+// capacity-upgrade system that was never built. Per design decision the
+// caps are removed: a full pack is never a constraint. The table is kept
+// (empty) alongside capacityFor() + grantItem()'s accepted/dropped plumbing
+// so re-introducing a genuine, intentional cap later is a one-line change.
+const ITEM_CAPS: Record<string, number> = {};
 
 export function capacityFor(itemName: string): number {
   return ITEM_CAPS[itemName.toLowerCase()] ?? Infinity;
