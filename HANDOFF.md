@@ -1,19 +1,87 @@
 # Tartaria Realms — Session Handoff
 
-> **Branch:** `claude/new-session-MvF82` (active work) + `HaL2001` (experimental sandbox, kept in sync — every OTA from this wave is on BOTH branches via cherry-pick after a HaL2001 push).
-> **App version:** `2.4.1` — milestone baseline; previous milestone was `2.201`.
-> **Latest OTA:** `2026-05-28-162` (Stress sweep wave — 5 stress agents in parallel surfaced 12 issues across the player-input + crafting + travel + collection paths; 8 shipped as OTAs 155-162 across one session. Player-side: OTA-155 eat-without-target refusal (fixes `eat ratoin` → 8h sleep, same class as OTA-125 drink), OTA-156 drunk-run collapse (`eatt`/`useee`/`scrappp`/`drinkkk` now resolve), OTA-157 no-space travel-verb splitter (`gowest`/`gonorth`/`walknorth`), OTA-158 dog-verb typo tolerance (`fed dog`/`cll dog`/`helll dog`), OTA-159 `defend` → dodge stance, OTA-160 scene-feature refusals teach salvage. Engine-side: OTA-161 Yulka disc grant merge, OTA-162 cardinal-step location discovery. 4 stress findings skipped as non-bugs (punctuation jam-ins handle correctly at parser; distance-bookkeeping on target switch is correct geography; weather.kind undefined is agent probing wrong field; silence-rate is downstream null-scene test bootstrap.). See **Section 0** for the closed-issue archive.
-> **Recent session arcs:**
-> - **2026-05-25 → 2026-05-26:** 37 OTAs from `020` → `056` — quality-of-life, scanner system, engagement engines, stress testing, playtester-feedback loop. See section 6.A.
-> - **2026-05-26 → 2026-05-27:** 25 OTAs from `070` → `094` — investigation table system (071-080), salvage/climb chip-greying hardening (070, 076, 083-086), elevated overlay mini-areas (089-092), parser tightening (093-094). See **Section 0.B** for the issue-tracker view of each.
-> **Latest APK trigger:** `2026-05-23a` (in `metro.config.js`) — APK **#207** built at runtime `2.4.1`. **Existing v2.201 testers must install APK 207 (or later) to receive any OTA published after `2026-05-23-011`.** No native rebuild has been required since.
-> **TypeScript:** 0 errors (`npx tsc --noEmit`) — checked at every OTA bump.
-> **Tests:** 107/107 pass across the canary five (`salvagePools`, `theftNarrationGuard`, `itemEffect`, `statTraining`, `areaSearch`) + the 9 new test files shipped this session (`variableRewards`, `chainedNarrative`, `jitTemptation`, `sessionResume`, `mysterySeeds`, `parserFuzz`, `craftRepairFuzz`, `engagementSmoke`, plus the existing `equipSwap`/`equippedIds`/`inventoryAudit`/`recipeFuzzy` set). The longer sim files (`yearSimulation`, `thousandDayStressSim`, `twoYearChaosSim`) pass too — `twoYearChaosSim` has one borderline "geographic loops ≤1" assertion that flakes 1 in 3 runs (RNG variance against an asymptote-of-threshold metric, pre-existing). Three stress files (`combatStress`, `domesticStress`, `metaNavStress`) OOM-abort in this sandbox at the 700-day sim length — pre-existing infrastructure ceiling, not a regression.
+> **Branches:**
+> - `HaL2001` — **live Android playtester branch.** Live OTA: **Zinc Anvil (OTA-300).** Tungsten Spire (OTA-301) was published then **ROLLED BACK** to Zinc Anvil this session — an unverified tutorial reached testers. See Closed §0.B.
+> - `claude/new-session-MvF82` — long-running dev branch; PR #1 → `main` (stale).
+> - `arbiters-line` — **CURRENT ACTIVE WORK. Isolated personal-test branch**, sideload-only on a **DEAD OTA channel** (`arbiters-line`): publishes no OTA, cannot reach playtesters. Carries the Tungsten Spire tutorial redesign + this session's fixes for the user's on-device verification BEFORE any promotion. Latest build: **Flint Coil — APK #276** (`OTA_BUILD_ID = 2026-06-03-arb1`). Draft PR #4 (**NOT for merge** — test tracker).
+> **App version:** `2.4.1` (display `3.0.0`).
+> **User's terminology (important):** "**production**" = *build + push* (just produce the build); "**distribution**" = *ship beyond the user's own phone* (playtesters / store). Flint Coil is production-done, NOT distribution-ready.
+> **Latest APK:** `arbiters-line` **#276 Flint Coil** — Tungsten Spire tutorial + **uncapped pack** + **25-adjective default names** + **land-in-exploration tutorial-end fix**. (Builds #274/#275 were the codename-less precursors.) Production APK/AAB line unchanged: last pair Cobalt Drift APK / **Granite Hold AAB**; `MINIMUM_RECOMMENDED_APK_BUILD = 263`.
+> **TypeScript:** 0 errors in `app/` (`npx tsc --noEmit`).
+> **Tests:** green. **The four 700-day stress sims — `combatStress`, `domesticStress`, `metaNavStress`, `interactionStress` — previously OOM-aborting are now FIXED this session:** per-turn `gameLog` trim (the project's documented OOM guard) + a **seeded global RNG** so each is deterministic, not flaky. Stale assertions corrected along the way (block-folded-into-dodge, rest-vs-hunger, scrap success-roll/consolation, save/load catalog re-hydration + map-calibration migration). Plus `defaultName` (25-adjective pool) and `inventoryAudit` + `craftingInventoryChaosSim` updated for the **uncapped pack**. Canary five + year/two-year/chaos green.
 > **Working tree:** clean.
-> **Open PR:** #1 — draft, this branch → `main`, **stale** relative to OTAs 020 → 056. Description still reflects OTA 053-era state. Refresh before requesting review (the PR summary should walk the five waves below + the deferred items in section 7).
-> **Open issues:** 5 (in Section 0.A — Hub-room key collision deferred; ongoing catalog backfill; inference engine doesn't check materials.json; hook-puzzle parser misses on "rotate the ring"; narrative-suggested actions like "knock on the steeple" parse as unknown). GitHub repo issue tracker remains at 0.
+> **Open PRs:** #1 (dev → main, stale), #3 (`iOS-initial`, draft, not for merge), #4 (`arbiters-line`, draft, not for merge — this session's test tracker).
+> **Open issues:** the 5 long-standing ones in §0.A (hub-room key collision; catalog backfill; inference engine doesn't check materials.json; hook-puzzle parser misses "rotate the ring"; "knock on the steeple"-style narrative actions parse as unknown), plus the parked **iOS → TestFlight** task at the top of §0.A. GitHub issue tracker: 0.
 
-> **For the next Claude instance:** the live work is the **⚡ ACTIVE TASK block at the top of Section 0.A** — iOS Distribution Certificate creation, mid-PowerShell-session on the user's Windows laptop. Read that FIRST; it tells you exactly where the cursor is and what's left. Then read section 16 for the player's working style + major systems, and the rest of Section 0 for the canonical Open / Closed tracker (read BEFORE planning any fix). Section 6.A has the recent wave's reasoning; section 7 lists what's still on the table.
+> **For the next Claude instance:** **current active work = the `arbiters-line` Flint Coil test APK (#276)**, built/building for the user's ON-DEVICE tutorial pass. It is production-done (build+push) but NOT distribution-ready. **To promote the tutorial from this isolated test → live, follow §P (Production Runbook) immediately below — read it FIRST.** A separate, still-open task (iOS → TestFlight) is parked at the top of §0.A. Then §16 for the player's working style + major systems, and §0 for the canonical Open/Closed tracker (read before planning any fix).
+
+---
+
+## P. Production Runbook — promote the Tungsten Spire tutorial from the isolated test → live
+
+> **If you (next Claude) have to be hand-fed to "get into production mode," this is the
+> map.** It takes the work currently isolated on `arbiters-line` (the Flint Coil test APK)
+> and puts it in front of real playtesters — the thing that was attempted-then-rolled-back
+> this session, done right. Do the steps in order; do not skip the gate.
+
+### P0 — The gate (do NOT skip)
+The whole reason this work is isolated: an **unverified** version of this tutorial reached
+playtesters and had to be rolled back to Zinc Anvil. **Do not promote until the user
+confirms they played Flint Coil (build #276) on-device end-to-end and approved it** — the
+10 tutorial beats (name → cudgel → rope → scrap → investigate → look → move → read-note →
+main-quest → pick-city), the in-feed Arbiter, hub-named exit chips, pulsing input/chips,
+landing back in **exploration** when it ends, the **uncapped pack**, and the **default
+name** ("<Adjective> <Race>"). No approval → stop here.
+
+### P1 — What promotes vs what stays behind
+The promotable work is **JS/engine code**, all on `arbiters-line`:
+- Tungsten Spire tutorial (`app/components/tutorialSteps.ts`, `TutorialOverlay/Target`, `InputBox`, `CharacterCreationScreen`, `ExplorationScreen`, `gameStore` tutorial state machine).
+- `skipTutorial` lands the player in `exploration` (gameStore).
+- Race-themed default name + 25-adjective pool (gameStore `generateDefaultName`).
+- Pack uncap (`app/engine/inventory.ts` — `ITEM_CAPS = {}`).
+- The stress-sim test fixes (`__tests__/*Stress*`, `inventoryAudit`, `craftingInventoryChaosSim`, `defaultName`).
+
+**Do NOT carry over the isolation scaffolding** (it's `arbiters-line`-only):
+- `app.json` — the `…arbiters` package, "Tartaria Realms ARB" name, `arbiters-line` channel header.
+- `app/buildInfo.ts` `OTA_BUILD_ID = 2026-06-03-arb1` and `buildCodename.ts` "Flint Coil" entry.
+- `metro.config.js` Flint Coil trigger line.
+- The `build-apk.yml` `arbiters-line` push trigger (harmless to leave, but not part of the feature).
+
+### P2 — Land it on the live branch
+Cherry-pick the P1 feature commits onto **`HaL2001`** (the live playtester branch). The
+clean feature commits are: the tutorial (`e32fad9` Tungsten Spire), the verification pass
+(`81d802d`), the name feature (`9ca8331`), and the post-isolation fixes (`9d7e88e`,
+`451a175` — pull the code hunks, NOT the `arbiters-line` channel edits). Resolve against
+HaL2001's current head (Zinc Anvil / OTA-300).
+
+### P3 — Restore production config on HaL2001
+- `app.json`: package back to the bare `com.hotatticgames.tartarprim.hal2001` (HaL2001's
+  own suffix — the production-AAB build step strips `.hal2001` for the Play bundle), name
+  back to "Tartaria Realms HAL", channel header back to `hal2001`.
+- Confirm `runtimeVersion` stays `2.4.1` (appVersion policy) — the tutorial is JS-only, so
+  the **existing installed APK can receive it as an OTA**; no native rebuild required.
+
+### P4 — Codename + version bump (follow the convention)
+- Bump `OTA_BUILD_ID` in `app/buildInfo.ts` to the next real id (`2026-MM-DD-302`).
+- Mint a fresh metallic-noun codename (the reserved pool is exhausted — see
+  `docs/build-codenames.md`), add it to `CODENAMES` + the doc's current-mapping table.
+- Commit title leads with it: `<Codename> — OTA-302 — Tungsten Spire tutorial + uncapped pack + default names`.
+
+### P5 — Verify, then ship
+- `npx tsc --noEmit` clean; run the suite (the four 700-day sims are reliably green now —
+  no NODE_OPTIONS needed, they self-trim + are seeded).
+- **Check the APK-hold:** PR #1 noted a Google Play internal-test hold (don't bump native
+  version / add native modules while a test is open). Tutorial is JS-only → **OTA is fine**;
+  only do a native APK/AAB (`[build-aab]` marker + APK build pair) if the user asks.
+- Update this HANDOFF (Closed §0.B) in the SAME commit (per `CLAUDE.md`).
+- Push `HaL2001` → `eas-update.yml` publishes the OTA to the `hal2001` channel → Android
+  playtesters get it on next boot. (iOS rides the separate TestFlight task in §0.A.)
+- Confirm live: About shows the new codename; the rolled-back Tungsten Spire is now
+  superseded by the verified version.
+
+### P6 — Cleanup (optional)
+Leave `arbiters-line` + draft PR #4 as the test tracker, or close PR #4 and let the branch
+sit. The Flint Coil id/codename never entered the production pool, so nothing to unwind.
 
 ---
 
@@ -323,6 +391,18 @@
 - **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Flint Coil (`2026-06-03-arb1`, APK #276) — isolated tutorial test build + stress-suite repair + pack uncap
+
+- **Context.** Tungsten Spire (OTA-301) shipped an **unverified** tutorial to live playtesters and had to be rolled back to Zinc Anvil (OTA-300). This session re-stages that tutorial safely and hardens the test infra around it. **WHO:** the user, asking for an isolated on-device test build. **WHAT/HOW/WHY below.**
+- **Rollback + isolation.** Reverted the live `hal2001` OTA to Zinc Anvil so testers are off the unverified tutorial. Parked Tungsten Spire on a new `arbiters-line` branch configured as a **dead end**: dedicated `arbiters-line` OTA channel (absent from `eas-update.yml`'s trigger list → publishes no OTA), `…arbiters` package + "Tartaria Realms ARB" name so it installs ALONGSIDE the HaL2001 build, and `arbiters-line` added to `build-apk.yml`'s push triggers (resolves to preview/APK). Sideload-only; cannot reach playtesters.
+- **Tutorial verified + one real fix.** Structural pass: all 10 beats wired to advancement triggers, `app/` tsc clean, stale `tutorialCurrencyAfterDog` test rewritten (34/34). **Real fix:** `skipTutorial` now resets `currentScreen` to `exploration` — the final beat (`pick_city`) runs on the contracts screen and the skip button can fire from any beat, so finishing/skipping could otherwise strand the player off the world feed.
+- **Stress sims un-OOM'd (the big one).** `combatStress`/`domesticStress`/`metaNavStress`/`interactionStress` (700-day sims) had been OOM-aborting and were written off as a "sandbox ceiling." Root cause: the in-memory `gameLog` is unbounded (`MAX_LOG_IN_MEMORY = Infinity` by design) and `persist()` JSON-stringifies the whole array every action, so it grows to >8 GB. **Fix:** the per-turn `slice(-40)` trim the project's own `thousandDayStressSim` already uses — added to the three that lacked it, at the default V8 heap (the project's convention; no NODE_OPTIONS). Then **seeded the global RNG** (`mulberry32` in `beforeAll`) in all four so the engine's combat/scene/loot/save rolls are deterministic and the metric/state-leak assertions stop flaking.
+- **Stale stress assertions corrected (test drift, not engine bugs — the sims never ran to completion before, so these were never validated):** `block` verb folded into dodge (no longer applies a `blocking` status); `rest` legitimately lowers stamina when the hunger penalty outpaces it (sim never eats); `scrap` rolls for success (failed roll → consolation = first material only) and `ITEM_CAPS` clip stacks, so assert each material delta ∈ `0..fullQty`; save/load `inventory` "diff" is benign on-load catalog re-hydration (compare only id/name/quantity); save/load `mapX/mapY` "drift" is the documented map-calibration migration (old-cal coords ≤14 snap to world center). Also fixed a pre-existing `inventoryAudit` drop-persistence test that hard-coded a room key (now scans all visited rooms for the unique item).
+- **Pack uncapped (engine).** Investigation for the user: there was **no real carry limit** — only Small Rock (10) / Big Rock (1) / Stick (6) were capped, behind messaging that promised a "pack full — drop something or **upgrade**" system that was never built. **Decision (user): remove the caps entirely** (`ITEM_CAPS = {}` in `app/engine/inventory.ts`); a full pack is never a constraint, and the misleading messaging is now unreachable. `capacityFor`/`grantItem` plumbing kept so a real intentional cap is a one-line change later. Tests updated (`inventoryAudit`, `craftingInventoryChaosSim`) to assert the uncapped pack, with the formerly-capped names as regression canaries.
+- **Default name (feature).** Skipping before the Arbiter's name beat now yields "`<Adjective> <Race>`" (Reddit-style), e.g. "Dusty Reclaimer", "Confused Aetherborn" — a **25-adjective** pool × the singular race noun (raceId title-cases; unknown race → "Wanderer"). Covered by `__tests__/defaultName.test.ts`.
+- **Codename.** This bundle differs from Tungsten Spire (301), so it got its own id `2026-06-03-arb1` + a fresh-minted codename **"Flint Coil"** (OTA reserved pool was exhausted). Non-numeric `-arb1` suffix keeps it out of the production OTA-30x sequence; never published OTA-side.
+- **Status:** built/building as APK #276 for the user's on-device pass. **Promotion path: §P (Production Runbook).** Not distribution-ready until the on-device gate clears + production config is restored.
 
 #### Tungsten Spire APK (build id `2026-06-03-301`) — Outpost tutorial redesign
 
