@@ -80,6 +80,10 @@ on:
       # any iOS-specific trigger file should NOT fire an Android
       # build (burns 30 min for nothing). Same in reverse.
       - '.github/workflows/build-ios.yml'
+      # ...and the OTA workflows. Editing an OTA publisher should NOT
+      # burn a 20-min APK build — OTAs are JS-only and self-publish.
+      - '.github/workflows/eas-update.yml'
+      - '.github/workflows/eas-update-arbiters.yml'
   workflow_dispatch:
     inputs:
       profile:
