@@ -23,6 +23,30 @@
 
 ### 0.A — Open Issues
 
+> **⚠️ ROLLBACK (2026-06-03 03:47 UTC) — Tungsten Spire OTA reverted off the live `hal2001` channel. READ BEFORE the ACTIVE TASK below.**
+>
+> Tungsten Spire (`e32fad9`, build `2026-06-03-301`) was pushed to `HaL2001`
+> at 02:49 UTC. The handoff treated it as "code staged, APK not yet built" —
+> but the push **auto-published it as an OTA** to the live `hal2001` channel
+> (runtime 2.4.1) at 02:50 UTC. Cause: `eas-update.yml`'s `paths-ignore` does
+> NOT exclude `app/**` (only `build-apk.yml`/`build-ios.yml` do), so any
+> `app/**` push to `HaL2001` ships an OTA. The unverified tutorial redesign
+> therefore went out to playtesters on APK 207+ before any on-device run.
+>
+> **Fix shipped:** commit `602f0f4` restored the 9 app files Tungsten Spire
+> touched to their **Zinc Anvil / OTA-300 (`66d888d`)** state — `app/` is now
+> byte-identical to `66d888d`. The push re-fired `eas-update.yml` (run #868,
+> success, 03:47 UTC), so the latest update on `hal2001` is the stable OTA-300
+> bundle again. Devices pull it on next launch. No APK/AAB/IPA was produced
+> (those workflows path-ignore `app/**`).
+>
+> **⛔ Lesson for the APK task below:** an "isolated test APK" CANNOT be staged
+> on `HaL2001` — any `app/**` push there auto-OTAs to live playtesters. To get
+> an isolated tutorial APK, build Tungsten Spire from a **separate branch / OTA
+> channel** (or temporarily bump the channel/runtimeVersion) so the preview
+> build can't reach the `hal2001` audience. Tungsten Spire code is preserved at
+> `e32fad9` (and on draft PR #2) for that re-attempt.
+>
 > **⚡ ACTIVE TASK (2026-06-03) — Tungsten Spire APK build TRIGGER + on-device verification. READ THIS FIRST. Supersedes the iOS task below until the APK lands and the new tutorial is exercised end-to-end.**
 >
 > **Code state:** Tungsten Spire (build id `2026-06-03-301`) is committed and pushed to `HaL2001` (commit `e32fad9`). Attached to draft PR #2. Outpost tutorial redesign — 11 files changed, ~800 net lines, TypeScript clean. The change replaces the welcome-card overlay with a diegetic 10-beat in-feed sequence (name → cudgel → typed take rope → salvage broken chest plate → investigate locked door → look → move north → take note → tap MAIN QUEST → pick city), adds hub-named exit chips inside outposts (driven off the existing hub graph), adds an Animated pulse on the TutorialTarget when the current step has `pulse: true`, removes the Nickel Tine + Zinc Anvil keyboard gate (the welcome step that justified it no longer exists), and gives the player their name in-game from the Arbiter instead of a pre-menu TextInput. Closed-issue entry in Section 0.B below has the full file list + design rationale.
