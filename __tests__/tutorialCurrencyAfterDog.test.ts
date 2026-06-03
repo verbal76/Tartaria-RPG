@@ -22,7 +22,7 @@ const VALID_SCREENS = new Set([
   'contracts', 'ending',
 ]);
 const VALID_AREAS = new Set([
-  'top-left-stats', 'top-right-enemy', 'scene-bar', 'feed',
+  'top-left-stats', 'top-right-enemy', 'scene-bar', 'objective-chip', 'feed',
   'travel-row', 'quick-row', 'input-row', 'fullscreen',
 ]);
 

@@ -13957,6 +13957,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'world',
       `You set course for ${tgtName}. Estimated ${tiles} day${tiles === 1 ? '' : 's'} of travel. CONTINUE / STOP from the travel row.`,
     );
+    // Tungsten Spire — during the pick_city tutorial beat, picking a Capital
+    // marks the road but does NOT auto-depart: the Arbiter hands control back
+    // so the player learns to set out themselves from the travel row. The
+    // tutorial then completes (pick_city is the final beat).
+    const inTutPickCity = (() => {
+      const ts = get().tutorialStep;
+      return ts !== null && TUTORIAL_STEPS[ts]?.id === 'pick_city';
+    })();
+    if (inTutPickCity) {
+      get().appendLog(
+        'arbiter',
+        `"Your road runs to ${tgtName}. Set your course and begin the journey whenever you're ready to leave — tap CONTINUE on the travel row below."`,
+      );
+      get().maybeAdvanceTutorial('pick_city');
+      return;
+    }
     // Take the first step immediately so the player sees motion now.
     // v2.4.1 (OTA 053) — this step now costs stamina + advances time
     // like the cardinal walks do, so multi-step travel can't be used
@@ -13983,11 +13999,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
         } : s));
       }
     }
-    // Tungsten Spire — pick_city beat: the tutorial completes when
-    // the player sets a travel course from the MAIN QUEST/MapScreen
-    // flow. Advancing from pick_city is the final step → tutorial
-    // collapses to null.
-    get().maybeAdvanceTutorial('pick_city');
   },
 
   continueTravel() {

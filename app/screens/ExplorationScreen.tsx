@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore, makeRoomKey } from '../state/gameStore';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
@@ -466,6 +466,7 @@ export function ExplorationScreen() {
             : phaseHint(mq.phase, cores);
         }
         return (
+          <TutorialTarget area="objective-chip">
           <TouchableOpacity
             style={styles.objectiveChip}
             onPress={() => {
@@ -501,6 +502,7 @@ export function ExplorationScreen() {
               )}
             </View>
           </TouchableOpacity>
+          </TutorialTarget>
         );
       })()}
 
@@ -601,7 +603,7 @@ export function ExplorationScreen() {
               submit(text);
             }}
             onOpenInventory={() => setScreen('inventory')}
-            onOpenSearch={() => setSearchOpen(true)}
+            onOpenSearch={() => { Keyboard.dismiss(); setSearchOpen(true); }}
             onOpenCrafting={() => setScreen('crafting')}
             onOpenApproach={() => {
               // OTA-238 — auto-target when there's exactly one enemy.
@@ -621,8 +623,8 @@ export function ExplorationScreen() {
               setApproachOpen(true);
             }}
             onOpenAskArbiter={() => setAskArbiterOpen(true)}
-            onOpenSalvage={() => setSalvageOpen(true)}
-            onOpenTake={() => setTakeOpen(true)}
+            onOpenSalvage={() => { Keyboard.dismiss(); setSalvageOpen(true); }}
+            onOpenTake={() => { Keyboard.dismiss(); setTakeOpen(true); }}
             onOpenClimb={() => setClimbOpen(true)}
             onClimbUp={() => {
               // OTA 033 — tolerate the old OTA 031 string schema for

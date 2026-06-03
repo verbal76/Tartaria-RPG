@@ -32,6 +32,10 @@ export type HighlightArea =
   | 'top-left-stats'
   | 'top-right-enemy'
   | 'scene-bar'
+  // The "MAIN QUEST · …" objective chip directly below the scene bar (the
+  // entry to Contracts / Capital selection). Distinct from 'scene-bar',
+  // which is the area/weather/time strip ABOVE it.
+  | 'objective-chip'
   | 'feed'
   | 'travel-row'
   | 'quick-row'
@@ -158,21 +162,21 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 'main_quest',
     screen: 'exploration',
-    area: 'scene-bar',
+    area: 'objective-chip',
     pulse: true,
     title: 'Your Main Quest',
-    body: 'The note points you at the Aetheric Cores the Guardians protect. Tap MAIN QUEST to plot a course.',
+    body: 'The note points you at the Aetheric Cores the Guardians protect. Tap the MAIN QUEST objective chip to open your contracts.',
     arbiter:
-      '"Cores. Nine of them, kept by their Guardians in the Lost Capitals — that\'s the road. Tap MAIN QUEST above to choose where you start."',
+      '"Cores. Nine of them, kept by their Guardians in the Lost Capitals — that\'s the road. Tap the MAIN QUEST chip below the scene bar to choose where you start."',
   },
   {
     id: 'pick_city',
     screen: 'contracts',
     area: 'fullscreen',
     title: 'Choose a Capital',
-    body: 'Any Capital works — distance varies, but the Aether marks the road.',
+    body: 'Tap the primary objective box at the top to open the list of nine Capitals, then choose one. Any works — distance varies, but the Aether marks the road.',
     arbiter:
-      '"Pick any Capital. The Aether marks the road from here."',
+      '"Tap the objective box up top — it opens the nine Lost Capitals. Pick any one; the Aether will mark the road from there."',
   },
 ];
 
