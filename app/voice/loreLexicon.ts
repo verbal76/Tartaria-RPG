@@ -190,6 +190,13 @@ export function cleanForSpeech(text: string): string {
   out = out.replace(/\s*->\s*/g, ' to ');
   // Middle-dot separator becomes a comma+space so we get a breath.
   out = out.replace(/\s*·\s*/g, ', ');
+  // Em / en dashes — playtester asked for these to speak as commas.
+  // Some TTS engines read an em-dash as a long dead gap that can
+  // swallow the clause after it (the "skipped sentence" report); a
+  // comma gives a clean, natural pause instead. The visible game log
+  // keeps the typographic dash — this only touches the spoken copy.
+  // Surrounding spaces are collapsed so we don't leave a double space.
+  out = out.replace(/\s*[—–]\s*/g, ', ');
   // Unicode "minus sign" (U+2212) shows up in combat lines emitted by
   // the dice/roll formatter and weapon-effect narration. Normalize it
   // to the ASCII "-" so the negative-number rule below catches it.

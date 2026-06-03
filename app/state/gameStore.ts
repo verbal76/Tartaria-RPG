@@ -13986,7 +13986,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId, distanceRemaining: tiles } } } : s));
     get().appendLog(
       'world',
-      `You set course for ${tgtName}. Estimated ${tiles} day${tiles === 1 ? '' : 's'} of travel. CONTINUE / STOP from the travel row.`,
+      `You set course for ${tgtName}. Estimated ${tiles} day${tiles === 1 ? '' : 's'} of travel. Tap the → ${tgtName.toUpperCase()} button on the travel row to press on; STOP TRAVEL to halt.`,
     );
     // Tungsten Spire — during the pick_city tutorial beat, picking a Capital
     // marks the road but does NOT auto-depart: the Arbiter hands control back
@@ -13999,7 +13999,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (inTutPickCity) {
       get().appendLog(
         'arbiter',
-        `"Your road runs to ${tgtName}. Set your course and begin the journey whenever you're ready to leave — tap CONTINUE on the travel row below."`,
+        `"Your road runs to ${tgtName}. When you're ready to leave, tap the button marked → ${tgtName.toUpperCase()} on the travel row below. Keep tapping it to close the distance, mile by mile."`,
       );
       get().maybeAdvanceTutorial('pick_city');
       return;
@@ -14203,7 +14203,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId: pending.locationId } } } : s));
       get().appendLog(
         'world',
-        `Course set for ${tgtName}, but ${sceneAfterLeave.vendor.name} is here on the road. Tap CONTINUE TRAVEL when you're ready to move on.`,
+        `Course set for ${tgtName}, but ${sceneAfterLeave.vendor.name} is here on the road. Tap the → ${tgtName.toUpperCase()} button on the travel row when you're ready to move on.`,
       );
       return;
     }

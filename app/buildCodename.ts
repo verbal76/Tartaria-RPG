@@ -82,6 +82,9 @@ const CODENAMES: Record<string, string> = {
   // Door-open branch: explore-vs-leave choice popup replaces the old
   // look/go-north/read-note beats; 'leave outpost' advances the tutorial.
   '2026-06-03-arb4': 'Forge Coil',
+  // Travel-row "continue" wording → "tap → CITY"; arbiter queue capped
+  // (no more cut-off lines); em/en dashes spoken as comma pauses.
+  '2026-06-03-arb5': 'Quench Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

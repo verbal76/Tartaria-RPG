@@ -54,6 +54,12 @@ let coalesceTimer: ReturnType<typeof setTimeout> | null = null;
 // utterance gives a natural sentence-end pause (~0.2s).
 const COALESCE_MS = 400;
 
+// arb5 — most queued Arbiter lines kept at once (see the cap in speak()).
+// 3 leaves room for a short ack → prompt → follow-up sequence while
+// still collapsing rapid-tap spam down to a few lines. drain() merges
+// adjacent same-voice items, so these read as one natural utterance.
+const MAX_QUEUED_ARBITER = 3;
+
 /** Returns true if expo-speech can run on this device. We try two
  *  probes because `getAvailableVoicesAsync` returns an empty list on
  *  some Android devices that DO have a working TTS engine (Samsung
@@ -123,12 +129,23 @@ export function speak(text: string, channel?: string, voiceId?: string | null): 
     return piperSpeak(trimmed, voiceId, channel);
   }
   const id = nextId++;
-  // OTA 226 — same Arbiter spam-collapse rule as the bundled engine.
-  // When a new arbiter line lands, drop other queued arbiter lines so
-  // the player isn't lectured for two minutes after rapid-tapping.
-  if (channel === 'arbiter' && queue.length > 0) {
-    for (let i = queue.length - 1; i >= 0; i--) {
-      if (queue[i]!.channel === 'arbiter') queue.splice(i, 1);
+  // OTA 226 + arb5 — Arbiter queue cap. Rapid-tapping a direction can
+  // fire many flavor lines; without a bound the player gets lectured
+  // for minutes. The original rule dropped EVERY queued arbiter line on
+  // each new one, which also ate intentional short sequences — a pickup
+  // acknowledgement immediately followed by the next beat's prompt — so
+  // the first line was cut off (playtester report). Instead of nuking
+  // the queue, cap it: keep at most MAX_QUEUED_ARBITER queued arbiter
+  // lines (oldest dropped first). Short sequences survive; genuine spam
+  // stays bounded. currentlySpeaking is never touched.
+  if (channel === 'arbiter') {
+    let arbCount = queue.reduce((n, q) => (q.channel === 'arbiter' ? n + 1 : n), 0);
+    // We're about to push one more, so drop until there's room for it.
+    while (arbCount >= MAX_QUEUED_ARBITER) {
+      const idx = queue.findIndex((q) => q.channel === 'arbiter');
+      if (idx === -1) break;
+      queue.splice(idx, 1);
+      arbCount--;
     }
   }
   queue.push({ id, text: trimmed, channel, voiceId });

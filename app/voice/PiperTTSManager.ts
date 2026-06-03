@@ -58,6 +58,11 @@ interface QueuedUtterance {
    *  recent queued line plays. Other channels (world / combat /
    *  reward) are unaffected. */
   channel?: string;
+  /** arb5 — the parent speak() call id. A single arbiter line is split
+   *  into multiple sentence chunks that all share one lineId, so the
+   *  queue cap can drop or keep WHOLE lines instead of truncating one
+   *  mid-line. */
+  lineId?: number;
   /** Prefetched samples + the rate they were inferred at. drain()
    *  pre-runs forward() on the NEXT queued utterance while the
    *  current one is still playing, so the next sentence's audio is
@@ -88,6 +93,9 @@ interface LoadedVoice {
   sticky: boolean;
 }
 const POOL_MAX = 2;
+// arb5 — most queued Arbiter lines kept at once (see the cap in speak()).
+// Keyed by lineId so whole lines are dropped, never truncated mid-line.
+const MAX_QUEUED_ARBITER_LINES = 3;
 const VOICE_POOL: Map<string, LoadedVoice> = new Map();
 // In-flight loads keyed by voiceId so concurrent ensureLoaded() calls
 // (e.g. beginScene's warm + the vendor's first line both hitting at
@@ -465,25 +473,29 @@ export function speak(text: string, voiceId?: string | null, channel?: string): 
   const prepared = cleanForSpeech(applyLoreLexicon(text)).trim();
   if (!prepared) return -1;
   const id = nextId++;
-  // OTA 226 — Arbiter spam collapse. Playtester: "if somebody spams
-  // a direction the Arbiter fires off a bunch of flavor lines and
-  // talks for 5 minutes afterwards. Finish the one he's reading,
-  // skip the ones in between, jump to the latest." Implementation:
-  // when a new arbiter utterance lands, drop every other queued
-  // arbiter chunk (the currently-speaking one keeps playing — we
-  // only touch `queue`, not `currentlySpeaking`). World / combat /
-  // reward channels are untouched so action results still chain.
-  if (channel === 'arbiter' && queue.length > 0) {
-    const before = queue.length;
-    for (let i = queue.length - 1; i >= 0; i--) {
-      if (queue[i]!.channel === 'arbiter') queue.splice(i, 1);
+  // OTA 226 + arb5 — Arbiter queue cap. Playtester: "if somebody spams
+  // a direction the Arbiter fires off a bunch of flavor lines and talks
+  // for 5 minutes afterwards." The original rule dropped EVERY queued
+  // arbiter chunk on each new line — but that also ate intentional short
+  // sequences (a pickup acknowledgement immediately followed by the next
+  // beat's prompt), cutting the first line off (later playtester report).
+  // Instead, cap the queue at MAX_QUEUED_ARBITER_LINES *whole lines*
+  // (oldest dropped first), keyed by lineId so a multi-chunk line is
+  // never truncated mid-sentence. currentlySpeaking is never touched;
+  // orphaned prefetch promises on dropped chunks GC harmlessly.
+  if (channel === 'arbiter') {
+    const queuedLineIds: number[] = [];
+    for (const q of queue) {
+      if (q.channel === 'arbiter' && q.lineId != null && !queuedLineIds.includes(q.lineId)) {
+        queuedLineIds.push(q.lineId);
+      }
     }
-    const dropped = before - queue.length;
-    if (dropped > 0) {
-      // Cancel any prefetch promises attached to the dropped lines
-      // by simply letting them resolve into the ether — drain() only
-      // consumes prefetch from items it actually shifts off the
-      // queue, so orphaned promises GC harmlessly.
+    // We're about to add one more line, so drop until there's room.
+    while (queuedLineIds.length >= MAX_QUEUED_ARBITER_LINES) {
+      const dropId = queuedLineIds.shift()!;
+      for (let i = queue.length - 1; i >= 0; i--) {
+        if (queue[i]!.channel === 'arbiter' && queue[i]!.lineId === dropId) queue.splice(i, 1);
+      }
     }
   }
   // Split into sentence-sized chunks so the first audio plays as
@@ -499,7 +511,7 @@ export function speak(text: string, voiceId?: string | null, channel?: string): 
   if (chunks.length === 0) chunks.push(prepared);
   const resolvedVoice = voiceId ?? arbiterVoiceId();
   for (const chunk of chunks) {
-    queue.push({ id: nextId++, text: chunk, voiceId: resolvedVoice, channel });
+    queue.push({ id: nextId++, text: chunk, voiceId: resolvedVoice, channel, lineId: id });
   }
   void drain();
   return id;
