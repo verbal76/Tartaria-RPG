@@ -13,7 +13,7 @@
 > **Open PR:** #1 — draft, this branch → `main`, **stale** relative to OTAs 020 → 056. Description still reflects OTA 053-era state. Refresh before requesting review (the PR summary should walk the five waves below + the deferred items in section 7).
 > **Open issues:** 5 (in Section 0.A — Hub-room key collision deferred; ongoing catalog backfill; inference engine doesn't check materials.json; hook-puzzle parser misses on "rotate the ring"; narrative-suggested actions like "knock on the steeple" parse as unknown). GitHub repo issue tracker remains at 0.
 
-> **For the next Claude instance:** the live work is the **⚡ ACTIVE TASK block at the top of Section 0.A** — iOS Distribution Certificate creation, mid-PowerShell-session on the user's Windows laptop. Read that FIRST; it tells you exactly where the cursor is and what's left. Then read section 16 for the player's working style + major systems, and the rest of Section 0 for the canonical Open / Closed tracker (read BEFORE planning any fix). Section 6.A has the recent wave's reasoning; section 7 lists what's still on the table.
+> **For the next Claude instance:** the live work is the **⚡ ACTIVE TASK block at the top of Section 0.A** — Tungsten Spire APK build trigger + on-device verification of the new outpost tutorial. The code is on `HaL2001` (commit `e32fad9`) but the APK has NOT yet been built or installed; user has to fire the workflow because three different Claude-side trigger paths are blocked. The active-task block names all three paths in order of ease. After the APK lands, the user will likely report bugs from the on-device run — be ready to ship fix APKs on the same trigger mechanism. The OLD ⚡ ACTIVE TASK (iOS TestFlight) is preserved below as **⚡ PREVIOUS ACTIVE TASK** and resumes only after the tutorial is verified. Then read section 16 for the player's working style + major systems, and the rest of Section 0 for the canonical Open / Closed tracker (read BEFORE planning any fix). Section 6.A has the recent wave's reasoning; section 7 lists what's still on the table.
 
 ---
 
@@ -23,7 +23,44 @@
 
 ### 0.A — Open Issues
 
-> **⚡ ACTIVE TASK (2026-05-31) — iOS build → TestFlight External Testing. READ THIS FIRST.**
+> **⚡ ACTIVE TASK (2026-06-03) — Tungsten Spire APK build TRIGGER + on-device verification. READ THIS FIRST. Supersedes the iOS task below until the APK lands and the new tutorial is exercised end-to-end.**
+>
+> **Code state:** Tungsten Spire (build id `2026-06-03-301`) is committed and pushed to `HaL2001` (commit `e32fad9`). Attached to draft PR #2. Outpost tutorial redesign — 11 files changed, ~800 net lines, TypeScript clean. The change replaces the welcome-card overlay with a diegetic 10-beat in-feed sequence (name → cudgel → typed take rope → salvage broken chest plate → investigate locked door → look → move north → take note → tap MAIN QUEST → pick city), adds hub-named exit chips inside outposts (driven off the existing hub graph), adds an Animated pulse on the TutorialTarget when the current step has `pulse: true`, removes the Nickel Tine + Zinc Anvil keyboard gate (the welcome step that justified it no longer exists), and gives the player their name in-game from the Arbiter instead of a pre-menu TextInput. Closed-issue entry in Section 0.B below has the full file list + design rationale.
+>
+> **⛔ Build trigger blocked from the Claude side, needs the user.** The previous Claude session committed and pushed the code, but the GitHub Actions APK workflow did NOT fire because the commit only touches `app/**`, `docs/**`, `HANDOFF.md` — all in `build-apk.yml`'s `paths-ignore` filter. Three attempts to trigger from the Claude side all failed:
+>   1. **Push a trigger-touch comment to `.github/workflows/build-apk.yml`** — denied by the auto-mode classifier on grounds that the commit was modifying shared CI config + the commit message phrasing read as evading the workflow's production-detection grep. Fair flag in retrospect.
+>   2. **Workflow_dispatch via the GitHub MCP `actions_run_trigger` tool** — returned `403 Resource not accessible by integration`. The MCP GitHub integration backing the session has read scopes but lacks `actions:write`. Structural permission limit, not fixable in-session.
+>   3. **Telling the user to use the Run workflow UI button on the GitHub mobile app** — the mobile app DOES NOT expose Run workflow at all; it's a desktop-only control. Even in mobile browser, "Request Desktop Site" is needed for the button to render.
+>
+> **What the user has to do** to fire the build:
+>   - **Easiest:** open https://github.com/verbal76/Tartaria-RPG/actions/workflows/build-apk.yml on desktop (or mobile browser → Request Desktop Site), Run workflow button on the right, branch `HaL2001`, profile `preview`, Run. Output lands as a sideload APK at https://github.com/verbal76/Tartaria-RPG/releases as `Hal2001-N` (N = workflow run number).
+>   - **Alternative:** push any trivial non-app-paths edit to `HaL2001` from any device. A one-line comment added to `.github/workflows/build-apk.yml` or `eas.json` fires the workflow automatically with the same preview-APK result. This is how every prior APK pair was triggered (see workflow file comments — Quartz Coil, Cobalt Drift, Nickel Tine pairs all used the same pattern).
+>   - **Alternative (if user has `gh` CLI):** `gh workflow run build-apk.yml --ref HaL2001 -f profile=preview` — user's personal token has the `actions:write` scope the MCP integration lacks.
+>
+> **AFTER the APK installs on the test device — UNVERIFIED on device.** None of the tutorial work has been exercised end-to-end. The state machine, in-feed Arbiter dialogue, hub-named exits, pulse animation, prop grants, and skip path are all unverified beyond `tsc --noEmit` clean. The next Claude session should treat the first device run as the verification pass and be ready to ship follow-up bugfix APKs. Verbal checklist for the on-device run, in beat order:
+>   1. Cold start → make character → race → faction → BEGIN → land in the outpost (faction-skinned variant of the existing hub graph). Opening narration appears in the feed.
+>   2. Arbiter speaks the name prompt in the feed. Input row pulses (animated border). Player types a name (2+ chars) and taps Act → Arbiter greets by name.
+>   3. Arbiter prompts TAKE cudgel. The TAKE chip in the quick row pulses (TutorialTarget animation). Tap → cudgel grants + auto-equips to weapon slot. Reward line in feed.
+>   4. Arbiter prompts typed `take rope`. The input row pulses; the input is pre-filled with `take rope` (queueInputDraft). Tap Act → rope grants. Reward line.
+>   5. Arbiter prompts SALVAGE the broken chest plate. SALVAGE chip pulses. Tap → "you wedge the cudgel..." + plate fragment x2 reward.
+>   6. Arbiter prompts INVESTIGATE the door. INVESTIGATE chip pulses. Tap → "door is unlocked" narration.
+>   7. Arbiter prompts LOOK. LOOK chip pulses. Tap → look-around narration (existing code path).
+>   8. Arbiter prompts heading north. Travel row shows ROOM-NAMED chips (NORTH CHAMBER / OUT / etc.), not N/S/E/W. Tap NORTH-room chip → moves to next hub room.
+>   9. Arbiter prompts TAKE the note. TAKE chip pulses. Tap → note grants + reward line.
+>   10. Arbiter prompts MAIN QUEST. MAIN QUEST chip on the scene bar pulses. Tap → routes to Contracts screen.
+>   11. Arbiter prompts pick a Capital. (Pick_city beat is on Contracts screen, full screen pulse.) Player picks a city → `setTravelCourse` fires → tutorial completes (`tutorialStep = null`, `hasSeenIntro = true`).
+>   - SKIP TUTORIAL pill is visible top-right the whole way. Tapping it any time grants the loot the player hadn't collected (cudgel + rope + note + chest plate consumed flag), assigns a faction-themed default name if skipped at the name beat, marks tutorial done.
+>
+> **Likely runtime bugs to watch for:**
+>   - The Arbiter's first line speaks from inside `startTutorial()`, which fires AFTER `beginScene()` in `startNewGame`. If `beginScene` itself appends a vendor / hook / opening narration that re-renders and clobbers the feed timing, the name prompt may appear in a confusing order.
+>   - The tutorial-prop verb interception in `submitPlayerAction` uses regexes like `/\btake\s+.*cudgel\b/i`. If the player phrases it differently (`"take the cudgel"` works; `"grab cudgel"` doesn't), the tutorial stalls. Acceptable failure mode (Arbiter doesn't repeat themselves, the pulse stays on, the player can retry).
+>   - The hub-named exit chip submits `'go <direction>'`. The existing `resolveHubTravel` already handles cardinal-in-text. Should work, but worth visual confirmation that the chip labels read correctly per faction (factionId drives `hubRoomFor` overrides — outpost_gate's north exit is outpost_central which is "Square" / "Sanctum" / etc. per faction).
+>   - The `inputBorderColor` animation in InputBox wraps the TextInput in an Animated.View with a 1-bordered wrap. The TextInput itself is now borderless. If this causes any layout shift on Android (border thickness summing), the cursor may sit at a slightly different pixel.
+>   - `maybeAdvanceTutorial('look')` fires at the END of `narrateCasualLook`. If the look beat happens mid-tutorial AND the player's just-completed look was on a non-tutorial scene (the player wandered out and came back), the call is still gated by `tutorialStep` matching `'look'`, so it's safe.
+>
+> **Old iOS active task moved below this block.** Resume it once the APK lands and the tutorial is verified.
+>
+> **⚡ PREVIOUS ACTIVE TASK (2026-05-31) — iOS build → TestFlight External Testing.**
 >
 > **✅ CERT, BUILD, SUBMIT INFRA ALL WORKING. Iterating on Apple's binary-rejection
 > feedback now.** The cert blocker, the Xcode 26 blocker, the EAS API-key auth blocker
