@@ -85,6 +85,9 @@ const CODENAMES: Record<string, string> = {
   // Travel-row "continue" wording → "tap → CITY"; arbiter queue capped
   // (no more cut-off lines); em/en dashes spoken as comma pauses.
   '2026-06-03-arb5': 'Quench Coil',
+  // Keyboard hygiene: no auto-pop (only on tap), Enter dismisses, modals
+  // keyboard-avoided so the text box rides above the keyboard.
+  '2026-06-03-arb6': 'Anvil Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

@@ -1401,6 +1401,13 @@ interface GameStore {
   pendingInputDraft: string | null;
   queueInputDraft: (text: string) => void;
   consumeInputDraft: () => string | null;
+  /** True while a popup that owns a text field (Ask the Arbiter,
+   *  Search, Salvage, Approach) is open on the Exploration screen.
+   *  The floating KeyboardInputBar checks this and hides itself so it
+   *  can't mount behind the modal and steal focus from the modal's own
+   *  (visible, keyboard-avoided) text field. Set by ExplorationScreen. */
+  inputModalOpen: boolean;
+  setInputModalOpen: (open: boolean) => void;
 
   hydrate: () => Promise<void>;
   setScreen: (screen: ScreenName) => void;
@@ -1764,6 +1771,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   pendingOtaAppliedFrom: null,
   pendingOTAUpdate: false,
   pendingInputDraft: null,
+  inputModalOpen: false,
   cognitiveModelInfo: null,
 
   qwenStatus: 'idle',
@@ -2191,6 +2199,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   queueInputDraft(text) {
     set({ pendingInputDraft: text });
+  },
+
+  setInputModalOpen(open) {
+    if (get().inputModalOpen !== open) set({ inputModalOpen: open });
   },
 
   consumeInputDraft() {

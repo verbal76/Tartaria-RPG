@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
   Pressable,
   Keyboard,
+  KeyboardAvoidingView,
   Dimensions,
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
@@ -239,7 +240,7 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalv
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={onCancel}>
-        <View style={styles.scrim}>
+        <KeyboardAvoidingView style={styles.scrim} behavior="padding">
           <TouchableWithoutFeedback>
             <View style={styles.card}>
               {phase === 'results' ? (
@@ -382,7 +383,7 @@ export function SalvageModal({ visible, hints, chips, onSubmit, onCancel, onSalv
               )}
             </View>
           </TouchableWithoutFeedback>
-        </View>
+        </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </Modal>
   );

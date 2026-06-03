@@ -104,15 +104,18 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const currentTutStep = tutorialStep !== null ? TUTORIAL_STEPS[tutorialStep] ?? null : null;
   const currentBeatId = currentTutStep?.id ?? null;
 
-  // Tungsten Spire — pre-fill input from pendingInputDraft (the rope
-  // beat queues "take rope"). Existing flow.
+  // Pre-fill input from pendingInputDraft (the rope beat queues "take
+  // rope"). We pre-fill the text as a VISIBLE hint but deliberately do
+  // NOT call .focus() here — auto-focusing raised the soft keyboard on
+  // its own (e.g. the instant the rope beat became active after the
+  // player took the cudgel), which the player reported as the keyboard
+  // popping up unbidden. Rule now: the keyboard only ever appears when
+  // the player taps the text field themselves. The pre-filled command
+  // sits in the field ready to send via the TAKE chip or a tap+enter.
   useEffect(() => {
     if (pendingDraft !== null) {
       const draft = consumeDraft();
-      if (draft) {
-        setText(draft);
-        setTimeout(() => inputRef.current?.focus(), 50);
-      }
+      if (draft) setText(draft);
     }
   }, [pendingDraft, consumeDraft]);
 
@@ -146,12 +149,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     onSubmit(trimmed);
     setText('');
     inputRef.current?.clear();
-    // The name beat is the one place the keyboard must not linger. After
-    // the player types their name and submits, the input would otherwise
-    // stay focused and the keyboard would reappear over the next beats
-    // (the cudgel TAKE button, etc.) — the long-standing "keyboard pops
-    // up again" report. Dismiss it at the source, right after the name.
-    if (awaitingTutorialName) Keyboard.dismiss();
+    // Hitting enter/send always dismisses the keyboard now (player ask:
+    // "when you hit enter it should go away"). Previously this only fired
+    // on the name beat, so the keyboard lingered after every typed
+    // command and could reappear over later UI.
+    Keyboard.dismiss();
   };
 
   // Tungsten Spire — hub-room named exits. When the player is inside

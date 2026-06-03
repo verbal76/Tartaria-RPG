@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore, makeRoomKey } from '../state/gameStore';
@@ -57,6 +57,7 @@ export function ExplorationScreen() {
   const partialArbiterText = useGameStore((s) => s.partialArbiterText);
   const isGenerating = useGameStore((s) => s.isGenerating);
   const submit = useGameStore((s) => s.submitPlayerAction);
+  const setInputModalOpen = useGameStore((s) => s.setInputModalOpen);
   const setScreen = useGameStore((s) => s.setScreen);
   const currentScene = useGameStore((s) => s.currentScene);
   // Tungsten Spire — current tutorial beat id (null when no tutorial). The
@@ -96,6 +97,14 @@ export function ExplorationScreen() {
   // climbable noun in the current scene; tapping one fires `climb
   // <noun>` which resolves one tier in the climb handler.
   const [climbOpen, setClimbOpen] = useState(false);
+  // Tell the floating KeyboardInputBar to stand down whenever a popup
+  // that owns its own (keyboard-avoided) text field is open, so the bar
+  // can't mount behind the modal and steal focus from the visible field.
+  // Reset to false on unmount so it never sticks across screens.
+  useEffect(() => {
+    setInputModalOpen(searchOpen || approachOpen || askArbiterOpen || salvageOpen);
+  }, [searchOpen, approachOpen, askArbiterOpen, salvageOpen, setInputModalOpen]);
+  useEffect(() => () => setInputModalOpen(false), [setInputModalOpen]);
   // 2026-05-25 — branded vendor-leave prompt (POLISH-4). Replaces
   // the native Alert that was breaking the dark+amber palette. Holds
   // {vendorName, pendingText} so confirmation dispatches the
@@ -1012,6 +1021,9 @@ export function ExplorationScreen() {
                 .map((n) => ({ noun: n, consumed: isAmbientConsumed(n) }))
         }
         onTake={(noun) => {
+          // Dismiss the keyboard as the modal closes so RN can't restore
+          // focus to the underlying command field and re-raise it.
+          Keyboard.dismiss();
           setTakeOpen(false);
           if (tutBeat === 'cudgel' && noun.toLowerCase() === 'cudgel') {
             submit('take cudgel');
@@ -1020,6 +1032,7 @@ export function ExplorationScreen() {
           takeAmbientNoun(noun);
         }}
         onStealthTake={(noun) => {
+          Keyboard.dismiss();
           setTakeOpen(false);
           stealthTakeAmbientNoun(noun);
         }}
@@ -1029,10 +1042,11 @@ export function ExplorationScreen() {
           // (already-taken dedup, inventory cap, etc.) that an
           // individual chip tap would, so partial success is
           // handled per-item by the store.
+          Keyboard.dismiss();
           setTakeOpen(false);
           for (const n of nouns) takeAmbientNoun(n);
         }}
-        onCancel={() => setTakeOpen(false)}
+        onCancel={() => { Keyboard.dismiss(); setTakeOpen(false); }}
       />
 
       <SalvageModal
@@ -1154,7 +1168,10 @@ export function ExplorationScreen() {
           value: askArbiterInput,
           onChangeText: setAskArbiterInput,
           placeholder: 'topic — event, place, faction, item, title…',
-          autoFocus: true,
+          // No autoFocus — the keyboard only appears when the player taps
+          // the field. The modal is keyboard-avoided so the field rides
+          // above the keyboard once they do.
+          autoFocus: false,
         }}
         buttons={[
           {
