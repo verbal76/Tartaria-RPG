@@ -66,6 +66,10 @@ export function ExplorationScreen() {
   // the prop submits the verb, which the tutorial intercept advances on.
   const tutorialStep = useGameStore((s) => s.tutorialStep);
   const tutBeat = tutorialStep !== null ? (TUTORIAL_STEPS[tutorialStep]?.id ?? null) : null;
+  // Door-open branch popup (explore_or_leave beat).
+  const tutorialExploreChosen = useGameStore((s) => s.tutorialExploreChosen);
+  const chooseTutorialExplore = useGameStore((s) => s.chooseTutorialExplore);
+  const chooseTutorialLeave = useGameStore((s) => s.chooseTutorialLeave);
   const pendingRolls = useGameStore((s) => s.pendingRolls);
   const pendingHookContinue = useGameStore((s) => s.pendingHookContinue);
   const continueHook = useGameStore((s) => s.continueHook);
@@ -1170,6 +1174,29 @@ export function ExplorationScreen() {
           },
         ]}
         onRequestClose={() => { setAskArbiterOpen(false); setAskArbiterInput(''); }}
+      />
+
+      {/* Door-open branch — the explore_or_leave tutorial beat. Shows once
+          the door is investigated open; hidden after EXPLORE is chosen so
+          the player can free-roam. Dismissing (scrim tap) defaults to the
+          less-final EXPLORE choice. */}
+      <BrandedModal
+        visible={tutBeat === 'explore_or_leave' && !tutorialExploreChosen}
+        title="The Door Is Open"
+        body="The outpost door stands open. Pick through what's left of this place, or step out and begin your journey. You can always leave later — just type 'leave outpost' or tap OUT."
+        buttons={[
+          {
+            label: 'Explore the Outpost',
+            onPress: () => chooseTutorialExplore(),
+            tone: 'neutral',
+          },
+          {
+            label: 'Leave & Begin Journey',
+            onPress: () => chooseTutorialLeave(),
+            tone: 'primary',
+          },
+        ]}
+        onRequestClose={() => chooseTutorialExplore()}
       />
 
       <BrandedModal

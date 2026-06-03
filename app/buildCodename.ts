@@ -79,6 +79,9 @@ const CODENAMES: Record<string, string> = {
   '2026-06-03-arb2': 'Cinder Coil',
   // Tutorial picker-confusion fix + Arbiter pacing acks + LOOK highlight.
   '2026-06-03-arb3': 'Slag Coil',
+  // Door-open branch: explore-vs-leave choice popup replaces the old
+  // look/go-north/read-note beats; 'leave outpost' advances the tutorial.
+  '2026-06-03-arb4': 'Forge Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

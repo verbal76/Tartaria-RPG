@@ -131,33 +131,21 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       '"The door north is locked. INVESTIGATE it — see what you\'re dealing with."',
   },
   {
-    id: 'look',
+    // Door-open branch. Replaces the old look → move_north → read_note
+    // beats: when the door opens the player chooses, via a popup, to keep
+    // poking around the outpost or to head out and begin the journey.
+    // 'fullscreen' area = no region glow (the popup carries the moment, and
+    // nothing should pulse while the player free-roams after choosing
+    // EXPLORE). Both choices converge on the main_quest beat — picking
+    // LEAVE (or later typing 'leave outpost') advances; see
+    // finishOutpostTutorial in gameStore.
+    id: 'explore_or_leave',
     screen: 'exploration',
-    area: 'quick-row',
-    pulse: true,
-    title: 'Look Around',
-    body: 'LOOK around now that the door is open. The room reads differently.',
+    area: 'fullscreen',
+    title: 'The Door Is Open',
+    body: 'The outpost door stands open. Explore what remains, or head out and begin your journey.',
     arbiter:
-      '"The lock gives. You feel it more than hear it. LOOK AROUND YOU — the room reads differently now."',
-  },
-  {
-    id: 'move_north',
-    screen: 'exploration',
-    area: 'travel-row',
-    pulse: true,
-    title: 'Head North',
-    body: 'Move through the open door — tap the room-name chip in the travel row.',
-    arbiter:
-      '"Through the door, then. Tap the room-name chip below to head north."',
-  },
-  {
-    id: 'read_note',
-    screen: 'exploration',
-    area: 'feed',
-    title: 'Read the Note',
-    body: 'A folded note sits on the floor of this room. TAKE it.',
-    arbiter:
-      '"A folded note here on the floor. TAKE it — and read."',
+      '"There it is — the way\'s open. You can pick through what\'s left of this outpost, or step out and begin the road. Your call."',
   },
   {
     id: 'main_quest',
@@ -165,7 +153,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     area: 'objective-chip',
     pulse: true,
     title: 'Your Main Quest',
-    body: 'The note points you at the Aetheric Cores the Guardians protect. Tap the MAIN QUEST objective chip to open your contracts.',
+    body: 'The road leads to the Aetheric Cores the Guardians protect. Tap the MAIN QUEST objective chip to open your contracts.',
     arbiter:
       '"Cores. Nine of them, kept by their Guardians in the Lost Capitals — that\'s the road. Tap the MAIN QUEST chip below the scene bar to choose where you start."',
   },

@@ -1287,6 +1287,13 @@ interface GameStore {
    *  cleared the moment the player provides a name or skips the
    *  tutorial. Drives the in-feed Arbiter name prompt. */
   awaitingTutorialName: boolean;
+  /** Door-open branch — true once the player taps EXPLORE on the
+   *  explore_or_leave choice popup. While true the popup stays hidden and
+   *  the player free-roams the outpost until they leave (typed 'leave
+   *  outpost', the OUT chip, or a cardinal step out the gate), at which
+   *  point finishOutpostTutorial advances to the main_quest beat. Cleared
+   *  when the beat advances or the tutorial ends. */
+  tutorialExploreChosen: boolean;
   /** Tungsten Spire — has the player taken the tutorial cudgel /
    *  rope / chest plate / note yet? Gates per-prop narration so the
    *  Arbiter doesn't repeat the same line after the player walks back
@@ -1302,6 +1309,14 @@ interface GameStore {
    *  handlers to advance after a verb resolves without coupling them
    *  to step index numbers. */
   maybeAdvanceTutorial: (beatId: string) => void;
+  /** Door-open branch (explore_or_leave beat). chooseTutorialExplore →
+   *  player keeps poking around; the Arbiter explains how to leave when
+   *  ready. chooseTutorialLeave → walk out the gate now. Both ultimately
+   *  reach the main_quest beat via finishOutpostTutorial, which also fires
+   *  when the player leaves the outpost by any means during this beat. */
+  chooseTutorialExplore: () => void;
+  chooseTutorialLeave: () => void;
+  finishOutpostTutorial: () => void;
 
   slots: SlotSummary[];
   activeSlotId: string | null;
@@ -1731,6 +1746,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   tutorialStep: null,
   tutorialDemoVendor: null,
   awaitingTutorialName: false,
+  tutorialExploreChosen: false,
   tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false },
 
   slots: [],
@@ -2505,6 +2521,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // never fires.
       tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false },
       awaitingTutorialName: false,
+      tutorialExploreChosen: false,
     });
     try {
       get().appendLog('debug', `APK session start: ${OTA_BUILD_ID}.`);
@@ -4094,8 +4111,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // (d) Tutorial investigate of the locked door.
       if (tStep?.id === 'investigate' && /\binvestigate\s+.*door\b/i.test(trimmed)) {
         if (!_opts?.silent) get().appendLog('player', trimmed);
-        get().appendLog('world', 'You crouch by the door. The latch is set into a frame that\'s seen worse — a single shove on the right bracket lifts it. The door is unlocked.');
-        get().appendLog('arbiter', '"There. Now the way is open."');
+        get().appendLog('world', 'You crouch by the door. The latch is set into a frame that\'s seen worse — a single shove on the right bracket lifts it. The door swings open.');
+        // No arbiter line here — the explore_or_leave beat's line (spoken
+        // by advanceTutorial next) carries the door-open framing + choice.
         get().maybeAdvanceTutorial('investigate');
         return;
       }
@@ -7532,6 +7550,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // because the player's currentLocationId is still the
             // hub's macro location.
             get().beginScene({ skipHubEntry: true });
+            // Door-open branch: if the player chose EXPLORE and is now
+            // leaving the outpost, advance to the main_quest beat. No-op
+            // outside that beat.
+            get().finishOutpostTutorial();
             break;
           }
           const visited = new Set(get().worldMemory.hubVisited ?? []);
@@ -7613,6 +7635,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
               `You walk ${dir} past the gate. The outpost falls away behind you.`,
             );
             get().beginScene({ skipHubEntry: true });
+            // Door-open branch: leaving the outpost via a cardinal step
+            // during the explore_or_leave beat advances to main_quest.
+            // No-op outside that beat.
+            get().finishOutpostTutorial();
             // First-silt hint — playtest 2026-05-21: player asked
             // "where are the rocks and sticks?" The dig refusal inside
             // the outpost already says "leave outpost ... once on the
@@ -14959,6 +14985,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({
       tutorialStep: next,
       awaitingTutorialName: nextStep.id === 'name',
+      // Leaving the explore_or_leave beat behind — clear the branch flag
+      // so a later replay/new game doesn't inherit a stale "explored".
+      tutorialExploreChosen: false,
       currentScreen: nextScreen,
     });
     // Speak the next Arbiter line in the feed.
@@ -14979,6 +15008,53 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().advanceTutorial();
     }
   },
+  chooseTutorialExplore() {
+    const state = get();
+    const step = state.tutorialStep !== null ? TUTORIAL_STEPS[state.tutorialStep] : null;
+    if (step?.id !== 'explore_or_leave') return;
+    // Hide the popup, hand control back. The player roams freely; leaving
+    // the outpost by any means (typed 'leave outpost', the OUT chip, or a
+    // cardinal step out the gate) trips finishOutpostTutorial.
+    set({ tutorialExploreChosen: true });
+    get().appendLog(
+      'arbiter',
+      `"Take your time, then — pick this place clean if you like. When you're ready to begin, tap OUT or type 'leave outpost', and I'll set you on the road."`,
+    );
+  },
+  chooseTutorialLeave() {
+    const state = get();
+    const step = state.tutorialStep !== null ? TUTORIAL_STEPS[state.tutorialStep] : null;
+    if (step?.id !== 'explore_or_leave') return;
+    const player = get().player;
+    // Walk the player out of the outpost (mirrors the isLeaveHubCommand
+    // path) so the main_quest beat lands them in the open with the MAIN
+    // QUEST objective chip in view.
+    if (player?.hubRoomId) {
+      set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+      set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.travel), 1) });
+      get().appendLog(
+        'world',
+        `You step out through the gate. Open ground, open sky — the outpost falls away behind you. The road starts here.`,
+      );
+      get().beginScene({ skipHubEntry: true });
+    }
+    get().finishOutpostTutorial();
+  },
+  finishOutpostTutorial() {
+    const state = get();
+    if (state.tutorialStep === null) return;
+    const step = TUTORIAL_STEPS[state.tutorialStep];
+    if (step?.id !== 'explore_or_leave') return;
+    // Starter note — kept for inventory parity with the skip path. Its
+    // main-quest framing is delivered by the main_quest beat's Arbiter
+    // line (next), so grant it silently here.
+    grantTutorialItem(get, set, 'note');
+    set({ tutorialExploreChosen: false });
+    // maybeAdvanceTutorial (not advanceTutorial) so the no-stall guard
+    // test sees explore_or_leave wired to an advancement call. Step is
+    // already confirmed explore_or_leave above, so this always advances.
+    get().maybeAdvanceTutorial('explore_or_leave');
+  },
   skipTutorial() {
     // Skip path — grant the starter loot the tutorial would have
     // walked the player through (cudgel + rope + note), mark
@@ -14993,6 +15069,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         tutorialStep: null,
         tutorialDemoVendor: null,
         awaitingTutorialName: false,
+        tutorialExploreChosen: false,
         tutorialPropsConsumed: { cudgel: true, rope: true, chestPlate: true, note: true },
         // Land back in the world when the tutorial ends. The final beat
         // (pick_city) runs on the 'contracts' / MAIN QUEST screen, and the
