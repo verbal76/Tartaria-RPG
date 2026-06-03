@@ -192,6 +192,14 @@ const CODENAMES: Record<string, string> = {
   // no "investigate all" to clear them. Per-noun find chance is unchanged,
   // so the odds a room shows the player something hold up with fewer taps.
   '2026-06-03-arb34': 'Salt Wake',
+  // Core Guardian stationing gate. currentLocationId lingers as the
+  // departure capital all through travel (and while wandering off its
+  // anchor tile), so a faction gate-intent action in the wilderness —
+  // a Monarch's `attack` on a roadside enemy, a Reclaimer's `investigate`
+  // — was summoning that capital's Core Guardian miles from the city.
+  // Now the Core gate + summon only fire when actually standing IN the
+  // capital (on the map anchor / in a hub room, not mid-journey).
+  '2026-06-03-arb35': 'Tar Sump',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

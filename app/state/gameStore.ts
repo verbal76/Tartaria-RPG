@@ -317,6 +317,25 @@ const allLocations = locationsData as Location[];
  *  unchanged, so the odds a room shows the player something still hold. */
 const AMBIENT_DISPLAY_CAP = 5;
 
+/** True only when the player is genuinely STANDING IN their current named
+ *  location — on its map anchor (or inside one of its hub rooms), and not
+ *  mid-journey.
+ *
+ *  Why this exists: `currentLocationId` flips to a new place only on
+ *  ARRIVAL, so it lingers as the DEPARTURE capital for the whole of a
+ *  plotted trip, and it also stays put while you cardinally wander off the
+ *  anchor into open ground. Any check that keys purely off currentLocationId
+ *  — Core recovery, Core-Guardian summon — would otherwise fire miles from
+ *  the city: leave a capital whose Core you haven't taken, throw a punch at
+ *  a wandering Mudling (a Monarch's gate intent is `attack`), and its
+ *  Guardian would materialise in the wilderness. Every arrival snaps the
+ *  player to WORLD_MAP_CENTER, so anchor + no travelTarget == "really here". */
+function isStationedAtNamedLocation(p: PlayerCharacter): boolean {
+  if (p.travelTarget) return false; // mid-journey — the departure city isn't "here"
+  if (p.hubRoomId != null) return true; // inside a building at the location
+  return p.mapX === WORLD_MAP_CENTER_X && p.mapY === WORLD_MAP_CENTER_Y;
+}
+
 interface CurrentScene {
   weather: WeatherEntry;
   location: Location;
@@ -5154,7 +5173,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const mqMod = require('../engine/mainQuest');
-      if (mqMod.canRecoverCore(player, parsed.intent)) {
+      // isStationedAtNamedLocation gate: currentLocationId lingers as the
+      // departure capital all through travel (and while wandering off its
+      // anchor), so without this a faction gate-intent action — e.g. a
+      // Monarch's `attack` on a wilderness Mudling — would summon that
+      // capital's Core Guardian miles from the city. Only let the Core
+      // gate fire when the player is actually standing IN the capital.
+      if (mqMod.canRecoverCore(player, parsed.intent) && isStationedAtNamedLocation(player)) {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const cg = require('../engine/coreGuardians');
         const capitalId = player.currentLocationId;
@@ -17049,6 +17074,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const mq = require('../engine/mainQuest');
     const capitalId = player.currentLocationId;
     if (!mq.LOST_CAPITAL_LOCATIONS.includes(capitalId)) {
+      return { ok: false, reason: 'not_at_capital' };
+    }
+    // currentLocationId lingers as the departure capital while travelling /
+    // wandering, so confirm the player is actually standing in the city
+    // before answering the summons in the wilderness.
+    if (!isStationedAtNamedLocation(player)) {
       return { ok: false, reason: 'not_at_capital' };
     }
     const mqState = mq.ensureMainQuest(player.mainQuest);
