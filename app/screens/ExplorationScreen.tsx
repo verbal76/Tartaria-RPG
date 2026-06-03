@@ -460,13 +460,7 @@ export function ExplorationScreen() {
         return (
           <TouchableOpacity
             style={styles.objectiveChip}
-            onPress={() => {
-              // Tungsten Spire — advance the main_quest tutorial beat
-              // when the player taps the MAIN QUEST chip, then route
-              // to the Contracts screen as normal.
-              useGameStore.getState().maybeAdvanceTutorial('main_quest');
-              setScreen('contracts');
-            }}
+            onPress={() => setScreen('contracts')}
             activeOpacity={0.7}
             hitSlop={6}
           >
