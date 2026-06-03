@@ -10,7 +10,7 @@
 
 import locationsData from '../data/locations/locations.json';
 import type { Location } from './types';
-import { LOCATION_ATLAS_COORDS } from './atlasCoords';
+import { LOCATION_ATLAS_COORDS, OUTPOST_ATLAS_COORD } from './atlasCoords';
 
 export type Direction = 'north' | 'east' | 'south' | 'west';
 
@@ -30,22 +30,6 @@ function xmur3(str: string): () => number {
     h ^= h >>> 16;
     return h >>> 0;
   };
-}
-
-function mulberry32(seed: number): () => number {
-  let a = seed;
-  return () => {
-    a = (a + 0x6d2b79f5) | 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function makeRng(characterSeed: string): () => number {
-  const hash = xmur3(characterSeed);
-  return mulberry32(hash());
 }
 
 export interface MapTile {
@@ -68,9 +52,16 @@ export interface MapTile {
 // states across, not 2-3 city blocks. Players need enough wander
 // tiles between cities to land encounters, collectibles, and
 // travelling NPCs.
-const GRID_W = 41;
+// arb29 — CANONICAL world. The grid is 82 wide × 41 tall (2:1, matching the
+// landscape atlas art) so the continent reads as states-across, not blocks.
+// Every named location sits at a FIXED, atlas-derived position — identical
+// for every character — instead of a per-save seeded scatter. The map is
+// still re-centered on the player's current location (it sits at CENTER), so
+// `mapX/mapY` semantics + travelTo are unchanged; only the OTHER locations'
+// placement is now canon.
+const GRID_W = 82;
 const GRID_H = 41;
-const CENTER_X = 20;
+const CENTER_X = 41;
 const CENTER_Y = 20;
 /** Exported so travelTo can reset the player to the new map's center
  *  after a location change — without this, mapX/mapY carry the old
@@ -91,8 +82,38 @@ export interface WorldMap {
 // Generate a deterministic world map for a character. Starting location
 // goes at the center; other locations scatter outward, with rarer/danger
 // locations weighted to the edges.
+// Atlas → grid spread. The atlas is 1408×768 (≈1.83:1); SPREAD_X/SPREAD_Y
+// keep that aspect (40/22 ≈ 1.82) so a step east on the grid matches east on
+// the atlas, and size the longest canonical journey to ~35-38 tiles on the
+// 82-wide grid — a real haul without running off the edge from any center.
+const SPREAD_X = 40;
+const SPREAD_Y = 22;
+
+const clampX = (v: number): number => Math.max(0, Math.min(GRID_W - 1, v));
+const clampY = (v: number): number => Math.max(0, Math.min(GRID_H - 1, v));
+
+// Find the nearest free, distinct tile to (baseX, baseY) by deterministic
+// outward ring search. Keeps canonical positions intact when free; only
+// nudges when two locations would land on the exact same tile.
+function findFreeTile(taken: Set<string>, baseX: number, baseY: number): { x: number; y: number } {
+  const bx = clampX(baseX);
+  const by = clampY(baseY);
+  if (!taken.has(`${bx},${by}`)) return { x: bx, y: by };
+  for (let r = 1; r < Math.max(GRID_W, GRID_H); r++) {
+    for (let dy = -r; dy <= r; dy++) {
+      for (let dx = -r; dx <= r; dx++) {
+        if (Math.abs(dx) !== r && Math.abs(dy) !== r) continue; // ring only
+        const x = clampX(bx + dx);
+        const y = clampY(by + dy);
+        if (!taken.has(`${x},${y}`)) return { x, y };
+      }
+    }
+  }
+  return { x: bx, y: by };
+}
+
 export function generateWorldMap(characterSeed: string, startingLocationId: string): WorldMap {
-  const rng = makeRng(characterSeed);
+  void characterSeed; // positions are canon now; seed kept for signature compat
   const tiles: MapTile[][] = [];
   for (let y = 0; y < GRID_H; y++) {
     const row: MapTile[] = [];
@@ -115,133 +136,34 @@ export function generateWorldMap(characterSeed: string, startingLocationId: stri
   };
   positions[startLoc.id] = { x: CENTER_X, y: CENTER_Y };
 
-  // Sort by danger DESCENDING — place the high-danger (far-edge)
-  // locations first while the outer rings of the grid are still
-  // uncontested. Otherwise D1 locations claim the near-center band
-  // and the D5 locations all crowd the same far arcs, fall back to
-  // jitter, and drift off canonical bearing. Reverse order keeps
-  // the most position-sensitive placements on-canon.
+  // CANONICAL placement: every other location goes at a FIXED offset from the
+  // start, taken straight from the world atlas (LOCATION_ATLAS_COORDS). The
+  // offset is the atlas-fraction delta scaled by SPREAD (aspect-preserved),
+  // so the geometry is identical for every character — Drakova is always the
+  // same bearing + distance from Asgardar. No seed, no per-save scatter.
+  // Deterministic id-sorted order makes the rare same-tile nudge stable.
   const others = ALL_LOCATIONS.filter((l) => l.id !== startLoc.id);
-  others.sort((a, b) => b.danger - a.danger);
-
-  // Place each location at a random tile within a danger-weighted radius,
-  // along the CANONICAL BEARING from the starting location's atlas
-  // position to this location's atlas position. This means "east in the
-  // engine" matches "east on the canonical atlas" — walking east toward
-  // Asgardar actually walks you toward where Asgardar is drawn on the
-  // map, not toward whatever random procedural tile got picked.
-  //
-  // Radius is still randomized within the danger band so different
-  // characters get different journey lengths (canonical lore says
-  // "a fortnight at most" not "exactly 13 days"). Direction is fixed.
-  //
-  // Bands sized for the 41×41 grid (max usable radius ~28 from center):
-  //   D1: 4-12   (Outpost catchment, ~a week+)
-  //   D2: 8-18   (Borderlands proper)
-  //   D3: 12-22  (outer formations)
-  //   D4: 16-26  (regional capitals)
-  //   D5: 20-28  (deep relic sites — at the corners)
-  const startAtlas = LOCATION_ATLAS_COORDS[startLoc.id] ?? null;
-  // Atlas is 1408 × 768. To compute a direction-preserving bearing in
-  // procedural-tile space, we aspect-correct the X component so equal
-  // visual atlas distances translate to equal procedural-tile distances.
-  const ATLAS_ASPECT = 1408 / 768;
-
+  others.sort((a, b) => a.id.localeCompare(b.id));
+  const startAtlas = LOCATION_ATLAS_COORDS[startLoc.id] ?? OUTPOST_ATLAS_COORD;
   const taken = new Set<string>([`${CENTER_X},${CENTER_Y}`]);
   for (const loc of others) {
-    const minRadius = Math.max(4, loc.danger * 4);
-    const maxRadius = Math.min(28, loc.danger * 5 + 8);
-    // Canonical bearing: vector from start anchor to this location's
-    // anchor in aspect-corrected atlas space. If either lacks an atlas
-    // coord (defensive), fall back to a deterministic per-location
-    // pseudo-random angle so placement is still stable across saves.
-    const locAtlas = LOCATION_ATLAS_COORDS[loc.id] ?? null;
-    let bearing: number;
-    if (startAtlas && locAtlas) {
-      const dxAtlas = (locAtlas.fx - startAtlas.fx) * ATLAS_ASPECT;
-      const dyAtlas = locAtlas.fy - startAtlas.fy;
-      bearing = Math.atan2(dyAtlas, dxAtlas);
+    const locAtlas = LOCATION_ATLAS_COORDS[loc.id];
+    let baseX: number;
+    let baseY: number;
+    if (locAtlas) {
+      baseX = CENTER_X + Math.round((locAtlas.fx - startAtlas.fx) * SPREAD_X);
+      baseY = CENTER_Y + Math.round((locAtlas.fy - startAtlas.fy) * SPREAD_Y);
     } else {
-      bearing = rng() * Math.PI * 2;
+      // Defensive: a location with no atlas coord still needs a stable spot.
+      // Deterministic angle from an id hash so it's the same every load.
+      const a = (xmur3(loc.id)() % 360) * Math.PI / 180;
+      baseX = CENTER_X + Math.round(Math.cos(a) * 22);
+      baseY = CENTER_Y + Math.round(Math.sin(a) * 12);
     }
-    let placed = false;
-    for (let attempt = 0; attempt < 30 && !placed; attempt++) {
-      // First 15 attempts: fixed bearing, jittered radius — keeps
-      // placement perfectly on-canon when there's room.
-      // Next 15 attempts: jitter bearing by up to ±25° so a
-      // collision-heavy quadrant can fan out without crossing the
-      // X/Y axis for locations with near-axial canonical bearings.
-      // ±25° (50° arc) is enough for collision avoidance without
-      // flipping a "barely south" location into "north."
-      const bearingJitter = attempt < 15
-        ? 0
-        : (rng() - 0.5) * (Math.PI * 5 / 18); // ±25°
-      const effectiveBearing = bearing + bearingJitter;
-      const r = minRadius + rng() * (maxRadius - minRadius);
-      const x = CENTER_X + Math.round(Math.cos(effectiveBearing) * r);
-      const y = CENTER_Y + Math.round(Math.sin(effectiveBearing) * r);
-      if (x < 0 || x >= GRID_W || y < 0 || y >= GRID_H) continue;
-      const key = `${x},${y}`;
-      if (taken.has(key)) continue;
-      // Don't sit adjacent to another location — keep the map "huge".
-      // Don't sit within 2 tiles of another named location — keeps the
-      // world feeling huge and walks meaningful.
-      let tooClose = false;
-      for (const k of taken) {
-        const [tx, ty] = k.split(',').map(Number) as [number, number];
-        if (Math.abs(tx - x) + Math.abs(ty - y) <= 2) {
-          tooClose = true;
-          break;
-        }
-      }
-      if (tooClose) continue;
-      tiles[y]![x] = { x, y, locationId: loc.id, locationName: loc.name, hint: loc.name };
-      positions[loc.id] = { x, y };
-      taken.add(key);
-      placed = true;
-    }
-    // Bearing-aware fallback. If 30 jittered attempts all collided,
-    // walk every grid tile and pick the closest free one to the
-    // ideal bearing*radius point — keeps the placement in the
-    // canonical quadrant rather than starting from (0,0).
-    if (!placed) {
-      const midRadius = (minRadius + maxRadius) / 2;
-      const idealX = CENTER_X + Math.cos(bearing) * midRadius;
-      const idealY = CENTER_Y + Math.sin(bearing) * midRadius;
-      let bestX = -1;
-      let bestY = -1;
-      let bestD = Infinity;
-      for (let y = 0; y < GRID_H; y++) {
-        for (let x = 0; x < GRID_W; x++) {
-          const key = `${x},${y}`;
-          if (taken.has(key)) continue;
-          if (Math.abs(x - CENTER_X) + Math.abs(y - CENTER_Y) < 2) continue;
-          // Reject tiles adjacent to existing placements (keep the
-          // world huge — same rule the main loop uses).
-          let tooClose = false;
-          for (const k of taken) {
-            const [tx, ty] = k.split(',').map(Number) as [number, number];
-            if (Math.abs(tx - x) + Math.abs(ty - y) <= 2) {
-              tooClose = true;
-              break;
-            }
-          }
-          if (tooClose) continue;
-          const d = Math.hypot(x - idealX, y - idealY);
-          if (d < bestD) {
-            bestD = d;
-            bestX = x;
-            bestY = y;
-          }
-        }
-      }
-      if (bestX >= 0) {
-        tiles[bestY]![bestX] = { x: bestX, y: bestY, locationId: loc.id, locationName: loc.name, hint: loc.name };
-        positions[loc.id] = { x: bestX, y: bestY };
-        taken.add(`${bestX},${bestY}`);
-        placed = true;
-      }
-    }
+    const place = findFreeTile(taken, baseX, baseY);
+    tiles[place.y]![place.x] = { x: place.x, y: place.y, locationId: loc.id, locationName: loc.name, hint: loc.name };
+    positions[loc.id] = { x: place.x, y: place.y };
+    taken.add(`${place.x},${place.y}`);
   }
 
   return { tiles, positions };

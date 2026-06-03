@@ -161,6 +161,9 @@ const CODENAMES: Record<string, string> = {
   // Plotted distance is now position-derived (|target − you| on the current
   // map), so cardinal detours off the course re-plot honestly (18 → 23).
   '2026-06-03-arb28': 'Plot Coil',
+  // Canonical world: 82x41 grid, every named location at a FIXED atlas-derived
+  // position (seed-independent, same for everyone). Saves snap to new center.
+  '2026-06-03-arb29': 'Atlas Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

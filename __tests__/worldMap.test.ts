@@ -11,13 +11,61 @@ describe('worldMap', () => {
     expect(Object.keys(map.positions).length).toBeGreaterThan(5);
   });
 
-  it('different seeds give different layouts', () => {
+  it('arb29 — layout is CANONICAL: identical for every character (seed-independent)', () => {
     const a = generateWorldMap('alice', 'tartarian_outskirts');
     const b = generateWorldMap('bob', 'tartarian_outskirts');
-    // Find a location that's in both but at different positions.
-    const ids = Object.keys(a.positions).filter((id) => id in b.positions);
-    const diffs = ids.filter((id) => a.positions[id]!.x !== b.positions[id]!.x || a.positions[id]!.y !== b.positions[id]!.y);
-    expect(diffs.length).toBeGreaterThan(0);
+    expect(a.positions).toEqual(b.positions);
+  });
+
+  it('arb29 — grid is 82×41', () => {
+    expect(MAP_DIM.width).toBe(82);
+    expect(MAP_DIM.height).toBe(41);
+  });
+
+  it('arb29 — no two locations share a tile', () => {
+    const map = generateWorldMap('x', 'tartarian_outskirts');
+    const keys = Object.values(map.positions).map((p) => `${p.x},${p.y}`);
+    expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  it('arb29 — all positions are within grid bounds', () => {
+    const map = generateWorldMap('x', 'tartarian_outskirts');
+    for (const p of Object.values(map.positions)) {
+      expect(p.x).toBeGreaterThanOrEqual(0);
+      expect(p.x).toBeLessThan(MAP_DIM.width);
+      expect(p.y).toBeGreaterThanOrEqual(0);
+      expect(p.y).toBeLessThan(MAP_DIM.height);
+    }
+  });
+
+  it('arb29 — geometry is symmetric: dist(A→B) === dist(B→A) across re-centers', () => {
+    const ids = Object.keys(generateWorldMap('x', 'tartarian_outskirts').positions).slice(0, 6);
+    for (const a of ids) {
+      for (const b of ids) {
+        if (a === b) continue;
+        const fromA = generateWorldMap('x', a).positions[b];
+        const fromB = generateWorldMap('x', b).positions[a];
+        if (!fromA || !fromB) continue;
+        const dA = Math.abs(fromA.x - MAP_DIM.centerX) + Math.abs(fromA.y - MAP_DIM.centerY);
+        const dB = Math.abs(fromB.x - MAP_DIM.centerX) + Math.abs(fromB.y - MAP_DIM.centerY);
+        expect(dA).toBe(dB);
+      }
+    }
+  });
+
+  it('arb29 — every location can anchor the map without collisions/off-grid', () => {
+    const allIds = Object.keys(generateWorldMap('x', 'tartarian_outskirts').positions);
+    for (const start of allIds) {
+      const map = generateWorldMap('x', start);
+      const keys = Object.values(map.positions).map((p) => `${p.x},${p.y}`);
+      expect(new Set(keys).size).toBe(keys.length); // no collisions
+      for (const p of Object.values(map.positions)) {
+        expect(p.x).toBeGreaterThanOrEqual(0);
+        expect(p.x).toBeLessThan(MAP_DIM.width);
+        expect(p.y).toBeGreaterThanOrEqual(0);
+        expect(p.y).toBeLessThan(MAP_DIM.height);
+      }
+    }
   });
 
   it('same seed reproduces same layout', () => {

@@ -876,16 +876,14 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     // old grid's max valid index was 20 but the canonical "just
     // arrived" value was 10) and snap to the new center. Saves
     // already at the new center pass through untouched.
-    mapX: (() => {
-      if (typeof p.mapX !== 'number') return WORLD_MAP_CENTER_X;
-      if (p.mapX <= 14 && (typeof p.mapY !== 'number' || p.mapY <= 14)) return WORLD_MAP_CENTER_X;
-      return p.mapX;
-    })(),
-    mapY: (() => {
-      if (typeof p.mapY !== 'number') return WORLD_MAP_CENTER_Y;
-      if (p.mapY <= 14 && (typeof p.mapX !== 'number' || p.mapX <= 14)) return WORLD_MAP_CENTER_Y;
-      return p.mapY;
-    })(),
+    // arb29 — the world was recalibrated to canonical 82×41 positions
+    // (center 20,20 → 41,20), so old mapX/mapY offsets no longer map to the
+    // new geometry. Snap every loaded save to the new center; the player is
+    // treated as standing at their current location (re-centered model), and
+    // any in-progress journey re-plots from there. New characters + location
+    // arrivals already use the new center via character.ts / travelTo.
+    mapX: WORLD_MAP_CENTER_X,
+    mapY: WORLD_MAP_CENTER_Y,
     // OTA-120 — Dog Companion default for legacy saves. null = no
     // dog acquired yet; rescue hooks fire normally on the player's
     // next investigation of a matching scene archetype.
@@ -908,23 +906,17 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     travelTarget: (() => {
       const t = p.travelTarget;
       if (!t) return undefined;
-      if (typeof t.distanceRemaining === 'number') return t;
+      // arb29 — recompute the distance from the new canonical map + the
+      // (snapped) center, since the geometry was recalibrated. The player
+      // resumes their journey from their current location.
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { generateWorldMap, WORLD_MAP_CENTER_X: cx, WORLD_MAP_CENTER_Y: cy } = require('../engine/worldMap');
       const seed = p.mapSeed ?? `${p.name}|${p.raceId}|${p.factionId}|legacy`;
       const map = generateWorldMap(seed, p.currentLocationId);
       const tgtPos = map.positions[t.locationId];
       if (!tgtPos) return undefined; // bearing lost — clear cleanly
-      const fromX = typeof p.mapX === 'number' ? p.mapX : cx;
-      const fromY = typeof p.mapY === 'number' ? p.mapY : cy;
-      const tiles = Math.abs(tgtPos.x - fromX) + Math.abs(tgtPos.y - fromY);
-      if (tiles === 0 && p.currentLocationId !== t.locationId) {
-        // Counter would land at 0 but player is NOT actually at the
-        // target — the relative-map coord coincidence the playtester
-        // hit. Clear the travelTarget so the player sees STOPPED and
-        // can re-set explicitly.
-        return undefined;
-      }
+      const tiles = Math.abs(tgtPos.x - cx) + Math.abs(tgtPos.y - cy);
+      if (tiles === 0 && p.currentLocationId !== t.locationId) return undefined;
       return { locationId: t.locationId, distanceRemaining: tiles };
     })(),
   };
