@@ -129,6 +129,9 @@ const CODENAMES: Record<string, string> = {
   // Rope beat: disable the TAKE shortcut so the typed-input lesson (pre-fill
   // + ACT) can't be bypassed; re-enables once ACT advances the beat.
   '2026-06-03-arb18': 'Latch Coil',
+  // Climb beat advances only at the top (full climb taught); terser Arbiter
+  // lines; only the instructed quick-action works per beat, wrong taps buzz.
+  '2026-06-03-arb19': 'Buzz Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

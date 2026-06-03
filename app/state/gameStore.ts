@@ -4088,7 +4088,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           player: { ...s.player, name: trimmed },
           awaitingTutorialName: false,
         } : { awaitingTutorialName: false }));
-        get().appendLog('arbiter', `"Well met, ${trimmed}. Now — to business."`);
+        get().appendLog('arbiter', `"Well met, ${trimmed}. To business."`);
         get().maybeAdvanceTutorial('name');
         return;
       }
@@ -4105,7 +4105,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().appendLog('reward', '✦ Cudgel (Common). [equipped]');
         // Acknowledge the pickup before the next instruction — a beat of
         // pacing so the Arbiter doesn't snap straight into "now salvage".
-        get().appendLog('arbiter', '"A fine weapon to start with. Plain, honest, and it won\'t run dry on you. Keep it close."');
+        get().appendLog('arbiter', '"Good. Keep it close."');
         get().maybeAdvanceTutorial('cudgel');
         return;
       }
@@ -4114,7 +4114,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         grantTutorialItem(get, set, 'rope');
         get().appendLog('world', "You uncoil the rope from the shelf. Aetheric fibers, woven tight. It goes into your pack.");
         get().appendLog('reward', "✦ Reclaimer's Rope (Common).");
-        get().appendLog('arbiter', '"Good. Rope has settled more arguments with a cliff than any blade ever has."');
+        get().appendLog('arbiter', '"Good. That rope earns its keep."');
         get().maybeAdvanceTutorial('rope');
         return;
       }
@@ -4130,7 +4130,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }));
         get().appendLog('world', 'You wedge the cudgel against the rim and pop the rusted plate off its strap. The metal comes apart along old hammer-marks.');
         get().appendLog('reward', '✦ Plate Fragment x2 (Common). [scrapped]');
-        get().appendLog('arbiter', '"That\'s the way of it. A ruin always pays out, if you know where to break it."');
+        get().appendLog('arbiter', '"There. Ruins always pay out."');
         get().maybeAdvanceTutorial('scrap');
         return;
       }
@@ -9157,9 +9157,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : s.currentScene,
             };
           });
-          // Tutorial climb beat — advances once the player scales anything.
-          // No-op outside the beat.
-          get().maybeAdvanceTutorial('climb');
+          // Tutorial climb beat — only advance once the player reaches the
+          // TOP, so they experience the full multi-tier climb (stamina cost,
+          // fall risk, loot at the crest) instead of the beat snapping away
+          // after a single pull. No-op outside the beat.
+          if (isTop) get().maybeAdvanceTutorial('climb');
           // OTA-120 Phase 3 — dog can't climb. On the FIRST tier of a
           // climb (currentTier becomes 1 from 0), drop the dog to
           // 'waiting_at_base' so it sits at the climb origin and isn't

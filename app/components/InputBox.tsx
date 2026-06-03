@@ -9,6 +9,7 @@ import {
   Keyboard,
   Platform,
   Animated,
+  Vibration,
 } from 'react-native';
 import { TutorialTarget } from './TutorialTarget';
 import { TUTORIAL_STEPS } from './tutorialSteps';
@@ -222,6 +223,16 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const climbTone: 'ready' | 'needs-approach' | 'unavailable' | undefined = tutActionBeat
     ? (tutActionBeat === 'climb' ? 'ready' : undefined)
     : (!playerHasRope ? 'unavailable' : climbableCount && climbableCount > 0 ? 'ready' : 'needs-approach');
+  // During a guided action beat, every quick-action EXCEPT the instructed
+  // one is blocked (dimmed + buzzes on tap). The rope beat blocks TAKE too,
+  // since its lesson is typed input (pre-fill + ACT). Approach is never a
+  // tutorial step, so it's blocked through all action beats.
+  const inTutAction = tutActionBeat !== null;
+  const takeBlocked = inTutAction && tutActionBeat !== 'cudgel';
+  const salvageBlocked = inTutAction && tutActionBeat !== 'scrap';
+  const investigateBlocked = inTutAction && tutActionBeat !== 'investigate';
+  const climbBlocked = inTutAction && tutActionBeat !== 'climb';
+  const approachBlocked = inTutAction;
 
   return (
     <View style={styles.container}>
@@ -310,28 +321,27 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               label="investigate"
               onPress={investigateOverride ?? onOpenSearch}
               tone={investigateTone}
+              blocked={investigateBlocked}
             />
-            <QuickBtn label="approach" onPress={onOpenApproach} />
+            <QuickBtn label="approach" onPress={onOpenApproach} blocked={approachBlocked} />
             <QuickBtn
               label="take"
               onPress={takeOverride ?? onOpenTake}
               tone={takeTone}
-              // Rope beat teaches TYPED input — the command is pre-filled and
-              // the player should hit ACT. Disable the TAKE shortcut so it
-              // can't bypass the lesson; it re-enables once ACT advances the
-              // beat.
-              disabled={currentBeatId === 'rope'}
+              blocked={takeBlocked}
             />
             <QuickBtn
               label="salvage"
               onPress={salvageOverride ?? onOpenSalvage}
               tone={salvageTone}
+              blocked={salvageBlocked}
             />
             {!elevatedOn ? (
               <QuickBtn
                 label="climb"
                 onPress={onOpenClimb}
                 tone={climbTone}
+                blocked={climbBlocked}
               />
             ) : (
               <>
@@ -406,16 +416,18 @@ function QuickBtn({
   onPress,
   defensive,
   tone,
-  disabled,
+  blocked,
 }: {
   label: string;
   onPress: () => void;
   defensive?: boolean;
   tone?: QuickBtnTone;
-  disabled?: boolean;
+  /** Tutorial gating: render neutral + dimmed, and a tap buzzes (haptic)
+   *  instead of firing the action — so only the beat's instructed button
+   *  actually does anything. */
+  blocked?: boolean;
 }) {
-  // Disabled renders neutral + dimmed (not the red 'unavailable' look).
-  const resolvedTone: QuickBtnTone | undefined = disabled
+  const resolvedTone: QuickBtnTone | undefined = blocked
     ? undefined
     : tone ?? (defensive ? 'defensive' : undefined);
   const containerStyle = [
@@ -424,7 +436,7 @@ function QuickBtn({
     resolvedTone === 'ready' && styles.quickReady,
     resolvedTone === 'needs-approach' && styles.quickNeedsApproach,
     resolvedTone === 'unavailable' && styles.quickUnavailable,
-    disabled && styles.quickDisabled,
+    blocked && styles.quickDisabled,
   ];
   const textStyle = [
     styles.quickText,
@@ -433,8 +445,16 @@ function QuickBtn({
     resolvedTone === 'needs-approach' && styles.quickNeedsApproachText,
     resolvedTone === 'unavailable' && styles.quickUnavailableText,
   ];
+  const handlePress = () => {
+    if (blocked) {
+      // Wrong action for this tutorial beat — buzz instead of acting.
+      try { Vibration.vibrate(30); } catch { /* ignore */ }
+      return;
+    }
+    onPress();
+  };
   return (
-    <TouchableOpacity style={containerStyle} onPress={onPress} disabled={disabled}>
+    <TouchableOpacity style={containerStyle} onPress={handlePress}>
       <Text style={textStyle}>{label.toUpperCase()}</Text>
     </TouchableOpacity>
   );
