@@ -123,6 +123,9 @@ const CODENAMES: Record<string, string> = {
   // Music ducking: live track drops to 85% (15% dip) while the Arbiter
   // speaks, restores to full when the speech queue empties.
   '2026-06-03-arb16': 'Echo Coil',
+  // Ducking amount is now a player setting (Settings → SFX → Music → "Duck
+  // under voice", 0–50%, default 15%).
+  '2026-06-03-arb17': 'Chord Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

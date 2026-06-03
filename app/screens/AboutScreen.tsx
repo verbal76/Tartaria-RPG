@@ -276,6 +276,7 @@ export function AboutScreen() {
   const [applyFlash, setApplyFlash] = useState(false);
   const toggleMusic = () => { void setAudioSettings({ enabled: !audio.enabled }); };
   const setMusicVolume = (v: number) => { void setAudioSettings({ volume: v }); };
+  const setMusicDuck = (v: number) => { void setAudioSettings({ duck: v }); };
   const applyMusic = () => {
     void forceReapplyAudioFromState().then(() => {
       setApplyFlash(true);
@@ -640,6 +641,22 @@ export function AboutScreen() {
                 decimals={0}
                 suffix="%"
                 onChange={(v) => setMusicVolume(v / 100)}
+              />
+            </View>
+          </View>
+          {/* arb17 — voice ducking: how much the music dips while the
+              Arbiter speaks. 0% = off; default 15%. Stored 0..0.5. */}
+          <View style={styles.musicRow}>
+            <Text style={styles.musicLabel}>Duck under voice</Text>
+            <View style={{ flex: 1, alignItems: 'flex-end' }}>
+              <NumberStepper
+                value={Math.round((audio.duck ?? 0.15) * 100)}
+                min={0}
+                max={50}
+                step={5}
+                decimals={0}
+                suffix="%"
+                onChange={(v) => setMusicDuck(v / 100)}
               />
             </View>
           </View>

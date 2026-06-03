@@ -11,9 +11,12 @@ export interface AudioSettings {
   /** Master volume 0.0 - 1.0. Applied as a multiplier on top of each
    *  track's authored volume. */
   volume: number;
+  /** arb17 — how much to lower the music while the Arbiter speaks, as a
+   *  fraction (0 = no ducking, 0.15 = a 15% dip). Clamped 0..0.5. */
+  duck: number;
 }
 
-const DEFAULTS: AudioSettings = { enabled: true, volume: 0.7 };
+const DEFAULTS: AudioSettings = { enabled: true, volume: 0.7, duck: 0.15 };
 
 let cache: AudioSettings | null = null;
 const listeners = new Set<(s: AudioSettings) => void>();
@@ -27,6 +30,7 @@ export async function loadAudioSettings(): Promise<AudioSettings> {
       cache = {
         enabled: typeof parsed.enabled === 'boolean' ? parsed.enabled : DEFAULTS.enabled,
         volume: typeof parsed.volume === 'number' ? clamp01(parsed.volume) : DEFAULTS.volume,
+        duck: typeof parsed.duck === 'number' ? clampDuck(parsed.duck) : DEFAULTS.duck,
       };
     } else {
       cache = { ...DEFAULTS };
@@ -46,6 +50,7 @@ export async function setAudioSettings(patch: Partial<AudioSettings>): Promise<A
   const next: AudioSettings = {
     enabled: patch.enabled !== undefined ? patch.enabled : current.enabled,
     volume: patch.volume !== undefined ? clamp01(patch.volume) : current.volume,
+    duck: patch.duck !== undefined ? clampDuck(patch.duck) : current.duck,
   };
   cache = next;
   try {
@@ -67,4 +72,9 @@ export function onAudioSettingsChange(fn: (s: AudioSettings) => void): () => voi
 function clamp01(v: number): number {
   if (!Number.isFinite(v)) return 0;
   return Math.max(0, Math.min(1, v));
+}
+
+function clampDuck(v: number): number {
+  if (!Number.isFinite(v)) return 0;
+  return Math.max(0, Math.min(0.5, v));
 }

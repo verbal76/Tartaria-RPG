@@ -82,10 +82,10 @@ const FADE_MS = 400;
 const FADE_STEPS = 8;
 
 // arb16 — music ducking while the Arbiter speaks. When `ducked` is true the
-// live music track plays at DUCK_FACTOR of its normal volume so the voice
-// sits clearly on top, then returns to full when speech stops. 0.85 = a
-// gentle 15% dip. Wired up from the TTS engines via setMusicDuck().
-const DUCK_FACTOR = 0.85;
+// live music track plays at (1 - duck) of its normal volume so the voice
+// sits clearly on top, then returns to full when speech stops. The dip
+// amount is player-adjustable (audioSettings.duck, default 0.15 = 15%).
+// Wired up from the TTS engines via setMusicDuck().
 let ducked = false;
 
 async function ensureAudioMode(): Promise<void> {
@@ -126,7 +126,8 @@ async function loadTrack(entry: TrackEntry): Promise<void> {
 function effectiveVolume(entry: TrackEntry): number {
   const s = getAudioSettings();
   if (!s.enabled) return 0;
-  return entry.baseVolume * s.volume * (ducked ? DUCK_FACTOR : 1);
+  const duckMul = ducked ? Math.max(0, 1 - (s.duck ?? 0.15)) : 1;
+  return entry.baseVolume * s.volume * duckMul;
 }
 
 function findEntry(id: string): TrackEntry | null {
