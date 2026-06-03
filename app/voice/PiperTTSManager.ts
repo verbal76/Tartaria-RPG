@@ -41,6 +41,14 @@ const exec = require('react-native-executorch') as {
 
 const KOKORO_SAMPLE_RATE = 22050;
 
+// arb7 prosody — bundle consecutive sentences in a single speak() call
+// up to this many characters before handing them to Kokoro. Kokoro reads
+// flat/robotic on tiny strings and pays a fresh inference + playback-join
+// gap per chunk; merging gives sentence-to-sentence context and one
+// continuous waveform. Well under Kokoro's ~510-token cap (≈ 260 chars is
+// ~200 phonemes, leaving generous headroom).
+const MERGE_TARGET_CHARS = 260;
+
 interface QueuedUtterance {
   id: number;
   text: string;
@@ -504,11 +512,25 @@ export function speak(text: string, voiceId?: string | null, channel?: string): 
   // through Kokoro before ANY sound starts. Subsequent sentences
   // queue behind the first and stream as they're produced.
   const { sentences, remainder } = splitSentences(prepared);
-  const chunks = sentences.length > 0 ? [...sentences] : [];
-  if (remainder.trim()) chunks.push(remainder.trim());
+  const rawChunks = sentences.length > 0 ? [...sentences] : [];
+  if (remainder.trim()) rawChunks.push(remainder.trim());
   // Fallback: if the text has zero terminators (rare — usually a
   // status line), speak it as one chunk.
-  if (chunks.length === 0) chunks.push(prepared);
+  if (rawChunks.length === 0) rawChunks.push(prepared);
+  // arb7 prosody — greedily merge short consecutive sentences up to
+  // MERGE_TARGET_CHARS so Kokoro reads them as one inflected breath
+  // instead of a string of choppy one-clip-per-sentence reads. (Streamed
+  // narration is pre-bundled upstream in TTSController; this also catches
+  // the many pre-written multi-sentence lines delivered in one speak().)
+  const chunks: string[] = [];
+  for (const piece of rawChunks) {
+    const last = chunks.length > 0 ? chunks[chunks.length - 1]! : null;
+    if (last !== null && last.length + 1 + piece.length <= MERGE_TARGET_CHARS) {
+      chunks[chunks.length - 1] = `${last} ${piece}`;
+    } else {
+      chunks.push(piece);
+    }
+  }
   const resolvedVoice = voiceId ?? arbiterVoiceId();
   for (const chunk of chunks) {
     queue.push({ id: nextId++, text: chunk, voiceId: resolvedVoice, channel, lineId: id });
@@ -646,8 +668,14 @@ async function playPcm(samples: Float32Array, sampleRate: number): Promise<void>
   // real phoneme content. Dropped to 3ms (~66 samples at 22.05 kHz),
   // which is well under any single phoneme and still kills the
   // click.
-  applyFadeEnvelope(samples, sampleRate, 3);
-  const wavBase64 = encodeWav(samples, sampleRate);
+  // arb7 prosody — strip the 30-150ms of near-silence Kokoro pads onto
+  // the head + tail of each utterance before fading. Concatenated in the
+  // queue these dead spans stack into the stuttering inter-sentence gap;
+  // trimming them (with a guard pad so soft attacks survive) tightens the
+  // join so consecutive chunks read as continuous speech.
+  const trimmed = trimSilenceLeadTrail(samples, sampleRate);
+  applyFadeEnvelope(trimmed, sampleRate, 3);
+  const wavBase64 = encodeWav(trimmed, sampleRate);
   // progressUpdateIntervalMillis defaults to 500ms in expo-av, which
   // means didJustFinish fires up to half a second AFTER the audio
   // actually ends — that latency is the bulk of the inter-sentence
@@ -673,6 +701,29 @@ async function playPcm(samples: Float32Array, sampleRate: number): Promise<void>
       }
     });
   });
+}
+
+/** Trim leading/trailing near-silence from a Kokoro waveform. Scans in
+ *  from each end to the first sample above an amplitude threshold, then
+ *  keeps a small guard pad so a soft consonant attack/decay is never
+ *  clipped, and caps how much can be removed per end so a genuinely
+ *  quiet line can't be gutted. Returns a subarray VIEW (no copy); never
+ *  returns empty — if the whole buffer is below threshold it's left as-is. */
+function trimSilenceLeadTrail(samples: Float32Array, sampleRate: number): Float32Array {
+  const n = samples.length;
+  if (n === 0) return samples;
+  const THRESHOLD = 0.01;                       // |amp| counted as "sound"
+  const guard = Math.floor(sampleRate * 0.008); // keep ~8ms padding each end
+  const maxTrim = Math.floor(sampleRate * 0.2); // never cut > 200ms per end
+  let first = 0;
+  while (first < n && Math.abs(samples[first]!) < THRESHOLD) first++;
+  let last = n - 1;
+  while (last > first && Math.abs(samples[last]!) < THRESHOLD) last--;
+  if (first >= last) return samples;            // all-silence / lone spike
+  const start = Math.min(Math.max(0, first - guard), maxTrim);
+  const end = Math.max(Math.min(n - 1, last + guard), n - 1 - maxTrim);
+  if (start <= 0 && end >= n - 1) return samples;
+  return samples.subarray(start, end + 1);
 }
 
 /** Apply a linear fade-in to the first `fadeMs` and fade-out to the

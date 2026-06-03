@@ -62,6 +62,14 @@ let controllerStartedAt: number | null = null;
  *  be voiced. */
 let lastSpokenEntryId: string | null = null;
 let streamBuffer = '';
+// arb7 prosody — streaming-narration bundling. Kokoro reads flat/choppy
+// when every completed sentence is shipped as its own tiny clip. We ship
+// the FIRST sentence of a stream immediately (so audio starts fast), then
+// accumulate subsequent sentences and flush them in ~STREAM_BUNDLE_CHARS
+// batches so the model gets multi-sentence context for natural inflection.
+let streamPending = '';
+let streamShippedFirst = false;
+const STREAM_BUNDLE_CHARS = 180;
 /** Ids of arbiter entries we already voiced via the streaming buffer.
  *  When the matching final entry lands on the arbiter channel via
  *  appendLog, we skip it (already spoken sentence-by-sentence). The
@@ -108,12 +116,17 @@ function wasAlreadyStreamed(text: string): boolean {
 }
 
 function flushStreamBuffer(): void {
-  const trimmed = streamBuffer.trim();
-  if (trimmed) {
-    speakArbiter(trimmed);
-    rememberStreamed(trimmed);
+  // Ship any bundled-but-unsent sentences together with the trailing
+  // (terminator-less) remainder as one final chunk, then reset the
+  // per-stream bundling state.
+  const tail = [streamPending, streamBuffer.trim()].filter(Boolean).join(' ').trim();
+  if (tail) {
+    speakArbiter(tail);
+    rememberStreamed(tail);
   }
   streamBuffer = '';
+  streamPending = '';
+  streamShippedFirst = false;
 }
 
 function syncToCurrent(state: GameState): void {
@@ -121,6 +134,8 @@ function syncToCurrent(state: GameState): void {
   const last = state.gameLog[state.gameLog.length - 1];
   lastSpokenEntryId = last ? last.id : null;
   streamBuffer = '';
+  streamPending = '';
+  streamShippedFirst = false;
 }
 
 function onState(state: GameState): void {
@@ -200,22 +215,37 @@ function onState(state: GameState): void {
   // 200-token response.
   const partial = state.partialArbiterText;
   if (partial == null) {
-    // Stream ended — flush remainder (if any) and reset.
-    if (streamBuffer) flushStreamBuffer();
+    // Stream ended — flush bundled/remainder text (if any) and reset.
+    if (streamBuffer || streamPending || streamShippedFirst) flushStreamBuffer();
   } else if (partial.length > streamBuffer.length) {
     // New tokens arrived — replace the buffer with the latest snapshot.
     // (gameStore stores the cumulative partial text, not the delta.)
     streamBuffer = partial;
     const { sentences, remainder } = splitSentences(streamBuffer);
     for (const s of sentences) {
-      speakArbiter(s);
+      // Remember every sentence so the final full-line appendLog is
+      // recognised as already-spoken (dedup is substring-based).
       rememberStreamed(s);
+      if (!streamShippedFirst) {
+        // First sentence ships immediately → audio starts fast.
+        speakArbiter(s);
+        streamShippedFirst = true;
+      } else {
+        // Bundle the rest so Kokoro reads multi-sentence chunks.
+        streamPending = streamPending ? `${streamPending} ${s}` : s;
+        if (streamPending.length >= STREAM_BUNDLE_CHARS) {
+          speakArbiter(streamPending);
+          streamPending = '';
+        }
+      }
     }
     streamBuffer = remainder;
   } else if (partial.length < streamBuffer.length) {
     // The store reset the partial text (e.g. submitPlayerAction
-    // cancelled the in-flight generation). Drop our buffer.
+    // cancelled the in-flight generation). Drop our buffer + bundle.
     streamBuffer = partial;
+    streamPending = '';
+    streamShippedFirst = false;
   }
 }
 

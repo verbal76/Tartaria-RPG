@@ -88,6 +88,9 @@ const CODENAMES: Record<string, string> = {
   // Keyboard hygiene: no auto-pop (only on tap), Enter dismisses, modals
   // keyboard-avoided so the text box rides above the keyboard.
   '2026-06-03-arb6': 'Anvil Coil',
+  // Kokoro prosody: bundle short sentences before inference, trim
+  // head/tail silence, bundle streamed narration (fast first sentence).
+  '2026-06-03-arb7': 'Bellows Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA
