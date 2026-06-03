@@ -158,6 +158,9 @@ const CODENAMES: Record<string, string> = {
   // enter, restore it on EXIT — same spot, weather, and plotted distance
   // (entering a building is never a travel step).
   '2026-06-03-arb27': 'Pocket Coil',
+  // Plotted distance is now position-derived (|target − you| on the current
+  // map), so cardinal detours off the course re-plot honestly (18 → 23).
+  '2026-06-03-arb28': 'Plot Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

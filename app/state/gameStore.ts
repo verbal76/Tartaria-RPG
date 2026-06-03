@@ -14269,18 +14269,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const after = get().player;
       if (after && after.currentLocationId === locationId) {
         set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
-      } else {
-        // OTA-126 — decrement remaining for the auto-taken first step.
-        set((s) => (s.player?.travelTarget ? {
-          player: {
-            ...s.player,
-            travelTarget: {
-              ...s.player.travelTarget,
-              distanceRemaining: Math.max(0, (s.player.travelTarget.distanceRemaining ?? tiles) - 1),
-            },
-          },
-        } : s));
       }
+      // arb28 — the auto first step goes through stepDirection, which already
+      // re-plots distanceRemaining from the new position (position-derived).
+      // No manual decrement here (it would double-count).
     }
   },
 
@@ -14376,20 +14368,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (after && after.currentLocationId === targetId) {
       set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
     } else {
-      // OTA-126 — decrement the snapshot tile counter so the badge
-      // counts down monotonically. Map regenerates per step centered
-      // on currentLocationId, which shifts the destination's coords
-      // and broke the legacy "recompute Manhattan from current map"
-      // badge when the player crossed a location boundary.
-      set((s) => (s.player?.travelTarget ? {
-        player: {
-          ...s.player,
-          travelTarget: {
-            ...s.player.travelTarget,
-            distanceRemaining: Math.max(0, (s.player.travelTarget.distanceRemaining ?? 0) - 1),
-          },
-        },
-      } : s));
+      // arb28 — position-derived distance. stepDirection already re-plots
+      // on in-transit steps; recompute here too (from a FRESH map centred
+      // on the post-step current location) so an auto-step that crosses an
+      // intermediate named location re-plots from the new centre instead of
+      // running a blind countdown. Authoritative replacement for the old
+      // OTA-126 monotonic decrement.
+      const live = get().player;
+      if (live?.travelTarget) {
+        const liveSeed = live.mapSeed ?? `${live.name}|${live.raceId}|${live.factionId}|legacy`;
+        const m = generateWorldMap(liveSeed, live.currentLocationId);
+        const t = m.positions[targetId];
+        if (t) {
+          const dist = Math.abs(t.x - (live.mapX ?? WORLD_MAP_CENTER_X))
+            + Math.abs(t.y - (live.mapY ?? WORLD_MAP_CENTER_Y));
+          set((s) => (s.player?.travelTarget ? {
+            player: { ...s.player, travelTarget: { ...s.player.travelTarget, distanceRemaining: dist } },
+          } : s));
+        }
+      }
     }
   },
 
@@ -14544,6 +14541,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set((s) => s.currentScene
           ? { currentScene: { ...s.currentScene, weather: newWeather } }
           : s);
+      }
+      // arb28 — RE-PLOT the distance to the plotted city from the NEW tile.
+      // The plotted distance is now position-derived (|target − you| on the
+      // current-centred map), so a cardinal detour off the course — a
+      // story-hook run for some far-off vendor, say — updates it honestly:
+      // it climbs as you walk away and drops as you head back, instead of a
+      // blind countdown. Arrival on a named location is handled by the
+      // discrete-location switch below.
+      if (!step.landedOn) {
+        const tgtId = get().player?.travelTarget?.locationId;
+        const tgt = tgtId ? map.positions[tgtId] : undefined;
+        if (tgt) {
+          const dist = Math.abs(tgt.x - step.x) + Math.abs(tgt.y - step.y);
+          set((s) => (s.player?.travelTarget ? {
+            player: { ...s.player, travelTarget: { ...s.player.travelTarget, distanceRemaining: dist } },
+          } : s));
+        }
       }
     } else {
       // Not in transit — clear any lingering transit label so a
