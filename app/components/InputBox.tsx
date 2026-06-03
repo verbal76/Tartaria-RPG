@@ -107,6 +107,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const activeBuildingId = useGameStore((s) => s.activeBuildingId);
   const activeBuildingRoomId = useGameStore((s) => s.activeBuildingRoomId);
   const buildingRevealed = useGameStore((s) => s.buildingRevealed);
+  // arb36 — enterable structure discovered on the current wild tile.
+  const sceneBuilding = useGameStore((s) => s.currentScene?.sceneBuilding ?? null);
+  const enterBuilding = useGameStore((s) => s.enterBuilding);
   const goBuildingRoom = useGameStore((s) => s.goBuildingRoom);
   const exitBuilding = useGameStore((s) => s.exitBuilding);
   const buildingRooms = useMemo(
@@ -294,6 +297,16 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 <TravelBtn key={c.submit} label={c.label} onPress={() => onSubmit(c.submit)} />
               ))}
               <TravelBtn label="EXIT" onPress={() => onSubmit('leave outpost')} />
+            </>
+          ) : sceneBuilding ? (
+            // arb36 — a structure stands on this tile: offer ENTER alongside
+            // the cardinals so the player can step inside what they found.
+            <>
+              <TravelBtn label="ENTER" onPress={() => enterBuilding(sceneBuilding)} />
+              <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} />
+              <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} />
+              <TravelBtn label="EAST" onPress={() => onSubmit('go east')} />
+              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} />
             </>
           ) : (
             <>

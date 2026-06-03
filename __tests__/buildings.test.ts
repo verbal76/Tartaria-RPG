@@ -6,7 +6,55 @@ import {
   visibleBuildingRooms,
   secretRoomRevealedBy,
   resolveBuildingRoom,
+  buildingForTile,
+  BUILDING_TILE_CHANCE,
 } from '../app/engine/buildings';
+
+describe('arb36 — buildingForTile (organic discovery)', () => {
+  it('is deterministic: same tile → same result every call', () => {
+    for (let i = 0; i < 50; i++) {
+      const a = buildingForTile('outskirts', i, i * 2);
+      const b = buildingForTile('outskirts', i, i * 2);
+      expect(a).toBe(b);
+    }
+  });
+
+  it('only ever returns a real building id or null', () => {
+    const ids = new Set(buildingIds());
+    for (let x = -40; x <= 40; x++) {
+      for (let y = -20; y <= 20; y++) {
+        const r = buildingForTile('outskirts', x, y);
+        if (r !== null) expect(ids.has(r)).toBe(true);
+      }
+    }
+  });
+
+  it('populates roughly BUILDING_TILE_CHANCE% of tiles (not all, not none)', () => {
+    let hits = 0;
+    let total = 0;
+    for (let x = -50; x <= 50; x++) {
+      for (let y = -25; y <= 25; y++) {
+        total++;
+        if (buildingForTile('mud_seas', x, y)) hits++;
+      }
+    }
+    const pct = (hits / total) * 100;
+    // Wide tolerance around the configured rate — just proving it's a
+    // sparse scatter, not "every tile" or "never".
+    expect(pct).toBeGreaterThan(BUILDING_TILE_CHANCE - 6);
+    expect(pct).toBeLessThan(BUILDING_TILE_CHANCE + 6);
+  });
+
+  it('differs across locations for the same coordinates', () => {
+    let differences = 0;
+    for (let i = 0; i < 60; i++) {
+      if (buildingForTile('outskirts', i, 0) !== buildingForTile('mud_seas', i, 0)) {
+        differences++;
+      }
+    }
+    expect(differences).toBeGreaterThan(0);
+  });
+});
 
 describe('building templates', () => {
   it('has the five starter templates', () => {

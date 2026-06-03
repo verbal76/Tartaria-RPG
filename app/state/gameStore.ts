@@ -157,7 +157,7 @@ import {
   getBuilding,
   getBuildingRoom,
   buildingEntryRoom,
-  buildingIds,
+  buildingForTile,
   resolveBuildingRoom,
   secretRoomRevealedBy,
 } from '../engine/buildings';
@@ -336,6 +336,15 @@ function isStationedAtNamedLocation(p: PlayerCharacter): boolean {
   return p.mapX === WORLD_MAP_CENTER_X && p.mapY === WORLD_MAP_CENTER_Y;
 }
 
+/** arb36 — "you stumble on a structure" line for an enterable building
+ *  discovered on a wild tile. Uses the template's article-friendly
+ *  hookLabel ("a leaning shack" → "A leaning shack…"). */
+function buildingApproachLine(buildingId: string): string {
+  const label = getBuilding(buildingId)?.hookLabel ?? 'a structure';
+  const Cap = label.charAt(0).toUpperCase() + label.slice(1);
+  return `${Cap} stands off the path here — weathered and quiet, a way in still clear. (Tap ENTER to step inside.)`;
+}
+
 interface CurrentScene {
   weather: WeatherEntry;
   location: Location;
@@ -347,6 +356,11 @@ interface CurrentScene {
   /** Index of the enemy the player is currently targeting. */
   activeEnemyIdx: number;
   vendor: VendorInstance | null;
+  /** arb36 — id of an enterable structure standing on the player's current
+   *  WILD tile (deterministic via buildingForTile), or null. Surfaces the
+   *  ENTER affordance + narration so buildings are discovered organically
+   *  while exploring, instead of via the old dev "enter <name>" trigger. */
+  sceneBuilding?: string | null;
   /** Distance from the player to the enemy group. Null when peaceful. */
   range: CombatRange | null;
   /** Live narrative hooks the player can follow into multi-stage chains. */
@@ -3342,9 +3356,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // microMicroId was resolved at the top of beginScene so the
     // encounter / loot rolls could use the ladder's curated pools.
+    // arb36 — enterable structure on this tile. Deterministic per tile,
+    // outdoor + peaceful + off the location anchor only (never a building
+    // sitting on top of a named city/hub). Replaces the old dev
+    // "enter <name>" teleport — buildings are now found by exploring.
+    const bX = player?.mapX ?? WORLD_MAP_CENTER_X;
+    const bY = player?.mapY ?? WORLD_MAP_CENTER_Y;
+    const onAnchorTile = bX === WORLD_MAP_CENTER_X && bY === WORLD_MAP_CENTER_Y;
+    const sceneBuilding: string | null =
+      !hasEnemies && !hubRoom && !onAnchorTile
+        ? buildingForTile(location.id, bX, bY)
+        : null;
     const scene: CurrentScene = {
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
       vendor, range, hooks: initialHooks, ambientNouns, displayedAmbientNouns, microMicroId,
+      sceneBuilding,
       enemyAmbushUsed: enemies.map(() => false),
       // OTA 037 — explicit null. Older code relied on undefined being
       // falsy at every read site; making it explicit prevents stale
@@ -3443,6 +3469,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     } catch { /* voice modules not present in tests */ }
     set({ currentScene: scene, pendingRolls: null, pendingHookContinue: null });
+    // arb36 — announce a discovered structure so the new ENTER affordance
+    // isn't unexplained. Skipped on the opening scene (you start on the
+    // anchor, so sceneBuilding is null there anyway).
+    if (scene.sceneBuilding && !opts?.isOpening) {
+      get().appendLog('world', buildingApproachLine(scene.sceneBuilding));
+    }
     // OTA-244 — danger-vs-tier warning. Player playtest: ate a
     // Mud Giant (Legendary, 360 HP) rest-ambush in Asgardar
     // (danger 5) at 48 HP. OTA-243 capped the ambush picker by
@@ -4387,21 +4419,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Otherwise fall through — take / search / look operate on the room's
         // interactables via the normal parser (which logs the player line).
       } else {
-        // Dev entry trigger: "enter shed", "go into the market", etc.
-        const enterMatch = /^(?:enter|go\s+in(?:to)?|step\s+in(?:to)?)\b\s*(?:the\s+|a\s+|an\s+)?(.*)$/i.exec(trimmed);
-        const want = (enterMatch?.[1] ?? '').trim().toLowerCase();
-        if (want) {
-          const id = buildingIds().find((bid) => {
-            const name = (getBuilding(bid)?.name ?? '').toLowerCase();
-            const idWords = bid.replace(/_/g, ' ');
-            return want.includes(idWords) || idWords.includes(want)
-                || (name && (want.includes(name) || name.includes(want)));
-          });
-          if (id) {
-            if (!_opts?.silent) get().appendLog('player', trimmed);
-            get().enterBuilding(id);
-            return;
-          }
+        // arb36 — ENTER the structure standing on THIS tile, if one was
+        // discovered here (scene.sceneBuilding). Accepts "enter", "enter the
+        // shed", "go in/inside", "step into the house", "head inside" — the
+        // specific name is irrelevant; you enter whatever you stumbled on.
+        // Replaces the old dev "enter <name>" teleport into any template:
+        // buildings are now reached only by finding them in the world.
+        const here = get().currentScene?.sceneBuilding ?? null;
+        if (here && /^(?:enter|go\s+in(?:to|side)?|step\s+in(?:to|side)?|head\s+in(?:side)?|walk\s+in(?:side)?)\b/i.test(trimmed)) {
+          if (!_opts?.silent) get().appendLog('player', trimmed);
+          get().enterBuilding(here);
+          return;
         }
       }
     }
@@ -14816,6 +14844,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
           'world',
           `A stall has been thrown up on the next stretch of ground — ${stall.name}, ${stall.title}. Tap the vendor banner to trade.`,
         );
+      }
+    }
+
+    // arb36 — per-tile enterable structure. Deterministic for the tile, so
+    // it persists on revisit and clears as you walk off; narrate only when
+    // a NEW structure comes into view so pacing past one isn't spammy.
+    {
+      const liveScene = get().currentScene;
+      const livePlayer = get().player;
+      const outdoorPeaceful = !!liveScene
+        && (!liveScene.enemies || liveScene.enemies.length === 0);
+      // Skip while auto-travelling: you're passing through, the travel row
+      // shows travel controls (no ENTER button), so narrating "Tap ENTER"
+      // mid-journey would dangle. Discovery is for on-foot exploration.
+      if (liveScene && livePlayer && outdoorPeaceful && !livePlayer.hubRoomId && !livePlayer.travelTarget && !get().activeBuildingId) {
+        const onAnchor = step.x === WORLD_MAP_CENTER_X && step.y === WORLD_MAP_CENTER_Y;
+        const here = onAnchor ? null : buildingForTile(livePlayer.currentLocationId, step.x, step.y);
+        const prior = liveScene.sceneBuilding ?? null;
+        if (here !== prior) {
+          set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, sceneBuilding: here } } : s));
+          if (here) get().appendLog('world', buildingApproachLine(here));
+        }
       }
     }
 

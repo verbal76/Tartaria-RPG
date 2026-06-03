@@ -200,6 +200,12 @@ const CODENAMES: Record<string, string> = {
   // Now the Core gate + summon only fire when actually standing IN the
   // capital (on the map anchor / in a hub room, not mid-journey).
   '2026-06-03-arb35': 'Tar Sump',
+  // Organic building discovery. Structures (flooded house / outpost / shack /
+  // shed / market) now appear deterministically on ~12% of wild tiles via
+  // buildingForTile, narrate on first sight, and surface an ENTER button +
+  // presence-gated "enter / go inside" verb. The dev "enter <name>" teleport
+  // into any template is retired — buildings are found by exploring now.
+  '2026-06-03-arb36': 'Drift Maw',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

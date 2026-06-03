@@ -263,6 +263,39 @@ export function buildingIds(): string[] {
   return Object.keys(BUILDINGS);
 }
 
+/** Out of 100 — how many wilderness tiles carry an enterable structure.
+ *  Tuned for "stumble on one every several tiles of exploring" rather than
+ *  a building on every screen. */
+export const BUILDING_TILE_CHANCE = 12;
+
+/** Deterministic "is there an enterable structure standing on this tile?"
+ *  Pure function of (locationId, mapX, mapY): the SAME tile always yields
+ *  the SAME structure (or none), so buildings persist across revisits and
+ *  never flicker in/out when a scene re-rolls — no stored state needed.
+ *  Returns a building id, or null for an empty tile. The caller is
+ *  responsible for only consulting this on outdoor, peaceful, non-anchor
+ *  tiles (we don't want a shed sitting on top of a capital). */
+export function buildingForTile(
+  locationId: string,
+  mapX: number,
+  mapY: number,
+): string | null {
+  // xmur3-style string hash over the tile key — stable and well-mixed.
+  const key = `${locationId}:${mapX}:${mapY}`;
+  let h = 1779033703 ^ key.length;
+  for (let i = 0; i < key.length; i++) {
+    h = Math.imul(h ^ key.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  h = (h ^ (h >>> 16)) >>> 0;
+  if (h % 100 >= BUILDING_TILE_CHANCE) return null;
+  const ids = Object.keys(BUILDINGS);
+  // A second, decorrelated draw picks WHICH structure, so the presence
+  // roll and the type roll don't move together.
+  const pick = Math.imul(h ^ 0x9e3779b9, 2654435761) >>> 0;
+  return ids[pick % ids.length] ?? null;
+}
+
 /** Look up a building template by id. */
 export function getBuilding(id: string | null | undefined): BuildingTemplate | null {
   if (!id) return null;
