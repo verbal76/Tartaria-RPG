@@ -77,6 +77,8 @@ const CODENAMES: Record<string, string> = {
   // these read as the arbiters-line lineage at a glance: Flint Coil →
   // Cinder Coil → …
   '2026-06-03-arb2': 'Cinder Coil',
+  // Tutorial picker-confusion fix + Arbiter pacing acks + LOOK highlight.
+  '2026-06-03-arb3': 'Slag Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

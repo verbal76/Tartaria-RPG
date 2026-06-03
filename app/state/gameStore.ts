@@ -4060,6 +4060,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         grantTutorialItem(get, set, 'cudgel');
         get().appendLog('world', 'You stoop and lift the cudgel. The lashing is loose but the head is solid. You equip it without thinking.');
         get().appendLog('reward', '✦ Cudgel (Common). [equipped]');
+        // Acknowledge the pickup before the next instruction — a beat of
+        // pacing so the Arbiter doesn't snap straight into "now salvage".
+        get().appendLog('arbiter', '"A fine weapon to start with — plain, honest, and it won\'t run dry on you. Keep it close."');
         get().maybeAdvanceTutorial('cudgel');
         return;
       }
@@ -4068,6 +4071,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         grantTutorialItem(get, set, 'rope');
         get().appendLog('world', "You uncoil the rope from the shelf. Aetheric fibers, woven tight. It goes into your pack.");
         get().appendLog('reward', "✦ Reclaimer's Rope (Common).");
+        get().appendLog('arbiter', '"Good. Rope has settled more arguments with a cliff than any blade ever has."');
         get().maybeAdvanceTutorial('rope');
         return;
       }
@@ -4083,6 +4087,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }));
         get().appendLog('world', 'You wedge the cudgel against the rim and pop the rusted plate off its strap. The metal comes apart along old hammer-marks.');
         get().appendLog('reward', '✦ Plate Fragment x2 (Common). [scrapped]');
+        get().appendLog('arbiter', '"That\'s the way of it — a ruin always pays out, if you know where to break it."');
         get().maybeAdvanceTutorial('scrap');
         return;
       }

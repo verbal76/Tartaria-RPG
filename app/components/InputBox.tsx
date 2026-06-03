@@ -266,7 +266,15 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
         ) : (
           <>
             {PEACE_QUICK_DIRECT.map((qa) => (
-              <QuickBtn key={qa.submit} label={qa.label} onPress={() => onSubmit(qa.submit)} />
+              <QuickBtn
+                key={qa.submit}
+                label={qa.label}
+                onPress={() => onSubmit(qa.submit)}
+                // Light "look around you" green during the look beat. It was
+                // a static, unlit button with nothing drawing the player to
+                // it (playtest: "nothing's drawing you to that button").
+                tone={currentBeatId === 'look' && qa.submit === 'look' ? 'ready' : undefined}
+              />
             ))}
             <QuickBtn
               label="investigate"

@@ -870,7 +870,10 @@ export function ExplorationScreen() {
 
       <SearchModal
         visible={searchOpen}
-        chips={[
+        // During the investigate beat, show ONLY the demo prop (the locked
+        // door) so the picker can't bury it under the room's real surfaces —
+        // same confusion fix as the TAKE / SALVAGE pickers.
+        chips={tutBeat === 'investigate' ? [{ noun: 'door', consumed: false }] : [
           // 'the ground' pinned at the top of the scene chip row.
           // OTA 222 — playtester wanted consistency: other consumed
           // nouns disappear from the chip list. The engine still
@@ -976,10 +979,6 @@ export function ExplorationScreen() {
                 unmetRequirement,
               };
             }),
-          // Tungsten Spire — the investigate beat's demo prop. onSubmit
-          // below routes through submit('investigate <target>'), which the
-          // tutorial intercept advances on.
-          ...(tutBeat === 'investigate' ? [{ noun: 'door', consumed: false }] : []),
         ]}
         onSubmit={(target) => {
           setSearchOpen(false);
@@ -996,16 +995,18 @@ export function ExplorationScreen() {
 
       <TakeModal
         visible={takeOpen}
-        takeable={[
-          ...(currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])
-            .filter((n) => findCatalogItem(n) !== null && !isOversized(n))
-            .map((n) => ({ noun: n, consumed: isAmbientConsumed(n) })),
-          // Tungsten Spire — the cudgel beat's demo prop. Not a real scene
-          // noun, so it's appended here (post-filter) only while the beat is
-          // live; picking it routes through submit() so the tutorial
-          // intercept grants + advances.
-          ...(tutBeat === 'cudgel' ? [{ noun: 'cudgel', consumed: false }] : []),
-        ]}
+        // During the cudgel beat, show ONLY the demo prop. Playtest: the
+        // cudgel was appended after the room's real takeable nouns, so the
+        // picker offered actual items first and the player took the wrong
+        // things ("neither of those are the cudgel"). The guided beat must
+        // present the prop alone; the normal scene nouns return after.
+        takeable={
+          tutBeat === 'cudgel'
+            ? [{ noun: 'cudgel', consumed: false }]
+            : (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])
+                .filter((n) => findCatalogItem(n) !== null && !isOversized(n))
+                .map((n) => ({ noun: n, consumed: isAmbientConsumed(n) }))
+        }
         onTake={(noun) => {
           setTakeOpen(false);
           if (tutBeat === 'cudgel' && noun.toLowerCase() === 'cudgel') {
@@ -1032,32 +1033,21 @@ export function ExplorationScreen() {
 
       <SalvageModal
         visible={salvageOpen}
-        chips={buildChipPool(currentScene).map((n) => ({
-          noun: n,
-          // OTA-167 — salvage chip greys on raw engine-consumed
-          // state (searched + flavor-exhausted), NOT through
-          // isAmbientConsumed's self-heal. The self-heal was
-          // designed for TAKE: if you sold a Rusted Blade and one
-          // sits on the ground, you should be able to re-take it.
-          // But salvage produces MATERIALS, not the catalog item
-          // itself — owning or not owning anything has nothing to
-          // do with whether a noun's been salvaged. Playtest log:
-          // `scraps of cloth` got a flavor-only investigate, the
-          // engine wrote it to flavorExhaustedNouns, but the
-          // SalvageModal chip stayed bright because findCatalogItem
-          // fuzzy-matched scraps-of-cloth to a catalog item the
-          // player didn't own, so the self-heal flipped the chip
-          // back to ungreyed. Player tapped salvage 8 times across
-          // 35 seconds, each producing "You've already turned the
-          // scraps cloth over here." Now: salvage chip trusts the
-          // engine's per-room consumed state directly.
-          consumed: isFuzzyConsumed(n, consumedAmbientNouns),
-        })).concat(
-          // Tungsten Spire — the scrap beat's demo prop. onSubmit below
-          // already routes through submit('salvage <target>'), which the
-          // tutorial intercept advances on.
-          tutBeat === 'scrap' ? [{ noun: 'broken chest plate', consumed: false }] : [],
-        )}
+        // During the scrap beat, show ONLY the demo prop (the broken chest
+        // plate) so the picker can't surface the room's real salvageables —
+        // same confusion fix as the TAKE picker above.
+        chips={
+          tutBeat === 'scrap'
+            ? [{ noun: 'broken chest plate', consumed: false }]
+            : buildChipPool(currentScene).map((n) => ({
+                noun: n,
+                // OTA-167 — salvage chip greys on the engine's per-room
+                // consumed state directly (searched + flavor-exhausted),
+                // NOT isAmbientConsumed's self-heal, which fuzzy-matched
+                // catalog items the player didn't own and kept chips lit.
+                consumed: isFuzzyConsumed(n, consumedAmbientNouns),
+              }))
+        }
         onSubmit={(target) => {
           setSalvageOpen(false);
           // Submit raw target — the modal's chip text already includes
