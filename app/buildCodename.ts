@@ -116,6 +116,10 @@ const CODENAMES: Record<string, string> = {
   // Actually suppress the pre-name Arbiter hints: arm the tutorial BEFORE
   // beginScene so the tutorialStep===null guards take effect on a new game.
   '2026-06-03-arb14': 'Volt Coil',
+  // Serialize Kokoro inference (fixes "[speak] [object Object]" + skipped
+  // sentences from concurrent forward()); default rate 1.35; faster poll +
+  // tighter queue; new CLIMB tutorial beat; tutorial CLIMB button gated.
+  '2026-06-03-arb15': 'Plasma Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

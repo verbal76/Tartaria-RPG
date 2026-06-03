@@ -119,7 +119,9 @@ interface LoadedVoice {
 const POOL_MAX = 2;
 // arb5 — most queued Arbiter lines kept at once (see the cap in speak()).
 // Keyed by lineId so whole lines are dropped, never truncated mid-line.
-const MAX_QUEUED_ARBITER_LINES = 3;
+// arb15 — lowered 3 → 2 so the voice can't lag as far behind a fast-tapping
+// player (drops the oldest queued line, keeps the newest two).
+const MAX_QUEUED_ARBITER_LINES = 2;
 const VOICE_POOL: Map<string, LoadedVoice> = new Map();
 // In-flight loads keyed by voiceId so concurrent ensureLoaded() calls
 // (e.g. beginScene's warm + the vendor's first line both hitting at
@@ -129,6 +131,22 @@ const LOADING: Map<string, Promise<any | null>> = new Map();
 
 let nextId = 1;
 const queue: QueuedUtterance[] = [];
+// arb15 — inference serializer. Kokoro's native module isn't reentrant:
+// two forward() calls in flight at once reject with a native error object
+// (surfaced as "[speak] [object Object]") and the affected chunks get
+// skipped — the "skipping sentences" report. The crossfade look-ahead
+// prefetch fires inference for upcoming chunks while one is playing, which
+// could overlap the next chunk's inference. Funnel ALL forward() calls
+// through this single promise chain so prefetch-ahead still happens (during
+// playback) but never two inferences run simultaneously.
+let inferenceChain: Promise<unknown> = Promise.resolve();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function inferSerial(model: any, text: string, rate: number): Promise<Float32Array | null> {
+  const run = inferenceChain.then(() => model.forward(text, rate));
+  // Keep the chain alive whether this inference resolves or rejects.
+  inferenceChain = run.then(() => undefined, () => undefined);
+  return run as Promise<Float32Array | null>;
+}
 let currentlySpeaking: QueuedUtterance | null = null;
 let currentSound: Audio.Sound | null = null;
 // Backwards-compat: TTSController checks isPiperAvailable / getKokoroState
@@ -214,13 +232,28 @@ async function captureFreeDiskMB(): Promise<number> {
   }
 }
 
+/** Human-readable message for any thrown value. Native rejections are
+ *  often plain objects, which String() renders as a useless
+ *  "[object Object]"; pull a .message/.code or JSON instead so the
+ *  diagnostic actually says what failed. */
+function describeErr(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  if (err && typeof err === 'object') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const o = err as any;
+    if (typeof o.message === 'string' && o.message) return o.code ? `${o.code}: ${o.message}` : o.message;
+    try { return JSON.stringify(err); } catch { /* fall through */ }
+  }
+  return String(err);
+}
+
 function recordKokoroError(
   step: KokoroErrorRecord['step'],
   voiceId: string,
   err: unknown,
   diskFreeMB: number,
 ): void {
-  const message = err instanceof Error ? err.message : String(err);
+  const message = describeErr(err);
   const stack = err instanceof Error && err.stack ? err.stack : null;
   KOKORO_ERROR_HISTORY.unshift({
     at: new Date().toISOString(),
@@ -425,7 +458,7 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
       // real line doesn't pay cold-start latency. Output discarded.
       // Captured here too — the executorch native graph compile is
       // the single most likely OOM site on low-RAM devices.
-      try { const samples: Float32Array = await m.forward('ok.', 1.0); void samples; }
+      try { const samples = await inferSerial(m, 'ok.', 1.0); void samples; }
       catch (warmupErr) {
         const diskFreeMB = await captureFreeDiskMB();
         recordKokoroError('warmup', voiceId, warmupErr, diskFreeMB);
@@ -438,7 +471,7 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
       if (sticky) setKokoroState({ phase: 'ready' });
       return m;
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
+      const msg = describeErr(err);
       // Avoid double-recording: warmup catch already wrote a
       // detailed record. For everything else, capture here.
       if (step !== 'warmup') {
@@ -594,7 +627,7 @@ async function drain(): Promise<void> {
     const prefetchStillValid = !!next.prefetch
       && (next.prefetchVoiceId === undefined || next.prefetchVoiceId === targetVoice);
     const firstSamples: Float32Array = asFloat32(
-      prefetchStillValid ? await next.prefetch! : await model.forward(next.text, settings.rate),
+      prefetchStillValid ? await next.prefetch! : await inferSerial(model, next.text, settings.rate),
     );
     if (!firstSamples || firstSamples.length === 0) {
       currentlySpeaking = null;
@@ -645,7 +678,7 @@ async function drain(): Promise<void> {
     }
     await playPcm(combined, KOKORO_SAMPLE_RATE);
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
+    const msg = describeErr(err);
     // OTA 23-017 — runtime-speak failure (model loaded, ready,
     // but a specific utterance blew up). Record so the diagnostic
     // captures it instead of just showing the truncated UI msg.
@@ -753,7 +786,7 @@ async function playPcm(samples: Float32Array, sampleRate: number): Promise<void>
   const ttsVolume = Math.max(0, Math.min(1, getVoiceSettings().volume ?? 1));
   const { sound } = await Audio.Sound.createAsync(
     { uri: `data:audio/wav;base64,${wavBase64}` },
-    { shouldPlay: true, progressUpdateIntervalMillis: 50, volume: ttsVolume },
+    { shouldPlay: true, progressUpdateIntervalMillis: 25, volume: ttsVolume },
   );
   currentSound = sound;
   await new Promise<void>((resolve) => {
@@ -826,8 +859,7 @@ function primePrefetch(model: any, voice: string, rate: number): void {
       // OTA 013 — stamp the voice we inferred with so the consume side
       // can discard stale audio after a mid-stream voice switch.
       item.prefetchVoiceId = voice;
-      item.prefetch = model
-        .forward(item.text, rate)
+      item.prefetch = inferSerial(model, item.text, rate)
         .then((s: unknown) => { const f = asFloat32(s); item.resolvedSamples = f; return f; })
         .catch(() => { item.resolvedSamples = null; return null; });
     }

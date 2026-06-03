@@ -31,7 +31,7 @@ const VALID_AREAS = new Set([
 const EXPECTED_BEAT_IDS = [
   // Door-open branch (arb4): the old look / move_north / read_note beats
   // were replaced by a single explore_or_leave choice popup.
-  'name', 'cudgel', 'rope', 'scrap', 'investigate',
+  'name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate',
   'explore_or_leave', 'main_quest', 'pick_city',
 ] as const;
 
@@ -75,7 +75,7 @@ describe('Tungsten Spire — tutorial play loop (TUTORIAL_STEPS)', () => {
     }
   });
 
-  it('is exactly the 8 canonical beats, in order', () => {
+  it('is exactly the 9 canonical beats, in order', () => {
     expect(TUTORIAL_STEPS.map((s) => s.id)).toEqual([...EXPECTED_BEAT_IDS]);
   });
 

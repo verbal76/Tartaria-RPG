@@ -203,7 +203,8 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   // green = the one thing to do now; the completed buttons drop to amber.
   const tutActionBeat =
     currentBeatId === 'cudgel' || currentBeatId === 'rope'
-      || currentBeatId === 'scrap' || currentBeatId === 'investigate'
+      || currentBeatId === 'scrap' || currentBeatId === 'climb'
+      || currentBeatId === 'investigate'
       ? currentBeatId : null;
   const takeTone: 'ready' | undefined = tutActionBeat
     ? (tutActionBeat === 'cudgel' || tutActionBeat === 'rope' ? 'ready' : undefined)
@@ -214,6 +215,13 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const investigateTone: 'ready' | undefined = tutActionBeat
     ? (tutActionBeat === 'investigate' ? 'ready' : undefined)
     : (investigateOverride || (investigateCount && investigateCount > 0) ? 'ready' : undefined);
+  // CLIMB is green whenever the room has climbables, which during the
+  // tutorial meant it glowed through every beat. Gate it to the climb beat
+  // so green points only at the current action; normal count/rope logic
+  // applies outside the tutorial.
+  const climbTone: 'ready' | 'needs-approach' | 'unavailable' | undefined = tutActionBeat
+    ? (tutActionBeat === 'climb' ? 'ready' : undefined)
+    : (!playerHasRope ? 'unavailable' : climbableCount && climbableCount > 0 ? 'ready' : 'needs-approach');
 
   return (
     <View style={styles.container}>
@@ -318,13 +326,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               <QuickBtn
                 label="climb"
                 onPress={onOpenClimb}
-                tone={
-                  !playerHasRope
-                    ? 'unavailable'
-                    : climbableCount && climbableCount > 0
-                      ? 'ready'
-                      : 'needs-approach'
-                }
+                tone={climbTone}
               />
             ) : (
               <>

@@ -65,7 +65,10 @@ const DEFAULTS: VoiceSettings = {
   ttsEnabled: true,
   sttEnabled: false,
   engine: 'bundled',
-  rate: 1.0,
+  // arb15 — ship at 1.35× so the Arbiter keeps pace with a tapping player
+  // out of the box (playtester default). Within the 0.5–1.5 clamp; the
+  // player can still adjust it in Settings → Voice.
+  rate: 1.35,
   pitch: 1.0,
   voiceId: null,
   kokoroVoice: 'am_michael',

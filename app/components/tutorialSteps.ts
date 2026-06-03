@@ -121,6 +121,16 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
       '"That chest plate by the door is broken through. Tap SALVAGE to break it down. The metal\'s worth more than a busted plate."',
   },
   {
+    id: 'climb',
+    screen: 'exploration',
+    area: 'quick-row',
+    pulse: true,
+    title: 'Climb',
+    body: 'There\'s something here worth getting on top of. Tap CLIMB and pick what to scale — your rope makes it possible.',
+    arbiter:
+      '"Now put that rope to use. Tap CLIMB and pick something to scale. Height is its own kind of advantage out here."',
+  },
+  {
     id: 'investigate',
     screen: 'exploration',
     area: 'quick-row',

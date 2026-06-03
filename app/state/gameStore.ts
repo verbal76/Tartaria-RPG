@@ -9157,6 +9157,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : s.currentScene,
             };
           });
+          // Tutorial climb beat — advances once the player scales anything.
+          // No-op outside the beat.
+          get().maybeAdvanceTutorial('climb');
           // OTA-120 Phase 3 — dog can't climb. On the FIRST tier of a
           // climb (currentTier becomes 1 from 0), drop the dog to
           // 'waiting_at_base' so it sits at the climb origin and isn't
