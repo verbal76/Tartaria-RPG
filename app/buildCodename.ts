@@ -91,6 +91,9 @@ const CODENAMES: Record<string, string> = {
   // Kokoro prosody: bundle short sentences before inference, trim
   // head/tail silence, bundle streamed narration (fast first sentence).
   '2026-06-03-arb7': 'Bellows Coil',
+  // Kokoro crossfade: adjacent ready chunks concatenated into one
+  // waveform with an equal-power crossfade at each join.
+  '2026-06-03-arb8': 'Temper Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

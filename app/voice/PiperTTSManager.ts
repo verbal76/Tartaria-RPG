@@ -49,6 +49,18 @@ const KOKORO_SAMPLE_RATE = 22050;
 // ~200 phonemes, leaving generous headroom).
 const MERGE_TARGET_CHARS = 260;
 
+// arb8 crossfade — adjacent same-voice chunks whose audio is already
+// inferred are concatenated into ONE waveform with a short equal-power
+// crossfade at each join, so the queue plays as continuous speech instead
+// of separate click/gap-prone clips. CROSSFADE_LOOKAHEAD = how many chunks
+// to infer ahead of playback (so a batch can form without blocking);
+// CROSSFADE_MAX_BATCH caps one playback buffer's size; CROSSFADE_MS is the
+// overlap length. First-audio stays fast because a batch only forms from
+// chunks that prefetch already finished during the prior chunk's playback.
+const CROSSFADE_LOOKAHEAD = 3;
+const CROSSFADE_MAX_BATCH = 4;
+const CROSSFADE_MS = 12;
+
 interface QueuedUtterance {
   id: number;
   text: string;
@@ -79,6 +91,10 @@ interface QueuedUtterance {
    *  expo-av's 500ms status poll). With prefetch + 50ms poll the gap
    *  drops to ~100ms. */
   prefetch?: Promise<Float32Array | null>;
+  /** arb8 — samples stamped onto the item when its prefetch resolves, so
+   *  drain() can synchronously tell whether a queued chunk is ready to
+   *  fold into a crossfade batch (undefined = still inferring). */
+  resolvedSamples?: Float32Array | null;
   /** OTA 013 — the voiceId the prefetch was inferred with. Drain
    *  validates this at consumption time: if the player switched
    *  voices between prefetch-start and consume, the prefetched
@@ -561,33 +577,46 @@ async function drain(): Promise<void> {
     // re-infer with the current model.
     const prefetchStillValid = !!next.prefetch
       && (next.prefetchVoiceId === undefined || next.prefetchVoiceId === targetVoice);
-    const samples: Float32Array | null = prefetchStillValid
+    const firstSamples: Float32Array | null = prefetchStillValid
       ? await next.prefetch!
       : await model.forward(next.text, settings.rate);
-    if (!samples || samples.length === 0) {
+    if (!firstSamples || firstSamples.length === 0) {
       currentlySpeaking = null;
       void drain();
       return;
     }
-    // Kick off inference for the NEXT queued chunk in parallel with
-    // this chunk's playback. Only prefetch when the next chunk uses
-    // the same loaded voice — switching voices mid-queue would force
-    // a model swap and defeat the win. If forward() rejects, the
-    // catch on the next iteration handles it.
-    const upcoming = queue[0];
-    if (upcoming && !upcoming.prefetch) {
-      const upcomingVoice = upcoming.voiceId ?? arbiterVoiceId();
-      if (upcomingVoice === targetVoice) {
-        // OTA 013 — stamp the voice we inferred with. Drain's
-        // consume-side check uses prefetchVoiceId to detect a
-        // mid-stream voice switch and discard stale audio.
-        upcoming.prefetchVoiceId = targetVoice;
-        upcoming.prefetch = model
-          .forward(upcoming.text, settings.rate)
-          .catch(() => null);
-      }
+    // arb8 — assemble a crossfade batch: this chunk plus any following
+    // same-voice chunks whose audio is ALREADY inferred (prefetch
+    // resolved). We never block on inference here, so first-audio stays
+    // fast; the batch only grows once prefetch has run ahead during the
+    // previous chunk's playback.
+    const batch: Float32Array[] = [firstSamples];
+    while (batch.length < CROSSFADE_MAX_BATCH) {
+      const peek = queue[0];
+      if (!peek) break;
+      const peekVoice = peek.voiceId ?? arbiterVoiceId();
+      if (peekVoice !== targetVoice) break;                 // stop at a voice change
+      if (peek.resolvedSamples === undefined) break;        // not inferred yet → don't block
+      if (peek.prefetchVoiceId !== undefined && peek.prefetchVoiceId !== targetVoice) break; // stale voice
+      queue.shift();
+      if (peek.resolvedSamples && peek.resolvedSamples.length) batch.push(peek.resolvedSamples);
     }
-    await playPcm(samples, KOKORO_SAMPLE_RATE);
+    // Prime inference for the next few chunks (same voice only) so future
+    // drains can keep forming batches. Switching voices mid-queue would
+    // force a model swap and defeat the win, so prefetch stops there.
+    primePrefetch(model, targetVoice, settings.rate);
+
+    let combined: Float32Array;
+    if (batch.length === 1) {
+      // Single chunk — unchanged path; playPcm trims + fades it.
+      combined = firstSamples;
+    } else {
+      // Trim each member's pad-silence first so the crossfade overlaps
+      // real audio, then join with an equal-power crossfade.
+      const trimmedBufs = batch.map((b) => trimSilenceLeadTrail(b, KOKORO_SAMPLE_RATE));
+      combined = concatWithCrossfade(trimmedBufs, KOKORO_SAMPLE_RATE);
+    }
+    await playPcm(combined, KOKORO_SAMPLE_RATE);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     // OTA 23-017 — runtime-speak failure (model loaded, ready,
@@ -724,6 +753,65 @@ function trimSilenceLeadTrail(samples: Float32Array, sampleRate: number): Float3
   const end = Math.max(Math.min(n - 1, last + guard), n - 1 - maxTrim);
   if (start <= 0 && end >= n - 1) return samples;
   return samples.subarray(start, end + 1);
+}
+
+/** arb8 — start inference for up to CROSSFADE_LOOKAHEAD chunks ahead of
+ *  playback (same voice only), stamping each item's resolvedSamples when
+ *  its forward() settles so drain() can fold ready chunks into a crossfade
+ *  batch without blocking. Idempotent: skips items already prefetching. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function primePrefetch(model: any, voice: string, rate: number): void {
+  let ahead = 0;
+  for (const item of queue) {
+    if (ahead >= CROSSFADE_LOOKAHEAD) break;
+    const v = item.voiceId ?? arbiterVoiceId();
+    if (v !== voice) break;                 // stop at a voice change
+    if (!item.prefetch) {
+      // OTA 013 — stamp the voice we inferred with so the consume side
+      // can discard stale audio after a mid-stream voice switch.
+      item.prefetchVoiceId = voice;
+      item.prefetch = model
+        .forward(item.text, rate)
+        .then((s: Float32Array | null) => { item.resolvedSamples = s; return s; })
+        .catch(() => { item.resolvedSamples = null; return null; });
+    }
+    ahead++;
+  }
+}
+
+/** arb8 — concatenate PCM buffers into one waveform, overlapping each join
+ *  by CROSSFADE_MS with an equal-power (constant-power) crossfade so the
+ *  transition is smooth and click-free without a mid-fade amplitude dip.
+ *  Inputs should already be silence-trimmed so the overlap is over real
+ *  audio. Returns a fresh buffer. */
+function concatWithCrossfade(buffers: Float32Array[], sampleRate: number): Float32Array {
+  if (buffers.length === 1) return buffers[0]!;
+  const xfadeMax = Math.max(1, Math.floor((sampleRate * CROSSFADE_MS) / 1000));
+  // Per-join overlap is capped by the shorter of the two neighbours.
+  const overlaps: number[] = [];
+  let total = buffers[0]!.length;
+  for (let i = 1; i < buffers.length; i++) {
+    const ov = Math.min(xfadeMax, buffers[i - 1]!.length, buffers[i]!.length);
+    overlaps.push(ov);
+    total += buffers[i]!.length - ov;
+  }
+  const out = new Float32Array(total);
+  out.set(buffers[0]!, 0);
+  let pos = buffers[0]!.length;
+  for (let i = 1; i < buffers.length; i++) {
+    const buf = buffers[i]!;
+    const ov = overlaps[i - 1]!;
+    const start = pos - ov;
+    for (let j = 0; j < ov; j++) {
+      const t = (j + 1) / (ov + 1);                 // 0..1 across the overlap
+      const gPrev = Math.cos((t * Math.PI) / 2);     // equal-power fade-out
+      const gNext = Math.sin((t * Math.PI) / 2);     // equal-power fade-in
+      out[start + j] = out[start + j]! * gPrev + buf[j]! * gNext;
+    }
+    out.set(buf.subarray(ov), pos);
+    pos += buf.length - ov;
+  }
+  return out;
 }
 
 /** Apply a linear fade-in to the first `fadeMs` and fade-out to the
