@@ -10,6 +10,7 @@
 import * as Speech from 'expo-speech';
 import { getVoiceSettings, loadVoiceSettings, onVoiceSettingsChange } from './voiceSettings';
 import { cleanForSpeech } from './loreLexicon';
+import { setMusicDuck } from '../audio/AudioManager';
 import {
   speak as piperSpeak,
   stopAndClear as piperStopAndClear,
@@ -169,6 +170,7 @@ export function speak(text: string, channel?: string, voiceId?: string | null): 
 export function stopAndClear(): void {
   queue.length = 0;
   currentlySpeaking = null;
+  void setMusicDuck(false);
   if (coalesceTimer != null) { clearTimeout(coalesceTimer); coalesceTimer = null; }
   try { void Speech.stop(); } catch { /* ignore */ }
   // Unhandled-rejection-safe — piperStopAndClear awaits expo-av
@@ -209,7 +211,13 @@ function withTerminator(text: string): string {
 
 function drain(): void {
   if (currentlySpeaking) return;
-  if (queue.length === 0) return;
+  if (queue.length === 0) {
+    // Nothing left to speak — restore music to full volume.
+    void setMusicDuck(false);
+    return;
+  }
+  // A line is about to play — duck the music under the voice.
+  void setMusicDuck(true);
   // Merge ADJACENT same-voice items into a single utterance so
   // Android TTS's per-utterance reinit gap doesn't break up
   // consecutive lines from the same speaker. Voice-change forces

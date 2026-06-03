@@ -120,6 +120,9 @@ const CODENAMES: Record<string, string> = {
   // sentences from concurrent forward()); default rate 1.35; faster poll +
   // tighter queue; new CLIMB tutorial beat; tutorial CLIMB button gated.
   '2026-06-03-arb15': 'Plasma Coil',
+  // Music ducking: live track drops to 85% (15% dip) while the Arbiter
+  // speaks, restores to full when the speech queue empties.
+  '2026-06-03-arb16': 'Echo Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

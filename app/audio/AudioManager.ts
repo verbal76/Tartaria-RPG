@@ -81,6 +81,13 @@ let transitionEpoch = 0;
 const FADE_MS = 400;
 const FADE_STEPS = 8;
 
+// arb16 — music ducking while the Arbiter speaks. When `ducked` is true the
+// live music track plays at DUCK_FACTOR of its normal volume so the voice
+// sits clearly on top, then returns to full when speech stops. 0.85 = a
+// gentle 15% dip. Wired up from the TTS engines via setMusicDuck().
+const DUCK_FACTOR = 0.85;
+let ducked = false;
+
 async function ensureAudioMode(): Promise<void> {
   if (audioModeReady) return;
   try {
@@ -119,7 +126,7 @@ async function loadTrack(entry: TrackEntry): Promise<void> {
 function effectiveVolume(entry: TrackEntry): number {
   const s = getAudioSettings();
   if (!s.enabled) return 0;
-  return entry.baseVolume * s.volume;
+  return entry.baseVolume * s.volume * (ducked ? DUCK_FACTOR : 1);
 }
 
 function findEntry(id: string): TrackEntry | null {
@@ -271,6 +278,20 @@ async function applySettings(): Promise<void> {
       await setSoundVolume(activeTrackId, effectiveVolume(entry));
     }
   }
+}
+
+/** arb16 — duck (or restore) the live music track while the Arbiter speaks.
+ *  Called by the TTS engines: true when a line starts, false when the queue
+ *  empties. No-op when music is off or nothing's playing; the 15% dip is
+ *  small enough to apply instantly without a fade (and instant avoids
+ *  racing the transition fades). */
+export async function setMusicDuck(active: boolean): Promise<void> {
+  if (active === ducked) return;
+  ducked = active;
+  if (!activeTrackId) return;
+  const entry = findEntry(activeTrackId);
+  if (!entry) return;
+  await setSoundVolume(activeTrackId, effectiveVolume(entry));
 }
 
 export async function forceReapplyAudio(targetContext: Context | null): Promise<void> {

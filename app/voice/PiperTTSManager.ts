@@ -25,6 +25,7 @@ import { Audio } from 'expo-av';
 import { getVoiceSettings } from './voiceSettings';
 import { applyLoreLexicon, cleanForSpeech } from './loreLexicon';
 import { splitSentences } from './sentenceSplitter';
+import { setMusicDuck } from '../audio/AudioManager';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const exec = require('react-native-executorch') as {
@@ -607,8 +608,14 @@ export function speak(text: string, voiceId?: string | null, channel?: string): 
 async function drain(): Promise<void> {
   if (currentlySpeaking) return;
   const next = queue.shift();
-  if (!next) return;
+  if (!next) {
+    // Nothing left to speak — restore music to full volume.
+    void setMusicDuck(false);
+    return;
+  }
   currentlySpeaking = next;
+  // A line is about to play — duck the music under the Arbiter's voice.
+  void setMusicDuck(true);
   const targetVoice = next.voiceId ?? arbiterVoiceId();
   const model = await ensureLoaded(targetVoice);
   if (!model) {
@@ -694,6 +701,7 @@ async function drain(): Promise<void> {
 export async function stopAndClear(): Promise<void> {
   queue.length = 0;
   currentlySpeaking = null;
+  void setMusicDuck(false);
   if (currentSound) {
     try { await currentSound.stopAsync(); } catch { /* ignore */ }
     try { await currentSound.unloadAsync(); } catch { /* ignore */ }
