@@ -2218,6 +2218,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   async loadSlotIntoGame(slotId) {
     set({ slotLoadError: null });
+    // Cut the title screen's "Choose your character" line the moment a
+    // character is picked. Otherwise it keeps inferring + playing in Kokoro
+    // and the "Welcome back" line queues behind it (inference is serialized),
+    // which is the multi-second gap before the greeting is spoken.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      void require('../voice/TTSManager').stopAndClear();
+    } catch { /* TTS not loaded yet — fine */ }
     let saved;
     try {
       saved = await loadSlot(slotId);
@@ -2507,6 +2515,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   async startNewGame(input) {
+    // Cut the title's "Choose your character" line so the name prompt isn't
+    // queued behind it in Kokoro (same delay as the welcome-back on resume).
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      void require('../voice/TTSManager').stopAndClear();
+    } catch { /* TTS not loaded yet — fine */ }
     // Tungsten Spire — accept an empty name. The Arbiter asks the
     // player for their name in the outpost (tutorial beat 0). For
     // the brief window between createCharacter and the player's

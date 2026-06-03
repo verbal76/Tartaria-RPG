@@ -135,6 +135,9 @@ const CODENAMES: Record<string, string> = {
   // Climb beat now completes on the way DOWN (back at ground level), not at
   // the top; line points at the full up-and-down loop.
   '2026-06-03-arb20': 'Tide Coil',
+  // Stop the title "Choose your character" line on character-select/new-game
+  // so the welcome-back / name prompt isn't queued behind it (the ~4s delay).
+  '2026-06-03-arb21': 'Cue Coil',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA
