@@ -26,6 +26,7 @@ import { searchRequirementFor, inventoryHasGate } from '../engine/itemEffect';
 import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
 import { ApproachModal } from '../components/ApproachModal';
 import { TutorialTarget } from '../components/TutorialTarget';
+import { TUTORIAL_STEPS } from '../components/tutorialSteps';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
 
 function describeTime(hours: number): string {
@@ -58,6 +59,13 @@ export function ExplorationScreen() {
   const submit = useGameStore((s) => s.submitPlayerAction);
   const setScreen = useGameStore((s) => s.setScreen);
   const currentScene = useGameStore((s) => s.currentScene);
+  // Tungsten Spire — current tutorial beat id (null when no tutorial). The
+  // TAKE / SALVAGE / INVESTIGATE beats inject their demo prop into the
+  // matching modal + light its chip so the player opens the REAL picker and
+  // learns the interaction (instead of the chip direct-submitting). Picking
+  // the prop submits the verb, which the tutorial intercept advances on.
+  const tutorialStep = useGameStore((s) => s.tutorialStep);
+  const tutBeat = tutorialStep !== null ? (TUTORIAL_STEPS[tutorialStep]?.id ?? null) : null;
   const pendingRolls = useGameStore((s) => s.pendingRolls);
   const pendingHookContinue = useGameStore((s) => s.pendingHookContinue);
   const continueHook = useGameStore((s) => s.continueHook);
@@ -655,7 +663,7 @@ export function ExplorationScreen() {
                 (n) => findCatalogItem(n) !== null
                   && !isOversized(n)
                   && !isAmbientConsumed(n),
-              ).length;
+              ).length + (tutBeat === 'cudgel' ? 1 : 0); // tutorial cudgel prop
             })()}
             salvageableCount={(() => {
               // 2026-05-25 — count predicate now uses SalvageModal's
@@ -666,7 +674,7 @@ export function ExplorationScreen() {
               // (and vice versa).
               return buildChipPool(currentScene).filter(
                 (n) => !isAmbientConsumed(n) && isSalvageableForModal(n),
-              ).length;
+              ).length + (tutBeat === 'scrap' ? 1 : 0); // tutorial chest-plate prop
             })()}
             climbableCount={(() => {
               // 2026-05-25 — green tone for CLIMB when the scene has at
@@ -755,7 +763,7 @@ export function ExplorationScreen() {
                   if (surfaceUnlocked) groundCount = 1;
                 }
               }
-              return sceneCount + groundCount;
+              return sceneCount + groundCount + (tutBeat === 'investigate' ? 1 : 0); // tutorial door prop
             })()}
             // OTA-188 — drives the CLIMB button's red/amber/green
             // ladder. inventoryHasGate checks every inventory item's
@@ -966,6 +974,10 @@ export function ExplorationScreen() {
                 unmetRequirement,
               };
             }),
+          // Tungsten Spire — the investigate beat's demo prop. onSubmit
+          // below routes through submit('investigate <target>'), which the
+          // tutorial intercept advances on.
+          ...(tutBeat === 'investigate' ? [{ noun: 'door', consumed: false }] : []),
         ]}
         onSubmit={(target) => {
           setSearchOpen(false);
@@ -982,11 +994,22 @@ export function ExplorationScreen() {
 
       <TakeModal
         visible={takeOpen}
-        takeable={(currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])
-          .filter((n) => findCatalogItem(n) !== null && !isOversized(n))
-          .map((n) => ({ noun: n, consumed: isAmbientConsumed(n) }))}
+        takeable={[
+          ...(currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])
+            .filter((n) => findCatalogItem(n) !== null && !isOversized(n))
+            .map((n) => ({ noun: n, consumed: isAmbientConsumed(n) })),
+          // Tungsten Spire — the cudgel beat's demo prop. Not a real scene
+          // noun, so it's appended here (post-filter) only while the beat is
+          // live; picking it routes through submit() so the tutorial
+          // intercept grants + advances.
+          ...(tutBeat === 'cudgel' ? [{ noun: 'cudgel', consumed: false }] : []),
+        ]}
         onTake={(noun) => {
           setTakeOpen(false);
+          if (tutBeat === 'cudgel' && noun.toLowerCase() === 'cudgel') {
+            submit('take cudgel');
+            return;
+          }
           takeAmbientNoun(noun);
         }}
         onStealthTake={(noun) => {
@@ -1027,7 +1050,12 @@ export function ExplorationScreen() {
           // scraps cloth over here." Now: salvage chip trusts the
           // engine's per-room consumed state directly.
           consumed: isFuzzyConsumed(n, consumedAmbientNouns),
-        }))}
+        })).concat(
+          // Tungsten Spire — the scrap beat's demo prop. onSubmit below
+          // already routes through submit('salvage <target>'), which the
+          // tutorial intercept advances on.
+          tutBeat === 'scrap' ? [{ noun: 'broken chest plate', consumed: false }] : [],
+        )}
         onSubmit={(target) => {
           setSalvageOpen(false);
           // Submit raw target — the modal's chip text already includes

@@ -169,25 +169,23 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
     return out;
   }, [hubRoom, factionId]);
 
-  // TAKE / SALVAGE / INVESTIGATE chip overrides during their tutorial
-  // beats — instead of opening the modal (which would be empty in
-  // the outpost since the props aren't scene nouns), the chip
-  // submits the tutorial verb directly. The submitPlayerAction
-  // tutorial pre-check picks it up and runs the prop grant +
-  // advancement.
-  const takeOverride: (() => void) | null = currentBeatId === 'cudgel'
-    ? () => onSubmit('take cudgel')
-    : currentBeatId === 'rope'
+  // TAKE / SALVAGE / INVESTIGATE during their tutorial beats now OPEN the
+  // real picker menu so the player learns the actual interaction — the demo
+  // prop (cudgel / broken chest plate / door) is injected into the matching
+  // modal by ExplorationScreen for that beat, and its chip lights via the
+  // count. Picking the prop submits the verb, which the submitPlayerAction
+  // tutorial intercept grants + advances on.
+  //
+  // Only the typed-input demos keep a direct submit: the rope beat is
+  // teaching TYPED input (the input row pulses with a pre-filled "take
+  // rope"), and the note is taken straight from the feed.
+  const takeOverride: (() => void) | null = currentBeatId === 'rope'
     ? () => onSubmit('take rope')
     : currentBeatId === 'read_note'
     ? () => onSubmit('take note')
     : null;
-  const salvageOverride: (() => void) | null = currentBeatId === 'scrap'
-    ? () => onSubmit('salvage broken chest plate')
-    : null;
-  const investigateOverride: (() => void) | null = currentBeatId === 'investigate'
-    ? () => onSubmit('investigate door')
-    : null;
+  const salvageOverride: (() => void) | null = null;
+  const investigateOverride: (() => void) | null = null;
 
   return (
     <View style={styles.container}>
