@@ -17,7 +17,7 @@
     },
     "preview": {
       "distribution": "internal",
-      "channel": "preview",
+      "channel": "arbiters-line",
       "android": {
         "buildType": "apk"
       },
