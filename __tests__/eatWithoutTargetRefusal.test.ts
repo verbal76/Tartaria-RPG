@@ -108,6 +108,10 @@ describe('OTA-155 — eat without target refuses, does NOT sleep 8h', () => {
     // behavior. Make sure the new check didn't catch this case.
     await bootstrap();
     const player0 = useGameStore.getState().player!;
+    // arb37 — rest restores STAMINA only and is refused when stamina is
+    // already full (a wounded-but-rested player is told to eat). Drain
+    // stamina so the rest path actually has work to do.
+    useGameStore.setState({ player: { ...player0, stamina: 0, corruption: 0 } });
     const hoursBefore = player0.hoursElapsed ?? 0;
     useGameStore.getState().submitPlayerAction('rest');
     const player1 = useGameStore.getState().player!;

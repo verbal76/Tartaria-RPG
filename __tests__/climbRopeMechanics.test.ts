@@ -185,9 +185,10 @@ describe('OTA 23-007 — climb mechanics', () => {
       });
       store.getState().submitPlayerAction('rest');
       const after = store.getState().player!;
-      // 8h rest: heal min(20, 16) = 16 HP, gain min(10, 8) = 8 stamina
-      expect(after.hp).toBeGreaterThan(10);
+      // arb37 — rest restores STAMINA only (HP is healed by eating).
+      // 8h rest: gain min(10, 8) = 8 stamina; HP stays put.
       expect(after.stamina).toBeGreaterThan(0);
+      expect(after.hp).toBe(10);
     });
   });
 });

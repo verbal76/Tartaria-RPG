@@ -206,6 +206,12 @@ const CODENAMES: Record<string, string> = {
   // presence-gated "enter / go inside" verb. The dev "enter <name>" teleport
   // into any template is retired — buildings are found by exploring now.
   '2026-06-03-arb36': 'Drift Maw',
+  // Food/rest split. Rest restores STAMINA only — it no longer heals HP.
+  // HP is recovered by EATING (food → health), so the health bar is topped
+  // by eating (spammable to full), not sleeping. Makes food markets and
+  // food lore carry real weight. The "already rested" gate keys on stamina
+  // + corruption now; a wounded-but-rested player is pointed at food.
+  '2026-06-03-arb37': 'Salt Larder',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

@@ -7536,7 +7536,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // passing. Real cost of rest is the clock advance (which
           // matters when a hunt / mystery / storyline is timed); the
           // heal/stamina ceiling is a separate dial.
-          const hpRoom = player.hpMax - player.hp;
+          // arb37 — rest restores STAMINA only. HP is healed by EATING
+          // (food → health), so food markets and food lore carry real
+          // weight and the player tops HP to full by eating, never by
+          // sleeping. hpRoom is no longer consulted by rest.
           const stamRoom = player.staminaMax - player.stamina;
           // OTA-238 — block rest when already fully whole. Playtester:
           // "there should be a block on resting if you're already
@@ -7550,12 +7553,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // ambush dial. Block when HP + stamina are both capped
           // AND there's no corruption to decay (corruption decay
           // is the other useful rest outcome).
+          // arb37 — gate on stamina + corruption only (rest no longer
+          // touches HP). A wounded-but-rested player is pointed at food,
+          // not told to sleep off the wound.
           const fullyRested =
-            hpRoom === 0 && stamRoom === 0 && (player.corruption ?? 0) === 0;
+            stamRoom === 0 && (player.corruption ?? 0) === 0;
           if (fullyRested) {
             get().appendLog(
               'arbiter',
-              `The Arbiter shakes their head. "You're whole, your wind is full, and the Aether carries no shadow on you. Save the hours for when you'll need them."`,
+              `The Arbiter shakes their head. "Your wind is full and the Aether carries no shadow on you. Sleep won't knit wounds — eat for that. Save the hours."`,
             );
             break;
           }
@@ -7595,7 +7601,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const restAmbushChance = restAmbushBase * rateMultRest(player.hoursElapsed);
           const restAmbush = Math.random() < restAmbushChance;
           const hours = 8;
-          const heal = Math.min(hpRoom, hours * 2);
+          // arb37 — rest grants NO HP. Stamina only: ~1/hr, up to 8.
+          const heal = 0;
           const stamGain = Math.min(stamRoom, hours);
           // Corruption decay — clean rest sheds one point of
           // corruption ONLY when both of:
@@ -16753,7 +16760,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   rest() {
     const player = get().player;
     if (!player) return;
-    const hpRoom = player.hpMax - player.hp;
+    // arb37 — rest restores STAMINA only; HP is healed by eating (food →
+    // health). hpRoom is intentionally not computed here.
     const effMax = effectiveStaminaMax(player);
     const stamRoom = effMax - player.stamina;
     // Rest always advances time, even at full health/stamina — you sat
@@ -16812,7 +16820,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       `You sit for ${hoursSlept} hours. You came back to yourself at the same place you set out from.`,
       `You sit for ${hoursSlept} hours. Tartaria did not change in any of them you can see.`,
     ];
-    if (hpRoom <= 0 && stamRoom <= 0 && hungerTicks === 0 && weatherHpDamage === 0 && weatherStamDamage === 0 && !ambushTriggered) {
+    if (stamRoom <= 0 && hungerTicks === 0 && weatherHpDamage === 0 && weatherStamDamage === 0 && !ambushTriggered) {
       set((s) => (s.player ? { player: { ...s.player, hoursElapsed: newHours } } : s));
       const restLine = FULL_HP_REST_LINES[Math.floor(Math.random() * FULL_HP_REST_LINES.length)]!;
       get().appendLog('world', `${restLine} (${describeTime(newHours)})`);
@@ -16852,15 +16860,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       void get().persist();
       return;
     }
-    // OTA-187 — rest healing nerfed. Was 2d6 HP (2-12) + 1d6+2
-    // stamina (3-8) per rest, so a single sleep restored ~30-40%
-    // of mid-game HP and most of the stamina bar. Playtester:
-    // "rest gives back too much health, I can fully heal and
-    // restore stamina with almost no downside." Now 1d6 HP (1-6)
-    // + 1d4 stamina (1-4) — multiple rests needed for a full
-    // top-up, and each rest still rolls an ambush + advances
-    // the clock 8 hours, so the recovery has a real cost.
-    const heal = Math.min(hpRoom, rollDie(6));
+    // OTA-187 nerfed rest healing; arb37 removes rest HP entirely.
+    // Rest now restores STAMINA only (1d4) — HP is healed by EATING
+    // (food → health), which makes food markets / food lore valuable
+    // and lets the player top HP to full by eating, never by sleeping.
+    // Each rest still rolls an ambush + advances the clock, so stamina
+    // recovery keeps a real cost.
+    const heal = 0;
     const stamGain = Math.min(stamRoom, rollDie(4));
     const prevHpRest = player.hp;
     const hpMaxRest = player.hpMax;
