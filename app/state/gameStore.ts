@@ -1267,7 +1267,15 @@ function patchSceneForBuildingRoom(
     : null;
   set((s) => {
     if (!s.currentScene) return {};
-    const nouns = [...room.interactables];
+    // arb39 — drop interactables already taken/salvaged in this building
+    // room so they don't respawn on re-entry (no farm loop). Keyed by the
+    // same room key the take/salvage handlers write to.
+    const p = s.player;
+    const roomKey = p
+      ? makeRoomKey(p.currentLocationId, s.currentScene.microMicroId, p.mapX, p.mapY, p.hubRoomId)
+      : null;
+    const consumed = roomConsumedSet(s.worldMemory, roomKey);
+    const nouns = room.interactables.filter((n) => !isConsumedNoun(consumed, n));
     return {
       currentScene: {
         ...s.currentScene,
@@ -3406,6 +3414,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const topupCount = Math.max(0, AMBIENT_DISPLAY_CAP - reservedPicks.length);
       displayedAmbientNouns = [...reservedPicks, ...shuffleSlice(remaining, topupCount)].slice(0, AMBIENT_DISPLAY_CAP);
     }
+    // arb39 — persistent-room emptiness for hub interiors (the tutorial
+    // outpost rooms, capital halls, etc.). Once an interactable has been
+    // taken or salvaged in this room, it stays gone on re-entry instead
+    // of respawning — closing the re-enter-a-room-to-farm exploit. Wild
+    // tiles are left alone (their re-roll is intentional). candidateKey is
+    // this room's per-room key (same one the take/salvage handlers write).
+    let sceneAmbientNouns = ambientNouns;
+    let sceneDisplayedNouns = displayedAmbientNouns;
+    if (hubRoom) {
+      const consumedHere = roomConsumedSet(get().worldMemory, candidateKey);
+      if (consumedHere.size > 0) {
+        sceneAmbientNouns = ambientNouns.filter((n) => !isConsumedNoun(consumedHere, n));
+        sceneDisplayedNouns = displayedAmbientNouns.filter((n) => !isConsumedNoun(consumedHere, n));
+      }
+    }
     // microMicroId was resolved at the top of beginScene so the
     // encounter / loot rolls could use the ladder's curated pools.
     // arb36 — enterable structure on this tile. Deterministic per tile,
@@ -3421,7 +3444,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         : null;
     const scene: CurrentScene = {
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
-      vendor, range, hooks: initialHooks, ambientNouns, displayedAmbientNouns, microMicroId,
+      vendor, range, hooks: initialHooks, ambientNouns: sceneAmbientNouns, displayedAmbientNouns: sceneDisplayedNouns, microMicroId,
       sceneBuilding,
       enemyAmbushUsed: enemies.map(() => false),
       // OTA 037 — explicit null. Older code relied on undefined being
@@ -18451,6 +18474,38 @@ function parseEnemyAP(enemy: { abilityPoint?: string } | null | undefined, fallb
 function nonClimbMarkers(searched: readonly string[] | undefined): string[] {
   if (!searched) return [];
   return searched.filter((s) => !s.startsWith('climbed:'));
+}
+
+// arb39 — persistent-room emptiness. searchedAmbientNouns is the
+// terminal-consumption record for a room key (written by take / pickup /
+// salvage / harvest / dig; investigate uses flavorExhaustedNouns, kept
+// separate, so this set never includes merely-investigated props). The
+// scene composers (beginScene hub interiors + patchSceneForBuildingRoom)
+// subtract this set so an interactable the player already took or
+// salvaged does NOT respawn as a chip on re-entry — closing the
+// re-enter-a-room-to-farm-skills/supplies exploit. Wild tiles don't use
+// this filter; their re-roll is intentional theme-park density.
+function roomConsumedSet(
+  worldMemory: { visitedRooms?: Record<string, VisitedRoom> },
+  roomKey: string | null | undefined,
+): Set<string> {
+  if (!roomKey) return new Set();
+  const searched = worldMemory.visitedRooms?.[roomKey]?.searchedAmbientNouns;
+  return new Set(nonClimbMarkers(searched).map((n) => n.toLowerCase()));
+}
+
+/** True when `noun` has already been consumed (taken/salvaged) in this
+ *  room. Mirrors the take-handler's dedupe match (exact OR substring
+ *  either way) so a chip is hidden under the same conditions a re-take
+ *  would be refused. */
+function isConsumedNoun(consumed: Set<string>, noun: string): boolean {
+  if (consumed.size === 0) return false;
+  const n = noun.toLowerCase();
+  if (consumed.has(n)) return true;
+  for (const c of consumed) {
+    if (n.includes(c) || c.includes(n)) return true;
+  }
+  return false;
 }
 
 // v2.4.1 (OTA 049) — next cardinal step toward a procedural-grid

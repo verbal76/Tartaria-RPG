@@ -217,6 +217,11 @@ const CODENAMES: Record<string, string> = {
   // boot breadcrumb, and offers Retry / Delete on the title screen
   // instead of an involuntary re-crash. Additive safety net.
   '2026-06-04-arb38': 'Ash Cradle',
+  // Persistent-room emptiness. Interactables taken/salvaged in a hub room
+  // or enterable building no longer respawn on re-entry — closes the
+  // re-enter-to-farm-skills/supplies exploit (tutorial outpost + any
+  // building). Wild tiles keep their intentional re-roll.
+  '2026-06-04-arb39': 'Hollow Pantry',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

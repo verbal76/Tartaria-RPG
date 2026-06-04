@@ -12117,4 +12117,16 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (new), app/state/gameStore.ts (breadcrumb + boot detection),
 // app/screens/TitleScreen.tsx (tile warning + tap-intercept recovery),
 // app/diagnostics/aboutSummary.ts (bug-report block).
-export const OTA_BUILD_ID = '2026-06-04-arb38';
+// arb39 — persistent-room emptiness. Playtester: staying in the tutorial
+// outpost and changing rooms respawned the interactables every entry, so a
+// player could re-enter a room (or any enterable building) to farm skills
+// and supplies indefinitely. Root cause: beginScene (hub interiors) and
+// patchSceneForBuildingRoom rebuilt the chip pool from the room template
+// with no memory of what was taken. Fix: subtract the room's terminal-
+// consumption record (visitedRooms[key].searchedAmbientNouns — written by
+// take/pickup/salvage/harvest; investigate uses the separate
+// flavorExhaustedNouns, so investigate-only props are unaffected) from the
+// composed nouns. Looted props stay gone on re-entry; wild tiles keep their
+// intentional re-roll. Files: app/state/gameStore.ts (roomConsumedSet /
+// isConsumedNoun helpers + both composers).
+export const OTA_BUILD_ID = '2026-06-04-arb39';
