@@ -212,6 +212,11 @@ const CODENAMES: Record<string, string> = {
   // food lore carry real weight. The "already rested" gate keys on stamina
   // + corruption now; a wounded-but-rested player is pointed at food.
   '2026-06-03-arb37': 'Salt Larder',
+  // Save-load crash guard. Detects a character that closed the app on
+  // load last session (stale cross-version save → native abort) via a
+  // boot breadcrumb, and offers Retry / Delete on the title screen
+  // instead of an involuntary re-crash. Additive safety net.
+  '2026-06-04-arb38': 'Ash Cradle',
 };
 
 // OTA-274 — separate codename pool for native AAB builds. The OTA

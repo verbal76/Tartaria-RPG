@@ -93,6 +93,10 @@ export function TitleScreen() {
   const slotLoadError = useGameStore((s) => s.slotLoadError);
   const clearSlotLoadError = useGameStore((s) => s.clearSlotLoadError);
   const deleteSlotById = useGameStore((s) => s.deleteSlotById);
+  // arb38 — slots that crashed the app on load last session. Tapping
+  // one opens the recovery modal (Retry / Delete) instead of re-running
+  // the crashing load.
+  const crashedSlotIds = useGameStore((s) => s.crashedSlotIds);
   const resurrectSlot = useGameStore((s) => s.resurrectSlot);
   const resurrectionGems = useGameStore((s) => s.resurrectionGems);
   const justUpdatedFromBuild = useGameStore((s) => s.justUpdatedFromBuild);
@@ -190,6 +194,21 @@ export function TitleScreen() {
       } else {
         setPendingAction({ kind: 'fallen', slot });
       }
+      return;
+    }
+    // arb38 — this character closed the app on load last session. Show
+    // the recovery modal BEFORE re-running the crashing load so the
+    // player deliberately chooses Retry or Delete instead of hitting an
+    // instant re-crash. Retry runs the real load (and clears the flag
+    // if it succeeds); Delete removes the bad save for good.
+    if (crashedSlotIds.includes(slot.slotId)) {
+      setLastTappedSlot(slot);
+      useGameStore.setState({
+        slotLoadError:
+          'This character closed the app the last time it was opened — ' +
+          'most likely a save left over from a previous version of the build. ' +
+          'Your other characters are not affected.',
+      });
       return;
     }
     setLastTappedSlot(slot);
@@ -579,6 +598,14 @@ export function TitleScreen() {
           </View>
           <Text style={styles.slotTime}>{timeAgo(item.savedAt)}</Text>
         </View>
+        {/* arb38 — load-crash warning. Surfaces BEFORE the player taps
+            so they know this character closed the app last time and a
+            tap opens the recovery options rather than the game. */}
+        {!item.dead && crashedSlotIds.includes(item.slotId) && (
+          <Text style={styles.slotCrashWarn}>
+            ⚠ Closed the app last time it opened — tap for recovery (Retry / Delete)
+          </Text>
+        )}
         <Text style={styles.slotMeta}>
           {raceLabel(item.raceId)} · {locationLabel(item.locationId)}
         </Text>
@@ -1221,6 +1248,8 @@ const styles = StyleSheet.create({
   slotObjective: { color: '#c9a86a', fontSize: 12, marginTop: 4, fontStyle: 'italic' },
   // OTA-120 Phase 5 — dog sub-line styling.
   slotDogLine: { color: '#c9a86a', fontSize: 11, marginTop: 2, letterSpacing: 0.5 },
+  // arb38 — amber load-crash warning on a flagged slot tile.
+  slotCrashWarn: { color: '#d8923c', fontSize: 11, marginTop: 3, fontWeight: '600' },
   deadActions: { flexDirection: 'row', gap: 6, marginTop: 8 },
   copyLogBtn: {
     backgroundColor: '#1a1714',

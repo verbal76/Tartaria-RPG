@@ -41,6 +41,13 @@ import {
   type LoreGenerator,
 } from '../engine/investigationTable';
 import {
+  loadSaveLoadHealth,
+  markSlotLoadStart,
+  markSlotLoadDone,
+  clearSlotCrash,
+  getCrashedSlotIds,
+} from '../diagnostics/saveLoadHealth';
+import {
   listSlots,
   loadSlot,
   saveSlot,
@@ -1370,6 +1377,11 @@ interface GameStore {
   weaponResistStreak: { enemyName: string; damageType: string; count: number } | null;
   /** Set when a slot load fails — UI surfaces this and offers recovery. */
   slotLoadError: string | null;
+  /** arb38 — ids of slots that crashed the app on load last session
+   *  (native abort, detected via the save-load breadcrumb on boot).
+   *  The title screen flags these and intercepts the tap to offer
+   *  Retry / Delete BEFORE re-running the crashing load. */
+  crashedSlotIds: string[];
   /** Current tutorial step index, or null when no tutorial is active. */
   tutorialStep: number | null;
   /** When set, the vendor screen displays this stub vendor for the
@@ -1861,6 +1873,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   aetherStatPickerOpen: false,
   pendingAetherFoodId: null,
   slotLoadError: null,
+  crashedSlotIds: [],
   tutorialStep: null,
   tutorialDemoVendor: null,
   awaitingTutorialName: false,
@@ -1909,6 +1922,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
   async hydrate() {
     // One-shot migration from the v1 single-slot save, if present.
     await migrateLegacySlotIfPresent();
+    // arb38 — read the save-load crash breadcrumb BEFORE any slot can
+    // be loaded. If last session died mid-load (native abort on a
+    // stale cross-version save), this flags the offending slot so the
+    // title screen can offer Retry / Delete instead of re-crashing.
+    let crashedSlotIds: string[] = [];
+    try {
+      await loadSaveLoadHealth();
+      crashedSlotIds = getCrashedSlotIds();
+    } catch { /* health is best-effort — never block boot on it */ }
     const activeId = await loadActiveSlotId();
     const slots = await listSlots();
     // OTA 454 — first-install Resurrection Gem seed. Idempotent: only
@@ -2044,6 +2066,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       resurrectionGems: stash.resurrectionGems,
       currentScreen: 'title',
       hydrated: true,
+      crashedSlotIds,
       justUpdatedFromBuild,
       // OTA-100 — parallel flag with the same source value but
       // a different lifecycle. justUpdatedFromBuild gets cleared
@@ -2427,6 +2450,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     if (saved.player.dead === true) return; // Dead characters need a Resurrection Gem first.
+    // arb38 — drop a "loading this slot" breadcrumb (durably flushed)
+    // BEFORE the hydration below. If hydrating a stale cross-version
+    // save drives native code into a SIGSEGV/SIGABRT, the process dies
+    // before any catch runs and this breadcrumb survives — the next
+    // boot reads it and flags this slot so the player gets Retry/Delete
+    // instead of an instant re-crash. Cleared on success and in the
+    // catch below; only a true native abort leaves it behind.
+    await markSlotLoadStart(slotId);
     try {
       await setActiveSlot(slotId);
       const player = backfillPlayer(saved.player);
@@ -2624,8 +2655,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
         lastWelcomeBackAt = now;
       }
+      // arb38 — hydration completed cleanly. Clear the in-progress
+      // breadcrumb so this load isn't mistaken for a crash, and clear
+      // any prior crash flag on this slot (it loads fine now). Refresh
+      // crashedSlotIds so a previously-flagged tile un-flags live.
+      await markSlotLoadDone();
+      try {
+        const remaining = await clearSlotCrash(slotId);
+        set({ crashedSlotIds: remaining });
+      } catch { /* best-effort — flag clears on next boot regardless */ }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
+      // arb38 — a JS-caught error is NOT a native crash; clear the
+      // breadcrumb so it isn't counted as one on the next boot. (The
+      // slot's existing crash flag, if any, is left intact — only a
+      // clean load clears that.)
+      await markSlotLoadDone();
       // Roll the active slot back so we don't leave a half-set state.
       // CRITICAL: also clear the in-memory activeSlotId — otherwise the
       // next persist() will write player=null over the slot's storage
@@ -2685,11 +2730,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   async deleteSlotById(slotId) {
     await deleteSlot(slotId);
+    // arb38 — the slot is gone; drop any load-crash flag it carried so
+    // a fresh character reusing logic doesn't inherit a stale warning.
+    let crashedSlotIds = get().crashedSlotIds;
+    try {
+      crashedSlotIds = await clearSlotCrash(slotId);
+    } catch { /* best-effort */ }
     const slots = await listSlots();
     const activeId = getActiveSlotId();
     set({
       slots,
       activeSlotId: activeId,
+      crashedSlotIds,
       // If we just deleted the currently-loaded character, drop player state too.
       ...(get().activeSlotId === slotId
         ? { player: null, gameLog: [], currentScene: null, pendingRolls: null, pendingHookContinue: null }

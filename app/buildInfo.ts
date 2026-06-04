@@ -12103,4 +12103,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //   '-arb1' suffix keeps it OUT of the production OTA-30x sequence so it
 //   can never collide with a real OTA id, and nothing parses the suffix
 //   as a number (it's an opaque map key + display string).
-export const OTA_BUILD_ID = '2026-06-03-arb37';
+// arb38 — Save-load crash guard. A tester who installed this build as
+// an UPDATE over an older APK kept their old character's save; tapping
+// that character closed the app every time until they deleted it
+// (clean reinstalls were fine). Diagnostic confirmed ML was healthy —
+// the crash was a NATIVE abort while hydrating the stale cross-version
+// save, which the existing JS try/catch can't catch. This OTA adds a
+// breadcrumb guard (mirrors mlHealth): mark a slot "loading" before
+// hydration, clear it on any JS-reachable exit; a surviving breadcrumb
+// on next boot flags that slot so the title screen offers Retry/Delete
+// instead of an involuntary re-crash. Additive; no behavior change for
+// saves that load cleanly. Files: app/diagnostics/saveLoadHealth.ts
+// (new), app/state/gameStore.ts (breadcrumb + boot detection),
+// app/screens/TitleScreen.tsx (tile warning + tap-intercept recovery),
+// app/diagnostics/aboutSummary.ts (bug-report block).
+export const OTA_BUILD_ID = '2026-06-04-arb38';
