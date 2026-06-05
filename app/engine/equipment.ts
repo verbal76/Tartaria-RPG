@@ -51,9 +51,9 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   }
   const armor = findArmorByName(item.name);
   if (armor) {
-    const equipSlots: EquipSlot[] = ['main','off','head','chest','legs','feet','amulet','ring'];
+    const equipSlots: EquipSlot[] = ['main','off','head','chest','hands','legs','feet','cloak','amulet','ring'];
     if (equipSlots.includes(armor.slot as EquipSlot)) return [armor.slot as EquipSlot];
-    return []; // cloak/hands slots not yet in the equip system
+    return []; // unknown/region-less armor
   }
   if (findAmuletByName(item.name)) return ['amulet'];
   if (findRingByName(item.name)) return ['ring'];
@@ -94,7 +94,15 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   if (/\b(helm|helmet|hood|headpiece|faceplate|faceguard|faceshroud|crown|circlet|coif|skullcap|mask)\b/i.test(nameLower)) {
     return ['head'];
   }
-  if (/\b(chestplate|breastplate|chestpiece|cuirass|hauberk|jerkin|vest|tunic|robe|battlecoat|coat|mantle|cloak|chest|warplate|plate)\b/i.test(nameLower)) {
+  // arb63 — hands (gauntlets/gloves) + cloak (back) fallbacks. Placed before
+  // chest so "cloak"/"mantle" no longer get mis-routed to the chest slot.
+  if (/\b(gauntlet|gauntlets|glove|gloves|handguard|handguards|bracer|bracers|vambrace|vambraces|mitt|mitts|knuckle|knuckles)\b/i.test(nameLower)) {
+    return ['hands'];
+  }
+  if (/\b(cloak|cape|mantle|shroud|drape|cloakwrap)\b/i.test(nameLower)) {
+    return ['cloak'];
+  }
+  if (/\b(chestplate|breastplate|chestpiece|cuirass|hauberk|jerkin|vest|tunic|robe|battlecoat|coat|chest|warplate|plate)\b/i.test(nameLower)) {
     return ['chest'];
   }
   if (/\b(leggings|legguards|legplates|greaves|chausses|trousers|breeches|pants|leg)\b/i.test(nameLower)) {
@@ -118,25 +126,29 @@ export const SLOT_LABEL: Record<EquipSlot, string> = {
   off: 'Off hand',
   head: 'Head',
   chest: 'Chest',
+  hands: 'Hands',
   legs: 'Legs',
   feet: 'Feet',
+  cloak: 'Cloak',
   amulet: 'Amulet',
   ring: 'Ring',
 };
 
 /** Slots that hold armor pieces (used to aggregate AC + resistances). */
-export const ARMOR_SLOTS: readonly EquipSlot[] = ['head', 'chest', 'legs', 'feet'];
+export const ARMOR_SLOTS: readonly EquipSlot[] = ['head', 'chest', 'hands', 'legs', 'feet', 'cloak'];
 
 /** Map an equip slot to its corresponding `*Id` key on PlayerEquipped.
  *  When set, the id key identifies the exact inventory instance bound
  *  to that slot (important when the player holds two of the same item). */
-export const SLOT_ID_KEY: Record<EquipSlot, 'mainId' | 'offId' | 'headId' | 'chestId' | 'legsId' | 'feetId' | 'amuletId' | 'ringId'> = {
+export const SLOT_ID_KEY: Record<EquipSlot, 'mainId' | 'offId' | 'headId' | 'chestId' | 'handsId' | 'legsId' | 'feetId' | 'cloakId' | 'amuletId' | 'ringId'> = {
   main: 'mainId',
   off: 'offId',
   head: 'headId',
   chest: 'chestId',
+  hands: 'handsId',
   legs: 'legsId',
   feet: 'feetId',
+  cloak: 'cloakId',
   amulet: 'amuletId',
   ring: 'ringId',
 };

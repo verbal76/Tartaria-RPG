@@ -1,4 +1,28 @@
-import { rollSalvagePool, __TEST_ONLY__ } from '../app/engine/salvagePools';
+import { rollSalvagePool, isSalvageMaterial, __TEST_ONLY__ } from '../app/engine/salvagePools';
+
+describe('salvage yields MATERIALS ONLY (arb61, Piece B)', () => {
+  const NOUNS = [
+    'half-buried wagon', 'fallen sentinel husk', 'aetheric drone shell',
+    'cracked supply crate', 'toppled obelisk fragment', 'rusted exoframe',
+    'crashed automaton chassis', 'salt-crusted lockbox', 'buried reclaimer cache',
+    'library archive console', 'royal display case', 'vault relic pedestal',
+    'forgotten order reliquary', 'hidden weapon locker', 'skeleton', 'pillar',
+  ];
+  it('no salvage roll ever returns gear/food/clues — only catalog materials', () => {
+    for (const noun of NOUNS) {
+      for (let i = 0; i < 60; i++) {
+        const out = rollSalvagePool(noun, () => (i + 0.5) / 60);
+        if (!out || !out.itemName) continue;
+        expect(isSalvageMaterial(out.itemName)).toBe(true);
+      }
+    }
+  });
+  it('the known bleed items are NOT materials (so they are filtered out)', () => {
+    for (const gear of ['Aetheric Locket', 'Aetheric Torch', 'Throwing Knife', 'Rusted Blade', 'Climbing Rope', 'Trail Rations', 'Tartarian Map Fragment', 'Sealed Tartarian Letter']) {
+      expect(isSalvageMaterial(gear)).toBe(false);
+    }
+  });
+});
 
 describe('salvage pool classifier', () => {
   it('returns null for nouns that match no pool', () => {

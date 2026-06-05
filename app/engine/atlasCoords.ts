@@ -95,6 +95,11 @@ export const LOCATION_ATLAS_COORDS: Record<string, AtlasCoord> = {
   ostragar:    { fx: 0.93, fy: 0.42 },  // far east wetlands — river-dynasty city
   karok_sa:    { fx: 0.42, fy: 0.72 },  // south band — Forgotten Order ritual seat
 
+  // arb46 — Tier-C challenge tiles (plotted but discoverable:false until the
+  // challenges are reviewed + turned on). Placed in previously-empty regions.
+  tartarian_enclave: { fx: 0.24, fy: 0.40 },  // deep beneath the Buried Cities
+  parley_ground:     { fx: 0.64, fy: 0.36 },  // east-central contested flats (neutral)
+
   // The Deep — Aetherstone-tier sites at the map's bottom
   giant_vault: { fx: 0.78, fy: 0.86 },
   etheric_chamber: { fx: 0.88, fy: 0.87 },

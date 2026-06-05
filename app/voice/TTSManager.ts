@@ -10,6 +10,7 @@
 import * as Speech from 'expo-speech';
 import { getVoiceSettings, loadVoiceSettings, onVoiceSettingsChange } from './voiceSettings';
 import { cleanForSpeech } from './loreLexicon';
+import { setMusicDuck } from '../audio/AudioManager';
 import {
   speak as piperSpeak,
   stopAndClear as piperStopAndClear,
@@ -18,6 +19,7 @@ import {
   disposePiperEngine,
   prewarmKokoro,
   disposeStickyArbiterVoice,
+  getKokoroState,
 } from './PiperTTSManager';
 
 interface QueuedUtterance {
@@ -37,6 +39,19 @@ interface QueuedUtterance {
 }
 
 let nextId = 1;
+// arb68 diagnostic — last few TTS routing decisions, surfaced in COPY VOICE
+// INFO so we can see which ENGINE actually voiced a given line (the title
+// "Choose your character" clip is upstream of playback, so knowing the route
+// — bundled Kokoro vs system expo-speech — pins down where the head is lost).
+interface TtsRouteRecord { route: string; phase: string; textHead: string; at: number }
+const ttsRouteLog: TtsRouteRecord[] = [];
+function recordTtsRoute(route: string, phase: string, text: string): void {
+  ttsRouteLog.unshift({ route, phase, textHead: text.slice(0, 40), at: Date.now() });
+  if (ttsRouteLog.length > 6) ttsRouteLog.length = 6;
+}
+export function getTtsRouteLog(): readonly TtsRouteRecord[] {
+  return ttsRouteLog;
+}
 const queue: QueuedUtterance[] = [];
 let currentlySpeaking: QueuedUtterance | null = null;
 let availabilityCache: boolean | null = null;
@@ -53,6 +68,12 @@ let coalesceTimer: ReturnType<typeof setTimeout> | null = null;
 // own utterance pays Android TTS's ~0.5–2s reinit gap; one merged
 // utterance gives a natural sentence-end pause (~0.2s).
 const COALESCE_MS = 400;
+
+// arb5 — most queued Arbiter lines kept at once (see the cap in speak()).
+// 3 leaves room for a short ack → prompt → follow-up sequence while
+// still collapsing rapid-tap spam down to a few lines. drain() merges
+// adjacent same-voice items, so these read as one natural utterance.
+const MAX_QUEUED_ARBITER = 3;
 
 /** Returns true if expo-speech can run on this device. We try two
  *  probes because `getAvailableVoicesAsync` returns an empty list on
@@ -113,22 +134,49 @@ export function speak(text: string, channel?: string, voiceId?: string | null): 
   const trimmed = cleanForSpeech(text).trim();
   if (!trimmed) return -1;
   if (settings.engine === 'bundled') {
-    // Kokoro can't switch voice per utterance (the voice is baked
-    // Bundled engine now ALSO supports per-vendor voices via the
-    // Kokoro voice pool (PiperTTSManager). Each vendor's assigned
-    // voiceId triggers a lazy-load of that voice on first use, and
-    // beginScene's warm hook keeps the latency invisible. Pool is
-    // capped at 2 simultaneous voices (Arbiter sticky + 1 vendor
-    // slot, LRU-evicted).
-    return piperSpeak(trimmed, voiceId, channel);
+    // arb54 — DON'T go silent when the bundled voice failed to install.
+    // If the Kokoro/Piper model is in an error state (e.g. the download
+    // was aborted), fall through to the system engine below so the
+    // Arbiter still narrates with the device voice. While it's still
+    // downloading/loading/ready we use the bundled path as normal.
+    if (getKokoroState().phase !== 'error') {
+      // arb68 diagnostic — record which engine actually voiced this line so
+      // COPY VOICE INFO can confirm the route. The title-line clip behaves
+      // identically across Kokoro-playback OTAs, which only makes sense if the
+      // loss is upstream of playback; this tells us bundled-vs-system per line.
+      recordTtsRoute('bundled-kokoro', getKokoroState().phase, trimmed);
+      // Kokoro can't switch voice per utterance (the voice is baked
+      // Bundled engine now ALSO supports per-vendor voices via the
+      // Kokoro voice pool (PiperTTSManager). Each vendor's assigned
+      // voiceId triggers a lazy-load of that voice on first use, and
+      // beginScene's warm hook keeps the latency invisible. Pool is
+      // capped at 2 simultaneous voices (Arbiter sticky + 1 vendor
+      // slot, LRU-evicted).
+      return piperSpeak(trimmed, voiceId, channel);
+    }
+    // else: bundled install failed — fall through to the system queue.
+    recordTtsRoute('system-fallback(kokoro-error)', getKokoroState().phase, trimmed);
+  } else {
+    recordTtsRoute('system-expo-speech', getKokoroState().phase, trimmed);
   }
   const id = nextId++;
-  // OTA 226 — same Arbiter spam-collapse rule as the bundled engine.
-  // When a new arbiter line lands, drop other queued arbiter lines so
-  // the player isn't lectured for two minutes after rapid-tapping.
-  if (channel === 'arbiter' && queue.length > 0) {
-    for (let i = queue.length - 1; i >= 0; i--) {
-      if (queue[i]!.channel === 'arbiter') queue.splice(i, 1);
+  // OTA 226 + arb5 — Arbiter queue cap. Rapid-tapping a direction can
+  // fire many flavor lines; without a bound the player gets lectured
+  // for minutes. The original rule dropped EVERY queued arbiter line on
+  // each new one, which also ate intentional short sequences — a pickup
+  // acknowledgement immediately followed by the next beat's prompt — so
+  // the first line was cut off (playtester report). Instead of nuking
+  // the queue, cap it: keep at most MAX_QUEUED_ARBITER queued arbiter
+  // lines (oldest dropped first). Short sequences survive; genuine spam
+  // stays bounded. currentlySpeaking is never touched.
+  if (channel === 'arbiter') {
+    let arbCount = queue.reduce((n, q) => (q.channel === 'arbiter' ? n + 1 : n), 0);
+    // We're about to push one more, so drop until there's room for it.
+    while (arbCount >= MAX_QUEUED_ARBITER) {
+      const idx = queue.findIndex((q) => q.channel === 'arbiter');
+      if (idx === -1) break;
+      queue.splice(idx, 1);
+      arbCount--;
     }
   }
   queue.push({ id, text: trimmed, channel, voiceId });
@@ -152,6 +200,7 @@ export function speak(text: string, channel?: string, voiceId?: string | null): 
 export function stopAndClear(): void {
   queue.length = 0;
   currentlySpeaking = null;
+  void setMusicDuck(false);
   if (coalesceTimer != null) { clearTimeout(coalesceTimer); coalesceTimer = null; }
   try { void Speech.stop(); } catch { /* ignore */ }
   // Unhandled-rejection-safe — piperStopAndClear awaits expo-av
@@ -192,7 +241,13 @@ function withTerminator(text: string): string {
 
 function drain(): void {
   if (currentlySpeaking) return;
-  if (queue.length === 0) return;
+  if (queue.length === 0) {
+    // Nothing left to speak — restore music to full volume.
+    void setMusicDuck(false);
+    return;
+  }
+  // A line is about to play — duck the music under the voice.
+  void setMusicDuck(true);
   // Merge ADJACENT same-voice items into a single utterance so
   // Android TTS's per-utterance reinit gap doesn't break up
   // consecutive lines from the same speaker. Voice-change forces

@@ -245,7 +245,8 @@
     "tags": [
       "research_hub",
       "experimental",
-      "ground_zero"
+      "ground_zero",
+      "lost_capital"
     ],
     "discoverable": true,
     "aliases": [
@@ -397,7 +398,8 @@
     "danger": 4,
     "tags": [
       "buried",
-      "tech_cache"
+      "tech_cache",
+      "lost_capital"
     ],
     "discoverable": true,
     "aliases": [
@@ -451,7 +453,8 @@
     "danger": 4,
     "tags": [
       "partial",
-      "red_tower"
+      "red_tower",
+      "lost_capital"
     ],
     "discoverable": true,
     "aliases": [
@@ -1650,6 +1653,34 @@
       "mirror corridor", "loose tile", "concealed grate", "architect's mark",
       "shadow lamp", "wax-sealed map", "veilkeeper's perch", "trick lever",
       "wrong door", "right door", "courier's slot", "blind window", "smoke vent"
+    ]
+  },
+  {
+    "id": "tartarian_enclave",
+    "name": "The Sunken Enclave",
+    "type": "settlement",
+    "description": "A deep, self-sufficient True Tartarian enclave hollowed beneath the Buried Cities — Aethercraft-shaped mud walls, ancestor-shrines to the fallen Giants, and Seekers who venture the labyrinthine tunnels for relics and Aetherstone. Hidden from the surface by design.",
+    "danger": 3,
+    "tags": ["settlement", "true_tartarians", "underground", "enclave", "disabled_challenge"],
+    "discoverable": false,
+    "aliases": ["the enclave", "sunken enclave", "mud dweller enclave", "tartarian enclave"],
+    "interactables": [
+      "ancestor shrine", "mud wall", "aetherstone hearth", "seeker's cache", "giant idol",
+      "tunnel mouth", "communal well", "relic altar", "watch-post", "shaped pillar"
+    ]
+  },
+  {
+    "id": "parley_ground",
+    "name": "The Parley Ground",
+    "type": "neutral_ground",
+    "description": "A weathered ring of standing stones on contested flats where rival factions meet under truce. No faction holds it; banners change with the season. A place for envoys, brokers, and uneasy bargains.",
+    "danger": 2,
+    "tags": ["neutral", "meeting", "truce", "broker"],
+    "discoverable": true,
+    "aliases": ["parley ground", "the parley", "truce stones", "neutral ground"],
+    "interactables": [
+      "standing stone", "truce banner", "envoy's table", "neutral fire", "stone ring",
+      "messenger's post", "token cairn", "old altar", "bargain stone", "watch-line"
     ]
   }
 ]

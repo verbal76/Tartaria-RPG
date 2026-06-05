@@ -55,6 +55,7 @@ import { useGameStore } from '../state/gameStore';
 export function KeyboardInputBar() {
   const screen = useGameStore((s) => s.currentScreen);
   const submit = useGameStore((s) => s.submitPlayerAction);
+  const inputModalOpen = useGameStore((s) => s.inputModalOpen);
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
@@ -141,6 +142,11 @@ export function KeyboardInputBar() {
   // floating popup would just clutter them.
   if (screen !== 'exploration') return null;
   if (keyboardOffset <= 0) return null;
+  // A popup with its own text field is open (Ask the Arbiter, Search,
+  // Salvage, Approach). That modal renders in its own window on top and
+  // is keyboard-avoided; the floating bar would only mount behind it and
+  // steal focus from the visible field. Stand down.
+  if (inputModalOpen) return null;
 
   const handleSubmit = () => {
     const trimmed = text.trim();
@@ -163,7 +169,7 @@ export function KeyboardInputBar() {
           value={text}
           onChangeText={setText}
           placeholder="What do you do?"
-          placeholderTextColor="#5a5246"
+          placeholderTextColor="#c9a86a"
           onSubmitEditing={handleSubmit}
           returnKeyType="send"
           autoFocus

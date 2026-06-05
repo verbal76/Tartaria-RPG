@@ -1,0 +1,688 @@
+{
+  "id": "labyrinth_of_shadows",
+  "title": "Wayfarer of the Lost Paths",
+  "titleId": "wayfarer_of_the_lost_paths",
+  "location": "iskan_veil",
+  "source": {
+    "spec": "assets/maps/labyrinth-of-shadows-spec.docx (user-supplied arb47)",
+    "image": "assets/maps/labyrinth-of-shadows.png"
+  },
+  "enabled": true,
+  "note": "Built + LIVE as of arb48 (engine/labyrinth.ts + gameStore handler). Switched on via locationChallenges TIER_C_ENABLED + per-challenge enabled. Wrong-turn budget balance-provisional.",
+  "grid": {
+    "width": 25,
+    "height": 25
+  },
+  "coordinateSystem": {
+    "format": "[col,row]",
+    "origin": "[1,1] = Northwest corner",
+    "x": "column, West->East",
+    "y": "row, North->South"
+  },
+  "start": [
+    1,
+    23
+  ],
+  "finish": [
+    25,
+    7
+  ],
+  "mainPath": [
+    [
+      1,
+      23
+    ],
+    [
+      2,
+      23
+    ],
+    [
+      2,
+      22
+    ],
+    [
+      2,
+      21
+    ],
+    [
+      3,
+      21
+    ],
+    [
+      4,
+      21
+    ],
+    [
+      5,
+      21
+    ],
+    [
+      6,
+      21
+    ],
+    [
+      6,
+      20
+    ],
+    [
+      6,
+      19
+    ],
+    [
+      6,
+      18
+    ],
+    [
+      6,
+      17
+    ],
+    [
+      6,
+      16
+    ],
+    [
+      7,
+      16
+    ],
+    [
+      8,
+      16
+    ],
+    [
+      9,
+      16
+    ],
+    [
+      10,
+      16
+    ],
+    [
+      10,
+      15
+    ],
+    [
+      10,
+      14
+    ],
+    [
+      10,
+      13
+    ],
+    [
+      10,
+      12
+    ],
+    [
+      9,
+      12
+    ],
+    [
+      8,
+      12
+    ],
+    [
+      8,
+      11
+    ],
+    [
+      7,
+      11
+    ],
+    [
+      6,
+      11
+    ],
+    [
+      6,
+      10
+    ],
+    [
+      6,
+      9
+    ],
+    [
+      7,
+      9
+    ],
+    [
+      8,
+      9
+    ],
+    [
+      9,
+      9
+    ],
+    [
+      10,
+      9
+    ],
+    [
+      11,
+      9
+    ],
+    [
+      12,
+      9
+    ],
+    [
+      12,
+      8
+    ],
+    [
+      12,
+      7
+    ],
+    [
+      12,
+      6
+    ],
+    [
+      12,
+      5
+    ],
+    [
+      13,
+      5
+    ],
+    [
+      14,
+      5
+    ],
+    [
+      15,
+      5
+    ],
+    [
+      16,
+      5
+    ],
+    [
+      16,
+      6
+    ],
+    [
+      16,
+      7
+    ],
+    [
+      16,
+      8
+    ],
+    [
+      16,
+      9
+    ],
+    [
+      17,
+      9
+    ],
+    [
+      18,
+      9
+    ],
+    [
+      19,
+      9
+    ],
+    [
+      19,
+      10
+    ],
+    [
+      19,
+      11
+    ],
+    [
+      19,
+      12
+    ],
+    [
+      20,
+      12
+    ],
+    [
+      21,
+      12
+    ],
+    [
+      22,
+      12
+    ],
+    [
+      22,
+      11
+    ],
+    [
+      22,
+      10
+    ],
+    [
+      22,
+      9
+    ],
+    [
+      22,
+      8
+    ],
+    [
+      22,
+      7
+    ],
+    [
+      23,
+      7
+    ],
+    [
+      24,
+      7
+    ],
+    [
+      25,
+      7
+    ]
+  ],
+  "mainPathLength": 63,
+  "branches": {
+    "A": {
+      "junction": [
+        6,
+        9
+      ],
+      "junctionMainIndex": 27,
+      "cells": [
+        [
+          6,
+          8
+        ],
+        [
+          6,
+          7
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          6,
+          5
+        ],
+        [
+          6,
+          4
+        ],
+        [
+          7,
+          4
+        ],
+        [
+          8,
+          4
+        ],
+        [
+          9,
+          4
+        ]
+      ],
+      "deadEnd": [
+        9,
+        4
+      ],
+      "length": 8
+    },
+    "B": {
+      "junction": [
+        16,
+        5
+      ],
+      "junctionMainIndex": 41,
+      "cells": [
+        [
+          17,
+          5
+        ],
+        [
+          18,
+          5
+        ],
+        [
+          19,
+          5
+        ],
+        [
+          20,
+          5
+        ],
+        [
+          20,
+          6
+        ],
+        [
+          20,
+          7
+        ],
+        [
+          19,
+          7
+        ],
+        [
+          18,
+          7
+        ]
+      ],
+      "deadEnd": [
+        18,
+        7
+      ],
+      "length": 8
+    },
+    "C": {
+      "junction": [
+        10,
+        13
+      ],
+      "junctionMainIndex": 19,
+      "cells": [
+        [
+          11,
+          13
+        ],
+        [
+          12,
+          13
+        ],
+        [
+          12,
+          12
+        ],
+        [
+          12,
+          11
+        ]
+      ],
+      "deadEnd": [
+        12,
+        11
+      ],
+      "length": 4
+    },
+    "D": {
+      "junction": [
+        16,
+        9
+      ],
+      "junctionMainIndex": 45,
+      "cells": [
+        [
+          16,
+          10
+        ],
+        [
+          16,
+          11
+        ],
+        [
+          16,
+          12
+        ],
+        [
+          16,
+          13
+        ],
+        [
+          16,
+          14
+        ],
+        [
+          15,
+          15
+        ],
+        [
+          14,
+          15
+        ]
+      ],
+      "deadEnd": [
+        14,
+        15
+      ],
+      "length": 7
+    },
+    "E": {
+      "junction": [
+        6,
+        16
+      ],
+      "junctionMainIndex": 12,
+      "cells": [
+        [
+          5,
+          16
+        ],
+        [
+          4,
+          16
+        ],
+        [
+          4,
+          15
+        ]
+      ],
+      "deadEnd": [
+        4,
+        15
+      ],
+      "length": 3
+    },
+    "F": {
+      "junction": [
+        2,
+        21
+      ],
+      "junctionMainIndex": 3,
+      "cells": [
+        [
+          2,
+          20
+        ],
+        [
+          2,
+          19
+        ],
+        [
+          1,
+          19
+        ]
+      ],
+      "deadEnd": [
+        1,
+        19
+      ],
+      "length": 3
+    },
+    "G": {
+      "junction": [
+        6,
+        20
+      ],
+      "junctionMainIndex": 8,
+      "cells": [
+        [
+          7,
+          20
+        ],
+        [
+          8,
+          20
+        ],
+        [
+          9,
+          20
+        ],
+        [
+          9,
+          21
+        ]
+      ],
+      "deadEnd": [
+        9,
+        21
+      ],
+      "length": 4
+    },
+    "H": {
+      "junction": [
+        22,
+        12
+      ],
+      "junctionMainIndex": 54,
+      "cells": [
+        [
+          23,
+          13
+        ],
+        [
+          23,
+          14
+        ],
+        [
+          23,
+          15
+        ],
+        [
+          23,
+          16
+        ],
+        [
+          23,
+          17
+        ],
+        [
+          24,
+          17
+        ],
+        [
+          25,
+          17
+        ],
+        [
+          25,
+          18
+        ],
+        [
+          25,
+          19
+        ],
+        [
+          25,
+          20
+        ],
+        [
+          25,
+          21
+        ]
+      ],
+      "deadEnd": [
+        25,
+        21
+      ],
+      "length": 11
+    }
+  },
+  "decisionPoints": [
+    {
+      "mainIndex": 3,
+      "branch": "F",
+      "cell": [
+        2,
+        21
+      ]
+    },
+    {
+      "mainIndex": 8,
+      "branch": "G",
+      "cell": [
+        6,
+        20
+      ]
+    },
+    {
+      "mainIndex": 12,
+      "branch": "E",
+      "cell": [
+        6,
+        16
+      ]
+    },
+    {
+      "mainIndex": 19,
+      "branch": "C",
+      "cell": [
+        10,
+        13
+      ]
+    },
+    {
+      "mainIndex": 27,
+      "branch": "A",
+      "cell": [
+        6,
+        9
+      ]
+    },
+    {
+      "mainIndex": 41,
+      "branch": "B",
+      "cell": [
+        16,
+        5
+      ]
+    },
+    {
+      "mainIndex": 45,
+      "branch": "D",
+      "cell": [
+        16,
+        9
+      ]
+    },
+    {
+      "mainIndex": 54,
+      "branch": "H",
+      "cell": [
+        22,
+        12
+      ]
+    }
+  ],
+  "diagonalLinks": [
+    {
+      "branch": "D",
+      "from": [
+        16,
+        14
+      ],
+      "to": [
+        15,
+        15
+      ],
+      "note": "corner-connected; intentional (Iskan-Veil spatial-distortion lore)"
+    },
+    {
+      "branch": "H",
+      "from": [
+        22,
+        12
+      ],
+      "to": [
+        23,
+        13
+      ],
+      "note": "corner-connected; intentional (Iskan-Veil spatial-distortion lore)"
+    }
+  ],
+  "wrongTurnBudget": 2,
+  "cleanRunRule": "reach finish from start entering <= wrongTurnBudget dead-end branch cells",
+  "rewardCounter": "labyrinthCleanRuns",
+  "rewardThreshold": 1,
+  "rewardPerk": "pathfinder"
+}

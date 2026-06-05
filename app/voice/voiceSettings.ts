@@ -65,12 +65,17 @@ const DEFAULTS: VoiceSettings = {
   ttsEnabled: true,
   sttEnabled: false,
   engine: 'bundled',
-  rate: 1.0,
+  // arb41 — ship at 1.20× (playtester-tuned default). The Arbiter still
+  // keeps pace with a tapping player but reads a touch less hurried than
+  // the old 1.35×. Within the 0.5–1.5 clamp; adjustable in Settings → Voice.
+  rate: 1.2,
   pitch: 1.0,
   voiceId: null,
   kokoroVoice: 'am_michael',
   autoSubmit: false,
-  volume: 1.0,
+  // arb41 — ship bundled-voice playback at 90% (playtester-tuned default)
+  // so the Arbiter sits just under the music bed rather than on top of it.
+  volume: 0.9,
 };
 
 let cache: VoiceSettings | null = null;

@@ -1195,7 +1195,7 @@
       "race_starter",
       "tartarian_giant"
     ],
-    "description": "Communication across great distances. Sends signals over vast distances \u2014 useful in mountains.",
+    "description": "Communication across great distances. Sends signals over vast distances — useful in mountains.",
     "effect": {
       "kind": "passive",
       "stat": "charisma",
@@ -1586,7 +1586,7 @@
       "race_starter",
       "architectural_sentinel"
     ],
-    "description": "Sentinel-built pulse reader. Equip in your off hand; while equipped, searching mechanical features \u2014 circuits, drones, emitters, runic gear \u2014 carries a chance to surface hidden salvage and Sentinel tech that bare-eye searches miss.",
+    "description": "Sentinel-built pulse reader. Equip in your off hand; while equipped, searching mechanical features — circuits, drones, emitters, runic gear — carries a chance to surface hidden salvage and Sentinel tech that bare-eye searches miss.",
     "effect": {
       "kind": "scanner",
       "bias": "pulse",
@@ -1606,7 +1606,7 @@
       "uncommon",
       "architectural_sentinel"
     ],
-    "description": "Tuned to the Aether band. Equip in your off hand; while equipped, searching pre-flood Aetheric features \u2014 fissures, glyphs, conduits, ley lines \u2014 surfaces rare crystals, shards, and Aetheric materials the eye cannot find on its own.",
+    "description": "Tuned to the Aether band. Equip in your off hand; while equipped, searching pre-flood Aetheric features — fissures, glyphs, conduits, ley lines — surfaces rare crystals, shards, and Aetheric materials the eye cannot find on its own.",
     "effect": {
       "kind": "scanner",
       "bias": "aetheric",
@@ -1626,7 +1626,7 @@
       "common",
       "mud_dweller"
     ],
-    "description": "Reads density anomalies through silt and sludge. Equip in your off hand; while equipped, searching mud-coded features \u2014 silt mounds, sludge pools, fungal beds, peat seams \u2014 surfaces caches and materials buried in the Mud Flood that nothing else will find.",
+    "description": "Reads density anomalies through silt and sludge. Equip in your off hand; while equipped, searching mud-coded features — silt mounds, sludge pools, fungal beds, peat seams — surfaces caches and materials buried in the Mud Flood that nothing else will find.",
     "effect": {
       "kind": "scanner",
       "bias": "mud",
@@ -1756,5 +1756,166 @@
       "stat": "intelligence",
       "bonus": 1
     }
+  },
+  {
+    "name": "Mud Flood Nexus Pulse-Key",
+    "kind": "quest",
+    "rarity": "Uncommon",
+    "faction": "Mud Monarchs",
+    "tcSell": 35,
+    "tags": [
+      "quest",
+      "coveted",
+      "broker",
+      "mud_monarchs"
+    ],
+    "description": "A heavy control-token cut to the Mud Flood Nexus's subterranean systems. The Monarchs would broker much to hold the buried country's pulse."
+  },
+  {
+    "name": "Architect's Master Blueprint",
+    "kind": "quest",
+    "rarity": "Uncommon",
+    "faction": "Forgotten Order",
+    "tcSell": 30,
+    "tags": [
+      "quest",
+      "coveted",
+      "broker",
+      "forgotten_order",
+      "lore"
+    ],
+    "description": "An engraved slate of original Tartarian engineering — floating towers, hovering citadels. The Order covets these to rebuild the lost infrastructure."
+  },
+  {
+    "name": "Fragment of the Endless Stair",
+    "kind": "quest",
+    "rarity": "Uncommon",
+    "faction": "Reclaimers Guild",
+    "tcSell": 40,
+    "tags": [
+      "quest",
+      "coveted",
+      "broker",
+      "reclaimers_guild"
+    ],
+    "description": "A broken step from the legendary vertical conduit, unnaturally dense — it still carries the weight of the Aetherstone Deep. A prize haul to any Reclaimer."
+  },
+  {
+    "name": "Mask of Tartaria's Last King",
+    "kind": "quest",
+    "rarity": "Uncommon",
+    "faction": "True Tartarians",
+    "tcSell": 32,
+    "tags": [
+      "quest",
+      "coveted",
+      "broker",
+      "true_tartarians",
+      "relic"
+    ],
+    "description": "A ceremonial mask from the catacombs, sacred to the True Tartarians as a link to the empire's final days."
+  },
+  {
+    "name": "Eternal Dynasty's Blood-Signet",
+    "kind": "quest",
+    "rarity": "Uncommon",
+    "faction": "Eternal Dynasty",
+    "tcSell": 38,
+    "tags": [
+      "quest",
+      "coveted",
+      "broker",
+      "eternal_dynasty",
+      "aether"
+    ],
+    "description": "A ring of refined Aetherstone that glows near Aetherborn blood. The Dynasty used it to verify bloodline purity — and still covets it."
+  },
+  {
+    "name": "Timeworn Ether Compass",
+    "kind": "quest",
+    "rarity": "Uncommon",
+    "faction": "Conspiracy Architects",
+    "tcSell": 34,
+    "tags": [
+      "quest",
+      "coveted",
+      "broker",
+      "conspiracy_architects",
+      "map"
+    ],
+    "description": "A navigation tool that points to the strongest Etheric source — and, they say, the road to cities not yet unlocked from the mud. The Architects prize hidden ways."
+  },
+  {
+    "name": "The Entombed's Prayer Tablet",
+    "kind": "quest",
+    "rarity": "Uncommon",
+    "faction": "Servants of the Giants",
+    "tcSell": 36,
+    "tags": [
+      "quest",
+      "coveted",
+      "broker",
+      "servants_of_giants",
+      "relic"
+    ],
+    "description": "A devotional tablet from the buried homes, honoring the Giants as divine architects. The Servants treat it as a holy charge."
+  },
+  {
+    "name": "Obsidian Siphon",
+    "kind": "quest",
+    "rarity": "Uncommon",
+    "faction": "Stone Builders",
+    "tcSell": 33,
+    "tags": [
+      "quest",
+      "coveted",
+      "broker",
+      "stone_builders"
+    ],
+    "description": "A specialized tool for bleeding magnetic energy from the Obsidian Pillars — essential to stabilizing Etheric grids. The Builders would raise a hall for it."
+  },
+  {
+    "name": "Aetheric Phoenix Feather",
+    "kind": "quest",
+    "rarity": "Uncommon",
+    "faction": "Tartarian Revivalists",
+    "tcSell": 37,
+    "tags": [
+      "quest",
+      "coveted",
+      "broker",
+      "tartarian_revivalists",
+      "aether"
+    ],
+    "description": "A feather that radiates rebirth-heat, as if forged from raw Aether. The Revivalists believe it a key to bringing dead Tartaria back."
+  },
+  {
+    "name": "Red Tower Glyph-Key",
+    "kind": "quest",
+    "rarity": "Uncommon",
+    "faction": "Forgotten Order",
+    "tcSell": 28,
+    "tags": [
+      "quest",
+      "speaker",
+      "glyph",
+      "red_tower",
+      "disabled_challenge"
+    ],
+    "description": "A cryptic device for deciphering Tartarian runes. Held to a living machine, its tongue begins to make sense."
+  },
+  {
+    "name": "Torn Labyrinth Chart",
+    "kind": "quest",
+    "rarity": "Common",
+    "tcSell": 12,
+    "tags": [
+      "quest",
+      "wayfarer",
+      "map",
+      "labyrinth",
+      "disabled_challenge"
+    ],
+    "description": "A water-stained fragment of a map to Iskan-Veil's shifting halls. Half the corridors are crossed out; the rest are wrong."
   }
 ]

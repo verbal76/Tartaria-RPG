@@ -87,6 +87,30 @@ export type AreaSearchOutcome =
 // Bumped Small Rock / Big Rock / Stick to be 50% of the material
 // pool by weight. Mud / Aether commodity weights lowered slightly
 // to compensate.
+// arb61 — investigate's RARE exception drop (Piece C). Investigate's NORM is
+// clues + mission hooks; routine common-material foraging was removed, so this
+// is the only item investigate yields (food still comes from the separate
+// forage path). A mix of Uncommon materials + Uncommon gear — gear names are
+// granted through the caller's lookupCraftedItem, so they land as real
+// weapons/armor, not inert misc.
+const RARE_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
+  // rare materials
+  { name: 'Aetheric Shard', rarity: 'Uncommon', weight: 6 },
+  { name: 'Mud Essence', rarity: 'Uncommon', weight: 5 },
+  { name: 'Drone Core', rarity: 'Uncommon', weight: 4 },
+  { name: 'Energy Fragment', rarity: 'Uncommon', weight: 4 },
+  // rare gear — weapons
+  { name: 'Mud-Rend Blade', rarity: 'Uncommon', weight: 3 },
+  { name: 'Aetheric Crystal Blade', rarity: 'Uncommon', weight: 2 },
+  { name: 'Storm Rod', rarity: 'Uncommon', weight: 2 },
+  { name: 'Bone Crossbow', rarity: 'Uncommon', weight: 2 },
+  // rare gear — armor
+  { name: "Salvager's Intuition Band", rarity: 'Uncommon', weight: 2 },
+  { name: "Aether-Seeker's Cap", rarity: 'Uncommon', weight: 2 },
+  { name: "Architect's Sight Enhancer", rarity: 'Uncommon', weight: 2 },
+  { name: "Spirit-Caller's Helm", rarity: 'Uncommon', weight: 2 },
+];
+
 const SMALL_FINDS: { name: string; rarity: Rarity; weight: number }[] = [
   // Rocks / sticks / scrap — the "normal stuff you'd find on the
   // ground." Highest weights so the player keeps stocking the
@@ -311,18 +335,22 @@ export function rollAreaSearch(
   const nothingCutoff = isInvestigate
     ? Math.max(0, 0.10 - bonus)
     : 0.40 - bonus;
-  const materialCutoff = isInvestigate
-    ? nothingCutoff + 0.15
+  // arb61 — investigate's NORM is clues + mission hooks. Routine common-
+  // material foraging is removed; investigate's only item drop is a RARE
+  // (Uncommon) gear-or-material find at ~7% (food still comes from the separate
+  // forage path). Search/harvest keep their 25% common SMALL_FINDS pool.
+  const findCutoff = isInvestigate
+    ? nothingCutoff + 0.07
     : nothingCutoff + 0.25;
   const tcCutoff = isInvestigate
-    ? materialCutoff + 0.15
-    : materialCutoff + 0.20;
+    ? findCutoff + 0.08
+    : findCutoff + 0.20;
   const r = Math.random();
   if (r < nothingCutoff) {
     return { kind: 'nothing', line: format(pick(NOTHING_LINES), target) };
   }
-  if (r < materialCutoff) {
-    const found = pickWeighted(SMALL_FINDS);
+  if (r < findCutoff) {
+    const found = pickWeighted(isInvestigate ? RARE_FINDS : SMALL_FINDS);
     return {
       kind: 'material',
       itemName: found.name,

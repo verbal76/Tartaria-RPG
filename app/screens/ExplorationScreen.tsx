@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore, makeRoomKey } from '../state/gameStore';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
@@ -26,6 +26,7 @@ import { searchRequirementFor, inventoryHasGate } from '../engine/itemEffect';
 import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
 import { ApproachModal } from '../components/ApproachModal';
 import { TutorialTarget } from '../components/TutorialTarget';
+import { TUTORIAL_STEPS } from '../components/tutorialSteps';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
 
 function describeTime(hours: number): string {
@@ -56,8 +57,20 @@ export function ExplorationScreen() {
   const partialArbiterText = useGameStore((s) => s.partialArbiterText);
   const isGenerating = useGameStore((s) => s.isGenerating);
   const submit = useGameStore((s) => s.submitPlayerAction);
+  const setInputModalOpen = useGameStore((s) => s.setInputModalOpen);
   const setScreen = useGameStore((s) => s.setScreen);
   const currentScene = useGameStore((s) => s.currentScene);
+  // Tungsten Spire — current tutorial beat id (null when no tutorial). The
+  // TAKE / SALVAGE / INVESTIGATE beats inject their demo prop into the
+  // matching modal + light its chip so the player opens the REAL picker and
+  // learns the interaction (instead of the chip direct-submitting). Picking
+  // the prop submits the verb, which the tutorial intercept advances on.
+  const tutorialStep = useGameStore((s) => s.tutorialStep);
+  const tutBeat = tutorialStep !== null ? (TUTORIAL_STEPS[tutorialStep]?.id ?? null) : null;
+  // Door-open branch popup (explore_or_leave beat).
+  const tutorialExploreChosen = useGameStore((s) => s.tutorialExploreChosen);
+  const chooseTutorialExplore = useGameStore((s) => s.chooseTutorialExplore);
+  const chooseTutorialLeave = useGameStore((s) => s.chooseTutorialLeave);
   const pendingRolls = useGameStore((s) => s.pendingRolls);
   const pendingHookContinue = useGameStore((s) => s.pendingHookContinue);
   const continueHook = useGameStore((s) => s.continueHook);
@@ -84,6 +97,14 @@ export function ExplorationScreen() {
   // climbable noun in the current scene; tapping one fires `climb
   // <noun>` which resolves one tier in the climb handler.
   const [climbOpen, setClimbOpen] = useState(false);
+  // Tell the floating KeyboardInputBar to stand down whenever a popup
+  // that owns its own (keyboard-avoided) text field is open, so the bar
+  // can't mount behind the modal and steal focus from the visible field.
+  // Reset to false on unmount so it never sticks across screens.
+  useEffect(() => {
+    setInputModalOpen(searchOpen || approachOpen || askArbiterOpen || salvageOpen);
+  }, [searchOpen, approachOpen, askArbiterOpen, salvageOpen, setInputModalOpen]);
+  useEffect(() => () => setInputModalOpen(false), [setInputModalOpen]);
   // 2026-05-25 — branded vendor-leave prompt (POLISH-4). Replaces
   // the native Alert that was breaking the dark+amber palette. Holds
   // {vendorName, pendingText} so confirmation dispatches the
@@ -458,9 +479,16 @@ export function ExplorationScreen() {
             : phaseHint(mq.phase, cores);
         }
         return (
+          <TutorialTarget area="objective-chip">
           <TouchableOpacity
             style={styles.objectiveChip}
-            onPress={() => setScreen('contracts')}
+            onPress={() => {
+              // Tungsten Spire — advance the main_quest tutorial beat
+              // when the player taps the MAIN QUEST chip, then route
+              // to the Contracts screen as normal.
+              useGameStore.getState().maybeAdvanceTutorial('main_quest');
+              setScreen('contracts');
+            }}
             activeOpacity={0.7}
             hitSlop={6}
           >
@@ -487,6 +515,7 @@ export function ExplorationScreen() {
               )}
             </View>
           </TouchableOpacity>
+          </TutorialTarget>
         );
       })()}
 
@@ -587,7 +616,7 @@ export function ExplorationScreen() {
               submit(text);
             }}
             onOpenInventory={() => setScreen('inventory')}
-            onOpenSearch={() => setSearchOpen(true)}
+            onOpenSearch={() => { Keyboard.dismiss(); setSearchOpen(true); }}
             onOpenCrafting={() => setScreen('crafting')}
             onOpenApproach={() => {
               // OTA-238 — auto-target when there's exactly one enemy.
@@ -607,8 +636,8 @@ export function ExplorationScreen() {
               setApproachOpen(true);
             }}
             onOpenAskArbiter={() => setAskArbiterOpen(true)}
-            onOpenSalvage={() => setSalvageOpen(true)}
-            onOpenTake={() => setTakeOpen(true)}
+            onOpenSalvage={() => { Keyboard.dismiss(); setSalvageOpen(true); }}
+            onOpenTake={() => { Keyboard.dismiss(); setTakeOpen(true); }}
             onOpenClimb={() => setClimbOpen(true)}
             onClimbUp={() => {
               // OTA 033 — tolerate the old OTA 031 string schema for
@@ -649,7 +678,7 @@ export function ExplorationScreen() {
                 (n) => findCatalogItem(n) !== null
                   && !isOversized(n)
                   && !isAmbientConsumed(n),
-              ).length;
+              ).length + (tutBeat === 'cudgel' ? 1 : 0); // tutorial cudgel prop
             })()}
             salvageableCount={(() => {
               // 2026-05-25 — count predicate now uses SalvageModal's
@@ -660,7 +689,7 @@ export function ExplorationScreen() {
               // (and vice versa).
               return buildChipPool(currentScene).filter(
                 (n) => !isAmbientConsumed(n) && isSalvageableForModal(n),
-              ).length;
+              ).length + (tutBeat === 'scrap' ? 1 : 0); // tutorial chest-plate prop
             })()}
             climbableCount={(() => {
               // 2026-05-25 — green tone for CLIMB when the scene has at
@@ -749,7 +778,7 @@ export function ExplorationScreen() {
                   if (surfaceUnlocked) groundCount = 1;
                 }
               }
-              return sceneCount + groundCount;
+              return sceneCount + groundCount + (tutBeat === 'investigate' ? 1 : 0); // tutorial door prop
             })()}
             // OTA-188 — drives the CLIMB button's red/amber/green
             // ladder. inventoryHasGate checks every inventory item's
@@ -854,7 +883,10 @@ export function ExplorationScreen() {
 
       <SearchModal
         visible={searchOpen}
-        chips={[
+        // During the investigate beat, show ONLY the demo prop (the locked
+        // door) so the picker can't bury it under the room's real surfaces —
+        // same confusion fix as the TAKE / SALVAGE pickers.
+        chips={tutBeat === 'investigate' ? [{ noun: 'door', consumed: false }] : [
           // 'the ground' pinned at the top of the scene chip row.
           // OTA 222 — playtester wanted consistency: other consumed
           // nouns disappear from the chip list. The engine still
@@ -976,14 +1008,31 @@ export function ExplorationScreen() {
 
       <TakeModal
         visible={takeOpen}
-        takeable={(currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])
-          .filter((n) => findCatalogItem(n) !== null && !isOversized(n))
-          .map((n) => ({ noun: n, consumed: isAmbientConsumed(n) }))}
+        // During the cudgel beat, show ONLY the demo prop. Playtest: the
+        // cudgel was appended after the room's real takeable nouns, so the
+        // picker offered actual items first and the player took the wrong
+        // things ("neither of those are the cudgel"). The guided beat must
+        // present the prop alone; the normal scene nouns return after.
+        takeable={
+          tutBeat === 'cudgel'
+            ? [{ noun: 'cudgel', consumed: false }]
+            : (currentScene?.displayedAmbientNouns ?? currentScene?.ambientNouns ?? [])
+                .filter((n) => findCatalogItem(n) !== null && !isOversized(n))
+                .map((n) => ({ noun: n, consumed: isAmbientConsumed(n) }))
+        }
         onTake={(noun) => {
+          // Dismiss the keyboard as the modal closes so RN can't restore
+          // focus to the underlying command field and re-raise it.
+          Keyboard.dismiss();
           setTakeOpen(false);
+          if (tutBeat === 'cudgel' && noun.toLowerCase() === 'cudgel') {
+            submit('take cudgel');
+            return;
+          }
           takeAmbientNoun(noun);
         }}
         onStealthTake={(noun) => {
+          Keyboard.dismiss();
           setTakeOpen(false);
           stealthTakeAmbientNoun(noun);
         }}
@@ -993,35 +1042,30 @@ export function ExplorationScreen() {
           // (already-taken dedup, inventory cap, etc.) that an
           // individual chip tap would, so partial success is
           // handled per-item by the store.
+          Keyboard.dismiss();
           setTakeOpen(false);
           for (const n of nouns) takeAmbientNoun(n);
         }}
-        onCancel={() => setTakeOpen(false)}
+        onCancel={() => { Keyboard.dismiss(); setTakeOpen(false); }}
       />
 
       <SalvageModal
         visible={salvageOpen}
-        chips={buildChipPool(currentScene).map((n) => ({
-          noun: n,
-          // OTA-167 — salvage chip greys on raw engine-consumed
-          // state (searched + flavor-exhausted), NOT through
-          // isAmbientConsumed's self-heal. The self-heal was
-          // designed for TAKE: if you sold a Rusted Blade and one
-          // sits on the ground, you should be able to re-take it.
-          // But salvage produces MATERIALS, not the catalog item
-          // itself — owning or not owning anything has nothing to
-          // do with whether a noun's been salvaged. Playtest log:
-          // `scraps of cloth` got a flavor-only investigate, the
-          // engine wrote it to flavorExhaustedNouns, but the
-          // SalvageModal chip stayed bright because findCatalogItem
-          // fuzzy-matched scraps-of-cloth to a catalog item the
-          // player didn't own, so the self-heal flipped the chip
-          // back to ungreyed. Player tapped salvage 8 times across
-          // 35 seconds, each producing "You've already turned the
-          // scraps cloth over here." Now: salvage chip trusts the
-          // engine's per-room consumed state directly.
-          consumed: isFuzzyConsumed(n, consumedAmbientNouns),
-        }))}
+        // During the scrap beat, show ONLY the demo prop (the broken chest
+        // plate) so the picker can't surface the room's real salvageables —
+        // same confusion fix as the TAKE picker above.
+        chips={
+          tutBeat === 'scrap'
+            ? [{ noun: 'broken chest plate', consumed: false }]
+            : buildChipPool(currentScene).map((n) => ({
+                noun: n,
+                // OTA-167 — salvage chip greys on the engine's per-room
+                // consumed state directly (searched + flavor-exhausted),
+                // NOT isAmbientConsumed's self-heal, which fuzzy-matched
+                // catalog items the player didn't own and kept chips lit.
+                consumed: isFuzzyConsumed(n, consumedAmbientNouns),
+              }))
+        }
         onSubmit={(target) => {
           setSalvageOpen(false);
           // Submit raw target — the modal's chip text already includes
@@ -1124,7 +1168,10 @@ export function ExplorationScreen() {
           value: askArbiterInput,
           onChangeText: setAskArbiterInput,
           placeholder: 'topic — event, place, faction, item, title…',
-          autoFocus: true,
+          // No autoFocus — the keyboard only appears when the player taps
+          // the field. The modal is keyboard-avoided so the field rides
+          // above the keyboard once they do.
+          autoFocus: false,
         }}
         buttons={[
           {
@@ -1144,6 +1191,29 @@ export function ExplorationScreen() {
           },
         ]}
         onRequestClose={() => { setAskArbiterOpen(false); setAskArbiterInput(''); }}
+      />
+
+      {/* Door-open branch — the explore_or_leave tutorial beat. Shows once
+          the door is investigated open; hidden after EXPLORE is chosen so
+          the player can free-roam. Dismissing (scrim tap) defaults to the
+          less-final EXPLORE choice. */}
+      <BrandedModal
+        visible={tutBeat === 'explore_or_leave' && !tutorialExploreChosen}
+        title="The Door Is Open"
+        body="The outpost door stands open. Pick through what's left of this place, or step out and begin your journey. You can always leave later — just type 'leave outpost' or tap EXIT."
+        buttons={[
+          {
+            label: 'Explore the Outpost',
+            onPress: () => chooseTutorialExplore(),
+            tone: 'neutral',
+          },
+          {
+            label: 'Leave & Begin Journey',
+            onPress: () => chooseTutorialLeave(),
+            tone: 'primary',
+          },
+        ]}
+        onRequestClose={() => chooseTutorialExplore()}
       />
 
       <BrandedModal

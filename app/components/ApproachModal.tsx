@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
   Pressable,
   Keyboard,
+  KeyboardAvoidingView,
 } from 'react-native';
 
 interface Props {
@@ -96,7 +97,7 @@ export function ApproachModal({
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={onCancel}>
-        <View style={styles.scrim}>
+        <KeyboardAvoidingView style={styles.scrim} behavior="padding">
           <TouchableWithoutFeedback>
             <View style={styles.card}>
               <Text style={styles.title}>APPROACH</Text>
@@ -113,7 +114,7 @@ export function ApproachModal({
                 value={text}
                 onChangeText={setText}
                 placeholder='e.g. "the guard", "the dragon", "the door"'
-                placeholderTextColor="#5a5246"
+                placeholderTextColor="#c9a86a"
                 onSubmitEditing={handleSubmit}
                 returnKeyType="go"
                 autoCorrect={false}
@@ -225,7 +226,7 @@ export function ApproachModal({
               </View>
             </View>
           </TouchableWithoutFeedback>
-        </View>
+        </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </Modal>
   );

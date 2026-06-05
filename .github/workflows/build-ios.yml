@@ -1,5 +1,10 @@
 name: iOS Build (Tartaria Realms)
 
+# OTA-302 (Ember Anvil) — trigger-touch for the production iOS IPA of the
+# arbiters-line working build (arb70) promoted onto the HaL2001 conduit.
+# build-ios's paths-ignore skips app/**, so this non-ignored edit fires the
+# [build-ios] production build. See HANDOFF.md → OTA-302.
+#
 # Triggers EAS Build for iOS — Expo's hosted macOS infrastructure does
 # the cert/provisioning/Xcode work. We just hand it the project,
 # auth, and Apple credentials; it returns a signed .ipa.

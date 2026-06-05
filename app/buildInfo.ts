@@ -12034,4 +12034,467 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //          app/buildInfo.ts (OTA-300 bump + this change note), docs/
 //          build-codenames.md (Zinc Anvil moved to current),
 //          HANDOFF.md (closed issue entry).
-export const OTA_BUILD_ID = '2026-06-02-300';
+// 2026-06-03-301 (Tungsten Spire) — Outpost tutorial redesign (APK-only
+//   test build, NOT shipped as an OTA — per direct user direction in
+//   this session: "i do not want to publish this as an OTA, i want
+//   this as a self-contained testing APK build only" → "there is not
+//   ota to be made from this, no aab, no adb. this is soley to be
+//   made into a single apk file for my phone only to test").
+//
+//   Design intent: rebuild the upfront tutorial so the Arbiter
+//   narrates from the world feed inside the player's faction-starting
+//   outpost, the player gives their name in-game (not in a pre-menu
+//   TextInput), room-to-room movement inside the outpost uses
+//   named-room chips instead of cardinals, and the relevant button
+//   or input pulses to show the player where to act next. End-state:
+//   the player walks out of the outpost holding a cudgel, a rope,
+//   and a note pointing them at the Aetheric Cores the Guardians
+//   protect, with a travel course set to a Capital they picked.
+//
+//   The 10 beats: name → take cudgel → type "take rope" → salvage
+//   broken chest plate → investigate locked door → look around →
+//   move north → take folded note → tap MAIN QUEST → pick city.
+//   State machine lives in gameStore — each beat advances on a
+//   specific player action (typed verb OR chip tap of the
+//   tutorial-overridden chip onPress).
+//
+//   Major file changes:
+//     app/components/tutorialSteps.ts — TUTORIAL_STEPS replaced with
+//       the new 10-beat sequence. TUTORIAL_DOCS_FULL stays for
+//       Tutorial Replay.
+//     app/components/TutorialTarget.tsx — pulse animation when the
+//       current step has pulse:true (Animated.loop on borderColor +
+//       shadowOpacity).
+//     app/components/TutorialOverlay.tsx — gutted; renders only the
+//       SKIP TUTORIAL pill anchored top-right while tutorial active.
+//     app/screens/CharacterCreationScreen.tsx — name step dropped;
+//       race → faction → BEGIN. Nickel Tine / Zinc Anvil keyboard
+//       race becomes moot.
+//     app/state/gameStore.ts — awaitingTutorialName latch +
+//       tutorialPropsConsumed ledger + new startTutorial /
+//       advanceTutorial / skipTutorial that drive in-feed Arbiter
+//       lines + queueInputDraft for the rope beat + grantTutorialItem
+//       helper for cudgel/rope/note + tutorial pre-check at top of
+//       submitPlayerAction for the prop-verb interception +
+//       maybeAdvanceTutorial calls in look, hub-move, MAIN QUEST chip
+//       and setTravelCourse.
+//     app/components/InputBox.tsx — hub-named exit chips when
+//       player.hubRoomId is set; input row pulses on inputPulse beats;
+//       TAKE / SALVAGE / INVESTIGATE chip onPress overridden during
+//       their matching beats to submit the tutorial verb directly
+//       (chip still works even though the prop isn't a scene noun);
+//       removed the Nickel Tine + Zinc Anvil keyboard gate (welcome
+//       step the gate protected no longer exists).
+//     app/screens/ExplorationScreen.tsx — MAIN QUEST chip tap calls
+//       maybeAdvanceTutorial('main_quest') before routing to
+//       Contracts.
+//
+//   APK shipping note: this build is for the player's phone only.
+//   No OTA push, no AAB, no Play Console upload, no public link.
+//   Cut as an APK via the EAS preview profile and installed
+//   directly; the player exercises the new tutorial flow end-to-end
+//   on device before deciding what (if anything) to fold back into
+//   the OTA channel.
+//   Codename: this isolated arbiters-line test build gets its OWN id +
+//   codename (Flint Coil) so the About screen / bug report shows a handle
+//   distinct from the Tungsten Spire (301) bundle it branched from — the
+//   bundle now also carries the uncapped pack, the 25-adjective default
+//   names, and the land-in-exploration tutorial-end fix. The non-numeric
+//   '-arb1' suffix keeps it OUT of the production OTA-30x sequence so it
+//   can never collide with a real OTA id, and nothing parses the suffix
+//   as a number (it's an opaque map key + display string).
+// arb38 — Save-load crash guard. A tester who installed this build as
+// an UPDATE over an older APK kept their old character's save; tapping
+// that character closed the app every time until they deleted it
+// (clean reinstalls were fine). Diagnostic confirmed ML was healthy —
+// the crash was a NATIVE abort while hydrating the stale cross-version
+// save, which the existing JS try/catch can't catch. This OTA adds a
+// breadcrumb guard (mirrors mlHealth): mark a slot "loading" before
+// hydration, clear it on any JS-reachable exit; a surviving breadcrumb
+// on next boot flags that slot so the title screen offers Retry/Delete
+// instead of an involuntary re-crash. Additive; no behavior change for
+// saves that load cleanly. Files: app/diagnostics/saveLoadHealth.ts
+// (new), app/state/gameStore.ts (breadcrumb + boot detection),
+// app/screens/TitleScreen.tsx (tile warning + tap-intercept recovery),
+// app/diagnostics/aboutSummary.ts (bug-report block).
+// arb39 — persistent-room emptiness. Playtester: staying in the tutorial
+// outpost and changing rooms respawned the interactables every entry, so a
+// player could re-enter a room (or any enterable building) to farm skills
+// and supplies indefinitely. Root cause: beginScene (hub interiors) and
+// patchSceneForBuildingRoom rebuilt the chip pool from the room template
+// with no memory of what was taken. Fix: subtract the room's terminal-
+// consumption record (visitedRooms[key].searchedAmbientNouns — written by
+// take/pickup/salvage/harvest; investigate uses the separate
+// flavorExhaustedNouns, so investigate-only props are unaffected) from the
+// composed nouns. Looted props stay gone on re-entry; wild tiles keep their
+// intentional re-roll. Files: app/state/gameStore.ts (roomConsumedSet /
+// isConsumedNoun helpers + both composers).
+//
+// arb40 — interior outpost movement is free + clearer 0-stamina stop.
+// Two playtester asks: (1) walking room-to-room inside an outpost was
+// charging full overland travel cost (2 stamina + 1h per room — same as
+// an 8-hour trek), which felt wrong for a living-room→dining-room step,
+// and could leave the player "stuck" at a vendor on empty legs. (2) at 0
+// stamina an overland move printed "You take one step and stop…" which
+// read as a partial move, so the player didn't realize nothing happened.
+// Fix: hub interior moves resolve at the TOP of case 'travel' for 0
+// stamina / 0 time (before the overland gate), so a 15-room capital is
+// free to roam; only "leave outpost" + overland travel still draw
+// stamina. The 0-stamina overland refusal now reads as a hard "no stamina
+// — can't travel" stop (the OTA-163 15-min fumble tick is preserved). The
+// requested haptic buzz on the block needs the VIBRATE permission /
+// expo-haptics and will ride a later native AAB. Files: app/state/
+// gameStore.ts (case 'travel' interior fast-path + gate wording).
+//
+// arb41 — the haptic buzz, shipped as an OTA after all. Correction to the
+// arb40 note: the app does NOT need expo-haptics or a native change. RN's
+// core `Vibration` is already imported and used in InputBox.tsx (the
+// tutorial wrong-button / out-of-range buzz, `Vibration.vibrate(30)`), so
+// it is already linked + permitted in the shipped binary — adding more
+// buzz calls is pure JS. New `buzzBlocked()` helper (inline-required
+// Vibration, try/caught, web/no-perm no-op) now fires a 30ms buzz on all
+// three depleted-movement refusals: the `case 'travel'` 0-stamina gate,
+// `setTravelCourse`, and `continueTravel`. Pairs with the arb40 clear
+// "no stamina — can't travel" wording so a refused move both reads and
+// feels like a hard stop. Files: app/state/gameStore.ts (buzzBlocked +
+// three call sites).
+//
+// arb42 — playtester-tuned default SFX/voice starting values (fresh
+// installs only; existing persisted settings are untouched). From the
+// user's Settings → SFX screenshot: music duck 15% → 40% (music dips
+// further under the Arbiter's voice), bundled-voice rate 1.35× → 1.20×,
+// and bundled-voice volume 100% → 90%. Music enabled/volume (on/70%),
+// TTS enabled, engine bundled, voice am_michael, and pitch 1.00 already
+// matched the screenshot — unchanged. Files: app/audio/audioSettings.ts
+// (DEFAULTS.duck), app/voice/voiceSettings.ts (DEFAULTS.rate + volume).
+//
+// arb43 — Ask the Arbiter: persona answers + world knowledge + a real bug
+// fix. Three parts:
+//   (1) BUG FIX. The player-introspection branches ("who am I", "what's my
+//       race/faction", "why am I here") read `racesData.races` /
+//       `factionsData.factions`, but those JSON files are top-level ARRAYS —
+//       so `.races`/`.factions` was undefined and `.find` THREW, silently
+//       killing the answer. They've been broken since written. Now read the
+//       arrays directly. (The Arbiter-self string branches — name/identity/
+//       purpose — were always fine; only the data-backed ones crashed.)
+//   (2) PERSONA FALLBACK. A lore-bank miss no longer ends in the "silent"
+//       line. Unmatched personal / open questions ("why are you following
+//       me", "do you know me", "what do you want from me") route to Qwen
+//       with a tight Arbiter persona prompt (gruff, terse, canon anchors,
+//       guardrails against inventing names/counts). Silent line only when
+//       Qwen is unavailable.
+//   (3) WORLD KNOWLEDGE. New app/engine/arbiterKnowledge.ts answers "list
+//       the factions / capitals / races" and "what city am I headed to"
+//       from REAL data, with forgiving phrasing (no magic word required) and
+//       premise-correction in voice — "name the eleven factions" → "There
+//       are not eleven. There are nine…". Counts are data-derived (9
+//       factions, 7 races, 6 capital tiles; the lore name-drops more
+//       capitals that aren't real locations, so the engine answers with what
+//       it actually has). Files: app/engine/arbiterKnowledge.ts (new),
+//       app/state/gameStore.ts (introspection fix + persona helper + ask
+//       fallback), __tests__/arbiterKnowledge.test.ts (new).
+//
+// arb44 — lore fix: the Arbiter now knows all NINE capitals. The questline
+// (mainQuest.ts LOST_CAPITAL_LOCATIONS, OTA-052) defines 9 guardian Lost
+// Capitals, but only 6 carried a capital tag in locations.json — the three
+// original-five sites Samarran, Nimari, and Voronov existed as plain
+// buried-city tiles with no capital tag, so arb43's data-derived count read
+// 6. Tagged all three `lost_capital` (matching Drakova's pattern — a buried
+// lost capital, the single tag arbiterKnowledge counts, with no
+// wasteland-encounter side effects). World-knowledge capital count is now 9
+// and "name the nine capitals" answers straight instead of correcting down
+// to six. Files: app/data/locations/locations.json (3 tag additions),
+// __tests__/arbiterKnowledge.test.ts (count 6→9 + correction case).
+//
+// arb45 — Arbiter titles are now EARNABLE. Finding: OTA-236 shipped the
+// character-page title display + `player.earnedTitles`, but nothing ever
+// wrote to it — all 20 titles were permanently unearnable. This wires the
+// 14 Tier-A/B titles (the 6 Tier-C ones are a later design pass). New
+// engine/titles.ts: a TitleProgress counter model, 14 award predicates, and
+// a passive-perk aggregator. gameStore gains `recordTitleProgress` (bump
+// counters → re-evaluate ALL predicates → award newly-met titles with an
+// in-voice Arbiter line). Counters wired at: sentinel kills (Bane), relic
+// sells (Relic Trader), relic finds (Seeker), repairs (Architect's Eye),
+// fusions (Master of Aethercraft), lore answers (Scholar), and the Etheric-
+// weather tick (Etherbound Survivor / Aetheric Attuned / Stormcaller /
+// Survivor of Aetherstone). The weather tick also runs a periodic catch-all
+// so the derived titles (Golem Whisperer, Scion of the Giants, Etheric
+// Explorer, Aetherborn Awakened) award during normal play. Live perks:
+// Survivor/Attuned/Stormcaller halve Etheric weather harm; Relic Trader
+// sweetens relic sell prices; Architect's Eye discounts relic repairs. The
+// remaining numeric perks (e.g. Bane's mechanical damage die, the +skill
+// bonuses) are aggregated by titlePerkModifiers() and exposed but their
+// per-check injection is a follow-up. Files: app/engine/titles.ts (new),
+// app/engine/types.ts (titleProgress field), app/state/gameStore.ts
+// (helpers + 7 hook sites + weather perks), __tests__/titles.test.ts (new).
+//
+// arb46 — Tier-C title challenges: canonical locations + wiring, SHIPPED OFF.
+// The 6 Tier-C titles arb45 deferred are each a place + a challenge. This
+// plots all six (Wayfarer→Iskan-Veil, Speaker→Red Tower of Nimari,
+// Warden→Sinking Cathedral, Shadow Diver→Endless Stair, Protector→new Sunken
+// Enclave, Guild Broker→new Parley Ground), wires their entry hooks + title
+// awards, and ships EVERYTHING switched OFF behind locationChallenges
+// .TIER_C_ENABLED (master) + per-challenge `enabled` flags — nothing can be
+// encountered in play until the user supplies hand-drawn layouts and reviews.
+// titles.ts gains the 6 Tier-C counters/predicates/perks (unearnable while the
+// challenges are OFF since their counters never increment). Guild Broker is
+// redefined as a two-faction brokering MISSION with a faction→coveted-item
+// chart (9 low-tier items in exploration.json) restricted to factions the
+// player is NOT affiliated with. New module engine/locationChallenges.ts is
+// the single OFF-switch + registry + chart; doc docs/tier-c-challenges.md is
+// the build register for what still needs drawing. Files: locationChallenges
+// .ts (new), titles.ts, gameStore.ts (inert entry-hook gate on arrival),
+// locations.json (+2 tiles, discoverable:false), atlasCoords.ts (+2 coords),
+// exploration.json (+11 quest items), tier-c-challenges.md (new),
+// __tests__/locationChallenges.test.ts (new), titles.test.ts.
+//
+// arb47 — Labyrinth of Shadows layout plotted (Tier-C, still OFF). The
+// user supplied exact maze coordinates (25x25, start (1,23) → finish
+// (25,7), a 63-cell main path + 8 dead-end branches A–H, 2 intentional
+// diagonal corner-links). Plotted to app/data/maze/labyrinth-of-shadows.json
+// + image assets/maps/labyrinth-of-shadows.png. locationChallenges gains an
+// optional `layout` field; the labyrinth entry flips needsLayout:false but
+// stays enabled:false behind TIER_C_ENABLED. New labyrinthLayout.test.ts
+// asserts continuity/branches/no-overlap + that it's still inert.
+//
+// arb48 — Labyrinth of Shadows BUILT + TURNED ON (Wayfarer of the Lost Paths
+// = the 15th earnable title). New engine/labyrinth.ts (pure maze navigation
+// over the plotted graph) + gameStore handler: arrive at Iskan-Veil → ENTER
+// LABYRINTH starts a run; typed directions walk the graph (false walls block,
+// branches count wrong turns); reach the finish within the budget for a clean
+// run → recordTitleProgress({labyrinthCleanRuns:1}) → Wayfarer + pathfinder.
+// locationChallenges master TIER_C_ENABLED flipped true + labyrinth enabled
+// true; the other 5 Tier-C stay enabled:false (challengeActive needs BOTH).
+// The 14 Tier-A/B titles remain live (award loop already wired in arb45).
+//
+// arb49 — readability: retire the too-dark `#5a5246` everywhere. It was the
+// color of the locked title NAMES + requirement DESCRIPTIONS on the Character
+// page (unreadable on the dark card), plus muted/placeholder text in ~13 files.
+// Per the user's call, every occurrence is replaced with the Explore-screen
+// amber `#c9a86a` (the brand accent, already used for EARNED title names), so
+// `#5a5246` now appears nowhere in the app.
+//
+// arb50 — Speaker of Forgotten Tongues + Warden of the Old World BUILT + ON
+// (titles 16 & 17). The two "no-drawing" Tier-C trials. New
+// engine/titleChallenges.ts + a gameStore handler with the user's one-shot
+// design: SCOUTING IS FREE (examine → learn the required material/relic + the
+// d20+stat-vs-DC you'll face, never consumes), COMMITTING IS ONE-SHOT (attempt
+// rolls; pass earns the title, fail spends your single chance — recorded on
+// player.challengeAttempts). Lacking the material refuses the attempt WITHOUT
+// consuming it. Speaker is skill-gated (Glyph-Key recovered free on-site, then
+// a d20+INT rune trial @ Red Tower of Nimari → languageLearned/machineSpeech).
+// Warden is materials-gated (bring 3× Scrap Metal, then a d20+INT Engineering
+// check @ Sinking Cathedral → relicsPreserved/ruinsDefenseBonus). Their
+// enabled flags flipped true; only trap_dives / defense / parley remain OFF.
+//
+// arb51 — readability pass 2 on the Character screen. The dim taupe `#7a705c`
+// (stat "Grows from:" descriptions, the italic kv caption notes, faction-row
+// names, HP/STA + slot labels) and the titles-summary `#9b8e74` were too dark
+// to read; both → the Explore amber `#c9a86a`, scoped to CharacterScreen's own
+// styles. Empty-slot dashes (`#3a342c`) + the green/cream/red accents kept.
+//
+// arb52 — Ask-the-Arbiter fix: "How many sites can I visit?" (playtester log)
+// fell through to a garbled echo because "sites" wasn't a world-knowledge
+// keyword. arbiterKnowledge.answerWorldKnowledge now answers a sites/locations/
+// places COUNT (discoverable tiles = 25 today) + discovery progress from
+// worldMemory; the `ask` handler passes discoveredSiteCount. A world-knowledge
+// hit short-circuits before the lore/persona fallback, so the double-line +
+// "The arbiter about many sites can visit" echo no longer fires for it.
+//
+// arb53 — Guild Broker BUILT + ON (title 18) + canon-relic chart + lore. The
+// Parley Ground (now discoverable) runs a fetch-two-relics encounter: PARLEY
+// picks two non-allied faction leaders + names their demanded relics; arriving
+// at a relic's source tile recovers it; SEAL THE ALLIANCE turns both in →
+// recordTitleProgress({alliancesBrokered:1}) → Guild Broker + diplomacyBonus.
+// FACTION_COVETED_ITEM upgraded to 9 canon Tartarian relics (exploration.json
+// token items renamed to match). All 15 canon relics from the user's list
+// added to canon-loot-treasure.json so the Arbiter can describe every one
+// (incl. the 6 the Broker doesn't use). New engine/broker.ts + player
+// .brokerMission. Only trap_dives + defense remain OFF (need drawings).
+//
+// arb54 — silent-narration fix + voice diagnostics. Playtester's COPY VOICE
+// INFO showed the bundled voice (am_michael) stuck: `[download] Software caused
+// connection abort`, 66 GB free — a NETWORK abort on the ~63 MB Piper tarball,
+// model never installed (0 voices), engine=bundled → no voice → silence. Not a
+// code regression (no voice files changed arb47–53). Two fixes: (1) TTSManager
+// .speak falls through to the SYSTEM voice when the bundled model is in an
+// error state, so the Arbiter still narrates (the fallback the Title screen
+// always claimed but never actually did); (2) TTSController logs bundled-voice
+// state + errors (failing step + free disk) to the game log so the LOG export
+// shows why narration is silent without opening About.
+//
+// arb55 — FIX THE DOWNLOAD (not just fall back). The bundled-voice model
+// (~60–100 MB .pte via react-native-executorch) was downloaded with a SINGLE
+// createDownloadResumable().downloadAsync() and no retry, so one mid-transfer
+// drop ("Software caused connection abort") failed the whole voice install.
+// executorchAdapter.resolveSource now retries up to 5× with exponential backoff
+// (1/2/4/8 s) and RESUMES the partial via the handle's resume data (HTTP Range)
+// instead of restarting — a flaky connection now recovers. Truncated partials
+// are kept (to resume) rather than deleted. Pairs with arb54's system-voice
+// safety net for the case where the network is fully down.
+//
+// arb56 — STOP re-downloading the voice every launch. The reuse check trusted
+// any cached file ≥ 50 MB, which (1) meant every model file UNDER 50 MB (the
+// voice + tokenizer/config) failed the check and re-downloaded on EVERY launch,
+// and (2) let a large partial (e.g. 71 MB) pass as "complete" then fail to
+// load. executorchAdapter now gates reuse on a `<file>.complete` MARKER written
+// only when a download actually finishes (and matched against the on-disk
+// size): partials of any size are never trusted, complete files of any size are
+// always reused. One-time cost: a previously-cached model with no marker
+// re-downloads once to establish it.
+//
+// arb57 — batch SELL + "all" buttons (player request). Scrap already had a
+// quantity stepper (OTA-286); added a "Scrap All (N)" one-tap button beside it.
+// The vendor SELL modal had no quantity at all (sold one unit) — added the same
+// NumberStepper (value/total TC update live) + "Sell ×N" and "Sell All (N)"
+// buttons, looping sellToVendor per unit. Gate-loss sells stay single + keep
+// the red "Sell anyway" confirm.
+//
+// arb58 — show a "[tool pouch]" tag next to pouched items in the inventory
+// list (player request). ItemRow gains an isPouched prop (item.id ∈
+// player.equipped.toolPouchIds); the meta row renders an amber [tool pouch]
+// badge beside the existing rarity / [fits dog] / ♥ markers.
+//
+// arb59 — combat takes precedence over scene hooks. A player log showed a
+// smoke-camp Reclaimer who turned hostile from a caught theft still resolving
+// the story-thread peacefully ("★★ STORY THREAD COMPLETE — you part ways, +25
+// TC") on "approach", then dying in the same fight. The hook intercept had no
+// combat guard; it now requires currentScene.enemies.length === 0, so during a
+// fight those verbs fall through to the combat handlers instead of resolving a
+// story/puzzle hook.
+// arb60 — REGRESSION-1 fix, Piece A: `take` spawns GEAR again. The dead take
+// loop's root cause: scenes never placed catalog gear as nouns, so the take
+// handler (which grants by findCatalogItem name-match) had nothing to grant.
+// New engine/takeableGearSpawns.ts places 1–3 common, portable catalog
+// weapons/armor per scene (real names → the handler resolves them), seeded by
+// room key so leave-and-return can't farm. Added additively to the displayed
+// nouns so investigate's flavor nouns keep their slots. Pieces B (salvage →
+// materials only) + C (investigate → clues/hooks + rare gear/material; food
+// can ride take OR investigate) still to come.
+//
+// arb61 — loot-loop Pieces B + C. B (salvage → materials only): salvagePools
+// now filters every roll to true materials (materials.json membership; Worn
+// Tartarian Coin stays as a byproduct), stripping the gear/food/clue bleed
+// (Aetheric Locket/Torch, Throwing Knife, Rusted Blade, Climbing Rope, Trail
+// Rations, Map Fragment, Sealed Letter). C (investigate → clues/hooks norm):
+// areaSearch's investigate branch drops routine common-material foraging — its
+// only item is now a RARE Uncommon gear-or-material find at ~7% (resolved
+// through lookupCraftedItem so gear lands as real weapons/armor); clues/hooks
+// rise to ~75%. Food still comes from the separate forage path; search/harvest
+// pools unchanged. Verb economy complete: take=gear, salvage=materials,
+// investigate=clues/hooks+rare find.
+//
+// arb62 — split-on-equip. Player had 3 Aetherbound Masks merged into one stack;
+// equipping one pointed the slot at the shared row id, so all 3 read as
+// EQUIPPED and the spares couldn't be scrapped/used. equipItem now peels ONE
+// copy off a stack of N>1 into its own instance (fresh id + own durability) and
+// decrements the stack, so the slot owns a single copy and the other N-1 stay
+// free. Existing stuck saves: unequip + re-equip the item to split it.
+// arb63 — hands + cloak armor slots. Gauntlets/gloves ("Hands Armor") and
+// cloaks/capes ("cloak" slot) had no equip slot — validSlotsForItem returned []
+// ("cannot be equipped"), stranding ~71 catalog armor pieces (35 hands + 36
+// cloak). Player: "all gear that is picked up must be equippable. do we not have
+// hand slots?" Added EquipSlot 'hands' + 'cloak' (+ PlayerEquipped names/ids),
+// SLOT_LABEL, ARMOR_SLOTS (so AC + stat bonuses aggregate), SLOT_ID_KEY,
+// validSlotsForItem catalog + name fallbacks (pulled cloak/mantle out of the
+// chest regex), and the Inventory/Character slot lists. equipItem already keys
+// off SLOT_ID_KEY so equip/unequip/EQUIPPED-badge work for both.
+// arb64 — stress-test fix pass. Full-suite + audit surfaced 6 real regressions
+// from this session (all verified deterministic, false positives ruled out):
+//  (1) split-on-equip pointed the slot at a NEW peeled id, breaking the
+//      equipped-id invariant (inventoryAudit/domesticStress). Flipped: the
+//      EQUIPPED copy keeps the ORIGINAL id, the remainder is peeled to a new id.
+//  (2) domesticStress 700-day craft churn — split leaves spare result rows that
+//      filled an item cap between the harness's >24 trims. Harness now trims to
+//      equipped-only every cycle (its stated intent); split correctness is
+//      covered by the equip* suites. (grantItem durable-merge left intact — it's
+//      intentional, see inventoryStacking "locket bug".)
+//  (3) hands/cloak (arb63) omitted from contextInjector (equipped gauntlets/
+//      cloak invisible to Arbiter narration) → added (+ring2/3).
+//  (4) hands/cloak omitted from the DROP equipped-guard → could drop worn
+//      gauntlets/cloak into a phantom slot → added.
+//  (5) gear-farm (arb60): spawned gear re-showed on wild tiles after take+scrap
+//      (self-heal re-grant) → beginScene now filters spawned gear by the room's
+//      consumed set.
+//  (6) investigateHookBias: stale ≤70% bound vs arb61's intended ~75% story
+//      norm → bound updated.
+//
+// arb65 — Voice start/end clipping fix. The Arbiter began swallowing the
+// first phonemes of utterances ("Choose your character" → "aracter"). Cause:
+// arb7/arb8's trimSilenceLeadTrail strips Kokoro's own leading silence pad,
+// which had been absorbing expo-av's AudioTrack warm-up latency; once the
+// voice finally bundled (arb55/56), the warm-up clipped real speech instead
+// of silence. Fix: a small CONTROLLED silent lead/tail pad (220ms / 90ms) is
+// re-added to the final playback buffer in playPcm via a new pure helper
+// `padSilence` (app/voice/audioPad.ts, unit-tested in audioPad.test.ts).
+// Applied to the whole crossfade batch, so inter-sentence joins INSIDE a
+// batch stay tight; only the batch's leading start-up and trailing unload
+// eat silence now.
+// arb66 — Voice clip fix, part 2 (the REAL cause). arb65's silent-pad theory
+// (expo-av AudioTrack warm-up) was too small to explain losing ~1.2s off the
+// FRONT of the title line ("Choose your character" → "aracter"). The actual
+// cause: that line is literally the FIRST Audio.Sound of the session, so it
+// pays a cold audio-HAL / audio-focus acquisition penalty — the playback
+// clock starts but the device routes no sound for up to ~1s, swallowing the
+// head. Fix: warmAudioOutput() plays a ~150ms SILENT primer (volume 0) to
+// spin the HAL up — fired early in prewarmKokoro (parallel with the model
+// download) and as an awaited backstop on the first playPcm. The per-utterance
+// padSilence guard is trimmed 220/90 → 90/70ms so it doesn't reintroduce the
+// inter-line latency arb7/arb8 tightened (warming, not padding, is the fix now).
+// arb67 — Voice clip fix pt.3. arb66's separate silent primer didn't hold:
+// fired at prewarm-start it's seconds too early (model download is slow, the
+// HAL re-idles before the title line plays), and a separate Sound that unloads
+// leaves a re-idle gap before the real one. Player still lost "choose your
+// cha". Fix: give ONLY the first utterance of the session a large CONTIGUOUS
+// silent lead pad (1300ms) in its OWN buffer — the device routes audio into
+// the silence while the HAL spins up, and real speech begins only once it's
+// hot. Every later utterance keeps the light 90/70ms guard. Latch reset on
+// dispose/refresh so a re-cold HAL gets the big pad again. The arb66
+// warmAudioOutput primer is removed.
+// arb68 — Voice clip, the actual fix. Evidence settled it: device is Android
+// running arb67, so the playback fixes WERE live — yet the title line was
+// unchanged. That proves the loss is UPSTREAM of playPcm (the buffer/word
+// itself arrives truncated), so no amount of playback padding (arb65-67)
+// could ever help. Fixes: (1) the title line gets a DISPOSABLE lead-in
+// ("Arise, traveler, and choose your character.") so whichever first-utterance
+// truncation (cold first inference OR Android's system-TTS first-utterance
+// clip) eats the throwaway clause and "choose your character" survives;
+// (2) removed the now-pointless 1300ms first-utterance lead (back to a light
+// 90/70ms guard); (3) added a TTS-route diagnostic to COPY VOICE INFO so the
+// next paste shows whether each line went out on bundled Kokoro or system
+// expo-speech — pinning the mechanism definitively.
+// arb69 — Voice clip, the polish that lands it. arb68's lead-in CONFIRMED the
+// fix works: player now hears "raveler choose your character" — i.e. the ~0.8s
+// first-utterance clip ate the disposable "Arise, t" and "choose your
+// character" came through INTACT. Two changes to clean it up: (1) split the
+// title greeting into a SEPARATE short primer utterance ("Welcome.") + the
+// real line ("Choose your character."), fired 600ms apart so they stay two
+// distinct utterances on both engines — the real line is then always a warm
+// SECOND playback, never the cold first one, robust even if the clip length
+// wanders; (2) the short "Welcome." primer is (near-)wholly eaten by the clip,
+// so the awkward "raveler" fragment is gone — at worst a soft "…come" precedes
+// a clean "Choose your character." The arb68 TTS-route diagnostic stays.
+// arb70 — Voice clip ROOT CAUSE found + fixed (real regression). Player: the
+// title line spoke clean for ~2 weeks, only recently clipped. Confirmed: the
+// default speech RATE was 1.0 for those two weeks (2026-05-18 → 06-03) and was
+// raised to 1.2 by Plasma/Copper Cask (~06-03). Kokoro's warm-up inference in
+// ensureLoaded was hardcoded to forward('ok.', 1.0); Kokoro's native
+// forward(text, speed) pays a cold cost on the first call AT A GIVEN SPEED
+// that truncates that utterance's head. While rate==1.0 the warm-up covered
+// the real line; once the real line ran at 1.2 the 1.0 warm-up no longer
+// warmed that path, so the title line (the first 1.2 forward of the session)
+// lost its head ("Choose your character" → "aracter"). Fits all evidence:
+// bundled-kokoro (route log), upstream of playback (arb65-67 padding had no
+// effect), first-utterance-only (later lines are warm), arb69's primer helped
+// (it became the sacrificial first 1.2 forward). Fix: warm up at the CONFIGURED
+// rate with a real-length phrase. Reverted the arb68/69 "Welcome." primer —
+// the title line is a clean single "Choose your character." again.
+//
+// OTA-302 — PRODUCTION PROMOTION. The arbiters-line working build (through
+// arb70 / Gold Goblet) is promoted onto the HaL2001 production conduit: all
+// tested code from arbiters-line, HaL2001's own store config + workflows
+// (package .hal2001, name "Tartaria Realms HAL", channel hal2001) kept intact
+// so the AAB/IPA build pipeline produces correctly-signed store binaries.
+// Shipped as a native AAB + iOS IPA ([build-aab] [build-ios]) and an OTA to
+// the hal2001 channel for existing installs.
+export const OTA_BUILD_ID = '2026-06-05-302';

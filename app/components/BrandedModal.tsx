@@ -8,6 +8,7 @@ import {
   TouchableWithoutFeedback,
   Pressable,
   TextInput,
+  KeyboardAvoidingView,
 } from 'react-native';
 import type { ItemPreview } from './itemPreview';
 import { NumberStepper } from './NumberStepper';
@@ -77,7 +78,9 @@ export function BrandedModal({
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={onRequestClose}>
-        <View style={styles.scrim}>
+        {/* 'padding' keeps the scrim full size and lifts the card above
+            the soft keyboard so an open text field is always visible. */}
+        <KeyboardAvoidingView style={styles.scrim} behavior="padding">
           <TouchableWithoutFeedback>
             <View style={styles.card}>
               <View style={styles.headerRow}>
@@ -119,7 +122,7 @@ export function BrandedModal({
                   value={textInput.value}
                   onChangeText={textInput.onChangeText}
                   placeholder={textInput.placeholder}
-                  placeholderTextColor="#5a5246"
+                  placeholderTextColor="#c9a86a"
                   autoFocus={textInput.autoFocus}
                   selectionColor="#c9a86a"
                 />
@@ -157,7 +160,7 @@ export function BrandedModal({
               </View>
             </View>
           </TouchableWithoutFeedback>
-        </View>
+        </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </Modal>
   );

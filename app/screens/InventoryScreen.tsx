@@ -152,8 +152,10 @@ export function InventoryScreen() {
     ['off', player.equipped?.off],
     ['head', player.equipped?.head],
     ['chest', player.equipped?.chest],
+    ['hands', player.equipped?.hands],
     ['legs', player.equipped?.legs],
     ['feet', player.equipped?.feet],
+    ['cloak', player.equipped?.cloak],
     ['amulet', player.equipped?.amulet],
     ['ring', player.equipped?.ring],
     // OTA-239 — three concurrent ring slots. ring2/ring3 share the
@@ -177,8 +179,8 @@ export function InventoryScreen() {
   const equippedItemIds = new Set<string>();
   const eq = player.equipped ?? {};
   const idSlots: (string | undefined)[] = [
-    eq.mainId, eq.offId, eq.headId, eq.chestId,
-    eq.legsId, eq.feetId, eq.amuletId, eq.ringId,
+    eq.mainId, eq.offId, eq.headId, eq.chestId, eq.handsId,
+    eq.legsId, eq.feetId, eq.cloakId, eq.amuletId, eq.ringId,
     // OTA-239 — ring2 / ring3 instance ids participate in the
     // EQUIPPED badge dedupe.
     eq.ring2Id, eq.ring3Id,
@@ -244,21 +246,22 @@ export function InventoryScreen() {
     dropInventoryItem(pending.item.name);
     setPending(null);
   };
-  const doScrap = () => {
+  // OTA-286 — batch scrap. `repsOverride` lets "Scrap All" pass the full
+  // stack regardless of the stepper; default uses the stepper value.
+  const doScrap = (repsOverride?: number) => {
     if (!pending) return;
     // Snapshot inventory BEFORE the whole batch so we can diff the
     // combined output across all N iterations. scrapInventoryItem
     // is synchronous, so each iteration's mutation is settled before
     // the next call runs.
     const before = (useGameStore.getState().player?.inventory ?? []).map((i) => ({ ...i }));
-    // OTA-286 — loop scrap N times based on stepper value. Each call
-    // does its own RNG roll + grant + log entry (so the player sees
-    // each yield individually in the world feed), and the modal's
-    // result body shows the combined delta. Clamp to the current
-    // stack size in case the inventory shifted while the modal was
+    // Loop scrap N times. Each call does its own RNG roll + grant + log
+    // entry (so the player sees each yield individually in the world feed),
+    // and the modal's result body shows the combined delta. Clamp to the
+    // current stack size in case the inventory shifted while the modal was
     // open (e.g., an autosave dock event).
     const stack = pending.item.quantity ?? 1;
-    const reps = Math.max(1, Math.min(scrapQty, stack));
+    const reps = Math.max(1, Math.min(repsOverride ?? scrapQty, stack));
     for (let i = 0; i < reps; i++) {
       scrapInventoryItem(pending.item.name);
     }
@@ -404,11 +407,20 @@ export function InventoryScreen() {
     // raw stock (already material) and for items currently equipped
     // (would leave a phantom slot).
     if (canScrap(pending.item) && equippedInSlots.length === 0) {
+      const stack = pending.item.quantity ?? 1;
       buttons.push({
-        label: 'Scrap',
-        onPress: doScrap,
+        label: stack > 1 ? `Scrap ×${Math.max(1, Math.min(scrapQty, stack))}` : 'Scrap',
+        onPress: () => doScrap(),
         tone: 'destructive',
       });
+      // Scrap All — one tap to break down the whole stack (skips the stepper).
+      if (stack > 1) {
+        buttons.push({
+          label: `Scrap All (${stack})`,
+          onPress: () => doScrap(stack),
+          tone: 'destructive',
+        });
+      }
     }
     // OTA-208 — the OTA-207 inventory "Throw at X" button was the
     // wrong abstraction. Throwables are now weapons (validSlotsForItem
@@ -553,6 +565,7 @@ export function InventoryScreen() {
                   item={item}
                   color={CATEGORY_COLORS[cat]}
                   isEquipped={equippedItemIds.has(item.id)}
+                  isPouched={(player.equipped?.toolPouchIds ?? []).includes(item.id)}
                   onPress={() => handleItemTap(item)}
                 />
               ))}
@@ -739,11 +752,13 @@ function ItemRow({
   item,
   color,
   isEquipped,
+  isPouched,
   onPress,
 }: {
   item: InventoryItem;
   color: string;
   isEquipped: boolean;
+  isPouched: boolean;
   onPress: () => void;
 }) {
   const canEquip = validSlotsForItem(item).length > 0;
@@ -795,6 +810,9 @@ function ItemRow({
               rarity / dog tags. No marker when un-reserved so the row
               isn't noisy for the catalog majority. */}
           {item.reservedForFusion && <Text style={[styles.rowMeta, styles.rowReserved]}>♥</Text>}
+          {/* arb58 — mark items currently stowed in the tool pouch so the
+              player can see at a glance which pack items are pouched. */}
+          {isPouched && <Text style={[styles.rowMeta, styles.rowPouch]}>[tool pouch]</Text>}
           {fitsDog && <Text style={[styles.rowMeta, styles.rowDogTag]}>[fits dog]</Text>}
           {isTreat && <Text style={[styles.rowMeta, styles.rowDogTag]}>[treat]</Text>}
           {/* OTA 028 — surface the weapon's damage dice next to
@@ -922,6 +940,7 @@ const styles = StyleSheet.create({
   // stand out from the grey rarity / durability metadata.
   rowDogTag: { color: '#c9a86a', fontWeight: '700' },
   rowReserved: { color: '#d97a7a', fontWeight: '700' },
+  rowPouch: { color: '#c9a86a', fontWeight: '700' },
   rowEquipped: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   rowEquippable: { color: '#7a705c', fontSize: 10, letterSpacing: 1, fontStyle: 'italic' },
   empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 30 },

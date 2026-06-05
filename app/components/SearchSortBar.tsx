@@ -71,7 +71,7 @@ export function SearchSortBar({
           value={query}
           onChangeText={onQueryChange}
           placeholder={placeholder}
-          placeholderTextColor="#5a5246"
+          placeholderTextColor="#c9a86a"
           autoCorrect={false}
           autoCapitalize="none"
         />

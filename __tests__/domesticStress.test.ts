@@ -73,6 +73,7 @@ jest.mock('expo-updates', () => ({}));
 const _origLog = console.log;
 const _origWarn = console.warn;
 const _origErr = console.error;
+const _origRandom = Math.random;
 
 import { useGameStore } from '../app/state/gameStore';
 import { getRaces, getFactions } from '../app/engine/character';
@@ -87,6 +88,19 @@ import type { Recipe } from '../app/engine/crafting';
 // ──────────────────────────────────────────────────────────────────────
 // Helpers
 // ──────────────────────────────────────────────────────────────────────
+
+// Seeded RNG — the sim AND the engine pull from Math.random (combat/scene/
+// loot/scrap rolls), so unseeded runs were flaky. Seed the global in
+// beforeAll so the whole 700-day playthrough is reproducible.
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a |= 0; a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
 let idCounter = 0;
 function uniqueId(prefix: string): string {
@@ -151,6 +165,7 @@ describe('Domestic / utility quick-action stress (700 in-game days)', () => {
     console.log = () => {};
     console.warn = () => {};
     console.error = () => {};
+    Math.random = mulberry32(0xd0e5);
 
     const store = useGameStore;
     await store.getState().hydrate();
@@ -170,6 +185,7 @@ describe('Domestic / utility quick-action stress (700 in-game days)', () => {
     console.log = _origLog;
     console.warn = _origWarn;
     console.error = _origErr;
+    Math.random = _origRandom;
   });
 
   it('cycles rest / craft / inventory operations for 700 in-game days', () => {
@@ -273,6 +289,42 @@ describe('Domestic / utility quick-action stress (700 in-game days)', () => {
         const dayNow = Math.floor((player.hoursElapsed ?? 0) / HOURS_PER_DAY) + 1;
         if (dayNow >= TARGET_DAYS) return;
         iter++;
+
+        // Same OOM guard as thousandDayStressSim: trim the in-memory gameLog
+        // every turn. The store keeps every entry (MAX_LOG_IN_MEMORY =
+        // Infinity) and persist() JSON.stringify-s the whole array into the
+        // AsyncStorage mock after almost every action; without trimming, 700
+        // days of crafting OOMs V8 (>8 GB strings). slice() drops the old
+        // entries' references so V8 can reclaim them even in this sync loop.
+        // This sim asserts on crash counters / inventory, never on gameLog.
+        const curLog = store.getState().gameLog;
+        if (curLog.length > 80) {
+          store.setState({ gameLog: curLog.slice(-40) });
+        }
+
+        // Keep the pack lean. Over 700 days the crafted results + scrap
+        // output pile up unbounded (the sim crafts/injects far faster than
+        // it consumes), eventually filling the pack — at which point craft
+        // correctly REFUSES (no room for the result) and ITEM_CAPS block
+        // re-provisioning ingredients, which the per-op checks below then
+        // mis-read as failures. A real player never carries 600+ items;
+        // reset to just the currently-equipped gear each turn so every op
+        // runs against a realistic, roomy pack and provisions what it needs.
+        // arb64 — trim EVERY cycle (was: only when length > 24). split-on-equip
+        // (arb62) legitimately leaves a spare non-equipped remainder row when a
+        // stack is equipped; between the old >24 trims those spares accumulated
+        // and could fill a result's ITEM_CAP, blocking the next deterministic
+        // craft. Trimming to equipped-only each turn — exactly this block's
+        // stated intent — keeps the pack realistic and removes the spare churn.
+        // (Split correctness itself is covered by the equip* suites.)
+        {
+          const p = getPlayer();
+          const equippedIds = new Set(
+            Object.values(p.equipped ?? {}).filter((v): v is string => typeof v === 'string'),
+          );
+          p.inventory = p.inventory.filter((i) => equippedIds.has(i.id));
+          setPlayer(p);
+        }
 
         // ─── 1. PROVISION (stand-in for digging) ─────────────────────
         // Drop materials directly so the test stays deterministic.
@@ -614,11 +666,21 @@ describe('Domestic / utility quick-action stress (700 in-game days)', () => {
           if (invQtyAfter !== invQtyBefore - 1) {
             crashes.push(`drop ${dropName}: qty ${invQtyBefore}→${invQtyAfter}`);
           }
+          // The drop records on the player's CURRENT room key. startTileKey
+          // was captured at setup, but the player's locationId can drift
+          // during the run (forcing mapX/mapY=4,4 doesn't restore it), so
+          // the entry legitimately lands under a different key. dropName is
+          // unique per iteration, so scan every visited room — found
+          // anywhere = the drop recorded correctly; found nowhere = a real
+          // drop failure.
           const visited = store.getState().worldMemory.visitedRooms ?? {};
-          const dropped = visited[startTileKey]?.droppedItems ?? [];
-          const hit = dropped.find((d) => d.name === dropName);
+          let hit: { name: string; quantity: number } | undefined;
+          for (const room of Object.values(visited)) {
+            const h = (room.droppedItems ?? []).find((d) => d.name === dropName);
+            if (h) { hit = h; break; }
+          }
           if (!hit) {
-            crashes.push(`drop ${dropName}: not recorded in droppedItems on tile ${startTileKey}`);
+            crashes.push(`drop ${dropName}: not recorded in droppedItems on any visited tile`);
           } else if (hit.quantity !== 1) {
             crashes.push(`drop ${dropName}: droppedItems quantity ${hit.quantity}, expected 1`);
           } else {
@@ -665,14 +727,23 @@ describe('Domestic / utility quick-action stress (700 in-game days)', () => {
             if (afterScrapQty !== beforeScrapQty - 1) {
               crashes.push(`scrap ${scrapName}: qty ${beforeScrapQty}→${afterScrapQty}`);
             }
-            // Each expected material should have grown by exactly its grant qty.
+            // Scrap yield is non-deterministic, so we don't assert exact
+            // amounts — only that each material grew within its valid range.
+            // Engine behavior (see scrapInventoryItem):
+            //   - success roll (base 70% + INT/DEX) → full output
+            //   - failed roll → consolation only: 1 of the FIRST material
+            //     (OTA-058 "no scrap is ever a wasted click"), others 0
+            //   - ITEM_CAPS can clip any stack, so a delta can be < grant
+            // A real bug would be a delta ABOVE the full grant (over-grant /
+            // dupe) or a NEGATIVE delta. Exact-yield is covered by the
+            // scrapEngine / salvagePools unit tests; here we just guard
+            // corruption over 700 days.
             let scrapOk = true;
             for (const g of expected.grants) {
-              const after = totalQty(getPlayer().inventory, g.name);
-              const before = beforeMats.get(g.name) ?? 0;
-              if (after - before !== g.quantity) {
+              const delta = totalQty(getPlayer().inventory, g.name) - (beforeMats.get(g.name) ?? 0);
+              if (delta < 0 || delta > g.quantity) {
                 crashes.push(
-                  `scrap ${scrapName}: material ${g.name} delta ${after - before}, expected +${g.quantity}`,
+                  `scrap ${scrapName}: material ${g.name} delta ${delta}, expected 0..${g.quantity}`,
                 );
                 scrapOk = false;
               }
@@ -717,9 +788,15 @@ describe('Domestic / utility quick-action stress (700 in-game days)', () => {
         if (hoursAdvanced < 1 || hoursAdvanced > 8) {
           crashes.push(`rest: advanced ${hoursAdvanced}h (out of [4..7] band)`);
         }
-        // Sanity — stamina shouldn't decrease from rest.
-        if (restAfter.stamina < stamBefore) {
-          crashes.push(`rest: stamina decreased ${stamBefore}→${restAfter.stamina}`);
+        // Sanity — stamina shouldn't decrease from rest, EXCEPT when the
+        // hunger mechanic (added 2026-05-24) is active: rest advances 4-8h,
+        // and advanceTime grows hungerStaminaPenalty, which lowers effective
+        // stamina max. A starving player (this sim never eats) correctly
+        // can't rest their way back up — the clamp to the reduced effective
+        // max nets a decrease. Only a decrease with NO hunger penalty is a
+        // real anomaly.
+        if (restAfter.stamina < stamBefore && (restAfter.hungerStaminaPenalty ?? 0) === 0) {
+          crashes.push(`rest: stamina decreased ${stamBefore}→${restAfter.stamina} (no hunger penalty)`);
         }
         // Rest should top stamina toward max — confirm cap respected.
         if (restAfter.stamina > restAfter.staminaMax) {

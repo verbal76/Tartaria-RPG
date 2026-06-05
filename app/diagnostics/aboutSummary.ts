@@ -18,6 +18,7 @@ import { Platform, Dimensions, PixelRatio } from 'react-native';
 import { OTA_BUILD_ID, DISPLAY_VERSION } from '../buildInfo';
 import { getBuildCodename, getApkCodename } from '../buildCodename';
 import { mlHealthSummary } from './mlHealth';
+import { saveLoadHealthSummary } from './saveLoadHealth';
 
 export function buildBasicDeviceSummary(): string {
   const apkBuild = Application.nativeBuildVersion ?? '(unknown)';
@@ -112,6 +113,11 @@ export function buildBasicDeviceSummary(): string {
     // can be diagnosed as "Qwen is auto-disabled, they're on
     // template narration only" instead of guessing.
     mlHealthSummary(),
+    // arb38 — save-load crash block. Surfaces whether any character
+    // has been closing the app on load (stale cross-version save) and
+    // how many times, so an "app crashes when I open my guy" report is
+    // diagnosed at a glance instead of guessed.
+    saveLoadHealthSummary(),
   ];
   return lines.join('\n');
 }

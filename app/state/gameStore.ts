@@ -41,6 +41,13 @@ import {
   type LoreGenerator,
 } from '../engine/investigationTable';
 import {
+  loadSaveLoadHealth,
+  markSlotLoadStart,
+  markSlotLoadDone,
+  clearSlotCrash,
+  getCrashedSlotIds,
+} from '../diagnostics/saveLoadHealth';
+import {
   listSlots,
   loadSlot,
   saveSlot,
@@ -56,6 +63,7 @@ import {
   type SlotSummary,
 } from '../engine/saveSystem';
 import { makeEntry, persistEntry } from '../engine/gameLog';
+import { activeChallengesAt, challengeActive } from '../engine/locationChallenges';
 import { createCharacter, getRaces, getFactions, type CreateCharacterInput } from '../engine/character';
 import { generateQuest } from '../engine/questGenerator';
 import {
@@ -140,7 +148,7 @@ import {
   type Recipe,
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
-import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, VENDORS, type VendorInstance } from '../engine/vendors';
+import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, VENDORS, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks } from '../engine/raceMechanics';
 import { trainStat, type StatKey } from '../engine/statTraining';
 import { findQuestFactionHint } from '../engine/factionHint';
@@ -153,6 +161,14 @@ import {
   resolveHubTravel,
   isLeaveHubCommand,
 } from '../engine/hub';
+import {
+  getBuilding,
+  getBuildingRoom,
+  buildingEntryRoom,
+  buildingForTile,
+  resolveBuildingRoom,
+  secretRoomRevealedBy,
+} from '../engine/buildings';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
 import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
@@ -258,7 +274,7 @@ import {
   spawnChainEnemy,
   makeStolenDiscs,
 } from '../engine/whispers';
-import { TUTORIAL_STEPS } from '../components/tutorialSteps';
+import { TUTORIAL_STEPS, type TutorialStep } from '../components/tutorialSteps';
 import { findFragmentById, findStoryByFragmentId, pickFragmentForBiome } from '../engine/collectables';
 
 interface Concept {
@@ -301,6 +317,42 @@ function findConcept(targetText: string | undefined): Concept | null {
 
 const allLocations = locationsData as Location[];
 
+/** How many ambient props a single scene/tile surfaces as Search /
+ *  Approach / Salvage / INVESTIGATE chips (and in look-around). Was 8;
+ *  dropped to 5 because a room full of 8-10 pokeable nouns turned
+ *  INVESTIGATE into a tap-grind with no "investigate all" escape hatch.
+ *  Fewer props = fewer taps to clear; the per-noun find chance is
+ *  unchanged, so the odds a room shows the player something still hold. */
+const AMBIENT_DISPLAY_CAP = 5;
+
+/** True only when the player is genuinely STANDING IN their current named
+ *  location — on its map anchor (or inside one of its hub rooms), and not
+ *  mid-journey.
+ *
+ *  Why this exists: `currentLocationId` flips to a new place only on
+ *  ARRIVAL, so it lingers as the DEPARTURE capital for the whole of a
+ *  plotted trip, and it also stays put while you cardinally wander off the
+ *  anchor into open ground. Any check that keys purely off currentLocationId
+ *  — Core recovery, Core-Guardian summon — would otherwise fire miles from
+ *  the city: leave a capital whose Core you haven't taken, throw a punch at
+ *  a wandering Mudling (a Monarch's gate intent is `attack`), and its
+ *  Guardian would materialise in the wilderness. Every arrival snaps the
+ *  player to WORLD_MAP_CENTER, so anchor + no travelTarget == "really here". */
+function isStationedAtNamedLocation(p: PlayerCharacter): boolean {
+  if (p.travelTarget) return false; // mid-journey — the departure city isn't "here"
+  if (p.hubRoomId != null) return true; // inside a building at the location
+  return p.mapX === WORLD_MAP_CENTER_X && p.mapY === WORLD_MAP_CENTER_Y;
+}
+
+/** arb36 — "you stumble on a structure" line for an enterable building
+ *  discovered on a wild tile. Uses the template's article-friendly
+ *  hookLabel ("a leaning shack" → "A leaning shack…"). */
+function buildingApproachLine(buildingId: string): string {
+  const label = getBuilding(buildingId)?.hookLabel ?? 'a structure';
+  const Cap = label.charAt(0).toUpperCase() + label.slice(1);
+  return `${Cap} stands off the path here — weathered and quiet, a way in still clear. (Tap ENTER to step inside.)`;
+}
+
 interface CurrentScene {
   weather: WeatherEntry;
   location: Location;
@@ -312,6 +364,11 @@ interface CurrentScene {
   /** Index of the enemy the player is currently targeting. */
   activeEnemyIdx: number;
   vendor: VendorInstance | null;
+  /** arb36 — id of an enterable structure standing on the player's current
+   *  WILD tile (deterministic via buildingForTile), or null. Surfaces the
+   *  ENTER affordance + narration so buildings are discovered organically
+   *  while exploring, instead of via the old dev "enter <name>" trigger. */
+  sceneBuilding?: string | null;
   /** Distance from the player to the enemy group. Null when peaceful. */
   range: CombatRange | null;
   /** Live narrative hooks the player can follow into multi-stage chains. */
@@ -320,13 +377,20 @@ interface CurrentScene {
    *  scene paragraph mentioned that the player can ask / investigate /
    *  search against. */
   ambientNouns: string[];
-  /** A shuffled 8-noun subset of ambientNouns, fixed for this scene
+  /** A shuffled 5-noun subset of ambientNouns, fixed for this scene
    *  visit. Both look-around AND the chip pool (Search / Approach /
    *  Salvage) read from this exact list — STRICT MATCH: if a noun
    *  isn't in your look, it isn't in your chips either. Hook
    *  primaries are appended on top of chips because they're separate
    *  narrative threads, not ambient props. Set once during
-   *  beginScene; leave and come back to re-roll. */
+   *  beginScene; leave and come back to re-roll.
+   *
+   *  Capped at 5 (was 8): a room shouldn't surface 8-10 things to poke
+   *  at — that turned INVESTIGATE into a tap-grind (open modal → tap
+   *  chip → repeat ~8×) with no "investigate all" to short-circuit it.
+   *  Fewer props means fewer taps to clear the green, and since each
+   *  investigate keeps the same per-noun find chance, the odds of a
+   *  given room showing the player SOMETHING actually hold up. */
   displayedAmbientNouns?: string[];
   /** When this Location maps to a Macro biome in worldLadder.json, the
    *  scene picks a specific Micro-Micro room to flavor the Arbiter's
@@ -334,6 +398,13 @@ interface CurrentScene {
    *  visit reads as one consistent room. Null for legacy/unmapped
    *  locations — the LLM context falls back to flat Location text. */
   microMicroId: string | null;
+  /** Weather changes rarely mid-fight, so the Arbiter announces the
+   *  visibility swing-penalty ("−1 to the swing") ONCE per combat instead
+   *  of on every attack. Holds the weather name we last announced for; the
+   *  arbiter line is suppressed while it matches the current weather, and
+   *  re-fires if the weather actually shifts. Cleared when a fresh combat
+   *  begins (so each new fight gets one reminder). */
+  weatherSwingAnnounced?: string | null;
   /** Slow-weather repositioning progress (Iron Fog etc.). Counts player
    *  advance/retreat actions toward the next range change. Reset to 0
    *  whenever range actually changes, the player switches direction, or
@@ -466,6 +537,308 @@ const cognitive = new CognitiveOrchestrator();
 // reports ready, the narrative pipeline keeps using the existing template
 // pools — there is no degraded mode.
 const qwen = new QwenGenerativeEngine();
+
+// arb43 — Qwen-backed Arbiter persona answer. When an `ask` isn't a map
+// query, a canned introspection line, a structured world-knowledge lookup,
+// or a lore-bank hit, the Arbiter answers IN VOICE via Qwen instead of going
+// silent — so "why are you following me", "do you know me", "what do you
+// want from me", etc. get a real, in-character reply. Guardrails keep him
+// from inventing names / counts / events he cannot know. Returns null when
+// Qwen isn't ready or returns nothing usable, so the caller can fall back to
+// the silent lore line.
+const ARBITER_PERSONA_SYSTEM =
+  "You are the Arbiter: the old, mysterious witness who walks the buried, " +
+  "mud-drowned world of Tartaria beside the traveler. Voice: terse, gruff, " +
+  "weathered, a little cryptic — never cheerful, never modern, never chatty. " +
+  "Canon you may lean on: you had a name before the flood, but it is buried " +
+  "with the city that used it; you do not sleep and do not bleed; you are " +
+  "neither god nor ghost nor relic; the buried country appoints witnesses, " +
+  "and you are one of them. RULES: reply in 1-3 short sentences, in the " +
+  "Arbiter's voice. Do NOT invent proper names of people, places, factions, " +
+  "items, or events, and do NOT state counts or facts you are unsure of — if " +
+  "asked something you cannot know, say it is buried or does not surface. " +
+  "Never mention games, rules, or AI, and never break character.";
+
+async function arbiterPersonaAnswer(question: string): Promise<string | null> {
+  if (!qwen.isReady()) return null;
+  try {
+    const out = await qwen.generate(
+      [
+        { role: 'system', content: ARBITER_PERSONA_SYSTEM },
+        { role: 'user', content: question },
+      ],
+      { maxNewTokens: 90, temperature: 0.7 },
+    );
+    const line = (out ?? '').trim();
+    return line.length > 0 ? line : null;
+  } catch {
+    return null;
+  }
+}
+
+// arb45 — Arbiter title-earning plumbing. `recordTitleProgress` bumps the
+// player's title counters (and folds in max-value fields like maxCorruption),
+// then `awardNewTitles` re-evaluates ALL 14 wired Tier-A/B predicates and
+// awards any newly-satisfied title with an in-voice Arbiter line. Because the
+// evaluation is holistic, the derived titles (golem/scion/explorer/aetherborn)
+// are caught by the periodic catch-all call in the world tick — no per-site
+// wiring needed for those.
+const ARBITER_TITLE_META: Record<string, { title: string; perk: string }> = (() => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const data = require('../data/lore/arbiter-titles.json') as { titles: Array<{ id: string; title: string; perk: string }> };
+  const m: Record<string, { title: string; perk: string }> = {};
+  for (const t of data.titles) m[t.id] = { title: t.title, perk: t.perk };
+  return m;
+})();
+
+function awardNewTitles(getStore: () => GameStore, setStore: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore> | GameStore)) => void): void {
+  const player = getStore().player;
+  if (!player) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { newlyEarnedTitles } = require('../engine/titles');
+  const fresh: string[] = newlyEarnedTitles(player);
+  if (fresh.length === 0) return;
+  setStore((s) => (s.player ? { player: { ...s.player, earnedTitles: [...(s.player.earnedTitles ?? []), ...fresh] } } : s));
+  for (const id of fresh) {
+    const meta = ARBITER_TITLE_META[id];
+    if (!meta) continue;
+    getStore().appendLog(
+      'arbiter',
+      `The Arbiter studies you a long moment. "You have earned a name to carry: ${meta.title}. ${meta.perk}"`,
+    );
+  }
+}
+
+function recordTitleProgress(
+  getStore: () => GameStore,
+  setStore: (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore> | GameStore)) => void,
+  delta?: Record<string, number>,
+  maxes?: Record<string, number>,
+): void {
+  const player = getStore().player;
+  if (!player) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { withTitleProgress } = require('../engine/titles');
+  const next = withTitleProgress(player.titleProgress);
+  const n = next as unknown as Record<string, number>;
+  if (delta) for (const k of Object.keys(delta)) n[k] = (n[k] ?? 0) + (delta[k] ?? 0);
+  if (maxes) for (const k of Object.keys(maxes)) n[k] = Math.max(n[k] ?? 0, maxes[k] ?? 0);
+  setStore((s) => (s.player ? { player: { ...s.player, titleProgress: next } } : s));
+  awardNewTitles(getStore, setStore);
+}
+
+// arb48 — Labyrinth of Shadows (Wayfarer of the Lost Paths). Both helpers are
+// store-driving wrappers around the pure engine in engine/labyrinth.ts.
+type StoreGet = () => GameStore;
+type StoreSet = (u: Partial<GameStore> | ((s: GameStore) => Partial<GameStore> | GameStore)) => void;
+
+function enterLabyrinth(getStore: StoreGet, setStore: StoreSet): void {
+  const player = getStore().player;
+  if (!player) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const lab = require('../engine/labyrinth');
+  const run = lab.startRun();
+  setStore((s) => (s.player ? { player: { ...s.player, labyrinthRun: run } } : s));
+  getStore().appendLog('world', 'You step into the Labyrinth of Shadows. False doors and overlaid corridors fold the dark around you — every map of this place is wrong by design. The heart lies somewhere to the north and east.');
+  getStore().appendLog('arbiter', `"Trust the true path, ${player.name}, not your eyes. Stray too often and the maze keeps you."`);
+  getStore().appendLog('world', `Passages lead: ${lab.openDirections(run.pos).map(lab.dirWord).join(', ')}. (Type a direction — north / east / south / west — or LEAVE to step back out.)`);
+}
+
+/** Handles every input while a maze run is active. Returns true (it always
+ *  consumes the turn) so the caller can early-return. */
+function handleLabyrinthStep(getStore: StoreGet, setStore: StoreSet, trimmed: string): boolean {
+  const player = getStore().player;
+  const run = player?.labyrinthRun;
+  if (!player || !run) return false;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const lab = require('../engine/labyrinth');
+  const openLine = (open: string[]) => open.map(lab.dirWord).join(', ');
+
+  if (/^\s*(leave|exit|out|step\s+out|give\s+up|abandon|back\s+out|stop)\s*$/i.test(trimmed)) {
+    setStore((s) => (s.player ? { player: { ...s.player, labyrinthRun: undefined } } : s));
+    getStore().appendLog('world', 'You retrace your steps to the mouth of the maze and step back out into Iskan-Veil.');
+    return true;
+  }
+  const dir = lab.parseDir(trimmed);
+  if (!dir) {
+    getStore().appendLog('world', `Inside the maze you can only move. Passages lead: ${openLine(lab.openDirections(run.pos))}. Type a direction, or LEAVE.`);
+    return true;
+  }
+  const res = lab.step(run, dir);
+  if (res.blocked) {
+    getStore().appendLog('world', `A false wall — the corridor doesn't run ${lab.dirWord(dir).toLowerCase()}. Passages lead: ${openLine(res.open)}.`);
+    return true;
+  }
+  setStore((s) => (s.player ? { player: { ...s.player, labyrinthRun: res.run } } : s));
+  if (res.reachedFinish) {
+    const clean = lab.isCleanRun(res.run);
+    setStore((s) => (s.player ? { player: { ...s.player, labyrinthRun: undefined } } : s));
+    if (clean) {
+      getStore().appendLog('world', "The corridors open onto a still chamber at the maze's heart. You walked it clean — the true path never left your hands.");
+      recordTitleProgress(getStore, setStore, { labyrinthCleanRuns: 1 });
+    } else {
+      const n = res.run.wrongTurns;
+      getStore().appendLog('world', `You reach the heart of the maze — but you strayed ${n} time${n === 1 ? '' : 's'} onto false paths along the way.`);
+      getStore().appendLog('arbiter', '"You found the center, not the path. The Wayfarer\'s name is for those who never lose it. Walk it again — cleaner."');
+    }
+    return true;
+  }
+  if (res.deadEnd) {
+    getStore().appendLog('world', `Dead end — the corridor stops at a blank wall. This was never the way. Passages lead: ${openLine(res.open)}.`);
+  } else if (res.enteredBranch) {
+    getStore().appendLog('world', `The passage narrows and the air sours — this feels wrong. Passages lead: ${openLine(res.open)}.`);
+  } else {
+    getStore().appendLog('world', `You follow the corridor ${lab.dirWord(dir).toLowerCase()}. Passages lead: ${openLine(res.open)}.`);
+  }
+  return true;
+}
+
+// arb50 — content-review Tier-C trials (Speaker @ Red Tower, Warden @ Sinking
+// Cathedral). SCOUTING is free + informative; ATTEMPTING is one-shot. Lacking
+// the required material refuses the attempt WITHOUT consuming it. `def` is the
+// already-matched TitleChallengeDef for the player's current location.
+function handleTitleChallenge(getStore: StoreGet, setStore: StoreSet, trimmed: string, def: any): void {
+  const player = getStore().player;
+  if (!player) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const tc = require('../engine/titleChallenges');
+  const req = def.requirement;
+  const countOf = (name: string) =>
+    player.inventory.filter((i) => i.name === name).reduce((s, i) => s + (i.quantity ?? 1), 0);
+  const intVal = effectiveStats(player)[def.check.stat as 'intelligence'] ?? 0;
+  const reqLine = `${req.quantity > 1 ? `${req.quantity}× ` : ''}${req.itemName}`;
+  const isAttempt = def.attemptVerb.test(trimmed);
+
+  // ── SCOUT (free) ──────────────────────────────────────────────────────────
+  if (!isAttempt) {
+    let have = countOf(req.itemName);
+    if (req.recoverOnScout && have < req.quantity) {
+      const res = grantItem(player.inventory, {
+        id: `${req.itemName.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_${Date.now()}`,
+        name: req.itemName, kind: 'misc', quantity: req.quantity, tags: ['quest', 'challenge'],
+        description: 'A cryptic device for deciphering Tartarian runes.',
+      });
+      setStore((s) => (s.player ? { player: { ...s.player, inventory: res.inventory } } : s));
+      have = req.quantity;
+      getStore().appendLog('reward', `✦ ${req.itemName} (Uncommon).`);
+    }
+    const status = getStore().player?.challengeAttempts?.[def.id];
+    if (status === 'succeeded') { getStore().appendLog('world', `You have already mastered this — the title is yours.`); return; }
+    if (status === 'failed') { getStore().appendLog('world', `Your one attempt here is spent.`); return; }
+    const haveLine = have >= req.quantity
+      ? `You have what you need (${reqLine}).`
+      : `You still need ${req.hint}.`;
+    getStore().appendLog(
+      'world',
+      `${haveLine} The trial is ${def.check.trialLabel}: a single d20 + ${def.check.statLabel} (yours: ${intVal}) against DC ${def.check.dc}. ` +
+      `${have >= req.quantity ? `Attempt it when ready — you get one chance.` : `Come back when you have it.`}`,
+    );
+    return;
+  }
+
+  // ── ATTEMPT (one-shot) ────────────────────────────────────────────────────
+  const status = player.challengeAttempts?.[def.id];
+  if (status === 'succeeded') { getStore().appendLog('world', `You've already earned this title — nothing more to prove here.`); return; }
+  if (status === 'failed') { getStore().appendLog('world', `You had your one attempt, and it's spent. This trial gives no second chance.`); return; }
+  const have = countOf(req.itemName);
+  if (have < req.quantity) {
+    // refuse WITHOUT consuming the attempt
+    getStore().appendLog('world', `You can't make the attempt yet — you need ${req.hint}. (Your one attempt is untouched; return when you're ready.)`);
+    return;
+  }
+  // Commit. Consume materials if required.
+  let inv = player.inventory;
+  if (req.consumeOnAttempt) {
+    let toRemove = req.quantity;
+    inv = inv
+      .map((it) => {
+        if (it.name !== req.itemName || toRemove <= 0) return it;
+        const take = Math.min(it.quantity ?? 1, toRemove);
+        toRemove -= take;
+        return { ...it, quantity: (it.quantity ?? 1) - take };
+      })
+      .filter((it) => (it.quantity ?? 1) > 0);
+  }
+  const r = tc.rollCheck(intVal, def.check.dc);
+  const attempts = { ...(player.challengeAttempts ?? {}), [def.id]: r.success ? 'succeeded' : 'failed' };
+  setStore((s) => (s.player ? { player: { ...s.player, inventory: inv, challengeAttempts: attempts } } : s));
+  const rollLine = `(d20 ${r.roll} + ${def.check.statLabel} ${intVal} = ${r.total} vs DC ${r.dc})`;
+  if (r.success) {
+    if (def.id === 'tongue_of_the_red_tower') {
+      getStore().appendLog('world', `The glyphs resolve under the Glyph-Key's tongue — meaning pours in. You can read the dead language now. ${rollLine}`);
+    } else {
+      getStore().appendLog('world', `The braces hold. The nave groans, settles, and stands. You've kept a piece of the old world from the dark. ${rollLine}`);
+    }
+    recordTitleProgress(getStore, setStore, { [def.counter]: 1 });
+  } else {
+    if (def.id === 'tongue_of_the_red_tower') {
+      getStore().appendLog('world', `The glyphs blur and scatter; the reading collapses into noise. ${rollLine}`);
+    } else {
+      getStore().appendLog('world', `The braces buckle. A section of the nave caves in with a roar of stone — the shoring is wasted. ${rollLine}`);
+    }
+    getStore().appendLog('arbiter', `"One chance, and it's gone. Some trials don't forgive."`);
+  }
+}
+
+// arb53 — Guild Broker (Parley Ground). Two non-allied faction leaders each
+// demand their faction's coveted relic; fetch both and return to seal the
+// alliance. No dice — a fetch-and-return, so it can't be failed. `seal` routes
+// the turn-in; otherwise it's a (free) parley that opens / reports the mission.
+function handleBroker(getStore: StoreGet, setStore: StoreSet, trimmed: string, seal: boolean): void {
+  const player = getStore().player;
+  if (!player) return;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const broker = require('../engine/broker');
+  const tileName = (id: string) => getLocationById(id)?.name ?? id;
+  let mission = player.brokerMission;
+
+  if (seal) {
+    if (!mission) { getStore().appendLog('world', 'No parley is underway. Approach the leaders first.'); return; }
+    if (mission.done) { getStore().appendLog('world', 'You have already brokered this alliance.'); return; }
+    const legs = broker.missionLegs(mission);
+    if (!legs) return;
+    const has = (name: string) => player.inventory.some((i) => i.name === name);
+    const missing = legs.filter((l: any) => !has(l.itemName));
+    if (missing.length > 0) {
+      getStore().appendLog('world',
+        `The leaders wait. You still owe: ${missing.map((l: any) => `${l.itemName} for ${l.factionName} (at ${tileName(l.tileId)})`).join('; ')}.`);
+      return;
+    }
+    // consume one of each relic, seal the pact
+    let inv = player.inventory;
+    for (const l of legs) {
+      let removed = false;
+      inv = inv
+        .map((it) => {
+          if (removed || it.name !== l.itemName) return it;
+          removed = true;
+          return { ...it, quantity: (it.quantity ?? 1) - 1 };
+        })
+        .filter((it) => (it.quantity ?? 1) > 0);
+    }
+    setStore((s) => (s.player ? { player: { ...s.player, inventory: inv, brokerMission: { ...mission!, done: true } } } : s));
+    getStore().appendLog('world',
+      `You lay both relics on the parley stone. ${legs[0].factionName} and ${legs[1].factionName} take their due — and, grudgingly, each other's hand. The alliance is brokered.`);
+    recordTitleProgress(getStore, setStore, { alliancesBrokered: 1 });
+    return;
+  }
+
+  // Parley (free): open a mission or report its state.
+  if (!mission) {
+    const picked = broker.pickBrokerFactions(player.factionId, player.factionStanding ?? []);
+    if (!picked) { getStore().appendLog('world', 'No two factions will sit with you on neutral ground right now.'); return; }
+    mission = { factionA: picked[0], factionB: picked[1] };
+    setStore((s) => (s.player ? { player: { ...s.player, brokerMission: mission } } : s));
+  }
+  if (mission.done) { getStore().appendLog('world', 'The alliance you brokered here holds.'); return; }
+  const legs = broker.missionLegs(mission);
+  if (!legs) return;
+  const has = (name: string) => player.inventory.some((i) => i.name === name);
+  const line = legs.map((l: any) =>
+    `${l.factionName} demands the ${l.itemName} (${has(l.itemName) ? 'in hand ✓' : `recover it at ${tileName(l.tileId)}`})`).join('; ');
+  getStore().appendLog('world',
+    `Two leaders face off across the parley stone. ${line}. Bring both, then SEAL THE ALLIANCE.`);
+}
 
 // OTA-223 — background dormancy watchdog. Polls every 60s; if Qwen
 // reports isDormant() (the OOM-killed state where status==='ready'
@@ -648,6 +1021,23 @@ const BODY_VERB_PART: Record<string, string> = {
  *  remarks were authored to react to). */
 const CORRUPTION_MAX = 50;
 const TRAVEL_MIN_STAMINA = STAMINA_COSTS.travel;
+
+// arb41 — short "you can't do that" buzz for refused-movement feedback,
+// mirroring the InputBox quick-action buzz (Vibration.vibrate(30)). The
+// user asked for a physical signal on a 0-stamina move so the block reads
+// without staring at the crawl. RN's core Vibration is already linked +
+// permitted in the shipped build (the tutorial wrong-button buzz uses the
+// very same call), so this rides an OTA — no native change. Inline-required
+// + try/caught so the engine stays import-clean and jest (which mocks
+// react-native) is unaffected; on web / missing-permission it no-ops.
+function buzzBlocked(): void {
+  try {
+    const { Vibration, Platform } = require('react-native');
+    if (Platform?.OS !== 'web') Vibration?.vibrate?.(30);
+  } catch {
+    /* no haptics available — ignore */
+  }
+}
 
 /** Pick a single distinctive keyword from a contract title for the
  *  "Say 'accept X' to take it" hint. Returns the LAST word ≥ 4 chars
@@ -868,16 +1258,14 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     // old grid's max valid index was 20 but the canonical "just
     // arrived" value was 10) and snap to the new center. Saves
     // already at the new center pass through untouched.
-    mapX: (() => {
-      if (typeof p.mapX !== 'number') return WORLD_MAP_CENTER_X;
-      if (p.mapX <= 14 && (typeof p.mapY !== 'number' || p.mapY <= 14)) return WORLD_MAP_CENTER_X;
-      return p.mapX;
-    })(),
-    mapY: (() => {
-      if (typeof p.mapY !== 'number') return WORLD_MAP_CENTER_Y;
-      if (p.mapY <= 14 && (typeof p.mapX !== 'number' || p.mapX <= 14)) return WORLD_MAP_CENTER_Y;
-      return p.mapY;
-    })(),
+    // arb29 — the world was recalibrated to canonical 82×41 positions
+    // (center 20,20 → 41,20), so old mapX/mapY offsets no longer map to the
+    // new geometry. Snap every loaded save to the new center; the player is
+    // treated as standing at their current location (re-centered model), and
+    // any in-progress journey re-plots from there. New characters + location
+    // arrivals already use the new center via character.ts / travelTo.
+    mapX: WORLD_MAP_CENTER_X,
+    mapY: WORLD_MAP_CENTER_Y,
     // OTA-120 — Dog Companion default for legacy saves. null = no
     // dog acquired yet; rescue hooks fire normally on the player's
     // next investigation of a matching scene archetype.
@@ -900,23 +1288,17 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     travelTarget: (() => {
       const t = p.travelTarget;
       if (!t) return undefined;
-      if (typeof t.distanceRemaining === 'number') return t;
+      // arb29 — recompute the distance from the new canonical map + the
+      // (snapped) center, since the geometry was recalibrated. The player
+      // resumes their journey from their current location.
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const { generateWorldMap, WORLD_MAP_CENTER_X: cx, WORLD_MAP_CENTER_Y: cy } = require('../engine/worldMap');
       const seed = p.mapSeed ?? `${p.name}|${p.raceId}|${p.factionId}|legacy`;
       const map = generateWorldMap(seed, p.currentLocationId);
       const tgtPos = map.positions[t.locationId];
       if (!tgtPos) return undefined; // bearing lost — clear cleanly
-      const fromX = typeof p.mapX === 'number' ? p.mapX : cx;
-      const fromY = typeof p.mapY === 'number' ? p.mapY : cy;
-      const tiles = Math.abs(tgtPos.x - fromX) + Math.abs(tgtPos.y - fromY);
-      if (tiles === 0 && p.currentLocationId !== t.locationId) {
-        // Counter would land at 0 but player is NOT actually at the
-        // target — the relative-map coord coincidence the playtester
-        // hit. Clear the travelTarget so the player sees STOPPED and
-        // can re-set explicitly.
-        return undefined;
-      }
+      const tiles = Math.abs(tgtPos.x - cx) + Math.abs(tgtPos.y - cy);
+      if (tiles === 0 && p.currentLocationId !== t.locationId) return undefined;
       return { locationId: t.locationId, distanceRemaining: tiles };
     })(),
   };
@@ -1100,6 +1482,171 @@ function restoreStamina(player: PlayerCharacter, amount: number): PlayerCharacte
   });
 }
 
+// Tungsten Spire — tutorial prop catalog. The Arbiter walks the
+// player through TAKE (cudgel), typed-input TAKE (rope), SCRAP
+// (broken chest plate), and the eventual note that points at the
+// Aetheric Cores. Each entry resolves to a pre-stamped InventoryItem
+// when the tutorial state machine grants it.
+type TutorialPropId = 'cudgel' | 'rope' | 'chestPlate' | 'note';
+
+function makeTutorialItem(id: TutorialPropId): InventoryItem | null {
+  switch (id) {
+    case 'cudgel':
+      // Catalog row already exists in weapons.json — stampDurability
+      // pulls the right baseDurability from there. The auto-equip
+      // happens at grant time in tutorialPath below.
+      return stampDurability({
+        id: `tutorial_cudgel_${Date.now()}`,
+        name: 'Cudgel',
+        kind: 'weapon',
+        rarity: 'Common',
+        quantity: 1,
+        tags: ['weapon', 'club', 'melee', 'improvised', 'weighted', 'emergency'],
+        description: 'A stick with a fat stone lashed to its head with rag. Slow swing, heavy landing. The lashing loosens.',
+      });
+    case 'rope':
+      return {
+        id: `tutorial_rope_${Date.now()}`,
+        name: "Reclaimer's Rope",
+        kind: 'misc',
+        rarity: 'Common',
+        quantity: 1,
+        tags: ['climb', 'rope', 'fiber'],
+        description: 'Reinforced rope woven with Aetheric fibers. Withstands Aetheric anomalies and high tension.',
+      };
+    case 'chestPlate':
+      // Pure prop — only ever shows up in the outpost during the
+      // scrap beat; grants nothing useful, exists only so the
+      // SCRAP flow has a target.
+      return stampDurability({
+        id: `tutorial_chest_plate_${Date.now()}`,
+        name: 'Broken Chest Plate',
+        kind: 'armor',
+        rarity: 'Common',
+        quantity: 1,
+        tags: ['armor', 'broken', 'plate', 'metal', 'fiber'],
+        description: 'A rusted breastplate, snapped across the shoulder strap. The plate itself is salvageable for the metal.',
+      });
+    case 'note':
+      return {
+        id: `tutorial_note_${Date.now()}`,
+        name: 'Folded Note',
+        kind: 'misc',
+        rarity: 'Common',
+        quantity: 1,
+        tags: ['note', 'quest', 'lore'],
+        description: 'A torn page. Hand-inked: "Find your way to the cores. The Guardians keep them. Walk the road to any Capital and the Aether will lead you the rest of the way."',
+      };
+  }
+}
+
+function grantTutorialItem(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  id: TutorialPropId,
+): void {
+  const player = get().player;
+  if (!player) return;
+  if (get().tutorialPropsConsumed[id]) return;
+  const item = makeTutorialItem(id);
+  if (!item) return;
+  set((s) => {
+    if (!s.player) return {};
+    // Add to inventory + mark consumed.
+    const inventory = [...s.player.inventory, item];
+    let equipped = s.player.equipped;
+    // Auto-equip the cudgel to weapon slot if the player has nothing
+    // better there. Keeps the post-tutorial player combat-ready.
+    if (id === 'cudgel' && (!equipped?.main || equipped.main.includes('barehand'))) {
+      equipped = { ...(equipped ?? {}), main: 'Cudgel' };
+    }
+    return {
+      player: { ...s.player, inventory, equipped },
+      tutorialPropsConsumed: { ...s.tutorialPropsConsumed, [id]: true },
+    };
+  });
+}
+
+// arb25 — patch the live scene to reflect a building room: its interactables
+// become the scene's ambient nouns (so LOOK / take / search / investigate
+// operate on the room), the scene-bar label shows "Building · Room", and any
+// wilderness vendor / hooks are cleared (you're indoors). Combat fields are
+// left untouched — buildings are entered from peaceful scenes.
+function patchSceneForBuildingRoom(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  buildingId: string,
+  roomId: string,
+): void {
+  const b = getBuilding(buildingId);
+  const room = getBuildingRoom(buildingId, roomId);
+  if (!b || !room) return;
+  // Market stalls mint a fresh trader (random stock) each time you step up.
+  const stallVendor = room.stallCategory
+    ? buildStallVendor(room.stallCategory, room.shortName)
+    : null;
+  set((s) => {
+    if (!s.currentScene) return {};
+    // arb39 — drop interactables already taken/salvaged in this building
+    // room so they don't respawn on re-entry (no farm loop). Keyed by the
+    // same room key the take/salvage handlers write to.
+    const p = s.player;
+    const roomKey = p
+      ? makeRoomKey(p.currentLocationId, s.currentScene.microMicroId, p.mapX, p.mapY, p.hubRoomId)
+      : null;
+    const consumed = roomConsumedSet(s.worldMemory, roomKey);
+    const nouns = room.interactables.filter((n) => !isConsumedNoun(consumed, n));
+    return {
+      currentScene: {
+        ...s.currentScene,
+        ambientNouns: nouns,
+        displayedAmbientNouns: nouns,
+        transitArea: `${b.name} · ${room.shortName}`,
+        // Indoors is peaceful — clear any wilderness combat / hooks.
+        enemies: [],
+        enemyHps: [],
+        activeEnemyIdx: 0,
+        range: null,
+        vendor: stallVendor,
+        hooks: [],
+      },
+    };
+  });
+}
+
+// Tungsten Spire — default-name generator for a player who skips the
+// tutorial before the Arbiter's name beat. Pairs a random flavor
+// adjective with the singular form of their race (e.g. "Dusty Reclaimer",
+// "Confused Aetherborn"). raceId is already a singular snake_case noun,
+// so title-casing it yields the race name; unknown/empty race falls back
+// to "Wanderer".
+// 25 flavor adjectives, paired with the singular race noun for a
+// Reddit-style generic handle ("Dusty Reclaimer", "Confused Aetherborn").
+const DEFAULT_NAME_ADJECTIVES = [
+  'Dusty', 'Confused', 'Weary', 'Ashen', 'Rusted',
+  'Grim', 'Wary', 'Hollow', 'Wandering', 'Nameless',
+  'Cracked', 'Sullen', 'Ragged', 'Bleary', 'Scarred',
+  'Muddy', 'Restless', 'Quiet', 'Forsaken', 'Lost',
+  'Cinderbound', 'Half-Awake', 'Stubborn', 'Brooding', 'Wayward',
+] as const;
+
+export function raceSingular(raceId: string | null | undefined): string {
+  if (!raceId) return 'Wanderer';
+  return raceId
+    .split('_')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+export const DEFAULT_NAME_ADJECTIVE_POOL = DEFAULT_NAME_ADJECTIVES;
+
+export function generateDefaultName(raceId: string | null | undefined): string {
+  const adj = DEFAULT_NAME_ADJECTIVES[
+    Math.floor(Math.random() * DEFAULT_NAME_ADJECTIVES.length)
+  ]!;
+  return `${adj} ${raceSingular(raceId)}`;
+}
+
 interface GameStore {
   player: PlayerCharacter | null;
   worldMemory: WorldMemory;
@@ -1158,11 +1705,69 @@ interface GameStore {
   weaponResistStreak: { enemyName: string; damageType: string; count: number } | null;
   /** Set when a slot load fails — UI surfaces this and offers recovery. */
   slotLoadError: string | null;
+  /** arb38 — ids of slots that crashed the app on load last session
+   *  (native abort, detected via the save-load breadcrumb on boot).
+   *  The title screen flags these and intercepts the tap to offer
+   *  Retry / Delete BEFORE re-running the crashing load. */
+  crashedSlotIds: string[];
   /** Current tutorial step index, or null when no tutorial is active. */
   tutorialStep: number | null;
   /** When set, the vendor screen displays this stub vendor for the
    *  tutorial's trading-screen step. Cleared on tutorial end. */
   tutorialDemoVendor: VendorInstance | null;
+  /** Tungsten Spire — when true, the next submitted text input is
+   *  treated as the player's name (instead of going through the verb
+   *  parser). Set by startNewGame when the name beat is active;
+   *  cleared the moment the player provides a name or skips the
+   *  tutorial. Drives the in-feed Arbiter name prompt. */
+  awaitingTutorialName: boolean;
+  /** Door-open branch — true once the player taps EXPLORE on the
+   *  explore_or_leave choice popup. While true the popup stays hidden and
+   *  the player free-roams the outpost until they leave (typed 'leave
+   *  outpost', the OUT chip, or a cardinal step out the gate), at which
+   *  point finishOutpostTutorial advances to the main_quest beat. Cleared
+   *  when the beat advances or the tutorial ends. */
+  tutorialExploreChosen: boolean;
+  /** arb25 — enterable-building state (flooded house / shack / shed /
+   *  market / outpost templates). activeBuildingId = which template you're
+   *  inside (null = out in the world); activeBuildingRoomId = current room;
+   *  buildingRevealed = secret room ids unlocked this visit. Transient (not
+   *  persisted) — saving inside a building reloads you outside. */
+  activeBuildingId: string | null;
+  activeBuildingRoomId: string | null;
+  buildingRevealed: string[];
+  /** The exact wild scene the player entered the building FROM. Restored
+   *  on EXIT so they come back out at the same spot, same weather, and
+   *  (critically) the same plotted course / distance — entering a building
+   *  is never a travel step. */
+  preBuildingScene: CurrentScene | null;
+  enterBuilding: (buildingId: string) => void;
+  goBuildingRoom: (roomId: string) => void;
+  exitBuilding: () => void;
+  revealBuildingRoom: (roomId: string) => void;
+  /** Tungsten Spire — has the player taken the tutorial cudgel /
+   *  rope / chest plate / note yet? Gates per-prop narration so the
+   *  Arbiter doesn't repeat the same line after the player walks back
+   *  into the outpost. Resets only on skipTutorial (consumed). */
+  tutorialPropsConsumed: {
+    cudgel: boolean;
+    rope: boolean;
+    chestPlate: boolean;
+    note: boolean;
+  };
+  /** Tungsten Spire — `maybeAdvanceTutorial(beatId)` advances the
+   *  tutorial only if the current beat matches. Used by action
+   *  handlers to advance after a verb resolves without coupling them
+   *  to step index numbers. */
+  maybeAdvanceTutorial: (beatId: string) => void;
+  /** Door-open branch (explore_or_leave beat). chooseTutorialExplore →
+   *  player keeps poking around; the Arbiter explains how to leave when
+   *  ready. chooseTutorialLeave → walk out the gate now. Both ultimately
+   *  reach the main_quest beat via finishOutpostTutorial, which also fires
+   *  when the player leaves the outpost by any means during this beat. */
+  chooseTutorialExplore: () => void;
+  chooseTutorialLeave: () => void;
+  finishOutpostTutorial: () => void;
 
   slots: SlotSummary[];
   activeSlotId: string | null;
@@ -1247,6 +1852,13 @@ interface GameStore {
   pendingInputDraft: string | null;
   queueInputDraft: (text: string) => void;
   consumeInputDraft: () => string | null;
+  /** True while a popup that owns a text field (Ask the Arbiter,
+   *  Search, Salvage, Approach) is open on the Exploration screen.
+   *  The floating KeyboardInputBar checks this and hides itself so it
+   *  can't mount behind the modal and steal focus from the modal's own
+   *  (visible, keyboard-avoided) text field. Set by ExplorationScreen. */
+  inputModalOpen: boolean;
+  setInputModalOpen: (open: boolean) => void;
 
   hydrate: () => Promise<void>;
   setScreen: (screen: ScreenName) => void;
@@ -1589,8 +2201,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
   aetherStatPickerOpen: false,
   pendingAetherFoodId: null,
   slotLoadError: null,
+  crashedSlotIds: [],
   tutorialStep: null,
   tutorialDemoVendor: null,
+  awaitingTutorialName: false,
+  tutorialExploreChosen: false,
+  activeBuildingId: null,
+  activeBuildingRoomId: null,
+  buildingRevealed: [],
+  preBuildingScene: null,
+  tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false },
 
   slots: [],
   activeSlotId: null,
@@ -1607,6 +2227,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   pendingOtaAppliedFrom: null,
   pendingOTAUpdate: false,
   pendingInputDraft: null,
+  inputModalOpen: false,
   cognitiveModelInfo: null,
 
   qwenStatus: 'idle',
@@ -1629,6 +2250,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
   async hydrate() {
     // One-shot migration from the v1 single-slot save, if present.
     await migrateLegacySlotIfPresent();
+    // arb38 — read the save-load crash breadcrumb BEFORE any slot can
+    // be loaded. If last session died mid-load (native abort on a
+    // stale cross-version save), this flags the offending slot so the
+    // title screen can offer Retry / Delete instead of re-crashing.
+    let crashedSlotIds: string[] = [];
+    try {
+      await loadSaveLoadHealth();
+      crashedSlotIds = getCrashedSlotIds();
+    } catch { /* health is best-effort — never block boot on it */ }
     const activeId = await loadActiveSlotId();
     const slots = await listSlots();
     // OTA 454 — first-install Resurrection Gem seed. Idempotent: only
@@ -1764,6 +2394,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       resurrectionGems: stash.resurrectionGems,
       currentScreen: 'title',
       hydrated: true,
+      crashedSlotIds,
       justUpdatedFromBuild,
       // OTA-100 — parallel flag with the same source value but
       // a different lifecycle. justUpdatedFromBuild gets cleared
@@ -2036,6 +2667,79 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ pendingInputDraft: text });
   },
 
+  setInputModalOpen(open) {
+    if (get().inputModalOpen !== open) set({ inputModalOpen: open });
+  },
+
+  // ── Enterable buildings (arb25) ──────────────────────────────────────
+  enterBuilding(buildingId) {
+    const b = getBuilding(buildingId);
+    const entry = buildingEntryRoom(buildingId);
+    if (!b || !entry) return;
+    // Can't duck indoors mid-fight — that left combat running inside the
+    // building and read as the rooms "cycling" with the enemy still active.
+    const scene = get().currentScene;
+    if (scene && scene.enemies && scene.enemies.length > 0) {
+      get().appendLog('world', 'Not while something has its eyes on you. Deal with the threat first.');
+      return;
+    }
+    set({
+      activeBuildingId: buildingId,
+      activeBuildingRoomId: entry.id,
+      buildingRevealed: [],
+      // Snapshot the wild tile so EXIT returns here unchanged (no re-roll,
+      // no travel step, same plotted distance to the city).
+      preBuildingScene: scene ?? null,
+    });
+    get().appendLog('world', `You step inside ${b.name.toLowerCase()}, into ${entry.name.toLowerCase()}.`);
+    get().appendLog('world', entry.description);
+    patchSceneForBuildingRoom(get, set, buildingId, entry.id);
+  },
+  goBuildingRoom(roomId) {
+    const id = get().activeBuildingId;
+    if (!id) return;
+    const room = getBuildingRoom(id, roomId);
+    if (!room) return;
+    if (roomId === get().activeBuildingRoomId) return;
+    // Hidden rooms can't be walked into until revealed.
+    if (room.secret && !get().buildingRevealed.includes(roomId)) return;
+    const p = get().player;
+    if (p) set({ player: advanceTime(spendStamina(p, 1), 0.25) });
+    set({ activeBuildingRoomId: roomId });
+    get().appendLog('world', `You step into ${room.name.toLowerCase()}.`);
+    get().appendLog('world', room.description);
+    patchSceneForBuildingRoom(get, set, id, roomId);
+  },
+  exitBuilding() {
+    const id = get().activeBuildingId;
+    if (!id) return;
+    const b = getBuilding(id);
+    const snap = get().preBuildingScene;
+    set({ activeBuildingId: null, activeBuildingRoomId: null, buildingRevealed: [], preBuildingScene: null });
+    get().appendLog('world', `You step back outside${b ? `, leaving ${b.name.toLowerCase()} behind` : ''}.`);
+    if (snap) {
+      // Restore the exact tile you entered from — same weather + spot, and
+      // the plotted course / distance untouched (a building is not a step).
+      set({ currentScene: snap });
+    } else {
+      // No snapshot (e.g. entered via a code path that didn't save one) —
+      // fall back to a fresh scene at the current position.
+      get().beginScene({ skipHubEntry: true });
+    }
+  },
+  revealBuildingRoom(roomId) {
+    const id = get().activeBuildingId;
+    if (!id || get().buildingRevealed.includes(roomId)) return;
+    const room = getBuildingRoom(id, roomId);
+    set({ buildingRevealed: [...get().buildingRevealed, roomId] });
+    get().appendLog(
+      'world',
+      room
+        ? `Hidden until now: ${room.name} opens up. It joins the rooms you can reach.`
+        : 'A hidden way opens up.',
+    );
+  },
+
   consumeInputDraft() {
     const draft = get().pendingInputDraft;
     if (draft !== null) set({ pendingInputDraft: null });
@@ -2049,6 +2753,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   async loadSlotIntoGame(slotId) {
     set({ slotLoadError: null });
+    // Cut the title screen's "Choose your character" line the moment a
+    // character is picked. Otherwise it keeps inferring + playing in Kokoro
+    // and the "Welcome back" line queues behind it (inference is serialized),
+    // which is the multi-second gap before the greeting is spoken.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      void require('../voice/TTSManager').stopAndClear();
+    } catch { /* TTS not loaded yet — fine */ }
     let saved;
     try {
       saved = await loadSlot(slotId);
@@ -2066,6 +2778,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
     if (saved.player.dead === true) return; // Dead characters need a Resurrection Gem first.
+    // arb38 — drop a "loading this slot" breadcrumb (durably flushed)
+    // BEFORE the hydration below. If hydrating a stale cross-version
+    // save drives native code into a SIGSEGV/SIGABRT, the process dies
+    // before any catch runs and this breadcrumb survives — the next
+    // boot reads it and flags this slot so the player gets Retry/Delete
+    // instead of an instant re-crash. Cleared on success and in the
+    // catch below; only a true native abort leaves it behind.
+    await markSlotLoadStart(slotId);
     try {
       await setActiveSlot(slotId);
       const player = backfillPlayer(saved.player);
@@ -2160,6 +2880,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         gameLog: saved.gameLog,
         currentScreen: 'exploration',
         activeSlotId: slotId,
+        // arb25 — never resume "inside a building" (building state is transient).
+        activeBuildingId: null,
+        activeBuildingRoomId: null,
+        buildingRevealed: [],
         currentScene: restoredScene,
         pendingRolls: null,
   pendingHookContinue: null,
@@ -2259,8 +2983,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
         lastWelcomeBackAt = now;
       }
+      // arb38 — hydration completed cleanly. Clear the in-progress
+      // breadcrumb so this load isn't mistaken for a crash, and clear
+      // any prior crash flag on this slot (it loads fine now). Refresh
+      // crashedSlotIds so a previously-flagged tile un-flags live.
+      await markSlotLoadDone();
+      try {
+        const remaining = await clearSlotCrash(slotId);
+        set({ crashedSlotIds: remaining });
+      } catch { /* best-effort — flag clears on next boot regardless */ }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
+      // arb38 — a JS-caught error is NOT a native crash; clear the
+      // breadcrumb so it isn't counted as one on the next boot. (The
+      // slot's existing crash flag, if any, is left intact — only a
+      // clean load clears that.)
+      await markSlotLoadDone();
       // Roll the active slot back so we don't leave a half-set state.
       // CRITICAL: also clear the in-memory activeSlotId — otherwise the
       // next persist() will write player=null over the slot's storage
@@ -2320,11 +3058,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   async deleteSlotById(slotId) {
     await deleteSlot(slotId);
+    // arb38 — the slot is gone; drop any load-crash flag it carried so
+    // a fresh character reusing logic doesn't inherit a stale warning.
+    let crashedSlotIds = get().crashedSlotIds;
+    try {
+      crashedSlotIds = await clearSlotCrash(slotId);
+    } catch { /* best-effort */ }
     const slots = await listSlots();
     const activeId = getActiveSlotId();
     set({
       slots,
       activeSlotId: activeId,
+      crashedSlotIds,
       // If we just deleted the currently-loaded character, drop player state too.
       ...(get().activeSlotId === slotId
         ? { player: null, gameLog: [], currentScene: null, pendingRolls: null, pendingHookContinue: null }
@@ -2338,10 +3083,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   async startNewGame(input) {
-    const player = createCharacter(input);
+    // Cut the title's "Choose your character" line so the name prompt isn't
+    // queued behind it in Kokoro (same delay as the welcome-back on resume).
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      void require('../voice/TTSManager').stopAndClear();
+    } catch { /* TTS not loaded yet — fine */ }
+    // Tungsten Spire — accept an empty name. The Arbiter asks the
+    // player for their name in the outpost (tutorial beat 0). For
+    // the brief window between createCharacter and the player's
+    // first input, player.name is an empty string; opening narration
+    // weaves around it via buildOpening. Character creation itself
+    // doesn't care — createCharacter writes player.name = '' and
+    // the tutorial overrides it on the first input.
+    const player = createCharacter({ ...input, name: input.name ?? '' });
     const memory = discoverLocation(emptyMemory(), player.currentLocationId);
-    // Each new character gets its own save slot; switch the active slot
-    // pointer so subsequent persist() writes go to it.
     const slotId = newSlotId();
     await setActiveSlot(slotId);
     set({
@@ -2351,26 +3107,41 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentScreen: 'exploration',
       currentScene: null,
       pendingRolls: null,
-  pendingHookContinue: null,
+      pendingHookContinue: null,
       activeSlotId: slotId,
+      // Tungsten Spire — reset tutorial-props ledger for the new
+      // character. Old characters loaded via loadSlotIntoGame don't
+      // hit this path; their hasSeenIntro stays true and the tutorial
+      // never fires.
+      tutorialPropsConsumed: { cudgel: false, rope: false, chestPlate: false, note: false },
+      awaitingTutorialName: false,
+      tutorialExploreChosen: false,
+      activeBuildingId: null,
+      activeBuildingRoomId: null,
+      buildingRevealed: [],
     });
-    // OTA-099 — session-start debug marker for new characters
-    // too. Same purpose as in loadSlotIntoGame: any log capture
-    // can be traced to the build ID it was running.
     try {
-      get().appendLog('debug', `OTA session start: ${OTA_BUILD_ID}.`);
+      get().appendLog('debug', `APK session start: ${OTA_BUILD_ID}.`);
     } catch { /* never block character creation on a debug log */ }
-    // Opening line + player name + weather get woven INTO the scene
-    // paragraph rather than printed as their own log entries, so the
-    // player sees one flowing intro instead of three stacked statements.
-    // The isOpening flag also suppresses vendor spawn, the macro radar,
-    // the system Weather effect line, and the random Arbiter intros.
+    // Arm the tutorial BEFORE beginScene so its scene-entry Arbiter hints
+    // (danger assessment, ask-the-Arbiter, hub-travel — each gated on
+    // tutorialStep === null) stay suppressed during the opening. They were
+    // firing ahead of the name prompt because, on a brand-new game, the
+    // tutorial wasn't "started" yet when beginScene ran, so tutorialStep was
+    // still null and the guards let them through.
+    if (!player.hasSeenIntro) {
+      set({ tutorialStep: 0, awaitingTutorialName: true });
+    }
+    // beginScene paints the opening narration (location + weather +
+    // hub-room description). The Arbiter name prompt lands AFTER
+    // those via startTutorial below.
     get().beginScene({ openingPrefix: buildOpening(), isOpening: true });
     await get().persist();
     const slots = await listSlots();
     set({ slots });
-    // First-time tutorial — only on brand-new characters. Persists once
-    // (hasSeenIntro) so it never reruns on load.
+    // First-time tutorial — only on brand-new characters. The
+    // tutorial's beat-0 Arbiter line arms awaitingTutorialName so
+    // the next text input becomes the player's name.
     if (!player.hasSeenIntro) {
       get().startTutorial();
     }
@@ -2940,33 +3711,84 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     const allClimbablesPool = Array.from(new Set([...baseClimbable, ...curatedClimbables]));
     const allSalvageablesPool = Array.from(new Set([...baseSalvageable, ...curatedSalvageables]));
-    const ambientNouns = Array.from(new Set([...baseTakeable, ...allClimbablesPool, ...allSalvageablesPool]));
+    // arb60 — place 1–3 common catalog GEAR items as takeable nouns so `take`
+    // pays out equipment again (REGRESSION-1 follow-up). Seeded by the room key
+    // → stable per tile, so leave-and-return can't farm fresh gear (the take
+    // handler's per-room consumed-dedup then blocks re-taking). Added additively
+    // to the displayed set below so investigate's flavor nouns keep their slots.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { pickTakeableGearForScene } = require('../engine/takeableGearSpawns');
+    // arb64 — drop gear already taken from THIS tile so it can't be farmed by
+    // leave-and-return. The spawn is seeded per room key (same gear each visit),
+    // and on wild tiles beginScene doesn't run the hub consumed-filter, so a
+    // taken+scrapped piece would otherwise re-spawn and the take handler's
+    // self-heal (consumed-but-not-owned) would re-grant it. Filtering against
+    // the room's consumed set (the take handler's searchedAmbientNouns) here
+    // makes a taken piece stay gone for that tile, on hub AND wild tiles.
+    const gearConsumed = roomConsumedSet(get().worldMemory, candidateKey);
+    const sceneGearNouns: string[] = pickTakeableGearForScene(candidateKey)
+      .filter((n: string) => !isConsumedNoun(gearConsumed, n));
+    const ambientNouns = Array.from(new Set([...sceneGearNouns, ...baseTakeable, ...allClimbablesPool, ...allSalvageablesPool]));
     // Lock the visible subset for THIS scene visit. Look-around and
     // the chip pool (Search/Approach/Salvage) BOTH read from this
     // same cache — strict match. If a noun isn't in your look-around,
-    // it isn't in your chips either. Five consecutive looks show the
-    // same eight; leave and come back to re-roll. Hook primaries get
+    // it isn't in your chips either. Consecutive looks show the same
+    // five; leave and come back to re-roll. Hook primaries get
     // appended to chips separately because they're active narrative
     // threads, not ambient props.
     let displayedAmbientNouns: string[];
-    if (ambientNouns.length <= 8) {
+    if (ambientNouns.length <= AMBIENT_DISPLAY_CAP) {
       displayedAmbientNouns = [...ambientNouns];
     } else {
-      // Reserve slots: 5 take + 2 climb + 2 salvage. Dedup overflow
-      // then top up any unused slot allocation from the remainder.
-      const pickedTakes = shuffleSlice(baseTakeable, 5);
-      const pickedClimb = shuffleSlice(allClimbablesPool, 2);
-      const pickedSalv = shuffleSlice(allSalvageablesPool, 2);
+      // Reserve slots so each verb still gets a look-in: 3 take + 1
+      // climb + 1 salvage. Dedup overflow, then top up any unused slot
+      // allocation from the remainder to fill the cap.
+      const pickedTakes = shuffleSlice(baseTakeable, 3);
+      const pickedClimb = shuffleSlice(allClimbablesPool, 1);
+      const pickedSalv = shuffleSlice(allSalvageablesPool, 1);
       const reservedPicks = Array.from(new Set([...pickedTakes, ...pickedClimb, ...pickedSalv]));
       const remaining = ambientNouns.filter((n) => !reservedPicks.includes(n));
-      const topupCount = Math.max(0, 8 - reservedPicks.length);
-      displayedAmbientNouns = [...reservedPicks, ...shuffleSlice(remaining, topupCount)].slice(0, 8);
+      const topupCount = Math.max(0, AMBIENT_DISPLAY_CAP - reservedPicks.length);
+      displayedAmbientNouns = [...reservedPicks, ...shuffleSlice(remaining, topupCount)].slice(0, AMBIENT_DISPLAY_CAP);
+    }
+    // arb60 — spawned gear shows under TAKE additively (it must NOT consume the
+    // flavor-noun slots investigate/salvage read from, so it's prepended after
+    // the capped selection rather than competing inside it).
+    if (sceneGearNouns.length > 0) {
+      displayedAmbientNouns = Array.from(new Set([...sceneGearNouns, ...displayedAmbientNouns]));
+    }
+    // arb39 — persistent-room emptiness for hub interiors (the tutorial
+    // outpost rooms, capital halls, etc.). Once an interactable has been
+    // taken or salvaged in this room, it stays gone on re-entry instead
+    // of respawning — closing the re-enter-a-room-to-farm exploit. Wild
+    // tiles are left alone (their re-roll is intentional). candidateKey is
+    // this room's per-room key (same one the take/salvage handlers write).
+    let sceneAmbientNouns = ambientNouns;
+    let sceneDisplayedNouns = displayedAmbientNouns;
+    if (hubRoom) {
+      const consumedHere = roomConsumedSet(get().worldMemory, candidateKey);
+      if (consumedHere.size > 0) {
+        sceneAmbientNouns = ambientNouns.filter((n) => !isConsumedNoun(consumedHere, n));
+        sceneDisplayedNouns = displayedAmbientNouns.filter((n) => !isConsumedNoun(consumedHere, n));
+      }
     }
     // microMicroId was resolved at the top of beginScene so the
     // encounter / loot rolls could use the ladder's curated pools.
+    // arb36 — enterable structure on this tile. Deterministic per tile,
+    // outdoor + peaceful + off the location anchor only (never a building
+    // sitting on top of a named city/hub). Replaces the old dev
+    // "enter <name>" teleport — buildings are now found by exploring.
+    const bX = player?.mapX ?? WORLD_MAP_CENTER_X;
+    const bY = player?.mapY ?? WORLD_MAP_CENTER_Y;
+    const onAnchorTile = bX === WORLD_MAP_CENTER_X && bY === WORLD_MAP_CENTER_Y;
+    const sceneBuilding: string | null =
+      !hasEnemies && !hubRoom && !onAnchorTile
+        ? buildingForTile(location.id, bX, bY)
+        : null;
     const scene: CurrentScene = {
       weather, location, hazard, enemies, enemyHps, activeEnemyIdx,
-      vendor, range, hooks: initialHooks, ambientNouns, displayedAmbientNouns, microMicroId,
+      vendor, range, hooks: initialHooks, ambientNouns: sceneAmbientNouns, displayedAmbientNouns: sceneDisplayedNouns, microMicroId,
+      sceneBuilding,
       enemyAmbushUsed: enemies.map(() => false),
       // OTA 037 — explicit null. Older code relied on undefined being
       // falsy at every read site; making it explicit prevents stale
@@ -3065,6 +3887,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       }
     } catch { /* voice modules not present in tests */ }
     set({ currentScene: scene, pendingRolls: null, pendingHookContinue: null });
+    // arb36 — announce a discovered structure so the new ENTER affordance
+    // isn't unexplained. Skipped on the opening scene (you start on the
+    // anchor, so sceneBuilding is null there anyway).
+    if (scene.sceneBuilding && !opts?.isOpening) {
+      get().appendLog('world', buildingApproachLine(scene.sceneBuilding));
+    }
     // OTA-244 — danger-vs-tier warning. Player playtest: ate a
     // Mud Giant (Legendary, 360 HP) rest-ambush in Asgardar
     // (danger 5) at 48 HP. OTA-243 capped the ambush picker by
@@ -3080,7 +3908,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const danger = loc?.danger ?? 0;
       const hpMax = player.hpMax ?? 0;
       const playerCap = hpMax < 60 ? 1 : hpMax < 100 ? 2 : hpMax < 140 ? 3 : 5;
-      if (loc && danger >= 4 && playerCap < danger) {
+      // Suppressed during the tutorial — the only Arbiter voice before the
+      // name prompt should be the name prompt. The warning still fires the
+      // first time the player re-enters this danger tile after the tutorial
+      // (the flag below isn't set while suppressed).
+      if (loc && danger >= 4 && playerCap < danger && get().tutorialStep === null) {
         const warned = get().worldMemory.dangerWarnedLocations ?? [];
         if (!warned.includes(loc.id)) {
           set((s) => ({
@@ -3092,7 +3924,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const tierLabel = ['', 'unsafe', 'edgy', 'dangerous', 'lethal', 'lethal'][danger] ?? 'lethal';
           get().appendLog(
             'arbiter',
-            `The Arbiter takes you in. "${loc.name} is ${tierLabel} country — the things that wake here pull above your weight. ${hpMax} HP carries you through the Outskirts (danger 2) or the Mud Seas (danger 2). Start the main quest before you camp here again, or move on until you've got your legs under you."`,
+            `The Arbiter takes you in. "${loc.name} is ${tierLabel} country. The things that wake here pull above your weight. ${hpMax} HP carries you through the Outskirts (danger 2) or the Mud Seas (danger 2). Start the main quest before you camp here again, or move on until you've got your legs under you."`,
           );
         }
       }
@@ -3359,10 +4191,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // never discover the path. Latched once per character via
       // milestones.firstQAHintShown.
       const msNow = get().player?.milestones;
-      if (!msNow?.firstQAHintShown) {
+      if (!msNow?.firstQAHintShown && get().tutorialStep === null) {
         get().appendLog(
           'arbiter',
-          `The Arbiter watches you settle. "If you want to know what something is — the Aether, a faction, a place — ask. 'What is the Aether.' 'Who are the Reclaimers.' 'What is Drakova.' I keep what I remember of the buried world."`,
+          `The Arbiter watches you settle. "If you want to know what something is, the Aether, a faction, a place, just ask. 'What is the Aether.' 'Who are the Reclaimers.' 'What is Drakova.' I keep what I remember of the buried world."`,
         );
         set((s) => (s.player ? {
           player: {
@@ -3386,13 +4218,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         livePlayerForHubHint
         && inOutpostForHint
         && !livePlayerForHubHint.milestones?.firstOutpostHintShown
+        && get().tutorialStep === null
       ) {
         const hubLabel = hubNameForFaction(livePlayerForHubHint.factionId)
           || hubRoom?.name
           || 'the outpost';
         get().appendLog(
           'arbiter',
-          `The Arbiter inclines a hand toward the doorway. "You're inside ${hubLabel}. To travel to another city, walk out the gate first — tap LEAVE OUTPOST, or type 'leave outpost'. Until then the cardinals only move you between the rooms of this place."`,
+          `The Arbiter inclines a hand toward the doorway. "You're inside ${hubLabel}. To travel to another city, step outside first. Tap EXIT, or type 'leave outpost'. Until then the room buttons only move you between the rooms of this place."`,
         );
         set((s) => (s.player ? {
           player: {
@@ -3875,6 +4708,206 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const trimmed = text.trim();
     if (!trimmed || get().pendingRolls) return;
 
+    // Tungsten Spire — TUTORIAL PRE-CHECK. Runs before the verb
+    // parser so the in-feed tutorial can intercept name input + the
+    // outpost prop verbs (take cudgel / take rope / take note,
+    // scrap broken chest plate, investigate door). Each branch
+    // appends the player's input as a log line, runs its side-
+    // effect, advances the tutorial, and returns — bypassing the
+    // normal parser for tutorial verbs.
+    {
+      const tState = get();
+      const tStepIdx = tState.tutorialStep;
+      const tStep = tStepIdx !== null ? TUTORIAL_STEPS[tStepIdx] : null;
+
+      // (a) Name capture. The Arbiter's first beat asks for a name;
+      //     awaitingTutorialName is true. Treat the input as the
+      //     name (2+ trimmed chars, no profanity check — players
+      //     can call themselves whatever).
+      if (tState.awaitingTutorialName && tStep?.id === 'name' && trimmed.length >= 2) {
+        if (!_opts?.silent) get().appendLog('player', trimmed);
+        set((s) => (s.player ? {
+          player: { ...s.player, name: trimmed },
+          awaitingTutorialName: false,
+        } : { awaitingTutorialName: false }));
+        get().appendLog('arbiter', `"Well met, ${trimmed}. To business."`);
+        get().maybeAdvanceTutorial('name');
+        return;
+      }
+
+      // (b) Tutorial-prop TAKES. Cudgel, rope, note. The parser
+      //     won't find these because they aren't scene nouns; we
+      //     handle them directly so the tutorial works end-to-end
+      //     from a single typed verb OR a chip tap that submits the
+      //     same verb under the hood.
+      if (tStep?.id === 'cudgel' && /\btake\s+.*cudgel\b/i.test(trimmed)) {
+        if (!_opts?.silent) get().appendLog('player', trimmed);
+        grantTutorialItem(get, set, 'cudgel');
+        get().appendLog('world', 'You stoop and lift the cudgel. The lashing is loose but the head is solid. You equip it without thinking.');
+        get().appendLog('reward', '✦ Cudgel (Common). [equipped]');
+        // Acknowledge the pickup before the next instruction — a beat of
+        // pacing so the Arbiter doesn't snap straight into "now salvage".
+        get().appendLog('arbiter', '"Good. Keep it close."');
+        get().maybeAdvanceTutorial('cudgel');
+        return;
+      }
+      if (tStep?.id === 'rope' && /\btake\s+.*rope\b/i.test(trimmed)) {
+        if (!_opts?.silent) get().appendLog('player', trimmed);
+        grantTutorialItem(get, set, 'rope');
+        get().appendLog('world', "You uncoil the rope from the shelf. Aetheric fibers, woven tight. It goes into your pack.");
+        get().appendLog('reward', "✦ Reclaimer's Rope (Common).");
+        get().appendLog('arbiter', '"Good. That rope earns its keep."');
+        get().maybeAdvanceTutorial('rope');
+        return;
+      }
+      // (c) Tutorial scrap of the chest plate. Mirrors the salvage
+      //     path's reward structure without running scrapEngine —
+      //     we don't need the random roll, just the verb teach. The
+      //     player learns the SCRAP/SALVAGE chip lights up at the
+      //     end of each scene; the broken plate is the demonstrator.
+      if (tStep?.id === 'scrap' && /\b(scrap|salvage|break)\s+.*(chest\s+plate|plate|breastplate)\b/i.test(trimmed)) {
+        if (!_opts?.silent) get().appendLog('player', trimmed);
+        set((s) => ({
+          tutorialPropsConsumed: { ...s.tutorialPropsConsumed, chestPlate: true },
+        }));
+        get().appendLog('world', 'You wedge the cudgel against the rim and pop the rusted plate off its strap. The metal comes apart along old hammer-marks.');
+        get().appendLog('reward', '✦ Plate Fragment x2 (Common). [scrapped]');
+        get().appendLog('arbiter', '"There. Ruins always pay out."');
+        get().maybeAdvanceTutorial('scrap');
+        return;
+      }
+      // (d) Tutorial investigate of the locked door.
+      if (tStep?.id === 'investigate' && /\binvestigate\s+.*door\b/i.test(trimmed)) {
+        if (!_opts?.silent) get().appendLog('player', trimmed);
+        get().appendLog('world', 'You crouch by the door. The latch is set into a frame that\'s seen worse — a single shove on the right bracket lifts it. The door swings open.');
+        // No arbiter line here — the explore_or_leave beat's line (spoken
+        // by advanceTutorial next) carries the door-open framing + choice.
+        get().maybeAdvanceTutorial('investigate');
+        return;
+      }
+      // (e) Tutorial NOTE pickup (after move_north). Same intercept
+      //     pattern as cudgel/rope.
+      if (tStep?.id === 'read_note' && /\b(take|read|pick\s+up)\s+.*note\b/i.test(trimmed)) {
+        if (!_opts?.silent) get().appendLog('player', trimmed);
+        grantTutorialItem(get, set, 'note');
+        get().appendLog('world', 'You unfold the note. Hand-inked, fresh ink: "Find your way to the cores. The Guardians keep them. Walk the road to any Capital and the Aether will lead you the rest of the way."');
+        get().appendLog('reward', '✦ Folded Note (Common).');
+        get().maybeAdvanceTutorial('read_note');
+        return;
+      }
+    }
+
+    // arb48 — Labyrinth of Shadows (Wayfarer of the Lost Paths). Intercepts
+    // before the world parser so maze movement / LEAVE don't fall through to
+    // overworld travel. (a) While a run is active, every input drives the maze.
+    // (b) At Iskan-Veil with the challenge live, "enter labyrinth" starts a run.
+    {
+      const pl = get().player;
+      if (pl?.labyrinthRun) {
+        if (!_opts?.silent) get().appendLog('player', trimmed);
+        handleLabyrinthStep(get, set, trimmed);
+        return;
+      }
+      if (
+        pl && !pl.labyrinthRun &&
+        pl.currentLocationId === 'iskan_veil' &&
+        challengeActive('labyrinth_of_shadows') &&
+        /\b(labyrinth|maze)\b/i.test(trimmed) &&
+        /^(enter|attempt|start|begin|walk|brave|try)\b/i.test(trimmed)
+      ) {
+        if (!_opts?.silent) get().appendLog('player', trimmed);
+        enterLabyrinth(get, set);
+        return;
+      }
+    }
+
+    // arb50 — content-review Tier-C trials (Speaker @ Red Tower, Warden @
+    // Sinking Cathedral). Intercept the scout/attempt verbs at those tiles
+    // before the world parser. Scouting is free; attempting is one-shot.
+    {
+      const pl = get().player;
+      if (pl && !pl.labyrinthRun) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const tc = require('../engine/titleChallenges');
+        const def = tc.challengeForLocation(pl.currentLocationId);
+        if (def && challengeActive(def.id) && (def.scoutVerb.test(trimmed) || def.attemptVerb.test(trimmed))) {
+          if (!_opts?.silent) get().appendLog('player', trimmed);
+          handleTitleChallenge(get, set, trimmed, def);
+          return;
+        }
+      }
+    }
+
+    // arb53 — Guild Broker at the Parley Ground. Free parley opens/reports the
+    // mission; SEAL turns in the two relics. Intercept before the world parser.
+    {
+      const pl = get().player;
+      if (pl && !pl.labyrinthRun && pl.currentLocationId === 'parley_ground' && challengeActive('parley_of_factions')) {
+        const sealVerb = /\b(seal|forge|complete|finish)\b.*\b(alliance|pact|peace|deal|truce|accord)\b|^(seal|forge)\b|\bbroker\s+(the\s+)?(alliance|pact|peace|deal)\b/i;
+        const parleyVerb = /\b(parley|approach|examine|inspect|survey|meet|talk|speak|leaders?|factions?|broker)\b/i;
+        if (sealVerb.test(trimmed) || parleyVerb.test(trimmed)) {
+          if (!_opts?.silent) get().appendLog('player', trimmed);
+          handleBroker(get, set, trimmed, sealVerb.test(trimmed));
+          return;
+        }
+      }
+    }
+
+    // arb25 — enterable buildings. When inside a building, room navigation /
+    // EXIT / secret-room reveal are handled here BEFORE the world parser so a
+    // room name doesn't fall through to overworld travel. "enter <building>"
+    // is a temporary dev trigger to walk the templates on-device.
+    {
+      const inBuilding = get().activeBuildingId;
+      if (inBuilding) {
+        // EXIT back to the open world.
+        if (isLeaveHubCommand(trimmed) || /^\s*(exit|outside|step\s+out|get\s+out)\s*$/i.test(trimmed)) {
+          if (!_opts?.silent) get().appendLog('player', trimmed);
+          get().exitBuilding();
+          return;
+        }
+        // Secret-room reveal: investigating the trigger noun opens a hidden room.
+        if (/\b(investigate|search|examine|pry|lift|check|open)\b/i.test(trimmed)) {
+          const reveal = secretRoomRevealedBy(inBuilding, trimmed);
+          if (reveal && !get().buildingRevealed.includes(reveal)) {
+            if (!_opts?.silent) get().appendLog('player', trimmed);
+            get().revealBuildingRoom(reveal);
+            return;
+          }
+        }
+        // Room navigation (tap a room button or type its name).
+        const roomId = resolveBuildingRoom(inBuilding, new Set(get().buildingRevealed), trimmed);
+        if (roomId && roomId !== get().activeBuildingRoomId) {
+          if (!_opts?.silent) get().appendLog('player', trimmed);
+          get().goBuildingRoom(roomId);
+          return;
+        }
+        // Swallow overworld-travel commands while indoors so a typed cardinal
+        // can't strand the player out on the map without EXITing. Movement
+        // inside is by room button only.
+        if (/\b(north|south|east|west)\b/i.test(trimmed) || /^(go|walk|head|travel|continue|onward|keep going)\b/i.test(trimmed)) {
+          if (!_opts?.silent) get().appendLog('player', trimmed);
+          get().appendLog('world', 'Inside, you move room to room. Tap a room, or EXIT to step back outside.');
+          return;
+        }
+        // Otherwise fall through — take / search / look operate on the room's
+        // interactables via the normal parser (which logs the player line).
+      } else {
+        // arb36 — ENTER the structure standing on THIS tile, if one was
+        // discovered here (scene.sceneBuilding). Accepts "enter", "enter the
+        // shed", "go in/inside", "step into the house", "head inside" — the
+        // specific name is irrelevant; you enter whatever you stumbled on.
+        // Replaces the old dev "enter <name>" teleport into any template:
+        // buildings are now reached only by finding them in the world.
+        const here = get().currentScene?.sceneBuilding ?? null;
+        if (here && /^(?:enter|go\s+in(?:to|side)?|step\s+in(?:to|side)?|head\s+in(?:side)?|walk\s+in(?:side)?)\b/i.test(trimmed)) {
+          if (!_opts?.silent) get().appendLog('player', trimmed);
+          get().enterBuilding(here);
+          return;
+        }
+      }
+    }
+
     // OTA-195 — fuse verb. Short-circuit before the parser since
     // 'fuse' isn't in any verb alias and the player typed it directly
     // after a Fusing Crucible encounter. Routes through fuseAtCrucible
@@ -4110,9 +5143,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const prevHpWeather = player.hp;
       const hpMaxWeather = player.hpMax ?? 1;
       const prevCorrWeather = player.corruption ?? 0;
+      // arb45 — title perks mitigate Etheric weather. Survivor of Aetherstone
+      // halves corruption gain; Aetheric Attuned / Stormcaller halve the
+      // Etheric HP bite. (Etheric weather is the kind that notches corruption.)
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const tPerks = require('../engine/titles').titlePerkModifiers(player);
+      const isEthericWeather = wtick.corruptionDelta > 0;
+      let effHpDelta = wtick.hpDelta;
+      let effCorrDelta = wtick.corruptionDelta;
+      if (tPerks.corruptionResist && effCorrDelta > 0) effCorrDelta = Math.ceil(effCorrDelta / 2);
+      if ((tPerks.ethericDamageResist || tPerks.ethericShield) && isEthericWeather && effHpDelta < 0) {
+        effHpDelta = Math.ceil(effHpDelta / 2);
+      }
       set((s) => {
         if (!s.player) return {};
-        const newHp = Math.max(0, s.player.hp + wtick.hpDelta);
+        const newHp = Math.max(0, s.player.hp + effHpDelta);
         const newStam = Math.max(0, Math.min(s.player.staminaMax, s.player.stamina + wtick.staminaDelta));
         // Cap corruption at CORRUPTION_MAX. QA sim showed a player
         // stuck in Whisper Fog accumulated 7868 corruption over 10
@@ -4120,7 +5165,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // meaningful as a gameplay signal. 50 is the design ceiling
         // (matches the threshold at which Aetheric content opens
         // permadeath checks); anything beyond is decorative.
-        const newCorr = Math.max(0, Math.min(CORRUPTION_MAX, s.player.corruption + wtick.corruptionDelta));
+        const newCorr = Math.max(0, Math.min(CORRUPTION_MAX, s.player.corruption + effCorrDelta));
         weatherKilled = newHp <= 0;
         return { player: { ...s.player, hp: newHp, stamina: newStam, corruption: newCorr } };
       });
@@ -4143,7 +5188,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
         void Promise.resolve().then(() => handlePlayerDeath(get, set));
         return;
       }
+      // arb45 — survived an Etheric storm tick (the kind that notches
+      // corruption). Records storm-survival (+companion variant for
+      // Stormcaller) and the high-water corruption mark for Survivor of
+      // Aetherstone. recordTitleProgress also runs the award check.
+      if (isEthericWeather) {
+        const survivor = get().player;
+        const withCompanion = !!(survivor && (survivor.dog || survivor.golem));
+        recordTitleProgress(
+          get,
+          set,
+          withCompanion ? { stormsSurvived: 1, stormsSurvivedWithCompanion: 1 } : { stormsSurvived: 1 },
+          { maxCorruption: survivor?.corruption ?? 0 },
+        );
+      }
     }
+    // arb45 — periodic catch-all so the DERIVED titles (Golem Whisperer,
+    // Scion of the Giants, Etheric Explorer, Aetherborn Awakened) award
+    // during normal play without per-site wiring.
+    awardNewTitles(get, set);
 
     // If the scene was lost (e.g. slot restore on an older save before this
     // fix) auto-recover before bailing — silent no-ops on submit are the
@@ -4479,7 +5542,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // intents and fall through to the normal verb dispatch.
       'rotate', 'knock', 'turn', 'twist', 'press', 'push', 'pull',
     ];
-    if (hookEligible.includes(parsed.intent) && currentScene.hooks && currentScene.hooks.length > 0) {
+    // arb59 — combat takes precedence over scene hooks. Without the
+    // enemies===0 guard, an 'advance'/'approach'/'cast'/etc. aimed at a
+    // hook noun could resolve a story-thread / puzzle hook mid-fight — e.g.
+    // a smoke-camp Reclaimer who turned hostile from a caught theft would
+    // still "★★ STORY THREAD COMPLETE — you part ways, +25 TC" and then be
+    // killed in the same exchange. While a live enemy is in the scene, these
+    // verbs fall through to the combat handlers below instead.
+    if (hookEligible.includes(parsed.intent) && currentScene.hooks && currentScene.hooks.length > 0 && currentScene.enemies.length === 0) {
       const targetText = (parsed.resolvedNoun ?? parsed.target ?? trimmed).toLowerCase();
       let hook = matchHookNoun(targetText, currentScene.hooks);
       // OTA-130 — direction-only fallback. If the player typed
@@ -4642,7 +5712,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
       const mqMod = require('../engine/mainQuest');
-      if (mqMod.canRecoverCore(player, parsed.intent)) {
+      // isStationedAtNamedLocation gate: currentLocationId lingers as the
+      // departure capital all through travel (and while wandering off its
+      // anchor), so without this a faction gate-intent action — e.g. a
+      // Monarch's `attack` on a wilderness Mudling — would summon that
+      // capital's Core Guardian miles from the city. Only let the Core
+      // gate fire when the player is actually standing IN the capital.
+      if (mqMod.canRecoverCore(player, parsed.intent) && isStationedAtNamedLocation(player)) {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const cg = require('../engine/coreGuardians');
         const capitalId = player.currentLocationId;
@@ -4879,12 +5955,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.attack), 0.1) });
           const visPenalty = weatherAttackPenalty(currentScene.weather);
           if (visPenalty > 0) {
-            get().appendLog(
-              'arbiter',
-              `${currentScene.weather!.name} hangs between you. "−${visPenalty} to the swing — see what you can," the Arbiter says.`,
-              { skipDedup: true },
-            );
-            get().appendLog('debug', `attack: visibility penalty −${visPenalty} (${currentScene.weather!.name})`);
+            // Announce the swing penalty only the FIRST time this weather
+            // bites in the current fight. It doesn't change round-to-round,
+            // so repeating it on every swing just clutters the log. Re-fires
+            // if the weather actually shifts to a different system.
+            const weatherName = currentScene.weather!.name;
+            if (currentScene.weatherSwingAnnounced !== weatherName) {
+              get().appendLog(
+                'arbiter',
+                `${weatherName} hangs between you. "−${visPenalty} to the swing — see what you can," the Arbiter says.`,
+                { skipDedup: true },
+              );
+              set((s) => (s.currentScene
+                ? { currentScene: { ...s.currentScene, weatherSwingAnnounced: weatherName } }
+                : {}));
+            }
+            get().appendLog('debug', `attack: visibility penalty −${visPenalty} (${weatherName})`);
           }
           // Aggregate the player's status-effect modifiers (aim, sprint,
           // surprise, etc.) so the dice prompt and the final attack
@@ -6445,6 +7531,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 ? { player: { ...s.player, inventory: grantResult.inventory } }
                 : s,
             );
+            // arb45 — Seeker of Lost Relics: a relic pulled from a dig/search
+            // counts as a discovered Tartarian relic (3 needed).
+            if (newItem.kind === 'relic' && grantResult.accepted > 0) {
+              recordTitleProgress(get, set, { relicsFound: 1 });
+            }
             if (!isStackableCommodity && grantResult.accepted > 0) {
               set((s) => recordRoomLootGrabbed(s, searchRoomKey, outcome.itemName));
             }
@@ -6961,7 +8052,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // passing. Real cost of rest is the clock advance (which
           // matters when a hunt / mystery / storyline is timed); the
           // heal/stamina ceiling is a separate dial.
-          const hpRoom = player.hpMax - player.hp;
+          // arb37 — rest restores STAMINA only. HP is healed by EATING
+          // (food → health), so food markets and food lore carry real
+          // weight and the player tops HP to full by eating, never by
+          // sleeping. hpRoom is no longer consulted by rest.
           const stamRoom = player.staminaMax - player.stamina;
           // OTA-238 — block rest when already fully whole. Playtester:
           // "there should be a block on resting if you're already
@@ -6975,12 +8069,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // ambush dial. Block when HP + stamina are both capped
           // AND there's no corruption to decay (corruption decay
           // is the other useful rest outcome).
+          // arb37 — gate on stamina + corruption only (rest no longer
+          // touches HP). A wounded-but-rested player is pointed at food,
+          // not told to sleep off the wound.
           const fullyRested =
-            hpRoom === 0 && stamRoom === 0 && (player.corruption ?? 0) === 0;
+            stamRoom === 0 && (player.corruption ?? 0) === 0;
           if (fullyRested) {
             get().appendLog(
               'arbiter',
-              `The Arbiter shakes their head. "You're whole, your wind is full, and the Aether carries no shadow on you. Save the hours for when you'll need them."`,
+              `The Arbiter shakes their head. "Your wind is full and the Aether carries no shadow on you. Sleep won't knit wounds — eat for that. Save the hours."`,
             );
             break;
           }
@@ -7020,7 +8117,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const restAmbushChance = restAmbushBase * rateMultRest(player.hoursElapsed);
           const restAmbush = Math.random() < restAmbushChance;
           const hours = 8;
-          const heal = Math.min(hpRoom, hours * 2);
+          // arb37 — rest grants NO HP. Stamina only: ~1/hr, up to 8.
+          const heal = 0;
           const stamGain = Math.min(stamRoom, hours);
           // Corruption decay — clean rest sheds one point of
           // corruption ONLY when both of:
@@ -7244,6 +8342,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       }
       case 'travel': {
+        // arb40 — interior outpost movement is FREE. Walking room-to-room
+        // inside a hand-authored hub costs no stamina and no time, so a
+        // 15-room capital can be explored freely and the player is never
+        // stuck at a vendor on empty legs. Resolved BEFORE the overland
+        // stamina gate below, so 0 stamina never blocks an interior step.
+        // Leaving the outpost (isLeaveHubCommand) is real overland travel
+        // and falls through to the gated/charged path.
+        if (player.hubRoomId && !isLeaveHubCommand(trimmed)) {
+          const hubVisited = new Set(get().worldMemory.hubVisited ?? []);
+          const interiorMove = resolveHubTravel(player.hubRoomId, trimmed, hubVisited);
+          if (interiorMove) {
+            set((s) => (s.player ? { player: { ...s.player, hubRoomId: interiorMove.roomId } } : s));
+            const dest = hubRoomFor(interiorMove.roomId, player.factionId);
+            if (dest) {
+              get().appendLog(
+                'world',
+                interiorMove.via === 'fast_travel'
+                  ? `You cut across the outpost to the ${dest.shortName}.`
+                  : `You head ${interiorMove.via === 'cardinal' ? 'on' : 'over'} to the ${dest.shortName}.`,
+              );
+            }
+            get().beginScene();
+            get().maybeAdvanceTutorial('move_north');
+            break;
+          }
+          // No interior exit matched (e.g. 'go to drakova') — fall through
+          // to the overland gate + wider location index below.
+        }
         if (player.stamina < TRAVEL_MIN_STAMINA) {
           // OTA-163 — refused-travel time tick. Stress sweep
           // (cartographer) found a 387-turn stuck-state where every
@@ -7252,16 +8378,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // minute. Real-world fix: even a failed attempt costs you
           // ~15 minutes of fumbling. Time passes; the player can
           // type `rest` to recover and the clock now keeps moving
-          // through the stretch instead of stopping dead.
+          // through the stretch instead of stopping dead. (This guard
+          // is overland-only — interior outpost moves are handled free
+          // above and never reach it.)
           set({ player: advanceTime(player, 0.25) });
-          // OTA-187 — companion to the setTravelCourse refusal
-          // rewrite. "Your legs will not" read as a body-part
-          // blocker the same way "out of legs" did. Warmer human
-          // read of fatigue now matches.
+          // OTA-187 → arb40 — refused-overland-move wording. The old
+          // "You take one step and stop" read as a partial move, so a
+          // player on empty legs didn't realize they hadn't moved. Now a
+          // hard, unambiguous "no stamina" stop. The 15-min fumble tick
+          // above stays (OTA-163 anti-stuck guard). TODO(native AAB): also
+          // fire a short haptic buzz here (and on other refused-move
+          // blocks) once expo-haptics / the VIBRATE permission ships in a
+          // native build — pure-JS OTA can't vibrate.
           get().appendLog(
             'world',
-            `You take one step and stop. You look exhausted — the buried world will hold for one night. Type 'rest' to recover (≈4h), then the road again.`,
+            `You have no stamina left — you can't travel. Type 'rest' to recover (≈4h), then back to the road.`,
           );
+          buzzBlocked(); // arb41 — physical "can't move" signal
           break;
         }
         const target = parsed.target?.toLowerCase() ?? '';
@@ -7296,30 +8429,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // because the player's currentLocationId is still the
             // hub's macro location.
             get().beginScene({ skipHubEntry: true });
+            // Door-open branch: if the player chose EXPLORE and is now
+            // leaving the outpost, advance to the main_quest beat. No-op
+            // outside that beat.
+            get().finishOutpostTutorial();
             break;
           }
-          const visited = new Set(get().worldMemory.hubVisited ?? []);
-          const move = resolveHubTravel(player.hubRoomId, trimmed, visited);
-          if (move) {
-            set((s) => (s.player ? { player: { ...s.player, hubRoomId: move.roomId } } : s));
-            const cost = move.via === 'fast_travel' ? 0.25 : 1;
-            const stam = move.via === 'fast_travel' ? 1 : STAMINA_COSTS.travel;
-            set({ player: advanceTime(spendStamina(get().player!, stam), cost) });
-            const dest = hubRoomFor(move.roomId, player.factionId);
-            if (dest) {
-              get().appendLog(
-                'world',
-                move.via === 'fast_travel'
-                  ? `You cut across the outpost to the ${dest.shortName}.`
-                  : `You head ${move.via === 'cardinal' ? 'on' : 'over'} to the ${dest.shortName}.`,
-              );
-            }
-            get().beginScene();
-            break;
-          }
-          // No hub-exit matched — fall through. This lets 'go to drakova'
-          // still resolve via the wider location index, treating the hub
-          // gate as a launch point.
+          // Interior room moves (cardinal / named / fast-travel) are handled
+          // FREE at the top of this case (arb40) — including the Tungsten
+          // Spire move_north tutorial beat. Anything that reaches here is a
+          // non-interior command (e.g. 'go to drakova'); fall through to the
+          // wider location index, treating the hub gate as a launch point.
         }
         // Continue / keep going / onward — repeat the player's last cardinal
         // direction without making them retype it. If there's no last
@@ -7370,6 +8490,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
               `You walk ${dir} past the gate. The outpost falls away behind you.`,
             );
             get().beginScene({ skipHubEntry: true });
+            // Door-open branch: leaving the outpost via a cardinal step
+            // during the explore_or_leave beat advances to main_quest.
+            // No-op outside that beat.
+            get().finishOutpostTutorial();
             // First-silt hint — playtest 2026-05-21: player asked
             // "where are the rocks and sticks?" The dig refusal inside
             // the outpost already says "leave outpost ... once on the
@@ -7903,11 +9027,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             || /\btell\s+me\s+about\s+(me|myself|my\s+character)\b/.test(introQ)
             || /\bdescribe\s+(me|myself|my\s+character)\b/.test(introQ)) {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const racesData = require('../data/races/races.json') as { races: Array<{ id: string; name: string }> };
+          const racesData = require('../data/races/races.json') as Array<{ id: string; name: string }>;
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const factionsData = require('../data/factions/factions.json') as { factions: Array<{ id: string; name: string }> };
-          const race = racesData.races.find((r) => r.id === player.raceId)?.name ?? player.raceId;
-          const fac = factionsData.factions.find((f) => f.id === player.factionId)?.name ?? player.factionId;
+          const factionsData = require('../data/factions/factions.json') as Array<{ id: string; name: string }>;
+          const race = racesData.find((r) => r.id === player.raceId)?.name ?? player.raceId;
+          const fac = factionsData.find((f) => f.id === player.factionId)?.name ?? player.factionId;
           get().appendLog(
             'arbiter',
             `The Arbiter studies you. "You are ${player.name}. Your blood is ${race}. Your work belongs to the ${fac}. The buried country knows you well enough to start speaking your name."`,
@@ -7937,8 +9061,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             || /\bwhat\s+am\s+i\s+(doing|here\s+for|supposed\s+to\s+do)\b/.test(introQ)
             || /\bwhat(?:'s|\s+is)\s+my\s+(purpose|mission|goal|task)\b/.test(introQ)) {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const factionsData = require('../data/factions/factions.json') as { factions: Array<{ id: string; name: string; description?: string }> };
-          const fac = factionsData.factions.find((f) => f.id === player.factionId);
+          const factionsData = require('../data/factions/factions.json') as Array<{ id: string; name: string; description?: string }>;
+          const fac = factionsData.find((f) => f.id === player.factionId);
           const qCount = (player.activeFactionQuestIds?.length ?? 0)
             + (player.activeHunts?.length ?? 0)
             + (player.activeMysteries?.length ?? 0);
@@ -7955,8 +9079,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (/\bwhat(?:'s|\s+is)\s+my\s+race\b/.test(introQ)
             || /\bwhat\s+(am\s+i|race\s+am\s+i)\b/.test(introQ)) {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const racesData = require('../data/races/races.json') as { races: Array<{ id: string; name: string; description?: string; traits?: string[] }> };
-          const race = racesData.races.find((r) => r.id === player.raceId);
+          const racesData = require('../data/races/races.json') as Array<{ id: string; name: string; description?: string; traits?: string[] }>;
+          const race = racesData.find((r) => r.id === player.raceId);
           const traits = race?.traits?.length ? ` Traits: ${race.traits.join(' · ')}.` : '';
           get().appendLog(
             'arbiter',
@@ -7968,8 +9092,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             || /\bwho\s+do\s+i\s+(serve|work\s+for)\b/.test(introQ)
             || /\bwhich\s+faction\b/.test(introQ)) {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          const factionsData = require('../data/factions/factions.json') as { factions: Array<{ id: string; name: string; description?: string }> };
-          const fac = factionsData.factions.find((f) => f.id === player.factionId);
+          const factionsData = require('../data/factions/factions.json') as Array<{ id: string; name: string; description?: string }>;
+          const fac = factionsData.find((f) => f.id === player.factionId);
           get().appendLog(
             'arbiter',
             `The Arbiter glances toward the horizon. "You serve the ${fac?.name ?? player.factionId}. ${fac?.description ?? ''}"`,
@@ -8084,35 +9208,52 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // the query against the bank and surface the closest concept.
         // Fire-and-forget — the lookup is async; result lands a moment
         // after the player sees a "considers" placeholder.
-        if (cognitive.isReady()) {
+        // arb43 — structured world knowledge first (deterministic,
+        // app-grounded): factions / capitals / races / current course.
+        // Answered from real game data, correcting a wrong count in the
+        // question, with forgiving phrasing.
+        {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const known = require('../engine/arbiterKnowledge').answerWorldKnowledge(trimmed, {
+            travelTarget: player.travelTarget,
+            currentLocationId: player.currentLocationId,
+            discoveredSiteCount: get().worldMemory?.discoveredLocationIds?.length,
+          });
+          if (known) {
+            get().appendLog('arbiter', known);
+            break;
+          }
+        }
+        // arb43 — lore-bank lookup → Qwen persona fallback. A miss no longer
+        // means silence: the Arbiter fields personal / open questions ("why
+        // are you with me", "do you know me", "what do you want from me") in
+        // voice via Qwen, and only lands on the silent line when Qwen is
+        // unavailable too. Fire-and-forget; the reply lands a moment after
+        // the player's ask.
+        void (async () => {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
           const aa = require('../engine/askArbiter');
-          const loreQuery = aa.extractLoreQuery(trimmed) || lookup;
-          void aa.findClosestLoreConcept(loreQuery, cognitive).then((hit: { concept: { id: string }; score: number } | null) => {
-            if (hit) {
-              get().appendLog('arbiter', aa.formatArbiterAnswer(hit.concept));
-            } else {
-              get().appendLog('arbiter', aa.ARBITER_SILENT_LINE);
+          let answered = false;
+          if (cognitive.isReady()) {
+            try {
+              const loreQuery = aa.extractLoreQuery(trimmed) || lookup;
+              const hit = await aa.findClosestLoreConcept(loreQuery, cognitive);
+              if (hit) {
+                get().appendLog('arbiter', aa.formatArbiterAnswer(hit.concept));
+                answered = true;
+                // arb45 — Scholar of Forgotten Lore: each canon lore answer
+                // is a deciphered text (3 needed).
+                recordTitleProgress(get, set, { loreRead: 1 });
+              }
+            } catch {
+              /* lore lookup failed — fall through to the persona */
             }
-          }).catch(() => {
-            // Lookup failure → fall back to a rotating miss reply so the
-            // player isn't left wondering whether the ask landed.
-            const missReplies = [
-              `The Arbiter considers. "I do not have a clean answer for that yet. Try a damage type, a faction, or one of the basic systems — HP, stamina, AC, corruption, the Aether."`,
-              `The Arbiter tilts their head. "Not a thing I have words for. Try a faction name, a damage type, or a system like HP or AC."`,
-            ];
-            get().appendLog('arbiter', rotatingPick(missReplies, 'arbiter.concept-miss'));
-          });
-          break;
-        }
-        // Cognitive not ready — keep the original keyword miss replies.
-        const missReplies = [
-          `The Arbiter considers. "I do not have a clean answer for that yet. Try a damage type, a faction, or one of the basic systems — HP, stamina, AC, corruption, the Aether."`,
-          `The Arbiter tilts their head. "Not a thing I have words for. Try a faction name, a damage type, or a system like HP or AC."`,
-          `The Arbiter exhales. "That sits outside what I know. Ask about HP, stamina, AC, corruption, the Aether — or a faction."`,
-          `The Arbiter shrugs. "I cannot place that. The basic systems — HP, stamina, AC, corruption, the Aether — those I can answer."`,
-        ];
-        get().appendLog('arbiter', rotatingPick(missReplies, 'arbiter.concept-miss'));
+          }
+          if (!answered) {
+            const persona = await arbiterPersonaAnswer(trimmed);
+            get().appendLog('arbiter', persona ?? aa.ARBITER_SILENT_LINE);
+          }
+        })();
         break;
       }
       case 'equip': {
@@ -8495,6 +9636,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             // OTA-120 Phase 3 — dog auto-rejoins on climb-down.
             rejoinDogOnDescent(get, set);
+            // Tutorial climb beat completes on the way DOWN — the player has
+            // climbed up and is back on the ground, ready for the door.
+            get().maybeAdvanceTutorial('climb');
             break;
           }
           set((s) => s.currentScene ? { currentScene: { ...s.currentScene, elevatedOn: null } } : s);
@@ -8505,6 +9649,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
           // OTA-120 Phase 3 — dog auto-rejoins on climb-down.
           rejoinDogOnDescent(get, set);
+          // Tutorial climb beat completes once the player is back on the
+          // ground after a climb (see the matching call in the overlay path).
+          get().maybeAdvanceTutorial('climb');
           break;
         }
         // Strip leading prepositions ("climb up the pole" → "pole",
@@ -8862,6 +10009,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
               } : s.currentScene,
             };
           });
+          // Tutorial climb beat does NOT advance on the way up — it ends
+          // when the player has climbed back DOWN to ground level (see the
+          // climb-down handler), so they finish the full climb first.
           // OTA-120 Phase 3 — dog can't climb. On the FIRST tier of a
           // climb (currentTier becomes 1 from 0), drop the dog to
           // 'waiting_at_base' so it sits at the climb origin and isn't
@@ -9556,7 +10706,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Equipped items can't be dropped without unequipping first —
         // would otherwise leave the player wielding a phantom blade.
         const eq = player.equipped ?? {};
-        const equippedSlots = ['main', 'off', 'head', 'chest', 'legs', 'feet', 'amulet', 'ring'] as const;
+        const equippedSlots = ['main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet', 'ring', 'ring2', 'ring3'] as const;
         const isEquipped = equippedSlots.some((slot) => eq[slot] === item.name);
         if (isEquipped) {
           get().appendLog('arbiter', `The Arbiter taps your hand. "Unequip the ${item.name} first — you can't drop what you're wielding."`);
@@ -11361,6 +12511,61 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
     }
     advanceActiveFactionQuests(get, set, 'travel');
+    // arb46 — Tier-C location-challenge entry hooks. activeChallengesAt()
+    // returns [] while the challenges are switched OFF (locationChallenges
+    // .TIER_C_ENABLED / per-challenge enabled both false), so this loop is
+    // inert today. When a challenge is reviewed + turned on, its entry hook
+    // surfaces here on arrival. The full interaction handlers are wired when
+    // the user supplies each challenge's layout.
+    for (const ch of activeChallengesAt(locationId)) {
+      const attempt = get().player?.challengeAttempts?.[ch.id];
+      if (ch.id === 'labyrinth_of_shadows') {
+        const cleared = (get().player?.titleProgress?.labyrinthCleanRuns ?? 0) > 0;
+        get().appendLog(
+          'world',
+          cleared
+            ? 'The mouth of the Labyrinth of Shadows yawns again. You know the true path now. (Type ENTER LABYRINTH to walk it once more.)'
+            : 'Etched into a fallen lintel you find a map drawn in false ink — the Labyrinth of Shadows. (Type ENTER LABYRINTH to attempt it.)',
+        );
+      } else if (ch.id === 'tongue_of_the_red_tower') {
+        get().appendLog('world',
+          attempt === 'succeeded' ? 'The rune-wall stands quiet — you have already read it.'
+          : attempt === 'failed' ? 'The rune-wall is silent to you now; your one reading is spent.'
+          : 'A wall of living Tartarian glyphs pulses in the Red Tower. (EXAMINE THE RUNES to study it — free — then DECIPHER THE RUNES for your one attempt.)');
+      } else if (ch.id === 'warden_of_the_cathedral') {
+        get().appendLog('world',
+          attempt === 'succeeded' ? 'The cathedral you saved still stands against the sink.'
+          : attempt === 'failed' ? 'The nave you failed to brace lies collapsed. Nothing more to do here.'
+          : 'The Sinking Cathedral groans as the ground swallows it. (EXAMINE THE CATHEDRAL to see what it needs — free — then STABILIZE THE CATHEDRAL for your one attempt.)');
+      } else if (ch.id === 'parley_of_factions') {
+        const done = get().player?.brokerMission?.done;
+        get().appendLog('world',
+          done ? 'The Parley Ground is quiet; the alliance you brokered here holds.'
+          : 'Two faction banners stand on the neutral flats of the Parley Ground, their leaders waiting. (PARLEY to hear their demands; SEAL THE ALLIANCE once you hold both relics.)');
+      } else {
+        get().appendLog('world', `A path opens here: ${ch.note}`);
+      }
+    }
+    // arb53 — Guild Broker: recover a demanded relic on arrival at its source
+    // tile (the "go fetch it" beat) while a mission is open.
+    {
+      const pl = get().player;
+      const mission = pl?.brokerMission;
+      if (pl && mission && !mission.done && challengeActive('parley_of_factions')) {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const broker = require('../engine/broker');
+        const leg = broker.isBrokerSourceTile(mission, locationId);
+        if (leg && !pl.inventory.some((i) => i.name === leg.itemName)) {
+          const res = grantItem(pl.inventory, {
+            id: `${leg.itemId}_${Date.now()}`, name: leg.itemName, kind: 'misc',
+            quantity: 1, tags: ['quest', 'coveted', 'broker'],
+            description: 'A coveted relic — a faction will broker an alliance for it.',
+          });
+          set((s) => (s.player ? { player: { ...s.player, inventory: res.inventory } } : s));
+          get().appendLog('reward', `✦ ${leg.itemName} (Uncommon). [for the Parley Ground]`);
+        }
+      }
+    }
     get().beginScene({ arrivalFromName: fromLocationName });
     // v2.4.1 (OTA 035 — Phase 2) — Lost Capital arrival logs the
     // faction's recovery hint; the Core itself only grants after the
@@ -11582,6 +12787,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         milestones: { ...prevMs, enemiesDefeated: newKills },
       },
     });
+    // arb45 — Bane of Sentinels: count Architectural Sentinel / mechanical
+    // kills toward the title (5 needed).
+    {
+      const tr = enemy.traits ?? [];
+      const isMechanical = tr.includes('mechanical') || tr.includes('sentinel')
+        || tr.includes('architectural_sentinel') || /sentinel/i.test(enemy.name ?? '');
+      if (isMechanical) recordTitleProgress(get, set, { sentinelsDefeated: 1 });
+    }
     if (stillFighting) {
       const next = remainingEnemies[nextActiveIdx]!;
       get().appendLog(
@@ -11956,7 +13169,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    const price = sellPriceFor(item, scene.vendor);
+    const basePrice = sellPriceFor(item, scene.vendor);
+    // arb45 — Relic Trader perk: sharper coin when bartering relics.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const tPerksSell = require('../engine/titles').titlePerkModifiers(player);
+    const isRelicTrade = item.kind === 'relic';
+    const price = (isRelicTrade && tPerksSell.tradeBonus > 0)
+      ? Math.round(basePrice * (1 + 0.05 * tPerksSell.tradeBonus))
+      : basePrice;
     if (price <= 0) {
       get().appendLog('system', `${scene.vendor.name} won't pay for ${item.name} — no resale value.`);
       return;
@@ -11978,6 +13198,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       `Sold ${item.name} to ${scene.vendor.name} for ${price} TC. (${player.tc + price} TC on hand)`,
     );
+    // arb45 — Relic Trader: count relic barters toward the title (5 needed).
+    if (isRelicTrade) recordTitleProgress(get, set, { relicsTraded: 1 });
     // OTA 059 — successful SELL trains CHA. Closing the trade
     // counts as social work.
     {
@@ -12318,7 +13540,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
-    const cost = repairCost(item);
+    const baseCost = repairCost(item);
+    // arb45 — Architect's Eye perk: cheaper mends on relic / ancient gear.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const tPerksRep = require('../engine/titles').titlePerkModifiers(player);
+    const isAncientItem = item.kind === 'relic' || (item.tags ?? []).some((t: string) => /ancient|relic|tartarian/i.test(t));
+    const cost = (isAncientItem && tPerksRep.repairBonus > 0)
+      ? Math.max(1, Math.round(baseCost * (1 - 0.05 * tPerksRep.repairBonus)))
+      : baseCost;
     if (player.tc < cost) {
       get().appendLog(
         'arbiter',
@@ -12334,6 +13563,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       `${scene.vendor.name} mends your ${item.name}. ${cost} TC. (durability restored)`,
     );
+    // arb45 — Architect's Eye: a completed mend counts as restoring ancient work.
+    recordTitleProgress(get, set, { repairsCompleted: 1 });
     void get().persist();
   },
 
@@ -13702,6 +14933,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         `The Arbiter holds out a hand. "You're too tired to set out for ${tgtNameForRefusal}. Rest before making any plans — the road will hold."`,
         { skipDedup: true },
       );
+      buzzBlocked(); // arb41 — physical "can't move" signal
       return;
     }
     // Locate the destination's friendly name for the announcement line.
@@ -13717,8 +14949,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId, distanceRemaining: tiles } } } : s));
     get().appendLog(
       'world',
-      `You set course for ${tgtName}. Estimated ${tiles} day${tiles === 1 ? '' : 's'} of travel. CONTINUE / STOP from the travel row.`,
+      `You set course for ${tgtName}. Estimated ${tiles} day${tiles === 1 ? '' : 's'} of travel. Tap the → ${tgtName.toUpperCase()} button on the travel row to press on; STOP TRAVEL to halt.`,
     );
+    // Tungsten Spire — during the pick_city tutorial beat, picking a Capital
+    // marks the road but does NOT auto-depart: the Arbiter hands control back
+    // so the player learns to set out themselves from the travel row. The
+    // tutorial then completes (pick_city is the final beat).
+    const inTutPickCity = (() => {
+      const ts = get().tutorialStep;
+      return ts !== null && TUTORIAL_STEPS[ts]?.id === 'pick_city';
+    })();
+    if (inTutPickCity) {
+      get().appendLog(
+        'arbiter',
+        `"Your road runs to ${tgtName}. When you're ready to leave, tap the button marked → ${tgtName.toUpperCase()} on the travel row below. Keep tapping it to close the distance, mile by mile."`,
+      );
+      get().maybeAdvanceTutorial('pick_city');
+      return;
+    }
     // Take the first step immediately so the player sees motion now.
     // v2.4.1 (OTA 053) — this step now costs stamina + advances time
     // like the cardinal walks do, so multi-step travel can't be used
@@ -13732,18 +14980,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const after = get().player;
       if (after && after.currentLocationId === locationId) {
         set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
-      } else {
-        // OTA-126 — decrement remaining for the auto-taken first step.
-        set((s) => (s.player?.travelTarget ? {
-          player: {
-            ...s.player,
-            travelTarget: {
-              ...s.player.travelTarget,
-              distanceRemaining: Math.max(0, (s.player.travelTarget.distanceRemaining ?? tiles) - 1),
-            },
-          },
-        } : s));
       }
+      // arb28 — the auto first step goes through stepDirection, which already
+      // re-plots distanceRemaining from the new position (position-derived).
+      // No manual decrement here (it would double-count).
     }
   },
 
@@ -13768,6 +15008,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'arbiter',
         `The Arbiter studies you. "You look exhausted. Rest the night, eat what you have, and the road will be there in the morning."`,
       );
+      buzzBlocked(); // arb41 — physical "can't move" signal
       return;
     }
     const targetId = player.travelTarget.locationId;
@@ -13839,20 +15080,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (after && after.currentLocationId === targetId) {
       set((s) => (s.player ? { player: { ...s.player, travelTarget: undefined } } : s));
     } else {
-      // OTA-126 — decrement the snapshot tile counter so the badge
-      // counts down monotonically. Map regenerates per step centered
-      // on currentLocationId, which shifts the destination's coords
-      // and broke the legacy "recompute Manhattan from current map"
-      // badge when the player crossed a location boundary.
-      set((s) => (s.player?.travelTarget ? {
-        player: {
-          ...s.player,
-          travelTarget: {
-            ...s.player.travelTarget,
-            distanceRemaining: Math.max(0, (s.player.travelTarget.distanceRemaining ?? 0) - 1),
-          },
-        },
-      } : s));
+      // arb28 — position-derived distance. stepDirection already re-plots
+      // on in-transit steps; recompute here too (from a FRESH map centred
+      // on the post-step current location) so an auto-step that crosses an
+      // intermediate named location re-plots from the new centre instead of
+      // running a blind countdown. Authoritative replacement for the old
+      // OTA-126 monotonic decrement.
+      const live = get().player;
+      if (live?.travelTarget) {
+        const liveSeed = live.mapSeed ?? `${live.name}|${live.raceId}|${live.factionId}|legacy`;
+        const m = generateWorldMap(liveSeed, live.currentLocationId);
+        const t = m.positions[targetId];
+        if (t) {
+          const dist = Math.abs(t.x - (live.mapX ?? WORLD_MAP_CENTER_X))
+            + Math.abs(t.y - (live.mapY ?? WORLD_MAP_CENTER_Y));
+          set((s) => (s.player?.travelTarget ? {
+            player: { ...s.player, travelTarget: { ...s.player.travelTarget, distanceRemaining: dist } },
+          } : s));
+        }
+      }
     }
   },
 
@@ -13918,7 +15164,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set((s) => (s.player ? { player: { ...s.player, travelTarget: { locationId: pending.locationId } } } : s));
       get().appendLog(
         'world',
-        `Course set for ${tgtName}, but ${sceneAfterLeave.vendor.name} is here on the road. Tap CONTINUE TRAVEL when you're ready to move on.`,
+        `Course set for ${tgtName}, but ${sceneAfterLeave.vendor.name} is here on the road. Tap the → ${tgtName.toUpperCase()} button on the travel row when you're ready to move on.`,
       );
       return;
     }
@@ -14007,6 +15253,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set((s) => s.currentScene
           ? { currentScene: { ...s.currentScene, weather: newWeather } }
           : s);
+      }
+      // arb28 — RE-PLOT the distance to the plotted city from the NEW tile.
+      // The plotted distance is now position-derived (|target − you| on the
+      // current-centred map), so a cardinal detour off the course — a
+      // story-hook run for some far-off vendor, say — updates it honestly:
+      // it climbs as you walk away and drops as you head back, instead of a
+      // blind countdown. Arrival on a named location is handled by the
+      // discrete-location switch below.
+      if (!step.landedOn) {
+        const tgtId = get().player?.travelTarget?.locationId;
+        const tgt = tgtId ? map.positions[tgtId] : undefined;
+        if (tgt) {
+          const dist = Math.abs(tgt.x - step.x) + Math.abs(tgt.y - step.y);
+          set((s) => (s.player?.travelTarget ? {
+            player: { ...s.player, travelTarget: { ...s.player.travelTarget, distanceRemaining: dist } },
+          } : s));
+        }
       }
     } else {
       // Not in transit — clear any lingering transit label so a
@@ -14144,22 +15407,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // coordinates. The macro location's full ambientNouns pool can be
     // 30-100+ entries (e.g. Tartarian Outskirts has 36, Buried Cities
     // has 90+), but displayedAmbientNouns gets locked at scene
-    // creation to one 8-noun strict subset. Without this re-shuffle,
-    // every cardinal step within the same location replays the same
-    // 8, so the player sees "lantern, arch, watchtower, scrap pile…"
+    // creation to one strict subset (DISPLAY_CAP = 5). Without this
+    // re-shuffle, every cardinal step within the same location replays
+    // the same five, so the player sees "lantern, arch, watchtower…"
     // tile after tile. The seed is (mapX, mapY) so re-entering the
     // same tile shows the same nouns (consistency) while neighbouring
     // tiles get different picks (variety). Only re-rolls when the
-    // pool is bigger than the display window — small pools (≤8) show
+    // pool is bigger than the display window — small pools (≤5) show
     // everything either way.
     set((s) => {
       if (!s.currentScene) return s;
       const pool = s.currentScene.ambientNouns ?? [];
-      if (pool.length <= 8) return s;
+      if (pool.length <= AMBIENT_DISPLAY_CAP) return s;
       // Cantor-pairing-style mix: hashes (x, y) → a single 32-bit
       // seed that distinguishes (-3, 5) from (5, -3) and from (3, 5).
       const seed = (((step.x + 1000) & 0xffff) * 65537) ^ ((step.y + 1000) & 0xffff);
-      const next = shuffleSliceSeeded(pool, 8, seed);
+      const next = shuffleSliceSeeded(pool, AMBIENT_DISPLAY_CAP, seed);
       return { currentScene: { ...s.currentScene, displayedAmbientNouns: next } };
     });
     // Re-entry narration — when a cardinal step lands on a tile the
@@ -14208,13 +15471,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
         && (!liveScene.enemies || liveScene.enemies.length === 0)
         && !liveScene.vendor;
       const inAnyHubRoom = !!livePlayer?.hubRoomId;
-      if (outdoorPeaceful && !inAnyHubRoom && Math.random() < 0.15) {
+      if (outdoorPeaceful && !inAnyHubRoom && Math.random() < 0.08) {
         const stall = pickRoadsideTrader();
         set((s) => s.currentScene ? { currentScene: { ...s.currentScene, vendor: stall } } : s);
         get().appendLog(
           'world',
           `A stall has been thrown up on the next stretch of ground — ${stall.name}, ${stall.title}. Tap the vendor banner to trade.`,
         );
+      }
+    }
+
+    // arb36 — per-tile enterable structure. Deterministic for the tile, so
+    // it persists on revisit and clears as you walk off; narrate only when
+    // a NEW structure comes into view so pacing past one isn't spammy.
+    {
+      const liveScene = get().currentScene;
+      const livePlayer = get().player;
+      const outdoorPeaceful = !!liveScene
+        && (!liveScene.enemies || liveScene.enemies.length === 0);
+      // Skip while auto-travelling: you're passing through, the travel row
+      // shows travel controls (no ENTER button), so narrating "Tap ENTER"
+      // mid-journey would dangle. Discovery is for on-foot exploration.
+      if (liveScene && livePlayer && outdoorPeaceful && !livePlayer.hubRoomId && !livePlayer.travelTarget && !get().activeBuildingId) {
+        const onAnchor = step.x === WORLD_MAP_CENTER_X && step.y === WORLD_MAP_CENTER_Y;
+        const here = onAnchor ? null : buildingForTile(livePlayer.currentLocationId, step.x, step.y);
+        const prior = liveScene.sceneBuilding ?? null;
+        if (here !== prior) {
+          set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, sceneBuilding: here } } : s));
+          if (here) get().appendLog('world', buildingApproachLine(here));
+        }
       }
     }
 
@@ -14432,14 +15717,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const { encounterRateMultiplier } = require('../engine/timeOfDay');
       const playerForEnc = get().player;
       const isAutoTravel = !!playerForEnc?.travelTarget;
-      // OTA-187 — wasteland encounter rate bumped (auto-travel
-      // 0.85→0.92, walking 0.70→0.82) per playtester: "the game
-      // is a little shy on combat." Threshold unchanged (1 step
-      // for auto-travel, 2 for manual). Net effect with the JSON
-      // weight distribution (~30% skirmish): combat per step rises
-      // from ~21-25% to ~24-28%.
+      // arb30 — rolled back toward "theme-park" pacing. Was 0.82 / 0.92
+      // (~24-28% combat per step), which on the new 82-wide map = a meat
+      // grinder over a long journey. 0.45 / 0.55 lands combat ~12-16% per
+      // step: lively action, not constant. Tune down toward "desolate"
+      // (~4-8%) from here once the feel is dialed in.
       const baseThreshold = isAutoTravel ? 1 : 2;
-      const baseRollChance = isAutoTravel ? 0.92 : 0.82;
+      const baseRollChance = isAutoTravel ? 0.55 : 0.45;
       const timeMult = encounterRateMultiplier(playerForEnc?.hoursElapsed);
       const effectiveRollChance = Math.min(0.99, baseRollChance * timeMult);
       // 2026-05-25 OTA-045 — JIT-temptation predicate. Depleted on
@@ -14619,7 +15903,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         && (!liveScene.enemies || liveScene.enemies.length === 0)
         && !liveScene.vendor;
       const inAnyHubRoom = !!livePlayer?.hubRoomId;
-      if (outdoorPeaceful && !inAnyHubRoom && livePlayer && Math.random() < 0.10) {
+      if (outdoorPeaceful && !inAnyHubRoom && livePlayer && Math.random() < 0.07) {
         const trinket = pick(INVESTIGATE_TRINKETS);
         const qty = trinket.qtyMin === trinket.qtyMax
           ? trinket.qtyMin
@@ -14660,71 +15944,162 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ slotLoadError: null });
   },
 
-  // Tutorial — runs once after first character creation. Players can skip
-  // at the welcome modal or any subsequent step. End of tutorial (skip or
-  // completion) marks player.hasSeenIntro=true so it never re-runs.
+  // Tutorial — Tungsten Spire APK rewrite. The tutorial is a 10-beat
+  // in-feed sequence driven by the Arbiter from the outpost (the
+  // player's faction-starting hub room). Each beat advances when the
+  // player performs the specific action the Arbiter just asked for.
+  // The OLD welcome-card overlay is gone; the OLD demo-vendor beat is
+  // gone; the OLD per-screen tour is reduced to the dialogue inside
+  // the outpost. A trimmed screen-orientation reference survives in
+  // TUTORIAL_DOCS_FULL for the future Tutorial Replay panel; the old
+  // per-system pages (crafting, golems, dogs, trading, contracts,
+  // inventory) were intentionally dropped — those systems teach
+  // themselves at their trigger sites via FirstTimeHint.
   startTutorial() {
-    set({ tutorialStep: 0 });
+    // Open the first beat — speak the Arbiter's name prompt and arm
+    // the awaitingTutorialName latch so the next text input becomes
+    // the player's name.
+    set({ tutorialStep: 0, awaitingTutorialName: true });
+    const firstStep = TUTORIAL_STEPS[0];
+    if (firstStep?.arbiter) {
+      get().appendLog('arbiter', firstStep.arbiter);
+    }
   },
   advanceTutorial() {
     const current = get().tutorialStep ?? 0;
     const next = current + 1;
-    // Total count comes from the step array — no more magic numbers
-    // drifting out of sync when steps are added or reordered.
     if (next >= TUTORIAL_STEPS.length) {
       get().skipTutorial();
       return;
     }
-    const currentStep = TUTORIAL_STEPS[current];
-    const nextStep = TUTORIAL_STEPS[next];
-    const enteringVendor = nextStep?.screen === 'vendor';
-    const leavingVendor = currentStep?.screen === 'vendor' && nextStep?.screen !== 'vendor';
-    // Drive the screen swap atomically with the step change. Previously
-    // we relied on TutorialOverlay's useEffect to dispatch setScreen
-    // after a re-render — that opened a one-frame window where the
-    // old screen rendered against new tutorial state (e.g. vendor
-    // screen with vendor=null after leaving the demo). Putting
-    // currentScreen in the same set() removes the in-between frame
-    // and the freeze it occasionally triggered.
-    const nextScreen = nextStep?.screen ?? 'exploration';
-    if (enteringVendor) {
-      const vendor = findVendorByName('Irma Ironhand') ?? pickRandomVendor();
-      set((s) => ({
-        currentScene: s.currentScene
-          ? { ...s.currentScene, vendor }
-          : s.currentScene,
-        tutorialDemoVendor: vendor,
-        tutorialStep: next,
-        currentScreen: nextScreen,
-      }));
+    const nextStep: TutorialStep | undefined = TUTORIAL_STEPS[next];
+    if (!nextStep) {
+      get().skipTutorial();
       return;
     }
-    if (leavingVendor) {
-      set((s) => ({
-        currentScene: s.currentScene
-          ? { ...s.currentScene, vendor: null }
-          : s.currentScene,
-        tutorialDemoVendor: null,
-        tutorialStep: next,
-        currentScreen: nextScreen,
-      }));
-      return;
+    // Screen swap only when the next beat explicitly lives on a
+    // different screen (pick_city → contracts). Most beats stay on
+    // exploration.
+    const nextScreen = nextStep.screen ?? 'exploration';
+    set({
+      tutorialStep: next,
+      awaitingTutorialName: nextStep.id === 'name',
+      // Leaving the explore_or_leave beat behind — clear the branch flag
+      // so a later replay/new game doesn't inherit a stale "explored".
+      tutorialExploreChosen: false,
+      currentScreen: nextScreen,
+    });
+    // Speak the next Arbiter line in the feed.
+    if (nextStep.arbiter) {
+      get().appendLog('arbiter', nextStep.arbiter);
     }
-    set({ tutorialStep: next, currentScreen: nextScreen });
+    // Pre-fill the input with the draft text (the rope beat uses
+    // this to demo typed input).
+    if (nextStep.draftText) {
+      get().queueInputDraft(nextStep.draftText);
+    }
+  },
+  maybeAdvanceTutorial(beatId) {
+    const state = get();
+    if (state.tutorialStep === null) return;
+    const step = TUTORIAL_STEPS[state.tutorialStep];
+    if (step?.id === beatId) {
+      get().advanceTutorial();
+    }
+  },
+  chooseTutorialExplore() {
+    const state = get();
+    const step = state.tutorialStep !== null ? TUTORIAL_STEPS[state.tutorialStep] : null;
+    if (step?.id !== 'explore_or_leave') return;
+    // Hide the popup, hand control back. The player roams freely; leaving
+    // the outpost by any means (typed 'leave outpost', the OUT chip, or a
+    // cardinal step out the gate) trips finishOutpostTutorial.
+    set({ tutorialExploreChosen: true });
+    get().appendLog(
+      'arbiter',
+      `"Take your time, then. Pick this place clean if you like. When you're ready to begin, tap EXIT or type 'leave outpost', and I'll set you on the road."`,
+    );
+  },
+  chooseTutorialLeave() {
+    const state = get();
+    const step = state.tutorialStep !== null ? TUTORIAL_STEPS[state.tutorialStep] : null;
+    if (step?.id !== 'explore_or_leave') return;
+    const player = get().player;
+    // Walk the player out of the outpost (mirrors the isLeaveHubCommand
+    // path) so the main_quest beat lands them in the open with the MAIN
+    // QUEST objective chip in view.
+    if (player?.hubRoomId) {
+      set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
+      set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.travel), 1) });
+      get().appendLog(
+        'world',
+        `You step out through the gate. Open ground, open sky — the outpost falls away behind you. The road starts here.`,
+      );
+      get().beginScene({ skipHubEntry: true });
+    }
+    get().finishOutpostTutorial();
+  },
+  finishOutpostTutorial() {
+    const state = get();
+    if (state.tutorialStep === null) return;
+    const step = TUTORIAL_STEPS[state.tutorialStep];
+    if (step?.id !== 'explore_or_leave') return;
+    // Starter note — kept for inventory parity with the skip path. Its
+    // main-quest framing is delivered by the main_quest beat's Arbiter
+    // line (next), so grant it silently here.
+    grantTutorialItem(get, set, 'note');
+    set({ tutorialExploreChosen: false });
+    // maybeAdvanceTutorial (not advanceTutorial) so the no-stall guard
+    // test sees explore_or_leave wired to an advancement call. Step is
+    // already confirmed explore_or_leave above, so this always advances.
+    get().maybeAdvanceTutorial('explore_or_leave');
   },
   skipTutorial() {
-    // Clear any tutorial-injected vendor from the scene.
+    // Skip path — grant the starter loot the tutorial would have
+    // walked the player through (cudgel + rope + note), mark
+    // tutorialPropsConsumed so the outpost doesn't keep narrating
+    // the props, and end the tutorial. If the player skipped at
+    // the name beat, assign a race-themed default name
+    // (random adjective + singular race, e.g. "Dusty Reclaimer").
+    const state = get();
+    const player = state.player;
     set((s) => {
-      const patch: Partial<GameStore> = { tutorialStep: null, tutorialDemoVendor: null };
+      const patch: Partial<GameStore> = {
+        tutorialStep: null,
+        tutorialDemoVendor: null,
+        awaitingTutorialName: false,
+        tutorialExploreChosen: false,
+        tutorialPropsConsumed: { cudgel: true, rope: true, chestPlate: true, note: true },
+        // Land back in the world when the tutorial ends. The final beat
+        // (pick_city) runs on the 'contracts' / MAIN QUEST screen, and the
+        // skip button can fire from any beat — without this, finishing or
+        // skipping could strand the player on whatever screen the last beat
+        // used (e.g. contracts) instead of dropping them into exploration.
+        currentScreen: 'exploration',
+      };
       if (s.currentScene && s.tutorialDemoVendor && s.currentScene.vendor === s.tutorialDemoVendor) {
         patch.currentScene = { ...s.currentScene, vendor: null };
       }
-      // Persist hasSeenIntro=true so the tutorial never re-runs for this character.
       if (s.player) {
-        patch.player = { ...s.player, hasSeenIntro: true };
+        const nextName = s.player.name && s.player.name.trim().length > 0
+          ? s.player.name
+          : generateDefaultName(s.player.raceId);
+        patch.player = { ...s.player, name: nextName, hasSeenIntro: true };
       }
       return patch;
     });
+    // Grant starter loot if the player skipped before they collected
+    // any of it. Idempotent — grantTutorialItem refuses duplicate
+    // stacks of unique items.
+    if (player && !state.tutorialPropsConsumed.cudgel) {
+      grantTutorialItem(get, set, 'cudgel');
+    }
+    if (player && !state.tutorialPropsConsumed.rope) {
+      grantTutorialItem(get, set, 'rope');
+    }
+    if (player && !state.tutorialPropsConsumed.note) {
+      grantTutorialItem(get, set, 'note');
+    }
     void get().persist();
   },
 
@@ -15370,6 +16745,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // slot and got two "You equip ..." lines with no signal that the locket
     // was actually displaced.
     const previousInSlot = (player.equipped ?? {})[writeSlot as keyof PlayerEquipped] as string | undefined;
+    // arb62 — split-on-equip. A stack of N>1 durable items (e.g. 3 Aetherbound
+    // Masks merged by grantItem) shares ONE inventory row + id; equipping it
+    // flagged ALL N as EQUIPPED and the spares couldn't be scrapped/used. Now:
+    // when equipping from a stack, the EQUIPPED copy KEEPS the original id (qty
+    // 1) and the REMAINDER (N-1) is peeled off into a new free instance. Keeping
+    // the original id on the equipped copy preserves the invariant that
+    // equipped[slotId] === the id of the item the caller equipped (relied on by
+    // durability wear, resolveEquippedItem, and the inventory-audit harnesses).
+    // arb64 — flipped the split direction (was: peel the equipped copy to a new
+    // id), which had broken that invariant. Quantity 1 → no split.
+    const equipId = item.id;
+    if ((item.quantity ?? 1) > 1) {
+      const remainderId = `equip_rem_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+      set((s) => {
+        if (!s.player) return s;
+        const inv = s.player.inventory.map((i) =>
+          i.id === item.id ? { ...i, quantity: 1 } : i,
+        );
+        inv.push({
+          ...item,
+          id: remainderId,
+          quantity: (item.quantity ?? 1) - 1,
+          durability: item.durability ? { ...item.durability } : undefined,
+        });
+        return { player: { ...s.player, inventory: inv } };
+      });
+    }
     // Store both the catalog name (for display + catalog lookup) AND the
     // specific InventoryItem.id so durability wear, the InventoryScreen
     // "EQUIPPED" badge, and any other instance-sensitive code knows
@@ -15382,7 +16784,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               equipped: {
                 ...(s.player.equipped ?? {}),
                 [writeSlot]: item.name,
-                [writeIdKey]: item.id,
+                [writeIdKey]: equipId,
               },
             },
           }
@@ -15706,6 +17108,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       `✦ Forged at the Crucible: ${fused.name} (${fused.rarity ?? 'Rare'}).`,
     );
+    // arb45 — Master of Aethercraft: a completed fusion is Aethercraft.
+    recordTitleProgress(get, set, { fusionsCompleted: 1 });
     get().appendLog(
       'world',
       `The Crucible exhales. ${result.description}`,
@@ -16012,7 +17416,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   rest() {
     const player = get().player;
     if (!player) return;
-    const hpRoom = player.hpMax - player.hp;
+    // arb37 — rest restores STAMINA only; HP is healed by eating (food →
+    // health). hpRoom is intentionally not computed here.
     const effMax = effectiveStaminaMax(player);
     const stamRoom = effMax - player.stamina;
     // Rest always advances time, even at full health/stamina — you sat
@@ -16071,7 +17476,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       `You sit for ${hoursSlept} hours. You came back to yourself at the same place you set out from.`,
       `You sit for ${hoursSlept} hours. Tartaria did not change in any of them you can see.`,
     ];
-    if (hpRoom <= 0 && stamRoom <= 0 && hungerTicks === 0 && weatherHpDamage === 0 && weatherStamDamage === 0 && !ambushTriggered) {
+    if (stamRoom <= 0 && hungerTicks === 0 && weatherHpDamage === 0 && weatherStamDamage === 0 && !ambushTriggered) {
       set((s) => (s.player ? { player: { ...s.player, hoursElapsed: newHours } } : s));
       const restLine = FULL_HP_REST_LINES[Math.floor(Math.random() * FULL_HP_REST_LINES.length)]!;
       get().appendLog('world', `${restLine} (${describeTime(newHours)})`);
@@ -16111,15 +17516,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       void get().persist();
       return;
     }
-    // OTA-187 — rest healing nerfed. Was 2d6 HP (2-12) + 1d6+2
-    // stamina (3-8) per rest, so a single sleep restored ~30-40%
-    // of mid-game HP and most of the stamina bar. Playtester:
-    // "rest gives back too much health, I can fully heal and
-    // restore stamina with almost no downside." Now 1d6 HP (1-6)
-    // + 1d4 stamina (1-4) — multiple rests needed for a full
-    // top-up, and each rest still rolls an ambush + advances
-    // the clock 8 hours, so the recovery has a real cost.
-    const heal = Math.min(hpRoom, rollDie(6));
+    // OTA-187 nerfed rest healing; arb37 removes rest HP entirely.
+    // Rest now restores STAMINA only (1d4) — HP is healed by EATING
+    // (food → health), which makes food markets / food lore valuable
+    // and lets the player top HP to full by eating, never by sleeping.
+    // Each rest still rolls an ambush + advances the clock, so stamina
+    // recovery keeps a real cost.
+    const heal = 0;
     const stamGain = Math.min(stamRoom, rollDie(4));
     const prevHpRest = player.hp;
     const hpMaxRest = player.hpMax;
@@ -16383,6 +17786,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const mq = require('../engine/mainQuest');
     const capitalId = player.currentLocationId;
     if (!mq.LOST_CAPITAL_LOCATIONS.includes(capitalId)) {
+      return { ok: false, reason: 'not_at_capital' };
+    }
+    // currentLocationId lingers as the departure capital while travelling /
+    // wandering, so confirm the player is actually standing in the city
+    // before answering the summons in the wilderness.
+    if (!isStationedAtNamedLocation(player)) {
       return { ok: false, reason: 'not_at_capital' };
     }
     const mqState = mq.ensureMainQuest(player.mainQuest);
@@ -17646,6 +19055,38 @@ function parseEnemyAP(enemy: { abilityPoint?: string } | null | undefined, fallb
 function nonClimbMarkers(searched: readonly string[] | undefined): string[] {
   if (!searched) return [];
   return searched.filter((s) => !s.startsWith('climbed:'));
+}
+
+// arb39 — persistent-room emptiness. searchedAmbientNouns is the
+// terminal-consumption record for a room key (written by take / pickup /
+// salvage / harvest / dig; investigate uses flavorExhaustedNouns, kept
+// separate, so this set never includes merely-investigated props). The
+// scene composers (beginScene hub interiors + patchSceneForBuildingRoom)
+// subtract this set so an interactable the player already took or
+// salvaged does NOT respawn as a chip on re-entry — closing the
+// re-enter-a-room-to-farm-skills/supplies exploit. Wild tiles don't use
+// this filter; their re-roll is intentional theme-park density.
+function roomConsumedSet(
+  worldMemory: { visitedRooms?: Record<string, VisitedRoom> },
+  roomKey: string | null | undefined,
+): Set<string> {
+  if (!roomKey) return new Set();
+  const searched = worldMemory.visitedRooms?.[roomKey]?.searchedAmbientNouns;
+  return new Set(nonClimbMarkers(searched).map((n) => n.toLowerCase()));
+}
+
+/** True when `noun` has already been consumed (taken/salvaged) in this
+ *  room. Mirrors the take-handler's dedupe match (exact OR substring
+ *  either way) so a chip is hidden under the same conditions a re-take
+ *  would be refused. */
+function isConsumedNoun(consumed: Set<string>, noun: string): boolean {
+  if (consumed.size === 0) return false;
+  const n = noun.toLowerCase();
+  if (consumed.has(n)) return true;
+  for (const c of consumed) {
+    if (n.includes(c) || c.includes(n)) return true;
+  }
+  return false;
 }
 
 // v2.4.1 (OTA 049) — next cardinal step toward a procedural-grid
@@ -19437,6 +20878,10 @@ function narrateCasualLook(
     set((s) => (s.currentScene ? { currentScene: { ...s.currentScene, hooks: [...(s.currentScene.hooks ?? []), hook] } } : s));
     get().appendLog('world', hook.plantedLine);
   }
+
+  // Tungsten Spire — tutorial look-beat advancement. Fires only when
+  // the current tutorial beat is 'look'; no-op otherwise.
+  get().maybeAdvanceTutorial('look');
 }
 
 // Variant pool for the intra-scene approach line. Six rotations so a

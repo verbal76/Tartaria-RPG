@@ -118,39 +118,81 @@ async function resolveSource(
   }
   await ensureCacheDir();
   const target = CACHE_DIR + cacheNameFor(source);
+  const marker = target + '.complete'; // written ONLY after a finished download
+
+  // arb56 — reuse is gated on a completion MARKER, not a size guess. The old
+  // ">= 50 MB looks done" heuristic had two failures the player hit as
+  // "downloads every time":
+  //   (1) every model file UNDER 50 MB (the voice + tokenizer/config) failed
+  //       the check and re-downloaded on EVERY launch — never cached.
+  //   (2) a large partial (e.g. 71 MB) PASSED the 50 MB check, got trusted as
+  //       complete, then failed to load.
+  // Now: a download writes `<file>.complete` (holding the final byte size) only
+  // when it actually finishes. We reuse the cached file only when that marker
+  // exists AND its recorded size matches the file on disk — so partials of any
+  // size are never trusted, and complete files of any size are always reused.
   const info = await FileSystem.getInfoAsync(target);
-  // OTA 23-018 — require a "looks plausible" file size before
-  // re-using the cached file. Kokoro-Medium ONNX is ~100 MB; a
-  // partial download landing as a 30 MB file was passing the old
-  // size > 0 check and getting cached forever, producing endless
-  // "Failed to load model" with no recovery path. New threshold:
-  // 50 MB. Below that → treat as corrupt, delete, re-download.
-  // Higher-resolution models will trivially exceed this.
-  const MIN_REUSE_BYTES = 50 * 1024 * 1024;
-  if (info.exists && typeof info.size === 'number' && info.size >= MIN_REUSE_BYTES) {
-    onProgress(1);
-    return target.replace(/^file:\/\//, '');
+  if (info.exists && typeof info.size === 'number' && info.size > 0) {
+    try {
+      const m = await FileSystem.getInfoAsync(marker);
+      if (m.exists) {
+        const recorded = parseInt(await FileSystem.readAsStringAsync(marker), 10);
+        if (Number.isFinite(recorded) && recorded === info.size) {
+          onProgress(1);
+          return target.replace(/^file:\/\//, '');
+        }
+      }
+    } catch { /* marker unreadable → fall through and re-fetch */ }
   }
-  if (info.exists) {
-    // Truncated / zero-byte file from a prior failed attempt —
-    // remove it so the downloadResumable below writes a clean copy.
-    try { await FileSystem.deleteAsync(target, { idempotent: true }); } catch { /* ignore */ }
+
+  // Not verified-complete. Keep any partial on disk so the retry loop can
+  // RESUME it (HTTP Range) within this session instead of restarting; on a
+  // single mid-transfer drop ("Software caused connection abort") we retry
+  // with exponential backoff rather than failing the whole voice install.
+  const progressCb = (p: { totalBytesWritten: number; totalBytesExpectedToWrite: number }) => {
+    if (!p.totalBytesExpectedToWrite) return;
+    const frac = p.totalBytesWritten / p.totalBytesExpectedToWrite;
+    onProgress(Math.max(0, Math.min(1, frac)));
+  };
+  const markComplete = async (): Promise<void> => {
+    try {
+      const fin = await FileSystem.getInfoAsync(target);
+      const size = fin.exists && typeof fin.size === 'number' ? fin.size : 0;
+      if (size > 0) await FileSystem.writeAsStringAsync(marker, String(size));
+    } catch { /* best-effort: if we can't mark, we just re-fetch next time */ }
+  };
+  const MAX_ATTEMPTS = 5;
+  let handle = FileSystem.createDownloadResumable(source, target, {}, progressCb);
+  let lastErr: unknown = null;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      // Attempt 1 starts fresh; later attempts resume the partial via the
+      // Range header carried in the handle's resume data.
+      const result = attempt === 1
+        ? await handle.downloadAsync()
+        : await handle.resumeAsync();
+      if (result?.uri) {
+        await markComplete();
+        return result.uri.replace(/^file:\/\//, '');
+      }
+      lastErr = new Error('download returned no uri');
+    } catch (e) {
+      lastErr = e;
+      // Rebuild the handle from its savable snapshot so the next attempt
+      // carries resumeData (the byte offset already written). Falls back to
+      // the existing handle if savable() isn't available.
+      try {
+        const s = handle.savable();
+        handle = FileSystem.createDownloadResumable(
+          s.url, s.fileUri, s.options, progressCb, s.resumeData,
+        );
+      } catch { /* keep existing handle */ }
+    }
+    if (attempt < MAX_ATTEMPTS) {
+      await new Promise((r) => setTimeout(r, 1000 * 2 ** (attempt - 1))); // 1s,2s,4s,8s
+    }
   }
-  // Fresh download. Progress maps the resumable callback to the
-  // 0–1 range the caller expects.
-  const handle = FileSystem.createDownloadResumable(
-    source,
-    target,
-    {},
-    (p) => {
-      if (!p.totalBytesExpectedToWrite) return;
-      const frac = p.totalBytesWritten / p.totalBytesExpectedToWrite;
-      onProgress(Math.max(0, Math.min(1, frac)));
-    },
-  );
-  const result = await handle.downloadAsync();
-  if (!result?.uri) return null;
-  return result.uri.replace(/^file:\/\//, '');
+  throw lastErr ?? new Error('download failed after retries');
 }
 
 /** Adapter instance handed to initExecutorch at boot. */

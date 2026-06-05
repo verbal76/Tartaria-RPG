@@ -65,6 +65,20 @@ function bump(c: Counter, key: string, n = 1) {
 const _origLog = console.log;
 const _origWarn = console.warn;
 const _origErr = console.error;
+const _origRandom = Math.random;
+
+// Seeded RNG — the sim AND the engine pull from Math.random (enemy picks,
+// dice, loot), so unseeded runs were flaky. Seed the global in beforeAll so
+// the whole 700-day playthrough is reproducible.
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a |= 0; a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
 describe('combatStress — quick-action combat verbs across 700 in-game days', () => {
   jest.setTimeout(170000);
@@ -73,11 +87,13 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
     console.log = () => {};
     console.warn = () => {};
     console.error = () => {};
+    Math.random = mulberry32(0xc0bba1);
   });
   afterAll(() => {
     console.log = _origLog;
     console.warn = _origWarn;
     console.error = _origErr;
+    Math.random = _origRandom;
   });
 
   it('drives 700 days of forced encounters through every combat verb', async () => {
@@ -303,6 +319,16 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
           hpSamples.push(p.hp);
           staminaSamples.push(p.stamina);
         }
+      }
+      // Trim gameLog every turn — same guard as thousandDayStressSim. The
+      // store keeps every entry (MAX_LOG_IN_MEMORY = Infinity) and persist()
+      // JSON.stringify-s the full array into the AsyncStorage mock after
+      // almost every action; without trimming, 700 days of combat OOMs V8
+      // (>8 GB strings). combatStress asserts on its own counters, never on
+      // gameLog, so dropping old entries is safe.
+      const curLog = store.getState().gameLog;
+      if (curLog.length > 80) {
+        store.setState({ gameLog: curLog.slice(-40) });
       }
       actions++;
 
@@ -658,9 +684,13 @@ First 5 crashes:      ${crashes.slice(0, 5).join(' | ') || '(none)'}
     expect(totalEncounters).toBeGreaterThan(10);
     expect(winRate).toBeGreaterThanOrEqual(0.6);
 
-    // 3. Every defensive verb fires its +AC status at least once.
+    // 3. Defensive verbs fire their +AC status at least once. NOTE: the
+    //    'block' verb was folded into dodge (see gameStore `case 'block'`:
+    //    "block folded into dodge"), so it intentionally no longer applies
+    //    a standalone 'blocking' status — only dodge and take_cover grant
+    //    their own +AC effect now. Asserting block here tested removed
+    //    behavior; the verb is still exercised above and must not crash.
     expect(defensiveAcApplied.dodge ?? 0).toBeGreaterThan(0);
-    expect(defensiveAcApplied.block ?? 0).toBeGreaterThan(0);
     expect(defensiveAcApplied.take_cover ?? 0).toBeGreaterThan(0);
 
     // 4. No infinite combat loops — assertion target is "every

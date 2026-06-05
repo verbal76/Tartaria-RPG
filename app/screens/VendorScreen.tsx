@@ -55,6 +55,8 @@ export function VendorScreen() {
   // "Rendered fewer hooks than expected" crash. All hooks must
   // unconditionally precede any return statement in this component.
   const [sellSort, setSellSort] = useState<'name' | 'value' | 'rarity'>('value');
+  // arb57 — batch sell: quantity stepper + Sell All, mirroring the scrap modal.
+  const [sellQty, setSellQty] = useState(1);
 
   const vendor = scene?.vendor ?? null;
 
@@ -74,7 +76,7 @@ export function VendorScreen() {
   }
 
   const openBuy = (itemName: string, price: number) => setPending({ mode: 'buy', itemName, price });
-  const openSell = (itemName: string, price: number) => setPending({ mode: 'sell', itemName, price });
+  const openSell = (itemName: string, price: number) => { setSellQty(1); setPending({ mode: 'sell', itemName, price }); };
 
   // OTA-178 — gate-loss warning helper. Returns the GateKind label
   // when selling THIS item would leave the player with no other
@@ -120,6 +122,20 @@ export function VendorScreen() {
     return { gate, label: GATE_LABELS[gate] ?? gate };
   };
   const pendingGateLoss = pending?.mode === 'sell' ? gateLossFor(pending.itemName) : null;
+  // arb57 — current stack size + batch-sell helper. `repsOverride` lets
+  // "Sell All" pass the whole stack; default uses the stepper value. Each
+  // sellToVendor call is one unit (its own TC credit + log line).
+  const sellStackFor = (name: string) =>
+    player.inventory.find((i) => i.name.toLowerCase() === name.toLowerCase())?.quantity ?? 1;
+  const pendingSellStack = pending?.mode === 'sell' ? sellStackFor(pending.itemName) : 1;
+  const sellRepsClamped = Math.max(1, Math.min(sellQty, pendingSellStack));
+  const doSell = (repsOverride?: number) => {
+    if (pending?.mode !== 'sell') return;
+    const stack = sellStackFor(pending.itemName);
+    const reps = Math.max(1, Math.min(repsOverride ?? sellQty, stack));
+    for (let i = 0; i < reps; i++) sellToVendor(pending.itemName);
+    setPending(null);
+  };
   // OTA 030 — steal DC is tiered by vendor source. Hub vendors have no
   // demeanor and default to DC 16 (alert, help nearby). Roadside
   // sketchy = DC 11, honest = DC 14. Pre-compute here so the
@@ -546,13 +562,24 @@ export function VendorScreen() {
                     : 'Not enough TC'
         }
         itemPreview={pending?.mode === 'accept' ? null : preview}
+        quantityStepper={
+          pending?.mode === 'sell' && !pendingGateLoss && pendingSellStack > 1
+            ? {
+                label: 'Sell how many?',
+                value: sellRepsClamped,
+                min: 1,
+                max: pendingSellStack,
+                onChange: setSellQty,
+              }
+            : undefined
+        }
         contextLine={
           pending?.mode === 'dismiss'
             ? 'They leave the scene. New offers will come from the next vendor who shows up.'
             : pending?.mode === 'sell'
               ? (pendingGateLoss
                   ? `Price: +${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.price} TC\n\n⚠ This is your ONLY way to ${pendingGateLoss.label}. Selling it leaves you with no other tool that satisfies the gate — actions that need it will refuse until you find or craft a replacement.`
-                  : `Price: +${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.price} TC`)
+                  : `Price: +${pending.price}${sellRepsClamped > 1 ? ` × ${sellRepsClamped} = +${pending.price * sellRepsClamped}` : ''} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc + pending.price * sellRepsClamped} TC`)
               : pending?.mode === 'steal'
                 ? `DEX ${player.stats.dexterity} vs DC ${pending.dc}. On a miss, ${vendor.name} draws steel and the deal becomes a fight.${vendor.faction ? ` Caught theft tanks rep with ${vendor.faction.replace(/_/g, ' ')}.` : ''}`
                 : pending?.mode === 'accept'
@@ -575,11 +602,15 @@ export function VendorScreen() {
                   // OTA-178 — gate-loss sells get the destructive (red)
                   // button tone + label change so the second tap reads
                   // as "yes I really mean to lose this capability."
-                  // Normal sells stay primary tone with the plain
-                  // "Sell" label.
+                  // Normal sells stay primary tone. arb57 — the label
+                  // carries the stepper quantity; Sell All adds a one-tap
+                  // whole-stack option (skips the stepper).
                   pendingGateLoss
-                    ? { label: 'Sell anyway', onPress: confirmAction, tone: 'destructive' as const }
-                    : { label: 'Sell', onPress: confirmAction, tone: 'primary' as const },
+                    ? { label: 'Sell anyway', onPress: () => doSell(1), tone: 'destructive' as const }
+                    : { label: pendingSellStack > 1 ? `Sell ×${sellRepsClamped}` : 'Sell', onPress: () => doSell(), tone: 'primary' as const },
+                  ...(!pendingGateLoss && pendingSellStack > 1
+                    ? [{ label: `Sell All (${pendingSellStack})`, onPress: () => doSell(pendingSellStack), tone: 'primary' as const }]
+                    : []),
                 ]
               : pending?.mode === 'steal'
                 ? [

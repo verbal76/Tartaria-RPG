@@ -694,7 +694,7 @@ const styles = StyleSheet.create({
   footerHere: { color: '#e07a5f', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
   footerWhere: { color: '#e6d8b3', fontSize: 13, marginTop: 2 },
   footerDist: { color: '#cdbf99', fontSize: 11, marginTop: 4 },
-  footerCaveat: { color: '#5a5246', fontSize: 9, fontStyle: 'italic', marginTop: 8, lineHeight: 13 },
+  footerCaveat: { color: '#c9a86a', fontSize: 9, fontStyle: 'italic', marginTop: 8, lineHeight: 13 },
   // OTA-171 — Places panel at the bottom of MapScreen. Scrollable
   // capped height so the panel doesn't push the atlas image off-
   // screen on smaller phones.

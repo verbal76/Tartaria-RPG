@@ -44,7 +44,7 @@ jest.mock('expo-av', () => ({
 
 import { useGameStore } from '../app/state/gameStore';
 
-async function bootstrapDrained() {
+async function bootstrapDrained(opts: { inHub?: boolean } = {}) {
   await useGameStore.getState().hydrate();
   await useGameStore.getState().startNewGame({
     name: 'Drained',
@@ -52,10 +52,17 @@ async function bootstrapDrained() {
     factionId: 'reclaimers_guild',
   });
   useGameStore.getState().skipTutorial?.();
-  // Drain the player to zero stamina so the travel refusal path
-  // fires deterministically.
+  // Drain the player to zero stamina so the travel refusal path fires
+  // deterministically. Unless a test explicitly wants the in-hub case,
+  // clear hubRoomId so `go north` exercises the OVERLAND refusal path —
+  // which is OTA-163's actual scenario (a cartographer roaming the open
+  // map, not an outpost interior). arb40 made interior outpost moves
+  // free (0 stamina / 0 time), so an in-hub `go north` no longer routes
+  // through the overland stamina gate that this guard locks.
   useGameStore.setState((s) => ({
-    player: s.player ? { ...s.player, stamina: 0 } : s.player,
+    player: s.player
+      ? { ...s.player, stamina: 0, hubRoomId: opts.inHub ? s.player.hubRoomId : null }
+      : s.player,
   }));
 }
 
@@ -99,5 +106,28 @@ describe('OTA-163 — depleted travel attempts still advance the clock', () => {
     const end = useGameStore.getState().player!.hoursElapsed ?? 0;
     // 100 refusals × ~0.25h = ~25h advanced. Pre-fix this was 0.
     expect(end - start).toBeGreaterThanOrEqual(20);
+  });
+
+  // arb40 — interior outpost movement is free. The OTA-163 overland tick
+  // above must NOT apply inside a hub: walking room-to-room costs no
+  // stamina and no time, so a player on empty legs is never stuck at a
+  // vendor and a 15-room capital is free to roam. Locks that an in-hub
+  // 0-stamina cardinal move advances neither the clock nor stamina.
+  it('arb40 — an in-hub 0-stamina cardinal move is FREE (no time, no stamina)', async () => {
+    await bootstrapDrained({ inHub: true });
+    const before = useGameStore.getState().player!;
+    // Sanity: the player starts inside the faction outpost.
+    expect(before.hubRoomId).toBeTruthy();
+    const hoursBefore = before.hoursElapsed ?? 0;
+    useGameStore.getState().submitPlayerAction('go north');
+    const after = useGameStore.getState().player!;
+    // Free move: the clock did not advance and no stamina was spent —
+    // proving it did NOT hit the overland gate (which would tick ~15 min).
+    expect((after.hoursElapsed ?? 0) - hoursBefore).toBe(0);
+    expect(after.stamina).toBe(0);
+    // And it was a real move, not a block — the room changed and the
+    // player is still inside the hub.
+    expect(after.hubRoomId).toBeTruthy();
+    expect(after.hubRoomId).not.toBe(before.hubRoomId);
   });
 });

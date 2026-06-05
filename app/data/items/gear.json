@@ -1,6 +1,6 @@
 {
   "gear": [
-    { "name": "Trail Rations", "kind": "consumable", "rarity": "Common", "tags": ["food"], "description": "Hardtack and salted mud-meat. Restores stamina and a touch of HP when eaten." },
+    { "name": "Trail Rations", "kind": "consumable", "rarity": "Common", "tags": ["food"], "description": "Hardtack and salted mud-meat. Eating mends the body — food is how you heal out here." },
 
     { "name": "Wild Onion",       "kind": "consumable", "rarity": "Common",   "tags": ["food","foraged","vegetable"], "description": "Pulled from the silt by its papery tops. Sharp, watery, fills a corner of the gut.",
       "effect": { "kind": "consumable", "healHP": 2, "restoreStamina": 1 } },

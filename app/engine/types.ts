@@ -506,8 +506,10 @@ export type EquipSlot =
   | 'off'
   | 'head'
   | 'chest'
+  | 'hands'
   | 'legs'
   | 'feet'
+  | 'cloak'
   | 'amulet'
   | 'ring';
 
@@ -519,8 +521,11 @@ export interface PlayerEquipped {
   off?: string;
   head?: string;
   chest?: string;
+  /** arb63 — hands (gauntlets/gloves) + cloak (back) armor slots. */
+  hands?: string;
   legs?: string;
   feet?: string;
+  cloak?: string;
   amulet?: string;
   /** OTA-239 — three concurrent ring slots. `ring` is the legacy first
    *  slot (kept for back-compat); `ring2` and `ring3` are the new
@@ -539,8 +544,10 @@ export interface PlayerEquipped {
   offId?: string;
   headId?: string;
   chestId?: string;
+  handsId?: string;
   legsId?: string;
   feetId?: string;
+  cloakId?: string;
   amuletId?: string;
   ringId?: string;
   ring2Id?: string;
@@ -712,8 +719,27 @@ export interface PlayerCharacter {
    *  Surfaced on the Character Screen's TITLES section. Phase 1 is
    *  display-only with no auto-unlock triggers; future OTAs wire
    *  the titles' requirement strings (e.g. "Discover three Tartarian
-   *  relics") to runtime trackers. */
+   *  relics") to runtime trackers. arb45 wires the Tier-A/B titles. */
   earnedTitles?: string[];
+  /** arb45 — running counters the title-earning engine reads to award
+   *  Arbiter titles (relics found, sentinels defeated, storms survived,
+   *  etc.). See engine/titles.ts. Absent on legacy saves → treated as all
+   *  zero. */
+  titleProgress?: import('./titles').TitleProgress;
+  /** arb48 — active run through the Labyrinth of Shadows (Iskan-Veil). Set
+   *  while the player is inside the maze; cleared on finish or LEAVE. Absent
+   *  except during a run. See engine/labyrinth.ts + the Wayfarer challenge. */
+  labyrinthRun?: import('./labyrinth').LabyrinthRun;
+  /** arb50 — one-shot outcomes for the content-review Tier-C title trials
+   *  (Speaker @ Red Tower, Warden @ Sinking Cathedral). Keyed by challenge id.
+   *  Present once the player has COMMITTED an attempt — scouting never writes
+   *  here. A 'failed' entry permanently locks that trial (you get one chance).
+   *  See engine/titleChallenges.ts. */
+  challengeAttempts?: Record<string, 'failed' | 'succeeded'>;
+  /** arb53 — active Guild Broker mission (Parley Ground): the two factions
+   *  being brokered. Set when the player first parleys; `done` once the
+   *  alliance is sealed. See engine/broker.ts. */
+  brokerMission?: import('./broker').BrokerMission;
   /** OTA-195 — one-shot fusion permit granted by a Fusing Crucible
    *  travel encounter. Cleared when the player runs the fuse action.
    *  Without this gate, the fuse verb would be usable anywhere; the

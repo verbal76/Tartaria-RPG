@@ -1,26 +1,25 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Pressable, Keyboard, Platform } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  Pressable,
+  Keyboard,
+  Platform,
+  Animated,
+  Vibration,
+} from 'react-native';
 import { TutorialTarget } from './TutorialTarget';
-// OTA-189 — speech-to-text removed entirely per player ask: "remove
-// the stt button, the code for it from the game, and the button for
-// activation from the voice tab in settings." Mic button, handleMic,
-// STTManager import, listening state + poll all dropped. TTS path is
-// unaffected — read-aloud still routes through TTSManager via
-// gameStore, controlled by the gear screen's TTS toggle.
+import { visibleBuildingRooms } from '../engine/buildings';
+import { TUTORIAL_STEPS } from './tutorialSteps';
 import { useGameStore } from '../state/gameStore';
+import { hubRoomFor, isLeaveHubCommand } from '../engine/hub';
 import { resolveDisplayWeaponByName } from '../engine/itemResolution';
 import type { InventoryItem } from '../engine/types';
 
-/** OTA 207 — does the equipped weapon reach the current combat range?
- *  Mirrors playerWeaponReach() in gameStore but takes weapon name +
- *  range as plain inputs so the component layer can call it. Returns
- *  the tone the QuickBtn should render: 'ready' when the weapon can
- *  hit at this range, 'needs-approach' when it can't. Returns
- *  undefined when there's no combat in progress so neutral grey
- *  rendering applies (we don't tone weapons out-of-combat).
- *  OTA-227 — takes inventory so fused weapons (catalog-absent,
- *  uniqueStats-bearing) resolve their weaponKind correctly instead
- *  of falling back to barehand. */
+/** OTA 207 — does the equipped weapon reach the current combat range? */
 function weaponTone(
   weaponName: string | null | undefined,
   range: 'arm' | 'close' | 'far' | null | undefined,
@@ -28,12 +27,9 @@ function weaponTone(
   inventory: ReadonlyArray<InventoryItem>,
 ): 'ready' | 'needs-approach' | undefined {
   if (!range) return undefined;
-  // Bare hands — arm reach only.
   if (!weaponName) return range === 'arm' ? 'ready' : 'needs-approach';
   const w = resolveDisplayWeaponByName(weaponName, inventory);
   if (!w) return range === 'arm' ? 'ready' : 'needs-approach';
-  // Reach bands per kind. Runecasters: 'arm'+'close' baseline,
-  // Int >= 9 extends to 'far' (matches the gameStore rule).
   let bands: Array<'arm' | 'close' | 'far'>;
   switch (w.weaponKind) {
     case 'melee':
@@ -57,108 +53,37 @@ interface Props {
   onOpenSearch: () => void;
   onOpenCrafting: () => void;
   onOpenApproach: () => void;
-  /** OTA-239 — opens the Ask the Arbiter modal (lore lookup). */
   onOpenAskArbiter: () => void;
   onOpenSalvage: () => void;
   onOpenTake: () => void;
-  /** OTA 031 — open the climb-target picker (ClimbModal). Lists every
-   *  climbable noun in the current scene with its tier count.
-   *  Tapping one fires `climb <noun>` which resolves one tier. */
   onOpenClimb: () => void;
-  /** OTA 031 — fire the next tier on whatever the player is already
-   *  climbing. Submits `climb <noun>` for the noun stamped in
-   *  elevatedOn so the player can ascend without re-opening the
-   *  picker each tap. */
   onClimbUp: () => void;
-  /** OTA 031 — fire the descent path. Submits `climb down` which
-   *  the climb handler routes to a quick descent narration and
-   *  clears the elevated flag. */
   onClimbDown: () => void;
-  /** OTA 032 — full elevation tuple so the HUD knows whether the
-   *  player still has tiers to ascend. Null when on the ground. */
   elevatedOn?: { noun: string; tier: number; totalTiers: number } | null;
-  /** OTA-180 — onOpenFeedback prop dropped alongside the 📝
-   *  designer-note button removal. The appendFeedback store action
-   *  is still exported for any future re-introduction or for
-   *  programmatic feedback emits. */
-  /** OTA 049 — open the world Atlas (MapScreen). Sits on the same row
-   *  as the cardinal direction buttons so the player can step out of
-   *  travel to consult the map without changing modes. Hidden in
-   *  combat alongside the rest of the travel row. */
   onOpenMap: () => void;
   inCombat: boolean;
   equippedMain: string | null;
   equippedOff: string | null;
-  /** OTA-227 — passed through to weaponTone so fused weapons
-   *  (uniqueStats-bearing, catalog-absent) resolve their weaponKind
-   *  for the in-range tone instead of falling back to barehand. */
   inventory: ReadonlyArray<InventoryItem>;
-  /** Current combat range — surfaces advance/retreat buttons when meaningful. */
   range?: 'arm' | 'close' | 'far' | null;
-  /** v2.4.1 (OTA 049) — when set, the cardinal travel row swaps to
-   *  CONTINUE TRAVEL / STOP TRAVEL buttons. Display name of the
-   *  destination is rendered above. */
   travelTargetName?: string | null;
   onContinueTravel?: () => void;
   onStopTravel?: () => void;
-  /** 2026-05-25 — Manhattan distance to the active travel target.
-   *  Rendered as a compact "N moves" badge between STOP TRAVEL and
-   *  MAP so the player knows how far they have to walk. Hidden when
-   *  travelTargetName is null. */
   movesLeft?: number | null;
-  /** 2026-05-25 [UI-2] — count of nouns that each modal will
-   *  ACTUALLY render. When > 0, the corresponding peace-mode quick
-   *  button renders with 'ready' tone (green) to signal there's
-   *  something actionable behind it. When 0/undefined the button
-   *  stays neutral. Same affordance pattern as the combat APPROACH
-   *  'needs-approach' tone.
-   *
-   *  Expansion 2026-05-25 — now covers all four ambient-noun modals
-   *  (take, salvage, climb, investigate). Empty modal → gray button,
-   *  populated modal → green. */
   takeableCount?: number;
   salvageableCount?: number;
   climbableCount?: number;
-  /** OTA-188 — true when the player has any item in inventory that
-   *  satisfies the climb_steep gate (Climbing Rope, Reclaimer's Rope,
-   *  Mudwalker's Treads, etc.). Drives the CLIMB button's red-amber-
-   *  green ladder: no rope → red, rope + nothing to climb → amber,
-   *  rope + climbable in scene → green. Player ask: "this button
-   *  should remain red until you have a usable rope in your
-   *  inventory. and then turn amber until there are things to climb
-   *  them turn green." */
   playerHasRope?: boolean;
   investigateCount?: number;
-  /** 2026-05-25 [MECHANIC-1b] — active golem sidekick summary. When
-   *  present + hp > 0 + in combat, a "golem (hp/max)" QuickBtn
-   *  renders in the combat row. Tap fires 'use golem' through
-   *  onSubmit. The button stays 'ready' tone always — its existence
-   *  signals the affordance. */
   golem?: { name: string; hp: number; hpMax: number } | null;
-  /** OTA-144 — active dog companion summary. When present + hp > 0 +
-   *  status='with_player' + in combat, a "{name} (hp/max)" QuickBtn
-   *  renders in the combat row, parallel to the golem button. Tap
-   *  opens a 2-button action picker (BITE / DISTRACT) per the OTA-121
-   *  spec which never wired the UI surface. */
   dog?: { name: string; hp: number; hpMax: number } | null;
 }
 
-// Peace-mode quick buttons. The "look around you" button submits 'look' —
-// the parser still routes via the look verb, but the label is more
-// inviting + more clearly tells the player what the button does.
-// 'search' = opens a search prompt where the player names what to search
-// (also covers digging — searching the mud/silt/ground routes through
-// the dig path when the player carries a tool).
-// 'rest' = direct verb.
 const PEACE_QUICK_DIRECT: Array<{ label: string; submit: string }> = [
   { label: 'look around you', submit: 'look' },
   { label: 'rest', submit: 'rest' },
 ];
 
-// Trim a weapon name down to fit comfortably on a button. Examples:
-// "Aetheric Crystal Blade" → "Crystal Blade"
-// "Mud-fist Wraps"          → "Mud-fist"
-// "Sentinel Cleaver"        → "Cleaver"
 function shortWeaponLabel(name: string): string {
   const tokens = name.split(/\s+/);
   if (tokens.length <= 2) return name;
@@ -166,128 +91,222 @@ function shortWeaponLabel(name: string): string {
 }
 
 export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenAskArbiter, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, inventory, range, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, playerHasRope }: Props) {
-  // OTA-144 — dog combat action picker state. When the player taps
-  // the DOG quick-button in combat, this flips to true and the
-  // BITE / DISTRACT row renders inline. Either tap fires the
-  // corresponding intent and closes the picker.
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
-  // BrandedKeyboard removed 2026-05-21 per playtester: "it is not
-  // looking like it fits." Reverted to the system IME — Android's
-  // native keyboard layout, predictive text, voice input, etc.
-  // The system keyboard does cover the input on some devices when
-  // raised; if that becomes a problem again, KeyboardAvoidingView
-  // around the parent screen is the React Native idiomatic fix.
 
-  // OTA-189 — voice state + listening poll dropped along with the
-  // mic button. The only voice-settings consumer left in InputBox
-  // was `voice.sttEnabled`; without STT there's nothing to watch.
-
-  // Pull a pre-filled draft (e.g. an example phrase the player tapped
-  // on ActionReferenceScreen). Consume → reads + clears the store
-  // field in one shot so the draft doesn't keep re-applying every
-  // render. Polled at 250ms via the same loop as voice state since
-  // we're already there.
   const consumeDraft = useGameStore((s) => s.consumeInputDraft);
   const pendingDraft = useGameStore((s) => s.pendingInputDraft);
-  // OTA 207 — Intelligence determines runecaster reach (Int ≥ 9
-  // extends to 'far'). Read it from the store so the weapon tone
-  // updates whenever the player's effective stats change.
   const playerInt = useGameStore((s) => s.player?.stats.intelligence ?? 0);
-
-  // OTA-298 — Tutorial keyboard gate. Player ask: "make it so the
-  // keyboard cannot be used until the player either hits the skip
-  // or first continue in the tutorial. it pops up as soon as you
-  // open on Android and then you cannot see skip and it's
-  // confusing." On Android the system likes to bring the soft
-  // keyboard up the moment a focused TextInput is on screen, which
-  // hides the welcome step's SKIP / CONTINUE buttons (positioned at
-  // the top of the screen — see TutorialOverlay's cardPositionFor:
-  // 'fullscreen' → bottom card, but the buttons sit on the keyboard
-  // edge). Solution: while the tutorial is on the welcome step
-  // (tutorialStep === 0), make the input non-editable + suppress
-  // the soft keyboard on focus. Hitting SKIP clears tutorialStep
-  // to null; hitting CONTINUE advances it to 1. Either action
-  // unlocks the input — exactly the "skip or first continue"
-  // gate the player asked for.
   const tutorialStep = useGameStore((s) => s.tutorialStep);
-  const tutorialBlocksInput = tutorialStep === 0;
-  useEffect(() => {
-    // If the keyboard happened to be up when the welcome step
-    // appeared (e.g. autoFocus from a stale draft, Android focus
-    // restoration), dismiss it so the tutorial buttons are visible.
-    if (tutorialBlocksInput) {
-      Keyboard.dismiss();
-    }
-  }, [tutorialBlocksInput]);
+  const awaitingTutorialName = useGameStore((s) => s.awaitingTutorialName);
+  const hubRoomId = useGameStore((s) => s.player?.hubRoomId ?? null);
+  const factionId = useGameStore((s) => s.player?.factionId ?? null);
+  // arb25 — enterable buildings: when inside one, the travel row shows the
+  // building's rooms + EXIT instead of cardinals / faction-hub exits.
+  const activeBuildingId = useGameStore((s) => s.activeBuildingId);
+  const activeBuildingRoomId = useGameStore((s) => s.activeBuildingRoomId);
+  const buildingRevealed = useGameStore((s) => s.buildingRevealed);
+  // arb36 — enterable structure discovered on the current wild tile.
+  const sceneBuilding = useGameStore((s) => s.currentScene?.sceneBuilding ?? null);
+  const enterBuilding = useGameStore((s) => s.enterBuilding);
+  const goBuildingRoom = useGameStore((s) => s.goBuildingRoom);
+  const exitBuilding = useGameStore((s) => s.exitBuilding);
+  const buildingRooms = useMemo(
+    () => (activeBuildingId
+      ? visibleBuildingRooms(activeBuildingId, new Set(buildingRevealed))
+      : []),
+    [activeBuildingId, buildingRevealed],
+  );
 
+  const currentTutStep = tutorialStep !== null ? TUTORIAL_STEPS[tutorialStep] ?? null : null;
+  const currentBeatId = currentTutStep?.id ?? null;
+
+  // Pre-fill input from pendingInputDraft (the rope beat queues "take
+  // rope"). We pre-fill the text as a VISIBLE hint but deliberately do
+  // NOT call .focus() here — auto-focusing raised the soft keyboard on
+  // its own (e.g. the instant the rope beat became active after the
+  // player took the cudgel), which the player reported as the keyboard
+  // popping up unbidden. Rule now: the keyboard only ever appears when
+  // the player taps the text field themselves. The pre-filled command
+  // sits in the field ready to send via the TAKE chip or a tap+enter.
   useEffect(() => {
     if (pendingDraft !== null) {
       const draft = consumeDraft();
-      if (draft) {
-        setText(draft);
-        // Defer focus by one tick so the TextInput is mounted +
-        // ready to receive the cursor. Skip the focus call while the
-        // tutorial is blocking input — the welcome step takes
-        // priority over any pending draft.
-        if (!tutorialBlocksInput) {
-          setTimeout(() => inputRef.current?.focus(), 50);
-        }
-      }
+      if (draft) setText(draft);
     }
-  }, [pendingDraft, consumeDraft, tutorialBlocksInput]);
+  }, [pendingDraft, consumeDraft]);
+
+  // Tungsten Spire — input row pulses when the current tutorial step
+  // has `inputPulse: true` (name beat + rope beat). Pulses a border
+  // colour animation; same Animated pattern as TutorialTarget.
+  const inputPulse = currentTutStep?.inputPulse === true;
+  const pulse = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (!inputPulse) {
+      pulse.stopAnimation();
+      pulse.setValue(0);
+      return;
+    }
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, { toValue: 1, duration: 700, useNativeDriver: false }),
+        Animated.timing(pulse, { toValue: 0, duration: 700, useNativeDriver: false }),
+      ]),
+    );
+    loop.start();
+    return () => { loop.stop(); };
+  }, [inputPulse, pulse]);
+  const inputBorderColor = inputPulse
+    ? pulse.interpolate({ inputRange: [0, 1], outputRange: ['#c9a86a', '#ffe28a'] })
+    : '#3a342c';
 
   const handleSubmit = () => {
     const trimmed = text.trim();
     if (!trimmed) return;
     onSubmit(trimmed);
-    // Android IME composition buffer keeps the tail of long inputs even
-    // after setText('') — controlled-value pattern alone isn't enough.
-    // Call the native clear() method too so the on-screen input actually
-    // empties out. Playtest screenshot showed "? it should make that
-    // what is going on right now" stuck in the box after Act.
     setText('');
     inputRef.current?.clear();
-    // System keyboard handles its own dismissal on returnKey;
-    // we don't need to drive it from here.
+    // Hitting enter/send always dismisses the keyboard now (player ask:
+    // "when you hit enter it should go away"). Previously this only fired
+    // on the name beat, so the keyboard lingered after every typed
+    // command and could reappear over later UI.
+    Keyboard.dismiss();
   };
 
-  // OTA-189 — handleMic removed. STT is gone from the game; the only
-  // voice affordance left on the input row is the Act button.
+  // Tungsten Spire — hub-room named exits. When the player is inside
+  // a hub (player.hubRoomId is set), the travel row swaps cardinal
+  // chips for chips named after the rooms reachable from this one,
+  // plus an OUT chip that fires the leave-hub verb. The chip's
+  // onPress still submits 'go <direction>' so resolveHubTravel does
+  // its existing thing; only the chip LABEL changes. Outside a hub
+  // the row renders cardinals as before.
+  const hubRoom = useMemo(() => (hubRoomId ? hubRoomFor(hubRoomId, factionId) : null), [hubRoomId, factionId]);
+  const hubExitChips: Array<{ label: string; submit: string }> = useMemo(() => {
+    if (!hubRoom) return [];
+    const out: Array<{ label: string; submit: string }> = [];
+    for (const dir of ['north', 'south', 'east', 'west'] as const) {
+      const targetId = hubRoom.exits[dir];
+      if (!targetId) continue;
+      const targetRoom = hubRoomFor(targetId, factionId);
+      const label = targetRoom?.shortName?.toUpperCase() ?? dir.toUpperCase();
+      out.push({ label, submit: `go ${dir}` });
+    }
+    return out;
+  }, [hubRoom, factionId]);
+
+  // TAKE / SALVAGE / INVESTIGATE during their tutorial beats now OPEN the
+  // real picker menu so the player learns the actual interaction — the demo
+  // prop (cudgel / broken chest plate / door) is injected into the matching
+  // modal by ExplorationScreen for that beat, and its chip lights via the
+  // count. Picking the prop submits the verb, which the submitPlayerAction
+  // tutorial intercept grants + advances on.
+  //
+  // Only the typed-input demos keep a direct submit: the rope beat is
+  // teaching TYPED input (the input row pulses with a pre-filled "take
+  // rope"), and the note is taken straight from the feed.
+  const takeOverride: (() => void) | null = currentBeatId === 'rope'
+    ? () => onSubmit('take rope')
+    : currentBeatId === 'read_note'
+    ? () => onSubmit('take note')
+    : null;
+  const salvageOverride: (() => void) | null = null;
+  const investigateOverride: (() => void) | null = null;
+
+  // During the guided action beats (cudgel / rope / scrap / investigate),
+  // drive the TAKE / SALVAGE / INVESTIGATE green "ready" glow off the CURRENT
+  // BEAT rather than the room's real interactable counts. Otherwise TAKE
+  // stayed green after the tutorial items were already taken (the room still
+  // had real nouns), and SALVAGE stayed green into the investigate beat.
+  // green = the one thing to do now; the completed buttons drop to amber.
+  const tutActionBeat =
+    currentBeatId === 'cudgel' || currentBeatId === 'rope'
+      || currentBeatId === 'scrap' || currentBeatId === 'climb'
+      || currentBeatId === 'investigate'
+      ? currentBeatId : null;
+  const takeTone: 'ready' | undefined = tutActionBeat
+    ? (tutActionBeat === 'cudgel' || tutActionBeat === 'rope' ? 'ready' : undefined)
+    : (takeOverride || (takeableCount && takeableCount > 0) ? 'ready' : undefined);
+  const salvageTone: 'ready' | undefined = tutActionBeat
+    ? (tutActionBeat === 'scrap' ? 'ready' : undefined)
+    : (salvageOverride || (salvageableCount && salvageableCount > 0) ? 'ready' : undefined);
+  const investigateTone: 'ready' | undefined = tutActionBeat
+    ? (tutActionBeat === 'investigate' ? 'ready' : undefined)
+    : (investigateOverride || (investigateCount && investigateCount > 0) ? 'ready' : undefined);
+  // CLIMB is green whenever the room has climbables, which during the
+  // tutorial meant it glowed through every beat. Gate it to the climb beat
+  // so green points only at the current action; normal count/rope logic
+  // applies outside the tutorial.
+  // CLIMB only carries a colour when there's actually something to climb:
+  //   • has rope + climbable here  → 'ready'   (green)
+  //   • no rope + climbable here   → 'unavailable' (red — go find a rope)
+  //   • nothing climbable here     → undefined (neutral, same as the rest)
+  // The old code left a 'needs-approach' (amber) fallback for the
+  // nothing-climbable case, so the button stayed amber after you'd climbed
+  // everything / when there was nothing to climb at all.
+  const climbTone: 'ready' | 'needs-approach' | 'unavailable' | undefined = tutActionBeat
+    ? (tutActionBeat === 'climb' ? 'ready' : undefined)
+    : (climbableCount && climbableCount > 0 ? (playerHasRope ? 'ready' : 'unavailable') : undefined);
+  // During a guided action beat, every quick-action EXCEPT the instructed
+  // one is blocked (dimmed + buzzes on tap). The rope beat blocks TAKE too,
+  // since its lesson is typed input (pre-fill + ACT). Approach is never a
+  // tutorial step, so it's blocked through all action beats.
+  const inTutAction = tutActionBeat !== null;
+  const takeBlocked = inTutAction && tutActionBeat !== 'cudgel';
+  const salvageBlocked = inTutAction && tutActionBeat !== 'scrap';
+  const investigateBlocked = inTutAction && tutActionBeat !== 'investigate';
+  const climbBlocked = inTutAction && tutActionBeat !== 'climb';
+  const approachBlocked = inTutAction;
 
   return (
     <View style={styles.container}>
-      {/* Quick-travel row — full-word buttons so they're easy to hit
-          without fat-fingering an adjacent direction. Travel is the
-          most-issued verb in playtest; pulling it onto the quick row
-          removes "go north" / "head east" typing every step. Hidden
-          in combat (cardinal travel is gated by enemy presence
-          anyway and the slot is needed for combat verbs). */}
       {!inCombat && (
         <TutorialTarget area="travel-row" style={styles.travelRow}>
-          {travelTargetName ? (
-            // v2.4.1 (OTA 049) — multi-step travel mode. Cardinal
-            // buttons swap to "→ [DEST]" + STOP TRAVEL while the
-            // player walks tile-by-tile toward the named destination.
-            // 2026-05-25 — MAP button kept on the travel row since
-            // cardinals are hidden; the moves-left badge shows the
-            // Manhattan distance to the target so the player knows
-            // how far they have to walk.
+          {activeBuildingId ? (
+            // Inside a building: up to 4 room buttons + EXIT (no MAP).
+            <>
+              {buildingRooms.slice(0, 4).map((r) => (
+                <TravelBtn
+                  key={r.id}
+                  label={r.shortName}
+                  onPress={() => goBuildingRoom(r.id)}
+                />
+              ))}
+              <TravelBtn label="EXIT" onPress={() => exitBuilding()} />
+            </>
+          ) : travelTargetName ? (
             <>
               <TravelBtn label={`→ ${travelTargetName.toUpperCase()}`} onPress={onContinueTravel ?? (() => {})} />
               <TravelBtn label="STOP TRAVEL" onPress={onStopTravel ?? (() => {})} />
               {typeof movesLeft === 'number' && movesLeft >= 0 ? (
                 <View style={styles.movesBadge}>
-                  <Text style={styles.movesBadgeText} numberOfLines={1}>
-                    {movesLeft}
-                  </Text>
-                  <Text style={styles.movesBadgeSub} numberOfLines={1}>
-                    {movesLeft === 1 ? 'move' : 'moves'}
-                  </Text>
+                  <Text style={styles.movesBadgeText} numberOfLines={1}>{movesLeft}</Text>
+                  <Text style={styles.movesBadgeSub} numberOfLines={1}>{movesLeft === 1 ? 'move' : 'moves'}</Text>
                 </View>
               ) : null}
               <TravelBtn label="MAP" onPress={onOpenMap} />
+            </>
+          ) : hubRoom ? (
+            // Tungsten Spire — hub-named exits. ROOM SHORT-NAMES instead of
+            // N/S/E/W when the player is inside a building. arb22 — the world
+            // MAP is meaningless indoors (you navigate by room, not tile), so
+            // it's dropped here; the freed slot keeps the row at "up to 4
+            // rooms + EXIT". EXIT (was OUT) leaves the building to the wilds.
+            <>
+              {hubExitChips.slice(0, 4).map((c) => (
+                <TravelBtn key={c.submit} label={c.label} onPress={() => onSubmit(c.submit)} />
+              ))}
+              <TravelBtn label="EXIT" onPress={() => onSubmit('leave outpost')} />
+            </>
+          ) : sceneBuilding ? (
+            // arb36 — a structure stands on this tile: offer ENTER alongside
+            // the cardinals so the player can step inside what they found.
+            <>
+              <TravelBtn label="ENTER" onPress={() => enterBuilding(sceneBuilding)} />
+              <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} />
+              <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} />
+              <TravelBtn label="EAST" onPress={() => onSubmit('go east')} />
+              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} />
             </>
           ) : (
             <>
@@ -303,293 +322,132 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
       <TutorialTarget area="quick-row" style={inCombat ? styles.quickRowColumn : styles.quickRow}>
         {inCombat ? (
           <>
-            {/* OTA-172 — combat row split into 3 lines per playtest
-                ask: "approach, step back, and inventory should be on
-                the third line, that keeps room for the dog and golem
-                on the second row, and keep dodge and flee next to
-                them on the second row."
-                Row 1: punch / kick / [main weapon] / [off weapon]
-                Row 2: [golem] / [dog] / dodge / flee
-                Row 3: inventory / approach / [step back] */}
             <View style={styles.quickRowLine}>
-              {/* OTA 207 — color-code weapon buttons by reach.
-                  GREEN  = can hit at the current combat range
-                  YELLOW = equipped but needs an advance to connect
-                  BLUE   = defensive alternative (dodge / flee)
-                  Bare-hand attacks (punch/kick) are always arm-only,
-                  so they tone exactly with the current range. Weapon
-                  buttons use weaponTone() which mirrors the same
-                  reach rules as gameStore.playerWeaponReach. */}
-              <QuickBtn
-                label="punch"
-                onPress={() => onSubmit('punch')}
-                tone={weaponTone(null, range, playerInt, inventory)}
-              />
-              <QuickBtn
-                label="kick"
-                onPress={() => onSubmit('kick')}
-                tone={weaponTone(null, range, playerInt, inventory)}
-              />
-              {equippedMain ? (
-                <QuickBtn
-                  label={shortWeaponLabel(equippedMain).toLowerCase()}
-                  onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)}
-                  tone={weaponTone(equippedMain, range, playerInt, inventory)}
-                />
-              ) : null}
-              {equippedOff ? (
-                <QuickBtn
-                  label={`off: ${shortWeaponLabel(equippedOff).toLowerCase()}`}
-                  onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)}
-                  tone={weaponTone(equippedOff, range, playerInt, inventory)}
-                />
-              ) : null}
+              {(() => {
+                const punchT = weaponTone(null, range, playerInt, inventory);
+                return <QuickBtn label="punch" onPress={() => onSubmit('punch')} tone={punchT} outOfRange={punchT === 'needs-approach'} />;
+              })()}
+              {(() => {
+                const kickT = weaponTone(null, range, playerInt, inventory);
+                return <QuickBtn label="kick" onPress={() => onSubmit('kick')} tone={kickT} outOfRange={kickT === 'needs-approach'} />;
+              })()}
+              {equippedMain ? (() => {
+                const mainT = weaponTone(equippedMain, range, playerInt, inventory);
+                return <QuickBtn label={shortWeaponLabel(equippedMain).toLowerCase()} onPress={() => onSubmit(`attack with the ${equippedMain.toLowerCase()}`)} tone={mainT} outOfRange={mainT === 'needs-approach'} />;
+              })() : null}
+              {equippedOff ? (() => {
+                const offT = weaponTone(equippedOff, range, playerInt, inventory);
+                return <QuickBtn label={`off: ${shortWeaponLabel(equippedOff).toLowerCase()}`} onPress={() => onSubmit(`attack with the off-hand ${equippedOff.toLowerCase()}`)} tone={offT} outOfRange={offT === 'needs-approach'} />;
+              })() : null}
             </View>
 
             <View style={styles.quickRowLine}>
-              {/* 2026-05-25 [MECHANIC-1b] — golem sidekick command.
-                  Only renders in combat when a golem is summoned and
-                  still alive. Tap fires 'use golem' which routes to
-                  handleGolemCommand and strikes the primary enemy. */}
               {golem && golem.hp > 0 ? (
-                <QuickBtn
-                  label={`golem (${golem.hp}/${golem.hpMax})`}
-                  onPress={() => onSubmit('use golem')}
-                  tone="ready"
-                />
+                <QuickBtn label={`golem (${golem.hp}/${golem.hpMax})`} onPress={() => onSubmit('use golem')} tone="ready" />
               ) : null}
-              {/* OTA-144 — Dog combat button. Mirrors the golem button
-                  pattern. Tap toggles a small picker (BITE / DISTRACT)
-                  below the quick row. The OTA-121 spec wired the
-                  parser intents + dispatch + resolver but never landed
-                  the UI surface; playtester (Rocky's owner) reported
-                  hunting for it through 3 combat rounds. */}
               {dog && dog.hp > 0 ? (
-                <QuickBtn
-                  label={`${dog.name.toLowerCase()} (${dog.hp}/${dog.hpMax})`}
-                  onPress={() => setDogPickerOpen((v) => !v)}
-                  tone="ready"
-                />
+                <QuickBtn label={`${dog.name.toLowerCase()} (${dog.hp}/${dog.hpMax})`} onPress={() => setDogPickerOpen((v) => !v)} tone="ready" />
               ) : null}
-              {/* `block` quick-action removed 2026-05-21 — folded into
-                  dodge. The dodge button now triggers the active-parry
-                  mechanic: opposed d20+DEX roll on the next incoming
-                  attack, full negation + 2× counter-strike on success,
-                  2 durability wear either way. */}
               <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} />
-              {/* Always-available escape. Iron Fog can lock advance/step
-                  back, so the player needs a visible flee button or they'll
-                  think the game is stuck. Routes to escape intent → skill
-                  check → enemies cleared on success. */}
               <QuickBtn label="flee" defensive onPress={() => onSubmit('flee')} />
             </View>
 
             <View style={styles.quickRowLine}>
-              {/* OTA-175 — row 3 order corrected to match the playtest
-                  spec: "approach, step back, and inventory should be on
-                  the third line." OTA-172 shipped these in
-                  inventory→approach→step-back order; reading the screen
-                  back, the player meant the literal order they listed.
-                  Now: APPROACH · STEP BACK · INVENTORY.
-                  Approach in combat lets the player pick a SPECIFIC
-                  enemy out of a multi-target encounter ("approach the
-                  human" while the dragon and hellhound watch) plus
-                  optionally slip in via stealth.
-                  2026-05-25 [POLISH-1] — tone='needs-approach' (green
-                  glow) when range is 'far' so the player sees at a
-                  glance they need to close before attacking. */}
-              <QuickBtn
-                label="approach"
-                onPress={onOpenApproach}
-                tone={range === 'far' ? 'needs-approach' : undefined}
-              />
-              {/* v2.4.1 (OTA 034) — `advance` quick-button removed; the
-                  approach button above unifies the close-range entry
-                  for both exploration and combat. Parser synonyms
-                  (`advance`, `lunge`, `forward`, `closein`, `charge
-                  in`, `near`) still parse to the same intent for
-                  typed-input compatibility. */}
+              <QuickBtn label="approach" onPress={onOpenApproach} tone={range === 'far' ? 'needs-approach' : undefined} />
               {range && range !== 'far' && (
                 <QuickBtn label="step back" onPress={() => onSubmit('step back')} />
               )}
-              {/* Inventory access stays prominent in combat — playtest
-                  report flagged "pack" at the end of the row as easy
-                  to miss. Now on the third row at the end of the
-                  approach / step-back / inventory sequence per the
-                  player's stated order. */}
               <QuickBtn label="inventory" onPress={onOpenInventory} />
             </View>
           </>
         ) : (
           <>
             {PEACE_QUICK_DIRECT.map((qa) => (
-              <QuickBtn key={qa.submit} label={qa.label} onPress={() => onSubmit(qa.submit)} />
+              <QuickBtn
+                key={qa.submit}
+                label={qa.label}
+                onPress={() => onSubmit(qa.submit)}
+                // Light "look around you" green during the look beat. It was
+                // a static, unlit button with nothing drawing the player to
+                // it (playtest: "nothing's drawing you to that button").
+                tone={currentBeatId === 'look' && qa.submit === 'look' ? 'ready' : undefined}
+              />
             ))}
-            {/* OTA 208 — label renamed from "search" to "investigate"
-                per playtester's semantic distinction: "I searched my
-                drawer for the right pair of socks" (looking for one
-                specific thing inside a container) vs "investigate
-                the dresser" (examining a context to learn what's
-                going on). The modal lets the player tap any scene
-                noun to learn about it — that's investigation, not
-                search. The parser intent is already 'investigate'
-                internally; this aligns the button with the intent. */}
             <QuickBtn
               label="investigate"
-              onPress={onOpenSearch}
-              tone={investigateCount && investigateCount > 0 ? 'ready' : undefined}
+              onPress={investigateOverride ?? onOpenSearch}
+              tone={investigateTone}
+              blocked={investigateBlocked}
             />
-            <QuickBtn label="approach" onPress={onOpenApproach} />
-            {/* 2026-05-25 [UI-2] — take/salvage tone='ready' (green)
-                when there's something actionable in the scene. Players
-                were tapping these and finding empty modals; the green
-                tint at-a-glance signals there's loot worth checking.
-                Gray (no tone) when count is 0/undefined. */}
+            <QuickBtn label="approach" onPress={onOpenApproach} blocked={approachBlocked} />
             <QuickBtn
               label="take"
-              onPress={onOpenTake}
-              tone={takeableCount && takeableCount > 0 ? 'ready' : undefined}
+              onPress={takeOverride ?? onOpenTake}
+              tone={takeTone}
+              blocked={takeBlocked}
             />
             <QuickBtn
               label="salvage"
-              onPress={onOpenSalvage}
-              tone={salvageableCount && salvageableCount > 0 ? 'ready' : undefined}
+              onPress={salvageOverride ?? onOpenSalvage}
+              tone={salvageTone}
+              blocked={salvageBlocked}
             />
-            {/* OTA 031/032 — climb action group. Three states:
-                  - on the ground       → CLIMB (opens noun picker)
-                  - elevated, mid-climb → CLIMB UP + CLIMB DOWN
-                  - elevated, at top    → CLIMB DOWN only
-                CLIMB UP fires the next tier on the same noun
-                without re-opening the picker. */}
             {!elevatedOn ? (
               <QuickBtn
                 label="climb"
                 onPress={onOpenClimb}
-                // OTA-188 — three-state tone ladder per player ask:
-                //   no rope        → red (can't climb at all)
-                //   rope + nothing → amber (ready when you find one)
-                //   rope + things  → green (go).
-                tone={
-                  !playerHasRope
-                    ? 'unavailable'
-                    : climbableCount && climbableCount > 0
-                      ? 'ready'
-                      : 'needs-approach'
-                }
+                tone={climbTone}
+                blocked={climbBlocked}
               />
             ) : (
               <>
-                {/* OTA-172 — climb up + climb down get the blue
-                    `defensive` tone when rendered. They only render
-                    when the player is elevated AND the action is
-                    usable (climb-up only shows mid-climb when more
-                    tiers remain; climb-down only shows when
-                    elevated), so the tone signals "this is the safe
-                    egress from being up high" — same blue cue the
-                    player already reads on dodge / flee. Player ask:
-                    "make the climb 1/3 type buttons blue and the
-                    climb down blue when they are able to be used." */}
                 {elevatedOn.tier < elevatedOn.totalTiers && (
-                  <QuickBtn
-                    label={`climb up (${elevatedOn.tier}/${elevatedOn.totalTiers})`}
-                    onPress={onClimbUp}
-                    defensive
-                  />
+                  <QuickBtn label={`climb up (${elevatedOn.tier}/${elevatedOn.totalTiers})`} onPress={onClimbUp} defensive />
                 )}
                 <QuickBtn label="climb down" onPress={onClimbDown} defensive />
               </>
             )}
             <QuickBtn label="craft" onPress={onOpenCrafting} />
             <QuickBtn label="inventory" onPress={onOpenInventory} />
-            {/* OTA-239 — Ask the Arbiter button. Surfaces OTA-233's
-                lore-lookup scheme as a one-tap action: opens a small
-                modal with a text input; submit fires `ask the arbiter
-                about <X>` through the parser → MiniLM cosine match
-                against the ~408-concept lore bank. */}
             <QuickBtn label="ask arbiter" onPress={onOpenAskArbiter} />
           </>
         )}
       </TutorialTarget>
-      {/* OTA-144 — Dog action picker. Renders below the quick-row
-          when the player has tapped the dog button. Two big buttons:
-          BITE fires `dog_bite`, DISTRACT fires `dog_distract`. Either
-          tap closes the picker. */}
       {dog && dog.hp > 0 && dogPickerOpen ? (
         <View style={styles.dogPicker}>
-          <Pressable
-            onPress={() => {
-              setDogPickerOpen(false);
-              onSubmit('bite');
-            }}
-            style={styles.dogPickerBtn}
-          >
+          <Pressable onPress={() => { setDogPickerOpen(false); onSubmit('bite'); }} style={styles.dogPickerBtn}>
             <Text style={styles.dogPickerLabel}>BITE</Text>
             <Text style={styles.dogPickerHint}>{dog.name} lunges in</Text>
           </Pressable>
-          <Pressable
-            onPress={() => {
-              setDogPickerOpen(false);
-              onSubmit('distract');
-            }}
-            style={styles.dogPickerBtn}
-          >
+          <Pressable onPress={() => { setDogPickerOpen(false); onSubmit('distract'); }} style={styles.dogPickerBtn}>
             <Text style={styles.dogPickerLabel}>DISTRACT</Text>
             <Text style={styles.dogPickerHint}>pounces + barks · +1 init, +2 atk next swing</Text>
           </Pressable>
         </View>
       ) : null}
       <TutorialTarget area="input-row" style={styles.inputRow}>
-        <TextInput
-          ref={inputRef}
-          style={styles.input}
-          value={text}
-          onChangeText={setText}
-          placeholder={
-            tutorialBlocksInput
-              ? 'Tap SKIP or CONTINUE above to begin'
-              : inCombat
-              ? 'What do you do? (or use quick buttons)'
-              : 'What do you do?'
-          }
-          placeholderTextColor="#5a5246"
-          onSubmitEditing={handleSubmit}
-          returnKeyType="send"
-          autoCorrect={false}
-          autoCapitalize="none"
-          autoComplete="off"
-          textContentType="none"
-          // OTA-298 — Tutorial keyboard gate. While the welcome step
-          // is on screen, the input is non-editable and the soft
-          // keyboard is suppressed even if the field somehow gets
-          // focus (Android focus-restoration on cold start). Both
-          // props are toggled together so the gate is consistent
-          // across platforms — iOS honors editable; Android honors
-          // showSoftInputOnFocus.
-          editable={!tutorialBlocksInput}
-          showSoftInputOnFocus={!tutorialBlocksInput}
-        />
-        {/* OTA-189 — mic button removed entirely along with all STT
-            wiring. TTS toggle still lives on the gear screen for
-            players who want read-aloud off. */}
-        {/* OTA-180 — designer-note (📝) button removed. Player:
-            "let's remove the add note function for the log, I am
-            past that portion of request adding." The feedback
-            channel + appendFeedback action stay in place (they're
-            referenced by the in-game tutorial copy and a few
-            engine breadcrumbs); only the UI affordance to
-            invoke them is gone. */}
-        {/* OTA-282 — final keyboard-dismiss state. Player corrected the
-            earlier Pitch Spire reading: "its supposed to be here for
-            ios and nowhere for android." The in-row ▼ between input
-            and Act IS the correct iOS position (the iOS keyboard
-            pushes the row up so it stays visible above the keyboard);
-            the InputAccessoryView bar I added in Ember Coil was the
-            wrong placement. Final design: in-row ▼ on iOS, nothing on
-            Android (system back already dismisses there).
-            Lineage: Chalk Tine (277) added in-row ▼ both platforms.
-            Ember Coil (279) added InputAccessoryView + brightened in-
-            row ▼. Ash Fence (280) iOS-gated the in-row ▼. Pitch Spire
-            (281) wrongly removed it. Tar Vault (282) restores it. */}
+        <Animated.View style={[styles.inputWrap, { borderColor: inputBorderColor }]}>
+          <TextInput
+            ref={inputRef}
+            style={styles.input}
+            value={text}
+            onChangeText={setText}
+            placeholder={
+              awaitingTutorialName
+                ? 'Speak your name…'
+                : inCombat
+                ? 'What do you do? (or use quick buttons)'
+                : 'What do you do?'
+            }
+            placeholderTextColor="#c9a86a"
+            onSubmitEditing={handleSubmit}
+            returnKeyType="send"
+            autoCorrect={false}
+            autoCapitalize={awaitingTutorialName ? 'words' : 'none'}
+            autoComplete="off"
+            textContentType="none"
+          />
+        </Animated.View>
         {Platform.OS === 'ios' ? (
           <TouchableOpacity
             style={styles.kbDismiss}
@@ -607,18 +465,6 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   );
 }
 
-/** OTA 207 — combat-tone props for weapon buttons.
- *  'ready'         (green)  — weapon can hit the current range
- *  'needs-approach' (yellow) — equipped but won't reach from here
- *  'defensive'     (blue)   — alternate actions (dodge / flee /
- *                             block); existing styling kept via the
- *                             legacy `defensive` boolean which is
- *                             treated as tone='defensive'
- *  undefined       (grey)   — neutral (inventory, search, etc.) */
-// OTA-188 — added 'unavailable' (red) for action buttons whose
-// requirement isn't met at all (e.g., CLIMB with no rope in
-// inventory). Greys are already taken by "nothing to act on";
-// red signals "can't do this from your current loadout."
 type QuickBtnTone = 'ready' | 'needs-approach' | 'defensive' | 'unavailable';
 
 function QuickBtn({
@@ -626,19 +472,34 @@ function QuickBtn({
   onPress,
   defensive,
   tone,
+  blocked,
+  outOfRange,
 }: {
   label: string;
   onPress: () => void;
   defensive?: boolean;
   tone?: QuickBtnTone;
+  /** Tutorial gating: render neutral + dimmed, and a tap buzzes (haptic)
+   *  instead of firing the action — so only the beat's instructed button
+   *  actually does anything. */
+  blocked?: boolean;
+  /** Combat range gating: the weapon can't reach the target from here.
+   *  KEEP the amber 'needs-approach' tone (so the player sees WHY), but a
+   *  tap buzzes ("can't do it") instead of firing the attack — the engine
+   *  used to treat an out-of-range attack as a free approach, which let
+   *  PUNCH double as APPROACH. Now you must hit APPROACH yourself. */
+  outOfRange?: boolean;
 }) {
-  const resolvedTone: QuickBtnTone | undefined = tone ?? (defensive ? 'defensive' : undefined);
+  const resolvedTone: QuickBtnTone | undefined = blocked
+    ? undefined
+    : tone ?? (defensive ? 'defensive' : undefined);
   const containerStyle = [
     styles.quick,
     resolvedTone === 'defensive' && styles.quickDefensive,
     resolvedTone === 'ready' && styles.quickReady,
     resolvedTone === 'needs-approach' && styles.quickNeedsApproach,
     resolvedTone === 'unavailable' && styles.quickUnavailable,
+    blocked && styles.quickDisabled,
   ];
   const textStyle = [
     styles.quickText,
@@ -647,28 +508,22 @@ function QuickBtn({
     resolvedTone === 'needs-approach' && styles.quickNeedsApproachText,
     resolvedTone === 'unavailable' && styles.quickUnavailableText,
   ];
+  const handlePress = () => {
+    if (blocked || outOfRange) {
+      // Wrong action for this tutorial beat, or weapon out of range — buzz
+      // ("can't do it") instead of acting. APPROACH is the player's job.
+      try { Vibration.vibrate(30); } catch { /* ignore */ }
+      return;
+    }
+    onPress();
+  };
   return (
-    <TouchableOpacity style={containerStyle} onPress={onPress}>
-      {/* OTA 206 — all action-button labels uppercased per playtester:
-          "all of the action buttons Dodge flee search take… all of
-          those should be all in capitals. Being all in lowercase
-          makes them look insignificant." */}
+    <TouchableOpacity style={containerStyle} onPress={handlePress}>
       <Text style={textStyle}>{label.toUpperCase()}</Text>
     </TouchableOpacity>
   );
 }
 
-/** Bigger button for the travel row so it's easy to hit without
- *  fat-fingering an adjacent direction. Equal-width flex layout
- *  splits the available horizontal space across all four buttons.
- *
- *  OTA-181 — destination button (label starts with "→") now
- *  renders 2 lines tall with the full-size font instead of the
- *  shrunk-to-70% single-line that was hard to read on long Capital
- *  names. Player ask: "the arrow to mud flood nexus in the route
- *  box is way too small, make it two line tall." Non-destination
- *  buttons (NORTH / STOP TRAVEL / MAP) stay single-line + auto-
- *  shrink because their labels fit cleanly at full size. */
 function TravelBtn({ label, onPress }: { label: string; onPress: () => void }) {
   const isDestination = label.startsWith('→');
   return (
@@ -682,7 +537,7 @@ function TravelBtn({ label, onPress }: { label: string; onPress: () => void }) {
         numberOfLines={isDestination ? 2 : 1}
         ellipsizeMode="tail"
         adjustsFontSizeToFit={!isDestination}
-        minimumFontScale={0.7}
+        minimumFontScale={0.55}
       >
         {label}
       </Text>
@@ -693,15 +548,8 @@ function TravelBtn({ label, onPress }: { label: string; onPress: () => void }) {
 const styles = StyleSheet.create({
   container: { gap: 6 },
   quickRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
-  // OTA-172 — combat-only stacked layout. The wrapper goes column,
-  // and each row inside uses quickRowLine. Peace mode keeps the
-  // single flat quickRow.
   quickRowColumn: { flexDirection: 'column', gap: 6 },
   quickRowLine: { flexDirection: 'row', gap: 6, flexWrap: 'wrap' },
-  // OTA-144 — dog action picker. Two big tap targets below the quick
-  // row when the player taps the dog combat button. Sized to match
-  // the QuickBtn visual register but more prominent (vertical-stack
-  // label + hint per option).
   dogPicker: { flexDirection: 'row', gap: 8, marginTop: 6 },
   dogPickerBtn: {
     flex: 1,
@@ -725,19 +573,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     alignItems: 'center',
   },
-  travelBtnText: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 2 },
-  // OTA-181 — destination travel button (label starts with "→").
-  // Taller box + larger center-wrapped text so a long Capital name
-  // ("→ MUD FLOOD NEXUS", "→ ISKAN-VEIL") reads at a glance instead
-  // of shrinking to a 70% single-line blur. Two lines plus a touch
-  // more vertical padding gives the destination its own visual
-  // weight — it's the most important button in the row while travel
-  // is active.
+  // letterSpacing kept low (1) so longer room names ("GRAND HALL",
+  // "LIVING ROOM") fit the equal-width slots without shrinking/ellipsizing
+  // as hard. Short labels (NORTH / EXIT) still read fine with it.
+  travelBtnText: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 1, paddingHorizontal: 2 },
   travelBtnDest: { paddingVertical: 8 },
   travelBtnTextDest: { fontSize: 14, lineHeight: 17, letterSpacing: 1.5, textAlign: 'center' },
-  /** 2026-05-25 — moves-left badge sits between STOP TRAVEL and MAP
-   *  in the travel row, sized to the digit + sub-label only so it
-   *  doesn't crowd the action buttons. Non-interactive. */
   movesBadge: {
     backgroundColor: '#13110f',
     borderColor: '#9ec96a',
@@ -760,31 +601,31 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   quickDefensive: { borderColor: '#6a9bbf' },
-  // OTA 207 — combat tone colors. Green for weapons that can hit
-  // the current range, yellow for weapons that need an advance to
-  // reach (player has it equipped but the swing won't connect from
-  // here). Blue/defensive is the existing dodge / flee treatment.
   quickReady: { borderColor: '#9ec96a', backgroundColor: '#1a201410' },
   quickNeedsApproach: { borderColor: '#c9a86a' },
-  // OTA-188 — red tone for actions with an unmet hard requirement
-  // (no rope → CLIMB red). Combat color #e07a5f matches the
-  // existing low-HP / damage warning palette.
   quickUnavailable: { borderColor: '#e07a5f' },
+  // Disabled (e.g. TAKE during the typed-input rope beat) — muted + dimmed
+  // so it reads as "not now" without the red 'unavailable' alarm color.
+  quickDisabled: { borderColor: '#3a342c', opacity: 0.4 },
   quickText: { color: '#cdbf99', fontSize: 12 },
   quickDefensiveText: { color: '#6a9bbf' },
   quickReadyText: { color: '#9ec96a' },
   quickNeedsApproachText: { color: '#c9a86a' },
   quickUnavailableText: { color: '#e07a5f' },
   inputRow: { flexDirection: 'row', gap: 6, alignItems: 'center' },
-  input: {
+  // Tungsten Spire — Animated.View wrapper so the input border can
+  // pulse during the name + rope beats. Border lives on the wrapper;
+  // TextInput inside is borderless so the pulse is the only frame.
+  inputWrap: {
     flex: 1,
-    backgroundColor: '#1a1714',
-    borderColor: '#3a342c',
     borderWidth: 1,
+    borderRadius: 4,
+    backgroundColor: '#1a1714',
+  },
+  input: {
     color: '#e6d8b3',
     paddingHorizontal: 10,
     paddingVertical: 8,
-    borderRadius: 4,
     fontSize: 14,
   },
   send: {
@@ -794,27 +635,13 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   sendText: { color: '#e6d8b3', fontWeight: '700' },
-  // OTA-277 — manual keyboard-dismiss chevron. Sized to sit between
-  // input field and Act button without dominating the row.
-  // OTA-279 — brightened from muted (#7a705c) to accent gold (#c9a86a)
-  // because the original render was nearly invisible against the dark
-  // background; iPhone playtester couldn't see the ▼ at all. Real iOS
-  // dismiss path is now the InputAccessoryView bar above the keyboard
-  // (kbAccessoryBar), but this in-row chevron stays as a redundant
-  // affordance for Android + for when the keyboard isn't yet up.
   kbDismiss: {
     backgroundColor: '#1a1714',
-    borderColor: '#5a5246',
+    borderColor: '#c9a86a',
     borderWidth: 1,
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 4,
   },
   kbDismissText: { color: '#c9a86a', fontSize: 14, fontWeight: '700' },
-  // OTA-189 — micBtn / micBtnActive / micBtnText styles removed
-  // alongside the mic button. STT is gone from the game entirely;
-  // only the TTS read-aloud path is still wired (and toggled from
-  // the gear screen).
-  // OTA-180 — feedbackBtn + feedbackBtnText styles removed alongside
-  // the 📝 designer-note button removal.
 });

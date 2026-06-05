@@ -446,87 +446,48 @@ describe('craftingInventoryChaosSim — Crafting / Scrap / Pack / Catalog', () =
   });
 
   // ====================================================================
-  // 3. Pack-full handling (OTA-078)
+  // 3. Uncapped pack invariants (was "Pack-full handling", OTA-078)
   // ====================================================================
-  describe('Pack-full handling (OTA-078)', () => {
-    // Use the ITEM_CAPS-bound names directly — these are the only
-    // codepaths where grantItem actually clamps + drops on the floor.
-    const CAPPED_ITEMS: { name: string; cap: number; kind: InventoryItem['kind'] }[] = [
-      { name: 'Small Rock', cap: 10, kind: 'misc' },
-      { name: 'Big Rock', cap: 1, kind: 'misc' },
-      { name: 'Stick', cap: 6, kind: 'misc' },
-    ];
+  describe('Uncapped pack invariants', () => {
+    // The pack now has NO carrying limit — the old per-name caps
+    // (Small Rock 10 / Big Rock 1 / Stick 6) were removed. These names are
+    // the regression canaries: if a cap ever sneaks back, these fail.
+    const FORMERLY_CAPPED = ['Small Rock', 'Big Rock', 'Stick'];
 
-    it('cap lookup matches the documented values (10 / 1 / 6)', () => {
-      for (const c of CAPPED_ITEMS) {
-        expect(capacityFor(c.name)).toBe(c.cap);
+    it('no item is capped — capacityFor is Infinity for every name', () => {
+      for (const name of [...FORMERLY_CAPPED, 'Scrap Metal', 'Iron Spear', 'Aether Residue']) {
+        expect(capacityFor(name)).toBe(Infinity);
       }
     });
 
-    it('50 grant attempts against a capped pack: either grant lands or it is fully rejected — never a silent partial-consume', () => {
+    it('100 grant attempts never lose a unit, never drop, and stack into one row', () => {
       const rng = makeRng(0xDECAFBAD);
-      // Pre-fill exactly to the cap for each item so the next grant
-      // MUST hit the cap-rejection branch.
-      const TRIALS = 50;
       const violations: string[] = [];
-      for (let t = 0; t < TRIALS; t++) {
-        const fixture = CAPPED_ITEMS[Math.floor(rng() * CAPPED_ITEMS.length)]!;
-        // Build an inventory exactly at the cap.
-        const inv: InventoryItem[] = [{
-          id: `cap_${t}`,
-          name: fixture.name,
-          kind: fixture.kind,
-          quantity: fixture.cap,
-          tags: [],
-        }];
+      for (let t = 0; t < 100; t++) {
+        const name = FORMERLY_CAPPED[Math.floor(rng() * FORMERLY_CAPPED.length)]!;
+        const inv: InventoryItem[] = [{ id: `seed_${t}`, name, kind: 'misc', quantity: 3, tags: [] }];
         const grantQty = 1 + Math.floor(rng() * 5);
-        const newItem: InventoryItem = {
-          id: `grant_${t}`,
-          name: fixture.name,
-          kind: fixture.kind,
-          quantity: grantQty,
-          tags: [],
-        };
-        const before = inv.map((i) => ({ name: i.name, qty: i.quantity }));
-        const result = grantItem(inv, newItem);
-        // accepted + dropped must equal the requested grant — no
-        // units can vanish.
-        if (result.accepted + result.dropped !== grantQty) {
-          violations.push(
-            `trial ${t}: accepted(${result.accepted}) + dropped(${result.dropped}) != grantQty(${grantQty})`,
-          );
+        const result = grantItem(inv, { id: `grant_${t}`, name, kind: 'misc', quantity: grantQty, tags: [] });
+        // Uncapped: everything is accepted, nothing dropped, no unit lost.
+        if (result.accepted !== grantQty) {
+          violations.push(`trial ${t}: accepted(${result.accepted}) != grantQty(${grantQty})`);
         }
-        // When accepted === 0, the inventory MUST be byte-equivalent
-        // to the original (OTA-078: no silent consume on pack-full).
-        if (result.accepted === 0) {
-          const after = result.inventory.map((i) => ({ name: i.name, qty: i.quantity }));
-          if (JSON.stringify(after) !== JSON.stringify(before)) {
-            violations.push(
-              `trial ${t}: pack-full but inventory changed — before=${JSON.stringify(before)} after=${JSON.stringify(after)}`,
-            );
-          }
+        if (result.dropped !== 0) {
+          violations.push(`trial ${t}: dropped(${result.dropped}) on an uncapped pack`);
         }
-        // When accepted > 0, inventory total for this name must equal
-        // before + accepted exactly.
-        if (result.accepted > 0) {
-          const beforeTotal = before.filter((b) => b.name === fixture.name).reduce((s, b) => s + b.qty, 0);
-          const afterTotal = result.inventory
-            .filter((i) => i.name === fixture.name)
-            .reduce((s, i) => s + i.quantity, 0);
-          if (afterTotal !== beforeTotal + result.accepted) {
-            violations.push(
-              `trial ${t}: stack mismatch — beforeTotal=${beforeTotal} accepted=${result.accepted} afterTotal=${afterTotal}`,
-            );
-          }
+        const afterTotal = result.inventory.filter((i) => i.name === name).reduce((s, i) => s + i.quantity, 0);
+        if (afterTotal !== 3 + grantQty) {
+          violations.push(`trial ${t}: stack total ${afterTotal} != ${3 + grantQty}`);
+        }
+        if (result.inventory.filter((i) => i.name === name).length !== 1) {
+          violations.push(`trial ${t}: row split instead of stacking`);
         }
       }
       expect(violations).toEqual([]);
     });
 
-    it('granting Small Rocks past cap drops the overflow but never goes negative or duplicates the row', () => {
-      const start: InventoryItem[] = [];
-      let inv: InventoryItem[] = start;
-      // Pour 25 rocks into an empty pack 1 at a time. Cap is 10.
+    it('pouring 25 Small Rocks one at a time stacks to 25 in a single row (no cap)', () => {
+      let inv: InventoryItem[] = [];
       let accepted = 0;
       let dropped = 0;
       for (let i = 0; i < 25; i++) {
@@ -535,12 +496,11 @@ describe('craftingInventoryChaosSim — Crafting / Scrap / Pack / Catalog', () =
         dropped += r.dropped;
         inv = r.inventory;
       }
-      expect(accepted).toBe(10);
-      expect(dropped).toBe(15);
-      // Exactly one row.
+      expect(accepted).toBe(25);
+      expect(dropped).toBe(0);
       const rocks = inv.filter((i) => i.name === 'Small Rock');
       expect(rocks).toHaveLength(1);
-      expect(rocks[0]!.quantity).toBe(10);
+      expect(rocks[0]!.quantity).toBe(25);
     });
   });
 

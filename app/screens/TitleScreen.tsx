@@ -93,6 +93,10 @@ export function TitleScreen() {
   const slotLoadError = useGameStore((s) => s.slotLoadError);
   const clearSlotLoadError = useGameStore((s) => s.clearSlotLoadError);
   const deleteSlotById = useGameStore((s) => s.deleteSlotById);
+  // arb38 — slots that crashed the app on load last session. Tapping
+  // one opens the recovery modal (Retry / Delete) instead of re-running
+  // the crashing load.
+  const crashedSlotIds = useGameStore((s) => s.crashedSlotIds);
   const resurrectSlot = useGameStore((s) => s.resurrectSlot);
   const resurrectionGems = useGameStore((s) => s.resurrectionGems);
   const justUpdatedFromBuild = useGameStore((s) => s.justUpdatedFromBuild);
@@ -138,12 +142,32 @@ export function TitleScreen() {
   // until both are 'ready' so the player physically can't trigger
   // OTA-apply during the danger window.
   const qwenStatus = useGameStore((s) => s.qwenStatus);
+  const qwenFraction = useGameStore((s) => s.qwenFraction);
   const [kokoroPhase, setKokoroPhase] = useState<KokoroState>(() => getKokoroState());
   useEffect(() => onKokoroStateChange(setKokoroPhase), []);
   const modelsLoading =
     qwenStatus === 'downloading' || qwenStatus === 'loading'
     || kokoroPhase.phase === 'downloading' || kokoroPhase.phase === 'loading';
-  const modelsReady = qwenStatus === 'ready' && kokoroPhase.phase === 'ready';
+  // Live per-engine readiness for the loading banner. Both percentages are
+  // the REAL native download fractions (Qwen GGUF + Kokoro model), not a
+  // timer. The compile/warm-up step has no native progress, so it honestly
+  // reads "finishing…" instead of freezing a stale % or snapping to green.
+  const qwenLabel =
+    qwenStatus === 'downloading' ? `${Math.round(qwenFraction * 100)}%`
+    : qwenStatus === 'loading' ? 'finishing…'
+    : qwenStatus === 'ready' ? 'ready ✓'
+    : 'starting…';
+  const kokoroLabel =
+    kokoroPhase.phase === 'downloading' ? `${Math.round(kokoroPhase.fraction * 100)}%`
+    : kokoroPhase.phase === 'loading' ? 'finishing…'
+    : kokoroPhase.phase === 'ready' ? 'ready ✓'
+    // Voice failed → the Arbiter still narrates; the system voice speaks.
+    // Read it honestly here so the NARRATION row can keep loading without
+    // the VOICE row falsely showing "starting…" forever.
+    : kokoroPhase.phase === 'error' ? 'system voice'
+    : 'starting…';
+  const qwenDone = qwenStatus === 'ready';
+  const kokoroDone = kokoroPhase.phase === 'ready';
   useEffect(() => {
     let cancelled = false;
     void (async () => {
@@ -170,6 +194,21 @@ export function TitleScreen() {
       } else {
         setPendingAction({ kind: 'fallen', slot });
       }
+      return;
+    }
+    // arb38 — this character closed the app on load last session. Show
+    // the recovery modal BEFORE re-running the crashing load so the
+    // player deliberately chooses Retry or Delete instead of hitting an
+    // instant re-crash. Retry runs the real load (and clears the flag
+    // if it succeeds); Delete removes the bad save for good.
+    if (crashedSlotIds.includes(slot.slotId)) {
+      setLastTappedSlot(slot);
+      useGameStore.setState({
+        slotLoadError:
+          'This character closed the app the last time it was opened — ' +
+          'most likely a save left over from a previous version of the build. ' +
+          'Your other characters are not affected.',
+      });
       return;
     }
     setLastTappedSlot(slot);
@@ -559,6 +598,14 @@ export function TitleScreen() {
           </View>
           <Text style={styles.slotTime}>{timeAgo(item.savedAt)}</Text>
         </View>
+        {/* arb38 — load-crash warning. Surfaces BEFORE the player taps
+            so they know this character closed the app last time and a
+            tap opens the recovery options rather than the game. */}
+        {!item.dead && crashedSlotIds.includes(item.slotId) && (
+          <Text style={styles.slotCrashWarn}>
+            ⚠ Closed the app last time it opened — tap for recovery (Retry / Delete)
+          </Text>
+        )}
         <Text style={styles.slotMeta}>
           {raceLabel(item.raceId)} · {locationLabel(item.locationId)}
         </Text>
@@ -671,13 +718,29 @@ export function TitleScreen() {
       {modelsLoading && (
         <View style={styles.modelLoadingBanner}>
           <Text style={styles.modelLoadingBannerTitle}>
-            ⚠ MODELS LOADING — DON'T CLOSE THE APP
+            ⚙  WAKING THE ARBITER — THIS IS NORMAL
           </Text>
           <Text style={styles.modelLoadingBannerBody}>
-            Voice + narration are downloading + warming up. Closing the
-            app now leaves partial files on disk that will crash the
-            next launch. Wait for the "voice ready" confirmation before
-            backgrounding or killing Tartaria Realms.
+            The Arbiter's mind and voice are loading for the first time — the
+            longest part. They download once, then Tartaria Realms runs fully
+            offline. A normal one-time setup, not an error.
+          </Text>
+          <View style={styles.modelLoadingRows}>
+            <View style={styles.modelLoadingRow}>
+              <Text style={styles.modelLoadingRowLabel}>MIND</Text>
+              <Text style={[styles.modelLoadingRowValue, qwenDone && styles.modelLoadingRowValueDone]}>
+                {qwenLabel}
+              </Text>
+            </View>
+            <View style={styles.modelLoadingRow}>
+              <Text style={styles.modelLoadingRowLabel}>VOICE</Text>
+              <Text style={[styles.modelLoadingRowValue, kokoroDone && styles.modelLoadingRowValueDone]}>
+                {kokoroLabel}
+              </Text>
+            </View>
+          </View>
+          <Text style={styles.modelLoadingBannerBody}>
+            Please keep the app open until both read “ready”.
           </Text>
         </View>
       )}
@@ -1185,6 +1248,8 @@ const styles = StyleSheet.create({
   slotObjective: { color: '#c9a86a', fontSize: 12, marginTop: 4, fontStyle: 'italic' },
   // OTA-120 Phase 5 — dog sub-line styling.
   slotDogLine: { color: '#c9a86a', fontSize: 11, marginTop: 2, letterSpacing: 0.5 },
+  // arb38 — amber load-crash warning on a flagged slot tile.
+  slotCrashWarn: { color: '#d8923c', fontSize: 11, marginTop: 3, fontWeight: '600' },
   deadActions: { flexDirection: 'row', gap: 6, marginTop: 8 },
   copyLogBtn: {
     backgroundColor: '#1a1714',
@@ -1278,13 +1343,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 3,
   },
-  // OTA-294 — "DON'T CLOSE THE APP" loading banner. Red-ish accent
-  // ramp (#bf5a3a outline, #2a1410 fill) so it reads as warning, not
-  // neutral. Sized like the updateBanner so it sits flush with the
-  // rest of the title-screen banner stack.
+  // OTA-294 — "getting things ready" loading banner. Amber/orange accent
+  // (#c9892f outline, #2a1e0c fill, #f0a740 title) so it reads as a calm
+  // "heads up, this is normal" notice rather than a red error/danger
+  // alert. Sized like the updateBanner so it sits flush with the rest of
+  // the title-screen banner stack.
   modelLoadingBanner: {
-    backgroundColor: '#2a1410',
-    borderColor: '#bf5a3a',
+    backgroundColor: '#2a1e0c',
+    borderColor: '#c9892f',
     borderWidth: 1,
     borderRadius: 4,
     paddingVertical: 10,
@@ -1292,7 +1358,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   modelLoadingBannerTitle: {
-    color: '#e07a5f',
+    color: '#f0a740',
     fontSize: 12,
     letterSpacing: 2,
     fontWeight: '800',
@@ -1304,6 +1370,34 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 4,
     lineHeight: 15,
+  },
+  // Live per-engine progress rows (real download %, "finishing…" during
+  // the no-progress compile step, "ready ✓" when done).
+  modelLoadingRows: {
+    marginTop: 8,
+    marginBottom: 2,
+    paddingHorizontal: 28,
+    gap: 3,
+  },
+  modelLoadingRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  modelLoadingRowLabel: {
+    color: '#cdbf99',
+    fontSize: 11,
+    letterSpacing: 1.5,
+    fontWeight: '700',
+  },
+  modelLoadingRowValue: {
+    color: '#f0a740',
+    fontSize: 11,
+    fontWeight: '800',
+    fontVariant: ['tabular-nums'],
+  },
+  modelLoadingRowValueDone: {
+    color: '#9ec96a',
   },
   apkBanner: {
     backgroundColor: '#1a2a14',
@@ -1694,57 +1788,49 @@ const lastCrashStyles = StyleSheet.create({
 function KokoroDownloadBanner(): React.ReactElement | null {
   const [state, setState] = useState<KokoroState>(() => getKokoroState());
   useEffect(() => onKokoroStateChange(setState), []);
-  if (state.phase === 'idle') return null;
+  // VOICE-only banner. The "WAKING THE ARBITER" status box above owns the
+  // overall boot narrative and shows the VOICE download % in its own row, so
+  // this component no longer renders the 'downloading' / 'loading' phases
+  // (that was a misnamed duplicate — it said "Waking up the Arbiter" but was
+  // driven solely by the voice engine). It now only handles the two things
+  // the status box can't: the spoken ready-flash, and the voice-failed
+  // fallback notice.
   if (state.phase === 'ready') {
-    // Auto-hide the ready confirmation after 4 seconds so it doesn't
-    // sit on the title screen forever once the voice is installed.
+    // The voice just came online — announce it (and auto-hide after a beat).
     return <ReadyFlash />;
   }
-  // Time-based gate in PiperTTSManager keeps 'downloading' phase
-  // suppressed for cache hits (resolve in <2s) and only escalates
-  // when a real 100 MB download is in flight (>4s elapsed + progress
-  // still <99%). So this branch only renders on a genuine first-time
-  // fetch or a post-reinstall refetch. Cache hits stay on the calmer
-  // 'loading' copy below.
-  if (state.phase === 'downloading') {
+  if (state.phase === 'error') {
     return (
       <View style={styles.kokoroBanner}>
         <Text style={styles.kokoroBannerText}>
-          ⬇  Installing premium voice (Kokoro)
+          ⚠  The Arbiter's voice couldn't load
         </Text>
         <Text style={styles.kokoroBannerProgress}>
-          {(state.fraction * 100).toFixed(0)}%  ·  one-time download (~100 MB), runs fully offline after this
+          The Arbiter still narrates — the system voice will speak instead.
+          Pull-to-refresh from Settings to retry.
         </Text>
       </View>
     );
   }
-  return (
-    <View style={styles.kokoroBanner}>
-      <Text style={styles.kokoroBannerText}>
-        {state.phase === 'error'
-          ? `⚠  Voice engine: ${state.message ?? 'error'}`
-          : '⚙  Waking up the Arbiter — select your character when it turns green'}
-      </Text>
-      {state.phase === 'error' && (
-        <Text style={styles.kokoroBannerProgress}>
-          The system voice will be used instead. Pull-to-refresh from Settings to retry.
-        </Text>
-      )}
-    </View>
-  );
+  // idle / downloading / loading — covered by the WAKING THE ARBITER box.
+  return null;
 }
 
 function ReadyFlash(): React.ReactElement | null {
   const [show, setShow] = useState(true);
   useEffect(() => {
-    // The Arbiter's first words when the voice engine comes online —
-    // Kokoro speaks "Choose your character" through the Arbiter voice.
-    // No-op if TTS is disabled in voice settings. 'system' channel so
-    // it's not subject to per-channel spam-collapse rules.
+    // The Arbiter's first words when the voice engine comes online.
+    // arb70 — back to the clean single line. The head-clip was a real
+    // regression: Kokoro's warm-up inference ran at a hardcoded rate 1.0, but
+    // the default speech rate was raised to 1.2, so the warm-up stopped
+    // covering the real line and the title line (first forward at 1.2) lost
+    // its head. Fixed at the source — the warm-up now runs at the configured
+    // rate (see PiperTTSManager.ensureLoaded) — so the sacrificial "Welcome."
+    // primer (arb68/69) is no longer needed.
+    // 'system' channel so it's not subject to per-channel spam-collapse rules.
     void ttsSpeak('Choose your character.', 'system');
-    // Banner hide timed to comfortably cover the spoken line (~1.5s
-    // for that phrase at default speed) plus a beat for the green
-    // confirmation to register visually before it fades.
+    // Banner hide timed to comfortably cover the spoken line plus a beat for
+    // the green confirmation to register visually before it fades.
     const t = setTimeout(() => setShow(false), 4500);
     return () => clearTimeout(t);
   }, []);
@@ -1752,7 +1838,7 @@ function ReadyFlash(): React.ReactElement | null {
   return (
     <View style={[styles.kokoroBanner, { borderColor: '#9ec96a' }]}>
       <Text style={[styles.kokoroBannerText, { color: '#9ec96a' }]}>
-        ✓  The Arbiter wakes — choose your character
+        ✓  The Arbiter finds their voice — choose your character
       </Text>
     </View>
   );

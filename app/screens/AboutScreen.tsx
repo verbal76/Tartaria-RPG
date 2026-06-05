@@ -25,7 +25,7 @@ import {
   onVoiceSettingsChange,
   type VoiceSettings,
 } from '../voice/voiceSettings';
-import { isTTSAvailable, getTTSVoices, stopAndClear as stopTTS } from '../voice/TTSManager';
+import { isTTSAvailable, getTTSVoices, stopAndClear as stopTTS, getTtsRouteLog } from '../voice/TTSManager';
 // OTA-189 — isSTTAvailable import dropped along with the STT toggle
 // + mic affordance. The Voice tab no longer surfaces any STT row, so
 // the availability probe is no longer needed.
@@ -276,6 +276,7 @@ export function AboutScreen() {
   const [applyFlash, setApplyFlash] = useState(false);
   const toggleMusic = () => { void setAudioSettings({ enabled: !audio.enabled }); };
   const setMusicVolume = (v: number) => { void setAudioSettings({ volume: v }); };
+  const setMusicDuck = (v: number) => { void setAudioSettings({ duck: v }); };
   const applyMusic = () => {
     void forceReapplyAudioFromState().then(() => {
       setApplyFlash(true);
@@ -411,6 +412,18 @@ export function AboutScreen() {
         `error: ${kokoroState.message}`
       }`,
     ];
+    // arb68 diagnostic — which engine actually voiced the last few lines.
+    // The title "Choose your character" clip is upstream of playback, so this
+    // tells us whether that line went out on bundled Kokoro or system
+    // expo-speech (the latter clips its first utterance on Android).
+    const routes = getTtsRouteLog();
+    if (routes.length > 0) {
+      lines.push('');
+      lines.push(`  Last TTS routes (newest first):`);
+      for (const r of routes) {
+        lines.push(`    • route=${r.route} · kokoro=${r.phase} · "${r.textHead}"`);
+      }
+    }
     // OTA 23-017 — append the Kokoro error history (last 5
     // attempts) so a tester reporting "Failed to load model"
     // can copy a paste-back that tells us WHICH step failed
@@ -640,6 +653,22 @@ export function AboutScreen() {
                 decimals={0}
                 suffix="%"
                 onChange={(v) => setMusicVolume(v / 100)}
+              />
+            </View>
+          </View>
+          {/* arb17 — voice ducking: how much the music dips while the
+              Arbiter speaks. 0% = off; default 15%. Stored 0..0.5. */}
+          <View style={styles.musicRow}>
+            <Text style={styles.musicLabel}>Duck under voice</Text>
+            <View style={{ flex: 1, alignItems: 'flex-end' }}>
+              <NumberStepper
+                value={Math.round((audio.duck ?? 0.15) * 100)}
+                min={0}
+                max={50}
+                step={5}
+                decimals={0}
+                suffix="%"
+                onChange={(v) => setMusicDuck(v / 100)}
               />
             </View>
           </View>

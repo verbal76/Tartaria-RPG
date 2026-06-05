@@ -34,8 +34,10 @@ const SLOT_LABEL: Record<string, string> = {
   off: 'Off hand',
   head: 'Head',
   chest: 'Chest',
+  hands: 'Hands',
   legs: 'Legs',
   feet: 'Feet',
+  cloak: 'Cloak',
   amulet: 'Amulet',
   ring: 'Ring',
 };
@@ -543,7 +545,7 @@ const styles = StyleSheet.create({
   },
   backText: { color: '#c9a86a', fontSize: 14, letterSpacing: 2, fontWeight: '700' },
   title: { color: '#c9a86a', fontSize: 14, letterSpacing: 4, fontWeight: '700' },
-  placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },
+  placeholder: { color: '#c9a86a', textAlign: 'center', marginTop: 80 },
   scroll: { flex: 1 },
   scrollContent: { paddingBottom: 24 },
 
@@ -565,10 +567,10 @@ const styles = StyleSheet.create({
   },
 
   name: { color: '#e6d8b3', fontSize: 18, fontWeight: '700', letterSpacing: 1 },
-  subline: { color: '#7a705c', fontSize: 12, letterSpacing: 1, marginTop: 2, marginBottom: 10 },
+  subline: { color: '#c9a86a', fontSize: 12, letterSpacing: 1, marginTop: 2, marginBottom: 10 },
 
   barRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
-  barLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1, width: 30 },
+  barLabel: { color: '#c9a86a', fontSize: 10, letterSpacing: 1, width: 30 },
   barBg: { flex: 1, height: 8, backgroundColor: '#1a1714', borderRadius: 4, overflow: 'hidden', marginHorizontal: 8 },
   barFill: { height: '100%' },
   barValue: { color: '#cdbf99', fontSize: 11, width: 64, textAlign: 'right' },
@@ -577,10 +579,10 @@ const styles = StyleSheet.create({
   statKey: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 1, width: 44, paddingTop: 2 },
   statBody: { flex: 1 },
   statTotal: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
-  statBase: { color: '#5a5246', fontSize: 11, fontWeight: '400' },
+  statBase: { color: '#c9a86a', fontSize: 11, fontWeight: '400' },
   progressBar: { color: '#9ec96a', fontSize: 10, letterSpacing: 1, marginTop: 3 },
-  progressPct: { color: '#5a5246', fontSize: 9, letterSpacing: 0.5 },
-  activityList: { color: '#7a705c', fontSize: 9, marginTop: 2, lineHeight: 13, letterSpacing: 0.3 },
+  progressPct: { color: '#c9a86a', fontSize: 9, letterSpacing: 0.5 },
+  activityList: { color: '#c9a86a', fontSize: 9, marginTop: 2, lineHeight: 13, letterSpacing: 0.3 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 },
   chip: { backgroundColor: '#1a1714', borderColor: '#3a342c', borderWidth: 1, borderRadius: 3, paddingHorizontal: 8, paddingVertical: 3 },
   chipNeg: { borderColor: '#7a4040', backgroundColor: '#221512' },
@@ -588,15 +590,15 @@ const styles = StyleSheet.create({
   chipTextNeg: { color: '#e07a5f' },
 
   kvRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingVertical: 4 },
-  kvKey: { color: '#7a705c', fontSize: 12, letterSpacing: 1 },
+  kvKey: { color: '#c9a86a', fontSize: 12, letterSpacing: 1 },
   factionOwn: { color: '#cdbf99', fontWeight: '700' },
   kvValue: { color: '#e6d8b3', fontSize: 14, fontWeight: '700' },
-  kvSub: { color: '#7a705c', fontSize: 10, fontStyle: 'italic', marginTop: -2, marginBottom: 4 },
+  kvSub: { color: '#c9a86a', fontSize: 10, fontStyle: 'italic', marginTop: -2, marginBottom: 4 },
   warning: { color: '#c9a86a' },
   danger: { color: '#e07a5f' },
 
   slotRow: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 6, borderBottomColor: '#1f1c18', borderBottomWidth: 1 },
-  slotLabel: { color: '#7a705c', fontSize: 10, letterSpacing: 1, width: 80, paddingTop: 2 },
+  slotLabel: { color: '#c9a86a', fontSize: 10, letterSpacing: 1, width: 80, paddingTop: 2 },
   slotBody: { flex: 1 },
   slotEmpty: { color: '#3a342c', fontSize: 12 },
   slotName: { color: '#e6d8b3', fontSize: 13, fontWeight: '700' },
@@ -604,20 +606,20 @@ const styles = StyleSheet.create({
 
   effectRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
   effectLabel: { color: '#e6d8b3', fontSize: 12 },
-  effectMeta: { color: '#7a705c', fontSize: 10, letterSpacing: 0.5 },
+  effectMeta: { color: '#c9a86a', fontSize: 10, letterSpacing: 0.5 },
 
   traitRow: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 4 },
 
   contractRow: { color: '#cdbf99', fontSize: 12, lineHeight: 17, marginBottom: 2 },
   contractTap: { color: '#c9a86a', fontSize: 10, letterSpacing: 1, marginTop: 6, fontStyle: 'italic', textAlign: 'right' },
 
-  footerHint: { color: '#5a5246', fontSize: 10, fontStyle: 'italic', textAlign: 'center', marginTop: 18 },
+  footerHint: { color: '#c9a86a', fontSize: 10, fontStyle: 'italic', textAlign: 'center', marginTop: 18 },
   // OTA-236 — Arbiter Titles section.
-  titlesSummary: { color: '#9b8e74', fontSize: 11, fontStyle: 'italic', marginBottom: 8 },
+  titlesSummary: { color: '#c9a86a', fontSize: 11, fontStyle: 'italic', marginBottom: 8 },
   titleRow: { marginBottom: 8 },
   titleName: { fontSize: 12, fontWeight: '700', letterSpacing: 0.3, marginBottom: 2 },
   titleNameEarned: { color: '#c9a86a' },
-  titleNameLocked: { color: '#5a5246' },
+  titleNameLocked: { color: '#c9a86a' },
   titlePerk: { color: '#cdbf99', fontSize: 11, lineHeight: 15, marginLeft: 14 },
-  titleRequirement: { color: '#5a5246', fontSize: 11, lineHeight: 15, marginLeft: 14, fontStyle: 'italic' },
+  titleRequirement: { color: '#c9a86a', fontSize: 11, lineHeight: 15, marginLeft: 14, fontStyle: 'italic' },
 });

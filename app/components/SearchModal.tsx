@@ -140,7 +140,7 @@ export function SearchModal({ visible, chips, onSubmit, onCancel }: Props) {
                 value={text}
                 onChangeText={setText}
                 placeholder='e.g. "the mud", "the doorway", "left side"'
-                placeholderTextColor="#5a5246"
+                placeholderTextColor="#c9a86a"
                 onSubmitEditing={handleSubmit}
                 returnKeyType="search"
                 autoCorrect={false}

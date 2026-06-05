@@ -1,7 +1,12 @@
 import vendorsData from '../data/npcs/vendors.json';
 import roadsideData from '../data/npcs/roadside_traders.json';
+import weaponsData from '../data/items/weapons.json';
+import armorData from '../data/items/armor.json';
+import materialsData from '../data/items/materials.json';
+import gearData from '../data/items/gear.json';
 import { pickWeighted } from './rng';
 import type { Enemy } from './types';
+import type { StallCategory } from './buildings';
 
 export interface VendorOffer {
   itemName: string;
@@ -114,6 +119,55 @@ export function pickRoadsideTrader(): VendorInstance {
     description: arch.description,
     offers,
     demeanor: arch.demeanor,
+  };
+}
+
+// arb26 — market stall vendors. Each stall (weapons / armor / food /
+// materials) mints a FRESH trader with a random mix of items from the
+// matching catalog every time the player steps up to it, so the stock
+// changes each visit. Prices come from the item's own tc / tcBuy when it
+// has one, else a rarity-based default with a little spread.
+interface StallCatalogItem { name: string; rarity?: string; tc?: number; tcBuy?: number; tags?: string[] }
+
+function stallCatalog(category: StallCategory): StallCatalogItem[] {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  switch (category) {
+    case 'weapons': return ((weaponsData as any).weapons ?? []) as StallCatalogItem[];
+    case 'armor': return ((armorData as any).armor ?? []) as StallCatalogItem[];
+    case 'materials': return ((materialsData as any).materials ?? []) as StallCatalogItem[];
+    case 'food':
+      return (((gearData as any).gear ?? []) as StallCatalogItem[]).filter(
+        (g) => (g.tags ?? []).includes('food'),
+      );
+    default: return [];
+  }
+}
+
+function rarityPrice(rarity?: string): number {
+  const r = (rarity ?? 'Common').toLowerCase();
+  if (r === 'legendary') return 120 + Math.floor(Math.random() * 130);
+  if (r === 'rare') return 40 + Math.floor(Math.random() * 40);
+  if (r === 'uncommon') return 15 + Math.floor(Math.random() * 16);
+  return 5 + Math.floor(Math.random() * 8);
+}
+
+export function buildStallVendor(category: StallCategory, stallName: string): VendorInstance {
+  const items = stallCatalog(category);
+  const n = Math.min(items.length, 3 + Math.floor(Math.random() * 4)); // 3-6
+  const shuffled = [...items].sort(() => Math.random() - 0.5).slice(0, n);
+  const offers: VendorOffer[] = shuffled.map((it) => {
+    const base = it.tc ?? it.tcBuy ?? rarityPrice(it.rarity);
+    const price = Math.max(2, Math.round(base * (0.85 + Math.random() * 0.3)));
+    return { itemName: it.name, price };
+  });
+  return {
+    id: `stall_${category}_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+    name: `${stallName} Trader`,
+    title: `${category} stall`,
+    faction: null,
+    description: `A trader minding the ${stallName.toLowerCase()} stall, wares laid out for haggling.`,
+    offers,
+    demeanor: 'honest',
   };
 }
 

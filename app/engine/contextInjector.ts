@@ -361,7 +361,7 @@ export function stringifyInventory(
 function collectEquippedNames(equipped: PlayerEquipped | undefined): Set<string> {
   const out = new Set<string>();
   if (!equipped) return out;
-  const slots: (keyof PlayerEquipped)[] = ['main', 'off', 'head', 'chest', 'legs', 'feet', 'amulet', 'ring'];
+  const slots: (keyof PlayerEquipped)[] = ['main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet', 'ring', 'ring2', 'ring3'];
   for (const slot of slots) {
     const name = equipped[slot];
     if (typeof name === 'string' && name) out.add(name);
@@ -376,8 +376,10 @@ function describeEquipped(equipped: PlayerEquipped | undefined, _names: Set<stri
   if (equipped.off) parts.push(`off hand ${equipped.off}`);
   if (equipped.head) parts.push(`head ${equipped.head}`);
   if (equipped.chest) parts.push(`chest ${equipped.chest}`);
+  if (equipped.hands) parts.push(`hands ${equipped.hands}`);
   if (equipped.legs) parts.push(`legs ${equipped.legs}`);
   if (equipped.feet) parts.push(`feet ${equipped.feet}`);
+  if (equipped.cloak) parts.push(`cloak ${equipped.cloak}`);
   if (equipped.amulet) parts.push(`amulet ${equipped.amulet}`);
   if (equipped.ring) parts.push(`ring ${equipped.ring}`);
   return parts.join(', ');

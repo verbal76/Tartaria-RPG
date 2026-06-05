@@ -10,6 +10,26 @@
 // for nouns we haven't classified.
 
 import type { Rarity } from './types';
+import materialsData from '../data/items/materials.json';
+
+// arb61 — salvage yields MATERIALS ONLY (player verb-economy: take = gear,
+// salvage = materials, investigate = clues/hooks). The hand-authored pools
+// historically mixed in gear (Aetheric Locket/Torch, Throwing Knife, Rusted
+// Blade, Climbing Rope), food (Trail Rations), and clues (Map Fragment, Sealed
+// Letter). We now filter every pool roll down to names that are TRUE materials
+// (present in materials.json — which includes Worn Tartarian Coin, a fine
+// salvage byproduct). Weight redistributes naturally among the survivors; if a
+// pool has no material entries we fall back to the all-material JUNK_POOL.
+const MATERIAL_NAMES: ReadonlySet<string> = new Set(
+  (() => {
+    const v = materialsData as unknown as Array<string | { name?: string }> | { materials?: unknown[]; items?: unknown[] };
+    const arr: Array<string | { name?: string }> = Array.isArray(v)
+      ? v
+      : ((v.materials as Array<string | { name?: string }>) ?? (v.items as Array<string | { name?: string }>) ?? []);
+    return arr.map((m) => (typeof m === 'string' ? m : m?.name)).filter((n): n is string => !!n);
+  })(),
+);
+export const isSalvageMaterial = (name: string): boolean => MATERIAL_NAMES.has(name);
 
 interface PoolEntry {
   name: string;
@@ -390,7 +410,17 @@ export function rollSalvagePool(noun: string, rng: () => number = Math.random): 
       line,
     };
   }
-  const entry = pickWeighted(pool.items, rng);
+  // arb61 — restrict to true materials; fall back to the all-material junk
+  // pool if this pool's only entries were the now-excluded gear/food/clues.
+  const materialItems = pool.items.filter((e) => isSalvageMaterial(e.name));
+  if (materialItems.length === 0) {
+    const junk = pickWeighted(JUNK_POOL, rng);
+    return {
+      kind: 'material', poolId: pool.id, itemName: junk.name, rarity: junk.rarity,
+      quantity: 1, line: format(MATERIAL_LINES, noun, rng),
+    };
+  }
+  const entry = pickWeighted(materialItems, rng);
   const span = entry.max - entry.min;
   const quantity = entry.min + (span > 0 ? Math.floor(rng() * (span + 1)) : 0);
   return {

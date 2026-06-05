@@ -42,6 +42,7 @@ import {
   Pressable,
   TouchableWithoutFeedback,
   Keyboard,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { startListening, stopListening, isListening } from '../voice/STTManager';
 
@@ -198,7 +199,7 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
       statusBarTranslucent
     >
       <TouchableWithoutFeedback onPress={handleCancel}>
-        <View style={styles.scrim}>
+        <KeyboardAvoidingView style={styles.scrim} behavior="padding">
           <TouchableWithoutFeedback>
             <View style={styles.card}>
               <Text style={styles.title}>DESIGNER NOTE</Text>
@@ -243,7 +244,7 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
                   onChangeText={setText}
                   onFocus={switchToManual}
                   placeholder='Type your note. e.g. "vendor chips disappeared after I purchased"'
-                  placeholderTextColor="#5a5246"
+                  placeholderTextColor="#c9a86a"
                   multiline
                   numberOfLines={4}
                   textAlignVertical="top"
@@ -274,7 +275,7 @@ export function FeedbackModal({ visible, onSubmit, onCancel }: Props) {
               </View>
             </View>
           </TouchableWithoutFeedback>
-        </View>
+        </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </Modal>
   );

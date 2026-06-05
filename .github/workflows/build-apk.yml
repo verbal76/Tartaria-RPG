@@ -1,5 +1,10 @@
 name: Android Build (Tartaria Realms)
 
+# OTA-302 (Ember Anvil) — trigger-touch for the production AAB of the
+# arbiters-line working build (arb70) promoted onto the HaL2001 conduit.
+# build-apk's paths-ignore skips app/**, so an OTA bump alone won't fire the
+# [build-aab] job; this non-ignored edit is the touch. See HANDOFF.md → OTA-302.
+#
 # First signed Play Store AAB: OTA 463 / build aab-build-N.
 # Triggered by commits containing [build-aab] (see meta step below)
 # or by pushing a refs/tags/v* tag.

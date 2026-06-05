@@ -25,6 +25,8 @@ import { Audio } from 'expo-av';
 import { getVoiceSettings } from './voiceSettings';
 import { applyLoreLexicon, cleanForSpeech } from './loreLexicon';
 import { splitSentences } from './sentenceSplitter';
+import { padSilence } from './audioPad';
+import { setMusicDuck } from '../audio/AudioManager';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const exec = require('react-native-executorch') as {
@@ -40,6 +42,26 @@ const exec = require('react-native-executorch') as {
 };
 
 const KOKORO_SAMPLE_RATE = 22050;
+
+// arb7 prosody — bundle consecutive sentences in a single speak() call
+// up to this many characters before handing them to Kokoro. Kokoro reads
+// flat/robotic on tiny strings and pays a fresh inference + playback-join
+// gap per chunk; merging gives sentence-to-sentence context and one
+// continuous waveform. Well under Kokoro's ~510-token cap (≈ 260 chars is
+// ~200 phonemes, leaving generous headroom).
+const MERGE_TARGET_CHARS = 200;
+
+// arb8 crossfade — adjacent same-voice chunks whose audio is already
+// inferred are concatenated into ONE waveform with a short equal-power
+// crossfade at each join, so the queue plays as continuous speech instead
+// of separate click/gap-prone clips. CROSSFADE_LOOKAHEAD = how many chunks
+// to infer ahead of playback (so a batch can form without blocking);
+// CROSSFADE_MAX_BATCH caps one playback buffer's size; CROSSFADE_MS is the
+// overlap length. First-audio stays fast because a batch only forms from
+// chunks that prefetch already finished during the prior chunk's playback.
+const CROSSFADE_LOOKAHEAD = 2;
+const CROSSFADE_MAX_BATCH = 4;
+const CROSSFADE_MS = 12;
 
 interface QueuedUtterance {
   id: number;
@@ -58,6 +80,11 @@ interface QueuedUtterance {
    *  recent queued line plays. Other channels (world / combat /
    *  reward) are unaffected. */
   channel?: string;
+  /** arb5 — the parent speak() call id. A single arbiter line is split
+   *  into multiple sentence chunks that all share one lineId, so the
+   *  queue cap can drop or keep WHOLE lines instead of truncating one
+   *  mid-line. */
+  lineId?: number;
   /** Prefetched samples + the rate they were inferred at. drain()
    *  pre-runs forward() on the NEXT queued utterance while the
    *  current one is still playing, so the next sentence's audio is
@@ -66,6 +93,10 @@ interface QueuedUtterance {
    *  expo-av's 500ms status poll). With prefetch + 50ms poll the gap
    *  drops to ~100ms. */
   prefetch?: Promise<Float32Array | null>;
+  /** arb8 — samples stamped onto the item when its prefetch resolves, so
+   *  drain() can synchronously tell whether a queued chunk is ready to
+   *  fold into a crossfade batch (undefined = still inferring). */
+  resolvedSamples?: Float32Array | null;
   /** OTA 013 — the voiceId the prefetch was inferred with. Drain
    *  validates this at consumption time: if the player switched
    *  voices between prefetch-start and consume, the prefetched
@@ -88,6 +119,11 @@ interface LoadedVoice {
   sticky: boolean;
 }
 const POOL_MAX = 2;
+// arb5 — most queued Arbiter lines kept at once (see the cap in speak()).
+// Keyed by lineId so whole lines are dropped, never truncated mid-line.
+// arb15 — lowered 3 → 2 so the voice can't lag as far behind a fast-tapping
+// player (drops the oldest queued line, keeps the newest two).
+const MAX_QUEUED_ARBITER_LINES = 2;
 const VOICE_POOL: Map<string, LoadedVoice> = new Map();
 // In-flight loads keyed by voiceId so concurrent ensureLoaded() calls
 // (e.g. beginScene's warm + the vendor's first line both hitting at
@@ -97,6 +133,22 @@ const LOADING: Map<string, Promise<any | null>> = new Map();
 
 let nextId = 1;
 const queue: QueuedUtterance[] = [];
+// arb15 — inference serializer. Kokoro's native module isn't reentrant:
+// two forward() calls in flight at once reject with a native error object
+// (surfaced as "[speak] [object Object]") and the affected chunks get
+// skipped — the "skipping sentences" report. The crossfade look-ahead
+// prefetch fires inference for upcoming chunks while one is playing, which
+// could overlap the next chunk's inference. Funnel ALL forward() calls
+// through this single promise chain so prefetch-ahead still happens (during
+// playback) but never two inferences run simultaneously.
+let inferenceChain: Promise<unknown> = Promise.resolve();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function inferSerial(model: any, text: string, rate: number): Promise<Float32Array | null> {
+  const run = inferenceChain.then(() => model.forward(text, rate));
+  // Keep the chain alive whether this inference resolves or rejects.
+  inferenceChain = run.then(() => undefined, () => undefined);
+  return run as Promise<Float32Array | null>;
+}
 let currentlySpeaking: QueuedUtterance | null = null;
 let currentSound: Audio.Sound | null = null;
 // Backwards-compat: TTSController checks isPiperAvailable / getKokoroState
@@ -182,13 +234,28 @@ async function captureFreeDiskMB(): Promise<number> {
   }
 }
 
+/** Human-readable message for any thrown value. Native rejections are
+ *  often plain objects, which String() renders as a useless
+ *  "[object Object]"; pull a .message/.code or JSON instead so the
+ *  diagnostic actually says what failed. */
+function describeErr(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  if (err && typeof err === 'object') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const o = err as any;
+    if (typeof o.message === 'string' && o.message) return o.code ? `${o.code}: ${o.message}` : o.message;
+    try { return JSON.stringify(err); } catch { /* fall through */ }
+  }
+  return String(err);
+}
+
 function recordKokoroError(
   step: KokoroErrorRecord['step'],
   voiceId: string,
   err: unknown,
   diskFreeMB: number,
 ): void {
-  const message = err instanceof Error ? err.message : String(err);
+  const message = describeErr(err);
   const stack = err instanceof Error && err.stack ? err.stack : null;
   KOKORO_ERROR_HISTORY.unshift({
     at: new Date().toISOString(),
@@ -367,7 +434,13 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
             lastDownloadProgress = p;
             if (!downloadEscalated) {
               const elapsed = Date.now() - loadStartedAt;
-              if (elapsed >= 4000 && p < 0.99) {
+              // 2000ms gate: cache hits report p≈1 well before this (and
+              // the p<0.99 guard skips them anyway), so only a genuine
+              // first-time download trips it. Lowered from 4000ms so the
+              // percentage surfaces nearer the true start of the ramp —
+              // at 4s a fast download was already ~37% in, which read as
+              // "the bar starts at 37% then jumps to done".
+              if (elapsed >= 2000 && p < 0.99) {
                 downloadEscalated = true;
               }
             }
@@ -383,11 +456,25 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
       step = 'load';
       if (sticky) setKokoroState({ phase: 'loading' });
       step = 'warmup';
-      // Warm-up forward — compiles the graph so the player's first
-      // real line doesn't pay cold-start latency. Output discarded.
-      // Captured here too — the executorch native graph compile is
-      // the single most likely OOM site on low-RAM devices.
-      try { const samples: Float32Array = await m.forward('ok.', 1.0); void samples; }
+      // Warm-up forward — compiles the graph so the player's first real line
+      // doesn't pay cold-start latency. Output discarded.
+      // arb70 — warm up at the CONFIGURED rate, not a hardcoded 1.0, with a
+      // realistic-length phrase. Kokoro's native forward(text, speed) pays a
+      // cold cost on the first call AT A GIVEN SPEED that TRUNCATES the head of
+      // that utterance. The old warm-up ran at 1.0; for two weeks the default
+      // rate was also 1.0 so it covered the real line — but once the default
+      // was raised to 1.2 (Plasma/Copper Cask) the warm-up no longer warmed
+      // the 1.2 path, so the title line (the first real forward at 1.2) came
+      // out with its head clipped ("Choose your character" → "aracter").
+      // Warming at the real rate + a real-length phrase pays that cost HERE
+      // (discarded) so the first user-facing line is clean.
+      // Captured here too — the executorch native graph compile is the single
+      // most likely OOM site on low-RAM devices.
+      const warmRate = getVoiceSettings().rate ?? 1.0;
+      try {
+        const samples = await inferSerial(m, 'The Arbiter stirs, and takes a breath.', warmRate);
+        void samples;
+      }
       catch (warmupErr) {
         const diskFreeMB = await captureFreeDiskMB();
         recordKokoroError('warmup', voiceId, warmupErr, diskFreeMB);
@@ -400,14 +487,18 @@ async function ensureLoaded(voiceId: string): Promise<any | null> {
       if (sticky) setKokoroState({ phase: 'ready' });
       return m;
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
+      const msg = describeErr(err);
       // Avoid double-recording: warmup catch already wrote a
       // detailed record. For everything else, capture here.
       if (step !== 'warmup') {
         const diskFreeMB = await captureFreeDiskMB();
         recordKokoroError(step, voiceId, err, diskFreeMB);
       }
-      if (sticky) setKokoroState({ phase: 'error', message: msg.slice(0, 240) });
+      // Prefix the step so the status line / COPY VOICE INFO says WHERE it
+      // failed: '[warmup] undefined is not a function' points at the native
+      // generate() call (APK/native mismatch — needs a rebuild), whereas a
+      // '[speak]' failure (drain catch) points at the JS post-processing.
+      if (sticky) setKokoroState({ phase: 'error', message: `[${step}] ${msg}`.slice(0, 240) });
       return null;
     } finally {
       LOADING.delete(voiceId);
@@ -465,25 +556,29 @@ export function speak(text: string, voiceId?: string | null, channel?: string): 
   const prepared = cleanForSpeech(applyLoreLexicon(text)).trim();
   if (!prepared) return -1;
   const id = nextId++;
-  // OTA 226 — Arbiter spam collapse. Playtester: "if somebody spams
-  // a direction the Arbiter fires off a bunch of flavor lines and
-  // talks for 5 minutes afterwards. Finish the one he's reading,
-  // skip the ones in between, jump to the latest." Implementation:
-  // when a new arbiter utterance lands, drop every other queued
-  // arbiter chunk (the currently-speaking one keeps playing — we
-  // only touch `queue`, not `currentlySpeaking`). World / combat /
-  // reward channels are untouched so action results still chain.
-  if (channel === 'arbiter' && queue.length > 0) {
-    const before = queue.length;
-    for (let i = queue.length - 1; i >= 0; i--) {
-      if (queue[i]!.channel === 'arbiter') queue.splice(i, 1);
+  // OTA 226 + arb5 — Arbiter queue cap. Playtester: "if somebody spams
+  // a direction the Arbiter fires off a bunch of flavor lines and talks
+  // for 5 minutes afterwards." The original rule dropped EVERY queued
+  // arbiter chunk on each new line — but that also ate intentional short
+  // sequences (a pickup acknowledgement immediately followed by the next
+  // beat's prompt), cutting the first line off (later playtester report).
+  // Instead, cap the queue at MAX_QUEUED_ARBITER_LINES *whole lines*
+  // (oldest dropped first), keyed by lineId so a multi-chunk line is
+  // never truncated mid-sentence. currentlySpeaking is never touched;
+  // orphaned prefetch promises on dropped chunks GC harmlessly.
+  if (channel === 'arbiter') {
+    const queuedLineIds: number[] = [];
+    for (const q of queue) {
+      if (q.channel === 'arbiter' && q.lineId != null && !queuedLineIds.includes(q.lineId)) {
+        queuedLineIds.push(q.lineId);
+      }
     }
-    const dropped = before - queue.length;
-    if (dropped > 0) {
-      // Cancel any prefetch promises attached to the dropped lines
-      // by simply letting them resolve into the ether — drain() only
-      // consumes prefetch from items it actually shifts off the
-      // queue, so orphaned promises GC harmlessly.
+    // We're about to add one more line, so drop until there's room.
+    while (queuedLineIds.length >= MAX_QUEUED_ARBITER_LINES) {
+      const dropId = queuedLineIds.shift()!;
+      for (let i = queue.length - 1; i >= 0; i--) {
+        if (queue[i]!.channel === 'arbiter' && queue[i]!.lineId === dropId) queue.splice(i, 1);
+      }
     }
   }
   // Split into sentence-sized chunks so the first audio plays as
@@ -492,14 +587,34 @@ export function speak(text: string, voiceId?: string | null, channel?: string): 
   // through Kokoro before ANY sound starts. Subsequent sentences
   // queue behind the first and stream as they're produced.
   const { sentences, remainder } = splitSentences(prepared);
-  const chunks = sentences.length > 0 ? [...sentences] : [];
-  if (remainder.trim()) chunks.push(remainder.trim());
+  const rawChunks = sentences.length > 0 ? [...sentences] : [];
+  if (remainder.trim()) rawChunks.push(remainder.trim());
   // Fallback: if the text has zero terminators (rare — usually a
   // status line), speak it as one chunk.
-  if (chunks.length === 0) chunks.push(prepared);
+  if (rawChunks.length === 0) rawChunks.push(prepared);
+  // arb7 prosody — greedily merge short consecutive sentences up to
+  // MERGE_TARGET_CHARS so Kokoro reads them as one inflected breath
+  // instead of a string of choppy one-clip-per-sentence reads. (Streamed
+  // narration is pre-bundled upstream in TTSController; this also catches
+  // the many pre-written multi-sentence lines delivered in one speak().)
+  const chunks: string[] = [];
+  for (let i = 0; i < rawChunks.length; i++) {
+    const piece = rawChunks[i]!;
+    const last = chunks.length > 0 ? chunks[chunks.length - 1]! : null;
+    // Keep the FIRST sentence as its own small chunk so audio starts fast
+    // (bundling the whole line meant Kokoro inferred a big block before any
+    // sound — the "heavy ramp-up delay" report). Bundle from the 2nd
+    // sentence onward, up to MERGE_TARGET_CHARS, for smoothness.
+    if (i === 0 || chunks.length < 2 || last === null
+        || last.length + 1 + piece.length > MERGE_TARGET_CHARS) {
+      chunks.push(piece);
+    } else {
+      chunks[chunks.length - 1] = `${last} ${piece}`;
+    }
+  }
   const resolvedVoice = voiceId ?? arbiterVoiceId();
   for (const chunk of chunks) {
-    queue.push({ id: nextId++, text: chunk, voiceId: resolvedVoice, channel });
+    queue.push({ id: nextId++, text: chunk, voiceId: resolvedVoice, channel, lineId: id });
   }
   void drain();
   return id;
@@ -508,8 +623,14 @@ export function speak(text: string, voiceId?: string | null, channel?: string): 
 async function drain(): Promise<void> {
   if (currentlySpeaking) return;
   const next = queue.shift();
-  if (!next) return;
+  if (!next) {
+    // Nothing left to speak — restore music to full volume.
+    void setMusicDuck(false);
+    return;
+  }
   currentlySpeaking = next;
+  // A line is about to play — duck the music under the Arbiter's voice.
+  void setMusicDuck(true);
   const targetVoice = next.voiceId ?? arbiterVoiceId();
   const model = await ensureLoaded(targetVoice);
   if (!model) {
@@ -527,41 +648,65 @@ async function drain(): Promise<void> {
     // re-infer with the current model.
     const prefetchStillValid = !!next.prefetch
       && (next.prefetchVoiceId === undefined || next.prefetchVoiceId === targetVoice);
-    const samples: Float32Array | null = prefetchStillValid
-      ? await next.prefetch!
-      : await model.forward(next.text, settings.rate);
-    if (!samples || samples.length === 0) {
+    const firstSamples: Float32Array = asFloat32(
+      prefetchStillValid ? await next.prefetch! : await inferSerial(model, next.text, settings.rate),
+    );
+    if (!firstSamples || firstSamples.length === 0) {
       currentlySpeaking = null;
       void drain();
       return;
     }
-    // Kick off inference for the NEXT queued chunk in parallel with
-    // this chunk's playback. Only prefetch when the next chunk uses
-    // the same loaded voice — switching voices mid-queue would force
-    // a model swap and defeat the win. If forward() rejects, the
-    // catch on the next iteration handles it.
-    const upcoming = queue[0];
-    if (upcoming && !upcoming.prefetch) {
-      const upcomingVoice = upcoming.voiceId ?? arbiterVoiceId();
-      if (upcomingVoice === targetVoice) {
-        // OTA 013 — stamp the voice we inferred with. Drain's
-        // consume-side check uses prefetchVoiceId to detect a
-        // mid-stream voice switch and discard stale audio.
-        upcoming.prefetchVoiceId = targetVoice;
-        upcoming.prefetch = model
-          .forward(upcoming.text, settings.rate)
-          .catch(() => null);
+    // arb8 — assemble a crossfade batch: this chunk plus any following
+    // same-voice chunks whose audio is ALREADY inferred (prefetch
+    // resolved). We never block on inference here, so first-audio stays
+    // fast; the batch only grows once prefetch has run ahead during the
+    // previous chunk's playback.
+    const batch: Float32Array[] = [firstSamples];
+    while (batch.length < CROSSFADE_MAX_BATCH) {
+      const peek = queue[0];
+      if (!peek) break;
+      // Only crossfade chunks of the SAME line. Merging across separate
+      // lines made discrete beats (e.g. tutorial acks) run together and
+      // feel laggy; intra-line bundling keeps long narration smooth while
+      // distinct lines stay responsive. (Prefetch still pipelines across
+      // lines below, so the inter-line gap stays small.)
+      if (peek.lineId !== next.lineId) break;
+      const peekVoice = peek.voiceId ?? arbiterVoiceId();
+      if (peekVoice !== targetVoice) break;                 // stop at a voice change
+      if (peek.resolvedSamples === undefined) break;        // not inferred yet → don't block
+      if (peek.prefetchVoiceId !== undefined && peek.prefetchVoiceId !== targetVoice) break; // stale voice
+      queue.shift();
+      if (peek.resolvedSamples && peek.resolvedSamples.length) batch.push(peek.resolvedSamples);
+    }
+    // Prime inference for the next few chunks (same voice only) so future
+    // drains can keep forming batches. Switching voices mid-queue would
+    // force a model swap and defeat the win, so prefetch stops there.
+    primePrefetch(model, targetVoice, settings.rate);
+
+    let combined: Float32Array;
+    if (batch.length === 1) {
+      // Single chunk — unchanged path; playPcm trims + fades it.
+      combined = firstSamples;
+    } else {
+      // Trim each member's pad-silence first so the crossfade overlaps
+      // real audio, then join with an equal-power crossfade. Never let the
+      // post-processing break playback — fall back to the first chunk.
+      try {
+        const trimmedBufs = batch.map((b) => trimSilenceLeadTrail(b, KOKORO_SAMPLE_RATE));
+        combined = concatWithCrossfade(trimmedBufs, KOKORO_SAMPLE_RATE);
+      } catch {
+        combined = firstSamples;
       }
     }
-    await playPcm(samples, KOKORO_SAMPLE_RATE);
+    await playPcm(combined, KOKORO_SAMPLE_RATE);
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
+    const msg = describeErr(err);
     // OTA 23-017 — runtime-speak failure (model loaded, ready,
     // but a specific utterance blew up). Record so the diagnostic
     // captures it instead of just showing the truncated UI msg.
     const diskFreeMB = await captureFreeDiskMB();
     recordKokoroError('unknown', currentlySpeaking?.voiceId ?? 'unknown', err, diskFreeMB);
-    setKokoroState({ phase: 'error', message: msg.slice(0, 240) });
+    setKokoroState({ phase: 'error', message: `[speak] ${msg}`.slice(0, 240) });
   } finally {
     currentlySpeaking = null;
     void drain();
@@ -571,6 +716,7 @@ async function drain(): Promise<void> {
 export async function stopAndClear(): Promise<void> {
   queue.length = 0;
   currentlySpeaking = null;
+  void setMusicDuck(false);
   if (currentSound) {
     try { await currentSound.stopAsync(); } catch { /* ignore */ }
     try { await currentSound.unloadAsync(); } catch { /* ignore */ }
@@ -634,8 +780,30 @@ async function playPcm(samples: Float32Array, sampleRate: number): Promise<void>
   // real phoneme content. Dropped to 3ms (~66 samples at 22.05 kHz),
   // which is well under any single phoneme and still kills the
   // click.
-  applyFadeEnvelope(samples, sampleRate, 3);
-  const wavBase64 = encodeWav(samples, sampleRate);
+  // arb7 prosody — strip the 30-150ms of near-silence Kokoro pads onto
+  // the head + tail of each utterance before fading. Concatenated in the
+  // queue these dead spans stack into the stuttering inter-sentence gap;
+  // trimming them (with a guard pad so soft attacks survive) tightens the
+  // join so consecutive chunks read as continuous speech.
+  // Normalize first (native bridges sometimes return a non-Float32Array),
+  // then trim + fade — but never let post-processing throw and silence the
+  // voice: on any failure, play the raw samples.
+  const src = asFloat32(samples);
+  let buf = src;
+  try {
+    buf = trimSilenceLeadTrail(src, sampleRate);
+    applyFadeEnvelope(buf, sampleRate, 3);
+  } catch {
+    buf = src;
+  }
+  // arb68 — light silent lead/tail guard so trimSilenceLeadTrail's strip + the
+  // didJustFinish/unload timing don't shave a soft attack/decay. Kept SHORT so
+  // it doesn't reintroduce the inter-line latency arb7/arb8 tightened. (The
+  // earlier 1300ms "first-utterance" lead was removed: the title-line clip is
+  // upstream of playback — the buffer itself arrives truncated — so padding the
+  // playback buffer never addressed it. Fixed at the source instead.)
+  try { buf = padSilence(buf, sampleRate, 90, 70); } catch { /* play unpadded */ }
+  const wavBase64 = encodeWav(buf, sampleRate);
   // progressUpdateIntervalMillis defaults to 500ms in expo-av, which
   // means didJustFinish fires up to half a second AFTER the audio
   // actually ends — that latency is the bulk of the inter-sentence
@@ -648,7 +816,7 @@ async function playPcm(samples: Float32Array, sampleRate: number): Promise<void>
   const ttsVolume = Math.max(0, Math.min(1, getVoiceSettings().volume ?? 1));
   const { sound } = await Audio.Sound.createAsync(
     { uri: `data:audio/wav;base64,${wavBase64}` },
-    { shouldPlay: true, progressUpdateIntervalMillis: 50, volume: ttsVolume },
+    { shouldPlay: true, progressUpdateIntervalMillis: 25, volume: ttsVolume },
   );
   currentSound = sound;
   await new Promise<void>((resolve) => {
@@ -661,6 +829,107 @@ async function playPcm(samples: Float32Array, sampleRate: number): Promise<void>
       }
     });
   });
+}
+
+/** Normalize whatever the native `generate()` bridge returns into a real
+ *  Float32Array. Some bridges hand back an array-like or ArrayBuffer that
+ *  lacks the TypedArray methods (.subarray/.set) the trim + crossfade
+ *  post-processing relies on; calling them would throw "undefined is not a
+ *  function" and drop the whole bundled voice to system TTS. Never throws;
+ *  returns an empty buffer on anything unusable. */
+function asFloat32(x: unknown): Float32Array {
+  if (x instanceof Float32Array) return x;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const v = x as any;
+  try {
+    if (v instanceof ArrayBuffer) return new Float32Array(v);
+    if (v && v.buffer instanceof ArrayBuffer && typeof v.byteOffset === 'number' && typeof v.length === 'number') {
+      return new Float32Array(v.buffer, v.byteOffset, v.length);
+    }
+    if (v && typeof v.length === 'number') return Float32Array.from(v as ArrayLike<number>);
+  } catch { /* fall through to empty */ }
+  return new Float32Array(0);
+}
+
+/** Trim leading/trailing near-silence from a Kokoro waveform. Scans in
+ *  from each end to the first sample above an amplitude threshold, then
+ *  keeps a small guard pad so a soft consonant attack/decay is never
+ *  clipped, and caps how much can be removed per end so a genuinely
+ *  quiet line can't be gutted. Returns a subarray VIEW (no copy); never
+ *  returns empty — if the whole buffer is below threshold it's left as-is. */
+function trimSilenceLeadTrail(samples: Float32Array, sampleRate: number): Float32Array {
+  const n = samples.length;
+  if (n === 0) return samples;
+  const THRESHOLD = 0.01;                       // |amp| counted as "sound"
+  const guard = Math.floor(sampleRate * 0.008); // keep ~8ms padding each end
+  const maxTrim = Math.floor(sampleRate * 0.2); // never cut > 200ms per end
+  let first = 0;
+  while (first < n && Math.abs(samples[first]!) < THRESHOLD) first++;
+  let last = n - 1;
+  while (last > first && Math.abs(samples[last]!) < THRESHOLD) last--;
+  if (first >= last) return samples;            // all-silence / lone spike
+  const start = Math.min(Math.max(0, first - guard), maxTrim);
+  const end = Math.max(Math.min(n - 1, last + guard), n - 1 - maxTrim);
+  if (start <= 0 && end >= n - 1) return samples;
+  return samples.subarray(start, end + 1);
+}
+
+/** arb8 — start inference for up to CROSSFADE_LOOKAHEAD chunks ahead of
+ *  playback (same voice only), stamping each item's resolvedSamples when
+ *  its forward() settles so drain() can fold ready chunks into a crossfade
+ *  batch without blocking. Idempotent: skips items already prefetching. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function primePrefetch(model: any, voice: string, rate: number): void {
+  let ahead = 0;
+  for (const item of queue) {
+    if (ahead >= CROSSFADE_LOOKAHEAD) break;
+    const v = item.voiceId ?? arbiterVoiceId();
+    if (v !== voice) break;                 // stop at a voice change
+    if (!item.prefetch) {
+      // OTA 013 — stamp the voice we inferred with so the consume side
+      // can discard stale audio after a mid-stream voice switch.
+      item.prefetchVoiceId = voice;
+      item.prefetch = inferSerial(model, item.text, rate)
+        .then((s: unknown) => { const f = asFloat32(s); item.resolvedSamples = f; return f; })
+        .catch(() => { item.resolvedSamples = null; return null; });
+    }
+    ahead++;
+  }
+}
+
+/** arb8 — concatenate PCM buffers into one waveform, overlapping each join
+ *  by CROSSFADE_MS with an equal-power (constant-power) crossfade so the
+ *  transition is smooth and click-free without a mid-fade amplitude dip.
+ *  Inputs should already be silence-trimmed so the overlap is over real
+ *  audio. Returns a fresh buffer. */
+function concatWithCrossfade(buffers: Float32Array[], sampleRate: number): Float32Array {
+  if (buffers.length === 1) return buffers[0]!;
+  const xfadeMax = Math.max(1, Math.floor((sampleRate * CROSSFADE_MS) / 1000));
+  // Per-join overlap is capped by the shorter of the two neighbours.
+  const overlaps: number[] = [];
+  let total = buffers[0]!.length;
+  for (let i = 1; i < buffers.length; i++) {
+    const ov = Math.min(xfadeMax, buffers[i - 1]!.length, buffers[i]!.length);
+    overlaps.push(ov);
+    total += buffers[i]!.length - ov;
+  }
+  const out = new Float32Array(total);
+  out.set(buffers[0]!, 0);
+  let pos = buffers[0]!.length;
+  for (let i = 1; i < buffers.length; i++) {
+    const buf = buffers[i]!;
+    const ov = overlaps[i - 1]!;
+    const start = pos - ov;
+    for (let j = 0; j < ov; j++) {
+      const t = (j + 1) / (ov + 1);                 // 0..1 across the overlap
+      const gPrev = Math.cos((t * Math.PI) / 2);     // equal-power fade-out
+      const gNext = Math.sin((t * Math.PI) / 2);     // equal-power fade-in
+      out[start + j] = out[start + j]! * gPrev + buf[j]! * gNext;
+    }
+    out.set(buf.subarray(ov), pos);
+    pos += buf.length - ov;
+  }
+  return out;
 }
 
 /** Apply a linear fade-in to the first `fadeMs` and fade-out to the

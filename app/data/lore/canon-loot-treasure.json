@@ -432,6 +432,141 @@
       "source": "Found in a scholar's vault",
       "tcValue": 250,
       "notes": "Holds vast knowledge prized by historians and scholars"
+    },
+    {
+      "id": "zalmar_frequency_harmonizer",
+      "name": "Zalmar Frequency Harmonizer",
+      "category": "Artifact",
+      "rarity": "Rare",
+      "source": "Samarran — ruins of Thametan's Tower",
+      "tcValue": 260,
+      "notes": "A handheld brass-and-aether-glass device of the philosopher-scientist Elior Zalmar, built to monitor the Aetherons of the Etheric Field and head off a resonance cascade."
+    },
+    {
+      "id": "sentinel_commanders_crest",
+      "name": "Sentinel Commander's Crest",
+      "category": "Artifact",
+      "rarity": "Legendary",
+      "source": "Asgardar — the Grand Spire of Etheria",
+      "tcValue": 480,
+      "notes": "A high officer's badge that hums at a frequency Architectural Sentinels read as Royal Authority — its bearer can issue commands to legions of the ancient machines."
+    },
+    {
+      "id": "mud_flood_nexus_pulse_key",
+      "name": "Mud Flood Nexus Pulse-Key",
+      "category": "Artifact",
+      "rarity": "Legendary",
+      "source": "The Mud Flood Nexus, deep in the Aetherstone Deep",
+      "tcValue": 500,
+      "notes": "A massive control interface for the subterranean systems that regulated the empire's geology. Rumored to be able to trigger — or reverse — a secondary cataclysm. Coveted by the Mud Monarchs."
+    },
+    {
+      "id": "eternal_dynasty_blood_signet",
+      "name": "Eternal Dynasty's Blood-Signet",
+      "category": "Artifact",
+      "rarity": "Rare",
+      "source": "Hidden sanctuaries in the spires of Asgardar or Nimari",
+      "tcValue": 300,
+      "notes": "A ring of refined Aetherstone that glows in the presence of Aetherborn. The Tartarian elite used it to verify bloodline purity; it remains a symbol of the Eternal Dynasty's divine right."
+    },
+    {
+      "id": "fragment_of_the_endless_stair",
+      "name": "Fragment of the Endless Stair",
+      "category": "Relic",
+      "rarity": "Rare",
+      "source": "The Endless Stair, near the impassable disturbance at its base",
+      "tcValue": 220,
+      "notes": "A heavy stone step broken from the legendary vertical conduit between the surface and the mantle. Unnaturally dense, as if it still carries the gravity of the Aetherstone Deep."
+    },
+    {
+      "id": "mask_of_tartarias_last_king",
+      "name": "Mask of Tartaria's Last King",
+      "category": "Artifact",
+      "rarity": "Legendary",
+      "source": "True Tartarian Catacombs / the Royal Vaults beneath Asgardar",
+      "tcValue": 450,
+      "notes": "A mask said to grant visions of the empire's final moments. The True Tartarians revere it as a sacred link to their ancestral history."
+    },
+    {
+      "id": "aetheric_phoenix_feather",
+      "name": "Aetheric Phoenix Feather",
+      "category": "Artifact",
+      "rarity": "Legendary",
+      "source": "The partially submerged Sinking Cathedral in the Mud Seas",
+      "tcValue": 470,
+      "notes": "A feather radiating intense heat, as if its bird was forged from raw Aetheric energy. Said to hold the power of rebirth — even to resurrect fallen allies."
+    },
+    {
+      "id": "wrath_of_the_ether_titan",
+      "name": "Wrath of the Ether Titan",
+      "category": "Weapon",
+      "rarity": "Legendary",
+      "source": "The Giant Vault in the Ural Mountains",
+      "tcValue": 520,
+      "notes": "A two-handed hammer of the ancient Tartarian Giants that calls localized Etheric storms on impact. Forged to defend the empire's most sacred vaults."
+    },
+    {
+      "id": "timeworn_ether_compass",
+      "name": "Timeworn Ether Compass",
+      "category": "Artifact",
+      "rarity": "Rare",
+      "source": "The Cradle of Dusk, within the Mud Seas",
+      "tcValue": 280,
+      "notes": "A navigation tool that always points to the strongest source of Etheric energy, ignoring magnetic interference. Said to defy time, showing paths to cities not yet unlocked from the mud."
+    },
+    {
+      "id": "heart_of_the_ether_dragon",
+      "name": "Heart of the Ether Dragon",
+      "category": "Artifact",
+      "rarity": "Legendary",
+      "source": "The Lost Capital of Drakova, rumored to hold an intact core",
+      "tcValue": 540,
+      "notes": "A preserved, pulsing energy core from a legendary creature of the old world — one of the most powerful fuel sources in existence, able to power an Etheric Chamber for centuries."
+    },
+    {
+      "id": "aetherstorm_shard",
+      "name": "Aetherstorm Shard",
+      "category": "Artifact",
+      "rarity": "Rare",
+      "source": "The Great Tartary Plains, near the original resonance-cascade site",
+      "tcValue": 290,
+      "notes": "A jagged, volatile crystal containing a miniature storm; it discharges violet lightning without pause. A prime component for crafting the most powerful legendary runecasters."
+    },
+    {
+      "id": "architects_master_blueprint",
+      "name": "Architect's Master Blueprint",
+      "category": "Treasure",
+      "rarity": "Rare",
+      "source": "The Tartarian Archives inside Nimari",
+      "tcValue": 300,
+      "notes": "An ancient slate of the original engineering designs for Tartaria's floating towers and hovering citadels. The Forgotten Order covets these to rebuild the world's lost infrastructure."
+    },
+    {
+      "id": "sovereign_ether_crown",
+      "name": "Sovereign Ether Crown",
+      "category": "Treasure",
+      "rarity": "Legendary",
+      "source": "The Royal Vaults deep beneath Asgardar",
+      "tcValue": 560,
+      "notes": "The first crown ever worn by a Tartarian king, believed to grant ultimate control over the empire's energy networks — a relic of the zenith of human achievement before the fall."
+    },
+    {
+      "id": "obsidian_siphon",
+      "name": "Obsidian Siphon",
+      "category": "Artifact",
+      "rarity": "Rare",
+      "source": "The Obsidian Pillars in the Great Tartary Plains",
+      "tcValue": 270,
+      "notes": "A specialized tool for bleeding magnetic energy from the Obsidian Pillars. Essential to researchers trying to stabilize Etheric grids without traditional power sources."
+    },
+    {
+      "id": "entombeds_prayer_tablet",
+      "name": "The Entombed's Prayer Tablet",
+      "category": "Treasure",
+      "rarity": "Uncommon",
+      "source": "Subterranean Catacombs / buried homes in the Buried Cities",
+      "tcValue": 140,
+      "notes": "A spiritual tablet used to honor the Giants as divine architects. Frequently found in buried homes where families were sealed in time by the Flood."
     }
   ]
 }

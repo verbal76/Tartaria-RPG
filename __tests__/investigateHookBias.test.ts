@@ -22,11 +22,12 @@ describe('OTA-213 — investigate intent biases rollAreaSearch toward hooks', ()
     expect(rate).toBeLessThanOrEqual(0.22);
   });
 
-  it('investigate intent lifts story-bucket rate to roughly 60% (OTA-216: split across hook + directional + cool_story)', () => {
-    // OTA-213 made the "story" bucket ~60% of investigates. OTA-216
-    // then split that 60% three ways (50% hook / 30% directional_find
-    // / 20% cool_story). Asserting on the TOTAL of all three is the
-    // stable invariant; individual sub-rates have their own tests in
+  it('investigate intent makes the story bucket the norm (~75%): hook + directional + cool_story', () => {
+    // OTA-213/216 made the "story" bucket the bulk of investigates. arb61
+    // raised it further (verb economy: investigate = clues + mission hooks as
+    // the NORM; routine common-material foraging removed, leaving only a ~7%
+    // RARE find + ~8% tc + ~10% nothing → ~75% story). Asserting on the TOTAL
+    // of the three story sub-kinds; sub-rates are covered in
     // directionalFindAndCoolStory.
     let storyCount = 0;
     for (let i = 0; i < 2000; i++) {
@@ -34,8 +35,8 @@ describe('OTA-213 — investigate intent biases rollAreaSearch toward hooks', ()
       if (o.kind === 'hook' || o.kind === 'directional_find' || o.kind === 'cool_story') storyCount++;
     }
     const rate = storyCount / 2000;
-    expect(rate).toBeGreaterThanOrEqual(0.50);
-    expect(rate).toBeLessThanOrEqual(0.70);
+    expect(rate).toBeGreaterThanOrEqual(0.65);
+    expect(rate).toBeLessThanOrEqual(0.85);
   });
 
   it('investigate + Vision Lens hookBonus stays under the 0.4 clamp', () => {
