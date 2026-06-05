@@ -172,6 +172,25 @@ jobs:
           "
           grep '"bundleIdentifier"' app.json | head -3
 
+      - name: Stamp unique iOS buildNumber = GitHub run_number
+        run: |
+          # eas.json uses appVersionSource:"local" + autoIncrement, which
+          # RESETS the iOS buildNumber every CI run and bumps 1 -> 2 each time,
+          # so every build comes out as 2.4.1 (2) — identical to the build
+          # already in TestFlight. Apple rejects a duplicate version+build, so
+          # the auto-submit silently fails ("fresh build, nothing in TestFlight").
+          # Stamp a unique, monotonically-increasing buildNumber from the GitHub
+          # run_number (mirrors the Android versionCode inject) so each build is
+          # strictly higher than the last and App Store Connect accepts it.
+          node -e "
+            const fs = require('fs');
+            const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));
+            app.expo.ios = app.expo.ios || {};
+            app.expo.ios.buildNumber = String(${{ github.run_number }});
+            fs.writeFileSync('app.json', JSON.stringify(app, null, 2));
+            console.log('iOS buildNumber stamped =', app.expo.ios.buildNumber);
+          "
+
       - name: Verify EXPO_TOKEN secret is set
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
