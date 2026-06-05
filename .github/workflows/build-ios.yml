@@ -1,5 +1,12 @@
 name: iOS Build (Tartaria Realms)
 
+# OTA-302 submit pass — rebuild + AUTO-SUBMIT to TestFlight. The earlier
+# [build-ios] run built the IPA but with submit:false, and the manual
+# submit-ios.yml dispatch wasn't permitted from automation, so nothing
+# reached TestFlight. This commit leads with [build-ios] [submit-ios] so the
+# production build runs with eas build --auto-submit (lands in App Store
+# Connect / TestFlight when the build finishes).
+#
 # OTA-302 (Ember Anvil) — trigger-touch for the production iOS IPA of the
 # arbiters-line working build (arb70) promoted onto the HaL2001 conduit.
 # build-ios's paths-ignore skips app/**, so this non-ignored edit fires the
