@@ -5,6 +5,11 @@ name: iOS Build (Tartaria Realms)
 # build-ios's paths-ignore skips app/**, so this non-ignored edit fires the
 # [build-ios] production build. See HANDOFF.md → OTA-302.
 #
+# OTA-302 re-trigger: the combined "[build-aab] [build-ios] …" commit led with
+# [build-aab], so this workflow's STRICT first-line-prefix check resolved to
+# `preview` (internal dist, no creds) and failed. Re-firing with [build-ios] as
+# the leading token so the production (App Store) profile is selected.
+#
 # Triggers EAS Build for iOS — Expo's hosted macOS infrastructure does
 # the cert/provisioning/Xcode work. We just hand it the project,
 # auth, and Apple credentials; it returns a signed .ipa.
