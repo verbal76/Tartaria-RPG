@@ -101,9 +101,28 @@ export function ExplorationScreen() {
   // that owns its own (keyboard-avoided) text field is open, so the bar
   // can't mount behind the modal and steal focus from the visible field.
   // Reset to false on unmount so it never sticks across screens.
+  //
+  // arb71 (iOS tutorial fix) — the floating bar AUTOFOCUSES to hold the
+  // keyboard above it. On iOS that focused input then (a) keeps the keyboard
+  // ON TOP of the chip-picker modals (Climb/Take) and (b) BLOCKS native
+  // <Modal>s — the explore_or_leave DOOR popup is a native <Modal> and would
+  // never present while a text input is focused, so the tutorial stalled with
+  // no popup even though the beat fired. The original list only covered the
+  // text-field popups. Widen it to EVERY popup that should own the screen —
+  // the climb/take pickers and the door beat included — and hard-dismiss the
+  // keyboard when one opens, so the floating bar unmounts (releasing focus)
+  // and the modal presents cleanly.
+  const doorBeatOpen = tutBeat === 'explore_or_leave' && !tutorialExploreChosen;
   useEffect(() => {
-    setInputModalOpen(searchOpen || approachOpen || askArbiterOpen || salvageOpen);
-  }, [searchOpen, approachOpen, askArbiterOpen, salvageOpen, setInputModalOpen]);
+    const anyPopupOpen =
+      searchOpen || approachOpen || askArbiterOpen || salvageOpen
+      || climbOpen || takeOpen || doorBeatOpen;
+    setInputModalOpen(anyPopupOpen);
+    // iOS: a native <Modal> won't present over a live keyboard / focused
+    // input, and the floating bar's autoFocus keeps re-grabbing it — so
+    // explicitly drop the keyboard the moment any popup/beat opens.
+    if (anyPopupOpen) Keyboard.dismiss();
+  }, [searchOpen, approachOpen, askArbiterOpen, salvageOpen, climbOpen, takeOpen, doorBeatOpen, setInputModalOpen]);
   useEffect(() => () => setInputModalOpen(false), [setInputModalOpen]);
   // 2026-05-25 — branded vendor-leave prompt (POLISH-4). Replaces
   // the native Alert that was breaking the dark+amber palette. Holds

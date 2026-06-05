@@ -70,6 +70,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-302 — production promotion of the arbiters-line working build (arb70)
   // onto the HaL2001 conduit. Native AAB + iOS IPA + hal2001 OTA.
   '2026-06-05-302': 'Ember Anvil',
+  // iOS tutorial keyboard fixes (door popup / climb modal / ghost bar) +
+  // iOS OTA route fix (publish preview→ios so the iOS build receives OTAs).
+  '2026-06-05-303': 'Onyx Anvil',
   '2026-06-03-301': 'Tungsten Spire',
   // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted
   // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).

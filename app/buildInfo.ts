@@ -12497,4 +12497,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // so the AAB/IPA build pipeline produces correctly-signed store binaries.
 // Shipped as a native AAB + iOS IPA ([build-aab] [build-ios]) and an OTA to
 // the hal2001 channel for existing installs.
-export const OTA_BUILD_ID = '2026-06-05-302';
+//
+// OTA-303 — iOS tutorial keyboard fixes (arb71 promoted) + iOS OTA route fix.
+// (1) Door leave/stay popup never presented on iOS, keyboard sat over the
+// Climb modal, ghost input bar — root cause the autoFocus floating bar holding
+// the keyboard so the native <Modal> couldn't present; fixed in
+// ExplorationScreen + KeyboardInputBar. (2) The iOS TestFlight build polls the
+// "preview" channel but HaL2001 only published "hal2001", so OTAs never reached
+// iOS ("Last OTA applied: No"); eas-update.yml now also publishes preview→ios.
+export const OTA_BUILD_ID = '2026-06-05-303';

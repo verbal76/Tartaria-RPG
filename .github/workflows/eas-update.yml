@@ -278,9 +278,20 @@ jobs:
               elif [ "${IOS_ONLY:-false}" = "true" ]; then
                 echo "::notice::[ota-ios-only] marker found — skipping Android publish for hal2001 channel."
                 publish_channel "hal2001" "ios" true
+                # OTA-303 — iOS OTA route fix. The production iOS TestFlight
+                # build is stamped channel "preview" (eas.json production
+                # profile), NOT hal2001, so the hal2001 iOS publish above never
+                # reached it ("Last OTA applied: No" on the iPad). Also publish
+                # iOS to the preview channel so the installed iOS build receives
+                # OTAs. Platform-scoped (ios) — does NOT touch preview→android
+                # (Android live testers), so branch isolation for Android holds.
+                publish_channel "preview" "ios" true
               else
                 publish_channel "hal2001" "android" false
                 publish_channel "hal2001" "ios" true
+                # OTA-303 — see note above: reach the iOS build that polls the
+                # "preview" channel (ios platform only).
+                publish_channel "preview" "ios" true
               fi
               ;;
             iOS-initial)

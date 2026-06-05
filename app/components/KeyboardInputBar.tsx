@@ -49,6 +49,7 @@ import {
   StyleSheet,
   Keyboard,
   Platform,
+  Dimensions,
 } from 'react-native';
 import { useGameStore } from '../state/gameStore';
 
@@ -90,6 +91,17 @@ export function KeyboardInputBar() {
       // suggestions, language bar). On Android Fabric this is often
       // the only event we get. Use it as a secondary trigger.
       const h = e.endCoordinates?.height ?? 0;
+      const screenY = e.endCoordinates?.screenY;
+      // arb71 — GHOST-BAR fix. On iOS the keyboard keeps a non-zero height
+      // even after it slides off-screen; only its top edge (screenY) moves to
+      // the window bottom. The old logic cleared the hide timer on any h>0
+      // change-frame but never zeroed the offset on the final off-screen
+      // frame (h was still >0), so the floating bar got stuck mid-screen.
+      // Treat a change-frame whose top edge is at/below the window bottom as a
+      // HIDE so the offset always returns to 0 when the keyboard is gone.
+      const winH = Dimensions.get('window').height;
+      const offscreen = typeof screenY === 'number' && screenY >= winH - 1;
+      if (offscreen) { onHide(); return; }
       if (h > 0) applyHeight(h);
     };
     const onHide = () => {
