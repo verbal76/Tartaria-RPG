@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, AppState, Platform, StatusBar as RNStatusBar, Keyboard, type AppStateStatus } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, AppState, Platform, StatusBar as RNStatusBar, Keyboard, ImageBackground, Image, type AppStateStatus } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 // expo-navigation-bar is a NATIVE module — only present in APKs built
 // after it was added. Loaded via lazy require() inside the effect
@@ -555,30 +555,48 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
   // view when typing.
   const interiorHeight = ui.logicalHeight - (top + bottomPad + keyboardOffset) / ui.scale;
   return (
-    <View style={[styles.safe, { paddingTop: top, paddingBottom: bottomPad, paddingLeft: insets.left, paddingRight: insets.right }]}>
-      <StatusBar style="light" hidden />
-      <View
-        style={{
-          width: ui.logicalWidth,
-          height: interiorHeight,
-          transform: [{ scale: ui.scale }],
-          transformOrigin: 'top left',
-        }}
-      >
-        {screen === 'title' && <TitleScreen />}
-        {screen === 'character_creation' && <CharacterCreationScreen />}
-        {screen === 'exploration' && <ExplorationScreen />}
-        {screen === 'log' && <LogScreen />}
-        {screen === 'lore' && <LoreScreen />}
-        {screen === 'about' && <AboutScreen />}
-        {screen === 'inventory' && <InventoryScreen />}
-        {screen === 'character' && <CharacterScreen />}
-        {screen === 'map' && <MapScreen />}
-        {screen === 'crafting' && <CraftingScreen />}
-        {screen === 'vendor' && <VendorScreen />}
-        {screen === 'actions' && <ActionReferenceScreen />}
-        {screen === 'contracts' && <ContractsScreen />}
-        {screen === 'ending' && <EndingScreen />}
+    <View style={styles.root}>
+      {/* arb76 — "aged artifact" background (Phase 1 prototype). Full-bleed,
+          behind everything, OUTSIDE the safe-area padding so it bleeds under
+          the bars. Umber base (styles.root) → faint tiled parchment (~5%) →
+          radial vignette that darkens the margins but keeps the center clear.
+          pointerEvents none so it never eats a touch. */}
+      <ImageBackground
+        source={require('./assets/textures/parchment.png')}
+        resizeMode="repeat"
+        style={StyleSheet.absoluteFill}
+        imageStyle={styles.parchmentImg}
+      />
+      <Image
+        source={require('./assets/textures/vignette.png')}
+        resizeMode="stretch"
+        style={StyleSheet.absoluteFill}
+      />
+      <View style={[styles.safe, { paddingTop: top, paddingBottom: bottomPad, paddingLeft: insets.left, paddingRight: insets.right }]}>
+        <StatusBar style="light" hidden />
+        <View
+          style={{
+            width: ui.logicalWidth,
+            height: interiorHeight,
+            transform: [{ scale: ui.scale }],
+            transformOrigin: 'top left',
+          }}
+        >
+          {screen === 'title' && <TitleScreen />}
+          {screen === 'character_creation' && <CharacterCreationScreen />}
+          {screen === 'exploration' && <ExplorationScreen />}
+          {screen === 'log' && <LogScreen />}
+          {screen === 'lore' && <LoreScreen />}
+          {screen === 'about' && <AboutScreen />}
+          {screen === 'inventory' && <InventoryScreen />}
+          {screen === 'character' && <CharacterScreen />}
+          {screen === 'map' && <MapScreen />}
+          {screen === 'crafting' && <CraftingScreen />}
+          {screen === 'vendor' && <VendorScreen />}
+          {screen === 'actions' && <ActionReferenceScreen />}
+          {screen === 'contracts' && <ContractsScreen />}
+          {screen === 'ending' && <EndingScreen />}
+        </View>
       </View>
     </View>
   );
@@ -597,9 +615,18 @@ const ANDROID_STATUS_PAD =
 void ANDROID_STATUS_PAD;
 
 const styles = StyleSheet.create({
+  // arb76 — root holds the umber base + full-bleed background layers.
+  root: {
+    flex: 1,
+    backgroundColor: '#1A1412', // deep espresso umber (was #0a0908 near-black)
+  },
+  parchmentImg: {
+    opacity: 0.05, // faint aged-paper grain; practically invisible until looked at
+  },
+  // safe is now transparent so the root's artifact background shows through.
   safe: {
     flex: 1,
-    backgroundColor: '#0a0908',
+    backgroundColor: 'transparent',
   },
   loading: { flex: 1, backgroundColor: '#0a0908', alignItems: 'center', justifyContent: 'center' },
   errorRoot: { flex: 1, backgroundColor: '#0a0908', padding: 24, justifyContent: 'center' },

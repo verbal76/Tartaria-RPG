@@ -82,6 +82,9 @@ const CODENAMES: Record<string, string> = {
   // Investigate chip cap 10→5 + bug report on Settings screen (bundles
   // voice+device+log into one report).
   '2026-06-06-306': 'Flint Anvil',
+  // "Aged artifact" background Phase-1 prototype (Exploration): umber base +
+  // parchment(5%) + vignette at AppShell root.
+  '2026-06-06-307': 'Umber Anvil',
   '2026-06-03-301': 'Tungsten Spire',
   // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted
   // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).

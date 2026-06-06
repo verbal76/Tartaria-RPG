@@ -393,6 +393,12 @@ sit. The Flint Coil id/codename never entered the production pool, so nothing to
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Umber Anvil (`2026-06-06-307`) — "aged artifact" background, Phase-1 prototype (Exploration) [arb76 promoted]
+- **WHAT.** Player: background too dark/oppressive → warm umber "lost Tartarian ledger" look. Phase-1 prototype on Exploration to eval the direction before full rollout.
+- **DONE (OTA).** New `app/theme/colors.ts` palette. `App.tsx` AppShell root layers full-bleed umber base (#1A1412) + tiled parchment (`assets/textures/parchment.png` @5%, repeat) + radial vignette (`assets/textures/vignette.png`, clear center → dark margins), behind everything, outside safe-area padding, non-interactive. Exploration container + feed transparent so it shows through behind the log. Textures generated procedurally; ship via OTA as bundled assets.
+- **RN notes / next.** No blend modes (opacity texture) + no radial-gradient lib (vignette PNG). Day/night `timeOfDayTint` deferred to Phase 2 (translucent wash). Phase 2 = roll palette/transparency to other screens + bundle a serif font (`expo-font` installed); Phase 3 = ornamental gold borders.
+- **Files:** `App.tsx`, `app/theme/colors.ts` (NEW), `app/screens/ExplorationScreen.tsx`, `assets/textures/parchment.png` + `vignette.png` (NEW), `app/buildInfo.ts`, `app/buildCodename.ts` (Umber Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
+
 #### Flint Anvil (`2026-06-06-306`) — Investigate cap 10→5 + bug report on Settings screen (bundles voice+device+log) [arb74+arb75 promoted]
 - **Investigate cap (arb74).** `buildChipPool` `.slice(0, 10)` → `.slice(0, 5)` (playtester "had close to ten").
 - **Bug report (arb75).** Player ask: bug-report button on Settings + one report covering voice/about/logs (no three-place paste). Chose "OTA now, native later". Extracted the composer to `app/diagnostics/bugReport.ts` (`composeAndSendBugReport`) with a folded **VOICE** block (engine / kokoro state / TTS route log / errors) alongside device + log → one clipboard copy, one paste. Added a **REPORT A BUG** button to Settings (About) → SESSION; TitleScreen uses the shared composer too.

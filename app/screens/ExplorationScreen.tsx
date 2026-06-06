@@ -377,11 +377,15 @@ export function ExplorationScreen() {
     );
   }
 
-  const bgTint = timeOfDayTint(player.hoursElapsed ?? 0);
+  // arb76 (Phase 1) — container is transparent so the AppShell's "aged
+  // artifact" background (umber + parchment + vignette) shows through here.
+  // The day/night tint (timeOfDayTint) returns in Phase 2 as a translucent
+  // wash over the texture rather than an opaque fill.
+  void timeOfDayTint;
 
   return (
     <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: bgTint }]}
+      style={[styles.container, { backgroundColor: 'transparent' }]}
       // OTA 022 — was behavior='height' on Android (OTA 209 fix for
       // keyboard covering the input). 'height' on Android double-
       // shrinks the view: Android's native adjustResize already
