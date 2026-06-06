@@ -6,6 +6,7 @@ export type InventoryCategory =
   | 'armor'
   | 'accessory'
   | 'consumable'
+  | 'tool'
   | 'relic'
   | 'material'
   | 'loot';
@@ -17,6 +18,7 @@ export const CATEGORY_COLORS: Record<InventoryCategory, string> = {
   armor: '#6a9bbf',
   accessory: '#d4a55a',
   consumable: '#9ec96a',
+  tool: '#7fb0a8', // teal — utility implements (pry bar, lockpick, scanner…)
   relic: '#b88ce0',
   material: '#c9a86a',
   loot: '#a89a7a',
@@ -27,6 +29,7 @@ export const CATEGORY_LABEL: Record<InventoryCategory, string> = {
   armor: 'Armor',
   accessory: 'Amulets & Rings',
   consumable: 'Consumables',
+  tool: 'Tools',
   relic: 'Relics',
   material: 'Materials',
   loot: 'Loot',
@@ -40,10 +43,24 @@ export const CATEGORY_ORDER: InventoryCategory[] = [
   'armor',
   'accessory',
   'consumable',
+  'tool',
   'relic',
   'material',
   'loot',
 ];
+
+// arb90 — what reads as a "tool": an interaction implement (pry bar,
+// lockpick, scanner, shovel, grapple, climbing gear, repair kit). Catalog
+// rows / inventory items can opt in explicitly with a `tool` tag; otherwise
+// a focused name/tag heuristic catches the obvious ones. Kept narrow so it
+// doesn't vacuum up weapons (checked first) or crafting stock — bare "rope"
+// is intentionally NOT here (Broken Rope is a material).
+const TOOL_NAME_RE =
+  /\b(pry ?bar|crowbar|lock\s?pick|scanner|grapple|grappler|grappling hook|climbing (gear|kit|strap|spikes?|rope)|grip pads|repair kit|tool ?kit|pick ?axe|chisel|pliers|wrench|tongs|shovel|trowel)\b/i;
+export function isToolItem(item: InventoryItem): boolean {
+  if (item.tags?.some((t) => /^(tool|lockpick|grapple|prybar)$/i.test(t))) return true;
+  return TOOL_NAME_RE.test(item.name);
+}
 
 export function categorizeItem(item: InventoryItem): InventoryCategory {
   const nameLower = item.name.toLowerCase();
@@ -54,6 +71,9 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   if (ARMOR.some((a) => a.name.toLowerCase() === nameLower)) return 'armor';
   if (AMULETS.some((a) => a.name.toLowerCase() === nameLower)) return 'accessory';
   if (RINGS.some((r) => r.name.toLowerCase() === nameLower)) return 'accessory';
+  // arb90 — tools before the generic gear/material buckets so utility
+  // implements get their own section (and the pry bar lands there).
+  if (isToolItem(item)) return 'tool';
   if (GEAR.some((g) => g.name.toLowerCase() === nameLower)) {
     const gearKind = GEAR.find((g) => g.name.toLowerCase() === nameLower)?.kind;
     if (gearKind === 'consumable') return 'consumable';
@@ -80,6 +100,7 @@ export function groupInventoryByCategory(
     armor: [],
     accessory: [],
     consumable: [],
+    tool: [],
     relic: [],
     material: [],
     loot: [],

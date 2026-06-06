@@ -68,6 +68,7 @@
     { "name": "Climbing Rope", "kind": "relic", "rarity": "Common", "tags": ["utility", "gate", "rope"], "baseDurability": 150, "description": "Fifty feet of mud-treated rope. Holds a Giant's weight if you don't push it. Wears with use; snaps cleanly when overstrained — two snapped ropes can be re-spliced into one good line.",
       "effect": { "kind": "gate", "unlocks": "climb_steep" } },
     { "name": "Broken Rope", "kind": "misc", "rarity": "Common", "tags": ["scrap", "rope"], "description": "A snapped length of rope, fibers frayed where it failed. Useless on its own — combine two to splice a fresh Climbing Rope." },
+    { "name": "Pry Bar", "kind": "relic", "rarity": "Common", "tags": ["tool", "pry", "utility"], "baseDurability": 120, "description": "A forearm of cold iron, one end flattened into a chisel, the other hooked. Set the lip under a stuck lid, sealed crate, or jammed lockbox and lean on it: type \"use pry bar on <thing>\" for a chance to crack it open and find what's inside. Sometimes it bites and slips — lean again." },
 
     { "name": "Shaped Aetheric Shard", "kind": "misc", "rarity": "Rare", "tags": ["throwable", "aether", "shaped"], "description": "A Small Rock pulled apart and reformed by Aethercraft into a singing edge of crystal and metal. ONE THROW only — 2d20 aetheric damage. Carry it for the worst thing the road shows you." },
 

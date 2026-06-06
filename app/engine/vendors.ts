@@ -11,6 +11,31 @@ import type { StallCategory } from './buildings';
 export interface VendorOffer {
   itemName: string;
   price: number;
+  /** arb92 — how many of this item the trader has in stock. Food stocks
+   *  up to 5, materials up to 10, everything else 1. The buy flow lets the
+   *  player purchase 1..quantity at once and decrements it; the offer drops
+   *  off the menu when it hits 0. Older offers without this field read as 1. */
+  quantity?: number;
+}
+
+// arb92 — food / material stocking. Traders carry multiples of perishables
+// and crafting stock so the player can buy a handful at once; weapons /
+// armor / relics stay one-of. Caps per the player's spec: ≤5 food, ≤10
+// material. Lookup sets are built once from the catalogs.
+const FOOD_NAMES = new Set(
+  (((gearData as unknown as { gear?: { name: string; tags?: string[] }[] }).gear ?? []))
+    .filter((g) => (g.tags ?? []).includes('food'))
+    .map((g) => g.name.toLowerCase()),
+);
+const MATERIAL_NAMES = new Set(
+  (((materialsData as unknown as { materials?: { name: string }[] }).materials ?? []))
+    .map((m) => m.name.toLowerCase()),
+);
+export function rollOfferQuantity(itemName: string): number {
+  const n = itemName.toLowerCase();
+  if (FOOD_NAMES.has(n)) return 1 + Math.floor(Math.random() * 5); // 1-5
+  if (MATERIAL_NAMES.has(n)) return 1 + Math.floor(Math.random() * 10); // 1-10
+  return 1;
 }
 
 // OTA 030 — roadside trader archetype shape. JSON-authored in
@@ -87,7 +112,10 @@ export function pickRandomVendor(): VendorInstance {
     title: v.title,
     faction: v.faction,
     description: v.description,
-    offers: v.offers.map((o) => ({ ...o })),
+    // arb92 — authored vendors.json offers carry no quantity; roll one for
+    // food / material entries (keeps weapons / armor / relics one-of) unless
+    // the template already specified a quantity.
+    offers: v.offers.map((o) => ({ ...o, quantity: o.quantity ?? rollOfferQuantity(o.itemName) })),
     voiceId: v.voiceId,
     gender: v.gender,
   };
@@ -109,7 +137,7 @@ export function pickRoadsideTrader(): VendorInstance {
     if (picked.has(item.itemName)) continue;
     picked.add(item.itemName);
     const price = item.priceMin + Math.floor(Math.random() * (item.priceMax - item.priceMin + 1));
-    offers.push({ itemName: item.itemName, price });
+    offers.push({ itemName: item.itemName, price, quantity: rollOfferQuantity(item.itemName) });
   }
   return {
     id: `roadside_${arch.demeanor}_${Date.now()}`,
@@ -158,7 +186,7 @@ export function buildStallVendor(category: StallCategory, stallName: string): Ve
   const offers: VendorOffer[] = shuffled.map((it) => {
     const base = it.tc ?? it.tcBuy ?? rarityPrice(it.rarity);
     const price = Math.max(2, Math.round(base * (0.85 + Math.random() * 0.3)));
-    return { itemName: it.name, price };
+    return { itemName: it.name, price, quantity: rollOfferQuantity(it.name) };
   });
   return {
     id: `stall_${category}_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
@@ -235,7 +263,10 @@ export function findVendorByName(name: string): VendorInstance | null {
     title: v.title,
     faction: v.faction,
     description: v.description,
-    offers: v.offers.map((o) => ({ ...o })),
+    // arb92 — authored vendors.json offers carry no quantity; roll one for
+    // food / material entries (keeps weapons / armor / relics one-of) unless
+    // the template already specified a quantity.
+    offers: v.offers.map((o) => ({ ...o, quantity: o.quantity ?? rollOfferQuantity(o.itemName) })),
     voiceId: v.voiceId,
     gender: v.gender,
   };

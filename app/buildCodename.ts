@@ -124,6 +124,11 @@ const CODENAMES: Record<string, string> = {
   // searchable; proactive dev-name Resurrection Gem on load (Sasmooch gets a
   // gem without restarting). [arb87+arb88+arb89]
   '2026-06-06-318': 'Reed Anvil',
+  // Batch: inventory TOOLS category + tool classification; Pry Bar tool +
+  // chance-based "use pry bar on X" mechanic (STR-leaned roll → cracks a
+  // sealed container for loot, retryable); traders stock multiples of food
+  // (≤5) / materials (≤10) and you can buy in quantity. [arb90+arb91]
+  '2026-06-06-319': 'Sedge Anvil',
   '2026-06-03-301': 'Tungsten Spire',
   // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted
   // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).

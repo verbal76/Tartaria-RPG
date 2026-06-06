@@ -94,6 +94,7 @@ import {
   classifyContainer,
   rollFromPool,
   narrate as containerNarrate,
+  type ContainerLootEntry,
 } from '../engine/containerLoot';
 import { pickWastelandEncounter } from '../engine/wastelandEncounters';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -2002,7 +2003,7 @@ interface GameStore {
   generateNewQuest: () => Quest;
   resolveEnemyDefeat: () => void;
   rest: () => void;
-  buyFromVendor: (itemName: string) => void;
+  buyFromVendor: (itemName: string, qty?: number) => void;
   sellToVendor: (itemName: string) => void;
   giftToVendor: (itemName: string) => void;
   stealFromVendor: (itemName: string) => void;
@@ -5353,6 +5354,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // CallDogModal. Intercepted before the diplomacy verb-pool can
     // swallow `call` as a generic speak verb.
     if (tryDogCallVerb(get, set, trimmed)) {
+      void get().persist();
+      return;
+    }
+    // arb91 — Pry Bar intercept. "use pry bar on X" / "crowbar X" / "pry
+    // open X with the bar" → a chance-based pry on a sealed/stuck container.
+    // Self-contained (returns before normal intent routing) so it can't
+    // disturb the open / harvest handlers; bare "pry"/"pry open" without
+    // the explicit bar phrasing keep their existing routing.
+    if (tryPryBar(get, set, trimmed)) {
       void get().persist();
       return;
     }
@@ -13016,7 +13026,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
-  buyFromVendor(itemName) {
+  buyFromVendor(itemName, qty) {
     const state = get();
     const scene = state.currentScene;
     const player = state.player;
@@ -13071,12 +13081,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ? 'relic'
               : 'misc';
     const tags = cat?.tags ?? [];
+    // arb92 — buy in quantity. Clamp the requested count to what's in stock
+    // and what the player can afford; the per-unit affordability gate above
+    // already guaranteed at least one is buyable.
+    const available = Math.max(1, offer.quantity ?? 1);
+    const requested = Math.max(1, Math.min(Math.floor(qty ?? 1), available));
+    const affordableCount = Math.floor(player.tc / effectivePrice);
+    const buyCount = Math.max(1, Math.min(requested, affordableCount));
     const newItem: InventoryItem = stampDurability({
       id: `bought_${Date.now()}`,
       name: offer.itemName,
       kind,
       rarity: cat?.rarity,
-      quantity: 1,
+      quantity: buyCount,
       tags,
     });
 
@@ -13097,6 +13114,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       );
       return;
     }
+    // arb92 — charge only for what the pack actually accepted (cap may
+    // trim a multi-buy), and decrement the trader's stock instead of
+    // always removing the whole offer.
+    const boughtCount = Math.max(1, dryRun.accepted);
+    const totalCost = effectivePrice * boughtCount;
+    const remainingStock = available - boughtCount;
     set((s) => {
       if (!s.player || !s.currentScene?.vendor) return s;
       // OTA 036 — filter by (itemName, price) instead of reference
@@ -13104,13 +13127,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // that rewrites currentScene.vendor.offers (e.g. via a spread)
       // would silently leave this offer in the list. (itemName, price)
       // pair is unique within a single vendor's session offers.
-      const newOffers = s.currentScene.vendor.offers.filter(
-        (o) => !(o.itemName === offer.itemName && o.price === offer.price),
-      );
+      const newOffers = s.currentScene.vendor.offers
+        .map((o) =>
+          o.itemName === offer.itemName && o.price === offer.price
+            ? { ...o, quantity: remainingStock }
+            : o,
+        )
+        .filter((o) => (o.quantity ?? 1) > 0);
       return {
         player: {
           ...s.player,
-          tc: s.player.tc - effectivePrice,
+          tc: s.player.tc - totalCost,
           inventory: dryRun.inventory,
           factionStanding: repResult.standing,
         },
@@ -13121,9 +13148,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       };
     });
     const markupNote = mult > 1 ? ` (${offer.price} base + ${Math.round((mult - 1) * 100)}% corruption)` : '';
+    const countNote = boughtCount > 1 ? `${boughtCount}× ` : '';
     get().appendLog(
       'reward',
-      `Bought ${offer.itemName} from ${scene.vendor.name} for ${effectivePrice} TC${markupNote}. (${player.tc - effectivePrice} TC left)`,
+      `Bought ${countNote}${offer.itemName} from ${scene.vendor.name} for ${totalCost} TC${markupNote}. (${player.tc - totalCost} TC left)`,
     );
     logRepChanges(get, repResult.changed);
     // OTA 059 — successful BUY trains CHA. You read the room well
@@ -22178,6 +22206,121 @@ function normalizeDogLeadingVerb(input: string): string {
     }
   }
   return lower;
+}
+
+// arb91 — generic pry loot for things that read as pryable but aren't a
+// named container archetype (a stuck panel / hatch / drawer / grate). Safe,
+// catalog-present scrap so no inference noise. Named containers (lockbox /
+// crate / strongbox / …) use their own richer pools via classifyContainer.
+const GENERIC_PRY_POOL: ContainerLootEntry[] = [
+  { name: 'Scrap Metal', weight: 5, min: 1, max: 2, tags: ['scrap', 'metal'], kind: 'misc' },
+  { name: 'Worn Tartarian Coin', weight: 3, min: 1, max: 3, tags: ['currency'], kind: 'misc' },
+  { name: 'Tartarian Pottery Shard', weight: 2, min: 1, max: 1, tags: ['relic_fragment'], kind: 'misc' },
+];
+// Nouns the bar can actually work on when they aren't a known container.
+const PRYABLE_NOUN_RE = /\b(lid|crate|box|hatch|panel|locker|strongbox|coffer|chest|drawer|grate|seal|plate|cover|case|casket|trunk|cabinet|vault|door|shutter|grille)\b/i;
+
+/** arb91 — Pry Bar. Explicit-invocation only ("use pry bar on X", "crowbar
+ *  X", "pry open X with the bar") so bare "pry"/"pry open" keep their
+ *  existing harvest/open routing. Requires a pry bar in the pack; rolls a
+ *  STR-leaned random success; on a hit cracks the target and rolls loot
+ *  (container pool when recognized, else a generic scrap pool); on a miss
+ *  it "holds fast" and stays retryable. */
+function tryPryBar(
+  get: () => GameStore,
+  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
+  rawInput: string,
+): boolean {
+  const lower = rawInput.trim().toLowerCase();
+  if (!lower) return false;
+  let target: string | null = null;
+  let m = /^use\s+(?:the\s+|my\s+)?(?:pry\s?bar|crowbar)\s+(?:on\s+|against\s+|to\s+(?:pry|open|force|crack)(?:\s+open)?\s+)?(.+)$/i.exec(lower);
+  if (m) target = m[1]!;
+  if (!target) {
+    m = /^(?:pry\s?bar|crowbar)\s+(.+)$/i.exec(lower);
+    if (m) target = m[1]!;
+  }
+  if (!target) {
+    m = /^(?:pry|jimmy|lever|force)\s+(?:open\s+|apart\s+)?(.+?)\s+with\s+(?:the\s+|my\s+)?(?:pry\s?bar|crowbar|bar)$/i.exec(lower);
+    if (m) target = m[1]!;
+  }
+  if (!target) return false;
+
+  target = target
+    .replace(/^(?:the|a|an|that|this|some)\s+/i, '')
+    .replace(/\s+(?:open|apart|up)$/i, '')
+    .trim();
+  if (!target) return false;
+
+  const state = get();
+  const player = state.player;
+  const scene = state.currentScene;
+  if (!player || !scene) return false;
+
+  const hasBar = (player.inventory ?? []).some(
+    (i) => /\b(?:pry\s?bar|crowbar)\b/i.test(i.name) && i.quantity > 0,
+  );
+  if (!hasBar) {
+    get().appendLog('arbiter', `"You'd need a lever for that," the Arbiter says. "A pry bar. You're not carrying one."`);
+    return true;
+  }
+
+  const matched = classifyContainer(target);
+  if (!matched && !PRYABLE_NOUN_RE.test(target)) {
+    get().appendLog('world', `You weigh the bar against the ${target}. There's no lip to set it under — nothing here the bar will help with.`);
+    return true;
+  }
+
+  const dropKey = makeRoomKey(player.currentLocationId, scene.microMicroId, player.mapX, player.mapY, player.hubRoomId);
+  const room = state.worldMemory.visitedRooms?.[dropKey] ?? {
+    firstVisitAt: Date.now(),
+    lastVisitAt: Date.now(),
+    visitCount: 1,
+  };
+  const key = target.toLowerCase();
+  if ((room.containersOpened ?? []).includes(key)) {
+    get().appendLog('world', `The ${target} is already pried open — nothing left inside.`);
+    return true;
+  }
+
+  // STR-leaned random success: 60% base, ±3%/point off 10, fair band.
+  const str = player.stats?.strength ?? 10;
+  const chance = Math.max(0.4, Math.min(0.9, 0.6 + (str - 10) * 0.03));
+  if (Math.random() >= chance) {
+    get().appendLog('world', `You set the bar's lip under the ${target} and lean. It bites, groans — then slips free. The ${target} holds. (Set it again and lean harder.)`);
+    return true;
+  }
+
+  // Success — mark pried (shares the open handler's per-room set) + loot.
+  const opened = [...(room.containersOpened ?? []), key];
+  set((s) => ({
+    worldMemory: {
+      ...s.worldMemory,
+      visitedRooms: {
+        ...(s.worldMemory.visitedRooms ?? {}),
+        [dropKey]: { ...room, containersOpened: opened },
+      },
+    },
+  }));
+  get().appendLog(
+    'world',
+    matched ? containerNarrate(matched, target) : `The bar bites, the ${target} gives with a crack of tortured wood and metal, and you reach into the dark inside.`,
+  );
+  const rolled = rollFromPool(matched?.pool ?? GENERIC_PRY_POOL);
+  if (rolled) {
+    const grantResult = grantItem(get().player?.inventory ?? [], {
+      id: `${rolled.entry.name}_${Date.now()}`,
+      name: rolled.entry.name,
+      kind: rolled.entry.kind,
+      quantity: rolled.quantity,
+      tags: rolled.entry.tags,
+    });
+    set((s) => (s.player ? { player: { ...s.player, inventory: grantResult.inventory } } : s));
+    if (grantResult.accepted > 0) {
+      get().appendLog('reward', `✦ ${rolled.entry.name}${rolled.quantity > 1 ? ` ×${rolled.quantity}` : ''} into your pack.`);
+    }
+  }
+  return true;
 }
 
 function tryDogApplyVerb(

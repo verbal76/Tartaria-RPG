@@ -57,6 +57,8 @@ export function VendorScreen() {
   const [sellSort, setSellSort] = useState<'name' | 'value' | 'rarity'>('value');
   // arb57 — batch sell: quantity stepper + Sell All, mirroring the scrap modal.
   const [sellQty, setSellQty] = useState(1);
+  // arb92 — buy in quantity (food/material traders stock multiples).
+  const [buyQty, setBuyQty] = useState(1);
 
   const vendor = scene?.vendor ?? null;
 
@@ -75,7 +77,7 @@ export function VendorScreen() {
     );
   }
 
-  const openBuy = (itemName: string, price: number) => setPending({ mode: 'buy', itemName, price });
+  const openBuy = (itemName: string, price: number) => { setBuyQty(1); setPending({ mode: 'buy', itemName, price }); };
   const openSell = (itemName: string, price: number) => { setSellQty(1); setPending({ mode: 'sell', itemName, price }); };
 
   // OTA-178 — gate-loss warning helper. Returns the GateKind label
@@ -134,6 +136,24 @@ export function VendorScreen() {
     const stack = sellStackFor(pending.itemName);
     const reps = Math.max(1, Math.min(repsOverride ?? sellQty, stack));
     for (let i = 0; i < reps; i++) sellToVendor(pending.itemName);
+    setPending(null);
+  };
+  // arb92 — buy-quantity helpers. Stock comes from the matching offer; the
+  // stepper clamps to min(stock, affordable). doBuy fires one quantity-aware
+  // purchase (gameStore.buyFromVendor charges per-unit × count and decrements
+  // the trader's stock).
+  const buyStockFor = (name: string) =>
+    vendor.offers.find((o) => o.itemName.toLowerCase() === name.toLowerCase())?.quantity ?? 1;
+  const pendingBuyStock = pending?.mode === 'buy' ? buyStockFor(pending.itemName) : 1;
+  const pendingBuyAfford = pending?.mode === 'buy' && pending.price > 0
+    ? Math.floor(player.tc / pending.price)
+    : 0;
+  const buyMax = Math.max(1, Math.min(pendingBuyStock, Math.max(1, pendingBuyAfford)));
+  const buyRepsClamped = Math.max(1, Math.min(buyQty, buyMax));
+  const doBuy = (override?: number) => {
+    if (pending?.mode !== 'buy') return;
+    const n = Math.max(1, Math.min(override ?? buyQty, buyMax));
+    buyFromVendor(pending.itemName, n);
     setPending(null);
   };
   // OTA 030 — steal DC is tiered by vendor source. Hub vendors have no
@@ -457,6 +477,9 @@ export function VendorScreen() {
                       <Text style={styles.offerKind} numberOfLines={1}>
                         {itemPreview.kindLabel}{itemPreview.rarity ? ` · ${itemPreview.rarity}` : ''}
                       </Text>
+                      {(o.quantity ?? 1) > 1 && (
+                        <Text style={styles.offerStock}>×{o.quantity} in stock</Text>
+                      )}
                       {owned > 0 && (
                         <Text style={styles.offerOwned}>you have {owned}</Text>
                       )}
@@ -571,7 +594,15 @@ export function VendorScreen() {
                 max: pendingSellStack,
                 onChange: setSellQty,
               }
-            : undefined
+            : pending?.mode === 'buy' && canAffordPending && buyMax > 1
+              ? {
+                  label: 'Buy how many?',
+                  value: buyRepsClamped,
+                  min: 1,
+                  max: buyMax,
+                  onChange: setBuyQty,
+                }
+              : undefined
         }
         contextLine={
           pending?.mode === 'dismiss'
@@ -586,7 +617,7 @@ export function VendorScreen() {
                   ? `Reward on completion: ${pending.reward}. The contract starts now — you can review it on the Contracts screen.`
                   : pending?.mode === 'buy'
                     ? canAffordPending
-                      ? `Price: ${pending.price} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc - pending.price} TC`
+                      ? `Price: ${pending.price}${buyRepsClamped > 1 ? ` × ${buyRepsClamped} = ${pending.price * buyRepsClamped}` : ''} TC   ·   You have: ${player.tc} TC   →   After: ${player.tc - pending.price * buyRepsClamped} TC${pendingBuyStock > 1 ? `\n\n${pendingBuyStock} in stock.` : ''}`
                       : `Price: ${pending.price} TC   ·   You only have ${player.tc} TC.`
                     : undefined
         }
@@ -624,8 +655,11 @@ export function VendorScreen() {
                     ]
                   : pending?.mode === 'buy' && canAffordPending
                     ? [
-                        { label: 'Cancel', onPress: cancel, tone: 'neutral' },
-                        { label: 'Buy', onPress: confirmAction, tone: 'primary' },
+                        { label: 'Cancel', onPress: cancel, tone: 'neutral' as const },
+                        { label: buyMax > 1 ? `Buy ×${buyRepsClamped}` : 'Buy', onPress: () => doBuy(), tone: 'primary' as const },
+                        ...(buyMax > 1
+                          ? [{ label: `Buy All (${buyMax})`, onPress: () => doBuy(buyMax), tone: 'primary' as const }]
+                          : []),
                       ]
                     : [{ label: 'OK', onPress: cancel, tone: 'neutral' }]
         }
@@ -780,6 +814,7 @@ const styles = StyleSheet.create({
   offerSubHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 2 },
   offerKind: { color: '#7a705c', fontSize: 10, letterSpacing: 1, flex: 1 },
   offerOwned: { color: '#9ec96a', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
+  offerStock: { color: '#7fb0a8', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
   offerStats: { color: '#cdbf99', fontSize: 11, marginTop: 4 },
   empty: { color: '#7a705c', fontStyle: 'italic', textAlign: 'center', marginTop: 40 },
   placeholder: { color: '#7a705c', textAlign: 'center', marginTop: 80 },

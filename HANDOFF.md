@@ -393,6 +393,11 @@ sit. The Flint Coil id/codename never entered the production pool, so nothing to
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Sedge Anvil (`2026-06-06-319`) — tools category + Pry Bar mechanic + trader sell-quantities (arb90–91)
+- **Player asks (batched, then "push them"):** (1) inventory needs a tool section / classify items as tools; (2) a pry bar — "a random modifier you type to use on something, a chance of prying it open and finding something"; (3) traders who sell food/materials should stock multiples and let you buy in quantity (≤5 food, ≤10 material).
+- **FIXES.** (1) `InventoryCategorize.ts` — new teal **Tools** category; `isToolItem` (tag or focused name heuristic: pry bar / crowbar / lockpick / scanner / grapple / climbing gear / repair kit / …), narrow so it won't swallow weapons or crafting stock. (2) **Pry Bar** tool in `gear.json` (roadside-sold); self-contained `tryPryBar` intercept (`use pry bar on X` / `crowbar X` / `pry open X with the bar`) — requires a bar, STR-leaned random success (60% ±3%/STR-pt, 40-90%), hit → loot via `classifyContainer` pool or a generic scrap pool + marks pried, miss → retryable. Bare `pry`/`pry open` keep existing routing. (3) `VendorOffer.quantity?` + `rollOfferQuantity` (≤5 food / ≤10 material) in all offer builders; `buyFromVendor(itemName, qty)` charges per-unit × count, caps to stock/affordability/pack, decrements stock; VendorScreen `×N in stock` + Buy-how-many stepper + Buy All. Test `vendorOfferQuantity.test.ts` locks the caps.
+- **Files:** `app/components/InventoryCategorize.ts`, `app/data/items/gear.json`, `app/data/npcs/roadside_traders.json`, `app/state/gameStore.ts`, `app/engine/vendors.ts`, `app/screens/VendorScreen.tsx`, `__tests__/vendorOfferQuantity.test.ts`, `app/buildInfo.ts`, `app/buildCodename.ts` (Sedge Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
+
 #### Reed Anvil (`2026-06-06-318`) — batch push from the live playthrough (arb87–89)
 - **Player asks (batched, then "push everything we have now"):**
   1. Inventory should show every item's stats so you know what you're picking.
