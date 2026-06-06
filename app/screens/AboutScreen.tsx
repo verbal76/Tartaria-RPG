@@ -8,6 +8,13 @@ import { getBuildCodename } from '../buildCodename';
 import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
 import { buildInventorySnapshot, stampInventoryExport } from '../diagnostics/inventorySnapshot';
 import { NumberStepper } from '../components/NumberStepper';
+import {
+  getDisplaySettings,
+  setDisplaySettings,
+  onDisplaySettingsChange,
+  resetDisplaySettings,
+  type DisplaySettings,
+} from '../ui/displaySettings';
 import { LoreCodexBody } from '../components/LoreCodexBody';
 import { THIRD_PARTY_NOTICES, NOTICES_PREAMBLE, NOTICES_VERIFIED_AT } from '../data/thirdPartyNotices';
 import {
@@ -80,7 +87,13 @@ export function AboutScreen() {
   // clear log — the three actions that previously cluttered the
   // bottom of the ExplorationScreen menu row. save & exit is the
   // most-pressed action, so it's the default tab on open.
-  const [tab, setTab] = useState<'session' | 'sfx' | 'lore' | 'about' | 'notices'>('session');
+  const [tab, setTab] = useState<'session' | 'sfx' | 'display' | 'lore' | 'about' | 'notices'>('session');
+  // arb78 — player-tunable background settings (live).
+  const [display, setDisplay] = useState<DisplaySettings>(() => getDisplaySettings());
+  useEffect(() => {
+    setDisplay(getDisplaySettings());
+    return onDisplaySettingsChange(setDisplay);
+  }, []);
   const [expandedNoticeId, setExpandedNoticeId] = useState<string | null>(null);
   const [logCharCount, setLogCharCount] = useState(0);
   const [logCopied, setLogCopied] = useState(false);
@@ -536,7 +549,7 @@ export function AboutScreen() {
           ABOUT / diagnostic block stays its own tab. Music card
           renders first inside SFX (most tweaked), voice card below. */}
       <View style={styles.tabRow}>
-        {(['session', 'sfx', 'lore', 'about', 'notices'] as const).map((id) => (
+        {(['session', 'sfx', 'display', 'lore', 'about', 'notices'] as const).map((id) => (
           <TouchableOpacity
             key={id}
             onPress={() => setTab(id)}
@@ -643,6 +656,83 @@ export function AboutScreen() {
             grouped by kind) so recurring-theme analysis doesn't have to scroll a
             log.
           </Text>
+        </View>
+        )}
+
+        {/* arb78 — DISPLAY tab: player-tunable "aged artifact" background.
+            Every slider applies LIVE (the AppShell subscribes), so the player
+            sees the change behind this screen as they drag. */}
+        {tab === 'display' && (
+        <View style={styles.musicCard}>
+          <View style={styles.musicHeader}>
+            <Text style={styles.musicTitle}>BACKGROUND</Text>
+          </View>
+          <Text style={styles.sessionHint}>
+            Make the parchment your own. Changes apply instantly and are saved.
+          </Text>
+
+          <View style={styles.musicRow}>
+            <Text style={styles.musicLabel}>Brightness</Text>
+            <View style={{ flex: 1, alignItems: 'flex-end' }}>
+              <NumberStepper
+                value={Math.round(((display.bgLight - 0.04) / 0.16) * 100)}
+                min={0} max={100} step={5} decimals={0} suffix="%"
+                onChange={(v) => { void setDisplaySettings({ bgLight: 0.04 + (Math.max(0, Math.min(100, v)) / 100) * 0.16 }); }}
+              />
+            </View>
+          </View>
+
+          <View style={styles.musicRow}>
+            <Text style={styles.musicLabel}>Hue (color)</Text>
+            <View style={{ flex: 1, alignItems: 'flex-end' }}>
+              <NumberStepper
+                value={Math.round(display.bgHue)}
+                min={0} max={360} step={5} decimals={0} suffix="°"
+                onChange={(v) => { void setDisplaySettings({ bgHue: v }); }}
+              />
+            </View>
+          </View>
+
+          <View style={styles.musicRow}>
+            <Text style={styles.musicLabel}>Color richness</Text>
+            <View style={{ flex: 1, alignItems: 'flex-end' }}>
+              <NumberStepper
+                value={Math.round(display.bgSat * 100)}
+                min={0} max={100} step={5} decimals={0} suffix="%"
+                onChange={(v) => { void setDisplaySettings({ bgSat: v / 100 }); }}
+              />
+            </View>
+          </View>
+
+          <View style={styles.musicRow}>
+            <Text style={styles.musicLabel}>Paper texture</Text>
+            <View style={{ flex: 1, alignItems: 'flex-end' }}>
+              <NumberStepper
+                value={Math.round(display.textureOpacity * 100)}
+                min={0} max={20} step={1} decimals={0} suffix="%"
+                onChange={(v) => { void setDisplaySettings({ textureOpacity: v / 100 }); }}
+              />
+            </View>
+          </View>
+
+          <View style={styles.musicRow}>
+            <Text style={styles.musicLabel}>Edge shadow</Text>
+            <View style={{ flex: 1, alignItems: 'flex-end' }}>
+              <NumberStepper
+                value={Math.round(display.vignetteStrength * 100)}
+                min={0} max={100} step={5} decimals={0} suffix="%"
+                onChange={(v) => { void setDisplaySettings({ vignetteStrength: v / 100 }); }}
+              />
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 10 }]}
+            onPress={() => { void resetDisplaySettings(); }}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.sessionBtnSecondaryText}>RESET TO DEFAULT</Text>
+          </TouchableOpacity>
         </View>
         )}
 

@@ -393,6 +393,10 @@ sit. The Flint Coil id/codename never entered the production pool, so nothing to
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Sienna Anvil (`2026-06-06-309`) — player-tunable background (Settings → DISPLAY tab) [arb78 promoted]
+- Player: control the background — color/tone/opacity. New `app/ui/displaySettings.ts` (persisted + reactive, mirrors voiceSettings): `bgHue`/`bgSat`/`bgLight`/`textureOpacity`/`vignetteStrength` + `hslToHex`; defaults = current look. AppShell applies them **live** via `useDisplaySettings()`. New DISPLAY tab on Settings with sliders (Brightness / Hue / Color richness / Paper texture / Edge shadow) + RESET.
+- **Files:** `app/ui/displaySettings.ts` (NEW), `App.tsx`, `app/screens/AboutScreen.tsx`, `app/buildInfo.ts`, `app/buildCodename.ts` (Sienna Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
+
 #### Clay Anvil (`2026-06-06-308`) — aesthetic tune (lighten umber + soften vignette) + iPad top-clip fix [arb77 promoted]
 - Player: artifact background reads "too dark chocolate brown" → lighten ~18%, and iPad portrait clips the settings-gear top edge. Base `#1A1412`→`#241C17`; parchment 0.05→0.06; vignette regenerated lighter + softer; top-padding floor `Math.max(insets.top, 14)` (iPad portrait status-bar-hidden tiny inset; notched iPhones unaffected).
 - **Files:** `App.tsx`, `app/theme/colors.ts`, `assets/textures/vignette.png`, `app/buildInfo.ts`, `app/buildCodename.ts` (Clay Anvil), `docs/build-codenames.md`, `HANDOFF.md`.

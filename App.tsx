@@ -39,6 +39,7 @@ import { startTTSController, stopTTSController } from './app/voice/TTSController
 import { createExpoFileSystemAdapter } from './app/voice/executorchAdapter';
 import { checkAndApplyOTA } from './app/updates/checkAndApplyOTA';
 import { useUiScale } from './app/ui/uiScale';
+import { loadDisplaySettings, useDisplaySettings, baseColorOf } from './app/ui/displaySettings';
 
 // Lazy-load expo-navigation-bar. The package is a native module bridged
 // only in APKs built AFTER it was added to dependencies — older
@@ -187,6 +188,9 @@ export default function App() {
     const setStage = (s: string) => {
       (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE = s;
     };
+    // arb78 — load the player's saved background settings (notifies the
+    // AppShell's useDisplaySettings hook once storage resolves).
+    void loadDisplaySettings();
     setStage('hydrate:start');
     void hydrate()
       .then(() => {
@@ -520,6 +524,8 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
   // scale recomputes. Every screen rendered below inherits the new
   // scale via the wrapper transform — no per-screen changes needed.
   const ui = useUiScale();
+  // arb78 — player-tunable background. Re-renders live as sliders change.
+  const display = useDisplaySettings();
   // OTA-182 — keyboard-aware interior height. The wrapper View has
   // a FIXED HEIGHT (interiorHeight) inside a `transform: scale`
   // container. Android's native adjustResize can't shrink a fixed-
@@ -559,8 +565,8 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
   // view when typing.
   const interiorHeight = ui.logicalHeight - (top + bottomPad + keyboardOffset) / ui.scale;
   return (
-    <View style={styles.root}>
-      {/* arb76 — "aged artifact" background (Phase 1 prototype). Full-bleed,
+    <View style={[styles.root, { backgroundColor: baseColorOf(display) }]}>
+      {/* arb76/arb78 — player-tunable "aged artifact" background. Full-bleed,
           behind everything, OUTSIDE the safe-area padding so it bleeds under
           the bars. Umber base (styles.root) → faint tiled parchment (~5%) →
           radial vignette that darkens the margins but keeps the center clear.
@@ -569,12 +575,12 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
         source={require('./assets/textures/parchment.png')}
         resizeMode="repeat"
         style={StyleSheet.absoluteFill}
-        imageStyle={styles.parchmentImg}
+        imageStyle={{ opacity: display.textureOpacity }}
       />
       <Image
         source={require('./assets/textures/vignette.png')}
         resizeMode="stretch"
-        style={StyleSheet.absoluteFill}
+        style={[StyleSheet.absoluteFill, { opacity: display.vignetteStrength }]}
       />
       <View style={[styles.safe, { paddingTop: top, paddingBottom: bottomPad, paddingLeft: insets.left, paddingRight: insets.right }]}>
         <StatusBar style="light" hidden />

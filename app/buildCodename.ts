@@ -87,6 +87,9 @@ const CODENAMES: Record<string, string> = {
   '2026-06-06-307': 'Umber Anvil',
   // Aesthetic tune: lighten umber base, soften vignette, iPad top-clip floor.
   '2026-06-06-308': 'Clay Anvil',
+  // Player-tunable background: Settings → DISPLAY tab (brightness/hue/richness/
+  // paper-texture/edge-shadow sliders), persisted + live.
+  '2026-06-06-309': 'Sienna Anvil',
   '2026-06-03-301': 'Tungsten Spire',
   // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted
   // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).
