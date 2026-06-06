@@ -880,7 +880,7 @@ function rarityHexColor(rarity: string | null | undefined): string {
 
 const styles = StyleSheet.create({
   // OTA-275 — tablet width cap. Phones unchanged; iPad centers at 600pt.
-  container: { flex: 1, backgroundColor: '#0a0908', padding: 12, width: '100%', maxWidth: 600, alignSelf: 'center' },
+  container: { flex: 1, backgroundColor: 'transparent', padding: 12, width: '100%', maxWidth: 600, alignSelf: 'center' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

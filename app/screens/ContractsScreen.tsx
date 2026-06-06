@@ -1079,7 +1079,7 @@ function CollectablesTab({ progress }: { progress: ReturnType<typeof computeAllP
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0a0908', padding: 12 },
+  container: { flex: 1, backgroundColor: 'transparent', padding: 12 },
   // v2.4.1 (OTA 033) — Primary Objective card. Sits at the top of
   // the Contracts screen above the tab row. Warm-gold border to
   // signal the main quest visually distinct from the per-faction

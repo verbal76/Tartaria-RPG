@@ -174,7 +174,7 @@ export function LogScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0a0908', padding: 12 },
+  container: { flex: 1, backgroundColor: 'transparent', padding: 12 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   backBtn: {
     backgroundColor: '#1a1714',

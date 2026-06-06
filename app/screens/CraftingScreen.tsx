@@ -589,7 +589,7 @@ export function CraftingScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0a0908', padding: 12 },
+  container: { flex: 1, backgroundColor: 'transparent', padding: 12 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

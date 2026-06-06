@@ -99,6 +99,9 @@ const CODENAMES: Record<string, string> = {
   // Title screen container → transparent: kills the top color-split where the
   // shell bg peeked above the opaque title card. First Phase-2 screen.
   '2026-06-06-312': 'Peat Anvil',
+  // Phase-2 rollout: ALL screen container roots → transparent so the shell
+  // artifact bg is continuous everywhere (no hard seams on any screen).
+  '2026-06-06-313': 'Marsh Anvil',
   '2026-06-03-301': 'Tungsten Spire',
   // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted
   // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).

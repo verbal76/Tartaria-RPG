@@ -393,6 +393,11 @@ sit. The Flint Coil id/codename never entered the production pool, so nothing to
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Marsh Anvil (`2026-06-06-313`) — Phase-2: all screens transparent (no background seams anywhere) [arb82 promoted]
+- Player: "smooth background with no hard seams." Swept all 14 screen root containers `backgroundColor: '#0a0908' → 'transparent'` so the AppShell umber+parchment+vignette is the single continuous background app-wide. Inner cards keep their own backgrounds; only the opaque root slab went transparent → the safe-area-inset seam is gone on every screen.
+- **Note.** Screens built for dark bg; extreme Brightness/Hue could lower card/text contrast — add slider limits later if it becomes an issue.
+- **Files:** `app/screens/*.tsx` (14), `app/buildInfo.ts`, `app/buildCodename.ts` (Marsh Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
+
 #### Peat Anvil (`2026-06-06-312`) — Title screen top color-split fix (container → transparent) [arb81 promoted]
 - Player set olive hue; Title screen showed a hard split — olive shell-bg strip at top (safe-area inset) above the Title's opaque `#0a0908` card. Fix: Title container `backgroundColor` → `transparent` so the player's shell bg shows through the whole screen (content cards keep theirs). First Phase-2 screen; same one-liner applies to Character creation / Inventory / Character / Map / Crafting / Vendor / Contracts / Log / Lore / About / Ending (full rollout pending go-ahead).
 - **Files:** `app/screens/TitleScreen.tsx`, `app/buildInfo.ts`, `app/buildCodename.ts` (Peat Anvil), `docs/build-codenames.md`, `HANDOFF.md`.

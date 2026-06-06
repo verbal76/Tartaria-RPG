@@ -223,7 +223,7 @@ function HomewardSplash({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0a0908', padding: 16 },
+  container: { flex: 1, backgroundColor: 'transparent', padding: 16 },
   scroll: { paddingBottom: 32 },
   tag: { color: '#7a705c', fontSize: 11, letterSpacing: 4, fontWeight: '700', marginTop: 16 },
   endingLabel: { fontSize: 36, letterSpacing: 6, fontWeight: '800', marginTop: 8 },

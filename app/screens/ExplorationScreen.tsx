@@ -1312,7 +1312,7 @@ export function ExplorationScreen() {
 
 const styles = StyleSheet.create({
   // OTA-275 — tablet width cap. Phones unchanged; iPad centers at 600pt.
-  container: { flex: 1, backgroundColor: '#0a0908', padding: 8, gap: 6, width: '100%', maxWidth: 600, alignSelf: 'center' },
+  container: { flex: 1, backgroundColor: 'transparent', padding: 8, gap: 6, width: '100%', maxWidth: 600, alignSelf: 'center' },
   // minHeight (not fixed height) — characters with multiple active
   // contracts / effects / a companion overflow 165px; the fixed height
   // clipped the bottom rows behind the scene bar. Letting the row grow
