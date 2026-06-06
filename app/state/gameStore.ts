@@ -19996,12 +19996,13 @@ function handlePlayerDeath(
   );
 
   // OTA-067 — dev cheat for the project owner. If the fallen
-  // character is named "Verbal" (case-insensitive, trimmed),
-  // grant a Resurrection Gem on death so they can immediately
-  // revive that same character from the title screen. No effect
-  // for any other name; everyone else dies on the normal rules
-  // (gem comes from boss kills / pity timer / rare drops).
-  if (player.name.trim().toLowerCase() === 'verbal') {
+  // character is named one of the dev names (case-insensitive,
+  // trimmed), grant a Resurrection Gem on death so they can
+  // immediately revive that same character from the title screen.
+  // No effect for any other name; everyone else dies on the normal
+  // rules (gem comes from boss kills / pity timer / rare drops).
+  const DEV_REVIVE_NAMES = ['verbal', 'sasmooch'];
+  if (DEV_REVIVE_NAMES.includes(player.name.trim().toLowerCase())) {
     void addResurrectionGems(1).then((total) => {
       set(() => ({ resurrectionGems: total }));
       get().appendLog(

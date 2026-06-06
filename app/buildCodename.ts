@@ -114,6 +114,11 @@ const CODENAMES: Record<string, string> = {
   // Procedural disc PNG (angle=hue, radius=saturation) + PanResponder; pure-JS,
   // OTA-safe (no native color-picker lib installed).
   '2026-06-06-316': 'Fen Anvil',
+  // Action-bar chips stayed solid on any tuned background — quickReady was a
+  // ~6%-alpha fill, quickDisabled used opacity:0.4, so a bright tuned hue
+  // flooded through. Now opaque fills + dimmed disabled label. Plus Sasmooch
+  // added to the dev revive-gem-on-death names.
+  '2026-06-06-317': 'Bog Anvil',
   '2026-06-03-301': 'Tungsten Spire',
   // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted
   // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).

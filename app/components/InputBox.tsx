@@ -507,6 +507,9 @@ function QuickBtn({
     resolvedTone === 'ready' && styles.quickReadyText,
     resolvedTone === 'needs-approach' && styles.quickNeedsApproachText,
     resolvedTone === 'unavailable' && styles.quickUnavailableText,
+    // arb86 — dim the LABEL on disabled chips (replaces the old whole-chip
+    // opacity:0.4 so the fill stays opaque against any tuned background).
+    blocked && styles.quickDisabledText,
   ];
   const handlePress = () => {
     if (blocked || outOfRange) {
@@ -601,13 +604,22 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   quickDefensive: { borderColor: '#6a9bbf' },
-  quickReady: { borderColor: '#9ec96a', backgroundColor: '#1a201410' },
+  // arb86 — was backgroundColor '#1a201410' (alpha ~6% → near-transparent).
+  // Against the old near-black bg it read as a faint green tint, but with the
+  // player-tunable background a bright hue FLOODED through the chip ("weird
+  // coloring"). Now a fully OPAQUE dark green-tinted fill so the chip keeps a
+  // solid background on any tuned hue; the green border still marks "ready".
+  quickReady: { borderColor: '#9ec96a', backgroundColor: '#1b2417' },
   quickNeedsApproach: { borderColor: '#c9a86a' },
   quickUnavailable: { borderColor: '#e07a5f' },
-  // Disabled (e.g. TAKE during the typed-input rope beat) — muted + dimmed
-  // so it reads as "not now" without the red 'unavailable' alarm color.
-  quickDisabled: { borderColor: '#3a342c', opacity: 0.4 },
+  // Disabled (e.g. TAKE during the typed-input rope beat) — muted so it reads
+  // as "not now" without the red 'unavailable' alarm color. arb86 — was
+  // opacity 0.4, which made the whole chip (fill included) translucent so the
+  // tuned background bled through ("weird fading"). Now an opaque darker fill +
+  // dimmer border + dimmed text instead, so the chip stays solid on any hue.
+  quickDisabled: { borderColor: '#2a2620', backgroundColor: '#141210' },
   quickText: { color: '#cdbf99', fontSize: 12 },
+  quickDisabledText: { color: '#6a6253' },
   quickDefensiveText: { color: '#6a9bbf' },
   quickReadyText: { color: '#9ec96a' },
   quickNeedsApproachText: { color: '#c9a86a' },

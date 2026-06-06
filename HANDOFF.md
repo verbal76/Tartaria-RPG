@@ -393,6 +393,13 @@ sit. The Flint Coil id/codename never entered the production pool, so nothing to
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Bog Anvil (`2026-06-06-317`) — action-bar buttons flooded by the tuned background + Sasmooch revive-gem [arb86 promoted]
+- Player (Verbal, magenta-tuned background, mid-tutorial): "weird fading behind the buttons and weird button coloring … all of the buttons need the background color in them." Plus: add the dev revive-gem-on-death to "Sasmooch" too.
+- **Cause (buttons):** two chip styles in `InputBox.tsx` were translucent — `quickReady` `backgroundColor: '#1a201410'` (8-digit hex, alpha ~6%) and `quickDisabled` `opacity: 0.4`. Fine on the old near-black bg; with the player-tunable background a bright hue floods through.
+- **Fix (buttons):** opaque fills — `quickReady` → `#1b2417` (green border still marks "ready"); `quickDisabled` → `#141210` + `#2a2620` border, disabled LABEL dimmed via new `quickDisabledText` instead of whole-chip opacity. Every action chip keeps a solid dark fill on any tuned hue.
+- **Fix (gem):** `gameStore.ts` death handler — `DEV_REVIVE_NAMES = ['verbal','sasmooch']`; both get a Resurrection Gem on death.
+- **Files:** `app/components/InputBox.tsx`, `app/state/gameStore.ts`, `app/buildInfo.ts`, `app/buildCodename.ts` (Bog Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
+
 #### Fen Anvil (`2026-06-06-316`) — color picker WHEEL replaces the Hue + Color-richness sliders [arb85 promoted]
 - Player: "instead of a hue slider can we do a color picker wheel."
 - New `app/components/ColorWheel.tsx` — a draggable hue/saturation disc (angle=hue, distance-from-center=richness). Pure-JS / OTA-safe (no color-picker lib installed; one would force a native build): a procedurally generated disc `assets/textures/colorwheel.png` (Pillow, `hsv_to_rgb`, soft-edge alpha) + a `PanResponder` that maps `atan2(dy,dx)`→hue and `dist/R`→sat, with a white-ringed thumb previewing the live base tone. Wired into the DISPLAY tab replacing BOTH old `Hue` + `Color richness` slider rows (the wheel covers both axes). Brightness / Paper texture / Edge shadow stay sliders. Same `setDisplaySettings({bgHue,bgSat})` plumbing → live + persisted.
