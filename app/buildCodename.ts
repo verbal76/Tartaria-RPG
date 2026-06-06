@@ -110,6 +110,10 @@ const CODENAMES: Record<string, string> = {
   // rectangle the player kept pointing at. Back to <ImageBackground> (tiles)
   // with opacity on the container style (dims reliably; iOS ignored imageStyle).
   '2026-06-06-315': 'Mire Anvil',
+  // Color picker WHEEL replaces the Hue + Color-richness sliders (DISPLAY tab).
+  // Procedural disc PNG (angle=hue, radius=saturation) + PanResponder; pure-JS,
+  // OTA-safe (no native color-picker lib installed).
+  '2026-06-06-316': 'Fen Anvil',
   '2026-06-03-301': 'Tungsten Spire',
   // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted
   // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).

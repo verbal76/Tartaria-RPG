@@ -12513,4 +12513,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // present a <Modal> in that window. Fix: a local `doorModalVisible` state now
 // drives the modal — on the door beat, dismiss the keyboard then flip it true
 // on a ~450ms timer so iOS presents over a clean, settled frame.
-export const OTA_BUILD_ID = '2026-06-06-315';
+export const OTA_BUILD_ID = '2026-06-06-316';

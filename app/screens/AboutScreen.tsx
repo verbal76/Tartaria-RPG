@@ -8,6 +8,7 @@ import { getBuildCodename } from '../buildCodename';
 import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
 import { buildInventorySnapshot, stampInventoryExport } from '../diagnostics/inventorySnapshot';
 import { NumberStepper } from '../components/NumberStepper';
+import { ColorWheel } from '../components/ColorWheel';
 import {
   getDisplaySettings,
   setDisplaySettings,
@@ -687,26 +688,21 @@ export function AboutScreen() {
             </View>
           </View>
 
-          <View style={styles.musicRow}>
-            <Text style={styles.musicLabel}>Hue (color)</Text>
-            <View style={{ flex: 1, alignItems: 'flex-end' }}>
-              <NumberStepper
-                value={Math.round(display.bgHue)}
-                min={0} max={360} step={5} decimals={0} suffix="°"
-                onChange={(v) => { void setDisplaySettings({ bgHue: v }); }}
-              />
-            </View>
-          </View>
-
-          <View style={styles.musicRow}>
-            <Text style={styles.musicLabel}>Color richness</Text>
-            <View style={{ flex: 1, alignItems: 'flex-end' }}>
-              <NumberStepper
-                value={Math.round(display.bgSat * 100)}
-                min={0} max={100} step={5} decimals={0} suffix="%"
-                onChange={(v) => { void setDisplaySettings({ bgSat: v / 100 }); }}
-              />
-            </View>
+          {/* arb85 — color wheel replaces the old Hue + Color-richness sliders.
+              Angle = hue, distance from center = richness (saturation). Drag
+              the dot anywhere on the disc; the base tone updates live. */}
+          <View style={styles.wheelRow}>
+            <Text style={styles.wheelLabel}>COLOR</Text>
+            <ColorWheel
+              size={220}
+              hue={display.bgHue}
+              sat={display.bgSat}
+              light={Math.max(0.4, display.bgLight + 0.35)}
+              onChange={(h, s) => { void setDisplaySettings({ bgHue: h, bgSat: s }); }}
+            />
+            <Text style={styles.wheelHint}>
+              Angle picks the color family · center → edge sets richness
+            </Text>
           </View>
 
           <View style={styles.musicRow}>
@@ -1286,6 +1282,10 @@ const styles = StyleSheet.create({
   musicToggleTextOn: { color: '#13110f' },
   musicRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   musicLabel: { color: '#7a705c', fontSize: 11, letterSpacing: 1, width: 60 },
+  // arb85 — color-wheel row (stacked + centered, full width).
+  wheelRow: { alignItems: 'center', gap: 8, marginVertical: 6 },
+  wheelLabel: { color: '#7a705c', fontSize: 11, letterSpacing: 2, textAlign: 'center' },
+  wheelHint: { color: '#7a705c', fontSize: 10, letterSpacing: 0.5, textAlign: 'center' },
   musicValue: { color: '#cdbf99', fontSize: 11, fontVariant: ['tabular-nums'], width: 44, textAlign: 'right' },
   applyBtn: {
     marginTop: 10,

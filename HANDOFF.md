@@ -393,6 +393,11 @@ sit. The Flint Coil id/codename never entered the production pool, so nothing to
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Fen Anvil (`2026-06-06-316`) — color picker WHEEL replaces the Hue + Color-richness sliders [arb85 promoted]
+- Player: "instead of a hue slider can we do a color picker wheel."
+- New `app/components/ColorWheel.tsx` — a draggable hue/saturation disc (angle=hue, distance-from-center=richness). Pure-JS / OTA-safe (no color-picker lib installed; one would force a native build): a procedurally generated disc `assets/textures/colorwheel.png` (Pillow, `hsv_to_rgb`, soft-edge alpha) + a `PanResponder` that maps `atan2(dy,dx)`→hue and `dist/R`→sat, with a white-ringed thumb previewing the live base tone. Wired into the DISPLAY tab replacing BOTH old `Hue` + `Color richness` slider rows (the wheel covers both axes). Brightness / Paper texture / Edge shadow stay sliders. Same `setDisplaySettings({bgHue,bgSat})` plumbing → live + persisted.
+- **Files:** `app/components/ColorWheel.tsx` (new), `assets/textures/colorwheel.png` (new), `app/screens/AboutScreen.tsx`, `app/buildInfo.ts`, `app/buildCodename.ts` (Fen Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
+
 #### Mire Anvil (`2026-06-06-315`) — THE "split" fix: parchment was rendering as ONE corner tile [arb84 promoted]
 - Player screenshot (green title screen): a hard-edged **lighter rectangle pinned top-left** — the persistent "split"/"hard color border" they'd flagged across arb79→arb83. Vignette smoothing (Silt Anvil/314) was a red herring; the artifact survived it.
 - **Cause:** arb79 switched the parchment layer from `<ImageBackground resizeMode="repeat">` to a plain `<Image resizeMode="repeat">` (to dodge an iOS imageStyle-opacity bug). But a plain RN `<Image>` with `repeat` does **NOT** tile — it draws ONE 256px copy in the top-left corner. That lone bright tile WAS the "split."
