@@ -323,6 +323,17 @@ describe('Domestic / utility quick-action stress (700 in-game days)', () => {
             Object.values(p.equipped ?? {}).filter((v): v is string => typeof v === 'string'),
           );
           p.inventory = p.inventory.filter((i) => equippedIds.has(i.id));
+          // arb94 — keep the sim player alive. This is a 700-day DOMESTIC
+          // (craft/rest/inventory) sim, not a survival test, and it never eats.
+          // The per-action weather tick at the top of submitPlayerAction chips
+          // HP every turn; over 700 days it can reach 0 and — once arb93 shifted
+          // the deterministic start-location weather/HP trajectory — land a
+          // lethal tick exactly on a `craft`, which then `return`s before the
+          // craft runs (engine is correct: you're dead). Top up HP each cycle so
+          // weather can't kill mid-craft. The HP-regen sampling blocks below
+          // wound the player on purpose, so this doesn't mask that coverage.
+          p.hp = p.hpMax;
+          p.dead = false;
           setPlayer(p);
         }
 

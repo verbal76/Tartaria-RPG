@@ -98,6 +98,17 @@ export const LOCATION_TO_MACRO: Record<string, string> = {
   voronov: 'silt_wastes',
   // Edge / liminal → Borderlands
   tartarian_outskirts: 'borderlands',
+  // arb92 — themed faction-start frontier outposts. All map to the
+  // starter-safe Borderlands biome (danger-2, tame curated pools) so a fresh
+  // character lands gently; the Lost Capitals remain the dangerous journey.
+  monarch_waystation: 'borderlands',
+  dynasty_border_post: 'borderlands',
+  pilgrim_waycamp: 'borderlands',
+  builders_survey_camp: 'borderlands',
+  giant_watch_shrine: 'borderlands',
+  revivalist_field_camp: 'borderlands',
+  reclaimer_stake: 'borderlands',
+  architect_blind: 'borderlands',
 };
 
 /** Convenience: returns the Macro for a Location, or null if not mapped. */

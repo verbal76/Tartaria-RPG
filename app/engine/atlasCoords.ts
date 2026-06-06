@@ -62,6 +62,18 @@ export const LOCATION_ATLAS_COORDS: Record<string, AtlasCoord> = {
   // The Outpost / Outskirts cluster
   tartarian_outskirts: { fx: 0.10, fy: 0.13 },
 
+  // arb92 — themed low-danger frontier outposts (faction starts). Plotted
+  // along the safe top frontier band, each roughly above the capital region
+  // its faction will journey down toward.
+  monarch_waystation: { fx: 0.14, fy: 0.08 },
+  dynasty_border_post: { fx: 0.23, fy: 0.09 },
+  pilgrim_waycamp: { fx: 0.32, fy: 0.08 },
+  builders_survey_camp: { fx: 0.41, fy: 0.09 },
+  giant_watch_shrine: { fx: 0.55, fy: 0.08 },
+  revivalist_field_camp: { fx: 0.70, fy: 0.09 },
+  reclaimer_stake: { fx: 0.06, fy: 0.16 },
+  architect_blind: { fx: 0.10, fy: 0.20 },
+
   // Northern band — surface ruins and weather lines
   sinking_cathedral: { fx: 0.36, fy: 0.12 },
   cradle_of_dusk: { fx: 0.62, fy: 0.17 },

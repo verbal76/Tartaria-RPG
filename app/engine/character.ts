@@ -181,16 +181,27 @@ export interface CreateCharacterInput {
 //   - Stone Builders + True Tartarians live in the Subterranean
 //     Empire (Aethercraft Workshop / True Tartarian Catacombs);
 //     buried_cities is the closest top-level location entry.
+// arb92 — every faction now starts at a low-danger (danger-2) themed
+// frontier outpost, NOT inside a Lost Capital (Core site) or a danger-4/5
+// zone. The capitals are the JOURNEY, not the spawn — this restores the
+// hook → travel → first-capital "revelation" arc and stops fresh characters
+// from being dropped on top of an endgame Core (and the Legendary spawns
+// that go with danger-5 tiles). Reclaimers / Architects / Forgotten Order
+// already started on safe frontier tiles and keep them.
+// arb93 — every faction now has its OWN distinct frontier outpost (Reclaimers
+// and Architects used to share Tartarian Outskirts). All 9 are danger-2,
+// non-capital, hub-capable. Tartarian Outskirts + Varakush remain in the
+// world as frontier regions/destinations.
 export const FACTION_STARTING_LOCATION: Record<string, string> = {
-  reclaimers_guild: 'tartarian_outskirts',
+  reclaimers_guild: 'reclaimer_stake',
   forgotten_order: 'varakush',
-  mud_monarchs: 'asgardar',
-  true_tartarians: 'buried_cities',
-  eternal_dynasty: 'asgardar',
-  conspiracy_architects: 'tartarian_outskirts',
-  servants_of_giants: 'giant_vault',
-  stone_builders: 'buried_cities',
-  tartarian_revivalists: 'drakova',
+  mud_monarchs: 'monarch_waystation',
+  true_tartarians: 'pilgrim_waycamp',
+  eternal_dynasty: 'dynasty_border_post',
+  conspiracy_architects: 'architect_blind',
+  servants_of_giants: 'giant_watch_shrine',
+  stone_builders: 'builders_survey_camp',
+  tartarian_revivalists: 'revivalist_field_camp',
 };
 
 export function startingLocationForFaction(factionId: string): string {

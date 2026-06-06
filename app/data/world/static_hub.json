@@ -9,7 +9,15 @@
     "asgardar",
     "buried_cities",
     "giant_vault",
-    "drakova"
+    "drakova",
+    "monarch_waystation",
+    "dynasty_border_post",
+    "pilgrim_waycamp",
+    "builders_survey_camp",
+    "giant_watch_shrine",
+    "revivalist_field_camp",
+    "reclaimer_stake",
+    "architect_blind"
   ],
   "factionHubNames": {
     "reclaimers_guild": "Reclaimers' Outpost",

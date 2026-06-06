@@ -27,6 +27,38 @@ individual locations as illustrative.
 
 ---
 
+## 0. CANON UPDATE — faction frontier outposts (the app is canon)
+
+> **This section supersedes any older statement below about "21 locations" or a
+> single shared "Reclaimers' Outpost" start.** As of the current app build the world
+> has **35 named locations**, and **every one of the 9 factions launches from its OWN
+> danger-2 frontier outpost on the Borderlands rim — never from inside a Lost Capital.**
+> The Capitals (danger 4–5) are now destinations you travel TO, not spawn points.
+> Full plotted coordinates, the canvas size, regions and danger rings are in the
+> companion doc **`docs/world-map-artist-brief.md`** (the authoritative map reference).
+
+**The 9 faction starting outposts (all Borderlands, danger 2):**
+
+| Faction | Frontier outpost | Leads toward |
+|---|---|---|
+| Conspiracy of Architects | **The Architect's Blind** | the routes none must connect |
+| Eternal Dynasty | **Dynasty Border Post** | the flooded capitals |
+| Forgotten Order | **Varakush** | the Subterranean Empire |
+| Mud Monarchs | **The Monarch's Waystation** | the buried capitals (Asgardar) |
+| Reclaimers Guild | **Reclaimer's Stake** | the Borderlands ruin-fields |
+| Servants of the Giants | **Giant-Watch Shrine** | the giant vaults |
+| Stone Builders | **Builders' Survey Camp** | the works below the ruin-field |
+| Tartarian Revivalists | **Revivalist Field Camp** | the capitals they mean to publicize |
+| True Tartarians | **Tartarian Pilgrim Camp** | the deep buried cities |
+
+Why the change: spawning a fresh character inside a danger-5 Core capital both
+short-cut the intended *hook → cross the wasteland → reach your first Lost Capital*
+arc AND dropped them where the encounter roll can field Legendary monsters. The
+frontier outposts restore the journey and the difficulty ramp. Big enemies still
+live in their correct high-danger zones; the Arbiter now suggests fleeing when the
+player is outmatched, and the scene-bar shows each area's danger tier.
+
+---
 ## 1. Macro regions (the five hands of Tartaria)
 
 These are the lore-meaningful regions. Every authored sub-scene lives

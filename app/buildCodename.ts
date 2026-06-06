@@ -129,6 +129,11 @@ const CODENAMES: Record<string, string> = {
   // sealed container for loot, retryable); traders stock multiples of food
   // (≤5) / materials (≤10) and you can buy in quantity. [arb90+arb91]
   '2026-06-06-319': 'Sedge Anvil',
+  // Batch: all 9 factions moved out of Lost Capitals onto their own danger-2
+  // frontier outposts (8 new locations); pry-bar loot-farm exploit + pry-pool
+  // catalog gap + vendor NaN guard fixed; Arbiter suggests fleeing when
+  // outmatched (no enemy cap); scene-bar shows area danger tier. [arb92-95]
+  '2026-06-06-320': 'Rush Anvil',
   '2026-06-03-301': 'Tungsten Spire',
   // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted
   // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).

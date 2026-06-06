@@ -7425,3 +7425,59 @@ Mud Flood Nexus: The subterranean control center believed to have regulated the 
 The Giant Vault: An ancient Tartarian vault believed to hold the last resting place of the Tartarian Giants, who symbolize Tartaria’s might. Legends claim it contains relics of immense power, but it is unclear if the giants within are protectors or a dormant threat​.
 Tartarian Outskirts: The regions surrounding Tartarian cities, littered with defenses, dormant traps, and relics of Etheric technology. Explorers often find clues about Tartaria’s inner workings here, but they must navigate Etheric anomalies and ancient defense systems​.
 The Buried Cities: Formerly vibrant Tartarian cities now sealed beneath Etherstone mud. These cities hold Tartaria’s most powerful secrets, preserved by impenetrable mud that resists excavation, where Etheric energy creates time distortions and magnetic anomalies​.
+
+================================================================================
+APP CANON ADDENDUM — WORLD MAP, FACTION OUTPOSTS & DANGER MODEL
+(Authoritative as of the current app build. THE APP IS CANON: where this
+addendum conflicts with older prose above or in the legacy bible, the app — and
+therefore this addendum — wins. Full plotted map coordinates, canvas size,
+region groupings and danger rings live in docs/world-map-artist-brief.md.)
+================================================================================
+
+WORLD SHAPE. Tartaria is a buried post-Mud-Flood empire. The map is organized as
+danger rings fanning out from a safe frontier rim (danger 1-2) toward the lethal
+buried deep (danger 5). Five macro-regions: the Borderlands (frontier rim), the
+Silt Wastes (surface mud crust), the Subterranean Empire (where survivors live),
+the Lost Capitals (the buried Core-cities), and the Aetherstone Deep (the power
+mantle, terminating at the Mud Flood Nexus).
+
+THE NINE CORES / NINE LOST CAPITALS. Each of the nine Lost Capitals — Asgardar,
+Samarran, Nimari, Drakova, Voronov, Karok-Sa, Yuldra-Tul, Ostragar, Iskan-Veil —
+entombs one Aetheric Core behind a Guardian. Recovering all nine opens the descent
+to the Mud Flood Nexus. Capitals are danger 4-5 destinations, NOT starting points.
+
+FACTION STARTING OUTPOSTS (NEW — every faction has its OWN). Each of the 9 factions
+now launches from its own danger-2 themed frontier outpost on the Borderlands rim.
+No faction starts inside a Lost Capital. This restores the intended early arc
+(hook -> cross the wasteland -> reach your first Lost Capital) and removes the
+fresh-character difficulty cliff. The 9 starts:
+
+  - Reclaimers’ Guild: Reclaimer's Stake
+  - Forgotten Order: Varakush
+  - Mud Monarchs: The Monarch's Waystation
+  - Eternal Dynasty: Dynasty Border Post
+  - True Tartarians: Tartarian Pilgrim Camp
+  - Conspiracy of Architects: The Architect's Blind
+  - Servants of the Giants: Giant-Watch Shrine
+  - Stone Builders: Builders' Survey Camp
+  - Tartarian Revivalists: Revivalist Field Camp
+
+NEW CANON LOCATIONS (frontier outposts added by the app; danger 2; Borderlands):
+
+The Monarch's Waystation: A frontier toll-court of the Mud Monarchs, last ordered ground before the buried capitals. Banners hang stiff with silt; a seneschal logs every traveler who passes toward the deeper cities.
+Dynasty Border Post: An old garrison of the Eternal Dynasty kept lit at the edge of the ruins. The oath-stones are still standing; the road past them runs down into the flooded capitals.
+Tartarian Pilgrim Camp: A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.
+Builders' Survey Camp: A Stone Builders' survey staging post — theodolite stakes, chalked plans, and stacked shoring timber at the safe edge of the ruin-field before the works run deep.
+Giant-Watch Shrine: A roadside vigil-shrine of the Servants of the Giants at the frontier, where keepers wait and watch before the long road down to the giant vaults.
+Revivalist Field Camp: A Revivalist dig-and-press camp pitched at the lip of the wastes. Crates of equipment, a printing trestle, and a map-board marking the capitals they mean to make headlines of.
+Reclaimer's Stake: A Reclaimers' Guild salvage-stake driven into the frontier mud: claim-posts, a tally-board of marked ruins, and a winch rig for hauling up whatever the wastes give. The expedition launches from here.
+The Architect's Blind: A Conspiracy of Architects observation-blind disguised as a collapsed waystation. Behind the false rubble: a map-wall of routes the public must never connect, and a quiet door onto the road.
+
+DANGER & BIG ENEMIES. Big/Legendary enemies (Mud Giant, Iron Titan, Bog Dragon,
+Mud Tyrant, Iron Worm, etc.) remain bound to their correct high-danger zones — they
+are NOT capped to the player's level. Instead, when the player is clearly outmatched
+the Arbiter suggests fleeing ('type flee and put ground between you'), and the
+scene-bar shows the area's danger tier (1 Calm / 2 Uneasy / 3 Dangerous / 4 Deadly /
+5 Lethal). Wandering into a deep capital under-leveled is a deliberate risk, not an
+ambush the engine forces on a beginner.
+

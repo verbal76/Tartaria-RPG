@@ -4364,6 +4364,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
         'combat',
         `Distance: ${rangeLabel}. ${lines.join(' · ')}.`,
       );
+      // arb95 — flee suggestion when the player is clearly outmatched. We do
+      // NOT cap the enemy by player level (big enemies stay in their correct
+      // danger zones); the Arbiter just nudges an under-equipped player to run
+      // rather than die. The HP ratio self-scales: a strong, high-HP player
+      // facing a Legendary they can actually trade with won't trip it, but a
+      // fresh character who wandered into a danger-5 capital will.
+      const hpMax = player.hpMax ?? 1;
+      const toughest = Math.max(...enemies.map((e) => e.hp));
+      const totalHp = enemies.reduce((acc, e) => acc + e.hp, 0);
+      if (toughest >= hpMax * 1.6 || totalHp >= hpMax * 2.5) {
+        get().appendLog(
+          'arbiter',
+          `The Arbiter's voice drops. "This one's beyond you for now — there's no shame in it. Type 'flee' and put ground between you, and come back when you're harder to kill."`,
+        );
+      }
     }
     // Track hub-room visits separately from the procedural visitedRooms
     // map so hub-specific UI can read it without scanning roomKeys.
@@ -13085,7 +13100,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // and what the player can afford; the per-unit affordability gate above
     // already guaranteed at least one is buyable.
     const available = Math.max(1, offer.quantity ?? 1);
-    const requested = Math.max(1, Math.min(Math.floor(qty ?? 1), available));
+    // arb94 — Number.isFinite guard so a non-finite qty (NaN/Infinity from a
+    // future caller) can't propagate into totalCost and corrupt TC / stock.
+    const reqRaw = Math.floor(qty ?? 1);
+    const requested = Number.isFinite(reqRaw) ? Math.max(1, Math.min(reqRaw, available)) : 1;
     const affordableCount = Math.floor(player.tc / effectivePrice);
     const buyCount = Math.max(1, Math.min(requested, affordableCount));
     const newItem: InventoryItem = stampDurability({
@@ -22215,7 +22233,10 @@ function normalizeDogLeadingVerb(input: string): string {
 const GENERIC_PRY_POOL: ContainerLootEntry[] = [
   { name: 'Scrap Metal', weight: 5, min: 1, max: 2, tags: ['scrap', 'metal'], kind: 'misc' },
   { name: 'Worn Tartarian Coin', weight: 3, min: 1, max: 3, tags: ['currency'], kind: 'misc' },
-  { name: 'Tartarian Pottery Shard', weight: 2, min: 1, max: 1, tags: ['relic_fragment'], kind: 'misc' },
+  // arb94 — was 'Tartarian Pottery Shard' (not in materials.json → fell to
+  // inferGear with a generic description). 'Aether Residue' is a real
+  // materials.json row, so it resolves cleanly with its authored stats.
+  { name: 'Aether Residue', weight: 2, min: 1, max: 2, tags: ['aether', 'residue'], kind: 'misc' },
 ];
 // Nouns the bar can actually work on when they aren't a known container.
 const PRYABLE_NOUN_RE = /\b(lid|crate|box|hatch|panel|locker|strongbox|coffer|chest|drawer|grate|seal|plate|cover|case|casket|trunk|cabinet|vault|door|shutter|grille)\b/i;
@@ -22277,8 +22298,20 @@ function tryPryBar(
     lastVisitAt: Date.now(),
     visitCount: 1,
   };
-  const key = target.toLowerCase();
-  if ((room.containersOpened ?? []).includes(key)) {
+  // arb94 — canonical dedupe key. Was the literal stripped target, but
+  // classifyContainer matches on a word-boundary SUBSTRING, so "crate" /
+  // "crate lid" / "crate box" all hit the same archetype with different
+  // raw keys → an unbounded loot farm (the bar is never consumed). Dedupe
+  // on the matched archetype id (or the matched pryable noun for the generic
+  // path) so every phrasing of the same thing collapses to one key. Still
+  // check the raw lowercased target too, so a prior `open <noun>` (which
+  // keys on the raw noun) cross-dedupes a later pry of the same noun.
+  const rawKey = target.toLowerCase();
+  const key = matched
+    ? `arch:${matched.archetypeId}`
+    : (PRYABLE_NOUN_RE.exec(target)?.[0]?.toLowerCase() ?? rawKey);
+  const alreadyPried = (room.containersOpened ?? []).some((k) => k === key || k === rawKey);
+  if (alreadyPried) {
     get().appendLog('world', `The ${target} is already pried open — nothing left inside.`);
     return true;
   }
@@ -22292,7 +22325,9 @@ function tryPryBar(
   }
 
   // Success — mark pried (shares the open handler's per-room set) + loot.
-  const opened = [...(room.containersOpened ?? []), key];
+  // Store BOTH the canonical key and the raw noun so a later `open <noun>`
+  // (which keys on the raw noun) also sees it as spent.
+  const opened = Array.from(new Set([...(room.containersOpened ?? []), key, rawKey]));
   set((s) => ({
     worldMemory: {
       ...s.worldMemory,

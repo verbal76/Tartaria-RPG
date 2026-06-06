@@ -40,6 +40,15 @@ function describeTime(hours: number): string {
   return `Day ${day} · ${part}`;
 }
 
+/** arb95 — danger readout for the scene-bar location line. Surfaces the
+ *  location's danger tier (1-5) so the player can read at a glance how
+ *  lethal the ground is — capitals (5) vs frontier outposts (2). */
+function dangerLabel(danger: number): string {
+  const d = Math.max(1, Math.min(5, Math.round(danger || 1)));
+  const tier = d <= 1 ? 'Calm' : d === 2 ? 'Uneasy' : d === 3 ? 'Dangerous' : d === 4 ? 'Deadly' : 'Lethal';
+  return `Danger ${d} (${tier})`;
+}
+
 /** Subtle background tint per time-of-day. Always darker than the base
  *  charcoal so text stays legible; nightly is the bluest, morning the
  *  warmest, evening the dustiest. */
@@ -455,7 +464,7 @@ export function ExplorationScreen() {
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text style={styles.sceneText} numberOfLines={1} ellipsizeMode="tail">
             {currentScene
-              ? `${currentScene.transitArea ?? currentScene.location.name}  /  ${currentScene.weather.name}${currentScene.hazard ? `  /  ${currentScene.hazard.name}` : ''}`
+              ? `${currentScene.transitArea ?? currentScene.location.name} · ${dangerLabel(currentScene.location.danger)}  /  ${currentScene.weather.name}${currentScene.hazard ? `  /  ${currentScene.hazard.name}` : ''}`
               : 'No scene'}
           </Text>
           <Text style={styles.timeText} numberOfLines={1}>
