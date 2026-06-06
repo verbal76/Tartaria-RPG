@@ -96,6 +96,9 @@ const CODENAMES: Record<string, string> = {
   // Settings tabs uncrowded (DISPLAY made 6 tabs wrap): smaller/tighter
   // labels + auto-fit one line.
   '2026-06-06-311': 'Loam Anvil',
+  // Title screen container → transparent: kills the top color-split where the
+  // shell bg peeked above the opaque title card. First Phase-2 screen.
+  '2026-06-06-312': 'Peat Anvil',
   '2026-06-03-301': 'Tungsten Spire',
   // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted
   // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).

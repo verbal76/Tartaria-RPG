@@ -393,6 +393,10 @@ sit. The Flint Coil id/codename never entered the production pool, so nothing to
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Peat Anvil (`2026-06-06-312`) — Title screen top color-split fix (container → transparent) [arb81 promoted]
+- Player set olive hue; Title screen showed a hard split — olive shell-bg strip at top (safe-area inset) above the Title's opaque `#0a0908` card. Fix: Title container `backgroundColor` → `transparent` so the player's shell bg shows through the whole screen (content cards keep theirs). First Phase-2 screen; same one-liner applies to Character creation / Inventory / Character / Map / Crafting / Vendor / Contracts / Log / Lore / About / Ending (full rollout pending go-ahead).
+- **Files:** `app/screens/TitleScreen.tsx`, `app/buildInfo.ts`, `app/buildCodename.ts` (Peat Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
+
 #### Loam Anvil (`2026-06-06-311`) — Settings tabs uncrowded (DISPLAY made 6 tabs wrap) [arb80 promoted]
 - The 6th tab (DISPLAY) made phone labels wrap ("SESSIO/N", "DISPLA/Y", "NOTIC/ES"). `tabBtnText` 12→10 / letterSpacing 2→0.5; `tabRow` gap 6→4; `tabBtn` +`paddingH:2`+center; labels `numberOfLines={1}` + `adjustsFontSizeToFit` + `minimumFontScale={0.7}` (auto-fit one line).
 - **Files:** `app/screens/AboutScreen.tsx`, `app/buildInfo.ts`, `app/buildCodename.ts` (Loam Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
