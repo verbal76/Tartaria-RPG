@@ -393,6 +393,10 @@ sit. The Flint Coil id/codename never entered the production pool, so nothing to
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Loam Anvil (`2026-06-06-311`) — Settings tabs uncrowded (DISPLAY made 6 tabs wrap) [arb80 promoted]
+- The 6th tab (DISPLAY) made phone labels wrap ("SESSIO/N", "DISPLA/Y", "NOTIC/ES"). `tabBtnText` 12→10 / letterSpacing 2→0.5; `tabRow` gap 6→4; `tabBtn` +`paddingH:2`+center; labels `numberOfLines={1}` + `adjustsFontSizeToFit` + `minimumFontScale={0.7}` (auto-fit one line).
+- **Files:** `app/screens/AboutScreen.tsx`, `app/buildInfo.ts`, `app/buildCodename.ts` (Loam Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
+
 #### Ochre Anvil (`2026-06-06-310`) — fix background light-tan margins / "blocky" (parchment opacity not applying on iOS) [arb79 promoted]
 - Player screenshot (iPad title): light-tan side margins + hard dark center rectangle. Cause: `ImageBackground` `imageStyle={{opacity}}` not dimming the parchment on iOS → cream rendered ~full. Fix: parchment → plain `<Image>` with `style` opacity. Margins back to dark umber + faint grain; Paper slider works. Remaining "blocky" center = Title screen's own opaque card → Phase-2 (transparent screens).
 - **Files:** `App.tsx`, `app/buildInfo.ts`, `app/buildCodename.ts` (Ochre Anvil), `docs/build-codenames.md`, `HANDOFF.md`.

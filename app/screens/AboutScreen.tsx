@@ -556,7 +556,12 @@ export function AboutScreen() {
             style={[styles.tabBtn, tab === id && styles.tabBtnActive]}
             activeOpacity={0.7}
           >
-            <Text style={[styles.tabBtnText, tab === id && styles.tabBtnTextActive]}>
+            <Text
+              style={[styles.tabBtnText, tab === id && styles.tabBtnTextActive]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.7}
+            >
               {id.toUpperCase()}
             </Text>
           </TouchableOpacity>
@@ -1160,18 +1165,20 @@ const styles = StyleSheet.create({
   // one is filled (amber on dark) and the others are outlined.
   tabRow: {
     flexDirection: 'row',
-    gap: 6,
+    gap: 4,
     paddingHorizontal: 12,
     marginBottom: 8,
   },
   tabBtn: {
     flex: 1,
     paddingVertical: 8,
+    paddingHorizontal: 2,
     borderRadius: 4,
     borderColor: '#3a342c',
     borderWidth: 1,
     backgroundColor: '#1a1612',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   tabBtnActive: {
     backgroundColor: '#c9a86a',
@@ -1179,9 +1186,9 @@ const styles = StyleSheet.create({
   },
   tabBtnText: {
     color: '#cdbf99',
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '700',
-    letterSpacing: 2,
+    letterSpacing: 0.5,
   },
   tabBtnTextActive: {
     color: '#13110f',
