@@ -393,6 +393,16 @@ sit. The Flint Coil id/codename never entered the production pool, so nothing to
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Reed Anvil (`2026-06-06-318`) — batch push from the live playthrough (arb87–89)
+- **Player asks (batched, then "push everything we have now"):**
+  1. Inventory should show every item's stats so you know what you're picking.
+  2. Picking armor for a slot should red-✗ the other items competing for that slot ("like the red x in battle text").
+  3. The "antechamber" exit chip is too long / writes too small — shorter word.
+  4. The ACTIONS button: "I have never used it, does it serve a purpose? can we implement it better?" → contextual + searchable.
+  5. Wife now plays **Sasmooch** — give her a Resurrection Gem and make the perk recognize her in-progress character without a restart.
+- **FIXES.** (1) `InventoryScreen` `ItemRow` renders a per-item stat line from `getItemPreviewForInstance(item).stats` (minus the already-shown weapon dice/durability + the noisy Tags). (2) Parent `itemSlotTaken(item)` → red ✗ (`#e07a5f`) when every slot the item competes for is worn; rings ✗ only when all three ring slots are full. (3) `hub_faction_variants.json` Mud Monarchs gate "The Antechamber"/"Antechamber" → "The Atrium"/"Atrium". (4) `ActionReferenceScreen` gains a search box (filters by name/effect/example/keyword → flat results) + context-first section ordering (combat-side leads mid-fight via `currentScene.enemies.length`, exploration-side otherwise); shared `renderCard`. (5) `saveSystem.grantDevGemOnce(slotKey)` (idempotent via `devGemGrantedSlots` in GlobalStash) called from `loadSlotIntoGame` for dev names → a gem up front on load; `DEV_REVIVE_NAMES` hoisted to module scope (shared with the on-death grant).
+- **Files:** `app/screens/InventoryScreen.tsx`, `app/data/world/hub_faction_variants.json`, `app/screens/ActionReferenceScreen.tsx`, `app/state/gameStore.ts`, `app/engine/saveSystem.ts`, `app/buildInfo.ts`, `app/buildCodename.ts` (Reed Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
+
 #### Bog Anvil (`2026-06-06-317`) — action-bar buttons flooded by the tuned background + Sasmooch revive-gem [arb86 promoted]
 - Player (Verbal, magenta-tuned background, mid-tutorial): "weird fading behind the buttons and weird button coloring … all of the buttons need the background color in them." Plus: add the dev revive-gem-on-death to "Sasmooch" too.
 - **Cause (buttons):** two chip styles in `InputBox.tsx` were translucent — `quickReady` `backgroundColor: '#1a201410'` (8-digit hex, alpha ~6%) and `quickDisabled` `opacity: 0.4`. Fine on the old near-black bg; with the player-tunable background a bright hue floods through.

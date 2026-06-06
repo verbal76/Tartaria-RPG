@@ -119,6 +119,11 @@ const CODENAMES: Record<string, string> = {
   // flooded through. Now opaque fills + dimmed disabled label. Plus Sasmooch
   // added to the dev revive-gem-on-death names.
   '2026-06-06-317': 'Bog Anvil',
+  // Batch push: inventory per-item stat lines + slot-taken red ✗; hub gate
+  // "Antechamber"→"Atrium" (chip too long); ACTIONS screen → contextual +
+  // searchable; proactive dev-name Resurrection Gem on load (Sasmooch gets a
+  // gem without restarting). [arb87+arb88+arb89]
+  '2026-06-06-318': 'Reed Anvil',
   '2026-06-03-301': 'Tungsten Spire',
   // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted
   // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).

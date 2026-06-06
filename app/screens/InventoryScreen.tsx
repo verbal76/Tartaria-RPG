@@ -201,6 +201,21 @@ export function InventoryScreen() {
     if (owner) equippedItemIds.add(owner.id);
   }
 
+  // arb87 — "slot full" marker. When a slot already holds a piece, every
+  // OTHER inventory item that competes for that slot gets a red ✗ (you'd
+  // have to unequip first). Rings have three physical slots, so a ring only
+  // counts as blocked when all three are worn.
+  const slotIsFull = (slot: EquipSlot): boolean => {
+    if (slot === 'ring') return !!(eq.ring && eq.ring2 && eq.ring3);
+    const worn = (eq as Record<string, unknown>)[slot];
+    return typeof worn === 'string' && worn.length > 0;
+  };
+  const itemSlotTaken = (item: InventoryItem): boolean => {
+    if (equippedItemIds.has(item.id)) return false;
+    const slots = validSlotsForItem(item);
+    return slots.length > 0 && slots.every(slotIsFull);
+  };
+
   // ALWAYS show the modal. Auto-equipping silently when there was only one
   // valid slot (e.g. amulet) made the player think the tap did nothing —
   // and left no path to unequip. Modal always opens; player picks Equip
@@ -566,6 +581,7 @@ export function InventoryScreen() {
                   color={CATEGORY_COLORS[cat]}
                   isEquipped={equippedItemIds.has(item.id)}
                   isPouched={(player.equipped?.toolPouchIds ?? []).includes(item.id)}
+                  slotTaken={itemSlotTaken(item)}
                   onPress={() => handleItemTap(item)}
                 />
               ))}
@@ -753,12 +769,14 @@ function ItemRow({
   color,
   isEquipped,
   isPouched,
+  slotTaken,
   onPress,
 }: {
   item: InventoryItem;
   color: string;
   isEquipped: boolean;
   isPouched: boolean;
+  slotTaken: boolean;
   onPress: () => void;
 }) {
   const canEquip = validSlotsForItem(item).length > 0;
@@ -795,6 +813,9 @@ function ItemRow({
               (OTA-195 uniqueStats) are catalog-absent by name AND
               carry a Rare / Legendary rarity, so they get a purple
               or orange diamond too. */}
+          {/* arb87 — red ✗ when this item's slot is already worn (you'd have
+              to unequip first). Same alarm red as combat misses. */}
+          {slotTaken && <Text style={styles.rowSlotTaken}>✗ </Text>}
           {isInferredInventoryItem(item) && (
             <Text style={[styles.rowInferredDiamond, { color: rarityHexColor(item.rarity) }]}>◆ </Text>
           )}
@@ -859,6 +880,22 @@ function ItemRow({
             );
           })()}
         </View>
+        {/* arb87 — at-a-glance stat line for EVERY item ("so you know what
+            you're picking"). Pulls the same preview stats the details modal
+            shows (AC, resists, stat bonuses, consumable restores, passives),
+            minus the ones already rendered above (weapon Damage dice +
+            Durability) and the noisy Tags line. */}
+        {(() => {
+          const extra = getItemPreviewForInstance(item).stats.filter(
+            (s) => !s.startsWith('Damage:') && !s.startsWith('Durability:') && !s.startsWith('Tags:'),
+          );
+          if (extra.length === 0) return null;
+          return (
+            <Text style={styles.rowStat} numberOfLines={1}>
+              {extra.join(' · ')}
+            </Text>
+          );
+        })()}
       </View>
     </TouchableOpacity>
   );
@@ -932,6 +969,10 @@ const styles = StyleSheet.create({
   rowQty: { color: '#cdbf99', fontSize: 12 },
   rowMetaRow: { flexDirection: 'row', gap: 8, marginTop: 2 },
   rowMeta: { color: '#7a705c', fontSize: 10, letterSpacing: 1 },
+  // arb87 — per-item stat line (AC / resists / bonuses / restores).
+  rowStat: { color: '#bfa86a', fontSize: 11, marginTop: 3 },
+  // arb87 — "slot already worn" red ✗ (combat-miss red).
+  rowSlotTaken: { color: '#e07a5f', fontSize: 13, fontWeight: '800' },
   rowDurabilityLow: { color: '#e07a5f' },
   // OTA 028 — damage dice chip in green so it pops as the
   // "how hard does this hit" signal at a glance.

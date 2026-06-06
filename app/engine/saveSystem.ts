@@ -53,6 +53,11 @@ export interface GlobalStash {
   // free starter gem on every hydrate. Set to true the moment we
   // grant the install gem; never cleared afterwards.
   installSeeded?: boolean;
+  // arb89 — dev-name proactive gem grant. Slot keys ("<slotId>:<name>")
+  // that have already received their one free Resurrection Gem for being
+  // a dev character (Verbal / Sasmooch). Idempotent so a load doesn't
+  // re-grant on every resume.
+  devGemGrantedSlots?: string[];
 }
 
 export async function loadGlobalStash(): Promise<GlobalStash> {
@@ -64,9 +69,10 @@ export async function loadGlobalStash(): Promise<GlobalStash> {
       resurrectionGems: parsed.resurrectionGems ?? 0,
       endingBadges: parsed.endingBadges ?? [],
       installSeeded: parsed.installSeeded ?? false,
+      devGemGrantedSlots: parsed.devGemGrantedSlots ?? [],
     };
   } catch {
-    return { resurrectionGems: 0, endingBadges: [], installSeeded: false };
+    return { resurrectionGems: 0, endingBadges: [], installSeeded: false, devGemGrantedSlots: [] };
   }
 }
 
@@ -95,6 +101,24 @@ export async function ensureFirstInstallSeed(): Promise<{ seeded: boolean; gems:
   stash.resurrectionGems = (stash.resurrectionGems ?? 0) + 1;
   await saveGlobalStash(stash);
   return { seeded: true, gems: stash.resurrectionGems };
+}
+
+/** arb89 — one-time proactive Resurrection Gem for a dev character
+ *  (Verbal / Sasmooch). Grants a gem the first time that specific slot
+ *  is recognized as a dev name, so the dev (or the dev's spouse playing
+ *  Sasmooch) has a gem in hand WITHOUT dying first and WITHOUT restarting
+ *  the character. Idempotent per slot key — re-loading the same save
+ *  never re-grants. */
+export async function grantDevGemOnce(slotKey: string): Promise<{ granted: boolean; gems: number }> {
+  const stash = await loadGlobalStash();
+  const already = stash.devGemGrantedSlots ?? [];
+  if (already.includes(slotKey)) {
+    return { granted: false, gems: stash.resurrectionGems };
+  }
+  stash.devGemGrantedSlots = [...already, slotKey];
+  stash.resurrectionGems = (stash.resurrectionGems ?? 0) + 1;
+  await saveGlobalStash(stash);
+  return { granted: true, gems: stash.resurrectionGems };
 }
 
 /** v2.4.1 (OTA 043) — record a completed (faction, ending) combo.

@@ -55,8 +55,8 @@
     },
     "mud_monarchs": {
       "outpost_gate": {
-        "name": "The Antechamber",
-        "shortName": "Antechamber",
+        "name": "The Atrium",
+        "shortName": "Atrium",
         "description": "Polished mud-glass tiles and a carved Monarch sigil over the doorway. The seneschal nods you through without speaking — your business has already been logged elsewhere."
       },
       "outpost_central": {

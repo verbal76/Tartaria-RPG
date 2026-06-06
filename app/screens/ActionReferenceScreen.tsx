@@ -6,7 +6,7 @@
 // on that same screen. ActionReferenceScreen is now ACTIONS
 // ONLY — actions reference + concept cards.
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Pressable, TextInput } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore } from '../state/gameStore';
 import conceptsData from '../data/lore/concepts.json';
@@ -244,9 +244,29 @@ function explanationFor(c: Concept): string {
   return SHORT[c.id] ?? c.answer;
 }
 
+// arb88 — flat index of every card for the search box.
+const ALL_CARDS: { section: string; id: string }[] = SECTIONS.flatMap((s) =>
+  s.ids.map((id) => ({ section: s.title, id })),
+);
+
+// arb88 — which sections matter "right now". When the player is mid-fight we
+// float the combat-side sections to the top; otherwise the exploration-side
+// ones lead. Everything stays in the list — only the order changes.
+const COMBAT_SECTIONS = new Set([
+  'Combat Actions', 'Firearms Actions', 'Evasive Actions', 'Possible Modifiers',
+]);
+const EXPLORE_SECTIONS = new Set([
+  'Movement Actions', 'Move Types', 'Gathering Information',
+  'Social Interactions', 'Skill-Based Actions', 'Preparation and Planning',
+]);
+
 export function ActionReferenceScreen() {
   const setScreen = useGameStore((s) => s.setScreen);
   const queueInputDraft = useGameStore((s) => s.queueInputDraft);
+  // arb88 — drives the context-first ordering of the reference.
+  const inCombat = useGameStore((s) => (s.currentScene?.enemies?.length ?? 0) > 0);
+  // arb88 — free-text filter across title / explanation / examples / keywords.
+  const [query, setQuery] = useState('');
   // OTA-095 — mode-toggle removed. Screen is actions-only now.
 
   // Per-card cycle index. Tapping a card cycles its example list:
@@ -280,6 +300,61 @@ export function ActionReferenceScreen() {
     return t !== undefined && Date.now() - t < 1400;
   };
 
+  // arb88 — single card renderer, shared by the sectioned view and the
+  // flat search-results view.
+  const renderCard = (id: string) => {
+    const c = lookup(id);
+    if (!c) return null;
+    const examples = EXAMPLES[id] ?? [];
+    const queuedIdx = cycleIdx[id];
+    const queuedPhrase = queuedIdx !== undefined ? examples[queuedIdx] : null;
+    const queued = isQueued(id);
+    return (
+      <Pressable
+        key={id}
+        style={({ pressed }) => [
+          styles.card,
+          pressed && styles.cardPressed,
+          queued && styles.cardQueued,
+        ]}
+        onPress={() => handleCardTap(id, examples)}
+      >
+        <Text style={styles.cardTitle}>{c.title}</Text>
+        <Text style={styles.cardBody}>{explanationFor(c)}</Text>
+        {examples.length > 0 && (
+          <Text style={styles.cardExamples}>
+            <Text style={styles.cardExamplesLabel}>Tap to queue: </Text>
+            {examples.map((ex, i) => (i === queuedIdx ? `[${ex}]` : `"${ex}"`)).join(' · ')}
+          </Text>
+        )}
+        {queued && queuedPhrase && (
+          <Text style={styles.queuedHint}>
+            ✓ &quot;{queuedPhrase}&quot; staged for the input box
+            {examples.length > 1 ? ` (${(queuedIdx ?? 0) + 1}/${examples.length} — tap again to cycle)` : ''}
+          </Text>
+        )}
+      </Pressable>
+    );
+  };
+
+  // arb88 — search results (flat) when the box has text; else the sections
+  // reordered so the context-relevant ones lead.
+  const q = query.trim().toLowerCase();
+  const searchResults = q.length > 0
+    ? ALL_CARDS.filter(({ id }) => {
+        const c = lookup(id);
+        if (!c) return false;
+        const hay = [c.title, explanationFor(c), ...(EXAMPLES[id] ?? []), ...(c.keywords ?? [])]
+          .join(' ')
+          .toLowerCase();
+        return hay.includes(q);
+      })
+    : [];
+  const priority = inCombat ? COMBAT_SECTIONS : EXPLORE_SECTIONS;
+  const orderedSections = [...SECTIONS].sort(
+    (a, b) => (priority.has(b.title) ? 1 : 0) - (priority.has(a.title) ? 1 : 0),
+  );
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -294,59 +369,53 @@ export function ActionReferenceScreen() {
         <Text style={styles.title}>ACTIONS</Text>
         <View style={{ width: 80 }} />
       </View>
-      <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
-        {/* OTA-095 — actions-only render. Recipes mode removed
-            (Aethercraft + recipe groupings moved to Crafting
-            Screen). The {mode === 'actions' ? ... : ...} ternary
-            collapsed; this is just the actions branch now. */}
-        <>
+      {/* arb88 — search box. Filters every card by name / what-it-does /
+          example phrasing / concept keywords. */}
+      <View style={styles.searchWrap}>
+        <TextInput
+          style={styles.searchInput}
+          value={query}
+          onChangeText={setQuery}
+          placeholder="Search actions (e.g. dodge, reload, climb)…"
+          placeholderTextColor="#6a6253"
+          autoCorrect={false}
+          autoCapitalize="none"
+          returnKeyType="search"
+        />
+        {query.length > 0 && (
+          <TouchableOpacity onPress={() => setQuery('')} hitSlop={8} style={styles.searchClear}>
+            <Text style={styles.searchClearText}>✕</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        {q.length > 0 ? (
+          // Flat search results.
+          searchResults.length === 0 ? (
+            <Text style={styles.intro}>No action matches “{query.trim()}”.</Text>
+          ) : (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>{searchResults.length} MATCH{searchResults.length === 1 ? '' : 'ES'}</Text>
+              {searchResults.map(({ id }) => renderCard(id))}
+            </View>
+          )
+        ) : (
+          <>
             <Text style={styles.intro}>
-              What every action does, with the exact mechanics. Tap any card to
-              drop its first example into the input box — tap again to cycle
-              through alternate phrasings. Hit BACK and finish the sentence.
+              {inCombat
+                ? 'You’re in a fight — combat actions are first. '
+                : 'Exploring — movement, search and social actions are first. '}
+              Tap any card to drop an example into the input box (tap again to cycle
+              phrasings), then hit BACK and finish the sentence. Or search above.
             </Text>
-            {SECTIONS.map((section) => (
+            {orderedSections.map((section) => (
               <View key={section.title} style={styles.section}>
                 <Text style={styles.sectionTitle}>{section.title}</Text>
-                {section.ids.map((id) => {
-                  const c = lookup(id);
-                  if (!c) return null;
-                  const examples = EXAMPLES[id] ?? [];
-                  const queuedIdx = cycleIdx[id];
-                  const queuedPhrase = queuedIdx !== undefined ? examples[queuedIdx] : null;
-                  const queued = isQueued(id);
-                  return (
-                    <Pressable
-                      key={id}
-                      style={({ pressed }) => [
-                        styles.card,
-                        pressed && styles.cardPressed,
-                        queued && styles.cardQueued,
-                      ]}
-                      onPress={() => handleCardTap(id, examples)}
-                    >
-                      <Text style={styles.cardTitle}>{c.title}</Text>
-                      <Text style={styles.cardBody}>{explanationFor(c)}</Text>
-                      {examples.length > 0 && (
-                        <Text style={styles.cardExamples}>
-                          <Text style={styles.cardExamplesLabel}>Tap to queue: </Text>
-                          {examples.map((ex, i) =>
-                            i === queuedIdx ? `[${ex}]` : `"${ex}"`,
-                          ).join(' · ')}
-                        </Text>
-                      )}
-                      {queued && queuedPhrase && (
-                        <Text style={styles.queuedHint}>
-                          ✓ &quot;{queuedPhrase}&quot; staged for the input box
-                          {examples.length > 1 ? ` (${(queuedIdx ?? 0) + 1}/${examples.length} — tap again to cycle)` : ''}
-                        </Text>
-                      )}
-                    </Pressable>
-                  );
-                })}
+                {section.ids.map((id) => renderCard(id))}
               </View>
             ))}
           </>
+        )}
       </ScrollView>
     </View>
   );
@@ -374,6 +443,25 @@ const styles = StyleSheet.create({
   title: { color: '#e6d8b3', letterSpacing: 4, fontSize: 14 },
   scroll: { flex: 1 },
   content: { paddingBottom: 32 },
+  // arb88 — search box.
+  searchWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1a1714',
+    borderColor: '#3a342c',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+  searchInput: {
+    flex: 1,
+    color: '#e6d8b3',
+    fontSize: 13,
+    paddingVertical: 8,
+  },
+  searchClear: { paddingLeft: 8, paddingVertical: 4 },
+  searchClearText: { color: '#7a705c', fontSize: 14, fontWeight: '700' },
   intro: {
     color: '#7a705c',
     fontSize: 12,

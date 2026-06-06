@@ -60,6 +60,7 @@ import {
   loadGlobalStash,
   addResurrectionGems,
   ensureFirstInstallSeed,
+  grantDevGemOnce,
   type SlotSummary,
 } from '../engine/saveSystem';
 import { makeEntry, persistEntry } from '../engine/gameLog';
@@ -324,6 +325,11 @@ const allLocations = locationsData as Location[];
  *  Fewer props = fewer taps to clear; the per-noun find chance is
  *  unchanged, so the odds a room shows the player something still hold. */
 const AMBIENT_DISPLAY_CAP = 5;
+
+// arb89 — dev character names that get the Resurrection-Gem perk: a gem
+// granted up front on load (grantDevGemOnce) AND another on every death.
+// Case-insensitive, trimmed. Shared by loadSlotIntoGame + handlePlayerDeath.
+const DEV_REVIVE_NAMES = ['verbal', 'sasmooch'];
 
 /** True only when the player is genuinely STANDING IN their current named
  *  location — on its map anchor (or inside one of its hub rooms), and not
@@ -2923,6 +2929,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         get().appendLog('debug', `OTA session start: ${OTA_BUILD_ID}.`);
       } catch { /* hardened: never block slot load on a debug log failure */ }
+      // arb89 — proactive dev-name Resurrection Gem. The death-handler
+      // perk (DEV_REVIVE_NAMES) already revives Verbal / Sasmooch on
+      // death without a restart; this grants the gem UP FRONT the first
+      // time such a character is loaded, so they hold one before ever
+      // dying. Idempotent per slot (grantDevGemOnce records the key), so
+      // resuming the same save never stacks more. No effect for other
+      // names.
+      if (DEV_REVIVE_NAMES.includes(player.name.trim().toLowerCase())) {
+        void grantDevGemOnce(`${slotId}:${player.name.trim().toLowerCase()}`).then((res) => {
+          if (res.granted) {
+            set({ resurrectionGems: res.gems });
+            get().appendLog(
+              'reward',
+              `✦ A Resurrection Gem is set aside for ${player.name} — the buried world keeps its own. (${res.gems} held)`,
+            );
+          }
+        });
+      }
       // Only fall back to beginScene when the save predates scene
       // capture. New saves restore the exact scene above and skip this.
       if (!restoredScene) {
@@ -20001,7 +20025,8 @@ function handlePlayerDeath(
   // immediately revive that same character from the title screen.
   // No effect for any other name; everyone else dies on the normal
   // rules (gem comes from boss kills / pity timer / rare drops).
-  const DEV_REVIVE_NAMES = ['verbal', 'sasmooch'];
+  // arb89 — DEV_REVIVE_NAMES hoisted to module scope (shared with the
+  // proactive on-load grant in loadSlotIntoGame).
   if (DEV_REVIVE_NAMES.includes(player.name.trim().toLowerCase())) {
     void addResurrectionGems(1).then((total) => {
       set(() => ({ resurrectionGems: total }));
