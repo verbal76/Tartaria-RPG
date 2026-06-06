@@ -393,6 +393,12 @@ sit. The Flint Coil id/codename never entered the production pool, so nothing to
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Mire Anvil (`2026-06-06-315`) — THE "split" fix: parchment was rendering as ONE corner tile [arb84 promoted]
+- Player screenshot (green title screen): a hard-edged **lighter rectangle pinned top-left** — the persistent "split"/"hard color border" they'd flagged across arb79→arb83. Vignette smoothing (Silt Anvil/314) was a red herring; the artifact survived it.
+- **Cause:** arb79 switched the parchment layer from `<ImageBackground resizeMode="repeat">` to a plain `<Image resizeMode="repeat">` (to dodge an iOS imageStyle-opacity bug). But a plain RN `<Image>` with `repeat` does **NOT** tile — it draws ONE 256px copy in the top-left corner. That lone bright tile WAS the "split."
+- **Fix:** reverted parchment to `<ImageBackground resizeMode="repeat">` (tiles reliably cross-platform) with `opacity` on the **container** style (`StyleSheet.absoluteFill`) instead of `imageStyle` — so it both tiles AND dims reliably (iOS ignored imageStyle opacity, the reason arb79 went to `<Image>`). Removed the orphaned `parchmentImg` style.
+- **Files:** `App.tsx`, `app/buildInfo.ts`, `app/buildCodename.ts` (Mire Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
+
 #### Silt Anvil (`2026-06-06-314`) — vignette → continuous smooth gradient (kill hard color border) [arb83 promoted]
 - Player (likes the floating cards on color): bg gradient had a "hard color border where the gradient is gone." Cause: vignette PNG had a flat transparent center (~55%) then a ramp → perceptible hard edge/band. Regenerated as a fully continuous smooth gradient (`a=(d^1.35)*128` center→corner) + dithering (kills banding). No flat zone, no band, no hard border.
 - **Files:** `assets/textures/vignette.png`, `app/buildInfo.ts`, `app/buildCodename.ts` (Silt Anvil), `docs/build-codenames.md`, `HANDOFF.md`.

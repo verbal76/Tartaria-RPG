@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, AppState, Platform, StatusBar as RNStatusBar, Keyboard, Image, type AppStateStatus } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, AppState, Platform, StatusBar as RNStatusBar, Keyboard, Image, ImageBackground, type AppStateStatus } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 // expo-navigation-bar is a NATIVE module — only present in APKs built
 // after it was added. Loaded via lazy require() inside the effect
@@ -571,11 +571,13 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
           the bars. Umber base (styles.root) → faint tiled parchment (~5%) →
           radial vignette that darkens the margins but keeps the center clear.
           pointerEvents none so it never eats a touch. */}
-      {/* arb79 — parchment as a plain <Image> with STYLE opacity. iOS was not
-          honoring ImageBackground's imageStyle opacity, so the cream texture
-          rendered near-full and lightened the margins to tan (and the Paper
-          slider did nothing). style opacity dims reliably. */}
-      <Image
+      {/* arb84 — parchment tiles via ImageBackground (a plain <Image> with
+          resizeMode="repeat" does NOT tile — it draws ONE 256px copy in the
+          top-left corner, which read as a hard-edged lighter rectangle / the
+          "color split"). ImageBackground tiles reliably; opacity goes on the
+          CONTAINER style (not imageStyle, which iOS ignored) so it dims
+          reliably AND repeats. */}
+      <ImageBackground
         source={require('./assets/textures/parchment.png')}
         resizeMode="repeat"
         style={[StyleSheet.absoluteFill, { opacity: display.textureOpacity }]}
@@ -632,9 +634,6 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#241C17', // warm umber — lightened ~18% from #1A1412 (player: too dark)
-  },
-  parchmentImg: {
-    opacity: 0.06, // faint aged-paper grain; a touch warmer than the first cut
   },
   // safe is now transparent so the root's artifact background shows through.
   safe: {

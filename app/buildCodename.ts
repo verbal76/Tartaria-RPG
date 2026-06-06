@@ -105,6 +105,11 @@ const CODENAMES: Record<string, string> = {
   // Vignette → continuous smooth gradient (was flat-center + ramp = hard
   // border/band). Dithered. No hard color border in the bg gradient.
   '2026-06-06-314': 'Silt Anvil',
+  // THE split fix: parchment was a plain <Image resizeMode="repeat"> which
+  // does NOT tile — drew ONE 256px corner copy = the lighter top-left
+  // rectangle the player kept pointing at. Back to <ImageBackground> (tiles)
+  // with opacity on the container style (dims reliably; iOS ignored imageStyle).
+  '2026-06-06-315': 'Mire Anvil',
   '2026-06-03-301': 'Tungsten Spire',
   // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted
   // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).
