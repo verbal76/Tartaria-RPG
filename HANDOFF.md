@@ -393,6 +393,10 @@ sit. The Flint Coil id/codename never entered the production pool, so nothing to
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Clay Anvil (`2026-06-06-308`) — aesthetic tune (lighten umber + soften vignette) + iPad top-clip fix [arb77 promoted]
+- Player: artifact background reads "too dark chocolate brown" → lighten ~18%, and iPad portrait clips the settings-gear top edge. Base `#1A1412`→`#241C17`; parchment 0.05→0.06; vignette regenerated lighter + softer; top-padding floor `Math.max(insets.top, 14)` (iPad portrait status-bar-hidden tiny inset; notched iPhones unaffected).
+- **Files:** `App.tsx`, `app/theme/colors.ts`, `assets/textures/vignette.png`, `app/buildInfo.ts`, `app/buildCodename.ts` (Clay Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
+
 #### Umber Anvil (`2026-06-06-307`) — "aged artifact" background, Phase-1 prototype (Exploration) [arb76 promoted]
 - **WHAT.** Player: background too dark/oppressive → warm umber "lost Tartarian ledger" look. Phase-1 prototype on Exploration to eval the direction before full rollout.
 - **DONE (OTA).** New `app/theme/colors.ts` palette. `App.tsx` AppShell root layers full-bleed umber base (#1A1412) + tiled parchment (`assets/textures/parchment.png` @5%, repeat) + radial vignette (`assets/textures/vignette.png`, clear center → dark margins), behind everything, outside safe-area padding, non-interactive. Exploration container + feed transparent so it shows through behind the log. Textures generated procedurally; ship via OTA as bundled assets.

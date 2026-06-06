@@ -6,7 +6,7 @@
 // (parchment + vignette) live in App.tsx's AppShell. Full rollout to the other
 // screens is Phase 2.
 export const theme = {
-  base: '#1A1412',          // deep espresso umber — the root background
+  base: '#241C17',          // warm umber — the root background (lightened from #1A1412)
   surface: 'rgba(32,24,20,0.62)', // translucent umber card, lets the texture show
   surfaceSolid: '#211A16',
   ink: '#EAE0C8',           // faded-cream body text (was harsh near-white)

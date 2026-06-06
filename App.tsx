@@ -508,7 +508,11 @@ class ScreenErrorBoundary extends React.Component<
 function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>['currentScreen'] }) {
   const insets = useSafeAreaInsets();
   // OTA 023 — see prior comment for why insets are trusted directly.
-  const top = insets.top;
+  // arb77 — top-padding FLOOR. iPad in portrait (status bar hidden) reports a
+  // tiny/zero top inset, so the top row (settings gear) clipped against the
+  // physical edge. Math.max(top, 14) gives a small floor that fixes iPad
+  // portrait without over-padding notched iPhones (their top inset >> 14).
+  const top = Math.max(insets.top, 14);
   const bottom = insets.bottom;
   // OTA 23-005 — global responsive scale. useWindowDimensions inside
   // useUiScale is reactive: orientation flips, foldable splits, and
@@ -618,10 +622,10 @@ const styles = StyleSheet.create({
   // arb76 — root holds the umber base + full-bleed background layers.
   root: {
     flex: 1,
-    backgroundColor: '#1A1412', // deep espresso umber (was #0a0908 near-black)
+    backgroundColor: '#241C17', // warm umber — lightened ~18% from #1A1412 (player: too dark)
   },
   parchmentImg: {
-    opacity: 0.05, // faint aged-paper grain; practically invisible until looked at
+    opacity: 0.06, // faint aged-paper grain; a touch warmer than the first cut
   },
   // safe is now transparent so the root's artifact background shows through.
   safe: {
