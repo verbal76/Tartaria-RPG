@@ -36,6 +36,7 @@ import { BrandedModal } from '../components/BrandedModal';
 import { BugReportModal } from '../components/BugReportModal';
 import { InvitePlaytesterModal } from '../components/InvitePlaytesterModal';
 import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
+import { composeAndSendBugReport } from '../diagnostics/bugReport';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
@@ -411,6 +412,19 @@ export function TitleScreen() {
   //       unmistakable (previous wording was a parenthetical that
   //       at least one tester missed entirely).
   const sendBugReport = async (args: {
+    slot: SlotSummary | null;
+    description: string;
+  }): Promise<void> => {
+    // arb75 — compose+send moved to the shared diagnostics/bugReport module so
+    // the in-game Settings (About) screen can file the same report (now bundling
+    // VOICE + device + log into one clipboard copy). UI flash state stays here.
+    await composeAndSendBugReport(args);
+    setBugReportOpen(false);
+    setBugReportSent(true);
+    setTimeout(() => setBugReportSent(false), 2200);
+  };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _legacySendBugReport = async (args: {
     slot: SlotSummary | null;
     description: string;
   }): Promise<void> => {

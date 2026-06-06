@@ -393,6 +393,12 @@ sit. The Flint Coil id/codename never entered the production pool, so nothing to
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Flint Anvil (`2026-06-06-306`) — Investigate cap 10→5 + bug report on Settings screen (bundles voice+device+log) [arb74+arb75 promoted]
+- **Investigate cap (arb74).** `buildChipPool` `.slice(0, 10)` → `.slice(0, 5)` (playtester "had close to ten").
+- **Bug report (arb75).** Player ask: bug-report button on Settings + one report covering voice/about/logs (no three-place paste). Chose "OTA now, native later". Extracted the composer to `app/diagnostics/bugReport.ts` (`composeAndSendBugReport`) with a folded **VOICE** block (engine / kokoro state / TTS route log / errors) alongside device + log → one clipboard copy, one paste. Added a **REPORT A BUG** button to Settings (About) → SESSION; TitleScreen uses the shared composer too.
+- **Deferred (native build):** `expo-mail-composer` for true zero-paste (email body pre-filled) — needs an AAB/IPA rebuild. (`mailto:` can't carry a 40KB log.)
+- **Files:** `app/screens/ExplorationScreen.tsx`, `app/diagnostics/bugReport.ts` (NEW), `app/screens/TitleScreen.tsx`, `app/screens/AboutScreen.tsx`, `app/buildInfo.ts`, `app/buildCodename.ts` (Flint Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
+
 #### Basalt Anvil (`2026-06-06-305`) — iOS door popup THE fix: native `<Modal>` presents INVISIBLY on iPad → render in-tree [arb73 promoted]
 - **WHAT.** Slate Anvil (304) reached the iPad (bug report confirms) and STILL failed — popup hidden AND EXIT/room buttons dead, player fully stuck. The native RN `<Modal>` presents **invisibly** on this iPad: renders nothing but its transparent backdrop eats every touch, blocking the buttons underneath.
 - **FIX (= arb73).** `BrandedModal` gains an **`inline`** prop → renders the popup as an in-tree **absolute overlay** (`position:absolute`, full-screen, `zIndex:9999`) instead of a native `<Modal>`. Card content extracted to a shared `cardChildren` (identical styling both paths). The tutorial door popup passes `inline={Platform.OS === 'ios'}`; Android keeps the native Modal.

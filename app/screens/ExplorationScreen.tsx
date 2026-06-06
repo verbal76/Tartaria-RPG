@@ -1528,5 +1528,9 @@ function buildChipPool(
     const primary = h.nouns?.[0];
     if (primary) push(primary);
   }
-  return out.slice(0, 10);
+  // arb74 — cap the Investigate chip pool at 5 (was 10; playtester had
+  // "close to ten"). Ambient nouns come first, then unresolved-hook primaries,
+  // so the most relevant 5 survive. The pinned surface chip (the ground/floor/
+  // mud) is added separately in the render, so the row shows ~5-6 total.
+  return out.slice(0, 5);
 }

@@ -16,7 +16,11 @@ import {
   getLastLogWriteError,
   clearLastLogWriteError,
   clearActiveSlotLog,
+  listSlots,
+  type SlotSummary,
 } from '../engine/saveSystem';
+import { BugReportModal } from '../components/BugReportModal';
+import { composeAndSendBugReport } from '../diagnostics/bugReport';
 import { getAudioSettings, setAudioSettings, onAudioSettingsChange, type AudioSettings } from '../audio/audioSettings';
 import { forceReapplyAudioFromState } from '../audio/AudioController';
 import {
@@ -61,6 +65,16 @@ export function AboutScreen() {
   const [voiceCopied, setVoiceCopied] = useState(false);
   const [kokoroCacheCleared, setKokoroCacheCleared] = useState(false);
   const [kokoroCache, setKokoroCache] = useState<ExecutorchCacheEntry[]>([]);
+  // arb75 — in-game bug report (Settings/About). Loads slots so the report can
+  // attach the current character's log; composeAndSendBugReport bundles VOICE +
+  // device + log into one clipboard copy.
+  const [bugReportOpen, setBugReportOpen] = useState(false);
+  const [bugReportSlots, setBugReportSlots] = useState<SlotSummary[]>([]);
+  useEffect(() => {
+    let live = true;
+    void listSlots().then((s) => { if (live) setBugReportSlots(s); }).catch(() => {});
+    return () => { live = false; };
+  }, []);
   // v2.4.1 (OTA 047) — SESSION tab added and made the first thing
   // seen when the gear opens. Holds save & exit, copy log, and
   // clear log — the three actions that previously cluttered the
@@ -610,6 +624,16 @@ export function AboutScreen() {
               {invCopied ? `✓ ${invCharCount.toLocaleString()} CHARS` : 'COPY INVENTORY'}
             </Text>
           </TouchableOpacity>
+          {/* arb75 — REPORT A BUG. One report bundling voice + device + log
+              (no more separate COPY VOICE / COPY LOG). Opens the same
+              BugReportModal the Title screen uses. */}
+          <TouchableOpacity
+            style={[styles.sessionBtn, styles.sessionBtnPrimary, { marginTop: 8 }]}
+            onPress={() => setBugReportOpen(true)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.sessionBtnPrimaryText}>REPORT A BUG</Text>
+          </TouchableOpacity>
           <Text style={styles.sessionFootnote}>
             COPY LOG drops the full disk log on the clipboard. Long-press it in the
             in-game menu (or use the LOG screen) for the share + chunked-paste view.
@@ -984,6 +1008,16 @@ export function AboutScreen() {
       {/* OTA 007 — UPDATE button + busy overlay moved to TitleScreen
           (under Lore Codex) so the player can pull updates from the
           main screen without opening settings. */}
+
+      {/* arb75 — in-game bug report (bundles voice + device + log into one
+          clipboard copy → one paste). Native zero-paste (mail-composer) is
+          a follow-up build. */}
+      <BugReportModal
+        visible={bugReportOpen}
+        slots={bugReportSlots}
+        onCancel={() => setBugReportOpen(false)}
+        onSend={(args) => { void composeAndSendBugReport(args); setBugReportOpen(false); }}
+      />
     </View>
   );
 }

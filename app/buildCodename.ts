@@ -79,6 +79,9 @@ const CODENAMES: Record<string, string> = {
   // iOS door popup THE fix — native <Modal> presents invisibly on iPad; render
   // the door popup as an in-tree overlay (BrandedModal inline mode) on iOS.
   '2026-06-06-305': 'Basalt Anvil',
+  // Investigate chip cap 10→5 + bug report on Settings screen (bundles
+  // voice+device+log into one report).
+  '2026-06-06-306': 'Flint Anvil',
   '2026-06-03-301': 'Tungsten Spire',
   // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted
   // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).
