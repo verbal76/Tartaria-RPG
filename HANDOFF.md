@@ -393,6 +393,12 @@ sit. The Flint Coil id/codename never entered the production pool, so nothing to
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Slate Anvil (`2026-06-06-304`) — iOS door leave/stay popup STILL never appeared (native `<Modal>` present-during-transition race) [arb72 promoted]
+- **WHAT.** Onyx Anvil (303) reached the iPad (verified: About showed "Onyx") and fixed the keyboard, but the leave/stay popup STILL never fired. So it's not the keyboard — it's a native RN `<Modal>` whose `visible` flipped true *during the beat transition* (store-driven re-render with the keyboard still dismissing from the typed "investigate door"); iOS silently refuses to present a `<Modal>` in that window. Take/Salvage/Climb modals work because the player taps them on a clean frame.
+- **FIX (= arb72).** A local `doorModalVisible` state drives the modal's `visible`. On the `explore_or_leave` beat: dismiss the keyboard, then flip `doorModalVisible` true on a **~450ms** timer so iOS presents over a settled, keyboard-free frame (`ExplorationScreen`).
+- **Verification.** `tsc --noEmit` clean. Ships as a preview→ios OTA (route fixed in OTA-303). On-device pending. Fallback if it still fails: replace the door `BrandedModal` with a non-native absolute overlay.
+- **Files:** `app/screens/ExplorationScreen.tsx` (from arb72), `app/buildInfo.ts`, `app/buildCodename.ts` (Slate Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
+
 #### Onyx Anvil (`2026-06-05-303`) — iOS tutorial keyboard fixes promoted to production + iOS OTA route fix
 - **WHAT.** iPad TestFlight (build 29 / Ember Anvil) tutorial bugs: ghost input bar stuck mid-screen, keyboard over the Climb modal, and the leave/stay **door popup never appeared** (tutorial stall) though the beat fired. See Pewter Goblet (arb71) for full root-cause; promoted here as code + delivery.
 - **CODE FIX (= arb71).** `ExplorationScreen` widens the floating `KeyboardInputBar` stand-down to the climb/take pickers + the `explore_or_leave` door beat and `Keyboard.dismiss()`es on open, so the autoFocus bar unmounts (releases focus) and the native door `<Modal>` can present on iOS. `KeyboardInputBar` treats an off-screen keyboard frame (`screenY >= window height`) as a hide so the offset zeroes (kills the ghost bar + stops the autoFocus re-grab).

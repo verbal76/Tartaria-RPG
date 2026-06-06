@@ -12505,4 +12505,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // ExplorationScreen + KeyboardInputBar. (2) The iOS TestFlight build polls the
 // "preview" channel but HaL2001 only published "hal2001", so OTAs never reached
 // iOS ("Last OTA applied: No"); eas-update.yml now also publishes preview→ios.
-export const OTA_BUILD_ID = '2026-06-05-303';
+//
+// OTA-304 — iOS door-popup fix pt.2 (arb72). Onyx Anvil (303) reached the iPad
+// and fixed the keyboard, but the leave/stay popup STILL never appeared: it's a
+// native <Modal> whose `visible` flipped true mid beat-transition (keyboard
+// still dismissing from the typed "investigate door"), and iOS refuses to
+// present a <Modal> in that window. Fix: a local `doorModalVisible` state now
+// drives the modal — on the door beat, dismiss the keyboard then flip it true
+// on a ~450ms timer so iOS presents over a clean, settled frame.
+export const OTA_BUILD_ID = '2026-06-06-304';

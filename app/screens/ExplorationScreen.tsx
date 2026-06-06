@@ -124,6 +124,22 @@ export function ExplorationScreen() {
     if (anyPopupOpen) Keyboard.dismiss();
   }, [searchOpen, approachOpen, askArbiterOpen, salvageOpen, climbOpen, takeOpen, doorBeatOpen, setInputModalOpen]);
   useEffect(() => () => setInputModalOpen(false), [setInputModalOpen]);
+  // arb72 (iOS door-popup fix) — the leave/stay popup is a native <Modal>, and
+  // its `visible` used to flip true the instant the explore_or_leave beat
+  // advanced (mid store-driven re-render, with the keyboard still dismissing
+  // from the typed "investigate door"). iOS silently refuses to present a
+  // <Modal> in that window, so the popup never appeared even though the beat
+  // fired (confirmed on Onyx Anvil / OTA-303). Decouple the present: when the
+  // door beat opens, dismiss the keyboard, then flip a LOCAL visible flag a
+  // beat later so iOS presents over a clean, settled frame. (The Take/Salvage/
+  // Climb modals work because the player taps them on an already-clean frame.)
+  const [doorModalVisible, setDoorModalVisible] = useState(false);
+  useEffect(() => {
+    if (!doorBeatOpen) { setDoorModalVisible(false); return; }
+    Keyboard.dismiss();
+    const t = setTimeout(() => setDoorModalVisible(true), 450);
+    return () => clearTimeout(t);
+  }, [doorBeatOpen]);
   // 2026-05-25 — branded vendor-leave prompt (POLISH-4). Replaces
   // the native Alert that was breaking the dark+amber palette. Holds
   // {vendorName, pendingText} so confirmation dispatches the
@@ -1217,7 +1233,7 @@ export function ExplorationScreen() {
           the player can free-roam. Dismissing (scrim tap) defaults to the
           less-final EXPLORE choice. */}
       <BrandedModal
-        visible={tutBeat === 'explore_or_leave' && !tutorialExploreChosen}
+        visible={doorModalVisible}
         title="The Door Is Open"
         body="The outpost door stands open. Pick through what's left of this place, or step out and begin your journey. You can always leave later — just type 'leave outpost' or tap EXIT."
         buttons={[

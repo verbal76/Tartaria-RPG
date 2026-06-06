@@ -73,6 +73,9 @@ const CODENAMES: Record<string, string> = {
   // iOS tutorial keyboard fixes (door popup / climb modal / ghost bar) +
   // iOS OTA route fix (publish preview→ios so the iOS build receives OTAs).
   '2026-06-05-303': 'Onyx Anvil',
+  // iOS door-popup fix pt.2 — decouple the native <Modal> present from the
+  // beat transition (dismiss keyboard, then present on a clean frame ~450ms).
+  '2026-06-06-304': 'Slate Anvil',
   '2026-06-03-301': 'Tungsten Spire',
   // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted
   // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).
