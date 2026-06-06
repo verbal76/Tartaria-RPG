@@ -1234,6 +1234,7 @@ export function ExplorationScreen() {
           less-final EXPLORE choice. */}
       <BrandedModal
         visible={doorModalVisible}
+        inline={Platform.OS === 'ios'}
         title="The Door Is Open"
         body="The outpost door stands open. Pick through what's left of this place, or step out and begin your journey. You can always leave later — just type 'leave outpost' or tap EXIT."
         buttons={[

@@ -52,6 +52,12 @@ interface Props {
     onChange: (v: number) => void;
   };
   buttons: BrandedModalButton[];
+  /** arb73 — render in-tree (absolute overlay) instead of a native <Modal>.
+   *  iPad/iOS can present a native <Modal> INVISIBLY (renders nothing but its
+   *  backdrop still eats touches), which both hid the door popup AND blocked
+   *  the EXIT/room buttons under it. An in-tree overlay always renders and is
+   *  tappable. Used for the tutorial door (no text field). */
+  inline?: boolean;
   onRequestClose: () => void;
 }
 
@@ -67,8 +73,106 @@ export function BrandedModal({
   textInput,
   quantityStepper,
   buttons,
+  inline,
   onRequestClose,
 }: Props) {
+  // Card content shared by the native-Modal path and the inline-overlay path.
+  const cardChildren = (
+    <>
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>{title.toUpperCase()}</Text>
+        <View style={styles.ruleLine} />
+      </View>
+
+      {itemPreview ? (
+        <View style={styles.itemBlock}>
+          <View style={styles.itemHead}>
+            <Text style={styles.itemName} numberOfLines={2}>
+              {itemPreview.name}
+            </Text>
+            {itemPreview.rarity && (
+              <Text style={[styles.rarity, rarityColor(itemPreview.rarity)]}>
+                {itemPreview.rarity}
+              </Text>
+            )}
+          </View>
+          <Text style={styles.itemKind}>{itemPreview.kindLabel}</Text>
+          {itemPreview.stats.length > 0 && (
+            <View style={styles.statsBlock}>
+              {itemPreview.stats.map((s) => (
+                <Text key={s} style={styles.statLine}>· {s}</Text>
+              ))}
+            </View>
+          )}
+          {itemPreview.description ? (
+            <Text style={styles.itemDesc}>"{itemPreview.description}"</Text>
+          ) : null}
+        </View>
+      ) : null}
+
+      {body ? <Text style={styles.body}>{body}</Text> : null}
+      {contextLine ? <Text style={styles.context}>{contextLine}</Text> : null}
+      {textInput ? (
+        <TextInput
+          style={styles.input}
+          value={textInput.value}
+          onChangeText={textInput.onChangeText}
+          placeholder={textInput.placeholder}
+          placeholderTextColor="#c9a86a"
+          autoFocus={textInput.autoFocus}
+          selectionColor="#c9a86a"
+        />
+      ) : null}
+      {quantityStepper ? (
+        <View style={styles.stepperRow}>
+          <Text style={styles.stepperLabel}>{quantityStepper.label}</Text>
+          <View style={{ flex: 1, alignItems: 'flex-end' }}>
+            <NumberStepper
+              value={quantityStepper.value}
+              min={quantityStepper.min}
+              max={quantityStepper.max}
+              step={1}
+              decimals={0}
+              onChange={quantityStepper.onChange}
+            />
+          </View>
+        </View>
+      ) : null}
+
+      <View style={styles.buttonRow}>
+        {buttons.map((b) => (
+          <Pressable
+            key={b.label}
+            style={({ pressed }) => [
+              styles.btn,
+              toneStyle(b.tone),
+              pressed && styles.btnPressed,
+            ]}
+            onPress={b.onPress}
+          >
+            <Text style={[styles.btnText, toneText(b.tone)]}>{b.label.toUpperCase()}</Text>
+          </Pressable>
+        ))}
+      </View>
+    </>
+  );
+  // arb73 — inline overlay path: skip the native <Modal> entirely (iPad can
+  // present it invisibly while still eating touches). Render nothing when
+  // hidden; otherwise an absolute full-screen overlay in the normal tree.
+  if (inline) {
+    if (!visible) return null;
+    return (
+      <View style={styles.inlineScrim} pointerEvents="box-none">
+        <TouchableWithoutFeedback onPress={onRequestClose}>
+          <KeyboardAvoidingView style={styles.scrim} behavior="padding">
+            <TouchableWithoutFeedback>
+              <View style={styles.card}>{cardChildren}</View>
+            </TouchableWithoutFeedback>
+          </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
+      </View>
+    );
+  }
   return (
     <Modal
       visible={visible}
@@ -82,83 +186,7 @@ export function BrandedModal({
             the soft keyboard so an open text field is always visible. */}
         <KeyboardAvoidingView style={styles.scrim} behavior="padding">
           <TouchableWithoutFeedback>
-            <View style={styles.card}>
-              <View style={styles.headerRow}>
-                <Text style={styles.title}>{title.toUpperCase()}</Text>
-                <View style={styles.ruleLine} />
-              </View>
-
-              {itemPreview ? (
-                <View style={styles.itemBlock}>
-                  <View style={styles.itemHead}>
-                    <Text style={styles.itemName} numberOfLines={2}>
-                      {itemPreview.name}
-                    </Text>
-                    {itemPreview.rarity && (
-                      <Text style={[styles.rarity, rarityColor(itemPreview.rarity)]}>
-                        {itemPreview.rarity}
-                      </Text>
-                    )}
-                  </View>
-                  <Text style={styles.itemKind}>{itemPreview.kindLabel}</Text>
-                  {itemPreview.stats.length > 0 && (
-                    <View style={styles.statsBlock}>
-                      {itemPreview.stats.map((s) => (
-                        <Text key={s} style={styles.statLine}>· {s}</Text>
-                      ))}
-                    </View>
-                  )}
-                  {itemPreview.description ? (
-                    <Text style={styles.itemDesc}>"{itemPreview.description}"</Text>
-                  ) : null}
-                </View>
-              ) : null}
-
-              {body ? <Text style={styles.body}>{body}</Text> : null}
-              {contextLine ? <Text style={styles.context}>{contextLine}</Text> : null}
-              {textInput ? (
-                <TextInput
-                  style={styles.input}
-                  value={textInput.value}
-                  onChangeText={textInput.onChangeText}
-                  placeholder={textInput.placeholder}
-                  placeholderTextColor="#c9a86a"
-                  autoFocus={textInput.autoFocus}
-                  selectionColor="#c9a86a"
-                />
-              ) : null}
-              {quantityStepper ? (
-                <View style={styles.stepperRow}>
-                  <Text style={styles.stepperLabel}>{quantityStepper.label}</Text>
-                  <View style={{ flex: 1, alignItems: 'flex-end' }}>
-                    <NumberStepper
-                      value={quantityStepper.value}
-                      min={quantityStepper.min}
-                      max={quantityStepper.max}
-                      step={1}
-                      decimals={0}
-                      onChange={quantityStepper.onChange}
-                    />
-                  </View>
-                </View>
-              ) : null}
-
-              <View style={styles.buttonRow}>
-                {buttons.map((b) => (
-                  <Pressable
-                    key={b.label}
-                    style={({ pressed }) => [
-                      styles.btn,
-                      toneStyle(b.tone),
-                      pressed && styles.btnPressed,
-                    ]}
-                    onPress={b.onPress}
-                  >
-                    <Text style={[styles.btnText, toneText(b.tone)]}>{b.label.toUpperCase()}</Text>
-                  </Pressable>
-                ))}
-              </View>
-            </View>
+            <View style={styles.card}>{cardChildren}</View>
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
@@ -198,6 +226,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
+  },
+  // arb73 — absolute full-screen layer for the inline (non-Modal) path. Fills
+  // the parent and floats above the scene content via a high zIndex so the
+  // popup renders and is tappable without relying on iOS native Modal
+  // presentation (which can present invisibly on iPad).
+  inlineScrim: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 9999,
+    elevation: 9999,
   },
   card: {
     width: '100%',

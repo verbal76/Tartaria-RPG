@@ -393,6 +393,13 @@ sit. The Flint Coil id/codename never entered the production pool, so nothing to
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Basalt Anvil (`2026-06-06-305`) — iOS door popup THE fix: native `<Modal>` presents INVISIBLY on iPad → render in-tree [arb73 promoted]
+- **WHAT.** Slate Anvil (304) reached the iPad (bug report confirms) and STILL failed — popup hidden AND EXIT/room buttons dead, player fully stuck. The native RN `<Modal>` presents **invisibly** on this iPad: renders nothing but its transparent backdrop eats every touch, blocking the buttons underneath.
+- **FIX (= arb73).** `BrandedModal` gains an **`inline`** prop → renders the popup as an in-tree **absolute overlay** (`position:absolute`, full-screen, `zIndex:9999`) instead of a native `<Modal>`. Card content extracted to a shared `cardChildren` (identical styling both paths). The tutorial door popup passes `inline={Platform.OS === 'ios'}`; Android keeps the native Modal.
+- **Verification.** `tsc --noEmit` clean. Ships via the preview→ios OTA route. On-device pending.
+- **Separate iOS issue (not the blocker):** iPad report shows `Qwen: Load failed: Failed to load the model` — on-device LLM won't load on iPad; Arbiter narration falls back to canned lines (tutorial unaffected). Track separately.
+- **Files:** `app/components/BrandedModal.tsx`, `app/screens/ExplorationScreen.tsx` (from arb73), `app/buildInfo.ts`, `app/buildCodename.ts` (Basalt Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
+
 #### Slate Anvil (`2026-06-06-304`) — iOS door leave/stay popup STILL never appeared (native `<Modal>` present-during-transition race) [arb72 promoted]
 - **WHAT.** Onyx Anvil (303) reached the iPad (verified: About showed "Onyx") and fixed the keyboard, but the leave/stay popup STILL never fired. So it's not the keyboard — it's a native RN `<Modal>` whose `visible` flipped true *during the beat transition* (store-driven re-render with the keyboard still dismissing from the typed "investigate door"); iOS silently refuses to present a `<Modal>` in that window. Take/Salvage/Climb modals work because the player taps them on a clean frame.
 - **FIX (= arb72).** A local `doorModalVisible` state drives the modal's `visible`. On the `explore_or_leave` beat: dismiss the keyboard, then flip `doorModalVisible` true on a **~450ms** timer so iOS presents over a settled, keyboard-free frame (`ExplorationScreen`).

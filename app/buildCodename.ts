@@ -76,6 +76,9 @@ const CODENAMES: Record<string, string> = {
   // iOS door-popup fix pt.2 — decouple the native <Modal> present from the
   // beat transition (dismiss keyboard, then present on a clean frame ~450ms).
   '2026-06-06-304': 'Slate Anvil',
+  // iOS door popup THE fix — native <Modal> presents invisibly on iPad; render
+  // the door popup as an in-tree overlay (BrandedModal inline mode) on iOS.
+  '2026-06-06-305': 'Basalt Anvil',
   '2026-06-03-301': 'Tungsten Spire',
   // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted
   // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).
