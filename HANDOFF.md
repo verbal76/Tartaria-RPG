@@ -393,6 +393,10 @@ sit. The Flint Coil id/codename never entered the production pool, so nothing to
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Silt Anvil (`2026-06-06-314`) — vignette → continuous smooth gradient (kill hard color border) [arb83 promoted]
+- Player (likes the floating cards on color): bg gradient had a "hard color border where the gradient is gone." Cause: vignette PNG had a flat transparent center (~55%) then a ramp → perceptible hard edge/band. Regenerated as a fully continuous smooth gradient (`a=(d^1.35)*128` center→corner) + dithering (kills banding). No flat zone, no band, no hard border.
+- **Files:** `assets/textures/vignette.png`, `app/buildInfo.ts`, `app/buildCodename.ts` (Silt Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
+
 #### Marsh Anvil (`2026-06-06-313`) — Phase-2: all screens transparent (no background seams anywhere) [arb82 promoted]
 - Player: "smooth background with no hard seams." Swept all 14 screen root containers `backgroundColor: '#0a0908' → 'transparent'` so the AppShell umber+parchment+vignette is the single continuous background app-wide. Inner cards keep their own backgrounds; only the opaque root slab went transparent → the safe-area-inset seam is gone on every screen.
 - **Note.** Screens built for dark bg; extreme Brightness/Hue could lower card/text contrast — add slider limits later if it becomes an issue.

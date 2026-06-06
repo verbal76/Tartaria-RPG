@@ -102,6 +102,9 @@ const CODENAMES: Record<string, string> = {
   // Phase-2 rollout: ALL screen container roots → transparent so the shell
   // artifact bg is continuous everywhere (no hard seams on any screen).
   '2026-06-06-313': 'Marsh Anvil',
+  // Vignette → continuous smooth gradient (was flat-center + ramp = hard
+  // border/band). Dithered. No hard color border in the bg gradient.
+  '2026-06-06-314': 'Silt Anvil',
   '2026-06-03-301': 'Tungsten Spire',
   // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted
   // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).
