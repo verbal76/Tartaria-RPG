@@ -393,6 +393,10 @@ sit. The Flint Coil id/codename never entered the production pool, so nothing to
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Ochre Anvil (`2026-06-06-310`) — fix background light-tan margins / "blocky" (parchment opacity not applying on iOS) [arb79 promoted]
+- Player screenshot (iPad title): light-tan side margins + hard dark center rectangle. Cause: `ImageBackground` `imageStyle={{opacity}}` not dimming the parchment on iOS → cream rendered ~full. Fix: parchment → plain `<Image>` with `style` opacity. Margins back to dark umber + faint grain; Paper slider works. Remaining "blocky" center = Title screen's own opaque card → Phase-2 (transparent screens).
+- **Files:** `App.tsx`, `app/buildInfo.ts`, `app/buildCodename.ts` (Ochre Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
+
 #### Sienna Anvil (`2026-06-06-309`) — player-tunable background (Settings → DISPLAY tab) [arb78 promoted]
 - Player: control the background — color/tone/opacity. New `app/ui/displaySettings.ts` (persisted + reactive, mirrors voiceSettings): `bgHue`/`bgSat`/`bgLight`/`textureOpacity`/`vignetteStrength` + `hslToHex`; defaults = current look. AppShell applies them **live** via `useDisplaySettings()`. New DISPLAY tab on Settings with sliders (Brightness / Hue / Color richness / Paper texture / Edge shadow) + RESET.
 - **Files:** `app/ui/displaySettings.ts` (NEW), `App.tsx`, `app/screens/AboutScreen.tsx`, `app/buildInfo.ts`, `app/buildCodename.ts` (Sienna Anvil), `docs/build-codenames.md`, `HANDOFF.md`.

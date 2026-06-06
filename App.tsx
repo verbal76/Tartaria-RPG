@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, StyleSheet, AppState, Platform, StatusBar as RNStatusBar, Keyboard, ImageBackground, Image, type AppStateStatus } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, AppState, Platform, StatusBar as RNStatusBar, Keyboard, Image, type AppStateStatus } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 // expo-navigation-bar is a NATIVE module — only present in APKs built
 // after it was added. Loaded via lazy require() inside the effect
@@ -571,11 +571,14 @@ function AppShell({ screen }: { screen: ReturnType<typeof useGameStore.getState>
           the bars. Umber base (styles.root) → faint tiled parchment (~5%) →
           radial vignette that darkens the margins but keeps the center clear.
           pointerEvents none so it never eats a touch. */}
-      <ImageBackground
+      {/* arb79 — parchment as a plain <Image> with STYLE opacity. iOS was not
+          honoring ImageBackground's imageStyle opacity, so the cream texture
+          rendered near-full and lightened the margins to tan (and the Paper
+          slider did nothing). style opacity dims reliably. */}
+      <Image
         source={require('./assets/textures/parchment.png')}
         resizeMode="repeat"
-        style={StyleSheet.absoluteFill}
-        imageStyle={{ opacity: display.textureOpacity }}
+        style={[StyleSheet.absoluteFill, { opacity: display.textureOpacity }]}
       />
       <Image
         source={require('./assets/textures/vignette.png')}

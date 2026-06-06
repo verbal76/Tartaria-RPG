@@ -90,6 +90,9 @@ const CODENAMES: Record<string, string> = {
   // Player-tunable background: Settings → DISPLAY tab (brightness/hue/richness/
   // paper-texture/edge-shadow sliders), persisted + live.
   '2026-06-06-309': 'Sienna Anvil',
+  // Fix: parchment rendered near-full on iOS → switched to <Image> style
+  // opacity. Margins were light tan; now dark umber + faint grain.
+  '2026-06-06-310': 'Ochre Anvil',
   '2026-06-03-301': 'Tungsten Spire',
   // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted
   // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).
