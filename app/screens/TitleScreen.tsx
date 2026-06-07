@@ -37,6 +37,7 @@ import { BugReportModal } from '../components/BugReportModal';
 import { InvitePlaytesterModal } from '../components/InvitePlaytesterModal';
 import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
 import { composeAndSendBugReport } from '../diagnostics/bugReport';
+import { loadCrashSave, clearCrashSave, buildCrashSaveExport, type CrashSaveCapture } from '../diagnostics/crashSave';
 import racesData from '../data/races/races.json';
 import locationsData from '../data/locations/locations.json';
 import { readSlotLog, type SlotSummary } from '../engine/saveSystem';
@@ -1118,6 +1119,11 @@ export function TitleScreen() {
             a concrete signal instead of "nothing happened". Tap to
             clear. */}
         <LastCrashLine />
+        {/* OTA-343 — if a crash captured the offending save's bytes,
+            offer a one-tap COPY CRASHED SAVE so the exact brick reaches
+            the dev for repro — including a corrupt save that can never
+            be loaded (and so can never be reached by COPY SAVE). */}
+        <CopyCrashedSaveLine />
         <Text style={[styles.footer, { color: mutedColor }]}>v{APP_VERSION}  /  2148</Text>
       </View>
 
@@ -1803,6 +1809,81 @@ const lastCrashStyles = StyleSheet.create({
   },
   title: { color: '#c97a7a', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
   message: { color: '#e6d8b3', fontSize: 11, marginTop: 2 },
+});
+
+// OTA-343 — COPY CRASHED SAVE surface. When a crash captured the offending
+// save's bytes (saveLoadHealth on a load-crash, or App.tsx's crash handlers
+// on a fatal/render crash), this shows a button that copies the EXACT save —
+// wrapped in the COPY SAVE export envelope — to the clipboard for repro. It
+// reaches even a corrupt save that can never be loaded (so COPY SAVE in
+// About can't reach it). Renders null when no crash save was captured.
+function CopyCrashedSaveLine(): React.ReactElement | null {
+  const [capture, setCapture] = useState<CrashSaveCapture | null>(null);
+  const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const cap = await loadCrashSave();
+      if (!cancelled) setCapture(cap);
+    })();
+    return () => { cancelled = true; };
+  }, []);
+  if (!capture) return null;
+  const ageMin = Math.max(1, Math.floor((Date.now() - capture.capturedAt) / 60000));
+  const bytes = capture.raw?.length ?? 0;
+  const doCopy = async () => {
+    try {
+      const stamped = buildCrashSaveExport(capture, buildBasicDeviceSummary());
+      await Clipboard.setStringAsync(stamped);
+      setCopied(true);
+    } catch {
+      /* clipboard unavailable — leave the button so a retry is possible */
+    }
+  };
+  return (
+    <View style={crashSaveStyles.pill}>
+      <Text style={crashSaveStyles.title}>
+        ⎘ CRASHED SAVE CAPTURED · {capture.stage} · {ageMin}m ago · {bytes} bytes
+      </Text>
+      <View style={crashSaveStyles.row}>
+        <TouchableOpacity onPress={() => void doCopy()} activeOpacity={0.7} style={crashSaveStyles.btn}>
+          <Text style={crashSaveStyles.btnText}>{copied ? '✓ COPIED' : 'COPY CRASHED SAVE'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => { void clearCrashSave(); setCapture(null); }}
+          activeOpacity={0.7}
+          style={[crashSaveStyles.btn, crashSaveStyles.btnGhost]}
+        >
+          <Text style={crashSaveStyles.btnText}>DISMISS</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+const crashSaveStyles = StyleSheet.create({
+  pill: {
+    borderColor: '#d8923c',
+    borderWidth: 1,
+    borderRadius: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginTop: 6,
+    marginHorizontal: 12,
+    backgroundColor: 'rgba(80,50,10,0.25)',
+  },
+  title: { color: '#d8923c', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+  row: { flexDirection: 'row', gap: 8, marginTop: 6 },
+  btn: {
+    borderColor: '#d8923c',
+    borderWidth: 1,
+    borderRadius: 3,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: '#2a1f12',
+  },
+  btnGhost: { backgroundColor: 'transparent' },
+  btnText: { color: '#e6d8b3', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
 });
 
 function KokoroDownloadBanner(): React.ReactElement | null {

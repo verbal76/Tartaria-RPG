@@ -599,8 +599,9 @@ export function AboutScreen() {
         <View style={styles.sessionCard}>
           <Text style={styles.sessionLabel}>RUN CONTROLS</Text>
           <Text style={styles.sessionHint}>
-            Save your progress, copy the on-disk log for sharing, or wipe the log
-            so the next paste-back contains only fresh activity.
+            Save your progress, export the log / your pack / your save for
+            sharing, or wipe the log so the next paste-back contains only
+            fresh activity.
           </Text>
 
           <TouchableOpacity

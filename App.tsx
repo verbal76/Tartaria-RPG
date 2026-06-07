@@ -117,6 +117,16 @@ try {
           }),
         ).catch(() => { /* ignore */ });
       } catch { /* ignore — AS not ready */ }
+      // OTA-343 — also snapshot the EXACT save bytes of the active slot so
+      // the next launch can COPY CRASHED SAVE for repro. Separate try so a
+      // failure here never blocks the lastCrash write above. Best-effort and
+      // fire-and-forget; captureActiveCrashSave never throws.
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const cs = require('./app/diagnostics/crashSave');
+        const stage = (globalThis as unknown as { __TARTARIA_BOOT_STAGE?: string }).__TARTARIA_BOOT_STAGE ?? 'unknown';
+        void cs.captureActiveCrashSave(`fatal:${stage}`);
+      } catch { /* ignore — module/AS not ready */ }
       const sinceBoot = Date.now() - bootTime;
       // OTA-237 — was sinceBoot > 5000. Cut to 800ms because the
       // current player crash repros within 1 second of title screen
@@ -335,6 +345,14 @@ export default function App() {
             }),
           ).catch(() => { /* ignore */ });
         } catch { /* ignore */ }
+        // OTA-343 — capture the crashing save bytes so the next launch can
+        // COPY CRASHED SAVE. A hydrate failure often IS a corrupt active
+        // save (the 338 brick), so this is the most important capture path.
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          const cs = require('./app/diagnostics/crashSave');
+          void cs.captureActiveCrashSave('hydrate:failed');
+        } catch { /* ignore */ }
       });
     return () => {
       stopAudioController();
@@ -467,6 +485,15 @@ class ScreenErrorBoundary extends React.Component<
     // Surface to the JS log so the next bug report COPY ALL captures it.
     // eslint-disable-next-line no-console
     console.warn('ScreenErrorBoundary caught:', error?.message, error?.stack);
+    // OTA-343 — a screen render crash is also a crash; capture the active
+    // save bytes so COPY CRASHED SAVE can export them next launch. The
+    // ScreenErrorBoundary shows a recovery card (not a process death), but
+    // the save that drove the bad render is exactly what we want for repro.
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const cs = require('./app/diagnostics/crashSave');
+      void cs.captureActiveCrashSave('screen-render');
+    } catch { /* ignore */ }
   }
   reset = () => this.setState({ error: null });
   render() {

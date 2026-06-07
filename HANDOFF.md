@@ -1,33 +1,47 @@
 # Tartaria Realms — Session Handoff
 
 > **READ FIRST — how we operate:** §P below is the single source of truth.
-> **ONE branch. ONE codename scheme. ONE OTA number.** Everything is built,
-> tested, committed, and pushed on **`HaL2001`** — and pushing `HaL2001` is what
-> publishes the OTA to the player's phone. There is no separate "dev" branch or
-> "Vault" codename anymore; that two-name dance only ever caused confusion (a
-> dev codename the player saw but that could never reach their device).
+> **ONE branch (`HaL2001`). ONE codename scheme (`<word> Anvil`). BATCH the
+> push (min 5), and the USER triggers it.** Everything is built, tested, and
+> committed on **`HaL2001`** — but pushing `HaL2001` is what publishes the OTA to
+> the player's phone, so we **accumulate ≥5 OTAs locally and only push when the
+> user says so** (see §P3a). We do NOT push singular OTAs anymore: pushing ~60
+> OTAs in a day is what set up the OTA-338 brick (a mid-session OTA apply during
+> a double-reload corrupted the live save).
 >
 > **The one branch:**
-> - **`HaL2001`** — the live branch (worktree **`/tmp/hal2001-rollback`**, which
->   now has `node_modules`, so `tsc` + `jest` run here). Pushing it fires
+> - **`HaL2001`** — the live working branch (work in a fresh `HaL2001` worktree;
+>   `npm ci` to get `node_modules` so `tsc` + `jest` run there). Pushing it fires
 >   `eas-update.yml` → **multi-channel publish to BOTH platforms**: `hal2001` +
 >   `preview` (Android) and `ios-preview` (iOS). Codenames are **`<word> Anvil`**;
 >   OTA ids are numeric **`YYYY-MM-DD-NNN`**. Its `app.json` carries the live
 >   channel/package/name (`hal2001` / `…hal2001` / "Tartaria Realms HAL") — never
->   change those.
-> - `arbiters-line` (Vault scheme) is **RETIRED** — a dead, no-publish scratch
->   branch. Do NOT commit there or mint Vault codenames. If you ever see two
->   codenames for one change, you've reintroduced the bug.
+>   change those. **`HaL2001` is kept as the conduit specifically because it owns
+>   the signed store workflows** — the production AAB (Google Play console) and
+>   the IPA (TestFlight). Everything we do must eventually land here and ship.
+> - `arbiters-line` was a **different build STYLE — an isolated proving line**
+>   (`<Gem> Vault` codenames, dead `arbiters-line` channel). Changes were
+>   developed/proven there, then **promoted (overwrote) onto `HaL2001`**, and
+>   `HaL2001` became the main working branch again (the Ember Anvil OTA-302
+>   production promotion). It is currently dormant — develop directly on
+>   `HaL2001`. (Lesson kept: never run TWO live codenames for one change — the
+>   Vault-name-the-player-sees-but-can't-receive confusion is the trap to avoid.)
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - `HaL2001` HEAD = **OTA-342 "Linden Anvil"** — the safe 338-batch pair
+> - **LIVE (pushed) = OTA-342 "Linden Anvil"** — the safe 338-batch pair
 >   (one-shot thrown weapons + rations preview) re-shipped on top of the live
 >   dog feature (340) + COPY SAVE (341). **340/341 boot clean with the dog
 >   feature live** — so the 338 disaster was a corrupted save, not the dog
 >   logic. Last unverified path: the dog feature's death/abandon WRITE (only
 >   fires when the dog actually dies/leaves) — once a dog death survives a
 >   restart, the feature is fully cleared.
+> - **STAGED (committed on `HaL2001`, NOT pushed) — next batch, 1/5:**
+>   - **OTA-343 "Birch Anvil"** — crash-save capture: on a crash, stash the
+>     offending slot's exact on-disk save bytes so the next launch offers
+>     **COPY CRASHED SAVE** (reaches a corrupt save that COPY SAVE can't).
+>   Holding for ≥5 before the user triggers the push (per §P3a). See the
+>   "Next Batch — staging list" at the top of §0.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /
@@ -95,7 +109,8 @@ codename you put on that commit is the codename the player sees on their device.
 publish — safe to push HANDOFF edits without burning an OTA.)
 
 ### P3 — The loop for EVERY change (the ~95% path)
-All in the **`/tmp/hal2001-rollback`** worktree, on `HaL2001`:
+All in a fresh `HaL2001` worktree (`npm ci` for `node_modules` so `tsc` + `jest`
+run there):
 1. Edit code in `app/`.
 2. `npx tsc --noEmit` clean for `app/` source. Run the touched suites. The full
    suite has known baseline flakes (header list) — re-run a "new" failure in
@@ -104,12 +119,25 @@ All in the **`/tmp/hal2001-rollback`** worktree, on `HaL2001`:
 3. Bump `app/buildInfo.ts` `OTA_BUILD_ID` → next numeric `YYYY-MM-DD-NNN`.
 4. Mint the next **Anvil** codename in `app/buildCodename.ts` + add a row to the
    current-mapping table in `docs/build-codenames.md`.
-5. Update `HANDOFF.md` §0.B (Closed) + the header "Current state" in the SAME
-   commit (per `CLAUDE.md`).
-6. Commit titled `<Anvil> — OTA-NNN — <desc>`; **`git push origin HaL2001`**.
-   That publish IS the ship — `eas-update.yml` pushes it to Android + iOS, and
-   the player pulls it via TitleScreen → CHECK FOR OTA UPDATE. **Done — there is
-   no second branch or codename to chase.**
+5. Update `HANDOFF.md` §0.B (Closed), the "Next Batch — staging list" (§0), and
+   the header "Current state" in the SAME commit (per `CLAUDE.md`).
+6. Commit titled `<Anvil> — OTA-NNN — <desc>` to `HaL2001`. **Commit only — do
+   NOT push.** Add the OTA to the staging list and report "N/5 staged."
+
+### P3a — Batching: accumulate ≥5, the USER triggers the push
+Pushing IS the ship (it publishes to Android + iOS). We do **not** push singular
+OTAs anymore — that churn is what set up the 338 brick. So:
+- **Accumulate a minimum of 5 committed OTAs** on `HaL2001` before pushing.
+- **Never `git push origin HaL2001` on your own.** Stage the batch and wait for
+  the user to say push. (Docs-only `**.md` pushes are `paths-ignore`'d and don't
+  publish, so a HANDOFF-only push is harmless — but a code push burns the OTA, so
+  it's the user's call.)
+- **Exceptions (push before 5):** the user overrides ("push now"), or a forced
+  native build / store submit (`[build-aab]` / `[build-ios]` / `[submit-ios]`)
+  ships the accumulated batch alongside it.
+- After a user-approved push: clear the staging list, reset the count, and update
+  "Current state" (LIVE = the new HEAD). The player pulls the OTA via TitleScreen
+  → CHECK FOR OTA UPDATE.
 
 ### P4 — `app.json` guard
 `app.json` is the one file you must never alter (it holds the live
@@ -136,6 +164,28 @@ checkout, not a special rollback tool.)
 ## 0. Issue Tracker — Open and Closed
 
 > **The canonical record of issues across the build.** Every OTA / APK push updates this section in the same commit. **Read this section before planning any fix** to (a) check whether the issue is already closed and the fix exists, and (b) make sure your plan won't break a previously-closed fix. The workflow rules live in `CLAUDE.md` → "HANDOFF.md — the build timeline."
+
+### 0.NEXT — Next Batch (staging list — committed on `HaL2001`, NOT pushed)
+
+> Per the batching rule (§P3a): accumulate **≥5** committed OTAs here, then the
+> **user** triggers the push. When the batch ships, move these into §0.B (Closed)
+> and clear this list.
+
+1. **OTA-343 "Birch Anvil" — MULTI-FIX BUNDLE (two parallel instances).**
+   - **(1) Crash-save capture.** On a crash, stash the offending slot's exact
+     on-disk save bytes; the next launch's title screen offers **COPY CRASHED
+     SAVE** (reaches a corrupt save that COPY SAVE can't). `diagnostics/crashSave.ts`
+     + capture wired into `saveLoadHealth` (native load-crash) and `App.tsx`
+     crash handlers (fatal/hydrate/render). Tests: `crashSaveCapture`. tsc clean.
+   - **(2) Settings hint copy fix.** The About → Session RUN CONTROLS hint
+     now names all four export buttons — "export the log / your pack / your
+     save for sharing" (was "copy the on-disk log") — matching COPY LOG /
+     COPY INVENTORY / COPY SAVE + CLEAR LOG. `app/screens/AboutScreen.tsx`.
+     (Folded in from a parallel instance, which rolled back its own short-lived
+     "Chestnut 343" so there's one OTA-343 = "Birch Anvil".)
+
+*(343 = 1 bundle counting toward the batch. ≥5 OTAs before this batch is
+push-ready, unless the user overrides or a forced build ships it early.)*
 
 ### 0.A — Open Issues
 
@@ -197,82 +247,38 @@ checkout, not a special rollback tool.)
   in a later OTA.** (Search: `fusionCompensationGranted` / `fused_comp_`.)
 
 
-> **⚡ ACTIVE TASK (2026-05-31) — iOS build → TestFlight External Testing. READ THIS FIRST.**
+> **⚡ CURRENT POSTURE (2026-06-07) — QoL OTAs only. NO more native builds planned.**
 >
-> **✅ CERT, BUILD, SUBMIT INFRA ALL WORKING. Iterating on Apple's binary-rejection
-> feedback now.** The cert blocker, the Xcode 26 blocker, the EAS API-key auth blocker
-> — all dead. iOS Distribution Certificate (serial `23E4172940150DFB4525AF86DA2CD0BF`,
-> profile `PQ4YD8C5WZ`, team `7Z67WUB9FA`) is on EAS forever; ASC API Key
-> `WJ44NUUU49` is stored on EAS so future submits are zero-prompt. The first signed
-> .ipa successfully uploaded to App Store Connect — but Apple's automated pre-review
-> bounced it for `ITMS-90683: Missing NSPhotoLibraryUsageDescription`. Fix in flight
-> (OTA-254): added the Info.plist key with the string "Tartaria Realms does not access
-> your photo library."; triggering a new build via `[build-ios] [submit-ios]` commit
-> title; auto-submit will land the new binary directly in TestFlight.
+> **Both store binaries are live and we are done building.** There is a build in
+> **TestFlight** (iOS) and a build in the **Google Play console** (Android AAB) — both
+> from the Ember Anvil OTA-302 production promotion (`[build-aab] [build-ios]`). From
+> here we **concentrate on quality-of-life OTAs and refinements**; everything ships as a
+> JS OTA on channel `hal2001` (rt 2.4.1) to the installed binaries. **Do not fire another
+> native build** (`[build-aab]` / `[build-ios]` / `[submit-ios]`) unless the user
+> explicitly calls for one (e.g. a new native module / SDK bump / store resubmission).
 >
-> **What was fired:** a commit titled `[build-ios] [submit-ios]` on `HaL2001` triggers
-> `build-ios.yml` → production iOS build on EAS macOS infra, reusing the new cert, with
-> **`--auto-submit`** so EAS pushes the `.ipa` to TestFlight automatically after the
-> build completes (server-side — no race). Build status:
-> https://expo.dev/accounts/hot-attic-games/projects/tartaria-/builds
+> **Reminder — `HaL2001` is the conduit because it owns the signed store workflows.** The
+> production AAB step strips `.hal2001` → `com.hotatticgames.tartarprim` for Play; the iOS
+> path is signed for TestFlight. Everything we do lands here and ships from here.
 >
-> **NEXT (once the build lands in TestFlight):** first external build sits in Apple's
-> **~24h beta review**, then TestFlight External Testing setup in App Store Connect:
-> privacy policy URL (offered to draft — local-only single-player game, no
-> analytics/accounts), age rating (~12+), External group + tester emails, Beta App
-> Review info. Then the user's Apple playtesters can install.
->
-> **DEAD ENDS (do not re-attempt if this ever needs redoing):** the expo.dev WEB wizard
-> cannot generate the cert (step-4-of-8 only "Upload"/"Choose", no Generate button);
-> Codespaces failed (localhost OAuth callback couldn't reach the phone). The CLI
-> `eas credentials` on a machine with the repo cloned is the path that works. NOTE: a
-> brief mid-session over-correction rewired the workflow for App Store Connect API-key
-> auth after an "I'm an AI in the cloud" JOKE was misread as a requirements change —
-> that was REVERTED; the workflow uses app-specific-password auth + the now-stored cert.
-> (API-key auth remains a valid future enhancement for zero-touch CI cert generation.)
->
-> **GOAL:** Apple playtesters install the game through TestFlight, current with HaL
-> (same JS bundle, OTA channel `hal2001`, rt 2.4.1). Build on Expo's hosted macOS infra
-> via `.github/workflows/build-ios.yml`, auto-submit to TestFlight.
->
-> **DONE (verified with the user):**
-> - Apple Developer account active ($99 paid, agreement signed).
-> - App ID **`com.hotatticgames.tartarprim`** (bare, no `.hal2001`) registered at
->   developer.apple.com → Identifiers. ✅
-> - App Store Connect listing exists. **`ASC_APP_ID = 6775124980`** (numeric ID from the
->   ASC app URL `/apps/6775124980/...`; a version is already in-flight / "Prepare for
->   Submission"). Added as a GitHub secret. ✅
-> - **`APPLE_TEAM_ID = 7Z67WUB9FA`** — already a GitHub secret. ✅
-> - GitHub secrets `EXPO_TOKEN`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD` set (prior
->   session). ✅
-> - `eas.json` ios profiles + `submit.production.ios` block, and `build-ios.yml`
->   (`[build-ios]` = production build, `[submit-ios]` = auto-submit to TestFlight,
->   strips `.hal2001` for production) — all shipped in OTA-251. EXIT GAME is gated to
->   Android-only so reviewers don't reject it. ✅
->
-> **NEXT STEPS once the cert prints "Created certificate / provisioning profile":**
-> 1. (Optional) verify it shows at
->    https://expo.dev/accounts/hot-attic-games/projects/tartaria-/credentials (iOS →
->    bundle `com.hotatticgames.tartarprim`).
-> 2. Fire the build: commit titled **`[build-ios] [submit-ios]`** on `HaL2001` → workflow
->    builds on EAS macOS infra (~20-30 min) using the now-existing cert + the existing
->    `EXPO_TOKEN` / `APPLE_ID` / `APPLE_APP_SPECIFIC_PASSWORD` secrets, then auto-submits
->    to TestFlight (submit uses `eas.json submit.production.ios`:
->    `appleId` / `ascAppId` / `appleTeamId` — all three secrets already set:
->    `ASC_APP_ID = 6775124980`, `APPLE_TEAM_ID = 7Z67WUB9FA`).
-> 3. First external TestFlight build needs **~24h Apple beta review** before it reaches the
->    external group.
-> 4. TestFlight External Testing setup (App Store Connect): privacy policy URL (offered to
->    draft — local-only single-player game, no analytics/accounts), age rating (~12+),
->    External group + tester emails, Beta App Review info.
->
-> **Standing user directive:** "I don't ever do anything in EAS. you should be able to
-> push everything through EAS on your own." After this one-time cert generation,
-> everything else (build + submit) is CI-driven.
->
-> **Note:** the designated feature branch per task instructions is
-> `claude/google-signing-code-app-WsOrj`, but the live OTA branch is `HaL2001`. Confirm
-> with the user which branch the `[build-ios]` commit should land on before firing.
+> ---
+> **ARCHIVED REFERENCE — iOS build → TestFlight (RESOLVED; keep for if a build is ever
+> needed again).** Cert/build/submit infra all proven working. iOS Distribution
+> Certificate (serial `23E4172940150DFB4525AF86DA2CD0BF`, profile `PQ4YD8C5WZ`, team
+> `7Z67WUB9FA`) on EAS; ASC API Key `WJ44NUUU49` stored on EAS for zero-prompt submits.
+> Secrets set: `EXPO_TOKEN`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `ASC_APP_ID =
+> 6775124980`, `APPLE_TEAM_ID = 7Z67WUB9FA`. App ID `com.hotatticgames.tartarprim`
+> registered. `eas.json` ios profiles + `submit.production.ios`, `build-ios.yml`
+> (`[build-ios]` build, `[submit-ios]` auto-submit, strips `.hal2001`) shipped in OTA-251;
+> EXIT GAME gated Android-only so reviewers don't reject it. The `ITMS-90683` photo-library
+> rejection was fixed (OTA-254 added the Info.plist usage string).
+> **To rebuild if ever needed:** commit titled `[build-ios] [submit-ios]` (or `[build-aab]`)
+> on `HaL2001` → EAS macOS/Android infra builds + auto-submits using the stored cert +
+> secrets. First external TestFlight build needs ~24h Apple beta review.
+> **DEAD ENDS (don't re-attempt):** the expo.dev WEB wizard can't generate the cert (no
+> Generate button); Codespaces OAuth callback can't reach the phone. The working path is
+> `eas credentials` on a machine with the repo cloned. (API-key auth = a valid future
+> zero-touch enhancement.)
 
 - **Rumor-of-trapped-dog Arbiter hint for old-save players (OTA-125 follow-up).** Day-32 character on OTA-124 went 2 days of gameplay without ever encountering a rescue hook noun. The rescue system is wired correctly (fires on any future tap of cage / chain / wagon / wheel / cellar / trapdoor / snare / trap / pit / smelter / forge ruin on investigate / attack / advance / travel / ask / use_relic), but discoverability is RNG-bound — a player who travels through scenes without those noun chips will never know the system exists. **Fix shape:** if `!player.dog && !worldMemory.dogRescueTipFired && day-count > 5`, the Arbiter periodically (~0.5% per scene entry) drops a rumor hint: *"Travelers have been speaking of a dog held at a smelter ruin to the [random cardinal]. The Reclaimers have been quiet about it."* Set the flag so the hint only fires once per save. Low priority — system works, just needs a discovery nudge. **Status:** open.
 

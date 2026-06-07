@@ -51,6 +51,7 @@
 // shows which (if any) slot has been crashing on load and how often.
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { captureCrashSaveFromDisk } from './crashSave';
 
 const KEY_LOADING = 'tartaria.save.loadInProgress';
 const KEY_CRASH_MAP = 'tartaria.save.crashSlots.v1';
@@ -132,6 +133,14 @@ export async function loadSaveLoadHealth(): Promise<SaveLoadHealthState> {
       };
       detectedThisBoot = slotId;
       await persistCrashMap(crashMap);
+      // OTA-343 — the breadcrumb survived ⇒ this slot crashed the
+      // process while loading. Its on-disk bytes are STILL on disk
+      // (the player is stuck, hasn't deleted it), so snapshot them now
+      // into the crash-save buffer. The title screen's COPY CRASHED
+      // SAVE button then exports the exact brick for repro — closing
+      // the gap COPY SAVE can't reach (a save that bricks the app can
+      // never be loaded, so it can never be COPY-SAVE'd).
+      await captureCrashSaveFromDisk(slotId, 'slot-load-native-crash');
     }
     try {
       await AsyncStorage.removeItem(KEY_LOADING);

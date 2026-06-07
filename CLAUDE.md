@@ -30,7 +30,7 @@ are LORE COPIES of the doc tables — they feed Qwen narration and the
 Ask the Arbiter MiniLM lookup. Treat them as authoritative for what
 the ARBITER knows, not for what the engine does.
 
-## Shipping rule: OTA-only
+## Shipping rule: OTA-only, and BATCH the push (min 5)
 
 Every change is shipped as an **OTA update** unless a native build
 is the only way to accomplish it. Default flow per change:
@@ -38,8 +38,31 @@ is the only way to accomplish it. Default flow per change:
 1. Edit code in `app/` / `__tests__/` / `docs/` etc.
 2. Bump `OTA_BUILD_ID` in `app/buildInfo.ts` (`YYYY-MM-DD-NNN`
    format; increment NNN per change)
-3. `git add -A && git commit && git push` to the current
-   feature branch — the OTA update server picks it up
+3. `git add -A && git commit` to `HaL2001` — **commit locally, do
+   NOT push yet** (see batching rule below).
+
+### Batching rule — accumulate ≥5, the USER triggers the push
+
+We do **not** push singular OTAs anymore. Pushing 60 OTAs in a day
+is what set up the OTA-338 brick (a mid-session OTA apply during a
+double-reload corrupted the live save). The rule now:
+
+- **Minimum 5 OTAs per batch before a push.** Build + commit each
+  change locally on `HaL2001` (its own OTA id + Anvil codename), and
+  keep a running **"Next Batch — staging list"** at the top of
+  HANDOFF.md §0 so the queued-but-unpushed OTAs are legible at a
+  glance.
+- **The push command comes from the USER.** Never `git push HaL2001`
+  on your own — pushing IS the ship (it publishes the OTA to phones).
+  Stage the work, report "N/5 staged," and wait for the user to say
+  push.
+- **Exceptions (push before 5 is allowed):** (a) the user explicitly
+  overrides ("push now"), or (b) we hit a state that forces a native
+  build / store submit (`[build-aab]` / `[build-ios]` / `[submit-ios]`)
+  — in which case the batch ships alongside the build per the user's
+  call.
+- After a user-approved push, clear the staging list and reset the
+  count for the next batch.
 
 **Native build is only required when:**
 - Adding a new native module / Expo plugin (camera, BLE, etc.)

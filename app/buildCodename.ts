@@ -185,6 +185,12 @@ const CODENAMES: Record<string, string> = {
   // open; locked-chip scanner-requirement text uses the EQUIPPED amber.
   // OTA-336 — fusion catalyst counts toward gate + equipped-catalyst confirm
   // prompt + one-time make-good grant; 2 craftable corruption-cleanse tonics.
+  // OTA-343 — MULTI-FIX BUNDLE: (1) crash-save capture — on a crash, stash
+  // the offending slot's on-disk save bytes so the next launch offers COPY
+  // CRASHED SAVE (reaches a corrupt save that can't be loaded; extends
+  // OTA-341); (2) Settings hint copy — About→Session RUN CONTROLS hint now
+  // names all four exports (log / pack / save).
+  '2026-06-07-343': 'Birch Anvil',
   // OTA-342 — the safe pair from the 338 batch, re-shipped independently:
   // one-shot thrown weapons (10 throwable tags) + Trail-Rations restore
   // preview. Data + UI only; no dog code. Rides on top of 340/341.

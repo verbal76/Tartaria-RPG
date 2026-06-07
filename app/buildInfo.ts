@@ -12648,4 +12648,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Aetherborn +1d6 on Aetheric weapons, Sentinel raised Resurrection-Gem drop,
 // and the 5 previously-dead title flags (golemEdge / ethericSurge /
 // ruinsDefenseBonus / pathfinder / machineSpeech). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-07-342';
+// OTA-343 (Birch Anvil) — MULTI-FIX BUNDLE (two parallel work streams).
+// (1) Crash-save capture. Extends OTA-341's COPY SAVE: on a crash, the exact
+//     on-disk save bytes of the offending slot are stashed to a buffer, and
+//     the next launch's title screen offers COPY CRASHED SAVE. Two capture
+//     paths — saveLoadHealth (native load-crash, the 338 case) and App.tsx's
+//     crash handlers (fatal/hydrate-fail/render). Reaches even a corrupt save
+//     that can never be loaded (so COPY SAVE can't), and emits raw bytes
+//     verbatim when they won't parse.
+// (2) Settings hint copy fix. The About → Session RUN CONTROLS hint now
+//     names all four export buttons — "export the log / your pack / your
+//     save for sharing" (was "copy the on-disk log") — matching COPY LOG /
+//     COPY INVENTORY / COPY SAVE + CLEAR LOG.
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-07-343';

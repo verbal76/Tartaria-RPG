@@ -4,8 +4,11 @@ import type { SaveState } from './types';
 // v2 schema: multi-slot. Each character is its own keyed save with its
 // own log; an index file lists summaries for the title screen.
 const SLOTS_INDEX_KEY = 'tartaria.slots.index.v2';
-const ACTIVE_SLOT_KEY = 'tartaria.activeSlot.v2';
-const slotSaveKey = (slotId: string) => `tartaria.slot.${slotId}.v2`;
+// OTA-343 — exported so the crash-save capture (app/diagnostics/crashSave.ts)
+// can read the active slot's on-disk bytes at crash time WITHOUT importing the
+// game store. Read-only consumers only; writes still go through saveSlot.
+export const ACTIVE_SLOT_KEY = 'tartaria.activeSlot.v2';
+export const slotSaveKey = (slotId: string) => `tartaria.slot.${slotId}.v2`;
 const slotLogKey = (slotId: string) => `tartaria.gamelog.${slotId}.v2`;
 
 // Legacy single-slot keys. Migrated to a v2 slot on first hydrate.
