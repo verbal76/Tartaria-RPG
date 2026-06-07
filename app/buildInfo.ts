@@ -12641,4 +12641,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Dust + foraged mushrooms: Aether-Purge Tonic (−8 corruption) and Hollow-
 // Cleanse Decoction (−18 corruption, +3 HP) — closes the "corruption only ever
 // goes up" gap (the existing cleanse consumables weren't craftable).
-export const OTA_BUILD_ID = '2026-06-07-336';
+// OTA-337 (Maple Anvil) — race + title attribute wiring pass. Turned the
+// flavor-only race traits and the dormant title perk flags into real mechanics:
+// context-conditional skill bonuses, tuned damage resistances, activatable
+// once/day race abilities (✦ picker), race loot-luck (rarer Aetheric finds),
+// Aetherborn +1d6 on Aetheric weapons, Sentinel raised Resurrection-Gem drop,
+// and the 5 previously-dead title flags (golemEdge / ethericSurge /
+// ruinsDefenseBonus / pathfinder / machineSpeech). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-07-337';

@@ -4,6 +4,64 @@ import { findWeaponByName, type CatalogWeapon } from './crafting';
 import { effectiveStats } from './equipment';
 import { traitACBonus } from './enemyTraits';
 import { barehandDamageFor } from './raceMechanics';
+import { titlePerkModifiers, type TitlePerks } from './titles';
+
+// arb-fix — passive skill bonuses from earned titles, injected into the skill
+// check (was "exposed but never read"). Each title's perk now actually moves
+// the relevant roll: Seeker/Scholar on investigate, the social titles on
+// diplomacy, Shadow Diver on stealth.
+function titleSkillBonus(intent: string, p: TitlePerks, ctx?: RaceSkillContext): { bonus: number; label: string } {
+  let bonus = 0;
+  const parts: string[] = [];
+  const add = (v: number, name: string) => { if (v > 0) { bonus += v; parts.push(name); } };
+  if (intent === 'investigate') {
+    add(p.investigationBonus, 'Seeker'); add(p.loreBonus, 'Scholar');
+    // arb-fix — Speaker title (machineSpeech): commune with relics/machines →
+    // +2 when investigating a relic/machine target specifically.
+    if (ctx?.relicTarget && p.machineSpeech) add(2, 'Speaker');
+  }
+  else if (intent === 'diplomacy') {
+    add(p.socialBonus, 'Scion'); add(p.tradeBonus, 'Trader');
+    add(p.diplomacyBonus, 'Broker'); add(p.leadershipBonus, 'Explorer');
+  }
+  else if (intent === 'stealth') { add(p.stealthBonus, 'Shadow Diver'); }
+  return { bonus, label: parts.length ? ` + ${bonus} (title: ${parts.join('/')})` : '' };
+}
+
+// arb-fix — CONTEXT-MATCHED race conditional bonuses (the "+X when ..." traits
+// that were flavor-only). The caller passes what it can detect about the
+// target/scene; the bonus only fires when the context matches.
+export interface RaceSkillContext {
+  /** The investigated target reads as an ancient relic / artifact / machine. */
+  relicTarget?: boolean;
+  /** The current location is a ruin / buried capital / tomb / vault / dig. */
+  inRuins?: boolean;
+}
+function raceSkillBonus(
+  intent: string,
+  player: PlayerCharacter,
+  ctx?: RaceSkillContext,
+): { bonus: number; label: string } {
+  const r = player.raceId;
+  let bonus = 0;
+  const parts: string[] = [];
+  const add = (v: number, name: string) => { bonus += v; parts.push(name); };
+  // Ancient/relic INVESTIGATE — Giants, Aetherborn, Reclaimers each read the
+  // old world better; Mud Dwellers handle the tech (Relic Savvy, DEX); Unknowing
+  // Masses' Curious Mind sharpens on Tartaria's secrets once they've seen them.
+  if (intent === 'investigate' && ctx?.relicTarget) {
+    if (r === 'tartarian_giant') add(1, 'Ancient Insight');
+    else if (r === 'aetherborn') add(2, 'Aetheric Awakening');
+    else if (r === 'reclaimer') add(1, 'Ruins Specialist');
+    else if (r === 'mud_dweller') add(2, 'Relic Savvy');
+    else if (r === 'unknowing_mass') add(2, 'Curious Mind');
+  }
+  // Aethercraft = the CAST discipline. Mud Dwellers (True Tartarians) trained it.
+  if (intent === 'cast' && r === 'mud_dweller') add(2, 'Aethercraft Mastery');
+  // Reclaimers move like ghosts through ruins.
+  if (intent === 'stealth' && ctx?.inRuins && r === 'reclaimer') add(2, 'Urban Explorer');
+  return { bonus, label: parts.length ? ` + ${bonus} (race: ${parts.join('/')})` : '' };
+}
 
 /**
  * Roll-modifier aggregator. Walks the player's status effects and sums
@@ -340,6 +398,13 @@ export function buildCombatSteps(
       ? { count: barehandSpec.count, sides: barehandSpec.sides }
       : damageDice(wc);
   const damageBonus = barehandSpec?.bonus ?? 0;
+  // arb-fix — Aetherborn "Destiny Unfolding": an Aetheric weapon channels the
+  // wielder's awakened bloodline for an extra 1d6 on every hit. Rolled here
+  // (like enemyInit above) so it's fixed for this swing and shows in the
+  // damage breakdown. Gated on raceId + the weapon's aetheric damageType.
+  const aetherSurge = (player.raceId === 'aetherborn' && equipped?.damageType === 'aetheric')
+    ? rollDie(6)
+    : 0;
   const damageTypeNote = equipped
     ? ` (${equipped.damageType})`
     : forcesBarehand ? ' (bludgeoning)' : '';
@@ -417,8 +482,11 @@ export function buildCombatSteps(
       label: 'Roll for DAMAGE',
       sides: dmg.sides,
       count: dmg.count,
-      bonus: damageBonus,
-      bonusLabel: damageBonus !== 0 ? `${damageBonus > 0 ? '+' : ''}${damageBonus} (race)` : '',
+      bonus: damageBonus + aetherSurge,
+      bonusLabel: [
+        damageBonus !== 0 ? `${damageBonus > 0 ? '+' : ''}${damageBonus} (race)` : '',
+        aetherSurge > 0 ? `+${aetherSurge} (Aetheric surge 1d6)` : '',
+      ].filter(Boolean).join(' '),
       context: `damage dealt to ${enemy.name}${damageTypeNote}`,
       // no target — always applies if the attack hit
     },
@@ -522,7 +590,7 @@ export function buildRestSteps(): RollStep[] {
 export function buildSkillSteps(
   intent: string,
   player: PlayerCharacter,
-  opts?: { weatherMod?: Partial<Stats>; companionAssist?: boolean; statusMods?: RollMods },
+  opts?: { weatherMod?: Partial<Stats>; companionAssist?: boolean; statusMods?: RollMods; raceCtx?: RaceSkillContext },
 ): RollStep[] {
   const statKey = SKILL_STAT[intent] ?? 'wisdom';
   const stats = effectiveStats(player, opts?.weatherMod);
@@ -544,16 +612,21 @@ export function buildSkillSteps(
   const sMods = opts?.statusMods;
   const statusNet = sMods?.net ?? 0;
   const statusLabel = sMods && sMods.sources.length > 0 ? ` ${statusNet >= 0 ? '+' : ''}${statusNet} (${sMods.sources.join(', ')})` : '';
+  // arb-fix — earned-title + context-matched race skill bonuses now apply.
+  const titleSk = titleSkillBonus(intent, titlePerkModifiers(player), opts?.raceCtx);
+  const raceSk = raceSkillBonus(intent, player, opts?.raceCtx);
+  const perkBonus = titleSk.bonus + raceSk.bonus;
+  const perkLabel = `${titleSk.label}${raceSk.label}`;
 
   return [{
     id: 'skill_check',
     label,
     sides: 20,
     count: 1,
-    bonus: statVal + assistBonus + statusNet,
-    bonusLabel: `${statLabel} ${statVal}${assistLabel}${statusLabel}`,
+    bonus: statVal + assistBonus + statusNet + perkBonus,
+    bonusLabel: `${statLabel} ${statVal}${assistLabel}${perkLabel}${statusLabel}`,
     target: dc,
     targetLabel: `DC ${dc}${dcName ? ` — ${dcName}` : ''}`,
-    context: `d20 + ${statLabel}${assistLabel}${statusLabel} vs ${dcName || 'DC'} ${dc}`,
+    context: `d20 + ${statLabel}${assistLabel}${perkLabel}${statusLabel} vs ${dcName || 'DC'} ${dc}`,
   }];
 }

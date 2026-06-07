@@ -72,6 +72,8 @@ export function ExplorationScreen() {
   const currentScene = useGameStore((s) => s.currentScene);
   // arb-fix — equipped-faction-catalyst fusion confirmation prompt.
   const fusionCatalystPrompt = useGameStore((s) => s.fusionCatalystPrompt);
+  // arb-fix — race-ability picker (activatable once/day race powers).
+  const raceAbilityPickerOpen = useGameStore((s) => s.raceAbilityPickerOpen);
   // Tungsten Spire — current tutorial beat id (null when no tutorial). The
   // TAKE / SALVAGE / INVESTIGATE beats inject their demo prop into the
   // matching modal + light its chip so the player opens the REAL picker and
@@ -916,6 +918,14 @@ export function ExplorationScreen() {
               if (d.status === 'with_player' && enemyIsAerial(activeEnemy)) return 'aerial';
               return null;
             })()}
+            raceAbilityReady={(() => {
+              if (!player) return false;
+              // eslint-disable-next-line @typescript-eslint/no-require-imports
+              const { availableRaceAbilities } = require('../engine/raceAbilities');
+              const inCombat = (currentScene?.enemies?.length ?? 0) > 0;
+              return availableRaceAbilities(player, inCombat).length > 0;
+            })()}
+            onOpenRaceAbilities={() => useGameStore.getState().openRaceAbilityPicker()}
             travelTargetName={(() => {
               if (!player?.travelTarget) return null;
               // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -1374,6 +1384,36 @@ export function ExplorationScreen() {
         ]}
         onRequestClose={() => useGameStore.getState().cancelFusionCatalystPrompt()}
       />
+
+      {/* arb-fix — ✦ race-ability picker. Lists the once/day race powers the
+          player can use right now (off cooldown, combat-gate satisfied) with a
+          button each; tapping fires the ability + closes. */}
+      {(() => {
+        if (!raceAbilityPickerOpen || !player) return null;
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const { availableRaceAbilities } = require('../engine/raceAbilities') as typeof import('../engine/raceAbilities');
+        const inCombat = (currentScene?.enemies?.length ?? 0) > 0;
+        const avail = availableRaceAbilities(player, inCombat);
+        const close = () => useGameStore.getState().closeRaceAbilityPicker();
+        return (
+          <BrandedModal
+            visible={true}
+            title="Race Abilities"
+            body={avail.length === 0
+              ? 'Nothing ready right now — your race powers return after a night’s rest.'
+              : avail.map((a) => `✦ ${a.name} — ${a.description}`).join('\n\n')}
+            buttons={[
+              ...avail.map((a) => ({
+                label: a.name,
+                onPress: () => useGameStore.getState().useRaceAbility(a.id),
+                tone: 'primary' as const,
+              })),
+              { label: 'Close', onPress: close, tone: 'neutral' as const },
+            ]}
+            onRequestClose={close}
+          />
+        );
+      })()}
 
       {/* 2026-05-25 OTA-035 — outpost-aware travel confirmation. When
           the player issues `travel to <city>` (typed or via SET COURSE)

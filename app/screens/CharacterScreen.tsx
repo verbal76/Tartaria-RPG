@@ -15,6 +15,7 @@ import { fineProgressBar, rawProgressPercent, SKILL_ACTIVITIES } from '../engine
 import { effectiveAC, barehandDamageFor } from '../engine/raceMechanics';
 import { corruptionTierOf, tierLabel, tierDescription } from '../engine/corruption';
 import arbiterTitlesData from '../data/lore/arbiter-titles.json';
+import { TITLE_PASSIVE_PERK } from '../engine/titles';
 import { getItemPreview } from '../components/itemPreview';
 import { weatherStatModifiers } from '../engine/weatherEffects';
 import { findFactionQuestById } from '../engine/factionQuests';
@@ -456,7 +457,7 @@ export function CharacterScreen() {
                         {isEarned ? '◆ ' : '◇ '}{t.title}
                       </Text>
                       <Text style={isEarned ? styles.titlePerk : styles.titleRequirement}>
-                        {isEarned ? t.perk : t.requirement}
+                        {isEarned ? (TITLE_PASSIVE_PERK[t.id] ?? t.perk) : t.requirement}
                       </Text>
                     </View>
                   );

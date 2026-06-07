@@ -34,9 +34,9 @@
     "barehandDamage": "1d6 -3",
     "tags": ["true_tartarian", "subterranean", "aethercraft"],
     "traits": [
-      "Dark Vision: Can see in darkness.",
+      "Tunnel Sense: At home in the dark. Indoors or underground you turn up loot more often and pull more story hooks when you investigate.",
       "Aethercraft Mastery: +2 Intelligence when using Aethercraft (shaping Aetherstone, tools, weapons, golems, earth).",
-      "Relic Savvy: +2 Dexterity when dealing with Aetherstone or Tartarian tech.",
+      "Relic Savvy: +2 Dexterity when investigating Aetherstone or Tartarian tech.",
       "Aetherstone Resilience: Half damage from Aetheric or Mud-power attacks."
     ],
     "description": "True Tartarians who survived underground in subterranean enclaves. Nimble but lacking brute force; rely on Aethercraft.",
@@ -56,10 +56,9 @@
     "barehandDamage": "1d6",
     "tags": ["scavenger", "urban", "rogue"],
     "traits": [
-      "Urban Explorer: +2 Acrobatics and Stealth in city ruins or underground.",
-      "Ruins Specialist: +1 Investigation, +1 Woodsman when searching for relics or navigating dangerous areas.",
-      "Rogue's Ingenuity: +1 Chicanery, reroll when picking locks or disarming traps.",
-      "Relic Hunter: Sense Aetherstone signatures within 30 feet."
+      "Urban Explorer: +2 Stealth in city ruins or underground.",
+      "Ruins Specialist: +1 Investigation when searching for relics or navigating dangerous areas.",
+      "Relic Hunter: A scavenger's nose for buried value — a strong, always-on chance to turn up rare Aetheric loot, materials, weapons, and armor when you search or investigate."
     ],
     "description": "Treasure hunters and scavengers, equally at home in ruined cities and dangerous tunnels. Profit before ideology.",
     "flavor": "Other people see ruins. You see paydays. The relic is real, the buyer is real, the danger is real — three more things than most mornings give you. Whatever you carry out, somebody's already paying for it."
@@ -80,7 +79,7 @@
     "traits": [
       "Aetheric Constitution: Half damage from energy-based attacks.",
       "Indomitable Strength: +2 Strength, +1 Intelligence.",
-      "Immunity to Time: Do not age, eat, or fatigue. Immune to hunger and exhaustion.",
+      "Immunity to Time: You are an ageless construct — you neither age, hunger, nor tire. Where the living must stop to forage, drink, and sleep off exhaustion, you simply keep going: a week-long vigil in a dead city, a march across a famine-struck waste, a night with no shelter — none of it wears on you the way it would on flesh. The one thing in Tartaria that survives death answers to that kindred patience: your kills are markedly more likely to yield a Resurrection Gem.",
       "Defensive Protocols: Once per day, activate a shield reducing incoming damage by half for 3 rounds."
     ],
     "description": "Aetherstone-powered constructs left over from Tartaria's golden age. Tireless, durable, programmed with ancient duties.",
@@ -140,10 +139,10 @@
     "barehandDamage": "1d6 -2",
     "tags": ["bloodline", "aetheric", "noble"],
     "traits": [
-      "Aetheric Awakening: Sense nearby Aetherstone/relics; +2 Intelligence when interacting with them.",
-      "Noble Heritage: +1 Charisma, daily reroll for persuasion or intimidation.",
-      "Latent Powers: Once per day, surge of Aetheric energy enhances speed, strength, or barrier for 3 rounds.",
-      "Destiny Unfolding: Powers grow with relic exposure; Rare/Legendary Aether powers cost 1d6 self-damage."
+      "Aetheric Awakening: Attuned to relics — +2 Intelligence when investigating them, and a higher chance to turn up rare Aetheric loot when you search or investigate.",
+      "Noble Heritage: +1 Charisma; once per day, an Aetheric-presence surge (+3 Charisma for 3 rounds) for persuasion or intimidation.",
+      "Latent Powers: Once per day, a surge of Aetheric energy grants +2 Strength for 3 rounds.",
+      "Destiny Unfolding: Your awakened bloodline charges Aetheric weapons — they deal an extra 1d6 damage on every hit."
     ],
     "description": "Descendants of Tartaria's noble bloodlines, born with awakened Aetheric genes. Powerful, dangerous, hunted.",
     "flavor": "Your grandmother kept the locket no one would explain. The locket is in your pocket now and it is humming, and you finally understand why she never let anyone else hold it. Some people will kill to take that locket from you. Others will kill to protect it."

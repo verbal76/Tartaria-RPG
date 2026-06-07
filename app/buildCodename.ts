@@ -185,6 +185,7 @@ const CODENAMES: Record<string, string> = {
   // open; locked-chip scanner-requirement text uses the EQUIPPED amber.
   // OTA-336 — fusion catalyst counts toward gate + equipped-catalyst confirm
   // prompt + one-time make-good grant; 2 craftable corruption-cleanse tonics.
+  '2026-06-07-337': 'Maple Anvil',
   '2026-06-07-336': 'Rowan Anvil',
   '2026-06-07-327': 'Hemlock Anvil',
   '2026-06-07-326': 'Tamarack Anvil',

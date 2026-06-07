@@ -174,6 +174,43 @@ export function effectiveAC(
   return base + delta;
 }
 
+// arb-fix — race LOOT-LUCK. Surfaced via rollAreaSearch: a non-zero bias both
+// widens the "find" window and biases the find toward the rare Aetheric gear
+// pool. Replaces three ex-flavor traits:
+//  - Reclaimer "Relic Hunter" + "Rogue's Ingenuity" (merged) — the strongest
+//    relic-finder; always on.
+//  - Aetherborn "Aetheric Awakening" (sense-half) — a steady relic pull.
+//  - Mud Dweller (ex-"Dark Vision") — same edge, but ONLY indoors/underground.
+function indoorOrUnderground(player: PlayerCharacter, scene: SceneContext | null): boolean {
+  const ctx = detectACContexts(player, scene);
+  return ctx.has('underground') || ctx.has('constructed_environment') || ctx.has('confined');
+}
+
+export function raceLootBias(player: PlayerCharacter, scene: SceneContext | null): number {
+  const r = player.raceId;
+  if (r === 'reclaimer') return 0.18;
+  if (r === 'aetherborn') return 0.12;
+  if (r === 'mud_dweller' && indoorOrUnderground(player, scene)) return 0.18;
+  return 0;
+}
+
+// arb-fix — Mud Dweller (ex-"Dark Vision") reads buried halls better: a keener
+// chance to pull a story HOOK while investigating indoors / underground.
+export function raceSearchHookBonus(player: PlayerCharacter, scene: SceneContext | null): number {
+  if (player.raceId === 'mud_dweller' && indoorOrUnderground(player, scene)) return 0.15;
+  return 0;
+}
+
+// arb-fix — Sentinel "Immunity to Time": the one race that cheats death finds
+// more of the one thing that cheats death. Per-kill Resurrection Gem drop
+// chance is raised from the base 0.5% to 1.25% for Sentinels (still rare, and
+// install-wide). Other races keep the base rate.
+export const BASE_GEM_DROP_CHANCE = 0.005;
+export function resurrectionGemDropChance(raceId: string | undefined): number {
+  if (raceId === 'architectural_sentinel') return 0.0125;
+  return BASE_GEM_DROP_CHANCE;
+}
+
 // ─── Racial stat bonuses ────────────────────────────────────────────
 // Always-on stat bumps that apply at every effectiveStats read. Context-
 // conditional bumps (e.g. Mud Dweller "+2 INT when using Aethercraft")
@@ -195,6 +232,46 @@ export function racialStatBonusesFor(raceId: string | undefined): RacialStatBonu
   if (!race) return {};
   const bonuses = (race as Race & { racialStatBonuses?: RacialStatBonuses }).racialStatBonuses;
   return bonuses ?? {};
+}
+
+// ─── Passive race damage resistances (arb-fix) ──────────────────────
+// Wires the "half damage from X" race traits that were flavor-only.
+// Returns a multiplier applied to incoming COMBAT damage (1 = no resist).
+//   • Mud Dweller — Aetherstone Resilience: ½ Aetheric.
+//   • Architectural Sentinel — Aetheric Constitution: ½ energy (aetheric /
+//     electrical / burn).
+//   • Mud Golem — Aetherstone Resilience: TUNED. Lore said "½ from
+//     non-Aetheric" (near-immune to everything); softened to a 25% reduction
+//     on non-Aetheric so it's a tank, not invulnerable. Aetheric (its weakness)
+//     lands full.
+export function raceDamageMultiplier(
+  raceId: string | undefined,
+  damageType: string | null | undefined,
+): number {
+  if (!raceId || !damageType) return 1;
+  const dt = damageType.toLowerCase();
+  switch (raceId) {
+    case 'mud_dweller':
+      return dt === 'aetheric' ? 0.5 : 1;
+    case 'architectural_sentinel':
+      return /aetheric|electrical|burn/.test(dt) ? 0.5 : 1;
+    case 'mud_golem':
+      return dt === 'aetheric' ? 1 : 0.75;
+    default:
+      return 1;
+  }
+}
+
+/** Human label for the resistance that fired (for the combat log), or ''. */
+export function raceResistLabel(raceId: string | undefined, mult: number): string {
+  if (mult >= 1) return '';
+  const pct = Math.round((1 - mult) * 100);
+  const name =
+    raceId === 'mud_dweller' ? 'Aetherstone Resilience'
+    : raceId === 'architectural_sentinel' ? 'Aetheric Constitution'
+    : raceId === 'mud_golem' ? 'Aetherstone Resilience'
+    : 'racial resilience';
+  return ` (${name} absorbs ${pct}%)`;
 }
 
 // ─── Aethercraft DC modifier ────────────────────────────────────────

@@ -227,6 +227,14 @@ function pickWeighted<T extends { weight: number }>(arr: T[]): T {
   return arr[arr.length - 1]!;
 }
 
+// arb-fix — rarity ordering for the race loot-luck "best of two" draw.
+const RARITY_RANK: Record<string, number> = {
+  Common: 0, Uncommon: 1, Rare: 2, Epic: 3, Legendary: 4,
+};
+function rarityRank(r: Rarity): number {
+  return RARITY_RANK[r] ?? 0;
+}
+
 // OTA-216 — directional-find pool. Each entry describes a specific
 // "go [dir] and find a [thing]" promise. The investigate handler
 // picks one at random when this outcome fires; the player gets the
@@ -322,9 +330,13 @@ function format(line: string, target: string): string {
  *  threads, not loot they could grind from search. */
 export function rollAreaSearch(
   target: string,
-  opts?: { hookBonus?: number; intent?: 'search' | 'investigate' | 'harvest' },
+  opts?: { hookBonus?: number; intent?: 'search' | 'investigate' | 'harvest'; rareLootBias?: number },
 ): AreaSearchOutcome {
   const bonus = Math.max(0, Math.min(0.4, opts?.hookBonus ?? 0));
+  // arb-fix — race loot-luck (Reclaimer / Aetherborn always; Mud Dweller
+  // indoors/underground). Widens the material-find window and upgrades the
+  // find toward the rare Aetheric gear pool. Clamped so it can't swamp hooks.
+  const loot = Math.max(0, Math.min(0.25, opts?.rareLootBias ?? 0));
   // OTA-213 — investigate flips the curve. Default search remains
   // 40% nothing / 25% material / 20% tc / 15% hook. Investigate is
   // 10% nothing / 15% material / 15% tc / 60% hook. hookBonus is
@@ -339,9 +351,10 @@ export function rollAreaSearch(
   // material foraging is removed; investigate's only item drop is a RARE
   // (Uncommon) gear-or-material find at ~7% (food still comes from the separate
   // forage path). Search/harvest keep their 25% common SMALL_FINDS pool.
-  const findCutoff = isInvestigate
+  // Loot-luck widens the material window (taking from the hook share).
+  const findCutoff = (isInvestigate
     ? nothingCutoff + 0.07
-    : nothingCutoff + 0.25;
+    : nothingCutoff + 0.25) + loot;
   const tcCutoff = isInvestigate
     ? findCutoff + 0.08
     : findCutoff + 0.20;
@@ -350,7 +363,19 @@ export function rollAreaSearch(
     return { kind: 'nothing', line: format(pick(NOTHING_LINES), target) };
   }
   if (r < findCutoff) {
-    const found = pickWeighted(isInvestigate ? RARE_FINDS : SMALL_FINDS);
+    const pool = isInvestigate ? RARE_FINDS : SMALL_FINDS;
+    let found = pickWeighted(pool);
+    // arb-fix — race loot-luck quality bias. On a plain search there's a
+    // chance to surface the rare Aetheric gear pool outright; otherwise keep
+    // the rarer of two draws so finds skew toward Aetheric loot.
+    if (loot > 0) {
+      if (!isInvestigate && Math.random() < loot * 2) {
+        found = pickWeighted(RARE_FINDS);
+      } else {
+        const alt = pickWeighted(pool);
+        if (rarityRank(alt.rarity) > rarityRank(found.rarity)) found = alt;
+      }
+    }
     return {
       kind: 'material',
       itemName: found.name,

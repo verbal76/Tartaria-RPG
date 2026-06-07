@@ -246,6 +246,35 @@ export const WIRED_TITLES: TitleDef[] = [
 
 export const WIRED_TITLE_IDS: ReadonlySet<string> = new Set(WIRED_TITLES.map((t) => t.id));
 
+// arb-fix — the canon `arbiter-titles.json` perk strings are tabletop lore
+// ("Once per day, …") and DON'T match the shipped implementation (passive,
+// always-on). This map is what the CharacterScreen shows for an EARNED title:
+// an honest, present-tense description of the PASSIVE effect the engine now
+// applies. Titles absent here fall back to the canon string.
+export const TITLE_PASSIVE_PERK: Record<string, string> = {
+  bane_of_sentinels: 'Passive: +1d6 damage against mechanical foes (automatons, sentinels, drones).',
+  seeker_of_lost_relics: 'Passive: +2 to Investigate checks.',
+  relic_trader: 'Passive: relics sell for more (≈+10%).',
+  etherbound_survivor: 'Passive: shrugs off some damage from falls and elemental/environmental hits.',
+  survivor_of_aetherstone: 'Passive: halves corruption gained from Etheric weather.',
+  scion_of_the_giants: 'Passive: +2 to social (diplomacy) checks.',
+  etheric_explorer: 'Passive: +1 to social (diplomacy) checks.',
+  golem_whisperer: 'Passive: golems you summon come out tougher (+30% HP, one larger attack die).',
+  master_of_aethercraft: 'Passive: golems you summon come out tougher (+30% HP, one larger attack die).',
+  architects_eye: 'Passive: ancient / relic repairs cost less (≈−10%).',
+  aetherborn_awakened: 'Passive: once per fight, your first hit detonates an Aetheric surge (+1d8 damage).',
+  scholar_of_forgotten_lore: 'Passive: +2 to Investigate / lore checks.',
+  aetheric_attuned: 'Passive: halves incoming Aetheric damage — in combat AND from Etheric weather.',
+  stormcaller: 'Passive: halves incoming Aetheric damage — in combat AND from Etheric weather.',
+  // Tier-C (earnable once those challenges go live):
+  guild_broker: 'Passive: +1 to social (diplomacy) checks.',
+  shadow_diver: 'Passive: +1 to Stealth checks.',
+  protector_of_the_forgotten: 'Passive: +1 AC while in ruins / constructed places (stacks with Warden).',
+  warden_of_the_old_world: 'Passive: +1 AC while in ruins / constructed places (stacks with Protector).',
+  speaker_of_forgotten_tongues: 'Passive: +2 when investigating relics & Tartarian machines.',
+  wayfarer_of_the_lost_paths: 'Passive: cardinal travel costs less stamina (2 → 1.5).',
+};
+
 /** Every wired title whose requirement the player currently meets. */
 export function evaluateEarnedTitles(player: PlayerCharacter): string[] {
   const p = withTitleProgress(player.titleProgress);

@@ -151,7 +151,7 @@ import {
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, VENDORS, type VendorInstance } from '../engine/vendors';
-import { effectiveAC, barehandDamageFor, barehandGateBlocks } from '../engine/raceMechanics';
+import { effectiveAC, barehandDamageFor, barehandGateBlocks, raceLootBias, raceSearchHookBonus, resurrectionGemDropChance } from '../engine/raceMechanics';
 import { trainStat, type StatKey } from '../engine/statTraining';
 import { findQuestFactionHint } from '../engine/factionHint';
 import {
@@ -1410,6 +1410,16 @@ function spendStamina(player: PlayerCharacter, amount: number): PlayerCharacter 
   });
 }
 
+// arb-fix — travel-specific stamina spend. The pathfinder title (Wayfarer,
+// earned by clearing the Labyrinth solo) lightens the load on the road:
+// cardinal travel costs 1.5 stamina instead of the usual 2.
+function spendTravelStamina(player: PlayerCharacter): PlayerCharacter {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const tp = require('../engine/titles').titlePerkModifiers(player);
+  const cost = tp.pathfinder ? 1.5 : STAMINA_COSTS.travel;
+  return spendStamina(player, cost);
+}
+
 // Advance the in-game clock by `hours`. Used by anything that isn't a rest
 // — travel (long), attack (short), skill check (short) — so the day/night
 // cycle progresses naturally even without explicit camping.
@@ -2129,6 +2139,14 @@ interface GameStore {
    *  which food to eat after the stat is picked. */
   aetherStatPickerOpen: boolean;
   pendingAetherFoodId: string | null;
+  /** arb-fix — ethericSurge title: enemy-lineup token marking the combat whose
+   *  once-per-fight Aetheric surge has already fired. Re-arms when it changes. */
+  surgeCombatToken: string | null;
+  /** arb-fix — the ✦ race-ability picker (activatable once/day race powers). */
+  raceAbilityPickerOpen: boolean;
+  openRaceAbilityPicker: () => void;
+  closeRaceAbilityPicker: () => void;
+  useRaceAbility: (id: string) => void;
   /** arb-fix — when the ONLY reserved faction catalyst is currently EQUIPPED,
    *  the Crucible asks before burning it (instead of silently consuming worn
    *  gear or hard-refusing). The modal warns the slot will be empty. `cost`>0
@@ -2250,6 +2268,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   weaponResistStreak: null,
   aetherStatPickerOpen: false,
   pendingAetherFoodId: null,
+  surgeCombatToken: null,
+  raceAbilityPickerOpen: false,
   slotLoadError: null,
   crashedSlotIds: [],
   tutorialStep: null,
@@ -6530,7 +6550,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
               break;
             }
             const lensActive = hasAethericVision(player);
-            const outcome = rollAreaSearch(rawTarget, { hookBonus: lensActive ? 0.15 : 0 });
+            const outcome = rollAreaSearch(rawTarget, {
+              hookBonus: lensActive ? 0.15 : 0,
+              // arb-fix — race loot-luck (Reclaimer/Aetherborn always; Mud
+              // Dweller indoors/underground) surfaces rarer Aetheric finds.
+              rareLootBias: raceLootBias(player, get().currentScene),
+            });
             set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
             // OTA-200 — visible lens cue. When the player carries the
             // Aetheric Vision Lens AND the outcome is a hook, narrate
@@ -6872,7 +6897,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // circuit, wagon → rations + rope, etc.). Falls through to
             // the generic area-search pool when no pool matches.
             const salvage = rollSalvagePool(harvestAmbient);
-            const outcome = salvage ?? rollAreaSearch(harvestAmbient, { hookBonus: hasAethericVision(player) ? 0.15 : 0 });
+            const outcome = salvage ?? rollAreaSearch(harvestAmbient, {
+              hookBonus: hasAethericVision(player) ? 0.15 : 0,
+              rareLootBias: raceLootBias(player, get().currentScene),
+            });
             // OTA 23-015 — `kind: 'nothing'` no longer leaves the noun
             // unconsumed. Playtest log: a player typed `salvage gate`
             // six times in a row, getting the "still here for another
@@ -7705,9 +7733,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
             break;
           }
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+          // arb-fix — race-context for the investigated target (ancient relic?).
+          const invCtxNoun = String(parsed.resolvedNoun ?? parsed.target ?? '').toLowerCase();
+          const invRelicTarget = /relic|ancient|tartarian|statue|sentinel|aetherstone|artifact|rune|monument|obelisk|automaton|machine|spire|throne|giant/.test(invCtxNoun);
+          const invInRuins = (currentScene?.location?.tags ?? []).some((t) => /ruin|buried|capital|cathedral|tomb|vault|dig|labyrinth/.test(String(t).toLowerCase()));
           const steps = buildSkillSteps('investigate', player, {
             weatherMod: weatherStatModifiers(currentScene.weather),
             companionAssist: !!player.companion,
+            raceCtx: { relicTarget: invRelicTarget, inRuins: invInRuins },
           });
           set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0 } });
           break;
@@ -7764,7 +7797,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const investigateLensActive = hasAethericVision(player);
           const outcome = rollAreaSearch(rawTarget, {
             intent: 'investigate',
-            hookBonus: investigateLensActive ? 0.15 : 0,
+            // arb-fix — lens hook bonus + Mud Dweller's indoors/underground
+            // hook keenness stack (clamped to 0.4 inside rollAreaSearch).
+            hookBonus: (investigateLensActive ? 0.15 : 0) + raceSearchHookBonus(player, get().currentScene),
+            rareLootBias: raceLootBias(player, get().currentScene),
           });
           if (investigateLensActive && outcome.kind === 'hook') {
             get().appendLog(
@@ -8182,9 +8218,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           stamina: player.stamina,
         };
         set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
+        // arb-fix — context for the conditional RACE skill bonuses: is the
+        // target an ancient relic, and are we in ruins?
+        const ctxNoun = String(parsed.resolvedNoun ?? parsed.target ?? '').toLowerCase();
+        const relicTarget = /relic|ancient|tartarian|statue|sentinel|aetherstone|artifact|rune|monument|obelisk|automaton|machine|spire|throne|giant/.test(ctxNoun);
+        const inRuins = (currentScene?.location?.tags ?? []).some((t) => /ruin|buried|capital|cathedral|tomb|vault|dig|labyrinth/.test(String(t).toLowerCase()));
         const steps = buildSkillSteps(parsed.intent, player, {
           weatherMod: weatherStatModifiers(currentScene.weather),
           companionAssist: !!player.companion,
+          raceCtx: { relicTarget, inRuins },
         });
         set({ pendingRolls: { actionText: trimmed, steps, currentStep: 0, refundOnCancel } });
         break;
@@ -8763,7 +8805,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (player.hubRoomId) {
           if (isLeaveHubCommand(trimmed)) {
             set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
-            set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.travel), 1) });
+            set({ player: advanceTime(spendTravelStamina(get().player!), 1) });
             get().appendLog(
               'world',
               `You walk back through the gate and out into the open ground. The outpost falls away behind you.`,
@@ -8791,7 +8833,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (isContinueCommand(trimmed)) {
           const last = player.lastTravelDirection;
           if (last) {
-            set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.travel), 1) });
+            set({ player: advanceTime(spendTravelStamina(player), 1) });
             get().stepDirection(last);
           } else {
             get().appendLog(
@@ -8827,7 +8869,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // is the canonical scene-rebuild path; use it.
             set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
             const currentPlayer = get().player ?? player;
-            set({ player: advanceTime(spendStamina(currentPlayer, STAMINA_COSTS.travel), 1) });
+            set({ player: advanceTime(spendTravelStamina(currentPlayer), 1) });
             get().appendLog(
               'world',
               `You walk ${dir} past the gate. The outpost falls away behind you.`,
@@ -8864,7 +8906,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             // player is committed to open ground.
             break;
           }
-          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.travel), 1) });
+          set({ player: advanceTime(spendTravelStamina(player), 1) });
           get().stepDirection(dir);
           break;
         }
@@ -8896,7 +8938,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (matchedExit || genericExit) {
               const sibling = pickSiblingMicroMicro(sceneMicroMicroId);
               if (sibling) {
-                set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.travel), 1) });
+                set({ player: advanceTime(spendTravelStamina(player), 1) });
                 get().appendLog(
                   'world',
                   matchedExit
@@ -8920,7 +8962,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (macroId) {
             const target = pickRandomMicroMicroIn(macroId);
             if (target) {
-              set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.travel), 1) });
+              set({ player: advanceTime(spendTravelStamina(player), 1) });
               get().appendLog(
                 'world',
                 `You descend below the surface. The air thickens, the light fails, and the buried world opens around you.`,
@@ -8939,7 +8981,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Micro-Micro returns to the parent macro tile.
         const wantsUp = /\b(surface|aboveground|topside|back up|climb out|leave the depths)\b/i.test(trimmed);
         if (wantsUp && currentScene.microMicroId) {
-          set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.travel), 1) });
+          set({ player: advanceTime(spendTravelStamina(player), 1) });
           get().appendLog(
             'world',
             `You climb back to the surface. The sky's gray weight returns to your shoulders.`,
@@ -10125,12 +10167,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
           combatReason: string,
           worldReason: string,
         ): void => {
-          const fallDamage = Math.max(1, Math.floor(player.hpMax * 0.2));
+          let fallDamage = Math.max(1, Math.floor(player.hpMax * 0.2));
+          // arb-fix — Etherbound Survivor ("survive environmental hazards")
+          // passively shaves its save bonus off a climbing fall — a real,
+          // always-on effect for what was flavor-only text.
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
+          const tPerksFall = require('../engine/titles').titlePerkModifiers(player);
+          let fallShaveTag = '';
+          if (tPerksFall.envHazardSaveBonus > 0 && fallDamage > 1) {
+            const shave = Math.min(fallDamage - 1, tPerksFall.envHazardSaveBonus);
+            if (shave > 0) { fallDamage -= shave; fallShaveTag = ` (Etherbound Survivor absorbs ${shave})`; }
+          }
           const newHp = Math.max(0, player.hp - fallDamage);
           get().appendLog('combat', combatReason);
           get().appendLog(
             'world',
-            `${worldReason} You drop hard, taking ${fallDamage} damage (${newHp}/${player.hpMax} HP).`,
+            `${worldReason} You drop hard, taking ${fallDamage} damage${fallShaveTag} (${newHp}/${player.hpMax} HP).`,
           );
           set((s) =>
             s.player
@@ -12572,7 +12624,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // the type+trait math.
       const parsedEffect = equipped ? parseWeaponEffect(equipped.effect) : null;
       const effectBonus = parsedEffect ? rollEffectBonusDamage(parsedEffect, enemy) : 0;
-      const dmg = Math.max(1, Math.round(mod.damage * traitMod.multiplier) + effectBonus);
+      // arb-fix — Bane of Sentinels: an earned title's "extra damage die vs
+      // mechanical foes" now actually rolls (was exposed but never applied).
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const tPerksAtk = require('../engine/titles').titlePerkModifiers(player);
+      let titleDmgBonus = 0;
+      if (tPerksAtk.mechanicalDamageDice > 0
+          && /automation|mechanism|construct|sentinel|drone/i.test(`${enemy.name} ${enemy.type ?? ''}`)) {
+        for (let i = 0; i < tPerksAtk.mechanicalDamageDice; i++) titleDmgBonus += rollDie(6);
+      }
+      // arb-fix — ethericSurge title (Aetherborn Awakened): once per combat, the
+      // first qualifying hit detonates an Aetheric surge (+1d8). Keyed to the
+      // enemy lineup so it re-arms for each new fight.
+      let surgeBonus = 0;
+      if (tPerksAtk.ethericSurge) {
+        const token = `${currentScene.enemies.map((e) => e.name).join(',')}#${currentScene.enemies.length}`;
+        if (get().surgeCombatToken !== token) {
+          surgeBonus = rollDie(8);
+          set({ surgeCombatToken: token });
+        }
+      }
+      const dmg = Math.max(1, Math.round(mod.damage * traitMod.multiplier) + effectBonus + titleDmgBonus + surgeBonus);
+      if (surgeBonus > 0) {
+        get().appendLog('combat', `✦ Aetheric surge — your awakened blood detonates for +${surgeBonus} on ${enemy.name}.`);
+      }
       const prevHp = currentScene.enemyHps[activeIdx] ?? enemy.hp;
       let newEnemyHp = prevHp - dmg;
 
@@ -13320,10 +13395,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     //  • boss kill → guaranteed (existing)
     //  • every 50th non-boss kill → pity timer (so any long campaign
     //    sees gems even if the 0.5% lottery never rolls)
-    //  • Math.random() < 0.005 → rare organic drop (existing)
+    //  • rare organic drop (existing) — base 0.5%, raised for Sentinels
+    //    (race "Immunity to Time": more likely to find the gem that cheats
+    //    death, per resurrectionGemDropChance).
     // First-install seed is granted separately on hydrate (one-shot).
     const pityHit = !enemy.boss && newKills > 0 && newKills % 50 === 0;
-    const gemDropped = enemy.boss || pityHit || Math.random() < 0.005;
+    const gemDropped = enemy.boss || pityHit
+      || Math.random() < resurrectionGemDropChance(get().player?.raceId);
     if (gemDropped) {
       void addResurrectionGems(1).then((total) => {
         set({ resurrectionGems: total });
@@ -15568,7 +15646,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // beginScene with skipHubEntry so we don't re-enter the gate.
     if (player.hubRoomId) {
       set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
-      set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.travel), 1) });
+      set({ player: advanceTime(spendTravelStamina(get().player!), 1) });
       get().appendLog(
         'world',
         `You walk back through the gate and out into the open ground. The outpost falls away behind you.`,
@@ -16459,7 +16537,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // QUEST objective chip in view.
     if (player?.hubRoomId) {
       set((s) => (s.player ? { player: { ...s.player, hubRoomId: null } } : s));
-      set({ player: advanceTime(spendStamina(get().player!, STAMINA_COSTS.travel), 1) });
+      set({ player: advanceTime(spendTravelStamina(get().player!), 1) });
       get().appendLog(
         'world',
         `You step out through the gate. Open ground, open sky — the outpost falls away behind you. The road starts here.`,
@@ -17675,6 +17753,92 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
   cancelFusionCatalystPrompt() {
     set({ fusionCatalystPrompt: null });
+  },
+
+  openRaceAbilityPicker() { set({ raceAbilityPickerOpen: true }); },
+  closeRaceAbilityPicker() { set({ raceAbilityPickerOpen: false }); },
+  // arb-fix — activate a once/day race ability. Validates ownership + cooldown
+  // + combat gate, applies the effect, then stamps the day onto abilityCooldowns.
+  useRaceAbility(id) {
+    const player = get().player;
+    if (!player) return;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const ra = require('../engine/raceAbilities');
+    const def = ra.RACE_ABILITIES.find((d: { id: string }) => d.id === id);
+    if (!def || def.raceId !== player.raceId) { set({ raceAbilityPickerOpen: false }); return; }
+    if (!ra.isAbilityReady(player, def)) {
+      get().appendLog('arbiter', `"${def.name} is spent for today," the Arbiter says. "Rest, and it returns."`);
+      set({ raceAbilityPickerOpen: false });
+      return;
+    }
+    const scene = get().currentScene;
+    const inCombat = (scene?.enemies?.length ?? 0) > 0;
+    if (def.combatOnly && !inCombat) {
+      get().appendLog('arbiter', `"Nothing here to turn ${def.name} on," the Arbiter says.`);
+      set({ raceAbilityPickerOpen: false });
+      return;
+    }
+    let applied = true;
+    switch (id) {
+      case 'legacy_of_power': {
+        let worstIdx = -1; let worstFrac = 1;
+        player.inventory.forEach((it, i) => {
+          const d = it.durability;
+          if (d && d.max > 0 && d.current < d.max) {
+            const f = d.current / d.max;
+            if (f < worstFrac) { worstFrac = f; worstIdx = i; }
+          }
+        });
+        if (worstIdx < 0) {
+          get().appendLog('world', `${def.name}: nothing in your pack needs mending. The Aether has nowhere to go.`);
+          applied = false;
+        } else {
+          const item = player.inventory[worstIdx]!;
+          set((s) => s.player ? { player: { ...s.player, inventory: s.player.inventory.map((it, i) => i === worstIdx && it.durability ? { ...it, durability: { ...it.durability, current: it.durability.max } } : it) } } : s);
+          get().appendLog('reward', `✦ ${def.name} — you channel Aether into the ${item.name}. It mends to full.`);
+        }
+        break;
+      }
+      case 'defensive_protocols': {
+        set((s) => s.player ? { player: { ...s.player, statusEffects: [...(s.player.statusEffects ?? []).filter((e) => e.kind !== 'shielded'), { kind: 'shielded' as const, remainingRounds: 3, label: 'Defensive Protocols' }] } } : s);
+        get().appendLog('reward', `✦ ${def.name} — an Aetheric shield flares around you. Incoming damage halved for 3 rounds.`);
+        break;
+      }
+      case 'regenerative_core': {
+        const heal = rollDie(10);
+        set((s) => s.player ? { player: { ...s.player, hp: Math.min(s.player.hpMax, s.player.hp + heal) } } : s);
+        get().appendLog('reward', `✦ ${def.name} — your core hums. +${heal} HP.`);
+        break;
+      }
+      case 'elemental_control': {
+        const liveScene = get().currentScene;
+        if (!liveScene || liveScene.enemies.length === 0) { applied = false; break; }
+        const idx = Math.max(0, Math.min(liveScene.activeEnemyIdx ?? 0, liveScene.enemies.length - 1));
+        const target = liveScene.enemies[idx]!;
+        const dmg = rollDie(6);
+        const prevHp = liveScene.enemyHps[idx] ?? target.hp;
+        const newHp = Math.max(0, prevHp - dmg);
+        set((s) => s.currentScene ? { currentScene: { ...s.currentScene, enemyHps: s.currentScene.enemyHps.map((h, i) => i === idx ? newHp : h) } } : s);
+        get().appendLog('reward', `✦ ${def.name} — shaped Aetherstone slams ${target.name} for ${dmg} aetheric. (${newHp} HP left)`);
+        break;
+      }
+      case 'latent_powers':
+      case 'noble_heritage':
+      case 'beginners_luck': {
+        const buff = id === 'latent_powers' ? { stat: 'strength' as const, amt: 2, label: 'Latent Powers' }
+          : id === 'noble_heritage' ? { stat: 'charisma' as const, amt: 3, label: 'Noble Heritage' }
+          : { stat: 'wisdom' as const, amt: 3, label: "Beginner's Luck" };
+        set((s) => s.player ? { player: { ...s.player, statusEffects: [...(s.player.statusEffects ?? []), { kind: 'food_buff' as const, remainingRounds: 3, buffStat: buff.stat, buffBonus: buff.amt, label: buff.label }] } } : s);
+        get().appendLog('reward', `✦ ${def.name} — +${buff.amt} ${buff.stat.slice(0, 3).toUpperCase()} for 3 rounds.`);
+        break;
+      }
+      default: applied = false;
+    }
+    if (applied) {
+      set((s) => s.player ? { player: { ...s.player, abilityCooldowns: { ...(s.player.abilityCooldowns ?? {}), [id]: ra.currentDayOf(s.player) } } } : s);
+    }
+    set({ raceAbilityPickerOpen: false });
+    void get().persist();
   },
 
   infuseAetherDust(foodName) {
@@ -20201,8 +20365,20 @@ function applyEnemyCounter(
   // isn't completely impossible to defend.
   const armorPieces = aggregateArmor(player);
   const racialAC = effectiveAC(player, get().currentScene);
+  // arb-fix — ruinsDefenseBonus title (Protector / Warden): +AC while in a
+  // ruin / constructed environment. Reuses the race AC context detector.
+  let titleRuinsAc = 0;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const tPerksAc = require('../engine/titles').titlePerkModifiers(player);
+  if (tPerksAc.ruinsDefenseBonus > 0) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { detectACContexts } = require('../engine/raceMechanics');
+    if (detectACContexts(player, get().currentScene).has('constructed_environment')) {
+      titleRuinsAc = tPerksAc.ruinsDefenseBonus;
+    }
+  }
   // racialAC already includes player.ac; add the gear stack on top.
-  const acFromGear = racialAC + armorPieces.acBonus;
+  const acFromGear = racialAC + armorPieces.acBonus + titleRuinsAc;
   const effectiveAc = Math.max(1, acFromGear + statusAcAdjustment(player.statusEffects));
   // Natural 1 / natural 20 rule — same floor and ceiling that applies
   // to the player. A nat-1 forces a miss regardless of bonuses; a nat-20
@@ -20248,6 +20424,49 @@ function applyEnemyCounter(
 
     const resisted = applyArmorResistance(rawDmg, enemyDamageType, armorPieces.resistances);
     let dmg = resisted.damage;
+    // arb-fix — title perks now bite in COMBAT, not just against Etheric
+    // weather. Aetheric Attuned / Stormcaller passively halve incoming
+    // AETHERIC damage (the "Aetheric resistance / shield" the titles promise);
+    // Etherbound Survivor shaves a flat chunk off ANY environmental/elemental
+    // hit (its "survive the hazard" perk). Both are passive — no activation.
+    let titleAethericHalved = false;
+    let titleHazardShaved = 0;
+    if (dmg > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const tPerksHit = require('../engine/titles').titlePerkModifiers(player);
+      if (enemyDamageType === 'aetheric' && (tPerksHit.ethericDamageResist || tPerksHit.ethericShield)) {
+        dmg = Math.max(1, Math.ceil(dmg / 2));
+        titleAethericHalved = true;
+      }
+      // Etherbound Survivor — environmental/elemental damage types (burn /
+      // cold / electrical / poison / aetheric) get the save-bonus shaved off.
+      if (tPerksHit.envHazardSaveBonus > 0
+          && !!enemyDamageType
+          && /aetheric|burn|cold|electrical|poison|radiation/.test(enemyDamageType)) {
+        const shave = Math.min(dmg - 1, tPerksHit.envHazardSaveBonus);
+        if (shave > 0) { dmg = Math.max(1, dmg - shave); titleHazardShaved = shave; }
+      }
+    }
+    // arb-fix — passive RACE damage resistances (Mud Dweller / Sentinel ½ of
+    // their type; Mud Golem 25% off non-aetheric). Was flavor-only text.
+    let raceResistTag = '';
+    if (dmg > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { raceDamageMultiplier, raceResistLabel } = require('../engine/raceMechanics');
+      const raceMult = raceDamageMultiplier(player.raceId, enemyDamageType);
+      if (raceMult < 1) {
+        const before = dmg;
+        dmg = Math.max(1, Math.round(dmg * raceMult));
+        if (dmg < before) raceResistTag = raceResistLabel(player.raceId, raceMult);
+      }
+    }
+    // arb-fix — Sentinel "Defensive Protocols" ability: an active shield halves
+    // ALL incoming damage while it lasts.
+    let shieldTag = '';
+    if (dmg > 1 && (player.statusEffects ?? []).some((e) => e.kind === 'shielded')) {
+      dmg = Math.max(1, Math.ceil(dmg / 2));
+      shieldTag = ' (Defensive Protocols shield)';
+    }
 
     // ACTIVE PARRY — the player committed a dodge before this swing
     // landed. Opposed roll: d20 + DEX vs the enemy's attack total.
@@ -20375,7 +20594,12 @@ function applyEnemyCounter(
       }
       const newHp = Math.max(0, nextPlayer.hp - dmg);
       killed = newHp <= 0;
-      const resistTag = resisted.blocked ? ` (armor halves the ${enemyDamageType})` : '';
+      const titleTag = titleAethericHalved
+        ? ` (your title turns aside half the ${enemyDamageType})`
+        : titleHazardShaved > 0
+          ? ` (Etherbound Survivor shrugs off ${titleHazardShaved})`
+          : '';
+      const resistTag = (resisted.blocked ? ` (armor halves the ${enemyDamageType})` : '') + titleTag + raceResistTag + shieldTag;
       const msg = killed
         ? `${enemy.name} deals ${dmg} damage${resistTag}. You fall.`
         : `${enemy.name} deals ${dmg} damage${resistTag}. You have ${newHp} HP remaining.`;
@@ -21790,11 +22014,27 @@ function runAethercraft(
     // until HP hits 0 or the player dismisses. The "golem"
     // QuickBtn picks up the existence of this field in combat
     // and renders a commandable strike button.
-    const golem = makeCompanion(golemDef);
+    let golem = makeCompanion(golemDef);
+    // arb-fix — golemEdge title (Golem Whisperer / Master of Aethercraft):
+    // golems you summon come out tougher — +30% HP and one larger attack die.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const tPerksGolem = require('../engine/titles').titlePerkModifiers(player);
+    let golemEdgeTag = '';
+    if (tPerksGolem.golemEdge) {
+      const bonusHp = Math.max(1, Math.round(golem.hpMax * 0.3));
+      const upsizeDie = (d: string): string => {
+        const m = /^(\d+)d(\d+)$/.exec(d.trim());
+        if (!m) return d;
+        const next: Record<string, string> = { '4': '6', '6': '8', '8': '10', '10': '12', '12': '20' };
+        return `${m[1]}d${next[m[2]!] ?? m[2]}`;
+      };
+      golem = { ...golem, hp: golem.hp + bonusHp, hpMax: golem.hpMax + bonusHp, attackDie: upsizeDie(golem.attackDie) };
+      golemEdgeTag = ' Your mastery shapes it stronger than most.';
+    }
     set((s) => s.player ? { player: { ...s.player, golem } } : s);
     get().appendLog(
       'world',
-      `Aetherstone lifts out of the ground and folds into a shape that walks. ${golem.name} stands ready beside you. (HP ${golem.hp}/${golem.hpMax}, ${golem.attackDie} ${golem.damageType})`,
+      `Aetherstone lifts out of the ground and folds into a shape that walks. ${golem.name} stands ready beside you.${golemEdgeTag} (HP ${golem.hp}/${golem.hpMax}, ${golem.attackDie} ${golem.damageType})`,
     );
   } else if (discipline === 'mend') {
     const livePlayer = get().player ?? player;

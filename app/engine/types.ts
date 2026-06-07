@@ -609,6 +609,9 @@ export type StatusEffectKind =
   // potion. buffStat + buffBonus carry the actual modifier;
   // effectiveStats sums every active food_buff matching the stat.
   | 'food_buff'
+  // arb-fix — Sentinel "Defensive Protocols" race ability: halves incoming
+  // damage while active (checked at the combat damage site). N rounds.
+  | 'shielded'
   // OTA 039 — Aethercraft shape outcome. shaped_stone_ward grants a
   // one-round +4 AC. The companion-style 'golem_companion' kind was
   // retired 2026-05-25 (MECHANIC-1b OTA-011) — replaced by
@@ -800,6 +803,10 @@ export interface PlayerCharacter {
   equipped?: PlayerEquipped;
   /** Active combat status effects; tick down each player action. */
   statusEffects?: StatusEffect[];
+  /** arb-fix — race ability cooldowns: ability id → the in-game DAY it was
+   *  last used. A daily ability is ready again when that day < the current
+   *  day (Math.floor(hoursElapsed/24)+1). */
+  abilityCooldowns?: Record<string, number>;
   /** Hours elapsed since the character entered Tartaria. Day = 24 hours. */
   hoursElapsed?: number;
   /** arb107 — monotonic counter bumped each time the player's macro

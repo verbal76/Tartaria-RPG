@@ -82,6 +82,9 @@ interface Props {
   // matching Arbiter line ('elevated' = benched at a climb base — hasn't
   // learned to climb; 'aerial' = target flies — can't jump that high).
   dogBlocked?: 'elevated' | 'aerial' | null;
+  // arb-fix — a once/day race ability is available → show the ✦ ability chip.
+  raceAbilityReady?: boolean;
+  onOpenRaceAbilities?: () => void;
 }
 
 const PEACE_QUICK_DIRECT: Array<{ label: string; submit: string }> = [
@@ -110,7 +113,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenAskArbiter, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, inventory, range, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, playerHasRope }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenAskArbiter, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, inventory, range, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, playerHasRope }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
@@ -398,6 +401,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                   }}
                 />
               ) : null}
+              {raceAbilityReady && onOpenRaceAbilities ? (
+                <QuickBtn label="✦ ability" onPress={onOpenRaceAbilities} tone="ready" />
+              ) : null}
               <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} />
               <QuickBtn label="flee" defensive onPress={() => onSubmit('flee')} />
             </View>
@@ -424,6 +430,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 blocked={tutLock}
               />
             ))}
+            {raceAbilityReady && onOpenRaceAbilities && !tutLock ? (
+              <QuickBtn label="✦ ability" onPress={onOpenRaceAbilities} tone="ready" />
+            ) : null}
             <QuickBtn
               label="investigate"
               onPress={investigateOverride ?? onOpenSearch}
