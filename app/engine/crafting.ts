@@ -63,6 +63,10 @@ export interface CatalogArmor {
   baseDurability?: number;
   tags: string[];
   description: string;
+  // arb-fix — worn gear reclassified from exploration tools can carry a
+  // functional `effect` (e.g. the Aether masks' `gate: breathe_toxic`), read
+  // via the EFFECT_RESOLVERS chain (which now includes findArmorByName).
+  effect?: ItemEffect;
 }
 
 export interface CatalogGear {

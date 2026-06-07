@@ -674,24 +674,6 @@
     }
   },
   {
-    "name": "Aetheric Mask",
-    "abilityReq": "Wisdom Level 6",
-    "kind": "exploration",
-    "rarity": "Uncommon",
-    "faction": "Mud Dwellers",
-    "tcBuy": 30,
-    "tags": [
-      "exploration",
-      "gear",
-      "uncommon"
-    ],
-    "description": "Provides 5 hours of air, filters toxins.",
-    "effect": {
-      "kind": "gate",
-      "unlocks": "breathe_toxic"
-    }
-  },
-  {
     "name": "Aether Respirator",
     "abilityReq": "Wisdom Level 9",
     "kind": "exploration",
@@ -1009,44 +991,6 @@
     }
   },
   {
-    "name": "Aetheric Cloak",
-    "abilityReq": "Dexterity Level 9",
-    "kind": "exploration",
-    "rarity": "Rare",
-    "faction": "Forgotten Order",
-    "tcBuy": 68,
-    "tags": [
-      "exploration",
-      "gear",
-      "rare"
-    ],
-    "description": "Provides stealth in Aetheric storms.",
-    "effect": {
-      "kind": "passive",
-      "stat": "dexterity",
-      "bonus": 1
-    }
-  },
-  {
-    "name": "Stealth Hood",
-    "abilityReq": "Dexterity Level 6",
-    "kind": "exploration",
-    "rarity": "Uncommon",
-    "faction": "Mud Dwellers",
-    "tcBuy": 28,
-    "tags": [
-      "exploration",
-      "gear",
-      "uncommon"
-    ],
-    "description": "Reduces visibility in fog and Aetheric disturbances.",
-    "effect": {
-      "kind": "passive",
-      "stat": "dexterity",
-      "bonus": 1
-    }
-  },
-  {
     "name": "Dimensional Pouch",
     "abilityReq": "Intelligence Level 11",
     "kind": "exploration",
@@ -1062,44 +1006,6 @@
     "effect": {
       "kind": "passive",
       "stat": "intelligence",
-      "bonus": 1
-    }
-  },
-  {
-    "name": "Anti-Aetheric Cloak",
-    "abilityReq": "Intelligence Level 9",
-    "kind": "exploration",
-    "rarity": "Rare",
-    "faction": "Forgotten Order",
-    "tcBuy": 60,
-    "tags": [
-      "exploration",
-      "gear",
-      "rare"
-    ],
-    "description": "Blocks detection from Aetheric sensors.",
-    "effect": {
-      "kind": "passive",
-      "stat": "dexterity",
-      "bonus": 1
-    }
-  },
-  {
-    "name": "Heat-Shield Gloves",
-    "abilityReq": "Dexterity Level 6",
-    "kind": "exploration",
-    "rarity": "Uncommon",
-    "faction": "Mud Dwellers",
-    "tcBuy": 30,
-    "tags": [
-      "exploration",
-      "gear",
-      "uncommon"
-    ],
-    "description": "Resistant to high temperatures and Aetheric burns.",
-    "effect": {
-      "kind": "passive",
-      "stat": "strength",
       "bonus": 1
     }
   },
@@ -1223,27 +1129,6 @@
     }
   },
   {
-    "name": "Golem Leather Gloves",
-    "abilityReq": "Strength Level 3",
-    "kind": "exploration",
-    "rarity": "Common",
-    "faction": "Mud Dwellers",
-    "tcBuy": 17,
-    "tags": [
-      "exploration",
-      "tool",
-      "common",
-      "race_starter",
-      "mud_dweller"
-    ],
-    "description": "Handling Aetheric stones and crystals. Provides resistance to Aetheric shocks.",
-    "effect": {
-      "kind": "passive",
-      "stat": "strength",
-      "bonus": 1
-    }
-  },
-  {
     "name": "Cavern Sound Stones",
     "abilityReq": "Intelligence Level 2",
     "kind": "exploration",
@@ -1282,26 +1167,6 @@
       "kind": "passive",
       "stat": "intelligence",
       "bonus": 1
-    }
-  },
-  {
-    "name": "Aether-Breath Mask",
-    "abilityReq": "Wisdom Level 3",
-    "kind": "exploration",
-    "rarity": "Common",
-    "faction": "Mud Dwellers",
-    "tcBuy": 22,
-    "tags": [
-      "exploration",
-      "tool",
-      "common",
-      "race_starter",
-      "mud_dweller"
-    ],
-    "description": "Breathing in Aether-heavy environments. Filters Aetheric air for safe breathing.",
-    "effect": {
-      "kind": "gate",
-      "unlocks": "breathe_toxic"
     }
   },
   {
@@ -1447,27 +1312,6 @@
     "effect": {
       "kind": "consumable",
       "revealScene": true
-    }
-  },
-  {
-    "name": "Echoing Steps Boots",
-    "abilityReq": "Dexterity Level 2",
-    "kind": "armor",
-    "rarity": "Common",
-    "faction": "Reclaimers",
-    "tcBuy": 16,
-    "tags": [
-      "armor",
-      "feet",
-      "common",
-      "race_starter",
-      "reclaimer"
-    ],
-    "description": "Boots tuned for silent movement in ruins. Reduces noise when walking on debris.",
-    "effect": {
-      "kind": "passive",
-      "stat": "dexterity",
-      "bonus": 1
     }
   },
   {
@@ -1672,27 +1516,6 @@
     "effect": {
       "kind": "consumable",
       "restoreStamina": 4
-    }
-  },
-  {
-    "name": "Mud-Sealer Gauntlets",
-    "abilityReq": "Strength Level 2",
-    "kind": "exploration",
-    "rarity": "Common",
-    "faction": "Mud Golems",
-    "tcBuy": 18,
-    "tags": [
-      "exploration",
-      "tool",
-      "common",
-      "race_starter",
-      "mud_golem"
-    ],
-    "description": "Gauntlets for shaping mud and clay. Enhances mud-shaping and solidification.",
-    "effect": {
-      "kind": "passive",
-      "stat": "strength",
-      "bonus": 1
     }
   },
   {

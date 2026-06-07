@@ -4,10 +4,19 @@ import {
   RACE_STARTER_EXPLORATION,
 } from '../app/engine/character';
 import explorationData from '../app/data/items/exploration.json';
+import armorData from '../app/data/items/armor.json';
+import weaponsData from '../app/data/items/weapons.json';
 
 interface CatalogItem { name: string; tags?: string[] }
 const explorationItems = explorationData as CatalogItem[];
-const explorationByName = new Map(explorationItems.map((i) => [i.name, i]));
+// arb-fix — a race-starter may live in ANY of these catalogs: exploration
+// (tools), armor (reclassified worn gear), or weapons (e.g. Mud-Rend Blade).
+// buildStarterInventory now resolves a starter name against all three.
+const armorItems = (armorData as { armor: CatalogItem[] }).armor;
+const weaponItems = (weaponsData as { weapons: CatalogItem[] }).weapons;
+const explorationByName = new Map<string, CatalogItem>(
+  [...explorationItems, ...armorItems, ...weaponItems].map((i) => [i.name, i]),
+);
 
 // ---------------------------------------------------------------------------
 // Data integrity — the race → starter-item map vs the catalog
@@ -20,7 +29,7 @@ describe('RACE_STARTER_EXPLORATION — data integrity', () => {
     expect(missing).toEqual([]);
   });
 
-  it('every starter-item name resolves to an entry in exploration.json', () => {
+  it('every starter-item name resolves to a catalog entry (exploration or armor)', () => {
     const orphans: string[] = [];
     for (const [raceId, items] of Object.entries(RACE_STARTER_EXPLORATION)) {
       for (const name of items) {

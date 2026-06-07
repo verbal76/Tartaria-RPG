@@ -30,7 +30,9 @@
         "blade",
         "melee",
         "mud",
-        "tartarian"
+        "tartarian",
+        "race_starter",
+        "mud_golem"
       ],
       "description": "A field-forged blade with a serrated spine for tearing through mud-glass crust. Reclaimer salvage crews favour it for cutting siltbound straps and wraith-flesh both."
     },

@@ -197,6 +197,13 @@ const STAT_KEYS: StatKey[] = ['strength', 'dexterity', 'intelligence', 'wisdom',
 // in more than one catalog by name).
 const EFFECT_RESOLVERS: EffectResolver[] = [
   (n) => findExplorationItemByName(n),
+  // arb-fix — worn gear that carries a functional `effect` (e.g. the Aether
+  // masks' `gate: breathe_toxic`) now lives in armor.json after the
+  // exploration-tool → armor reclassification, so armor must flow through the
+  // gate/passive resolver chain too. (Armor stat bonuses still apply only when
+  // EQUIPPED, via aggregateEquippedStatBonuses + statBonus; the reclassified
+  // armor rows carry no `effect.passive`, so this doesn't double-apply.)
+  (n) => findArmorByName(n),
   (n) => findGearByName(n),
   (n) => findMaterialByName(n),
   // Equipped-class catalogs also flow through so a future ring or

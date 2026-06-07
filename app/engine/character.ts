@@ -3,6 +3,8 @@ import { rollDie, rollDice, rollFromNotation } from './rng';
 import racesData from '../data/races/races.json';
 import factionsData from '../data/factions/factions.json';
 import explorationData from '../data/items/exploration.json';
+import armorData from '../data/items/armor.json';
+import weaponsData from '../data/items/weapons.json';
 import { stampDurability } from './durability';
 import { WORLD_MAP_CENTER_X, WORLD_MAP_CENTER_Y } from './worldMap';
 import { initMainQuest } from './mainQuest';
@@ -67,6 +69,22 @@ const EXPLORATION_BY_NAME = new Map<string, CatalogExplorationItem>();
 for (const item of explorationData as CatalogExplorationItem[]) {
   EXPLORATION_BY_NAME.set(item.name, item);
 }
+// arb-fix — some race-starter worn gear (boots / gloves / gauntlets / mask)
+// was reclassified exploration-tool → ARMOR, so buildStarterInventory must
+// also resolve a starter name against armor.json. Mirrors EXPLORATION_BY_NAME
+// (built inline to avoid a crafting.ts import + circular-dep risk).
+interface CatalogArmorStarter { name: string; rarity?: string; tags?: string[]; description?: string }
+const ARMOR_BY_NAME = new Map<string, CatalogArmorStarter>();
+for (const item of (armorData as { armor: CatalogArmorStarter[] }).armor) {
+  ARMOR_BY_NAME.set(item.name, item);
+}
+// arb-fix — and a starter name may be a weapon (e.g. the mud_golem's
+// Mud-Rend Blade) that only lives in weapons.json; the grant previously only
+// looked in exploration.json, so that starter was silently dropped.
+const WEAPONS_BY_NAME = new Map<string, CatalogArmorStarter>();
+for (const item of (weaponsData as { weapons: CatalogArmorStarter[] }).weapons) {
+  WEAPONS_BY_NAME.set(item.name, item);
+}
 
 /**
  * Maps the catalog's loose `kind: 'exploration'` to a PlayerCharacter
@@ -116,19 +134,50 @@ function buildStarterInventory(race: Race, faction: Faction): InventoryItem[] {
   for (let i = 0; i < raceStarterNames.length; i++) {
     const itemName = raceStarterNames[i]!;
     const catalog = EXPLORATION_BY_NAME.get(itemName);
-    if (!catalog) continue; // safety — skip silently if the catalog is missing
-    const kind = explorationToInventoryKind(catalog);
-    const item: InventoryItem = {
-      id: `starter_explore_${i}_${Date.now()}`,
-      name: catalog.name,
-      kind,
-      rarity: 'Common',
-      quantity: 1,
-      tags: catalog.tags,
-      description: catalog.description,
-    };
-    // Weapons need durability stamped; relics and misc don't track it.
-    items.push(kind === 'weapon' ? stampDurability(item) : item);
+    if (catalog) {
+      const kind = explorationToInventoryKind(catalog);
+      const item: InventoryItem = {
+        id: `starter_explore_${i}_${Date.now()}`,
+        name: catalog.name,
+        kind,
+        rarity: 'Common',
+        quantity: 1,
+        tags: catalog.tags,
+        description: catalog.description,
+      };
+      // Weapons need durability stamped; relics and misc don't track it.
+      items.push(kind === 'weapon' ? stampDurability(item) : item);
+      continue;
+    }
+    // arb-fix — the starter item was reclassified into armor.json (boots /
+    // gloves / gauntlets / mask). Grant it as ARMOR so it equips + carries its
+    // stat bonus / resistance / gate, instead of silently dropping it.
+    const armorCat = ARMOR_BY_NAME.get(itemName);
+    if (armorCat) {
+      items.push(stampDurability({
+        id: `starter_armor_${i}_${Date.now()}`,
+        name: armorCat.name,
+        kind: 'armor',
+        rarity: (armorCat.rarity as InventoryItem['rarity']) ?? 'Common',
+        quantity: 1,
+        tags: armorCat.tags ?? ['armor'],
+        description: armorCat.description ?? '',
+      }));
+      continue;
+    }
+    const weaponCat = WEAPONS_BY_NAME.get(itemName);
+    if (weaponCat) {
+      items.push(stampDurability({
+        id: `starter_weapon_${i}_${Date.now()}`,
+        name: weaponCat.name,
+        kind: 'weapon',
+        rarity: (weaponCat.rarity as InventoryItem['rarity']) ?? 'Common',
+        quantity: 1,
+        tags: weaponCat.tags ?? ['weapon'],
+        description: weaponCat.description ?? '',
+      }));
+    }
+    // else: skip silently if the catalog is missing
   }
   return items;
 }

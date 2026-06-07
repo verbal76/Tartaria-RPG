@@ -8619,6 +8619,309 @@
         "tartarian_revivalists"
       ],
       "description": "Faction-issue chest armor of the tartarian revivalists. Bears their colors."
+    },
+    {
+      "name": "Echoing Steps Boots",
+      "slot": "feet",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "faction": "Reclaimers",
+      "dexReq": 1,
+      "tcBuy": 16,
+      "tcSell": 6,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "feet",
+        "boots",
+        "race_starter",
+        "reclaimer",
+        "common"
+      ],
+      "description": "Boots tuned for silent movement in ruins. Reduces noise when walking on debris.",
+      "abilityReq": "Dexterity Level 2"
+    },
+    {
+      "name": "Golem Leather Gloves",
+      "slot": "hands",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "faction": "Mud Dwellers",
+      "dexReq": 1,
+      "tcBuy": 17,
+      "tcSell": 7,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "hands",
+        "gloves",
+        "race_starter",
+        "mud_dweller",
+        "common"
+      ],
+      "description": "Handling Aetheric stones and crystals. Provides resistance to Aetheric shocks.",
+      "abilityReq": "Strength Level 3"
+    },
+    {
+      "name": "Mud-Sealer Gauntlets",
+      "slot": "hands",
+      "acBonus": 1,
+      "resistances": [],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "faction": "Mud Golems",
+      "dexReq": 1,
+      "tcBuy": 18,
+      "tcSell": 7,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "hands",
+        "gauntlets",
+        "race_starter",
+        "mud_golem",
+        "common"
+      ],
+      "description": "Gauntlets for shaping mud and clay. Enhances mud-shaping and solidification.",
+      "abilityReq": "Strength Level 2"
+    },
+    {
+      "name": "Heat-Shield Gloves",
+      "slot": "hands",
+      "acBonus": 1,
+      "resistances": [
+        "burn"
+      ],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "strength",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "faction": "Mud Dwellers",
+      "dexReq": 1,
+      "tcBuy": 30,
+      "tcSell": 12,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "hands",
+        "gloves",
+        "uncommon"
+      ],
+      "description": "Resistant to high temperatures and Aetheric burns.",
+      "abilityReq": "Dexterity Level 6"
+    },
+    {
+      "name": "Aetheric Mask",
+      "slot": "head",
+      "acBonus": 1,
+      "resistances": [
+        "aetheric"
+      ],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "faction": "Mud Dwellers",
+      "dexReq": 1,
+      "tcBuy": 30,
+      "tcSell": 12,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "aether",
+        "uncommon"
+      ],
+      "description": "Provides 5 hours of air, filters toxins.",
+      "abilityReq": "Wisdom Level 6",
+      "effect": {
+        "kind": "gate",
+        "unlocks": "breathe_toxic"
+      }
+    },
+    {
+      "name": "Aether-Breath Mask",
+      "slot": "head",
+      "acBonus": 1,
+      "resistances": [
+        "aetheric"
+      ],
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 1
+        }
+      ],
+      "rarity": "Common",
+      "faction": "Mud Dwellers",
+      "dexReq": 1,
+      "tcBuy": 22,
+      "tcSell": 9,
+      "baseDurability": 20,
+      "tags": [
+        "armor",
+        "head",
+        "mask",
+        "aether",
+        "race_starter",
+        "mud_dweller",
+        "common"
+      ],
+      "description": "Breathing in Aether-heavy environments. Filters Aetheric air for safe breathing.",
+      "abilityReq": "Wisdom Level 3",
+      "effect": {
+        "kind": "gate",
+        "unlocks": "breathe_toxic"
+      }
+    },
+    {
+      "name": "Aetheric Cloak",
+      "slot": "cloak",
+      "acBonus": 1,
+      "resistances": [
+        "aetheric"
+      ],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Rare",
+      "faction": "Forgotten Order",
+      "dexReq": 1,
+      "tcBuy": 68,
+      "tcSell": 27,
+      "baseDurability": 35,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "aether",
+        "rare"
+      ],
+      "description": "Provides stealth in Aetheric storms.",
+      "abilityReq": "Dexterity Level 9"
+    },
+    {
+      "name": "Anti-Aetheric Cloak",
+      "slot": "cloak",
+      "acBonus": 1,
+      "resistances": [
+        "aetheric"
+      ],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Rare",
+      "faction": "Forgotten Order",
+      "dexReq": 1,
+      "tcBuy": 60,
+      "tcSell": 24,
+      "baseDurability": 35,
+      "tags": [
+        "armor",
+        "cloak",
+        "cloak",
+        "aether",
+        "rare"
+      ],
+      "description": "Blocks detection from Aetheric sensors.",
+      "abilityReq": "Intelligence Level 9"
+    },
+    {
+      "name": "Stealth Hood",
+      "slot": "head",
+      "acBonus": 1,
+      "resistances": [
+        "aetheric"
+      ],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
+      "rarity": "Uncommon",
+      "faction": "Mud Dwellers",
+      "dexReq": 1,
+      "tcBuy": 28,
+      "tcSell": 11,
+      "baseDurability": 30,
+      "tags": [
+        "armor",
+        "head",
+        "hood",
+        "aether",
+        "uncommon"
+      ],
+      "description": "Reduces visibility in fog and Aetheric disturbances.",
+      "abilityReq": "Dexterity Level 6"
     }
   ]
 }

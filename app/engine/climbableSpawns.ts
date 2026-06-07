@@ -32,7 +32,6 @@ export const OUTSIDE_CLIMBABLES: ClimbableSpawn[] = [
   { name: 'ruined skyscraper',          context: 'outside', height: 4 },
   { name: 'petrified mud wave',         context: 'outside', height: 2 },
   { name: 'obsidian pillar',            context: 'outside', height: 3 },
-  { name: "titan's bone marker",        context: 'outside', height: 1 },
   { name: 'submerged giant statue',     context: 'outside', height: 3 },
   { name: 'buried strip mall rooftop',  context: 'outside', height: 2 },
   { name: 'endless stair landing',      context: 'outside', height: 4 },
@@ -58,8 +57,8 @@ export const INSIDE_CLIMBABLES: ClimbableSpawn[] = [
 
 // Adjective prefixes for variety — applied at spawn time so each visit
 // to a similar scene reads distinct. Skipped for proper-noun items
-// that already carry context ("titan's bone marker" doesn't need
-// "ancient" in front; "zharak's teeth spire" reads weird with one).
+// that already carry context ("zharak's teeth spire" reads weird with
+// an adjective in front).
 const FLAVOR_ADJECTIVES = [
   'ancient', 'weathered', 'leaning', 'broken', 'half-buried',
   'shattered', 'rusted', 'cracked', 'tilting', 'jagged',

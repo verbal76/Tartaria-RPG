@@ -157,6 +157,12 @@ const CODENAMES: Record<string, string> = {
   // OTA-325 — Echoing Steps Boots reclassified exploration-tool → feet armor;
   // inventory shows a green ✓ on the equipped item (twin of the red ✗); and
   // the dev/Vault two-codename split is retired (ship everything from HaL2001).
+  // OTA-326 — removed the Titan's Bone Marker scene noun (climb/investigate
+  // problem); reclassified 9 worn exploration-tools → armor (boots/gloves/
+  // gauntlets + Aether masks/cloaks/hood w/ aether resist + breathe_toxic gate);
+  // race-starter grant now resolves armor + weapons (fixes Mud-Rend Blade);
+  // new docs/armor-catalog.md balance reference.
+  '2026-06-07-326': 'Tamarack Anvil',
   '2026-06-07-325': 'Cypress Anvil',
   '2026-06-07-324': 'Willow Anvil',
   '2026-06-07-323': 'Alder Anvil',

@@ -12553,4 +12553,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // positive twin of the red ✗ for a slot already worn. (3) Workflow doc reset:
 // retired the dev/Vault two-codename split — everything builds, tests, and
 // ships from HaL2001 now (one branch, one Anvil codename, one OTA number).
-export const OTA_BUILD_ID = '2026-06-07-325';
+// OTA-326 — Tamarack Anvil. (1) Removed the "Titan's Bone Marker" scene noun
+// (a recurring climb/investigate problem) — from locations.json, the climbable
+// pool, and the registry doc; it was never a catalog item / quest dep. (2)
+// Reclassified 9 worn exploration-tools → ARMOR: Echoing Steps Boots (+1 DEX,
+// feet), gloves/gauntlets (Golem Leather, Mud-Sealer, Heat-Shield → hands; Heat
+// gets burn resist), and the Aether masks/cloaks/hood → head/cloak armor with
+// aether resistance (the masks keep their breathe_toxic gate). Engine: armor
+// now flows through EFFECT_RESOLVERS (gates), the race-starter grant resolves
+// armor + weapons catalogs, and Mud-Rend Blade (a broken mud_golem starter) is
+// granted again. (3) New docs/armor-catalog.md — every armor item + stats, for
+// balancing.
+export const OTA_BUILD_ID = '2026-06-07-326';

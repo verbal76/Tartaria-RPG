@@ -56,7 +56,7 @@ red glass · steam pipe · mud pit · tower relay · broken scaffold · coin pou
 ## 3. The Great Tartary Plains
 *Flood-scarred wasteland filled with buried ruins and storms.*
 
-petrified mud · bone marker · dust whirlwind · buried wagon · storm crystal · sinkhole · rusted spear · survey tripod · broken compass · mud fissure · fossil rib · rope coil · flood trench · lantern shard · weather beacon · ash drift · salvage sack · cracked obelisk · rail spike · shimmering rift · dead tree · sludge pool · bone tool · broken flare · buried statue
+petrified mud · dust whirlwind · buried wagon · storm crystal · sinkhole · rusted spear · survey tripod · broken compass · mud fissure · fossil rib · rope coil · flood trench · lantern shard · weather beacon · ash drift · salvage sack · cracked obelisk · rail spike · shimmering rift · dead tree · sludge pool · bone tool · broken flare · buried statue
 
 ## 4. The Mud Seas
 *An endless drowned wasteland concealing submerged Tartarian structures.*
@@ -191,7 +191,7 @@ pump housing · pressure gauge · cooling pipe · steam burst · rusted ladder �
 *Frozen mountain choke point leading toward the Giant Vaults.*
 *(Mapped to `giant_vault`.)*
 
-ice wall · snow drift · avalanche debris · frozen rope · cliff crack · bone marker · frost lantern · rusted spike · wind tunnel · stone bridge · ice fissure · broken sled · frozen corpse · mountain rail · storm flag · ice ladder · frost chain · rockslide debris · bone spear · snow trench · cracked cairn · blizzard fog · echo horn · frozen torch · cliff edge
+ice wall · snow drift · avalanche debris · frozen rope · cliff crack · frost lantern · rusted spike · wind tunnel · stone bridge · ice fissure · broken sled · frozen corpse · mountain rail · storm flag · ice ladder · frost chain · rockslide debris · bone spear · snow trench · cracked cairn · blizzard fog · echo horn · frozen torch · cliff edge
 
 ## 50. The Silent Gallery
 *A burial corridor lined with preserved Entombed citizens.*
