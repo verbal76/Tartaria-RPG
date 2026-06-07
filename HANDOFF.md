@@ -21,7 +21,7 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - `HaL2001` HEAD = **OTA-334 "Larch Anvil"** — live on Android + iOS.
+> - `HaL2001` HEAD = **OTA-335 "Aspen Anvil"** — live on Android + iOS.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - tsc clean. Tests green modulo the known baseline flakes (dogTravelClimb,
@@ -417,6 +417,12 @@ checkout, not a special rollback tool.)
 - **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Aspen Anvil (`2026-06-07-335`) — inventory slot display + default slot sort + locked-chip color
+- **Armor/gear rows show the slot they fill.** Player: armor should say what slot it fills. Every equippable row now reads it: unequipped → "Chest · tap to equip" / "Feet · tap to equip" (weapons collapse to "Hand"/"Two-handed"); equipped already showed "EQUIPPED (slot)" since OTA-334. New `slotFillLabelFor` (from `validSlotsForItem` + `SLOT_LABEL`), passed to `ItemRow.fillSlotLabel`. `app/screens/InventoryScreen.tsx`.
+- **Default SLOT sort.** Opening the pack now defaults to a new SLOT sort (first option) — within each category, gear orders head-to-toe via `SLOT_RANK` (main→off→head→chest→hands→legs→feet→cloak→amulet→ring); non-equippable items fall to the bottom by name. `sortKey` default `'name'`→`'slot'`; resets to SLOT each time the screen re-opens, switchable after. `INV_SORT_OPTIONS` + `sortInventoryItems` 'slot' case + `primarySlotRank`.
+- **Locked-chip requirement color.** The scanner-requirement label ("requires Mud Scanner") on a 🔒 locked chip in the investigate modal used `#bf9b6a` (an off-tone the player flagged); now uses the inventory EQUIPPED amber `#c9a86a`. `chipFullHint` is used only for that label. `app/components/SearchModal.tsx`.
+- **Verified:** src tsc clean.
 
 #### Larch Anvil (`2026-06-07-334`) — playtest batch (10 fixes)
 A batch from a live playthrough (Verbal, Dynasty Border Post). All JS-only → OTA.

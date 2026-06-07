@@ -314,7 +314,10 @@ const styles = StyleSheet.create({
   // always renders in full at its natural width.
   chipFullText: { color: '#e6d8b3', fontSize: 14, fontWeight: '600', flex: 1, flexShrink: 1 },
   chipFullArrow: { color: '#9ec96a', fontSize: 11, letterSpacing: 1, flexShrink: 0, marginLeft: 8 },
-  chipFullHint: { color: '#bf9b6a', fontSize: 11, letterSpacing: 0.5, flexShrink: 0, marginLeft: 8 },
+  // arb-fix — the scanner-requirement label on a locked chip ("requires Mud
+  // Scanner") used #bf9b6a, an off-tone amber the player flagged. Match the
+  // inventory "EQUIPPED" amber (#c9a86a) so the palette is consistent.
+  chipFullHint: { color: '#c9a86a', fontSize: 11, letterSpacing: 0.5, flexShrink: 0, marginLeft: 8 },
   chipFullConsumed: {
     backgroundColor: '#13110f',
     borderColor: '#3a342c',

@@ -181,7 +181,9 @@ const CODENAMES: Record<string, string> = {
   // auto-close, dog-in-arsenal vs climb/aerial + anti-air weapons, apostrophe
   // clear-fix, vendor stock/owned stack, FUSABLE tab, dog food heal, runecaster
   // casing drops, fuzzy investigate/salvage clears.
-  '2026-06-07-334': 'Larch Anvil',
+  // OTA-335 — inventory: rows show the slot they fill; default SLOT sort on
+  // open; locked-chip scanner-requirement text uses the EQUIPPED amber.
+  '2026-06-07-335': 'Aspen Anvil',
   '2026-06-07-327': 'Hemlock Anvil',
   '2026-06-07-326': 'Tamarack Anvil',
   '2026-06-07-325': 'Cypress Anvil',

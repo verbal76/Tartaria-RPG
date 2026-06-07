@@ -25,6 +25,10 @@ import { FirstTimeHint } from '../components/FirstTimeHint';
 // asc = Common→Legendary, quantity desc = biggest stacks
 // first, kind asc). Tapping the active axis toggles direction.
 const INV_SORT_OPTIONS = [
+  // arb-fix — SLOT is the default: within each category, gear orders by the
+  // body slot it fills (main → off → head → chest → hands → legs → feet →
+  // cloak → amulet → ring), so the Armor section reads head-to-toe.
+  { key: 'slot', label: 'SLOT' },
   { key: 'name', label: 'NAME' },
   { key: 'rarity', label: 'RARITY' },
   { key: 'kind', label: 'KIND' },
@@ -48,6 +52,15 @@ const RARITY_RANK: Record<string, number> = {
   Rare: 2,
   Legendary: 3,
 };
+// arb-fix — head-to-toe order for the SLOT sort. Items with no equip slot
+// (materials, consumables, loot) fall to the bottom of their category by name.
+const SLOT_RANK: Record<string, number> = {
+  main: 0, off: 1, head: 2, chest: 3, hands: 4, legs: 5, feet: 6, cloak: 7, amulet: 8, ring: 9,
+};
+function primarySlotRank(item: InventoryItem): number {
+  const s = validSlotsForItem(item)[0];
+  return s ? (SLOT_RANK[s] ?? 50) : 99;
+}
 
 function sortInventoryItems(
   items: InventoryItem[],
@@ -78,6 +91,12 @@ function sortInventoryItems(
         // Reserved (♥) items float to the top of the fusion view, then by name.
         const ar = a.reservedForFusion ? 0 : 1;
         const br = b.reservedForFusion ? 0 : 1;
+        if (ar !== br) return (ar - br) * dir;
+        return a.name.localeCompare(b.name) * dir;
+      }
+      case 'slot': {
+        const ar = primarySlotRank(a);
+        const br = primarySlotRank(b);
         if (ar !== br) return (ar - br) * dir;
         return a.name.localeCompare(b.name) * dir;
       }
@@ -133,7 +152,10 @@ export function InventoryScreen() {
   // the item NAME only (not tags or kind) — keeps the search
   // mental-model simple and predictable.
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortKey, setSortKey] = useState('name');
+  // arb-fix — default to SLOT sort so opening the pack always groups gear by
+  // the slot it fills (head-to-toe within Armor). The player can switch sorts
+  // afterwards; this resets to SLOT each time the screen re-opens.
+  const [sortKey, setSortKey] = useState('slot');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   // OTA-269 — when the player taps an empty tool pouch slot, the
   // inventory list below filters to ONLY pouch-eligible items so they
@@ -262,6 +284,17 @@ export function InventoryScreen() {
     // Armor / accessory: the human slot label(s), deduped (e.g. a ring → "ring").
     const labels = [...new Set(slots.map((s) => SLOT_LABEL[s] ?? s))];
     return labels.join(' + ');
+  };
+  // arb-fix — the slot an item FILLS, shown on every equippable row (esp. armor:
+  // "Chest", "Head", "Feet"…) whether worn or not, so the player can see where a
+  // piece goes at a glance. Weapons collapse to "Hand" / "Two-handed".
+  const slotFillLabelFor = (item: InventoryItem): string => {
+    const slots = validSlotsForItem(item);
+    if (slots.length === 0) return '';
+    if (findWeaponByName(item.name)?.style === 'two_handed') return 'Two-handed';
+    if (slots.every((s) => s === 'main' || s === 'off')) return 'Hand';
+    const labels = [...new Set(slots.map((s) => SLOT_LABEL[s] ?? s))];
+    return labels.join(' / ');
   };
 
 
@@ -663,6 +696,7 @@ export function InventoryScreen() {
                   color={CATEGORY_COLORS[cat]}
                   isEquipped={equippedItemIds.has(item.id)}
                   equippedSlotLabel={equippedSlotLabelFor(item)}
+                  fillSlotLabel={slotFillLabelFor(item)}
                   isPouched={(player.equipped?.toolPouchIds ?? []).includes(item.id)}
                   slotTaken={itemSlotTaken(item)}
                   onPress={() => handleItemTap(item)}
@@ -857,6 +891,7 @@ function ItemRow({
   color,
   isEquipped,
   equippedSlotLabel,
+  fillSlotLabel,
   isPouched,
   slotTaken,
   onPress,
@@ -865,6 +900,7 @@ function ItemRow({
   color: string;
   isEquipped: boolean;
   equippedSlotLabel: string;
+  fillSlotLabel: string;
   isPouched: boolean;
   slotTaken: boolean;
   onPress: () => void;
@@ -958,7 +994,13 @@ function ItemRow({
               dur {item.durability.current}/{item.durability.max}
             </Text>
           )}
-          {canEquip && !isEquipped && <Text style={styles.rowEquippable}>tap to equip</Text>}
+          {/* arb-fix — show the slot the piece fills (esp. armor: "Chest",
+              "Feet"…) right on the row so the player sees where it goes. */}
+          {canEquip && !isEquipped && (
+            <Text style={styles.rowEquippable}>
+              {fillSlotLabel ? `${fillSlotLabel} · tap to equip` : 'tap to equip'}
+            </Text>
+          )}
           {!canEquip && !isEquipped && <Text style={styles.rowEquippable}>tap for details</Text>}
           {isEquipped && (
             // 2026-05-26 OTA-056 — show the slot the item occupies so the

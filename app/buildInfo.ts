@@ -12623,4 +12623,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Runecaster Casings are now obtainable — tier-matched drops from 20 automatons.
 // (10) A fuzzy-matched investigate/salvage that lands on an inventory item shows
 // the preview once then clears (was an infinite preview loop).
-export const OTA_BUILD_ID = '2026-06-07-334';
+// OTA-335 — Aspen Anvil. Inventory polish: (1) every equippable row shows the
+// slot it fills ("Chest · tap to equip", "Feet · tap to equip"; weapons →
+// "Hand"/"Two-handed"). (2) The pack now defaults to a SLOT sort on open —
+// within each category gear orders head-to-toe (main→off→head→chest→hands→
+// legs→feet→cloak→amulet→ring); resets to SLOT each open, switchable after.
+// (3) The locked-chip scanner-requirement label in the investigate modal now
+// uses the inventory EQUIPPED amber (#c9a86a) instead of the off-tone #bf9b6a.
+export const OTA_BUILD_ID = '2026-06-07-335';
