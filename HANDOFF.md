@@ -1,87 +1,116 @@
 # Tartaria Realms — Session Handoff
 
-> **Branches:**
-> - `HaL2001` — **live Android playtester branch.** Live OTA: **Zinc Anvil (OTA-300).** Tungsten Spire (OTA-301) was published then **ROLLED BACK** to Zinc Anvil this session — an unverified tutorial reached testers. See Closed §0.B.
-> - `claude/new-session-MvF82` — long-running dev branch; PR #1 → `main` (stale).
-> - `arbiters-line` — **CURRENT ACTIVE WORK. Isolated personal-test branch**, sideload-only on a **DEAD OTA channel** (`arbiters-line`): publishes no OTA, cannot reach playtesters. Carries the Tungsten Spire tutorial redesign + this session's fixes for the user's on-device verification BEFORE any promotion. Latest build: **Flint Coil — APK #276** (`OTA_BUILD_ID = 2026-06-03-arb1`). Draft PR #4 (**NOT for merge** — test tracker).
-> **App version:** `2.4.1` (display `3.0.0`).
-> **User's terminology (important):** "**production**" = *build + push* (just produce the build); "**distribution**" = *ship beyond the user's own phone* (playtesters / store). Flint Coil is production-done, NOT distribution-ready.
-> **Latest APK:** `arbiters-line` **#276 Flint Coil** — Tungsten Spire tutorial + **uncapped pack** + **25-adjective default names** + **land-in-exploration tutorial-end fix**. (Builds #274/#275 were the codename-less precursors.) Production APK/AAB line unchanged: last pair Cobalt Drift APK / **Granite Hold AAB**; `MINIMUM_RECOMMENDED_APK_BUILD = 263`.
-> **TypeScript:** 0 errors in `app/` (`npx tsc --noEmit`).
-> **Tests:** green. **The four 700-day stress sims — `combatStress`, `domesticStress`, `metaNavStress`, `interactionStress` — previously OOM-aborting are now FIXED this session:** per-turn `gameLog` trim (the project's documented OOM guard) + a **seeded global RNG** so each is deterministic, not flaky. Stale assertions corrected along the way (block-folded-into-dodge, rest-vs-hunger, scrap success-roll/consolation, save/load catalog re-hydration + map-calibration migration). Plus `defaultName` (25-adjective pool) and `inventoryAudit` + `craftingInventoryChaosSim` updated for the **uncapped pack**. Canary five + year/two-year/chaos green.
-> **Working tree:** clean.
-> **Open PRs:** #1 (dev → main, stale), #3 (`iOS-initial`, draft, not for merge), #4 (`arbiters-line`, draft, not for merge — this session's test tracker).
-> **Open issues:** the 5 long-standing ones in §0.A (hub-room key collision; catalog backfill; inference engine doesn't check materials.json; hook-puzzle parser misses "rotate the ring"; "knock on the steeple"-style narrative actions parse as unknown), plus the parked **iOS → TestFlight** task at the top of §0.A. GitHub issue tracker: 0.
-
-> **For the next Claude instance:** **current active work = the `arbiters-line` Flint Coil test APK (#276)**, built/building for the user's ON-DEVICE tutorial pass. It is production-done (build+push) but NOT distribution-ready. **To promote the tutorial from this isolated test → live, follow §P (Production Runbook) immediately below — read it FIRST.** A separate, still-open task (iOS → TestFlight) is parked at the top of §0.A. Then §16 for the player's working style + major systems, and §0 for the canonical Open/Closed tracker (read before planning any fix).
+> **READ FIRST — how we operate:** §P (Operating model & promotion runbook) directly below is the single source of truth for the two-branch dev→production model, codename schemes, and how a push actually reaches players. If anything in this header and §P disagree, §P wins. (This is the `HaL2001` checkout — the live release branch. Procedures here are kept identical to the dev branch's HANDOFF.)
+>
+> **Two branches / two worktrees (memorize this):**
+> - **`arbiters-line`** — **dev working branch** (worktree `/tmp/arbiters-line`). All day-to-day work lands here. Codenames **`<Gem> Vault`**; OTA ids **`YYYY-MM-DD-arbNNN`**. Its `app.json` points at the **`arbiters-line` channel + `…arbiters` package** — a **scratch channel that publishes NOTHING to players.**
+> - **`HaL2001`** — **the live release branch** (worktree `/tmp/hal2001-rollback`, this one). Pushing it fires `eas-update.yml`, which **multi-channel publishes to BOTH platforms at once**: `hal2001` + `preview` (Android) and `ios-preview` (iOS). Codenames **`<word> Anvil`**; OTA ids **`YYYY-MM-DD-NNN`** (numeric). Its `app.json` carries the production channel/package/name — **never overwrite it from dev.**
+> - `main`, `claude/*` — base/parked branches; leave alone unless the user asks.
+>
+> **Current state (update this every push):**
+> - Dev `arbiters-line` HEAD = **arb107 "Jasper Vault"**.
+> - Production `HaL2001` HEAD = **OTA-322 "Cattail Anvil"** — live on **Android + iOS**; carries arb100–107. Dev and prod are code-equivalent (arb107 ≡ OTA-322).
+> - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime = `2.4.1`. JS-only changes ship as OTA — no native rebuild.
+> - tsc clean (source). Tests green modulo the known baseline flakes (dogTravelClimb, climbRopeMechanics, parserFuzzWithDogVerbs, dogSystemPerfSmoke, statSpamGates, investigateItemPreview, variableRewards).
+>
+> **How a change ships:** develop on `arbiters-line` (Vault OTA, dead channel) → when the user says "push"/"promote", run §P4 to carry the dev code onto `HaL2001` as the next **Anvil** OTA → push `HaL2001` → multi-channel publish to Android + iOS. Both branches keep their OWN HANDOFF / buildInfo / buildCodename / docs/build-codenames, each tracking its own codename scheme.
 
 ---
 
-## P. Production Runbook — promote the Tungsten Spire tutorial from the isolated test → live
+## P. Operating model & promotion runbook (READ FIRST)
 
-> **If you (next Claude) have to be hand-fed to "get into production mode," this is the
-> map.** It takes the work currently isolated on `arbiters-line` (the Flint Coil test APK)
-> and puts it in front of real playtesters — the thing that was attempted-then-rolled-back
-> this session, done right. Do the steps in order; do not skip the gate.
+This is how the project actually runs, end to end. (The old one-time "Tungsten
+Spire isolation" runbook that used to live here is retired — that episode is
+long closed; production has shipped steadily since, through OTA-322. We now run
+a routine **dev → prod** cadence, below.)
 
-### P0 — The gate (do NOT skip)
-The whole reason this work is isolated: an **unverified** version of this tutorial reached
-playtesters and had to be rolled back to Zinc Anvil. **Do not promote until the user
-confirms they played Flint Coil (build #276) on-device end-to-end and approved it** — the
-10 tutorial beats (name → cudgel → rope → scrap → investigate → look → move → read-note →
-main-quest → pick-city), the in-feed Arbiter, hub-named exit chips, pulsing input/chips,
-landing back in **exploration** when it ends, the **uncapped pack**, and the **default
-name** ("<Adjective> <Race>"). No approval → stop here.
+### P1 — Two branches, two worktrees, two codename schemes
+|  | Dev | Production |
+|---|---|---|
+| Branch | `arbiters-line` | `HaL2001` |
+| Worktree | `/tmp/arbiters-line` | `/tmp/hal2001-rollback` |
+| Codename | `<Gem> Vault` (Garnet, Opal, Jasper, …) | `<word> Anvil` (Tule, Rush, Cattail, …) |
+| OTA id | `YYYY-MM-DD-arbNNN` | `YYYY-MM-DD-NNN` (numeric) |
+| `app.json` channel | `arbiters-line` (**DEAD** — publishes nothing) | `hal2001` |
+| `app.json` package | `…tartarprim.arbiters` | `…tartarprim.hal2001` |
+| `app.json` name | "Tartaria Realms ARB" | "Tartaria Realms HAL" |
+| Reaches players? | **NO** (scratch channel) | **YES** — see P2 |
 
-### P1 — What promotes vs what stays behind
-The promotable work is **JS/engine code**, all on `arbiters-line`:
-- Tungsten Spire tutorial (`app/components/tutorialSteps.ts`, `TutorialOverlay/Target`, `InputBox`, `CharacterCreationScreen`, `ExplorationScreen`, `gameStore` tutorial state machine).
-- `skipTutorial` lands the player in `exploration` (gameStore).
-- Race-themed default name + 25-adjective pool (gameStore `generateDefaultName`).
-- Pack uncap (`app/engine/inventory.ts` — `ITEM_CAPS = {}`).
-- The stress-sim test fixes (`__tests__/*Stress*`, `inventoryAudit`, `craftingInventoryChaosSim`, `defaultName`).
+Both branches carry their OWN `HANDOFF.md`, `buildInfo.ts`, `buildCodename.ts`,
+and `docs/build-codenames.md`, each tracking its own codename scheme. The two
+branches are kept **code-equivalent** at every promotion point; only those
+config/log files differ. **NEVER let dev's `app.json` overwrite prod's** — that
+would publish to the dead channel and change the store package. (`app.json` lives
+at repo ROOT, not under `app/`, which makes it easy to leave untouched — see P4.)
 
-**Do NOT carry over the isolation scaffolding** (it's `arbiters-line`-only):
-- `app.json` — the `…arbiters` package, "Tartaria Realms ARB" name, `arbiters-line` channel header.
-- `app/buildInfo.ts` `OTA_BUILD_ID = 2026-06-03-arb1` and `buildCodename.ts` "Flint Coil" entry.
-- `metro.config.js` Flint Coil trigger line.
-- The `build-apk.yml` `arbiters-line` push trigger (harmless to leave, but not part of the feature).
+### P2 — How a push reaches players (multi-channel, both platforms)
+Pushing **`HaL2001`** triggers `.github/workflows/eas-update.yml`, which runs ONE
+multi-channel `eas update` to all three channels at once:
+- `hal2001` — Android experimental
+- `preview` — Android live testers
+- `ios-preview` — iOS Internal Distribution (best-effort)
 
-### P2 — Land it on the live branch
-Cherry-pick the P1 feature commits onto **`HaL2001`** (the live playtester branch). The
-clean feature commits are: the tutorial (`e32fad9` Tungsten Spire), the verification pass
-(`81d802d`), the name feature (`9ca8331`), and the post-isolation fixes (`9d7e88e`,
-`451a175` — pull the code hunks, NOT the `arbiters-line` channel edits). Resolve against
-HaL2001's current head (Zinc Anvil / OTA-300).
+So a single `HaL2001` push ships the OTA to **both Android and iOS**. Pushing
+`arbiters-line` reaches nobody (dead channel) — dev + the user's own sideload
+only. Commit-title platform gates `[ota-android-only]` / `[ota-ios-only]` can
+scope a publish to one platform if ever needed. (Docs-only / `**.md` pushes are
+in `paths-ignore`, so they DON'T trigger a publish.)
 
-### P3 — Restore production config on HaL2001
-- `app.json`: package back to the bare `com.hotatticgames.tartarprim.hal2001` (HaL2001's
-  own suffix — the production-AAB build step strips `.hal2001` for the Play bundle), name
-  back to "Tartaria Realms HAL", channel header back to `hal2001`.
-- Confirm `runtimeVersion` stays `2.4.1` (appVersion policy) — the tutorial is JS-only, so
-  the **existing installed APK can receive it as an OTA**; no native rebuild required.
+### P3 — Day-to-day dev loop (the ~95% path, on `arbiters-line`)
+1. Edit code in `app/` (worktree `/tmp/arbiters-line`).
+2. `npx tsc --noEmit` clean for `app/` source. Run the touched suites. The full
+   suite has known baseline flakes (header list) — re-run a "new" failure in
+   isolation, and confirm it against a stash of your changes before calling it
+   a regression.
+3. Bump `app/buildInfo.ts` `OTA_BUILD_ID` → `YYYY-MM-DD-arbNNN`.
+4. Mint the next **Vault** codename in `app/buildCodename.ts`; move it from the
+   reserved pool into the current-mapping table in `docs/build-codenames.md`.
+5. Update `HANDOFF.md` §0.B (Closed) in the SAME commit (per `CLAUDE.md`).
+6. Commit titled `<Vault> — OTA-arbNNN — <desc>`; push `arbiters-line`.
+   Reaches NO players — this is dev.
 
-### P4 — Codename + version bump (follow the convention)
-- Bump `OTA_BUILD_ID` in `app/buildInfo.ts` to the next real id (`2026-MM-DD-302`).
-- Mint a fresh metallic-noun codename (the reserved pool is exhausted — see
-  `docs/build-codenames.md`), add it to `CODENAMES` + the doc's current-mapping table.
-- Commit title leads with it: `<Codename> — OTA-302 — Tungsten Spire tutorial + uncapped pack + default names`.
+### P4 — Promotion to production (only when the user says "push" / "promote")
+Production (`HaL2001`) is kept code-identical to a dev point, then bumped to a
+fresh numeric OTA + Anvil codename. To promote the unpromoted dev work:
+1. **Find the dev commit matching HaL2001's head** (they're code-equivalent).
+   Verify it's truly equivalent:
+   `git diff HaL2001 <devMatch> -- app/ __tests__/ assets/ ':(exclude)app/buildInfo.ts' ':(exclude)app/buildCodename.ts' --stat`  → **empty**.
+2. In `/tmp/hal2001-rollback` (on `HaL2001`, clean tree), apply the dev code
+   delta WITHOUT touching prod config:
+   ```
+   git checkout <devHEAD> -- app/ __tests__/ assets/ docs/
+   git checkout HEAD -- app/buildInfo.ts app/buildCodename.ts docs/build-codenames.md
+   ```
+   (`app.json` is at repo root → untouched. Leave it that way.)
+3. **Confirm** working-tree code == dev HEAD code:
+   `git diff <devHEAD> -- app/ __tests__/ assets/ ':(exclude)app/buildInfo.ts' ':(exclude)app/buildCodename.ts'` → empty.
+   And confirm `app.json` STILL shows channel `hal2001`, package `…hal2001`,
+   name "Tartaria Realms HAL".
+4. Bump `app/buildInfo.ts` → next numeric `YYYY-MM-DD-NNN`; add an **Anvil**
+   codename to `buildCodename.ts` + `docs/build-codenames.md`; write a HaL2001
+   §0.B entry summarizing the promoted dev OTAs (e.g. "arb100–107").
+5. `npx tsc --noEmit`. (The HaL2001 worktree may lack `node_modules` for jest —
+   that's fine; the code is byte-identical to the already-tested dev HEAD, so
+   the dev test run IS the verification.)
+6. Commit `<Anvil> — OTA-NNN — <desc> (arbXXX–arbYYY → prod)`; push `HaL2001`.
+   `eas-update.yml` then publishes to Android + iOS (P2).
+7. Promotions usually **BUNDLE** several dev OTAs into one Anvil OTA (e.g.
+   OTA-322 = arb100–107; OTA-321 = arb96–99).
+8. Update this header's "Current state" with both new heads.
 
-### P5 — Verify, then ship
-- `npx tsc --noEmit` clean; run the suite (the four 700-day sims are reliably green now —
-  no NODE_OPTIONS needed, they self-trim + are seeded).
-- **Check the APK-hold:** PR #1 noted a Google Play internal-test hold (don't bump native
-  version / add native modules while a test is open). Tutorial is JS-only → **OTA is fine**;
-  only do a native APK/AAB (`[build-aab]` marker + APK build pair) if the user asks.
-- Update this HANDOFF (Closed §0.B) in the SAME commit (per `CLAUDE.md`).
-- Push `HaL2001` → `eas-update.yml` publishes the OTA to the `hal2001` channel → Android
-  playtesters get it on next boot. (iOS rides the separate TestFlight task in §0.A.)
-- Confirm live: About shows the new codename; the rolled-back Tungsten Spire is now
-  superseded by the verified version.
+### P5 — When a NATIVE build (APK / AAB / IPA) is required (rare)
+OTA covers everything in the JS bundle (engine, screens, JSON, bundled assets).
+A native rebuild is needed ONLY for: a new native module / Expo plugin, an
+`app.json`/`app.config` runtime-version change, edits under `ios/` or `android/`,
+an Expo SDK bump, or Hermes/permission-manifest changes. **Confirm with the user
+first.** Native markers `[build-aab]` / `[build-ios]` / `[submit-ios]` lead the
+commit title, BEFORE the codename.
 
-### P6 — Cleanup (optional)
-Leave `arbiters-line` + draft PR #4 as the test tracker, or close PR #4 and let the branch
-sit. The Flint Coil id/codename never entered the production pool, so nothing to unwind.
+### P6 — Rollback
+There is no "unpublish." A bad OTA is superseded by publishing a corrected OTA on
+the same channel — push a fix to `HaL2001` and you roll FORWARD. (The
+`/tmp/hal2001-rollback` worktree name is historical; it's just the HaL2001
+checkout, not a special rollback tool.)
 
 ---
 
@@ -2488,7 +2517,7 @@ sit. The Flint Coil id/codename never entered the production pool, so nothing to
 
 ## 1. What this is
 
-**Tartaria Realms** — React Native / Expo SDK 52 procedural narrative RPG. Android-first, Hermes engine. Repo: `verbal76/tartaria-rpg`. Distribution: EAS channel `preview` for OTAs.
+**Tartaria Realms** — React Native / Expo SDK 52 procedural narrative RPG. Android + iOS, Hermes engine. Repo: `verbal76/tartaria-rpg`. Distribution: OTAs ship by pushing the **`HaL2001`** release branch, which multi-channel-publishes to `hal2001` + `preview` (Android) and `ios-preview` (iOS) — see §P. The `arbiters-line` dev branch publishes to a dead channel (no players).
 
 **Setting:** post-Aetherstone-flood Tartaria — player wakes into a buried civilization, picks race + faction + name, plays procedural scenes driven by authored data + light template stitching + on-device LLM narration.
 
@@ -2504,53 +2533,52 @@ sit. The Flint Coil id/codename never entered the production pool, so nothing to
 
 ## 2. Model identity for the assistant
 
-**This session runs on `claude-opus-4-7[1m]`.** Use that exact string when asked which model you are. Never include the model identifier in commit messages, PR titles/bodies, code comments, or any artifact pushed to the repo — chat replies only.
+When asked which model you are, use the model identifier configured for **your** session (from your environment / system prompt) — do NOT trust any model id written in this doc, which goes stale across sessions. **Never include any model identifier** in commit messages, PR titles/bodies, code comments, or any artifact pushed to the repo — chat replies only.
 
 ---
 
 ## 3. Branch hierarchy & workflow
 
+**The authoritative operating model is §P (top of file).** This section is the
+condensed cross-reference; if it ever disagrees with §P, §P wins.
+
 ### Branches
 
-- **`main`** — production. Tagged releases live here. Do NOT push directly.
-- **`claude/new-session-MvF82`** — the active session branch for everything you ship. Every OTA flows from here. Push to this branch only.
-- (Other `claude/*` branches may exist from prior sessions — leave them alone unless the user asks.)
+- **`arbiters-line`** — **dev working branch; do all work here** (worktree `/tmp/arbiters-line`). Vault codenames, `arbNNN` ids, dead `arbiters-line` channel (no players).
+- **`HaL2001`** — **the live release branch** (worktree `/tmp/hal2001-rollback`). Pushing it publishes the OTA to Android + iOS (§P2). Anvil codenames, numeric ids, prod `hal2001` channel/package/name.
+- **`main`** — base; tagged releases. Do NOT push directly.
+- Other `claude/*` branches — parked/base from prior sessions; leave alone unless asked. (The harness may start you on a `claude/*` branch; the real work happens in the `/tmp/arbiters-line` worktree on `arbiters-line` — see §P.)
 
-The harness sometimes preconfigures a different branch name at session start. **If you're already on `claude/new-session-MvF82` with uncommitted/recent work, stay on it.** Don't switch branches mid-stream — that risks losing work in flight.
-
-### Per-push workflow (OTA-only, ~95% of pushes)
+### Per-push workflow (OTA-only, ~95% of pushes) — DEV
 
 ```
-1. Edit code in app/
-2. npx tsc --noEmit   → must be 0 errors
-3. npx jest --silent  → all suites must pass (see flakes section)
-4. Bump app/buildInfo.ts → OTA_BUILD_ID format YYYY-MM-DD-NNN
-5. git add -A && git commit -m "fix|feat|chore: <short subject>
-
-   <body explaining the WHY with concrete before/after>"
-6. git push -u origin claude/new-session-MvF82
+1. Edit code in app/ (worktree /tmp/arbiters-line)
+2. npx tsc --noEmit                 → 0 errors in app/ source
+3. npx jest <touched suites>        → green (full suite has baseline flakes; §header)
+4. Bump app/buildInfo.ts            → OTA_BUILD_ID = YYYY-MM-DD-arbNNN
+5. Mint the next Vault codename in app/buildCodename.ts + docs/build-codenames.md
+6. Update HANDOFF.md §0.B in the SAME commit
+7. git commit -m "<Vault> — OTA-arbNNN — <desc>"  (codename-first; see §8 + CLAUDE.md)
+8. git push -u origin arbiters-line
 ```
 
-The `.github/workflows/eas-update.yml` workflow auto-publishes to channel `preview` on every push to this branch. Player's device pulls the OTA on next launch via the boot-time silent check.
+This reaches **no players** (dead channel). To put it in front of testers, run
+the **§P4 promotion** onto `HaL2001` when the user says "push" / "promote".
 
-### When a new APK build is needed
+### When a NATIVE build is needed
 
-Only when you add a NATIVE module (new dependency that ships native code) or change `app.json` native config. Steps:
-1. Confirm with the user before adding the native dep
-2. Add to `package.json` + `npm install`
-3. Decide whether to bump `version` in `app.json`:
-   - **Keep at `2.201`** if you want existing testers' APK to still receive OTAs and the new APK to share the same OTA stream (recommended default — no fragmentation)
-   - **Bump to e.g. `2.202`** only if old APKs CANNOT safely no-op past the new module. After this, OTAs to `2.202` will not reach old APKs.
-4. Bump comment in `metro.config.js` to trigger `build-apk.yml`
-5. The user redistributes the APK manually to testers
-
-**Lazy-load any native module that might not be in older APKs.** Static `import * as X from 'native-module'` at the top of a file can crash the JS bundle on APKs that don't have the native bridge. Use `require()` inside a try/catch helper (see `loadNavigationBar()` in `App.tsx` for the pattern). This way ALL OTAs reach all APKs regardless of native-module additions.
+See **§P5.** Only for new native modules / Expo plugins, runtime-version changes,
+`ios/`+`android/` edits, SDK bumps, or Hermes/permission changes. Confirm with the
+user first; native markers `[build-aab]` / `[build-ios]` / `[submit-ios]` lead the
+commit title. **Lazy-load any native module** that might not be in older binaries —
+`require()` inside a try/catch helper (see `loadNavigationBar()` in `App.tsx`), so
+OTAs never crash a binary that lacks the native bridge.
 
 ### OTA / APK runtime model (critical)
 
-- `app.json` has `"runtimeVersion": { "policy": "appVersion" }` — meaning **runtimeVersion = the `version` field at build time** (currently `2.201`).
-- OTAs are delivered to **every device on the same runtime + channel**. Multiple APKs on the same `version` share the OTA stream.
-- Testers may be on different APK build numbers but the same runtime — they still get every OTA. APK build number is just the binary version; the runtime key is what matters for OTA delivery.
+- `app.json` has `"runtimeVersion": { "policy": "appVersion" }` ⇒ **runtimeVersion = the `version` field** (currently **`2.4.1`**).
+- OTAs reach **every device on the same runtime + channel**. Different binary build numbers on the same `version` share the OTA stream.
+- JS-only changes (engine, screens, JSON, bundled assets) ship as an OTA to the installed builds — no native rebuild (§P5).
 
 ---
 
@@ -2950,14 +2978,20 @@ Seven parallel Explore agents audited the codebase (combat, exploration, vendor/
 
 User asked for a utilization audit on 2026-05-24 ("am I getting the most out of MiniLM, Qwen, and Kokoro"). Kokoro is well-utilized; MiniLM is underused (2 call sites — target match + recipe lookup); Qwen is gated out of most narration. Below are the four planned upgrades, ordered by recommended ship cadence. When user asks "what's open on AI," grep `[AI-OPEN]` and surface this list.
 
-**EXPERIMENTAL BRANCH:** `HaL2001` (forked off `claude/new-session-MvF82` on 2026-05-24). Isolated package id (`com.hotatticgames.tartarprim.hal2001`) + isolated OTA channel (`hal2001`). APK builds tagged `Hal2001-N`. Lives on user's phone as a separate app icon ("Tartaria Realms HAL") alongside the live Tartaria Realms — no risk to live game / OTA stream / other testers. Each AI item ships as its own OTA on this branch's channel. Plan file: `/root/.claude/plans/so-i-believe-the-unified-wigderson.md`.
+> **NOTE (current model — supersedes the 2026-05-24 framing below):** `HaL2001`
+> started as the experimental fork described here, but it is now **THE live
+> release branch** (Android + iOS, multi-channel — see §P). Dev work happens on
+> `arbiters-line`; promotion is `arbiters-line → HaL2001` (§P4), NOT the reverse.
+> Treat the historical text below as background, not current procedure.
+
+**[historical, 2026-05-24] EXPERIMENTAL BRANCH:** `HaL2001` (forked off `claude/new-session-MvF82` on 2026-05-24). Isolated package id (`com.hotatticgames.tartarprim.hal2001`) + isolated OTA channel (`hal2001`). APK builds tagged `Hal2001-N`. Lives on user's phone as a separate app icon ("Tartaria Realms HAL") alongside the live Tartaria Realms. Plan file: `/root/.claude/plans/so-i-believe-the-unified-wigderson.md`.
 
 - **[AI-OPEN-1]** MiniLM lore search — semantic Q&A against `concepts.json` (paraphrase coverage for "what is X" / "who are X" / "tell me about X"). New module: `app/ai/embedding/ConceptIndex.ts`. Tiered lookup at `gameStore.ts:5335`: substring → MiniLM cosine ≥ 0.65 → canned fallback. **HIGH impact / LOW risk / ~1 hr.**
 - **[AI-OPEN-2]** MiniLM parser disambiguation — kill "I'm not sure" refusals by inserting intent classification between dictionary parser and Qwen LLM fallback. New module: `app/ai/IntentClassifier.ts` (36 pre-embedded intent phrases). `CognitiveOrchestrator.inferIntent()` exposed. Wires into `gameStore.ts:3025` parser-low-confidence branch. **HIGH impact / MED risk / ~2 hr.**
 - **[AI-OPEN-3]** Qwen vendor banter — first-contact greetings per vendor, cached per-session. New module: `app/engine/vendorBanter.ts`. Optional `personality` field per vendor in `vendors.json` (27 vendors). Scene-entry wiring + per-session cap (8 banters max) + `arbiterGenerationEpoch` cancellation. **MED impact / MED risk / ~2-3 hr.**
 - **[AI-OPEN-4]** Qwen dynamic Arbiter wellness lines — 30% of wellness fires call Qwen for situational lines instead of canned pick. Extends `narrativeGenerator.ts:567` wellness fork + new `app/engine/arbiterPersona.ts` (system prompt + style). Throttle: max 10 per session + 60s cooldown. Fallback to canned on timeout / error. **MED-LOW impact / LOW impl risk / MED runtime risk / ~1.5 hr.**
 
-Mark items `[AI-DONE-N]` in this list when they pass user playtest on HaL2001. Eventual promotion: cherry-pick each item to `claude/new-session-MvF82` for live OTA release.
+Mark items `[AI-DONE-N]` when shipped. (Promotion to players now follows §P4: develop on `arbiters-line`, then promote `arbiters-line → HaL2001` — the old "cherry-pick to new-session-MvF82" path is retired.)
 
 ### Open polish items (deferred until user has hours to work them)
 
@@ -3065,15 +3099,15 @@ User flagged these on 2026-05-24 to revisit when they have time. Grep `[POLISH]`
 
 ### Commits
 
-- **Prefix:** `feat:` / `fix:` / `chore:` / `refactor:` / `debug:` / `test:` / `perf:` / `ui:` / `content:`
-- **Subject:** one line, lowercase after prefix, concrete and specific
-- **Body:** explain the WHY with concrete before/after. Reference OTA numbers when fixing earlier bugs.
-- **Never include** the model identifier (`claude-opus-4-7[1m]`) in any committed artifact.
+- **Title is codename-first** (per `CLAUDE.md`): `<Codename> — OTA-NNN — <short description>`. On `arbiters-line` the codename is the next **Vault** and the id is `OTA-arbNNN`; on `HaL2001` it's the next **Anvil** and the numeric `OTA-NNN`. Native markers `[build-aab]`/`[build-ios]`/`[submit-ios]` go BEFORE the codename. (The old `feat:`/`fix:` prefix convention is retired — the codename-first title is what the user reads on a phone where titles truncate at ~30-40 chars.)
+- **Body:** explain the WHY with concrete before/after. Reference earlier OTA numbers when fixing/regressing a prior change.
+- **Never include any model identifier** in a committed artifact (commit/PR/code/doc) — chat replies only.
 
 ### OTA bumps
 
-- Format `YYYY-MM-DD-NNN`. NNN is monotonic counter; today's first OTA is 001, second is 002, etc.
-- Bump on EVERY push that ships JS changes (which is ~all of them).
+- **Dev (`arbiters-line`):** `OTA_BUILD_ID = YYYY-MM-DD-arbNNN` (the `arb` counter is monotonic across days — arb106 → arb107, not reset daily).
+- **Prod (`HaL2001`):** `OTA_BUILD_ID = YYYY-MM-DD-NNN` (numeric, monotonic — 321 → 322).
+- Bump on EVERY push that ships JS changes (≈ all of them), and mint the matching codename (§P3 / §P4).
 
 ### Tests
 
@@ -3152,17 +3186,23 @@ npx jest <suite-name>
 git log --oneline -10
 git status
 
-# Push as OTA-only (typical path)
-#  1) edit code in app/
-#  2) bump app/buildInfo.ts OTA_BUILD_ID
-#  3) commit + push → eas-update.yml fires
-git add -A && git commit -m "fix: ..."
-git push -u origin claude/new-session-MvF82
+# DEV push (typical path — reaches NO players; see §P3)
+#  1) edit code in app/ (worktree /tmp/arbiters-line)
+#  2) bump app/buildInfo.ts OTA_BUILD_ID = YYYY-MM-DD-arbNNN + mint a Vault codename
+#  3) update HANDOFF §0.B in the same commit
+git add -A && git commit -m "<Vault> — OTA-arbNNN — <desc>"
+git push -u origin arbiters-line     # publishes to the DEAD arbiters-line channel only
 
-# Push as APK rebuild (native deps / version bump)
-#  1) confirm with user first
-#  2) bump comment in metro.config.js
-#  3) commit + push → build-apk.yml fires (~17–20 min)
+# PROMOTE to production (when the user says "push"/"promote"; full steps in §P4)
+#  in /tmp/hal2001-rollback, on HaL2001:
+#  git checkout <devHEAD> -- app/ __tests__/ assets/ docs/
+#  git checkout HEAD -- app/buildInfo.ts app/buildCodename.ts docs/build-codenames.md
+#  (verify app.json still = hal2001 channel/package/name; bump numeric OTA + Anvil codename)
+#  git commit -m "<Anvil> — OTA-NNN — <desc> (arbXX–arbYY → prod)" && git push -u origin HaL2001
+#  → eas-update.yml multi-channel publishes to Android (hal2001+preview) AND iOS (ios-preview)
+
+# NATIVE rebuild (rare — see §P5; confirm with user first)
+#  markers [build-aab]/[build-ios]/[submit-ios] lead the commit title
 ```
 
 ---
@@ -3262,7 +3302,11 @@ off the store.
 
 ## 16. For the next Claude instance — picking up where I left off
 
-If you're picking up this branch, read this section first, then section 6.A (the OTA 020 → 056 wave) for the reasoning, then section 7 for what's still on the table.
+> **For CURRENT state + how-we-operate, the file header + §P are authoritative.**
+> Everything in this §16 is a **dated historical snapshot** (2026-05-26) kept for
+> the reasoning narrative — the OTA numbers, branch notes, and "latest" lines
+> below are NOT current. Read §P first, then §0 (Open/Closed tracker), then come
+> back here + §6.A for the deeper history.
 
 ### State at handoff (2026-05-26 — end of the engagement-engine + playtester-feedback marathon)
 
