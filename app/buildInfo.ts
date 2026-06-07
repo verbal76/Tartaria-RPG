@@ -12575,4 +12575,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // reads the whole `statBonuses` array; HP still routes to hpMax, and CON /
 // acrobatics / stealth / investigation / aetheria stay non-attribute flavor
 // with no player field). (2) New docs/weapon-catalog.md — every weapon + stats.
-export const OTA_BUILD_ID = '2026-06-07-328';
+// OTA-329 — Sumac Anvil. Weapon rebalance (MELEE block, all 145) from the
+// player's CSV: damageDice / type / scaling stat / style / stat-req / defense /
+// durability / rarity / faction / tc applied. New max-HP-on-WEAPONS mechanic
+// mirroring armor: weapons whose effect reads "Grants +X HP" (34 melee — mostly
+// shields/maces) now carry a structured {stat:'hp'} bonus; `weaponHpBonus` +
+// the unified `gearHpBonus` fold it into hpMax on equip/unequip (main/off slots
+// route through the same handler armor uses). Ranged + runecaster rebalance
+// pending the rest of the CSV. docs/weapon-catalog.md regenerated.
+export const OTA_BUILD_ID = '2026-06-07-329';

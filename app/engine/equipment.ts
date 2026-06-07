@@ -319,6 +319,28 @@ export function armorHpBonus(name: string | null | undefined): number {
     .reduce((sum, b) => sum + (b.amount ?? 0), 0);
 }
 
+// arb-fix — total max-HP bonus from a single equipped WEAPON, read from its
+// `statBonuses` array (populated from the "Grants +X HP" rebalance text). Some
+// shields/maces/etc. grant HP just like a chestpiece; the main/off equip slots
+// route through the same handler, so this lets a wielded weapon raise hpMax too.
+export function weaponHpBonus(name: string | null | undefined): number {
+  if (!name) return 0;
+  const wpn = findWeaponByName(name);
+  if (!wpn) return 0;
+  const bonuses = wpn.statBonuses ?? [];
+  return bonuses
+    .filter((b) => b.stat === 'hp')
+    .reduce((sum, b) => sum + (b.amount ?? 0), 0);
+}
+
+// arb-fix — unified max-HP bonus for ANYTHING equippable (armor OR weapon).
+// The gameStore equip/unequip handlers call this once per slot, so a piece is
+// resolved against whichever catalog owns it. A name is only ever in one
+// catalog, so the sum is just "whichever matched".
+export function gearHpBonus(name: string | null | undefined): number {
+  return armorHpBonus(name) + weaponHpBonus(name);
+}
+
 // Apply the aggregated stat bonuses on top of the player's base stats.
 // Used by combat (attack rolls, damage rolls, skill checks) so equipped
 // gear actually changes the math. Optional `weatherMod` parameter folds

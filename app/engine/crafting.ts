@@ -48,6 +48,11 @@ export interface CatalogWeapon {
    *  Some get wired into mechanics (bleed, stun); the rest read as
    *  flavor at the moment but the data is preserved for future hooks. */
   effect?: string;
+  // arb-fix — weapons can carry a structured max-HP bonus (mirrors armor's
+  // `statBonuses`). The "Grants +X HP" rebalance text on a weapon's `effect`
+  // is parsed into a {stat:'hp', amount} entry here so the equip/unequip
+  // handlers can bake it into hpMax exactly like armor HP boosts.
+  statBonuses?: { stat: string; amount: number }[];
 }
 
 export type ArmorSlot = 'head' | 'chest' | 'legs' | 'feet';

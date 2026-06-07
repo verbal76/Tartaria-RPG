@@ -1,156 +1,156 @@
 # Tartaria Realms — Weapon Catalog (balance reference)
 
-_Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`damageDice`, Type=`damageType`, Stat=scaling `stat`, Style=`style` (one_handed / two_handed / dual_wield / shield / ranged / runecaster), Req=`statRequirement` (min in the scaling stat), Def=`defense` (block/parry value), Dura=`baseDurability`, tc=`tc` (buy). `effect` is free-text. Edit the JSON; regenerate after changes._
+_Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`damageDice`, Type=`damageType`, Stat=scaling `stat`, Style=`style` (one_handed / two_handed / dual_wield / shield / ranged / runecaster), Req=`statRequirement` (min in the scaling stat), Def=`defense` (block/parry value), Dura=`baseDurability`, tc=`tc` (buy). `effect` is free-text; weapons whose effect reads "Grants +X HP" carry a structured hp bonus that raises max HP on equip. Edit the JSON; regenerate after changes._
 
 ## Melee (145)
 
 | Name | Dmg | Type | Stat | Style | Req | Def | Dura | Rarity | Faction | tc | Effect |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| Aetheric Baton | 1d6 | electrical | charisma | single_handed | 3 | 2 | — | Common | aetheric | 51 | +1 damage to mechanical creatures. |
-| Aetheric Pike | 1d6 | aetheric | strength | two_handed | 4 | 4 | — | Common | aetheric | 42 | — |
-| Aetheric Rod | 1d6 | electrical | dexterity | dual_wield | 3 | 2 | — | Common | aetheric | 41 | +1 damage to tech. |
-| Aetherium Spear | 1d6 | aetheric | strength | two_handed | 4 | 3 | — | Common | aetheric | 25 | +1d6 damage against mechanical enemies or weapons. |
-| Bone Club | 1d6 | bludgeoning | charisma | single_handed | 2 | 3 | — | Common | giants | 33 | +1 to Coercion. |
-| Bone Knife | 1d6 | piercing | dexterity | dual_wield | 2 | 1 | — | Common | giants | 35 | — |
-| Bone Maul | 1d6 | bludgeoning | strength | two_handed | 3 | 4 | — | Common | giants | 20 | — |
-| Bone Shiv | 1d4 | piercing | dexterity | — | — | 1 | 18 | Common | — | — | — |
-| Bone Shiv (Stealth) | 1d6 | piercing | dexterity | dual_wield | 2 | 1 | — | Common | giants | 33 | +1 to Stealth. |
-| Bone Shortsword | 1d6 | slashing | charisma | single_handed | 3 | 2 | — | Common | giants | 26 | +1 to parry when used with shields. |
-| Bone Splitter Axe | 1d6 | slashing | strength | two_handed | 3 | 3 | — | Common | giants | 37 | Splits shields on a max roll. |
-| Bonebreaker Mace | 1d6 | bludgeoning | strength | two_handed | 4 | 4 | — | Common | giants | 25 | — |
-| Club | 1d6 | bludgeoning | strength | — | — | 0 | 8 | Common | — | 4 | — |
-| Compact Energy Blade | 1d6 | burn | charisma | single_handed | 4 | 2 | — | Common | unknowing_masses | 31 | Ignores 1 armor point on hit. |
-| Cudgel | 1d8 | bludgeoning | strength | — | — | 1 | 12 | Common | — | 10 | — |
-| Iron Buckler | 1d6 | bludgeoning | dexterity | shield | 4 | 5 | — | Common | mud_dwellers | 20 | Can bash for 1d6 (even/odd 1d6 to determine); does not count as attack move. |
-| Iron Spear | 1d8 | piercing | strength | two_handed | — | 2 | 18 | Common | — | 14 | — |
-| Magnetized Rod | 1d6 | electrical | charisma | single_handed | 4 | 2 | — | Common | aetheric | 46 | Pulls metallic objects toward the wielder. |
-| Mud Buckler | 1d6 | bludgeoning | dexterity | shield | 1 | 4 | — | Common | mud_dwellers | 29 | — |
-| Mud Claymore | 1d6 | slashing | strength | two_handed | 4 | 4 | — | Common | mud_dwellers | 36 | — |
-| Mud Grinder Axe | 1d6 | slashing | strength | two_handed | 3 | 3 | — | Common | mud_dwellers | 42 | Causes bleed (1d6 / turn for 2 turns) on expert usage. |
-| Mud Harpoon | 1d6 | piercing | strength | two_handed | 3 | 3 | — | Common | mud_dwellers | 26 | — |
-| Mud Heater Shield | 1d6 | bludgeoning | dexterity | shield | 4 | 5 | — | Common | mud_dwellers | 44 | +2 AC vs fire damage. |
-| Mud Heater Sword | 1d6 | slashing | charisma | single_handed | 4 | 2 | — | Common | mud_dwellers | 28 | +1d6 against cold creatures. |
-| Mud Knife | 1d6 | slashing | charisma | single_handed | 1 | 1 | — | Common | mud_dwellers | 36 | Chance to inflict 1d6 bleed. |
-| Mud Long Axe | 1d6 | slashing | strength | two_handed | 4 | 4 | — | Common | mud_dwellers | 38 | Bonus action — trip enemies on a max damage roll. |
-| Mud Mauler | 1d6 | bludgeoning | strength | two_handed | 2 | 3 | — | Common | mud_dwellers | 24 | — |
-| Mud Shortsword | 1d6 | slashing | dexterity | dual_wield | 4 | 2 | — | Common | mud_dwellers | 43 | Close-range 50% chance to stun (even/odd 1d6 to confirm). |
-| Mud Sledge | 1d6 | bludgeoning | strength | two_handed | 4 | 4 | — | Common | mud_dwellers | 31 | — |
-| Mud War Pike | 1d6 | piercing | strength | two_handed | 4 | 4 | — | Common | mud_dwellers | 49 | Enemies hit must make a Strength save or be pushed back 10 feet. |
-| Mud-Iron Cleaver | 1d8 | slashing | strength | — | — | 2 | 14 | Common | — | 18 | — |
-| Mud-fist Wraps | 1d6 | bludgeoning | strength | — | — | 2 | — | Common | — | — | — |
-| Order Letter-Opener | 1d4 | piercing | intelligence | — | — | 1 | 15 | Common | — | — | — |
-| Plasma Cutter | 1d6 | burn | charisma | single_handed | 4 | 1 | — | Common | unknowing_masses | 28 | Rolls of 19+ count as max roll. |
-| Plasma Dagger | 1d6 | burn | dexterity | dual_wield | 4 | 1 | — | Common | unknowing_masses | 27 | +5 Aetheric damage on max roll. |
-| Pocket Knife | 1d4 | slashing | dexterity | — | — | 1 | 15 | Common | — | — | — |
-| Rail Saber | 1d6 | electrical | strength | two_handed | 4 | 3 | — | Common | unknowing_masses | 37 | — |
-| Reclaimer's Trowel | 1d4 | piercing | dexterity | — | — | 2 | 20 | Common | — | — | — |
-| Rust Dagger | 1d6 | slashing | dexterity | dual_wield | 1 | 1 | — | Common | mud_dwellers | 34 | Breaks on any parry attempt. |
-| Rusted Blade | 1d6 | slashing | strength | — | — | 3 | — | Common | — | — | — |
-| Rusty Shortsword | 1d6 | slashing | charisma | single_handed | 1 | 2 | — | Common | mud_dwellers | 27 | -1 to attack after each fight. |
-| Stone Spear | 1d6 | piercing | strength | two_handed | — | 1 | 8 | Common | — | 6 | — |
-| Tartarian Bone Knife | 1d6 | piercing | charisma | single_handed | 3 | 1 | — | Common | giants | 21 | +1d6 against natural armor. |
-| Tartarian Claw Knife | 1d6 | piercing | dexterity | dual_wield | 3 | 2 | — | Common | giants | 30 | +4 damage against creatures with natural armor. |
-| Tartarian Hand Axe | 1d6 | slashing | dexterity | dual_wield | 3 | 2 | — | Common | giants | 22 | 1 damage reroll per encounter. |
-| Tartarian Hand Axe (Throw) | 1d6 | slashing | charisma | single_handed | 3 | 2 | — | Common | giants | 44 | Throwable to Close range. |
-| Aether-Shard Spear | 1d8 | piercing | strength | two_handed | — | 2 | 20 | Uncommon | — | 40 | +1d4 aetheric damage against aetheric or magical targets. |
-| Aetheric Blade | 2d6 | aetheric | charisma | single_handed | 6 | 3 | — | Uncommon | aetheric | 77 | +1d6 Aetheric; bypasses non-magical defenses. |
-| Aetheric Cross-Saber | 2d6 | aetheric | strength | two_handed | 5 | 4 | — | Uncommon | aetheric | 92 | +1d6 damage to energy-based enemies. |
-| Aetheric Crystal Blade | 2d6 | slashing | strength | — | — | 4 | — | Uncommon | — | — | — |
-| Aetheric Dagger | 2d6 | aetheric | dexterity | dual_wield | 5 | 2 | — | Uncommon | aetheric | 50 | — |
-| Aetheric Greatsword | 2d6 | aetheric | strength | two_handed | 5 | 5 | — | Uncommon | aetheric | 57 | +1 to grip usage while in your possession. |
-| Aetheric Halberd | 2d6 | aetheric | strength | two_handed | 6 | 5 | — | Uncommon | aetheric | 82 | — |
-| Aetheric Shield | 2d6 | aetheric | dexterity | shield | 6 | 6 | — | Uncommon | aetheric | 64 | Deflects energy attacks; +2 AC vs energy damage. |
-| Aetheric Shield-Hammer | 2d6 | bludgeoning | strength | two_handed | 7 | 6 | — | Uncommon | aetheric | 126 | +2 AC for 1 round after a hit. |
-| Ancestor Bone Cleaver | 1d10 | slashing | strength | two_handed | 3 | 0 | — | Uncommon | true_tartarians | 56 | Faction-issue armament of the true tartarians. |
-| Architect's Silent Dagger | 1d4 | piercing | dexterity | one_handed | 3 | 0 | — | Uncommon | conspiracy_architects | 54 | Faction-issue armament of the conspiracy architects. |
-| Bone Cleaver | 2d6 | slashing | strength | two_handed | 6 | 5 | — | Uncommon | giants | 94 | Even/odd reroll to stun the enemy after each use. |
-| Bone Round Shield | 2d6 | bludgeoning | dexterity | shield | 5 | 6 | — | Uncommon | giants | 63 | +2 AC; can bash for 1d6. |
-| Bone Scimitar | 2d6 | slashing | dexterity | dual_wield | 6 | 3 | — | Uncommon | giants | 94 | +1d6 on max roll. |
-| Bone Sword | 2d6 | slashing | charisma | single_handed | 5 | 3 | — | Uncommon | giants | 73 | +1d6 to Large creatures. |
-| Bone Thornblade | 2d6 | poison | charisma | single_handed | 8 | 3 | — | Uncommon | mud_dwellers | 132 | +1d6 poison damage on hit. |
-| Builder's Aethercraft Hammer | 1d10 | bludgeoning | strength | two_handed | 3 | 0 | — | Uncommon | stone_builders | 60 | Faction-issue armament of the stone builders. |
-| Dynasty Oathspear | 1d8 | piercing | strength | one_handed | 3 | 0 | — | Uncommon | eternal_dynasty | 60 | Faction-issue armament of the eternal dynasty. |
-| Energy Baton | 2d6 | electrical | dexterity | dual_wield | 6 | 3 | — | Uncommon | aetheric | 105 | Stuns target on max roll (1 round). |
-| Energy Blade | 2d6 | burn | charisma | single_handed | 5 | 3 | — | Uncommon | unknowing_masses | 102 | Cuts non-magical armor; +1d6 on max roll. |
-| Energy Saber | 2d6 | electrical | charisma | single_handed | 8 | 3 | — | Uncommon | unknowing_masses | 135 | Emits energy pulse on hit. |
-| Giant Bone Shield | 2d6 | bludgeoning | dexterity | shield | 7 | 7 | — | Uncommon | giants | 115 | +3 AC; reduces incoming slashing by 1d6. |
-| Giant Warblade | 2d6 | slashing | charisma | single_handed | 8 | 4 | — | Uncommon | giants | 148 | Damage to all enemies in same range on max roll. |
-| Giant-Watch Greatspear | 1d10 | piercing | strength | two_handed | 3 | 0 | — | Uncommon | servants_of_giants | 66 | Faction-issue armament of the servants of giants. |
-| Heavy Aetheric Flail | 2d6 | aetheric | strength | two_handed | 6 | 4 | — | Uncommon | aetheric | 68 | Automatically wins attack rolls against Aetherkin. |
-| High-Frequency Dagger | 2d6 | electrical | dexterity | dual_wield | 6 | 2 | — | Uncommon | unknowing_masses | 70 | Ignores non-Aetheric armor; 50% chance to disarm (1d6 even/odd). |
-| Laser Blade | 2d6 | burn | dexterity | dual_wield | 6 | 3 | — | Uncommon | unknowing_masses | 86 | Cuts through metal; +1d6 against armor. |
-| Magnetized Halberd | 2d6 | electrical | strength | two_handed | 6 | 5 | — | Uncommon | aetheric | 105 | Pulls metallic objects toward the wielder. |
-| Monarch's Court Blade | 1d8 | slashing | strength | one_handed | 3 | 0 | — | Uncommon | mud_monarchs | 64 | Faction-issue armament of the mud monarchs. |
-| Mud Bone Sword | 2d6 | slashing | charisma | single_handed | 7 | 3 | — | Uncommon | giants | 82 | +1d6 bleed on hit. |
-| Mud Cleaver | 2d6 | slashing | charisma | single_handed | 6 | 3 | — | Uncommon | mud_dwellers | 110 | Reduces enemy armor by 1 on hit. |
-| Mud Kukri | 2d6 | slashing | dexterity | dual_wield | 5 | 3 | — | Uncommon | mud_dwellers | 77 | Reduces enemy armor by 1d6 on max roll. |
-| Mud Saber | 2d6 | slashing | charisma | single_handed | 6 | 3 | — | Uncommon | mud_dwellers | 91 | Reduces enemy speed by 10 ft on hit. |
-| Mud Spiked Shield | 2d6 | piercing | dexterity | shield | 5 | 6 | — | Uncommon | mud_dwellers | 88 | Deals 1d6 damage on the block. |
-| Mud-Rend Blade | 1d8 | slashing | strength | — | — | 3 | 18 | Uncommon | — | 35 | — |
-| Order Reliquary Blade | 1d8 | slashing | dexterity | one_handed | 3 | 0 | — | Uncommon | forgotten_order | 62 | Faction-issue armament of the forgotten order. |
-| Plasma Knife | 2d6 | burn | charisma | single_handed | 6 | 2 | — | Uncommon | unknowing_masses | 88 | +1d6 plasma damage on hit. |
-| Plasma Scythe | 2d6 | burn | strength | two_handed | 6 | 4 | — | Uncommon | aetheric | 140 | Ignores armor on max damage roll once per encounter (declinable, save for later). |
-| Plasma Shield | 2d6 | burn | dexterity | shield | 7 | 6 | — | Uncommon | unknowing_masses | 90 | Blocks Aetheric-based damage; reduces blunt force by 1d6. |
-| Reclaimer's Salvage Maul | 1d10 | bludgeoning | strength | two_handed | 3 | 0 | — | Uncommon | reclaimers_guild | 58 | Faction-issue armament of the reclaimers guild. |
-| Shockwave Buckler | 2d6 | bludgeoning | dexterity | shield | 8 | 6 | — | Uncommon | aetheric | 129 | Shockwave on max-roll block — push enemies to far distance. |
-| Tartarian Spear | 2d6 | piercing | strength | — | — | 3 | — | Uncommon | — | — | — |
-| Tartarian War Knife | 2d6 | piercing | charisma | single_handed | 5 | 2 | — | Uncommon | giants | 99 | +1d6 against constructs. |
-| Tartarian Warblade | 2d6 | slashing | dexterity | dual_wield | 8 | 4 | — | Uncommon | giants | 111 | +1d6 against Large creatures. |
-| Titan Warhammer | 2d6 | bludgeoning | strength | two_handed | 6 | 5 | — | Uncommon | giants | 65 | +1d6 damage against structures or vehicles. |
-| Wyrm-Fang Blade | 1d8 | piercing | dexterity | — | — | 3 | 24 | Uncommon | — | 65 | +1d4 against beasts. |
-| Aether Lance | 1d10 | aetheric | strength | two_handed | 7 | 5 | — | Rare | aetheric | 255 | Disrupts energy shields; +1d6 against energy-shielded targets. |
-| Aetheric Blade of Light | 1d10+1d6 | aetheric | charisma | single_handed | 9 | 4 | — | Rare | aetheric | 178 | +1d6 against creatures of darkness. |
-| Aetheric Hand Axe | 1d10 | aetheric | dexterity | dual_wield | 9 | 4 | — | Rare | aetheric | 250 | 50% chance to paralyze for 2 rounds (1d6 even/odd). |
-| Aetheric Plasma Blade | 1d10 | burn | dexterity | dual_wield | 9 | 4 | — | Rare | aetheric | 180 | +1d20 to all in close range if broken on parry. |
-| Aetherstone Gauntlet | 1d10+1d6 | bludgeoning | strength | — | — | 5 | — | Rare | — | — | — |
-| Fusion Greatsword | 1d10 | burn | strength | two_handed | 9 | 6 | — | Rare | aetheric | 309 | +1d6 fire damage on max roll; causes burns. |
-| Giant Bone Knuckles | 1d10 | bludgeoning | dexterity | dual_wield | 9 | 3 | — | Rare | giants | 242 | +1d6 to arm's-reach targets. |
-| Giant Bone Spear (Single) | 1d10+1d6 | piercing | charisma | single_handed | 9 | 4 | — | Rare | giants | 242 | +1d6 to structures. |
-| Giant Bone Sword | 1d10+1d6 | slashing | charisma | single_handed | 10 | 4 | — | Rare | giants | 175 | +1d6 against armored enemies. |
-| Graviton Shield | 1d10 | bludgeoning | dexterity | shield | 9 | 7 | — | Rare | aetheric | 190 | Absorbs impact; +1d6 environmental damage reduction. |
-| Gravity Hammer | 1d10 | bludgeoning | strength | two_handed | 9 | 6 | — | Rare | aetheric | 199 | Knock-stun enemies in same range as you (even/odd reroll to confirm). |
-| Heavy Plasma Hammer | 1d10 | burn | strength | two_handed | 9 | 6 | — | Rare | unknowing_masses | 215 | +1d6 Aetheric damage to any target with no Aetheric gear / weapons / items. |
-| Laser Sword | 1d10+1d6 | burn | charisma | single_handed | 10 | 4 | — | Rare | unknowing_masses | 164 | +1d6 energy; ignores non-magical armor. |
-| Magnetic Axe | 1d10+1d6 | electrical | charisma | single_handed | 9 | 4 | — | Rare | aetheric | 290 | Pulls metallic enemies 10 ft closer on hit. |
-| Mud Executioner's Blade | 1d10+1d6 | slashing | charisma | single_handed | 10 | 4 | — | Rare | mud_dwellers | 298 | +1d6 on max roll; bleed (1d6/turn × 2). |
-| Mud Thornblade | 1d10 | poison | dexterity | dual_wield | 9 | 3 | — | Rare | mud_dwellers | 199 | +1d6 poison damage to unarmored enemies for 2 rounds. |
-| Mud Venom Blade | 1d10 | poison | dexterity | dual_wield | 10 | 3 | — | Rare | mud_dwellers | 300 | 1d6 poison damage over 2 turns on rolls of 15+. |
-| Mud Venom Blade (Rare) | 1d10+1d6 | poison | charisma | single_handed | 9 | 3 | — | Rare | mud_dwellers | 183 | +1d6 poison over 2 turns. |
-| Mud-Iron Greatblade | 2d6 | slashing | strength | two_handed | — | 4 | 40 | Rare | — | 160 | — |
-| Plasma Buckler | 1d10 | burn | dexterity | shield | 9 | 6 | — | Rare | unknowing_masses | 219 | Reflects 1d6 plasma damage back at attacker on max roll. |
-| Plasma Mace | 1d10+1d6 | burn | charisma | single_handed | 9 | 4 | — | Rare | unknowing_masses | 255 | +1d6 plasma damage. |
-| Plasma Warhammer | 1d10 | burn | strength | two_handed | 9 | 6 | — | Rare | unknowing_masses | 385 | +1d6 bludgeoning damage to Large-size enemies. |
-| Sentinel Cleaver | 1d10+1d6 | slashing | strength | — | — | 5 | — | Rare | — | — | — |
-| Shock Gauntlet | 1d10 | electrical | dexterity | dual_wield | 9 | 4 | — | Rare | unknowing_masses | 289 | Stuns on max roll (1 round). |
-| Tartarian Great Knife | 1d10 | slashing | dexterity | dual_wield | 10 | 3 | — | Rare | giants | 233 | +1d6 to armor or structures. |
-| Titan Bone Axe | 1d10 | slashing | strength | two_handed | 8 | 5 | — | Rare | giants | 193 | +1d6 against structures. |
-| Titan Shield | 1d10 | bludgeoning | dexterity | shield | 10 | 8 | — | Rare | giants | 284 | +4 AC; blocks +1d6 from physical attacks. |
-| Aetheric Arm Blade | 2d6 | aetheric | dexterity | dual_wield | 12 | 5 | — | Legendary | aetheric | 431 | +1d6 against constructs. |
-| Aetheric Deathblade | 2d10 | aetheric | charisma | single_handed | 12 | 5 | — | Legendary | aetheric | 502 | Instantly kills enemies on max roll if HP below 20. |
-| Aetheric Spear (Legendary) | 2d10 | aetheric | strength | two_handed | 10 | 6 | — | Legendary | aetheric | 337 | +1d6 against energy shields. |
-| Aetheric Sword of Light | 2d6 | aetheric | dexterity | dual_wield | 11 | 5 | — | Legendary | aetheric | 432 | +1d6 against Mud Aether weapon users. |
+| Aetheric Baton | 1d6 | electrical | charisma | single_handed | 3 | 2 | — | Common | aetheric | 45 | +1 damage to mechanical creatures. |
+| Aetheric Pike | 1d8 | aetheric | strength | two_handed | 4 | 4 | — | Common | aetheric | 50 | — |
+| Aetheric Rod | 1d6 | electrical | dexterity | dual_wield | 3 | 2 | — | Common | aetheric | 45 | +1 damage to tech. |
+| Aetherium Spear | 1d8 | aetheric | strength | two_handed | 4 | 3 | — | Common | aetheric | 55 | +1d6 damage against mechanical enemies or weapons. |
+| Bone Club | 1d6 | bludgeoning | charisma | single_handed | 2 | 3 | — | Common | giants | 35 | +1 to Coercion. Grants +5 HP. |
+| Bone Knife | 1d4 | piercing | dexterity | dual_wield | 2 | 1 | — | Common | giants | 25 | — |
+| Bone Maul | 1d8 | bludgeoning | strength | two_handed | 3 | 4 | — | Common | giants | 40 | Grants +5 HP. |
+| Bone Shiv | 1d4 | piercing | dexterity | — | — | 1 | 18 | Common | — | 20 | — |
+| Bone Shiv (Stealth) | 1d4 | piercing | dexterity | dual_wield | 2 | 1 | — | Common | giants | 35 | +1 to Stealth. |
+| Bone Shortsword | 1d6 | slashing | charisma | single_handed | 3 | 2 | — | Common | giants | 30 | +1 to parry when used with shields. |
+| Bone Splitter Axe | 1d8 | slashing | strength | two_handed | 3 | 3 | — | Common | giants | 45 | Splits shields on a max roll. |
+| Bonebreaker Mace | 1d8 | bludgeoning | strength | two_handed | 4 | 4 | — | Common | giants | 45 | Grants +5 HP. |
+| Club | 1d6 | bludgeoning | strength | — | — | 0 | 8 | Common | — | 20 | Grants +5 HP. |
+| Compact Energy Blade | 1d6 | burn | charisma | single_handed | 4 | 2 | — | Common | unknowing_masses | 40 | Ignores 1 armor point on hit. |
+| Cudgel | 1d8 | bludgeoning | strength | — | — | 1 | 12 | Common | — | 25 | Grants +5 HP. |
+| Iron Buckler | 1d4 | bludgeoning | dexterity | shield | 4 | 5 | — | Common | mud_dwellers | 30 | Can bash for 1d4; does not count as attack move. Grants +10 HP. |
+| Iron Spear | 1d8 | piercing | strength | two_handed | — | 2 | 18 | Common | — | 35 | — |
+| Magnetized Rod | 1d6 | electrical | charisma | single_handed | 4 | 2 | — | Common | aetheric | 45 | Pulls metallic objects toward the wielder. |
+| Mud Buckler | 1d4 | bludgeoning | dexterity | shield | 1 | 4 | — | Common | mud_dwellers | 30 | Grants +10 HP. |
+| Mud Claymore | 1d8 | slashing | strength | two_handed | 4 | 4 | — | Common | mud_dwellers | 45 | — |
+| Mud Grinder Axe | 1d8 | slashing | strength | two_handed | 3 | 3 | — | Common | mud_dwellers | 50 | Causes bleed (1d6 / turn for 2 turns) on expert usage. |
+| Mud Harpoon | 1d8 | piercing | strength | two_handed | 3 | 3 | — | Common | mud_dwellers | 40 | — |
+| Mud Heater Shield | 1d4 | bludgeoning | dexterity | shield | 4 | 5 | — | Common | mud_dwellers | 45 | +2 AC vs fire damage. Grants +15 HP. |
+| Mud Heater Sword | 1d6 | slashing | charisma | single_handed | 4 | 2 | — | Common | mud_dwellers | 35 | +1d6 against cold creatures. |
+| Mud Knife | 1d4 | slashing | charisma | single_handed | 1 | 1 | — | Common | mud_dwellers | 30 | Chance to inflict 1d4 bleed. |
+| Mud Long Axe | 1d8 | slashing | strength | two_handed | 4 | 4 | — | Common | mud_dwellers | 45 | Bonus action — trip enemies on a max damage roll. |
+| Mud Mauler | 1d8 | bludgeoning | strength | two_handed | 2 | 3 | — | Common | mud_dwellers | 40 | Grants +5 HP. |
+| Mud Shortsword | 1d6 | slashing | dexterity | dual_wield | 4 | 2 | — | Common | mud_dwellers | 40 | Close-range 50% chance to stun (even/odd 1d6 to confirm). |
+| Mud Sledge | 1d8 | bludgeoning | strength | two_handed | 4 | 4 | — | Common | mud_dwellers | 45 | Grants +10 HP. |
+| Mud War Pike | 1d8 | piercing | strength | two_handed | 4 | 4 | — | Common | mud_dwellers | 50 | Enemies hit must make a Strength save or be pushed back 10 feet. |
+| Mud-fist Wraps | 1d4 | bludgeoning | strength | — | — | 2 | — | Common | — | 25 | — |
+| Mud-Iron Cleaver | 1d6 | slashing | strength | — | — | 2 | 14 | Common | — | 35 | — |
+| Order Letter-Opener | 1d4 | piercing | intelligence | — | — | 1 | 15 | Common | — | 25 | — |
+| Plasma Cutter | 1d6 | burn | charisma | single_handed | 4 | 1 | — | Common | unknowing_masses | 45 | Rolls of 19+ count as max roll. |
+| Plasma Dagger | 1d4 | burn | dexterity | dual_wield | 4 | 1 | — | Common | unknowing_masses | 40 | +5 Aetheric damage on max roll. |
+| Pocket Knife | 1d4 | slashing | dexterity | — | — | 1 | 15 | Common | — | 15 | — |
+| Rail Saber | 1d8 | electrical | strength | two_handed | 4 | 3 | — | Common | unknowing_masses | 50 | — |
+| Reclaimer's Trowel | 1d4 | piercing | dexterity | — | — | 2 | 20 | Common | — | 20 | — |
+| Rust Dagger | 1d4 | slashing | dexterity | dual_wield | 1 | 1 | — | Common | mud_dwellers | 25 | Breaks on any parry attempt. |
+| Rusted Blade | 1d6 | slashing | strength | — | — | 3 | — | Common | — | 20 | — |
+| Rusty Shortsword | 1d6 | slashing | charisma | single_handed | 1 | 2 | — | Common | mud_dwellers | 25 | -1 to attack after each fight. |
+| Stone Spear | 1d8 | piercing | strength | two_handed | — | 1 | 8 | Common | — | 25 | Grants +5 HP. |
+| Tartarian Bone Knife | 1d4 | piercing | charisma | single_handed | 3 | 1 | — | Common | giants | 30 | +1d6 against natural armor. |
+| Tartarian Claw Knife | 1d4 | piercing | dexterity | dual_wield | 3 | 2 | — | Common | giants | 35 | +4 damage against creatures with natural armor. |
+| Tartarian Hand Axe | 1d6 | slashing | dexterity | dual_wield | 3 | 2 | — | Common | giants | 35 | 1 damage reroll per encounter. |
+| Tartarian Hand Axe (Throw) | 1d6 | slashing | charisma | single_handed | 3 | 2 | — | Common | giants | 40 | Throwable to Close range. |
+| Aether-Shard Spear | 2d6 | piercing | strength | two_handed | — | 2 | 20 | Uncommon | — | 110 | +1d4 aetheric damage against aetheric or magical targets. |
+| Aetheric Blade | 1d8 | aetheric | charisma | single_handed | 6 | 3 | — | Uncommon | aetheric | 115 | +1d6 Aetheric; bypasses non-magical defenses. |
+| Aetheric Cross-Saber | 2d6 | aetheric | strength | two_handed | 5 | 4 | — | Uncommon | aetheric | 120 | +1d6 damage to energy-based enemies. |
+| Aetheric Crystal Blade | 1d8 | slashing | strength | — | — | 4 | — | Uncommon | — | 90 | — |
+| Aetheric Dagger | 1d6 | aetheric | dexterity | dual_wield | 5 | 2 | — | Uncommon | aetheric | 85 | — |
+| Aetheric Greatsword | 2d6 | aetheric | strength | two_handed | 5 | 5 | — | Uncommon | aetheric | 130 | +1 to grip usage while in your possession. |
+| Aetheric Halberd | 2d6 | aetheric | strength | two_handed | 6 | 5 | — | Uncommon | aetheric | 135 | — |
+| Aetheric Shield | 1d6 | aetheric | dexterity | shield | 6 | 6 | — | Uncommon | aetheric | 120 | Deflects energy attacks; +2 AC vs energy damage. Grants +20 HP. |
+| Aetheric Shield-Hammer | 2d6 | bludgeoning | strength | two_handed | 7 | 6 | — | Uncommon | aetheric | 145 | +2 AC for 1 round after a hit. Grants +15 HP. |
+| Ancestor Bone Cleaver | 2d6 | slashing | strength | two_handed | 3 | 0 | — | Uncommon | true_tartarians | 120 | Faction-issue armament of the true tartarians. |
+| Architect's Silent Dagger | 1d6 | piercing | dexterity | one_handed | 3 | 0 | — | Uncommon | conspiracy_architects | 95 | Faction-issue armament of the conspiracy architects. |
+| Bone Cleaver | 2d6 | slashing | strength | two_handed | 6 | 5 | — | Uncommon | giants | 130 | Even/odd reroll to stun the enemy after each use. |
+| Bone Round Shield | 1d6 | bludgeoning | dexterity | shield | 5 | 6 | — | Uncommon | giants | 115 | +2 AC; can bash for 1d6. Grants +20 HP. |
+| Bone Scimitar | 1d8 | slashing | dexterity | dual_wield | 6 | 3 | — | Uncommon | giants | 110 | +1d6 on max roll. |
+| Bone Sword | 1d8 | slashing | charisma | single_handed | 5 | 3 | — | Uncommon | giants | 105 | +1d6 to Large creatures. |
+| Bone Thornblade | 1d8 | poison | charisma | single_handed | 8 | 3 | — | Uncommon | mud_dwellers | 120 | +1d6 poison damage on hit. |
+| Builder's Aethercraft Hammer | 2d6 | bludgeoning | strength | two_handed | 3 | 0 | — | Uncommon | stone_builders | 130 | Faction-issue armament of the stone builders. Grants +10 HP. |
+| Dynasty Oathspear | 1d8 | piercing | strength | one_handed | 3 | 0 | — | Uncommon | eternal_dynasty | 115 | Faction-issue armament of the eternal dynasty. |
+| Energy Baton | 1d8 | electrical | dexterity | dual_wield | 6 | 3 | — | Uncommon | aetheric | 110 | Stuns target on max roll (1 round). |
+| Energy Blade | 1d8 | burn | charisma | single_handed | 5 | 3 | — | Uncommon | unknowing_masses | 115 | Cuts non-magical armor; +1d6 on max roll. |
+| Energy Saber | 1d8 | electrical | charisma | single_handed | 8 | 3 | — | Uncommon | unknowing_masses | 125 | Emits energy pulse on hit. |
+| Giant Bone Shield | 1d6 | bludgeoning | dexterity | shield | 7 | 7 | — | Uncommon | giants | 140 | +3 AC; reduces incoming slashing by 1d6. Grants +25 HP. |
+| Giant Warblade | 1d8 | slashing | charisma | single_handed | 8 | 4 | — | Uncommon | giants | 125 | Damage to all enemies in same range on max roll. |
+| Giant-Watch Greatspear | 2d6 | piercing | strength | two_handed | 3 | 0 | — | Uncommon | servants_of_giants | 130 | Faction-issue armament of the servants of giants. |
+| Heavy Aetheric Flail | 2d6 | aetheric | strength | two_handed | 6 | 4 | — | Uncommon | aetheric | 140 | Automatically wins attack rolls against Aetherkin. |
+| High-Frequency Dagger | 1d6 | electrical | dexterity | dual_wield | 6 | 2 | — | Uncommon | unknowing_masses | 105 | Ignores non-Aetheric armor; 50% chance to disarm (1d6 even/odd). |
+| Laser Blade | 1d8 | burn | dexterity | dual_wield | 6 | 3 | — | Uncommon | unknowing_masses | 115 | Cuts through metal; +1d6 against armor. |
+| Magnetized Halberd | 2d6 | electrical | strength | two_handed | 6 | 5 | — | Uncommon | aetheric | 135 | Pulls metallic objects toward the wielder. |
+| Monarch's Court Blade | 1d8 | slashing | strength | one_handed | 3 | 0 | — | Uncommon | mud_monarchs | 110 | Faction-issue armament of the mud monarchs. |
+| Mud Bone Sword | 1d8 | slashing | charisma | single_handed | 7 | 3 | — | Uncommon | giants | 105 | +1d6 bleed on hit. |
+| Mud Cleaver | 1d8 | slashing | charisma | single_handed | 6 | 3 | — | Uncommon | mud_dwellers | 115 | Reduces enemy armor by 1 on hit. |
+| Mud Kukri | 1d8 | slashing | dexterity | dual_wield | 5 | 3 | — | Uncommon | mud_dwellers | 110 | Reduces enemy armor by 1d6 on max roll. |
+| Mud Saber | 1d8 | slashing | charisma | single_handed | 6 | 3 | — | Uncommon | mud_dwellers | 110 | Reduces enemy speed by 10 ft on hit. |
+| Mud Spiked Shield | 1d6 | piercing | dexterity | shield | 5 | 6 | — | Uncommon | mud_dwellers | 125 | Deals 1d6 damage on the block. Grants +15 HP. |
+| Mud-Rend Blade | 1d8 | slashing | strength | — | — | 3 | 18 | Uncommon | — | 95 | — |
+| Order Reliquary Blade | 1d8 | slashing | dexterity | one_handed | 3 | 0 | — | Uncommon | forgotten_order | 110 | Faction-issue armament of the forgotten order. |
+| Plasma Knife | 1d6 | burn | charisma | single_handed | 6 | 2 | — | Uncommon | unknowing_masses | 105 | +1d6 plasma damage on hit. |
+| Plasma Scythe | 2d6 | burn | strength | two_handed | 6 | 4 | — | Uncommon | aetheric | 150 | Ignores armor on max damage roll once per encounter (declinable, save for later). |
+| Plasma Shield | 1d6 | burn | dexterity | shield | 7 | 6 | — | Uncommon | unknowing_masses | 135 | Blocks Aetheric-based damage; reduces blunt force by 1d6. Grants +20 HP. |
+| Reclaimer's Salvage Maul | 2d6 | bludgeoning | strength | two_handed | 3 | 0 | — | Uncommon | reclaimers_guild | 125 | Faction-issue armament of the reclaimers guild. Grants +10 HP. |
+| Shockwave Buckler | 1d6 | bludgeoning | dexterity | shield | 8 | 6 | — | Uncommon | aetheric | 140 | Shockwave on max-roll block — push enemies to far distance. Grants +15 HP. |
+| Tartarian Spear | 2d6 | piercing | strength | — | — | 3 | — | Uncommon | — | 120 | — |
+| Tartarian War Knife | 1d8 | piercing | charisma | single_handed | 5 | 2 | — | Uncommon | giants | 115 | +1d6 against constructs. |
+| Tartarian Warblade | 1d8 | slashing | dexterity | dual_wield | 8 | 4 | — | Uncommon | giants | 125 | +1d6 against Large creatures. |
+| Titan Warhammer | 2d6 | bludgeoning | strength | two_handed | 6 | 5 | — | Uncommon | giants | 140 | +1d6 damage against structures or vehicles. Grants +15 HP. |
+| Wyrm-Fang Blade | 1d8 | piercing | dexterity | — | — | 3 | 24 | Uncommon | — | 105 | +1d4 against beasts. |
+| Aether Lance | 2d8 | aetheric | strength | two_handed | 7 | 5 | — | Rare | aetheric | 320 | Disrupts energy shields; +1d6 against energy-shielded targets. |
+| Aetheric Blade of Light | 2d6 | aetheric | charisma | single_handed | 9 | 4 | — | Rare | aetheric | 280 | +1d6 against creatures of darkness. |
+| Aetheric Hand Axe | 2d6 | aetheric | dexterity | dual_wield | 9 | 4 | — | Rare | aetheric | 290 | 50% chance to paralyze for 2 rounds (1d6 even/odd). |
+| Aetheric Plasma Blade | 2d6 | burn | dexterity | dual_wield | 9 | 4 | — | Rare | aetheric | 290 | +1d20 to all in close range if broken on parry. |
+| Aetherstone Gauntlet | 2d6 | bludgeoning | strength | — | — | 5 | — | Rare | — | 270 | Grants +15 HP. |
+| Fusion Greatsword | 2d8 | burn | strength | two_handed | 9 | 6 | — | Rare | aetheric | 350 | +1d6 fire damage on max roll; causes burns. |
+| Giant Bone Knuckles | 2d6 | bludgeoning | dexterity | dual_wield | 9 | 3 | — | Rare | giants | 280 | +1d6 to arm's-reach targets. Grants +10 HP. |
+| Giant Bone Spear (Single) | 2d6 | piercing | charisma | single_handed | 9 | 4 | — | Rare | giants | 285 | +1d6 to structures. |
+| Giant Bone Sword | 2d6 | slashing | charisma | single_handed | 10 | 4 | — | Rare | giants | 290 | +1d6 against armored enemies. |
+| Graviton Shield | 1d8 | bludgeoning | dexterity | shield | 9 | 7 | — | Rare | aetheric | 295 | Absorbs impact; +1d6 environmental damage reduction. Grants +30 HP. |
+| Gravity Hammer | 2d8 | bludgeoning | strength | two_handed | 9 | 6 | — | Rare | aetheric | 360 | Knock-stun enemies in same range as you (even/odd reroll to confirm). Grants +20 HP. |
+| Heavy Plasma Hammer | 2d8 | burn | strength | two_handed | 9 | 6 | — | Rare | unknowing_masses | 365 | +1d6 Aetheric damage to any target with no Aetheric gear / weapons / items. |
+| Laser Sword | 2d6 | burn | charisma | single_handed | 10 | 4 | — | Rare | unknowing_masses | 295 | +1d6 energy; ignores non-magical armor. |
+| Magnetic Axe | 2d6 | electrical | charisma | single_handed | 9 | 4 | — | Rare | aetheric | 285 | Pulls metallic enemies 10 ft closer on hit. |
+| Mud Executioner's Blade | 2d8 | slashing | charisma | single_handed | 10 | 4 | — | Rare | mud_dwellers | 310 | +1d6 on max roll; bleed (1d6/turn × 2). |
+| Mud Thornblade | 2d6 | poison | dexterity | dual_wield | 9 | 3 | — | Rare | mud_dwellers | 290 | +1d6 poison damage to unarmored enemies for 2 rounds. |
+| Mud Venom Blade | 2d6 | poison | dexterity | dual_wield | 10 | 3 | — | Rare | mud_dwellers | 300 | 1d6 poison damage over 2 turns on rolls of 15+. |
+| Mud Venom Blade (Rare) | 2d6 | poison | charisma | single_handed | 9 | 3 | — | Rare | mud_dwellers | 295 | +1d6 poison over 2 turns. |
+| Mud-Iron Greatblade | 2d8 | slashing | strength | two_handed | — | 4 | 40 | Rare | — | 330 | — |
+| Plasma Buckler | 1d8 | burn | dexterity | shield | 9 | 6 | — | Rare | unknowing_masses | 280 | Reflects 1d6 plasma damage back at attacker on max roll. Grants +20 HP. |
+| Plasma Mace | 2d6 | burn | charisma | single_handed | 9 | 4 | — | Rare | unknowing_masses | 290 | +1d6 plasma damage. |
+| Plasma Warhammer | 2d8 | burn | strength | two_handed | 9 | 6 | — | Rare | unknowing_masses | 380 | +1d6 bludgeoning damage to Large-size enemies. Grants +15 HP. |
+| Sentinel Cleaver | 2d8 | slashing | strength | — | — | 5 | — | Rare | — | 340 | — |
+| Shock Gauntlet | 2d6 | electrical | dexterity | dual_wield | 9 | 4 | — | Rare | unknowing_masses | 295 | Stuns on max roll (1 round). |
+| Tartarian Great Knife | 2d6 | slashing | dexterity | dual_wield | 10 | 3 | — | Rare | giants | 300 | +1d6 to armor or structures. |
+| Titan Bone Axe | 2d8 | slashing | strength | two_handed | 8 | 5 | — | Rare | giants | 360 | +1d6 against structures. Grants +15 HP. |
+| Titan Shield | 1d8 | bludgeoning | dexterity | shield | 10 | 8 | — | Rare | giants | 320 | +4 AC; blocks +1d6 from physical attacks. Grants +35 HP. |
+| Aetheric Arm Blade | 2d8 | aetheric | dexterity | dual_wield | 12 | 5 | — | Legendary | aetheric | 850 | +1d6 against constructs. |
+| Aetheric Deathblade | 2d10 | aetheric | charisma | single_handed | 12 | 5 | — | Legendary | aetheric | 950 | Instantly kills enemies on max roll if HP below 20. |
+| Aetheric Spear (Legendary) | 2d10 | aetheric | strength | two_handed | 10 | 6 | — | Legendary | aetheric | 880 | +1d6 against energy shields. |
+| Aetheric Sword of Light | 2d8 | aetheric | dexterity | dual_wield | 11 | 5 | — | Legendary | aetheric | 860 | +1d6 against Mud Aether weapon users. |
 | Aetheric Sword of Storms | 3d10 | electrical | charisma | single_handed | 11 | 5 | — | Legendary | aetheric | 1100 | Max roll calls a storm — 1d10 AoE Close range (allies included). |
-| Energy Blade (Legendary) | 2d6 | burn | dexterity | dual_wield | 11 | 5 | — | Legendary | unknowing_masses | 497 | Cuts through any armor; ignores non-magical defenses. |
-| Energy Hammer | 2d10 | electrical | charisma | single_handed | 11 | 5 | — | Legendary | unknowing_masses | 520 | +1d6 shock damage. |
-| Energy Pike | 2d10 | burn | strength | two_handed | 11 | 6 | — | Legendary | aetheric | 397 | Fires energy blasts (assigned damage roll) or melee to stun (even = stun for 3 turns). |
-| Founder's Edge | 2d10 | slashing | strength | — | — | 6 | — | Legendary | — | — | — |
-| Giant Bone Spear | 2d10 | piercing | strength | two_handed | 10 | 6 | — | Legendary | giants | 562 | Advantage on all attacks vs giants and golems. +2 STR (permanent) on 5th max roll; does not stack. |
-| Graviton Gauntlet | 2d6 | bludgeoning | dexterity | dual_wield | 11 | 5 | — | Legendary | aetheric | 470 | Slows enemy movement by 10 ft on hit. |
-| Gravity Pike | 2d10 | aetheric | strength | two_handed | 10 | 6 | — | Legendary | aetheric | 572 | Alters gravity, slowing the target; companions rolling later get advantage. |
-| Heavy Rail Axe | 2d10 | electrical | strength | two_handed | 11 | 6 | — | Legendary | unknowing_masses | 432 | +1d6 shock damage. |
-| Mud Army War Hammer | 2d10 | bludgeoning | strength | two_handed | 12 | 6 | — | Legendary | mud_dwellers | 406 | Close-in shockwave on max roll; +2d10 to everything in arm's reach radius. Even/odd reroll to suppress the effect for one attack. |
-| Mud Emperor's Buckler | 2d6 | bludgeoning | dexterity | shield | 12 | 7 | — | Legendary | mud_dwellers | 357 | +3 AC; reflects up to 1d6 back at attacker. |
-| Mud Emperor's Saber | 2d10 | slashing | charisma | single_handed | 11 | 5 | — | Legendary | mud_dwellers | 337 | Bleed (1d6 × 2 rounds); reduces enemy armor. |
-| Mud Royal Blade | 2d10 | poison | charisma | single_handed | 12 | 5 | — | Legendary | mud_dwellers | 432 | Poison (1d6/turn); reduces enemy armor by 2. |
-| Mud Royal Shield | 2d6 | bludgeoning | dexterity | shield | 11 | 8 | — | Legendary | mud_dwellers | 520 | Deflects runecasters / powers once per day; +3 AC. |
-| Plasma Cutter Knife | 2d6 | burn | dexterity | dual_wield | 12 | 4 | — | Legendary | unknowing_masses | 555 | Melts through armor; 1d6 burning damage. |
-| Plasma Energy Shield | 2d6 | burn | dexterity | shield | 12 | 8 | — | Legendary | unknowing_masses | 564 | Blocks all plasma damage; reflects 1d6 back. |
-| Plasma Executioner's Axe | 2d10 | burn | charisma | single_handed | 12 | 5 | — | Legendary | unknowing_masses | 399 | +1d6 energy; bypasses shield on max rolls. |
-| Reaver's Greatsword | 2d8 | slashing | strength | two_handed | 10 | 6 | 50 | Legendary | — | 420 | Notches the haft for each warband cut down. |
-| Shockwave Club | 2d10 | bludgeoning | strength | two_handed | 11 | 6 | — | Legendary | aetheric | 391 | Emits shockwave on max roll — knocks back enemies 1 range band. |
-| Tartarian Bone Cleaver | 2d6 | slashing | dexterity | dual_wield | 11 | 5 | — | Legendary | giants | 368 | +1d6 bleed damage on hit. |
-| Tartarian Crown Blade | 2d6 | slashing | dexterity | dual_wield | 12 | 5 | — | Legendary | giants | 601 | +1d6 on all max roll hits. |
-| Tartarian Crown Sword | 2d10 | slashing | charisma | single_handed | 12 | 5 | — | Legendary | giants | 575 | +1d6 against supernatural creatures. |
+| Energy Blade (Legendary) | 2d8 | burn | dexterity | dual_wield | 11 | 5 | — | Legendary | unknowing_masses | 890 | Cuts through any armor; ignores non-magical defenses. |
+| Energy Hammer | 2d10 | electrical | charisma | single_handed | 11 | 5 | — | Legendary | unknowing_masses | 920 | +1d6 shock damage. |
+| Energy Pike | 2d10 | burn | strength | two_handed | 11 | 6 | — | Legendary | aetheric | 900 | Fires energy blasts (assigned damage roll) or melee to stun (even = stun for 3 turns). |
+| Founder's Edge | 2d10 | slashing | strength | — | — | 6 | — | Legendary | — | 950 | — |
+| Giant Bone Spear | 2d10 | piercing | strength | two_handed | 10 | 6 | — | Legendary | giants | 980 | Advantage on all attacks vs giants and golems. +2 STR (permanent) on 5th max roll; does not stack. |
+| Graviton Gauntlet | 2d8 | bludgeoning | dexterity | dual_wield | 11 | 5 | — | Legendary | aetheric | 860 | Slows enemy movement by 10 ft on hit. |
+| Gravity Pike | 2d10 | aetheric | strength | two_handed | 10 | 6 | — | Legendary | aetheric | 990 | Alters gravity, slowing the target; companions rolling later get advantage. |
+| Heavy Rail Axe | 2d10 | electrical | strength | two_handed | 11 | 6 | — | Legendary | unknowing_masses | 940 | +1d6 shock damage. |
+| Mud Army War Hammer | 2d10 | bludgeoning | strength | two_handed | 12 | 6 | — | Legendary | mud_dwellers | 960 | Close-in shockwave on max roll; +2d10 to everything in arm's reach radius. Even/odd reroll to suppress the effect for one attack. Grants +25 HP. |
+| Mud Emperor's Buckler | 1d10 | bludgeoning | dexterity | shield | 12 | 7 | — | Legendary | mud_dwellers | 850 | +3 AC; reflects up to 1d6 back at attacker. Grants +40 HP. |
+| Mud Emperor's Saber | 2d10 | slashing | charisma | single_handed | 11 | 5 | — | Legendary | mud_dwellers | 920 | Bleed (1d6 × 2 rounds); reduces enemy armor. |
+| Mud Royal Blade | 2d10 | poison | charisma | single_handed | 12 | 5 | — | Legendary | mud_dwellers | 930 | Poison (1d6/turn); reduces enemy armor by 2. |
+| Mud Royal Shield | 1d10 | bludgeoning | dexterity | shield | 11 | 8 | — | Legendary | mud_dwellers | 990 | Deflects runecasters / powers once per day; +3 AC. Grants +50 HP. |
+| Plasma Cutter Knife | 2d8 | burn | dexterity | dual_wield | 12 | 4 | — | Legendary | unknowing_masses | 890 | Melts through armor; 1d6 burning damage. |
+| Plasma Energy Shield | 1d10 | burn | dexterity | shield | 12 | 8 | — | Legendary | unknowing_masses | 950 | Blocks all plasma damage; reflects 1d6 back. Grants +30 HP. |
+| Plasma Executioner's Axe | 2d10 | burn | charisma | single_handed | 12 | 5 | — | Legendary | unknowing_masses | 970 | +1d6 energy; bypasses shield on max rolls. |
+| Reaver's Greatsword | 2d10 | slashing | strength | two_handed | 10 | 6 | 50 | Legendary | — | 980 | Notches the haft for each warband cut down. |
+| Shockwave Club | 2d10 | bludgeoning | strength | two_handed | 11 | 6 | — | Legendary | aetheric | 950 | Emits shockwave on max roll — knocks back enemies 1 range band. Grants +20 HP. |
+| Tartarian Bone Cleaver | 2d8 | slashing | dexterity | dual_wield | 11 | 5 | — | Legendary | giants | 880 | +1d6 bleed damage on hit. |
+| Tartarian Crown Blade | 2d8 | slashing | dexterity | dual_wield | 12 | 5 | — | Legendary | giants | 920 | +1d6 on all max roll hits. |
+| Tartarian Crown Sword | 2d10 | slashing | charisma | single_handed | 12 | 5 | — | Legendary | giants | 950 | +1d6 against supernatural creatures. |
 
 ## Ranged (64)
 
@@ -279,4 +279,3 @@ _Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`
 | Shatter Aether | 1d4 | aetheric | intelligence | runecaster | 10 | 0 | — | Legendary | aetheric | 603 | Breaks any magical effect or structure. Instantaneous. |
 | Void Edge | 2d20 | aetheric | intelligence | runecaster | 12 | 0 | — | Legendary | — | 640 | 2d20 void; opens a damaging rift on the target tile for 2 rounds. |
 | Wrath of Titans | 2d20 | bludgeoning | intelligence | runecaster | 11 | 0 | — | Legendary | — | 580 | 2d20 bludgeoning; massive AoE stun + knockback (all enemies in 15 ft). |
-

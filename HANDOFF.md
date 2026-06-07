@@ -21,7 +21,7 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - `HaL2001` HEAD = **OTA-328 "Juniper Anvil"** — live on Android + iOS.
+> - `HaL2001` HEAD = **OTA-329 "Sumac Anvil"** — live on Android + iOS.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - tsc clean. Tests green modulo the known baseline flakes (dogTravelClimb,
@@ -116,6 +116,17 @@ checkout, not a special rollback tool.)
 > **The canonical record of issues across the build.** Every OTA / APK push updates this section in the same commit. **Read this section before planning any fix** to (a) check whether the issue is already closed and the fix exists, and (b) make sure your plan won't break a previously-closed fix. The workflow rules live in `CLAUDE.md` → "HANDOFF.md — the build timeline."
 
 ### 0.A — Open Issues
+
+- **Ranged + runecaster weapon rebalance — pending the rest of the CSV.** OTA-329
+  (Sumac Anvil) applied the player's rebalanced **MELEE** block (all 145) + the new
+  max-HP-on-weapons mechanic. The pasted CSV was **truncated** mid-row in the Ranged
+  section (cuts off at "Tartarian Hand Spear"), so the 64 ranged + 54 runecaster rows
+  were NOT applied — they keep their pre-rebalance stats. The engine wiring is already
+  in place (`weaponHpBonus` / `gearHpBonus` resolve ANY weapon, so a ranged/runecaster
+  "Grants +X HP" effect will work the instant the row is applied). **Next step:** when
+  the player sends the remaining CSV (paste starting AFTER the Tartarian Hand Spear
+  row to dodge the truncation), apply it with the same script path used for melee and
+  regenerate `docs/weapon-catalog.md`. Deferred — waiting on data.
 
 
 > **⚡ ACTIVE TASK (2026-05-31) — iOS build → TestFlight External Testing. READ THIS FIRST.**
@@ -418,6 +429,15 @@ checkout, not a special rollback tool.)
 - **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Sumac Anvil (`2026-06-07-329`) — MELEE weapon rebalance + max-HP-on-weapons
+- **WHAT.** Player took the Juniper Anvil `weapon-catalog.md`, rebalanced it (adding "Grants +X HP" to many entries, mirroring the armor HP pass), and pasted the CSV back: "here are the rebalanced weapons." First verified the catalog was complete (it was — 145 melee / 64 ranged / 54 runecaster = all 263, exact name-for-name match). The pasted CSV arrived **truncated** (cuts off mid-row in Ranged at "Tartarian Hand Spear"), so only the **Melee block was complete** — applied that; ranged + runecaster deferred to the rest of the CSV.
+- **FIX (apply MELEE balance).** Parsed the 145-row melee CSV and wrote it into `weapons.json`: `damageDice`, `damageType`, scaling `stat`, `style` (skipped when the CSV cell is "—" → keep existing), `statRequirement`, `defense`, `baseDurability` (skipped when "—"), `rarity`, `faction` (skipped when "—"), `tc`, and the free-text `effect`. All 145 melee names matched exactly, 0 orphans / 0 extras.
+- **FIX (max-HP-on-weapons mechanic).** 34 melee rows (mostly shields + heavy maces — Titan Shield +35, Mud Royal Shield +50, Mud Emperor's Buckler +40, etc.) carry a "Grants +X HP" effect. Mirroring OTA-327's armor HP wiring: those weapons now get a structured `statBonuses: [{stat:'hp', amount:X}]` (parsed from the effect text). `CatalogWeapon` gained `statBonuses?`. New `equipment.weaponHpBonus(name)` reads it; new unified `equipment.gearHpBonus(name) = armorHpBonus + weaponHpBonus` is now what `equipItem`/`unequipSlot` call (they already ran for every slot, incl. main/off), so a wielded weapon's HP grant bakes into `player.hpMax` (+hp) on equip and strips on unequip, swap-aware. The full effect text (incl. "Grants +X HP") is kept for display.
+- **DOC.** `docs/weapon-catalog.md` regenerated from the rebalanced JSON (note added that "Grants +X HP" weapons carry a real max-HP bonus).
+- **Verified:** tsc clean on touched source (`equipment.ts`, `crafting.ts`, `gameStore.ts`); new `__tests__/weaponHpBonus.test.ts` (Titan Shield +35, Mud Royal Shield +50, plain weapon 0, unknown/null 0, gearHpBonus resolves a weapon while armorHpBonus alone does not) + armorHpBonus + armorMultiStat all green (12/12). The pre-existing test-file tsc errors (qwen*, stressMode*, createAsync*) are unchanged and unrelated.
+- **Files:** `app/data/items/weapons.json` (145 melee rebalanced, 34 HP-wired), `app/engine/crafting.ts` (`CatalogWeapon.statBonuses?`), `app/engine/equipment.ts` (`weaponHpBonus`, `gearHpBonus`), `app/state/gameStore.ts` (equip/unequip use `gearHpBonus`), `__tests__/weaponHpBonus.test.ts` (new), `docs/weapon-catalog.md` (regenerated), `app/buildInfo.ts`, `app/buildCodename.ts` (Sumac Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
+- **STILL OPEN.** Ranged (64) + runecaster (54) weapon rebalance — pending the rest of the truncated CSV. See Open Issues.
 
 #### Juniper Anvil (`2026-06-07-328`) — all armor base-stats apply + weapon catalog
 - **WHAT.** Player: "yes, all of the stats of the armor should apply, not just the first one." + "give me a list of every weapon in the game with all of their stats."

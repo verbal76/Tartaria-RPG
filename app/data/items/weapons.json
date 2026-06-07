@@ -13,7 +13,9 @@
         "blade",
         "melee"
       ],
-      "description": "A salvaged edge. Pitted with rust, still sharp enough to cut."
+      "description": "A salvaged edge. Pitted with rust, still sharp enough to cut.",
+      "statRequirement": null,
+      "tc": 20
     },
     {
       "name": "Mud-Rend Blade",
@@ -23,7 +25,7 @@
       "stat": "strength",
       "rarity": "Uncommon",
       "baseDurability": 18,
-      "tc": 35,
+      "tc": 95,
       "defense": 3,
       "tags": [
         "weapon",
@@ -34,17 +36,18 @@
         "race_starter",
         "mud_golem"
       ],
-      "description": "A field-forged blade with a serrated spine for tearing through mud-glass crust. Reclaimer salvage crews favour it for cutting siltbound straps and wraith-flesh both."
+      "description": "A field-forged blade with a serrated spine for tearing through mud-glass crust. Reclaimer salvage crews favour it for cutting siltbound straps and wraith-flesh both.",
+      "statRequirement": null
     },
     {
       "name": "Mud-Iron Cleaver",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "1d8",
+      "damageDice": "1d6",
       "stat": "strength",
       "rarity": "Common",
       "baseDurability": 14,
-      "tc": 18,
+      "tc": 35,
       "defense": 2,
       "tags": [
         "weapon",
@@ -52,13 +55,14 @@
         "melee",
         "mud"
       ],
-      "description": "A heavy single-edged blade cast from mud-iron. Crude balance but it carries weight through the swing."
+      "description": "A heavy single-edged blade cast from mud-iron. Crude balance but it carries weight through the swing.",
+      "statRequirement": null
     },
     {
       "name": "Mud-fist Wraps",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "1d6",
+      "damageDice": "1d4",
       "stat": "strength",
       "rarity": "Common",
       "defense": 2,
@@ -67,7 +71,9 @@
         "barehanded",
         "melee"
       ],
-      "description": "Hardened mud-glass strapped over knuckles. Hurts more than it should."
+      "description": "Hardened mud-glass strapped over knuckles. Hurts more than it should.",
+      "statRequirement": null,
+      "tc": 25
     },
     {
       "name": "Club",
@@ -77,7 +83,7 @@
       "stat": "strength",
       "rarity": "Common",
       "baseDurability": 8,
-      "tc": 4,
+      "tc": 20,
       "defense": 0,
       "tags": [
         "weapon",
@@ -87,7 +93,15 @@
         "wood",
         "emergency"
       ],
-      "description": "A length of dry wood, fist-thick. Crude but it breaks bones honestly. Splinters fast."
+      "description": "A length of dry wood, fist-thick. Crude but it breaks bones honestly. Splinters fast.",
+      "statRequirement": null,
+      "effect": "Grants +5 HP.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 5
+        }
+      ]
     },
     {
       "name": "Cudgel",
@@ -97,7 +111,7 @@
       "stat": "strength",
       "rarity": "Common",
       "baseDurability": 12,
-      "tc": 10,
+      "tc": 25,
       "defense": 1,
       "tags": [
         "weapon",
@@ -107,18 +121,26 @@
         "weighted",
         "emergency"
       ],
-      "description": "A stick with a fat stone lashed to its head with rag. Slow swing, heavy landing. The lashing loosens."
+      "description": "A stick with a fat stone lashed to its head with rag. Slow swing, heavy landing. The lashing loosens.",
+      "statRequirement": null,
+      "effect": "Grants +5 HP.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 5
+        }
+      ]
     },
     {
       "name": "Stone Spear",
       "weaponKind": "melee",
       "damageType": "piercing",
-      "damageDice": "1d6",
+      "damageDice": "1d8",
       "stat": "strength",
       "rarity": "Common",
       "style": "two_handed",
       "baseDurability": 8,
-      "tc": 6,
+      "tc": 25,
       "defense": 1,
       "tags": [
         "weapon",
@@ -130,7 +152,15 @@
         "reach",
         "emergency"
       ],
-      "description": "A stick with a chipped rock lashed to its point. Crude but it reaches. The stone shatters on the first solid hit."
+      "description": "A stick with a chipped rock lashed to its point. Crude but it reaches. The stone shatters on the first solid hit.",
+      "statRequirement": null,
+      "effect": "Grants +5 HP.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 5
+        }
+      ]
     },
     {
       "name": "Iron Spear",
@@ -141,7 +171,7 @@
       "rarity": "Common",
       "style": "two_handed",
       "baseDurability": 18,
-      "tc": 14,
+      "tc": 35,
       "defense": 2,
       "tags": [
         "weapon",
@@ -153,18 +183,19 @@
         "reach",
         "emergency"
       ],
-      "description": "A salvaged-iron head on a wooden shaft. A real spear — keeps enemies at arm's length or buries itself in their chest. Won't last forever."
+      "description": "A salvaged-iron head on a wooden shaft. A real spear — keeps enemies at arm's length or buries itself in their chest. Won't last forever.",
+      "statRequirement": null
     },
     {
       "name": "Aether-Shard Spear",
       "weaponKind": "melee",
       "damageType": "piercing",
-      "damageDice": "1d8",
+      "damageDice": "2d6",
       "stat": "strength",
       "rarity": "Uncommon",
       "style": "two_handed",
       "baseDurability": 20,
-      "tc": 40,
+      "tc": 110,
       "defense": 2,
       "tags": [
         "weapon",
@@ -176,7 +207,8 @@
         "reach"
       ],
       "effect": "+1d4 aetheric damage against aetheric or magical targets.",
-      "description": "An Aetheric shard bound to a hardwood shaft. Hums faintly. Cuts cleaner than iron — and the shard's energy survives the wood."
+      "description": "An Aetheric shard bound to a hardwood shaft. Hums faintly. Cuts cleaner than iron — and the shard's energy survives the wood.",
+      "statRequirement": null
     },
     {
       "name": "Pocket Knife",
@@ -193,7 +225,9 @@
         "knife",
         "tool"
       ],
-      "description": "A folding pocket knife. Cuts, peels, and — in this country — digs. Doesn't survive heavy work."
+      "description": "A folding pocket knife. Cuts, peels, and — in this country — digs. Doesn't survive heavy work.",
+      "statRequirement": null,
+      "tc": 15
     },
     {
       "name": "Bone Shiv",
@@ -211,7 +245,9 @@
         "tool",
         "bone"
       ],
-      "description": "Mud Dweller workshop output — an Aetheric-treated bone splinter, ground to a point. Brittle but very, very sharp."
+      "description": "Mud Dweller workshop output — an Aetheric-treated bone splinter, ground to a point. Brittle but very, very sharp.",
+      "statRequirement": null,
+      "tc": 20
     },
     {
       "name": "Reclaimer's Trowel",
@@ -228,7 +264,9 @@
         "tool",
         "dig"
       ],
-      "description": "A flat hand-trowel with a sharpened lip. Standard Reclaimer kit — used like an archaeologist's blade: point-first, deliberate, never destructive."
+      "description": "A flat hand-trowel with a sharpened lip. Standard Reclaimer kit — used like an archaeologist's blade: point-first, deliberate, never destructive.",
+      "statRequirement": null,
+      "tc": 20
     },
     {
       "name": "Order Letter-Opener",
@@ -246,7 +284,9 @@
         "tool",
         "scholarly"
       ],
-      "description": "An Order scholar's letter-opener. Steel, slim, surprisingly stab-able."
+      "description": "An Order scholar's letter-opener. Steel, slim, surprisingly stab-able.",
+      "statRequirement": null,
+      "tc": 25
     },
     {
       "name": "Salvaged Bow",
@@ -281,7 +321,7 @@
       "name": "Aetheric Crystal Blade",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "2d6",
+      "damageDice": "1d8",
       "stat": "strength",
       "rarity": "Uncommon",
       "defense": 4,
@@ -291,7 +331,9 @@
         "melee",
         "aetheric"
       ],
-      "description": "Slag-cast Aetherstone hilted in mud-bone. Cuts cloth and Aetheric haze alike."
+      "description": "Slag-cast Aetherstone hilted in mud-bone. Cuts cloth and Aetheric haze alike.",
+      "statRequirement": null,
+      "tc": 90
     },
     {
       "name": "Tartarian Spear",
@@ -306,7 +348,9 @@
         "spear",
         "melee"
       ],
-      "description": "A spear forged from pre-flood iron. Balanced for throw or thrust."
+      "description": "A spear forged from pre-flood iron. Balanced for throw or thrust.",
+      "statRequirement": null,
+      "tc": 120
     },
     {
       "name": "Storm Rod",
@@ -378,7 +422,7 @@
       "name": "Sentinel Cleaver",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "1d10+1d6",
+      "damageDice": "2d8",
       "stat": "strength",
       "rarity": "Rare",
       "defense": 5,
@@ -388,13 +432,15 @@
         "melee",
         "sentinel"
       ],
-      "description": "Repurposed plate from a fallen Sentinel, ground to an edge. Heavier than it looks."
+      "description": "Repurposed plate from a fallen Sentinel, ground to an edge. Heavier than it looks.",
+      "statRequirement": null,
+      "tc": 340
     },
     {
       "name": "Aetherstone Gauntlet",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "1d10+1d6",
+      "damageDice": "2d6",
       "stat": "strength",
       "rarity": "Rare",
       "defense": 5,
@@ -404,7 +450,16 @@
         "melee",
         "aetheric"
       ],
-      "description": "A gauntlet cored with Aetherstone. Every strike pulses a concussive ring."
+      "description": "A gauntlet cored with Aetherstone. Every strike pulses a concussive ring.",
+      "statRequirement": null,
+      "tc": 270,
+      "effect": "Grants +15 HP.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 15
+        }
+      ]
     },
     {
       "name": "Mire Stave",
@@ -436,7 +491,9 @@
         "aetheric",
         "founder"
       ],
-      "description": "Said to have been carried by one of Tartaria's first builders. Cuts through Aetheric haze like it isn't there."
+      "description": "Said to have been carried by one of Tartaria's first builders. Cuts through Aetheric haze like it isn't there.",
+      "statRequirement": null,
+      "tc": 950
     },
     {
       "name": "Crown of Verdict",
@@ -480,13 +537,13 @@
       "name": "Bone Maul",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "1d6",
+      "damageDice": "1d8",
       "stat": "strength",
       "statRequirement": 3,
       "rarity": "Common",
       "style": "two_handed",
       "faction": "giants",
-      "tc": 20,
+      "tc": 40,
       "defense": 4,
       "tags": [
         "weapon",
@@ -495,19 +552,26 @@
         "giants",
         "bone"
       ],
-      "description": "Heavy bone maul with a large crack down the haft. No effects, just weight."
+      "description": "Heavy bone maul with a large crack down the haft. No effects, just weight.",
+      "effect": "Grants +5 HP.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 5
+        }
+      ]
     },
     {
       "name": "Mud Long Axe",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "1d6",
+      "damageDice": "1d8",
       "stat": "strength",
       "statRequirement": 4,
       "rarity": "Common",
       "style": "two_handed",
       "faction": "mud_dwellers",
-      "tc": 38,
+      "tc": 45,
       "defense": 4,
       "tags": [
         "weapon",
@@ -545,13 +609,13 @@
       "name": "Mud Harpoon",
       "weaponKind": "melee",
       "damageType": "piercing",
-      "damageDice": "1d6",
+      "damageDice": "1d8",
       "stat": "strength",
       "statRequirement": 3,
       "rarity": "Common",
       "style": "two_handed",
       "faction": "mud_dwellers",
-      "tc": 26,
+      "tc": 40,
       "defense": 3,
       "tags": [
         "weapon",
@@ -588,13 +652,13 @@
       "name": "Mud Sledge",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "1d6",
+      "damageDice": "1d8",
       "stat": "strength",
       "statRequirement": 4,
       "rarity": "Common",
       "style": "two_handed",
       "faction": "mud_dwellers",
-      "tc": 31,
+      "tc": 45,
       "defense": 4,
       "tags": [
         "weapon",
@@ -603,19 +667,26 @@
         "hammer",
         "mud_dwellers"
       ],
-      "description": "Standard large sledge carved from hardened mud. Heavy work, heavier hit."
+      "description": "Standard large sledge carved from hardened mud. Heavy work, heavier hit.",
+      "effect": "Grants +10 HP.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 10
+        }
+      ]
     },
     {
       "name": "Mud Grinder Axe",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "1d6",
+      "damageDice": "1d8",
       "stat": "strength",
       "statRequirement": 3,
       "rarity": "Common",
       "style": "two_handed",
       "faction": "mud_dwellers",
-      "tc": 42,
+      "tc": 50,
       "defense": 3,
       "tags": [
         "weapon",
@@ -631,13 +702,13 @@
       "name": "Mud Mauler",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "1d6",
+      "damageDice": "1d8",
       "stat": "strength",
       "statRequirement": 2,
       "rarity": "Common",
       "style": "two_handed",
       "faction": "mud_dwellers",
-      "tc": 24,
+      "tc": 40,
       "defense": 3,
       "tags": [
         "weapon",
@@ -646,19 +717,26 @@
         "hammer",
         "mud_dwellers"
       ],
-      "description": "Large maul made from hardened mud filled with building remnants. Crude. Effective."
+      "description": "Large maul made from hardened mud filled with building remnants. Crude. Effective.",
+      "effect": "Grants +5 HP.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 5
+        }
+      ]
     },
     {
       "name": "Rail Saber",
       "weaponKind": "melee",
       "damageType": "electrical",
-      "damageDice": "1d6",
+      "damageDice": "1d8",
       "stat": "strength",
       "statRequirement": 4,
       "rarity": "Common",
       "style": "two_handed",
       "faction": "unknowing_masses",
-      "tc": 37,
+      "tc": 50,
       "defense": 3,
       "tags": [
         "weapon",
@@ -673,13 +751,13 @@
       "name": "Aetherium Spear",
       "weaponKind": "melee",
       "damageType": "aetheric",
-      "damageDice": "1d6",
+      "damageDice": "1d8",
       "stat": "strength",
       "statRequirement": 4,
       "rarity": "Common",
       "style": "two_handed",
       "faction": "aetheric",
-      "tc": 25,
+      "tc": 55,
       "defense": 3,
       "tags": [
         "weapon",
@@ -716,13 +794,13 @@
       "name": "Bone Splitter Axe",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "1d6",
+      "damageDice": "1d8",
       "stat": "strength",
       "statRequirement": 3,
       "rarity": "Common",
       "style": "two_handed",
       "faction": "giants",
-      "tc": 37,
+      "tc": 45,
       "defense": 3,
       "tags": [
         "weapon",
@@ -738,13 +816,13 @@
       "name": "Bonebreaker Mace",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "1d6",
+      "damageDice": "1d8",
       "stat": "strength",
       "statRequirement": 4,
       "rarity": "Common",
       "style": "two_handed",
       "faction": "giants",
-      "tc": 25,
+      "tc": 45,
       "defense": 4,
       "tags": [
         "weapon",
@@ -753,19 +831,26 @@
         "hammer",
         "giants"
       ],
-      "description": "Giant-forged mace, the head as wide as a man's chest."
+      "description": "Giant-forged mace, the head as wide as a man's chest.",
+      "effect": "Grants +5 HP.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 5
+        }
+      ]
     },
     {
       "name": "Mud Claymore",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "1d6",
+      "damageDice": "1d8",
       "stat": "strength",
       "statRequirement": 4,
       "rarity": "Common",
       "style": "two_handed",
       "faction": "mud_dwellers",
-      "tc": 36,
+      "tc": 45,
       "defense": 4,
       "tags": [
         "weapon",
@@ -780,13 +865,13 @@
       "name": "Aetheric Pike",
       "weaponKind": "melee",
       "damageType": "aetheric",
-      "damageDice": "1d6",
+      "damageDice": "1d8",
       "stat": "strength",
       "statRequirement": 4,
       "rarity": "Common",
       "style": "two_handed",
       "faction": "aetheric",
-      "tc": 42,
+      "tc": 50,
       "defense": 4,
       "tags": [
         "weapon",
@@ -801,13 +886,13 @@
       "name": "Mud War Pike",
       "weaponKind": "melee",
       "damageType": "piercing",
-      "damageDice": "1d6",
+      "damageDice": "1d8",
       "stat": "strength",
       "statRequirement": 4,
       "rarity": "Common",
       "style": "two_handed",
       "faction": "mud_dwellers",
-      "tc": 49,
+      "tc": 50,
       "defense": 4,
       "tags": [
         "weapon",
@@ -829,7 +914,7 @@
       "rarity": "Uncommon",
       "style": "two_handed",
       "faction": "aetheric",
-      "tc": 57,
+      "tc": 130,
       "defense": 5,
       "tags": [
         "weapon",
@@ -851,7 +936,7 @@
       "rarity": "Uncommon",
       "style": "two_handed",
       "faction": "giants",
-      "tc": 65,
+      "tc": 140,
       "defense": 5,
       "tags": [
         "weapon",
@@ -860,8 +945,14 @@
         "hammer",
         "giants"
       ],
-      "effect": "+1d6 damage against structures or vehicles.",
-      "description": "Giant-forged warhammer with a head the size of a kettle drum."
+      "effect": "+1d6 damage against structures or vehicles. Grants +15 HP.",
+      "description": "Giant-forged warhammer with a head the size of a kettle drum.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 15
+        }
+      ]
     },
     {
       "name": "Aetheric Halberd",
@@ -873,7 +964,7 @@
       "rarity": "Uncommon",
       "style": "two_handed",
       "faction": "aetheric",
-      "tc": 82,
+      "tc": 135,
       "defense": 5,
       "tags": [
         "weapon",
@@ -894,7 +985,7 @@
       "rarity": "Uncommon",
       "style": "two_handed",
       "faction": "aetheric",
-      "tc": 68,
+      "tc": 140,
       "defense": 4,
       "tags": [
         "weapon",
@@ -938,7 +1029,7 @@
       "rarity": "Uncommon",
       "style": "two_handed",
       "faction": "aetheric",
-      "tc": 105,
+      "tc": 135,
       "defense": 5,
       "tags": [
         "weapon",
@@ -1024,7 +1115,7 @@
       "rarity": "Uncommon",
       "style": "two_handed",
       "faction": "aetheric",
-      "tc": 92,
+      "tc": 120,
       "defense": 4,
       "tags": [
         "weapon",
@@ -1046,7 +1137,7 @@
       "rarity": "Uncommon",
       "style": "two_handed",
       "faction": "aetheric",
-      "tc": 140,
+      "tc": 150,
       "defense": 4,
       "tags": [
         "weapon",
@@ -1090,7 +1181,7 @@
       "rarity": "Uncommon",
       "style": "two_handed",
       "faction": "giants",
-      "tc": 94,
+      "tc": 130,
       "defense": 5,
       "tags": [
         "weapon",
@@ -1112,7 +1203,7 @@
       "rarity": "Uncommon",
       "style": "two_handed",
       "faction": "aetheric",
-      "tc": 126,
+      "tc": 145,
       "defense": 6,
       "tags": [
         "weapon",
@@ -1121,20 +1212,26 @@
         "hammer",
         "aetheric"
       ],
-      "effect": "+2 AC for 1 round after a hit.",
-      "description": "Hammer with a wide guard that doubles as a shield face."
+      "effect": "+2 AC for 1 round after a hit. Grants +15 HP.",
+      "description": "Hammer with a wide guard that doubles as a shield face.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 15
+        }
+      ]
     },
     {
       "name": "Aether Lance",
       "weaponKind": "melee",
       "damageType": "aetheric",
-      "damageDice": "1d10",
+      "damageDice": "2d8",
       "stat": "strength",
       "statRequirement": 7,
       "rarity": "Rare",
       "style": "two_handed",
       "faction": "aetheric",
-      "tc": 255,
+      "tc": 320,
       "defense": 5,
       "tags": [
         "weapon",
@@ -1237,13 +1334,13 @@
       "name": "Heavy Plasma Hammer",
       "weaponKind": "melee",
       "damageType": "burn",
-      "damageDice": "1d10",
+      "damageDice": "2d8",
       "stat": "strength",
       "statRequirement": 9,
       "rarity": "Rare",
       "style": "two_handed",
       "faction": "unknowing_masses",
-      "tc": 215,
+      "tc": 365,
       "defense": 6,
       "tags": [
         "weapon",
@@ -1259,13 +1356,13 @@
       "name": "Fusion Greatsword",
       "weaponKind": "melee",
       "damageType": "burn",
-      "damageDice": "1d10",
+      "damageDice": "2d8",
       "stat": "strength",
       "statRequirement": 9,
       "rarity": "Rare",
       "style": "two_handed",
       "faction": "aetheric",
-      "tc": 309,
+      "tc": 350,
       "defense": 6,
       "tags": [
         "weapon",
@@ -1303,13 +1400,13 @@
       "name": "Titan Bone Axe",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "1d10",
+      "damageDice": "2d8",
       "stat": "strength",
       "statRequirement": 8,
       "rarity": "Rare",
       "style": "two_handed",
       "faction": "giants",
-      "tc": 193,
+      "tc": 360,
       "defense": 5,
       "tags": [
         "weapon",
@@ -1318,20 +1415,26 @@
         "axe",
         "giants"
       ],
-      "effect": "+1d6 against structures.",
-      "description": "Axe ground from a Titan's femur. Carries the weight of the species."
+      "effect": "+1d6 against structures. Grants +15 HP.",
+      "description": "Axe ground from a Titan's femur. Carries the weight of the species.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 15
+        }
+      ]
     },
     {
       "name": "Gravity Hammer",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "1d10",
+      "damageDice": "2d8",
       "stat": "strength",
       "statRequirement": 9,
       "rarity": "Rare",
       "style": "two_handed",
       "faction": "aetheric",
-      "tc": 199,
+      "tc": 360,
       "defense": 6,
       "tags": [
         "weapon",
@@ -1340,20 +1443,26 @@
         "hammer",
         "aetheric"
       ],
-      "effect": "Knock-stun enemies in same range as you (even/odd reroll to confirm).",
-      "description": "Hammer that drags the air with it. The world dips when it falls."
+      "effect": "Knock-stun enemies in same range as you (even/odd reroll to confirm). Grants +20 HP.",
+      "description": "Hammer that drags the air with it. The world dips when it falls.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 20
+        }
+      ]
     },
     {
       "name": "Plasma Warhammer",
       "weaponKind": "melee",
       "damageType": "burn",
-      "damageDice": "1d10",
+      "damageDice": "2d8",
       "stat": "strength",
       "statRequirement": 9,
       "rarity": "Rare",
       "style": "two_handed",
       "faction": "unknowing_masses",
-      "tc": 385,
+      "tc": 380,
       "defense": 6,
       "tags": [
         "weapon",
@@ -1362,8 +1471,14 @@
         "hammer",
         "unknowing_masses"
       ],
-      "effect": "+1d6 bludgeoning damage to Large-size enemies.",
-      "description": "Plasma-vented warhammer. The head sings on impact."
+      "effect": "+1d6 bludgeoning damage to Large-size enemies. Grants +15 HP.",
+      "description": "Plasma-vented warhammer. The head sings on impact.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 15
+        }
+      ]
     },
     {
       "name": "Aetheric Spear (Legendary)",
@@ -1375,7 +1490,7 @@
       "rarity": "Legendary",
       "style": "two_handed",
       "faction": "aetheric",
-      "tc": 337,
+      "tc": 880,
       "defense": 6,
       "tags": [
         "weapon",
@@ -1398,7 +1513,7 @@
       "rarity": "Legendary",
       "style": "two_handed",
       "faction": "aetheric",
-      "tc": 572,
+      "tc": 990,
       "defense": 6,
       "tags": [
         "weapon",
@@ -1421,7 +1536,7 @@
       "rarity": "Legendary",
       "style": "two_handed",
       "faction": "unknowing_masses",
-      "tc": 432,
+      "tc": 940,
       "defense": 6,
       "tags": [
         "weapon",
@@ -1444,7 +1559,7 @@
       "rarity": "Legendary",
       "style": "two_handed",
       "faction": "aetheric",
-      "tc": 397,
+      "tc": 900,
       "defense": 6,
       "tags": [
         "weapon",
@@ -1467,7 +1582,7 @@
       "rarity": "Legendary",
       "style": "two_handed",
       "faction": "giants",
-      "tc": 562,
+      "tc": 980,
       "defense": 6,
       "tags": [
         "weapon",
@@ -1490,7 +1605,7 @@
       "rarity": "Legendary",
       "style": "two_handed",
       "faction": "aetheric",
-      "tc": 391,
+      "tc": 950,
       "defense": 6,
       "tags": [
         "weapon",
@@ -1500,8 +1615,14 @@
         "aetheric",
         "legendary"
       ],
-      "effect": "Emits shockwave on max roll — knocks back enemies 1 range band.",
-      "description": "Massive Aether-cored club. Lands like an earthquake."
+      "effect": "Emits shockwave on max roll — knocks back enemies 1 range band. Grants +20 HP.",
+      "description": "Massive Aether-cored club. Lands like an earthquake.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 20
+        }
+      ]
     },
     {
       "name": "Mud Army War Hammer",
@@ -1513,7 +1634,7 @@
       "rarity": "Legendary",
       "style": "two_handed",
       "faction": "mud_dwellers",
-      "tc": 406,
+      "tc": 960,
       "defense": 6,
       "tags": [
         "weapon",
@@ -1523,20 +1644,26 @@
         "mud_dwellers",
         "legendary"
       ],
-      "effect": "Close-in shockwave on max roll; +2d10 to everything in arm's reach radius. Even/odd reroll to suppress the effect for one attack.",
-      "description": "Banner-weapon of the Mud Army. The world hears it land."
+      "effect": "Close-in shockwave on max roll; +2d10 to everything in arm's reach radius. Even/odd reroll to suppress the effect for one attack. Grants +25 HP.",
+      "description": "Banner-weapon of the Mud Army. The world hears it land.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 25
+        }
+      ]
     },
     {
       "name": "Rust Dagger",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "1d6",
+      "damageDice": "1d4",
       "stat": "dexterity",
       "statRequirement": 1,
       "rarity": "Common",
       "style": "dual_wield",
       "faction": "mud_dwellers",
-      "tc": 34,
+      "tc": 25,
       "defense": 1,
       "tags": [
         "weapon",
@@ -1552,13 +1679,13 @@
       "name": "Mud Buckler",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "1d6",
+      "damageDice": "1d4",
       "stat": "dexterity",
       "statRequirement": 1,
       "rarity": "Common",
       "style": "shield",
       "faction": "mud_dwellers",
-      "tc": 29,
+      "tc": 30,
       "defense": 4,
       "tags": [
         "weapon",
@@ -1566,19 +1693,26 @@
         "dual_wield",
         "mud_dwellers"
       ],
-      "description": "Small wooden buckler. Will block one good hit, maybe."
+      "description": "Small wooden buckler. Will block one good hit, maybe.",
+      "effect": "Grants +10 HP.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 10
+        }
+      ]
     },
     {
       "name": "Bone Knife",
       "weaponKind": "melee",
       "damageType": "piercing",
-      "damageDice": "1d6",
+      "damageDice": "1d4",
       "stat": "dexterity",
       "statRequirement": 2,
       "rarity": "Common",
       "style": "dual_wield",
       "faction": "giants",
-      "tc": 35,
+      "tc": 25,
       "defense": 1,
       "tags": [
         "weapon",
@@ -1599,7 +1733,7 @@
       "rarity": "Common",
       "style": "dual_wield",
       "faction": "aetheric",
-      "tc": 41,
+      "tc": 45,
       "defense": 2,
       "tags": [
         "weapon",
@@ -1620,7 +1754,7 @@
       "rarity": "Common",
       "style": "dual_wield",
       "faction": "giants",
-      "tc": 22,
+      "tc": 35,
       "defense": 2,
       "tags": [
         "weapon",
@@ -1663,7 +1797,7 @@
       "rarity": "Common",
       "style": "dual_wield",
       "faction": "mud_dwellers",
-      "tc": 43,
+      "tc": 40,
       "defense": 2,
       "tags": [
         "weapon",
@@ -1679,13 +1813,13 @@
       "name": "Iron Buckler",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "1d6",
+      "damageDice": "1d4",
       "stat": "dexterity",
       "statRequirement": 4,
       "rarity": "Common",
       "style": "shield",
       "faction": "mud_dwellers",
-      "tc": 20,
+      "tc": 30,
       "defense": 5,
       "tags": [
         "weapon",
@@ -1693,20 +1827,26 @@
         "dual_wield",
         "mud_dwellers"
       ],
-      "effect": "Can bash for 1d6 (even/odd 1d6 to determine); does not count as attack move.",
-      "description": "Round iron buckler. Cheap, dented, dependable."
+      "effect": "Can bash for 1d4; does not count as attack move. Grants +10 HP.",
+      "description": "Round iron buckler. Cheap, dented, dependable.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 10
+        }
+      ]
     },
     {
       "name": "Plasma Dagger",
       "weaponKind": "melee",
       "damageType": "burn",
-      "damageDice": "1d6",
+      "damageDice": "1d4",
       "stat": "dexterity",
       "statRequirement": 4,
       "rarity": "Common",
       "style": "dual_wield",
       "faction": "unknowing_masses",
-      "tc": 27,
+      "tc": 40,
       "defense": 1,
       "tags": [
         "weapon",
@@ -1722,13 +1862,13 @@
       "name": "Bone Shiv (Stealth)",
       "weaponKind": "melee",
       "damageType": "piercing",
-      "damageDice": "1d6",
+      "damageDice": "1d4",
       "stat": "dexterity",
       "statRequirement": 2,
       "rarity": "Common",
       "style": "dual_wield",
       "faction": "giants",
-      "tc": 33,
+      "tc": 35,
       "defense": 1,
       "tags": [
         "weapon",
@@ -1745,13 +1885,13 @@
       "name": "Tartarian Claw Knife",
       "weaponKind": "melee",
       "damageType": "piercing",
-      "damageDice": "1d6",
+      "damageDice": "1d4",
       "stat": "dexterity",
       "statRequirement": 3,
       "rarity": "Common",
       "style": "dual_wield",
       "faction": "giants",
-      "tc": 30,
+      "tc": 35,
       "defense": 2,
       "tags": [
         "weapon",
@@ -1767,13 +1907,13 @@
       "name": "Mud Heater Shield",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "1d6",
+      "damageDice": "1d4",
       "stat": "dexterity",
       "statRequirement": 4,
       "rarity": "Common",
       "style": "shield",
       "faction": "mud_dwellers",
-      "tc": 44,
+      "tc": 45,
       "defense": 5,
       "tags": [
         "weapon",
@@ -1781,20 +1921,26 @@
         "dual_wield",
         "mud_dwellers"
       ],
-      "effect": "+2 AC vs fire damage.",
-      "description": "Tall heater-style shield, layered with fire-treated mud."
+      "effect": "+2 AC vs fire damage. Grants +15 HP.",
+      "description": "Tall heater-style shield, layered with fire-treated mud.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 15
+        }
+      ]
     },
     {
       "name": "Aetheric Dagger",
       "weaponKind": "melee",
       "damageType": "aetheric",
-      "damageDice": "2d6",
+      "damageDice": "1d6",
       "stat": "dexterity",
       "statRequirement": 5,
       "rarity": "Uncommon",
       "style": "dual_wield",
       "faction": "aetheric",
-      "tc": 50,
+      "tc": 85,
       "defense": 2,
       "tags": [
         "weapon",
@@ -1809,13 +1955,13 @@
       "name": "Bone Round Shield",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "2d6",
+      "damageDice": "1d6",
       "stat": "dexterity",
       "statRequirement": 5,
       "rarity": "Uncommon",
       "style": "shield",
       "faction": "giants",
-      "tc": 63,
+      "tc": 115,
       "defense": 6,
       "tags": [
         "weapon",
@@ -1823,20 +1969,26 @@
         "dual_wield",
         "giants"
       ],
-      "effect": "+2 AC; can bash for 1d6.",
-      "description": "Heavy bone round shield. Doubles as a battering edge."
+      "effect": "+2 AC; can bash for 1d6. Grants +20 HP.",
+      "description": "Heavy bone round shield. Doubles as a battering edge.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 20
+        }
+      ]
     },
     {
       "name": "High-Frequency Dagger",
       "weaponKind": "melee",
       "damageType": "electrical",
-      "damageDice": "2d6",
+      "damageDice": "1d6",
       "stat": "dexterity",
       "statRequirement": 6,
       "rarity": "Uncommon",
       "style": "dual_wield",
       "faction": "unknowing_masses",
-      "tc": 70,
+      "tc": 105,
       "defense": 2,
       "tags": [
         "weapon",
@@ -1852,13 +2004,13 @@
       "name": "Aetheric Shield",
       "weaponKind": "melee",
       "damageType": "aetheric",
-      "damageDice": "2d6",
+      "damageDice": "1d6",
       "stat": "dexterity",
       "statRequirement": 6,
       "rarity": "Uncommon",
       "style": "shield",
       "faction": "aetheric",
-      "tc": 64,
+      "tc": 120,
       "defense": 6,
       "tags": [
         "weapon",
@@ -1866,20 +2018,26 @@
         "dual_wield",
         "aetheric"
       ],
-      "effect": "Deflects energy attacks; +2 AC vs energy damage.",
-      "description": "Aether-cored shield. Eats energy bolts and stays cool."
+      "effect": "Deflects energy attacks; +2 AC vs energy damage. Grants +20 HP.",
+      "description": "Aether-cored shield. Eats energy bolts and stays cool.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 20
+        }
+      ]
     },
     {
       "name": "Mud Spiked Shield",
       "weaponKind": "melee",
       "damageType": "piercing",
-      "damageDice": "2d6",
+      "damageDice": "1d6",
       "stat": "dexterity",
       "statRequirement": 5,
       "rarity": "Uncommon",
       "style": "shield",
       "faction": "mud_dwellers",
-      "tc": 88,
+      "tc": 125,
       "defense": 6,
       "tags": [
         "weapon",
@@ -1887,20 +2045,26 @@
         "dual_wield",
         "mud_dwellers"
       ],
-      "effect": "Deals 1d6 damage on the block.",
-      "description": "Mud-glass shield with hammered spikes. Hits back."
+      "effect": "Deals 1d6 damage on the block. Grants +15 HP.",
+      "description": "Mud-glass shield with hammered spikes. Hits back.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 15
+        }
+      ]
     },
     {
       "name": "Plasma Shield",
       "weaponKind": "melee",
       "damageType": "burn",
-      "damageDice": "2d6",
+      "damageDice": "1d6",
       "stat": "dexterity",
       "statRequirement": 7,
       "rarity": "Uncommon",
       "style": "shield",
       "faction": "unknowing_masses",
-      "tc": 90,
+      "tc": 135,
       "defense": 6,
       "tags": [
         "weapon",
@@ -1908,20 +2072,26 @@
         "dual_wield",
         "unknowing_masses"
       ],
-      "effect": "Blocks Aetheric-based damage; reduces blunt force by 1d6.",
-      "description": "Translucent plasma shield. Hums on impact."
+      "effect": "Blocks Aetheric-based damage; reduces blunt force by 1d6. Grants +20 HP.",
+      "description": "Translucent plasma shield. Hums on impact.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 20
+        }
+      ]
     },
     {
       "name": "Bone Scimitar",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "2d6",
+      "damageDice": "1d8",
       "stat": "dexterity",
       "statRequirement": 6,
       "rarity": "Uncommon",
       "style": "dual_wield",
       "faction": "giants",
-      "tc": 94,
+      "tc": 110,
       "defense": 3,
       "tags": [
         "weapon",
@@ -1937,13 +2107,13 @@
       "name": "Laser Blade",
       "weaponKind": "melee",
       "damageType": "burn",
-      "damageDice": "2d6",
+      "damageDice": "1d8",
       "stat": "dexterity",
       "statRequirement": 6,
       "rarity": "Uncommon",
       "style": "dual_wield",
       "faction": "unknowing_masses",
-      "tc": 86,
+      "tc": 115,
       "defense": 3,
       "tags": [
         "weapon",
@@ -1959,13 +2129,13 @@
       "name": "Mud Kukri",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "2d6",
+      "damageDice": "1d8",
       "stat": "dexterity",
       "statRequirement": 5,
       "rarity": "Uncommon",
       "style": "dual_wield",
       "faction": "mud_dwellers",
-      "tc": 77,
+      "tc": 110,
       "defense": 3,
       "tags": [
         "weapon",
@@ -1981,13 +2151,13 @@
       "name": "Energy Baton",
       "weaponKind": "melee",
       "damageType": "electrical",
-      "damageDice": "2d6",
+      "damageDice": "1d8",
       "stat": "dexterity",
       "statRequirement": 6,
       "rarity": "Uncommon",
       "style": "dual_wield",
       "faction": "aetheric",
-      "tc": 105,
+      "tc": 110,
       "defense": 3,
       "tags": [
         "weapon",
@@ -2002,13 +2172,13 @@
       "name": "Giant Bone Shield",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "2d6",
+      "damageDice": "1d6",
       "stat": "dexterity",
       "statRequirement": 7,
       "rarity": "Uncommon",
       "style": "shield",
       "faction": "giants",
-      "tc": 115,
+      "tc": 140,
       "defense": 7,
       "tags": [
         "weapon",
@@ -2016,8 +2186,14 @@
         "dual_wield",
         "giants"
       ],
-      "effect": "+3 AC; reduces incoming slashing by 1d6.",
-      "description": "Giant-bone shield, the size of a small door."
+      "effect": "+3 AC; reduces incoming slashing by 1d6. Grants +25 HP.",
+      "description": "Giant-bone shield, the size of a small door.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 25
+        }
+      ]
     },
     {
       "name": "Plasma Handgun",
@@ -2045,13 +2221,13 @@
       "name": "Tartarian Warblade",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "2d6",
+      "damageDice": "1d8",
       "stat": "dexterity",
       "statRequirement": 8,
       "rarity": "Uncommon",
       "style": "dual_wield",
       "faction": "giants",
-      "tc": 111,
+      "tc": 125,
       "defense": 4,
       "tags": [
         "weapon",
@@ -2067,13 +2243,13 @@
       "name": "Shockwave Buckler",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "2d6",
+      "damageDice": "1d6",
       "stat": "dexterity",
       "statRequirement": 8,
       "rarity": "Uncommon",
       "style": "shield",
       "faction": "aetheric",
-      "tc": 129,
+      "tc": 140,
       "defense": 6,
       "tags": [
         "weapon",
@@ -2081,20 +2257,26 @@
         "dual_wield",
         "aetheric"
       ],
-      "effect": "Shockwave on max-roll block — push enemies to far distance.",
-      "description": "Aether-cored buckler. Releases concussive ring on solid contact."
+      "effect": "Shockwave on max-roll block — push enemies to far distance. Grants +15 HP.",
+      "description": "Aether-cored buckler. Releases concussive ring on solid contact.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 15
+        }
+      ]
     },
     {
       "name": "Aetheric Plasma Blade",
       "weaponKind": "melee",
       "damageType": "burn",
-      "damageDice": "1d10",
+      "damageDice": "2d6",
       "stat": "dexterity",
       "statRequirement": 9,
       "rarity": "Rare",
       "style": "dual_wield",
       "faction": "aetheric",
-      "tc": 180,
+      "tc": 290,
       "defense": 4,
       "tags": [
         "weapon",
@@ -2110,13 +2292,13 @@
       "name": "Graviton Shield",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "1d10",
+      "damageDice": "1d8",
       "stat": "dexterity",
       "statRequirement": 9,
       "rarity": "Rare",
       "style": "shield",
       "faction": "aetheric",
-      "tc": 190,
+      "tc": 295,
       "defense": 7,
       "tags": [
         "weapon",
@@ -2124,20 +2306,26 @@
         "dual_wield",
         "aetheric"
       ],
-      "effect": "Absorbs impact; +1d6 environmental damage reduction.",
-      "description": "Graviton-skinned shield. Drags the bow of incoming force."
+      "effect": "Absorbs impact; +1d6 environmental damage reduction. Grants +30 HP.",
+      "description": "Graviton-skinned shield. Drags the bow of incoming force.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 30
+        }
+      ]
     },
     {
       "name": "Giant Bone Knuckles",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "1d10",
+      "damageDice": "2d6",
       "stat": "dexterity",
       "statRequirement": 9,
       "rarity": "Rare",
       "style": "dual_wield",
       "faction": "giants",
-      "tc": 242,
+      "tc": 280,
       "defense": 3,
       "tags": [
         "weapon",
@@ -2146,20 +2334,26 @@
         "barehanded",
         "giants"
       ],
-      "effect": "+1d6 to arm's-reach targets.",
-      "description": "Heavy bone knuckles fitted to a clenched fist."
+      "effect": "+1d6 to arm's-reach targets. Grants +10 HP.",
+      "description": "Heavy bone knuckles fitted to a clenched fist.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 10
+        }
+      ]
     },
     {
       "name": "Shock Gauntlet",
       "weaponKind": "melee",
       "damageType": "electrical",
-      "damageDice": "1d10",
+      "damageDice": "2d6",
       "stat": "dexterity",
       "statRequirement": 9,
       "rarity": "Rare",
       "style": "dual_wield",
       "faction": "unknowing_masses",
-      "tc": 289,
+      "tc": 295,
       "defense": 4,
       "tags": [
         "weapon",
@@ -2175,13 +2369,13 @@
       "name": "Plasma Buckler",
       "weaponKind": "melee",
       "damageType": "burn",
-      "damageDice": "1d10",
+      "damageDice": "1d8",
       "stat": "dexterity",
       "statRequirement": 9,
       "rarity": "Rare",
       "style": "shield",
       "faction": "unknowing_masses",
-      "tc": 219,
+      "tc": 280,
       "defense": 6,
       "tags": [
         "weapon",
@@ -2189,20 +2383,26 @@
         "dual_wield",
         "unknowing_masses"
       ],
-      "effect": "Reflects 1d6 plasma damage back at attacker on max roll.",
-      "description": "Buckler with a plasma surface. Mirrors energy attacks."
+      "effect": "Reflects 1d6 plasma damage back at attacker on max roll. Grants +20 HP.",
+      "description": "Buckler with a plasma surface. Mirrors energy attacks.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 20
+        }
+      ]
     },
     {
       "name": "Mud Thornblade",
       "weaponKind": "melee",
       "damageType": "poison",
-      "damageDice": "1d10",
+      "damageDice": "2d6",
       "stat": "dexterity",
       "statRequirement": 9,
       "rarity": "Rare",
       "style": "dual_wield",
       "faction": "mud_dwellers",
-      "tc": 199,
+      "tc": 290,
       "defense": 3,
       "tags": [
         "weapon",
@@ -2218,13 +2418,13 @@
       "name": "Aetheric Hand Axe",
       "weaponKind": "melee",
       "damageType": "aetheric",
-      "damageDice": "1d10",
+      "damageDice": "2d6",
       "stat": "dexterity",
       "statRequirement": 9,
       "rarity": "Rare",
       "style": "dual_wield",
       "faction": "aetheric",
-      "tc": 250,
+      "tc": 290,
       "defense": 4,
       "tags": [
         "weapon",
@@ -2240,13 +2440,13 @@
       "name": "Tartarian Great Knife",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "1d10",
+      "damageDice": "2d6",
       "stat": "dexterity",
       "statRequirement": 10,
       "rarity": "Rare",
       "style": "dual_wield",
       "faction": "giants",
-      "tc": 233,
+      "tc": 300,
       "defense": 3,
       "tags": [
         "weapon",
@@ -2284,13 +2484,13 @@
       "name": "Titan Shield",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "1d10",
+      "damageDice": "1d8",
       "stat": "dexterity",
       "statRequirement": 10,
       "rarity": "Rare",
       "style": "shield",
       "faction": "giants",
-      "tc": 284,
+      "tc": 320,
       "defense": 8,
       "tags": [
         "weapon",
@@ -2298,14 +2498,20 @@
         "dual_wield",
         "giants"
       ],
-      "effect": "+4 AC; blocks +1d6 from physical attacks.",
-      "description": "Titan-bone shield, taller than most Reclaimers."
+      "effect": "+4 AC; blocks +1d6 from physical attacks. Grants +35 HP.",
+      "description": "Titan-bone shield, taller than most Reclaimers.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 35
+        }
+      ]
     },
     {
       "name": "Mud Venom Blade",
       "weaponKind": "melee",
       "damageType": "poison",
-      "damageDice": "1d10",
+      "damageDice": "2d6",
       "stat": "dexterity",
       "statRequirement": 10,
       "rarity": "Rare",
@@ -2327,13 +2533,13 @@
       "name": "Aetheric Sword of Light",
       "weaponKind": "melee",
       "damageType": "aetheric",
-      "damageDice": "2d6",
+      "damageDice": "2d8",
       "stat": "dexterity",
       "statRequirement": 11,
       "rarity": "Legendary",
       "style": "dual_wield",
       "faction": "aetheric",
-      "tc": 432,
+      "tc": 860,
       "defense": 5,
       "tags": [
         "weapon",
@@ -2350,13 +2556,13 @@
       "name": "Tartarian Bone Cleaver",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "2d6",
+      "damageDice": "2d8",
       "stat": "dexterity",
       "statRequirement": 11,
       "rarity": "Legendary",
       "style": "dual_wield",
       "faction": "giants",
-      "tc": 368,
+      "tc": 880,
       "defense": 5,
       "tags": [
         "weapon",
@@ -2373,13 +2579,13 @@
       "name": "Energy Blade (Legendary)",
       "weaponKind": "melee",
       "damageType": "burn",
-      "damageDice": "2d6",
+      "damageDice": "2d8",
       "stat": "dexterity",
       "statRequirement": 11,
       "rarity": "Legendary",
       "style": "dual_wield",
       "faction": "unknowing_masses",
-      "tc": 497,
+      "tc": 890,
       "defense": 5,
       "tags": [
         "weapon",
@@ -2396,13 +2602,13 @@
       "name": "Mud Royal Shield",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "2d6",
+      "damageDice": "1d10",
       "stat": "dexterity",
       "statRequirement": 11,
       "rarity": "Legendary",
       "style": "shield",
       "faction": "mud_dwellers",
-      "tc": 520,
+      "tc": 990,
       "defense": 8,
       "tags": [
         "weapon",
@@ -2411,20 +2617,26 @@
         "mud_dwellers",
         "legendary"
       ],
-      "effect": "Deflects runecasters / powers once per day; +3 AC.",
-      "description": "Banner-shield of the Mud Royal Guard. Etched with old glyphs."
+      "effect": "Deflects runecasters / powers once per day; +3 AC. Grants +50 HP.",
+      "description": "Banner-shield of the Mud Royal Guard. Etched with old glyphs.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 50
+        }
+      ]
     },
     {
       "name": "Graviton Gauntlet",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "2d6",
+      "damageDice": "2d8",
       "stat": "dexterity",
       "statRequirement": 11,
       "rarity": "Legendary",
       "style": "dual_wield",
       "faction": "aetheric",
-      "tc": 470,
+      "tc": 860,
       "defense": 5,
       "tags": [
         "weapon",
@@ -2441,13 +2653,13 @@
       "name": "Tartarian Crown Blade",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "2d6",
+      "damageDice": "2d8",
       "stat": "dexterity",
       "statRequirement": 12,
       "rarity": "Legendary",
       "style": "dual_wield",
       "faction": "giants",
-      "tc": 601,
+      "tc": 920,
       "defense": 5,
       "tags": [
         "weapon",
@@ -2464,13 +2676,13 @@
       "name": "Plasma Energy Shield",
       "weaponKind": "melee",
       "damageType": "burn",
-      "damageDice": "2d6",
+      "damageDice": "1d10",
       "stat": "dexterity",
       "statRequirement": 12,
       "rarity": "Legendary",
       "style": "shield",
       "faction": "unknowing_masses",
-      "tc": 564,
+      "tc": 950,
       "defense": 8,
       "tags": [
         "weapon",
@@ -2479,20 +2691,26 @@
         "unknowing_masses",
         "legendary"
       ],
-      "effect": "Blocks all plasma damage; reflects 1d6 back.",
-      "description": "Plasma-screen shield. Eats fire, throws fire back."
+      "effect": "Blocks all plasma damage; reflects 1d6 back. Grants +30 HP.",
+      "description": "Plasma-screen shield. Eats fire, throws fire back.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 30
+        }
+      ]
     },
     {
       "name": "Aetheric Arm Blade",
       "weaponKind": "melee",
       "damageType": "aetheric",
-      "damageDice": "2d6",
+      "damageDice": "2d8",
       "stat": "dexterity",
       "statRequirement": 12,
       "rarity": "Legendary",
       "style": "dual_wield",
       "faction": "aetheric",
-      "tc": 431,
+      "tc": 850,
       "defense": 5,
       "tags": [
         "weapon",
@@ -2508,13 +2726,13 @@
       "name": "Mud Emperor's Buckler",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "2d6",
+      "damageDice": "1d10",
       "stat": "dexterity",
       "statRequirement": 12,
       "rarity": "Legendary",
       "style": "shield",
       "faction": "mud_dwellers",
-      "tc": 357,
+      "tc": 850,
       "defense": 7,
       "tags": [
         "weapon",
@@ -2523,20 +2741,26 @@
         "mud_dwellers",
         "legendary"
       ],
-      "effect": "+3 AC; reflects up to 1d6 back at attacker.",
-      "description": "Buckler of the Mud Emperor's honor guard."
+      "effect": "+3 AC; reflects up to 1d6 back at attacker. Grants +40 HP.",
+      "description": "Buckler of the Mud Emperor's honor guard.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 40
+        }
+      ]
     },
     {
       "name": "Plasma Cutter Knife",
       "weaponKind": "melee",
       "damageType": "burn",
-      "damageDice": "2d6",
+      "damageDice": "2d8",
       "stat": "dexterity",
       "statRequirement": 12,
       "rarity": "Legendary",
       "style": "dual_wield",
       "faction": "unknowing_masses",
-      "tc": 555,
+      "tc": 890,
       "defense": 4,
       "tags": [
         "weapon",
@@ -2559,7 +2783,7 @@
       "rarity": "Common",
       "style": "single_handed",
       "faction": "mud_dwellers",
-      "tc": 27,
+      "tc": 25,
       "defense": 2,
       "tags": [
         "weapon",
@@ -2581,7 +2805,7 @@
       "rarity": "Common",
       "style": "single_handed",
       "faction": "giants",
-      "tc": 33,
+      "tc": 35,
       "defense": 3,
       "tags": [
         "weapon",
@@ -2590,20 +2814,26 @@
         "hammer",
         "giants"
       ],
-      "effect": "+1 to Coercion.",
-      "description": "Knotted bone club. Conversations end faster around it."
+      "effect": "+1 to Coercion. Grants +5 HP.",
+      "description": "Knotted bone club. Conversations end faster around it.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 5
+        }
+      ]
     },
     {
       "name": "Tartarian Bone Knife",
       "weaponKind": "melee",
       "damageType": "piercing",
-      "damageDice": "1d6",
+      "damageDice": "1d4",
       "stat": "charisma",
       "statRequirement": 3,
       "rarity": "Common",
       "style": "single_handed",
       "faction": "giants",
-      "tc": 21,
+      "tc": 30,
       "defense": 1,
       "tags": [
         "weapon",
@@ -2619,13 +2849,13 @@
       "name": "Mud Knife",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "1d6",
+      "damageDice": "1d4",
       "stat": "charisma",
       "statRequirement": 1,
       "rarity": "Common",
       "style": "single_handed",
       "faction": "mud_dwellers",
-      "tc": 36,
+      "tc": 30,
       "defense": 1,
       "tags": [
         "weapon",
@@ -2634,7 +2864,7 @@
         "knife",
         "mud_dwellers"
       ],
-      "effect": "Chance to inflict 1d6 bleed.",
+      "effect": "Chance to inflict 1d4 bleed.",
       "description": "Standard mud-iron utility knife. Cuts more than rope."
     },
     {
@@ -2647,7 +2877,7 @@
       "rarity": "Common",
       "style": "single_handed",
       "faction": "unknowing_masses",
-      "tc": 28,
+      "tc": 45,
       "defense": 1,
       "tags": [
         "weapon",
@@ -2669,7 +2899,7 @@
       "rarity": "Common",
       "style": "single_handed",
       "faction": "giants",
-      "tc": 44,
+      "tc": 40,
       "defense": 2,
       "tags": [
         "weapon",
@@ -2692,7 +2922,7 @@
       "rarity": "Common",
       "style": "single_handed",
       "faction": "aetheric",
-      "tc": 51,
+      "tc": 45,
       "defense": 2,
       "tags": [
         "weapon",
@@ -2713,7 +2943,7 @@
       "rarity": "Common",
       "style": "single_handed",
       "faction": "unknowing_masses",
-      "tc": 31,
+      "tc": 40,
       "defense": 2,
       "tags": [
         "weapon",
@@ -2735,7 +2965,7 @@
       "rarity": "Common",
       "style": "single_handed",
       "faction": "mud_dwellers",
-      "tc": 28,
+      "tc": 35,
       "defense": 2,
       "tags": [
         "weapon",
@@ -2757,7 +2987,7 @@
       "rarity": "Common",
       "style": "single_handed",
       "faction": "giants",
-      "tc": 26,
+      "tc": 30,
       "defense": 2,
       "tags": [
         "weapon",
@@ -2779,7 +3009,7 @@
       "rarity": "Common",
       "style": "single_handed",
       "faction": "aetheric",
-      "tc": 46,
+      "tc": 45,
       "defense": 2,
       "tags": [
         "weapon",
@@ -2794,13 +3024,13 @@
       "name": "Energy Blade",
       "weaponKind": "melee",
       "damageType": "burn",
-      "damageDice": "2d6",
+      "damageDice": "1d8",
       "stat": "charisma",
       "statRequirement": 5,
       "rarity": "Uncommon",
       "style": "single_handed",
       "faction": "unknowing_masses",
-      "tc": 102,
+      "tc": 115,
       "defense": 3,
       "tags": [
         "weapon",
@@ -2816,13 +3046,13 @@
       "name": "Bone Sword",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "2d6",
+      "damageDice": "1d8",
       "stat": "charisma",
       "statRequirement": 5,
       "rarity": "Uncommon",
       "style": "single_handed",
       "faction": "giants",
-      "tc": 73,
+      "tc": 105,
       "defense": 3,
       "tags": [
         "weapon",
@@ -2838,13 +3068,13 @@
       "name": "Mud Cleaver",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "2d6",
+      "damageDice": "1d8",
       "stat": "charisma",
       "statRequirement": 6,
       "rarity": "Uncommon",
       "style": "single_handed",
       "faction": "mud_dwellers",
-      "tc": 110,
+      "tc": 115,
       "defense": 3,
       "tags": [
         "weapon",
@@ -2860,13 +3090,13 @@
       "name": "Plasma Knife",
       "weaponKind": "melee",
       "damageType": "burn",
-      "damageDice": "2d6",
+      "damageDice": "1d6",
       "stat": "charisma",
       "statRequirement": 6,
       "rarity": "Uncommon",
       "style": "single_handed",
       "faction": "unknowing_masses",
-      "tc": 88,
+      "tc": 105,
       "defense": 2,
       "tags": [
         "weapon",
@@ -2882,13 +3112,13 @@
       "name": "Aetheric Blade",
       "weaponKind": "melee",
       "damageType": "aetheric",
-      "damageDice": "2d6",
+      "damageDice": "1d8",
       "stat": "charisma",
       "statRequirement": 6,
       "rarity": "Uncommon",
       "style": "single_handed",
       "faction": "aetheric",
-      "tc": 77,
+      "tc": 115,
       "defense": 3,
       "tags": [
         "weapon",
@@ -2904,13 +3134,13 @@
       "name": "Tartarian War Knife",
       "weaponKind": "melee",
       "damageType": "piercing",
-      "damageDice": "2d6",
+      "damageDice": "1d8",
       "stat": "charisma",
       "statRequirement": 5,
       "rarity": "Uncommon",
       "style": "single_handed",
       "faction": "giants",
-      "tc": 99,
+      "tc": 115,
       "defense": 2,
       "tags": [
         "weapon",
@@ -2926,13 +3156,13 @@
       "name": "Mud Saber",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "2d6",
+      "damageDice": "1d8",
       "stat": "charisma",
       "statRequirement": 6,
       "rarity": "Uncommon",
       "style": "single_handed",
       "faction": "mud_dwellers",
-      "tc": 91,
+      "tc": 110,
       "defense": 3,
       "tags": [
         "weapon",
@@ -2970,13 +3200,13 @@
       "name": "Mud Bone Sword",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "2d6",
+      "damageDice": "1d8",
       "stat": "charisma",
       "statRequirement": 7,
       "rarity": "Uncommon",
       "style": "single_handed",
       "faction": "giants",
-      "tc": 82,
+      "tc": 105,
       "defense": 3,
       "tags": [
         "weapon",
@@ -3014,13 +3244,13 @@
       "name": "Bone Thornblade",
       "weaponKind": "melee",
       "damageType": "poison",
-      "damageDice": "2d6",
+      "damageDice": "1d8",
       "stat": "charisma",
       "statRequirement": 8,
       "rarity": "Uncommon",
       "style": "single_handed",
       "faction": "mud_dwellers",
-      "tc": 132,
+      "tc": 120,
       "defense": 3,
       "tags": [
         "weapon",
@@ -3036,13 +3266,13 @@
       "name": "Energy Saber",
       "weaponKind": "melee",
       "damageType": "electrical",
-      "damageDice": "2d6",
+      "damageDice": "1d8",
       "stat": "charisma",
       "statRequirement": 8,
       "rarity": "Uncommon",
       "style": "single_handed",
       "faction": "unknowing_masses",
-      "tc": 135,
+      "tc": 125,
       "defense": 3,
       "tags": [
         "weapon",
@@ -3058,13 +3288,13 @@
       "name": "Giant Warblade",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "2d6",
+      "damageDice": "1d8",
       "stat": "charisma",
       "statRequirement": 8,
       "rarity": "Uncommon",
       "style": "single_handed",
       "faction": "giants",
-      "tc": 148,
+      "tc": 125,
       "defense": 4,
       "tags": [
         "weapon",
@@ -3080,13 +3310,13 @@
       "name": "Plasma Mace",
       "weaponKind": "melee",
       "damageType": "burn",
-      "damageDice": "1d10+1d6",
+      "damageDice": "2d6",
       "stat": "charisma",
       "statRequirement": 9,
       "rarity": "Rare",
       "style": "single_handed",
       "faction": "unknowing_masses",
-      "tc": 255,
+      "tc": 290,
       "defense": 4,
       "tags": [
         "weapon",
@@ -3102,13 +3332,13 @@
       "name": "Aetheric Blade of Light",
       "weaponKind": "melee",
       "damageType": "aetheric",
-      "damageDice": "1d10+1d6",
+      "damageDice": "2d6",
       "stat": "charisma",
       "statRequirement": 9,
       "rarity": "Rare",
       "style": "single_handed",
       "faction": "aetheric",
-      "tc": 178,
+      "tc": 280,
       "defense": 4,
       "tags": [
         "weapon",
@@ -3124,13 +3354,13 @@
       "name": "Mud Venom Blade (Rare)",
       "weaponKind": "melee",
       "damageType": "poison",
-      "damageDice": "1d10+1d6",
+      "damageDice": "2d6",
       "stat": "charisma",
       "statRequirement": 9,
       "rarity": "Rare",
       "style": "single_handed",
       "faction": "mud_dwellers",
-      "tc": 183,
+      "tc": 295,
       "defense": 3,
       "tags": [
         "weapon",
@@ -3146,13 +3376,13 @@
       "name": "Giant Bone Spear (Single)",
       "weaponKind": "melee",
       "damageType": "piercing",
-      "damageDice": "1d10+1d6",
+      "damageDice": "2d6",
       "stat": "charisma",
       "statRequirement": 9,
       "rarity": "Rare",
       "style": "single_handed",
       "faction": "giants",
-      "tc": 242,
+      "tc": 285,
       "defense": 4,
       "tags": [
         "weapon",
@@ -3168,13 +3398,13 @@
       "name": "Magnetic Axe",
       "weaponKind": "melee",
       "damageType": "electrical",
-      "damageDice": "1d10+1d6",
+      "damageDice": "2d6",
       "stat": "charisma",
       "statRequirement": 9,
       "rarity": "Rare",
       "style": "single_handed",
       "faction": "aetheric",
-      "tc": 290,
+      "tc": 285,
       "defense": 4,
       "tags": [
         "weapon",
@@ -3190,13 +3420,13 @@
       "name": "Laser Sword",
       "weaponKind": "melee",
       "damageType": "burn",
-      "damageDice": "1d10+1d6",
+      "damageDice": "2d6",
       "stat": "charisma",
       "statRequirement": 10,
       "rarity": "Rare",
       "style": "single_handed",
       "faction": "unknowing_masses",
-      "tc": 164,
+      "tc": 295,
       "defense": 4,
       "tags": [
         "weapon",
@@ -3234,13 +3464,13 @@
       "name": "Mud Executioner's Blade",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "1d10+1d6",
+      "damageDice": "2d8",
       "stat": "charisma",
       "statRequirement": 10,
       "rarity": "Rare",
       "style": "single_handed",
       "faction": "mud_dwellers",
-      "tc": 298,
+      "tc": 310,
       "defense": 4,
       "tags": [
         "weapon",
@@ -3278,13 +3508,13 @@
       "name": "Giant Bone Sword",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "1d10+1d6",
+      "damageDice": "2d6",
       "stat": "charisma",
       "statRequirement": 10,
       "rarity": "Rare",
       "style": "single_handed",
       "faction": "giants",
-      "tc": 175,
+      "tc": 290,
       "defense": 4,
       "tags": [
         "weapon",
@@ -3306,7 +3536,7 @@
       "rarity": "Legendary",
       "style": "single_handed",
       "faction": "mud_dwellers",
-      "tc": 337,
+      "tc": 920,
       "defense": 5,
       "tags": [
         "weapon",
@@ -3329,7 +3559,7 @@
       "rarity": "Legendary",
       "style": "single_handed",
       "faction": "unknowing_masses",
-      "tc": 520,
+      "tc": 920,
       "defense": 5,
       "tags": [
         "weapon",
@@ -3375,7 +3605,7 @@
       "rarity": "Legendary",
       "style": "single_handed",
       "faction": "unknowing_masses",
-      "tc": 399,
+      "tc": 970,
       "defense": 5,
       "tags": [
         "weapon",
@@ -3398,7 +3628,7 @@
       "rarity": "Legendary",
       "style": "single_handed",
       "faction": "giants",
-      "tc": 575,
+      "tc": 950,
       "defense": 5,
       "tags": [
         "weapon",
@@ -3421,7 +3651,7 @@
       "rarity": "Legendary",
       "style": "single_handed",
       "faction": "aetheric",
-      "tc": 502,
+      "tc": 950,
       "defense": 5,
       "tags": [
         "weapon",
@@ -3444,7 +3674,7 @@
       "rarity": "Legendary",
       "style": "single_handed",
       "faction": "mud_dwellers",
-      "tc": 432,
+      "tc": 930,
       "defense": 5,
       "tags": [
         "weapon",
@@ -5027,13 +5257,13 @@
       "name": "Reaver's Greatsword",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "2d8",
+      "damageDice": "2d10",
       "stat": "strength",
       "statRequirement": 10,
       "rarity": "Legendary",
       "style": "two_handed",
       "baseDurability": 50,
-      "tc": 420,
+      "tc": 980,
       "defense": 6,
       "tags": [
         "weapon",
@@ -5055,7 +5285,7 @@
       "stat": "dexterity",
       "rarity": "Uncommon",
       "baseDurability": 24,
-      "tc": 65,
+      "tc": 105,
       "defense": 3,
       "tags": [
         "weapon",
@@ -5065,18 +5295,19 @@
         "crafted"
       ],
       "effect": "+1d4 against beasts.",
-      "description": "Wyrm-Fang Blade. A single Wyrm fang lashed to a scrap-metal hilt with spider silk. Bites deeper into thick hide than the size suggests."
+      "description": "Wyrm-Fang Blade. A single Wyrm fang lashed to a scrap-metal hilt with spider silk. Bites deeper into thick hide than the size suggests.",
+      "statRequirement": null
     },
     {
       "name": "Mud-Iron Greatblade",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "2d6",
+      "damageDice": "2d8",
       "stat": "strength",
       "rarity": "Rare",
       "style": "two_handed",
       "baseDurability": 40,
-      "tc": 160,
+      "tc": 330,
       "defense": 4,
       "tags": [
         "weapon",
@@ -5086,7 +5317,8 @@
         "mud",
         "crafted"
       ],
-      "description": "Mud-Iron Greatblade. A two-hander forged around a mud-iron heart, the spine flecked with hardened mudstone. Heavy on the draw, devastating on the landing."
+      "description": "Mud-Iron Greatblade. A two-hander forged around a mud-iron heart, the spine flecked with hardened mudstone. Heavy on the draw, devastating on the landing.",
+      "statRequirement": null
     },
     {
       "name": "Flame of Aether",
@@ -5427,7 +5659,7 @@
       "rarity": "Uncommon",
       "style": "one_handed",
       "faction": "mud_monarchs",
-      "tc": 64,
+      "tc": 110,
       "defense": 0,
       "tags": [
         "weapon",
@@ -5449,7 +5681,7 @@
       "rarity": "Uncommon",
       "style": "one_handed",
       "faction": "eternal_dynasty",
-      "tc": 60,
+      "tc": 115,
       "defense": 0,
       "tags": [
         "weapon",
@@ -5465,13 +5697,13 @@
       "name": "Reclaimer's Salvage Maul",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "1d10",
+      "damageDice": "2d6",
       "stat": "strength",
       "statRequirement": 3,
       "rarity": "Uncommon",
       "style": "two_handed",
       "faction": "reclaimers_guild",
-      "tc": 58,
+      "tc": 125,
       "defense": 0,
       "tags": [
         "weapon",
@@ -5480,8 +5712,14 @@
         "faction_gear",
         "reclaimers_guild"
       ],
-      "effect": "Faction-issue armament of the reclaimers guild.",
-      "description": "Faction-issue melee weapon, struck for the reclaimers guild. Marked with their sigil."
+      "effect": "Faction-issue armament of the reclaimers guild. Grants +10 HP.",
+      "description": "Faction-issue melee weapon, struck for the reclaimers guild. Marked with their sigil.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 10
+        }
+      ]
     },
     {
       "name": "Order Reliquary Blade",
@@ -5493,7 +5731,7 @@
       "rarity": "Uncommon",
       "style": "one_handed",
       "faction": "forgotten_order",
-      "tc": 62,
+      "tc": 110,
       "defense": 0,
       "tags": [
         "weapon",
@@ -5509,13 +5747,13 @@
       "name": "Ancestor Bone Cleaver",
       "weaponKind": "melee",
       "damageType": "slashing",
-      "damageDice": "1d10",
+      "damageDice": "2d6",
       "stat": "strength",
       "statRequirement": 3,
       "rarity": "Uncommon",
       "style": "two_handed",
       "faction": "true_tartarians",
-      "tc": 56,
+      "tc": 120,
       "defense": 0,
       "tags": [
         "weapon",
@@ -5531,13 +5769,13 @@
       "name": "Builder's Aethercraft Hammer",
       "weaponKind": "melee",
       "damageType": "bludgeoning",
-      "damageDice": "1d10",
+      "damageDice": "2d6",
       "stat": "strength",
       "statRequirement": 3,
       "rarity": "Uncommon",
       "style": "two_handed",
       "faction": "stone_builders",
-      "tc": 60,
+      "tc": 130,
       "defense": 0,
       "tags": [
         "weapon",
@@ -5546,20 +5784,26 @@
         "faction_gear",
         "stone_builders"
       ],
-      "effect": "Faction-issue armament of the stone builders.",
-      "description": "Faction-issue melee weapon, struck for the stone builders. Marked with their sigil."
+      "effect": "Faction-issue armament of the stone builders. Grants +10 HP.",
+      "description": "Faction-issue melee weapon, struck for the stone builders. Marked with their sigil.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 10
+        }
+      ]
     },
     {
       "name": "Giant-Watch Greatspear",
       "weaponKind": "melee",
       "damageType": "piercing",
-      "damageDice": "1d10",
+      "damageDice": "2d6",
       "stat": "strength",
       "statRequirement": 3,
       "rarity": "Uncommon",
       "style": "two_handed",
       "faction": "servants_of_giants",
-      "tc": 66,
+      "tc": 130,
       "defense": 0,
       "tags": [
         "weapon",
@@ -5575,13 +5819,13 @@
       "name": "Architect's Silent Dagger",
       "weaponKind": "melee",
       "damageType": "piercing",
-      "damageDice": "1d4",
+      "damageDice": "1d6",
       "stat": "dexterity",
       "statRequirement": 3,
       "rarity": "Uncommon",
       "style": "one_handed",
       "faction": "conspiracy_architects",
-      "tc": 54,
+      "tc": 95,
       "defense": 0,
       "tags": [
         "weapon",

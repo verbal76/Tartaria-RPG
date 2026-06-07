@@ -172,7 +172,7 @@ import {
   secretRoomRevealedBy,
 } from '../engine/buildings';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
-import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, armorHpBonus } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, gearHpBonus } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import {
   canScrap,
@@ -17095,7 +17095,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // piece's HP bonus minus whatever this slot already held (so swaps don't
     // double-count). hp rises with the cap so the player actually gains the HP.
     {
-      const hpDelta = armorHpBonus(item.name) - armorHpBonus(previousInSlot);
+      const hpDelta = gearHpBonus(item.name) - gearHpBonus(previousInSlot);
       if (hpDelta !== 0) {
         set((s) => {
           if (!s.player) return s;
@@ -17119,7 +17119,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // arb-fix — strip the removed armor's max-HP bonus from hpMax (mirror of
     // the equip bake-in). Read the occupant before clearing the slot.
     const removed = (get().player?.equipped ?? {})[slot as keyof PlayerEquipped] as string | undefined;
-    const hpDelta = -armorHpBonus(removed);
+    const hpDelta = -gearHpBonus(removed);
     set((s) =>
       s.player
         ? {
