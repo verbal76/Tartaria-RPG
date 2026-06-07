@@ -13,7 +13,7 @@
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime = `2.4.1`. JS-only changes ship as OTA — no native rebuild.
 > - tsc clean (source). Tests green modulo the known baseline flakes (dogTravelClimb, climbRopeMechanics, parserFuzzWithDogVerbs, dogSystemPerfSmoke, statSpamGates, investigateItemPreview, variableRewards).
 >
-> **How a change ships:** develop on `arbiters-line` (Vault OTA, dead channel) → when the user says "push"/"promote", run §P4 to carry the dev code onto `HaL2001` as the next **Anvil** OTA → push `HaL2001` → multi-channel publish to Android + iOS. Both branches keep their OWN HANDOFF / buildInfo / buildCodename / docs/build-codenames, each tracking its own codename scheme.
+> **⇒ THE RULE (do not drift):** an OTA reaches the installed AAB/IPA **ONLY** through the **`HaL2001` workflow** — the `arbiters-line` channel is dead. So **every OTA pushes through HaL, in the same turn as the change** (the user has said this word-for-word). Develop + test in the `/tmp/arbiters-line` worktree (it has `node_modules`), then **immediately** run §P4 to ship the same code as the next **Anvil** OTA through `HaL2001` → multi-channel publish to Android + iOS. A change is NOT shipped until that HaL push happens — never hold work on dev waiting for a "push" cue.
 
 ---
 
@@ -69,9 +69,12 @@ in `paths-ignore`, so they DON'T trigger a publish.)
 6. Commit titled `<Vault> — OTA-arbNNN — <desc>`; push `arbiters-line`.
    Reaches NO players — this is dev.
 
-### P4 — Promotion to production (only when the user says "push" / "promote")
-Production (`HaL2001`) is kept code-identical to a dev point, then bumped to a
-fresh numeric OTA + Anvil codename. To promote the unpromoted dev work:
+### P4 — Ship through HaL (DO THIS FOR EVERY OTA, same turn — not gated on "push")
+This is the step that actually reaches the player's installed AAB/IPA. The user
+has said it word-for-word: **all OTAs push through HaL's workflow to reach the
+last AAB/IPA.** Don't leave a change sitting on dev. `HaL2001` is kept
+code-identical to the dev point, then bumped to a fresh numeric OTA + Anvil
+codename. To ship the new dev work:
 1. **Find the dev commit matching HaL2001's head** (they're code-equivalent).
    Verify it's truly equivalent:
    `git diff HaL2001 <devMatch> -- app/ __tests__/ assets/ ':(exclude)app/buildInfo.ts' ':(exclude)app/buildCodename.ts' --stat`  → **empty**.
