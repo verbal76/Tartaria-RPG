@@ -1,47 +1,64 @@
 # Tartaria Realms — Session Handoff
 
-> **READ FIRST — how we operate:** §P (Operating model & promotion runbook) directly below is the single source of truth for the two-branch dev→production model, codename schemes, and how a push actually reaches players. If anything in this header and §P disagree, §P wins. (This is the `HaL2001` checkout — the live release branch. Procedures here are kept identical to the dev branch's HANDOFF.)
+> **READ FIRST — how we operate:** §P below is the single source of truth.
+> **ONE branch. ONE codename scheme. ONE OTA number.** Everything is built,
+> tested, committed, and pushed on **`HaL2001`** — and pushing `HaL2001` is what
+> publishes the OTA to the player's phone. There is no separate "dev" branch or
+> "Vault" codename anymore; that two-name dance only ever caused confusion (a
+> dev codename the player saw but that could never reach their device).
 >
-> **Two branches / two worktrees (memorize this):**
-> - **`arbiters-line`** — **dev working branch** (worktree `/tmp/arbiters-line`). All day-to-day work lands here. Codenames **`<Gem> Vault`**; OTA ids **`YYYY-MM-DD-arbNNN`**. Its `app.json` points at the **`arbiters-line` channel + `…arbiters` package** — a **scratch channel that publishes NOTHING to players.**
-> - **`HaL2001`** — **the live release branch** (worktree `/tmp/hal2001-rollback`, this one). Pushing it fires `eas-update.yml`, which **multi-channel publishes to BOTH platforms at once**: `hal2001` + `preview` (Android) and `ios-preview` (iOS). Codenames **`<word> Anvil`**; OTA ids **`YYYY-MM-DD-NNN`** (numeric). Its `app.json` carries the production channel/package/name — **never overwrite it from dev.**
-> - `main`, `claude/*` — base/parked branches; leave alone unless the user asks.
+> **The one branch:**
+> - **`HaL2001`** — the live branch (worktree **`/tmp/hal2001-rollback`**, which
+>   now has `node_modules`, so `tsc` + `jest` run here). Pushing it fires
+>   `eas-update.yml` → **multi-channel publish to BOTH platforms**: `hal2001` +
+>   `preview` (Android) and `ios-preview` (iOS). Codenames are **`<word> Anvil`**;
+>   OTA ids are numeric **`YYYY-MM-DD-NNN`**. Its `app.json` carries the live
+>   channel/package/name (`hal2001` / `…hal2001` / "Tartaria Realms HAL") — never
+>   change those.
+> - `arbiters-line` (Vault scheme) is **RETIRED** — a dead, no-publish scratch
+>   branch. Do NOT commit there or mint Vault codenames. If you ever see two
+>   codenames for one change, you've reintroduced the bug.
+> - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
-> **Current state (update this every push):**
-> - Dev `arbiters-line` HEAD = **arb107 "Jasper Vault"**.
-> - Production `HaL2001` HEAD = **OTA-322 "Cattail Anvil"** — live on **Android + iOS**; carries arb100–107. Dev and prod are code-equivalent (arb107 ≡ OTA-322).
-> - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime = `2.4.1`. JS-only changes ship as OTA — no native rebuild.
-> - tsc clean (source). Tests green modulo the known baseline flakes (dogTravelClimb, climbRopeMechanics, parserFuzzWithDogVerbs, dogSystemPerfSmoke, statSpamGates, investigateItemPreview, variableRewards).
+> **Current state (update this EVERY push):**
+> - `HaL2001` HEAD = **OTA-325 "Cypress Anvil"** — live on Android + iOS.
+> - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
+>   JS-only changes ship as OTA — no native rebuild.
+> - tsc clean. Tests green modulo the known baseline flakes (dogTravelClimb,
+>   climbRopeMechanics, parserFuzzWithDogVerbs, dogSystemPerfSmoke, statSpamGates,
+>   investigateItemPreview, variableRewards — verify a "new" failure against a
+>   stash before treating it as a regression).
 >
-> **⇒ THE RULE (do not drift):** an OTA reaches the installed AAB/IPA **ONLY** through the **`HaL2001` workflow** — the `arbiters-line` channel is dead. So **every OTA pushes through HaL, in the same turn as the change** (the user has said this word-for-word). Develop + test in the `/tmp/arbiters-line` worktree (it has `node_modules`), then **immediately** run §P4 to ship the same code as the next **Anvil** OTA through `HaL2001` → multi-channel publish to Android + iOS. A change is NOT shipped until that HaL push happens — never hold work on dev waiting for a "push" cue.
+> **⇒ THE RULE (do not drift):** a change is built + tested + committed + pushed
+> on **`HaL2001`**, and that push IS the ship — the OTA publishes to the phone.
+> One codename per change (the next **Anvil**), and it's the one the player sees
+> on their device. Never split a change across two branches or two codenames.
 
 ---
 
-## P. Operating model & promotion runbook (READ FIRST)
+## P. Operating model (READ FIRST) — ONE branch, ONE codename, ONE OTA number
 
-This is how the project actually runs, end to end. (The old one-time "Tungsten
-Spire isolation" runbook that used to live here is retired — that episode is
-long closed; production has shipped steadily since, through OTA-322. We now run
-a routine **dev → prod** cadence, below.)
+The whole project ships from a single branch. Build it, test it, commit it,
+push it — all on **`HaL2001`** — and that push publishes the OTA to the phone.
+There is no separate dev branch and no second codename. (History: there used to
+be an `arbiters-line` "dev" branch with `<Gem> Vault` codenames that was promoted
+to `HaL2001` `<word> Anvil` OTAs. That two-name split repeatedly confused the
+user — they'd see a "Vault" name published that could never reach their device,
+because the `arbiters-line` channel is dead. **Retired.** If you ever produce two
+codenames for one change, you've reintroduced the bug.)
 
-### P1 — Two branches, two worktrees, two codename schemes
-|  | Dev | Production |
-|---|---|---|
-| Branch | `arbiters-line` | `HaL2001` |
-| Worktree | `/tmp/arbiters-line` | `/tmp/hal2001-rollback` |
-| Codename | `<Gem> Vault` (Garnet, Opal, Jasper, …) | `<word> Anvil` (Tule, Rush, Cattail, …) |
-| OTA id | `YYYY-MM-DD-arbNNN` | `YYYY-MM-DD-NNN` (numeric) |
-| `app.json` channel | `arbiters-line` (**DEAD** — publishes nothing) | `hal2001` |
-| `app.json` package | `…tartarprim.arbiters` | `…tartarprim.hal2001` |
-| `app.json` name | "Tartaria Realms ARB" | "Tartaria Realms HAL" |
-| Reaches players? | **NO** (scratch channel) | **YES** — see P2 |
+### P1 — The one branch / worktree / scheme
+| | Value |
+|---|---|
+| Branch | **`HaL2001`** (the only one you commit to) |
+| Worktree | **`/tmp/hal2001-rollback`** (has `node_modules` via a symlink to `/tmp/arbiters-line/node_modules`, so `tsc` + `jest` run here) |
+| Codename | **`<word> Anvil`** (Tule, Rush, Cattail, Alder, Willow, …) |
+| OTA id | numeric **`YYYY-MM-DD-NNN`** |
+| `app.json` | channel `hal2001`, package `…tartarprim.hal2001`, name "Tartaria Realms HAL" — **never change these** |
+| Reaches the phone? | **YES** — see P2 |
 
-Both branches carry their OWN `HANDOFF.md`, `buildInfo.ts`, `buildCodename.ts`,
-and `docs/build-codenames.md`, each tracking its own codename scheme. The two
-branches are kept **code-equivalent** at every promotion point; only those
-config/log files differ. **NEVER let dev's `app.json` overwrite prod's** — that
-would publish to the dead channel and change the store package. (`app.json` lives
-at repo ROOT, not under `app/`, which makes it easy to leave untouched — see P4.)
+`arbiters-line` is a **retired, dead-channel scratch branch** — don't commit to
+it, don't mint Vault codenames. `main` / `claude/*` are base/parked.
 
 ### P2 — How a push reaches players (multi-channel, both platforms)
 Pushing **`HaL2001`** triggers `.github/workflows/eas-update.yml`, which runs ONE
@@ -50,56 +67,33 @@ multi-channel `eas update` to all three channels at once:
 - `preview` — Android live testers
 - `ios-preview` — iOS Internal Distribution (best-effort)
 
-So a single `HaL2001` push ships the OTA to **both Android and iOS**. Pushing
-`arbiters-line` reaches nobody (dead channel) — dev + the user's own sideload
-only. Commit-title platform gates `[ota-android-only]` / `[ota-ios-only]` can
-scope a publish to one platform if ever needed. (Docs-only / `**.md` pushes are
-in `paths-ignore`, so they DON'T trigger a publish.)
+So a single `HaL2001` push ships the OTA to **both Android and iOS**. The
+codename you put on that commit is the codename the player sees on their device.
+(Docs-only / `**.md` pushes are in `paths-ignore`, so they do NOT trigger a
+publish — safe to push HANDOFF edits without burning an OTA.)
 
-### P3 — Day-to-day dev loop (the ~95% path, on `arbiters-line`)
-1. Edit code in `app/` (worktree `/tmp/arbiters-line`).
+### P3 — The loop for EVERY change (the ~95% path)
+All in the **`/tmp/hal2001-rollback`** worktree, on `HaL2001`:
+1. Edit code in `app/`.
 2. `npx tsc --noEmit` clean for `app/` source. Run the touched suites. The full
    suite has known baseline flakes (header list) — re-run a "new" failure in
-   isolation, and confirm it against a stash of your changes before calling it
-   a regression.
-3. Bump `app/buildInfo.ts` `OTA_BUILD_ID` → `YYYY-MM-DD-arbNNN`.
-4. Mint the next **Vault** codename in `app/buildCodename.ts`; move it from the
-   reserved pool into the current-mapping table in `docs/build-codenames.md`.
-5. Update `HANDOFF.md` §0.B (Closed) in the SAME commit (per `CLAUDE.md`).
-6. Commit titled `<Vault> — OTA-arbNNN — <desc>`; push `arbiters-line`.
-   Reaches NO players — this is dev.
+   isolation and confirm it against a stash of your changes before calling it a
+   regression.
+3. Bump `app/buildInfo.ts` `OTA_BUILD_ID` → next numeric `YYYY-MM-DD-NNN`.
+4. Mint the next **Anvil** codename in `app/buildCodename.ts` + add a row to the
+   current-mapping table in `docs/build-codenames.md`.
+5. Update `HANDOFF.md` §0.B (Closed) + the header "Current state" in the SAME
+   commit (per `CLAUDE.md`).
+6. Commit titled `<Anvil> — OTA-NNN — <desc>`; **`git push origin HaL2001`**.
+   That publish IS the ship — `eas-update.yml` pushes it to Android + iOS, and
+   the player pulls it via TitleScreen → CHECK FOR OTA UPDATE. **Done — there is
+   no second branch or codename to chase.**
 
-### P4 — Ship through HaL (DO THIS FOR EVERY OTA, same turn — not gated on "push")
-This is the step that actually reaches the player's installed AAB/IPA. The user
-has said it word-for-word: **all OTAs push through HaL's workflow to reach the
-last AAB/IPA.** Don't leave a change sitting on dev. `HaL2001` is kept
-code-identical to the dev point, then bumped to a fresh numeric OTA + Anvil
-codename. To ship the new dev work:
-1. **Find the dev commit matching HaL2001's head** (they're code-equivalent).
-   Verify it's truly equivalent:
-   `git diff HaL2001 <devMatch> -- app/ __tests__/ assets/ ':(exclude)app/buildInfo.ts' ':(exclude)app/buildCodename.ts' --stat`  → **empty**.
-2. In `/tmp/hal2001-rollback` (on `HaL2001`, clean tree), apply the dev code
-   delta WITHOUT touching prod config:
-   ```
-   git checkout <devHEAD> -- app/ __tests__/ assets/ docs/
-   git checkout HEAD -- app/buildInfo.ts app/buildCodename.ts docs/build-codenames.md
-   ```
-   (`app.json` is at repo root → untouched. Leave it that way.)
-3. **Confirm** working-tree code == dev HEAD code:
-   `git diff <devHEAD> -- app/ __tests__/ assets/ ':(exclude)app/buildInfo.ts' ':(exclude)app/buildCodename.ts'` → empty.
-   And confirm `app.json` STILL shows channel `hal2001`, package `…hal2001`,
-   name "Tartaria Realms HAL".
-4. Bump `app/buildInfo.ts` → next numeric `YYYY-MM-DD-NNN`; add an **Anvil**
-   codename to `buildCodename.ts` + `docs/build-codenames.md`; write a HaL2001
-   §0.B entry summarizing the promoted dev OTAs (e.g. "arb100–107").
-5. `npx tsc --noEmit`. (The HaL2001 worktree may lack `node_modules` for jest —
-   that's fine; the code is byte-identical to the already-tested dev HEAD, so
-   the dev test run IS the verification.)
-6. Commit `<Anvil> — OTA-NNN — <desc> (arbXXX–arbYYY → prod)`; push `HaL2001`.
-   `eas-update.yml` then publishes to Android + iOS (P2).
-7. Promotions usually **BUNDLE** several dev OTAs into one Anvil OTA (e.g.
-   OTA-322 = arb100–107; OTA-321 = arb96–99).
-8. Update this header's "Current state" with both new heads.
+### P4 — `app.json` guard
+`app.json` is the one file you must never alter (it holds the live
+channel/package/name). It sits at the repo ROOT, not under `app/`, so normal
+edits won't touch it. If a tool ever stages it, restore it: `git checkout HEAD --
+app.json`.
 
 ### P5 — When a NATIVE build (APK / AAB / IPA) is required (rare)
 OTA covers everything in the JS bundle (engine, screens, JSON, bundled assets).
@@ -112,7 +106,7 @@ commit title, BEFORE the codename.
 ### P6 — Rollback
 There is no "unpublish." A bad OTA is superseded by publishing a corrected OTA on
 the same channel — push a fix to `HaL2001` and you roll FORWARD. (The
-`/tmp/hal2001-rollback` worktree name is historical; it's just the HaL2001
+`/tmp/hal2001-rollback` worktree name is historical; it's just the `HaL2001`
 checkout, not a special rollback tool.)
 
 ---
@@ -424,6 +418,14 @@ checkout, not a special rollback tool.)
 - **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Cypress Anvil (`2026-06-07-325`) — boots → armor + inventory equipped-✓ + workflow reset (single-branch)
+- **WHAT.** Playtest: (1) "echoing steps boots are marked tools, they are armor." (2) "in the inventory where you have the red x for blocked, have then [a] combat green check for equipped." Plus the recurring workflow confusion — the player kept seeing a dev "Vault" codename that could never reach their device.
+- **FIX 1 (boots → armor).** `Echoing Steps Boots` (a Reclaimer race-starter in `exploration.json`) were `kind: exploration` + a `tool` tag, so `buildStarterInventory` granted them as a misc TOOL (the `tool`/`exploration` tags tripped `itemIsTool`). Re-authored to `kind: armor` + `["armor","feet"]` tags (dropped `tool`/`exploration`; also dropped `wardrobe`, which would mis-route to the cloak slot via `equipment.ts:55`). Taught `explorationToInventoryKind` (character.ts) to return `'armor'` for `armor`-tagged starter items (it only ever returned weapon/relic/misc). Result: granted as armor, equips to the feet slot (`validSlotsForItem` name-routes "boots" → feet), not a tool. *Note:* its +1 DEX is authored as an `effect` (not the armor `statBonus` schema) and the item lives in `exploration.json`, not `armor.json`, so `aggregateEquippedStatBonuses` (which reads `findArmorByName`) doesn't apply the bonus — same as before the fix (it was granted as misc with no stat wiring). Classification is correct now; wiring the +1 DEX would mean moving it into `armor.json` + a race-starter lookup change — flagged, not done.
+- **FIX 2 (inventory equipped-✓).** `InventoryScreen` rows now render a green `✓` prefix on the item that is currently equipped (`isEquipped`), the positive twin of the red `✗` shown when an item's slot is already worn (`slotTaken`). New `rowEquippedCheck` style (`#7fb069`, combat-success green). Mutually exclusive with the ✗ (an equipped item isn't "slot-taken by another").
+- **FIX 3 (workflow reset — single branch).** Retired the `arbiters-line` dev branch + `<Gem> Vault` codename scheme. It repeatedly confused the player: every change produced a Vault codename (pushed to a dead channel) that they'd see but that could never reach their phone, plus an Anvil codename that did. Now **everything builds, tests, and ships from `HaL2001`** — one branch, one Anvil codename, one numeric OTA. `node_modules` is symlinked into `/tmp/hal2001-rollback` so `tsc` + `jest` run there. §P + the header were rewritten to the single-branch model.
+- **Verified:** tsc clean (source); new `__tests__/echoingBootsArmor.test.ts` 2/2; inventory/equip/pouch/catalog/character sweep 191/191; `raceStarterItems`'s 2 failures are pre-existing baseline (the `Mud-Rend Blade` starter isn't in `exploration.json`), identical on a clean checkout.
+- **Files:** `app/data/items/exploration.json` (Echoing Steps Boots), `app/engine/character.ts` (`explorationToInventoryKind`), `app/screens/InventoryScreen.tsx` (equipped ✓ + style), `__tests__/echoingBootsArmor.test.ts` (new), `app/buildInfo.ts`, `app/buildCodename.ts` (Cypress Anvil), `docs/build-codenames.md`, `HANDOFF.md` (§P single-branch rewrite + this entry).
 
 #### Willow Anvil (`2026-06-07-324`) — tutorial "wrong control" feedback: buzz + Arbiter nudge (promotes arb109)
 - **WHAT.** Playtest of Alder Anvil (OTA-323): the lockdown correctly BLOCKS off-script controls on every beat, but "it doesn't give the buzz feedback saying that they are wrong" — the only feedback was a single 30ms haptic, easy to miss and conveying nothing.

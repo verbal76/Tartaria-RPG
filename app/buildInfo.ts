@@ -12546,4 +12546,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // short Arbiter line naming the current step ("Not that — tap the glowing
 // SALVAGE button…"), deduped. Wired across the quick buttons, the travel/room
 // chips, and the scene-bar MAP. JS-only → OTA to hal2001.
-export const OTA_BUILD_ID = '2026-06-07-324';
+// OTA-325 — Cypress Anvil. (1) Echoing Steps Boots were mis-classified as a
+// tool (kind exploration + tool tag); they're feet ARMOR now (kind armor,
+// armor/feet tags; explorationToInventoryKind grants armor-tagged starters as
+// armor). (2) Inventory rows show a green ✓ on the item that's equipped — the
+// positive twin of the red ✗ for a slot already worn. (3) Workflow doc reset:
+// retired the dev/Vault two-codename split — everything builds, tests, and
+// ships from HaL2001 now (one branch, one Anvil codename, one OTA number).
+export const OTA_BUILD_ID = '2026-06-07-325';

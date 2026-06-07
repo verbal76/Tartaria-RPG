@@ -1452,13 +1452,13 @@
   {
     "name": "Echoing Steps Boots",
     "abilityReq": "Dexterity Level 2",
-    "kind": "exploration",
+    "kind": "armor",
     "rarity": "Common",
     "faction": "Reclaimers",
     "tcBuy": 16,
     "tags": [
-      "exploration",
-      "tool",
+      "armor",
+      "feet",
       "common",
       "race_starter",
       "reclaimer"

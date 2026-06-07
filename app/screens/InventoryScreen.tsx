@@ -837,7 +837,11 @@ function ItemRow({
               carry a Rare / Legendary rarity, so they get a purple
               or orange diamond too. */}
           {/* arb87 — red ✗ when this item's slot is already worn (you'd have
-              to unequip first). Same alarm red as combat misses. */}
+              to unequip first). Same alarm red as combat misses.
+              arb-fix — and a green ✓ when THIS item is the one equipped, the
+              positive twin of the red ✗ (same combat-success green as a crit).
+              Mutually exclusive: an equipped item isn't "slot-taken by another". */}
+          {isEquipped && <Text style={styles.rowEquippedCheck}>✓ </Text>}
           {slotTaken && <Text style={styles.rowSlotTaken}>✗ </Text>}
           {isInferredInventoryItem(item) && (
             <Text style={[styles.rowInferredDiamond, { color: rarityHexColor(item.rarity) }]}>◆ </Text>
@@ -996,6 +1000,8 @@ const styles = StyleSheet.create({
   rowStat: { color: '#bfa86a', fontSize: 11, marginTop: 3 },
   // arb87 — "slot already worn" red ✗ (combat-miss red).
   rowSlotTaken: { color: '#e07a5f', fontSize: 13, fontWeight: '800' },
+  // arb-fix — "this is equipped" green ✓ (combat-success green, twin of ✗).
+  rowEquippedCheck: { color: '#7fb069', fontSize: 13, fontWeight: '800' },
   rowDurabilityLow: { color: '#e07a5f' },
   // OTA 028 — damage dice chip in green so it pops as the
   // "how hard does this hit" signal at a glance.

@@ -77,6 +77,11 @@ for (const item of explorationData as CatalogExplorationItem[]) {
 function explorationToInventoryKind(item: CatalogExplorationItem): InventoryItem['kind'] {
   if (item.tags.includes('weapon')) return 'weapon';
   if (item.tags.includes('relic')) return 'relic';
+  // arb-fix — worn pieces that live in the exploration starter table (e.g.
+  // Echoing Steps Boots) carry an `armor` tag so they're granted as ARMOR,
+  // not a generic misc tool. Without this they fell into the `misc` bucket
+  // and their `tool`/`exploration` tags marked them tools in the pouch.
+  if (item.tags.includes('armor')) return 'armor';
   return 'misc';
 }
 
