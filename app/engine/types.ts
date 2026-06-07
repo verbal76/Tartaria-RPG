@@ -1196,6 +1196,11 @@ export interface WorldMemory {
    *  the player is elevated). Cleared when the dog rejoins on descent,
    *  so each climb gets the joke once; taps still buzz. */
   dogClimbNoticeShown?: boolean;
+  /** arb-fix — one-time make-good: a faction fused item the player should
+   *  have received but didn't (the pre-fix faction catalyst never counted
+   *  toward the gate). Granted once per save on load for dev names; this
+   *  flag makes it idempotent. */
+  fusionCompensationGranted?: boolean;
   /** OTA-139 — rumor-of-trapped-dog Arbiter hint. Set true after
    *  the hint fires once. Discoverability nudge for players who
    *  pass day 5 without ever tapping a rescue-hook noun (smelter /

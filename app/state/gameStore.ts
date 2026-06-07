@@ -2129,6 +2129,21 @@ interface GameStore {
    *  which food to eat after the stat is picked. */
   aetherStatPickerOpen: boolean;
   pendingAetherFoodId: string | null;
+  /** arb-fix — when the ONLY reserved faction catalyst is currently EQUIPPED,
+   *  the Crucible asks before burning it (instead of silently consuming worn
+   *  gear or hard-refusing). The modal warns the slot will be empty. `cost`>0
+   *  + `vendorName` means a vendor crucible (charge on confirm); 0 = outpost. */
+  fusionCatalystPrompt: {
+    itemName: string;
+    slot: EquipSlot;
+    slotLabel: string;
+    cost: number;
+    vendorName?: string;
+  } | null;
+  /** Confirm: unequip the catalyst, (charge if vendor,) then fuse. */
+  confirmEquippedCatalystFusion: () => void;
+  /** Dismiss the equipped-catalyst prompt without fusing. */
+  cancelFusionCatalystPrompt: () => void;
   /** OTA-211 — pick a stat for the Aether Dust +3 buff, apply it,
    *  consume the pending food + 1 Aether Dust, close the picker. */
   selectAetherStat: (stat: 'strength' | 'dexterity' | 'intelligence' | 'wisdom' | 'charisma') => void;
@@ -2203,6 +2218,23 @@ interface GameStore {
 // build required, not OTA).
 const MAX_LOG_IN_MEMORY = Number.POSITIVE_INFINITY;
 
+// arb-fix — which equip slot currently holds a given inventory-item id. Used
+// by the equipped-faction-catalyst fusion prompt to know which slot to free.
+// Returns null when the id isn't worn (ring2/ring3 fall through — rare for a
+// faction catalyst, and they collapse to the primary 'ring' handling).
+function slotOfEquippedId(
+  equipped: PlayerEquipped | undefined,
+  id: string,
+): EquipSlot | null {
+  if (!equipped) return null;
+  const slots: EquipSlot[] = ['main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet', 'ring'];
+  for (const slot of slots) {
+    const idKey = SLOT_ID_KEY[slot];
+    if (idKey && (equipped as Record<string, unknown>)[idKey] === id) return slot;
+  }
+  return null;
+}
+
 export const useGameStore = create<GameStore>((set, get) => ({
   player: null,
   worldMemory: emptyMemory(),
@@ -2211,6 +2243,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   currentScene: null,
   pendingRolls: null,
   pendingHookContinue: null,
+  fusionCatalystPrompt: null,
   pendingTravelConfirm: null,
   hydrated: false,
   lowHpWarned: false,
@@ -2891,6 +2924,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         dogGolemCoActivated: saved.worldMemory.dogGolemCoActivated ?? false,
         dogAerialNoticeShown: saved.worldMemory.dogAerialNoticeShown ?? [],
         dogClimbNoticeShown: saved.worldMemory.dogClimbNoticeShown ?? false,
+        fusionCompensationGranted: saved.worldMemory.fusionCompensationGranted ?? false,
         pendingDogOnboarding: saved.worldMemory.pendingDogOnboarding ?? null,
       };
       set({
@@ -2959,6 +2993,46 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
           }
         });
+      }
+      // arb-fix — one-time make-good for the faction-catalyst fusion bug: pre-fix
+      // the catalyst never counted toward the gate, so a tester who reserved a
+      // faction item + 2 inferred items got no fused piece. Grant the Eternal-
+      // Dynasty-themed fused chest they were owed, once per save (idempotent via
+      // worldMemory.fusionCompensationGranted). Dev names only.
+      if (DEV_REVIVE_NAMES.includes(player.name.trim().toLowerCase())
+          && !get().worldMemory.fusionCompensationGranted) {
+        const liveForComp = get().player;
+        if (liveForComp) {
+          const comp: InventoryItem = {
+            id: `fused_comp_${slotId}_${Date.now()}`,
+            name: "Eternal Dynasty Heir's Aegis",
+            kind: 'armor',
+            quantity: 1,
+            tags: ['fused', 'unique', 'faction_gear', 'eternal_dynasty', 'aetheric'],
+            rarity: 'Rare',
+            description: 'A fused breastplate kept warm by Dynasty resonance. It bears the mark of the Eternal Dynasty — the line endures.',
+            durability: { current: 30, max: 30 },
+            uniqueStats: {
+              kind: 'armor',
+              rarity: 'Rare',
+              durability: { current: 30, max: 30 },
+              acBonus: 5,
+              armorSlot: 'chest',
+              resistance: 'aetheric',
+              special: 'Forged from a Dynasty heirloom in the Crucible — the line endures.',
+            },
+          };
+          const granted = grantItem(liveForComp.inventory, comp);
+          set((s) => (s.player ? {
+            player: { ...s.player, inventory: granted.inventory },
+            worldMemory: { ...s.worldMemory, fusionCompensationGranted: true },
+          } : s));
+          get().appendLog(
+            'reward',
+            `✦ The Crucible settles a debt — Eternal Dynasty Heir's Aegis (Rare), the faction fusion you were owed.`,
+          );
+          void get().persist();
+        }
       }
       // Only fall back to beginScene when the save predates scene
       // capture. New saves restore the exact scene above and skip this.
@@ -13837,8 +13911,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // can't make. Charge only when they're actually ready.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const fusion = require('../engine/itemFusion');
-    const gate = fusion.gateFusion(player.inventory) as ReturnType<typeof import('../engine/itemFusion').gateFusion>;
+    // arb-fix — same catalyst-counts gate as fuseAtCrucible. Resolve the
+    // faction catalyst (excluding equipped instances) so 2 inferred + 1
+    // reserved faction item passes here too, and so the player isn't charged
+    // for a fuse the gate would refuse.
+    const eqForVendorFuse = player.equipped ?? {};
+    const vendorEquippedIds = new Set(
+      [eqForVendorFuse.mainId, eqForVendorFuse.offId, eqForVendorFuse.headId, eqForVendorFuse.chestId, eqForVendorFuse.handsId, eqForVendorFuse.legsId, eqForVendorFuse.feetId, eqForVendorFuse.cloakId, eqForVendorFuse.amuletId, eqForVendorFuse.ringId, eqForVendorFuse.ring2Id, eqForVendorFuse.ring3Id].filter(Boolean) as string[],
+    );
+    const vendorCatalyst = fusion.findFactionCatalyst(player.inventory, vendorEquippedIds) as ReturnType<typeof import('../engine/itemFusion').findFactionCatalyst>;
+    const gate = fusion.gateFusion(player.inventory, vendorCatalyst) as ReturnType<typeof import('../engine/itemFusion').gateFusion>;
     if (!gate.ok) {
+      // arb-fix — equipped faction catalyst would complete it → ask first
+      // (charge happens on confirm, not now).
+      const equippedReservedFaction = player.inventory.find(
+        (i) => i.reservedForFusion && (i.tags ?? []).includes('faction_gear') && vendorEquippedIds.has(i.id),
+      );
+      if (equippedReservedFaction && fusion.gateFusion(player.inventory, equippedReservedFaction).ok) {
+        const slot = slotOfEquippedId(player.equipped, equippedReservedFaction.id);
+        if (slot) {
+          set({ fusionCatalystPrompt: { itemName: equippedReservedFaction.name, slot, slotLabel: SLOT_LABEL[slot] ?? slot, cost: COST, vendorName: scene.vendor.name } });
+          return;
+        }
+      }
       get().appendLog(
         'arbiter',
         `${scene.vendor.name} taps the cold Crucible. "${gate.reason ?? 'Reserve at least three pieces first, then I will fire it up.'}" No charge until you are ready.`,
@@ -17398,8 +17493,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // inputs + a refusal reason if not.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const fusion = require('../engine/itemFusion');
-    const gate = fusion.gateFusion(player.inventory) as ReturnType<typeof import('../engine/itemFusion').gateFusion>;
+    // arb-fix — resolve the faction catalyst BEFORE gating, excluding EQUIPPED
+    // instances (the Crucible CONSUMES the catalyst, so it must never eat worn
+    // gear). The catalyst now counts toward the input gate: 2 inferred + 1
+    // reserved faction item = a faction fusion.
+    const eqForFuse = player.equipped ?? {};
+    const equippedIdSet = new Set(
+      [eqForFuse.mainId, eqForFuse.offId, eqForFuse.headId, eqForFuse.chestId, eqForFuse.handsId, eqForFuse.legsId, eqForFuse.feetId, eqForFuse.cloakId, eqForFuse.amuletId, eqForFuse.ringId, eqForFuse.ring2Id, eqForFuse.ring3Id].filter(Boolean) as string[],
+    );
+    const preCatalyst = fusion.findFactionCatalyst(player.inventory, equippedIdSet) as ReturnType<typeof import('../engine/itemFusion').findFactionCatalyst>;
+    const gate = fusion.gateFusion(player.inventory, preCatalyst) as ReturnType<typeof import('../engine/itemFusion').gateFusion>;
     if (!gate.ok) {
+      // arb-fix — if a reserved faction item is EQUIPPED and using it WOULD
+      // complete the fusion, ASK before burning it (don't silently eat worn
+      // gear). On confirm we unequip it (freeing the slot) and fuse.
+      const equippedReservedFaction = player.inventory.find(
+        (i) => i.reservedForFusion && (i.tags ?? []).includes('faction_gear') && equippedIdSet.has(i.id),
+      );
+      if (equippedReservedFaction && fusion.gateFusion(player.inventory, equippedReservedFaction).ok) {
+        const slot = slotOfEquippedId(player.equipped, equippedReservedFaction.id);
+        if (slot) {
+          set({ fusionCatalystPrompt: { itemName: equippedReservedFaction.name, slot, slotLabel: SLOT_LABEL[slot] ?? slot, cost: 0 } });
+          return;
+        }
+      }
       get().appendLog(
         'arbiter',
         `The Crucible hums, then cools. "${gate.reason ?? 'Not yet.'}"`,
@@ -17481,7 +17598,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // faction-gear item alongside their 3 scraps, resolve its faction
     // (the factionId is one of its tags) and theme the output as a unique
     // faction item; the catalyst is consumed by applyFusion.
-    const catalyst = fusion.findFactionCatalyst(livePlayer.inventory) as ReturnType<typeof import('../engine/itemFusion').findFactionCatalyst>;
+    const catalyst = fusion.findFactionCatalyst(livePlayer.inventory, equippedIdSet) as ReturnType<typeof import('../engine/itemFusion').findFactionCatalyst>;
     let factionTheme: import('../engine/itemFusion').FactionTheme | null = null;
     if (catalyst) {
       const fac = FACTIONS.find((f) => (catalyst.tags ?? []).includes(f.id));
@@ -17527,6 +17644,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('arbiter', `The Arbiter studies it. "${result.stats.special}"`);
     }
     void get().persist();
+  },
+
+  // arb-fix — player tapped "Use it" on the equipped-faction-catalyst prompt:
+  // take the catalyst off (freeing its slot), charge if it's a vendor crucible,
+  // then run the fusion (the catalyst is now un-equipped, so it counts + the
+  // Crucible may consume it). The empty-slot warning was shown in the modal.
+  confirmEquippedCatalystFusion() {
+    const prompt = get().fusionCatalystPrompt;
+    if (!prompt) return;
+    const player = get().player;
+    if (!player) { set({ fusionCatalystPrompt: null }); return; }
+    if (prompt.cost > 0 && player.tc < prompt.cost) {
+      get().appendLog('system', `The Crucible costs ${prompt.cost} TC to fire; you have ${player.tc}.`);
+      set({ fusionCatalystPrompt: null });
+      return;
+    }
+    // Free the slot so the Crucible can consume the catalyst.
+    get().unequipSlot(prompt.slot);
+    get().appendLog(
+      'world',
+      `You slip off the ${prompt.itemName} and set it on the Crucible's pedestal. Your ${prompt.slotLabel.toLowerCase()} slot is bare now — equip something else when the fusing is done.`,
+    );
+    if (prompt.cost > 0) {
+      set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc - prompt.cost, fusionPending: true } } : s));
+      get().appendLog('reward', `${prompt.vendorName ?? 'The trader'} fires up a portable Crucible for you. (−${prompt.cost} TC)`);
+    }
+    set({ fusionCatalystPrompt: null });
+    void get().fuseAtCrucible();
+  },
+  cancelFusionCatalystPrompt() {
+    set({ fusionCatalystPrompt: null });
   },
 
   infuseAetherDust(foodName) {

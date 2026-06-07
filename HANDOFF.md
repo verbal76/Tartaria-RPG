@@ -21,7 +21,7 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - `HaL2001` HEAD = **OTA-335 "Aspen Anvil"** — live on Android + iOS.
+> - `HaL2001` HEAD = **OTA-336 "Rowan Anvil"** — live on Android + iOS.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - tsc clean. Tests green modulo the known baseline flakes (dogTravelClimb,
@@ -116,6 +116,26 @@ checkout, not a special rollback tool.)
 > **The canonical record of issues across the build.** Every OTA / APK push updates this section in the same commit. **Read this section before planning any fix** to (a) check whether the issue is already closed and the fix exists, and (b) make sure your plan won't break a previously-closed fix. The workflow rules live in `CLAUDE.md` → "HANDOFF.md — the build timeline."
 
 ### 0.A — Open Issues
+
+- **Store achievements (Google Play Games Services + Apple Game Center).** Add
+  Steam-style achievements. Requires: (1) define the achievement set in BOTH consoles
+  (Play Console PGS + App Store Connect Game Center) with IDs/points/icons; (2) NATIVE
+  integration (NOT OTA — needs a new AAB/IPA) via a config plugin / Expo native module
+  wrapping PGS (Kotlin) + GameKit (Swift), plus player sign-in on launch; (3) wire
+  `unlock(id)` at the milestones the game ALREADY tracks — titles (`titles.ts`), the 27
+  ending badges (9 factions × 3 endings), collectible pages, fusion count — with an
+  offline unlock queue + a Play↔Game-Center ID map. The "what to award" logic exists;
+  the work is the native bridge + console setup. Deferred per the player. Good first
+  step: draft the achievement list from the existing titles/badges for the consoles.
+
+- **Remove the one-time fusion-compensation grant (later OTA).** The faction-catalyst
+  fusion fix (this session) shipped a one-time make-good grant on save load for dev names
+  (verbal/sasmooch) — the "Eternal Dynasty Heir's Aegis" — to repay the faction fusion
+  that the pre-fix gate never let them complete. It's idempotent per save
+  (`worldMemory.fusionCompensationGranted`), but it would re-fire once on any FUTURE
+  dev-named save. The player has theirs; **strip the grant block from `loadSlotIntoGame`
+  in a later OTA.** (Search: `fusionCompensationGranted` / `fused_comp_`.)
+
 
 > **⚡ ACTIVE TASK (2026-05-31) — iOS build → TestFlight External Testing. READ THIS FIRST.**
 >
@@ -417,6 +437,14 @@ checkout, not a special rollback tool.)
 - **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Rowan Anvil (`2026-06-07-336`) — faction-catalyst fusion fix + equipped-catalyst prompt + craftable corruption cleanse
+- **Faction catalyst now COUNTS toward the fusion gate.** Player reserved 2 inferred items + a faction item and the Crucible said "you have 2" — the catalyst never counted (old rule: 3 inferred + optional catalyst). Now `gateFusion(inventory, catalyst?)` takes the catalyst: with one present the bar is **2 inferred inputs** (catalyst is the 3rd) and **2 material tags** (the faction supplies the output identity). Without a catalyst the original 3/3 rule stands. `findFactionCatalyst(inventory, excludeIds?)` skips EQUIPPED instances so the Crucible never consumes worn gear. Applied at all three gate sites (outpost `fuseAtCrucible`, vendor `useVendorCrucible`, and the fuse-banner readout). `app/engine/itemFusion.ts`, `__tests__/factionFusionCatalyst.test.ts` (updated + 3 new cases).
+- **Equipped-catalyst confirmation prompt.** When the only catalyst is worn, the Crucible no longer hard-refuses — it ASKS ("Burn your worn faction piece? … your {slot} slot will be empty"). Confirm (`confirmEquippedCatalystFusion`) unequips it, charges the vendor cost if applicable, and fuses; cancel keeps it on. New store state `fusionCatalystPrompt` + `BrandedModal` in `ExplorationScreen`. `slotOfEquippedId` helper finds the slot to free.
+- **One-time make-good grant.** Repays the faction fusion the pre-fix gate never allowed: dev-name saves (verbal/sasmooch) get the **Eternal Dynasty Heir's Aegis** (Rare fused chest, AC+5, aetheric resist) once on load, idempotent via `worldMemory.fusionCompensationGranted`. **Flagged for removal in a later OTA** (see Open Issues).
+- **Craftable corruption remediation.** Corruption only ever went UP in play (Aetheric Healing = +2/cast; some weathers tick +1) and the only `reduceCorruption` consumables (Cleansing Tonic / Purification Vial) weren't craftable. Added two CRAFTABLE tonics in `gear.json` + recipes: **Aether-Purge Tonic** (Common, −8 corruption) from Aether Dust + Orange Sporecap + Red Cap Mushroom; **Hollow-Cleanse Decoction** (Uncommon, −18 corruption +3 HP) from 2 Aether Dust + Violet + Blue Cap. All ingredients resolve + are obtainable (dust = automaton/salvage, caps = forage).
+- **Verified:** src tsc clean; fusion suites green (40 across factionFusionCatalyst/itemFusionEngine/crucibleUseRouting, incl. catalyst-counts + equipped-exclusion); recipes + items valid JSON, ingredients resolve.
+- **Files:** `app/engine/itemFusion.ts`, `app/state/gameStore.ts` (gate sites + prompt actions + grant + slotOfEquippedId), `app/screens/ExplorationScreen.tsx` (prompt modal + banner gate), `app/engine/types.ts` (worldMemory flags + prompt state), `app/data/items/gear.json` (2 tonics), `app/data/items/recipes.json` (2 recipes), `__tests__/factionFusionCatalyst.test.ts`, `app/buildInfo.ts`, `app/buildCodename.ts` (Rowan Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
 
 #### Aspen Anvil (`2026-06-07-335`) — inventory slot display + default slot sort + locked-chip color
 - **Armor/gear rows show the slot they fill.** Player: armor should say what slot it fills. Every equippable row now reads it: unequipped → "Chest · tap to equip" / "Feet · tap to equip" (weapons collapse to "Hand"/"Two-handed"); equipped already showed "EQUIPPED (slot)" since OTA-334. New `slotFillLabelFor` (from `validSlotsForItem` + `SLOT_LABEL`), passed to `ItemRow.fillSlotLabel`. `app/screens/InventoryScreen.tsx`.

@@ -77,6 +77,10 @@
 
     { "name": "Purification Vial", "kind": "consumable", "rarity": "Uncommon", "tags": ["healing", "purification", "monarch"], "description": "Mud Monarch issue. A grey-clear vial that smells of clean stone. Carried by Purifiers; drops corruption by 15.",
       "effect": { "kind": "consumable", "reduceCorruption": 15 } },
+    { "name": "Aether-Purge Tonic", "kind": "consumable", "rarity": "Common", "tags": ["potion", "purification", "foraged", "mushroom", "crafted"], "description": "A forager's cleanse — orange sporecaps boiled down with a measure of aether dust. The dust draws the aether back out of your blood. Drops corruption by 8.",
+      "effect": { "kind": "consumable", "reduceCorruption": 8 } },
+    { "name": "Hollow-Cleanse Decoction", "kind": "consumable", "rarity": "Uncommon", "tags": ["potion", "purification", "foraged", "mushroom", "crafted"], "description": "A stronger brew — violet and blue caps distilled with a double measure of aether dust. Scours deep corruption and knits a little flesh. Drops corruption by 18, restores 3 HP.",
+      "effect": { "kind": "consumable", "reduceCorruption": 18, "healHP": 3 } },
     { "name": "Resonant Song Phial", "kind": "consumable", "rarity": "Uncommon", "tags": ["consumable", "aether", "crafted", "healing"], "description": "Resonant Song Phial. A glass phial holding distilled Aetheric Song. Cracking the seal releases a calming chord that knits flesh and quiets the nerves.",
       "effect": { "kind": "consumable", "healHP": 6, "restoreStamina": 2 } },
     { "name": "Iron-Worm Engine", "kind": "relic", "rarity": "Rare", "tags": ["relic", "construct", "crafted"], "description": "Iron-Worm Engine. A palm-sized scavenger drone forged around an iron core. Hums and ticks in the pack, marking nearby relics with a quiet click." },

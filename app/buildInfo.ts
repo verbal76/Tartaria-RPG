@@ -12630,4 +12630,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // legs→feet→cloak→amulet→ring); resets to SLOT each open, switchable after.
 // (3) The locked-chip scanner-requirement label in the investigate modal now
 // uses the inventory EQUIPPED amber (#c9a86a) instead of the off-tone #bf9b6a.
-export const OTA_BUILD_ID = '2026-06-07-335';
+// OTA-336 — Rowan Anvil. Fusion + corruption batch. (1) A reserved faction
+// CATALYST now counts toward the fusion gate (2 inferred + 1 catalyst = a
+// faction fusion); equipped catalysts are excluded (never consume worn gear).
+// (2) When the only catalyst is EQUIPPED, the Crucible ASKS before burning it
+// (confirm → unequip + fuse, with an empty-slot warning) instead of refusing.
+// (3) One-time make-good grant on save load for dev names (Eternal Dynasty
+// Heir's Aegis) repaying the pre-fix faction fusion — flagged for removal in a
+// later OTA. (4) Two new CRAFTABLE corruption-remediation tonics from Aether
+// Dust + foraged mushrooms: Aether-Purge Tonic (−8 corruption) and Hollow-
+// Cleanse Decoction (−18 corruption, +3 HP) — closes the "corruption only ever
+// goes up" gap (the existing cleanse consumables weren't craftable).
+export const OTA_BUILD_ID = '2026-06-07-336';

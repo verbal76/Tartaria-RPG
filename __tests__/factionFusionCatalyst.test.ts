@@ -8,10 +8,12 @@ import {
 import type { InventoryItem } from '../app/engine/types';
 
 // arb105 — a reserved faction-gear item acts as an optional fusion
-// CATALYST. It must NOT count toward the 3-scrap / 3-tag gate, but when
-// present at fuse time it themes the output into a unique faction item
-// (faction-prefixed name, faction_gear + factionId tags, Legendary) and is
-// consumed alongside the scrap inputs.
+// CATALYST: it themes the output into a unique faction item (faction-prefixed
+// name, faction_gear + factionId tags) and is consumed alongside the inputs.
+// arb-fix — the catalyst now ALSO COUNTS toward the input gate when passed to
+// gateFusion: 2 inferred scraps + 1 catalyst = a valid faction fusion (was 3
+// scraps required). findFactionCatalyst takes an excludeIds set so an EQUIPPED
+// faction piece is never chosen (the Crucible would consume it).
 
 function scrap(id: string, name: string, tags: string[]): InventoryItem {
   return { id, name, kind: 'misc', quantity: 1, tags, reservedForFusion: true };
@@ -34,11 +36,28 @@ const FACTION_GEAR: InventoryItem = {
 };
 
 describe('faction fusion catalyst (arb105)', () => {
-  it('faction gear does NOT count toward the 3-scrap gate', () => {
-    // Only 2 scraps + a reserved faction item → gate must still fail
-    // (faction gear is not an eligible scrap input).
+  it('without telling the gate about a catalyst, 2 scraps still fails (3 required)', () => {
     const inv = [SCRAPS[0]!, SCRAPS[1]!, FACTION_GEAR];
     const gate = gateFusion(inv);
+    expect(gate.ok).toBe(false);
+  });
+
+  it('arb-fix: 2 inferred scraps + a faction CATALYST passes (catalyst is the 3rd)', () => {
+    const inv = [SCRAPS[0]!, SCRAPS[1]!, FACTION_GEAR];
+    const catalyst = findFactionCatalyst(inv);
+    const gate = gateFusion(inv, catalyst);
+    expect(gate.ok).toBe(true);
+    // The catalyst is NOT one of the consumed scrap inputs.
+    expect(gate.inputs.length).toBe(2);
+    expect(gate.inputs.find((i) => i.id === 'mc1')).toBeUndefined();
+  });
+
+  it('arb-fix: an EQUIPPED faction piece is excluded as a catalyst', () => {
+    const inv = [SCRAPS[0]!, SCRAPS[1]!, FACTION_GEAR];
+    // mc1 is equipped → not a usable catalyst → gate falls back to 3-input rule.
+    const excluded = new Set(['mc1']);
+    expect(findFactionCatalyst(inv, excluded)).toBeNull();
+    const gate = gateFusion(inv, findFactionCatalyst(inv, excluded));
     expect(gate.ok).toBe(false);
   });
 

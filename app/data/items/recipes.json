@@ -1,6 +1,22 @@
 {
   "recipes": [
     {
+      "result": "Aether-Purge Tonic",
+      "ingredients": [
+        { "name": "Aether Dust", "quantity": 1 },
+        { "name": "Orange Sporecap", "quantity": 1 },
+        { "name": "Red Cap Mushroom", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Hollow-Cleanse Decoction",
+      "ingredients": [
+        { "name": "Aether Dust", "quantity": 2 },
+        { "name": "Violet Cap Mushroom", "quantity": 1 },
+        { "name": "Blue Cap Mushroom", "quantity": 1 }
+      ]
+    },
+    {
       "result": "Climbing Rope",
       "ingredients": [
         {

@@ -70,6 +70,8 @@ export function ExplorationScreen() {
   const setInputModalOpen = useGameStore((s) => s.setInputModalOpen);
   const setScreen = useGameStore((s) => s.setScreen);
   const currentScene = useGameStore((s) => s.currentScene);
+  // arb-fix — equipped-faction-catalyst fusion confirmation prompt.
+  const fusionCatalystPrompt = useGameStore((s) => s.fusionCatalystPrompt);
   // Tungsten Spire — current tutorial beat id (null when no tutorial). The
   // TAKE / SALVAGE / INVESTIGATE beats inject their demo prop into the
   // matching modal + light its chip so the player opens the REAL picker and
@@ -632,8 +634,16 @@ export function ExplorationScreen() {
           tutorial, which runs before you've ever left. */}
       {(player?.fusionPending || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1)) && (() => {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
-        const { gateFusion } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
-        const gate = gateFusion(player.inventory ?? []);
+        const { gateFusion, findFactionCatalyst } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
+        // arb-fix — mirror the fuse handler: a reserved faction catalyst counts
+        // toward the gate, but only when it isn't equipped (the Crucible burns
+        // it). So the banner reads "ready" exactly when the fuse will succeed.
+        const eqF = player.equipped ?? {};
+        const bannerEquippedIds = new Set(
+          [eqF.mainId, eqF.offId, eqF.headId, eqF.chestId, eqF.handsId, eqF.legsId, eqF.feetId, eqF.cloakId, eqF.amuletId, eqF.ringId, eqF.ring2Id, eqF.ring3Id].filter(Boolean) as string[],
+        );
+        const bannerCatalyst = findFactionCatalyst(player.inventory ?? [], bannerEquippedIds);
+        const gate = gateFusion(player.inventory ?? [], bannerCatalyst);
         return (
         <TouchableOpacity
           style={styles.fusionBanner}
@@ -1338,6 +1348,31 @@ export function ExplorationScreen() {
           },
         ]}
         onRequestClose={() => setVendorLeavePrompt(null)}
+      />
+
+      {/* arb-fix — equipped faction catalyst confirmation. When the only
+          reserved faction catalyst is currently worn, the Crucible asks before
+          burning it (instead of silently consuming worn gear). Confirm unequips
+          it + fuses; the body warns the slot will be empty. */}
+      <BrandedModal
+        visible={fusionCatalystPrompt !== null}
+        title="Burn your worn faction piece?"
+        body={fusionCatalystPrompt
+          ? `Your ${fusionCatalystPrompt.itemName} is the faction catalyst — but you're wearing it (${fusionCatalystPrompt.slotLabel}). The Crucible CONSUMES the catalyst: fuse it and it's gone, leaving your ${fusionCatalystPrompt.slotLabel.toLowerCase()} slot empty until you equip something else.${fusionCatalystPrompt.cost > 0 ? ` This vendor charges ${fusionCatalystPrompt.cost} TC to fire the Crucible.` : ''}\n\nTake it off and fuse it now?`
+          : undefined}
+        buttons={[
+          {
+            label: 'Keep wearing it',
+            onPress: () => useGameStore.getState().cancelFusionCatalystPrompt(),
+            tone: 'neutral',
+          },
+          {
+            label: 'Use it & fuse',
+            onPress: () => useGameStore.getState().confirmEquippedCatalystFusion(),
+            tone: 'primary',
+          },
+        ]}
+        onRequestClose={() => useGameStore.getState().cancelFusionCatalystPrompt()}
       />
 
       {/* 2026-05-25 OTA-035 — outpost-aware travel confirmation. When

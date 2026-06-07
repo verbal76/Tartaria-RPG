@@ -183,7 +183,9 @@ const CODENAMES: Record<string, string> = {
   // casing drops, fuzzy investigate/salvage clears.
   // OTA-335 — inventory: rows show the slot they fill; default SLOT sort on
   // open; locked-chip scanner-requirement text uses the EQUIPPED amber.
-  '2026-06-07-335': 'Aspen Anvil',
+  // OTA-336 — fusion catalyst counts toward gate + equipped-catalyst confirm
+  // prompt + one-time make-good grant; 2 craftable corruption-cleanse tonics.
+  '2026-06-07-336': 'Rowan Anvil',
   '2026-06-07-327': 'Hemlock Anvil',
   '2026-06-07-326': 'Tamarack Anvil',
   '2026-06-07-325': 'Cypress Anvil',

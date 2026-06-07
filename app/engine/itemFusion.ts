@@ -99,28 +99,43 @@ function eligibleInputs(inventory: readonly InventoryItem[]): InventoryItem[] {
  *     scrap-tag set: metal / fiber / wood / stone / aether / etc.)
  *  Without diversity, the LLM has nothing to make a unique theme
  *  from; without quantity, the bench feels too easy to spam. */
-export function gateFusion(inventory: readonly InventoryItem[]): FusionGate {
+export function gateFusion(
+  inventory: readonly InventoryItem[],
+  factionCatalyst?: InventoryItem | null,
+): FusionGate {
   const inputs = eligibleInputs(inventory);
-  if (inputs.length < 3) {
+  // arb-fix — a reserved faction CATALYST now COUNTS as the third item. Player
+  // expectation: "2 inferred items + a faction item should fuse into a faction
+  // piece." With a catalyst present the bar is 2 inferred inputs (the catalyst
+  // is the 3rd) and 2 material tags (the faction supplies the output's
+  // identity, so less raw diversity is needed). Without a catalyst the original
+  // 3-inferred / 3-tag gate stands.
+  const hasCatalyst = !!factionCatalyst;
+  const minInputs = hasCatalyst ? 2 : 3;
+  if (inputs.length < minInputs) {
     return {
       ok: false,
-      reason: `Need at least 3 inferred items reserved for fusion (♥ in inventory). You have ${inputs.length}.`,
+      reason: hasCatalyst
+        ? `Need at least 2 inferred items (♥) to fuse with your faction catalyst. You have ${inputs.length}.`
+        : `Need at least 3 inferred items reserved for fusion (♥ in inventory). You have ${inputs.length}.`,
       inputs: [],
       tagProfile: [],
     };
   }
   const tagSet = new Set<string>();
-  for (const inp of inputs) {
+  const tagSources = hasCatalyst ? [...inputs, factionCatalyst] : inputs;
+  for (const inp of tagSources) {
     for (const t of inp.tags ?? []) {
       const k = t.toLowerCase();
       if (MATERIAL_TAG_SET.has(k)) tagSet.add(k);
     }
   }
   const tagProfile = Array.from(tagSet);
-  if (tagProfile.length < 3) {
+  const minTags = hasCatalyst ? 2 : 3;
+  if (tagProfile.length < minTags) {
     return {
       ok: false,
-      reason: `The Crucible needs at least 3 distinct material tags across your reserved items; your profile carries only ${tagProfile.length} (${tagProfile.join(', ') || 'none'}).`,
+      reason: `The Crucible needs at least ${minTags} distinct material tags across your reserved items; your profile carries only ${tagProfile.length} (${tagProfile.join(', ') || 'none'}).`,
       inputs: [],
       tagProfile,
     };
@@ -130,15 +145,20 @@ export function gateFusion(inventory: readonly InventoryItem[]): FusionGate {
 
 /** arb105 — optional faction CATALYST. A faction-gear item (tagged
  *  `faction_gear`) the player has reserved (♥) acts as a catalyst at the
- *  Crucible: it does NOT count toward the 3-input / 3-tag gate, but when
- *  present at fuse time the output is themed as a unique faction item
- *  (faction-prefixed name, faction tags, bumped to Legendary) and the
- *  catalyst is consumed alongside the scrap inputs. Returns the first
- *  reserved faction-gear item, or null. */
-export function findFactionCatalyst(inventory: readonly InventoryItem[]): InventoryItem | null {
+ *  Crucible: when present at fuse time the output is themed as a unique
+ *  faction item (faction-prefixed name, faction tags, bumped rarity) and the
+ *  catalyst is consumed alongside the scrap inputs. arb-fix — it now also
+ *  COUNTS toward the input gate (see gateFusion). Returns the first reserved
+ *  faction-gear item, or null. `excludeIds` skips EQUIPPED instances so the
+ *  Crucible never consumes gear the player is still wearing. */
+export function findFactionCatalyst(
+  inventory: readonly InventoryItem[],
+  excludeIds?: ReadonlySet<string>,
+): InventoryItem | null {
   for (const it of inventory) {
     if (!it.reservedForFusion) continue;
     if (it.quantity <= 0) continue;
+    if (excludeIds?.has(it.id)) continue;
     if ((it.tags ?? []).includes('faction_gear')) return it;
   }
   return null;
