@@ -185,6 +185,10 @@ const CODENAMES: Record<string, string> = {
   // open; locked-chip scanner-requirement text uses the EQUIPPED amber.
   // OTA-336 — fusion catalyst counts toward gate + equipped-catalyst confirm
   // prompt + one-time make-good grant; 2 craftable corruption-cleanse tonics.
+  // OTA-345 — boot-resilience guard (338 hardening #2): beginScene wraps the
+  // real builder in a try/catch that bails to title (recoverable error + crash-
+  // save capture) instead of crashing/graying out when a scene build throws.
+  '2026-06-07-345': 'Juniper Anvil',
   // OTA-344 — atomic save writes (338 hardening #1): saveSlot stages to a temp
   // key, verifies, snapshots the prior good save to .bak, then swaps; loadSlot
   // falls back to .bak (previous save) + heals when the live copy is corrupt.

@@ -12670,4 +12670,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // corrupt. saveSlot never throws (callers fire-and-forget persist) — on failure
 // it records getLastSaveWriteError() and leaves the live save + backup intact.
 // Worst case: lose only the most recent save, never the character. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-07-344';
+// OTA-345 (Juniper Anvil) — boot-resilience guard (338 hardening #2). beginScene
+// (the scene builder run on load-resume, travel, new game) is now a thin wrapper
+// that try/catches the real builder (_beginSceneCore): a scene build that throws
+// bails to the title with a recoverable error, logs it (LAST CRASH pill / bug
+// report), and captures the save (OTA-343) — instead of crashing or stranding
+// the player on a gray screen. Protects every call site. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-07-345';

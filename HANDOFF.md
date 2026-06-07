@@ -36,11 +36,13 @@
 >   logic. Last unverified path: the dog feature's death/abandon WRITE (only
 >   fires when the dog actually dies/leaves) — once a dog death survives a
 >   restart, the feature is fully cleared.
-> - **STAGED (committed on `HaL2001`, NOT pushed) — next batch, 2 so far:**
+> - **STAGED (committed on `HaL2001`, NOT pushed) — next batch, 3 so far:**
 >   - **OTA-343 "Birch Anvil"** — crash-save capture (COPY CRASHED SAVE) +
 >     Settings-hint copy fix (folded in from the parallel instance).
 >   - **OTA-344 "Hazel Anvil"** — atomic save writes (338 hardening #1):
 >     temp → verify → `.bak` snapshot → swap; `loadSlot` recovers from `.bak`.
+>   - **OTA-345 "Juniper Anvil"** — boot-resilience guard (338 hardening #2):
+>     `beginScene` bails to title (not crash) when a scene build throws.
 >   Holding toward ≥5 before the user triggers the push (per §P3a). See the
 >   "Next Batch — staging list" at the top of §0.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
@@ -194,7 +196,16 @@ checkout, not a special rollback tool.)
    `app/engine/saveSystem.ts`; tests `atomicSaveWrites` (8). tsc clean. Closes
    defense #1 of the 338-hardening Open Issue.
 
-*(2 OTAs staged toward the batch. ≥5 before this batch is push-ready, unless the
+3. **OTA-345 "Juniper Anvil" — boot-resilience guard (338 hardening #2).**
+   `beginScene` is now a thin wrapper that try/catches the real builder
+   (`_beginSceneCore`); a scene build that throws bails to the title with a
+   recoverable error, logs it (LAST CRASH pill / bug report), and captures the
+   save (OTA-343) — instead of crashing or graying out. Closes the blind spot
+   where the load breadcrumb was cleared before the scene built. Protects every
+   call site. `app/state/gameStore.ts`; tests `beginSceneGuard` (3). tsc clean.
+   Closes defense #2 of the 338-hardening Open Issue.
+
+*(3 OTAs staged toward the batch. ≥5 before this batch is push-ready, unless the
 user overrides or a forced build ships it early.)*
 
 ### 0.A — Open Issues
@@ -213,16 +224,15 @@ user overrides or a forced build ships it early.)*
   338's ~90% boot-crash was a **corrupted save**, almost certainly an *interrupted
   save write* during 338's mid-session double-reload (Expo applied the OTA while the
   old JS was live, reloading twice and leaving the active save truncated/half-written).
-  Three defenses — **#1 atomic save writes is DONE (OTA-344, staged); #2 and #3 remain:**
+  Three defenses — **#1 and #2 DONE (OTA-344/345, staged); #3 remains:**
   1. ✅ **Atomic save writes — DONE (OTA-344 Hazel Anvil, STAGED — see §0.NEXT).**
      `saveSlot` now stages to a temp key → verifies → snapshots a `.bak` → swaps;
      `loadSlot` recovers from `.bak` + heals when the live copy is corrupt. Moves to
      §0.B (Closed) when the batch is pushed.
-  2. **Boot-resilience guard** — a save that throws on load / `beginScene` should drop
-     to the title with a recoverable error, NOT crash-loop. The "Save-load health:
-     clean" detector never flagged the 338 brick because the crash is *after* the load
-     check — close that blind spot (wrap `beginScene`/scene-resume in a guard that
-     bails to title on throw).
+  2. ✅ **Boot-resilience guard — DONE (OTA-345 Juniper Anvil, STAGED — see §0.NEXT).**
+     `beginScene` is now a thin wrapper that try/catches the real builder; a scene
+     build that throws bails to title with a recoverable error + captures the save,
+     instead of crashing / graying out. Protects every call site.
   3. **Clear `player.dog` on death/abandon** — the dog feature sets `status` to
      `'dead'`/`'abandoned'` but leaves the dog object on `player.dog`; the puppy-vendor
      replacement arc is guarded behind `!player.dog`, so it can never actually fire.

@@ -1968,6 +1968,16 @@ interface GameStore {
      *  departure + lore beat + time of day + presence + bearings. */
     arrivalFromName?: string;
   }) => void;
+  /** OTA-345 — internal scene builder. `beginScene` is a thin guard that
+   *  try/catches this; never call `_beginSceneCore` directly (it has no
+   *  boot-resilience guard). Same signature as `beginScene`. */
+  _beginSceneCore: (opts?: {
+    openingPrefix?: string;
+    microMicroId?: string;
+    isOpening?: boolean;
+    skipHubEntry?: boolean;
+    arrivalFromName?: string;
+  }) => void;
   /**
    * Submit a player action through the parse → dispatch pipeline.
    *
@@ -3507,7 +3517,49 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().appendLog('feedback', `📝 ${trimmed}`);
   },
 
+  // OTA-345 — boot-resilience guard (OTA-338 hardening #2). The scene
+  // builder is large and runs on load-resume, travel, and new-game; if it
+  // throws, the player would land on a crashed/gray screen with no way out
+  // (and saveLoadHealth wouldn't flag it, since the load breadcrumb is
+  // already cleared by the time the scene builds). This thin wrapper
+  // try/catches the real builder: on a throw it bails to the title with a
+  // recoverable error, logs it (so the next bug report / LAST CRASH pill
+  // shows it), and captures the save that triggered it (OTA-343) for repro.
   beginScene(opts?: {
+    openingPrefix?: string;
+    microMicroId?: string;
+    isOpening?: boolean;
+    skipHubEntry?: boolean;
+    arrivalFromName?: string;
+  }) {
+    try {
+      get()._beginSceneCore(opts);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      // eslint-disable-next-line no-console
+      console.warn('beginScene failed — bailing to title (boot-resilience guard):', msg, e instanceof Error ? e.stack : '');
+      try { get().appendLog('debug', `beginScene failed (bailed to title): ${msg}`); } catch { /* never block the bail on a log failure */ }
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const AS = require('@react-native-async-storage/async-storage').default;
+        void AS.setItem('@tartaria/lastCrash', JSON.stringify({
+          stage: 'beginScene',
+          message: msg.slice(0, 500),
+          stack: (e instanceof Error ? e.stack ?? '' : '').slice(0, 2000),
+          timestamp: Date.now(),
+        })).catch(() => { /* ignore */ });
+      } catch { /* ignore — AS not ready */ }
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        require('../diagnostics/crashSave').captureActiveCrashSave('beginScene');
+      } catch { /* ignore */ }
+      set({
+        currentScreen: 'title',
+        slotLoadError: `The scene failed to build: ${msg}\n\nYour save is intact — tap your character to try again. If it keeps happening, use COPY CRASHED SAVE on the title screen.`,
+      });
+    }
+  },
+  _beginSceneCore(opts?: {
     openingPrefix?: string;
     microMicroId?: string;
     isOpening?: boolean;
