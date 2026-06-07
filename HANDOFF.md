@@ -30,10 +30,26 @@
 >   restart, the feature is fully cleared.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
-> - tsc clean. Tests green modulo the known baseline flakes (dogTravelClimb,
->   climbRopeMechanics, parserFuzzWithDogVerbs, dogSystemPerfSmoke, statSpamGates,
->   investigateItemPreview, variableRewards — verify a "new" failure against a
->   stash before treating it as a regression).
+> - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /
+>   ~22 fail across ~20 suites — ALL pre-existing, none from recent work**
+>   (vetted 2026-06-07 at OTA-342 against the OTA-339 baseline: identical fails).
+>   Three buckets, none a regression:
+>   - **Timing flakes** (pass in isolation, fail under parallel load):
+>     `dogTravelClimb`, `parserFuzzWithDogVerbs` (`callDogModalOpen` leak),
+>     `statSpamGates`, `investigateItemPreview`, `variableRewards`,
+>     `dogSystemPerfSmoke`, `climbRopeMechanics`.
+>   - **Heavy stress / OOM** (resource contention in a full parallel run):
+>     `combatBalanceProbe` (JS-heap OOM), `combatStress` (~170s), `interactionStress`,
+>     `movementStress`, `fullGameIntegration`, `parserHitRate`,
+>     `questProgressionAudit`, `actionReferenceExamples`.
+>   - **Deterministic PRE-EXISTING** (fail in isolation AND on the 339 baseline —
+>     untouched domains): `apkRelease` (release-pointer fixture → 207 vs 200),
+>     `checkAndApplyOTA` (OTA fetch-error mock path), `itemEffect` (Aetheric Mask
+>     `breathe_toxic` gate, from the OTA-326 armor reclass), `atlasCoords`,
+>     `atlasIdw`, `loreLexicon`, `voiceSettings`.
+>   - **RULE:** always verify a "new" failure against the baseline commit
+>     (`git stash` → checkout the prior OTA → run the suite) before treating it as
+>     a regression. Run a suspect suite in isolation first — parallel load lies.
 >
 > **⇒ THE RULE (do not drift):** a change is built + tested + committed + pushed
 > on **`HaL2001`**, and that push IS the ship — the OTA publishes to the phone.
@@ -123,28 +139,35 @@ checkout, not a special rollback tool.)
 
 ### 0.A — Open Issues
 
-- **OTA-338 crash was SAVE DATA, not runtime — pin which write is fatal (HIGH).**
-  Updated diagnosis: 338 crashed ~**90% of cold opens** on the player's existing
-  save, but OTA-339 (= 337's **exact** runtime) **still crashed that same save**,
-  while a **fresh save boots clean on 339**. So the brick is in the *save*: 338 was
-  the first build ever to write the new dog-mortality state (dog `status` →
-  `'dead'`/`'abandoned'`, `puppyVendorOwed`/`puppyVendorQueued`, and the new
-  `downedAtHour`/`bleedWarned`/`loyaltyBeatFloor` fields) and to activate the
-  long-dead puppy-vendor / rubble-puppy arc. One of those writes puts the save into
-  a shape 337's boot/scene-begin path can't survive — intermittently (~90%), which
-  points at a race in async boot rather than a clean throw. **First suspect (the
-  scene-entry puppy vendor) is GUARDED OUT** — it requires `!player.dog`, but 338
-  sets the dog's `status` to dead/abandoned *without clearing `player.dog`*, so the
-  vendor never fires. Exact fatal field still unpinned (player deleted the save).
-  **Plan:** (1) OTA-340 "Beech Anvil" re-ships the dog feature ALONE as a live test
-  — does it brick a *fresh* save? (2) Reproduce in a test: build a save with each
-  338-written state and run load→beginScene, find the throw. (3) Add a **boot-
-  resilience guard** so a bad save drops to the title with a recoverable error
-  instead of crash-looping (note: "Save-load health: clean" never flagged this — the
-  crash is *after* the load check, a blind spot to close). (4) On death/abandon,
-  **clear `player.dog`** so the replacement arc can actually fire. Feature preserved
-  in commit `0741522`. The one-shot thrown weapons + Trail-Rations preview (data/UI
-  only, not implicated) are still pending re-ship separately.
+- **Dog-mortality death/abandon WRITE — verify on a live save (MEDIUM).** The dog
+  feature shipped clean (OTA-340) — it boots fine on a fresh save, and the
+  `dogSaveBrickRepro` test loads all 6 post-death states cleanly through the real
+  cold-boot path. The one path not yet exercised on a *real* device save: the
+  feature's new persisted state only writes when the dog **actually dies (bleed-out)
+  or abandons (loyalty 0)**. Once a dog death survives a cold restart in live play,
+  the feature is fully cleared. If it ever bricks, **COPY SAVE** (About → Session,
+  OTA-341) captures the exact state for instant repro. Low urgency — no evidence it
+  breaks; this is the last unchecked box from the 338 saga.
+
+- **Hardening from the OTA-338 incident (MEDIUM — recommended, not yet done).**
+  338's ~90% boot-crash was a **corrupted save**, almost certainly an *interrupted
+  save write* during 338's mid-session double-reload (Expo applied the OTA while the
+  old JS was live, reloading twice and leaving the active save truncated/half-written).
+  Three defenses, none shipped yet:
+  1. **Atomic save writes** — `saveSlot` (`app/engine/saveSystem.ts`) does a single
+     `AsyncStorage.setItem`; a crash mid-write can corrupt the active slot. Write to a
+     temp key + verify-parse + swap (or keep a last-good backup) so an interrupted
+     write can never brick the live save.
+  2. **Boot-resilience guard** — a save that throws on load / `beginScene` should drop
+     to the title with a recoverable error, NOT crash-loop. The "Save-load health:
+     clean" detector never flagged the 338 brick because the crash is *after* the load
+     check — close that blind spot (wrap `beginScene`/scene-resume in a guard that
+     bails to title on throw).
+  3. **Clear `player.dog` on death/abandon** — the dog feature sets `status` to
+     `'dead'`/`'abandoned'` but leaves the dog object on `player.dog`; the puppy-vendor
+     replacement arc is guarded behind `!player.dog`, so it can never actually fire.
+     Clear the slot (or change the guard to status-based) so the replacement content
+     the feature unlocked is reachable.
 
 - **Race-trait display polish (OPTIONAL, low priority).** Mechanically races + titles +
   factions are all fully wired (OTA-337). The only loose thread: the Character screen still
@@ -517,9 +540,35 @@ checkout, not a special rollback tool.)
 - **Why:** stabilize the live build first; the 338 work is preserved in commit
   `0741522` and will be **re-shipped as discrete mini-OTAs** (one change per OTA,
   pushed one at a time) so the exact culprit can be bisected on-device. See the
-  matching Open Issue. **Suspect:** the `tickDogStatus` microtask firing mid-hydration.
+  matching Open Issue.
+- **RESOLUTION (later builds — the suspect was WRONG):** it was **not** the
+  microtask or any runtime logic. 339 (= 337's exact runtime) **still crashed the
+  old save** ~90%, while a **fresh save booted clean** — so the brick was **corrupted
+  save data**, almost certainly an interrupted save write during 338's mid-session
+  double-reload. The full dog feature then **re-shipped clean** (OTA-340 Beech), as
+  did the rest of the 338 batch (OTA-342 Linden). See those entries + the COPY SAVE
+  tool (OTA-341) added to capture any future bricked save.
 
-#### Poplar Anvil (`2026-06-07-338`) — dog mortality + one-shot thrown weapons + Trail-Rations preview · ⚠️ ROLLED BACK by OTA-339 (boot crash)
+#### Beech Anvil (`2026-06-07-340`) — re-ship dog-mortality feature alone (cleared the 338 scare)
+- **What:** re-shipped ONLY the dog work from commit `0741522` (`gameStore.ts` +
+  `types.ts`: bleed-out + abandonment + the `tickDogStatus` microtask + the
+  combat-down stamp + the "feed him before he's gone forever" Arbiter warnings) on
+  the clean 339 baseline — no weapons, no rations — as a live test of whether the
+  feature bricks a *fresh* save.
+- **Result: boots clean.** Combined with the `dogSaveBrickRepro` test (OTA-341, 6
+  post-death states all load clean through the real cold-boot path), this proved the
+  338 disaster was the **corrupted save**, not the dog code. The dog feature is live.
+- **Spec recap (full detail in the Poplar entry below):** dog benched at 0 HP for
+  ≥ `DOG_BLEED_OUT_HOURS` (24) without healing dies; loyalty 0 → abandons; both set
+  `puppyVendorOwed`. New optional `DogCompanion` fields `downedAtHour` /
+  `bleedWarned` / `loyaltyBeatFloor`. Tests: `dogBleedOutAndAbandon`,
+  `puppyVendorEdges` (reconciled).
+
+#### Poplar Anvil (`2026-06-07-338`) — dog mortality + one-shot thrown weapons + Trail-Rations preview · ⚠️ ROLLED BACK by OTA-339 (corrupted-save boot crash) → re-shipped clean in OTA-340 (dog) + OTA-342 (weapons/rations)
+> NOTE: the batch itself was sound. It was rolled back only because 338's
+> mid-session OTA double-reload corrupted the player's save (not a code bug —
+> see the Elm/Beech entries above). All of the below shipped successfully,
+> split across OTA-340 (dog) and OTA-342 (one-shot weapons + rations preview).
 - **The dog was functionally immortal, which broke three things at once** (player diagnosis): with no real death there was *no stake* to feeding/healing it (a downed dog auto-healed free on rest), the dog was a *risk-free OP attacker*, and the authored **rubble-puppy / puppy-vendor replacement arc was dead content** (its only gate, `puppyVendorOwed`, flipped solely on a player-death-with-dog). **Fix:** the dog can now permanently leave you two ways, both of which finally fire the replacement arc. New `tickDogStatus(get, set)` reconciler, scheduled as a microtask off `submitPlayerAction` so a rescue verb (feed / rest / heal) resolves *before* the reaper checks. (a) **Bleed-out** — when the dog is knocked to 0 HP it benches AND stamps `downedAtHour`; if it isn't healed above 0 within **`DOG_BLEED_OUT_HOURS` = 24** game-hours it dies for real (`status: 'dead'`). (b) **Abandonment** — loyalty already decayed −1/4hr but did nothing; now **loyalty 0 → the dog walks off** (`status: 'abandoned'`), after escalating warning beats latched at 50/30/15 (`loyaltyBeatFloor`). Both set `puppyVendorOwed` (gated on `!puppyVendorUsed`) + call `queuePuppyVendor`. **Why this approach:** per the user's call the bite stays strong — the danger comes from *maintenance*, not a nerf; and re-enabling permadeath restores the existing rubble-puppy content rather than building anything new.
 - **"Feed him before he's gone forever" Arbiter warnings** (player ask). At the down-moment the Arbiter says to feed/poultice the dog or lose it; a sharper mid-window reminder fires once past the 12h halfway mark (latched by `bleedWarned`). Both clear when the dog is healed back up.
 - **New `DogCompanion` fields:** `downedAtHour?`, `bleedWarned?`, `loyaltyBeatFloor?` (all optional → no save migration). Combat-down bench (`handleDogCombat` retaliation) now stamps `downedAtHour` + `bleedWarned: false`.
