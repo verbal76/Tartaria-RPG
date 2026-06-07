@@ -21,7 +21,7 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - `HaL2001` HEAD = **OTA-331 "Birch Anvil"** — live on Android + iOS.
+> - `HaL2001` HEAD = **OTA-332 "Cedar Anvil"** — live on Android + iOS.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - tsc clean. Tests green modulo the known baseline flakes (dogTravelClimb,
@@ -417,6 +417,13 @@ checkout, not a special rollback tool.)
 - **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Cedar Anvil (`2026-06-07-332`) — title-screen text auto-contrasts vs the tuned background
+- **WHAT.** Player (screenshot, green-tuned bg): the inventory-legend text-color fix (arb103, OTA-322 — auto-contrast vs the player's tuned background) needs to apply to the **title screen** too "and for any other text in the game this color." On a light/bright tuned bg the title screen's muted secondary text (flavor line, empty-list hint, YOUR TARTARIANS label, thank-you line, version footer) washed out — they render directly on the transparent → tuned background.
+- **FIX.** Lifted the legend's luminance logic out of `InventoryScreen` into `app/ui/displaySettings.ts` as the single source of truth: `hexLuminance(hex)`, `readableMutedOf(settings)` (returns `#241c14` dark-ink on a light bg / `#d8cba8` faded-parchment on a dark bg — the exact legend pair), and the reactive `useReadableMuted()` hook. `TitleScreen` calls the hook and overrides the color on the 5 washed-out `Text`s. `InventoryScreen` now consumes the same hook (removed its local copy) so the legend + title share one definition.
+- **SCOPE NOTE (the "any other text" half).** The auto-contrast tone is correct ONLY for text that sits **directly on the tuned background** (title screen, transparent screens). Most other screens render their muted `#7a705c` text on **dark inner cards** (`#13110f` etc.), where it's already legible on any bg — a blanket swap there would invert to dark-on-dark when the bg is light, making it WORSE. So this OTA fixes the title screen (the visible offender); extending to any other specific on-background spot is now a one-line `useReadableMuted()` call. Flagged for follow-up if the player names another washed-out surface.
+- **Verified:** tsc clean on `TitleScreen` / `InventoryScreen` / `displaySettings`.
+- **Files:** `app/ui/displaySettings.ts` (hexLuminance + readableMutedOf + useReadableMuted), `app/screens/InventoryScreen.tsx` (consume shared hook), `app/screens/TitleScreen.tsx` (apply to 5 texts), `app/buildInfo.ts`, `app/buildCodename.ts` (Cedar Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
 
 #### Birch Anvil (`2026-06-07-331`) — strip "Temp HP" from runecaster shield-spells
 - **WHAT.** Player: "Skip that effect. take it out of the list of effects for that weapon and don't even use them as flavor text." Re the 5 runecaster shield-spells that read "Grants +X Temp HP" (Hazel Anvil left them as flavor only).

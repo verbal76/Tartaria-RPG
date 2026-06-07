@@ -114,3 +114,28 @@ export function useDisplaySettings(): DisplaySettings {
   }, []);
   return s;
 }
+
+// arb103 → shared. Perceived luminance of a #rrggbb color (0..1). Lifted out of
+// InventoryScreen so any text that sits directly on the player's tuned
+// background can pick a readable color the same way the inventory legend does.
+export function hexLuminance(hex: string): number {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  return 0.299 * r + 0.587 * g + 0.114 * b;
+}
+
+// The legend/secondary text tone that stays legible on ANY tuned background:
+// dark ink on a light background, faded parchment on a dark one. Same pair the
+// inventory legend shipped with (arb103), now the single source of truth.
+export function readableMutedOf(s: DisplaySettings): string {
+  return hexLuminance(baseColorOf(s)) > 0.5 ? '#241c14' : '#d8cba8';
+}
+
+/** Reactive hook — the auto-contrast muted/secondary text color for whatever
+ *  the player has set their background to. Use for any text that renders
+ *  directly on the tuned background (title screen, transparent screens). */
+export function useReadableMuted(): string {
+  const s = useDisplaySettings();
+  return readableMutedOf(s);
+}

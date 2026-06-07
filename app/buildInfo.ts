@@ -12594,4 +12594,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Aetheric Ward, Mud Armor, Aetheric Armor, Mud Guard) — not wired, not even
 // flavor. Effects now read just the block + duration (e.g. "blocks 1d6 damage.
 // 3 rounds."). docs/weapon-catalog.md regenerated.
-export const OTA_BUILD_ID = '2026-06-07-331';
+// OTA-332 — Cedar Anvil. The inventory legend's auto-contrast text tone (dark
+// ink on a light tuned bg, faded parchment on a dark one) is lifted into
+// displaySettings as the shared `useReadableMuted()` hook and applied to the
+// TITLE SCREEN's washed-out secondary text (the flavor line, the empty-list
+// hint, the YOUR TARTARIANS label, the thank-you line, and the version footer)
+// — they render directly on the player's tuned background and washed out on a
+// light/bright bg. InventoryScreen now consumes the same hook (single source).
+export const OTA_BUILD_ID = '2026-06-07-332';

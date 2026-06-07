@@ -172,7 +172,10 @@ const CODENAMES: Record<string, string> = {
   // now balanced. Runecaster "Temp HP" is cast-time temporary, not max HP.
   // OTA-331 — "Grants +X Temp HP" stripped from the 5 runecaster shield-spell
   // effects entirely (not wired, not flavor).
-  '2026-06-07-331': 'Birch Anvil',
+  // OTA-332 — title-screen secondary text now uses the inventory legend's
+  // auto-contrast tone (shared useReadableMuted hook) so it stays readable on
+  // any tuned background.
+  '2026-06-07-332': 'Cedar Anvil',
   '2026-06-07-327': 'Hemlock Anvil',
   '2026-06-07-326': 'Tamarack Anvil',
   '2026-06-07-325': 'Cypress Anvil',

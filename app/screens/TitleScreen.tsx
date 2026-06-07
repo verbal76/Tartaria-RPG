@@ -52,6 +52,7 @@ import { getKokoroState, onKokoroStateChange, type KokoroState } from '../voice/
 import { speak as ttsSpeak } from '../voice/TTSManager';
 import type { MainQuestPhase } from '../engine/types';
 import { checkAndApplyOTA } from '../updates/checkAndApplyOTA';
+import { useReadableMuted } from '../ui/displaySettings';
 
 const races = racesData as { id: string; name: string }[];
 const locations = locationsData as { id: string; name: string }[];
@@ -87,6 +88,11 @@ function resumeObjectiveLine(phase: MainQuestPhase, cores: number): string {
 }
 
 export function TitleScreen() {
+  // The title screen renders directly on the player's tuned background (the
+  // container is transparent), so the muted secondary text washed out when a
+  // player picked a light/bright bg — same problem the inventory legend had.
+  // Reuse the exact auto-contrast tone so this text stays readable on ANY bg.
+  const mutedColor = useReadableMuted();
   const slots = useGameStore((s) => s.slots);
   const setScreen = useGameStore((s) => s.setScreen);
   const refreshSlots = useGameStore((s) => s.refreshSlots);
@@ -711,7 +717,7 @@ export function TitleScreen() {
       />
       <Text style={styles.title}>TARTARIA</Text>
       <Text style={styles.subtitle}>REALMS</Text>
-      <Text style={styles.flavor}>A procedural narrative of the buried world.</Text>
+      <Text style={[styles.flavor, { color: mutedColor }]}>A procedural narrative of the buried world.</Text>
       {resurrectionGems > 0 && (
         <Text style={styles.gems}>✦ {resurrectionGems} Resurrection Gem{resurrectionGems === 1 ? '' : 's'} held</Text>
       )}
@@ -936,12 +942,12 @@ export function TitleScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#c9a86a" />
         }
         ListEmptyComponent={
-          <Text style={styles.empty}>
+          <Text style={[styles.empty, { color: mutedColor }]}>
             No Tartarians yet. Swipe down to refresh — or pull a New Expedition below.
           </Text>
         }
         ListHeaderComponent={
-          slots.length > 0 ? <Text style={styles.listLabel}>YOUR TARTARIANS  ·  swipe left to delete</Text> : null
+          slots.length > 0 ? <Text style={[styles.listLabel, { color: mutedColor }]}>YOUR TARTARIANS  ·  swipe left to delete</Text> : null
         }
         ListFooterComponent={
           <View style={styles.footerActions}>
@@ -1046,7 +1052,7 @@ export function TitleScreen() {
             version footer in visual weight so it reads as a
             standalone message, not a button label or a diag
             string. */}
-        <Text style={styles.thankYou}>
+        <Text style={[styles.thankYou, { color: mutedColor }]}>
           Thank you for helping us test our new game, enjoy Tartaria!
         </Text>
         {/* OTA-068 — three centered action buttons (INVITE
@@ -1112,7 +1118,7 @@ export function TitleScreen() {
             a concrete signal instead of "nothing happened". Tap to
             clear. */}
         <LastCrashLine />
-        <Text style={styles.footer}>v{APP_VERSION}  /  2148</Text>
+        <Text style={[styles.footer, { color: mutedColor }]}>v{APP_VERSION}  /  2148</Text>
       </View>
 
       <BugReportModal

@@ -13,7 +13,7 @@ import { canScrap } from '../engine/scrapEngine';
 import { findWeaponByName, isInferredItem, isInferredInventoryItem } from '../engine/crafting';
 import { resolveDisplayWeapon } from '../engine/itemResolution';
 import { isPouchEligible } from '../engine/pouchEligibility';
-import { useDisplaySettings, baseColorOf } from '../ui/displaySettings';
+import { useReadableMuted } from '../ui/displaySettings';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
@@ -73,24 +73,14 @@ function sortInventoryItems(
 // 3rd tab (CRAFT / REPAIR / RECIPES). InventoryScreen is now a
 // single ITEMS view — no tabs needed.
 
-// arb103 — perceived luminance of a #rrggbb color (0..1).
-function hexLuminance(hex: string): number {
-  const r = parseInt(hex.slice(1, 3), 16) / 255;
-  const g = parseInt(hex.slice(3, 5), 16) / 255;
-  const b = parseInt(hex.slice(5, 7), 16) / 255;
-  return 0.299 * r + 0.587 * g + 0.114 * b;
-}
-
 export function InventoryScreen() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
-  // arb103 — the bottom legend text washed out when the player tuned a
-  // lighter/brighter background. Pick the text color by the background's
-  // ACTUAL perceived luminance (hue+sat+brightness): dark text on a light
-  // bg, light text on a dark bg.
-  const display = useDisplaySettings();
-  const bgLum = hexLuminance(baseColorOf(display));
-  const legendTextColor = bgLum > 0.5 ? '#241c14' : '#d8cba8';
+  // arb103 → shared. The bottom legend text washed out when the player tuned a
+  // lighter/brighter background. The auto-contrast tone (dark ink on a light
+  // bg, faded parchment on a dark one) now lives in displaySettings so the
+  // title screen + other on-background text reuse the exact same color.
+  const legendTextColor = useReadableMuted();
   const equipItem = useGameStore((s) => s.equipItem);
   const unequipSlot = useGameStore((s) => s.unequipSlot);
   const dropInventoryItem = useGameStore((s) => s.dropInventoryItem);
