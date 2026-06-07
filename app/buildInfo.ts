@@ -12564,4 +12564,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // armor + weapons catalogs, and Mud-Rend Blade (a broken mud_golem starter) is
 // granted again. (3) New docs/armor-catalog.md — every armor item + stats, for
 // balancing.
-export const OTA_BUILD_ID = '2026-06-07-326';
+// OTA-327 — Hemlock Anvil. Applied the player's full armor rebalance to all
+// 279 armor.json entries (acBonus / statBonuses / resistances / rarity /
+// faction / tcBuy), and added a NEW mechanic: **max-HP boosts on armor** (76
+// pieces). `armorHpBonus` reads the `hp` entry from a piece's `statBonuses`,
+// and equipItem/unequipSlot bake the delta into `player.hpMax` (+ hp), so HP
+// gear actually raises your max HP. docs/armor-catalog.md regenerated.
+export const OTA_BUILD_ID = '2026-06-07-327';

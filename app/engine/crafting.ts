@@ -59,6 +59,9 @@ export interface CatalogArmor {
   acBonus: number;
   resistances: string[];
   statBonus?: { stat: string; amount: number };
+  // arb-fix — armor can carry MULTIPLE bonuses (the primary `statBonus` is the
+  // first of these; secondary stats + the new `hp` max-HP boost live here).
+  statBonuses?: { stat: string; amount: number }[];
   rarity: Rarity;
   baseDurability?: number;
   tags: string[];

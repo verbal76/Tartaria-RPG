@@ -18,8 +18,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -82,8 +82,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -116,8 +116,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 110,
+      "tcSell": 44,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -136,22 +136,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "wisdom",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "wisdom",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "intelligence",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -180,7 +180,7 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 7,
+      "tcBuy": 8,
       "tcSell": 3,
       "baseDurability": 20,
       "tags": [
@@ -206,12 +206,16 @@
         {
           "stat": "wisdom",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 5
         }
       ],
       "rarity": "Common",
       "dexReq": 3,
-      "tcBuy": 8,
-      "tcSell": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -244,8 +248,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -278,8 +282,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 110,
+      "tcSell": 44,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -298,22 +302,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "intelligence",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "intelligence",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "strength",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -342,8 +350,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -406,8 +414,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -440,8 +448,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 110,
+      "tcSell": 44,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -460,22 +468,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "intelligence",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "intelligence",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "charisma",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -504,8 +512,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -568,8 +576,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -602,8 +610,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 110,
+      "tcSell": 44,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -622,22 +630,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "wisdom",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "wisdom",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "dexterity",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -666,8 +678,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 7,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -692,12 +704,16 @@
         {
           "stat": "wisdom",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 5
         }
       ],
       "rarity": "Common",
       "dexReq": 3,
-      "tcBuy": 8,
-      "tcSell": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -726,12 +742,16 @@
         {
           "stat": "constitution",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 10
         }
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 45,
+      "tcSell": 18,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -760,12 +780,16 @@
         {
           "stat": "aetheria",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 20
         }
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -784,22 +808,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "intelligence",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "intelligence",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "dexterity",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -828,7 +856,7 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 7,
+      "tcBuy": 8,
       "tcSell": 3,
       "baseDurability": 20,
       "tags": [
@@ -892,8 +920,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -926,8 +954,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 110,
+      "tcSell": 44,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -946,12 +974,12 @@
       "resistances": [],
       "statBonus": {
         "stat": "intelligence",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "intelligence",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "charisma",
@@ -960,8 +988,8 @@
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -990,8 +1018,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -1054,8 +1082,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -1088,8 +1116,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 110,
+      "tcSell": 44,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -1108,22 +1136,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "wisdom",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "wisdom",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "strength",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -1152,8 +1180,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -1216,8 +1244,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -1250,8 +1278,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 110,
+      "tcSell": 44,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -1270,22 +1298,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "charisma",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -1310,12 +1342,16 @@
         {
           "stat": "dexterity",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 5
         }
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -1374,12 +1410,16 @@
         {
           "stat": "strength",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 10
         }
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 45,
+      "tcSell": 18,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -1408,12 +1448,16 @@
         {
           "stat": "constitution",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 20
         }
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -1432,22 +1476,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "charisma",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "charisma",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "dexterity",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -1476,8 +1520,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -1540,8 +1584,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -1574,8 +1618,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 110,
+      "tcSell": 44,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -1594,22 +1638,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "charisma",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "charisma",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "dexterity",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -1634,12 +1678,16 @@
         {
           "stat": "dexterity",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 5
         }
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -1702,8 +1750,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -1732,12 +1780,16 @@
         {
           "stat": "strength",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 20
         }
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -1756,22 +1808,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "constitution",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -1800,8 +1856,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -1826,12 +1882,16 @@
         {
           "stat": "charisma",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 5
         }
       ],
       "rarity": "Common",
       "dexReq": 3,
-      "tcBuy": 8,
-      "tcSell": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -1860,12 +1920,16 @@
         {
           "stat": "strength",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 10
         }
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 45,
+      "tcSell": 18,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -1894,12 +1958,16 @@
         {
           "stat": "wisdom",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 20
         }
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -1918,22 +1986,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "strength",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -1962,7 +2034,7 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 7,
+      "tcBuy": 8,
       "tcSell": 3,
       "baseDurability": 20,
       "tags": [
@@ -2026,8 +2098,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -2060,8 +2132,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 110,
+      "tcSell": 44,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -2080,22 +2152,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "charisma",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -2124,8 +2196,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -2188,8 +2260,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -2222,8 +2294,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 110,
+      "tcSell": 44,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -2242,22 +2314,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "charisma",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "charisma",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "dexterity",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -2286,8 +2358,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 8,
-      "tcSell": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -2350,8 +2422,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 22,
-      "tcSell": 8,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -2384,8 +2456,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 45,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -2404,22 +2476,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "constitution",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "constitution",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "strength",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 50
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 60,
-      "tcSell": 20,
+      "tcBuy": 275,
+      "tcSell": 110,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -2448,8 +2524,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 8,
-      "tcSell": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -2474,12 +2550,16 @@
         {
           "stat": "constitution",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 10
         }
       ],
       "rarity": "Common",
       "dexReq": 3,
-      "tcBuy": 10,
-      "tcSell": 4,
+      "tcBuy": 12,
+      "tcSell": 5,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -2512,8 +2592,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 22,
-      "tcSell": 8,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -2546,8 +2626,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 45,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -2566,22 +2646,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "strength",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "strength",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "dexterity",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 60,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -2610,8 +2694,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 7,
-      "tcSell": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -2674,8 +2758,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 22,
-      "tcSell": 8,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -2708,8 +2792,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 45,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -2728,22 +2812,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "constitution",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "constitution",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "strength",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 60,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -2768,12 +2852,16 @@
         {
           "stat": "strength",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 10
         }
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 8,
-      "tcSell": 3,
+      "tcBuy": 12,
+      "tcSell": 5,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -2836,8 +2924,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 22,
-      "tcSell": 8,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -2866,12 +2954,16 @@
         {
           "stat": "dexterity",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 30
         }
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 45,
-      "tcSell": 15,
+      "tcBuy": 135,
+      "tcSell": 54,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -2890,22 +2982,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "constitution",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "constitution",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "strength",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 50
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 60,
-      "tcSell": 20,
+      "tcBuy": 275,
+      "tcSell": 110,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -2934,8 +3030,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 8,
-      "tcSell": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -2960,12 +3056,16 @@
         {
           "stat": "constitution",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 10
         }
       ],
       "rarity": "Common",
       "dexReq": 3,
-      "tcBuy": 10,
-      "tcSell": 4,
+      "tcBuy": 12,
+      "tcSell": 5,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -2994,12 +3094,16 @@
         {
           "stat": "constitution",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 15
         }
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 22,
-      "tcSell": 8,
+      "tcBuy": 45,
+      "tcSell": 18,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -3028,12 +3132,16 @@
         {
           "stat": "strength",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 30
         }
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 45,
-      "tcSell": 15,
+      "tcBuy": 135,
+      "tcSell": 54,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -3052,22 +3160,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "constitution",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "constitution",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "strength",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 50
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 60,
-      "tcSell": 20,
+      "tcBuy": 275,
+      "tcSell": 110,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -3096,8 +3208,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 8,
-      "tcSell": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -3160,8 +3272,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 22,
-      "tcSell": 8,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -3194,8 +3306,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 45,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -3214,22 +3326,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "strength",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "strength",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "dexterity",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 60,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -3258,8 +3374,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 7,
-      "tcSell": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -3322,8 +3438,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 22,
-      "tcSell": 8,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -3356,8 +3472,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 45,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -3376,22 +3492,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "constitution",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "constitution",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "dexterity",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 60,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -3420,8 +3540,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -3484,8 +3604,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -3518,8 +3638,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -3538,22 +3658,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "acrobatics",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -3582,8 +3706,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -3608,12 +3732,16 @@
         {
           "stat": "acrobatics",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 5
         }
       ],
       "rarity": "Common",
       "dexReq": 3,
-      "tcBuy": 8,
-      "tcSell": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -3642,12 +3770,16 @@
         {
           "stat": "strength",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 10
         }
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 45,
+      "tcSell": 18,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -3680,8 +3812,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -3700,22 +3832,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "acrobatics",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -3744,8 +3880,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -3808,8 +3944,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -3842,8 +3978,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -3862,22 +3998,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "acrobatics",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -3906,8 +4042,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -3970,8 +4106,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -4004,8 +4140,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -4024,22 +4160,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "acrobatics",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -4064,12 +4204,16 @@
         {
           "stat": "dexterity",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 5
         }
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -4094,12 +4238,16 @@
         {
           "stat": "acrobatics",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 5
         }
       ],
       "rarity": "Common",
       "dexReq": 3,
-      "tcBuy": 8,
-      "tcSell": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -4128,12 +4276,16 @@
         {
           "stat": "strength",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 10
         }
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 45,
+      "tcSell": 18,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -4162,12 +4314,16 @@
         {
           "stat": "constitution",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 20
         }
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 135,
+      "tcSell": 54,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -4186,22 +4342,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "acrobatics",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -4230,8 +4390,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -4294,8 +4454,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -4328,8 +4488,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -4348,22 +4508,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "acrobatics",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -4392,8 +4552,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -4456,8 +4616,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -4490,8 +4650,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -4510,22 +4670,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "stealth",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -4554,8 +4714,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -4618,8 +4778,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -4653,7 +4813,7 @@
       "rarity": "Uncommon",
       "dexReq": 2,
       "tcBuy": 110,
-      "tcSell": 38,
+      "tcSell": 44,
       "baseDurability": 25,
       "tags": [
         "armor",
@@ -4685,7 +4845,7 @@
       "rarity": "Uncommon",
       "dexReq": 4,
       "tcBuy": 130,
-      "tcSell": 45,
+      "tcSell": 52,
       "baseDurability": 40,
       "tags": [
         "armor",
@@ -4718,8 +4878,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 4,
-      "tcBuy": 280,
-      "tcSell": 95,
+      "tcBuy": 180,
+      "tcSell": 72,
       "baseDurability": 50,
       "tags": [
         "armor",
@@ -4752,8 +4912,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -4772,22 +4932,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "stealth",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -4812,12 +4976,16 @@
         {
           "stat": "strength",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 5
         }
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -4876,12 +5044,16 @@
         {
           "stat": "constitution",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 10
         }
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 45,
+      "tcSell": 18,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -4910,12 +5082,16 @@
         {
           "stat": "dexterity",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 20
         }
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 135,
+      "tcSell": 54,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -4934,22 +5110,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "strength",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "strength",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "constitution",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -4978,8 +5154,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -5042,8 +5218,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -5076,8 +5252,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -5096,22 +5272,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "strength",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -5140,8 +5316,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -5204,8 +5380,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -5234,12 +5410,16 @@
         {
           "stat": "dexterity",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 20
         }
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 135,
+      "tcSell": 54,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -5258,22 +5438,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "constitution",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -5302,8 +5482,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -5362,12 +5542,16 @@
         {
           "stat": "constitution",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 10
         }
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 45,
+      "tcSell": 18,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -5400,8 +5584,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -5420,22 +5604,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "constitution",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -5464,8 +5652,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -5528,8 +5716,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -5562,8 +5750,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -5582,22 +5770,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "charisma",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "charisma",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "dexterity",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -5626,8 +5814,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -5690,8 +5878,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -5724,8 +5912,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -5744,22 +5932,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "stealth",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -5788,8 +5976,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -5852,8 +6040,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -5886,8 +6074,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -5906,22 +6094,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "acrobatics",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -5950,8 +6142,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -5976,12 +6168,16 @@
         {
           "stat": "acrobatics",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 5
         }
       ],
       "rarity": "Common",
       "dexReq": 3,
-      "tcBuy": 8,
-      "tcSell": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -6014,8 +6210,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -6044,12 +6240,16 @@
         {
           "stat": "constitution",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 20
         }
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 135,
+      "tcSell": 54,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -6068,22 +6268,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "acrobatics",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -6112,8 +6312,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -6176,8 +6376,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -6210,8 +6410,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -6230,22 +6430,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "acrobatics",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -6274,8 +6474,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -6338,8 +6538,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -6368,12 +6568,16 @@
         {
           "stat": "strength",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 20
         }
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 135,
+      "tcSell": 54,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -6392,22 +6596,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "acrobatics",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -6432,12 +6640,16 @@
         {
           "stat": "dexterity",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 5
         }
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -6462,12 +6674,16 @@
         {
           "stat": "strength",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 5
         }
       ],
       "rarity": "Common",
       "dexReq": 3,
-      "tcBuy": 8,
-      "tcSell": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -6496,12 +6712,16 @@
         {
           "stat": "strength",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 10
         }
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 45,
+      "tcSell": 18,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -6530,12 +6750,16 @@
         {
           "stat": "constitution",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 20
         }
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 135,
+      "tcSell": 54,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -6554,22 +6778,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "strength",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -6598,8 +6826,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -6662,8 +6890,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -6696,8 +6924,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -6716,22 +6944,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "acrobatics",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -6760,8 +6988,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -6824,8 +7052,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -6858,8 +7086,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -6878,22 +7106,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "acrobatics",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -6922,8 +7150,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -6986,8 +7214,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -7020,8 +7248,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -7040,22 +7268,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "strength",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "strength",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "dexterity",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -7080,12 +7312,16 @@
         {
           "stat": "strength",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 5
         }
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -7148,8 +7384,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -7182,8 +7418,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -7202,22 +7438,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "strength",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "strength",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "dexterity",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -7246,8 +7486,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -7310,8 +7550,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -7344,8 +7584,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -7364,22 +7604,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "strength",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "strength",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "dexterity",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -7404,12 +7644,16 @@
         {
           "stat": "strength",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 5
         }
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -7472,8 +7716,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -7502,12 +7746,16 @@
         {
           "stat": "strength",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 20
         }
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 135,
+      "tcSell": 54,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -7526,22 +7774,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "strength",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "strength",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "dexterity",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -7570,8 +7822,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -7596,12 +7848,16 @@
         {
           "stat": "dexterity",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 5
         }
       ],
       "rarity": "Common",
       "dexReq": 3,
-      "tcBuy": 8,
-      "tcSell": 3,
+      "tcBuy": 10,
+      "tcSell": 4,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -7630,12 +7886,16 @@
         {
           "stat": "dexterity",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 10
         }
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 45,
+      "tcSell": 18,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -7664,12 +7924,16 @@
         {
           "stat": "constitution",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 20
         }
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 135,
+      "tcSell": 54,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -7688,22 +7952,26 @@
       "resistances": [],
       "statBonus": {
         "stat": "strength",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "strength",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "dexterity",
-          "amount": 3
+          "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 260,
+      "tcSell": 104,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -7732,8 +8000,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -7796,8 +8064,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -7830,8 +8098,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -7850,22 +8118,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "charisma",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -7894,8 +8162,8 @@
       ],
       "rarity": "Common",
       "dexReq": 1,
-      "tcBuy": 6,
-      "tcSell": 2,
+      "tcBuy": 8,
+      "tcSell": 3,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -7958,8 +8226,8 @@
       ],
       "rarity": "Uncommon",
       "dexReq": 5,
-      "tcBuy": 18,
-      "tcSell": 7,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -7992,8 +8260,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 9,
-      "tcBuy": 40,
-      "tcSell": 15,
+      "tcBuy": 120,
+      "tcSell": 48,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -8012,22 +8280,22 @@
       "resistances": [],
       "statBonus": {
         "stat": "dexterity",
-        "amount": 4
+        "amount": 3
       },
       "statBonuses": [
         {
           "stat": "dexterity",
-          "amount": 4
+          "amount": 3
         },
         {
           "stat": "strength",
-          "amount": 3
+          "amount": 2
         }
       ],
       "rarity": "Legendary",
       "dexReq": 12,
-      "tcBuy": 55,
-      "tcSell": 20,
+      "tcBuy": 250,
+      "tcSell": 100,
       "baseDurability": 65,
       "tags": [
         "armor",
@@ -8089,12 +8357,16 @@
         {
           "stat": "charisma",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 50
         }
       ],
       "rarity": "Legendary",
       "dexReq": 10,
-      "tcBuy": 240,
-      "tcSell": 96,
+      "tcBuy": 340,
+      "tcSell": 136,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -8130,8 +8402,8 @@
       ],
       "rarity": "Legendary",
       "dexReq": 10,
-      "tcBuy": 260,
-      "tcSell": 104,
+      "tcBuy": 300,
+      "tcSell": 120,
       "baseDurability": 45,
       "tags": [
         "armor",
@@ -8163,12 +8435,16 @@
         {
           "stat": "strength",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 50
         }
       ],
       "rarity": "Legendary",
       "dexReq": 8,
-      "tcBuy": 320,
-      "tcSell": 128,
+      "tcBuy": 340,
+      "tcSell": 136,
       "baseDurability": 50,
       "tags": [
         "armor",
@@ -8200,12 +8476,16 @@
         {
           "stat": "intelligence",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 45
         }
       ],
       "rarity": "Legendary",
       "dexReq": 9,
-      "tcBuy": 300,
-      "tcSell": 120,
+      "tcBuy": 330,
+      "tcSell": 132,
       "baseDurability": 48,
       "tags": [
         "armor",
@@ -8240,8 +8520,8 @@
       ],
       "rarity": "Legendary",
       "dexReq": 10,
-      "tcBuy": 280,
-      "tcSell": 112,
+      "tcBuy": 310,
+      "tcSell": 124,
       "baseDurability": 48,
       "tags": [
         "armor",
@@ -8309,12 +8589,16 @@
         {
           "stat": "constitution",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 40
         }
       ],
       "rarity": "Legendary",
       "dexReq": 11,
-      "tcBuy": 290,
-      "tcSell": 116,
+      "tcBuy": 320,
+      "tcSell": 128,
       "baseDurability": 46,
       "tags": [
         "armor",
@@ -8344,12 +8628,16 @@
         {
           "stat": "constitution",
           "amount": 2
+        },
+        {
+          "stat": "hp",
+          "amount": 60
         }
       ],
       "rarity": "Legendary",
       "dexReq": 8,
-      "tcBuy": 330,
-      "tcSell": 132,
+      "tcBuy": 360,
+      "tcSell": 144,
       "baseDurability": 50,
       "tags": [
         "armor",
@@ -8370,8 +8658,8 @@
         "poison"
       ],
       "rarity": "Uncommon",
-      "tcBuy": 48,
-      "tcSell": 19,
+      "tcBuy": 60,
+      "tcSell": 24,
       "baseDurability": 28,
       "tags": [
         "armor",
@@ -8380,7 +8668,8 @@
         "aether",
         "crafted"
       ],
-      "description": "Sludge-Forged Vest. Patched cloth waxed with Aetheric sludge, stiffened to a crust. Brittle to a clean cut but it eats the splash from Aether-tainted weather."
+      "description": "Sludge-Forged Vest. Patched cloth waxed with Aetheric sludge, stiffened to a crust. Brittle to a clean cut but it eats the splash from Aether-tainted weather.",
+      "statBonuses": []
     },
     {
       "name": "Aether-Wing Cloak",
@@ -8422,8 +8711,8 @@
       ],
       "rarity": "Rare",
       "dexReq": 0,
-      "tcBuy": 140,
-      "tcSell": 56,
+      "tcBuy": 160,
+      "tcSell": 64,
       "baseDurability": 50,
       "tags": [
         "armor",
@@ -8433,7 +8722,17 @@
         "mud",
         "crafted"
       ],
-      "description": "Mudstone Bulwark. Plates of hardened mudstone bolted to a leather backing. Heavy enough to slow a swing, dense enough to turn a Reclaimer pickaxe."
+      "description": "Mudstone Bulwark. Plates of hardened mudstone bolted to a leather backing. Heavy enough to slow a swing, dense enough to turn a Reclaimer pickaxe.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 30
+        }
+      ],
+      "statBonus": {
+        "stat": "hp",
+        "amount": 30
+      }
     },
     {
       "name": "Hollow Crown Circlet",
@@ -8478,7 +8777,10 @@
         "faction_gear",
         "mud_monarchs"
       ],
-      "description": "Faction-issue chest armor of the mud monarchs. Bears their colors."
+      "description": "Faction-issue chest armor of the mud monarchs. Bears their colors.",
+      "statBonuses": [],
+      "tcBuy": 40,
+      "tcSell": 16
     },
     {
       "name": "Heir's Dynastic Plate",
@@ -8493,7 +8795,10 @@
         "faction_gear",
         "eternal_dynasty"
       ],
-      "description": "Faction-issue chest armor of the eternal dynasty. Bears their colors."
+      "description": "Faction-issue chest armor of the eternal dynasty. Bears their colors.",
+      "statBonuses": [],
+      "tcBuy": 40,
+      "tcSell": 16
     },
     {
       "name": "Reclaimer's Scrapplate",
@@ -8508,7 +8813,10 @@
         "faction_gear",
         "reclaimers_guild"
       ],
-      "description": "Faction-issue chest armor of the reclaimers guild. Bears their colors."
+      "description": "Faction-issue chest armor of the reclaimers guild. Bears their colors.",
+      "statBonuses": [],
+      "tcBuy": 40,
+      "tcSell": 16
     },
     {
       "name": "Order Vellum Mantle",
@@ -8533,7 +8841,9 @@
           "stat": "wisdom",
           "amount": 1
         }
-      ]
+      ],
+      "tcBuy": 40,
+      "tcSell": 16
     },
     {
       "name": "Ancestor Bone Vest",
@@ -8548,7 +8858,10 @@
         "faction_gear",
         "true_tartarians"
       ],
-      "description": "Faction-issue chest armor of the true tartarians. Bears their colors."
+      "description": "Faction-issue chest armor of the true tartarians. Bears their colors.",
+      "statBonuses": [],
+      "tcBuy": 40,
+      "tcSell": 16
     },
     {
       "name": "Builder's Shoring Plate",
@@ -8563,7 +8876,19 @@
         "faction_gear",
         "stone_builders"
       ],
-      "description": "Faction-issue chest armor of the stone builders. Bears their colors."
+      "description": "Faction-issue chest armor of the stone builders. Bears their colors.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 20
+        }
+      ],
+      "statBonus": {
+        "stat": "hp",
+        "amount": 20
+      },
+      "tcBuy": 45,
+      "tcSell": 18
     },
     {
       "name": "Tomb-Warden Plate",
@@ -8578,7 +8903,19 @@
         "faction_gear",
         "servants_of_giants"
       ],
-      "description": "Faction-issue chest armor of the servants of giants. Bears their colors."
+      "description": "Faction-issue chest armor of the servants of giants. Bears their colors.",
+      "statBonuses": [
+        {
+          "stat": "hp",
+          "amount": 20
+        }
+      ],
+      "statBonus": {
+        "stat": "hp",
+        "amount": 20
+      },
+      "tcBuy": 45,
+      "tcSell": 18
     },
     {
       "name": "Architect's Shadow Coat",
@@ -8603,7 +8940,9 @@
           "stat": "dexterity",
           "amount": 1
         }
-      ]
+      ],
+      "tcBuy": 40,
+      "tcSell": 16
     },
     {
       "name": "Revivalist Field Jacket",
@@ -8618,7 +8957,10 @@
         "faction_gear",
         "tartarian_revivalists"
       ],
-      "description": "Faction-issue chest armor of the tartarian revivalists. Bears their colors."
+      "description": "Faction-issue chest armor of the tartarian revivalists. Bears their colors.",
+      "statBonuses": [],
+      "tcBuy": 40,
+      "tcSell": 16
     },
     {
       "name": "Echoing Steps Boots",
@@ -8638,8 +8980,8 @@
       "rarity": "Common",
       "faction": "Reclaimers",
       "dexReq": 1,
-      "tcBuy": 16,
-      "tcSell": 6,
+      "tcBuy": 18,
+      "tcSell": 7,
       "baseDurability": 20,
       "tags": [
         "armor",
@@ -8665,12 +9007,16 @@
         {
           "stat": "strength",
           "amount": 1
+        },
+        {
+          "stat": "hp",
+          "amount": 5
         }
       ],
       "rarity": "Common",
       "faction": "Mud Dwellers",
       "dexReq": 1,
-      "tcBuy": 17,
+      "tcBuy": 18,
       "tcSell": 7,
       "baseDurability": 20,
       "tags": [
@@ -8736,8 +9082,8 @@
       "rarity": "Uncommon",
       "faction": "Mud Dwellers",
       "dexReq": 1,
-      "tcBuy": 30,
-      "tcSell": 12,
+      "tcBuy": 50,
+      "tcSell": 20,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -8768,8 +9114,8 @@
       "rarity": "Uncommon",
       "faction": "Mud Dwellers",
       "dexReq": 1,
-      "tcBuy": 30,
-      "tcSell": 12,
+      "tcBuy": 45,
+      "tcSell": 18,
       "baseDurability": 30,
       "tags": [
         "armor",
@@ -8844,8 +9190,8 @@
       "rarity": "Rare",
       "faction": "Forgotten Order",
       "dexReq": 1,
-      "tcBuy": 68,
-      "tcSell": 27,
+      "tcBuy": 140,
+      "tcSell": 56,
       "baseDurability": 35,
       "tags": [
         "armor",
@@ -8877,8 +9223,8 @@
       "rarity": "Rare",
       "faction": "Forgotten Order",
       "dexReq": 1,
-      "tcBuy": 60,
-      "tcSell": 24,
+      "tcBuy": 140,
+      "tcSell": 56,
       "baseDurability": 35,
       "tags": [
         "armor",
@@ -8910,8 +9256,8 @@
       "rarity": "Uncommon",
       "faction": "Mud Dwellers",
       "dexReq": 1,
-      "tcBuy": 28,
-      "tcSell": 11,
+      "tcBuy": 40,
+      "tcSell": 16,
       "baseDurability": 30,
       "tags": [
         "armor",

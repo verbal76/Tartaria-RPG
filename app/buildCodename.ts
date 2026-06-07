@@ -162,6 +162,9 @@ const CODENAMES: Record<string, string> = {
   // gauntlets + Aether masks/cloaks/hood w/ aether resist + breathe_toxic gate);
   // race-starter grant now resolves armor + weapons (fixes Mud-Rend Blade);
   // new docs/armor-catalog.md balance reference.
+  // OTA-327 — player's armor rebalance applied to all 279 entries + a new
+  // max-HP-on-armor mechanic (76 pieces; baked into hpMax on equip/unequip).
+  '2026-06-07-327': 'Hemlock Anvil',
   '2026-06-07-326': 'Tamarack Anvil',
   '2026-06-07-325': 'Cypress Anvil',
   '2026-06-07-324': 'Willow Anvil',

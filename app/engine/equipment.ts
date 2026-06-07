@@ -294,6 +294,23 @@ export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<S
   return bonus;
 }
 
+// arb-fix — total max-HP bonus from a single equipped armor piece, read from
+// its `statBonuses` array (the `hp` entry, which is a SECONDARY bonus so it's
+// not picked up by aggregateEquippedStatBonuses' primary-only `statBonus`).
+// Returns 0 for non-armor names / pieces with no hp bonus. The gameStore
+// equip/unequip handlers bake this delta into `player.hpMax` (Option B: hpMax
+// is read in 100+ sites, so adjusting it on equip is simpler + drift-free vs an
+// effective-max computed everywhere).
+export function armorHpBonus(name: string | null | undefined): number {
+  if (!name) return 0;
+  const piece = findArmorByName(name);
+  if (!piece) return 0;
+  const bonuses = piece.statBonuses ?? (piece.statBonus ? [piece.statBonus] : []);
+  return bonuses
+    .filter((b) => b.stat === 'hp')
+    .reduce((sum, b) => sum + (b.amount ?? 0), 0);
+}
+
 // Apply the aggregated stat bonuses on top of the player's base stats.
 // Used by combat (attack rolls, damage rolls, skill checks) so equipped
 // gear actually changes the math. Optional `weatherMod` parameter folds

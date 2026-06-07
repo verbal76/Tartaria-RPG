@@ -172,7 +172,7 @@ import {
   secretRoomRevealedBy,
 } from '../engine/buildings';
 import { sellPriceFor, isUnsellable } from '../engine/sellPrice';
-import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats } from '../engine/equipment';
+import { validSlotsForItem, SLOT_LABEL, ARMOR_SLOTS, SLOT_ID_KEY, effectiveStats, armorHpBonus } from '../engine/equipment';
 import { isPouchEligible } from '../engine/pouchEligibility';
 import {
   canScrap,
@@ -17091,6 +17091,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         : s,
     );
+    // arb-fix — bake the armor's max-HP bonus into hpMax. Net delta = new
+    // piece's HP bonus minus whatever this slot already held (so swaps don't
+    // double-count). hp rises with the cap so the player actually gains the HP.
+    {
+      const hpDelta = armorHpBonus(item.name) - armorHpBonus(previousInSlot);
+      if (hpDelta !== 0) {
+        set((s) => {
+          if (!s.player) return s;
+          const newMax = Math.max(1, (s.player.hpMax ?? 1) + hpDelta);
+          return { player: { ...s.player, hpMax: newMax, hp: Math.max(1, Math.min((s.player.hp ?? 1) + hpDelta, newMax)) } };
+        });
+      }
+    }
     if (previousInSlot && previousInSlot !== item.name) {
       get().appendLog(
         'world',
@@ -17103,6 +17116,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   unequipSlot(slot) {
+    // arb-fix — strip the removed armor's max-HP bonus from hpMax (mirror of
+    // the equip bake-in). Read the occupant before clearing the slot.
+    const removed = (get().player?.equipped ?? {})[slot as keyof PlayerEquipped] as string | undefined;
+    const hpDelta = -armorHpBonus(removed);
     set((s) =>
       s.player
         ? {
@@ -17113,6 +17130,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 [slot]: undefined,
                 [SLOT_ID_KEY[slot]]: undefined,
               },
+              ...(hpDelta !== 0
+                ? (() => {
+                    const newMax = Math.max(1, (s.player.hpMax ?? 1) + hpDelta);
+                    return { hpMax: newMax, hp: Math.max(1, Math.min(s.player.hp ?? 1, newMax)) };
+                  })()
+                : {}),
             },
           }
         : s,
