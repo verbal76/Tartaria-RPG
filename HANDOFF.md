@@ -21,8 +21,10 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - `HaL2001` HEAD = **OTA-339 "Elm Anvil"** (rollback to 337 runtime) — live
->   on Android + iOS. OTA-338 "Poplar Anvil" was rolled back (boot crash).
+> - `HaL2001` HEAD = **OTA-340 "Beech Anvil"** — dog-mortality feature
+>   re-shipped ALONE on the clean baseline as a live diagnostic. (338's crash
+>   was **save data, not runtime** — 339=337 still crashed the old save, a fresh
+>   save boots clean. 340 tests whether the dog feature bricks a fresh save.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - tsc clean. Tests green modulo the known baseline flakes (dogTravelClimb,
@@ -118,22 +120,28 @@ checkout, not a special rollback tool.)
 
 ### 0.A — Open Issues
 
-- **OTA-338 "Poplar Anvil" boot crash — re-ship the dog-mortality feature (HIGH).**
-  338 crashed on ~**90% of cold opens** ("1 out of 10 stays working"); rolled back
-  by OTA-339 (Elm Anvil = 337 runtime). The crash is **intermittent → a boot-time
-  race**, and the only new async/timing surface 338 added is the `tickDogStatus`
-  **microtask scheduled off `submitPlayerAction`** (`void Promise.resolve().then(...)`).
-  The session-resume / welcome-back path fires a `submitPlayerAction` during boot;
-  the microtask almost certainly lands **mid-hydration**, calling `set(...)` /
-  `get().persist()` against a half-built store → intermittent crash. The full feature
-  is preserved in **commit `0741522`**. **Re-ship plan:** recover the diff, then make
-  the tick boot-safe — only schedule it for **non-silent** actions AND gate on a
-  "hydration complete / player present & named" check (or move the reconciler out of
-  the action path into an explicit post-rest / post-combat / post-time-advance call
-  instead of a microtask). Add a boot-resume test that asserts no tick fires before
-  hydration. tsc + the touched-area suite were green pre-rollback, so the logic itself
-  is sound — only the *scheduling* needs to be made boot-safe. The one-shot thrown
-  weapons + Trail-Rations preview (data/UI only, not implicated) ride along on re-ship.
+- **OTA-338 crash was SAVE DATA, not runtime — pin which write is fatal (HIGH).**
+  Updated diagnosis: 338 crashed ~**90% of cold opens** on the player's existing
+  save, but OTA-339 (= 337's **exact** runtime) **still crashed that same save**,
+  while a **fresh save boots clean on 339**. So the brick is in the *save*: 338 was
+  the first build ever to write the new dog-mortality state (dog `status` →
+  `'dead'`/`'abandoned'`, `puppyVendorOwed`/`puppyVendorQueued`, and the new
+  `downedAtHour`/`bleedWarned`/`loyaltyBeatFloor` fields) and to activate the
+  long-dead puppy-vendor / rubble-puppy arc. One of those writes puts the save into
+  a shape 337's boot/scene-begin path can't survive — intermittently (~90%), which
+  points at a race in async boot rather than a clean throw. **First suspect (the
+  scene-entry puppy vendor) is GUARDED OUT** — it requires `!player.dog`, but 338
+  sets the dog's `status` to dead/abandoned *without clearing `player.dog`*, so the
+  vendor never fires. Exact fatal field still unpinned (player deleted the save).
+  **Plan:** (1) OTA-340 "Beech Anvil" re-ships the dog feature ALONE as a live test
+  — does it brick a *fresh* save? (2) Reproduce in a test: build a save with each
+  338-written state and run load→beginScene, find the throw. (3) Add a **boot-
+  resilience guard** so a bad save drops to the title with a recoverable error
+  instead of crash-looping (note: "Save-load health: clean" never flagged this — the
+  crash is *after* the load check, a blind spot to close). (4) On death/abandon,
+  **clear `player.dog`** so the replacement arc can actually fire. Feature preserved
+  in commit `0741522`. The one-shot thrown weapons + Trail-Rations preview (data/UI
+  only, not implicated) are still pending re-ship separately.
 
 - **Race-trait display polish (OPTIONAL, low priority).** Mechanically races + titles +
   factions are all fully wired (OTA-337). The only loose thread: the Character screen still

@@ -185,9 +185,14 @@ const CODENAMES: Record<string, string> = {
   // open; locked-chip scanner-requirement text uses the EQUIPPED amber.
   // OTA-336 — fusion catalyst counts toward gate + equipped-catalyst confirm
   // prompt + one-time make-good grant; 2 craftable corruption-cleanse tonics.
-  // OTA-339 — ROLLBACK of 338. 338 crashed ~90% of cold opens (boot race),
-  // so 339 republishes 337's exact runtime. The dog/one-shot/rations work is
-  // preserved in git (commit 0741522) to re-ship once the boot crash is fixed.
+  // OTA-340 — RE-SHIP of the dog-mortality feature ALONE (bleed-out +
+  // abandonment + the tickDogStatus microtask) on a clean baseline, to test
+  // whether it bricks a FRESH save (the 338 crash turned out to be save-data,
+  // not the OTA runtime — 339=337 still crashed the old save; a new save boots
+  // fine). One-shot weapons + rations preview deliberately NOT included.
+  '2026-06-07-340': 'Beech Anvil',
+  // OTA-339 — ROLLBACK of 338. 338's old save crashed ~90% of cold opens;
+  // 339 republished 337's exact runtime. Root cause = save data, not runtime.
   '2026-06-07-339': 'Elm Anvil',
   // OTA-338 — dog bleed-out timer + loyalty abandonment + one-shot thrown
   // weapons + Trail-Rations preview. ROLLED BACK by 339 (boot crash).
