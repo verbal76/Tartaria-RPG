@@ -12661,4 +12661,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 //     save for sharing" (was "copy the on-disk log") — matching COPY LOG /
 //     COPY INVENTORY / COPY SAVE + CLEAR LOG.
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-07-343';
+// OTA-344 (Hazel Anvil) — atomic save writes (338 hardening #1). saveSlot no
+// longer overwrites the live slot in place (a write interrupted by a crash /
+// OS kill / OTA reload — the 338 brick — left the only copy truncated).
+// Now: stage to a temp key → verify it round-trips → snapshot the current good
+// save to a .bak → swap the live key → cleanup. loadSlot falls back to .bak
+// (the previous save) and heals the live key when the live copy is missing or
+// corrupt. saveSlot never throws (callers fire-and-forget persist) — on failure
+// it records getLastSaveWriteError() and leaves the live save + backup intact.
+// Worst case: lose only the most recent save, never the character. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-07-344';

@@ -9,6 +9,13 @@ const SLOTS_INDEX_KEY = 'tartaria.slots.index.v2';
 // game store. Read-only consumers only; writes still go through saveSlot.
 export const ACTIVE_SLOT_KEY = 'tartaria.activeSlot.v2';
 export const slotSaveKey = (slotId: string) => `tartaria.slot.${slotId}.v2`;
+// OTA-344 — atomic-write keys. The live save is written via temp → verify →
+// swap, with the previous good save kept as a `.bak` so an interrupted write
+// (crash / OS kill / OTA reload mid-write — the OTA-338 brick) can never leave
+// the only copy truncated. Worst case loadSlot falls back to .bak (the previous
+// save), never to nothing.
+const slotSaveTmpKey = (slotId: string) => `tartaria.slot.${slotId}.v2.tmp`;
+const slotSaveBakKey = (slotId: string) => `tartaria.slot.${slotId}.v2.bak`;
 const slotLogKey = (slotId: string) => `tartaria.gamelog.${slotId}.v2`;
 
 // Legacy single-slot keys. Migrated to a v2 slot on first hydrate.
@@ -190,20 +197,92 @@ async function upsertIndexEntry(entry: SlotSummary): Promise<void> {
   await writeIndex(filtered);
 }
 
-export async function loadSlot(slotId: string): Promise<SaveState | null> {
+async function readParseKey(key: string): Promise<SaveState | null> {
   try {
-    const raw = await AsyncStorage.getItem(slotSaveKey(slotId));
+    const raw = await AsyncStorage.getItem(key);
     if (!raw) return null;
     return JSON.parse(raw) as SaveState;
-  } catch (e) {
-    console.warn('loadSlot failed', e);
+  } catch {
     return null;
   }
 }
 
+export async function loadSlot(slotId: string): Promise<SaveState | null> {
+  // OTA-344 — atomic-save fallback chain. Read the live key first; if it's
+  // missing or corrupt (a swap interrupted mid-write — the 338 class), fall
+  // back to the last-good `.bak` and HEAL the live key from it so subsequent
+  // reads (and the title-screen index) see a valid save again.
+  const primary = await readParseKey(slotSaveKey(slotId));
+  if (primary) return primary;
+  const backup = await readParseKey(slotSaveBakKey(slotId));
+  if (backup) {
+    try {
+      const raw = await AsyncStorage.getItem(slotSaveBakKey(slotId));
+      if (raw) await AsyncStorage.setItem(slotSaveKey(slotId), raw);
+    } catch { /* best-effort heal — the in-memory return below still recovers play */ }
+    console.warn(`loadSlot: live save for ${slotId} was missing/corrupt — recovered from .bak (previous save)`);
+    return backup;
+  }
+  return null;
+}
+
+// OTA-344 — surface a failed atomic save (storage full / interrupted verify)
+// the same way getLastLogWriteError surfaces a failed log write. saveSlot never
+// rejects (its callers `void persist()` fire-and-forget, so a throw would be an
+// unhandled rejection); instead it stamps the failure here, having left the live
+// save + backup intact ("as if the save never started").
+let lastSaveWriteError: string | null = null;
+export function getLastSaveWriteError(): string | null {
+  return lastSaveWriteError;
+}
+export function clearLastSaveWriteError(): void {
+  lastSaveWriteError = null;
+}
+
 export async function saveSlot(slotId: string, state: SaveState): Promise<void> {
   const toSave: SaveState = { ...state, savedAt: Date.now(), version: 1 };
-  await AsyncStorage.setItem(slotSaveKey(slotId), JSON.stringify(toSave));
+  const payload = JSON.stringify(toSave);
+  const tmpKey = slotSaveTmpKey(slotId);
+  const bakKey = slotSaveBakKey(slotId);
+  const liveKey = slotSaveKey(slotId);
+
+  // OTA-344 — atomic write: temp → verify → snapshot last-good → swap → cleanup.
+  // Never throws (see lastSaveWriteError note above): on any failure the live
+  // save and the .bak are left exactly as they were.
+  try {
+    // 1. Stage to a temp key.
+    await AsyncStorage.setItem(tmpKey, payload);
+    // 2. Verify the staged copy round-trips byte-for-byte — catches a truncated
+    //    / quota-capped write BEFORE we touch the live slot.
+    const staged = await AsyncStorage.getItem(tmpKey);
+    if (staged !== payload) {
+      throw new Error('staged save did not verify (truncated or storage full)');
+    }
+    // 3. Snapshot the current live save → backup (last-good), but ONLY if it
+    //    parses — never promote already-corrupt bytes to the backup.
+    try {
+      const currentLive = await AsyncStorage.getItem(liveKey);
+      if (currentLive) {
+        JSON.parse(currentLive);
+        await AsyncStorage.setItem(bakKey, currentLive);
+      }
+    } catch { /* current live is garbage or absent — keep the prior last-good */ }
+    // 4. Swap: commit the verified payload to the live key. If a reload
+    //    interrupts THIS write, .bak still holds the previous good save and
+    //    loadSlot recovers it.
+    await AsyncStorage.setItem(liveKey, payload);
+    // 5. Cleanup the temp.
+    await AsyncStorage.removeItem(tmpKey).catch(() => { /* harmless leftover */ });
+    lastSaveWriteError = null;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    lastSaveWriteError = msg.slice(0, 200);
+    // eslint-disable-next-line no-console
+    console.warn('saveSlot: atomic write failed; live save + backup left intact:', msg);
+    await AsyncStorage.removeItem(tmpKey).catch(() => { /* ignore */ });
+    return; // do NOT update the index against a save that didn't land
+  }
+
   if (state.player) {
     const summary: SlotSummary = {
       slotId,
@@ -239,7 +318,14 @@ async function readCreatedAt(slotId: string): Promise<number | null> {
 }
 
 export async function deleteSlot(slotId: string): Promise<void> {
-  await AsyncStorage.multiRemove([slotSaveKey(slotId), slotLogKey(slotId)]);
+  // OTA-344 — also clear the atomic-write temp + backup keys so a deleted
+  // character leaves no recoverable bytes behind.
+  await AsyncStorage.multiRemove([
+    slotSaveKey(slotId),
+    slotSaveTmpKey(slotId),
+    slotSaveBakKey(slotId),
+    slotLogKey(slotId),
+  ]);
   const all = await listSlots();
   await writeIndex(all.filter((s) => s.slotId !== slotId));
   if (activeSlotId === slotId) {

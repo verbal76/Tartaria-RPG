@@ -36,11 +36,12 @@
 >   logic. Last unverified path: the dog feature's death/abandon WRITE (only
 >   fires when the dog actually dies/leaves) — once a dog death survives a
 >   restart, the feature is fully cleared.
-> - **STAGED (committed on `HaL2001`, NOT pushed) — next batch, 1/5:**
->   - **OTA-343 "Birch Anvil"** — crash-save capture: on a crash, stash the
->     offending slot's exact on-disk save bytes so the next launch offers
->     **COPY CRASHED SAVE** (reaches a corrupt save that COPY SAVE can't).
->   Holding for ≥5 before the user triggers the push (per §P3a). See the
+> - **STAGED (committed on `HaL2001`, NOT pushed) — next batch, 2 so far:**
+>   - **OTA-343 "Birch Anvil"** — crash-save capture (COPY CRASHED SAVE) +
+>     Settings-hint copy fix (folded in from the parallel instance).
+>   - **OTA-344 "Hazel Anvil"** — atomic save writes (338 hardening #1):
+>     temp → verify → `.bak` snapshot → swap; `loadSlot` recovers from `.bak`.
+>   Holding toward ≥5 before the user triggers the push (per §P3a). See the
 >   "Next Batch — staging list" at the top of §0.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
@@ -184,8 +185,17 @@ checkout, not a special rollback tool.)
      (Folded in from a parallel instance, which rolled back its own short-lived
      "Chestnut 343" so there's one OTA-343 = "Birch Anvil".)
 
-*(343 = 1 bundle counting toward the batch. ≥5 OTAs before this batch is
-push-ready, unless the user overrides or a forced build ships it early.)*
+2. **OTA-344 "Hazel Anvil" — atomic save writes (338 hardening #1).** `saveSlot`
+   stages to a `.tmp` key → verifies it round-trips → snapshots the prior good
+   save to `.bak` → swaps the live key → cleans up; `loadSlot` falls back to
+   `.bak` (the previous save) and heals the live key when the live copy is
+   missing/corrupt. Never throws (callers fire-and-forget `persist()`) — records
+   `getLastSaveWriteError()` and leaves the live save + backup intact on failure.
+   `app/engine/saveSystem.ts`; tests `atomicSaveWrites` (8). tsc clean. Closes
+   defense #1 of the 338-hardening Open Issue.
+
+*(2 OTAs staged toward the batch. ≥5 before this batch is push-ready, unless the
+user overrides or a forced build ships it early.)*
 
 ### 0.A — Open Issues
 
@@ -199,15 +209,15 @@ push-ready, unless the user overrides or a forced build ships it early.)*
   OTA-341) captures the exact state for instant repro. Low urgency — no evidence it
   breaks; this is the last unchecked box from the 338 saga.
 
-- **Hardening from the OTA-338 incident (MEDIUM — recommended, not yet done).**
+- **Hardening from the OTA-338 incident (MEDIUM — recommended).**
   338's ~90% boot-crash was a **corrupted save**, almost certainly an *interrupted
   save write* during 338's mid-session double-reload (Expo applied the OTA while the
   old JS was live, reloading twice and leaving the active save truncated/half-written).
-  Three defenses, none shipped yet:
-  1. **Atomic save writes** — `saveSlot` (`app/engine/saveSystem.ts`) does a single
-     `AsyncStorage.setItem`; a crash mid-write can corrupt the active slot. Write to a
-     temp key + verify-parse + swap (or keep a last-good backup) so an interrupted
-     write can never brick the live save.
+  Three defenses — **#1 atomic save writes is DONE (OTA-344, staged); #2 and #3 remain:**
+  1. ✅ **Atomic save writes — DONE (OTA-344 Hazel Anvil, STAGED — see §0.NEXT).**
+     `saveSlot` now stages to a temp key → verifies → snapshots a `.bak` → swaps;
+     `loadSlot` recovers from `.bak` + heals when the live copy is corrupt. Moves to
+     §0.B (Closed) when the batch is pushed.
   2. **Boot-resilience guard** — a save that throws on load / `beginScene` should drop
      to the title with a recoverable error, NOT crash-loop. The "Save-load health:
      clean" detector never flagged the 338 brick because the crash is *after* the load

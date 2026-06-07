@@ -875,9 +875,9 @@ export function AboutScreen() {
           {voice.ttsEnabled && (
             <>
               {/* Engine picker — System uses expo-speech (lightweight,
-                  device-dependent quality); Bundled uses the Piper
-                  neural voice via sherpa-onnx (better quality, requires
-                  one-time ~63 MB download). */}
+                  device-dependent quality); Bundled uses the Kokoro-82M
+                  neural voice via react-native-executorch (better quality,
+                  fully offline, ~100 MB one-time download). */}
               <View style={styles.musicRow}>
                 <Text style={styles.musicLabel}>Engine</Text>
                 <View style={{ flexDirection: 'row', gap: 6 }}>

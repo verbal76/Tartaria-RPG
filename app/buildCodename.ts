@@ -185,6 +185,10 @@ const CODENAMES: Record<string, string> = {
   // open; locked-chip scanner-requirement text uses the EQUIPPED amber.
   // OTA-336 — fusion catalyst counts toward gate + equipped-catalyst confirm
   // prompt + one-time make-good grant; 2 craftable corruption-cleanse tonics.
+  // OTA-344 — atomic save writes (338 hardening #1): saveSlot stages to a temp
+  // key, verifies, snapshots the prior good save to .bak, then swaps; loadSlot
+  // falls back to .bak (previous save) + heals when the live copy is corrupt.
+  '2026-06-07-344': 'Hazel Anvil',
   // OTA-343 — MULTI-FIX BUNDLE: (1) crash-save capture — on a crash, stash
   // the offending slot's on-disk save bytes so the next launch offers COPY
   // CRASHED SAVE (reaches a corrupt save that can't be loaded; extends
