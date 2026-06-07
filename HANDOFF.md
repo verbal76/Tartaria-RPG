@@ -21,13 +21,13 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - `HaL2001` HEAD = **OTA-341 "Hawthorn Anvil"** — COPY SAVE diagnostic on top
->   of 340's live dog-mortality test. (338's crash was **save data, not runtime**
->   — 339=337 still crashed the old save, a fresh save boots clean. 340 tests
->   whether the dog feature bricks a fresh save; 341 adds the tool to capture a
->   bricked save before it's deleted. A 6-variant repro test shows the dog
->   *state* loads clean through the real cold-boot path — so any dog crash is a
->   render path or the boot microtask race, not the persisted state.)
+> - `HaL2001` HEAD = **OTA-342 "Linden Anvil"** — the safe 338-batch pair
+>   (one-shot thrown weapons + rations preview) re-shipped on top of the live
+>   dog feature (340) + COPY SAVE (341). **340/341 boot clean with the dog
+>   feature live** — so the 338 disaster was a corrupted save, not the dog
+>   logic. Last unverified path: the dog feature's death/abandon WRITE (only
+>   fires when the dog actually dies/leaves) — once a dog death survives a
+>   restart, the feature is fully cleared.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - tsc clean. Tests green modulo the known baseline flakes (dogTravelClimb,
@@ -474,6 +474,19 @@ checkout, not a special rollback tool.)
 - **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Linden Anvil (`2026-06-07-342`) — one-shot thrown weapons + Trail-Rations preview (safe 338 pair)
+- **What:** the two pieces of the 338 batch that never touched the dog code,
+  re-shipped independently once 340/341 proved the dog feature boots clean.
+- **One-shot thrown weapons:** 10 dedicated projectiles (Throwing Knife, Mud
+  Throwing Knife, Bone Throwing Axe, Tartarian Hand Axe (Throw), Bone Javelin,
+  Bone War Javelin, Tartarian Hand Spear, Plasma Spear, Tartarian Spear (Throw),
+  Mud Spear (Throwing)) tagged `throwable` → the OTA-208 throwable path consumes
+  one on throw + auto-unequips at 0. Reusable throwers/slings + the returning
+  Aetheric Throwing Disk stay multi-use; `itemBackfill` unions the tag onto held
+  instances. **Trail-Rations preview:** effect-less food shows "Restores: 2d6 HP".
+- **Files:** `app/data/items/weapons.json`, `app/components/itemPreview.ts`; tests
+  `oneShotThrownWeapons`, `consumableRestorePreview`.
 
 #### Hawthorn Anvil (`2026-06-07-341`) — COPY SAVE diagnostic + dog save-brick repro
 - **Player ask:** "we don't have a way yet to export the save files to the logs,

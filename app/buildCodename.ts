@@ -185,6 +185,10 @@ const CODENAMES: Record<string, string> = {
   // open; locked-chip scanner-requirement text uses the EQUIPPED amber.
   // OTA-336 — fusion catalyst counts toward gate + equipped-catalyst confirm
   // prompt + one-time make-good grant; 2 craftable corruption-cleanse tonics.
+  // OTA-342 — the safe pair from the 338 batch, re-shipped independently:
+  // one-shot thrown weapons (10 throwable tags) + Trail-Rations restore
+  // preview. Data + UI only; no dog code. Rides on top of 340/341.
+  '2026-06-07-342': 'Linden Anvil',
   // OTA-341 — COPY SAVE diagnostic (export loadable save state for brick
   // repro) on top of 340's dog test. Read-only; doesn't disturb the dog test.
   '2026-06-07-341': 'Hawthorn Anvil',
