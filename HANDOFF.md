@@ -21,7 +21,7 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - `HaL2001` HEAD = **OTA-327 "Hemlock Anvil"** — live on Android + iOS.
+> - `HaL2001` HEAD = **OTA-328 "Juniper Anvil"** — live on Android + iOS.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - tsc clean. Tests green modulo the known baseline flakes (dogTravelClimb,
@@ -418,6 +418,13 @@ checkout, not a special rollback tool.)
 - **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Juniper Anvil (`2026-06-07-328`) — all armor base-stats apply + weapon catalog
+- **WHAT.** Player: "yes, all of the stats of the armor should apply, not just the first one." + "give me a list of every weapon in the game with all of their stats."
+- **FIX (all stats apply).** `equipment.aggregateEquippedStatBonuses` armor loop now iterates the whole `statBonuses` array (falling back to `[statBonus]`) instead of reading only the primary `statBonus`, so a multi-stat piece like "INT+2, CHA+1" grants BOTH. The `add` filter still gates on `STAT_KEYS` (the 5 base stats), so `hp` (routed to hpMax via OTA-327's bake-in) and the non-attribute flavor stats — constitution / acrobatics / stealth / investigation / aetheria, which have no `PlayerCharacter` field — are correctly dropped here (no double-count with hpMax, no phantom attributes). This is the deferred call from the Hemlock entry's "known limitation," now enabled per the player.
+- **DOC (weapon list).** New `docs/weapon-catalog.md` — all 263 weapons (145 melee / 64 ranged / 54 runecaster) as tables: name · damage dice · damage type · scaling stat · style (one_handed/two_handed/dual_wield/shield/ranged/runecaster) · stat-requirement · defense · base durability · rarity · faction · tc · effect (free-text). Grouped by `weaponKind`, sorted by rarity. Auto-generated from weapons.json.
+- **Verified:** tsc clean; new `__tests__/armorMultiStat.test.ts` (multi-stat piece grants both base stats; non-base CON/HP dropped from the base aggregate; HP still via armorHpBonus) + armorHpBonus + equip 33/33. (`combatBalanceProbe` OOM-aborts in the sandbox — a heavy combat sim, infra not logic; aborts on a clean checkout too.) Note: enabling all base-stats buffs every multi-stat piece already in play — intended per the player's balancing.
+- **Files:** `app/engine/equipment.ts` (aggregateEquippedStatBonuses), `__tests__/armorMultiStat.test.ts` (new), `docs/weapon-catalog.md` (new), `app/buildInfo.ts`, `app/buildCodename.ts` (Juniper Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
 
 #### Hemlock Anvil (`2026-06-07-327`) — armor rebalance applied + max-HP-on-armor mechanic
 - **WHAT.** Player took the Tamarack Anvil `armor-catalog.md`, rebalanced it, and **added HP boosts**, then pasted the full CSV back: "balanced and added HP boosts."

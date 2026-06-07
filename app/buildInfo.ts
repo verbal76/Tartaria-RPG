@@ -12570,4 +12570,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // pieces). `armorHpBonus` reads the `hp` entry from a piece's `statBonuses`,
 // and equipItem/unequipSlot bake the delta into `player.hpMax` (+ hp), so HP
 // gear actually raises your max HP. docs/armor-catalog.md regenerated.
-export const OTA_BUILD_ID = '2026-06-07-327';
+// OTA-328 — Juniper Anvil. (1) ALL of a multi-stat armor piece's base-stat
+// bonuses now apply, not just the primary (`aggregateEquippedStatBonuses`
+// reads the whole `statBonuses` array; HP still routes to hpMax, and CON /
+// acrobatics / stealth / investigation / aetheria stay non-attribute flavor
+// with no player field). (2) New docs/weapon-catalog.md — every weapon + stats.
+export const OTA_BUILD_ID = '2026-06-07-328';

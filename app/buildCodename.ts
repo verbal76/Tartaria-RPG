@@ -164,6 +164,9 @@ const CODENAMES: Record<string, string> = {
   // new docs/armor-catalog.md balance reference.
   // OTA-327 — player's armor rebalance applied to all 279 entries + a new
   // max-HP-on-armor mechanic (76 pieces; baked into hpMax on equip/unequip).
+  // OTA-328 — all base-stat bonuses on multi-stat armor now apply (was
+  // primary-only); new docs/weapon-catalog.md (every weapon + stats).
+  '2026-06-07-328': 'Juniper Anvil',
   '2026-06-07-327': 'Hemlock Anvil',
   '2026-06-07-326': 'Tamarack Anvil',
   '2026-06-07-325': 'Cypress Anvil',

@@ -278,7 +278,15 @@ export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<S
     const name = eq[slot];
     if (!name) continue;
     const piece = findArmorByName(name);
-    if (piece?.statBonus) add(piece.statBonus.stat, piece.statBonus.amount);
+    if (!piece) continue;
+    // arb-fix — apply EVERY stat bonus on a piece, not just the primary
+    // `statBonus`. `add` filters to the five base stats (STAT_KEYS), so the
+    // `hp` entry (handled separately via hpMax) and non-attribute flavor
+    // stats (constitution / acrobatics / stealth / investigation / aetheria,
+    // which have no PlayerCharacter field) are dropped here as before — but a
+    // multi-base-stat piece like "INT+2, CHA+1" now grants BOTH.
+    const bonuses = piece.statBonuses ?? (piece.statBonus ? [piece.statBonus] : []);
+    for (const b of bonuses) add(b.stat, b.amount);
   }
   if (eq.amulet) {
     const a = findAmuletByName(eq.amulet);
