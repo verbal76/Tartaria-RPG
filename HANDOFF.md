@@ -21,7 +21,7 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - `HaL2001` HEAD = **OTA-333 "Spruce Anvil"** — live on Android + iOS.
+> - `HaL2001` HEAD = **OTA-334 "Larch Anvil"** — live on Android + iOS.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - tsc clean. Tests green modulo the known baseline flakes (dogTravelClimb,
@@ -417,6 +417,21 @@ checkout, not a special rollback tool.)
 - **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Larch Anvil (`2026-06-07-334`) — playtest batch (10 fixes)
+A batch from a live playthrough (Verbal, Dynasty Border Post). All JS-only → OTA.
+- **Climbing Strap → Armor.** The Hardened Climbing Strap (kind:exploration, `wardrobe` tag, cloak slot) fell through `categorizeItem` to the Loot bucket. Added a `wardrobe`→`armor` rule (it's the only wardrobe item). Display-only; equip/gate/starter paths untouched. `app/components/InventoryCategorize.ts`.
+- **Equipped weapons show the slot.** Inventory rows now read "EQUIPPED (main hand)/(off hand)/(both hands)/(two-handed)"; armor reads its slot label. Computed from per-slot instance ids (legacy name fallback). `app/screens/InventoryScreen.tsx`.
+- **Scrap result auto-closes** after ~2.8s (player: "no one is going to study the text"). Close button stays as an early-out. `InventoryScreen` (useEffect on scrapResult).
+- **Dog stays in the combat arsenal when it can't act.** Player: dog vanished from combat vs a flying drone / while climbing. Now the dog chip shows whenever there's a living companion (incl. benched at a climb base = `waiting_at_base`); tapping a blocked dog buzzes (`Vibration`) + the engine drops a contextual Arbiter line (aerial → "can't jump that high", once per enemy; climb-benched → "hasn't learned to climb", once per climb) with NO turn spent. New `enemyTraits.enemyIsAerial` + `aerial` trait on Aetherbat/Scrap Drone/Aetheric Drone. `InputBox.dogBlocked`, `ExplorationScreen`, `gameStore.handleDogCombat`, `types.WorldMemory.dogAerialNoticeShown`/`dogClimbNoticeShown`.
+- **Anti-air weapons.** 8 ranged weapons (Short Hunting Bow, Giant Bone Longbow, Aetheric Longbow, Laser Crossbow, Plasma Rifle, Aetheric Pulse Rifle, Tartarian Longbow +1d6; Aetheric Sniper Bow +2d6) gain "+Nd6 against airborne enemies". `weaponEffects` now parses + stacks MULTIPLE "+NdN against X" clauses (was first-match-only) and adds an `aerial` condition. `__tests__/weaponEffects.test.ts`.
+- **Possessive scene features now clear from salvage/investigate.** "Zharak's Teeth Spire" never greyed because the chip-consumed fuzzy matcher was apostrophe-sensitive (stored "zharak teeth spire" vs chip "zharak's teeth spire" — the `'s` broke the substring). Matcher now strips apostrophes both sides. `ExplorationScreen.isFuzzyConsumed`.
+- **Vendor stock + owned stack** on two right-aligned lines instead of one. `VendorScreen` (offerCounts column).
+- **FUSABLE inventory tab.** New sort/filter that narrows to Crucible-eligible items (inferred OR `faction_gear`), reserved-first. `InventoryScreen` (isFusionEligible + sortInventoryItems case + filter).
+- **Dog food heal.** Feeding the dog a food with no structured effect (Trail Rations) gave loyalty but 0 HP; the dog only read `fx.healHP`. Now mirrors the PLAYER's eat default — food with no effect heals the dog 2d6 (clamped). `gameStore` feedDogOrHealDog.
+- **Blank Runecaster Casings now obtainable.** A full 53-recipe audit found the 4 casing tiers were the ONLY truly-unsourced craft ingredients (mushrooms/wild chicken etc. are in forage tables). Added tier-matched casing drops to 20 automatons (Common→Scrap Drone … Legendary→Iron Titan/sentinels). `app/data/enemies/enemies.json`.
+- **Fuzzy investigate/salvage now clears.** A typed noun that fuzzy-matched an inventory item (e.g. "scraps of cloth"→owned "Mud Cloth") re-showed the item preview forever. Now it shows once, marks the typed noun flavor-exhausted for the room, and repeats read "already examined." `gameStore` investigate item-preview branch.
+- **Verified:** src tsc clean; `weaponEffects` (17) + `weaponHpBonus` + `InventoryCategorize` + `raceStarterItems` + `domesticStress` green. Pre-existing test-file tsc errors (qwen/stressMode/createAsync) unchanged.
 
 #### Spruce Anvil (`2026-06-07-333`) — kill the "2-tone box behind the buttons" (tutorial highlight fill)
 - **WHAT.** Player (screenshot, green-tuned bg, mid-tutorial): "we still have that weird 2 tone box behind the buttons on the bottom." Bog Anvil (OTA-317) had made the button *chips* opaque, but a translucent box remained behind the whole bottom cluster.

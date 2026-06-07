@@ -29,7 +29,19 @@ const INV_SORT_OPTIONS = [
   { key: 'rarity', label: 'RARITY' },
   { key: 'kind', label: 'KIND' },
   { key: 'qty', label: 'QTY' },
+  // arb-fix — FUSABLE acts as a filter: it narrows the list to every item that
+  // qualifies for the Crucible (whether or not it's reserved ♥), so the player
+  // can see their fusion stock at a glance.
+  { key: 'fusionable', label: 'FUSABLE' },
 ];
+
+// arb-fix — an item qualifies for fusion if it's engine-inferred (the Crucible
+// only fuses non-catalog items) OR it's faction gear (a reservable catalyst).
+// Mirrors the eligibility gate in gameStore.toggleReserveForFusion exactly.
+function isFusionEligible(item: InventoryItem): boolean {
+  if ((item.tags ?? []).includes('faction_gear')) return true;
+  return isInferredItem(item.name);
+}
 const RARITY_RANK: Record<string, number> = {
   Common: 0,
   Uncommon: 1,
@@ -60,6 +72,13 @@ function sortInventoryItems(
       }
       case 'qty': {
         if (a.quantity !== b.quantity) return (a.quantity - b.quantity) * dir;
+        return a.name.localeCompare(b.name) * dir;
+      }
+      case 'fusionable': {
+        // Reserved (♥) items float to the top of the fusion view, then by name.
+        const ar = a.reservedForFusion ? 0 : 1;
+        const br = b.reservedForFusion ? 0 : 1;
+        if (ar !== br) return (ar - br) * dir;
         return a.name.localeCompare(b.name) * dir;
       }
       case 'name':
@@ -148,7 +167,12 @@ export function InventoryScreen() {
   const filtered = pouchFilterActive
     ? queryFiltered.filter((i) => isPouchEligible(i, player).eligible)
     : queryFiltered;
-  const sorted = sortInventoryItems(filtered, sortKey, sortDirection);
+  // arb-fix — the FUSABLE tab is a filter, not just a sort: narrow to items
+  // that qualify for the Crucible (reserved or not).
+  const fusionFiltered = sortKey === 'fusionable'
+    ? filtered.filter(isFusionEligible)
+    : filtered;
+  const sorted = sortInventoryItems(fusionFiltered, sortKey, sortDirection);
   const grouped = groupInventoryByCategory(sorted);
   // Map equipped item name → the slot(s) it's currently in. Used so the
   // modal can offer Unequip on items already worn.
@@ -207,7 +231,40 @@ export function InventoryScreen() {
     if (owner) equippedItemIds.add(owner.id);
   }
 
-  // arb87 — "slot full" marker. When a slot already holds a piece, every
+  // arb-fix — which SLOT(s) an equipped instance occupies, so the row can show
+  // "EQUIPPED (main hand)" / "(off hand)" / "(both hands)" for weapons instead
+  // of a bare EQUIPPED (player: weapons don't say which hand). Built from the
+  // per-slot instance ids (exact), with a legacy name fallback for old saves.
+  const equippedSlotsById = new Map<string, EquipSlot[]>();
+  const idSlotPairs: Array<[string | undefined, EquipSlot]> = [
+    [eq.mainId, 'main'], [eq.offId, 'off'], [eq.headId, 'head'],
+    [eq.chestId, 'chest'], [eq.handsId, 'hands'], [eq.legsId, 'legs'],
+    [eq.feetId, 'feet'], [eq.cloakId, 'cloak'], [eq.amuletId, 'amulet'],
+    [eq.ringId, 'ring'], [eq.ring2Id, 'ring'], [eq.ring3Id, 'ring'],
+  ];
+  for (const [id, slot] of idSlotPairs) {
+    if (!id) continue;
+    const list = equippedSlotsById.get(id) ?? [];
+    list.push(slot);
+    equippedSlotsById.set(id, list);
+  }
+  const equippedSlotLabelFor = (item: InventoryItem): string => {
+    let slots = equippedSlotsById.get(item.id);
+    if (!slots || slots.length === 0) slots = slotsByEquippedName.get(item.name) ?? [];
+    if (slots.length === 0) return '';
+    // Two-handed weapons take both hands by design — keep the existing wording.
+    if (findWeaponByName(item.name)?.style === 'two_handed') return 'two-handed';
+    const hasMain = slots.includes('main');
+    const hasOff = slots.includes('off');
+    if (hasMain && hasOff) return 'both hands';
+    if (hasMain) return 'main hand';
+    if (hasOff) return 'off hand';
+    // Armor / accessory: the human slot label(s), deduped (e.g. a ring → "ring").
+    const labels = [...new Set(slots.map((s) => SLOT_LABEL[s] ?? s))];
+    return labels.join(' + ');
+  };
+
+
   // OTHER inventory item that competes for that slot gets a red ✗ (you'd
   // have to unequip first). Rings have three physical slots, so a ring only
   // counts as blocked when all three are worn.
@@ -247,6 +304,18 @@ export function InventoryScreen() {
     setPending(null);
     setScrapResult(null);
   };
+  // arb-fix — auto-dismiss the post-salvage result. The "what you received"
+  // panel only needs a beat to read, not a deliberate Close tap (player: "no
+  // one is going to study the text"). When scrapResult is populated, close the
+  // modal on a short timer; the Close button stays as an early-out.
+  useEffect(() => {
+    if (scrapResult === null) return;
+    const t = setTimeout(() => {
+      setPending(null);
+      setScrapResult(null);
+    }, 2800);
+    return () => clearTimeout(t);
+  }, [scrapResult]);
   const chooseSlot = (slot: EquipSlot) => {
     if (!pending) return;
     equipItem(pending.item.name, slot);
@@ -593,6 +662,7 @@ export function InventoryScreen() {
                   item={item}
                   color={CATEGORY_COLORS[cat]}
                   isEquipped={equippedItemIds.has(item.id)}
+                  equippedSlotLabel={equippedSlotLabelFor(item)}
                   isPouched={(player.equipped?.toolPouchIds ?? []).includes(item.id)}
                   slotTaken={itemSlotTaken(item)}
                   onPress={() => handleItemTap(item)}
@@ -603,6 +673,11 @@ export function InventoryScreen() {
         })}
         {player.inventory.length === 0 && (
           <Text style={styles.empty}>Your pack is empty. Tartaria has not given you anything yet.</Text>
+        )}
+        {/* arb-fix — distinct empty copy when the FUSABLE filter hides
+            everything, so it doesn't read as a totally empty pack. */}
+        {player.inventory.length > 0 && sortKey === 'fusionable' && sorted.length === 0 && (
+          <Text style={styles.empty}>Nothing in your pack qualifies for the Crucible yet. Salvage-grade engine-named items and faction gear can be fused.</Text>
         )}
       </ScrollView>
 
@@ -781,6 +856,7 @@ function ItemRow({
   item,
   color,
   isEquipped,
+  equippedSlotLabel,
   isPouched,
   slotTaken,
   onPress,
@@ -788,6 +864,7 @@ function ItemRow({
   item: InventoryItem;
   color: string;
   isEquipped: boolean;
+  equippedSlotLabel: string;
   isPouched: boolean;
   slotTaken: boolean;
   onPress: () => void;
@@ -883,19 +960,15 @@ function ItemRow({
           )}
           {canEquip && !isEquipped && <Text style={styles.rowEquippable}>tap to equip</Text>}
           {!canEquip && !isEquipped && <Text style={styles.rowEquippable}>tap for details</Text>}
-          {isEquipped && (() => {
-            // 2026-05-26 OTA-056 — when a two-handed weapon is equipped,
-            // show "EQUIPPED (two-handed)" so the player sees in the
-            // inventory list that the weapon is taking BOTH hands.
-            // Matches the off-hand mirror on the Character Screen.
-            const w = findWeaponByName(item.name);
-            const twoHanded = w?.style === 'two_handed';
-            return (
-              <Text style={styles.rowEquipped}>
-                EQUIPPED{twoHanded ? ' (two-handed)' : ''}
-              </Text>
-            );
-          })()}
+          {isEquipped && (
+            // 2026-05-26 OTA-056 — show the slot the item occupies so the
+            // player sees it at a glance: weapons read "(main hand)" /
+            // "(off hand)" / "(both hands)" / "(two-handed)"; armor reads
+            // its slot label. Computed in the parent (equippedSlotLabelFor).
+            <Text style={styles.rowEquipped}>
+              EQUIPPED{equippedSlotLabel ? ` (${equippedSlotLabel})` : ''}
+            </Text>
+          )}
         </View>
         {/* arb87 — at-a-glance stat line for EVERY item ("so you know what
             you're picking"). Pulls the same preview stats the details modal

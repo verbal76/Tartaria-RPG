@@ -7,6 +7,21 @@
 // a colon — "resist:slashing", "vulnerable:burn". Unknown ids are ignored,
 // so the catalog can drift ahead of code without breaking saves.
 
+// arb-fix — flying / hovering enemies the dog can't reach (it can't jump
+// that high), and that ranged "+Nd6 against airborne enemies" weapons get a
+// bonus against. Primary signal is the explicit `aerial` trait; a name/type
+// fallback catches drones / bats authored before the trait existed.
+export function enemyIsAerial(enemy: {
+  traits?: readonly string[];
+  name?: string;
+  type?: string;
+} | null | undefined): boolean {
+  if (!enemy) return false;
+  if ((enemy.traits ?? []).some((t) => /^aerial$|flying|airborne/i.test(t))) return true;
+  const sig = `${enemy.name ?? ''} ${enemy.type ?? ''}`.toLowerCase();
+  return /\bdrone\b|\bbat\b|flying|airborne|wyvern|harpy|aetherwing/.test(sig);
+}
+
 /** Stat-style modifiers — applied to enemy AC / attack rolls. */
 export function traitACBonus(traits: readonly string[] | undefined): number {
   if (!traits) return 0;

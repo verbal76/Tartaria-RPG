@@ -23,6 +23,7 @@ import { findCatalogItem } from '../engine/crafting';
 import { isOversized } from '../engine/portability';
 import { playerHasScannerEquipped } from '../engine/equipment';
 import { searchRequirementFor, inventoryHasGate } from '../engine/itemEffect';
+import { enemyIsAerial } from '../engine/enemyTraits';
 import { findGearByName, findMaterialByName, findExplorationItemByName } from '../engine/crafting';
 import { ApproachModal } from '../components/ApproachModal';
 import { TutorialTarget } from '../components/TutorialTarget';
@@ -339,12 +340,22 @@ export function ExplorationScreen() {
   // filter which strips empty + climbed: markers before the same
   // .some() check.
   const isFuzzyConsumed = (chipNoun: string, pool: Set<string>): boolean => {
-    const chipLower = chipNoun.toLowerCase();
+    // arb-fix — apostrophe-insensitive. A possessive scene feature like
+    // "Zharak's Teeth Spire" gets stored consumed as the parser-normalized
+    // "zharak teeth spire" (no 's), but the chip noun keeps the apostrophe —
+    // and "zharak's teeth spire".includes("zharak teeth spire") is FALSE
+    // because of the "'s". So the chip never greyed and the player re-tapped a
+    // live SALVAGE/INVESTIGATE chip getting "already examined" forever. Strip
+    // apostrophes from BOTH sides before the substring compare.
+    const norm = (s: string) => s.toLowerCase().replace(/['’]/g, '');
+    const chipLower = norm(chipNoun);
     for (const entry of pool) {
       if (entry.length === 0) continue;
-      if (entry === chipLower) return true;
-      if (chipLower.includes(entry)) return true;
-      if (entry.includes(chipLower)) return true;
+      const e = norm(entry);
+      if (e.length === 0) continue;
+      if (e === chipLower) return true;
+      if (chipLower.includes(e)) return true;
+      if (e.includes(chipLower)) return true;
     }
     return false;
   };
@@ -876,11 +887,25 @@ export function ExplorationScreen() {
               hp: player.golem.hp,
               hpMax: player.golem.hpMax,
             } : null}
-            dog={player?.dog && player.dog.status === 'with_player' ? {
-              name: player.dog.name,
-              hp: player.dog.hp,
-              hpMax: player.dog.hpMax,
-            } : null}
+            // arb-fix — keep the dog in the combat arsenal whenever it's a
+            // living companion, INCLUDING when benched at a climb base
+            // (waiting_at_base). dogBlocked tells InputBox to buzz + let the
+            // engine explain instead of opening the BITE/DISTRACT picker.
+            dog={player?.dog
+              && player.dog.hp > 0
+              && (player.dog.status === 'with_player' || player.dog.status === 'waiting_at_base')
+              ? { name: player.dog.name, hp: player.dog.hp, hpMax: player.dog.hpMax }
+              : null}
+            dogBlocked={(() => {
+              const d = player?.dog;
+              if (!d || d.hp <= 0) return null;
+              // Benched at the base of a climb — can't follow you up.
+              if (d.status === 'waiting_at_base') return 'elevated';
+              // At your side, but the active target flies out of reach.
+              const activeEnemy = currentScene?.enemies?.[activeIdx];
+              if (d.status === 'with_player' && enemyIsAerial(activeEnemy)) return 'aerial';
+              return null;
+            })()}
             travelTargetName={(() => {
               if (!player?.travelTarget) return null;
               // eslint-disable-next-line @typescript-eslint/no-require-imports

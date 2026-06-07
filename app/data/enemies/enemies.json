@@ -7,9 +7,20 @@
     "damage": "2D6",
     "hp": 20,
     "rarity": "Common",
-    "loot": ["Boar Hide", "Aether Mud"],
-    "aliases": ["boar", "pig", "hog", "the boar"],
-    "traits": ["savage", "ambush_strike"]
+    "loot": [
+      "Boar Hide",
+      "Aether Mud"
+    ],
+    "aliases": [
+      "boar",
+      "pig",
+      "hog",
+      "the boar"
+    ],
+    "traits": [
+      "savage",
+      "ambush_strike"
+    ]
   },
   {
     "name": "Mud Wasp",
@@ -19,8 +30,14 @@
     "damage": "1D6",
     "hp": 10,
     "rarity": "Common",
-    "loot": ["Wasp Venom", "Aether Residue"],
-    "traits": ["quick", "venomous"]
+    "loot": [
+      "Wasp Venom",
+      "Aether Residue"
+    ],
+    "traits": [
+      "quick",
+      "venomous"
+    ]
   },
   {
     "name": "Swamp Crab",
@@ -30,8 +47,15 @@
     "damage": "1D6",
     "hp": 15,
     "rarity": "Common",
-    "loot": ["Crab Meat", "Swamp Shell"],
-    "traits": ["armored", "slow", "resist:piercing"]
+    "loot": [
+      "Crab Meat",
+      "Swamp Shell"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "resist:piercing"
+    ]
   },
   {
     "name": "Gutter Rat",
@@ -41,9 +65,19 @@
     "damage": "1D6",
     "hp": 8,
     "rarity": "Common",
-    "loot": ["Rat Fur", "Disease Sample"],
-    "aliases": ["rat", "rodent", "vermin", "the rat"],
-    "traits": ["quick"]
+    "loot": [
+      "Rat Fur",
+      "Disease Sample"
+    ],
+    "aliases": [
+      "rat",
+      "rodent",
+      "vermin",
+      "the rat"
+    ],
+    "traits": [
+      "quick"
+    ]
   },
   {
     "name": "Bog Hound",
@@ -53,9 +87,21 @@
     "damage": "1D6",
     "hp": 18,
     "rarity": "Common",
-    "loot": ["Hound Fur", "Aetheric Teeth"],
-    "aliases": ["hound", "dog", "wolf", "the hound", "the dog"],
-    "traits": ["quick", "savage"]
+    "loot": [
+      "Hound Fur",
+      "Aetheric Teeth"
+    ],
+    "aliases": [
+      "hound",
+      "dog",
+      "wolf",
+      "the hound",
+      "the dog"
+    ],
+    "traits": [
+      "quick",
+      "savage"
+    ]
   },
   {
     "name": "Mudling",
@@ -65,9 +111,19 @@
     "damage": "1D6",
     "hp": 18,
     "rarity": "Common",
-    "loot": ["Aetheric Sludge", "Minor Relic"],
-    "aliases": ["mudling", "imp", "the mudling", "mud thing"],
-    "traits": ["quick"]
+    "loot": [
+      "Aetheric Sludge",
+      "Minor Relic"
+    ],
+    "aliases": [
+      "mudling",
+      "imp",
+      "the mudling",
+      "mud thing"
+    ],
+    "traits": [
+      "quick"
+    ]
   },
   {
     "name": "Aetheric Ooze",
@@ -77,9 +133,21 @@
     "damage": "1D10",
     "hp": 12,
     "rarity": "Common",
-    "loot": ["Ooze Residue", "Aether Crystal"],
-    "aliases": ["ooze", "slime", "the ooze", "blob"],
-    "traits": ["regenerate", "vulnerable:burn", "resist:slashing"]
+    "loot": [
+      "Ooze Residue",
+      "Aether Crystal"
+    ],
+    "aliases": [
+      "ooze",
+      "slime",
+      "the ooze",
+      "blob"
+    ],
+    "traits": [
+      "regenerate",
+      "vulnerable:burn",
+      "resist:slashing"
+    ]
   },
   {
     "name": "Aetherbat",
@@ -89,9 +157,21 @@
     "damage": "1D6",
     "hp": 15,
     "rarity": "Common",
-    "loot": ["Aetherwing", "Crystalline Echo"],
-    "aliases": ["bat", "aether bat", "the bat", "flying thing"],
-    "traits": ["quick", "agile"]
+    "loot": [
+      "Aetherwing",
+      "Crystalline Echo"
+    ],
+    "aliases": [
+      "bat",
+      "aether bat",
+      "the bat",
+      "flying thing"
+    ],
+    "traits": [
+      "quick",
+      "agile",
+      "aerial"
+    ]
   },
   {
     "name": "Mud Strider",
@@ -101,8 +181,14 @@
     "damage": "2D6",
     "hp": 20,
     "rarity": "Common",
-    "loot": ["Strider Leg", "Aether Residue"],
-    "traits": ["quick", "ambush_strike"]
+    "loot": [
+      "Strider Leg",
+      "Aether Residue"
+    ],
+    "traits": [
+      "quick",
+      "ambush_strike"
+    ]
   },
   {
     "name": "Aetheric Leech",
@@ -112,8 +198,14 @@
     "damage": "1D10 Aetheric",
     "hp": 16,
     "rarity": "Common",
-    "loot": ["Aetheric Blood", "Leech Mucus"],
-    "traits": ["bleeder", "vulnerable:burn"]
+    "loot": [
+      "Aetheric Blood",
+      "Leech Mucus"
+    ],
+    "traits": [
+      "bleeder",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Mud Tortoise",
@@ -123,8 +215,16 @@
     "damage": "2D6",
     "hp": 25,
     "rarity": "Common",
-    "loot": ["Tortoise Shell", "Mud Fragment"],
-    "traits": ["armored", "slow", "resist:slashing", "resist:piercing"]
+    "loot": [
+      "Tortoise Shell",
+      "Mud Fragment"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "resist:slashing",
+      "resist:piercing"
+    ]
   },
   {
     "name": "Aetheric Spider",
@@ -134,9 +234,22 @@
     "damage": "1D6",
     "hp": 12,
     "rarity": "Common",
-    "loot": ["Spider Silk", "Aether Venom"],
-    "aliases": ["spider", "aether spider", "the spider", "web spinner", "webber"],
-    "traits": ["quick", "ambush_strike", "venomous"]
+    "loot": [
+      "Spider Silk",
+      "Aether Venom"
+    ],
+    "aliases": [
+      "spider",
+      "aether spider",
+      "the spider",
+      "web spinner",
+      "webber"
+    ],
+    "traits": [
+      "quick",
+      "ambush_strike",
+      "venomous"
+    ]
   },
   {
     "name": "Scrap Drone",
@@ -146,9 +259,24 @@
     "damage": "2D6",
     "hp": 15,
     "rarity": "Common",
-    "loot": ["Drone Processor", "Aetheric Cog"],
-    "aliases": ["drone", "robot", "machine", "the drone", "automaton"],
-    "traits": ["armored", "resist:piercing", "vulnerable:burn"]
+    "loot": [
+      "Drone Processor",
+      "Aetheric Cog",
+      "Blank Runecaster Casing (Common)"
+    ],
+    "aliases": [
+      "drone",
+      "robot",
+      "machine",
+      "the drone",
+      "automaton"
+    ],
+    "traits": [
+      "armored",
+      "resist:piercing",
+      "vulnerable:burn",
+      "aerial"
+    ]
   },
   {
     "name": "Aetheric Worm",
@@ -158,8 +286,14 @@
     "damage": "2D6",
     "hp": 18,
     "rarity": "Common",
-    "loot": ["Worm Mucus", "Aether Acid"],
-    "traits": ["regenerate", "vulnerable:burn"]
+    "loot": [
+      "Worm Mucus",
+      "Aether Acid"
+    ],
+    "traits": [
+      "regenerate",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Mud Imp",
@@ -169,8 +303,14 @@
     "damage": "1D6",
     "hp": 14,
     "rarity": "Common",
-    "loot": ["Imp Horn", "Aether Residue"],
-    "traits": ["quick", "ambush_strike"]
+    "loot": [
+      "Imp Horn",
+      "Aether Residue"
+    ],
+    "traits": [
+      "quick",
+      "ambush_strike"
+    ]
   },
   {
     "name": "Aetheric Slug",
@@ -180,8 +320,15 @@
     "damage": "1D6",
     "hp": 12,
     "rarity": "Common",
-    "loot": ["Slug Slime", "Aetheric Residue"],
-    "traits": ["slow", "regenerate", "vulnerable:burn"]
+    "loot": [
+      "Slug Slime",
+      "Aetheric Residue"
+    ],
+    "traits": [
+      "slow",
+      "regenerate",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Mud Spider",
@@ -191,9 +338,21 @@
     "damage": "2D6",
     "hp": 18,
     "rarity": "Common",
-    "aliases": ["spider", "mud crawler", "the spider", "crawler"],
-    "loot": ["Spider Silk", "Mud Poison"],
-    "traits": ["quick", "venomous", "ambush_strike"]
+    "aliases": [
+      "spider",
+      "mud crawler",
+      "the spider",
+      "crawler"
+    ],
+    "loot": [
+      "Spider Silk",
+      "Mud Poison"
+    ],
+    "traits": [
+      "quick",
+      "venomous",
+      "ambush_strike"
+    ]
   },
   {
     "name": "Aetheric Raven",
@@ -203,9 +362,20 @@
     "damage": "1D6",
     "hp": 18,
     "rarity": "Common",
-    "loot": ["Raven Feather", "Aether Wing"],
-    "aliases": ["raven", "crow", "bird", "the raven"],
-    "traits": ["quick", "agile"]
+    "loot": [
+      "Raven Feather",
+      "Aether Wing"
+    ],
+    "aliases": [
+      "raven",
+      "crow",
+      "bird",
+      "the raven"
+    ],
+    "traits": [
+      "quick",
+      "agile"
+    ]
   },
   {
     "name": "Mud Lurker",
@@ -215,9 +385,19 @@
     "damage": "2D6",
     "hp": 25,
     "rarity": "Uncommon",
-    "loot": ["Aetheric Mud Fragment", "Relic Key"],
-    "aliases": ["lurker", "mud thing", "the lurker"],
-    "traits": ["ambush_strike", "armored"]
+    "loot": [
+      "Aetheric Mud Fragment",
+      "Relic Key"
+    ],
+    "aliases": [
+      "lurker",
+      "mud thing",
+      "the lurker"
+    ],
+    "traits": [
+      "ambush_strike",
+      "armored"
+    ]
   },
   {
     "name": "Silt Serpent",
@@ -227,9 +407,21 @@
     "damage": "2D10",
     "hp": 30,
     "rarity": "Uncommon",
-    "loot": ["Serpent Fang", "Mud Essence"],
-    "aliases": ["serpent", "snake", "the serpent", "silt snake"],
-    "traits": ["quick", "venomous", "bleeder"]
+    "loot": [
+      "Serpent Fang",
+      "Mud Essence"
+    ],
+    "aliases": [
+      "serpent",
+      "snake",
+      "the serpent",
+      "silt snake"
+    ],
+    "traits": [
+      "quick",
+      "venomous",
+      "bleeder"
+    ]
   },
   {
     "name": "Aetheric Drone",
@@ -239,9 +431,24 @@
     "damage": "2D6",
     "hp": 44,
     "rarity": "Uncommon",
-    "loot": ["Drone Core", "Energy Fragment"],
-    "aliases": ["drone", "aether drone", "machine", "the drone"],
-    "traits": ["armored", "resist:piercing", "resist:slashing", "vulnerable:burn"]
+    "loot": [
+      "Drone Core",
+      "Energy Fragment",
+      "Blank Runecaster Casing (Uncommon)"
+    ],
+    "aliases": [
+      "drone",
+      "aether drone",
+      "machine",
+      "the drone"
+    ],
+    "traits": [
+      "armored",
+      "resist:piercing",
+      "resist:slashing",
+      "vulnerable:burn",
+      "aerial"
+    ]
   },
   {
     "name": "Silt Stalker",
@@ -251,8 +458,15 @@
     "damage": "2D6",
     "hp": 38,
     "rarity": "Uncommon",
-    "loot": ["Stalker Hide", "Silt Core"],
-    "traits": ["quick", "ambush_strike", "bleeder"]
+    "loot": [
+      "Stalker Hide",
+      "Silt Core"
+    ],
+    "traits": [
+      "quick",
+      "ambush_strike",
+      "bleeder"
+    ]
   },
   {
     "name": "Mud Viper",
@@ -262,8 +476,15 @@
     "damage": "2D6",
     "hp": 51,
     "rarity": "Uncommon",
-    "loot": ["Viper Venom", "Aetheric Fang"],
-    "traits": ["quick", "venomous", "ambush_strike"]
+    "loot": [
+      "Viper Venom",
+      "Aetheric Fang"
+    ],
+    "traits": [
+      "quick",
+      "venomous",
+      "ambush_strike"
+    ]
   },
   {
     "name": "Dust Fiend",
@@ -273,8 +494,15 @@
     "damage": "2D6",
     "hp": 47,
     "rarity": "Uncommon",
-    "loot": ["Aetheric Dust", "Tornado Core"],
-    "traits": ["quick", "agile", "resist:slashing"]
+    "loot": [
+      "Aetheric Dust",
+      "Tornado Core"
+    ],
+    "traits": [
+      "quick",
+      "agile",
+      "resist:slashing"
+    ]
   },
   {
     "name": "Rust Lurker",
@@ -284,9 +512,22 @@
     "damage": "2D6",
     "hp": 55,
     "rarity": "Uncommon",
-    "loot": ["Rusted Parts", "Scrap Metal"],
-    "aliases": ["lurker", "rust thing", "the lurker", "rusted thing"],
-    "traits": ["armored", "ambush_strike", "vulnerable:burn"]
+    "loot": [
+      "Rusted Parts",
+      "Scrap Metal",
+      "Blank Runecaster Casing (Uncommon)"
+    ],
+    "aliases": [
+      "lurker",
+      "rust thing",
+      "the lurker",
+      "rusted thing"
+    ],
+    "traits": [
+      "armored",
+      "ambush_strike",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Bog Creeper",
@@ -296,8 +537,15 @@
     "damage": "2D6",
     "hp": 58,
     "rarity": "Uncommon",
-    "loot": ["Creeper Vine", "Aetheric Moss"],
-    "traits": ["regenerate", "vulnerable:burn", "bleeder"]
+    "loot": [
+      "Creeper Vine",
+      "Aetheric Moss"
+    ],
+    "traits": [
+      "regenerate",
+      "vulnerable:burn",
+      "bleeder"
+    ]
   },
   {
     "name": "Mud Hound Alpha",
@@ -307,8 +555,16 @@
     "damage": "2D6",
     "hp": 60,
     "rarity": "Uncommon",
-    "loot": ["Alpha Fur", "Aether Fang"],
-    "traits": ["savage", "quick", "ambush_strike", "bleeder"]
+    "loot": [
+      "Alpha Fur",
+      "Aether Fang"
+    ],
+    "traits": [
+      "savage",
+      "quick",
+      "ambush_strike",
+      "bleeder"
+    ]
   },
   {
     "name": "Plague Moth",
@@ -318,8 +574,14 @@
     "damage": "1D6 Poison",
     "hp": 51,
     "rarity": "Uncommon",
-    "loot": ["Moth Wing", "Poison Dust"],
-    "traits": ["agile", "venomous"]
+    "loot": [
+      "Moth Wing",
+      "Poison Dust"
+    ],
+    "traits": [
+      "agile",
+      "venomous"
+    ]
   },
   {
     "name": "Aetheric Salamander",
@@ -329,8 +591,14 @@
     "damage": "2D6",
     "hp": 66,
     "rarity": "Uncommon",
-    "loot": ["Salamander Scale", "Fire Essence"],
-    "traits": ["resist:burn", "vulnerable:bludgeoning"]
+    "loot": [
+      "Salamander Scale",
+      "Fire Essence"
+    ],
+    "traits": [
+      "resist:burn",
+      "vulnerable:bludgeoning"
+    ]
   },
   {
     "name": "Aetheric Scarab",
@@ -340,8 +608,14 @@
     "damage": "2D6",
     "hp": 58,
     "rarity": "Uncommon",
-    "loot": ["Scarab Shell", "Aether Gem"],
-    "traits": ["armored", "resist:piercing"]
+    "loot": [
+      "Scarab Shell",
+      "Aether Gem"
+    ],
+    "traits": [
+      "armored",
+      "resist:piercing"
+    ]
   },
   {
     "name": "Aetheric Shrike",
@@ -351,8 +625,15 @@
     "damage": "2D6",
     "hp": 47,
     "rarity": "Uncommon",
-    "loot": ["Shrike Claw", "Aether Feather"],
-    "traits": ["quick", "agile", "bleeder"]
+    "loot": [
+      "Shrike Claw",
+      "Aether Feather"
+    ],
+    "traits": [
+      "quick",
+      "agile",
+      "bleeder"
+    ]
   },
   {
     "name": "Iron Spider",
@@ -362,8 +643,17 @@
     "damage": "2D6",
     "hp": 39,
     "rarity": "Uncommon",
-    "loot": ["Iron Fangs", "Spider Mechanism"],
-    "traits": ["armored", "quick", "resist:piercing", "vulnerable:burn"]
+    "loot": [
+      "Iron Fangs",
+      "Spider Mechanism",
+      "Blank Runecaster Casing (Uncommon)"
+    ],
+    "traits": [
+      "armored",
+      "quick",
+      "resist:piercing",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Mud Spirit",
@@ -373,8 +663,15 @@
     "damage": "2D6 Psychic",
     "hp": 61,
     "rarity": "Uncommon",
-    "loot": ["Spirit Residue", "Mud Essence"],
-    "traits": ["resist:slashing", "resist:piercing", "vulnerable:aetheric"]
+    "loot": [
+      "Spirit Residue",
+      "Mud Essence"
+    ],
+    "traits": [
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:aetheric"
+    ]
   },
   {
     "name": "Mud Harpy",
@@ -384,8 +681,15 @@
     "damage": "2D6",
     "hp": 76,
     "rarity": "Uncommon",
-    "loot": ["Harpy Feather", "Mud Fragment"],
-    "traits": ["quick", "agile", "ambush_strike"]
+    "loot": [
+      "Harpy Feather",
+      "Mud Fragment"
+    ],
+    "traits": [
+      "quick",
+      "agile",
+      "ambush_strike"
+    ]
   },
   {
     "name": "Shifting Shade",
@@ -395,8 +699,17 @@
     "damage": "2D6",
     "hp": 100,
     "rarity": "Rare",
-    "loot": ["Aetheric Cloth", "Shadow Core"],
-    "traits": ["quick", "agile", "ambush_strike", "resist:slashing", "vulnerable:burn"]
+    "loot": [
+      "Aetheric Cloth",
+      "Shadow Core"
+    ],
+    "traits": [
+      "quick",
+      "agile",
+      "ambush_strike",
+      "resist:slashing",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Mud Golem",
@@ -406,8 +719,17 @@
     "damage": "2D10",
     "hp": 122,
     "rarity": "Rare",
-    "loot": ["Golem Core", "Mudstone"],
-    "traits": ["armored", "slow", "resist:slashing", "resist:piercing", "vulnerable:bludgeoning"]
+    "loot": [
+      "Golem Core",
+      "Mudstone"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:bludgeoning"
+    ]
   },
   {
     "name": "Aetheric Hound",
@@ -417,8 +739,16 @@
     "damage": "2D10 Aetheric",
     "hp": 115,
     "rarity": "Rare",
-    "loot": ["Aetheric Pelt", "Fragmented Aether"],
-    "traits": ["savage", "quick", "ambush_strike", "vulnerable:burn"]
+    "loot": [
+      "Aetheric Pelt",
+      "Fragmented Aether"
+    ],
+    "traits": [
+      "savage",
+      "quick",
+      "ambush_strike",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Mud Siren",
@@ -428,8 +758,15 @@
     "damage": "2D6 Psychic",
     "hp": 142,
     "rarity": "Rare",
-    "loot": ["Siren Scale", "Aetheric Shard"],
-    "traits": ["concussive", "resist:slashing", "vulnerable:aetheric"]
+    "loot": [
+      "Siren Scale",
+      "Aetheric Shard"
+    ],
+    "traits": [
+      "concussive",
+      "resist:slashing",
+      "vulnerable:aetheric"
+    ]
   },
   {
     "name": "Aetheric Apparition",
@@ -439,8 +776,16 @@
     "damage": "2D6",
     "hp": 131,
     "rarity": "Rare",
-    "loot": ["Ghostly Remnant", "Aetheric Cloth"],
-    "traits": ["agile", "resist:slashing", "resist:piercing", "vulnerable:aetheric"]
+    "loot": [
+      "Ghostly Remnant",
+      "Aetheric Cloth"
+    ],
+    "traits": [
+      "agile",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:aetheric"
+    ]
   },
   {
     "name": "Steam Walker",
@@ -450,8 +795,17 @@
     "damage": "2D10",
     "hp": 134,
     "rarity": "Rare",
-    "loot": ["Gears", "Aether Engine"],
-    "traits": ["armored", "slow", "resist:piercing", "vulnerable:bludgeoning"]
+    "loot": [
+      "Gears",
+      "Aether Engine",
+      "Blank Runecaster Casing (Rare)"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "resist:piercing",
+      "vulnerable:bludgeoning"
+    ]
   },
   {
     "name": "Rock Basilisk",
@@ -461,8 +815,16 @@
     "damage": "2D10",
     "hp": 155,
     "rarity": "Rare",
-    "loot": ["Basilisk Eye", "Stone Fragment"],
-    "traits": ["armored", "concussive", "resist:slashing", "resist:piercing"]
+    "loot": [
+      "Basilisk Eye",
+      "Stone Fragment"
+    ],
+    "traits": [
+      "armored",
+      "concussive",
+      "resist:slashing",
+      "resist:piercing"
+    ]
   },
   {
     "name": "Steel Hound",
@@ -472,8 +834,18 @@
     "damage": "2D6",
     "hp": 118,
     "rarity": "Rare",
-    "loot": ["Hound Processor", "Gear Box"],
-    "traits": ["armored", "quick", "savage", "resist:piercing", "vulnerable:burn"]
+    "loot": [
+      "Hound Processor",
+      "Gear Box",
+      "Blank Runecaster Casing (Rare)"
+    ],
+    "traits": [
+      "armored",
+      "quick",
+      "savage",
+      "resist:piercing",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Shifting Phantom",
@@ -483,8 +855,17 @@
     "damage": "2D6",
     "hp": 133,
     "rarity": "Rare",
-    "loot": ["Aether Veil", "Phantom Core"],
-    "traits": ["quick", "agile", "resist:slashing", "resist:piercing", "vulnerable:aetheric"]
+    "loot": [
+      "Aether Veil",
+      "Phantom Core"
+    ],
+    "traits": [
+      "quick",
+      "agile",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:aetheric"
+    ]
   },
   {
     "name": "Flesh Weaver",
@@ -494,8 +875,16 @@
     "damage": "3D10",
     "hp": 139,
     "rarity": "Rare",
-    "loot": ["Flesh Shard", "Aetheric Thread"],
-    "traits": ["savage", "bleeder", "regenerate", "vulnerable:burn"]
+    "loot": [
+      "Flesh Shard",
+      "Aetheric Thread"
+    ],
+    "traits": [
+      "savage",
+      "bleeder",
+      "regenerate",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Jade Serpent",
@@ -505,8 +894,15 @@
     "damage": "2D10",
     "hp": 134,
     "rarity": "Rare",
-    "loot": ["Serpent Scale", "Aether Poison"],
-    "traits": ["quick", "venomous", "ambush_strike"]
+    "loot": [
+      "Serpent Scale",
+      "Aether Poison"
+    ],
+    "traits": [
+      "quick",
+      "venomous",
+      "ambush_strike"
+    ]
   },
   {
     "name": "Mud Cyclops",
@@ -516,8 +912,15 @@
     "damage": "3D6",
     "hp": 140,
     "rarity": "Rare",
-    "loot": ["Cyclops Eye", "Mudstone"],
-    "traits": ["savage", "slow", "concussive"]
+    "loot": [
+      "Cyclops Eye",
+      "Mudstone"
+    ],
+    "traits": [
+      "savage",
+      "slow",
+      "concussive"
+    ]
   },
   {
     "name": "Crystalline Entity",
@@ -527,8 +930,16 @@
     "damage": "2D10",
     "hp": 134,
     "rarity": "Rare",
-    "loot": ["Crystal Core", "Aetheric Gem"],
-    "traits": ["armored", "slow", "resist:piercing", "vulnerable:bludgeoning"]
+    "loot": [
+      "Crystal Core",
+      "Aetheric Gem"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "resist:piercing",
+      "vulnerable:bludgeoning"
+    ]
   },
   {
     "name": "Aether Serpent",
@@ -538,8 +949,15 @@
     "damage": "2D10",
     "hp": 130,
     "rarity": "Rare",
-    "loot": ["Serpent Coil", "Aetheric Fang"],
-    "traits": ["quick", "concussive", "ambush_strike"]
+    "loot": [
+      "Serpent Coil",
+      "Aetheric Fang"
+    ],
+    "traits": [
+      "quick",
+      "concussive",
+      "ambush_strike"
+    ]
   },
   {
     "name": "Steam Golem",
@@ -549,8 +967,18 @@
     "damage": "3D6",
     "hp": 142,
     "rarity": "Rare",
-    "loot": ["Steam Core", "Golem Fragment"],
-    "traits": ["armored", "slow", "savage", "resist:piercing", "vulnerable:bludgeoning"]
+    "loot": [
+      "Steam Core",
+      "Golem Fragment",
+      "Blank Runecaster Casing (Rare)"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "savage",
+      "resist:piercing",
+      "vulnerable:bludgeoning"
+    ]
   },
   {
     "name": "Aetheric Harpy",
@@ -560,8 +988,15 @@
     "damage": "2D6 Psychic",
     "hp": 158,
     "rarity": "Rare",
-    "loot": ["Harpy Feather", "Aether Wing"],
-    "traits": ["quick", "agile", "concussive"]
+    "loot": [
+      "Harpy Feather",
+      "Aether Wing"
+    ],
+    "traits": [
+      "quick",
+      "agile",
+      "concussive"
+    ]
   },
   {
     "name": "Clockwork Knight",
@@ -571,8 +1006,18 @@
     "damage": "3D6",
     "hp": 144,
     "rarity": "Rare",
-    "loot": ["Knight Armor", "Clockwork Core"],
-    "traits": ["armored", "savage", "resist:slashing", "resist:piercing", "vulnerable:burn"]
+    "loot": [
+      "Knight Armor",
+      "Clockwork Core",
+      "Blank Runecaster Casing (Rare)"
+    ],
+    "traits": [
+      "armored",
+      "savage",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Mud Wraith",
@@ -582,8 +1027,17 @@
     "damage": "3D6 Aetheric",
     "hp": 102,
     "rarity": "Rare",
-    "loot": ["Wraith Essence", "Mud Remains"],
-    "traits": ["agile", "ambush_strike", "resist:slashing", "resist:piercing", "vulnerable:aetheric"]
+    "loot": [
+      "Wraith Essence",
+      "Mud Remains"
+    ],
+    "traits": [
+      "agile",
+      "ambush_strike",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:aetheric"
+    ]
   },
   {
     "name": "Aetheric Ghost",
@@ -593,8 +1047,17 @@
     "damage": "2D6 Psychic",
     "hp": 126,
     "rarity": "Rare",
-    "loot": ["Aetheric Fragment", "Spirit Cloth"],
-    "traits": ["agile", "concussive", "resist:slashing", "resist:piercing", "vulnerable:aetheric"]
+    "loot": [
+      "Aetheric Fragment",
+      "Spirit Cloth"
+    ],
+    "traits": [
+      "agile",
+      "concussive",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:aetheric"
+    ]
   },
   {
     "name": "Mud Ogre",
@@ -604,8 +1067,16 @@
     "damage": "3D10",
     "hp": 140,
     "rarity": "Rare",
-    "loot": ["Ogre Club", "Mud Fragment"],
-    "traits": ["savage", "slow", "armored", "concussive"]
+    "loot": [
+      "Ogre Club",
+      "Mud Fragment"
+    ],
+    "traits": [
+      "savage",
+      "slow",
+      "armored",
+      "concussive"
+    ]
   },
   {
     "name": "Stone Warden",
@@ -615,8 +1086,18 @@
     "damage": "3D6",
     "hp": 142,
     "rarity": "Rare",
-    "loot": ["Warden Stone", "Aetheric Key"],
-    "traits": ["armored", "slow", "resist:slashing", "resist:piercing", "vulnerable:bludgeoning"]
+    "loot": [
+      "Warden Stone",
+      "Aetheric Key",
+      "Blank Runecaster Casing (Rare)"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:bludgeoning"
+    ]
   },
   {
     "name": "Golem Knight",
@@ -626,8 +1107,18 @@
     "damage": "3D6",
     "hp": 149,
     "rarity": "Rare",
-    "loot": ["Golem Armor", "Aether Core"],
-    "traits": ["armored", "slow", "savage", "resist:piercing", "vulnerable:burn"]
+    "loot": [
+      "Golem Armor",
+      "Aether Core",
+      "Blank Runecaster Casing (Rare)"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "savage",
+      "resist:piercing",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Aetheric Gargoyle",
@@ -637,8 +1128,17 @@
     "damage": "3D6",
     "hp": 135,
     "rarity": "Rare",
-    "loot": ["Gargoyle Wing", "Aetheric Dust"],
-    "traits": ["armored", "agile", "ambush_strike", "resist:slashing", "vulnerable:bludgeoning"]
+    "loot": [
+      "Gargoyle Wing",
+      "Aetheric Dust"
+    ],
+    "traits": [
+      "armored",
+      "agile",
+      "ambush_strike",
+      "resist:slashing",
+      "vulnerable:bludgeoning"
+    ]
   },
   {
     "name": "Silt Horror",
@@ -648,8 +1148,16 @@
     "damage": "2D10",
     "hp": 136,
     "rarity": "Rare",
-    "loot": ["Horror Tendril", "Aetheric Slime"],
-    "traits": ["savage", "regenerate", "bleeder", "vulnerable:burn"]
+    "loot": [
+      "Horror Tendril",
+      "Aetheric Slime"
+    ],
+    "traits": [
+      "savage",
+      "regenerate",
+      "bleeder",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Aetheric Lion",
@@ -659,8 +1167,16 @@
     "damage": "3D6",
     "hp": 138,
     "rarity": "Rare",
-    "loot": ["Lion Mane", "Aether Core"],
-    "traits": ["savage", "quick", "concussive", "ambush_strike"]
+    "loot": [
+      "Lion Mane",
+      "Aether Core"
+    ],
+    "traits": [
+      "savage",
+      "quick",
+      "concussive",
+      "ambush_strike"
+    ]
   },
   {
     "name": "Mud Serpent",
@@ -670,8 +1186,15 @@
     "damage": "2D10",
     "hp": 133,
     "rarity": "Rare",
-    "loot": ["Serpent Fang", "Mud Essence"],
-    "traits": ["quick", "venomous", "ambush_strike"]
+    "loot": [
+      "Serpent Fang",
+      "Mud Essence"
+    ],
+    "traits": [
+      "quick",
+      "venomous",
+      "ambush_strike"
+    ]
   },
   {
     "name": "Aetheric Cyclops",
@@ -681,8 +1204,16 @@
     "damage": "3D10",
     "hp": 144,
     "rarity": "Rare",
-    "loot": ["Cyclops Eye", "Aetheric Crystal"],
-    "traits": ["slow", "savage", "concussive", "vulnerable:bludgeoning"]
+    "loot": [
+      "Cyclops Eye",
+      "Aetheric Crystal"
+    ],
+    "traits": [
+      "slow",
+      "savage",
+      "concussive",
+      "vulnerable:bludgeoning"
+    ]
   },
   {
     "name": "Steam Spider",
@@ -692,8 +1223,17 @@
     "damage": "2D6",
     "hp": 128,
     "rarity": "Rare",
-    "loot": ["Steam Core", "Spider Legs"],
-    "traits": ["armored", "quick", "resist:piercing", "vulnerable:burn"]
+    "loot": [
+      "Steam Core",
+      "Spider Legs",
+      "Blank Runecaster Casing (Rare)"
+    ],
+    "traits": [
+      "armored",
+      "quick",
+      "resist:piercing",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Aetheric Banshee",
@@ -703,8 +1243,17 @@
     "damage": "3D10 Psychic",
     "hp": 142,
     "rarity": "Rare",
-    "loot": ["Banshee Wail", "Aetheric Hair"],
-    "traits": ["agile", "concussive", "resist:slashing", "resist:piercing", "vulnerable:aetheric"]
+    "loot": [
+      "Banshee Wail",
+      "Aetheric Hair"
+    ],
+    "traits": [
+      "agile",
+      "concussive",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:aetheric"
+    ]
   },
   {
     "name": "Mud Drake",
@@ -714,8 +1263,16 @@
     "damage": "3D6",
     "hp": 138,
     "rarity": "Rare",
-    "loot": ["Drake Scale", "Mud Fragment"],
-    "traits": ["armored", "savage", "regenerate", "resist:slashing"]
+    "loot": [
+      "Drake Scale",
+      "Mud Fragment"
+    ],
+    "traits": [
+      "armored",
+      "savage",
+      "regenerate",
+      "resist:slashing"
+    ]
   },
   {
     "name": "Clockwork Serpent",
@@ -725,8 +1282,18 @@
     "damage": "3D6",
     "hp": 134,
     "rarity": "Rare",
-    "loot": ["Serpent Gear", "Clockwork Core"],
-    "traits": ["armored", "quick", "concussive", "resist:piercing", "vulnerable:burn"]
+    "loot": [
+      "Serpent Gear",
+      "Clockwork Core",
+      "Blank Runecaster Casing (Rare)"
+    ],
+    "traits": [
+      "armored",
+      "quick",
+      "concussive",
+      "resist:piercing",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Silt Guardian",
@@ -736,8 +1303,17 @@
     "damage": "3D6",
     "hp": 132,
     "rarity": "Rare",
-    "loot": ["Silt Heart", "Guardian Key"],
-    "traits": ["armored", "slow", "resist:slashing", "resist:piercing", "vulnerable:bludgeoning"]
+    "loot": [
+      "Silt Heart",
+      "Guardian Key"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:bludgeoning"
+    ]
   },
   {
     "name": "Aetheric Beast",
@@ -747,8 +1323,16 @@
     "damage": "3D6",
     "hp": 136,
     "rarity": "Rare",
-    "loot": ["Beast Fang", "Aether Fur"],
-    "traits": ["savage", "quick", "ambush_strike", "bleeder"]
+    "loot": [
+      "Beast Fang",
+      "Aether Fur"
+    ],
+    "traits": [
+      "savage",
+      "quick",
+      "ambush_strike",
+      "bleeder"
+    ]
   },
   {
     "name": "Architectural Sentinel",
@@ -758,9 +1342,28 @@
     "damage": "3D10",
     "hp": 245,
     "rarity": "Legendary",
-    "loot": ["Sentinel Core", "Relic Shard"],
-    "aliases": ["sentinel", "guardian", "statue", "the sentinel", "construct", "tartarian sentinel"],
-    "traits": ["armored", "slow", "savage", "resist:slashing", "resist:piercing", "vulnerable:burn", "fast_regen"]
+    "loot": [
+      "Sentinel Core",
+      "Relic Shard",
+      "Blank Runecaster Casing (Legendary)"
+    ],
+    "aliases": [
+      "sentinel",
+      "guardian",
+      "statue",
+      "the sentinel",
+      "construct",
+      "tartarian sentinel"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "savage",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:burn",
+      "fast_regen"
+    ]
   },
   {
     "name": "Mud Elemental",
@@ -770,8 +1373,19 @@
     "damage": "4D6",
     "hp": 250,
     "rarity": "Legendary",
-    "loot": ["Elemental Core", "Hardened Aether Mud"],
-    "traits": ["armored", "slow", "concussive", "fast_regen", "resist:slashing", "resist:piercing", "vulnerable:burn"]
+    "loot": [
+      "Elemental Core",
+      "Hardened Aether Mud"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "concussive",
+      "fast_regen",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Aether Golem",
@@ -781,8 +1395,17 @@
     "damage": "3D10",
     "hp": 248,
     "rarity": "Legendary",
-    "loot": ["Aether Core", "Ancient Relic"],
-    "traits": ["armored", "savage", "fast_regen", "resist:slashing", "vulnerable:bludgeoning"]
+    "loot": [
+      "Aether Core",
+      "Ancient Relic"
+    ],
+    "traits": [
+      "armored",
+      "savage",
+      "fast_regen",
+      "resist:slashing",
+      "vulnerable:bludgeoning"
+    ]
   },
   {
     "name": "Bog Dragon",
@@ -792,8 +1415,18 @@
     "damage": "4D10",
     "hp": 255,
     "rarity": "Legendary",
-    "loot": ["Dragon Scale", "Aetheric Breath"],
-    "traits": ["armored", "savage", "fast_regen", "concussive", "resist:slashing", "resist:burn"]
+    "loot": [
+      "Dragon Scale",
+      "Aetheric Breath"
+    ],
+    "traits": [
+      "armored",
+      "savage",
+      "fast_regen",
+      "concussive",
+      "resist:slashing",
+      "resist:burn"
+    ]
   },
   {
     "name": "Metal Hydra",
@@ -803,8 +1436,19 @@
     "damage": "3D10",
     "hp": 250,
     "rarity": "Legendary",
-    "loot": ["Hydra Core", "Aetheric Alloy"],
-    "traits": ["armored", "savage", "fast_regen", "resist:slashing", "resist:piercing", "vulnerable:burn"]
+    "loot": [
+      "Hydra Core",
+      "Aetheric Alloy",
+      "Blank Runecaster Casing (Legendary)"
+    ],
+    "traits": [
+      "armored",
+      "savage",
+      "fast_regen",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Storm Walker",
@@ -814,8 +1458,18 @@
     "damage": "3D6",
     "hp": 240,
     "rarity": "Legendary",
-    "loot": ["Thunder Core", "Aetheric Battery"],
-    "traits": ["armored", "slow", "concussive", "resist:piercing", "vulnerable:bludgeoning"]
+    "loot": [
+      "Thunder Core",
+      "Aetheric Battery",
+      "Blank Runecaster Casing (Legendary)"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "concussive",
+      "resist:piercing",
+      "vulnerable:bludgeoning"
+    ]
   },
   {
     "name": "Aetheric Wyvern",
@@ -825,8 +1479,17 @@
     "damage": "3D6",
     "hp": 245,
     "rarity": "Legendary",
-    "loot": ["Wyvern Scale", "Aether Core"],
-    "traits": ["agile", "savage", "ambush_strike", "fast_regen", "resist:piercing"]
+    "loot": [
+      "Wyvern Scale",
+      "Aether Core"
+    ],
+    "traits": [
+      "agile",
+      "savage",
+      "ambush_strike",
+      "fast_regen",
+      "resist:piercing"
+    ]
   },
   {
     "name": "Mud Titan",
@@ -836,8 +1499,19 @@
     "damage": "4D6",
     "hp": 260,
     "rarity": "Legendary",
-    "loot": ["Titan Core", "Hardened Mudstone"],
-    "traits": ["armored", "slow", "savage", "concussive", "resist:slashing", "resist:piercing", "vulnerable:bludgeoning"]
+    "loot": [
+      "Titan Core",
+      "Hardened Mudstone"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "savage",
+      "concussive",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:bludgeoning"
+    ]
   },
   {
     "name": "Mech Sentinel",
@@ -847,8 +1521,19 @@
     "damage": "3D10",
     "hp": 248,
     "rarity": "Legendary",
-    "loot": ["Sentinel Gears", "Core Relic"],
-    "traits": ["armored", "savage", "fast_regen", "resist:piercing", "resist:slashing", "vulnerable:burn"]
+    "loot": [
+      "Sentinel Gears",
+      "Core Relic",
+      "Blank Runecaster Casing (Legendary)"
+    ],
+    "traits": [
+      "armored",
+      "savage",
+      "fast_regen",
+      "resist:piercing",
+      "resist:slashing",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Mud Elemental Spawn",
@@ -858,8 +1543,18 @@
     "damage": "3D6",
     "hp": 244,
     "rarity": "Legendary",
-    "loot": ["Aetheric Mud Heart", "Elemental Core"],
-    "traits": ["armored", "slow", "regenerate", "resist:slashing", "resist:piercing", "vulnerable:burn"]
+    "loot": [
+      "Aetheric Mud Heart",
+      "Elemental Core"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "regenerate",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Obsidian Sentinel",
@@ -869,8 +1564,19 @@
     "damage": "4D6",
     "hp": 250,
     "rarity": "Legendary",
-    "loot": ["Obsidian Shard", "Sentinel Core"],
-    "traits": ["armored", "slow", "concussive", "fast_regen", "resist:slashing", "resist:piercing"]
+    "loot": [
+      "Obsidian Shard",
+      "Sentinel Core",
+      "Blank Runecaster Casing (Legendary)"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "concussive",
+      "fast_regen",
+      "resist:slashing",
+      "resist:piercing"
+    ]
   },
   {
     "name": "Mud Monarch",
@@ -880,8 +1586,17 @@
     "damage": "3D6",
     "hp": 288,
     "rarity": "Legendary",
-    "loot": ["Monarch Crown", "Aether Core"],
-    "traits": ["savage", "fast_regen", "concussive", "bleeder", "vulnerable:burn"]
+    "loot": [
+      "Monarch Crown",
+      "Aether Core"
+    ],
+    "traits": [
+      "savage",
+      "fast_regen",
+      "concussive",
+      "bleeder",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Stone Chimera",
@@ -891,8 +1606,17 @@
     "damage": "4D6",
     "hp": 298,
     "rarity": "Legendary",
-    "loot": ["Chimera Horn", "Aetheric Core"],
-    "traits": ["armored", "savage", "fast_regen", "resist:slashing", "vulnerable:bludgeoning"]
+    "loot": [
+      "Chimera Horn",
+      "Aetheric Core"
+    ],
+    "traits": [
+      "armored",
+      "savage",
+      "fast_regen",
+      "resist:slashing",
+      "vulnerable:bludgeoning"
+    ]
   },
   {
     "name": "Iron Titan",
@@ -902,8 +1626,21 @@
     "damage": "4D10",
     "hp": 360,
     "rarity": "Legendary",
-    "loot": ["Titan Armor", "Aether Shard"],
-    "traits": ["armored", "slow", "savage", "concussive", "fast_regen", "resist:piercing", "resist:slashing", "vulnerable:burn"]
+    "loot": [
+      "Titan Armor",
+      "Aether Shard",
+      "Blank Runecaster Casing (Legendary)"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "savage",
+      "concussive",
+      "fast_regen",
+      "resist:piercing",
+      "resist:slashing",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Mud Siren Queen",
@@ -913,8 +1650,17 @@
     "damage": "4D6 Psychic",
     "hp": 352,
     "rarity": "Legendary",
-    "loot": ["Aetheric Song", "Siren Crystal"],
-    "traits": ["concussive", "fast_regen", "resist:slashing", "resist:piercing", "vulnerable:aetheric"]
+    "loot": [
+      "Aetheric Song",
+      "Siren Crystal"
+    ],
+    "traits": [
+      "concussive",
+      "fast_regen",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:aetheric"
+    ]
   },
   {
     "name": "Aetheric Guardian",
@@ -924,9 +1670,25 @@
     "damage": "3D6",
     "hp": 345,
     "rarity": "Legendary",
-    "loot": ["Guardian Core", "Aetheric Shield"],
-    "aliases": ["guardian", "the guardian", "aether guardian", "watcher"],
-    "traits": ["armored", "savage", "fast_regen", "concussive", "resist:slashing", "resist:piercing"]
+    "loot": [
+      "Guardian Core",
+      "Aetheric Shield",
+      "Blank Runecaster Casing (Legendary)"
+    ],
+    "aliases": [
+      "guardian",
+      "the guardian",
+      "aether guardian",
+      "watcher"
+    ],
+    "traits": [
+      "armored",
+      "savage",
+      "fast_regen",
+      "concussive",
+      "resist:slashing",
+      "resist:piercing"
+    ]
   },
   {
     "name": "Aetheric Phoenix",
@@ -936,8 +1698,17 @@
     "damage": "4D10",
     "hp": 360,
     "rarity": "Legendary",
-    "loot": ["Phoenix Feather", "Aether Core"],
-    "traits": ["agile", "savage", "fast_regen", "resist:burn", "vulnerable:bludgeoning"]
+    "loot": [
+      "Phoenix Feather",
+      "Aether Core"
+    ],
+    "traits": [
+      "agile",
+      "savage",
+      "fast_regen",
+      "resist:burn",
+      "vulnerable:bludgeoning"
+    ]
   },
   {
     "name": "Sludge Behemoth",
@@ -947,8 +1718,18 @@
     "damage": "3D10",
     "hp": 350,
     "rarity": "Legendary",
-    "loot": ["Behemoth Horn", "Mud Gem"],
-    "traits": ["armored", "slow", "savage", "concussive", "fast_regen", "vulnerable:burn"]
+    "loot": [
+      "Behemoth Horn",
+      "Mud Gem"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "savage",
+      "concussive",
+      "fast_regen",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Aetheric Horror",
@@ -958,8 +1739,16 @@
     "damage": "4D6 Psychic",
     "hp": 346,
     "rarity": "Legendary",
-    "loot": ["Horror Tendril", "Aether Core"],
-    "traits": ["concussive", "bleeder", "fast_regen", "vulnerable:burn"]
+    "loot": [
+      "Horror Tendril",
+      "Aether Core"
+    ],
+    "traits": [
+      "concussive",
+      "bleeder",
+      "fast_regen",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Aetheric Minotaur",
@@ -969,8 +1758,17 @@
     "damage": "4D6",
     "hp": 344,
     "rarity": "Legendary",
-    "loot": ["Minotaur Horn", "Aether Axe"],
-    "traits": ["savage", "armored", "concussive", "bleeder", "vulnerable:burn"]
+    "loot": [
+      "Minotaur Horn",
+      "Aether Axe"
+    ],
+    "traits": [
+      "savage",
+      "armored",
+      "concussive",
+      "bleeder",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Aetheric Leviathan",
@@ -980,8 +1778,18 @@
     "damage": "4D10",
     "hp": 358,
     "rarity": "Legendary",
-    "loot": ["Leviathan Scale", "Aether Pearl"],
-    "traits": ["armored", "savage", "fast_regen", "concussive", "resist:slashing", "resist:piercing"]
+    "loot": [
+      "Leviathan Scale",
+      "Aether Pearl"
+    ],
+    "traits": [
+      "armored",
+      "savage",
+      "fast_regen",
+      "concussive",
+      "resist:slashing",
+      "resist:piercing"
+    ]
   },
   {
     "name": "Mud Leviathan",
@@ -991,8 +1799,18 @@
     "damage": "4D6",
     "hp": 354,
     "rarity": "Legendary",
-    "loot": ["Leviathan Fang", "Mudstone"],
-    "traits": ["armored", "slow", "savage", "fast_regen", "resist:slashing", "vulnerable:burn"]
+    "loot": [
+      "Leviathan Fang",
+      "Mudstone"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "savage",
+      "fast_regen",
+      "resist:slashing",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Aetheric Chimera",
@@ -1002,8 +1820,17 @@
     "damage": "4D6",
     "hp": 356,
     "rarity": "Legendary",
-    "loot": ["Chimera Claw", "Aetheric Heart"],
-    "traits": ["savage", "quick", "ambush_strike", "fast_regen", "bleeder"]
+    "loot": [
+      "Chimera Claw",
+      "Aetheric Heart"
+    ],
+    "traits": [
+      "savage",
+      "quick",
+      "ambush_strike",
+      "fast_regen",
+      "bleeder"
+    ]
   },
   {
     "name": "Mud Demon",
@@ -1013,8 +1840,17 @@
     "damage": "3D10",
     "hp": 345,
     "rarity": "Legendary",
-    "loot": ["Demon Core", "Mud Relic"],
-    "traits": ["savage", "fast_regen", "ambush_strike", "bleeder", "vulnerable:burn"]
+    "loot": [
+      "Demon Core",
+      "Mud Relic"
+    ],
+    "traits": [
+      "savage",
+      "fast_regen",
+      "ambush_strike",
+      "bleeder",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Aetheric Kraken",
@@ -1024,8 +1860,17 @@
     "damage": "4D10",
     "hp": 360,
     "rarity": "Legendary",
-    "loot": ["Kraken Ink", "Aether Core"],
-    "traits": ["savage", "concussive", "fast_regen", "bleeder", "vulnerable:burn"]
+    "loot": [
+      "Kraken Ink",
+      "Aether Core"
+    ],
+    "traits": [
+      "savage",
+      "concussive",
+      "fast_regen",
+      "bleeder",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Mud Lich",
@@ -1035,8 +1880,17 @@
     "damage": "3D10",
     "hp": 342,
     "rarity": "Legendary",
-    "loot": ["Lich Robe", "Aether Skull"],
-    "traits": ["fast_regen", "concussive", "resist:slashing", "resist:piercing", "vulnerable:aetheric"]
+    "loot": [
+      "Lich Robe",
+      "Aether Skull"
+    ],
+    "traits": [
+      "fast_regen",
+      "concussive",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:aetheric"
+    ]
   },
   {
     "name": "Mud Giant",
@@ -1046,8 +1900,18 @@
     "damage": "4D6",
     "hp": 360,
     "rarity": "Legendary",
-    "loot": ["Giant's Club", "Mud Gem"],
-    "traits": ["armored", "slow", "savage", "concussive", "resist:slashing", "vulnerable:bludgeoning"]
+    "loot": [
+      "Giant's Club",
+      "Mud Gem"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "savage",
+      "concussive",
+      "resist:slashing",
+      "vulnerable:bludgeoning"
+    ]
   },
   {
     "name": "Aetheric Necromancer",
@@ -1057,8 +1921,17 @@
     "damage": "3D10",
     "hp": 446,
     "rarity": "Legendary",
-    "loot": ["Necromancer Staff", "Aetheric Scroll"],
-    "traits": ["fast_regen", "concussive", "bleeder", "resist:slashing", "vulnerable:burn"]
+    "loot": [
+      "Necromancer Staff",
+      "Aetheric Scroll"
+    ],
+    "traits": [
+      "fast_regen",
+      "concussive",
+      "bleeder",
+      "resist:slashing",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Aetheric Behemoth",
@@ -1068,9 +1941,25 @@
     "damage": "4D10",
     "hp": 458,
     "rarity": "Legendary",
-    "loot": ["Behemoth Heart", "Behemoth Plate", "Aetheric Shard", "Resurrection Gem"],
-    "aliases": ["behemoth", "the behemoth", "aetheric behemoth"],
-    "traits": ["armored", "savage", "slow", "concussive", "fast_regen", "vulnerable:bludgeoning"],
+    "loot": [
+      "Behemoth Heart",
+      "Behemoth Plate",
+      "Aetheric Shard",
+      "Resurrection Gem"
+    ],
+    "aliases": [
+      "behemoth",
+      "the behemoth",
+      "aetheric behemoth"
+    ],
+    "traits": [
+      "armored",
+      "savage",
+      "slow",
+      "concussive",
+      "fast_regen",
+      "vulnerable:bludgeoning"
+    ],
     "boss": true
   },
   {
@@ -1081,9 +1970,25 @@
     "damage": "3D6 Aetheric",
     "hp": 180,
     "rarity": "Rare",
-    "loot": ["Aetherstone Fragment", "Veil of Peace"],
-    "aliases": ["aetherkin", "undead", "the dead", "risen", "the aetherkin", "the kin"],
-    "traits": ["agile", "ambush_strike", "resist:slashing", "resist:piercing", "vulnerable:burn"]
+    "loot": [
+      "Aetherstone Fragment",
+      "Veil of Peace"
+    ],
+    "aliases": [
+      "aetherkin",
+      "undead",
+      "the dead",
+      "risen",
+      "the aetherkin",
+      "the kin"
+    ],
+    "traits": [
+      "agile",
+      "ambush_strike",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:burn"
+    ]
   },
   {
     "name": "Reclaimer Ambusher",
@@ -1093,9 +1998,21 @@
     "damage": "1D6",
     "hp": 24,
     "rarity": "Uncommon",
-    "aliases": ["ambusher", "reclaimer", "raider", "the ambusher", "scavenger"],
-    "loot": ["Bone Bolt", "Patched Cloth"],
-    "traits": ["quick", "ambush_strike"]
+    "aliases": [
+      "ambusher",
+      "reclaimer",
+      "raider",
+      "the ambusher",
+      "scavenger"
+    ],
+    "loot": [
+      "Bone Bolt",
+      "Patched Cloth"
+    ],
+    "traits": [
+      "quick",
+      "ambush_strike"
+    ]
   },
   {
     "name": "Black Cloak Agent",
@@ -1105,9 +2022,25 @@
     "damage": "2D6",
     "hp": 32,
     "rarity": "Rare",
-    "loot": ["Aether Residue", "Patched Cloth"],
-    "aliases": ["agent", "cloak", "black cloak", "the agent", "monarch agent", "spy", "assassin"],
-    "traits": ["quick", "ambush_strike", "venomous", "bleeder"]
+    "loot": [
+      "Aether Residue",
+      "Patched Cloth"
+    ],
+    "aliases": [
+      "agent",
+      "cloak",
+      "black cloak",
+      "the agent",
+      "monarch agent",
+      "spy",
+      "assassin"
+    ],
+    "traits": [
+      "quick",
+      "ambush_strike",
+      "venomous",
+      "bleeder"
+    ]
   },
   {
     "name": "Aetheric Lich",
@@ -1117,9 +2050,25 @@
     "damage": "3D8 Aetheric",
     "hp": 520,
     "rarity": "Legendary",
-    "loot": ["Lich Phylactery", "Lich-Bone Mantle", "Aetherstone Heart", "Resurrection Gem"],
-    "aliases": ["lich", "the lich", "aetheric lich"],
-    "traits": ["fast_regen", "ambush_strike", "concussive", "resist:slashing", "resist:piercing", "vulnerable:burn"],
+    "loot": [
+      "Lich Phylactery",
+      "Lich-Bone Mantle",
+      "Aetherstone Heart",
+      "Resurrection Gem"
+    ],
+    "aliases": [
+      "lich",
+      "the lich",
+      "aetheric lich"
+    ],
+    "traits": [
+      "fast_regen",
+      "ambush_strike",
+      "concussive",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:burn"
+    ],
     "boss": true
   },
   {
@@ -1130,9 +2079,25 @@
     "damage": "4D8",
     "hp": 640,
     "rarity": "Legendary",
-    "loot": ["Tyrant's Crown", "Mud-Iron Heart", "Resurrection Gem"],
-    "aliases": ["tyrant", "the tyrant", "mud tyrant", "mud king"],
-    "traits": ["armored", "savage", "concussive", "bleeder", "fast_regen", "vulnerable:bludgeoning"],
+    "loot": [
+      "Tyrant's Crown",
+      "Mud-Iron Heart",
+      "Resurrection Gem"
+    ],
+    "aliases": [
+      "tyrant",
+      "the tyrant",
+      "mud tyrant",
+      "mud king"
+    ],
+    "traits": [
+      "armored",
+      "savage",
+      "concussive",
+      "bleeder",
+      "fast_regen",
+      "vulnerable:bludgeoning"
+    ],
     "boss": true
   },
   {
@@ -1143,9 +2108,25 @@
     "damage": "3D10",
     "hp": 580,
     "rarity": "Legendary",
-    "loot": ["Hollow Crown", "Throne Shard", "Resurrection Gem"],
-    "aliases": ["king", "the king", "hollow king", "hollowed king"],
-    "traits": ["armored", "savage", "ambush_strike", "fast_regen", "resist:piercing", "vulnerable:burn"],
+    "loot": [
+      "Hollow Crown",
+      "Throne Shard",
+      "Resurrection Gem"
+    ],
+    "aliases": [
+      "king",
+      "the king",
+      "hollow king",
+      "hollowed king"
+    ],
+    "traits": [
+      "armored",
+      "savage",
+      "ambush_strike",
+      "fast_regen",
+      "resist:piercing",
+      "vulnerable:burn"
+    ],
     "boss": true
   },
   {
@@ -1156,9 +2137,27 @@
     "damage": "4D6",
     "hp": 700,
     "rarity": "Legendary",
-    "loot": ["Worm Plating", "Iron Core", "Resurrection Gem"],
-    "aliases": ["worm", "iron worm", "the worm"],
-    "traits": ["armored", "slow", "savage", "fast_regen", "concussive", "resist:slashing", "resist:piercing", "vulnerable:burn"],
+    "loot": [
+      "Worm Plating",
+      "Iron Core",
+      "Resurrection Gem",
+      "Blank Runecaster Casing (Legendary)"
+    ],
+    "aliases": [
+      "worm",
+      "iron worm",
+      "the worm"
+    ],
+    "traits": [
+      "armored",
+      "slow",
+      "savage",
+      "fast_regen",
+      "concussive",
+      "resist:slashing",
+      "resist:piercing",
+      "vulnerable:burn"
+    ],
     "boss": true
   },
   {
@@ -1169,9 +2168,27 @@
     "damage": "3D8",
     "hp": 540,
     "rarity": "Legendary",
-    "loot": ["Wyrm Fang", "Wyrm-Scale Hide", "Bog-Heart Pearl", "Resurrection Gem"],
-    "aliases": ["wyrm", "the wyrm", "bog wyrm", "serpent"],
-    "traits": ["agile", "quick", "venomous", "bleeder", "fast_regen", "resist:piercing", "vulnerable:burn"],
+    "loot": [
+      "Wyrm Fang",
+      "Wyrm-Scale Hide",
+      "Bog-Heart Pearl",
+      "Resurrection Gem"
+    ],
+    "aliases": [
+      "wyrm",
+      "the wyrm",
+      "bog wyrm",
+      "serpent"
+    ],
+    "traits": [
+      "agile",
+      "quick",
+      "venomous",
+      "bleeder",
+      "fast_regen",
+      "resist:piercing",
+      "vulnerable:burn"
+    ],
     "boss": true
   },
   {
@@ -1182,9 +2199,27 @@
     "damage": "3D8 Aetheric",
     "hp": 560,
     "rarity": "Legendary",
-    "loot": ["Matriarch's Carapace", "Voidspawn Egg", "Resurrection Gem"],
-    "aliases": ["matriarch", "the matriarch", "voidspawn", "voidspawn matriarch", "queen"],
-    "traits": ["armored", "venomous", "bleeder", "fast_regen", "concussive", "resist:burn", "vulnerable:slashing"],
+    "loot": [
+      "Matriarch's Carapace",
+      "Voidspawn Egg",
+      "Resurrection Gem"
+    ],
+    "aliases": [
+      "matriarch",
+      "the matriarch",
+      "voidspawn",
+      "voidspawn matriarch",
+      "queen"
+    ],
+    "traits": [
+      "armored",
+      "venomous",
+      "bleeder",
+      "fast_regen",
+      "concussive",
+      "resist:burn",
+      "vulnerable:slashing"
+    ],
     "boss": true
   },
   {
@@ -1195,9 +2230,25 @@
     "damage": "3D8",
     "hp": 480,
     "rarity": "Legendary",
-    "loot": ["Reaver's Greatsword", "Reaver's Pauldron", "Resurrection Gem"],
-    "aliases": ["reaver", "the reaver", "tartarian reaver"],
-    "traits": ["armored", "savage", "quick", "ambush_strike", "bleeder", "concussive", "vulnerable:piercing"],
+    "loot": [
+      "Reaver's Greatsword",
+      "Reaver's Pauldron",
+      "Resurrection Gem"
+    ],
+    "aliases": [
+      "reaver",
+      "the reaver",
+      "tartarian reaver"
+    ],
+    "traits": [
+      "armored",
+      "savage",
+      "quick",
+      "ambush_strike",
+      "bleeder",
+      "concussive",
+      "vulnerable:piercing"
+    ],
     "boss": true
   },
   {
@@ -1208,9 +2259,21 @@
     "damage": "1D8",
     "hp": 28,
     "rarity": "Uncommon",
-    "loot": ["Patched Cloth", "Aether Residue"],
-    "aliases": ["thief", "silt thief", "the thief", "pendejo"],
-    "traits": ["quick", "ambush_strike", "bleeder"]
+    "loot": [
+      "Patched Cloth",
+      "Aether Residue"
+    ],
+    "aliases": [
+      "thief",
+      "silt thief",
+      "the thief",
+      "pendejo"
+    ],
+    "traits": [
+      "quick",
+      "ambush_strike",
+      "bleeder"
+    ]
   },
   {
     "name": "Disc Hijacker",
@@ -1220,9 +2283,20 @@
     "damage": "2D6",
     "hp": 32,
     "rarity": "Uncommon",
-    "loot": ["Aether Residue", "Patched Cloth"],
-    "aliases": ["hijacker", "disc hijacker", "the hijacker", "mugger"],
-    "traits": ["savage", "concussive"]
+    "loot": [
+      "Aether Residue",
+      "Patched Cloth"
+    ],
+    "aliases": [
+      "hijacker",
+      "disc hijacker",
+      "the hijacker",
+      "mugger"
+    ],
+    "traits": [
+      "savage",
+      "concussive"
+    ]
   },
   {
     "name": "Mud Monarch Purifier",
@@ -1232,8 +2306,20 @@
     "damage": "2D8",
     "hp": 70,
     "rarity": "Rare",
-    "loot": ["Purification Vial", "Aetheric Shard", "Patched Cloth"],
-    "aliases": ["purifier", "the purifier", "monarch purifier", "mud monarch agent"],
-    "traits": ["quick", "resist:aetheric"]
+    "loot": [
+      "Purification Vial",
+      "Aetheric Shard",
+      "Patched Cloth"
+    ],
+    "aliases": [
+      "purifier",
+      "the purifier",
+      "monarch purifier",
+      "mud monarch agent"
+    ],
+    "traits": [
+      "quick",
+      "resist:aetheric"
+    ]
   }
 ]

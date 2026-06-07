@@ -1186,6 +1186,16 @@ export interface WorldMemory {
   /** OTA-120 — set true on the first co-activation of a dog and a
    *  golem in combat, so the "wide arc" flavor only fires once. */
   dogGolemCoActivated?: boolean;
+  /** arb-fix — enemy names the player has already been told the dog
+   *  can't reach (aerial / flying targets). The Arbiter's "{dog} can't
+   *  jump that high" line fires once per enemy name; afterwards tapping
+   *  the dog just buzzes. */
+  dogAerialNoticeShown?: string[];
+  /** arb-fix — set when the "{dog} hasn't learned to climb" joke has
+   *  fired for the current climb (the dog is benched at the base while
+   *  the player is elevated). Cleared when the dog rejoins on descent,
+   *  so each climb gets the joke once; taps still buzz. */
+  dogClimbNoticeShown?: boolean;
   /** OTA-139 — rumor-of-trapped-dog Arbiter hint. Set true after
    *  the hint fires once. Discoverability nudge for players who
    *  pass day 5 without ever tapping a rescue-hook noun (smelter /

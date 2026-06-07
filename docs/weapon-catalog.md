@@ -1,6 +1,6 @@
 # Tartaria Realms — Weapon Catalog (balance reference)
 
-_Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`damageDice`, Type=`damageType`, Stat=scaling `stat`, Style=`style` (one_handed / two_handed / dual_wield / shield / ranged / runecaster), Req=`statRequirement` (min in the scaling stat), Def=`defense` (block/parry value), Dura=`baseDurability`, tc=`tc` (buy). `effect` is free-text; weapons whose effect reads "Grants +X HP" carry a structured hp bonus that raises max HP on equip. Edit the JSON; regenerate after changes._
+_Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`damageDice`, Type=`damageType`, Stat=scaling `stat`, Style=`style`, Req=`statRequirement`, Def=`defense`, Dura=`baseDurability`, tc=`tc` (buy). `effect` is free-text; "Grants +X HP" carries a structured max-HP bonus, and "+NdN against airborne enemies" grants bonus damage vs aerial foes (drones/bats). Edit the JSON; regenerate after changes._
 
 ## Melee (145)
 
@@ -162,7 +162,7 @@ _Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`
 | Bone Throwing Axe | 1d6 | slashing | wisdom | ranged | 3 | 0 | — | Common | giants | 35 | May cause 1d6 bleed over 2 turns; short range. |
 | Compact Blaster | 1d6 | burn | dexterity | dual_wield | 4 | 0 | — | Common | unknowing_masses | 45 | — |
 | Compact Laser Pistol (Ranged) | 1d6 | burn | wisdom | ranged | 4 | 0 | — | Common | unknowing_masses | 40 | Loses accuracy in extreme cold. |
-| Giant Bone Longbow | 1d8 | piercing | strength | two_handed | 4 | 0 | — | Common | giants | 45 | +1d6 damage to creatures of Large size. |
+| Giant Bone Longbow | 1d8 | piercing | strength | two_handed | 4 | 0 | — | Common | giants | 45 | +1d6 damage to creatures of Large size. +1d6 against airborne enemies. |
 | Mud Darts | 1d4 | poison | wisdom | ranged | 2 | 0 | — | Common | mud_dwellers | 30 | Poisoned; weather does not affect effectiveness. |
 | Mud Sling | 1d4 | bludgeoning | wisdom | ranged | 2 | 0 | — | Common | mud_dwellers | 25 | +1d6 against glass or fragile objects. |
 | Mud Throwing Knife | 1d4 | piercing | wisdom | ranged | 1 | 0 | — | Common | mud_dwellers | 20 | Short range; poor performance in rain. |
@@ -172,10 +172,10 @@ _Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`
 | Rust Rifle | 1d8 | piercing | strength | two_handed | 2 | 0 | — | Common | mud_dwellers | 40 | Old, unreliable — may jam on a natural 1 attack roll (even/odd reroll to confirm jam). |
 | Rusty Shortbow | 1d6 | piercing | wisdom | ranged | 2 | 0 | — | Common | mud_dwellers | 30 | Reduced range in bad weather; may jam in mud. |
 | Salvaged Bow | 1d6 | piercing | dexterity | — | — | 0 | — | Common | — | 25 | — |
-| Short Hunting Bow | 1d6 | piercing | wisdom | ranged | 4 | 0 | — | Common | mud_dwellers | 35 | Loses effectiveness in high wind. |
+| Short Hunting Bow | 1d6 | piercing | wisdom | ranged | 4 | 0 | — | Common | mud_dwellers | 35 | Loses effectiveness in high wind. +1d6 against airborne enemies. |
 | Tartarian Hand Spear | 1d6 | piercing | wisdom | ranged | 3 | 0 | — | Common | giants | 35 | Short-range; chance to pin target. |
 | Throwing Knife | 1d4 | piercing | dexterity | ranged | 1 | 0 | — | Common | unknowing_masses | 20 | Short range; weighted for tumble-throw. |
-| Aetheric Longbow | 2d6 | aetheric | wisdom | ranged | 6 | 0 | — | Uncommon | aetheric | 120 | Ignores wind conditions. |
+| Aetheric Longbow | 2d6 | aetheric | wisdom | ranged | 6 | 0 | — | Uncommon | aetheric | 120 | Ignores wind conditions. +1d6 against airborne enemies. |
 | Aetheric Throwing Disk | 1d8 | aetheric | wisdom | ranged | 7 | 0 | — | Uncommon | aetheric | 110 | Returns to wielder on miss; unaffected by wind. |
 | Bolt-Caster | 2d6 | piercing | dexterity | — | — | 0 | 25 | Uncommon | — | 130 | — |
 | Bone Crossbow | 2d6 | piercing | dexterity | — | — | 0 | — | Uncommon | — | 115 | — |
@@ -185,14 +185,14 @@ _Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`
 | Compact Laser Pistol | 1d8 | burn | charisma | single_handed | 7 | 0 | — | Uncommon | unknowing_masses | 115 | Ignores light armor. |
 | Energy Thrower | 2d6 | burn | wisdom | ranged | 7 | 0 | — | Uncommon | unknowing_masses | 135 | Throws plasma grenades; loses power in extreme cold. |
 | Giant Bone Bow | 2d6 | piercing | wisdom | ranged | 6 | 0 | — | Uncommon | giants | 120 | Long-range; +1d6 to Large creatures. |
-| Laser Crossbow | 2d6 | burn | wisdom | ranged | 5 | 0 | — | Uncommon | unknowing_masses | 130 | Accuracy unaffected by weather. |
+| Laser Crossbow | 2d6 | burn | wisdom | ranged | 5 | 0 | — | Uncommon | unknowing_masses | 130 | Accuracy unaffected by weather. +1d6 against airborne enemies. |
 | Mud Hunting Rifle | 2d6 | piercing | wisdom | ranged | 8 | 0 | — | Uncommon | mud_dwellers | 125 | +1d6 against animals; reduced accuracy in rain. |
 | Mud Repeater Crossbow | 2d6 | piercing | wisdom | ranged | 5 | 0 | — | Uncommon | mud_dwellers | 115 | Fires 3 bolts per round; reduced reload in rain. |
 | Mud Spear (Throwing) | 1d8 | piercing | strength | two_handed | 5 | 0 | — | Uncommon | mud_dwellers | 110 | Can be thrown to far range from any other. |
 | Plasma Handgun | 1d8 | burn | dexterity | dual_wield | 8 | 0 | — | Uncommon | unknowing_masses | 135 | Natural 1 → overheat, useless 2 rounds. |
 | Plasma Pistol (Single) | 1d8 | burn | charisma | single_handed | 8 | 0 | — | Uncommon | unknowing_masses | 120 | Fires twice per round. |
 | Plasma Repeater Rifle | 2d6 | burn | strength | two_handed | 7 | 0 | — | Uncommon | unknowing_masses | 140 | Rapid plasma — natural 1 triggers an overheat reroll. After 4 overheats it explodes (1d10 to everyone in your range). |
-| Plasma Rifle | 2d6 | burn | wisdom | ranged | 8 | 0 | — | Uncommon | unknowing_masses | 130 | Long-range; 1d6 splash on hit. |
+| Plasma Rifle | 2d6 | burn | wisdom | ranged | 8 | 0 | — | Uncommon | unknowing_masses | 130 | Long-range; 1d6 splash on hit. +1d6 against airborne enemies. |
 | Plasma Spear | 1d8 | burn | wisdom | ranged | 5 | 0 | — | Uncommon | unknowing_masses | 110 | Short range; +1d6 plasma damage. |
 | Revivalist Field Carbine | 2d6 | piercing | dexterity | two_handed | 3 | 0 | — | Uncommon | tartarian_revivalists | 125 | Faction-issue armament of the tartarian revivalists. |
 | Tartarian Siege Bow | 2d6 | piercing | strength | two_handed | 7 | 0 | — | Uncommon | giants | 140 | +1d6 damage to machines. |
@@ -201,7 +201,7 @@ _Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`
 | Aetheric Bow | 2d8 | aetheric | wisdom | ranged | 9 | 0 | — | Rare | aetheric | 330 | +1d6 against magical creatures. |
 | Aetheric Hand Cannon | 2d8 | aetheric | charisma | single_handed | 10 | 0 | — | Rare | aetheric | 350 | Natural 1 → overload: 1d6 self damage, useless 2 turns. |
 | Aetheric Pike (Rare) | 2d6 | aetheric | strength | two_handed | 8 | 0 | — | Rare | aetheric | 310 | Fires an energy projectile at any range; +1d6 vs affiliated foes. |
-| Aetheric Pulse Rifle | 2d8 | aetheric | wisdom | ranged | 10 | 0 | — | Rare | aetheric | 340 | Ignores 2 armor points. |
+| Aetheric Pulse Rifle | 2d8 | aetheric | wisdom | ranged | 10 | 0 | — | Rare | aetheric | 340 | Ignores 2 armor points. +1d6 against airborne enemies. |
 | Bone Spear Launcher | 2d8 | piercing | wisdom | ranged | 9 | 0 | — | Rare | giants | 320 | Bypasses shields permanently on third max roll. |
 | High-Impact Blaster | 2d6 | burn | strength | two_handed | 9 | 0 | — | Rare | unknowing_masses | 310 | — |
 | Magna-Cannon | 2d8 | burn | strength | two_handed | 9 | 0 | — | Rare | unknowing_masses | 350 | Explosive rounds — same 1d10 AoE damage to enemies or allies in arm's reach of target. |
@@ -212,9 +212,9 @@ _Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`
 | Plasma Pistol | 2d6 | burn | dexterity | dual_wield | 10 | 0 | — | Rare | unknowing_masses | 320 | 50% enemy HP loss on rolls of 20+. |
 | Rail Cannon | 2d8 | electrical | strength | two_handed | 9 | 0 | — | Rare | unknowing_masses | 380 | Requires 1 round to charge; deals 1d6 as a club while charging. |
 | Railgun Pike | 2d6 | electrical | strength | two_handed | 8 | 0 | — | Rare | aetheric | 330 | +1d6 vs mechanical traps or machines. |
-| Tartarian Longbow | 2d8 | piercing | wisdom | ranged | 9 | 0 | — | Rare | giants | 320 | +1d6 to constructs or armor. |
+| Tartarian Longbow | 2d8 | piercing | wisdom | ranged | 9 | 0 | — | Rare | giants | 320 | +1d6 to constructs or armor. +1d6 against airborne enemies. |
 | Aetheric Railgun | 2d10 | electrical | wisdom | ranged | 12 | 0 | — | Legendary | aetheric | 1050 | Ignores armor; long range. |
-| Aetheric Sniper Bow | 2d10 | aetheric | wisdom | ranged | 11 | 0 | — | Legendary | aetheric | 950 | Ignores cover; unaffected by weather. |
+| Aetheric Sniper Bow | 2d10 | aetheric | wisdom | ranged | 11 | 0 | — | Legendary | aetheric | 950 | Ignores cover; unaffected by weather. +2d6 against airborne enemies. |
 | Mud Emperor's Harpoon | 2d10 | piercing | wisdom | ranged | 12 | 0 | — | Legendary | mud_dwellers | 980 | Pins enemies for 2 rounds. |
 | Plasma Artillery Cannon | 2d10 | burn | wisdom | ranged | 12 | 0 | — | Legendary | unknowing_masses | 1100 | Explosive plasma rounds; 1d6 splash on hit. |
 | Plasma Burst Rifle | 2d10 | burn | wisdom | ranged | 11 | 0 | — | Legendary | unknowing_masses | 960 | Ignores shields on advantage rolls. |

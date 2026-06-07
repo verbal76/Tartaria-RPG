@@ -177,7 +177,11 @@ const CODENAMES: Record<string, string> = {
   // any tuned background.
   // OTA-333 — removed the translucent fill from the active tutorial highlight
   // (the "2-tone box behind the buttons"); border + glow still spotlight.
-  '2026-06-07-333': 'Spruce Anvil',
+  // OTA-334 — batch of 10: climbing-strap→armor, equipped-hand label, scrap
+  // auto-close, dog-in-arsenal vs climb/aerial + anti-air weapons, apostrophe
+  // clear-fix, vendor stock/owned stack, FUSABLE tab, dog food heal, runecaster
+  // casing drops, fuzzy investigate/salvage clears.
+  '2026-06-07-334': 'Larch Anvil',
   '2026-06-07-327': 'Hemlock Anvil',
   '2026-06-07-326': 'Tamarack Anvil',
   '2026-06-07-325': 'Cypress Anvil',

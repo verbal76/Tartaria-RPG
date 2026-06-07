@@ -486,12 +486,16 @@ export function VendorScreen() {
                       <Text style={styles.offerKind} numberOfLines={1}>
                         {itemPreview.kindLabel}{itemPreview.rarity ? ` · ${itemPreview.rarity}` : ''}
                       </Text>
-                      {(o.quantity ?? 1) > 1 && (
-                        <Text style={styles.offerStock}>×{o.quantity} in stock</Text>
-                      )}
-                      {owned > 0 && (
-                        <Text style={styles.offerOwned}>you have {owned}</Text>
-                      )}
+                      {/* arb-fix — stock count and owned count stack one above
+                          the other (right-aligned), not jammed on one line. */}
+                      <View style={styles.offerCounts}>
+                        {(o.quantity ?? 1) > 1 && (
+                          <Text style={styles.offerStock}>×{o.quantity} in stock</Text>
+                        )}
+                        {owned > 0 && (
+                          <Text style={styles.offerOwned}>you have {owned}</Text>
+                        )}
+                      </View>
                     </View>
                     {itemPreview.stats.length > 0 && (
                       <Text style={styles.offerStats} numberOfLines={2}>
@@ -831,8 +835,10 @@ const styles = StyleSheet.create({
   offerName: { color: '#e6d8b3', fontSize: 14, fontWeight: '700', flex: 1, marginRight: 8 },
   offerPrice: { color: '#c9a86a', fontSize: 12, fontWeight: '700' },
   offerPriceBroke: { color: '#7a705c' },
-  offerSubHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 2 },
+  offerSubHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 2 },
   offerKind: { color: '#7a705c', fontSize: 10, letterSpacing: 1, flex: 1 },
+  // arb-fix — right-hand stack: "×N in stock" over "you have N".
+  offerCounts: { alignItems: 'flex-end', gap: 1 },
   offerOwned: { color: '#9ec96a', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
   offerStock: { color: '#7fb0a8', fontSize: 10, letterSpacing: 1, fontWeight: '700' },
   offerStats: { color: '#cdbf99', fontSize: 11, marginTop: 4 },

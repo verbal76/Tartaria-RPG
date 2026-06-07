@@ -77,6 +77,11 @@ interface Props {
   investigateCount?: number;
   golem?: { name: string; hp: number; hpMax: number } | null;
   dog?: { name: string; hp: number; hpMax: number } | null;
+  // arb-fix — why the dog can't act THIS swing, if at all. The dog chip still
+  // shows in combat; when blocked, tapping it buzzes and the engine drops the
+  // matching Arbiter line ('elevated' = benched at a climb base — hasn't
+  // learned to climb; 'aerial' = target flies — can't jump that high).
+  dogBlocked?: 'elevated' | 'aerial' | null;
 }
 
 const PEACE_QUICK_DIRECT: Array<{ label: string; submit: string }> = [
@@ -105,7 +110,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenAskArbiter, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, inventory, range, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, playerHasRope }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenAskArbiter, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, inventory, range, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, playerHasRope }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
@@ -376,7 +381,22 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 <QuickBtn label={`golem (${golem.hp}/${golem.hpMax})`} onPress={() => onSubmit('use golem')} tone="ready" />
               ) : null}
               {dog && dog.hp > 0 ? (
-                <QuickBtn label={`${dog.name.toLowerCase()} (${dog.hp}/${dog.hpMax})`} onPress={() => setDogPickerOpen((v) => !v)} tone="ready" />
+                <QuickBtn
+                  label={`${dog.name.toLowerCase()} (${dog.hp}/${dog.hpMax})`}
+                  // arb-fix — keep the dog in the arsenal even when it can't act
+                  // (benched at a climb base, or the target's airborne). Tapping
+                  // a blocked dog buzzes + lets the engine explain (once); an
+                  // available dog opens the BITE/DISTRACT picker as before.
+                  tone={dogBlocked ? 'needs-approach' : 'ready'}
+                  onPress={() => {
+                    if (dogBlocked) {
+                      Vibration.vibrate(40);
+                      onSubmit('bite');
+                      return;
+                    }
+                    setDogPickerOpen((v) => !v);
+                  }}
+                />
               ) : null}
               <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} />
               <QuickBtn label="flee" defensive onPress={() => onSubmit('flee')} />

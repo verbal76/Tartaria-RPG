@@ -661,7 +661,7 @@
         "bow",
         "giants"
       ],
-      "effect": "+1d6 damage to creatures of Large size.",
+      "effect": "+1d6 damage to creatures of Large size. +1d6 against airborne enemies.",
       "description": "A bow drawn from a Giant's femur. Pulls heavy, fires far."
     },
     {
@@ -3939,7 +3939,7 @@
         "two_handed",
         "mud_dwellers"
       ],
-      "effect": "Loses effectiveness in high wind.",
+      "effect": "Loses effectiveness in high wind. +1d6 against airborne enemies.",
       "description": "Standard hunting bow. Reliable in still air."
     },
     {
@@ -4025,7 +4025,7 @@
         "two_handed",
         "unknowing_masses"
       ],
-      "effect": "Accuracy unaffected by weather.",
+      "effect": "Accuracy unaffected by weather. +1d6 against airborne enemies.",
       "description": "Crossbow that fires energy bolts. Light, low recoil."
     },
     {
@@ -4047,7 +4047,7 @@
         "two_handed",
         "aetheric"
       ],
-      "effect": "Ignores wind conditions.",
+      "effect": "Ignores wind conditions. +1d6 against airborne enemies.",
       "description": "Aether-strung longbow. The arrow trails violet."
     },
     {
@@ -4222,7 +4222,7 @@
         "two_handed",
         "unknowing_masses"
       ],
-      "effect": "Long-range; 1d6 splash on hit.",
+      "effect": "Long-range; 1d6 splash on hit. +1d6 against airborne enemies.",
       "description": "Pre-flood plasma rifle. Service issue, well-cared-for."
     },
     {
@@ -4310,7 +4310,7 @@
         "two_handed",
         "giants"
       ],
-      "effect": "+1d6 to constructs or armor.",
+      "effect": "+1d6 to constructs or armor. +1d6 against airborne enemies.",
       "description": "Heavy Giant longbow. Each shot a small spear."
     },
     {
@@ -4377,7 +4377,7 @@
         "two_handed",
         "aetheric"
       ],
-      "effect": "Ignores 2 armor points.",
+      "effect": "Ignores 2 armor points. +1d6 against airborne enemies.",
       "description": "Aether pulse rifle. Energy bolts pop through plate."
     },
     {
@@ -4422,7 +4422,7 @@
         "aetheric",
         "legendary"
       ],
-      "effect": "Ignores cover; unaffected by weather.",
+      "effect": "Ignores cover; unaffected by weather. +2d6 against airborne enemies.",
       "description": "Aether sniper bow. Picks off targets across stretches."
     },
     {

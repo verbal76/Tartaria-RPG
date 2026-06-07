@@ -12607,4 +12607,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // cluster — so on a tuned background it read as a "weird 2-tone box behind the
 // buttons." The 2px pulsing amber border + glow still spotlight the target; the
 // box is gone (region stays transparent).
-export const OTA_BUILD_ID = '2026-06-07-333';
+// OTA-334 — Larch Anvil. Batch (10 fixes): (1) Hardened Climbing Strap →
+// Armor category (was Loot). (2) Equipped weapons show the slot —
+// "(main hand)/(off hand)/(both hands)/(two-handed)"; armor shows its slot.
+// (3) Scrap-result panel auto-closes after ~2.8s. (4) Dog stays in the combat
+// arsenal when it can't act (benched at a climb base, or the target's airborne)
+// and buzzes + drops a contextual Arbiter line; new `aerial` enemy trait on
+// drones/bats; 8 ranged weapons gain "+Nd6 against airborne enemies" (the
+// effect parser now stacks multiple "+NdN against X" clauses). (5) Possessive
+// scene features (Zharak's Teeth Spire) now clear from salvage/investigate —
+// the chip-consumed matcher is apostrophe-insensitive. (6) Vendor stock + owned
+// counts stack on two lines. (7) New FUSABLE inventory tab filters to Crucible-
+// eligible items. (8) Feeding the dog plain food now heals it the player's
+// default 2d6 (was 0 unless the food had an explicit healHP). (9) Blank
+// Runecaster Casings are now obtainable — tier-matched drops from 20 automatons.
+// (10) A fuzzy-matched investigate/salvage that lands on an inventory item shows
+// the preview once then clears (was an infinite preview loop).
+export const OTA_BUILD_ID = '2026-06-07-334';

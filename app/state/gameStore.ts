@@ -236,7 +236,7 @@ import {
   fuzzyFindStoryline,
 } from '../engine/factionStorylines';
 import { tickWeather, weatherRepositionCost, weatherAttackPenalty, weatherStatModifiers, describeWeatherStatModifiers } from '../engine/weatherEffects';
-import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, traitDodgeChance } from '../engine/enemyTraits';
+import { traitAttackBonus, traitAmbushBonus, traitDamageMultiplier, traitOnHitStatus, traitRegen, traitDodgeChance, enemyIsAerial } from '../engine/enemyTraits';
 import { parseWeaponEffect, rollEffectBonusDamage } from '../engine/weaponEffects';
 import { rollThrowDamage, weightLabel, itemWeight } from '../engine/itemWeight';
 import { extractAmbientNouns, matchAmbientNoun } from '../engine/ambientNouns';
@@ -2889,6 +2889,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         puppyVendorUsed: saved.worldMemory.puppyVendorUsed ?? false,
         puppyVendorQueued: saved.worldMemory.puppyVendorQueued ?? false,
         dogGolemCoActivated: saved.worldMemory.dogGolemCoActivated ?? false,
+        dogAerialNoticeShown: saved.worldMemory.dogAerialNoticeShown ?? [],
+        dogClimbNoticeShown: saved.worldMemory.dogClimbNoticeShown ?? false,
         pendingDogOnboarding: saved.worldMemory.pendingDogOnboarding ?? null,
       };
       set({
@@ -7553,6 +7555,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? player.inventory.find((i) => i.id === parsed.resolvedItemId)
             : null;
           if (invItem) {
+            // arb-fix — a fuzzy-matched investigate/salvage that lands on one
+            // of your inventory items used to re-show the same item preview
+            // FOREVER (e.g. "investigate scraps of cloth" → fuzzy-matched the
+            // "Mud Cloth" in your pack → looped). Per the player: if it matched
+            // well enough to produce a result, it should CLEAR. So: show the
+            // preview once, mark the TYPED noun flavor-exhausted for this room,
+            // and short-circuit repeats to the standard "already examined" line.
+            const previewRoomKey = makeRoomKey(
+              player.currentLocationId,
+              currentScene.microMicroId,
+              player.mapX,
+              player.mapY,
+              player.hubRoomId,
+            );
+            const previewNoun = (rawTarget || invItem.name).toLowerCase().trim();
+            const previewRoom = get().worldMemory.visitedRooms?.[previewRoomKey];
+            const previewExhausted = (previewRoom?.flavorExhaustedNouns ?? []).map((n) => n.toLowerCase());
+            const alreadyPreviewed = previewNoun.length > 0 && previewExhausted.some(
+              (n) => n.length > 0 && (n === previewNoun || previewNoun.includes(n) || n.includes(previewNoun)),
+            );
+            if (alreadyPreviewed) {
+              get().appendLog(
+                'world',
+                `You've already examined the ${previewNoun}. There's nothing more to find here.`,
+              );
+              break;
+            }
             const preview = getItemPreview(invItem.name);
             const headline = preview.rarity
               ? `${preview.name} — ${preview.rarity} ${preview.kindLabel}.`
@@ -7570,6 +7599,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
             );
             if (meaningfulStats.length > 0) {
               get().appendLog('world', meaningfulStats.join(' · '));
+            }
+            // Mark the typed noun flavor-exhausted so a repeat clears instead
+            // of re-showing the same preview (the loop the player hit).
+            if (previewNoun.length > 0) {
+              set((s) => {
+                const room = s.worldMemory.visitedRooms?.[previewRoomKey] ?? {
+                  firstVisitAt: Date.now(),
+                  lastVisitAt: Date.now(),
+                  visitCount: 1,
+                };
+                const existing = room.flavorExhaustedNouns ?? [];
+                if (existing.includes(previewNoun)) return s;
+                return {
+                  worldMemory: {
+                    ...s.worldMemory,
+                    visitedRooms: {
+                      ...(s.worldMemory.visitedRooms ?? {}),
+                      [previewRoomKey]: { ...room, flavorExhaustedNouns: [...existing, previewNoun] },
+                    },
+                  },
+                };
+              });
             }
             // arb107 — inspecting your OWN inventory item is NOT a discovery
             // roll. It used to fall through and build an `investigate` skill
@@ -22043,8 +22094,35 @@ function handleDogCombat(
   const scene = get().currentScene;
   if (!player || !scene) return;
   const dog = player.dog;
-  if (!dog || dog.status !== 'with_player' || dog.hp <= 0) {
+  // Truly no companion to command (never had one, abandoned, or dead).
+  if (!dog || dog.status === 'abandoned' || dog.status === 'dead') {
     get().appendLog('arbiter', `"No dog at your side," the Arbiter says.`);
+    return;
+  }
+  // arb-fix — benched at the base of a climb: the dog is real and at your
+  // side in spirit, but it can't follow you up a wall. Keep the chip in the
+  // arsenal (UI buzzes on tap); the Arbiter ribs you once per climb. No turn
+  // is spent. (A knocked-out dog also benches to waiting_at_base at hp 0 —
+  // that reads as "still down, let it rest" instead of the climb joke.)
+  if (dog.status === 'waiting_at_base') {
+    if (dog.hp <= 0) {
+      get().appendLog('arbiter', `The Arbiter shakes their head. "${dog.name} is still down. Let them rest before you ask for teeth."`);
+    } else {
+      if (!get().worldMemory.dogClimbNoticeShown) {
+        get().appendLog(
+          'arbiter',
+          applyDogPronouns(
+            `The Arbiter peers over the edge. "I don't think ${dog.name} has learned to climb. {Pronoun} {isOrAre} holding the ground below."`,
+            dog.sex.pronoun,
+          ),
+        );
+        set((s) => ({ worldMemory: { ...s.worldMemory, dogClimbNoticeShown: true } }));
+      }
+    }
+    return;
+  }
+  if (dog.hp <= 0) {
+    get().appendLog('arbiter', `The Arbiter shakes their head. "${dog.name} is still down. Let them rest before you ask for teeth."`);
     return;
   }
   if (scene.enemies.length === 0) {
@@ -22073,6 +22151,24 @@ function handleDogCombat(
   }
   const target = scene.enemies[targetIdx]!;
   const targetHp = scene.enemyHps[targetIdx] ?? target.hp;
+  // arb-fix — the dog can't engage a flyer (a drone hovers out of reach; it
+  // "can't jump that high"). The dog button still appears in combat, but
+  // commanding it at an aerial target is refused WITHOUT burning the turn. The
+  // Arbiter explains the first time per enemy name; after that the UI just
+  // buzzes. Pair this with the "+Nd6 against airborne enemies" ranged weapons.
+  if (enemyIsAerial(target)) {
+    const told = get().worldMemory.dogAerialNoticeShown ?? [];
+    if (!told.includes(target.name)) {
+      get().appendLog(
+        'arbiter',
+        `"${dog.name}!" The Arbiter catches your dog mid-crouch. "${dog.name} can't jump that high — the ${target.name} stays out of reach. Bring it down with something that flies."`,
+      );
+      set((s) => ({
+        worldMemory: { ...s.worldMemory, dogAerialNoticeShown: [...told, target.name] },
+      }));
+    }
+    return;
+  }
   if (kind === 'dog_bite') {
     const ac = Math.max(5, Math.min(18, 5 + parseEnemyAP(target)));
     const roll = rollDie(20);
@@ -22300,7 +22396,12 @@ function rejoinDogOnDescent(
   const dog = player?.dog;
   if (!dog || dog.status !== 'waiting_at_base' || dog.hp <= 0) return;
   set((s) => s.player && s.player.dog
-    ? { player: { ...s.player, dog: { ...s.player.dog, status: 'with_player' as const } } }
+    ? {
+        player: { ...s.player, dog: { ...s.player.dog, status: 'with_player' as const } },
+        // arb-fix — reset the "hasn't learned to climb" joke so the NEXT climb
+        // gets it once more (it's benched-at-a-climb feedback, not a one-time).
+        worldMemory: { ...s.worldMemory, dogClimbNoticeShown: false },
+      }
     : s);
   get().appendLog(
     'world',
@@ -22422,10 +22523,21 @@ function applyItemToDog(
   const isDogTreat = !!(fx && fx.kind === 'consumable' && (fx as { dogTreat?: boolean }).dogTreat === true);
   const isConsumable = !!(fx && fx.kind === 'consumable') || item.kind === 'consumable';
   const loyaltyGain = isDogTreat ? 40 : (isConsumable ? 20 : 5);
-  // HP heal: pull healHP from the consumable effect if present.
-  const healAmount = fx && fx.kind === 'consumable' && (fx as { healHP?: number }).healHP
-    ? Math.min(Math.max(0, dog.hpMax - dog.hp), (fx as { healHP: number }).healHP)
-    : 0;
+  // HP heal — mirror the PLAYER's eat handler (gameStore ~8104): a consumable
+  // with a structured effect heals its `healHP`; a food with NO structured
+  // effect (e.g. Trail Rations — kind:consumable, tags:[food], no `effect`)
+  // falls back to the default 2d6 food heal. arb-fix — the dog used to read
+  // ONLY `fx.healHP`, so feeding it plain food (the common case) gave loyalty
+  // but 0 HP. Now food heals the dog just like it heals you.
+  const hpRoom = Math.max(0, dog.hpMax - dog.hp);
+  const healAmount = (() => {
+    if (fx && fx.kind === 'consumable') {
+      return Math.min(hpRoom, (fx as { healHP?: number }).healHP ?? 0);
+    }
+    // No structured effect, but it IS food/consumable → default food heal.
+    const isFoodish = isConsumable || (item.tags ?? []).includes('food');
+    return isFoodish ? Math.min(hpRoom, rollDie(6) + rollDie(6)) : 0;
+  })();
   // Consume 1 of the item.
   const newInventory = player.inventory
     .map((i) => (i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i))

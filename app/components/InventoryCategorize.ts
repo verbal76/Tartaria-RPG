@@ -71,6 +71,13 @@ export function categorizeItem(item: InventoryItem): InventoryCategory {
   // arb90 — tools before the generic gear/material buckets so utility
   // implements get their own section (and the pry bar lands there).
   if (isToolItem(item)) return 'tool';
+  // arb-fix — `wardrobe`-tagged worn apparel (the Hardened Climbing Strap)
+  // equips in the cloak slot, so it belongs under ARMOR, not the generic Loot
+  // bucket. It lives in exploration.json (kind:exploration) for its climb_steep
+  // gate, so it isn't in the ARMOR catalog above and was falling through to
+  // 'loot'. `wardrobe` is the canonical worn-not-tool tag (see pouchEligibility
+  // NON_TOOL_TAGS); the strap is currently its only holder.
+  if (item.tags.some((t) => t.toLowerCase() === 'wardrobe')) return 'armor';
   if (GEAR.some((g) => g.name.toLowerCase() === nameLower)) {
     const gearKind = GEAR.find((g) => g.name.toLowerCase() === nameLower)?.kind;
     if (gearKind === 'consumable') return 'consumable';
