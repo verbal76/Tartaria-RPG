@@ -12648,4 +12648,4 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Aetherborn +1d6 on Aetheric weapons, Sentinel raised Resurrection-Gem drop,
 // and the 5 previously-dead title flags (golemEdge / ethericSurge /
 // ruinsDefenseBonus / pathfinder / machineSpeech). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-07-337';
+export const OTA_BUILD_ID = '2026-06-07-338';

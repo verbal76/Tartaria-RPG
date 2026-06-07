@@ -972,6 +972,22 @@ export interface DogCompanion {
   /** Game-clock hour of the last feed. lastFedAtHour and the player's
    *  hoursElapsed drive the -1-per-4-hour decay. */
   lastFedAtHour: number;
+  /** Poplar Anvil — game-clock hour the dog was knocked down to 0 HP and
+   *  benched (waiting_at_base, hp 0). A downed dog that isn't healed
+   *  above 0 within DOG_BLEED_OUT_HOURS bleeds out and dies for real
+   *  (status → dead, puppyVendorOwed flips). Cleared once it's healed
+   *  back up so a later knockdown restarts the clock. undefined = not
+   *  currently bleeding out. */
+  downedAtHour?: number;
+  /** Poplar Anvil — latches the mid-window "he's fading, feed him now"
+   *  Arbiter reminder so it fires once per down-event, not every tick.
+   *  Cleared alongside downedAtHour when the dog is healed back up. */
+  bleedWarned?: boolean;
+  /** Poplar Anvil — lowest loyalty band already warned about (50/30/15).
+   *  Latches so each escalating "your dog is drifting" Arbiter beat
+   *  fires once per crossing, not every tick. undefined = none warned
+   *  yet (treated as 101). */
+  loyaltyBeatFloor?: number;
   equipped: { vest: string | null };
   /** with_player follows; waiting_at_base = at the climb origin or
    *  in 24h auto-heal recovery; abandoned = walked off at loyalty 0;

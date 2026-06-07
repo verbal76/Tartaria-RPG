@@ -185,6 +185,10 @@ const CODENAMES: Record<string, string> = {
   // open; locked-chip scanner-requirement text uses the EQUIPPED amber.
   // OTA-336 — fusion catalyst counts toward gate + equipped-catalyst confirm
   // prompt + one-time make-good grant; 2 craftable corruption-cleanse tonics.
+  // OTA-338 — dog bleed-out timer + loyalty abandonment (both now fire the
+  // puppy-vendor arc) + feed-or-lose-him Arbiter warnings; one-shot thrown
+  // weapons; Trail-Rations restore preview; OTA-337 race-balance audit test.
+  '2026-06-07-338': 'Poplar Anvil',
   '2026-06-07-337': 'Maple Anvil',
   '2026-06-07-336': 'Rowan Anvil',
   '2026-06-07-327': 'Hemlock Anvil',
