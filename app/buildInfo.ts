@@ -12539,4 +12539,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // are dead until you've left to another named location and returned. (3) The
 // fuse banner sits like the trader banner (full width, flush under the
 // main-quest box). JS-only → OTA to hal2001; no native rebuild.
-export const OTA_BUILD_ID = '2026-06-07-323';
+// OTA-324 — Willow Anvil. Promotion of dev arb109. Tutorial "wrong control"
+// feedback: arb108 (OTA-323) blocked off-script controls but the only signal
+// was a single 30ms haptic — easy to miss, said nothing. Now every
+// tutorial-locked tap fires a stronger double-pulse "error" buzz AND drops a
+// short Arbiter line naming the current step ("Not that — tap the glowing
+// SALVAGE button…"), deduped. Wired across the quick buttons, the travel/room
+// chips, and the scene-bar MAP. JS-only → OTA to hal2001.
+export const OTA_BUILD_ID = '2026-06-07-324';

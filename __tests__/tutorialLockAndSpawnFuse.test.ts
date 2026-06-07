@@ -119,3 +119,22 @@ describe('arb108 — spawn-outpost fuse gate (macroVisitSeq)', () => {
     expect(logText()).toMatch(/Need at least 3|Crucible hums, then cools/i);
   });
 });
+
+describe('arb109 — wrong-control nudge feedback', () => {
+  beforeAll(async () => { await boot(); });
+
+  it('drops a step-specific Arbiter nudge during a locked beat', () => {
+    const store = useGameStore;
+    store.setState({ tutorialStep: beatIdx('scrap'), tutorialExploreChosen: false, gameLog: [] });
+    store.getState().nudgeTutorialBlocked();
+    expect(logText()).toMatch(/Not that/i);
+    expect(logText()).toMatch(/SALVAGE/i); // names the current step's action
+  });
+
+  it('is a no-op when the tutorial is over', () => {
+    const store = useGameStore;
+    store.setState({ tutorialStep: null, gameLog: [] });
+    store.getState().nudgeTutorialBlocked();
+    expect(store.getState().gameLog.length).toBe(0);
+  });
+});

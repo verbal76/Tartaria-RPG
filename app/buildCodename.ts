@@ -151,6 +151,10 @@ const CODENAMES: Record<string, string> = {
   // instructed control works until the stay/leave choice; SKIP is the one
   // exit), no Crucible in the spawn outpost (fuse gated on having left &
   // returned), fuse banner repositioned full-width under the main-quest box.
+  // OTA-324 — promotion of dev arb109: tutorial wrong-control feedback
+  // (double-pulse "error" haptic + a deduped Arbiter nudge naming the current
+  // step) on every locked control — quick buttons, travel/room chips, MAP.
+  '2026-06-07-324': 'Willow Anvil',
   '2026-06-07-323': 'Alder Anvil',
   '2026-06-07-322': 'Cattail Anvil',
   '2026-06-06-321': 'Tule Anvil',

@@ -91,6 +91,14 @@ const PEACE_QUICK_DIRECT: Array<{ label: string; submit: string }> = [
 // past explore_or_leave (main_quest / pick_city are post-choice).
 const TUT_LOCK_BEATS = ['name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'];
 
+// arb109 — "wrong control" haptic. A double-pulse (buzz · pause · buzz) reads
+// unmistakably as an error, unlike the old single 30ms tap that was easy to
+// miss on a Pixel-class device. Wrapped in try/catch since Vibration is a
+// no-op on devices/sims without a vibrator.
+function buzzWrong() {
+  try { Vibration.vibrate([0, 32, 45, 32]); } catch { /* ignore */ }
+}
+
 function shortWeaponLabel(name: string): string {
   const tokens = name.split(/\s+/);
   if (tokens.length <= 2) return name;
@@ -535,9 +543,16 @@ function QuickBtn({
     blocked && styles.quickDisabledText,
   ];
   const handlePress = () => {
-    if (blocked || outOfRange) {
-      // Wrong action for this tutorial beat, or weapon out of range — buzz
-      // ("can't do it") instead of acting. APPROACH is the player's job.
+    if (blocked) {
+      // arb109 — wrong control for this tutorial beat. A stronger double-pulse
+      // (clearly an "error" buzz, not a tap) PLUS an on-screen Arbiter nudge,
+      // because the old single 30ms buzz was easy to miss and "said" nothing.
+      buzzWrong();
+      useGameStore.getState().nudgeTutorialBlocked();
+      return;
+    }
+    if (outOfRange) {
+      // Combat range gate — buzz only (no tutorial nudge).
       try { Vibration.vibrate(30); } catch { /* ignore */ }
       return;
     }
@@ -552,10 +567,11 @@ function QuickBtn({
 
 function TravelBtn({ label, onPress, blocked }: { label: string; onPress: () => void; blocked?: boolean }) {
   const isDestination = label.startsWith('→');
-  // arb108 — during the outpost tutorial lockdown, travel/room buttons buzz
-  // ("not yet") instead of moving, so the player can't wander off-script.
+  // arb108/arb109 — during the outpost tutorial lockdown, travel/room buttons
+  // buzz (double-pulse) + drop an Arbiter nudge instead of moving, so the
+  // player can't wander off-script and gets clear "wrong" feedback.
   const handlePress = () => {
-    if (blocked) { try { Vibration.vibrate(30); } catch { /* ignore */ } return; }
+    if (blocked) { buzzWrong(); useGameStore.getState().nudgeTutorialBlocked(); return; }
     onPress();
   };
   return (

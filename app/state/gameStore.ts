@@ -1775,6 +1775,12 @@ interface GameStore {
   chooseTutorialExplore: () => void;
   chooseTutorialLeave: () => void;
   finishOutpostTutorial: () => void;
+  /** arb109 — feedback when a tutorial-locked control is tapped: the buzz
+   *  alone (a 30ms haptic) was easy to miss, so this also drops a short
+   *  Arbiter line naming the current step. Deduped by the log merge so
+   *  spamming a wrong button doesn't flood the feed. No-op outside the
+   *  outpost tutorial. */
+  nudgeTutorialBlocked: () => void;
 
   slots: SlotSummary[];
   activeSlotId: string | null;
@@ -16330,6 +16336,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // test sees explore_or_leave wired to an advancement call. Step is
     // already confirmed explore_or_leave above, so this always advances.
     get().maybeAdvanceTutorial('explore_or_leave');
+  },
+  nudgeTutorialBlocked() {
+    const state = get();
+    if (state.tutorialStep === null) return;
+    const id = TUTORIAL_STEPS[state.tutorialStep]?.id ?? '';
+    const hint: Record<string, string> = {
+      name: 'type your name in the box, then tap ACT.',
+      cudgel: 'tap the glowing TAKE button and lift the cudgel.',
+      rope: "type 'take rope' in the box, then tap ACT.",
+      scrap: 'tap the glowing SALVAGE button and break the chest plate.',
+      climb: 'tap the glowing CLIMB button.',
+      investigate: 'tap the glowing INVESTIGATE button and look at the door.',
+      explore_or_leave: 'answer the prompt — stay and explore, or leave the outpost.',
+    };
+    get().appendLog(
+      'arbiter',
+      `The Arbiter raps the slate. "Not that — ${hint[id] ?? "do what I've asked, or tap SKIP TUTORIAL."}"`,
+    );
   },
   skipTutorial() {
     // Skip path — grant the starter loot the tutorial would have

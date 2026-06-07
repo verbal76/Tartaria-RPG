@@ -484,7 +484,13 @@ export function ExplorationScreen() {
               shows the world atlas. */}
           <TouchableOpacity
             onPress={() => {
-              if (tutLock) { try { Vibration.vibrate(30); } catch { /* ignore */ } return; }
+              if (tutLock) {
+                // arb109 — double-pulse "wrong" buzz + Arbiter nudge (the old
+                // single 30ms tap was easy to miss and said nothing).
+                try { Vibration.vibrate([0, 32, 45, 32]); } catch { /* ignore */ }
+                useGameStore.getState().nudgeTutorialBlocked();
+                return;
+              }
               setScreen('map');
             }}
             hitSlop={8}
