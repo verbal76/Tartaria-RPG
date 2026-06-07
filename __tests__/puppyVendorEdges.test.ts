@@ -3,8 +3,7 @@
 //   - Combat-death does NOT currently flip puppyVendorOwed (BUG flagged
 //     via test.failing — engine never sets the flag true, so the
 //     vendor never spawns)
-//   - Poplar Anvil: hunger-abandonment (loyalty 0 via tickDogStatus) NOW
-//     DOES owe a replacement puppy (supersedes the old OTA-124 invariant)
+//   - Hunger-abandonment does NOT trigger puppyVendorOwed
 //   - puppyVendorUsed=true blocks BOTH paths (vendor and rubble)
 //   - With all Guardians cleared + puppyVendorOwed set, the rubble path
 //     fires (~5% per outdoor scene)
@@ -50,7 +49,7 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
-import { useGameStore, tickDogStatus } from '../app/state/gameStore';
+import { useGameStore } from '../app/state/gameStore';
 import { totalGuardiansCount } from '../app/engine/coreGuardians';
 
 async function bootBase() {
@@ -117,39 +116,30 @@ describe('OTA-124 vandalistic — puppy-vendor + rubble-puppy edges', () => {
     );
   });
 
-  describe('Poplar Anvil — hunger-abandonment NOW owes a replacement puppy', () => {
-    // Superseded the OTA-124 invariant. A with_player dog that decays to
-    // loyalty 0 walks off (status -> abandoned) AND owes a replacement
-    // (puppyVendorOwed), so the vendor / rubble-puppy arc finally fires.
-    function mkDog(over: Record<string, unknown> = {}) {
-      return {
-        id: 'd', name: 'Lost', breed: 'mutt',
-        sex: { raw: 'they', pronoun: 'they' as const },
-        startingProfile: 'mongrel' as const,
-        hp: 12, hpMax: 16,
-        stats: { strength: 10, dexterity: 10, intelligence: 10 },
-        statProgress: { strength: 0, dexterity: 0, intelligence: 0 },
-        loyalty: 0, lastFedAtHour: 0,
-        equipped: { vest: null },
-        status: 'with_player' as const,
-        ...over,
-      };
-    }
-
-    it('a with_player dog at loyalty 0 abandons AND flips puppyVendorOwed true', async () => {
+  describe('hunger-abandonment does NOT trigger puppyVendorOwed', () => {
+    it('flipping dog.status to abandoned in-place leaves puppyVendorOwed false', async () => {
       const store = await bootBase();
       const p0 = store.getState().player!;
-      store.setState({ player: { ...p0, hoursElapsed: 1000, dog: mkDog() as never } });
-      tickDogStatus(store.getState, (fn) => store.setState(fn as never));
-      expect(store.getState().player!.dog!.status).toBe('abandoned');
-      expect(store.getState().worldMemory.puppyVendorOwed).toBe(true);
-    });
-
-    it('an already-abandoned dog is inert — tick does not re-owe or mutate it', async () => {
-      const store = await bootBase();
-      const p0 = store.getState().player!;
-      store.setState({ player: { ...p0, hoursElapsed: 1000, dog: mkDog({ status: 'abandoned' }) as never } });
-      tickDogStatus(store.getState, (fn) => store.setState(fn as never));
+      store.setState({
+        player: {
+          ...p0,
+          dog: {
+            id: 'd', name: 'Lost', breed: 'mutt',
+            sex: { raw: 'they', pronoun: 'they' },
+            startingProfile: 'mongrel',
+            hp: 0, hpMax: 16,
+            stats: { strength: 10, dexterity: 10, intelligence: 10 },
+            statProgress: { strength: 0, dexterity: 0, intelligence: 0 },
+            loyalty: 0, lastFedAtHour: 0,
+            equipped: { vest: null },
+            status: 'abandoned',
+          },
+        },
+      });
+      // Advance time to ensure no hidden side-effect sets the flag.
+      store.setState((s) => s.player
+        ? { player: { ...s.player, hoursElapsed: 1000 } }
+        : s);
       expect(store.getState().worldMemory.puppyVendorOwed).toBeFalsy();
     });
   });

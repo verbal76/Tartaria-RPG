@@ -21,7 +21,8 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - `HaL2001` HEAD = **OTA-338 "Poplar Anvil"** — live on Android + iOS.
+> - `HaL2001` HEAD = **OTA-339 "Elm Anvil"** (rollback to 337 runtime) — live
+>   on Android + iOS. OTA-338 "Poplar Anvil" was rolled back (boot crash).
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - tsc clean. Tests green modulo the known baseline flakes (dogTravelClimb,
@@ -116,6 +117,23 @@ checkout, not a special rollback tool.)
 > **The canonical record of issues across the build.** Every OTA / APK push updates this section in the same commit. **Read this section before planning any fix** to (a) check whether the issue is already closed and the fix exists, and (b) make sure your plan won't break a previously-closed fix. The workflow rules live in `CLAUDE.md` → "HANDOFF.md — the build timeline."
 
 ### 0.A — Open Issues
+
+- **OTA-338 "Poplar Anvil" boot crash — re-ship the dog-mortality feature (HIGH).**
+  338 crashed on ~**90% of cold opens** ("1 out of 10 stays working"); rolled back
+  by OTA-339 (Elm Anvil = 337 runtime). The crash is **intermittent → a boot-time
+  race**, and the only new async/timing surface 338 added is the `tickDogStatus`
+  **microtask scheduled off `submitPlayerAction`** (`void Promise.resolve().then(...)`).
+  The session-resume / welcome-back path fires a `submitPlayerAction` during boot;
+  the microtask almost certainly lands **mid-hydration**, calling `set(...)` /
+  `get().persist()` against a half-built store → intermittent crash. The full feature
+  is preserved in **commit `0741522`**. **Re-ship plan:** recover the diff, then make
+  the tick boot-safe — only schedule it for **non-silent** actions AND gate on a
+  "hydration complete / player present & named" check (or move the reconciler out of
+  the action path into an explicit post-rest / post-combat / post-time-advance call
+  instead of a microtask). Add a boot-resume test that asserts no tick fires before
+  hydration. tsc + the touched-area suite were green pre-rollback, so the logic itself
+  is sound — only the *scheduling* needs to be made boot-safe. The one-shot thrown
+  weapons + Trail-Rations preview (data/UI only, not implicated) ride along on re-ship.
 
 - **Race-trait display polish (OPTIONAL, low priority).** Mechanically races + titles +
   factions are all fully wired (OTA-337). The only loose thread: the Character screen still
@@ -446,7 +464,20 @@ checkout, not a special rollback tool.)
 
 ### 0.B — Closed Issues (most recent first)
 
-#### Poplar Anvil (`2026-06-07-338`) — dog mortality + one-shot thrown weapons + Trail-Rations preview
+#### Elm Anvil (`2026-06-07-339`) — ROLLBACK of OTA-338 (boot crash)
+- **What broke:** OTA-338 "Poplar Anvil" crashed on **~90% of cold opens**
+  (player: "1 out of 10 stays working"). Near-deterministic but intermittent →
+  a **boot-time race**, not a logic bug (tsc + the touched-area suite were green).
+- **How fixed:** republished **337's exact runtime** — the four touched runtime
+  files (`app/state/gameStore.ts`, `app/engine/types.ts`, `app/data/items/weapons.json`,
+  `app/components/itemPreview.ts`) reset to the Maple Anvil commit `6acd125`; the
+  orphaned 338 tests removed. Build id → `2026-06-07-339`, codename Elm Anvil.
+- **Why:** stabilize the live build first; the 338 work is preserved in commit
+  `0741522` and will be **re-shipped as discrete mini-OTAs** (one change per OTA,
+  pushed one at a time) so the exact culprit can be bisected on-device. See the
+  matching Open Issue. **Suspect:** the `tickDogStatus` microtask firing mid-hydration.
+
+#### Poplar Anvil (`2026-06-07-338`) — dog mortality + one-shot thrown weapons + Trail-Rations preview · ⚠️ ROLLED BACK by OTA-339 (boot crash)
 - **The dog was functionally immortal, which broke three things at once** (player diagnosis): with no real death there was *no stake* to feeding/healing it (a downed dog auto-healed free on rest), the dog was a *risk-free OP attacker*, and the authored **rubble-puppy / puppy-vendor replacement arc was dead content** (its only gate, `puppyVendorOwed`, flipped solely on a player-death-with-dog). **Fix:** the dog can now permanently leave you two ways, both of which finally fire the replacement arc. New `tickDogStatus(get, set)` reconciler, scheduled as a microtask off `submitPlayerAction` so a rescue verb (feed / rest / heal) resolves *before* the reaper checks. (a) **Bleed-out** — when the dog is knocked to 0 HP it benches AND stamps `downedAtHour`; if it isn't healed above 0 within **`DOG_BLEED_OUT_HOURS` = 24** game-hours it dies for real (`status: 'dead'`). (b) **Abandonment** — loyalty already decayed −1/4hr but did nothing; now **loyalty 0 → the dog walks off** (`status: 'abandoned'`), after escalating warning beats latched at 50/30/15 (`loyaltyBeatFloor`). Both set `puppyVendorOwed` (gated on `!puppyVendorUsed`) + call `queuePuppyVendor`. **Why this approach:** per the user's call the bite stays strong — the danger comes from *maintenance*, not a nerf; and re-enabling permadeath restores the existing rubble-puppy content rather than building anything new.
 - **"Feed him before he's gone forever" Arbiter warnings** (player ask). At the down-moment the Arbiter says to feed/poultice the dog or lose it; a sharper mid-window reminder fires once past the 12h halfway mark (latched by `bleedWarned`). Both clear when the dog is healed back up.
 - **New `DogCompanion` fields:** `downedAtHour?`, `bleedWarned?`, `loyaltyBeatFloor?` (all optional → no save migration). Combat-down bench (`handleDogCombat` retaliation) now stamps `downedAtHour` + `bleedWarned: false`.

@@ -1090,7 +1090,6 @@
       "tc": 110,
       "defense": 0,
       "tags": [
-        "throwable",
         "weapon",
         "ranged",
         "two_handed",
@@ -2919,7 +2918,6 @@
       "tc": 40,
       "defense": 2,
       "tags": [
-        "throwable",
         "weapon",
         "melee",
         "single_handed",
@@ -3741,7 +3739,6 @@
       "tc": 20,
       "defense": 0,
       "tags": [
-        "throwable",
         "weapon",
         "ranged",
         "knife",
@@ -3764,7 +3761,6 @@
       "tc": 20,
       "defense": 0,
       "tags": [
-        "throwable",
         "weapon",
         "ranged",
         "knife",
@@ -3829,7 +3825,6 @@
       "tc": 35,
       "defense": 0,
       "tags": [
-        "throwable",
         "weapon",
         "ranged",
         "thrown",
@@ -3873,7 +3868,6 @@
       "tc": 30,
       "defense": 0,
       "tags": [
-        "throwable",
         "weapon",
         "ranged",
         "thrown",
@@ -3982,7 +3976,6 @@
       "tc": 35,
       "defense": 0,
       "tags": [
-        "throwable",
         "weapon",
         "ranged",
         "thrown",
@@ -4070,7 +4063,6 @@
       "tc": 110,
       "defense": 0,
       "tags": [
-        "throwable",
         "weapon",
         "ranged",
         "thrown",
@@ -4137,7 +4129,6 @@
       "tc": 110,
       "defense": 0,
       "tags": [
-        "throwable",
         "weapon",
         "ranged",
         "thrown",
@@ -4181,7 +4172,6 @@
       "tc": 105,
       "defense": 0,
       "tags": [
-        "throwable",
         "weapon",
         "ranged",
         "thrown",

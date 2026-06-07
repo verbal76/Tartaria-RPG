@@ -195,19 +195,6 @@ function previewGear(g: CatalogGear): ItemPreview {
     if (g.effect.cureBleed) stats.push('Cures: bleed');
     if (g.effect.revealScene) stats.push('Reveals hidden scene hooks');
   }
-  // arb-fix — effect-LESS food/consumables (Trail Rations and any other
-  // consumable authored without a structured effect block) don't declare a
-  // restore, so the eat/rest handler heals a default **2d6 HP** (rollDie(6) +
-  // rollDie(6), capped at missing HP — see gameStore `rest` case). The preview
-  // showed only "Tags: food", so the player couldn't tell what a ration gives
-  // back. Surface the engine's actual default so the row reads honestly. Only
-  // fires when there's NO structured consumable effect — an effect block with
-  // no healHP heals 0 (not 2d6), so we leave those alone.
-  const hasConsumableEffect = !!(g.effect && g.effect.kind === 'consumable');
-  const isFoodish = g.kind === 'consumable' || g.tags.includes('food');
-  if (!hasConsumableEffect && isFoodish) {
-    stats.push('Restores: 2d6 HP (~7 avg)');
-  }
   if (g.tags.length > 0) stats.push(`Tags: ${g.tags.slice(0, 4).join(', ')}`);
   return { name: g.name, kindLabel, rarity: g.rarity, description: g.description, stats };
 }

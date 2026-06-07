@@ -4953,17 +4953,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const trimmed = text.trim();
     if (!trimmed || get().pendingRolls) return;
 
-    // Poplar Anvil — reconcile the dog's time-based fates (bleed-out /
-    // abandonment) AFTER this action resolves. Scheduled as a microtask
-    // so a rescue verb (feed / rest / heal) applies its HP / loyalty
-    // first and never races the reaper. Skipped on silent (LLM-internal)
-    // submissions to avoid double-ticking. Never blocks input.
-    if (!_opts?.silent) {
-      void Promise.resolve().then(() => {
-        try { tickDogStatus(get, set); } catch { /* dog upkeep must never break the action loop */ }
-      });
-    }
-
     // Tungsten Spire — TUTORIAL PRE-CHECK. Runs before the verb
     // parser so the in-feed tutorial can intercept name input + the
     // outpost prop verbs (take cudgel / take rope / take note,
@@ -22736,22 +22725,11 @@ function handleDogCombat(
           liveDog.sex.pronoun,
         );
         get().appendLog('world', downLine);
-        // Poplar Anvil — bench the downed dog AND stamp downedAtHour so the
-        // bleed-out clock starts. If it isn't healed above 0 within
-        // DOG_BLEED_OUT_HOURS (tickDogStatus), it dies for real.
+        // Auto-recovery handled after fight ends in the resolve path;
+        // for now, mark 'waiting_at_base'.
         set((s) => s.player && s.player.dog
-          ? { player: { ...s.player, dog: { ...s.player.dog, hp: 0, status: 'waiting_at_base' as const, downedAtHour: s.player.hoursElapsed ?? 0, bleedWarned: false } } }
+          ? { player: { ...s.player, dog: { ...s.player.dog, hp: 0, status: 'waiting_at_base' as const } } }
           : s,
-        );
-        // Poplar Anvil — the moment the dog drops, the Arbiter tells the
-        // player straight: heal it or lose it. A downed dog is no longer
-        // permanently safe.
-        get().appendLog(
-          'arbiter',
-          applyDogPronouns(
-            `The Arbiter kneels by the dog. "Feed ${liveDog.name} — or get a poultice in {pronoun}. {Pronoun} won't last a day down like this, and down dogs don't always get back up."`,
-            liveDog.sex.pronoun,
-          ),
         );
       } else {
         set((s) => s.player && s.player.dog
@@ -23309,136 +23287,6 @@ function tryDogCallVerb(
 /** Phase 6: queue the puppy vendor for the next outdoor scene. Called
  *  from the Core-Guardian-defeat path when puppyVendorOwed is set and
  *  not all Guardians are cleared. */
-/** Poplar Anvil — in-game hours a downed (hp 0, benched) dog survives
- *  before it bleeds out and dies for real. Matches the "24h recovery
- *  window" the OTA-120 DogCompanion doc already referenced: heal it
- *  (feed / first-aid / rest) inside a day, or lose it. */
-export const DOG_BLEED_OUT_HOURS = 24;
-
-/** Poplar Anvil — per-action reconciliation of the dog's time-based fates.
- *  Scheduled as a microtask off submitPlayerAction so it runs AFTER the
- *  action's own effects land — a `feed dog` / `rest` that heals or
- *  re-bonds the dog resolves first, so a rescue never races the reaper.
- *
- *  Two fates, both of which finally make the puppy-vendor / rubble-puppy
- *  replacement arc reachable (it was dead content while the dog could
- *  never permanently leave — its only gate, puppyVendorOwed, used to
- *  flip ONLY on a player-death-with-dog):
- *    1. Bleed-out — a dog benched at 0 HP for >= DOG_BLEED_OUT_HOURS
- *       without being healed above 0 dies (status -> dead).
- *    2. Abandonment — loyalty decays to 0 and the dog walks off
- *       (status -> abandoned), after escalating 50/30/15 warning beats. */
-export function tickDogStatus(
-  get: () => GameStore,
-  set: (fn: (s: GameStore) => Partial<GameStore>) => void,
-): void {
-  const player = get().player;
-  const dog = player?.dog;
-  if (!player || !dog) return;
-  if (dog.status === 'dead' || dog.status === 'abandoned') return;
-  const now = player.hoursElapsed ?? 0;
-
-  // --- 1. Bleed-out (downed + benched at 0 HP) -----------------------
-  if (dog.status === 'waiting_at_base' && dog.hp <= 0) {
-    if (dog.downedAtHour == null) {
-      // Benched at 0 with no stamp (legacy save / climb edge) — start
-      // the clock NOW rather than killing it retroactively.
-      set((s) => s.player?.dog
-        ? { player: { ...s.player, dog: { ...s.player.dog, downedAtHour: now, bleedWarned: false } } }
-        : s);
-      return;
-    }
-    const downFor = now - dog.downedAtHour;
-    // Mid-window urgent reminder — once, past the halfway mark — so the
-    // player gets a second, sharper nudge before the dog is gone for good.
-    if (downFor >= DOG_BLEED_OUT_HOURS / 2 && downFor < DOG_BLEED_OUT_HOURS && !dog.bleedWarned) {
-      set((s) => s.player?.dog
-        ? { player: { ...s.player, dog: { ...s.player.dog, bleedWarned: true } } }
-        : s);
-      get().appendLog(
-        'arbiter',
-        applyDogPronouns(
-          `The Arbiter's voice drops. "${dog.name} is fading. Feed {pronoun} or work a poultice now — wait much longer and {pronoun} is gone forever."`,
-          dog.sex.pronoun,
-        ),
-      );
-      return;
-    }
-    if (downFor >= DOG_BLEED_OUT_HOURS) {
-      set((s) => s.player?.dog
-        ? {
-            player: { ...s.player, dog: { ...s.player.dog, status: 'dead' as const } },
-            worldMemory: s.worldMemory.puppyVendorUsed
-              ? s.worldMemory
-              : { ...s.worldMemory, puppyVendorOwed: true },
-          }
-        : s);
-      get().appendLog(
-        'combat',
-        applyDogPronouns(
-          `${dog.name} never got back up. The wounds ran too deep and no hand tended them in time. {Pronoun} {isOrAre} gone.`,
-          dog.sex.pronoun,
-        ),
-      );
-      queuePuppyVendor(get, set);
-      void get().persist();
-      return;
-    }
-    return; // still down, still inside the window
-  }
-
-  // Healed back above 0 since a down — clear the bleed-out stamp + warn
-  // latch so a later knockdown starts a fresh clock.
-  if (dog.downedAtHour != null || dog.bleedWarned) {
-    set((s) => s.player?.dog
-      ? { player: { ...s.player, dog: { ...s.player.dog, downedAtHour: undefined, bleedWarned: false } } }
-      : s);
-  }
-
-  // --- 2. Loyalty: warning beats + abandonment -----------------------
-  if (dog.status !== 'with_player') return;
-  const loy = dog.loyalty;
-  const floor = dog.loyaltyBeatFloor ?? 101;
-
-  if (loy <= 0) {
-    set((s) => s.player?.dog
-      ? {
-          player: { ...s.player, dog: { ...s.player.dog, status: 'abandoned' as const } },
-          worldMemory: s.worldMemory.puppyVendorUsed
-            ? s.worldMemory
-            : { ...s.worldMemory, puppyVendorOwed: true },
-        }
-      : s);
-    get().appendLog(
-      'world',
-      applyDogPronouns(
-        `${dog.name} stops following. {Pronoun} watched you go hungry past too many fires. When you look back, the road is empty.`,
-        dog.sex.pronoun,
-      ),
-    );
-    queuePuppyVendor(get, set);
-    void get().persist();
-    return;
-  }
-
-  // Escalating warning beats at 50 / 30 / 15 — latched so each fires
-  // once per crossing, not every tick.
-  const bands: Array<{ at: number; line: string }> = [
-    { at: 50, line: `${dog.name} keeps eyeing your pack. {Pronoun} {isOrAre} hungry — feed {pronoun} before the bond frays.` },
-    { at: 30, line: `${dog.name} lags a pace behind, ribs showing. {Pronoun} won't follow a starving road forever.` },
-    { at: 15, line: `${dog.name} won't meet your eye. One more empty day and {pronoun} walks.` },
-  ];
-  for (const b of bands) {
-    if (loy <= b.at && floor > b.at) {
-      set((s) => s.player?.dog
-        ? { player: { ...s.player, dog: { ...s.player.dog, loyaltyBeatFloor: b.at } } }
-        : s);
-      get().appendLog('arbiter', applyDogPronouns(`The Arbiter nods at the dog. "${b.line}"`, dog.sex.pronoun));
-      break; // one beat per tick
-    }
-  }
-}
-
 function queuePuppyVendor(
   get: () => GameStore,
   set: (fn: (s: GameStore) => Partial<GameStore>) => void,

@@ -185,9 +185,12 @@ const CODENAMES: Record<string, string> = {
   // open; locked-chip scanner-requirement text uses the EQUIPPED amber.
   // OTA-336 — fusion catalyst counts toward gate + equipped-catalyst confirm
   // prompt + one-time make-good grant; 2 craftable corruption-cleanse tonics.
-  // OTA-338 — dog bleed-out timer + loyalty abandonment (both now fire the
-  // puppy-vendor arc) + feed-or-lose-him Arbiter warnings; one-shot thrown
-  // weapons; Trail-Rations restore preview; OTA-337 race-balance audit test.
+  // OTA-339 — ROLLBACK of 338. 338 crashed ~90% of cold opens (boot race),
+  // so 339 republishes 337's exact runtime. The dog/one-shot/rations work is
+  // preserved in git (commit 0741522) to re-ship once the boot crash is fixed.
+  '2026-06-07-339': 'Elm Anvil',
+  // OTA-338 — dog bleed-out timer + loyalty abandonment + one-shot thrown
+  // weapons + Trail-Rations preview. ROLLED BACK by 339 (boot crash).
   '2026-06-07-338': 'Poplar Anvil',
   '2026-06-07-337': 'Maple Anvil',
   '2026-06-07-336': 'Rowan Anvil',
