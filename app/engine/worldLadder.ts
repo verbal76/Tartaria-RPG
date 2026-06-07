@@ -80,8 +80,17 @@ export const LOCATION_TO_MACRO: Record<string, string> = {
   nimari: 'lost_capitals',
   red_tower_of_nimari: 'lost_capitals',
   drakova: 'lost_capitals',
+  // arb96 — the four OTA-052 Lost Capitals had atlas coords + Core/Guardian
+  // status but no macro mapping, so they fell through to the legacy global
+  // encounter roll (and read as "(unmapped)" in the world brief). Bind them
+  // to the Lost Capitals biome like the other Core-cities.
+  karok_sa: 'lost_capitals',
+  yuldra_tul: 'lost_capitals',
+  ostragar: 'lost_capitals',
+  iskan_veil: 'lost_capitals',
   // Subterranean enclaves → Subterranean Empire
   varakush: 'subterranean_empire',
+  tartarian_enclave: 'subterranean_empire', // arb96 — underground True Tartarian enclave
   // Tartarian deep facilities → Aetherstone Deep
   obsidian_pillars: 'aetherstone_deep',
   endless_stair: 'aetherstone_deep',
@@ -98,6 +107,7 @@ export const LOCATION_TO_MACRO: Record<string, string> = {
   voronov: 'silt_wastes',
   // Edge / liminal → Borderlands
   tartarian_outskirts: 'borderlands',
+  parley_ground: 'borderlands', // arb96 — neutral meeting flats on the frontier
   // arb92 — themed faction-start frontier outposts. All map to the
   // starter-safe Borderlands biome (danger-2, tame curated pools) so a fresh
   // character lands gently; the Lost Capitals remain the dangerous journey.

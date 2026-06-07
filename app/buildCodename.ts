@@ -134,6 +134,12 @@ const CODENAMES: Record<string, string> = {
   // catalog gap + vendor NaN guard fixed; Arbiter suggests fleeing when
   // outmatched (no enemy cap); scene-bar shows area danger tier. [arb92-95]
   '2026-06-06-320': 'Rush Anvil',
+  // Batch: completed region-to-macro mapping (4 capitals + enclave + parley);
+  // new commissioned world map art (1774×887); descriptive "you are near…"
+  // map footer; ACTIONS button removed from the location bar and MAP moved
+  // there; location-aware Map screen — your outpost INTERIOR map inside the
+  // outpost (7 factions wired), world atlas outside. [arb96–99]
+  '2026-06-06-321': 'Tule Anvil',
   '2026-06-03-301': 'Tungsten Spire',
   // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted
   // pair (the reserved metallic-noun pool was exhausted at Tungsten Spire).

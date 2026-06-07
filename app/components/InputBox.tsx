@@ -283,9 +283,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                   <Text style={styles.movesBadgeText} numberOfLines={1}>{movesLeft}</Text>
                   <Text style={styles.movesBadgeSub} numberOfLines={1}>{movesLeft === 1 ? 'move' : 'moves'}</Text>
                 </View>
-              ) : null}
-              <TravelBtn label="MAP" onPress={onOpenMap} />
-            </>
+              ) : null}            </>
           ) : hubRoom ? (
             // Tungsten Spire — hub-named exits. ROOM SHORT-NAMES instead of
             // N/S/E/W when the player is inside a building. arb22 — the world
@@ -313,9 +311,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               <TravelBtn label="NORTH" onPress={() => onSubmit('go north')} />
               <TravelBtn label="SOUTH" onPress={() => onSubmit('go south')} />
               <TravelBtn label="EAST" onPress={() => onSubmit('go east')} />
-              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} />
-              <TravelBtn label="MAP" onPress={onOpenMap} />
-            </>
+              <TravelBtn label="WEST" onPress={() => onSubmit('go west')} />            </>
           )}
         </TutorialTarget>
       )}

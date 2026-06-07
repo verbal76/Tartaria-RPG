@@ -17,10 +17,8 @@ Nine **factions** (Mud Monarchs, Eternal Dynasty, Reclaimers' Guild, Forgotten O
 ## 2. Map canvas & coordinate system
 
 - **Canvas size:** **1408 × 768 px** (landscape, ~16:9). The shipped atlas asset is `assets/world-atlas.png` at this size.
-- **Coordinate system:** every location has a normalized **(fx, fy)** in the range 0..1, where **fx=0 is the left edge, fx=1 the right edge; fy=0 is the top, fy=1 the bottom.** Multiply by the canvas to get pixels: **px = (fx×1408, fy×768)**.
-- The painted/usable area is inset slightly from the very edge: keep icons within **fx ∈ [0.05, 0.92], fy ∈ [0.05, 0.92]**.
-- Each table below lists BOTH normalized (fx, fy) and pixel (x, y) for convenience.
-- The marker the game drops is small (~26 px). Leave room around each plotted point for a label.
+- **Coordinate system:** every location has a normalized **(fx, fy)** in 0..1 — **fx=0 left edge, fx=1 right; fy=0 top, fy=1 bottom.** Pixels: **px = (fx×1408, fy×768)**.
+- Keep icons within **fx ∈ [0.05, 0.92], fy ∈ [0.05, 0.92]**. Each table lists BOTH normalized and pixel coords. Marker ≈ 26 px; leave label room.
 
 ## 3. Danger rings (difficulty zones)
 
@@ -42,12 +40,12 @@ Each holds one Aetheric Core behind a Guardian. These should read as the biggest
 |---|---|---|---|---|
 | **Asgardar** | 5 | (0.160, 0.470) | (225, 361) | lost_capitals |
 | **Drakova** | 5 | (0.770, 0.470) | (1084, 361) | lost_capitals |
-| **Iskan-Veil** | 5 | (0.050, 0.320) | (70, 246) | (unmapped) |
-| **Karok-Sa** | 5 | (0.420, 0.720) | (591, 553) | (unmapped) |
+| **Iskan-Veil** | 5 | (0.050, 0.320) | (70, 246) | lost_capitals |
+| **Karok-Sa** | 5 | (0.420, 0.720) | (591, 553) | lost_capitals |
 | **Samarran** | 5 | (0.280, 0.480) | (394, 369) | lost_capitals |
-| **Yuldra-Tul** | 5 | (0.880, 0.180) | (1239, 138) | (unmapped) |
+| **Yuldra-Tul** | 5 | (0.880, 0.180) | (1239, 138) | lost_capitals |
 | **Nimari** | 4 | (0.500, 0.500) | (704, 384) | lost_capitals |
-| **Ostragar** | 4 | (0.930, 0.420) | (1309, 323) | (unmapped) |
+| **Ostragar** | 4 | (0.930, 0.420) | (1309, 323) | lost_capitals |
 | **Voronov** | 4 | (0.780, 0.560) | (1098, 430) | silt_wastes |
 
 ## 5. The nine faction starting outposts (frontier rim — danger 2)
@@ -81,6 +79,7 @@ Each holds one Aetheric Core behind a Guardian. These should read as the biggest
 | **Tartarian Pilgrim Camp** | 2 | (0.320, 0.080) | (451, 61) | region | start: True Tartarians |
 | **The Architect's Blind** | 2 | (0.100, 0.200) | (141, 154) | region | start: Conspiracy of Architects |
 | **The Monarch's Waystation** | 2 | (0.140, 0.080) | (197, 61) | region | start: Mud Monarchs |
+| **The Parley Ground** | 2 | (0.640, 0.360) | (901, 276) | neutral_ground |  |
 
 **Descriptions:**
 
@@ -93,6 +92,7 @@ Each holds one Aetheric Core behind a Guardian. These should read as the biggest
 - **Tartarian Pilgrim Camp** — A rest-camp of True Tartarian pilgrims on the frontier track, where the faithful gather before the long descent into the deep buried cities.
 - **The Architect's Blind** — A Conspiracy of Architects observation-blind disguised as a collapsed waystation. Behind the false rubble: a map-wall of routes the public must never connect, and a quiet door onto the road.
 - **The Monarch's Waystation** — A frontier toll-court of the Mud Monarchs, last ordered ground before the buried capitals. Banners hang stiff with silt; a seneschal logs every traveler who passes toward the deeper cities.
+- **The Parley Ground** — A weathered ring of standing stones on contested flats where rival factions meet under truce. No faction holds it; banners change with the season. A place for envoys, brokers, and uneasy bargains.
 
 ### The Silt Wastes — the Endless Mud (surface)
 
@@ -116,15 +116,17 @@ Each holds one Aetheric Core behind a Guardian. These should read as the biggest
 
 ### The Subterranean Empire — where the living went
 
-*The strata where surviving humanity actually lives — enclaves and strongholds dug into the mud and rock below the wastes. Varakush, the Forgotten Order's seat, anchors this layer.*
+*The strata where surviving humanity actually lives — enclaves and strongholds dug into the mud and rock below the wastes. Varakush and the deep True Tartarian enclave anchor this layer.*
 
 | Location | Danger | Norm (fx, fy) | Pixel (x, y) | Type | Notes |
 |---|---|---|---|---|---|
 | **Varakush** | 1 | (0.280, 0.740) | (394, 568) | stronghold | start: Forgotten Order |
+| **The Sunken Enclave** | 3 | (0.240, 0.400) | (338, 307) | settlement |  |
 
 **Descriptions:**
 
 - **Varakush** — Hidden base of the Forgotten Order, perched on the edge of the Great Tartary Plains. Library, workshop, refuge.
+- **The Sunken Enclave** — A deep, self-sufficient True Tartarian enclave hollowed beneath the Buried Cities — Aethercraft-shaped mud walls, ancestor-shrines to the fallen Giants, and Seekers who venture the labyrinthine tunnels for relics and Aetherstone. Hidden from the surface by design.
 
 ### The Lost Capitals — the buried Core-cities
 
@@ -133,22 +135,30 @@ Each holds one Aetheric Core behind a Guardian. These should read as the biggest
 | Location | Danger | Norm (fx, fy) | Pixel (x, y) | Type | Notes |
 |---|---|---|---|---|---|
 | **Nimari** | 4 | (0.500, 0.500) | (704, 384) | partially_buried_city | ★ CORE CAPITAL |
+| **Ostragar** | 4 | (0.930, 0.420) | (1309, 323) | lost_capital | ★ CORE CAPITAL |
 | **Asgardar** | 5 | (0.160, 0.470) | (225, 361) | buried_capital | ★ CORE CAPITAL |
 | **Drakova** | 5 | (0.770, 0.470) | (1084, 361) | lost_capital | ★ CORE CAPITAL |
 | **Grand Spire of Etheria** | 5 | (0.160, 0.530) | (225, 407) | tower |  |
+| **Iskan-Veil** | 5 | (0.050, 0.320) | (70, 246) | lost_capital | ★ CORE CAPITAL |
+| **Karok-Sa** | 5 | (0.420, 0.720) | (591, 553) | lost_capital | ★ CORE CAPITAL |
 | **Red Tower of Nimari** | 5 | (0.520, 0.600) | (732, 461) | tower |  |
 | **Samarran** | 5 | (0.280, 0.480) | (394, 369) | buried_city | ★ CORE CAPITAL |
 | **Thametan's Tower** | 5 | (0.330, 0.570) | (465, 438) | tower |  |
+| **Yuldra-Tul** | 5 | (0.880, 0.180) | (1239, 138) | lost_capital | ★ CORE CAPITAL |
 
 **Descriptions:**
 
 - **Nimari** — Half-swallowed. The Red Tower of Nimari is rumored to house one of the last operational Aetheric Cores.
+- **Ostragar** — An eastern wetland Lost Capital. The Eternal Dynasty's river city — half-submerged in slow current, the Core seat ringed by a still pool the Riverbinder bound to the housing with a cantor's chord.
 - **Asgardar** — The ancient capital of Tartaria. Home of the Grand Spire of Etheria, which once channeled cosmic Aether into the city grid.
 - **Drakova** — A legendary Lost Capital, sealed beneath Aetherstone mud. Believed to hold an intact Aetheric Core.
 - **Grand Spire of Etheria** — A monumental tower in Asgardar that drew Aether from celestial realms. Said to be one of the most powerful Aetheric structures ever built.
+- **Iskan-Veil** — A far-northwestern Lost Capital. The Conspiracy Architects' hidden city — a maze of false doors and overlaid corridors. Every map of Iskan-Veil is wrong by design; the true Core seat is behind the door you didn't see.
+- **Karok-Sa** — A southern Lost Capital. The Forgotten Order's ritual seat — halls of binding-sigils carved into black basalt, the Core kept under a chain of seals only a Sealwarden can read.
 - **Red Tower of Nimari** — Believed to contain a functional Aetheric Core. A critical objective for every faction.
 - **Samarran** — A research hub of Tartaria. Home of Thametan's Tower and the Etheric Engine whose malfunction triggered the Great Mud Flood.
 - **Thametan's Tower** — Houses the catastrophic Etheric Engine. Site of Elior Zalmar's final resonance cascade. The walls still hum.
+- **Yuldra-Tul** — A northeastern mountain Lost Capital. Frost-wreathed, the gate-city to the Giants' tombs. The Servants of Giants kept the long vigil here before the Flood — the Core sleeps under a cold-stone in the deep keep.
 
 ### The Aetherstone Deep — the Power Mantle
 
@@ -173,28 +183,6 @@ Each holds one Aetheric Core behind a Guardian. These should read as the biggest
 - **Etheric Chamber** — The primary power source and control hub for Tartarian technology, buried deep. Guarded by ancient automatons and Etheric traps.
 - **Mud Flood Nexus** — The subterranean control center believed to have regulated the disaster itself. Touching it might mean rebirth — or a second flood.
 - **The Giant Vault** — Ancient vault rumored to hold the last resting place of the Tartarian Giants. Are they sleeping, or imprisoned?
-
-### Unzoned / liminal sites
-
-*Sites not bound to a single macro-region in the engine's travel ladder.*
-
-| Location | Danger | Norm (fx, fy) | Pixel (x, y) | Type | Notes |
-|---|---|---|---|---|---|
-| **The Parley Ground** | 2 | (0.640, 0.360) | (901, 276) | neutral_ground |  |
-| **The Sunken Enclave** | 3 | (0.240, 0.400) | (338, 307) | settlement |  |
-| **Ostragar** | 4 | (0.930, 0.420) | (1309, 323) | lost_capital | ★ CORE CAPITAL |
-| **Iskan-Veil** | 5 | (0.050, 0.320) | (70, 246) | lost_capital | ★ CORE CAPITAL |
-| **Karok-Sa** | 5 | (0.420, 0.720) | (591, 553) | lost_capital | ★ CORE CAPITAL |
-| **Yuldra-Tul** | 5 | (0.880, 0.180) | (1239, 138) | lost_capital | ★ CORE CAPITAL |
-
-**Descriptions:**
-
-- **The Parley Ground** — A weathered ring of standing stones on contested flats where rival factions meet under truce. No faction holds it; banners change with the season. A place for envoys, brokers, and uneasy bargains.
-- **The Sunken Enclave** — A deep, self-sufficient True Tartarian enclave hollowed beneath the Buried Cities — Aethercraft-shaped mud walls, ancestor-shrines to the fallen Giants, and Seekers who venture the labyrinthine tunnels for relics and Aetherstone. Hidden from the surface by design.
-- **Ostragar** — An eastern wetland Lost Capital. The Eternal Dynasty's river city — half-submerged in slow current, the Core seat ringed by a still pool the Riverbinder bound to the housing with a cantor's chord.
-- **Iskan-Veil** — A far-northwestern Lost Capital. The Conspiracy Architects' hidden city — a maze of false doors and overlaid corridors. Every map of Iskan-Veil is wrong by design; the true Core seat is behind the door you didn't see.
-- **Karok-Sa** — A southern Lost Capital. The Forgotten Order's ritual seat — halls of binding-sigils carved into black basalt, the Core kept under a chain of seals only a Sealwarden can read.
-- **Yuldra-Tul** — A northeastern mountain Lost Capital. Frost-wreathed, the gate-city to the Giants' tombs. The Servants of Giants kept the long vigil here before the Flood — the Core sleeps under a cold-stone in the deep keep.
 
 ## 7. Legend / art-direction checklist
 

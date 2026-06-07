@@ -472,12 +472,16 @@ export function ExplorationScreen() {
           </Text>
         </View>
         <View style={styles.sceneBarBtns}>
+          {/* arb99 — ACTIONS removed (player never used it) and MAP moved
+              here so the map is always one tap away. Inside an outpost the
+              Map screen shows your outpost interior; out in the world it
+              shows the world atlas. */}
           <TouchableOpacity
-            onPress={() => setScreen('actions')}
+            onPress={() => setScreen('map')}
             hitSlop={8}
             style={styles.sceneBarBtn}
           >
-            <Text style={styles.sceneBarBtnText}>ACTIONS</Text>
+            <Text style={styles.sceneBarBtnText}>MAP</Text>
           </TouchableOpacity>
           {/* v2.4.1 (OTA 045) — QUESTS button removed per player
               direction. The main-quest objective chip below the

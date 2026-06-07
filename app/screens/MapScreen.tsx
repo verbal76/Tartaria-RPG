@@ -48,7 +48,9 @@ import {
   cardinalOffsetFromAnchor,
   hubRoomMinimapCoord,
   OUTPOST_ATLAS_COORD,
+  LOCATION_ATLAS_COORDS,
 } from '../engine/atlasCoords';
+import { LOCATION_TO_MACRO } from '../engine/worldLadder';
 import { isHubLocation, hubRoomFor, hubNameForFaction } from '../engine/hub';
 // OTA 051 — locations.json carries the human-readable name we want
 // to surface in the "You are here: <name>" chip when the player is
@@ -58,10 +60,65 @@ import type { Location } from '../engine/types';
 
 const LOCATIONS = locationsData as Location[];
 
+// arb98 — descriptive (text-only) whereabouts for the map footer. The map is
+// a reference image with NO player marker; instead the footer tells the player
+// IN WORDS roughly where they are relative to the drawn landmarks/regions, so
+// they can find themselves on the picture. Reads the canon grid coords; does
+// NOT modify them.
+const REGION_DISPLAY: Record<string, string> = {
+  borderlands: 'the Borderlands',
+  silt_wastes: 'the Silt Wastes',
+  subterranean_empire: 'the Subterranean Empire',
+  lost_capitals: 'the Lost Capitals',
+  aetherstone_deep: 'the Aetherstone Deep',
+};
+function cardinalBetween(from: { fx: number; fy: number }, to: { fx: number; fy: number }): string {
+  const ns = to.fy < from.fy - 0.04 ? 'north' : to.fy > from.fy + 0.04 ? 'south' : '';
+  const ew = to.fx > from.fx + 0.04 ? 'east' : to.fx < from.fx - 0.04 ? 'west' : '';
+  return (ns + ew) || 'close by';
+}
+/** A verbal "you are near …" line built from the canon atlas layout. */
+function describeWhereabouts(locId: string, locs: Location[]): string {
+  const here = LOCATION_ATLAS_COORDS[locId] ?? atlasCoordForLocation(locId);
+  if (!here) return '';
+  const region = REGION_DISPLAY[LOCATION_TO_MACRO[locId] ?? ''] ?? '';
+  const near = locs
+    .filter((l) => l.id !== locId && l.discoverable !== false && LOCATION_ATLAS_COORDS[l.id])
+    .map((l) => {
+      const c = LOCATION_ATLAS_COORDS[l.id]!;
+      return { name: l.name, d: Math.hypot(c.fx - here.fx, c.fy - here.fy), dir: cardinalBetween(here, c) };
+    })
+    .sort((a, b) => a.d - b.d)
+    .slice(0, 3);
+  const nearStr = near.map((n) => `${n.name} (${n.dir})`).join(', ');
+  const regionPart = region ? `In ${region}.` : '';
+  const nearPart = nearStr ? ` Near ${nearStr}.` : '';
+  return (regionPart + nearPart).trim();
+}
+
 // Atlas asset's pixel dimensions — used to compute the letterboxed
 // image rect inside the flex-filled imageBox.
-const ATLAS_W = 1408;
-const ATLAS_H = 768;
+// arb97 — new commissioned atlas art (assets/world-atlas.png) is 1774×887
+// (2.0:1), replacing the old 1408×768 (1.83:1) hand-drawn map. The dot math
+// is aspect-driven, so these MUST match the live asset's real dimensions.
+const ATLAS_W = 1774;
+const ATLAS_H = 887;
+
+// arb99 — the world atlas, plus per-faction outpost INTERIOR maps. When the
+// player is inside their outpost the Map screen shows that faction's interior;
+// out in the world it shows the world atlas. Outpost maps are 1254×1254 (1:1).
+// stone_builders + servants_of_giants aren't finalized yet → they fall back to
+// the world atlas until their art lands (just drop the PNG in assets/outposts).
+const WORLD_ATLAS = require('../../assets/world-atlas.png');
+const OUTPOST_MAPS: Record<string, number> = {
+  mud_monarchs: require('../../assets/outposts/mud_monarchs.png'),
+  eternal_dynasty: require('../../assets/outposts/eternal_dynasty.png'),
+  forgotten_order: require('../../assets/outposts/forgotten_order.png'),
+  reclaimers_guild: require('../../assets/outposts/reclaimers_guild.png'),
+  true_tartarians: require('../../assets/outposts/true_tartarians.png'),
+  tartarian_revivalists: require('../../assets/outposts/tartarian_revivalists.png'),
+  conspiracy_architects: require('../../assets/outposts/conspiracy_architects.png'),
+};
 
 // Gesture clamps.
 const MIN_SCALE = 0.8;
@@ -191,6 +248,13 @@ export function MapScreen() {
   // through to the world-map cardinal-offset logic.
   const inHub = isHubLocation(player?.currentLocationId) && !!player?.hubRoomId;
   const hubMinimapPos = inHub ? hubRoomMinimapCoord(player?.hubRoomId) : null;
+  // arb99 — pick the map for where you are. Inside an outpost whose interior
+  // art exists → that faction's outpost map (square); otherwise the world
+  // atlas (2:1). mapAspect drives the fill/letterbox math below.
+  const outpostMapSource = inHub && player?.factionId ? OUTPOST_MAPS[player.factionId] : undefined;
+  const showingOutpost = !!outpostMapSource;
+  const mapSource = outpostMapSource ?? WORLD_ATLAS;
+  const mapAspect = showingOutpost ? 1 : ATLAS_W / ATLAS_H;
   const currentAnchor =
     atlasCoordForLocation(player?.currentLocationId) ?? OUTPOST_ATLAS_COORD;
   const atCenter =
@@ -221,7 +285,7 @@ export function MapScreen() {
   const didAutoFocusHub = useRef(false);
   useEffect(() => {
     if (!imgBox) return;
-    const imgAspect = ATLAS_W / ATLAS_H;
+    const imgAspect = mapAspect;
     const boxAspect = imgBox.width / imgBox.height;
     const fill = boxAspect < imgAspect ? imgAspect / boxAspect : 1;
     baselineScale.current = fill;
@@ -236,11 +300,13 @@ export function MapScreen() {
   }, [imgBox, scale]);
 
   useEffect(() => {
-    if (!imgBox || !inHub || didAutoFocusHub.current) return;
+    // arb99 — when showing the actual outpost interior map, skip the old
+    // world-map "center on the hub inset" focus; the interior fills the screen.
+    if (!imgBox || !inHub || showingOutpost || didAutoFocusHub.current) return;
     if (!hubMinimapPos) return;
     // Compute the marker's position in unscaled imgBox coordinates
     // using the same letterbox-aware math as the dotStyle below.
-    const imgAspect = ATLAS_W / ATLAS_H;
+    const imgAspect = mapAspect;
     const boxAspect = imgBox.width / imgBox.height;
     let renderedW: number;
     let renderedH: number;
@@ -275,7 +341,7 @@ export function MapScreen() {
       txRef.current = clamped.tx;
       tyRef.current = clamped.ty;
     });
-  }, [imgBox, inHub, hubMinimapPos, scale, translateX, translateY]);
+  }, [imgBox, inHub, showingOutpost, hubMinimapPos, scale, translateX, translateY]);
 
   const resetTransform = () => {
     const target = baselineScale.current;
@@ -398,7 +464,7 @@ export function MapScreen() {
     // letterboxes within that larger window. Compute the actual
     // image-rendered rect inside the box so the dot lands on real
     // pixels, not the empty letterbox margins.
-    const imgAspect = ATLAS_W / ATLAS_H;
+    const imgAspect = mapAspect;
     const boxAspect = imgBox.width / imgBox.height;
     let renderedW: number;
     let renderedH: number;
@@ -450,6 +516,13 @@ export function MapScreen() {
         ? `${Math.abs(dx)} tile${Math.abs(dx) === 1 ? '' : 's'} ${dx >= 0 ? 'east' : 'west'} of ${fromName}`
         : `${Math.abs(dy)} tile${Math.abs(dy) === 1 ? '' : 's'} ${dy >= 0 ? 'south' : 'north'} of ${fromName}`);
 
+  // arb98 — verbal whereabouts (no marker on the art; this is the player's
+  // orientation cue). Inside a hub we just name the outpost; out in the world
+  // we describe the region + the nearest drawn landmarks.
+  const whereaboutsLine = inHub
+    ? `Inside the ${hubNameForFaction(player?.factionId)} — a fixed outpost interior.`
+    : describeWhereabouts(player.currentLocationId, LOCATIONS);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -487,7 +560,7 @@ export function MapScreen() {
           ]}
         >
           <Image
-            source={require('../../assets/world-atlas.png')}
+            source={mapSource}
             style={styles.atlas}
             resizeMode="contain"
           />
@@ -504,8 +577,11 @@ export function MapScreen() {
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.footerHere}>● YOU ARE HERE</Text>
+        <Text style={styles.footerHere}>WHERE YOU ARE</Text>
         <Text style={styles.footerWhere}>{whereLine}</Text>
+        {whereaboutsLine ? (
+          <Text style={styles.footerNear}>{whereaboutsLine}</Text>
+        ) : null}
         <Text style={styles.footerDist}>
           {inHub
             ? `Inside the ${hubNameForFaction(player?.factionId)}.`
@@ -514,12 +590,11 @@ export function MapScreen() {
               : `${tiles} day${tiles === 1 ? '' : 's'} of travel from ${fromName}.`}
         </Text>
         <Text style={styles.footerCaveat}>
-          Drag to pan · pinch to zoom · double-tap to reset.
-          {inHub
-            ? ' Marker on the interior minimap, bottom-left.'
-            : atCenter
-              ? ' Marker snapped to the atlas drawing.'
-              : ' Marker drifting in your direction of travel.'}
+          {/* arb97 — the map is a hand-illustrated REFERENCE only; no player
+              marker is drawn on it (removed OTA-182). The footer text above
+              carries your location/bearings; this line is just the gesture
+              hint. */}
+          Drag to pan · pinch to zoom · double-tap to reset. {showingOutpost ? 'Your outpost interior.' : 'A reference map of the buried world.'}
         </Text>
       </View>
 
@@ -693,6 +768,7 @@ const styles = StyleSheet.create({
   },
   footerHere: { color: '#e07a5f', fontSize: 11, letterSpacing: 2, fontWeight: '700' },
   footerWhere: { color: '#e6d8b3', fontSize: 13, marginTop: 2 },
+  footerNear: { color: '#cdbf99', fontSize: 11, marginTop: 2, lineHeight: 15 },
   footerDist: { color: '#cdbf99', fontSize: 11, marginTop: 4 },
   footerCaveat: { color: '#c9a86a', fontSize: 9, fontStyle: 'italic', marginTop: 8, lineHeight: 13 },
   // OTA-171 — Places panel at the bottom of MapScreen. Scrollable
