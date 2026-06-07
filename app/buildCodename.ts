@@ -185,6 +185,9 @@ const CODENAMES: Record<string, string> = {
   // open; locked-chip scanner-requirement text uses the EQUIPPED amber.
   // OTA-336 — fusion catalyst counts toward gate + equipped-catalyst confirm
   // prompt + one-time make-good grant; 2 craftable corruption-cleanse tonics.
+  // OTA-341 — COPY SAVE diagnostic (export loadable save state for brick
+  // repro) on top of 340's dog test. Read-only; doesn't disturb the dog test.
+  '2026-06-07-341': 'Hawthorn Anvil',
   // OTA-340 — RE-SHIP of the dog-mortality feature ALONE (bleed-out +
   // abandonment + the tickDogStatus microtask) on a clean baseline, to test
   // whether it bricks a FRESH save (the 338 crash turned out to be save-data,

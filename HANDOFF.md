@@ -21,10 +21,13 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - `HaL2001` HEAD = **OTA-340 "Beech Anvil"** — dog-mortality feature
->   re-shipped ALONE on the clean baseline as a live diagnostic. (338's crash
->   was **save data, not runtime** — 339=337 still crashed the old save, a fresh
->   save boots clean. 340 tests whether the dog feature bricks a fresh save.)
+> - `HaL2001` HEAD = **OTA-341 "Hawthorn Anvil"** — COPY SAVE diagnostic on top
+>   of 340's live dog-mortality test. (338's crash was **save data, not runtime**
+>   — 339=337 still crashed the old save, a fresh save boots clean. 340 tests
+>   whether the dog feature bricks a fresh save; 341 adds the tool to capture a
+>   bricked save before it's deleted. A 6-variant repro test shows the dog
+>   *state* loads clean through the real cold-boot path — so any dog crash is a
+>   render path or the boot microtask race, not the persisted state.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - tsc clean. Tests green modulo the known baseline flakes (dogTravelClimb,
@@ -471,6 +474,24 @@ checkout, not a special rollback tool.)
 - **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Hawthorn Anvil (`2026-06-07-341`) — COPY SAVE diagnostic + dog save-brick repro
+- **Player ask:** "we don't have a way yet to export the save files to the logs,
+  we should add that." Surfaced by the 338 brick — the fatal save state was lost
+  when the character had to be deleted to recover.
+- **Added:** `app/diagnostics/saveSnapshot.ts` (`buildSaveSnapshot` exports
+  `player` + `worldMemory` minus `gameLog`, with a HIGHLIGHTS block for the
+  brick-suspect fields; `stampSaveExport` wraps it in a `=== TARTARIA SAVE ===`
+  envelope) + a **COPY SAVE** button on the About/Session tab (`AboutScreen.tsx`).
+  The JSON round-trips exactly into `loadSlotIntoGame`. Tests: `saveSnapshot`.
+- **Repro finding:** `__tests__/dogSaveBrickRepro.test.ts` plants 6 post-338 dog
+  states (dead/abandoned dog still on `player.dog` + vendor flags; mid-bleed-out
+  benched dog; healthy dog w/ new fields; vendor-flags-no-dog fires the dead
+  vendor path; rubble `pendingDogOnboarding`) and loads each through the **real
+  cold-boot path** (`loadSlotIntoGame` → `loadSlot` + `beginScene`). **All load
+  clean.** So the dog *state* is not a logic-level brick — any dog crash is in a
+  React render path (jest can't exercise it) or the boot-time microtask race
+  (timing, on-device only). Narrows the 340 live test's suspect to the microtask.
 
 #### Elm Anvil (`2026-06-07-339`) — ROLLBACK of OTA-338 (boot crash)
 - **What broke:** OTA-338 "Poplar Anvil" crashed on **~90% of cold opens**

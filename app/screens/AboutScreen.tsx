@@ -7,6 +7,7 @@ import { OTA_BUILD_ID } from '../buildInfo';
 import { getBuildCodename } from '../buildCodename';
 import { buildBasicDeviceSummary, stampLogExport } from '../diagnostics/aboutSummary';
 import { buildInventorySnapshot, stampInventoryExport } from '../diagnostics/inventorySnapshot';
+import { buildSaveSnapshot, stampSaveExport } from '../diagnostics/saveSnapshot';
 import { NumberStepper } from '../components/NumberStepper';
 import { ColorWheel } from '../components/ColorWheel';
 import {
@@ -103,6 +104,9 @@ export function AboutScreen() {
   // export so the player can choose which one to paste back.
   const [invCopied, setInvCopied] = useState(false);
   const [invCharCount, setInvCharCount] = useState(0);
+  // OTA-341 — COPY SAVE: export the loadable save state for brick repro.
+  const [saveCopied, setSaveCopied] = useState(false);
+  const [saveCharCount, setSaveCharCount] = useState(0);
   // v2.4.1 (OTA 053) — chunked-copy cursor for the session log so
   // long sessions (>~25 KB, the silent paste cap on most chat
   // clients) can be sent in parts the way the dead-character log
@@ -184,6 +188,22 @@ export function AboutScreen() {
       setInvCharCount(stamped.length);
       setInvCopied(true);
       setTimeout(() => setInvCopied(false), 2500);
+    } catch { /* clipboard rarely fails on Android */ }
+  }
+  // OTA-341 — COPY SAVE. Exports the loadable save state (player +
+  // worldMemory, minus the narration log) so a crashing/bricked save can be
+  // pasted back and reproduced EXACTLY via loadSlotIntoGame. Player ask after
+  // the OTA-338 brick, where we had no way to capture the fatal state before
+  // the character had to be deleted to recover.
+  async function handleCopySave() {
+    try {
+      const s = useGameStore.getState();
+      const snapshot = buildSaveSnapshot(s.player, s.worldMemory);
+      const stamped = stampSaveExport(snapshot, buildBasicDeviceSummary(), s.player?.name);
+      await Clipboard.setStringAsync(stamped);
+      setSaveCharCount(stamped.length);
+      setSaveCopied(true);
+      setTimeout(() => setSaveCopied(false), 2500);
     } catch { /* clipboard rarely fails on Android */ }
   }
   async function handleClearLog() {
@@ -643,6 +663,18 @@ export function AboutScreen() {
               {invCopied ? `✓ ${invCharCount.toLocaleString()} CHARS` : 'COPY INVENTORY'}
             </Text>
           </TouchableOpacity>
+          {/* OTA-341 — COPY SAVE. Drops the loadable save state (player +
+              worldMemory, minus the narration log) so a crashing save can be
+              pasted back and reproduced exactly. */}
+          <TouchableOpacity
+            style={[styles.sessionBtn, styles.sessionBtnSecondary, { marginTop: 8 }]}
+            onPress={() => { void handleCopySave(); }}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.sessionBtnSecondaryText}>
+              {saveCopied ? `✓ ${saveCharCount.toLocaleString()} CHARS` : 'COPY SAVE'}
+            </Text>
+          </TouchableOpacity>
           {/* arb75 — REPORT A BUG. One report bundling voice + device + log
               (no more separate COPY VOICE / COPY LOG). Opens the same
               BugReportModal the Title screen uses. */}
@@ -660,7 +692,9 @@ export function AboutScreen() {
             log paste-back will contain only the play that follows.
             COPY INVENTORY drops just your pack contents (one line per item,
             grouped by kind) so recurring-theme analysis doesn't have to scroll a
-            log.
+            log. COPY SAVE drops the loadable save state (player + world flags,
+            minus the narration log) so a crashing save can be pasted back and
+            reproduced exactly.
           </Text>
         </View>
         )}
