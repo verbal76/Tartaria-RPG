@@ -39,6 +39,7 @@ export function VendorScreen() {
   const sellToVendor = useGameStore((s) => s.sellToVendor);
   const stealFromVendor = useGameStore((s) => s.stealFromVendor);
   const dismissVendor = useGameStore((s) => s.dismissVendor);
+  const useVendorCrucible = useGameStore((s) => s.useVendorCrucible);
   const acceptFactionQuest = useGameStore((s) => s.acceptFactionQuest);
   const acceptHunt = useGameStore((s) => s.acceptHunt);
   const acceptMystery = useGameStore((s) => s.acceptMystery);
@@ -237,6 +238,14 @@ export function VendorScreen() {
         <Text style={styles.vendorName}>{vendor.name}</Text>
         <Text style={styles.vendorTitle}>{vendor.title}</Text>
         <Text style={styles.vendorDesc}>{vendor.description}</Text>
+        {/* arb103 — every vendor will fire a portable Fusing Crucible for 25 TC. */}
+        <TouchableOpacity
+          style={styles.crucibleBtn}
+          onPress={() => { useVendorCrucible(); setScreen('exploration'); }}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.crucibleBtnText}>★★ USE CRUCIBLE · 25 TC</Text>
+        </TouchableOpacity>
       </View>
 
       {tutorialDemoVendor && (
@@ -741,6 +750,17 @@ const styles = StyleSheet.create({
   vendorName: { color: '#c9a86a', fontSize: 15, fontWeight: '700', letterSpacing: 1 },
   vendorTitle: { color: '#7a705c', fontSize: 11, letterSpacing: 1, marginTop: 1 },
   vendorDesc: { color: '#cdbf99', fontSize: 12, marginTop: 6, lineHeight: 17, fontStyle: 'italic' },
+  // arb103 — vendor Fusing Crucible offer.
+  crucibleBtn: {
+    marginTop: 10,
+    paddingVertical: 8,
+    borderRadius: 4,
+    borderColor: '#b88ce0',
+    borderWidth: 1,
+    backgroundColor: '#1e1726',
+    alignItems: 'center',
+  },
+  crucibleBtnText: { color: '#d9b8f0', fontSize: 12, fontWeight: '800', letterSpacing: 1 },
   walletRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',

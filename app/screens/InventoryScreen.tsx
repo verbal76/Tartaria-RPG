@@ -13,6 +13,7 @@ import { canScrap } from '../engine/scrapEngine';
 import { findWeaponByName, isInferredItem, isInferredInventoryItem } from '../engine/crafting';
 import { resolveDisplayWeapon } from '../engine/itemResolution';
 import { isPouchEligible } from '../engine/pouchEligibility';
+import { useDisplaySettings, baseColorOf } from '../ui/displaySettings';
 import { BrandedModal } from '../components/BrandedModal';
 import { getItemPreview, getItemPreviewForInstance } from '../components/itemPreview';
 import { computeInventoryDelta, type InventoryDelta } from '../components/inventoryDelta';
@@ -72,9 +73,24 @@ function sortInventoryItems(
 // 3rd tab (CRAFT / REPAIR / RECIPES). InventoryScreen is now a
 // single ITEMS view — no tabs needed.
 
+// arb103 — perceived luminance of a #rrggbb color (0..1).
+function hexLuminance(hex: string): number {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  return 0.299 * r + 0.587 * g + 0.114 * b;
+}
+
 export function InventoryScreen() {
   const player = useGameStore((s) => s.player);
   const setScreen = useGameStore((s) => s.setScreen);
+  // arb103 — the bottom legend text washed out when the player tuned a
+  // lighter/brighter background. Pick the text color by the background's
+  // ACTUAL perceived luminance (hue+sat+brightness): dark text on a light
+  // bg, light text on a dark bg.
+  const display = useDisplaySettings();
+  const bgLum = hexLuminance(baseColorOf(display));
+  const legendTextColor = bgLum > 0.5 ? '#241c14' : '#d8cba8';
   const equipItem = useGameStore((s) => s.equipItem);
   const unequipSlot = useGameStore((s) => s.unequipSlot);
   const dropInventoryItem = useGameStore((s) => s.dropInventoryItem);
@@ -449,10 +465,17 @@ export function InventoryScreen() {
     // OTA-193's auto-substitute crafting drain; empty heart = free
     // to be consumed for canonical material substitution. The
     // fusion bench (planned) will draw from reserved items.
-    if (isInferredInventoryItem(pending.item)) {
+    // arb105 — faction-gear items can ALSO be reserved, as a fusion
+    // CATALYST: reserving one themes the next Crucible output into a
+    // unique faction item (it doesn't count toward the 3-scrap gate).
+    const isFactionCatalyst = (pending.item.tags ?? []).includes('faction_gear');
+    if (isInferredInventoryItem(pending.item) || isFactionCatalyst) {
       const reserved = pending.item.reservedForFusion === true;
+      const label = isFactionCatalyst
+        ? (reserved ? '♥ Reserved as faction catalyst' : '♡ Save as faction catalyst')
+        : (reserved ? '♥ Reserved for fusion' : '♡ Save for fusion');
       buttons.push({
-        label: reserved ? '♥ Reserved for fusion' : '♡ Save for fusion',
+        label,
         onPress: () => {
           toggleReserveForFusion(pending.item.id);
           closeModal();
@@ -597,7 +620,7 @@ export function InventoryScreen() {
         {CATEGORY_ORDER.map((cat) => (
           <View key={cat} style={styles.legendItem}>
             <View style={[styles.legendSwatch, { backgroundColor: CATEGORY_COLORS[cat] }]} />
-            <Text style={styles.legendText}>{CATEGORY_LABEL[cat]}</Text>
+            <Text style={[styles.legendText, { color: legendTextColor }]}>{CATEGORY_LABEL[cat]}</Text>
           </View>
         ))}
       </View>

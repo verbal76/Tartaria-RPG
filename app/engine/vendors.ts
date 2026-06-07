@@ -38,6 +38,19 @@ export function rollOfferQuantity(itemName: string): number {
   return 1;
 }
 
+// arb104 — faction-issue armor + weapons (tagged `faction_gear` + faction)
+// stocked by the outpost Armory for the player's own faction.
+interface FactionGearRow { name: string; faction?: string; tc?: number; rarity?: string; tags?: string[] }
+const FACTION_GEAR: FactionGearRow[] = [
+  ...(((weaponsData as unknown as { weapons?: FactionGearRow[] }).weapons ?? [])),
+  ...(((armorData as unknown as { armor?: FactionGearRow[] }).armor ?? [])),
+].filter((it) => (it.tags ?? []).includes('faction_gear'));
+export function factionGearOffers(factionId: string): VendorOffer[] {
+  return FACTION_GEAR
+    .filter((it) => it.faction === factionId)
+    .map((it) => ({ itemName: it.name, price: Math.max(2, Math.round(it.tc ?? 50)), quantity: 1 }));
+}
+
 // OTA 030 — roadside trader archetype shape. JSON-authored in
 // data/npcs/roadside_traders.json. demeanor drives the steal DC
 // (sketchy = easier to lift from, but bigger fight on a miss).

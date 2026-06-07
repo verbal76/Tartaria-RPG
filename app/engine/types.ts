@@ -802,6 +802,19 @@ export interface PlayerCharacter {
   statusEffects?: StatusEffect[];
   /** Hours elapsed since the character entered Tartaria. Day = 24 hours. */
   hoursElapsed?: number;
+  /** arb107 — monotonic counter bumped each time the player's macro
+   *  location changes between scenes (i.e. an actual named-location
+   *  travel, not room-to-room movement inside an outpost). Outpost rooms
+   *  stamp this at loot-clear time and restock only when it has advanced
+   *  (player left to another named location and came back). */
+  macroVisitSeq?: number;
+  /** arb107 — the macro location id observed at the previous beginScene,
+   *  used to detect a location change and bump `macroVisitSeq`. */
+  lastBeganLocationId?: string;
+  /** arb107 — in-game hour at which `rest` last paid out its WIS-train +
+   *  trinket reward. Gates those rewards behind a per-day cooldown so the
+   *  player can't farm WIS / free trinkets by spamming short rests. */
+  lastRestRewardAtHours?: number;
   /** 2026-05-25 OTA-046 — unix ms when this player's last persist
    *  fired. Approximates "session ended at" because persist runs on
    *  every meaningful action. Used on slot-load to compute real-time
@@ -1260,6 +1273,24 @@ export interface VisitedRoom {
    *  passed. Wall-clock fallback (lastVisitAt) remains for legacy
    *  saves that don't carry this field. */
   hoursElapsedAtVisit?: number;
+  /** arb105 — in-game hour at which this room's loot/interactables were
+   *  most recently consumed (take/salvage). Used ONLY for hub/outpost
+   *  rooms: once `searchedAmbientNouns` has entries, the chips stay gone
+   *  until HUB_LOOT_RESPAWN_HOURS have elapsed since this stamp, then
+   *  beginScene clears the consumed set so the room's loot respawns. Wild
+   *  tiles ignore this field (their re-roll is handled separately). Lazily
+  /** arb105/arb107 — outpost loot restock marker. Originally an in-game
+   *  hour stamp (arb105); arb107 changed the restock trigger from a raw
+   *  48h timer (which `rest` could skip for free) to "the player traveled
+   *  to a DIFFERENT named location and returned." This now records the
+   *  player's `macroVisitSeq` at the moment this hub room's loot was
+   *  cleared. On re-entry, if the player's current `macroVisitSeq` has
+   *  advanced past this value (they left to another named location and
+   *  came back), the room's consumed record resets and the loot restocks.
+   *  Walking between outpost rooms or resting in place does NOT advance the
+   *  seq, so the building can't be farmed in place. Lazily stamped on the
+   *  first re-entry observing a non-empty consumed set. */
+  clearedAtMacroSeq?: number;
   /** 2026-05-26 OTA-071 — per-room investigation table. Seeded
    *  on first scene generation from ambientNouns. Each entry
    *  has a category, curated/Qwen lore, optional yield, hook

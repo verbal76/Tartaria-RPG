@@ -36,13 +36,35 @@
 // more grounded refusal ("That's lunch, not a tool." instead of
 // "STOW FAILED").
 
-import type { InventoryItem, PlayerCharacter } from './types';
+import type { InventoryItem } from './types';
+import type { PlayerCharacter } from './types';
 
 const TOOL_KINDS = ['exploration', 'relic'] as const;
 const TOOL_TAGS = [
   'tool', 'light', 'detection', 'utility',
   'rope', 'scanner', 'gate', 'aetheric',
+  'lens', 'optic', 'pry', 'navigation', 'kit',
 ] as const;
+// arb101 — explicit "this is WORN gear, not a tool" escape hatch. A wardrobe
+// piece (e.g. the Hardened Climbing Strap) can be kind:exploration for legacy
+// reasons but must NOT count as a tool / pouch item. Tag it `wardrobe`.
+const NON_TOOL_TAGS = ['wardrobe', 'worn', 'apparel'] as const;
+const NON_TOOL_KINDS = ['consumable', 'weapon', 'armor', 'accessory', 'amulet', 'ring'] as const;
+
+/** arb101 — THE single source of truth for "is this item a tool?" (pure,
+ *  item-only — no player context). Used by both the tool-pouch eligibility
+ *  here AND the inventory TOOLS category (InventoryCategorize), so the two
+ *  can never disagree again. A tool is: not consumable/weapon/armor/jewelry,
+ *  not explicitly tagged wardrobe, AND either a tool kind (exploration/relic)
+ *  or a tool tag (scanner/light/lens/pry/…). */
+export function itemIsTool(item: InventoryItem): boolean {
+  const kind = (item.kind ?? '').toLowerCase();
+  if ((NON_TOOL_KINDS as readonly string[]).includes(kind)) return false;
+  const tags = (item.tags ?? []).map((t) => t.toLowerCase());
+  if (tags.some((t) => (NON_TOOL_TAGS as readonly string[]).includes(t))) return false;
+  if ((TOOL_KINDS as readonly string[]).includes(kind)) return true;
+  return tags.some((t) => (TOOL_TAGS as readonly string[]).includes(t));
+}
 
 export interface PouchEligibility {
   eligible: boolean;
@@ -85,14 +107,15 @@ export function isPouchEligible(
     return { eligible: false, reason: "that's jewelry — equip it on a ring or amulet slot" };
   }
 
-  // Positive checks: tool kinds OR tool tags.
-  if ((TOOL_KINDS as readonly string[]).includes(kind)) {
-    return { eligible: true };
-  }
+  // arb101 — wardrobe pieces are worn, not pouched (nicer message than the
+  // generic fall-through below).
   const tags = (item.tags ?? []).map((t) => t.toLowerCase());
-  if (tags.some((t) => (TOOL_TAGS as readonly string[]).includes(t))) {
+  if (tags.some((t) => (NON_TOOL_TAGS as readonly string[]).includes(t))) {
+    return { eligible: false, reason: "you wear that — it's not a tool" };
+  }
+  // Single source of truth (shared with the inventory TOOLS category).
+  if (itemIsTool(item)) {
     return { eligible: true };
   }
-
   return { eligible: false, reason: "that's not a tool" };
 }

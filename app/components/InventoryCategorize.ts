@@ -1,5 +1,6 @@
 import type { InventoryItem } from '../engine/types';
 import { WEAPONS, ARMOR, MATERIALS, GEAR, AMULETS, RINGS } from '../engine/crafting';
+import { itemIsTool } from '../engine/pouchEligibility';
 
 export type InventoryCategory =
   | 'weapon'
@@ -49,18 +50,14 @@ export const CATEGORY_ORDER: InventoryCategory[] = [
   'loot',
 ];
 
-// arb90 — what reads as a "tool": an interaction implement (pry bar,
-// lockpick, scanner, shovel, grapple, climbing gear, repair kit). Catalog
-// rows / inventory items can opt in explicitly with a `tool` tag; otherwise
-// a focused name/tag heuristic catches the obvious ones. Kept narrow so it
-// doesn't vacuum up weapons (checked first) or crafting stock — bare "rope"
-// is intentionally NOT here (Broken Rope is a material).
-const TOOL_NAME_RE =
-  /\b(pry ?bar|crowbar|lock\s?pick|scanner|grapple|grappler|grappling hook|climbing (gear|kit|strap|spikes?|rope)|grip pads|repair kit|tool ?kit|pick ?axe|chisel|pliers|wrench|tongs|shovel|trowel)\b/i;
-export function isToolItem(item: InventoryItem): boolean {
-  if (item.tags?.some((t) => /^(tool|lockpick|grapple|prybar)$/i.test(t))) return true;
-  return TOOL_NAME_RE.test(item.name);
-}
+// arb101 — the inventory TOOLS category now uses the SAME tool definition as
+// the tool pouch (engine/pouchEligibility.itemIsTool), so what shows as a
+// "Tool" is exactly what can be stowed in a tool slot — scanners, lenses,
+// torches, pry bar, kits, ropes, grapples, etc. — and a `wardrobe`-tagged
+// piece (the Hardened Climbing Strap) is correctly NOT a tool. (Was a
+// separate name-regex that disagreed with the pouch: it missed torches/lenses
+// and wrongly caught the climbing strap.)
+export const isToolItem = itemIsTool;
 
 export function categorizeItem(item: InventoryItem): InventoryCategory {
   const nameLower = item.name.toLowerCase();

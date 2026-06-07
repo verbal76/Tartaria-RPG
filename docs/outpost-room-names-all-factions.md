@@ -1,16 +1,10 @@
 # Tartaria — Outpost Room Names, All Factions
 
-> The complete, canonical reference for drawing each faction's outpost interior. **The
-> layout is identical for all 9 factions** (same 15 rooms, same connections); only the
-> NAMES change, and only for the 10 surface rooms — the 5 buried rooms are generic for
-> everyone. Each faction section below is self-contained: it uses that faction's own
-> room names in both the label and the 'connects to' column, so a map can be made from
-> one section. Pulled live from the shipped app — canon.
+> Canonical reference for each faction's outpost interior. **Same 15-room layout for all 9** (same connections); only the 10 surface-room NAMES change. Each section is self-contained. Pulled live from the app — canon.
 
 ---
 
 ## The fixed layout (positions — same for every faction)
-
 ```
                  SURFACE OUTPOST  (enter at the Gate room)
 
@@ -34,8 +28,6 @@
                         |
                 [ SECOND LANDING ]--[ SHALLOW DIGS ]
 ```
-
-The ALL-CAPS words above are the room *slots*. Each faction renames them per its section below.
 
 ## Mud Monarchs — "Monarch Court"
 
@@ -141,14 +133,14 @@ The ALL-CAPS words above are the room *slots*. Each faction renames them per its
 
 | Room | Tier | Connects to |
 |---|---|---|
-| **The Tool Threshold** | surface | N→The Plan Floor, E→The Aethercraft Smithy, W→The Mess Bench |
-| **The Plan Floor** | surface | N→The Construction Hall, S→The Tool Threshold, E→The Aethercraft Smithy, W→The Mess Bench |
-| **The Aethercraft Smithy** | surface | N→The Construction Hall, W→The Plan Floor |
+| **The Tool Threshold** | surface | N→The Plan Floor, E→The Forge Shrine, W→The Mess Bench |
+| **The Plan Floor** | surface | N→The Aethercraft Smithy, S→The Tool Threshold, E→The Forge Shrine, W→The Mess Bench |
+| **The Forge Shrine** | surface | N→The Aethercraft Smithy, W→The Plan Floor |
 | **The Mess Bench** | surface | N→The Crew Bunks, E→The Plan Floor |
-| **The Construction Hall** | surface | N→The Materials Vault, S→The Plan Floor, E→The Aethercraft Smithy, W→The Drafting Office |
+| **The Aethercraft Smithy** | surface | N→The Materials Vault, S→The Plan Floor, E→The Forge Shrine, W→The Drafting Office |
 | **The Crew Bunks** | surface | S→The Mess Bench |
-| **The Drafting Office** | surface | N→The Materials Vault, E→The Construction Hall |
-| **The Materials Vault** | surface | S→The Construction Hall, W→The Drafting Office |
+| **The Drafting Office** | surface | N→The Materials Vault, E→The Aethercraft Smithy |
+| **The Materials Vault** | surface | S→The Aethercraft Smithy, W→The Drafting Office |
 | **The Plan Room** | surface | S→The Plan Floor, W→The Crew Bunks |
 | **The Foundation Descent** | surface | S→The Plan Floor |
 | **First Landing** | buried | N→The Foundation Descent, S→Second Landing, E→Storage Halls, W→The Pump Room |

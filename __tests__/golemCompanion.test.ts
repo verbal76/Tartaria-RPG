@@ -145,7 +145,7 @@ describe('MECHANIC-1b — golem sidekick', () => {
       const g = makeCompanion(GOLEM_DEFINITIONS.iron_golem);
       expect(g.hp).toBe(g.hpMax);
       expect(g.kind).toBe('iron_golem');
-      expect(g.attackDie).toBe('1d6');
+      expect(g.attackDie).toBe('1d8'); // arb100 — golem power scaled by summon DC
     });
   });
 

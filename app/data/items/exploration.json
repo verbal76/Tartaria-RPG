@@ -1170,10 +1170,10 @@
     "tcBuy": 20,
     "tags": [
       "exploration",
-      "tool",
       "common",
       "race_starter",
-      "tartarian_giant"
+      "tartarian_giant",
+      "wardrobe"
     ],
     "description": "Climbing support sized for large bodies. Supports heavy weights and prevents falls in rugged terrain.",
     "effect": {

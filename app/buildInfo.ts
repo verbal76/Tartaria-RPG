@@ -12513,4 +12513,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // present a <Modal> in that window. Fix: a local `doorModalVisible` state now
 // drives the modal — on the door beat, dismiss the keyboard then flip it true
 // on a ~450ms timer so iOS presents over a clean, settled frame.
-export const OTA_BUILD_ID = '2026-06-06-321';
+// OTA-322 — Cattail Anvil. Production promotion of the arbiters-line batch
+// arb100–arb107 (the work since Tule Anvil/OTA-321=arb99): golem power
+// scaling + Stone Builders room names→map; unified tool definition
+// (scanners/lens/torch/pry are tools, the Hardened Climbing Strap is
+// wardrobe → cloak slot, 0-stamina climb + rest while climbing); a Fusing
+// Crucible in every outpost + vendors fire a portable one for 25 TC;
+// inventory legend text auto-contrast; faction outpost economy (every
+// Armory sells your faction's named arms+armor, every faction has standing
+// missions, map travel list tags + routes to all 9 outposts); outpost loot
+// restocks when you travel to another named location and return; a reserved
+// faction item can be added to the Crucible as a catalyst → unique faction
+// item; Servants of the Giants ("Tomb Vigil") outpost map wired (9/9). Plus
+// a pre-promotion red-team exploit sweep: fused items unsellable (closes the
+// fusion→sell money pump), faction fusion bumps one rarity tier (not auto-
+// Legendary), and the investigate-INT / rest-WIS / dog-INT farms tightened.
+// JS-only → ships as an OTA to the hal2001 channel; no native rebuild.
+export const OTA_BUILD_ID = '2026-06-07-322';

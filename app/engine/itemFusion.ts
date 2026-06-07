@@ -128,6 +128,40 @@ export function gateFusion(inventory: readonly InventoryItem[]): FusionGate {
   return { ok: true, inputs, tagProfile };
 }
 
+/** arb105 — optional faction CATALYST. A faction-gear item (tagged
+ *  `faction_gear`) the player has reserved (♥) acts as a catalyst at the
+ *  Crucible: it does NOT count toward the 3-input / 3-tag gate, but when
+ *  present at fuse time the output is themed as a unique faction item
+ *  (faction-prefixed name, faction tags, bumped to Legendary) and the
+ *  catalyst is consumed alongside the scrap inputs. Returns the first
+ *  reserved faction-gear item, or null. */
+export function findFactionCatalyst(inventory: readonly InventoryItem[]): InventoryItem | null {
+  for (const it of inventory) {
+    if (!it.reservedForFusion) continue;
+    if (it.quantity <= 0) continue;
+    if ((it.tags ?? []).includes('faction_gear')) return it;
+  }
+  return null;
+}
+
+/** Faction-theme overlay for a fused item. Identity of the catalyst's
+ *  faction is supplied by the caller (it has factions.json). */
+export interface FactionTheme {
+  /** Faction id, added as a tag so the item reads as that faction's. */
+  id: string;
+  /** Short display label prefixed to the fused name ("Monarch Court", … ). */
+  label: string;
+  /** The catalyst InventoryItem id to drain on fuse. */
+  catalystId: string;
+  /** arb107 — the rarity the faction catalyst confers, computed by the
+   *  caller as ONE tier above the inputs' natural fusion rarity (capped at
+   *  Legendary). With the minimum 3-tag input set this lands on Rare; a
+   *  richer 4+-tag set reaches Legendary. Replaces arb105's unconditional
+   *  Legendary stamp, which (with free scrap + a cheap catalyst) trivialized
+   *  the rarity ladder. */
+  rarity: 'Rare' | 'Legendary';
+}
+
 /** Stable hash of an input set so reloads / re-attempts with the same
  *  pack produce the same fused item. Deterministic by sorted lowercased
  *  names. */
@@ -430,8 +464,11 @@ export function applyFusion(
   inputs: readonly InventoryItem[],
   result: { name: string; description: string; stats: UniqueItemStats },
   itemIdSeed: string,
+  faction?: FactionTheme | null,
 ): { inventory: InventoryItem[]; fused: InventoryItem } {
   const inputIds = new Set(inputs.map((i) => i.id));
+  // arb105 — the faction catalyst is also consumed (one unit) when present.
+  if (faction) inputIds.add(faction.catalystId);
   // Drain one unit from each input. The eligible-inputs path filters
   // on quantity > 0, and inferred items are almost always quantity 1,
   // but be tolerant just in case.
@@ -450,16 +487,37 @@ export function applyFusion(
     : result.stats.kind === 'dog_armor' ? 'dog_armor'
     : 'armor';
 
+  // arb105/arb107 — faction theming overlay. A catalyst makes the result a
+  // one-of-a-kind faction item: the name is prefixed with the faction's
+  // label and the faction id + faction_gear tags are stamped on. arb107
+  // changed the rarity from an unconditional Legendary stamp to "one tier
+  // above the inputs' natural rarity" (the caller passes `faction.rarity`),
+  // and never DOWNGRADES below what the synth produced — so a rich input
+  // set that already synthesized Legendary stays Legendary.
+  const rank = (r: 'Rare' | 'Legendary') => (r === 'Legendary' ? 1 : 0);
+  const themedRarity: 'Rare' | 'Legendary' = faction
+    ? (rank(faction.rarity) >= rank(result.stats.rarity) ? faction.rarity : result.stats.rarity)
+    : result.stats.rarity;
+  const stats: UniqueItemStats = faction
+    ? { ...result.stats, rarity: themedRarity }
+    : result.stats;
+  const name = faction ? `${faction.label} ${result.name}`.slice(0, 48) : result.name;
+  const tags = faction
+    ? ['fused', 'unique', 'faction_gear', faction.id, ...(stats.resistance ? [stats.resistance] : [])]
+    : ['fused', 'unique', ...(stats.resistance ? [stats.resistance] : [])];
+
   const fused: InventoryItem = {
     id: `fused_${itemIdSeed}`,
-    name: result.name,
+    name,
     kind: inventoryKind,
     quantity: 1,
-    tags: ['fused', 'unique', ...(result.stats.resistance ? [result.stats.resistance] : [])],
-    rarity: result.stats.rarity,
-    description: result.description,
-    durability: { ...result.stats.durability },
-    uniqueStats: result.stats,
+    tags,
+    rarity: stats.rarity,
+    description: faction
+      ? `${result.description} It bears the mark of ${faction.label}.`
+      : result.description,
+    durability: { ...stats.durability },
+    uniqueStats: stats,
   };
 
   return { inventory: [...drained, fused], fused };

@@ -49,6 +49,12 @@ export function validSlotsForItem(item: InventoryItem): EquipSlot[] {
   if (exp?.effect?.kind === 'scanner') {
     return [exp.effect.slot]; // currently always 'off'
   }
+  // arb102 — `wardrobe`-tagged worn gear that isn't catalog armor (the
+  // Hardened Climbing Strap) equips in the cloak / outer-layer slot, so it's
+  // worn like apparel rather than stowed as a tool.
+  if (item.tags?.some((t) => t.toLowerCase() === 'wardrobe')) {
+    return ['cloak'];
+  }
   const armor = findArmorByName(item.name);
   if (armor) {
     const equipSlots: EquipSlot[] = ['main','off','head','chest','hands','legs','feet','cloak','amulet','ring'];

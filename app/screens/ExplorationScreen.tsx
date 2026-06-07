@@ -598,7 +598,7 @@ export function ExplorationScreen() {
                   player knows exactly what's missing.
           Tapping still submits "fuse" so the engine's own gates fire
           for narration parity. */}
-      {player?.fusionPending && (() => {
+      {(player?.fusionPending || player?.hubRoomId) && (() => {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { gateFusion } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
         const gate = gateFusion(player.inventory ?? []);

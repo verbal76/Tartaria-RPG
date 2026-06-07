@@ -325,8 +325,8 @@
         "description": "A workshop floor of laid blueprints and stacked stone. The center stone has the Buried Cities' load-bearing tunnels chalked across it in three layers."
       },
       "outpost_armory": {
-        "name": "The Aethercraft Smithy",
-        "shortName": "Smithy",
+        "name": "The Forge Shrine",
+        "shortName": "Forge",
         "description": "Anvils on Aetheric isolators. Irma builds — she does not break. Each weapon she sets out is also a tool: a chisel that cuts mud-glass, a maul that lifts stone."
       },
       "outpost_messhall": {
@@ -335,8 +335,8 @@
         "description": "A workshop break-room with iron-leg tables and tin plates. Halem feeds whoever can hold a tool; the food is hot, plenty, and gone in an hour."
       },
       "outpost_workshop": {
-        "name": "The Construction Hall",
-        "shortName": "Hall",
+        "name": "The Aethercraft Smithy",
+        "shortName": "Smithy",
         "description": "Tarek's home turf. Half-assembled Aethercraft engines, drone chassis, mud-glass casting molds — the Builders' real art happens at this bench."
       },
       "outpost_quarters": {

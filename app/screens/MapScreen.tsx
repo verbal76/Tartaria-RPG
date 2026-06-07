@@ -52,6 +52,7 @@ import {
 } from '../engine/atlasCoords';
 import { LOCATION_TO_MACRO } from '../engine/worldLadder';
 import { isHubLocation, hubRoomFor, hubNameForFaction } from '../engine/hub';
+import { FACTION_STARTING_LOCATION } from '../engine/character';
 // OTA 051 — locations.json carries the human-readable name we want
 // to surface in the "You are here: <name>" chip when the player is
 // on a depicted tile.
@@ -59,6 +60,18 @@ import locationsData from '../data/locations/locations.json';
 import type { Location } from '../engine/types';
 
 const LOCATIONS = locationsData as Location[];
+
+// arb105 — map each faction's outpost macro-tile to that faction's
+// outpost display name ("Reclaimers' Outpost", "Monarch Court", …). The
+// travel list shows the geographic tile name (e.g. "Reclaimer's Stake"),
+// which doesn't read as an outpost; this lets the row tag the tile with
+// its outpost identity in parens so the player can spot the 9 faction
+// outposts at a glance.
+const OUTPOST_NAME_BY_LOCATION: Record<string, string> = Object.fromEntries(
+  Object.entries(FACTION_STARTING_LOCATION).map(
+    ([factionId, locId]) => [locId, hubNameForFaction(factionId)],
+  ),
+);
 
 // arb98 — descriptive (text-only) whereabouts for the map footer. The map is
 // a reference image with NO player marker; instead the footer tells the player
@@ -107,8 +120,10 @@ const ATLAS_H = 887;
 // arb99 — the world atlas, plus per-faction outpost INTERIOR maps. When the
 // player is inside their outpost the Map screen shows that faction's interior;
 // out in the world it shows the world atlas. Outpost maps are 1254×1254 (1:1).
-// stone_builders + servants_of_giants aren't finalized yet → they fall back to
-// the world atlas until their art lands (just drop the PNG in assets/outposts).
+// arb106 — all 9 faction outpost interior maps have now landed. The Servants
+// of the Giants map ("Tomb Vigil") was the last one; its room names already
+// matched the artist's labels (hub_faction_variants.json), so wiring the PNG
+// completes the set.
 const WORLD_ATLAS = require('../../assets/world-atlas.png');
 const OUTPOST_MAPS: Record<string, number> = {
   mud_monarchs: require('../../assets/outposts/mud_monarchs.png'),
@@ -118,6 +133,8 @@ const OUTPOST_MAPS: Record<string, number> = {
   true_tartarians: require('../../assets/outposts/true_tartarians.png'),
   tartarian_revivalists: require('../../assets/outposts/tartarian_revivalists.png'),
   conspiracy_architects: require('../../assets/outposts/conspiracy_architects.png'),
+  stone_builders: require('../../assets/outposts/stone_builders.png'),
+  servants_of_giants: require('../../assets/outposts/servants_of_giants.png'),
 };
 
 // Gesture clamps.
@@ -639,8 +656,13 @@ export function MapScreen() {
                 <View style={styles.placeRowLeft}>
                   <Text style={[styles.placeName, isHere && styles.placeNameHere]}>
                     {p.name}
+                    {OUTPOST_NAME_BY_LOCATION[p.id]
+                      ? `  (${OUTPOST_NAME_BY_LOCATION[p.id]})`
+                      : ''}
                   </Text>
-                  <Text style={styles.placeType}>{p.type}</Text>
+                  <Text style={styles.placeType}>
+                    {OUTPOST_NAME_BY_LOCATION[p.id] ? 'faction outpost' : p.type}
+                  </Text>
                 </View>
                 <View style={styles.placeRowRight}>
                   {isHere ? (

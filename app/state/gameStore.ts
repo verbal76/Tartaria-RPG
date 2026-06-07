@@ -150,7 +150,7 @@ import {
   type Recipe,
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
-import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, VENDORS, type VendorInstance } from '../engine/vendors';
+import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, VENDORS, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks } from '../engine/raceMechanics';
 import { trainStat, type StatKey } from '../engine/statTraining';
 import { findQuestFactionHint } from '../engine/factionHint';
@@ -2072,6 +2072,10 @@ interface GameStore {
   /** Craft a specific recipe directly (used by the CraftingScreen list). */
   craftRecipe: (recipeName: string) => void;
   dismissVendor: () => void;
+  /** arb103 — every vendor will fire up a portable Fusing Crucible for a
+   *  flat 25 TC. Pre-checks the reserve gate (no charge if you're not ready),
+   *  then charges + fuses. */
+  useVendorCrucible: () => void;
   joinFaction: (factionId: string) => void;
   equipItem: (itemName: string, slot: EquipSlot) => void;
   unequipSlot: (slot: EquipSlot) => void;
@@ -3482,6 +3486,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const candidateKey = makeRoomKey(player.currentLocationId, microMicroId, player.mapX, player.mapY, player.hubRoomId);
     const priorVisit = worldMemory.visitedRooms?.[candidateKey];
     const hoursElapsed = player.hoursElapsed ?? 0;
+    // arb107 — macro-location visit sequence. Bumps whenever the player's
+    // macro location changes between scenes (an actual named-location
+    // travel — NOT room-to-room movement inside an outpost, which keeps the
+    // same currentLocationId). Outpost loot restocks key on this: a room's
+    // loot returns only once the seq has advanced past the value stamped
+    // when it was cleared, i.e. the player left to another named location
+    // and came back. This replaces arb105's raw 48h hour-timer, which
+    // `rest` could skip for free. Persisted on the player at the visit
+    // record below (along with lastBeganLocationId).
+    const macroChanged = !!player.lastBeganLocationId && player.lastBeganLocationId !== location.id;
+    const macroVisitSeq = (player.macroVisitSeq ?? 0) + (macroChanged ? 1 : 0);
     // Prefer the in-game hour delta when available so idling in real
     // time doesn't accidentally clear the respawn cooldown. Fall back
     // to the wall-clock heuristic for legacy saves that pre-date the
@@ -3540,13 +3555,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // vendor-turned-enemy — falls). Roadside traders are unaffected
     // (random + unnamed; can't be in defeatedEnemies meaningfully).
     const defeatedSet = new Set(get().worldMemory.defeatedEnemies ?? []);
-    const vendor: VendorInstance | null = opts?.isOpening
-      ? null
-      : hubRoom && hubRoom.anchorNpc
-        ? (defeatedSet.has(hubRoom.anchorNpc)
-            ? null
-            : (findVendorByName(hubRoom.anchorNpc) ?? null))
-        : (!hasEnemies && !hubRoom && Math.random() < 0.25 ? pickRoadsideTrader() : null);
+    const vendor: VendorInstance | null = ((): VendorInstance | null => {
+      const base: VendorInstance | null = opts?.isOpening
+        ? null
+        : hubRoom && hubRoom.anchorNpc
+          ? (defeatedSet.has(hubRoom.anchorNpc)
+              ? null
+              : (findVendorByName(hubRoom.anchorNpc) ?? null))
+          : (!hasEnemies && !hubRoom && Math.random() < 0.25 ? pickRoadsideTrader() : null);
+      // arb104 — the outpost Armory stocks the player's OWN faction's named
+      // armor + weapons (Irma carries faction-issue gear in your outpost).
+      if (base && hubRoom?.anchorNpc === 'Irma Ironhand' && player.factionId) {
+        const facOffers = factionGearOffers(player.factionId);
+        if (facOffers.length > 0) {
+          const have = new Set(base.offers.map((o) => o.itemName));
+          return { ...base, offers: [...base.offers, ...facOffers.filter((o) => !have.has(o.itemName))] };
+        }
+      }
+      return base;
+    })();
     // Enemies start at 'close' range — close enough to be a problem but not
     // already swinging. Players have to advance (or be charged) to land
     // melee, retreat to set up ranged shots.
@@ -3784,17 +3811,76 @@ export const useGameStore = create<GameStore>((set, get) => ({
     }
     // arb39 — persistent-room emptiness for hub interiors (the tutorial
     // outpost rooms, capital halls, etc.). Once an interactable has been
-    // taken or salvaged in this room, it stays gone on re-entry instead
-    // of respawning — closing the re-enter-a-room-to-farm exploit. Wild
-    // tiles are left alone (their re-roll is intentional). candidateKey is
-    // this room's per-room key (same one the take/salvage handlers write).
+    // taken or salvaged in this room, it stays gone on re-entry — closing
+    // the re-enter-a-room-to-farm exploit. Wild tiles are left alone
+    // (their re-roll is intentional). candidateKey is this room's per-room
+    // key (same one the take/salvage handlers write).
+    // arb105/arb107 — the player wanted a renewable outpost, NOT a tight
+    // in/out farm. arb105 used a 48h hour-timer; arb107 changed the reset
+    // trigger to "the player traveled to a DIFFERENT named location and
+    // returned" (red-team found `rest` could skip the hour-timer for free).
+    // We record the player's `macroVisitSeq` the first time we observe a
+    // non-empty consumed set here; once the seq has advanced past that
+    // stamp (a real round-trip to another named location), we wipe the
+    // room's consumed records so its loot — take, salvage, scanner finds,
+    // floor-dig — restocks, and re-arm the dog's nose + investigate flavor.
+    // Walking outpost room-to-room or resting in place keeps the same
+    // currentLocationId, so the seq doesn't move and nothing restocks.
     let sceneAmbientNouns = ambientNouns;
     let sceneDisplayedNouns = displayedAmbientNouns;
     if (hubRoom) {
       const consumedHere = roomConsumedSet(get().worldMemory, candidateKey);
       if (consumedHere.size > 0) {
-        sceneAmbientNouns = ambientNouns.filter((n) => !isConsumedNoun(consumedHere, n));
-        sceneDisplayedNouns = displayedAmbientNouns.filter((n) => !isConsumedNoun(consumedHere, n));
+        const roomRec = get().worldMemory.visitedRooms?.[candidateKey];
+        const clearedSeq = roomRec?.clearedAtMacroSeq;
+        if (typeof clearedSeq === 'number' && macroVisitSeq > clearedSeq) {
+          // The player left to another named location and came back —
+          // restock the whole room and clear the stamp so the next consume
+          // starts a fresh round-trip clock. Don't filter this scene.
+          set((s) => {
+            const prev = s.worldMemory.visitedRooms?.[candidateKey];
+            if (!prev) return s;
+            return {
+              worldMemory: {
+                ...s.worldMemory,
+                visitedRooms: {
+                  ...s.worldMemory.visitedRooms,
+                  [candidateKey]: {
+                    ...prev,
+                    searchedAmbientNouns: [],
+                    flavorExhaustedNouns: [],
+                    dogSmelledHere: false,
+                    clearedAtMacroSeq: undefined,
+                  },
+                },
+              },
+            };
+          });
+          get().appendLog(
+            'world',
+            `The outpost has restocked since you were last through — supplies have been set out again.`,
+          );
+        } else {
+          // Still "in residence" — keep the room consumed. Stamp the
+          // clear-seq lazily on the first re-entry observing consumption.
+          if (typeof clearedSeq !== 'number') {
+            set((s) => {
+              const prev = s.worldMemory.visitedRooms?.[candidateKey];
+              if (!prev) return s;
+              return {
+                worldMemory: {
+                  ...s.worldMemory,
+                  visitedRooms: {
+                    ...s.worldMemory.visitedRooms,
+                    [candidateKey]: { ...prev, clearedAtMacroSeq: macroVisitSeq },
+                  },
+                },
+              };
+            });
+          }
+          sceneAmbientNouns = ambientNouns.filter((n) => !isConsumedNoun(consumedHere, n));
+          sceneDisplayedNouns = displayedAmbientNouns.filter((n) => !isConsumedNoun(consumedHere, n));
+        }
       }
     }
     // microMicroId was resolved at the top of beginScene so the
@@ -4435,9 +4521,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
             containersOpened: existing?.containersOpened ?? [],
             searchedAmbientNouns: existing?.searchedAmbientNouns ?? [],
             hoursElapsedAtVisit: hoursElapsed,
+            // arb107 — this literal replaces the room object wholesale, so
+            // any un-spread field is dropped. Preserve the loot/restock +
+            // dedup/latch fields so they survive re-entry: the outpost
+            // restock stamp, the investigate flavor-exhaustion record, and
+            // the dog smell-find latch (without this, the latch was wiped
+            // every entry, so the dog re-smelled — and re-trained INT —
+            // on every visit; now it stays latched until a travel-return
+            // restock re-arms it).
+            clearedAtMacroSeq: existing?.clearedAtMacroSeq,
+            flavorExhaustedNouns: existing?.flavorExhaustedNouns ?? [],
+            dogSmelledHere: existing?.dogSmelledHere,
           },
         },
       },
+      // arb107 — persist the macro-visit sequence + the location observed
+      // this scene so the NEXT beginScene can detect a named-location
+      // change and advance the seq (drives the outpost restock trigger).
+      player: s.player
+        ? { ...s.player, macroVisitSeq, lastBeganLocationId: location.id }
+        : s.player,
     }));
     // When we're in a Micro-Micro room, surface its named exits on its own
     // line so the player has a deterministic list of things to type
@@ -7100,17 +7203,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
                         },
                         searchedAmbientNouns: searchedWithNoun,
                         flavorExhaustedNouns: flavorWithNoun,
-                        // OTA-124 — clear the smell-find cooldown
-                        // whenever the player engages with a noun in
-                        // the room. The dog's nose is then free to
-                        // re-engage on the next scene re-entry, which
-                        // matches the spec's "re-eligible after the
-                        // room's visible nouns are all consumed."
-                        // Strict "all consumed" would require pool-
-                        // size comparison; resetting on any investigate
-                        // is simpler and gets the spirit (per-room,
-                        // not per-save).
-                        dogSmelledHere: false,
+                        // arb107 — do NOT reset the dog smell-find latch on
+                        // investigate. The OTA-124 reset (clear on any
+                        // investigate) was a farm: investigate a noun →
+                        // re-enter the room (a free interior move) → the dog
+                        // re-smells + re-trains INT + spawns a fresh noun →
+                        // repeat. The dog now smells a room once; the latch
+                        // re-arms only when the room fully resets — i.e. when
+                        // the player has traveled to another named location
+                        // and returned (handled in beginScene's restock).
+                        // (dogSmelledHere intentionally left unchanged here.)
                       },
                     },
                   },
@@ -7434,6 +7536,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (meaningfulStats.length > 0) {
               get().appendLog('world', meaningfulStats.join(' · '));
             }
+            // arb107 — inspecting your OWN inventory item is NOT a discovery
+            // roll. It used to fall through and build an `investigate` skill
+            // check, and concludeRolls trains INT on every success — with no
+            // dedupe, so `investigate <my item>` was an infinite INT farm.
+            // Just show the item's details and stop: no stamina, no dice, no
+            // stat training. (Scene-noun investigate below still rolls.)
+            break;
           }
           set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
           const steps = buildSkillSteps('investigate', player, {
@@ -8084,13 +8193,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // allowed via the consumable branch above; only this
           // long-rest path is gated.
           if (currentScene?.elevatedOn) {
+            // arb102 — rest while elevated needs a Reclaimer's Rope (belay
+            // loops) OR a worn Hardened Climbing Strap (a harness you can hang
+            // and doze in).
+            const wearsClimbStrapForRest = (player.equipped?.cloak ?? '').toLowerCase() === 'hardened climbing strap';
             const hasReclaimersRopeForRest = player.inventory.some(
               (i) => i.name === "Reclaimer's Rope" && i.quantity > 0,
-            );
+            ) || wearsClimbStrapForRest;
             if (!hasReclaimersRopeForRest) {
               get().appendLog(
                 'arbiter',
-                `The Arbiter looks up. "You can't sleep on a wall. Climb down, or wait until you have a Reclaimer's Rope to anchor a doze."`,
+                `The Arbiter looks up. "You can't sleep on a wall. Climb down, or wear a Hardened Climbing Strap (or carry a Reclaimer's Rope) to anchor a doze."`,
               );
               break;
             }
@@ -8334,31 +8447,48 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // full HP saw 30 in-game days of "Whole already" with no
           // variation (playtester literal report). Skipped on
           // ambush — the player has bigger problems.
+          // arb107 — per-day cooldown on the FARMABLE rest rewards (the
+          // trinket ITEM grant below + the WIS train further down). Without
+          // it, `rest` (8h, free game-time) could be spammed to farm WIS
+          // progress and a 30%/rest free trinket. The cooldown gates only
+          // the item + WIS; the OTA-050 "while you slept" FLAVOR beat still
+          // fires every rest (anti-boredom variety — it grants nothing), so
+          // a trinket roll on cooldown narrates the beat but hands over no
+          // item.
+          const REST_REWARD_COOLDOWN_HOURS = 24;
+          const lastRestReward = player.lastRestRewardAtHours;
+          const restRewardEligible =
+            typeof lastRestReward !== 'number' || (newHours - lastRestReward) >= REST_REWARD_COOLDOWN_HOURS;
           if (!restAmbush && Math.random() < 0.30) {
             const pull = REST_PULL_LINES[Math.floor(Math.random() * REST_PULL_LINES.length)]!;
             if (pull.kind === 'trinket') {
-              const liveAfterRest = get().player;
-              if (liveAfterRest) {
-                const trinket = pick(INVESTIGATE_TRINKETS);
-                const qty = trinket.qtyMin === trinket.qtyMax
-                  ? trinket.qtyMin
-                  : trinket.qtyMin + Math.floor(Math.random() * (trinket.qtyMax - trinket.qtyMin + 1));
-                const itemCat = lookupCraftedItem(trinket.name);
-                const newItem: InventoryItem = stampDurability({
-                  id: `rest_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-                  name: trinket.name,
-                  kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
-                  rarity: trinket.rarity,
-                  quantity: qty,
-                  tags: itemCat.tags,
-                });
-                const granted = grantItem(liveAfterRest.inventory, newItem);
-                set((s) => (s.player ? { player: { ...s.player, inventory: granted.inventory } } : s));
-                if (granted.accepted > 0) {
-                  get().appendLog('world', pull.line);
-                  const qtyLabel = granted.accepted > 1 ? ` x${granted.accepted}` : '';
-                  get().appendLog('reward', `✦ ${trinket.name}${qtyLabel} (${trinket.rarity}).`);
+              if (restRewardEligible) {
+                const liveAfterRest = get().player;
+                if (liveAfterRest) {
+                  const trinket = pick(INVESTIGATE_TRINKETS);
+                  const qty = trinket.qtyMin === trinket.qtyMax
+                    ? trinket.qtyMin
+                    : trinket.qtyMin + Math.floor(Math.random() * (trinket.qtyMax - trinket.qtyMin + 1));
+                  const itemCat = lookupCraftedItem(trinket.name);
+                  const newItem: InventoryItem = stampDurability({
+                    id: `rest_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                    name: trinket.name,
+                    kind: itemCat.kind === 'weapon' ? 'weapon' : itemCat.kind === 'armor' ? 'armor' : itemCat.kind,
+                    rarity: trinket.rarity,
+                    quantity: qty,
+                    tags: itemCat.tags,
+                  });
+                  const granted = grantItem(liveAfterRest.inventory, newItem);
+                  set((s) => (s.player ? { player: { ...s.player, inventory: granted.inventory } } : s));
+                  if (granted.accepted > 0) {
+                    get().appendLog('world', pull.line);
+                    const qtyLabel = granted.accepted > 1 ? ` x${granted.accepted}` : '';
+                    get().appendLog('reward', `✦ ${trinket.name}${qtyLabel} (${trinket.rarity}).`);
+                  }
                 }
+              } else {
+                // On cooldown — narrate the beat, but no item this time.
+                get().appendLog('world', pull.line);
               }
             } else {
               get().appendLog(pull.kind, pull.line);
@@ -8370,14 +8500,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
           // no trainStat call existed for it — the UI promised a
           // mechanic that never fired. Wired here on the 8-hour
           // rest path (parser-routed; the no-ambush + ambush
-          // branches both reach this point). The 8h game-time
-          // cost is itself the natural rate limit — can't farm WIS
-          // by spamming rest because each one burns a workday.
-          {
+          // branches both reach this point).
+          // arb107 — gated behind the per-day REST_REWARD_COOLDOWN so
+          // spamming short rests can't farm WIS. On an eligible rest we
+          // train WIS and stamp lastRestRewardAtHours so the next reward
+          // can't fire until a full in-game day later.
+          if (restRewardEligible) {
             const liveRester = get().player;
             if (liveRester) {
               const trWis = trainStat(liveRester, 'wisdom', true);
-              set((s) => (s.player ? { player: trWis.player } : s));
+              set((s) => (s.player
+                ? { player: { ...trWis.player, lastRestRewardAtHours: newHours } }
+                : s));
               if (trWis.leveled) {
                 get().appendLog(
                   'reward',
@@ -9797,7 +9931,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const hasReclaimersRope = player.inventory.some(
           (i) => i.name === "Reclaimer's Rope" && i.quantity > 0,
         );
-        const climbStaminaCost = hasReclaimersRope ? 1 : 2;
+        // arb102 — Hardened Climbing Strap (worn in the cloak slot) takes the
+        // whole weight off your arms: climbing costs 0 stamina while it's worn.
+        const wearsClimbStrap = (player.equipped?.cloak ?? '').toLowerCase() === 'hardened climbing strap';
+        const climbStaminaCost = wearsClimbStrap ? 0 : (hasReclaimersRope ? 1 : 2);
         // Active rope instance for wear/snap tracking. Reclaimer's takes
         // precedence; falls back to Climbing Rope. We pick the highest-
         // durability instance among matches so the freshest copy gets used
@@ -13590,6 +13727,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
     void get().persist();
   },
 
+  useVendorCrucible() {
+    const state = get();
+    const scene = state.currentScene;
+    const player = state.player;
+    if (!scene?.vendor || !player) return;
+    if (state.tutorialDemoVendor) {
+      get().appendLog('system', 'Tour mode — the crucible is offline while the tutorial is running.');
+      return;
+    }
+    const COST = 25;
+    // Pre-check the reserve gate so the player never pays for a fuse they
+    // can't make. Charge only when they're actually ready.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const fusion = require('../engine/itemFusion');
+    const gate = fusion.gateFusion(player.inventory) as ReturnType<typeof import('../engine/itemFusion').gateFusion>;
+    if (!gate.ok) {
+      get().appendLog(
+        'arbiter',
+        `${scene.vendor.name} taps the cold Crucible. "${gate.reason ?? 'Reserve at least three pieces first, then I will fire it up.'}" No charge until you are ready.`,
+      );
+      return;
+    }
+    if (player.tc < COST) {
+      get().appendLog('system', `The Crucible costs ${COST} TC to fire; you have ${player.tc}.`);
+      return;
+    }
+    set((s) => (s.player ? { player: { ...s.player, tc: s.player.tc - COST, fusionPending: true } } : s));
+    get().appendLog('reward', `${scene.vendor.name} fires up a portable Crucible for you. (−${COST} TC)`);
+    void get().fuseAtCrucible();
+  },
+
   repairWithVendor(itemName) {
     const state = get();
     const scene = state.currentScene;
@@ -17048,7 +17216,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!item) return;
     // Catalog-bound items can't be reserved — they have a fixed
     // identity and the fusion bench only operates on inferred items.
-    if (!isInferredItem(item.name)) return;
+    // arb105 EXCEPTION: faction-gear items (tagged `faction_gear`) CAN be
+    // reserved as a fusion CATALYST — reserving one themes the fused
+    // output into a unique faction item (see findFactionCatalyst /
+    // applyFusion). They still don't count toward the 3-scrap gate.
+    const isFactionCatalyst = (item.tags ?? []).includes('faction_gear');
+    if (!isInferredItem(item.name) && !isFactionCatalyst) return;
     const next = !item.reservedForFusion;
     set((s) => s.player
       ? {
@@ -17065,13 +17238,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
   async fuseAtCrucible() {
     const player = get().player;
     if (!player) return;
-    // Gate 1 — permit. The fusion_bench encounter sets fusionPending;
-    // without that flag, the verb refuses (the bench is not at your
-    // feet). Keeps fusion from being usable anywhere.
-    if (!player.fusionPending) {
+    // Gate 1 — permit. A wild fusion_bench encounter sets fusionPending;
+    // additionally (arb103) EVERY outpost has its own Crucible, so being
+    // inside your outpost (hubRoomId set) grants access without the flag.
+    // Keeps fusion from being usable in the open wilds without a permit.
+    const atOutpostCrucible = !!player.hubRoomId;
+    if (!player.fusionPending && !atOutpostCrucible) {
       get().appendLog(
         'arbiter',
-        `"There's no Crucible here," the Arbiter says. "Find one — they wait in the silt and the ruins. Reserve your pieces, then bring them to the bowl."`,
+        `"There's no Crucible here," the Arbiter says. "Find one — they wait in the silt and the ruins, and every outpost keeps one. Reserve your pieces, then bring them to the bowl."`,
       );
       return;
     }
@@ -17159,11 +17334,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const livePlayer = get().player;
     if (!livePlayer) return;
     const seed = `${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    // arb105 — optional faction catalyst. If the player reserved a
+    // faction-gear item alongside their 3 scraps, resolve its faction
+    // (the factionId is one of its tags) and theme the output as a unique
+    // faction item; the catalyst is consumed by applyFusion.
+    const catalyst = fusion.findFactionCatalyst(livePlayer.inventory) as ReturnType<typeof import('../engine/itemFusion').findFactionCatalyst>;
+    let factionTheme: import('../engine/itemFusion').FactionTheme | null = null;
+    if (catalyst) {
+      const fac = FACTIONS.find((f) => (catalyst.tags ?? []).includes(f.id));
+      if (fac) {
+        // arb107 — the catalyst bumps rarity ONE tier above the inputs'
+        // natural fusion rarity (capped at Legendary), instead of an
+        // unconditional Legendary. Natural fusion is Rare below 5 material
+        // tags and Legendary at 5+; one tier up means a 4+-tag profile
+        // reaches Legendary while the minimum 3-tag set stays Rare. This
+        // keeps the faction item special without making top-tier gear a
+        // ~50-TC firehose.
+        const facRarity: 'Rare' | 'Legendary' = gate.tagProfile.length >= 4 ? 'Legendary' : 'Rare';
+        factionTheme = { id: fac.id, label: fac.name, catalystId: catalyst.id, rarity: facRarity };
+      }
+    }
     const { inventory: newInv, fused } = fusion.applyFusion(
       livePlayer.inventory,
       gate.inputs,
       result,
       seed,
+      factionTheme,
     );
     set((s) => s.player
       ? {
@@ -17182,7 +17378,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     recordTitleProgress(get, set, { fusionsCompleted: 1 });
     get().appendLog(
       'world',
-      `The Crucible exhales. ${result.description}`,
+      `The Crucible exhales. ${fused.description}`,
     );
     if (result.stats.special) {
       get().appendLog('arbiter', `The Arbiter studies it. "${result.stats.special}"`);

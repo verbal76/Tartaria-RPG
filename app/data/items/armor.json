@@ -4669,7 +4669,9 @@
       "slot": "chest",
       "raceAffinity": "Mud Dwellers",
       "acBonus": 3,
-      "resistances": ["piercing"],
+      "resistances": [
+        "piercing"
+      ],
       "statBonus": {
         "stat": "constitution",
         "amount": 1
@@ -8041,215 +8043,582 @@
       "slot": "chest",
       "raceAffinity": "Aetherborn",
       "acBonus": 3,
-      "resistances": ["aetheric"],
-      "statBonus": { "stat": "intelligence", "amount": 1 },
+      "resistances": [
+        "aetheric"
+      ],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 1
+      },
       "statBonuses": [
-        { "stat": "intelligence", "amount": 1 }
+        {
+          "stat": "intelligence",
+          "amount": 1
+        }
       ],
       "rarity": "Rare",
       "dexReq": 2,
       "tcBuy": 180,
       "tcSell": 72,
       "baseDurability": 30,
-      "tags": ["armor", "chest", "cloth", "aether", "rare"],
+      "tags": [
+        "armor",
+        "chest",
+        "cloth",
+        "aether",
+        "rare"
+      ],
       "description": "Aetheric Vest. Aether-thread cloth bound to a shard lattice — turns aside blade and stray Aetheric current alike."
     },
     {
       "name": "Tyrant's Crown",
       "slot": "head",
       "acBonus": 4,
-      "resistances": ["bludgeoning"],
-      "statBonus": { "stat": "strength", "amount": 3 },
+      "resistances": [
+        "bludgeoning"
+      ],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 3
+      },
       "statBonuses": [
-        { "stat": "strength", "amount": 3 },
-        { "stat": "charisma", "amount": 2 }
+        {
+          "stat": "strength",
+          "amount": 3
+        },
+        {
+          "stat": "charisma",
+          "amount": 2
+        }
       ],
       "rarity": "Legendary",
       "dexReq": 10,
       "tcBuy": 240,
       "tcSell": 96,
       "baseDurability": 45,
-      "tags": ["armor", "head", "crown", "mud_dwellers", "boss", "legendary"],
+      "tags": [
+        "armor",
+        "head",
+        "crown",
+        "mud_dwellers",
+        "boss",
+        "legendary"
+      ],
       "description": "Tyrant's Crown. A circlet of cooled mud-iron, set with shards pried from broken siegework. The Mud Tyrant wore it as proof he had outlasted the kings before him."
     },
     {
       "name": "Hollow Crown",
       "slot": "head",
       "acBonus": 4,
-      "resistances": ["aetheric", "piercing"],
-      "statBonus": { "stat": "charisma", "amount": 3 },
+      "resistances": [
+        "aetheric",
+        "piercing"
+      ],
+      "statBonus": {
+        "stat": "charisma",
+        "amount": 3
+      },
       "statBonuses": [
-        { "stat": "charisma", "amount": 3 },
-        { "stat": "wisdom", "amount": 2 }
+        {
+          "stat": "charisma",
+          "amount": 3
+        },
+        {
+          "stat": "wisdom",
+          "amount": 2
+        }
       ],
       "rarity": "Legendary",
       "dexReq": 10,
       "tcBuy": 260,
       "tcSell": 104,
       "baseDurability": 45,
-      "tags": ["armor", "head", "crown", "undead", "boss", "legendary"],
+      "tags": [
+        "armor",
+        "head",
+        "crown",
+        "undead",
+        "boss",
+        "legendary"
+      ],
       "description": "Hollow Crown. Bone fused to tarnished gold, weightless in the hand. Its wearer hears the throne-room arguments of a kingdom that drowned."
     },
     {
       "name": "Worm Plating",
       "slot": "chest",
       "acBonus": 5,
-      "resistances": ["piercing", "slashing"],
-      "statBonus": { "stat": "constitution", "amount": 3 },
+      "resistances": [
+        "piercing",
+        "slashing"
+      ],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 3
+      },
       "statBonuses": [
-        { "stat": "constitution", "amount": 3 },
-        { "stat": "strength", "amount": 2 }
+        {
+          "stat": "constitution",
+          "amount": 3
+        },
+        {
+          "stat": "strength",
+          "amount": 2
+        }
       ],
       "rarity": "Legendary",
       "dexReq": 8,
       "tcBuy": 320,
       "tcSell": 128,
       "baseDurability": 50,
-      "tags": ["armor", "chest", "plate", "construct", "boss", "legendary"],
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "construct",
+        "boss",
+        "legendary"
+      ],
       "description": "Worm Plating. Overlapping iron scutes stripped from the Iron Worm's flank. They still shift when warmed, as if remembering the coil."
     },
     {
       "name": "Matriarch's Carapace",
       "slot": "chest",
       "acBonus": 5,
-      "resistances": ["burn", "poison"],
-      "statBonus": { "stat": "constitution", "amount": 3 },
+      "resistances": [
+        "burn",
+        "poison"
+      ],
+      "statBonus": {
+        "stat": "constitution",
+        "amount": 3
+      },
       "statBonuses": [
-        { "stat": "constitution", "amount": 3 },
-        { "stat": "intelligence", "amount": 2 }
+        {
+          "stat": "constitution",
+          "amount": 3
+        },
+        {
+          "stat": "intelligence",
+          "amount": 2
+        }
       ],
       "rarity": "Legendary",
       "dexReq": 9,
       "tcBuy": 300,
       "tcSell": 120,
       "baseDurability": 48,
-      "tags": ["armor", "chest", "chitin", "aether", "boss", "legendary"],
+      "tags": [
+        "armor",
+        "chest",
+        "chitin",
+        "aether",
+        "boss",
+        "legendary"
+      ],
       "description": "Matriarch's Carapace. A back-plate cut from the Voidspawn Matriarch's brood-shell. Cooled to glass, it weeps a faint resin that knits its own cracks."
     },
     {
       "name": "Reaver's Pauldron",
       "slot": "chest",
       "acBonus": 5,
-      "resistances": ["slashing"],
-      "statBonus": { "stat": "strength", "amount": 3 },
+      "resistances": [
+        "slashing"
+      ],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 3
+      },
       "statBonuses": [
-        { "stat": "strength", "amount": 3 },
-        { "stat": "dexterity", "amount": 2 }
+        {
+          "stat": "strength",
+          "amount": 3
+        },
+        {
+          "stat": "dexterity",
+          "amount": 2
+        }
       ],
       "rarity": "Legendary",
       "dexReq": 10,
       "tcBuy": 280,
       "tcSell": 112,
       "baseDurability": 48,
-      "tags": ["armor", "chest", "plate", "reaver", "boss", "legendary"],
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "reaver",
+        "boss",
+        "legendary"
+      ],
       "description": "Reaver's Pauldron. A massive shoulder-piece of scavenged steel, lashed across the chest with mud-bone cord. Notched once for every warband the Reaver broke."
     },
     {
       "name": "Lich-Bone Mantle",
       "slot": "chest",
       "acBonus": 5,
-      "resistances": ["aetheric"],
-      "statBonus": { "stat": "intelligence", "amount": 3 },
+      "resistances": [
+        "aetheric"
+      ],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 3
+      },
       "statBonuses": [
-        { "stat": "intelligence", "amount": 3 },
-        { "stat": "wisdom", "amount": 2 }
+        {
+          "stat": "intelligence",
+          "amount": 3
+        },
+        {
+          "stat": "wisdom",
+          "amount": 2
+        }
       ],
       "rarity": "Legendary",
       "dexReq": 6,
       "tcBuy": 340,
       "tcSell": 136,
       "baseDurability": 42,
-      "tags": ["armor", "chest", "cloth", "aether", "undead", "boss", "legendary"],
+      "tags": [
+        "armor",
+        "chest",
+        "cloth",
+        "aether",
+        "undead",
+        "boss",
+        "legendary"
+      ],
       "description": "Lich-Bone Mantle. Vertebrae of an old Aetheric Lich strung on Aetheric thread. Cold to the touch, and quieter than cloth ought to be."
     },
     {
       "name": "Wyrm-Scale Hide",
       "slot": "chest",
       "acBonus": 5,
-      "resistances": ["poison"],
-      "statBonus": { "stat": "dexterity", "amount": 3 },
+      "resistances": [
+        "poison"
+      ],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 3
+      },
       "statBonuses": [
-        { "stat": "dexterity", "amount": 3 },
-        { "stat": "constitution", "amount": 2 }
+        {
+          "stat": "dexterity",
+          "amount": 3
+        },
+        {
+          "stat": "constitution",
+          "amount": 2
+        }
       ],
       "rarity": "Legendary",
       "dexReq": 11,
       "tcBuy": 290,
       "tcSell": 116,
       "baseDurability": 46,
-      "tags": ["armor", "chest", "hide", "boss", "legendary"],
+      "tags": [
+        "armor",
+        "chest",
+        "hide",
+        "boss",
+        "legendary"
+      ],
       "description": "Wyrm-Scale Hide. Bog-tanned scales from the Bog Wyrm, each one still slick with the venom that cured them. Light, supple, and faintly toxic to handle bare."
     },
     {
       "name": "Behemoth Plate",
       "slot": "chest",
       "acBonus": 5,
-      "resistances": ["bludgeoning"],
-      "statBonus": { "stat": "strength", "amount": 3 },
+      "resistances": [
+        "bludgeoning"
+      ],
+      "statBonus": {
+        "stat": "strength",
+        "amount": 3
+      },
       "statBonuses": [
-        { "stat": "strength", "amount": 3 },
-        { "stat": "constitution", "amount": 2 }
+        {
+          "stat": "strength",
+          "amount": 3
+        },
+        {
+          "stat": "constitution",
+          "amount": 2
+        }
       ],
       "rarity": "Legendary",
       "dexReq": 8,
       "tcBuy": 330,
       "tcSell": 132,
       "baseDurability": 50,
-      "tags": ["armor", "chest", "plate", "aether", "boss", "legendary"],
+      "tags": [
+        "armor",
+        "chest",
+        "plate",
+        "aether",
+        "boss",
+        "legendary"
+      ],
       "description": "Behemoth Plate. Hammered from the fused ribs of an Aetheric Behemoth. Heavy as a door, and shrugs off a falling beam the same way."
     },
     {
       "name": "Sludge-Forged Vest",
       "slot": "chest",
       "acBonus": 2,
-      "resistances": ["aetheric", "poison"],
+      "resistances": [
+        "aetheric",
+        "poison"
+      ],
       "rarity": "Uncommon",
       "tcBuy": 48,
       "tcSell": 19,
       "baseDurability": 28,
-      "tags": ["armor", "chest", "cloth", "aether", "crafted"],
+      "tags": [
+        "armor",
+        "chest",
+        "cloth",
+        "aether",
+        "crafted"
+      ],
       "description": "Sludge-Forged Vest. Patched cloth waxed with Aetheric sludge, stiffened to a crust. Brittle to a clean cut but it eats the splash from Aether-tainted weather."
     },
     {
       "name": "Aether-Wing Cloak",
       "slot": "chest",
       "acBonus": 1,
-      "resistances": ["aetheric"],
-      "statBonus": { "stat": "dexterity", "amount": 1 },
-      "statBonuses": [{ "stat": "dexterity", "amount": 1 }],
+      "resistances": [
+        "aetheric"
+      ],
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ],
       "rarity": "Rare",
       "tcBuy": 110,
       "tcSell": 44,
       "baseDurability": 32,
-      "tags": ["armor", "chest", "cloak", "aether", "crafted"],
+      "tags": [
+        "armor",
+        "chest",
+        "cloak",
+        "aether",
+        "crafted"
+      ],
       "description": "Aether-Wing Cloak. Spider silk stretched over the membrane of an Aether-Wing moth. Catches gusts that aren't quite there; the wearer moves a half-beat lighter."
     },
     {
       "name": "Mudstone Bulwark",
       "slot": "chest",
       "acBonus": 3,
-      "resistances": ["bludgeoning", "piercing"],
+      "resistances": [
+        "bludgeoning",
+        "piercing"
+      ],
       "rarity": "Rare",
       "dexReq": 0,
       "tcBuy": 140,
       "tcSell": 56,
       "baseDurability": 50,
-      "tags": ["armor", "chest", "heavy", "stone", "mud", "crafted"],
+      "tags": [
+        "armor",
+        "chest",
+        "heavy",
+        "stone",
+        "mud",
+        "crafted"
+      ],
       "description": "Mudstone Bulwark. Plates of hardened mudstone bolted to a leather backing. Heavy enough to slow a swing, dense enough to turn a Reclaimer pickaxe."
     },
     {
       "name": "Hollow Crown Circlet",
       "slot": "head",
       "acBonus": 1,
-      "resistances": ["aetheric"],
-      "statBonus": { "stat": "intelligence", "amount": 2 },
-      "statBonuses": [{ "stat": "intelligence", "amount": 2 }],
+      "resistances": [
+        "aetheric"
+      ],
+      "statBonus": {
+        "stat": "intelligence",
+        "amount": 2
+      },
+      "statBonuses": [
+        {
+          "stat": "intelligence",
+          "amount": 2
+        }
+      ],
       "rarity": "Rare",
       "tcBuy": 180,
       "tcSell": 72,
       "baseDurability": 35,
-      "tags": ["armor", "head", "circlet", "throne", "crafted"],
+      "tags": [
+        "armor",
+        "head",
+        "circlet",
+        "throne",
+        "crafted"
+      ],
       "description": "Hollow Crown Circlet. A thin band of mudstone set with a sliver of Throne Shard. The wearer feels watched, but reads the world with uncomfortable clarity."
+    },
+    {
+      "name": "Court Standards Cuirass",
+      "slot": "chest",
+      "acBonus": 3,
+      "resistances": [],
+      "rarity": "Uncommon",
+      "faction": "mud_monarchs",
+      "tags": [
+        "armor",
+        "chest",
+        "faction_gear",
+        "mud_monarchs"
+      ],
+      "description": "Faction-issue chest armor of the mud monarchs. Bears their colors."
+    },
+    {
+      "name": "Heir's Dynastic Plate",
+      "slot": "chest",
+      "acBonus": 3,
+      "resistances": [],
+      "rarity": "Uncommon",
+      "faction": "eternal_dynasty",
+      "tags": [
+        "armor",
+        "chest",
+        "faction_gear",
+        "eternal_dynasty"
+      ],
+      "description": "Faction-issue chest armor of the eternal dynasty. Bears their colors."
+    },
+    {
+      "name": "Reclaimer's Scrapplate",
+      "slot": "chest",
+      "acBonus": 2,
+      "resistances": [],
+      "rarity": "Uncommon",
+      "faction": "reclaimers_guild",
+      "tags": [
+        "armor",
+        "chest",
+        "faction_gear",
+        "reclaimers_guild"
+      ],
+      "description": "Faction-issue chest armor of the reclaimers guild. Bears their colors."
+    },
+    {
+      "name": "Order Vellum Mantle",
+      "slot": "cloak",
+      "acBonus": 2,
+      "resistances": [],
+      "rarity": "Uncommon",
+      "faction": "forgotten_order",
+      "tags": [
+        "armor",
+        "cloak",
+        "faction_gear",
+        "forgotten_order"
+      ],
+      "description": "Faction-issue cloak armor of the forgotten order. Bears their colors.",
+      "statBonus": {
+        "stat": "wisdom",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "wisdom",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "name": "Ancestor Bone Vest",
+      "slot": "chest",
+      "acBonus": 2,
+      "resistances": [],
+      "rarity": "Uncommon",
+      "faction": "true_tartarians",
+      "tags": [
+        "armor",
+        "chest",
+        "faction_gear",
+        "true_tartarians"
+      ],
+      "description": "Faction-issue chest armor of the true tartarians. Bears their colors."
+    },
+    {
+      "name": "Builder's Shoring Plate",
+      "slot": "chest",
+      "acBonus": 3,
+      "resistances": [],
+      "rarity": "Uncommon",
+      "faction": "stone_builders",
+      "tags": [
+        "armor",
+        "chest",
+        "faction_gear",
+        "stone_builders"
+      ],
+      "description": "Faction-issue chest armor of the stone builders. Bears their colors."
+    },
+    {
+      "name": "Tomb-Warden Plate",
+      "slot": "chest",
+      "acBonus": 3,
+      "resistances": [],
+      "rarity": "Uncommon",
+      "faction": "servants_of_giants",
+      "tags": [
+        "armor",
+        "chest",
+        "faction_gear",
+        "servants_of_giants"
+      ],
+      "description": "Faction-issue chest armor of the servants of giants. Bears their colors."
+    },
+    {
+      "name": "Architect's Shadow Coat",
+      "slot": "chest",
+      "acBonus": 2,
+      "resistances": [],
+      "rarity": "Uncommon",
+      "faction": "conspiracy_architects",
+      "tags": [
+        "armor",
+        "chest",
+        "faction_gear",
+        "conspiracy_architects"
+      ],
+      "description": "Faction-issue chest armor of the conspiracy architects. Bears their colors.",
+      "statBonus": {
+        "stat": "dexterity",
+        "amount": 1
+      },
+      "statBonuses": [
+        {
+          "stat": "dexterity",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "name": "Revivalist Field Jacket",
+      "slot": "chest",
+      "acBonus": 2,
+      "resistances": [],
+      "rarity": "Uncommon",
+      "faction": "tartarian_revivalists",
+      "tags": [
+        "armor",
+        "chest",
+        "faction_gear",
+        "tartarian_revivalists"
+      ],
+      "description": "Faction-issue chest armor of the tartarian revivalists. Bears their colors."
     }
   ]
 }

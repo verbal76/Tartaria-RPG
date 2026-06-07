@@ -6,8 +6,13 @@
       "title": "Salvage the buried lens",
       "description": "Varakush has heard of a Relic Seeker's Lens half-buried in the Outskirts. Recover it.",
       "objective": "Defeat any Aetheric creature and return.",
-      "requirement": { "rep": 5 },
-      "reward": { "tc": 80, "rep": 10 },
+      "requirement": {
+        "rep": 5
+      },
+      "reward": {
+        "tc": 80,
+        "rep": 10
+      },
       "stages": [
         {
           "narration": "Varakush slips a folded map into your hand — silt-stained at the corners. 'The lens is buried somewhere out there. Aetheric creatures guard the dig sites; cut your way through and bring back what you find.'",
@@ -30,8 +35,13 @@
       "title": "Field a scholar",
       "description": "Travel to two new locations and bring back what you saw.",
       "objective": "Discover 2 locations.",
-      "requirement": { "rep": 0 },
-      "reward": { "tc": 60, "rep": 8 },
+      "requirement": {
+        "rep": 0
+      },
+      "reward": {
+        "tc": 60,
+        "rep": 8
+      },
       "stages": [
         {
           "narration": "The scholar hands you a slim travel ledger and three sharpened pencils. 'Walk. Note. Return. The Order remembers what walkers tell us.'",
@@ -53,8 +63,13 @@
       "title": "Run the haul",
       "description": "The Guild needs 100 TC worth of relic salvage. Deliver, no questions asked.",
       "objective": "Reach 100 TC, then complete the quest.",
-      "requirement": { "rep": 0 },
-      "reward": { "tc": 40, "rep": 8 },
+      "requirement": {
+        "rep": 0
+      },
+      "reward": {
+        "tc": 40,
+        "rep": 8
+      },
       "stages": [
         {
           "narration": "The Reclaimer hands you a delivery slip — blank line for what you bring, signed by the Guild's broker. 'Anything sellable. Don't ask. We don't.'",
@@ -73,8 +88,13 @@
       "title": "Pinch from the Monarchs",
       "description": "Steal something from a Mud Monarchs vendor without being caught.",
       "objective": "Steal successfully from any vendor.",
-      "requirement": { "rep": 5 },
-      "reward": { "tc": 70, "rep": 12 },
+      "requirement": {
+        "rep": 5
+      },
+      "reward": {
+        "tc": 70,
+        "rep": 12
+      },
       "stages": [
         {
           "narration": "The Reclaimer's voice drops. 'A Mud Monarchs vendor. Anything they're not watching. Bring it back.'",
@@ -93,8 +113,13 @@
       "title": "Walk the buried road",
       "description": "Make a pilgrimage to a buried capital — every True Tartarian who matters has done it.",
       "objective": "Travel 5 times.",
-      "requirement": { "rep": 0 },
-      "reward": { "tc": 60, "rep": 10 },
+      "requirement": {
+        "rep": 0
+      },
+      "reward": {
+        "tc": 60,
+        "rep": 10
+      },
       "stages": [
         {
           "narration": "The elder traces a finger across an old map. 'The road goes where the ground forgets it. Walk it. We will know.'",
@@ -120,8 +145,13 @@
       "title": "Cut down a rare beast",
       "description": "The enclave hears you. Prove you fight like one of them.",
       "objective": "Defeat a Rare or Legendary enemy.",
-      "requirement": { "rep": 10 },
-      "reward": { "tc": 120, "rep": 15 },
+      "requirement": {
+        "rep": 10
+      },
+      "reward": {
+        "tc": 120,
+        "rep": 15
+      },
       "stages": [
         {
           "narration": "The Giant elder hands you a stone token. 'When you take down something Rare or worse, bring the token back. We will know what to do with it.'",
@@ -140,8 +170,13 @@
       "title": "Silence a rediscoverer",
       "description": "Someone has been talking about Tartaria where they should not. End the conversation.",
       "objective": "Defeat 3 enemies.",
-      "requirement": { "rep": 0 },
-      "reward": { "tc": 80, "rep": 12 },
+      "requirement": {
+        "rep": 0
+      },
+      "reward": {
+        "tc": 80,
+        "rep": 12
+      },
       "stages": [
         {
           "narration": "The Monarch agent's voice is flat. 'Three names. Three silences. You don't have to know why. We do.'",
@@ -168,8 +203,13 @@
       "title": "Tribute at the Vault",
       "description": "Walk the road to the Giant Vault and leave an offering at its threshold. The Giants are sleeping — the Servants ask only that we keep the path warm.",
       "objective": "Travel to the Giant Vault and leave tribute.",
-      "requirement": { "rep": 0 },
-      "reward": { "tc": 50, "rep": 8 },
+      "requirement": {
+        "rep": 0
+      },
+      "reward": {
+        "tc": 50,
+        "rep": 8
+      },
       "stages": [
         {
           "narration": "The Servant presses a small carved stone into your palm. 'This is the tribute. Carry it to the Vault. Set it on the threshold. Do not enter. We will know.'",
@@ -183,6 +223,286 @@
         {
           "narration": "The Vault rises ahead. Stone fitted by no living mason. You set the tribute on the threshold and step back. The hum that meets your palm is not a sound.",
           "advanceOn": "travel"
+        }
+      ]
+    },
+    {
+      "id": "fq_dynasty_seal",
+      "factionId": "eternal_dynasty",
+      "title": "Reclaim a Dynasty seal",
+      "description": "An oath-stone bearing the Eternal line's seal was carried off into the ruins. Bring it home.",
+      "objective": "Cut through the looters and recover the seal.",
+      "requirement": {
+        "rep": 0
+      },
+      "reward": {
+        "tc": 70,
+        "rep": 10
+      },
+      "stages": [
+        {
+          "narration": "A herald presses a writ into your hand. 'The seal is dynastic property. Whoever holds it dies a thief.'",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "Armed looters guard the cache where the seal was last seen.",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "You lift the oath-stone from the rubble, the seal still warm. Return it to the Dynasty.",
+          "advanceOn": "kill"
+        }
+      ]
+    },
+    {
+      "id": "fq_dynasty_pretender",
+      "factionId": "eternal_dynasty",
+      "title": "Silence a pretender",
+      "description": "A rival claimant is raising a banner against the Eternal Dynasty. End it before it spreads.",
+      "objective": "Scatter the pretender's followers.",
+      "requirement": {
+        "rep": 8
+      },
+      "reward": {
+        "tc": 120,
+        "rep": 12
+      },
+      "stages": [
+        {
+          "narration": "'A false heir,' the herald says flatly. 'The oaths do not bend. Make sure his do not either.'",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "The pretender's sworn swords close ranks around him.",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "The banner comes down. The Dynasty's claim stands unchallenged — for now.",
+          "advanceOn": "kill"
+        }
+      ]
+    },
+    {
+      "id": "fq_builders_survey",
+      "factionId": "stone_builders",
+      "title": "Clear the unstable works",
+      "description": "A dig site is crawling with reactivated constructs. The Builders can't survey it until it's quiet.",
+      "objective": "Destroy the rogue constructs.",
+      "requirement": {
+        "rep": 0
+      },
+      "reward": {
+        "tc": 70,
+        "rep": 10
+      },
+      "stages": [
+        {
+          "narration": "A foreman rolls out a chalked plan. 'We can't measure a thing while those things are walking. Put them down.'",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "Aethercraft constructs lurch between the shoring timbers.",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "The site falls silent. The surveyors can finally work. Report back.",
+          "advanceOn": "kill"
+        }
+      ]
+    },
+    {
+      "id": "fq_builders_regulator",
+      "factionId": "stone_builders",
+      "title": "Recover a regulator core",
+      "description": "A pre-flood regulator core would let the Builders cycle a dead engine. It's guarded.",
+      "objective": "Defeat the automatons and bring the core back.",
+      "requirement": {
+        "rep": 8
+      },
+      "reward": {
+        "tc": 120,
+        "rep": 12
+      },
+      "stages": [
+        {
+          "narration": "'One regulator,' the foreman says. 'The Nexus runs on nine of them. This is practice.' He marks an X on the plan.",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "Sentinel automatons ring the core housing.",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "You pry the regulator loose. It hums faintly in your pack. Bring it to the Builders.",
+          "advanceOn": "kill"
+        }
+      ]
+    },
+    {
+      "id": "fq_architects_evidence",
+      "factionId": "conspiracy_architects",
+      "title": "Burn an evidence trail",
+      "description": "Someone's been connecting dots the Architects buried. Erase what they found.",
+      "objective": "Eliminate the snoops at the cache.",
+      "requirement": {
+        "rep": 0
+      },
+      "reward": {
+        "tc": 70,
+        "rep": 10
+      },
+      "stages": [
+        {
+          "narration": "A handler slides you a dossier across the false rubble. 'They saw too much. The map-wall must never leak.'",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "Hired guards protect the leaked documents.",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "The trail goes cold. The dots stay unconnected. Return to the Blind.",
+          "advanceOn": "kill"
+        }
+      ]
+    },
+    {
+      "id": "fq_architects_informant",
+      "factionId": "conspiracy_architects",
+      "title": "Sever a connected dot",
+      "description": "An informant is one conversation from blowing the whole conspiracy. Cut the line.",
+      "objective": "Break through the informant's protection.",
+      "requirement": {
+        "rep": 8
+      },
+      "reward": {
+        "tc": 120,
+        "rep": 12
+      },
+      "stages": [
+        {
+          "narration": "'A dot that connects to nine others,' the handler murmurs. 'Sever it cleanly.'",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "The informant's hired muscle stands between you and the line.",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "Silence. The web holds. The Architects breathe easier — quietly.",
+          "advanceOn": "kill"
+        }
+      ]
+    },
+    {
+      "id": "fq_revivalists_dig",
+      "factionId": "tartarian_revivalists",
+      "title": "Stage a recovery",
+      "description": "The Revivalists need a clean, photogenic recovery. Clear the dig of anything that bites.",
+      "objective": "Clear the creatures from the dig site.",
+      "requirement": {
+        "rep": 0
+      },
+      "reward": {
+        "tc": 70,
+        "rep": 10
+      },
+      "stages": [
+        {
+          "narration": "A field organizer hands you a schedule. 'Press at noon. The site has to be safe and the relic has to be dramatic.'",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "Wasteland creatures have nested in the exposed ruin.",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "The site is clear and camera-ready. Bring back the find for the front page.",
+          "advanceOn": "kill"
+        }
+      ]
+    },
+    {
+      "id": "fq_revivalists_headline",
+      "factionId": "tartarian_revivalists",
+      "title": "Bring back a front-page relic",
+      "description": "One artifact the surface world can't ignore. Fight to it and carry it out.",
+      "objective": "Recover the headline relic.",
+      "requirement": {
+        "rep": 8
+      },
+      "reward": {
+        "tc": 120,
+        "rep": 12
+      },
+      "stages": [
+        {
+          "narration": "'By Capital five the Revival is the headline,' the organizer grins. 'This is Capital one. Make it loud.'",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "Guardians of the ruin do not want their treasure publicized.",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "You haul the relic into daylight. The cameras will love it. Bring it in.",
+          "advanceOn": "kill"
+        }
+      ]
+    },
+    {
+      "id": "fq_monarchs_standard",
+      "factionId": "mud_monarchs",
+      "title": "Plant the Monarch standard",
+      "description": "A holdout refuses the Monarchs' writ. Make the standard fly over their ground.",
+      "objective": "Break the holdout's defenders.",
+      "requirement": {
+        "rep": 8
+      },
+      "reward": {
+        "tc": 120,
+        "rep": 12
+      },
+      "stages": [
+        {
+          "narration": "A seneschal hands you a furled banner. 'Where this flies, the family rules. See that it flies.'",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "The holdout's defenders mass at the gate.",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "The standard rises over taken ground. The Court will be pleased.",
+          "advanceOn": "kill"
+        }
+      ]
+    },
+    {
+      "id": "fq_servants_vigil",
+      "factionId": "servants_of_giants",
+      "title": "Keep the vigil",
+      "description": "Grave-robbers are disturbing a Giant's tomb. The Servants cannot allow it.",
+      "objective": "Drive off the tomb-disturbers.",
+      "requirement": {
+        "rep": 8
+      },
+      "reward": {
+        "tc": 120,
+        "rep": 12
+      },
+      "stages": [
+        {
+          "narration": "A keeper pours a libation. 'The Giant must not be woken in anger. Send the robbers away — or send them down.'",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "The grave-robbers fight to keep their dig.",
+          "advanceOn": "kill"
+        },
+        {
+          "narration": "The tomb is quiet again. The vigil holds. Return to the shrine.",
+          "advanceOn": "kill"
         }
       ]
     }

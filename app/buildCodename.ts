@@ -139,6 +139,15 @@ const CODENAMES: Record<string, string> = {
   // map footer; ACTIONS button removed from the location bar and MAP moved
   // there; location-aware Map screen — your outpost INTERIOR map inside the
   // outpost (7 factions wired), world atlas outside. [arb96–99]
+  // OTA-322 — promotion of arbiters-line arb100–arb107: golem scaling +
+  // Stone Builders names; unified tool definition (Strap→wardrobe/cloak);
+  // Crucible in every outpost + 25-TC vendor Crucible; inventory legend
+  // auto-contrast; faction outpost economy (named gear + standing missions
+  // + map routing); travel-return loot restock; faction-item fusion catalyst
+  // (one-tier rarity bump); Tomb Vigil outpost map (9/9); + a red-team
+  // exploit sweep (fused items unsellable, rest/investigate/dog farms
+  // tightened). [arb100–107]
+  '2026-06-07-322': 'Cattail Anvil',
   '2026-06-06-321': 'Tule Anvil',
   '2026-06-03-301': 'Tungsten Spire',
   // Isolated arbiters-line test build — NOT a production OTA. Fresh-minted

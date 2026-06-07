@@ -63,5 +63,15 @@ function durabilityFraction(item: InventoryItem): number {
 export function isUnsellable(item: InventoryItem): boolean {
   if (item.tags?.includes('quest')) return true;
   if (item.tags?.includes('unsellable')) return true;
+  // arb107 — Crucible-fused items are UNSELLABLE. They're one-of-a-kind
+  // gear minted to be wielded, not a commodity. Without this, a fused
+  // item's unique name never matches a vendor offer, so it fell through to
+  // the RARITY_BASE fallback (96 TC for a forced-Legendary faction fuse,
+  // 36 TC for a Rare) — far above its acquisition cost (free scrap + a
+  // ~50 TC catalyst + a free outpost Crucible). That was an unbounded,
+  // net-positive money pump (red-team confirmed). The `fused` tag is
+  // stamped by applyFusion on every fused item, faction-themed or not, so
+  // this closes both the faction-catalyst and plain-fusion variants.
+  if (item.tags?.includes('fused')) return true;
   return false;
 }
