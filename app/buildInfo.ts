@@ -12583,4 +12583,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the unified `gearHpBonus` fold it into hpMax on equip/unequip (main/off slots
 // route through the same handler armor uses). Ranged + runecaster rebalance
 // pending the rest of the CSV. docs/weapon-catalog.md regenerated.
-export const OTA_BUILD_ID = '2026-06-07-329';
+// OTA-330 — Hazel Anvil. Completes the weapon rebalance: RANGED (64) +
+// RUNECASTER (54) blocks applied from the rest of the player's CSV (all 263
+// weapons now rebalanced). No permanent HP grants in these blocks; the 5
+// runecaster shield-spells' "Grants +X Temp HP" is a cast-time temporary
+// shield (N rounds), NOT a max-HP boost, so it is intentionally NOT wired into
+// hpMax (kept as effect flavor text). docs/weapon-catalog.md regenerated.
+export const OTA_BUILD_ID = '2026-06-07-330';

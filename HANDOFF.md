@@ -21,7 +21,7 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - `HaL2001` HEAD = **OTA-329 "Sumac Anvil"** — live on Android + iOS.
+> - `HaL2001` HEAD = **OTA-330 "Hazel Anvil"** — live on Android + iOS.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - tsc clean. Tests green modulo the known baseline flakes (dogTravelClimb,
@@ -116,18 +116,6 @@ checkout, not a special rollback tool.)
 > **The canonical record of issues across the build.** Every OTA / APK push updates this section in the same commit. **Read this section before planning any fix** to (a) check whether the issue is already closed and the fix exists, and (b) make sure your plan won't break a previously-closed fix. The workflow rules live in `CLAUDE.md` → "HANDOFF.md — the build timeline."
 
 ### 0.A — Open Issues
-
-- **Ranged + runecaster weapon rebalance — pending the rest of the CSV.** OTA-329
-  (Sumac Anvil) applied the player's rebalanced **MELEE** block (all 145) + the new
-  max-HP-on-weapons mechanic. The pasted CSV was **truncated** mid-row in the Ranged
-  section (cuts off at "Tartarian Hand Spear"), so the 64 ranged + 54 runecaster rows
-  were NOT applied — they keep their pre-rebalance stats. The engine wiring is already
-  in place (`weaponHpBonus` / `gearHpBonus` resolve ANY weapon, so a ranged/runecaster
-  "Grants +X HP" effect will work the instant the row is applied). **Next step:** when
-  the player sends the remaining CSV (paste starting AFTER the Tartarian Hand Spear
-  row to dodge the truncation), apply it with the same script path used for melee and
-  regenerate `docs/weapon-catalog.md`. Deferred — waiting on data.
-
 
 > **⚡ ACTIVE TASK (2026-05-31) — iOS build → TestFlight External Testing. READ THIS FIRST.**
 >
@@ -430,6 +418,14 @@ checkout, not a special rollback tool.)
 
 ### 0.B — Closed Issues (most recent first)
 
+#### Hazel Anvil (`2026-06-07-330`) — RANGED + RUNECASTER weapon rebalance (rebalance complete)
+- **WHAT.** Completes the weapon rebalance started in Sumac Anvil. The player sent the rest of the truncated CSV (the Common-ranged tail + all Uncommon/Rare/Legendary ranged + the full runecaster block). Combined with the Common-ranged rows from the earlier paste, this is the remaining **64 ranged + 54 runecaster** = all 118 non-melee weapons. With Sumac's 145 melee, **all 263 weapons are now rebalanced.**
+- **FIX (apply balance).** Merged + de-duped the two ranged pastes (preferring the complete rows), validated **exact name-for-name** against `weapons.json` (64/64 ranged, 54/54 runecaster, 0 orphans / 0 extras), and applied via the same script path as melee: `damageDice`, `damageType`, scaling `stat`, `style` (skip "—"), `statRequirement`, `defense`, `baseDurability` (skip "—"), `rarity`, `faction` (skip "—"), `tc`, free-text `effect`.
+- **Temp-HP decision.** 5 runecaster shield-spells (Mud Shell +10, Aetheric Ward +15, Mud Armor +20, Aetheric Armor +30, Mud Guard +30) read "Grants +X **Temp** HP" — a cast-time temporary shield that lasts N rounds, NOT an equip-time max-HP boost. The HP parser explicitly **excludes** "Temp HP" (`/\+\d+\s*Temp\s*HP/`), so these are NOT wired into hpMax; they stay as effect flavor (the temporary-shield mechanic is a separate runecast verb, not built here — no speculative infra). No permanent "Grants +X HP" grants exist in the ranged/runecaster blocks, so 0 new HP-wirings this OTA (the 34 melee shields/maces from Sumac remain the only HP-granting weapons).
+- **DOC.** `docs/weapon-catalog.md` regenerated (all 263 reflect the final stats; the header note now distinguishes permanent "Grants +X HP" from runecaster "+X Temp HP").
+- **Verified:** weapons.json valid JSON; `weaponHpBonus` + `raceStarterItems` green (13/13). Data + doc only — no engine change (the Sumac wiring already covers any weapon).
+- **Files:** `app/data/items/weapons.json` (118 ranged+runecaster rebalanced), `docs/weapon-catalog.md` (regenerated), `app/buildInfo.ts`, `app/buildCodename.ts` (Hazel Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
+
 #### Sumac Anvil (`2026-06-07-329`) — MELEE weapon rebalance + max-HP-on-weapons
 - **WHAT.** Player took the Juniper Anvil `weapon-catalog.md`, rebalanced it (adding "Grants +X HP" to many entries, mirroring the armor HP pass), and pasted the CSV back: "here are the rebalanced weapons." First verified the catalog was complete (it was — 145 melee / 64 ranged / 54 runecaster = all 263, exact name-for-name match). The pasted CSV arrived **truncated** (cuts off mid-row in Ranged at "Tartarian Hand Spear"), so only the **Melee block was complete** — applied that; ranged + runecaster deferred to the rest of the CSV.
 - **FIX (apply MELEE balance).** Parsed the 145-row melee CSV and wrote it into `weapons.json`: `damageDice`, `damageType`, scaling `stat`, `style` (skipped when the CSV cell is "—" → keep existing), `statRequirement`, `defense`, `baseDurability` (skipped when "—"), `rarity`, `faction` (skipped when "—"), `tc`, and the free-text `effect`. All 145 melee names matched exactly, 0 orphans / 0 extras.
@@ -437,7 +433,7 @@ checkout, not a special rollback tool.)
 - **DOC.** `docs/weapon-catalog.md` regenerated from the rebalanced JSON (note added that "Grants +X HP" weapons carry a real max-HP bonus).
 - **Verified:** tsc clean on touched source (`equipment.ts`, `crafting.ts`, `gameStore.ts`); new `__tests__/weaponHpBonus.test.ts` (Titan Shield +35, Mud Royal Shield +50, plain weapon 0, unknown/null 0, gearHpBonus resolves a weapon while armorHpBonus alone does not) + armorHpBonus + armorMultiStat all green (12/12). The pre-existing test-file tsc errors (qwen*, stressMode*, createAsync*) are unchanged and unrelated.
 - **Files:** `app/data/items/weapons.json` (145 melee rebalanced, 34 HP-wired), `app/engine/crafting.ts` (`CatalogWeapon.statBonuses?`), `app/engine/equipment.ts` (`weaponHpBonus`, `gearHpBonus`), `app/state/gameStore.ts` (equip/unequip use `gearHpBonus`), `__tests__/weaponHpBonus.test.ts` (new), `docs/weapon-catalog.md` (regenerated), `app/buildInfo.ts`, `app/buildCodename.ts` (Sumac Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
-- **STILL OPEN.** Ranged (64) + runecaster (54) weapon rebalance — pending the rest of the truncated CSV. See Open Issues.
+- **FOLLOW-UP (now closed).** Ranged (64) + runecaster (54) rebalance was deferred here pending the rest of the truncated CSV — completed in **Hazel Anvil (OTA-330)** above.
 
 #### Juniper Anvil (`2026-06-07-328`) — all armor base-stats apply + weapon catalog
 - **WHAT.** Player: "yes, all of the stats of the armor should apply, not just the first one." + "give me a list of every weapon in the game with all of their stats."

@@ -1,6 +1,6 @@
 # Tartaria Realms — Weapon Catalog (balance reference)
 
-_Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`damageDice`, Type=`damageType`, Stat=scaling `stat`, Style=`style` (one_handed / two_handed / dual_wield / shield / ranged / runecaster), Req=`statRequirement` (min in the scaling stat), Def=`defense` (block/parry value), Dura=`baseDurability`, tc=`tc` (buy). `effect` is free-text; weapons whose effect reads "Grants +X HP" carry a structured hp bonus that raises max HP on equip. Edit the JSON; regenerate after changes._
+_Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`damageDice`, Type=`damageType`, Stat=scaling `stat`, Style=`style` (one_handed / two_handed / dual_wield / shield / ranged / runecaster), Req=`statRequirement` (min in the scaling stat), Def=`defense` (block/parry value), Dura=`baseDurability`, tc=`tc` (buy). `effect` is free-text; weapons whose effect reads "Grants +X HP" (no "Temp") carry a structured hp bonus that raises max HP on equip. Runecaster "+X Temp HP" is a cast-time temporary shield (N rounds), NOT a max-HP boost. Edit the JSON; regenerate after changes._
 
 ## Melee (145)
 
@@ -156,126 +156,126 @@ _Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`
 
 | Name | Dmg | Type | Stat | Style | Req | Def | Dura | Rarity | Faction | tc | Effect |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| Aetheric Bolt Gun | 1d6 | aetheric | wisdom | ranged | 4 | 0 | — | Common | aetheric | 36 | Accuracy drops in dense fog. |
-| Bone Javelin | 1d6 | piercing | wisdom | ranged | 2 | 0 | — | Common | giants | 26 | Longer throw than a knife; high wind reduces accuracy. |
-| Bone Sling | 1d6 | bludgeoning | wisdom | ranged | 1 | 0 | — | Common | giants | 22 | Throws stones/bones; reduced range in wind. |
-| Bone Throwing Axe | 1d6 | slashing | wisdom | ranged | 3 | 0 | — | Common | giants | 30 | May cause 1d6 bleed over 2 turns; short range. |
-| Compact Blaster | 1d6 | burn | dexterity | dual_wield | 4 | 0 | — | Common | unknowing_masses | 39 | — |
-| Compact Laser Pistol (Ranged) | 1d6 | burn | wisdom | ranged | 4 | 0 | — | Common | unknowing_masses | 30 | Loses accuracy in extreme cold. |
-| Giant Bone Longbow | 1d6 | piercing | strength | two_handed | 4 | 0 | — | Common | giants | 30 | +1d6 damage to creatures of Large size. |
-| Mud Darts | 1d6 | poison | wisdom | ranged | 2 | 0 | — | Common | mud_dwellers | 28 | Poisoned; weather does not affect effectiveness. |
-| Mud Sling | 1d6 | bludgeoning | wisdom | ranged | 2 | 0 | — | Common | mud_dwellers | 24 | +1d6 against glass or fragile objects. |
-| Mud Throwing Knife | 1d6 | piercing | wisdom | ranged | 1 | 0 | — | Common | mud_dwellers | 20 | Short range; poor performance in rain. |
-| Plasma Thrower | 1d6 | burn | wisdom | ranged | 3 | 0 | — | Common | unknowing_masses | 32 | Short range; rain reduces damage by 1d6. |
-| Repeater Crossbow | 1d6 | piercing | strength | two_handed | 4 | 0 | — | Common | mud_dwellers | 41 | Fires 2 bolts per round; needs 1 round to reload. |
-| Repeater Rifle | 1d6 | piercing | strength | two_handed | 4 | 0 | — | Common | mud_dwellers | 24 | — |
-| Rust Rifle | 1d6 | piercing | strength | two_handed | 2 | 0 | — | Common | mud_dwellers | 44 | Old, unreliable — may jam on a natural 1 attack roll (even/odd reroll to confirm jam). |
-| Rusty Shortbow | 1d6 | piercing | wisdom | ranged | 2 | 0 | — | Common | mud_dwellers | 25 | Reduced range in bad weather; may jam in mud. |
-| Salvaged Bow | 1d6 | piercing | dexterity | — | — | 0 | — | Common | — | — | — |
+| Aetheric Bolt Gun | 1d6 | aetheric | wisdom | ranged | 4 | 0 | — | Common | aetheric | 40 | Accuracy drops in dense fog. |
+| Bone Javelin | 1d6 | piercing | wisdom | ranged | 2 | 0 | — | Common | giants | 30 | Longer throw than a knife; high wind reduces accuracy. |
+| Bone Sling | 1d4 | bludgeoning | wisdom | ranged | 1 | 0 | — | Common | giants | 25 | Throws stones/bones; reduced range in wind. |
+| Bone Throwing Axe | 1d6 | slashing | wisdom | ranged | 3 | 0 | — | Common | giants | 35 | May cause 1d6 bleed over 2 turns; short range. |
+| Compact Blaster | 1d6 | burn | dexterity | dual_wield | 4 | 0 | — | Common | unknowing_masses | 45 | — |
+| Compact Laser Pistol (Ranged) | 1d6 | burn | wisdom | ranged | 4 | 0 | — | Common | unknowing_masses | 40 | Loses accuracy in extreme cold. |
+| Giant Bone Longbow | 1d8 | piercing | strength | two_handed | 4 | 0 | — | Common | giants | 45 | +1d6 damage to creatures of Large size. |
+| Mud Darts | 1d4 | poison | wisdom | ranged | 2 | 0 | — | Common | mud_dwellers | 30 | Poisoned; weather does not affect effectiveness. |
+| Mud Sling | 1d4 | bludgeoning | wisdom | ranged | 2 | 0 | — | Common | mud_dwellers | 25 | +1d6 against glass or fragile objects. |
+| Mud Throwing Knife | 1d4 | piercing | wisdom | ranged | 1 | 0 | — | Common | mud_dwellers | 20 | Short range; poor performance in rain. |
+| Plasma Thrower | 1d6 | burn | wisdom | ranged | 3 | 0 | — | Common | unknowing_masses | 45 | Short range; rain reduces damage by 1d6. |
+| Repeater Crossbow | 1d8 | piercing | strength | two_handed | 4 | 0 | — | Common | mud_dwellers | 55 | Fires 2 bolts per round; needs 1 round to reload. |
+| Repeater Rifle | 1d8 | piercing | strength | two_handed | 4 | 0 | — | Common | mud_dwellers | 50 | — |
+| Rust Rifle | 1d8 | piercing | strength | two_handed | 2 | 0 | — | Common | mud_dwellers | 40 | Old, unreliable — may jam on a natural 1 attack roll (even/odd reroll to confirm jam). |
+| Rusty Shortbow | 1d6 | piercing | wisdom | ranged | 2 | 0 | — | Common | mud_dwellers | 30 | Reduced range in bad weather; may jam in mud. |
+| Salvaged Bow | 1d6 | piercing | dexterity | — | — | 0 | — | Common | — | 25 | — |
 | Short Hunting Bow | 1d6 | piercing | wisdom | ranged | 4 | 0 | — | Common | mud_dwellers | 35 | Loses effectiveness in high wind. |
-| Tartarian Hand Spear | 1d6 | piercing | wisdom | ranged | 3 | 0 | — | Common | giants | 28 | Short-range; chance to pin target. |
-| Throwing Knife | 1d4 | piercing | dexterity | ranged | 1 | 0 | — | Common | unknowing_masses | 18 | Short range; weighted for tumble-throw. |
-| Aetheric Longbow | 2d6 | aetheric | wisdom | ranged | 6 | 0 | — | Uncommon | aetheric | 60 | Ignores wind conditions. |
-| Aetheric Throwing Disk | 2d6 | aetheric | wisdom | ranged | 7 | 0 | — | Uncommon | aetheric | 75 | Returns to wielder on miss; unaffected by wind. |
-| Bolt-Caster | 1d10 | piercing | dexterity | — | — | 0 | 25 | Uncommon | — | — | — |
-| Bone Crossbow | 2d6 | piercing | dexterity | — | — | 0 | — | Uncommon | — | — | — |
-| Bone Harpoon Launcher | 2d6 | piercing | strength | two_handed | 5 | 0 | — | Uncommon | giants | 109 | — |
-| Bone Siege Crossbow | 2d6 | piercing | strength | two_handed | 6 | 0 | — | Uncommon | giants | 86 | Pierces armor; only energy armor resists. |
-| Bone War Javelin | 2d6 | piercing | wisdom | ranged | 7 | 0 | — | Uncommon | giants | 72 | Long range; 1d6 bleed to Large creatures. |
-| Compact Laser Pistol | 2d6 | burn | charisma | single_handed | 7 | 0 | — | Uncommon | unknowing_masses | 62 | Ignores light armor. |
-| Energy Thrower | 2d6 | burn | wisdom | ranged | 7 | 0 | — | Uncommon | unknowing_masses | 70 | Throws plasma grenades; loses power in extreme cold. |
-| Giant Bone Bow | 2d6 | piercing | wisdom | ranged | 6 | 0 | — | Uncommon | giants | 65 | Long-range; +1d6 to Large creatures. |
-| Laser Crossbow | 2d6 | burn | wisdom | ranged | 5 | 0 | — | Uncommon | unknowing_masses | 55 | Accuracy unaffected by weather. |
-| Mud Hunting Rifle | 2d6 | piercing | wisdom | ranged | 8 | 0 | — | Uncommon | mud_dwellers | 82 | +1d6 against animals; reduced accuracy in rain. |
-| Mud Repeater Crossbow | 2d6 | piercing | wisdom | ranged | 5 | 0 | — | Uncommon | mud_dwellers | 62 | Fires 3 bolts per round; reduced reload in rain. |
-| Mud Spear (Throwing) | 2d6 | piercing | strength | two_handed | 5 | 0 | — | Uncommon | mud_dwellers | 88 | Can be thrown to far range from any other. |
-| Plasma Handgun | 2d6 | burn | dexterity | dual_wield | 8 | 0 | — | Uncommon | unknowing_masses | 131 | Natural 1 → overheat, useless 2 rounds. |
-| Plasma Pistol (Single) | 2d6 | burn | charisma | single_handed | 8 | 0 | — | Uncommon | unknowing_masses | 103 | Fires twice per round. |
-| Plasma Repeater Rifle | 2d6 | burn | strength | two_handed | 7 | 0 | — | Uncommon | unknowing_masses | 99 | Rapid plasma — natural 1 triggers an overheat reroll. After 4 overheats it explodes (1d10 to everyone in your range). |
-| Plasma Rifle | 2d6 | burn | wisdom | ranged | 8 | 0 | — | Uncommon | unknowing_masses | 85 | Long-range; 1d6 splash on hit. |
-| Plasma Spear | 2d6 | burn | wisdom | ranged | 5 | 0 | — | Uncommon | unknowing_masses | 58 | Short range; +1d6 plasma damage. |
-| Revivalist Field Carbine | 1d8 | piercing | dexterity | two_handed | 3 | 0 | — | Uncommon | tartarian_revivalists | 70 | Faction-issue armament of the tartarian revivalists. |
-| Tartarian Siege Bow | 2d6 | piercing | strength | two_handed | 7 | 0 | — | Uncommon | giants | 136 | +1d6 damage to machines. |
-| Tartarian Spear (Throw) | 2d6 | piercing | wisdom | ranged | 6 | 0 | — | Uncommon | giants | 65 | Long throw; accuracy drops in wind. |
-| Aether Bolt-Caster | 1d10+1d6 | burn | intelligence | — | — | 0 | 30 | Rare | — | — | — |
-| Aetheric Bow | 1d10+1d6 | aetheric | wisdom | ranged | 9 | 0 | — | Rare | aetheric | 150 | +1d6 against magical creatures. |
-| Aetheric Hand Cannon | 1d10+1d6 | aetheric | charisma | single_handed | 10 | 0 | — | Rare | aetheric | 233 | Natural 1 → overload: 1d6 self damage, useless 2 turns. |
-| Aetheric Pike (Rare) | 1d10 | aetheric | strength | two_handed | 8 | 0 | — | Rare | aetheric | 178 | Fires an energy projectile at any range; +1d6 vs affiliated foes. |
-| Aetheric Pulse Rifle | 1d10+1d6 | aetheric | wisdom | ranged | 10 | 0 | — | Rare | aetheric | 165 | Ignores 2 armor points. |
-| Bone Spear Launcher | 1d10+1d6 | piercing | wisdom | ranged | 9 | 0 | — | Rare | giants | 158 | Bypasses shields permanently on third max roll. |
-| High-Impact Blaster | 1d10 | burn | strength | two_handed | 9 | 0 | — | Rare | unknowing_masses | 285 | — |
-| Magna-Cannon | 1d10 | burn | strength | two_handed | 9 | 0 | — | Rare | unknowing_masses | 177 | Explosive rounds — same 1d10 AoE damage to enemies or allies in arm's reach of target. |
-| Mud Harpoon Gun | 1d10+1d6 | piercing | wisdom | ranged | 9 | 0 | — | Rare | mud_dwellers | 200 | Pins enemies in place for 1 round. |
-| Plasma Cannon | 1d10+1d6 | burn | wisdom | ranged | 9 | 0 | — | Rare | unknowing_masses | 250 | Long-range; 1d6 splash damage. |
-| Plasma Hand Cannon | 1d10+1d6 | burn | charisma | single_handed | 10 | 0 | — | Rare | unknowing_masses | 176 | Permanent +1 STR on first max roll. |
-| Plasma Long Rifle | 1d10+1d6 | burn | wisdom | ranged | 10 | 0 | — | Rare | unknowing_masses | 170 | +1d6 in extreme heat. |
-| Plasma Pistol | 1d10 | burn | dexterity | dual_wield | 10 | 0 | — | Rare | unknowing_masses | 160 | 50% enemy HP loss on rolls of 20+. |
-| Rail Cannon | 1d10 | electrical | strength | two_handed | 9 | 0 | — | Rare | unknowing_masses | 305 | Requires 1 round to charge; deals 1d6 as a club while charging. |
-| Railgun Pike | 1d10 | electrical | strength | two_handed | 8 | 0 | — | Rare | aetheric | 321 | +1d6 vs mechanical traps or machines. |
-| Tartarian Longbow | 1d10+1d6 | piercing | wisdom | ranged | 9 | 0 | — | Rare | giants | 160 | +1d6 to constructs or armor. |
-| Aetheric Railgun | 2d10 | electrical | wisdom | ranged | 12 | 0 | — | Legendary | aetheric | 475 | Ignores armor; long range. |
-| Aetheric Sniper Bow | 2d10 | aetheric | wisdom | ranged | 11 | 0 | — | Legendary | aetheric | 300 | Ignores cover; unaffected by weather. |
-| Mud Emperor's Harpoon | 2d10 | piercing | wisdom | ranged | 12 | 0 | — | Legendary | mud_dwellers | 350 | Pins enemies for 2 rounds. |
-| Plasma Artillery Cannon | 2d10 | burn | wisdom | ranged | 12 | 0 | — | Legendary | unknowing_masses | 550 | Explosive plasma rounds; 1d6 splash on hit. |
-| Plasma Burst Rifle | 2d10 | burn | wisdom | ranged | 11 | 0 | — | Legendary | unknowing_masses | 320 | Ignores shields on advantage rolls. |
-| Plasma Destroyer | 2d10 | burn | charisma | single_handed | 12 | 0 | — | Legendary | unknowing_masses | 368 | 1d6 splash damage to nearby enemies on hit. |
-| Tartarian Siege Bow (Legendary) | 2d10 | piercing | wisdom | ranged | 11 | 0 | — | Legendary | giants | 310 | +1d6 to structures; ignores armor. |
+| Tartarian Hand Spear | 1d6 | piercing | wisdom | ranged | 3 | 0 | — | Common | giants | 35 | Short-range; chance to pin target. |
+| Throwing Knife | 1d4 | piercing | dexterity | ranged | 1 | 0 | — | Common | unknowing_masses | 20 | Short range; weighted for tumble-throw. |
+| Aetheric Longbow | 2d6 | aetheric | wisdom | ranged | 6 | 0 | — | Uncommon | aetheric | 120 | Ignores wind conditions. |
+| Aetheric Throwing Disk | 1d8 | aetheric | wisdom | ranged | 7 | 0 | — | Uncommon | aetheric | 110 | Returns to wielder on miss; unaffected by wind. |
+| Bolt-Caster | 2d6 | piercing | dexterity | — | — | 0 | 25 | Uncommon | — | 130 | — |
+| Bone Crossbow | 2d6 | piercing | dexterity | — | — | 0 | — | Uncommon | — | 115 | — |
+| Bone Harpoon Launcher | 2d6 | piercing | strength | two_handed | 5 | 0 | — | Uncommon | giants | 125 | — |
+| Bone Siege Crossbow | 2d6 | piercing | strength | two_handed | 6 | 0 | — | Uncommon | giants | 140 | Pierces armor; only energy armor resists. |
+| Bone War Javelin | 1d8 | piercing | wisdom | ranged | 7 | 0 | — | Uncommon | giants | 105 | Long range; 1d6 bleed to Large creatures. |
+| Compact Laser Pistol | 1d8 | burn | charisma | single_handed | 7 | 0 | — | Uncommon | unknowing_masses | 115 | Ignores light armor. |
+| Energy Thrower | 2d6 | burn | wisdom | ranged | 7 | 0 | — | Uncommon | unknowing_masses | 135 | Throws plasma grenades; loses power in extreme cold. |
+| Giant Bone Bow | 2d6 | piercing | wisdom | ranged | 6 | 0 | — | Uncommon | giants | 120 | Long-range; +1d6 to Large creatures. |
+| Laser Crossbow | 2d6 | burn | wisdom | ranged | 5 | 0 | — | Uncommon | unknowing_masses | 130 | Accuracy unaffected by weather. |
+| Mud Hunting Rifle | 2d6 | piercing | wisdom | ranged | 8 | 0 | — | Uncommon | mud_dwellers | 125 | +1d6 against animals; reduced accuracy in rain. |
+| Mud Repeater Crossbow | 2d6 | piercing | wisdom | ranged | 5 | 0 | — | Uncommon | mud_dwellers | 115 | Fires 3 bolts per round; reduced reload in rain. |
+| Mud Spear (Throwing) | 1d8 | piercing | strength | two_handed | 5 | 0 | — | Uncommon | mud_dwellers | 110 | Can be thrown to far range from any other. |
+| Plasma Handgun | 1d8 | burn | dexterity | dual_wield | 8 | 0 | — | Uncommon | unknowing_masses | 135 | Natural 1 → overheat, useless 2 rounds. |
+| Plasma Pistol (Single) | 1d8 | burn | charisma | single_handed | 8 | 0 | — | Uncommon | unknowing_masses | 120 | Fires twice per round. |
+| Plasma Repeater Rifle | 2d6 | burn | strength | two_handed | 7 | 0 | — | Uncommon | unknowing_masses | 140 | Rapid plasma — natural 1 triggers an overheat reroll. After 4 overheats it explodes (1d10 to everyone in your range). |
+| Plasma Rifle | 2d6 | burn | wisdom | ranged | 8 | 0 | — | Uncommon | unknowing_masses | 130 | Long-range; 1d6 splash on hit. |
+| Plasma Spear | 1d8 | burn | wisdom | ranged | 5 | 0 | — | Uncommon | unknowing_masses | 110 | Short range; +1d6 plasma damage. |
+| Revivalist Field Carbine | 2d6 | piercing | dexterity | two_handed | 3 | 0 | — | Uncommon | tartarian_revivalists | 125 | Faction-issue armament of the tartarian revivalists. |
+| Tartarian Siege Bow | 2d6 | piercing | strength | two_handed | 7 | 0 | — | Uncommon | giants | 140 | +1d6 damage to machines. |
+| Tartarian Spear (Throw) | 1d8 | piercing | wisdom | ranged | 6 | 0 | — | Uncommon | giants | 110 | Long throw; accuracy drops in wind. |
+| Aether Bolt-Caster | 2d8 | burn | intelligence | — | — | 0 | 30 | Rare | — | 310 | — |
+| Aetheric Bow | 2d8 | aetheric | wisdom | ranged | 9 | 0 | — | Rare | aetheric | 330 | +1d6 against magical creatures. |
+| Aetheric Hand Cannon | 2d8 | aetheric | charisma | single_handed | 10 | 0 | — | Rare | aetheric | 350 | Natural 1 → overload: 1d6 self damage, useless 2 turns. |
+| Aetheric Pike (Rare) | 2d6 | aetheric | strength | two_handed | 8 | 0 | — | Rare | aetheric | 310 | Fires an energy projectile at any range; +1d6 vs affiliated foes. |
+| Aetheric Pulse Rifle | 2d8 | aetheric | wisdom | ranged | 10 | 0 | — | Rare | aetheric | 340 | Ignores 2 armor points. |
+| Bone Spear Launcher | 2d8 | piercing | wisdom | ranged | 9 | 0 | — | Rare | giants | 320 | Bypasses shields permanently on third max roll. |
+| High-Impact Blaster | 2d6 | burn | strength | two_handed | 9 | 0 | — | Rare | unknowing_masses | 310 | — |
+| Magna-Cannon | 2d8 | burn | strength | two_handed | 9 | 0 | — | Rare | unknowing_masses | 350 | Explosive rounds — same 1d10 AoE damage to enemies or allies in arm's reach of target. |
+| Mud Harpoon Gun | 2d8 | piercing | wisdom | ranged | 9 | 0 | — | Rare | mud_dwellers | 340 | Pins enemies in place for 1 round. |
+| Plasma Cannon | 2d8 | burn | wisdom | ranged | 9 | 0 | — | Rare | unknowing_masses | 360 | Long-range; 1d6 splash damage. |
+| Plasma Hand Cannon | 2d8 | burn | charisma | single_handed | 10 | 0 | — | Rare | unknowing_masses | 350 | Permanent +1 STR on first max roll. |
+| Plasma Long Rifle | 2d8 | burn | wisdom | ranged | 10 | 0 | — | Rare | unknowing_masses | 340 | +1d6 in extreme heat. |
+| Plasma Pistol | 2d6 | burn | dexterity | dual_wield | 10 | 0 | — | Rare | unknowing_masses | 320 | 50% enemy HP loss on rolls of 20+. |
+| Rail Cannon | 2d8 | electrical | strength | two_handed | 9 | 0 | — | Rare | unknowing_masses | 380 | Requires 1 round to charge; deals 1d6 as a club while charging. |
+| Railgun Pike | 2d6 | electrical | strength | two_handed | 8 | 0 | — | Rare | aetheric | 330 | +1d6 vs mechanical traps or machines. |
+| Tartarian Longbow | 2d8 | piercing | wisdom | ranged | 9 | 0 | — | Rare | giants | 320 | +1d6 to constructs or armor. |
+| Aetheric Railgun | 2d10 | electrical | wisdom | ranged | 12 | 0 | — | Legendary | aetheric | 1050 | Ignores armor; long range. |
+| Aetheric Sniper Bow | 2d10 | aetheric | wisdom | ranged | 11 | 0 | — | Legendary | aetheric | 950 | Ignores cover; unaffected by weather. |
+| Mud Emperor's Harpoon | 2d10 | piercing | wisdom | ranged | 12 | 0 | — | Legendary | mud_dwellers | 980 | Pins enemies for 2 rounds. |
+| Plasma Artillery Cannon | 2d10 | burn | wisdom | ranged | 12 | 0 | — | Legendary | unknowing_masses | 1100 | Explosive plasma rounds; 1d6 splash on hit. |
+| Plasma Burst Rifle | 2d10 | burn | wisdom | ranged | 11 | 0 | — | Legendary | unknowing_masses | 960 | Ignores shields on advantage rolls. |
+| Plasma Destroyer | 2d10 | burn | charisma | single_handed | 12 | 0 | — | Legendary | unknowing_masses | 1020 | 1d6 splash damage to nearby enemies on hit. |
+| Tartarian Siege Bow (Legendary) | 2d10 | piercing | wisdom | ranged | 11 | 0 | — | Legendary | giants | 940 | +1d6 to structures; ignores armor. |
 
 ## Runecaster (54)
 
 | Name | Dmg | Type | Stat | Style | Req | Def | Dura | Rarity | Faction | tc | Effect |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| Aetheric Spark | 1d6 | aetheric | intelligence | runecaster | 1 | 0 | — | Common | aetheric | 27 | Minor arcane damage. Instantaneous. |
-| Aetheric Touch | 1d6 | aetheric | intelligence | runecaster | 2 | 0 | — | Common | aetheric | 20 | Restores 1d6 HP to a target. Instantaneous. |
-| Dust Cloud | 1d4 | bludgeoning | intelligence | runecaster | 1 | 0 | — | Common | mud_dwellers | 23 | Creates a small dust cloud for cover. 1 round. |
+| Aetheric Spark | 1d6 | aetheric | intelligence | runecaster | 1 | 0 | — | Common | aetheric | 35 | Minor arcane damage. Instantaneous. |
+| Aetheric Touch | 1d6 | aetheric | intelligence | runecaster | 2 | 0 | — | Common | aetheric | 30 | Restores 1d6 HP to a target. Instantaneous. |
+| Dust Cloud | 1d6 | bludgeoning | intelligence | runecaster | 1 | 0 | — | Common | mud_dwellers | 30 | Creates a small dust cloud for cover. 1 round. |
 | Earthshaker | 1d6 | bludgeoning | intelligence | runecaster | 2 | 0 | — | Common | — | 40 | 1d6 earth; knocks the target prone. |
 | Flame of Aether | 1d6 | burn | intelligence | runecaster | 1 | 0 | — | Common | — | 35 | 1d6 fire; chance to ignite the target for 1 round. |
 | Force Wave | 1d6 | force | intelligence | runecaster | 2 | 0 | — | Common | — | 45 | 1d6 force; 10 ft knockback. |
-| Gale Binder | 1d6 | force | intelligence | runecaster | 1 | 0 | — | Common | — | 38 | 1d6 force; pushes the target back 5 ft. |
-| Lightfoot Dash | 1d4 | aetheric | intelligence | runecaster | 2 | 0 | — | Common | aetheric | 47 | Caster moves at 2× speed for 2 rounds. |
-| Minor Repair | 1d4 | aetheric | intelligence | runecaster | 2 | 0 | — | Common | aetheric | 52 | Repairs Tartarian tech. Instantaneous. |
-| Mud Grip | 1d4 | bludgeoning | intelligence | runecaster | 1 | 0 | — | Common | mud_dwellers | 33 | Immobilizes a single target in mud (restrained, 3 rounds). |
-| Mud Shell | 1d4 | bludgeoning | intelligence | runecaster | 3 | 4 | — | Common | mud_dwellers | 32 | Shields caster with mud barrier; blocks 1d6 damage. 3 rounds. |
-| Mud Spray | 1d6 | bludgeoning | intelligence | runecaster | 2 | 0 | — | Common | mud_dwellers | 44 | Sprays mud to blind enemies. 1d6 damage + blinded 2 rounds. |
-| Pyric Wand | 1d6 | burn | intelligence | — | — | 1 | — | Common | — | — | — |
-| Slick Mud | 1d4 | bludgeoning | intelligence | runecaster | 3 | 0 | — | Common | mud_dwellers | 41 | Creates slippery ground; DEX save or fall. 5 rounds. |
-| Sparkstrike | 1d6 | electrical | intelligence | runecaster | 2 | 0 | — | Common | — | 42 | 1d6 lightning; 1-round stun on a hit. |
-| Vine Grasp | 1d4 | piercing | intelligence | runecaster | 2 | 0 | — | Common | mud_dwellers | 55 | Summons vines to entangle (restrained, 3 rounds). |
-| Aetheric Disrupt | 1d4 | aetheric | intelligence | runecaster | 3 | 0 | — | Uncommon | aetheric | 65 | Disables magical effects in a small area. 2 rounds. |
-| Aetheric Push | 1d6 | aetheric | intelligence | runecaster | 5 | 0 | — | Uncommon | aetheric | 136 | Pushes target back 10 ft. Instantaneous. |
-| Aetheric Ward | 1d4 | aetheric | intelligence | runecaster | 5 | 6 | — | Uncommon | aetheric | 95 | Floating Aether shield; blocks 2d6 damage. 3 rounds. |
-| Aetheric Wave | 1d10 | aetheric | intelligence | runecaster | 5 | 0 | — | Uncommon | aetheric | 111 | Area attack — 1d10 force damage to all targets. Instantaneous. |
-| Barrier of Aether | 1d6 | aetheric | intelligence | runecaster | 4 | 5 | — | Uncommon | aetheric | 100 | Creates force barrier; blocks 1d6 damage. 5 rounds. |
-| Dark Blight | 1d10 | poison | intelligence | runecaster | 5 | 0 | — | Uncommon | — | 95 | 1d10 necrotic; 50% chance to apply poisoned (2 rounds). |
-| Ether Bolt | 1d10 | electrical | intelligence | runecaster | 6 | 0 | — | Uncommon | — | 105 | 1d10 lightning; disables Tartarian tech in the target for 2 rounds. |
-| Mud Armor | 1d4 | bludgeoning | intelligence | runecaster | 4 | 6 | — | Uncommon | mud_dwellers | 124 | Covers self in mud armor; blocks 2d6 damage. 5 rounds. |
-| Mud Blast | 2d6 | bludgeoning | intelligence | runecaster | 3 | 0 | — | Uncommon | mud_dwellers | 82 | Blast of mud — damages and slows enemies. 1 round. |
-| Mud Spear (Runecaster) | 2d6 | piercing | intelligence | runecaster | 4 | 0 | — | Uncommon | mud_dwellers | 68 | Launches a hardened spear of mud. Instantaneous. |
-| Mud Torrent | 1d6 | bludgeoning | intelligence | runecaster | 5 | 0 | — | Uncommon | mud_dwellers | 76 | Flood of mud — 1d6 damage and prone. Instantaneous. |
-| Slow Aether | 1d4 | aetheric | intelligence | runecaster | 4 | 0 | — | Uncommon | aetheric | 99 | Slows enemy movement by 50%. 3 rounds. |
-| Stone Fist | 1d10 | bludgeoning | intelligence | runecaster | 5 | 0 | — | Uncommon | — | 90 | 1d10 earth; knocks the target prone. |
-| Storm Rod | 2d6 | electrical | intelligence | — | — | 2 | — | Uncommon | — | — | — |
-| Tangle Roots | 1d6 | piercing | intelligence | runecaster | 3 | 0 | — | Uncommon | mud_dwellers | 77 | Roots entangle multiple enemies (restrained, 5 rounds). |
-| Void Pulse | 1d10 | aetheric | intelligence | runecaster | 6 | 0 | — | Uncommon | — | 110 | 1d10 void; pulls the target 5 ft closer to the caster. |
-| Aetheric Armor | 1d4 | aetheric | intelligence | runecaster | 7 | 7 | — | Rare | aetheric | 207 | Invisible force armor; blocks 2d10 damage. 5 rounds. |
-| Aetheric Collapse | 2d10 | aetheric | intelligence | runecaster | 8 | 0 | — | Rare | aetheric | 184 | Causes structures to collapse on enemies. 2d10 damage. Instantaneous. |
-| Aetheric Pillar | 2d10 | aetheric | intelligence | runecaster | 7 | 0 | — | Rare | aetheric | 226 | Raises a force pillar — 2d10 damage. Instantaneous. |
-| Aetheric Shackle | 1d4 | aetheric | intelligence | runecaster | 6 | 0 | — | Rare | aetheric | 244 | Binds target with energy chains (paralyzed, 3 rounds). |
-| Earthquake Ripple | 2d6 | bludgeoning | intelligence | runecaster | 6 | 0 | — | Rare | mud_dwellers | 194 | Minor tremors — 2d6 damage and prone. 3 rounds. |
-| Ember Storm | 1d20 | burn | intelligence | runecaster | 9 | 0 | — | Rare | — | 250 | 1d20 fire; 15 ft AoE, burning ground for 2 rounds. |
-| Mire Stave | 1d10+1d6 | poison | intelligence | — | — | 3 | — | Rare | — | — | — |
-| Mud Forge | 1d6 | bludgeoning | intelligence | runecaster | 6 | 0 | — | Rare | mud_dwellers | 231 | Creates temporary mud weapons; last 1 encounter. |
-| Mud Golem Creation | 2d6 | bludgeoning | intelligence | runecaster | 8 | 0 | — | Rare | mud_dwellers | 261 | Summons a powerful mud golem (golem stats). 10 rounds. |
-| Mud Guard | 1d4 | bludgeoning | intelligence | runecaster | 8 | 6 | — | Rare | mud_dwellers | 199 | Mud covers an ally — blocks 2d8 damage. 5 rounds. |
-| Mud Wave | 2d10 | bludgeoning | intelligence | runecaster | 7 | 0 | — | Rare | mud_dwellers | 285 | Massive wave — 2d10 damage, knocks prone. Instantaneous. |
-| Shadow Caller | 1d20 | aetheric | intelligence | runecaster | 9 | 0 | — | Rare | — | 240 | 1d20 aetheric; caster turns invisible for 1 round after the hit. |
-| Stormcaller | 1d20 | electrical | intelligence | runecaster | 10 | 0 | — | Rare | — | 265 | 1d20 lightning; arcs to one extra target within 10 ft. |
-| Aetheric Storm | 2d10 | electrical | intelligence | runecaster | 9 | 0 | — | Legendary | aetheric | 570 | Storm of Aether energy — 2d10 to all enemies. 1 round. |
-| Crown of Verdict | 2d10 | radiation | intelligence | — | — | 4 | — | Legendary | — | — | — |
-| Displace Aether | 1d4 | aetheric | intelligence | runecaster | 9 | 0 | — | Legendary | aetheric | 327 | Teleports caster to a visible location. Instantaneous. |
-| Mud Army | 1d6 | bludgeoning | intelligence | runecaster | 12 | 0 | — | Legendary | mud_dwellers | 488 | Summons an army of mud creatures (each 1d6). 1 encounter. |
-| Mud Emperor's Curse | 1d10 | poison | intelligence | runecaster | 10 | 0 | — | Legendary | mud_dwellers | 575 | Curse — 1d10 damage per round. 3 rounds. |
-| Phoenix Rebirth | 2d20 | burn | intelligence | runecaster | 11 | 0 | — | Legendary | — | 620 | 2d20 fire; resurrects one downed ally to half HP. |
-| Shatter Aether | 1d4 | aetheric | intelligence | runecaster | 10 | 0 | — | Legendary | aetheric | 603 | Breaks any magical effect or structure. Instantaneous. |
-| Void Edge | 2d20 | aetheric | intelligence | runecaster | 12 | 0 | — | Legendary | — | 640 | 2d20 void; opens a damaging rift on the target tile for 2 rounds. |
-| Wrath of Titans | 2d20 | bludgeoning | intelligence | runecaster | 11 | 0 | — | Legendary | — | 580 | 2d20 bludgeoning; massive AoE stun + knockback (all enemies in 15 ft). |
+| Gale Binder | 1d6 | force | intelligence | runecaster | 1 | 0 | — | Common | — | 35 | 1d6 force; pushes the target back 5 ft. |
+| Lightfoot Dash | 1d6 | aetheric | intelligence | runecaster | 2 | 0 | — | Common | aetheric | 45 | Caster moves at 2× speed for 2 rounds. |
+| Minor Repair | 1d6 | aetheric | intelligence | runecaster | 2 | 0 | — | Common | aetheric | 50 | Repairs Tartarian tech. Instantaneous. |
+| Mud Grip | 1d6 | bludgeoning | intelligence | runecaster | 1 | 0 | — | Common | mud_dwellers | 35 | Immobilizes a single target in mud (restrained, 3 rounds). |
+| Mud Shell | 1d6 | bludgeoning | intelligence | runecaster | 3 | 4 | — | Common | mud_dwellers | 35 | Shields caster with mud barrier; blocks 1d6 damage. Grants +10 Temp HP. 3 rounds. |
+| Mud Spray | 1d6 | bludgeoning | intelligence | runecaster | 2 | 0 | — | Common | mud_dwellers | 45 | Sprays mud to blind enemies. 1d6 damage + blinded 2 rounds. |
+| Pyric Wand | 1d6 | burn | intelligence | — | — | 1 | — | Common | — | 40 | — |
+| Slick Mud | 1d6 | bludgeoning | intelligence | runecaster | 3 | 0 | — | Common | mud_dwellers | 40 | Creates slippery ground; DEX save or fall. 5 rounds. |
+| Sparkstrike | 1d6 | electrical | intelligence | runecaster | 2 | 0 | — | Common | — | 45 | 1d6 lightning; 1-round stun on a hit. |
+| Vine Grasp | 1d6 | piercing | intelligence | runecaster | 2 | 0 | — | Common | mud_dwellers | 55 | Summons vines to entangle (restrained, 3 rounds). |
+| Aetheric Disrupt | 1d8 | aetheric | intelligence | runecaster | 3 | 0 | — | Uncommon | aetheric | 110 | Disables magical effects in a small area. 2 rounds. |
+| Aetheric Push | 1d8 | aetheric | intelligence | runecaster | 5 | 0 | — | Uncommon | aetheric | 130 | Pushes target back 10 ft. Instantaneous. |
+| Aetheric Ward | 1d8 | aetheric | intelligence | runecaster | 5 | 6 | — | Uncommon | aetheric | 120 | Floating Aether shield; blocks 2d6 damage. Grants +15 Temp HP. 3 rounds. |
+| Aetheric Wave | 2d6 | aetheric | intelligence | runecaster | 5 | 0 | — | Uncommon | aetheric | 140 | Area attack — 2d6 force damage to all targets. Instantaneous. |
+| Barrier of Aether | 1d8 | aetheric | intelligence | runecaster | 4 | 5 | — | Uncommon | aetheric | 125 | Creates force barrier; blocks 1d6 damage. 5 rounds. |
+| Dark Blight | 2d6 | poison | intelligence | runecaster | 5 | 0 | — | Uncommon | — | 125 | 2d6 necrotic; 50% chance to apply poisoned (2 rounds). |
+| Ether Bolt | 2d6 | electrical | intelligence | runecaster | 6 | 0 | — | Uncommon | — | 135 | 2d6 lightning; disables Tartarian tech in the target for 2 rounds. |
+| Mud Armor | 1d8 | bludgeoning | intelligence | runecaster | 4 | 6 | — | Uncommon | mud_dwellers | 145 | Covers self in mud armor; blocks 2d6 damage. Grants +20 Temp HP. 5 rounds. |
+| Mud Blast | 2d6 | bludgeoning | intelligence | runecaster | 3 | 0 | — | Uncommon | mud_dwellers | 120 | Blast of mud — damages and slows enemies. 1 round. |
+| Mud Spear (Runecaster) | 2d6 | piercing | intelligence | runecaster | 4 | 0 | — | Uncommon | mud_dwellers | 110 | Launches a hardened spear of mud. Instantaneous. |
+| Mud Torrent | 1d8 | bludgeoning | intelligence | runecaster | 5 | 0 | — | Uncommon | mud_dwellers | 115 | Flood of mud — 1d8 damage and prone. Instantaneous. |
+| Slow Aether | 1d8 | aetheric | intelligence | runecaster | 4 | 0 | — | Uncommon | aetheric | 120 | Slows enemy movement by 50%. 3 rounds. |
+| Stone Fist | 2d6 | bludgeoning | intelligence | runecaster | 5 | 0 | — | Uncommon | — | 130 | 2d6 earth; knocks the target prone. |
+| Storm Rod | 2d6 | electrical | intelligence | — | — | 2 | — | Uncommon | — | 125 | — |
+| Tangle Roots | 1d8 | piercing | intelligence | runecaster | 3 | 0 | — | Uncommon | mud_dwellers | 115 | Roots entangle multiple enemies (restrained, 5 rounds). |
+| Void Pulse | 2d6 | aetheric | intelligence | runecaster | 6 | 0 | — | Uncommon | — | 140 | 2d6 void; pulls the target 5 ft closer to the caster. |
+| Aetheric Armor | 1d10 | aetheric | intelligence | runecaster | 7 | 7 | — | Rare | aetheric | 290 | Invisible force armor; blocks 2d10 damage. Grants +30 Temp HP. 5 rounds. |
+| Aetheric Collapse | 2d8 | aetheric | intelligence | runecaster | 8 | 0 | — | Rare | aetheric | 310 | Causes structures to collapse on enemies. 2d8 damage. Instantaneous. |
+| Aetheric Pillar | 2d8 | aetheric | intelligence | runecaster | 7 | 0 | — | Rare | aetheric | 330 | Raises a force pillar — 2d8 damage. Instantaneous. |
+| Aetheric Shackle | 1d10 | aetheric | intelligence | runecaster | 6 | 0 | — | Rare | aetheric | 340 | Binds target with energy chains (paralyzed, 3 rounds). |
+| Earthquake Ripple | 2d8 | bludgeoning | intelligence | runecaster | 6 | 0 | — | Rare | mud_dwellers | 320 | Minor tremors — 2d8 damage and prone. 3 rounds. |
+| Ember Storm | 2d8 | burn | intelligence | runecaster | 9 | 0 | — | Rare | — | 350 | 2d8 fire; 15 ft AoE, burning ground for 2 rounds. |
+| Mire Stave | 2d8 | poison | intelligence | — | — | 3 | — | Rare | — | 310 | — |
+| Mud Forge | 1d10 | bludgeoning | intelligence | runecaster | 6 | 0 | — | Rare | mud_dwellers | 330 | Creates temporary mud weapons; last 1 encounter. |
+| Mud Golem Creation | 2d8 | bludgeoning | intelligence | runecaster | 8 | 0 | — | Rare | mud_dwellers | 360 | Summons a powerful mud golem (golem stats). 10 rounds. |
+| Mud Guard | 1d10 | bludgeoning | intelligence | runecaster | 8 | 6 | — | Rare | mud_dwellers | 310 | Mud covers an ally — blocks 2d8 damage. Grants +30 Temp HP. 5 rounds. |
+| Mud Wave | 2d8 | bludgeoning | intelligence | runecaster | 7 | 0 | — | Rare | mud_dwellers | 370 | Massive wave — 2d8 damage, knocks prone. Instantaneous. |
+| Shadow Caller | 2d8 | aetheric | intelligence | runecaster | 9 | 0 | — | Rare | — | 350 | 2d8 aetheric; caster turns invisible for 1 round after the hit. |
+| Stormcaller | 2d8 | electrical | intelligence | runecaster | 10 | 0 | — | Rare | — | 360 | 2d8 lightning; arcs to one extra target within 10 ft. |
+| Aetheric Storm | 2d10 | electrical | intelligence | runecaster | 9 | 0 | — | Legendary | aetheric | 980 | Storm of Aether energy — 2d10 to all enemies. 1 round. |
+| Crown of Verdict | 2d10 | radiation | intelligence | — | — | 4 | — | Legendary | — | 1050 | — |
+| Displace Aether | 1d10 | aetheric | intelligence | runecaster | 9 | 0 | — | Legendary | aetheric | 850 | Teleports caster to a visible location. Instantaneous. |
+| Mud Army | 2d8 | bludgeoning | intelligence | runecaster | 12 | 0 | — | Legendary | mud_dwellers | 950 | Summons an army of mud creatures (each 2d8). 1 encounter. |
+| Mud Emperor's Curse | 2d10 | poison | intelligence | runecaster | 10 | 0 | — | Legendary | mud_dwellers | 990 | Curse — 2d10 damage per round. 3 rounds. |
+| Phoenix Rebirth | 2d20 | burn | intelligence | runecaster | 11 | 0 | — | Legendary | — | 1100 | 2d20 fire; resurrects one downed ally to half HP. |
+| Shatter Aether | 1d10 | aetheric | intelligence | runecaster | 10 | 0 | — | Legendary | aetheric | 890 | Breaks any magical effect or structure. Instantaneous. |
+| Void Edge | 2d20 | aetheric | intelligence | runecaster | 12 | 0 | — | Legendary | — | 1100 | 2d20 void; opens a damaging rift on the target tile for 2 rounds. |
+| Wrath of Titans | 2d20 | bludgeoning | intelligence | runecaster | 11 | 0 | — | Legendary | — | 1050 | 2d20 bludgeoning; massive AoE stun + knockback (all enemies in 15 ft). |

@@ -168,7 +168,9 @@ const CODENAMES: Record<string, string> = {
   // primary-only); new docs/weapon-catalog.md (every weapon + stats).
   // OTA-329 — MELEE weapon rebalance (all 145) + max-HP-on-weapons mechanic
   // (34 melee carry "Grants +X HP"; weaponHpBonus/gearHpBonus → hpMax).
-  '2026-06-07-329': 'Sumac Anvil',
+  // OTA-330 — RANGED (64) + RUNECASTER (54) rebalance applied; all 263 weapons
+  // now balanced. Runecaster "Temp HP" is cast-time temporary, not max HP.
+  '2026-06-07-330': 'Hazel Anvil',
   '2026-06-07-327': 'Hemlock Anvil',
   '2026-06-07-326': 'Tamarack Anvil',
   '2026-06-07-325': 'Cypress Anvil',
