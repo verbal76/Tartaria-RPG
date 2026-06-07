@@ -21,7 +21,7 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - `HaL2001` HEAD = **OTA-330 "Hazel Anvil"** — live on Android + iOS.
+> - `HaL2001` HEAD = **OTA-331 "Birch Anvil"** — live on Android + iOS.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - tsc clean. Tests green modulo the known baseline flakes (dogTravelClimb,
@@ -417,6 +417,12 @@ checkout, not a special rollback tool.)
 - **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Birch Anvil (`2026-06-07-331`) — strip "Temp HP" from runecaster shield-spells
+- **WHAT.** Player: "Skip that effect. take it out of the list of effects for that weapon and don't even use them as flavor text." Re the 5 runecaster shield-spells that read "Grants +X Temp HP" (Hazel Anvil left them as flavor only).
+- **FIX.** Removed the `Grants +X Temp HP.` clause from the `effect` string of all 5 (Mud Shell, Aetheric Ward, Mud Armor, Aetheric Armor, Mud Guard) — regex strip + double-space collapse, so each reads cleanly: e.g. Mud Shell `"Shields caster with mud barrier; blocks 1d6 damage. 3 rounds."` (was `"… blocks 1d6 damage. Grants +10 Temp HP. 3 rounds."`). 0 "Temp HP" references remain anywhere in weapons.json. The block-value + duration are untouched.
+- **Verified:** weapons.json valid; `docs/weapon-catalog.md` regenerated. Data + doc only.
+- **Files:** `app/data/items/weapons.json` (5 effects), `docs/weapon-catalog.md`, `app/buildInfo.ts`, `app/buildCodename.ts` (Birch Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
 
 #### Hazel Anvil (`2026-06-07-330`) — RANGED + RUNECASTER weapon rebalance (rebalance complete)
 - **WHAT.** Completes the weapon rebalance started in Sumac Anvil. The player sent the rest of the truncated CSV (the Common-ranged tail + all Uncommon/Rare/Legendary ranged + the full runecaster block). Combined with the Common-ranged rows from the earlier paste, this is the remaining **64 ranged + 54 runecaster** = all 118 non-melee weapons. With Sumac's 145 melee, **all 263 weapons are now rebalanced.**

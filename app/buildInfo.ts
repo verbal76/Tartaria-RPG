@@ -12589,4 +12589,9 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // runecaster shield-spells' "Grants +X Temp HP" is a cast-time temporary
 // shield (N rounds), NOT a max-HP boost, so it is intentionally NOT wired into
 // hpMax (kept as effect flavor text). docs/weapon-catalog.md regenerated.
-export const OTA_BUILD_ID = '2026-06-07-330';
+// OTA-331 — Birch Anvil. Per the player, the "Grants +X Temp HP" clause is
+// removed entirely from the 5 runecaster shield-spells' effect text (Mud Shell,
+// Aetheric Ward, Mud Armor, Aetheric Armor, Mud Guard) — not wired, not even
+// flavor. Effects now read just the block + duration (e.g. "blocks 1d6 damage.
+// 3 rounds."). docs/weapon-catalog.md regenerated.
+export const OTA_BUILD_ID = '2026-06-07-331';

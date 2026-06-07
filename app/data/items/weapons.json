@@ -4745,7 +4745,7 @@
         "mud_dwellers",
         "ward"
       ],
-      "effect": "Shields caster with mud barrier; blocks 1d6 damage. Grants +10 Temp HP. 3 rounds.",
+      "effect": "Shields caster with mud barrier; blocks 1d6 damage. 3 rounds.",
       "description": "A dome-shaped runecaster. Calls a mud shell up around the wielder."
     },
     {
@@ -4889,7 +4889,7 @@
         "mud_dwellers",
         "ward"
       ],
-      "effect": "Covers self in mud armor; blocks 2d6 damage. Grants +20 Temp HP. 5 rounds.",
+      "effect": "Covers self in mud armor; blocks 2d6 damage. 5 rounds.",
       "description": "Wide flat runecaster. Plates the wielder in living mud."
     },
     {
@@ -4951,7 +4951,7 @@
         "aetheric",
         "ward"
       ],
-      "effect": "Floating Aether shield; blocks 2d6 damage. Grants +15 Temp HP. 3 rounds.",
+      "effect": "Floating Aether shield; blocks 2d6 damage. 3 rounds.",
       "description": "A small disk-runecaster. Hovers between caster and harm. Renamed from Aetheric Shield in OTA-134 — the melee Aetheric Shield is a different item."
     },
     {
@@ -5055,7 +5055,7 @@
         "aetheric",
         "ward"
       ],
-      "effect": "Invisible force armor; blocks 2d10 damage. Grants +30 Temp HP. 5 rounds.",
+      "effect": "Invisible force armor; blocks 2d10 damage. 5 rounds.",
       "description": "Lattice runecaster. Plates the caster in unseen force."
     },
     {
@@ -5159,7 +5159,7 @@
         "mud_dwellers",
         "ward"
       ],
-      "effect": "Mud covers an ally — blocks 2d8 damage. Grants +30 Temp HP. 5 rounds.",
+      "effect": "Mud covers an ally — blocks 2d8 damage. 5 rounds.",
       "description": "Twin-runecaster. Plates an ally in living mud at range."
     },
     {

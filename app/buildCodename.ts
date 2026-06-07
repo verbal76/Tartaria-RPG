@@ -170,7 +170,9 @@ const CODENAMES: Record<string, string> = {
   // (34 melee carry "Grants +X HP"; weaponHpBonus/gearHpBonus → hpMax).
   // OTA-330 — RANGED (64) + RUNECASTER (54) rebalance applied; all 263 weapons
   // now balanced. Runecaster "Temp HP" is cast-time temporary, not max HP.
-  '2026-06-07-330': 'Hazel Anvil',
+  // OTA-331 — "Grants +X Temp HP" stripped from the 5 runecaster shield-spell
+  // effects entirely (not wired, not flavor).
+  '2026-06-07-331': 'Birch Anvil',
   '2026-06-07-327': 'Hemlock Anvil',
   '2026-06-07-326': 'Tamarack Anvil',
   '2026-06-07-325': 'Cypress Anvil',

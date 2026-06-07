@@ -1,6 +1,6 @@
 # Tartaria Realms — Weapon Catalog (balance reference)
 
-_Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`damageDice`, Type=`damageType`, Stat=scaling `stat`, Style=`style` (one_handed / two_handed / dual_wield / shield / ranged / runecaster), Req=`statRequirement` (min in the scaling stat), Def=`defense` (block/parry value), Dura=`baseDurability`, tc=`tc` (buy). `effect` is free-text; weapons whose effect reads "Grants +X HP" (no "Temp") carry a structured hp bonus that raises max HP on equip. Runecaster "+X Temp HP" is a cast-time temporary shield (N rounds), NOT a max-HP boost. Edit the JSON; regenerate after changes._
+_Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`damageDice`, Type=`damageType`, Stat=scaling `stat`, Style=`style` (one_handed / two_handed / dual_wield / shield / ranged / runecaster), Req=`statRequirement` (min in the scaling stat), Def=`defense` (block/parry value), Dura=`baseDurability`, tc=`tc` (buy). `effect` is free-text; weapons whose effect reads "Grants +X HP" carry a structured hp bonus that raises max HP on equip. Edit the JSON; regenerate after changes._
 
 ## Melee (145)
 
@@ -235,7 +235,7 @@ _Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`
 | Lightfoot Dash | 1d6 | aetheric | intelligence | runecaster | 2 | 0 | — | Common | aetheric | 45 | Caster moves at 2× speed for 2 rounds. |
 | Minor Repair | 1d6 | aetheric | intelligence | runecaster | 2 | 0 | — | Common | aetheric | 50 | Repairs Tartarian tech. Instantaneous. |
 | Mud Grip | 1d6 | bludgeoning | intelligence | runecaster | 1 | 0 | — | Common | mud_dwellers | 35 | Immobilizes a single target in mud (restrained, 3 rounds). |
-| Mud Shell | 1d6 | bludgeoning | intelligence | runecaster | 3 | 4 | — | Common | mud_dwellers | 35 | Shields caster with mud barrier; blocks 1d6 damage. Grants +10 Temp HP. 3 rounds. |
+| Mud Shell | 1d6 | bludgeoning | intelligence | runecaster | 3 | 4 | — | Common | mud_dwellers | 35 | Shields caster with mud barrier; blocks 1d6 damage. 3 rounds. |
 | Mud Spray | 1d6 | bludgeoning | intelligence | runecaster | 2 | 0 | — | Common | mud_dwellers | 45 | Sprays mud to blind enemies. 1d6 damage + blinded 2 rounds. |
 | Pyric Wand | 1d6 | burn | intelligence | — | — | 1 | — | Common | — | 40 | — |
 | Slick Mud | 1d6 | bludgeoning | intelligence | runecaster | 3 | 0 | — | Common | mud_dwellers | 40 | Creates slippery ground; DEX save or fall. 5 rounds. |
@@ -243,12 +243,12 @@ _Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`
 | Vine Grasp | 1d6 | piercing | intelligence | runecaster | 2 | 0 | — | Common | mud_dwellers | 55 | Summons vines to entangle (restrained, 3 rounds). |
 | Aetheric Disrupt | 1d8 | aetheric | intelligence | runecaster | 3 | 0 | — | Uncommon | aetheric | 110 | Disables magical effects in a small area. 2 rounds. |
 | Aetheric Push | 1d8 | aetheric | intelligence | runecaster | 5 | 0 | — | Uncommon | aetheric | 130 | Pushes target back 10 ft. Instantaneous. |
-| Aetheric Ward | 1d8 | aetheric | intelligence | runecaster | 5 | 6 | — | Uncommon | aetheric | 120 | Floating Aether shield; blocks 2d6 damage. Grants +15 Temp HP. 3 rounds. |
+| Aetheric Ward | 1d8 | aetheric | intelligence | runecaster | 5 | 6 | — | Uncommon | aetheric | 120 | Floating Aether shield; blocks 2d6 damage. 3 rounds. |
 | Aetheric Wave | 2d6 | aetheric | intelligence | runecaster | 5 | 0 | — | Uncommon | aetheric | 140 | Area attack — 2d6 force damage to all targets. Instantaneous. |
 | Barrier of Aether | 1d8 | aetheric | intelligence | runecaster | 4 | 5 | — | Uncommon | aetheric | 125 | Creates force barrier; blocks 1d6 damage. 5 rounds. |
 | Dark Blight | 2d6 | poison | intelligence | runecaster | 5 | 0 | — | Uncommon | — | 125 | 2d6 necrotic; 50% chance to apply poisoned (2 rounds). |
 | Ether Bolt | 2d6 | electrical | intelligence | runecaster | 6 | 0 | — | Uncommon | — | 135 | 2d6 lightning; disables Tartarian tech in the target for 2 rounds. |
-| Mud Armor | 1d8 | bludgeoning | intelligence | runecaster | 4 | 6 | — | Uncommon | mud_dwellers | 145 | Covers self in mud armor; blocks 2d6 damage. Grants +20 Temp HP. 5 rounds. |
+| Mud Armor | 1d8 | bludgeoning | intelligence | runecaster | 4 | 6 | — | Uncommon | mud_dwellers | 145 | Covers self in mud armor; blocks 2d6 damage. 5 rounds. |
 | Mud Blast | 2d6 | bludgeoning | intelligence | runecaster | 3 | 0 | — | Uncommon | mud_dwellers | 120 | Blast of mud — damages and slows enemies. 1 round. |
 | Mud Spear (Runecaster) | 2d6 | piercing | intelligence | runecaster | 4 | 0 | — | Uncommon | mud_dwellers | 110 | Launches a hardened spear of mud. Instantaneous. |
 | Mud Torrent | 1d8 | bludgeoning | intelligence | runecaster | 5 | 0 | — | Uncommon | mud_dwellers | 115 | Flood of mud — 1d8 damage and prone. Instantaneous. |
@@ -257,7 +257,7 @@ _Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`
 | Storm Rod | 2d6 | electrical | intelligence | — | — | 2 | — | Uncommon | — | 125 | — |
 | Tangle Roots | 1d8 | piercing | intelligence | runecaster | 3 | 0 | — | Uncommon | mud_dwellers | 115 | Roots entangle multiple enemies (restrained, 5 rounds). |
 | Void Pulse | 2d6 | aetheric | intelligence | runecaster | 6 | 0 | — | Uncommon | — | 140 | 2d6 void; pulls the target 5 ft closer to the caster. |
-| Aetheric Armor | 1d10 | aetheric | intelligence | runecaster | 7 | 7 | — | Rare | aetheric | 290 | Invisible force armor; blocks 2d10 damage. Grants +30 Temp HP. 5 rounds. |
+| Aetheric Armor | 1d10 | aetheric | intelligence | runecaster | 7 | 7 | — | Rare | aetheric | 290 | Invisible force armor; blocks 2d10 damage. 5 rounds. |
 | Aetheric Collapse | 2d8 | aetheric | intelligence | runecaster | 8 | 0 | — | Rare | aetheric | 310 | Causes structures to collapse on enemies. 2d8 damage. Instantaneous. |
 | Aetheric Pillar | 2d8 | aetheric | intelligence | runecaster | 7 | 0 | — | Rare | aetheric | 330 | Raises a force pillar — 2d8 damage. Instantaneous. |
 | Aetheric Shackle | 1d10 | aetheric | intelligence | runecaster | 6 | 0 | — | Rare | aetheric | 340 | Binds target with energy chains (paralyzed, 3 rounds). |
@@ -266,7 +266,7 @@ _Auto-generated from `app/data/items/weapons.json` (263 weapons). Columns: Dmg=`
 | Mire Stave | 2d8 | poison | intelligence | — | — | 3 | — | Rare | — | 310 | — |
 | Mud Forge | 1d10 | bludgeoning | intelligence | runecaster | 6 | 0 | — | Rare | mud_dwellers | 330 | Creates temporary mud weapons; last 1 encounter. |
 | Mud Golem Creation | 2d8 | bludgeoning | intelligence | runecaster | 8 | 0 | — | Rare | mud_dwellers | 360 | Summons a powerful mud golem (golem stats). 10 rounds. |
-| Mud Guard | 1d10 | bludgeoning | intelligence | runecaster | 8 | 6 | — | Rare | mud_dwellers | 310 | Mud covers an ally — blocks 2d8 damage. Grants +30 Temp HP. 5 rounds. |
+| Mud Guard | 1d10 | bludgeoning | intelligence | runecaster | 8 | 6 | — | Rare | mud_dwellers | 310 | Mud covers an ally — blocks 2d8 damage. 5 rounds. |
 | Mud Wave | 2d8 | bludgeoning | intelligence | runecaster | 7 | 0 | — | Rare | mud_dwellers | 370 | Massive wave — 2d8 damage, knocks prone. Instantaneous. |
 | Shadow Caller | 2d8 | aetheric | intelligence | runecaster | 9 | 0 | — | Rare | — | 350 | 2d8 aetheric; caster turns invisible for 1 round after the hit. |
 | Stormcaller | 2d8 | electrical | intelligence | runecaster | 10 | 0 | — | Rare | — | 360 | 2d8 lightning; arcs to one extra target within 10 ft. |
