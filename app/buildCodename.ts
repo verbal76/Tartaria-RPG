@@ -175,7 +175,9 @@ const CODENAMES: Record<string, string> = {
   // OTA-332 — title-screen secondary text now uses the inventory legend's
   // auto-contrast tone (shared useReadableMuted hook) so it stays readable on
   // any tuned background.
-  '2026-06-07-332': 'Cedar Anvil',
+  // OTA-333 — removed the translucent fill from the active tutorial highlight
+  // (the "2-tone box behind the buttons"); border + glow still spotlight.
+  '2026-06-07-333': 'Spruce Anvil',
   '2026-06-07-327': 'Hemlock Anvil',
   '2026-06-07-326': 'Tamarack Anvil',
   '2026-06-07-325': 'Cypress Anvil',

@@ -58,7 +58,13 @@ export function TutorialTarget({ area, children, style, ...rest }: Props) {
     borderColor,
     borderWidth: 2,
     borderRadius: 6,
-    backgroundColor: 'rgba(201, 168, 106, 0.08)',
+    // arb-fix — NO translucent fill. The amber fill (rgba(201,168,106,0.08))
+    // tinted the whole wrapped region a different shade than the player's tuned
+    // background, reading as a "weird 2-tone box behind the buttons" whenever a
+    // step targeted a large area (e.g. quick-row wraps the entire bottom button
+    // cluster). The 2px pulsing border + glow already spotlight the target, so
+    // the fill is pure cost. Keep the region's own background (transparent).
+    backgroundColor: 'transparent',
     shadowColor: '#c9a86a',
     shadowOpacity,
     shadowRadius: 12,

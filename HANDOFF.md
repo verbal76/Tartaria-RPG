@@ -21,7 +21,7 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - `HaL2001` HEAD = **OTA-332 "Cedar Anvil"** — live on Android + iOS.
+> - `HaL2001` HEAD = **OTA-333 "Spruce Anvil"** — live on Android + iOS.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - tsc clean. Tests green modulo the known baseline flakes (dogTravelClimb,
@@ -417,6 +417,13 @@ checkout, not a special rollback tool.)
 - **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Spruce Anvil (`2026-06-07-333`) — kill the "2-tone box behind the buttons" (tutorial highlight fill)
+- **WHAT.** Player (screenshot, green-tuned bg, mid-tutorial): "we still have that weird 2 tone box behind the buttons on the bottom." Bog Anvil (OTA-317) had made the button *chips* opaque, but a translucent box remained behind the whole bottom cluster.
+- **ROOT CAUSE.** `TutorialTarget`'s active style filled the wrapped region with `backgroundColor: 'rgba(201, 168, 106, 0.08)'` (a faint amber wash). Several tutorial steps target `quick-row`, which wraps the ENTIRE bottom quick-button cluster — so that whole region got tinted a different shade than the player's tuned background, reading as a "weird 2-tone box." It only appears while the tutorial is running (both of the player's box screenshots were mid-tutorial), which is why it survived the earlier opaque-chip fix.
+- **FIX.** Set the active-highlight `backgroundColor` to `transparent` (region keeps its own/transparent bg). The 2px pulsing amber border + shadow glow already spotlight the active target, so the spotlight is unchanged — just no tinted fill, no 2-tone box.
+- **Verified:** tsc clean on `TutorialTarget`.
+- **Files:** `app/components/TutorialTarget.tsx` (animatedStyle backgroundColor → transparent), `app/buildInfo.ts`, `app/buildCodename.ts` (Spruce Anvil), `docs/build-codenames.md`, `HANDOFF.md`.
 
 #### Cedar Anvil (`2026-06-07-332`) — title-screen text auto-contrasts vs the tuned background
 - **WHAT.** Player (screenshot, green-tuned bg): the inventory-legend text-color fix (arb103, OTA-322 — auto-contrast vs the player's tuned background) needs to apply to the **title screen** too "and for any other text in the game this color." On a light/bright tuned bg the title screen's muted secondary text (flavor line, empty-list hint, YOUR TARTARIANS label, thank-you line, version footer) washed out — they render directly on the transparent → tuned background.

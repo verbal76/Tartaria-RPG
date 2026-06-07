@@ -12601,4 +12601,10 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // hint, the YOUR TARTARIANS label, the thank-you line, and the version footer)
 // — they render directly on the player's tuned background and washed out on a
 // light/bright bg. InventoryScreen now consumes the same hook (single source).
-export const OTA_BUILD_ID = '2026-06-07-332';
+// OTA-333 — Spruce Anvil. Removed the translucent amber fill from the active
+// tutorial highlight (TutorialTarget). The `rgba(201,168,106,0.08)` fill tinted
+// the whole wrapped region — and quick-row wraps the ENTIRE bottom button
+// cluster — so on a tuned background it read as a "weird 2-tone box behind the
+// buttons." The 2px pulsing amber border + glow still spotlight the target; the
+// box is gone (region stays transparent).
+export const OTA_BUILD_ID = '2026-06-07-333';
