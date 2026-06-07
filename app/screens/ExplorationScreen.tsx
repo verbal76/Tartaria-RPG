@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Pressable, Keyboard, Vibration } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { useGameStore, makeRoomKey } from '../state/gameStore';
 import { readFullLog, flushLogWrites, clearActiveSlotLog, getLastLogWriteError, clearLastLogWriteError } from '../engine/saveSystem';
@@ -79,6 +79,12 @@ export function ExplorationScreen() {
   // Door-open branch popup (explore_or_leave beat).
   const tutorialExploreChosen = useGameStore((s) => s.tutorialExploreChosen);
   const chooseTutorialExplore = useGameStore((s) => s.chooseTutorialExplore);
+  // arb108 — outpost tutorial lockdown (mirrors InputBox): MAP + other
+  // out-of-band controls buzz until the player makes the stay/leave choice.
+  const tutLock =
+    tutBeat !== null
+    && ['name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'].includes(tutBeat)
+    && !tutorialExploreChosen;
   const chooseTutorialLeave = useGameStore((s) => s.chooseTutorialLeave);
   const pendingRolls = useGameStore((s) => s.pendingRolls);
   const pendingHookContinue = useGameStore((s) => s.pendingHookContinue);
@@ -477,9 +483,12 @@ export function ExplorationScreen() {
               Map screen shows your outpost interior; out in the world it
               shows the world atlas. */}
           <TouchableOpacity
-            onPress={() => setScreen('map')}
+            onPress={() => {
+              if (tutLock) { try { Vibration.vibrate(30); } catch { /* ignore */ } return; }
+              setScreen('map');
+            }}
             hitSlop={8}
-            style={styles.sceneBarBtn}
+            style={[styles.sceneBarBtn, tutLock && styles.sceneBarBtnBlocked]}
           >
             <Text style={styles.sceneBarBtnText}>MAP</Text>
           </TouchableOpacity>
@@ -598,7 +607,13 @@ export function ExplorationScreen() {
                   player knows exactly what's missing.
           Tapping still submits "fuse" so the engine's own gates fire
           for narration parity. */}
-      {(player?.fusionPending || player?.hubRoomId) && (() => {
+      {/* arb108 — no Crucible in the SPAWN outpost. The outpost banner only
+          appears once the player has left to another named location and come
+          back (macroVisitSeq ≥ 1; it's 0 only while you've never left the
+          spawn macro-location). A wild fusion_bench permit (fusionPending)
+          still shows it anywhere. This also keeps it off-screen for the whole
+          tutorial, which runs before you've ever left. */}
+      {(player?.fusionPending || (player?.hubRoomId && (player?.macroVisitSeq ?? 0) >= 1)) && (() => {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const { gateFusion } = require('../engine/itemFusion') as typeof import('../engine/itemFusion');
         const gate = gateFusion(player.inventory ?? []);
@@ -1378,6 +1393,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 3,
   },
+  sceneBarBtnBlocked: { opacity: 0.4, borderColor: '#2a2620' },
   sceneBarBtnText: { color: '#c9a86a', fontSize: 9, fontWeight: '700', letterSpacing: 1 },
   // OTA-179 — flex:1 alone wasn't shrinking the feed enough when
   // the OTA-172 combat row went 3 lines tall, so the bottom action
@@ -1489,9 +1505,12 @@ const styles = StyleSheet.create({
   // OTA-217 — Crucible permit banner. Purple stripe to differentiate
   // from the vendor banner's amber, matching the OTA-199 Rare rarity
   // color so the visual signal reads "rare event, act now."
+  // arb108 — positioned like the trader banner: full content width (no
+  // horizontal inset) and flush under the main-quest box (no top margin), so
+  // it reads as a sibling of the quest box / vendor banner rather than a
+  // detached, narrower chip. Mirrors `vendorBanner`'s box model; only the
+  // purple accent colour distinguishes it.
   fusionBanner: {
-    marginHorizontal: 12,
-    marginTop: 6,
     backgroundColor: '#13110f',
     flexDirection: 'row',
     alignItems: 'center',

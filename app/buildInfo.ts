@@ -12529,4 +12529,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // fusion→sell money pump), faction fusion bumps one rarity tier (not auto-
 // Legendary), and the investigate-INT / rest-WIS / dog-INT farms tightened.
 // JS-only → ships as an OTA to the hal2001 channel; no native rebuild.
-export const OTA_BUILD_ID = '2026-06-07-322';
+// OTA-323 — Alder Anvil. Promotion of dev arb108 (Citrine Vault): playtest
+// fixes from the OTA-322 live build. (1) Outpost tutorial LOCKDOWN — until
+// the stay/leave choice, only the current beat's instructed control works;
+// every other quick button, the look/rest row, craft/inventory/ask-arbiter,
+// the travel/room chips, the scene-bar MAP, and typed commands (e.g. "fuse")
+// buzz/refuse. SKIP is the one exit and hides on the choice. (2) No Crucible
+// in the spawn outpost — the fuse banner + fuseAtCrucible + useVendorCrucible
+// are dead until you've left to another named location and returned. (3) The
+// fuse banner sits like the trader banner (full width, flush under the
+// main-quest box). JS-only → OTA to hal2001; no native rebuild.
+export const OTA_BUILD_ID = '2026-06-07-323';

@@ -147,6 +147,11 @@ const CODENAMES: Record<string, string> = {
   // (one-tier rarity bump); Tomb Vigil outpost map (9/9); + a red-team
   // exploit sweep (fused items unsellable, rest/investigate/dog farms
   // tightened). [arb100–107]
+  // OTA-323 — promotion of dev arb108: outpost tutorial lockdown (only the
+  // instructed control works until the stay/leave choice; SKIP is the one
+  // exit), no Crucible in the spawn outpost (fuse gated on having left &
+  // returned), fuse banner repositioned full-width under the main-quest box.
+  '2026-06-07-323': 'Alder Anvil',
   '2026-06-07-322': 'Cattail Anvil',
   '2026-06-06-321': 'Tule Anvil',
   '2026-06-03-301': 'Tungsten Spire',

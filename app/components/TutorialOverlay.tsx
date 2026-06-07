@@ -1,18 +1,30 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useGameStore } from '../state/gameStore';
+import { TUTORIAL_STEPS } from './tutorialSteps';
 
 // Tungsten Spire rewrite: the welcome-card overlay is gone. Tutorial
 // dialogue lives inline in the world feed (Arbiter channel) and the
 // pulsing UI element below tells the player what to act on. The
 // overlay's only remaining job is the SKIP TUTORIAL pill, anchored
-// to the top-right of the screen and visible whenever the tutorial
-// is active.
+// to the top-right of the screen.
+//
+// arb108 — the pill is the player's escape hatch from the OUTPOST tutorial
+// LOCKDOWN, so it shows for exactly as long as the lock holds: from the name
+// beat through the stay/leave choice. It disappears the moment the player
+// taps SKIP (tutorialStep → null) OR makes the stay/leave choice
+// (tutorialExploreChosen, or the beat advances past explore_or_leave to
+// main_quest / pick_city, which are post-choice and not locked).
+const TUT_LOCK_BEATS = ['name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'];
 export function TutorialOverlay() {
   const tutorialStep = useGameStore((s) => s.tutorialStep);
+  const tutorialExploreChosen = useGameStore((s) => s.tutorialExploreChosen);
   const skipTutorial = useGameStore((s) => s.skipTutorial);
 
   if (tutorialStep === null) return null;
+  const beatId = TUTORIAL_STEPS[tutorialStep]?.id ?? null;
+  const locked = beatId !== null && TUT_LOCK_BEATS.includes(beatId) && !tutorialExploreChosen;
+  if (!locked) return null;
 
   return (
     <View style={styles.root} pointerEvents="box-none">

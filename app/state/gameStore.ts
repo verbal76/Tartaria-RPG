@@ -4938,6 +4938,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
         get().maybeAdvanceTutorial('read_note');
         return;
       }
+
+      // (f) arb108 — OUTPOST TUTORIAL LOCKDOWN for typed input. Until the
+      //     stay/leave choice, only the current beat's instructed verb runs;
+      //     any OTHER typed command (e.g. "fuse", "craft", "cast") is refused
+      //     so the player can't act off-script (matches the button buzz in
+      //     InputBox). The specific intercepts (a)-(e) above already consumed
+      //     the right verb for cudgel/rope/scrap/investigate/name; the climb
+      //     beat advances via the real climb handler (so climb commands pass
+      //     through), and explore_or_leave lets the leave command through.
+      const lockBeatId = tStep?.id ?? '';
+      if (
+        ['name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'].includes(lockBeatId)
+        && !tState.tutorialExploreChosen
+      ) {
+        const isClimbCmd = /\bclimb\b/i.test(trimmed);
+        const isLeaveCmd = isLeaveHubCommand(trimmed)
+          || /^\s*(exit|outside|step\s+out|get\s+out)\s*$/i.test(trimmed);
+        const beatAllows =
+          (lockBeatId === 'climb' && isClimbCmd)
+          || (lockBeatId === 'explore_or_leave' && isLeaveCmd);
+        if (!beatAllows) {
+          if (!_opts?.silent) get().appendLog('player', trimmed);
+          get().appendLog(
+            'arbiter',
+            `The Arbiter lifts a hand. "Not yet — do what I've asked of you, or tap SKIP TUTORIAL to set out on your own."`,
+          );
+          return;
+        }
+      }
     }
 
     // arb48 — Labyrinth of Shadows (Wayfarer of the Lost Paths). Intercepts
@@ -13736,6 +13765,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().appendLog('system', 'Tour mode — the crucible is offline while the tutorial is running.');
       return;
     }
+    // arb108 — no Crucible in the spawn outpost (never-left). Matches the
+    // outpost-Crucible gate in fuseAtCrucible: you must have ventured out and
+    // returned (macroVisitSeq ≥ 1) before a vendor will fire one.
+    if ((player.macroVisitSeq ?? 0) < 1) {
+      get().appendLog(
+        'arbiter',
+        `${scene.vendor.name} waves you off. "The Crucible's not for first-timers. Get some road under you, then come back."`,
+      );
+      return;
+    }
     const COST = 25;
     // Pre-check the reserve gate so the player never pays for a fuse they
     // can't make. Charge only when they're actually ready.
@@ -17240,13 +17279,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     if (!player) return;
     // Gate 1 — permit. A wild fusion_bench encounter sets fusionPending;
     // additionally (arb103) EVERY outpost has its own Crucible, so being
-    // inside your outpost (hubRoomId set) grants access without the flag.
-    // Keeps fusion from being usable in the open wilds without a permit.
-    const atOutpostCrucible = !!player.hubRoomId;
+    // inside your outpost grants access without the flag.
+    // arb108 — but NOT the spawn outpost you wake in: the outpost Crucible
+    // only fires once you've ventured out to another named location and come
+    // back (macroVisitSeq ≥ 1; it's 0 only while you've never left the spawn
+    // macro-location). This keeps fusion out of the tutorial / first beat.
+    const hasLeftOutpost = (player.macroVisitSeq ?? 0) >= 1;
+    const atOutpostCrucible = !!player.hubRoomId && hasLeftOutpost;
     if (!player.fusionPending && !atOutpostCrucible) {
       get().appendLog(
         'arbiter',
-        `"There's no Crucible here," the Arbiter says. "Find one — they wait in the silt and the ruins, and every outpost keeps one. Reserve your pieces, then bring them to the bowl."`,
+        !!player.hubRoomId && !hasLeftOutpost
+          ? `The foreman shakes his head. "The Crucible's not for first-timers. Walk the road, see the country, then come back — I'll fire it for you then."`
+          : `"There's no Crucible here," the Arbiter says. "Find one — they wait in the silt and the ruins, and every outpost keeps one. Reserve your pieces, then bring them to the bowl."`,
       );
       return;
     }

@@ -84,6 +84,13 @@ const PEACE_QUICK_DIRECT: Array<{ label: string; submit: string }> = [
   { label: 'rest', submit: 'rest' },
 ];
 
+// arb108 — beats that hold the player in the OUTPOST tutorial lockdown:
+// from the name beat through the stay/leave choice. While locked, only the
+// current beat's instructed control works; everything else buzzes. The lock
+// lifts once the player chooses (tutorialExploreChosen) or the beat advances
+// past explore_or_leave (main_quest / pick_city are post-choice).
+const TUT_LOCK_BEATS = ['name', 'cudgel', 'rope', 'scrap', 'climb', 'investigate', 'explore_or_leave'];
+
 function shortWeaponLabel(name: string): string {
   const tokens = name.split(/\s+/);
   if (tokens.length <= 2) return name;
@@ -100,6 +107,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const playerInt = useGameStore((s) => s.player?.stats.intelligence ?? 0);
   const tutorialStep = useGameStore((s) => s.tutorialStep);
   const awaitingTutorialName = useGameStore((s) => s.awaitingTutorialName);
+  const tutorialExploreChosen = useGameStore((s) => s.tutorialExploreChosen);
   const hubRoomId = useGameStore((s) => s.player?.hubRoomId ?? null);
   const factionId = useGameStore((s) => s.player?.factionId ?? null);
   // arb25 — enterable buildings: when inside one, the travel row shows the
@@ -247,16 +255,31 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
   const climbTone: 'ready' | 'needs-approach' | 'unavailable' | undefined = tutActionBeat
     ? (tutActionBeat === 'climb' ? 'ready' : undefined)
     : (climbableCount && climbableCount > 0 ? (playerHasRope ? 'ready' : 'unavailable') : undefined);
-  // During a guided action beat, every quick-action EXCEPT the instructed
-  // one is blocked (dimmed + buzzes on tap). The rope beat blocks TAKE too,
-  // since its lesson is typed input (pre-fill + ACT). Approach is never a
-  // tutorial step, so it's blocked through all action beats.
-  const inTutAction = tutActionBeat !== null;
-  const takeBlocked = inTutAction && tutActionBeat !== 'cudgel';
-  const salvageBlocked = inTutAction && tutActionBeat !== 'scrap';
-  const investigateBlocked = inTutAction && tutActionBeat !== 'investigate';
-  const climbBlocked = inTutAction && tutActionBeat !== 'climb';
-  const approachBlocked = inTutAction;
+  // arb108 — OUTPOST TUTORIAL LOCKDOWN. Until the player makes the
+  // stay/leave choice (explore_or_leave), they're in the tutorial and may do
+  // ONLY what the current beat asks; EVERY other control is dimmed + buzzes
+  // on tap. This covers the beats that have no single "action" button (name,
+  // rope→type, explore_or_leave) where nothing used to be blocked, plus the
+  // controls that always slipped through (craft / inventory / ask-arbiter /
+  // the direct quick row / travel / MAP). The lock lifts the moment the
+  // player chooses (tutorialExploreChosen, or the beat advances past
+  // explore_or_leave). The SKIP TUTORIAL pill is the one always-allowed exit.
+  const tutLock =
+    currentBeatId !== null
+    && TUT_LOCK_BEATS.includes(currentBeatId)
+    && !tutorialExploreChosen;
+  // The single button the current beat permits (null = none; type/choose).
+  const tutInstructed: 'take' | 'salvage' | 'investigate' | 'climb' | null =
+    currentBeatId === 'cudgel' ? 'take'
+    : currentBeatId === 'scrap' ? 'salvage'
+    : currentBeatId === 'investigate' ? 'investigate'
+    : currentBeatId === 'climb' ? 'climb'
+    : null; // name / rope (typed) / explore_or_leave (popup) → no button
+  const takeBlocked = tutLock && tutInstructed !== 'take';
+  const salvageBlocked = tutLock && tutInstructed !== 'salvage';
+  const investigateBlocked = tutLock && tutInstructed !== 'investigate';
+  const climbBlocked = tutLock && tutInstructed !== 'climb';
+  const approachBlocked = tutLock;
 
   return (
     <View style={styles.container}>
@@ -292,9 +315,12 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
             // rooms + EXIT". EXIT (was OUT) leaves the building to the wilds.
             <>
               {hubExitChips.slice(0, 4).map((c) => (
-                <TravelBtn key={c.submit} label={c.label} onPress={() => onSubmit(c.submit)} />
+                // arb108 — room hops are locked during the tutorial so the
+                // beats stay in the spawn room; EXIT unlocks at the stay/leave
+                // choice (the player's way out of the outpost + the tutorial).
+                <TravelBtn key={c.submit} label={c.label} onPress={() => onSubmit(c.submit)} blocked={tutLock} />
               ))}
-              <TravelBtn label="EXIT" onPress={() => onSubmit('leave outpost')} />
+              <TravelBtn label="EXIT" onPress={() => onSubmit('leave outpost')} blocked={tutLock && currentBeatId !== 'explore_or_leave'} />
             </>
           ) : sceneBuilding ? (
             // arb36 — a structure stands on this tile: offer ENTER alongside
@@ -367,6 +393,7 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 // a static, unlit button with nothing drawing the player to
                 // it (playtest: "nothing's drawing you to that button").
                 tone={currentBeatId === 'look' && qa.submit === 'look' ? 'ready' : undefined}
+                blocked={tutLock}
               />
             ))}
             <QuickBtn
@@ -403,9 +430,9 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
                 <QuickBtn label="climb down" onPress={onClimbDown} defensive />
               </>
             )}
-            <QuickBtn label="craft" onPress={onOpenCrafting} />
-            <QuickBtn label="inventory" onPress={onOpenInventory} />
-            <QuickBtn label="ask arbiter" onPress={onOpenAskArbiter} />
+            <QuickBtn label="craft" onPress={onOpenCrafting} blocked={tutLock} />
+            <QuickBtn label="inventory" onPress={onOpenInventory} blocked={tutLock} />
+            <QuickBtn label="ask arbiter" onPress={onOpenAskArbiter} blocked={tutLock} />
           </>
         )}
       </TutorialTarget>
@@ -523,13 +550,19 @@ function QuickBtn({
   );
 }
 
-function TravelBtn({ label, onPress }: { label: string; onPress: () => void }) {
+function TravelBtn({ label, onPress, blocked }: { label: string; onPress: () => void; blocked?: boolean }) {
   const isDestination = label.startsWith('→');
+  // arb108 — during the outpost tutorial lockdown, travel/room buttons buzz
+  // ("not yet") instead of moving, so the player can't wander off-script.
+  const handlePress = () => {
+    if (blocked) { try { Vibration.vibrate(30); } catch { /* ignore */ } return; }
+    onPress();
+  };
   return (
     <TouchableOpacity
-      style={[styles.travelBtn, isDestination && styles.travelBtnDest]}
-      onPress={onPress}
-      activeOpacity={0.7}
+      style={[styles.travelBtn, isDestination && styles.travelBtnDest, blocked && styles.travelBtnBlocked]}
+      onPress={handlePress}
+      activeOpacity={blocked ? 1 : 0.7}
     >
       <Text
         style={[styles.travelBtnText, isDestination && styles.travelBtnTextDest]}
@@ -577,6 +610,7 @@ const styles = StyleSheet.create({
   // as hard. Short labels (NORTH / EXIT) still read fine with it.
   travelBtnText: { color: '#c9a86a', fontSize: 12, fontWeight: '700', letterSpacing: 1, paddingHorizontal: 2 },
   travelBtnDest: { paddingVertical: 8 },
+  travelBtnBlocked: { borderColor: '#2a2620', backgroundColor: '#141210', opacity: 0.5 },
   travelBtnTextDest: { fontSize: 14, lineHeight: 17, letterSpacing: 1.5, textAlign: 'center' },
   movesBadge: {
     backgroundColor: '#13110f',
