@@ -185,6 +185,10 @@ const CODENAMES: Record<string, string> = {
   // open; locked-chip scanner-requirement text uses the EQUIPPED amber.
   // OTA-336 — fusion catalyst counts toward gate + equipped-catalyst confirm
   // prompt + one-time make-good grant; 2 craftable corruption-cleanse tonics.
+  // OTA-348 — Stealth as a first-class attribute: race-proportional starting
+  // roll (Giants 0 … Reclaimer 1d12), governs the stealth/steal checks (off
+  // DEX), trains up, shows as STE, and equipped stealth gear now feeds it.
+  '2026-06-08-348': 'Walnut Anvil',
   // OTA-347 — Display "Paper texture" ceiling 20% → 50% (stepper max + the
   // textureOpacity clamp in both displaySettings paths).
   '2026-06-08-347': 'Hickory Anvil',

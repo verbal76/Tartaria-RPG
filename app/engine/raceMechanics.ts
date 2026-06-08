@@ -225,6 +225,11 @@ export interface RacialStatBonuses {
   intelligence?: number;
   wisdom?: number;
   charisma?: number;
+  // OTA-348 — present so effectiveStats can read racial.stealth. No race
+  // currently grants a flat stealth bonus (race proportionality is the
+  // creation roll, not a runtime modifier), but the key must exist for the
+  // keyof-Stats indexing in effectiveStatsBreakdown.
+  stealth?: number;
 }
 
 export function racialStatBonusesFor(raceId: string | undefined): RacialStatBonuses {

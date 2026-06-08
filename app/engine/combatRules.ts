@@ -517,7 +517,7 @@ const SKILL_DC: Record<string, number> = {
 };
 
 const SKILL_STAT: Record<string, keyof PlayerCharacter['stats']> = {
-  stealth: 'dexterity',
+  stealth: 'stealth', // OTA-348 — now governed by the dedicated Stealth attribute (was 'dexterity')
   diplomacy: 'charisma',
   escape: 'dexterity',
   investigate: 'intelligence',
@@ -554,6 +554,7 @@ const STAT_LABEL: Record<keyof PlayerCharacter['stats'], string> = {
   intelligence: 'INT',
   wisdom: 'WIS',
   charisma: 'CHA',
+  stealth: 'STE', // OTA-348
 };
 
 const DC_NAME: Record<number, string> = {

@@ -29,10 +29,10 @@ export function corruptionTierOf(value: number): CorruptionTier {
 export function corruptionStatPenalty(tier: CorruptionTier): Partial<Stats> {
   if (tier === 'tainted') return { charisma: -1 };
   if (tier === 'corrupted') {
-    return { strength: -1, dexterity: -1, intelligence: -1, wisdom: -1, charisma: -1 };
+    return { strength: -1, dexterity: -1, intelligence: -1, wisdom: -1, charisma: -1, stealth: -1 };
   }
   if (tier === 'hollowed') {
-    return { strength: -2, dexterity: -2, intelligence: -2, wisdom: -2, charisma: -2 };
+    return { strength: -2, dexterity: -2, intelligence: -2, wisdom: -2, charisma: -2, stealth: -2 };
   }
   return {};
 }

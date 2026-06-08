@@ -188,7 +188,9 @@ export function resolveEquippedItem(
 // Stat names the equipment system can boost. Includes 'constitution' for
 // future use (some accessories grant it) — it routes to HP/stamina math.
 type StatKey = keyof Stats;
-const STAT_KEYS: StatKey[] = ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma'];
+// OTA-348 — 'stealth' added so equipped stealth bonuses (Salvager's Trench Coat
+// + ~16 other authored pieces) actually apply through aggregateEquippedStatBonuses.
+const STAT_KEYS: StatKey[] = ['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma', 'stealth'];
 
 // Shared resolver list — the effect system can be backed by any
 // catalog row that carries an `effect` field. As of OTA 192 that's
@@ -389,6 +391,8 @@ export function effectiveStats(
     intelligence: player.stats.intelligence + (bonus.intelligence ?? 0) + (inv.intelligence ?? 0) + (food.intelligence ?? 0) + (w.intelligence ?? 0) + (racial.intelligence ?? 0) + (corrPen.intelligence ?? 0),
     wisdom: player.stats.wisdom + (bonus.wisdom ?? 0) + (inv.wisdom ?? 0) + (food.wisdom ?? 0) + (w.wisdom ?? 0) + (racial.wisdom ?? 0) + (corrPen.wisdom ?? 0),
     charisma: player.stats.charisma + (bonus.charisma ?? 0) + (inv.charisma ?? 0) + (food.charisma ?? 0) + (w.charisma ?? 0) + (racial.charisma ?? 0) + (corrPen.charisma ?? 0),
+    // OTA-348 — stealth. `?? 0` guards a pre-backfill in-memory player.
+    stealth: (player.stats.stealth ?? 0) + (bonus.stealth ?? 0) + (inv.stealth ?? 0) + (food.stealth ?? 0) + (w.stealth ?? 0) + (racial.stealth ?? 0) + (corrPen.stealth ?? 0),
   };
 }
 
@@ -428,7 +432,7 @@ export function effectiveStatsBreakdown(
   const w = weatherMod ?? {};
 
   const build = (stat: keyof Stats): StatBreakdown => {
-    const base = player.stats[stat];
+    const base = player.stats[stat] ?? 0; // OTA-348 — guard pre-backfill stealth
     const sources: StatSource[] = [];
     if ((racial[stat] ?? 0) !== 0) sources.push({ label: 'race', delta: racial[stat]! });
     if ((bonus[stat] ?? 0) !== 0) sources.push({ label: 'equipped', delta: bonus[stat]! });
@@ -447,5 +451,6 @@ export function effectiveStatsBreakdown(
     intelligence: build('intelligence'),
     wisdom: build('wisdom'),
     charisma: build('charisma'),
+    stealth: build('stealth'), // OTA-348
   };
 }

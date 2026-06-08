@@ -93,7 +93,7 @@ export function trainStat(
 /** Initialize statProgress on hydration if the slot pre-dates OTA 058. */
 export function ensureStatProgress(player: PlayerCharacter): PlayerCharacter {
   if (player.statProgress
-    && (['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma'] as const).every(
+    && (['strength', 'dexterity', 'intelligence', 'wisdom', 'charisma', 'stealth'] as const).every(
       (k) => typeof player.statProgress![k] === 'number',
     )
   ) {
@@ -107,6 +107,7 @@ export function ensureStatProgress(player: PlayerCharacter): PlayerCharacter {
       intelligence: player.statProgress?.intelligence ?? 0,
       wisdom: player.statProgress?.wisdom ?? 0,
       charisma: player.statProgress?.charisma ?? 0,
+      stealth: player.statProgress?.stealth ?? 0, // OTA-348
     },
   };
 }
@@ -182,9 +183,6 @@ export const SKILL_ACTIVITIES: Record<StatKey, string[]> = {
   dexterity: [
     'Climbing (per tier)',
     'Parry / dodge in combat',
-    'Stealing from vendors',
-    'Stealth approaches',
-    'Sleight-of-hand takes',
   ],
   intelligence: [
     'Scrapping items in your pack',
@@ -208,5 +206,12 @@ export const SKILL_ACTIVITIES: Record<StatKey, string[]> = {
     'Accepting a hunt / mystery / storyline / faction contract',
     'Wearing named armor / wielding named weapon (passive, on new ground)',
     'Completing a storyline chapter',
+  ],
+  // OTA-348 — Stealth's own activities (moved off DEX). Starting value is a
+  // race-proportional roll; these grow it from there.
+  stealth: [
+    'A successful STEALTH approach (the APPROACH "use stealth" toggle)',
+    'Stealing from vendors',
+    'Sleight-of-hand / pickpocket takes',
   ],
 };

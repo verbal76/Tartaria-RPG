@@ -37,8 +37,11 @@
 >   (Paper-texture ceiling 20%→50%). Plus a test-only verification that the real
 >   dog death/abandon WRITE survives a cold reload. Pushed `789eabf..2bd41c6`;
 >   `eas-update.yml` publishes to Android + iOS. **338 is closed.**
-> - **STAGED — none.** Staging list is clear; next change starts the next batch
->   (≥5 before the next push, per §P3a).
+> - **STAGED (committed on `HaL2001`, NOT pushed) — next batch, 1 so far:**
+>   - **OTA-348 "Walnut Anvil"** — Stealth as a first-class attribute (race-rolled
+>     STE: Giant 0 … Reclaimer 1d12); governs stealth/steal checks (off DEX),
+>     trains up, and equipped stealth gear (Salvager's Trench Coat) now feeds it.
+>   Holding toward ≥5 before the user triggers the push (per §P3a).
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /
@@ -168,8 +171,19 @@ checkout, not a special rollback tool.)
 > **user** triggers the push. When the batch ships, move these into §0.B (Closed)
 > and clear this list.
 
-**Empty** — the 343→347 batch shipped 2026-06-08 (see §0.B). The next change
-starts a fresh batch (≥5 before the next push).
+1. **OTA-348 "Walnut Anvil" — Stealth as a first-class attribute.** Player ask:
+   make Stealth a real trait (like STR/WIS), wire the Salvager's Trench Coat to
+   it, and give every starting character a race-proportional Stealth roll.
+   Added `stealth` to `Stats` (6th attribute, shows as **STE**). Starting roll
+   per race: **Giant 0 · Mud Golem 1d4 · Sentinel/Unknowing 1d6 · Aetherborn
+   1d8 · Mud Dweller 1d10 · Reclaimer 1d12** (unknown 1d6). Governs the stealth
+   skill check (APPROACH "use stealth" toggle) + pickpocket + vendor-steal (off
+   DEX), trains via `trainStat`, and equipped stealth gear now feeds it
+   (`STAT_KEYS += stealth`). Legacy saves backfilled with a one-time race roll.
+   Tests: `stealthAttribute` (6). tsc clean.
+
+*(1 OTA staged toward the next batch. ≥5 before the next push, per §P3a — unless
+the user overrides or a forced build ships it early.)*
 
 ### 0.A — Open Issues
 

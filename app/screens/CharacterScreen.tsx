@@ -28,6 +28,7 @@ const STAT_LABEL: Record<keyof Stats, string> = {
   intelligence: 'INT',
   wisdom: 'WIS',
   charisma: 'CHA',
+  stealth: 'STE', // OTA-348 — Stealth attribute (race-rolled at creation)
 };
 
 const SLOT_LABEL: Record<string, string> = {

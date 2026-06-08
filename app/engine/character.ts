@@ -195,7 +195,32 @@ export function rollStats(): Stats {
     intelligence: rollDie(10),
     wisdom: rollDie(10),
     charisma: rollDie(10),
+    // OTA-348 — placeholder; createCharacter overwrites with a per-race roll
+    // (rollRaceStealth). Stealth is NOT a uniform 1d10 — it's race-defined.
+    stealth: 0,
   };
+}
+
+// OTA-348 — per-race starting Stealth dice. Stealth is a race-defined trait,
+// not a uniform roll: a lumbering Giant has none; constructs barely any; a
+// tunnel-dwelling Mud Dweller or scavenging Reclaimer a lot. `null` = none (0).
+// Unknown race → 1d6 (middle). Rolled once at creation and backfilled per-race
+// for legacy saves (backfillPlayer).
+const STEALTH_DICE: Record<string, string | null> = {
+  tartarian_giant: null,          // none — far too big to go unseen
+  mud_golem: '1d4',               // construct: heavy, slow
+  architectural_sentinel: '1d6',  // construct, but can hold perfectly still
+  unknowing_mass: '1d6',          // shambling, formless
+  aetherborn: '1d8',              // half-there — can slip a watcher
+  mud_dweller: '1d10',            // Tunnel Sense — at home unseen in the dark
+  reclaimer: '1d12',              // scavenger's instinct — the best sneaks
+};
+
+export function rollRaceStealth(raceId: string): number {
+  const die = STEALTH_DICE[raceId];
+  if (die === undefined) return rollDie(6); // unknown race → middle of the pack
+  if (die === null) return 0;               // explicitly none (Giants)
+  return rollFromNotation(die);
 }
 
 function rollFromTCFormula(formula: string): number {
@@ -266,6 +291,9 @@ export function createCharacter(input: CreateCharacterInput): PlayerCharacter {
   const race = races.find((r) => r.id === input.raceId) ?? races[0]!;
   const faction = factions.find((f) => f.id === input.factionId) ?? factions[0]!;
   const stats = rollStats();
+  // OTA-348 — overwrite the placeholder Stealth with a race-proportional roll
+  // (Giants 0, constructs low, Mud Dwellers / Reclaimers high).
+  stats.stealth = rollRaceStealth(race.id);
   const hpMax = rollStartingHP(race);
   // Stamina scales lightly off STR (1d10 stat → +0..+5 bonus over base 12).
   // 2026-05-24 — bumped base 8 → 12 so the Tired status (< 25%) triggers

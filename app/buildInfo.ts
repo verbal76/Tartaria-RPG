@@ -12688,4 +12688,13 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // per player ask. Bumped the NumberStepper max AND the textureOpacity clamp in
 // both displaySettings paths (load + setDisplaySettings) — the stepper alone
 // wasn't enough, the clamp would snap anything above 0.20 back down. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-347';
+// OTA-348 (Walnut Anvil) — Stealth is now a first-class attribute (6th stat
+// alongside STR/DEX/INT/WIS/CHA). Starting value is a RACE-PROPORTIONAL roll
+// (Giants 0, Mud Golem 1d4, Sentinel/Unknowing 1d6, Aetherborn 1d8, Mud Dweller
+// 1d10, Reclaimer 1d12; unknown 1d6) — not a uniform 1d10. It governs the stealth
+// skill check (the APPROACH "use stealth" toggle) + pickpocket / vendor-steal
+// rolls (all moved off DEX), grows via trainStat on stealth successes, shows on
+// the Character sheet (STE), and equipped stealth gear (Salvager's Trench Coat +
+// ~16 pieces) now actually feeds it (added to STAT_KEYS). Legacy saves get a
+// one-time race roll via backfillPlayer. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-348';

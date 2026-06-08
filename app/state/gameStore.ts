@@ -1203,10 +1203,15 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
   // canonical start so a corrupted save still loads to a sensible
   // tile.
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { startingLocationForFaction: stf } = require('../engine/character');
+  const { startingLocationForFaction: stf, rollRaceStealth: rrs } = require('../engine/character');
   const safeLocationId = p.currentLocationId || stf(p.factionId) || 'tartarian_outskirts';
+  // OTA-348 — legacy saves predate the Stealth attribute. Backfill it once with
+  // a race-proportional roll (Giants 0, constructs low, Mud Dwellers/Reclaimers
+  // high) so existing characters get a sensible Stealth instead of undefined.
+  const stats = { ...p.stats, stealth: p.stats?.stealth ?? rrs(p.raceId) };
   return {
     ...p,
+    stats,
     currentLocationId: safeLocationId,
     inventory,
     staminaMax: stamMax,
@@ -1218,8 +1223,14 @@ function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
     milestones: p.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 },
     // OTA 058 — initialize stat progress for legacy saves so the
     // use-based growth system has a clean baseline.
-    statProgress: p.statProgress ?? {
-      strength: 0, dexterity: 0, intelligence: 0, wisdom: 0, charisma: 0,
+    // OTA-348 — rebuild so legacy progress objects gain a `stealth` key.
+    statProgress: {
+      strength: p.statProgress?.strength ?? 0,
+      dexterity: p.statProgress?.dexterity ?? 0,
+      intelligence: p.statProgress?.intelligence ?? 0,
+      wisdom: p.statProgress?.wisdom ?? 0,
+      charisma: p.statProgress?.charisma ?? 0,
+      stealth: p.statProgress?.stealth ?? 0,
     },
     // v2.4.1 (OTA 033) — backfill the Mud Flood Nexus main quest for
     // legacy saves. Starts everyone at the 'hook' phase regardless
@@ -1365,7 +1376,7 @@ function checkMilestone(
 // Which stat each skill-check intent trains. Mirrors the combatRules SKILL_STAT
 // map but inlined here so the gameStore doesn't have to import from there.
 const INTENT_TO_STAT: Record<string, keyof PlayerCharacter['stats']> = {
-  stealth: 'dexterity',
+  stealth: 'stealth', // OTA-348 — a successful stealth check now trains Stealth (was 'dexterity')
   diplomacy: 'charisma',
   escape: 'dexterity',
   investigate: 'intelligence',
@@ -2688,13 +2699,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const stats = effectiveStats(player, weatherStatModifiers(scene.weather));
     const timeBonus = stealthTimeBonus(player.hoursElapsed);
     const roll = rollDie(20);
-    const total = roll + stats.dexterity + timeBonus;
+    // OTA-348 — pickpocket / sleight-of-hand now rolls Stealth (was DEX).
+    const total = roll + stats.stealth + timeBonus;
     const success = total >= 10;
     const timeNote = timeBonus !== 0 ? ` ${timeBonus > 0 ? '+' : ''}${timeBonus} (${timeBonus > 0 ? 'night' : 'day'})` : '';
     set({ player: advanceTime(spendStamina(player, STAMINA_COSTS.skillCheck), 0.25) });
     get().appendLog(
       'combat',
-      `You — sleight of hand on ${ambientHit} → d20 ${roll} + DEX ${stats.dexterity}${timeNote} = ${total} vs DC 10 — ${success ? '✓ HIT' : '✗ MISS'}`,
+      `You — sleight of hand on ${ambientHit} → d20 ${roll} + STE ${stats.stealth}${timeNote} = ${total} vs DC 10 — ${success ? '✓ HIT' : '✗ MISS'}`,
     );
     if (!success) {
       // Failure narrates the slip; the noun stays available. Player
@@ -11584,11 +11596,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (ambient) {
           const stats = effectiveStats(player, weatherStatModifiers(currentScene.weather));
           const roll = rollDie(20);
-          const total = roll + stats.dexterity;
+          const total = roll + stats.stealth; // OTA-348 — sleight-of-hand rolls Stealth
           const success = total >= 10;
           get().appendLog(
             'combat',
-            `You — sleight of hand on ${ambient} → d20 ${roll} + DEX ${stats.dexterity} = ${total} vs DC 10 — ${success ? '✓ HIT' : '✗ MISS'}`,
+            `You — sleight of hand on ${ambient} → d20 ${roll} + STE ${stats.stealth} = ${total} vs DC 10 — ${success ? '✓ HIT' : '✗ MISS'}`,
           );
           if (success) {
             // Grant a small generic salvage item — represents whatever
@@ -13838,7 +13850,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Use effectiveStats so buffs / equipment / weather count.
     const stats = effectiveStats(player, weatherStatModifiers(scene.weather));
     const roll = rollDie(20);
-    const total = roll + stats.dexterity;
+    const total = roll + stats.stealth; // OTA-348 — vendor theft rolls Stealth
     const success = total >= dc;
     // OTA 035 — only surface the combat-channel roll line on a CAUGHT
     // miss (the player needs to see why the fight is starting).
@@ -13917,16 +13929,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
         };
       });
       get().appendLog('reward', `✦ Successfully stole ${offer.itemName} from ${scene.vendor.name}.`);
-      // OTA 058 — successful steal trains DEX (your fingers got
-      // quicker).
+      // OTA 058 — successful steal trains the thief. OTA-348 — now Stealth
+      // (your sleight got quieter), not DEX.
       const liveThief = get().player;
       if (liveThief) {
-        const tr = trainStat(liveThief, 'dexterity', true);
+        const tr = trainStat(liveThief, 'stealth', true);
         set((s) => (s.player ? { player: tr.player } : s));
         if (tr.leveled) {
           get().appendLog(
             'reward',
-            `✦ Light hands. +1 DEX (now ${tr.leveled.to}).`,
+            `✦ Light hands. +1 STE (now ${tr.leveled.to}).`,
           );
         }
       }

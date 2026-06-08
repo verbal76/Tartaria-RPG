@@ -154,6 +154,13 @@ export interface Stats {
   intelligence: number;
   wisdom: number;
   charisma: number;
+  // OTA-348 — Stealth is a first-class attribute. Unlike the other five
+  // (uniform 1d10 at creation) its starting value is a race-proportional roll
+  // (Giants 0, constructs ~1d4-1d6, Mud Dwellers/Reclaimers high). It governs
+  // the stealth skill check (the APPROACH "use stealth" toggle) + pickpocket /
+  // vendor-steal rolls, grows via trainStat, and equipped stealth gear (e.g.
+  // the Salvager's Trench Coat) now feeds it.
+  stealth: number;
 }
 
 export interface Race {
