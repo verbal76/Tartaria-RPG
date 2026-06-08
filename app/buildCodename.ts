@@ -193,6 +193,9 @@ const CODENAMES: Record<string, string> = {
   // native SIGSEGVs mid-generation, disable ONLY Qwen (classifier/Kokoro stay).
   // OTA-352 — Tier-1 verification logging: [debug] skill-check breakdown +
   // loadout/stat snapshot (equip + skill-check) + training-progress line.
+  // OTA-353 — three log-review fixes: strip the re-firing fusion-comp grant;
+  // honest title earn-message (passive, not "once/day"); empty-name opening.
+  '2026-06-08-353': 'Mulberry Anvil',
   '2026-06-08-352': 'Holly Anvil',
   '2026-06-08-351': 'Magnolia Anvil',
   '2026-06-08-350': 'Dogwood Anvil',

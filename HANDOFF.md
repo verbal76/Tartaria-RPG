@@ -183,6 +183,13 @@ checkout, not a special rollback tool.)
    training-progress line per successful check. Lets a log review confirm the
    stealth expansion works on-device. `state/gameStore.ts`. tsc clean.
 
+3. **OTA-353 "Mulberry Anvil" — three log-review fixes.** (1) Stripped the
+   re-firing fusion-compensation grant (closes the §0.A open issue). (2) Title
+   earn announcement uses the honest passive string (not the canon "once/day"
+   flavor). (3) Empty-name opening renders cleanly (name-less opener variants).
+   `state/gameStore.ts`, `engine/narrativeGenerator.ts`; tests `openingEmptyName`
+   (2). tsc clean.
+
 ### 0.A — Open Issues
 
 - **Dog-mortality death/abandon WRITE — verified by automated cold-boot regression
@@ -234,14 +241,6 @@ checkout, not a special rollback tool.)
   offline unlock queue + a Play↔Game-Center ID map. The "what to award" logic exists;
   the work is the native bridge + console setup. Deferred per the player. Good first
   step: draft the achievement list from the existing titles/badges for the consoles.
-
-- **Remove the one-time fusion-compensation grant (later OTA).** The faction-catalyst
-  fusion fix (this session) shipped a one-time make-good grant on save load for dev names
-  (verbal/sasmooch) — the "Eternal Dynasty Heir's Aegis" — to repay the faction fusion
-  that the pre-fix gate never let them complete. It's idempotent per save
-  (`worldMemory.fusionCompensationGranted`), but it would re-fire once on any FUTURE
-  dev-named save. The player has theirs; **strip the grant block from `loadSlotIntoGame`
-  in a later OTA.** (Search: `fusionCompensationGranted` / `fused_comp_`.)
 
 
 > **⚡ CURRENT POSTURE (2026-06-07) — QoL OTAs only. NO more native builds planned.**

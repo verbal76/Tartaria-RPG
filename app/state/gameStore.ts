@@ -602,16 +602,22 @@ function awardNewTitles(getStore: () => GameStore, setStore: (u: Partial<GameSto
   const player = getStore().player;
   if (!player) return;
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { newlyEarnedTitles } = require('../engine/titles');
+  const { newlyEarnedTitles, TITLE_PASSIVE_PERK } = require('../engine/titles');
   const fresh: string[] = newlyEarnedTitles(player);
   if (fresh.length === 0) return;
   setStore((s) => (s.player ? { player: { ...s.player, earnedTitles: [...(s.player.earnedTitles ?? []), ...fresh] } } : s));
   for (const id of fresh) {
     const meta = ARBITER_TITLE_META[id];
     if (!meta) continue;
+    // OTA-353 — announce the HONEST passive effect, not the canon
+    // arbiter-titles.json "Once per day…" flavor. The engine implements these
+    // as always-on passives (and several now grant +Stealth, OTA-350); the
+    // earn message used to promise a daily active that doesn't exist. The
+    // Character screen already shows TITLE_PASSIVE_PERK — match it here.
+    const honest: string = (TITLE_PASSIVE_PERK as Record<string, string>)[id] ?? meta.perk;
     getStore().appendLog(
       'arbiter',
-      `The Arbiter studies you a long moment. "You have earned a name to carry: ${meta.title}. ${meta.perk}"`,
+      `The Arbiter studies you a long moment. "You have earned a name to carry: ${meta.title}. ${honest}"`,
     );
   }
 }
@@ -3060,46 +3066,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
         });
       }
-      // arb-fix — one-time make-good for the faction-catalyst fusion bug: pre-fix
-      // the catalyst never counted toward the gate, so a tester who reserved a
-      // faction item + 2 inferred items got no fused piece. Grant the Eternal-
-      // Dynasty-themed fused chest they were owed, once per save (idempotent via
-      // worldMemory.fusionCompensationGranted). Dev names only.
-      if (DEV_REVIVE_NAMES.includes(player.name.trim().toLowerCase())
-          && !get().worldMemory.fusionCompensationGranted) {
-        const liveForComp = get().player;
-        if (liveForComp) {
-          const comp: InventoryItem = {
-            id: `fused_comp_${slotId}_${Date.now()}`,
-            name: "Eternal Dynasty Heir's Aegis",
-            kind: 'armor',
-            quantity: 1,
-            tags: ['fused', 'unique', 'faction_gear', 'eternal_dynasty', 'aetheric'],
-            rarity: 'Rare',
-            description: 'A fused breastplate kept warm by Dynasty resonance. It bears the mark of the Eternal Dynasty — the line endures.',
-            durability: { current: 30, max: 30 },
-            uniqueStats: {
-              kind: 'armor',
-              rarity: 'Rare',
-              durability: { current: 30, max: 30 },
-              acBonus: 5,
-              armorSlot: 'chest',
-              resistance: 'aetheric',
-              special: 'Forged from a Dynasty heirloom in the Crucible — the line endures.',
-            },
-          };
-          const granted = grantItem(liveForComp.inventory, comp);
-          set((s) => (s.player ? {
-            player: { ...s.player, inventory: granted.inventory },
-            worldMemory: { ...s.worldMemory, fusionCompensationGranted: true },
-          } : s));
-          get().appendLog(
-            'reward',
-            `✦ The Crucible settles a debt — Eternal Dynasty Heir's Aegis (Rare), the faction fusion you were owed.`,
-          );
-          void get().persist();
-        }
-      }
+      // OTA-353 — REMOVED: the one-time faction-catalyst fusion-compensation
+      // make-good ("Eternal Dynasty Heir's Aegis"). It was a dev-name-only
+      // repayment for the pre-OTA-336 fusion-gate bug; the devs have theirs
+      // (worldMemory.fusionCompensationGranted is set on their saves), and the
+      // bug it compensated for has been fixed since OTA-336. It was re-firing on
+      // any FUTURE dev-named save (observed in a live bug-report load), so per
+      // the HANDOFF open issue it's stripped. The dev-name Resurrection-Gem
+      // grant above (grantDevGemOnce) is a separate, kept feature.
       // Only fall back to beginScene when the save predates scene
       // capture. New saves restore the exact scene above and skip this.
       if (!restoredScene) {

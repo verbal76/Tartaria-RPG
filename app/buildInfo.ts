@@ -12734,4 +12734,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // bonuses + worn slots) at skill-check time and on every equip change — verifies
 // weapon/cloak/fused stealth actually sums into effectiveStats. (3) training
 // visibility: a progress/level line each successful check trains a stat. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-352';
+// OTA-353 (Mulberry Anvil) — three log-review fixes. (1) STRIPPED the one-time
+// faction-catalyst fusion-compensation grant ("Eternal Dynasty Heir's Aegis") —
+// it was re-firing on dev-named saves on every load (HANDOFF open issue); the
+// dev Resurrection-Gem grant stays. (2) Title EARN announcement now uses the
+// honest passive string (TITLE_PASSIVE_PERK) instead of the canon "Once per
+// day…" flavor — the engine implements these as passives (and several grant
+// +Stealth as of 350); the Character screen already showed the honest text. (3)
+// Empty-name opening: the in-game-name flow narrated "Your name is . Your blood
+// is…" before the player typed a name — name-less opener variants now render
+// cleanly. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-353';

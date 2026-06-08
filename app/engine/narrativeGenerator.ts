@@ -79,10 +79,20 @@ export function buildOpeningNarrative(input: {
   // P1 — character framing. Pulls race + faction so the opening feels
   // earned rather than generic. The buried-world line is the same beat
   // every character gets; the specifics flex around it.
-  const p1Variants = [
+  // OTA-353 — name-aware framing. In the in-game-name flow (Tungsten Spire
+  // tutorial) the opening narrates BEFORE the player types their name, so
+  // playerName is empty here. The named variants then rendered as "Your name
+  // is . Your blood is …" — a stray bare clause. Drop the name clause entirely
+  // when the name isn't set yet; the Arbiter asks for it moments later.
+  const named = (playerName ?? '').trim().length > 0;
+  const p1Variants = named ? [
     `You are ${playerName} of the ${raceName}, walking under the colors of the ${factionName}. A thousand years ago the Aetherstone flood drowned Tartaria and most of what made it. The world above kept turning. The world below waited. Today the waiting ends — you have woken into the buried country.`,
     `Your name is ${playerName}. Your blood is ${raceName}. Your work, from this hour on, belongs to the ${factionName}. The continent under your boots is Tartaria — a civilization the surface forgot to remember. The flood that buried it is older than every kingdom drawn on every honest map. Today it lets you in.`,
     `${playerName}, of the ${raceName}, sworn to the ${factionName}: you have crossed into Tartaria. The buried country. The cataclysm that made it was called the Aetherstone Flood, and it ended a thousand years ago — yet here, at ground level, it never quite stopped. The mud still moves. The air still hums.`,
+  ] : [
+    `You walk under the colors of the ${factionName}, ${raceName} blood in your veins. A thousand years ago the Aetherstone flood drowned Tartaria and most of what made it. The world above kept turning. The world below waited. Today the waiting ends — you have woken into the buried country.`,
+    `Your blood is ${raceName}. Your work, from this hour on, belongs to the ${factionName}. The continent under your boots is Tartaria — a civilization the surface forgot to remember. The flood that buried it is older than every kingdom drawn on every honest map. Today it lets you in.`,
+    `Of the ${raceName}, sworn to the ${factionName}: you have crossed into Tartaria. The buried country. The cataclysm that made it was called the Aetherstone Flood, and it ended a thousand years ago — yet here, at ground level, it never quite stopped. The mud still moves. The air still hums.`,
   ];
   const p1 = pick(p1Variants);
 
