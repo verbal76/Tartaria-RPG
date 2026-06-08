@@ -51,7 +51,10 @@
 >     looted coatable weapon (KO'd humanoid's kit, enemy weapon drop) has an 18%
 >     shot at arriving pre-coated. `grantItem` never merges a coated weapon.
 >     **Completes the coating feature** (craft + combat + loot).
->   (Batch is at **4 of ≥5**; the **user** triggers the push.)
+>   - **OTA-364 "Larch Anvil"** — poison follow-through. The poisoned −2 attack
+>     penalty (orphaned in an uncalled helper) now rides in `rollMods`, so poison
+>     degrades the victim's swings, not just their HP.
+>   (Batch is at **5 of ≥5**; more queued — strip dead statuses + Black Cloak.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /

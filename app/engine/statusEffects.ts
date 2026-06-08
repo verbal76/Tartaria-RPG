@@ -216,16 +216,11 @@ export function hasFullCover(current: readonly StatusEffect[] | undefined): bool
   return hasEffect(current, 'in_cover_full');
 }
 
-/**
- * Attack-roll penalty from status effects. Poisoned imposes
- * disadvantage in the rulebook; we approximate with a flat -2.
- */
-export function statusAttackPenalty(current: readonly StatusEffect[] | undefined): number {
-  if (!current) return 0;
-  let pen = 0;
-  if (hasEffect(current, 'poisoned')) pen -= 2;
-  return pen;
-}
+// OTA-364 — the orphan statusAttackPenalty() lived here for the poison
+// -2 but was never called by any code path, so poison only ticked DOT
+// and never degraded the victim's swings. The penalty now rides in
+// rollMods (combatRules.ts) — the consumer the attack flow actually
+// reads — as a `case 'poisoned'`. Removed the dead function.
 
 /**
  * True if the player cannot act this round — stun or paralysis active.

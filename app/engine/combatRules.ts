@@ -216,6 +216,19 @@ export function rollMods(
           sources.push('defensive +2');
         }
         break;
+      // OTA-364 — poison follow-through. The rulebook gives a poisoned
+      // fighter disadvantage; we approximate with a flat -2 to the
+      // attack roll (was computed by the orphan statusAttackPenalty,
+      // which nothing ever called — so poison only ever ticked DOT and
+      // never actually degraded the victim's swings). Now it bites here,
+      // the one consumer the attack flow reads. Not consumed — it rides
+      // until the poison DOT runs its course.
+      case 'poisoned':
+        if (action === 'attack_melee' || action === 'attack_ranged') {
+          penalty += 2;
+          sources.push('poisoned -2');
+        }
+        break;
     }
   }
   return { bonus, penalty, net: bonus - penalty, sources, consume };

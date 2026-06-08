@@ -224,6 +224,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-363 — weapon coatings phase 3 (occasional loot): a looted coatable
   // weapon (KO'd humanoid's kit, defeated enemy's weapon drop) has an 18% shot
   // at arriving pre-coated. grantItem never merges a coated weapon (unique).
+  // OTA-364 — poison follow-through: the poisoned -2 attack penalty (orphaned in
+  // an uncalled statusAttackPenalty) now rides in rollMods, so poison degrades
+  // the victim's swings instead of only ticking DOT.
+  '2026-06-08-364': 'Larch Anvil',
   '2026-06-08-363': 'Cedar Anvil',
   '2026-06-08-362': 'Spruce Anvil',
   '2026-06-08-361': 'Aspen Anvil',

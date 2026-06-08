@@ -12853,4 +12853,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // coated drop a full durability block so it reads + wears like a real weapon.
 // engine/inventory.ts merge guard; __tests__/weaponCoating.test.ts (+7).
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-363';
+// OTA-364 (Larch Anvil) — poison follow-through. The poisoned status's -2
+// attack penalty lived in an orphan statusAttackPenalty() that NOTHING ever
+// called, so a poisoned fighter only took DOT and swung at full accuracy. The
+// -2 now rides in rollMods (combatRules.ts) as a `case 'poisoned'` on
+// attack_melee / attack_ranged — the consumer the attack flow actually reads —
+// and is NOT consumed (it persists while the poison DOT runs). Removed the dead
+// statusAttackPenalty from statusEffects.ts. __tests__/rollMods.test.ts (+3).
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-364';

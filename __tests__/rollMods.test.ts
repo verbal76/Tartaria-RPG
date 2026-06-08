@@ -118,6 +118,22 @@ describe('rollMods — full cover gives +8 on defense', () => {
   });
 });
 
+describe('rollMods — poisoned penalizes attacks (OTA-364)', () => {
+  it('-2 on melee and ranged attack rolls', () => {
+    expect(rollMods([eff('poisoned')], 'attack_melee').net).toBe(-2);
+    expect(rollMods([eff('poisoned')], 'attack_ranged').net).toBe(-2);
+    expect(rollMods([eff('poisoned')], 'attack_melee').sources).toContain('poisoned -2');
+  });
+
+  it('is NOT consumed — it rides until the DOT runs out', () => {
+    expect(rollMods([eff('poisoned')], 'attack_melee').consume).not.toContain('poisoned');
+  });
+
+  it('does not touch defense rolls', () => {
+    expect(rollMods([eff('poisoned')], 'defense').net).toBe(0);
+  });
+});
+
 describe('rollMods — fighting_back is a flag, not a modifier', () => {
   it('returns zero net (the handler reads the kind separately)', () => {
     expect(rollMods([eff('fighting_back')], 'defense').net).toBe(0);
