@@ -185,6 +185,10 @@ const CODENAMES: Record<string, string> = {
   // open; locked-chip scanner-requirement text uses the EQUIPPED amber.
   // OTA-336 — fusion catalyst counts toward gate + equipped-catalyst confirm
   // prompt + one-time make-good grant; 2 craftable corruption-cleanse tonics.
+  // OTA-346 — clear-the-slot status-based (338 hardening #3): a dead/abandoned
+  // dog keeps its record but no longer counts as an ACTIVE dog (hasActiveDog),
+  // so the puppy-vendor replacement arc (gated on "no active dog") can fire.
+  '2026-06-08-346': 'Sycamore Anvil',
   // OTA-345 — boot-resilience guard (338 hardening #2): beginScene wraps the
   // real builder in a try/catch that bails to title (recoverable error + crash-
   // save capture) instead of crashing/graying out when a scene build throws.

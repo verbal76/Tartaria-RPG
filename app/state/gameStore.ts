@@ -4251,7 +4251,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         !wm.pendingDogOnboarding &&
         isOutdoor &&
         player &&
-        !player.dog
+        !hasActiveDog(player)
       ) {
         triggerPuppyVendor(get, set);
       }
@@ -4269,7 +4269,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         !wm.puppyVendorUsed &&
         !wm.pendingDogOnboarding &&
         livePlayer &&
-        !livePlayer.dog &&
+        !hasActiveDog(livePlayer) &&
         defCount >= totalGuardians &&
         isOutdoor &&
         Math.random() < 0.05
@@ -5711,7 +5711,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         wm.puppyVendorOwed &&
         !wm.puppyVendorUsed &&
         !wm.pendingDogOnboarding &&
-        !get().player?.dog &&
+        !hasActiveDog(get().player) &&
         /\b(basket|wicker basket|stranger|pups|puppies)\b/.test(lower)
       ) {
         triggerPuppyVendor(get, set);
@@ -5722,7 +5722,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         wm.puppyVendorOwed &&
         !wm.puppyVendorUsed &&
         !wm.pendingDogOnboarding &&
-        !get().player?.dog &&
+        !hasActiveDog(get().player) &&
         /\brubble\b/.test(lower)
       ) {
         tryFireRubblePuppy(get, set);
@@ -23489,6 +23489,19 @@ export function tickDogStatus(
       break; // one beat per tick
     }
   }
+}
+
+// OTA-346 — does the player have a LIVING, present companion dog? A dog that
+// died (bleed-out / fell with the player) or was abandoned (loyalty 0) keeps its
+// record on `player.dog` (status 'dead'/'abandoned') so the COPY SAVE highlights,
+// grief narration, and the still-open death/abandon WRITE-verification can read
+// it — but it is NOT an active companion. The puppy-vendor replacement arc was
+// gated on a raw `!player.dog`, so once a dog died the slot was never "empty" and
+// the replacement vendor could never fire. Gate on this instead so the arc the
+// feature unlocks is actually reachable, without erasing the dead-dog record.
+export function hasActiveDog(player: PlayerCharacter | null | undefined): boolean {
+  const dog = player?.dog;
+  return !!dog && (dog.status === 'with_player' || dog.status === 'waiting_at_base');
 }
 
 function queuePuppyVendor(

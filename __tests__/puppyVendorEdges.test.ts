@@ -50,7 +50,7 @@ jest.mock('expo-font', () => ({ loadAsync: jest.fn(async () => {}) }));
 jest.mock('expo-speech-recognition', () => ({}));
 jest.mock('expo-updates', () => ({}));
 
-import { useGameStore, tickDogStatus } from '../app/state/gameStore';
+import { useGameStore, tickDogStatus, hasActiveDog } from '../app/state/gameStore';
 import { totalGuardiansCount } from '../app/engine/coreGuardians';
 
 async function bootBase() {
@@ -334,5 +334,40 @@ describe('OTA-124 vandalistic — puppy-vendor + rubble-puppy edges', () => {
       // were more, some code path would be flipping the latch back.
       expect(matches.length).toBeLessThanOrEqual(1);
     });
+  });
+});
+
+// OTA-346 — 338 hardening #3: clear-the-slot, status-based. A dog that died or
+// was abandoned KEEPS its record on player.dog (status 'dead'/'abandoned') so the
+// dead-dog narration + COPY SAVE highlights + WRITE-verification can read it — but
+// it must NOT count as an active companion, or the puppy-vendor REPLACEMENT arc
+// (gated on "no active dog") can never fire. hasActiveDog encodes that gate.
+describe('OTA-346 — hasActiveDog gates the puppy-vendor replacement arc', () => {
+  function dog(status: string) {
+    return { id: 'd', name: 'Rocky', status, hp: status === 'dead' ? 0 : 12, hpMax: 12, loyalty: status === 'abandoned' ? 0 : 80 } as never;
+  }
+  it('a living, present dog counts as active (vendor stays gated off)', () => {
+    expect(hasActiveDog({ dog: dog('with_player') } as never)).toBe(true);
+    expect(hasActiveDog({ dog: dog('waiting_at_base') } as never)).toBe(true);
+  });
+  it('a DEAD or ABANDONED dog does NOT count as active (replacement arc reachable)', () => {
+    expect(hasActiveDog({ dog: dog('dead') } as never)).toBe(false);
+    expect(hasActiveDog({ dog: dog('abandoned') } as never)).toBe(false);
+  });
+  it('no dog / no player → not active', () => {
+    expect(hasActiveDog({ dog: null } as never)).toBe(false);
+    expect(hasActiveDog(null)).toBe(false);
+    expect(hasActiveDog(undefined)).toBe(false);
+  });
+  it('the spawn guards gate on hasActiveDog, not a raw !player.dog', () => {
+    // Regression: a dead/abandoned dog used to leave `!player.dog` false forever,
+    // so the replacement vendor never fired. The four spawn-guard sites must use
+    // hasActiveDog now.
+    const fs = require('fs');
+    const src = fs.readFileSync(require.resolve('../app/state/gameStore'), 'utf8') as string;
+    // Every puppy-vendor / rubble spawn guard uses hasActiveDog(...)
+    expect((src.match(/!hasActiveDog\(/g) ?? []).length).toBeGreaterThanOrEqual(4);
+    // ...and the old raw truthy dog guards are gone from those spawn sites.
+    expect(src).not.toMatch(/!wm\.pendingDogOnboarding &&\s*\n\s*!get\(\)\.player\?\.dog &&/);
   });
 });

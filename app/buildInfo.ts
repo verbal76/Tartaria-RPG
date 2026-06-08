@@ -12676,4 +12676,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // bails to the title with a recoverable error, logs it (LAST CRASH pill / bug
 // report), and captures the save (OTA-343) — instead of crashing or stranding
 // the player on a gray screen. Protects every call site. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-07-345';
+// OTA-346 (Sycamore Anvil) — clear-the-slot, status-based (338 hardening #3).
+// A dog that died (bleed-out / fell with the player) or was abandoned (loyalty
+// 0) keeps its record on player.dog (status 'dead'/'abandoned') for the grief
+// narration / COPY SAVE highlights / death-WRITE verification — but it no longer
+// counts as an ACTIVE companion. New hasActiveDog() gates the four puppy-vendor /
+// rubble-puppy spawn sites (was a raw !player.dog that a dead dog left false
+// forever), so the replacement-puppy arc the feature unlocks is finally
+// reachable. Completes all three 338-hardening defenses. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-346';
