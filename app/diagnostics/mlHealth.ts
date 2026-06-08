@@ -49,6 +49,21 @@ const KEY_CRASH_COUNT = 'tartaria.ml.crashCount';
 const KEY_DISABLED = 'tartaria.ml.disabledByCrash';
 const MAX_CRASHES_BEFORE_DISABLE = 2;
 
+// OTA-351 — Qwen COMPLETION-crash guard. The init guard above only catches
+// crashes during init. But on newer high-end ARM cores (e.g. Pixel 10 Pro XL /
+// Tensor G5) llama.rn's SVE-optimized kernels can SIGSEGV during token
+// generation — AFTER a clean init (`qwen:done`), so the init guard never fires
+// and the process just dies mid-narration and relaunches. Same breadcrumb trick,
+// scoped to completions: write a breadcrumb before each completion, clear it
+// after; if it survives to the next boot, a completion crashed the process.
+// After MAX_QWEN_COMPLETION_CRASHES we disable ONLY Qwen (the classifier /
+// Kokoro are a different native lib and stay on) — the Arbiter falls back to
+// template narration, fully playable.
+const KEY_COMPLETION_IN_PROGRESS = 'tartaria.ml.qwenCompletionInProgress';
+const KEY_QWEN_CRASH_COUNT = 'tartaria.ml.qwenCompletionCrashCount';
+const KEY_QWEN_DISABLED = 'tartaria.ml.qwenDisabledByCrash';
+const MAX_QWEN_COMPLETION_CRASHES = 3; // completions recover, so a touch more tolerant than init (2)
+
 interface MLHealthState {
   lastAttemptAt: string | null;
   lastSuccessAt: string | null;
@@ -57,6 +72,10 @@ interface MLHealthState {
   /** True if we DETECTED a previous-session crash on THIS load
    *  (informational; affects what the summary line reads). */
   detectedCrashThisBoot: boolean;
+  // OTA-351 — Qwen completion-crash guard (independent of the init guard above).
+  qwenCompletionCrashCount: number;
+  qwenDisabledByCrash: boolean;
+  detectedQwenCompletionCrashThisBoot: boolean;
 }
 
 let cached: MLHealthState | null = null;
@@ -74,12 +93,18 @@ export async function loadMLHealth(): Promise<MLHealthState> {
   let succeeded: string | null = null;
   let crashCountStr: string | null = null;
   let disabledStr: string | null = null;
+  let completionInProgress: string | null = null;
+  let qwenCrashCountStr: string | null = null;
+  let qwenDisabledStr: string | null = null;
   try {
-    [attempted, succeeded, crashCountStr, disabledStr] = await Promise.all([
+    [attempted, succeeded, crashCountStr, disabledStr, completionInProgress, qwenCrashCountStr, qwenDisabledStr] = await Promise.all([
       AsyncStorage.getItem(KEY_ATTEMPTED),
       AsyncStorage.getItem(KEY_SUCCEEDED),
       AsyncStorage.getItem(KEY_CRASH_COUNT),
       AsyncStorage.getItem(KEY_DISABLED),
+      AsyncStorage.getItem(KEY_COMPLETION_IN_PROGRESS),
+      AsyncStorage.getItem(KEY_QWEN_CRASH_COUNT),
+      AsyncStorage.getItem(KEY_QWEN_DISABLED),
     ]);
   } catch {
     // AsyncStorage failed — defensive default to "all clean, attempt ML."
@@ -111,14 +136,65 @@ export async function loadMLHealth(): Promise<MLHealthState> {
     }
   }
 
+  // OTA-351 — Qwen completion-crash detection. If the completion breadcrumb
+  // survived to this boot, a completion crashed the process last session.
+  let qwenCompletionCrashCount = Number.parseInt(qwenCrashCountStr ?? '0', 10);
+  if (!Number.isFinite(qwenCompletionCrashCount) || qwenCompletionCrashCount < 0) qwenCompletionCrashCount = 0;
+  let qwenDisabledByCrash = qwenDisabledStr === 'true';
+  let detectedQwenCompletionCrashThisBoot = false;
+  if (completionInProgress) {
+    detectedQwenCompletionCrashThisBoot = true;
+    qwenCompletionCrashCount += 1;
+    try {
+      await AsyncStorage.setItem(KEY_QWEN_CRASH_COUNT, String(qwenCompletionCrashCount));
+      await AsyncStorage.removeItem(KEY_COMPLETION_IN_PROGRESS);
+    } catch { /* re-detected next launch if the write fails */ }
+    if (qwenCompletionCrashCount >= MAX_QWEN_COMPLETION_CRASHES) {
+      qwenDisabledByCrash = true;
+      try { await AsyncStorage.setItem(KEY_QWEN_DISABLED, 'true'); } catch { /* ignore */ }
+    }
+  }
+
   cached = {
     lastAttemptAt: attempted,
     lastSuccessAt: succeeded,
     crashCount,
     disabledByCrash,
     detectedCrashThisBoot,
+    qwenCompletionCrashCount,
+    qwenDisabledByCrash,
+    detectedQwenCompletionCrashThisBoot,
   };
   return cached;
+}
+
+/**
+ * OTA-351 — should we attempt to BOOT Qwen this session? False once the
+ * completion-crash guard has tripped (so the generative model stays off and the
+ * Arbiter uses template narration), OR if the broad ML guard is disabled.
+ * Independent of the classifier / Kokoro, which use a different native lib.
+ */
+export function shouldAttemptQwen(): boolean {
+  if (!shouldAttemptMLInit()) return false;
+  return !(cached?.qwenDisabledByCrash ?? false);
+}
+
+/** OTA-351 — call BEFORE each Qwen completion. AWAITED so the breadcrumb is
+ *  durably flushed before the native call (a SIGSEGV mid-completion then leaves
+ *  it behind for the next boot to detect). No-op if Qwen is already disabled. */
+export async function markQwenCompletionStart(): Promise<void> {
+  if (cached?.qwenDisabledByCrash) return;
+  try {
+    await AsyncStorage.setItem(KEY_COMPLETION_IN_PROGRESS, new Date().toISOString());
+  } catch { /* best effort — lose detection for this one completion */ }
+}
+
+/** OTA-351 — call AFTER a Qwen completion returns (success). Clears the
+ *  breadcrumb so a clean completion is never counted as a crash. */
+export async function markQwenCompletionDone(): Promise<void> {
+  try {
+    await AsyncStorage.removeItem(KEY_COMPLETION_IN_PROGRESS);
+  } catch { /* ignore — re-detected only if a crash also occurs, which it didn't */ }
 }
 
 /**
@@ -171,6 +247,10 @@ export async function resetMLHealth(): Promise<void> {
     await Promise.all([
       AsyncStorage.removeItem(KEY_CRASH_COUNT),
       AsyncStorage.removeItem(KEY_DISABLED),
+      // OTA-351 — also clear the Qwen completion-crash guard.
+      AsyncStorage.removeItem(KEY_QWEN_CRASH_COUNT),
+      AsyncStorage.removeItem(KEY_QWEN_DISABLED),
+      AsyncStorage.removeItem(KEY_COMPLETION_IN_PROGRESS),
     ]);
   } catch {
     // ignore
@@ -178,6 +258,8 @@ export async function resetMLHealth(): Promise<void> {
   if (cached) {
     cached.crashCount = 0;
     cached.disabledByCrash = false;
+    cached.qwenCompletionCrashCount = 0;
+    cached.qwenDisabledByCrash = false;
   }
 }
 
@@ -206,6 +288,17 @@ export function mlHealthSummary(): string {
   } else {
     status = `active (no crashes detected)`;
   }
+  // OTA-351 — Qwen completion-crash guard line (the SVE-on-Tensor-G5 class).
+  let qwenStatus: string;
+  if (state.qwenDisabledByCrash) {
+    qwenStatus = `auto-disabled after ${state.qwenCompletionCrashCount} completion crashes (template narration in use)`;
+  } else if (state.detectedQwenCompletionCrashThisBoot) {
+    qwenStatus = `recovering — completion crash on previous launch (${state.qwenCompletionCrashCount}/${MAX_QWEN_COMPLETION_CRASHES} before auto-disable)`;
+  } else if (state.qwenCompletionCrashCount > 0) {
+    qwenStatus = `${state.qwenCompletionCrashCount}/${MAX_QWEN_COMPLETION_CRASHES} completion crashes this install`;
+  } else {
+    qwenStatus = `clean (no completion crashes)`;
+  }
   return [
     `ML runtime health`,
     `  Status: ${status}`,
@@ -213,5 +306,6 @@ export function mlHealthSummary(): string {
     `  Last init attempt: ${state.lastAttemptAt ?? 'never'}`,
     `  Last init success: ${state.lastSuccessAt ?? 'never'}`,
     `  Crashes-before-disable threshold: ${MAX_CRASHES_BEFORE_DISABLE}`,
+    `  Qwen completion guard: ${qwenStatus}`,
   ].join('\n');
 }

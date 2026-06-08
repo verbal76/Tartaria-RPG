@@ -11,6 +11,7 @@ import { useGameStore } from './app/state/gameStore';
 import {
   loadMLHealth,
   shouldAttemptMLInit,
+  shouldAttemptQwen,
   markMLInitAttempted,
   markMLInitSucceeded,
 } from './app/diagnostics/mlHealth';
@@ -249,6 +250,16 @@ export default function App() {
             void markMLInitSucceeded();
             // Defer Qwen init 3s — see comment above.
             setTimeout(() => {
+              // OTA-351 — skip Qwen entirely if its completion-crash guard has
+              // tripped (repeated native SIGSEGVs during generation on this
+              // device). The classifier above already booted; the Arbiter uses
+              // template narration. Fully playable.
+              if (!shouldAttemptQwen()) {
+                // eslint-disable-next-line no-console
+                console.warn('mlHealth: Qwen disabled (completion-crash guard). Template narration this session.');
+                setStage('qwen:skipped');
+                return;
+              }
               setStage('qwen:start');
               void markMLInitAttempted();
               void bootQwen()
@@ -274,6 +285,8 @@ export default function App() {
           setStage('cognitive:start');
           void bootCognitive().then(() => {
             setStage('cognitive:done');
+            // OTA-351 — honor the Qwen completion-crash guard on this path too.
+            if (!shouldAttemptQwen()) { setStage('qwen:skipped'); return; }
             void bootQwen().catch((err) => {
               // eslint-disable-next-line no-console
               console.warn('bootQwen failed:', err);

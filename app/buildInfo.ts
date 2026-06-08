@@ -12718,4 +12718,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // fitting spots — a threatening (not flee-level) encounter when the player has
 // trained STE or stealth gear — nudging APPROACH → "use stealth"; throttled so
 // it's situational advice, not a nag. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-350';
+// OTA-351 (Magnolia Anvil) — Qwen completion-crash guard (the SVE-on-Tensor-G5
+// class seen on Pixel 10 Pro XL). llama.rn's SVE kernels can SIGSEGV during
+// token generation AFTER a clean init, which the OTA-272 init guard never
+// catches. mlHealth now writes a durable breadcrumb before each completion and
+// clears it after; if it survives to the next boot, a completion crashed the
+// process. After 3 such crashes it disables ONLY Qwen (template narration) —
+// the classifier + Kokoro (different native lib) stay on. mlHealthSummary (in
+// every bug report) gains a "Qwen completion guard" line. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-351';

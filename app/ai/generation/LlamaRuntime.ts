@@ -169,27 +169,46 @@ export class LlamaRuntime {
     if (!this.context) throw new Error('LlamaRuntime not initialized');
     const prompt = renderChatML(messages);
     let assembled = '';
-    const result = await this.context.completion(
-      {
-        prompt,
-        n_predict: opts.maxTokens ?? 120,
-        temperature: opts.temperature ?? 0.8,
-        top_p: opts.topP ?? 0.9,
-        top_k: opts.topK ?? 40,
-        stop: [...QWEN_STOP_TOKENS],
-      },
-      opts.onToken
-        ? (evt) => {
-            if (typeof evt.token === 'string') {
-              assembled += evt.token;
-              try { opts.onToken?.(evt.token); } catch { /* swallow user errors */ }
+    // OTA-351 — completion-crash breadcrumb. On newer high-end ARM cores
+    // llama.rn's SVE kernels can SIGSEGV inside `completion()` (ggml graph
+    // compute) — a native abort no JS try/catch can see. We durably flush a
+    // breadcrumb before the call and clear it after; if it survives to the next
+    // boot, mlHealth counts a completion crash and (after a few) disables Qwen.
+    // require()'d lazily to avoid a hard import cycle at module load.
+    let markDone: (() => Promise<void>) | null = null;
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const ml = require('../../diagnostics/mlHealth') as typeof import('../../diagnostics/mlHealth');
+      await ml.markQwenCompletionStart();
+      markDone = ml.markQwenCompletionDone;
+    } catch { /* guard module unavailable — proceed without the breadcrumb */ }
+    try {
+      const result = await this.context.completion(
+        {
+          prompt,
+          n_predict: opts.maxTokens ?? 120,
+          temperature: opts.temperature ?? 0.8,
+          top_p: opts.topP ?? 0.9,
+          top_k: opts.topK ?? 40,
+          stop: [...QWEN_STOP_TOKENS],
+        },
+        opts.onToken
+          ? (evt) => {
+              if (typeof evt.token === 'string') {
+                assembled += evt.token;
+                try { opts.onToken?.(evt.token); } catch { /* swallow user errors */ }
+              }
             }
-          }
-        : undefined,
-    );
-    // Prefer assembled tokens (already stripped of prompt) but fall back to
-    // the final text the native side returns.
-    return (assembled || result.text || '').trim();
+          : undefined,
+      );
+      // Prefer assembled tokens (already stripped of prompt) but fall back to
+      // the final text the native side returns.
+      return (assembled || result.text || '').trim();
+    } finally {
+      // Clears on success OR a JS throw. A NATIVE crash never reaches here —
+      // that's the whole point; the breadcrumb survives for next-boot detection.
+      try { await markDone?.(); } catch { /* ignore */ }
+    }
   }
 
   async dispose(): Promise<void> {

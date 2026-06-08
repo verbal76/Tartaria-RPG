@@ -189,6 +189,9 @@ const CODENAMES: Record<string, string> = {
   // Diver / Wayfarer / Etherbound Survivor); using stealth gear in combat
   // (clean parry/dodge while geared) trains STE; the Arbiter suggests stealth
   // in fitting encounters (throttled).
+  // OTA-351 — Qwen completion-crash guard: breadcrumb each completion; after 3
+  // native SIGSEGVs mid-generation, disable ONLY Qwen (classifier/Kokoro stay).
+  '2026-06-08-351': 'Magnolia Anvil',
   '2026-06-08-350': 'Dogwood Anvil',
   // OTA-349 — stealth gear pass: stealth statBonus on fitting weapons (daggers/
   // bow/throwing knife) + light armor (cloaks/boots); equipment applies weapon +

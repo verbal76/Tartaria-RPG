@@ -165,8 +165,16 @@ checkout, not a special rollback tool.)
 > **user** triggers the push. When the batch ships, move these into §0.B (Closed)
 > and clear this list.
 
-**Empty** — the 348→350 stealth expansion shipped 2026-06-08 (see §0.B). The
-next change starts a fresh batch (≥5 before the next push).
+> **This batch = the log-review pass** (from a Pixel 10 Pro XL bug report +
+> two COPY LOG exports): native-crash guard, debug instrumentation to verify
+> game flow, and a few concrete fixes.
+
+1. **OTA-351 "Magnolia Anvil" — Qwen completion-crash guard.** The SVE-on-Tensor-G5
+   crash (Pixel 10 Pro XL): `librnllama_…_sve.so` SIGSEGVs during token generation
+   after a clean init, which OTA-272's init guard misses. `mlHealth` now breadcrumbs
+   each Qwen `completion()`; a survivor on next boot = a completion crash. After 3,
+   disable ONLY Qwen (template narration); classifier/Kokoro stay on. Bug-report
+   summary gains a Qwen-guard line. Tests: `qwenCompletionGuard` (5). tsc clean.
 
 ### 0.A — Open Issues
 
