@@ -29,39 +29,25 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-08) = OTA-359 "Sassafras Anvil"** — status batch:
->   357 Tupelo (rounds→turns + "until you rest") · 358 Persimmon · 359 Sassafras
->   (combat effects are PER-ENCOUNTER — cleared when the fight ends; corrects 358).
->   Pushed through `3882947`; `eas-update.yml` publishes to Android + iOS.
-> - **STAGED (committed on `HaL2001`, NOT yet pushed):**
->   - **OTA-360 "Chestnut Anvil"** — weapon coatings, phase 1 (data + apply +
->     UI). Poison/Acid/Corruption consumables + recipes paint onto a bladed or
->     projectile weapon → "Corrupted Battle Axe" + damage chip; permanent for the
->     weapon's life.
->   - **OTA-361 "Aspen Anvil"** — knockout + loot humanoids. A single non-lethal
->     blow whose cumulative damage is > half a Human enemy's max HP knocks them
->     out (out of the fight); a combat "loot" button strips their authored kit
->     (damaged) + drops + TC and clears them. 6 Human enemies gained `carries`
->     kits.
->   - **OTA-362 "Spruce Anvil"** — weapon coatings, phase 2 (combat wiring).
->     Coatings now bite: on-hit roll folds into the blow (immediate + counts
->     toward KO) and seeds an enemy DOT. Poison = pure DOT; acid = DOT + AC
->     shred; corruption = DOT + stacks that tick harder.
->   - **OTA-363 "Cedar Anvil"** — weapon coatings, phase 3 (occasional loot). A
->     looted coatable weapon (KO'd humanoid's kit, enemy weapon drop) has an 18%
->     shot at arriving pre-coated. `grantItem` never merges a coated weapon.
->     **Completes the coating feature** (craft + combat + loot).
->   - **OTA-364 "Larch Anvil"** — poison follow-through. The poisoned −2 attack
->     penalty (orphaned in an uncalled helper) now rides in `rollMods`, so poison
->     degrades the victim's swings, not just their HP.
->   - **OTA-365 "Fir Anvil"** — dead-status cleanup. Removed `well_fed` /
->     `blocking` / `overwhelmed` / `helping` (no apply or no consumer); WIRED
->     `ready` (a live command) to deliver its promised +2 next-attack.
->   - **OTA-366 "Pine Anvil"** — the Black Cloak Agent reframed as a Forgotten
->     Order enforcer; his signature **Hollow Edge** (corrupted, razor-gripped) is
->     never lootable (new `Enemy.signatureWeapon` + reason on kill/knockout); 2
->     lore concepts seed the Order's enforcer line as a future antagonist arc.
->   (Batch at **7** — user authorized the push; shipping 360→366.)
+> - **LIVE (pushed 2026-06-08) = OTA-366 "Pine Anvil"** — the weapons batch
+>   (360→366), pushed through `7ab730c`; `eas-update.yml` publishes to Android +
+>   iOS. Seven OTAs:
+>   - **360 Chestnut** — weapon coatings phase 1 (data + apply + inventory UI).
+>   - **361 Aspen** — knockout + loot humanoids (non-lethal blow > ½ max HP, KO'd
+>     enemy is out of the fight, combat "loot" button strips their damaged kit).
+>   - **362 Spruce** — coatings phase 2 (combat wiring: poison DOT / acid AC-shred
+>     / corruption stacks; on-hit roll folds into the blow + counts toward KO).
+>   - **363 Cedar** — coatings phase 3 (18% pre-coated weapon loot; coated weapons
+>     never merge). *Coating feature complete: craft + combat + loot.*
+>   - **364 Larch** — poison follow-through (the −2 attack penalty now rides in
+>     `rollMods`, was an orphan nothing called).
+>   - **365 Fir** — dead-status cleanup (removed `well_fed`/`blocking`/
+>     `overwhelmed`/`helping`; WIRED `ready` → real +2 next-attack).
+>   - **366 Pine** — Black Cloak Agent = Forgotten Order enforcer; his
+>     non-lootable **Hollow Edge** (`Enemy.signatureWeapon`); 2 lore concepts seed
+>     the Order as a future antagonist arc.
+>   Full per-OTA detail in `docs/build-codenames.md`.
+> - **STAGED — none.** Staging list clear; next change starts a fresh batch.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /
@@ -191,7 +177,11 @@ checkout, not a special rollback tool.)
 > **user** triggers the push. When the batch ships, move these into §0.B (Closed)
 > and clear this list.
 
-**Batch open (2 of ≥5):**
+**Empty** — the weapons batch (**OTA-360→366**) shipped 2026-06-08 (LIVE = Pine
+Anvil; see the header + `docs/build-codenames.md`). Next change starts a fresh
+batch.
+
+<details><summary>Shipped batch notes (360→366) — retained for reference</summary>
 
 - **OTA-361 "Aspen Anvil" — knockout + loot humanoids.** Player ask: "you should
   be able to knock out humanoid enemies … hit them with at least half of their
@@ -256,6 +246,13 @@ checkout, not a special rollback tool.)
     (the `coating` field makes the instance unique); coated `resolveEnemyDefeat`
     drops get a full durability block. `weaponCoating.test.ts` (+7). **Weapon-
     coating feature COMPLETE: craft (360) + combat (362) + loot (363).**
+- **OTA-364 Larch** — poison −2 attack penalty wired into `rollMods` (was an
+  orphan). **OTA-365 Fir** — removed dead statuses (`well_fed`/`blocking`/
+  `overwhelmed`/`helping`), wired `ready` → +2 next-attack. **OTA-366 Pine** —
+  Black Cloak Agent → Forgotten Order enforcer; non-lootable Hollow Edge
+  (`Enemy.signatureWeapon`); lore concepts seed the Order as a future antagonist.
+
+</details>
 
 ### 0.A — Open Issues
 
