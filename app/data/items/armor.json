@@ -90,7 +90,8 @@
         "head",
         "cloth",
         "helmet",
-        "mud_dwellers"
+        "mud_dwellers",
+        "stealth"
       ],
       "description": "Spirit-Caller's Helm. Uncommon head armor from the Mud Dwellers tradition."
     },
@@ -1252,7 +1253,8 @@
         "head",
         "mask",
         "face",
-        "mud_dwellers"
+        "mud_dwellers",
+        "stealth"
       ],
       "description": "Shaman's Veil of Secrets. Uncommon head armor from the Mud Dwellers tradition."
     },
@@ -1758,7 +1760,8 @@
         "head",
         "mask",
         "face",
-        "architectural_sentinels"
+        "architectural_sentinels",
+        "stealth"
       ],
       "description": "Mask of the Forgotten Gaze. Uncommon head armor from the Architectural Sentinels tradition."
     },
@@ -2302,7 +2305,8 @@
         "head",
         "mask",
         "face",
-        "unknowing_masses"
+        "unknowing_masses",
+        "stealth"
       ],
       "description": "Mask of the Shadow Lord. Rare head armor from the Unknowing Masses tradition."
     },
@@ -3612,7 +3616,8 @@
         "legs",
         "greaves",
         "legs",
-        "mud_dwellers"
+        "mud_dwellers",
+        "stealth"
       ],
       "description": "Aether-Warden's Legguards. Uncommon legs armor from the Mud Dwellers tradition."
     },
@@ -4148,7 +4153,8 @@
         "legs",
         "greaves",
         "legs",
-        "architectural_sentinels"
+        "architectural_sentinels",
+        "stealth"
       ],
       "description": "Sentinel's Agile Legplates. Rare legs armor from the Architectural Sentinels tradition."
     },
@@ -4692,7 +4698,8 @@
         "legs",
         "greaves",
         "legs",
-        "unknowing_masses"
+        "unknowing_masses",
+        "stealth"
       ],
       "description": "Legplates of the Lost King. Legendary legs armor from the Unknowing Masses tradition."
     },
@@ -4722,7 +4729,8 @@
         "cloak",
         "cloak",
         "outer",
-        "mud_dwellers"
+        "mud_dwellers",
+        "stealth"
       ],
       "description": "Mud-Bound Cloak. Common cloak armor from the Mud Dwellers tradition."
     },
@@ -4786,7 +4794,8 @@
         "cloak",
         "cloak",
         "outer",
-        "mud_dwellers"
+        "mud_dwellers",
+        "stealth"
       ],
       "description": "Aether-Warden's Cape. Uncommon cloak armor from the Mud Dwellers tradition."
     },
@@ -4908,6 +4917,10 @@
         {
           "stat": "wisdom",
           "amount": 2
+        },
+        {
+          "stat": "stealth",
+          "amount": 2
         }
       ],
       "rarity": "Rare",
@@ -4920,7 +4933,8 @@
         "cloak",
         "cloak",
         "outer",
-        "mud_dwellers"
+        "mud_dwellers",
+        "stealth"
       ],
       "description": "Shaman's Mantle of Secrets. Rare cloak armor from the Mud Dwellers tradition."
     },
@@ -4958,7 +4972,8 @@
         "cloak",
         "cloak",
         "outer",
-        "mud_dwellers"
+        "mud_dwellers",
+        "stealth"
       ],
       "description": "Cloak of the Mud King. Legendary cloak armor from the Mud Dwellers tradition."
     },
@@ -5150,6 +5165,10 @@
         {
           "stat": "dexterity",
           "amount": 1
+        },
+        {
+          "stat": "stealth",
+          "amount": 1
         }
       ],
       "rarity": "Common",
@@ -5162,7 +5181,8 @@
         "cloak",
         "cloak",
         "outer",
-        "reclaimers"
+        "reclaimers",
+        "stealth"
       ],
       "description": "Reclaimer's Cloak. Common cloak armor from the Reclaimers tradition."
     },
@@ -5192,7 +5212,8 @@
         "cloak",
         "cloak",
         "outer",
-        "reclaimers"
+        "reclaimers",
+        "stealth"
       ],
       "description": "Salvager's Trench Coat. Common cloak armor from the Reclaimers tradition."
     },
@@ -5248,6 +5269,10 @@
         {
           "stat": "charisma",
           "amount": 2
+        },
+        {
+          "stat": "stealth",
+          "amount": 2
         }
       ],
       "rarity": "Rare",
@@ -5260,7 +5285,8 @@
         "cloak",
         "cloak",
         "outer",
-        "reclaimers"
+        "reclaimers",
+        "stealth"
       ],
       "description": "Cloak of the Forgotten Seeker. Rare cloak armor from the Reclaimers tradition."
     },
@@ -5810,6 +5836,10 @@
         {
           "stat": "dexterity",
           "amount": 1
+        },
+        {
+          "stat": "stealth",
+          "amount": 1
         }
       ],
       "rarity": "Common",
@@ -5822,7 +5852,8 @@
         "cloak",
         "cloak",
         "outer",
-        "unknowing_masses"
+        "unknowing_masses",
+        "stealth"
       ],
       "description": "Traveler's Cloak. Common cloak armor from the Unknowing Masses tradition."
     },
@@ -5852,7 +5883,8 @@
         "cloak",
         "cloak",
         "outer",
-        "unknowing_masses"
+        "unknowing_masses",
+        "stealth"
       ],
       "description": "Wanderer's Outercoat. Common cloak armor from the Unknowing Masses tradition."
     },
@@ -5954,7 +5986,8 @@
         "cloak",
         "cloak",
         "outer",
-        "unknowing_masses"
+        "unknowing_masses",
+        "stealth"
       ],
       "description": "Cloak of the Forgotten Heir. Legendary cloak armor from the Unknowing Masses tradition."
     },
@@ -5972,6 +6005,10 @@
         {
           "stat": "dexterity",
           "amount": 1
+        },
+        {
+          "stat": "stealth",
+          "amount": 1
         }
       ],
       "rarity": "Common",
@@ -5984,7 +6021,8 @@
         "feet",
         "boots",
         "feet",
-        "mud_dwellers"
+        "mud_dwellers",
+        "stealth"
       ],
       "description": "Mud-Lurker Boots. Common feet armor from the Mud Dwellers tradition."
     },
@@ -6014,7 +6052,8 @@
         "feet",
         "boots",
         "feet",
-        "mud_dwellers"
+        "mud_dwellers",
+        "stealth"
       ],
       "description": "Mud-Stalker's Footwraps. Common feet armor from the Mud Dwellers tradition."
     },
@@ -6308,6 +6347,10 @@
         {
           "stat": "dexterity",
           "amount": 1
+        },
+        {
+          "stat": "stealth",
+          "amount": 1
         }
       ],
       "rarity": "Common",
@@ -6320,7 +6363,8 @@
         "feet",
         "boots",
         "feet",
-        "reclaimers"
+        "reclaimers",
+        "stealth"
       ],
       "description": "Reclaimer's Boots. Common feet armor from the Reclaimers tradition."
     },
@@ -6338,6 +6382,10 @@
         {
           "stat": "acrobatics",
           "amount": 1
+        },
+        {
+          "stat": "stealth",
+          "amount": 1
         }
       ],
       "rarity": "Common",
@@ -6350,7 +6398,8 @@
         "feet",
         "boots",
         "feet",
-        "reclaimers"
+        "reclaimers",
+        "stealth"
       ],
       "description": "Salvager's Worn Boots. Common feet armor from the Reclaimers tradition."
     },
@@ -7014,6 +7063,10 @@
         {
           "stat": "acrobatics",
           "amount": 1
+        },
+        {
+          "stat": "stealth",
+          "amount": 1
         }
       ],
       "rarity": "Common",
@@ -7026,7 +7079,8 @@
         "feet",
         "boots",
         "feet",
-        "unknowing_masses"
+        "unknowing_masses",
+        "stealth"
       ],
       "description": "Wanderer's Footwraps. Common feet armor from the Unknowing Masses tradition."
     },
@@ -7094,7 +7148,8 @@
         "feet",
         "boots",
         "feet",
-        "unknowing_masses"
+        "unknowing_masses",
+        "stealth"
       ],
       "description": "Lost Hero's Greaves. Rare feet armor from the Unknowing Masses tradition."
     },

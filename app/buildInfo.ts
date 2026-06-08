@@ -12697,4 +12697,15 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // the Character sheet (STE), and equipped stealth gear (Salvager's Trench Coat +
 // ~16 pieces) now actually feeds it (added to STAT_KEYS). Legacy saves get a
 // one-time race roll via backfillPlayer. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-348';
+// OTA-349 (Yew Anvil) — stealth gear pass + catalog mechanics. (1) Added a
+// stealth statBonus to thematically-fitting weapons (Bone Shiv (Stealth) +2,
+// Salvaged Bow / Throwing Knife / Tartarian Claw Knife +1) and light armor
+// (cloaks: Reclaimer's/Traveler's +1, Shaman's Mantle of Secrets / Cloak of the
+// Forgotten Seeker +2; boots: Mud-Lurker / Salvager's Worn / Wanderer's
+// Footwraps / Reclaimer's +1) — all also tagged `stealth`. (2) equipment now
+// applies WEAPON stealth (main/off) + equipped FUSED-item statBonus. (3) Fusion
+// inherits stealth from stealthy inputs (deterministic + Qwen) via the new
+// UniqueItemStats.statBonus. (4) The inferred-stats engine grants stealth for
+// shadow/silent/muffled/etc. names (weapons, armor, accessories). (5) Catalog
+// tag-backfill propagates the new `stealth` tags to held instances. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-349';

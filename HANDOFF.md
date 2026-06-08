@@ -37,10 +37,13 @@
 >   (Paper-texture ceiling 20%→50%). Plus a test-only verification that the real
 >   dog death/abandon WRITE survives a cold reload. Pushed `789eabf..2bd41c6`;
 >   `eas-update.yml` publishes to Android + iOS. **338 is closed.**
-> - **STAGED (committed on `HaL2001`, NOT pushed) — next batch, 1 so far:**
+> - **STAGED (committed on `HaL2001`, NOT pushed) — next batch, 2 so far:**
 >   - **OTA-348 "Walnut Anvil"** — Stealth as a first-class attribute (race-rolled
 >     STE: Giant 0 … Reclaimer 1d12); governs stealth/steal checks (off DEX),
 >     trains up, and equipped stealth gear (Salvager's Trench Coat) now feeds it.
+>   - **OTA-349 "Yew Anvil"** — stealth gear pass: stealth on fitting weapons +
+>     light armor; equipment applies weapon/fused stealth; fusion + inferred-stats
+>     + tag-backfill all understand stealth.
 >   Holding toward ≥5 before the user triggers the push (per §P3a).
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
@@ -182,7 +185,17 @@ checkout, not a special rollback tool.)
    (`STAT_KEYS += stealth`). Legacy saves backfilled with a one-time race roll.
    Tests: `stealthAttribute` (6). tsc clean.
 
-*(1 OTA staged toward the next batch. ≥5 before the next push, per §P3a — unless
+2. **OTA-349 "Yew Anvil" — stealth gear pass + catalog mechanics.** Brings the
+   Stealth stat into the item economy: stealth `statBonus` on fitting weapons
+   (Bone Shiv (Stealth) +2; Salvaged Bow / Throwing Knife / Tartarian Claw Knife
+   +1) and light armor (4 cloaks + 4 boots, all tagged `stealth`); equipment now
+   applies WEAPON + equipped-FUSED-item stealth; fusion inherits stealth from
+   stealthy inputs (new `UniqueItemStats.statBonus`); the inferred-stats engine
+   grants stealth for shadow/silent/muffled names (weapons/armor/accessories);
+   tag-backfill propagates the new tags to held items. Tests:
+   `stealthGearAndFusion` (7). tsc clean.
+
+*(2 OTAs staged toward the next batch. ≥5 before the next push, per §P3a — unless
 the user overrides or a forced build ships it early.)*
 
 ### 0.A — Open Issues

@@ -299,11 +299,18 @@
       "tags": [
         "weapon",
         "ranged",
-        "bow"
+        "bow",
+        "stealth"
       ],
       "description": "A bone-wood bow re-strung with spider silk. Quiet and serviceable.",
       "statRequirement": null,
-      "tc": 25
+      "tc": 25,
+      "statBonuses": [
+        {
+          "stat": "stealth",
+          "amount": 1
+        }
+      ]
     },
     {
       "name": "Pyric Wand",
@@ -1896,7 +1903,13 @@
         "stealth"
       ],
       "effect": "+1 to Stealth.",
-      "description": "Slim bone shiv shaped for the quiet kill."
+      "description": "Slim bone shiv shaped for the quiet kill.",
+      "statBonuses": [
+        {
+          "stat": "stealth",
+          "amount": 2
+        }
+      ]
     },
     {
       "name": "Tartarian Claw Knife",
@@ -1915,10 +1928,17 @@
         "melee",
         "dual_wield",
         "knife",
-        "giants"
+        "giants",
+        "stealth"
       ],
       "effect": "+4 damage against creatures with natural armor.",
-      "description": "Curved bone knife. Designed to find seams in scaled hides."
+      "description": "Curved bone knife. Designed to find seams in scaled hides.",
+      "statBonuses": [
+        {
+          "stat": "stealth",
+          "amount": 1
+        }
+      ]
     },
     {
       "name": "Mud Heater Shield",
@@ -3768,10 +3788,17 @@
         "weapon",
         "ranged",
         "knife",
-        "thrown"
+        "thrown",
+        "stealth"
       ],
       "effect": "Short range; weighted for tumble-throw.",
-      "description": "Plain steel throwing knife. Drifter's standard — light, balanced, single piece."
+      "description": "Plain steel throwing knife. Drifter's standard — light, balanced, single piece.",
+      "statBonuses": [
+        {
+          "stat": "stealth",
+          "amount": 1
+        }
+      ]
     },
     {
       "name": "Bone Sling",

@@ -282,13 +282,24 @@ export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<S
     const piece = findArmorByName(name);
     if (!piece) continue;
     // arb-fix — apply EVERY stat bonus on a piece, not just the primary
-    // `statBonus`. `add` filters to the five base stats (STAT_KEYS), so the
-    // `hp` entry (handled separately via hpMax) and non-attribute flavor
-    // stats (constitution / acrobatics / stealth / investigation / aetheria,
-    // which have no PlayerCharacter field) are dropped here as before — but a
-    // multi-base-stat piece like "INT+2, CHA+1" now grants BOTH.
+    // `statBonus`. `add` filters to the base stats (STAT_KEYS — now incl.
+    // stealth, OTA-348), so the `hp` entry (handled separately via hpMax) and
+    // the remaining non-attribute flavor stats (constitution / acrobatics /
+    // investigation / aetheria, which have no PlayerCharacter field) are
+    // dropped here — but a multi-base-stat piece like "INT+2, CHA+1" grants BOTH.
     const bonuses = piece.statBonuses ?? (piece.statBonus ? [piece.statBonus] : []);
     for (const b of bonuses) add(b.stat, b.amount);
+  }
+  // OTA-349 — weapon slots (main/off) can carry stealth (finesse daggers,
+  // quiet bows, balanced throwing knives). Same STAT_KEYS filter, so a weapon's
+  // `hp` bonus (baked into hpMax via weaponHpBonus) is dropped here — only
+  // base-stat bonuses like stealth apply, with no double-count.
+  for (const slot of ['main', 'off'] as const) {
+    const name = eq[slot];
+    if (!name) continue;
+    const wpn = findWeaponByName(name);
+    if (!wpn) continue;
+    for (const b of wpn.statBonuses ?? []) add(b.stat, b.amount);
   }
   if (eq.amulet) {
     const a = findAmuletByName(eq.amulet);
@@ -300,6 +311,17 @@ export function aggregateEquippedStatBonuses(player: PlayerCharacter): Partial<S
     if (!ringName) continue;
     const r = findRingByName(ringName);
     if (r?.statBonus) add(r.statBonus.stat, r.statBonus.amount);
+  }
+  // OTA-349 — equipped FUSED items carry their stat bonus on the inventory
+  // item's uniqueStats (their unique names aren't in the catalog, so the
+  // findArmor/Weapon lookups above miss them). Apply those here so a fused
+  // stealth piece counts. Fused names never collide with catalog names, so
+  // no double-count.
+  const equippedNames = new Set(Object.values(eq).filter(Boolean) as string[]);
+  for (const item of player.inventory ?? []) {
+    if (!equippedNames.has(item.name)) continue;
+    const sb = item.uniqueStats?.statBonus;
+    if (sb) add(sb.stat, sb.amount);
   }
   return bonus;
 }

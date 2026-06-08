@@ -432,6 +432,10 @@ export interface UniqueItemStats {
   /** Short flavor describing the unique effect. Narrative today;
    *  hook into mechanics in a future OTA. */
   special?: string;
+  /** OTA-349 — a base-stat bonus the fused item grants while equipped
+   *  (applied by aggregateEquippedStatBonuses' fused-item pass). Fusion
+   *  inherits a stealth bonus when the inputs include stealthy gear. */
+  statBonus?: { stat: keyof Stats; amount: number };
 }
 
 export type CombatRange = 'arm' | 'close' | 'far';

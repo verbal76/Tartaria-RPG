@@ -145,6 +145,17 @@ function inferWeaponEffectString(name: string): string | undefined {
   return undefined;
 }
 
+// OTA-349 — stealthy-named gear infers a Stealth bonus. Light / quiet /
+// concealing vocabulary → +1, the strongest cues → +2. Used by inferWeapon /
+// inferArmor / inferAccessory so a newly-encountered "Shadowstep Footwraps" or
+// "Muffled Shiv" actually grants Stealth instead of dropping it as flavor.
+export function inferStealthBonus(name: string): number {
+  const n = name.toLowerCase();
+  if (/\b(shadowstep|nightstalker|silent|stealth|umbral)\b/.test(n)) return 2;
+  if (/(shadow|shade|muffled|whisper|veil|veiled|hidden|cloaked|sneak|lurker|stalker|prowler|ghost|quiet|softstep|soft-step|footpad|skulk|slink)/.test(n)) return 1;
+  return 0;
+}
+
 export function inferWeapon(name: string): CatalogWeapon {
   const matched = WEAPON_HEURISTICS.find((w) => w.pattern.test(name));
   // Default — generic melee improvised when nothing matches.
@@ -156,6 +167,8 @@ export function inferWeapon(name: string): CatalogWeapon {
   const h = bumpForAether(name, raw);
   const rarity: Rarity = h.tags.includes('aether') ? 'Uncommon' : 'Common';
   const effect = inferWeaponEffectString(name);
+  const ste = inferStealthBonus(name); // OTA-349
+  const tags = ste > 0 ? Array.from(new Set([...h.tags, 'stealth'])) : h.tags;
   note(`weapon:${name}`);
   return {
     name,
@@ -166,9 +179,10 @@ export function inferWeapon(name: string): CatalogWeapon {
     rarity,
     baseDurability: h.baseDurability,
     defense: h.defense,
-    tags: h.tags,
+    tags,
     description: `${h.kind === 'ranged' ? 'A ranged weapon' : h.kind === 'runecaster' ? 'An Aether-channeling focus' : 'A melee weapon'}, sized for a reclaimer's hand.`,
     ...(effect ? { effect } : {}),
+    ...(ste > 0 ? { statBonuses: [{ stat: 'stealth', amount: ste }] } : {}),
   };
 }
 
@@ -222,7 +236,9 @@ export function inferArmor(name: string): CatalogArmor | null {
   const aether = /\b(aether|aetheric|aetherstone|etheric|ether)\b/i.test(name);
   const rarity: Rarity = aether ? 'Uncommon' : 'Common';
   const resistances = inferArmorResistances(name);
-  const tags = aether ? Array.from(new Set([...h.tags, 'aether'])) : h.tags;
+  const ste = inferStealthBonus(name); // OTA-349
+  let tags = aether ? Array.from(new Set([...h.tags, 'aether'])) : h.tags;
+  if (ste > 0) tags = Array.from(new Set([...tags, 'stealth']));
   note(`armor:${name}`);
   return {
     name,
@@ -233,6 +249,7 @@ export function inferArmor(name: string): CatalogArmor | null {
     baseDurability: h.baseDurability,
     tags,
     description: `Worn armor, sized for a reclaimer's frame.`,
+    ...(ste > 0 ? { statBonuses: [{ stat: 'stealth', amount: ste }] } : {}),
   };
 }
 
@@ -247,8 +264,12 @@ export function inferAccessory(name: string): CatalogAccessory | null {
   const aether = /\b(aether|aetheric|aetherstone|etheric|ether)\b/i.test(name);
   // Small stat bonus inferred from name keywords.
   let statBonus: { stat: string; amount: number } | undefined;
-  if (/\b(strength|might|iron|stone|warrior)\b/i.test(name)) statBonus = { stat: 'strength', amount: 1 };
-  else if (/\b(swift|dex|wind|shadow|nimble)\b/i.test(name)) statBonus = { stat: 'dexterity', amount: 1 };
+  // OTA-349 — stealth cues win first (a "Shadow Pendant" / "Silent Charm" now
+  // grants Stealth, not DEX). Only the strongest cue gives +2.
+  const steAmt = inferStealthBonus(name);
+  if (steAmt > 0) statBonus = { stat: 'stealth', amount: steAmt };
+  else if (/\b(strength|might|iron|stone|warrior)\b/i.test(name)) statBonus = { stat: 'strength', amount: 1 };
+  else if (/\b(swift|dex|wind|nimble)\b/i.test(name)) statBonus = { stat: 'dexterity', amount: 1 };
   else if (/\b(scholar|mind|tome|wise|sage|aetheric|spell)\b/i.test(name)) statBonus = { stat: 'intelligence', amount: 1 };
   else if (/\b(seer|sight|listen|patient|silver|moon)\b/i.test(name)) statBonus = { stat: 'wisdom', amount: 1 };
   else if (/\b(silver|charm|grace|noble|gilded)\b/i.test(name)) statBonus = { stat: 'charisma', amount: 1 };

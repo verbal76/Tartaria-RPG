@@ -185,6 +185,11 @@ const CODENAMES: Record<string, string> = {
   // open; locked-chip scanner-requirement text uses the EQUIPPED amber.
   // OTA-336 — fusion catalyst counts toward gate + equipped-catalyst confirm
   // prompt + one-time make-good grant; 2 craftable corruption-cleanse tonics.
+  // OTA-349 — stealth gear pass: stealth statBonus on fitting weapons (daggers/
+  // bow/throwing knife) + light armor (cloaks/boots); equipment applies weapon +
+  // fused-item stealth; fusion inherits stealth from stealthy inputs; inferred-
+  // stats grants stealth for shadow/silent/muffled names; tag-backfill propagates.
+  '2026-06-08-349': 'Yew Anvil',
   // OTA-348 — Stealth as a first-class attribute: race-proportional starting
   // roll (Giants 0 … Reclaimer 1d12), governs the stealth/steal checks (off
   // DEX), trains up, shows as STE, and equipped stealth gear now feeds it.

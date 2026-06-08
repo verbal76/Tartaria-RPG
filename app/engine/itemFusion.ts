@@ -226,6 +226,7 @@ function buildPrompt(
         '- ONE resistance max, and only if a thematic tag (aether → aetheric, organic → poison) is present.',
         '- "special" is a single short clause; the engine does not parse it mechanically (yet).',
         '- "rarity" should be "Legendary" only when the input pack spans 5+ material tags; otherwise "Rare".',
+        '- Optionally add "stealthBonus": 1–2 ONLY when the inputs include stealthy / silent / shadow / muffled gear (e.g. a shiv, cloak, footwraps) — it grants +Stealth while equipped. Omit otherwise.',
       ].join('\n'),
     },
     {
@@ -271,6 +272,7 @@ interface RawFusionResponse {
   armorSlot?: unknown;
   resistance?: unknown;
   special?: unknown;
+  stealthBonus?: unknown; // OTA-349
 }
 
 /** Validate, clamp, and shape the model response into UniqueItemStats.
@@ -298,6 +300,12 @@ export function validateFusionResponse(raw: RawFusionResponse): { name: string; 
     : undefined;
 
   const special = typeof raw.special === 'string' ? raw.special.trim().slice(0, 120) : undefined;
+  // OTA-349 — optional stealth bonus on a fused item (0-3, clamped). Lets the
+  // model grant stealth when the inputs are stealthy; the deterministic path
+  // does the same off the tag profile.
+  const stealthBonus = typeof raw.stealthBonus === 'number'
+    ? Math.max(0, Math.min(3, Math.floor(raw.stealthBonus)))
+    : 0;
 
   const stats: UniqueItemStats = {
     kind: kind as 'weapon' | 'armor' | 'dog_armor',
@@ -305,6 +313,7 @@ export function validateFusionResponse(raw: RawFusionResponse): { name: string; 
     durability: { current: FUSION_CLAMPS.durabilityMax, max: FUSION_CLAMPS.durabilityMax },
     ...(resistance ? { resistance } : {}),
     ...(special ? { special } : {}),
+    ...(stealthBonus > 0 ? { statBonus: { stat: 'stealth' as const, amount: stealthBonus } } : {}),
   };
 
   if (kind === 'weapon') {
@@ -474,6 +483,13 @@ export function synthesizeFusionDeterministic(
     : dominantTag === 'metal' ? 'degradation'
     : undefined;
   if (resistance) baseStats.resistance = resistance;
+  // OTA-349 — stealth flows through the Crucible: if any input is stealthy
+  // (carries the 'stealth' tag), the fused result inherits a stealth bonus
+  // (Rare +1 / Legendary +2). Detected off the tag profile, which is built
+  // from the inputs' tags.
+  if (tagSet.has('stealth')) {
+    baseStats.statBonus = { stat: 'stealth', amount: rarity === 'Legendary' ? 2 : 1 };
+  }
   baseStats.special = `Field-forged from ${inputs.length} reclaimer scraps. The Crucible answered.`;
   const description = `A ${rarity.toLowerCase()} ${kind === 'dog_armor' ? 'dog vest' : kind} hammered together from your reserved pieces. The seams still hum with the Crucible's last breath.`;
   return { name, description, stats: baseStats };
