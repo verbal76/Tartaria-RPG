@@ -1388,6 +1388,26 @@ const INTENT_TO_STAT: Record<string, keyof PlayerCharacter['stats']> = {
   use_relic: 'wisdom',
 };
 
+// OTA-352 — debug-only loadout/stat snapshot. Routed to the `[debug]` channel
+// (captured in COPY LOG / bug reports, never shown in the gameplay window).
+// Lets a log review verify equipped gear / race / title / stealth bonuses are
+// actually summing into effectiveStats — i.e. that the stealth expansion works
+// on-device. Emitted at skill-check time + on equip change, not every tick.
+function debugLoadout(player: PlayerCharacter): string {
+  const es = effectiveStats(player);
+  const eqb = aggregateEquippedStatBonuses(player) as Record<string, number>;
+  const eq = (player.equipped ?? {}) as Record<string, string | undefined>;
+  const worn = (['main', 'off', 'head', 'chest', 'hands', 'legs', 'feet', 'cloak', 'amulet', 'ring', 'ring2', 'ring3'] as const)
+    .filter((s) => eq[s])
+    .map((s) => `${s}=${eq[s]}`)
+    .join(' ');
+  const gearBon = Object.entries(eqb)
+    .filter(([, v]) => v)
+    .map(([k, v]) => `${k.slice(0, 3).toUpperCase()}+${v}`)
+    .join(',');
+  return `stats: STR${es.strength} DEX${es.dexterity} INT${es.intelligence} WIS${es.wisdom} CHA${es.charisma} STE${es.stealth} | gear: ${gearBon || 'none'} | worn: ${worn || 'none'}`;
+}
+
 // 2026-05-24 — effective stamina max accounting for hunger penalty.
 // hungerStaminaPenalty (0-5) shrinks the usable cap; the raw staminaMax
 // field is the unmodified character ceiling. Always use this when
@@ -12118,6 +12138,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // ── SKILL CHECK ───────────────────────────────────────────────────────
     if (skill) {
       const { intent } = parseInput(actionText);
+      // OTA-352 — skill-check breakdown (the [debug] equivalent of the combat
+      // "You — d20 → X + STR Y = Z vs AC W" line). Verifies the new stealth
+      // check (and every other) fires with the right governing stat + DC.
+      {
+        const d20 = (skill.total ?? 0) - (skill.bonus ?? 0);
+        get().appendLog(
+          'debug',
+          `skillcheck: ${intent} d20=${d20} ${skill.bonusLabel ?? ''} = ${skill.total} vs ${skill.targetLabel ?? `DC ${skill.target}`} → ${skill.success ? 'PASS' : 'FAIL'}`,
+        );
+        const live = get().player;
+        if (live) get().appendLog('debug', debugLoadout(live));
+      }
       if (skill.success) {
         // Hunt advancement: if the player has an active hunt whose next
         // stage expects this skill intent, advance one stage of the hunt.
@@ -12193,6 +12225,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const newChecks = prevMs.checksSucceeded + 1;
         const statKey: StatKey = INTENT_TO_STAT[intent] ?? 'wisdom';
         const trainResult = trainStat(player, statKey, true);
+        // OTA-352 — training visibility (progress increments, not just the
+        // level-up reward line). Confirms a successful check trains the right
+        // stat (e.g. a stealth approach trains STE).
+        get().appendLog(
+          'debug',
+          `train: ${statKey} (${intent} check) → ${trainResult.leveled ? `LEVEL +1 (now ${trainResult.leveled.to})` : `progress ${trainResult.player.statProgress?.[statKey] ?? '?'}/100`}`,
+        );
         set((s) => ({
           player: s.player
             ? {
@@ -17437,6 +17476,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } else {
       get().appendLog('world', `You equip ${item.name} (${SLOT_LABEL[slot]}).`);
     }
+    // OTA-352 — loadout snapshot on equip change, so a log review can confirm
+    // the piece's bonuses (incl. weapon/cloak/fused stealth) landed in effectiveStats.
+    { const live = get().player; if (live) get().appendLog('debug', debugLoadout(live)); }
     void get().persist();
   },
 

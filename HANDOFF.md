@@ -176,6 +176,13 @@ checkout, not a special rollback tool.)
    disable ONLY Qwen (template narration); classifier/Kokoro stay on. Bug-report
    summary gains a Qwen-guard line. Tests: `qwenCompletionGuard` (5). tsc clean.
 
+2. **OTA-352 "Holly Anvil" — Tier-1 verification logging (`[debug]`-only).**
+   skill-check breakdown line (the `[debug]` twin of the combat roll line, covers
+   stealth + every check), a loadout/effective-stats snapshot at skill-check time
+   + on equip change (verifies weapon/cloak/fused stealth sums in), and a
+   training-progress line per successful check. Lets a log review confirm the
+   stealth expansion works on-device. `state/gameStore.ts`. tsc clean.
+
 ### 0.A — Open Issues
 
 - **Dog-mortality death/abandon WRITE — verified by automated cold-boot regression

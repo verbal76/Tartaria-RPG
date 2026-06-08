@@ -191,6 +191,9 @@ const CODENAMES: Record<string, string> = {
   // in fitting encounters (throttled).
   // OTA-351 — Qwen completion-crash guard: breadcrumb each completion; after 3
   // native SIGSEGVs mid-generation, disable ONLY Qwen (classifier/Kokoro stay).
+  // OTA-352 — Tier-1 verification logging: [debug] skill-check breakdown +
+  // loadout/stat snapshot (equip + skill-check) + training-progress line.
+  '2026-06-08-352': 'Holly Anvil',
   '2026-06-08-351': 'Magnolia Anvil',
   '2026-06-08-350': 'Dogwood Anvil',
   // OTA-349 — stealth gear pass: stealth statBonus on fitting weapons (daggers/

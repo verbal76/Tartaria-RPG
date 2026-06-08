@@ -12726,4 +12726,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // process. After 3 such crashes it disables ONLY Qwen (template narration) —
 // the classifier + Kokoro (different native lib) stay on. mlHealthSummary (in
 // every bug report) gains a "Qwen completion guard" line. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-351';
+// OTA-352 (Holly Anvil) — Tier-1 verification logging ([debug] channel, never
+// player-facing). (1) skill-check breakdown: `skillcheck: <intent> d20=X <bonus
+// label> = total vs DC → PASS/FAIL` — the [debug] twin of the combat roll line,
+// so a log review can confirm the new stealth check fires with STE + the right
+// DC. (2) loadout snapshot (effective STR/DEX/INT/WIS/CHA/STE + equipped gear
+// bonuses + worn slots) at skill-check time and on every equip change — verifies
+// weapon/cloak/fused stealth actually sums into effectiveStats. (3) training
+// visibility: a progress/level line each successful check trains a stat. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-352';
