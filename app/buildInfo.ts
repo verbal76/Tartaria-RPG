@@ -12765,4 +12765,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // UP (elevatedOn set) still falls. Real-world logic: if you can't get off the
 // ground, you can't fall off it. Resolves the §0.A climb-fall design call.
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-356';
+// OTA-357 (Tupelo Anvil) — status-duration display honesty. (A) "rounds" →
+// "turns" on the status counter + action-card / crafting / DOT lines: a status
+// duration is just your next N actions (the engine literally treats every player
+// action as one "round"), not a tabletop combat round — "turns" is the honest
+// word. Weapon firing-rate / ammo "rounds" left alone (correct usage). (B) Tired
+// / Exhausted are stamina-gated (cleared the moment you recover), so the Character
+// screen shows "until you rest" instead of a meaningless 99-seeded countdown.
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-357';

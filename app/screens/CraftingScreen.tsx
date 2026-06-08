@@ -40,7 +40,7 @@ const AETHERCRAFT_DISCIPLINES: AethercraftDiscipline[] = [
     id: 'aether_shape',
     title: 'Aetherstone Manipulation (shape)',
     body:
-      'INT check, DC 12. In combat: +4 AC for one round (shaped-stone ward). Out of combat: ' +
+      'INT check, DC 12. In combat: +4 AC for one turn (shaped-stone ward). Out of combat: ' +
       'binds an Aetheric Shard to a Small Rock, producing a throwable Shaped Aetheric Shard. ' +
       'Mud Dwellers and Aetherborn cast at the base DC; every other race rolls +4 harder.',
     fuels: ['Aetheric Shard', 'Aether Crystal', 'Aether Mud', 'Aether Residue', 'Golem Core', 'Aetheric Locket'],

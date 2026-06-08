@@ -340,12 +340,24 @@ export function CharacterScreen() {
           <>
             <Text style={styles.sectionTitle}>STATUS EFFECTS</Text>
             <View style={styles.card}>
-              {(player.statusEffects ?? []).map((e, i) => (
-                <View key={i} style={styles.effectRow}>
-                  <Text style={styles.effectLabel}>{e.label ?? e.kind}</Text>
-                  <Text style={styles.effectMeta}>{e.remainingRounds} round{e.remainingRounds === 1 ? '' : 's'} left</Text>
-                </View>
-              ))}
+              {(player.statusEffects ?? []).map((e, i) => {
+                // OTA-357 — (A) "rounds" → "turns": a status duration is just
+                // your next N actions, not a tabletop combat round. (B) Tired /
+                // Exhausted are stamina-gated (cleared the moment you recover) —
+                // their counter is meaningless bookkeeping, so show "until you
+                // rest" instead of a fake countdown.
+                const stamGated = e.kind === 'tired' || e.kind === 'exhausted';
+                return (
+                  <View key={i} style={styles.effectRow}>
+                    <Text style={styles.effectLabel}>{e.label ?? e.kind}</Text>
+                    <Text style={styles.effectMeta}>
+                      {stamGated
+                        ? 'until you rest'
+                        : `${e.remainingRounds} turn${e.remainingRounds === 1 ? '' : 's'} left`}
+                    </Text>
+                  </View>
+                );
+              })}
             </View>
           </>
         )}

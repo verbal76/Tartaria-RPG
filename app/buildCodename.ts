@@ -201,6 +201,9 @@ const CODENAMES: Record<string, string> = {
   // lightning etc.) now show the HP loss instead of reading as a near-miss.
   // OTA-356 — no ground, no fall: a 0-stamina climb attempt on the ground
   // refuses instead of dealing fall damage; mid-climb shortfall still falls.
+  // OTA-357 — status-duration display honesty: "rounds"→"turns"; Tired/
+  // Exhausted show "until you rest" (stamina-gated, no real countdown).
+  '2026-06-08-357': 'Tupelo Anvil',
   '2026-06-08-356': 'Sequoia Anvil',
   '2026-06-08-355': 'Buckeye Anvil',
   '2026-06-08-354': 'Cottonwood Anvil',

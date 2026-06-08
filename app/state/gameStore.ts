@@ -6246,7 +6246,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   newHps[i] = updatedHp;
                   get().appendLog(
                     'combat',
-                    `${sceneNow.enemies[i]!.name} convulses — infection bleeds ${dmg}. (${updatedHp}/${sceneNow.enemies[i]!.hp} HP, ${st.turnsRemaining - 1} rounds left)`,
+                    `${sceneNow.enemies[i]!.name} convulses — infection bleeds ${dmg}. (${updatedHp}/${sceneNow.enemies[i]!.hp} HP, ${st.turnsRemaining - 1} turns left)`,
                   );
                   if (st.turnsRemaining - 1 > 0) {
                     remaining.push({ ...st, turnsRemaining: st.turnsRemaining - 1 });

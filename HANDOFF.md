@@ -165,8 +165,12 @@ checkout, not a special rollback tool.)
 > **user** triggers the push. When the batch ships, move these into §0.B (Closed)
 > and clear this list.
 
-**Empty** — the log-review batch (351→356) shipped 2026-06-08 (see §0.B).
-The next change starts a fresh batch (≥5 before the next push).
+1. **OTA-357 "Tupelo Anvil" — status-duration display honesty.** (A) "rounds" →
+   "turns" on the status counter + action-card / crafting / DOT lines (a duration
+   is your next N actions, not a tabletop combat round). (B) Tired/Exhausted show
+   "until you rest" instead of the meaningless 99-seeded countdown (answers the
+   player's "tired 96r"). `CharacterScreen` + `ActionReferenceScreen` +
+   `CraftingScreen` + `gameStore`. tsc clean.
 
 ### 0.A — Open Issues
 
