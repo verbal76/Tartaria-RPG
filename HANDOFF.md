@@ -37,11 +37,16 @@
 >   - **OTA-360 "Chestnut Anvil"** — weapon coatings, phase 1 (data + apply +
 >     UI). Poison/Acid/Corruption consumables + recipes paint onto a bladed or
 >     projectile weapon → "Corrupted Battle Axe" + damage chip; permanent for the
->     weapon's life. Combat on-hit effect + loot land in a follow-up OTA.
+>     weapon's life.
 >   - **OTA-361 "Aspen Anvil"** — knockout + loot humanoids. A single non-lethal
->     blow ≥ half a Human enemy's max HP knocks them out (out of the fight); a
->     combat "loot" button strips their authored kit (damaged) + drops + TC and
->     clears them. 6 Human enemies gained `carries` kits.
+>     blow whose cumulative damage is > half a Human enemy's max HP knocks them
+>     out (out of the fight); a combat "loot" button strips their authored kit
+>     (damaged) + drops + TC and clears them. 6 Human enemies gained `carries`
+>     kits.
+>   - **OTA-362 "Spruce Anvil"** — weapon coatings, phase 2 (combat wiring).
+>     Coatings now bite: on-hit roll folds into the blow (immediate + counts
+>     toward KO) and seeds an enemy DOT. Poison = pure DOT; acid = DOT + AC
+>     shred; corruption = DOT + stacks that tick harder. (Phase 3 = loot drops.)
 >   (Batch is building toward the ≥5 threshold; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
@@ -220,14 +225,19 @@ checkout, not a special rollback tool.)
     coated display name + damage chip in the pack (base `name` unchanged so
     `findWeaponByName` still resolves stats). NEW `engine/weaponCoating.ts`;
     `__tests__/weaponCoating.test.ts` (13). tsc clean.
-  - **FOLLOW-UP OTA (phase 2 — combat wiring, NOT yet built):** on a landing hit
-    a coated weapon rolls `coating.dice` → enemy status via `enemyStatuses`
-    (extend the `infected` kind union + tick loop ~`gameStore.ts:6237`): **poison**
-    = pure DOT; **acid** = DOT + armor shred (−AC at the enemy to-hit/defense
-    site); **corruption** = DOT + corruption stacks (sicken tougher foes). Read
-    the coating off the equipped weapon INSTANCE (`equippedItem` ~`gameStore.ts:
-    12890`, not the catalog `equipped`). Then **phase 3 / fold-in:** occasional
-    `coating`-bearing loot drops.
+  - **OTA-362 (phase 2 — combat wiring) — DONE.** On a landing hit a coated
+    weapon rolls `coating.dice` once → the roll folds into the cumulative blow
+    `dmg` (immediate damage + counts toward the knockout threshold) and, if the
+    enemy survives, seeds a DOT on `enemyStatuses` (kinds `poison_coat` /
+    `acid_coat` / `corruption_coat`; tick loop ~`gameStore.ts:6288` generalized).
+    **poison** = pure DOT; **acid** = DOT + armor shred (per-hit −AC, capped,
+    `buildCombatSteps` `acReduction` opt); **corruption** = DOT + stacks (each
+    hit adds a stack; DOT ticks harder per stack via `coatingDotPerTurn`). New
+    `enemyArmorShred` / `enemyCorruptionStacks` arrays; splice sites keep all
+    per-enemy arrays aligned. `weaponCoating.test.ts` (+5) +
+    `weaponCoatingCombat.test.ts` (2).
+  - **PHASE 3 (loot drops) — next OTA:** occasional `coating`-bearing weapon
+    loot drops so coated weapons appear in the wild, not just from crafting.
 
 ### 0.A — Open Issues
 

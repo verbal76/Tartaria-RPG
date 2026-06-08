@@ -1,4 +1,8 @@
-import { isCoatableWeapon, coatedDisplayName, coatingBlurb } from '../app/engine/weaponCoating';
+import {
+  isCoatableWeapon, coatedDisplayName, coatingBlurb,
+  coatingStatusKind, coatingDotPerTurn,
+  COATING_DOT_TURNS, ACID_SHRED_PER_HIT, ACID_SHRED_MAX, CORRUPTION_STACK_BONUS,
+} from '../app/engine/weaponCoating';
 import { resolveItemEffect } from '../app/engine/itemEffect';
 import { findGearByName, RECIPES } from '../app/engine/crafting';
 
@@ -48,6 +52,34 @@ describe('coatingBlurb — one line per kind', () => {
     expect(coatingBlurb('poison')).toMatch(/poison/i);
     expect(coatingBlurb('acid')).toMatch(/armor/i);
     expect(coatingBlurb('corruption')).toMatch(/corruption/i);
+  });
+});
+
+describe('coating combat math (OTA-362)', () => {
+  it('coatingStatusKind maps each family to its DOT kind', () => {
+    expect(coatingStatusKind('poison')).toBe('poison_coat');
+    expect(coatingStatusKind('acid')).toBe('acid_coat');
+    expect(coatingStatusKind('corruption')).toBe('corruption_coat');
+  });
+
+  it('poison / acid tick the rolled amount flat (no stack scaling)', () => {
+    expect(coatingDotPerTurn('poison', 4, 0)).toBe(4);
+    expect(coatingDotPerTurn('acid', 3, 0)).toBe(3);
+    // stacks are ignored for non-corruption.
+    expect(coatingDotPerTurn('poison', 4, 5)).toBe(4);
+  });
+
+  it('corruption ticks harder per accumulated stack', () => {
+    // First hit (1 stack): just the rolled amount.
+    expect(coatingDotPerTurn('corruption', 4, 1)).toBe(4);
+    // Third hit (3 stacks): rolled + 2 × bonus.
+    expect(coatingDotPerTurn('corruption', 4, 3)).toBe(4 + 2 * CORRUPTION_STACK_BONUS);
+  });
+
+  it('tuning constants are sane', () => {
+    expect(COATING_DOT_TURNS).toBeGreaterThan(0);
+    expect(ACID_SHRED_PER_HIT).toBeGreaterThan(0);
+    expect(ACID_SHRED_MAX).toBeGreaterThanOrEqual(ACID_SHRED_PER_HIT);
   });
 });
 

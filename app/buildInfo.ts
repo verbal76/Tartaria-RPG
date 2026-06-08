@@ -12824,4 +12824,20 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // it counts toward the knockout, per the player's spec.) NEW engine/knockout.ts;
 // __tests__/weaponKnockout.test.ts (4) + knockoutThreshold.test.ts (10).
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-361';
+// OTA-362 (Spruce Anvil) — weapon coatings, phase 2 (combat wiring). A coated
+// weapon's on-hit roll now BITES: on a landing hit it rolls coating.dice once,
+// folds that into the cumulative blow `dmg` (so it deals immediate damage AND
+// counts toward the knockout threshold, per the player's spec), then — if the
+// enemy survives — seeds an ongoing enemy DOT (COATING_DOT_TURNS turns) on
+// currentScene.enemyStatuses (kinds poison_coat / acid_coat / corruption_coat;
+// the tick loop generalized to drain them with kind-flavored lines). The three
+// families diverge: poison = pure DOT; acid = DOT + armor shred (per-hit −AC on
+// the target, capped, read by buildCombatSteps via the new acReduction opt so
+// the foe gets easier to hit); corruption = DOT + stacks (each hit adds a stack;
+// the DOT ticks harder per stack via coatingDotPerTurn, so tough foes rot
+// faster). New per-enemy currentScene.enemyArmorShred / enemyCorruptionStacks
+// arrays; resolveEnemyDefeat + lootKnockedOutEnemy now keep every index-parallel
+// per-enemy array aligned on an enemy splice. Tuning + pure math in
+// engine/weaponCoating.ts. __tests__/weaponCoating.test.ts (+5) +
+// weaponCoatingCombat.test.ts (2). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-362';

@@ -58,3 +58,49 @@ export function coatingBlurb(kind: WeaponCoating['kind']): string {
       return 'pushes corruption into the target (damage over time + sickening stacks)';
   }
 }
+
+// ─── OTA-362 — coating combat tuning + on-hit math ──────────────────
+//
+// On a landing hit, a coated weapon rolls its dice once. That roll
+// lands as IMMEDIATE bonus damage on the strike (so it counts toward
+// the cumulative knockout threshold and hurts now) AND seeds an
+// ongoing DOT for the next COATING_DOT_TURNS turns. The three families
+// then diverge, per the locked design:
+//   poison     — pure DOT, nothing extra.
+//   acid       — DOT + armor shred: each hit drops the target's AC by
+//                ACID_SHRED_PER_HIT (capped at ACID_SHRED_MAX), so the
+//                more you hit, the easier they are to hit.
+//   corruption — DOT + stacks: each hit adds a corruption stack, and
+//                the DOT ticks harder by CORRUPTION_STACK_BONUS per
+//                stack. Tough foes you hit many times rot faster —
+//                "sickening tougher foes."
+
+/** Ongoing DOT duration (turns) after the immediate on-hit tick. */
+export const COATING_DOT_TURNS = 3;
+/** AC reduction an acid coating inflicts per landing hit. */
+export const ACID_SHRED_PER_HIT = 1;
+/** Cap on accumulated acid armor shred per enemy. */
+export const ACID_SHRED_MAX = 5;
+/** Extra DOT-per-turn a corruption coating gains per accumulated stack. */
+export const CORRUPTION_STACK_BONUS = 1;
+
+/** The enemyStatuses `kind` string a coating lands as a DOT. */
+export function coatingStatusKind(
+  kind: WeaponCoating['kind'],
+): 'poison_coat' | 'acid_coat' | 'corruption_coat' {
+  return `${kind}_coat` as 'poison_coat' | 'acid_coat' | 'corruption_coat';
+}
+
+/** DOT damage-per-turn for a coating proc. Poison / acid tick the
+ *  rolled amount; corruption ticks the rolled amount plus a bonus per
+ *  accumulated stack (stacksAfter includes the stack this hit added). */
+export function coatingDotPerTurn(
+  kind: WeaponCoating['kind'],
+  rolled: number,
+  stacksAfter: number,
+): number {
+  if (kind === 'corruption') {
+    return rolled + Math.max(0, stacksAfter - 1) * CORRUPTION_STACK_BONUS;
+  }
+  return rolled;
+}

@@ -152,6 +152,7 @@ import {
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
 import { knocksOutHumanoid } from '../engine/knockout';
+import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, ACID_SHRED_PER_HIT, ACID_SHRED_MAX } from '../engine/weaponCoating';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, VENDORS, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks, raceLootBias, raceSearchHookBonus, resurrectionGemDropChance } from '../engine/raceMechanics';
 import { trainStat, type StatKey } from '../engine/statTraining';
@@ -438,11 +439,22 @@ interface CurrentScene {
    *  status list; ticks each combat round. Empty array when no
    *  status is active. Initialized empty by beginScene. */
   enemyStatuses?: Array<Array<{
-    kind: 'infected';
+    kind: 'infected' | 'poison_coat' | 'acid_coat' | 'corruption_coat';
     turnsRemaining: number;
     dmgPerTurn: number;
     sourceName: string;
   }>>;
+  /** OTA-362 — accumulated acid armor shred per enemy (parallel to
+   *  enemies). Each acid-coated hit drops the enemy's AC by
+   *  ACID_SHRED_PER_HIT (capped at ACID_SHRED_MAX); buildCombatSteps
+   *  reads this via the acReduction opt so subsequent attacks land
+   *  more easily. Lazily created on first acid proc. */
+  enemyArmorShred?: number[];
+  /** OTA-362 — accumulated corruption stacks per enemy (parallel to
+   *  enemies). Each corruption-coated hit adds a stack; the corruption
+   *  DOT ticks harder per stack (coatingDotPerTurn), so tough foes hit
+   *  many times rot faster. Lazily created on first corruption proc. */
+  enemyCorruptionStacks?: number[];
   /** OTA-361 — per-enemy knockout flag. Parallel to enemyHps /
    *  enemies. Set true when the player lands a single non-lethal blow
    *  dealing ≥ half a HUMANOID enemy's max HP. A knocked-out enemy is
@@ -6274,20 +6286,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
               const list = newStatuses[i] ?? [];
               const remaining: typeof list = [];
               for (const st of list) {
-                if (st.kind === 'infected' && st.turnsRemaining > 0) {
+                // OTA-362 — coating DOTs (poison/acid/corruption) tick the
+                // same way as the OTA-210 infection: dmgPerTurn off the HP,
+                // decrement turns, expire with a kind-flavored line.
+                const isDot = st.kind === 'infected'
+                  || st.kind === 'poison_coat'
+                  || st.kind === 'acid_coat'
+                  || st.kind === 'corruption_coat';
+                if (isDot && st.turnsRemaining > 0) {
                   const dmg = st.dmgPerTurn;
                   const updatedHp = Math.max(0, (newHps[i] ?? 0) - dmg);
                   newHps[i] = updatedHp;
+                  const enemyName = sceneNow.enemies[i]!.name;
+                  const tickLine = st.kind === 'poison_coat'
+                    ? `${enemyName} shudders — poison eats ${dmg}.`
+                    : st.kind === 'acid_coat'
+                      ? `${enemyName} smokes — acid eats ${dmg}.`
+                      : st.kind === 'corruption_coat'
+                        ? `${enemyName} blackens — corruption eats ${dmg}.`
+                        : `${enemyName} convulses — infection bleeds ${dmg}.`;
                   get().appendLog(
                     'combat',
-                    `${sceneNow.enemies[i]!.name} convulses — infection bleeds ${dmg}. (${updatedHp}/${sceneNow.enemies[i]!.hp} HP, ${st.turnsRemaining - 1} turns left)`,
+                    `${tickLine} (${updatedHp}/${sceneNow.enemies[i]!.hp} HP, ${st.turnsRemaining - 1} turns left)`,
                   );
                   if (st.turnsRemaining - 1 > 0) {
                     remaining.push({ ...st, turnsRemaining: st.turnsRemaining - 1 });
                   } else {
                     get().appendLog(
                       'combat',
-                      `${sceneNow.enemies[i]!.name}'s fever breaks — the ${st.sourceName} has run its course.`,
+                      `${enemyName}${st.kind === 'infected' ? "'s fever breaks" : ' shakes off the last of the coating'} — the ${st.sourceName} has run its course.`,
                     );
                   }
                 } else {
@@ -6416,6 +6443,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             weatherMod: weatherStatModifiers(currentScene.weather),
             statusMods,
             pointBlankBonus,
+            // OTA-362 — acid-coating armor shred on the active enemy.
+            acReduction: currentScene.enemyArmorShred?.[currentScene.activeEnemyIdx] ?? 0,
           });
           // Drop one-shot status effects consumed by this roll (aiming
           // burns on use).
@@ -12835,7 +12864,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
           set({ surgeCombatToken: token });
         }
       }
-      const dmg = Math.max(1, Math.round(mod.damage * traitMod.multiplier) + effectBonus + titleDmgBonus + surgeBonus);
+      let dmg = Math.max(1, Math.round(mod.damage * traitMod.multiplier) + effectBonus + titleDmgBonus + surgeBonus);
+      // OTA-362 — weapon coating on-hit. If the weapon that landed this
+      // blow carries a coating, roll its dice ONCE: the roll lands as
+      // IMMEDIATE bonus damage this strike (folded into `dmg` so it
+      // counts toward the cumulative knockout threshold + hurts now) and
+      // also seeds an ongoing DOT (applied below, only if the enemy
+      // survives the blow). The instance is resolved off the equipped
+      // slot id for the hand that swung.
+      let coatingProc: { kind: 'poison' | 'acid' | 'corruption'; rolled: number; label: string; source: string } | null = null;
+      if (!barehand) {
+        const coatSlotId = usedOffHandForDmg
+          ? (player.equipped?.offId ?? null)
+          : (player.equipped?.mainId ?? player.equipped?.offId ?? null);
+        const coatInst = coatSlotId ? player.inventory.find((i) => i.id === coatSlotId) : null;
+        const coating = coatInst?.coating;
+        if (coating) {
+          const rolled = Math.max(1, rollFromNotation(coating.dice));
+          coatingProc = { kind: coating.kind, rolled, label: coating.label, source: coatInst!.name };
+          dmg += rolled;
+        }
+      }
       if (surgeBonus > 0) {
         get().appendLog('combat', `✦ Aetheric surge — your awakened blood detonates for +${surgeBonus} on ${enemy.name}.`);
       }
@@ -13028,9 +13077,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       } else {
         // OTA-361 — KNOCKOUT. A single NON-LETHAL blow whose CUMULATIVE
         // damage (`dmg` already sums the weapon roll × traits + weapon-
-        // effect + title + surge bonuses for this one attack; coating
-        // immediate damage folds in here once coating phase 2 lands) is
-        // STRICTLY more than half a HUMANOID's max HP subdues them: they
+        // effect + title + surge bonuses for this one attack, PLUS the
+        // OTA-362 coating immediate roll folded in above) is STRICTLY
+        // more than half a HUMANOID's max HP subdues them: they
         // drop unconscious, out of the fight, lootable in full. Only
         // Human-type enemies can be knocked out (beasts / automata can't
         // be subdued and carry no kit); a blow that would kill (handled
@@ -13064,6 +13113,54 @@ export const useGameStore = create<GameStore>((set, get) => ({
           );
         } else {
           get().appendLog('combat', attackHit(weaponName, enemy.name, dmg, newEnemyHp), { combatOutcome: 'player_dmg' });
+        }
+        // OTA-362 — the enemy survived the blow, so apply the coating's
+        // ONGOING effects: seed/refresh the DOT; acid also shreds the
+        // enemy's AC (capped), corruption also adds a stack that makes
+        // its DOT tick harder. (Immediate coating damage already landed
+        // above, folded into `dmg`.)
+        if (coatingProc) {
+          const proc = coatingProc;
+          set((s) => {
+            if (!s.currentScene) return s;
+            const n = s.currentScene.enemies.length;
+            let stacksAfter = 0;
+            let corr = s.currentScene.enemyCorruptionStacks;
+            if (proc.kind === 'corruption') {
+              corr = [...(corr ?? s.currentScene.enemies.map(() => 0))];
+              while (corr.length < n) corr.push(0);
+              corr[activeIdx] = (corr[activeIdx] ?? 0) + 1;
+              stacksAfter = corr[activeIdx]!;
+            }
+            let shred = s.currentScene.enemyArmorShred;
+            if (proc.kind === 'acid') {
+              shred = [...(shred ?? s.currentScene.enemies.map(() => 0))];
+              while (shred.length < n) shred.push(0);
+              shred[activeIdx] = Math.min(ACID_SHRED_MAX, (shred[activeIdx] ?? 0) + ACID_SHRED_PER_HIT);
+            }
+            const dotKind = coatingStatusKind(proc.kind);
+            const dotPerTurn = coatingDotPerTurn(proc.kind, proc.rolled, stacksAfter);
+            const statuses = (s.currentScene.enemyStatuses ?? []).map((arr) => [...arr]);
+            while (statuses.length < n) statuses.push([]);
+            // Refresh: drop any prior coating-of-this-kind, push a fresh one.
+            const list = (statuses[activeIdx] ?? []).filter((st) => st.kind !== dotKind);
+            list.push({ kind: dotKind, turnsRemaining: COATING_DOT_TURNS, dmgPerTurn: dotPerTurn, sourceName: proc.source });
+            statuses[activeIdx] = list;
+            const next: typeof s.currentScene = { ...s.currentScene, enemyStatuses: statuses };
+            if (corr) next.enemyCorruptionStacks = corr;
+            if (shred) next.enemyArmorShred = shred;
+            return { currentScene: next };
+          });
+          const extra = proc.kind === 'acid'
+            ? ` Its guard pits and hisses — easier to hit now (−${ACID_SHRED_PER_HIT} AC, ${(get().currentScene?.enemyArmorShred?.[activeIdx] ?? 0)} total).`
+            : proc.kind === 'corruption'
+              ? ` The rot deepens (${get().currentScene?.enemyCorruptionStacks?.[activeIdx] ?? 1} stack${(get().currentScene?.enemyCorruptionStacks?.[activeIdx] ?? 1) === 1 ? '' : 's'}).`
+              : '';
+          get().appendLog(
+            'combat',
+            `${proc.label} ${weaponName ?? 'weapon'} — ${proc.rolled} ${proc.kind} bites in and festers (${COATING_DOT_TURNS} turns).${extra}`,
+            { combatOutcome: 'player_dmg' },
+          );
         }
         // After the player's strike, every still-living enemy that ISN'T
         // knocked out counter-attacks (runEnemyGroupCounters skips KO'd).
@@ -13399,11 +13496,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const remainingHps = currentScene.enemyHps.filter((_, i) => i !== activeIdx);
     const nextActiveIdx = remainingEnemies.length > 0 ? Math.min(activeIdx, remainingEnemies.length - 1) : 0;
     const stillFighting = remainingEnemies.length > 0;
+    // OTA-362 — keep the index-parallel per-enemy arrays aligned with the
+    // spliced enemies list (status DOTs, KO flags, acid shred, corruption
+    // stacks, ambush flags) so they don't drift onto the wrong enemy.
+    const dropAt = <T>(arr: T[] | undefined): T[] | undefined =>
+      arr ? arr.filter((_, i) => i !== activeIdx) : undefined;
     set({
       currentScene: {
         ...currentScene,
         enemies: remainingEnemies,
         enemyHps: remainingHps,
+        enemyStatuses: dropAt(currentScene.enemyStatuses),
+        enemyKnockedOut: dropAt(currentScene.enemyKnockedOut),
+        enemyArmorShred: dropAt(currentScene.enemyArmorShred),
+        enemyCorruptionStacks: dropAt(currentScene.enemyCorruptionStacks),
+        enemyAmbushUsed: dropAt(currentScene.enemyAmbushUsed),
         activeEnemyIdx: nextActiveIdx,
         range: stillFighting ? currentScene.range : null,
         hooks: currentScene.hooks ?? [],
@@ -13702,10 +13809,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
     }
     const tcGained = carries.tc ?? (rollDie(6) + 2);
-    // Splice the looted enemy out of the scene (enemies / hps / KO flags).
+    // Splice the looted enemy out of the scene — keep every index-parallel
+    // per-enemy array aligned (hps / KO / status DOTs / acid shred /
+    // corruption stacks / ambush flags).
     const remainingEnemies = currentScene.enemies.filter((_, i) => i !== idx);
     const remainingHps = currentScene.enemyHps.filter((_, i) => i !== idx);
     const remainingKO = ko.filter((_, i) => i !== idx);
+    const dropAt = <T>(arr: T[] | undefined): T[] | undefined =>
+      arr ? arr.filter((_, i) => i !== idx) : undefined;
     const stillFighting = remainingEnemies.length > 0;
     const nextActiveIdx = stillFighting ? Math.min(activeIdx, remainingEnemies.length - 1) : 0;
     set((s) => {
@@ -13718,6 +13829,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
           enemies: remainingEnemies,
           enemyHps: remainingHps,
           enemyKnockedOut: remainingKO,
+          enemyStatuses: dropAt(s.currentScene.enemyStatuses),
+          enemyArmorShred: dropAt(s.currentScene.enemyArmorShred),
+          enemyCorruptionStacks: dropAt(s.currentScene.enemyCorruptionStacks),
+          enemyAmbushUsed: dropAt(s.currentScene.enemyAmbushUsed),
           activeEnemyIdx: nextActiveIdx,
           range: stillFighting ? s.currentScene.range : null,
         },

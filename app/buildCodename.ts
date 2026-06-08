@@ -217,6 +217,11 @@ const CODENAMES: Record<string, string> = {
   // Human enemy's max HP knocks them out (enemyKnockedOut flag; they stop
   // countering); a combat "loot" button strips their authored carries kit
   // (damaged) + full loot + TC and clears them. 6 Human enemies gained kits.
+  // OTA-362 — weapon coatings phase 2 (combat wiring): a coated weapon's on-hit
+  // roll folds into the cumulative blow (immediate damage + counts toward KO) and
+  // seeds an enemy DOT; poison = pure DOT, acid = DOT + AC shred, corruption =
+  // DOT + stacks that tick harder. New enemyArmorShred / enemyCorruptionStacks.
+  '2026-06-08-362': 'Spruce Anvil',
   '2026-06-08-361': 'Aspen Anvil',
   '2026-06-08-360': 'Chestnut Anvil',
   '2026-06-08-359': 'Sassafras Anvil',

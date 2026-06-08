@@ -360,6 +360,10 @@ export function buildCombatSteps(
     /** Point-blank bonus from being at arm's reach with a ranged weapon
      *  designed for it. +2 to the attack roll. */
     pointBlankBonus?: boolean;
+    /** OTA-362 — accumulated acid-coating armor shred on the target.
+     *  Subtracted from the enemy's AC so the more you've hit them with
+     *  an acid weapon, the easier they are to hit. */
+    acReduction?: number;
   },
 ): RollStep[] {
   // Equipped weapon takes precedence over text-based weapon-class detection.
@@ -382,7 +386,10 @@ export function buildCombatSteps(
   const stat = equipped
     ? { value: stats[equipped.stat], label: STAT_LABEL[equipped.stat] }
     : attackStatFor(wc, stats);
-  const ac = enemyAC(enemy);
+  // OTA-362 — acid armor shred lowers the target's effective AC (floored
+  // at 1) so an acid-coated weapon makes a tough foe progressively easier
+  // to land.
+  const ac = Math.max(1, enemyAC(enemy) - Math.max(0, opts?.acReduction ?? 0));
   const enemyInit = rollDie(10);
   // Use equipped damage dice if available; parse "2d6" or "1d10+1d6".
   // OTA 038 — barehanded path now reads race.barehandDamage instead of
