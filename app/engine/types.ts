@@ -259,6 +259,15 @@ export interface Enemy {
    *  or the boss-spawn gate (~1% on wasteland encounters once the
    *  player has cleared 3+ Legendaries). */
   boss?: boolean;
+  /** OTA-361 — concrete gear a HUMANOID (type 'Human') enemy carries.
+   *  When the player KNOCKS THEM OUT — a single non-lethal blow that
+   *  deals ≥ half the enemy's max HP — a Loot action transfers this
+   *  whole kit to the pack, DAMAGED (durability scaled to how hurt the
+   *  enemy was), plus the enemy's `loot` drops and a little `tc`. Weapon
+   *  / armor names resolve through findWeaponByName / findArmorByName.
+   *  Absent on non-humanoids (beasts, automata) — they can't be subdued
+   *  and carry no kit. */
+  carries?: { weapons?: string[]; armor?: string[]; tc?: number };
 }
 
 export interface WeatherEntry {

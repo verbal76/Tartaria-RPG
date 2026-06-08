@@ -212,6 +212,12 @@ const CODENAMES: Record<string, string> = {
   // projectile weapon instance (coating field), shown as "Corrupted Battle
   // Axe" + a damage chip; permanent for the weapon's life (survives repair,
   // lost on break). Combat on-hit wiring lands in a follow-up OTA.
+  // OTA-361 — knockout + loot humanoids: a single non-lethal blow whose
+  // CUMULATIVE damage (weapon + coating + bonuses) is strictly more than half a
+  // Human enemy's max HP knocks them out (enemyKnockedOut flag; they stop
+  // countering); a combat "loot" button strips their authored carries kit
+  // (damaged) + full loot + TC and clears them. 6 Human enemies gained kits.
+  '2026-06-08-361': 'Aspen Anvil',
   '2026-06-08-360': 'Chestnut Anvil',
   '2026-06-08-359': 'Sassafras Anvil',
   '2026-06-08-358': 'Persimmon Anvil',

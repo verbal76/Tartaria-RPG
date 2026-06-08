@@ -37,7 +37,11 @@
 >   - **OTA-360 "Chestnut Anvil"** — weapon coatings, phase 1 (data + apply +
 >     UI). Poison/Acid/Corruption consumables + recipes paint onto a bladed or
 >     projectile weapon → "Corrupted Battle Axe" + damage chip; permanent for the
->     weapon's life. Combat on-hit effect + loot land in the follow-up OTA.
+>     weapon's life. Combat on-hit effect + loot land in a follow-up OTA.
+>   - **OTA-361 "Aspen Anvil"** — knockout + loot humanoids. A single non-lethal
+>     blow ≥ half a Human enemy's max HP knocks them out (out of the fight); a
+>     combat "loot" button strips their authored kit (damaged) + drops + TC and
+>     clears them. 6 Human enemies gained `carries` kits.
 >   (Batch is building toward the ≥5 threshold; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
@@ -168,8 +172,38 @@ checkout, not a special rollback tool.)
 > **user** triggers the push. When the batch ships, move these into §0.B (Closed)
 > and clear this list.
 
-**Batch open (1 of ≥5):**
+**Batch open (2 of ≥5):**
 
+- **OTA-361 "Aspen Anvil" — knockout + loot humanoids.** Player ask: "you should
+  be able to knock out humanoid enemies … hit them with at least half of their
+  original HP value … in a single blow … then loot all their gear and weapons …
+  they would have the damage you've been inflicting so you wouldn't get pristine
+  items … a loot button … auto take all of armor and all of their weapons in a
+  small amount of TC." Clarified by the player: the half-HP threshold is the
+  **cumulative** damage of one round (weapon roll + coating 1d4 + any flat/percent
+  bonuses, all summed), and it must be **strictly more than half** ("one hit
+  point more than half"). Locked design (via AskUserQuestion): **KO only if
+  non-lethal** (a blow that would kill still kills — you can't subdue a corpse);
+  **author a real weapon+armor kit per humanoid** (the 6 Human enemies).
+  - **Built:** the rule lives in NEW `engine/knockout.ts` (`knocksOutHumanoid`,
+    pure + tested): `enemy.type === 'Human'` + `newEnemyHp > 0` + cumulative
+    `dmg > maxHP/2` (= `⌊maxHP/2⌋+1`). `dmg` at the hit site already sums weapon ×
+    traits + weapon-effect + title + surge bonuses; coating immediate damage will
+    fold into it in coating phase 2 so it counts. On KO → set
+    `currentScene.enemyKnockedOut[idx]` (parallel array, init false in
+    `beginScene`). KO'd enemies are skipped by
+    `runEnemyGroupCounters` (never counter). Combat **"loot"** button in
+    `InputBox` (gated on `knockedOutPresent`, wired from `ExplorationScreen`)
+    fires `lootKnockedOutEnemy`: grants the enemy's `carries` kit (weapons via
+    `findWeaponByName` + armor via `findArmorByName`, durability =
+    `round(baseDurability × clamp(remainingHP/maxHP, 0.15, 0.85))` — damaged,
+    never pristine) + full `loot` list + `carries.tc` (or a small default) +
+    `advanceTime(…, 0.1)`, then splices the enemy out. `enemies.json` gained a
+    `carries` field on all 6 Human enemies. `__tests__/weaponKnockout.test.ts`
+    (4) + `knockoutThreshold.test.ts` (10). tsc clean.
+  - **Possible follow-ups (not built):** KO'd enemies don't currently "wake up"
+    (they stay down until looted or killed — intentional, simple). Only `Human`
+    type is subduable today; `Etheric Undead` / others are excluded by design.
 - **OTA-360 "Chestnut Anvil" — weapon coatings, phase 1 (data + apply + UI).**
   Player ask: "add some acid and poison and corruption recipes to add to bladed
   weapons and arrows and boltcasters … 'add corruption to battle axe' … my

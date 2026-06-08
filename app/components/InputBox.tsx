@@ -66,6 +66,9 @@ interface Props {
   equippedOff: string | null;
   inventory: ReadonlyArray<InventoryItem>;
   range?: 'arm' | 'close' | 'far' | null;
+  // OTA-361 — at least one enemy in the scene is knocked out and lootable.
+  // Surfaces the combat "loot" button.
+  knockedOutPresent?: boolean;
   travelTargetName?: string | null;
   onContinueTravel?: () => void;
   onStopTravel?: () => void;
@@ -113,7 +116,7 @@ function shortWeaponLabel(name: string): string {
   return tokens.slice(-2).join(' ');
 }
 
-export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenAskArbiter, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, inventory, range, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, playerHasRope }: Props) {
+export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafting, onOpenApproach, onOpenAskArbiter, onOpenSalvage, onOpenTake, onOpenClimb, onClimbUp, onClimbDown, elevatedOn, onOpenMap, inCombat, equippedMain, equippedOff, inventory, range, knockedOutPresent, travelTargetName, onContinueTravel, onStopTravel, movesLeft, takeableCount, salvageableCount, climbableCount, investigateCount, golem, dog, dogBlocked, raceAbilityReady, onOpenRaceAbilities, playerHasRope }: Props) {
   const [dogPickerOpen, setDogPickerOpen] = useState(false);
   const [text, setText] = useState('');
   const inputRef = useRef<TextInput>(null);
@@ -406,6 +409,11 @@ export function InputBox({ onSubmit, onOpenInventory, onOpenSearch, onOpenCrafti
               ) : null}
               <QuickBtn label="dodge" defensive onPress={() => onSubmit('dodge')} />
               <QuickBtn label="flee" defensive onPress={() => onSubmit('flee')} />
+              {/* OTA-361 — loot a knocked-out humanoid. One tap strips their
+                  kit (damaged) + drops + TC and clears them from the fight. */}
+              {knockedOutPresent ? (
+                <QuickBtn label="loot" tone="ready" onPress={() => useGameStore.getState().lootKnockedOutEnemy()} />
+              ) : null}
             </View>
 
             <View style={styles.quickRowLine}>

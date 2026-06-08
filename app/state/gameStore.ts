@@ -151,6 +151,7 @@ import {
   type Recipe,
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
+import { knocksOutHumanoid } from '../engine/knockout';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, VENDORS, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks, raceLootBias, raceSearchHookBonus, resurrectionGemDropChance } from '../engine/raceMechanics';
 import { trainStat, type StatKey } from '../engine/statTraining';
@@ -442,6 +443,14 @@ interface CurrentScene {
     dmgPerTurn: number;
     sourceName: string;
   }>>;
+  /** OTA-361 — per-enemy knockout flag. Parallel to enemyHps /
+   *  enemies. Set true when the player lands a single non-lethal blow
+   *  dealing ≥ half a HUMANOID enemy's max HP. A knocked-out enemy is
+   *  OUT of the fight — it never counter-attacks (runEnemyGroupCounters
+   *  skips it) — and is lootable via the combat Loot action, which
+   *  transfers its `carries` kit (damaged) + loot + TC and removes it
+   *  from the scene. Initialized all-false in beginScene. */
+  enemyKnockedOut?: boolean[];
   /** Whether each enemy in `enemies` has already used its
    *  ambush_strike trait this scene. Parallel to enemyHps. Trait
    *  fires only on the first counter; the +2 bonus is consumed and
@@ -2190,6 +2199,14 @@ interface GameStore {
    *  the prior coating. Returns nothing; surfaces success/refusal
    *  via the log. */
   applyCoating: (coatingItemId: string, weaponId: string) => void;
+  /** OTA-361 — loot a knocked-out humanoid. Transfers the enemy's
+   *  `carries` kit (weapons + armor, DAMAGED — durability scaled to how
+   *  hurt they were), the full `loot` drop list, and a little TC into
+   *  the pack, then removes the enemy from the scene. Picks the active
+   *  enemy if it's knocked out, else the first knocked-out enemy. No-op
+   *  (with a log line) if no knocked-out enemy is present. Costs a
+   *  little in-world time. */
+  lootKnockedOutEnemy: () => void;
   /** OTA-195 — fuse reserved inferred items at a Crucible (one-shot
    *  flag set by the fusion_bench travel encounter). Gates on the
    *  pending flag + gateFusion rules (≥3 reserved inferred items,
@@ -4083,6 +4100,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       vendor, range, hooks: initialHooks, ambientNouns: sceneAmbientNouns, displayedAmbientNouns: sceneDisplayedNouns, microMicroId,
       sceneBuilding,
       enemyAmbushUsed: enemies.map(() => false),
+      // OTA-361 — knockout flags, one per enemy, all false at scene start.
+      enemyKnockedOut: enemies.map(() => false),
       // OTA 037 — explicit null. Older code relied on undefined being
       // falsy at every read site; making it explicit prevents stale
       // values from leaking across scenes if any future code switches
@@ -13007,16 +13026,47 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // in resolveEnemyDefeat which now operates per-active-enemy).
         get().resolveEnemyDefeat();
       } else {
-        // Write the new HP back into the aligned array.
+        // OTA-361 — KNOCKOUT. A single NON-LETHAL blow whose CUMULATIVE
+        // damage (`dmg` already sums the weapon roll × traits + weapon-
+        // effect + title + surge bonuses for this one attack; coating
+        // immediate damage folds in here once coating phase 2 lands) is
+        // STRICTLY more than half a HUMANOID's max HP subdues them: they
+        // drop unconscious, out of the fight, lootable in full. Only
+        // Human-type enemies can be knocked out (beasts / automata can't
+        // be subdued and carry no kit); a blow that would kill (handled
+        // above) still kills. Already-KO'd enemies don't re-trigger.
+        const enemyMaxHp = enemy.hp;
+        const knocksOut = knocksOutHumanoid({
+          enemyType: enemy.type,
+          blowDamage: dmg,
+          maxHp: enemyMaxHp,
+          resultingHp: newEnemyHp,
+          alreadyKnockedOut: get().currentScene?.enemyKnockedOut?.[activeIdx] === true,
+        });
+        // Write the new HP back into the aligned array (+ the KO flag).
         set((s) => {
           if (!s.currentScene) return {};
           const hps = [...s.currentScene.enemyHps];
           hps[activeIdx] = newEnemyHp;
-          return { currentScene: { ...s.currentScene, enemyHps: hps } };
+          const next: typeof s.currentScene = { ...s.currentScene, enemyHps: hps };
+          if (knocksOut) {
+            const ko = [...(s.currentScene.enemyKnockedOut ?? s.currentScene.enemies.map(() => false))];
+            ko[activeIdx] = true;
+            next.enemyKnockedOut = ko;
+          }
+          return { currentScene: next };
         });
-        get().appendLog('combat', attackHit(weaponName, enemy.name, dmg, newEnemyHp), { combatOutcome: 'player_dmg' });
-        // After the player's strike, every still-living enemy in the
-        // scene counter-attacks. The group acts as a group.
+        if (knocksOut) {
+          get().appendLog(
+            'combat',
+            `You crack the ${enemy.name} with the ${weaponName} for ${dmg} — half their fight, gone in one blow. They crumple, out cold. (${newEnemyHp}/${enemyMaxHp} HP) Loot them before they come to.`,
+            { combatOutcome: 'player_dmg' },
+          );
+        } else {
+          get().appendLog('combat', attackHit(weaponName, enemy.name, dmg, newEnemyHp), { combatOutcome: 'player_dmg' });
+        }
+        // After the player's strike, every still-living enemy that ISN'T
+        // knocked out counter-attacks (runEnemyGroupCounters skips KO'd).
         runEnemyGroupCounters(get, set, player);
       }
     } else {
@@ -13584,6 +13634,110 @@ export const useGameStore = create<GameStore>((set, get) => ({
           : `✦ A Resurrection Gem flickers from the dust — gathered to your stash. (${total} held)`;
         get().appendLog('reward', line);
       });
+    }
+    void get().persist();
+  },
+
+  lootKnockedOutEnemy() {
+    const { currentScene, player } = get();
+    if (!currentScene || !player) return;
+    const ko = currentScene.enemyKnockedOut ?? [];
+    // Prefer the active enemy if it's down; otherwise the first KO'd one.
+    const activeIdx = currentScene.activeEnemyIdx;
+    let idx = ko[activeIdx] ? activeIdx : ko.findIndex((v) => v === true);
+    if (idx < 0) {
+      get().appendLog('world', 'No one here is down to loot. Knock a humanoid out cold first — half their fight in one blow.');
+      return;
+    }
+    const enemy = currentScene.enemies[idx];
+    if (!enemy) return;
+    // Damage proxy: the more you'd beaten them down, the rougher the kit.
+    // Looted durability fraction tracks the enemy's remaining HP %, never
+    // pristine (clamped 0.15–0.85). A barely-subdued foe yields better
+    // gear than one you'd nearly killed first.
+    const remainingHp = Math.max(0, currentScene.enemyHps[idx] ?? enemy.hp);
+    const hpFrac = enemy.hp > 0 ? remainingHp / enemy.hp : 0.5;
+    const durFrac = Math.max(0.15, Math.min(0.85, hpFrac));
+    const carries = enemy.carries ?? {};
+    const grants: InventoryItem[] = [];
+    const stamp = Date.now();
+    let n = 0;
+    for (const wName of carries.weapons ?? []) {
+      const w = findWeaponByName(wName);
+      const base = w?.baseDurability ?? 10;
+      grants.push({
+        id: `ko_${stamp}_${n++}`,
+        name: wName,
+        kind: 'weapon',
+        rarity: w?.rarity,
+        quantity: 1,
+        tags: [...(w?.tags ?? []), 'loot'],
+        durability: { current: Math.max(1, Math.round(base * durFrac)), max: base },
+      });
+    }
+    for (const aName of carries.armor ?? []) {
+      const a = findArmorByName(aName);
+      const base = a?.baseDurability ?? 10;
+      grants.push({
+        id: `ko_${stamp}_${n++}`,
+        name: aName,
+        kind: 'armor',
+        rarity: a?.rarity,
+        quantity: 1,
+        tags: [...(a?.tags ?? []), 'loot'],
+        durability: { current: Math.max(1, Math.round(base * durFrac)), max: base },
+      });
+    }
+    // The enemy's drop list comes over in FULL (not the partial kill
+    // roll) — you're picking the body clean.
+    for (const lootName of enemy.loot ?? []) {
+      const lk = lookupCraftedItem(lootName);
+      grants.push({
+        id: `ko_${stamp}_${n++}`,
+        name: lootName,
+        kind: lk.kind,
+        rarity: lk.rarity,
+        quantity: 1,
+        tags: [...lk.tags, 'loot'],
+      });
+    }
+    const tcGained = carries.tc ?? (rollDie(6) + 2);
+    // Splice the looted enemy out of the scene (enemies / hps / KO flags).
+    const remainingEnemies = currentScene.enemies.filter((_, i) => i !== idx);
+    const remainingHps = currentScene.enemyHps.filter((_, i) => i !== idx);
+    const remainingKO = ko.filter((_, i) => i !== idx);
+    const stillFighting = remainingEnemies.length > 0;
+    const nextActiveIdx = stillFighting ? Math.min(activeIdx, remainingEnemies.length - 1) : 0;
+    set((s) => {
+      if (!s.player || !s.currentScene) return s;
+      let inv = s.player.inventory;
+      for (const g of grants) inv = mergeOrPushItem(inv, g);
+      return {
+        currentScene: {
+          ...s.currentScene,
+          enemies: remainingEnemies,
+          enemyHps: remainingHps,
+          enemyKnockedOut: remainingKO,
+          activeEnemyIdx: nextActiveIdx,
+          range: stillFighting ? s.currentScene.range : null,
+        },
+        // Looting is quick — a little in-world time, no stamina cost.
+        player: advanceTime({ ...s.player, inventory: inv, tc: s.player.tc + tcGained }, 0.1),
+      };
+    });
+    const kit = grants.map((g) => g.name);
+    const summary = (() => {
+      const counts: Record<string, number> = {};
+      for (const k of kit) counts[k] = (counts[k] ?? 0) + 1;
+      return Object.entries(counts).map(([k, q]) => (q > 1 ? `${k} ×${q}` : k)).join(', ');
+    })();
+    get().appendLog(
+      'reward',
+      `You strip the unconscious ${enemy.name} — ${summary || 'nothing of worth'}${tcGained > 0 ? `, +${tcGained} TC` : ''}. The gear's seen better days (worn from the fight).`,
+    );
+    if (stillFighting) {
+      const next = remainingEnemies[nextActiveIdx]!;
+      get().appendLog('combat', `${remainingEnemies.length} still standing. ${next.name} now in your sights.`);
     }
     void get().persist();
   },
@@ -20417,6 +20571,8 @@ function runEnemyGroupCounters(
     if (liveIdx < 0) continue;
     const hpAtCounter = liveScene.enemyHps[liveIdx];
     if (hpAtCounter === undefined || hpAtCounter <= 0) continue;
+    // OTA-361 — a knocked-out enemy is unconscious: it never counters.
+    if (liveScene.enemyKnockedOut?.[liveIdx]) continue;
     // Range gate — melee enemies can't counter when the player is at
     // 'far'. Ranged enemies (matched on attack/damage flavor) reach
     // all bands. Mirrors enemyCanReach used by movement intents.

@@ -757,6 +757,7 @@ export function ExplorationScreen() {
             equippedOff={equippedOff}
             inventory={player?.inventory ?? []}
             range={currentScene?.range ?? null}
+            knockedOutPresent={(currentScene?.enemyKnockedOut ?? []).some(Boolean)}
             takeableCount={(() => {
               // 2026-05-25 [UI-2] — green tone fires only when the
               // count of nouns the TakeModal will ACTUALLY render is

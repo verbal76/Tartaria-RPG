@@ -12805,4 +12805,23 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // weapon breaks (the instance is removed at durability 0). The combat on-hit
 // effect (differentiated enemy DOT: poison pure / acid armor-shred / corruption
 // stacks) + occasional loot drops land in the follow-up OTA. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-360';
+// OTA-361 (Aspen Anvil) — knockout + loot humanoids. A single NON-LETHAL blow
+// whose CUMULATIVE damage (the weapon roll + coating roll + every flat/percent
+// bonus that landed this one round, all summed) is STRICTLY more than half a
+// HUMANOID's max HP — i.e. ⌊maxHP/2⌋+1, "one hit point more than half" — knocks
+// them out (enemy.type 'Human'). New per-enemy currentScene.enemyKnockedOut flag
+// (parallel to enemyHps, init false in beginScene). The threshold rule lives in
+// engine/knockout.ts (knocksOutHumanoid) so it's pure + tested. A knocked-out
+// enemy is OUT of the fight — runEnemyGroupCounters skips it — and a combat
+// "loot" button (InputBox, gated on knockedOutPresent) fires lootKnockedOutEnemy:
+// it transfers the enemy's authored `carries` kit (weapons + armor, DAMAGED —
+// durability scaled to the enemy's remaining-HP %, clamped 0.15–0.85, never
+// pristine) plus the FULL loot list and a little TC, then splices them out of the
+// scene (a little in-world time cost). Each of the 6 Human enemies gained a
+// `carries` kit in enemies.json. A lethal blow still kills (KO only fires when
+// the enemy survives the blow); only humanoids can be subdued. (When coating
+// phase 2 lands, the coating's immediate roll folds into the cumulative blow so
+// it counts toward the knockout, per the player's spec.) NEW engine/knockout.ts;
+// __tests__/weaponKnockout.test.ts (4) + knockoutThreshold.test.ts (10).
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-361';

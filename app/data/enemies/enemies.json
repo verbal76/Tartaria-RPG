@@ -1993,6 +1993,7 @@
   {
     "name": "Reclaimer Ambusher",
     "type": "Human",
+    "carries": { "weapons": ["Bone Crossbow"], "armor": ["Reclaimer's Salvage Vest"], "tc": 8 },
     "abilityPoint": "Dexterity 5",
     "attack": "Crossbow Volley",
     "damage": "1D6",
@@ -2017,6 +2018,7 @@
   {
     "name": "Black Cloak Agent",
     "type": "Human",
+    "carries": { "weapons": ["Rust Dagger"], "armor": ["Mud-Bound Cloak"], "tc": 15 },
     "abilityPoint": "Dexterity 6",
     "attack": "Concealed Blade",
     "damage": "2D6",
@@ -2225,6 +2227,7 @@
   {
     "name": "Tartarian Reaver",
     "type": "Human",
+    "carries": { "weapons": ["Reaver's Greatsword"], "armor": ["Vest of the Forgotten Hero"], "tc": 60 },
     "abilityPoint": "Strength 12",
     "attack": "Reaver's Sweep",
     "damage": "3D8",
@@ -2254,6 +2257,7 @@
   {
     "name": "Silt Thief",
     "type": "Human",
+    "carries": { "weapons": ["Bone Knife"], "armor": ["Mud-Warden's Vest"], "tc": 6 },
     "abilityPoint": "Dexterity 5",
     "attack": "Quick Knife",
     "damage": "1D8",
@@ -2278,6 +2282,7 @@
   {
     "name": "Disc Hijacker",
     "type": "Human",
+    "carries": { "weapons": ["Cudgel"], "armor": ["Reclaimer's Salvage Vest"], "tc": 10 },
     "abilityPoint": "Strength 4",
     "attack": "Cudgel Smash",
     "damage": "2D6",
@@ -2301,6 +2306,7 @@
   {
     "name": "Mud Monarch Purifier",
     "type": "Human",
+    "carries": { "weapons": ["Iron Spear"], "armor": ["Mud-Warden's Vest"], "tc": 20 },
     "abilityPoint": "Wisdom 5",
     "attack": "Radiant Lance",
     "damage": "2D8",
