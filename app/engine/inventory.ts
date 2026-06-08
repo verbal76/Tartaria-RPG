@@ -86,6 +86,10 @@ export function grantItem(
   const mergeIdx = inventory.findIndex((existing) => {
     if (existing.name !== newItem.name) return false;
     if (existing.kind !== newItem.kind) return false;
+    // OTA-363 — a weapon coating makes an instance unique; never merge a
+    // coated weapon (it would silently drop the coating on the incoming
+    // item or fuse two differently-coated blades).
+    if (existing.coating || newItem.coating) return false;
     if (stackable) return true;
     return isFullyDurable(existing) && newItemFull;
   });

@@ -46,8 +46,12 @@
 >   - **OTA-362 "Spruce Anvil"** — weapon coatings, phase 2 (combat wiring).
 >     Coatings now bite: on-hit roll folds into the blow (immediate + counts
 >     toward KO) and seeds an enemy DOT. Poison = pure DOT; acid = DOT + AC
->     shred; corruption = DOT + stacks that tick harder. (Phase 3 = loot drops.)
->   (Batch is building toward the ≥5 threshold; the **user** triggers the push.)
+>     shred; corruption = DOT + stacks that tick harder.
+>   - **OTA-363 "Cedar Anvil"** — weapon coatings, phase 3 (occasional loot). A
+>     looted coatable weapon (KO'd humanoid's kit, enemy weapon drop) has an 18%
+>     shot at arriving pre-coated. `grantItem` never merges a coated weapon.
+>     **Completes the coating feature** (craft + combat + loot).
+>   (Batch is at **4 of ≥5**; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /
@@ -236,8 +240,12 @@ checkout, not a special rollback tool.)
     `enemyArmorShred` / `enemyCorruptionStacks` arrays; splice sites keep all
     per-enemy arrays aligned. `weaponCoating.test.ts` (+5) +
     `weaponCoatingCombat.test.ts` (2).
-  - **PHASE 3 (loot drops) — next OTA:** occasional `coating`-bearing weapon
-    loot drops so coated weapons appear in the wild, not just from crafting.
+  - **OTA-363 (phase 3 — occasional loot) — DONE.** `rollLootCoating` (18%) on
+    looted coatable weapons at both mints (`lootKnockedOutEnemy` kit weapon +
+    `resolveEnemyDefeat` weapon drop). `grantItem` never merges a coated weapon
+    (the `coating` field makes the instance unique); coated `resolveEnemyDefeat`
+    drops get a full durability block. `weaponCoating.test.ts` (+7). **Weapon-
+    coating feature COMPLETE: craft (360) + combat (362) + loot (363).**
 
 ### 0.A — Open Issues
 

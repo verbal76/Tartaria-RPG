@@ -12840,4 +12840,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // per-enemy array aligned on an enemy splice. Tuning + pure math in
 // engine/weaponCoating.ts. __tests__/weaponCoating.test.ts (+5) +
 // weaponCoatingCombat.test.ts (2). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-362';
+// OTA-363 (Cedar Anvil) — weapon coatings, phase 3 (occasional loot). Coated
+// weapons now turn up in the wild, completing the locked "craft + occasional
+// loot" acquisition. New rollLootCoating(weaponName, {chance, rng}) in
+// engine/weaponCoating.ts: a looted COATABLE weapon has a LOOT_COATING_CHANCE
+// (18%) shot at arriving pre-coated with a random 1d4 family. Wired at the two
+// weapon-loot mints — a knocked-out humanoid's kit weapon (lootKnockedOutEnemy)
+// and a defeated enemy's weapon drop (resolveEnemyDefeat, e.g. the Reaver's
+// Greatsword). A coated drop mints as a DISTINCT instance: grantItem now refuses
+// to merge any item carrying a `coating` (it would otherwise silently drop the
+// coating or fuse two differently-coated blades), and resolveEnemyDefeat gives a
+// coated drop a full durability block so it reads + wears like a real weapon.
+// engine/inventory.ts merge guard; __tests__/weaponCoating.test.ts (+7).
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-363';

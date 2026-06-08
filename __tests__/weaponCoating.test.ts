@@ -1,8 +1,10 @@
 import {
   isCoatableWeapon, coatedDisplayName, coatingBlurb,
-  coatingStatusKind, coatingDotPerTurn,
+  coatingStatusKind, coatingDotPerTurn, rollLootCoating,
   COATING_DOT_TURNS, ACID_SHRED_PER_HIT, ACID_SHRED_MAX, CORRUPTION_STACK_BONUS,
 } from '../app/engine/weaponCoating';
+import { mergeOrPushItem } from '../app/engine/inventory';
+import type { InventoryItem } from '../app/engine/types';
 import { resolveItemEffect } from '../app/engine/itemEffect';
 import { findGearByName, RECIPES } from '../app/engine/crafting';
 
@@ -80,6 +82,53 @@ describe('coating combat math (OTA-362)', () => {
     expect(COATING_DOT_TURNS).toBeGreaterThan(0);
     expect(ACID_SHRED_PER_HIT).toBeGreaterThan(0);
     expect(ACID_SHRED_MAX).toBeGreaterThanOrEqual(ACID_SHRED_PER_HIT);
+  });
+});
+
+describe('rollLootCoating (OTA-363) — occasional coated-weapon loot', () => {
+  it('never coats a non-coatable weapon, even on a guaranteed roll', () => {
+    expect(rollLootCoating('Cudgel', { rng: () => 0 })).toBeNull(); // bludgeoning
+    expect(rollLootCoating('Scrap Metal', { rng: () => 0 })).toBeNull(); // not a weapon
+  });
+
+  it('coats a coatable weapon when the roll passes', () => {
+    // rng() = 0 → 0 < chance (passes) → kind index floor(0 * 3) = 0 (poison).
+    const c = rollLootCoating('Rust Dagger', { rng: () => 0 });
+    expect(c).not.toBeNull();
+    expect(c!.kind).toBe('poison');
+    expect(c!.dice).toBe('1d4');
+    expect(c!.label).toBe('Poisoned');
+  });
+
+  it('does not coat when the roll exceeds the chance', () => {
+    // rng() = 0.99 ≥ default chance → null.
+    expect(rollLootCoating('Rust Dagger', { rng: () => 0.99 })).toBeNull();
+  });
+
+  it('honors a custom chance', () => {
+    expect(rollLootCoating('Rust Dagger', { chance: 0, rng: () => 0 })).toBeNull(); // 0 ≥ 0 → no
+    expect(rollLootCoating('Rust Dagger', { chance: 1, rng: () => 0.5 })).not.toBeNull();
+  });
+});
+
+describe('coated weapons never merge into a stack', () => {
+  const blade = (coating?: InventoryItem['coating']): InventoryItem => ({
+    id: Math.random().toString(36), name: 'Rust Dagger', kind: 'weapon', quantity: 1, tags: ['weapon'],
+    durability: { current: 10, max: 10 }, ...(coating ? { coating } : {}),
+  });
+
+  it('a coated blade lands as its own row, not merged onto an uncoated twin', () => {
+    let inv: InventoryItem[] = [blade()]; // one uncoated, fully durable
+    inv = mergeOrPushItem(inv, blade({ kind: 'poison', dice: '1d4', label: 'Poisoned' }));
+    expect(inv.length).toBe(2);
+    expect(inv.filter((i) => i.coating).length).toBe(1);
+  });
+
+  it('two uncoated fully-durable twins still stack (no regression)', () => {
+    let inv: InventoryItem[] = [blade()];
+    inv = mergeOrPushItem(inv, blade());
+    expect(inv.length).toBe(1);
+    expect(inv[0]!.quantity).toBe(2);
   });
 });
 

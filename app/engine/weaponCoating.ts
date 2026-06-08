@@ -91,6 +91,38 @@ export function coatingStatusKind(
   return `${kind}_coat` as 'poison_coat' | 'acid_coat' | 'corruption_coat';
 }
 
+// ─── OTA-363 — occasional coated-weapon loot ───────────────────────
+//
+// Coated weapons should turn up in the wild, not only from the bench —
+// the acquisition the player locked was "craft + occasional loot." When
+// a coatable weapon is granted as loot (a knocked-out humanoid's kit, a
+// defeated enemy's weapon drop), it has a small chance to come already
+// coated, so a looted blade sometimes drips poison / acid / corruption.
+
+/** Default chance a looted coatable weapon arrives pre-coated. */
+export const LOOT_COATING_CHANCE = 0.18;
+
+const LOOT_COATING_LABELS: Record<WeaponCoating['kind'], string> = {
+  poison: 'Poisoned',
+  acid: 'Acid-Etched',
+  corruption: 'Corrupted',
+};
+
+/** Roll whether a looted weapon arrives pre-coated. Returns the coating
+ *  to stamp (a random family at 1d4) or null. No-op for non-coatable
+ *  weapons. `rng` is injectable for tests. */
+export function rollLootCoating(
+  weaponName: string,
+  opts?: { chance?: number; rng?: () => number },
+): WeaponCoating | null {
+  if (!isCoatableWeapon(weaponName)) return null;
+  const rng = opts?.rng ?? Math.random;
+  if (rng() >= (opts?.chance ?? LOOT_COATING_CHANCE)) return null;
+  const kinds: WeaponCoating['kind'][] = ['poison', 'acid', 'corruption'];
+  const kind = kinds[Math.min(kinds.length - 1, Math.floor(rng() * kinds.length))]!;
+  return { kind, dice: '1d4', label: LOOT_COATING_LABELS[kind] };
+}
+
 /** DOT damage-per-turn for a coating proc. Poison / acid tick the
  *  rolled amount; corruption ticks the rolled amount plus a bonus per
  *  accumulated stack (stacksAfter includes the stack this hit added). */

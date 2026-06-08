@@ -152,7 +152,7 @@ import {
 } from '../engine/crafting';
 import { getEquippedWeapon, isBareHandAttack, parseDamageDice } from '../engine/combatRules';
 import { knocksOutHumanoid } from '../engine/knockout';
-import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, ACID_SHRED_PER_HIT, ACID_SHRED_MAX } from '../engine/weaponCoating';
+import { coatingStatusKind, coatingDotPerTurn, COATING_DOT_TURNS, ACID_SHRED_PER_HIT, ACID_SHRED_MAX, rollLootCoating } from '../engine/weaponCoating';
 import { pickRandomVendor, findVendorByName, pickRoadsideTrader, buildTraderEnemy, buildStallVendor, factionGearOffers, VENDORS, type VendorInstance } from '../engine/vendors';
 import { effectiveAC, barehandDamageFor, barehandGateBlocks, raceLootBias, raceSearchHookBonus, resurrectionGemDropChance } from '../engine/raceMechanics';
 import { trainStat, type StatKey } from '../engine/statTraining';
@@ -13523,6 +13523,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         inventory: lootDrops.reduce(
           (inv, lootName, i) => {
             const lootLookup = lookupCraftedItem(lootName);
+            // OTA-363 — a dropped coatable weapon occasionally arrives
+            // pre-coated. Coated weapons mint as a distinct instance
+            // (grantItem refuses to merge them) with a full durability
+            // block so they read + wear like a real found weapon.
+            const lootCoat = lootLookup.kind === 'weapon' ? rollLootCoating(lootName) : null;
+            const baseDur = lootCoat ? (findWeaponByName(lootName)?.baseDurability ?? 10) : undefined;
             return mergeOrPushItem(inv, {
               id: `loot_${Date.now()}_${i}`,
               name: lootName,
@@ -13530,6 +13536,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               rarity: lootLookup.rarity,
               quantity: 1,
               tags: [...lootLookup.tags, 'loot'],
+              ...(lootCoat ? { coating: lootCoat, durability: { current: baseDur!, max: baseDur! } } : {}),
             });
           },
           player.inventory,
@@ -13772,6 +13779,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     for (const wName of carries.weapons ?? []) {
       const w = findWeaponByName(wName);
       const base = w?.baseDurability ?? 10;
+      // OTA-363 — a looted blade sometimes comes already coated (the
+      // owner was running it dirty).
+      const lootCoat = rollLootCoating(wName);
       grants.push({
         id: `ko_${stamp}_${n++}`,
         name: wName,
@@ -13780,6 +13790,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         quantity: 1,
         tags: [...(w?.tags ?? []), 'loot'],
         durability: { current: Math.max(1, Math.round(base * durFrac)), max: base },
+        ...(lootCoat ? { coating: lootCoat } : {}),
       });
     }
     for (const aName of carries.armor ?? []) {

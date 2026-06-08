@@ -221,6 +221,10 @@ const CODENAMES: Record<string, string> = {
   // roll folds into the cumulative blow (immediate damage + counts toward KO) and
   // seeds an enemy DOT; poison = pure DOT, acid = DOT + AC shred, corruption =
   // DOT + stacks that tick harder. New enemyArmorShred / enemyCorruptionStacks.
+  // OTA-363 — weapon coatings phase 3 (occasional loot): a looted coatable
+  // weapon (KO'd humanoid's kit, defeated enemy's weapon drop) has an 18% shot
+  // at arriving pre-coated. grantItem never merges a coated weapon (unique).
+  '2026-06-08-363': 'Cedar Anvil',
   '2026-06-08-362': 'Spruce Anvil',
   '2026-06-08-361': 'Aspen Anvil',
   '2026-06-08-360': 'Chestnut Anvil',
