@@ -195,6 +195,9 @@ const CODENAMES: Record<string, string> = {
   // loadout/stat snapshot (equip + skill-check) + training-progress line.
   // OTA-353 — three log-review fixes: strip the re-firing fusion-comp grant;
   // honest title earn-message (passive, not "once/day"); empty-name opening.
+  // OTA-354 — Tier-2 flow logging: [debug] enemy-spawn stats, vitals@fall,
+  // persist-failure line.
+  '2026-06-08-354': 'Cottonwood Anvil',
   '2026-06-08-353': 'Mulberry Anvil',
   '2026-06-08-352': 'Holly Anvil',
   '2026-06-08-351': 'Magnolia Anvil',

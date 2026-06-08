@@ -12744,4 +12744,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // Empty-name opening: the in-game-name flow narrated "Your name is . Your blood
 // is…" before the player typed a name — name-less opener variants now render
 // cleanly. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-353';
+// OTA-354 (Cottonwood Anvil) — Tier-2 flow logging ([debug] channel only).
+// (1) enemy spawn line at each combat-start site (name/hp/ac/atk/dmg/rarity/
+// danger/boss) — verifies encounters match the zone's danger tier. (2) vitals@
+// fall (hp/stamina before + fall damage + result) so a fall-death is
+// reconstructable from the log. (3) persist FAILURE line (failure-only, since
+// persist fires every action) surfacing getLastSaveWriteError so a log review
+// can confirm the OTA-344 atomic save is landing on-device. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-354';

@@ -61,6 +61,7 @@ import {
   addResurrectionGems,
   ensureFirstInstallSeed,
   grantDevGemOnce,
+  getLastSaveWriteError,
   type SlotSummary,
 } from '../engine/saveSystem';
 import { makeEntry, persistEntry } from '../engine/gameLog';
@@ -1412,6 +1413,13 @@ function debugLoadout(player: PlayerCharacter): string {
     .map(([k, v]) => `${k.slice(0, 3).toUpperCase()}+${v}`)
     .join(',');
   return `stats: STR${es.strength} DEX${es.dexterity} INT${es.intelligence} WIS${es.wisdom} CHA${es.charisma} STE${es.stealth} | gear: ${gearBon || 'none'} | worn: ${worn || 'none'}`;
+}
+
+// OTA-354 — debug-only enemy spawn line (combat-start balance: do encounters
+// match the zone's danger tier?). Routed to `[debug]` (log/bug-report only).
+function debugEnemy(e: Record<string, unknown>): string {
+  const g = (k: string) => (e[k] ?? '?');
+  return `enemy: ${g('name')} hp=${g('hp')} ac=${g('ac')} atk=${g('attack')} dmg=${g('damage')} rarity=${g('rarity')} danger=${g('danger')}${e['boss'] ? ' BOSS' : ''}`;
 }
 
 // 2026-05-24 — effective stamina max accounting for hunger penalty.
@@ -6842,6 +6850,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               'combat',
               `${finalSpawn.name} — ${finalSpawn.attack} ready, ${finalSpawn.damage} damage on a hit.`,
             );
+            get().appendLog('debug', debugEnemy(finalSpawn as unknown as Record<string, unknown>)); // OTA-354
             break;
           }
         }
@@ -8729,6 +8738,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 `The Arbiter goes still. "You weren't alone. Something circled while you were out — and it stopped circling."`,
               );
               get().appendLog('world', `A ${enemy.name} closes the distance through the dark. The rest is over.`);
+              get().appendLog('debug', debugEnemy(enemy as unknown as Record<string, unknown>)); // OTA-354
             } else {
               // No enemy could be spawned — emit a flavor line so the
               // player knows the world stirred even though no fight
@@ -10274,7 +10284,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (shave > 0) { fallDamage -= shave; fallShaveTag = ` (Etherbound Survivor absorbs ${shave})`; }
           }
           const newHp = Math.max(0, player.hp - fallDamage);
+          // OTA-354 — vitals at the fall, so a log review can reconstruct a
+          // fall-death (was the player already low? did the fall over-damage?).
+          get().appendLog('debug', `vitals@fall: hp ${player.hp}/${player.hpMax} stam ${player.stamina}/${player.staminaMax} → fall ${fallDamage} ⇒ hp ${newHp}`);
           get().appendLog('combat', combatReason);
+          // OTA-354 — vitals at the fall (would have made the "fell to 0/38"
+          // bug-report death reconstructable: pre-fall HP/stamina + the hit).
+          get().appendLog(
+            'debug',
+            `vitals: pre-fall hp=${player.hp}/${player.hpMax} stam=${player.stamina}/${player.staminaMax} corruption=${player.corruption ?? 0} → fall ${fallDamage} → hp=${newHp}${newHp <= 0 ? ' (DEATH)' : ''}`,
+          );
           get().appendLog(
             'world',
             `${worldReason} You drop hard, taking ${fallDamage} damage${fallShaveTag} (${newHp}/${player.hpMax} HP).`,
@@ -10654,6 +10673,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                   'combat',
                   `${enemy.name} is here — and it has seen you.`,
                 );
+                get().appendLog('debug', debugEnemy(enemy as unknown as Record<string, unknown>)); // OTA-354
               }
               if (overlayVendor) {
                 get().appendLog(
@@ -18727,6 +18747,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       // a save-load round trip can't reset it (cheese).
       wastelandStepsSinceEncounter,
     });
+    // OTA-354 — persist health on-device, FAILURE-ONLY (persist fires every
+    // action, so we don't spam "ok"). saveSlot is atomic (OTA-344) and never
+    // throws; it records getLastSaveWriteError() on a failed write. A line here
+    // means the atomic save isn't landing — exactly what a log review needs.
+    const saveErr = getLastSaveWriteError();
+    if (saveErr) get().appendLog('debug', `persist: slot ${activeSlotId} FAILED — ${saveErr}`);
   },
 }));
 

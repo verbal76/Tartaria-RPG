@@ -190,6 +190,11 @@ checkout, not a special rollback tool.)
    `state/gameStore.ts`, `engine/narrativeGenerator.ts`; tests `openingEmptyName`
    (2). tsc clean.
 
+4. **OTA-354 "Cottonwood Anvil" — Tier-2 flow logging (`[debug]`-only).** Enemy-spawn
+   stats at each combat-start site (encounter-vs-danger-tier), `vitals@fall`
+   (reconstruct a fall-death), and a persist-FAILURE line (surfaces
+   `getLastSaveWriteError`, confirms the atomic save lands on-device). tsc clean.
+
 ### 0.A — Open Issues
 
 - **Dog-mortality death/abandon WRITE — verified by automated cold-boot regression
