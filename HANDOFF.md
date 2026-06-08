@@ -29,25 +29,16 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed) = OTA-342 "Linden Anvil"** — the safe 338-batch pair
->   (one-shot thrown weapons + rations preview) re-shipped on top of the live
->   dog feature (340) + COPY SAVE (341). **340/341 boot clean with the dog
->   feature live** — so the 338 disaster was a corrupted save, not the dog
->   logic. Last unverified path: the dog feature's death/abandon WRITE (only
->   fires when the dog actually dies/leaves) — once a dog death survives a
->   restart, the feature is fully cleared.
-> - **STAGED (committed on `HaL2001`, NOT pushed) — next batch is PUSH-READY (5):**
->   - **OTA-343 "Birch Anvil"** — crash-save capture (COPY CRASHED SAVE) +
->     Settings-hint copy fix (folded in from the parallel instance).
->   - **OTA-344 "Hazel Anvil"** — atomic save writes (338 hardening #1):
->     temp → verify → `.bak` snapshot → swap; `loadSlot` recovers from `.bak`.
->   - **OTA-345 "Juniper Anvil"** — boot-resilience guard (338 hardening #2):
->     `beginScene` bails to title (not crash) when a scene build throws.
->   - **OTA-346 "Sycamore Anvil"** — clear-the-slot status-based (338 hardening #3):
->     a dead/abandoned dog no longer blocks the puppy-vendor replacement arc.
->   - **OTA-347 "Hickory Anvil"** — Display "Paper texture" ceiling raised 20% → 50%.
->   The **338-hardening trio (#1–#3) is done** + the death-WRITE verified. **≥5 reached
->   — awaiting the user's push command** (per §P3a). See the staging list at top of §0.
+> - **LIVE (pushed 2026-06-08) = OTA-347 "Hickory Anvil"** — head of the
+>   343→347 batch (the OTA-338 saga fully resolved + a QoL OTA). The batch:
+>   343 Birch (crash-save capture / COPY CRASHED SAVE + Settings-hint copy) ·
+>   344 Hazel (atomic save writes, hardening #1) · 345 Juniper (boot-resilience
+>   guard, #2) · 346 Sycamore (clear-the-slot status-based, #3) · 347 Hickory
+>   (Paper-texture ceiling 20%→50%). Plus a test-only verification that the real
+>   dog death/abandon WRITE survives a cold reload. Pushed `789eabf..2bd41c6`;
+>   `eas-update.yml` publishes to Android + iOS. **338 is closed.**
+> - **STAGED — none.** Staging list is clear; next change starts the next batch
+>   (≥5 before the next push, per §P3a).
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /
@@ -177,59 +168,8 @@ checkout, not a special rollback tool.)
 > **user** triggers the push. When the batch ships, move these into §0.B (Closed)
 > and clear this list.
 
-1. **OTA-343 "Birch Anvil" — MULTI-FIX BUNDLE (two parallel instances).**
-   - **(1) Crash-save capture.** On a crash, stash the offending slot's exact
-     on-disk save bytes; the next launch's title screen offers **COPY CRASHED
-     SAVE** (reaches a corrupt save that COPY SAVE can't). `diagnostics/crashSave.ts`
-     + capture wired into `saveLoadHealth` (native load-crash) and `App.tsx`
-     crash handlers (fatal/hydrate/render). Tests: `crashSaveCapture`. tsc clean.
-   - **(2) Settings hint copy fix.** The About → Session RUN CONTROLS hint
-     now names all four export buttons — "export the log / your pack / your
-     save for sharing" (was "copy the on-disk log") — matching COPY LOG /
-     COPY INVENTORY / COPY SAVE + CLEAR LOG. `app/screens/AboutScreen.tsx`.
-     (Folded in from a parallel instance, which rolled back its own short-lived
-     "Chestnut 343" so there's one OTA-343 = "Birch Anvil".)
-
-2. **OTA-344 "Hazel Anvil" — atomic save writes (338 hardening #1).** `saveSlot`
-   stages to a `.tmp` key → verifies it round-trips → snapshots the prior good
-   save to `.bak` → swaps the live key → cleans up; `loadSlot` falls back to
-   `.bak` (the previous save) and heals the live key when the live copy is
-   missing/corrupt. Never throws (callers fire-and-forget `persist()`) — records
-   `getLastSaveWriteError()` and leaves the live save + backup intact on failure.
-   `app/engine/saveSystem.ts`; tests `atomicSaveWrites` (8). tsc clean. Closes
-   defense #1 of the 338-hardening Open Issue.
-
-3. **OTA-345 "Juniper Anvil" — boot-resilience guard (338 hardening #2).**
-   `beginScene` is now a thin wrapper that try/catches the real builder
-   (`_beginSceneCore`); a scene build that throws bails to the title with a
-   recoverable error, logs it (LAST CRASH pill / bug report), and captures the
-   save (OTA-343) — instead of crashing or graying out. Closes the blind spot
-   where the load breadcrumb was cleared before the scene built. Protects every
-   call site. `app/state/gameStore.ts`; tests `beginSceneGuard` (3). tsc clean.
-   Closes defense #2 of the 338-hardening Open Issue.
-
-4. **OTA-346 "Sycamore Anvil" — clear-the-slot, status-based (338 hardening #3).**
-   A dead/abandoned dog keeps its record (grief narration / COPY SAVE / WRITE-
-   verification) but no longer counts as an active companion — new
-   `hasActiveDog(player)` replaces the raw `!player.dog` guard at the four
-   puppy-vendor / rubble-puppy spawn sites, so the replacement-puppy arc finally
-   fires. `app/state/gameStore.ts`; tests `puppyVendorEdges` (+4). tsc clean.
-   Closes defense #3 — **the 338-hardening trio is complete.**
-
-5. **OTA-347 "Hickory Anvil" — Display "Paper texture" ceiling 20% → 50%.**
-   Player ask. Bumped the `NumberStepper` max AND the `textureOpacity` clamp in
-   both `displaySettings` paths (the stepper alone would snap >0.20 back down).
-   `app/screens/AboutScreen.tsx`, `app/ui/displaySettings.ts`; tests
-   `displayTextureCeiling` (4). tsc clean.
-
-**+ Verification (test-only, no OTA number — rides with the batch):**
-`__tests__/dogDeathWriteSurvivesReload.test.ts` drives the REAL dog bleed-out
-death + loyalty-abandon write through the live atomic `persist()` and cold-reload
-— closing the last 338 thread (the "death/abandon WRITE — verify on a live save"
-Open issue). No `app/` change, so it ships nothing on its own.
-
-*(5 numbered OTAs staged + the verification test — the batch is **push-ready (≥5)**,
-awaiting the user's push command per §P3a.)*
+**Empty** — the 343→347 batch shipped 2026-06-08 (see §0.B). The next change
+starts a fresh batch (≥5 before the next push).
 
 ### 0.A — Open Issues
 
@@ -548,6 +488,32 @@ awaiting the user's push command per §P3a.)*
 - **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Hickory Anvil (`2026-06-08-347`) — Display "Paper texture" ceiling 20% → 50%
+- **What:** player asked to raise the top end of the Paper-texture slider (Settings → DISPLAY).
+- **How:** bumped the `NumberStepper` `max` 20 → 50 AND the `textureOpacity` clamp (0..0.20 → 0..0.50) in BOTH `displaySettings` paths (load + `setDisplaySettings`). The stepper alone wasn't enough — the clamp snapped anything >0.20 back down. `app/screens/AboutScreen.tsx`, `app/ui/displaySettings.ts`; `__tests__/displayTextureCeiling.test.ts` (4).
+- **Why:** clamp + UI must move together or the new ceiling is cosmetic-only.
+
+#### Sycamore Anvil (`2026-06-08-346`) — clear-the-slot, status-based (OTA-338 hardening #3)
+- **What:** a dead/abandoned dog left the puppy-vendor REPLACEMENT arc unreachable — it was gated on a raw `!player.dog`, and the dog record stays on `player.dog` (status `dead`/`abandoned`) after death, so the slot was never "empty."
+- **How:** new `hasActiveDog(player)` (dog present AND `with_player`/`waiting_at_base`) replaces `!player.dog` at the four puppy-vendor / rubble-puppy spawn guards. `app/state/gameStore.ts`; `__tests__/puppyVendorEdges.test.ts` (+4).
+- **Why:** chose status-based over nulling `player.dog` — preserves the dead-dog record for grief narration, COPY SAVE highlights, and the death-WRITE verification; `dogSaveBrickRepro` already proved that record isn't a brick risk.
+
+#### Juniper Anvil (`2026-06-07-345`) — boot-resilience guard (OTA-338 hardening #2)
+- **What:** the scene builder (`beginScene`, run on load-resume / travel / new-game) had no internal guard; a throw would crash or strand the player on a gray screen, and `saveLoadHealth` wouldn't flag it (the load breadcrumb is cleared by the time the scene builds — the "after the load check" blind spot).
+- **How:** `beginScene` is now a thin wrapper that try/catches the real builder (`_beginSceneCore`); on a throw it bails to title with a recoverable error, logs it (LAST CRASH pill / bug report), and captures the save (OTA-343). Protects every call site. `app/state/gameStore.ts`; `__tests__/beginSceneGuard.test.ts` (3).
+- **Why:** belt-and-suspenders over the load-path try/catch — bail-to-title beats crash/gray-out from any caller.
+
+#### Hazel Anvil (`2026-06-07-344`) — atomic save writes (OTA-338 hardening #1)
+- **What:** `saveSlot` did a single in-place `AsyncStorage.setItem`; an interrupted write (crash / OS kill / OTA reload mid-write — the literal 338 brick) left the only copy truncated and unloadable.
+- **How:** all-or-nothing — stage to `.tmp` → verify it round-trips → snapshot the prior good save to `.bak` (only if it parses) → swap the live key → cleanup. `loadSlot` falls back to `.bak` (previous save) and heals the live key when corrupt. `saveSlot` never throws (callers fire-and-forget `persist()`); records `getLastSaveWriteError()` and leaves the live save + backup intact on failure. `deleteSlot` clears `.tmp`/`.bak`. `app/engine/saveSystem.ts`; `__tests__/atomicSaveWrites.test.ts` (8).
+- **Why:** AsyncStorage has no atomic rename; the `.bak` is what survives an interrupted swap. Worst case becomes "lose the most recent save," never the character.
+- **Verified (test-only):** `__tests__/dogDeathWriteSurvivesReload.test.ts` drives the REAL dog bleed-out death + loyalty-0 abandon through the live atomic `persist()` and a cold reload — both load clean, closing the last 338 "death/abandon WRITE — verify on a live save" thread.
+
+#### Birch Anvil (`2026-06-07-343`) — crash-save capture (COPY CRASHED SAVE) + Settings-hint copy
+- **What:** OTA-341's COPY SAVE can't reach a save that bricks the app (a bricked save can never be loaded), so the exact fatal bytes were unrecoverable — the original 338 pain (the player deleted the character to recover, destroying the evidence).
+- **How:** on a crash, the exact on-disk save bytes of the offending slot are stashed to `@tartaria/lastCrashSave`; the next launch's title screen shows **COPY CRASHED SAVE** (amber, beside the LAST CRASH pill), exporting them in the COPY SAVE envelope — verbatim under a PARSE-FAILED marker when they won't parse. Captured from `saveLoadHealth` (native load-crash) + `App.tsx` crash handlers (fatal / hydrate-fail / render). New `app/diagnostics/crashSave.ts`; `__tests__/crashSaveCapture.test.ts` (13). **(2)** Settings RUN CONTROLS hint now names all four exports (folded in from a parallel instance; its short-lived "Chestnut 343" was rolled back so there's one OTA-343).
+- **Why:** you can't fix a brick you can't see; capture the corrupt bytes the one moment they still exist.
 
 #### Linden Anvil (`2026-06-07-342`) — one-shot thrown weapons + Trail-Rations preview (safe 338 pair)
 - **What:** the two pieces of the 338 batch that never touched the dog code,
