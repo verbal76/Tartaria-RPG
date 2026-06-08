@@ -57,8 +57,11 @@
 >   - **OTA-365 "Fir Anvil"** — dead-status cleanup. Removed `well_fed` /
 >     `blocking` / `overwhelmed` / `helping` (no apply or no consumer); WIRED
 >     `ready` (a live command) to deliver its promised +2 next-attack.
->   (Batch is at **6 of ≥5**; one more queued — the Black Cloak Agent / his Order,
->   then **push**.)
+>   - **OTA-366 "Pine Anvil"** — the Black Cloak Agent reframed as a Forgotten
+>     Order enforcer; his signature **Hollow Edge** (corrupted, razor-gripped) is
+>     never lootable (new `Enemy.signatureWeapon` + reason on kill/knockout); 2
+>     lore concepts seed the Order's enforcer line as a future antagonist arc.
+>   (Batch at **7** — user authorized the push; shipping 360→366.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /

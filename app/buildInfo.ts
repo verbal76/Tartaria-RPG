@@ -12874,4 +12874,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // applied by a live command but had no consumer, so its "+1 bonus die" line was
 // vapor. Updated the COMBAT_ONLY_STATUSES set, contextInjector display map, and
 // the rollMods / combatStress / defensiveTurnAdvances tests. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-365';
+// OTA-366 (Pine Anvil) — the Black Cloak Agent + the Forgotten Order. Reframed
+// the Black Cloak Agent from a vague "monarch agent" into a covert ENFORCER of
+// the existing Forgotten Order faction (idealist scholars who bury their secrets
+// and keep a hand to guard them). His signature weapon is NEW: the Hollow Edge,
+// a corruption-weeping blade whose grip is honed to a razor along the inner
+// curve — only a trained Order hand (a two-finger "hold" taught behind sealed
+// doors) can take it up without flaying their own palm. New Enemy.signatureWeapon
+// ({ name, reason }) — a weapon the enemy fights with that is NEVER lootable: on
+// defeat (kill via resolveEnemyDefeat OR knockout via lootKnockedOutEnemy) the
+// player eyes it on the body, reads the `reason`, and leaves it. The agent's
+// lootable kit is now just his cloak + TC (the blade replaced his Rust Dagger);
+// aliases retied to the Order. Two new lore concepts (black_cloak_agents,
+// hollow_edge) seed the Order's enforcer line as a future antagonist arc.
+// __tests__/blackCloakAgent.test.ts (4). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-366';

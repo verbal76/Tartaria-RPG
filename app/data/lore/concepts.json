@@ -1,6 +1,18 @@
 {
   "concepts": [
     {
+      "id": "black_cloak_agents",
+      "keywords": ["black cloak", "black cloak agent", "forgotten order enforcer", "order enforcer", "the order", "hollow blade", "black cloaks"],
+      "title": "The Black Cloaks (Forgotten Order enforcers)",
+      "answer": "The Forgotten Order are scholars and diggers in the light — but every order that buries its secrets keeps a hand to guard them. The Black Cloaks are that hand: the Order's covert enforcers, sent to shadow expeditions, silence loose tongues, and recover what the Order would rather no one else hold. Where the Order publicly calls corruption a sickness, its Black Cloaks have learned to wear it like a glove — the inner circle's open secret. They answer to no faction standing you can buy; you meet them when you've seen something the Order wants forgotten."
+    },
+    {
+      "id": "hollow_edge",
+      "keywords": ["hollow edge", "the hollow edge", "corrupted blade", "razor grip", "order's hold"],
+      "title": "The Hollow Edge",
+      "answer": "The signature blade of the Order's Black Cloaks — steel steeped in corruption until it weeps a faint Aetheric fog. Its cruelty is in the grip: honed to a razor along the inner curve so the handle is a second blade, and only one of its edges is meant for the enemy. An untrained hand that closes on it flays itself to the bone. Initiates are taught the Order's hold — a two-finger grip drilled behind sealed doors — without which the weapon can't be carried. Take one off a fallen Cloak and you'll only open your own palm; the blades stay with the Order, one way or another."
+    },
+    {
       "id": "burn",
       "keywords": ["burn", "fire", "flame", "burning"],
       "title": "Burn damage",

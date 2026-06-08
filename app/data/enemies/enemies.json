@@ -2018,7 +2018,11 @@
   {
     "name": "Black Cloak Agent",
     "type": "Human",
-    "carries": { "weapons": ["Rust Dagger"], "armor": ["Mud-Bound Cloak"], "tc": 15 },
+    "carries": { "armor": ["Mud-Bound Cloak"], "tc": 15 },
+    "signatureWeapon": {
+      "name": "the Hollow Edge",
+      "reason": "You crouch for the blade — the Hollow Edge, the black mark of the Forgotten Order's enforcers, its steel weeping a faint corruption that fogs the air. But the grip is wrong. It's honed: razored along the inner curve so the handle itself is a second blade, and only one of its edges is meant for the enemy. Take it up untrained and you flay your own palm to the bone. Only a hand that knows the Order's hold — that two-finger grip they teach behind sealed doors — can carry it. You leave it where it fell."
+    },
     "abilityPoint": "Dexterity 6",
     "attack": "Concealed Blade",
     "damage": "2D6",
@@ -2033,7 +2037,10 @@
       "cloak",
       "black cloak",
       "the agent",
-      "monarch agent",
+      "order agent",
+      "forgotten order agent",
+      "order enforcer",
+      "enforcer",
       "spy",
       "assassin"
     ],

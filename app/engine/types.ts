@@ -268,6 +268,13 @@ export interface Enemy {
    *  Absent on non-humanoids (beasts, automata) — they can't be subdued
    *  and carry no kit. */
   carries?: { weapons?: string[]; armor?: string[]; tc?: number };
+  /** OTA-366 — a signature weapon the enemy fights with that CANNOT be
+   *  looted (kill or knockout). `reason` is the flavor line shown when
+   *  the player eyes it on the body and leaves it. Used for the Forgotten
+   *  Order's Black Cloak enforcers, whose Hollow Edge blades are honed
+   *  along the grip so only a trained Order hand can take one up without
+   *  flaying their own palm. Never enters the loot grant. */
+  signatureWeapon?: { name: string; reason: string };
 }
 
 export interface WeatherEntry {

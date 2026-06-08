@@ -13473,6 +13473,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
         .join(', ');
     })();
     get().appendLog('reward', `${enemy.name} defeated. You recover ${lootSummary}.`);
+    // OTA-366 — a signature weapon (the Order's Hollow Edge) can't be taken,
+    // even off a corpse; surface why and leave it.
+    if (enemy.signatureWeapon) {
+      get().appendLog('world', enemy.signatureWeapon.reason);
+    }
 
     // Increment lifetime kill count and check for a milestone bump.
     const prevMs = player.milestones ?? { enemiesDefeated: 0, travelsCompleted: 0, checksSucceeded: 0 };
@@ -13853,6 +13858,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       'reward',
       `You strip the unconscious ${enemy.name} — ${summary || 'nothing of worth'}${tcGained > 0 ? `, +${tcGained} TC` : ''}. The gear's seen better days (worn from the fight).`,
     );
+    // OTA-366 — a signature weapon (the Order's Hollow Edge) is never
+    // lootable; surface the reason and leave it on the body.
+    if (enemy.signatureWeapon) {
+      get().appendLog('world', enemy.signatureWeapon.reason);
+    }
     if (stillFighting) {
       const next = remainingEnemies[nextActiveIdx]!;
       get().appendLog('combat', `${remainingEnemies.length} still standing. ${next.name} now in your sights.`);

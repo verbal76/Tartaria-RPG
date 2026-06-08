@@ -230,6 +230,11 @@ const CODENAMES: Record<string, string> = {
   // OTA-365 — dead-status cleanup: removed 'well_fed' / 'blocking' /
   // 'overwhelmed' / 'helping' (no apply or no consumer); WIRED 'ready' (a live
   // command) to deliver its promised +2 next-attack instead of being inert.
+  // OTA-366 — the Black Cloak Agent reframed as a Forgotten Order enforcer; his
+  // signature Hollow Edge (corrupted, razor-gripped) is NEVER lootable (new
+  // Enemy.signatureWeapon + reason line on kill/knockout); 2 lore concepts seed
+  // the Order's enforcer line as a future antagonist arc.
+  '2026-06-08-366': 'Pine Anvil',
   '2026-06-08-365': 'Fir Anvil',
   '2026-06-08-364': 'Larch Anvil',
   '2026-06-08-363': 'Cedar Anvil',
