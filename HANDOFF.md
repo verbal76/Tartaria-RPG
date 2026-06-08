@@ -29,26 +29,13 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-08) = OTA-347 "Hickory Anvil"** — head of the
->   343→347 batch (the OTA-338 saga fully resolved + a QoL OTA). The batch:
->   343 Birch (crash-save capture / COPY CRASHED SAVE + Settings-hint copy) ·
->   344 Hazel (atomic save writes, hardening #1) · 345 Juniper (boot-resilience
->   guard, #2) · 346 Sycamore (clear-the-slot status-based, #3) · 347 Hickory
->   (Paper-texture ceiling 20%→50%). Plus a test-only verification that the real
->   dog death/abandon WRITE survives a cold reload. Pushed `789eabf..2bd41c6`;
->   `eas-update.yml` publishes to Android + iOS. **338 is closed.**
-> - **STAGED (committed on `HaL2001`, NOT pushed) — next batch, 3 so far:**
->   - **OTA-348 "Walnut Anvil"** — Stealth as a first-class attribute (race-rolled
->     STE: Giant 0 … Reclaimer 1d12); governs stealth/steal checks (off DEX),
->     trains up, and equipped stealth gear (Salvager's Trench Coat) now feeds it.
->   - **OTA-349 "Yew Anvil"** — stealth gear pass: stealth on fitting weapons +
->     light armor; equipment applies weapon/fused stealth; fusion + inferred-stats
->     + tag-backfill all understand stealth.
->   - **OTA-350 "Dogwood Anvil"** — stealth mechanics + Arbiter: 3 titles grant
->     +Stealth; stealth gear used in combat trains STE; the Arbiter suggests
->     stealth in fitting encounters.
->   The full **stealth expansion (348→350)** is staged. Holding toward ≥5 before
->   the user triggers the push (per §P3a).
+> - **LIVE (pushed 2026-06-08) = OTA-350 "Dogwood Anvil"** — head of the
+>   343→347 (338 saga) + 348→350 (stealth expansion) work. The stealth batch:
+>   348 Walnut (Stealth as a 6th attribute, race-rolled) · 349 Yew (stealth gear
+>   pass + fusion/inferred/backfill) · 350 Dogwood (stealth titles + train-via-
+>   gear-in-combat + Arbiter suggestion). Pushed `59fe3ae..a638905`;
+>   `eas-update.yml` publishes to Android + iOS.
+> - **STAGED — none.** Staging list is clear; next change starts the next batch.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /
@@ -178,38 +165,8 @@ checkout, not a special rollback tool.)
 > **user** triggers the push. When the batch ships, move these into §0.B (Closed)
 > and clear this list.
 
-1. **OTA-348 "Walnut Anvil" — Stealth as a first-class attribute.** Player ask:
-   make Stealth a real trait (like STR/WIS), wire the Salvager's Trench Coat to
-   it, and give every starting character a race-proportional Stealth roll.
-   Added `stealth` to `Stats` (6th attribute, shows as **STE**). Starting roll
-   per race: **Giant 0 · Mud Golem 1d4 · Sentinel/Unknowing 1d6 · Aetherborn
-   1d8 · Mud Dweller 1d10 · Reclaimer 1d12** (unknown 1d6). Governs the stealth
-   skill check (APPROACH "use stealth" toggle) + pickpocket + vendor-steal (off
-   DEX), trains via `trainStat`, and equipped stealth gear now feeds it
-   (`STAT_KEYS += stealth`). Legacy saves backfilled with a one-time race roll.
-   Tests: `stealthAttribute` (6). tsc clean.
-
-2. **OTA-349 "Yew Anvil" — stealth gear pass + catalog mechanics.** Brings the
-   Stealth stat into the item economy: stealth `statBonus` on fitting weapons
-   (Bone Shiv (Stealth) +2; Salvaged Bow / Throwing Knife / Tartarian Claw Knife
-   +1) and light armor (4 cloaks + 4 boots, all tagged `stealth`); equipment now
-   applies WEAPON + equipped-FUSED-item stealth; fusion inherits stealth from
-   stealthy inputs (new `UniqueItemStats.statBonus`); the inferred-stats engine
-   grants stealth for shadow/silent/muffled names (weapons/armor/accessories);
-   tag-backfill propagates the new tags to held items. Tests:
-   `stealthGearAndFusion` (7). tsc clean.
-
-3. **OTA-350 "Dogwood Anvil" — stealth mechanics + Arbiter.** Closes the stealth
-   expansion: (1) three titles grant +1 Stealth (Shadow Diver / Wayfarer of the
-   Lost Paths / Etherbound Survivor); (2) using stealth gear in combat (a clean
-   parry/dodge while geared) trains STE — the other two sources (stealth
-   approaches + vendor steals) already trained it since 348; (3) the Arbiter
-   suggests stealth in threatening-but-survivable encounters when the player has
-   STE/gear, nudging APPROACH → "use stealth" (throttled). Tests: `stealthTitles`
-   (5). tsc clean.
-
-*(3 OTAs staged toward the next batch. ≥5 before the next push, per §P3a — unless
-the user overrides or a forced build ships it early.)*
+**Empty** — the 348→350 stealth expansion shipped 2026-06-08 (see §0.B). The
+next change starts a fresh batch (≥5 before the next push).
 
 ### 0.A — Open Issues
 
@@ -528,6 +485,21 @@ the user overrides or a forced build ships it early.)*
 - **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Dogwood Anvil (`2026-06-08-350`) — stealth mechanics + Arbiter (stealth expansion 3/3)
+- **What:** stealth needed to be *used* by the game, not just exist — title bonuses, a third training source, and Arbiter awareness.
+- **How:** (1) three titles grant +1 STE — Shadow Diver (existing), Wayfarer of the Lost Paths, Etherbound Survivor — via `titleSkillBonus`. (2) A clean parry/dodge while wearing equipped stealth gear trains STE (gated on equipped stealth > 0); stealth approaches + vendor steals already trained it (348). (3) The Arbiter suggests stealth in a threatening-but-survivable encounter when the player has STE (≥4) or stealth gear — nudging APPROACH → "use stealth" — sitting in the `else` of the flee-suggestion and throttled (`STEALTH_HINT_MIN_MS` 120s). `titles.ts`, `state/gameStore.ts`; `__tests__/stealthTitles.test.ts` (5).
+- **Why:** makes the stat matter at the table — gear/titles pay off, the skill grows three ways, and the AI surfaces the option.
+
+#### Yew Anvil (`2026-06-08-349`) — stealth gear pass + catalog mechanics (stealth expansion 2/3)
+- **What:** put stealth onto realistically-appropriate gear and teach the item systems about it.
+- **How:** stealth `statBonus` on fitting weapons (Bone Shiv (Stealth) +2; Salvaged Bow / Throwing Knife / Tartarian Claw Knife +1) and light armor (4 cloaks + 4 boots), all tagged `stealth` (no plate/greaves/mauls). `aggregateEquippedStatBonuses` now reads WEAPON slots + equipped FUSED items (new `UniqueItemStats.statBonus`). Fusion inherits stealth from stealthy inputs (deterministic off the tag profile + optional Qwen `stealthBonus`). New `inferStealthBonus` grants stealth for shadow/silent/muffled/veil/etc. names across weapons/armor/accessories. The existing catalog tag-merge backfills the new `stealth` tags onto held items. `weapons.json`, `armor.json`, `equipment.ts`, `itemFusion.ts`, `itemDefaults.ts`, `types.ts`; `__tests__/stealthGearAndFusion.test.ts` (7).
+- **Why:** stealth has to be acquirable + craftable + inferable, or the stat has nowhere to come from in play.
+
+#### Walnut Anvil (`2026-06-08-348`) — Stealth as a first-class attribute (stealth expansion 1/3)
+- **What:** player ask — make Stealth a real trait like STR/WIS, wire the Salvager's Trench Coat to it, and give every starting character a race-proportional Stealth roll.
+- **How:** added `stealth` to `Stats` (6th attribute, shows as **STE**). Starting value is a race roll (`rollRaceStealth`): Giant **0**, Mud Golem **1d4**, Sentinel/Unknowing **1d6**, Aetherborn **1d8**, Mud Dweller **1d10**, Reclaimer **1d12** (unknown 1d6) — not the uniform 1d10. Governs the stealth skill check (the APPROACH "use stealth" toggle), pickpocket, and vendor-steal (all moved off DEX); trains via `trainStat`; equipped stealth gear feeds it (`STAT_KEYS += stealth`). Extended `effectiveStats`/breakdown, corruption penalty, `RacialStatBonuses`, `statTraining`, `CharacterScreen`. Legacy saves backfilled with a one-time race roll. `types.ts`, `character.ts`, `equipment.ts`, `combatRules.ts`, `corruption.ts`, `raceMechanics.ts`, `statTraining.ts`, `state/gameStore.ts`, `screens/CharacterScreen.tsx`; `__tests__/stealthAttribute.test.ts` (6).
+- **Why:** stealth was a flavor string the engine dropped (the Trench Coat's "+1 stealth" did nothing); now it's a real attribute that the toggle, gear, and titles all feed.
 
 #### Hickory Anvil (`2026-06-08-347`) — Display "Paper texture" ceiling 20% → 50%
 - **What:** player asked to raise the top end of the Paper-texture slider (Settings → DISPLAY).
