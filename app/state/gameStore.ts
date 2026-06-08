@@ -5459,9 +5459,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // rephrasing of the same player input, and we don't want to tick
     // statuses twice for one action. The first pass already ran the
     // tick; the second pass jumps straight to the parser.
+    // OTA-358 — a "round" is one player action. Combat-only tactical buffs/
+    // stances (stealthed, shielded, aiming, dodging, …) only tick while enemies
+    // are present, so they don't evaporate when you investigate / salvage / walk
+    // between fights. DOT + timed buffs + afflictions still tick every action.
+    const inCombat = (get().currentScene?.enemies?.length ?? 0) > 0;
     const tick = _opts?.skipPreChecks
       ? { effects: player.statusEffects ?? [], dotDamage: 0, expired: [] as ReturnType<typeof tickEffects>['expired'] }
-      : tickEffects(player.statusEffects ?? []);
+      : tickEffects(player.statusEffects ?? [], { inCombat });
     if (!_opts?.skipPreChecks && (player.statusEffects?.length ?? 0) > 0) {
       const incapacitated = isIncapacitated(player.statusEffects);
       const newHp = Math.max(0, player.hp - tick.dotDamage);

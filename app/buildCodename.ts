@@ -203,6 +203,9 @@ const CODENAMES: Record<string, string> = {
   // refuses instead of dealing fall damage; mid-climb shortfall still falls.
   // OTA-357 — status-duration display honesty: "rounds"→"turns"; Tired/
   // Exhausted show "until you rest" (stamina-gated, no real countdown).
+  // OTA-358 — combat-only status ticking: tactical buffs/stances only tick
+  // when enemies are present (don't evaporate during exploration).
+  '2026-06-08-358': 'Persimmon Anvil',
   '2026-06-08-357': 'Tupelo Anvil',
   '2026-06-08-356': 'Sequoia Anvil',
   '2026-06-08-355': 'Buckeye Anvil',

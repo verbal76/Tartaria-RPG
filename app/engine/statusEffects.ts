@@ -123,15 +123,43 @@ export function applyEffect(
  * Tick all effects down one round. Returns the new effects array
  * (filtered to those still active) and the total bleed-style DOT to
  * apply to the player's HP this round.
+ *
+ * OTA-358 — a "round" is one player action (tickEffects runs per
+ * submitPlayerAction). Two refinements so tactical buffs don't evaporate
+ * during exploration and stamina states don't fake a countdown:
+ *   - COMBAT-ONLY statuses (stances / next-strike buffs) only tick when
+ *     `opts.inCombat` — they hold otherwise, so a shielded/aiming/stealthed
+ *     buff survives the walk between fights instead of decaying on investigate
+ *     / salvage / travel.
+ *   - STAMINA-GATED statuses (tired / exhausted) NEVER tick here; they're
+ *     owned by tickPlayerStaminaStatuses (added/cleared from current stamina).
+ *   - DOT (bleed / poison) and timed buffs (food_buff / well_fed) and
+ *     afflictions (stun / paralyzed / etc.) tick every action as before.
+ * Default `inCombat: true` preserves prior behavior for any caller that
+ * doesn't pass it.
  */
+const COMBAT_ONLY_STATUSES: ReadonlySet<StatusEffectKind> = new Set([
+  'dodging', 'blocking', 'aiming', 'sprinting', 'in_cover', 'in_cover_full',
+  'ready', 'helping', 'overwhelmed', 'surprised', 'fighting_back', 'quick_fire',
+  'stealthed', 'shielded', 'shaped_stone_ward', 'power_attack_pending',
+  'defensive_stance', 'distracted',
+]);
+const STAMINA_GATED_STATUSES: ReadonlySet<StatusEffectKind> = new Set(['tired', 'exhausted']);
+
 export function tickEffects(
   current: readonly StatusEffect[],
+  opts?: { inCombat?: boolean },
 ): { effects: StatusEffect[]; dotDamage: number; expired: StatusEffect[] } {
+  const inCombat = opts?.inCombat ?? true;
   const next: StatusEffect[] = [];
   const expired: StatusEffect[] = [];
   let dot = 0;
   for (const eff of current) {
-    if (eff.perRoundDamage) dot += eff.perRoundDamage;
+    if (eff.perRoundDamage) dot += eff.perRoundDamage; // DOT always applies
+    // Stamina-gated: never decremented here (stamina sync owns them).
+    if (STAMINA_GATED_STATUSES.has(eff.kind)) { next.push(eff); continue; }
+    // Combat-only tactical buffs/stances: hold (don't tick) outside combat.
+    if (COMBAT_ONLY_STATUSES.has(eff.kind) && !inCombat) { next.push(eff); continue; }
     const nextRounds = eff.remainingRounds - 1;
     if (nextRounds > 0) {
       next.push({ ...eff, remainingRounds: nextRounds });

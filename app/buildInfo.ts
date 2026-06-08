@@ -12773,4 +12773,14 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // / Exhausted are stamina-gated (cleared the moment you recover), so the Character
 // screen shows "until you rest" instead of a meaningless 99-seeded countdown.
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-357';
+// OTA-358 (Persimmon Anvil) — combat-only status ticking. A "round" is one
+// player action (tickEffects runs per submitPlayerAction), so tactical combat
+// buffs/stances (stealthed, shielded, aiming, dodging, in_cover, surprised,
+// power_attack_pending, defensive_stance, …) used to decay while you investigate
+// / salvage / travel BETWEEN fights. Now those COMBAT-ONLY statuses only tick
+// when enemies are present; DOT (bleed/poison), timed buffs (food_buff/well_fed),
+// and afflictions (stun/paralyzed) still tick every action; stamina-gated
+// (tired/exhausted) never tick here (stamina sync owns them). Fixes "rounds were
+// a tabletop combat concept that doesn't fit": durations now spend only on
+// combat turns. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-358';
