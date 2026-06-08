@@ -240,6 +240,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-368 — save durability: 90s + on-background autosave; persist() refuses
   // to overwrite a slot with a player missing core identity; backfillPlayer (the
   // save-upgrade step) wrapped to never throw out of a load.
+  // OTA-369 — big-jump-tolerant OTA download: bundle fetch budget 60s → 240s
+  // (new fetchTimeoutMs opt) + auto-retry up to 3× that RESUMES via EAS's asset
+  // cache, so a device far behind catches up instead of timing out / "failing".
+  '2026-06-08-369': 'Catalpa Anvil',
   '2026-06-08-368': 'Locust Anvil',
   '2026-06-08-367': 'Oak Anvil',
   '2026-06-08-366': 'Pine Anvil',

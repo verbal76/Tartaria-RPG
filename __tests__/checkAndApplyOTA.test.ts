@@ -148,3 +148,42 @@ describe('OTA-367 — boot-front auto-apply (skipTeardown / checkTimeoutMs)', ()
     expect(mockReloadAsync).not.toHaveBeenCalled();
   });
 });
+
+describe('OTA-369 — big-jump tolerant fetch (resume-retry)', () => {
+  beforeEach(() => {
+    mockCheckForUpdateAsync.mockReset();
+    mockFetchUpdateAsync.mockReset();
+    mockReloadAsync.mockReset();
+    mockCheckForUpdateAsync.mockResolvedValue({ isAvailable: true });
+    mockReloadAsync.mockResolvedValue(undefined);
+  });
+
+  it('a transient download failure is retried (resume) and then applies', async () => {
+    mockFetchUpdateAsync
+      .mockRejectedValueOnce(new Error('network blip mid-download'))
+      .mockResolvedValueOnce(undefined);
+    const result = await checkAndApplyOTA({ silent: true, skipTeardown: true });
+    expect(mockFetchUpdateAsync).toHaveBeenCalledTimes(2); // first failed, second resumed
+    expect(mockReloadAsync).toHaveBeenCalledTimes(1);
+    expect(result).toBe('applied');
+  }, 15000);
+
+  it('ERR_UPDATES_FETCH (nothing newer) is NOT retried — resolves cleanly as noUpdate', async () => {
+    mockFetchUpdateAsync.mockRejectedValue(
+      Object.assign(new Error('Failed to download new update'), { code: 'ERR_UPDATES_FETCH' }),
+    );
+    const result = await checkAndApplyOTA({ silent: true, skipTeardown: true });
+    expect(mockFetchUpdateAsync).toHaveBeenCalledTimes(1); // no retry on "nothing newer"
+    expect(mockReloadAsync).not.toHaveBeenCalled();
+    expect(result).toBe('noUpdate');
+  });
+
+  it('a persistent transient failure across all attempts surfaces as errored', async () => {
+    mockFetchUpdateAsync.mockRejectedValue(new Error('network down'));
+    const onError = jest.fn();
+    const result = await checkAndApplyOTA({ silent: true, skipTeardown: true, onError });
+    expect(mockFetchUpdateAsync).toHaveBeenCalledTimes(3); // exhausts the 3 attempts
+    expect(mockReloadAsync).not.toHaveBeenCalled();
+    expect(result).toBe('errored');
+  }, 20000);
+});

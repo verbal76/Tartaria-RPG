@@ -70,6 +70,14 @@ export interface CheckAndApplyOptions {
    *  launch never stalls boot for long before falling through to load
    *  the game on the current bundle. */
   checkTimeoutMs?: number;
+  /** OTA-369 — override the bundle-download timeout (default 240s, up
+   *  from the old 60s). A device that's many OTAs behind ("a big jump")
+   *  is missing every ASSET added in between — audio tracks, faction
+   *  art, the world atlas — which is tens of MB; 60s wasn't enough on
+   *  iPad WiFi and the download timed out. The fetch also auto-retries
+   *  (EAS caches partial downloads, so each retry resumes), so a big
+   *  jump completes instead of failing. */
+  fetchTimeoutMs?: number;
   /** OTA-367 — skip the native-resource teardown before reloadAsync.
    *  Used by the boot-FRONT auto-apply, which runs BEFORE the mind
    *  (Qwen) and voice (Kokoro/Piper) and audio modules have started —
@@ -92,7 +100,7 @@ export interface CheckAndApplyOptions {
 export type CheckAndApplyResult = 'applied' | 'pending' | 'noUpdate' | 'skipped' | 'errored';
 
 export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise<CheckAndApplyResult> {
-  const { onStatus, onError, silent = false, fetchOnly = false, skipFetch = false, checkTimeoutMs = 10_000, skipTeardown = false } = opts;
+  const { onStatus, onError, silent = false, fetchOnly = false, skipFetch = false, checkTimeoutMs = 10_000, skipTeardown = false, fetchTimeoutMs = 240_000 } = opts;
   try {
     if (!Updates.isEnabled) {
       if (!silent) onStatus?.('Disabled (dev build / Expo Go)');
@@ -124,12 +132,36 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
         onStatus?.('Already up to date');
         return 'noUpdate';
       }
-      onStatus?.('Downloading update…');
-      await withTimeout(
-        Updates.fetchUpdateAsync(),
-        60_000,
-        'download',
-      );
+      // OTA-369 — big-jump-tolerant download. A device many OTAs behind
+      // must pull every ASSET added since (tens of MB), so the budget is
+      // 240s (was 60s) AND the fetch auto-retries. EAS caches each
+      // partially-downloaded asset on disk, so every retry RESUMES —
+      // re-fetching only what's still missing. This automates the
+      // "tap apply again until it catches up" a far-behind device needed.
+      onStatus?.('Downloading update… (a large update can take a minute)');
+      const FETCH_ATTEMPTS = 3;
+      let downloaded = false;
+      let lastFetchErr: unknown = null;
+      for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt++) {
+        try {
+          await withTimeout(Updates.fetchUpdateAsync(), fetchTimeoutMs, 'download');
+          downloaded = true;
+          break;
+        } catch (e) {
+          lastFetchErr = e;
+          const m = e instanceof Error ? e.message : String(e);
+          // ERR_UPDATES_FETCH = "the server has nothing newer to fetch" —
+          // not a transient failure; let it bubble to the catch below,
+          // which resolves it cleanly as 'noUpdate'.
+          if (/ERR_UPDATES_FETCH|Failed to download new update/i.test(m)) throw e;
+          if (attempt < FETCH_ATTEMPTS) {
+            onStatus?.(`Download interrupted — resuming (attempt ${attempt + 1}/${FETCH_ATTEMPTS})…`);
+            // Brief backoff; the next attempt picks up the cached assets.
+            await new Promise((r) => setTimeout(r, 3000));
+          }
+        }
+      }
+      if (!downloaded) throw lastFetchErr ?? new Error('OTA download did not complete');
       // fetchOnly path — silent boot check. Don't reload mid-boot;
       // native modules are still initialising and reloadAsync at
       // this point reliably crashes the process to home screen.

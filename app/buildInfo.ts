@@ -12918,4 +12918,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // failing to .bak / a slot-load error (and the integrity guard keeps a degraded
 // record from being written back). __tests__/persistIntegrityGuard.test.ts (2).
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-368';
+// OTA-369 (Catalpa Anvil) — big-jump-tolerant OTA download. A device many OTAs
+// behind ("a big jump") must pull every ASSET added in between (audio 5–8 MB
+// each, faction art ~3.4 MB, the world atlas — tens of MB), and the old 60s
+// fetch timeout wasn't enough on iPad WiFi: the download timed out and "kept
+// failing" (each manual retry only partly caught up via EAS's asset cache until
+// one finally fit in 60s). Now checkAndApplyOTA gives the bundle download a 240s
+// budget (new `fetchTimeoutMs` opt, default 240s) AND auto-retries up to 3 times
+// — EAS caches partial downloads, so each retry RESUMES (re-fetches only what's
+// missing), automating the "tap apply again until it catches up" by hand. A
+// real "nothing newer" (ERR_UPDATES_FETCH) is not retried (resolves clean as
+// noUpdate); a persistent network failure across all attempts surfaces as
+// errored and boot falls through to load on the current bundle.
+// __tests__/checkAndApplyOTA.test.ts (+3). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-369';

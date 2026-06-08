@@ -56,7 +56,13 @@
 >     non-lootable **Hollow Edge** (`Enemy.signatureWeapon`); 2 lore concepts seed
 >     the Order as a future antagonist arc.
 >   Full per-OTA detail in `docs/build-codenames.md`.
-> - **STAGED — none.** Staging list clear; next change starts a fresh batch.
+> - **STAGED (committed on `HaL2001`, NOT yet pushed):**
+>   - **OTA-369 "Catalpa Anvil"** — big-jump-tolerant OTA download. A device far
+>     behind must pull every asset added since (tens of MB); the old 60s fetch
+>     timeout failed on iPad WiFi. Now the download budget is **240s** + **auto-
+>     retry up to 3×** that resumes via EAS's asset cache (new `fetchTimeoutMs`
+>     opt). Pairs with 367 so a far-behind iOS device catches up on next launch.
+>   (Batch building toward ≥5; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /
