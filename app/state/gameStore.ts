@@ -5556,7 +5556,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (crossLine) get().appendLog('reward', crossLine);
       }
       if (!recentlyShown) {
-        get().appendLog('world', wtick.line);
+        // OTA-355 — surface the actual HP bite. Lines like "a silent bolt
+        // singes your sleeve" read as a near-miss, but these ticks do real
+        // damage (aether_lightning 1-3, etc.) — show it so the hazard isn't a
+        // phantom the player keeps seeing with no apparent consequence.
+        const dmgTag = effHpDelta < 0 ? ` (−${-effHpDelta} HP)` : '';
+        get().appendLog('world', `${wtick.line}${dmgTag}`);
       }
       if (!weatherKilled) {
         checkLowHpWarning(prevHpWeather, Math.max(0, prevHpWeather + wtick.hpDelta), hpMaxWeather, get, set);

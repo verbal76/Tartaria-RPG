@@ -167,7 +167,7 @@ checkout, not a special rollback tool.)
 
 > **This batch = the log-review pass** (from a Pixel 10 Pro XL bug report +
 > two COPY LOG exports): native-crash guard, debug instrumentation to verify
-> game flow, and a few concrete fixes.
+> game flow, and a few concrete fixes. **5/5 — push-ready, awaiting the user.**
 
 1. **OTA-351 "Magnolia Anvil" — Qwen completion-crash guard.** The SVE-on-Tensor-G5
    crash (Pixel 10 Pro XL): `librnllama_…_sve.so` SIGSEGVs during token generation
@@ -195,7 +195,31 @@ checkout, not a special rollback tool.)
    (reconstruct a fall-death), and a persist-FAILURE line (surfaces
    `getLastSaveWriteError`, confirms the atomic save lands on-device). tsc clean.
 
+5. **OTA-355 "Buckeye Anvil" — weather-hazard visibility.** Weather ticks that bite
+   (aether lightning's "silent bolt", etc.) read as near-misses but do real 1–N HP
+   damage; the world line now appends `(−N HP)` so the hazard isn't a phantom.
+   Tests: `weatherHazardBite` (2). tsc clean.
+
+*(5 OTAs staged — the log-review batch is **push-ready (≥5)**, awaiting the user's
+push command per §P3a.)*
+
 ### 0.A — Open Issues
+
+- **0-stamina climb-fall — design call (from the log review).** A live log showed a
+  Mud Golem grind stamina to 0 climbing repeatedly, then a `stamina 0 < cost → YOU
+  FALL` do ~5 dmg and kill at low HP. This is a **deliberate, tested mechanic**
+  (OTA 23-007; `climbRopeMechanics` asserts the fall), so OTA-355 **did not change
+  it** — a tier-1 ground-level "refuse instead of fall" tweak broke those tests, and
+  it's the user's design call whether a 0-stamina attempt should fall or refuse. The
+  new `vitals@fall` debug (OTA-354) makes any such death reconstructable. **Decision
+  needed:** keep the fall as-is, or make a ground-level (tier 1, nothing cleared)
+  empty-stamina attempt a refusal (and update the OTA 23-007 tests).
+- **Weapon-swap-during-combat turn cost (from the log review) — needs a probe.** A
+  live log showed 8+ main-hand weapon swaps in ~30s mid-fight while the enemy kept
+  attacking. Unclear whether each combat-time `equipItem` silently consumes the
+  player's turn (giving the enemy free hits). Not yet instrumented — add a
+  `[debug] equip: mid-combat swap → turn consumed? enemy free-attack?` probe to a
+  future OTA, then decide if it needs a fix.
 
 - **Dog-mortality death/abandon WRITE — verified by automated cold-boot regression
   (was: verify on a live save). Effectively closed; live-device confirm optional.**

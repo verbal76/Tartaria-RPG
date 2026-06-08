@@ -12751,4 +12751,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // reconstructable from the log. (3) persist FAILURE line (failure-only, since
 // persist fires every action) surfacing getLastSaveWriteError so a log review
 // can confirm the OTA-344 atomic save is landing on-device. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-354';
+// OTA-355 (Buckeye Anvil) — weather-hazard visibility. The "a silent bolt
+// singes your sleeve" (aether_lightning) and similar weather ticks read as
+// near-misses but do real 1-N HP damage; the world line now appends "(−N HP)"
+// when the tick bites, so the hazard isn't a phantom the player keeps seeing
+// with no apparent consequence. (The 0-stamina climb-fall the log showed is a
+// deliberate, tested mechanic — OTA 23-007 — left as a design call in §0.A, not
+// changed; vitals@fall (OTA-354) makes such deaths diagnosable.) JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-355';
