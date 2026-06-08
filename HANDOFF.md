@@ -215,20 +215,30 @@ checkout, not a special rollback tool.)
    fires. `app/state/gameStore.ts`; tests `puppyVendorEdges` (+4). tsc clean.
    Closes defense #3 — **the 338-hardening trio is complete.**
 
-*(4 OTAs staged toward the batch. 1 more before this batch is push-ready (≥5),
-unless the user overrides or a forced build ships it early.)*
+**+ Verification (test-only, no OTA number — rides with the batch):**
+`__tests__/dogDeathWriteSurvivesReload.test.ts` drives the REAL dog bleed-out
+death + loyalty-abandon write through the live atomic `persist()` and cold-reload
+— closing the last 338 thread (the "death/abandon WRITE — verify on a live save"
+Open issue). No `app/` change, so it ships nothing on its own.
+
+*(4 numbered OTAs staged + the verification test. 1 more shippable OTA reaches the
+≥5 threshold, unless the user overrides or a forced build ships it early.)*
 
 ### 0.A — Open Issues
 
-- **Dog-mortality death/abandon WRITE — verify on a live save (MEDIUM).** The dog
-  feature shipped clean (OTA-340) — it boots fine on a fresh save, and the
-  `dogSaveBrickRepro` test loads all 6 post-death states cleanly through the real
-  cold-boot path. The one path not yet exercised on a *real* device save: the
-  feature's new persisted state only writes when the dog **actually dies (bleed-out)
-  or abandons (loyalty 0)**. Once a dog death survives a cold restart in live play,
-  the feature is fully cleared. If it ever bricks, **COPY SAVE** (About → Session,
-  OTA-341) captures the exact state for instant repro. Low urgency — no evidence it
-  breaks; this is the last unchecked box from the 338 saga.
+- **Dog-mortality death/abandon WRITE — verified by automated cold-boot regression
+  (was: verify on a live save). Effectively closed; live-device confirm optional.**
+  The dog feature shipped clean (OTA-340); `dogSaveBrickRepro` loads all 6 *planted*
+  post-death states through the real cold-boot path. The one path that wasn't
+  exercised was the **real write** — the actual `tickDogStatus` death/abandon
+  transition persisted through the live (now atomic, OTA-344) `persist()` and then
+  reloaded. `__tests__/dogDeathWriteSurvivesReload.test.ts` now drives that
+  end-to-end for BOTH a real bleed-out death and a real loyalty-0 abandon: the write
+  hits disk with the right status and `loadSlotIntoGame` cold-reloads it clean (no
+  throw, player present, status preserved). Combined with the atomic-save +
+  boot-resilience hardening, the death-WRITE brick risk is closed. A courtesy
+  live-device confirm is still nice-to-have but low-urgency. If it ever bricks,
+  **COPY SAVE** / **COPY CRASHED SAVE** capture the exact state for instant repro.
 
 - **Hardening from the OTA-338 incident — ALL THREE DONE (OTA-344/345/346, STAGED).**
   338's ~90% boot-crash was a **corrupted save**, almost certainly an *interrupted
