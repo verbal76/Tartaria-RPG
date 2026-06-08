@@ -29,9 +29,18 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-08) = OTA-366 "Pine Anvil"** — the weapons batch
->   (360→366), pushed through `7ab730c`; `eas-update.yml` publishes to Android +
->   iOS. Seven OTAs:
+> - **LIVE (pushed 2026-06-08) = OTA-368 "Locust Anvil"** — boot/save-durability
+>   pair (367→368), pushed through `a11d215`; `eas-update.yml` publishes to
+>   Android + iOS.
+>   - **367 Oak** — OTA updates apply AUTOMATICALLY at the FRONT of boot (before
+>     mind/voice). Fixes the manual-tap requirement AND the mid-load reload race
+>     that crashed to home + could persist `player=null` over the slot.
+>   - **368 Locust** — save durability: 90s + on-background autosave; `persist()`
+>     refuses to overwrite a slot with a player missing core identity;
+>     `backfillPlayer` (the on-load save-upgrade step) wrapped to never throw.
+>     Closes the save-corruption-across-OTA vectors with 367.
+> - **PRIOR LIVE = OTA-366 "Pine Anvil"** — the weapons batch (360→366), pushed
+>   through `7ab730c`. Seven OTAs:
 >   - **360 Chestnut** — weapon coatings phase 1 (data + apply + inventory UI).
 >   - **361 Aspen** — knockout + loot humanoids (non-lethal blow > ½ max HP, KO'd
 >     enemy is out of the fight, combat "loot" button strips their damaged kit).
@@ -47,20 +56,7 @@
 >     non-lootable **Hollow Edge** (`Enemy.signatureWeapon`); 2 lore concepts seed
 >     the Order as a future antagonist arc.
 >   Full per-OTA detail in `docs/build-codenames.md`.
-> - **STAGED (committed on `HaL2001`, NOT yet pushed):**
->   - **OTA-367 "Oak Anvil"** — OTA updates apply AUTOMATICALLY at the front of
->     boot (before mind/voice). Fixes: (a) updates needed a manual tap; (b)
->     applying mid-load crashed to home + could corrupt the save (the
->     `player=null`-over-slot vector). `App.tsx` awaits `checkAndApplyOTA({
->     skipTeardown, checkTimeoutMs: 5000 })` before any model boots; removed the
->     mid-load banner path.
->   - **OTA-368 "Locust Anvil"** — save durability. (a) Periodic autosave (90s +
->     on-background); (b) `persist()` refuses to overwrite a slot with a player
->     missing core identity (name/raceId/stats); (c) `backfillPlayer` — the
->     save-upgrade step (scans + upgrades an old save to current spec on every
->     load) — wrapped to never throw out of a load. Closes the
->     save-corruption-across-OTA vectors with 367.
->   (Batch building toward ≥5; the **user** triggers the push.)
+> - **STAGED — none.** Staging list clear; next change starts a fresh batch.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /
