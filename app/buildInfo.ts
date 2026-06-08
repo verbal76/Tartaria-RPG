@@ -12903,4 +12903,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // check + the mid-load banner-apply path (the AboutScreen manual button remains
 // for a deliberate mid-session apply). __tests__/checkAndApplyOTA.test.ts (+3,
 // fixed 1 stale). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-367';
+// OTA-368 (Locust Anvil) — save durability: autosave + integrity guard + a
+// never-throw save-upgrade step. THREE parts: (1) PERIODIC AUTOSAVE — App.tsx
+// flushes progress every 90s AND the moment the app backgrounds (the most common
+// silent session-end), so an idle player who hits a crash/rollback loses ≤90s.
+// (2) persist() INTEGRITY GUARD — beyond the existing player=null guard, persist
+// now refuses to overwrite a slot when the in-memory player is missing its core
+// identity (name / raceId / stats) — a half-built or corrupt record can no longer
+// blow out a good save on disk. (3) backfillPlayer (THE save-upgrade step that
+// scans a loaded save and brings it up to the current spec — staminaMax formula,
+// multi-slot equipped, item durability/kind/tags, map recalibration, dog/travel
+// fields, …, run on every load) is now WRAPPED so it can NEVER throw out of a
+// load: a malformed legacy save degrades to the raw saved player instead of
+// failing to .bak / a slot-load error (and the integrity guard keeps a degraded
+// record from being written back). __tests__/persistIntegrityGuard.test.ts (2).
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-368';

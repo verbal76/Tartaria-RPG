@@ -53,7 +53,13 @@
 >     applying mid-load crashed to home + could corrupt the save (the
 >     `player=null`-over-slot vector). `App.tsx` awaits `checkAndApplyOTA({
 >     skipTeardown, checkTimeoutMs: 5000 })` before any model boots; removed the
->     mid-load banner path. (More queued: periodic autosave + backfill guard.)
+>     mid-load banner path.
+>   - **OTA-368 "Locust Anvil"** — save durability. (a) Periodic autosave (90s +
+>     on-background); (b) `persist()` refuses to overwrite a slot with a player
+>     missing core identity (name/raceId/stats); (c) `backfillPlayer` — the
+>     save-upgrade step (scans + upgrades an old save to current spec on every
+>     load) — wrapped to never throw out of a load. Closes the
+>     save-corruption-across-OTA vectors with 367.
 >   (Batch building toward ≥5; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.

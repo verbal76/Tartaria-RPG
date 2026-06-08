@@ -1109,7 +1109,28 @@ function acceptKeyword(title: string): string {
   return (tokens[0] ?? title).toLowerCase();
 }
 
+// OTA-368 — THE SAVE-UPGRADE STEP. Scans a loaded save and brings it up
+// to the current game's spec: fills new fields with defaults and migrates
+// renamed / reshaped ones (staminaMax formula, single→multi-slot equipped,
+// per-item durability / kind / tags, fused-item name repair, world-map
+// recalibration, dog + travel-target fields, …). Runs on EVERY load
+// (loadSlotIntoGame + resurrectSlot), so an old save plays under the new
+// rules without the player doing anything. The public wrapper below makes
+// it NEVER throw out of a load: a genuinely malformed legacy save degrades
+// to the raw saved player (which still loads — and the persist integrity
+// guard then refuses to write it back if it's missing core identity)
+// instead of failing the load to .bak / a slot-load error.
 function backfillPlayer(p: PlayerCharacter): PlayerCharacter {
+  try {
+    return backfillPlayerInner(p);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn('backfillPlayer: save-upgrade migration threw; loading the raw saved player (degraded-safe)', e);
+    return p;
+  }
+}
+
+function backfillPlayerInner(p: PlayerCharacter): PlayerCharacter {
   // 2026-05-24 — staminaMax formula bumped from `8 + floor(STR/2)` to
   // `12 + floor(STR/2)` so the new Tired status (< 25% max) triggers at
   // a realistic count instead of after 3 actions. Existing saves with a
@@ -19089,6 +19110,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // cleared. Writing player=null silently here was a major source of
     // "save file is missing the character record" errors across updates.
     if (!player) return;
+    // OTA-368 — structural integrity guard. Beyond player=null, refuse to
+    // overwrite a slot when the in-memory player is missing its core
+    // identity (name / raceId / stats) — a sign of a half-constructed or
+    // corrupt record (mid-migration, a backfill that produced a stub,
+    // etc.). Writing such a record would blow out a good save on disk;
+    // skipping leaves the last-good save intact. A real character always
+    // has all three.
+    if (!player.name || !player.raceId || !player.stats) {
+      get().appendLog(
+        'debug',
+        `persist: skipped — player record missing core identity (name=${player.name ? '✓' : '∅'}, raceId=${player.raceId ? '✓' : '∅'}, stats=${player.stats ? '✓' : '∅'}); slot ${activeSlotId} left intact`,
+      );
+      return;
+    }
     // 2026-05-25 OTA-046 — stamp the player's lastSessionEndedAt at
     // every persist so a slot-load round trip can compute "real-time
     // since last play" for the while-you-were-away beat. persist

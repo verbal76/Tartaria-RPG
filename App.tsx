@@ -395,6 +395,12 @@ export default function App() {
   useEffect(() => {
     const onChange = (status: AppStateStatus) => {
       if (status === 'background' || status === 'inactive') {
+        // OTA-368 — flush progress the moment the app leaves the
+        // foreground. Backgrounding is the most common way a session
+        // ends (the OS may reclaim the process without another tick), so
+        // this is the single highest-value autosave point. persist()
+        // self-guards on no-slot / no-player / invalid record.
+        void useGameStore.getState().persist();
         void shutdownCognitive();
         void shutdownQwen();
       } else if (status === 'active') {
@@ -414,6 +420,21 @@ export default function App() {
     const sub = AppState.addEventListener('change', onChange);
     return () => sub.remove();
   }, [shutdownCognitive, resumeCognitive, shutdownQwen]);
+
+  // OTA-368 — periodic autosave. persist() fires on every meaningful
+  // action, but a player who sits idle (reading, thinking) between
+  // actions has no recent write; if a rollback or crash happens then,
+  // the gap is whatever they last did. A gentle 90s timer bounds that
+  // loss to ~90s of idle. The write is atomic + cheap, and persist()
+  // self-guards (no slot / no player / invalid record → no-op), so the
+  // timer can fire unconditionally even on the title screen.
+  useEffect(() => {
+    const AUTOSAVE_MS = 90_000;
+    const timer = setInterval(() => {
+      void useGameStore.getState().persist();
+    }, AUTOSAVE_MS);
+    return () => clearInterval(timer);
+  }, []);
 
   if (!hydrated) {
     return (

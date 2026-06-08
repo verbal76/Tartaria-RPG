@@ -237,6 +237,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-367 — OTA updates apply AUTOMATICALLY at the front of boot (before
   // mind/voice), replacing the tap-to-apply banner whose mid-load reload crashed
   // to home and could corrupt the save. New skipTeardown / checkTimeoutMs opts.
+  // OTA-368 — save durability: 90s + on-background autosave; persist() refuses
+  // to overwrite a slot with a player missing core identity; backfillPlayer (the
+  // save-upgrade step) wrapped to never throw out of a load.
+  '2026-06-08-368': 'Locust Anvil',
   '2026-06-08-367': 'Oak Anvil',
   '2026-06-08-366': 'Pine Anvil',
   '2026-06-08-365': 'Fir Anvil',
