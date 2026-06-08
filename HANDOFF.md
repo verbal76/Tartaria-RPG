@@ -29,12 +29,10 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-08) = OTA-356 "Sequoia Anvil"** — head of the
->   log-review batch (351→356): 351 Qwen completion-crash guard · 352 Tier-1
->   verification logging · 353 three fixes (fusion-comp strip / honest titles /
->   empty name) · 354 Tier-2 flow logging · 355 weather-hazard visibility · 356
->   no-ground-no-fall climb. Pushed `1efd550..104d30b`; `eas-update.yml` publishes
->   to Android + iOS.
+> - **LIVE (pushed 2026-06-08) = OTA-358 "Persimmon Anvil"** — status batch:
+>   357 Tupelo (rounds→turns + "until you rest" for tired/exhausted) · 358
+>   Persimmon (combat-only status ticking — tactical buffs hold between fights).
+>   Pushed `a2ebd2c..c06c77b`; `eas-update.yml` publishes to Android + iOS.
 > - **STAGED — none.** Staging list clear; next change starts a fresh batch.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
@@ -165,12 +163,8 @@ checkout, not a special rollback tool.)
 > **user** triggers the push. When the batch ships, move these into §0.B (Closed)
 > and clear this list.
 
-1. **OTA-357 "Tupelo Anvil" — status-duration display honesty.** (A) "rounds" →
-   "turns" on the status counter + action-card / crafting / DOT lines (a duration
-   is your next N actions, not a tabletop combat round). (B) Tired/Exhausted show
-   "until you rest" instead of the meaningless 99-seeded countdown (answers the
-   player's "tired 96r"). `CharacterScreen` + `ActionReferenceScreen` +
-   `CraftingScreen` + `gameStore`. tsc clean.
+**Empty** — the status batch (357→358) shipped 2026-06-08 (see §0.B).
+The next change starts a fresh batch.
 
 ### 0.A — Open Issues
 
@@ -491,6 +485,13 @@ checkout, not a special rollback tool.)
 - **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Persimmon Anvil (`2026-06-08-358`) — combat-only status ticking
+- **What/Why:** a "round" is one player action (tickEffects runs per submitPlayerAction), so tactical combat buffs/stances decayed while you investigate / salvage / travel between fights ("rounds are a tabletop concept that doesn't fit").
+- **How:** `tickEffects(effects, { inCombat })` only ticks COMBAT-ONLY statuses (stealthed, shielded, aiming, dodging, in_cover, surprised, power_attack_pending, defensive_stance, …) when enemies are present. DOT (bleed/poison) + timed buffs (food_buff/well_fed) + afflictions (stun/paralyzed) tick every action; stamina-gated (tired/exhausted) never tick here. Call site passes `inCombat = enemies.length > 0`; default `inCombat:true` keeps existing in-combat duration tests valid. `engine/statusEffects.ts`, `state/gameStore.ts`; `combatOnlyStatusTick` (6).
+
+#### Tupelo Anvil (`2026-06-08-357`) — status-duration display honesty
+- **(A)** "rounds" → "turns" on the Character-screen status counter, action-card descriptions, crafting ward line, and the DOT/infection log line — a duration is your next N actions, not a tabletop combat round (weapon firing-rate / ammo "rounds" left as-is). **(B)** Tired / Exhausted are stamina-gated, so the Character screen shows "until you rest" instead of the meaningless 99-seeded countdown (answers the player's "tired 96r"). `screens/CharacterScreen.tsx`, `screens/ActionReferenceScreen.tsx`, `screens/CraftingScreen.tsx`, `state/gameStore.ts`.
 
 #### Sequoia Anvil (`2026-06-08-356`) — no ground, no fall (climb fix)
 - **What/Why:** a 0-stamina climb attempt while still on the ground killed a low-HP player (live log). Per the user: you can't fall off something you haven't left the ground to climb.
