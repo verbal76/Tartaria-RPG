@@ -29,13 +29,13 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-08) = OTA-350 "Dogwood Anvil"** — head of the
->   343→347 (338 saga) + 348→350 (stealth expansion) work. The stealth batch:
->   348 Walnut (Stealth as a 6th attribute, race-rolled) · 349 Yew (stealth gear
->   pass + fusion/inferred/backfill) · 350 Dogwood (stealth titles + train-via-
->   gear-in-combat + Arbiter suggestion). Pushed `59fe3ae..a638905`;
->   `eas-update.yml` publishes to Android + iOS.
-> - **STAGED — none.** Staging list is clear; next change starts the next batch.
+> - **LIVE (pushed 2026-06-08) = OTA-356 "Sequoia Anvil"** — head of the
+>   log-review batch (351→356): 351 Qwen completion-crash guard · 352 Tier-1
+>   verification logging · 353 three fixes (fusion-comp strip / honest titles /
+>   empty name) · 354 Tier-2 flow logging · 355 weather-hazard visibility · 356
+>   no-ground-no-fall climb. Pushed `1efd550..104d30b`; `eas-update.yml` publishes
+>   to Android + iOS.
+> - **STAGED — none.** Staging list clear; next change starts a fresh batch.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /
@@ -165,49 +165,8 @@ checkout, not a special rollback tool.)
 > **user** triggers the push. When the batch ships, move these into §0.B (Closed)
 > and clear this list.
 
-> **This batch = the log-review pass** (from a Pixel 10 Pro XL bug report +
-> two COPY LOG exports): native-crash guard, debug instrumentation to verify
-> game flow, and a few concrete fixes. **5/5 — push-ready, awaiting the user.**
-
-1. **OTA-351 "Magnolia Anvil" — Qwen completion-crash guard.** The SVE-on-Tensor-G5
-   crash (Pixel 10 Pro XL): `librnllama_…_sve.so` SIGSEGVs during token generation
-   after a clean init, which OTA-272's init guard misses. `mlHealth` now breadcrumbs
-   each Qwen `completion()`; a survivor on next boot = a completion crash. After 3,
-   disable ONLY Qwen (template narration); classifier/Kokoro stay on. Bug-report
-   summary gains a Qwen-guard line. Tests: `qwenCompletionGuard` (5). tsc clean.
-
-2. **OTA-352 "Holly Anvil" — Tier-1 verification logging (`[debug]`-only).**
-   skill-check breakdown line (the `[debug]` twin of the combat roll line, covers
-   stealth + every check), a loadout/effective-stats snapshot at skill-check time
-   + on equip change (verifies weapon/cloak/fused stealth sums in), and a
-   training-progress line per successful check. Lets a log review confirm the
-   stealth expansion works on-device. `state/gameStore.ts`. tsc clean.
-
-3. **OTA-353 "Mulberry Anvil" — three log-review fixes.** (1) Stripped the
-   re-firing fusion-compensation grant (closes the §0.A open issue). (2) Title
-   earn announcement uses the honest passive string (not the canon "once/day"
-   flavor). (3) Empty-name opening renders cleanly (name-less opener variants).
-   `state/gameStore.ts`, `engine/narrativeGenerator.ts`; tests `openingEmptyName`
-   (2). tsc clean.
-
-4. **OTA-354 "Cottonwood Anvil" — Tier-2 flow logging (`[debug]`-only).** Enemy-spawn
-   stats at each combat-start site (encounter-vs-danger-tier), `vitals@fall`
-   (reconstruct a fall-death), and a persist-FAILURE line (surfaces
-   `getLastSaveWriteError`, confirms the atomic save lands on-device). tsc clean.
-
-5. **OTA-355 "Buckeye Anvil" — weather-hazard visibility.** Weather ticks that bite
-   (aether lightning's "silent bolt", etc.) read as near-misses but do real 1–N HP
-   damage; the world line now appends `(−N HP)` so the hazard isn't a phantom.
-   Tests: `weatherHazardBite` (2). tsc clean.
-
-6. **OTA-356 "Sequoia Anvil" — no ground, no fall (climb fix).** Per the user's
-   call: a 0-stamina climb attempt while still on the ground (`elevatedOn` null)
-   now REFUSES ("rest first") instead of dealing fall damage; a shortfall while
-   already up still falls. Resolves the climb-fall design call. Tests:
-   `climbRopeMechanics` (+1, 9/9). tsc clean.
-
-*(6 OTAs staged — the log-review batch is **push-ready (≥5)**, awaiting the user's
-push command per §P3a.)*
+**Empty** — the log-review batch (351→356) shipped 2026-06-08 (see §0.B).
+The next change starts a fresh batch (≥5 before the next push).
 
 ### 0.A — Open Issues
 
@@ -525,6 +484,27 @@ push command per §P3a.)*
 - **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Sequoia Anvil (`2026-06-08-356`) — no ground, no fall (climb fix)
+- **What/Why:** a 0-stamina climb attempt while still on the ground killed a low-HP player (live log). Per the user: you can't fall off something you haven't left the ground to climb.
+- **How:** a stamina shortfall while `currentScene.elevatedOn` is null (on the ground) now REFUSES ("rest first") with no damage; a shortfall while already up (`elevatedOn` set) still falls. Gated on `elevatedOn`, not `currentTier`, so OTA 23-007 mid-climb fall tests stay valid. `state/gameStore.ts`; `climbRopeMechanics` +1 (9/9).
+
+#### Buckeye Anvil (`2026-06-08-355`) — weather-hazard visibility
+- **What/Why:** "a silent bolt singes your sleeve" (aether_lightning tick) and friends read as near-misses but do real 1–N HP damage — looked like a phantom (player kept seeing it with no consequence).
+- **How:** the exploration weather-tick world line appends `(−N HP)` when `effHpDelta < 0`. `state/gameStore.ts`; `weatherHazardBite` (2).
+
+#### Cottonwood Anvil (`2026-06-08-354`) — Tier-2 flow logging (`[debug]`-only)
+- **What/How:** enemy-spawn line at each combat-start site (encounter-vs-danger-tier), `vitals@fall` (reconstruct a fall-death), and a persist-FAILURE line (`getLastSaveWriteError` — confirms the OTA-344 atomic save lands on-device). `state/gameStore.ts`.
+
+#### Mulberry Anvil (`2026-06-08-353`) — three log-review fixes
+- **(1)** Stripped the re-firing fusion-compensation grant ("Eternal Dynasty Heir's Aegis") — it fired on dev-named saves every load; the bug it repaid is fixed since OTA-336. Dev Resurrection-Gem grant kept. **(2)** Title earn announcement uses the honest passive string (`TITLE_PASSIVE_PERK`) not the canon "once/day" flavor. **(3)** Empty-name opening: name-less opener variants when the name isn't set yet (Tungsten-Spire flow). `state/gameStore.ts`, `engine/narrativeGenerator.ts`; `openingEmptyName` (2).
+
+#### Holly Anvil (`2026-06-08-352`) — Tier-1 verification logging (`[debug]`-only)
+- **What/How:** skill-check breakdown (`skillcheck: <intent> d20=X <bonusLabel> = total vs DC → PASS/FAIL` — the `[debug]` twin of the combat roll line, covers stealth + every check); loadout/effective-stats snapshot at skill-check time + on equip change (verifies weapon/cloak/fused stealth sums into `effectiveStats`); training-progress line per successful check. Lets a log review confirm the stealth expansion works on-device. `state/gameStore.ts`.
+
+#### Magnolia Anvil (`2026-06-08-351`) — Qwen completion-crash guard (SVE / Tensor G5)
+- **What/Why:** Pixel 10 Pro XL bug reports showed a native SIGSEGV inside `librnllama_…_sve.so` during token generation — AFTER a clean `qwen:done` init, so OTA-272's init guard never fired; the process died mid-narration and relaunched.
+- **How:** `mlHealth` breadcrumbs each Qwen `completion()` (awaited flush) and clears it after; a survivor on the next boot = a completion crash. After 3, `shouldAttemptQwen()` → false disables ONLY Qwen (template narration); the classifier (MiniLM) + Kokoro (different native lib) stay on. `mlHealthSummary` (every bug report) gains a Qwen-guard line; `resetMLHealth` re-enables. `mlHealth.ts`, `ai/generation/LlamaRuntime.ts`, `App.tsx`; `qwenCompletionGuard` (5).
 
 #### Dogwood Anvil (`2026-06-08-350`) — stealth mechanics + Arbiter (stealth expansion 3/3)
 - **What:** stealth needed to be *used* by the game, not just exist — title bonuses, a third training source, and Arbiter awareness.
