@@ -124,17 +124,19 @@ export function applyEffect(
  * (filtered to those still active) and the total bleed-style DOT to
  * apply to the player's HP this round.
  *
- * OTA-358 — a "round" is one player action (tickEffects runs per
- * submitPlayerAction). Two refinements so tactical buffs don't evaporate
- * during exploration and stamina states don't fake a countdown:
- *   - COMBAT-ONLY statuses (stances / next-strike buffs) only tick when
- *     `opts.inCombat` — they hold otherwise, so a shielded/aiming/stealthed
- *     buff survives the walk between fights instead of decaying on investigate
- *     / salvage / travel.
+ * OTA-358 → corrected OTA-359 — a "round" is one player action (tickEffects
+ * runs per submitPlayerAction). Combat effects are PER-ENCOUNTER:
+ *   - COMBAT-ONLY statuses (stances / next-strike buffs: dodge, stealthed,
+ *     shielded, aiming, …) tick normally WHILE you're in the fight, and are
+ *     CLEARED the moment there are no enemies (`opts.inCombat` false). A dodge
+ *     you used against one attacker is not still active when his buddies show up
+ *     three hours later — it's only valid in the encounter it was for.
  *   - STAMINA-GATED statuses (tired / exhausted) NEVER tick here; they're
  *     owned by tickPlayerStaminaStatuses (added/cleared from current stamina).
  *   - DOT (bleed / poison) and timed buffs (food_buff / well_fed) and
- *     afflictions (stun / paralyzed / etc.) tick every action as before.
+ *     afflictions (stun / paralyzed / etc.) tick every action regardless — those
+ *     follow you out of a fight (you keep bleeding; the carrot buff keeps its
+ *     timer).
  * Default `inCombat: true` preserves prior behavior for any caller that
  * doesn't pass it.
  */
@@ -158,8 +160,9 @@ export function tickEffects(
     if (eff.perRoundDamage) dot += eff.perRoundDamage; // DOT always applies
     // Stamina-gated: never decremented here (stamina sync owns them).
     if (STAMINA_GATED_STATUSES.has(eff.kind)) { next.push(eff); continue; }
-    // Combat-only tactical buffs/stances: hold (don't tick) outside combat.
-    if (COMBAT_ONLY_STATUSES.has(eff.kind) && !inCombat) { next.push(eff); continue; }
+    // Combat-only: per-encounter. Cleared the moment the fight is over so a
+    // stance/buff never carries into a separate, later encounter.
+    if (COMBAT_ONLY_STATUSES.has(eff.kind) && !inCombat) { expired.push(eff); continue; }
     const nextRounds = eff.remainingRounds - 1;
     if (nextRounds > 0) {
       next.push({ ...eff, remainingRounds: nextRounds });

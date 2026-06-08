@@ -205,6 +205,9 @@ const CODENAMES: Record<string, string> = {
   // Exhausted show "until you rest" (stamina-gated, no real countdown).
   // OTA-358 — combat-only status ticking: tactical buffs/stances only tick
   // when enemies are present (don't evaporate during exploration).
+  // OTA-359 — combat effects are per-encounter (corrects 358): combat-only
+  // statuses tick in the fight and CLEAR when no enemies, not carry forward.
+  '2026-06-08-359': 'Sassafras Anvil',
   '2026-06-08-358': 'Persimmon Anvil',
   '2026-06-08-357': 'Tupelo Anvil',
   '2026-06-08-356': 'Sequoia Anvil',

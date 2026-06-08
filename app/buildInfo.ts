@@ -12783,4 +12783,12 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // (tired/exhausted) never tick here (stamina sync owns them). Fixes "rounds were
 // a tabletop combat concept that doesn't fit": durations now spend only on
 // combat turns. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-358';
+// OTA-359 (Sassafras Anvil) — combat effects are PER-ENCOUNTER (corrects 358).
+// 358 made combat-only statuses HOLD out of combat — wrong: a dodge/stance from
+// a finished fight would still be active against a different enemy hours later.
+// Now combat-only statuses (dodge, stealthed, shielded, aiming, …) tick normally
+// while you're in the fight and are CLEARED the moment there are no enemies, so
+// they're only valid in the encounter they were for. DOT (bleed/poison),
+// afflictions (stun/paralyzed), and timed buffs (food_buff/well_fed) still follow
+// you out of a fight. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-359';
