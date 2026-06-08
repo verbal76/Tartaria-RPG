@@ -325,7 +325,6 @@ function prettyEffect(kind: string): string {
     case 'paralyzed': return 'Paralyzed';
     case 'poisoned': return 'Poisoned';
     case 'dodging': return 'Dodging';
-    case 'blocking': return 'Blocking';
     default: return capitalizeWords(kind.replace(/_/g, ' '));
   }
 }

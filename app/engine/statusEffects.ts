@@ -141,8 +141,9 @@ export function applyEffect(
  * doesn't pass it.
  */
 const COMBAT_ONLY_STATUSES: ReadonlySet<StatusEffectKind> = new Set([
-  'dodging', 'blocking', 'aiming', 'sprinting', 'in_cover', 'in_cover_full',
-  'ready', 'helping', 'overwhelmed', 'surprised', 'fighting_back', 'quick_fire',
+  // OTA-365 — 'blocking', 'helping', 'overwhelmed' removed (retired kinds).
+  'dodging', 'aiming', 'sprinting', 'in_cover', 'in_cover_full',
+  'ready', 'surprised', 'fighting_back', 'quick_fire',
   'stealthed', 'shielded', 'shaped_stone_ward', 'power_attack_pending',
   'defensive_stance', 'distracted',
 ]);
@@ -201,9 +202,9 @@ export function statusAcAdjustment(current: readonly StatusEffect[] | undefined)
     // rework moved it from a passive +4 AC into an active post-hit
     // parry roll handled in applyEnemyCounter. The roll itself is
     // what gates the swing now, not a passive AC bump.
-    // 'blocking' status kind is retired (no engine path applies it
-    // anymore) but the type-union entry is kept so legacy saves
-    // with a cached blocking effect deserialize cleanly.
+    // OTA-365 — the retired 'blocking' kind was removed from the union;
+    // a legacy save carrying a cached blocking effect simply tick-expires
+    // it (no matching case here or in rollMods, so it contributes nothing).
   }
   return adj;
 }

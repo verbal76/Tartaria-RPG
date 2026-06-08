@@ -564,7 +564,9 @@ describe('combatStress — quick-action combat verbs across 700 in-game days', (
         const postAc = statusAcAdjustment(post);
         const kindMap: Record<string, StatusEffectKind> = {
           dodge: 'dodging',
-          block: 'blocking',
+          // OTA-365 — 'block' verb folds into the dodge status (the
+          // retired 'blocking' kind was removed).
+          block: 'dodging',
           take_cover: 'in_cover',
         };
         if (hasEffect(post, kindMap[verb]!)) {
@@ -714,7 +716,7 @@ First 5 crashes:      ${crashes.slice(0, 5).join(' | ') || '(none)'}
     //    are coded with remainingRounds=2 and decrement once per tick,
     //    so we should never see those kinds exceed 2 rounds observed.
     //    aiming is remainingRounds=1.
-    for (const k of ['dodging', 'blocking', 'in_cover', 'in_cover_full', 'aiming'] as StatusEffectKind[]) {
+    for (const k of ['dodging', 'in_cover', 'in_cover_full', 'aiming'] as StatusEffectKind[]) {
       const dur = statusMaxObservedDuration[k];
       if (dur !== undefined) {
         // Allowed because applyEffect refreshes to max(existing, incoming).

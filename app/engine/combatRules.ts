@@ -154,16 +154,16 @@ export function rollMods(
           consume.push('dodging');
         }
         break;
-      case 'blocking':
-        if (action === 'defense') {
-          bonus += 4;
-          sources.push('block +4');
-        }
-        break;
-      case 'overwhelmed':
-        if (action === 'defense') {
-          penalty += 2;
-          sources.push('overwhelmed -2');
+      // OTA-365 — 'ready' (the hold/prepare command) now DELIVERS its
+      // promised held-strike bonus: +2 on the next attack, consumed on
+      // use. Previously the status was stamped by the `ready` command but
+      // no consumer read it, so the "+1 bonus die on the reaction" line
+      // was vapor.
+      case 'ready':
+        if (action === 'attack_melee' || action === 'attack_ranged') {
+          bonus += 2;
+          sources.push('readied +2');
+          consume.push('ready');
         }
         break;
       case 'surprised':

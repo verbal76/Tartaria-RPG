@@ -227,6 +227,10 @@ const CODENAMES: Record<string, string> = {
   // OTA-364 — poison follow-through: the poisoned -2 attack penalty (orphaned in
   // an uncalled statusAttackPenalty) now rides in rollMods, so poison degrades
   // the victim's swings instead of only ticking DOT.
+  // OTA-365 — dead-status cleanup: removed 'well_fed' / 'blocking' /
+  // 'overwhelmed' / 'helping' (no apply or no consumer); WIRED 'ready' (a live
+  // command) to deliver its promised +2 next-attack instead of being inert.
+  '2026-06-08-365': 'Fir Anvil',
   '2026-06-08-364': 'Larch Anvil',
   '2026-06-08-363': 'Cedar Anvil',
   '2026-06-08-362': 'Spruce Anvil',

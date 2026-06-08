@@ -51,13 +51,9 @@ describe('rollMods — sprint status', () => {
   });
 });
 
-describe('rollMods — cover / dodge / block stack on defense', () => {
+describe('rollMods — cover / dodge stack on defense', () => {
   it('in_cover gives +4 defense', () => {
     expect(rollMods([eff('in_cover', 'partial cover')], 'defense').net).toBe(4);
-  });
-
-  it('blocking gives +4 defense', () => {
-    expect(rollMods([eff('blocking')], 'defense').net).toBe(4);
   });
 
   it('dodging gives +4 defense', () => {
@@ -65,13 +61,17 @@ describe('rollMods — cover / dodge / block stack on defense', () => {
   });
 });
 
-describe('rollMods — overwhelmed penalizes defense', () => {
-  it('-2 on evasive rolls', () => {
-    expect(rollMods([eff('overwhelmed')], 'defense').net).toBe(-2);
+describe('rollMods — ready (held strike) grants +2 attack, consumed (OTA-365)', () => {
+  it('+2 on melee and ranged attack rolls, consumed on use', () => {
+    const m = rollMods([eff('ready')], 'attack_melee');
+    expect(m.net).toBe(2);
+    expect(m.consume).toContain('ready');
+    expect(m.sources).toContain('readied +2');
+    expect(rollMods([eff('ready')], 'attack_ranged').net).toBe(2);
   });
 
-  it('does not affect attack rolls', () => {
-    expect(rollMods([eff('overwhelmed')], 'attack_ranged').net).toBe(0);
+  it('does not affect defense rolls', () => {
+    expect(rollMods([eff('ready')], 'defense').net).toBe(0);
   });
 });
 
@@ -90,9 +90,9 @@ describe('rollMods — combined pool sums correctly', () => {
     expect(m.sources.length).toBe(2);
   });
 
-  it('cover + overwhelmed on defense', () => {
-    const m = rollMods([eff('in_cover'), eff('overwhelmed')], 'defense');
-    expect(m.net).toBe(2);
+  it('cover + tired on defense (cover +4, tired -1)', () => {
+    const m = rollMods([eff('in_cover'), eff('tired')], 'defense');
+    expect(m.net).toBe(3);
   });
 });
 

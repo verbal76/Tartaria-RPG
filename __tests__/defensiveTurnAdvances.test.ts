@@ -140,8 +140,9 @@ describe('defensive verbs advance the round', () => {
     // Enemy counter fired this turn.
     expect(newLines.some((t) => /vs your AC/i.test(t))).toBe(true);
     // The legacy 'blocking' status MUST NOT be in play — the new
-    // mechanic uses 'dodging' for both.
-    expect(store.getState().player!.statusEffects?.some((e) => e.kind === 'blocking')).toBe(false);
+    // mechanic uses 'dodging' for both (and OTA-365 removed the kind
+    // from the union entirely; compare as a string).
+    expect(store.getState().player!.statusEffects?.some((e) => (e.kind as string) === 'blocking')).toBe(false);
   });
 
   it('take_cover triggers the enemy counter so the cover bonus actually gates an incoming swing', async () => {

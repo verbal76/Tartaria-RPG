@@ -631,16 +631,17 @@ export type StatusEffectKind =
   | 'paralyzed'
   | 'poisoned'
   | 'dodging'
-  | 'blocking'
+  // OTA-365 — 'blocking' removed (retired: no engine path ever applied
+  // it; the dodge rework folded block into dodge).
   // Action-card status effects. Each one is a one-round die modifier
   // routed through rollMods() in combatRules.ts.
   | 'aiming'         // +2 on next ranged attack vs the same target
   | 'sprinting'      // -2 on attack rolls this turn (post-sprint penalty)
   | 'in_cover'       // +4 AC vs ranged (partial cover)
   | 'in_cover_full'  // ranged attacks against you auto-miss (full cover)
-  | 'ready'          // bonus die on the held action when its trigger fires
-  | 'helping'        // bonus die for an ally next check (single-player: narrative)
-  | 'overwhelmed'    // -2 on dodge/evade after multiple hits in one round
+  | 'ready'          // +2 on the next attack (held/prepared strike); consumed on use
+  // OTA-365 — 'helping' (single-player narrative no-op) and 'overwhelmed'
+  // (never applied) removed.
   | 'surprised'      // -2 on first reaction; consumed once
   | 'fighting_back'  // next enemy counter resolves as opposed Fighting roll
   | 'quick_fire'    // +2 on the next ranged attack THIS turn (initiative bonus surrogate)
@@ -664,13 +665,12 @@ export type StatusEffectKind =
   // are auto-applied/cleared by tickPlayerStaminaStatuses based on
   // current stamina (no persistence drift). power_attack_pending and
   // defensive_stance are player-chosen tactical statuses.
-  // well_fed is granted by eating any food consumable; provides +3
-  // temp stamina above max that decays over 5 rounds in combat.
+  // (OTA-365 — 'well_fed' removed: it was declared but never applied or
+  // read; the live food buff is 'food_buff'.)
   | 'tired'                  // stamina < 25% → -1 atk, -1 AC
   | 'exhausted'              // stamina === 0 → -2 atk, ½ damage, no active dodge/parry
   | 'power_attack_pending'   // next attack +2 to hit, +1 damage die (consumed)
   | 'defensive_stance'       // +2 AC per round; 2 stamina per round drain
-  | 'well_fed'               // temp stamina above max from food
   // OTA-120 — dog distract success applies this to one enemy for
   // the player's NEXT action. The next attack hit roll, dodge
   // parry, or flee from THAT enemy gets +2. Consumed when applied.

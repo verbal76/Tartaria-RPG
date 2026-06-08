@@ -10905,21 +10905,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       case 'help': {
         set({ player: advanceTime(spendStamina(player, 1), 0.1) });
         const tgt = parsed.target ?? parsed.resolvedNoun ?? 'the nearest ally';
-        // Apply 'helping' status — narrative-only in single-player; in
-        // future multi-actor scenes the ally's next roll would consume it.
-        const helping: StatusEffect = {
-          kind: 'helping',
-          remainingRounds: 1,
-          label: `helping ${tgt}`,
-        };
-        set((s) =>
-          s.player
-            ? { player: { ...s.player, statusEffects: applyEffect(s.player.statusEffects ?? [], helping) } }
-            : s,
-        );
+        // OTA-365 — the 'helping' status was stamped here but nothing ever
+        // consumed it (single-player has no ally to roll at Advantage), so
+        // it was a dead status promising a benefit that never landed. The
+        // help command stays as a narrative beat; the dead stamp is gone.
         get().appendLog(
           'world',
-          `You shoulder in beside ${tgt}. Their next ability check or attack rolls at Advantage — if they're within 5 ft. Cost: 1 Combat Action.`,
+          `You shoulder in beside ${tgt} — but here, alone on the road, there's no second pair of hands to lift. The gesture costs you the moment and gains you nothing. (No allies to help in single-player.)`,
         );
         break;
       }
@@ -10938,7 +10930,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
         get().appendLog(
           'world',
-          `You hold your turn, watching for ${tgt}. When that trigger fires you get a +1 bonus die on the reaction. Cost: 1 turn.`,
+          `You hold your turn, watching for ${tgt}. Your next strike comes from a coiled, ready stance — +2 to hit. Cost: 1 turn.`,
         );
         if (currentScene.enemies.length > 0) {
           runEnemyGroupCounters(get, set, get().player ?? player);
@@ -20848,10 +20840,10 @@ function applyEnemyCounter(
   // takes the HIGHER (advantage on attacker). One-die path stays for
   // the neutral case so the log reads cleanly.
   const fx = player.statusEffects ?? [];
-  // 'dodging' and 'blocking' deliberately NOT in this list as of
-  // 2026-05-21 — the dodge rework moved their effect from a passive
-  // 2d20-keep-lower defender advantage into an active post-hit
-  // parry roll (see below). Cover statuses still apply normally.
+  // 'dodging' deliberately NOT in this list as of 2026-05-21 — the
+  // dodge rework moved its effect from a passive 2d20-keep-lower defender
+  // advantage into an active post-hit parry roll (see below). ('blocking'
+  // was retired entirely in OTA-365.) Cover statuses still apply normally.
   const defenderAdvantage = fx.some((e) => ['in_cover', 'in_cover_full'].includes(e.kind) && e.remainingRounds > 0);
   const attackerAdvantage = fx.some((e) => e.kind === 'surprised' && e.remainingRounds > 0);
   let atkRoll = rollDie(20);

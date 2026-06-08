@@ -54,7 +54,11 @@
 >   - **OTA-364 "Larch Anvil"** — poison follow-through. The poisoned −2 attack
 >     penalty (orphaned in an uncalled helper) now rides in `rollMods`, so poison
 >     degrades the victim's swings, not just their HP.
->   (Batch is at **5 of ≥5**; more queued — strip dead statuses + Black Cloak.)
+>   - **OTA-365 "Fir Anvil"** — dead-status cleanup. Removed `well_fed` /
+>     `blocking` / `overwhelmed` / `helping` (no apply or no consumer); WIRED
+>     `ready` (a live command) to deliver its promised +2 next-attack.
+>   (Batch is at **6 of ≥5**; one more queued — the Black Cloak Agent / his Order,
+>   then **push**.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /

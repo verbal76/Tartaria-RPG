@@ -12861,4 +12861,17 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // and is NOT consumed (it persists while the poison DOT runs). Removed the dead
 // statusAttackPenalty from statusEffects.ts. __tests__/rollMods.test.ts (+3).
 // JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-364';
+// OTA-365 (Fir Anvil) — dead-status cleanup. Audited the status union for kinds
+// that no code path applies or consumes. REMOVED four: 'well_fed' (declared but
+// never applied/read — the live food buff is 'food_buff'), 'blocking' (retired
+// in the dodge rework — only orphan rollMods / contextInjector handlers, no apply
+// site), 'overwhelmed' (orphan rollMods handler, never applied), and 'helping'
+// (the `help` command stamped it but nothing ever consumed it — single-player has
+// no ally to roll at Advantage, so it promised a benefit that never landed; the
+// help verb stays as a narrative beat, the dead stamp is gone). WIRED 'ready'
+// (the hold/prepare command) to actually DELIVER its promised held-strike bonus:
+// +2 on the next attack, consumed on use (rollMods `case 'ready'`) — it was
+// applied by a live command but had no consumer, so its "+1 bonus die" line was
+// vapor. Updated the COMBAT_ONLY_STATUSES set, contextInjector display map, and
+// the rollMods / combatStress / defensiveTurnAdvances tests. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-365';
