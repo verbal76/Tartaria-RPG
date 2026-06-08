@@ -199,6 +199,9 @@ const CODENAMES: Record<string, string> = {
   // persist-failure line.
   // OTA-355 — weather-hazard visibility: weather ticks that bite (aether
   // lightning etc.) now show the HP loss instead of reading as a near-miss.
+  // OTA-356 — no ground, no fall: a 0-stamina climb attempt on the ground
+  // refuses instead of dealing fall damage; mid-climb shortfall still falls.
+  '2026-06-08-356': 'Sequoia Anvil',
   '2026-06-08-355': 'Buckeye Anvil',
   '2026-06-08-354': 'Cottonwood Anvil',
   '2026-06-08-353': 'Mulberry Anvil',

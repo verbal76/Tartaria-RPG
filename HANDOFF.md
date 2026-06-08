@@ -200,20 +200,17 @@ checkout, not a special rollback tool.)
    damage; the world line now appends `(−N HP)` so the hazard isn't a phantom.
    Tests: `weatherHazardBite` (2). tsc clean.
 
-*(5 OTAs staged — the log-review batch is **push-ready (≥5)**, awaiting the user's
+6. **OTA-356 "Sequoia Anvil" — no ground, no fall (climb fix).** Per the user's
+   call: a 0-stamina climb attempt while still on the ground (`elevatedOn` null)
+   now REFUSES ("rest first") instead of dealing fall damage; a shortfall while
+   already up still falls. Resolves the climb-fall design call. Tests:
+   `climbRopeMechanics` (+1, 9/9). tsc clean.
+
+*(6 OTAs staged — the log-review batch is **push-ready (≥5)**, awaiting the user's
 push command per §P3a.)*
 
 ### 0.A — Open Issues
 
-- **0-stamina climb-fall — design call (from the log review).** A live log showed a
-  Mud Golem grind stamina to 0 climbing repeatedly, then a `stamina 0 < cost → YOU
-  FALL` do ~5 dmg and kill at low HP. This is a **deliberate, tested mechanic**
-  (OTA 23-007; `climbRopeMechanics` asserts the fall), so OTA-355 **did not change
-  it** — a tier-1 ground-level "refuse instead of fall" tweak broke those tests, and
-  it's the user's design call whether a 0-stamina attempt should fall or refuse. The
-  new `vitals@fall` debug (OTA-354) makes any such death reconstructable. **Decision
-  needed:** keep the fall as-is, or make a ground-level (tier 1, nothing cleared)
-  empty-stamina attempt a refusal (and update the OTA 23-007 tests).
 - **Weapon-swap-during-combat turn cost (from the log review) — needs a probe.** A
   live log showed 8+ main-hand weapon swaps in ~30s mid-fight while the enemy kept
   attacking. Unclear whether each combat-time `equipItem` silently consumes the

@@ -10324,6 +10324,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // injure you now (the old "fail the DEX roll → 1 HP" branch
         // is gone since rope is required).
         if (player.stamina < climbStaminaCost) {
+          // OTA-356 — no ground, no fall. If you're still ON THE GROUND (not yet
+          // elevated on anything), an empty tank just means you can't START the
+          // climb — you don't fall off a thing you haven't left. Only a shortfall
+          // while ALREADY UP (currentScene.elevatedOn set) drops you. Player's
+          // call: "if you're on the ground and can't climb, you can't get off the
+          // ground to fall."
+          const alreadyUp = !!get().currentScene?.elevatedOn;
+          if (!alreadyUp) {
+            get().appendLog(
+              'arbiter',
+              `The Arbiter catches your arm. "Not on empty — you'd never leave the ground. Rest, eat, then climb the ${tgt}."`,
+            );
+            get().appendLog(
+              'combat',
+              `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — stamina ${player.stamina} < ${climbStaminaCost} required. (refused — you're on the ground; rest first)`,
+            );
+            break;
+          }
           climbFall(
             `Climb ${tgt} (tier ${currentTier}/${totalTiers}) — stamina ${player.stamina} < ${climbStaminaCost} required. ✗ YOU FALL.`,
             `Your grip gives out on the ${tgt}.`,

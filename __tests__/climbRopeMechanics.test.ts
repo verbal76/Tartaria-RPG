@@ -118,6 +118,20 @@ describe('OTA 23-007 — climb mechanics', () => {
     });
   });
 
+  describe('OTA-356 — ground-level empty-stamina refuses (no fall)', () => {
+    it('on the ground (not elevated), stamina < cost → refused, no HP lost, no fall', async () => {
+      const store = await setupClimber('Climbing Rope', { hp: 30, hpMax: 30, stamina: 0, staminaMax: 10 });
+      // elevatedOn is null (default) — player is on the ground.
+      expect(store.getState().currentScene?.elevatedOn).toBeNull();
+      store.getState().submitPlayerAction('climb wall');
+      const after = store.getState().player!;
+      expect(after.hp).toBe(30); // no fall damage
+      const logs = store.getState().gameLog.map((e) => e.text).join('\n');
+      expect(logs).toMatch(/refused — you're on the ground/);
+      expect(logs).not.toMatch(/YOU FALL/);
+    });
+  });
+
   describe('stamina-depletion fall', () => {
     it('plain rope, stamina < 2: player falls, loses 20% max HP, elevation cleared', async () => {
       const store = await setupClimber('Climbing Rope', {
@@ -140,6 +154,10 @@ describe('OTA 23-007 — climb mechanics', () => {
       const store = await setupClimber("Reclaimer's Rope", {
         hp: 50, hpMax: 50, stamina: 0, staminaMax: 10,
       });
+      // OTA-356 — already UP (elevatedOn set) so a shortfall falls, not refuses.
+      store.setState({
+        currentScene: { ...store.getState().currentScene!, elevatedOn: { noun: 'wall', tier: 1, totalTiers: 2 } },
+      });
       store.getState().submitPlayerAction('climb wall');
       const after = store.getState().player!;
       // 20% of 50 HP = 10 damage
@@ -149,6 +167,10 @@ describe('OTA 23-007 — climb mechanics', () => {
     it('fall damage floors at 1 even on a low-HP-max character', async () => {
       const store = await setupClimber('Climbing Rope', {
         hp: 3, hpMax: 3, stamina: 0, staminaMax: 10,
+      });
+      // OTA-356 — already UP (elevatedOn set) so a shortfall falls, not refuses.
+      store.setState({
+        currentScene: { ...store.getState().currentScene!, elevatedOn: { noun: 'wall', tier: 1, totalTiers: 2 } },
       });
       store.getState().submitPlayerAction('climb wall');
       const after = store.getState().player!;

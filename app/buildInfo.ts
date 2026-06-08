@@ -12758,4 +12758,11 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // with no apparent consequence. (The 0-stamina climb-fall the log showed is a
 // deliberate, tested mechanic — OTA 23-007 — left as a design call in §0.A, not
 // changed; vitals@fall (OTA-354) makes such deaths diagnosable.) JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-355';
+// OTA-356 (Sequoia Anvil) — no ground, no fall (climb fix, per the user's call).
+// A 0-stamina climb attempt while still ON THE GROUND (currentScene.elevatedOn
+// is null — not yet up on anything) now REFUSES ("you'd never leave the ground —
+// rest first") instead of doing fall damage. A stamina shortfall while ALREADY
+// UP (elevatedOn set) still falls. Real-world logic: if you can't get off the
+// ground, you can't fall off it. Resolves the §0.A climb-fall design call.
+// JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-356';
