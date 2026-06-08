@@ -170,12 +170,15 @@ The next change starts a fresh batch (≥5 before the next push).
 
 ### 0.A — Open Issues
 
-- **Weapon-swap-during-combat turn cost (from the log review) — needs a probe.** A
-  live log showed 8+ main-hand weapon swaps in ~30s mid-fight while the enemy kept
-  attacking. Unclear whether each combat-time `equipItem` silently consumes the
-  player's turn (giving the enemy free hits). Not yet instrumented — add a
-  `[debug] equip: mid-combat swap → turn consumed? enemy free-attack?` probe to a
-  future OTA, then decide if it needs a fix.
+- **Weapon-swap-during-combat turn cost — RESOLVED (working as intended).** The
+  log's 8+ mid-fight swaps prompted a "does equip cost a turn?" question. Confirmed
+  in code: `equipItem` calls no `advanceTime` / no stamina / no enemy reaction —
+  combat-time weapon swaps are **free** (and the enemy did NOT get free hits; my
+  initial read of that was wrong). The user wants it free **by design** — you should
+  be able to drop a cudgel + knife and switch to a ranged bolt-caster to drop a
+  charging axe-wielder before he closes. No change. (Optional future UX: the combat
+  weapon picker could show reach/range/effectiveness so a player picks once instead
+  of toggling — that's the only real symptom, and it's clarity, not balance.)
 
 - **Dog-mortality death/abandon WRITE — verified by automated cold-boot regression
   (was: verify on a live save). Effectively closed; live-device confirm optional.**
