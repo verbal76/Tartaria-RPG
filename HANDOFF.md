@@ -29,10 +29,10 @@
 > - `main`, `claude/*` — base/parked; leave alone unless asked.
 >
 > **Current state (update this EVERY push):**
-> - **LIVE (pushed 2026-06-08) = OTA-358 "Persimmon Anvil"** — status batch:
->   357 Tupelo (rounds→turns + "until you rest" for tired/exhausted) · 358
->   Persimmon (combat-only status ticking — tactical buffs hold between fights).
->   Pushed `a2ebd2c..c06c77b`; `eas-update.yml` publishes to Android + iOS.
+> - **LIVE (pushed 2026-06-08) = OTA-359 "Sassafras Anvil"** — status batch:
+>   357 Tupelo (rounds→turns + "until you rest") · 358 Persimmon · 359 Sassafras
+>   (combat effects are PER-ENCOUNTER — cleared when the fight ends; corrects 358).
+>   Pushed through `3882947`; `eas-update.yml` publishes to Android + iOS.
 > - **STAGED — none.** Staging list clear; next change starts a fresh batch.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
@@ -485,6 +485,10 @@ The next change starts a fresh batch.
 - **TC wagering minigame (deferred idea, 2026-05-31).** User idea surfaced while answering the App Store age-rating questionnaire for the inaugural iOS build: add a minigame where the player can wager TC (in-game trade coin) on chance-based outcomes — coin flips, dice, simple card games, vendor side-bets, etc. **Why it's safe:** TC has no real-money exchange path, so this stays "Simulated Gambling" not regulated gambling (no IAP gate, no App Store policy lift, no compliance change). **Scope shape:** vendor side-stalls in towns / hub interiors, or a dedicated NPC who runs a back-room game. Reuse the existing d10 dice infra for resolution, route winnings/losings through the existing TC ledger. **App Store consequence when shipped:** the next age-rating questionnaire would need Simulated Gambling bumped from None → Infrequent (or Frequent if it's prominent), which would likely push the rating from 17+ to 17+ (already there) — no rerating fire drill. **Status:** deferred — not in current wave, just a logged future idea.
 
 ### 0.B — Closed Issues (most recent first)
+
+#### Sassafras Anvil (`2026-06-08-359`) — combat effects are per-encounter (corrects 358)
+- **What/Why:** the player: "combat effects like dodge are only valid in the encounter they're for — a dodge against one attacker shouldn't still be active when his buddies show up hours later." OTA-358 made combat-only statuses HOLD out of combat — exactly that bug.
+- **How:** `tickEffects` now DROPS (expires) combat-only statuses the moment there are no enemies (`inCombat` false), instead of holding them; they still tick during the fight. DOT / afflictions / timed buffs follow you out of a fight (unchanged); stamina-gated never tick here. `engine/statusEffects.ts`; `combatOnlyStatusTick` (6, updated).
 
 #### Persimmon Anvil (`2026-06-08-358`) — combat-only status ticking
 - **What/Why:** a "round" is one player action (tickEffects runs per submitPlayerAction), so tactical combat buffs/stances decayed while you investigate / salvage / travel between fights ("rounds are a tabletop concept that doesn't fit").
