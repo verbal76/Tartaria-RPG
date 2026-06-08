@@ -207,6 +207,12 @@ const CODENAMES: Record<string, string> = {
   // when enemies are present (don't evaporate during exploration).
   // OTA-359 — combat effects are per-encounter (corrects 358): combat-only
   // statuses tick in the fight and CLEAR when no enemies, not carry forward.
+  // OTA-360 — weapon coatings (phase 1: data + apply + UI): poison / acid /
+  // corruption consumables (3 gear rows + 3 recipes) paint onto a bladed or
+  // projectile weapon instance (coating field), shown as "Corrupted Battle
+  // Axe" + a damage chip; permanent for the weapon's life (survives repair,
+  // lost on break). Combat on-hit wiring lands in a follow-up OTA.
+  '2026-06-08-360': 'Chestnut Anvil',
   '2026-06-08-359': 'Sassafras Anvil',
   '2026-06-08-358': 'Persimmon Anvil',
   '2026-06-08-357': 'Tupelo Anvil',

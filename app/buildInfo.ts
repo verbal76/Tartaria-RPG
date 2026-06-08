@@ -12791,4 +12791,18 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // they're only valid in the encounter they were for. DOT (bleed/poison),
 // afflictions (stun/paralyzed), and timed buffs (food_buff/well_fed) still follow
 // you out of a fight. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-359';
+// OTA-360 (Chestnut Anvil) — weapon coatings, phase 1 (data + apply + UI).
+// New per-instance InventoryItem.coating ({ kind, dice, label }). Three coating
+// consumables (Poison Vial / Acid Flask / Corruption Tonic, tagged
+// `weapon_coating`) + three craft recipes from existing materials. An inventory
+// "Coat a weapon" button opens a weapon picker (coatable = bladed melee or
+// projectile ranged, gated by isCoatableWeapon on damage type); applyCoating
+// stamps the coating onto the chosen weapon instance and consumes one unit. A
+// coated weapon shows its derived name ("Corrupted Battle Axe") + a damage chip
+// in the pack — the base `name` is never renamed so findWeaponByName still
+// resolves the weapon's stats. Coating is permanent for the weapon's life: it
+// survives a repair (durability repair is in-place) and is lost only when the
+// weapon breaks (the instance is removed at durability 0). The combat on-hit
+// effect (differentiated enemy DOT: poison pure / acid armor-shred / corruption
+// stacks) + occasional loot drops land in the follow-up OTA. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-360';

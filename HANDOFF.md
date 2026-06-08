@@ -33,7 +33,12 @@
 >   357 Tupelo (rounds→turns + "until you rest") · 358 Persimmon · 359 Sassafras
 >   (combat effects are PER-ENCOUNTER — cleared when the fight ends; corrects 358).
 >   Pushed through `3882947`; `eas-update.yml` publishes to Android + iOS.
-> - **STAGED — none.** Staging list clear; next change starts a fresh batch.
+> - **STAGED (committed on `HaL2001`, NOT yet pushed):**
+>   - **OTA-360 "Chestnut Anvil"** — weapon coatings, phase 1 (data + apply +
+>     UI). Poison/Acid/Corruption consumables + recipes paint onto a bladed or
+>     projectile weapon → "Corrupted Battle Axe" + damage chip; permanent for the
+>     weapon's life. Combat on-hit effect + loot land in the follow-up OTA.
+>   (Batch is building toward the ≥5 threshold; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /
@@ -163,8 +168,32 @@ checkout, not a special rollback tool.)
 > **user** triggers the push. When the batch ships, move these into §0.B (Closed)
 > and clear this list.
 
-**Empty** — the status batch (357→358) shipped 2026-06-08 (see §0.B).
-The next change starts a fresh batch.
+**Batch open (1 of ≥5):**
+
+- **OTA-360 "Chestnut Anvil" — weapon coatings, phase 1 (data + apply + UI).**
+  Player ask: "add some acid and poison and corruption recipes to add to bladed
+  weapons and arrows and boltcasters … 'add corruption to battle axe' … my
+  inventory would have a *Corrupted Battle Axe* and it would add say 1d4 of
+  corruption to the enemy." Locked design: lifespan = **permanent for the
+  weapon's life** (survives repair, lost only on break); **differentiated** type
+  effects (poison pure DOT / acid DOT + armor-shred / corruption DOT + stacks);
+  acquisition = **craft + occasional loot**.
+  - **This OTA (phase 1):** per-instance `InventoryItem.coating` (`{ kind, dice,
+    label }`); 3 coating consumables (Poison Vial / Acid Flask / Corruption
+    Tonic, `weapon_coating` tag) + 3 recipes from existing materials; inventory
+    "Coat a weapon" button → weapon picker (`isCoatableWeapon`: bladed melee or
+    projectile ranged, by damage type); `applyCoating` stamps + consumes one;
+    coated display name + damage chip in the pack (base `name` unchanged so
+    `findWeaponByName` still resolves stats). NEW `engine/weaponCoating.ts`;
+    `__tests__/weaponCoating.test.ts` (13). tsc clean.
+  - **FOLLOW-UP OTA (phase 2 — combat wiring, NOT yet built):** on a landing hit
+    a coated weapon rolls `coating.dice` → enemy status via `enemyStatuses`
+    (extend the `infected` kind union + tick loop ~`gameStore.ts:6237`): **poison**
+    = pure DOT; **acid** = DOT + armor shred (−AC at the enemy to-hit/defense
+    site); **corruption** = DOT + corruption stacks (sicken tougher foes). Read
+    the coating off the equipped weapon INSTANCE (`equippedItem` ~`gameStore.ts:
+    12890`, not the catalog `equipped`). Then **phase 3 / fold-in:** occasional
+    `coating`-bearing loot drops.
 
 ### 0.A — Open Issues
 

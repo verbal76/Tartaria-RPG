@@ -125,6 +125,7 @@ export function InventoryScreen() {
   const useInventoryItem = useGameStore((s) => s.useInventoryItem);
   const scrapInventoryItem = useGameStore((s) => s.scrapInventoryItem);
   const toggleReserveForFusion = useGameStore((s) => s.toggleReserveForFusion);
+  const applyCoating = useGameStore((s) => s.applyCoating);
   // OTA-269 — pulled in for the pouch-filter-tap stow path. Bypasses
   // the equip modal entirely when pouchFilterActive — a single tap
   // on the eligible item stows it and clears the filter.
@@ -163,6 +164,11 @@ export function InventoryScreen() {
   // eligible item stows it and clears the filter. Cancel button or
   // toggling the slot off also clears.
   const [pouchFilterActive, setPouchFilterActive] = useState(false);
+  // OTA-360 — weapon-coating picker. When the player taps "Coat a
+  // weapon" on a coating consumable, this holds that consumable and
+  // the second modal lists the coatable weapons in the pack as
+  // pick buttons. Cleared on apply or cancel.
+  const [coatTarget, setCoatTarget] = useState<InventoryItem | null>(null);
 
   if (!player) {
     return (
@@ -526,6 +532,22 @@ export function InventoryScreen() {
         tone: 'primary',
       });
     }
+    // OTA-360 — COAT A WEAPON. Weapon-coating consumables (Poison
+    // Vial / Acid Flask / Corruption Tonic, tagged `weapon_coating`)
+    // aren't drunk: they paint onto a chosen weapon instance. Opening
+    // the picker stashes the coating item in coatTarget; the second
+    // modal lists the coatable weapons in the pack.
+    if ((pending.item.tags ?? []).includes('weapon_coating')) {
+      buttons.push({
+        label: 'Coat a weapon',
+        onPress: () => {
+          const coat = pending.item;
+          closeModal();
+          setCoatTarget(coat);
+        },
+        tone: 'primary',
+      });
+    }
     // SCRAP — only for built items with material content. Hidden for
     // raw stock (already material) and for items currently equipped
     // (would leave a phantom slot).
@@ -615,6 +637,41 @@ export function InventoryScreen() {
   const scrapResultButtons = scrapResult !== null
     ? [{ label: 'Close', onPress: closeModal, tone: 'neutral' as const }]
     : null;
+
+  // OTA-360 — weapon-coating picker. When coatTarget is set, list the
+  // coatable weapon instances in the pack as pick buttons. Each shows
+  // its current coating (if any) so the player knows a re-coat will
+  // replace it. Wrapped in try/catch since isCoatableWeapon resolves
+  // through the weapon catalog.
+  let coatPickerBody: string | undefined;
+  let coatPickerButtons: Array<{ label: string; onPress: () => void; tone: 'primary' | 'neutral' | 'destructive' }> = [];
+  if (coatTarget) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const { isCoatableWeapon, coatedDisplayName } = require('../engine/weaponCoating');
+      const coatable = (player.inventory ?? []).filter(
+        (i: InventoryItem) => isCoatableWeapon(i.name),
+      );
+      if (coatable.length === 0) {
+        coatPickerBody = 'Nothing in your pack can hold this coating. A coating needs an edge or a point to carry it — a blade, an arrow-arm, or a bolt-caster.';
+      } else {
+        coatPickerBody = `Paint the ${coatTarget.name.toLowerCase()} onto which weapon? It stays on until the weapon breaks (a repair won't scrub it off).`;
+        coatPickerButtons = coatable.map((w: InventoryItem) => ({
+          label: w.coating
+            ? `${coatedDisplayName(w)} — replaces ${w.coating.label.toLowerCase()}`
+            : w.name,
+          onPress: () => {
+            applyCoating(coatTarget.id, w.id);
+            setCoatTarget(null);
+          },
+          tone: 'primary' as const,
+        }));
+      }
+    } catch {
+      coatPickerBody = 'Could not read your weapons just now.';
+    }
+    coatPickerButtons.push({ label: 'Cancel', onPress: () => setCoatTarget(null), tone: 'neutral' });
+  }
 
   return (
     <View style={styles.container}>
@@ -763,6 +820,17 @@ export function InventoryScreen() {
         }
         buttons={scrapResultButtons ?? buildModalButtons()}
         onRequestClose={closeModal}
+      />
+
+      {/* OTA-360 — weapon-coating picker. Second modal that opens when
+          the player chose "Coat a weapon"; lists the coatable weapons
+          in the pack as pick buttons. */}
+      <BrandedModal
+        visible={coatTarget !== null}
+        title={coatTarget ? `Apply ${coatTarget.name}` : ''}
+        body={coatPickerBody}
+        buttons={coatPickerButtons}
+        onRequestClose={() => setCoatTarget(null)}
       />
     </View>
   );
@@ -950,7 +1018,10 @@ function ItemRow({
             <Text style={[styles.rowInferredDiamond, { color: rarityHexColor(item.rarity) }]}>◆ </Text>
           )}
           <Text style={styles.rowName} numberOfLines={1}>
-            {item.name}
+            {/* OTA-360 — a coated weapon shows its coated name
+                ("Corrupted Battle Axe"); the underlying name is
+                unchanged for stat lookup. */}
+            {item.coating ? `${item.coating.label} ${item.name}` : item.name}
           </Text>
           <Text style={styles.rowQty}>×{item.quantity}</Text>
         </View>
@@ -992,6 +1063,13 @@ function ItemRow({
               ]}
             >
               dur {item.durability.current}/{item.durability.max}
+            </Text>
+          )}
+          {/* OTA-360 — coating chip: the extra damage a coated weapon
+              lands on every hit. */}
+          {item.coating && (
+            <Text style={[styles.rowMeta, styles.rowCoating]}>
+              +{item.coating.dice} {item.coating.kind}
             </Text>
           )}
           {/* arb-fix — show the slot the piece fills (esp. armor: "Chest",
@@ -1115,6 +1193,9 @@ const styles = StyleSheet.create({
   // stand out from the grey rarity / durability metadata.
   rowDogTag: { color: '#c9a86a', fontWeight: '700' },
   rowReserved: { color: '#d97a7a', fontWeight: '700' },
+  // OTA-360 — weapon-coating chip. Sickly green-violet so it reads as
+  // an applied toxin distinct from the green damage-dice chip.
+  rowCoating: { color: '#b08fd4', fontWeight: '700' },
   rowPouch: { color: '#c9a86a', fontWeight: '700' },
   rowEquipped: { color: '#c9a86a', fontSize: 10, fontWeight: '700', letterSpacing: 1 },
   rowEquippable: { color: '#7a705c', fontSize: 10, letterSpacing: 1, fontStyle: 'italic' },

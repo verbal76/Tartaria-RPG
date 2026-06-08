@@ -17,6 +17,27 @@
       ]
     },
     {
+      "result": "Poison Vial",
+      "ingredients": [
+        { "name": "Leech Mucus", "quantity": 1 },
+        { "name": "Violet Cap Mushroom", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Acid Flask",
+      "ingredients": [
+        { "name": "Aether Dust", "quantity": 1 },
+        { "name": "Scrap Metal", "quantity": 1 }
+      ]
+    },
+    {
+      "result": "Corruption Tonic",
+      "ingredients": [
+        { "name": "Aether Dust", "quantity": 2 },
+        { "name": "Blue Cap Mushroom", "quantity": 1 }
+      ]
+    },
+    {
       "result": "Climbing Rope",
       "ingredients": [
         {

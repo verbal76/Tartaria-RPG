@@ -83,6 +83,13 @@ export type ItemEffect =
       // still eat the treat themselves; the dogTreat flag is purely
       // a loyalty multiplier on the feed-dog path.
       dogTreat?: boolean;
+      // OTA-360 — weapon-coating payload. When present, this
+      // consumable is NOT drunk: the inventory "Coat a weapon"
+      // button paints the spec onto a chosen weapon instance
+      // (InventoryItem.coating) and consumes one unit. poison =
+      // pure DOT, acid = DOT + armor shred, corruption = DOT +
+      // corruption stacks. dice rolls on a landing hit.
+      coating?: { kind: 'poison' | 'acid' | 'corruption'; dice: string; label: string };
     }
   | { kind: 'gate'; unlocks: GateKind }
   | {

@@ -2180,6 +2180,16 @@ interface GameStore {
    *  OTA-193 auto-substitute drain so they survive for the fusion
    *  bench. Looked up by InventoryItem.id to disambiguate stacks. */
   toggleReserveForFusion: (itemId: string) => void;
+  /** OTA-360 — paint a weapon-coating consumable onto a weapon
+   *  instance. `coatingItemId` is the consumable (Poison Vial /
+   *  Acid Flask / Corruption Tonic); `weaponId` is the target
+   *  weapon instance. Validates the weapon is coatable, stamps
+   *  InventoryItem.coating, and consumes one coating unit. The
+   *  coating is permanent for the weapon's life (survives repair,
+   *  lost on break). Re-coating an already-coated weapon replaces
+   *  the prior coating. Returns nothing; surfaces success/refusal
+   *  via the log. */
+  applyCoating: (coatingItemId: string, weaponId: string) => void;
   /** OTA-195 — fuse reserved inferred items at a Crucible (one-shot
    *  flag set by the fusion_bench travel encounter). Gates on the
    *  pending flag + gateFusion rules (≥3 reserved inferred items,
@@ -17708,6 +17718,55 @@ export const useGameStore = create<GameStore>((set, get) => ({
           },
         }
       : s);
+  },
+
+  applyCoating(coatingItemId, weaponId) {
+    const player = get().player;
+    if (!player) return;
+    const coatItem = player.inventory.find((i) => i.id === coatingItemId);
+    const weapon = player.inventory.find((i) => i.id === weaponId);
+    if (!coatItem || !weapon) return;
+    // Resolve the coating spec off the consumable's catalog effect.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { resolveItemEffect } = require('../engine/itemEffect');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { findGearByName } = require('../engine/crafting');
+    const fx = resolveItemEffect(coatItem.name, [findGearByName]);
+    const spec = fx?.kind === 'consumable' ? fx.coating : undefined;
+    if (!spec) {
+      get().appendLog('debug', `applyCoating: ${coatItem.name} carries no coating spec`);
+      return;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { isCoatableWeapon, coatedDisplayName } = require('../engine/weaponCoating');
+    if (!isCoatableWeapon(weapon.name)) {
+      get().appendLog('world', `You can't coat the ${weapon.name} — a coating needs an edge or a point to carry it. Try a blade, an arrow-arm, or a bolt-caster.`);
+      return;
+    }
+    const hadCoating = weapon.coating;
+    set((s) => {
+      if (!s.player) return s;
+      const inv = s.player.inventory
+        // Stamp the coating on the target weapon instance.
+        .map((i) =>
+          i.id === weaponId
+            ? { ...i, coating: { kind: spec.kind, dice: spec.dice, label: spec.label } }
+            : i,
+        )
+        // Consume one coating unit (drop the stack when it hits 0).
+        .map((i) =>
+          i.id === coatingItemId ? { ...i, quantity: i.quantity - 1 } : i,
+        )
+        .filter((i) => !(i.id === coatingItemId && i.quantity <= 0));
+      return { player: { ...s.player, inventory: inv } };
+    });
+    const display = coatedDisplayName({ name: weapon.name, coating: { ...spec } });
+    get().appendLog(
+      'reward',
+      hadCoating
+        ? `You scrape off the old ${hadCoating.label.toLowerCase()} layer and work the ${coatItem.name.toLowerCase()} into the weapon. Now wielding the ${display} — ${spec.dice} ${spec.kind} on every landing hit.`
+        : `You work the ${coatItem.name.toLowerCase()} along the weapon. Now wielding the ${display} — ${spec.dice} ${spec.kind} on every landing hit.`,
+    );
   },
 
   async fuseAtCrucible() {

@@ -398,6 +398,28 @@ export interface InventoryItem {
    *  one-of-a-kind for this save and will not appear in any vendor /
    *  loot / catalog lookup elsewhere. */
   uniqueStats?: UniqueItemStats;
+  /** OTA-360 — weapon-coating applied to THIS weapon instance. A
+   *  consumable coating (poison / acid / corruption) painted onto a
+   *  bladed or ranged weapon. Permanent for the weapon's life: it
+   *  survives repair and is only lost when the weapon breaks (the
+   *  instance is removed at durability 0). The display name is
+   *  derived ("Corrupted Battle Axe") via coatedDisplayName — the
+   *  underlying `name` is NOT renamed so weapon stat lookup
+   *  (findWeaponByName) still resolves the base weapon. On a landing
+   *  hit the coating rolls `dice` and applies a differentiated enemy
+   *  status: poison = pure DOT, acid = DOT + armor shred (−AC),
+   *  corruption = DOT + corruption stacks. */
+  coating?: WeaponCoating;
+}
+
+/** OTA-360 — a weapon coating stamped on a single weapon instance. */
+export interface WeaponCoating {
+  /** Coating family — drives the on-hit enemy status that lands. */
+  kind: 'poison' | 'acid' | 'corruption';
+  /** Damage dice rolled on a landing hit ("1d4"). */
+  dice: string;
+  /** Display adjective used by coatedDisplayName ("Corrupted"). */
+  label: string;
 }
 
 /** OTA-195 — fused item identity. Stamped on the InventoryItem
