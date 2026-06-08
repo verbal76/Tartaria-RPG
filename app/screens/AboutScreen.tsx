@@ -745,7 +745,7 @@ export function AboutScreen() {
             <View style={{ flex: 1, alignItems: 'flex-end' }}>
               <NumberStepper
                 value={Math.round(display.textureOpacity * 100)}
-                min={0} max={20} step={1} decimals={0} suffix="%"
+                min={0} max={50} step={1} decimals={0} suffix="%"
                 onChange={(v) => { void setDisplaySettings({ textureOpacity: v / 100 }); }}
               />
             </View>

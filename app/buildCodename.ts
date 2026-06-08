@@ -185,6 +185,9 @@ const CODENAMES: Record<string, string> = {
   // open; locked-chip scanner-requirement text uses the EQUIPPED amber.
   // OTA-336 — fusion catalyst counts toward gate + equipped-catalyst confirm
   // prompt + one-time make-good grant; 2 craftable corruption-cleanse tonics.
+  // OTA-347 — Display "Paper texture" ceiling 20% → 50% (stepper max + the
+  // textureOpacity clamp in both displaySettings paths).
+  '2026-06-08-347': 'Hickory Anvil',
   // OTA-346 — clear-the-slot status-based (338 hardening #3): a dead/abandoned
   // dog keeps its record but no longer counts as an ACTIVE dog (hasActiveDog),
   // so the puppy-vendor replacement arc (gated on "no active dog") can fire.

@@ -12684,4 +12684,8 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // rubble-puppy spawn sites (was a raw !player.dog that a dead dog left false
 // forever), so the replacement-puppy arc the feature unlocks is finally
 // reachable. Completes all three 338-hardening defenses. JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-346';
+// OTA-347 (Hickory Anvil) — Display tab "Paper texture" ceiling raised 20% → 50%
+// per player ask. Bumped the NumberStepper max AND the textureOpacity clamp in
+// both displaySettings paths (load + setDisplaySettings) — the stepper alone
+// wasn't enough, the clamp would snap anything above 0.20 back down. JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-347';

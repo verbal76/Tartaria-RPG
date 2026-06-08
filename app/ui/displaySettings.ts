@@ -10,7 +10,7 @@ export interface DisplaySettings {
   bgHue: number;            // 0..360  — base color family (default warm umber ~24)
   bgSat: number;            // 0..1    — richness (0 = grey, 1 = saturated)
   bgLight: number;          // 0..1    — HSL lightness of the base (kept dark-ish)
-  textureOpacity: number;   // 0..0.20 — parchment grain opacity
+  textureOpacity: number;   // 0..0.50 — parchment grain opacity
   vignetteStrength: number; // 0..1    — edge-shadow (vignette) opacity multiplier
 }
 
@@ -40,7 +40,7 @@ export async function loadDisplaySettings(): Promise<DisplaySettings> {
         bgHue: typeof p.bgHue === 'number' ? clamp(p.bgHue, 0, 360, DEFAULTS.bgHue) : DEFAULTS.bgHue,
         bgSat: typeof p.bgSat === 'number' ? clamp(p.bgSat, 0, 1, DEFAULTS.bgSat) : DEFAULTS.bgSat,
         bgLight: typeof p.bgLight === 'number' ? clamp(p.bgLight, 0.02, 0.30, DEFAULTS.bgLight) : DEFAULTS.bgLight,
-        textureOpacity: typeof p.textureOpacity === 'number' ? clamp(p.textureOpacity, 0, 0.20, DEFAULTS.textureOpacity) : DEFAULTS.textureOpacity,
+        textureOpacity: typeof p.textureOpacity === 'number' ? clamp(p.textureOpacity, 0, 0.50, DEFAULTS.textureOpacity) : DEFAULTS.textureOpacity,
         vignetteStrength: typeof p.vignetteStrength === 'number' ? clamp(p.vignetteStrength, 0, 1, DEFAULTS.vignetteStrength) : DEFAULTS.vignetteStrength,
       };
     } else {
@@ -65,7 +65,7 @@ export async function setDisplaySettings(patch: Partial<DisplaySettings>): Promi
     bgHue: patch.bgHue !== undefined ? clamp(patch.bgHue, 0, 360, cur.bgHue) : cur.bgHue,
     bgSat: patch.bgSat !== undefined ? clamp(patch.bgSat, 0, 1, cur.bgSat) : cur.bgSat,
     bgLight: patch.bgLight !== undefined ? clamp(patch.bgLight, 0.02, 0.30, cur.bgLight) : cur.bgLight,
-    textureOpacity: patch.textureOpacity !== undefined ? clamp(patch.textureOpacity, 0, 0.20, cur.textureOpacity) : cur.textureOpacity,
+    textureOpacity: patch.textureOpacity !== undefined ? clamp(patch.textureOpacity, 0, 0.50, cur.textureOpacity) : cur.textureOpacity,
     vignetteStrength: patch.vignetteStrength !== undefined ? clamp(patch.vignetteStrength, 0, 1, cur.vignetteStrength) : cur.vignetteStrength,
   };
   cache = next;

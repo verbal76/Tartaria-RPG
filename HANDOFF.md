@@ -36,7 +36,7 @@
 >   logic. Last unverified path: the dog feature's death/abandon WRITE (only
 >   fires when the dog actually dies/leaves) — once a dog death survives a
 >   restart, the feature is fully cleared.
-> - **STAGED (committed on `HaL2001`, NOT pushed) — next batch, 4 so far (1 to go):**
+> - **STAGED (committed on `HaL2001`, NOT pushed) — next batch is PUSH-READY (5):**
 >   - **OTA-343 "Birch Anvil"** — crash-save capture (COPY CRASHED SAVE) +
 >     Settings-hint copy fix (folded in from the parallel instance).
 >   - **OTA-344 "Hazel Anvil"** — atomic save writes (338 hardening #1):
@@ -45,8 +45,9 @@
 >     `beginScene` bails to title (not crash) when a scene build throws.
 >   - **OTA-346 "Sycamore Anvil"** — clear-the-slot status-based (338 hardening #3):
 >     a dead/abandoned dog no longer blocks the puppy-vendor replacement arc.
->   The full **338-hardening trio (#1–#3) is now done.** Holding toward ≥5 before
->   the user triggers the push (per §P3a). See the staging list at the top of §0.
+>   - **OTA-347 "Hickory Anvil"** — Display "Paper texture" ceiling raised 20% → 50%.
+>   The **338-hardening trio (#1–#3) is done** + the death-WRITE verified. **≥5 reached
+>   — awaiting the user's push command** (per §P3a). See the staging list at top of §0.
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /
@@ -215,14 +216,20 @@ checkout, not a special rollback tool.)
    fires. `app/state/gameStore.ts`; tests `puppyVendorEdges` (+4). tsc clean.
    Closes defense #3 — **the 338-hardening trio is complete.**
 
+5. **OTA-347 "Hickory Anvil" — Display "Paper texture" ceiling 20% → 50%.**
+   Player ask. Bumped the `NumberStepper` max AND the `textureOpacity` clamp in
+   both `displaySettings` paths (the stepper alone would snap >0.20 back down).
+   `app/screens/AboutScreen.tsx`, `app/ui/displaySettings.ts`; tests
+   `displayTextureCeiling` (4). tsc clean.
+
 **+ Verification (test-only, no OTA number — rides with the batch):**
 `__tests__/dogDeathWriteSurvivesReload.test.ts` drives the REAL dog bleed-out
 death + loyalty-abandon write through the live atomic `persist()` and cold-reload
 — closing the last 338 thread (the "death/abandon WRITE — verify on a live save"
 Open issue). No `app/` change, so it ships nothing on its own.
 
-*(4 numbered OTAs staged + the verification test. 1 more shippable OTA reaches the
-≥5 threshold, unless the user overrides or a forced build ships it early.)*
+*(5 numbered OTAs staged + the verification test — the batch is **push-ready (≥5)**,
+awaiting the user's push command per §P3a.)*
 
 ### 0.A — Open Issues
 
