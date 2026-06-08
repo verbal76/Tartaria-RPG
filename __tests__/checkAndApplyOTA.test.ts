@@ -75,18 +75,19 @@ describe('OTA 047 — checkAndApplyOTA skipFetch path', () => {
     expect(result).toBe('applied');
   });
 
-  it('default path with mockFetchUpdateAsync failure surfaces ERR_UPDATES_FETCH via onError', async () => {
+  it('ERR_UPDATES_FETCH during fetch is treated as a clean noUpdate (OTA 044), not an error', async () => {
+    // expo-updates throws ERR_UPDATES_FETCH ("Failed to download new
+    // update") when the server simply has nothing newer to serve — it
+    // is NOT a real failure. The helper swallows it as 'noUpdate' with a
+    // friendly status and NO onError banner (scared a playtester before).
     mockFetchUpdateAsync.mockRejectedValue(
       Object.assign(new Error('Failed to download new update'), { code: 'ERR_UPDATES_FETCH' }),
     );
     const onError = jest.fn();
     const result = await checkAndApplyOTA({ onError });
-    expect(result).toBe('errored');
+    expect(result).toBe('noUpdate');
     expect(mockReloadAsync).not.toHaveBeenCalled();
-    expect(onError).toHaveBeenCalledTimes(1);
-    const msg = onError.mock.calls[0]![0] as string;
-    expect(msg).toMatch(/Failed to download new update/);
-    expect(msg).toMatch(/ERR_UPDATES_FETCH/);
+    expect(onError).not.toHaveBeenCalled();
   });
 
   it('skipFetch=true survives a fetch-side failure mode by never calling fetch', async () => {
@@ -99,5 +100,51 @@ describe('OTA 047 — checkAndApplyOTA skipFetch path', () => {
     expect(mockFetchUpdateAsync).not.toHaveBeenCalled();
     expect(onError).not.toHaveBeenCalled();
     expect(result).toBe('applied');
+  });
+});
+
+describe('OTA-367 — boot-front auto-apply (skipTeardown / checkTimeoutMs)', () => {
+  beforeEach(() => {
+    mockCheckForUpdateAsync.mockReset();
+    mockFetchUpdateAsync.mockReset();
+    mockReloadAsync.mockReset();
+    mockReloadAsync.mockResolvedValue(undefined);
+    mockFetchUpdateAsync.mockResolvedValue(undefined);
+  });
+
+  it('skipTeardown=true with an available update: check + fetch + reload, applied — and NO native teardown', async () => {
+    mockCheckForUpdateAsync.mockResolvedValue({ isAvailable: true });
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { disposeAudio } = require('../app/audio/AudioManager');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { disposePiperEngine } = require('../app/voice/PiperTTSManager');
+    disposeAudio.mockClear();
+    disposePiperEngine.mockClear();
+
+    const result = await checkAndApplyOTA({ silent: true, skipTeardown: true });
+
+    expect(mockCheckForUpdateAsync).toHaveBeenCalledTimes(1);
+    expect(mockFetchUpdateAsync).toHaveBeenCalledTimes(1);
+    expect(mockReloadAsync).toHaveBeenCalledTimes(1);
+    expect(result).toBe('applied');
+    // The boot-front path skips dispose entirely (nothing is up yet).
+    expect(disposeAudio).not.toHaveBeenCalled();
+    expect(disposePiperEngine).not.toHaveBeenCalled();
+  });
+
+  it('up-to-date: returns noUpdate fast and never fetches or reloads', async () => {
+    mockCheckForUpdateAsync.mockResolvedValue({ isAvailable: false });
+    const result = await checkAndApplyOTA({ silent: true, skipTeardown: true, checkTimeoutMs: 5000 });
+    expect(result).toBe('noUpdate');
+    expect(mockFetchUpdateAsync).not.toHaveBeenCalled();
+    expect(mockReloadAsync).not.toHaveBeenCalled();
+  });
+
+  it('a slow check is capped by checkTimeoutMs and surfaces as errored (boot falls through)', async () => {
+    // Never resolves → the withTimeout race rejects after the budget.
+    mockCheckForUpdateAsync.mockReturnValue(new Promise(() => {}));
+    const result = await checkAndApplyOTA({ silent: true, skipTeardown: true, checkTimeoutMs: 50 });
+    expect(result).toBe('errored');
+    expect(mockReloadAsync).not.toHaveBeenCalled();
   });
 });

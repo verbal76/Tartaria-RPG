@@ -12888,4 +12888,19 @@ export const MINIMUM_RECOMMENDED_APK_BUILD = 263;
 // aliases retied to the Order. Two new lore concepts (black_cloak_agents,
 // hollow_edge) seed the Order's enforcer line as a future antagonist arc.
 // __tests__/blackCloakAgent.test.ts (4). JS-only → OTA.
-export const OTA_BUILD_ID = '2026-06-08-366';
+// OTA-367 (Oak Anvil) — OTA updates now apply AUTOMATICALLY, at the FRONT of boot
+// (before mind/voice). Previously a fetched update sat behind a TitleScreen
+// "tap to apply" banner, and tapping it could fire reloadAsync WHILE the native
+// modules (Kokoro/Qwen/ONNX/expo-av) were still spinning up — which crashed to
+// home AND could persist player=null over the slot (save corruption across
+// updates). Now App.tsx awaits checkAndApplyOTA({ skipTeardown, checkTimeoutMs:
+// 5000 }) right after hydrate, BEFORE booting the models: if an update is staged
+// it applies immediately (nothing native is open, so reloadAsync can't race
+// anything); otherwise boot falls through to load the game on the current bundle.
+// Fast when up to date, capped ~5s offline, longer only while actually
+// downloading. New checkAndApplyOTA opts: `skipTeardown` (boot path — no modules
+// to dispose) + `checkTimeoutMs`. Removed the old +1.5s fetchOnly background
+// check + the mid-load banner-apply path (the AboutScreen manual button remains
+// for a deliberate mid-session apply). __tests__/checkAndApplyOTA.test.ts (+3,
+// fixed 1 stale). JS-only → OTA.
+export const OTA_BUILD_ID = '2026-06-08-367';

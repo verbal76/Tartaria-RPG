@@ -47,7 +47,14 @@
 >     non-lootable **Hollow Edge** (`Enemy.signatureWeapon`); 2 lore concepts seed
 >     the Order as a future antagonist arc.
 >   Full per-OTA detail in `docs/build-codenames.md`.
-> - **STAGED — none.** Staging list clear; next change starts a fresh batch.
+> - **STAGED (committed on `HaL2001`, NOT yet pushed):**
+>   - **OTA-367 "Oak Anvil"** — OTA updates apply AUTOMATICALLY at the front of
+>     boot (before mind/voice). Fixes: (a) updates needed a manual tap; (b)
+>     applying mid-load crashed to home + could corrupt the save (the
+>     `player=null`-over-slot vector). `App.tsx` awaits `checkAndApplyOTA({
+>     skipTeardown, checkTimeoutMs: 5000 })` before any model boots; removed the
+>     mid-load banner path. (More queued: periodic autosave + backfill guard.)
+>   (Batch building toward ≥5; the **user** triggers the push.)
 > - App `version` `2.4.1`; `runtimeVersion` policy `appVersion` ⇒ runtime `2.4.1`.
 >   JS-only changes ship as OTA — no native rebuild.
 > - **tsc clean (0 source errors).** Full suite (`npx jest`): **~2714 pass /

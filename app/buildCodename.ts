@@ -234,6 +234,10 @@ const CODENAMES: Record<string, string> = {
   // signature Hollow Edge (corrupted, razor-gripped) is NEVER lootable (new
   // Enemy.signatureWeapon + reason line on kill/knockout); 2 lore concepts seed
   // the Order's enforcer line as a future antagonist arc.
+  // OTA-367 — OTA updates apply AUTOMATICALLY at the front of boot (before
+  // mind/voice), replacing the tap-to-apply banner whose mid-load reload crashed
+  // to home and could corrupt the save. New skipTeardown / checkTimeoutMs opts.
+  '2026-06-08-367': 'Oak Anvil',
   '2026-06-08-366': 'Pine Anvil',
   '2026-06-08-365': 'Fir Anvil',
   '2026-06-08-364': 'Larch Anvil',

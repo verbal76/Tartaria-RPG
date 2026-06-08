@@ -204,8 +204,33 @@ export default function App() {
     void loadDisplaySettings();
     setStage('hydrate:start');
     void hydrate()
-      .then(() => {
+      .then(async () => {
         setStage('hydrate:done');
+        // OTA-367 — BOOT-FRONT auto-apply. Check for an OTA update FIRST,
+        // before the mind (Qwen), voice (Kokoro/Piper), and audio modules
+        // start. If one is staged, apply it now (reloadAsync) — nothing
+        // native is open yet, so the reload can't race a half-initialised
+        // module or an in-flight save the way the old mid-load banner-tap
+        // could (that race crashed to home AND could persist player=null
+        // over the slot). Automatic: no tap required.
+        //
+        // Fails safe: a disabled env (dev / Expo Go), no update, a slow /
+        // offline check (capped at 5s), or any error all fall THROUGH to
+        // the normal boot below. The check resolves fast when up to date;
+        // it only blocks longer while actually downloading an update.
+        try {
+          setStage('ota:check');
+          const otaResult = await checkAndApplyOTA({ silent: true, checkTimeoutMs: 5000, skipTeardown: true });
+          if (otaResult === 'applied') {
+            // reloadAsync fired — the JS bridge is restarting onto the new
+            // bundle. Do NOT boot the native models; this context is dead.
+            return;
+          }
+          setStage('ota:done');
+        } catch (otaErr) {
+          // eslint-disable-next-line no-console
+          console.warn('boot-front OTA check failed (proceeding to load):', otaErr);
+        }
         // OTA-272 — ML init now gated by mlHealth crash counter. On
         // certain ARMv8.2 Android devices (Snapdragon 865 family —
         // Galaxy S20, Pixel 5, OnePlus 8) the native ML libs crash
@@ -319,21 +344,14 @@ export default function App() {
           // eslint-disable-next-line no-console
           console.warn('initTTSManager failed:', e);
         });
-      // Boot-time OTA check. fetchOnly: download the update in the
-      // background but DO NOT reload here — auto-reload mid-boot
-      // crashes the process to home because native modules
-      // (executorch Kokoro, llama.rn Qwen, ONNX MiniLM, expo-av Sound)
-      // are still spinning up while reloadAsync swaps the JS bundle.
-      // The pendingOTAUpdate flag drives a TitleScreen banner that
-      // offers the player a one-tap apply from a clean state.
-      setTimeout(() => {
-        if (useGameStore.getState().currentScreen !== 'title') return;
-        void checkAndApplyOTA({ silent: true, fetchOnly: true }).then((result) => {
-          if (result === 'pending') {
-            useGameStore.setState({ pendingOTAUpdate: true });
-          }
-        });
-        }, 1500);
+        // OTA-367 — the old +1.5s fetchOnly background check + TitleScreen
+        // "tap to apply" banner was REMOVED. That banner-tap was the exact
+        // mid-load apply path that crashed to home (native modules still
+        // spinning up while reloadAsync swapped the bundle) and could
+        // corrupt the save. The boot-FRONT auto-apply above now handles
+        // updates cleanly before anything native starts; the AboutScreen
+        // "CHECK FOR OTA UPDATE" button remains for a deliberate
+        // mid-session apply from a stable state.
         setStage('boot:complete');
       })
       .catch((e) => {

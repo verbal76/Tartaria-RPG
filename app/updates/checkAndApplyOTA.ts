@@ -65,6 +65,20 @@ export interface CheckAndApplyOptions {
    *  ERR_UPDATES_FETCH 'Failed to download new update' even
    *  though the bundle was already on disk and ready to load. */
   skipFetch?: boolean;
+  /** OTA-367 — override the check-for-update timeout (default 10s). The
+   *  boot-front gate uses a shorter budget (~5s) so an offline / slow
+   *  launch never stalls boot for long before falling through to load
+   *  the game on the current bundle. */
+  checkTimeoutMs?: number;
+  /** OTA-367 — skip the native-resource teardown before reloadAsync.
+   *  Used by the boot-FRONT auto-apply, which runs BEFORE the mind
+   *  (Qwen) and voice (Kokoro/Piper) and audio modules have started —
+   *  so there is nothing to dispose, and calling the shutdown actions on
+   *  uninitialised modules would only add latency. Applying here is safe
+   *  precisely because no native handles are open to race reloadAsync.
+   *  (The mid-session AboutScreen button leaves this false — by then the
+   *  modules ARE up and must be torn down first.) */
+  skipTeardown?: boolean;
 }
 
 /** Result the caller can inspect. `applied` means we triggered a
@@ -78,7 +92,7 @@ export interface CheckAndApplyOptions {
 export type CheckAndApplyResult = 'applied' | 'pending' | 'noUpdate' | 'skipped' | 'errored';
 
 export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise<CheckAndApplyResult> {
-  const { onStatus, onError, silent = false, fetchOnly = false, skipFetch = false } = opts;
+  const { onStatus, onError, silent = false, fetchOnly = false, skipFetch = false, checkTimeoutMs = 10_000, skipTeardown = false } = opts;
   try {
     if (!Updates.isEnabled) {
       if (!silent) onStatus?.('Disabled (dev build / Expo Go)');
@@ -103,7 +117,7 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
       // the catch below and surfaces as a clean 'errored' return.
       const result = await withTimeout(
         Updates.checkForUpdateAsync(),
-        10_000,
+        checkTimeoutMs,
         'check',
       );
       if (!result.isAvailable) {
@@ -153,6 +167,22 @@ export async function checkAndApplyOTA(opts: CheckAndApplyOptions = {}): Promise
     // no error fired — the await just never returned. Better to
     // hand-wave the cleanup at 3s and let reloadAsync deal with the
     // half-released native handle than to hang the player forever.
+    // OTA-367 — the boot-front auto-apply runs before any native module
+    // has started, so there is nothing to release; skip straight to the
+    // reload. (This is also why applying here can't crash the way the
+    // old mid-load banner-tap could — no open native handles to race.)
+    if (skipTeardown) {
+      onStatus?.('Restarting to apply…');
+      try {
+        await Updates.reloadAsync();
+        return 'applied';
+      } catch (reloadErr) {
+        const m = reloadErr instanceof Error ? reloadErr.message : String(reloadErr);
+        onStatus?.('Restart failed');
+        onError?.(`reloadAsync error: ${m}. Please restart the app manually — your progress was saved.`);
+        return 'errored';
+      }
+    }
     onStatus?.('Releasing resources…');
     // Each dispose await is given 3 seconds. The existing module-
     // level `withTimeout` rejects on timeout; we want to RESOLVE
